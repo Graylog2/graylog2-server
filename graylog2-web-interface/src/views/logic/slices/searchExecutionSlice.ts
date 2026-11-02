@@ -154,6 +154,8 @@ export type SearchExecutors = {
     stopPolling?: (progress: number) => boolean;
   }) => Promise<SearchExecutionResult>;
   cancelJob: (jobIds: JobIds) => Promise<null>;
+  /** Stores a search before it is executed. Executors running unsaved searches return it unchanged. */
+  createSearch?: (search: Search) => Promise<Search>;
 };
 
 export const cancelExecutedJob =
