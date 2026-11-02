@@ -271,20 +271,132 @@
     "no_match": "沒有符合篩選條件的 Fleet"
   },
   "recent_activity": {
-    "title": "近期活動"
+    "title": "近期活動",
+    "empty": "目前沒有近期活動。"
   },
-  "collector_facts": {},
-  "connection_success": {},
-  "fleet_choice": {},
-  "ingest_endpoint": {},
-  "install_command": {},
-  "log_preview": {},
-  "next_steps": {},
-  "timeline": {},
-  "platform_picker": {},
-  "source_status": {},
-  "waiting_for_connection": {},
-  "settings": {},
+  "collector_facts": {
+    "title": "Collector",
+    "host": "主機",
+    "os": "作業系統",
+    "version": "版本",
+    "fleet": "Fleet",
+    "enrolled": "註冊時間",
+    "last_seen": "最後上線時間",
+    "hide_attributes": "隱藏屬性"
+  },
+  "connection_success": {
+    "offline": "Collector 曾成功連線一次，但自 <lastSeen /> 起便未再回報。",
+    "receiving": "Collector 已連線並正在傳送訊息。",
+    "waiting": "即將完成，Collector 已連線，我們正在等待其第一批訊息。",
+    "title": "正在設定 {{host}}",
+    "view_instances": "檢視執行個體",
+    "check_again": "重新檢查",
+    "log_preview": "日誌預覽",
+    "caption_messages": "顯示自 {{duration}} 前起接收到的訊息",
+    "caption_messages_checking": "顯示自 {{duration}} 前起接收到的訊息，每幾秒檢查一次",
+    "caption_system": "顯示自 {{duration}} 前起接收到的 Collector 系統訊息",
+    "caption_system_checking": "顯示自 {{duration}} 前起接收到的 Collector 系統訊息，每幾秒檢查一次"
+  },
+  "fleet_choice": {
+    "selected_heading": "此 Collector 的 Fleet",
+    "change": "變更 Fleet",
+    "heading": "為此 Collector 選擇 Fleet",
+    "create_new": "建立新的 Fleet",
+    "or": "或",
+    "select_existing": "選擇現有的 Fleet",
+    "select_existing_placeholder": "選擇現有的 Fleet..."
+  },
+  "ingest_endpoint": {
+    "setting_up": "正在設定 Collector...",
+    "confirm": "確認端點",
+    "create_input": "建立輸入",
+    "save": "儲存端點",
+    "hostname": "外部主機名稱",
+    "hostname_placeholder": "例如：otlp.example.com",
+    "port": "外部連接埠",
+    "cancel": "取消",
+    "reachability_hint": "Collector 會將日誌傳送至此位址。每台 Collector 主機都必須能連線到此位址，可以是負載平衡器，或此伺服器本身。",
+    "confirm_title": "確認 Collector 如何將資料傳送至此叢集",
+    "change": "變更端點",
+    "sending_to": "Collector 會將資料傳送至此叢集的 <endpoint />",
+    "no_input_title": "不存在擷取輸入",
+    "no_input": "Collector 可以註冊，但在建立輸入之前將無法傳送資料。",
+    "not_running_title": "<endpoint /> 上的擷取輸入未在執行",
+    "not_running": "Collector 可以註冊，但在輸入執行之前將無法傳送資料。",
+    "manage_input": "管理輸入"
+  },
+  "install_command": {
+    "title": "在 {{platform}} 上執行此指令",
+    "copy": "複製指令",
+    "note_expires": "下載並安裝 Collector，將其註冊至所選的 Fleet，並啟動服務。需要系統管理員權限。權杖將於 {{duration}} 後過期。",
+    "note_never_expires": "下載並安裝 Collector，將其註冊至所選的 Fleet，並啟動服務。需要系統管理員權限。此權杖永不過期。"
+  },
+  "log_preview": {
+    "unavailable": "無法使用日誌預覽 — {{error}}",
+    "loading": "正在載入日誌預覽...",
+    "empty": "尚無訊息，每幾秒檢查一次"
+  },
+  "next_steps": {
+    "explore": "探索您的資料",
+    "explore_description": "開啟搜尋並篩選為此 Collector",
+    "configure_sources": "設定來源",
+    "configure_sources_description": "新增或調整此 Fleet 收集的內容",
+    "manage_fleets": "管理 Fleet",
+    "manage_fleets_description": "將此 Collector 移至永久的 Fleet",
+    "install_another": "安裝另一個 Collector",
+    "install_another_description": "在另一台主機上重複此設定",
+    "offline_title": "讓它重新上線",
+    "check_service": "請確認主機上的 Collector 服務正在執行。",
+    "check_reachability": "請確認主機可以連線到此 {{productName}} 伺服器。",
+    "check_logs": "請在下方的預覽中檢查 Collector 自身的日誌，查看是否有連線錯誤。",
+    "title": "後續步驟"
+  },
+  "timeline": {
+    "connection_lost": "連線中斷",
+    "last_heartbeat": "最後心跳時間 <lastSeen />",
+    "first_messages": "首批訊息",
+    "listening": "等待中...通常不到一分鐘",
+    "enrolled": "已註冊",
+    "enrolled_detail": "已使用註冊權杖登錄 - <enrolledAt />",
+    "connected": "已連線",
+    "connected_detail": "已收到心跳 - <lastSeen />",
+    "sources_configured": "來源已設定"
+  },
+  "platform_picker": {
+    "title": "開始使用 Collector",
+    "description": "在您的基礎架構中部署輕量型 Collector，將日誌轉送至 {{productName}}。"
+  },
+  "source_status": {
+    "disabled": "已停用",
+    "not_applicable": "不適用於 {{os}}",
+    "unrecognised": "無法辨識的來源類型",
+    "paused": "已暫停 — Collector 離線",
+    "no_messages": "尚無訊息",
+    "waiting": "等待第一批訊息...",
+    "title": "日誌來源",
+    "no_sources": "此 Fleet 尚未設定來源。"
+  },
+  "waiting_for_connection": {
+    "status": "等待連線... {{seconds}} 秒"
+  },
+  "settings": {
+    "getting_started": "開始使用 Collector",
+    "getting_started_cloud": "Collector 會連線至受管理的擷取端點以傳送資料。儲存 Collector 設定以初始化 Collector 基礎架構。設定完成後，您可以建立 Fleet、新增來源，並將 Collector 部署到您的主機。",
+    "getting_started_self_managed": "Collector 需要擷取端點來接收收集到的資料。請在下方設定 HTTP 端點並儲存，以初始化 Collector 基礎架構。設定完成後，您可以建立 Fleet、新增來源，並將 Collector 部署到您的主機。",
+    "ingest_endpoint": "擷取端點",
+    "ingest_endpoint_cloud": "擷取端點由系統管理。Collector 會自動連線至此。",
+    "ingest_endpoint_help": "擷取端點透過 OpenTelemetry (OTLP) 接收來自 Collector 的日誌資料。這是推送給受管理 Collector 的外部資料目的地位址，必須路由至正在執行的 Collector 擷取輸入。通常是負載平衡器或伺服器本身的位址。",
+    "hostname_help": "Collector 用於連線的主機名稱或 IP 位址。必須能從 Collector 主機連線。",
+    "create_input": "建立擷取輸入",
+    "lifecycle": "Collector 生命週期",
+    "offline_threshold": "離線門檻",
+    "offline_threshold_help": "在此時間內未回報的 Collector 將顯示為離線。",
+    "default_visibility": "預設可見性",
+    "default_visibility_help": "在此時間內未回報的 Collector 將從預設檢視中隱藏。使用者可在執行個體表格中調整或移除此篩選條件。",
+    "expiration_threshold": "過期門檻",
+    "expiration_threshold_help": "在此時間內未回報的 Collector 將被永久移除。",
+    "confirm": "確認設定"
+  },
   "ingest_inputs": {},
   "port_mismatch": {},
   "source_types": {},
