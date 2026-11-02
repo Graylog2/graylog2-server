@@ -48,6 +48,32 @@ const FLAGS: { [code in LanguageCode]: React.ReactNode } = {
       <rect y="20" width="60" height="10" fill="#FFCE00" />
     </>
   ),
+  es: (
+    <>
+      <rect width="60" height="30" fill="#AA151B" />
+      <rect y="7.5" width="60" height="15" fill="#F1BF00" />
+    </>
+  ),
+  fr: (
+    <>
+      <rect width="20" height="30" fill="#0055A4" />
+      <rect x="20" width="20" height="30" fill="#FFFFFF" />
+      <rect x="40" width="20" height="30" fill="#EF4135" />
+    </>
+  ),
+  'pt-BR': (
+    <>
+      <rect width="60" height="30" fill="#009C3B" />
+      <path d="M30,3 L55,15 L30,27 L5,15 z" fill="#FFDF00" />
+      <circle cx="30" cy="15" r="7" fill="#002776" />
+    </>
+  ),
+  'zh-CN': (
+    <>
+      <rect width="60" height="30" fill="#DE2910" />
+      <path d="M10,4 L12,10 L18,10 L13,14 L15,20 L10,16 L5,20 L7,14 L2,10 L8,10 z" fill="#FFDE00" />
+    </>
+  ),
   [PSEUDO_LANGUAGE]: <rect width="60" height="30" fill="#8C8C8C" />,
 };
 
