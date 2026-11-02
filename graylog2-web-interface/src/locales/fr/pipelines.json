@@ -123,21 +123,136 @@
       "actions": "Actions"
     }
   },
-  "stage": {},
-  "stage_form": {},
-  "used_in_pipelines": {},
-  "deprecation": {},
-  "rule_form": {},
-  "rule_list_entry": {},
-  "metrics_config": {},
-  "rule_simulation": {},
-  "convert_modal": {},
-  "block_display": {},
-  "block": {},
-  "builder_form": {},
-  "block_form": {},
-  "block_field": {},
-  "builder": {},
+  "stage": {
+    "last_stage": "Il n'y a plus d'étapes dans ce pipeline. Une fois les règles de cette étape appliquées, le traitement du pipeline sera terminé.",
+    "continue_all": "Les messages satisfaisant <matchText>toutes les règles</matchText> de cette étape passeront à l'étape suivante.",
+    "continue_either": "Les messages satisfaisant <matchText>au moins une règle</matchText> de cette étape passeront à l'étape suivante.",
+    "continue_pass": "Les messages satisfaisant <matchText>aucune ou plusieurs règles</matchText> de cette étape passeront à l'étape suivante.",
+    "continue_unknown": "Les messages satisfaisant <matchText>UNKNOWN</matchText> dans cette étape passeront à l'étape suivante.",
+    "title": "Étape {{stage}}",
+    "remove_routing_rule_title": "Supprimer la règle de routage",
+    "remove_routing_rule_confirm": "Voulez-vous vraiment supprimer la règle de routage <ruleTitle>{{title}}</ruleTitle> ?"
+  },
+  "stage_form": {
+    "rules_help": "Sélectionnez les règles évaluées à cette étape, ou créez-en une sur la <rulesLink>page Règles de pipeline</rulesLink>.",
+    "add_button": "Ajouter une nouvelle étape",
+    "add_title": "Ajouter la nouvelle étape {{stage}}",
+    "edit_title": "Modifier l'étape {{stage}}",
+    "add_submit": "Ajouter l'étape",
+    "update_submit": "Mettre à jour l'étape",
+    "stage": "Étape",
+    "stage_in_use": "Cette étape est déjà utilisée. Veuillez utiliser un autre numéro ou modifier l'étape existante.",
+    "stage_help": "Priorité de l'étape. Plus le numéro est petit, plus l'étape est exécutée tôt.",
+    "continue_when": "Poursuivre le traitement à l'étape suivante lorsque",
+    "match_all": "Toutes les règles de cette étape correspondent au message",
+    "match_any": "Au moins une des règles de cette étape correspond au message",
+    "match_pass": "Aucune ou plusieurs règles de cette étape correspondent",
+    "stage_rules": "Règles de l'étape"
+  },
+  "used_in_pipelines": {
+    "label": "Utilisée dans les pipelines",
+    "help": "Pipelines qui utilisent cette règle dans une ou plusieurs de leurs étapes.",
+    "none": "Cette règle n'est utilisée dans aucun pipeline."
+  },
+  "deprecation": {
+    "label": "Fonction obsolète",
+    "title_rule": "Cette règle contient au moins une fonction obsolète :",
+    "title_pipeline": "Ce pipeline contient au moins une fonction obsolète :"
+  },
+  "rule_form": {
+    "duplicate_title": "Le titre de règle \"{{title}}\" existe déjà !",
+    "title": "Titre",
+    "title_help": "Vous pouvez définir le titre de la règle dans sa source. Consultez la référence rapide pour plus d'informations.",
+    "leave_question": "Voulez-vous vraiment quitter cette page et perdre vos modifications ? Cette action est irréversible.",
+    "description": "Description",
+    "description_help": "Description de la règle (facultative).",
+    "source": "Source de la règle",
+    "source_help": "Source de la règle, consultez la référence rapide pour plus d'informations.",
+    "create_submit": "Créer la règle",
+    "update_close_submit": "Mettre à jour la règle et fermer",
+    "update": "Mettre à jour la règle"
+  },
+  "rule_list_entry": {
+    "edit": "Modifier",
+    "delete_title": "Supprimer la règle",
+    "delete": "Supprimer",
+    "managed": "Géré par Application",
+    "throughput_suffix": "msg/s",
+    "errors_suffix": "erreurs/s"
+  },
+  "metrics_config": {
+    "loading": "Chargement de la configuration des métriques...",
+    "title": "Configuration des métriques de règles",
+    "submit": "Mettre à jour la configuration",
+    "warning": "Les métriques de règles ne doivent être activées que pour déboguer un problème de performance, car leur collecte ralentit le traitement des messages et augmente l'utilisation de la mémoire.",
+    "enable": "Activer les métriques de règles",
+    "disable": "Désactiver les métriques de règles",
+    "pipeline_load_info": "L'activation de ces métriques ajoute une nouvelle colonne aux pages Pipeline et Règle de pipeline, appelée <columnName>Charge du pipeline</columnName>, qui affiche en pourcentage la part relative du temps de thread consommée par chacun de vos pipelines.",
+    "rule_load_info": "L'activation de ces métriques ajoute également une nouvelle colonne à la page Détails du pipeline, appelée <columnName>Charge de la règle</columnName>. Elle permet d'identifier les règles de pipeline les plus coûteuses dans le pipeline sélectionné."
+  },
+  "rule_simulation": {
+    "error_builder": "Impossible d'exécuter la simulation de règle. Veuillez corriger les erreurs de l'éditeur de règles.",
+    "placeholder_simple": "champ de message simple",
+    "invalid_json": "JSON invalide !",
+    "title": "Simulation de règle",
+    "optional": "(facultatif)",
+    "json": "JSON",
+    "key_value": "Clé-valeur",
+    "simple_message": "Message simple",
+    "input_title": "Champ de message simple, paires clé-valeur ou JSON",
+    "input_help": "Saisissez une chaîne normale pour simuler le champ de message, des paires clé-valeur, ou un JSON pour simuler le message entier.",
+    "run": "Exécuter la simulation de règle",
+    "reset": "Réinitialiser",
+    "conditions_output": "Sortie des conditions",
+    "actions_output": "Sortie des actions"
+  },
+  "convert_modal": {
+    "no_title": "<sans titre>",
+    "no_code": "<aucun code>",
+    "create_rule": "Créer une nouvelle règle à partir du code",
+    "copied": "Code source de la règle copié dans le presse-papiers !",
+    "copy_close": "Copier et fermer"
+  },
+  "block_display": {
+    "number": "Numéro",
+    "not": "Non",
+    "deprecated": "Obsolète",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "duplicate": "Dupliquer",
+    "insert_above": "Insérer au-dessus",
+    "insert_below": "Insérer en dessous"
+  },
+  "block": {
+    "insert_title_above": "Insérer une nouvelle action au-dessus de l'action n°{{order}}",
+    "insert_title_below": "Insérer une nouvelle action en dessous de l'action n°{{order}}"
+  },
+  "builder_form": {
+    "title": "Titre",
+    "title_help": "Titre de la règle.",
+    "description": "Description",
+    "description_help": "Description de la règle (facultative)."
+  },
+  "block_form": {
+    "add_condition": "Ajouter une condition",
+    "add_action": "Ajouter une action",
+    "syntax_help": "Aide sur la syntaxe des fonctions",
+    "update": "Mettre à jour",
+    "add": "Ajouter"
+  },
+  "block_field": {
+    "no_dollar": "Les champs commençant par « $ » ne sont pas autorisés.",
+    "use_previous_output": "Utiliser la sortie des étapes précédentes",
+    "set_custom": "Définir {{name}} personnalisé",
+    "select_output": "Sélectionner une sortie dans la liste",
+    "output_from_step": "Sortie de l'étape {{step}} ({{name}})",
+    "type_not_found": "Aucune action précédente ne renvoie le type {{type}}",
+    "true": "vrai",
+    "false": "faux"
+  },
+  "builder": {
+    "title": "Éditeur de règles"
+  },
   "helper": {},
   "helper_table": {},
   "simulator": {},
