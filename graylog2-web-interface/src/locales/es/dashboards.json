@@ -1,1 +1,48 @@
-{}
+{
+  "human_name": "dashboards",
+  "full_screen": {
+    "menu": "Pantalla completa",
+    "title": "Configurar pantalla completa",
+    "start": "Iniciar la vista de pantalla completa",
+    "refresh_interval": "Intervalo de actualización",
+    "refresh_interval_help": "¿Cada cuántos segundos debe actualizarse el dashboard?",
+    "tabs": "Pestañas",
+    "tabs_help": "Selecciona las pestañas de consulta que se incluirán en la rotación.",
+    "cycle_interval": "Intervalo de cambio de pestaña",
+    "cycle_interval_help": "¿Cada cuántos segundos debe mostrarse la siguiente pestaña?"
+  },
+  "properties": {
+    "title": "Título",
+    "title_help": "El título del dashboard.",
+    "summary": "Resumen",
+    "summary_help": "Un resumen útil del dashboard.",
+    "description": "Descripción",
+    "description_help": "Una descripción más extensa y útil del dashboard y de su funcionalidad."
+  },
+  "overview": {
+    "missing_requirements": "Requisitos que faltan",
+    "user_defined": "Definido por el usuario",
+    "load_failed": "Error al cargar los dashboards. Estado:",
+    "could_not_load": "No se han podido cargar los dashboards"
+  },
+  "delete": {
+    "confirm": "¿Seguro que quieres eliminar \"{{title}}\"?",
+    "success": "El dashboard \"{{title}}\" se ha eliminado correctamente.",
+    "success_title": "¡Correcto!",
+    "failed": "Error al eliminar el dashboard: {{error}}",
+    "failed_title": "¡Error!"
+  },
+  "bulk_delete": {
+    "confirm_one": "¿Seguro que quieres eliminar {{count}} dashboard?",
+    "confirm_other": "¿Seguro que quieres eliminar {{count}} dashboards?",
+    "partial_failure_one": "{{failed}} de {{count}} dashboard seleccionado no se ha podido eliminar.",
+    "partial_failure_other": "{{failed}} de {{count}} dashboards seleccionados no se han podido eliminar.",
+    "success_one": "{{count}} dashboard se ha eliminado correctamente.",
+    "success_other": "{{count}} dashboards se han eliminado correctamente.",
+    "success_title": "Correcto",
+    "failed": "Se ha producido un error al eliminar los dashboards. {{error}}",
+    "confirm_many": "¿Seguro que quieres eliminar {{count}} dashboards?",
+    "partial_failure_many": "{{failed}} de {{count}} dashboards seleccionados no se han podido eliminar.",
+    "success_many": "{{count}} dashboards se han eliminado correctamente."
+  }
+}
