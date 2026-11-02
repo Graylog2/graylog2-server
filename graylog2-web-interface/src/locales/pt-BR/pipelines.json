@@ -1,1 +1,157 @@
-{}
+{
+  "title": "Pipelines",
+  "overview_header_title": "Visão geral dos pipelines",
+  "documentation_link_title": "Documentação de pipelines",
+  "overview_description": "Pipelines permitem transformar e processar mensagens provenientes de streams. Pipelines são compostos por estágios nos quais as regras são avaliadas e aplicadas. As mensagens podem passar por um ou mais estágios.",
+  "new_pipeline": "Novo pipeline",
+  "pipeline_details_title": "Pipeline {{title}}",
+  "pipeline_details_description": "Pipelines permitem transformar e processar mensagens provenientes de streams. Pipelines são compostos por estágios nos quais as regras são avaliadas e aplicadas. As mensagens podem passar por um ou mais estágios.\nAo final de cada estágio, você pode decidir se as mensagens que correspondem a todas ou a uma das regras continuam para o próximo estágio.",
+  "rules_page_title": "Regras de pipeline",
+  "rules_page_header_title": "Regras de Pipeline",
+  "rules_page_documentation_link": "Documentação de regras de pipeline",
+  "rules_page_description": "Regras são uma forma de aplicar alterações às mensagens. Uma regra consiste em uma condição e uma lista de ações. A condição é avaliada em uma mensagem, e as ações são executadas se a condição for satisfeita.",
+  "rules_delete_confirm": "Você realmente deseja excluir a regra \"{{title}}\"?",
+  "rule_details_new_title": "Nova regra de pipeline",
+  "rule_details_title": "Regra de pipeline {{title}}",
+  "rule_details_loading": "Carregando detalhes da regra...",
+  "loading_rule": "Carregando regra",
+  "create_pipeline_rule": "Criar regra de pipeline",
+  "pipeline_rule": "Regra de pipeline <ruleTitle>{{title}}</ruleTitle>",
+  "use_source_code_editor": "Usar editor de código-fonte",
+  "rule_is_managed_warning": "Esta regra é gerenciada pelo Application. Você não pode editá-la.",
+  "switch_to_source_code_editor": "Mudar para o editor de código-fonte",
+  "switch_to_source_code_editor_confirm_text": "Você está prestes a sair desta página e ir para o editor de código-fonte.",
+  "switch_to_source_code_editor_confirm_warning": "Certifique-se de não ter alterações não salvas.",
+  "pipeline_new": {
+    "description": "Dê um nome e uma descrição ao novo pipeline. Você pode adicionar estágios a ele ao salvar as alterações."
+  },
+  "processing_errors": {
+    "rate_suffix": "erros/s",
+    "total": "({{total}} no total)"
+  },
+  "timeline": {
+    "entity_name": "Pipeline",
+    "delete_confirm": "Você realmente deseja excluir o pipeline \"{{title}}\"? Esta ação não pode ser desfeita.",
+    "filter_label": "Filtrar pipelines",
+    "no_pipelines": "Nenhum pipeline foi encontrado",
+    "headers": {
+      "pipeline": "Pipeline",
+      "connected_streams": "Conectado a streams",
+      "processing_errors": "Erros de processamento",
+      "pipeline_load": "Carga do pipeline (15m)",
+      "processing_timeline": "Linha do tempo de processamento",
+      "actions": "Ações"
+    }
+  },
+  "debug_metrics": {
+    "banner_title": "Métricas de depuração estão ativadas",
+    "banner_text": "As métricas de depuração aumentam a sobrecarga no processamento de mensagens e o uso de memória. Desative-as quando terminar a solução de problemas. Os valores de Carga do pipeline são suavizados em uma janela de 15 minutos e podem levar alguns minutos para se estabilizar após a ativação.",
+    "disable": "Desativar métricas de depuração",
+    "enable": "Ativar métricas de depuração",
+    "help": "Carga do pipeline (15m) mostra a parcela relativa do tempo de execução das regras de pipeline no cluster. Ative as métricas de depuração para começar a coletar dados de temporizador. Os valores podem levar até cerca de 15 minutos para serem preenchidos após a ativação, e a coleta adiciona sobrecarga ao processamento de mensagens."
+  },
+  "pipeline": {
+    "not_connected": "Este pipeline não está conectado a nenhum stream no momento. Você precisa conectar um pipeline a pelo menos um stream para que ele processe as mensagens recebidas. Observe que isso não é necessário se você pretende usar este pipeline apenas para transformar resultados de pesquisa com decorators.",
+    "delete_stage_confirm": "Você está prestes a excluir o estágio {{stage}}. Tem certeza de que deseja continuar?",
+    "list_and": " e ",
+    "managed_1": "Este pipeline é gerenciado pelo sistema e só pode ser editado de forma limitada.",
+    "managed_2": "Regras de pipeline só podem ser adicionadas a este pipeline pelo Assistente de entradas.",
+    "managed_3": "As regras de pipeline neste pipeline serão renomeadas automaticamente para refletir quaisquer alterações no nome da entrada correspondente.",
+    "managed_4": "As regras de pipeline podem ser removidas manualmente deste pipeline, mas não adicionadas manualmente.",
+    "connections_title": "Conexões do pipeline",
+    "no_connections": "Selecione os streams que serão processados por este pipeline.",
+    "stages_title": "Estágios do pipeline",
+    "stages_description": "Estágios são grupos de condições e ações que precisam ser executados em ordem e fornecem o controle de fluxo necessário para decidir se o restante do pipeline deve ser executado.",
+    "no_rules_on_stage": "Não há regras neste estágio."
+  },
+  "connections_form": {
+    "streams_help": "Selecione os streams que você deseja conectar a este pipeline ou crie um na <streamsLink>página Streams</streamsLink>.",
+    "edit": "Editar conexões",
+    "title": "Editar conexões de <pipelineTitle>{{title}}</pipelineTitle>",
+    "submit": "Atualizar conexões",
+    "streams": "Streams"
+  },
+  "details": {
+    "title": "Detalhes",
+    "title_label": "Título",
+    "description": "Descrição",
+    "created": "Criado",
+    "last_modified": "Última modificação",
+    "throughput": "Throughput atual",
+    "throughput_suffix": "msg/s"
+  },
+  "form": {
+    "title": "Título",
+    "title_help": "Nome do pipeline.",
+    "description": "Descrição",
+    "description_help": "Descrição do pipeline.",
+    "add_button": "Adicionar novo pipeline",
+    "edit_button": "Editar detalhes do pipeline",
+    "add_title": "Adicionar novo pipeline {{title}}",
+    "edit_title": "Editar pipeline {{title}}",
+    "add_submit": "Adicionar pipeline",
+    "update_submit": "Atualizar pipeline",
+    "create_submit": "Criar pipeline"
+  },
+  "list_item": {
+    "idle": "Ocioso",
+    "stage": "Estágio {{stage}}",
+    "loading": "Carregando pipeline...",
+    "managed": "Gerenciado pelo Application",
+    "throughput_prefix": "Throughput:",
+    "throughput_suffix": "msg/s",
+    "not_connected": "Não conectado",
+    "edit_aria": "Editar pipeline",
+    "edit": "Editar",
+    "delete_aria": "Excluir pipeline",
+    "delete": "Excluir"
+  },
+  "stage_rules": {
+    "invalid_rule": "A regra {{name}} foi renomeada ou removida. Esta regra será ignorada.",
+    "throughput_suffix": "msg/s",
+    "errors_suffix": "erros/s",
+    "remove_title": "Remover {{title}}",
+    "removing": "Removendo...",
+    "remove": "Remover",
+    "no_rules": "Este estágio ainda não tem regras. Clique em editar para adicionar algumas.",
+    "headers": {
+      "title": "Título",
+      "description": "Descrição",
+      "throughput": "Throughput",
+      "errors": "Erros",
+      "rule_load": "Carga de regra (15m)",
+      "actions": "Ações"
+    }
+  },
+  "stage": {},
+  "stage_form": {},
+  "used_in_pipelines": {},
+  "deprecation": {},
+  "rule_form": {},
+  "rule_list_entry": {},
+  "metrics_config": {},
+  "rule_simulation": {},
+  "convert_modal": {},
+  "block_display": {},
+  "block": {},
+  "builder_form": {},
+  "block_form": {},
+  "block_field": {},
+  "builder": {},
+  "helper": {},
+  "helper_table": {},
+  "simulator": {},
+  "simulation_changes": {},
+  "simulation_preview": {},
+  "simulation_trace": {},
+  "simulation_results": {},
+  "simulator_page": {},
+  "rule_notifications": {},
+  "page_navigation": {},
+  "pipeline_notifications": {},
+  "connections_list": {},
+  "rule_list": {
+    "headers": {}
+  },
+  "load_cell": {}
+}
