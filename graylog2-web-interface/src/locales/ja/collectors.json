@@ -397,37 +397,164 @@
     "expiration_threshold_help": "この時間内にレポートしなかった Collectors は、完全に削除されます。",
     "confirm": "設定を確定"
   },
-  "ingest_inputs": {},
+  "ingest_inputs": {
+    "title": "取り込み入力",
+    "none": "Collector の取り込み入力が存在しません。入力が作成されるまで、Collectors はデータを送信できません。",
+    "none_running": "Collector の取り込み入力は存在しますが、現在実行中のものはありません。Collectors はデータを送信できません。",
+    "name": "名前",
+    "status": "ステータス",
+    "bind_address": "バインドアドレス",
+    "port": "ポート",
+    "manage": "管理"
+  },
   "port_mismatch": {},
-  "source_types": {},
-  "source_columns": {},
-  "source_form": {},
+  "source_types": {
+    "file": "ファイル",
+    "journald": "Journald",
+    "windows_event_log": "Windows イベントログ",
+    "macos_unified_logging": "macOS 統合ロギング"
+  },
+  "source_columns": {
+    "enabled": "有効"
+  },
+  "source_form": {
+    "max_poll_interval_error": "最大ポーリング間隔は 1 秒以上である必要があります。",
+    "max_log_age_error": "最大ログ保持期間は 0 または正の値である必要があります。",
+    "read_mode_end": "末尾から (tail)",
+    "read_mode_beginning": "先頭から",
+    "file_paths": "ファイルパス",
+    "file_paths_help": "グロブパターンに対応しています (例: /var/log/*.log, /var/log/**/*.log)。Collector は一致したファイルに新しい行がないか監視します。",
+    "read_mode": "読み取りモード",
+    "read_mode_file_help": "末尾から: Collector の起動後に追加された新しい行のみを収集します。先頭から: 既存のすべての行を先に収集し、その後は末尾の監視を続けます。",
+    "read_mode_journald_help": "末尾から: Collector の起動後に追加された新しいエントリのみを収集します。先頭から: 既存のすべてのエントリを先に収集し、その後は末尾の監視を続けます。",
+    "priority": "優先度",
+    "priority_help": "収集する最低の重要度です。たとえば「エラー」を選択すると、重大、アラート、緊急のエントリも収集されます。",
+    "priority_emerg": "緊急",
+    "priority_alert": "アラート",
+    "priority_crit": "重大",
+    "priority_err": "エラー",
+    "priority_warning": "警告",
+    "priority_notice": "通知",
+    "priority_info": "情報",
+    "priority_debug": "デバッグ",
+    "match_pattern": "一致パターン",
+    "match_pattern_help": "ユニットやプロセスなどでエントリをフィルターするための任意の journald マッチ式です。例: _SYSTEMD_UNIT=nginx.service",
+    "channels": "チャネル",
+    "channels_help": "カンマ区切りのチャネル名です (例: Application, Security, System)",
+    "include_default_channels": "既定のチャネルを含める",
+    "include_default_channels_help": "既定値は {{channels}} です",
+    "predicate": "述語",
+    "predicate_help": "<code>log</code> コマンドに渡される、任意の macOS 統合ロギング用のフィルター述語です。空のままにすると、システムのすべてのログが収集されます。<code>info</code> および <code>debug</code> レベルは、ノイズが多く価値のある情報がほとんどないため、現在収集されません。例: <code>{{example}}</code>",
+    "max_poll_interval": "最大ポーリング間隔",
+    "max_poll_interval_help": "Collector が新しいログエントリを確認する頻度です。1 秒以上である必要があります。",
+    "max_log_age": "最大ログ保持期間",
+    "max_log_age_help": "初回起動時に、どこまで遡ってログを取り込むかを指定します。0 に設定すると、遡った取り込みを無効にします。",
+    "edit_title": "ソースを編集",
+    "new_title": "新しいソース",
+    "description": "ソースは、このフリートの Collectors が収集すべきデータを定義します。ソースタイプごとに異なる収集方法に対応しています。",
+    "source_type": "ソースタイプ",
+    "file_type_help": "ホスト上のファイルからログ行を収集します。複数のファイルに一致させるためのグロブパターンに対応しています。",
+    "journald_type_help": "systemd journal からエントリを収集します (Linux のみ)。",
+    "windows_type_help": "Windows イベントビューアーのチャネルからイベントを収集します。",
+    "macos_type_help": "<code>log</code> コマンドを介して macOS 統合ロギングシステムから収集します (macOS のみ)。",
+    "enabled_help": "無効にしたソースは Collectors に送信されません。ソースを削除せずに一時的に収集を停止するために使用します。",
+    "update": "ソースを更新",
+    "create": "ソースを作成"
+  },
   "load_errors": {
-    "recent_activity": {},
-    "input_ids": {},
-    "stats": {},
-    "config": {},
-    "enrollment_tokens": {},
-    "pending_changes": {},
-    "instances": {},
-    "collector_instances": {},
-    "fleets": {},
-    "fleet": {},
-    "fleet_stats": {},
-    "sources": {},
-    "input_details": {}
+    "recent_activity": {
+      "message": "最近のアクティビティの読み込みに失敗しました。ステータス:",
+      "title": "最近のアクティビティを読み込めませんでした"
+    },
+    "input_ids": {
+      "message": "Collector の入力 ID の読み込みに失敗しました。ステータス:",
+      "title": "Collector の入力 ID を読み込めませんでした。"
+    },
+    "stats": {
+      "message": "Collector の統計の読み込みに失敗しました。ステータス:",
+      "title": "Collector の統計を読み込めませんでした。"
+    },
+    "config": {
+      "message": "Collectors の設定の読み込みに失敗しました。ステータス:",
+      "title": "Collectors の設定を読み込めませんでした。"
+    },
+    "enrollment_tokens": {
+      "message": "登録トークンの読み込みに失敗しました。ステータス:",
+      "title": "登録トークンを読み込めませんでした"
+    },
+    "pending_changes": {
+      "message": "保留中の変更の読み込みに失敗しました。ステータス:",
+      "title": "保留中の変更を読み込めませんでした"
+    },
+    "instances": {
+      "message": "インスタンスの読み込みに失敗しました。ステータス:",
+      "title": "インスタンスを読み込めませんでした"
+    },
+    "collector_instances": {
+      "message": "Collector インスタンスの読み込みに失敗しました。ステータス:",
+      "title": "Collector インスタンスを読み込めませんでした"
+    },
+    "fleets": {
+      "message": "フリートの読み込みに失敗しました。ステータス:",
+      "title": "フリートを読み込めませんでした"
+    },
+    "fleet": {
+      "message": "フリートの読み込みに失敗しました。ステータス:",
+      "title": "フリートを読み込めませんでした"
+    },
+    "fleet_stats": {
+      "message": "フリートの統計の読み込みに失敗しました。ステータス:",
+      "title": "フリートの統計を読み込めませんでした"
+    },
+    "sources": {
+      "message": "ソースの読み込みに失敗しました。ステータス:",
+      "title": "ソースを読み込めませんでした"
+    },
+    "input_details": {
+      "message": "Collector の入力の詳細の読み込みに失敗しました。ステータス: {{error}}",
+      "title": "Collector の入力の詳細を読み込めませんでした。"
+    }
   },
   "mutation_errors": {
-    "create_fleet": {},
-    "update_fleet": {},
-    "delete_fleet": {},
-    "create_source": {},
-    "update_source": {},
-    "delete_source": {},
-    "create_enrollment_token": {},
-    "delete_enrollment_token": {},
-    "delete_enrollment_tokens": {},
-    "reassign_instances": {},
+    "create_fleet": {
+      "message": "フリートの作成に失敗しました: {{error}}",
+      "title": "フリートを作成できませんでした"
+    },
+    "update_fleet": {
+      "message": "フリートの更新に失敗しました: {{error}}",
+      "title": "フリートを更新できませんでした"
+    },
+    "delete_fleet": {
+      "message": "フリートの削除に失敗しました: {{error}}",
+      "title": "フリートを削除できませんでした"
+    },
+    "create_source": {
+      "message": "ソースの作成に失敗しました: {{error}}",
+      "title": "ソースを作成できませんでした"
+    },
+    "update_source": {
+      "message": "ソースの更新に失敗しました: {{error}}",
+      "title": "ソースを更新できませんでした"
+    },
+    "delete_source": {
+      "message": "ソースの削除に失敗しました: {{error}}",
+      "title": "ソースを削除できませんでした"
+    },
+    "create_enrollment_token": {
+      "message": "登録トークンの作成に失敗しました: {{error}}",
+      "title": "登録トークンを作成できませんでした"
+    },
+    "delete_enrollment_token": {
+      "message": "登録トークンの削除に失敗しました: {{error}}",
+      "title": "登録トークンを削除できませんでした"
+    },
+    "delete_enrollment_tokens": {
+      "message": "登録トークンの削除に失敗しました: {{error}}",
+      "title": "登録トークンを削除できませんでした"
+    },
+    "reassign_instances": {
+      "message": "インスタンスの再割り当てに失敗しました: {{error}}"
+    },
     "delete_instance": {},
     "save_config": {},
     "create_input": {},
