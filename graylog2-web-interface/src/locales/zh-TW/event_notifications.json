@@ -227,7 +227,15 @@
     "load_failed_title": "無法載入事件通知"
   },
   "test": {
-    "success": "通知已成功執行。"
+    "success": "通知已成功執行。",
+    "validation_failed": "驗證失敗，請先更正表單中的所有錯誤再繼續。",
+    "unknown_error": "未知錯誤，請查看伺服器日誌。",
+    "unknown_error_product": "未知錯誤，請查看 {{productName}} 伺服器日誌。"
   },
-  "bulk": {}
+  "bulk": {
+    "delete_confirm_other": "確定要移除 {{count}} 個事件通知嗎？",
+    "delete_failed_other": "所選的 {{count}} 個事件通知中，有 {{failed}} 個無法刪除。狀態：{{status}}",
+    "delete_success_other": "已成功刪除 {{count}} 個事件通知。",
+    "success_title": "成功"
+  }
 }
