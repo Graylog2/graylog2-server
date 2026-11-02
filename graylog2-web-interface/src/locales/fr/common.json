@@ -248,36 +248,161 @@
     "add_favorite_failed_title": "Impossible d'ajouter le champ aux favoris",
     "remove_favorite_failed": "Échec de la suppression du champ des favoris avec l'erreur : {{error}}",
     "remove_favorite_failed_title": "Impossible de supprimer le champ des favoris",
-    "field_terms": "Termes du champ :"
+    "field_terms": "Termes du champ :",
+    "received_by_radio_value": "via <inputName/> sur le radio <node/>"
   },
-  "entity_types": {},
-  "chips_cell": {},
-  "compact_pagination": {},
-  "expandable_checkbox_list_item": {},
-  "traffic_graph": {},
-  "link_to_node": {},
-  "markdown": {},
-  "public_notifications": {},
-  "refresh_controls": {},
-  "scroll_button": {},
-  "section": {},
-  "selectable_list": {},
-  "share_menu_item": {},
-  "status_icon": {},
-  "type_ahead_field_input": {},
+  "entity_types": {
+    "user": "utilisateur",
+    "team": "équipe",
+    "dashboard": "dashboard",
+    "event_definition": "définition d'événement",
+    "notification": "notification",
+    "search": "recherche",
+    "stream": "stream",
+    "search_filter": "filtre de recherche",
+    "report": "rapport",
+    "role": "rôle",
+    "output": "output",
+    "sigma_rule": "règle Sigma",
+    "event_procedure": "procédure d'événement",
+    "event_procedure_step": "étape de procédure d'événement",
+    "collection": "collection",
+    "collection_entities": "entités de la collection"
+  },
+  "marketplace_link": "la Marketplace {{productName}}",
+  "chips_cell": {
+    "show_fewer": "Afficher moins",
+    "show_all": "Tout afficher",
+    "filter_by": "Filtrer par {{itemLabel}} \"{{value}}\""
+  },
+  "compact_pagination": {
+    "previous_page": "Page précédente",
+    "select_page": "Sélectionner la page",
+    "next_page": "Page suivante",
+    "of_pages": "sur {{totalPages}}"
+  },
+  "expandable_checkbox_list_item": {
+    "select_item": "Sélectionner l'élément"
+  },
+  "traffic_graph": {
+    "days": "Jours",
+    "incoming": "Trafic entrant",
+    "outgoing": "Trafic sortant",
+    "last_days": "Derniers {{days}} jours : {{traffic}}"
+  },
+  "link_to_node": {
+    "unknown_node": "Nœud inconnu"
+  },
+  "markdown": {
+    "images_unsupported": "Les images ne sont pas prises en charge pour des raisons de sécurité. Veuillez activer les sources autorisées <configurationLink>ici</configurationLink>"
+  },
+  "public_notifications": {
+    "read_less": "Lire moins",
+    "read_more": "Lire la suite"
+  },
+  "refresh_controls": {
+    "controls_label": "Commandes d'actualisation {{humanName}}",
+    "below_minimum": "L'intervalle de <intervalDuration /> ({{interval}}) est inférieur à l'intervalle minimal configuré de <minimumDuration /> ({{minimum}})."
+  },
+  "scroll_button": {
+    "back_to_top": "Retour en haut"
+  },
+  "section": {
+    "toggle_section": "Afficher/masquer la section {{title, lowercase}}"
+  },
+  "selectable_list": {
+    "remove": "Supprimer"
+  },
+  "share_menu_item": {
+    "share": "Partager"
+  },
+  "status_icon": {
+    "yes": "Oui",
+    "no": "Non"
+  },
+  "type_ahead_field_input": {
+    "select_field": "Sélectionner un champ"
+  },
   "query_helper": {
-    "common_fields": {}
+    "title": "Aide sur la syntaxe de recherche",
+    "show_help": "Afficher l'aide sur la syntaxe de recherche",
+    "available_fields": "Champs de recherche disponibles",
+    "field": "Champ",
+    "description": "Description",
+    "examples": "Exemples",
+    "example_description": "Trouver tous les {{entityName}} dont la description contient security :",
+    "example_id": "Trouver un {{entityName}} avec l'id 5f4dfb9c69be46153b9a9a7b :",
+    "example_query_description": "description:security",
+    "example_query_id": "id:5f4dfb9c69be46153b9a9a7b",
+    "common_fields": {
+      "id": "Identifiant de {{entityName}}, qui est une référence unique.",
+      "title": "Titre de {{entityName}}.",
+      "name": "Nom de {{entityName}}.",
+      "description": "Courte description de {{entityName}}.",
+      "summary": "Résumé détaillé de {{entityName}}."
+    }
   },
-  "url_allow_list_modal": {},
-  "configuration_well": {},
-  "configuration_forms": {},
-  "enterprise_advertisement": {},
-  "plugin_list": {},
-  "reported_error": {},
-  "hotkeys": {},
-  "right_sidebar": {},
+  "url_allow_list_modal": {
+    "add": "Ajouter à la liste d'autorisation des URL",
+    "title": "Mettre à jour la configuration de la liste d'autorisation",
+    "submit": "Mettre à jour la configuration",
+    "urls": "URL autorisées"
+  },
+  "configuration_well": {
+    "empty": "<empty>",
+    "uploaded_file_content": "<uploaded file content>",
+    "no_configuration": "-- aucune configuration --"
+  },
+  "configuration_forms": {
+    "undo_reset": "Annuler la réinitialisation",
+    "remove": "Supprimer",
+    "title": "Titre",
+    "optional": "facultatif"
+  },
+  "enterprise_advertisement": {
+    "enterprise_title": "{{productName}} Enterprise",
+    "enterprise_description": "Conçu pour répondre aux besoins des équipes d'exploitation informatique et d'ingénierie logicielle aux ressources limitées, {{productName}} Enterprise propose de nombreuses améliorations de productivité qui vous feront gagner des milliers d'heures par an dans la collecte et l'analyse des données de journaux pour identifier la cause des problèmes de performance, de panne et d'erreur.",
+    "security_title": "{{productName}} Security",
+    "security_description": "Étendez les capacités de {{productName}} Open pour détecter, analyser et répondre aux menaces de cybersécurité grâce à des tableaux de bord et des alertes spécifiques à la sécurité, un moteur de détection d'anomalies basé sur l'IA et le ML, des intégrations avec d'autres outils de sécurité, des fonctionnalités SOAR et de nombreuses fonctionnalités de reporting de conformité.",
+    "request_now": "Demander maintenant"
+  },
+  "plugin_list": {
+    "plugin_enterprise": "Plugin {{productName}} Enterprise",
+    "installed": "{{pluginName}} est installé",
+    "not_installed": "{{pluginName}} n'est pas installé",
+    "status": "Voici l'état des modules {{productName}} Enterprise dans ce cluster :"
+  },
+  "reported_error": {
+    "title": "Une erreur s'est produite",
+    "description": "Une erreur inconnue s'est produite. Veuillez consulter le message suivant et le journal du serveur {{productName}} pour plus d'informations."
+  },
+  "hotkeys": {
+    "or": "ou",
+    "title": "Raccourcis clavier",
+    "view_all": "Voir tous les raccourcis clavier"
+  },
+  "right_sidebar": {
+    "sidebar_label": "Panneau latéral {{title}}",
+    "sidebar_label_collapsed": "Panneau latéral {{title}} (réduit)",
+    "close": "Fermer le panneau latéral",
+    "expand": "Développer le panneau latéral",
+    "collapse": "Réduire le panneau latéral",
+    "go_back": "Retour",
+    "go_back_label": "Revenir au contenu précédent",
+    "go_forward": "Avancer",
+    "go_forward_label": "Aller au contenu suivant"
+  },
   "maxmind_adapter": {
-    "documentation": {},
+    "documentation": {
+      "intro": "L'adaptateur de données GeoIP permet de lire les bases de données GeoIP2 de MaxMind.",
+      "limitations_title": "Limites",
+      "limitations_supported": "Actuellement, les bases de données ASN, ville et pays sont prises en charge.",
+      "limitations_more": "Pour la prise en charge d'autres types de bases de données, veuillez consulter nos canaux d'assistance.",
+      "asn_fields": "Champs de la base de données ASN",
+      "country_fields": "Champs de la base de données pays",
+      "city_fields": "Champs de la base de données ville",
+      "city_additional_fields": "En plus des champs fournis par la base de données pays, la base de données ville comprend également les champs suivants :"
+    },
     "database_types": {},
     "field_set": {},
     "summary": {}
