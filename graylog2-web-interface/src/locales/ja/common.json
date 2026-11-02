@@ -401,28 +401,147 @@
       "asn_fields": "ASN データベースのフィールド",
       "country_fields": "国データベースのフィールド",
       "city_fields": "都市データベースのフィールド",
-      "city_additional_fields": "都市データベースには、国データベースのフィールドに加えて、次のフィールドも含まれます:"
+      "city_additional_fields": "都市データベースには、国データベースのフィールドに加えて、次のフィールドも含まれます:",
+      "complete_documentation": "フィールドの詳細なドキュメントについては、MaxMind の <docsLink>開発者向けドキュメント</docsLink>を参照してください"
     },
-    "database_types": {},
-    "field_set": {},
-    "summary": {}
+    "database_types": {
+      "asn": "ASN データベース",
+      "city": "都市データベース",
+      "country": "国データベース",
+      "ipinfo_location": "IPinfo 位置情報データベース",
+      "ipinfo_asn": "IPinfo ASN データベース"
+    },
+    "field_set": {
+      "file_path": "ファイルパス",
+      "file_path_help": "データベースファイルのパスです。",
+      "database_type": "データベースの種類",
+      "database_type_help": "データベースファイルの種類を選択してください",
+      "database_type_placeholder": "データベースファイルの種類を選択",
+      "refresh_file": "ファイルを更新",
+      "refresh_file_help": "有効にすると、データベースファイルの変更を確認し、ディスク上で変更された場合は更新します。"
+    },
+    "summary": {
+      "database_file_path": "データベースファイルのパス",
+      "database_type": "データベースの種類",
+      "check_interval": "チェック間隔"
+    }
   },
-  "abs_geoip": {},
-  "gcs_geoip": {},
-  "geoip_resolver": {},
-  "links": {},
-  "quick_jump": {},
-  "scratchpad": {},
-  "extractor_actions": {},
-  "surrounding_search": {},
-  "support_sources": {},
-  "times_list": {},
-  "widget_visualization_not_found": {},
-  "telemetry": {},
-  "app_facade": {},
-  "suggest_reload": {},
-  "footer": {},
-  "notifications": {},
+  "abs_geoip": {
+    "container_name": "Azure Blob コンテナー名",
+    "container_name_help": "Azure Blob コンテナーの名前です。",
+    "endpoint_url": "Azure Blob エンドポイント URL",
+    "endpoint_url_help": "Azure Blob エンドポイントの URL です。既定のエンドポイントを上書きする場合にのみ必要です。",
+    "account_name": "Azure アカウント名",
+    "account_name_placeholder": "your-account-name",
+    "account_name_help": "Azure ストレージアカウントの名前です。",
+    "account_key_reset": "Azure アカウントキー",
+    "reset_password": "パスワードをリセット",
+    "account_key": "Azure アカウントキー",
+    "account_key_help": "Azure ストレージアカウントのアカウントキーです。"
+  },
+  "gcs_geoip": {
+    "project_id": "Google Cloud Storage プロジェクト ID"
+  },
+  "geoip_resolver": {
+    "title": "Geo-Location Processor の設定",
+    "description": "Geo-Location Processor プラグインは、すべてのメッセージをスキャンし、<bold>IP アドレスのみ</bold>を含むフィールドを検出して、その位置情報（座標、ISO 国コード、都市名）を別のフィールドに格納します。詳細は<docsLink>ドキュメント</docsLink>を参照してください。",
+    "enabled_summary": "有効:",
+    "enforce_schema_summary": "デフォルトのスキーマを適用:",
+    "vendor_type_summary": "データベースのベンダー種別:",
+    "city_db_path_summary": "都市データベースのパス:",
+    "asn_db_path_summary": "ASN データベースのパス:",
+    "refresh_interval_summary": "データベースの更新間隔:",
+    "pull_from_cloud_summary": "クラウドストレージバケットからファイルを取得:",
+    "edit": "設定を編集",
+    "modal_title": "Geo-Location Processor の設定を更新",
+    "enable_processor": "Geo-Location Processor を有効にする",
+    "enforce_schema": "デフォルトのスキーマを適用",
+    "vendor_select": "GeoIP データベースのベンダーを選択",
+    "city_db_path": "都市データベースのパス",
+    "asn_db_path": "ASN データベースのパス",
+    "refresh_interval": "データベースの更新間隔",
+    "refresh_interval_help": "データベースファイルの変更を確認する間隔です。ディスク上で変更が検出されると更新されます。",
+    "pull_from_cloud": "クラウドストレージバケットからファイルを取得",
+    "select_cloud_storage": "クラウドストレージを選択",
+    "update_configuration": "設定を更新",
+    "updating_configuration": "設定を更新中..."
+  },
+  "links": {
+    "documentation": "ドキュメント"
+  },
+  "quick_jump": {
+    "title": "クイックジャンプ",
+    "open": "クイックジャンプを開く",
+    "search_placeholder": "ページ/ダッシュボード/ストリームを検索 ...",
+    "intro": "ページ、ストリーム、ダッシュボード、入力、その他の項目を検索するには、検索クエリを入力してください。",
+    "intro_hint": "手早く始められるように、<bold>最近開いた</bold>項目と<bold>お気に入り</bold>の項目の一覧を以下に表示します:",
+    "no_results": "検索結果が見つかりませんでした。別の検索語句を試してください。",
+    "recent": "最近"
+  },
+  "scratchpad": {
+    "title": "スクラッチパッド",
+    "status_cleared": "クリアしました。",
+    "status_auto_saved": "自動保存されました。",
+    "got_it": "了解",
+    "sensitive_warning": "パスワードなどの機密情報は、この領域に<bold>保存しないでください</bold>。",
+    "help_overlay": "ブラウザーのウィンドウを離れずに、個人的なメモやその他の情報をこの領域に保存できます。例えば、各種調査で必要になるタイムスタンプ、ユーザー ID、IP アドレスなどを保存できます。",
+    "copy": "コピー",
+    "clear": "クリア",
+    "clear_confirm": "スクラッチパッドの内容が消去されます。続行しますか？"
+  },
+  "extractor_actions": {
+    "select_type": "Extractor の種類を選択",
+    "only_string_fields": "Extractor は文字列フィールドにのみ使用できます。"
+  },
+  "surrounding_search": {
+    "button": "前後のメッセージを表示"
+  },
+  "support_sources": {
+    "title": "サポートが必要ですか？",
+    "help_text": "<docsLink>ドキュメント</docsLink>で質問への回答が見つからない場合は、遠慮なく {{productName}} コミュニティにご相談ください。",
+    "community_support": "コミュニティサポート",
+    "issue_tracker": "課題トラッカー",
+    "professional_support": "プロフェッショナルサポート"
+  },
+  "times_list": {
+    "title": "時刻の設定",
+    "description": "タイムゾーンの扱いは分かりにくい場合があります。ここでは、システムの各コンポーネントに適用されているタイムゾーンを確認できます。特定の {{productName}} サーバーノードのタイムゾーン設定は、各ノードの詳細ページで確認できます。",
+    "user": "ユーザー <bold>{{username}}</bold>:",
+    "web_browser": "お使いの Web ブラウザー:",
+    "server": "{{productName}} サーバー:"
+  },
+  "widget_visualization_not_found": {
+    "description": "ウィジェットの可視化 (<italic>{{widgetClassName}}</italic>) が見つかりません。このウィジェットを提供するプラグインが読み込まれていない可能性があります。"
+  },
+  "telemetry": {
+    "title": "テレメトリー",
+    "enable_label": "テレメトリーを有効にする",
+    "enabled_checkbox": "有効",
+    "update_preferences": "設定を更新",
+    "update_button": "テレメトリーを更新",
+    "info_modal_title": "{{productName}} の改善にご協力ください",
+    "ok": "OK",
+    "info": "匿名の利用データを収集し、今後の改善の優先順位付けや {{productName}} の品質向上に役立てたいと考えています。",
+    "no_personal_data": "お使いのインスタンスで、個人データ、機密情報、ログなどのコンテンツは収集しません。",
+    "learn_more": "詳しくは<privacyLink>プライバシーポリシー</privacyLink>をご覧ください。",
+    "turn_off_profile": "データ収集は、いつでも<bold>ユーザープロフィール</bold>から無効または有効にできます。",
+    "turn_off_here": "データ収集は、いつでもここから無効または有効にできます。"
+  },
+  "app_facade": {
+    "preparing": "Web インターフェースを準備しています..."
+  },
+  "suggest_reload": {
+    "title": "{{productName}} のバージョンが変更されました",
+    "version_changed": "{{productName}} のバージョンが <bold>{{version}}</bold> から <bold>{{newVersion}}</bold> に変更されました。",
+    "save_work": "エラーを避けるため、作業内容を保存してからページを再読み込みしてください。",
+    "reload_now": "今すぐ再読み込み"
+  },
+  "footer": {
+    "system_info": "{{productName}} {{version}}（{{hostname}} 上、{{jvmInfo}}）"
+  },
+  "notifications": {
+    "download_failed": "ダウンロードに失敗しました。ステータス: {{error}}"
+  },
   "use_favorite_item_mutation_notifications": {},
   "use_entity_titles_notifications": {},
   "use_search_version_check_notifications": {}
