@@ -503,7 +503,19 @@
   "tor_exit_node_adapter_summary": {
     "no_configuration": "Nessuna configurazione necessaria"
   },
-  "whois_adapter_documentation": {},
-  "whois_adapter_field_set": {},
-  "whois_adapter_summary": {}
+  "whois_adapter_documentation": {
+    "intro": "L'adapter dati di ricerca IP whois può richiedere le informazioni sulla proprietà di rete di un indirizzo IP.",
+    "configuration_title": "Configurazione",
+    "connect_timeout_description": "Il timeout di connessione del socket verso il server whois, in millisecondi. Se lo imposti su un valore alto, può influire sulle prestazioni di elaborazione.",
+    "read_timeout_description": "Il timeout di lettura della connessione del socket verso il server whois, in millisecondi. Se lo imposti su un valore alto, può influire sulle prestazioni di elaborazione."
+  },
+  "whois_adapter_field_set": {
+    "connect_timeout_label": "Timeout di connessione",
+    "connect_timeout_help": "Timeout di connessione WHOIS in millisecondi.",
+    "read_timeout_label": "Timeout di lettura",
+    "read_timeout_help": "Timeout di lettura della connessione WHOIS in millisecondi."
+  },
+  "whois_adapter_summary": {
+    "unit_ms": "ms"
+  }
 }
