@@ -142,6 +142,17 @@ public class StartPageServiceTest {
     }
 
     @Test
+    public void addsLastOpenedEntitiesOfAnyTypeAlongsideViews() {
+        final var eventDefinition = grnRegistry.newGRN(GRNTypes.EVENT_DEFINITION, "id2");
+        startPageService.addLastOpenedFor(ViewDTO.builder().title("test").state(Map.of()).searchId("1").id("id1").build(), searchUser);
+        startPageService.addLastOpenedFor(eventDefinition, searchUser.getUser());
+
+        final var list = (List<LastOpened>) startPageService.findLastOpenedFor(searchUser, 1, 10).jsonValue().get("lastOpened");
+        assertThat(list).extracting(LastOpened::grn)
+                .containsExactly(eventDefinition, grnRegistry.newGRN(GRNTypes.SEARCH, "id1"));
+    }
+
+    @Test
     public void recentActivityPrefersTheCatalogTitleAndFallsBackToTheStoredOne() {
         final var grn = grnRegistry.newGRN(GRNTypes.DASHBOARD, "1");
         final var row = RecentActivityDTO.builder()
