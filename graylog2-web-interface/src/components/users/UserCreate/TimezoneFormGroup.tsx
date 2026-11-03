@@ -35,7 +35,7 @@ const TimezoneFormGroup = () => {
           wrapperClassName="col-sm-9">
           <TimezoneSelect
             className="timezone-select"
-            value={value || "Browser's time zone"}
+            value={value || t('time.browser_time_zone', { ns: 'common' })}
             name="timezone"
             onChange={(newValue) => onChange({ target: { name, value: newValue } })}
           />
