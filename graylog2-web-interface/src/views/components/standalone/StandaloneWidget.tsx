@@ -24,6 +24,7 @@ import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { updateWidgetConfig } from 'views/logic/slices/widgetActions';
 import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
 import type Widget from 'views/logic/widgets/Widget';
+import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
 import WidgetColorContext from 'views/components/widgets/WidgetColorContext';
 import WidgetErrorBoundary from 'views/components/widgets/WidgetErrorBoundary';
 import WidgetVisualization from 'views/components/widgets/WidgetVisualization';
@@ -71,14 +72,16 @@ type Props = {
    * Its container needs a height until then.
    */
   lazy?: boolean;
+  /** Runs the widget's search, e.g. to show stored results instead. Must be stable across renders. */
+  searchExecutors?: SearchExecutors;
 };
 
 /**
  * Shows a widget with its results outside of a search or dashboard.
  */
-const StandaloneWidget = ({ widget, title, lazy = false }: Props) => {
+const StandaloneWidget = ({ widget, title, lazy = false, searchExecutors = undefined }: Props) => {
   const content = (
-    <StandaloneWidgetProvider widget={widget} title={title}>
+    <StandaloneWidgetProvider widget={widget} title={title} searchExecutors={searchExecutors}>
       <WidgetColorContext id={widget.id}>
         <StandaloneWidgetVisualization title={title} editing={false} />
       </WidgetColorContext>
