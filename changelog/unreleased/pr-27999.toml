@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fixed an error when assigning streams to an index set they were already in."
+
+pulls = ["27999"]

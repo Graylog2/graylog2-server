@@ -76,6 +76,7 @@ interface PluginForwarder {
   }>;
   fetchForwarderInput: (inputId: string) => Promise<ForwarderInput>;
   fetchForwarderNode: (nodeId: string) => Promise<Forwarder>;
+  fetchForwarderNodes?: (nodeIds: Array<string>) => Promise<Array<Forwarder>>;
   isLocalNode: (nodeId: string) => Promise<boolean>;
   messageLoaders: {
     ForwarderInputDropdown: React.ComponentType<{
@@ -141,6 +142,16 @@ type DataTiering = {
     eventKey: string;
     indexSetId: string;
   }>;
+  ArchiveRetentionFields?: React.ComponentType<{
+    valuesPrefix?: string;
+    archivingEnabled: boolean;
+    hiddenFields?: string[];
+    immutableFields?: string[];
+    ignoreFieldRestrictions?: boolean;
+  }>;
+  useIndexSetSubmitConfirmation?: (options?: {
+    enabled?: boolean;
+  }) => (initialValues: unknown, values: unknown) => { title: string; message: string } | null;
 };
 
 type InputSetupWizard = {
@@ -222,7 +233,8 @@ type StreamsOverviewTableElement = {
 type IndexSetsOverviewTableElement = {
   attributeName: string;
   group?: 'configuration';
-  attributes: Array<Attribute>;
+  attributes?: Array<Attribute>;
+  backendAttributeIds?: Array<string>;
   columnRenderers: ColumnRenderersByAttribute<IndexSetEntity>;
 };
 

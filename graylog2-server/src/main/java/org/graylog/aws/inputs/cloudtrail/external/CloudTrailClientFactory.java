@@ -21,6 +21,7 @@ import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
 import org.graylog.aws.AWSProxyConfigurationProvider;
+import org.graylog.integrations.common.CheckCredentialsResponse;
 import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
@@ -51,10 +52,10 @@ public class CloudTrailClientFactory {
      * @param sqsQueueName        The URL of the SQS queue to check
      * @param credentialsProvider AWS credentials provider
      * @param awsRegion           AWS region
-     * @return JSON string indicating whether the credentials are valid
+     * @return the result of the credentials check
      * @throws Exception if the credentials are invalid or an error occurs
      */
-    public String checkCredentials(String sqsQueueName, AwsCredentialsProvider credentialsProvider, String awsRegion) throws Exception {
+    public CheckCredentialsResponse checkCredentials(String sqsQueueName, AwsCredentialsProvider credentialsProvider, String awsRegion) throws Exception {
         try {
             try (SqsClient client = SqsClient.builder()
                     .httpClientBuilder(proxyConfigurationProvider.get())
@@ -67,7 +68,7 @@ public class CloudTrailClientFactory {
                         .build();
                 client.receiveMessage(receiveMessageRequest);
             }
-            return "{\"result\":\"valid\"}";
+            return CheckCredentialsResponse.VALID;
         } catch (Exception e) {
             LOG.error("AWS Cloudtrail credentials invalid {}", ExceptionUtils.getRootCauseMessage(e));
             throw new BadRequestException(ExceptionUtils.getRootCauseMessage(e));

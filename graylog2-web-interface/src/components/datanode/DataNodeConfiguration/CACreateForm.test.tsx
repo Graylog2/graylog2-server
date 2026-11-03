@@ -21,13 +21,12 @@ import DefaultQueryClientProvider from 'DefaultQueryClientProvider';
 
 import { CA } from '@graylog/server-api';
 
-import { asMock, StoreMock as MockStore } from 'helpers/mocking';
+import { asMock } from 'helpers/mocking';
 import UserNotification from 'util/UserNotification';
 
 import CACreateForm from './CACreateForm';
 
 jest.mock('@graylog/server-api', () => ({ CA: { createCA: jest.fn() } }));
-jest.mock('stores/sessions/SessionStore', () => ({ SessionStore: MockStore(['isLoggedIn', jest.fn()]) }));
 
 jest.mock('util/UserNotification', () => ({
   error: jest.fn(),

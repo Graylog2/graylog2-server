@@ -56,7 +56,7 @@ public class DropMessage extends AbstractFunction<Void> {
                 .description("Discards a message from further processing, after completing the current stage")
                 .ruleBuilderEnabled()
                 .ruleBuilderName("Drop message")
-                .ruleBuilderTitle("Remove message from the processing pipeline after current stage")
+                .ruleBuilderTitle("Remove message from the processing pipeline after current stage. Note that this permanently deletes the message from all streams associated with the pipeline.")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)
                 .build();
     }

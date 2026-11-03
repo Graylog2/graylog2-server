@@ -42,30 +42,8 @@ import EntityShareModal from './EntityShareModal';
 const mockEmptyResult = { data: undefined };
 const mockFailedResult = { data: failedEntityShareState };
 
-jest.mock('domainActions/permissions/EntityShareDomain', () => ({
-  __esModule: true,
-  default: {
-    prepare: jest.fn(() => Promise.resolve()),
-    prepareCreate: jest.fn(() => Promise.resolve()),
-    update: jest.fn(() => Promise.resolve()),
-    loadUserSharesPaginated: jest.fn(() =>
-      Promise.resolve({
-        list: Immutable.List(),
-        pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
-      }),
-    ),
-  },
-}));
-jest.mock('hooks/useEntityShareState', () => {
-  const mockSetEntityShareState = jest.fn();
-
-  return {
-    __esModule: true,
-    default: jest.fn(() => ({ data: undefined })),
-    useSetEntityShareState: jest.fn(() => mockSetEntityShareState),
-    entityShareQueryKey: jest.fn((grn) => ['entity-share', grn ?? 'new']),
-  };
-});
+jest.mock('domainActions/permissions/EntityShareDomain');
+jest.mock('hooks/useEntityShareState');
 
 jest.setTimeout(10000);
 
@@ -73,7 +51,7 @@ const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTim
 
 describe('EntityShareModal', () => {
   beforeEach(() => {
-    asMock(useEntityShareState).mockReturnValue({ data: mockEntityShareState } as any);
+    asMock(useEntityShareState).mockReturnValue({ data: mockEntityShareState });
   });
 
   beforeAll(() => {
@@ -134,7 +112,7 @@ describe('EntityShareModal', () => {
 
   describe('displays', () => {
     it('loading spinner while loading entity share state', async () => {
-      asMock(useEntityShareState).mockReturnValue(mockEmptyResult as any);
+      asMock(useEntityShareState).mockReturnValue(mockEmptyResult);
       render(<SimpleEntityShareModal />);
 
       act(() => {
@@ -145,7 +123,7 @@ describe('EntityShareModal', () => {
     });
 
     it('displays an error if validation failed and disables submit', async () => {
-      asMock(useEntityShareState).mockReturnValue(mockFailedResult as any);
+      asMock(useEntityShareState).mockReturnValue(mockFailedResult);
       render(<SimpleEntityShareModal />);
 
       await screen.findByText('Removing the following owners will leave the entity ownerless:');
@@ -229,7 +207,7 @@ describe('EntityShareModal', () => {
 
         await setupUser().click(await screen.findByRole('button', { name: /add collaborator/i }));
 
-        const setEntityShareStateMock = (useSetEntityShareState as jest.Mock).mock.results[0]?.value;
+        const setEntityShareStateMock = asMock(useSetEntityShareState).mock.results[0]?.value;
 
         await waitFor(() => {
           expect(setEntityShareStateMock).toHaveBeenCalledWith(mockEntityShareState.entity, updatedShareState);
@@ -305,7 +283,7 @@ describe('EntityShareModal', () => {
         .build();
 
       beforeEach(() => {
-        asMock(useEntityShareState).mockReturnValue({ data: entityShareState } as any);
+        asMock(useEntityShareState).mockReturnValue({ data: entityShareState });
       });
 
       const deleteGrantee = async ({ grantee }) => {

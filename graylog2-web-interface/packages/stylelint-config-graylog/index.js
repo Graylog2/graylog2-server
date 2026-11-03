@@ -21,6 +21,10 @@ module.exports = {
   ],
   rules: {
     'declaration-empty-line-before': null,
+    'declaration-property-value-disallowed-list': [
+      { 'z-index': [/^-?\d{2,}$/] },
+      { message: 'Use a value from `theme/z-indices` instead of a numeric z-index.' },
+    ],
     'function-name-case': null,
     'media-query-no-invalid': null,
     // `postcss-styled-syntax` does not treat a styled-component template root as a

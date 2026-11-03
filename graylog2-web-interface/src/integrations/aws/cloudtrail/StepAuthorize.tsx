@@ -77,7 +77,7 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
       assume_role_arn: formData?.awsAssumeRoleARN?.value || '',
       aws_external_id: formData?.awsExternalId?.value || '',
     })
-      .then((result: any) => {
+      .then((result) => {
         if (result.result === 'valid') {
           setFormError(null);
           onSubmit();

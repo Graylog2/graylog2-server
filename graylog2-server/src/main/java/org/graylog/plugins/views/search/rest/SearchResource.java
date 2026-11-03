@@ -301,6 +301,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
 
     @DELETE
     @Path("cancel/{jobId}")
+    @Operation(summary = "Cancel a running search job")
     @NoAuditEvent("To be decided if we want to have cancellation of jobs in audit log")
     @Produces({MediaType.APPLICATION_JSON})
     public Response cancelJob(@PathParam("jobId") String jobId,

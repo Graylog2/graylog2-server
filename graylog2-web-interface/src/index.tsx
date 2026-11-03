@@ -24,6 +24,7 @@ import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import AppFacade from 'routing/AppFacade';
 import ServerAvailabilityProvider from 'contexts/ServerAvailabilityProvider';
+import DocumentTitleContextProvider from 'contexts/DocumentTitleContextProvider';
 import ViewsBindings from 'views/bindings';
 import ThreatIntelBindings from 'threatintel/bindings';
 import AwsBindings from 'aws/bindings';
@@ -86,7 +87,9 @@ root.render(
   <LoginQueryClientProvider>
     <TelemetryInit>
       <ServerAvailabilityProvider>
-        <AppFacade />
+        <DocumentTitleContextProvider>
+          <AppFacade />
+        </DocumentTitleContextProvider>
       </ServerAvailabilityProvider>
     </TelemetryInit>
   </LoginQueryClientProvider>,

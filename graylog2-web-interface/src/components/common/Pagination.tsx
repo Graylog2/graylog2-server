@@ -39,10 +39,17 @@ const controlAriaLabels = {
   last: 'Open last page',
 };
 
-const PrevIcon = () => <Icon name="chevron_left" />;
-const NextIcon = () => <Icon name="chevron_right" />;
-const FirstIcon = () => <Icon name="keyboard_double_arrow_left" />;
-const LastIcon = () => <Icon name="keyboard_double_arrow_right" />;
+export enum ICON_NAMES {
+  FIRST = 'keyboard_double_arrow_left',
+  PREVIOUS = 'chevron_left',
+  NEXT = 'chevron_right',
+  LAST = 'keyboard_double_arrow_right',
+}
+
+const PrevIcon = () => <Icon name={ICON_NAMES.PREVIOUS} />;
+const NextIcon = () => <Icon name={ICON_NAMES.NEXT} />;
+const FirstIcon = () => <Icon name={ICON_NAMES.FIRST} />;
+const LastIcon = () => <Icon name={ICON_NAMES.LAST} />;
 
 const StyledPagination = styled(MantinePagination)`
   margin-top: 10px;

@@ -24,13 +24,13 @@ export type EventReplayInfo = {
 };
 
 export interface Event {
-  timerange_end: string;
+  timerange_end?: string;
   timestamp_processing: string;
   origin_context?: string;
   scores?: {
     [_key: string]: number;
   };
-  replay_info: EventReplayInfo;
+  replay_info?: EventReplayInfo;
   streams?: string[];
   source_streams: string[];
   source?: string;
@@ -55,7 +55,7 @@ export interface Event {
     [_key: string]: number;
   };
   timestamp: string;
-  timerange_start: string;
+  timerange_start?: string;
 }
 
 export type EventDefinitionContext = {
