@@ -16,6 +16,8 @@
  */
 package org.graylog2.shared.security;
 
+import org.graylog.security.permissions.PermissionInstances;
+
 import com.google.common.base.Splitter;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableMap;
@@ -68,6 +70,13 @@ public class Permissions {
     }
 
     public Set<String> userSelfEditPermissions(String username, boolean isAllowedToCreateToken) {
+        if (!PermissionInstances.isSafe(username)) {
+            // Granting these would not address a single user. See PermissionInstances#isSafe. Usernames like this
+            // are rejected on save, but users created before that check was in place can still be in the database.
+            LOG.warn("Not granting self-edit permissions to user <{}> because the username cannot be used as a "
+                    + "permission instance. Please rename the user.", username);
+            return Set.of();
+        }
         ImmutableSet.Builder<String> perms = ImmutableSet.builder();
         perms.add(perInstance(RestPermissions.USERS_READ, username));
         perms.add(perInstance(RestPermissions.USERS_EDIT, username));
@@ -81,7 +90,6 @@ public class Permissions {
     }
 
     private String perInstance(String permission, String instance) {
-        // TODO check for existing instance etc (use DomainPermission subclass)
         return permission + ":" + instance;
     }
 
