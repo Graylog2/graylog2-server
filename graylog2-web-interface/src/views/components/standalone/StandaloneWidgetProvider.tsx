@@ -34,6 +34,10 @@ import syncSearchExecutors from 'views/logic/slices/syncSearchExecutors';
 
 import createStandaloneView, { STANDALONE_QUERY_ID } from './createStandaloneView';
 
+// Stable across renders: the views store is created again whenever its initial execution state changes, which
+// runs the widget's search again.
+const EMPTY_EXECUTION_STATE = SearchExecutionState.empty();
+
 const noop = () => {};
 const autoRefreshDisabled = {
   animationId: '',
@@ -96,7 +100,7 @@ const StandaloneWidgetProvider = ({
         view={view}
         isNew={false}
         initialQuery={STANDALONE_QUERY_ID}
-        executionState={SearchExecutionState.empty()}>
+        executionState={EMPTY_EXECUTION_STATE}>
         <AutoRefreshContext.Provider value={autoRefreshDisabled}>
           <ExecuteOnMount />
           <WidgetFromStore widgetId={widget.id}>{children}</WidgetFromStore>
