@@ -193,5 +193,6 @@
   "views.search_not_available": "検索 {{searchId}} は利用できません",
   "views.search_not_available_2": "検索 {{originalViewSearchId}} は利用できません",
   "views.unable_to_delete": "{{entity}} を削除できませんでした。",
-  "web_interface_assets.couldnt_find_plugin": "プラグイン {{pluginName}} が見つかりません"
+  "web_interface_assets.couldnt_find_plugin": "プラグイン {{pluginName}} が見つかりません",
+  "message.codec_does_not_support_single_message": "コーデックタイプ {{codec}} は単一メッセージの解析をサポートしていません。"
 }

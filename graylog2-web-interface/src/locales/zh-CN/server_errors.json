@@ -193,5 +193,6 @@
   "views.search_not_available": "搜索 {{searchId}} 不可用",
   "views.search_not_available_2": "搜索 {{originalViewSearchId}} 不可用",
   "views.unable_to_delete": "无法删除 {{entity}}。",
-  "web_interface_assets.couldnt_find_plugin": "找不到插件 {{pluginName}}"
+  "web_interface_assets.couldnt_find_plugin": "找不到插件 {{pluginName}}",
+  "message.codec_does_not_support_single_message": "编解码器类型 {{codec}} 不支持解析单条消息。"
 }

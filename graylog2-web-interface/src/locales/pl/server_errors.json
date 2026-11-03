@@ -193,5 +193,6 @@
   "views.search_not_available": "Wyszukiwanie {{searchId}} jest niedostępne",
   "views.search_not_available_2": "Wyszukiwanie {{originalViewSearchId}} jest niedostępne",
   "views.unable_to_delete": "Nie można usunąć {{entity}}.",
-  "web_interface_assets.couldnt_find_plugin": "Nie znaleziono wtyczki {{pluginName}}"
+  "web_interface_assets.couldnt_find_plugin": "Nie znaleziono wtyczki {{pluginName}}",
+  "message.codec_does_not_support_single_message": "Typ kodeka {{codec}} nie obsługuje analizowania pojedynczej wiadomości."
 }

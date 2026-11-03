@@ -193,5 +193,6 @@
   "views.search_not_available": "Die Suche {{searchId}} ist nicht verfügbar",
   "views.search_not_available_2": "Die Suche {{originalViewSearchId}} ist nicht verfügbar",
   "views.unable_to_delete": "{{entity}} kann nicht gelöscht werden.",
-  "web_interface_assets.couldnt_find_plugin": "Das Plugin {{pluginName}} wurde nicht gefunden"
+  "web_interface_assets.couldnt_find_plugin": "Das Plugin {{pluginName}} wurde nicht gefunden",
+  "message.codec_does_not_support_single_message": "Der Codec-Typ {{codec}} unterstützt das Parsen einer einzelnen Nachricht nicht."
 }

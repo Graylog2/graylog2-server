@@ -158,7 +158,7 @@ public class MessageResource extends RestResource {
             throw new NotFoundException("Codec type " + request.codec() + " does not exist.");
         }
         if (codecFactory.isMultiMessageCodec(request.codec())) {
-            throw new BadRequestException("Codec type " + request.codec() + " does not support parsing a single message.");
+            throw new CodedBadRequestException("message.codec_does_not_support_single_message", "Codec type " + request.codec() + " does not support parsing a single message.", CodedException.paramsOf("codec", request.codec()));
         }
 
         final Codec codec;
@@ -166,7 +166,7 @@ public class MessageResource extends RestResource {
             codec = codecFactory.create(request.codec(), new Configuration(request.configuration()));
         } catch (Exception e) {
             LOG.debug("Could not create codec <{}>", request.codec(), e);
-            throw new BadRequestException("Could not decode message");
+            throw new CodedBadRequestException("message.could_not_decode_message", "Could not decode message");
         }
 
         final ResolvableInetSocketAddress remoteAddress = ResolvableInetSocketAddress.wrap(new InetSocketAddress(request.remoteAddress(), 1234));
