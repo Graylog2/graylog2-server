@@ -38,7 +38,7 @@ yarn test --testPathPattern=<pattern>
 # Type check
 yarn tsgo
 
-# Lint changed files (requires committed changes)
+# Lint changed files (requires committed changes, diffs against origin/master, so fetch first)
 yarn lint:changes
 
 # Lint a specific file
@@ -50,8 +50,14 @@ yarn lint:styles
 # Lint styles for a specific file
 yarn lint:styles:path <file>
 
-# Format code
+# Format code (always formats all of src, test and docs, even with file arguments)
 yarn format
+
+# Format specific files
+yarn oxfmt <file>
+
+# Regenerate the API types in target/api (@graylog/server-api) from the backend's swagger output
+yarn generate:apidefs
 
 # Regenerate the default themes after changing the theme in src/theme/sawmill
 yarn generate:themes

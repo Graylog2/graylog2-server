@@ -47,7 +47,8 @@ Coding conventions for the Graylog web interface. They apply to all changes, whe
 - State, in order of preference: `useState` (local) → `useContext` (shared in a hierarchy) → Redux (complex).
 - No Reflux in new code. Replace existing stores with `react-query` or `useState`/`useContext` where possible; otherwise access them via `useStore`.
 - Server state: `@tanstack/react-query`, wrapped in dedicated hooks instead of calling `useQuery`/`useMutation` in many components.
-- API calls: typed stubs from `@graylog/server-api` and `@graylog/enterprise-api`.
+- API calls: typed stubs from `@graylog/server-api` and `@graylog/enterprise-api`. They are generated into `target/api` from the Swagger definition of the Maven build (`yarn generate:apidefs`) and not committed. Don't edit them. If a stub is still missing after regenerating, the backend API has to change first.
+- Feature flags: read them with `useFeature('flag_name')`. Flags are defined and enabled by the backend, the frontend can't add one alone.
 - Forms: `formik`, reusing existing Formik-based helpers and components.
 - Session: every `fetch` from `FetchProvider` extends the user's session. Periodic requests must not — use `fetchPeriodically`, or pass `{ requestShouldExtendSession: false }` as the last argument of generated stubs.
 
@@ -61,8 +62,10 @@ Coding conventions for the Graylog web interface. They apply to all changes, whe
 - Choose queries by Testing Library's [priority guide](https://testing-library.com/docs/queries/about#priority).
 - Use `findBy` for UI that may update asynchronously, and `await screen.findBy…` on its own — it already fails if the element is missing, no `expect(…).toBeInTheDocument()` needed.
 - Don't mock `@tanstack/react-query`; mock the hook on top of it. If that hook lives inside a component, move it to its own file.
-- Use `asMock(foo)`, never `foo as jest.Mock`.
-- Reuse existing fixtures instead of large inline mocks. If none fits, create a fixture file following the local pattern, otherwise in a nearby `__tests__/` directory.
+- Use `asMock(foo)`, never `foo as jest.Mock`. Mock Reflux stores with `MockStore` (both from `helpers/mocking`).
+- For `react-select` inputs, use `helpers/selectEvent`.
+- `console.warn` and `console.error` fail tests. Fix the cause; wrap only expected errors in `helpers/suppressConsole`.
+- Reuse existing fixtures (shared ones in `test/fixtures/`, imported as `fixtures/...`) instead of large inline mocks. If none fits, create a fixture file following the local pattern, otherwise in a nearby `__tests__/` directory.
 - Placement: `ComponentA.test.tsx` next to `ComponentA.tsx`. With fixtures: `__tests__/ComponentA.test.tsx` and `__tests__/ComponentA.test.case1.json`.
 
 ## JavaScript
