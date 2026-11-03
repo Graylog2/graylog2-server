@@ -29,6 +29,7 @@ import WidgetErrorBoundary from 'views/components/widgets/WidgetErrorBoundary';
 import WidgetVisualization from 'views/components/widgets/WidgetVisualization';
 
 import StandaloneWidgetProvider from './StandaloneWidgetProvider';
+import RenderWhenVisible from './RenderWhenVisible';
 
 const noop = () => {};
 
@@ -65,17 +66,26 @@ export const StandaloneWidgetVisualization = ({ title, editing }: VisualizationP
 type Props = {
   widget: Widget;
   title: string;
+  /**
+   * Renders the widget and runs its search only once it comes close to the viewport, e.g. for long lists of widgets.
+   * Its container needs a height until then.
+   */
+  lazy?: boolean;
 };
 
 /**
  * Shows a widget with its results outside of a search or dashboard.
  */
-const StandaloneWidget = ({ widget, title }: Props) => (
-  <StandaloneWidgetProvider widget={widget} title={title}>
-    <WidgetColorContext id={widget.id}>
-      <StandaloneWidgetVisualization title={title} editing={false} />
-    </WidgetColorContext>
-  </StandaloneWidgetProvider>
-);
+const StandaloneWidget = ({ widget, title, lazy = false }: Props) => {
+  const content = (
+    <StandaloneWidgetProvider widget={widget} title={title}>
+      <WidgetColorContext id={widget.id}>
+        <StandaloneWidgetVisualization title={title} editing={false} />
+      </WidgetColorContext>
+    </StandaloneWidgetProvider>
+  );
+
+  return lazy ? <RenderWhenVisible>{content}</RenderWhenVisible> : content;
+};
 
 export default StandaloneWidget;
