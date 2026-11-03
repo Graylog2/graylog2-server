@@ -324,8 +324,8 @@
   },
   "global_throughput": {
     "aria_label": "Rendimiento: entrada {{input}} / salida {{output}} msg/s",
-    "in": "entrada",
-    "out": "salida"
+    "in_title": "Mensajes entrantes por segundo",
+    "out_title": "Mensajes salientes por segundo"
   },
   "node_throughput": {
     "loading": "Cargando el rendimiento...",

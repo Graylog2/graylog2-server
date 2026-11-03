@@ -324,8 +324,8 @@
   },
   "global_throughput": {
     "aria_label": "Débit : entrée {{input}} / sortie {{output}} msg/s",
-    "in": "entrée",
-    "out": "sortie"
+    "in_title": "Messages entrants par seconde",
+    "out_title": "Messages sortants par seconde"
   },
   "node_throughput": {
     "loading": "Chargement du débit...",

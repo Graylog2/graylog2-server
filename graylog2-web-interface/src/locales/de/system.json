@@ -319,9 +319,9 @@
     "message": "Nachricht"
   },
   "global_throughput": {
-    "aria_label": "Durchsatz: Ein {{input}} / Aus {{output}} msg/s",
-    "in": "ein",
-    "out": "aus"
+    "aria_label": "Durchsatz: {{input}} eingehend / {{output}} ausgehend (Nachrichten/s)",
+    "in_title": "Eingehende Nachrichten pro Sekunde",
+    "out_title": "Ausgehende Nachrichten pro Sekunde"
   },
   "node_throughput": {
     "loading": "Durchsatz wird geladen...",

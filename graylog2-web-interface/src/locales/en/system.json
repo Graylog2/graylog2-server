@@ -320,8 +320,8 @@
   },
   "global_throughput": {
     "aria_label": "Throughput: In {{input}} / Out {{output}} msg/s",
-    "in": "in",
-    "out": "out"
+    "in_title": "Incoming messages per second",
+    "out_title": "Outgoing messages per second"
   },
   "node_throughput": {
     "loading": "Loading throughput...",

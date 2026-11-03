@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next';
 
 import NumberUtils from 'util/NumberUtils';
 import { NavItem } from 'components/bootstrap';
-import { Spinner } from 'components/common';
+import { Icon, Spinner } from 'components/common';
 import { itemStateIndicatorContainerSelector } from 'components/common/NavItemStateIndicator';
 import { useGlobalThroughput } from 'hooks/useMetrics';
 
@@ -49,15 +49,16 @@ const ThroughputData = styled.span<{ $dataIn?: boolean }>(
     gap: 0 3px;
     color: ${theme.colors.text.primary};
 
-    > span {
+    > span:first-of-type {
       grid-area: 1 / 1 / 2 / 2;
       text-align: right;
       padding-left: 3px;
     }
 
-    > i {
-      font-weight: normal;
+    > .material-symbols-rounded {
       grid-area: 1 / 2 / 2 / 3;
+      align-self: center;
+      justify-self: center;
     }
 
     &::after {
@@ -85,10 +86,12 @@ const GlobalThroughput = (props) => {
     output = (
       <ContentWrap aria-label={t('global_throughput.aria_label', { input: inputNumeral, output: outputNumeral })}>
         <ThroughputData $dataIn>
-          <span>{inputNumeral}</span> <i>{t('global_throughput.in')}</i>
+          <span>{inputNumeral}</span>
+          <Icon name="arrow_downward" size="xs" title={t('global_throughput.in_title')} />
         </ThroughputData>
         <ThroughputData>
-          <span>{outputNumeral}</span> <i>{t('global_throughput.out')}</i>
+          <span>{outputNumeral}</span>
+          <Icon name="arrow_upward" size="xs" title={t('global_throughput.out_title')} />
         </ThroughputData>
       </ContentWrap>
     );

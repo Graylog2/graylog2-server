@@ -316,8 +316,8 @@
   },
   "global_throughput": {
     "aria_label": "スループット: 入力 {{input}} / 出力 {{output}} メッセージ/秒",
-    "in": "入力",
-    "out": "出力"
+    "in_title": "1 秒あたりの受信メッセージ数",
+    "out_title": "1 秒あたりの送信メッセージ数"
   },
   "node_throughput": {
     "loading": "スループットを読み込んでいます...",

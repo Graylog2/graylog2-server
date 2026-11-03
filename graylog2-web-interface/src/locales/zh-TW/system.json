@@ -316,8 +316,8 @@
   },
   "global_throughput": {
     "aria_label": "吞吐量：輸入 {{input}} / 輸出 {{output}} 則訊息/秒",
-    "in": "輸入",
-    "out": "輸出"
+    "in_title": "每秒傳入訊息數",
+    "out_title": "每秒傳出訊息數"
   },
   "node_throughput": {
     "loading": "正在載入吞吐量...",

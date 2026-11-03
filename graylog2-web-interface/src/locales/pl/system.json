@@ -328,8 +328,8 @@
   },
   "global_throughput": {
     "aria_label": "Przepustowość: wejście {{input}} / wyjście {{output}} msg/s",
-    "in": "wejście",
-    "out": "wyjście"
+    "in_title": "Wiadomości przychodzące na sekundę",
+    "out_title": "Wiadomości wychodzące na sekundę"
   },
   "node_throughput": {
     "loading": "Ładowanie przepustowości...",
