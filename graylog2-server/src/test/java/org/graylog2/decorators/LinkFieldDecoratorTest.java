@@ -180,6 +180,38 @@ public class LinkFieldDecoratorTest {
     }
 
     @Test
+    public void encodesAlreadyEncodedFieldValuesAgain() {
+        decorator = createDecorator("https://example.com/search?q=${query}", null);
+
+        assertThat(getDecoratedField("original value", Map.of("query", "foo%3Abar")))
+                .containsEntry("href", "https://example.com/search?q=foo%253Abar");
+    }
+
+    @Test
+    public void doesNotEncodeLiteralTemplateParts() {
+        decorator = createDecorator("https://example.com/search?a=${a}&b=${b}&sort=last%20seen", null);
+
+        assertThat(getDecoratedField("original value", Map.of("a", "1 2", "b", "x&y")))
+                .containsEntry("href", "https://example.com/search?a=1%202&b=x%26y&sort=last%20seen");
+    }
+
+    @Test
+    public void fieldValuesCannotChangeUrlStructure() {
+        decorator = createDecorator("https://example.com/search?q=${query}", null);
+
+        assertThat(getDecoratedField("original value", Map.of("query", "x#frag?admin=true&q=https://evil.com/")))
+                .containsEntry("href", "https://example.com/search?q=x%23frag%3Fadmin%3Dtrue%26q%3Dhttps%3A%2F%2Fevil.com%2F");
+    }
+
+    @Test
+    public void fieldValueCannotProvideWholeUrl() {
+        decorator = createDecorator("${target}", null);
+
+        assertThat(getDecoratedMessage("original value", Map.of("target", "https://evil.com")))
+                .containsEntry(TEST_FIELD, "original value");
+    }
+
+    @Test
     public void leavesMessageUnchangedIfTemplateFieldIsMissing() {
         decorator = createDecorator("https://ipam.example.com/search?ip=${src_ip}", null);
 
