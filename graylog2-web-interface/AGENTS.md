@@ -32,11 +32,15 @@ yarn build
 # Run all tests (DO NOT use `yarn jest`)
 yarn test
 
-# Run a specific test
-yarn test --testPathPattern=<pattern>
+# Run specific tests (file or folder path)
+yarn test <path>
 
-# Type check
+# Type check (~10s)
 yarn tsgo
+
+# Quick check while working: type check plus the tests of the feature you changed.
+# Prefer a folder path over `--findRelatedTests`, which pulls in hundreds of suites for shared components.
+yarn tsgo && yarn test <feature-folder>
 
 # Lint changed files (requires committed changes, diffs against origin/master, so fetch first)
 yarn lint:changes
@@ -56,7 +60,9 @@ yarn format
 # Format specific files
 yarn oxfmt <file>
 
-# Regenerate the API types in target/api (@graylog/server-api) from the backend's swagger output
+# Regenerate the API types in target/api (@graylog/server-api) from the backend's swagger output.
+# `tsgo` errors about `@graylog/server-api` can mean target/api is stale: compile the backend
+# (see the root AGENTS.md, it writes the swagger output), then run this.
 yarn generate:apidefs
 
 # Regenerate the default themes after changing the theme in src/theme/sawmill
