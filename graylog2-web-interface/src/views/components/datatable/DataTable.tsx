@@ -41,6 +41,8 @@ import MessagesTable from './MessagesTable';
 import deduplicateValues from './DeduplicateValues';
 import Headers from './Headers';
 import styles from './DataTable.css';
+import useRowSelection from './useRowSelection';
+import SelectedRowsActions from './SelectedRowsActions';
 
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
 import type { VisualizationComponentProps } from '../aggregationbuilder/AggregationBuilder';
@@ -236,6 +238,9 @@ const DataTable = ({
     rows.filter((r): r is Leaf => r.source === 'leaf'),
   );
 
+  const rowSelection = useRowSelection(expandedRows, rowFieldNames, fields);
+  const selectionColumnOffset = rowSelection.selectAll ? 1 : 0;
+
   const actualColumnPivotFields = _extractColumnPivotValues(rows);
   const pinnedColumns: Immutable.Set<string> = useMemo(
     () => widget?.config?.visualizationConfig?.pinnedColumns ?? Immutable.Set(),
@@ -245,7 +250,8 @@ const DataTable = ({
   const stickyLeftMarginsByColumnIndex = useMemo(() => {
     let prev = 0;
     const res = [];
-    const lineNumberOffset = widget?.config?.visualizationConfig?.showRowNumbers === false ? 0 : 1;
+    const lineNumberOffset =
+      (widget?.config?.visualizationConfig?.showRowNumbers === false ? 0 : 1) + selectionColumnOffset;
 
     const rowPivotsFields = rowPivots.flatMap((rowPivot) => rowPivot.fields ?? []);
 
@@ -266,7 +272,14 @@ const DataTable = ({
     });
 
     return res;
-  }, [widget?.config?.visualizationConfig?.showRowNumbers, rowPivots, series, pinnedColumns, rowPivotColumnsWidth]);
+  }, [
+    widget?.config?.visualizationConfig?.showRowNumbers,
+    selectionColumnOffset,
+    rowPivots,
+    series,
+    pinnedColumns,
+    rowPivotColumnsWidth,
+  ]);
   const pinnedColumnIndexes = useMemo(
     () => new Set(stickyLeftMarginsByColumnIndex.map(({ index }) => index)),
     [stickyLeftMarginsByColumnIndex],
@@ -291,6 +304,7 @@ const DataTable = ({
         units={widgetUnits}
         pinnedColumnIndexes={pinnedColumnIndexes}
         striped={striped}
+        selection={rowSelection.selectionFor(expandedRows[idx])}
       />
     );
   });
@@ -302,6 +316,13 @@ const DataTable = ({
 
   return (
     <div className={styles.container}>
+      {rowSelection.selectedRowsCount > 0 && (
+        <SelectedRowsActions
+          selectedRowsCount={rowSelection.selectedRowsCount}
+          fieldValues={rowSelection.selectedValuesByField}
+          onClearSelection={rowSelection.clearSelection}
+        />
+      )}
       <div className={styles.scrollContainer}>
         <MessagesTable striped={striped} bordered={bordered} stickyHeader={stickyHeader} condensed={condensed}>
           <THead $stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>
@@ -321,6 +342,7 @@ const DataTable = ({
               pinnedColumnIndexes={pinnedColumnIndexes}
               togglePin={togglePin}
               showRowNumbers={showRowNumbers}
+              selectAll={rowSelection.selectAll}
             />
           </THead>
           <TBody $stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>{formattedRows}</TBody>

@@ -37,8 +37,11 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import { createViewWithWidgets } from 'fixtures/searches';
 import { updateWidgetConfig } from 'views/logic/slices/widgetActions';
+import { updateQueryString } from 'views/logic/slices/viewSlice';
+import Query, { createElasticsearchQueryString } from 'views/logic/queries/Query';
 
 import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
+import InteractiveContext from '../contexts/InteractiveContext';
 
 const createWidget = (config: AggregationWidgetConfig = AggregationWidgetConfig.builder().build()) =>
   AggregationWidget.builder().id('deadbeef').config(config).build();
@@ -46,6 +49,11 @@ const createWidget = (config: AggregationWidgetConfig = AggregationWidgetConfig.
 jest.mock('views/logic/slices/widgetActions', () => ({
   ...jest.requireActual('views/logic/slices/widgetActions'),
   updateWidgetConfig: jest.fn(() => async () => {}),
+}));
+
+jest.mock('views/logic/slices/viewSlice', () => ({
+  ...jest.requireActual('views/logic/slices/viewSlice'),
+  updateQueryString: jest.fn(() => async () => {}),
 }));
 
 describe('DataTable', () => {
@@ -126,7 +134,12 @@ describe('DataTable', () => {
 
   const SimplifiedDataTable = (props: Partial<React.ComponentProps<typeof DataTable>>) => {
     const widget = createWidget(props.config);
-    const view = createViewWithWidgets([widget], {});
+    const viewWithWidgets = createViewWithWidgets([widget], {});
+    const query = Query.builder().id('query-id-1').query(createElasticsearchQueryString()).build();
+    const view = viewWithWidgets
+      .toBuilder()
+      .search(viewWithWidgets.search.toBuilder().queries([query]).build())
+      .build();
 
     return (
       <TestStoreProvider view={view}>
@@ -479,6 +492,180 @@ describe('DataTable', () => {
           .visualizationConfig(DataTableVisualizationConfig.create(['bytes']).toBuilder().build())
           .build(),
       );
+    });
+  });
+
+  describe('selecting rows', () => {
+    const sourcePivot = Pivot.createValues(['source']);
+    const sourceData = {
+      chart: ['host1', 'host2', 'host3'].map((host, idx) => ({
+        key: [host],
+        source: 'leaf',
+        values: [{ key: ['count()'], rollup: true, source: 'row-leaf', value: 100 - idx }],
+      })),
+    };
+    const sourceConfig = AggregationWidgetConfig.builder()
+      .rowPivots([sourcePivot])
+      .series([series])
+      .visualization('table')
+      .rollup(true)
+      .build();
+
+    const selectBulkAction = async (action: string, field: string) => {
+      await userEvent.click(screen.getByRole('button', { name: /bulk actions/i }));
+      await userEvent.click(await screen.findByRole('menuitem', { name: action }));
+      await userEvent.click(await screen.findByRole('menuitem', { name: field }));
+    };
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it('adds values of selected rows to query', async () => {
+      render(
+        <SimplifiedDataTable
+          config={sourceConfig}
+          // @ts-expect-error
+          data={sourceData}
+        />,
+      );
+
+      await userEvent.click(await screen.findByRole('checkbox', { name: 'Select source host1' }));
+      await userEvent.click(screen.getByRole('checkbox', { name: 'Select source host3' }));
+      await screen.findByText('2 rows selected');
+      await selectBulkAction('Add to query', 'source');
+
+      expect(updateQueryString).toHaveBeenCalledWith('query-id-1', 'source:(host1 OR host3)');
+      expect(screen.queryByText('2 rows selected')).not.toBeInTheDocument();
+    });
+
+    it('excludes values of all rows', async () => {
+      render(
+        <SimplifiedDataTable
+          config={sourceConfig}
+          // @ts-expect-error
+          data={sourceData}
+        />,
+      );
+
+      await userEvent.click(await screen.findByRole('checkbox', { name: 'Select all rows' }));
+      await screen.findByText('3 rows selected');
+      await selectBulkAction('Exclude from results', 'source');
+
+      expect(updateQueryString).toHaveBeenCalledWith('query-id-1', 'NOT source:(host1 OR host2 OR host3)');
+    });
+
+    it('cancels selection', async () => {
+      render(
+        <SimplifiedDataTable
+          config={sourceConfig}
+          // @ts-expect-error
+          data={sourceData}
+        />,
+      );
+
+      await userEvent.click(await screen.findByRole('checkbox', { name: 'Select source host1' }));
+      await screen.findByText('1 row selected');
+      await userEvent.click(screen.getByRole('button', { name: /bulk actions/i }));
+      await userEvent.click(await screen.findByRole('menuitem', { name: 'Cancel selection' }));
+
+      expect(screen.queryByText('1 row selected')).not.toBeInTheDocument();
+      expect(screen.getByRole('checkbox', { name: 'Select source host1' })).not.toBeChecked();
+    });
+
+    it('deselects all rows', async () => {
+      render(
+        <SimplifiedDataTable
+          config={sourceConfig}
+          // @ts-expect-error
+          data={sourceData}
+        />,
+      );
+
+      await userEvent.click(await screen.findByRole('checkbox', { name: 'Select all rows' }));
+      await screen.findByText('3 rows selected');
+      await userEvent.click(screen.getByRole('checkbox', { name: 'Deselect all rows' }));
+
+      expect(screen.queryByText(/selected/)).not.toBeInTheDocument();
+    });
+
+    it('ignores selected rows which are no longer part of the result', async () => {
+      const { rerender } = render(
+        <SimplifiedDataTable
+          config={sourceConfig}
+          // @ts-expect-error
+          data={sourceData}
+        />,
+      );
+
+      await userEvent.click(await screen.findByRole('checkbox', { name: 'Select source host1' }));
+      await userEvent.click(screen.getByRole('checkbox', { name: 'Select source host3' }));
+      await screen.findByText('2 rows selected');
+
+      rerender(
+        <SimplifiedDataTable
+          config={sourceConfig}
+          // @ts-expect-error
+          data={{ chart: sourceData.chart.slice(0, 2) }}
+        />,
+      );
+
+      await screen.findByText('1 row selected');
+      await selectBulkAction('Add to query', 'source');
+
+      expect(updateQueryString).toHaveBeenCalledWith('query-id-1', 'source:host1');
+    });
+
+    it('adds distinct values of chosen field when grouping by multiple fields', async () => {
+      const config = sourceConfig.toBuilder().rowPivots([Pivot.createValues(['source', 'controller'])]).build();
+      const multiFieldData = {
+        chart: [
+          ['host1', 'UsersController'],
+          ['host1', 'StreamsController'],
+          ['host2', 'UsersController'],
+        ].map((key) => ({
+          key,
+          source: 'leaf',
+          values: [{ key: ['count()'], rollup: true, source: 'row-leaf', value: 42 }],
+        })),
+      };
+      render(
+        <SimplifiedDataTable
+          config={config}
+          // @ts-expect-error
+          data={multiFieldData}
+        />,
+      );
+
+      await userEvent.click(
+        await screen.findByRole('checkbox', { name: 'Select source host1, controller UsersController' }),
+      );
+      await userEvent.click(screen.getByRole('checkbox', { name: 'Select source host1, controller StreamsController' }));
+      await selectBulkAction('Add to query', 'source');
+
+      expect(updateQueryString).toHaveBeenCalledWith('query-id-1', 'source:host1');
+
+      await userEvent.click(screen.getByRole('checkbox', { name: 'Select source host1, controller UsersController' }));
+      await userEvent.click(screen.getByRole('checkbox', { name: 'Select source host2, controller UsersController' }));
+      await selectBulkAction('Add to query', 'controller');
+
+      expect(updateQueryString).toHaveBeenCalledWith('query-id-1', 'controller:UsersController');
+    });
+
+    it('does not allow selecting rows in non-interactive mode', async () => {
+      render(
+        <InteractiveContext.Provider value="read-only">
+          <SimplifiedDataTable
+            config={sourceConfig}
+            // @ts-expect-error
+            data={sourceData}
+          />
+        </InteractiveContext.Provider>,
+      );
+
+      await screen.findByText('host1');
+
+      expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
     });
   });
 });
