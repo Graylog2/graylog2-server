@@ -447,6 +447,8 @@ declare module 'graylog-web-plugin/plugin' {
     ) =>
       | { grnType: string; id: string; Title?: React.ComponentType<EntityLinkTitleProps> }
       | { onClick: (context: EntityLinkOnClickContext) => void }
+      // Renders the link itself, for targets only known where the link is shown, e.g. through a React context.
+      | { id: string; Link: React.ComponentType<EntityLinkTitleProps> }
       | null;
   };
 
