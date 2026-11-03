@@ -63,7 +63,32 @@
     "select_unit": "選擇單位",
     "predefined_unit": "欄位 <bold>{{field}}</bold> 已設定單位 <bold>{{unit}}</bold>。變更此單位可能會導致圖表上的資料顯示不正確。",
     "clear": "清除",
-    "ok": "確定"
+    "ok": "確定",
+    "unit_type_labels": {
+      "size": "大小",
+      "time": "時間",
+      "percent": "百分比",
+      "binary_size": "二進位大小"
+    },
+    "unit_labels": {
+      "byte": "位元組",
+      "kilobyte": "千位元組",
+      "megabyte": "百萬位元組",
+      "gigabyte": "十億位元組",
+      "kibibyte": "KiB（千位二進位元組）",
+      "mebibyte": "MiB（百萬位二進位元組）",
+      "gibibyte": "GiB（十億位二進位元組）",
+      "nanosecond": "奈秒",
+      "microsecond": "微秒",
+      "millisecond": "毫秒",
+      "second": "秒",
+      "minute": "分鐘",
+      "hour": "小時",
+      "day": "天",
+      "month": "月",
+      "percent_decimal": "百分比（小數）",
+      "percent_1_100": "百分比（1..100）"
+    }
   },
   "wizard_metric": {
     "function": "函式",

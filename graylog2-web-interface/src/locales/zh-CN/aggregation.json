@@ -63,7 +63,32 @@
     "select_unit": "选择单位",
     "predefined_unit": "字段 <bold>{{field}}</bold> 已配置单位 <bold>{{unit}}</bold>。更改此单位可能导致图表数据显示不正确。",
     "clear": "清除",
-    "ok": "确定"
+    "ok": "确定",
+    "unit_type_labels": {
+      "size": "大小",
+      "time": "时间",
+      "percent": "百分比",
+      "binary_size": "二进制大小"
+    },
+    "unit_labels": {
+      "byte": "字节",
+      "kilobyte": "千字节",
+      "megabyte": "兆字节",
+      "gigabyte": "吉字节",
+      "kibibyte": "千位二进制字节",
+      "mebibyte": "兆位二进制字节",
+      "gibibyte": "吉位二进制字节",
+      "nanosecond": "纳秒",
+      "microsecond": "微秒",
+      "millisecond": "毫秒",
+      "second": "秒",
+      "minute": "分钟",
+      "hour": "小时",
+      "day": "天",
+      "month": "月",
+      "percent_decimal": "百分比（小数）",
+      "percent_1_100": "百分比（1..100）"
+    }
   },
   "wizard_metric": {
     "function": "函数",

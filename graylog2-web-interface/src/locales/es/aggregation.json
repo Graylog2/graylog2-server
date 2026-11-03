@@ -65,7 +65,32 @@
     "select_unit": "Selecciona una unidad",
     "predefined_unit": "Se ha configurado la unidad <bold>{{unit}}</bold> para el campo <bold>{{field}}</bold>. Cambiar esta unidad puede representar los datos de forma incorrecta en los gráficos.",
     "clear": "Borrar",
-    "ok": "Aceptar"
+    "ok": "Aceptar",
+    "unit_type_labels": {
+      "size": "Tamaño",
+      "time": "Tiempo",
+      "percent": "Porcentaje",
+      "binary_size": "Tamaño binario"
+    },
+    "unit_labels": {
+      "byte": "Byte",
+      "kilobyte": "Kilobyte",
+      "megabyte": "Megabyte",
+      "gigabyte": "Gigabyte",
+      "kibibyte": "Kibibyte",
+      "mebibyte": "Mebibyte",
+      "gibibyte": "Gibibyte",
+      "nanosecond": "Nanosegundo",
+      "microsecond": "Microsegundo",
+      "millisecond": "Milisegundo",
+      "second": "Segundo",
+      "minute": "Minuto",
+      "hour": "Hora",
+      "day": "Día",
+      "month": "Mes",
+      "percent_decimal": "Porcentaje (decimal)",
+      "percent_1_100": "Porcentaje (1..100)"
+    }
   },
   "wizard_metric": {
     "function": "Función",

@@ -63,7 +63,32 @@
     "select_unit": "単位を選択",
     "predefined_unit": "フィールド <bold>{{field}}</bold> には単位 <bold>{{unit}}</bold> が設定されています。単位を変更すると、グラフ上でデータが正しく表示されない場合があります。",
     "clear": "クリア",
-    "ok": "OK"
+    "ok": "OK",
+    "unit_type_labels": {
+      "size": "サイズ",
+      "time": "時間",
+      "percent": "パーセント",
+      "binary_size": "バイナリサイズ"
+    },
+    "unit_labels": {
+      "byte": "バイト",
+      "kilobyte": "キロバイト",
+      "megabyte": "メガバイト",
+      "gigabyte": "ギガバイト",
+      "kibibyte": "キビバイト",
+      "mebibyte": "メビバイト",
+      "gibibyte": "ギビバイト",
+      "nanosecond": "ナノ秒",
+      "microsecond": "マイクロ秒",
+      "millisecond": "ミリ秒",
+      "second": "秒",
+      "minute": "分",
+      "hour": "時間",
+      "day": "日",
+      "month": "月",
+      "percent_decimal": "パーセント（小数）",
+      "percent_1_100": "パーセント（1..100）"
+    }
   },
   "wizard_metric": {
     "function": "関数",

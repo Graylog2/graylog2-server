@@ -22,6 +22,7 @@ import { Col } from 'components/bootstrap';
 import { FormikInput, IconButton } from 'components/common';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
 import { mappedUnitsFromJSON } from 'views/components/visualizations/utils/unitConverters';
+import { unitNameLabel } from 'views/components/visualizations/utils/unitLabels';
 import ColorConfigurationPopover from 'views/components/aggregationwizard/ColorConfigurationPopover';
 
 type Props = { metricIndex: number; thresholdIndex: number; onRemove: () => void };
@@ -46,7 +47,7 @@ const ThresholdFormItem = ({ metricIndex, thresholdIndex, onRemove }: Props) => 
     const unit = units?.[field];
     if (!unit?.abbrev || !unit?.unitType) return null;
 
-    return mappedUnitsFromJSON[unit.unitType].find(({ abbrev }) => abbrev === unit?.abbrev).name;
+    return unitNameLabel(mappedUnitsFromJSON[unit.unitType].find(({ abbrev }) => abbrev === unit?.abbrev).name);
   }, [metricIndex, metrics, units]);
 
   return (

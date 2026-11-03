@@ -18,7 +18,6 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { styled, css } from 'styled-components';
 import { Field, useFormikContext } from 'formik';
-import capitalize from 'lodash/capitalize';
 
 import Select from 'components/common/Select';
 import Popover from 'components/common/Popover';
@@ -29,6 +28,7 @@ import { mappedUnitsFromJSONForAggregation as units } from 'views/components/vis
 import type { FieldUnitsFormValues } from 'views/types';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 import getUnitTextLabel from 'views/components/visualizations/utils/getUnitTextLabel';
+import { unitNameLabel, unitTypeLabel } from 'views/components/visualizations/utils/unitLabels';
 
 const Container = styled.div`
   display: flex;
@@ -70,12 +70,18 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string; predefined
   const [show, setShow] = useState(false);
   const { setFieldValue, values } = useFormikContext<{ units: FieldUnitsFormValues }>();
   const currentUnitType = useMemo<string>(() => values?.units?.[field]?.unitType, [values, field]);
-  const unitTypesOptions = useMemo(() => Object.keys(units).map((key) => ({ value: key, label: capitalize(key) })), []);
+  // `t` is a dependency, so the labels follow the language of the UI.
+  const unitTypesOptions = useMemo(
+    () => Object.keys(units).map((key) => ({ value: key, label: unitTypeLabel(key) })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [t],
+  );
   const unitOptions = useMemo(
     () =>
       currentUnitType &&
-      units[currentUnitType].map(({ abbrev, name }: Unit) => ({ value: abbrev, label: capitalize(name) })),
-    [currentUnitType],
+      units[currentUnitType].map(({ abbrev, name }: Unit) => ({ value: abbrev, label: unitNameLabel(name) })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentUnitType, t],
   );
   const toggleShow = () => setShow((cur) => !cur);
   const onUnitTypeChange = useCallback(
@@ -95,7 +101,9 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string; predefined
   const predefinedInfo = useMemo(() => {
     if (!predefinedUnit?.isDefined) return null;
 
-    const unitName = units[predefinedUnit?.unitType].find(({ abbrev }) => abbrev === predefinedUnit?.abbrev).name;
+    const unitName = unitNameLabel(
+      units[predefinedUnit?.unitType].find(({ abbrev }) => abbrev === predefinedUnit?.abbrev).name,
+    );
 
     return (
       <Trans
