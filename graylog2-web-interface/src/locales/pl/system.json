@@ -367,7 +367,8 @@
   },
   "configurations_page": {
     "title": "Konfiguracje",
-    "description": "Na tej stronie można konfigurować ustawienia systemu dla poszczególnych podsystemów."
+    "description": "Na tej stronie można konfigurować ustawienia systemu dla poszczególnych podsystemów.",
+    "plugins": "Wtyczki"
   },
   "enterprise_page": {
     "document_title": "{{productName}} Enterprise",

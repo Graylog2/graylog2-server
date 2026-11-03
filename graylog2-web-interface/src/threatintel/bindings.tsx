@@ -17,6 +17,8 @@
 
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
+import i18n from 'i18n';
+
 import ThreatIntelPluginConfig from './components/ThreatIntelPluginConfig';
 import {
   SpamhausEDROPAdapterDocumentation,
@@ -44,7 +46,9 @@ const bindings: PluginExports = {
   systemConfigurations: [
     {
       component: ThreatIntelPluginConfig,
-      displayName: 'Threat Intelligence Lookup',
+      get displayName() {
+        return i18n.t('plugin_sections.threat_intelligence_lookup', { ns: 'configurations' });
+      },
       configType: 'org.graylog.plugins.threatintel.ThreatIntelPluginConfiguration',
     },
   ],

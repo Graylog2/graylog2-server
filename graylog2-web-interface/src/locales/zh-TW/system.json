@@ -355,7 +355,8 @@
   },
   "configurations_page": {
     "title": "設定",
-    "description": "您可以在此頁面為不同子系統設定系統設定。"
+    "description": "您可以在此頁面為不同子系統設定系統設定。",
+    "plugins": "外掛程式"
   },
   "enterprise_page": {
     "document_title": "{{productName}} Enterprise",

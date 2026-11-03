@@ -355,7 +355,8 @@
   },
   "configurations_page": {
     "title": "設定",
-    "description": "このページでは、さまざまなサブシステムのシステム設定を行えます。"
+    "description": "このページでは、さまざまなサブシステムのシステム設定を行えます。",
+    "plugins": "プラグイン"
   },
   "enterprise_page": {
     "document_title": "{{productName}} Enterprise",

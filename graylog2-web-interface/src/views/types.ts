@@ -246,7 +246,10 @@ export interface SystemConfiguration {
 }
 
 export interface CoreSystemConfiguration {
+  /** Identifies the section and is part of its URL. */
   name: string;
+  /** Translated label for the sidebar, `name` is used when missing. */
+  displayName?: string;
   SectionComponent: React.ComponentType;
   permissions?: Array<Permission>;
   showCaret?: boolean;

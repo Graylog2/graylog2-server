@@ -247,5 +247,25 @@
     "allowlist_update_failed_title": "無法更新 URL 允許清單：{{configType}}",
     "processors_update_failed": "訊息處理器設定更新失敗：{{error}}",
     "processors_update_failed_title": "無法更新設定：{{configType}}"
+  },
+  "sections": {
+    "search": "搜尋",
+    "message_processors": "訊息處理器",
+    "sidecars": "Sidecar",
+    "events": "事件",
+    "url_allowlist": "URL 允許清單",
+    "url_allowlist_title": "URL 允許清單",
+    "decorators": "裝飾器",
+    "permissions": "權限",
+    "password_policy": "密碼原則",
+    "users": "使用者",
+    "users_title": "Index Set 預設值",
+    "markdown": "Markdown",
+    "welcome_page": "歡迎頁面",
+    "mcp": "MCP"
+  },
+  "plugin_sections": {
+    "geo_location_processor": "地理位置處理器",
+    "threat_intelligence_lookup": "威脅情報查詢"
   }
 }

@@ -355,7 +355,8 @@
   },
   "configurations_page": {
     "title": "配置",
-    "description": "您可以在此页面配置不同子系统的系统设置。"
+    "description": "您可以在此页面配置不同子系统的系统设置。",
+    "plugins": "插件"
   },
   "enterprise_page": {
     "document_title": "{{productName}} Enterprise",

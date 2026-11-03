@@ -248,5 +248,25 @@
     "allowlist_update_failed_title": "Could not update Url allowlist: {{configType}}",
     "processors_update_failed": "Message processors config update failed: {{error}}",
     "processors_update_failed_title": "Could not update config: {{configType}}"
+  },
+  "sections": {
+    "search": "Search",
+    "message_processors": "Message Processors",
+    "sidecars": "Sidecars",
+    "events": "Events",
+    "url_allowlist": "URL Allowlist",
+    "url_allowlist_title": "URL allowlist",
+    "decorators": "Decorators",
+    "permissions": "Permissions",
+    "password_policy": "Password Policy",
+    "users": "Users",
+    "users_title": "Index Set Defaults",
+    "markdown": "Markdown",
+    "welcome_page": "Welcome Page",
+    "mcp": "MCP"
+  },
+  "plugin_sections": {
+    "geo_location_processor": "Geo-Location Processor",
+    "threat_intelligence_lookup": "Threat Intelligence Lookup"
   }
 }

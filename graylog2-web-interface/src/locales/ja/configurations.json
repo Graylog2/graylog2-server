@@ -247,5 +247,25 @@
     "allowlist_update_failed_title": "URL許可リストを更新できませんでした：{{configType}}",
     "processors_update_failed": "メッセージプロセッサーの設定の更新に失敗しました：{{error}}",
     "processors_update_failed_title": "設定を更新できませんでした：{{configType}}"
+  },
+  "sections": {
+    "search": "検索",
+    "message_processors": "メッセージプロセッサー",
+    "sidecars": "Sidecar",
+    "events": "イベント",
+    "url_allowlist": "URL 許可リスト",
+    "url_allowlist_title": "URL 許可リスト",
+    "decorators": "デコレーター",
+    "permissions": "権限",
+    "password_policy": "パスワードポリシー",
+    "users": "ユーザー",
+    "users_title": "Index Set のデフォルト",
+    "markdown": "Markdown",
+    "welcome_page": "ウェルカムページ",
+    "mcp": "MCP"
+  },
+  "plugin_sections": {
+    "geo_location_processor": "ジオロケーションプロセッサー",
+    "threat_intelligence_lookup": "脅威インテリジェンス検索"
   }
 }

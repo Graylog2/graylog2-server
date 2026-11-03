@@ -363,7 +363,8 @@
   },
   "configurations_page": {
     "title": "Configurations",
-    "description": "Vous pouvez configurer ici les paramètres système des différents sous-systèmes."
+    "description": "Vous pouvez configurer ici les paramètres système des différents sous-systèmes.",
+    "plugins": "Plugins"
   },
   "enterprise_page": {
     "document_title": "{{productName}} Enterprise",

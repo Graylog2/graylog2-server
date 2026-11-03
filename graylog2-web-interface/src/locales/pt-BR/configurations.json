@@ -249,5 +249,25 @@
     "allowlist_update_failed_title": "Não foi possível atualizar a lista de permissão de URLs: {{configType}}",
     "processors_update_failed": "Falha ao atualizar a configuração dos processadores de mensagens: {{error}}",
     "processors_update_failed_title": "Não foi possível atualizar a configuração: {{configType}}"
+  },
+  "sections": {
+    "search": "Pesquisa",
+    "message_processors": "Processadores de mensagens",
+    "sidecars": "Sidecars",
+    "events": "Eventos",
+    "url_allowlist": "Lista de permissões de URL",
+    "url_allowlist_title": "Lista de permissões de URL",
+    "decorators": "Decoradores",
+    "permissions": "Permissões",
+    "password_policy": "Política de senhas",
+    "users": "Usuários",
+    "users_title": "Padrões de Index Sets",
+    "markdown": "Markdown",
+    "welcome_page": "Página de Boas-vindas",
+    "mcp": "MCP"
+  },
+  "plugin_sections": {
+    "geo_location_processor": "Processador de geolocalização",
+    "threat_intelligence_lookup": "Consulta de Threat Intelligence"
   }
 }

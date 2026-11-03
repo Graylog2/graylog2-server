@@ -359,7 +359,8 @@
   },
   "configurations_page": {
     "title": "Configurations",
-    "description": "You can configure system settings for different sub systems on this page."
+    "description": "You can configure system settings for different sub systems on this page.",
+    "plugins": "Plugins"
   },
   "enterprise_page": {
     "document_title": "{{productName}} Enterprise",

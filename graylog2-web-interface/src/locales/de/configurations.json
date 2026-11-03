@@ -248,5 +248,25 @@
     "allowlist_update_failed_title": "URL-Allowlist konnte nicht aktualisiert werden: {{configType}}",
     "processors_update_failed": "Aktualisierung der Konfiguration der Message-Processors fehlgeschlagen: {{error}}",
     "processors_update_failed_title": "Konfiguration konnte nicht aktualisiert werden: {{configType}}"
+  },
+  "sections": {
+    "search": "Suche",
+    "message_processors": "Nachrichtenprozessoren",
+    "sidecars": "Sidecars",
+    "events": "Events",
+    "url_allowlist": "URL-Allowlist",
+    "url_allowlist_title": "URL-Allowlist",
+    "decorators": "Decorators",
+    "permissions": "Berechtigungen",
+    "password_policy": "Passwortrichtlinie",
+    "users": "Benutzer",
+    "users_title": "Index-Set-Standardwerte",
+    "markdown": "Markdown",
+    "welcome_page": "Startseite",
+    "mcp": "MCP"
+  },
+  "plugin_sections": {
+    "geo_location_processor": "Geolokalisierungsprozessor",
+    "threat_intelligence_lookup": "Threat-Intelligence-Lookup"
   }
 }

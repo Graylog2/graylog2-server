@@ -55,7 +55,7 @@ const useConfigurationPages = () => {
     .map((page) => ({
       type: PAGE_TYPE,
       link: prefixUrl(`${Routes.SYSTEM.CONFIGURATIONS}/${page.name}`),
-      title: `Configurations / ${page.name}`,
+      title: `Configurations / ${page.displayName ?? page.name}`,
     }));
 
   const pluginNavItems = pluginSystemConfigurations

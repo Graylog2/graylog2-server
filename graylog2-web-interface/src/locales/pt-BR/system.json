@@ -363,7 +363,8 @@
   },
   "configurations_page": {
     "title": "Configurações",
-    "description": "Você pode configurar as definições do sistema para diferentes subsistemas nesta página."
+    "description": "Você pode configurar as definições do sistema para diferentes subsistemas nesta página.",
+    "plugins": "Plugins"
   },
   "enterprise_page": {
     "document_title": "{{productName}} Enterprise",

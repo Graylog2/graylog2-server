@@ -42,10 +42,11 @@ const SubNavIconOpen = styled(Icon)`
 
 type SectionLinkProps = {
   name: string;
+  label?: string;
   showCaret: boolean;
 };
 
-const SectionLink = ({ name, showCaret }: SectionLinkProps) => {
+const SectionLink = ({ name, label = undefined, showCaret }: SectionLinkProps) => {
   const absolutePath = useResolvedPath(name);
   const location = useLocation();
 
@@ -55,8 +56,8 @@ const SectionLink = ({ name, showCaret }: SectionLinkProps) => {
   return (
     <SectionNavItem className={isActive ? 'active' : undefined}>
       <LinkContainer key={`nav-${name}`} to={name}>
-        <NavItem title={name} withMinHeight={false}>
-          {name}
+        <NavItem title={label ?? name} withMinHeight={false}>
+          {label ?? name}
           {showCaret &&
             (isActive ? <SubNavIconClosed name="arrow_right" /> : <SubNavIconOpen name="arrow_drop_down" />)}
         </NavItem>
@@ -74,6 +75,7 @@ const ConfigurationsPage = () => {
     ...coreSystemConfigurations,
     {
       name: 'Plugins',
+      displayName: t('configurations_page.plugins'),
       SectionComponent: PluginsConfig,
       showCaret: true,
       catchAll: true,
@@ -89,8 +91,8 @@ const ConfigurationsPage = () => {
       <ConfigletRow className="content">
         <Col md={2}>
           <SectionNav>
-            {configurationSections.map(({ name, showCaret }) => (
-              <SectionLink key={`nav-${name}`} name={name} showCaret={showCaret} />
+            {configurationSections.map(({ name, displayName, showCaret }) => (
+              <SectionLink key={`nav-${name}`} name={name} label={displayName} showCaret={showCaret} />
             ))}
           </SectionNav>
         </Col>
