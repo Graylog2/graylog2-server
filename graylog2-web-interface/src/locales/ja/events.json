@@ -30,7 +30,9 @@
     "no_key": "このイベントにはキーが設定されていません。",
     "no_time_range": "期間なし",
     "refresh_human_name": "イベント",
-    "replay_search": "検索を再実行"
+    "replay_search": "検索を再実行",
+    "histogram_series_events": "イベント",
+    "histogram_series_alerts": "アラート"
   },
   "alerts_replay": {
     "cannot_replay": "このイベントを再実行できません: {{reason}} 別のイベントを選択してください。",

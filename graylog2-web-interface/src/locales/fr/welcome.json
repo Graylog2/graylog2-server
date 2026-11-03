@@ -80,6 +80,7 @@
     "messages_today": "Messages aujourd'hui",
     "alerts_today": "Alertes aujourd'hui",
     "events_today": "Événements aujourd'hui",
-    "top_sources": "Top 5 des sources"
+    "top_sources": "Top 5 des sources",
+    "tab_general": "Général"
   }
 }

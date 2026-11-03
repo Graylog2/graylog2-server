@@ -80,6 +80,7 @@
     "messages_today": "今日消息",
     "alerts_today": "今日警报",
     "events_today": "今日事件",
-    "top_sources": "前 5 个来源"
+    "top_sources": "前 5 个来源",
+    "tab_general": "常规"
   }
 }

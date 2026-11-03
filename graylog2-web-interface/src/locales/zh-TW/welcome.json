@@ -80,6 +80,7 @@
     "messages_today": "今日訊息",
     "alerts_today": "今日警示",
     "events_today": "今日事件",
-    "top_sources": "前 5 個來源"
+    "top_sources": "前 5 個來源",
+    "tab_general": "一般"
   }
 }

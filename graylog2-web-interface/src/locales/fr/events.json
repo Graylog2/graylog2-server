@@ -30,7 +30,9 @@
     "no_key": "Aucune clé définie pour cet événement.",
     "no_time_range": "Aucune plage de temps",
     "refresh_human_name": "Événements",
-    "replay_search": "Rejouer la recherche"
+    "replay_search": "Rejouer la recherche",
+    "histogram_series_events": "Événements",
+    "histogram_series_alerts": "Alertes"
   },
   "alerts_replay": {
     "cannot_replay": "Impossible de rejouer cet événement : {{reason}} Veuillez en sélectionner un autre.",

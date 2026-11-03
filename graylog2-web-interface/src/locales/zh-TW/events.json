@@ -30,7 +30,9 @@
     "no_key": "此事件未設定鍵。",
     "no_time_range": "沒有時間範圍",
     "refresh_human_name": "事件",
-    "replay_search": "重播搜尋"
+    "replay_search": "重播搜尋",
+    "histogram_series_events": "事件",
+    "histogram_series_alerts": "警示"
   },
   "alerts_replay": {
     "cannot_replay": "無法重播此事件：{{reason}} 請選擇其他事件。",

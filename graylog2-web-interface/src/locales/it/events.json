@@ -30,7 +30,9 @@
     "no_key": "Nessuna chiave impostata per questo evento.",
     "no_time_range": "Nessun intervallo di tempo",
     "refresh_human_name": "Eventi",
-    "replay_search": "Riesegui ricerca"
+    "replay_search": "Riesegui ricerca",
+    "histogram_series_events": "Eventi",
+    "histogram_series_alerts": "Avvisi"
   },
   "alerts_replay": {
     "cannot_replay": "Impossibile rieseguire questo evento: {{reason}} Seleziona un evento diverso.",

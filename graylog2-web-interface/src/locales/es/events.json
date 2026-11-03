@@ -30,7 +30,9 @@
     "no_key": "No se ha definido una clave para este evento.",
     "no_time_range": "Sin intervalo de tiempo",
     "refresh_human_name": "Eventos",
-    "replay_search": "Repetir búsqueda"
+    "replay_search": "Repetir búsqueda",
+    "histogram_series_events": "Eventos",
+    "histogram_series_alerts": "Alertas"
   },
   "alerts_replay": {
     "cannot_replay": "No se puede repetir este evento: {{reason}} Selecciona otro.",

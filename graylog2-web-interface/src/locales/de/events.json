@@ -30,7 +30,9 @@
     "no_key": "Für dieses Ereignis ist kein Schlüssel gesetzt.",
     "no_time_range": "Kein Zeitraum",
     "refresh_human_name": "Ereignisse",
-    "replay_search": "Suche wiederholen"
+    "replay_search": "Suche wiederholen",
+    "histogram_series_events": "Ereignisse",
+    "histogram_series_alerts": "Alarme"
   },
   "alerts_replay": {
     "cannot_replay": "Dieses Ereignis kann nicht wiederholt werden: {{reason}} Bitte wählen Sie ein anderes aus.",

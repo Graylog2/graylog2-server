@@ -30,7 +30,9 @@
     "no_key": "Nie ustawiono klucza dla tego zdarzenia.",
     "no_time_range": "Brak zakresu czasu",
     "refresh_human_name": "Zdarzenia",
-    "replay_search": "Odtwórz wyszukiwanie"
+    "replay_search": "Odtwórz wyszukiwanie",
+    "histogram_series_events": "Zdarzenia",
+    "histogram_series_alerts": "Alerty"
   },
   "alerts_replay": {
     "cannot_replay": "Nie można odtworzyć tego zdarzenia: {{reason}} Wybierz inne.",

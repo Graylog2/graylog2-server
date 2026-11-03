@@ -60,10 +60,11 @@ const OverviewSection = ({ headerActions = undefined, children = undefined }: Ov
 };
 
 const MetricsTabs = ({ metricsPlugins }: { metricsPlugins: Array<WelcomePageMetricsPlugin> }) => {
+  const { t } = useTranslation('welcome');
   const [selectedTabValue, setSelectedTabValue] = useState<string>();
 
   const tabs = [
-    { label: 'General', value: GENERAL_TAB_VALUE, component: GeneralMetrics },
+    { label: t('metrics.tab_general'), value: GENERAL_TAB_VALUE, component: GeneralMetrics },
     ...metricsPlugins.map(({ label, component }) => ({ label, value: label, component })),
   ];
   const activeTabValue = selectedTabValue ?? metricsPlugins[0].label;

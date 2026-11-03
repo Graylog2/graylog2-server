@@ -30,7 +30,9 @@
     "no_key": "No Key set for this Event.",
     "no_time_range": "No time range",
     "refresh_human_name": "Events",
-    "replay_search": "Replay search"
+    "replay_search": "Replay search",
+    "histogram_series_events": "Events",
+    "histogram_series_alerts": "Alerts"
   },
   "alerts_replay": {
     "cannot_replay": "Cannot replay this event: {{reason}} Please select a different one.",

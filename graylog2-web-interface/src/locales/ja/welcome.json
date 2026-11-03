@@ -80,6 +80,7 @@
     "messages_today": "今日のメッセージ",
     "alerts_today": "今日のアラート",
     "events_today": "今日のイベント",
-    "top_sources": "上位 5 件のソース"
+    "top_sources": "上位 5 件のソース",
+    "tab_general": "全般"
   }
 }
