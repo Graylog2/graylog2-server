@@ -27,7 +27,7 @@
     "save_error_title": "Could not save AWS plugin configuration."
   },
   "gcs_setup_info": {
-    "intro": "To setup a Google Cloud Storage backend, the steps are as follows:",
+    "intro": "To set up a Google Cloud Storage backend, the steps are as follows:",
     "step_bucket": "Create a Google Cloud Storage Bucket with a unique name - see Google‘s documentation on <bucketsLink>Buckets</bucketsLink>. The default Standard Storage Class is recommended.",
     "step_service_account": "Create a Google Cloud Service Account, with permissions to read/write/delete from that Bucket - see Google‘s documentation on <serviceAccountsLink>Service Accounts</serviceAccountsLink>.",
     "step_credentials": "Set up Application Default credentials on all Graylog nodes. The method differs depending on how your cluster is hosted - see Google‘s documentation on <adcLink>Setting up Application Default credentials</adcLink>.",
@@ -123,7 +123,7 @@
     "sqs_queue_name_label": "SQS Queue Name"
   },
   "aws_cloudtrail_step_review": {
-    "save_error": "We were unable to save your Input, please try again in a few moments.",
+    "save_error": "We were unable to save your input, please try again in a few moments.",
     "save_button": "Save and Start Input",
     "description": "Check out everything below to make sure it's correct, then click the button below to complete your AWS CloudTrail setup!",
     "input_configuration": "Input Configuration",
@@ -182,7 +182,7 @@
   },
   "aws_cloudwatch_step_review": {
     "default_label": "(default)",
-    "save_error": "We were unable to save your Input, please try again in a few moments.",
+    "save_error": "We were unable to save your input, please try again in a few moments.",
     "complete_button": "Complete CloudWatch Setup",
     "title": "Final Review",
     "description": "Check out everything below to make sure it's correct, then click the button below to complete your CloudWatch setup!",
@@ -217,7 +217,7 @@
     "sidebar_title": "Don't see the stream you need?",
     "sidebar_requirement": "At least one Kinesis stream must exist in the specified region in order to continue with the setup. The log stream must contain at least a few log messages.",
     "sidebar_auto_setup": "{{productName}} also supports the ability to create a Kinesis stream for you and subscribe it to a CloudWatch log group of your choice. Please be aware that this option will create additional resources in your AWS environment that will incur billing charges.",
-    "setup_automatically_button": "Setup Kinesis Automatically",
+    "setup_automatically_button": "Set Up Kinesis Automatically",
     "no_logs_error": "We were unable to find any logs in this Kinesis stream. Please select a different Kinesis stream.",
     "loading_message": "This request may take a few moments.",
     "verify_button": "Verify Stream & Format",
@@ -391,7 +391,7 @@
     "custom_incident_label": "Use Custom Incident Key",
     "custom_incident_help": "Generate a custom incident key.",
     "key_prefix_label": "Incident Key Prefix",
-    "key_prefix_help": "Incident key prefix that will be followed by Stream(s) and the Event Definition title. Use Incident Key to customize entire key.",
+    "key_prefix_help": "Incident key prefix that will be followed by stream(s) and the event definition title. Use Incident Key to customize entire key.",
     "incident_key_label": "Incident Key",
     "incident_key_help": "Full key to identify the incident. Will be used instead of prefix, if provided.",
     "client_name_label": "Client Name",

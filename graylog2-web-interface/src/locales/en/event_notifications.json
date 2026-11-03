@@ -173,7 +173,7 @@
     "type_option": "Legacy {{name}}",
     "choose": "Choose Legacy Notification",
     "select": "Select Legacy Notification",
-    "select_help": "Select a Legacy Notification to use on this Event Definition.",
+    "select_help": "Select a Legacy Notification to use on this event definition.",
     "deprecated": "Legacy alarm callbacks are deprecated and will be removed with the next major release. Please switch to the new notification types as soon as possible!"
   },
   "details": {
@@ -196,7 +196,7 @@
     "human_name": "event notifications"
   },
   "pages": {
-    "description": "Notifications alert you of any configured Event when they occur. Notifications can be sent directly to you or to other systems you use for that purpose. Remember to assign Notifications while creating or editing an Event Definition.",
+    "description": "Notifications alert you of any configured Event when they occur. Notifications can be sent directly to you or to other systems you use for that purpose. Remember to assign Notifications while creating or editing an event definition.",
     "alerts_docs": "Alerts documentation",
     "title": "Notifications",
     "new": "New Notification",

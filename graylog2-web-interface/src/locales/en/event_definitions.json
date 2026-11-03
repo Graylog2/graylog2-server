@@ -9,7 +9,7 @@
   },
   "aggregation_form": {
     "description": "Summarize log messages matching the Filter defined above by using a function. You can optionally group the Filter results by identical field values.",
-    "group_by_example": "Assuming you created a Filter with all failed log-in attempts in your network, an alert could be triggered when there are more than 5 failed log-in attempts overall. Now, add <code>username</code> as Group by Field and an alert will be triggered <em>for each <code>username</code></em> with more than 5 failed log-in attempts.",
+    "group_by_example": "Assuming you created a Filter with all failed login attempts in your network, an alert could be triggered when there are more than 5 failed login attempts overall. Now, add <code>username</code> as Group by Field and an alert will be triggered <em>for each <code>username</code></em> with more than 5 failed login attempts.",
     "group_by_help": "Select fields to group filter results when they have identical values. <bold>Example:</bold>",
     "title": "Aggregation"
   },
@@ -102,8 +102,8 @@
   "details_form": {
     "add_event_procedure": "Add Event Procedure",
     "description": "Description",
-    "description_help": "Longer description for this Event Definition.",
-    "no_event_procedures": "This Event Definition does not have any Event Procedures yet.",
+    "description_help": "Longer description for this event definition.",
+    "no_event_procedures": "This event definition does not have any Event Procedures yet.",
     "no_remediation_steps": "No remediation steps given",
     "optional": "(Optional)",
     "priority": "Priority",
@@ -120,7 +120,7 @@
     "event_count": "To control how many Events a <bold>Filter & Aggregation</bold> definition creates, use \"Create Events for Definition if...\" with \"Aggregation of results reaches a threshold\" and configure Group by Field(s).",
     "example": "<bold>Example:</bold> two definitions, <em>Login failure</em> and <em>Privilege escalation</em>, both with Event Key <code>username</code>. A correlation of the two only fires when both Events carry the same username.",
     "intro": "Event Keys are custom fields whose values are combined into the Event's key (values joined with <code>|</code>). The key identifies the entity an Event is about. It does not change how many Events are created.",
-    "where_it_matters": "<bold>Where the key matters:</bold> <bold>Event Correlation</bold> only matches source Events that share the same key, and creates at most one Event per key within its search window. Set Keys on the Event Definitions you intend to correlate, not on the correlation itself."
+    "where_it_matters": "<bold>Where the key matters:</bold> <bold>Event Correlation</bold> only matches source Events that share the same key, and creates at most one Event per key within its search window. Set Keys on the event definitions you intend to correlate, not on the correlation itself."
   },
   "expanded_notifications": {
     "description": "Notifications fired when this event definition triggers.",
@@ -153,7 +153,7 @@
     }
   },
   "fields_form": {
-    "description": "Include additional information in Events generated from this Event Definition by adding custom Fields. That can help you search Events or having more context when receiving Notifications.",
+    "description": "Include additional information in Events generated from this event definition by adding custom Fields. That can help you search Events or having more context when receiving Notifications.",
     "errors_description": "Please correct the following errors before saving this Event Definition:",
     "errors_title": "Fields with errors",
     "event_fields": "Event Fields",
@@ -161,7 +161,7 @@
     "not_editable": "The event fields of this event definition type cannot be edited.",
     "optional": "(optional)",
     "tags": "Tags",
-    "tags_description": "Attach labels to this Event Definition. Tags propagate onto every Event it produces and make filtering and grouping easier on the Alerts & Events list."
+    "tags_description": "Attach labels to this event definition. Tags propagate onto every Event it produces and make filtering and grouping easier on the Alerts & Events list."
   },
   "fields_list": {
     "configuration": "Configuration",
@@ -186,7 +186,7 @@
     "cron_expression_help": "A Quartz cron expression to determine when the event should be run.",
     "cron_time_zone": "Cron Time Zone",
     "declare_missing_parameters": "Please declare missing query parameters by clicking on the buttons above.",
-    "description": "Add information to filter the log messages that are relevant for this Event Definition.",
+    "description": "Add information to filter the log messages that are relevant for this event definition.",
     "enable": "Enable",
     "enable_help": "Should this event definition be executed automatically?",
     "execute_every": "Execute search every",
@@ -261,7 +261,7 @@
     "load_failed_title": "Could not load Event definition",
     "load_list_failed": "Loading Event Definitions failed with status",
     "load_one_failed": "Loading Event Definition failed with status",
-    "not_found": "Unable to find Event Definition with id <{{id}}>, please ensure it wasn't deleted.",
+    "not_found": "Unable to find event definition with id <{{id}}>, please ensure it wasn't deleted.",
     "not_found_title": "Could not retrieve Event Definition",
     "save_failed": "Saving EventDefinition failed with status: {{error}}",
     "save_failed_title": "Could not save EventDefinition",
@@ -298,7 +298,7 @@
     "create_multiple": "Create Event Definitions",
     "description_alerts": "Event Definitions allow you to create Alerts from different Conditions and alert on them.",
     "description_events": "Event Definitions allow you to create Events from different Conditions and alert on them.",
-    "description_list": "Create new Event Definitions that will allow you to search for different Conditions and alert on them.",
+    "description_list": "Create new event definitions that will allow you to search for different Conditions and alert on them.",
     "duplicate": "Duplicate Event Definition",
     "edit": "Edit Event Definition",
     "edit_named": "Edit \"{{title}}\" Event Definition",
@@ -518,7 +518,7 @@
       "title": "Filter & Aggregation"
     },
     "system": {
-      "description": "Built-in Event Definition {{productName}} uses to report system notifications as Events.",
+      "description": "Built-in event definition {{productName}} uses to report system notifications as Events.",
       "title": "System Event Definition"
     }
   },

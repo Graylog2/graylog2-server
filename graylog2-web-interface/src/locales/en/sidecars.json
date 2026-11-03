@@ -58,9 +58,9 @@
       "button": "Process",
       "confirm": "Are you sure you want to proceed with this action?",
       "no_effect": {
-        "restart": "Restarting a Collector without Configuration will have no effect.",
-        "start": "Starting a Collector without Configuration will have no effect.",
-        "stop": "Stopping a Collector without Configuration will have no effect."
+        "restart": "Restarting a collector without Configuration will have no effect.",
+        "start": "Starting a collector without Configuration will have no effect.",
+        "stop": "Stopping a collector without Configuration will have no effect."
       },
       "summary": {
         "restart_one": "You are going to <action>restart</action> log collectors in this sidecar:",
@@ -73,7 +73,7 @@
       "summary_title": "Process action summary",
       "title": "Manage collector processes",
       "understood": "Understood, continue anyway",
-      "warning_text": "At least one selected Collector is not configured yet. To start a new Collector, assign a Configuration to it and the Sidecar will start the process for you.",
+      "warning_text": "At least one selected collector is not configured yet. To start a new collector, assign a Configuration to it and the Sidecar will start the process for you.",
       "warning_title": "Collectors without Configuration"
     }
   },
@@ -126,7 +126,7 @@
       "change_color": "Change color",
       "collector": "Collector",
       "collector_help": "Choose the log collector this configuration is meant for.",
-      "collector_in_use": "Log Collector cannot change while the Configuration is in use. Clone the Configuration to test it using another Collector.",
+      "collector_in_use": "Log collector cannot change while the Configuration is in use. Clone the Configuration to test it using another collector.",
       "collector_on_os": "{{name}} on {{os}}",
       "collector_placeholder": "Collector",
       "color": "Configuration color",
@@ -206,7 +206,7 @@
     "collector_list": {
       "actions": "Actions",
       "create_collector": "Create Log Collector",
-      "description": "Manage Log Collectors that you can configure and supervise through sidecars and the web interface.",
+      "description": "Manage Log collectors that you can configure and supervise through sidecars and the web interface.",
       "name": "Name",
       "no_data": "There are no log collectors to display, why don't you create one?",
       "operating_system": "Operating System",
@@ -224,7 +224,7 @@
       "color": "Color",
       "configuration": "Configuration",
       "create_configuration": "Create Configuration",
-      "description": "These are the Configurations to use in your Collectors. Remember to apply new configurations to Collectors in the Administration page.",
+      "description": "These are the Configurations to use in your collectors. Remember to apply new configurations to collectors in the Administration page.",
       "no_data": "There are no configurations to display, try creating one or changing your query.",
       "placeholder": "Find configurations",
       "title": "Configurations",

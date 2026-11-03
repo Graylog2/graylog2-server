@@ -6,7 +6,7 @@
       "description": "Run the command on any number of hosts — they enroll into the fleet you pick and appear as they check in.",
       "deploy_tab": "Deploy",
       "tokens_tab": "Enrollment tokens",
-      "tokens_description": "Tokens authorize new Collectors to enroll into a fleet. Deleting a token does not affect already-enrolled Collectors."
+      "tokens_description": "Tokens authorize new collectors to enroll into a fleet. Deleting a token does not affect already-enrolled collectors."
     },
     "fleets": {
       "document_title": "Collector Fleets",
@@ -112,13 +112,13 @@
   },
   "enrollment_tokens": {
     "bulk_delete_title": "Delete enrollment tokens",
-    "bulk_delete_confirm_one": "Are you sure you want to delete {{count}} enrollment token? New Collectors will not be able to enroll using the deleted token.",
-    "bulk_delete_confirm_other": "Are you sure you want to delete {{count}} enrollment tokens? New Collectors will not be able to enroll using the deleted tokens.",
+    "bulk_delete_confirm_one": "Are you sure you want to delete {{count}} enrollment token? New collectors will not be able to enroll using the deleted token.",
+    "bulk_delete_confirm_other": "Are you sure you want to delete {{count}} enrollment tokens? New collectors will not be able to enroll using the deleted tokens.",
     "never": "Never",
     "expired": "Expired",
     "human_name": "enrollment tokens",
     "delete_title": "Delete enrollment token",
-    "delete_confirm": "Are you sure you want to delete this enrollment token? New Collectors will not be able to enroll using this token. Already-enrolled Collectors will continue to operate normally."
+    "delete_confirm": "Are you sure you want to delete this enrollment token? New collectors will not be able to enroll using this token. Already-enrolled collectors will continue to operate normally."
   },
   "deployment": {
     "select_fleet_step": "Select Fleet",
@@ -212,13 +212,13 @@
     "stat_online": "Online",
     "stat_online_help": "Instances that reported a heartbeat within the offline threshold.",
     "stat_offline": "Offline",
-    "stat_offline_help": "Instances that missed their heartbeat. Check host connectivity or Collector process status.",
+    "stat_offline_help": "Instances that missed their heartbeat. Check host connectivity or collector process status.",
     "stat_sources": "Sources",
     "stat_sources_help": "Data collection configurations assigned to this fleet.",
-    "sources_description": "Sources are automatically pushed to all Collectors in this fleet. Changes take effect within seconds.",
+    "sources_description": "Sources are automatically pushed to all collectors in this fleet. Changes take effect within seconds.",
     "add_source": "Add Source",
     "sources_human_name": "sources",
-    "instances_description": "Collector instances enrolled in this fleet. Each instance runs all enabled sources. To add more instances, <deployLink>deploy Collectors</deployLink> using an enrollment token for this fleet.",
+    "instances_description": "Collector instances enrolled in this fleet. Each instance runs all enabled sources. To add more instances, <deployLink>deploy collectors</deployLink> using an enrollment token for this fleet.",
     "instances_human_name": "instances",
     "delete_source_title": "Delete source",
     "delete_source_confirm": "Are you sure you want to delete source <emphasis>{{sourceName}}</emphasis>? Collectors in this fleet will stop collecting data from this source within seconds."
@@ -228,15 +228,15 @@
     "view_system_logs": "View System Logs",
     "details": "Details",
     "delete_title": "Delete Collector instance",
-    "delete_confirm": "Are you sure you want to delete instance <emphasis>{{instanceName}}</emphasis>?<lineBreak />The Collector will need to be re-enrolled to appear again."
+    "delete_confirm": "Are you sure you want to delete instance <emphasis>{{instanceName}}</emphasis>?<lineBreak />The collector will need to be re-enrolled to appear again."
   },
   "reassign_fleet": {
     "fleet_required": "Fleet is required",
     "title_one": "Reassign {{count}} instance to fleet",
     "title_other": "Reassign {{count}} instances to fleet",
-    "no_other_fleet_one": "There is no other fleet to assign this Collector to.",
-    "no_other_fleet_other": "There is no other fleet to assign these Collectors to.",
-    "no_permission": "You do not have permission to assign Collectors to any other fleet.",
+    "no_other_fleet_one": "There is no other fleet to assign this collector to.",
+    "no_other_fleet_other": "There is no other fleet to assign these collectors to.",
+    "no_permission": "You do not have permission to assign collectors to any other fleet.",
     "select_placeholder": "Select a fleet...",
     "submit_one": "Reassign instance",
     "submit_other": "Reassign instances",
@@ -281,9 +281,9 @@
     "all_applied": "The collector has applied all queued actions."
   },
   "overview": {
-    "stat_instances_help": "Running Collector processes across all fleets.",
+    "stat_instances_help": "Running collector processes across all fleets.",
     "stat_fleets": "Fleets",
-    "stat_fleets_help": "Logical groups of Collectors that share the same source configuration.",
+    "stat_fleets_help": "Logical groups of collectors that share the same source configuration.",
     "stat_sources_help": "Data collection configurations (file paths, journald, Windows Event Logs) across all fleets.",
     "fleet_stats_error": "Could not load fleet stats.",
     "stats_error": "Could not load Collector stats.",
@@ -291,7 +291,7 @@
     "filter_placeholder": "Filter fleets...",
     "config_error": "Could not load Collectors config.",
     "endpoint_missing_title": "Collector ingest endpoint not set up",
-    "endpoint_missing": "Collectors enroll against an ingest endpoint that has not been set up yet. Setting it up requires permission to edit the Collectors configuration and to create or change the Collector Ingest (HTTP) input, which your account does not have. Ask an administrator to set up the endpoint first."
+    "endpoint_missing": "Collectors enroll against an ingest endpoint that has not been set up yet. Setting it up requires permission to edit the collectors configuration and to create or change the Collector Ingest (HTTP) input, which your account does not have. Ask an administrator to set up the endpoint first."
   },
   "fleet_card": {
     "healthy": "All instances in this fleet are online",
@@ -309,8 +309,8 @@
   },
   "fleet_cards": {
     "empty_title": "No Fleets Yet",
-    "contact_admin": "Contact an administrator to set up the first Collectors.",
-    "empty_description": "Fleets let you manage groups of Collectors with shared configuration. Create your first fleet, then add sources to define what data its Collectors should collect. Once configured, <deployLink>deploy Collectors</deployLink> using an enrollment token.",
+    "contact_admin": "Contact an administrator to set up the first collectors.",
+    "empty_description": "Fleets let you manage groups of collectors with shared configuration. Create your first fleet, then add sources to define what data its collectors should collect. Once configured, <deployLink>deploy collectors</deployLink> using an enrollment token.",
     "create": "Create Fleet",
     "no_match": "No fleets matching filter"
   },
@@ -361,7 +361,7 @@
     "hostname_placeholder": "e.g. otlp.example.com",
     "port": "External port",
     "cancel": "Cancel",
-    "reachability_hint": "Collectors send their logs to this address. It must be reachable from every Collector host: a load balancer, or this server.",
+    "reachability_hint": "Collectors send their logs to this address. It must be reachable from every collector host: a load balancer, or this server.",
     "confirm_title": "Confirm how Collectors send data to this cluster",
     "change": "Change endpoint",
     "sending_to": "Collectors send data to this cluster at <endpoint />",
@@ -438,7 +438,7 @@
     "ingest_endpoint": "Ingest Endpoint",
     "ingest_endpoint_cloud": "The ingest endpoint is system-managed. Collectors connect here automatically.",
     "ingest_endpoint_help": "Ingest endpoints receive log data from collectors via OpenTelemetry (OTLP). The external address that is pushed to managed collectors as their data destination. It must route to a running collector ingest input. This is typically the address of a load balancer or the server itself.",
-    "hostname_help": "The hostname or IP address that Collectors will use to connect. Must be reachable from Collector hosts.",
+    "hostname_help": "The hostname or IP address that collectors will use to connect. Must be reachable from collector hosts.",
     "create_input": "Create ingest input",
     "lifecycle": "Collector Lifecycle",
     "offline_threshold": "Offline threshold",
@@ -451,7 +451,7 @@
   },
   "ingest_inputs": {
     "title": "Ingest Inputs",
-    "none": "No Collector ingest input exists. Collectors will not be able to send data until an input is created.",
+    "none": "No collector ingest input exists. Collectors will not be able to send data until an input is created.",
     "unreadable_one": "{{count}} collector ingest input exists but you do not have permission to view it.",
     "unreadable_other": "{{count}} collector ingest inputs exist but you do not have permission to view them.",
     "none_running": "Collector ingest inputs exist but none are currently running. Collectors will not be able to send data.",
@@ -482,10 +482,10 @@
     "read_mode_end": "From end (tail)",
     "read_mode_beginning": "From beginning",
     "file_paths": "File Path(s)",
-    "file_paths_help": "Glob patterns supported (e.g., /var/log/*.log, /var/log/**/*.log). The Collector watches matched files for new lines.",
+    "file_paths_help": "Glob patterns supported (e.g., /var/log/*.log, /var/log/**/*.log). The collector watches matched files for new lines.",
     "read_mode": "Read Mode",
-    "read_mode_file_help": "From end: only collect new lines after the Collector starts. From beginning: collect all existing lines first, then continue tailing.",
-    "read_mode_journald_help": "From end: only collect new entries after the Collector starts. From beginning: collect all existing entries first, then continue tailing.",
+    "read_mode_file_help": "From end: only collect new lines after the collector starts. From beginning: collect all existing lines first, then continue tailing.",
+    "read_mode_journald_help": "From end: only collect new entries after the collector starts. From beginning: collect all existing entries first, then continue tailing.",
     "priority": "Priority",
     "priority_help": "Minimum severity level to collect. For example, selecting Error also collects Critical, Alert, and Emergency entries.",
     "priority_emerg": "Emergency",
@@ -505,18 +505,18 @@
     "predicate": "Predicate",
     "predicate_help": "Optional macOS unified logging filter predicate passed to the <code>log</code> command. Leaving this empty collects all logs from the system! <code>info</code> or <code>debug</code> levels are not currently collected, as they are very noisy and carry very little valuable information. Example: <code>{{example}}</code>",
     "max_poll_interval": "Max poll interval",
-    "max_poll_interval_help": "How often the Collector checks for new log entries. Must be at least 1 second.",
+    "max_poll_interval_help": "How often the collector checks for new log entries. Must be at least 1 second.",
     "max_log_age": "Max log age",
     "max_log_age_help": "On first start, how far back to backfill logs. Set to 0 to disable backfilling.",
     "edit_title": "Edit Source",
     "new_title": "New Source",
-    "description": "A source defines what data Collectors in this fleet should collect. Each source type corresponds to a different collection method.",
+    "description": "A source defines what data collectors in this fleet should collect. Each source type corresponds to a different collection method.",
     "source_type": "Source Type",
     "file_type_help": "Collect log lines from files on the host. Supports glob patterns for matching multiple files.",
     "journald_type_help": "Collect entries from the systemd journal (Linux only).",
     "windows_type_help": "Collect events from Windows Event Viewer channels.",
     "macos_type_help": "Collect from the macOS unified logging system via the <code>log</code> command (macOS only).",
-    "enabled_help": "Disabled sources are not sent to Collectors. Use this to temporarily stop collection without removing the source.",
+    "enabled_help": "Disabled sources are not sent to collectors. Use this to temporarily stop collection without removing the source.",
     "update": "Update source",
     "create": "Create source"
   },
@@ -527,7 +527,7 @@
     },
     "input_ids": {
       "message": "Loading Collector input IDs failed with status",
-      "title": "Could not load Collector input IDs."
+      "title": "Could not load collector input IDs."
     },
     "stats": {
       "message": "Loading Collector stats failed with status",
@@ -571,7 +571,7 @@
     },
     "input_details": {
       "message": "Loading Collector input details failed with status: {{error}}",
-      "title": "Could not load Collector input details."
+      "title": "Could not load collector input details."
     }
   },
   "mutation_errors": {

@@ -92,7 +92,7 @@
     "create_multiple": "Create Event Definitions",
     "description_alerts": "Event Definitions allow you to create Alerts from different Conditions and alert on them.",
     "description_events": "Event Definitions allow you to create Events from different Conditions and alert on them.",
-    "description_list": "Create new Event Definitions that will allow you to search for different Conditions and alert on them.",
+    "description_list": "Create new event definitions that will allow you to search for different Conditions and alert on them.",
     "duplicate": "Duplicate Event Definition",
     "edit": "Edit Event Definition",
     "edit_named": "Edit \"{{title}}\" Event Definition",

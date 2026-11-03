@@ -266,7 +266,7 @@
         "correlation_aggregation": "Correlation & Aggregation Events",
         "threat_intel": "Threat Intel Integrations",
         "incident_workspaces": "Incident Investigation Workspaces",
-        "prebuilt_parser_dashboards": "Pre-build Security Parser & Dashboards",
+        "prebuilt_parser_dashboards": "Pre-built Security Parser & Dashboards",
         "sigma_rules": "Sigma Rules",
         "parameterized_dashboards": "Parameterized Dashboarding",
         "input_output_integrations": "Input & Output Integrations",
@@ -278,7 +278,7 @@
       "banner_text": "For more information and booking a full demo of the product visit {{productName}} website.",
       "button": "{{productName}} Security",
       "overview": "OVERVIEW",
-      "description": "{{productName}} Security is designed to revolutionize cybersecurity for IT teams, offering the combined capabilities of SIEM, Security Analytics, Incident Investigation, and Anomaly Detection. By using our platform, you can work more efficiently, tackling critical tasks quicker, and mitigating risk caused by malicious actors and credential-based attacks."
+      "description": "{{productName}} Security is designed to revolutionize cybersecurity for IT teams, offering the combined capabilities of SIEM, Security Analytics, Incident investigation, and Anomaly Detection. By using our platform, you can work more efficiently, tackling critical tasks quicker, and mitigating risk caused by malicious actors and credential-based attacks."
     }
   },
   "user_fields": {

@@ -1,7 +1,7 @@
 {
   "destination_permission_alert": {
     "data_lake": "You currently do not have the permissions to view or manage Data Lake destination.",
-    "index_set": "You currently do not have the permissions to view or manage Index Set destination.",
+    "index_set": "You currently do not have the permissions to view or manage index set destination.",
     "outputs": "You currently do not have the permissions to view or manage Outputs destination."
   },
   "index_set_select": {
@@ -60,7 +60,7 @@
       "header_status": "Status",
       "header_title": "Title",
       "info_data_lake": "Messages which meet the criteria of the following filter rule(s) will not be routed to the Data Lake.",
-      "info_indexer": "Messages which meet the criteria of the following filter rule(s) will not be routed to the Index Set.",
+      "info_indexer": "Messages which meet the criteria of the following filter rule(s) will not be routed to the index set.",
       "no_filters": "No filter have been found.",
       "title": "Filter Rules"
     }
@@ -118,7 +118,7 @@
       "disabled": "Disabled",
       "enabled": "Enabled",
       "filters": "FILTERS {{count}}",
-      "info": "Messages routed to the <boldText>Search Cluster</boldText> will be searchable and count towards the {{productName}} License usage. These messages will be stored in the defined Index Set until the retention policy criteria is met. Note: Messages not routed to the <boldText>Search Cluster</boldText> will not be searchable.",
+      "info": "Messages routed to the <boldText>Search Cluster</boldText> will be searchable and count towards the {{productName}} License usage. These messages will be stored in the defined index set until the retention policy criteria is met. Note: Messages not routed to the <boldText>Search Cluster</boldText> will not be searchable.",
       "title": "Index Set",
       "toggle_aria": "Toggle index set"
     },
@@ -157,13 +157,13 @@
     "edit": "Edit",
     "edit_modal_title": "Editing Stream",
     "heading": "Stream: {{title}}",
-    "intake_description": "Stream Rules may be used to collect a filtered subset of messages directly from Inputs to this Stream. Note that Stream Rules are now a legacy feature, the recommended device to manage stream routing is now Pipeline Rules.",
-    "no_pipelines": "This stream is not connected to any Pipeline.",
+    "intake_description": "Stream Rules may be used to collect a filtered subset of messages directly from inputs to this stream. Note that Stream Rules are now a legacy feature, the recommended device to manage stream routing is now Pipeline Rules.",
+    "no_pipelines": "This stream is not connected to any pipeline.",
     "pipeline_header": "Pipeline",
     "processing_description": "Pipelines let you transform and process messages coming from streams. Pipelines consist of stages where rules are evaluated and applied. Messages can go through one or more stages.",
     "processing_title": "Pipelines",
     "rule_header": "Rule",
-    "rules_info": "Stream Rules take effect first in the default processing order, and are used to direct messages from Inputs into Streams. Any message that meets the criteria of the Stream Rule(s) will be directed into this Stream.",
+    "rules_info": "Stream Rules take effect first in the default processing order, and are used to direct messages from inputs into streams. Any message that meets the criteria of the Stream Rule(s) will be directed into this stream.",
     "rules_title": "Stream rules",
     "segment_destinations": "3: Destinations",
     "segment_intake": "1: Intake",
@@ -211,7 +211,7 @@
     "description": "Description",
     "description_help": "What kind of messages are routed into this stream?",
     "index_set_required": "Index set is required",
-    "remove_matches_help": "Don't assign messages that match this stream to the ‘Default Stream’.",
+    "remove_matches_help": "Don't assign messages that match this stream to the ‘Default stream’.",
     "remove_matches_label": "Remove matches from ‘Default Stream’",
     "share_description": "Search for a User or Team to add as collaborator on this stream.",
     "title": "Title",
@@ -498,7 +498,7 @@
     "add_failed_title": "Could not add output to stream",
     "remove_failed": "Deleting output from stream failed with status: {{error}}",
     "remove_failed_title": "Could not delete output from stream",
-    "added_success": "Output has been successfully added to Stream.",
+    "added_success": "Output has been successfully added to stream.",
     "removed_success": "Output has been successfully removed from stream.",
     "success_title": "Success!"
   },

@@ -57,9 +57,9 @@
     "processing_streams_one": "This pipeline is processing messages from the stream {{streams}}.",
     "processing_streams_other": "This pipeline is processing messages from the streams {{streams}}.",
     "managed_1": "This pipeline is system managed and can only be edited in a limited way.",
-    "managed_2": "Pipeline Rules may only be added to this Pipeline via the Input Wizard.",
-    "managed_3": "Pipeline Rules in this Pipeline will be automatically renamed to reflect any changes to the corresponding Input name.",
-    "managed_4": "Pipeline Rules can be removed manually from this Pipeline, but not added manually.",
+    "managed_2": "Pipeline Rules may only be added to this pipeline via the Input Wizard.",
+    "managed_3": "Pipeline Rules in this pipeline will be automatically renamed to reflect any changes to the corresponding input name.",
+    "managed_4": "Pipeline Rules can be removed manually from this pipeline, but not added manually.",
     "connections_title": "Pipeline connections",
     "no_connections": "Select streams that will be processed by this pipeline.",
     "stages_title": "Pipeline Stages",
@@ -191,8 +191,8 @@
     "warning": "Rule metrics should only be enabled to debug a performance issue because collecting the metrics will slow down message processing and increase memory usage.",
     "enable": "Enable rule metrics",
     "disable": "Disable rule metrics",
-    "pipeline_load_info": "Enabling these metrics will add a new column to the Pipeline and Pipeline Rule pages called <columnName>Pipeline Load</columnName>, which will contain % values showing relatively, which of your Pipelines is consuming the most thread time.",
-    "rule_load_info": "Enabling these metrics will also add a new column to the Pipeline Detail page called <columnName>Rule Load</columnName>, This will identify which Pipeline rules within the selected Pipeline are the most expensive."
+    "pipeline_load_info": "Enabling these metrics will add a new column to the pipeline and Pipeline Rule pages called <columnName>Pipeline Load</columnName>, which will contain % values showing relatively, which of your pipelines is consuming the most thread time.",
+    "rule_load_info": "Enabling these metrics will also add a new column to the Pipeline Detail page called <columnName>Rule Load</columnName>, This will identify which pipeline rules within the selected pipeline are the most expensive."
   },
   "rule_simulation": {
     "error_builder": "Could not run the rule simulation. Please fix the rule builder errors.",

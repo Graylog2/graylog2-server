@@ -34,7 +34,7 @@
     "TERMINATED": "Terminated"
   },
   "state_control": {
-    "set_up": "Set-up Input",
+    "set_up": "Set Up Input",
     "stopping": "Stopping...",
     "stop": "Stop input",
     "starting": "Starting...",
@@ -97,17 +97,17 @@
       "listening_for_title": "This Input is Listening For:",
       "listening_for": "Note that UPD traffic sent to a TCP input, or TCP traffic sent to a UDP input will show up as network I/O, but no messages will be received.",
       "empty_messages_discarded_title": "Empty Messages discarded:",
-      "empty_messages_discarded": "Messages with a message payload length of 0 will be discarded by the Input.",
+      "empty_messages_discarded": "Messages with a message payload length of 0 will be discarded by the input.",
       "network_io_title": "Network I/O:",
       "network_io": "Note that this value can be used to detect connection attempts and invalid traffic to an input.",
-      "input_state": "An Input in running State is ready to receive messages. An Input in a failed or failing state has encountered a problem; click on the button below to view the associated error message.",
+      "input_state": "An input in running State is ready to receive messages. An input in a failed or failing state has encountered a problem; click on the button below to view the associated error message.",
       "message_error_at_input_title": "Message Error at Input:",
-      "message_error_at_input": "Each input type expects to receive messages in a particular format. Messages that break this format can be rejected by the Input, in which case they will not proceed to processing. To resolve these cases, review the messages that are being sent. More descriptive errors can be found in the {{productName}} server.log file.",
+      "message_error_at_input": "Each input type expects to receive messages in a particular format. Messages that break this format can be rejected by the input, in which case they will not proceed to processing. To resolve these cases, review the messages that are being sent. More descriptive errors can be found in the {{productName}} server.log file.",
       "message_failed_to_process_title": "Message Failed to Process:",
       "message_failed_to_process": "Extractors and pipelines can be used to perform processing operations on messages such as parsing out fields. A pipeline rule that tries to perform a nonsensical operation, or that modifies the properties of a field in the message to a format that conflicts with the data type or field length limits of that field, can fail to process. Messages that fail to process in this fashion can be reviewed within the Processing and Indexing Failures stream.",
       "message_failed_to_index_title": "Message Errors:",
       "message_failed_to_index": "Within the search cluster, a message can only be saved into an Index if it meets the schema of that Index. Each field in OpenSearch has a field type and character limit; if either is exceeded, the message will fail to Index. Messages that fail to Index in this fashion can be reviewed within the Processing and Indexing Failures stream.",
-      "received_message_count_by_stream": "Use this view to understand where stream and pipeline rules are directing the messages from this Input. A message can be duplicated into multiple streams; if this results in the message being saved to more than one Index, this can also multiply license usage. This view can be useful to detect such duplication."
+      "received_message_count_by_stream": "Use this view to understand where stream and pipeline rules are directing the messages from this input. A message can be duplicated into multiple streams; if this results in the message being saved to more than one Index, this can also multiply license usage. This view can be useful to detect such duplication."
     },
     "node": {
       "node_id": "Node ID:",
@@ -119,7 +119,7 @@
     },
     "information": {
       "title": "Information",
-      "description": "The address on which the Input is being run.",
+      "description": "The address on which the input is being run.",
       "input_title": "Input Title:",
       "input_type": "Input Type:",
       "running_on": "This Input is running on:",
@@ -130,28 +130,28 @@
     },
     "state": {
       "title": "State",
-      "description": "Number of {{productName}} nodes the Input is configured to run, and on how many it is running. If any are not running, click to see any associated error messages.",
+      "description": "Number of {{productName}} nodes the input is configured to run, and on how many it is running. If any are not running, click to see any associated error messages.",
       "failed_starts": "Failed starts (last 15min):",
       "not_running": "Input is not running."
     },
     "troubleshooting": {
       "title": "Troubleshooting",
-      "failed_title": "If Input is in a failed state.",
-      "failed_message_field": "When an Input fails on one or more {{productName}} nodes, the Message field of the State panel will show a short error message; a full length error message may be found in the {{productName}} server.log file.",
-      "failed_port": "An input configured to use a specified port will fail if that port is privileged (and {{productName}} is not running as root), or already in use by another Input or application.",
+      "failed_title": "If input is in a failed state.",
+      "failed_message_field": "When an input fails on one or more {{productName}} nodes, the Message field of the State panel will show a short error message; a full length error message may be found in the {{productName}} server.log file.",
+      "failed_port": "An input configured to use a specified port will fail if that port is privileged (and {{productName}} is not running as root), or already in use by another input or application.",
       "failed_route": "An input will fail if it is unable to route to the specified IP.",
       "failed_internet": "An input that requires an internet connection in order to connect to an API will fail if it has no internet connection or else is unable to route to that API.",
       "failed_certificate": "A TCP input will fail if it has an invalid or expired certificate.",
-      "failed_external_api": "Inputs that connect to an external API (for example, the Microsoft Azure Input) require configuration changes at the source to enable {{productName}} to collect logs. The steps required will be detailed on the appropriate documentation sub-page for that Input. An input that connects to an external API will fail if incorrectly configured at either the {{productName}} side, or (as applicable) the side hosting the API.",
-      "no_messages_title": "If Input is running on all nodes, but messages are not reaching the Input.",
+      "failed_external_api": "Inputs that connect to an external API (for example, the Microsoft Azure input) require configuration changes at the source to enable {{productName}} to collect logs. The steps required will be detailed on the appropriate documentation sub-page for that input. An input that connects to an external API will fail if incorrectly configured at either the {{productName}} side, or (as applicable) the side hosting the API.",
+      "no_messages_title": "If input is running on all nodes, but messages are not reaching the input.",
       "no_messages_network_io": "Check the Network I/O field of the Received Traffic panel. If no traffic is showing here, that suggests a connectivity problem.",
       "no_messages_connectivity": "If no traffic is showing, first troubleshoot network connectivity between the {{productName}} server(s) and the log source. This may be achieved by running ping, telnet or tracert commands.",
-      "no_messages_external_api": "For Inputs that connect to an external API, check the {{productName}} server.log file - authentication failures (invalid logins or permissions to perform the action on the API) will be printed in full here.",
-      "no_messages_format": "If traffic is showing on the Network I/O field of the Received Traffic panel, but no messages have been received, this suggests the messages are not being sent in a format appropriate to the Input.",
+      "no_messages_external_api": "For inputs that connect to an external API, check the {{productName}} server.log file - authentication failures (invalid logins or permissions to perform the action on the API) will be printed in full here.",
+      "no_messages_format": "If traffic is showing on the Network I/O field of the Received Traffic panel, but no messages have been received, this suggests the messages are not being sent in a format appropriate to the input.",
       "no_messages_protocol": "TCP input cannot read UDP traffic, and vice versa.",
       "no_messages_empty": "A message with no content will be discarded. This can be monitored via the Empty Messages Discarded field.",
-      "no_messages_listener": "Listener Inputs expect messages in a limited range of formats and may be unable to read messages in foreign formats. For troubleshooting purposes, the Raw Text Input has the most permissive requirements.",
-      "message_errors_title": "If Input is running on all nodes, messages are reaching the Input, but some (or all) are showing as Message Errors.",
+      "no_messages_listener": "Listener inputs expect messages in a limited range of formats and may be unable to read messages in foreign formats. For troubleshooting purposes, the Raw Text input has the most permissive requirements.",
+      "message_errors_title": "If input is running on all nodes, messages are reaching the input, but some (or all) are showing as Message Errors.",
       "message_errors_failure_processing": "On Licensed Enterprise clusters, Failure Processing can be enabled to allow storage of messages that error at each stage - input, processing, and writing to the search cluster, along with details of the failure - see the failure_cause and failure_details fields. Navigate to the Message Error panel and click on the message count to examine individual failed messages."
     },
     "received_traffic": {
@@ -166,24 +166,24 @@
     },
     "message_count_by_stream": {
       "title": "Received Message count by Stream",
-      "description": "Messages successfully ingested from this Input in the last 15 minutes. Click on the Stream to inspect the messages.",
+      "description": "Messages successfully ingested from this input in the last 15 minutes. Click on the stream to inspect the messages.",
       "stream": "{{streamName}}:",
-      "none": "No messages from this Input were routed into Streams in the last 15 minutes."
+      "none": "No messages from this input were routed into streams in the last 15 minutes."
     },
     "message_errors": {
       "title": "Message Errors",
-      "description": "Messages can fail to process at the Input, at the processing pipeline, or when being indexed to the Search Cluster.",
+      "description": "Messages can fail to process at the input, at the processing pipeline, or when being indexed to the Search Cluster.",
       "at_input": "Message Error at Input:",
       "failed_to_process": "Message failed to process:",
       "failed_to_index": "Message failed to index:"
     },
     "rules": {
       "pipeline_rules_title": "Input appears in Pipeline Rules",
-      "pipeline_rules_description": "Pipeline rules detailed below explicitly reference this Input (e.g. via from_input, from_forwarder_input, or a match on gl2_source_input/gl2_forwarder_input).",
+      "pipeline_rules_description": "Pipeline rules detailed below explicitly reference this input (e.g. via from_input, from_forwarder_input, or a match on gl2_source_input/gl2_forwarder_input).",
       "pipeline_rules_human_name": "pipeline rules",
       "pipeline_rules_search": "Search for pipeline rule",
       "stream_rules_title": "Input appears in Stream Rules",
-      "stream_rules_description": "Stream rules detailed below contain a match input function which explicitly targets this Input. Note that Stream Rules which may capture messages from this Input without the explicit use of the match input function will not be listed.",
+      "stream_rules_description": "Stream rules detailed below contain a match input function which explicitly targets this input. Note that Stream Rules which may capture messages from this input without the explicit use of the match input function will not be listed.",
       "stream_rules_human_name": "stream rules",
       "stream_rules_search": "Search for stream rule",
       "load_pipeline_rules_failed": "Loading input pipeline rules failed with status",
@@ -218,10 +218,10 @@
     "routing": {
       "connected_pipelines_title": "Pipelines connected to target Stream",
       "connected_pipelines": "We recommending checking the impact of these prior to completing the Input Setup. The target Stream has the following Pipelines connected to it:",
-      "select_destination": "Select a destination Stream to route messages from this input to.",
+      "select_destination": "Select a destination stream to route messages from this input to.",
       "recommend_new_stream": "<strong>We recommend creating a new stream for each new input.</strong> This will help categorize your messages into a basic schema.",
-      "default_stream_fallback": "Messages that are not routed to any Stream will be routed to the <strong>Default Stream</strong>.",
-      "pipeline_rules_info": "Pipeline rules can be automatically created and attached to the <strong>Default Stream</strong> by this Wizard. These rules will be placed in the system managed Default Routing Pipeline, and will be automatically renamed (or deleted) to accurately reflect the state of this Input.",
+      "default_stream_fallback": "Messages that are not routed to any stream will be routed to the <strong>Default stream</strong>.",
+      "pipeline_rules_info": "Pipeline rules can be automatically created and attached to the <strong>Default stream</strong> by this Wizard. These rules will be placed in the system managed Default Routing pipeline, and will be automatically renamed (or deleted) to accurately reflect the state of this input.",
       "new_stream_heading": "Route to a new Stream",
       "recommended": "Recommended!",
       "create_stream": "Create Stream",
@@ -230,16 +230,16 @@
       "create_new_stream": "Create new Stream",
       "choose_existing_stream": "Choose an existing Stream",
       "existing_stream_selected": "Route messages from this input to an existing stream is selected.",
-      "pipeline_rules_created": "Pipeline Rules will be created when the <strong>Start Input</strong> button is pressed.",
+      "pipeline_rules_created": "Pipeline Rules will be created when the <strong>Start input</strong> button is pressed.",
       "default_stream": "Default Stream",
       "remove_from_default": "Remove matches from ‘Default Stream’",
-      "remove_from_default_help": "Don't assign messages that match this stream to the ‘Default Stream’."
+      "remove_from_default_help": "Don't assign messages that match this stream to the ‘Default stream’."
     },
     "start": {
-      "description": "Set up and start the Input according to the configuration made.",
+      "description": "Set up and start the input according to the configuration made.",
       "rolling_back": "Rolling back Input...",
       "setting_up": "Setting up Input...",
-      "not_ready": "Your Input is not ready to be setup yet. Please complete the previous steps.",
+      "not_ready": "Your input is not ready to be set up yet. Please complete the previous steps.",
       "start_input": "Start Input",
       "rollback_input": "Rollback Input",
       "launch_diagnosis": "Launch Input Diagnosis"
@@ -269,7 +269,7 @@
         "create_pipeline": "Creating Pipeline failed!",
         "create_pipeline_named": "Creating Pipeline \"{{name}}\" failed!",
         "setup_routing": "Setting up routing failed!",
-        "result": "Starting the Input has failed. Please roll it back to clean it up.",
+        "result": "Starting the input has failed. Please roll it back to clean it up.",
         "delete_stream": "Deleting Stream failed!",
         "delete_stream_named": "Deleting Stream \"{{name}}\" failed!",
         "delete_pipeline": "Deleting Pipeline failed!",
@@ -303,8 +303,8 @@
       "description_help": "What kind of messages are routed into this stream?",
       "create_pipeline": "Create a new pipeline for this stream",
       "select_index_set": "Select Index Set",
-      "index_set_info": "Messages that match this stream will be written to the configured Index Set. Index Sets are used to rationally partition data to allow faster searches.",
-      "index_set_recommendation": "We recommend creating a new Index Set for each Input type.",
+      "index_set_info": "Messages that match this stream will be written to the configured index set. Index Sets are used to rationally partition data to allow faster searches.",
+      "index_set_recommendation": "We recommend creating a new index set for each input type.",
       "create_index_set": "Create a new Index Set"
     },
     "input_in_use": {
@@ -315,12 +315,12 @@
     },
     "index_set_alert": {
       "default_title": "Default Index Set selected",
-      "default_selected": "You have selected the Default Index Set.",
-      "default_recommendation": "We recommend against this: as the potential recipient of messages of many different formats (any message with no routing, via the Default Stream), the Default Index Set is susceptible to reaching the maximum per-Index field limit of the search backend if used extensively.",
+      "default_selected": "You have selected the Default index set.",
+      "default_recommendation": "We recommend against this: as the potential recipient of messages of many different formats (any message with no routing, via the Default stream), the Default index set is susceptible to reaching the maximum per-Index field limit of the search backend if used extensively.",
       "in_use_title": "Selected index set already associated with another stream",
       "in_use": "The selected index set is already associated with another stream(s).",
       "field_limit": "Note that each Index has a unique field limit, defaulting to 1000.",
-      "organise_recommendation": "For this reason, we recommend that streams be organised by log format across multiple Index Sets where possible."
+      "organise_recommendation": "For this reason, we recommend that streams be organised by log format across multiple index sets where possible."
     }
   },
   "overview": {
