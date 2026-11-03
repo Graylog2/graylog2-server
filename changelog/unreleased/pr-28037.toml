@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix IPFIX and NetFlow v9 inputs not releasing buffered flows that also reference a template received in an earlier packet."
+
+issues = ["28034"]
+pulls = ["28037"]
