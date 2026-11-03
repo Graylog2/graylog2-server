@@ -1,5 +1,0 @@
-type = "a"
-message = "Add optional `code` and `params` to REST API error responses so the web interface can translate errors."
-
-issues = [""]
-pulls = [""]
