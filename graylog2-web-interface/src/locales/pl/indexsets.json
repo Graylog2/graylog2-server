@@ -309,6 +309,7 @@
     "search_placeholder": "Znajdź zestawy indeksów",
     "section_details": "Szczegóły",
     "section_streams": "Powiązane strumienie",
+    "streams_label": "powiązane strumienie dla {{title}}",
     "set_field_type_profile": "Ustaw profil typów pól",
     "remove_field_type_profile": "Usuń profil typów pól",
     "view": "Widok:",

@@ -58,6 +58,7 @@
     "description_hint": "Please contact your administrator and provide the error details.",
     "description_intro": "You do not have the required permissions to view this resource.",
     "page_details": "The permissions check for the following request failed,\nwhile trying to access {{pathname}}.",
+    "page_details_no_request": "The permissions check failed while trying to access {{pathname}}.",
     "title": "Missing Permissions"
   }
 }

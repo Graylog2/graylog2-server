@@ -375,6 +375,7 @@
       "associated_inputs_load_failed": "無法載入相關聯的 Input。",
       "associated_inputs_none": "過去 24 小時內沒有任何 Input 傳送訊息至此串流。",
       "deleted": "{{id}}（已刪除）",
+      "missing_permissions": "缺少權限",
       "destination_data_lake": "Data Lake",
       "destination_index_set": "Index Set",
       "destination_output": "Output",

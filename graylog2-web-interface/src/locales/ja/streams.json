@@ -375,6 +375,7 @@
       "associated_inputs_load_failed": "関連する Input を読み込めませんでした。",
       "associated_inputs_none": "過去 24 時間にこのストリームへメッセージを送信した Input はありません。",
       "deleted": "{{id}}（削除済み）",
+      "missing_permissions": "権限がありません",
       "destination_data_lake": "Data Lake",
       "destination_index_set": "Index Set",
       "destination_output": "Output",

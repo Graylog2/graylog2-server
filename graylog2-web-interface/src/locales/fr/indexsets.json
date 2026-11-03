@@ -302,6 +302,7 @@
     "search_placeholder": "Rechercher des Index Sets",
     "section_details": "Détails",
     "section_streams": "Streams associés",
+    "streams_label": "streams associés à {{title}}",
     "set_field_type_profile": "Définir le profil de type de champ",
     "remove_field_type_profile": "Supprimer le profil de type de champ",
     "view": "Affichage :",

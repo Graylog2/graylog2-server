@@ -288,6 +288,7 @@
     "search_placeholder": "Index Set を検索",
     "section_details": "詳細",
     "section_streams": "関連する Stream",
+    "streams_label": "{{title}} に関連付けられたストリーム",
     "set_field_type_profile": "フィールドタイププロファイルを設定",
     "remove_field_type_profile": "フィールドタイププロファイルを削除",
     "view": "表示:",

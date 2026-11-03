@@ -351,7 +351,10 @@
       "hide_messages_per_stream": "Ukryj liczbę wiadomości według streamu dla {{title}}",
       "show_metrics": "Pokaż metryki",
       "hide_metrics": "Ukryj metryki",
-      "throughput": "{{value}} wiad./s"
+      "throughput": "{{value}} wiad./s",
+      "associated_streams_label": "powiązane strumienie dla {{title}}",
+      "extractors_label": "ekstraktory dla {{title}}",
+      "messages_per_stream_label": "wiadomości na strumień dla {{title}}"
     },
     "sections": {
       "could_not_load_associated_streams": "Nie udało się załadować powiązanych streamów.",

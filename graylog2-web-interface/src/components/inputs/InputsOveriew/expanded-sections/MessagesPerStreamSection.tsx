@@ -23,7 +23,7 @@ import useEntityTitles from 'hooks/useEntityTitles';
 import { Link, Spinner } from 'components/common';
 import { Table } from 'components/bootstrap';
 import { formatCount } from 'components/inputs/helpers/InputThroughputUtils';
-import { useInputMetricsFor } from 'components/inputs/InputsOveriew/InputMetricsContext';
+import useInputMetrics from 'hooks/useInputMetrics';
 import Routes from 'routing/Routes';
 
 type Props = {
@@ -49,8 +49,8 @@ const MessageCountCell = styled.td`
 
 const MessagesPerStreamSection = ({ input }: Props) => {
   const { t } = useTranslation('inputs');
-  const { metrics, isInitialLoading, isError } = useInputMetricsFor(input.id);
-  const messagesPerStream = metrics?.messages_per_stream;
+  const { metricsByInputId, isInitialLoading, isError } = useInputMetrics([input.id], ['messages_per_stream']);
+  const messagesPerStream = metricsByInputId[input.id]?.messages_per_stream;
 
   const streamIds = messagesPerStream ? Object.keys(messagesPerStream) : [];
   const titleEntities = streamIds.map((id) => ({ id, type: 'streams' }));

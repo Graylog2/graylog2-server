@@ -348,7 +348,10 @@
       "hide_messages_per_stream": "隱藏 {{title}} 依 Stream 統計的訊息數",
       "show_metrics": "顯示指標",
       "hide_metrics": "隱藏指標",
-      "throughput": "{{value}} 則訊息/秒"
+      "throughput": "{{value}} 則訊息/秒",
+      "associated_streams_label": "{{title}} 的關聯串流",
+      "extractors_label": "{{title}} 的擷取器",
+      "messages_per_stream_label": "{{title}} 每個串流的訊息"
     },
     "sections": {
       "could_not_load_associated_streams": "無法載入關聯的 Stream。",

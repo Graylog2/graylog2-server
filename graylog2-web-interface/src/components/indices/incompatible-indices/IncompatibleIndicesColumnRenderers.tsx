@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { ColorVariant } from '@graylog/sawmill';
 
 import i18n from 'i18n';
+import type { ColorVariant } from 'theme/sawmill';
 import { Label } from 'components/bootstrap';
 import { Timestamp } from 'components/common';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';

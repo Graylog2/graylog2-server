@@ -288,6 +288,7 @@
     "search_placeholder": "查找索引集",
     "section_details": "详细信息",
     "section_streams": "关联的流",
+    "streams_label": "{{title}} 的关联数据流",
     "set_field_type_profile": "设置字段类型配置文件",
     "remove_field_type_profile": "移除字段类型配置文件",
     "view": "视图：",

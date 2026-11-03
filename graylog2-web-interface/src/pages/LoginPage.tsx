@@ -29,7 +29,7 @@ import LoginForm from 'components/login/LoginForm';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import AppConfig from 'util/AppConfig';
 import { LOGIN_INITIALIZING_STATE, LOGIN_INITIALIZED_STATE } from 'logic/authentication/constants';
-import { SessionActions } from 'stores/sessions/SessionStore';
+import { validate } from 'logic/session/SessionApi';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useProductName from 'brand-customization/useProductName';
 
@@ -93,14 +93,18 @@ const useValidateSession = () => {
   const [didValidateSession, setDidValidateSession] = useState(false);
 
   useEffect(() => {
-    const sessionPromise = SessionActions.validate().then((response) => {
-      setDidValidateSession(true);
+    let ignore = false;
 
-      return response;
-    });
+    const onValidated = () => {
+      if (!ignore) {
+        setDidValidateSession(true);
+      }
+    };
+
+    validate().then(onValidated, () => {});
 
     return () => {
-      sessionPromise.cancel();
+      ignore = true;
     };
   }, []);
 
@@ -127,6 +131,7 @@ const LoginPage = () => {
   const hasCustomLogin = CustomLogin !== undefined;
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLastError(undefined);
   }, [useFallback]);
 
@@ -173,7 +178,9 @@ const LoginPage = () => {
   return (
     <DocumentTitle title={t('sign_in')}>
       <LoginChrome>
+        {/* eslint-disable-next-line react-hooks/static-components */}
         <LastError />
+        {/* eslint-disable-next-line react-hooks/static-components */}
         <PluggableLoginForm />
         {shouldDisplayFallbackLink && (
           <StyledButton as="a" onClick={() => setUseFallback(!useFallback)}>

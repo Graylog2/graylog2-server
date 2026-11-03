@@ -26,35 +26,31 @@ import type { Location } from 'routing/withLocation';
 const createErrorMessageString = (
   errorDetails: string | null | undefined,
   pageDetails: string,
-  errorMessage: string,
-) => {
-  const defaultText = `${pageDetails}\n${errorMessage}`;
-
-  if (errorDetails) {
-    return `${errorDetails}\n${defaultText}`;
-  }
-
-  return defaultText;
-};
+  errorMessage: string | undefined,
+) => [errorDetails, pageDetails, errorMessage].filter((part) => !!part).join('\n');
 
 type Props = {
   description?: React.ReactNode;
-  error: FetchError;
+  displayPageLayout?: boolean;
+  error?: FetchError;
   errorDetails?: string;
   location: Location;
   title?: string;
 };
 
 const UnauthorizedErrorPage = ({
-  error,
+  error = undefined,
   errorDetails = undefined,
   title = undefined,
   description = undefined,
+  displayPageLayout = true,
   location: { pathname },
 }: Props) => {
   const { t } = useTranslation('pages');
-  const errorMessage = error?.message ?? JSON.stringify(error);
-  const pageDetails = t('unauthorized.page_details', { pathname });
+  const errorMessage = error ? (error.message ?? JSON.stringify(error)) : undefined;
+  const pageDetails = error
+    ? t('unauthorized.page_details', { pathname })
+    : t('unauthorized.page_details_no_request', { pathname });
   const defaultDescription = (
     <>
       <p>{t('unauthorized.description_intro')}</p>
@@ -64,7 +60,10 @@ const UnauthorizedErrorPage = ({
   const errorMessageString = createErrorMessageString(errorDetails, pageDetails, errorMessage);
 
   return (
-    <ErrorPage title={title ?? t('unauthorized.title')} description={description ?? defaultDescription}>
+    <ErrorPage
+      title={title ?? t('unauthorized.title')}
+      description={description ?? defaultDescription}
+      displayPageLayout={displayPageLayout}>
       <dl>
         <dd>
           <pre className="content">
@@ -78,7 +77,7 @@ const UnauthorizedErrorPage = ({
             </div>
             {errorDetails && <p>{errorDetails}</p>}
             <p>{pageDetails}</p>
-            <p>{errorMessage}</p>
+            {errorMessage && <p>{errorMessage}</p>}
           </pre>
         </dd>
       </dl>

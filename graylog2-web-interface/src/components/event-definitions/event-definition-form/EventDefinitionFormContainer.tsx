@@ -21,7 +21,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
 import { ConfirmLeaveDialog, Spinner } from 'components/common';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import CurrentUser from 'logic/users/CurrentUser';
 import type {
   EventDefinition,
   EventDefinitionFormControlsProps,
@@ -191,7 +191,7 @@ const EventDefinitionFormContainer = ({
   const handleSubmitSuccessResponse = () => {
     setIsDirty(false);
     queryClient.invalidateQueries({ queryKey: EVENT_DEFINITIONS_QUERY_KEY });
-    CurrentUserStore.update(currentUser.username);
+    CurrentUser.reload();
 
     onSubmit();
   };

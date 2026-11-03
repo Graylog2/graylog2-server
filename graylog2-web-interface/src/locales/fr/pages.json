@@ -58,6 +58,7 @@
     "description_hint": "Veuillez contacter votre administrateur et lui fournir les détails de l'erreur.",
     "description_intro": "Vous n'avez pas les permissions requises pour consulter cette ressource.",
     "page_details": "La vérification des permissions pour la requête suivante a échoué,\nlors de la tentative d'accès à {{pathname}}.",
+    "page_details_no_request": "La vérification des autorisations a échoué lors de l'accès à {{pathname}}.",
     "title": "Permissions manquantes"
   }
 }

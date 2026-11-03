@@ -318,6 +318,16 @@
     "show_all": "Mostra tutti",
     "filter_by": "Filtra per {{itemLabel}} \"{{value}}\""
   },
+  "expandable_cell_list": {
+    "show_less": "Mostra meno",
+    "show_more_one": "Mostra 1 in più",
+    "show_more_many": "Mostra altri {{count}}",
+    "show_more_other": "Mostra altri {{count}}"
+  },
+  "expanded_section_count": {
+    "show": "Mostra {{label}}",
+    "hide": "Nascondi {{label}}"
+  },
   "compact_pagination": {
     "previous_page": "Pagina precedente",
     "select_page": "Seleziona pagina",
@@ -571,7 +581,9 @@
     "turn_off_here": "Puoi disattivare o attivare la raccolta dei dati in qualsiasi momento da qui."
   },
   "app_facade": {
-    "preparing": "Stiamo preparando l'interfaccia web per te..."
+    "preparing": "Stiamo preparando l'interfaccia web per te...",
+    "load_user_failed": "Caricamento dell'utente non riuscito",
+    "reload_page": "Ricarica la pagina"
   },
   "suggest_reload": {
     "title": "La versione di {{productName}} è cambiata",

@@ -58,6 +58,7 @@
     "description_hint": "Ponte en contacto con tu administrador y proporciónale los detalles del error.",
     "description_intro": "No tienes los permisos necesarios para ver este recurso.",
     "page_details": "La comprobación de permisos de la siguiente solicitud ha fallado\nal intentar acceder a {{pathname}}.",
+    "page_details_no_request": "La comprobación de permisos falló al intentar acceder a {{pathname}}.",
     "title": "Faltan permisos"
   }
 }

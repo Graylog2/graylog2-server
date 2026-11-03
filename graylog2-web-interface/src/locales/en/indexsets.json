@@ -282,6 +282,7 @@
     "search_placeholder": "Find index sets",
     "section_details": "Details",
     "section_streams": "Associated streams",
+    "streams_label": "associated streams for {{title}}",
     "set_field_type_profile": "Set field type profile",
     "remove_field_type_profile": "Remove field type profile",
     "view": "View:",

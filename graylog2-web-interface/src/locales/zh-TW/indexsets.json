@@ -288,6 +288,7 @@
     "search_placeholder": "尋找 Index Set",
     "section_details": "詳細資訊",
     "section_streams": "關聯的 Stream",
+    "streams_label": "{{title}} 的關聯串流",
     "set_field_type_profile": "設定欄位類型設定檔",
     "remove_field_type_profile": "移除欄位類型設定檔",
     "view": "檢視：",

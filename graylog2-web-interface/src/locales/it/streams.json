@@ -399,6 +399,7 @@
       "associated_inputs_load_failed": "Impossibile caricare gli input associati.",
       "associated_inputs_none": "Nessun input ha inviato messaggi a questo stream nelle ultime 24 ore.",
       "deleted": "{{id}} (eliminato)",
+      "missing_permissions": "Permessi mancanti",
       "destination_data_lake": "Data Lake",
       "destination_index_set": "Index Set",
       "destination_output": "Output",

@@ -348,7 +348,10 @@
       "hide_messages_per_stream": "{{title}} のストリーム別メッセージを非表示",
       "show_metrics": "メトリクスを表示",
       "hide_metrics": "メトリクスを非表示",
-      "throughput": "{{value}} msg/s"
+      "throughput": "{{value}} msg/s",
+      "associated_streams_label": "{{title}} に関連付けられたストリーム",
+      "extractors_label": "{{title}} のエクストラクター",
+      "messages_per_stream_label": "{{title}} のストリームごとのメッセージ"
     },
     "sections": {
       "could_not_load_associated_streams": "関連付けられたストリームを読み込めませんでした。",

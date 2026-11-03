@@ -122,4 +122,10 @@ export default defineConfig([
       'graylog/no-untranslated-text': 'error',
     },
   },
+  {
+    files: ['docs/graylog-luma/**'],
+    rules: {
+      'graylog/no-literal-product-name': 'off',
+    },
+  },
 ]);

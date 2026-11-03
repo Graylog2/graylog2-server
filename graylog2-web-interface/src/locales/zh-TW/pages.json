@@ -58,6 +58,7 @@
     "description_hint": "請聯絡您的管理員，並提供錯誤詳細資訊。",
     "description_intro": "您沒有檢視此資源所需的權限。",
     "page_details": "以下要求的權限檢查失敗，\n在嘗試存取 {{pathname}} 時。",
+    "page_details_no_request": "嘗試存取 {{pathname}} 時權限檢查失敗。",
     "title": "缺少權限"
   }
 }

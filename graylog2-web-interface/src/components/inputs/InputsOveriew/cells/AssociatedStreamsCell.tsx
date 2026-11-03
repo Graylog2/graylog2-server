@@ -18,8 +18,8 @@ import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type { InputSummary } from 'hooks/usePaginatedInputs';
-import { CountBadge, Spinner } from 'components/common';
-import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
+import { Spinner } from 'components/common';
+import ExpandedSectionCount from 'components/common/EntityDataTable/ExpandedSectionCount';
 import { useInputMetricsFor } from 'components/inputs/InputsOveriew/InputMetricsContext';
 import { METRIC_COLUMN_IDS } from 'components/inputs/InputsOveriew/metricColumns';
 
@@ -32,7 +32,6 @@ const SECTION_NAME = METRIC_COLUMN_IDS.associatedStreams;
 const AssociatedStreamsCell = ({ input }: Props) => {
   const { t } = useTranslation('inputs');
   const { metrics, isInitialLoading, isError } = useInputMetricsFor(input.id);
-  const { toggleSection, expandedSections } = useExpandedSections();
 
   if (isInitialLoading && !metrics) {
     return <Spinner size="xs" />;
@@ -43,17 +42,13 @@ const AssociatedStreamsCell = ({ input }: Props) => {
   }
 
   const streamCount = Object.keys(metrics.messages_per_stream).length;
-  const isOpen = expandedSections?.[input.id]?.includes(SECTION_NAME) ?? false;
-  const title = t(isOpen ? 'overview.cells.hide_associated_streams' : 'overview.cells.show_associated_streams', {
-    title: input.title,
-  });
 
   return (
-    <CountBadge
+    <ExpandedSectionCount
+      entityId={input.id}
+      section={SECTION_NAME}
       count={streamCount}
-      iconName={isOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
-      onClick={() => toggleSection(input.id, SECTION_NAME)}
-      title={title}
+      label={t('overview.cells.associated_streams_label', { title: input.title })}
     />
   );
 };

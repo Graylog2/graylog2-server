@@ -58,6 +58,7 @@
     "description_hint": "Skontaktuj się z administratorem i podaj szczegóły błędu.",
     "description_intro": "Nie masz wymaganych uprawnień, aby wyświetlić ten zasób.",
     "page_details": "Sprawdzenie uprawnień dla następującego żądania nie powiodło się,\npodczas próby dostępu do {{pathname}}.",
+    "page_details_no_request": "Sprawdzenie uprawnień nie powiodło się podczas próby dostępu do {{pathname}}.",
     "title": "Brak uprawnień"
   }
 }

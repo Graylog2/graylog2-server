@@ -307,6 +307,15 @@
     "show_all": "Alle anzeigen",
     "filter_by": "Nach {{itemLabel}} „{{value}}“ filtern"
   },
+  "expandable_cell_list": {
+    "show_less": "Weniger anzeigen",
+    "show_more_one": "1 weiteres anzeigen",
+    "show_more_other": "{{count}} weitere anzeigen"
+  },
+  "expanded_section_count": {
+    "show": "{{label}} anzeigen",
+    "hide": "{{label}} ausblenden"
+  },
   "compact_pagination": {
     "previous_page": "Vorherige Seite",
     "select_page": "Seite auswählen",
@@ -560,7 +569,9 @@
     "turn_off_here": "Sie können die Datenerfassung jederzeit hier ein- oder ausschalten."
   },
   "app_facade": {
-    "preparing": "Die Weboberfläche wird für Sie vorbereitet..."
+    "preparing": "Die Weboberfläche wird für Sie vorbereitet...",
+    "load_user_failed": "Laden Ihres Benutzers fehlgeschlagen",
+    "reload_page": "Seite neu laden"
   },
   "suggest_reload": {
     "title": "{{productName}}-Version wurde geändert",

@@ -58,6 +58,7 @@
     "description_hint": "Bitte wenden Sie sich an Ihre Administratorin oder Ihren Administrator und geben Sie die Fehlerdetails an.",
     "description_intro": "Sie haben nicht die erforderlichen Berechtigungen, um diese Ressource anzuzeigen.",
     "page_details": "Die Berechtigungsprüfung für die folgende Anfrage ist fehlgeschlagen,\nwährend versucht wurde, auf {{pathname}} zuzugreifen.",
+    "page_details_no_request": "Die Berechtigungsprüfung ist beim Zugriff auf {{pathname}} fehlgeschlagen.",
     "title": "Fehlende Berechtigungen"
   }
 }

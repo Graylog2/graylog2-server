@@ -302,6 +302,7 @@
     "search_placeholder": "Trova Index Set",
     "section_details": "Dettagli",
     "section_streams": "Stream associati",
+    "streams_label": "stream associati a {{title}}",
     "set_field_type_profile": "Imposta profilo del tipo di campo",
     "remove_field_type_profile": "Rimuovi profilo del tipo di campo",
     "view": "Vista:",

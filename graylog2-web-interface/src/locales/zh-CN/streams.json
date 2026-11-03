@@ -375,6 +375,7 @@
       "associated_inputs_load_failed": "无法加载关联的输入。",
       "associated_inputs_none": "过去 24 小时内没有输入向此 Stream 发送过消息。",
       "deleted": "{{id}}（已删除）",
+      "missing_permissions": "缺少权限",
       "destination_data_lake": "Data Lake",
       "destination_index_set": "索引集",
       "destination_output": "Output",

@@ -282,6 +282,7 @@
     "search_placeholder": "Index-Sets suchen",
     "section_details": "Details",
     "section_streams": "Zugeordnete Streams",
+    "streams_label": "zugeordnete Streams für {{title}}",
     "set_field_type_profile": "Feldtyp-Profil festlegen",
     "remove_field_type_profile": "Feldtyp-Profil entfernen",
     "view": "Ansicht:",

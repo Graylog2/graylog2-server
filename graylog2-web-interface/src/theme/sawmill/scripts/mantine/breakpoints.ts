@@ -14,25 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { useTranslation } from 'react-i18next';
+import type { ThemeBase } from '../../types';
 
-import { Button } from 'components/bootstrap';
-import { IfPermitted, LinkContainer } from 'components/common';
-import Routes from 'routing/Routes';
-
-const ExpandedPipelinesActions = () => {
-  const { t } = useTranslation('streams');
-
-  return (
-    <IfPermitted permissions={['pipeline:read']}>
-      <LinkContainer to={Routes.SYSTEM.PIPELINES.OVERVIEW}>
-        <Button bsStyle="link" bsSize="xsmall">
-          {t('streams_overview.expanded.manage_pipelines')}
-        </Button>
-      </LinkContainer>
-    </IfPermitted>
+const pxToRem = (sizePx: number, rootFontSize: number, targetUnit = 'rem') =>
+  `${(1 / rootFontSize) * sizePx}${targetUnit}`;
+const generateBreakpoints = (breakpointsBase: ThemeBase['breakpoints'], rootFontSize: number) =>
+  Object.fromEntries(
+    Object.entries(breakpointsBase).map(([sizeName, sizePx]) => [sizeName, pxToRem(sizePx, rootFontSize, 'em')]),
   );
-};
 
-export default ExpandedPipelinesActions;
+export default generateBreakpoints;

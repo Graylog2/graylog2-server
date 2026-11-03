@@ -53,6 +53,9 @@ yarn lint:styles:path <file>
 # Format code
 yarn format
 
+# Regenerate the default themes after changing the theme in src/theme/sawmill
+yarn generate:themes
+
 # Pre-PR verification (run before considering work complete)
 yarn tsgo && yarn lint:changes && yarn test
 ```
@@ -60,6 +63,7 @@ yarn tsgo && yarn lint:changes && yarn test
 ## Project Structure
 
 - `src/` — Application source code (components, views, stores, actions, logic)
+- `src/theme/sawmill/` — Mantine and styled-components theme, see "Theme" in [CONVENTIONS.md](./CONVENTIONS.md)
 - `packages/graylog-web-plugin/` — Shared packages for core and plugins, webpack config for plugins, plugin registration interfaces
 - `packages/eslint-config-graylog/` — Custom ESLint rules
 - `packages/stylelint-config-graylog/` — Custom Stylelint rules

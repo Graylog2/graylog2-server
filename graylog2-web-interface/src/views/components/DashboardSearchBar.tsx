@@ -46,6 +46,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import useUserDateTime from 'hooks/useUserDateTime';
 import {
   SEARCH_BAR_GAP,
+  SEARCH_BAR_CONTAINER_NAME,
   SearchBarContainer,
   SearchQueryRow,
   SearchButtonAndQuery,
@@ -79,7 +80,7 @@ const TimeRangeRow = styled.div(
     justify-content: space-between;
     gap: ${SEARCH_BAR_GAP};
 
-    @media (max-width: ${theme.breakpoints.max.sm}) {
+    @container ${SEARCH_BAR_CONTAINER_NAME} (max-width: ${theme.breakpoints.max.sm}) {
       flex-direction: column;
     }
   `,
@@ -90,7 +91,7 @@ const StyledTimeRangeFilter = styled(TimeRangeFilter)(
     flex: 0.2;
     flex-basis: 380px;
 
-    @media (max-width: ${theme.breakpoints.max.sm}) {
+    @container ${SEARCH_BAR_CONTAINER_NAME} (max-width: ${theme.breakpoints.max.sm}) {
       flex: 1;
       flex-basis: auto;
     }

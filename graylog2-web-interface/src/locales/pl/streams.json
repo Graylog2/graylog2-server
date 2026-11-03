@@ -411,6 +411,7 @@
       "associated_inputs_load_failed": "Nie udało się załadować powiązanych inputów.",
       "associated_inputs_none": "W ciągu ostatnich 24 godzin żaden input nie wysłał wiadomości do tego strumienia.",
       "deleted": "{{id}} (usunięty)",
+      "missing_permissions": "Brak uprawnień",
       "destination_data_lake": "Data Lake",
       "destination_index_set": "Index Set",
       "destination_output": "Output",

@@ -290,6 +290,14 @@
     "show_all": "すべて表示",
     "filter_by": "{{itemLabel}} 「{{value}}」でフィルター"
   },
+  "expandable_cell_list": {
+    "show_less": "表示を減らす",
+    "show_more_other": "さらに {{count}} 件表示"
+  },
+  "expanded_section_count": {
+    "show": "{{label}}を表示",
+    "hide": "{{label}}を非表示"
+  },
   "compact_pagination": {
     "previous_page": "前のページ",
     "select_page": "ページを選択",
@@ -543,7 +551,9 @@
     "turn_off_here": "データ収集は、いつでもここから無効または有効にできます。"
   },
   "app_facade": {
-    "preparing": "Web インターフェースを準備しています..."
+    "preparing": "Web インターフェースを準備しています...",
+    "load_user_failed": "ユーザーの読み込みに失敗しました",
+    "reload_page": "ページを再読み込み"
   },
   "suggest_reload": {
     "title": "{{productName}} のバージョンが変更されました",

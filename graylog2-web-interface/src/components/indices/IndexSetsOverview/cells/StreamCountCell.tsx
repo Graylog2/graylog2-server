@@ -17,8 +17,7 @@
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { CountBadge } from 'components/common';
-import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
+import ExpandedSectionCount from 'components/common/EntityDataTable/ExpandedSectionCount';
 
 import { STREAMS_SECTION } from '../Constants';
 import type { IndexSetEntity } from '../types';
@@ -29,19 +28,13 @@ type Props = {
 
 const StreamCountCell = ({ indexSet }: Props) => {
   const { t } = useTranslation('indexsets');
-  const { toggleSection, expandedSections } = useExpandedSections();
-  const isOpen = expandedSections?.[indexSet.id]?.includes(STREAMS_SECTION) ?? false;
 
   return (
-    <CountBadge
+    <ExpandedSectionCount
+      entityId={indexSet.id}
+      section={STREAMS_SECTION}
       count={indexSet.stream_count}
-      iconName={isOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
-      onClick={() => toggleSection(indexSet.id, STREAMS_SECTION)}
-      title={
-        isOpen
-          ? t('overview_table.hide_streams', { title: indexSet.title })
-          : t('overview_table.show_streams', { title: indexSet.title })
-      }
+      label={t('overview_table.streams_label', { title: indexSet.title })}
     />
   );
 };

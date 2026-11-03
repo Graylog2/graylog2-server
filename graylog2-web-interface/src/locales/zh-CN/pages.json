@@ -58,6 +58,7 @@
     "description_hint": "请联系管理员并提供错误详情。",
     "description_intro": "您没有查看此资源所需的权限。",
     "page_details": "在访问 {{pathname}} 时，以下请求的权限检查失败。\n",
+    "page_details_no_request": "尝试访问 {{pathname}} 时权限检查失败。",
     "title": "缺少权限"
   }
 }

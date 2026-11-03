@@ -15,28 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useTranslation } from 'react-i18next';
 
-import { ButtonToolbar, Button } from 'components/bootstrap';
+import { ButtonToolbar } from 'components/bootstrap';
 import { MoreActions } from 'components/common/EntityDataTable';
 import type { Event } from 'components/events/events/types';
-import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
 import useEventAction from 'components/events/events/hooks/useEventAction';
 
 const EventActions = ({ event }: { event: Event }) => {
-  const { t } = useTranslation('events');
   const { moreActions, pluggableActionModals } = useEventAction(event);
-  const { toggleSection } = useExpandedSections();
-  const toggleExtraSection = () => toggleSection(event.id, 'restFieldsExpandedSection');
 
   return (
     <>
-      <ButtonToolbar>
-        <Button bsSize="xs" onClick={toggleExtraSection}>
-          {t('alerts_list.details')}
-        </Button>
-        {moreActions.length ? <MoreActions>{moreActions}</MoreActions> : null}
-      </ButtonToolbar>
+      <ButtonToolbar>{moreActions.length ? <MoreActions>{moreActions}</MoreActions> : null}</ButtonToolbar>
       {pluggableActionModals}
     </>
   );

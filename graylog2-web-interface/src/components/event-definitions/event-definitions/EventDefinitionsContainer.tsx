@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import startCase from 'lodash/startCase';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -35,7 +34,6 @@ import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 import EventDefinitionActions from './EventDefinitionActions';
 import EventDefinitionNotificationsCell from './EventDefinitionNotificationsCell';
-import ExpandedNotificationsSection from './ExpandedNotificationsSection';
 import SchedulingCell from './SchedulingCell';
 import StatusCell from './StatusCell';
 import useEventDefinitionOverviewSections from './useEventDefinitionOverviewSections';
@@ -85,8 +83,7 @@ const getCustomColumnRenderers = (
       renderCell: (_notifications: EventDefinition['notifications'], eventDefinition: EventDefinition) => (
         <EventDefinitionNotificationsCell eventDefinition={eventDefinition} />
       ),
-      textAlign: 'right',
-      staticWidth: 'matchHeader' as const,
+      staticWidth: COLUMN_WIDTH.reference,
     },
     '_entity_source.source': {
       renderCell: (_title: string, eventDefinition: EventDefinition) => (
@@ -125,15 +122,6 @@ const renderEventDefinitionActions = (listItem: EventDefinition) => (
   <EventDefinitionActions eventDefinition={listItem} />
 );
 
-const renderExpandedNotifications = (eventDefinition: EventDefinition) => (
-  <ExpandedNotificationsSection eventDefinition={eventDefinition} />
-);
-
-const createNotificationsExpandedSection = (title: string) => ({
-  title,
-  content: renderExpandedNotifications,
-});
-
 const EventDefinitionsContainer = () => {
   const { t } = useTranslation('event_definitions');
   const { pluggableColumnRenderers, pluggableAttributes, pluggableExpandedSections } =
@@ -160,13 +148,6 @@ const EventDefinitionsContainer = () => {
   const filterValueRenderers = activeTacticsTechniquesPlugin?.filterValueRenderer
     ? { ...FilterValueRenderers, [tacticsTechniquesAttribute.id]: activeTacticsTechniquesPlugin.filterValueRenderer }
     : FilterValueRenderers;
-  const expandedSections = useMemo(
-    () => ({
-      notifications: createNotificationsExpandedSection(t('replay_search.attributes.notifications')),
-      ...pluggableExpandedSections,
-    }),
-    [pluggableExpandedSections, t],
-  );
   const overviewSections = useEventDefinitionOverviewSections();
 
   return (
@@ -183,7 +164,7 @@ const EventDefinitionsContainer = () => {
         entityActions={renderEventDefinitionActions}
         keyFn={keyFn}
         entityAttributesAreCamelCase={false}
-        expandedSectionRenderers={expandedSections}
+        expandedSectionRenderers={pluggableExpandedSections}
         filterValueRenderers={filterValueRenderers}
         columnRenderers={getCustomColumnRenderers(pluggableColumnRenderers, activeTacticsTechniquesPlugin)}
         bulkSelection={bulkSelection}

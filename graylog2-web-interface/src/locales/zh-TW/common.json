@@ -290,6 +290,14 @@
     "show_all": "顯示全部",
     "filter_by": "依{{itemLabel}}「{{value}}」篩選"
   },
+  "expandable_cell_list": {
+    "show_less": "顯示較少",
+    "show_more_other": "再顯示 {{count}} 項"
+  },
+  "expanded_section_count": {
+    "show": "顯示{{label}}",
+    "hide": "隱藏{{label}}"
+  },
   "compact_pagination": {
     "previous_page": "上一頁",
     "select_page": "選擇頁面",
@@ -543,7 +551,9 @@
     "turn_off_here": "您可以隨時在此開啟或關閉資料收集。"
   },
   "app_facade": {
-    "preparing": "我們正在為您準備網頁介面..."
+    "preparing": "我們正在為您準備網頁介面...",
+    "load_user_failed": "載入您的使用者失敗",
+    "reload_page": "重新載入頁面"
   },
   "suggest_reload": {
     "title": "{{productName}} 版本已變更",

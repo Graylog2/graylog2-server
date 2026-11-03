@@ -349,7 +349,10 @@
       "hide_messages_per_stream": "Nachrichten pro Stream für {{title}} ausblenden",
       "show_metrics": "Metriken einblenden",
       "hide_metrics": "Metriken ausblenden",
-      "throughput": "{{value}} Nachr./s"
+      "throughput": "{{value}} Nachr./s",
+      "associated_streams_label": "zugeordnete Streams für {{title}}",
+      "extractors_label": "Extraktoren für {{title}}",
+      "messages_per_stream_label": "Nachrichten pro Stream für {{title}}"
     },
     "sections": {
       "could_not_load_associated_streams": "Zugeordnete Streams konnten nicht geladen werden.",

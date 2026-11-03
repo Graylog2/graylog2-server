@@ -304,6 +304,15 @@
     "show_all": "Show all",
     "filter_by": "Filter by {{itemLabel}} \"{{value}}\""
   },
+  "expandable_cell_list": {
+    "show_less": "Show less",
+    "show_more_one": "Show 1 more",
+    "show_more_other": "Show {{count}} more"
+  },
+  "expanded_section_count": {
+    "show": "Show {{label}}",
+    "hide": "Hide {{label}}"
+  },
   "compact_pagination": {
     "previous_page": "Previous page",
     "select_page": "Select page",
@@ -557,7 +566,9 @@
     "turn_off_here": "You can turn data collection off or on any time here."
   },
   "app_facade": {
-    "preparing": "We are preparing the web interface for you..."
+    "preparing": "We are preparing the web interface for you...",
+    "load_user_failed": "Loading your user failed",
+    "reload_page": "Reload page"
   },
   "suggest_reload": {
     "title": "{{productName}} Version Changed",

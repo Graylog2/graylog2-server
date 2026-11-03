@@ -350,7 +350,10 @@
       "hide_messages_per_stream": "Nascondi i messaggi per stream per {{title}}",
       "show_metrics": "Mostra metriche",
       "hide_metrics": "Nascondi metriche",
-      "throughput": "{{value}} msg/s"
+      "throughput": "{{value}} msg/s",
+      "associated_streams_label": "stream associati a {{title}}",
+      "extractors_label": "estrattori di {{title}}",
+      "messages_per_stream_label": "messaggi per stream di {{title}}"
     },
     "sections": {
       "could_not_load_associated_streams": "Impossibile caricare gli stream associati.",

@@ -58,6 +58,7 @@
     "description_hint": "Entre em contato com o administrador e informe os detalhes do erro.",
     "description_intro": "Você não tem as permissões necessárias para visualizar este recurso.",
     "page_details": "A verificação de permissões para a seguinte requisição falhou,\nao tentar acessar {{pathname}}.",
+    "page_details_no_request": "A verificação de permissões falhou ao tentar acessar {{pathname}}.",
     "title": "Permissões ausentes"
   }
 }

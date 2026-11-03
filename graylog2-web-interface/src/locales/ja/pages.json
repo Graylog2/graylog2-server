@@ -58,6 +58,7 @@
     "description_hint": "管理者に連絡し、エラーの詳細を伝えてください。",
     "description_intro": "このリソースを表示するために必要な権限がありません。",
     "page_details": "次のリクエストの権限チェックに失敗しました。\n アクセス先: {{pathname}}。",
+    "page_details_no_request": "{{pathname}} へのアクセス時に権限チェックが失敗しました。",
     "title": "権限が不足しています"
   }
 }

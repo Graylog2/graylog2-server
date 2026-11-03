@@ -19,7 +19,7 @@ import ApiRoutes from 'routing/ApiRoutes';
 import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import CurrentUser from 'logic/users/CurrentUser';
 
 export const setStartpage = (userId: string, type: string, id: string): Promise<void> => {
   const url = qualifyUrl(ApiRoutes.UsersApiController.update(userId).url);
@@ -32,7 +32,7 @@ export const setStartpage = (userId: string, type: string, id: string): Promise<
 
   return fetch('PUT', url, { startpage: payload }).then(
     () => {
-      CurrentUserStore.reload();
+      CurrentUser.reload();
       UserNotification.success(i18n.t('notifications.change_success', { ns: 'users' }));
     },
     (error: unknown) =>

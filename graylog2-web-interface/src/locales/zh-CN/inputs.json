@@ -348,7 +348,10 @@
       "hide_messages_per_stream": "隐藏 {{title}} 按 Stream 统计的消息数",
       "show_metrics": "显示指标",
       "hide_metrics": "隐藏指标",
-      "throughput": "{{value}} 条消息/秒"
+      "throughput": "{{value}} 条消息/秒",
+      "associated_streams_label": "{{title}} 的关联数据流",
+      "extractors_label": "{{title}} 的提取器",
+      "messages_per_stream_label": "{{title}} 每个数据流的消息"
     },
     "sections": {
       "could_not_load_associated_streams": "无法加载关联的 Stream。",

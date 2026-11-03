@@ -18,13 +18,11 @@ import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 
 import useIndexProfileWithMappingsByField from 'components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField';
-import Routes from 'routing/Routes';
-import { Link } from 'components/common';
 import type { ExpandedSectionProps } from 'components/indices/IndexSetFieldTypes/types';
 
 const IndexExpandedSection = ({ type }: ExpandedSectionProps) => {
   const { t } = useTranslation('indexsets');
-  const { id, name: profileName } = useIndexProfileWithMappingsByField();
+  const { name: profileName } = useIndexProfileWithMappingsByField();
 
   return (
     <p>
@@ -32,7 +30,7 @@ const IndexExpandedSection = ({ type }: ExpandedSectionProps) => {
         t={t}
         i18nKey="field_types.origin_profile"
         values={{ type, profileName }}
-        components={{ i: <i />, profileLink: <Link to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(id)} /> }}
+        components={{ i: <i />, profileLink: <span /> }}
       />
     </p>
   );

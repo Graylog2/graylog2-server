@@ -15,23 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useRef, useCallback } from 'react';
-import styled from 'styled-components';
 import { useTranslation } from 'react-i18next';
 
 import type { InputSummary } from 'hooks/usePaginatedInputs';
 import { useMetric } from 'hooks/useMetrics';
 import { Spinner } from 'components/common';
 import { formatCount, getValueFromMetric, prefixMetric } from 'components/inputs/helpers/InputThroughputUtils';
-import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
 
 type Props = {
   input: InputSummary;
 };
-
-const StyledSpan = styled.span`
-  cursor: pointer;
-`;
 
 const METRIC_NAME = 'incomingMessages';
 
@@ -39,11 +32,6 @@ const ThroughputCell = ({ input }: Props) => {
   const { t } = useTranslation('inputs');
   const metricName = prefixMetric(input, METRIC_NAME);
   const { data: metrics, isLoading } = useMetric(metricName);
-  const spanRef = useRef();
-  const { toggleSection, expandedSections } = useExpandedSections();
-
-  const toggleTrafficSection = useCallback(() => toggleSection(input.id, 'traffic'), [input.id, toggleSection]);
-
   if (isLoading || Object.keys(metrics).length === 0) {
     return <Spinner size="xs" />;
   }
@@ -63,16 +51,7 @@ const ThroughputCell = ({ input }: Props) => {
       return previous;
     }, NaN) || 0;
 
-  const throughputSectionIsOpen = expandedSections?.[input.id]?.includes('traffic');
-
-  return (
-    <StyledSpan
-      ref={spanRef}
-      title={t(throughputSectionIsOpen ? 'overview.cells.hide_metrics' : 'overview.cells.show_metrics')}
-      onClick={toggleTrafficSection}>
-      {t('overview.cells.throughput', { value: !isNaN(incomingMessages) ? formatCount(incomingMessages) : 0 })}
-    </StyledSpan>
-  );
+  return <>{t('overview.cells.throughput', { value: !isNaN(incomingMessages) ? formatCount(incomingMessages) : 0 })}</>;
 };
 
 export default ThroughputCell;

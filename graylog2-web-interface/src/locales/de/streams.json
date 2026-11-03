@@ -387,6 +387,7 @@
       "associated_inputs_load_failed": "Die zugehörigen Inputs konnten nicht geladen werden.",
       "associated_inputs_none": "In den letzten 24 Stunden haben keine Inputs Nachrichten an diesen Stream gesendet.",
       "deleted": "{{id}} (gelöscht)",
+      "missing_permissions": "Fehlende Berechtigungen",
       "destination_data_lake": "Data Lake",
       "destination_index_set": "Index-Set",
       "destination_output": "Output",

@@ -58,6 +58,7 @@
     "description_hint": "Contatta l'amministratore e fornisci i dettagli dell'errore.",
     "description_intro": "Non disponi delle autorizzazioni necessarie per visualizzare questa risorsa.",
     "page_details": "La verifica dei permessi per la seguente richiesta non è riuscita,\nmentre si tentava di accedere a {{pathname}}.",
+    "page_details_no_request": "Il controllo dei permessi non è riuscito durante l'accesso a {{pathname}}.",
     "title": "Permessi mancanti"
   }
 }

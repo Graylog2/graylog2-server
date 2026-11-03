@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { create, windowScheduler } from '@yornaath/batshit';
+import uniqBy from 'lodash/uniqBy';
 
 import { SystemCatalog } from '@graylog/server-api';
 
@@ -24,6 +26,25 @@ import i18n from 'i18n';
 export type EntityRef = { id: string; type: string };
 
 const fetchEntityTitles = (entities: Array<EntityRef>) => SystemCatalog.getTitles({ entities: entities as any });
+
+type TitlesResponse = Awaited<ReturnType<typeof fetchEntityTitles>>;
+
+// Batches the requests of components rendered together, e.g. the cells of a table page.
+// Handles errors per batch, so a failed request shows one notification instead of one per component.
+const entityTitles = create({
+  fetcher: (entities: Array<EntityRef>) =>
+    defaultOnError(
+      fetchEntityTitles(uniqBy(entities, ({ id, type }) => `${type}:${id}`)),
+      i18n.t('use_entity_titles_notifications.load_failed', { ns: 'common' }),
+      i18n.t('use_entity_titles_notifications.load_failed_title', { ns: 'common' }),
+    ),
+  resolver: (response: TitlesResponse, { id }: EntityRef) => ({
+    id,
+    title: response.entities?.find((entity) => entity.id === id)?.title,
+    isPermitted: !response.not_permitted_to_view?.includes(id),
+  }),
+  scheduler: windowScheduler(10),
+});
 
 const useEntityTitles = (
   entities: Array<EntityRef>,
@@ -39,22 +60,15 @@ const useEntityTitles = (
 
   const { data, isInitialLoading, isFetching, isError } = useQuery({
     queryKey: ['entity_titles', stableEntities],
-    queryFn: () =>
-      defaultOnError(
-        fetchEntityTitles(stableEntities),
-        i18n.t('use_entity_titles_notifications.load_failed', { ns: 'common' }),
-        i18n.t('use_entity_titles_notifications.load_failed_title', { ns: 'common' }),
-      ),
+    queryFn: () => Promise.all(stableEntities.map((entity) => entityTitles.fetch(entity))),
     enabled,
     placeholderData: keepPreviousData,
   });
 
-  const titlesById: Record<string, string> = {};
-  (data?.entities ?? []).forEach((entry) => {
-    titlesById[entry.id] = entry.title;
-  });
-
-  const notPermittedIds = new Set(data?.not_permitted_to_view ?? []);
+  const titlesById: Record<string, string> = Object.fromEntries(
+    (data ?? []).filter(({ title }) => title !== undefined).map(({ id, title }) => [id, title]),
+  );
+  const notPermittedIds = new Set((data ?? []).filter(({ isPermitted }) => !isPermitted).map(({ id }) => id));
 
   return {
     titlesById,

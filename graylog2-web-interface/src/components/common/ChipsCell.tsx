@@ -16,35 +16,12 @@
  */
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import { Badge, Label } from 'components/bootstrap';
-import { Icon } from 'components/common';
+import { Label } from 'components/bootstrap';
+import ExpandableCellList from 'components/common/ExpandableCellList';
 
-const DEFAULT_COLLAPSED_COUNT = 3;
-
-const Wrapper = styled.div(
-  ({ theme }) => css`
-    display: flex;
-    align-items: center;
-    gap: ${theme.spacings.xs};
-    flex-wrap: wrap;
-
-    /* Fill the cell so max-width: 100% on chips resolves against the cell width. */
-    width: 100%;
-    min-width: 0;
-  `,
-);
-
-const ChipsContainer = styled.div(
-  ({ theme }) => css`
-    display: flex;
-    flex-wrap: wrap;
-    gap: ${theme.spacings.xs};
-    min-width: 0;
-  `,
-);
+const DEFAULT_COLLAPSED_COUNT = 1;
 
 const HoverableLabel = styled(Label)(
   ({ theme }) => css`
@@ -75,30 +52,10 @@ const HoverableLabel = styled(Label)(
   `,
 );
 
-const ToggleButton = styled.button(
-  ({ theme }) => css`
-    background: transparent;
-    border: 0;
-    padding: 0;
-    cursor: pointer;
-
-    & * {
-      cursor: pointer;
-    }
-
-    &:focus-visible {
-      outline: 2px solid ${theme.colors.input.borderFocus};
-      outline-offset: 2px;
-      border-radius: 2px;
-    }
-  `,
-);
-
 type BaseProps = {
   items: ReadonlyArray<string> | undefined | null;
   collapsedCount?: number;
   truncate?: boolean;
-  emptyFallback?: React.ReactNode;
   // Renders the chip's label content in place of the raw item; the chip itself (and its click
   // handling) stays owned by ChipsCell. Plain chips drop their raw-item title, so content that can be
   // cut off needs its own title; clickable chips already carry a "Filter by ..." title, so skip it there.
@@ -117,29 +74,19 @@ const ChipsCell = ({
   onItemClick = undefined,
   collapsedCount = DEFAULT_COLLAPSED_COUNT,
   truncate = true,
-  emptyFallback = null,
   renderItemContent = undefined,
   itemLabel,
   itemTitle = undefined,
 }: Props) => {
   const { t } = useTranslation('common');
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  if (!items?.length) {
-    return <>{emptyFallback}</>;
-  }
-
-  const sorted = [...items].sort();
-  const isTruncated = truncate && sorted.length > collapsedCount;
-  const visible = !isExpanded && isTruncated ? sorted.slice(0, collapsedCount) : sorted;
-  const hiddenCount = sorted.length - collapsedCount;
+  const sorted = [...(items ?? [])].sort();
 
   const renderChip = (item: string) => {
     const content = renderItemContent ? renderItemContent(item) : item;
 
     if (!onItemClick) {
       return (
-        <HoverableLabel key={item} bsStyle="default" title={renderItemContent ? undefined : item}>
+        <HoverableLabel bsStyle="default" title={renderItemContent ? undefined : item}>
           {content}
         </HoverableLabel>
       );
@@ -149,7 +96,6 @@ const ChipsCell = ({
 
     return (
       <HoverableLabel
-        key={item}
         bsStyle="default"
         onClick={(e: React.MouseEvent) => {
           e.stopPropagation();
@@ -163,21 +109,13 @@ const ChipsCell = ({
   };
 
   return (
-    <Wrapper>
-      <ChipsContainer>{visible.map(renderChip)}</ChipsContainer>
-      {isTruncated && (
-        <ToggleButton
-          type="button"
-          aria-label={isExpanded ? t('chips_cell.show_fewer') : t('chips_cell.show_all')}
-          title={isExpanded ? t('chips_cell.show_fewer') : t('chips_cell.show_all')}
-          onClick={(e: React.MouseEvent) => {
-            e.stopPropagation();
-            setIsExpanded((v) => !v);
-          }}>
-          <Badge>{isExpanded ? <Icon name="keyboard_arrow_up" /> : `+ ${hiddenCount}`}</Badge>
-        </ToggleButton>
-      )}
-    </Wrapper>
+    <ExpandableCellList
+      items={sorted}
+      renderItem={renderChip}
+      itemKey={(item) => item}
+      collapsedCount={truncate ? collapsedCount : sorted.length}
+      layout="inline"
+    />
   );
 };
 

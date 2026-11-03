@@ -17,9 +17,9 @@
 import * as React from 'react';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
-import type { ColorVariant } from '@graylog/sawmill';
 import { useTranslation } from 'react-i18next';
 
+import type { ColorVariant } from 'theme/sawmill';
 import { Alert, Input } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import useHistory from 'routing/useHistory';

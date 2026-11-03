@@ -302,6 +302,7 @@
     "search_placeholder": "Buscar conjuntos de índices",
     "section_details": "Detalles",
     "section_streams": "Streams asociados",
+    "streams_label": "streams asociados de {{title}}",
     "set_field_type_profile": "Definir perfil de tipos de campo",
     "remove_field_type_profile": "Eliminar perfil de tipos de campo",
     "view": "Vista:",
