@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+/* eslint-disable graylog/no-literal-product-name -- HTTP header name expected by the backend */
 import { Builder } from 'logic/rest/FetchProvider';
 
 import request from './request';
@@ -81,6 +82,12 @@ describe('request', () => {
       'X-Custom': 'value',
       'X-Graylog-No-Session-Extension': true,
     });
+  });
+
+  it('drops headers without a value', () => {
+    request('PUT', '/foo', null, {}, { Accept: ['application/json'], 'If-Match': undefined, 'X-Empty': null });
+
+    expect(mockSetHeaders).toHaveBeenCalledWith({ Accept: ['application/json'] });
   });
 
   it('passes method and qualified URL to the Builder', () => {
