@@ -149,6 +149,7 @@ describe('DataNodeConfigurationPage', () => {
 
       expect(router.state.location.pathname).toBe(`${settingsPath}/${storageSection}`);
       expect(screen.getByRole('heading', { name: 'Data Node Configuration' })).toBeInTheDocument();
+      expect(screen.getByText(/following order of precedence/)).toBeInTheDocument();
       expect(screen.queryByRole('navigation', { name: 'Data Node configuration sections' })).not.toBeInTheDocument();
       expect(screen.getByRole('heading', { name: 'Storage and Capacity' })).toBeInTheDocument();
       expect(lowWatermark).toHaveValue(85);
@@ -271,7 +272,7 @@ describe('DataNodeConfigurationPage', () => {
       await screen.findByText('Saved shard limit: 1500');
       expect(screen.getByRole('spinbutton', { name: 'Shard limit per Data Node' })).toHaveValue(1000);
       expect(screen.getByRole('spinbutton', { name: 'Shard limit per Data Node' })).not.toHaveAccessibleDescription(
-        /Source:/,
+        /Current source:/,
       );
       expect(screen.getByRole('spinbutton', { name: 'Stop allocating shards at (% disk used)' })).toHaveValue(80);
 
@@ -282,7 +283,7 @@ describe('DataNodeConfigurationPage', () => {
       await waitFor(() => expect(getApplyButton()).toBeDisabled());
       expect(screen.getByRole('spinbutton', { name: 'Shard limit per Data Node' })).toHaveValue(1500);
       expect(screen.getByRole('spinbutton', { name: 'Shard limit per Data Node' })).toHaveAccessibleDescription(
-        /Source: Configuration file/,
+        /Current source: Configuration file/,
       );
     });
 
@@ -677,7 +678,7 @@ describe('DataNodeConfigurationPage', () => {
       const source = screen.getByRole('button', { name: 'About the value for Shard limit per Data Node' });
       await userEvent.hover(source);
       expect(await screen.findByRole('tooltip')).toHaveTextContent(
-        'This value is saved in the application and takes precedence over configuration files, environment variables, and Java system properties.',
+        'This value was set here and takes precedence over all other sources.',
       );
       await userEvent.unhover(source);
       await userEvent.click(screen.getByRole('button', { name: 'Reset value for Shard limit per Data Node' }));
@@ -719,7 +720,7 @@ describe('DataNodeConfigurationPage', () => {
 
       const watermark = await screen.findByRole('spinbutton', { name: 'Stop allocating shards at (% disk used)' });
       expect(watermark).toHaveValue(85);
-      expect(watermark).toHaveAccessibleDescription(/Source: Configuration file/);
+      expect(watermark).toHaveAccessibleDescription(/Current source: Configuration file/);
       await changeConfigurationField('Shard limit per Data Node', '1200');
       await userEvent.click(getApplyButton());
 
@@ -728,7 +729,7 @@ describe('DataNodeConfigurationPage', () => {
       const saved = await managedConfigurationApi.get();
       expect(saved.parameters.find(({ name }) => name === lowWatermarkName)?.set_value).toBeNull();
       expect(watermark).toHaveValue(85);
-      expect(watermark).toHaveAccessibleDescription(/Source: Configuration file/);
+      expect(watermark).toHaveAccessibleDescription(/Current source: Configuration file/);
     });
 
     it('validates watermark order against the fallback while keeping the reset in the save request', async () => {
@@ -812,7 +813,7 @@ describe('DataNodeConfigurationPage', () => {
         'placeholder',
         'Enter a value',
       );
-      expect(screen.queryByText(/Source:/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Current source:/)).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: /^Reset value/ })).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: /About the value/ })).not.toBeInTheDocument();
       expect(getApplyButton()).toBeDisabled();

@@ -49,9 +49,8 @@ const sourceDescriptions: Partial<Record<ConfigurationSource, { label: string; d
     description: 'This value was read from a Java system property (-D...) passed to the Data Node process at startup.',
   },
   database: {
-    label: 'Saved value',
-    description:
-      'This value is saved in the application and takes precedence over configuration files, environment variables, and Java system properties.',
+    label: 'This field',
+    description: 'This value was set here and takes precedence over all other sources.',
   },
 };
 
@@ -194,7 +193,7 @@ const ConfigurationFieldInput = ({ parameter, canEdit, canDelete }: Props) => {
             <code>{name}</code>
             {sourceDescription && (
               <>
-                {' · Source: '}
+                {' · Current source: '}
                 {sourceDescription.label}
                 <Tooltip label={sourceDescription.description} multiline maw={400}>
                   <Button

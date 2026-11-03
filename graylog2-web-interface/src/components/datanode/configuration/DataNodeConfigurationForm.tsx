@@ -29,6 +29,7 @@ import type { ConfigurationCategory } from './types';
 import { categoryId } from './configurationFields';
 import useDataNodeConfigurationForm from './useDataNodeConfigurationForm';
 import DataNodeConfigurationSection from './DataNodeConfigurationSection';
+import ConfigurationPrecedenceHelp from './ConfigurationPrecedenceHelp';
 
 const RestartSettingsList = styled.ul`
   display: flex;
@@ -84,7 +85,10 @@ const DataNodeConfigurationForm = ({ categories, nodeId, basePath, children = un
           <ConfirmLeaveDialog question="Discard your unsaved configuration changes?" ignoredRoutes={ignoredRoutes} />
         )}
         <Row className="content">
-          {children && <Col xs={12}>{children}</Col>}
+          <Col xs={12}>
+            {children}
+            <ConfigurationPrecedenceHelp />
+          </Col>
           {showNavigation && (
             <Col md={2}>
               <nav aria-label="Data Node configuration sections">

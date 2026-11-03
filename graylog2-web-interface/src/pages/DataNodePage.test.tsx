@@ -138,7 +138,7 @@ describe('DataNodePage configuration', () => {
       expect(router.state.location.pathname).toBe(`${nodePath}/${nodeSettingsSection}`);
       expect(screen.getByRole('heading', { name: `Data Nodes: ${dataNodes[0].hostname}` })).toBeInTheDocument();
       expect(heap).toHaveValue(2);
-      expect(heap).toHaveAccessibleDescription(/opensearch_heap · Source: Saved value/);
+      expect(heap).toHaveAccessibleDescription(/opensearch_heap · Current source: This field/);
       expect(screen.getByRole('combobox', { name: 'Node roles' })).toBeInTheDocument();
       expect(screen.getByRole('link', { name: 'Node Settings' })).toHaveAttribute('aria-current', 'page');
       expect(screen.getByRole('link', { name: 'Search' })).toHaveAttribute('href', `${nodePath}/search`);
@@ -317,7 +317,9 @@ describe('DataNodePage configuration', () => {
         expect(heap).toHaveValue(amount);
         expect(heap).toHaveFocus();
         expect(heap).toHaveAccessibleDescription(
-          fallback === null ? /^Description of OpenSearch JVM heap\. opensearch_heap$/ : /Source: Configuration file/,
+          fallback === null
+            ? /^Description of OpenSearch JVM heap\. opensearch_heap$/
+            : /Current source: Configuration file/,
         );
         expect(resetButton).toBeDisabled();
         expect(getApplyButton()).toBeEnabled();
@@ -326,7 +328,7 @@ describe('DataNodePage configuration', () => {
         await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
         expect(heap).toHaveValue(4);
-        expect(heap).toHaveAccessibleDescription(/Source: Saved value/);
+        expect(heap).toHaveAccessibleDescription(/Current source: This field/);
         expect(resetButton).toBeEnabled();
         expect(getApplyButton()).toBeDisabled();
 
