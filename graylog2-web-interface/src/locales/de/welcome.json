@@ -75,5 +75,11 @@
     "load_config_failed_title": "Content Stream konnte nicht geladen werden.",
     "load_tags_failed": "Laden des Content-Stream-Tags fehlgeschlagen mit Status",
     "load_tags_failed_title": "Content-Stream-Tags konnten nicht geladen werden."
+  },
+  "metrics": {
+    "messages_today": "Nachrichten heute",
+    "alerts_today": "Alarme heute",
+    "events_today": "Ereignisse heute",
+    "top_sources": "Top 5 Quellen"
   }
 }

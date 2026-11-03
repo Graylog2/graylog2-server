@@ -75,5 +75,11 @@
     "load_config_failed_title": "Impossible de charger le flux de contenu.",
     "load_tags_failed": "Échec du chargement des tags du flux de contenu, statut :",
     "load_tags_failed_title": "Impossible de charger les tags du flux de contenu."
+  },
+  "metrics": {
+    "messages_today": "Messages aujourd'hui",
+    "alerts_today": "Alertes aujourd'hui",
+    "events_today": "Événements aujourd'hui",
+    "top_sources": "Top 5 des sources"
   }
 }

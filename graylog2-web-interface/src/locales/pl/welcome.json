@@ -75,5 +75,11 @@
     "load_config_failed_title": "Nie udało się załadować strumienia treści.",
     "load_tags_failed": "Ładowanie tagów strumienia treści nie powiodło się, status:",
     "load_tags_failed_title": "Nie udało się załadować tagów strumienia treści."
+  },
+  "metrics": {
+    "messages_today": "Wiadomości dzisiaj",
+    "alerts_today": "Alerty dzisiaj",
+    "events_today": "Zdarzenia dzisiaj",
+    "top_sources": "5 najważniejszych źródeł"
   }
 }

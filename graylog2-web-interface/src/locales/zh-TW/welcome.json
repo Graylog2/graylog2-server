@@ -75,5 +75,11 @@
     "load_config_failed_title": "無法載入內容串流。",
     "load_tags_failed": "載入內容串流標籤失敗，狀態為",
     "load_tags_failed_title": "無法載入內容串流標籤。"
+  },
+  "metrics": {
+    "messages_today": "今日訊息",
+    "alerts_today": "今日警示",
+    "events_today": "今日事件",
+    "top_sources": "前 5 個來源"
   }
 }

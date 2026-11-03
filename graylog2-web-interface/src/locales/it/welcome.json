@@ -75,5 +75,11 @@
     "load_config_failed_title": "Impossibile caricare il content stream.",
     "load_tags_failed": "Caricamento dei tag del content stream non riuscito con stato",
     "load_tags_failed_title": "Impossibile caricare i tag del content stream."
+  },
+  "metrics": {
+    "messages_today": "Messaggi di oggi",
+    "alerts_today": "Avvisi di oggi",
+    "events_today": "Eventi di oggi",
+    "top_sources": "Prime 5 sorgenti"
   }
 }

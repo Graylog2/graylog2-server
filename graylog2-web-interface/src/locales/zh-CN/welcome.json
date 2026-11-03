@@ -75,5 +75,11 @@
     "load_config_failed_title": "无法加载内容流。",
     "load_tags_failed": "加载内容流标签失败，状态为",
     "load_tags_failed_title": "无法加载内容流标签。"
+  },
+  "metrics": {
+    "messages_today": "今日消息",
+    "alerts_today": "今日警报",
+    "events_today": "今日事件",
+    "top_sources": "前 5 个来源"
   }
 }

@@ -75,5 +75,11 @@
     "load_config_failed_title": "No se pudo cargar el flujo de contenido.",
     "load_tags_failed": "Error al cargar las etiquetas del flujo de contenido con el estado",
     "load_tags_failed_title": "No se pudieron cargar las etiquetas del flujo de contenido."
+  },
+  "metrics": {
+    "messages_today": "Mensajes de hoy",
+    "alerts_today": "Alertas de hoy",
+    "events_today": "Eventos de hoy",
+    "top_sources": "Top 5 de fuentes"
   }
 }

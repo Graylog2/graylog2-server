@@ -75,5 +75,11 @@
     "load_config_failed_title": "Could not load content stream.",
     "load_tags_failed": "Loading content stream tag failed with status",
     "load_tags_failed_title": "Could not load content stream tags."
+  },
+  "metrics": {
+    "messages_today": "Messages Today",
+    "alerts_today": "Alerts Today",
+    "events_today": "Events Today",
+    "top_sources": "Top 5 Sources"
   }
 }

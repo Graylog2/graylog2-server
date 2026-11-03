@@ -75,5 +75,11 @@
     "load_config_failed_title": "コンテンツストリームを読み込めませんでした。",
     "load_tags_failed": "コンテンツストリームのタグの読み込みがステータス付きで失敗しました",
     "load_tags_failed_title": "コンテンツストリームのタグを読み込めませんでした。"
+  },
+  "metrics": {
+    "messages_today": "今日のメッセージ",
+    "alerts_today": "今日のアラート",
+    "events_today": "今日のイベント",
+    "top_sources": "上位 5 件のソース"
   }
 }
