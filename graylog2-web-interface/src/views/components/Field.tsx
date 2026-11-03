@@ -27,13 +27,14 @@ type Props = {
   name: string;
   menuContainer?: HTMLElement;
   type: FieldType;
+  value?: unknown;
 };
 
-const Field = ({ children = null, disabled = false, menuContainer = document.body, name, type }: Props) => {
+const Field = ({ children = null, disabled = false, menuContainer = document.body, name, type, value = undefined }: Props) => {
   const isInteractive = useIsInteractiveMode();
 
   return isInteractive ? (
-    <FieldActions element={children || name} disabled={disabled} menuContainer={menuContainer} name={name} type={type}>
+    <FieldActions element={children || name} disabled={disabled} menuContainer={menuContainer} name={name} type={type} value={value}>
       {name} = {type.type}
     </FieldActions>
   ) : (
