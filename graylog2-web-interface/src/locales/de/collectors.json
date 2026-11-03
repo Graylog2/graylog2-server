@@ -284,7 +284,7 @@
     "stat_instances_help": "Laufende Collector-Prozesse über alle Fleets.",
     "stat_fleets": "Fleets",
     "stat_fleets_help": "Logische Gruppen von Collectors mit derselben Quellenkonfiguration.",
-    "stat_sources_help": "Konfigurationen zur Datenerfassung (Dateipfade, journald, Windows-Ereignisprotokolle) über alle Fleets.",
+    "stat_sources_help": "Konfigurationen zur Datenerfassung (Dateipfade, journald, Windows-Event-Protokolle) über alle Fleets.",
     "fleet_stats_error": "Fleet-Statistiken konnten nicht geladen werden.",
     "stats_error": "Collector-Statistiken konnten nicht geladen werden.",
     "fleets_title": "Fleets",
@@ -470,7 +470,7 @@
   "source_types": {
     "file": "Datei",
     "journald": "Journald",
-    "windows_event_log": "Windows-Ereignisprotokoll",
+    "windows_event_log": "Windows-Event-Protokoll",
     "macos_unified_logging": "macOS Unified Logging"
   },
   "source_columns": {
@@ -514,7 +514,7 @@
     "source_type": "Quellentyp",
     "file_type_help": "Sammelt Logzeilen aus Dateien auf dem Host. Unterstützt Glob-Muster, um mehrere Dateien zu erfassen.",
     "journald_type_help": "Sammelt Einträge aus dem systemd-Journal (nur Linux).",
-    "windows_type_help": "Sammelt Ereignisse aus Kanälen der Windows-Ereignisanzeige.",
+    "windows_type_help": "Sammelt Events aus Kanälen der Windows-Event-Anzeige.",
     "macos_type_help": "Sammelt über den Befehl <code>log</code> aus dem macOS Unified Logging System (nur macOS).",
     "enabled_help": "Deaktivierte Quellen werden nicht an Collectors gesendet. Damit können Sie das Sammeln vorübergehend stoppen, ohne die Quelle zu entfernen.",
     "update": "Quelle aktualisieren",

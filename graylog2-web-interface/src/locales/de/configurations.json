@@ -24,7 +24,7 @@
     "backlog_size": "Standardgröße des Benachrichtigungs-Backlogs",
     "backlog_size_help": "Anzahl der Nachrichten, die standardmäßig in einer Benachrichtigung enthalten sind.",
     "catch_up_window": "Aufholfenster",
-    "catch_up_window_help": "Wenn die Ausführung des Ereignisprozessors dem Zeitplan hinterherhinkt, werden Abfragen auf älteren Daten mit dieser Fenstergröße ausgeführt, um die Verarbeitung zu beschleunigen. (Ist die Einstellung „Suche innerhalb der letzten“ einer Ereignisdefinition größer, wird diese Einstellung ignoriert)",
+    "catch_up_window_help": "Wenn die Ausführung des Eventprozessors dem Zeitplan hinterherhinkt, werden Abfragen auf älteren Daten mit dieser Fenstergröße ausgeführt, um die Verarbeitung zu beschleunigen. (Ist die Einstellung „Suche innerhalb der letzten“ einer Event Definition größer, wird diese Einstellung ignoriert)",
     "catch_up_window_size": "Größe des Aufholfensters",
     "notification_backlog": "Benachrichtigungs-Backlog",
     "notification_retry": "Wiederholung von Benachrichtigungen",
@@ -35,8 +35,8 @@
     "tcp_keepalive_help": "Wenn aktiviert, senden HTTP-Verbindungen für Benachrichtigungen TCP-Keep-Alive-Pakete",
     "tcp_keepalive_label": "TCP-Keep-Alive-Pakete für Benachrichtigungsverbindungen senden",
     "tcp_keepalive_probes": "TCP-Keep-Alive-Pakete",
-    "title": "Ereigniskonfiguration",
-    "update_title": "Ereignis-Systemkonfiguration aktualisieren"
+    "title": "Eventkonfiguration",
+    "update_title": "Eventsystemkonfiguration aktualisieren"
   },
   "markdown": {
     "allow_all_sources": "Bilder aus allen Quellen zulassen",
@@ -190,7 +190,7 @@
     "column_title": "Titel",
     "column_type": "Typ",
     "column_url": "URL",
-    "description": "Wenn aktiviert, werden ausgehende HTTP-Anfragen der {{productName}}-Server, etwa Ereignisbenachrichtigungen oder Anfragen von HTTP-basierten Datenadaptern, anhand der hier konfigurierten Allowlists geprüft. Da die HTTP-Anfragen von den {{productName}}-Servern aus gestellt werden, können sie möglicherweise sensiblere Systeme erreichen als ein externer Benutzer, darunter die AWS-EC2-Metadaten, die Schlüssel und andere Geheimnisse enthalten können, Elasticsearch und weitere. Der administrative Zugriff auf die Allowlist ist unabhängig von der Konfiguration der Datenadapter und Ereignisbenachrichtigungen.",
+    "description": "Wenn aktiviert, werden ausgehende HTTP-Anfragen der {{productName}}-Server, etwa Event Benachrichtigungen oder Anfragen von HTTP-basierten Datenadaptern, anhand der hier konfigurierten Allowlists geprüft. Da die HTTP-Anfragen von den {{productName}}-Servern aus gestellt werden, können sie möglicherweise sensiblere Systeme erreichen als ein externer Benutzer, darunter die AWS-EC2-Metadaten, die Schlüssel und andere Geheimnisse enthalten können, Elasticsearch und weitere. Der administrative Zugriff auf die Allowlist ist unabhängig von der Konfiguration der Datenadapter und Event Benachrichtigungen.",
     "disabled": "Deaktiviert",
     "enabled": "Aktiviert",
     "exact_match": "Exakte Übereinstimmung",
@@ -230,9 +230,9 @@
     "update_title": "Benutzerkonfiguration aktualisieren"
   },
   "welcome_page": {
-    "description": "Die Startseite kann Widgets mit Nachrichten-, Alarm- und Ereignisanzahlen sowie ein Diagramm der häufigsten Quellen anzeigen. In großen oder stark ausgelasteten Clustern verursachen diese Abfragen jedes Mal zusätzliche Last, wenn ein Benutzer die Startseite öffnet. Deaktivieren Sie sie unten, wenn Sie diese Last vermeiden möchten. Die Widgets werden dann ausgeblendet und ihre Abfragen nicht ausgeführt.",
+    "description": "Die Startseite kann Widgets mit Nachrichten-, Alarm- und Eventanzahlen sowie ein Diagramm der häufigsten Quellen anzeigen. In großen oder stark ausgelasteten Clustern verursachen diese Abfragen jedes Mal zusätzliche Last, wenn ein Benutzer die Startseite öffnet. Deaktivieren Sie sie unten, wenn Sie diese Last vermeiden möchten. Die Widgets werden dann ausgeblendet und ihre Abfragen nicht ausgeführt.",
     "enable_metrics": "Metriken der Startseite aktivieren",
-    "enable_metrics_help": "Wenn deaktiviert, werden die Widgets mit Nachrichten-, Alarm- und Ereignisanzahlen sowie das Diagramm der häufigsten Quellen auf der Startseite ausgeblendet und ihre zugrunde liegenden Abfragen nicht ausgeführt. Deaktivieren Sie dies in großen oder stark ausgelasteten Clustern, um die Abfragelast zu verringern.",
+    "enable_metrics_help": "Wenn deaktiviert, werden die Widgets mit Nachrichten-, Alarm- und Eventanzahlen sowie das Diagramm der häufigsten Quellen auf der Startseite ausgeblendet und ihre zugrunde liegenden Abfragen nicht ausgeführt. Deaktivieren Sie dies in großen oder stark ausgelasteten Clustern, um die Abfragelast zu verringern.",
     "metrics": "Metriken der Startseite",
     "title": "Startseite",
     "update_title": "Konfiguration der Startseite aktualisieren"

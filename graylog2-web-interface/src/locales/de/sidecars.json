@@ -313,7 +313,7 @@
   },
   "pages": {
     "administration": {
-      "description": "Collectors können Inhalte von Logdateien oder des Windows-Ereignisprotokolls (EventLog) zuverlässig von Ihren Servern weiterleiten.",
+      "description": "Collectors können Inhalte von Logdateien oder des Windows-Event-Protokolls (EventLog) zuverlässig von Ihren Servern weiterleiten.",
       "title": "Collector-Verwaltung"
     },
     "configuration": {
@@ -343,7 +343,7 @@
       "title": "Neue Collector-Konfiguration"
     },
     "overview": {
-      "description": "Sidecars können Inhalte von Logdateien oder des Windows-Ereignisprotokolls (EventLog) zuverlässig von Ihren Servern weiterleiten.",
+      "description": "Sidecars können Inhalte von Logdateien oder des Windows-Event-Protokolls (EventLog) zuverlässig von Ihren Servern weiterleiten.",
       "document_title": "Sidecars",
       "title": "Sidecars-Übersicht",
       "token_hint": "Benötigen Sie ein API-Token für einen Sidecar? <tokenLink>Token für den Benutzer <em>{{username}}</em> erstellen oder wiederverwenden</tokenLink>"

@@ -42,7 +42,7 @@
     "empty_body": "Leerer Text",
     "html_body": "HTML-Text der E-Mail",
     "empty_html_body": "Leerer HTML-Text",
-    "include_event_procedure": "Event-Prozedur in E-Mail-Text einfügen"
+    "include_event_procedure": "Eventprozedur in E-Mail-Text einfügen"
   },
   "form": {
     "create": "Benachrichtigung erstellen",
@@ -81,8 +81,8 @@
     "email_recipients_help": "Fügen Sie E-Mail-Adressen hinzu, die diese Benachrichtigung erhalten.",
     "html_body_template": "HTML-Vorlage für den Inhalt",
     "html_body_template_help": "Die Vorlage, mit der der HTML-Inhalt der E-Mail erzeugt wird.",
-    "include_event_procedure": "Ereignisprozedur in den E-Mail-Inhalt aufnehmen",
-    "lut_key_help": "Name des Ereignisfelds, dessen Wert als Lookup-Tabellen-Schlüssel verwendet wird.",
+    "include_event_procedure": "Eventprozedur in den E-Mail-Inhalt aufnehmen",
+    "lut_key_help": "Name des Eventfelds, dessen Wert als Lookup-Tabellen-Schlüssel verwendet wird.",
     "recipients_lut_key": "Lookup-Tabellen-Schlüssel für Empfänger",
     "reply_to_help": "Die E-Mail-Adresse, an die Empfänger ihre Antworten senden sollen.",
     "reply_to_lut_key": "Lookup-Tabellen-Schlüssel für Antwortadresse",
@@ -173,7 +173,7 @@
     "type_option": "Legacy {{name}}",
     "choose": "Legacy-Benachrichtigung wählen",
     "select": "Legacy-Benachrichtigung auswählen",
-    "select_help": "Wählen Sie eine Legacy-Benachrichtigung für diese Event-Definition aus.",
+    "select_help": "Wählen Sie eine Legacy-Benachrichtigung für diese Event Definition aus.",
     "deprecated": "Legacy Alarm Callbacks sind veraltet und werden mit dem nächsten Major-Release entfernt. Bitte wechseln Sie so bald wie möglich zu den neuen Benachrichtigungstypen!"
   },
   "details": {
@@ -183,7 +183,7 @@
     "edit_notification": "Benachrichtigung bearbeiten"
   },
   "list": {
-    "empty_description": "Konfigurieren Sie Event-Benachrichtigungen, die Sie alarmieren, wenn ein Event auftritt. Mit Benachrichtigungen können Sie Alarme auch in ein externes Alarmierungssystem integrieren, das Sie verwenden.",
+    "empty_description": "Konfigurieren Sie Event Benachrichtigungen, die Sie alarmieren, wenn ein Event auftritt. Mit Benachrichtigungen können Sie Alarme auch in ein externes Alarmierungssystem integrieren, das Sie verwenden.",
     "get_started": "Jetzt starten!",
     "testing_notification": "Benachrichtigung wird getestet...",
     "test_error": "Fehler:",
@@ -193,10 +193,10 @@
     "delete_title": "Benachrichtigung löschen",
     "delete_confirm": "Möchten Sie \"{{title}}\" wirklich löschen?",
     "share_description": "Suchen Sie nach einem Benutzer oder Team, um es als Mitwirkenden zu dieser Benachrichtigung hinzuzufügen.",
-    "human_name": "Event-Benachrichtigungen"
+    "human_name": "Event Benachrichtigungen"
   },
   "pages": {
-    "description": "Benachrichtigungen informieren Sie über konfigurierte Events, sobald sie auftreten. Benachrichtigungen können direkt an Sie oder an andere Systeme gesendet werden, die Sie dafür verwenden. Denken Sie daran, Benachrichtigungen beim Erstellen oder Bearbeiten einer Event-Definition zuzuweisen.",
+    "description": "Benachrichtigungen informieren Sie über konfigurierte Events, sobald sie auftreten. Benachrichtigungen können direkt an Sie oder an andere Systeme gesendet werden, die Sie dafür verwenden. Denken Sie daran, Benachrichtigungen beim Erstellen oder Bearbeiten einer Event Definition zuzuweisen.",
     "alerts_docs": "Dokumentation zu Alarmen",
     "title": "Benachrichtigungen",
     "new": "Neue Benachrichtigung",
@@ -207,8 +207,8 @@
     "loading": "Informationen zur Benachrichtigung werden geladen..."
   },
   "messages": {
-    "not_found": "Event-Benachrichtigung mit ID <{{id}}> nicht gefunden. Bitte stellen Sie sicher, dass sie nicht gelöscht wurde.",
-    "not_found_title": "Event-Benachrichtigung konnte nicht abgerufen werden",
+    "not_found": "Event Benachrichtigung mit ID <{{id}}> nicht gefunden. Bitte stellen Sie sicher, dass sie nicht gelöscht wurde.",
+    "not_found_title": "Event Benachrichtigung konnte nicht abgerufen werden",
     "created": "Benachrichtigung erfolgreich erstellt",
     "created_title": "Benachrichtigung \"{{title}}\" wurde erfolgreich erstellt.",
     "create_failed": "Erstellen der Benachrichtigung \"{{title}}\" fehlgeschlagen mit Status: {{error}}",
@@ -221,10 +221,10 @@
     "deleted_title": "Benachrichtigung \"{{title}}\" wurde erfolgreich gelöscht.",
     "delete_failed": "Löschen der Benachrichtigung \"{{title}}\" fehlgeschlagen mit Status: {{error}}",
     "delete_failed_title": "Benachrichtigung konnte nicht gelöscht werden",
-    "load_all_failed": "Laden der Event-Benachrichtigungen fehlgeschlagen mit Status",
-    "load_all_failed_title": "Event-Benachrichtigungen konnten nicht geladen werden",
-    "load_failed": "Laden der Event-Benachrichtigung fehlgeschlagen mit Status",
-    "load_failed_title": "Event-Benachrichtigung konnte nicht geladen werden"
+    "load_all_failed": "Laden der Event Benachrichtigungen fehlgeschlagen mit Status",
+    "load_all_failed_title": "Event Benachrichtigungen konnten nicht geladen werden",
+    "load_failed": "Laden der Event Benachrichtigung fehlgeschlagen mit Status",
+    "load_failed_title": "Event Benachrichtigung konnte nicht geladen werden"
   },
   "test": {
     "success": "Die Benachrichtigung wurde erfolgreich ausgeführt.",
@@ -233,12 +233,12 @@
     "unknown_error_product": "Unbekannter Fehler. Bitte prüfen Sie Ihre {{productName}}-Server-Logs."
   },
   "bulk": {
-    "delete_confirm_one": "Möchten Sie {{count}} Event-Benachrichtigung wirklich entfernen?",
-    "delete_confirm_other": "Möchten Sie {{count}} Event-Benachrichtigungen wirklich entfernen?",
-    "delete_failed_one": "{{failed}} von {{count}} ausgewählten Event-Benachrichtigung konnte nicht gelöscht werden. Status: {{status}}",
-    "delete_failed_other": "{{failed}} von {{count}} ausgewählten Event-Benachrichtigungen konnten nicht gelöscht werden. Status: {{status}}",
-    "delete_success_one": "{{count}} Event-Benachrichtigung wurde erfolgreich gelöscht.",
-    "delete_success_other": "{{count}} Event-Benachrichtigungen wurden erfolgreich gelöscht.",
+    "delete_confirm_one": "Möchten Sie {{count}} Event Benachrichtigung wirklich entfernen?",
+    "delete_confirm_other": "Möchten Sie {{count}} Event Benachrichtigungen wirklich entfernen?",
+    "delete_failed_one": "{{failed}} von {{count}} ausgewählten Event Benachrichtigung konnte nicht gelöscht werden. Status: {{status}}",
+    "delete_failed_other": "{{failed}} von {{count}} ausgewählten Event Benachrichtigungen konnten nicht gelöscht werden. Status: {{status}}",
+    "delete_success_one": "{{count}} Event Benachrichtigung wurde erfolgreich gelöscht.",
+    "delete_success_other": "{{count}} Event Benachrichtigungen wurden erfolgreich gelöscht.",
     "success_title": "Erfolg"
   }
 }

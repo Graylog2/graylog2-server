@@ -79,7 +79,7 @@
   "metrics": {
     "messages_today": "Nachrichten heute",
     "alerts_today": "Alarme heute",
-    "events_today": "Ereignisse heute",
+    "events_today": "Events heute",
     "top_sources": "Top 5 Quellen",
     "tab_general": "Allgemein"
   }

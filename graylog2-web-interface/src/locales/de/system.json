@@ -127,7 +127,7 @@
   },
   "meter_details": {
     "total": "Gesamt:",
-    "events": "Ereignisse",
+    "events": "Events",
     "one_minute_avg": "Durchschnitt 1 Min.:",
     "five_minute_avg": "Durchschnitt 5 Min.:",
     "fifteen_minute_avg": "Durchschnitt 15 Min.:"
@@ -311,7 +311,7 @@
   },
   "system_messages_component": {
     "title": "Systemnachrichten",
-    "description": "Systemnachrichten werden von {{productName}}-Serverknoten bei bestimmten Ereignissen erzeugt, die für die {{productName}}-Administratoren interessant sein könnten. Sie müssen auf keines dieser Ereignisse aktiv reagieren, da für alle Ereignisse, die eine Aktion erfordern, Benachrichtigungen ausgegeben werden."
+    "description": "Systemnachrichten werden von {{productName}}-Serverknoten bei bestimmten Events erzeugt, die für die {{productName}}-Administratoren interessant sein könnten. Sie müssen auf keines dieser Events aktiv reagieren, da für alle Events, die eine Aktion erfordern, Benachrichtigungen ausgegeben werden."
   },
   "system_messages_list": {
     "timestamp": "Zeitstempel",
@@ -332,7 +332,7 @@
   "telemetry_debug_entry_row": {
     "delta": " (+{{delta}}ms)",
     "pii_suspect": "PII-Verdacht: {{suspect}}",
-    "copy_as_json": "Ereignis als JSON kopieren"
+    "copy_as_json": "Event als JSON kopieren"
   },
   "telemetry_debug_overlay": {
     "badge_label": "Telemetry-Debug",
@@ -340,16 +340,16 @@
     "drawer_label": "Telemetry-Debug-Panel",
     "resize_label": "Telemetry-Debug-Panel in der Größe ändern",
     "title": "Telemetry-Debug ({{count}})",
-    "filter_label": "Ereignisse filtern",
-    "filter_placeholder": "Nach Ereignisname oder Payload filtern...",
+    "filter_label": "Events filtern",
+    "filter_placeholder": "Nach Eventname oder Payload filtern...",
     "resume": "Fortsetzen",
     "pause": "Pausieren",
     "clear": "Leeren",
     "export_session": "Sitzung exportieren",
     "collapse": "Einklappen",
-    "no_events": "Noch keine Telemetrie-Ereignisse erfasst. Interagieren Sie mit der Anwendung, um sie hier zu sehen.",
+    "no_events": "Noch keine Telemetrie-Events erfasst. Interagieren Sie mit der Anwendung, um sie hier zu sehen.",
     "time": "Zeit",
-    "event": "Ereignis",
+    "event": "Event",
     "action": "Aktion",
     "status": "Status"
   },

@@ -106,7 +106,7 @@
     "sqs_batch_size_label": "SQS-Nachrichten-Batchgröße",
     "sqs_batch_size_help": "Die maximale Anzahl an Nachrichten, die gleichzeitig aus SQS abgefragt werden. Der maximal zulässige Wert ist 10.",
     "include_full_message_json_label": "full_message_json einschließen?",
-    "include_full_message_json_help": "Das vollständige CloudTrail-Ereignis als JSON im Feld full_message_json speichern?"
+    "include_full_message_json_help": "Das vollständige CloudTrail-Event als JSON im Feld full_message_json speichern?"
   },
   "aws_cloudtrail_step_authorize": {
     "connection_error": "Verbindung zu AWS CloudTrail mit der angegebenen Konfiguration nicht möglich.",
@@ -156,7 +156,7 @@
     "flow_log_prefix_label": "Feldnamen-Präfix für Flow Logs hinzufügen",
     "flow_log_prefix_help": "Feld mit dem Flow-Log-Präfix hinzufügen, z. B. „src_addr“ -> „flow_log_src_addr“.",
     "store_full_message_label": "Vollständige Nachricht speichern?",
-    "store_full_message_help": "Das ursprüngliche Kinesis-/CloudWatch-Logereignis im Feld full_message speichern.",
+    "store_full_message_help": "Das ursprüngliche Kinesis-/CloudWatch-Logevent im Feld full_message speichern.",
     "override_source_label": "Quelle überschreiben (optional)",
     "override_source_help": "Die Nachrichtenquelle ist standardmäßig auf aws-kinesis-raw-logs gesetzt. Bei Bedarf können Sie sie durch einen eigenen Wert überschreiben.",
     "batch_size_label": "Batchgröße für Kinesis-Records",
@@ -304,7 +304,7 @@
     "channel_label": "Kanal",
     "custom_message_label": "Benutzerdefinierte Nachrichtenvorlage",
     "empty_body": "Leerer Inhalt",
-    "include_event_procedure_label": "Ereignisprozedur im E-Mail-Text einschließen",
+    "include_event_procedure_label": "Eventprozedur im E-Mail-Text einschließen",
     "backlog_limit_label": "Nachrichten-Backlog-Limit",
     "user_name_label": "Benutzername",
     "include_title_label": "Titel einschließen",
@@ -342,7 +342,7 @@
     "backlog_limit_help": "Begrenzt die Anzahl der Backlog-Nachrichten, die Teil der Slack-Benachrichtigung sind. Bei 0 gibt es keine Begrenzung.",
     "user_name_label": "Benutzername (optional)",
     "user_name_help": "Benutzername des Absenders in Slack",
-    "include_title_help": "Titel und Beschreibung der Ereignisdefinition in die Benachrichtigung aufnehmen",
+    "include_title_help": "Titel und Beschreibung der Event Definition in die Benachrichtigung aufnehmen",
     "notify_channel_help": "Alle Benutzer im Kanal benachrichtigen, indem @channel zur Nachricht hinzugefügt wird",
     "notify_here_label": "Hier benachrichtigen",
     "notify_here_help": "Aktive Benutzer im Kanal benachrichtigen, indem @here zur Nachricht hinzugefügt wird",
@@ -353,8 +353,8 @@
     "icon_emoji_help": "Emoji, das als Symbol für diese Nachricht verwendet wird (überschreibt die Symbol-URL)"
   },
   "event_procedure_checkbox": {
-    "label": "Ereignisprozedur einschließen",
-    "help": "Eine formatierte Version der Ereignisprozedur der Ereignisdefinition am Ende des Nachrichtentextes anhängen."
+    "label": "Eventprozedur einschließen",
+    "help": "Eine formatierte Version der Eventprozedur der Event Definition am Ende des Nachrichtentextes anhängen."
   },
   "slack_notification_summary": {
     "color_label": "Farbe",
@@ -387,17 +387,17 @@
     "routing_key_label": "Routing Key",
     "routing_key_help": "Der Routing Key der Pager-Duty-Integration.",
     "incident_title_label": "Incident-Titel",
-    "incident_title_help": "Benutzerdefinierter Titel für den Incident in Pager Duty. Ist keiner angegeben, wird der Ereignistitel verwendet, wie er in {{productName}} angezeigt wird.",
+    "incident_title_help": "Benutzerdefinierter Titel für den Incident in Pager Duty. Ist keiner angegeben, wird der Eventtitel verwendet, wie er in {{productName}} angezeigt wird.",
     "custom_incident_label": "Benutzerdefinierten Incident-Key verwenden",
     "custom_incident_help": "Einen benutzerdefinierten Incident-Key generieren.",
     "key_prefix_label": "Incident-Key-Präfix",
-    "key_prefix_help": "Incident-Key-Präfix, dem die Stream(s) und der Titel der Ereignisdefinition folgen. Verwenden Sie den Incident-Key, um den gesamten Schlüssel anzupassen.",
+    "key_prefix_help": "Incident-Key-Präfix, dem die Stream(s) und der Titel der Event Definition folgen. Verwenden Sie den Incident-Key, um den gesamten Schlüssel anzupassen.",
     "incident_key_label": "Incident-Key",
     "incident_key_help": "Vollständiger Schlüssel zur Identifikation des Incidents. Wird anstelle des Präfixes verwendet, sofern angegeben.",
     "client_name_label": "Client-Name",
-    "client_name_help": "Der Name des {{productName}}-Systems, das das PagerDuty-Ereignis auslöst.",
+    "client_name_help": "Der Name des {{productName}}-Systems, das das PagerDuty-Event auslöst.",
     "client_url_label": "Client-URL",
-    "client_url_help": "Die URL des {{productName}}-Systems, das das PagerDuty-Ereignis auslöst."
+    "client_url_help": "Die URL des {{productName}}-Systems, das das PagerDuty-Event auslöst."
   },
   "pager_duty_notification_summary": {
     "routing_key_label": "Routing Key",

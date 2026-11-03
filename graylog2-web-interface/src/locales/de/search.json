@@ -87,7 +87,7 @@
     "generic": "Generisch",
     "predefined_aggregation": "Vordefinierte Aggregation",
     "investigations": "Untersuchungen",
-    "events": "Ereignisse"
+    "events": "Events"
   },
   "sidebar_highlighting": {
     "description": "Suchbegriffe und Feldwerte können hervorgehoben werden. Das Hervorheben Ihrer Suchanfrage in den Ergebnissen kann in der {{productName}}-Serverkonfiguration aktiviert/deaktiviert werden. Jeder Feldwert kann durch Klicken auf den Wert und Auswählen von \"Diesen Wert hervorheben\" hervorgehoben werden.\nWenn ein Begriff oder Wert mehr als eine Regel hat, wird die erste übereinstimmende Regel verwendet.",
@@ -291,8 +291,8 @@
     "back": "Zurück"
   },
   "view_header": {
-    "alerts_and_events": "Alarme & Ereignisse",
-    "event_definitions": "Ereignisdefinitionen",
+    "alerts_and_events": "Alarme & Events",
+    "event_definitions": "Event Definitionen",
     "edit_search_metadata": "Metadaten der Suche {{title}} bearbeiten",
     "edit_dashboard_metadata": "Metadaten des Dashboards {{title}} bearbeiten",
     "editing_search": "Gespeicherte Suche bearbeiten",
@@ -455,11 +455,11 @@
     "show_documents": "Dokumente für diesen Wert anzeigen",
     "create_extractor": "Extractor erstellen",
     "highlight_value": "Diesen Wert hervorheben",
-    "create_event_definition": "Ereignisdefinition erstellen",
+    "create_event_definition": "Event Definition erstellen",
     "copy_value": "Wert in die Zwischenablage kopieren"
   },
   "create_event_definition": {
-    "title": "Neue Ereignisdefinition konfigurieren",
+    "title": "Neue Event Definition konfigurieren",
     "hide_details": "Details der Strategie ausblenden",
     "show_details": "Details der Strategie einblenden",
     "continue": "Konfiguration fortsetzen",
@@ -539,7 +539,7 @@
     "message_table": "Nachrichtentabelle",
     "custom_aggregation": "Benutzerdefinierte Aggregation",
     "aggregation": "Aggregation",
-    "events_overview": "Ereignisübersicht",
+    "events_overview": "Eventübersicht",
     "text_markdown": "Text/Markdown"
   },
   "message_details": {

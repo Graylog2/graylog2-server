@@ -115,9 +115,9 @@
   "events_widget": {
     "actions": "Aktionen",
     "replay_search": "Suche wiederholen",
-    "view_details": "Ereignisdetails anzeigen",
-    "toggle_actions": "Ereignisaktionen umschalten",
-    "details_title": "Ereignisdetails",
+    "view_details": "Eventdetails anzeigen",
+    "toggle_actions": "Eventaktionen umschalten",
+    "details_title": "Eventdetails",
     "close": "Schließen",
     "unknown_visualization": "Unbekannter Visualisierungstyp des Widgets: {{mode}}",
     "mode_list": "Liste",
@@ -129,7 +129,7 @@
     "sorting": "Sortierung",
     "unknown_attribute": "Unbekannt",
     "unknown_attribute_help": "Dieses Attribut ist derzeit nicht verfügbar, da es eine gültige Lizenz erfordert.",
-    "select_event_definition": "Ereignisdefinition auswählen",
+    "select_event_definition": "Event Definition auswählen",
     "alert": "Alarm",
     "event": "Event"
   },
@@ -182,7 +182,7 @@
     "show_row_numbers_title": "Zeilennummern einblenden"
   },
   "field_types": {
-    "missing_event_definition": "Fehlende Ereignisdefinition: {{id}}"
+    "missing_event_definition": "Fehlende Event Definition: {{id}}"
   },
   "export": {
     "title_search": "Alle Suchergebnisse exportieren",

@@ -36,7 +36,7 @@
   "parameter_edit": {
     "default_value_help": "Wählen Sie einen Standardwert für den Fall, dass das Lookup-Ergebnis leer ist",
     "default_value_label": "Standardwert",
-    "empty_result": "Die Abfrage der Ereignisdefinition wird nur ausgeführt, wenn ein Wert für den Parameter vorhanden ist. Ist das Lookup-Ergebnis leer, wird die Ausführung übersprungen und so behandelt, als hätte die <emphasis>Suchanfrage</emphasis> keine Nachrichten gefunden. Soll die Abfrage dennoch ausgeführt werden, muss ein <emphasis>Standardwert</emphasis> angegeben werden, der das gewünschte Suchergebnis liefert. Je nach Anwendungsfall kann zum Beispiel ein Platzhalter wie <inlineCode>{{wildcard}}</inlineCode> ein sinnvoller Standardwert sein.",
+    "empty_result": "Die Abfrage der Event Definition wird nur ausgeführt, wenn ein Wert für den Parameter vorhanden ist. Ist das Lookup-Ergebnis leer, wird die Ausführung übersprungen und so behandelt, als hätte die <emphasis>Suchanfrage</emphasis> keine Nachrichten gefunden. Soll die Abfrage dennoch ausgeführt werden, muss ein <emphasis>Standardwert</emphasis> angegeben werden, der das gewünschte Suchergebnis liefert. Je nach Anwendungsfall kann zum Beispiel ein Platzhalter wie <inlineCode>{{wildcard}}</inlineCode> ein sinnvoller Standardwert sein.",
     "empty_result_title": "Verhalten bei leerer Lookup-Ergebnisliste",
     "general_usage": "Nach der Deklaration wird der Parameter <inlineCode>{{parameter}}</inlineCode> in Ihrer Abfrage durch die Liste der Ergebnisse aus der Lookup-Tabelle ersetzt. Die Ergebnisliste wird in Form einer Lucene-BooleanQuery dargestellt, z. B.: <inlineCode>{{example}}</inlineCode>",
     "general_usage_title": "Allgemeine Verwendung",

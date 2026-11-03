@@ -109,7 +109,7 @@
   "wizard_visualization": {
     "type": "Typ",
     "select_type": "Visualisierungstyp auswählen",
-    "show_event_annotations": "Event-Anmerkungen anzeigen",
+    "show_event_annotations": "Eventanmerkungen anzeigen",
     "help_for": "Hilfe zu {{field}}",
     "select_field": "{{field}} auswählen",
     "color_for": "Farbe für {{field}} konfigurieren",

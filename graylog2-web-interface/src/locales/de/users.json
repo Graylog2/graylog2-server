@@ -69,7 +69,7 @@
     "title": "Rollenübersicht",
     "documentation_link_title": "Berechtigungsdokumentation",
     "button_text": "Rollenübersicht",
-    "description": "Übersicht über alle verfügbaren Rollen in {{productName}}. Rollen ermöglichen es, Benutzern Fähigkeiten zu gewähren, wie z. B. das Erstellen von Dashboards oder Ereignisdefinitionen.",
+    "description": "Übersicht über alle verfügbaren Rollen in {{productName}}. Rollen ermöglichen es, Benutzern Fähigkeiten zu gewähren, wie z. B. das Erstellen von Dashboards oder Event Definitionen.",
     "alert_title": "Berechtigungen vergeben",
     "alert_body_prefix": "Die integrierten Rollen ermöglichen es, Benutzern Fähigkeiten zu gewähren, wie z. B. das Erstellen von Dashboards oder das Anzeigen des Archivkatalogs. Sie gewähren jedoch keine Berechtigungen für ein bestimmtes Dashboard oder einen bestimmten Stream. Es ist auch nicht möglich, eine eigene Rolle zu erstellen. Das Gewähren von Berechtigungen für eine bestimmte Entität kann über deren ",
     "share_text": "Teilen",
@@ -219,7 +219,7 @@
   "security_teaser": {
     "overview": {
       "hotspot_0": "Finden Sie Ihre wichtigsten Sicherheitsinformationen schnell auf dem Tab „Overview“.",
-      "hotspot_1": "Hier sehen Sie hohe Alarme, die wichtigsten Ereignisquellen und mehr, die Ihnen Einblick in Ihre Sicherheitslage geben.",
+      "hotspot_1": "Hier sehen Sie hohe Alarme, die wichtigsten Eventquellen und mehr, die Ihnen Einblick in Ihre Sicherheitslage geben.",
       "hotspot_2": "Bewegen Sie den Mauszeiger über diese Tooltips auf dieser Seite, um mehr über die Funktionen von {{productName}} Security zu erfahren",
       "title": "Übersicht"
     },
@@ -227,7 +227,7 @@
       "hotspot_0": "Erhalten Sie eine Übersicht über die laufenden Anomalien, wie viele erkannt wurden und wie sich das im Vergleich zum vorherigen Zeitraum verhält.",
       "hotspot_1": "Konfidenzintervalle zeigen, wie weit das Verhalten von der Norm abweicht.",
       "hotspot_2": "Es gibt Detektoren für verschiedene Arten von Anomalien – sehen Sie schnell, welche davon Alarme erzeugen.",
-      "hotspot_3": "Erkennen Sie Benutzerkonten mit für sie ungewöhnlichem Verhalten bei Anmeldungen oder Sicherheitsereignissen.",
+      "hotspot_3": "Erkennen Sie Benutzerkonten mit für sie ungewöhnlichem Verhalten bei Anmeldungen oder Sicherheitsevents.",
       "title": "Anomalien"
     },
     "host_activity": {
@@ -235,7 +235,7 @@
       "hotspot_1": "Erkennen Sie sofort, welche Hosts die hohen Alarme erzeugen, um die MTTR zu verkürzen.",
       "hotspot_2": "Sehen Sie, welche Technik die meisten Anmeldungen erzeugt.",
       "hotspot_3": "Starten Sie eine Untersuchung, wenn Änderungen an Identitäts- und Zugriffskontrollen von unerwarteten Rechnern kommen.",
-      "hotspot_4": "Die Nachrichtenzahlen je Ereignisquelle zeigen Ihnen täglich die regulären Muster in den Daten; Ausreißer lösen Untersuchungen aus, warum sie auftreten.",
+      "hotspot_4": "Die Nachrichtenzahlen je Eventquelle zeigen Ihnen täglich die regulären Muster in den Daten; Ausreißer lösen Untersuchungen aus, warum sie auftreten.",
       "title": "Host-Aktivität"
     },
     "network_activity": {
@@ -243,7 +243,7 @@
       "hotspot_1": "Sehen Sie schnell, woher die Daten kommen und wohin sie gehen.",
       "hotspot_2": "Erkennen Sie, welche Benutzer die größten Datenmengen über das Netzwerk senden.",
       "hotspot_3": "Stellen Sie fest, ob ein ungewöhnliches Muster in den DNS-Abfrageergebnissen vorliegt, etwa ein bestimmter Fehlercode, der plötzlich in der Top-15-Liste auftaucht. ",
-      "hotspot_4": "Die 15 wichtigsten Plattformen, die DNS-Anfragen erzeugen, nach Ereignisquelle.",
+      "hotspot_4": "Die 15 wichtigsten Plattformen, die DNS-Anfragen erzeugen, nach Eventquelle.",
       "title": "Netzwerkaktivität"
     },
     "user_activity": {
@@ -263,7 +263,7 @@
         "dynamic_lookup_tables": "Dynamische Lookup-Tabellen",
         "advanced_alerting": "Erweiterte Alarmierung mit Skripting",
         "compliance_reporting": "Compliance-Berichte",
-        "correlation_aggregation": "Korrelations- und Aggregationsereignisse",
+        "correlation_aggregation": "Korrelations- und Aggregationsevents",
         "threat_intel": "Threat-Intel-Integrationen",
         "incident_workspaces": "Arbeitsbereiche für Incident-Untersuchungen",
         "prebuilt_parser_dashboards": "Vorgefertigte Security-Parser und Dashboards",
