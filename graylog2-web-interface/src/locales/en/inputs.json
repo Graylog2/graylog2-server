@@ -106,7 +106,7 @@
       "message_failed_to_process_title": "Message Failed to Process:",
       "message_failed_to_process": "Extractors and pipelines can be used to perform processing operations on messages such as parsing out fields. A pipeline rule that tries to perform a nonsensical operation, or that modifies the properties of a field in the message to a format that conflicts with the data type or field length limits of that field, can fail to process. Messages that fail to process in this fashion can be reviewed within the Processing and Indexing Failures stream.",
       "message_failed_to_index_title": "Message Errors:",
-      "message_failed_to_index": "Within the search cluster, a message can only be saved into an Index if it meets the schema of that Index. Each field in Opensearch has a field type and character limit; if either is exceeded, the message will fail to Index. Messages that fail to Index in this fashion can be reviewed within the Processing and Indexing Failures stream.",
+      "message_failed_to_index": "Within the search cluster, a message can only be saved into an Index if it meets the schema of that Index. Each field in OpenSearch has a field type and character limit; if either is exceeded, the message will fail to Index. Messages that fail to Index in this fashion can be reviewed within the Processing and Indexing Failures stream.",
       "received_message_count_by_stream": "Use this view to understand where stream and pipeline rules are directing the messages from this Input. A message can be duplicated into multiple streams; if this results in the message being saved to more than one Index, this can also multiply license usage. This view can be useful to detect such duplication."
     },
     "node": {
@@ -219,7 +219,7 @@
       "connected_pipelines_title": "Pipelines connected to target Stream",
       "connected_pipelines": "We recommending checking the impact of these prior to completing the Input Setup. The target Stream has the following Pipelines connected to it:",
       "select_destination": "Select a destination Stream to route messages from this input to.",
-      "recommend_new_stream": "<strong>We recommend creating a new stream for each new input.</strong> This will help categorise your messages into a basic schema.",
+      "recommend_new_stream": "<strong>We recommend creating a new stream for each new input.</strong> This will help categorize your messages into a basic schema.",
       "default_stream_fallback": "Messages that are not routed to any Stream will be routed to the <strong>Default Stream</strong>.",
       "pipeline_rules_info": "Pipeline rules can be automatically created and attached to the <strong>Default Stream</strong> by this Wizard. These rules will be placed in the system managed Default Routing Pipeline, and will be automatically renamed (or deleted) to accurately reflect the state of this Input.",
       "new_stream_heading": "Route to a new Stream",

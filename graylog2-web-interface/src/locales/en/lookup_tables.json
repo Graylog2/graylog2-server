@@ -37,7 +37,7 @@
     "default_value_help": "Select a default value in case the lookup result is empty",
     "default_value_label": "Default Value",
     "empty_result": "The event definition query is only executed if a value for the parameter is present. If the lookup result is empty, the execution will be skipped and treated as if the <emphasis>Search Query</emphasis> found no messages. If an execution is desired a <emphasis>Default Value</emphasis> that yields the desired search result needs to be provided. For example, (depending on the use case) a wildcard like <inlineCode>{{wildcard}}</inlineCode> can be a meaningful Default Value.",
-    "empty_result_title": "Behaviour on empty lookup result list",
+    "empty_result_title": "Behavior on empty lookup result list",
     "general_usage": "After declaring it, the parameter <inlineCode>{{parameter}}</inlineCode> in your query, will be replaced with the list of results from the lookup table. The list of results will be presented in the form of a Lucene BooleanQuery. E.g.: <inlineCode>{{example}}</inlineCode>",
     "general_usage_title": "General Usage",
     "help_title": "How to use lookup table parameters",

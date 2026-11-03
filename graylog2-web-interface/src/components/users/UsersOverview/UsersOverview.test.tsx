@@ -60,7 +60,7 @@ describe('UsersOverview', () => {
 
   it('should display table header', async () => {
     renderSUT();
-    const headers = ['Username', 'Full name', 'E-Mail Address', 'Client Address', 'Role', 'Actions'];
+    const headers = ['Username', 'Full name', 'Email Address', 'Client Address', 'Role', 'Actions'];
 
     // wait until list is displayed
     await screen.findByText('Users');

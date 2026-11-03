@@ -65,7 +65,7 @@ describe('<ContentPackInstallEntityList />', () => {
   it('should render with uninstall and entities', async () => {
     render(<ContentPackInstallEntityList uninstall entities={entities} />);
 
-    await screen.findByText(/Entites to be uninstalled/i);
+    await screen.findByText(/Entities to be uninstalled/i);
     await screen.findByText('Threat Intel Uncached Adapters');
     await screen.findByText('Tor Exit Node List');
     await screen.findByText('Tor Exit Node');

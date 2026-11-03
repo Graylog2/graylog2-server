@@ -221,7 +221,7 @@ public class SystemJobResource extends RestResource {
             if (systemJob.isCancelable()) {
                 systemJob.requestCancel();
             } else {
-                throw new CodedForbiddenException("system_job.cannot_cancel", "System job with ID <" + jobId + "> cannot be cancelled", Map.of("jobId", jobId));
+                throw new CodedForbiddenException("system_job.cannot_cancel", "System job with ID <" + jobId + "> cannot be canceled", Map.of("jobId", jobId));
             }
 
             return SystemJobSummary.create(
@@ -247,7 +247,7 @@ public class SystemJobResource extends RestResource {
         checkPermission(RestPermissions.SYSTEMJOBS_DELETE, summary.jobType());
 
         if (!summary.isCancelable()) {
-            throw new CodedForbiddenException("system_job.cannot_cancel", "System job with ID <" + jobId + "> cannot be cancelled", Map.of("jobId", jobId));
+            throw new CodedForbiddenException("system_job.cannot_cancel", "System job with ID <" + jobId + "> cannot be canceled", Map.of("jobId", jobId));
         }
 
         systemJobManager.cancel(jobId);

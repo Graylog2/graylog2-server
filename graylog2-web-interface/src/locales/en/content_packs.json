@@ -104,7 +104,7 @@
   "install_entities": {
     "installed": "Installed Entities",
     "title": "Title",
-    "to_be_uninstalled": "Entites to be uninstalled",
+    "to_be_uninstalled": "Entities to be uninstalled",
     "type": "Type"
   },
   "install_view": {

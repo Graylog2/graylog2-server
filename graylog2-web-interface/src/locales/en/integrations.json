@@ -287,7 +287,7 @@
     "help": "If enabled, no new messages will be read from this input until the {{productName}} server catches up with its message load. This is typically useful for inputs reading from files or message queue systems like AMQP or Kafka. If you regularly poll an external system, e.g. via HTTP, you normally want to leave this disabled."
   },
   "grey_noise_adapter_documentation": {
-    "description": "The GreyNoise Quick IP Lookup data adapter uses the <greynoiseLink>Greynoise API</greynoiseLink> to lookup indicators for the given key and returns the values for the IP Quick Context endpoint. See <quickContextLink>IP Quick Context</quickContextLink>"
+    "description": "The GreyNoise Quick IP Lookup data adapter uses the <greynoiseLink>GreyNoise API</greynoiseLink> to lookup indicators for the given key and returns the values for the IP Quick Context endpoint. See <quickContextLink>IP Quick Context</quickContextLink>"
   },
   "grey_noise_adapter_field_set": {
     "user_password_label": "User Password",

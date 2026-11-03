@@ -132,7 +132,7 @@ public class CollectorResource extends RestResource implements PluginRestResourc
 
         final Collector collector = this.collectorService.find(id);
         if (collector == null) {
-            throw new CodedNotFoundException("sidecar.collector_not_found", "Cound not find collector <" + id + ">.", Map.of("id", id));
+            throw new CodedNotFoundException("sidecar.collector_not_found", "Could not find collector <" + id + ">.", Map.of("id", id));
         }
 
         return collector;

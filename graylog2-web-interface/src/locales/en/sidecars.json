@@ -317,7 +317,7 @@
       "title": "Collectors Administration"
     },
     "configuration": {
-      "description": "The Collector Sidecar runs next to your favourite log collector and configures it for you. Here you can manage the Sidecar configurations.",
+      "description": "The Collector Sidecar runs next to your favorite log collector and configures it for you. Here you can manage the Sidecar configurations.",
       "title": "Collectors Configuration"
     },
     "documentation_title": "Sidecar documentation",

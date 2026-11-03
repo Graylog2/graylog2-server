@@ -185,13 +185,13 @@ public class EmailAlarmCallback implements AlarmCallback {
         }
 
         configurationRequest.addField(new TextField("subject",
-                "E-Mail Subject",
+                "Email Subject",
                 customizationConfig.productName() + " alert for stream: ${stream.title}: ${check_result.resultDescription}",
                 "The subject of sent out mail alerts",
                 ConfigurationField.Optional.NOT_OPTIONAL));
 
         configurationRequest.addField(new TextField("body",
-                "E-Mail Body",
+                "Email Body",
                 FormattedEmailAlertSender.bodyTemplate,
                 "The template to generate the body from",
                 ConfigurationField.Optional.OPTIONAL,
@@ -205,10 +205,10 @@ public class EmailAlarmCallback implements AlarmCallback {
                 ConfigurationField.Optional.OPTIONAL));
 
         configurationRequest.addField(new ListField(CK_EMAIL_RECEIVERS,
-                "E-Mail Receivers",
+                "Email Receivers",
                 Collections.emptyList(),
                 Collections.emptyMap(),
-                "E-Mail addresses that should receive this alert",
+                "Email addresses that should receive this alert",
                 ConfigurationField.Optional.OPTIONAL,
                 ListField.Attribute.ALLOW_CREATE));
 

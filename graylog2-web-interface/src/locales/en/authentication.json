@@ -11,7 +11,7 @@
       "system_user_dn": "The username for the initial connection to the Active Directory server, e.g. <code>ldapbind@some.domain</code>.<lineBreak/>This needs to match the <code>userPrincipalName</code> of that user.",
       "system_user_password": "The password for the initial connection to the Active Directory server.",
       "user_full_name_attribute": "Which Active Directory attribute to use for the full name of a synchronized user, e.g. <code>displayName</code>.<lineBreak/>",
-      "user_name_attribute": "Which Active Directory attribute to use for the full name of the synchronized user, e.g. <code>userPrincipalName</code>.<lineBreak/>Try to load a test user in the sidebar section <emphasis>User Login Test</emphasis>, if you are unsure which attribute to use.",
+      "user_name_attribute": "Which Active Directory attribute to use for the username of the synchronized user, e.g. <code>userPrincipalName</code>.<lineBreak/>Try to load a test user in the sidebar section <emphasis>User Login Test</emphasis>, if you are unsure which attribute to use.",
       "user_search_base": "The base tree to limit the Active Directory search query to, e.g. <code>cn=users,dc=example,dc=com</code>."
     }
   },

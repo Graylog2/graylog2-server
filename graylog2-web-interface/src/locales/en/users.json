@@ -286,7 +286,7 @@
     "first_name": "First Name",
     "last_name": "Last Name",
     "full_name": "Full name",
-    "email": "E-Mail Address",
+    "email": "Email Address",
     "password": "Password",
     "repeat_password": "Repeat password",
     "time_zone": "Time Zone",
@@ -392,7 +392,7 @@
     "headers": {
       "full_name": "Full name",
       "username": "Username",
-      "email": "E-Mail Address",
+      "email": "Email Address",
       "client_address": "Client Address",
       "enabled": "Enabled",
       "role": "Role",
@@ -450,7 +450,7 @@
       "created": "The date of the token creation",
       "last_access": "The last time the token was used",
       "external_user": "Is the token owner a user from an external authentication backend",
-      "auth_backend": "The user authentication bakend. N/A for internal users"
+      "auth_backend": "The user authentication backend. N/A for internal users"
     },
     "example_user": "Find tokens created by a given user:",
     "example_name": "Find token by a given token name:",

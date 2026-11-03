@@ -33,7 +33,7 @@
   },
   "resume_startup": {
     "button": "Resume startup",
-    "confirm": "Are you sure you want to resume startup without a running {{productName}} data node? This will cause the configuration to fall back to using an Opensearch instance on localhost:9200.",
+    "confirm": "Are you sure you want to resume startup without a running {{productName}} data node? This will cause the configuration to fall back to using an OpenSearch instance on localhost:9200.",
     "error": "Resuming startup failed with error: {{error}}",
     "error_title": "Could not resume startup"
   },

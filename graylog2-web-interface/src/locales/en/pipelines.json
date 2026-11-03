@@ -371,7 +371,7 @@
     "load_failed": "Loading pipelines failed with status",
     "load_failed_title": "Could not load pipelines",
     "load_paginated_failed": "Loading paginated pipelines failed with status",
-    "load_paginated_failed_title": "Could not load  paginated pipelines",
+    "load_paginated_failed_title": "Could not load paginated pipelines",
     "load_single_failed": "Loading pipeline failed with status",
     "load_single_failed_title": "Could not load pipeline",
     "connections_failed": "Fetching pipeline connections failed with status",
