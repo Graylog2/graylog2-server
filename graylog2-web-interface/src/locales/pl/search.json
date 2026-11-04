@@ -428,7 +428,7 @@
     "select_field_type_for": "Wybierz typ pola dla {{fieldName}}",
     "select_field_type_for_field": "Wybierz typ pola dla pola",
     "select_field_type": "Wybierz typ pola",
-    "select_index_sets": "Wybierz docelowe Index Sets",
+    "select_index_sets": "Wybierz docelowe zestawy indeksów",
     "index_sets_hint_with_type": "Domyślnie typ pola <bold>{{type}}</bold> zostanie ustawiony dla pola <bold>{{fieldName}}</bold> we wszystkich index setach bieżącej wiadomości/wyszukiwania. Możesz wybrać, dla których index setów chcesz wprowadzić tę zmianę.",
     "index_sets_hint": "Domyślnie wybrany typ pola zostanie ustawiony dla pola <bold>{{fieldName}}</bold> we wszystkich index setach bieżącej wiadomości/wyszukiwania. Możesz wybrać, dla których index setów chcesz wprowadzić tę zmianę.",
     "select_rotation_strategy": "Wybierz strategię rotacji",
@@ -487,7 +487,7 @@
       "searchFilterQuery": "Zapytanie z filtrów wyszukiwania",
       "streams": "Strumienie",
       "searchWithinMs": "Szukaj w ciągu (ms)",
-      "lutParameters": "Parametry tabeli wyszukiwania (Lookup Table)",
+      "lutParameters": "Parametry tabeli wyszukiwania",
       "searchFromValue": "Zapytanie z wartości"
     },
     "item_label": "{{label}}: ",

@@ -165,7 +165,7 @@
   },
   "field_value_providers": {
     "lookup_table": {
-      "title": "Tabela wyszukiwania (Lookup Table)"
+      "title": "Tabela wyszukiwania"
     },
     "template": {
       "title": "Szablon"
@@ -209,7 +209,7 @@
     "enable": "Włącz",
     "enable_help": "Czy ta definicja zdarzenia ma być wykonywana automatycznie?",
     "execute_every": "Wykonuj wyszukiwanie co",
-    "lookup_table_permission_missing": "To konto nie ma uprawnień do deklarowania parametrów zapytania z Tabel wyszukiwania (Lookup Table).",
+    "lookup_table_permission_missing": "To konto nie ma uprawnień do deklarowania parametrów zapytania z tabel wyszukiwania.",
     "optional": "(opcjonalnie)",
     "query_parameters": "Parametry zapytania",
     "search_filters": "Filtry wyszukiwania",
@@ -236,7 +236,7 @@
     "loading": "Ładowanie podglądu filtra...",
     "message": "Wiadomość",
     "no_messages": "Nie znaleziono żadnych wiadomości dla bieżących kryteriów wyszukiwania.",
-    "no_streams_access": "Nie można wyświetlić podglądu filtra, ponieważ użytkownik nie ma dostępu do żadnych Streamów.",
+    "no_streams_access": "Nie można wyświetlić podglądu filtra, ponieważ użytkownik nie ma dostępu do żadnych strumieni.",
     "timestamp": "Znacznik czasu",
     "title": "Podgląd filtra"
   },
@@ -339,7 +339,7 @@
   },
   "provider_summary": {
     "less_details": "Mniej szczegółów",
-    "lookup_table_key_field": "Pole klucza tabeli wyszukiwania (Lookup Table)",
+    "lookup_table_key_field": "Pole klucza tabeli wyszukiwania",
     "more_details": "Więcej szczegółów",
     "validate_template_values": "Sprawdź, czy ustawiono wszystkie wartości szablonu",
     "value_source": "Źródło wartości"
@@ -349,7 +349,7 @@
     "title": "Zadeklaruj parametr zapytania \"{{name}}\"",
     "type": "Typ",
     "types": {
-      "lookup_table": "Tabela wyszukiwania (Lookup Table)"
+      "lookup_table": "Tabela wyszukiwania"
     },
     "undeclared": ": niezadeklarowany"
   },
@@ -439,16 +439,16 @@
     "event_limit": "Limit zdarzeń",
     "execute_every": "Wykonuj wyszukiwanie co",
     "group_by": "Grupuj według pól",
-    "missing_stream_permissions": "Brak uprawnień do Streamów dla:",
+    "missing_stream_permissions": "Brak uprawnień do strumieni dla:",
     "no": "nie",
     "no_cron_expression": "Błąd: nie określono wyrażenia cron!",
     "no_filters": "Nie skonfigurowano filtrów",
     "no_group_by": "Nie skonfigurowano grupowania",
-    "no_streams": "Nie wybrano Streamów, wyszukiwanie obejmuje wszystkie Streamy",
+    "no_streams": "Nie wybrano strumieni, wyszukiwanie obejmuje wszystkie strumienie",
     "search_filters": "Filtry wyszukiwania",
     "search_query": "Zapytanie wyszukiwania",
     "search_within": "Szukaj w ciągu",
-    "stream_categories": "Kategorie Streamów",
+    "stream_categories": "Kategorie strumieni",
     "streams": "Streamy",
     "time_zone": "Strefa czasowa",
     "type": "Typ",

@@ -21,7 +21,7 @@
     "authentication": "Uwierzytelnianie",
     "content_packs": "Pakiety treści",
     "grok_patterns": "Wzorce Grok",
-    "lookup_tables": "Tabele wyszukiwania (Lookup Tables)",
+    "lookup_tables": "Tabele wyszukiwania",
     "pipelines": "Pipelines",
     "sidecars": "Sidecars",
     "collectors": "Collectors"

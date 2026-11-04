@@ -71,7 +71,7 @@
     "button_text": "Przegląd ról",
     "description": "Przegląd wszystkich ról dostępnych w {{productName}}. Role pozwalają przyznawać użytkownikom uprawnienia, na przykład do tworzenia dashboardów lub definicji zdarzeń.",
     "alert_title": "Przyznawanie uprawnień",
-    "alert_body_prefix": "Wbudowane role pozwalają przyznawać użytkownikom uprawnienia, na przykład do tworzenia dashboardów lub przeglądania katalogu archiwum. Nie przyznają jednak uprawnień do konkretnego dashboardu ani Stream. Nie można też utworzyć własnej roli. Uprawnienia do konkretnego elementu można przyznać, używając przycisku ",
+    "alert_body_prefix": "Wbudowane role pozwalają przyznawać użytkownikom uprawnienia, na przykład do tworzenia dashboardów lub przeglądania katalogu archiwum. Nie przyznają jednak uprawnień do konkretnego dashboardu ani strumienia. Nie można też utworzyć własnej roli. Uprawnienia do konkretnego elementu można przyznać, używając przycisku ",
     "share_text": "Udostępnij",
     "alert_body_suffix": ". Przycisk ten znajdziesz np. na stronie przeglądu elementów. Jeśli chcesz przyznać uprawnienia do elementu wielu użytkownikom jednocześnie, możesz użyć zespołów. Więcej informacji znajdziesz w ",
     "documentation_text": "dokumentacji"
@@ -275,7 +275,7 @@
         "prebuilt_parser_dashboards": "Gotowe parsery i dashboardy bezpieczeństwa",
         "sigma_rules": "Reguły Sigma",
         "parameterized_dashboards": "Dashboardy z parametrami",
-        "input_output_integrations": "Integracje Input i Output",
+        "input_output_integrations": "Integracje wejść i wyjść",
         "threat_management": "Zarządzanie zagrożeniami",
         "search_workflow": "Przepływ pracy wyszukiwania, szablony i filtry",
         "soar_integrations": "Integracje SOAR"
@@ -330,7 +330,7 @@
   },
   "permissions_info": {
     "title": "Przyznawanie uprawnień",
-    "text": "Uprawnienia do elementów, takich jak Stream i dashboardy, można skonfigurować za pomocą przycisku <shareLabel>Udostępnij</shareLabel> przy danym elemencie. Przycisk ten znajdziesz np. na stronie przeglądu elementów. Więcej informacji znajdziesz w <docsLink>dokumentacji</docsLink>."
+    "text": "Uprawnienia do elementów, takich jak strumienie i dashboardy, można skonfigurować za pomocą przycisku <shareLabel>Udostępnij</shareLabel> przy danym elemencie. Przycisk ten znajdziesz np. na stronie przeglądu elementów. Więcej informacji znajdziesz w <docsLink>dokumentacji</docsLink>."
   },
   "startpage": {
     "label": "Strona startowa",
@@ -340,7 +340,7 @@
     "entity": "element",
     "types": {
       "dashboard": "Dashboard",
-      "stream": "Stream",
+      "stream": "Strumień",
       "search": "Wyszukiwanie"
     },
     "new_search": "Nowe wyszukiwanie",

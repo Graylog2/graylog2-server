@@ -1,13 +1,13 @@
 {
   "destination_permission_alert": {
     "data_lake": "Obecnie nie masz uprawnień do wyświetlania ani zarządzania miejscem docelowym Data Lake.",
-    "index_set": "Obecnie nie masz uprawnień do wyświetlania ani zarządzania miejscem docelowym Index Set.",
+    "index_set": "Obecnie nie masz uprawnień do wyświetlania ani zarządzania miejscem docelowym zestawu indeksów.",
     "outputs": "Obecnie nie masz uprawnień do wyświetlania ani zarządzania miejscem docelowym Outputs."
   },
   "index_set_select": {
-    "help": "Wiadomości pasujące do tego strumienia będą zapisywane w skonfigurowanym Index Set.",
-    "label": "Index Set",
-    "placeholder": "Wybierz Index Set"
+    "help": "Wiadomości pasujące do tego strumienia będą zapisywane w skonfigurowanym zestawie indeksów.",
+    "label": "Zestaw indeksów",
+    "placeholder": "Wybierz zestaw indeksów"
   },
   "matching_type": {
     "all": "Wiadomość musi spełniać wszystkie poniższe reguły",
@@ -60,7 +60,7 @@
       "header_status": "Status",
       "header_title": "Tytuł",
       "info_data_lake": "Wiadomości spełniające kryteria poniższych reguł filtrowania nie będą kierowane do Data Lake.",
-      "info_indexer": "Wiadomości spełniające kryteria poniższych reguł filtrowania nie będą kierowane do Index Set.",
+      "info_indexer": "Wiadomości spełniające kryteria poniższych reguł filtrowania nie będą kierowane do zestawu indeksów.",
       "no_filters": "Nie znaleziono żadnych filtrów.",
       "title": "Reguły filtrowania"
     }
@@ -118,18 +118,18 @@
       "disabled": "Wyłączony",
       "enabled": "Włączony",
       "filters": "FILTRY {{count}}",
-      "info": "Wiadomości kierowane do <boldText>klastra wyszukiwania</boldText> będą przeszukiwalne i wliczają się do wykorzystania licencji {{productName}}. Wiadomości te będą przechowywane w zdefiniowanym Index Set do momentu spełnienia kryteriów polityki retencji. Uwaga: wiadomości, które nie są kierowane do <boldText>klastra wyszukiwania</boldText>, nie będą przeszukiwalne.",
-      "title": "Index Set",
+      "info": "Wiadomości kierowane do <boldText>klastra wyszukiwania</boldText> będą przeszukiwalne i wliczają się do wykorzystania licencji {{productName}}. Wiadomości te będą przechowywane w zdefiniowanym zestawie indeksów do momentu spełnienia kryteriów polityki retencji. Uwaga: wiadomości, które nie są kierowane do <boldText>klastra wyszukiwania</boldText>, nie będą przeszukiwalne.",
+      "title": "Zestaw indeksów",
       "toggle_aria": "Przełącz index set"
     },
     "index_set_update": {
-      "button": "Edytuj Index Set",
-      "modal_title": "Edycja Index Set strumienia",
+      "button": "Edytuj zestaw indeksów",
+      "modal_title": "Edycja zestawu indeksów strumienia",
       "saving": "Zapisywanie strumienia",
       "submit": "Zaktualizuj",
       "success_title": "Sukces",
       "tooltip": "Edytuj index set",
-      "updated": "Index Set strumienia „{{title}}” został zaktualizowany."
+      "updated": "Zestaw indeksów strumienia „{{title}}” został zaktualizowany."
     },
     "output_item": {
       "type": "(Typ: {{type}})"
@@ -157,13 +157,13 @@
     "edit": "Edytuj",
     "edit_modal_title": "Edycja strumienia",
     "heading": "Strumień: {{title}}",
-    "intake_description": "Reguły strumienia mogą służyć do zbierania wyfiltrowanego podzbioru wiadomości bezpośrednio z Inputów do tego strumienia. Należy pamiętać, że reguły strumienia są obecnie funkcją przestarzałą, a zalecanym sposobem zarządzania routingiem strumieni są reguły Pipeline.",
+    "intake_description": "Reguły strumienia mogą służyć do zbierania wyfiltrowanego podzbioru wiadomości bezpośrednio z wejść do tego strumienia. Należy pamiętać, że reguły strumienia są obecnie funkcją przestarzałą, a zalecanym sposobem zarządzania routingiem strumieni są reguły Pipeline.",
     "no_pipelines": "Ten strumień nie jest połączony z żadnym Pipeline.",
     "pipeline_header": "Pipeline",
     "processing_description": "Pipeline'y pozwalają przekształcać i przetwarzać wiadomości pochodzące ze strumieni. Pipeline składa się z etapów, na których reguły są oceniane i stosowane. Wiadomości mogą przechodzić przez jeden lub więcej etapów.",
     "processing_title": "Pipeline'y",
     "rule_header": "Reguła",
-    "rules_info": "Reguły strumienia są stosowane jako pierwsze w domyślnej kolejności przetwarzania i służą do kierowania wiadomości z Inputów do strumieni. Każda wiadomość spełniająca kryteria reguł strumienia zostanie skierowana do tego strumienia.",
+    "rules_info": "Reguły strumienia są stosowane jako pierwsze w domyślnej kolejności przetwarzania i służą do kierowania wiadomości z wejść do strumieni. Każda wiadomość spełniająca kryteria reguł strumienia zostanie skierowana do tego strumienia.",
     "rules_title": "Reguły strumienia",
     "segment_destinations": "3: Miejsca docelowe",
     "segment_intake": "1: Przyjmowanie",
@@ -261,7 +261,7 @@
       "description": "Opis",
       "field": "Pole",
       "field_required": "Pole jest wymagane",
-      "input": "Input",
+      "input": "Wejście",
       "inverted": "Odwrócona",
       "matcher_code_link": "Zapoznaj się z kodem matchera na GitHub",
       "matcher_info": "Serwer będzie próbował przekonwertować wartości na ciągi znaków lub liczby na podstawie typu matchera, w miarę możliwości.",
@@ -336,10 +336,10 @@
       "assign_index_set": "Przypisz index set",
       "assign_loading": "Przypisywanie index set...",
       "assign_submit": "Przypisz index set",
-      "assign_success_one": "Pomyślnie przypisano Index Set do {{count}} strumienia.",
-      "assign_success_other": "Pomyślnie przypisano Index Set do {{count}} strumienia.",
-      "assign_title_one": "Przypisz Index Set do {{count}} strumienia",
-      "assign_title_other": "Przypisz Index Set do {{count}} strumienia",
+      "assign_success_one": "Pomyślnie przypisano zestaw indeksów do {{count}} strumienia.",
+      "assign_success_other": "Pomyślnie przypisano zestaw indeksów do {{count}} strumienia.",
+      "assign_title_one": "Przypisz zestaw indeksów do {{count}} strumienia",
+      "assign_title_other": "Przypisz zestaw indeksów do {{count}} strumienia",
       "delete_confirm_one": "Czy na pewno chcesz usunąć {{count}} strumień? Tej operacji nie można cofnąć.",
       "delete_confirm_other": "Czy na pewno chcesz usunąć {{count}} strumienia? Tej operacji nie można cofnąć.",
       "delete_error": "Wystąpił błąd podczas usuwania strumieni. {{error}}",
@@ -364,10 +364,10 @@
       "success_stopped_one": "{{count}} strumień został pomyślnie zatrzymany.",
       "success_stopped_other": "{{count}} strumienia zostało pomyślnie zatrzymane.",
       "success_title": "Sukces",
-      "assign_success_few": "Pomyślnie przypisano Index Set do {{count}} strumieni.",
-      "assign_success_many": "Pomyślnie przypisano Index Set do {{count}} strumieni.",
-      "assign_title_few": "Przypisz Index Set do {{count}} strumieni",
-      "assign_title_many": "Przypisz Index Set do {{count}} strumieni",
+      "assign_success_few": "Pomyślnie przypisano zestaw indeksów do {{count}} strumieni.",
+      "assign_success_many": "Pomyślnie przypisano zestaw indeksów do {{count}} strumieni.",
+      "assign_title_few": "Przypisz zestaw indeksów do {{count}} strumieni",
+      "assign_title_many": "Przypisz zestaw indeksów do {{count}} strumieni",
       "delete_confirm_few": "Czy na pewno chcesz usunąć {{count}} strumienie? Tej operacji nie można cofnąć.",
       "delete_confirm_many": "Czy na pewno chcesz usunąć {{count}} strumieni? Tej operacji nie można cofnąć.",
       "failed_deleted_few": "Nie udało się usunąć {{failed}} z {{count}} wybranych strumieni.",
@@ -401,7 +401,7 @@
     "columns": {
       "archiving": "Archiwizacja",
       "destination_filters": "Reguły filtrowania",
-      "index_set_title": "Index Set",
+      "index_set_title": "Zestaw indeksów",
       "outputs": "Outputy",
       "pipelines": "Pipeline'y",
       "rules": "Reguły strumienia",
@@ -413,7 +413,7 @@
       "deleted": "{{id}} (usunięty)",
       "missing_permissions": "Brak uprawnień",
       "destination_data_lake": "Data Lake",
-      "destination_index_set": "Index Set",
+      "destination_index_set": "Zestaw indeksów",
       "destination_output": "Output",
       "filter_rules_header_destination": "Miejsce docelowe",
       "filter_rules_header_status": "Status",

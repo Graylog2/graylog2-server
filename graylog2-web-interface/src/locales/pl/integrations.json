@@ -199,10 +199,10 @@
     "label_kinesis_endpoint": "Endpoint VPC Kinesis",
     "label_aws_region": "Region AWS",
     "setting_up_kinesis": "Konfiguracja Kinesis",
-    "label_kinesis_stream": "Stream Kinesis",
+    "label_kinesis_stream": "Strumień Kinesis",
     "label_kinesis_stream_arn": "ARN streamu Kinesis",
     "stream_arn_error": "Błąd: nie udało się pobrać ARN streamu. Upewnij się, że rola IAM zawiera uprawnienie kinesis:DescribeStream.",
-    "label_global_input": "Input globalny",
+    "label_global_input": "Wejście globalne",
     "label_record_batch_size": "Rozmiar paczki rekordów",
     "label_enable_throttling": "Włącz ograniczanie przepustowości",
     "label_flow_log_prefix": "Dodaj prefiks Flow Log do nazw pól",
@@ -215,7 +215,7 @@
   },
   "aws_kinesis_existing_streams": {
     "sidebar_title": "Nie widzisz potrzebnego streamu?",
-    "sidebar_requirement": "Aby kontynuować konfigurację, w określonym regionie musi istnieć co najmniej jeden stream Kinesis. Stream z logami powinien zawierać co najmniej kilka wiadomości.",
+    "sidebar_requirement": "Aby kontynuować konfigurację, w określonym regionie musi istnieć co najmniej jeden strumień Kinesis. Strumień z logami powinien zawierać co najmniej kilka wiadomości.",
     "sidebar_auto_setup": "{{productName}} umożliwia również automatyczne utworzenie streamu Kinesis i zasubskrybowanie go do wybranej grupy logów CloudWatch. Pamiętaj, że ta opcja utworzy dodatkowe zasoby w Twoim środowisku AWS, za które będą naliczane opłaty.",
     "setup_automatically_button": "Skonfiguruj Kinesis automatycznie",
     "no_logs_error": "Nie udało się znaleźć żadnych logów w tym streamie Kinesis. Wybierz inny stream Kinesis.",
@@ -255,7 +255,7 @@
     "create": "Utwórz: {{label}}"
   },
   "aws_kinesis_setup_steps": {
-    "stream_label": "Stream Kinesis",
+    "stream_label": "Strumień Kinesis",
     "policy_label": "Polityka subskrypcji",
     "subscription_label": "Subskrypcja"
   },
@@ -391,7 +391,7 @@
     "custom_incident_label": "Użyj własnego klucza incydentu",
     "custom_incident_help": "Wygeneruj własny klucz incydentu.",
     "key_prefix_label": "Prefiks klucza incydentu",
-    "key_prefix_help": "Prefiks klucza incydentu, po którym następują Stream(y) i tytuł definicji zdarzenia. Użyj Klucza incydentu, aby dostosować cały klucz.",
+    "key_prefix_help": "Prefiks klucza incydentu, po którym następują strumienie i tytuł definicji zdarzenia. Użyj Klucza incydentu, aby dostosować cały klucz.",
     "incident_key_label": "Klucz incydentu",
     "incident_key_help": "Pełny klucz identyfikujący incydent. Jeśli zostanie podany, będzie użyty zamiast prefiksu.",
     "client_name_label": "Nazwa klienta",

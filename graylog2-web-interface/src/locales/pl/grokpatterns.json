@@ -44,7 +44,7 @@
     "load_failed": "Ładowanie wzorców Grok nie powiodło się, status: {{error}}",
     "load_failed_title": "Nie udało się załadować wzorców Grok",
     "load_streams_failed": "Ładowanie wzorców nie powiodło się, status: {{error}}",
-    "load_streams_failed_title": "Nie udało się załadować Streamów",
+    "load_streams_failed_title": "Nie udało się załadować strumieni",
     "save_failed": "Zapisywanie wzorca Grok \"{{name}}\" nie powiodło się, status: {{error}}",
     "save_failed_title": "Nie udało się zapisać wzorca Grok",
     "delete_failed": "Usuwanie wzorca Grok \"{{name}}\" nie powiodło się, status: {{error}}",

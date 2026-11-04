@@ -160,8 +160,8 @@
     "utilization": "<strong>{{usage}} wiadomości</strong> w {{title}}, wykorzystanie: {{percentage}}."
   },
   "input_types_data_table": {
-    "loading": "Ładowanie typów Inputów...",
-    "unavailable": "Typy Inputów są niedostępne.",
+    "loading": "Ładowanie typów wejść...",
+    "unavailable": "Typy wejść są niedostępne.",
     "documentation": "Dokumentacja",
     "name": "Nazwa",
     "type": "Typ",
@@ -208,12 +208,12 @@
   "node_overview": {
     "plugins_installed_one": "Zainstalowano {{count}} wtyczkę",
     "plugins_installed_other": "Zainstalowano {{count}} wtyczki",
-    "inputs_running_one": "{{count}} Input działa na tym węźle",
+    "inputs_running_one": "{{count}} wejście działa na tym węźle",
     "inputs_running_other": "{{count}} Inputa działa na tym węźle",
     "memory_heap_usage": "Zużycie pamięci/sterty",
     "buffers": "Bufory",
     "buffers_description": "Bufory służą do krótkotrwałego (zazwyczaj przez kilka milisekund) przechowywania niewielkiej liczby wiadomości podczas ich przechodzenia przez kolejne procesory.",
-    "input_buffer": "Bufor Input",
+    "input_buffer": "Bufor wejścia",
     "process_buffer": "Bufor przetwarzania",
     "output_buffer": "Bufor Output",
     "disk_journal": "Dyskowy journal",
@@ -222,11 +222,11 @@
     "rest_api": "REST API",
     "installed_plugins": "Zainstalowane wtyczki",
     "manage_inputs": "Zarządzaj Inputami",
-    "available_input_types": "Dostępne typy Inputów",
+    "available_input_types": "Dostępne typy wejść",
     "plugins_installed_few": "Zainstalowano {{count}} wtyczki",
     "plugins_installed_many": "Zainstalowano {{count}} wtyczek",
     "inputs_running_few": "{{count}} Inputy działają na tym węźle",
-    "inputs_running_many": "{{count}} Inputów działa na tym węźle"
+    "inputs_running_many": "{{count}} wejść działa na tym węźle"
   },
   "nodes_actions": {
     "details": "Szczegóły",

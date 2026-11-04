@@ -1,6 +1,6 @@
 {
   "decorators": {
-    "description": "Poniżej znajdują się aktualnie skonfigurowane dekoratory, pogrupowane według Stream:",
+    "description": "Poniżej znajdują się aktualnie skonfigurowane dekoratory, pogrupowane według strumieni:",
     "edit": "Edytuj konfigurację",
     "none_configured": "Brak skonfigurowanych dekoratorów.",
     "save_error": "Nie można zapisać nowych dekoratorów: {{error}}",
@@ -13,10 +13,10 @@
   "decorators_update": {
     "default_search": "Domyślne wyszukiwanie",
     "drag_and_drop": "Przeciągnij i upuść, aby zmienić kolejność wykonywania dekoratorów.",
-    "no_decorators_placeholder": "Dla żadnego Stream nie skonfigurowano dekoratorów.",
-    "read_only": "Dostęp tylko do odczytu – do edycji wybranego Stream potrzebne jest uprawnienie",
-    "select_stream": "Wybierz Stream, dla którego chcesz zmienić zestaw domyślnych dekoratorów.",
-    "select_type": "Wybierz typ, aby utworzyć nowy dekorator dla tego Stream:",
+    "no_decorators_placeholder": "Dla żadnego strumienia nie skonfigurowano dekoratorów.",
+    "read_only": "Dostęp tylko do odczytu – do edycji wybranego strumienia potrzebne jest uprawnienie",
+    "select_stream": "Wybierz strumień, dla którego chcesz zmienić zestaw domyślnych dekoratorów.",
+    "select_type": "Wybierz typ, aby utworzyć nowy dekorator dla tego strumienia:",
     "submit": "Zaktualizuj konfigurację",
     "title": "Aktualizacja konfiguracji domyślnych dekoratorów"
   },
@@ -67,7 +67,7 @@
     "enabled": "Włączony",
     "future_timestamp_help": "Włącza normalizację znaczników czasu określających czas znacznie wyprzedzający czas systemowy {{productName}}. Zwykle dzieje się tak, gdy źródło logów działa na serwerze z nieprawidłowym zegarem systemowym. Znaczniki czasu z przyszłości zostaną znormalizowane do czasu, w którym wiadomość została po raz pierwszy odebrana przez {{productName}} Forwarder lub {{productName}}. Zapobieganie przyszłym znacznikom czasu jest ważne przy korzystaniu z Warm Tier, ponieważ w przeciwnym razie może to pogorszyć wydajność.",
     "future_timestamp_normalization": "Normalizacja znaczników czasu z przyszłości",
-    "global_description": "Globalne reguły przetwarzania są stosowane po odebraniu wiadomości przez Input, a przed regułami przetwarzania stosowanymi przez procesory wiadomości.",
+    "global_description": "Globalne reguły przetwarzania są stosowane po odebraniu wiadomości przez wejście, a przed regułami przetwarzania stosowanymi przez procesory wiadomości.",
     "global_title": "Konfiguracja globalnych reguł przetwarzania",
     "grace_period": "Okres tolerancji",
     "grace_period_help": "Jeśli normalizacja znaczników czasu z przyszłości jest włączona, znaczniki czasu wskazujące czas dalej w przyszłości niż interwał okresu tolerancji, względem czasu systemowego {{productName}}, zostaną znormalizowane.",
