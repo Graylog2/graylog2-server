@@ -87,11 +87,11 @@ const GlobalThroughput = (props) => {
       <ContentWrap aria-label={t('global_throughput.aria_label', { input: inputNumeral, output: outputNumeral })}>
         <ThroughputData $dataIn>
           <span>{inputNumeral}</span>
-          <Icon name="arrow_downward" size="xs" title={t('global_throughput.in_title')} />
+          <Icon name="input" size="xs" title={t('global_throughput.in_title')} />
         </ThroughputData>
         <ThroughputData>
           <span>{outputNumeral}</span>
-          <Icon name="arrow_upward" size="xs" title={t('global_throughput.out_title')} />
+          <Icon name="output" size="xs" title={t('global_throughput.out_title')} />
         </ThroughputData>
       </ContentWrap>
     );
