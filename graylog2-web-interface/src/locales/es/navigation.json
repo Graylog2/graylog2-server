@@ -53,5 +53,24 @@
     "utility": "Utilidades",
     "toggle_navigation": "Mostrar u ocultar la navegación",
     "scratchpad": "Scratchpad"
+  },
+  "page_navigation": {
+    "cluster_configuration": "Configuración del clúster",
+    "certificate_management": "Gestión de certificados",
+    "data_node_dashboard": "Panel de Data Node",
+    "data_node_upgrade": "Actualización de Data Node",
+    "data_node_migration": "Migración de Data Node",
+    "overview": "Resumen",
+    "notifications": "Notificaciones",
+    "lookup_tables": "Tablas de búsqueda",
+    "caches": "Cachés",
+    "data_adapters": "Adaptadores de datos",
+    "users_overview": "Resumen de usuarios",
+    "token_management": "Gestión de tokens",
+    "administration": "Administración",
+    "configuration": "Configuración",
+    "failure_tracking": "Seguimiento de fallos",
+    "alerts_and_events": "Alertas y eventos",
+    "event_definitions": "Definiciones de eventos"
   }
 }

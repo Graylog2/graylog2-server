@@ -28,9 +28,10 @@ const bindings: PluginExports = {
     {
       description: PAGE_NAV_TITLE,
       children: [
-        { description: 'Cluster Configuration', path: Routes.SYSTEM.CLUSTER.NODES, exactPathMatch: true },
+        { description: 'Cluster Configuration', titleKey: 'navigation:page_navigation.cluster_configuration', path: Routes.SYSTEM.CLUSTER.NODES, exactPathMatch: true },
         {
           description: 'Certificate Management',
+          titleKey: 'navigation:page_navigation.certificate_management',
           path: Routes.SYSTEM.CLUSTER.CERTIFICATE_MANAGEMENT,
           useCondition: () => {
             const { isDatanodeConfiguredAndUsed } = useShowDatanodeMigration();
@@ -40,6 +41,7 @@ const bindings: PluginExports = {
         },
         {
           description: 'Data Node Dashboard',
+          titleKey: 'navigation:page_navigation.data_node_dashboard',
           path: Routes.SYSTEM.CLUSTER.DATANODE_DASHBOARD,
           useCondition: () => {
             const { isDatanodeConfiguredAndUsed } = useShowDatanodeMigration();
@@ -49,6 +51,7 @@ const bindings: PluginExports = {
         },
         {
           description: 'Data Node Upgrade',
+          titleKey: 'navigation:page_navigation.data_node_upgrade',
           path: Routes.SYSTEM.CLUSTER.DATANODE_UPGRADE,
           useCondition: () => {
             const { isDatanodeConfiguredAndUsed } = useShowDatanodeMigration();
@@ -60,6 +63,7 @@ const bindings: PluginExports = {
           ? [
               {
                 description: 'Data Node Migration',
+                titleKey: 'navigation:page_navigation.data_node_migration',
                 path: Routes.SYSTEM.CLUSTER.DATANODE_MIGRATION,
                 useCondition: () => {
                   const { showDatanodeMigration } = useShowDatanodeMigration();

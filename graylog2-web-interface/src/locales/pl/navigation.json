@@ -53,5 +53,24 @@
     "utility": "Narzędzia",
     "toggle_navigation": "Przełącz nawigację",
     "scratchpad": "Brudnopis"
+  },
+  "page_navigation": {
+    "cluster_configuration": "Konfiguracja klastra",
+    "certificate_management": "Zarządzanie certyfikatami",
+    "data_node_dashboard": "Panel Data Node",
+    "data_node_upgrade": "Aktualizacja Data Node",
+    "data_node_migration": "Migracja Data Node",
+    "overview": "Przegląd",
+    "notifications": "Powiadomienia",
+    "lookup_tables": "Tabele wyszukiwania",
+    "caches": "Pamięci podręczne",
+    "data_adapters": "Adaptery danych",
+    "users_overview": "Przegląd użytkowników",
+    "token_management": "Zarządzanie tokenami",
+    "administration": "Administracja",
+    "configuration": "Konfiguracja",
+    "failure_tracking": "Śledzenie awarii",
+    "alerts_and_events": "Alerty i zdarzenia",
+    "event_definitions": "Definicje zdarzeń"
   }
 }

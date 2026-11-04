@@ -53,5 +53,24 @@
     "utility": "Utilitários",
     "toggle_navigation": "Alternar navegação",
     "scratchpad": "Rascunho"
+  },
+  "page_navigation": {
+    "cluster_configuration": "Configuração do cluster",
+    "certificate_management": "Gerenciamento de certificados",
+    "data_node_dashboard": "Painel do Data Node",
+    "data_node_upgrade": "Atualização do Data Node",
+    "data_node_migration": "Migração do Data Node",
+    "overview": "Visão geral",
+    "notifications": "Notificações",
+    "lookup_tables": "Tabelas de consulta",
+    "caches": "Caches",
+    "data_adapters": "Adaptadores de dados",
+    "users_overview": "Visão geral de usuários",
+    "token_management": "Gerenciamento de tokens",
+    "administration": "Administração",
+    "configuration": "Configuração",
+    "failure_tracking": "Rastreamento de falhas",
+    "alerts_and_events": "Alertas e eventos",
+    "event_definitions": "Definições de eventos"
   }
 }

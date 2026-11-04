@@ -53,5 +53,24 @@
     "utility": "实用工具",
     "toggle_navigation": "切换导航",
     "scratchpad": "草稿本"
+  },
+  "page_navigation": {
+    "cluster_configuration": "集群配置",
+    "certificate_management": "证书管理",
+    "data_node_dashboard": "Data Node 仪表板",
+    "data_node_upgrade": "Data Node 升级",
+    "data_node_migration": "Data Node 迁移",
+    "overview": "概览",
+    "notifications": "通知",
+    "lookup_tables": "查找表",
+    "caches": "缓存",
+    "data_adapters": "数据适配器",
+    "users_overview": "用户概览",
+    "token_management": "令牌管理",
+    "administration": "管理",
+    "configuration": "配置",
+    "failure_tracking": "故障跟踪",
+    "alerts_and_events": "警报和事件",
+    "event_definitions": "事件定义"
   }
 }

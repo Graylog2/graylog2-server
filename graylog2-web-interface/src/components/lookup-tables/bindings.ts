@@ -25,9 +25,9 @@ const bindings: PluginExports = {
     {
       description: PAGE_NAV_TITLE,
       children: [
-        { description: 'Lookup Tables', path: Routes.SYSTEM.LOOKUPTABLES.OVERVIEW, exactPathMatch: true },
-        { description: 'Caches', path: Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW },
-        { description: 'Data Adapters', path: Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW },
+        { description: 'Lookup Tables', titleKey: 'navigation:page_navigation.lookup_tables', path: Routes.SYSTEM.LOOKUPTABLES.OVERVIEW, exactPathMatch: true },
+        { description: 'Caches', titleKey: 'navigation:page_navigation.caches', path: Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW },
+        { description: 'Data Adapters', titleKey: 'navigation:page_navigation.data_adapters', path: Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW },
       ],
     },
   ],

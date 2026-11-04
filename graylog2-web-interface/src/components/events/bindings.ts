@@ -29,9 +29,9 @@ const eventsBindings: PluginExports = {
     {
       description: PAGE_NAVIGATION_TITLE,
       children: [
-        { description: ALERTS_TITLE, path: Routes.ALERTS.LIST, exactPathMatch: true },
-        { description: EVENT_DEFINITIONS_TITLE, path: Routes.ALERTS.DEFINITIONS.LIST },
-        { description: NOTIFICATIONS_TITLE, path: Routes.ALERTS.NOTIFICATIONS.LIST },
+        { description: ALERTS_TITLE, titleKey: 'navigation:page_navigation.alerts_and_events', path: Routes.ALERTS.LIST, exactPathMatch: true },
+        { description: EVENT_DEFINITIONS_TITLE, titleKey: 'navigation:page_navigation.event_definitions', path: Routes.ALERTS.DEFINITIONS.LIST },
+        { description: NOTIFICATIONS_TITLE, titleKey: 'navigation:page_navigation.notifications', path: Routes.ALERTS.NOTIFICATIONS.LIST },
       ],
     },
   ],

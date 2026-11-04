@@ -25,9 +25,10 @@ const bindings: PluginExports = {
     {
       description: PAGE_NAV_TITLE,
       children: [
-        { description: USERS_OVERVIEW_TITLE, path: Routes.SYSTEM.USERS.OVERVIEW },
+        { description: USERS_OVERVIEW_TITLE, titleKey: 'navigation:page_navigation.users_overview', path: Routes.SYSTEM.USERS.OVERVIEW },
         {
           description: 'Token Management',
+          titleKey: 'navigation:page_navigation.token_management',
           path: Routes.SYSTEM.USERS_TOKEN_MANAGEMENT.overview,
           permissions: 'users:tokenlist',
         },

@@ -53,5 +53,24 @@
     "utility": "Utility",
     "toggle_navigation": "Toggle navigation",
     "scratchpad": "Scratchpad"
+  },
+  "page_navigation": {
+    "cluster_configuration": "Cluster Configuration",
+    "certificate_management": "Certificate Management",
+    "data_node_dashboard": "Data Node Dashboard",
+    "data_node_upgrade": "Data Node Upgrade",
+    "data_node_migration": "Data Node Migration",
+    "overview": "Overview",
+    "notifications": "Notifications",
+    "lookup_tables": "Lookup Tables",
+    "caches": "Caches",
+    "data_adapters": "Data Adapters",
+    "users_overview": "Users Overview",
+    "token_management": "Token Management",
+    "administration": "Administration",
+    "configuration": "Configuration",
+    "failure_tracking": "Failure Tracking",
+    "alerts_and_events": "Alerts & Events",
+    "event_definitions": "Event Definitions"
   }
 }

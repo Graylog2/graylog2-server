@@ -53,5 +53,24 @@
     "utility": "ユーティリティ",
     "toggle_navigation": "ナビゲーションの切り替え",
     "scratchpad": "スクラッチパッド"
+  },
+  "page_navigation": {
+    "cluster_configuration": "クラスター設定",
+    "certificate_management": "証明書管理",
+    "data_node_dashboard": "Data Node ダッシュボード",
+    "data_node_upgrade": "Data Node アップグレード",
+    "data_node_migration": "Data Node 移行",
+    "overview": "概要",
+    "notifications": "通知",
+    "lookup_tables": "ルックアップテーブル",
+    "caches": "キャッシュ",
+    "data_adapters": "データアダプター",
+    "users_overview": "ユーザー概要",
+    "token_management": "トークン管理",
+    "administration": "管理",
+    "configuration": "設定",
+    "failure_tracking": "失敗の追跡",
+    "alerts_and_events": "アラートとイベント",
+    "event_definitions": "イベント定義"
   }
 }
