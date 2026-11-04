@@ -14,10 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import styled from 'styled-components';
 
 import { Icon, Center } from 'components/common';
+import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
 
 import styles from './MessageWidgets.css';
 
@@ -49,22 +50,31 @@ const Row = styled.div`
 const ErrorWidget = ({
   errors,
   title = 'While retrieving data for this widget, the following error(s) occurred:',
-}: Props) => (
-  <Center>
-    <Icon name="warning" size="3x" className={styles.iconMargin} />
-    <Description>
-      <Row>
-        <strong>{title}</strong>
-      </Row>
-      <ErrorList>
-        {errors.map((e) => (
-          <Row as="li" key={e.description}>
-            {e.description}
-          </Row>
-        ))}
-      </ErrorList>
-    </Description>
-  </Center>
-);
+}: Props) => {
+  const onRenderComplete = useContext(RenderCompletionCallback);
+
+  // Exports wait for every widget to render, including those that failed.
+  useEffect(() => {
+    onRenderComplete();
+  }, [onRenderComplete]);
+
+  return (
+    <Center>
+      <Icon name="warning" size="3x" className={styles.iconMargin} />
+      <Description>
+        <Row>
+          <strong>{title}</strong>
+        </Row>
+        <ErrorList>
+          {errors.map((e) => (
+            <Row as="li" key={e.description}>
+              {e.description}
+            </Row>
+          ))}
+        </ErrorList>
+      </Description>
+    </Center>
+  );
+};
 
 export default ErrorWidget;
