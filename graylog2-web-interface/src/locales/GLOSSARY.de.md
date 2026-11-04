@@ -29,7 +29,7 @@ Terms used in the German translations (`de/*.json`), so the whole interface uses
 | Report                             | Report (never "Bericht"); compounds: "Report-Verlauf", "Health-Report" |
 | Filter (noun / verb)               | Filter / Filtern              |
 | Hide / Show (columns, sections)    | Ausblenden / Einblenden       |
-| Preferences                        | Voreinstellungen              |
+| Preferences                        | Einstellungen                 |
 | Preset (e.g. time range)           | Vorlage                       |
 | Preview                            | Vorschau                      |
 | Refresh                            | Aktualisierung                |

@@ -22,7 +22,7 @@
     "description": "Sie können die Benutzerdetails und das Passwort hier ändern und Rollen und Teams zuweisen.",
     "segments": {
       "profile": "Profil",
-      "preferences": "Voreinstellungen",
+      "preferences": "Einstellungen",
       "teams_roles": "Teams und Rollen",
       "shared_entities": "Geteilte Einträge"
     },
@@ -58,7 +58,7 @@
       "search_sidebar_help": "Kann auch über das Pin-Symbol der Seitenleiste der Suche geändert werden",
       "dashboard_sidebar_help": "Kann auch über das Pin-Symbol der Seitenleiste des Dashboards geändert werden",
       "theme_mode_help": "Kann über den Schalter im Benutzermenü geändert werden",
-      "update": "Voreinstellungen aktualisieren"
+      "update": "Einstellungen aktualisieren"
     },
     "settings": {
       "select_entity": "Bitte wählen Sie einen Eintrag aus.",
@@ -370,7 +370,7 @@
     "enabled": "Aktiviert",
     "auth_service_disabled": "Der Authentifizierungsdienst ist deaktiviert, der Benutzer kann sich nicht anmelden",
     "preferences": {
-      "title": "Voreinstellungen",
+      "title": "Einstellungen",
       "search_autocompletion": "Autovervollständigung in der Suche",
       "update_unfocused": "Aktualisierung ohne Fokus",
       "pin_search_sidebar": "Seitenleiste der Suche anheften",
