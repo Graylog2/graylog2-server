@@ -153,6 +153,7 @@ const Routes = {
     LOGGING: '/system/logging',
     METRICS: (nodeId: string) => `/system/metrics/node/${nodeId}`,
     THREADDUMP: (nodeId: string) => `/system/threaddump/${nodeId}`,
+    TRANSLATION_FEEDBACK: '/system/translation-feedback',
     OUTPUTS: '/system/outputs',
     OVERVIEW: '/system/overview',
     NOTIFICATIONS: '/system/notifications',

@@ -1,0 +1,61 @@
+{
+  "menu": {
+    "report": "Übersetzung melden…",
+    "native_menu_hint": "Umschalt + Rechtsklick öffnet das Browsermenü"
+  },
+  "modal": {
+    "title": "Übersetzung melden",
+    "text": "Text",
+    "text_help": "Der Text, wie er auf der Seite steht. Kürzen Sie ihn auf den Teil, der geprüft werden soll.",
+    "key": "Übersetzung",
+    "partial_match": "teilweise Übereinstimmung",
+    "not_translated": "nicht übersetzt",
+    "none_of_these": "Keine davon",
+    "no_key_found": "Keine Übersetzung gefunden, der Text ist wahrscheinlich noch nicht übersetzt.",
+    "english": "Englisches Original:",
+    "current_translation": "Aktuelle Übersetzung:",
+    "category": "Problem",
+    "suggestion": "Übersetzungsvorschlag",
+    "suggestion_help": "Optional. Wie der Text lauten sollte.",
+    "comment": "Kommentar",
+    "submit": "Melden",
+    "submitting": "Wird gemeldet…"
+  },
+  "categories": {
+    "wrong": "Falsche Übersetzung",
+    "untranslated": "Nicht übersetzt",
+    "awkward": "Ungeschickte Formulierung",
+    "layout": "Layout defekt oder Text abgeschnitten",
+    "other": "Sonstiges"
+  },
+  "statuses": {
+    "open": "Offen",
+    "fixed": "Behoben",
+    "wont_fix": "Wird nicht behoben"
+  },
+  "list": {
+    "human_name": "Übersetzungsmeldungen",
+    "search_placeholder": "Übersetzungsmeldungen durchsuchen",
+    "no_key": "Kein Schlüssel",
+    "download_json": "JSON herunterladen",
+    "download_csv": "CSV herunterladen"
+  },
+  "actions": {
+    "mark_fixed": "Als behoben markieren",
+    "reopen": "Wieder öffnen",
+    "mark_wont_fix": "Wird nicht behoben",
+    "confirm_delete": "Möchten Sie die Meldung zu „{{text}}“ wirklich löschen?"
+  },
+  "page": {
+    "title": "Übersetzungsfeedback",
+    "description": "Meldungen zu den Übersetzungen der Oberfläche. Klicken Sie mit der rechten Maustaste auf einen Text, um ihn zu melden."
+  },
+  "notifications": {
+    "created": "Vielen Dank! Ihre Meldung wurde gespeichert.",
+    "created_title": "Übersetzung gemeldet",
+    "create_failed": "Die Meldung konnte nicht gespeichert werden: {{error}}",
+    "create_failed_title": "Übersetzung konnte nicht gemeldet werden",
+    "update_failed": "Die Meldung konnte nicht aktualisiert werden: {{error}}",
+    "update_failed_title": "Meldung konnte nicht aktualisiert werden"
+  }
+}

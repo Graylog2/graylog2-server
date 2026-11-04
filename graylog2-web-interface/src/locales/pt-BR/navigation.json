@@ -24,7 +24,8 @@
     "lookup_tables": "Lookup Tables",
     "pipelines": "Pipelines",
     "sidecars": "Sidecars",
-    "collectors": "Collectors"
+    "collectors": "Collectors",
+    "translation_feedback": "Feedback de tradução"
   },
   "security": {
     "overview": "Visão geral",

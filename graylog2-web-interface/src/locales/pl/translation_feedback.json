@@ -1,0 +1,61 @@
+{
+  "menu": {
+    "report": "Zgłoś tłumaczenie…",
+    "native_menu_hint": "Shift + prawy przycisk otwiera menu przeglądarki"
+  },
+  "modal": {
+    "title": "Zgłoś tłumaczenie",
+    "text": "Tekst",
+    "text_help": "Tekst w postaci widocznej na stronie. Skróć go do fragmentu, który wymaga uwagi.",
+    "key": "Tłumaczenie",
+    "partial_match": "częściowe dopasowanie",
+    "not_translated": "nieprzetłumaczone",
+    "none_of_these": "Żadne z tych",
+    "no_key_found": "Nie znaleziono tłumaczenia, tekst prawdopodobnie nie jest jeszcze przetłumaczony.",
+    "english": "Oryginał angielski:",
+    "current_translation": "Obecne tłumaczenie:",
+    "category": "Problem",
+    "suggestion": "Proponowane tłumaczenie",
+    "suggestion_help": "Opcjonalne. Jak powinien brzmieć tekst.",
+    "comment": "Komentarz",
+    "submit": "Zgłoś",
+    "submitting": "Zgłaszanie…"
+  },
+  "categories": {
+    "wrong": "Błędne tłumaczenie",
+    "untranslated": "Nieprzetłumaczone",
+    "awkward": "Niezręczne sformułowanie",
+    "layout": "Zepsuty układ lub ucięty tekst",
+    "other": "Inne"
+  },
+  "statuses": {
+    "open": "Otwarte",
+    "fixed": "Poprawione",
+    "wont_fix": "Nie zostanie poprawione"
+  },
+  "list": {
+    "human_name": "zgłoszenia tłumaczeń",
+    "search_placeholder": "Szukaj zgłoszeń tłumaczeń",
+    "no_key": "Brak klucza",
+    "download_json": "Pobierz JSON",
+    "download_csv": "Pobierz CSV"
+  },
+  "actions": {
+    "mark_fixed": "Oznacz jako poprawione",
+    "reopen": "Otwórz ponownie",
+    "mark_wont_fix": "Nie zostanie poprawione",
+    "confirm_delete": "Czy na pewno chcesz usunąć zgłoszenie dotyczące „{{text}}”?"
+  },
+  "page": {
+    "title": "Uwagi do tłumaczenia",
+    "description": "Zgłoszenia dotyczące tłumaczeń interfejsu. Kliknij prawym przyciskiem dowolny tekst, aby go zgłosić."
+  },
+  "notifications": {
+    "created": "Dziękujemy! Twoje zgłoszenie zostało zapisane.",
+    "created_title": "Tłumaczenie zgłoszone",
+    "create_failed": "Nie udało się zapisać zgłoszenia: {{error}}",
+    "create_failed_title": "Nie udało się zgłosić tłumaczenia",
+    "update_failed": "Nie udało się zaktualizować zgłoszenia: {{error}}",
+    "update_failed_title": "Nie udało się zaktualizować zgłoszenia"
+  }
+}

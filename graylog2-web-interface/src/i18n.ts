@@ -19,8 +19,10 @@ import { initReactI18next } from 'react-i18next';
 
 import { singleton } from 'logic/singleton';
 import pseudoLocalize, { PSEUDO_LANGUAGE } from 'util/pseudoLocalize';
+import { recordTranslation } from 'util/i18n/renderedTranslations';
 
 type Translations = { [key: string]: unknown };
+type ResolvedTranslation = { usedNS?: string; usedKey?: string; usedLng?: string };
 export type TranslationsLoader = () => Promise<{ default: Translations }>;
 
 const DEFAULT_LANGUAGE = 'en';
@@ -38,9 +40,24 @@ const i18n = singleton('i18n', () => {
       process: (value: string, _key: unknown, _options: unknown, translator: { language: string }) =>
         translator.language === PSEUDO_LANGUAGE ? pseudoLocalize(value) : value,
     })
+    .use({
+      type: 'postProcessor',
+      name: 'record',
+      process: (value: string, _key: unknown, options: { i18nResolved?: ResolvedTranslation }) => {
+        const { usedNS, usedKey, usedLng } = options?.i18nResolved ?? {};
+
+        if (usedNS && usedKey) {
+          recordTranslation(value, { namespace: usedNS, key: usedKey, usedLanguage: usedLng });
+        }
+
+        return value;
+      },
+    })
     .init({
       resources: {},
-      postProcess: ['pseudo'],
+      // `record` runs last, so it remembers the text as it is rendered.
+      postProcess: ['pseudo', 'record'],
+      postProcessPassResolved: true,
       lng: DEFAULT_LANGUAGE,
       fallbackLng: DEFAULT_LANGUAGE,
       interpolation: { escapeValue: false },

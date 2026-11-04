@@ -1,0 +1,61 @@
+{
+  "menu": {
+    "report": "Segnala traduzione…",
+    "native_menu_hint": "Maiusc + clic destro apre il menu del browser"
+  },
+  "modal": {
+    "title": "Segnala traduzione",
+    "text": "Testo",
+    "text_help": "Il testo come appare nella pagina. Accorcialo alla parte che richiede attenzione.",
+    "key": "Traduzione",
+    "partial_match": "corrispondenza parziale",
+    "not_translated": "non tradotto",
+    "none_of_these": "Nessuna di queste",
+    "no_key_found": "Nessuna traduzione trovata, probabilmente il testo non è ancora tradotto.",
+    "english": "Originale inglese:",
+    "current_translation": "Traduzione attuale:",
+    "category": "Problema",
+    "suggestion": "Traduzione suggerita",
+    "suggestion_help": "Facoltativo. Come dovrebbe essere il testo.",
+    "comment": "Commento",
+    "submit": "Segnala",
+    "submitting": "Invio in corso…"
+  },
+  "categories": {
+    "wrong": "Traduzione errata",
+    "untranslated": "Non tradotto",
+    "awkward": "Formulazione poco naturale",
+    "layout": "Layout rotto o testo tagliato",
+    "other": "Altro"
+  },
+  "statuses": {
+    "open": "Aperta",
+    "fixed": "Risolta",
+    "wont_fix": "Non verrà risolta"
+  },
+  "list": {
+    "human_name": "segnalazioni di traduzione",
+    "search_placeholder": "Cerca segnalazioni di traduzione",
+    "no_key": "Nessuna chiave",
+    "download_json": "Scarica JSON",
+    "download_csv": "Scarica CSV"
+  },
+  "actions": {
+    "mark_fixed": "Segna come risolta",
+    "reopen": "Riapri",
+    "mark_wont_fix": "Non verrà risolta",
+    "confirm_delete": "Vuoi davvero eliminare la segnalazione per \"{{text}}\"?"
+  },
+  "page": {
+    "title": "Feedback sulla traduzione",
+    "description": "Segnalazioni sulle traduzioni dell'interfaccia. Fai clic destro su qualsiasi testo per segnalarlo."
+  },
+  "notifications": {
+    "created": "Grazie! La tua segnalazione è stata salvata.",
+    "created_title": "Traduzione segnalata",
+    "create_failed": "Impossibile salvare la segnalazione: {{error}}",
+    "create_failed_title": "Impossibile segnalare la traduzione",
+    "update_failed": "Impossibile aggiornare la segnalazione: {{error}}",
+    "update_failed_title": "Impossibile aggiornare la segnalazione"
+  }
+}

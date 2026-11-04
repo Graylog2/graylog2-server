@@ -35,6 +35,7 @@ import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 import RightSidebarProvider from 'contexts/RightSidebarProvider';
 import RightSidebar from 'components/layout/RightSidebar';
 import RightSidebarContext from 'contexts/RightSidebarContext';
+import TranslationFeedbackContextMenu from 'components/translation-feedback/TranslationFeedbackContextMenu';
 
 const AppLayout = styled.div`
   display: flex;
@@ -98,6 +99,7 @@ const App = () => (
                   </AppLayout>
                   <HotkeysModalContainer />
                   <TelemetryDebugOverlay />
+                  <TranslationFeedbackContextMenu />
                 </>
               </ScratchpadProvider>
             </HotkeysProvider>

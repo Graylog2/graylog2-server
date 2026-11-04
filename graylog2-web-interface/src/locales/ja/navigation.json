@@ -24,7 +24,8 @@
     "lookup_tables": "ルックアップテーブル",
     "pipelines": "パイプライン",
     "sidecars": "サイドカー",
-    "collectors": "コレクター"
+    "collectors": "コレクター",
+    "translation_feedback": "翻訳フィードバック"
   },
   "security": {
     "overview": "概要",

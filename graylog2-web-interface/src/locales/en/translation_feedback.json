@@ -1,0 +1,61 @@
+{
+  "menu": {
+    "report": "Report translation…",
+    "native_menu_hint": "Shift + right-click opens the browser menu"
+  },
+  "modal": {
+    "title": "Report translation",
+    "text": "Text",
+    "text_help": "The text as shown on the page. Shorten it to the part that needs attention.",
+    "key": "Translation",
+    "partial_match": "partial match",
+    "not_translated": "not translated",
+    "none_of_these": "None of these",
+    "no_key_found": "No translation found, the text is probably not translated yet.",
+    "english": "English original:",
+    "current_translation": "Current translation:",
+    "category": "Problem",
+    "suggestion": "Suggested translation",
+    "suggestion_help": "Optional. How the text should read.",
+    "comment": "Comment",
+    "submit": "Report",
+    "submitting": "Reporting…"
+  },
+  "categories": {
+    "wrong": "Wrong translation",
+    "untranslated": "Not translated",
+    "awkward": "Awkward wording",
+    "layout": "Layout broken or text cut off",
+    "other": "Other"
+  },
+  "statuses": {
+    "open": "Open",
+    "fixed": "Fixed",
+    "wont_fix": "Won't fix"
+  },
+  "list": {
+    "human_name": "translation reports",
+    "search_placeholder": "Search translation reports",
+    "no_key": "No key",
+    "download_json": "Download JSON",
+    "download_csv": "Download CSV"
+  },
+  "actions": {
+    "mark_fixed": "Mark fixed",
+    "reopen": "Reopen",
+    "mark_wont_fix": "Won't fix",
+    "confirm_delete": "Do you really want to delete the report for \"{{text}}\"?"
+  },
+  "page": {
+    "title": "Translation Feedback",
+    "description": "Reports about the translations of the interface. Right-click any text to report it."
+  },
+  "notifications": {
+    "created": "Thank you! Your report was saved.",
+    "created_title": "Translation reported",
+    "create_failed": "Saving the report failed: {{error}}",
+    "create_failed_title": "Could not report translation",
+    "update_failed": "Updating the report failed: {{error}}",
+    "update_failed_title": "Could not update report"
+  }
+}

@@ -150,6 +150,11 @@ const navigationBindings: PluginExports = {
               permissions: ['collector_fleets:read', 'collectors_config:read'],
               requiredFeatureFlag: 'collectors',
             },
+            {
+              path: Routes.SYSTEM.TRANSLATION_FEEDBACK,
+              description: 'Translation Feedback',
+              titleKey: 'navigation:system.translation_feedback',
+            },
           ],
           AppConfig.isCloud() && !AppConfig.isFeatureEnabled('cloud_inputs') ? [Routes.SYSTEM.INPUTS] : [],
         ),

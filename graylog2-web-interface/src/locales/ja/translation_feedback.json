@@ -1,0 +1,61 @@
+{
+  "menu": {
+    "report": "翻訳を報告…",
+    "native_menu_hint": "Shift + 右クリックでブラウザーのメニューを開きます"
+  },
+  "modal": {
+    "title": "翻訳を報告",
+    "text": "テキスト",
+    "text_help": "ページに表示されているテキストです。確認が必要な部分だけに短くしてください。",
+    "key": "翻訳",
+    "partial_match": "部分一致",
+    "not_translated": "未翻訳",
+    "none_of_these": "該当なし",
+    "no_key_found": "翻訳が見つかりません。このテキストはまだ翻訳されていない可能性があります。",
+    "english": "英語の原文：",
+    "current_translation": "現在の翻訳：",
+    "category": "問題の種類",
+    "suggestion": "翻訳の提案",
+    "suggestion_help": "任意。テキストのあるべき表現。",
+    "comment": "コメント",
+    "submit": "報告",
+    "submitting": "報告中…"
+  },
+  "categories": {
+    "wrong": "誤訳",
+    "untranslated": "未翻訳",
+    "awkward": "不自然な表現",
+    "layout": "レイアウト崩れまたはテキストの切れ",
+    "other": "その他"
+  },
+  "statuses": {
+    "open": "未対応",
+    "fixed": "修正済み",
+    "wont_fix": "対応しない"
+  },
+  "list": {
+    "human_name": "翻訳レポート",
+    "search_placeholder": "翻訳レポートを検索",
+    "no_key": "キーなし",
+    "download_json": "JSON をダウンロード",
+    "download_csv": "CSV をダウンロード"
+  },
+  "actions": {
+    "mark_fixed": "修正済みにする",
+    "reopen": "再オープン",
+    "mark_wont_fix": "対応しない",
+    "confirm_delete": "「{{text}}」に関するレポートを削除してもよろしいですか？"
+  },
+  "page": {
+    "title": "翻訳フィードバック",
+    "description": "インターフェースの翻訳に関するレポートです。任意のテキストを右クリックして報告できます。"
+  },
+  "notifications": {
+    "created": "ありがとうございます。レポートを保存しました。",
+    "created_title": "翻訳を報告しました",
+    "create_failed": "レポートを保存できませんでした: {{error}}",
+    "create_failed_title": "翻訳を報告できませんでした",
+    "update_failed": "レポートを更新できませんでした: {{error}}",
+    "update_failed_title": "レポートを更新できませんでした"
+  }
+}

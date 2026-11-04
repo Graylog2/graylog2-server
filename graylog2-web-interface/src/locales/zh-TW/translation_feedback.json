@@ -1,0 +1,61 @@
+{
+  "menu": {
+    "report": "回報翻譯問題…",
+    "native_menu_hint": "Shift + 右鍵開啟瀏覽器選單"
+  },
+  "modal": {
+    "title": "回報翻譯問題",
+    "text": "文字",
+    "text_help": "頁面上顯示的文字。請縮減為需要注意的部分。",
+    "key": "翻譯",
+    "partial_match": "部分相符",
+    "not_translated": "未翻譯",
+    "none_of_these": "皆非",
+    "no_key_found": "找不到翻譯，此文字可能尚未翻譯。",
+    "english": "英文原文：",
+    "current_translation": "目前翻譯：",
+    "category": "問題類型",
+    "suggestion": "建議翻譯",
+    "suggestion_help": "選填。文字應如何表述。",
+    "comment": "備註",
+    "submit": "回報",
+    "submitting": "正在回報…"
+  },
+  "categories": {
+    "wrong": "翻譯錯誤",
+    "untranslated": "未翻譯",
+    "awkward": "措辭不自然",
+    "layout": "版面錯亂或文字遭截斷",
+    "other": "其他"
+  },
+  "statuses": {
+    "open": "待處理",
+    "fixed": "已修正",
+    "wont_fix": "不予修正"
+  },
+  "list": {
+    "human_name": "翻譯回報",
+    "search_placeholder": "搜尋翻譯回報",
+    "no_key": "無鍵",
+    "download_json": "下載 JSON",
+    "download_csv": "下載 CSV"
+  },
+  "actions": {
+    "mark_fixed": "標示為已修正",
+    "reopen": "重新開啟",
+    "mark_wont_fix": "不予修正",
+    "confirm_delete": "確定要刪除關於「{{text}}」的回報嗎？"
+  },
+  "page": {
+    "title": "翻譯意見回饋",
+    "description": "關於介面翻譯的回報。在任何文字上按右鍵即可回報。"
+  },
+  "notifications": {
+    "created": "謝謝！您的回報已儲存。",
+    "created_title": "已回報翻譯問題",
+    "create_failed": "儲存回報失敗：{{error}}",
+    "create_failed_title": "無法回報翻譯問題",
+    "update_failed": "更新回報失敗：{{error}}",
+    "update_failed_title": "無法更新回報"
+  }
+}

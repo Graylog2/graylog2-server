@@ -1,0 +1,61 @@
+{
+  "menu": {
+    "report": "Relatar tradução…",
+    "native_menu_hint": "Shift + clique direito abre o menu do navegador"
+  },
+  "modal": {
+    "title": "Relatar tradução",
+    "text": "Texto",
+    "text_help": "O texto como aparece na página. Reduza-o à parte que precisa de atenção.",
+    "key": "Tradução",
+    "partial_match": "correspondência parcial",
+    "not_translated": "não traduzido",
+    "none_of_these": "Nenhuma destas",
+    "no_key_found": "Nenhuma tradução encontrada, o texto provavelmente ainda não foi traduzido.",
+    "english": "Original em inglês:",
+    "current_translation": "Tradução atual:",
+    "category": "Problema",
+    "suggestion": "Tradução sugerida",
+    "suggestion_help": "Opcional. Como o texto deveria ficar.",
+    "comment": "Comentário",
+    "submit": "Relatar",
+    "submitting": "Relatando…"
+  },
+  "categories": {
+    "wrong": "Tradução incorreta",
+    "untranslated": "Não traduzido",
+    "awkward": "Redação estranha",
+    "layout": "Layout quebrado ou texto cortado",
+    "other": "Outro"
+  },
+  "statuses": {
+    "open": "Aberto",
+    "fixed": "Corrigido",
+    "wont_fix": "Não será corrigido"
+  },
+  "list": {
+    "human_name": "relatos de tradução",
+    "search_placeholder": "Pesquisar relatos de tradução",
+    "no_key": "Sem chave",
+    "download_json": "Baixar JSON",
+    "download_csv": "Baixar CSV"
+  },
+  "actions": {
+    "mark_fixed": "Marcar como corrigido",
+    "reopen": "Reabrir",
+    "mark_wont_fix": "Não será corrigido",
+    "confirm_delete": "Deseja realmente excluir o relato sobre \"{{text}}\"?"
+  },
+  "page": {
+    "title": "Feedback de tradução",
+    "description": "Relatos sobre as traduções da interface. Clique com o botão direito em qualquer texto para relatá-lo."
+  },
+  "notifications": {
+    "created": "Obrigado! Seu relato foi salvo.",
+    "created_title": "Tradução relatada",
+    "create_failed": "Não foi possível salvar o relato: {{error}}",
+    "create_failed_title": "Não foi possível relatar a tradução",
+    "update_failed": "Não foi possível atualizar o relato: {{error}}",
+    "update_failed_title": "Não foi possível atualizar o relato"
+  }
+}

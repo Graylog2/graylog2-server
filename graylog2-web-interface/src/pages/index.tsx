@@ -69,6 +69,7 @@ const InputDiagnosisPage = loadAsync(() => import('./InputDiagnosisPage'));
 const KeyboardShortcutsPage = loadAsync(() => import('./KeyboardShortcutsPage'));
 const LoadingPage = loadAsync(() => import(/* webpackChunkName: "LoadingPage" */ 'pages/LoadingPage'));
 const LoggersPage = loadAsync(() => import('./LoggersPage'));
+const TranslationFeedbackPage = loadAsync(() => import('./TranslationFeedbackPage'));
 const LoginPage = loadAsync(() => import(/* webpackChunkName: "LoginPage" */ 'pages/LoginPage'));
 const LUTCacheDetailsPage = loadAsync(() => import('./LUTCacheDetailsPage'));
 const LUTCachesPage = loadAsync(() => import('./LUTCachesPage'));
@@ -184,6 +185,7 @@ export {
   LoadingPage,
   LoggersPage,
   LoginPage,
+  TranslationFeedbackPage,
   LUTCacheDetailsPage,
   LUTCachesPage,
   LUTCachesFormPage,
