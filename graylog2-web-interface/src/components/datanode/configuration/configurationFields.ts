@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import groupBy from 'lodash/groupBy';
+
 import type { ConfigurationCategory, ConfigurationParameter, ConfigurationValues } from './types';
 
 export const categoryId = (category: string) =>
@@ -22,21 +24,12 @@ export const categoryId = (category: string) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
 
-export const getConfigurationCategories = (parameters: Array<ConfigurationParameter>): Array<ConfigurationCategory> => {
-  const categories: Array<ConfigurationCategory> = [];
-
-  parameters.forEach((parameter) => {
-    const existing = categories.find(({ label }) => label === parameter.category);
-
-    if (existing) {
-      existing.parameters.push(parameter);
-    } else {
-      categories.push({ id: categoryId(parameter.category), label: parameter.category, parameters: [parameter] });
-    }
-  });
-
-  return categories;
-};
+export const getConfigurationCategories = (parameters: Array<ConfigurationParameter>): Array<ConfigurationCategory> =>
+  Object.entries(groupBy(parameters, 'category')).map(([label, categoryParameters]) => ({
+    id: categoryId(label),
+    label,
+    parameters: categoryParameters,
+  }));
 
 export const buildConfigurationValues = (parameters: Array<ConfigurationParameter>): ConfigurationValues =>
   Object.fromEntries(parameters.filter(({ value }) => value != null).map(({ name, value }) => [name, value]));
