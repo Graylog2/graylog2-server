@@ -65,9 +65,9 @@ const MetricsTabs = ({ metricsPlugins }: { metricsPlugins: Array<WelcomePageMetr
 
   const tabs = [
     { label: t('metrics.tab_general'), value: GENERAL_TAB_VALUE, component: GeneralMetrics },
-    ...metricsPlugins.map(({ label, component }) => ({ label, value: label, component })),
+    ...metricsPlugins.map(({ id, label, component }) => ({ label, value: id ?? String(label), component })),
   ];
-  const activeTabValue = selectedTabValue ?? metricsPlugins[0].label;
+  const activeTabValue = selectedTabValue ?? tabs[1].value;
   const ActiveTabComponent = tabs.find(({ value }) => value === activeTabValue)?.component ?? GeneralMetrics;
 
   return (
