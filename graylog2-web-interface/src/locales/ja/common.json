@@ -269,11 +269,11 @@
   "entity_types": {
     "user": "ユーザー",
     "team": "チーム",
-    "dashboard": "Dashboard",
+    "dashboard": "ダッシュボード",
     "event_definition": "Event Definition",
     "notification": "通知",
     "search": "検索",
-    "stream": "Stream",
+    "stream": "ストリーム",
     "search_filter": "検索フィルター",
     "report": "レポート",
     "role": "ロール",
@@ -513,8 +513,8 @@
     "clear_confirm": "スクラッチパッドの内容が消去されます。続行しますか？"
   },
   "extractor_actions": {
-    "select_type": "Extractor の種類を選択",
-    "only_string_fields": "Extractor は文字列フィールドにのみ使用できます。"
+    "select_type": "エクストラクターの種類を選択",
+    "only_string_fields": "エクストラクターは文字列フィールドにのみ使用できます。"
   },
   "surrounding_search": {
     "button": "前後のメッセージを表示"
@@ -593,10 +593,10 @@
     "notification": "通知を作成",
     "dashboard": "ダッシュボードを作成",
     "stream": "ストリームを作成",
-    "index_set": "Index Set を作成",
+    "index_set": "インデックスセットを作成",
     "user": "ユーザーを作成",
-    "pipeline": "Pipeline を作成",
-    "pipeline_rule": "Pipeline ルールを作成",
+    "pipeline": "パイプラインを作成",
+    "pipeline_rule": "パイプラインルールを作成",
     "content_pack": "コンテンツパックを作成",
     "fleet": "フリートを作成"
   }

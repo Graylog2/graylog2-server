@@ -138,7 +138,7 @@
   },
   "field_value_providers": {
     "lookup_table": {
-      "title": "Lookup Table"
+      "title": "ルックアップテーブル"
     },
     "template": {
       "title": "テンプレート"
@@ -182,12 +182,12 @@
     "enable": "有効化",
     "enable_help": "このイベント定義を自動的に実行しますか？",
     "execute_every": "検索を次の間隔で実行",
-    "lookup_table_permission_missing": "このアカウントには、Lookup Table からクエリパラメーターを宣言する権限がありません。",
+    "lookup_table_permission_missing": "このアカウントには、ルックアップテーブルからクエリパラメーターを宣言する権限がありません。",
     "optional": "（任意）",
     "query_parameters": "クエリパラメーター",
     "search_filters": "検索フィルター",
     "search_query": "検索クエリ",
-    "search_query_help": "メッセージが一致する必要がある検索クエリです。検索ページと同じ構文を使用できます。<code>{{syntax}}</code> 構文を使用して、Lookup Table からクエリパラメーターを宣言することも含まれます。",
+    "search_query_help": "メッセージが一致する必要がある検索クエリです。検索ページと同じ構文を使用できます。<code>{{syntax}}</code> 構文を使用して、ルックアップテーブルからクエリパラメーターを宣言することも含まれます。",
     "search_within": "次の期間内を検索",
     "streams_and_categories": "ストリームとカテゴリ",
     "streams_help": "検索に含めるストリームを選択します。",
@@ -312,7 +312,7 @@
   },
   "provider_summary": {
     "less_details": "詳細を縮小",
-    "lookup_table_key_field": "Lookup Table のキーフィールド",
+    "lookup_table_key_field": "ルックアップテーブルのキーフィールド",
     "more_details": "詳細を表示",
     "validate_template_values": "すべてのテンプレートの値が設定されていることを検証",
     "value_source": "値のソース"
@@ -322,7 +322,7 @@
     "title": "クエリパラメーター \"{{name}}\" を宣言",
     "type": "種類",
     "types": {
-      "lookup_table": "Lookup Table"
+      "lookup_table": "ルックアップテーブル"
     },
     "undeclared": ": 未宣言"
   },
@@ -412,17 +412,17 @@
     "event_limit": "イベントの上限",
     "execute_every": "検索を次の間隔で実行",
     "group_by": "グループ化フィールド",
-    "missing_stream_permissions": "次の Stream の権限がありません:",
+    "missing_stream_permissions": "次のストリームの権限がありません:",
     "no": "いいえ",
     "no_cron_expression": "エラー: Cron 式が指定されていません！",
     "no_filters": "フィルターが設定されていません",
     "no_group_by": "グループ化が設定されていません",
-    "no_streams": "Stream が選択されていないため、すべての Stream を検索します",
+    "no_streams": "ストリームが選択されていないため、すべてのストリームを検索します",
     "search_filters": "検索フィルター",
     "search_query": "検索クエリ",
     "search_within": "次の期間内を検索",
-    "stream_categories": "Stream カテゴリ",
-    "streams": "Stream",
+    "stream_categories": "ストリームカテゴリ",
+    "streams": "ストリーム",
     "time_zone": "タイムゾーン",
     "type": "種類",
     "undeclared_parameters": "未宣言のクエリパラメーターがあります: {{parameters}}",

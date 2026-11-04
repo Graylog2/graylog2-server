@@ -1,72 +1,72 @@
 {
-  "title": "Pipeline",
-  "overview_header_title": "Pipeline の概要",
-  "documentation_link_title": "Pipeline のドキュメント",
-  "overview_description": "Pipeline を使うと、ストリームから届くメッセージを変換・処理できます。Pipeline は、ルールを評価して適用するステージで構成されます。メッセージは1つ以上のステージを通過できます。",
-  "new_pipeline": "新しい Pipeline",
-  "pipeline_details_title": "Pipeline {{title}}",
-  "pipeline_details_description": "Pipeline を使うと、ストリームから届くメッセージを変換・処理できます。Pipeline は、ルールを評価して適用するステージで構成されます。メッセージは1つ以上のステージを通過できます。\n各ステージが完了した後、すべてのルールに一致するメッセージ、またはいずれかのルールに一致するメッセージを次のステージに進めるかどうかを決めることができます。",
-  "rules_page_title": "Pipeline ルール",
-  "rules_page_header_title": "Pipeline ルール",
-  "rules_page_documentation_link": "Pipeline ルールのドキュメント",
+  "title": "パイプライン",
+  "overview_header_title": "パイプラインの概要",
+  "documentation_link_title": "パイプラインのドキュメント",
+  "overview_description": "パイプラインを使うと、ストリームから届くメッセージを変換・処理できます。パイプラインは、ルールを評価して適用するステージで構成されます。メッセージは1つ以上のステージを通過できます。",
+  "new_pipeline": "新しいパイプライン",
+  "pipeline_details_title": "パイプライン {{title}}",
+  "pipeline_details_description": "パイプラインを使うと、ストリームから届くメッセージを変換・処理できます。パイプラインは、ルールを評価して適用するステージで構成されます。メッセージは1つ以上のステージを通過できます。\n各ステージが完了した後、すべてのルールに一致するメッセージ、またはいずれかのルールに一致するメッセージを次のステージに進めるかどうかを決めることができます。",
+  "rules_page_title": "パイプラインルール",
+  "rules_page_header_title": "パイプラインルール",
+  "rules_page_documentation_link": "パイプラインルールのドキュメント",
   "rules_page_description": "ルールは、メッセージに変更を適用する方法です。ルールは条件とアクションのリストで構成されます。条件はメッセージに対して評価され、条件を満たした場合にアクションが実行されます。",
   "rules_delete_confirm": "ルール「{{title}}」を本当に削除しますか？",
-  "rule_details_new_title": "新しい Pipeline ルール",
-  "rule_details_title": "Pipeline ルール {{title}}",
+  "rule_details_new_title": "新しいパイプラインルール",
+  "rule_details_title": "パイプラインルール {{title}}",
   "rule_details_loading": "ルールの詳細を読み込んでいます...",
   "loading_rule": "ルールを読み込んでいます",
-  "create_pipeline_rule": "Pipeline ルールを作成",
-  "pipeline_rule": "Pipeline ルール <ruleTitle>{{title}}</ruleTitle>",
+  "create_pipeline_rule": "パイプラインルールを作成",
+  "pipeline_rule": "パイプラインルール <ruleTitle>{{title}}</ruleTitle>",
   "use_source_code_editor": "ソースコードエディターを使用",
   "rule_is_managed_warning": "このルールはアプリケーションによって管理されています。編集できません。",
   "switch_to_source_code_editor": "ソースコードエディターに切り替え",
   "switch_to_source_code_editor_confirm_text": "このページを離れて、ソースコードエディターに移動します。",
   "switch_to_source_code_editor_confirm_warning": "保存されていない変更がないことを確認してください。",
   "pipeline_new": {
-    "description": "新しい Pipeline に名前と説明を付けてください。変更を保存した後にステージを追加できます。"
+    "description": "新しいパイプラインに名前と説明を付けてください。変更を保存した後にステージを追加できます。"
   },
   "processing_errors": {
     "rate_suffix": "errors/s",
     "total": "（合計 {{total}} 件）"
   },
   "timeline": {
-    "entity_name": "Pipeline",
-    "delete_confirm": "Pipeline「{{title}}」を本当に削除しますか？この操作は取り消せません。",
-    "filter_label": "Pipeline をフィルター",
-    "no_pipelines": "Pipeline が見つかりませんでした",
+    "entity_name": "パイプライン",
+    "delete_confirm": "パイプライン「{{title}}」を本当に削除しますか？この操作は取り消せません。",
+    "filter_label": "パイプラインをフィルター",
+    "no_pipelines": "パイプラインが見つかりませんでした",
     "headers": {
-      "pipeline": "Pipeline",
+      "pipeline": "パイプライン",
       "connected_streams": "接続先のストリーム",
       "processing_errors": "処理エラー",
-      "pipeline_load": "Pipeline 負荷 (15m)",
+      "pipeline_load": "パイプライン負荷 (15m)",
       "processing_timeline": "処理タイムライン",
       "actions": "アクション"
     }
   },
   "debug_metrics": {
     "banner_title": "デバッグメトリクスが有効です",
-    "banner_text": "デバッグメトリクスはメッセージ処理にオーバーヘッドを加え、メモリー使用量を増やします。トラブルシューティングが終わったら無効にしてください。Pipeline 負荷の値は15分間のウィンドウで平均化されるため、有効化後に安定するまで数分かかる場合があります。",
+    "banner_text": "デバッグメトリクスはメッセージ処理にオーバーヘッドを加え、メモリー使用量を増やします。トラブルシューティングが終わったら無効にしてください。パイプライン負荷の値は15分間のウィンドウで平均化されるため、有効化後に安定するまで数分かかる場合があります。",
     "disable": "デバッグメトリクスを無効化",
     "enable": "デバッグメトリクスを有効化",
-    "help": "Pipeline 負荷 (15m) は、クラスター全体で Pipeline ルールの実行時間が占める相対的な割合を示します。デバッグメトリクスを有効にすると、タイマーデータの収集が始まります。有効化後、値が表示されるまで約15分かかる場合があり、収集はメッセージ処理にオーバーヘッドを加えます。"
+    "help": "パイプライン負荷 (15m) は、クラスター全体でパイプラインルールの実行時間が占める相対的な割合を示します。デバッグメトリクスを有効にすると、タイマーデータの収集が始まります。有効化後、値が表示されるまで約15分かかる場合があり、収集はメッセージ処理にオーバーヘッドを加えます。"
   },
   "pipeline": {
-    "not_connected": "この Pipeline は現在どのストリームにも接続されていません。受信メッセージを処理させるには、少なくとも1つのストリームに接続する必要があります。デコレーターを使って検索結果の変換のみに使用する場合は、接続は不要です。",
+    "not_connected": "このパイプラインは現在どのストリームにも接続されていません。受信メッセージを処理させるには、少なくとも1つのストリームに接続する必要があります。デコレーターを使って検索結果の変換のみに使用する場合は、接続は不要です。",
     "delete_stage_confirm": "ステージ {{stage}} を削除しようとしています。続行しますか？",
     "list_and": " および ",
-    "processing_streams_other": "この Pipeline は、ストリーム {{streams}} からのメッセージを処理しています。",
-    "managed_1": "この Pipeline はシステムで管理されており、編集は一部に制限されています。",
-    "managed_2": "Pipeline ルールは、入力ウィザードを通してのみこの Pipeline に追加できます。",
-    "managed_3": "この Pipeline の Pipeline ルールは、対応する入力名の変更に合わせて自動的に名前が変更されます。",
-    "managed_4": "Pipeline ルールはこの Pipeline から手動で削除できますが、手動で追加することはできません。",
-    "connections_title": "Pipeline の接続",
-    "no_connections": "この Pipeline で処理するストリームを選択してください。",
-    "stages_title": "Pipeline のステージ",
-    "stages_description": "ステージは、順番に実行する必要がある条件とアクションのグループです。Pipeline の残りを実行するかどうかを決める制御フローを提供します。",
+    "processing_streams_other": "このパイプラインは、ストリーム {{streams}} からのメッセージを処理しています。",
+    "managed_1": "このパイプラインはシステムで管理されており、編集は一部に制限されています。",
+    "managed_2": "パイプラインルールは、入力ウィザードを通してのみこのパイプラインに追加できます。",
+    "managed_3": "このパイプラインのパイプラインルールは、対応する入力名の変更に合わせて自動的に名前が変更されます。",
+    "managed_4": "パイプラインルールはこのパイプラインから手動で削除できますが、手動で追加することはできません。",
+    "connections_title": "パイプラインの接続",
+    "no_connections": "このパイプラインで処理するストリームを選択してください。",
+    "stages_title": "パイプラインのステージ",
+    "stages_description": "ステージは、順番に実行する必要がある条件とアクションのグループです。パイプラインの残りを実行するかどうかを決める制御フローを提供します。",
     "no_rules_on_stage": "このステージにはルールがありません。"
   },
   "connections_form": {
-    "streams_help": "この Pipeline に接続するストリームを選択するか、<streamsLink>ストリームページ</streamsLink>で作成してください。",
+    "streams_help": "このパイプラインに接続するストリームを選択するか、<streamsLink>ストリームページ</streamsLink>で作成してください。",
     "edit": "接続を編集",
     "title": "<pipelineTitle>{{title}}</pipelineTitle> の接続を編集",
     "submit": "接続を更新",
@@ -83,28 +83,28 @@
   },
   "form": {
     "title": "タイトル",
-    "title_help": "Pipeline 名です。",
+    "title_help": "パイプライン名です。",
     "description": "説明",
-    "description_help": "Pipeline の説明です。",
-    "add_button": "新しい Pipeline を追加",
-    "edit_button": "Pipeline の詳細を編集",
-    "add_title": "新しい Pipeline {{title}} を追加",
-    "edit_title": "Pipeline {{title}} を編集",
-    "add_submit": "Pipeline を追加",
-    "update_submit": "Pipeline を更新",
-    "create_submit": "Pipeline を作成"
+    "description_help": "パイプラインの説明です。",
+    "add_button": "新しいパイプラインを追加",
+    "edit_button": "パイプラインの詳細を編集",
+    "add_title": "新しいパイプライン {{title}} を追加",
+    "edit_title": "パイプライン {{title}} を編集",
+    "add_submit": "パイプラインを追加",
+    "update_submit": "パイプラインを更新",
+    "create_submit": "パイプラインを作成"
   },
   "list_item": {
     "idle": "アイドル",
     "stage": "ステージ {{stage}}",
-    "loading": "Pipeline を読み込んでいます...",
+    "loading": "パイプラインを読み込んでいます...",
     "managed": "アプリケーションによって管理",
     "throughput_prefix": "スループット:",
     "throughput_suffix": "msg/s",
     "not_connected": "未接続",
-    "edit_aria": "Pipeline を編集",
+    "edit_aria": "パイプラインを編集",
     "edit": "編集",
-    "delete_aria": "Pipeline を削除",
+    "delete_aria": "パイプラインを削除",
     "delete": "削除"
   },
   "stage_rules": {
@@ -126,7 +126,7 @@
   },
   "stage": {
     "contains_rules_other": "{{count}} 件のルールを含みます",
-    "last_stage": "この Pipeline にはこれ以上ステージがありません。このステージのルールが適用されると、Pipeline の処理は完了します。",
+    "last_stage": "このパイプラインにはこれ以上ステージがありません。このステージのルールが適用されると、パイプラインの処理は完了します。",
     "continue_all": "このステージの<matchText>すべてのルール</matchText>に一致するメッセージは、次のステージに進みます。",
     "continue_either": "このステージの<matchText>少なくとも1つのルール</matchText>に一致するメッセージは、次のステージに進みます。",
     "continue_pass": "このステージの<matchText>いずれかのルール、またはルールなし</matchText>に一致するメッセージは、次のステージに進みます。",
@@ -136,7 +136,7 @@
     "remove_routing_rule_confirm": "ルーティングルール <ruleTitle>{{title}}</ruleTitle> を本当に削除しますか？"
   },
   "stage_form": {
-    "rules_help": "このステージで評価するルールを選択するか、<rulesLink>Pipeline ルールページ</rulesLink>で作成してください。",
+    "rules_help": "このステージで評価するルールを選択するか、<rulesLink>パイプラインルールページ</rulesLink>で作成してください。",
     "add_button": "新しいステージを追加",
     "add_title": "新しいステージ {{stage}} を追加",
     "edit_title": "ステージ {{stage}} を編集",
@@ -152,14 +152,14 @@
     "stage_rules": "ステージのルール"
   },
   "used_in_pipelines": {
-    "label": "使用中の Pipeline",
-    "help": "1つ以上のステージでこのルールを使用している Pipeline です。",
-    "none": "このルールはどの Pipeline でも使用されていません。"
+    "label": "使用中のパイプライン",
+    "help": "1つ以上のステージでこのルールを使用しているパイプラインです。",
+    "none": "このルールはどのパイプラインでも使用されていません。"
   },
   "deprecation": {
     "label": "非推奨の関数",
     "title_rule": "このルールには、少なくとも1つの非推奨の関数が含まれています:",
-    "title_pipeline": "この Pipeline には、少なくとも1つの非推奨の関数が含まれています:"
+    "title_pipeline": "このパイプラインには、少なくとも1つの非推奨の関数が含まれています:"
   },
   "rule_form": {
     "duplicate_title": "ルールのタイトル「{{title}}」は既に存在します。",
@@ -189,8 +189,8 @@
     "warning": "ルールメトリクスは、パフォーマンスの問題をデバッグする場合にのみ有効にしてください。メトリクスを収集するとメッセージ処理が遅くなり、メモリー使用量が増えます。",
     "enable": "ルールメトリクスを有効化",
     "disable": "ルールメトリクスを無効化",
-    "pipeline_load_info": "これらのメトリクスを有効にすると、Pipeline と Pipeline ルールのページに<columnName>Pipeline 負荷</columnName>という新しい列が追加されます。この列には、どの Pipeline がスレッド時間を最も多く消費しているかを相対的に示す割合（%）が表示されます。",
-    "rule_load_info": "これらのメトリクスを有効にすると、Pipeline の詳細ページにも<columnName>ルール負荷</columnName>という新しい列が追加されます。これにより、選択した Pipeline 内のどの Pipeline ルールが最も高コストかを特定できます。"
+    "pipeline_load_info": "これらのメトリクスを有効にすると、パイプラインとパイプラインルールのページに<columnName>パイプライン負荷</columnName>という新しい列が追加されます。この列には、どのパイプラインがスレッド時間を最も多く消費しているかを相対的に示す割合（%）が表示されます。",
+    "rule_load_info": "これらのメトリクスを有効にすると、パイプラインの詳細ページにも<columnName>ルール負荷</columnName>という新しい列が追加されます。これにより、選択したパイプライン内のどのパイプラインルールが最も高コストかを特定できます。"
   },
   "rule_simulation": {
     "error_builder": "ルールのシミュレーションを実行できませんでした。ルールビルダーのエラーを修正してください。",
@@ -267,12 +267,12 @@
   },
   "helper": {
     "title": "ルールのクイックリファレンス",
-    "docs_hint": "Pipeline ルールの仕組みをより深く理解するには、<docsLink>ドキュメント全体</docsLink>をお読みください。",
+    "docs_hint": "パイプラインルールの仕組みをより深く理解するには、<docsLink>ドキュメント全体</docsLink>をお読みください。",
     "functions": "関数",
     "example": "例",
-    "functions_description": "Pipeline ルールで使用できるすべての関数の一覧です。行をクリックすると、関数のパラメーターの詳細が表示されます。",
+    "functions_description": "パイプラインルールで使用できるすべての関数の一覧です。行をクリックすると、関数のパラメーターの詳細が表示されます。",
     "filter_rules": "ルールをフィルター",
-    "example_description": "Pipeline ルールがどのように見えるか確認しますか？次の例をご覧ください:"
+    "example_description": "パイプラインルールがどのように見えるか確認しますか？次の例をご覧ください:"
   },
   "helper_table": {
     "parameter": "パラメーター",
@@ -283,7 +283,7 @@
   },
   "simulator": {
     "no_streams_title": "ストリームが見つかりません",
-    "no_streams": "Pipeline はストリームに対して動作しますが、現在システムにストリームがありません。<streamsLink>ストリームを作成</streamsLink>してから、新しいストリームで受信メッセージを処理する Pipeline をテストするためにここに戻ってきてください。",
+    "no_streams": "パイプラインはストリームに対して動作しますが、現在システムにストリームがありません。<streamsLink>ストリームを作成</streamsLink>してから、新しいストリームで受信メッセージを処理するパイプラインをテストするためにここに戻ってきてください。",
     "stream_help": "シミュレーションで使用するストリームを選択してください。デフォルトでは <streamTitle>{{title}}</streamTitle> ストリームが使用されます。",
     "load_message": "メッセージを読み込む",
     "load_message_description": "シミュレーションで使用するサンプルメッセージを作成します。<notice>実際のメッセージは変更されません。すべてのアクションは、以下で入力する一時的な入力に対してのみシミュレートされます。</notice>",
@@ -301,7 +301,7 @@
   },
   "simulation_preview": {
     "dropped_title": "メッセージは破棄されます",
-    "dropped": "Pipeline プロセッサーはこのようなメッセージを破棄します。つまり、メッセージは<notStored>保存されず</notStored>、検索、アラート、出力、ダッシュボードで利用できなくなります。"
+    "dropped": "パイプラインプロセッサーはこのようなメッセージを破棄します。つまり、メッセージは<notStored>保存されず</notStored>、検索、アラート、出力、ダッシュボードで利用できなくなります。"
   },
   "simulation_trace": {
     "microseconds": "μs"
@@ -320,8 +320,8 @@
   },
   "simulator_page": {
     "title": "処理をシミュレート",
-    "documentation_title": "Pipeline のドキュメント",
-    "description": "メッセージの処理は複雑になることがあります。このページを使うと、現在の Pipeline とルールのセットを使って、受信メッセージの処理結果をシミュレートできます。"
+    "documentation_title": "パイプラインのドキュメント",
+    "description": "メッセージの処理は複雑になることがあります。このページを使うと、現在のパイプラインとルールのセットを使って、受信メッセージの処理結果をシミュレートできます。"
   },
   "rule_notifications": {
     "fetch_failed": "ステータス {{error}} でルールの取得に失敗しました",
@@ -344,8 +344,8 @@
     "metrics_update_success": "ルールメトリクスの設定を更新しました",
     "metrics_update_failed": "ルールメトリクスの設定を更新できませんでした: {{error}}",
     "metrics_update_failed_title": "ルールメトリクスの設定を更新できませんでした",
-    "metadata_failed": "ステータス付きで Pipeline ルールのメタデータの読み込みに失敗しました",
-    "metadata_failed_title": "Pipeline ルールのメタデータを読み込めませんでした",
+    "metadata_failed": "ステータス付きでパイプラインルールのメタデータの読み込みに失敗しました",
+    "metadata_failed_title": "パイプラインルールのメタデータを読み込めませんでした",
     "deprecated_failed": "ステータス付きでルールの非推奨の関数の読み込みに失敗しました",
     "deprecated_failed_title": "ルールメタデータの非推奨の関数を読み込めませんでした",
     "builder_create_failed": "ステータス {{error}} でルールビルダーのルールの作成に失敗しました",
@@ -360,35 +360,35 @@
     "builder_actions_failed_title": "ルールビルダーのアクション一覧を読み込めませんでした。"
   },
   "page_navigation": {
-    "manage_pipelines": "Pipeline を管理",
+    "manage_pipelines": "パイプラインを管理",
     "manage_rules": "ルールを管理",
     "simulator": "シミュレーター"
   },
   "pipeline_notifications": {
-    "load_failed": "ステータス付きで Pipeline の読み込みに失敗しました",
-    "load_failed_title": "Pipeline を読み込めませんでした",
-    "load_paginated_failed": "ステータス付きでページ分割された Pipeline の読み込みに失敗しました",
-    "load_paginated_failed_title": "ページ分割された Pipeline を読み込めませんでした",
-    "load_single_failed": "ステータス付きで Pipeline の読み込みに失敗しました",
-    "load_single_failed_title": "Pipeline を読み込めませんでした",
-    "connections_failed": "ステータス付きで Pipeline の接続の取得に失敗しました",
-    "connections_failed_title": "Pipeline の接続を取得できませんでした",
-    "connections_updated": "Pipeline の接続を更新しました",
-    "connections_update_failed": "ステータス {{error}} で Pipeline の接続の更新に失敗しました",
-    "connections_update_failed_title": "Pipeline の接続を更新できませんでした",
-    "create_failed": "ステータス {{error}} で Pipeline の作成に失敗しました",
-    "create_failed_title": "Pipeline を作成できませんでした",
-    "create_success": "Pipeline を作成しました。",
-    "update_failed": "ステータス {{error}} で Pipeline の更新に失敗しました",
-    "update_failed_title": "Pipeline を更新できませんでした",
-    "update_success": "Pipeline を更新しました。",
-    "delete_failed": "ステータス {{error}} で Pipeline の削除に失敗しました",
-    "delete_failed_title": "Pipeline を削除できませんでした",
-    "delete_success": "Pipeline を削除しました。",
+    "load_failed": "ステータス付きでパイプラインの読み込みに失敗しました",
+    "load_failed_title": "パイプラインを読み込めませんでした",
+    "load_paginated_failed": "ステータス付きでページ分割されたパイプラインの読み込みに失敗しました",
+    "load_paginated_failed_title": "ページ分割されたパイプラインを読み込めませんでした",
+    "load_single_failed": "ステータス付きでパイプラインの読み込みに失敗しました",
+    "load_single_failed_title": "パイプラインを読み込めませんでした",
+    "connections_failed": "ステータス付きでパイプラインの接続の取得に失敗しました",
+    "connections_failed_title": "パイプラインの接続を取得できませんでした",
+    "connections_updated": "パイプラインの接続を更新しました",
+    "connections_update_failed": "ステータス {{error}} でパイプラインの接続の更新に失敗しました",
+    "connections_update_failed_title": "パイプラインの接続を更新できませんでした",
+    "create_failed": "ステータス {{error}} でパイプラインの作成に失敗しました",
+    "create_failed_title": "パイプラインを作成できませんでした",
+    "create_success": "パイプラインを作成しました。",
+    "update_failed": "ステータス {{error}} でパイプラインの更新に失敗しました",
+    "update_failed_title": "パイプラインを更新できませんでした",
+    "update_success": "パイプラインを更新しました。",
+    "delete_failed": "ステータス {{error}} でパイプラインの削除に失敗しました",
+    "delete_failed_title": "パイプラインを削除できませんでした",
+    "delete_success": "パイプラインを削除しました。",
     "success_title": "成功しました！"
   },
   "connections_list": {
-    "not_connected": "この Pipeline はどのストリームにも接続されていません"
+    "not_connected": "このパイプラインはどのストリームにも接続されていません"
   },
   "rule_list": {
     "headers": {
@@ -398,12 +398,12 @@
       "last_modified": "最終更新日時",
       "throughput": "スループット",
       "errors": "エラー",
-      "pipeline_load": "Pipeline 負荷 (15m)",
-      "pipelines": "Pipeline",
+      "pipeline_load": "パイプライン負荷 (15m)",
+      "pipelines": "パイプライン",
       "actions": "アクション"
     }
   },
   "load_cell": {
-    "error_tooltip": "Pipeline 負荷を利用できません。処理負荷のメトリクスを読み込めませんでした。"
+    "error_tooltip": "パイプライン負荷を利用できません。処理負荷のメトリクスを読み込めませんでした。"
   }
 }

@@ -22,9 +22,9 @@
     "content_packs": "コンテンツパック",
     "grok_patterns": "Grok パターン",
     "lookup_tables": "ルックアップテーブル",
-    "pipelines": "Pipelines",
-    "sidecars": "Sidecars",
-    "collectors": "Collectors"
+    "pipelines": "パイプライン",
+    "sidecars": "サイドカー",
+    "collectors": "コレクター"
   },
   "security": {
     "overview": "概要",

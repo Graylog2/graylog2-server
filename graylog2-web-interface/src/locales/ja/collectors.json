@@ -1,39 +1,39 @@
 {
   "pages": {
-    "documentation_title": "Collectors ドキュメント",
+    "documentation_title": "コレクタードキュメント",
     "deployment": {
-      "title": "Collectors のデプロイ",
+      "title": "コレクターのデプロイ",
       "description": "任意の台数のホストでコマンドを実行します。ホストは選択したフリートに登録され、チェックインすると表示されます。",
       "deploy_tab": "デプロイ",
       "tokens_tab": "登録トークン",
-      "tokens_description": "トークンは、新しい Collectors がフリートに登録することを許可します。トークンを削除しても、登録済みの Collectors には影響しません。"
+      "tokens_description": "トークンは、新しいコレクターがフリートに登録することを許可します。トークンを削除しても、登録済みのコレクターには影響しません。"
     },
     "fleets": {
-      "document_title": "Collector フリート",
+      "document_title": "コレクターフリート",
       "title": "フリート",
-      "description": "フリートは、同じ設定を共有する Collectors のグループです。フリート内のすべての Collectors は同じソースからデータを収集します。環境、チーム、用途ごとに Collectors を整理するためにフリートを使用します。"
+      "description": "フリートは、同じ設定を共有するコレクターのグループです。フリート内のすべてのコレクターは同じソースからデータを収集します。環境、チーム、用途ごとにコレクターを整理するためにフリートを使用します。"
     },
     "fleet_detail": {
       "title": "フリートの詳細"
     },
     "instances": {
-      "document_title": "Collector インスタンス",
+      "document_title": "コレクターインスタンス",
       "title": "インスタンス",
-      "description": "Collector インスタンスは、リモートホスト上で実行中の Collector プロセスを表します。インスタンスは登録トークンを使ってフリートに登録され、フリートのソース設定を自動的に受け取ります。"
+      "description": "コレクターインスタンスは、リモートホスト上で実行中のコレクタープロセスを表します。インスタンスは登録トークンを使ってフリートに登録され、フリートのソース設定を自動的に受け取ります。"
     },
     "onboarding": {
-      "title": "Collector オンボーディング",
-      "description": "新しく接続された Collector のステータスです。",
-      "load_error": "Collector インスタンスを読み込めませんでした: {{error}}",
-      "not_found": "Collector インスタンスが見つかりません。削除された可能性があります。すべての<instancesLink>インスタンス</instancesLink>を確認してください。"
+      "title": "コレクターオンボーディング",
+      "description": "新しく接続されたコレクターのステータスです。",
+      "load_error": "コレクターインスタンスを読み込めませんでした: {{error}}",
+      "not_found": "コレクターインスタンスが見つかりません。削除された可能性があります。すべての<instancesLink>インスタンス</instancesLink>を確認してください。"
     },
     "overview": {
-      "title": "Collectors の概要",
-      "description": "Collectors は、インフラストラクチャ全体に配置される軽量のサービスで、ログを収集して {{productName}} に転送します。フリートに編成され、収集するデータを定義するソースで設定されます。"
+      "title": "コレクターの概要",
+      "description": "コレクターは、インフラストラクチャ全体に配置される軽量のサービスで、ログを収集して {{productName}} に転送します。フリートに編成され、収集するデータを定義するソースで設定されます。"
     },
     "settings": {
-      "title": "Collectors の設定",
-      "description": "管理対象の Collectors のエンドポイントとライフサイクル設定を構成します。Collectors はこれらのエンドポイントに接続して設定の更新を受け取り、収集したログデータを送信します。"
+      "title": "コレクターの設定",
+      "description": "管理対象のコレクターのエンドポイントとライフサイクル設定を構成します。コレクターはこれらのエンドポイントに接続して設定の更新を受け取り、収集したログデータを送信します。"
     }
   },
   "navigation": {
@@ -50,45 +50,45 @@
     "config_changed": {
       "fleet": "フリート <targetLink /> の設定が更新されました",
       "fleet_with_others_other": "フリート <targetLink /> および他 {{count}} 件のフリートの設定が更新されました",
-      "collector": "Collector <targetLink /> の設定が更新されました",
-      "collector_with_others_other": "Collector <targetLink /> および他 {{count}} 件の Collector の設定が更新されました"
+      "collector": "コレクター <targetLink /> の設定が更新されました",
+      "collector_with_others_other": "コレクター <targetLink /> および他 {{count}} 件のコレクターの設定が更新されました"
     },
     "ingest_config_changed": {
       "fleet": "フリート <targetLink /> の取り込み設定が更新されました",
       "fleet_with_others_other": "フリート <targetLink /> および他 {{count}} 件のフリートの取り込み設定が更新されました",
-      "collector": "Collector <targetLink /> の取り込み設定が更新されました",
-      "collector_with_others_other": "Collector <targetLink /> および他 {{count}} 件の Collector の取り込み設定が更新されました"
+      "collector": "コレクター <targetLink /> の取り込み設定が更新されました",
+      "collector_with_others_other": "コレクター <targetLink /> および他 {{count}} 件のコレクターの取り込み設定が更新されました"
     },
     "restart": {
       "fleet": "フリート <targetLink /> の再起動が要求されました",
       "fleet_with_others_other": "フリート <targetLink /> および他 {{count}} 件のフリートの再起動が要求されました",
-      "collector": "Collector <targetLink /> の再起動が要求されました",
-      "collector_with_others_other": "Collector <targetLink /> および他 {{count}} 件の Collector の再起動が要求されました"
+      "collector": "コレクター <targetLink /> の再起動が要求されました",
+      "collector_with_others_other": "コレクター <targetLink /> および他 {{count}} 件のコレクターの再起動が要求されました"
     },
     "discovery_run": {
       "fleet": "フリート <targetLink /> の検出実行がトリガーされました",
       "fleet_with_others_other": "フリート <targetLink /> および他 {{count}} 件のフリートで検出実行がトリガーされました",
-      "collector": "Collector <targetLink /> の検出実行がトリガーされました",
-      "collector_with_others_other": "Collector <targetLink /> および他 {{count}} 件の Collector で検出実行がトリガーされました"
+      "collector": "コレクター <targetLink /> の検出実行がトリガーされました",
+      "collector_with_others_other": "コレクター <targetLink /> および他 {{count}} 件のコレクターで検出実行がトリガーされました"
     },
     "reassigned": {
-      "collector": "Collector <targetLink /> が再割り当てされました",
-      "collector_with_others_other": "Collector <targetLink /> および他 {{count}} 件の Collector が再割り当てされました"
+      "collector": "コレクター <targetLink /> が再割り当てされました",
+      "collector_with_others_other": "コレクター <targetLink /> および他 {{count}} 件のコレクターが再割り当てされました"
     },
     "reassigned_to_fleet": {
-      "collector": "Collector <targetLink /> がフリート <destinationLink /> に再割り当てされました",
-      "collector_with_others_other": "Collector <targetLink /> および他 {{count}} 件の Collector がフリート <destinationLink /> に再割り当てされました"
+      "collector": "コレクター <targetLink /> がフリート <destinationLink /> に再割り当てされました",
+      "collector_with_others_other": "コレクター <targetLink /> および他 {{count}} 件のコレクターがフリート <destinationLink /> に再割り当てされました"
     }
   },
   "fleet_reference": {
-    "moving_title": "Collector は次回チェックイン時にこのフリートに移動します。",
+    "moving_title": "コレクターは次回チェックイン時にこのフリートに移動します。",
     "moving_from": "({{fleet}} から移動中)",
     "moving_from_removed": "(削除されたフリートから移動中)",
     "removed_title": "このフリートは削除されました。",
     "removed": "フリートが削除されました ({{fleetId}})"
   },
   "sync_state": {
-    "pending_title": "同期保留中 — 変更は Collector の次回チェックイン時に適用されます",
+    "pending_title": "同期保留中 — 変更はコレクターの次回チェックイン時に適用されます",
     "pending": "同期保留中",
     "in_sync_title": "同期済み — すべての変更が適用されています",
     "in_sync": "同期済み"
@@ -102,17 +102,17 @@
   },
   "enrollment_tokens": {
     "bulk_delete_title": "登録トークンを削除",
-    "bulk_delete_confirm_other": "{{count}} 件の登録トークンを削除してもよろしいですか？ 新しい Collectors は、削除されたトークンを使用して登録できなくなります。",
+    "bulk_delete_confirm_other": "{{count}} 件の登録トークンを削除してもよろしいですか？ 新しいコレクターは、削除されたトークンを使用して登録できなくなります。",
     "never": "なし",
     "expired": "期限切れ",
     "human_name": "登録トークン",
     "delete_title": "登録トークンを削除",
-    "delete_confirm": "この登録トークンを削除してもよろしいですか？ 新しい Collectors はこのトークンを使用して登録できなくなります。登録済みの Collectors は引き続き正常に動作します。"
+    "delete_confirm": "この登録トークンを削除してもよろしいですか？ 新しいコレクターはこのトークンを使用して登録できなくなります。登録済みのコレクターは引き続き正常に動作します。"
   },
   "deployment": {
     "select_fleet_step": "フリートを選択",
     "generate_token_step": "トークンを生成",
-    "install_step": "Collector をインストール",
+    "install_step": "コレクターをインストール",
     "open_in_search": "検索で開く",
     "generate_token_first": "上でトークンを生成すると、インストールコマンドが表示されます。",
     "copy_token_only": "トークンのみコピー"
@@ -193,35 +193,35 @@
     "tab_settings": "設定",
     "edit_source": "編集",
     "not_found": "フリートが見つかりません",
-    "deploy_collector": "新しい Collector をデプロイ",
+    "deploy_collector": "新しいコレクターをデプロイ",
     "stat_instances": "インスタンス",
-    "stat_instances_help": "このフリートに登録されている Collector プロセスです。",
+    "stat_instances_help": "このフリートに登録されているコレクタープロセスです。",
     "stat_online": "オンライン",
     "stat_online_help": "オフラインのしきい値内にハートビートを報告したインスタンスです。",
     "stat_offline": "オフライン",
-    "stat_offline_help": "ハートビートが途絶えたインスタンスです。ホストの接続または Collector プロセスのステータスを確認してください。",
+    "stat_offline_help": "ハートビートが途絶えたインスタンスです。ホストの接続またはコレクタープロセスのステータスを確認してください。",
     "stat_sources": "ソース",
     "stat_sources_help": "このフリートに割り当てられているデータ収集の設定です。",
-    "sources_description": "ソースはこのフリート内のすべての Collectors に自動的にプッシュされます。変更は数秒以内に反映されます。",
+    "sources_description": "ソースはこのフリート内のすべてのコレクターに自動的にプッシュされます。変更は数秒以内に反映されます。",
     "add_source": "ソースを追加",
     "sources_human_name": "ソース",
-    "instances_description": "このフリートに登録されている Collector インスタンスです。各インスタンスは有効なすべてのソースを実行します。インスタンスを追加するには、このフリートの登録トークンを使用して<deployLink>Collectors をデプロイ</deployLink>してください。",
+    "instances_description": "このフリートに登録されているコレクターインスタンスです。各インスタンスは有効なすべてのソースを実行します。インスタンスを追加するには、このフリートの登録トークンを使用して<deployLink>コレクターをデプロイ</deployLink>してください。",
     "instances_human_name": "インスタンス",
     "delete_source_title": "ソースを削除",
-    "delete_source_confirm": "ソース <emphasis>{{sourceName}}</emphasis> を削除してもよろしいですか？ このフリート内の Collectors は、数秒以内にこのソースからのデータ収集を停止します。"
+    "delete_source_confirm": "ソース <emphasis>{{sourceName}}</emphasis> を削除してもよろしいですか？ このフリート内のコレクターは、数秒以内にこのソースからのデータ収集を停止します。"
   },
   "instance_actions": {
     "reassign": "フリートに再割り当て",
     "view_system_logs": "システムログを表示",
     "details": "詳細",
-    "delete_title": "Collector インスタンスを削除",
-    "delete_confirm": "インスタンス <emphasis>{{instanceName}}</emphasis> を削除してもよろしいですか？<lineBreak />Collector は再び表示されるために、再度登録する必要があります。"
+    "delete_title": "コレクターインスタンスを削除",
+    "delete_confirm": "インスタンス <emphasis>{{instanceName}}</emphasis> を削除してもよろしいですか？<lineBreak />コレクターは再び表示されるために、再度登録する必要があります。"
   },
   "reassign_fleet": {
     "fleet_required": "フリートは必須です",
     "title_other": "{{count}} 件のインスタンスをフリートに再割り当て",
-    "no_other_fleet_other": "これらの Collectors を割り当てられる他のフリートはありません。",
-    "no_permission": "他のフリートに Collectors を割り当てる権限がありません。",
+    "no_other_fleet_other": "これらのコレクターを割り当てられる他のフリートはありません。",
+    "no_permission": "他のフリートにコレクターを割り当てる権限がありません。",
     "select_placeholder": "フリートを選択...",
     "submit_other": "インスタンスを再割り当て",
     "submitting": "再割り当て中..."
@@ -229,7 +229,7 @@
   "instance_health": {
     "title": "ヘルス",
     "unknown": "不明",
-    "no_report": "この Collector はヘルス情報を報告していません。",
+    "no_report": "このコレクターはヘルス情報を報告していません。",
     "healthy": "正常",
     "unhealthy": "異常",
     "last_known": "最終確認時の状態: {{state}}",
@@ -256,30 +256,30 @@
     "no_sources": "このフリートにはソースが設定されていません。データの収集を開始するには、フリートの詳細ページでソースを追加してください。",
     "synchronization": "同期",
     "pending_load_error": "保留中の変更を読み込めませんでした。しばらくしてから再試行してください。",
-    "queued_actions": "次のアクションは、Collector が同期するまでキューに入れられます:",
+    "queued_actions": "次のアクションは、コレクターが同期するまでキューに入れられます:",
     "hide_transactions": "キューに入ったトランザクションを非表示",
     "show_transactions_other": "キューに入ったトランザクションを表示（{{count}}）",
-    "changes_queued": "変更はキューに入れられ、Collector の次回チェックイン時に適用されます。",
-    "all_applied": "Collector はキューに入ったすべてのアクションを適用しました。"
+    "changes_queued": "変更はキューに入れられ、コレクターの次回チェックイン時に適用されます。",
+    "all_applied": "コレクターはキューに入ったすべてのアクションを適用しました。"
   },
   "overview": {
-    "stat_instances_help": "すべてのフリートで実行中の Collector プロセスです。",
+    "stat_instances_help": "すべてのフリートで実行中のコレクタープロセスです。",
     "stat_fleets": "フリート",
-    "stat_fleets_help": "同じソース設定を共有する Collectors の論理グループです。",
+    "stat_fleets_help": "同じソース設定を共有するコレクターの論理グループです。",
     "stat_sources_help": "すべてのフリートにわたるデータ収集の設定（ファイルパス、journald、Windows イベントログ）です。",
     "fleet_stats_error": "フリートの統計を読み込めませんでした。",
-    "stats_error": "Collector の統計を読み込めませんでした。",
+    "stats_error": "コレクターの統計を読み込めませんでした。",
     "fleets_title": "フリート",
     "filter_placeholder": "フリートをフィルター...",
-    "config_error": "Collectors の設定を読み込めませんでした。",
-    "endpoint_missing_title": "Collector の取り込みエンドポイントが設定されていません",
-    "endpoint_missing": "Collectors は、まだ設定されていない取り込みエンドポイントに登録します。設定するには、Collectors 設定の編集権限と、Collector Ingest (HTTP) 入力の作成または変更権限が必要ですが、お使いのアカウントにはこれらの権限がありません。まず管理者にエンドポイントの設定を依頼してください。"
+    "config_error": "コレクターの設定を読み込めませんでした。",
+    "endpoint_missing_title": "コレクターの取り込みエンドポイントが設定されていません",
+    "endpoint_missing": "コレクターは、まだ設定されていない取り込みエンドポイントに登録します。設定するには、コレクター設定の編集権限と、Collector Ingest (HTTP) 入力の作成または変更権限が必要ですが、お使いのアカウントにはこれらの権限がありません。まず管理者にエンドポイントの設定を依頼してください。"
   },
   "fleet_card": {
     "healthy": "このフリートのすべてのインスタンスがオンラインです",
     "degraded": "このフリートの一部のインスタンスがオフラインです",
     "down": "このフリートのすべてのインスタンスがオフラインです",
-    "empty": "このフリートにはまだ Collector インスタンスが登録されていません",
+    "empty": "このフリートにはまだコレクターインスタンスが登録されていません",
     "instances_other": "インスタンス",
     "online_other": "● {{count}} 件オンライン",
     "offline_other": "● {{count}} 件オフライン",
@@ -287,8 +287,8 @@
   },
   "fleet_cards": {
     "empty_title": "フリートはまだありません",
-    "contact_admin": "最初の Collectors を設定するには、管理者に連絡してください。",
-    "empty_description": "フリートを使うと、共有設定を持つ Collectors のグループを管理できます。最初のフリートを作成し、そのCollectors が収集すべきデータを定義するソースを追加してください。設定後、登録トークンを使用して<deployLink>Collectors をデプロイ</deployLink>してください。",
+    "contact_admin": "最初のコレクターを設定するには、管理者に連絡してください。",
+    "empty_description": "フリートを使うと、共有設定を持つコレクターのグループを管理できます。最初のフリートを作成し、そのコレクターが収集すべきデータを定義するソースを追加してください。設定後、登録トークンを使用して<deployLink>コレクターをデプロイ</deployLink>してください。",
     "create": "フリートを作成",
     "no_match": "フィルターに一致するフリートはありません"
   },
@@ -297,7 +297,7 @@
     "empty": "最近のアクティビティはありません。"
   },
   "collector_facts": {
-    "title": "Collector",
+    "title": "コレクター",
     "host": "ホスト",
     "os": "OS",
     "version": "バージョン",
@@ -308,29 +308,29 @@
     "hide_attributes": "属性を非表示"
   },
   "connection_success": {
-    "offline": "Collector は一度接続しましたが、<lastSeen /> 以降レポートがありません。",
-    "receiving": "Collector は接続されており、メッセージを送信しています。",
-    "waiting": "もうすぐです。Collector は接続されており、最初のメッセージを待機しています。",
+    "offline": "コレクターは一度接続しましたが、<lastSeen /> 以降レポートがありません。",
+    "receiving": "コレクターは接続されており、メッセージを送信しています。",
+    "waiting": "もうすぐです。コレクターは接続されており、最初のメッセージを待機しています。",
     "title": "{{host}} をセットアップ中",
     "view_instances": "インスタンスを表示",
     "check_again": "再確認",
     "log_preview": "ログプレビュー",
     "caption_messages": "{{duration}} 以内に受信したメッセージを表示しています",
     "caption_messages_checking": "{{duration}} 以内に受信したメッセージを表示しています - 数秒ごとに確認中",
-    "caption_system": "{{duration}} 以内に受信した Collector のシステムメッセージを表示しています",
-    "caption_system_checking": "{{duration}} 以内に受信した Collector のシステムメッセージを表示しています - 数秒ごとに確認中"
+    "caption_system": "{{duration}} 以内に受信したコレクターのシステムメッセージを表示しています",
+    "caption_system_checking": "{{duration}} 以内に受信したコレクターのシステムメッセージを表示しています - 数秒ごとに確認中"
   },
   "fleet_choice": {
-    "selected_heading": "この Collector のフリート",
+    "selected_heading": "このコレクターのフリート",
     "change": "フリートを変更",
-    "heading": "この Collector のフリートを選択",
+    "heading": "このコレクターのフリートを選択",
     "create_new": "新しいフリートを作成",
     "or": "または",
     "select_existing": "既存のフリートを選択",
     "select_existing_placeholder": "既存のフリートを選択..."
   },
   "ingest_endpoint": {
-    "setting_up": "Collectors をセットアップ中...",
+    "setting_up": "コレクターをセットアップ中...",
     "confirm": "エンドポイントを確認",
     "create_input": "入力を作成",
     "save": "エンドポイントを保存",
@@ -338,21 +338,21 @@
     "hostname_placeholder": "例: otlp.example.com",
     "port": "外部ポート",
     "cancel": "キャンセル",
-    "reachability_hint": "Collectors はこのアドレスにログを送信します。すべての Collector ホストから到達可能である必要があります。ロードバランサー、またはこのサーバーのアドレスを指定してください。",
-    "confirm_title": "Collectors がこのクラスターにデータを送信する方法を確認",
+    "reachability_hint": "コレクターはこのアドレスにログを送信します。すべてのコレクターホストから到達可能である必要があります。ロードバランサー、またはこのサーバーのアドレスを指定してください。",
+    "confirm_title": "コレクターがこのクラスターにデータを送信する方法を確認",
     "change": "エンドポイントを変更",
-    "sending_to": "Collectors は <endpoint /> のこのクラスターにデータを送信します",
+    "sending_to": "コレクターは <endpoint /> のこのクラスターにデータを送信します",
     "no_input_title": "取り込み入力が存在しません",
-    "no_input": "Collectors は登録できますが、入力が作成されるまでデータを送信できません。",
+    "no_input": "コレクターは登録できますが、入力が作成されるまでデータを送信できません。",
     "not_running_title": "<endpoint /> の取り込み入力が実行されていません",
-    "not_running": "Collectors は登録できますが、入力が実行されるまでデータを送信できません。",
+    "not_running": "コレクターは登録できますが、入力が実行されるまでデータを送信できません。",
     "manage_input": "入力を管理"
   },
   "install_command": {
     "title": "{{platform}} でこのコマンドを実行",
     "copy": "コマンドをコピー",
-    "note_expires": "Collector をダウンロードしてインストールし、選択したフリートに登録して、サービスを開始します。管理者権限が必要です。トークンの有効期限は {{duration}} です。",
-    "note_never_expires": "Collector をダウンロードしてインストールし、選択したフリートに登録して、サービスを開始します。管理者権限が必要です。このトークンに有効期限はありません。"
+    "note_expires": "コレクターをダウンロードしてインストールし、選択したフリートに登録して、サービスを開始します。管理者権限が必要です。トークンの有効期限は {{duration}} です。",
+    "note_never_expires": "コレクターをダウンロードしてインストールし、選択したフリートに登録して、サービスを開始します。管理者権限が必要です。このトークンに有効期限はありません。"
   },
   "log_preview": {
     "unavailable": "ログプレビューを利用できません — {{error}}",
@@ -361,17 +361,17 @@
   },
   "next_steps": {
     "explore": "データを探索",
-    "explore_description": "この Collector で絞り込んだ検索を開きます",
+    "explore_description": "このコレクターで絞り込んだ検索を開きます",
     "configure_sources": "ソースを設定",
     "configure_sources_description": "このフリートが収集する対象を追加または調整します",
     "manage_fleets": "フリートを管理",
-    "manage_fleets_description": "この Collector を恒久的なフリートに移動します",
-    "install_another": "別の Collector をインストール",
+    "manage_fleets_description": "このコレクターを恒久的なフリートに移動します",
+    "install_another": "別のコレクターをインストール",
     "install_another_description": "別のホストで同じセットアップを繰り返します",
     "offline_title": "オンラインに戻す",
-    "check_service": "ホスト上で Collector サービスが実行中かどうかを確認してください。",
+    "check_service": "ホスト上でコレクターサービスが実行中かどうかを確認してください。",
     "check_reachability": "ホストがこの {{productName}} サーバーに到達できることを確認してください。",
-    "check_logs": "接続エラーがないか、下のプレビューで Collector 自身のログを確認してください。",
+    "check_logs": "接続エラーがないか、下のプレビューでコレクター自身のログを確認してください。",
     "title": "次のステップ"
   },
   "timeline": {
@@ -388,15 +388,15 @@
     "sources_detail_other": "フリート <fleetLink>{{fleetName}}</fleetLink> の {{count}} 件のソース"
   },
   "platform_picker": {
-    "title": "Collectors を始める",
-    "description": "インフラストラクチャ全体に軽量の Collectors をデプロイし、ログを {{productName}} に転送します。"
+    "title": "コレクターを始める",
+    "description": "インフラストラクチャ全体に軽量のコレクターをデプロイし、ログを {{productName}} に転送します。"
   },
   "source_status": {
     "messages_other": "{{formattedCount}} 件のメッセージ",
     "disabled": "無効",
     "not_applicable": "{{os}} では対象外です",
     "unrecognised": "認識されないソースタイプです",
-    "paused": "一時停止中 — Collector がオフラインです",
+    "paused": "一時停止中 — コレクターがオフラインです",
     "no_messages": "まだメッセージはありません",
     "waiting": "最初のメッセージを待機中...",
     "title": "ログソース",
@@ -406,28 +406,28 @@
     "status": "接続を待機中... {{seconds}} 秒"
   },
   "settings": {
-    "getting_started": "Collectors を始める",
-    "getting_started_cloud": "Collectors は、データを送信するためにマネージドの取り込みエンドポイントに接続します。Collector の設定を保存すると、Collector インフラストラクチャが初期化されます。セットアップ後、フリートを作成し、ソースを追加して、Collectors をホストにデプロイできます。",
-    "getting_started_self_managed": "Collectors は、収集したデータを受信するために取り込みエンドポイントが必要です。以下で HTTP エンドポイントを設定して保存すると、Collector インフラストラクチャが初期化されます。セットアップ後、フリートを作成し、ソースを追加して、Collectors をホストにデプロイできます。",
+    "getting_started": "コレクターを始める",
+    "getting_started_cloud": "コレクターは、データを送信するためにマネージドの取り込みエンドポイントに接続します。コレクターの設定を保存すると、コレクターインフラストラクチャが初期化されます。セットアップ後、フリートを作成し、ソースを追加して、コレクターをホストにデプロイできます。",
+    "getting_started_self_managed": "コレクターは、収集したデータを受信するために取り込みエンドポイントが必要です。以下で HTTP エンドポイントを設定して保存すると、コレクターインフラストラクチャが初期化されます。セットアップ後、フリートを作成し、ソースを追加して、コレクターをホストにデプロイできます。",
     "ingest_endpoint": "取り込みエンドポイント",
-    "ingest_endpoint_cloud": "取り込みエンドポイントはシステムによって管理されます。Collectors はここに自動的に接続します。",
-    "ingest_endpoint_help": "取り込みエンドポイントは、OpenTelemetry (OTLP) を介して Collectors からログデータを受信します。マネージド Collectors にデータの送信先として通知される外部アドレスです。実行中の Collector 取り込み入力に到達する必要があります。通常は、ロードバランサーまたはサーバー自体のアドレスです。",
-    "hostname_help": "Collectors が接続に使用するホスト名または IP アドレスです。Collector ホストから到達可能である必要があります。",
+    "ingest_endpoint_cloud": "取り込みエンドポイントはシステムによって管理されます。コレクターはここに自動的に接続します。",
+    "ingest_endpoint_help": "取り込みエンドポイントは、OpenTelemetry (OTLP) を介してコレクターからログデータを受信します。マネージドコレクターにデータの送信先として通知される外部アドレスです。実行中のコレクター取り込み入力に到達する必要があります。通常は、ロードバランサーまたはサーバー自体のアドレスです。",
+    "hostname_help": "コレクターが接続に使用するホスト名または IP アドレスです。コレクターホストから到達可能である必要があります。",
     "create_input": "取り込み入力を作成",
-    "lifecycle": "Collector のライフサイクル",
+    "lifecycle": "コレクターのライフサイクル",
     "offline_threshold": "オフラインのしきい値",
-    "offline_threshold_help": "この時間内にレポートしなかった Collectors は、オフラインとして表示されます。",
+    "offline_threshold_help": "この時間内にレポートしなかったコレクターは、オフラインとして表示されます。",
     "default_visibility": "既定の表示設定",
-    "default_visibility_help": "この時間内にレポートしなかった Collectors は、既定のビューから非表示になります。ユーザーはインスタンステーブルでこのフィルターを調整または削除できます。",
+    "default_visibility_help": "この時間内にレポートしなかったコレクターは、既定のビューから非表示になります。ユーザーはインスタンステーブルでこのフィルターを調整または削除できます。",
     "expiration_threshold": "有効期限のしきい値",
-    "expiration_threshold_help": "この時間内にレポートしなかった Collectors は、完全に削除されます。",
+    "expiration_threshold_help": "この時間内にレポートしなかったコレクターは、完全に削除されます。",
     "confirm": "設定を確定"
   },
   "ingest_inputs": {
     "title": "取り込み入力",
-    "none": "Collector の取り込み入力が存在しません。入力が作成されるまで、Collectors はデータを送信できません。",
-    "unreadable_other": "{{count}} 件の Collector の取り込み入力が存在しますが、それらを表示する権限がありません。",
-    "none_running": "Collector の取り込み入力は存在しますが、現在実行中のものはありません。Collectors はデータを送信できません。",
+    "none": "コレクターの取り込み入力が存在しません。入力が作成されるまで、コレクターはデータを送信できません。",
+    "unreadable_other": "{{count}} 件のコレクターの取り込み入力が存在しますが、それらを表示する権限がありません。",
+    "none_running": "コレクターの取り込み入力は存在しますが、現在実行中のものはありません。コレクターはデータを送信できません。",
     "name": "名前",
     "status": "ステータス",
     "bind_address": "バインドアドレス",
@@ -436,7 +436,7 @@
     "additional_unreadable_other": "権限のため表示されない追加の入力が {{count}} 件あります。"
   },
   "port_mismatch": {
-    "message_other": "Collector の取り込み入力が異なるポート（{{ports}}）に存在します。外部ポートが入力のポートと異なる場合は、ネットワークがトラフィックを正しくルーティングしていることを確認してください。"
+    "message_other": "コレクターの取り込み入力が異なるポート（{{ports}}）に存在します。外部ポートが入力のポートと異なる場合は、ネットワークがトラフィックを正しくルーティングしていることを確認してください。"
   },
   "source_types": {
     "file": "ファイル",
@@ -453,10 +453,10 @@
     "read_mode_end": "末尾から (tail)",
     "read_mode_beginning": "先頭から",
     "file_paths": "ファイルパス",
-    "file_paths_help": "グロブパターンに対応しています (例: /var/log/*.log, /var/log/**/*.log)。Collector は一致したファイルに新しい行がないか監視します。",
+    "file_paths_help": "グロブパターンに対応しています (例: /var/log/*.log, /var/log/**/*.log)。コレクターは一致したファイルに新しい行がないか監視します。",
     "read_mode": "読み取りモード",
-    "read_mode_file_help": "末尾から: Collector の起動後に追加された新しい行のみを収集します。先頭から: 既存のすべての行を先に収集し、その後は末尾の監視を続けます。",
-    "read_mode_journald_help": "末尾から: Collector の起動後に追加された新しいエントリのみを収集します。先頭から: 既存のすべてのエントリを先に収集し、その後は末尾の監視を続けます。",
+    "read_mode_file_help": "末尾から: コレクターの起動後に追加された新しい行のみを収集します。先頭から: 既存のすべての行を先に収集し、その後は末尾の監視を続けます。",
+    "read_mode_journald_help": "末尾から: コレクターの起動後に追加された新しいエントリのみを収集します。先頭から: 既存のすべてのエントリを先に収集し、その後は末尾の監視を続けます。",
     "priority": "優先度",
     "priority_help": "収集する最低の重要度です。たとえば「エラー」を選択すると、重大、アラート、緊急のエントリも収集されます。",
     "priority_emerg": "緊急",
@@ -476,18 +476,18 @@
     "predicate": "述語",
     "predicate_help": "<code>log</code> コマンドに渡される、任意の macOS 統合ロギング用のフィルター述語です。空のままにすると、システムのすべてのログが収集されます。<code>info</code> および <code>debug</code> レベルは、ノイズが多く価値のある情報がほとんどないため、現在収集されません。例: <code>{{example}}</code>",
     "max_poll_interval": "最大ポーリング間隔",
-    "max_poll_interval_help": "Collector が新しいログエントリを確認する頻度です。1 秒以上である必要があります。",
+    "max_poll_interval_help": "コレクターが新しいログエントリを確認する頻度です。1 秒以上である必要があります。",
     "max_log_age": "最大ログ保持期間",
     "max_log_age_help": "初回起動時に、どこまで遡ってログを取り込むかを指定します。0 に設定すると、遡った取り込みを無効にします。",
     "edit_title": "ソースを編集",
     "new_title": "新しいソース",
-    "description": "ソースは、このフリートの Collectors が収集すべきデータを定義します。ソースタイプごとに異なる収集方法に対応しています。",
+    "description": "ソースは、このフリートのコレクターが収集すべきデータを定義します。ソースタイプごとに異なる収集方法に対応しています。",
     "source_type": "ソースタイプ",
     "file_type_help": "ホスト上のファイルからログ行を収集します。複数のファイルに一致させるためのグロブパターンに対応しています。",
     "journald_type_help": "systemd journal からエントリを収集します (Linux のみ)。",
     "windows_type_help": "Windows イベントビューアーのチャネルからイベントを収集します。",
     "macos_type_help": "<code>log</code> コマンドを介して macOS 統合ロギングシステムから収集します (macOS のみ)。",
-    "enabled_help": "無効にしたソースは Collectors に送信されません。ソースを削除せずに一時的に収集を停止するために使用します。",
+    "enabled_help": "無効にしたソースはコレクターに送信されません。ソースを削除せずに一時的に収集を停止するために使用します。",
     "update": "ソースを更新",
     "create": "ソースを作成"
   },
@@ -497,16 +497,16 @@
       "title": "最近のアクティビティを読み込めませんでした"
     },
     "input_ids": {
-      "message": "Collector の入力 ID の読み込みに失敗しました。ステータス:",
-      "title": "Collector の入力 ID を読み込めませんでした。"
+      "message": "コレクターの入力 ID の読み込みに失敗しました。ステータス:",
+      "title": "コレクターの入力 ID を読み込めませんでした。"
     },
     "stats": {
-      "message": "Collector の統計の読み込みに失敗しました。ステータス:",
-      "title": "Collector の統計を読み込めませんでした。"
+      "message": "コレクターの統計の読み込みに失敗しました。ステータス:",
+      "title": "コレクターの統計を読み込めませんでした。"
     },
     "config": {
-      "message": "Collectors の設定の読み込みに失敗しました。ステータス:",
-      "title": "Collectors の設定を読み込めませんでした。"
+      "message": "コレクターの設定の読み込みに失敗しました。ステータス:",
+      "title": "コレクターの設定を読み込めませんでした。"
     },
     "enrollment_tokens": {
       "message": "登録トークンの読み込みに失敗しました。ステータス:",
@@ -521,8 +521,8 @@
       "title": "インスタンスを読み込めませんでした"
     },
     "collector_instances": {
-      "message": "Collector インスタンスの読み込みに失敗しました。ステータス:",
-      "title": "Collector インスタンスを読み込めませんでした"
+      "message": "コレクターインスタンスの読み込みに失敗しました。ステータス:",
+      "title": "コレクターインスタンスを読み込めませんでした"
     },
     "fleets": {
       "message": "フリートの読み込みに失敗しました。ステータス:",
@@ -541,8 +541,8 @@
       "title": "ソースを読み込めませんでした"
     },
     "input_details": {
-      "message": "Collector の入力の詳細の読み込みに失敗しました。ステータス: {{error}}",
-      "title": "Collector の入力の詳細を読み込めませんでした。"
+      "message": "コレクターの入力の詳細の読み込みに失敗しました。ステータス: {{error}}",
+      "title": "コレクターの入力の詳細を読み込めませんでした。"
     }
   },
   "mutation_errors": {
@@ -591,16 +591,16 @@
       "title": "インスタンスを削除できませんでした"
     },
     "save_config": {
-      "message": "Collectors の設定の保存に失敗しました: {{error}}",
+      "message": "コレクターの設定の保存に失敗しました: {{error}}",
       "title": "設定を保存できませんでした"
     },
     "create_input": {
-      "message": "Collector の取り込み入力の作成に失敗しました: {{error}}",
-      "title": "Collector の取り込み入力を作成できませんでした"
+      "message": "コレクターの取り込み入力の作成に失敗しました: {{error}}",
+      "title": "コレクターの取り込み入力を作成できませんでした"
     },
     "update_input": {
-      "message": "Collector の取り込み入力の更新に失敗しました: {{error}}",
-      "title": "Collector の取り込み入力を更新できませんでした"
+      "message": "コレクターの取り込み入力の更新に失敗しました: {{error}}",
+      "title": "コレクターの取り込み入力を更新できませんでした"
     }
   },
   "notifications": {
@@ -615,9 +615,9 @@
     "enrollment_tokens_deleted": "登録トークンを削除しました。",
     "instances_reassigned": "インスタンスを再割り当てしました。",
     "instance_deleted": "インスタンスを削除しました。",
-    "config_saved": "Collectors の設定を保存しました。",
-    "input_created": "Collector の取り込み入力を作成しました。",
-    "input_moved": "Collector の取り込み入力を新しいポートに移動しました。"
+    "config_saved": "コレクターの設定を保存しました。",
+    "input_created": "コレクターの取り込み入力を作成しました。",
+    "input_moved": "コレクターの取り込み入力を新しいポートに移動しました。"
   },
   "datanode": {
     "compatibility_check": {
@@ -1071,7 +1071,7 @@
     }
   },
   "use_collector_configurations_notifications": {
-    "fetch_failed": "Collector の設定の取得に失敗しました。ステータス: {{error}}",
+    "fetch_failed": "コレクターの設定の取得に失敗しました。ステータス: {{error}}",
     "fetch_failed_title": "設定を取得できませんでした",
     "fetch_configuration_failed": "設定の取得に失敗しました。ステータス: {{error}}",
     "configuration_not_found": "ID <{{configurationId}}> の設定が見つかりません。削除されていないかご確認ください。",
@@ -1094,20 +1094,20 @@
     "validate_failed_title": "設定を検証できませんでした"
   },
   "use_collectors_notifications": {
-    "fetch_failed": "Collectors の取得に失敗しました。ステータス: {{error}}",
-    "fetch_failed_title": "Collectors を取得できませんでした",
-    "not_found": "ID <{{collectorId}}> の Collector が見つかりません。削除されていないかご確認ください。",
-    "fetch_collector_failed": "Collector の取得に失敗しました。ステータス: {{error}}",
-    "fetch_collector_failed_title": "Collector を取得できませんでした",
-    "created_success": "Collector を作成しました",
-    "updated_success": "Collector を更新しました",
-    "deleted_success": "Collector \"{{name}}\" を削除しました",
-    "delete_failed": "Collector の削除に失敗しました: {{error}}",
-    "delete_failed_title": "Collector \"{{name}}\" を削除できませんでした",
-    "copied_success": "Collector \"{{name}}\" をコピーしました",
-    "copy_failed": "Collector \"{{name}}\" の保存に失敗しました。ステータス: {{error}}",
-    "copy_failed_title": "Collector を保存できませんでした",
-    "validate_failed": "Collector \"{{name}}\" の検証に失敗しました。ステータス: {{error}}",
-    "validate_failed_title": "Collector を検証できませんでした"
+    "fetch_failed": "コレクターの取得に失敗しました。ステータス: {{error}}",
+    "fetch_failed_title": "コレクターを取得できませんでした",
+    "not_found": "ID <{{collectorId}}> のコレクターが見つかりません。削除されていないかご確認ください。",
+    "fetch_collector_failed": "コレクターの取得に失敗しました。ステータス: {{error}}",
+    "fetch_collector_failed_title": "コレクターを取得できませんでした",
+    "created_success": "コレクターを作成しました",
+    "updated_success": "コレクターを更新しました",
+    "deleted_success": "コレクター \"{{name}}\" を削除しました",
+    "delete_failed": "コレクターの削除に失敗しました: {{error}}",
+    "delete_failed_title": "コレクター \"{{name}}\" を削除できませんでした",
+    "copied_success": "コレクター \"{{name}}\" をコピーしました",
+    "copy_failed": "コレクター \"{{name}}\" の保存に失敗しました。ステータス: {{error}}",
+    "copy_failed_title": "コレクターを保存できませんでした",
+    "validate_failed": "コレクター \"{{name}}\" の検証に失敗しました。ステータス: {{error}}",
+    "validate_failed_title": "コレクターを検証できませんでした"
   }
 }

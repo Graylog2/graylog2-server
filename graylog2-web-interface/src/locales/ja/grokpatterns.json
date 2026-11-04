@@ -1,6 +1,6 @@
 {
   "title": "Grok パターン",
-  "delete_confirmation": "Grok パターン {{name}} を本当に削除しますか？\nシステムから削除され、どの Extractor でも使用できなくなります。まだ Extractor で使用されている場合、それらは動作しなくなります。",
+  "delete_confirmation": "Grok パターン {{name}} を本当に削除しますか？\nシステムから削除され、どのエクストラクターでも使用できなくなります。まだエクストラクターで使用されている場合、それらは動作しなくなります。",
   "delete": "削除",
   "header_name": "名前",
   "header_pattern": "パターン",

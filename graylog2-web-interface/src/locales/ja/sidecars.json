@@ -12,7 +12,7 @@
     "collectors_administration_actions": {
       "assign_configurations": "設定を割り当て",
       "cannot_change_configurations": "{{collectors}} 個のコレクターの設定を同時に変更することはできません。",
-      "incompatible_collectors": "互換性のないコレクターです。Sidecar の設定を確認してください。"
+      "incompatible_collectors": "互換性のないコレクターです。サイドカーの設定を確認してください。"
     },
     "collectors_administration_filters": {
       "collector": "コレクター",
@@ -31,13 +31,13 @@
       "no_configurations": "選択したログコレクターに利用できる設定がありません。",
       "remove": "{{name}} を削除",
       "selected": "{{name}} が選択されています",
-      "sidecar_count_other": "Sidecar {{count}} 件: ",
+      "sidecar_count_other": "サイドカー {{count}} 件: ",
       "title": "<collectorName>{{name}}</collectorName> の設定を編集",
       "unknown_collector": "不明なコレクター"
     },
     "configuration_summary": {
       "confirm": "<summaryText>{{summary}}</summaryText> に対してこの操作を実行してもよろしいですか？",
-      "sidecars_summary_other": "Sidecar {{count}} 件",
+      "sidecars_summary_other": "サイドカー {{count}} 件",
       "title": "設定の概要"
     },
     "filters_summary": {
@@ -60,14 +60,14 @@
         "stop": "設定のないコレクターを停止しても効果はありません。"
       },
       "summary": {
-        "restart_other": "これらの Sidecar にあるログコレクターを <action>再起動</action>します:",
-        "start_other": "これらの Sidecar にあるログコレクターを <action>開始</action>します:",
-        "stop_other": "これらの Sidecar にあるログコレクターを <action>停止</action>します:"
+        "restart_other": "これらのサイドカーにあるログコレクターを <action>再起動</action>します:",
+        "start_other": "これらのサイドカーにあるログコレクターを <action>開始</action>します:",
+        "stop_other": "これらのサイドカーにあるログコレクターを <action>停止</action>します:"
       },
       "summary_title": "プロセス操作の概要",
       "title": "コレクターのプロセスを管理",
       "understood": "理解しました。それでも続行",
-      "warning_text": "選択したコレクターの少なくとも 1 つはまだ設定されていません。新しいコレクターを開始するには、設定を割り当ててください。Sidecar がプロセスを開始します。",
+      "warning_text": "選択したコレクターの少なくとも 1 つはまだ設定されていません。新しいコレクターを開始するには、設定を割り当ててください。サイドカーがプロセスを開始します。",
       "warning_title": "設定のないコレクター"
     }
   },
@@ -83,14 +83,14 @@
     },
     "save": "保存",
     "sidecar_search_form": {
-      "field_last_seen": "Sidecar が {{productName}} と最後に通信した日時",
-      "field_node_id": "Sidecar の識別子",
-      "field_operating_system": "Sidecar が実行されている OS",
-      "field_sidecar_version": "Sidecar のバージョン",
-      "field_status": "一覧に表示される Sidecar のステータス（実行中、失敗、不明など）",
-      "last_seen_example": "特定の日付以降に通信していない Sidecar を検索:",
-      "placeholder": "Sidecar を検索",
-      "status_example": "ステータスが <code>failing</code> または <code>unknown</code> の Sidecar を検索:"
+      "field_last_seen": "サイドカーが {{productName}} と最後に通信した日時",
+      "field_node_id": "サイドカーの識別子",
+      "field_operating_system": "サイドカーが実行されている OS",
+      "field_sidecar_version": "サイドカーのバージョン",
+      "field_status": "一覧に表示されるサイドカーのステータス（実行中、失敗、不明など）",
+      "last_seen_example": "特定の日付以降に通信していないサイドカーを検索:",
+      "placeholder": "サイドカーを検索",
+      "status_example": "ステータスが <code>failing</code> または <code>unknown</code> のサイドカーを検索:"
     }
   },
   "configuration_forms": {
@@ -130,7 +130,7 @@
       "name_help": "必須。この設定の名前",
       "preview": "プレビュー",
       "tags": "設定の割り当てタグ",
-      "tags_help": "一致するタグが設定された Sidecar には、この設定が自動的に適用されます。",
+      "tags_help": "一致するタグが設定されたサイドカーには、この設定が自動的に適用されます。",
       "template": "設定",
       "template_help": "必須。コレクターの設定です。詳細はクイックリファレンスを参照してください。",
       "template_required": "設定の項目を入力してください。",
@@ -142,7 +142,7 @@
       "filebeat_reference": "Filebeat リファレンス",
       "nxlog_reference": "NXLog リファレンスマニュアル",
       "reference_help": "コレクター設定のテンプレートを用意しています。<lineBreak/>詳細は、お使いのコレクターの公式ドキュメントを参照してください。",
-      "runtime_variables_help": "これらの変数には、各 Sidecar の実行時情報が設定されます。",
+      "runtime_variables_help": "これらの変数には、各サイドカーの実行時情報が設定されます。",
       "tab_reference": "リファレンス",
       "tab_runtime_variables": "実行時変数",
       "tab_variables": "変数",
@@ -188,19 +188,19 @@
     "templates_helper": {
       "description": "説明",
       "name": "名前",
-      "node_id": "Sidecar の UUID です。",
-      "node_name": "Sidecar の名前です。未設定の場合はホスト名になります。",
-      "operating_system": "Sidecar が実行されている OS の名前（例: <code>\"Linux\", \"Windows\"</code>）",
-      "sidecar_version": "実行中の Sidecar のバージョン文字列です。",
+      "node_id": "サイドカーの UUID です。",
+      "node_name": "サイドカーの名前です。未設定の場合はホスト名になります。",
+      "operating_system": "サイドカーが実行されている OS の名前（例: <code>\"Linux\", \"Windows\"</code>）",
+      "sidecar_version": "実行中のサイドカーのバージョン文字列です。",
       "spool_dir": "設定ごとに固有のディレクトリで、コレクターのデータを保存するために使用できます。",
-      "tags": "Sidecar に設定されたタグのマップです。条件付きの設定スニペットの生成に使用できます。例:"
+      "tags": "サイドカーに設定されたタグのマップです。条件付きの設定スニペットの生成に使用できます。例:"
     }
   },
   "configurations": {
     "collector_list": {
       "actions": "操作",
       "create_collector": "ログコレクターを作成",
-      "description": "Sidecar と Web インターフェースを通じて設定および監視できるログコレクターを管理します。",
+      "description": "サイドカーと Web インターフェースを通じて設定および監視できるログコレクターを管理します。",
       "name": "名前",
       "no_data": "表示するログコレクターがありません。作成してみてはいかがですか？",
       "operating_system": "オペレーティングシステム",
@@ -237,15 +237,15 @@
         "collector": "コレクター",
         "error_message": "エラーメッセージ",
         "last_seen": "最終確認",
-        "sidecar": "Sidecar",
+        "sidecar": "サイドカー",
         "status": "ステータス",
         "verbose_message": "詳細メッセージ"
       },
-      "hide_inactive_sidecars": "非アクティブな Sidecar を非表示",
-      "include_inactive_hint": "、または「非アクティブな Sidecar を含める」をクリックしてください",
-      "include_inactive_sidecars": "非アクティブな Sidecar を含める",
-      "no_failures": "失敗が発生している Sidecar はありません。",
-      "no_matching_sidecars": "検索条件に一致する、失敗が発生している Sidecar はありません。検索フィルターを調整してください: {{query}} {{inactiveHint}}"
+      "hide_inactive_sidecars": "非アクティブなサイドカーを非表示",
+      "include_inactive_hint": "、または「非アクティブなサイドカーを含める」をクリックしてください",
+      "include_inactive_sidecars": "非アクティブなサイドカーを含める",
+      "no_failures": "失敗が発生しているサイドカーはありません。",
+      "no_matching_sidecars": "検索条件に一致する、失敗が発生しているサイドカーはありません。検索フィルターを調整してください: {{query}} {{inactiveHint}}"
     },
     "rows": {
       "inactive_annotation": "（非アクティブ）",
@@ -254,44 +254,44 @@
     }
   },
   "basic_sidecar_user": {
-    "load_failed": "Sidecar ユーザーの読み込みに失敗しました。ステータス: {{error}}",
-    "load_failed_title": "Sidecar ユーザーを読み込めませんでした"
+    "load_failed": "サイドカーユーザーの読み込みに失敗しました。ステータス: {{error}}",
+    "load_failed_title": "サイドカーユーザーを読み込めませんでした"
   },
   "sidecar_status_file_list": {
     "filter_files": "ファイルをフィルター"
   },
   "sidecars": {
     "sidecar_list": {
-      "hide_inactive_sidecars": "非アクティブな Sidecar を非表示",
-      "include_inactive_hint": "、または「非アクティブな Sidecar を含める」をクリックしてください",
-      "include_inactive_sidecars": "非アクティブな Sidecar を含める",
+      "hide_inactive_sidecars": "非アクティブなサイドカーを非表示",
+      "include_inactive_hint": "、または「非アクティブなサイドカーを含める」をクリックしてください",
+      "include_inactive_sidecars": "非アクティブなサイドカーを含める",
       "last_seen": "最終確認",
       "name": "名前",
-      "no_matching_sidecars": "検索条件に一致する Sidecar はありません。検索フィルターを調整してください{{inactiveHint}}。",
-      "no_sidecars": "設定されている Sidecar はありません。",
+      "no_matching_sidecars": "検索条件に一致するサイドカーはありません。検索フィルターを調整してください{{inactiveHint}}。",
+      "no_sidecars": "設定されているサイドカーはありません。",
       "node_id": "ノード ID",
       "operating_system": "オペレーティングシステム",
-      "sidecar_version": "Sidecar のバージョン",
+      "sidecar_version": "サイドカーのバージョン",
       "status": "ステータス"
     },
     "sidecar_row": {
       "inactive_annotation": "（非アクティブ）",
-      "manage_sidecar": "Sidecar を管理",
+      "manage_sidecar": "サイドカーを管理",
       "show_messages": "メッセージを表示"
     },
     "sidecar_status": {
       "collector_running": "コレクターは実行中です。",
       "collector_unknown": "コレクターのステータスは現在不明です。",
       "collectors_status_title": "コレクターのステータス",
-      "collectors_status_unavailable": "コレクターのステータスは現在利用できません。しばらく待ってから、Sidecar がサーバーに正しく接続されているか確認してください。",
+      "collectors_status_unavailable": "コレクターのステータスは現在利用できません。しばらく待ってから、サイドカーがサーバーに正しく接続されているか確認してください。",
       "cpu_idle": "CPU アイドル",
       "ip_address": "IP アドレス",
       "load": "負荷",
       "log_files_title": "ログファイル",
       "node_details_title": "ノードの詳細",
-      "node_details_unavailable": "ノードの詳細は現在利用できません。しばらく待ってから、Sidecar がサーバーに正しく接続されているか確認してください。",
-      "no_collectors": "この Sidecar に設定されたコレクターはありません。",
-      "no_status_received": "コレクターのステータスを受信していません。この情報を表示するには、Sidecar の設定で <code>send_status: true</code> を設定してください。",
+      "node_details_unavailable": "ノードの詳細は現在利用できません。しばらく待ってから、サイドカーがサーバーに正しく接続されているか確認してください。",
+      "no_collectors": "このサイドカーに設定されたコレクターはありません。",
+      "no_status_received": "コレクターのステータスを受信していません。この情報を表示するには、サイドカーの設定で <code>send_status: true</code> を設定してください。",
       "none": "なし",
       "not_available": "利用できません",
       "operating_system": "オペレーティングシステム",
@@ -311,10 +311,10 @@
       "title": "コレクター管理"
     },
     "configuration": {
-      "description": "Collector Sidecar は、お使いのログコレクターと並行して動作し、設定を自動で行います。ここでは Sidecar の設定を管理できます。",
+      "description": "Collector Sidecar は、お使いのログコレクターと並行して動作し、設定を自動で行います。ここではサイドカーの設定を管理できます。",
       "title": "コレクター設定"
     },
-    "documentation_title": "Sidecar のドキュメント",
+    "documentation_title": "サイドカーのドキュメント",
     "edit_collector": {
       "description": "ログコレクターについての説明です。",
       "title": "ログコレクター"
@@ -324,8 +324,8 @@
       "title": "コレクター設定"
     },
     "failure_tracking": {
-      "description": "Sidecar の失敗追跡では、失敗の理由に関する追加情報を確認できます。トラブルシューティングの時間を短縮し、コレクターをより早くオンラインに戻すのに役立ちます。",
-      "document_title": "Sidecar",
+      "description": "サイドカーの失敗追跡では、失敗の理由に関する追加情報を確認できます。トラブルシューティングの時間を短縮し、コレクターをより早くオンラインに戻すのに役立ちます。",
+      "document_title": "サイドカー",
       "title": "失敗の追跡"
     },
     "new_collector": {
@@ -337,17 +337,17 @@
       "title": "新しいコレクター設定"
     },
     "overview": {
-      "description": "Sidecar は、サーバーのログファイルや Windows EventLog の内容を確実に転送できます。",
-      "document_title": "Sidecar",
-      "title": "Sidecar の概要",
-      "token_hint": "Sidecar 用の API トークンが必要ですか？ <tokenLink><em>{{username}}</em> ユーザーのトークンを作成するか、既存のトークンを再利用します</tokenLink>"
+      "description": "サイドカーは、サーバーのログファイルや Windows EventLog の内容を確実に転送できます。",
+      "document_title": "サイドカー",
+      "title": "サイドカーの概要",
+      "token_hint": "サイドカー用の API トークンが必要ですか？ <tokenLink><em>{{username}}</em> ユーザーのトークンを作成するか、既存のトークンを再利用します</tokenLink>"
     },
     "status": {
-      "description": "Sidecar のステータスの概要です。",
-      "document_title": "Sidecar のステータス",
-      "document_title_named": "Sidecar {{name}} のステータス",
-      "documentation_title": "Sidecar のドキュメント",
-      "title": "Sidecar <em>{{name}} のステータス</em>"
+      "description": "サイドカーのステータスの概要です。",
+      "document_title": "サイドカーのステータス",
+      "document_title_named": "サイドカー {{name}} のステータス",
+      "documentation_title": "サイドカーのドキュメント",
+      "title": "サイドカー <em>{{name}} のステータス</em>"
     }
   },
   "notifications": {
@@ -365,20 +365,20 @@
     "configurations_fetch_failed": "この変数の設定の取得に失敗しました。ステータス: {{error}}"
   },
   "use_sidecars_notifications": {
-    "fetch_failed": "Sidecar の取得に失敗しました。ステータス: {{error}}",
-    "fetch_failed_title": "Sidecar を取得できませんでした",
-    "not_found": "ID <{{sidecarId}}> の Sidecar が見つかりません。長時間非アクティブだった可能性があります。",
-    "fetch_actions_failed": "Sidecar の操作の取得に失敗しました。ステータス: {{error}}",
-    "fetch_actions_failed_title": "Sidecar の操作を取得できませんでした",
-    "restart_failed": "Sidecar の再起動に失敗しました。ステータス: {{error}}",
-    "restart_failed_title": "Sidecar を再起動できませんでした",
+    "fetch_failed": "サイドカーの取得に失敗しました。ステータス: {{error}}",
+    "fetch_failed_title": "サイドカーを取得できませんでした",
+    "not_found": "ID <{{sidecarId}}> のサイドカーが見つかりません。長時間非アクティブだった可能性があります。",
+    "fetch_actions_failed": "サイドカーの操作の取得に失敗しました。ステータス: {{error}}",
+    "fetch_actions_failed_title": "サイドカーの操作を取得できませんでした",
+    "restart_failed": "サイドカーの再起動に失敗しました。ステータス: {{error}}",
+    "restart_failed_title": "サイドカーを再起動できませんでした",
     "configuration_change_requested": "{{amount}} 個のコレクターの設定変更を要求しました",
-    "fetch_sidecars_failed": "Sidecar の取得に失敗しました。ステータス: {{error}}",
-    "fetch_sidecars_failed_title": "Sidecar を取得できませんでした"
+    "fetch_sidecars_failed": "サイドカーの取得に失敗しました。ステータス: {{error}}",
+    "fetch_sidecars_failed_title": "サイドカーを取得できませんでした"
   },
   "use_sidecars_administration_notifications": {
-    "fetch_sidecars_failed": "Sidecar の取得に失敗しました。ステータス: {{error}}",
-    "fetch_sidecars_failed_title": "Sidecar を取得できませんでした",
+    "fetch_sidecars_failed": "サイドカーの取得に失敗しました。ステータス: {{error}}",
+    "fetch_sidecars_failed_title": "サイドカーを取得できませんでした",
     "requested": {
       "start": "{{amount}} 個のコレクターの開始を要求しました",
       "restart": "{{amount}} 個のコレクターの再起動を要求しました",

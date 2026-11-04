@@ -339,8 +339,8 @@
     "select_value": "{{type, lowercase}}を選択",
     "entity": "項目",
     "types": {
-      "dashboard": "Dashboard",
-      "stream": "Stream",
+      "dashboard": "ダッシュボード",
+      "stream": "ストリーム",
       "search": "検索"
     },
     "new_search": "新規検索",

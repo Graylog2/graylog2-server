@@ -1,13 +1,13 @@
 {
   "destination_permission_alert": {
     "data_lake": "現在、Data Lake の宛先を表示または管理する権限がありません。",
-    "index_set": "現在、Index Set の宛先を表示または管理する権限がありません。",
+    "index_set": "現在、インデックスセットの宛先を表示または管理する権限がありません。",
     "outputs": "現在、Outputs の宛先を表示または管理する権限がありません。"
   },
   "index_set_select": {
-    "help": "このストリームに一致するメッセージは、設定された Index Set に書き込まれます。",
-    "label": "Index Set",
-    "placeholder": "Index Set を選択"
+    "help": "このストリームに一致するメッセージは、設定されたインデックスセットに書き込まれます。",
+    "label": "インデックスセット",
+    "placeholder": "インデックスセットを選択"
   },
   "matching_type": {
     "all": "メッセージは次のルールすべてに一致する必要があります",
@@ -60,7 +60,7 @@
       "header_status": "ステータス",
       "header_title": "タイトル",
       "info_data_lake": "次のフィルタールールの条件に一致するメッセージは、Data Lake にルーティングされません。",
-      "info_indexer": "次のフィルタールールの条件に一致するメッセージは、Index Set にルーティングされません。",
+      "info_indexer": "次のフィルタールールの条件に一致するメッセージは、インデックスセットにルーティングされません。",
       "no_filters": "フィルターが見つかりません。",
       "title": "フィルタールール"
     }
@@ -86,13 +86,13 @@
     "update_submit": "Output を更新"
   },
   "pipelines_connection_form": {
-    "edit_button": "Pipeline 接続を編集",
-    "help": "このストリームに接続する Pipeline を選択するか、<pipelinesLink>Pipeline ページ</pipelinesLink>で作成してください。",
-    "label": "Pipeline",
+    "edit_button": "パイプライン接続を編集",
+    "help": "このストリームに接続するパイプラインを選択するか、<pipelinesLink>パイプラインページ</pipelinesLink>で作成してください。",
+    "label": "パイプライン",
     "modal_title": "<streamLabel>ストリーム</streamLabel> の接続を編集",
-    "save_failed": "ストリームの Pipeline 接続の保存に失敗しました。ステータス: {{error}}",
-    "save_success": "ストリームの Pipeline 接続を保存しました。",
-    "save_title": "ストリームの Pipeline 接続を保存中。",
+    "save_failed": "ストリームのパイプライン接続の保存に失敗しました。ステータス: {{error}}",
+    "save_success": "ストリームのパイプライン接続を保存しました。",
+    "save_title": "ストリームのパイプライン接続を保存中。",
     "submit": "接続を更新"
   },
   "routing_destination": {
@@ -118,18 +118,18 @@
       "disabled": "無効",
       "enabled": "有効",
       "filters": "フィルター {{count}}",
-      "info": "<boldText>Search Cluster</boldText> にルーティングされたメッセージは検索可能になり、{{productName}} のライセンス使用量に含まれます。これらのメッセージは、保持ポリシーの条件を満たすまで定義済みの Index Set に保存されます。注: <boldText>Search Cluster</boldText> にルーティングされなかったメッセージは検索できません。",
-      "title": "Index Set",
-      "toggle_aria": "Index Set を切り替え"
+      "info": "<boldText>Search Cluster</boldText> にルーティングされたメッセージは検索可能になり、{{productName}} のライセンス使用量に含まれます。これらのメッセージは、保持ポリシーの条件を満たすまで定義済みのインデックスセットに保存されます。注: <boldText>Search Cluster</boldText> にルーティングされなかったメッセージは検索できません。",
+      "title": "インデックスセット",
+      "toggle_aria": "インデックスセットを切り替え"
     },
     "index_set_update": {
-      "button": "Index Set を編集",
-      "modal_title": "ストリームの Index Set を編集",
+      "button": "インデックスセットを編集",
+      "modal_title": "ストリームのインデックスセットを編集",
       "saving": "ストリームを保存中",
       "submit": "更新",
       "success_title": "成功",
-      "tooltip": "Index Set を編集",
-      "updated": "ストリーム '{{title}}' の Index Set を更新しました。"
+      "tooltip": "インデックスセットを編集",
+      "updated": "ストリーム '{{title}}' のインデックスセットを更新しました。"
     },
     "output_item": {
       "type": "（種類: {{type}}）"
@@ -150,7 +150,7 @@
   },
   "stream_details": {
     "back": "戻る",
-    "connected_pipelines_human_name": "Pipeline",
+    "connected_pipelines_human_name": "パイプライン",
     "connected_pipelines_title": "他のストリームからのルーティング",
     "data_routing": "データのルーティング",
     "destination_description": "宛先ページでは、このストリームのメッセージをルーティングする先を定義できます。ストリームには複数の宛先を設定できます。Data Lake のみにルーティングされたメッセージは、後で取得されない限りライセンス使用量に含まれません。宛先ごとにフィルターを適用し、その宛先が受信するメッセージの範囲を制限することもできます。",
@@ -158,10 +158,10 @@
     "edit_modal_title": "ストリームを編集",
     "heading": "ストリーム: {{title}}",
     "intake_description": "ストリームルールを使用すると、フィルターされたメッセージの一部を Input から直接このストリームに収集できます。ストリームルールは現在レガシー機能であり、ストリームのルーティングを管理するには Pipeline Rules の使用が推奨されます。",
-    "no_pipelines": "このストリームはどの Pipeline にも接続されていません。",
-    "pipeline_header": "Pipeline",
-    "processing_description": "Pipeline を使用すると、ストリームから届くメッセージを変換・処理できます。Pipeline はステージで構成され、各ステージでルールが評価・適用されます。メッセージは 1 つ以上のステージを通過できます。",
-    "processing_title": "Pipeline",
+    "no_pipelines": "このストリームはどのパイプラインにも接続されていません。",
+    "pipeline_header": "パイプライン",
+    "processing_description": "パイプラインを使用すると、ストリームから届くメッセージを変換・処理できます。パイプラインはステージで構成され、各ステージでルールが評価・適用されます。メッセージは 1 つ以上のステージを通過できます。",
+    "processing_title": "パイプライン",
     "rule_header": "ルール",
     "rules_info": "ストリームルールは、デフォルトの処理順序で最初に適用され、Input からのメッセージをストリームに振り分けるために使用されます。ストリームルールの条件に一致するメッセージは、このストリームに振り分けられます。",
     "rules_title": "ストリームルール",
@@ -177,7 +177,7 @@
   "stream_edit_page": {
     "default_stream_error": "デフォルトストリームは編集できません。",
     "description": "この画面では、ストリームルールを簡単かつ快適に作成・編集できます。設定したストリームルールがメッセージの一致にどのような影響を与えるかをここで確認できます。",
-    "documentation_link_title": "Streams ドキュメント",
+    "documentation_link_title": "ストリームドキュメント",
     "title": "ストリーム {{title}} のルール",
     "title_span": "ストリーム \"{{title}}\" のルール"
   },
@@ -188,8 +188,8 @@
     "delete_rule_failed": "ストリーム Output フィルタールールの削除に失敗しました。ステータス: {{error}}",
     "delete_rule_failed_title": "ストリーム Output フィルタールールを削除できませんでした",
     "delete_rule_success": "ストリーム Output フィルタールールを削除しました。",
-    "load_connected_pipelines_failed": "接続された Pipeline の読み込みに失敗しました。ステータス",
-    "load_connected_pipelines_failed_title": "接続された Pipeline を読み込めませんでした",
+    "load_connected_pipelines_failed": "接続されたパイプラインの読み込みに失敗しました。ステータス",
+    "load_connected_pipelines_failed_title": "接続されたパイプラインを読み込めませんでした",
     "load_output_filters_failed": "ストリーム Output フィルターの読み込みに失敗しました。ステータス",
     "load_output_filters_failed_title": "ストリーム Output フィルターを読み込めませんでした",
     "load_output_types_failed": "ストリーム Output の読み込みに失敗しました。ステータス",
@@ -210,7 +210,7 @@
   "stream_modal": {
     "description": "説明",
     "description_help": "このストリームにはどのような種類のメッセージがルーティングされますか？",
-    "index_set_required": "Index Set は必須です",
+    "index_set_required": "インデックスセットは必須です",
     "remove_matches_help": "このストリームに一致するメッセージを「Default Stream」に割り当てないでください。",
     "remove_matches_label": "「Default Stream」から一致するメッセージを削除",
     "share_description": "このストリームの共同編集者として追加するユーザーまたはチームを検索してください。",
@@ -330,20 +330,20 @@
       "view_routing": "ルーティング"
     },
     "bulk": {
-      "assign_failed": "Index Set の割り当てに失敗しました。ステータス: {{error}}",
+      "assign_failed": "インデックスセットの割り当てに失敗しました。ステータス: {{error}}",
       "assign_failed_title": "エラー",
-      "assign_help": "選択したストリームに一致するメッセージは、設定された Index Set に書き込まれます。",
-      "assign_index_set": "Index Set を割り当て",
-      "assign_loading": "Index Set を割り当て中...",
-      "assign_submit": "Index Set を割り当て",
-      "assign_success_other": "{{count}} 件のストリームに Index Set を割り当てました。",
-      "assign_title_other": "{{count}} 件のストリームに Index Set を割り当て",
+      "assign_help": "選択したストリームに一致するメッセージは、設定されたインデックスセットに書き込まれます。",
+      "assign_index_set": "インデックスセットを割り当て",
+      "assign_loading": "インデックスセットを割り当て中...",
+      "assign_submit": "インデックスセットを割り当て",
+      "assign_success_other": "{{count}} 件のストリームにインデックスセットを割り当てました。",
+      "assign_title_other": "{{count}} 件のストリームにインデックスセットを割り当て",
       "delete_confirm_other": "{{count}} 件のストリームを本当に削除しますか？この操作は元に戻せません。",
       "delete_error": "ストリームの削除中にエラーが発生しました。{{error}}",
       "failed_deleted_other": "選択した {{count}} 件のストリームのうち {{failed}} 件を削除できませんでした。",
       "failed_started_other": "選択した {{count}} 件のストリームのうち {{failed}} 件を開始できませんでした。",
       "failed_stopped_other": "選択した {{count}} 件のストリームのうち {{failed}} 件を停止できませんでした。",
-      "index_set_required": "Index Set は必須です",
+      "index_set_required": "インデックスセットは必須です",
       "search_in_streams": "ストリームで検索",
       "start_error": "ストリームの開始中にエラーが発生しました。{{error}}",
       "start_streams_other": "ストリームを開始",
@@ -365,9 +365,9 @@
     "columns": {
       "archiving": "アーカイブ",
       "destination_filters": "フィルタールール",
-      "index_set_title": "Index Set",
+      "index_set_title": "インデックスセット",
       "outputs": "Output",
-      "pipelines": "Pipeline",
+      "pipelines": "パイプライン",
       "rules": "ストリームルール",
       "throughput": "スループット"
     },
@@ -377,7 +377,7 @@
       "deleted": "{{id}}（削除済み）",
       "missing_permissions": "権限がありません",
       "destination_data_lake": "Data Lake",
-      "destination_index_set": "Index Set",
+      "destination_index_set": "インデックスセット",
       "destination_output": "Output",
       "filter_rules_header_destination": "宛先",
       "filter_rules_header_status": "ステータス",
@@ -385,15 +385,15 @@
       "filter_rules_summary_other": "すべての宛先に設定された {{count}} 件のフィルタールールを表示しています。",
       "manage_filter_rules": "フィルタールールを管理",
       "manage_outputs": "Output を管理",
-      "manage_pipelines": "Pipeline を管理",
+      "manage_pipelines": "パイプラインを管理",
       "manage_rules": "ルールを管理",
       "no_filter_rules": "フィルタールールが見つかりません。",
       "outputs_summary_other": "接続された Output が {{count}} 件あります。",
-      "pipelines_load_failed": "接続された Pipeline を読み込めませんでした。",
-      "pipelines_none": "このストリームに接続されている Pipeline はありません。",
+      "pipelines_load_failed": "接続されたパイプラインを読み込めませんでした。",
+      "pipelines_none": "このストリームに接続されているパイプラインはありません。",
       "quick_add_rule": "ルールをすばやく追加",
-      "routing_pipelines_load_failed": "ルーティング Pipeline を読み込めませんでした。",
-      "routing_pipelines_none": "このストリームにメッセージをルーティングしている Pipeline はありません。",
+      "routing_pipelines_load_failed": "ルーティングパイプラインを読み込めませんでした。",
+      "routing_pipelines_none": "このストリームにメッセージをルーティングしているパイプラインはありません。",
       "rules_summary_and_other": "設定された {{count}} 件のストリームルールすべてに一致する必要があります。",
       "rules_summary_or_other": "設定された {{count}} 件のストリームルールのうち少なくとも 1 つに一致する必要があります。"
     },
@@ -408,8 +408,8 @@
       "avg_processing_time_ms": "平均処理時間（過去 15 分）",
       "max_processing_time_ms": "最大処理時間（過去 15 分）",
       "message_count": "メッセージ数（過去 24 時間）",
-      "pipelines": "Pipeline",
-      "routing_pipelines": "ルーティング Pipeline"
+      "pipelines": "パイプライン",
+      "routing_pipelines": "ルーティングパイプライン"
     }
   },
   "streams_page": {
@@ -419,7 +419,7 @@
     "create_success_title": "成功",
     "create_title": "ストリームを作成",
     "description": "受信メッセージにルールを適用して、ストリームにルーティングできます。ストリームのルールに一致するメッセージはそのストリームにルーティングされます。1 つのメッセージを複数のストリームにルーティングすることもできます。",
-    "documentation_link_title": "Streams ドキュメント",
+    "documentation_link_title": "ストリームドキュメント",
     "title": "ストリーム"
   },
   "system_outputs": {

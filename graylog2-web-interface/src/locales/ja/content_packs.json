@@ -143,7 +143,7 @@
     "delete_confirmation": "このコンテンツパックを削除します。よろしいですか？",
     "delete_error_message": "バンドルの削除に失敗しました: {{error}}",
     "delete_success": "コンテンツパックを削除しました。",
-    "description": "コンテンツパックを使用すると、特定のデータソースのセットアップを効率化できます。コンテンツパックには Input/Extractor、Stream、Dashboard を含めることができます。",
+    "description": "コンテンツパックを使用すると、特定のデータソースのセットアップを効率化できます。コンテンツパックには Input/Extractor、ストリーム、ダッシュボードを含めることができます。",
     "install_error_message": "コンテンツパックのインストールに失敗しました。ステータス: {{status}}。ID {{id}} のコンテンツパックをインストールできませんでした",
     "install_success": "コンテンツパックをインストールしました。",
     "title": "コンテンツパック",
@@ -152,7 +152,7 @@
   "pages": {
     "back_button": "コンテンツパック",
     "create_title": "コンテンツパックを作成",
-    "description": "コンテンツパックを使用すると、特定のデータソースのセットアップを効率化できます。コンテンツパックには Input/Extractor、Stream、Dashboard を含めることができます。",
+    "description": "コンテンツパックを使用すると、特定のデータソースのセットアップを効率化できます。コンテンツパックには Input/Extractor、ストリーム、ダッシュボードを含めることができます。",
     "document_title": "コンテンツパック",
     "edit_title": "コンテンツパックを編集",
     "marketplace_prefix": "その他のコンテンツパックは次で探せます:"

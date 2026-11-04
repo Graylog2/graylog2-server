@@ -5,7 +5,8 @@ Terms used in the Japanese translations (`ja/*.json`), so the whole interface us
 ## Style
 
 - Use polite Japanese (です・ます style) for sentences; buttons and menu items use short noun/verb forms ("作成", "削除", "保存"). Write loanwords in katakana (サーバー, ユーザー, フィルター, データ, ファイル). Do not insert spaces between Japanese characters; use a space between Japanese text and Latin words/numbers only where natural. Use full-width punctuation (、。：（）) in Japanese sentences, but keep ASCII punctuation inside code, placeholders, URLs and numbers. Keyboard names: "Ctrl", "Shift". Japanese has no plural forms: only `_other` keys exist.
-- Keep product and feature names in English: Graylog, Enterprise, Data Lake, Security, Stream, Dashboard, Widget, Input, Output, Extractor, Pipeline, Sidecar, Content Pack, Index Set, Lookup Table, Collector, Fleet, Event Definition, Forwarder, Illuminate, Sigma, Watchlist, MITRE ATT&CK, Investigation, Asset, Detection Chain, Data Tiering, Input Profile, Content Hub, OpenSearch.
+- Keep brand and component names in English: Graylog, Enterprise, Data Lake, Data Node, Forwarder, Illuminate, Sigma, MITRE ATT&CK, Input Profile, Detection Chain, Data Tiering, Content Hub, Watchlist, OpenSearch, Event Definition, Investigation.
+- Common IT loanwords are written in katakana, consistently: パイプライン (Pipeline), サイドカー (Sidecar), コレクター (Collector), ストリーム (Stream), ダッシュボード (Dashboard), ウィジェット (Widget), エクストラクター (Extractor), フリート (Fleet), ルックアップテーブル (Lookup Table), インデックスセット (Index Set), コンテンツパック (Content Pack), アセット (Asset), アラート (Alert), イベント (Event). Keep a space between a Latin word and Japanese text, but not around katakana terms.
 - Translate only the value. Keep every `{{placeholder}}`, `<tag>` / `</tag>` and `<0>`-style Trans markers exactly as they are, plus technical identifiers in `backticks`.
 - `<empty>`-style values that look like tags may stay English (the helper treats them as tags).
 
