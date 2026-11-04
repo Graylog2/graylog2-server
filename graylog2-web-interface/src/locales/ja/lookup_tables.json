@@ -1,6 +1,6 @@
 {
   "title": "Lookup Tables",
-  "description": "Lookup Tables は、エクストラクター、コンバーター、処理パイプラインでメッセージフィールドの変換やメッセージの補完に使用できます。",
+  "description": "Lookup Tables は、エクストラクター、コンバーター、処理 Pipeline でメッセージフィールドの変換やメッセージの補完に使用できます。",
   "create_button": "Lookup Table を作成",
   "details_document_title": "Lookup Table の詳細",
   "details_page_title": "Lookup Tables の詳細",
@@ -21,7 +21,7 @@
   "loading_adapter": "データアダプターを読み込み中",
   "create_document_title": "Lookup Tables の作成",
   "create_page_title": "Lookup Tables の作成",
-  "create_description": "Lookup Tables は、エクストラクター、コンバーター、処理パイプラインでメッセージフィールドの変換やメッセージの補完に使用できます。",
+  "create_description": "Lookup Tables は、エクストラクター、コンバーター、処理 Pipeline でメッセージフィールドの変換やメッセージの補完に使用できます。",
   "loading_create": "読み込み中...",
   "cache_document_title": "Lookup Tables - キャッシュ",
   "cache_page_title": "Lookup Tables のキャッシュ",
@@ -224,8 +224,8 @@
     "result_title": "結果",
     "single_value_result": "単一値:",
     "multi_value_result": "複数値:",
-    "pipeline_rule_title": "パイプラインルール",
-    "pipeline_rule_intro": "これは、前の設定例のサンプルデータを使用するパイプラインルールの例です。"
+    "pipeline_rule_title": "Pipeline ルール",
+    "pipeline_rule_intro": "これは、前の設定例のサンプルデータを使用する Pipeline ルールの例です。"
   },
   "http_fields": {
     "url_validation": "ルックアップの URL。（テンプレートです。ドキュメントを参照してください）",

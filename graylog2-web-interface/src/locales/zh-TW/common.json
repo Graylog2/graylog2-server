@@ -420,7 +420,7 @@
       "intro": "GeoIP 資料適配器支援讀取 MaxMind 的 GeoIP2 資料庫。",
       "limitations_title": "限制",
       "limitations_supported": "目前支援 ASN、城市及國家資料庫。",
-      "limitations_more": "如需支援其他資料庫類型，請造訪我們的支援管道。",
+      "limitations_more": "如需支援其他資料庫類型，請造訪我們的支援 Pipeline。",
       "asn_fields": "ASN 資料庫欄位",
       "country_fields": "國家資料庫欄位",
       "city_fields": "城市資料庫欄位",
@@ -595,8 +595,8 @@
     "stream": "建立串流",
     "index_set": "建立 Index Set",
     "user": "建立使用者",
-    "pipeline": "建立管線",
-    "pipeline_rule": "建立管線規則",
+    "pipeline": "建立 Pipeline",
+    "pipeline_rule": "建立 Pipeline 規則",
     "content_pack": "建立內容套件",
     "fleet": "建立 Fleet"
   }

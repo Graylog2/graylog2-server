@@ -210,7 +210,7 @@
     "label_override_source": "ソースの上書き",
     "formatting": "フォーマット",
     "label_log_type": "ログタイプ",
-    "pipeline_hint": "ログを別の方法で解析する必要がある場合は、詳細と手順について <pipelineLink>パイプラインルール</pipelineLink> を確認してください。",
+    "pipeline_hint": "ログを別の方法で解析する必要がある場合は、詳細と手順について <pipelineLink>Pipeline ルール</pipelineLink> を確認してください。",
     "no_response": "Amazon からまだ応答を受信していません。"
   },
   "aws_kinesis_existing_streams": {
@@ -420,9 +420,9 @@
     "disabled": "無効",
     "modal_title": "脅威インテリジェンスプラグインの設定を更新",
     "tor_checkbox_label": "Tor 出口ノードのルックアップを許可しますか？",
-    "tor_checkbox_help": "有効にすると、グローバルパイプライン関数に Tor 出口ノードのルックアップが含まれます。無効にすると、データの更新も停止します。",
+    "tor_checkbox_help": "有効にすると、グローバル Pipeline 関数に Tor 出口ノードのルックアップが含まれます。無効にすると、データの更新も停止します。",
     "spamhaus_checkbox_label": "Spamhaus DROP/EDROP のルックアップを許可しますか？",
-    "spamhaus_checkbox_help": "有効にすると、グローバルパイプライン関数に Spamhaus のルックアップが含まれます。無効にすると、データの更新も停止します。"
+    "spamhaus_checkbox_help": "有効にすると、グローバル Pipeline 関数に Spamhaus のルックアップが含まれます。無効にすると、データの更新も停止します。"
   },
   "abusech_ransom_adapter_documentation": {
     "deprecation_title": "非推奨の警告",

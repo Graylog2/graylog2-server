@@ -595,8 +595,8 @@
     "stream": "ストリームを作成",
     "index_set": "Index Set を作成",
     "user": "ユーザーを作成",
-    "pipeline": "パイプラインを作成",
-    "pipeline_rule": "パイプラインルールを作成",
+    "pipeline": "Pipeline を作成",
+    "pipeline_rule": "Pipeline ルールを作成",
     "content_pack": "コンテンツパックを作成",
     "fleet": "フリートを作成"
   }

@@ -103,10 +103,10 @@
       "message_error_at_input_title": "Input でのメッセージエラー:",
       "message_error_at_input": "各 Input タイプは特定の形式のメッセージを受信することを想定しています。この形式に従わないメッセージは Input によって拒否される場合があり、その場合は処理に進みません。これを解決するには、送信されているメッセージを確認してください。より詳細なエラーは {{productName}} サーバーの server.log ファイルで確認できます。",
       "message_failed_to_process_title": "メッセージの処理に失敗:",
-      "message_failed_to_process": "Extractor や Pipeline を使用して、フィールドのパースなどのメッセージ処理を実行できます。無効な操作を実行しようとするパイプラインルール、またはフィールドのデータ型やフィールド長の上限と競合する形式にフィールドのプロパティを変更するパイプラインルールは、処理に失敗する場合があります。このように処理に失敗したメッセージは、Processing and Indexing Failures ストリームで確認できます。",
+      "message_failed_to_process": "Extractor や Pipeline を使用して、フィールドのパースなどのメッセージ処理を実行できます。無効な操作を実行しようとする Pipeline ルール、またはフィールドのデータ型やフィールド長の上限と競合する形式にフィールドのプロパティを変更する Pipeline ルールは、処理に失敗する場合があります。このように処理に失敗したメッセージは、Processing and Indexing Failures ストリームで確認できます。",
       "message_failed_to_index_title": "メッセージエラー:",
       "message_failed_to_index": "検索クラスター内では、メッセージはインデックスのスキーマに適合する場合にのみ保存できます。OpenSearch の各フィールドにはフィールドタイプと文字数の上限があり、いずれかを超えるとメッセージのインデックス登録に失敗します。このように失敗したメッセージは、Processing and Indexing Failures ストリームで確認できます。",
-      "received_message_count_by_stream": "このビューを使用すると、ストリームとパイプラインルールがこの Input からのメッセージをどこに振り分けているかを確認できます。メッセージは複数のストリームに複製される場合があり、その結果メッセージが複数のインデックスに保存されると、ライセンスの使用量も増える可能性があります。このビューは、そのような重複を検出するのに役立ちます。"
+      "received_message_count_by_stream": "このビューを使用すると、ストリームと Pipeline ルールがこの Input からのメッセージをどこに振り分けているかを確認できます。メッセージは複数のストリームに複製される場合があり、その結果メッセージが複数のインデックスに保存されると、ライセンスの使用量も増える可能性があります。このビューは、そのような重複を検出するのに役立ちます。"
     },
     "node": {
       "node_id": "ノード ID:",
@@ -171,22 +171,22 @@
     },
     "message_errors": {
       "title": "メッセージエラー",
-      "description": "メッセージは、Input、処理パイプライン、または検索クラスターへのインデックス登録時に処理に失敗する場合があります。",
+      "description": "メッセージは、Input、処理 Pipeline、または検索クラスターへのインデックス登録時に処理に失敗する場合があります。",
       "at_input": "Input でのメッセージエラー:",
       "failed_to_process": "メッセージの処理に失敗:",
       "failed_to_index": "メッセージのインデックス登録に失敗:"
     },
     "rules": {
-      "pipeline_rules_title": "Input がパイプラインルールに含まれています",
-      "pipeline_rules_description": "以下のパイプラインルールは、この Input を明示的に参照しています (例: from_input、from_forwarder_input、または gl2_source_input/gl2_forwarder_input との一致による)。",
-      "pipeline_rules_human_name": "パイプラインルール",
-      "pipeline_rules_search": "パイプラインルールを検索",
+      "pipeline_rules_title": "Input が Pipeline ルールに含まれています",
+      "pipeline_rules_description": "以下の Pipeline ルールは、この Input を明示的に参照しています (例: from_input、from_forwarder_input、または gl2_source_input/gl2_forwarder_input との一致による)。",
+      "pipeline_rules_human_name": "Pipeline ルール",
+      "pipeline_rules_search": "Pipeline ルールを検索",
       "stream_rules_title": "Input がストリームルールに含まれています",
       "stream_rules_description": "以下のストリームルールには、この Input を明示的に対象とする match input 関数が含まれています。match input 関数を明示的に使用せずに、この Input からメッセージを取り込む可能性のあるストリームルールは一覧に表示されません。",
       "stream_rules_human_name": "ストリームルール",
       "stream_rules_search": "ストリームルールを検索",
-      "load_pipeline_rules_failed": "Input のパイプラインルールの読み込みに失敗しました。ステータス:",
-      "could_not_load_pipeline_rules": "Input のパイプラインルールを読み込めませんでした",
+      "load_pipeline_rules_failed": "Input の Pipeline ルールの読み込みに失敗しました。ステータス:",
+      "could_not_load_pipeline_rules": "Input の Pipeline ルールを読み込めませんでした",
       "load_stream_rules_failed": "Input のストリームルールの読み込みに失敗しました。ステータス:",
       "could_not_load_stream_rules": "Input のストリームルールを読み込めませんでした"
     },
@@ -220,7 +220,7 @@
       "select_destination": "この Input からメッセージをルーティングする先のストリームを選択してください。",
       "recommend_new_stream": "<strong>新しい Input ごとに新しいストリームを作成することをお勧めします。</strong> これにより、メッセージを基本的なスキーマに分類しやすくなります。",
       "default_stream_fallback": "どのストリームにもルーティングされないメッセージは、<strong>Default Stream</strong> にルーティングされます。",
-      "pipeline_rules_info": "このウィザードでは、パイプラインルールを自動的に作成して <strong>Default Stream</strong> に関連付けることができます。これらのルールはシステム管理の Default Routing Pipeline に配置され、この Input の状態を正確に反映するように自動的に名前が変更される (または削除される) ようになります。",
+      "pipeline_rules_info": "このウィザードでは、Pipeline ルールを自動的に作成して <strong>Default Stream</strong> に関連付けることができます。これらのルールはシステム管理の Default Routing Pipeline に配置され、この Input の状態を正確に反映するように自動的に名前が変更される (または削除される) ようになります。",
       "new_stream_heading": "新しいストリームにルーティング",
       "recommended": "おすすめ!",
       "create_stream": "ストリームを作成",
@@ -229,7 +229,7 @@
       "create_new_stream": "新しいストリームを作成",
       "choose_existing_stream": "既存のストリームを選択",
       "existing_stream_selected": "この Input からのメッセージを既存のストリームにルーティングする設定が選択されています。",
-      "pipeline_rules_created": "<strong>Input を開始</strong> ボタンを押すと、パイプラインルールが作成されます。",
+      "pipeline_rules_created": "<strong>Input を開始</strong> ボタンを押すと、Pipeline ルールが作成されます。",
       "default_stream": "Default Stream",
       "remove_from_default": "「Default Stream」からの一致を削除",
       "remove_from_default_help": "このストリームに一致するメッセージを「Default Stream」に割り当てないでください。"
@@ -309,7 +309,7 @@
     "input_in_use": {
       "title": "Input はすでに使用中です - メッセージの重複リスク！",
       "stream_refs": "この Input は、次のストリームのストリームルール内ですでに参照されています:",
-      "pipeline_refs": "この Input は、次の Pipeline のパイプラインルール内ですでに参照されています:",
+      "pipeline_refs": "この Input は、次の Pipeline の Pipeline ルール内ですでに参照されています:",
       "prevent_duplication": "重複の可能性を防ぐため、続行する前に既存のルーティングをすべて削除してください。"
     },
     "index_set_alert": {

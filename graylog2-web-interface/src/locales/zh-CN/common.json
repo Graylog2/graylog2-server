@@ -595,8 +595,8 @@
     "stream": "创建数据流",
     "index_set": "创建索引集",
     "user": "创建用户",
-    "pipeline": "创建管道",
-    "pipeline_rule": "创建管道规则",
+    "pipeline": "创建 Pipeline",
+    "pipeline_rule": "创建 Pipeline 规则",
     "content_pack": "创建内容包",
     "fleet": "创建 Fleet"
   }

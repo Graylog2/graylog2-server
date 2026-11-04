@@ -156,7 +156,7 @@
   "Path to the TLS private key file": "TLS秘密鍵ファイルのパス",
   "Path to the YAML file containing Netflow 9 field definitions": "Netflow 9フィールド定義を含むYAMLファイルのパス",
   "Path to the value you want to extract from the JSON response. Take a look at the documentation for a more detailed explanation.": "JSONレスポンスから抽出したい値のパスです。詳しい説明はドキュメントを参照してください。",
-  "Pipeline": "パイプライン",
+  "Pipeline": "Pipeline",
   "Polling interval": "ポーリング間隔",
   "Port": "ポート",
   "Port of the AMQP broker to use": "使用するAMQPブローカーのポート",
@@ -277,6 +277,6 @@
   "Whether to send TCP keep alive packets": "TCPキープアライブパケットを送信するかどうか",
   "Whether to use Nagle's algorithm for TCP connections": "TCP接続でNagleのアルゴリズムを使用するかどうか",
   "Whether to verify peers when using TLS": "TLSを使用する際に通信相手を検証するかどうか",
-  "Which pipeline to use for message decoration": "メッセージの装飾に使用するパイプライン",
+  "Which pipeline to use for message decoration": "メッセージの装飾に使用する Pipeline",
   "ZooKeeper address (legacy mode only)": "ZooKeeperのアドレス（レガシーモードのみ）"
 }

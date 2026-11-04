@@ -156,7 +156,7 @@
   "Path to the TLS private key file": "TLS 私密金鑰檔案路徑",
   "Path to the YAML file containing Netflow 9 field definitions": "包含 Netflow 9 欄位定義的 YAML 檔案路徑",
   "Path to the value you want to extract from the JSON response. Take a look at the documentation for a more detailed explanation.": "要從 JSON 回應中擷取之值的路徑。請參閱文件以取得更詳細的說明。",
-  "Pipeline": "管線",
+  "Pipeline": "Pipeline",
   "Polling interval": "輪詢間隔",
   "Port": "連接埠",
   "Port of the AMQP broker to use": "要使用的 AMQP Broker 連接埠",
@@ -277,6 +277,6 @@
   "Whether to send TCP keep alive packets": "是否傳送 TCP keep alive 封包",
   "Whether to use Nagle's algorithm for TCP connections": "是否對 TCP 連線使用 Nagle 演算法",
   "Whether to verify peers when using TLS": "使用 TLS 時是否驗證對等端",
-  "Which pipeline to use for message decoration": "用於訊息裝飾的管線",
+  "Which pipeline to use for message decoration": "用於訊息裝飾的 Pipeline",
   "ZooKeeper address (legacy mode only)": "ZooKeeper 位址（僅限舊版模式）"
 }

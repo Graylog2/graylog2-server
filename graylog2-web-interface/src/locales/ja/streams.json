@@ -86,13 +86,13 @@
     "update_submit": "Output を更新"
   },
   "pipelines_connection_form": {
-    "edit_button": "パイプライン接続を編集",
-    "help": "このストリームに接続するパイプラインを選択するか、<pipelinesLink>パイプラインページ</pipelinesLink>で作成してください。",
-    "label": "パイプライン",
+    "edit_button": "Pipeline 接続を編集",
+    "help": "このストリームに接続する Pipeline を選択するか、<pipelinesLink>Pipeline ページ</pipelinesLink>で作成してください。",
+    "label": "Pipeline",
     "modal_title": "<streamLabel>ストリーム</streamLabel> の接続を編集",
-    "save_failed": "ストリームのパイプライン接続の保存に失敗しました。ステータス: {{error}}",
-    "save_success": "ストリームのパイプライン接続を保存しました。",
-    "save_title": "ストリームのパイプライン接続を保存中。",
+    "save_failed": "ストリームの Pipeline 接続の保存に失敗しました。ステータス: {{error}}",
+    "save_success": "ストリームの Pipeline 接続を保存しました。",
+    "save_title": "ストリームの Pipeline 接続を保存中。",
     "submit": "接続を更新"
   },
   "routing_destination": {
@@ -150,7 +150,7 @@
   },
   "stream_details": {
     "back": "戻る",
-    "connected_pipelines_human_name": "パイプライン",
+    "connected_pipelines_human_name": "Pipeline",
     "connected_pipelines_title": "他のストリームからのルーティング",
     "data_routing": "データのルーティング",
     "destination_description": "宛先ページでは、このストリームのメッセージをルーティングする先を定義できます。ストリームには複数の宛先を設定できます。Data Lake のみにルーティングされたメッセージは、後で取得されない限りライセンス使用量に含まれません。宛先ごとにフィルターを適用し、その宛先が受信するメッセージの範囲を制限することもできます。",
