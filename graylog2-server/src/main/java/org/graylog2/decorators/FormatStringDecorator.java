@@ -34,6 +34,7 @@ import org.graylog2.rest.resources.search.responses.SearchResponse;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
@@ -111,12 +112,14 @@ public class FormatStringDecorator implements SearchResponseDecorator {
     @WithSpan
     @Override
     public SearchResponse apply(SearchResponse searchResponse) {
+        final Map<String, Object> timeRange = TimeRangeTemplateContext.from(searchResponse);
         final List<ResultMessageSummary> summaries = searchResponse.messages().stream()
                 .map(summary -> {
-                    if (requireAllFields && !usedVariables.stream().allMatch(variable -> summary.message().containsKey(variable.name))) {
+                    if (requireAllFields && !hasAllMessageFields(summary.message())) {
                         return summary;
                     }
-                    final String formattedString = template.transform(summary.message(), Locale.ENGLISH);
+                    final Map<String, Object> model = TimeRangeTemplateContext.model(summary.message(), timeRange);
+                    final String formattedString = template.transform(model, Locale.ENGLISH);
 
                     if (formattedString == null) {
                         return summary;
@@ -129,5 +132,11 @@ public class FormatStringDecorator implements SearchResponseDecorator {
                 .collect(Collectors.toList());
 
         return searchResponse.toBuilder().messages(summaries).build();
+    }
+
+    private boolean hasAllMessageFields(Map<String, Object> messageFields) {
+        return usedVariables.stream()
+                .filter(variable -> !TimeRangeTemplateContext.isContextVariable(variable.name))
+                .allMatch(variable -> messageFields.containsKey(variable.name));
     }
 }
