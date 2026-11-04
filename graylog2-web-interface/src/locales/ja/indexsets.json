@@ -14,7 +14,13 @@
     "indices_info": {
       "summary": "{{count}} 個のインデックスで、合計 {{messageCount}} 件のメッセージを管理しています。現在の書き込み対象インデックスは <i>{{currentTarget}}</i> です。"
     },
-    "document_title": "Index Set - {{title}}"
+    "document_title": "Index Set - {{title}}",
+    "tiers": {
+      "hot_title": "Hot Tier",
+      "warm_title": "Warm Tier",
+      "hot_description": "このセクションのインデックスは、検索クラスター内のアクティブなシャードとして保存され、高速な取得と検索を可能にします。Hot Tierのデータは検索クラスターの Java ヒープメモリを常時消費し、過剰になると検索パフォーマンスが低下します。",
+      "warm_description": "このセクションのインデックスは、Warm Tierリポジトリ内の検索可能なスナップショットとして保存され、低コストで少ないリソースで保管できます。Warm Tierのデータの取得と検索は遅くなります。「Search」ロールを持つ検索ノードのみがWarm Tierの検索と取得に参加できる点にご注意ください。"
+    }
   },
   "indexers": {
     "cluster_health": {

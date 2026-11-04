@@ -116,7 +116,8 @@
   "expanded_notifications": {
     "description": "此 Event Definition 触发时发出的通知。",
     "loading": "正在加载通知...",
-    "missing_permissions": "缺少以下通知的权限："
+    "missing_permissions": "缺少以下通知的权限：",
+    "missing_permission_title": "缺少权限"
   },
   "field_form": {
     "add": "添加自定义字段",

@@ -14,7 +14,13 @@
     "indices_info": {
       "summary": "{{count}} Indizes mit insgesamt {{messageCount}} verwalteten Nachrichten, der aktuell beschreibbare Index ist <i>{{currentTarget}}</i>."
     },
-    "document_title": "Index-Set - {{title}}"
+    "document_title": "Index-Set - {{title}}",
+    "tiers": {
+      "hot_title": "Hot Tier",
+      "warm_title": "Warm Tier",
+      "hot_description": "Indizes in diesem Bereich werden als aktive Shards im Search-Cluster gespeichert und ermöglichen schnelles Abrufen und schnelle Suchen. Daten im Hot Tier belegen dauerhaft Java-Heap-Speicher des Search-Clusters und beeinträchtigen bei übermäßiger Menge die Suchleistung.",
+      "warm_description": "Indizes in diesem Bereich werden als durchsuchbare Snapshots im Warm-Tier-Repository gespeichert, was günstige Speicherung und geringen Ressourcenbedarf ermöglicht. Abruf und Suche von Daten im Warm Tier sind langsamer. Beachten Sie, dass nur Search-Nodes mit der Rolle „Search“ an der Suche und am Abruf im Warm Tier teilnehmen können."
+    }
   },
   "indexers": {
     "cluster_health.title": "{{distribution}}-Cluster",

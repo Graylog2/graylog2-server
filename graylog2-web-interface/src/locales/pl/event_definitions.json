@@ -143,7 +143,8 @@
   "expanded_notifications": {
     "description": "Powiadomienia uruchamiane, gdy ta definicja zdarzenia zostanie wyzwolona.",
     "loading": "Ładowanie powiadomień...",
-    "missing_permissions": "Brak uprawnień do powiadomień dla:"
+    "missing_permissions": "Brak uprawnień do powiadomień dla:",
+    "missing_permission_title": "Brak uprawnień"
   },
   "field_form": {
     "add": "Dodaj pole niestandardowe",

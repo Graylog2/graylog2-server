@@ -116,7 +116,8 @@
   "expanded_notifications": {
     "description": "このイベント定義がトリガーされたときに送信される通知です。",
     "loading": "通知を読み込み中...",
-    "missing_permissions": "次の通知権限がありません:"
+    "missing_permissions": "次の通知権限がありません:",
+    "missing_permission_title": "権限がありません"
   },
   "field_form": {
     "add": "カスタムフィールドを追加",

@@ -116,7 +116,8 @@
   "expanded_notifications": {
     "description": "此 Event Definition 觸發時所發送的通知。",
     "loading": "正在載入通知...",
-    "missing_permissions": "缺少以下通知的權限："
+    "missing_permissions": "缺少以下通知的權限：",
+    "missing_permission_title": "缺少權限"
   },
   "field_form": {
     "add": "新增自訂欄位",

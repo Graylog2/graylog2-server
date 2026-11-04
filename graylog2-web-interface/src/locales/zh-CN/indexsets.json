@@ -14,7 +14,13 @@
     "indices_info": {
       "summary": "共 {{count}} 个索引，总计管理 {{messageCount}} 条消息，当前写入活动索引为 <i>{{currentTarget}}</i>。"
     },
-    "document_title": "索引集 - {{title}}"
+    "document_title": "索引集 - {{title}}",
+    "tiers": {
+      "hot_title": "Hot Tier",
+      "warm_title": "Warm Tier",
+      "hot_description": "此部分的索引以活动分片形式存储在搜索集群中，便于快速检索和搜索。Hot Tier 中的数据会永久占用搜索集群的 Java 堆内存，数据过多将降低搜索性能。",
+      "warm_description": "此部分的索引以可搜索快照形式存储在 Warm Tier 存储库中，存储成本低、资源开销小。Warm Tier 中数据的检索和搜索速度较慢。请注意，只有具有“Search”角色的搜索节点才能参与 Warm Tier 的搜索和检索。"
+    }
   },
   "indexers": {
     "cluster_health": {

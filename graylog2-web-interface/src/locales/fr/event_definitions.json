@@ -134,7 +134,8 @@
   "expanded_notifications": {
     "description": "Notifications déclenchées lorsque cette définition d'événement se déclenche.",
     "loading": "Chargement des notifications...",
-    "missing_permissions": "Autorisations manquantes pour les notifications :"
+    "missing_permissions": "Autorisations manquantes pour les notifications :",
+    "missing_permission_title": "Autorisations manquantes"
   },
   "field_form": {
     "add": "Ajouter un champ personnalisé",

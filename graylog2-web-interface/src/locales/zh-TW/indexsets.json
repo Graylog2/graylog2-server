@@ -14,7 +14,13 @@
     "indices_info": {
       "summary": "共管理 {{count}} 個索引，總計 {{messageCount}} 則訊息，目前寫入中的索引為 <i>{{currentTarget}}</i>。"
     },
-    "document_title": "Index Set - {{title}}"
+    "document_title": "Index Set - {{title}}",
+    "tiers": {
+      "hot_title": "Hot Tier",
+      "warm_title": "Warm Tier",
+      "hot_description": "此區段的索引以作用中分片的形式儲存在搜尋叢集內，有助於快速擷取與搜尋。Hot Tier 中的資料會永久佔用搜尋叢集的 Java Heap 記憶體，過量時將降低搜尋效能。",
+      "warm_description": "此區段的索引以可搜尋快照的形式儲存在 Warm Tier 儲存庫中，儲存成本低且資源負擔小。Warm Tier 中資料的擷取與搜尋速度較慢。請注意，只有具備「Search」角色的搜尋節點才能參與 Warm Tier 的搜尋與擷取。"
+    }
   },
   "indexers": {
     "cluster_health": {

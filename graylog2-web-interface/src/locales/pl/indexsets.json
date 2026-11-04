@@ -14,7 +14,13 @@
     "indices_info": {
       "summary": "Indeksów: {{count}}, łączna liczba zarządzanych wiadomości: {{messageCount}}, aktualny indeks zapisu to <i>{{currentTarget}}</i>."
     },
-    "document_title": "Zestaw indeksów - {{title}}"
+    "document_title": "Zestaw indeksów - {{title}}",
+    "tiers": {
+      "hot_title": "Hot Tier",
+      "warm_title": "Warm Tier",
+      "hot_description": "Indeksy w tej sekcji są przechowywane jako aktywne shardy w klastrze wyszukiwania, co umożliwia szybkie pobieranie i wyszukiwanie. Dane w Hot Tier trwale zajmują pamięć Java Heap klastra wyszukiwania, a ich nadmiar obniża wydajność wyszukiwania.",
+      "warm_description": "Indeksy w tej sekcji są przechowywane jako przeszukiwalne snapshoty w repozytorium Warm Tier, co zapewnia tanie przechowywanie i niskie obciążenie zasobów. Pobieranie i wyszukiwanie danych w Warm Tier jest wolniejsze. Pamiętaj, że w wyszukiwaniu i pobieraniu danych z Warm Tier mogą uczestniczyć tylko węzły wyszukiwania z rolą \"Search\"."
+    }
   },
   "indexers": {
     "cluster_health": {

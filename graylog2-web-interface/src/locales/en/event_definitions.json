@@ -125,7 +125,8 @@
   "expanded_notifications": {
     "description": "Notifications fired when this event definition triggers.",
     "loading": "Loading notifications...",
-    "missing_permissions": "Missing Notifications Permissions for:"
+    "missing_permissions": "Missing Notifications Permissions for:",
+    "missing_permission_title": "Missing permissions"
   },
   "field_form": {
     "add": "Add custom field",

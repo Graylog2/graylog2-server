@@ -134,7 +134,8 @@
   "expanded_notifications": {
     "description": "Notificaciones que se envían cuando se activa este Event Definition.",
     "loading": "Cargando notificaciones...",
-    "missing_permissions": "Faltan permisos de notificaciones para:"
+    "missing_permissions": "Faltan permisos de notificaciones para:",
+    "missing_permission_title": "Faltan permisos"
   },
   "field_form": {
     "add": "Añadir campo personalizado",

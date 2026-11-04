@@ -14,7 +14,13 @@
     "indices_info": {
       "summary": "{{count}} index totalisant {{messageCount}} messages gérés, l'index d'écriture actif est <i>{{currentTarget}}</i>."
     },
-    "document_title": "Index Set - {{title}}"
+    "document_title": "Index Set - {{title}}",
+    "tiers": {
+      "hot_title": "Hot Tier",
+      "warm_title": "Warm Tier",
+      "hot_description": "Les index de cette section sont stockés sous forme de shards actifs dans le cluster de recherche, ce qui permet une récupération et des recherches rapides. Les données du Hot Tier occupent en permanence de la mémoire Java Heap du cluster de recherche et, en excès, dégraderont les performances de recherche.",
+      "warm_description": "Les index de cette section sont stockés sous forme de snapshots interrogeables dans le dépôt du Warm Tier, ce qui permet un stockage économique et une faible consommation de ressources. La récupération et la recherche des données du Warm Tier seront plus lentes. Notez que seuls les nœuds de recherche ayant le rôle « Search » peuvent participer à la recherche et à la récupération dans le Warm Tier."
+    }
   },
   "indexers": {
     "cluster_health": {

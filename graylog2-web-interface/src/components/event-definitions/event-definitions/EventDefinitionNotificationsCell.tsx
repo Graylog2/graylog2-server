@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import i18n from 'i18n';
 
 import { Spinner } from 'components/common';
 import ExpandableCellList from 'components/common/ExpandableCellList';
@@ -30,7 +31,7 @@ type NotificationItem = {
 };
 
 const renderNotification = ({ id, title, isPermitted }: NotificationItem) =>
-  isPermitted ? <EventNotificationLink id={id} title={title} /> : <i title="Missing permissions">{id}</i>;
+  isPermitted ? <EventNotificationLink id={id} title={title} /> : <i title={i18n.t('expanded_notifications.missing_permission_title', { ns: 'event_definitions' })}>{id}</i>;
 
 type Props = {
   eventDefinition: EventDefinition;

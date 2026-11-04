@@ -134,7 +134,8 @@
   "expanded_notifications": {
     "description": "Notifiche attivate quando questa Event Definition si attiva.",
     "loading": "Caricamento notifiche...",
-    "missing_permissions": "Permessi per le notifiche mancanti per:"
+    "missing_permissions": "Permessi per le notifiche mancanti per:",
+    "missing_permission_title": "Autorizzazioni mancanti"
   },
   "field_form": {
     "add": "Aggiungi campo personalizzato",

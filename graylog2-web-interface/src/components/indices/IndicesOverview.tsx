@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { IndexSummary } from 'hooks/useIndexerOverview';
 import IndexSection from 'components/indices/IndexSection';
@@ -27,6 +28,7 @@ type Props = {
 };
 
 const IndicesOverview = ({ indexDetails, indices, indexSetId = undefined }: Props) => {
+  const { t } = useTranslation('indexsets');
   const indicesFilteredByTier = (
     indicesList: Array<IndexSummary>,
     tier: 'WARM' | 'HOT' | undefined,
@@ -35,15 +37,13 @@ const IndicesOverview = ({ indexDetails, indices, indexSetId = undefined }: Prop
   const warmTierIndices = indicesFilteredByTier(indices, 'WARM');
   const hotTierIndices = indicesFilteredByTier(indices, 'HOT');
   const hotTierList = hotTierIndices.length > 0 ? hotTierIndices : indicesFilteredByTier(indices, undefined);
-  const hotTierSubheading =
-    'Indices in this section are stored as active shards within the Search cluster, facilitating fast retrieval and search jobs. Data held in the Hot Tier has a permanent footprint in the Java Heap memory of the Search Cluster and in excess, will degrade search performance.';
-  const warmTierSubheading =
-    'Indices in this section are stored as searchable snapshots within the Warm Tier Repository, facilitating cheap storage and low resource overheads. Retrieval and Search jobs of data held in the Warm Tier will be slower. Note that only Search nodes with the "Search" role can participate in Warm Tier search and retrieval.';
+  const hotTierSubheading = t('overview.tiers.hot_description');
+  const warmTierSubheading = t('overview.tiers.warm_description');
 
   return (
     <>
       <IndexSection
-        headline="Hot Tier"
+        headline={t('overview.tiers.hot_title')}
         subheading={hotTierSubheading}
         indices={hotTierList}
         indexDetails={indexDetails}
@@ -51,7 +51,7 @@ const IndicesOverview = ({ indexDetails, indices, indexSetId = undefined }: Prop
       />
       {warmTierIndices.length > 0 && (
         <IndexSection
-          headline="Warm Tier"
+          headline={t('overview.tiers.warm_title')}
           subheading={warmTierSubheading}
           indices={warmTierIndices}
           indexDetails={indexDetails}

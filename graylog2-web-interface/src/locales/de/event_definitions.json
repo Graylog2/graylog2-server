@@ -125,7 +125,8 @@
   "expanded_notifications": {
     "description": "Benachrichtigungen, die ausgelöst werden, wenn diese Event Definition auslöst.",
     "loading": "Benachrichtigungen werden geladen...",
-    "missing_permissions": "Fehlende Berechtigungen für Benachrichtigungen:"
+    "missing_permissions": "Fehlende Berechtigungen für Benachrichtigungen:",
+    "missing_permission_title": "Fehlende Berechtigungen"
   },
   "field_form": {
     "add": "Benutzerdefiniertes Feld hinzufügen",
