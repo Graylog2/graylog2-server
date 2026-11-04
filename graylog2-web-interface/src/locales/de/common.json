@@ -558,7 +558,7 @@
     "title": "Telemetrie",
     "enable_label": "Telemetrie aktivieren",
     "enabled_checkbox": "aktiviert",
-    "update_preferences": "Voreinstellungen aktualisieren",
+    "update_preferences": "Einstellungen aktualisieren",
     "update_button": "Telemetrie aktualisieren",
     "info_modal_title": "Helfen Sie uns, {{productName}} zu verbessern",
     "ok": "OK",
@@ -617,5 +617,10 @@
     "pipeline_rule": "Pipeline-Regel erstellen",
     "content_pack": "Content Pack erstellen",
     "fleet": "Fleet erstellen"
+  },
+  "user_notification": {
+    "success": "Erfolg",
+    "error": "Fehler",
+    "attention": "Achtung"
   }
 }

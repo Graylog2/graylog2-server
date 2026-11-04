@@ -250,6 +250,10 @@
     "view_type": {
       "search": "検索",
       "dashboard": "ダッシュボード"
+    },
+    "unsaved_view": {
+      "search": "未保存の検索",
+      "dashboard": "未保存のダッシュボード"
     }
   },
   "field_charts_migration": {

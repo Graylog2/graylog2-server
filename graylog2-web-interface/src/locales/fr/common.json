@@ -629,5 +629,10 @@
     "pipeline_rule": "Créer une règle de pipeline",
     "content_pack": "Créer un Content Pack",
     "fleet": "Créer une flotte"
+  },
+  "user_notification": {
+    "success": "Succès",
+    "error": "Erreur",
+    "attention": "Attention"
   }
 }

@@ -599,5 +599,10 @@
     "pipeline_rule": "建立 Pipeline 規則",
     "content_pack": "建立 Content Pack",
     "fleet": "建立 Fleet"
+  },
+  "user_notification": {
+    "success": "成功",
+    "error": "錯誤",
+    "attention": "注意"
   }
 }

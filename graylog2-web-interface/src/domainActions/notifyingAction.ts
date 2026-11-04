@@ -29,7 +29,8 @@ const _displaySuccessNotification = <T, Args extends Array<T>>(
   ...args: Args
 ) => {
   const { message, title } = successNotification(...args);
-  UserNotification.success(message, title || 'Success');
+  // an empty title gets the default title of the notification
+  UserNotification.success(message, title || undefined);
 };
 
 const _displayErrorNotification = <T, Args extends Array<T>>(
@@ -44,7 +45,7 @@ const _displayErrorNotification = <T, Args extends Array<T>>(
   }
 
   const { message, title } = errorNotification(errorMessage, ...args);
-  UserNotification.error(message, title || 'Error');
+  UserNotification.error(message, title || undefined);
 };
 
 type Props<F extends (...args: Array<any>) => any> = {

@@ -250,6 +250,10 @@
     "view_type": {
       "search": "Suche",
       "dashboard": "Dashboard"
+    },
+    "unsaved_view": {
+      "search": "Ungespeicherte Suche",
+      "dashboard": "Ungespeichertes Dashboard"
     }
   },
   "field_charts_migration": {

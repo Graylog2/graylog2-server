@@ -644,5 +644,10 @@
     "pipeline_rule": "Utwórz regułę pipeline",
     "content_pack": "Utwórz Content Pack",
     "fleet": "Utwórz flotę"
+  },
+  "user_notification": {
+    "success": "Sukces",
+    "error": "Błąd",
+    "attention": "Uwaga"
   }
 }

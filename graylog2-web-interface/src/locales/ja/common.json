@@ -599,5 +599,10 @@
     "pipeline_rule": "パイプラインルールを作成",
     "content_pack": "コンテンツパックを作成",
     "fleet": "フリートを作成"
+  },
+  "user_notification": {
+    "success": "成功",
+    "error": "エラー",
+    "attention": "注意"
   }
 }

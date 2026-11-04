@@ -250,6 +250,10 @@
     "view_type": {
       "search": "pesquisa",
       "dashboard": "dashboard"
+    },
+    "unsaved_view": {
+      "search": "Pesquisa não salva",
+      "dashboard": "Dashboard não salvo"
     }
   },
   "field_charts_migration": {

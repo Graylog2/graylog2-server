@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { FastField } from 'formik';
+import { Field } from 'formik';
 
 import { Input } from 'components/bootstrap';
 import { TimezoneSelect } from 'components/common';
@@ -24,8 +24,9 @@ import { TimezoneSelect } from 'components/common';
 const TimezoneFormGroup = () => {
   const { t } = useTranslation('users');
 
+  // `FastField` would only render again when the value changes, keeping the texts of the previous language.
   return (
-    <FastField name="timezone">
+    <Field name="timezone">
       {({ field: { name, value, onChange } }) => (
         <Input
           id="timezone-select"
@@ -41,7 +42,7 @@ const TimezoneFormGroup = () => {
           />
         </Input>
       )}
-    </FastField>
+    </Field>
   );
 };
 

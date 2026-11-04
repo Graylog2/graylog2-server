@@ -250,6 +250,10 @@
     "view_type": {
       "search": "搜尋",
       "dashboard": "Dashboard"
+    },
+    "unsaved_view": {
+      "search": "未儲存的搜尋",
+      "dashboard": "未儲存的 Dashboard"
     }
   },
   "field_charts_migration": {
