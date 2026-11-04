@@ -342,7 +342,7 @@
     "backlog_limit_help": "限制作為 Slack 通知一部分發送的積壓訊息數量。設為 0 時，不會強制執行限制。",
     "user_name_label": "使用者名稱（選填）",
     "user_name_help": "Slack 中發送者的使用者名稱",
-    "include_title_help": "在通知中包含事件定義的標題與描述",
+    "include_title_help": "在通知中包含 Event Definition 的標題與描述",
     "notify_channel_help": "在訊息中加入 @channel，以通知頻道中的所有使用者",
     "notify_here_label": "通知在線使用者",
     "notify_here_help": "在訊息中加入 @here，以通知頻道中的在線使用者",
@@ -354,7 +354,7 @@
   },
   "event_procedure_checkbox": {
     "label": "包含事件程序",
-    "help": "將事件定義之事件程序的格式化版本附加到通知內文末尾。"
+    "help": "將 Event Definition 之事件程序的格式化版本附加到通知內文末尾。"
   },
   "slack_notification_summary": {
     "color_label": "顏色",
@@ -391,7 +391,7 @@
     "custom_incident_label": "使用自訂事件金鑰",
     "custom_incident_help": "產生自訂的事件金鑰。",
     "key_prefix_label": "事件金鑰前綴",
-    "key_prefix_help": "事件金鑰的前綴，之後會接上 Stream 與事件定義的標題。若要自訂完整金鑰，請使用事件金鑰。",
+    "key_prefix_help": "事件金鑰的前綴，之後會接上 Stream 與 Event Definition 的標題。若要自訂完整金鑰，請使用事件金鑰。",
     "incident_key_label": "事件金鑰",
     "incident_key_help": "用於識別事件的完整金鑰。若有提供，將取代前綴使用。",
     "client_name_label": "用戶端名稱",

@@ -143,7 +143,7 @@
     "delete_confirmation": "您即将删除此内容包，确定要继续吗？",
     "delete_error_message": "删除内容包失败：{{error}}",
     "delete_success": "内容包已成功删除。",
-    "description": "内容包可加快特定数据源的设置过程。内容包可包含输入/提取器、流和仪表板。",
+    "description": "内容包可加快特定数据源的设置过程。内容包可包含输入/Extractor、流和 Dashboard。",
     "install_error_message": "安装内容包失败，状态码：{{status}}。无法安装 ID 为 {{id}} 的内容包",
     "install_success": "内容包已成功安装。",
     "title": "内容包",
@@ -152,7 +152,7 @@
   "pages": {
     "back_button": "内容包",
     "create_title": "创建内容包",
-    "description": "内容包可加快特定数据源的设置过程。内容包可包含输入/提取器、流和仪表板。",
+    "description": "内容包可加快特定数据源的设置过程。内容包可包含输入/Extractor、流和 Dashboard。",
     "document_title": "内容包",
     "edit_title": "编辑内容包",
     "marketplace_prefix": "在以下位置查找更多内容包："

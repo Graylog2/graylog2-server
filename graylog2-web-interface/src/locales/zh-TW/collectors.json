@@ -1008,7 +1008,7 @@
     "pages": {
       "description": "{{productName}} Data Node 與 {{productName}} 的整合更佳，並簡化未來的更新。它們可讓您對 {{productName}} 訊息資料庫中的所有訊息建立索引並搜尋。",
       "upgrade_title": "Data Node 升級",
-      "cluster_management_title": "Data Node 儀表板",
+      "cluster_management_title": "Data Node Dashboard",
       "certificate_management_title": "憑證管理",
       "migration_title": "Data Node 遷移",
       "documentation_title": "Data Node 文件"

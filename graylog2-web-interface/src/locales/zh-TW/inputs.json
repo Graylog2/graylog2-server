@@ -213,7 +213,7 @@
     },
     "load_streams_failed": "載入 Stream 失敗：{{error}}",
     "load_input_references_failed": "載入 Input 參照失敗：{{error}}",
-    "load_streams_by_index_set_failed": "依索引集載入 Stream 失敗：{{error}}",
+    "load_streams_by_index_set_failed": "依 Index Set 載入 Stream 失敗：{{error}}",
     "routing": {
       "connected_pipelines_title": "連接至目標 Stream 的 Pipeline",
       "connected_pipelines": "建議在完成 Input 設定前，先檢查這些 Pipeline 的影響。目標 Stream 已連接以下 Pipeline：",
@@ -297,7 +297,7 @@
       "title": "標題",
       "title_help": "新 Stream 的描述性名稱",
       "title_required": "必須填寫標題",
-      "index_set_required": "必須選擇索引集",
+      "index_set_required": "必須選擇 Index Set",
       "description": "描述",
       "description_help": "哪些類型的訊息會路由至此 Stream？",
       "create_pipeline": "為此 Stream 建立新的 Pipeline",
@@ -349,9 +349,9 @@
       "show_metrics": "顯示指標",
       "hide_metrics": "隱藏指標",
       "throughput": "{{value}} 則訊息/秒",
-      "associated_streams_label": "{{title}} 的關聯串流",
+      "associated_streams_label": "{{title}} 的關聯 Stream",
       "extractors_label": "{{title}} 的擷取器",
-      "messages_per_stream_label": "{{title}} 每個串流的訊息"
+      "messages_per_stream_label": "{{title}} 每個 Stream 的訊息"
     },
     "sections": {
       "could_not_load_associated_streams": "無法載入關聯的 Stream。",

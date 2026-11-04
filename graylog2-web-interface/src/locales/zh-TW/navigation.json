@@ -57,12 +57,12 @@
   "page_navigation": {
     "cluster_configuration": "叢集設定",
     "certificate_management": "憑證管理",
-    "data_node_dashboard": "Data Node 儀表板",
+    "data_node_dashboard": "Data Node Dashboard",
     "data_node_upgrade": "Data Node 升級",
     "data_node_migration": "Data Node 遷移",
     "overview": "總覽",
     "notifications": "通知",
-    "lookup_tables": "查詢表",
+    "lookup_tables": "Lookup Table",
     "caches": "快取",
     "data_adapters": "資料轉接器",
     "users_overview": "使用者總覽",
@@ -71,6 +71,6 @@
     "configuration": "設定",
     "failure_tracking": "失敗追蹤",
     "alerts_and_events": "警示與事件",
-    "event_definitions": "事件定義"
+    "event_definitions": "Event Definition"
   }
 }

@@ -24,7 +24,7 @@
     "backlog_size": "默认通知积压大小",
     "backlog_size_help": "默认情况下，通知中包含的日志消息数量。",
     "catch_up_window": "追赶窗口",
-    "catch_up_window_help": "如果事件处理器的执行进度落后于计划，将使用此窗口大小查询较早的数据以加快处理。（如果事件定义中的“搜索最近时间”设置更大，则忽略此设置）",
+    "catch_up_window_help": "如果事件处理器的执行进度落后于计划，将使用此窗口大小查询较早的数据以加快处理。（如果 Event Definition 中的“搜索最近时间”设置更大，则忽略此设置）",
     "catch_up_window_size": "追赶窗口大小",
     "notification_backlog": "通知积压",
     "notification_retry": "通知重试",

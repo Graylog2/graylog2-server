@@ -36,7 +36,7 @@
   "parameter_edit": {
     "default_value_help": "若查找結果為空，請選擇預設值",
     "default_value_label": "預設值",
-    "empty_result": "僅在參數有值時才會執行事件定義查詢。若查找結果為空，將略過執行，並視同 <emphasis>搜尋查詢</emphasis> 未找到任何訊息。若仍需執行，必須提供能產生所需搜尋結果的 <emphasis>預設值</emphasis>。例如（視使用情境而定），萬用字元 <inlineCode>{{wildcard}}</inlineCode> 可能是有意義的預設值。",
+    "empty_result": "僅在參數有值時才會執行 Event Definition 查詢。若查找結果為空，將略過執行，並視同 <emphasis>搜尋查詢</emphasis> 未找到任何訊息。若仍需執行，必須提供能產生所需搜尋結果的 <emphasis>預設值</emphasis>。例如（視使用情境而定），萬用字元 <inlineCode>{{wildcard}}</inlineCode> 可能是有意義的預設值。",
     "empty_result_title": "查找結果清單為空時的行為",
     "general_usage": "宣告後，查詢中的參數 <inlineCode>{{parameter}}</inlineCode> 將以 Lookup Table 的結果清單取代。結果清單會以 Lucene BooleanQuery 的形式呈現。例如：<inlineCode>{{example}}</inlineCode>",
     "general_usage_title": "一般用法",

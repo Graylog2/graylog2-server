@@ -53,10 +53,10 @@
       "language_help": "{{productName}} 介面的語言。標示為 Beta 的翻譯尚未經過審查。",
       "enable_autocompletion": "啟用自動完成",
       "search_sidebar": "搜尋側邊欄",
-      "dashboard_sidebar": "儀表板側邊欄",
+      "dashboard_sidebar": "Dashboard 側邊欄",
       "is_pinned": "已釘選",
       "search_sidebar_help": "也可以使用搜尋側邊欄的釘選圖示變更",
-      "dashboard_sidebar_help": "也可以使用儀表板側邊欄的釘選圖示變更",
+      "dashboard_sidebar_help": "也可以使用 Dashboard 側邊欄的釘選圖示變更",
       "theme_mode_help": "可使用使用者下拉選單中的切換按鈕變更",
       "update": "更新偏好設定"
     },
@@ -69,9 +69,9 @@
     "title": "角色總覽",
     "documentation_link_title": "權限說明文件",
     "button_text": "角色總覽",
-    "description": "{{productName}} 中所有可用角色的總覽。角色可授予使用者功能權限，例如建立儀表板或事件定義。",
+    "description": "{{productName}} 中所有可用角色的總覽。角色可授予使用者功能權限，例如建立 Dashboard 或 Event Definition。",
     "alert_title": "授予權限",
-    "alert_body_prefix": "內建角色可授予使用者功能權限，例如建立儀表板或檢視封存目錄。但它們不會授予特定儀表板或 Stream 的權限，也無法建立自訂角色。若要授予特定項目的權限，可使用該項目的 ",
+    "alert_body_prefix": "內建角色可授予使用者功能權限，例如建立 Dashboard 或檢視封存目錄。但它們不會授予特定 Dashboard 或 Stream 的權限，也無法建立自訂角色。若要授予特定項目的權限，可使用該項目的 ",
     "share_text": "共用",
     "alert_body_suffix": " 按鈕。例如可在項目總覽頁面找到此按鈕。若要同時為多位使用者授予某項目的權限，可以使用團隊。詳細資訊請參閱 ",
     "documentation_text": "說明文件"
@@ -245,7 +245,7 @@
       "title": "主機活動"
     },
     "network_activity": {
-      "hotspot_0": "即時查看網路中串流量的激增。",
+      "hotspot_0": "即時查看網路中 Stream 量的激增。",
       "hotspot_1": "快速查看資料的來源與去向。",
       "hotspot_2": "找出透過網路傳送最多資料的使用者。",
       "hotspot_3": "判斷 DNS 查詢結果是否出現異常模式，例如某個錯誤代碼突然出現在前 15 名清單中。 ",
@@ -272,9 +272,9 @@
         "correlation_aggregation": "關聯與彙總事件",
         "threat_intel": "威脅情報整合",
         "incident_workspaces": "事件調查工作區",
-        "prebuilt_parser_dashboards": "預先建置的安全解析器與儀表板",
+        "prebuilt_parser_dashboards": "預先建置的安全解析器與 Dashboard",
         "sigma_rules": "Sigma Rules",
-        "parameterized_dashboards": "參數化儀表板",
+        "parameterized_dashboards": "參數化 Dashboard",
         "input_output_integrations": "Input 與 Output 整合",
         "threat_management": "威脅管理",
         "search_workflow": "搜尋工作流程、範本與篩選器",
@@ -330,7 +330,7 @@
   },
   "permissions_info": {
     "title": "授予權限",
-    "text": "可使用項目的 <shareLabel>共用</shareLabel> 按鈕設定 Stream 與儀表板等項目的權限授予。例如可在項目總覽頁面找到此按鈕。詳細資訊請參閱 <docsLink>說明文件</docsLink>。"
+    "text": "可使用項目的 <shareLabel>共用</shareLabel> 按鈕設定 Stream 與 Dashboard 等項目的權限授予。例如可在項目總覽頁面找到此按鈕。詳細資訊請參閱 <docsLink>說明文件</docsLink>。"
   },
   "startpage": {
     "label": "起始頁面",
@@ -374,7 +374,7 @@
       "search_autocompletion": "搜尋自動完成",
       "update_unfocused": "未聚焦時更新",
       "pin_search_sidebar": "釘選搜尋側邊欄",
-      "pin_dashboard_sidebar": "釘選儀表板側邊欄",
+      "pin_dashboard_sidebar": "釘選 Dashboard 側邊欄",
       "theme_mode": "主題模式",
       "not_configured": "未設定",
       "language": "語言"

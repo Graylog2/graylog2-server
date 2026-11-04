@@ -44,7 +44,7 @@
     "load_failed": "載入 Grok 模式失敗，狀態：{{error}}",
     "load_failed_title": "無法載入 Grok 模式",
     "load_streams_failed": "載入模式失敗，狀態：{{error}}",
-    "load_streams_failed_title": "無法載入串流",
+    "load_streams_failed_title": "無法載入 Stream",
     "save_failed": "儲存 Grok 模式「{{name}}」失敗，狀態：{{error}}",
     "save_failed_title": "無法儲存 Grok 模式",
     "delete_failed": "刪除 Grok 模式「{{name}}」失敗，狀態：{{error}}",

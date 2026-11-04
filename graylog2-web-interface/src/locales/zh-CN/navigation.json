@@ -19,7 +19,7 @@
     "users_and_teams": "用户和团队",
     "roles": "角色",
     "authentication": "认证",
-    "content_packs": "Content Packs",
+    "content_packs": "内容包",
     "grok_patterns": "Grok 模式",
     "lookup_tables": "Lookup Tables",
     "pipelines": "Pipelines",
@@ -57,12 +57,12 @@
   "page_navigation": {
     "cluster_configuration": "集群配置",
     "certificate_management": "证书管理",
-    "data_node_dashboard": "Data Node 仪表板",
+    "data_node_dashboard": "Data Node Dashboard",
     "data_node_upgrade": "Data Node 升级",
     "data_node_migration": "Data Node 迁移",
     "overview": "概览",
     "notifications": "通知",
-    "lookup_tables": "查找表",
+    "lookup_tables": "Lookup Table",
     "caches": "缓存",
     "data_adapters": "数据适配器",
     "users_overview": "用户概览",
@@ -71,6 +71,6 @@
     "configuration": "配置",
     "failure_tracking": "故障跟踪",
     "alerts_and_events": "告警和事件",
-    "event_definitions": "事件定义"
+    "event_definitions": "Event Definition"
   }
 }

@@ -1,8 +1,8 @@
 {
   "copy_to_dashboard": {
-    "title": "將 Widget 複製到儀表板",
-    "no_dashboards": "找不到儀表板。",
-    "create_new": "建立新儀表板"
+    "title": "將 Widget 複製到 Dashboard",
+    "no_dashboards": "找不到 Dashboard。",
+    "create_new": "建立新 Dashboard"
   },
   "edit_message_list": {
     "fields": "欄位",
@@ -75,7 +75,7 @@
     "title": "未知的 Widget：{{type}}",
     "cannot_render": "很抱歉，無法轉譯此 Widget，因為我們不知道如何處理類型為 <strong>{{type}}</strong> 的 Widget。可能是由以下情況造成：",
     "missing_plugin": "您建立此 Widget 所使用的外掛已不存在。",
-    "legacy_dashboard": "此 Widget 屬於舊版儀表板，由已不再提供的外掛建立。",
+    "legacy_dashboard": "此 Widget 屬於舊版 Dashboard，由已不再提供的外掛建立。",
     "what_to_do": "您可以怎麼做？您可以重新載入外掛、聯絡原外掛作者以取得與目前版本 {{productName}} 相容的外掛，或在不需要時移除此 Widget。",
     "copy_config": "無論如何，您都可以將 Widget 的設定複製到剪貼簿："
   },
@@ -85,7 +85,7 @@
     "focus": "聚焦此 Widget",
     "edit": "編輯",
     "duplicate": "複製",
-    "copy_to_dashboard": "複製到儀表板",
+    "copy_to_dashboard": "複製到 Dashboard",
     "move_to_page": "移至頁面",
     "copying": "正在複製 Widget...",
     "copy": "複製 Widget",
@@ -127,7 +127,7 @@
     "sorting": "排序",
     "unknown_attribute": "未知",
     "unknown_attribute_help": "此屬性目前無法使用，因為需要有效的授權。",
-    "select_event_definition": "選取事件定義",
+    "select_event_definition": "選取 Event Definition",
     "alert": "警示",
     "event": "事件"
   },
@@ -167,7 +167,7 @@
       "create": "建立",
       "update": "更新",
       "help_title": "什麼是訊息裝飾器？",
-      "help_description": "裝飾器可即時修改搜尋結果中顯示的訊息。這些變更不會被儲存，僅會顯示在搜尋結果中。裝飾器設定會<strong>依串流</strong>儲存。",
+      "help_description": "裝飾器可即時修改搜尋結果中顯示的訊息。這些變更不會被儲存，僅會顯示在搜尋結果中。裝飾器設定會<strong>依 Stream</strong>儲存。",
       "help_order": "拖放即可調整裝飾器的處理順序。",
       "help_docs": "在<docsLink>說明文件</docsLink>中閱讀更多關於訊息裝飾器的資訊。"
     },
@@ -180,7 +180,7 @@
     "show_row_numbers_title": "顯示列號"
   },
   "field_types": {
-    "missing_event_definition": "缺少事件定義：{{id}}"
+    "missing_event_definition": "缺少 Event Definition：{{id}}"
   },
   "export": {
     "title_search": "匯出所有搜尋結果",

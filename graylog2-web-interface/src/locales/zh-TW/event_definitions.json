@@ -45,7 +45,7 @@
     "condition_type_help": "選擇此事件的條件類型。",
     "description": "定義此類型的事件應如何建立。日後您可以將這些事件作為其他條件的輸入，藉此建立以其他條件為基礎的強大條件。",
     "no_description": "沒有可用的說明。",
-    "not_editable": "此事件定義類型的條件無法編輯。",
+    "not_editable": "此 Event Definition 類型的條件無法編輯。",
     "select_condition_type": "選取條件類型",
     "title": "事件條件"
   },
@@ -150,7 +150,7 @@
     "errors_title": "含有錯誤的欄位",
     "event_fields": "事件欄位",
     "no_keys": "尚未設定任何鍵。",
-    "not_editable": "此事件定義類型的事件欄位無法編輯。",
+    "not_editable": "此 Event Definition 類型的事件欄位無法編輯。",
     "optional": "（選填）",
     "tags": "標籤",
     "tags_description": "為此 Event Definition 附加標籤。標籤會套用到其產生的每個事件，讓在「警示與事件」清單中篩選和分組更加容易。"
@@ -329,7 +329,7 @@
   "replay_search": {
     "attributes": {
       "description": "說明",
-      "edited_after_event": "Event Definition <definitionTitle>{{title}}</definitionTitle> 在此事件發生後已被編輯。部分彙總小工具可能無法準確反映此事件。",
+      "edited_after_event": "Event Definition <definitionTitle>{{title}}</definitionTitle> 在此事件發生後已被編輯。部分彙總 Widget 可能無法準確反映此事件。",
       "event_definition": "Event Definition",
       "execute_every": "搜尋執行間隔",
       "notifications": "通知",

@@ -386,7 +386,7 @@
     "enterprise_title": "{{productName}} Enterprise",
     "enterprise_description": "專為資源有限的 IT 維運與軟體工程團隊所設計，{{productName}} Enterprise 提供多項生產力強化功能，讓您在收集與分析日誌資料、找出效能、服務中斷與錯誤問題的根本原因時，每年可節省數千小時。",
     "security_title": "{{productName}} Security",
-    "security_description": "擴充 {{productName}} Open 的功能，透過專屬的安全儀表板與警示、異常偵測 AI/ML 引擎、與其他安全工具的整合、SOAR 功能，以及多項合規報告功能，偵測、調查並回應網路安全威脅。",
+    "security_description": "擴充 {{productName}} Open 的功能，透過專屬的安全 Dashboard 與警示、異常偵測 AI/ML 引擎、與其他安全工具的整合、SOAR 功能，以及多項合規報告功能，偵測、調查並回應網路安全威脅。",
     "request_now": "立即申請"
   },
   "plugin_list": {
@@ -589,15 +589,15 @@
     "fetch_failed_title": "無法擷取覆寫資料"
   },
   "entity_creators": {
-    "event_definition": "建立事件定義",
+    "event_definition": "建立 Event Definition",
     "notification": "建立通知",
-    "dashboard": "建立儀表板",
-    "stream": "建立串流",
+    "dashboard": "建立 Dashboard",
+    "stream": "建立 Stream",
     "index_set": "建立 Index Set",
     "user": "建立使用者",
     "pipeline": "建立 Pipeline",
     "pipeline_rule": "建立 Pipeline 規則",
-    "content_pack": "建立內容包",
+    "content_pack": "建立 Content Pack",
     "fleet": "建立 Fleet"
   }
 }

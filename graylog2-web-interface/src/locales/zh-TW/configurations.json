@@ -1,6 +1,6 @@
 {
   "decorators": {
-    "description": "以下為目前依串流設定的裝飾器：",
+    "description": "以下為目前依 Stream 設定的裝飾器：",
     "edit": "編輯設定",
     "none_configured": "目前未設定任何裝飾器。",
     "save_error": "無法儲存新的裝飾器：{{error}}",
@@ -13,10 +13,10 @@
   "decorators_update": {
     "default_search": "預設搜尋",
     "drag_and_drop": "使用拖放功能變更裝飾器的執行順序。",
-    "no_decorators_placeholder": "沒有任何串流設定裝飾器。",
-    "read_only": "唯讀存取 - 您需要編輯所選串流的權限",
-    "select_stream": "選擇要變更預設裝飾器集合的串流。",
-    "select_type": "選擇類型，以為此串流建立新的裝飾器：",
+    "no_decorators_placeholder": "沒有任何 Stream 設定裝飾器。",
+    "read_only": "唯讀存取 - 您需要編輯所選 Stream 的權限",
+    "select_stream": "選擇要變更預設裝飾器集合的 Stream。",
+    "select_type": "選擇類型，以為此 Stream 建立新的裝飾器：",
     "submit": "更新設定",
     "title": "更新預設裝飾器設定"
   },
@@ -24,7 +24,7 @@
     "backlog_size": "預設通知積壓大小",
     "backlog_size_help": "預設情況下，通知中包含的日誌訊息數量。",
     "catch_up_window": "追趕時間窗",
-    "catch_up_window_help": "若事件處理器的執行進度落後於排程，對較舊資料的查詢將以此時間窗大小執行，以加快處理速度。（若事件定義的「搜尋範圍」設定較大，則忽略此設定）",
+    "catch_up_window_help": "若事件處理器的執行進度落後於排程，對較舊資料的查詢將以此時間窗大小執行，以加快處理速度。（若 Event Definition 的「搜尋範圍」設定較大，則忽略此設定）",
     "catch_up_window_size": "追趕時間窗大小",
     "notification_backlog": "通知積壓",
     "notification_retry": "通知重試",
@@ -44,7 +44,7 @@
     "allowed_sources": "允許的圖片來源（以逗號分隔）",
     "allowed_sources_help": "嵌入 Markdown 文件中圖片時允許的圖片來源。",
     "allowed_sources_view": "允許的圖片來源（以逗號分隔）",
-    "description": "這些設定可用於設定產品中不同位置的 Markdown 渲染，包括文字/Markdown 小工具。變更允許的圖片來源設定後，頁面將會重新載入以確保設定生效。",
+    "description": "這些設定可用於設定產品中不同位置的 Markdown 渲染，包括文字/Markdown Widget。變更允許的圖片來源設定後，頁面將會重新載入以確保設定生效。",
     "disabled": "已停用",
     "enabled": "已啟用",
     "title": "Markdown 設定",
@@ -119,7 +119,7 @@
     "auto_refresh_options_title": "自動重新整理間隔選項",
     "cancel_after_seconds_other": "{{count}} 秒",
     "cancellation_timeout": "取消逾時",
-    "cancellation_timeout_description": "每個小工具在此秒數後將自動取消搜尋執行。這可減少執行的搜尋數量並提升效能。",
+    "cancellation_timeout_description": "每個 Widget 在此秒數後將自動取消搜尋執行。這可減少執行的搜尋數量並提升效能。",
     "default_auto_refresh_interval": "預設自動重新整理間隔",
     "default_auto_refresh_option": "預設自動重新整理選項",
     "default_auto_refresh_option_help": "選擇在未明確選取間隔的情況下啟動自動重新整理時所使用的間隔。",
@@ -229,9 +229,9 @@
     "update_title": "更新使用者設定"
   },
   "welcome_page": {
-    "description": "歡迎頁面可顯示訊息、警示及事件數量的小工具，以及熱門來源圖表。在大型或繁忙的叢集上，每當使用者開啟歡迎頁面時，這些查詢都會增加額外負載。若要避免此負載，請在下方停用。小工具將被隱藏，且其查詢將不會執行。",
+    "description": "歡迎頁面可顯示訊息、警示及事件數量的 Widget，以及熱門來源圖表。在大型或繁忙的叢集上，每當使用者開啟歡迎頁面時，這些查詢都會增加額外負載。若要避免此負載，請在下方停用。Widget 將被隱藏，且其查詢將不會執行。",
     "enable_metrics": "啟用歡迎頁面指標",
-    "enable_metrics_help": "若停用，訊息、警示及事件數量小工具以及熱門來源圖表將從歡迎頁面隱藏，其底層查詢也將不會執行。在大型或繁忙的叢集上請關閉此選項，以減少查詢負載。",
+    "enable_metrics_help": "若停用，訊息、警示及事件數量 Widget 以及熱門來源圖表將從歡迎頁面隱藏，其底層查詢也將不會執行。在大型或繁忙的叢集上請關閉此選項，以減少查詢負載。",
     "metrics": "歡迎頁面指標",
     "title": "歡迎頁面",
     "update_title": "更新歡迎頁面設定"

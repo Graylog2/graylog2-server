@@ -45,7 +45,7 @@
     "condition_type_help": "为此事件选择条件类型。",
     "description": "定义此类事件的创建方式。之后可将这些事件用作其他条件的输入，从而基于其他条件构建功能强大的条件。",
     "no_description": "暂无描述。",
-    "not_editable": "此事件定义类型的条件无法编辑。",
+    "not_editable": "此 Event Definition 类型的条件无法编辑。",
     "select_condition_type": "选择条件类型",
     "title": "事件条件"
   },

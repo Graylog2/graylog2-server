@@ -301,7 +301,7 @@
   },
   "simulation_preview": {
     "dropped_title": "消息将被丢弃",
-    "dropped": "Pipeline 处理器会丢弃此类消息。这意味着该消息<notStored>不会被存储</notStored>，也无法用于搜索、告警、Output 或仪表板。"
+    "dropped": "Pipeline 处理器会丢弃此类消息。这意味着该消息<notStored>不会被存储</notStored>，也无法用于搜索、告警、Output 或 Dashboard。"
   },
   "simulation_trace": {
     "microseconds": "μs"

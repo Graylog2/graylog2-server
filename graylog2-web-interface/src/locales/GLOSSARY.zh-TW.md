@@ -9,6 +9,8 @@ Terms used in the Traditional Chinese (Taiwan) translations (`zh-TW/*.json`), so
 - Translate only the value. Keep every `{{placeholder}}`, `<tag>` / `</tag>` and `<0>`-style Trans markers exactly as they are, plus technical identifiers in `backticks`.
 - `<empty>`-style values that look like tags may stay English (the helper treats them as tags).
 
+- Terminology follows the dominant usage of the catalog: English for Stream, Dashboard, Pipeline, Sidecar, Collector, Fleet, Forwarder, Lookup Table, Widget, Index Set, Content Pack, Event Definition, Investigation; Chinese for 擷取器 (Extractor), 集合 (Collection), 節點 (Node), 警示 (Alert), 事件, 通知, 報告, 資產, 權杖, 叢集. Keep a space between English terms and Chinese text.
+
 ## Terms
 
 | English | Traditional Chinese (Taiwan) |

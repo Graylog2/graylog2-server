@@ -269,8 +269,8 @@
   "entity_types": {
     "user": "用户",
     "team": "团队",
-    "dashboard": "仪表盘",
-    "event_definition": "事件定义",
+    "dashboard": "Dashboard",
+    "event_definition": "Event Definition",
     "notification": "通知",
     "search": "搜索",
     "stream": "Stream",
@@ -281,8 +281,8 @@
     "sigma_rule": "Sigma 规则",
     "event_procedure": "事件流程",
     "event_procedure_step": "事件流程步骤",
-    "collection": "集合",
-    "collection_entities": "集合条目"
+    "collection": "Collection",
+    "collection_entities": "Collection 条目"
   },
   "marketplace_link": "{{productName}} 市场",
   "chips_cell": {
@@ -386,7 +386,7 @@
     "enterprise_title": "{{productName}} Enterprise",
     "enterprise_description": "专为资源有限的 IT 运维和软件工程团队设计，{{productName}} Enterprise 提供大量效率增强功能，帮助您每年节省数千小时用于收集和分析日志数据，从而找出性能、故障和错误问题的根本原因。",
     "security_title": "{{productName}} Security",
-    "security_description": "借助安全专用仪表盘和告警、异常检测 AI/ML 引擎、与其他安全工具的集成、SOAR 功能以及众多合规报告功能，扩展 {{productName}} Open 在检测、调查和响应网络安全威胁方面的能力。",
+    "security_description": "借助安全专用 Dashboard 和告警、异常检测 AI/ML 引擎、与其他安全工具的集成、SOAR 功能以及众多合规报告功能，扩展 {{productName}} Open 在检测、调查和响应网络安全威胁方面的能力。",
     "request_now": "立即申请"
   },
   "plugin_list": {
@@ -495,8 +495,8 @@
   "quick_jump": {
     "title": "快速跳转",
     "open": "打开快速跳转",
-    "search_placeholder": "搜索页面/仪表盘/Streams ...",
-    "intro": "请输入搜索查询，以搜索页面、Stream、仪表盘、输入或其他条目。",
+    "search_placeholder": "搜索页面/Dashboard/Streams ...",
+    "intro": "请输入搜索查询，以搜索页面、Stream、Dashboard、输入或其他条目。",
     "intro_hint": "为方便您快速开始，下方列出了您<bold>最近打开</bold>和<bold>收藏</bold>的条目：",
     "no_results": "未找到搜索结果，请尝试其他搜索词。",
     "recent": "最近"
@@ -513,8 +513,8 @@
     "clear_confirm": "此操作将清除草稿板中的内容，是否继续？"
   },
   "extractor_actions": {
-    "select_type": "选择提取器类型",
-    "only_string_fields": "提取器只能用于字符串字段。"
+    "select_type": "选择 Extractor 类型",
+    "only_string_fields": "Extractor 只能用于字符串字段。"
   },
   "surrounding_search": {
     "button": "显示上下文消息"
@@ -534,7 +534,7 @@
     "server": "{{productName}} 服务器："
   },
   "widget_visualization_not_found": {
-    "description": "未找到 Widget 可视化（<italic>{{widgetClassName}}</italic>）。看起来提供此 Widget 的插件未加载。"
+    "description": "未找到组件可视化（<italic>{{widgetClassName}}</italic>）。看起来提供此组件的插件未加载。"
   },
   "telemetry": {
     "title": "遥测",
@@ -568,7 +568,7 @@
     "download_failed": "下载失败，状态：{{error}}",
     "download_failed_title": "无法下载",
     "export_failed": "导出失败",
-    "export_widget_failed": "Widget 导出失败",
+    "export_widget_failed": "组件导出失败",
     "telemetry_update_failed": "更新失败：{{error}}",
     "telemetry_update_failed_title": "无法更新遥测设置。",
     "delete_property_confirm": "确定要删除属性“{{key}}”吗？",
@@ -589,10 +589,10 @@
     "fetch_failed_title": "无法获取覆盖数据"
   },
   "entity_creators": {
-    "event_definition": "创建事件定义",
+    "event_definition": "创建 Event Definition",
     "notification": "创建通知",
-    "dashboard": "创建仪表板",
-    "stream": "创建数据流",
+    "dashboard": "创建 Dashboard",
+    "stream": "创建 Stream",
     "index_set": "创建索引集",
     "user": "创建用户",
     "pipeline": "创建 Pipeline",

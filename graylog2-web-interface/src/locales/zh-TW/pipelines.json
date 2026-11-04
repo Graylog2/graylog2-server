@@ -301,7 +301,7 @@
   },
   "simulation_preview": {
     "dropped_title": "訊息將被捨棄",
-    "dropped": "Pipeline 處理器會捨棄此類訊息，亦即該訊息<notStored>將不會被儲存</notStored>，也無法用於搜尋、警示、Output 或儀表板。"
+    "dropped": "Pipeline 處理器會捨棄此類訊息，亦即該訊息<notStored>將不會被儲存</notStored>，也無法用於搜尋、警示、Output 或 Dashboard。"
   },
   "simulation_trace": {
     "microseconds": "μs"

@@ -1008,7 +1008,7 @@
     "pages": {
       "description": "{{productName}} Data Nodes 与 {{productName}} 的集成更好，并简化了后续升级。它们使您能够对 {{productName}} 消息数据库中的所有消息进行索引和搜索。",
       "upgrade_title": "Data Node 升级",
-      "cluster_management_title": "Data Node 仪表板",
+      "cluster_management_title": "Data Node Dashboard",
       "certificate_management_title": "证书管理",
       "migration_title": "Data Node 迁移",
       "documentation_title": "Data Nodes 文档"

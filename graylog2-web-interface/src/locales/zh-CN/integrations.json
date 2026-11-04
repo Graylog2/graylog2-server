@@ -342,7 +342,7 @@
     "backlog_limit_help": "限制作为 Slack 通知一部分发送的积压消息数量。设置为 0 时不限制。",
     "user_name_label": "用户名（可选）",
     "user_name_help": "Slack 中发送者的用户名",
-    "include_title_help": "在通知中包含事件定义的标题和描述",
+    "include_title_help": "在通知中包含 Event Definition 的标题和描述",
     "notify_channel_help": "在消息中添加 @channel 以通知频道中的所有用户",
     "notify_here_label": "通知在线成员",
     "notify_here_help": "在消息中添加 @here 以通知频道中的在线用户",
@@ -354,7 +354,7 @@
   },
   "event_procedure_checkbox": {
     "label": "包含事件处理流程",
-    "help": "将事件定义的事件处理流程的格式化版本附加到通知正文末尾。"
+    "help": "将 Event Definition 的事件处理流程的格式化版本附加到通知正文末尾。"
   },
   "slack_notification_summary": {
     "color_label": "颜色",
@@ -391,7 +391,7 @@
     "custom_incident_label": "使用自定义事件键",
     "custom_incident_help": "生成自定义事件键。",
     "key_prefix_label": "事件键前缀",
-    "key_prefix_help": "事件键前缀，之后将依次附加流和事件定义的标题。如需自定义整个键，请使用事件键。",
+    "key_prefix_help": "事件键前缀，之后将依次附加流和 Event Definition 的标题。如需自定义整个键，请使用事件键。",
     "incident_key_label": "事件键",
     "incident_key_help": "用于标识事件的完整键。如已提供，将代替前缀使用。",
     "client_name_label": "客户端名称",
@@ -420,9 +420,9 @@
     "disabled": "已禁用",
     "modal_title": "更新威胁情报插件配置",
     "tor_checkbox_label": "允许查询 Tor 出口节点？",
-    "tor_checkbox_help": "启用后，全局流水线函数将包含 Tor 出口节点查询；禁用后也将停止刷新数据。",
+    "tor_checkbox_help": "启用后，全局 Pipeline 函数将包含 Tor 出口节点查询；禁用后也将停止刷新数据。",
     "spamhaus_checkbox_label": "允许查询 Spamhaus DROP/EDROP？",
-    "spamhaus_checkbox_help": "启用后，全局流水线函数将包含 Spamhaus 查询；禁用后也将停止刷新数据。"
+    "spamhaus_checkbox_help": "启用后，全局 Pipeline 函数将包含 Spamhaus 查询；禁用后也将停止刷新数据。"
   },
   "abusech_ransom_adapter_documentation": {
     "deprecation_title": "弃用警告",

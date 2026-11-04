@@ -10,9 +10,9 @@
     "fields": "字段"
   },
   "empty_state": {
-    "no_widgets_search": "没有可用于可视化搜索结果的 Widget",
-    "no_widgets_dashboard": "此 Dashboard 还没有 Widget",
-    "create_widget_hint": "在左侧边栏的“创建”部分选择 Widget 类型，即可创建新的 Widget。",
+    "no_widgets_search": "没有可用于可视化搜索结果的组件",
+    "no_widgets_dashboard": "此 Dashboard 还没有组件",
+    "create_widget_hint": "在左侧边栏的“创建”部分选择组件类型，即可创建新的组件。",
     "tips_title": "创建搜索和 Dashboard 的一些提示",
     "tip_1": "从想要回答的<bold>问题</bold>开始，明确需要解决的问题。",
     "tip_2": "<bold>限定</bold>数据范围，只保留想要查看的数据点。",
@@ -77,7 +77,7 @@
     "no_query": "尚未执行任何查询。",
     "query_executed_in": "查询执行耗时",
     "effective_time_range": "实际时间范围",
-    "varies_per_widget": "因 Widget 而异",
+    "varies_per_widget": "因组件而异",
     "time_from": "开始",
     "time_to": "结束",
     "total_results": "结果总数"
@@ -210,10 +210,10 @@
     "order_help": "拖放即可更改 Dashboard 页面的顺序。双击 Dashboard 标题即可修改标题。"
   },
   "widget_creation": {
-    "title": "创建新 Widget",
-    "create_widget": "创建 {{title}} Widget",
-    "placeholder": "在此创建新 Widget",
-    "scroll_to_new_widget": "滚动到新 Widget"
+    "title": "创建新组件",
+    "create_widget": "创建 {{title}} 组件",
+    "placeholder": "在此创建新组件",
+    "scroll_to_new_widget": "滚动到新组件"
   },
   "dashboard_actions": {
     "immutable": "此 Dashboard 由 {{productName}} 管理，为只读。使用“另存为”可创建可编辑的副本。",
@@ -228,7 +228,7 @@
     "share_description": "搜索用户或团队，将其添加为此 Dashboard 的协作者。"
   },
   "dashboard_search_bar": {
-    "filter_placeholder": "将过滤器应用于所有 Widget"
+    "filter_placeholder": "将过滤器应用于所有组件"
   },
   "debug": {
     "title": "调试信息"
@@ -261,7 +261,7 @@
   },
   "query": {
     "contained_in_enterprise": "（包含于 <enterpriseLink>Graylog Enterprise</enterpriseLink>）",
-    "documentation_hint": "也可以查阅<docsLink>文档</docsLink>，了解有关创建 Widget 的更多信息。"
+    "documentation_hint": "也可以查阅<docsLink>文档</docsLink>，了解有关创建组件的更多信息。"
   },
   "widget_query": {
     "reset_global_filter": "重置全局过滤器"
@@ -291,7 +291,7 @@
   },
   "view_header": {
     "alerts_and_events": "告警和事件",
-    "event_definitions": "事件定义",
+    "event_definitions": "Event Definition",
     "edit_search_metadata": "编辑搜索 {{title}} 的元数据",
     "edit_dashboard_metadata": "编辑 Dashboard {{title}} 的元数据",
     "editing_search": "编辑已保存的搜索",
@@ -451,11 +451,11 @@
     "show_documents": "显示该值的文档",
     "create_extractor": "创建 Extractor",
     "highlight_value": "高亮此值",
-    "create_event_definition": "创建事件定义",
+    "create_event_definition": "创建 Event Definition",
     "copy_value": "复制值到剪贴板"
   },
   "create_event_definition": {
-    "title": "配置新的事件定义",
+    "title": "配置新的 Event Definition",
     "hide_details": "隐藏策略详情",
     "show_details": "显示策略详情",
     "continue": "继续配置",
@@ -493,7 +493,7 @@
         "description": "该策略包括列透视"
       },
       "ALL": {
-        "label": "Widget 中任意值",
+        "label": "组件中任意值",
         "description": "该策略包括与所选值相关的所有行和列透视值"
       },
       "CUSTOM": {
@@ -509,7 +509,7 @@
   "views_notifications": {
     "delete_view_failed": "删除视图 {{title}} 失败，状态：{{error}}",
     "delete_view_failed_title": "无法删除视图",
-    "apply_widget_changes_failed": "应用 Widget 更改失败，状态：{{error}}",
+    "apply_widget_changes_failed": "应用组件更改失败，状态：{{error}}",
     "load_message_failed": "加载消息信息失败，状态码",
     "could_not_load_message": "无法加载消息信息"
   },

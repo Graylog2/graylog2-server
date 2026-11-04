@@ -9,6 +9,8 @@ Terms used in the Simplified Chinese translations (`zh-CN/*.json`), so the whole
 - Translate only the value. Keep every `{{placeholder}}`, `<tag>` / `</tag>` and `<0>`-style Trans markers exactly as they are, plus technical identifiers in `backticks`.
 - Plural keys: for `_one` use the singular form with the number, for `_many`/`_other` the plural form (Chinese has only `_other`).
 
+- Terminology follows the dominant usage of the catalog: English for Stream, Dashboard, Pipeline, Sidecar, Collector, Fleet, Forwarder, Lookup Table, Extractor, Collection, Event Definition, Investigation; Chinese for 组件 (Widget), 索引集 (Index Set), 内容包 (Content Pack), 节点 (Node), 告警 (Alert), 事件, 通知, 报告, 资产, 令牌, 集群. Keep a space between English terms and Chinese text.
+
 ## Terms
 
 | English | Simplified Chinese |

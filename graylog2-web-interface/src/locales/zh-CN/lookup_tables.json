@@ -1,6 +1,6 @@
 {
   "title": "Lookup Tables",
-  "description": "Lookup Table 可用于提取器、转换器和处理流水线中，用于转换消息字段或丰富消息内容。",
+  "description": "Lookup Table 可用于 Extractor、转换器和处理 Pipeline 中，用于转换消息字段或丰富消息内容。",
   "create_button": "创建 Lookup Table",
   "details_document_title": "Lookup Table 详情",
   "details_page_title": "Lookup Tables 详情",
@@ -21,7 +21,7 @@
   "loading_adapter": "正在加载数据适配器",
   "create_document_title": "创建 Lookup Table",
   "create_page_title": "创建 Lookup Table",
-  "create_description": "Lookup Table 可用于提取器、转换器和处理流水线中，用于转换消息字段或丰富消息内容。",
+  "create_description": "Lookup Table 可用于 Extractor、转换器和处理 Pipeline 中，用于转换消息字段或丰富消息内容。",
   "loading_create": "加载中...",
   "cache_document_title": "Lookup Tables - 缓存",
   "cache_page_title": "Lookup Tables 的缓存",
@@ -36,7 +36,7 @@
   "parameter_edit": {
     "default_value_help": "如果查找结果为空，请选择一个默认值",
     "default_value_label": "默认值",
-    "empty_result": "事件定义查询仅在参数有值时执行。如果查找结果为空，则会跳过执行，并视同 <emphasis>搜索查询</emphasis> 未找到任何消息。如需执行，则需提供能产生所需搜索结果的 <emphasis>默认值</emphasis>。例如（取决于具体用例），通配符 <inlineCode>{{wildcard}}</inlineCode> 可以是一个有意义的默认值。",
+    "empty_result": "Event Definition 查询仅在参数有值时执行。如果查找结果为空，则会跳过执行，并视同 <emphasis>搜索查询</emphasis> 未找到任何消息。如需执行，则需提供能产生所需搜索结果的 <emphasis>默认值</emphasis>。例如（取决于具体用例），通配符 <inlineCode>{{wildcard}}</inlineCode> 可以是一个有意义的默认值。",
     "empty_result_title": "查找结果列表为空时的行为",
     "general_usage": "声明后，查询中的参数 <inlineCode>{{parameter}}</inlineCode> 将被替换为 Lookup Table 的结果列表。结果列表将以 Lucene BooleanQuery 的形式呈现。例如：<inlineCode>{{example}}</inlineCode>",
     "general_usage_title": "通用用法",

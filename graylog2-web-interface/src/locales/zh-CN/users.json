@@ -53,10 +53,10 @@
       "language_help": "{{productName}} 界面的语言。标记为 Beta 的翻译尚未经过审核。",
       "enable_autocompletion": "启用自动补全",
       "search_sidebar": "搜索侧边栏",
-      "dashboard_sidebar": "仪表板侧边栏",
+      "dashboard_sidebar": "Dashboard 侧边栏",
       "is_pinned": "已固定",
       "search_sidebar_help": "也可以通过搜索侧边栏的固定图标进行更改",
-      "dashboard_sidebar_help": "也可以通过仪表板侧边栏的固定图标进行更改",
+      "dashboard_sidebar_help": "也可以通过 Dashboard 侧边栏的固定图标进行更改",
       "theme_mode_help": "可以通过用户下拉菜单中的切换开关进行更改",
       "update": "更新偏好设置"
     },
@@ -69,9 +69,9 @@
     "title": "角色概览",
     "documentation_link_title": "权限文档",
     "button_text": "角色概览",
-    "description": "{{productName}} 中所有可用角色的概览。角色允许向用户授予功能权限，例如创建仪表板或事件定义。",
+    "description": "{{productName}} 中所有可用角色的概览。角色允许向用户授予功能权限，例如创建 Dashboard 或 Event Definition。",
     "alert_title": "授予权限",
-    "alert_body_prefix": "内置角色允许向用户授予功能权限，例如创建仪表板或查看归档目录。但它们不会授予对特定仪表板或数据流的权限，也无法创建自定义角色。要为特定条目授予权限，可以使用其 ",
+    "alert_body_prefix": "内置角色允许向用户授予功能权限，例如创建 Dashboard 或查看归档目录。但它们不会授予对特定 Dashboard 或 Stream 的权限，也无法创建自定义角色。要为特定条目授予权限，可以使用其 ",
     "share_text": "共享",
     "alert_body_suffix": " 按钮。例如，您可以在条目概览页面上找到该按钮。如果要同时为多个用户授予某个条目的权限，可以使用团队。更多信息请参阅",
     "documentation_text": "文档"
@@ -136,7 +136,7 @@
       "search_placeholder": "搜索用户和团队",
       "collaborators": "协作者",
       "direct_collaborators": "直接协作者",
-      "shared_via_collections": "通过集合共享",
+      "shared_via_collections": "通过 Collection 共享",
       "update_sharing": "更新共享",
       "modal_title": "共享{{entityType}}：<entityTitle>{{entityTitle}}</entityTitle>",
       "confirm_not_added_named": "已选择\"{{title}}\"，但从未将其添加为协作者。是否仍要继续？",
@@ -266,15 +266,15 @@
         "cloud_option": "云端选项",
         "archiving": "归档",
         "audit_logs_cloud": "{{productName}} Cloud 的审计日志",
-        "dynamic_lookup_tables": "动态查找表",
+        "dynamic_lookup_tables": "动态 Lookup Table",
         "advanced_alerting": "借助脚本实现高级告警",
         "compliance_reporting": "合规报告",
         "correlation_aggregation": "事件关联与聚合",
         "threat_intel": "威胁情报集成",
         "incident_workspaces": "事件调查工作区",
-        "prebuilt_parser_dashboards": "预构建的安全解析器和仪表板",
+        "prebuilt_parser_dashboards": "预构建的安全解析器和 Dashboard",
         "sigma_rules": "Sigma 规则",
-        "parameterized_dashboards": "参数化仪表板",
+        "parameterized_dashboards": "参数化 Dashboard",
         "input_output_integrations": "Input 和 Output 集成",
         "threat_management": "威胁管理",
         "search_workflow": "搜索工作流、模板和过滤器",
@@ -330,7 +330,7 @@
   },
   "permissions_info": {
     "title": "授予权限",
-    "text": "可以使用条目的 <shareLabel>共享</shareLabel> 按钮为数据流和仪表板等条目授予权限。例如，您可以在条目概览页面上找到该按钮。更多信息请参阅<docsLink>文档</docsLink>。"
+    "text": "可以使用条目的 <shareLabel>共享</shareLabel> 按钮为 Stream 和 Dashboard 等条目授予权限。例如，您可以在条目概览页面上找到该按钮。更多信息请参阅<docsLink>文档</docsLink>。"
   },
   "startpage": {
     "label": "起始页",
@@ -339,8 +339,8 @@
     "select_value": "选择{{type, lowercase}}",
     "entity": "条目",
     "types": {
-      "dashboard": "仪表板",
-      "stream": "数据流",
+      "dashboard": "Dashboard",
+      "stream": "Stream",
       "search": "搜索"
     },
     "new_search": "新建搜索",
@@ -374,7 +374,7 @@
       "search_autocompletion": "搜索自动补全",
       "update_unfocused": "失去焦点时更新",
       "pin_search_sidebar": "固定搜索侧边栏",
-      "pin_dashboard_sidebar": "固定仪表板侧边栏",
+      "pin_dashboard_sidebar": "固定 Dashboard 侧边栏",
       "theme_mode": "主题模式",
       "not_configured": "未配置",
       "language": "语言"
