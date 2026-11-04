@@ -22,7 +22,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Range;
-import org.graylog2.jmte.NamedDateRenderer;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
@@ -44,7 +43,7 @@ public class FormatStringDecoratorTest {
     private static final DateTime TO = new DateTime(2026, 11, 4, 11, 30, DateTimeZone.UTC);
 
     private final MessageFactory messageFactory = new TestMessageFactory();
-    private final Engine templateEngine = new Engine();
+    private final Engine templateEngine = new DecoratorTemplateEngineProvider().get();
 
     @Test
     public void testFormat() {
@@ -94,12 +93,10 @@ public class FormatStringDecoratorTest {
 
     @Test
     public void formatsTimeRangeWithDateRenderer() {
-        final Engine engine = Engine.createEngine();
-        engine.registerNamedRenderer(new NamedDateRenderer());
         final DecoratorImpl decorator = getDecoratorConfig(
                 "${search.from;date(yyyy-MM-dd HH:mm)} to ${search.to;date(HH:mm)}", "message", false);
 
-        final FormatStringDecorator formatStringDecorator = new FormatStringDecorator(decorator, engine, messageFactory);
+        final FormatStringDecorator formatStringDecorator = new FormatStringDecorator(decorator, templateEngine, messageFactory);
         final SearchResponse response = formatStringDecorator.apply(getSearchResponse());
 
         assertThat(response.messages().get(0).message().get("message")).isEqualTo("2026-11-04 10:00 to 11:30");
@@ -119,8 +116,8 @@ public class FormatStringDecoratorTest {
     }
 
     @Test
-    public void messageFieldTakesPrecedenceOverSearchContext() {
-        final DecoratorImpl decorator = getDecoratorConfig("${search}", "message", false);
+    public void messageFieldAndSearchContextDoNotCollide() {
+        final DecoratorImpl decorator = getDecoratorConfig("${search} ${search.from_ms}", "message", false);
         final SearchResponse searchResponse = getSearchResponse().toBuilder()
                 .messages(ImmutableList.of(create(ImmutableMultimap.of(), ImmutableMap.of("_id", "h", "search", "from-message"), "graylog_0")))
                 .build();
@@ -128,7 +125,7 @@ public class FormatStringDecoratorTest {
         final FormatStringDecorator formatStringDecorator = new FormatStringDecorator(decorator, templateEngine, messageFactory);
         final SearchResponse response = formatStringDecorator.apply(searchResponse);
 
-        assertThat(response.messages().get(0).message().get("message")).isEqualTo("from-message");
+        assertThat(response.messages().get(0).message().get("message")).isEqualTo("from-message 1793786400000");
         assertThat(response.messages().get(0).message().get("search")).isEqualTo("from-message");
     }
 

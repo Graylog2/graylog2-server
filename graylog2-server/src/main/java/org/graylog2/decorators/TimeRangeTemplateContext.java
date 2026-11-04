@@ -16,46 +16,58 @@
  */
 package org.graylog2.decorators;
 
+import com.floreysoft.jmte.DefaultModelAdaptor;
+import com.floreysoft.jmte.TemplateContext;
+import com.floreysoft.jmte.token.Token;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Exposes the search time range to template-based decorators.
  * <p>
- * The values are available in templates under the reserved {@value #KEY} key, e.g. {@code ${search.from}}
+ * The values are available in templates as properties of {@value #TEMPLATE_KEY}, e.g. {@code ${search.from}}
  * or {@code ${search.from;date(yyyy-MM-dd HH:mm)}}. Time range boundaries are exposed as {@link org.joda.time.DateTime}
  * so the {@code date} named renderer can format them, and additionally as epoch milliseconds.
+ * <p>
+ * To avoid collisions with message fields, the time range is stored in the template model under {@value #MODEL_KEY},
+ * which is not a valid message field name, and {@link ModelAdaptor} redirects dotted {@code search.*} lookups to it.
+ * A bare {@code ${search}} still resolves to a message field with that name.
  */
 public final class TimeRangeTemplateContext {
-    public static final String KEY = "search";
+    private static final String TEMPLATE_KEY = "search";
+    private static final String MODEL_KEY = "#search";
 
     private static final String FROM = "from";
     private static final String TO = "to";
     private static final String FROM_MS = "from_ms";
     private static final String TO_MS = "to_ms";
 
-    private TimeRangeTemplateContext() {
+    private final Map<String, Object> timeRange;
+
+    private TimeRangeTemplateContext(Map<String, Object> timeRange) {
+        this.timeRange = timeRange;
     }
 
-    public static Map<String, Object> from(SearchResponse searchResponse) {
-        return ImmutableMap.<String, Object>builder()
-                .put(FROM, searchResponse.from())
-                .put(TO, searchResponse.to())
-                .put(FROM_MS, searchResponse.from().getMillis())
-                .put(TO_MS, searchResponse.to().getMillis())
-                .build();
+    public static TimeRangeTemplateContext of(SearchResponse searchResponse) {
+        return new TimeRangeTemplateContext(ImmutableMap.of(
+                FROM, searchResponse.from(),
+                TO, searchResponse.to(),
+                FROM_MS, searchResponse.from().getMillis(),
+                TO_MS, searchResponse.to().getMillis()
+        ));
     }
 
     /**
-     * Builds the template model for a single message. A message field with the same name as {@link #KEY} takes
-     * precedence over the time range, so existing templates referring to such a field keep working.
+     * Builds the template model for a single message. Requires an engine using {@link ModelAdaptor}.
      */
-    public static Map<String, Object> model(Map<String, Object> messageFields, Map<String, Object> timeRange) {
+    public Map<String, Object> model(Map<String, Object> messageFields) {
         final Map<String, Object> model = new HashMap<>(messageFields);
-        model.putIfAbsent(KEY, timeRange);
+        model.put(MODEL_KEY, timeRange);
         return model;
     }
 
@@ -64,6 +76,22 @@ public final class TimeRangeTemplateContext {
      * A bare {@code search} is treated as a message field.
      */
     public static boolean isContextVariable(String variableName) {
-        return variableName.startsWith(KEY + ".");
+        return variableName.startsWith(TEMPLATE_KEY + ".");
+    }
+
+    /**
+     * Resolves {@code search.*} variables from the time range stored under {@value #MODEL_KEY} instead of
+     * from a message field named {@value #TEMPLATE_KEY}.
+     */
+    static class ModelAdaptor extends DefaultModelAdaptor {
+        @Override
+        public Object getValue(TemplateContext context, Token token, List<String> segments, String expression) {
+            if (segments.size() > 1 && TEMPLATE_KEY.equals(segments.getFirst())) {
+                final List<String> redirected = new ArrayList<>(segments);
+                redirected.set(0, MODEL_KEY);
+                return super.getValue(context, token, redirected, expression);
+            }
+            return super.getValue(context, token, segments, expression);
+        }
     }
 }

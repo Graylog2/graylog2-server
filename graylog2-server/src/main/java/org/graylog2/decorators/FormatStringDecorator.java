@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.inject.assistedinject.Assisted;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -34,7 +35,6 @@ import org.graylog2.rest.resources.search.responses.SearchResponse;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
@@ -97,7 +97,9 @@ public class FormatStringDecorator implements SearchResponseDecorator {
     }
 
     @Inject
-    public FormatStringDecorator(@Assisted Decorator decorator, Engine templateEngine, MessageFactory messageFactory) {
+    public FormatStringDecorator(@Assisted Decorator decorator,
+                                 @Named(DecoratorTemplateEngineProvider.NAME) Engine templateEngine,
+                                 MessageFactory messageFactory) {
         this.messageFactory = messageFactory;
         final String formatString = (String) requireNonNull(decorator.config().get(CK_FORMAT_STRING),
                 CK_FORMAT_STRING + " cannot be null");
@@ -112,14 +114,15 @@ public class FormatStringDecorator implements SearchResponseDecorator {
     @WithSpan
     @Override
     public SearchResponse apply(SearchResponse searchResponse) {
-        final Map<String, Object> timeRange = TimeRangeTemplateContext.from(searchResponse);
+        final TimeRangeTemplateContext timeRangeContext = TimeRangeTemplateContext.of(searchResponse);
         final List<ResultMessageSummary> summaries = searchResponse.messages().stream()
                 .map(summary -> {
-                    if (requireAllFields && !hasAllMessageFields(summary.message())) {
+                    if (requireAllFields && !usedVariables.stream()
+                            .filter(variable -> !TimeRangeTemplateContext.isContextVariable(variable.name))
+                            .allMatch(variable -> summary.message().containsKey(variable.name))) {
                         return summary;
                     }
-                    final Map<String, Object> model = TimeRangeTemplateContext.model(summary.message(), timeRange);
-                    final String formattedString = template.transform(model, Locale.ENGLISH);
+                    final String formattedString = template.transform(timeRangeContext.model(summary.message()), Locale.ENGLISH);
 
                     if (formattedString == null) {
                         return summary;
@@ -132,11 +135,5 @@ public class FormatStringDecorator implements SearchResponseDecorator {
                 .collect(Collectors.toList());
 
         return searchResponse.toBuilder().messages(summaries).build();
-    }
-
-    private boolean hasAllMessageFields(Map<String, Object> messageFields) {
-        return usedVariables.stream()
-                .filter(variable -> !TimeRangeTemplateContext.isContextVariable(variable.name))
-                .allMatch(variable -> messageFields.containsKey(variable.name));
     }
 }
