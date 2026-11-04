@@ -52,10 +52,15 @@
     "title": "{{productName}}-Knoten"
   },
   "load_balancer_status_cell": {
-    "aria_label": "Load Balancer {{status}}"
+    "aria_label": "Load Balancer {{status}}",
+    "status_alive": "Aktiv",
+    "status_dead": "Inaktiv",
+    "status_throttled": "Gedrosselt"
   },
   "processing_state_cell": {
-    "aria_label": "Nachrichtenverarbeitung {{status}}"
+    "aria_label": "Nachrichtenverarbeitung {{status}}",
+    "enabled": "Aktiviert",
+    "disabled": "Deaktiviert"
   },
   "mongodb_nodes_expandable": {
     "title": "MongoDB Nodes"
@@ -455,5 +460,26 @@
   "use_plugin_list_notifications": {
     "fetch_failed": "Abrufen der Plugins auf Knoten \"{{nodeId}}\" fehlgeschlagen",
     "fetch_failed_title": "Die Plugins konnten nicht abgerufen werden"
+  },
+  "node_lifecycle": {
+    "uninitialized": "Nicht initialisiert",
+    "starting": "Startet",
+    "running": "Läuft",
+    "failed": "Fehlgeschlagen",
+    "halting": "Wird beendet",
+    "paused": "Pausiert",
+    "throttled": "Gedrosselt",
+    "override_lb_alive": "Load Balancer: aktiv (erzwungen)",
+    "override_lb_dead": "Load Balancer: inaktiv (erzwungen)",
+    "override_lb_throttled": "Load Balancer: gedrosselt (erzwungen)"
+  },
+  "buffers_metrics_cell": {
+    "input": "Input",
+    "process": "Verarbeitung",
+    "output": "Output"
+  },
+  "throughput_metrics_cell": {
+    "in": "Eingehend",
+    "out": "Ausgehend"
   }
 }

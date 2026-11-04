@@ -52,10 +52,15 @@
     "title": "{{productName}} Nodes"
   },
   "load_balancer_status_cell": {
-    "aria_label": "Load balancer {{status}}"
+    "aria_label": "Load balancer {{status}}",
+    "status_alive": "ALIVE",
+    "status_dead": "DEAD",
+    "status_throttled": "THROTTLED"
   },
   "processing_state_cell": {
-    "aria_label": "Message processing {{status}}"
+    "aria_label": "Message processing {{status}}",
+    "enabled": "ENABLED",
+    "disabled": "DISABLED"
   },
   "mongodb_nodes_expandable": {
     "title": "MongoDB Nodes"
@@ -455,5 +460,26 @@
   "use_plugin_list_notifications": {
     "fetch_failed": "Getting plugins on node \"{{nodeId}}\" failed",
     "fetch_failed_title": "Could not get plugins"
+  },
+  "node_lifecycle": {
+    "uninitialized": "UNINITIALIZED",
+    "starting": "STARTING",
+    "running": "RUNNING",
+    "failed": "FAILED",
+    "halting": "HALTING",
+    "paused": "PAUSED",
+    "throttled": "THROTTLED",
+    "override_lb_alive": "OVERRIDE_LB_ALIVE",
+    "override_lb_dead": "OVERRIDE_LB_DEAD",
+    "override_lb_throttled": "OVERRIDE_LB_THROTTLED"
+  },
+  "buffers_metrics_cell": {
+    "input": "Input",
+    "process": "Process",
+    "output": "Output"
+  },
+  "throughput_metrics_cell": {
+    "in": "In",
+    "out": "Out"
   }
 }

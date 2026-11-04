@@ -52,10 +52,15 @@
     "title": "{{productName}} 节点"
   },
   "load_balancer_status_cell": {
-    "aria_label": "负载均衡器 {{status}}"
+    "aria_label": "负载均衡器 {{status}}",
+    "status_alive": "在线",
+    "status_dead": "离线",
+    "status_throttled": "已限流"
   },
   "processing_state_cell": {
-    "aria_label": "消息处理 {{status}}"
+    "aria_label": "消息处理 {{status}}",
+    "enabled": "已启用",
+    "disabled": "已禁用"
   },
   "mongodb_nodes_expandable": {
     "title": "MongoDB 节点"
@@ -450,5 +455,26 @@
   "use_plugin_list_notifications": {
     "fetch_failed": "获取节点“{{nodeId}}”上的插件失败",
     "fetch_failed_title": "无法获取插件"
+  },
+  "node_lifecycle": {
+    "uninitialized": "未初始化",
+    "starting": "正在启动",
+    "running": "运行中",
+    "failed": "失败",
+    "halting": "正在停止",
+    "paused": "已暂停",
+    "throttled": "已限流",
+    "override_lb_alive": "负载均衡器：强制在线",
+    "override_lb_dead": "负载均衡器：强制离线",
+    "override_lb_throttled": "负载均衡器：强制限流"
+  },
+  "buffers_metrics_cell": {
+    "input": "输入",
+    "process": "处理",
+    "output": "输出"
+  },
+  "throughput_metrics_cell": {
+    "in": "流入",
+    "out": "流出"
   }
 }

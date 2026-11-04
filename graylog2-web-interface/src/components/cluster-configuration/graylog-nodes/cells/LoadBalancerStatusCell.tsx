@@ -34,14 +34,16 @@ const LoadBalancerStatusCell = ({ node }: Props) => {
     return null;
   }
 
+  const statusLabel = t(`load_balancer_status_cell.status_${status.toLowerCase()}`, { defaultValue: status });
+
   return (
     <MetricsColumn>
       <MetricsRow>
         <Label
           bsStyle={status === 'ALIVE' ? 'success' : 'warning'}
           bsSize="xs"
-          aria-label={t('load_balancer_status_cell.aria_label', { status })}>
-          {status}
+          aria-label={t('load_balancer_status_cell.aria_label', { status: statusLabel })}>
+          {statusLabel}
         </Label>
       </MetricsRow>
     </MetricsColumn>

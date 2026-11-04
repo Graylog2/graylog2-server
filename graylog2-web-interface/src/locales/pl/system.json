@@ -52,10 +52,15 @@
     "title": "Węzły {{productName}}"
   },
   "load_balancer_status_cell": {
-    "aria_label": "Load balancer {{status}}"
+    "aria_label": "Load balancer {{status}}",
+    "status_alive": "Aktywny",
+    "status_dead": "Nieaktywny",
+    "status_throttled": "Ograniczony"
   },
   "processing_state_cell": {
-    "aria_label": "Przetwarzanie wiadomości {{status}}"
+    "aria_label": "Przetwarzanie wiadomości {{status}}",
+    "enabled": "Włączone",
+    "disabled": "Wyłączone"
   },
   "mongodb_nodes_expandable": {
     "title": "Węzły MongoDB"
@@ -465,5 +470,26 @@
   "use_plugin_list_notifications": {
     "fetch_failed": "Pobranie wtyczek na węźle \"{{nodeId}}\" nie powiodło się",
     "fetch_failed_title": "Nie udało się pobrać wtyczek"
+  },
+  "node_lifecycle": {
+    "uninitialized": "Niezainicjowany",
+    "starting": "Uruchamianie",
+    "running": "Działa",
+    "failed": "Niepowodzenie",
+    "halting": "Zatrzymywanie",
+    "paused": "Wstrzymany",
+    "throttled": "Ograniczony",
+    "override_lb_alive": "Load balancer: aktywny (wymuszony)",
+    "override_lb_dead": "Load balancer: nieaktywny (wymuszony)",
+    "override_lb_throttled": "Load balancer: ograniczony (wymuszony)"
+  },
+  "buffers_metrics_cell": {
+    "input": "Wejście",
+    "process": "Przetwarzanie",
+    "output": "Wyjście"
+  },
+  "throughput_metrics_cell": {
+    "in": "Przychodzące",
+    "out": "Wychodzące"
   }
 }

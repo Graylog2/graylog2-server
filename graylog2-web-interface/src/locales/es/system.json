@@ -52,10 +52,15 @@
     "title": "Nodos de {{productName}}"
   },
   "load_balancer_status_cell": {
-    "aria_label": "Balanceador de carga {{status}}"
+    "aria_label": "Balanceador de carga {{status}}",
+    "status_alive": "Activo",
+    "status_dead": "Inactivo",
+    "status_throttled": "Limitado"
   },
   "processing_state_cell": {
-    "aria_label": "Procesamiento de mensajes {{status}}"
+    "aria_label": "Procesamiento de mensajes {{status}}",
+    "enabled": "Habilitado",
+    "disabled": "Deshabilitado"
   },
   "mongodb_nodes_expandable": {
     "title": "Nodos de MongoDB"
@@ -460,5 +465,26 @@
   "use_plugin_list_notifications": {
     "fetch_failed": "Error al obtener los plugins del nodo \"{{nodeId}}\"",
     "fetch_failed_title": "No se pudieron obtener los plugins"
+  },
+  "node_lifecycle": {
+    "uninitialized": "No inicializado",
+    "starting": "Iniciando",
+    "running": "En ejecución",
+    "failed": "Con error",
+    "halting": "Deteniéndose",
+    "paused": "En pausa",
+    "throttled": "Limitado",
+    "override_lb_alive": "Balanceador: activo (forzado)",
+    "override_lb_dead": "Balanceador: inactivo (forzado)",
+    "override_lb_throttled": "Balanceador: limitado (forzado)"
+  },
+  "buffers_metrics_cell": {
+    "input": "Entrada",
+    "process": "Proceso",
+    "output": "Salida"
+  },
+  "throughput_metrics_cell": {
+    "in": "Entrada",
+    "out": "Salida"
   }
 }

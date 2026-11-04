@@ -33,7 +33,7 @@ const ProcessingStateCell = ({ node }: Props) => {
     return null;
   }
 
-  const status = node.is_processing ? 'ENABLED' : 'DISABLED';
+  const status = node.is_processing ? t('processing_state_cell.enabled') : t('processing_state_cell.disabled');
 
   return (
     <MetricsColumn>

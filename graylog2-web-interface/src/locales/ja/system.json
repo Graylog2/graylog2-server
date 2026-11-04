@@ -52,10 +52,15 @@
     "title": "{{productName}}ノード"
   },
   "load_balancer_status_cell": {
-    "aria_label": "ロードバランサー {{status}}"
+    "aria_label": "ロードバランサー {{status}}",
+    "status_alive": "アクティブ",
+    "status_dead": "非アクティブ",
+    "status_throttled": "スロットリング中"
   },
   "processing_state_cell": {
-    "aria_label": "メッセージ処理 {{status}}"
+    "aria_label": "メッセージ処理 {{status}}",
+    "enabled": "有効",
+    "disabled": "無効"
   },
   "mongodb_nodes_expandable": {
     "title": "MongoDBノード"
@@ -450,5 +455,26 @@
   "use_plugin_list_notifications": {
     "fetch_failed": "ノード \"{{nodeId}}\" のプラグインの取得に失敗しました",
     "fetch_failed_title": "プラグインを取得できませんでした"
+  },
+  "node_lifecycle": {
+    "uninitialized": "未初期化",
+    "starting": "起動中",
+    "running": "実行中",
+    "failed": "失敗",
+    "halting": "停止中",
+    "paused": "一時停止",
+    "throttled": "スロットリング中",
+    "override_lb_alive": "ロードバランサー：強制的にアクティブ",
+    "override_lb_dead": "ロードバランサー：強制的に非アクティブ",
+    "override_lb_throttled": "ロードバランサー：強制的にスロットリング"
+  },
+  "buffers_metrics_cell": {
+    "input": "入力",
+    "process": "処理",
+    "output": "出力"
+  },
+  "throughput_metrics_cell": {
+    "in": "受信",
+    "out": "送信"
   }
 }

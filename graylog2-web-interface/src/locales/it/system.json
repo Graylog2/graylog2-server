@@ -52,10 +52,15 @@
     "title": "Nodi {{productName}}"
   },
   "load_balancer_status_cell": {
-    "aria_label": "Load balancer {{status}}"
+    "aria_label": "Load balancer {{status}}",
+    "status_alive": "Attivo",
+    "status_dead": "Inattivo",
+    "status_throttled": "Limitato"
   },
   "processing_state_cell": {
-    "aria_label": "Elaborazione dei messaggi {{status}}"
+    "aria_label": "Elaborazione dei messaggi {{status}}",
+    "enabled": "Abilitato",
+    "disabled": "Disabilitato"
   },
   "mongodb_nodes_expandable": {
     "title": "Nodi MongoDB"
@@ -460,5 +465,26 @@
   "use_plugin_list_notifications": {
     "fetch_failed": "Recupero dei plugin sul nodo \"{{nodeId}}\" non riuscito",
     "fetch_failed_title": "Impossibile ottenere i plugin"
+  },
+  "node_lifecycle": {
+    "uninitialized": "Non inizializzato",
+    "starting": "Avvio in corso",
+    "running": "In esecuzione",
+    "failed": "Non riuscito",
+    "halting": "Arresto in corso",
+    "paused": "In pausa",
+    "throttled": "Limitato",
+    "override_lb_alive": "Bilanciatore: attivo (forzato)",
+    "override_lb_dead": "Bilanciatore: inattivo (forzato)",
+    "override_lb_throttled": "Bilanciatore: limitato (forzato)"
+  },
+  "buffers_metrics_cell": {
+    "input": "Ingresso",
+    "process": "Elaborazione",
+    "output": "Uscita"
+  },
+  "throughput_metrics_cell": {
+    "in": "In entrata",
+    "out": "In uscita"
   }
 }

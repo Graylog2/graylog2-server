@@ -52,10 +52,15 @@
     "title": "Nœuds {{productName}}"
   },
   "load_balancer_status_cell": {
-    "aria_label": "Load balancer {{status}}"
+    "aria_label": "Load balancer {{status}}",
+    "status_alive": "Actif",
+    "status_dead": "Inactif",
+    "status_throttled": "Limité"
   },
   "processing_state_cell": {
-    "aria_label": "Traitement des messages {{status}}"
+    "aria_label": "Traitement des messages {{status}}",
+    "enabled": "Activé",
+    "disabled": "Désactivé"
   },
   "mongodb_nodes_expandable": {
     "title": "Nœuds MongoDB"
@@ -460,5 +465,26 @@
   "use_plugin_list_notifications": {
     "fetch_failed": "Échec de la récupération des plugins sur le nœud \"{{nodeId}}\"",
     "fetch_failed_title": "Impossible de récupérer les plugins"
+  },
+  "node_lifecycle": {
+    "uninitialized": "Non initialisé",
+    "starting": "Démarrage",
+    "running": "En cours d'exécution",
+    "failed": "Échec",
+    "halting": "Arrêt en cours",
+    "paused": "En pause",
+    "throttled": "Limité",
+    "override_lb_alive": "Répartiteur : actif (forcé)",
+    "override_lb_dead": "Répartiteur : inactif (forcé)",
+    "override_lb_throttled": "Répartiteur : limité (forcé)"
+  },
+  "buffers_metrics_cell": {
+    "input": "Entrée",
+    "process": "Traitement",
+    "output": "Sortie"
+  },
+  "throughput_metrics_cell": {
+    "in": "Entrant",
+    "out": "Sortant"
   }
 }

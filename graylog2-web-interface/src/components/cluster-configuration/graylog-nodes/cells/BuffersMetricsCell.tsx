@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import i18n from 'i18n';
 import { buildRatioIndicator, computeRatio } from '../../shared-components/RatioIndicator';
@@ -49,19 +50,20 @@ const renderBufferRow = (
 };
 
 const BuffersMetricsCell = ({ node, warningThreshold = Number.NaN, dangerThreshold = Number.NaN }: Props) => {
+  const { t } = useTranslation('system');
   const rows = [
     {
-      label: 'Input',
+      label: t('buffers_metrics_cell.input'),
       usage: node.metrics?.bufferInputUsage,
       size: node.metrics?.bufferInputSize,
     },
     {
-      label: 'Process',
+      label: t('buffers_metrics_cell.process'),
       usage: node.metrics?.bufferProcessUsage,
       size: node.metrics?.bufferProcessSize,
     },
     {
-      label: 'Output',
+      label: t('buffers_metrics_cell.output'),
       usage: node.metrics?.bufferOutputUsage,
       size: node.metrics?.bufferOutputSize,
     },
