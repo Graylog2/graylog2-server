@@ -185,8 +185,7 @@
                             <goal>enforce</goal>
                         </goals>
                         <configuration>
-                            <!-- Don't merge rules from plugin-level enforcer configurations in child modules
-                                 into this execution. (e.g., RestrictImports in datanode-enterprise-plugin) -->
+                            <!-- Don't merge rules from plugin-level enforcer configurations in child modules into this execution. -->
                             <rules combine.self="override">
                                 <bannedDependencies>
                                     <message>Native Netty libraries are provided by the Graylog server and must not be bundled in plugins. Add a "provided" scope override to the dependencyManagement section of graylog-plugin-parent.</message>
