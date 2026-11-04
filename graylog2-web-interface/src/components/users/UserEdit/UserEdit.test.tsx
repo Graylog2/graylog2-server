@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import omit from 'lodash/omit';
 import { screen, render, act, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
@@ -122,7 +123,7 @@ describe('<UserEdit />', () => {
     expect(updateSpy).toHaveBeenCalledWith(
       user.id,
       {
-        ...user.toJSON(),
+        ...omit(user.toJSON(), ['permissions', 'grn_permissions']),
         fullName: 'Updated Name',
       },
       user.fullName,
@@ -146,11 +147,35 @@ describe('<UserEdit />', () => {
     expect(updateSpy).toHaveBeenCalledWith(
       user.id,
       {
-        ...user.toJSON(),
+        ...omit(user.toJSON(), ['permissions', 'grn_permissions']),
         roles: ['new-role'],
       },
       user.fullName,
     );
+  });
+
+  it('should not send permissions but keep timezone and startpage when updating user', async () => {
+    const updateSpy = jest.fn((_userId: string, _payload: object, _fullName: string) => Promise.resolve());
+    (UsersDomain.update as jest.Mock) = updateSpy;
+    const userWithSettings = user
+      .toBuilder()
+      .timezone('Europe/Berlin')
+      .startpage({ type: 'dashboard', id: 'dashboard-id' })
+      .build();
+
+    render(<UserEdit user={userWithSettings} />);
+
+    const updateButton = await screen.findByText('Update Profile');
+    await setupUser().click(updateButton);
+
+    await waitFor(() => expect(updateSpy).toHaveBeenCalledTimes(1));
+
+    const payload = updateSpy.mock.calls[0][1];
+
+    expect(payload).not.toHaveProperty('permissions');
+    expect(payload).not.toHaveProperty('grn_permissions');
+    expect(payload).toHaveProperty('timezone', 'Europe/Berlin');
+    expect(payload).toHaveProperty('startpage', { type: 'dashboard', id: 'dashboard-id' });
   });
 
   it('should reload current user when updating current user', async () => {

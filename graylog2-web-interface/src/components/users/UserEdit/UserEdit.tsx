@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useCallback } from 'react';
+import omit from 'lodash/omit';
 
 import UsersDomain from 'domainActions/users/UsersDomain';
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -48,7 +49,13 @@ const UserEdit = ({ user }: Props) => {
   const [selectedSegment, setSelectedSegment] = useState<UserSegment>('profile');
   const updateUser = useCallback(
     (data: UserUpdate) =>
-      UsersDomain.update(user.id, { ...user.toJSON(), ...data }, user.fullName).then(() => {
+      // Permissions in the user response are effective permissions, incl. permission that are derived from shares.
+      // Sending them back would store them as direct user permissions.
+      UsersDomain.update(
+        user.id,
+        { ...omit(user.toJSON(), ['permissions', 'grn_permissions']), ...data },
+        user.fullName,
+      ).then(() => {
         if (user.id === currentUser?.id) {
           CurrentUser.reload();
         }

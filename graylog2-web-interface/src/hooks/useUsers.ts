@@ -49,11 +49,16 @@ export type UserCreate = {
   username: UserJSON['username'];
 };
 
+// Permissions must never be sent on update. The user response contains effective permissions, incl. permissions that
+// are derived e.g. from shares. Sending them back would store them as direct user permissions.
 export type UserUpdate = Partial<
-  UserCreate & {
+  Omit<UserCreate, 'permissions'> & {
     old_password: string;
   }
->;
+> & {
+  permissions?: never;
+  grn_permissions?: never;
+};
 
 export type Token = {
   id: string;
