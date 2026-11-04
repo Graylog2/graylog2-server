@@ -29,6 +29,7 @@ enum ConfigurationType {
   MCP_CONFIG = 'org.graylog.mcp.config.McpConfiguration',
   MARKDOWN_CONFIG = 'org.graylog2.configuration.MarkdownConfiguration',
   WELCOME_PAGE_CONFIG = 'org.graylog2.configuration.WelcomePageConfiguration',
+  BEATS_INPUT_DEFAULTS_CONFIG = 'org.graylog.plugins.beats.BeatsInputDefaultsConfig',
 }
 export default ConfigurationType;
 export { ConfigurationType };

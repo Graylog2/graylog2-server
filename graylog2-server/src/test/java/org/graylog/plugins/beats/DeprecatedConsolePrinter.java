@@ -59,7 +59,7 @@ public class DeprecatedConsolePrinter {
                         @Override
                         public void initChannel(SocketChannel ch) {
                             ch.pipeline().addLast("logging", new LoggingHandler());
-                            ch.pipeline().addLast("beats-frame-decoder", new BeatsFrameDecoder());
+                            ch.pipeline().addLast("beats-frame-decoder", new BeatsFrameDecoder(BeatsInputDefaultsConfig.DEFAULT_MAX_EVENT_SIZE));
                             ch.pipeline().addLast("beats-deprecated-codec", new BeatsCodecHandler());
                         }
                     });

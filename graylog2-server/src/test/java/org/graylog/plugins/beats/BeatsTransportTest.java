@@ -17,6 +17,7 @@
 package org.graylog.plugins.beats;
 
 import io.netty.channel.nio.NioEventLoopGroup;
+import org.graylog.security.certutil.InMemoryClusterConfigService;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
 import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
@@ -34,6 +35,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
@@ -42,6 +45,7 @@ import static org.mockito.Mockito.mock;
 public class BeatsTransportTest {
 
     private NioEventLoopGroup eventLoopGroup;
+    private InMemoryClusterConfigService clusterConfigService;
 
     @Mock
     private TLSProtocolsConfiguration tlsConfiguration;
@@ -49,6 +53,7 @@ public class BeatsTransportTest {
     @BeforeEach
     public void setUp() {
         eventLoopGroup = new NioEventLoopGroup(1);
+        clusterConfigService = new InMemoryClusterConfigService();
     }
 
     @AfterEach
@@ -58,20 +63,56 @@ public class BeatsTransportTest {
 
     @Test
     public void customChildChannelHandlersContainBeatsHandler() {
+        final BeatsTransport transport = createTransport(Configuration.EMPTY_CONFIGURATION);
+
+        final MessageInput input = mock(MessageInput.class);
+        assertThat(transport.getCustomChildChannelHandlers(input)).containsKey("beats");
+    }
+
+    @Test
+    public void maxEventSizeFallsBackToBuiltInDefault() {
+        final BeatsTransport transport = createTransport(Configuration.EMPTY_CONFIGURATION);
+
+        assertThat(transport.maxEventSize()).isEqualTo(BeatsInputDefaultsConfig.DEFAULT_MAX_EVENT_SIZE);
+    }
+
+    @Test
+    public void maxEventSizeFallsBackToClusterDefault() {
+        clusterConfigService.write(BeatsInputDefaultsConfig.create(32 * 1024 * 1024));
+        final BeatsTransport transport = createTransport(Configuration.EMPTY_CONFIGURATION);
+
+        assertThat(transport.maxEventSize()).isEqualTo(32 * 1024 * 1024);
+    }
+
+    @Test
+    public void maxEventSizeUsesInputSettingOverClusterDefault() {
+        clusterConfigService.write(BeatsInputDefaultsConfig.create(32 * 1024 * 1024));
+        final BeatsTransport transport = createTransport(new Configuration(Map.of(BeatsTransport.CK_MAX_EVENT_SIZE, 1024)));
+
+        assertThat(transport.maxEventSize()).isEqualTo(1024);
+    }
+
+    @Test
+    public void maxEventSizeOfZeroUsesClusterDefault() {
+        clusterConfigService.write(BeatsInputDefaultsConfig.create(32 * 1024 * 1024));
+        final BeatsTransport transport = createTransport(new Configuration(Map.of(BeatsTransport.CK_MAX_EVENT_SIZE, 0)));
+
+        assertThat(transport.maxEventSize()).isEqualTo(32 * 1024 * 1024);
+    }
+
+    private BeatsTransport createTransport(Configuration configuration) {
         final NettyTransportConfiguration nettyTransportConfiguration = new NettyTransportConfiguration("nio", "jdk", 1);
         final EventLoopGroupFactory eventLoopGroupFactory = new EventLoopGroupFactory(nettyTransportConfiguration);
-        final BeatsTransport transport = new BeatsTransport(
-                Configuration.EMPTY_CONFIGURATION,
+        return new BeatsTransport(
+                configuration,
                 eventLoopGroup,
                 eventLoopGroupFactory,
                 nettyTransportConfiguration,
                 new ThroughputCounter(eventLoopGroup),
                 new LocalMetricRegistry(),
                 tlsConfiguration,
-                mock(EncryptedValueService.class)
+                mock(EncryptedValueService.class),
+                clusterConfigService
         );
-
-        final MessageInput input = mock(MessageInput.class);
-        assertThat(transport.getCustomChildChannelHandlers(input)).containsKey("beats");
     }
 }
