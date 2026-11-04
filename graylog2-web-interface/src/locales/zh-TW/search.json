@@ -475,7 +475,7 @@
       "searchFilterQuery": "從搜尋篩選器查詢",
       "streams": "Stream",
       "searchWithinMs": "在毫秒內搜尋",
-      "lutParameters": "查閱表參數",
+      "lutParameters": "查詢表參數",
       "searchFromValue": "從值查詢"
     },
     "item_label": "{{label}}：",

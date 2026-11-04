@@ -1,11 +1,11 @@
 {
   "title": "Grok 模式",
-  "delete_confirmation": "確定要刪除 Grok 模式 {{name}} 嗎？\n此模式將從系統中移除，任何提取器都將無法使用。若仍有提取器在使用此模式，這些提取器將無法正常運作。",
+  "delete_confirmation": "確定要刪除 Grok 模式 {{name}} 嗎？\n此模式將從系統中移除，任何擷取器都將無法使用。若仍有擷取器在使用此模式，這些擷取器將無法正常運作。",
   "delete": "刪除",
   "header_name": "名稱",
   "header_pattern": "模式",
   "header_actions": "動作",
-  "description": "這是可用於 Grok 提取器的 Grok 模式清單。您可以手動新增自訂模式，或從所謂的模式檔案匯入整份模式清單。",
+  "description": "這是可用於 Grok 擷取器的 Grok 模式清單。您可以手動新增自訂模式，或從所謂的模式檔案匯入整份模式清單。",
   "no_data": "找不到任何 Grok 模式。",
   "error_name_exists": "已存在相同名稱的模式！",
   "error_test_missing": "若要測試模式，必須提供名稱和模式！",

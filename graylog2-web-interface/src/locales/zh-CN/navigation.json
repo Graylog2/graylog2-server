@@ -70,7 +70,7 @@
     "administration": "管理",
     "configuration": "配置",
     "failure_tracking": "故障跟踪",
-    "alerts_and_events": "警报和事件",
+    "alerts_and_events": "告警和事件",
     "event_definitions": "事件定义"
   }
 }

@@ -248,7 +248,7 @@
   "Threshold Type": "阈值类型",
   "Time Range": "时间范围",
   "Time Zone": "时区",
-  "Time between every collector run. Select a time unit in the corresponding dropdown. Example: Run every 5 minutes.": "每次收集器运行之间的时间间隔。请在对应的下拉菜单中选择时间单位。例如：每 5 分钟运行一次。",
+  "Time between every collector run. Select a time unit in the corresponding dropdown. Example: Run every 5 minutes.": "每次 Collector 运行之间的时间间隔。请在对应的下拉菜单中选择时间单位。例如：每 5 分钟运行一次。",
   "Time to wait between reconnects in milliseconds": "重新连接之间的等待时间（毫秒）",
   "Time zone of the Palo Alto device": "Palo Alto 设备的时区",
   "Timezone": "时区",

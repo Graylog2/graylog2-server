@@ -597,7 +597,7 @@
     "user": "建立使用者",
     "pipeline": "建立 Pipeline",
     "pipeline_rule": "建立 Pipeline 規則",
-    "content_pack": "建立內容套件",
+    "content_pack": "建立內容包",
     "fleet": "建立 Fleet"
   }
 }

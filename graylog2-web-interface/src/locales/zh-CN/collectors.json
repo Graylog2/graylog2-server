@@ -460,7 +460,7 @@
     "priority": "优先级",
     "priority_help": "要收集的最低严重级别。例如，选择 Error 时还会收集 Critical、Alert 和 Emergency 条目。",
     "priority_emerg": "紧急",
-    "priority_alert": "警报",
+    "priority_alert": "告警",
     "priority_crit": "严重",
     "priority_err": "错误",
     "priority_warning": "警告",

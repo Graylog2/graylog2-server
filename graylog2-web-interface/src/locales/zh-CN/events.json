@@ -32,7 +32,7 @@
     "refresh_human_name": "事件",
     "replay_search": "重放搜索",
     "histogram_series_events": "事件",
-    "histogram_series_alerts": "警报"
+    "histogram_series_alerts": "告警"
   },
   "alerts_replay": {
     "cannot_replay": "无法重放此事件：{{reason}} 请选择其他事件。",

@@ -99,7 +99,7 @@
       "default_template": "默认模板",
       "default_template_help": "默认的 Collector 配置。",
       "execute_parameters": "执行参数",
-      "execute_parameters_help": "采集器启动时使用的参数。<strong>%s 将被替换为配置文件的路径。</strong>",
+      "execute_parameters_help": "Collector 启动时使用的参数。<strong>%s 将被替换为配置文件的路径。</strong>",
       "executable_path": "可执行文件路径",
       "executable_path_help": "Collector 可执行文件的路径",
       "name": "名称",
