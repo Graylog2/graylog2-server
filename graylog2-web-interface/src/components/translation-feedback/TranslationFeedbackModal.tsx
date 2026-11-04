@@ -75,10 +75,12 @@ type Props = {
 const TranslationFeedbackModal = ({ target, onClose }: Props) => {
   const { t } = useTranslation('translation_feedback');
   const { candidates, language } = target;
-  const [selected, setSelected] = useState<string>(candidates.length > 0 ? candidateId(candidates[0]) : NO_KEY);
+  // Texts which only partly match a translation are often a coincidence, so the reporter has to pick those.
+  const preselected = candidates.find(({ exact }) => exact);
+  const [selected, setSelected] = useState<string>(preselected ? candidateId(preselected) : NO_KEY);
   const candidate = candidates.find((other) => candidateId(other) === selected);
   const [text, setText] = useState(target.text);
-  const [category, setCategory] = useState<Category>(defaultCategory(candidates[0], language));
+  const [category, setCategory] = useState<Category>(defaultCategory(preselected, language));
   const [suggestion, setSuggestion] = useState('');
   const [comment, setComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);

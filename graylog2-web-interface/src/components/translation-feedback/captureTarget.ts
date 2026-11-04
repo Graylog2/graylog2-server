@@ -31,6 +31,20 @@ const closestElement = (target: EventTarget | null): HTMLElement | null => {
   return null;
 };
 
+// Material Symbols are ligatures, so their text is the icon's name, e.g. "arrow_drop_down".
+const ICON_SELECTOR = '.material-symbols-rounded';
+
+const textWithoutIcons = (element: HTMLElement) => {
+  if (!element.querySelector(ICON_SELECTOR)) {
+    return element.matches(ICON_SELECTOR) ? '' : element.innerText || element.textContent;
+  }
+
+  const copy = element.cloneNode(true) as HTMLElement;
+  copy.querySelectorAll(ICON_SELECTOR).forEach((icon) => icon.remove());
+
+  return copy.textContent;
+};
+
 /**
  * Text the user selected, otherwise the text of the clicked element. Elements without text, like icon buttons,
  * fall back to their title or aria label.
@@ -49,8 +63,7 @@ export const textOfTarget = (target: EventTarget | null): string => {
   }
 
   const text =
-    element.innerText ||
-    element.textContent ||
+    textWithoutIcons(element) ||
     element.getAttribute('title') ||
     element.getAttribute('aria-label') ||
     element.closest('[title]')?.getAttribute('title') ||

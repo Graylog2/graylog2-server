@@ -54,6 +54,17 @@ describe('renderedTranslations', () => {
     ]);
   });
 
+  it('ignores texts which only share a part of a word or a small part of a translation', () => {
+    recordTranslation('OpenSearch cluster', source('cluster'));
+    recordTranslation('Notes', source('notes'));
+    recordTranslation('Collapse Cluster Health', source('collapse'));
+
+    expect(findTranslations('Open')).toEqual([]);
+    expect(findTranslations('No')).toEqual([]);
+    expect(findTranslations('Cluster Health')).toEqual([expect.objectContaining({ key: 'collapse', exact: false })]);
+    expect(findTranslations('Health')).toEqual([]);
+  });
+
   it('returns nothing for texts which were not translated', () => {
     recordTranslation('Suche', source('search'));
 

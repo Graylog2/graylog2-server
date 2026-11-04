@@ -30,6 +30,38 @@ export type TranslationSource = {
 const MAX_ENTRIES = 5000;
 const MAX_CANDIDATES = 5;
 const MIN_PARTIAL_MATCH_LENGTH = 3;
+// A clicked text which is only a small part of a translation, like "Open" in "OpenSearch cluster", is a coincidence.
+const MIN_CONTAINED_RATIO = 0.5;
+const WORD_CHARACTER = /[\p{L}\p{N}]/u;
+
+const isWordCharacter = (character: string | undefined) => !!character && WORD_CHARACTER.test(character);
+
+/** Whether `part` appears in `text` as whole words, so "Name" is in "First Name", but "No" is not in "Notes". */
+const containsWords = (text: string, part: string) => {
+  let index = text.indexOf(part);
+
+  while (index !== -1) {
+    if (!isWordCharacter(text[index - 1]) && !isWordCharacter(text[index + part.length])) {
+      return true;
+    }
+
+    index = text.indexOf(part, index + 1);
+  }
+
+  return false;
+};
+
+const isPartialMatch = (clicked: string, recorded: string) => {
+  if (recorded.length < MIN_PARTIAL_MATCH_LENGTH || clicked.length < MIN_PARTIAL_MATCH_LENGTH) {
+    return false;
+  }
+
+  if (recorded.length > clicked.length) {
+    return clicked.length / recorded.length >= MIN_CONTAINED_RATIO && containsWords(recorded, clicked);
+  }
+
+  return containsWords(clicked, recorded);
+};
 
 // Tags of `<Trans>` components, e.g. `<0>`, `</bold>` or `<br/>`, are not part of the rendered text.
 const TAG = /<\/?[\w-]+\s*\/?>/g;
@@ -67,7 +99,7 @@ export type Candidate = TranslationSource & { text: string; exact: boolean };
 
 /**
  * Returns the translations which most likely produced the given text. Texts which were rendered exactly like this
- * come first. Otherwise, texts containing or contained in it are returned, closest in length first,
+ * come first. Otherwise, texts containing or contained in it as whole words are returned, closest in length first,
  * e.g. for an element combining a translation with a value.
  */
 export const findTranslations = (text: string): Array<Candidate> => {
@@ -86,11 +118,7 @@ export const findTranslations = (text: string): Array<Candidate> => {
   const partial: Array<Candidate & { distance: number }> = [];
 
   textsToSources.forEach((sources, recorded) => {
-    if (recorded.length < MIN_PARTIAL_MATCH_LENGTH) {
-      return;
-    }
-
-    if (normalized.includes(recorded) || recorded.includes(normalized)) {
+    if (isPartialMatch(normalized, recorded)) {
       sources.forEach((source) =>
         partial.push({
           ...source,
