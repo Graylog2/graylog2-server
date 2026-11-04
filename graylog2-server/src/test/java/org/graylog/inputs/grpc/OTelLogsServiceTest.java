@@ -19,9 +19,16 @@ package org.graylog.inputs.grpc;
 import com.google.common.io.Resources;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.util.JsonFormat;
+import com.google.rpc.RetryInfo;
+import io.grpc.Context;
+import io.grpc.Metadata;
+import io.grpc.Status;
+import io.grpc.protobuf.StatusProto;
+import io.grpc.stub.MetadataUtils;
 import io.grpc.stub.StreamObserver;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceResponse;
+import io.opentelemetry.proto.collector.logs.v1.LogsServiceGrpc;
 import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.common.v1.InstrumentationScope;
 import io.opentelemetry.proto.common.v1.KeyValue;
@@ -31,29 +38,37 @@ import io.opentelemetry.proto.logs.v1.ScopeLogs;
 import io.opentelemetry.proto.resource.v1.Resource;
 import org.graylog.inputs.otel.OTelGrpcInput;
 import org.graylog.inputs.otel.OTelJournal;
-
 import org.graylog.inputs.otel.transport.OTelLogsService;
+import org.graylog.testing.grpc.InProcessGrpc;
+import org.graylog.testing.grpc.InProcessGrpcExtension;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.transports.ThrottleableTransport2;
 import org.graylog2.plugin.journal.RawMessage;
-import org.mockito.ArgumentCaptor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog.inputs.grpc.RemoteAddressProviderInterceptor.REMOTE_ADDRESS;
+import static org.graylog.testing.grpc.GrpcAssertions.assertStatus;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(InProcessGrpcExtension.class)
 class OTelLogsServiceTest {
 
     @Mock
@@ -140,7 +155,103 @@ class OTelLogsServiceTest {
 
     @Test
     void exportWithSingleLogRecordAssignsFullRequestSize() {
-        final ExportLogsServiceRequest request = ExportLogsServiceRequest.newBuilder()
+        final ExportLogsServiceRequest request = singleRecordRequest();
+
+        logsService.export(request, responseObserver);
+
+        final ArgumentCaptor<RawMessage> captor = ArgumentCaptor.forClass(RawMessage.class);
+        verify(input).processRawMessage(captor.capture());
+
+        assertThat(captor.getValue().getInputMessageSize())
+                .as("Single log record should get the full request serialized size")
+                .isEqualTo(request.getSerializedSize());
+    }
+
+    @Test
+    void exportFailsWithCancelledIfCallWasCancelled() {
+        final Context.CancellableContext context = Context.current().withCancellation();
+        context.cancel(null);
+
+        context.run(() -> logsService.export(singleRecordRequest(), responseObserver));
+
+        final ArgumentCaptor<Throwable> captor = ArgumentCaptor.forClass(Throwable.class);
+        verify(responseObserver).onError(captor.capture());
+        verifyNoMoreInteractions(responseObserver);
+        assertThat(Status.fromThrowable(captor.getValue()).getCode()).isEqualTo(Status.Code.CANCELLED);
+        verifyNoInteractions(input);
+    }
+
+    @Test
+    void exportFailsWithUnavailableIfTransportIsThrottled() {
+        when(transport.isThrottled()).thenReturn(true);
+
+        logsService.export(singleRecordRequest(), responseObserver);
+
+        final ArgumentCaptor<Throwable> captor = ArgumentCaptor.forClass(Throwable.class);
+        verify(responseObserver).onError(captor.capture());
+        verifyNoMoreInteractions(responseObserver);
+        assertThat(Status.fromThrowable(captor.getValue()).getCode()).isEqualTo(Status.Code.UNAVAILABLE);
+        verifyNoInteractions(input);
+    }
+
+    @Test
+    void exportAddsRemoteAddressFromContextToRawMessage() {
+        final var remoteAddress = new InetSocketAddress("192.0.2.10", 54321);
+
+        Context.current().withValue(REMOTE_ADDRESS, remoteAddress)
+                .run(() -> logsService.export(singleRecordRequest(), responseObserver));
+
+        final ArgumentCaptor<RawMessage> captor = ArgumentCaptor.forClass(RawMessage.class);
+        verify(input).processRawMessage(captor.capture());
+        assertThat(captor.getValue().getRemoteAddress()).isNotNull();
+        assertThat(captor.getValue().getRemoteAddress().getInetSocketAddress()).isEqualTo(remoteAddress);
+    }
+
+    @Test
+    void exportWithoutRemoteAddressInContextCreatesRawMessageWithoutRemoteAddress() {
+        logsService.export(singleRecordRequest(), responseObserver);
+
+        final ArgumentCaptor<RawMessage> captor = ArgumentCaptor.forClass(RawMessage.class);
+        verify(input).processRawMessage(captor.capture());
+        assertThat(captor.getValue().getRemoteAddress()).isNull();
+    }
+
+    @Test
+    void exportOverGrpcWithInterceptorsProcessesRecords(InProcessGrpc grpc) throws IOException {
+        final var headers = new Metadata();
+        headers.put(Metadata.Key.of("authorization", Metadata.ASCII_STRING_MARSHALLER), "Bearer s3cr3t");
+
+        // Same interceptor setup as AbstractGrpcTransport with a configured bearer token.
+        final var stub = LogsServiceGrpc.newBlockingStub(grpc.start(logsService,
+                        new RemoteAddressProviderInterceptor(),
+                        new BearerTokenAuthInterceptor("s3cr3t")))
+                .withInterceptors(MetadataUtils.newAttachHeadersInterceptor(headers));
+
+        assertThat(stub.export(singleRecordRequest())).isEqualTo(ExportLogsServiceResponse.getDefaultInstance());
+
+        final ArgumentCaptor<RawMessage> captor = ArgumentCaptor.forClass(RawMessage.class);
+        verify(input).processRawMessage(captor.capture());
+        // The in-process transport doesn't provide an InetSocketAddress.
+        assertThat(captor.getValue().getRemoteAddress()).isNull();
+    }
+
+    @Test
+    void throttledStatusWithRetryInfoReachesGrpcClient(InProcessGrpc grpc) throws IOException {
+        when(transport.isThrottled()).thenReturn(true);
+
+        final var stub = LogsServiceGrpc.newBlockingStub(grpc.start(logsService));
+
+        final var e = assertStatus(() -> stub.export(singleRecordRequest()), Status.Code.UNAVAILABLE);
+
+        final com.google.rpc.Status status = StatusProto.fromThrowable(e);
+        assertThat(status).isNotNull();
+        assertThat(status.getDetailsList()).singleElement().satisfies(detail ->
+                assertThat(detail.unpack(RetryInfo.class).getRetryDelay().getSeconds()).isEqualTo(30));
+        verifyNoInteractions(input);
+    }
+
+    private static ExportLogsServiceRequest singleRecordRequest() {
+        return ExportLogsServiceRequest.newBuilder()
                 .addResourceLogs(ResourceLogs.newBuilder()
                         .setResource(Resource.newBuilder()
                                 .addAttributes(KeyValue.newBuilder()
@@ -151,15 +262,6 @@ class OTelLogsServiceTest {
                                 .addLogRecords(LogRecord.newBuilder()
                                         .setBody(AnyValue.newBuilder().setStringValue("single log message")))))
                 .build();
-
-        logsService.export(request, responseObserver);
-
-        final ArgumentCaptor<RawMessage> captor = ArgumentCaptor.forClass(RawMessage.class);
-        verify(input).processRawMessage(captor.capture());
-
-        assertThat(captor.getValue().getInputMessageSize())
-                .as("Single log record should get the full request serialized size")
-                .isEqualTo(request.getSerializedSize());
     }
 
     private OTelJournal.Record parseJournalRecord(byte[] payload) {
