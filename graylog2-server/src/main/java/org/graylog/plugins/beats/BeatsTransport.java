@@ -26,6 +26,7 @@ import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.NumberField;
@@ -80,8 +81,40 @@ public class BeatsTransport extends AbstractTcpTransport {
      */
     @VisibleForTesting
     int maxEventSize() {
-        final int configured = configuration.getInt(CK_MAX_EVENT_SIZE, USE_CLUSTER_DEFAULT);
+        final int configured;
+        try {
+            configured = configuredMaxEventSize(configuration);
+        } catch (ConfigurationException e) {
+            throw new IllegalStateException(e.getMessage(), e);
+        }
         return configured > 0 ? configured : defaults(clusterConfigService).maxEventSize();
+    }
+
+    /**
+     * Validates the input's max. event size. Used by the Beats inputs to reject invalid values when they are saved.
+     */
+    static void checkConfiguration(Configuration configuration) throws ConfigurationException {
+        configuredMaxEventSize(configuration);
+    }
+
+    /**
+     * Reads the raw configured value, because {@link Configuration#getInt} silently truncates values outside the
+     * int range, e.g. turning 4294968320 into 1024.
+     */
+    private static int configuredMaxEventSize(Configuration configuration) throws ConfigurationException {
+        final Object value = configuration.getSource().get(CK_MAX_EVENT_SIZE);
+        if (value == null) {
+            return USE_CLUSTER_DEFAULT;
+        }
+        if (!(value instanceof Number number)) {
+            throw new ConfigurationException(f("Max. event size must be a number, but is \"%s\".", value));
+        }
+        final long size = number.longValue();
+        if (size < 0 || size > Integer.MAX_VALUE) {
+            throw new ConfigurationException(f("Max. event size must be between 0 and %d bytes, but is %d.",
+                    Integer.MAX_VALUE, size));
+        }
+        return (int) size;
     }
 
     private static BeatsInputDefaultsConfig defaults(ClusterConfigService clusterConfigService) {

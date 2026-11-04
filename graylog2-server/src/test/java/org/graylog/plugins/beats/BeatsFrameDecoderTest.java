@@ -262,10 +262,11 @@ public class BeatsFrameDecoderTest {
         channel = new EmbeddedChannel(new BeatsFrameDecoder(jsonBytes.length));
 
         channel.writeInbound(buildJsonFrame(jsonBytes, 0));
-        channel.finish();
 
         final ByteBuf received = channel.readInbound();
         assertThat(received.toString(StandardCharsets.UTF_8)).isEqualTo("{\"answer\": 42}");
+        received.release();
+        channel.finishAndReleaseAll();
     }
 
     @Test
@@ -330,11 +331,12 @@ public class BeatsFrameDecoderTest {
         channel = new EmbeddedChannel(new BeatsFrameDecoder(16));
 
         channel.writeInbound(buildDataFrame(ImmutableMap.of("foo", "hello"), 0));
-        channel.finish();
 
         final ByteBuf received = channel.readInbound();
         final Map<String, Object> result = objectMapper.readValue(received.toString(StandardCharsets.UTF_8), TypeReferences.MAP_STRING_OBJECT);
         assertThat(result).containsEntry("foo", "hello");
+        received.release();
+        channel.finishAndReleaseAll();
     }
 
     @Test
