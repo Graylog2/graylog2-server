@@ -116,9 +116,11 @@
         <aws-msk-iam-auth.version>2.3.9</aws-msk-iam-auth.version>
         <bouncycastle-prov.version>1.86</bouncycastle-prov.version>
         <bouncycastle-pkix.version>1.86</bouncycastle-pkix.version>
+        <byte-buddy.version>1.18.14</byte-buddy.version>
         <caffeine.version>3.3.1</caffeine.version>
         <classgraph.version>5.0.0</classgraph.version>
         <commons-codec.version>1.22.1</commons-codec.version>
+        <commons-collections4.version>4.6.0</commons-collections4.version>
         <commons-csv.version>1.14.1</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
         <commons-exec.version>1.6.0</commons-exec.version>
@@ -228,6 +230,7 @@
         <stateless4j.version>2.6.0</stateless4j.version>
         <poi.version>5.5.1</poi.version>
         <mcp-bom.version>2.1.0</mcp-bom.version>
+        <json-schema-validator.version>2.0.4</json-schema-validator.version>
         <json-schema-generator.version>4.38.0</json-schema-generator.version>
 
         <!-- Test dependencies -->
@@ -877,6 +880,27 @@
                 <artifactId>javassist</artifactId>
                 <version>${javassist.version}</version>
             </dependency>
+            <!-- Test dependencies (mockito, assertj, equalsverifier) pull in older byte-buddy versions
+                 than selenium requires -->
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${byte-buddy.version}</version>
+            </dependency>
+            <!-- airline, poi and amazon-kinesis-client pull in older commons-collections4 versions
+                 than the Apache Directory API requires -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>${commons-collections4.version}</version>
+            </dependency>
+            <!-- wiremock pulls in json-schema-validator 1.x, but the MCP SDK (mcp-json-jackson2)
+                 requires 2.x. Keep in sync with the version required by the MCP SDK. -->
+            <dependency>
+                <groupId>com.networknt</groupId>
+                <artifactId>json-schema-validator</artifactId>
+                <version>${json-schema-validator.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -1003,7 +1027,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.6.3</version>
+                    <version>3.7.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.cyclonedx</groupId>
