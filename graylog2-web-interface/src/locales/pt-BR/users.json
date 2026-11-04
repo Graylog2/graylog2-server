@@ -176,7 +176,13 @@
     },
     "validation_error": {
       "ownerless": "Remover os proprietários a seguir deixará o item sem proprietário:"
-    }
+    },
+    "capabilities": {
+      "viewer": "Visualizador",
+      "manager": "Gerenciador",
+      "owner": "Proprietário"
+    },
+    "select_capability": "Selecione um nível de acesso"
   },
   "roles": {
     "profile": {

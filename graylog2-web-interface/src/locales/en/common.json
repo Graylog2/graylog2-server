@@ -602,5 +602,17 @@
   },
   "use_search_version_check_notifications": {
     "fetch_failed_title": "Could not fetch override data"
+  },
+  "entity_creators": {
+    "event_definition": "Create event definition",
+    "notification": "Create notification",
+    "dashboard": "Create dashboard",
+    "stream": "Create stream",
+    "index_set": "Create index set",
+    "user": "Create user",
+    "pipeline": "Create pipeline",
+    "pipeline_rule": "Create pipeline rule",
+    "content_pack": "Create content pack",
+    "fleet": "Create fleet"
   }
 }

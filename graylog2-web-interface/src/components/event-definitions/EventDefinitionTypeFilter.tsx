@@ -20,6 +20,7 @@ import { useState } from 'react';
 import type { FilterComponentProps } from 'stores/PaginationTypes';
 import SuggestionsList from 'components/common/EntityFilters/FilterConfiguration/SuggestionsList';
 import usePluginEntities from 'hooks/usePluginEntities';
+import { eventDefinitionTypeTitle } from 'components/event-definitions/pluginTitles';
 
 const DEFAULT_SEARCH_PARAMS = {
   query: '',
@@ -44,7 +45,7 @@ const EventDefinitionTypeFilter = ({
     // Match the create form (EventConditionForm): only offer types whose license/feature
     // gate is satisfied, so unlicensed enterprise types aren't listed.
     .filter((edt) => edt.useCondition())
-    .map((edt) => ({ id: edt.type, value: edt.displayName }))
+    .map((edt) => ({ id: edt.type, value: eventDefinitionTypeTitle(edt) }))
     .filter((suggestion) => suggestion.value.toLowerCase().includes(filterQuery.query.toLowerCase()))
     .sort((a, b) => a.value.localeCompare(b.value));
 

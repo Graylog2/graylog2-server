@@ -176,7 +176,13 @@
     },
     "validation_error": {
       "ownerless": "次の所有者を削除すると、項目の所有者がいなくなります:"
-    }
+    },
+    "capabilities": {
+      "viewer": "閲覧者",
+      "manager": "マネージャー",
+      "owner": "オーナー"
+    },
+    "select_capability": "権限を選択"
   },
   "roles": {
     "profile": {

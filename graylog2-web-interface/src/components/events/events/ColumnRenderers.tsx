@@ -33,6 +33,7 @@ import type { ColumnRenderersByAttribute, EntityBase } from 'components/common/E
 import EventDefinitionLink from 'components/events/events/EventDefinitionLink';
 import RemediationSteps from 'components/events/ReplaySearchSidebar/RemediationSteps';
 import ChipsCell from 'components/common/ChipsCell';
+import { eventDefinitionTypeTitle } from 'components/event-definitions/pluginTitles';
 import useAppendTagFilter from 'components/events/useAppendTagFilter';
 import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
@@ -58,7 +59,7 @@ export const EventDefinitionTypeRenderer = ({ type }: { type: string }) => {
     return eventDefinitionTypes.find((edt) => edt.type === type);
   }, [eventDefinitionTypes, type]);
 
-  return <>{(plugin && plugin.displayName) || type}</>;
+  return <>{(plugin && eventDefinitionTypeTitle(plugin)) || type}</>;
 };
 
 const EmptyValue = ({ textKey }: { textKey: string }) => {

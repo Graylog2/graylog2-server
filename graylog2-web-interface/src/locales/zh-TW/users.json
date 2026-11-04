@@ -176,7 +176,13 @@
     },
     "validation_error": {
       "ownerless": "移除以下擁有者將使此項目沒有擁有者："
-    }
+    },
+    "capabilities": {
+      "viewer": "檢視者",
+      "manager": "管理者",
+      "owner": "擁有者"
+    },
+    "select_capability": "選擇權限等級"
   },
   "roles": {
     "profile": {

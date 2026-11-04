@@ -587,5 +587,17 @@
   },
   "use_search_version_check_notifications": {
     "fetch_failed_title": "无法获取覆盖数据"
+  },
+  "entity_creators": {
+    "event_definition": "创建事件定义",
+    "notification": "创建通知",
+    "dashboard": "创建仪表板",
+    "stream": "创建数据流",
+    "index_set": "创建索引集",
+    "user": "创建用户",
+    "pipeline": "创建管道",
+    "pipeline_rule": "创建管道规则",
+    "content_pack": "创建内容包",
+    "fleet": "创建 Fleet"
   }
 }

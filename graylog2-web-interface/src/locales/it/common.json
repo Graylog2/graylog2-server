@@ -617,5 +617,17 @@
   },
   "use_search_version_check_notifications": {
     "fetch_failed_title": "Impossibile recuperare i dati di sostituzione"
+  },
+  "entity_creators": {
+    "event_definition": "Crea definizione di evento",
+    "notification": "Crea notifica",
+    "dashboard": "Crea dashboard",
+    "stream": "Crea stream",
+    "index_set": "Crea Index Set",
+    "user": "Crea utente",
+    "pipeline": "Crea pipeline",
+    "pipeline_rule": "Crea regola di pipeline",
+    "content_pack": "Crea Content Pack",
+    "fleet": "Crea fleet"
   }
 }

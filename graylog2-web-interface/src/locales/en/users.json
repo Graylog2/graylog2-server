@@ -176,7 +176,13 @@
     },
     "validation_error": {
       "ownerless": "Removing the following owners will leave the entity ownerless:"
-    }
+    },
+    "capabilities": {
+      "viewer": "Viewer",
+      "manager": "Manager",
+      "owner": "Owner"
+    },
+    "select_capability": "Select a capability"
   },
   "roles": {
     "profile": {

@@ -587,5 +587,17 @@
   },
   "use_search_version_check_notifications": {
     "fetch_failed_title": "上書きデータを取得できませんでした"
+  },
+  "entity_creators": {
+    "event_definition": "イベント定義を作成",
+    "notification": "通知を作成",
+    "dashboard": "ダッシュボードを作成",
+    "stream": "ストリームを作成",
+    "index_set": "Index Set を作成",
+    "user": "ユーザーを作成",
+    "pipeline": "パイプラインを作成",
+    "pipeline_rule": "パイプラインルールを作成",
+    "content_pack": "コンテンツパックを作成",
+    "fleet": "フリートを作成"
   }
 }

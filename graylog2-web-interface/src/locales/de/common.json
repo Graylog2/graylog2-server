@@ -605,5 +605,17 @@
   },
   "use_search_version_check_notifications": {
     "fetch_failed_title": "Die Überschreibungsdaten konnten nicht abgerufen werden"
+  },
+  "entity_creators": {
+    "event_definition": "Event Definition erstellen",
+    "notification": "Benachrichtigung erstellen",
+    "dashboard": "Dashboard erstellen",
+    "stream": "Stream erstellen",
+    "index_set": "Index-Set erstellen",
+    "user": "Benutzer erstellen",
+    "pipeline": "Pipeline erstellen",
+    "pipeline_rule": "Pipeline-Regel erstellen",
+    "content_pack": "Content Pack erstellen",
+    "fleet": "Fleet erstellen"
   }
 }

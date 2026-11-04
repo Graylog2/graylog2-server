@@ -176,7 +176,13 @@
     },
     "validation_error": {
       "ownerless": "Wenn Sie die folgenden Eigentümer entfernen, hat der Eintrag keinen Eigentümer mehr:"
-    }
+    },
+    "capabilities": {
+      "viewer": "Betrachter",
+      "manager": "Manager",
+      "owner": "Eigentümer"
+    },
+    "select_capability": "Berechtigung auswählen"
   },
   "roles": {
     "profile": {

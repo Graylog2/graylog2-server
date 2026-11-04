@@ -632,5 +632,17 @@
   },
   "use_search_version_check_notifications": {
     "fetch_failed_title": "Nie udało się pobrać danych nadpisania"
+  },
+  "entity_creators": {
+    "event_definition": "Utwórz definicję zdarzenia",
+    "notification": "Utwórz powiadomienie",
+    "dashboard": "Utwórz dashboard",
+    "stream": "Utwórz strumień",
+    "index_set": "Utwórz zestaw indeksów",
+    "user": "Utwórz użytkownika",
+    "pipeline": "Utwórz pipeline",
+    "pipeline_rule": "Utwórz regułę pipeline",
+    "content_pack": "Utwórz Content Pack",
+    "fleet": "Utwórz flotę"
   }
 }

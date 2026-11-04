@@ -176,7 +176,13 @@
     },
     "validation_error": {
       "ownerless": "Rimuovendo i seguenti proprietari, l'elemento resterà senza proprietario:"
-    }
+    },
+    "capabilities": {
+      "viewer": "Visualizzatore",
+      "manager": "Gestore",
+      "owner": "Proprietario"
+    },
+    "select_capability": "Seleziona un livello di accesso"
   },
   "roles": {
     "profile": {

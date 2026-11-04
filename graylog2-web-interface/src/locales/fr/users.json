@@ -176,7 +176,13 @@
     },
     "validation_error": {
       "ownerless": "La suppression des propriétaires suivants laissera l'élément sans propriétaire :"
-    }
+    },
+    "capabilities": {
+      "viewer": "Lecteur",
+      "manager": "Gestionnaire",
+      "owner": "Propriétaire"
+    },
+    "select_capability": "Sélectionner un niveau d'accès"
   },
   "roles": {
     "profile": {

@@ -17,13 +17,15 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 import { Field } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { Select } from 'components/common';
 import type { CapabilitiesList } from 'logic/permissions/EntityShareState';
 import type { CapabilityType } from 'logic/permissions/types';
+import capabilityLabel from 'logic/permissions/capabilityLabel';
 
 const _capabilitiesOptions = (capabilities: CapabilitiesList) =>
-  capabilities.map((capability) => ({ label: capability.title, value: capability.id })).toJS();
+  capabilities.map((capability) => ({ label: capabilityLabel(capability.title), value: capability.id })).toJS();
 
 type Props = {
   onChange?: (id: CapabilityType['id']) => void;
@@ -31,7 +33,8 @@ type Props = {
   title?: string;
 };
 
-const CapabilitySelect = ({ capabilities, onChange = null, title = 'Select a capability', ...rest }: Props) => {
+const CapabilitySelect = ({ capabilities, onChange = null, title = undefined, ...rest }: Props) => {
+  const { t } = useTranslation('users');
   const capabilitiesOptions = _capabilitiesOptions(capabilities);
 
   const handleChange = useCallback(
@@ -53,7 +56,7 @@ const CapabilitySelect = ({ capabilities, onChange = null, title = 'Select a cap
           clearable={false}
           onChange={(capabilityId) => handleChange(name, capabilityId, onFieldChange)}
           options={capabilitiesOptions}
-          placeholder={title}
+          placeholder={title ?? t('permissions.select_capability')}
           value={value}
         />
       )}

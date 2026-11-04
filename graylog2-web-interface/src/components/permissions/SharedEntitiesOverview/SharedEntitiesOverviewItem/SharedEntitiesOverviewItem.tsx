@@ -20,6 +20,7 @@ import styled from 'styled-components';
 import useHasEntityPermissionByGRN from 'hooks/useHasEntityPermissionByGRN';
 import { RestrictedAccessTooltip, Link } from 'components/common';
 import type SharedEntity from 'logic/permissions/SharedEntity';
+import capabilityLabel from 'logic/permissions/capabilityLabel';
 import useShowRouteFromGRN from 'routing/hooks/useShowRouteFromGRN';
 import usePluggableSharedEntityTableElements from 'hooks/usePluggableSharedEntityTableElements';
 
@@ -67,7 +68,7 @@ const SharedEntitiesOverviewItem = ({ capabilityTitle, sharedEntity: { owners, t
       </td>
       <td className="limited">{type}</td>
       <OwnersCell owners={owners} />
-      <td className="limited">{capabilityTitle}</td>
+      <td className="limited">{capabilityLabel(capabilityTitle)}</td>
       {pluggableAttributes && getPluggableTableCells(id, type)}
     </tr>
   );

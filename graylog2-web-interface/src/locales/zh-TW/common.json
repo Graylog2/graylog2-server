@@ -587,5 +587,17 @@
   },
   "use_search_version_check_notifications": {
     "fetch_failed_title": "無法擷取覆寫資料"
+  },
+  "entity_creators": {
+    "event_definition": "建立事件定義",
+    "notification": "建立通知",
+    "dashboard": "建立儀表板",
+    "stream": "建立串流",
+    "index_set": "建立 Index Set",
+    "user": "建立使用者",
+    "pipeline": "建立管線",
+    "pipeline_rule": "建立管線規則",
+    "content_pack": "建立內容套件",
+    "fleet": "建立 Fleet"
   }
 }

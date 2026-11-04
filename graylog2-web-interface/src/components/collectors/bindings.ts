@@ -16,6 +16,7 @@
  */
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
+import i18n from 'i18n';
 import Routes from 'routing/Routes';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import AppConfig from 'util/AppConfig';
@@ -61,7 +62,10 @@ const bindings: PluginExports = AppConfig.isFeatureEnabled('collectors')
       entityCreators: [
         {
           id: 'Fleet',
-          title: 'Create fleet',
+          // Read lazily, so the title is translated when it is displayed and not when the module loads.
+      get title() {
+        return i18n.t('entity_creators.fleet', { ns: 'common' });
+      },
           path: Routes.SYSTEM.COLLECTORS.FLEETS_NEW,
           telemetryEvent: {
             type: TELEMETRY_EVENT_TYPE.COLLECTORS.FLEET.CREATE_OPENED,

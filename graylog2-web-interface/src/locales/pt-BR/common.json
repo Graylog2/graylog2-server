@@ -617,5 +617,17 @@
   },
   "use_search_version_check_notifications": {
     "fetch_failed_title": "Não foi possível buscar os dados de substituição"
+  },
+  "entity_creators": {
+    "event_definition": "Criar definição de evento",
+    "notification": "Criar notificação",
+    "dashboard": "Criar dashboard",
+    "stream": "Criar stream",
+    "index_set": "Criar Index Set",
+    "user": "Criar usuário",
+    "pipeline": "Criar pipeline",
+    "pipeline_rule": "Criar regra de pipeline",
+    "content_pack": "Criar content pack",
+    "fleet": "Criar frota"
   }
 }
