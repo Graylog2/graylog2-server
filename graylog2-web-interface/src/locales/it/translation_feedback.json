@@ -57,5 +57,29 @@
     "create_failed_title": "Impossibile segnalare la traduzione",
     "update_failed": "Impossibile aggiornare la segnalazione: {{error}}",
     "update_failed_title": "Impossibile aggiornare la segnalazione"
+  },
+  "bulk": {
+    "delete": "Elimina",
+    "changed_one": "{{count}} segnalazione modificata.",
+    "changed_many": "{{count}} segnalazioni modificate.",
+    "changed_other": "{{count}} segnalazioni modificate.",
+    "confirm_delete_one": "Vuoi davvero eliminare {{count}} segnalazione?",
+    "confirm_delete_many": "Vuoi davvero eliminare {{count}} segnalazioni?",
+    "confirm_delete_other": "Vuoi davvero eliminare {{count}} segnalazioni?"
+  },
+  "upload": {
+    "button": "Carica risoluzioni",
+    "uploading": "Caricamento…",
+    "help": "Carica un file di risoluzioni per impostare lo stato e una nota per chi ha segnalato su più segnalazioni contemporaneamente.",
+    "failed": "Impossibile applicare le risoluzioni: {{error}}",
+    "failed_title": "Impossibile applicare le risoluzioni",
+    "invalid_file": "Il file non contiene un elenco di risoluzioni.",
+    "applied_title": "Risoluzioni applicate",
+    "applied_one": "{{count}} segnalazione aggiornata.",
+    "applied_many": "{{count}} segnalazioni aggiornate.",
+    "applied_other": "{{count}} segnalazioni aggiornate.",
+    "applied_with_missing_one": "{{count}} segnalazione aggiornata, {{notFound}} non trovate.",
+    "applied_with_missing_many": "{{count}} segnalazioni aggiornate, {{notFound}} non trovate.",
+    "applied_with_missing_other": "{{count}} segnalazioni aggiornate, {{notFound}} non trovate."
   }
 }

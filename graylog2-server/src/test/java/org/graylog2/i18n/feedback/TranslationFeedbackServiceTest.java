@@ -17,6 +17,7 @@
 package org.graylog2.i18n.feedback;
 
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -83,6 +84,45 @@ class TranslationFeedbackServiceTest {
         assertThat(service.delete(created.id())).isTrue();
         assertThat(service.get(created.id())).isEmpty();
         assertThat(service.updateStatus(created.id(), TranslationFeedbackDTO.STATUS_OPEN)).isEmpty();
+    }
+
+    @Test
+    void updatesAndDeletesSeveralReports() {
+        final String first = service.create(request("de", "search", "a", "A"), "a").id();
+        final String second = service.create(request("de", "search", "b", "B"), "a").id();
+        final String missing = new ObjectId().toHexString();
+
+        assertThat(service.updateStatus(List.of(first, second, missing, "invalid"), TranslationFeedbackDTO.STATUS_WONT_FIX))
+                .isEqualTo(new BulkTranslationFeedbackResponse(2, 2));
+        assertThat(service.get(first)).hasValueSatisfying(report -> assertThat(report.status()).isEqualTo("wont_fix"));
+
+        assertThat(service.delete(List.of(first, missing))).isEqualTo(new BulkTranslationFeedbackResponse(1, 1));
+        assertThat(service.get(first)).isEmpty();
+        assertThat(service.get(second)).isPresent();
+    }
+
+    @Test
+    void appliesResolutionsWithNotesForTheReporters() {
+        final String fixed = service.create(request("de", "search", "a", "A"), "a").id();
+        final String kept = service.create(request("de", "search", "b", "B"), "a").id();
+
+        final BulkTranslationFeedbackResponse response = service.applyResolutions(List.of(
+                new TranslationFeedbackResolutions.Resolution(fixed, "fixed", "Changed to „Suche“"),
+                new TranslationFeedbackResolutions.Resolution(kept, "wont_fix", "Glossary term"),
+                new TranslationFeedbackResolutions.Resolution("invalid", "fixed", null)));
+
+        assertThat(response).isEqualTo(new BulkTranslationFeedbackResponse(2, 1));
+        assertThat(service.get(fixed)).hasValueSatisfying(report -> {
+            assertThat(report.status()).isEqualTo("fixed");
+            assertThat(report.resolution()).isEqualTo("Changed to „Suche“");
+        });
+
+        service.applyResolutions(List.of(new TranslationFeedbackResolutions.Resolution(fixed, "open", null)));
+
+        assertThat(service.get(fixed)).hasValueSatisfying(report -> {
+            assertThat(report.status()).as("reopened").isEqualTo("open");
+            assertThat(report.resolution()).as("a missing note keeps the existing one").isEqualTo("Changed to „Suche“");
+        });
     }
 
     @Test

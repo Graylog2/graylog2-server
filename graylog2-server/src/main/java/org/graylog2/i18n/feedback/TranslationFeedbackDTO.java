@@ -42,6 +42,7 @@ public record TranslationFeedbackDTO(@JsonProperty(FIELD_ID) @Nullable @Id @Obje
                                      @JsonProperty(FIELD_DOM_PATH) @Nullable String domPath,
                                      @JsonProperty(FIELD_REPORTER) String reporter,
                                      @JsonProperty(FIELD_STATUS) String status,
+                                     @JsonProperty(FIELD_RESOLUTION) @Nullable String resolution,
                                      @JsonProperty(FIELD_CREATED_AT) DateTime createdAt,
                                      @JsonProperty(FIELD_UPDATED_AT) DateTime updatedAt) implements MongoEntity {
 
@@ -58,6 +59,8 @@ public record TranslationFeedbackDTO(@JsonProperty(FIELD_ID) @Nullable @Id @Obje
     public static final String FIELD_DOM_PATH = "dom_path";
     public static final String FIELD_REPORTER = "reporter";
     public static final String FIELD_STATUS = "status";
+    /** Note for the reporter how the report was handled, e.g. the new translation or why it stays as it is. */
+    public static final String FIELD_RESOLUTION = "resolution";
     public static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_UPDATED_AT = "updated_at";
 

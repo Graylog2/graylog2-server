@@ -26,6 +26,8 @@ import usePermissions from 'hooks/usePermissions';
 import { exportTranslationFeedback, fetchTranslationFeedback, keyFn } from './api';
 import type { TranslationFeedback } from './types';
 import TranslationFeedbackActions from './TranslationFeedbackActions';
+import BulkActions from './BulkActions';
+import UploadResolutionsButton from './UploadResolutionsButton';
 
 export const DEFAULT_LAYOUT = {
   entityTableId: 'translation-feedback',
@@ -40,6 +42,7 @@ export const DEFAULT_LAYOUT = {
     'reporter',
     'path',
     'status',
+    'resolution',
     'created_at',
   ],
   defaultColumnOrder: [
@@ -54,6 +57,7 @@ export const DEFAULT_LAYOUT = {
     'reporter',
     'path',
     'status',
+    'resolution',
     'created_at',
     'updated_at',
   ],
@@ -61,6 +65,7 @@ export const DEFAULT_LAYOUT = {
 
 const ExportButtons = ({ searchParams }: MiddleSectionProps) => {
   const { t } = useTranslation('translation_feedback');
+  const { isAdmin } = usePermissions();
 
   return (
     <ButtonToolbar>
@@ -70,11 +75,13 @@ const ExportButtons = ({ searchParams }: MiddleSectionProps) => {
       <Button bsSize="small" onClick={() => exportTranslationFeedback('csv', searchParams)}>
         {t('list.download_csv')}
       </Button>
+      {isAdmin && <UploadResolutionsButton />}
     </ButtonToolbar>
   );
 };
 
 const renderActions = (feedback: TranslationFeedback) => <TranslationFeedbackActions feedback={feedback} />;
+const bulkSelection = { actions: <BulkActions /> };
 
 const TranslationFeedbackList = () => {
   const { t } = useTranslation('translation_feedback');
@@ -106,6 +113,7 @@ const TranslationFeedbackList = () => {
       entityAttributesAreCamelCase={false}
       columnRenderers={columnRenderers}
       entityActions={isAdmin ? renderActions : undefined}
+      bulkSelection={isAdmin ? bulkSelection : undefined}
       middleSection={ExportButtons}
       searchPlaceholder={t('list.search_placeholder')}
     />

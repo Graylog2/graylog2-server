@@ -102,5 +102,16 @@
   "User ID": "使用者 ID",
   "Username": "使用者名稱",
   "Version": "版本",
-  "id": "ID"
+  "id": "ID",
+  "Language": "語言",
+  "Namespace": "命名空間",
+  "Key": "鍵",
+  "Text": "文字",
+  "English": "英文",
+  "Suggestion": "建議",
+  "Comment": "備註",
+  "Page": "頁面",
+  "Reporter": "回報者",
+  "Resolution": "處理結果",
+  "Updated": "更新時間"
 }

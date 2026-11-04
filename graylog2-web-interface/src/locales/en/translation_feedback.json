@@ -57,5 +57,25 @@
     "create_failed_title": "Could not report translation",
     "update_failed": "Updating the report failed: {{error}}",
     "update_failed_title": "Could not update report"
+  },
+  "bulk": {
+    "delete": "Delete",
+    "changed_one": "{{count}} report changed.",
+    "changed_other": "{{count}} reports changed.",
+    "confirm_delete_one": "Do you really want to delete {{count}} report?",
+    "confirm_delete_other": "Do you really want to delete {{count}} reports?"
+  },
+  "upload": {
+    "button": "Upload resolutions",
+    "uploading": "Uploading…",
+    "help": "Upload a resolutions file to set the status and a note for the reporter of several reports at once.",
+    "failed": "Applying the resolutions failed: {{error}}",
+    "failed_title": "Could not apply resolutions",
+    "invalid_file": "The file does not contain a list of resolutions.",
+    "applied_title": "Resolutions applied",
+    "applied_one": "{{count}} report updated.",
+    "applied_other": "{{count}} reports updated.",
+    "applied_with_missing_one": "{{count}} report updated, {{notFound}} not found.",
+    "applied_with_missing_other": "{{count}} reports updated, {{notFound}} not found."
   }
 }

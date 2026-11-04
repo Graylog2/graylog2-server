@@ -20,10 +20,12 @@ import com.mongodb.client.model.FindOneAndUpdateOptions;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.ReturnDocument;
 import com.mongodb.client.model.Sorts;
+import com.mongodb.client.model.UpdateOneModel;
 import com.mongodb.client.model.Updates;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
@@ -34,15 +36,22 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
+import static org.graylog2.database.utils.MongoUtils.stringIdsIn;
 import static org.graylog2.i18n.feedback.TranslationFeedbackDTO.FIELD_CREATED_AT;
 import static org.graylog2.i18n.feedback.TranslationFeedbackDTO.FIELD_KEY;
 import static org.graylog2.i18n.feedback.TranslationFeedbackDTO.FIELD_LANGUAGE;
 import static org.graylog2.i18n.feedback.TranslationFeedbackDTO.FIELD_NAMESPACE;
+import static org.graylog2.i18n.feedback.TranslationFeedbackDTO.FIELD_RESOLUTION;
 import static org.graylog2.i18n.feedback.TranslationFeedbackDTO.FIELD_STATUS;
 import static org.graylog2.i18n.feedback.TranslationFeedbackDTO.FIELD_UPDATED_AT;
 
@@ -81,6 +90,7 @@ public class TranslationFeedbackService {
                 blankToNull(request.domPath()),
                 reporter,
                 TranslationFeedbackDTO.STATUS_OPEN,
+                null,
                 now,
                 now);
         final String id = insertedIdAsString(collection.insertOne(feedback));
@@ -109,6 +119,46 @@ public class TranslationFeedbackService {
 
     public boolean delete(String id) {
         return mongoUtils.deleteById(id);
+    }
+
+    public BulkTranslationFeedbackResponse updateStatus(Collection<String> ids, String status) {
+        final Set<String> validIds = validIds(ids);
+        final long changed = validIds.isEmpty() ? 0 : collection.updateMany(
+                stringIdsIn(validIds),
+                Updates.combine(Updates.set(FIELD_STATUS, status), Updates.set(FIELD_UPDATED_AT, DateTime.now(DateTimeZone.UTC))))
+                .getMatchedCount();
+
+        return new BulkTranslationFeedbackResponse(changed, Set.copyOf(ids).size() - changed);
+    }
+
+    public BulkTranslationFeedbackResponse delete(Collection<String> ids) {
+        final Set<String> validIds = validIds(ids);
+        final long deleted = validIds.isEmpty() ? 0 : collection.deleteMany(stringIdsIn(validIds)).getDeletedCount();
+
+        return new BulkTranslationFeedbackResponse(deleted, Set.copyOf(ids).size() - deleted);
+    }
+
+    /**
+     * Sets status and note of each report. A note which is left out keeps the existing one.
+     */
+    public BulkTranslationFeedbackResponse applyResolutions(List<TranslationFeedbackResolutions.Resolution> resolutions) {
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        final List<UpdateOneModel<TranslationFeedbackDTO>> updates = resolutions.stream()
+                .filter(resolution -> ObjectId.isValid(resolution.id()))
+                .map(resolution -> new UpdateOneModel<TranslationFeedbackDTO>(idEq(resolution.id()), Updates.combine(Stream.of(
+                                Updates.set(FIELD_STATUS, resolution.status()),
+                                Updates.set(FIELD_UPDATED_AT, now),
+                                resolution.note() == null ? null : Updates.set(FIELD_RESOLUTION, blankToNull(resolution.note())))
+                        .filter(Objects::nonNull)
+                        .toList())))
+                .toList();
+        final long changed = updates.isEmpty() ? 0 : collection.bulkWrite(updates).getMatchedCount();
+
+        return new BulkTranslationFeedbackResponse(changed, resolutions.size() - changed);
+    }
+
+    private static Set<String> validIds(Collection<String> ids) {
+        return ids.stream().filter(ObjectId::isValid).collect(Collectors.toSet());
     }
 
     /**

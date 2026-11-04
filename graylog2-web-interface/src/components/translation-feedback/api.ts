@@ -56,6 +56,19 @@ export const updateTranslationFeedbackStatus = (id: string, status: Status): Pro
 export const deleteTranslationFeedback = (id: string) =>
   fetch('DELETE', qualifyUrl(`${BASE_URL}/${encodeURIComponent(id)}`));
 
+export type BulkResult = { changed: number; not_found: number };
+
+export const bulkUpdateTranslationFeedbackStatus = (ids: Array<string>, status: Status): Promise<BulkResult> =>
+  fetch('POST', qualifyUrl(`${BASE_URL}/bulk_status`), { ids, status });
+
+export const bulkDeleteTranslationFeedback = (ids: Array<string>): Promise<BulkResult> =>
+  fetch('POST', qualifyUrl(`${BASE_URL}/bulk_delete`), { ids });
+
+export type Resolutions = { resolutions: Array<{ id: string; status: Status; note?: string }> };
+
+export const applyTranslationFeedbackResolutions = (resolutions: Resolutions): Promise<BulkResult> =>
+  fetch('POST', qualifyUrl(`${BASE_URL}/resolutions`), resolutions);
+
 const EXPORT_MIME_TYPES = { json: 'application/json', csv: 'text/csv' };
 
 export const exportTranslationFeedback = (

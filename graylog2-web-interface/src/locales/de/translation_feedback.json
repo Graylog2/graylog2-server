@@ -57,5 +57,25 @@
     "create_failed_title": "Übersetzung konnte nicht gemeldet werden",
     "update_failed": "Die Meldung konnte nicht aktualisiert werden: {{error}}",
     "update_failed_title": "Meldung konnte nicht aktualisiert werden"
+  },
+  "bulk": {
+    "delete": "Löschen",
+    "changed_one": "{{count}} Meldung geändert.",
+    "changed_other": "{{count}} Meldungen geändert.",
+    "confirm_delete_one": "Möchten Sie {{count}} Meldung wirklich löschen?",
+    "confirm_delete_other": "Möchten Sie {{count}} Meldungen wirklich löschen?"
+  },
+  "upload": {
+    "button": "Ergebnisse hochladen",
+    "uploading": "Wird hochgeladen…",
+    "help": "Laden Sie eine Ergebnisdatei hoch, um Status und Hinweis für die Meldenden mehrerer Meldungen auf einmal zu setzen.",
+    "failed": "Die Ergebnisse konnten nicht übernommen werden: {{error}}",
+    "failed_title": "Ergebnisse konnten nicht übernommen werden",
+    "invalid_file": "Die Datei enthält keine Liste von Ergebnissen.",
+    "applied_title": "Ergebnisse übernommen",
+    "applied_one": "{{count}} Meldung aktualisiert.",
+    "applied_other": "{{count}} Meldungen aktualisiert.",
+    "applied_with_missing_one": "{{count}} Meldung aktualisiert, {{notFound}} nicht gefunden.",
+    "applied_with_missing_other": "{{count}} Meldungen aktualisiert, {{notFound}} nicht gefunden."
   }
 }

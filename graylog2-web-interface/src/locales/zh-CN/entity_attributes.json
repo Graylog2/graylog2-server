@@ -102,5 +102,16 @@
   "User ID": "用户 ID",
   "Username": "用户名",
   "Version": "版本",
-  "id": "ID"
+  "id": "ID",
+  "Language": "语言",
+  "Namespace": "命名空间",
+  "Key": "键",
+  "Text": "文本",
+  "English": "英文",
+  "Suggestion": "建议",
+  "Comment": "备注",
+  "Page": "页面",
+  "Reporter": "报告人",
+  "Resolution": "处理结果",
+  "Updated": "更新时间"
 }

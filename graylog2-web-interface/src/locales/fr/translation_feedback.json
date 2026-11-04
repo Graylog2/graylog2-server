@@ -57,5 +57,29 @@
     "create_failed_title": "Impossible de signaler la traduction",
     "update_failed": "Impossible de mettre à jour le signalement : {{error}}",
     "update_failed_title": "Impossible de mettre à jour le signalement"
+  },
+  "bulk": {
+    "delete": "Supprimer",
+    "changed_one": "{{count}} signalement modifié.",
+    "changed_many": "{{count}} signalements modifiés.",
+    "changed_other": "{{count}} signalements modifiés.",
+    "confirm_delete_one": "Voulez-vous vraiment supprimer {{count}} signalement ?",
+    "confirm_delete_many": "Voulez-vous vraiment supprimer {{count}} signalements ?",
+    "confirm_delete_other": "Voulez-vous vraiment supprimer {{count}} signalements ?"
+  },
+  "upload": {
+    "button": "Importer les résolutions",
+    "uploading": "Importation…",
+    "help": "Importez un fichier de résolutions pour définir le statut et une note pour l'auteur de plusieurs signalements à la fois.",
+    "failed": "Impossible d'appliquer les résolutions : {{error}}",
+    "failed_title": "Impossible d'appliquer les résolutions",
+    "invalid_file": "Le fichier ne contient pas de liste de résolutions.",
+    "applied_title": "Résolutions appliquées",
+    "applied_one": "{{count}} signalement mis à jour.",
+    "applied_many": "{{count}} signalements mis à jour.",
+    "applied_other": "{{count}} signalements mis à jour.",
+    "applied_with_missing_one": "{{count}} signalement mis à jour, {{notFound}} introuvables.",
+    "applied_with_missing_many": "{{count}} signalements mis à jour, {{notFound}} introuvables.",
+    "applied_with_missing_other": "{{count}} signalements mis à jour, {{notFound}} introuvables."
   }
 }

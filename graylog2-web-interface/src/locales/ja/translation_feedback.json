@@ -57,5 +57,21 @@
     "create_failed_title": "翻訳を報告できませんでした",
     "update_failed": "レポートを更新できませんでした: {{error}}",
     "update_failed_title": "レポートを更新できませんでした"
+  },
+  "bulk": {
+    "delete": "削除",
+    "changed_other": "{{count}} 件のレポートを変更しました。",
+    "confirm_delete_other": "{{count}} 件のレポートを削除してもよろしいですか？"
+  },
+  "upload": {
+    "button": "対応結果をアップロード",
+    "uploading": "アップロード中…",
+    "help": "対応結果ファイルをアップロードして、複数のレポートのステータスと報告者へのメモを一度に設定します。",
+    "failed": "対応結果を適用できませんでした: {{error}}",
+    "failed_title": "対応結果を適用できませんでした",
+    "invalid_file": "ファイルに対応結果の一覧が含まれていません。",
+    "applied_title": "対応結果を適用しました",
+    "applied_other": "{{count}} 件のレポートを更新しました。",
+    "applied_with_missing_other": "{{count}} 件のレポートを更新しました。{{notFound}} 件は見つかりませんでした。"
   }
 }

@@ -102,5 +102,16 @@
   "User ID": "User ID",
   "Username": "Username",
   "Version": "Version",
-  "id": "id"
+  "id": "id",
+  "Language": "Language",
+  "Namespace": "Namespace",
+  "Key": "Key",
+  "Text": "Text",
+  "English": "English",
+  "Suggestion": "Suggestion",
+  "Comment": "Comment",
+  "Page": "Page",
+  "Reporter": "Reporter",
+  "Resolution": "Resolution",
+  "Updated": "Updated"
 }

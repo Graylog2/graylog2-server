@@ -37,6 +37,7 @@ public record TranslationFeedbackExport(@JsonProperty("generated_at") DateTime g
 
     public record Entry(@JsonProperty("id") String id,
                         @JsonProperty("status") String status,
+                        @JsonProperty("resolution") @Nullable String resolution,
                         @JsonProperty("category") String category,
                         @JsonProperty("text") String text,
                         @JsonProperty("english_text") @Nullable String englishText,
@@ -47,7 +48,7 @@ public record TranslationFeedbackExport(@JsonProperty("generated_at") DateTime g
                         @JsonProperty("dom_path") @Nullable String domPath,
                         @JsonProperty("created_at") DateTime createdAt) {
         static Entry of(TranslationFeedbackDTO feedback) {
-            return new Entry(feedback.id(), feedback.status(), feedback.category(), feedback.text(), feedback.englishText(),
+            return new Entry(feedback.id(), feedback.status(), feedback.resolution(), feedback.category(), feedback.text(), feedback.englishText(),
                     feedback.suggestion(), feedback.comment(), feedback.reporter(), feedback.path(), feedback.domPath(),
                     feedback.createdAt());
         }
@@ -69,15 +70,15 @@ public record TranslationFeedbackExport(@JsonProperty("generated_at") DateTime g
         return new TranslationFeedbackExport(generatedAt, reports.size(), languages);
     }
 
-    private static final List<String> CSV_HEADER = List.of("id", "language", "namespace", "key", "status", "category", "text",
-            "english_text", "suggestion", "comment", "reporter", "path", "dom_path", "created_at");
+    private static final List<String> CSV_HEADER = List.of("id", "language", "namespace", "key", "status", "resolution",
+            "category", "text", "english_text", "suggestion", "comment", "reporter", "path", "dom_path", "created_at");
 
     public static String toCsv(List<TranslationFeedbackDTO> reports) {
         final StringBuilder csv = new StringBuilder();
         appendRow(csv, CSV_HEADER.stream());
 
         reports.forEach(report -> appendRow(csv, Stream.of(report.id(), report.language(), report.namespace(), report.key(),
-                report.status(), report.category(), report.text(), report.englishText(), report.suggestion(), report.comment(),
+                report.status(), report.resolution(), report.category(), report.text(), report.englishText(), report.suggestion(), report.comment(),
                 report.reporter(), report.path(), report.domPath(),
                 report.createdAt() == null ? null : report.createdAt().toString())));
 

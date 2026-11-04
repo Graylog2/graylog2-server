@@ -57,5 +57,21 @@
     "create_failed_title": "无法报告翻译问题",
     "update_failed": "更新报告失败：{{error}}",
     "update_failed_title": "无法更新报告"
+  },
+  "bulk": {
+    "delete": "删除",
+    "changed_other": "已更改 {{count}} 个报告。",
+    "confirm_delete_other": "确定要删除 {{count}} 个报告吗？"
+  },
+  "upload": {
+    "button": "上传处理结果",
+    "uploading": "正在上传…",
+    "help": "上传处理结果文件，一次性设置多个报告的状态并为报告人添加备注。",
+    "failed": "应用处理结果失败：{{error}}",
+    "failed_title": "无法应用处理结果",
+    "invalid_file": "该文件不包含处理结果列表。",
+    "applied_title": "已应用处理结果",
+    "applied_other": "已更新 {{count}} 个报告。",
+    "applied_with_missing_other": "已更新 {{count}} 个报告，{{notFound}} 个未找到。"
   }
 }

@@ -57,5 +57,29 @@
     "create_failed_title": "No se pudo notificar la traducción",
     "update_failed": "No se pudo actualizar el informe: {{error}}",
     "update_failed_title": "No se pudo actualizar el informe"
+  },
+  "bulk": {
+    "delete": "Eliminar",
+    "changed_one": "Se modificó {{count}} informe.",
+    "changed_many": "Se modificaron {{count}} informes.",
+    "changed_other": "Se modificaron {{count}} informes.",
+    "confirm_delete_one": "¿Realmente desea eliminar {{count}} informe?",
+    "confirm_delete_many": "¿Realmente desea eliminar {{count}} informes?",
+    "confirm_delete_other": "¿Realmente desea eliminar {{count}} informes?"
+  },
+  "upload": {
+    "button": "Subir resoluciones",
+    "uploading": "Subiendo…",
+    "help": "Suba un archivo de resoluciones para establecer el estado y una nota para quien informó en varios informes a la vez.",
+    "failed": "No se pudieron aplicar las resoluciones: {{error}}",
+    "failed_title": "No se pudieron aplicar las resoluciones",
+    "invalid_file": "El archivo no contiene una lista de resoluciones.",
+    "applied_title": "Resoluciones aplicadas",
+    "applied_one": "Se actualizó {{count}} informe.",
+    "applied_many": "Se actualizaron {{count}} informes.",
+    "applied_other": "Se actualizaron {{count}} informes.",
+    "applied_with_missing_one": "Se actualizó {{count}} informe; {{notFound}} no se encontraron.",
+    "applied_with_missing_many": "Se actualizaron {{count}} informes; {{notFound}} no se encontraron.",
+    "applied_with_missing_other": "Se actualizaron {{count}} informes; {{notFound}} no se encontraron."
   }
 }

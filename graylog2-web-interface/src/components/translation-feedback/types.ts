@@ -34,11 +34,12 @@ export type TranslationFeedback = {
   dom_path?: string;
   reporter: string;
   status: Status;
+  resolution?: string;
   created_at: string;
   updated_at: string;
 };
 
 export type CreateTranslationFeedback = Omit<
   TranslationFeedback,
-  'id' | 'reporter' | 'status' | 'created_at' | 'updated_at'
+  'id' | 'reporter' | 'status' | 'resolution' | 'created_at' | 'updated_at'
 >;

@@ -68,6 +68,7 @@ import static org.graylog2.i18n.feedback.TranslationFeedbackDTO.FIELD_LANGUAGE;
 import static org.graylog2.i18n.feedback.TranslationFeedbackDTO.FIELD_NAMESPACE;
 import static org.graylog2.i18n.feedback.TranslationFeedbackDTO.FIELD_PATH;
 import static org.graylog2.i18n.feedback.TranslationFeedbackDTO.FIELD_REPORTER;
+import static org.graylog2.i18n.feedback.TranslationFeedbackDTO.FIELD_RESOLUTION;
 import static org.graylog2.i18n.feedback.TranslationFeedbackDTO.FIELD_STATUS;
 import static org.graylog2.i18n.feedback.TranslationFeedbackDTO.FIELD_SUGGESTION;
 import static org.graylog2.i18n.feedback.TranslationFeedbackDTO.FIELD_TEXT;
@@ -110,6 +111,7 @@ public class TranslationFeedbackResource extends RestResource {
             EntityAttribute.builder().id(FIELD_REPORTER).title("Reporter").sortable(true).searchable(true).filterable(true).build(),
             EntityAttribute.builder().id(FIELD_STATUS).title("Status").sortable(true).filterable(true)
                     .filterOptions(options(STATUSES)).build(),
+            EntityAttribute.builder().id(FIELD_RESOLUTION).title("Resolution").searchable(true).build(),
             EntityAttribute.builder().id(FIELD_CREATED_AT).title("Created").type(SearchQueryField.Type.DATE).sortable(true).filterable(true).build(),
             EntityAttribute.builder().id(FIELD_UPDATED_AT).title("Updated").type(SearchQueryField.Type.DATE).sortable(true).hidden(true).build()
     );
@@ -189,6 +191,48 @@ public class TranslationFeedbackResource extends RestResource {
         if (!service.delete(id)) {
             throw new NotFoundException("Translation report " + id + " not found");
         }
+    }
+
+    @POST
+    @Timed
+    @Path("/bulk_status")
+    @Operation(summary = "Change the status of several translation reports")
+    @RequiresPermissions(ADMIN_PERMISSION)
+    @NoAuditEvent("Feedback for proofreading, no configuration change")
+    public BulkTranslationFeedbackResponse bulkUpdateStatus(@Valid @NotNull BulkTranslationFeedbackRequest request) {
+        if (request.status() == null || !STATUSES.contains(request.status())) {
+            throw new BadRequestException("Unknown status: " + request.status());
+        }
+
+        return service.updateStatus(request.ids(), request.status());
+    }
+
+    @POST
+    @Timed
+    @Path("/resolutions")
+    @Operation(summary = "Apply an uploaded file setting the status and a note for the reporter of several reports")
+    @RequiresPermissions(ADMIN_PERMISSION)
+    @NoAuditEvent("Feedback for proofreading, no configuration change")
+    public BulkTranslationFeedbackResponse applyResolutions(@Valid @NotNull TranslationFeedbackResolutions request) {
+        request.resolutions().stream()
+                .map(TranslationFeedbackResolutions.Resolution::status)
+                .filter(status -> !STATUSES.contains(status))
+                .findFirst()
+                .ifPresent(status -> {
+                    throw new BadRequestException("Unknown status: " + status);
+                });
+
+        return service.applyResolutions(request.resolutions());
+    }
+
+    @POST
+    @Timed
+    @Path("/bulk_delete")
+    @Operation(summary = "Delete several translation reports")
+    @RequiresPermissions(ADMIN_PERMISSION)
+    @NoAuditEvent("Feedback for proofreading, no configuration change")
+    public BulkTranslationFeedbackResponse bulkDelete(@Valid @NotNull BulkTranslationFeedbackRequest request) {
+        return service.delete(request.ids());
     }
 
     @GET

@@ -57,5 +57,21 @@
     "create_failed_title": "無法回報翻譯問題",
     "update_failed": "更新回報失敗：{{error}}",
     "update_failed_title": "無法更新回報"
+  },
+  "bulk": {
+    "delete": "刪除",
+    "changed_other": "已變更 {{count}} 筆回報。",
+    "confirm_delete_other": "確定要刪除 {{count}} 筆回報嗎？"
+  },
+  "upload": {
+    "button": "上傳處理結果",
+    "uploading": "正在上傳…",
+    "help": "上傳處理結果檔案，一次設定多筆回報的狀態並為回報者加上備註。",
+    "failed": "套用處理結果失敗：{{error}}",
+    "failed_title": "無法套用處理結果",
+    "invalid_file": "此檔案不包含處理結果清單。",
+    "applied_title": "已套用處理結果",
+    "applied_other": "已更新 {{count}} 筆回報。",
+    "applied_with_missing_other": "已更新 {{count}} 筆回報，{{notFound}} 筆找不到。"
   }
 }
