@@ -1,0 +1,10 @@
+{
+  "match exactly": "match exactly",
+  "match regular expression": "match regular expression",
+  "be greater than": "be greater than",
+  "be smaller than": "be smaller than",
+  "be present": "be present",
+  "contain": "contain",
+  "always match": "always match",
+  "match input": "match input"
+}

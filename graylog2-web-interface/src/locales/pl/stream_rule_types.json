@@ -1,0 +1,10 @@
+{
+  "match exactly": "dokładne dopasowanie",
+  "match regular expression": "dopasowanie wyrażenia regularnego",
+  "greater than": "większe niż",
+  "smaller than": "mniejsze niż",
+  "field presence": "obecność pola",
+  "contain": "zawiera",
+  "always match": "zawsze pasuje",
+  "match input": "dopasowanie wejścia"
+}

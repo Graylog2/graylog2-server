@@ -24,14 +24,16 @@ import { Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
 import { IndicesPageNavigation } from 'components/indices';
 import TemplateDetails from 'components/indices/IndexSetTemplates/TemplateDetails';
 import useTemplate from 'components/indices/IndexSetTemplates/hooks/useTemplate';
+import useTemplateText from 'components/indices/IndexSetTemplates/hooks/useTemplateText';
 
 const IndexSetTemplatePage = () => {
   const { t } = useTranslation('indexsets');
   const { templateId } = useParams();
   const { data, isFetching, isSuccess, isError } = useTemplate(templateId);
+  const templateText = useTemplateText();
 
-  const title = !isFetching ? data.title : t('pages.template_title');
-  const description = !isFetching ? data.description : t('pages.template_view_description');
+  const title = !isFetching ? templateText(data, data.title) : t('pages.template_title');
+  const description = !isFetching ? templateText(data, data.description) : t('pages.template_view_description');
 
   return (
     <DocumentTitle title={title}>

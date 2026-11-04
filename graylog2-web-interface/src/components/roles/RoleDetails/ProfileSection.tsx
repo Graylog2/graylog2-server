@@ -20,18 +20,25 @@ import { useTranslation } from 'react-i18next';
 import type Role from 'logic/roles/Role';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import { ReadOnlyFormGroup } from 'components/common';
+import useServerText from 'util/serverText';
 
 type Props = {
   role: Role;
 };
 
-const ProfileSection = ({ role: { name, description } }: Props) => {
+const BUILT_IN_ROLES_NAMESPACES = ['builtin_roles'];
+
+const ProfileSection = ({ role: { name, description, readOnly } }: Props) => {
   const { t } = useTranslation('users');
+  const serverText = useServerText(BUILT_IN_ROLES_NAMESPACES);
 
   return (
     <SectionComponent title={t('roles.profile.title')}>
       <ReadOnlyFormGroup label={t('roles.profile.name')} value={name} />
-      <ReadOnlyFormGroup label={t('roles.profile.description')} value={description} />
+      <ReadOnlyFormGroup
+        label={t('roles.profile.description')}
+        value={readOnly ? serverText(description) : description}
+      />
     </SectionComponent>
   );
 };

@@ -23,6 +23,7 @@ import { Button, Col, Row } from 'components/bootstrap';
 import { Card } from 'components/common';
 import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
 import { prepareDataTieringInitialValues, DataTieringVisualisation } from 'components/indices/data-tiering';
+import useTemplateText from 'components/indices/IndexSetTemplates/hooks/useTemplateText';
 
 type Props = {
   template: IndexSetTemplate;
@@ -61,12 +62,14 @@ const Description = styled.p`
 
 const IndexSetTemplateCard = ({ template, handleCardClick, isSelected }: Props) => {
   const { t } = useTranslation('indexsets');
+  const templateText = useTemplateText();
+  const description = templateText(template, template.description);
   const dataTieringConfig = prepareDataTieringInitialValues(template.index_set_config.data_tiering, PluginStore, false);
 
   return (
     <StyledCard $selected={isSelected} $disabled={!template.enabled}>
-      <Title $disabled={!template.enabled}>{template.title}</Title>
-      {template.index_set_config.use_legacy_rotation && <Description>{template.description}</Description>}
+      <Title $disabled={!template.enabled}>{templateText(template, template.title)}</Title>
+      {template.index_set_config.use_legacy_rotation && <Description>{description}</Description>}
       {!template.index_set_config.use_legacy_rotation && (
         <Row>
           <Col md={8}>
@@ -79,7 +82,7 @@ const IndexSetTemplateCard = ({ template, handleCardClick, isSelected }: Props) 
             />
           </Col>
           <Col md={4}>
-            <Description>{template.description}</Description>
+            <Description>{description}</Description>
           </Col>
         </Row>
       )}

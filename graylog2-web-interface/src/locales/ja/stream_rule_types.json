@@ -1,0 +1,10 @@
+{
+  "match exactly": "完全一致",
+  "match regular expression": "正規表現に一致",
+  "greater than": "より大きい",
+  "smaller than": "より小さい",
+  "field presence": "フィールドの存在",
+  "contain": "含む",
+  "always match": "常に一致",
+  "match input": "Input に一致"
+}

@@ -33,6 +33,7 @@ import {
   DataTieringVisualisation,
 } from 'components/indices/data-tiering';
 import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
+import useTemplateText from 'components/indices/IndexSetTemplates/hooks/useTemplateText';
 import usePluginEntities from 'hooks/usePluginEntities';
 
 type Props = {
@@ -100,6 +101,7 @@ const formatRefreshInterval = (intervalInMs: number, t: TFunction) => {
 
 const TemplateDetails = ({ template, showDescription = false }: Props) => {
   const { t } = useTranslation('indexsets');
+  const templateText = useTemplateText();
   const dataTieringPlugins = usePluginEntities('dataTiering');
   const dataTieringPlugin = dataTieringPlugins.find((plugin) => plugin.type === DATA_TIERING_TYPE.HOT_WARM);
   const dataTieringConfig = prepareDataTieringInitialValues(template.index_set_config.data_tiering, PluginStore, false);
@@ -125,7 +127,7 @@ const TemplateDetails = ({ template, showDescription = false }: Props) => {
           <Row>
             <Col md={12}>
               <Section title={t('templates.description')}>
-                <p>{template.description}</p>
+                <p>{templateText(template, template.description)}</p>
               </Section>
             </Col>
           </Row>

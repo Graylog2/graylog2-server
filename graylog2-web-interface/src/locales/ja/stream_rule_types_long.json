@@ -1,0 +1,10 @@
+{
+  "match exactly": "次と完全に一致する",
+  "match regular expression": "次の正規表現に一致する",
+  "be greater than": "次より大きい",
+  "be smaller than": "次より小さい",
+  "be present": "存在する",
+  "contain": "次を含む",
+  "always match": "常に一致する",
+  "match input": "次の Input に一致する"
+}

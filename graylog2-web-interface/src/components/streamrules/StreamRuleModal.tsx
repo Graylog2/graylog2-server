@@ -39,6 +39,9 @@ import useStreamRulesInputs from 'hooks/useStreamRulesInputs';
 import STREAM_RULE_TYPES from 'logic/streams/streamRuleTypes';
 import useStreamRuleTypes from 'components/streams/hooks/useStreamRuleTypes';
 import useResourceCustomization from 'brand-customization/useResourceCustomization';
+import useServerText from 'util/serverText';
+
+const STREAM_RULE_TYPES_NAMESPACES = ['stream_rule_types'];
 
 type FormValues = Partial<Pick<StreamRule, 'type' | 'field' | 'description' | 'value' | 'inverted'>>;
 
@@ -92,6 +95,7 @@ const StreamRuleModal = ({
   const { enabled, url } = useResourceCustomization('stream_rule_matcher_code');
   const { data: inputs } = useStreamRulesInputs();
   const { data: streamRuleTypes } = useStreamRuleTypes();
+  const serverText = useServerText(STREAM_RULE_TYPES_NAMESPACES);
 
   const _onSubmit = useCallback(
     (values: FormValues) => onSubmit(initialValues?.id, values).then(() => onClose()),
@@ -102,10 +106,10 @@ const StreamRuleModal = ({
     () =>
       streamRuleTypes?.map(({ id, short_desc }) => ({
         value: id,
-        label: short_desc,
+        label: serverText(short_desc),
       })),
 
-    [streamRuleTypes],
+    [streamRuleTypes, serverText],
   );
 
   const inputOptions = useMemo(

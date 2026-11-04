@@ -22,6 +22,7 @@ import type { Input } from 'components/messageloaders/Types';
 import type { StreamRule } from 'logic/streams/types';
 import STREAM_RULE_TYPES from 'logic/streams/streamRuleTypes';
 import useStreamRuleTypes from 'components/streams/hooks/useStreamRuleTypes';
+import useServerText from 'util/serverText';
 
 const getEmptyTag = () => i18n.t('stream_rules.human.empty', { ns: 'streams' });
 
@@ -64,11 +65,14 @@ type Props = {
   inputs: Array<Input> | undefined;
 };
 
+const STREAM_RULE_TYPE_DESCRIPTIONS = ['stream_rule_types_long'];
+
 const HumanReadableStreamRule = ({ streamRule, inputs }: Props) => {
   const { t } = useTranslation('streams');
+  const serverText = useServerText(STREAM_RULE_TYPE_DESCRIPTIONS);
   const { data: streamRuleTypes } = useStreamRuleTypes();
   const streamRuleType = streamRuleTypes?.find(({ id }) => id === streamRule.type);
-  const longDesc = streamRuleType ? streamRuleType.long_desc : null;
+  const longDesc = streamRuleType ? serverText(streamRuleType.long_desc) : null;
 
   if (streamRule.type === STREAM_RULE_TYPES.ALWAYS_MATCHES) {
     return <span>{t('stream_rules.human.always_matches')}</span>;

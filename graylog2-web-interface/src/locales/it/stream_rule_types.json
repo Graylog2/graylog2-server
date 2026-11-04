@@ -1,0 +1,10 @@
+{
+  "match exactly": "corrisponde esattamente",
+  "match regular expression": "corrisponde all'espressione regolare",
+  "greater than": "maggiore di",
+  "smaller than": "minore di",
+  "field presence": "presenza del campo",
+  "contain": "contiene",
+  "always match": "corrisponde sempre",
+  "match input": "corrisponde all'Input"
+}

@@ -1,0 +1,14 @@
+{
+  "7 Days Hot, 90 Days Total": "7 dni Hot, łącznie 90 dni",
+  "14 Days Hot, 90 Days Total.": "14 dni Hot, łącznie 90 dni",
+  "30 days Hot, 90 Days Total": "30 dni Hot, łącznie 90 dni",
+  "7 Days Hot": "7 dni Hot",
+  "14 Days Hot": "14 dni Hot",
+  "30 Days Hot": "30 dni Hot",
+  "Use case: minimal need for historical searches. This configuration has low memory and storage usage. Logs will be searchable for a minimum of 90 days.": "Przypadek użycia: minimalna potrzeba wyszukiwania danych historycznych. Ta konfiguracja ma niskie zużycie pamięci i miejsca na dane. Logi będą dostępne do wyszukiwania przez co najmniej 90 dni.",
+  "Use case: regular need for historical searches. Logs will be searchable for a minimum of 90 days.": "Przypadek użycia: regularna potrzeba wyszukiwania danych historycznych. Logi będą dostępne do wyszukiwania przez co najmniej 90 dni.",
+  "Use case: need for frequent and deep historical searches. This configuration has high memory and storage usage. Logs will be searchable for a minimum of 90 days.": "Przypadek użycia: potrzeba częstego i dogłębnego wyszukiwania danych historycznych. Ta konfiguracja ma wysokie zużycie pamięci i miejsca na dane. Logi będą dostępne do wyszukiwania przez co najmniej 90 dni.",
+  "Use case: rare historical searches. This configuration maintains a minimum of 7 days of logs in the Hot Tier.": "Przypadek użycia: rzadkie wyszukiwanie danych historycznych. Ta konfiguracja przechowuje w Hot Tier logi z co najmniej 7 dni.",
+  "Use case: some historical searches. This configuration maintains a minimum of 14 days of logs in the Hot Tier.": "Przypadek użycia: okazjonalne wyszukiwanie danych historycznych. Ta konfiguracja przechowuje w Hot Tier logi z co najmniej 14 dni.",
+  "Use case: frequent historical searches. This configuration maintains a minimum of 30 days of logs in the Hot Tier.": "Przypadek użycia: częste wyszukiwanie danych historycznych. Ta konfiguracja przechowuje w Hot Tier logi z co najmniej 30 dni."
+}

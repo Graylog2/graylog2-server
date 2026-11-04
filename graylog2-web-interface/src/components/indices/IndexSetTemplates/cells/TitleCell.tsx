@@ -20,12 +20,14 @@ import styled, { css } from 'styled-components';
 
 import Routes from 'routing/Routes';
 import { DefaultLabel, Link } from 'components/common';
+import useTemplateText from 'components/indices/IndexSetTemplates/hooks/useTemplateText';
 
 type Props = {
   title: string;
   id: string;
   isDefault: boolean;
   isEnabled: boolean;
+  isBuiltIn: boolean;
 };
 
 const DisabledTitle = styled.span(
@@ -34,8 +36,10 @@ const DisabledTitle = styled.span(
   `,
 );
 
-const TitleCell = ({ title, id, isDefault, isEnabled }: Props) => {
+const TitleCell = ({ title: templateTitle, id, isDefault, isEnabled, isBuiltIn }: Props) => {
   const { t } = useTranslation('indexsets');
+  const templateText = useTemplateText();
+  const title = templateText({ built_in: isBuiltIn }, templateTitle);
 
   if (!isEnabled) {
     return (
