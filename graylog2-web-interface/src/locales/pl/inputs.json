@@ -1,24 +1,24 @@
 {
   "create_input": {
-    "select_input": "Wybierz input",
-    "launch_new": "Uruchom nowy input",
-    "launch_new_type": "Uruchom nowy input typu <type>{{type}}</type>",
-    "launch": "Uruchom input",
-    "no_inputs_available": "Brak dostępnych inputów"
+    "select_input": "Wybierz wejście",
+    "launch_new": "Uruchom nowe wejście",
+    "launch_new_type": "Uruchom nowe wejście typu <type>{{type}}</type>",
+    "launch": "Uruchom wejście",
+    "no_inputs_available": "Brak dostępnych wejść"
   },
   "edit_input": {
-    "edit": "Edytuj input",
-    "editing": "Edycja inputu {{title}}",
-    "update": "Zaktualizuj input"
+    "edit": "Edytuj wejście",
+    "editing": "Edycja wejścia {{title}}",
+    "update": "Zaktualizuj wejście"
   },
   "input_dropdown": {
-    "label": "wybór inputu serwera",
-    "select": "Wybierz input",
-    "unknown_type": "Nieznany typ inputu",
+    "label": "wybór wejścia serwera",
+    "select": "Wybierz wejście",
+    "unknown_type": "Nieznany typ wejścia",
     "option": "{{title}} ({{type}})"
   },
   "input_states": {
-    "title": "Stany inputu {{title}}",
+    "title": "Stany wejścia {{title}}",
     "count_one": "{{count}} {{state}}",
     "count_other": "{{count}} {{state}}",
     "CREATED": "Utworzony",
@@ -36,80 +36,80 @@
     "count_many": "{{count}} {{state}}"
   },
   "state_control": {
-    "set_up": "Skonfiguruj input",
+    "set_up": "Skonfiguruj wejście",
     "stopping": "Zatrzymywanie...",
-    "stop": "Zatrzymaj input",
+    "stop": "Zatrzymaj wejście",
     "starting": "Uruchamianie...",
-    "start": "Uruchom input"
+    "start": "Uruchom wejście"
   },
   "static_fields": {
     "title": "Pola statyczne",
     "add": "Dodaj pole statyczne",
     "add_field": "Dodaj pole",
     "add_success": "Pole statyczne '{{field}}' zostało pomyślnie dodane do '{{input}}'",
-    "add_failed": "Dodanie pola statycznego do inputu nie powiodło się: {{error}}",
-    "add_failed_title": "Nie udało się dodać pola statycznego do inputu '{{input}}'",
+    "add_failed": "Dodanie pola statycznego do wejścia nie powiodło się: {{error}}",
+    "add_failed_title": "Nie udało się dodać pola statycznego do wejścia '{{input}}'",
     "remove_success": "Pole statyczne '{{field}}' zostało pomyślnie usunięte z '{{input}}'",
-    "remove_failed": "Usunięcie pola statycznego z inputu nie powiodło się: {{error}}",
-    "remove_failed_title": "Nie udało się usunąć pola statycznego '{{field}}' z inputu '{{input}}'",
+    "remove_failed": "Usunięcie pola statycznego z wejścia nie powiodło się: {{error}}",
+    "remove_failed_title": "Nie udało się usunąć pola statycznego '{{field}}' z wejścia '{{input}}'",
     "delete_title": "Usuń pole statyczne",
     "delete_confirm": "Czy na pewno chcesz usunąć pole statyczne '{{field}}' z '{{input}}'?",
-    "description": "Zdefiniuj pole statyczne, które będzie dodawane do każdej wiadomości przychodzącej przez ten input. Pole nie zostanie nadpisane, jeśli wiadomość już zawiera ten klucz. Klucz może zawierać wyłącznie znaki alfanumeryczne lub podkreślenia i nie może być zarezerwowanym polem.",
+    "description": "Zdefiniuj pole statyczne, które będzie dodawane do każdej wiadomości przychodzącej przez to wejście. Pole nie zostanie nadpisane, jeśli wiadomość już zawiera ten klucz. Klucz może zawierać wyłącznie znaki alfanumeryczne lub podkreślenia i nie może być zarezerwowanym polem.",
     "field_name": "Nazwa pola",
     "field_name_title": "Może składać się wyłącznie ze znaków alfanumerycznych i podkreśleń.",
     "field_value": "Wartość pola"
   },
   "notifications": {
     "warning": "Ostrzeżenie",
-    "failed": "Inputy z błędem nie będą odbierać ruchu, dopóki nie zostaną uruchomione.",
-    "setup": "Inputy aktualnie w trybie konfiguracji nie będą odbierać ruchu, dopóki nie zostaną uruchomione.",
-    "stopped": "Zatrzymane inputy nie będą odbierać ruchu, dopóki nie zostaną uruchomione.",
-    "show_failed": "Pokaż inputy z błędem",
-    "show_setup": "Pokaż inputy w trybie konfiguracji",
-    "show_stopped": "Pokaż zatrzymane inputy"
+    "failed": "Wejścia z błędem nie będą odbierać ruchu, dopóki nie zostaną uruchomione.",
+    "setup": "Wejścia aktualnie w trybie konfiguracji nie będą odbierać ruchu, dopóki nie zostaną uruchomione.",
+    "stopped": "Zatrzymane wejścia nie będą odbierać ruchu, dopóki nie zostaną uruchomione.",
+    "show_failed": "Pokaż wejścia z błędem",
+    "show_setup": "Pokaż wejścia w trybie konfiguracji",
+    "show_stopped": "Pokaż zatrzymane wejścia"
   },
   "node_select": {
     "node": "Węzeł",
-    "node_help": "Na którym węźle ten input ma się uruchomić",
+    "node_help": "Na którym węźle to wejście ma się uruchomić",
     "select_node": "Wybierz węzeł",
     "global": "Globalny",
-    "global_help": "Czy ten input ma się uruchomić na wszystkich węzłach"
+    "global_help": "Czy to wejście ma się uruchomić na wszystkich węzłach"
   },
   "pages": {
-    "inputs": "Inputy",
-    "docs": "Dokumentacja inputów",
-    "description": "Węzły {{productName}} przyjmują dane za pomocą inputów. Tutaj możesz uruchamiać i zatrzymywać dowolną liczbę inputów.",
-    "cloud_description": "Chmura {{productName}} przyjmuje dane za pomocą inputów. Dostępnych jest wiele typów inputów, ale tylko niektóre mogą działać bezpośrednio w chmurze. Możesz je uruchamiać i zatrzymywać na tej stronie.",
-    "cloud_forwarder_hint": "Jeśli na liście dostępnych inputów na tej stronie brakuje typu inputu, możesz uruchomić go na <forwarderLink>Forwarderze</forwarderLink>.",
+    "inputs": "Wejścia",
+    "docs": "Dokumentacja wejść",
+    "description": "Węzły {{productName}} przyjmują dane za pomocą wejść. Tutaj możesz uruchamiać i zatrzymywać dowolną liczbę wejść.",
+    "cloud_description": "Chmura {{productName}} przyjmuje dane za pomocą wejść. Dostępnych jest wiele typów wejść, ale tylko niektóre mogą działać bezpośrednio w chmurze. Możesz je uruchamiać i zatrzymywać na tej stronie.",
+    "cloud_forwarder_hint": "Jeśli na liście dostępnych wejść na tej stronie brakuje typu wejścia, możesz uruchomić go na <forwarderLink>Forwarderze</forwarderLink>.",
     "back": "Wstecz",
-    "diagnosis_title": "Diagnostyka inputu: {{name}}",
-    "diagnosis_description": "Diagnostyka inputu służy do testowania inputów i parsowania bez zapisywania jakichkolwiek danych w klastrze wyszukiwania.",
+    "diagnosis_title": "Diagnostyka wejścia: {{name}}",
+    "diagnosis_description": "Diagnostyka wejścia służy do testowania wejść i parsowania bez zapisywania jakichkolwiek danych w klastrze wyszukiwania.",
     "tab_overview": "Przegląd",
     "tab_rules": "Reguły",
-    "node_inputs_title": "Inputy węzła {{nodeId}} / {{hostname}}",
-    "node_inputs_description": "Węzły {{productName}} przyjmują dane za pomocą inputów. Na tej stronie zobaczysz, które inputy działają na tym konkretnym węźle.",
-    "node_inputs_hint": "Inputy w klastrze możesz uruchamiać i zatrzymywać <inputsLink>tutaj</inputsLink>.",
-    "local_inputs": "Inputy lokalne",
-    "global_inputs": "Inputy globalne"
+    "node_inputs_title": "Wejścia węzła {{nodeId}} / {{hostname}}",
+    "node_inputs_description": "Węzły {{productName}} przyjmują dane za pomocą wejść. Na tej stronie zobaczysz, które wejścia działają na tym konkretnym węźle.",
+    "node_inputs_hint": "Wejścia w klastrze możesz uruchamiać i zatrzymywać <inputsLink>tutaj</inputsLink>.",
+    "local_inputs": "Wejścia lokalne",
+    "global_inputs": "Wejścia globalne"
   },
   "diagnosis": {
     "help": {
-      "listening_on_title": "Ten input nasłuchuje na:",
-      "listening_on": "Pamiętaj, że adres bind musi wskazywać na usługę {{productName}}. Wybrany port musi być wolny i nie może powodować konfliktu z innym inputem na każdym węźle. Pamiętaj, że lokalny input na jednym węźle może kolidować z inputem globalnym działającym na wszystkich węzłach, przez co input zakończy się błędem na pojedynczym węźle.",
-      "listening_for_title": "Ten input nasłuchuje:",
-      "listening_for": "Pamiętaj, że ruch UDP wysyłany do inputu TCP lub ruch TCP wysyłany do inputu UDP będzie widoczny jako ruch sieciowy (I/O), ale wiadomości nie zostaną odebrane.",
+      "listening_on_title": "To wejście nasłuchuje na:",
+      "listening_on": "Pamiętaj, że adres bind musi wskazywać na usługę {{productName}}. Wybrany port musi być wolny i nie może powodować konfliktu z innym wejściem na każdym węźle. Pamiętaj, że lokalne wejście na jednym węźle może kolidować z wejściem globalnym działającym na wszystkich węzłach, przez co wejście zakończy się błędem na pojedynczym węźle.",
+      "listening_for_title": "To wejście nasłuchuje:",
+      "listening_for": "Pamiętaj, że ruch UDP wysyłany do wejścia TCP lub ruch TCP wysyłany do wejścia UDP będzie widoczny jako ruch sieciowy (I/O), ale wiadomości nie zostaną odebrane.",
       "empty_messages_discarded_title": "Odrzucone puste wiadomości:",
-      "empty_messages_discarded": "Wiadomości o długości ładunku równej 0 zostaną odrzucone przez input.",
+      "empty_messages_discarded": "Wiadomości o długości ładunku równej 0 zostaną odrzucone przez wejście.",
       "network_io_title": "Ruch sieciowy (I/O):",
-      "network_io": "Tej wartości można użyć do wykrywania prób połączeń i nieprawidłowego ruchu do inputu.",
+      "network_io": "Tej wartości można użyć do wykrywania prób połączeń i nieprawidłowego ruchu do wejścia.",
       "input_state": "Wejście w stanie Działa jest gotowe do odbierania wiadomości. Wejście w stanie błędu lub błędu w toku napotkało problem; kliknij przycisk poniżej, aby zobaczyć powiązany komunikat o błędzie.",
-      "message_error_at_input_title": "Błąd wiadomości w inpucie:",
-      "message_error_at_input": "Każdy typ inputu oczekuje wiadomości w określonym formacie. Wiadomości niezgodne z tym formatem mogą zostać odrzucone przez input i wtedy nie trafią do przetwarzania. Aby rozwiązać ten problem, sprawdź wysyłane wiadomości. Bardziej szczegółowe błędy znajdziesz w pliku server.log serwera {{productName}}.",
+      "message_error_at_input_title": "Błąd wiadomości w wejściu:",
+      "message_error_at_input": "Każdy typ wejścia oczekuje wiadomości w określonym formacie. Wiadomości niezgodne z tym formatem mogą zostać odrzucone przez wejście i wtedy nie trafią do przetwarzania. Aby rozwiązać ten problem, sprawdź wysyłane wiadomości. Bardziej szczegółowe błędy znajdziesz w pliku server.log serwera {{productName}}.",
       "message_failed_to_process_title": "Nie udało się przetworzyć wiadomości:",
-      "message_failed_to_process": "Ekstraktory i pipeline'y można wykorzystać do przetwarzania wiadomości, np. do wyodrębniania pól. Reguła pipeline, która próbuje wykonać bezsensowną operację albo zmienia właściwości pola w wiadomości na format niezgodny z typem danych lub limitami długości tego pola, może zakończyć się błędem przetwarzania. Wiadomości, które w ten sposób nie zostały przetworzone, można przejrzeć w streamie Processing and Indexing Failures.",
+      "message_failed_to_process": "Ekstraktory i pipeline'y można wykorzystać do przetwarzania wiadomości, np. do wyodrębniania pól. Reguła pipeline, która próbuje wykonać bezsensowną operację albo zmienia właściwości pola w wiadomości na format niezgodny z typem danych lub limitami długości tego pola, może zakończyć się błędem przetwarzania. Wiadomości, które w ten sposób nie zostały przetworzone, można przejrzeć w strumieniu Processing and Indexing Failures.",
       "message_failed_to_index_title": "Błędy wiadomości:",
-      "message_failed_to_index": "W klastrze wyszukiwania wiadomość może zostać zapisana w indeksie tylko wtedy, gdy spełnia schemat tego indeksu. Każde pole w OpenSearch ma typ pola i limit znaków; jeśli którykolwiek z nich zostanie przekroczony, wiadomość nie zostanie zindeksowana. Wiadomości, które w ten sposób nie zostały zindeksowane, można przejrzeć w streamie Processing and Indexing Failures.",
-      "received_message_count_by_stream": "Z tego widoku dowiesz się, dokąd streamy i reguły pipeline kierują wiadomości z tego inputu. Wiadomość może zostać zduplikowana do wielu streamów; jeśli w efekcie zostanie zapisana w więcej niż jednym indeksie, może to również zwiększać zużycie licencji. Ten widok pomaga wykryć takie duplikowanie."
+      "message_failed_to_index": "W klastrze wyszukiwania wiadomość może zostać zapisana w indeksie tylko wtedy, gdy spełnia schemat tego indeksu. Każde pole w OpenSearch ma typ pola i limit znaków; jeśli którykolwiek z nich zostanie przekroczony, wiadomość nie zostanie zindeksowana. Wiadomości, które w ten sposób nie zostały zindeksowane, można przejrzeć w strumieniu Processing and Indexing Failures.",
+      "received_message_count_by_stream": "Z tego widoku dowiesz się, dokąd strumienie i reguły pipeline kierują wiadomości z tego wejścia. Wiadomość może zostać zduplikowana do wielu strumieni; jeśli w efekcie zostanie zapisana w więcej niż jednym indeksie, może to również zwiększać zużycie licencji. Ten widok pomaga wykryć takie duplikowanie."
     },
     "node": {
       "node_id": "ID węzła:",
@@ -121,45 +121,45 @@
     },
     "information": {
       "title": "Informacje",
-      "description": "Adres, na którym działa input.",
-      "input_title": "Tytuł inputu:",
-      "input_type": "Typ inputu:",
-      "running_on": "Ten input działa na:",
+      "description": "Adres, na którym działa wejście.",
+      "input_title": "Tytuł wejścia:",
+      "input_type": "Typ wejścia:",
+      "running_on": "To wejście działa na:",
       "all_nodes": "wszystkich węzłach {{productName}}",
-      "listening_on": "Ten input nasłuchuje na:",
+      "listening_on": "To wejście nasłuchuje na:",
       "listening_on_value": "Adres bind {{bindAddress}}, port {{port}}.",
-      "listening_for": "Ten input nasłuchuje:"
+      "listening_for": "To wejście nasłuchuje:"
     },
     "state": {
       "title": "Stan",
-      "description": "Liczba węzłów {{productName}}, na których input jest skonfigurowany do działania, oraz liczba węzłów, na których faktycznie działa. Jeśli któryś z nich nie działa, kliknij, aby zobaczyć powiązane komunikaty o błędach.",
+      "description": "Liczba węzłów {{productName}}, na których wejście jest skonfigurowane do działania, oraz liczba węzłów, na których faktycznie działa. Jeśli któryś z nich nie działa, kliknij, aby zobaczyć powiązane komunikaty o błędach.",
       "failed_starts": "Nieudane uruchomienia (ostatnie 15 min):",
       "not_running": "Wejście nie działa."
     },
     "troubleshooting": {
       "title": "Rozwiązywanie problemów",
-      "failed_title": "Jeśli input jest w stanie błędu.",
-      "failed_message_field": "Gdy input zakończy się błędem na jednym lub większej liczbie węzłów {{productName}}, pole Wiadomość w panelu Stan pokaże krótki komunikat o błędzie. Pełny komunikat znajdziesz w pliku server.log serwera {{productName}}.",
+      "failed_title": "Jeśli wejście jest w stanie błędu.",
+      "failed_message_field": "Gdy wejście zakończy się błędem na jednym lub większej liczbie węzłów {{productName}}, pole Wiadomość w panelu Stan pokaże krótki komunikat o błędzie. Pełny komunikat znajdziesz w pliku server.log serwera {{productName}}.",
       "failed_port": "Wejście skonfigurowane do używania określonego portu zakończy się błędem, jeśli port jest uprzywilejowany (a {{productName}} nie działa jako root) lub jest już używany przez inne wejście albo aplikację.",
       "failed_route": "Wejście zakończy się błędem, jeśli nie może przesłać ruchu do określonego adresu IP.",
       "failed_internet": "Wejście, które wymaga połączenia z internetem w celu połączenia z API, zakończy się błędem, jeśli nie ma połączenia z internetem lub nie może dotrzeć do tego API.",
       "failed_certificate": "Wejście TCP zakończy się błędem, jeśli ma nieprawidłowy lub wygasły certyfikat.",
       "failed_external_api": "Wejścia łączące się z zewnętrznym API (na przykład wejście Microsoft Azure) wymagają zmian konfiguracji po stronie źródła, aby {{productName}} mógł zbierać logi. Wymagane kroki są opisane na odpowiedniej podstronie dokumentacji danego wejścia. Wejście łączące się z zewnętrznym API zakończy się błędem, jeśli jest nieprawidłowo skonfigurowany po stronie {{productName}} lub (w zależności od przypadku) po stronie hostującej API.",
-      "no_messages_title": "Jeśli input działa na wszystkich węzłach, ale wiadomości do niego nie docierają.",
+      "no_messages_title": "Jeśli wejście działa na wszystkich węzłach, ale wiadomości do niego nie docierają.",
       "no_messages_network_io": "Sprawdź pole Ruch sieciowy (I/O) w panelu Odebrany ruch. Jeśli nie widać tutaj żadnego ruchu, może to oznaczać problem z łącznością.",
       "no_messages_connectivity": "Jeśli nie widać żadnego ruchu, najpierw sprawdź łączność sieciową między serwerami {{productName}} a źródłem logów. Można to zrobić, uruchamiając polecenia ping, telnet lub tracert.",
-      "no_messages_external_api": "W przypadku inputów łączących się z zewnętrznym API sprawdź plik server.log serwera {{productName}} – błędy uwierzytelniania (nieprawidłowe dane logowania lub brak uprawnień do wykonania działania w API) zostaną zapisane tam w całości.",
-      "no_messages_format": "Jeśli w polu Ruch sieciowy (I/O) w panelu Odebrany ruch widać ruch, ale nie odebrano żadnych wiadomości, oznacza to, że wiadomości nie są wysyłane w formacie odpowiednim dla inputu.",
+      "no_messages_external_api": "W przypadku wejść łączących się z zewnętrznym API sprawdź plik server.log serwera {{productName}} – błędy uwierzytelniania (nieprawidłowe dane logowania lub brak uprawnień do wykonania działania w API) zostaną zapisane tam w całości.",
+      "no_messages_format": "Jeśli w polu Ruch sieciowy (I/O) w panelu Odebrany ruch widać ruch, ale nie odebrano żadnych wiadomości, oznacza to, że wiadomości nie są wysyłane w formacie odpowiednim dla wejścia.",
       "no_messages_protocol": "Wejście TCP nie może odczytywać ruchu UDP i odwrotnie.",
       "no_messages_empty": "Wiadomość bez treści zostanie odrzucona. Można to monitorować w polu Odrzucone puste wiadomości.",
       "no_messages_listener": "Wejścia typu Listener oczekują wiadomości w ograniczonym zakresie formatów i mogą nie być w stanie odczytać wiadomości w obcych formatach. Na potrzeby rozwiązywania problemów Raw Text Input ma najmniej restrykcyjne wymagania.",
-      "message_errors_title": "Jeśli input działa na wszystkich węzłach, wiadomości do niego docierają, ale niektóre (lub wszystkie) są wyświetlane jako błędy wiadomości.",
-      "message_errors_failure_processing": "W licencjonowanych klastrach Enterprise można włączyć Failure Processing, aby zapisywać wiadomości, które zakończyły się błędem na każdym etapie: w inpucie, przetwarzaniu i zapisie do klastra wyszukiwania, wraz ze szczegółami błędu – zobacz pola failure_cause i failure_details. Przejdź do panelu Błąd wiadomości i kliknij liczbę wiadomości, aby przejrzeć poszczególne wiadomości z błędami."
+      "message_errors_title": "Jeśli wejście działa na wszystkich węzłach, wiadomości do niego docierają, ale niektóre (lub wszystkie) są wyświetlane jako błędy wiadomości.",
+      "message_errors_failure_processing": "W licencjonowanych klastrach Enterprise można włączyć Failure Processing, aby zapisywać wiadomości, które zakończyły się błędem na każdym etapie: w wejściu, przetwarzaniu i zapisie do klastra wyszukiwania, wraz ze szczegółami błędu – zobacz pola failure_cause i failure_details. Przejdź do panelu Błąd wiadomości i kliknij liczbę wiadomości, aby przejrzeć poszczególne wiadomości z błędami."
     },
     "received_traffic": {
       "title": "Odebrany ruch",
-      "description": "Wiadomości i ruch sieciowy, który dotarł do inputu. Uwaga: metryki obejmują tylko ostatnie 15 minut.",
-      "total_messages": "Łączna liczba wiadomości odebranych przez input:",
+      "description": "Wiadomości i ruch sieciowy, który dotarł do wejścia. Uwaga: metryki obejmują tylko ostatnie 15 minut.",
+      "total_messages": "Łączna liczba wiadomości odebranych przez wejście:",
       "events": "Liczba zdarzeń: {{count}}",
       "empty_messages": "Odrzucone puste wiadomości:",
       "active_connections": "Aktywne połączenia:",
@@ -167,42 +167,42 @@
       "network_io": "Ruch sieciowy (I/O):"
     },
     "message_count_by_stream": {
-      "title": "Liczba odebranych wiadomości według streamu",
-      "description": "Wiadomości pomyślnie pobrane z tego inputu w ciągu ostatnich 15 minut. Kliknij stream, aby zobaczyć wiadomości.",
+      "title": "Liczba odebranych wiadomości według strumienia",
+      "description": "Wiadomości pomyślnie pobrane z tego wejścia w ciągu ostatnich 15 minut. Kliknij strumień, aby zobaczyć wiadomości.",
       "stream": "{{streamName}}:",
-      "none": "W ciągu ostatnich 15 minut żadne wiadomości z tego inputu nie zostały skierowane do streamów."
+      "none": "W ciągu ostatnich 15 minut żadne wiadomości z tego wejścia nie zostały skierowane do strumieni."
     },
     "message_errors": {
       "title": "Błędy wiadomości",
-      "description": "Wiadomości mogą zakończyć się błędem przetwarzania w inpucie, w pipeline przetwarzania lub podczas indeksowania w klastrze wyszukiwania.",
-      "at_input": "Błąd wiadomości w inpucie:",
+      "description": "Wiadomości mogą zakończyć się błędem przetwarzania w wejściu, w pipeline przetwarzania lub podczas indeksowania w klastrze wyszukiwania.",
+      "at_input": "Błąd wiadomości w wejściu:",
       "failed_to_process": "Nie udało się przetworzyć wiadomości:",
       "failed_to_index": "Nie udało się zindeksować wiadomości:"
     },
     "rules": {
       "pipeline_rules_title": "Wejście występuje w regułach pipeline",
-      "pipeline_rules_description": "Poniższe reguły pipeline wprost odwołują się do tego inputu (np. przez from_input, from_forwarder_input lub dopasowanie gl2_source_input/gl2_forwarder_input).",
+      "pipeline_rules_description": "Poniższe reguły pipeline wprost odwołują się do tego wejścia (np. przez from_input, from_forwarder_input lub dopasowanie gl2_source_input/gl2_forwarder_input).",
       "pipeline_rules_human_name": "reguły pipeline",
       "pipeline_rules_search": "Wyszukaj regułę pipeline",
       "stream_rules_title": "Wejście występuje w regułach strumieni",
-      "stream_rules_description": "Poniższe reguły streamów zawierają funkcję dopasowania match input, która wprost wskazuje ten input. Reguły streamów, które mogą przechwytywać wiadomości z tego inputu bez jawnego użycia funkcji match input, nie są tutaj wymienione.",
-      "stream_rules_human_name": "reguły streamów",
-      "stream_rules_search": "Wyszukaj regułę streamu",
-      "load_pipeline_rules_failed": "Nie udało się załadować reguł pipeline inputu, status:",
-      "could_not_load_pipeline_rules": "Nie udało się załadować reguł pipeline inputu",
-      "load_stream_rules_failed": "Nie udało się załadować reguł streamów inputu, status:",
-      "could_not_load_stream_rules": "Nie udało się załadować reguł streamów inputu"
+      "stream_rules_description": "Poniższe reguły strumieni zawierają funkcję dopasowania match input, która wprost wskazuje to wejście. Reguły strumieni, które mogą przechwytywać wiadomości z tego wejścia bez jawnego użycia funkcji match input, nie są tutaj wymienione.",
+      "stream_rules_human_name": "reguły strumieni",
+      "stream_rules_search": "Wyszukaj regułę strumienia",
+      "load_pipeline_rules_failed": "Nie udało się załadować reguł pipeline wejścia, status:",
+      "could_not_load_pipeline_rules": "Nie udało się załadować reguł pipeline wejścia",
+      "load_stream_rules_failed": "Nie udało się załadować reguł strumieni wejścia, status:",
+      "could_not_load_stream_rules": "Nie udało się załadować reguł strumieni wejścia"
     },
     "network_stats": {
       "total_prefix": " (łącznie: ",
       "total_suffix": ")"
     },
     "show_received_messages": "Pokaż odebrane wiadomości",
-    "fetch_failed": "Pobieranie diagnostyki inputu nie powiodło się, status:",
-    "could_not_fetch": "Nie udało się pobrać diagnostyki inputu"
+    "fetch_failed": "Pobieranie diagnostyki wejścia nie powiodło się, status:",
+    "could_not_fetch": "Nie udało się pobrać diagnostyki wejścia"
   },
   "setup_wizard": {
-    "title": "Kreator konfiguracji inputu",
+    "title": "Kreator konfiguracji wejścia",
     "back": "Wstecz",
     "finish": "Zakończ",
     "steps": {
@@ -211,144 +211,144 @@
       "diagnosis": "Diagnostyka"
     },
     "diagnosis_step": {
-      "description": "Testuj inputy i parsowanie bez zapisywania jakichkolwiek danych w klastrze wyszukiwania.",
-      "go_to_diagnosis": "Przejdź do diagnostyki inputu"
+      "description": "Testuj wejścia i parsowanie bez zapisywania jakichkolwiek danych w klastrze wyszukiwania.",
+      "go_to_diagnosis": "Przejdź do diagnostyki wejścia"
     },
-    "load_streams_failed": "Nie udało się załadować streamów, błąd: {{error}}",
-    "load_input_references_failed": "Nie udało się załadować powiązań inputu, błąd: {{error}}",
-    "load_streams_by_index_set_failed": "Nie udało się załadować streamów według zestawu indeksów, błąd: {{error}}",
+    "load_streams_failed": "Nie udało się załadować strumieni, błąd: {{error}}",
+    "load_input_references_failed": "Nie udało się załadować powiązań wejścia, błąd: {{error}}",
+    "load_streams_by_index_set_failed": "Nie udało się załadować strumieni według zestawu indeksów, błąd: {{error}}",
     "routing": {
-      "connected_pipelines_title": "Pipeline'y połączone z docelowym streamem",
-      "connected_pipelines": "Zalecamy sprawdzenie wpływu tych pipeline'ów przed zakończeniem konfiguracji inputu. Docelowy stream ma połączone następujące pipeline'y:",
-      "select_destination": "Wybierz docelowy stream, do którego mają być kierowane wiadomości z tego inputu.",
-      "recommend_new_stream": "<strong>Zalecamy utworzenie nowego streamu dla każdego nowego inputu.</strong> Pomoże to skategoryzować wiadomości zgodnie z podstawowym schematem.",
+      "connected_pipelines_title": "Pipeline'y połączone z docelowym strumieniem",
+      "connected_pipelines": "Zalecamy sprawdzenie wpływu tych pipeline'ów przed zakończeniem konfiguracji wejścia. Docelowy strumień ma połączone następujące pipeline'y:",
+      "select_destination": "Wybierz docelowy strumień, do którego mają być kierowane wiadomości z tego wejścia.",
+      "recommend_new_stream": "<strong>Zalecamy utworzenie nowego strumienia dla każdego nowego wejścia.</strong> Pomoże to skategoryzować wiadomości zgodnie z podstawowym schematem.",
       "default_stream_fallback": "Wiadomości, które nie zostaną skierowane do żadnego strumienia, trafią do <strong>Default Stream</strong>.",
       "pipeline_rules_info": "Kreator może automatycznie utworzyć reguły pipeline i dołączyć je do <strong>Default Stream</strong>. Reguły te zostaną umieszczone w zarządzanym przez system pipeline Default Routing Pipeline i zostaną automatycznie przemianowane (lub usunięte), aby dokładnie odzwierciedlać stan tego wejścia.",
-      "new_stream_heading": "Kieruj do nowego streamu",
+      "new_stream_heading": "Kieruj do nowego strumienia",
       "recommended": "Zalecane!",
-      "create_stream": "Utwórz stream",
-      "existing_stream_heading": "Kieruj do istniejącego streamu",
-      "select_stream": "Wybierz stream",
-      "create_new_stream": "Utwórz nowy stream",
-      "choose_existing_stream": "Wybierz istniejący stream",
-      "existing_stream_selected": "Wybrano kierowanie wiadomości z tego inputu do istniejącego streamu.",
-      "pipeline_rules_created": "Reguły pipeline zostaną utworzone po naciśnięciu przycisku <strong>Uruchom input</strong>.",
+      "create_stream": "Utwórz strumień",
+      "existing_stream_heading": "Kieruj do istniejącego strumienia",
+      "select_stream": "Wybierz strumień",
+      "create_new_stream": "Utwórz nowy strumień",
+      "choose_existing_stream": "Wybierz istniejący strumień",
+      "existing_stream_selected": "Wybrano kierowanie wiadomości z tego wejścia do istniejącego strumienia.",
+      "pipeline_rules_created": "Reguły pipeline zostaną utworzone po naciśnięciu przycisku <strong>Uruchom wejście</strong>.",
       "default_stream": "Default Stream",
       "remove_from_default": "Usuń dopasowania z „Default Stream”",
       "remove_from_default_help": "Nie przypisuj wiadomości pasujących do tego strumienia do „Default Stream”."
     },
     "start": {
-      "description": "Skonfiguruj i uruchom input zgodnie z wprowadzoną konfiguracją.",
-      "rolling_back": "Wycofywanie inputu...",
-      "setting_up": "Konfigurowanie inputu...",
+      "description": "Skonfiguruj i uruchom wejście zgodnie z wprowadzoną konfiguracją.",
+      "rolling_back": "Wycofywanie wejścia...",
+      "setting_up": "Konfigurowanie wejścia...",
       "not_ready": "Wejście nie jest jeszcze gotowe do konfiguracji. Wykonaj poprzednie kroki.",
-      "start_input": "Uruchom input",
-      "rollback_input": "Wycofaj input",
-      "launch_diagnosis": "Uruchom diagnostykę inputu"
+      "start_input": "Uruchom wejście",
+      "rollback_input": "Wycofaj wejście",
+      "launch_diagnosis": "Uruchom diagnostykę wejścia"
     },
     "progress": {
       "details": "Szczegóły:",
       "loading": {
-        "create_stream": "Tworzenie streamu...",
-        "create_stream_named": "Tworzenie streamu \"{{name}}\"...",
-        "start_stream": "Uruchamianie streamu...",
-        "start_stream_named": "Uruchamianie streamu \"{{name}}\"...",
+        "create_stream": "Tworzenie strumienia...",
+        "create_stream_named": "Tworzenie strumienia \"{{name}}\"...",
+        "start_stream": "Uruchamianie strumienia...",
+        "start_stream_named": "Uruchamianie strumienia \"{{name}}\"...",
         "create_pipeline": "Tworzenie pipeline'u...",
         "create_pipeline_named": "Tworzenie pipeline'u \"{{name}}\"...",
         "setup_routing": "Konfigurowanie routingu...",
-        "delete_stream": "Usuwanie streamu...",
-        "delete_stream_named": "Usuwanie streamu \"{{name}}\"...",
+        "delete_stream": "Usuwanie strumienia...",
+        "delete_stream_named": "Usuwanie strumienia \"{{name}}\"...",
         "delete_pipeline": "Usuwanie pipeline'u...",
         "delete_pipeline_named": "Usuwanie pipeline'u \"{{name}}\"...",
         "delete_routing": "Usuwanie routingu...",
-        "connect_pipeline": "Łączenie pipeline'u ze streamem..."
+        "connect_pipeline": "Łączenie pipeline'u ze strumieniem..."
       },
       "error": {
-        "create_stream": "Nie udało się utworzyć streamu!",
-        "create_stream_named": "Nie udało się utworzyć streamu \"{{name}}\"!",
-        "start_stream": "Nie udało się uruchomić streamu!",
-        "start_stream_named": "Nie udało się uruchomić streamu \"{{name}}\"!",
+        "create_stream": "Nie udało się utworzyć strumienia!",
+        "create_stream_named": "Nie udało się utworzyć strumienia \"{{name}}\"!",
+        "start_stream": "Nie udało się uruchomić strumienia!",
+        "start_stream_named": "Nie udało się uruchomić strumienia \"{{name}}\"!",
         "create_pipeline": "Nie udało się utworzyć pipeline'u!",
         "create_pipeline_named": "Nie udało się utworzyć pipeline'u \"{{name}}\"!",
         "setup_routing": "Nie udało się skonfigurować routingu!",
-        "result": "Uruchomienie inputu nie powiodło się. Wycofaj go, aby oczyścić konfigurację.",
-        "delete_stream": "Nie udało się usunąć streamu!",
-        "delete_stream_named": "Nie udało się usunąć streamu \"{{name}}\"!",
+        "result": "Uruchomienie wejścia nie powiodło się. Wycofaj je, aby oczyścić konfigurację.",
+        "delete_stream": "Nie udało się usunąć strumienia!",
+        "delete_stream_named": "Nie udało się usunąć strumienia \"{{name}}\"!",
         "delete_pipeline": "Nie udało się usunąć pipeline'u!",
         "delete_pipeline_named": "Nie udało się usunąć pipeline'u \"{{name}}\"!",
         "delete_routing": "Nie udało się usunąć routingu!",
-        "connect_pipeline": "Nie udało się połączyć pipeline'u ze streamem!"
+        "connect_pipeline": "Nie udało się połączyć pipeline'u ze strumieniem!"
       },
       "success": {
-        "create_stream": "Utworzono stream!",
-        "create_stream_named": "Utworzono stream \"{{name}}\"!",
-        "start_stream": "Uruchomiono stream!",
-        "start_stream_named": "Uruchomiono stream \"{{name}}\"!",
+        "create_stream": "Utworzono strumień!",
+        "create_stream_named": "Utworzono strumień \"{{name}}\"!",
+        "start_stream": "Uruchomiono strumień!",
+        "start_stream_named": "Uruchomiono strumień \"{{name}}\"!",
         "create_pipeline": "Utworzono pipeline!",
         "create_pipeline_named": "Utworzono pipeline \"{{name}}\"!",
         "setup_routing": "Skonfigurowano routing!",
         "result": "Wejście zostało uruchomiony pomyślnie!",
-        "delete_stream": "Usunięto stream!",
-        "delete_stream_named": "Usunięto stream \"{{name}}\"!",
+        "delete_stream": "Usunięto strumień!",
+        "delete_stream_named": "Usunięto strumień \"{{name}}\"!",
         "delete_pipeline": "Usunięto pipeline!",
         "delete_pipeline_named": "Usunięto pipeline \"{{name}}\"!",
         "delete_routing": "Usunięto routing!",
-        "connect_pipeline": "Pomyślnie połączono pipeline ze streamem!"
+        "connect_pipeline": "Pomyślnie połączono pipeline ze strumieniem!"
       }
     },
     "create_stream": {
       "title": "Tytuł",
-      "title_help": "Opisowa nazwa nowego streamu",
+      "title_help": "Opisowa nazwa nowego strumienia",
       "title_required": "Tytuł jest wymagany",
       "index_set_required": "Zestaw indeksów jest wymagany",
       "description": "Opis",
-      "description_help": "Jakiego rodzaju wiadomości są kierowane do tego streamu?",
-      "create_pipeline": "Utwórz nowy pipeline dla tego streamu",
+      "description_help": "Jakiego rodzaju wiadomości są kierowane do tego strumienia?",
+      "create_pipeline": "Utwórz nowy pipeline dla tego strumienia",
       "select_index_set": "Wybierz zestaw indeksów",
-      "index_set_info": "Wiadomości pasujące do tego streamu będą zapisywane w skonfigurowanym zestawie indeksów. Zestawy indeksów służą do logicznego podziału danych, co przyspiesza wyszukiwanie.",
-      "index_set_recommendation": "Zalecamy utworzenie nowego zestawu indeksów dla każdego typu inputu.",
+      "index_set_info": "Wiadomości pasujące do tego strumienia będą zapisywane w skonfigurowanym zestawie indeksów. Zestawy indeksów służą do logicznego podziału danych, co przyspiesza wyszukiwanie.",
+      "index_set_recommendation": "Zalecamy utworzenie nowego zestawu indeksów dla każdego typu wejścia.",
       "create_index_set": "Utwórz nowy zestaw indeksów"
     },
     "input_in_use": {
       "title": "Wejście jest już używany – ryzyko duplikowania wiadomości!",
-      "stream_refs": "Ten input jest już uwzględniony w regułach streamów następujących streamów:",
-      "pipeline_refs": "Ten input jest już uwzględniony w regułach pipeline następujących pipeline'ów:",
+      "stream_refs": "To wejście jest już uwzględnione w regułach strumieni następujących strumieni:",
+      "pipeline_refs": "To wejście jest już uwzględnione w regułach pipeline następujących pipeline'ów:",
       "prevent_duplication": "Aby zapobiec potencjalnemu duplikowaniu, przed kontynuowaniem usuń wszelkie istniejące routingi."
     },
     "index_set_alert": {
       "default_title": "Wybrano domyślny zestaw indeksów",
       "default_selected": "Wybrano domyślny zestaw indeksów.",
       "default_recommendation": "Nie zalecamy tego rozwiązania: domyślny zestaw indeksów, do którego mogą trafiać wiadomości w wielu różnych formatach (każda wiadomość bez routingu, przez Default Stream), przy intensywnym użyciu jest podatny na osiągnięcie maksymalnego limitu pól na indeks w backendzie wyszukiwania.",
-      "in_use_title": "Wybrany zestaw indeksów jest już powiązany z innym streamem",
-      "in_use": "Wybrany zestaw indeksów jest już powiązany z innym streamem lub streamami.",
+      "in_use_title": "Wybrany zestaw indeksów jest już powiązany z innym strumieniem",
+      "in_use": "Wybrany zestaw indeksów jest już powiązany z innym strumieniem lub strumieniami.",
       "field_limit": "Pamiętaj, że każdy indeks ma własny limit pól, domyślnie 1000.",
-      "organise_recommendation": "Z tego powodu, gdy to możliwe, zalecamy organizowanie streamów według formatu logów w kilku zestawach indeksów."
+      "organise_recommendation": "Z tego powodu, gdy to możliwe, zalecamy organizowanie strumieni według formatu logów w kilku zestawach indeksów."
     }
   },
   "overview": {
     "columns": {
       "traffic": "Ruch w ostatniej minucie",
-      "input_failures": "Błędy inputu",
+      "input_failures": "Błędy wejścia",
       "address": "Adres",
       "port": "Port",
       "messages_per_stream": "Liczba wiadomości (ostatnie 24 h)",
       "extractor_count": "Ekstraktory",
-      "associated_streams": "Powiązane streamy (ostatnie 24 h)",
+      "associated_streams": "Powiązane strumienie (ostatnie 24 h)",
       "configuration": "Konfiguracja"
     },
     "not_available": "Brak danych",
-    "show_diagnosis_for": "pokaż diagnostykę inputu dla {{title}}",
-    "show_diagnosis_for_capitalized": "Pokaż diagnostykę inputu dla {{title}}",
+    "show_diagnosis_for": "pokaż diagnostykę wejścia dla {{title}}",
+    "show_diagnosis_for_capitalized": "Pokaż diagnostykę wejścia dla {{title}}",
     "cells": {
-      "no_associated_streams": "Brak dostępnych powiązanych streamów dla inputu {{title}}",
-      "show_associated_streams": "Pokaż powiązane streamy dla {{title}}",
-      "hide_associated_streams": "Ukryj powiązane streamy dla {{title}}",
-      "no_extractor_count": "Brak dostępnej liczby ekstraktorów dla inputu {{title}}",
+      "no_associated_streams": "Brak dostępnych powiązanych strumieni dla wejścia {{title}}",
+      "show_associated_streams": "Pokaż powiązane strumienie dla {{title}}",
+      "hide_associated_streams": "Ukryj powiązane strumienie dla {{title}}",
+      "no_extractor_count": "Brak dostępnej liczby ekstraktorów dla wejścia {{title}}",
       "show_extractors": "Pokaż ekstraktory dla {{title}}",
       "hide_extractors": "Ukryj ekstraktory dla {{title}}",
-      "no_message_count": "Brak dostępnej liczby wiadomości dla inputu {{title}}",
-      "show_messages_per_stream": "Pokaż liczbę wiadomości według streamu dla {{title}}",
-      "hide_messages_per_stream": "Ukryj liczbę wiadomości według streamu dla {{title}}",
+      "no_message_count": "Brak dostępnej liczby wiadomości dla wejścia {{title}}",
+      "show_messages_per_stream": "Pokaż liczbę wiadomości według strumienia dla {{title}}",
+      "hide_messages_per_stream": "Ukryj liczbę wiadomości według strumienia dla {{title}}",
       "show_metrics": "Pokaż metryki",
       "hide_metrics": "Ukryj metryki",
       "throughput": "{{value}} wiad./s",
@@ -357,8 +357,8 @@
       "messages_per_stream_label": "wiadomości na strumień dla {{title}}"
     },
     "sections": {
-      "could_not_load_associated_streams": "Nie udało się załadować powiązanych streamów.",
-      "no_associated_streams": "W ciągu ostatnich 24 godzin żadne streamy nie były powiązane z tym inputem.",
+      "could_not_load_associated_streams": "Nie udało się załadować powiązanych strumieni.",
+      "no_associated_streams": "W ciągu ostatnich 24 godzin żadne strumienie nie były powiązane z tym wejściem.",
       "deleted_stream": "{{streamId}} (usunięty)",
       "active_connections": "Aktywne połączenia: <active>{{open}} </active>(łącznie: <total>{{total}}</total>)",
       "throughput_metrics": "Przepustowość / metryki",
@@ -366,13 +366,13 @@
       "load_extractors_failed": "Nie udało się załadować ekstraktorów, status:",
       "could_not_load_extractors_title": "Nie udało się załadować ekstraktorów",
       "could_not_load_extractors": "Nie udało się załadować ekstraktorów.",
-      "no_extractors": "Ten input nie ma skonfigurowanych ekstraktorów.",
+      "no_extractors": "To wejście nie ma skonfigurowanych ekstraktorów.",
       "extractor_title": "Tytuł",
       "extractor_type": "Typ",
       "source_field": "Pole źródłowe",
       "target_field": "Pole docelowe",
-      "could_not_load_messages_per_stream": "Nie udało się załadować liczby wiadomości według streamu.",
-      "no_messages_per_stream": "W ciągu ostatnich 24 godzin żaden stream nie otrzymał wiadomości z tego inputu.",
+      "could_not_load_messages_per_stream": "Nie udało się załadować liczby wiadomości według strumienia.",
+      "no_messages_per_stream": "W ciągu ostatnich 24 godzin żaden strumień nie otrzymał wiadomości z tego wejścia.",
       "stream": "Strumień",
       "messages": "Wiadomości",
       "network_io": "Ruch sieciowy (I/O): ",
@@ -380,59 +380,59 @@
       "total_suffix": " )",
       "empty_messages_discarded": "Odrzucone puste wiadomości: {{value}}",
       "no_node_metrics": "Brak dostępnych metryk dla tego węzła",
-      "no_input_metrics": "Brak dostępnych metryk dla tego inputu",
+      "no_input_metrics": "Brak dostępnych metryk dla tego wejścia",
       "show_details": "Pokaż szczegóły",
       "hide_details": "Ukryj szczegóły"
     },
     "actions": {
       "received_messages": "Odebrane wiadomości",
-      "input_diagnosis": "Diagnostyka inputu",
+      "input_diagnosis": "Diagnostyka wejścia",
       "exit_setup_mode": "Zakończ tryb konfiguracji",
       "enter_setup_mode": "Przejdź do trybu konfiguracji",
       "show_metrics": "Pokaż metryki",
-      "delete_input": "Usuń input",
-      "delete_title": "Usuwanie inputu",
-      "delete_confirm": "Czy na pewno chcesz usunąć input {{title}}?"
+      "delete_input": "Usuń wejście",
+      "delete_title": "Usuwanie wejścia",
+      "delete_confirm": "Czy na pewno chcesz usunąć wejście {{title}}?"
     }
   },
   "dot_badge": {
-    "problematic_inputs": "Niektóre inputy są w stanie błędu lub w trybie konfiguracji."
+    "problematic_inputs": "Niektóre wejścia są w stanie błędu lub w trybie konfiguracji."
   },
   "use_input_notifications": {
-    "load_failed": "Nie udało się załadować inputu, status:",
-    "load_failed_title": "Nie udało się załadować inputu"
+    "load_failed": "Nie udało się załadować wejścia, status:",
+    "load_failed_title": "Nie udało się załadować wejścia"
   },
   "use_input_details_notifications": {
-    "load_failed": "Nie udało się załadować szczegółów inputu, status:",
-    "load_failed_title": "Nie udało się załadować szczegółów inputu"
+    "load_failed": "Nie udało się załadować szczegółów wejścia, status:",
+    "load_failed_title": "Nie udało się załadować szczegółów wejścia"
   },
   "use_input_metrics_notifications": {
-    "load_failed": "Nie udało się załadować metryk inputu, status:",
-    "load_failed_title": "Nie udało się załadować metryk inputu"
+    "load_failed": "Nie udało się załadować metryk wejścia, status:",
+    "load_failed_title": "Nie udało się załadować metryk wejścia"
   },
   "use_input_state_summary_notifications": {
-    "load_failed": "Nie udało się załadować podsumowania stanu inputów, status:",
-    "load_failed_title": "Nie udało się załadować podsumowania stanu inputu."
+    "load_failed": "Nie udało się załadować podsumowania stanu wejść, status:",
+    "load_failed_title": "Nie udało się załadować podsumowania stanu wejścia."
   },
   "use_input_state_mutations_notifications": {
-    "start_failed": "Błąd podczas uruchamiania inputu '{{title}}': {{error}}",
-    "start_failed_title": "Nie udało się uruchomić inputu '{{title}}'",
+    "start_failed": "Błąd podczas uruchamiania wejścia '{{title}}': {{error}}",
+    "start_failed_title": "Nie udało się uruchomić wejścia '{{title}}'",
     "started_success": "Wejście zostało uruchomione pomyślnie.",
-    "stop_failed": "Błąd podczas zatrzymywania inputu '{{title}}': {{error}}",
-    "stop_failed_title": "Nie udało się zatrzymać inputu '{{title}}'",
+    "stop_failed": "Błąd podczas zatrzymywania wejścia '{{title}}': {{error}}",
+    "stop_failed_title": "Nie udało się zatrzymać wejścia '{{title}}'",
     "stopped_success": "Wejście zostało zatrzymane pomyślnie.",
-    "setup_failed": "Błąd podczas przełączania inputu '{{title}}' w tryb konfiguracji: {{error}}",
-    "setup_failed_title": "Nie udało się przełączyć inputu '{{title}}' w tryb konfiguracji",
+    "setup_failed": "Błąd podczas przełączania wejścia '{{title}}' w tryb konfiguracji: {{error}}",
+    "setup_failed_title": "Nie udało się przełączyć wejścia '{{title}}' w tryb konfiguracji",
     "deleted_success": "Wejście zostało usunięte pomyślnie.",
     "success_title": "Sukces!"
   },
   "use_input_mutations_notifications": {
-    "save_failed": "Zapisywanie inputu nie powiodło się, status: {{error}}",
-    "save_failed_title": "Nie udało się zapisać inputu",
-    "update_failed": "Aktualizacja inputu nie powiodła się, status: {{error}}",
-    "update_failed_title": "Nie udało się zaktualizować inputu",
-    "delete_failed": "Usuwanie inputu nie powiodło się, status: {{error}}",
-    "delete_failed_title": "Nie udało się usunąć inputu",
+    "save_failed": "Zapisywanie wejścia nie powiodło się, status: {{error}}",
+    "save_failed_title": "Nie udało się zapisać wejścia",
+    "update_failed": "Aktualizacja wejścia nie powiodła się, status: {{error}}",
+    "update_failed_title": "Nie udało się zaktualizować wejścia",
+    "delete_failed": "Usuwanie wejścia nie powiodło się, status: {{error}}",
+    "delete_failed_title": "Nie udało się usunąć wejścia",
     "created_success": "Wejście zostało utworzone pomyślnie.",
     "updated_success": "Wejście zostało zaktualizowane pomyślnie.",
     "deleted_success": "Wejście zostało usunięte pomyślnie.",
@@ -440,15 +440,15 @@
   },
   "use_inputs_notifications": {
     "launched_success": "Wejście '{{title}}' zostało uruchomione pomyślnie",
-    "launch_failed": "Uruchamianie inputu '{{title}}' nie powiodło się, status: {{error}}",
-    "launch_failed_title": "Nie udało się uruchomić inputu",
+    "launch_failed": "Uruchamianie wejścia '{{title}}' nie powiodło się, status: {{error}}",
+    "launch_failed_title": "Nie udało się uruchomić wejścia",
     "updated_success": "Wejście '{{title}}' zostało zaktualizowane pomyślnie",
-    "update_failed": "Aktualizacja inputu '{{title}}' nie powiodła się, status: {{error}}",
-    "update_failed_title": "Nie udało się zaktualizować inputu",
+    "update_failed": "Aktualizacja wejścia '{{title}}' nie powiodła się, status: {{error}}",
+    "update_failed_title": "Nie udało się zaktualizować wejścia",
     "deleted_success": "Wejście '{{title}}' zostało usunięte pomyślnie",
-    "delete_failed": "Usuwanie inputu '{{title}}' nie powiodło się, status: {{error}}",
-    "delete_failed_title": "Nie udało się usunąć inputu",
-    "fetch_failed": "Pobieranie inputów nie powiodło się, status: {{error}}",
-    "fetch_failed_title": "Nie udało się pobrać inputów"
+    "delete_failed": "Usuwanie wejścia '{{title}}' nie powiodło się, status: {{error}}",
+    "delete_failed_title": "Nie udało się usunąć wejścia",
+    "fetch_failed": "Pobieranie wejść nie powiodło się, status: {{error}}",
+    "fetch_failed_title": "Nie udało się pobrać wejść"
   }
 }

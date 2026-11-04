@@ -2,7 +2,7 @@
   "destination_permission_alert": {
     "data_lake": "Obecnie nie masz uprawnień do wyświetlania ani zarządzania miejscem docelowym Data Lake.",
     "index_set": "Obecnie nie masz uprawnień do wyświetlania ani zarządzania miejscem docelowym zestawu indeksów.",
-    "outputs": "Obecnie nie masz uprawnień do wyświetlania ani zarządzania miejscem docelowym Outputs."
+    "outputs": "Obecnie nie masz uprawnień do wyświetlania ani zarządzania miejscem docelowym wyjść."
   },
   "index_set_select": {
     "help": "Wiadomości pasujące do tego strumienia będą zapisywane w skonfigurowanym zestawie indeksów.",
@@ -66,24 +66,24 @@
     }
   },
   "outputs": {
-    "assign_existing": "Przypisz istniejący Output",
+    "assign_existing": "Przypisz istniejące wyjście",
     "content_pack_title": "Utworzono z pakietu treści",
-    "create_submit": "Utwórz output",
-    "create_title": "Utwórz nowy Output",
+    "create_submit": "Utwórz wyjście",
+    "create_title": "Utwórz nowe wyjście",
     "delete_from_stream": "Usuń ze strumienia",
     "delete_globally": "Usuń globalnie",
     "edit": "Edytuj",
-    "edit_title": "Edycja Output {{title}}",
+    "edit_title": "Edycja wyjścia {{title}}",
     "id_label": "ID: {{id}}",
-    "launch_new": "Uruchom nowy output",
-    "name_help": "Wybierz nazwę opisującą nowy output.",
-    "none_available": "Brak dostępnych outputów",
-    "none_configured": "Nie skonfigurowano żadnych outputów.",
-    "plugin_error": "Wtyczka wymagana dla tego outputu nie jest załadowana. Edycja nie jest możliwa. Załaduj wtyczkę lub usuń output.",
-    "select_existing": "Wybierz istniejący output",
-    "select_type": "Wybierz typ outputu",
+    "launch_new": "Uruchom nowe wyjście",
+    "name_help": "Wybierz nazwę opisującą nowe wyjście.",
+    "none_available": "Brak dostępnych wyjść",
+    "none_configured": "Nie skonfigurowano żadnych wyjść.",
+    "plugin_error": "Wtyczka wymagana dla tego wyjścia nie jest załadowana. Edycja nie jest możliwa. Załaduj wtyczkę lub usuń wyjście.",
+    "select_existing": "Wybierz istniejące wyjście",
+    "select_type": "Wybierz typ wyjścia",
     "type_label": "Typ: {{type}}",
-    "update_submit": "Zaktualizuj output"
+    "update_submit": "Zaktualizuj wyjście"
   },
   "pipelines_connection_form": {
     "edit_button": "Edytuj połączenie z pipeline'ami",
@@ -97,18 +97,18 @@
   },
   "routing_destination": {
     "add_output": {
-      "assign_segment": "Przypisz istniejący output",
-      "button": "Dodaj output",
-      "create_segment": "Utwórz nowy output",
-      "modal_title": "Dodaj output do strumienia",
-      "tooltip": "Edytuj output"
+      "assign_segment": "Przypisz istniejące wyjście",
+      "button": "Dodaj wyjście",
+      "create_segment": "Utwórz nowe wyjście",
+      "modal_title": "Dodaj wyjście do strumienia",
+      "tooltip": "Edytuj wyjście"
     },
     "archiving": {
       "disabled": "Archiwizacja jest wyłączona",
       "enabled": "Archiwizacja jest włączona"
     },
     "edit_output": {
-      "tooltip": "Edytuj output"
+      "tooltip": "Edytuj wyjście"
     },
     "index_set": {
       "col_archiving": "Archiwizacja",
@@ -135,17 +135,17 @@
       "type": "(Typ: {{type}})"
     },
     "outputs": {
-      "count": "OUTPUTY {{count}}",
-      "title": "Outputy",
-      "toggle_aria": "Przełącz output"
+      "count": "WYJŚCIA {{count}}",
+      "title": "Wyjścia",
+      "toggle_aria": "Przełącz wyjście"
     },
     "outputs_list": {
       "name": "Nazwa",
-      "none": "Nie zdefiniowano żadnego outputu."
+      "none": "Nie zdefiniowano żadnego wyjścia."
     },
     "remove_output": {
-      "confirm": "Czy na pewno chcesz usunąć ten output ze strumienia?",
-      "title": "Usuń output"
+      "confirm": "Czy na pewno chcesz usunąć to wyjście ze strumienia?",
+      "title": "Usuń wyjście"
     }
   },
   "stream_details": {
@@ -182,20 +182,20 @@
     "title_span": "Reguły strumienia „{{title}}”"
   },
   "stream_hooks": {
-    "create_rule_failed": "Tworzenie reguły filtrowania outputu strumienia nie powiodło się, status: {{error}}",
-    "create_rule_failed_title": "Nie udało się utworzyć reguły filtrowania outputu strumienia",
-    "create_rule_success": "Reguła filtrowania outputu strumienia została pomyślnie utworzona.",
-    "delete_rule_failed": "Usuwanie reguły filtrowania outputu strumienia nie powiodło się, status: {{error}}",
-    "delete_rule_failed_title": "Nie udało się usunąć reguły filtrowania outputu strumienia",
-    "delete_rule_success": "Reguła filtrowania outputu strumienia została pomyślnie usunięta.",
+    "create_rule_failed": "Tworzenie reguły filtrowania wyjścia strumienia nie powiodło się, status: {{error}}",
+    "create_rule_failed_title": "Nie udało się utworzyć reguły filtrowania wyjścia strumienia",
+    "create_rule_success": "Reguła filtrowania wyjścia strumienia została pomyślnie utworzona.",
+    "delete_rule_failed": "Usuwanie reguły filtrowania wyjścia strumienia nie powiodło się, status: {{error}}",
+    "delete_rule_failed_title": "Nie udało się usunąć reguły filtrowania wyjścia strumienia",
+    "delete_rule_success": "Reguła filtrowania wyjścia strumienia została pomyślnie usunięta.",
     "load_connected_pipelines_failed": "Ładowanie połączonych Pipeline'ów nie powiodło się, status",
     "load_connected_pipelines_failed_title": "Nie udało się załadować połączonych Pipeline'ów",
-    "load_output_filters_failed": "Ładowanie filtrów outputów strumienia nie powiodło się, status",
-    "load_output_filters_failed_title": "Nie udało się załadować filtrów outputów strumienia",
-    "load_output_types_failed": "Ładowanie outputów strumienia nie powiodło się, status",
-    "load_output_types_failed_title": "Nie udało się załadować outputów strumienia",
-    "load_rule_builder_failed": "Ładowanie listy warunków kreatora reguł filtrowania outputu strumienia nie powiodło się, status",
-    "load_rule_builder_failed_title": "Nie udało się załadować listy warunków kreatora reguł filtrowania outputu strumienia.",
+    "load_output_filters_failed": "Ładowanie filtrów wyjść strumienia nie powiodło się, status",
+    "load_output_filters_failed_title": "Nie udało się załadować filtrów wyjść strumienia",
+    "load_output_types_failed": "Ładowanie wyjść strumienia nie powiodło się, status",
+    "load_output_types_failed_title": "Nie udało się załadować wyjść strumienia",
+    "load_rule_builder_failed": "Ładowanie listy warunków kreatora reguł filtrowania wyjścia strumienia nie powiodło się, status",
+    "load_rule_builder_failed_title": "Nie udało się załadować listy warunków kreatora reguł filtrowania wyjścia strumienia.",
     "load_rule_types_failed": "Ładowanie typów reguł strumienia nie powiodło się, status",
     "load_rule_types_failed_title": "Nie udało się załadować typów reguł strumienia",
     "load_stream_failed": "Ładowanie strumienia nie powiodło się, status",
@@ -203,9 +203,9 @@
     "load_streams_failed": "Ładowanie strumieni nie powiodło się, status",
     "load_streams_failed_title": "Nie udało się załadować strumieni",
     "success_title": "Sukces!",
-    "update_rule_failed": "Aktualizacja reguły filtrowania outputu strumienia nie powiodła się, status: {{error}}",
-    "update_rule_failed_title": "Nie udało się zaktualizować reguły filtrowania outputu strumienia",
-    "update_rule_success": "Reguła filtrowania outputu strumienia została pomyślnie zaktualizowana."
+    "update_rule_failed": "Aktualizacja reguły filtrowania wyjścia strumienia nie powiodła się, status: {{error}}",
+    "update_rule_failed_title": "Nie udało się zaktualizować reguły filtrowania wyjścia strumienia",
+    "update_rule_success": "Reguła filtrowania wyjścia strumienia została pomyślnie zaktualizowana."
   },
   "stream_modal": {
     "description": "Opis",
@@ -219,10 +219,10 @@
     "title_required": "Tytuł jest wymagany"
   },
   "stream_outputs": {
-    "description": "Węzły {{productName}} mogą przekazywać wiadomości ze strumieni za pomocą outputów. Tutaj możesz uruchamiać i zatrzymywać dowolną liczbę outputów. Możesz też ponownie wykorzystać outputy, które już działają dla innych strumieni. Globalny widok wszystkich skonfigurowanych outputów jest dostępny <outputsLink>tutaj</outputsLink>.",
-    "marketplace_prefix": "Wtyczki outputów znajdziesz na",
-    "removing_description": "<emphasis>Usunięcie</emphasis> outputu usuwa go z tego strumienia, ale nadal będzie on widoczny na liście dostępnych outputów. <emphasis>Globalne</emphasis> usunięcie outputu spowoduje usunięcie go z tego i wszystkich innych strumieni oraz jego zatrzymanie. Wszystkie zdefiniowane outputy możesz zobaczyć szczegółowo na <outputsLink>globalnej liście outputów</outputsLink>.",
-    "title": "Outputy strumienia »{{streamTitle}}«"
+    "description": "Węzły {{productName}} mogą przekazywać wiadomości ze strumieni za pomocą wyjść. Tutaj możesz uruchamiać i zatrzymywać dowolną liczbę wyjść. Możesz też ponownie wykorzystać wyjścia, które już działają dla innych strumieni. Globalny widok wszystkich skonfigurowanych wyjść jest dostępny <outputsLink>tutaj</outputsLink>.",
+    "marketplace_prefix": "Wtyczki wyjść znajdziesz na",
+    "removing_description": "<emphasis>Usunięcie</emphasis> wyjścia usuwa je z tego strumienia, ale nadal będzie ono widoczne na liście dostępnych wyjść. <emphasis>Globalne</emphasis> usunięcie wyjścia spowoduje usunięcie go z tego i wszystkich innych strumieni oraz jego zatrzymanie. Wszystkie zdefiniowane wyjścia możesz zobaczyć szczegółowo na <outputsLink>globalnej liście wyjść</outputsLink>.",
+    "title": "Wyjścia strumienia »{{streamTitle}}«"
   },
   "stream_permission_error_page": {
     "description_p1": "Ten zasób zawiera strumienie, do których nie masz uprawnień.",
@@ -268,7 +268,7 @@
       "more_information": "Więcej informacji",
       "regex_info": "Wyrażenia regularne używają składni Javy.",
       "result": "Wynik:",
-      "select_input": "Wybierz input",
+      "select_input": "Wybierz wejście",
       "select_type": "Wybierz typ",
       "type": "Typ",
       "type_required": "Typ jest wymagany",
@@ -306,7 +306,7 @@
       "edit_stream": "Edytuj strumień",
       "edit_title": "Edycja strumienia",
       "manage_alerts": "Zarządzaj alertami",
-      "manage_outputs": "Zarządzaj outputami",
+      "manage_outputs": "Zarządzaj wyjściami",
       "manage_rules": "Zarządzaj regułami",
       "not_available_default": "Akcja niedostępna dla domyślnego strumienia",
       "pause_confirm": "Czy na pewno chcesz wstrzymać strumień „{{title}}”?",
@@ -402,31 +402,31 @@
       "archiving": "Archiwizacja",
       "destination_filters": "Reguły filtrowania",
       "index_set_title": "Zestaw indeksów",
-      "outputs": "Outputy",
+      "outputs": "Wyjścia",
       "pipelines": "Pipeline'y",
       "rules": "Reguły strumienia",
       "throughput": "Przepustowość"
     },
     "expanded": {
-      "associated_inputs_load_failed": "Nie udało się załadować powiązanych inputów.",
-      "associated_inputs_none": "W ciągu ostatnich 24 godzin żaden input nie wysłał wiadomości do tego strumienia.",
+      "associated_inputs_load_failed": "Nie udało się załadować powiązanych wejść.",
+      "associated_inputs_none": "W ciągu ostatnich 24 godzin żadne wejście nie wysłało wiadomości do tego strumienia.",
       "deleted": "{{id}} (usunięty)",
       "missing_permissions": "Brak uprawnień",
       "destination_data_lake": "Data Lake",
       "destination_index_set": "Zestaw indeksów",
-      "destination_output": "Output",
+      "destination_output": "Wyjście",
       "filter_rules_header_destination": "Miejsce docelowe",
       "filter_rules_header_status": "Status",
       "filter_rules_header_title": "Tytuł",
       "filter_rules_summary_one": "Wyświetlono {{count}} skonfigurowaną regułę filtrowania dla wszystkich miejsc docelowych.",
       "filter_rules_summary_other": "Wyświetlono {{count}} skonfigurowanej reguły filtrowania dla wszystkich miejsc docelowych.",
       "manage_filter_rules": "Zarządzaj regułami filtrowania",
-      "manage_outputs": "Zarządzaj outputami",
+      "manage_outputs": "Zarządzaj wyjściami",
       "manage_pipelines": "Zarządzaj pipeline'ami",
       "manage_rules": "Zarządzaj regułami",
       "no_filter_rules": "Nie znaleziono żadnych reguł filtrowania.",
-      "outputs_summary_one": "{{count}} połączony output.",
-      "outputs_summary_other": "{{count}} połączonego outputu.",
+      "outputs_summary_one": "{{count}} połączone wyjście.",
+      "outputs_summary_other": "{{count}} połączonego wyjścia.",
       "pipelines_load_failed": "Nie udało się załadować połączonych pipeline'ów.",
       "pipelines_none": "Do tego strumienia nie są podłączone żadne pipeline'y.",
       "quick_add_rule": "Szybko dodaj regułę",
@@ -438,8 +438,8 @@
       "rules_summary_or_other": "Musi spełniać co najmniej jedną z {{count}} skonfigurowanej reguły strumienia.",
       "filter_rules_summary_few": "Wyświetlono {{count}} skonfigurowane reguły filtrowania dla wszystkich miejsc docelowych.",
       "filter_rules_summary_many": "Wyświetlono {{count}} skonfigurowanych reguł filtrowania dla wszystkich miejsc docelowych.",
-      "outputs_summary_few": "{{count}} połączone outputy.",
-      "outputs_summary_many": "{{count}} połączonych outputów.",
+      "outputs_summary_few": "{{count}} połączone wyjścia.",
+      "outputs_summary_many": "{{count}} połączonych wyjść.",
       "rules_summary_and_few": "Musi spełniać wszystkie {{count}} skonfigurowane reguły strumienia.",
       "rules_summary_and_many": "Musi spełniać wszystkie {{count}} skonfigurowanych reguł strumienia.",
       "rules_summary_or_few": "Musi spełniać co najmniej jedną z {{count}} skonfigurowanych reguł strumienia.",
@@ -447,12 +447,12 @@
     },
     "expanded_titles": {
       "destination_filters": "Reguły filtrowania",
-      "outputs": "Outputy",
+      "outputs": "Wyjścia",
       "rules": "Reguły"
     },
     "human_name": "strumienie",
     "metric_columns": {
-      "associated_inputs": "Powiązane inputy (ostatnie 24 h)",
+      "associated_inputs": "Powiązane wejścia (ostatnie 24 h)",
       "avg_processing_time_ms": "Śr. czas przetwarzania (ostatnie 15 min)",
       "max_processing_time_ms": "Maks. czas przetwarzania (ostatnie 15 min)",
       "message_count": "Liczba wiadomości (ostatnie 24 h)",
@@ -471,10 +471,10 @@
     "title": "Strumienie"
   },
   "system_outputs": {
-    "description": "Węzły {{productName}} mogą przekazywać wiadomości za pomocą outputów. Tutaj możesz uruchamiać i zatrzymywać dowolną liczbę outputów <highlight>a następnie przypisywać je do strumieni, aby w czasie rzeczywistym przekazywać wszystkie wiadomości strumienia.</highlight>",
-    "header_title": "Outputy w klastrze",
-    "marketplace_prefix": "Wtyczki outputów znajdziesz w",
-    "title": "Outputy"
+    "description": "Węzły {{productName}} mogą przekazywać wiadomości za pomocą wyjść. Tutaj możesz uruchamiać i zatrzymywać dowolną liczbę wyjść <highlight>a następnie przypisywać je do strumieni, aby w czasie rzeczywistym przekazywać wszystkie wiadomości strumienia.</highlight>",
+    "header_title": "Wyjścia w klastrze",
+    "marketplace_prefix": "Wtyczki wyjść znajdziesz w",
+    "title": "Wyjścia"
   },
   "user_no_stream_access": {
     "alert": "Nie możemy teraz rozpocząć wyszukiwania, ponieważ nie masz uprawnień dostępu do żadnego strumienia. Jeśli uważasz, że to błąd, skontaktuj się z administratorem.",
@@ -493,22 +493,22 @@
     "clone_failed_title": "Nie udało się sklonować strumienia",
     "test_match_failed": "Testowanie reguł strumienia nie powiodło się, status: {{error}}",
     "test_match_failed_title": "Nie udało się przetestować reguł strumienia",
-    "output_terminate_confirm": "Czy na pewno chcesz zatrzymać ten output?",
-    "output_terminated": "Output został zatrzymany.",
-    "output_remove_confirm": "Czy na pewno chcesz usunąć ten output ze strumienia?",
+    "output_terminate_confirm": "Czy na pewno chcesz zatrzymać to wyjście?",
+    "output_terminated": "Wyjście zostało zatrzymane.",
+    "output_remove_confirm": "Czy na pewno chcesz usunąć to wyjście ze strumienia?",
     "success_title": "Sukces"
   },
   "use_output_mutations_notifications": {
-    "save_failed": "Zapisywanie outputu „{{title}}” nie powiodło się, status: {{error}}",
-    "save_failed_title": "Nie udało się zapisać outputu",
-    "update_failed": "Aktualizacja outputu „{{title}}” nie powiodła się, status: {{error}}",
-    "update_failed_title": "Nie udało się zaktualizować outputu",
-    "terminate_failed": "Zatrzymanie outputu nie powiodło się, status: {{error}}",
-    "terminate_failed_title": "Nie udało się zatrzymać outputu"
+    "save_failed": "Zapisywanie wyjścia „{{title}}” nie powiodło się, status: {{error}}",
+    "save_failed_title": "Nie udało się zapisać wyjścia",
+    "update_failed": "Aktualizacja wyjścia „{{title}}” nie powiodła się, status: {{error}}",
+    "update_failed_title": "Nie udało się zaktualizować wyjścia",
+    "terminate_failed": "Zatrzymanie wyjścia nie powiodło się, status: {{error}}",
+    "terminate_failed_title": "Nie udało się zatrzymać wyjścia"
   },
   "use_outputs_notifications": {
-    "load_failed": "Ładowanie outputów nie powiodło się, status",
-    "load_failed_title": "Nie udało się załadować outputów"
+    "load_failed": "Ładowanie wyjść nie powiodło się, status",
+    "load_failed_title": "Nie udało się załadować wyjść"
   },
   "use_stream_notifications": {
     "load_failed": "Ładowanie strumienia nie powiodło się, status",
@@ -519,20 +519,20 @@
     "load_failed_title": "Nie udało się załadować metryk strumienia"
   },
   "use_stream_outputs_notifications": {
-    "load_failed": "Ładowanie outputów strumienia nie powiodło się, status",
-    "load_failed_title": "Nie udało się załadować outputów strumienia"
+    "load_failed": "Ładowanie wyjść strumienia nie powiodło się, status",
+    "load_failed_title": "Nie udało się załadować wyjść strumienia"
   },
   "use_stream_mutations_notifications": {
     "save_failed": "Zapisywanie strumienia nie powiodło się, status: {{error}}",
     "save_failed_title": "Nie udało się zapisać strumienia"
   },
   "use_stream_output_mutations_notifications": {
-    "add_failed": "Dodawanie outputu do strumienia nie powiodło się, status: {{error}}",
-    "add_failed_title": "Nie udało się dodać outputu do strumienia",
-    "remove_failed": "Usuwanie outputu ze strumienia nie powiodło się, status: {{error}}",
-    "remove_failed_title": "Nie udało się usunąć outputu ze strumienia",
-    "added_success": "Output został pomyślnie dodany do strumienia.",
-    "removed_success": "Output został pomyślnie usunięty ze strumienia.",
+    "add_failed": "Dodawanie wyjścia do strumienia nie powiodło się, status: {{error}}",
+    "add_failed_title": "Nie udało się dodać wyjścia do strumienia",
+    "remove_failed": "Usuwanie wyjścia ze strumienia nie powiodło się, status: {{error}}",
+    "remove_failed_title": "Nie udało się usunąć wyjścia ze strumienia",
+    "added_success": "Wyjście zostało pomyślnie dodane do strumienia.",
+    "removed_success": "Wyjście zostało pomyślnie usunięte ze strumienia.",
     "success_title": "Sukces!"
   },
   "use_stream_rule_mutations_notifications": {
@@ -544,7 +544,7 @@
     "delete_failed_title": "Nie udało się usunąć reguły strumienia"
   },
   "use_stream_rules_inputs_notifications": {
-    "fetch_failed": "Pobieranie listy inputów reguł strumienia nie powiodło się, status: {{error}}",
-    "fetch_failed_title": "Nie udało się pobrać inputów reguł strumienia"
+    "fetch_failed": "Pobieranie listy wejść reguł strumienia nie powiodło się, status: {{error}}",
+    "fetch_failed_title": "Nie udało się pobrać wejść reguł strumienia"
   }
 }

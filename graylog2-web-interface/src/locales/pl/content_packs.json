@@ -143,7 +143,7 @@
     "delete_confirmation": "Zamierzasz usunąć ten pakiet treści. Czy na pewno chcesz kontynuować?",
     "delete_error_message": "Usuwanie pakietu nie powiodło się: {{error}}",
     "delete_success": "Pakiet treści został usunięty.",
-    "description": "Pakiety treści przyspieszają konfigurację dla określonego źródła danych. Pakiet treści może zawierać Inputy/Extractory, Streamy i Dashboardy.",
+    "description": "Pakiety treści przyspieszają konfigurację dla określonego źródła danych. Pakiet treści może zawierać wejścia/Extractory, strumienie i panele.",
     "install_error_message": "Instalacja pakietu treści nie powiodła się, status: {{status}}. Nie udało się zainstalować pakietu treści o ID: {{id}}",
     "install_success": "Pakiet treści został zainstalowany pomyślnie.",
     "title": "Pakiety treści",
@@ -152,7 +152,7 @@
   "pages": {
     "back_button": "Pakiety treści",
     "create_title": "Utwórz pakiety treści",
-    "description": "Pakiety treści przyspieszają konfigurację dla określonego źródła danych. Pakiet treści może zawierać Inputy/Extractory, Streamy i Dashboardy.",
+    "description": "Pakiety treści przyspieszają konfigurację dla określonego źródła danych. Pakiet treści może zawierać wejścia/Extractory, strumienie i panele.",
     "document_title": "Pakiety treści",
     "edit_title": "Edytuj pakiet treści",
     "marketplace_prefix": "Więcej pakietów treści znajdziesz w"

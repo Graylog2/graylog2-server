@@ -1,8 +1,8 @@
 {
   "copy_to_dashboard": {
-    "title": "Copier le widget vers le dashboard",
-    "no_dashboards": "Aucun dashboard trouvé.",
-    "create_new": "Créer un nouveau dashboard"
+    "title": "Copier le widget vers le tableau de bord",
+    "no_dashboards": "Aucun tableau de bord trouvé.",
+    "create_new": "Créer un nouveau tableau de bord"
   },
   "edit_message_list": {
     "fields": "Champs",
@@ -79,7 +79,7 @@
     "title": "Widget inconnu : {{type}}",
     "cannot_render": "Malheureusement, nous ne pouvons pas afficher ce widget, car nous ne savons pas traiter les widgets de type <strong>{{type}}</strong>. Cela peut être dû à l'une de ces situations :",
     "missing_plugin": "Vous avez créé ce widget à l'aide d'un plugin qui n'est plus disponible.",
-    "legacy_dashboard": "Ce widget faisait partie d'un ancien dashboard et a été créé par un plugin qui n'est plus disponible.",
+    "legacy_dashboard": "Ce widget faisait partie d'un ancien tableau de bord et a été créé par un plugin qui n'est plus disponible.",
     "what_to_do": "Que pouvez-vous faire ? Vous pouvez réinstaller le plugin, contacter l'auteur du plugin pour obtenir une version compatible avec la version actuelle de {{productName}}, ou supprimer le widget si vous n'en avez plus besoin.",
     "copy_config": "Dans tous les cas, vous pouvez copier la configuration du widget dans le presse-papiers :"
   },
@@ -89,7 +89,7 @@
     "focus": "Mettre ce widget en mode focus",
     "edit": "Modifier",
     "duplicate": "Dupliquer",
-    "copy_to_dashboard": "Copier vers le dashboard",
+    "copy_to_dashboard": "Copier vers le tableau de bord",
     "move_to_page": "Déplacer vers la page",
     "copying": "Copie du widget...",
     "copy": "Copier le widget",

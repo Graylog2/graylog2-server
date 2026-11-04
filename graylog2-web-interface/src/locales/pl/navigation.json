@@ -1,9 +1,9 @@
 {
   "main": {
     "search": "Wyszukiwanie",
-    "streams": "Streamy",
+    "streams": "Strumienie",
     "alerts": "Alerty",
-    "dashboards": "Dashboardy",
+    "dashboards": "Panele",
     "system": "System",
     "enterprise": "Enterprise",
     "security": "Bezpieczeństwo"
@@ -12,8 +12,8 @@
     "overview": "Przegląd",
     "configurations": "Konfiguracje",
     "cluster_configuration": "Konfiguracja klastra",
-    "inputs": "Inputy",
-    "outputs": "Outputy",
+    "inputs": "Wejścia",
+    "outputs": "Wyjścia",
     "indices": "Indeksy",
     "logging": "Logowanie",
     "users_and_teams": "Użytkownicy i zespoły",

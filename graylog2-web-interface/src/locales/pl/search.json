@@ -11,13 +11,13 @@
   },
   "empty_state": {
     "no_widgets_search": "Brak zdefiniowanych widgetów do wizualizacji wyniku wyszukiwania",
-    "no_widgets_dashboard": "Ten dashboard nie ma jeszcze żadnych widgetów",
+    "no_widgets_dashboard": "Ten panel nie ma jeszcze żadnych widgetów",
     "create_widget_hint": "Utwórz nowy widget, wybierając typ widgetu w lewym panelu bocznym, w sekcji „Utwórz”.",
-    "tips_title": "Kilka wskazówek dotyczących tworzenia wyszukiwań i dashboardów",
+    "tips_title": "Kilka wskazówek dotyczących tworzenia wyszukiwań i paneli",
     "tip_1": "Zacznij od <bold>pytania</bold>, na które chcesz uzyskać odpowiedź. Określ problem, który chcesz rozwiązać.",
     "tip_2": "<bold>Ogranicz</bold> dane tylko do punktów danych, które chcesz zobaczyć.",
     "tip_3": "<bold>Zwizualizuj</bold> dane. Czy odpowiadają na Twoje pytanie?",
-    "tip_4": "<bold>Udostępnij</bold> dashboard współpracownikom. Przygotuj go do <bold>ponownego użycia</bold>, wykorzystując parametry"
+    "tip_4": "<bold>Udostępnij</bold> panel współpracownikom. Przygotuj go do <bold>ponownego użycia</bold>, wykorzystując parametry"
   },
   "search_bar": {
     "streams_placeholder": "Wybierz strumienie, które ma uwzględniać wyszukiwanie. Jeśli pole jest puste, wyszukiwanie obejmie wszystkie strumienie.",
@@ -39,7 +39,7 @@
     "share_disabled": "Udostępniać można tylko zapisane wyszukiwania.",
     "dropdown_aria_label": "Otwórz listę akcji wyszukiwania",
     "edit_metadata": "Edytuj metadane",
-    "export_to_dashboard": "Eksportuj do dashboardu",
+    "export_to_dashboard": "Eksportuj do panelu",
     "export": "Eksportuj",
     "reset_search": "Resetuj wyszukiwanie",
     "editing_modal_title": "Edycja zapisanego wyszukiwania",
@@ -69,7 +69,7 @@
   },
   "sidebar_description": {
     "execution": "Wykonanie",
-    "ad_hoc_info": "Zapisz wyszukiwanie lub wyeksportuj je do dashboardu, aby dodać niestandardowe podsumowanie i opis.",
+    "ad_hoc_info": "Zapisz wyszukiwanie lub wyeksportuj je do panelu, aby dodać niestandardowe podsumowanie i opis.",
     "edit_metadata_hint": "Aby dodać opis i podsumowanie dla tego widoku typu {{viewType}}, kliknij ikonę <icon/> na pasku wyszukiwania, aby otworzyć jego menu akcji. Menu zawiera opcję „Edytuj metadane”.",
     "search_section": "Wyszukiwanie",
     "no_summary": "Ten widok typu {{viewType}} nie ma podsumowania.",
@@ -98,8 +98,8 @@
   "save_view": {
     "save": "Zapisz",
     "save_as": "Zapisz jako",
-    "save_as_new_dashboard_title": "Zapisz jako nowy dashboard",
-    "save_dashboard_title": "Zapisz dashboard"
+    "save_as_new_dashboard_title": "Zapisz jako nowy panel",
+    "save_dashboard_title": "Zapisz panel"
   },
   "undo_redo": {
     "undo": "Cofnij",
@@ -198,16 +198,16 @@
   },
   "query_tabs": {
     "create_page": "Utwórz nową stronę",
-    "more_pages": "Więcej stron dashboardu",
+    "more_pages": "Więcej stron panelu",
     "open_configuration": "Otwórz konfigurację stron",
     "copy_page": "Kopiuj stronę",
     "copying_page": "Kopiowanie strony...",
-    "copy_page_failed": "Kopiowanie strony dashboardu nie powiodło się, błąd: {{error}}",
+    "copy_page_failed": "Kopiowanie strony panelu nie powiodło się, błąd: {{error}}",
     "remove_page": "Usuń stronę {{title}}",
-    "configuration_title": "Zaktualizuj konfigurację stron dashboardu",
+    "configuration_title": "Zaktualizuj konfigurację stron panelu",
     "update_configuration": "Zaktualizuj konfigurację",
     "order": "Kolejność",
-    "order_help": "Przeciągnij i upuść, aby zmienić kolejność stron dashboardu. Kliknij dwukrotnie tytuł dashboardu, aby go zmienić."
+    "order_help": "Przeciągnij i upuść, aby zmienić kolejność stron panelu. Kliknij dwukrotnie tytuł panelu, aby go zmienić."
   },
   "widget_creation": {
     "title": "Utwórz nowy widget",
@@ -216,16 +216,16 @@
     "scroll_to_new_widget": "Przewiń do nowego widgetu"
   },
   "dashboard_actions": {
-    "immutable": "Ten dashboard jest tylko do odczytu, ponieważ jest zarządzany przez {{productName}}. Użyj opcji „Zapisz jako”, aby utworzyć edytowalną kopię.",
+    "immutable": "Ten panel jest tylko do odczytu, ponieważ jest zarządzany przez {{productName}}. Użyj opcji „Zapisz jako”, aby utworzyć edytowalną kopię.",
     "debug": "Debugowanie",
-    "share_unsaved": "Udostępniać można tylko zapisane dashboardy.",
+    "share_unsaved": "Udostępniać można tylko zapisane panele.",
     "edit_metadata": "Edytuj metadane",
     "export": "Eksportuj",
-    "save_new_title": "Zapisz nowy dashboard",
-    "create": "Utwórz dashboard",
-    "edit_title": "Edycja dashboardu",
-    "update": "Zaktualizuj dashboard",
-    "share_description": "Wyszukaj użytkownika lub zespół, który ma zostać współpracownikiem tego dashboardu."
+    "save_new_title": "Zapisz nowy panel",
+    "create": "Utwórz panel",
+    "edit_title": "Edycja panelu",
+    "update": "Zaktualizuj panel",
+    "share_description": "Wyszukaj użytkownika lub zespół, który ma zostać współpracownikiem tego panelu."
   },
   "dashboard_search_bar": {
     "filter_placeholder": "Zastosuj filtr do wszystkich widgetów"
@@ -249,18 +249,18 @@
     "add_to_favorites": "Dodaj do ulubionych",
     "view_type": {
       "search": "wyszukiwanie",
-      "dashboard": "dashboard"
+      "dashboard": "panel"
     },
     "unsaved_view": {
       "search": "Niezapisane wyszukiwanie",
-      "dashboard": "Niezapisany dashboard"
+      "dashboard": "Niezapisany panel"
     }
   },
   "field_charts_migration": {
     "title": "Migruj istniejące wykresy ze strony wyszukiwania",
     "found_charts_one": "Znaleźliśmy {{count}} wykres utworzony dla starszej wersji wyszukiwania. Czy chcesz zmigrować ten wykres dla bieżącego wyszukiwania?",
     "found_charts_other": "Znaleźliśmy {{count}} wykresu utworzonego dla starszej wersji wyszukiwania. Czy chcesz zmigrować ten wykres dla bieżącego wyszukiwania?",
-    "save_hint": "Po uruchomieniu migracji, jeśli chcesz zachować nowo utworzone wykresy, musisz zapisać bieżące wyszukiwanie jako nowy dashboard. W przeciwnym razie wykresy zostaną utracone po opuszczeniu strony wyszukiwania.",
+    "save_hint": "Po uruchomieniu migracji, jeśli chcesz zachować nowo utworzone wykresy, musisz zapisać bieżące wyszukiwanie jako nowy panel. W przeciwnym razie wykresy zostaną utracone po opuszczeniu strony wyszukiwania.",
     "migrate": "Migruj",
     "discard": "Odrzuć wykresy",
     "found_charts_few": "Znaleźliśmy {{count}} wykresy utworzone dla starszej wersji wyszukiwania. Czy chcesz zmigrować te wykresy dla bieżącego wyszukiwania?",
@@ -284,15 +284,15 @@
     "page_actions": "Akcje strony",
     "edit_title": "Edytuj tytuł",
     "duplicate": "Duplikuj",
-    "copy_to_dashboard": "Kopiuj do dashboardu",
-    "edit_modal_title": "Edycja tytułu strony dashboardu",
+    "copy_to_dashboard": "Kopiuj do panelu",
+    "edit_modal_title": "Edycja tytułu strony panelu",
     "update_title": "Zaktualizuj tytuł",
-    "title_help": "Wpisz czytelny tytuł strony dashboardu. Maksymalna długość to 40 znaków.",
+    "title_help": "Wpisz czytelny tytuł strony panelu. Maksymalna długość to 40 znaków.",
     "title": "Tytuł"
   },
   "missing_requirements": {
     "description_search": "Niestety wykonanie tego wyszukiwania nie jest możliwe. Wymaga ono następujących funkcji, które nie są dostępne:",
-    "description_dashboard": "Niestety wyświetlenie tego dashboardu nie jest możliwe. Wymaga ono następujących funkcji, które nie są dostępne:",
+    "description_dashboard": "Niestety wyświetlenie tego panelu nie jest możliwe. Wymaga ono następujących funkcji, które nie są dostępne:",
     "included_in": "<requirementName>{{requirement}}</requirementName> - zawarte w <pluginLink>{{plugin}}</pluginLink>",
     "back": "Wstecz"
   },
@@ -300,22 +300,22 @@
     "alerts_and_events": "Alerty i zdarzenia",
     "event_definitions": "Definicje zdarzeń",
     "edit_search_metadata": "Edytuj metadane wyszukiwania {{title}}",
-    "edit_dashboard_metadata": "Edytuj metadane dashboardu {{title}}",
+    "edit_dashboard_metadata": "Edytuj metadane panelu {{title}}",
     "editing_search": "Edycja zapisanego wyszukiwania",
-    "editing_dashboard": "Edycja zapisanego dashboardu",
+    "editing_dashboard": "Edycja zapisanego panelu",
     "save_search": "Zapisz wyszukiwanie",
-    "save_dashboard": "Zapisz dashboard"
+    "save_dashboard": "Zapisz panel"
   },
   "execution": {
     "not_executed": "Nie wykonano jeszcze żadnego zapytania."
   },
   "dashboards_page": {
-    "documentation": "Dokumentacja dashboardów",
-    "description": "Używaj dashboardów, aby tworzyć własne widoki wiadomości. Utwórz tutaj nowy dashboard i dodaj jednym kliknięciem dowolny wykres lub diagram utworzony w innych częściach aplikacji."
+    "documentation": "Dokumentacja paneli",
+    "description": "Używaj paneli, aby tworzyć własne widoki wiadomości. Utwórz tutaj nowy panel i dodaj jednym kliknięciem dowolny wykres lub diagram utworzony w innych częściach aplikacji."
   },
   "search_filter_banner": {
     "explanation": "<italic>Filtry wyszukiwania</italic> zawierają własne zapytanie i rozszerzają główne zapytanie za pomocą operatora <bold>AND</bold>.",
-    "explanation_saved": "Filtry można zapisywać osobno i ponownie wykorzystywać w zapisanych wyszukiwaniach i dashboardach. Aktualizacja zapisanego filtra automatycznie wpłynie na wyniki wyszukiwań, które go zawierają."
+    "explanation_saved": "Filtry można zapisywać osobno i ponownie wykorzystywać w zapisanych wyszukiwaniach i panelach. Aktualizacja zapisanego filtra automatycznie wpłynie na wyniki wyszukiwań, które go zawierają."
   },
   "widget_time_range": {
     "reset_global_override": "Resetuj globalne zastąpienie"
@@ -555,7 +555,7 @@
     "text_markdown": "Tekst/Markdown"
   },
   "message_details": {
-    "deleted_input": "usunięty input",
+    "deleted_input": "usunięte wejście",
     "timestamp": "Znacznik czasu",
     "not_stored": "Nie zapisano",
     "not_stored_message": "Wiadomość nie jest zapisana",
@@ -565,6 +565,6 @@
   },
   "views_logic": {
     "result_window_limit": "Elasticsearch ogranicza wynik wyszukiwania do {{limit}} wiadomości. Przy rozmiarze strony wynoszącym {{pageSize}} wiadomości możesz użyć pierwszych {{validPages}} stron.",
-    "confirm_delete_dashboard_page": "Czy na pewno chcesz usunąć tę stronę dashboardu?"
+    "confirm_delete_dashboard_page": "Czy na pewno chcesz usunąć tę stronę panelu?"
   }
 }

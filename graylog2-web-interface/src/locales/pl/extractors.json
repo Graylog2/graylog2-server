@@ -137,7 +137,7 @@
   "import": {
     "parse_error": "Wystąpił błąd podczas parsowania extractorów. Czy są w formacie JSON? {{error}}",
     "parse_error_title": "Nie udało się zaimportować extractorów",
-    "submit": "Dodaj extractory do Inputa"
+    "submit": "Dodaj extractory do wejścia"
   },
   "message_loader": {
     "load": "Wczytaj wiadomość",
@@ -203,17 +203,17 @@
     "end_index": "Indeks końcowy"
   },
   "pages": {
-    "new_title": "Nowy extractor dla Inputa {{title}}",
-    "new_header": "Nowy extractor dla Inputa <em>{{title}}</em>",
+    "new_title": "Nowy extractor dla wejścia {{title}}",
+    "new_header": "Nowy extractor dla wejścia <em>{{title}}</em>",
     "edit_title": "Edytuj extractor {{title}}",
-    "edit_header": "Edytuj extractor <em>{{title}}</em> dla Inputa <em>{{inputTitle}}</em>",
+    "edit_header": "Edytuj extractor <em>{{title}}</em> dla wejścia <em>{{inputTitle}}</em>",
     "description": "Ekstraktory są stosowane do każdej wiadomości odebranej przez wejście. Służą do wydobywania i przekształcania danych tekstowych w pola, które później umożliwiają wygodne filtrowanie i analizę.",
     "export_title": "Eksport extractorów {{title}}",
     "export_header": "Eksport extractorów <em>{{title}}</em>",
-    "export_marketplace_prefix": "Extractory Inputa można wyeksportować do JSON, aby zaimportować je w innych konfiguracjach lub udostępnić w",
+    "export_marketplace_prefix": "Extractory wejścia można wyeksportować do JSON, aby zaimportować je w innych konfiguracjach lub udostępnić w",
     "import_title": "Import extractorów do {{title}}",
     "import_header": "Import extractorów do <em>{{title}}</em>",
-    "import_description": "Wyeksportowane extractory można zaimportować do Inputa.",
+    "import_description": "Wyeksportowane extractory można zaimportować do wejścia.",
     "import_marketplace_prefix": "Potrzebny jest tylko eksport extractorów w formacie JSON z dowolnej innej konfiguracji {{productName}} lub z"
   },
   "tools_api": {

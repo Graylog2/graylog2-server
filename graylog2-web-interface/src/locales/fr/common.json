@@ -297,7 +297,7 @@
   "entity_types": {
     "user": "utilisateur",
     "team": "équipe",
-    "dashboard": "dashboard",
+    "dashboard": "tableau de bord",
     "event_definition": "définition d'événement",
     "notification": "notification",
     "search": "recherche",
@@ -525,8 +525,8 @@
   "quick_jump": {
     "title": "Accès rapide",
     "open": "Ouvrir l'accès rapide",
-    "search_placeholder": "Rechercher des pages/dashboards/streams ...",
-    "intro": "Veuillez saisir une requête de recherche pour trouver une page, un stream, un dashboard, un input ou d'autres éléments.",
+    "search_placeholder": "Rechercher des pages/tableaux de bord/streams ...",
+    "intro": "Veuillez saisir une requête de recherche pour trouver une page, un stream, un tableau de bord, un input ou d'autres éléments.",
     "intro_hint": "Pour vous faciliter la tâche, vous trouverez ci-dessous la liste de vos éléments <bold>ouverts récemment</bold> et <bold>favoris</bold> :",
     "no_results": "Aucun résultat trouvé. Veuillez essayer d'autres termes de recherche.",
     "recent": "Récents"
@@ -621,7 +621,7 @@
   "entity_creators": {
     "event_definition": "Créer une définition d'événement",
     "notification": "Créer une notification",
-    "dashboard": "Créer un dashboard",
+    "dashboard": "Créer un tableau de bord",
     "stream": "Créer un stream",
     "index_set": "Créer un Index Set",
     "user": "Créer un utilisateur",

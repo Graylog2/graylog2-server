@@ -11,13 +11,13 @@
   },
   "empty_state": {
     "no_widgets_search": "Aucun widget n'est défini pour visualiser le résultat de la recherche",
-    "no_widgets_dashboard": "Ce dashboard n'a pas encore de widget",
+    "no_widgets_dashboard": "Ce tableau de bord n'a pas encore de widget",
     "create_widget_hint": "Créez un nouveau widget en sélectionnant un type de widget dans la section « Créer » de la barre latérale gauche.",
-    "tips_title": "Quelques conseils pour créer des recherches et des dashboards",
+    "tips_title": "Quelques conseils pour créer des recherches et des tableaux de bord",
     "tip_1": "Commencez par une <bold>question</bold> à laquelle vous souhaitez répondre. Définissez le problème que vous voulez résoudre.",
     "tip_2": "<bold>Limitez</bold> les données aux seuls points de données que vous souhaitez voir.",
     "tip_3": "<bold>Visualisez</bold> les données. Répondent-elles à votre question ?",
-    "tip_4": "<bold>Partagez</bold> le dashboard avec vos collègues. Préparez-le pour une <bold>réutilisation</bold> en utilisant des paramètres"
+    "tip_4": "<bold>Partagez</bold> le tableau de bord avec vos collègues. Préparez-le pour une <bold>réutilisation</bold> en utilisant des paramètres"
   },
   "search_bar": {
     "streams_placeholder": "Sélectionnez les streams à inclure dans la recherche. La recherche porte sur tous les streams si aucun n'est sélectionné.",
@@ -39,7 +39,7 @@
     "share_disabled": "Seules les recherches enregistrées peuvent être partagées.",
     "dropdown_aria_label": "Ouvrir le menu d'actions de recherche",
     "edit_metadata": "Modifier les métadonnées",
-    "export_to_dashboard": "Exporter vers un dashboard",
+    "export_to_dashboard": "Exporter vers un tableau de bord",
     "export": "Exporter",
     "reset_search": "Réinitialiser la recherche",
     "editing_modal_title": "Modification de la recherche enregistrée",
@@ -69,7 +69,7 @@
   },
   "sidebar_description": {
     "execution": "Exécution",
-    "ad_hoc_info": "Enregistrez la recherche ou exportez-la vers un dashboard pour ajouter un résumé et une description personnalisés.",
+    "ad_hoc_info": "Enregistrez la recherche ou exportez-la vers un tableau de bord pour ajouter un résumé et une description personnalisés.",
     "edit_metadata_hint": "Pour ajouter une description et un résumé pour ce {{viewType}}, cliquez sur l'icône <icon/> dans la barre de recherche pour ouvrir son menu d'actions. Ce menu contient l'option « Modifier les métadonnées ».",
     "search_section": "Recherche",
     "no_summary": "Ce {{viewType}} n'a pas de résumé.",
@@ -98,8 +98,8 @@
   "save_view": {
     "save": "Enregistrer",
     "save_as": "Enregistrer sous",
-    "save_as_new_dashboard_title": "Enregistrer sous un nouveau dashboard",
-    "save_dashboard_title": "Enregistrer le dashboard"
+    "save_as_new_dashboard_title": "Enregistrer sous un nouveau tableau de bord",
+    "save_dashboard_title": "Enregistrer le tableau de bord"
   },
   "undo_redo": {
     "undo": "Annuler",
@@ -198,16 +198,16 @@
   },
   "query_tabs": {
     "create_page": "Créer une nouvelle page",
-    "more_pages": "Plus de pages de dashboard",
+    "more_pages": "Plus de pages de tableau de bord",
     "open_configuration": "Ouvrir la configuration des pages",
     "copy_page": "Copier la page",
     "copying_page": "Copie de la page en cours...",
-    "copy_page_failed": "Échec de la copie de la page du dashboard : {{error}}",
+    "copy_page_failed": "Échec de la copie de la page du tableau de bord : {{error}}",
     "remove_page": "Supprimer la page {{title}}",
-    "configuration_title": "Mettre à jour la configuration des pages du dashboard",
+    "configuration_title": "Mettre à jour la configuration des pages du tableau de bord",
     "update_configuration": "Mettre à jour la configuration",
     "order": "Ordre",
-    "order_help": "Utilisez le glisser-déposer pour modifier l'ordre des pages du dashboard. Double-cliquez sur le titre d'un dashboard pour le modifier."
+    "order_help": "Utilisez le glisser-déposer pour modifier l'ordre des pages du tableau de bord. Double-cliquez sur le titre d'un tableau de bord pour le modifier."
   },
   "widget_creation": {
     "title": "Créer un nouveau widget",
@@ -216,16 +216,16 @@
     "scroll_to_new_widget": "Défiler jusqu'au nouveau widget"
   },
   "dashboard_actions": {
-    "immutable": "Ce dashboard est en lecture seule car il est géré par {{productName}}. Utilisez « Enregistrer sous » pour créer une copie modifiable.",
+    "immutable": "Ce tableau de bord est en lecture seule car il est géré par {{productName}}. Utilisez « Enregistrer sous » pour créer une copie modifiable.",
     "debug": "Déboguer",
-    "share_unsaved": "Seuls les dashboards enregistrés peuvent être partagés.",
+    "share_unsaved": "Seuls les tableaux de bord enregistrés peuvent être partagés.",
     "edit_metadata": "Modifier les métadonnées",
     "export": "Exporter",
-    "save_new_title": "Enregistrer un nouveau dashboard",
-    "create": "Créer un dashboard",
-    "edit_title": "Modification du dashboard",
-    "update": "Mettre à jour le dashboard",
-    "share_description": "Recherchez un utilisateur ou une équipe à ajouter comme collaborateur de ce dashboard."
+    "save_new_title": "Enregistrer un nouveau tableau de bord",
+    "create": "Créer un tableau de bord",
+    "edit_title": "Modification du tableau de bord",
+    "update": "Mettre à jour le tableau de bord",
+    "share_description": "Recherchez un utilisateur ou une équipe à ajouter comme collaborateur de ce tableau de bord."
   },
   "dashboard_search_bar": {
     "filter_placeholder": "Appliquer un filtre à tous les widgets"
@@ -249,18 +249,18 @@
     "add_to_favorites": "Ajouter aux favoris",
     "view_type": {
       "search": "recherche",
-      "dashboard": "dashboard"
+      "dashboard": "tableau de bord"
     },
     "unsaved_view": {
       "search": "Recherche non enregistrée",
-      "dashboard": "Dashboard non enregistré"
+      "dashboard": "Tableau de bord non enregistré"
     }
   },
   "field_charts_migration": {
     "title": "Migrer les graphiques de la page de recherche existante",
     "found_charts_one": "Nous avons trouvé {{count}} graphique créé pour une version antérieure de la recherche. Voulez-vous migrer ce graphique pour la recherche actuelle ?",
     "found_charts_other": "Nous avons trouvé {{count}} graphiques créés pour une version antérieure de la recherche. Voulez-vous migrer ces graphiques pour la recherche actuelle ?",
-    "save_hint": "Une fois la migration exécutée et si vous souhaitez conserver les nouveaux graphiques, vous devrez enregistrer la recherche actuelle comme nouveau dashboard. Sinon, les graphiques seront perdus à la sortie de la page de recherche.",
+    "save_hint": "Une fois la migration exécutée et si vous souhaitez conserver les nouveaux graphiques, vous devrez enregistrer la recherche actuelle comme nouveau tableau de bord. Sinon, les graphiques seront perdus à la sortie de la page de recherche.",
     "migrate": "Migrer",
     "discard": "Abandonner les graphiques",
     "found_charts_many": "Nous avons trouvé {{count}} graphiques créés pour une version antérieure de la recherche. Voulez-vous migrer ces graphiques pour la recherche actuelle ?"
@@ -283,15 +283,15 @@
     "page_actions": "Actions de la page",
     "edit_title": "Modifier le titre",
     "duplicate": "Dupliquer",
-    "copy_to_dashboard": "Copier vers le dashboard",
-    "edit_modal_title": "Modification du titre de la page du dashboard",
+    "copy_to_dashboard": "Copier vers le tableau de bord",
+    "edit_modal_title": "Modification du titre de la page du tableau de bord",
     "update_title": "Mettre à jour le titre",
-    "title_help": "Saisissez un titre de page de dashboard explicite. Il ne doit pas dépasser 40 caractères.",
+    "title_help": "Saisissez un titre de page de tableau de bord explicite. Il ne doit pas dépasser 40 caractères.",
     "title": "Titre"
   },
   "missing_requirements": {
     "description_search": "Malheureusement, l'exécution de cette recherche n'est pas possible. Elle utilise les fonctionnalités suivantes qui ne sont pas disponibles :",
-    "description_dashboard": "Malheureusement, l'exécution de ce dashboard n'est pas possible. Il utilise les fonctionnalités suivantes qui ne sont pas disponibles :",
+    "description_dashboard": "Malheureusement, l'exécution de ce tableau de bord n'est pas possible. Il utilise les fonctionnalités suivantes qui ne sont pas disponibles :",
     "included_in": "<requirementName>{{requirement}}</requirementName> - inclus dans <pluginLink>{{plugin}}</pluginLink>",
     "back": "Retour"
   },
@@ -299,22 +299,22 @@
     "alerts_and_events": "Alertes et événements",
     "event_definitions": "Définitions d'événements",
     "edit_search_metadata": "Modifier les métadonnées de la recherche {{title}}",
-    "edit_dashboard_metadata": "Modifier les métadonnées du dashboard {{title}}",
+    "edit_dashboard_metadata": "Modifier les métadonnées du tableau de bord {{title}}",
     "editing_search": "Modification de la recherche enregistrée",
-    "editing_dashboard": "Modification du dashboard enregistré",
+    "editing_dashboard": "Modification du tableau de bord enregistré",
     "save_search": "Enregistrer la recherche",
-    "save_dashboard": "Enregistrer le dashboard"
+    "save_dashboard": "Enregistrer le tableau de bord"
   },
   "execution": {
     "not_executed": "Aucune requête exécutée pour le moment."
   },
   "dashboards_page": {
-    "documentation": "Documentation des dashboards",
-    "description": "Utilisez les dashboards pour créer des vues spécifiques de vos messages. Créez ici un nouveau dashboard et ajoutez-y en un clic tout graphique créé dans d'autres parties de l'application."
+    "documentation": "Documentation des tableaux de bord",
+    "description": "Utilisez les tableaux de bord pour créer des vues spécifiques de vos messages. Créez ici un nouveau tableau de bord et ajoutez-y en un clic tout graphique créé dans d'autres parties de l'application."
   },
   "search_filter_banner": {
     "explanation": "Les <italic>filtres de recherche</italic> contiennent leur propre requête et étendent la requête principale à l'aide de l'opérateur <bold>AND</bold>.",
-    "explanation_saved": "Les filtres peuvent être enregistrés séparément et réutilisés dans les recherches et dashboards enregistrés. La mise à jour d'un filtre enregistré affecte automatiquement les résultats des recherches qui l'incluent."
+    "explanation_saved": "Les filtres peuvent être enregistrés séparément et réutilisés dans les recherches et tableaux de bord enregistrés. La mise à jour d'un filtre enregistré affecte automatiquement les résultats des recherches qui l'incluent."
   },
   "widget_time_range": {
     "reset_global_override": "Réinitialiser la substitution globale"
@@ -561,6 +561,6 @@
   },
   "views_logic": {
     "result_window_limit": "Elasticsearch limite le résultat de la recherche à {{limit}} messages. Avec une taille de page de {{pageSize}} messages, vous pouvez utiliser les {{validPages}} premières pages.",
-    "confirm_delete_dashboard_page": "Voulez-vous vraiment supprimer cette page de dashboard ?"
+    "confirm_delete_dashboard_page": "Voulez-vous vraiment supprimer cette page de tableau de bord ?"
   }
 }

@@ -310,7 +310,7 @@
   },
   "simulation_preview": {
     "dropped_title": "Wiadomość zostałaby odrzucona",
-    "dropped": "Procesor pipeline'u odrzuciłby taką wiadomość. Oznacza to, że wiadomość <notStored>nie zostałaby zapisana</notStored> i nie byłaby dostępna do wyszukiwania, alertów, outputów ani dashboardów."
+    "dropped": "Procesor pipeline'u odrzuciłby taką wiadomość. Oznacza to, że wiadomość <notStored>nie zostałaby zapisana</notStored> i nie byłaby dostępna do wyszukiwania, alertów, wyjść ani paneli."
   },
   "simulation_trace": {
     "microseconds": "μs"

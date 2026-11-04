@@ -53,10 +53,10 @@
       "language_help": "Język interfejsu {{productName}}. Tłumaczenia oznaczone jako Beta nie zostały jeszcze sprawdzone.",
       "enable_autocompletion": "Włącz autouzupełnianie",
       "search_sidebar": "Panel boczny wyszukiwania",
-      "dashboard_sidebar": "Panel boczny dashboardu",
+      "dashboard_sidebar": "Pasek boczny panelu",
       "is_pinned": "Przypięty",
       "search_sidebar_help": "Można to również zmienić, używając ikony przypinania panelu bocznego wyszukiwania",
-      "dashboard_sidebar_help": "Można to również zmienić, używając ikony przypinania panelu bocznego dashboardu",
+      "dashboard_sidebar_help": "Można to również zmienić, używając ikony przypinania paska bocznego panelu",
       "theme_mode_help": "Można to zmienić za pomocą przełącznika w menu rozwijanym użytkownika",
       "update": "Zaktualizuj preferencje"
     },
@@ -69,9 +69,9 @@
     "title": "Przegląd ról",
     "documentation_link_title": "Dokumentacja uprawnień",
     "button_text": "Przegląd ról",
-    "description": "Przegląd wszystkich ról dostępnych w {{productName}}. Role pozwalają przyznawać użytkownikom uprawnienia, na przykład do tworzenia dashboardów lub definicji zdarzeń.",
+    "description": "Przegląd wszystkich ról dostępnych w {{productName}}. Role pozwalają przyznawać użytkownikom uprawnienia, na przykład do tworzenia paneli lub definicji zdarzeń.",
     "alert_title": "Przyznawanie uprawnień",
-    "alert_body_prefix": "Wbudowane role pozwalają przyznawać użytkownikom uprawnienia, na przykład do tworzenia dashboardów lub przeglądania katalogu archiwum. Nie przyznają jednak uprawnień do konkretnego dashboardu ani strumienia. Nie można też utworzyć własnej roli. Uprawnienia do konkretnego elementu można przyznać, używając przycisku ",
+    "alert_body_prefix": "Wbudowane role pozwalają przyznawać użytkownikom uprawnienia, na przykład do tworzenia paneli lub przeglądania katalogu archiwum. Nie przyznają jednak uprawnień do konkretnego panelu ani strumienia. Nie można też utworzyć własnej roli. Uprawnienia do konkretnego elementu można przyznać, używając przycisku ",
     "share_text": "Udostępnij",
     "alert_body_suffix": ". Przycisk ten znajdziesz np. na stronie przeglądu elementów. Jeśli chcesz przyznać uprawnienia do elementu wielu użytkownikom jednocześnie, możesz użyć zespołów. Więcej informacji znajdziesz w ",
     "documentation_text": "dokumentacji"
@@ -272,9 +272,9 @@
         "correlation_aggregation": "Korelacja i agregacja zdarzeń",
         "threat_intel": "Integracje z wywiadem zagrożeń",
         "incident_workspaces": "Obszary robocze do badania incydentów",
-        "prebuilt_parser_dashboards": "Gotowe parsery i dashboardy bezpieczeństwa",
+        "prebuilt_parser_dashboards": "Gotowe parsery i panele bezpieczeństwa",
         "sigma_rules": "Reguły Sigma",
-        "parameterized_dashboards": "Dashboardy z parametrami",
+        "parameterized_dashboards": "Panele z parametrami",
         "input_output_integrations": "Integracje wejść i wyjść",
         "threat_management": "Zarządzanie zagrożeniami",
         "search_workflow": "Przepływ pracy wyszukiwania, szablony i filtry",
@@ -330,7 +330,7 @@
   },
   "permissions_info": {
     "title": "Przyznawanie uprawnień",
-    "text": "Uprawnienia do elementów, takich jak strumienie i dashboardy, można skonfigurować za pomocą przycisku <shareLabel>Udostępnij</shareLabel> przy danym elemencie. Przycisk ten znajdziesz np. na stronie przeglądu elementów. Więcej informacji znajdziesz w <docsLink>dokumentacji</docsLink>."
+    "text": "Uprawnienia do elementów, takich jak strumienie i panele, można skonfigurować za pomocą przycisku <shareLabel>Udostępnij</shareLabel> przy danym elemencie. Przycisk ten znajdziesz np. na stronie przeglądu elementów. Więcej informacji znajdziesz w <docsLink>dokumentacji</docsLink>."
   },
   "startpage": {
     "label": "Strona startowa",
@@ -339,7 +339,7 @@
     "select_value": "Wybierz {{type, lowercase}}",
     "entity": "element",
     "types": {
-      "dashboard": "Dashboard",
+      "dashboard": "Panel",
       "stream": "Strumień",
       "search": "Wyszukiwanie"
     },
@@ -374,7 +374,7 @@
       "search_autocompletion": "Autouzupełnianie wyszukiwania",
       "update_unfocused": "Aktualizuj, gdy okno jest nieaktywne",
       "pin_search_sidebar": "Przypnij panel boczny wyszukiwania",
-      "pin_dashboard_sidebar": "Przypnij panel boczny dashboardu",
+      "pin_dashboard_sidebar": "Przypnij pasek boczny panelu",
       "theme_mode": "Tryb motywu",
       "not_configured": "Nieskonfigurowane",
       "language": "Język"

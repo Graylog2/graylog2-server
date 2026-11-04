@@ -1,11 +1,11 @@
 {
-  "human_name": "dashboardy",
+  "human_name": "panele",
   "full_screen": {
     "menu": "Pełny ekran",
     "title": "Konfiguracja trybu pełnoekranowego",
     "start": "Rozpocznij widok pełnoekranowy",
     "refresh_interval": "Interwał odświeżania",
-    "refresh_interval_help": "Po ilu sekundach dashboard ma się odświeżyć?",
+    "refresh_interval_help": "Po ilu sekundach panel ma się odświeżyć?",
     "tabs": "Karty",
     "tabs_help": "Wybierz karty zapytań, które mają zostać uwzględnione w rotacji.",
     "cycle_interval": "Interwał zmiany kart",
@@ -13,39 +13,39 @@
   },
   "properties": {
     "title": "Tytuł",
-    "title_help": "Tytuł dashboardu.",
+    "title_help": "Tytuł panelu.",
     "summary": "Podsumowanie",
-    "summary_help": "Pomocne podsumowanie dashboardu.",
+    "summary_help": "Pomocne podsumowanie panelu.",
     "description": "Opis",
-    "description_help": "Dłuższy, pomocny opis dashboardu i jego funkcjonalności."
+    "description_help": "Dłuższy, pomocny opis panelu i jego funkcjonalności."
   },
   "overview": {
     "missing_requirements": "Brakujące wymagania",
     "user_defined": "Zdefiniowane przez użytkownika",
-    "load_failed": "Ładowanie dashboardów nie powiodło się, status:",
-    "could_not_load": "Nie udało się załadować dashboardów"
+    "load_failed": "Ładowanie paneli nie powiodło się, status:",
+    "could_not_load": "Nie udało się załadować paneli"
   },
   "delete": {
     "confirm": "Czy na pewno chcesz usunąć \"{{title}}\"?",
-    "success": "Usunięcie dashboardu \"{{title}}\" powiodło się!",
+    "success": "Usunięcie panelu \"{{title}}\" powiodło się!",
     "success_title": "Sukces!",
-    "failed": "Usuwanie dashboardu nie powiodło się: {{error}}",
+    "failed": "Usuwanie panelu nie powiodło się: {{error}}",
     "failed_title": "Błąd!"
   },
   "bulk_delete": {
-    "confirm_one": "Czy na pewno chcesz usunąć {{count}} dashboard?",
-    "confirm_other": "Czy na pewno chcesz usunąć {{count}} dashboardu?",
-    "partial_failure_one": "Nie udało się usunąć {{failed}} z {{count}} wybranego dashboardu.",
-    "partial_failure_other": "Nie udało się usunąć {{failed}} z {{count}} wybranego dashboardu.",
-    "success_one": "Pomyślnie usunięto {{count}} dashboard.",
-    "success_other": "Pomyślnie usunięto {{count}} dashboardu.",
+    "confirm_one": "Czy na pewno chcesz usunąć {{count}} panel?",
+    "confirm_other": "Czy na pewno chcesz usunąć {{count}} panelu?",
+    "partial_failure_one": "Nie udało się usunąć {{failed}} z {{count}} wybranego panelu.",
+    "partial_failure_other": "Nie udało się usunąć {{failed}} z {{count}} wybranego panelu.",
+    "success_one": "Pomyślnie usunięto {{count}} panel.",
+    "success_other": "Pomyślnie usunięto {{count}} panelu.",
     "success_title": "Sukces",
-    "failed": "Wystąpił błąd podczas usuwania dashboardów. {{error}}",
-    "confirm_few": "Czy na pewno chcesz usunąć {{count}} dashboardy?",
-    "confirm_many": "Czy na pewno chcesz usunąć {{count}} dashboardów?",
-    "partial_failure_few": "Nie udało się usunąć {{failed}} z {{count}} wybranych dashboardów.",
-    "partial_failure_many": "Nie udało się usunąć {{failed}} z {{count}} wybranych dashboardów.",
-    "success_few": "Pomyślnie usunięto {{count}} dashboardy.",
-    "success_many": "Pomyślnie usunięto {{count}} dashboardów."
+    "failed": "Wystąpił błąd podczas usuwania paneli. {{error}}",
+    "confirm_few": "Czy na pewno chcesz usunąć {{count}} panele?",
+    "confirm_many": "Czy na pewno chcesz usunąć {{count}} paneli?",
+    "partial_failure_few": "Nie udało się usunąć {{failed}} z {{count}} wybranych paneli.",
+    "partial_failure_many": "Nie udało się usunąć {{failed}} z {{count}} wybranych paneli.",
+    "success_few": "Pomyślnie usunięto {{count}} panele.",
+    "success_many": "Pomyślnie usunięto {{count}} paneli."
   }
 }

@@ -1,8 +1,8 @@
 {
   "copy_to_dashboard": {
-    "title": "Kopiuj widget do Dashboardu",
-    "no_dashboards": "Nie znaleziono Dashboardów.",
-    "create_new": "Utwórz nowy Dashboard"
+    "title": "Kopiuj widget do panelu",
+    "no_dashboards": "Nie znaleziono paneli.",
+    "create_new": "Utwórz nowy panel"
   },
   "edit_message_list": {
     "fields": "Pola",
@@ -81,7 +81,7 @@
     "title": "Nieznany widget: {{type}}",
     "cannot_render": "Niestety nie można wyrenderować tego widgetu, ponieważ nie wiadomo, jak obsługiwać widgety typu <strong>{{type}}</strong>. Może to być spowodowane jedną z poniższych sytuacji:",
     "missing_plugin": "Ten widget został utworzony za pomocą wtyczki, która jest obecnie niedostępna.",
-    "legacy_dashboard": "Ten widget był częścią starszego Dashboardu i został utworzony przez wtyczkę, która nie jest już dostępna.",
+    "legacy_dashboard": "Ten widget był częścią starszego panelu i został utworzony przez wtyczkę, która nie jest już dostępna.",
     "what_to_do": "Co można z tym zrobić? Można ponownie załadować wtyczkę, skontaktować się z autorem wtyczki w celu uzyskania wersji zgodnej z aktualną wersją {{productName}} lub usunąć widget, jeśli nie jest już potrzebny.",
     "copy_config": "W każdym przypadku konfigurację widgetu można skopiować do schowka:"
   },
@@ -91,7 +91,7 @@
     "focus": "Skup się na tym widgecie",
     "edit": "Edytuj",
     "duplicate": "Duplikuj",
-    "copy_to_dashboard": "Kopiuj do Dashboardu",
+    "copy_to_dashboard": "Kopiuj do panelu",
     "move_to_page": "Przenieś na stronę",
     "copying": "Kopiowanie widgetu...",
     "copy": "Kopiuj widget",
@@ -173,7 +173,7 @@
       "create": "Utwórz",
       "update": "Zaktualizuj",
       "help_title": "Czym są dekoratory wiadomości?",
-      "help_description": "Dekoratory mogą modyfikować wiadomości wyświetlane w wynikach wyszukiwania w locie. Zmiany nie są zapisywane, a jedynie pokazywane w wynikach wyszukiwania. Konfiguracja dekoratorów jest zapisywana <strong>dla każdego Streamu</strong>.",
+      "help_description": "Dekoratory mogą modyfikować wiadomości wyświetlane w wynikach wyszukiwania w locie. Zmiany nie są zapisywane, a jedynie pokazywane w wynikach wyszukiwania. Konfiguracja dekoratorów jest zapisywana <strong>dla każdego strumienia</strong>.",
       "help_order": "Przeciągnij i upuść, aby zmienić kolejność, w jakiej dekoratory są przetwarzane.",
       "help_docs": "Więcej informacji o dekoratorach wiadomości znajdziesz w <docsLink>dokumentacji</docsLink>."
     },

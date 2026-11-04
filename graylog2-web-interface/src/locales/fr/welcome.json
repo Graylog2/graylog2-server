@@ -10,9 +10,9 @@
   "last_opened_description": "Vue d'ensemble des recherches enregistrées et tableaux de bord récemment consultés.",
   "overview": "Vue d'ensemble",
   "no_favorites": "Vous n'avez encore aucun élément favori.",
-  "no_favorites_hint": "Ajoutez une <searchLink>Recherche</searchLink> ou un <dashboardLink>Dashboard</dashboardLink> aux favoris pour les voir apparaître ici.",
-  "no_last_opened": "Vous n'avez encore ouvert aucune recherche ni aucun Dashboard.",
-  "no_last_opened_hint": "Désormais, chaque fois que vous ouvrez une recherche ou un Dashboard enregistré, il apparaîtra ici. En attendant, vous pouvez démarrer une nouvelle <searchLink>Recherche</searchLink> ou un <dashboardLink>Dashboard</dashboardLink>.",
+  "no_favorites_hint": "Ajoutez une <searchLink>Recherche</searchLink> ou un <dashboardLink>tableau de bord</dashboardLink> aux favoris pour les voir apparaître ici.",
+  "no_last_opened": "Vous n'avez encore ouvert aucune recherche ni aucun tableau de bord.",
+  "no_last_opened_hint": "Désormais, chaque fois que vous ouvrez une recherche ou un tableau de bord enregistré, il apparaîtra ici. En attendant, vous pouvez démarrer une nouvelle <searchLink>Recherche</searchLink> ou un <dashboardLink>Tableau de bord</dashboardLink>.",
   "no_recent_activity": "Il n'y a pas encore d'activité récente.",
   "no_recent_activity_hint": "Chaque fois qu'un autre utilisateur mettra à jour un contenu auquel vous avez accès, ou partagera un nouveau contenu avec vous, il apparaîtra ici.",
   "activity": {

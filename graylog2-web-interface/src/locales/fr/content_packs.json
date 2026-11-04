@@ -143,7 +143,7 @@
     "delete_confirmation": "Vous êtes sur le point de supprimer ce Content Pack. Êtes-vous sûr ?",
     "delete_error_message": "Échec de la suppression du bundle : {{error}}",
     "delete_success": "Content Pack supprimé avec succès.",
-    "description": "Les Content Packs accélèrent la configuration d'une source de données spécifique. Un Content Pack peut inclure des inputs, des extractors, des streams et des dashboards.",
+    "description": "Les Content Packs accélèrent la configuration d'une source de données spécifique. Un Content Pack peut inclure des inputs, des extractors, des streams et des tableaux de bord.",
     "install_error_message": "Échec de l'installation du Content Pack avec le statut : {{status}}. Impossible d'installer le Content Pack avec l'ID : {{id}}",
     "install_success": "Content Pack installé avec succès.",
     "title": "Content Packs",
@@ -152,7 +152,7 @@
   "pages": {
     "back_button": "Content Packs",
     "create_title": "Créer des Content Packs",
-    "description": "Les Content Packs accélèrent la configuration d'une source de données spécifique. Un Content Pack peut inclure des inputs, des extractors, des streams et des dashboards.",
+    "description": "Les Content Packs accélèrent la configuration d'une source de données spécifique. Un Content Pack peut inclure des inputs, des extractors, des streams et des tableaux de bord.",
     "document_title": "Content Packs",
     "edit_title": "Modifier le Content Pack",
     "marketplace_prefix": "Trouvez d'autres Content Packs dans"
