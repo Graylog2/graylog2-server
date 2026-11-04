@@ -268,7 +268,7 @@
         "audit_logs_cloud": "Audit-Logs für {{productName}} Cloud",
         "dynamic_lookup_tables": "Dynamische Lookup-Tabellen",
         "advanced_alerting": "Erweiterte Alarmierung mit Skripting",
-        "compliance_reporting": "Compliance-Berichte",
+        "compliance_reporting": "Compliance-Reports",
         "correlation_aggregation": "Korrelations- und Aggregationsevents",
         "threat_intel": "Threat-Intel-Integrationen",
         "incident_workspaces": "Arbeitsbereiche für Incident-Untersuchungen",

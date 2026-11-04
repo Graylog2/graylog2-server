@@ -24,7 +24,9 @@ Terms used in the German translations (`de/*.json`), so the whole interface uses
 | Event                              | Event (not "Ereignis")        |
 | Event definition                   | Event Definition / Event Definitionen |
 | Event notification                 | Event Benachrichtigung / Event Benachrichtigungen |
+| Collection                         | Collection / Collections (not "Sammlung") |
 | Notification                       | Benachrichtigung              |
+| Report                             | Report (never "Bericht"); compounds: "Report-Verlauf", "Health-Report" |
 | Filter (noun / verb)               | Filter / Filtern              |
 | Hide / Show (columns, sections)    | Ausblenden / Einblenden       |
 | Preferences                        | Voreinstellungen              |
@@ -50,7 +52,7 @@ Enterprise texts live in `graylog-plugin-enterprise/enterprise/src/web/locales` 
 | Anomaly         | Anomalie         |
 | Archive         | Archiv           |
 | Audit log       | Audit-Log        |
-| Report          | Bericht          |
+| Report          | Report           |
 | Retention       | Aufbewahrung     |
 | Risk score      | Risikobewertung  |
 | Warm / hot tier | Warm- / Hot-Tier |

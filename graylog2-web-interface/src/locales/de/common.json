@@ -292,14 +292,14 @@
     "search": "Suche",
     "stream": "Stream",
     "search_filter": "Suchfilter",
-    "report": "Bericht",
+    "report": "Report",
     "role": "Rolle",
     "output": "Output",
     "sigma_rule": "Sigma-Regel",
     "event_procedure": "Eventprozedur",
     "event_procedure_step": "Schritt einer Eventprozedur",
-    "collection": "Sammlung",
-    "collection_entities": "Sammlungseinträge"
+    "collection": "Collection",
+    "collection_entities": "Collection-Einträge"
   },
   "marketplace_link": "{{productName}} Marketplace",
   "chips_cell": {
@@ -404,7 +404,7 @@
     "enterprise_title": "{{productName}} Enterprise",
     "enterprise_description": "{{productName}} Enterprise wurde für die Anforderungen von IT-Betriebs- und Software-Engineering-Teams mit begrenzten Ressourcen entwickelt und bietet zahlreiche Produktivitätsverbesserungen, die Ihnen jedes Jahr Tausende Arbeitsstunden beim Sammeln und Analysieren von Logdaten ersparen, um die Ursache von Leistungs-, Ausfall- und Fehlerproblemen aufzudecken.",
     "security_title": "{{productName}} Security",
-    "security_description": "Erweitern Sie die Möglichkeiten von {{productName}} Open zum Erkennen, Untersuchen und Beantworten von Cybersicherheitsbedrohungen um sicherheitsspezifische Dashboards und Alarme, eine KI/ML-Engine zur Anomalieerkennung, Integrationen mit anderen Sicherheitstools, SOAR-Funktionen und zahlreiche Funktionen für Compliance-Berichte.",
+    "security_description": "Erweitern Sie die Möglichkeiten von {{productName}} Open zum Erkennen, Untersuchen und Beantworten von Cybersicherheitsbedrohungen um sicherheitsspezifische Dashboards und Alarme, eine KI/ML-Engine zur Anomalieerkennung, Integrationen mit anderen Sicherheitstools, SOAR-Funktionen und zahlreiche Funktionen für Compliance-Reports.",
     "request_now": "Jetzt anfragen"
   },
   "plugin_list": {

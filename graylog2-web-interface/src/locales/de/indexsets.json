@@ -555,8 +555,8 @@
     "templates_default_info": "Legen Sie hier eine Standardvorlage fest, um die Konfiguration von Index-Sets zu steuern, die von Illuminate-Paketen erstellt werden.",
     "failures_title": "Indexer-Fehler",
     "failures_description": "Dies ist eine Liste fehlgeschlagener Versuche, Nachrichten zu indizieren. Ein Fehler bedeutet, dass eine Nachricht korrekt verarbeitet wurde, das Schreiben in den Indexer-Cluster aber fehlgeschlagen ist. Beachten Sie, dass die Liste auf eine Größe von 50 MB begrenzt ist. Sie enthält daher viele Fehlerprotokolle, aber nicht unbedingt alle, die jemals aufgetreten sind.",
-    "failures_total_one": "Die Sammlung enthält insgesamt {{formattedCount}} Indexer-Fehler.",
-    "failures_total_other": "Die Sammlung enthält insgesamt {{formattedCount}} Indexer-Fehler.",
+    "failures_total_one": "Die Collection enthält insgesamt {{formattedCount}} Indexer-Fehler.",
+    "failures_total_other": "Die Collection enthält insgesamt {{formattedCount}} Indexer-Fehler.",
     "indices_document_title": "Indizes und Index-Sets",
     "indices_title": "Indizes und Index-Sets",
     "indices_description": "Ein Stream schreibt Nachrichten in ein Index-Set, das die Aufbewahrung, das Sharding und die Replikation der gespeicherten Daten konfiguriert. Durch die Konfiguration von Index-Sets können Sie beispielsweise unterschiedliche Aufbewahrungszeiten für bestimmte Streams festlegen."
