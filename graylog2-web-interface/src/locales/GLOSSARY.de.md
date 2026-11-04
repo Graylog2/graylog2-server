@@ -45,7 +45,7 @@ Terms used in the German translations (`de/*.json`), so the whole interface uses
 
 Enterprise texts live in `graylog-plugin-enterprise/enterprise/src/web/locales` (namespaces `enterprise_*`) and use the same rules.
 
-- Keep in English: Security, Investigation, Asset, Sigma, Detection Chain, Data Lake, Data Tiering, Forwarder, Input Profile, Illuminate, Content Hub, Watchlist, MITRE ATT&CK.
+- Keep in English: Threat Coverage, Security, Investigation, Asset, Sigma, Detection Chain, Data Lake, Data Tiering, Forwarder, Input Profile, Illuminate, Content Hub, Watchlist, MITRE ATT&CK.
 
 | English         | German           |
 | --------------- | ---------------- |
