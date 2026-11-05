@@ -22,8 +22,11 @@ Coding conventions for the Graylog web interface. They apply to all changes, whe
 
 ### Reusing Components
 
-- Reuse shared components before creating new ones or using native HTML elements. See the [frontend documentation](https://graylog2.github.io/frontend-documentation).
-- `src/components/common`: shared components. `src/components/bootstrap`: our Mantine and react-bootstrap wrappers.
+- Reuse shared components before creating new ones or using native HTML elements. Look at the [graylog-luma design system](https://graylog2.github.io/design-system) first (sources in `docs/graylog-luma/stories/`), then `src/components/common` and `src/components/bootstrap`.
+- `src/components/common`: shared components, including thin wrappers around Mantine components (`Stack`, `Text`, `Tooltip`, …). New shared components go here.
+- `src/components/bootstrap`: replacements for former react-bootstrap components that keep their API (e.g. `Button` with `bsStyle`), today mostly built on Mantine. Only add a component here when it replaces a react-bootstrap one.
+- The goal is a consistent UI the designer has approved, so avoid one-off UI in feature code. If a shared component is missing, create it in `src/components/common`, even while the design is still open, and document it with a story in `docs/graylog-luma/stories/`. Without an approved design, say so in the story and the PR, and open a follow-up issue to align it with the designer.
+- Patterns, recurring combinations of components such as entity list pages (`PageHeader` with a `CreateButton`, then a `PaginatedEntityTable`), follow `docs/graylog-luma/stories/Patterns/` or, where a pattern isn't documented yet, the composition of existing pages of the same kind. Document a missing pattern in a separate PR. Check the Figma file or ask the designer first; if there is no design yet, start from what the code does and get the PR reviewed by frontend and design.
 
 ## Types
 
