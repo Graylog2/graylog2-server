@@ -116,7 +116,7 @@
         <aws-msk-iam-auth.version>2.3.9</aws-msk-iam-auth.version>
         <bouncycastle-prov.version>1.86</bouncycastle-prov.version>
         <bouncycastle-pkix.version>1.86</bouncycastle-pkix.version>
-        <byte-buddy.version>1.18.14</byte-buddy.version>
+        <byte-buddy.version>1.18.16</byte-buddy.version>
         <caffeine.version>3.3.1</caffeine.version>
         <classgraph.version>5.0.1</classgraph.version>
         <commons-codec.version>1.22.1</commons-codec.version>
