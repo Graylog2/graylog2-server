@@ -26,6 +26,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import type { RuleBlock, BlockType, BlockDict, OutputVariables } from './types';
 import { getDictForFunction } from './helpers';
+import useRuleBuilderText from './useRuleBuilderText';
 
 const BlockContainer = styled.div(
   ({ theme }) => css`
@@ -56,6 +57,7 @@ const RuleBuilderBlock = ({
   deleteBlock,
 }: Props) => {
   const { t } = useTranslation('pipelines');
+  const ruleBuilderText = useRuleBuilderText();
   const [currentBlockDict, setCurrentBlockDict] = useState<BlockDict>(undefined);
   const [editMode, setEditMode] = useState<boolean>(false);
   const [insertMode, setInsertMode] = useState<'above' | 'below' | undefined>(undefined);
@@ -202,9 +204,9 @@ const RuleBuilderBlock = ({
   const isBlockNegatable = (): boolean => type === 'condition';
 
   const options = blockDict.map(({ name, description, rule_builder_name, deprecated }) => ({
-    label: rule_builder_name,
+    label: ruleBuilderText(rule_builder_name),
     value: name,
-    description,
+    description: ruleBuilderText(description),
     deprecated,
   }));
 

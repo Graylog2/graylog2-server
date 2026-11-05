@@ -26,6 +26,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import Errors from './Errors';
+import useRuleBuilderText from './useRuleBuilderText';
 import { RuleBuilderTypes } from './types';
 import type { BlockType, RuleBlock, BlockDict, BlockFieldDict, OutputVariables } from './types';
 
@@ -114,6 +115,7 @@ const RuleBlockForm = ({
   type,
 }: Props) => {
   const { t } = useTranslation('pipelines');
+  const ruleBuilderText = useRuleBuilderText();
   const [initialValues, setInitialValues] = useState<{}>({});
 
   const sendTelemetry = useSendTelemetry('pipeline-rule-builder');
@@ -228,7 +230,7 @@ const RuleBlockForm = ({
                   <SelectedBlockInfo>
                     <Col md={12}>
                       <h5>
-                        {existingBlock?.step_title || selectedBlockDict.rule_builder_name}
+                        {existingBlock?.step_title || ruleBuilderText(selectedBlockDict.rule_builder_name)}
                         <OverlayTrigger
                           trigger="click"
                           rootClose
@@ -254,7 +256,7 @@ const RuleBlockForm = ({
                           </DeprecatedLabel>
                         )}
                       </h5>
-                      <BlockDescription>{selectedBlockDict.description}</BlockDescription>
+                      <BlockDescription>{ruleBuilderText(selectedBlockDict.description)}</BlockDescription>
                     </Col>
                   </SelectedBlockInfo>
 

@@ -46,6 +46,7 @@ import enLookupTables from 'locales/en/lookup_tables.json';
 import enMessageloaders from 'locales/en/messageloaders.json';
 import enNavigation from 'locales/en/navigation.json';
 import enPages from 'locales/en/pages.json';
+import enPipelineRuleBuilder from 'locales/en/pipeline_rule_builder.json';
 import enPipelines from 'locales/en/pipelines.json';
 import enPreflight from 'locales/en/preflight.json';
 import enSearch from 'locales/en/search.json';
@@ -482,6 +483,33 @@ registerTranslations('pages', enPages, {
   fr: () => import(/* webpackChunkName: "translations-fr-pages" */ 'locales/fr/pages.json'),
   'pt-BR': () => import(/* webpackChunkName: "translations-pt-br-pages" */ 'locales/pt-BR/pages.json'),
   'zh-CN': () => import(/* webpackChunkName: "translations-zh-cn-pages" */ 'locales/zh-CN/pages.json'),
+});
+
+registerTranslations('pipeline_rule_builder', enPipelineRuleBuilder, {
+  de: () =>
+    import(/* webpackChunkName: "translations-de-pipeline-rule-builder" */ 'locales/de/pipeline_rule_builder.json'),
+  it: () =>
+    import(/* webpackChunkName: "translations-it-pipeline-rule-builder" */ 'locales/it/pipeline_rule_builder.json'),
+  'zh-TW': () =>
+    import(
+      /* webpackChunkName: "translations-zh-tw-pipeline-rule-builder" */ 'locales/zh-TW/pipeline_rule_builder.json'
+    ),
+  ja: () =>
+    import(/* webpackChunkName: "translations-ja-pipeline-rule-builder" */ 'locales/ja/pipeline_rule_builder.json'),
+  pl: () =>
+    import(/* webpackChunkName: "translations-pl-pipeline-rule-builder" */ 'locales/pl/pipeline_rule_builder.json'),
+  es: () =>
+    import(/* webpackChunkName: "translations-es-pipeline-rule-builder" */ 'locales/es/pipeline_rule_builder.json'),
+  fr: () =>
+    import(/* webpackChunkName: "translations-fr-pipeline-rule-builder" */ 'locales/fr/pipeline_rule_builder.json'),
+  'pt-BR': () =>
+    import(
+      /* webpackChunkName: "translations-pt-br-pipeline-rule-builder" */ 'locales/pt-BR/pipeline_rule_builder.json'
+    ),
+  'zh-CN': () =>
+    import(
+      /* webpackChunkName: "translations-zh-cn-pipeline-rule-builder" */ 'locales/zh-CN/pipeline_rule_builder.json'
+    ),
 });
 
 registerTranslations('pipelines', enPipelines, {
