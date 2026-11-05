@@ -81,6 +81,64 @@ class DatanodeRestApiProxyTargetUrlTest {
         assertThat(url.encodedPath()).startsWith("/api/");
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"https://datanode1:8999", "https://datanode1:8999/"})
+    void worksWithRootBaseUrl(String baseUrl) {
+        final HttpUrl url = DatanodeRestApiProxy.buildTargetUrl(baseUrl, request("metrics"));
+
+        assertThat(url.toString()).isEqualTo("https://datanode1:8999/metrics");
+    }
+
+    /**
+     * Characters that would end the path, start a query/fragment, inject userinfo or break the request line are
+     * percent-encoded into the path segments; encoded traversal sequences are not decoded into real ".." segments.
+     * Note that JAX-RS decodes the path parameter once before it reaches the proxy, so "%252e" arrives as "%2e".
+     */
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "_cat?x=1",
+            "_cat#fragment",
+            "a#@evil.example.com/x",
+            "a?@evil.example.com/x",
+            "a\r\nHost: evil.example.com",
+            "a\tb c",
+            ".%2e/secrets",
+            "%2e./secrets",
+            "%2e%2e%2fsecrets",
+            "%252e%252e/secrets",
+            "..%2fsecrets",
+            "..%5csecrets",
+            "\\\\evil.example.com\\x"
+    })
+    void encodesSpecialCharactersInPath(String path) {
+        final HttpUrl url = DatanodeRestApiProxy.buildTargetUrl("https://datanode1:8999/api", request(path));
+
+        assertThat(url.scheme()).isEqualTo("https");
+        assertThat(url.host()).isEqualTo("datanode1");
+        assertThat(url.port()).isEqualTo(8999);
+        assertThat(url.username()).isEmpty();
+        assertThat(url.encodedPath()).startsWith("/api/");
+        assertThat(url.pathSegments()).doesNotContain("..", ".");
+        assertThat(url.query()).isNull();
+        assertThat(url.fragment()).isNull();
+    }
+
+    @Test
+    void encodesQueryParameterKeysAndValues() {
+        final MultivaluedMap<String, String> query = new MultivaluedHashMap<>();
+        query.add("a&b=c", "1#@evil.example.com/x");
+        query.add("d", "e&f=g?h");
+
+        final HttpUrl url = DatanodeRestApiProxy.buildTargetUrl("https://datanode1:8999/api", request("_cat/indices", query));
+
+        assertThat(url.host()).isEqualTo("datanode1");
+        assertThat(url.encodedPath()).isEqualTo("/api/_cat/indices");
+        assertThat(url.fragment()).isNull();
+        assertThat(url.queryParameterNames()).containsExactlyInAnyOrder("a&b=c", "d");
+        assertThat(url.queryParameter("a&b=c")).isEqualTo("1#@evil.example.com/x");
+        assertThat(url.queryParameter("d")).isEqualTo("e&f=g?h");
+    }
+
     @Test
     void rejectsInvalidBaseUrl() {
         assertThatThrownBy(() -> DatanodeRestApiProxy.buildTargetUrl("not a url", request("_cat")))
