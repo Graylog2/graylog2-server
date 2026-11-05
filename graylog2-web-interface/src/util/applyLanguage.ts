@@ -26,6 +26,7 @@ import 'moment/locale/zh-tw';
 import 'moment/locale/ja';
 import 'moment/locale/it';
 import 'moment/locale/uk';
+import 'moment/locale/ko';
 import 'numeral/locales/de';
 import 'numeral/locales/es';
 import 'numeral/locales/fr';

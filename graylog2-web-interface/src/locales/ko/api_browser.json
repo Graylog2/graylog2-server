@@ -1,0 +1,14 @@
+{
+  "title": "API 브라우저",
+  "description": "Graylog REST API 둘러보기",
+  "search_placeholder": "엔드포인트 검색...",
+  "no_results": "검색과 일치하는 엔드포인트를 찾을 수 없습니다.",
+  "error_loading": "API 브라우저를 불러오는 중 오류가 발생했습니다.",
+  "error_fetching_endpoint": "엔드포인트 세부 정보를 가져오는 중 오류가 발생했습니다.",
+  "endpoint_name": "엔드포인트 이름",
+  "endpoint_path": "경로",
+  "endpoint_method": "메서드",
+  "endpoint_description": "설명",
+  "endpoint_parameters": "매개변수",
+  "endpoint_response": "응답"
+}

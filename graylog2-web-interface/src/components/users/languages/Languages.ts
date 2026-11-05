@@ -28,6 +28,7 @@ export type LanguageCode =
   | 'zh-CN'
   | 'zh-TW'
   | 'ja'
+  | 'ko'
   | 'uk'
   | typeof PSEUDO_LANGUAGE;
 
@@ -54,6 +55,7 @@ export const LANGUAGES: Array<Language> = [
   { code: 'zh-CN', name: '简体中文', beta: true },
   { code: 'zh-TW', name: '繁體中文', beta: true },
   { code: 'ja', name: '日本語', beta: true },
+  { code: 'ko', name: '한국어', beta: true },
   { code: 'uk', name: 'Українська', beta: true },
   { code: PSEUDO_LANGUAGE, name: 'Pseudo', beta: false, developmentOnly: true },
 ];

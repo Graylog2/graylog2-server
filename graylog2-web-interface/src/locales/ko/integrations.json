@@ -1,0 +1,521 @@
+{
+  "aws_plugin_configuration": {
+    "title": "AWS 플러그인 구성",
+    "description": "AWS 모듈이 제공하는 모든 플러그인의 기본 구성입니다. 일부 매개변수는 암호화 없이 MongoDB에 저장됩니다. 필요한 권한이 있는 사용자는 이 페이지의 구성 대화 상자에서 해당 값을 읽을 수 있습니다.",
+    "status_instance_detail_lookups": "인스턴스 세부 정보 조회:",
+    "status_connect_through_proxy": "프록시를 통해 연결:",
+    "status_lookup_regions": "조회 리전:",
+    "status_access_key": "액세스 키:",
+    "status_secret_key": "시크릿 키:",
+    "status_enabled": "활성화됨",
+    "status_disabled": "비활성화됨",
+    "status_not_set": "[설정 안 됨]",
+    "edit_configuration": "구성 편집",
+    "modal_title": "AWS 플러그인 구성 업데이트",
+    "submit_configuration": "구성 업데이트",
+    "lookups_enabled_label": "IP 주소에 대해 AWS 인스턴스 세부 정보 조회를 실행하시겠습니까?",
+    "lookups_enabled_help": "활성화하면 메시지 프로세서가 AWS 항목(EC2, ELB, RDS 등)의 IP 주소를 식별하고 그 뒤에 있는 서비스 또는 인스턴스에 대한 추가 정보를 더하려고 시도합니다. 변경 사항이 적용되기까지 최대 1분이 걸릴 수 있습니다.",
+    "access_key_label": "AWS 액세스 키",
+    "access_key_help": "이 값은 암호화된 연결에서만 사용되지만 일반 텍스트로 저장됩니다. 기본 IAM 사용자에게 할당할 권장 권한은 문서를 참조하십시오.",
+    "secret_key_label": "AWS 시크릿 키",
+    "secret_key_help": "이 값은 암호화된 연결에서만 사용되며 (시스템 시크릿을 사용하여) 암호화되어 저장됩니다. 기본 IAM 사용자에게 할당할 권장 권한은 문서를 참조하십시오.",
+    "lookup_regions_label": "조회 리전",
+    "lookup_regions_help": "AWS 인스턴스 조회 메시지 프로세서는 빠른 주소 변환을 위해 인스턴스 테이블을 유지합니다. 테이블에 포함할 AWS 리전을 정의하십시오. AWS 서비스를 실행하는 모든 리전이어야 합니다. IAM 사용자에게 이러한 리전에 대한 권한이 필요하며, 없으면 {{productName}} 서버 로그에 경고가 표시됩니다.",
+    "proxy_enabled_label": "HTTP 프록시를 사용하시겠습니까?",
+    "proxy_enabled_help": "활성화하면 {{productName}} 구성 파일에 구성된 HTTP 프록시(<code>http_proxy_uri</code>)를 통해 AWS API에 접근합니다.<lineBreak/><em>중요:</em> 이 구성을 적용하려면 모든 AWS 입력을 다시 시작해야 합니다.",
+    "save_error_message": "AWS 플러그인 구성에 실패했습니다. 상태: {{error}}",
+    "save_error_title": "AWS 플러그인 구성을 저장할 수 없습니다."
+  },
+  "gcs_setup_info": {
+    "intro": "Google Cloud Storage 백엔드를 설정하는 단계는 다음과 같습니다:",
+    "step_bucket": "고유한 이름으로 Google Cloud Storage 버킷을 만드십시오. Google의 <bucketsLink>버킷</bucketsLink> 문서를 참조하십시오. 기본 Standard Storage Class를 권장합니다.",
+    "step_service_account": "해당 버킷에서 읽기/쓰기/삭제 권한이 있는 Google Cloud 서비스 계정을 만드십시오. Google의 <serviceAccountsLink>서비스 계정</serviceAccountsLink> 문서를 참조하십시오.",
+    "step_credentials": "모든 Graylog 노드에 Application Default 자격 증명을 설정하십시오. 방법은 클러스터가 호스팅되는 방식에 따라 다릅니다. Google의 <adcLink>Application Default 자격 증명 설정</adcLink> 문서를 참조하십시오.",
+    "step_setup_backend": "이제 이 페이지에서 Google Cloud Storage 백엔드를 설정할 수 있습니다. 첫 번째 단계에서 만든 Google Cloud 스토리지의 고유한 이름을 입력해야 합니다."
+  },
+  "aws_step_authorize": {
+    "invalid_key_message": "잘못된 AWS 키입니다. AWS 계정에서 보통 \"AK\"로 시작하는 20자 영숫자 문자열을 확인하십시오",
+    "invalid_secret_message": "잘못된 AWS 시크릿입니다. 보통 40자 base-64 인코딩 문자열이며, 키를 만들 때 한 번만 볼 수 있습니다",
+    "authorize_button": "인증 및 스트림 선택",
+    "title": "입력 만들기 및 AWS 인증",
+    "description": "이 통합은 Kinesis 스트림에서 메시지를 직접 읽을 수 있게 합니다. CloudWatch 메시지는 선택적으로 CloudWatch 구독을 통해 Kinesis로 전달한 후 처리할 수 있습니다.",
+    "input_name": "입력 이름",
+    "aws_region": "AWS 리전",
+    "aws_region_help": "서비스가 실행 중인 AWS 리전입니다.",
+    "choose_region": "AWS 리전 선택"
+  },
+  "aws_arn": {
+    "assume_role_label": "AWS 역할 가정 (ARN)",
+    "assume_role_help": "교차 계정 권한이 필요한 Amazon Resource Name",
+    "assume_role_placeholder": "arn:aws:sts::123456789012:assumed-role/some-role",
+    "external_id_label": "AWS External ID (선택 사항)",
+    "external_id_help": "혼동된 대리인 문제를 방지하기 위해 AssumeRole 요청에 추가되는 외부 ID입니다. 역할 신뢰 정책에서 요구하는 경우에만 필요합니다."
+  },
+  "aws_authentication_types": {
+    "label": "AWS 인증 유형"
+  },
+  "aws_custom_endpoints": {
+    "title": "선택적 AWS VPC 엔드포인트",
+    "section_title": "{{productName}}이(가) 통신하는 기본 AWS API 엔드포인트 URL을 재정의합니다.",
+    "note": "AWS 서비스에 <vpcEndpointsLink>VPC 엔드포인트</vpcEndpointsLink>를 사용하는 경우에만 지정하십시오.",
+    "input_message": "도메인은 'https://'로 시작해야 합니다",
+    "cloudwatch_label": "CloudWatch API 엔드포인트 재정의",
+    "iam_label": "IAM API 엔드포인트 재정의",
+    "dynamodb_label": "DynamoDB API 엔드포인트 재정의",
+    "kinesis_label": "Kinesis API 엔드포인트 재정의"
+  },
+  "aws_automatic": {
+    "section_title": "자동 인증은 다음 항목을 나열된 순서대로 시도합니다.",
+    "env_variables_label": "환경 변수",
+    "env_variables_value": "<code>AWS_ACCESS_KEY_ID</code> 및 <code>AWS_SECRET_ACCESS_KEY</code>",
+    "java_properties_label": "Java 시스템 속성",
+    "java_properties_value": "<code>aws.accessKeyId</code> 및 <code>aws.secretKey</code>",
+    "profiles_label": "기본 자격 증명 프로필 파일",
+    "profiles_value": "일반적으로 <code>~/.aws/credentials</code>에 있습니다",
+    "ecs_label": "Amazon ECS 컨테이너 자격 증명",
+    "ecs_value": "환경 변수 <code>AWS_CONTAINER_CREDENTIALS_RELATIVE_URI</code>가 설정된 경우 Amazon ECS에서 로드됩니다",
+    "instance_label": "인스턴스 프로필 자격 증명",
+    "instance_value": "EC2 인스턴스에서 사용되며 Amazon EC2 메타데이터 서비스를 통해 전달됩니다",
+    "more_info": "자세한 내용은 <docsLink>AWS 자격 증명 구성 문서 <openIcon/></docsLink>를 참조하십시오."
+  },
+  "aws_key_secret": {
+    "access_key_label": "AWS 액세스 키",
+    "access_key_placeholder": "AK****************",
+    "access_key_help": "AWS 키는 \"AK\"로 시작하는 20자 영숫자 문자열이어야 합니다.",
+    "access_key_help_optional": "AWS 키는 \"AK\"로 시작하는 20자 영숫자 문자열이어야 합니다. (선택 사항 - 제공하지 않으면 레거시 AWS 플러그인 구성을 사용합니다)",
+    "secret_key_label": "AWS 시크릿 키",
+    "secret_key_placeholder": "***********",
+    "secret_key_help": "AWS 시크릿은 보통 40자 base-64 인코딩 문자열입니다.",
+    "secret_key_help_optional": "AWS 시크릿은 보통 40자 base-64 인코딩 문자열입니다. (선택 사항 - 제공하지 않으면 레거시 AWS 플러그인 구성을 사용합니다)"
+  },
+  "aws_cloudtrail": {
+    "step_authorize_title": "AWS CloudTrail 연결 구성",
+    "step_subscribe_title": "AWS CloudTrail 입력 구성",
+    "step_review_title": "AWS CloudTrail 최종 검토"
+  },
+  "aws_cloudtrail_app": {
+    "title": "AWS CloudTrail 통합",
+    "description": "이 기능은 AWS CloudTrail 플랫폼에서 로그 레코드를 가져옵니다.",
+    "requirement": "<cloudTrailLink>AWS CloudTrail</cloudTrailLink>이(가) 필요합니다."
+  },
+  "aws_cloudtrail_advanced_options": {
+    "title": "고급 옵션",
+    "sqs_batch_size_error": "SQS 메시지 배치 크기를 1에서 10 사이로 선택하십시오.",
+    "override_source_label": "소스 재정의 (선택 사항)",
+    "override_source_help": "소스는 기본적으로 aws-cloudtrail로 설정됩니다. 원하는 경우 사용자 지정 값으로 재정의할 수 있습니다.",
+    "sqs_batch_size_label": "SQS 메시지 배치 크기",
+    "sqs_batch_size_help": "SQS에서 한 번에 쿼리할 최대 메시지 수입니다. 허용되는 최댓값은 10입니다.",
+    "include_full_message_json_label": "full_message_json 포함",
+    "include_full_message_json_help": "전체 CloudTrail 이벤트를 full_message_json 필드에 JSON으로 저장하시겠습니까?"
+  },
+  "aws_cloudtrail_step_authorize": {
+    "connection_error": "제공된 구성으로 AWS CloudTrail에 연결할 수 없습니다.",
+    "verify_button": "연결 확인 및 계속",
+    "input_name": "입력 이름",
+    "input_name_help": "새 입력을 설명하는 이름을 선택하십시오.",
+    "sqs_region_help": "SQS 큐가 있는 AWS 리전입니다.",
+    "sqs_region_label": "AWS SQS 리전",
+    "choose_sqs_region": "SQS 리전 선택",
+    "s3_region_help": "S3 버킷이 있는 AWS 리전입니다.",
+    "s3_region_label": "AWS S3 리전",
+    "choose_s3_region": "S3 리전 선택",
+    "sqs_queue_name_help": "CloudTrail Subscriber가 만든 SQS 큐 이름",
+    "sqs_queue_name_label": "SQS 큐 이름"
+  },
+  "aws_cloudtrail_step_review": {
+    "save_error": "입력을 저장할 수 없습니다. 잠시 후 다시 시도하십시오.",
+    "save_button": "저장 및 입력 시작",
+    "description": "아래 내용이 모두 올바른지 확인한 후 아래 버튼을 클릭하여 AWS CloudTrail 설정을 완료하십시오!",
+    "input_configuration": "입력 구성",
+    "label_name": "이름",
+    "label_access_key": "AWS 액세스 키",
+    "label_sqs_region": "SQS 리전",
+    "label_s3_region": "S3 리전",
+    "label_assume_role_arn": "AWS 역할 가정 (ARN)",
+    "label_external_id": "AWS External ID",
+    "label_sqs_queue_name": "AWS SQS 큐 이름",
+    "label_sqs_batch_size": "SQS 메시지 배치 크기",
+    "label_polling_interval": "폴링 간격",
+    "label_enable_throttling": "스로틀링 활성화"
+  },
+  "aws_cloudtrail_step_subscribe": {
+    "polling_interval_error_full": "유효한 폴링 간격을 입력하십시오",
+    "polling_interval_error": "허용되는 최소 폴링 간격은 1분입니다.",
+    "batch_size_error_full": "유효한 SQS 메시지 배치 크기를 입력하십시오.",
+    "batch_size_error": "SQS 메시지 배치 크기를 1에서 10 사이로 선택하십시오.",
+    "proceed_button": "계속",
+    "polling_interval_help": "AWS CloudTrail에서 새 데이터를 확인하는 빈도(분)를 결정합니다. 허용되는 최소 간격은 1분입니다.",
+    "polling_interval_label": "폴링 간격"
+  },
+  "aws_cloudwatch_app": {
+    "title": "AWS 통합",
+    "description": "이 기능은 다양한 AWS 소스에서 로그 메시지를 가져옵니다."
+  },
+  "aws_cloudwatch_advanced_options": {
+    "title": "고급 옵션",
+    "flow_log_prefix_label": "Flow Log 필드 이름 접두사 추가",
+    "flow_log_prefix_help": "Flow Log 접두사가 붙은 필드를 추가합니다. 예: \"src_addr\" -> \"flow_log_src_addr\".",
+    "store_full_message_label": "전체 메시지를 저장하시겠습니까?",
+    "store_full_message_help": "원본 Kinesis/CloudWatch 로그 이벤트 페이로드를 full_message 필드에 저장합니다.",
+    "override_source_label": "소스 재정의 (선택 사항)",
+    "override_source_help": "메시지 소스는 기본적으로 aws-kinesis-raw-logs로 설정됩니다. 원하는 경우 사용자 지정 값으로 재정의할 수 있습니다.",
+    "batch_size_label": "Kinesis 레코드 배치 크기",
+    "batch_size_help": "한 번에 가져올 Kinesis 레코드 수입니다. 각 레코드의 크기는 최대 1MB일 수 있습니다. AWS 기본값은 10,000입니다. 한 번에 더 작은 단위로 처리하려면 더 작은 값을 입력하십시오."
+  },
+  "aws_sidebar_permissions": {
+    "title": "AWS 정책 권한",
+    "description": "필요한 AWS 권한에 대한 정보는 <docsLink/>를 참조하십시오.",
+    "docs_link_text": "공식 문서"
+  },
+  "aws_step_health_check": {
+    "no_response_title": "아직 Amazon으로부터 응답을 받지 못했습니다.",
+    "waiting_description": "AWS 스트림에서 로그를 계속 확인하는 동안 잠시 기다려 주십시오. Amazon 서버는 10분마다 로그를 파싱하므로 시간이 다소 걸릴 수 있습니다. 커피 한 잔 하며 기다리십시오!",
+    "checking_again_in": "다음 확인까지: <countdown/>",
+    "checking_button": "확인 중...",
+    "check_now_button": "지금 확인",
+    "do_not_refresh": "브라우저를 새로 고치지 마십시오. 로그를 계속 확인하고 있으며 로그를 사용할 수 있게 되면 이 페이지가 자동으로 새로 고침됩니다.",
+    "review_button": "검토 및 완료",
+    "title": "Kinesis 스트림 만들기",
+    "sample_description": "사용할 수 있는 경우 스트림에서 파싱된 {{logType}} 메시지 샘플이 아래에 표시됩니다.",
+    "formatted_log_label": "형식화된 로그 메시지",
+    "no_messages": "스트림에서 메시지를 찾을 수 없습니다."
+  },
+  "aws_cloudwatch_step_review": {
+    "default_label": "(기본값)",
+    "save_error": "입력을 저장할 수 없습니다. 잠시 후 다시 시도하십시오.",
+    "complete_button": "CloudWatch 설정 완료",
+    "title": "최종 검토",
+    "description": "아래 내용이 모두 올바른지 확인한 후 아래 버튼을 클릭하여 CloudWatch 설정을 완료하십시오!",
+    "setting_up_cloudwatch": "CloudWatch 설정",
+    "edit": "편집",
+    "label_name": "이름",
+    "label_authorization_type": "권한 부여 유형",
+    "label_aws_key": "AWS 키",
+    "label_assumed_role_arn": "AWS 가정 ARN 역할",
+    "label_external_id": "AWS External ID",
+    "label_cloudwatch_endpoint": "CloudWatch VPC 엔드포인트",
+    "label_dynamodb_endpoint": "DynamoDB VPC 엔드포인트",
+    "label_iam_endpoint": "IAM VPC 엔드포인트",
+    "label_kinesis_endpoint": "Kinesis VPC 엔드포인트",
+    "label_aws_region": "AWS 리전",
+    "setting_up_kinesis": "Kinesis 설정",
+    "label_kinesis_stream": "Kinesis Stream",
+    "label_kinesis_stream_arn": "Kinesis Stream ARN",
+    "stream_arn_error": "오류: 스트림 ARN을 가져오지 못했습니다. IAM 역할에 kinesis:DescribeStream 권한이 포함되어 있는지 확인하십시오.",
+    "label_global_input": "글로벌 입력",
+    "label_record_batch_size": "레코드 배치 크기",
+    "label_enable_throttling": "스로틀링 활성화",
+    "label_flow_log_prefix": "필드 이름에 Flow Log 접두사 추가",
+    "label_store_full_message": "전체 메시지 저장",
+    "label_override_source": "소스 재정의",
+    "formatting": "형식 지정",
+    "label_log_type": "로그 유형",
+    "pipeline_hint": "로그를 다르게 파싱해야 하는 경우 추가 세부 정보와 지침은 <pipelineLink>파이프라인 규칙</pipelineLink>을 확인하십시오.",
+    "no_response": "아직 Amazon으로부터 응답을 받지 못했습니다."
+  },
+  "aws_kinesis_existing_streams": {
+    "sidebar_title": "필요한 스트림이 보이지 않습니까?",
+    "sidebar_requirement": "설정을 계속하려면 지정한 리전에 Kinesis 스트림이 하나 이상 있어야 합니다. 로그 스트림에는 로그 메시지가 최소 몇 개 있어야 합니다.",
+    "sidebar_auto_setup": "{{productName}}은(는) Kinesis 스트림을 대신 만들어 선택한 CloudWatch 로그 그룹에 구독시키는 기능도 지원합니다. 이 옵션은 AWS 환경에 추가 리소스를 만들며 요금이 청구된다는 점에 유의하십시오.",
+    "setup_automatically_button": "Kinesis 자동 설정",
+    "no_logs_error": "이 Kinesis 스트림에서 로그를 찾을 수 없습니다. 다른 Kinesis 스트림을 선택하십시오.",
+    "loading_message": "이 요청은 시간이 조금 걸릴 수 있습니다.",
+    "verify_button": "스트림 및 형식 확인",
+    "title": "Kinesis 스트림 선택",
+    "description_list": "아래는 지정한 AWS 계정에서 찾은 모든 Kinesis 스트림 목록입니다.",
+    "description_docs": "메시지를 읽을 스트림을 선택하거나, 이 설정에 대한 자세한 내용은 <docsLink/> 문서를 따르십시오.",
+    "docs_link_text": "AWS Kinesis/CloudWatch 입력",
+    "select_stream_label": "스트림 선택",
+    "select_stream_placeholder": "Kinesis 스트림 선택"
+  },
+  "aws_kinesis_setup_new_stream": {
+    "no_groups_error": "선택한 리전에서 그룹을 찾을 수 없습니다. 다른 리전을 선택해 보십시오.",
+    "begin_button": "자동 설정 시작",
+    "title": "Kinesis 자동 설정",
+    "intro": "아래 필드를 작성하여 Kinesis 자동 설정을 시작하십시오. AWS 계정에서 다음 작업이 수행됩니다. 자세한 내용은 AWS 문서의 <docsLink>CloudWatch Logs 구독 필터 사용</docsLink>을 참조하십시오.",
+    "step_create_stream": "지정한 이름으로 새 Kinesis 스트림을 만듭니다.",
+    "step_create_role": "Kinesis 스트림을 CloudWatch 로그 그룹에 구독시키는 데 필요한 IAM 역할/정책을 만듭니다.",
+    "step_subscribe": "새 Kinesis 스트림을 로그 그룹에 구독시킵니다.",
+    "stream_name_label": "Kinesis Stream 이름",
+    "stream_name_placeholder": "스트림 이름",
+    "stream_name_help": "영숫자 및 특수 문자 밑줄(_), 마침표(.), 하이픈(-)으로 구성된 1~128자.",
+    "group_name_label": "CloudWatch 그룹 이름",
+    "choose_group": "CloudWatch 그룹 선택",
+    "back_button": "스트림 선택으로 돌아가기"
+  },
+  "aws_kinesis_setup_agree": {
+    "description": "이 자동 설정은 다음 AWS 리소스를 만듭니다. 아래를 클릭하면 이러한 리소스가 생성되며 이로 인해 발생하는 AWS 요금에 대한 책임이 전적으로 본인에게 있음을 이해한 것으로 간주됩니다. 필요하지 않은 리소스는 모두 직접 삭제해야 합니다.",
+    "step_stream": "샤드가 <strong>1</strong>개인 Kinesis 스트림을 만듭니다.",
+    "step_role": "지정한 CloudWatch 그룹 <strong>{{groupName}}</strong>이(가) Kinesis 스트림 <strong>{{streamName}}</strong>에 로그 메시지를 게시할 수 있도록 IAM 역할과 정책을 만듭니다",
+    "step_subscription": "로그 메시지를 Kinesis 스트림에 게시하는 CloudWatch 구독을 만듭니다."
+  },
+  "aws_kinesis_setup_step": {
+    "waiting": "대기 중...",
+    "creating": "{{label}} 만드는 중",
+    "create": "{{label}} 만들기"
+  },
+  "aws_kinesis_setup_steps": {
+    "stream_label": "Kinesis Stream",
+    "policy_label": "구독 정책",
+    "subscription_label": "구독"
+  },
+  "aws_kinesis_setup_modal": {
+    "creating_button": "만드는 중...",
+    "close_button": "닫기",
+    "continue_button": "설정 계속",
+    "executing_title": "자동 설정 실행 중",
+    "agreement_title": "Kinesis 자동 설정 동의",
+    "delayed_logs": "첫 번째 메시지가 Kinesis 스트림에 도착하기까지 최대 10분이 걸릴 수 있습니다. 다음 단계의 Kinesis 상태 확인은 스트림에 메시지가 있을 때까지 성공적으로 완료되지 않습니다. 자세한 내용은 공식 <cloudWatchLink>CloudWatch 구독</cloudWatchLink> 문서를 참조하십시오.",
+    "agree_button": "동의합니다! 지금 이 AWS 리소스를 만듭니다."
+  },
+  "form_wrap": {
+    "more_info": "자세한 정보",
+    "additional_information": "추가 정보:",
+    "loading_button": "로드 중...",
+    "submit_button": "제출"
+  },
+  "aws_skip_health_check": {
+    "title": "상태 확인 건너뛰기",
+    "confirm_button": "확인",
+    "form_title": "로그 유형 선택 및 상태 확인 건너뛰기",
+    "description": "새 <strong>{{streamName}}</strong> 스트림에 포함된 데이터를 확신하는 경우 아래 옵션을 선택하여 자동 확인을 건너뛰십시오.",
+    "input_type_label": "AWS 입력 유형 선택",
+    "choose_log_type": "로그 유형 선택"
+  },
+  "throttling_checkbox": {
+    "label": "스로틀링 활성화",
+    "help": "활성화하면 {{productName}} 서버가 메시지 부하를 따라잡을 때까지 이 입력에서 새 메시지를 읽지 않습니다. 파일이나 AMQP, Kafka 같은 메시지 큐 시스템에서 읽는 입력에 주로 유용합니다. HTTP 등으로 외부 시스템을 정기적으로 폴링하는 경우에는 일반적으로 비활성화 상태로 두십시오."
+  },
+  "grey_noise_adapter_documentation": {
+    "description": "GreyNoise Quick IP Lookup 데이터 어댑터는 <greynoiseLink>GreyNoise API</greynoiseLink>를 사용하여 지정한 키에 대한 지표를 조회하고 IP Quick Context 엔드포인트의 값을 반환합니다. <quickContextLink>IP Quick Context</quickContextLink>를 참조하십시오"
+  },
+  "grey_noise_adapter_field_set": {
+    "user_password_label": "사용자 비밀번호",
+    "reset_token_button": "토큰 재설정",
+    "api_token_label": "API 토큰",
+    "undo_reset_button": "재설정 취소",
+    "api_token_help": "API 토큰입니다."
+  },
+  "grey_noise_adapter_summary": {
+    "api_token_label": "API 토큰"
+  },
+  "slack_notification_details": {
+    "webhook_url_label": "Webhook URL",
+    "channel_label": "채널",
+    "custom_message_label": "사용자 지정 메시지 템플릿",
+    "empty_body": "본문 없음",
+    "include_event_procedure_label": "이메일 본문에 이벤트 절차 포함",
+    "backlog_limit_label": "메시지 백로그 제한",
+    "user_name_label": "사용자 이름",
+    "include_title_label": "제목 포함",
+    "notify_channel_label": "채널에 알림",
+    "link_names_label": "이름 링크",
+    "icon_url_label": "아이콘 URL",
+    "icon_emoji_label": "아이콘 이모지",
+    "time_zone_label": "시간대"
+  },
+  "teams_notification_details": {
+    "webhook_url_label": "Webhook URL",
+    "custom_message_label": "사용자 지정 메시지 템플릿",
+    "empty_body": "본문 없음",
+    "backlog_limit_label": "메시지 백로그 제한",
+    "icon_url_label": "아이콘 URL",
+    "time_zone_label": "시간대"
+  },
+  "teams_notification_v2_details": {
+    "webhook_url_label": "Webhook URL",
+    "adaptive_card_label": "Adaptive Card 템플릿",
+    "backlog_limit_label": "메시지 백로그 제한"
+  },
+  "slack_notification_form": {
+    "configuration_color_label": "구성 색상",
+    "change_color_button": "색상 변경",
+    "color_help": "이 구성에 사용할 색상을 선택하십시오.",
+    "custom_message_help": "경고 제목 아래에 추가할 사용자 지정 메시지입니다. 자세한 내용은 <docsLink/>를 참조하십시오.",
+    "docs_link_text": "문서",
+    "webhook_url_help": "Slack \"Incoming Webhook\" URL",
+    "channel_help": "Slack #channel 이름 또는 다이렉트 메시지를 보낼 @user",
+    "custom_message_label": "사용자 지정 메시지 (선택 사항)",
+    "time_zone_help": "알림 본문의 타임스탬프에 사용하는 시간대입니다.",
+    "time_zone_label": "날짜/시간 값의 시간대",
+    "backlog_limit_label": "메시지 백로그 제한 (선택 사항)",
+    "backlog_limit_help": "Slack 알림에 포함하여 보내는 백로그 메시지 수를 제한합니다. 0으로 설정하면 제한이 적용되지 않습니다.",
+    "user_name_label": "사용자 이름 (선택 사항)",
+    "user_name_help": "Slack에서 표시되는 발신자의 사용자 이름",
+    "include_title_help": "알림에 이벤트 정의 제목과 설명을 포함합니다",
+    "notify_channel_help": "메시지에 @channel을 추가하여 채널의 모든 사용자에게 알립니다",
+    "notify_here_label": "현재 접속자에게 알림",
+    "notify_here_help": "메시지에 @here를 추가하여 채널의 활성 사용자에게 알립니다",
+    "link_names_help": "채널 이름과 사용자 이름을 찾아 링크합니다",
+    "icon_url_label": "아이콘 URL (선택 사항)",
+    "icon_url_help": "이 메시지의 아이콘으로 사용할 이미지",
+    "icon_emoji_label": "아이콘 이모지 (선택 사항)",
+    "icon_emoji_help": "이 메시지의 아이콘으로 사용할 이모지 (아이콘 URL보다 우선 적용)"
+  },
+  "event_procedure_checkbox": {
+    "label": "이벤트 절차 포함",
+    "help": "이벤트 정의의 이벤트 절차를 형식화하여 알림 본문 끝에 추가합니다."
+  },
+  "slack_notification_summary": {
+    "color_label": "색상",
+    "custom_message_label": "사용자 지정 메시지",
+    "yes": "예",
+    "no": "아니요"
+  },
+  "teams_notification_summary": {
+    "color_label": "색상",
+    "custom_message_label": "사용자 지정 메시지"
+  },
+  "teams_notification_form": {
+    "webhook_url_help": "Teams \"Incoming Webhook\" URL",
+    "backlog_limit_help": "Microsoft Teams 알림에 포함하여 보내는 백로그 메시지 수를 제한합니다. 0으로 설정하면 제한이 적용되지 않습니다."
+  },
+  "teams_notification_v2_form": {
+    "adaptive_card_help": "Teams에 게시할 Adaptive Card입니다. 자세한 내용은 <docsLink/>를 참조하십시오.",
+    "backlog_toggle_aria_label": "메시지 백로그 제한 활성화"
+  },
+  "pager_duty_notification_details": {
+    "routing_key_label": "라우팅 키",
+    "incident_title_label": "인시던트 제목",
+    "custom_incident_label": "사용자 지정 인시던트",
+    "key_prefix_label": "키 접두사",
+    "incident_key_label": "인시던트 키",
+    "client_name_label": "클라이언트 이름",
+    "client_url_label": "클라이언트 URL"
+  },
+  "pager_duty_notification_form": {
+    "routing_key_label": "라우팅 키",
+    "routing_key_help": "Pager Duty 통합 라우팅 키입니다.",
+    "incident_title_label": "인시던트 제목",
+    "incident_title_help": "Pager Duty의 인시던트에 사용할 사용자 지정 제목입니다. 설정하지 않으면 {{productName}}에 표시되는 이벤트 제목이 사용됩니다.",
+    "custom_incident_label": "사용자 지정 인시던트 키 사용",
+    "custom_incident_help": "사용자 지정 인시던트 키를 생성합니다.",
+    "key_prefix_label": "인시던트 키 접두사",
+    "key_prefix_help": "스트림과 이벤트 정의 제목이 뒤에 붙는 인시던트 키 접두사입니다. 전체 키를 사용자 지정하려면 인시던트 키를 사용하십시오.",
+    "incident_key_label": "인시던트 키",
+    "incident_key_help": "인시던트를 식별하는 전체 키입니다. 제공하면 접두사 대신 사용됩니다.",
+    "client_name_label": "클라이언트 이름",
+    "client_name_help": "PagerDuty 이벤트를 트리거하는 {{productName}} 시스템의 이름입니다.",
+    "client_url_label": "클라이언트 URL",
+    "client_url_help": "PagerDuty 이벤트를 트리거하는 {{productName}} 시스템의 URL입니다."
+  },
+  "pager_duty_notification_summary": {
+    "routing_key_label": "라우팅 키",
+    "incident_title_label": "인시던트 제목",
+    "default_value": "기본값",
+    "use_custom_incident_key_label": "사용자 지정 인시던트 키 사용",
+    "yes": "예",
+    "no": "아니요",
+    "key_prefix_label": "인시던트 키 접두사",
+    "incident_key_label": "인시던트 키",
+    "client_name_label": "클라이언트 이름",
+    "client_url_label": "클라이언트 URL"
+  },
+  "threat_intel_plugin_config": {
+    "title": "위협 인텔리전스 조회 구성",
+    "description": "위협 인텔리전스 조회 플러그인의 구성입니다.",
+    "tor_exit_nodes_label": "Tor 출구 노드:",
+    "spamhaus_label": "Spamhaus:",
+    "enabled": "활성화됨",
+    "disabled": "비활성화됨",
+    "modal_title": "위협 인텔리전스 플러그인 구성 업데이트",
+    "tor_checkbox_label": "Tor 출구 노드 조회를 허용하시겠습니까?",
+    "tor_checkbox_help": "활성화하면 전역 파이프라인 함수에 Tor 출구 노드 조회가 포함됩니다. 비활성화하면 데이터 새로 고침도 중지됩니다.",
+    "spamhaus_checkbox_label": "Spamhaus DROP/EDROP 조회를 허용하시겠습니까?",
+    "spamhaus_checkbox_help": "활성화하면 전역 파이프라인 함수에 Spamhaus 조회가 포함됩니다. 비활성화하면 데이터 새로 고침도 중지됩니다."
+  },
+  "abusech_ransom_adapter_documentation": {
+    "deprecation_title": "지원 중단 경고",
+    "deprecation_text": "abuse.ch Ransomware Tracker는 2019-12-08에 종료되었습니다. 이 데이터 어댑터는 사용하지 마십시오."
+  },
+  "abusech_ransom_adapter_field_set": {
+    "domains_blocklist": "도메인 차단 목록",
+    "urls_blocklist": "URL 차단 목록",
+    "ips_blocklist": "IP 차단 목록",
+    "blocklist_type_label": "차단 목록 유형",
+    "blocklist_type_help": "abuse.ch 랜섬웨어 차단 목록의 유형을 선택하십시오",
+    "blocklist_type_placeholder": "차단 목록 유형 선택",
+    "refresh_blocklist_label": "차단 목록 새로 고침",
+    "refresh_blocklist_help": "활성화하면 abuse.ch 랜섬웨어 차단 목록이 변경될 때 새로 고침됩니다."
+  },
+  "abusech_ransom_adapter_summary": {
+    "domains_blocklist": "도메인 차단 목록",
+    "urls_blocklist": "URL 차단 목록",
+    "ips_blocklist": "IP 차단 목록",
+    "blocklist_type_label": "차단 목록 유형",
+    "update_interval_label": "업데이트 간격",
+    "deprecation_title": "지원 중단 경고",
+    "deprecation_text": "abuse.ch Ransomware Tracker는 2019-12-08에 종료되었습니다. 이 데이터 어댑터는 사용하지 마십시오."
+  },
+  "otx_adapter_documentation": {
+    "intro": "AlienVault OTX 데이터 어댑터는 <otxLink>OTX API</otxLink>를 사용하여 지정한 키에 대한 지표를 조회합니다.",
+    "configuration_title": "구성",
+    "indicator_title": "지표",
+    "indicator_description": "OTX API는 여러 가지 침해 지표(IOC)를 제공합니다. 이 데이터 어댑터에 사용할 지표를 선택해야 합니다.",
+    "ip_auto_detect": "<code>IP Auto-Detect</code> 지표는 공식 지표가 아닙니다. 동일한 데이터 어댑터를 IP v4 및 v6 주소에 사용할 수 있도록 IP 주소 유형을 자동으로 감지하기 위해 추가했습니다.",
+    "api_key_title": "OTX API 키",
+    "api_key_description": "OTX API 키는 API 요청을 인증하는 데 사용됩니다. API 키를 입력하지 않아도 요청은 작동하지만 요청 한도가 더 낮을 가능성이 높습니다. <strong>이 데이터 어댑터를 프로덕션 트래픽에 사용하는 경우 OTX 계정을 등록하고 API 키를 받으십시오.</strong>",
+    "api_url_title": "OTX API URL",
+    "api_url_description": "OTX API 서버의 HTTP URL입니다. 사용자 지정 서버로 테스트하는 경우가 아니면 기본 설정인 <code>https://otx.alienvault.com</code>을 변경하지 마십시오.",
+    "user_agent_title": "HTTP User-Agent",
+    "user_agent_description": "OTX API 요청의 <code>User-Agent</code> HTTP 헤더를 설정합니다. API 요청에 문제가 있을 때 OTX API 운영자가 연락할 수 있도록 연락처 정보를 포함하도록 수정할 수 있습니다.",
+    "connection_timeout_title": "HTTP 연결 제한 시간",
+    "connection_timeout_description": "OTX API 요청의 HTTP 연결 제한 시간(밀리초)입니다. 높은 값으로 설정하고 OTX API 연결이 느리면 처리 성능에 영향을 줄 수 있습니다.",
+    "write_timeout_title": "HTTP 쓰기 제한 시간",
+    "write_timeout_description": "OTX API 요청의 HTTP 쓰기 제한 시간(밀리초)입니다. 높은 값으로 설정하고 OTX API 연결이 느리면 처리 성능에 영향을 줄 수 있습니다.",
+    "read_timeout_title": "HTTP 읽기 제한 시간",
+    "read_timeout_description": "OTX API 요청의 HTTP 읽기 제한 시간(밀리초)입니다. 높은 값으로 설정하고 OTX API 연결이 느리면 처리 성능에 영향을 줄 수 있습니다."
+  },
+  "otx_adapter_field_set": {
+    "option_ip_auto_detect": "IP Auto-Detect",
+    "option_ip_v4": "IP v4",
+    "option_ip_v6": "IP v6",
+    "option_domain": "도메인",
+    "option_hostname": "호스트 이름",
+    "option_file": "파일",
+    "option_url": "URL",
+    "option_cve": "CVE",
+    "option_nids": "NIDS",
+    "option_correlation_rule": "상관관계 규칙",
+    "indicator_label": "지표",
+    "indicator_help": "조회에 사용할 OTX 지표 유형입니다.",
+    "indicator_placeholder": "지표 선택",
+    "api_key_label": "OTX API 키",
+    "api_key_help": "OTX API 키입니다.",
+    "api_url_label": "OTX API URL",
+    "api_url_help": "OTX API 서버의 URL입니다.",
+    "user_agent_label": "HTTP User-Agent",
+    "user_agent_help": "HTTP 요청에 사용할 User-Agent 헤더입니다.",
+    "connect_timeout_label": "HTTP 연결 제한 시간",
+    "connect_timeout_help": "HTTP 연결 제한 시간(밀리초)입니다.",
+    "write_timeout_label": "HTTP 쓰기 제한 시간",
+    "write_timeout_help": "HTTP 쓰기 제한 시간(밀리초)입니다.",
+    "read_timeout_label": "HTTP 읽기 제한 시간",
+    "read_timeout_help": "HTTP 읽기 제한 시간(밀리초)입니다."
+  },
+  "otx_adapter_summary": {
+    "not_available": "해당 없음",
+    "unit_ms": "ms"
+  },
+  "spamhaus_edrop_adapter_summary": {
+    "no_configuration": "필요한 구성이 없습니다."
+  },
+  "tor_exit_node_adapter_summary": {
+    "no_configuration": "필요한 구성이 없습니다"
+  },
+  "whois_adapter_documentation": {
+    "intro": "whois IP 조회 데이터 어댑터는 IP 주소의 네트워크 소유권 정보를 요청할 수 있습니다.",
+    "configuration_title": "구성",
+    "connect_timeout_description": "whois 서버에 대한 소켓의 연결 제한 시간(밀리초)입니다. 높은 값으로 설정하면 처리 성능에 영향을 줄 수 있습니다.",
+    "read_timeout_description": "whois 서버에 대한 소켓의 연결 읽기 제한 시간(밀리초)입니다. 높은 값으로 설정하면 처리 성능에 영향을 줄 수 있습니다."
+  },
+  "whois_adapter_field_set": {
+    "connect_timeout_label": "연결 제한 시간",
+    "connect_timeout_help": "WHOIS 연결 제한 시간(밀리초)입니다.",
+    "read_timeout_label": "읽기 제한 시간",
+    "read_timeout_help": "WHOIS 연결 읽기 제한 시간(밀리초)입니다."
+  },
+  "whois_adapter_summary": {
+    "unit_ms": "ms"
+  }
+}

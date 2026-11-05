@@ -1,0 +1,252 @@
+{
+  "extractors_of": "{{title}}의 추출기",
+  "actions": "작업",
+  "import_extractors": "추출기 가져오기",
+  "export_extractors": "추출기 내보내기",
+  "documentation_title": "추출기 문서",
+  "description": "추출기는 이 입력이 수신하는 모든 메시지에 적용됩니다. 추출기를 사용하여 텍스트 데이터를 추출하고 변환하면 나중에 쉽게 필터링하고 분석할 수 있는 필드로 만들 수 있습니다. 예: 로그 메시지에서 HTTP 응답 코드를 추출하여 숫자 필드로 변환한 다음 {{field}}(으)로 메시지에 첨부합니다.",
+  "list_item": {
+    "subtitle_copy": "<em>{{source}}</em>에서 <em>{{target}}</em>(으)로 데이터를 추출하며 원본은 그대로 둡니다.",
+    "subtitle_cut": "<em>{{source}}</em>에서 <em>{{target}}</em>(으)로 데이터를 추출하며 원본은 그대로 두지 않습니다.",
+    "condition": "조건",
+    "condition_string": "메시지에 문자열 <em>{{value}}</em>이(가) 포함된 경우에만 실행을 시도합니다",
+    "condition_regex": "메시지가 정규식 <em>{{value}}</em>과(와) 일치하는 경우에만 실행을 시도합니다",
+    "confirm_delete": "추출기 \"{{title}}\"을(를) 제거하시겠습니까?",
+    "details": "세부 정보",
+    "edit": "편집",
+    "delete": "삭제",
+    "no_configuration": "구성 옵션 없음",
+    "configuration": "구성",
+    "converters": "변환기"
+  },
+  "metrics": {
+    "title": "메트릭",
+    "percentile_95": "95번째 백분위수:",
+    "percentile_98": "98번째 백분위수:",
+    "percentile_99": "99번째 백분위수:",
+    "std_dev": "표준 편차:",
+    "mean": "평균:",
+    "minimum": "최소:",
+    "maximum": "최대:",
+    "invocations": "부팅 이후 총 {{total}}회 호출, 평균: {{oneMinute}}, {{fiveMinutes}}, {{fifteenMinutes}}.",
+    "hits_misses": "적중 {{hits}}회, 미적중 {{misses}}회",
+    "no_messages": "아직 이곳을 통과한 메시지가 없습니다.",
+    "total_time": "총 시간",
+    "condition_time": "조건 시간",
+    "execution_time": "실행 시간",
+    "converter_time": "변환기 시간",
+    "microseconds": "{{value}}μs"
+  },
+  "edit": {
+    "condition_string_label": "필드에 문자열 포함",
+    "condition_string_help": "추출을 시도하기 위해 필드에 포함되어야 하는 문자열을 입력하십시오.",
+    "condition_regex_label": "필드가 정규식과 일치",
+    "condition_regex_help": "추출을 시도하기 위해 필드에 포함되어야 하는 정규식을 입력하십시오.",
+    "condition_matches": "일치합니다! 추출기가 이 예시에 대해 실행됩니다.",
+    "condition_no_match": "일치하지 않습니다! 추출기가 실행되지 않습니다.",
+    "try": "시도",
+    "condition_type_help": "특정 조건과 일치하는 메시지에서만 추출하면 잘못되었거나 불필요한 추출을 피할 수 있고 CPU 리소스도 절약할 수 있습니다.",
+    "cursor_strategy_help": "소스에서 복사하시겠습니까, 잘라내시겠습니까? <em>message</em> 및 <em>source</em>와 같은 표준 필드에는 잘라내기 기능을 사용할 수 없습니다.",
+    "target_field_help": "추출한 값을 저장할 필드 이름을 선택하십시오. <b>영숫자와 밑줄</b>만 사용할 수 있습니다. 예: <em>http_response_code</em>.",
+    "store_as_field": "필드로 저장",
+    "example_message": "예시 메시지",
+    "configuration": "추출기 구성",
+    "extractor_type": "추출기 유형",
+    "source_field": "소스 필드",
+    "condition": "조건",
+    "condition_none": "항상 추출 시도",
+    "condition_string": "필드에 문자열이 포함된 경우에만 추출 시도",
+    "condition_regex": "필드가 정규식과 일치하는 경우에만 추출 시도",
+    "extraction_strategy": "추출 전략",
+    "copy": "복사",
+    "cut": "잘라내기",
+    "title": "추출기 제목",
+    "title_help": "이 추출기를 설명하는 이름입니다.",
+    "create": "추출기 만들기",
+    "update": "추출기 업데이트"
+  },
+  "converters": {
+    "csv_enable": "CSV 열을 필드로 추가",
+    "csv_field_names": "필드 이름",
+    "csv_separator": "구분 문자",
+    "csv_quote": "따옴표 문자",
+    "csv_escape": "이스케이프 문자",
+    "csv_escape_help": "구분 문자와 따옴표 문자를 이스케이프하는 데 사용하는 문자입니다.",
+    "csv_strict_quotes": "엄격한 따옴표 사용",
+    "csv_strict_quotes_help": "따옴표 바깥의 내용을 무시합니다.",
+    "csv_trim": "앞쪽 공백 제거",
+    "date_enable": "날짜 유형으로 변환",
+    "date_format": "형식 문자열",
+    "time_zone": "시간대",
+    "locale": "로캘",
+    "flexdate_enable": "날짜를 유연하게 구문 분석",
+    "hash": "값에서 MD5 해시 생성",
+    "ip_anonymizer": "마지막 옥텟을 치환하여 IPv4 주소 익명화",
+    "lookup_table_enable": "조회 테이블을 사용하여 값 변환",
+    "lookup_table": "조회 테이블",
+    "lookup_table_placeholder": "조회 테이블 선택",
+    "lowercase": "값을 소문자로 변환",
+    "numeric": "숫자 값으로 변환",
+    "split_and_count": "분할 및 개수 세기",
+    "split_by": "분할 기준",
+    "syslog_pri_facility": "PRI에서 syslog 퍼실리티로 변환",
+    "syslog_pri_level": "PRI에서 syslog 레벨로 변환",
+    "tokenizer": "Key=Value 쌍을 필드로 추가",
+    "uppercase": "값을 대문자로 변환",
+    "csv_separator_help": "예를 들어 <code>,</code>, <code>\\n</code>, <code>\\t</code>는 단일 문자로 변환됩니다.",
+    "date_format_help": "날짜가 사용하는 문자열 형식입니다. 자세한 내용은 <docsLink>문서</docsLink>를 참조하십시오.",
+    "time_zone_help": "날짜에 적용할 시간대입니다. 자세한 내용은 <docsLink>문서</docsLink>를 참조하십시오.",
+    "locale_help": "날짜를 구문 분석할 때 사용할 로캘입니다. 자세한 내용은 <docsLink>문서</docsLink>를 참조하십시오.",
+    "lookup_table_help": "조회 테이블은 <lookupTablesLink>여기</lookupTablesLink>에서 만들 수 있습니다.",
+    "split_by_help": "분할 및 개수 세기 변환기는 추출된 부분을 정의된 문자로 분할하고 토큰 수를 필드로 저장합니다. <strong>예:</strong> <em>?fields=first_name,last_name,zip</em>을 <em>,</em>로 분할하면 결과는 <em>3</em>입니다. GET 사용자 REST 요청에서 요청된 필드 수를 센 것입니다."
+  },
+  "wizard": {
+    "title": "추출기 추가",
+    "description": "작업할 예시를 얻기 위해 먼저 메시지를 로드하십시오. 이 입력이 수신한 최근 메시지를 로드하거나 ID로 메시지를 직접 선택할 수 있습니다.",
+    "create": "추출기 만들기"
+  },
+  "configuration": {
+    "preview": "추출기 미리 보기",
+    "nothing_extracted": "추출되는 항목이 없습니다",
+    "try_example": "예시로 시도"
+  },
+  "converters_editor": {
+    "not_supported": "<em>{{type}}</em> 추출기에는 변환기를 추가할 수 없습니다.",
+    "add_label": "변환기 추가",
+    "add_help": "추출된 값을 변환할 변환기를 추가합니다.",
+    "select_placeholder": "변환기 선택",
+    "add": "추가"
+  },
+  "export": {
+    "json_title": "추출기 JSON",
+    "copy": "추출기 복사"
+  },
+  "example_message": {
+    "not_loaded": "필드 ‘{{field}}’의 예시를 로드할 수 없습니다. 업데이트하기 전에는 추출기를 테스트할 수 없습니다."
+  },
+  "sort": {
+    "title": "<em>{{title}}</em>의 추출기 정렬",
+    "description": "목록에서 추출기를 끌어다 놓아 적용 순서를 변경하십시오.",
+    "submit": "정렬 업데이트"
+  },
+  "list": {
+    "sort": "추출기 정렬",
+    "title": "구성된 추출기",
+    "no_extractors": "이 입력에는 구성된 추출기가 없습니다."
+  },
+  "import": {
+    "parse_error": "추출기를 구문 분석하는 중 오류가 발생했습니다. JSON 형식입니까? {{error}}",
+    "parse_error_title": "추출기를 가져올 수 없습니다",
+    "submit": "입력에 추출기 추가"
+  },
+  "message_loader": {
+    "load": "메시지 로드",
+    "loading": "메시지를 로드하는 중...",
+    "wrong_example": "예시가 잘못되었습니까?",
+    "load_another": "다른 메시지 로드",
+    "message_id": "메시지 ID",
+    "index": "인덱스"
+  },
+  "copy_input": {
+    "description": "전체 입력이 그대로 복사됩니다."
+  },
+  "grok": {
+    "error": "다음 오류로 인해 grok 추출을 실행할 수 없습니다: {{error}}",
+    "no_match": "grok 추출을 실행할 수 없습니다. 매개변수를 확인하십시오.",
+    "named_captures_only": "이름 있는 캡처만",
+    "named_captures_only_help": "명시적으로 이름이 지정된 캡처만 메시지에 넣습니다.",
+    "pattern": "Grok 패턴"
+  },
+  "json": {
+    "flatten": "구조 평탄화",
+    "flatten_help": "JSON 객체를 하나의 메시지 필드로 평탄화할지, 여러 필드로 확장할지 여부입니다.",
+    "list_separator": "목록 항목 구분자",
+    "list_separator_help": "JSON 목록의 항목을 연결하는 데 사용할 문자열입니다.",
+    "key_separator": "키 구분자",
+    "key_separator_help": "중첩된 JSON 객체의 서로 다른 키를 연결하는 데 사용할 문자열입니다(평탄화하지 <em>않은</em> 경우에만 사용).",
+    "kv_separator": "키/값 구분자",
+    "kv_separator_help": "JSON 객체의 키/값 쌍을 연결하는 데 사용할 문자열입니다(평탄화한 경우에만 사용).",
+    "key_prefix": "키 접두사",
+    "key_prefix_help": "JSON 객체에서 추출한 각 키 앞에 붙일 텍스트입니다.",
+    "replace_key_whitespace": "키의 공백 치환",
+    "replace_key_whitespace_help": "공백이 포함된 필드 키는 추출된 메시지를 저장할 때 버려집니다. JSON 키의 공백을 다른 문자로 치환하려면 이 상자를 선택하십시오.",
+    "key_whitespace_replacement": "키 공백 치환 문자",
+    "key_whitespace_replacement_help": "메시지 키의 공백을 치환할 때 사용할 문자입니다. 치환 문자가 Lucene에서 유효한지 확인하십시오(예: '-' 또는 '_')."
+  },
+  "lookup_table": {
+    "error": "조회를 실행할 수 없습니다: {{error}}"
+  },
+  "regex": {
+    "no_match": "정규식이 일치하지 않았습니다.",
+    "no_group": "정규식에 추출할 매처 그룹이 없습니다.",
+    "help": "추출에 사용하는 정규식입니다. 첫 번째 매처 그룹이 사용됩니다. 자세한 내용은 <docsLink>문서</docsLink>를 참조하십시오.",
+    "label": "정규식"
+  },
+  "regex_replace": {
+    "regex_help": "추출에 사용하는 정규식입니다. 자세한 내용은 <docsLink>문서</docsLink>를 참조하십시오.",
+    "replacement_help": "일치하는 텍스트에 사용할 치환 값입니다. 가능한 옵션은 <matcherLink>Matcher</matcherLink> API 문서를 참조하십시오.",
+    "replacement": "치환 값",
+    "replace_all": "패턴의 모든 항목 치환",
+    "replace_all_help": "지정한 패턴의 모든 항목을 치환할지, 첫 번째 항목만 치환할지 여부입니다."
+  },
+  "split_and_index": {
+    "no_match": "분할 및 인덱스 추출을 실행할 수 없습니다. 매개변수를 확인하십시오.",
+    "split_by_help": "분할할 문자입니다. <strong>예:</strong> 공백 문자는 <em>foo bar baz</em>를 <em>[foo,bar,baz]</em>로 분할합니다.",
+    "index_help": "분할된 문자열의 어느 부분을 사용하시겠습니까? <strong>예:</strong> 공백으로 분할할 때 <em>2</em>는 <em>foo bar baz</em>에서 <em>bar</em>를 선택합니다.",
+    "index": "대상 인덱스"
+  },
+  "substring": {
+    "no_match": "부분 문자열 추출을 실행할 수 없습니다. 인덱스 범위를 확인하십시오.",
+    "end_index_help": "추출을 끝낼 위치입니다. (해당 위치 제외) <strong>예:</strong> <em>1,5</em>는 문자열 <em>ilovelogs</em>에서 <em>love</em>를 잘라냅니다.",
+    "begin_index": "시작 인덱스",
+    "begin_index_help": "추출을 시작할 문자 위치입니다. (해당 위치 포함)",
+    "end_index": "끝 인덱스"
+  },
+  "pages": {
+    "new_title": "입력 {{title}}의 새 추출기",
+    "new_header": "입력 <em>{{title}}</em>의 새 추출기",
+    "edit_title": "추출기 {{title}} 편집",
+    "edit_header": "입력 <em>{{inputTitle}}</em>의 추출기 <em>{{title}}</em> 편집",
+    "description": "추출기는 입력이 수신하는 모든 메시지에 적용됩니다. 추출기를 사용하여 텍스트 데이터를 추출하고 변환하면 나중에 쉽게 필터링하고 분석할 수 있는 필드로 만들 수 있습니다.",
+    "export_title": "{{title}}의 추출기 내보내기",
+    "export_header": "<em>{{title}}</em>의 추출기 내보내기",
+    "export_marketplace_prefix": "입력의 추출기는 JSON으로 내보내 다른 환경으로 가져오거나 다음 위치에서 공유할 수 있습니다:",
+    "import_title": "{{title}}(으)로 추출기 가져오기",
+    "import_header": "<em>{{title}}</em>(으)로 추출기 가져오기",
+    "import_description": "내보낸 추출기를 입력으로 가져올 수 있습니다.",
+    "import_marketplace_prefix": "필요한 것은 다른 {{productName}} 환경 또는 다음 위치에서 가져온 추출기의 JSON 내보내기 파일뿐입니다:"
+  },
+  "tools_api": {
+    "details": "세부 정보: {{error}}",
+    "natural_date_failed": "키워드 미리 보기를 로드하지 못했습니다. 상태: {{error}}",
+    "natural_date_failed_title": "키워드 미리 보기를 로드할 수 없습니다",
+    "grok_failed_title": "grok 추출을 실행할 수 없습니다. 매개변수를 확인하십시오.",
+    "json_failed_title": "JSON 추출을 실행할 수 없습니다. 매개변수를 확인하십시오.",
+    "regex_invalid_title": "정규식을 검증할 수 없습니다. 올바른 정규식인지 확인하십시오.",
+    "allowlist_check_title": "URL이 허용 목록에 있는지 확인할 수 없습니다.",
+    "regex_generate_title": "정규식을 생성할 수 없습니다.",
+    "regex_try_title": "정규식을 시도할 수 없습니다. 올바른 정규식인지 확인하십시오.",
+    "split_index_failed_title": "분할 및 인덱스 추출을 실행할 수 없습니다. 매개변수를 확인하십시오.",
+    "substring_failed_title": "부분 문자열 추출을 실행할 수 없습니다. 인덱스 범위를 확인하십시오.",
+    "contains_string_failed_title": "필드에 문자열이 포함되어 있는지 확인할 수 없습니다",
+    "lookup_table_failed_title": "조회 테이블이 문자열을 변환하는지 확인할 수 없습니다"
+  },
+  "use_extractors_notifications": {
+    "created_success": "추출기 {{title}}이(가) 만들어졌습니다",
+    "create_failed": "추출기를 만들지 못했습니다: {{error}}",
+    "create_failed_title": "추출기를 만들 수 없습니다",
+    "updated_success": "추출기 \"{{title}}\"이(가) 업데이트되었습니다",
+    "update_failed": "추출기를 업데이트하지 못했습니다: {{error}}",
+    "update_failed_title": "추출기를 업데이트할 수 없습니다",
+    "deleted_success": "추출기 \"{{title}}\"이(가) 삭제되었습니다",
+    "delete_failed": "추출기를 삭제하지 못했습니다: {{error}}",
+    "delete_failed_title": "추출기 {{title}}을(를) 삭제할 수 없습니다",
+    "positions_updated_success": "추출기 위치가 업데이트되었습니다",
+    "positions_failed": "추출기 위치를 변경하지 못했습니다: {{error}}",
+    "positions_failed_title": "추출기 위치를 업데이트할 수 없습니다",
+    "import_success": "가져오기 결과: 추출기 {{successful}}개를 가져왔습니다.",
+    "import_success_title": "가져오기 작업 성공",
+    "import_warning": "가져오기 결과: 추출기 {{successful}}개를 가져왔으며 오류가 {{failed}}건 발생했습니다.",
+    "import_warning_title": "가져오기 작업 완료"
+  }
+}

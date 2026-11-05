@@ -1,0 +1,222 @@
+{
+  "copy_to_dashboard": {
+    "title": "위젯을 대시보드에 복사",
+    "no_dashboards": "대시보드를 찾을 수 없습니다.",
+    "create_new": "새 대시보드 만들기"
+  },
+  "edit_message_list": {
+    "fields": "필드",
+    "message_preview": "메시지 미리 보기",
+    "sorting": "정렬",
+    "direction": "방향",
+    "decorators": "데코레이터"
+  },
+  "widget_frame": {
+    "loading": "위젯을 불러오는 중 ..."
+  },
+  "export_widget": {
+    "export_all": "모든 검색 결과 내보내기",
+    "title": "위젯 내보내기",
+    "enterprise_explanation": "집계 위젯 내보내기 기능은 Enterprise 버전에서 사용할 수 있습니다. 이 기능은 데이터를 CSV, JSON, YAML, XML 등 널리 사용되는 파일 형식으로 내보내는 옵션을 제공합니다."
+  },
+  "field_sort": {
+    "placeholder": "없음: 클릭하여 필드 추가",
+    "aria_label": "정렬할 필드 선택"
+  },
+  "fields_configuration": {
+    "add_field": "필드 추가",
+    "hide_selected_other": "선택한 필드 {{count}}개 숨기기",
+    "show_selected_other": "선택한 필드 {{count}}개 표시"
+  },
+  "move_widget": {
+    "no_pages": "페이지를 찾을 수 없습니다",
+    "copy": "위젯 복사",
+    "move": "위젯 이동",
+    "title": "대상 페이지 선택",
+    "keep_copy": "이 페이지에 사본 유지",
+    "keep_copy_help": "'이 페이지에 사본 유지'를 사용하면 위젯이 다른 페이지로 이동되지 않고 복사됩니다"
+  },
+  "widget_edit": {
+    "update": "위젯 업데이트",
+    "updating": "위젯 업데이트 중..."
+  },
+  "execution_info": {
+    "executed_at": "실행 시각:",
+    "executed_at_label": "실행 시각",
+    "executed_in": "실행 시간:",
+    "duration": "{{duration}}ms",
+    "effective_time_range": "유효 시간 범위:",
+    "from": "시작",
+    "to": "종료",
+    "from_label": "유효 시간 범위 시작",
+    "to_label": "유효 시간 범위 종료",
+    "total_results": "총 결과:",
+    "title": "실행 정보",
+    "no_query_executed": "아직 실행된 쿼리가 없습니다."
+  },
+  "selected_fields": {
+    "fields": "필드",
+    "edit_field": "{{field}} 필드 편집",
+    "remove_field": "{{field}} 필드 제거"
+  },
+  "sort_direction": {
+    "ascending": "오름차순",
+    "descending": "내림차순",
+    "no_sorting": "선택된 정렬 없음",
+    "select_direction": "클릭하여 방향 선택"
+  },
+  "timerange_info": {
+    "global_override": "전역 재정의: {{timerange}}",
+    "effective_unavailable": "현재 유효 위젯 시간 범위를 사용할 수 없습니다.",
+    "independent": "이 위젯의 결과는 현재 검색과 무관합니다.",
+    "all_time": "전체 기간"
+  },
+  "unknown_widget": {
+    "title": "알 수 없는 위젯: {{type}}",
+    "cannot_render": "<strong>{{type}}</strong> 유형의 위젯을 처리하는 방법을 알 수 없어 이 위젯을 렌더링할 수 없습니다. 다음 상황 중 하나가 원인일 수 있습니다:",
+    "missing_plugin": "현재 없는 플러그인을 사용하여 이 위젯을 만들었습니다.",
+    "legacy_dashboard": "이 위젯은 레거시 대시보드의 일부였으며 더 이상 사용할 수 없는 플러그인으로 만들어졌습니다.",
+    "what_to_do": "어떻게 해야 할까요? 플러그인을 다시 로드하거나, 현재 {{productName}} 버전에서 작동하는 플러그인에 대해 원래 플러그인 작성자에게 문의하거나, 더 이상 필요하지 않다면 위젯을 제거할 수 있습니다.",
+    "copy_config": "어느 경우든 위젯의 구성을 클립보드에 복사할 수 있습니다:"
+  },
+  "widget_actions": {
+    "open_dropdown": "작업 드롭다운 열기",
+    "unfocus": "위젯 포커스 해제",
+    "focus": "이 위젯에 포커스",
+    "edit": "편집",
+    "duplicate": "복제",
+    "copy_to_dashboard": "대시보드에 복사",
+    "move_to_page": "페이지로 이동",
+    "copying": "위젯 복사 중...",
+    "copy": "위젯 복사",
+    "confirm_remove": "위젯 \"{{title}}\"을(를) 제거하시겠습니까?",
+    "compress_width": "너비 줄이기",
+    "stretch_width": "너비 늘리기",
+    "replay_search": "검색 다시 실행"
+  },
+  "widget_loading": {
+    "content": "위젯 콘텐츠를 불러오는 중"
+  },
+  "widget_errors": {
+    "render_error": "이 위젯을 렌더링하는 동안 다음 오류가 발생했습니다:"
+  },
+  "widget_header": {
+    "no_description": "제공된 위젯 설명이 없습니다",
+    "show_description": "위젯 설명 표시",
+    "description_placeholder": "위젯에 유용한 설명을 추가하십시오",
+    "drag_handle": "{{title}}의 드래그 핸들"
+  },
+  "warm_tier": {
+    "info": "정보",
+    "loading_slow": "이 위젯은 Warm Tier에서 데이터를 가져오고 있으며 불러오는 데 시간이 더 걸릴 수 있습니다."
+  },
+  "events_widget": {
+    "actions": "작업",
+    "replay_search": "검색 다시 실행",
+    "view_details": "이벤트 세부 정보 보기",
+    "toggle_actions": "이벤트 작업 전환",
+    "details_title": "이벤트 세부 정보",
+    "close": "닫기",
+    "unknown_visualization": "알 수 없는 위젯 시각화 유형 {{mode}}",
+    "mode_list": "목록",
+    "mode_count": "개수",
+    "visualization": "시각화",
+    "columns": "열",
+    "select_column": "새 열 선택",
+    "filter": "필터",
+    "sorting": "정렬",
+    "unknown_attribute": "알 수 없음",
+    "unknown_attribute_help": "이 속성은 유효한 라이선스가 필요하므로 현재 사용할 수 없습니다.",
+    "select_event_definition": "이벤트 정의 선택",
+    "alert": "경고",
+    "event": "이벤트"
+  },
+  "overview_configuration": {
+    "remove_column": "{{column}} 열 제거",
+    "column": "열",
+    "select_column": "열 선택",
+    "direction": "방향",
+    "select_direction": "방향 선택",
+    "type": "유형",
+    "add_column": "열 추가",
+    "configure_filter": "새 필터 구성",
+    "edit_filter": "{{column}} 필터 편집",
+    "delete_filter": "{{column}} 필터 삭제"
+  },
+  "date_filter": {
+    "single_date": "단일 날짜",
+    "range": "범위",
+    "select_single_date": "단일 날짜 유형 선택",
+    "select_range": "범위 유형 선택",
+    "date_range": "{{from}} ~ {{to}}"
+  },
+  "message_table": {
+    "actions": "작업",
+    "loading": "불러오는 중",
+    "decorated": "(데코레이트됨)",
+    "stopped_node": "중지된 노드",
+    "cluster_node": "클러스터 노드 {{nodeId}} / {{hostname}}",
+    "decorators": {
+      "create_new": "새 {{name}} 만들기",
+      "select_decorator": "데코레이터 선택",
+      "none_configured": "구성된 데코레이터가 없습니다.",
+      "actions": "작업",
+      "edit": "편집",
+      "edit_named": "{{name}} 편집",
+      "unknown_type": "알 수 없는 데코레이터 유형",
+      "create": "만들기",
+      "update": "업데이트",
+      "help_title": "메시지 데코레이터란 무엇입니까?",
+      "help_description": "데코레이터는 검색 결과에 표시되는 메시지를 즉석에서 수정할 수 있습니다. 이러한 변경 사항은 저장되지 않고 검색 결과에만 표시됩니다. 데코레이터 구성은 <strong>스트림별로</strong> 저장됩니다.",
+      "help_order": "끌어서 놓기를 사용하여 데코레이터가 처리되는 순서를 수정하십시오.",
+      "help_docs": "메시지 데코레이터에 대한 자세한 내용은 <docsLink>문서</docsLink>를 참조하십시오."
+    },
+    "show_message_in_new_row": "메시지를 새 행에 표시"
+  },
+  "data_table": {
+    "spacer": "스페이서",
+    "display_name": "데이터 테이블",
+    "pinned_columns_title": "고정된 열",
+    "show_row_numbers_title": "행 번호 표시"
+  },
+  "field_types": {
+    "missing_event_definition": "이벤트 정의 없음: {{id}}"
+  },
+  "export": {
+    "title_search": "모든 검색 결과 내보내기",
+    "title_dashboard": "메시지 테이블 검색 결과 내보내기",
+    "select_different_table": "다른 메시지 테이블 선택",
+    "downloading": "다운로드 중...",
+    "start_download": "다운로드 시작",
+    "settings_based_on": "다음 설정은 메시지 테이블 {{title}}을(를) 기반으로 합니다",
+    "exporting_table": "현재 메시지 테이블 {{title}}의 검색 결과를 내보내고 있습니다",
+    "define_fields": "파일에 포함할 필드를 정의하십시오.",
+    "decorated_fields_hint": "내보내기는 메시지 테이블에 포함된 데코레이터가 만든 필드를 지원하지만 현재 필드 목록에는 표시되지 않습니다. 데코레이트된 필드를 내보내려면 해당 이름을 입력하십시오.",
+    "finish_hint": "구성을 마쳤으면 <quote>다운로드 시작</quote>을 클릭하십시오.",
+    "fields_to_export": "내보낼 필드",
+    "messages_limit": "메시지 제한",
+    "limit_help": "메시지는 청크 단위로 로드됩니다. 제한이 정의된 경우 제한에 도달하는 청크까지의 모든 청크를 가져옵니다. 즉, 전달되는 메시지의 총 개수가 정의된 제한보다 많을 수 있습니다.",
+    "search_contains_all": "내보내기에는 현재 검색의 모든 메시지가 포함됩니다.",
+    "search_select_table": "필드를 적용할 메시지 테이블을 선택하십시오. 다음 단계에서 모든 설정을 조정할 수 있습니다.",
+    "dashboard_select_table": "검색 결과를 내보낼 메시지 테이블을 선택하십시오. 다음 단계에서 필드를 조정할 수 있습니다.",
+    "dashboard_equals_action": "메시지 테이블을 선택하는 것은 메시지 테이블 작업 메뉴에서 \"CSV로 내보내기\" 옵션을 사용하는 것과 같습니다.",
+    "select_message_table": "메시지 테이블 선택",
+    "no_message_table": "결과를 내보내려면 메시지 테이블 위젯을 만들어야 합니다.",
+    "output_format": "출력 형식",
+    "untitled_view": "제목 없는 {{type}}"
+  },
+  "enterprise_widgets": {
+    "message_list": "메시지 목록",
+    "results": "결과",
+    "events": "이벤트",
+    "text_markdown": "텍스트/마크다운"
+  },
+  "comma_separated_values_csv": "쉼표로 구분된 값 (CSV)",
+  "error_widget": {
+    "title": "이 위젯의 데이터를 가져오는 동안 다음 오류가 발생했습니다:"
+  },
+  "notifications": {
+    "delete_decorator_confirm": "이 데코레이터를 삭제하시겠습니까?",
+    "unsaved_changes_confirm": "구성 양식에 저장되지 않은 변경 사항이 있습니다. 이 작업을 수행하면 변경 사항이 되돌려집니다"
+  }
+}

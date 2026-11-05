@@ -1,0 +1,11 @@
+{
+  "title": "인증서",
+  "certificate_list": "인증서 목록",
+  "certificate_name": "이름",
+  "certificate_expiration": "만료일",
+  "certificate_details": "세부 정보",
+  "certificate_status": "상태",
+  "certificate_active": "활성",
+  "certificate_expired": "만료됨",
+  "certificate_revoked": "해지됨"
+}

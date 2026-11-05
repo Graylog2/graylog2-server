@@ -1,0 +1,558 @@
+{
+  "button": {
+    "perform_search": "검색 실행",
+    "perform_search_dirty": "검색 실행 (마지막 검색 실행 이후 변경 사항이 있습니다)"
+  },
+  "sidebar": {
+    "description": "설명",
+    "create": "만들기",
+    "highlighting": "강조 표시",
+    "fields": "필드"
+  },
+  "empty_state": {
+    "no_widgets_search": "검색 결과를 시각화할 위젯이 정의되어 있지 않습니다",
+    "no_widgets_dashboard": "이 대시보드에는 아직 위젯이 없습니다",
+    "create_widget_hint": "왼쪽 사이드바의 \"만들기\" 섹션에서 위젯 유형을 선택하여 새 위젯을 만드십시오.",
+    "tips_title": "검색과 대시보드를 만들기 위한 몇 가지 팁",
+    "tip_1": "답을 찾고자 하는 <bold>질문</bold>으로 시작하십시오. 해결하려는 문제를 정의하십시오.",
+    "tip_2": "보고자 하는 데이터 포인트만 보이도록 데이터를 <bold>제한</bold>하십시오.",
+    "tip_3": "데이터를 <bold>시각화</bold>하십시오. 질문에 대한 답이 되는지 확인하십시오.",
+    "tip_4": "대시보드를 동료와 <bold>공유</bold>하십시오. 매개변수를 사용하여 <bold>재사용</bold>할 수 있도록 준비하십시오"
+  },
+  "search_bar": {
+    "streams_placeholder": "검색에 포함할 스트림을 선택하십시오. 비워 두면 모든 스트림에서 검색합니다.",
+    "refresh_human_name": "검색",
+    "query_history_title": "쿼리 기록 열기",
+    "filters_label": "필터",
+    "filters_tooltip_title": "검색 필터",
+    "filters_enterprise_hint": "검색 필터와 매개변수는 Enterprise 버전에서 사용할 수 있습니다.",
+    "filters_hide_controls": "컨트롤 숨기기",
+    "scroll_hint": "검색 표시줄로 스크롤",
+    "query_placeholder": "여기에 검색 쿼리를 입력하고 Enter 키를 누르십시오. 예: (\"not found\" AND http) OR http_response_code:[400 TO 404]"
+  },
+  "actions_menu": {
+    "saved_search": "저장된 검색",
+    "save_search": "검색 저장",
+    "unsaved_changes": "저장되지 않은 변경 사항",
+    "load_title": "이전에 저장한 검색 불러오기",
+    "load": "불러오기",
+    "share_disabled": "저장된 검색만 공유할 수 있습니다.",
+    "dropdown_aria_label": "검색 작업 드롭다운 열기",
+    "edit_metadata": "메타데이터 편집",
+    "export_to_dashboard": "대시보드로 내보내기",
+    "export": "내보내기",
+    "reset_search": "검색 초기화",
+    "editing_modal_title": "저장된 검색 편집",
+    "update_search": "검색 업데이트",
+    "share_description": "이 저장된 검색의 공동 작업자로 추가할 사용자 또는 팀을 검색하십시오.",
+    "save_success": "뷰 \"{{title}}\"을(를) 저장했습니다!",
+    "save_error": "뷰를 저장하지 못했습니다: {{error}}",
+    "delete_success": "저장된 검색 \"{{title}}\"을(를) 삭제했습니다!",
+    "delete_error": "저장된 검색을 삭제하지 못했습니다: {{error}}"
+  },
+  "save_form": {
+    "popover_title": "검색 이름",
+    "dirty_warning": "검색 매개변수(시간 범위, 스트림 또는 쿼리)에 확인되지 않은 변경 사항이 있습니다. 지금 저장하면 해당 변경 사항이 삭제됩니다. 의도한 것이 아니라면 저장하기 전에 검색을 실행하여 변경 사항을 적용하십시오.",
+    "title_label": "제목",
+    "title_placeholder": "제목 입력",
+    "share_description": "이 검색의 공동 작업자로 추가할 사용자 또는 팀을 검색하십시오.",
+    "create_new": "새로 만들기",
+    "save_as": "다른 이름으로 저장",
+    "create_new_title": "새 검색 만들기",
+    "save_as_title": "새 검색으로 저장",
+    "save": "저장",
+    "save_title": "검색 저장",
+    "cancel": "취소"
+  },
+  "results": {
+    "loading": "검색 결과를 업데이트하는 중..."
+  },
+  "sidebar_description": {
+    "execution": "실행",
+    "ad_hoc_info": "사용자 지정 요약과 설명을 추가하려면 검색을 저장하거나 대시보드로 내보내십시오.",
+    "edit_metadata_hint": "이 {{viewType}}의 설명과 요약을 추가하려면 검색 표시줄의 <icon/> 아이콘을 클릭하여 작업 메뉴를 여십시오. 작업 메뉴에는 \"메타데이터 편집\" 옵션이 있습니다.",
+    "search_section": "검색",
+    "no_summary": "이 {{viewType}}에는 요약이 없습니다.",
+    "no_description": "이 {{viewType}}에는 설명이 없습니다.",
+    "no_query": "아직 실행된 쿼리가 없습니다.",
+    "query_executed_in": "쿼리 실행 시간",
+    "effective_time_range": "유효 시간 범위",
+    "varies_per_widget": "위젯마다 다름",
+    "time_from": "시작",
+    "time_to": "종료",
+    "total_results": "전체 결과"
+  },
+  "sidebar_create": {
+    "info": "다음 옵션을 사용하여 검색에 집계, 로그 뷰(Enterprise 기능) 또는 매개변수(Enterprise 기능)를 추가하십시오.",
+    "generic": "일반",
+    "predefined_aggregation": "사전 정의된 집계",
+    "investigations": "조사",
+    "events": "이벤트"
+  },
+  "sidebar_highlighting": {
+    "description": "검색어와 필드 값을 강조 표시할 수 있습니다. 결과에서 검색 쿼리를 강조 표시할지 여부는 {{productName}} 서버 구성에서 활성화/비활성화할 수 있습니다. 필드 값을 클릭하고 \"이 값 강조 표시\"를 선택하면 모든 필드 값을 강조 표시할 수 있습니다.\n용어나 값에 규칙이 둘 이상 있으면 처음 일치하는 규칙이 사용됩니다.",
+    "active_highlights": "활성 강조 표시",
+    "add_rule_title": "강조 표시 규칙 추가",
+    "search_terms": "검색어"
+  },
+  "save_view": {
+    "save": "저장",
+    "save_as": "다른 이름으로 저장",
+    "save_as_new_dashboard_title": "새 대시보드로 저장",
+    "save_dashboard_title": "대시보드 저장"
+  },
+  "undo_redo": {
+    "undo": "실행 취소",
+    "redo": "다시 실행"
+  },
+  "time_range": {
+    "tab_relative": "상대",
+    "tab_absolute": "절대",
+    "tab_keyword": "키워드",
+    "from_label": "시작:",
+    "until_label": "종료:",
+    "keyword_label": "키워드:",
+    "no_override": "재정의 없음",
+    "now": "현재",
+    "all_time": "전체 기간",
+    "ago": "전",
+    "range_ago": "{{time}} 전",
+    "range_length_placeholder": "범위 길이 선택",
+    "load_preset": "프리셋 불러오기",
+    "no_available_presets": "사용 가능한 프리셋 없음",
+    "loading": "로드 중...",
+    "configure_presets": "프리셋 구성",
+    "insert_current_date": "현재 날짜 삽입",
+    "from_hours_label": "시작 시간 레이블",
+    "from_minutes_label": "시작 분 레이블",
+    "from_seconds_label": "시작 초 레이블",
+    "to_hours_label": "종료 시간 레이블",
+    "to_minutes_label": "종료 분 레이블",
+    "to_seconds_label": "종료 초 레이블",
+    "from_hour": "시작 시",
+    "from_minutes": "시작 분",
+    "from_seconds": "시작 초",
+    "to_hour": "종료 시",
+    "to_minutes": "종료 분",
+    "to_seconds": "종료 초",
+    "toggle_day_boundary": "하루의 시작과 끝 전환",
+    "set_current_time": "현재 로컬 시간으로 설정",
+    "set_range_value": "범위 값 설정",
+    "set_from_value": "시작 값 설정",
+    "set_to_value": "종료 값 설정",
+    "save_as_preset": "프리셋으로 저장",
+    "save_current_as_preset": "현재 시간 범위를 프리셋으로 저장",
+    "preset_description_placeholder": "설명 추가...",
+    "preset_description_label": "시간 범위 설명",
+    "preset_description_required": "설명은 필수입니다",
+    "preset_similar": "<configurationsLink>범위 구성</configurationsLink>에 이미 비슷한 시간 범위가 있습니다",
+    "save_preset": "프리셋 저장",
+    "calendar": "달력",
+    "timestamp": "타임스탬프",
+    "date_format": "날짜는 <code>{{format}}</code> 형식이어야 합니다.",
+    "from_timestamp": "시작 타임스탬프",
+    "to_timestamp": "종료 타임스탬프",
+    "no_override_title": "선택된 날짜/시간 재정의가 없습니다.",
+    "no_override_hint": "위의 탭을 사용하여 검색할 날짜 및 시간 범위를 선택하십시오.",
+    "keyword_from": "시작",
+    "keyword_to": "종료",
+    "keyword_headline": "시간 범위:",
+    "keyword_input": "키워드 입력",
+    "keyword_help": "검색할 기간을 자연어로 지정하십시오.",
+    "keyword_preview": "미리 보기",
+    "keyword_example_last_month": "<code>{{keyword}}</code>은(는) 한 달 전부터 현재까지 검색합니다",
+    "keyword_example_hours_ago": "<code>{{keyword}}</code>은(는) 4시간 전부터 현재까지 검색합니다",
+    "keyword_example_range": "<code>{{keyword}}</code>은(는) 4월 1일부터 2일 전까지 검색합니다",
+    "keyword_example_timezone": "<code>{{keyword}}</code>은(는) 시간대 +0200 기준 어제 자정부터 오늘 자정까지 검색합니다 - UTC로는 22:00이 됩니다",
+    "keyword_docs": "자세한 내용은 <docsLink>문서</docsLink>를 참조하십시오.",
+    "keyword_docs_title": "키워드 시간 범위 문서",
+    "display_label": "검색 시간 범위, 클릭하면 시간 범위 선택기가 열립니다",
+    "picker_title": "검색 시간 범위",
+    "admin_limit": "관리자가 검색을 {{duration}}(으)로 제한했습니다",
+    "update": "시간 범위 업데이트",
+    "open_selector": "시간 범위 선택기 열기",
+    "timezones_using": "모든 시간대 기준: <bold>{{timezone}}</bold>",
+    "unit_seconds": "초",
+    "unit_minutes": "분",
+    "unit_hours": "시간",
+    "unit_days": "일"
+  },
+  "execution_info": {
+    "query_executed": "쿼리가 {{duration}}ms 동안 실행됨, 실행 시각:",
+    "total_results": "전체 결과: {{total}}",
+    "no_query": "아직 실행된 쿼리가 없습니다."
+  },
+  "highlight_form": {
+    "edit_title": "강조 표시 규칙 편집",
+    "create_title": "강조 표시 규칙 만들기",
+    "field_label": "필드",
+    "field_placeholder": "필드 이름 선택 또는 입력",
+    "field_required": "필드는 필수입니다",
+    "condition_label": "조건",
+    "condition_placeholder": "조건 선택",
+    "condition_required": "조건은 필수입니다",
+    "value_label": "값",
+    "value_required": "값은 필수입니다",
+    "update_rule": "규칙 업데이트",
+    "create_rule": "규칙 만들기"
+  },
+  "query_tabs": {
+    "create_page": "새 페이지 만들기",
+    "more_pages": "더 많은 대시보드 페이지",
+    "open_configuration": "페이지 구성 열기",
+    "copy_page": "페이지 복사",
+    "copying_page": "페이지를 복사하는 중...",
+    "copy_page_failed": "대시보드 페이지를 복사하지 못했습니다. 오류: {{error}}",
+    "remove_page": "페이지 {{title}} 제거",
+    "configuration_title": "대시보드 페이지 구성 업데이트",
+    "update_configuration": "구성 업데이트",
+    "order": "순서",
+    "order_help": "드래그 앤 드롭으로 대시보드 페이지의 순서를 변경하십시오. 대시보드 제목을 두 번 클릭하면 제목을 변경할 수 있습니다."
+  },
+  "widget_creation": {
+    "title": "새 위젯 만들기",
+    "create_widget": "{{title}} 위젯 만들기",
+    "placeholder": "여기에서 새 위젯 만들기",
+    "scroll_to_new_widget": "새 위젯으로 스크롤"
+  },
+  "dashboard_actions": {
+    "immutable": "이 대시보드는 {{productName}}에서 관리하므로 읽기 전용입니다. 편집 가능한 사본을 만들려면 \"다른 이름으로 저장\"을 사용하십시오.",
+    "debug": "디버그",
+    "share_unsaved": "저장된 대시보드만 공유할 수 있습니다.",
+    "edit_metadata": "메타데이터 편집",
+    "export": "내보내기",
+    "save_new_title": "새 대시보드 저장",
+    "create": "대시보드 만들기",
+    "edit_title": "대시보드 편집",
+    "update": "대시보드 업데이트",
+    "share_description": "이 대시보드의 공동 작업자로 추가할 사용자 또는 팀을 검색하십시오."
+  },
+  "dashboard_search_bar": {
+    "filter_placeholder": "모든 위젯에 필터 적용"
+  },
+  "debug": {
+    "title": "디버그 정보"
+  },
+  "common_views": {
+    "empty_value": "<빈 값>",
+    "add_to_query": "쿼리에 추가",
+    "time_range_validation": {
+      "invalid_date_format": "형식은 {{format}}이어야 합니다.",
+      "range_limit": "범위가 제한 기간을 벗어났습니다.",
+      "date_limit": "날짜가 제한 기간을 벗어났습니다.",
+      "until_before_from": "\"종료\" 날짜는 \"시작\" 날짜 이후여야 합니다.",
+      "empty": "비워 둘 수 없습니다.",
+      "keyword_empty": "키워드는 비어 있으면 안 됩니다!",
+      "keyword_unparsable": "키워드를 파싱할 수 없습니다"
+    },
+    "remove_from_favorites": "즐겨찾기에서 제거",
+    "add_to_favorites": "즐겨찾기에 추가",
+    "view_type": {
+      "search": "검색",
+      "dashboard": "대시보드"
+    },
+    "unsaved_view": {
+      "search": "저장되지 않은 검색",
+      "dashboard": "저장되지 않은 대시보드"
+    }
+  },
+  "field_charts_migration": {
+    "title": "기존 검색 페이지 차트 마이그레이션",
+    "found_charts_other": "이전 버전의 검색용으로 만들어진 차트 {{count}}개를 찾았습니다. 이 차트를 현재 검색으로 마이그레이션하시겠습니까?",
+    "save_hint": "마이그레이션을 실행한 후 새로 만들어진 차트를 유지하려면 현재 검색을 새 대시보드로 저장해야 합니다. 그렇지 않으면 검색 페이지를 벗어날 때 차트가 사라집니다.",
+    "migrate": "마이그레이션",
+    "discard": "차트 삭제"
+  },
+  "query": {
+    "contained_in_enterprise": "(<enterpriseLink>Graylog Enterprise</enterpriseLink>에 포함됨)",
+    "documentation_hint": "위젯 생성에 대해 더 알아보려면 <docsLink>문서</docsLink>도 참조하십시오."
+  },
+  "widget_query": {
+    "reset_global_filter": "전역 필터 초기화"
+  },
+  "editable_title": {
+    "edit": "제목 편집",
+    "hint": "{{value}} - 제목을 두 번 클릭하면 편집할 수 있습니다."
+  },
+  "message_permalink": {
+    "label": "퍼머링크"
+  },
+  "query_title": {
+    "page_actions": "페이지 작업",
+    "edit_title": "제목 편집",
+    "duplicate": "복제",
+    "copy_to_dashboard": "대시보드로 복사",
+    "edit_modal_title": "대시보드 페이지 제목 편집",
+    "update_title": "제목 업데이트",
+    "title_help": "알아보기 쉬운 대시보드 페이지 제목을 입력하십시오. 최대 길이는 40자입니다.",
+    "title": "제목"
+  },
+  "missing_requirements": {
+    "description_search": "안타깝게도 이 검색을 실행할 수 없습니다. 사용할 수 없는 다음 기능을 사용하고 있습니다:",
+    "description_dashboard": "안타깝게도 이 대시보드를 실행할 수 없습니다. 사용할 수 없는 다음 기능을 사용하고 있습니다:",
+    "included_in": "<requirementName>{{requirement}}</requirementName> - <pluginLink>{{plugin}}</pluginLink>에 포함됨",
+    "back": "뒤로"
+  },
+  "view_header": {
+    "alerts_and_events": "경고 및 이벤트",
+    "event_definitions": "이벤트 정의",
+    "edit_search_metadata": "검색 {{title}} 메타데이터 편집",
+    "edit_dashboard_metadata": "대시보드 {{title}} 메타데이터 편집",
+    "editing_search": "저장된 검색 편집",
+    "editing_dashboard": "저장된 대시보드 편집",
+    "save_search": "검색 저장",
+    "save_dashboard": "대시보드 저장"
+  },
+  "execution": {
+    "not_executed": "아직 실행된 쿼리가 없습니다."
+  },
+  "dashboards_page": {
+    "documentation": "대시보드 문서",
+    "description": "대시보드를 사용하여 메시지에 대한 특정 뷰를 만드십시오. 여기에서 새 대시보드를 만들고 애플리케이션의 다른 부분에서 만든 모든 그래프나 차트를 클릭 한 번으로 추가하십시오."
+  },
+  "search_filter_banner": {
+    "explanation": "<italic>검색 필터</italic>에는 자체 쿼리가 있으며 <bold>AND</bold> 연산자를 사용하여 기본 쿼리를 확장합니다.",
+    "explanation_saved": "필터를 별도로 저장하여 저장된 검색과 대시보드에서 재사용할 수 있습니다. 저장된 필터를 업데이트하면 해당 필터를 포함하는 검색의 결과에 자동으로 영향을 줍니다."
+  },
+  "widget_time_range": {
+    "reset_global_override": "전역 재정의 초기화"
+  },
+  "time_range_presets": {
+    "select_time_range": "시간 범위 선택",
+    "open_preset_select": "시간 범위 프리셋 선택 열기"
+  },
+  "move_range": {
+    "show_previous": "이전 보기",
+    "show_previous_duration": "이전 {{duration}} 보기",
+    "show_next": "다음 보기",
+    "show_next_duration": "다음 {{duration}} 보기"
+  },
+  "query_validation": {
+    "toggle_warning": "유효성 검사 경고 전환",
+    "toggle_information": "유효성 검사 정보 전환",
+    "toggle_error": "유효성 검사 오류 설명 전환",
+    "syntax_documentation": "검색 쿼리 구문 문서",
+    "error_documentation": "쿼리 오류 문서",
+    "status_warning": "경고",
+    "status_info": "정보",
+    "status_error": "오류",
+    "validation_failed": "검색 쿼리의 유효성을 검사하지 못했습니다. 상태: {{error}}",
+    "warm_tier_title": "Warm Tier 검색",
+    "warm_tier_message": "선택한 시간 범위에 Warm Tier에 저장된 데이터가 포함되어 있어 가져오는 데 시간이 오래 걸릴 수 있습니다. 표시된 타임스탬프보다 오래된 데이터는 해당 스트림의 Warm Tier에 속합니다:"
+  },
+  "saved_searches": {
+    "title": "저장된 검색",
+    "confirm_bulk_delete_other": "저장된 검색 {{count}}개를 제거하시겠습니까?",
+    "bulk_delete_partial_other": "선택한 저장된 검색 {{count}}개 중 {{failed}}개를 삭제하지 못했습니다.",
+    "bulk_delete_success_other": "저장된 검색 {{count}}개를 삭제했습니다.",
+    "success": "성공",
+    "bulk_delete_error": "저장된 검색을 삭제하는 중 오류가 발생했습니다. {{error}}",
+    "confirm_delete": "저장된 검색 \"{{title}}\"을(를) 삭제하려고 합니다. 계속하시겠습니까?",
+    "delete_search": "검색 {{title}} 삭제",
+    "delete": "삭제"
+  },
+  "search_meta": {
+    "buttons": "검색 메타 버튼"
+  },
+  "save_view_notifications": {
+    "success_title": "성공!",
+    "error_title": "오류!",
+    "plugin_initial_values_failed": "플러그인에서 검색 표시줄 양식의 초기 값을 수집하는 중 오류가 발생했습니다",
+    "plugin_validation_preparation_failed": "플러그인의 검색 표시줄 유효성 검사를 준비하는 중 오류가 발생했습니다",
+    "plugin_validation_failed": "플러그인의 검색 표시줄 값을 검증하는 중 오류가 발생했습니다",
+    "plugin_submit_failed": "플러그인의 제출 핸들러를 실행하는 중 오류가 발생했습니다: {{error}}",
+    "load_saved_searches_failed": "저장된 검색을 로드하지 못했습니다. 상태",
+    "could_not_load_saved_searches": "저장된 검색을 로드할 수 없습니다",
+    "load_minimum_refresh_interval_failed": "시스템 구성 \"minimum_auto_refresh_interval\"을(를) 로드하지 못했습니다. 상태",
+    "could_not_load_configuration": "구성 옵션을 로드할 수 없습니다"
+  },
+  "sidebar_layout": {
+    "display_as_overlay": "사이드바를 오버레이로 표시",
+    "display_inline": "사이드바를 인라인으로 표시"
+  },
+  "search_result_overview": {
+    "duration_at": "{{duration}}ms, <timestamp/>",
+    "effective_from": "유효 시간 범위 시작",
+    "effective_to": "유효 시간 범위 종료"
+  },
+  "fields_overview": {
+    "filter_placeholder": "필드 필터링",
+    "reset": "초기화",
+    "list_fields": "<current>현재 쿼리</current>, <all>전체</all> 또는 <allReserved>예약된 필드를 포함한 전체</allReserved> 필드를 나열합니다.",
+    "current_title": "현재 쿼리에 나타나는 필드를 표시합니다.",
+    "all_title": "예약된 필드(gl2_*)를 제외한 모든 필드를 표시합니다.",
+    "all_reserved_title": "예약된 필드(gl2_*)를 포함한 모든 필드를 표시합니다.",
+    "no_field_information": "사용 가능한 필드 정보가 없습니다.",
+    "no_fields": "표시할 필드가 없습니다. 필터 용어를 변경하거나 위에서 다른 필드 세트를 선택하십시오."
+  },
+  "highlighting_color": {
+    "color": "색상",
+    "gradient_name": "그라데이션 이름",
+    "gradient_placeholder": "그라데이션 색상 선택",
+    "lowest_placeholder": "최솟값 지정",
+    "lowest_label": "최솟값",
+    "lowest_help": "필드/시리즈에서 예상되는 최솟값입니다.",
+    "highest_aria": "최댓값 지정",
+    "highest_label": "최댓값",
+    "highest_help": "필드/시리즈에서 예상되는 최댓값입니다.",
+    "coloring": "색상 지정",
+    "static_color": "고정 색상",
+    "gradient": "그라데이션",
+    "must_be_selected": "선택해야 합니다.",
+    "must_be_present": "값이 있어야 합니다.",
+    "must_be_number": "숫자여야 합니다.",
+    "must_be_higher": "최솟값보다 커야 합니다.",
+    "coloring_required": "색상 지정은 필수입니다",
+    "gradient_numeric_only": "그라데이션은 숫자형 필드에만 정의할 수 있습니다."
+  },
+  "highlighting_rule": {
+    "edit": "이 강조 표시 규칙 편집",
+    "remove": "이 강조 표시 규칙 제거",
+    "confirm_remove": "이 강조 표시를 제거하시겠습니까?"
+  },
+  "change_field_type": {
+    "no_permission_title": "권한 없음",
+    "no_permission_description": "해당 작업을 수행할 권한이 없습니다",
+    "enterprise_plugin_required": "(<enterpriseLink>Enterprise 플러그인</enterpriseLink> 필요)",
+    "modal_title": "{{fieldName}} 필드 유형 변경",
+    "impact_warning": "<bold>{{fieldName}}</bold> 필드의 유형을 변경하면 향후 로그 메시지 수집에 상당한 영향을 줄 수 있습니다. 수집하는 로그와 호환되지 않는 유형을 필드에 선언하면 수집 오류가 발생할 수 있습니다.",
+    "failure_processing_hint": "<docsLink>Failure Processing</docsLink>을 활성화하고 이후 <failureStream/> 스트림을 주의 깊게 모니터링하는 것이 좋습니다.",
+    "select_field_type_for": "{{fieldName}}의 필드 유형 선택",
+    "select_field_type_for_field": "필드의 필드 유형 선택",
+    "select_field_type": "필드 유형 선택",
+    "select_index_sets": "대상 인덱스 세트 선택",
+    "index_sets_hint_with_type": "기본적으로 <bold>{{type}}</bold> 필드 유형은 현재 메시지/검색의 모든 인덱스 세트에서 <bold>{{fieldName}}</bold> 필드에 설정됩니다. 변경을 적용할 인덱스 세트를 선택할 수 있습니다.",
+    "index_sets_hint": "기본적으로 선택한 필드 유형은 현재 메시지/검색의 모든 인덱스 세트에서 <bold>{{fieldName}}</bold> 필드에 설정됩니다. 변경을 적용할 인덱스 세트를 선택할 수 있습니다.",
+    "select_rotation_strategy": "순환 전략 선택",
+    "rotation_hint_type_field": "<bold>{{type}}</bold>을(를) <bold>{{fieldName}}</bold>의 필드 유형으로 확인하고 사용하려면 인덱스를 순환해야 합니다. 이 양식을 제출한 후 영향을 받는 인덱스를 자동으로 순환하거나 나중에 수동으로 순환할 수 있습니다.",
+    "rotation_hint_type": "<bold>{{type}}</bold>을(를) 필드 유형으로 확인하고 사용하려면 인덱스를 순환해야 합니다. 이 양식을 제출한 후 영향을 받는 인덱스를 자동으로 순환하거나 나중에 수동으로 순환할 수 있습니다.",
+    "rotation_hint_field": "선택한 필드 유형을 <bold>{{fieldName}}</bold>의 필드 유형으로 확인하고 사용하려면 인덱스를 순환해야 합니다. 이 양식을 제출한 후 영향을 받는 인덱스를 자동으로 순환하거나 나중에 수동으로 순환할 수 있습니다.",
+    "rotation_hint": "선택한 필드 유형을 필드 유형으로 확인하고 사용하려면 인덱스를 순환해야 합니다. 이 양식을 제출한 후 영향을 받는 인덱스를 자동으로 순환하거나 나중에 수동으로 순환할 수 있습니다.",
+    "rotate_indices": "변경 후 영향을 받는 인덱스 순환",
+    "changing": "필드 유형을 변경하는 중...",
+    "change": "필드 유형 변경",
+    "select_field": "필드 선택",
+    "select_field_placeholder": "필드 선택 또는 입력",
+    "type_not_defined": "유형이 정의되지 않았습니다",
+    "previous_values": "(이전 값: {{values}})",
+    "load_index_field_types_failed": "인덱스 필드 유형을 로드하지 못했습니다. 상태",
+    "could_not_load_index_field_types": "인덱스 필드 유형을 로드할 수 없습니다",
+    "load_field_type_options_failed": "필드 유형 옵션을 로드하지 못했습니다. 상태",
+    "could_not_load_field_type_options": "필드 유형 옵션을 로드할 수 없습니다",
+    "load_field_types_failed": "{{field}} 유형을 로드하지 못했습니다. 상태",
+    "could_not_load_field_types": "필드 유형을 로드할 수 없습니다",
+    "load_index_sets_failed": "필드 유형 변경을 지원하는 인덱스 세트를 로드하지 못했습니다. 상태",
+    "could_not_load_index_sets": "필드 유형 변경을 지원하는 인덱스 세트를 로드할 수 없습니다",
+    "change_failed": "필드 유형을 변경하지 못했습니다. 상태: {{error}}",
+    "change_failed_title": "필드 유형을 변경할 수 없습니다",
+    "change_success": "필드 유형이 변경되었습니다",
+    "success_title": "성공!"
+  },
+  "value_actions": {
+    "select_extractor_type": "추출기 유형 선택",
+    "exclude": "결과에서 제외",
+    "add_to_query": "쿼리에 추가",
+    "show_documents": "값에 해당하는 문서 표시",
+    "create_extractor": "추출기 만들기",
+    "highlight_value": "이 값 강조 표시",
+    "create_event_definition": "이벤트 정의 만들기",
+    "copy_value": "값을 클립보드에 복사"
+  },
+  "create_event_definition": {
+    "title": "새 이벤트 정의 구성",
+    "hide_details": "전략 세부 정보 숨기기",
+    "show_details": "전략 세부 정보 표시",
+    "continue": "구성 계속",
+    "strategy_by": "전략 기준:",
+    "description": "설명:",
+    "sections": {
+      "aggregation": "집계 설정",
+      "search": "검색 쿼리"
+    },
+    "items": {
+      "rowValuePath": "테이블 행의 쿼리",
+      "columnValuePath": "테이블 열의 쿼리",
+      "columnGroupBy": "열 값으로 그룹화",
+      "rowGroupBy": "행 값으로 그룹화",
+      "aggCondition": "조건",
+      "queryWithReplacedParams": "검색의 쿼리",
+      "searchFilterQuery": "검색 필터의 쿼리",
+      "streams": "스트림",
+      "searchWithinMs": "검색 범위(ms)",
+      "lutParameters": "조회 테이블 매개변수",
+      "searchFromValue": "값의 쿼리"
+    },
+    "item_label": "{{label}}: ",
+    "strategies": {
+      "EXACT": {
+        "label": "정확히 이 값",
+        "description": "현재 검색 뷰와 관련된 모든 검색 쿼리, 필터 등을 포함하는 전략입니다"
+      },
+      "ROW": {
+        "label": "행의 모든 값",
+        "description": "행 피벗을 포함하는 전략입니다"
+      },
+      "COL": {
+        "label": "열의 모든 값",
+        "description": "열 피벗을 포함하는 전략입니다"
+      },
+      "ALL": {
+        "label": "위젯의 모든 값",
+        "description": "선택한 값과 관련된 모든 행 및 열 피벗 값을 포함하는 전략입니다"
+      },
+      "CUSTOM": {
+        "label": "사용자 지정",
+        "description": "검색의 원하는 부분을 선택할 수 있습니다"
+      }
+    }
+  },
+  "view_errors": {
+    "something_went_wrong": "문제가 발생했습니다",
+    "unknown_error": "알 수 없는 오류가 발생했습니다. 자세한 내용은 다음 메시지와 {{productName}} 서버 로그를 확인하십시오."
+  },
+  "views_notifications": {
+    "delete_view_failed": "뷰 {{title}}을(를) 삭제하지 못했습니다. 상태: {{error}}",
+    "delete_view_failed_title": "뷰를 삭제할 수 없습니다",
+    "apply_widget_changes_failed": "위젯 변경 사항을 적용하지 못했습니다. 상태: {{error}}",
+    "load_message_failed": "메시지 정보를 로드하지 못했습니다. 상태",
+    "could_not_load_message": "메시지 정보를 로드할 수 없습니다"
+  },
+  "field_actions": {
+    "chart": "차트",
+    "show_top_values": "상위 값 표시",
+    "statistics": "통계",
+    "add_to_table": "테이블에 추가",
+    "remove_from_table": "테이블에서 제거",
+    "add_to_all_tables": "모든 테이블에 추가",
+    "remove_from_all_tables": "모든 테이블에서 제거",
+    "change_field_type": "필드 유형 변경",
+    "copy_field_name": "필드 이름을 클립보드에 복사",
+    "add_to_favorites": "필드를 즐겨찾기에 추가",
+    "remove_from_favorites": "필드를 즐겨찾기에서 제거"
+  },
+  "aggregation": {
+    "summary_by": "{{fields}} 기준으로 {{series}} 집계",
+    "summary_only": "{{series}} 집계"
+  },
+  "widget_creators": {
+    "message_count": "메시지 수",
+    "message_table": "메시지 테이블",
+    "custom_aggregation": "사용자 지정 집계",
+    "aggregation": "집계",
+    "events_overview": "이벤트 개요",
+    "text_markdown": "텍스트/Markdown"
+  },
+  "message_details": {
+    "deleted_input": "삭제된 입력",
+    "timestamp": "타임스탬프",
+    "not_stored": "저장되지 않음",
+    "not_stored_message": "메시지가 저장되지 않았습니다",
+    "received_by": "수신 노드",
+    "stored_in_index": "저장된 인덱스",
+    "routed_into_streams": "라우팅된 스트림"
+  },
+  "views_logic": {
+    "result_window_limit": "Elasticsearch는 검색 결과를 메시지 {{limit}}개로 제한합니다. 페이지 크기가 메시지 {{pageSize}}개이면 처음 {{validPages}}페이지를 사용할 수 있습니다.",
+    "confirm_delete_dashboard_page": "이 대시보드 페이지를 삭제하시겠습니까?"
+  }
+}

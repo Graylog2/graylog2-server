@@ -1,0 +1,512 @@
+{
+  "shared": {
+    "leader": "리더",
+    "not_available": "해당 없음"
+  },
+  "cluster_configuration_nodes": {
+    "loading_search_backend": "검색 백엔드 노드를 불러오는 중...",
+    "search_backend_unknown": "구성된 검색 백엔드를 확인할 수 없습니다.",
+    "search_placeholder": "노드 검색…",
+    "all_nodes": "모든 노드",
+    "data_nodes": "Data Nodes",
+    "opensearch_nodes": "OpenSearch 노드",
+    "mongodb_nodes": "MongoDB 노드"
+  },
+  "cluster_column_titles": {
+    "cpu": "CPU",
+    "memory": "메모리",
+    "jvm": "JVM",
+    "indexing": "인덱싱",
+    "storage": "스토리지",
+    "buffers": "버퍼",
+    "journal": "저널",
+    "data_lake_journal": "데이터 레이크 저널",
+    "throughput": "처리량"
+  },
+  "data_nodes_expandable": {
+    "title": "Data Nodes"
+  },
+  "indexing_metrics_cell": {
+    "docs": "문서",
+    "latency": "지연 시간"
+  },
+  "node_actions": {
+    "thread_dump": "스레드 덤프 가져오기",
+    "process_buffer_dump": "프로세스 버퍼 덤프 가져오기",
+    "metrics": "메트릭"
+  },
+  "graylog_node_actions": {
+    "pause_message_processing": "메시지 처리 일시 중지",
+    "resume_message_processing": "메시지 처리 재개",
+    "override_load_balancer_dead": "로드 밸런서 상태를 DEAD로 재정의",
+    "override_load_balancer_alive": "로드 밸런서 상태를 ALIVE로 재정의",
+    "local_message_inputs": "로컬 메시지 입력",
+    "recent_system_logs": "최근 시스템 로그 메시지 가져오기",
+    "message_processing_title": "메시지 처리",
+    "pause_confirm": "<b>{{nodeName}}</b> 노드의 메시지 처리를 <b>일시 중지</b>하려고 합니다. 계속하시겠습니까?",
+    "resume_confirm": "<b>{{nodeName}}</b> 노드의 메시지 처리를 <b>재개</b>하려고 합니다. 계속하시겠습니까?",
+    "load_balancer_title": "로드 밸런서",
+    "load_balancer_confirm": "<b>{{nodeName}}</b> 노드의 로드 밸런서 상태를 <b>{{status}}</b>(으)로 변경하려고 합니다. 계속하시겠습니까?"
+  },
+  "graylog_nodes_expandable": {
+    "title": "{{productName}} 노드"
+  },
+  "load_balancer_status_cell": {
+    "aria_label": "로드 밸런서 {{status}}",
+    "status_alive": "활성",
+    "status_dead": "비활성",
+    "status_throttled": "제한됨"
+  },
+  "processing_state_cell": {
+    "aria_label": "메시지 처리 {{status}}",
+    "enabled": "사용",
+    "disabled": "사용 안 함"
+  },
+  "mongodb_nodes_expandable": {
+    "title": "MongoDB 노드"
+  },
+  "mongodb_profiling_action": {
+    "description": "MongoDB 프로파일링은 클러스터 노드 전체에서 느린 쿼리를 식별하고 성능 문제를 해결하는 데 도움이 됩니다.",
+    "enabling_profiling": "프로파일링을 사용하는 중...",
+    "enable_confirm": "모든 MongoDB 노드에서 <b>Slow Ops</b> 프로파일링({{threshold}})을 사용하시겠습니까? 재시작 없이 즉시 적용되지만, 시작 시 구성하지 않으면 재시작 후 초기화됩니다.",
+    "enable_profiling": "프로파일링 사용",
+    "disable_profiling": "프로파일링 사용 안 함",
+    "enabling": "사용하는 중...",
+    "disabling": "사용 중지하는 중...",
+    "loading_status": "상태를 불러오는 중...",
+    "loading_status_title": "MongoDB 프로파일링 상태를 불러오는 중",
+    "enable_title": "모든 MongoDB 노드에서 프로파일링을 Slow Ops로 설정",
+    "disable_title": "모든 MongoDB 노드에서 프로파일링 사용 안 함",
+    "status_loading": "MongoDB 노드 전체의 현재 프로파일링 상태를 불러오는 중...",
+    "status_off": "모든 MongoDB 노드에서 프로파일링이 꺼져 있습니다({{summary}}). 느린 쿼리 진단 정보를 수집하려면 사용하십시오.",
+    "status_mixed": "MongoDB 노드마다 프로파일링 상태가 다릅니다({{summary}}). 진단을 일관되게 하려면 프로파일링을 사용하십시오.",
+    "status_enabled": "모든 MongoDB 노드에서 프로파일링이 켜져 있습니다({{summary}}). MongoDB 오버헤드를 줄이려면 문제 해결 후 사용을 중지하십시오.",
+    "status_unavailable_with_summary": "프로파일링 상태를 확인할 수 없습니다({{summary}}). 필요하면 상태를 업데이트할 수 있습니다.",
+    "status_unavailable": "프로파일링 상태를 확인할 수 없습니다. 필요하면 상태를 업데이트할 수 있습니다.",
+    "threshold_level": "레벨 1",
+    "threshold_level_with_ms": "레벨 1, 임계값 {{slowMs}}ms",
+    "distribution": "OFF {{off}}, SLOW_OPS {{slowOps}}, ALL {{all}}",
+    "nodes_profiled_other": "노드 {{count}}개 중 {{enabledCount}}개 프로파일링 중"
+  },
+  "opensearch_nodes_expandable": {
+    "title": "OpenSearch 노드"
+  },
+  "cluster_nodes_section_wrapper": {
+    "show_title": "{{title}} 표시"
+  },
+  "cpu_metrics_cell": {
+    "load_1m": "부하(1분)"
+  },
+  "graylog_cluster_overview": {
+    "cluster": "클러스터",
+    "cluster_id": "클러스터 ID:",
+    "not_available": "사용할 수 없음",
+    "number_of_nodes": "노드 수:"
+  },
+  "cluster_support_bundle_info": {
+    "description": "Graylog 클러스터의 유용한 디버깅 정보가 포함된 zip 파일을 만듭니다.",
+    "enterprise_customers": "Graylog Enterprise 고객은 번들을 지원 티켓에 첨부할 수 있으며, 이는 Graylog 기술 지원 팀이 문제를 분석하고 진단하는 데 도움이 됩니다.",
+    "examine_content": "번들을 공유하기 전에 내용을 검토하십시오. IP 주소, 호스트 이름 또는 비밀번호와 같은 민감한 데이터가 포함되어 있을 수 있습니다.",
+    "paid_license_only": "유료 라이선스 사용자만 Graylog Enterprise 지원을 받을 수 있습니다. 단, 이 파일은 다른 디버깅 용도로 사용할 수 있습니다."
+  },
+  "cluster_support_bundle_overview": {
+    "title": "클러스터 지원 번들",
+    "create": "지원 번들 만들기",
+    "download": "다운로드",
+    "delete": "삭제",
+    "filename": "파일 이름",
+    "size": "크기",
+    "no_bundles": "지원 번들이 없습니다.",
+    "delete_title": "지원 번들 삭제",
+    "delete_confirm": "<strong>{{name}}</strong>을(를) 삭제하시겠습니까?"
+  },
+  "log_level_metrics": {
+    "level": "레벨: {{level}}",
+    "total_written": "총 기록 수:",
+    "mean_rate": "평균 속도:",
+    "one_minute_rate": "1분 속도:",
+    "per_second": "/ 초"
+  },
+  "logging_subsystem": {
+    "subsystem": "서브시스템: {{name}}"
+  },
+  "node_loggers": {
+    "show_log_level_metrics": "로그 레벨 메트릭 표시",
+    "hide_log_level_metrics": "로그 레벨 메트릭 숨기기",
+    "total_log_messages": "총 <strong>{{throughput}}개의 내부 로그 메시지를 기록했습니다.</strong>"
+  },
+  "metric_details": {
+    "value": "값:",
+    "count": "개수:",
+    "mean": "평균:",
+    "minimum": "최소:",
+    "maximum": "최대:",
+    "standard_deviation": "표준 편차:",
+    "percentile_95": "95번째 백분위수:",
+    "percentile_98": "98번째 백분위수:",
+    "percentile_99": "99번째 백분위수:",
+    "invalid_type": "잘못된 메트릭 유형: {{type}}",
+    "microseconds": "μs"
+  },
+  "meter_details": {
+    "total": "합계:",
+    "events": "이벤트",
+    "one_minute_avg": "1분 평균:",
+    "five_minute_avg": "5분 평균:",
+    "fifteen_minute_avg": "15분 평균:"
+  },
+  "counter_rate": {
+    "calculating": "계산하는 중...",
+    "total": "(총 {{total}})",
+    "per_second": "초당"
+  },
+  "metric_container": {
+    "loading": "불러오는 중..."
+  },
+  "metrics_component": {
+    "fetch_error": "노드에서 메트릭을 가져올 수 없습니다. 서버가 상태 코드 {{status}}과(와) 함께 <em>{{responseMessage}}</em>을(를) 반환했습니다.",
+    "fetch_problem": "노드 메트릭을 가져오는 중 문제가 발생했습니다.",
+    "retry_in_background": "백그라운드에서 계속 가져오기를 시도합니다.",
+    "fetch_error_last_metrics": "노드에서 메트릭을 가져올 수 없습니다. 서버가 상태 코드 {{status}}과(와) 함께 <em>{{responseMessage}}</em>을(를) 반환했습니다. 사용 가능한 마지막 메트릭을 표시합니다.",
+    "filter_placeholder": "필터링할 메트릭 이름을 입력하십시오…"
+  },
+  "metrics_list": {
+    "no_metrics": "지정한 필터와 일치하는 메트릭이 없습니다. 올바른 정규식을 사용했는지 확인하십시오"
+  },
+  "buffer_usage": {
+    "metrics": "메트릭",
+    "utilization": "{{title}}에 <strong>메시지 {{usage}}개</strong>, 사용률 {{percentage}}."
+  },
+  "input_types_data_table": {
+    "loading": "입력 유형을 불러오는 중...",
+    "unavailable": "입력 유형을 사용할 수 없습니다.",
+    "documentation": "문서",
+    "name": "이름",
+    "type": "유형",
+    "filter": "필터"
+  },
+  "journal_details": {
+    "loading": "저널 메트릭을 불러오는 중...",
+    "disabled": "이 노드에서는 디스크 저널이 비활성화되어 있습니다.",
+    "unavailable": "저널 메트릭을 사용할 수 없습니다.",
+    "overcommitted": "<strong>경고!</strong> 저널 사용량이 정의된 최대 크기를 초과하고 있습니다. 자세한 내용은 <overviewLink>여기</overviewLink>를 클릭하십시오.",
+    "configuration": "구성",
+    "path": "경로:",
+    "earliest_entry": "가장 오래된 항목:",
+    "maximum_size": "최대 크기:",
+    "maximum_age": "최대 보존 기간:",
+    "flush_policy": "플러시 정책:",
+    "flush_policy_value": "메시지 {{messages}}개마다 또는 {{duration}}마다",
+    "maximum_age_format": "d [일] h [시간] m [분]",
+    "flush_duration_format": "h [시간] m [분] s [초]",
+    "utilization": "사용률",
+    "unprocessed_messages": "현재 저널에 <strong>처리되지 않은 메시지 {{messages}}개</strong>가 {{segments}}개 세그먼트에 있습니다.",
+    "appended_and_read": "지난 1초 동안 <strong>메시지 {{appended}}개</strong>가 추가되었고 <strong>메시지 {{read}}개</strong>를 읽었습니다."
+  },
+  "journal_state": {
+    "loading": "저널 메트릭을 불러오는 중...",
+    "unavailable": "저널 메트릭을 사용할 수 없습니다.",
+    "summary_other": "저널에 <strong>처리되지 않은 메시지 {{messages}}개</strong>가 {{count}}개 세그먼트에 있습니다. 지난 1초 동안 <strong>메시지 {{appended}}개</strong>가 추가되었고 <strong>메시지 {{read}}개</strong>를 읽었습니다."
+  },
+  "jvm_heap_usage": {
+    "loading": "힙 사용량 정보를 불러오는 중...",
+    "unavailable": "힙 정보를 사용할 수 없습니다.",
+    "usage": "JVM이 힙 공간 <committedBlob /><strong> {{committed}}</strong> 중 <usedBlob /><strong> {{used}}</strong>을(를) 사용하고 있으며 <maxBlob /><strong> {{max}}</strong>보다 많이 사용하려고 시도하지 않습니다"
+  },
+  "node_list_item": {
+    "system_info_unavailable": "시스템 정보를 현재 사용할 수 없습니다."
+  },
+  "node_maintenance_dropdown": {
+    "actions": "작업",
+    "configure_internal_logging": "내부 로깅 구성"
+  },
+  "node_overview": {
+    "plugins_installed_other": "플러그인 {{count}}개 설치됨",
+    "inputs_running_other": "이 노드에서 입력 {{count}}개 실행 중",
+    "memory_heap_usage": "메모리/힙 사용량",
+    "buffers": "버퍼",
+    "buffers_description": "버퍼는 메시지가 여러 프로세서를 거치는 동안 소량의 메시지를 아주 짧은 시간(보통 밀리초) 동안 캐시하도록 만들어졌습니다.",
+    "input_buffer": "입력 버퍼",
+    "process_buffer": "처리 버퍼",
+    "output_buffer": "출력 버퍼",
+    "disk_journal": "디스크 저널",
+    "disk_journal_description": "수신 메시지는 서버 장애가 발생해도 안전하게 보관되도록 디스크 저널에 기록됩니다. 저널은 출력 중 하나가 메시지 속도를 따라가지 못하거나 수신 메시지가 급증할 때도 기능을 유지하는 데 도움이 됩니다. 이를 통해 메모리 과부하를 방지하고 지나치게 긴 가비지 컬렉션 일시 중지를 피할 수 있습니다.",
+    "system": "시스템",
+    "rest_api": "REST API",
+    "installed_plugins": "설치된 플러그인",
+    "manage_inputs": "입력 관리",
+    "available_input_types": "사용 가능한 입력 유형"
+  },
+  "nodes_actions": {
+    "details": "세부 정보",
+    "metrics": "메트릭",
+    "more_actions": "추가 작업",
+    "pause_message_processing": "메시지 처리 일시 중지",
+    "resume_message_processing": "메시지 처리 재개",
+    "pause_confirm": "이 노드의 메시지 처리를 일시 중지하려고 합니다. 계속하시겠습니까?",
+    "resume_confirm": "이 노드의 메시지 처리를 재개하려고 합니다. 계속하시겠습니까?",
+    "override_lb_status": "LB 상태 재정의",
+    "status_alive": "ALIVE",
+    "status_dead": "DEAD",
+    "load_balancer_confirm": "이 노드의 로드 밸런서 상태를 {{status}}(으)로 변경하려고 합니다. 계속하시겠습니까?",
+    "local_message_inputs": "로컬 메시지 입력",
+    "thread_dump": "스레드 덤프 가져오기",
+    "process_buffer_dump": "프로세스 버퍼 덤프 가져오기",
+    "recent_system_logs": "최근 시스템 로그 메시지 가져오기"
+  },
+  "nodes_list": {
+    "active_nodes_other": "활성 노드가 {{count}}개 있습니다",
+    "no_active_nodes": "활성 노드가 없습니다."
+  },
+  "plugins_data_table": {
+    "loading": "이 노드의 플러그인을 불러오는 중...",
+    "no_plugins": "이 노드에는 설치된 플러그인이 없습니다.",
+    "name": "이름",
+    "version": "버전",
+    "author": "작성자",
+    "description": "설명",
+    "website": "웹사이트",
+    "filter": "필터"
+  },
+  "rest_api_overview": {
+    "transport_address": "전송 주소:",
+    "last_seen": "마지막 확인:"
+  },
+  "system_information": {
+    "pid_info": "PID {{pid}}, {{info}}",
+    "jvm_unavailable": "이 노드의 JVM 정보를 사용할 수 없습니다.",
+    "hostname": "호스트 이름:",
+    "node_id": "노드 ID:",
+    "version": "버전:",
+    "version_codename": "{{version}}, 코드명 <em>{{codename}}</em>",
+    "jvm": "JVM:",
+    "time": "시간:"
+  },
+  "system_overview_details": {
+    "pause_confirm": "이 노드의 메시지 처리를 일시 중지하려고 합니다. 계속하시겠습니까?",
+    "resume_confirm": "이 노드의 메시지 처리를 재개하려고 합니다. 계속하시겠습니까?",
+    "what_does_this_mean": "무슨 의미입니까?",
+    "lifecycle_state": "라이프사이클 상태: <strong>{{lifecycle}}</strong>",
+    "marked_as_lb_status": "로드 밸런서에 <strong>{{status}}</strong>(으)로 표시됨",
+    "pause_processing": "처리 일시 중지",
+    "resume_processing": "처리 재개",
+    "not_processing": "노드가 메시지를 처리하고 <strong>있지 않습니다</strong>"
+  },
+  "system_overview_summary": {
+    "current_lifecycle_state": "현재 라이프사이클 상태:",
+    "message_processing": "메시지 처리:",
+    "enabled": "사용",
+    "disabled": "사용 안 함",
+    "lb_indication": "로드 밸런서 표시:"
+  },
+  "bulk_actions": {
+    "dismiss": "해제"
+  },
+  "system_notifications_table": {
+    "title": "알림",
+    "human_name": "알림"
+  },
+  "actions_cell": {
+    "dismiss": "해제"
+  },
+  "title_cell": {
+    "show_full_message": "전체 메시지 표시: {{title}}"
+  },
+  "system_job": {
+    "acknowledge_failed": "작업을 확인할 수 없습니다",
+    "cancel_failed": "작업을 취소할 수 없습니다",
+    "cancel_confirm": "시스템 작업 \"{{info}}\"을(를) 취소하시겠습니까?",
+    "on_node": "- 노드:",
+    "runtime": "실행 시간: {{duration}}",
+    "cancel": "취소",
+    "acknowledge": "확인"
+  },
+  "system_jobs_component": {
+    "title": "시스템 작업",
+    "description": "시스템 작업은 {{productName}} 서버 노드가 유지 관리를 위해 실행하는 장시간 작업입니다. 일부 작업은 진행 상황 정보를 제공하거나 중지할 수 있습니다."
+  },
+  "system_jobs_list": {
+    "no_active_jobs": "활성 시스템 작업이 없습니다."
+  },
+  "system_messages_component": {
+    "title": "시스템 메시지",
+    "description": "시스템 메시지는 {{productName}} 관리자에게 유용할 수 있는 특정 이벤트가 발생할 때 {{productName}} 서버 노드가 생성합니다. 조치가 필요한 이벤트에 대해서는 알림이 발생하므로 여기에 있는 이벤트에 대해 직접 조치하지 않아도 됩니다."
+  },
+  "system_messages_list": {
+    "timestamp": "타임스탬프",
+    "node": "노드",
+    "message": "메시지"
+  },
+  "global_throughput": {
+    "aria_label": "처리량: 입력 {{input}} / 출력 {{output}} msg/s",
+    "in_title": "초당 수신 메시지",
+    "out_title": "초당 송신 메시지"
+  },
+  "node_throughput": {
+    "loading": "처리량을 불러오는 중...",
+    "unable_to_load": "처리량을 불러올 수 없습니다.",
+    "processing_long": "수신 <strong>{{totalIn}}</strong>, 송신 <strong>{{totalOut}}</strong> msg/s를 처리하고 있습니다.",
+    "short": "입력 {{totalIn}} / 출력 {{totalOut}} msg/s."
+  },
+  "telemetry_debug_entry_row": {
+    "delta": " (+{{delta}}ms)",
+    "pii_suspect": "PII 의심: {{suspect}}",
+    "copy_as_json": "이벤트를 JSON으로 복사"
+  },
+  "telemetry_debug_overlay": {
+    "badge_label": "텔레메트리 디버그",
+    "badge": "텔레메트리 디버그: {{count}}",
+    "drawer_label": "텔레메트리 디버그 패널",
+    "resize_label": "텔레메트리 디버그 패널 크기 조정",
+    "title": "텔레메트리 디버그({{count}})",
+    "filter_label": "이벤트 필터링",
+    "filter_placeholder": "이벤트 이름 또는 페이로드로 필터링...",
+    "resume": "재개",
+    "pause": "일시 중지",
+    "clear": "지우기",
+    "export_session": "세션 내보내기",
+    "collapse": "접기",
+    "no_events": "아직 기록된 텔레메트리 이벤트가 없습니다. 앱을 사용하면 여기에 표시됩니다.",
+    "time": "시간",
+    "event": "이벤트",
+    "action": "작업",
+    "status": "상태"
+  },
+  "cluster_configuration_page": {
+    "title": "클러스터 구성",
+    "description": "이 페이지에서는 클러스터에 있는 노드의 실시간 개요를 제공합니다. 언제든지 메시지 처리를 일시 중지할 수 있습니다. 처리를 재개할 때까지 처리 버퍼는 새 메시지를 받지 않습니다. 노드에 메시지 저널이 활성화되어 있으면(기본값) 처리가 비활성화된 경우에도 수신 메시지가 디스크에 저장됩니다."
+  },
+  "configurations_page": {
+    "title": "구성",
+    "description": "이 페이지에서 여러 하위 시스템의 시스템 설정을 구성할 수 있습니다.",
+    "plugins": "플러그인"
+  },
+  "enterprise_page": {
+    "document_title": "{{productName}} Enterprise",
+    "page_title": "{{productName}} Enterprise <upsell>체험하기</upsell>",
+    "learn_more": "<upsell>{{productName}} Enterprise 기능에 대해 <productLink>자세히 알아보기</productLink></upsell>"
+  },
+  "process_buffer_dump_page": {
+    "title": "노드 {{shortNodeId}} / {{hostname}}의 프로세스 버퍼 덤프",
+    "taken_at": "수집 시각: <0/>"
+  },
+  "show_metrics_page": {
+    "title": "노드 {{shortNodeId}} / {{hostname}}의 메트릭",
+    "description": "모든 {{productName}} 노드는 진단, 디버깅 및 모니터링을 위한 내부 메트릭 세트를 제공합니다. 모든 메트릭은 JMX를 통해서도 액세스할 수 있습니다.",
+    "total_metrics_other": "이 노드는 총 {{count}}개의 메트릭을 보고하고 있습니다."
+  },
+  "node_page": {
+    "title": "노드 {{shortNodeId}} / {{hostname}}",
+    "description": "이 페이지에는 클러스터에서 활성 상태이며 연결 가능한 {{productName}} 서버 노드의 세부 정보가 표시됩니다.",
+    "leader_node": "리더 노드입니다.",
+    "not_leader_node": "리더 노드가 <em>아닙니다</em>."
+  },
+  "system_logs_page": {
+    "title": "노드 {{shortNodeId}} / {{hostname}}의 최근 시스템 로그({{limit}}개로 제한)",
+    "taken_at": "수집 시각: <0/>",
+    "reload": "새로 고침",
+    "back": "뒤로",
+    "document_title": "노드 {{shortNodeId}} / {{hostname}}의 시스템 로그"
+  },
+  "system_notifications_page": {
+    "title": "시스템 알림"
+  },
+  "system_overview_page": {
+    "title": "시스템 개요"
+  },
+  "thread_dump_page": {
+    "title": "노드 {{shortNodeId}} / {{hostname}}의 스레드 덤프",
+    "taken_at": "수집 시각: <0/>"
+  },
+  "notifications": {
+    "lb_change_success": "노드 '{{nodeId}}'의 로드 밸런서 상태가 '{{status}}'(으)로 변경되었습니다",
+    "lb_change_failed": "'{{nodeId}}'의 로드 밸런서 상태를 변경하지 못했습니다: {{error}}",
+    "lb_change_failed_title": "노드 '{{nodeId}}'의 로드 밸런서 상태를 '{{status}}'(으)로 변경할 수 없습니다",
+    "processing_pause_success": "'{{nodeId}}'의 메시지 처리가 일시 중지되었습니다",
+    "processing_pause_failed": "'{{nodeId}}'의 메시지 처리를 일시 중지하지 못했습니다: {{error}}",
+    "processing_pause_failed_title": "노드 '{{nodeId}}'의 메시지 처리를 일시 중지할 수 없습니다",
+    "processing_resume_success": "'{{nodeId}}'의 메시지 처리가 재개되었습니다",
+    "processing_resume_failed": "'{{nodeId}}'의 메시지 처리를 재개하지 못했습니다: {{error}}",
+    "processing_resume_failed_title": "노드 '{{nodeId}}'의 메시지 처리를 재개할 수 없습니다",
+    "nothing_selected": "선택한 알림이 없습니다.",
+    "nothing_to_dismiss_title": "해제할 항목이 없습니다",
+    "bulk_dismiss_failed": "알림을 해제하지 못했습니다. 다시 시도하십시오.",
+    "dismiss_failed": "알림을 해제하지 못했습니다. 다시 시도하십시오.",
+    "dismiss_failed_title": "해제 실패",
+    "profiling_enabled": "MongoDB 프로파일링이 사용 설정되었습니다.",
+    "profiling_disabled": "MongoDB 프로파일링이 사용 중지되었습니다.",
+    "profiling_enable_failed": "MongoDB 프로파일링을 사용 설정하지 못했습니다: {{error}}",
+    "profiling_disable_failed": "MongoDB 프로파일링을 사용 중지하지 못했습니다: {{error}}",
+    "profiling_update_failed_title": "MongoDB 프로파일링을 업데이트할 수 없습니다.",
+    "data_node_metrics_failed": "Data Node \"{{hostname}}\"의 메트릭을 불러오지 못했습니다",
+    "data_node_metrics_failed_title": "Data Node 메트릭을 불러올 수 없습니다.",
+    "graylog_node_metrics_failed": "Graylog 노드 메트릭을 불러오지 못했습니다. 상태",
+    "graylog_node_metrics_failed_title": "Graylog 노드 메트릭을 불러올 수 없습니다.",
+    "cluster_traffic_failed": "클러스터 트래픽을 불러오지 못했습니다. 상태",
+    "cluster_traffic_failed_title": "클러스터 트래픽을 불러올 수 없습니다",
+    "journal_failed": "저널 정보를 가져올 수 없습니다",
+    "system_jobs_failed": "시스템 작업을 불러오지 못했습니다. 상태",
+    "system_jobs_failed_title": "시스템 작업을 불러올 수 없습니다"
+  },
+  "use_cluster_overview_notifications": {
+    "jvm_failed": "노드 '{{nodeId}}'의 JVM 정보를 가져오지 못했습니다: {{error}}",
+    "jvm_failed_title": "JVM 정보를 가져올 수 없습니다",
+    "thread_dump_failed": "노드 '{{nodeId}}'의 스레드 덤프를 가져오지 못했습니다: {{error}}",
+    "thread_dump_failed_title": "스레드 덤프를 가져올 수 없습니다",
+    "process_buffer_dump_failed": "노드 '{{nodeId}}'의 프로세스 버퍼 덤프를 가져오지 못했습니다: {{error}}",
+    "process_buffer_dump_failed_title": "프로세스 버퍼 덤프를 가져올 수 없습니다",
+    "system_logs_failed": "노드 '{{nodeId}}'의 시스템 로그 메시지를 가져오지 못했습니다: {{error}}",
+    "system_logs_failed_title": "시스템 로그 메시지를 가져올 수 없습니다",
+    "overview_failed": "클러스터 개요를 가져오지 못했습니다: {{error}}",
+    "overview_failed_title": "클러스터 개요를 가져올 수 없습니다"
+  },
+  "use_cluster_support_bundle_notifications": {
+    "create_failed": "지원 번들을 만들지 못했습니다. 상태: {{error}}",
+    "create_failed_title": "지원 번들을 만들 수 없습니다.",
+    "delete_failed": "지원 번들을 삭제하지 못했습니다. 상태: {{error}}",
+    "delete_failed_title": "지원 번들을 삭제할 수 없습니다.",
+    "download_failed": "지원 번들을 다운로드하지 못했습니다. 상태: {{error}}",
+    "download_failed_title": "지원 번들을 다운로드할 수 없습니다.",
+    "load_list_failed": "지원 번들 목록을 불러오지 못했습니다. 상태",
+    "load_list_failed_title": "지원 번들 목록을 불러올 수 없습니다."
+  },
+  "use_plugin_list_notifications": {
+    "fetch_failed": "노드 \"{{nodeId}}\"의 플러그인을 가져오지 못했습니다",
+    "fetch_failed_title": "플러그인을 가져올 수 없습니다"
+  },
+  "node_lifecycle": {
+    "uninitialized": "초기화되지 않음",
+    "starting": "시작 중",
+    "running": "실행 중",
+    "failed": "실패",
+    "halting": "종료 중",
+    "paused": "일시 중지됨",
+    "throttled": "제한됨",
+    "override_lb_alive": "로드 밸런서: 활성(강제)",
+    "override_lb_dead": "로드 밸런서: 비활성(강제)",
+    "override_lb_throttled": "로드 밸런서: 제한됨(강제)"
+  },
+  "buffers_metrics_cell": {
+    "input": "입력",
+    "process": "처리",
+    "output": "출력"
+  },
+  "throughput_metrics_cell": {
+    "in": "입력",
+    "out": "출력"
+  },
+  "mongodb_nodes": {
+    "profiling_levels": {
+      "off": "끔",
+      "slow_ops": "Slow Ops",
+      "all": "전체",
+      "unknown": "알 수 없음({{level}})"
+    },
+    "roles": {
+      "primary": "기본",
+      "secondary": "보조",
+      "arbiter": "ARBITER",
+      "standalone": "독립 실행형"
+    }
+  }
+}

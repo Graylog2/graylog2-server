@@ -1,0 +1,206 @@
+{
+  "action_links": {
+    "create": "서비스 만들기",
+    "edit_active": "활성 서비스 편집",
+    "view_active": "활성 서비스 보기"
+  },
+  "active_directory": {
+    "create_title": "Active Directory 인증 서비스 만들기",
+    "edit_title": "Active Directory 인증 서비스 편집",
+    "help": {
+      "system_user_dn": "Active Directory 서버에 최초로 연결할 때 사용하는 사용자 이름입니다. 예: <code>ldapbind@some.domain</code>.<lineBreak/>이 값은 해당 사용자의 <code>userPrincipalName</code>과 일치해야 합니다.",
+      "system_user_password": "Active Directory 서버에 최초로 연결할 때 사용하는 비밀번호입니다.",
+      "user_full_name_attribute": "동기화된 사용자의 전체 이름에 사용할 Active Directory 속성입니다. 예: <code>displayName</code>.<lineBreak/>",
+      "user_name_attribute": "동기화된 사용자의 사용자 이름에 사용할 Active Directory 속성입니다. 예: <code>userPrincipalName</code>.<lineBreak/>어떤 속성을 사용해야 할지 모르는 경우 사이드바의 <emphasis>사용자 로그인 테스트</emphasis> 섹션에서 테스트 사용자를 불러와 보십시오.",
+      "user_search_base": "Active Directory 검색 쿼리를 제한할 기본 트리입니다. 예: <code>cn=users,dc=example,dc=com</code>."
+    }
+  },
+  "active_page": {
+    "title": "활성 인증 서비스"
+  },
+  "authenticators": {
+    "description": "신뢰할 수 있는 헤더 인증을 구성합니다.",
+    "documentation_title": "인증기 문서",
+    "edit": "인증기 편집",
+    "title": "인증기 상세 정보"
+  },
+  "backend_details_page": {
+    "edit_service": "서비스 편집",
+    "title": "인증 서비스 상세 정보"
+  },
+  "backends_overview": {
+    "activate": "활성화",
+    "confirm_activate": "인증 서비스 \"{{title}}\"을(를) 활성화하시겠습니까?",
+    "confirm_deactivate": "인증 서비스 \"{{title}}\"을(를) 비활성화하시겠습니까?",
+    "confirm_delete": "인증 서비스 \"{{title}}\"을(를) 삭제하시겠습니까?",
+    "deactivate": "비활성화",
+    "delete": "삭제",
+    "edit": "편집",
+    "filter_label": "서비스 필터링",
+    "found_other": "시스템에 구성된 인증 서비스 {{count}}개를 찾았습니다.",
+    "headers": {
+      "actions": "작업",
+      "default_roles": "기본 역할",
+      "description": "설명",
+      "title": "제목"
+    },
+    "query_example": "제목에 LDAP이 포함된 백엔드 찾기:",
+    "role_not_found": "역할을 찾을 수 없습니다",
+    "title": "구성된 인증 서비스"
+  },
+  "config_details": {
+    "edit": "편집",
+    "group_sync_feature_name": "그룹 동기화",
+    "group_sync_title": "그룹 동기화"
+  },
+  "connection_test": {
+    "default_error": "오류가 발생했습니다",
+    "description": "\"서버 구성\" 단계에서 정의한 주소와 자격 증명으로 백그라운드 연결 확인을 수행합니다.",
+    "submit": "서버 연결 테스트",
+    "title": "서버 연결 확인"
+  },
+  "create_page": {
+    "getting_started_title": "새 인증 서비스 만들기",
+    "title": "인증 서비스 만들기"
+  },
+  "directory_help": {
+    "default_roles": "동기화된 사용자가 갖게 될 기본 역할입니다. 웹 인터페이스를 사용하려면 모든 사용자에게 <code>Reader</code> 역할이 필요합니다",
+    "default_user_timezone": "새 사용자의 기본 시간대를 선택합니다.",
+    "user_search_pattern": "예: <exampleCode>{{example}}</exampleCode>. 문자열 <code>{{placeholder}}</code>은(는) 입력한 사용자 이름으로 대체됩니다."
+  },
+  "getting_started": {
+    "description": "내부 사용자 데이터베이스나 LDAP/Active Directory 같은 기본 제공 인증 메커니즘 외에도, 플러그인을 통해 인증 서비스를 확장하여 다른 인증 메커니즘을 지원할 수 있습니다. 새로 설정할 인증 서비스를 선택하십시오.",
+    "select_service": "서비스 선택",
+    "submit": "시작하기"
+  },
+  "ldap": {
+    "create_title": "LDAP 인증 서비스 만들기",
+    "edit_title": "LDAP 인증 서비스 편집",
+    "help": {
+      "email_attributes": "사용자의 이메일 주소에 사용할 LDAP 속성입니다. 예: <code>mail</code>.<lineBreak/>여러 속성을 지정할 수 있으며, 값을 확정하려면 <kbd>Tab</kbd> 또는 <kbd>Enter</kbd>를 입력하십시오.",
+      "system_user_dn": "LDAP 서버에 최초로 연결할 때 사용하는 사용자 이름입니다. 예: <code>cn=admin,dc=example,dc=com</code>. LDAP 서버에 따라 선택 사항일 수 있습니다.",
+      "system_user_password": "LDAP 서버에 최초로 연결할 때 사용하는 비밀번호입니다.",
+      "user_full_name_attribute": "동기화된 사용자의 전체 이름에 사용할 LDAP 속성입니다. 예: <code>cn</code>.<lineBreak/>",
+      "user_name_attribute": "동기화된 사용자의 사용자 이름에 사용할 LDAP 속성입니다. 예: <code>uid</code>.<lineBreak/>어떤 속성을 사용해야 할지 모르는 경우 사이드바의 <emphasis>사용자 로그인 테스트</emphasis> 섹션에서 테스트 사용자를 불러와 보십시오.",
+      "user_search_base": "LDAP 검색 쿼리를 제한할 기본 트리입니다. 예: <code>cn=users,dc=example,dc=com</code>.",
+      "user_unique_id_attribute": "동기화된 사용자의 ID에 사용할 LDAP 속성입니다. 예: <code>entryUUID</code>.<lineBreak/>"
+    }
+  },
+  "login_test": {
+    "description": "지정한 사용자 이름의 항목을 불러와 설정을 확인합니다. 비밀번호를 생략하면 인증을 시도하지 않습니다.",
+    "login_failed": "로그인에 실패했습니다",
+    "password": "비밀번호",
+    "submit": "사용자 로그인 테스트",
+    "title": "사용자 로그인 테스트",
+    "user_attribute": "사용자 속성",
+    "user_does_not_exist": "사용자가 존재하지 않습니다",
+    "username": "사용자 이름",
+    "value": "값"
+  },
+  "no_service_plugin": "유형 \"{{type}}\"에 대해 구성된 인증 서비스 플러그인이 없습니다",
+  "no_service_plugin_for": "\"{{type}}\"에 대해 구성된 인증 서비스 플러그인이 없습니다",
+  "notifications": {
+    "create_failed": "인증 서비스 생성에 실패했습니다. 상태: {{error}}",
+    "create_success": "인증 서비스를 만들었습니다.",
+    "error_title": "오류",
+    "success_title": "성공",
+    "update_failed": "인증 서비스 업데이트에 실패했습니다. 상태: {{error}}",
+    "update_success": "인증 서비스를 업데이트했습니다."
+  },
+  "overview_page": {
+    "no_active_backend": "현재 활성 상태인 인증 서비스가 없습니다.",
+    "title": "모든 인증 서비스"
+  },
+  "page": {
+    "description": "이 클러스터의 인증 서비스를 구성합니다.",
+    "documentation_title": "인증 문서"
+  },
+  "page_navigation": {
+    "authenticators": "인증기",
+    "services": "인증 서비스"
+  },
+  "server_config": {
+    "description_label": "설명",
+    "hostname": "호스트 이름",
+    "port": "포트",
+    "reset_password": "비밀번호 재설정",
+    "server_address": "서버 주소",
+    "system_password": "시스템 비밀번호",
+    "system_user_dn": "시스템 사용자 DN",
+    "system_username": "시스템 사용자 이름",
+    "title": "서버 구성",
+    "title_label": "제목",
+    "transport_security": "전송 보안",
+    "transport_security_none": "없음",
+    "undo_reset": "재설정 취소",
+    "verify_certificates": "인증서 확인"
+  },
+  "synced_teams": {
+    "feature_name": "팀",
+    "title": "동기화된 팀"
+  },
+  "synced_users": {
+    "edit": "편집",
+    "filter_label": "사용자 필터링",
+    "found_other": "동기화된 사용자 {{count}}명을 찾았습니다.",
+    "headers": {
+      "actions": "작업",
+      "full_name": "전체 이름",
+      "roles": "역할",
+      "username": "사용자 이름"
+    },
+    "none_found": "동기화된 사용자가 없습니다.",
+    "role_not_found": "역할을 찾을 수 없습니다",
+    "title": "동기화된 사용자"
+  },
+  "trusted_header": {
+    "description": "이 인증기를 사용하면 추가 상호 작용 없이 HTTP 헤더를 기반으로 사용자를 로그인시킬 수 있습니다.",
+    "enable_sso": "HTTP 헤더를 통한 Single Sign-On 사용",
+    "enabled": "사용",
+    "title": "Trusted Header 인증",
+    "trusted_proxies_hint": "{{productName}} 서버 구성 파일에서 <code>trusted_proxies</code> 설정을 구성하십시오.",
+    "update_config": "구성 업데이트",
+    "username_header": "사용자 이름 헤더",
+    "username_header_help": "암묵적으로 신뢰하는 사용자 이름이 담긴 HTTP 헤더입니다. (헤더 일치는 대/소문자를 구분하지 않습니다)"
+  },
+  "user_sync": {
+    "browser_time_zone": "브라우저 시간대",
+    "default_assignments_hint": "기본 역할 및 시간대 할당을 변경하면 {{serviceTitle}}을(를) 통해 새로 만들어지는 사용자에게만 적용됩니다!",
+    "default_roles": "기본 역할",
+    "default_user_time_zone": "기본 사용자 시간대",
+    "email_attribute": "이메일 속성",
+    "email_attributes": "이메일 속성",
+    "full_name_attribute": "전체 이름 속성",
+    "id_attribute": "ID 속성",
+    "name_attribute": "이름 속성",
+    "role_not_found": "역할을 찾을 수 없습니다",
+    "search_base_dn": "검색 기준 DN",
+    "search_pattern": "검색 패턴",
+    "search_roles": "역할 검색",
+    "test_login_hint": "설정을 확인하려면 사이드바 패널에서 사용자 로그인을 테스트하는 것을 권장합니다.",
+    "title": "사용자 동기화"
+  },
+  "wizard": {
+    "confirm_remove_group_sync": "이 인증 서비스의 그룹 동기화 구성을 제거하시겠습니까?",
+    "create_failed": "인증 서비스를 만들지 못했습니다",
+    "edit_failed": "인증 서비스를 편집하지 못했습니다",
+    "finish_and_save": "완료 및 서비스 저장",
+    "finish_and_save_identity_service": "완료 및 Identity Service 저장",
+    "next_group_sync": "다음: 그룹 동기화",
+    "next_user_sync": "다음: 사용자 동기화",
+    "server_validation_error": "서버 유효성 검사 오류: {{errors}}",
+    "steps": {
+      "group_sync": "그룹 동기화 (선택)",
+      "server_config": "서버 구성",
+      "user_sync": "사용자 동기화"
+    }
+  },
+  "wizard_header": {
+    "edit_title": "인증 서비스 편집 - <emphasis>{{backendTitle}}</emphasis>"
+  },
+  "http_header_notifications": {
+    "load_failed": "HTTP 헤더 인증 구성을 불러오지 못했습니다",
+    "update_success": "HTTP 헤더 인증 구성을 업데이트했습니다",
+    "update_failed": "HTTP 헤더 인증 구성 업데이트에 실패했습니다. 상태: {{error}}"
+  }
+}

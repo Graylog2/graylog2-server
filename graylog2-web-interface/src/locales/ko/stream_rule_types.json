@@ -1,0 +1,10 @@
+{
+  "match exactly": "정확히 일치",
+  "match regular expression": "정규식과 일치",
+  "greater than": "보다 큼",
+  "smaller than": "보다 작음",
+  "field presence": "필드 존재 여부",
+  "contain": "포함",
+  "always match": "항상 일치",
+  "match input": "입력과 일치"
+}

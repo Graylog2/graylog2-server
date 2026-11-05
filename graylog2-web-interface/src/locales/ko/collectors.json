@@ -1,0 +1,1113 @@
+{
+  "pages": {
+    "documentation_title": "Collectors 문서",
+    "deployment": {
+      "title": "Collector 배포",
+      "description": "원하는 수만큼의 호스트에서 명령을 실행하십시오. 선택한 플릿에 등록되며 체크인하는 대로 표시됩니다.",
+      "deploy_tab": "배포",
+      "tokens_tab": "등록 토큰",
+      "tokens_description": "토큰은 새 수집기가 플릿에 등록할 수 있도록 승인합니다. 토큰을 삭제해도 이미 등록된 수집기에는 영향을 주지 않습니다."
+    },
+    "fleets": {
+      "document_title": "Collector 플릿",
+      "title": "플릿",
+      "description": "플릿은 동일한 구성을 공유하는 수집기의 그룹입니다. 플릿의 모든 수집기는 동일한 소스에서 데이터를 수집합니다. 플릿을 사용하여 환경, 팀 또는 목적별로 수집기를 구성하십시오."
+    },
+    "fleet_detail": {
+      "title": "플릿 상세 정보"
+    },
+    "instances": {
+      "document_title": "Collector 인스턴스",
+      "title": "인스턴스",
+      "description": "수집기 인스턴스는 원격 호스트에서 실행 중인 수집기 프로세스를 나타냅니다. 인스턴스는 등록 토큰을 사용하여 플릿에 등록되며 해당 플릿의 소스 구성을 자동으로 받습니다."
+    },
+    "onboarding": {
+      "title": "Collector 온보딩",
+      "description": "새로 연결된 수집기의 상태입니다.",
+      "load_error": "수집기 인스턴스를 불러올 수 없습니다: {{error}}",
+      "not_found": "수집기 인스턴스를 찾을 수 없습니다. 제거되었을 수 있습니다. 모든 <instancesLink>인스턴스</instancesLink>를 확인하십시오."
+    },
+    "overview": {
+      "title": "Collectors 개요",
+      "description": "수집기는 인프라 전반에 배포되어 로그를 수집하고 {{productName}}(으)로 전달하는 경량 서비스입니다. 수집기는 플릿으로 구성되며 수집할 데이터를 정의하는 소스로 구성됩니다."
+    },
+    "settings": {
+      "title": "Collectors 설정",
+      "description": "관리되는 수집기의 엔드포인트와 수명 주기 설정을 구성합니다. 수집기는 이 엔드포인트에 연결하여 구성 업데이트를 받고 수집한 로그 데이터를 전송합니다."
+    }
+  },
+  "navigation": {
+    "overview": "개요",
+    "fleets": "플릿",
+    "instances": "인스턴스",
+    "deployment": "배포",
+    "settings": "설정"
+  },
+  "activity": {
+    "deleted_target": "[삭제됨]",
+    "by_actor": "{{name}}",
+    "by_system": "시스템",
+    "config_changed": {
+      "fleet": "플릿 <targetLink />의 구성이 업데이트되었습니다",
+      "fleet_with_others_other": "플릿 <targetLink /> 및 기타 플릿 {{count}}개의 구성이 업데이트되었습니다",
+      "collector": "수집기 <targetLink />의 구성이 업데이트되었습니다",
+      "collector_with_others_other": "수집기 <targetLink /> 및 기타 수집기 {{count}}개의 구성이 업데이트되었습니다"
+    },
+    "ingest_config_changed": {
+      "fleet": "플릿 <targetLink />의 수집 구성이 업데이트되었습니다",
+      "fleet_with_others_other": "플릿 <targetLink /> 및 기타 플릿 {{count}}개의 수집 구성이 업데이트되었습니다",
+      "collector": "수집기 <targetLink />의 수집 구성이 업데이트되었습니다",
+      "collector_with_others_other": "수집기 <targetLink /> 및 기타 수집기 {{count}}개의 수집 구성이 업데이트되었습니다"
+    },
+    "restart": {
+      "fleet": "플릿 <targetLink />에 재시작이 요청되었습니다",
+      "fleet_with_others_other": "플릿 <targetLink /> 및 기타 플릿 {{count}}개에 재시작이 요청되었습니다",
+      "collector": "수집기 <targetLink />에 재시작이 요청되었습니다",
+      "collector_with_others_other": "수집기 <targetLink /> 및 기타 수집기 {{count}}개에 재시작이 요청되었습니다"
+    },
+    "discovery_run": {
+      "fleet": "플릿 <targetLink />에 디스커버리 실행이 트리거되었습니다",
+      "fleet_with_others_other": "플릿 <targetLink /> 및 기타 플릿 {{count}}개에 디스커버리 실행이 트리거되었습니다",
+      "collector": "수집기 <targetLink />에 디스커버리 실행이 트리거되었습니다",
+      "collector_with_others_other": "수집기 <targetLink /> 및 기타 수집기 {{count}}개에 디스커버리 실행이 트리거되었습니다"
+    },
+    "reassigned": {
+      "collector": "수집기 <targetLink />이(가) 재할당되었습니다",
+      "collector_with_others_other": "수집기 <targetLink /> 및 기타 수집기 {{count}}개가 재할당되었습니다"
+    },
+    "reassigned_to_fleet": {
+      "collector": "수집기 <targetLink />이(가) 플릿 <destinationLink />(으)로 재할당되었습니다",
+      "collector_with_others_other": "수집기 <targetLink /> 및 기타 수집기 {{count}}개가 플릿 <destinationLink />(으)로 재할당되었습니다"
+    }
+  },
+  "fleet_reference": {
+    "moving_title": "수집기는 다음에 체크인할 때 이 플릿으로 이동합니다.",
+    "moving_from": "({{fleet}}에서 이동 중)",
+    "moving_from_removed": "(제거된 플릿에서 이동 중)",
+    "removed_title": "이 플릿은 삭제되었습니다.",
+    "removed": "플릿 제거됨 ({{fleetId}})"
+  },
+  "sync_state": {
+    "pending_title": "동기화 대기 중 - 변경 사항은 수집기의 다음 체크인 시 적용됩니다",
+    "pending": "동기화 대기 중",
+    "in_sync_title": "동기화됨 - 모든 변경 사항이 적용되었습니다",
+    "in_sync": "동기화됨"
+  },
+  "instance_status": {
+    "online": "온라인",
+    "offline": "오프라인"
+  },
+  "os": {
+    "unknown": "알 수 없음"
+  },
+  "enrollment_tokens": {
+    "bulk_delete_title": "등록 토큰 삭제",
+    "bulk_delete_confirm_other": "등록 토큰 {{count}}개를 삭제하시겠습니까? 새 수집기는 삭제된 토큰을 사용하여 등록할 수 없습니다.",
+    "never": "없음",
+    "expired": "만료됨",
+    "human_name": "등록 토큰",
+    "delete_title": "등록 토큰 삭제",
+    "delete_confirm": "이 등록 토큰을 삭제하시겠습니까? 새 수집기는 이 토큰을 사용하여 등록할 수 없습니다. 이미 등록된 수집기는 계속 정상적으로 작동합니다."
+  },
+  "deployment": {
+    "select_fleet_step": "플릿 선택",
+    "generate_token_step": "토큰 생성",
+    "install_step": "Collector 설치",
+    "open_in_search": "검색에서 열기",
+    "generate_token_first": "설치 명령을 보려면 위에서 토큰을 생성하십시오.",
+    "copy_token_only": "토큰만 복사"
+  },
+  "enrolling_hosts": {
+    "receiving": "수신 중",
+    "listening": "수신 대기 중…",
+    "title": "등록 중인 호스트",
+    "connected_other": "{{count}}개 연결됨 · 추가 수신 대기 중…",
+    "listening_subtitle": "수신 대기 중…",
+    "view_all": "인스턴스에서 모두 보기",
+    "host": "호스트",
+    "status": "상태",
+    "first_messages": "첫 메시지",
+    "enrolled": "등록됨",
+    "actions": "작업",
+    "hide_setup": "설정 숨기기",
+    "view_setup": "설정 보기",
+    "empty": "명령을 실행하는 호스트는 체크인하는 대로 여기에 표시됩니다.",
+    "connection_problem": "서버에 연결하는 데 문제가 있습니다. 자동으로 다시 시도합니다"
+  },
+  "token_step": {
+    "summary_expires": "토큰 <emphasis>{{tokenName}}</emphasis>이(가) 생성되었습니다 - 만료: <expiresAt />",
+    "summary_expires_with_fleet": "토큰 <emphasis>{{tokenName}}</emphasis>이(가) 생성되었습니다 - 만료: <expiresAt /> - 플릿 <emphasis>{{fleetName}}</emphasis>로 범위 제한됨",
+    "summary_never_expires": "토큰 <emphasis>{{tokenName}}</emphasis>이(가) 생성되었습니다 - 만료되지 않음",
+    "summary_never_expires_with_fleet": "토큰 <emphasis>{{tokenName}}</emphasis>이(가) 생성되었습니다 - 만료되지 않음 - 플릿 <emphasis>{{fleetName}}</emphasis>로 범위 제한됨",
+    "change_token": "토큰 변경",
+    "short_lived": "단기 토큰 (1일 후 만료)",
+    "custom": "사용자 지정 토큰",
+    "expiry_24_hours": "24시간",
+    "expiry_7_days": "7일",
+    "expiry_30_days": "30일",
+    "expiry_never": "만료 없음",
+    "name": "이름",
+    "name_placeholder": "예: web-servers 롤아웃",
+    "custom_hint": "사용자 지정 토큰은 등록 토큰 탭에 표시되며 언제든지 취소할 수 있습니다.",
+    "no_permission": "이 플릿에 대한 등록 토큰을 만들 권한이 없습니다",
+    "generating": "생성 중...",
+    "generate": "토큰 생성",
+    "select_fleet_first": "먼저 위에서 플릿을 선택하십시오."
+  },
+  "fleet_actions": {
+    "received_messages": "수신된 메시지",
+    "delete": "삭제",
+    "delete_blocked_other": "이 플릿에는 할당된 인스턴스가 {{count}}개 있습니다. 플릿을 삭제하기 전에 인스턴스를 재할당하거나 삭제하십시오.",
+    "delete_title": "플릿 삭제",
+    "delete_confirm": "플릿 <emphasis>{{fleetName}}</emphasis>을(를) 삭제하시겠습니까? 해당 플릿의 소스 구성과 등록 토큰이 제거됩니다."
+  },
+  "fleet_form": {
+    "name_required": "이름은 필수입니다",
+    "edit_title": "플릿 편집",
+    "new_title": "새 플릿",
+    "name": "이름",
+    "name_help": "이 플릿의 고유한 이름",
+    "description": "설명",
+    "description_help": "이 플릿의 용도에 대한 선택적 설명",
+    "update": "플릿 업데이트",
+    "create": "플릿 만들기",
+    "updating": "업데이트 중...",
+    "creating": "만드는 중..."
+  },
+  "fleet_settings": {
+    "general": "일반 설정",
+    "fleet_name": "플릿 이름",
+    "save": "변경 사항 저장",
+    "saving": "저장 중...",
+    "information": "플릿 정보",
+    "fleet_id": "플릿 ID:",
+    "created": "생성일:",
+    "updated": "업데이트일:"
+  },
+  "fleets": {
+    "human_name": "플릿"
+  },
+  "fleet_detail": {
+    "tab_sources": "소스",
+    "tab_instances": "인스턴스",
+    "tab_settings": "설정",
+    "edit_source": "편집",
+    "not_found": "플릿을 찾을 수 없습니다",
+    "deploy_collector": "새 Collector 배포",
+    "stat_instances": "인스턴스",
+    "stat_instances_help": "이 플릿에 등록된 수집기 프로세스입니다.",
+    "stat_online": "온라인",
+    "stat_online_help": "오프라인 임계값 이내에 하트비트를 보고한 인스턴스입니다.",
+    "stat_offline": "오프라인",
+    "stat_offline_help": "하트비트를 놓친 인스턴스입니다. 호스트 연결 상태 또는 수집기 프로세스 상태를 확인하십시오.",
+    "stat_sources": "소스",
+    "stat_sources_help": "이 플릿에 할당된 데이터 수집 구성입니다.",
+    "sources_description": "소스는 이 플릿의 모든 수집기에 자동으로 푸시됩니다. 변경 사항은 몇 초 내에 적용됩니다.",
+    "add_source": "소스 추가",
+    "sources_human_name": "소스",
+    "instances_description": "이 플릿에 등록된 수집기 인스턴스입니다. 각 인스턴스는 활성화된 모든 소스를 실행합니다. 인스턴스를 더 추가하려면 이 플릿의 등록 토큰을 사용하여 <deployLink>수집기를 배포</deployLink>하십시오.",
+    "instances_human_name": "인스턴스",
+    "delete_source_title": "소스 삭제",
+    "delete_source_confirm": "소스 <emphasis>{{sourceName}}</emphasis>을(를) 삭제하시겠습니까? 이 플릿의 수집기는 몇 초 내에 이 소스에서 데이터 수집을 중단합니다."
+  },
+  "instance_actions": {
+    "reassign": "플릿에 재할당",
+    "view_system_logs": "시스템 로그 보기",
+    "details": "상세 정보",
+    "delete_title": "Collector 인스턴스 삭제",
+    "delete_confirm": "인스턴스 <emphasis>{{instanceName}}</emphasis>을(를) 삭제하시겠습니까?<lineBreak />다시 표시되려면 수집기를 다시 등록해야 합니다."
+  },
+  "reassign_fleet": {
+    "fleet_required": "플릿은 필수입니다",
+    "title_other": "인스턴스 {{count}}개를 플릿에 재할당",
+    "no_other_fleet_other": "이 수집기를 할당할 다른 플릿이 없습니다.",
+    "no_permission": "수집기를 다른 플릿에 할당할 권한이 없습니다.",
+    "select_placeholder": "플릿 선택...",
+    "submit_other": "인스턴스 재할당",
+    "submitting": "재할당 중..."
+  },
+  "instance_health": {
+    "title": "상태",
+    "unknown": "알 수 없음",
+    "no_report": "이 수집기는 상태 정보를 보고하지 않았습니다.",
+    "healthy": "정상",
+    "unhealthy": "비정상",
+    "last_known": "마지막으로 확인된 상태: {{state}}",
+    "since": "<duration /> 동안"
+  },
+  "instance_drawer": {
+    "action_reassign": "다른 플릿에 재할당",
+    "action_reload_config": "구성 다시 불러오기",
+    "action_reload_ingest_config": "수집 구성 다시 불러오기",
+    "action_restart": "재시작",
+    "action_discovery": "소스 디스커버리 실행",
+    "status": "상태:",
+    "sync": "동기화:",
+    "fleet": "플릿:",
+    "os": "운영 체제:",
+    "last_seen": "마지막 확인:",
+    "enrolled": "등록일:",
+    "version": "버전:",
+    "logs": "로그:",
+    "messages": "메시지:",
+    "attributes": "속성",
+    "active_sources_other": "활성 소스 ({{count}})",
+    "sources_inherited": "소스는 이 인스턴스의 플릿 구성에서 상속됩니다.",
+    "no_sources": "이 플릿에 구성된 소스가 없습니다. 데이터 수집을 시작하려면 플릿 상세 정보 페이지에서 소스를 추가하십시오.",
+    "synchronization": "동기화",
+    "pending_load_error": "대기 중인 변경 사항을 불러올 수 없습니다. 나중에 다시 시도하십시오.",
+    "queued_actions": "수집기가 동기화될 때까지 다음 작업이 대기열에 있습니다:",
+    "hide_transactions": "대기 중인 트랜잭션 숨기기",
+    "show_transactions_other": "대기 중인 트랜잭션 표시 ({{count}})",
+    "changes_queued": "변경 사항이 대기열에 있으며 수집기의 다음 체크인 시 적용됩니다.",
+    "all_applied": "수집기가 대기 중이던 모든 작업을 적용했습니다."
+  },
+  "overview": {
+    "stat_instances_help": "모든 플릿에서 실행 중인 수집기 프로세스입니다.",
+    "stat_fleets": "플릿",
+    "stat_fleets_help": "동일한 소스 구성을 공유하는 수집기의 논리적 그룹입니다.",
+    "stat_sources_help": "모든 플릿의 데이터 수집 구성(파일 경로, journald, Windows Event Logs)입니다.",
+    "fleet_stats_error": "플릿 통계를 불러올 수 없습니다.",
+    "stats_error": "Collector 통계를 불러올 수 없습니다.",
+    "fleets_title": "플릿",
+    "filter_placeholder": "플릿 필터링...",
+    "config_error": "Collectors 구성을 불러올 수 없습니다.",
+    "endpoint_missing_title": "Collector 수집 엔드포인트가 설정되지 않았습니다",
+    "endpoint_missing": "수집기는 아직 설정되지 않은 수집 엔드포인트에 등록됩니다. 설정하려면 collectors 구성을 편집하고 Collector Ingest (HTTP) 입력을 만들거나 변경할 권한이 필요하지만 현재 계정에는 해당 권한이 없습니다. 먼저 관리자에게 엔드포인트 설정을 요청하십시오."
+  },
+  "fleet_card": {
+    "healthy": "이 플릿의 모든 인스턴스가 온라인입니다",
+    "degraded": "이 플릿의 일부 인스턴스가 오프라인입니다",
+    "down": "이 플릿의 모든 인스턴스가 오프라인입니다",
+    "empty": "아직 이 플릿에 등록된 Collector 인스턴스가 없습니다",
+    "instances_other": "인스턴스",
+    "online_other": "● 온라인 {{count}}개",
+    "offline_other": "● 오프라인 {{count}}개",
+    "sources_other": "소스 {{count}}개"
+  },
+  "fleet_cards": {
+    "empty_title": "아직 플릿이 없습니다",
+    "contact_admin": "첫 번째 수집기를 설정하려면 관리자에게 문의하십시오.",
+    "empty_description": "플릿을 사용하면 구성을 공유하는 수집기 그룹을 관리할 수 있습니다. 첫 번째 플릿을 만든 다음 소스를 추가하여 해당 수집기가 수집할 데이터를 정의하십시오. 구성이 끝나면 등록 토큰을 사용하여 <deployLink>수집기를 배포</deployLink>하십시오.",
+    "create": "플릿 만들기",
+    "no_match": "필터와 일치하는 플릿이 없습니다"
+  },
+  "recent_activity": {
+    "title": "최근 활동",
+    "empty": "최근 활동이 없습니다."
+  },
+  "collector_facts": {
+    "title": "Collector",
+    "host": "호스트",
+    "os": "OS",
+    "version": "버전",
+    "fleet": "플릿",
+    "enrolled": "등록일",
+    "last_seen": "마지막 확인",
+    "show_attributes_other": "속성 {{count}}개 모두 표시",
+    "hide_attributes": "속성 숨기기"
+  },
+  "connection_success": {
+    "offline": "수집기가 한 번 연결되었지만 <lastSeen />부터 보고하지 않았습니다.",
+    "receiving": "수집기가 연결되어 메시지를 전달하고 있습니다.",
+    "waiting": "거의 다 되었습니다. 수집기가 연결되었으며 첫 메시지를 기다리고 있습니다.",
+    "title": "{{host}} 설정 중",
+    "view_instances": "인스턴스 보기",
+    "check_again": "다시 확인",
+    "log_preview": "로그 미리 보기",
+    "caption_messages": "{{duration}} 이후 수신된 메시지를 표시합니다",
+    "caption_messages_checking": "{{duration}} 이후 수신된 메시지를 표시합니다 - 몇 초마다 확인 중",
+    "caption_system": "{{duration}} 이후 수신된 Collector 시스템 메시지를 표시합니다",
+    "caption_system_checking": "{{duration}} 이후 수신된 Collector 시스템 메시지를 표시합니다 - 몇 초마다 확인 중"
+  },
+  "fleet_choice": {
+    "selected_heading": "이 수집기의 플릿",
+    "change": "플릿 변경",
+    "heading": "이 수집기의 플릿 선택",
+    "create_new": "새 플릿 만들기",
+    "or": "또는",
+    "select_existing": "기존 플릿 선택",
+    "select_existing_placeholder": "기존 플릿 선택..."
+  },
+  "ingest_endpoint": {
+    "setting_up": "Collectors 설정 중...",
+    "confirm": "엔드포인트 확인",
+    "create_input": "입력 만들기",
+    "save": "엔드포인트 저장",
+    "hostname": "외부 호스트 이름",
+    "hostname_placeholder": "예: otlp.example.com",
+    "port": "외부 포트",
+    "cancel": "취소",
+    "reachability_hint": "수집기는 이 주소로 로그를 전송합니다. 모든 수집기 호스트에서 접근할 수 있어야 합니다. 로드 밸런서 또는 이 서버일 수 있습니다.",
+    "confirm_title": "Collectors가 이 클러스터로 데이터를 전송하는 방법 확인",
+    "change": "엔드포인트 변경",
+    "sending_to": "수집기는 <endpoint />에서 이 클러스터로 데이터를 전송합니다",
+    "no_input_title": "수집 입력이 없습니다",
+    "no_input": "수집기는 등록할 수 있지만 입력이 만들어질 때까지 데이터를 전송할 수 없습니다.",
+    "not_running_title": "<endpoint />의 수집 입력이 실행 중이 아닙니다",
+    "not_running": "수집기는 등록할 수 있지만 입력이 실행될 때까지 데이터를 전송할 수 없습니다.",
+    "manage_input": "입력 관리"
+  },
+  "install_command": {
+    "title": "{{platform}}에서 실행",
+    "copy": "명령 복사",
+    "note_expires": "수집기를 다운로드하여 설치하고, 선택한 플릿에 등록한 후 서비스를 시작합니다. 관리자 권한이 필요합니다. 토큰은 {{duration}} 후에 만료됩니다.",
+    "note_never_expires": "수집기를 다운로드하여 설치하고, 선택한 플릿에 등록한 후 서비스를 시작합니다. 관리자 권한이 필요합니다. 이 토큰은 만료되지 않습니다."
+  },
+  "log_preview": {
+    "unavailable": "로그 미리 보기를 사용할 수 없습니다 - {{error}}",
+    "loading": "로그 미리 보기를 불러오는 중...",
+    "empty": "아직 메시지가 없습니다 - 몇 초마다 확인 중"
+  },
+  "next_steps": {
+    "explore": "데이터 탐색",
+    "explore_description": "이 수집기로 필터링된 검색 열기",
+    "configure_sources": "소스 구성",
+    "configure_sources_description": "이 플릿이 수집하는 항목을 추가하거나 조정합니다",
+    "manage_fleets": "플릿 관리",
+    "manage_fleets_description": "이 수집기를 영구 플릿으로 이동합니다",
+    "install_another": "다른 수집기 설치",
+    "install_another_description": "다른 호스트에서 이 설정을 반복합니다",
+    "offline_title": "다시 온라인 상태로 복구",
+    "check_service": "호스트에서 수집기 서비스가 실행 중인지 확인하십시오.",
+    "check_reachability": "호스트가 이 {{productName}} 서버에 접근할 수 있는지 확인하십시오.",
+    "check_logs": "아래 미리 보기에서 수집기 자체 로그의 연결 오류를 검토하십시오.",
+    "title": "다음 단계"
+  },
+  "timeline": {
+    "connection_lost": "연결 끊김",
+    "last_heartbeat": "마지막 하트비트 <lastSeen />",
+    "first_messages": "첫 메시지",
+    "receiving_other": "수신 중 - {{duration}} 이후 메시지 {{count}}건",
+    "listening": "수신 대기 중... 보통 1분 이내",
+    "enrolled": "등록됨",
+    "enrolled_detail": "등록 토큰으로 등록됨 - <enrolledAt />",
+    "connected": "연결됨",
+    "connected_detail": "하트비트 수신됨 - <lastSeen />",
+    "sources_configured": "소스 구성됨",
+    "sources_detail_other": "플릿 <fleetLink>{{fleetName}}</fleetLink>의 소스 {{count}}개"
+  },
+  "platform_picker": {
+    "title": "Collectors 시작하기",
+    "description": "인프라 전반에 경량 수집기를 배포하여 로그를 {{productName}}(으)로 전달하십시오."
+  },
+  "source_status": {
+    "messages_other": "메시지 {{formattedCount}}건",
+    "disabled": "사용 안 함",
+    "not_applicable": "{{os}}에서는 적용되지 않음",
+    "unrecognised": "인식할 수 없는 소스 유형",
+    "paused": "일시 중지됨 - 수집기 오프라인",
+    "no_messages": "아직 메시지가 없습니다",
+    "waiting": "첫 메시지를 기다리는 중...",
+    "title": "로그 소스",
+    "no_sources": "이 플릿에 아직 구성된 소스가 없습니다."
+  },
+  "waiting_for_connection": {
+    "status": "연결을 기다리는 중... {{seconds}}초"
+  },
+  "settings": {
+    "getting_started": "Collectors 시작하기",
+    "getting_started_cloud": "수집기는 관리형 수집 엔드포인트에 연결하여 데이터를 전송합니다. 수집기 인프라를 초기화하려면 수집기 설정을 저장하십시오. 설정이 끝나면 플릿을 만들고, 소스를 추가하고, 호스트에 수집기를 배포할 수 있습니다.",
+    "getting_started_self_managed": "수집기가 수집한 데이터를 받으려면 수집 엔드포인트가 필요합니다. 아래에서 HTTP 엔드포인트를 구성하고 저장하여 수집기 인프라를 초기화하십시오. 설정이 끝나면 플릿을 만들고, 소스를 추가하고, 호스트에 수집기를 배포할 수 있습니다.",
+    "ingest_endpoint": "수집 엔드포인트",
+    "ingest_endpoint_cloud": "수집 엔드포인트는 시스템에서 관리됩니다. 수집기가 자동으로 여기에 연결됩니다.",
+    "ingest_endpoint_help": "수집 엔드포인트는 OpenTelemetry (OTLP)를 통해 수집기로부터 로그 데이터를 받습니다. 관리되는 수집기에 데이터 대상으로 푸시되는 외부 주소입니다. 실행 중인 collector 수집 입력으로 라우팅되어야 합니다. 일반적으로 로드 밸런서 또는 서버 자체의 주소입니다.",
+    "hostname_help": "수집기가 연결에 사용할 호스트 이름 또는 IP 주소입니다. 수집기 호스트에서 접근할 수 있어야 합니다.",
+    "create_input": "수집 입력 만들기",
+    "lifecycle": "Collector 수명 주기",
+    "offline_threshold": "오프라인 임계값",
+    "offline_threshold_help": "이 시간 내에 보고하지 않은 수집기는 오프라인으로 표시됩니다.",
+    "default_visibility": "기본 표시 범위",
+    "default_visibility_help": "이 시간 내에 보고하지 않은 수집기는 기본 보기에서 숨겨집니다. 사용자는 인스턴스 테이블에서 이 필터를 조정하거나 제거할 수 있습니다.",
+    "expiration_threshold": "만료 임계값",
+    "expiration_threshold_help": "이 시간 내에 보고하지 않은 수집기는 영구적으로 제거됩니다.",
+    "confirm": "설정 확인"
+  },
+  "ingest_inputs": {
+    "title": "수집 입력",
+    "none": "Collector 수집 입력이 없습니다. 입력이 만들어질 때까지 수집기는 데이터를 전송할 수 없습니다.",
+    "unreadable_other": "Collector 수집 입력이 {{count}}개 있지만 이를 볼 수 있는 권한이 없습니다.",
+    "none_running": "Collector 수집 입력이 있지만 현재 실행 중인 입력이 없습니다. 수집기는 데이터를 전송할 수 없습니다.",
+    "name": "이름",
+    "status": "상태",
+    "bind_address": "바인드 주소",
+    "port": "포트",
+    "manage": "관리",
+    "additional_unreadable_other": "권한 문제로 표시되지 않는 추가 입력이 {{count}}개 있습니다."
+  },
+  "port_mismatch": {
+    "message_other": "Collector 수집 입력이 서로 다른 포트에 있습니다: {{ports}}. 외부 포트가 입력 포트와 다른 경우 네트워크가 트래픽을 올바르게 라우팅하는지 확인하십시오."
+  },
+  "source_types": {
+    "file": "파일",
+    "journald": "Journald",
+    "windows_event_log": "Windows Event Log",
+    "macos_unified_logging": "macOS Unified Logging"
+  },
+  "source_columns": {
+    "enabled": "사용"
+  },
+  "source_form": {
+    "max_poll_interval_error": "최대 폴링 간격은 1초 이상이어야 합니다.",
+    "max_log_age_error": "최대 로그 보존 기간은 0 또는 양수여야 합니다.",
+    "read_mode_end": "끝에서 (tail)",
+    "read_mode_beginning": "처음부터",
+    "file_paths": "파일 경로",
+    "file_paths_help": "Glob 패턴을 지원합니다(예: /var/log/*.log, /var/log/**/*.log). 수집기는 일치하는 파일에서 새 줄을 감시합니다.",
+    "read_mode": "읽기 모드",
+    "read_mode_file_help": "끝에서: 수집기가 시작된 이후의 새 줄만 수집합니다. 처음부터: 기존의 모든 줄을 먼저 수집한 후 계속 tail합니다.",
+    "read_mode_journald_help": "끝에서: 수집기가 시작된 이후의 새 항목만 수집합니다. 처음부터: 기존의 모든 항목을 먼저 수집한 후 계속 tail합니다.",
+    "priority": "우선순위",
+    "priority_help": "수집할 최소 심각도 수준입니다. 예를 들어 오류를 선택하면 심각, 경고, 긴급 항목도 함께 수집합니다.",
+    "priority_emerg": "긴급",
+    "priority_alert": "경고",
+    "priority_crit": "심각",
+    "priority_err": "오류",
+    "priority_warning": "주의",
+    "priority_notice": "알림",
+    "priority_info": "정보",
+    "priority_debug": "디버그",
+    "match_pattern": "일치 패턴",
+    "match_pattern_help": "유닛, 프로세스 등으로 항목을 필터링하는 선택적 journald 일치 표현식입니다. 예: _SYSTEMD_UNIT=nginx.service",
+    "channels": "채널",
+    "channels_help": "쉼표로 구분된 채널 이름(예: Application, Security, System)",
+    "include_default_channels": "기본 채널 포함",
+    "include_default_channels_help": "기본값: {{channels}}",
+    "predicate": "조건자",
+    "predicate_help": "<code>log</code> 명령에 전달되는 선택적 macOS unified logging 필터 조건자입니다. 비워 두면 시스템의 모든 로그를 수집합니다! <code>info</code> 또는 <code>debug</code> 수준은 노이즈가 매우 많고 유용한 정보가 거의 없으므로 현재 수집되지 않습니다. 예: <code>{{example}}</code>",
+    "max_poll_interval": "최대 폴링 간격",
+    "max_poll_interval_help": "수집기가 새 로그 항목을 확인하는 빈도입니다. 1초 이상이어야 합니다.",
+    "max_log_age": "최대 로그 보존 기간",
+    "max_log_age_help": "처음 시작할 때 얼마나 이전 로그까지 백필할지 정합니다. 0으로 설정하면 백필을 사용하지 않습니다.",
+    "edit_title": "소스 편집",
+    "new_title": "새 소스",
+    "description": "소스는 이 플릿의 수집기가 수집할 데이터를 정의합니다. 각 소스 유형은 서로 다른 수집 방법에 해당합니다.",
+    "source_type": "소스 유형",
+    "file_type_help": "호스트의 파일에서 로그 줄을 수집합니다. 여러 파일을 일치시키기 위한 glob 패턴을 지원합니다.",
+    "journald_type_help": "systemd 저널의 항목을 수집합니다(Linux 전용).",
+    "windows_type_help": "Windows 이벤트 뷰어 채널의 이벤트를 수집합니다.",
+    "macos_type_help": "<code>log</code> 명령을 통해 macOS unified logging 시스템에서 수집합니다(macOS 전용).",
+    "enabled_help": "사용 안 함으로 설정된 소스는 수집기로 전송되지 않습니다. 소스를 제거하지 않고 수집을 일시적으로 중지할 때 사용하십시오.",
+    "update": "소스 업데이트",
+    "create": "소스 만들기"
+  },
+  "load_errors": {
+    "recent_activity": {
+      "message": "최근 활동을 불러오지 못했습니다. 상태:",
+      "title": "최근 활동을 불러올 수 없습니다"
+    },
+    "input_ids": {
+      "message": "Collector 입력 ID를 불러오지 못했습니다. 상태:",
+      "title": "Collector 입력 ID를 불러올 수 없습니다."
+    },
+    "stats": {
+      "message": "Collector 통계를 불러오지 못했습니다. 상태:",
+      "title": "Collector 통계를 불러올 수 없습니다."
+    },
+    "config": {
+      "message": "Collectors 구성을 불러오지 못했습니다. 상태:",
+      "title": "Collectors 구성을 불러올 수 없습니다."
+    },
+    "enrollment_tokens": {
+      "message": "등록 토큰을 불러오지 못했습니다. 상태:",
+      "title": "등록 토큰을 불러올 수 없습니다"
+    },
+    "pending_changes": {
+      "message": "대기 중인 변경 사항을 불러오지 못했습니다. 상태:",
+      "title": "대기 중인 변경 사항을 불러올 수 없습니다"
+    },
+    "instances": {
+      "message": "인스턴스를 불러오지 못했습니다. 상태:",
+      "title": "인스턴스를 불러올 수 없습니다"
+    },
+    "collector_instances": {
+      "message": "Collector 인스턴스를 불러오지 못했습니다. 상태:",
+      "title": "Collector 인스턴스를 불러올 수 없습니다"
+    },
+    "fleets": {
+      "message": "플릿을 불러오지 못했습니다. 상태:",
+      "title": "플릿을 불러올 수 없습니다"
+    },
+    "fleet": {
+      "message": "플릿을 불러오지 못했습니다. 상태:",
+      "title": "플릿을 불러올 수 없습니다"
+    },
+    "fleet_stats": {
+      "message": "플릿 통계를 불러오지 못했습니다. 상태:",
+      "title": "플릿 통계를 불러올 수 없습니다"
+    },
+    "sources": {
+      "message": "소스를 불러오지 못했습니다. 상태:",
+      "title": "소스를 불러올 수 없습니다"
+    },
+    "input_details": {
+      "message": "Collector 입력 세부 정보를 불러오지 못했습니다. 상태: {{error}}",
+      "title": "Collector 입력 세부 정보를 불러올 수 없습니다."
+    }
+  },
+  "mutation_errors": {
+    "create_fleet": {
+      "message": "플릿을 만들지 못했습니다: {{error}}",
+      "title": "플릿을 만들 수 없습니다"
+    },
+    "update_fleet": {
+      "message": "플릿을 업데이트하지 못했습니다: {{error}}",
+      "title": "플릿을 업데이트할 수 없습니다"
+    },
+    "delete_fleet": {
+      "message": "플릿을 삭제하지 못했습니다: {{error}}",
+      "title": "플릿을 삭제할 수 없습니다"
+    },
+    "create_source": {
+      "message": "소스를 만들지 못했습니다: {{error}}",
+      "title": "소스를 만들 수 없습니다"
+    },
+    "update_source": {
+      "message": "소스를 업데이트하지 못했습니다: {{error}}",
+      "title": "소스를 업데이트할 수 없습니다"
+    },
+    "delete_source": {
+      "message": "소스를 삭제하지 못했습니다: {{error}}",
+      "title": "소스를 삭제할 수 없습니다"
+    },
+    "create_enrollment_token": {
+      "message": "등록 토큰을 만들지 못했습니다: {{error}}",
+      "title": "등록 토큰을 만들 수 없습니다"
+    },
+    "delete_enrollment_token": {
+      "message": "등록 토큰을 삭제하지 못했습니다: {{error}}",
+      "title": "등록 토큰을 삭제할 수 없습니다"
+    },
+    "delete_enrollment_tokens": {
+      "message": "등록 토큰을 삭제하지 못했습니다: {{error}}",
+      "title": "등록 토큰을 삭제할 수 없습니다"
+    },
+    "reassign_instances": {
+      "message": "인스턴스를 재할당하지 못했습니다: {{error}}",
+      "title": "인스턴스를 재할당할 수 없습니다"
+    },
+    "delete_instance": {
+      "message": "인스턴스를 삭제하지 못했습니다: {{error}}",
+      "title": "인스턴스를 삭제할 수 없습니다"
+    },
+    "save_config": {
+      "message": "Collectors 구성을 저장하지 못했습니다: {{error}}",
+      "title": "구성을 저장할 수 없습니다"
+    },
+    "create_input": {
+      "message": "Collector 수집 입력을 만들지 못했습니다: {{error}}",
+      "title": "Collector 수집 입력을 만들 수 없습니다"
+    },
+    "update_input": {
+      "message": "Collector 수집 입력을 업데이트하지 못했습니다: {{error}}",
+      "title": "Collector 수집 입력을 업데이트할 수 없습니다"
+    }
+  },
+  "notifications": {
+    "success_title": "성공!",
+    "fleet_created": "플릿 \"{{name}}\"이(가) 만들어졌습니다.",
+    "fleet_updated": "플릿 \"{{name}}\"이(가) 업데이트되었습니다.",
+    "fleet_deleted": "플릿이 삭제되었습니다.",
+    "source_created": "소스 \"{{name}}\"이(가) 만들어졌습니다.",
+    "source_updated": "소스 \"{{name}}\"이(가) 업데이트되었습니다.",
+    "source_deleted": "소스가 삭제되었습니다.",
+    "enrollment_token_deleted": "등록 토큰이 삭제되었습니다.",
+    "enrollment_tokens_deleted": "등록 토큰이 삭제되었습니다.",
+    "instances_reassigned": "인스턴스가 재할당되었습니다.",
+    "instance_deleted": "인스턴스가 삭제되었습니다.",
+    "config_saved": "Collectors 구성이 저장되었습니다.",
+    "input_created": "Collector 수집 입력이 만들어졌습니다.",
+    "input_moved": "Collector 수집 입력이 새 포트로 이동되었습니다."
+  },
+  "datanode": {
+    "compatibility_check": {
+      "compatible": "기존 OpenSearch 데이터를 Data Node로 마이그레이션할 수 있습니다.",
+      "error": "호환성을 확인하는 중 오류가 발생했습니다",
+      "incompatible": "기존 OpenSearch 데이터를 Data Node로 마이그레이션할 수 없습니다.",
+      "loading": "호환성 검사 결과를 불러오는 중...",
+      "title": "디렉터리 호환성 검사",
+      "version_incompatible": "OpenSearch 클러스터가 이 Data Node 버전과 호환되지 않아 마이그레이션할 수 없습니다."
+    },
+    "migration_steps_text": {
+      "renewal_step_required": "계속하기 전에 인증서 갱신 정책을 만드십시오.",
+      "finished": "마이그레이션이 완료되었습니다!",
+      "ca_step_required": "계속하기 전에 인증 기관을 만드십시오."
+    },
+    "migration_welcome": {
+      "earlier_deployments": "v5.2 이전 배포 또는 Data Node를 설치하지 않기로 선택한 배포는 메시지 데이터베이스를 Data Node로 마이그레이션해야 합니다.",
+      "incompatible_backend": "호환되지 않는 검색 백엔드입니다. 마이그레이션 마법사를 사용하려면 OpenSearch로 업그레이드하십시오.",
+      "intro": "{{productName}} Data Node는 {{productName}}에서 사용할 OpenSearch를 구성하고 최적화하도록 설계된 관리 구성 요소로, 관리 부담을 줄이고 향후 업데이트를 간소화합니다.",
+      "more_information": "Data Node 마이그레이션에 대한 자세한 내용은 <docsLink>문서</docsLink>에서 확인할 수 있습니다.",
+      "required_steps": "Data Node로 마이그레이션하려면 OS에서, 현재 OS/ES 클러스터 내에서, 그리고 구성 파일에서 몇 가지 단계를 수행해야 합니다.",
+      "title": "Data Node 마이그레이션",
+      "tool_description": "이 마이그레이션 도구는 구성 요소의 호환성을 확인하고 기존 OpenSearch 데이터를 Data Node로 마이그레이션하는 과정을 안내합니다."
+    },
+    "migration_wizard": {
+      "loading": "불러오는 중 ..."
+    },
+    "compatibility_status": {
+      "creation_date": "생성일",
+      "datanode_opensearch_version": "Datanode OpenSearch 버전",
+      "index_version": "인덱스 버전",
+      "indices": "인덱스",
+      "node_title_other": "노드: {{hostname}}, 버전: {{version}}, 인덱스 {{count}}개",
+      "opensearch_data_location": "OpenSearch 데이터 위치",
+      "shard_count_other": "샤드 {{count}}개",
+      "shards": "샤드"
+    },
+    "in_place_migration": {
+      "description": "기존 OpenSearch 2.x 또는 1.3.x 클러스터를 Data Node로 마이그레이션하려면 다음 단계를 따르십시오.",
+      "title": "In-Place 마이그레이션"
+    },
+    "migration_data_nodes": {
+      "certificate_valid_until": "인증서 유효 기간",
+      "found_other": "발견된 Data Node: {{count}}개",
+      "hostname": "호스트 이름",
+      "incompatible": "현재 {{productName}} 버전과 호환되지 않는 버전으로 실행 중인 Data Node가 있습니다. {{productName}}와 Data Node에 동일한 버전을 사용하십시오.",
+      "incompatible_title": "호환되지 않는 Data Node가 발견되었습니다",
+      "loading": "Data Node 불러오는 중",
+      "looking": "Data Node를 찾는 중...",
+      "no_certificate": "인증서 없음",
+      "none_found": "발견된 Data Node가 없습니다.",
+      "none_found_title": "Data Node를 찾을 수 없습니다",
+      "start_data_node": "마이그레이션 프로세스를 계속하려면 Data Node를 하나 이상 시작하십시오. Data Node를 시작하는 방법에 대한 자세한 내용은 <docsLink>문서</docsLink>에서 확인할 수 있습니다.",
+      "status": "상태",
+      "transport_address": "전송 주소",
+      "version": "버전",
+      "version_incompatible": "이 버전은 현재 {{productName}} 버전과 호환되지 않습니다."
+    },
+    "manual_migration": {
+      "migration_type": "마이그레이션 유형",
+      "migration_type_help": "수행하려는 마이그레이션의 유형입니다.",
+      "select_migration_type": "마이그레이션 유형 선택"
+    },
+    "stop_processing": {
+      "change_owner": "Data Node가 데이터 디렉터리를 가리키도록 하여 기존 OpenSearch 데이터를 마이그레이션하는 경우, 데이터 디렉터리의 소유자를 Data Node를 실행하는 사용자(일반적으로 graylog-datanode)로 변경하고 올바른 권한을 다시 설정하십시오. 예를 들어 다음을 실행합니다",
+      "stop_cluster": "계속하기 전에 OpenSearch 클러스터를 중지하십시오.",
+      "stop_opensearch": "OpenSearch 중지",
+      "stopped": "{{productName}} 처리가 중지되었습니다."
+    },
+    "journal_size_warning": {
+      "description": "마이그레이션 중에는 {{productName}} 노드의 처리를 중지해야 하므로 저널 크기가 증가합니다. 따라서 저널 크기 축소 단계 중 또는 그 이전에 저널 볼륨 크기를 늘려야 합니다.",
+      "title": "저널 크기 경고"
+    },
+    "journal_downtime": {
+      "current_size": "현재 저널 크기: <bold>{{size}} MB</bold>, 현재 저널 처리량: <bold>{{throughput}} KB/min</bold>",
+      "estimation_error": "저널 처리량을 추정하는 중 오류가 발생했습니다: {{message}}",
+      "increase_size": "따라서 저널 볼륨 크기를 늘려야 할 수 있습니다.",
+      "max_downtime": "{{productName}}가 Data Node를 가리키도록 재구성하기 위한 현재 최대 다운타임: <bold>{{duration}}</bold>",
+      "processing_stops": "마이그레이션 중에는 {{productName}} 노드의 데이터 처리가 중지되므로 저널 크기가 증가합니다.",
+      "sufficient_size": "계속하기 전에 저널 볼륨 크기가 충분한지 확인하십시오.",
+      "title": "저널 다운타임 크기 경고"
+    },
+    "in_place_welcome": {
+      "description": "In-Place 마이그레이션은 기존 클러스터의 데이터 폴더를 Data Node 클러스터로 마이그레이션합니다.",
+      "install": "시작하려면 이전 설정의 모든 OS/ES 노드에 Data Node를 설치하십시오. Data Node를 다운로드하고 설치하는 방법에 대한 자세한 내용은 <docsLink>여기</docsLink>에서 확인할 수 있습니다.",
+      "title": "시작"
+    },
+    "restart_graylog": {
+      "almost_there": "거의 다 되었습니다!",
+      "example": "예:",
+      "remove_hosts": "<codeSnippet>server.conf</codeSnippet>에서 <codeSnippet>elasticsearch_hosts</codeSnippet> 줄을 제거하십시오",
+      "restart": "완료되면 {{productName}}를 재시작하여 마이그레이션을 마치십시오.",
+      "wait_for_available": "모든 Data Node가 'AVAILABLE' 상태가 될 때까지 기다리십시오. 1~2분 내에 사용 가능 상태가 되지 않으면 Data Node의 로그를 확인하십시오."
+    },
+    "in_place_migration_info": {
+      "configuration": "In-Place 마이그레이션의 경우, <codeSnippet>datanode.conf</codeSnippet>의 Data Node 구성, 특히 <codeSnippet>opensearch_data_location</codeSnippet> 구성 옵션이 모든 노드에서 기존 OpenSearch 데이터 디렉터리를 올바르게 가리키는지 확인하십시오.",
+      "permissions": "마이그레이션 중에는 Data Node와 OpenSearch의 시스템 사용자 모두 데이터 디렉터리에 접근하고 쓸 수 있어야 합니다. 이를 보장하려면 예를 들어 다음을 실행할 수 있습니다"
+    },
+    "certificates_provisioning": {
+      "ca_configured": "인증 기관이 성공적으로 구성되었습니다.",
+      "finished": "Data Node 프로비저닝이 완료되었습니다.",
+      "loading": "마이그레이션 상태를 불러오는 중입니다.",
+      "provision_now": "이제 Data Node의 인증서를 프로비저닝할 수 있습니다.",
+      "provisioning": "인증서 프로비저닝 중"
+    },
+    "jwt_authentication": {
+      "add_snippet": "이를 위해 <codeSnippet>opensearch-security/config.yml</codeSnippet>에 다음 스니펫을 추가해야 합니다",
+      "description": "기존 클러스터를 보호한 방식에 따라 보안 구성에 사전 변경이 필요합니다. {{productName}}에서 OpenSearch에 접근할 때 JWT 인증을 사용합니다. 다음 단계에서 Data Node에서 데이터에 접근할 수 있도록 기존 OpenSearch 클러스터에서 JWT 인증을 수동으로 활성화해야 합니다.",
+      "replace_signing_key": "서명 키를 base64로 인코딩한 <codeSnippet>GRAYLOG_PASSWORD_SECRET</codeSnippet>으로 바꾸십시오. 인코딩하려면 다음을 실행할 수 있습니다",
+      "title": "JWT 인증"
+    },
+    "reset_migration": {
+      "button": "마이그레이션 재설정",
+      "confirm": "마이그레이션을 재설정하시겠습니까?",
+      "failed": "마이그레이션 상태를 재설정하지 못했습니다. 상태: {{error}}",
+      "failed_title": "마이그레이션 상태를 재설정할 수 없습니다.",
+      "success": "마이그레이션 상태가 재설정되었습니다."
+    },
+    "migration_actions": {
+      "next": "다음",
+      "show_renewal_policy_creation": "인증서 갱신 정책 구성",
+      "show_migration_selection": "마이그레이션 단계로 이동",
+      "run_directory_compatibility_check": "디렉터리 호환성 검사 실행",
+      "provision_datanode_certificates": "Data Node에 인증서 프로비저닝"
+    },
+    "force_start": {
+      "confirm": "그래도 시작",
+      "description": "백엔드에서 일반 사전 점검을 통과하지 못했다고 보고했습니다.",
+      "submitting": "시작하는 중...",
+      "title": "그래도 OpenSearch 업그레이드를 시작하시겠습니까?"
+    },
+    "rolling_upgrade_nodes": {
+      "abort_requested": "중단이 요청되었습니다. 현재 단계가 끝나면 업그레이드가 중지됩니다.",
+      "no_remaining_nodes": "남은 노드가 없습니다.",
+      "no_upgraded_nodes": "아직 업그레이드된 노드가 없습니다.",
+      "not_started": "아직 OpenSearch 롤링 업그레이드가 시작되지 않았습니다.",
+      "title": "OpenSearch 롤링 업그레이드",
+      "upgraded_heading": "대상 OpenSearch로 업그레이드됨",
+      "waiting_heading": "OpenSearch 업그레이드 대기 중",
+      "current": "현재",
+      "data_node": "Data Node",
+      "manager": "매니저",
+      "opensearch_version": "OpenSearch 버전",
+      "status": "상태",
+      "unknown": "알 수 없음",
+      "node_status": {
+        "pending": "대기 중",
+        "restarting": "재시작 중",
+        "started": "시작됨",
+        "completed": "업그레이드됨",
+        "failed": "실패",
+        "skipped": "건너뜀"
+      },
+      "state": {
+        "preparing_cluster": "클러스터 준비 중",
+        "selecting_next_node": "다음 노드 선택 중",
+        "upgrading_node": "노드 업그레이드 중",
+        "waiting_node_joined": "노드 재참여 대기 중",
+        "reenabling_allocation": "할당 다시 활성화 중",
+        "waiting_green": "클러스터 green 상태 대기 중",
+        "paused_waiting_green": "클러스터 green 상태 대기 중 일시 중지됨",
+        "finalizing": "마무리 중",
+        "completed": "완료됨",
+        "aborted": "중단됨",
+        "failed": "실패",
+        "in_progress": "진행 중"
+      }
+    },
+    "opensearch_upgrade_info": {
+      "current_version": "현재 OpenSearch 버전:",
+      "data_nodes": "Data Node:",
+      "data_nodes_summary": "{{total}}개 ({{available}}개 사용 가능)",
+      "loading": "불러오는 중...",
+      "target_version": "대상 OpenSearch 버전:",
+      "unknown": "알 수 없음"
+    },
+    "start_upgrade": {
+      "full": {
+        "alert_title": "Data Node가 3개 미만입니다. 롤링이 아닌 전체 재시작입니다",
+        "confirm": "재시작",
+        "journal": "OpenSearch가 중단된 동안 수신 메시지는 각 {{productName}} 노드의 디스크 저널에 쌓입니다. 중단 시간이 저널의 크기 또는 보존 기간 제한을 초과하면 수집이 정체되고 메시지가 유실될 수 있습니다. 예상 다운타임 동안 저널에 충분한 여유가 있는 경우에만 진행하십시오.",
+        "submitting": "재시작하는 중...",
+        "title": "Data Node의 OpenSearch를 재시작하시겠습니까?",
+        "tolerate_downtime": "다운타임을 감수할 수 있는 경우에만 진행하십시오.",
+        "restart_together_with_versions_other": "Data Node가 3개 미만이면 노드를 한 번에 하나씩 재시작하는 방식으로는 OpenSearch를 계속 사용할 수 없습니다. OpenSearch를 <strong>{{currentVersion}}</strong>에서 <strong>{{targetVersion}}</strong>(으)로 이동하기 위해 모든 Data Node가 함께 재시작되므로, 완료될 때까지 스토리지 백엔드를 <strong>사용할 수 없으며</strong> 검색과 인덱싱이 중단됩니다.",
+        "restart_together_other": "Data Node가 3개 미만이면 노드를 한 번에 하나씩 재시작하는 방식으로는 OpenSearch를 계속 사용할 수 없습니다. OpenSearch를 대상 버전으로 이동하기 위해 모든 Data Node가 함께 재시작되므로, 완료될 때까지 스토리지 백엔드를 <strong>사용할 수 없으며</strong> 검색과 인덱싱이 중단됩니다."
+      },
+      "no_rollback": "시작하면 이전 버전으로 롤백할 수 없습니다.",
+      "rolling": {
+        "alert_title": "모든 Data Node를 한 번에 하나씩 재시작합니다",
+        "confirm": "롤링 업그레이드 시작",
+        "healthy_cluster": "계속하기 전에 클러스터가 정상(green) 상태인지 확인하십시오.",
+        "shard_allocation": "각 재시작 중에는 샤드 할당이 일시 중지되므로 클러스터는 계속 사용할 수 있지만, 노드가 나갔다가 다시 참여하는 동안 인덱싱과 검색이 일시적으로 저하될 수 있습니다.",
+        "title": "OpenSearch 롤링 업그레이드를 시작하시겠습니까?",
+        "wait_for_green": "각 노드가 끝날 때마다 업그레이드는 클러스터가 green 상태로 돌아올 때까지 기다린 후 계속합니다. 시간이 너무 오래 걸리면 일시 중지되고 사용자가 재개하기를 기다립니다.",
+        "each_node_with_versions_other": "{{count}}개의 Data Node 각각이 한 번에 하나씩 업그레이드되고 재시작되어 내장 OpenSearch가 <strong>{{currentVersion}}</strong>에서 <strong>{{targetVersion}}</strong>(으)로 이동합니다.",
+        "each_node_other": "{{count}}개의 Data Node 각각이 한 번에 하나씩 업그레이드되고 재시작되어 내장 OpenSearch가 대상 버전으로 이동합니다."
+      },
+      "starting": "시작하는 중..."
+    },
+    "opensearch_upgrade": {
+      "already_up_to_date": "Data Node의 내장 OpenSearch가 이미 최신 상태입니다.",
+      "automatic_upgrade": "각 Data Node는 내장 OpenSearch를 대상 버전으로 자동 업그레이드합니다.",
+      "backup": "원활한 롤백 경로를 확보하려면 업그레이드하기 전에 MongoDB, Data Node 및 Data Lake 스토리지를 백업하십시오.",
+      "before_upgrading": "업그레이드 전",
+      "check_failed": "OpenSearch 업그레이드 가능 여부를 확인할 수 없습니다.",
+      "full_restart": "업그레이드를 적용하려면 모든 Data Node를 재시작해야 합니다.",
+      "full_search_unavailable": "Data Node를 재시작하는 동안 검색과 인덱싱을 사용할 수 없습니다.",
+      "incompatible_indices": "호환되지 않는 인덱스",
+      "old_indices_unreadable": "OpenSearch 3은 OpenSearch 2 이전 버전으로 생성된 인덱스를 읽을 수 없습니다. 업그레이드 중에 이러한 인덱스가 남아 있으면 해당 데이터를 사용할 수 없게 됩니다.",
+      "resolve_indices_first": "먼저 호환되지 않는 모든 인덱스를 해결하십시오.",
+      "restarting": "재시작하는 중...",
+      "resume": "재개",
+      "resuming": "재개하는 중...",
+      "rolling_restart": "영향을 최소화하기 위해 Data Node를 한 번에 하나씩 재시작합니다.",
+      "rolling_search_impaired": "Data Node를 재시작하는 동안 검색 기능이 저하될 수 있습니다.",
+      "start_rolling_upgrade": "OpenSearch 롤링 업그레이드 시작",
+      "start_upgrade_and_restart": "OpenSearch 업그레이드 및 재시작 시작",
+      "starting_rolling_upgrade": "OpenSearch 롤링 업그레이드를 시작하는 중...",
+      "title": "Data Node의 내장 OpenSearch 업그레이드",
+      "unconfirmed_other": "Data Node {{count}}개를 사용할 수 없는 동안에는 호환되지 않는 인덱스와 업그레이드 상태를 확인할 수 없습니다. 모든 Data Node를 사용할 수 있게 되면 다시 표시됩니다.",
+      "upgrade_process": "업그레이드 프로세스",
+      "use_table": "계속하기 전에 아래 테이블을 사용하여 시스템 인덱스를 다시 인덱싱하고 데이터 인덱스를 아카이브하거나 삭제하십시오."
+    },
+    "client_certificate": {
+      "certificate_lifetime": "인증서 수명",
+      "close": "닫기",
+      "create_title": "클라이언트 인증서 만들기",
+      "password": "비밀번호",
+      "principal": "주체",
+      "principal_placeholder": "주체",
+      "role": "역할",
+      "role_help": "OpenSearch 역할 매핑을 나타냅니다.",
+      "role_placeholder": "역할",
+      "submit": "인증서 만들기",
+      "submitting": "인증서를 만드는 중...",
+      "unencrypted": "암호화되지 않음",
+      "ca_certificate": "CA 인증서",
+      "certificate": "인증서",
+      "copy_to_clipboard": "클립보드에 복사",
+      "private_key": "개인 키",
+      "view_principal": "주체:",
+      "view_role": "역할:",
+      "generate": "클라이언트 인증서 생성",
+      "description": "타사 도구용 클라이언트 인증서 생성",
+      "title": "클라이언트 인증서"
+    },
+    "cluster_health": {
+      "cluster_manager": "클러스터 매니저:",
+      "disabled": "사용 안 함",
+      "enabled": "사용",
+      "nodes_summary": "{{total}}개 (오래됨 {{outdated}}개, 업그레이드됨 {{upgraded}}개)",
+      "number_of_nodes": "노드 수:",
+      "number_of_shards": "샤드 수:",
+      "server_version": "서버 버전:",
+      "shard_replication": "샤드 복제:",
+      "shard_replication_help": {
+        "confirm": "노드가 업그레이드된 후 <emphasis><bold>업그레이드 확인</bold></emphasis>을 클릭하면 샤드 복제가 다시 활성화되고, 노드 업그레이드로 인해 사용할 수 없었던 모든 샤드가 다시 할당됩니다.",
+        "force_disabled": "강제 비활성화",
+        "force_enabled": "강제 활성화",
+        "start": "노드의 <emphasis><bold>업그레이드 프로세스 시작</bold></emphasis>을 클릭하면 OpenSearch가 사용 가능한 샤드만 사용하도록 샤드 할당이 복제 없음으로 설정됩니다."
+      },
+      "shards_summary": "활성 {{active}}개, 초기화 중 {{initializing}}개, 재배치 중 {{relocating}}개, 미할당 {{unassigned}}개",
+      "state_help": {
+        "green": "노드가 업그레이드된 후 <emphasis>업그레이드 확인</emphasis>을 클릭하면 샤드 복제가 다시 활성화되고, 노드 업그레이드로 인해 사용할 수 없었던 모든 샤드가 다시 할당되며 클러스터가 GREEN 상태로 돌아옵니다.",
+        "question": "롤링 업그레이드 중에 클러스터 상태는 어떻게 변경됩니까?",
+        "red": "RED - 복제가 없는 인덱스를 사용하면서 해당 인덱스의 샤드를 호스팅하는 노드를 업그레이드하면 클러스터가 red 상태가 되어 이러한 인덱스로 데이터를 수집하거나 검색할 수 없습니다.",
+        "yellow": "YELLOW - 노드 업그레이드를 시작하면 OpenSearch가 사용 가능한 샤드만 사용하도록 샤드 할당이 복제 없음으로 설정됩니다."
+      }
+    },
+    "upgrade_method": {
+      "cluster_restart": "클러스터 재시작",
+      "cluster_restart_description": "클러스터 재시작 방식을 사용하면 모든 Data Node를 한 번에 업그레이드합니다. 이 시간 동안 메시지는 저널에 버퍼링되고 Data Node 클러스터가 다시 온라인 상태가 되면 처리되므로, Data Node 다운타임 동안 예상되는 메시지 볼륨에 맞게 저널 크기가 구성되어 있다면 데이터 손실이 없습니다.",
+      "cluster_restart_less_than_three": "노드가 3개 미만인 Data Node 클러스터를 실행 중인 경우 클러스터 재시작 방식만 사용할 수 있습니다.",
+      "cluster_restart_three_or_more": "노드가 3개 이상인 Data Node 클러스터를 실행 중인 경우 저널 크기와 메시지 처리량을 고려한 후 클러스터 재시작 방식을 사용하도록 선택할 수 있습니다.",
+      "rolling_upgrade": "롤링 업그레이드",
+      "rolling_upgrade_description": "롤링 업그레이드는 <bold>노드가 3개 이상</bold>인 실행 중인 Data Node 클러스터에서만 수행할 수 있으며 다운타임이 거의 없습니다.",
+      "rolling_upgrade_process": "Data Node는 개별적으로 중지되어 제자리에서 업그레이드됩니다. 또는 Data Node를 한 번에 하나씩 중지하고 새 버전을 실행하는 호스트로 교체할 수 있습니다. 이 과정 중에도 클러스터에서 데이터를 계속 인덱싱하고 쿼리할 수 있습니다."
+    },
+    "upgrade_status": {
+      "all_data_nodes_up_to_date": "모든 Data Node가 최신 상태입니다.",
+      "checking": "OpenSearch 상태를 확인하는 중...",
+      "error": "Data Node의 내장 OpenSearch 버전을 확인할 수 없습니다.",
+      "outdated": "Data Node의 내장 OpenSearch가 최신 상태가 아닙니다.",
+      "unconfirmed_other": "Data Node {{count}}개를 사용할 수 없는 동안에는 Data Node의 내장 OpenSearch 상태를 확인할 수 없습니다.",
+      "up_to_date": "Data Node의 내장 OpenSearch가 최신 상태입니다.",
+      "up_to_date_with_version": "Data Node의 내장 OpenSearch가 최신 상태입니다 <bold>({{version}}).</bold>",
+      "upgrading": "OpenSearch 롤링 업그레이드가 진행 중입니다."
+    },
+    "upgrade_nodes": {
+      "manager": "매니저",
+      "no_outdated_nodes": "오래된 노드가 없습니다.",
+      "no_upgraded_nodes": "업그레이드된 노드가 없습니다.",
+      "outdated_nodes": "오래된 노드",
+      "start_upgrade": "업그레이드 프로세스 시작",
+      "upgraded": "업그레이드됨",
+      "upgraded_nodes": "업그레이드된 노드"
+    },
+    "data_node_actions": {
+      "rejoin": "다시 참여",
+      "remove": "제거",
+      "renew_certificate": "인증서 갱신",
+      "show_logs": "로그 표시",
+      "start": "시작",
+      "stop": "중지",
+      "rejoin_title": "Data Node 다시 참여",
+      "rejoin_confirm": "Data Node \"{{hostname}}\"을(를) 다시 참여시키시겠습니까?",
+      "remove_title": "Data Node 제거",
+      "remove_confirm": "Data Node \"{{hostname}}\"을(를) 제거하시겠습니까?",
+      "stop_title": "Data Node 중지",
+      "stop_confirm": "Data Node \"{{hostname}}\"을(를) 중지하시겠습니까?"
+    },
+    "data_node_badge": {
+      "short_node_id": "짧은 노드 ID"
+    },
+    "data_node_status": {
+      "queued_for": "{{action}} 대기 중"
+    },
+    "data_node_logs": {
+      "no_logs": "로그가 없습니다.",
+      "title": "{{hostname}} 로그"
+    },
+    "cluster_management": {
+      "teaser_hotspot": "Data Node 및 관리되는 OpenSearch 클러스터의 성능 메트릭을 표시합니다.",
+      "teaser_license_warning": "Data Node 및 관리되는 OpenSearch 클러스터의 성능 메트릭을 보려면 유효한 라이선스와 Data Node가 구성되어 있는지 확인하십시오."
+    },
+    "ca_configuration": {
+      "create_tab": "새 CA 만들기",
+      "description_provision": "인증 기관은 Data Node의 인증서를 더 쉽게 프로비저닝하고 관리합니다.",
+      "description_upload_or_create": "이 단계에서는 새 인증 기관을 업로드하거나 만들 수 있습니다.",
+      "reusing_certificates": "기존 클러스터에서 인증서를 사용하는 경우, 다음 단계에서 Data Node를 프로비저닝할 때 기본적으로 {{productName}} CA와 자동으로 생성된 인증서로 교체됩니다. 자체 CA를 포함하려면 기존 인증서를 업로드할 수 있습니다. 자세한 내용은 <docsLink>{{productName}} Data Node - Getting Started</docsLink>를 참조하십시오.",
+      "reusing_certificates_title": "인증서 재사용",
+      "title": "인증 기관 구성",
+      "upload_tab": "CA 업로드"
+    },
+    "ca_upload": {
+      "certificate_authority": "인증 기관",
+      "dropzone": "CA를 여기로 끌어다 놓거나 클릭하여 파일을 선택하십시오",
+      "explanation": "여기에서 기존 CA를 업로드할 수 있습니다. 개인 키(암호화 또는 암호화되지 않음), CA 인증서 및 모든 중간 인증서를 포함하는 단일 파일을 업로드해야 합니다. 파일은 PEM 또는 PKCS#12 형식일 수 있습니다. 개인 키가 암호화된 경우 해당 비밀번호도 제공해야 합니다.",
+      "failed": "CA 업로드에 실패했습니다. 오류: {{error}}",
+      "password": "비밀번호",
+      "rejected": "CA 업로드에 실패했습니다",
+      "submit": "CA 업로드",
+      "submitting": "CA를 업로드하는 중...",
+      "success": "CA가 업로드되었습니다"
+    },
+    "ca_create": {
+      "description": "“CA 만들기” 버튼을 클릭하면 {{productName}} Data Node용 새 인증 기관을 빠르게 만들 수 있습니다.",
+      "failed": "CA 생성에 실패했습니다. 오류: {{error}}",
+      "organization_name": "조직 이름",
+      "submit": "CA 만들기",
+      "submitting": "CA를 만드는 중...",
+      "success": "CA가 만들어졌습니다"
+    },
+    "renewal_policy": {
+      "certificate_lifetime": "인증서 수명:",
+      "certificate_lifetime_label": "인증서 수명",
+      "configure": "인증서 갱신 정책 구성",
+      "description": "이 설정은 인증서 만료를 감지하거나 갱신할 때 사용됩니다.",
+      "edit": "구성 편집",
+      "lifetime_explanation": "인증서 수명은 새로 만든 인증서의 유효 기간으로 사용됩니다.",
+      "mode_explanation": "갱신 정책을 \"자동\"으로 설정하면 사용자 개입 없이 만료되는 모든 인증서를 갱신합니다. \"수동\"으로 설정하면 하나 이상의 인증서가 곧 만료될 때 시스템 알림을 만들어 갱신을 확인할 수 있도록 합니다.",
+      "renewal_mode": "갱신 모드:",
+      "renewal_mode_label": "인증서 갱신 모드",
+      "select_mode": "인증서 갱신 모드 선택",
+      "submit": "구성 업데이트",
+      "submitting": "구성 업데이트 중",
+      "title": "인증서 갱신 정책 구성",
+      "update_failed": "인증서 갱신 정책을 업데이트하는 중 오류가 발생했습니다: {{error}}",
+      "update_failed_title": "인증서 갱신 정책을 업데이트할 수 없습니다",
+      "modes": {
+        "automatic": "자동",
+        "manual": "수동"
+      }
+    },
+    "details_page": {
+      "certificate_valid_until": "인증서 유효 기간:",
+      "configuration_warnings": "구성 경고",
+      "datanode_version": "Datanode 버전:",
+      "details": "세부 정보:",
+      "error": "오류: {{message}}",
+      "hostname": "호스트 이름:",
+      "not_available": "해당 없음",
+      "status": "상태:",
+      "title": "Data Node: {{hostname}}",
+      "transport_address": "전송 주소:"
+    },
+    "pages": {
+      "description": "{{productName}} Data Node는 {{productName}}와 더 나은 통합을 제공하고 향후 업데이트를 간소화합니다. {{productName}} 메시지 데이터베이스의 모든 메시지를 인덱싱하고 검색할 수 있습니다.",
+      "upgrade_title": "Data Node 업그레이드",
+      "cluster_management_title": "Data Node 대시보드",
+      "certificate_management_title": "인증서 관리",
+      "migration_title": "Data Node 마이그레이션",
+      "documentation_title": "Data Nodes 문서"
+    },
+    "upgrade_page": {
+      "manual_instructions": "Data Node를 수동으로 업그레이드하려면 <docsLink>문서</docsLink>의 지침을 따르십시오.",
+      "manual_upgrade_title": "Data Node 수동 업그레이드",
+      "select_strategy": "업그레이드 전략 선택",
+      "upgrade_data_node": "Data Node 업그레이드",
+      "manual_upgrade_of_node": "시스템에서 <bold>{{node}}</bold>의 수동 업그레이드를 완료한 후 다시 연결되어 <bold>업그레이드된 노드</bold> 패널에 표시될 때까지 기다린 다음 <confirmButton><bold>업그레이드 확인</bold></confirmButton>을 클릭하고 다음 노드로 진행하십시오.",
+      "manual_upgrade_of_data_node": "시스템에서 Data Node의 수동 업그레이드를 완료한 후 다시 연결되어 <bold>업그레이드된 노드</bold> 패널에 표시될 때까지 기다린 다음 <confirmButton><bold>업그레이드 확인</bold></confirmButton>을 클릭하고 다음 노드로 진행하십시오."
+    },
+    "migration_steps": {
+      "ca_configuration": "인증 기관 구성",
+      "renewal_policy_configuration": "갱신 정책 구성",
+      "compatibility_check": "Datanode와 OpenSearch 호환성 확인",
+      "manual_migration_step": "마이그레이션 단계.",
+      "migration_finished": "마이그레이션 완료"
+    },
+    "migration_states": {
+      "new": "마이그레이션",
+      "migration_welcome_page": "시작",
+      "ca_creation_page": "인증 기관",
+      "renewal_policy_creation_page": "인증서 갱신 정책",
+      "migration_selection_page": "마이그레이션 단계",
+      "rolling_upgrade_migration_welcome_page": "In-Place 마이그레이션 시작",
+      "ask_to_shutdown_old_cluster": "이전 클러스터 종료",
+      "manually_remove_old_connection_string_from_config": "연결 문자열 제거",
+      "message_processing_stop": "메시지 처리 중지",
+      "replace_cluster": "기존 클러스터 교체",
+      "restart_graylog": "구성 파일 업데이트 및 {{productName}} 재시작",
+      "directory_compatibility_check_page": "디렉터리 호환성 검사",
+      "provision_rolling_upgrade_nodes_with_certificates": "인증서 프로비저닝 개요",
+      "provision_rolling_upgrade_nodes_running": "Data Node의 인증서를 프로비저닝합니다.",
+      "journal_size_downtime_warning": "저널 크기 다운타임 경고",
+      "failed": "마이그레이션 실패",
+      "finished": "마이그레이션 완료"
+    },
+    "certificate_renewal": {
+      "loading_failed": "Data Node를 불러오지 못했습니다. 상태:",
+      "loading_failed_title": "Data Node를 불러올 수 없습니다",
+      "renew": {
+        "button": "인증서 갱신",
+        "button_loading": "인증서 갱신 중",
+        "success": "인증서가 갱신되었습니다",
+        "failed": "인증서 갱신에 실패했습니다. 오류: {{error}}"
+      },
+      "provision": {
+        "button": "인증서 프로비저닝",
+        "button_loading": "인증서 프로비저닝 중...",
+        "success": "인증서가 프로비저닝되었습니다",
+        "failed": "인증서 프로비저닝에 실패했습니다. 오류: {{error}}"
+      },
+      "title": "인증서 갱신 및 프로비저닝",
+      "description": "여기에서 {{productName}} Data Node의 인증서 갱신 또는 프로비저닝을 수동으로 트리거할 수 있습니다. 갱신 정책 모드가 \"수동\"으로 구성되어 있고 최초 인증서 프로비저닝 이후 Data Node가 시작된 경우에만 인증서를 수동으로 프로비저닝해야 합니다.",
+      "transport_address": "전송 주소",
+      "hostname": "호스트 이름",
+      "valid_until": "{{relativeTime}}까지 유효",
+      "no_data_nodes": "Data Node를 찾을 수 없습니다."
+    }
+  },
+  "use_collector_configurations_notifications": {
+    "fetch_failed": "수집기 구성을 가져오지 못했습니다. 상태: {{error}}",
+    "fetch_failed_title": "구성을 가져올 수 없습니다",
+    "fetch_configuration_failed": "구성을 가져오지 못했습니다. 상태: {{error}}",
+    "configuration_not_found": "ID가 <{{configurationId}}>인 구성을 찾을 수 없습니다. 삭제되지 않았는지 확인하십시오.",
+    "fetch_configuration_failed_title": "구성을 가져올 수 없습니다",
+    "preview_failed": "구성 미리 보기를 가져오지 못했습니다. 상태: {{error}}",
+    "preview_failed_title": "미리 보기를 가져올 수 없습니다",
+    "created_success": "구성이 만들어졌습니다",
+    "create_failed": "구성을 만들지 못했습니다. 상태: {{error}}",
+    "create_failed_title": "구성을 저장할 수 없습니다",
+    "updated_success": "구성이 업데이트되었습니다",
+    "update_failed": "구성을 업데이트하지 못했습니다: {{error}}",
+    "update_failed_title": "구성 {{name}}을(를) 업데이트할 수 없습니다",
+    "copied_success": "구성 \"{{name}}\"이(가) 복사되었습니다",
+    "copy_failed": "구성 \"{{name}}\"을(를) 저장하지 못했습니다. 상태: {{error}}",
+    "copy_failed_title": "구성을 저장할 수 없습니다",
+    "deleted_success": "구성 \"{{name}}\"이(가) 삭제되었습니다",
+    "delete_failed": "구성을 삭제하지 못했습니다: {{error}}",
+    "delete_failed_title": "구성 {{name}}을(를) 삭제할 수 없습니다",
+    "validate_failed": "구성 \"{{name}}\"의 유효성을 검사하지 못했습니다. 상태: {{error}}",
+    "validate_failed_title": "구성의 유효성을 검사할 수 없습니다"
+  },
+  "use_collectors_notifications": {
+    "fetch_failed": "수집기를 가져오지 못했습니다. 상태: {{error}}",
+    "fetch_failed_title": "수집기를 가져올 수 없습니다",
+    "not_found": "ID가 <{{collectorId}}>인 수집기를 찾을 수 없습니다. 삭제되지 않았는지 확인하십시오.",
+    "fetch_collector_failed": "수집기를 가져오지 못했습니다. 상태: {{error}}",
+    "fetch_collector_failed_title": "수집기를 가져올 수 없습니다",
+    "created_success": "수집기가 만들어졌습니다",
+    "updated_success": "수집기가 업데이트되었습니다",
+    "deleted_success": "수집기 \"{{name}}\"이(가) 삭제되었습니다",
+    "delete_failed": "수집기를 삭제하지 못했습니다: {{error}}",
+    "delete_failed_title": "수집기 \"{{name}}\"을(를) 삭제할 수 없습니다",
+    "copied_success": "수집기 \"{{name}}\"이(가) 복사되었습니다",
+    "copy_failed": "수집기 \"{{name}}\"을(를) 저장하지 못했습니다. 상태: {{error}}",
+    "copy_failed_title": "수집기를 저장할 수 없습니다",
+    "validate_failed": "수집기 \"{{name}}\"의 유효성을 검사하지 못했습니다. 상태: {{error}}",
+    "validate_failed_title": "수집기의 유효성을 검사할 수 없습니다"
+  }
+}

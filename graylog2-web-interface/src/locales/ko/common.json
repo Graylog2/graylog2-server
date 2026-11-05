@@ -1,0 +1,608 @@
+{
+  "actions": {
+    "cancel": "취소",
+    "confirm": "확인",
+    "submit": "제출",
+    "delete": "삭제",
+    "previous": "이전",
+    "next": "다음",
+    "add": "추가",
+    "edit": "편집",
+    "preview": "미리 보기",
+    "close": "닫기",
+    "done": "완료",
+    "filter": "필터",
+    "reset": "초기화",
+    "reset_search": "검색 초기화",
+    "more_actions": "더 많은 작업",
+    "sort": "정렬",
+    "clear_selection": "선택 해제",
+    "remove_item": "{{name}} 제거"
+  },
+  "confirm_leave": {
+    "question": "계속하시겠습니까?"
+  },
+  "duration": {
+    "years_other": "{{count}}년",
+    "months_other": "{{count}}개월",
+    "days_other": "{{count}}일",
+    "hours_other": "{{count}}시간",
+    "minutes_other": "{{count}}분",
+    "seconds_other": "{{count}}초",
+    "milliseconds_other": "{{count}}밀리초",
+    "nanoseconds_other": "{{count}}나노초",
+    "microseconds_other": "{{count}}마이크로초"
+  },
+  "bulk_actions": {
+    "title": "일괄 작업",
+    "cancel": "선택 취소"
+  },
+  "refresh": {
+    "not_updating": "업데이트 안 함",
+    "every": "주기",
+    "pause": "새로 고침 일시 중지",
+    "start": "새로 고침 시작"
+  },
+  "create_entity": {
+    "title": "{{entityName}} 만들기",
+    "submit": "{{entityName, lowercase}} 만들기",
+    "submitting": "{{entityName, lowercase}}을(를) 만드는 중...",
+    "save_failed": "저장하지 못했습니다",
+    "unknown_error": "오류가 발생했습니다. 다시 시도하십시오."
+  },
+  "key_value_table": {
+    "name": "이름",
+    "value": "값",
+    "actions": "작업"
+  },
+  "markdown_editor": {
+    "editor_title": "Markdown 편집기",
+    "preview_title": "Markdown 미리 보기",
+    "expand_preview": "미리 보기 확장",
+    "expand_content": "콘텐츠 확장"
+  },
+  "source_code_editor": {
+    "copy": "복사 (Ctrl+C / ⌘C)",
+    "paste": "붙여넣기 (Ctrl+V / ⌘V)",
+    "undo": "실행 취소 (Ctrl+Z / ⌘Z)",
+    "redo": "다시 실행 (Ctrl+Shift+Z / ⌘⇧Z)",
+    "paste_hint": "클립보드에서 붙여넣으려면 Ctrl+V(macOS에서는 ⌘V)를 누르거나 편집 → 붙여넣기를 선택하십시오."
+  },
+  "loading": "로드 중...",
+  "loading_long_wait": "시간이 조금 더 걸리고 있습니다. 잠시 기다려 주십시오...",
+  "errors": {
+    "runtime_error": "런타임 오류",
+    "unknown_error": "알 수 없는 오류",
+    "fetch_error": "{{message}}: {{error}}",
+    "page_error_title": "데이터를 가져오는 중 오류 발생",
+    "page_error_description": "이 페이지를 구성하는 데 필요한 일부 데이터를 가져오지 못해 대신 그림을 표시합니다.",
+    "page_error_logs": "자세한 내용은 {{productName}} 서버 로그를 확인하십시오."
+  },
+  "empty": {
+    "no_data": "사용 가능한 데이터가 없습니다.",
+    "no_entities": "항목이 없습니다.",
+    "nothing_here": "아직 아무것도 없습니다.",
+    "no_items": "표시할 항목이 없습니다",
+    "no_items_available": "사용 가능한 항목이 없습니다",
+    "no_items_found": "표시할 항목을 찾을 수 없습니다.",
+    "filter_no_match": "필터와 일치하는 데이터가 없습니다."
+  },
+  "badges": {
+    "beta": "Beta",
+    "preview": "미리 보기",
+    "default": "기본값",
+    "optional": "(선택)"
+  },
+  "clipboard": {
+    "copied": "복사되었습니다!"
+  },
+  "restricted_access": {
+    "view": "이 {{entityName}}을(를) 볼 수 있는 권한이 없습니다."
+  },
+  "enterprise_plugin_not_found": {
+    "title": "Enterprise 기능",
+    "description": "<bold>{{featureName}}</bold> 기능을 사용하려면 <licenseLink>Graylog Enterprise 라이선스</licenseLink>와 <docsLink>Graylog Enterprise 플러그인</docsLink>이 필요합니다."
+  },
+  "pagination": {
+    "first": "첫 페이지 열기",
+    "previous": "이전 페이지 열기",
+    "next": "다음 페이지 열기",
+    "last": "마지막 페이지 열기",
+    "page": "{{page}} 페이지 열기",
+    "active_page": "현재 페이지"
+  },
+  "page_size": {
+    "rows_other": "{{count}}개 행",
+    "configure": "페이지 크기 구성",
+    "show": "<select/> 표시"
+  },
+  "search_form": {
+    "placeholder": "검색 쿼리를 입력하십시오...",
+    "filter_placeholder": "필터링할 쿼리를 입력하십시오"
+  },
+  "select": {
+    "placeholder": "선택...",
+    "no_options": "옵션 없음",
+    "loading": "로드 중...",
+    "loading_options": "옵션을 로드하는 중...",
+    "type_to_filter": "입력하여 필터링"
+  },
+  "entity_table": {
+    "selected_items_other": "{{count}}개 항목 선택됨",
+    "columns": "열",
+    "configure_columns": "표시할 열 구성",
+    "reset_columns": "모든 열 초기화",
+    "show_column": "{{column}} 표시",
+    "hide_column_named": "{{column}} 숨기기",
+    "show_label": "표시",
+    "show_details": "세부 정보 표시",
+    "collapse_section": "섹션 접기",
+    "toggle_column_actions": "{{column}} 작업 전환",
+    "sort_ascending": "오름차순 정렬",
+    "sort_descending": "내림차순 정렬",
+    "sort_column_ascending": "{{column, lowercase}} 오름차순 정렬",
+    "sort_column_descending": "{{column, lowercase}} 내림차순 정렬",
+    "hide_column": "열 숨기기",
+    "resize_column": "{{column}} 열 크기 조정",
+    "slicing_by": "{{column}} 기준 분할",
+    "select_entity": "항목 선택",
+    "deselect_entity": "항목 선택 해제",
+    "select_all": "표시된 모든 항목 선택",
+    "deselect_all": "표시된 모든 항목 선택 해제",
+    "more": "더 보기",
+    "more_actions": "더 많은 작업",
+    "load_layout_failed": "\"{{entityId}}\" 개요의 레이아웃 환경 설정을 로드하지 못했습니다. 상태",
+    "update_layout_failed": "테이블 레이아웃 환경 설정을 업데이트하지 못했습니다. 오류: {{error}}",
+    "search_placeholder": "{{humanName}} 검색",
+    "fetch_failed": "{{humanName}}을(를) 가져오지 못했습니다",
+    "fetch_failed_with_status": "{{humanName}}을(를) 가져오지 못했습니다. 상태",
+    "could_not_retrieve": "{{humanName}}을(를) 가져올 수 없습니다",
+    "no_results": "{{humanName}}을(를) 찾을 수 없습니다."
+  },
+  "slicing": {
+    "slice_by": "분할 기준",
+    "slice_by_values": "값 기준 분할",
+    "no_slicing": "분할 안 함",
+    "unselect_slice": "분할 선택 해제",
+    "sort_by": "{{option}} 기준 정렬",
+    "filter": "{{column}} 필터",
+    "filter_slices": "분할 필터",
+    "sort_ascending": "오름차순 정렬",
+    "sort_descending": "내림차순 정렬",
+    "hide_empty": "빈 분할 숨기기 ({{count}})",
+    "show_empty": "빈 분할 표시 ({{count}})",
+    "hide_empty_title": "빈 분할 숨기기",
+    "show_empty_title": "빈 분할 표시",
+    "no_empty": "빈 분할 (0)",
+    "fetch_failed": "테이블 분할을 가져오는 중 오류 발생"
+  },
+  "filters": {
+    "filters": "필터",
+    "create_filter": "필터 만들기",
+    "change_value": "필터 값 변경",
+    "delete_filter": "필터 삭제",
+    "filter_ignored": "필터 무시됨",
+    "slice_conflict": "이 속성에 분할이 활성화되어 있어 이 필터는 무시됩니다. 필터를 적용하려면 분할을 해제하십시오.",
+    "single_filter_only": "이 속성에는 필터를 하나만 만들 수 있습니다.",
+    "update_existing": "필터 값을 변경하려면 기존 필터를 업데이트하십시오.",
+    "create_attribute_filter": "{{attribute, lowercase}} 필터 만들기",
+    "edit_attribute_filter": "{{attribute, lowercase}} 필터 편집",
+    "create_submit": "필터 만들기",
+    "update_submit": "필터 업데이트",
+    "value_placeholder": "필터링할 값을 입력하십시오",
+    "must_not_be_empty": "비워 둘 수 없습니다.",
+    "search_attribute": "{{attribute, lowercase}} 검색",
+    "no_entities_found": "항목을 찾을 수 없습니다",
+    "hold_shift": "Shift를 누른 채 여러 개 선택",
+    "load_suggestions_failed": "필터 제안을 로드하지 못했습니다. 상태",
+    "could_not_load_suggestions": "필터 제안을 로드할 수 없습니다",
+    "load_titles_failed": "필터 제목을 로드하지 못했습니다. 상태",
+    "could_not_load_titles": "필터 제목을 로드할 수 없습니다",
+    "all_time": "전체 기간",
+    "now": "현재",
+    "now_lowercase": "현재",
+    "relative_range": "{{from}}부터 {{until}}까지"
+  },
+  "time_units": {
+    "nanoseconds": "나노초",
+    "microseconds": "마이크로초",
+    "milliseconds": "밀리초",
+    "seconds": "초",
+    "minutes": "분",
+    "hours": "시간",
+    "days": "일",
+    "months": "개월",
+    "years": "년"
+  },
+  "time": {
+    "never": "없음",
+    "toggle_time": "시간 전환",
+    "time_unit_input": "시간 단위 입력",
+    "browser_time_zone": "브라우저 시간대",
+    "pick_time_zone": "시간대 선택",
+    "unclassified_time_zones": "미분류",
+    "default_locale": "기본 로캘",
+    "pick_locale": "로캘 선택"
+  },
+  "page_header": {
+    "experimental": "실험적",
+    "legacy": "레거시",
+    "experimental_message": "이 기능은 새로운 기능이며 실험적인 기능으로 간주해야 합니다.",
+    "legacy_message": "이 기능은 중단되었으며 향후 버전에서 제거됩니다."
+  },
+  "message": {
+    "collector_ingest": "수집기 수집",
+    "deleted_input": "삭제된 입력",
+    "received_by": "수신 위치",
+    "received_by_value": "<node/>의 <inputName/>",
+    "filter_streams": "스트림 필터",
+    "default_stream_not_testable": "기본 스트림에 대해서는 테스트할 수 없습니다",
+    "no_streams": "사용 가능한 스트림이 없습니다",
+    "test_against_stream": "스트림에 대해 테스트",
+    "show_changes": "변경 사항 표시",
+    "copy_id": "ID 복사",
+    "copy_message": "메시지 복사",
+    "not_stored": "저장되지 않음",
+    "timestamp": "타임스탬프",
+    "stored_in_index": "저장된 인덱스",
+    "not_stored_in_index": "메시지가 저장되지 않았습니다",
+    "routed_into_streams": "라우팅된 스트림",
+    "edit_favorite_fields": "즐겨찾기 필드 편집",
+    "show_remaining_fields_other": "나머지 필드 {{count}}개 표시",
+    "hide_remaining_fields_other": "나머지 필드 {{count}}개 숨기기",
+    "favorite_fields_configuration": "즐겨찾기 필드 구성",
+    "favorite_fields_hint_other": "즐겨찾기 필드는 이 메시지가 속한 모든 스트림에 표시되며, 이 메시지가 라우팅되는 스트림 <streams/>도 포함됩니다.",
+    "save_configuration": "구성 저장",
+    "reset_to_default": "기본값으로 초기화",
+    "reset_to_default_title": "기본 필드로 초기화: {{fields}}",
+    "favorite_fields": "즐겨찾기 필드",
+    "remaining_fields": "나머지 필드",
+    "set_favorites_failed": "필드를 즐겨찾기로 설정하지 못했습니다. 오류: {{error}}",
+    "set_favorites_failed_title": "필드를 즐겨찾기로 설정할 수 없습니다",
+    "add_favorite_failed": "필드를 즐겨찾기에 추가하지 못했습니다. 오류: {{error}}",
+    "add_favorite_failed_title": "필드를 즐겨찾기에 추가할 수 없습니다",
+    "remove_favorite_failed": "즐겨찾기에서 필드를 제거하지 못했습니다. 오류: {{error}}",
+    "remove_favorite_failed_title": "즐겨찾기에서 필드를 제거할 수 없습니다",
+    "field_terms": "필드 용어:",
+    "received_by_radio_value": "라디오 <node/>의 <inputName/>을(를) 통해"
+  },
+  "entity_types": {
+    "user": "사용자",
+    "team": "팀",
+    "dashboard": "대시보드",
+    "event_definition": "이벤트 정의",
+    "notification": "알림",
+    "search": "검색",
+    "stream": "스트림",
+    "search_filter": "검색 필터",
+    "report": "보고서",
+    "role": "역할",
+    "output": "출력",
+    "sigma_rule": "Sigma 규칙",
+    "event_procedure": "이벤트 절차",
+    "event_procedure_step": "이벤트 절차 단계",
+    "collection": "컬렉션",
+    "collection_entities": "컬렉션 항목"
+  },
+  "marketplace_link": "{{productName}} Marketplace",
+  "chips_cell": {
+    "show_fewer": "간단히 보기",
+    "show_all": "모두 보기",
+    "filter_by": "{{itemLabel}} \"{{value}}\"(으)로 필터링"
+  },
+  "expandable_cell_list": {
+    "show_less": "간단히 보기",
+    "show_more_other": "{{count}}개 더 보기"
+  },
+  "expanded_section_count": {
+    "show": "{{label}} 표시",
+    "hide": "{{label}} 숨기기"
+  },
+  "compact_pagination": {
+    "previous_page": "이전 페이지",
+    "select_page": "페이지 선택",
+    "next_page": "다음 페이지",
+    "of_pages": "/ {{totalPages}}"
+  },
+  "expandable_checkbox_list_item": {
+    "select_item": "항목 선택"
+  },
+  "traffic_graph": {
+    "days": "일수",
+    "incoming": "수신 트래픽",
+    "outgoing": "송신 트래픽",
+    "last_days": "최근 {{days}}일: {{traffic}}"
+  },
+  "link_to_node": {
+    "unknown_node": "알 수 없는 노드"
+  },
+  "markdown": {
+    "images_unsupported": "보안상의 이유로 이미지는 지원되지 않습니다. 허용된 소스를 <configurationLink>여기</configurationLink>에서 활성화하십시오"
+  },
+  "public_notifications": {
+    "read_less": "간단히 보기",
+    "read_more": "더 보기"
+  },
+  "refresh_controls": {
+    "controls_label": "{{humanName}} 새로 고침 컨트롤",
+    "below_minimum": "<intervalDuration /> ({{interval}}) 간격이 구성된 최소 간격 <minimumDuration /> ({{minimum}})보다 짧습니다."
+  },
+  "scroll_button": {
+    "back_to_top": "맨 위로"
+  },
+  "section": {
+    "toggle_section": "{{title, lowercase}} 섹션 전환"
+  },
+  "selectable_list": {
+    "remove": "제거"
+  },
+  "share_menu_item": {
+    "share": "공유"
+  },
+  "status_icon": {
+    "yes": "예",
+    "no": "아니요"
+  },
+  "type_ahead_field_input": {
+    "select_field": "필드 선택"
+  },
+  "query_helper": {
+    "title": "검색 구문 도움말",
+    "show_help": "검색 구문 도움말 표시",
+    "available_fields": "사용 가능한 검색 필드",
+    "field": "필드",
+    "description": "설명",
+    "examples": "예시",
+    "example_description": "설명에 security가 포함된 모든 {{entityName}} 찾기:",
+    "example_id": "ID가 5f4dfb9c69be46153b9a9a7b인 {{entityName}} 찾기:",
+    "example_query_description": "description:security",
+    "example_query_id": "id:5f4dfb9c69be46153b9a9a7b",
+    "common_fields": {
+      "id": "{{entityName}}의 ID이며 고유한 참조입니다.",
+      "title": "{{entityName}}의 제목입니다.",
+      "name": "{{entityName}}의 이름입니다.",
+      "description": "{{entityName}}의 간단한 설명입니다.",
+      "summary": "{{entityName}}의 상세 요약입니다."
+    }
+  },
+  "url_allow_list_modal": {
+    "add": "URL 허용 목록에 추가",
+    "title": "허용 목록 구성 업데이트",
+    "submit": "구성 업데이트",
+    "urls": "허용 목록 URL"
+  },
+  "configuration_well": {
+    "empty": "<empty>",
+    "uploaded_file_content": "<uploaded file content>",
+    "no_configuration": "-- 구성 없음 --"
+  },
+  "configuration_forms": {
+    "undo_reset": "초기화 취소",
+    "remove": "제거",
+    "title": "제목",
+    "optional": "선택 사항"
+  },
+  "enterprise_advertisement": {
+    "enterprise_title": "{{productName}} Enterprise",
+    "enterprise_description": "리소스가 제한된 IT 운영 및 소프트웨어 엔지니어링 팀의 요구를 충족하도록 설계된 {{productName}} Enterprise는 로그 데이터를 수집하고 분석하여 성능, 장애 및 오류 문제의 근본 원인을 찾는 데 연간 수천 시간을 절약해 주는 다양한 생산성 향상 기능을 제공합니다.",
+    "security_title": "{{productName}} Security",
+    "security_description": "보안 전용 대시보드와 경고, 이상 징후 탐지 AI/ML 엔진, 다른 보안 도구와의 통합, SOAR 기능, 다양한 규정 준수 보고 기능으로 사이버 보안 위협을 탐지, 조사 및 대응하는 {{productName}} Open의 기능을 확장합니다.",
+    "request_now": "지금 요청"
+  },
+  "plugin_list": {
+    "plugin_enterprise": "{{productName}} Plugin Enterprise",
+    "installed": "{{pluginName}}이(가) 설치되어 있습니다",
+    "not_installed": "{{pluginName}}이(가) 설치되어 있지 않습니다",
+    "status": "이 클러스터의 {{productName}} Enterprise 모듈 상태입니다:"
+  },
+  "reported_error": {
+    "title": "문제가 발생했습니다",
+    "description": "알 수 없는 오류가 발생했습니다. 자세한 내용은 다음 메시지와 {{productName}} 서버 로그를 확인하십시오."
+  },
+  "hotkeys": {
+    "or": "또는",
+    "title": "키보드 단축키",
+    "view_all": "모든 키보드 단축키 보기"
+  },
+  "right_sidebar": {
+    "sidebar_label": "{{title}} 사이드바",
+    "sidebar_label_collapsed": "{{title}} 사이드바 (접힘)",
+    "close": "사이드바 닫기",
+    "expand": "사이드바 펼치기",
+    "collapse": "사이드바 접기",
+    "go_back": "뒤로",
+    "go_back_label": "이전 콘텐츠로 돌아가기",
+    "go_forward": "앞으로",
+    "go_forward_label": "다음 콘텐츠로 이동"
+  },
+  "maxmind_adapter": {
+    "documentation": {
+      "intro": "GeoIP 데이터 어댑터는 MaxMind의 GeoIP2 데이터베이스 읽기를 지원합니다.",
+      "limitations_title": "제한 사항",
+      "limitations_supported": "현재 ASN, 도시 및 국가 데이터베이스가 지원됩니다.",
+      "limitations_more": "추가 데이터베이스 유형 지원은 지원 채널을 통해 문의하십시오.",
+      "asn_fields": "ASN 데이터베이스 필드",
+      "country_fields": "국가 데이터베이스 필드",
+      "city_fields": "도시 데이터베이스 필드",
+      "city_additional_fields": "도시 데이터베이스에는 국가 데이터베이스에서 제공하는 필드 외에 다음 필드도 포함됩니다:",
+      "complete_documentation": "필드에 대한 전체 문서는 MaxMind의 <docsLink>개발자 문서</docsLink>를 참조하십시오"
+    },
+    "database_types": {
+      "asn": "ASN 데이터베이스",
+      "city": "도시 데이터베이스",
+      "country": "국가 데이터베이스",
+      "ipinfo_location": "IPinfo 위치 데이터베이스",
+      "ipinfo_asn": "IPinfo ASN 데이터베이스"
+    },
+    "field_set": {
+      "file_path": "파일 경로",
+      "file_path_help": "데이터베이스 파일의 경로입니다.",
+      "database_type": "데이터베이스 유형",
+      "database_type_help": "데이터베이스 파일의 유형을 선택하십시오",
+      "database_type_placeholder": "데이터베이스 파일 유형 선택",
+      "refresh_file": "파일 새로 고침",
+      "refresh_file_help": "활성화하면 데이터베이스 파일의 수정 여부를 확인하고 디스크에서 변경되었을 때 새로 고칩니다."
+    },
+    "summary": {
+      "database_file_path": "데이터베이스 파일 경로",
+      "database_type": "데이터베이스 유형",
+      "check_interval": "확인 간격"
+    }
+  },
+  "abs_geoip": {
+    "container_name": "Azure Blob 컨테이너 이름",
+    "container_name_help": "Azure Blob 컨테이너 이름입니다.",
+    "endpoint_url": "Azure Blob 엔드포인트 URL",
+    "endpoint_url_help": "Azure Blob 엔드포인트 URL이며, 기본 엔드포인트를 재정의하려는 경우에만 필요합니다.",
+    "account_name": "Azure 계정 이름",
+    "account_name_placeholder": "your-account-name",
+    "account_name_help": "Azure 스토리지 계정의 이름입니다.",
+    "account_key_reset": "Azure 계정 키",
+    "reset_password": "비밀번호 초기화",
+    "account_key": "Azure 계정 키",
+    "account_key_help": "Azure 스토리지 계정의 계정 키입니다."
+  },
+  "gcs_geoip": {
+    "project_id": "Google Cloud Storage 프로젝트 ID"
+  },
+  "geoip_resolver": {
+    "title": "위치 정보 프로세서 구성",
+    "description": "위치 정보 프로세서 플러그인은 모든 메시지에서 IP 주소<bold>만</bold> 포함하는 필드를 검색하여 해당 위치 정보(좌표, ISO 국가 코드, 도시 이름)를 다른 필드에 넣습니다. 자세한 내용은 <docsLink>문서</docsLink>를 참조하십시오.",
+    "enabled_summary": "활성화:",
+    "enforce_schema_summary": "기본 스키마 적용:",
+    "vendor_type_summary": "데이터베이스 공급업체 유형:",
+    "city_db_path_summary": "도시 데이터베이스 경로:",
+    "asn_db_path_summary": "ASN 데이터베이스 경로:",
+    "refresh_interval_summary": "데이터베이스 새로 고침 간격:",
+    "pull_from_cloud_summary": "클라우드 스토리지 버킷에서 파일 가져오기:",
+    "edit": "구성 편집",
+    "modal_title": "위치 정보 프로세서 구성 업데이트",
+    "enable_processor": "위치 정보 프로세서 활성화",
+    "enforce_schema": "기본 스키마 적용",
+    "vendor_select": "GeoIP 데이터베이스 공급업체 선택",
+    "city_db_path": "도시 데이터베이스 경로",
+    "asn_db_path": "ASN 데이터베이스 경로",
+    "refresh_interval": "데이터베이스 새로 고침 간격",
+    "refresh_interval_help": "데이터베이스 파일의 수정 여부를 확인하고 디스크에서 변경이 감지되면 새로 고치는 간격입니다.",
+    "pull_from_cloud": "클라우드 스토리지 버킷에서 파일 가져오기",
+    "select_cloud_storage": "클라우드 스토리지 선택",
+    "update_configuration": "구성 업데이트",
+    "updating_configuration": "구성을 업데이트하는 중..."
+  },
+  "links": {
+    "documentation": "문서"
+  },
+  "quick_jump": {
+    "title": "빠른 이동",
+    "open": "빠른 이동 열기",
+    "search_placeholder": "페이지/대시보드/스트림 검색 ...",
+    "intro": "페이지, 스트림, 대시보드, 입력 또는 기타 항목을 검색하려면 검색 쿼리를 입력하십시오.",
+    "intro_hint": "빠르게 시작할 수 있도록 <bold>최근에 연</bold> 항목과 <bold>즐겨찾기</bold> 항목 목록이 아래에 표시됩니다:",
+    "no_results": "검색 결과가 없습니다. 다른 검색어를 사용해 보십시오.",
+    "recent": "최근"
+  },
+  "scratchpad": {
+    "title": "스크래치패드",
+    "status_cleared": "지워졌습니다.",
+    "status_auto_saved": "자동 저장되었습니다.",
+    "got_it": "확인",
+    "sensitive_warning": "이 영역에는 비밀번호와 같은 민감한 정보를 저장하지 <bold>않는</bold> 것을 권장합니다.",
+    "help_overlay": "이 공간에는 브라우저 창을 벗어나지 않고 개인 메모와 기타 정보를 저장할 수 있습니다. 예를 들어 여러 조사에서 필요한 타임스탬프, 사용자 ID 또는 IP 주소를 저장할 수 있습니다.",
+    "copy": "복사",
+    "clear": "지우기",
+    "clear_confirm": "스크래치패드의 내용이 지워집니다. 계속하시겠습니까?"
+  },
+  "extractor_actions": {
+    "select_type": "추출기 유형 선택",
+    "only_string_fields": "추출기는 문자열 필드에만 사용할 수 있습니다."
+  },
+  "surrounding_search": {
+    "button": "주변 메시지 표시"
+  },
+  "support_sources": {
+    "title": "도움이 필요하십니까?",
+    "help_text": "<docsLink>문서</docsLink>에서 질문에 대한 답을 찾지 못한 경우 {{productName}} 커뮤니티에 문의하십시오.",
+    "community_support": "커뮤니티 지원",
+    "issue_tracker": "이슈 트래커",
+    "professional_support": "전문 지원"
+  },
+  "times_list": {
+    "title": "시간 구성",
+    "description": "시간대는 혼동하기 쉽습니다. 여기에서 시스템의 각 구성 요소에 적용된 시간대를 확인할 수 있습니다. 특정 {{productName}} 서버 노드의 시간대 설정은 해당 노드의 상세 페이지에서 확인할 수 있습니다.",
+    "user": "사용자 <bold>{{username}}</bold>:",
+    "web_browser": "웹 브라우저:",
+    "server": "{{productName}} 서버:"
+  },
+  "widget_visualization_not_found": {
+    "description": "위젯 시각화(<italic>{{widgetClassName}}</italic>)를 찾을 수 없습니다. 이 위젯을 제공하는 플러그인이 로드되지 않은 것 같습니다."
+  },
+  "telemetry": {
+    "title": "텔레메트리",
+    "enable_label": "텔레메트리 활성화",
+    "enabled_checkbox": "활성화됨",
+    "update_preferences": "환경 설정 업데이트",
+    "update_button": "텔레메트리 업데이트",
+    "info_modal_title": "{{productName}} 개선에 도움을 주십시오",
+    "ok": "확인",
+    "info": "향후 개선 사항의 우선순위를 정하고 {{productName}}을(를) 더 좋게 만들 수 있도록 익명 사용 데이터를 수집하고자 합니다.",
+    "no_personal_data": "개인 데이터, 민감한 정보, 인스턴스의 로그와 같은 콘텐츠는 수집하지 않습니다.",
+    "learn_more": "자세한 내용은 <privacyLink>개인정보 처리방침</privacyLink>을 참조하십시오.",
+    "turn_off_profile": "데이터 수집은 <bold>사용자 프로필에서</bold> 언제든지 끄거나 켤 수 있습니다.",
+    "turn_off_here": "데이터 수집은 여기에서 언제든지 끄거나 켤 수 있습니다."
+  },
+  "app_facade": {
+    "preparing": "웹 인터페이스를 준비하고 있습니다...",
+    "load_user_failed": "사용자를 로드하지 못했습니다",
+    "reload_page": "페이지 새로 고침"
+  },
+  "suggest_reload": {
+    "title": "{{productName}} 버전이 변경되었습니다",
+    "version_changed": "{{productName}} 버전이 <bold>{{version}}</bold>에서 <bold>{{newVersion}}</bold>(으)로 변경되었습니다.",
+    "save_work": "오류를 방지하려면 작업 내용을 저장하고 페이지를 새로 고치십시오.",
+    "reload_now": "지금 새로 고침"
+  },
+  "footer": {
+    "system_info": "{{productName}} {{version}} - {{hostname}} ({{jvmInfo}})"
+  },
+  "notifications": {
+    "download_failed": "다운로드하지 못했습니다. 상태: {{error}}",
+    "download_failed_title": "다운로드할 수 없습니다",
+    "export_failed": "내보내기에 실패했습니다",
+    "export_widget_failed": "위젯 내보내기에 실패했습니다",
+    "telemetry_update_failed": "업데이트하지 못했습니다: {{error}}",
+    "telemetry_update_failed_title": "텔레메트리 설정을 업데이트할 수 없습니다.",
+    "delete_property_confirm": "'{{key}}' 속성을 삭제하시겠습니까?",
+    "quick_jump_failed": "항목 검색 결과를 가져오지 못했습니다. 상태",
+    "quick_jump_failed_title": "항목 검색 결과를 가져올 수 없습니다."
+  },
+  "use_favorite_item_mutation_notifications": {
+    "put_failed": "즐겨찾기에 항목을 추가하지 못했습니다. 상태: {{error}}",
+    "put_failed_title": "즐겨찾기에 항목을 추가할 수 없습니다",
+    "delete_failed": "즐겨찾기에서 항목을 삭제하지 못했습니다. 상태: {{error}}",
+    "delete_failed_title": "즐겨찾기에서 항목을 삭제할 수 없습니다"
+  },
+  "use_entity_titles_notifications": {
+    "load_failed": "항목 제목을 로드하지 못했습니다. 상태",
+    "load_failed_title": "항목 제목을 로드할 수 없습니다"
+  },
+  "use_search_version_check_notifications": {
+    "fetch_failed_title": "재정의 데이터를 가져올 수 없습니다"
+  },
+  "entity_creators": {
+    "event_definition": "이벤트 정의 만들기",
+    "notification": "알림 만들기",
+    "dashboard": "대시보드 만들기",
+    "stream": "스트림 만들기",
+    "index_set": "인덱스 세트 만들기",
+    "user": "사용자 만들기",
+    "pipeline": "파이프라인 만들기",
+    "pipeline_rule": "파이프라인 규칙 만들기",
+    "content_pack": "콘텐츠 팩 만들기",
+    "fleet": "Fleet 만들기"
+  },
+  "user_notification": {
+    "success": "성공",
+    "error": "오류",
+    "attention": "주의"
+  }
+}

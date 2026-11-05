@@ -1,0 +1,13 @@
+{
+  "welcome": "{{productName}}에 오신 것을 환영합니다",
+  "username": "사용자 이름",
+  "password": "비밀번호",
+  "sign_in": "로그인",
+  "signing_in": "로그인하는 중...",
+  "invalid_credentials": "자격 증명이 올바르지 않습니다. 확인한 후 다시 시도하십시오.",
+  "server_error": "오류 - 서버 응답: {{status}} - {{message}}",
+  "fallback_error_cloud": "로그인 화면을 불러오는 중 오류가 발생했습니다. {{productName}} 계정 관리자에게 문의하십시오.",
+  "fallback_error": "활성 인증 서비스 로그인을 사용하는 중 오류가 발생했습니다. 구성을 확인하거나 {{productName}} 계정 관리자에게 문의하십시오. 오류 세부 정보:",
+  "login_with_default": "기본 방법으로 로그인",
+  "login_with": "{{method}}(으)로 로그인"
+}

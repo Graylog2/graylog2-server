@@ -1,0 +1,499 @@
+{
+  "users_overview": {
+    "title": "사용자 개요",
+    "documentation_link_title": "권한 문서",
+    "description": "등록된 모든 사용자의 개요입니다."
+  },
+  "user_create": {
+    "title": "새 사용자 만들기",
+    "documentation_link_title": "권한 문서",
+    "description": "이 페이지에서 웹 인터페이스 또는 REST API용 새 사용자를 만듭니다.",
+    "submit_button": "사용자 만들기",
+    "reader_role_description": "모든 {{productName}} 사용자에게 기본 권한을 부여합니다 (내장)",
+    "role_required": "<em>Reader</em> 또는 <em>Admin</em> 역할 중 하나 이상을 선택해야 합니다.",
+    "failed_title": "사용자를 만들지 못했습니다",
+    "submit": "사용자 만들기",
+    "submitting": "사용자를 만드는 중..."
+  },
+  "user_edit": {
+    "title": "사용자 {{username}} 편집",
+    "title_prefix": "사용자 편집",
+    "documentation_link_title": "권한 문서",
+    "description": "여기에서 사용자 세부 정보와 비밀번호를 변경하고 역할과 팀을 할당할 수 있습니다.",
+    "segments": {
+      "profile": "프로필",
+      "preferences": "환경 설정",
+      "teams_roles": "팀 및 역할",
+      "shared_entities": "공유된 항목"
+    },
+    "password": {
+      "new_password": "새 비밀번호",
+      "repeat_password": "비밀번호 확인",
+      "old_password": "이전 비밀번호",
+      "alert_title": "비밀번호 변경",
+      "alert_text": "비밀번호를 변경하면 사용자가 로그아웃되고 현재 세션이 모두 무효화됩니다. 본인의 비밀번호를 변경하는 경우 저장 직후 로그아웃됩니다. 이 경우 보류 중인 변경 사항을 먼저 저장하십시오.",
+      "change": "비밀번호 변경"
+    },
+    "profile": {
+      "email": "이메일",
+      "full_name": "전체 이름",
+      "update": "프로필 업데이트"
+    },
+    "profile_info": {
+      "title": "이름 및 성",
+      "text": "{{productName}} 4.1부터 이름과 성 필드가 별도로 추가되었습니다. 사용자 프로필을 저장하려면 이 필드를 입력해야 합니다."
+    },
+    "read_only": "선택한 사용자 {{fullName}}은(는) 편집할 수 없습니다.",
+    "roles_required": "역할에는 최소한 Admin 또는 Reader 역할이 포함되어야 합니다.",
+    "external": {
+      "title": "외부 사용자",
+      "text": "이 사용자는 외부 서버에서 동기화되었으므로 프로필과 비밀번호를 변경할 수 없습니다. 자세한 내용은 관리자에게 문의하십시오."
+    },
+    "preferences": {
+      "language_help": "{{productName}} 인터페이스의 언어입니다. Beta로 표시된 번역은 아직 검토되지 않았습니다.",
+      "enable_autocompletion": "자동 완성 활성화",
+      "search_sidebar": "검색 사이드바",
+      "dashboard_sidebar": "대시보드 사이드바",
+      "is_pinned": "고정됨",
+      "search_sidebar_help": "검색 사이드바의 고정 아이콘으로도 변경할 수 있습니다",
+      "dashboard_sidebar_help": "대시보드 사이드바의 고정 아이콘으로도 변경할 수 있습니다",
+      "theme_mode_help": "사용자 드롭다운의 토글로 변경할 수 있습니다",
+      "update": "환경 설정 업데이트"
+    },
+    "settings": {
+      "select_entity": "항목을 선택하십시오.",
+      "update": "설정 업데이트"
+    }
+  },
+  "roles_overview": {
+    "title": "역할 개요",
+    "documentation_link_title": "권한 문서",
+    "button_text": "역할 개요",
+    "description": "{{productName}}에서 사용할 수 있는 모든 역할의 개요입니다. 역할을 사용하면 대시보드 또는 이벤트 정의 만들기와 같은 기능을 사용자에게 부여할 수 있습니다.",
+    "alert_title": "권한 부여",
+    "alert_body_prefix": "내장 역할을 사용하면 대시보드 만들기 또는 아카이브 카탈로그 보기와 같은 기능을 사용자에게 부여할 수 있습니다. 그러나 특정 대시보드나 스트림에 대한 권한은 부여하지 않습니다. 직접 역할을 만들 수도 없습니다. 특정 항목에 대한 권한은 해당 항목의 ",
+    "share_text": "공유",
+    "alert_body_suffix": " 버튼으로 부여할 수 있습니다. 이 버튼은 예를 들어 항목 개요 페이지에서 찾을 수 있습니다. 항목에 대한 권한을 여러 사용자에게 한 번에 부여하려면 팀을 사용할 수 있습니다. 자세한 내용은 ",
+    "documentation_text": "문서"
+  },
+  "role_details": {
+    "title": "역할 세부 정보 {{name}}",
+    "title_prefix": "역할 세부 정보",
+    "documentation_link_title": "권한 문서",
+    "button_text": "역할 개요",
+    "description": "이름, 설명, 할당된 사용자와 같은 세부 정보의 개요입니다."
+  },
+  "role_edit": {
+    "title": "역할 {{name}} 편집",
+    "title_prefix": "역할 편집",
+    "documentation_link_title": "권한 문서",
+    "button_text": "역할 개요",
+    "description": "역할을 사용자에게 할당할 수 있습니다."
+  },
+  "user_tokens_edit": {
+    "title": "사용자 {{username}}의 토큰 편집",
+    "title_prefix": "사용자 토큰 편집",
+    "documentation_link_title": "권한 문서",
+    "description": "새 토큰을 만들거나 이전 토큰을 삭제할 수 있습니다."
+  },
+  "token_management": {
+    "title": "토큰 관리",
+    "documentation_link_title": "권한 문서",
+    "description": "{{productName}}에 구성된 액세스 토큰 개요입니다."
+  },
+  "token_list": {
+    "title": "토큰 만들기 및 편집",
+    "token_created": "토큰 {{name}}이(가) 만들어졌습니다!",
+    "token_created_description": "새 토큰입니다. 지금 복사해 두십시오. 다시 볼 수 없습니다.",
+    "done_button": "완료",
+    "title_list": "토큰",
+    "filter_label": "필터",
+    "no_tokens_to_display": "표시할 토큰이 없습니다.",
+    "no_tokens_match_filter": "필터와 일치하는 토큰이 없습니다.",
+    "column_name": "토큰 이름",
+    "column_created": "생성일",
+    "column_last_access": "마지막 액세스",
+    "column_expires_at": "만료일",
+    "column_actions": "작업",
+    "never_used": "사용된 적 없음"
+  },
+  "permissions": {
+    "grantee_types": {
+      "user": "사용자",
+      "team": "팀",
+      "global": "모든 사용자",
+      "error": "오류"
+    },
+    "dependencies_warning": {
+      "title": "현재 공동 작업자 집합에 누락된 종속성이 있습니다",
+      "needs_access": "{{type}} <granteeTitle>{{title}}</granteeTitle>에 필요한 액세스 대상",
+      "dependency": "{{type}}: <dependencyTitle>{{title}}</dependencyTitle>",
+      "owners": "소유자:",
+      "owner": "{{type}} <ownerTitle>{{title}}</ownerTitle>"
+    },
+    "share": {
+      "add_collaborator": "공동 작업자 추가",
+      "search_placeholder": "사용자 및 팀 검색",
+      "collaborators": "공동 작업자",
+      "direct_collaborators": "직접 공동 작업자",
+      "shared_via_collections": "컬렉션을 통해 공유됨",
+      "update_sharing": "공유 업데이트",
+      "modal_title": "{{entityType}} 공유: <entityTitle>{{entityTitle}}</entityTitle>",
+      "confirm_not_added_named": "\"{{title}}\"이(가) 선택되었지만 공동 작업자로 추가되지 않았습니다. 그래도 계속하시겠습니까?",
+      "confirm_not_added_unnamed": "항목(이름을 찾을 수 없음)이 선택되었지만 공동 작업자로 추가되지 않았습니다. 그래도 계속하시겠습니까?"
+    },
+    "grantees": {
+      "change_capability": "{{title}}의 기능 변경",
+      "remove_sharing": "{{title}}의 공유 제거",
+      "no_collaborators": "이 {{entityType}}에는 공동 작업자가 없습니다."
+    },
+    "roles_selector": {
+      "search_placeholder": "역할 검색",
+      "assign_role": "역할 할당"
+    },
+    "shareable_url": {
+      "copy_title": "매개변수를 클립보드에 복사",
+      "hint": "본인 또는 보기 권한이 있는 모든 사용자가 이 링크에 액세스할 수 있습니다."
+    },
+    "shared_entities": {
+      "entity_type": "항목 유형",
+      "filter_entity_types": "항목 유형 필터",
+      "capability": "기능",
+      "filter_capabilities": "기능 필터",
+      "found": "{{entityType}}와(과) 공유된 항목 {{total}}개를 찾았습니다.",
+      "no_results": "공유된 항목을 찾을 수 없습니다.",
+      "headers": {
+        "entity_name": "항목 이름",
+        "entity_type": "항목 유형",
+        "owner": "소유자",
+        "capability": "기능"
+      },
+      "query_example": "제목에 security가 포함된 공유 항목 찾기:"
+    },
+    "sharing_disabled": {
+      "title": "공유할 수 없음",
+      "owners_only": "이 {{type}}의 소유자만 공유할 수 있습니다."
+    },
+    "validation_error": {
+      "ownerless": "다음 소유자를 제거하면 항목에 소유자가 없게 됩니다:"
+    },
+    "capabilities": {
+      "viewer": "뷰어",
+      "manager": "관리자",
+      "owner": "소유자"
+    },
+    "select_capability": "기능 선택"
+  },
+  "roles": {
+    "profile": {
+      "title": "프로필",
+      "name": "이름",
+      "description": "설명"
+    },
+    "teams": "팀",
+    "users": {
+      "title": "사용자",
+      "none_selected": "선택된 사용자를 찾을 수 없습니다.",
+      "assign_users": "사용자 할당",
+      "selected_users": "선택된 사용자",
+      "needs_reader_or_admin": "사용자 '{{name}}'에게는 최소한 Reader 또는 Admin 역할이 필요합니다."
+    },
+    "users_selector": {
+      "search_placeholder": "사용자 검색",
+      "assign_user": "사용자 할당"
+    },
+    "actions": {
+      "edit_role_title": "역할 {{name}} 편집",
+      "delete_role_title": "역할 {{name}} 삭제",
+      "edit": "편집",
+      "deleting": "삭제 중",
+      "delete": "삭제",
+      "confirm_delete": "역할 \"{{name}}\"을(를) 삭제하시겠습니까?",
+      "still_assigned": "아직 {{count}}명의 사용자에게 할당되어 있습니다."
+    },
+    "overview": {
+      "title": "역할",
+      "found": "시스템에서 역할 {{total}}개를 찾았습니다.",
+      "none_found": "역할을 찾을 수 없습니다."
+    },
+    "query_example": "이름에 manager가 포함된 역할 찾기:",
+    "navigation": {
+      "view_details": "세부 정보 보기",
+      "edit_role": "역할 편집"
+    }
+  },
+  "security_teaser": {
+    "overview": {
+      "hotspot_0": "개요 탭에서 가장 중요한 보안 정보를 빠르게 찾을 수 있습니다.",
+      "hotspot_1": "높은 심각도의 경고, 주요 이벤트 소스 등 보안 상태를 파악할 수 있는 정보를 확인하십시오.",
+      "hotspot_2": "이 페이지의 툴팁에 마우스를 올려 {{productName}} Security의 기능에 대해 자세히 알아보십시오",
+      "title": "개요"
+    },
+    "anomalies": {
+      "hotspot_0": "실행 중인 이상 징후 탐지 항목, 탐지된 건수, 이전 기간과의 비교 요약을 확인하십시오.",
+      "hotspot_1": "신뢰 구간은 행동이 정상 범위에서 얼마나 벗어났는지 알려 줍니다.",
+      "hotspot_2": "다양한 유형의 이상 징후에 대한 탐지기가 있으며, 어떤 탐지기가 경고를 생성하는지 빠르게 확인할 수 있습니다.",
+      "hotspot_3": "로그온 또는 보안 이벤트에서 평소와 다른 행동을 보이는 사용자 계정을 식별하십시오.",
+      "title": "이상 징후"
+    },
+    "host_activity": {
+      "hotspot_0": "높음, 중간, 낮음 경고 수와 추세 정보를 한눈에 확인하여 오늘이 평소와 같은 날인지 . . . 아닌지 파악하십시오.",
+      "hotspot_1": "높은 심각도의 경고를 생성하는 호스트를 즉시 식별하여 MTTR을 단축하십시오.",
+      "hotspot_2": "로그온을 가장 많이 생성하는 기술을 확인하십시오.",
+      "hotspot_3": "예상치 못한 컴퓨터에서 ID 및 액세스 제어 변경이 발생하면 조사를 시작하십시오.",
+      "hotspot_4": "이벤트 소스별 메시지 수로 데이터의 일일 정상 패턴을 확인할 수 있으며, 정상 범위를 벗어난 급증은 그 원인에 대한 조사를 촉발합니다.",
+      "title": "호스트 활동"
+    },
+    "network_activity": {
+      "hotspot_0": "네트워크 전반의 데이터 흐름 급증을 즉시 확인하십시오.",
+      "hotspot_1": "데이터가 어디에서 오고 어디로 가는지 빠르게 확인하십시오.",
+      "hotspot_2": "네트워크에서 가장 많은 양의 데이터를 전송하는 사용자를 식별하십시오.",
+      "hotspot_3": "특정 오류 코드가 갑자기 상위 15개 목록에 나타나는 것과 같은 DNS 쿼리 결과의 비정상적인 패턴이 있는지 확인하십시오. ",
+      "hotspot_4": "이벤트 소스별로 DNS 요청을 가장 많이 생성하는 상위 15개 플랫폼입니다.",
+      "title": "네트워크 활동"
+    },
+    "user_activity": {
+      "hotspot_0": "로그온 실패에서 우려되는 추세가 있는지 빠르게 확인하십시오.",
+      "hotspot_1": "사용자별 로그온 성공 및 실패를 통해 문제 계정과 비정상적인 활동을 찾을 수 있습니다.",
+      "hotspot_2": "높은 심각도의 경고를 생성하는 상위 15개 사용자 계정입니다!",
+      "hotspot_3": "환경에서 가장 흔한 ID 및 액세스 제어 변경은 무엇입니까?",
+      "hotspot_4": "가장 빈번한 액세스 제어 변경의 대상을 파악하십시오.",
+      "title": "사용자 활동"
+    },
+    "demo": {
+      "items": {
+        "anomaly_detection_ai": "이상 징후 탐지 AI",
+        "cloud_option": "클라우드 옵션",
+        "archiving": "아카이브",
+        "audit_logs_cloud": "{{productName}} Cloud 감사 로그",
+        "dynamic_lookup_tables": "동적 조회 테이블",
+        "advanced_alerting": "스크립팅을 통한 고급 경고",
+        "compliance_reporting": "규정 준수 보고",
+        "correlation_aggregation": "상관 관계 및 집계 이벤트",
+        "threat_intel": "위협 인텔리전스 통합",
+        "incident_workspaces": "인시던트 조사 워크스페이스",
+        "prebuilt_parser_dashboards": "사전 구축된 보안 파서 및 대시보드",
+        "sigma_rules": "Sigma 규칙",
+        "parameterized_dashboards": "매개변수화된 대시보드",
+        "input_output_integrations": "입력 및 출력 통합",
+        "threat_management": "위협 관리",
+        "search_workflow": "검색 워크플로, 템플릿 및 필터",
+        "soar_integrations": "SOAR 통합"
+      },
+      "title": "Security 데모",
+      "banner_text": "제품에 대한 자세한 정보와 전체 데모 예약은 {{productName}} 웹사이트를 방문하십시오.",
+      "button": "{{productName}} Security",
+      "overview": "개요",
+      "description": "{{productName}} Security는 SIEM, 보안 분석, 인시던트 조사, 이상 징후 탐지 기능을 결합하여 IT 팀의 사이버 보안을 혁신하도록 설계되었습니다. 이 플랫폼을 사용하면 더 효율적으로 작업하고, 중요한 작업을 더 빠르게 처리하며, 악의적인 행위자와 자격 증명 기반 공격으로 인한 위험을 줄일 수 있습니다."
+    }
+  },
+  "user_fields": {
+    "username": "사용자 이름",
+    "first_name": "이름",
+    "last_name": "성",
+    "full_name": "전체 이름",
+    "email": "이메일 주소",
+    "password": "비밀번호",
+    "repeat_password": "비밀번호 확인",
+    "time_zone": "시간대",
+    "sessions_timeout": "세션 시간 제한",
+    "profile": "프로필",
+    "settings": "설정",
+    "roles": "역할",
+    "assign_roles": "역할 할당",
+    "selected_roles": "선택된 역할",
+    "teams": "팀"
+  },
+  "user_form": {
+    "first_name_help": "사용자의 이름입니다.",
+    "last_name_help": "사용자의 성입니다.",
+    "email_help": "사용자의 이메일 주소입니다.",
+    "username_help": "로그인에 사용할 고유한 사용자 이름을 선택하십시오.",
+    "username_taken": "이미 사용 중인 사용자 이름입니다",
+    "passwords_mismatch": "비밀번호가 일치하지 않습니다",
+    "time_zone_help": "현지 시간대를 선택하거나 그대로 두어 브라우저 기본값을 사용하십시오.",
+    "service_account": "서비스 계정",
+    "service_account_label": "사용자가 서비스 계정입니다",
+    "service_account_help": "선택하면 사용자가 서비스 계정이 되며 웹 인터페이스에 로그인하거나 자신의 설정(예: API 토큰)을 편집할 수 없습니다.",
+    "service_account_confirm_title": "계속하시겠습니까?",
+    "service_account_confirm": "이 사용자를 서비스 계정으로 변경하면 웹 인터페이스에 로그인하거나 자신의 설정(예: API 토큰)을 편집할 수 없게 됩니다. 계속하시겠습니까?",
+    "global_timeout_message": "<timeoutLink>전역 세션 시간 제한</timeoutLink>이 활성화되어 있으므로 사용자 세션 시간 제한을 편집할 수 없습니다."
+  },
+  "token_form": {
+    "token_name": "토큰 이름",
+    "placeholder": "이 토큰은 무엇을 위한 것입니까?",
+    "ttl_label": "토큰 TTL",
+    "ttl_invalid": "유효하지 않음 (최소: 1분)",
+    "creating": "만드는 중...",
+    "create": "토큰 만들기",
+    "ttl_help": "TTL 구문 예시: 60초: PT60S, 60분: PT60M, 24시간: PT24H, 30일: P30D"
+  },
+  "permissions_info": {
+    "title": "권한 부여",
+    "text": "스트림 및 대시보드와 같은 항목에 대한 권한은 항목의 <shareLabel>공유</shareLabel> 버튼으로 구성할 수 있습니다. 이 버튼은 예를 들어 항목 개요 페이지에서 찾을 수 있습니다. 자세한 내용은 <docsLink>문서</docsLink>를 참조하십시오."
+  },
+  "startpage": {
+    "label": "시작 페이지",
+    "help": "로그인 직후 사용자에게 표시할 페이지를 선택하십시오. 사용자에게 권한이 있는 항목만 선택할 수 있습니다.",
+    "select_type": "유형 선택",
+    "select_value": "{{type, lowercase}} 선택",
+    "entity": "항목",
+    "types": {
+      "dashboard": "대시보드",
+      "stream": "스트림",
+      "search": "검색"
+    },
+    "new_search": "새 검색",
+    "threat_coverage": "위협 커버리지",
+    "missing_permission": "사용자에게 구성된 페이지에 대한 권한이 없습니다"
+  },
+  "timeout": {
+    "sessions_label": "세션 시간 제한",
+    "alert_title": "세션 시간 제한 변경",
+    "alert_text": "세션 시간 제한 설정을 변경하면 사용자가 로그아웃되고 현재 세션이 모두 무효화됩니다. 본인의 설정을 변경하는 경우 설정을 저장하는 즉시 로그아웃됩니다. 이 경우 시간 제한을 변경하기 전에 보류 중인 변경 사항을 먼저 저장하십시오.",
+    "never_label": "세션이 만료되지 않음",
+    "never_help": "선택하면 비활성 상태로 인해 세션이 만료되지 않습니다.",
+    "amount_placeholder": "시간 제한 값",
+    "help": "세션은 활발히 사용되지 않으면 이 시간이 지난 후 자동으로 종료됩니다.",
+    "unit_label": "시간 제한 단위",
+    "units": {
+      "seconds": "초",
+      "minutes": "분",
+      "hours": "시간",
+      "days": "일"
+    }
+  },
+  "user_details": {
+    "client_address": "클라이언트 주소",
+    "last_activity": "마지막 활동",
+    "logged_in": "로그인됨",
+    "enabled": "활성화됨",
+    "auth_service_disabled": "인증 서비스가 비활성화되어 사용자가 로그인할 수 없습니다",
+    "preferences": {
+      "title": "환경 설정",
+      "search_autocompletion": "검색 자동 완성",
+      "update_unfocused": "포커스 없을 때 업데이트",
+      "pin_search_sidebar": "검색 사이드바 고정",
+      "pin_dashboard_sidebar": "대시보드 사이드바 고정",
+      "theme_mode": "테마 모드",
+      "not_configured": "구성되지 않음",
+      "language": "언어"
+    },
+    "roles_none_selected": "선택된 역할을 찾을 수 없습니다.",
+    "settings": {
+      "timezone": "시간대",
+      "startpage": "시작 페이지",
+      "no_startpage": "시작 페이지가 설정되지 않았습니다",
+      "no_timeout": "세션이 만료되지 않음",
+      "globally_set": "(<configLink>전역 설정</configLink>)"
+    },
+    "shared_entities": "공유된 항목"
+  },
+  "users_list": {
+    "client_address_help": "세션을 처음 설정하는 데 사용된 클라이언트의 주소이며 현재 주소와 다를 수 있습니다.",
+    "admin": {
+      "title": "시스템 관리자",
+      "description": "시스템 관리자는 {{productName}} 구성 파일에서만 편집할 수 있습니다."
+    },
+    "headers": {
+      "full_name": "전체 이름",
+      "username": "사용자 이름",
+      "email": "이메일 주소",
+      "client_address": "클라이언트 주소",
+      "enabled": "활성화됨",
+      "role": "역할",
+      "actions": "작업"
+    },
+    "title": "사용자",
+    "found": "시스템에서 등록된 사용자 {{total}}명을 찾았습니다.",
+    "none_found": "사용자를 찾을 수 없습니다.",
+    "filter_label": "사용자 필터",
+    "actions": {
+      "edit_tokens_title": "사용자 {{name}}의 토큰 편집",
+      "edit_tokens": "토큰 편집",
+      "system_user_tooltip": "시스템 사용자는 서버 구성 파일에서만 수정할 수 있습니다.",
+      "system_user": "시스템 사용자",
+      "confirm_disable": "사용자 {{name}}을(를) 비활성화하시겠습니까? 현재 세션이 모두 종료됩니다.",
+      "confirm_delete": "사용자 {{name}}을(를) 삭제하시겠습니까?",
+      "edit_title": "사용자 {{name}} 편집",
+      "edit": "편집",
+      "set_status_title": "{{name}}의 새 계정 상태 설정",
+      "disable": "비활성화",
+      "enable": "활성화",
+      "delete_title": "사용자 {{name}} 삭제"
+    },
+    "logged_in": {
+      "title": "로그인됨",
+      "last_activity": "마지막 활동: {{activity}}",
+      "client_address": "클라이언트 주소: {{address}}",
+      "not_logged_in": "로그인하지 않음"
+    },
+    "status": {
+      "user_is": "사용자가 {{status}} 상태입니다",
+      "auth_disabled": " (인증 서비스가 비활성화됨)",
+      "enabled": "활성화",
+      "disabled": "비활성화"
+    },
+    "query_example": "이메일에 example.com이 포함된 사용자 찾기:",
+    "fields": {
+      "full_name": "사용자의 전체 이름",
+      "username": "사용자의 로그인 사용자 이름입니다.",
+      "email": "사용자의 이메일입니다."
+    },
+    "select_users": "사용자 선택..."
+  },
+  "user_navigation": {
+    "view_details": "세부 정보 보기",
+    "edit_user": "사용자 편집",
+    "edit_tokens": "토큰 편집"
+  },
+  "token_admin": {
+    "title": "토큰",
+    "human_name": "토큰",
+    "fields": {
+      "username": "토큰 소유자의 사용자 이름",
+      "name": "토큰의 이름",
+      "created": "토큰 생성 날짜",
+      "last_access": "토큰이 마지막으로 사용된 시간",
+      "external_user": "토큰 소유자가 외부 인증 백엔드의 사용자인지 여부",
+      "auth_backend": "사용자 인증 백엔드입니다. 내부 사용자는 해당 없음"
+    },
+    "example_user": "특정 사용자가 만든 토큰 찾기:",
+    "example_name": "특정 토큰 이름으로 토큰 찾기:",
+    "deleting_title": "토큰 삭제 중",
+    "delete_confirm": "토큰 \"{{name}}\"을(를) 삭제하려고 합니다. 계속하시겠습니까?",
+    "delete": "삭제",
+    "user_not_found": "사용자가 존재하지 않습니다.",
+    "user_error_title": "토큰 사용자 오류",
+    "not_available": "해당 없음",
+    "delete_failed": "토큰을 삭제하지 못했습니다: {{error}}",
+    "delete_failed_title": "토큰을 삭제할 수 없습니다",
+    "deleted": "토큰이 삭제되었습니다.",
+    "deleted_title": "성공!"
+  },
+  "user_details_page": {
+    "title": "사용자 세부 정보",
+    "title_with_name": "사용자 세부 정보 {{name}}",
+    "documentation_link_title": "권한 문서",
+    "description": "프로필 정보, 설정, 팀 및 역할과 같은 세부 정보의 개요입니다."
+  },
+  "password_rules": {
+    "min_length": "비밀번호는 {{minLength}}자 이상이어야 합니다.",
+    "require_uppercase": "비밀번호에 대문자가 하나 이상 포함되어야 합니다.",
+    "require_lowercase": "비밀번호에 소문자가 하나 이상 포함되어야 합니다.",
+    "require_numbers": "비밀번호에 숫자가 하나 이상 포함되어야 합니다.",
+    "require_special_chars": "비밀번호에 다음 중 특수 문자가 하나 이상 포함되어야 합니다: {{characters}}"
+  },
+  "notifications": {
+    "save_success": "사용자 환경 설정이 저장되었습니다",
+    "save_failed": "\"{{userName}}\"의 환경 설정을 저장하지 못했습니다. 상태: {{error}}",
+    "save_failed_title": "사용자 환경 설정을 저장할 수 없습니다",
+    "change_success": "시작 페이지가 변경되었습니다",
+    "change_failed": "시작 페이지를 변경하지 못했습니다. 오류: {{error}}",
+    "change_failed_title": "시작 페이지를 변경할 수 없습니다"
+  },
+  "use_basic_user_notifications": {
+    "load_failed": "사용자 {{userId}}을(를) 로드하지 못했습니다. 상태",
+    "load_failed_title": "사용자 {{userId}}을(를) 로드할 수 없습니다"
+  }
+}

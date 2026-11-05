@@ -1,0 +1,64 @@
+{
+  "api_browser": {
+    "download_label": "OpenAPI 사양 다운로드:",
+    "fetch_failed": "API 사양을 가져오지 못했습니다!",
+    "loading": "API 사양을 로드하는 중 ...",
+    "loading_title": "API Browser - API 사양 로드 중",
+    "select_format": "형식 선택",
+    "title": "API Browser"
+  },
+  "configlet": {
+    "error": "문제가 발생했습니다:"
+  },
+  "errors": {
+    "copy_error_details": "오류 세부 정보를 클립보드에 복사"
+  },
+  "keyboard_shortcuts": {
+    "description": "사용 가능한 모든 단축키 목록",
+    "title": "키보드 단축키"
+  },
+  "loading": {
+    "text": "로드 중입니다. 잠시 기다리십시오...",
+    "title": "로드 중..."
+  },
+  "not_found": {
+    "back_hint": "<mainPageLink>메인 페이지</mainPageLink>로 돌아가 다시 이동할 수 있습니다.",
+    "description": "찾으시는 페이지가 존재하지 않습니다(더 이상 존재하지 않을 수 있습니다).",
+    "title": "페이지를 찾을 수 없음"
+  },
+  "runtime_error": {
+    "description_hint": "내비게이션을 사용하여 제품의 다른 부분으로 이동하거나, 페이지를 새로 고치거나, 오류 보고서를 제출할 수 있습니다.",
+    "description_intro": "이동한 페이지에 오류가 있는 것 같습니다.",
+    "error_label": "오류:",
+    "show_less": "간략히 보기",
+    "show_more": "더 보기",
+    "title": "문제가 발생했습니다."
+  },
+  "server_unavailable": {
+    "document_title": "서버를 사용할 수 없음",
+    "error_message": "오류 메시지",
+    "full_error_message": "전체 오류 메시지",
+    "intro": "<serverAddress>{{address}}</serverAddress>에서 실행 중인 {{productName}} 서버에 연결하는 데 문제가 발생했습니다. 서버가 정상적으로 작동하는지 확인하십시오.",
+    "last_response": "서버로부터 받은 마지막 응답입니다:",
+    "less_details": "세부 정보 줄이기",
+    "modal_title": "서버를 현재 사용할 수 없음",
+    "more_details": "세부 정보 더 보기",
+    "need_help": "도움이 필요하십니까? <helpLink>도움을 받을 수 있습니다</helpLink>.",
+    "no_information": "사용 가능한 정보가 없습니다.",
+    "original_request": "원본 요청",
+    "redirect_hint": "서버에 연결되면 이전 페이지로 자동으로 이동합니다.",
+    "status_code": "상태 코드"
+  },
+  "show_message": {
+    "document_title": "{{index}}의 메시지 {{messageId}}",
+    "not_found_description": "지정한 인덱스 또는 메시지를 찾을 수 없습니다. 가장 가능성이 높은 원인은 참조된 메시지가 들어 있는 인덱스가 삭제된 것입니다. 전체 오류 메시지는 다음과 같습니다:",
+    "not_found_title": "인덱스/메시지를 찾을 수 없음"
+  },
+  "unauthorized": {
+    "description_hint": "관리자에게 문의하여 오류 세부 정보를 전달하십시오.",
+    "description_intro": "이 리소스를 볼 수 있는 권한이 없습니다.",
+    "page_details": "{{pathname}}에 접근하는 동안 다음 요청에 대한 권한 확인에 실패했습니다.",
+    "page_details_no_request": "{{pathname}}에 접근하는 동안 권한 확인에 실패했습니다.",
+    "title": "권한 없음"
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "pages": {
+    "description": "{{productName}} Data Nodes는 {{productName}}와(과) 더 나은 통합을 제공하고 향후 업데이트를 간소화합니다. {{productName}} 메시지 데이터베이스에 있는 모든 메시지를 인덱싱하고 검색할 수 있습니다.",
+    "documentation_title": "Data Nodes 문서",
+    "cluster_management_title": "Data Node 대시보드",
+    "certificate_management_title": "인증서 관리",
+    "migration_title": "Data Node 마이그레이션",
+    "upgrade_title": "Data Node 업그레이드"
+  },
+  "details_page": {
+    "error": "오류: {{message}}",
+    "title": "Data Nodes: {{hostname}}",
+    "details": "세부 정보:",
+    "hostname": "호스트 이름:",
+    "transport_address": "전송 주소:",
+    "status": "상태:",
+    "not_available": "해당 없음",
+    "certificate_valid_until": "인증서 유효 기간:",
+    "datanode_version": "Datanode 버전:",
+    "configuration_warnings": "구성 경고"
+  },
+  "upgrade_status": {
+    "title": "업그레이드 상태",
+    "message": "노드를 업그레이드하는 중..."
+  },
+  "upgrade_complete": {
+    "title": "업그레이드 완료",
+    "message": "모든 노드가 최신 상태입니다."
+  },
+  "data_node_notifications": {
+    "start_replication_success": "복제가 시작되었습니다.",
+    "start_replication_failure": "복제를 시작하지 못했습니다.",
+    "replication_in_progress": "복제 진행 중...",
+    "replication_complete": "복제가 완료되었습니다.",
+    "replication_failed": "복제에 실패했습니다.",
+    "replication_error": "복제 오류: {{error}}",
+    "status_unknown": "알 수 없는 상태",
+    "loading_rolling_upgrade_failed": "OpenSearch 롤링 업그레이드 상태를 불러오지 못했습니다",
+    "loading_rolling_upgrade_failed_title": "OpenSearch 롤링 업그레이드 상태를 불러올 수 없습니다",
+    "resume_rolling_upgrade_failed_title": "OpenSearch 롤링 업그레이드를 재개할 수 없습니다",
+    "resume_rolling_upgrade_success": "OpenSearch 롤링 업그레이드가 재개되었습니다.",
+    "start_rolling_upgrade_failed_title": "OpenSearch 롤링 업그레이드를 시작할 수 없습니다",
+    "loading_versions_failed": "OpenSearch 버전 개요를 불러오지 못했습니다",
+    "loading_versions_failed_title": "OpenSearch 버전 개요를 불러올 수 없습니다",
+    "loading_journal_estimate_failed": "Data Node 마이그레이션 저널 추정치를 불러오는 중",
+    "loading_journal_estimate_failed_title": "Data Node 저널 크기 추정치를 불러올 수 없습니다",
+    "bulk_remove_failed_title": "Data Nodes를 제거할 수 없습니다.",
+    "bulk_remove_success_other": "Data Nodes {{count}}개를 제거했습니다.",
+    "bulk_start_failed_title": "Data Nodes를 시작할 수 없습니다.",
+    "bulk_start_success_other": "Data Nodes {{count}}개를 시작했습니다.",
+    "bulk_stop_failed_title": "Data Nodes를 중지할 수 없습니다.",
+    "bulk_stop_success_other": "Data Nodes {{count}}개를 중지했습니다.",
+    "loading_failed": "Data Nodes를 불러오지 못했습니다. 상태",
+    "loading_failed_title": "Data Nodes를 불러올 수 없습니다.",
+    "rejoin_failed": "Data Node를 다시 연결하지 못했습니다. 상태: {{status}}",
+    "rejoin_failed_title": "Data Node를 다시 연결할 수 없습니다.",
+    "rejoin_success": "Data Node \"{{datanodeId}}\"을(를) 다시 연결했습니다.",
+    "remove_failed": "Data Node를 제거하지 못했습니다. 상태: {{status}}",
+    "remove_failed_title": "Data Node를 제거할 수 없습니다.",
+    "remove_success": "Data Node \"{{datanodeId}}\"을(를) 제거했습니다.",
+    "renew_certificate_failed": "인증서 갱신에 실패했습니다. 오류: {{error}}",
+    "renew_certificate_success": "인증서가 갱신되었습니다.",
+    "start_failed": "Data Node를 시작하지 못했습니다. 상태: {{status}}",
+    "start_failed_title": "Data Node를 시작할 수 없습니다.",
+    "start_success": "Data Node \"{{datanodeId}}\"을(를) 시작했습니다.",
+    "stop_failed": "Data Node를 중지하지 못했습니다. 상태: {{status}}",
+    "stop_failed_title": "Data Node를 중지할 수 없습니다.",
+    "stop_success": "Data Node \"{{datanodeId}}\"을(를) 중지했습니다.",
+    "loading_node_failed": "Data Node를 불러오지 못했습니다. 상태",
+    "loading_node_failed_title": "Data Node를 불러올 수 없습니다",
+    "loading_upgrade_status_failed": "Data Node 업그레이드 상태를 불러오지 못했습니다",
+    "loading_upgrade_status_failed_title": "Data Node 업그레이드 상태를 불러올 수 없습니다",
+    "start_replication_failed": "샤드 복제를 시작하지 못했습니다. 상태: {{status}}",
+    "start_replication_failed_title": "샤드 복제를 시작할 수 없습니다.",
+    "stop_replication_failed": "샤드 복제를 중지하지 못했습니다. 상태: {{status}}",
+    "stop_replication_failed_title": "샤드 복제를 중지할 수 없습니다.",
+    "stop_replication_success": "샤드 복제가 중지되었습니다",
+    "loading_stderr_failed": "Data Node stderr 로그를 불러오지 못했습니다. 상태",
+    "loading_stderr_failed_title": "Data Node stderr 로그를 불러올 수 없습니다",
+    "loading_stdout_failed": "Data Node stdout 로그를 불러오지 못했습니다. 상태",
+    "loading_stdout_failed_title": "Data Node stdout 로그를 불러올 수 없습니다"
+  },
+  "ca_upload": {
+    "file_required": "파일을 업로드하십시오.",
+    "single_file": "파일을 하나만 업로드하십시오."
+  },
+  "notifications": {
+    "certificate_provisioned_success": "인증서가 프로비저닝되었습니다",
+    "certificate_renewed_success": "인증서가 갱신되었습니다",
+    "certificate_provisioning_failed": "인증서 프로비저닝에 실패했습니다. 오류: {{error}}",
+    "certificate_renewal_failed": "인증서 갱신에 실패했습니다. 오류: {{error}}"
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "main": {
+    "search": "검색",
+    "streams": "스트림",
+    "alerts": "경고",
+    "dashboards": "대시보드",
+    "system": "시스템",
+    "enterprise": "Enterprise",
+    "security": "보안"
+  },
+  "system": {
+    "overview": "개요",
+    "configurations": "구성",
+    "cluster_configuration": "클러스터 구성",
+    "inputs": "입력",
+    "outputs": "출력",
+    "indices": "인덱스",
+    "logging": "로깅",
+    "users_and_teams": "사용자 및 팀",
+    "roles": "역할",
+    "authentication": "인증",
+    "content_packs": "콘텐츠 팩",
+    "grok_patterns": "Grok 패턴",
+    "lookup_tables": "조회 테이블",
+    "pipelines": "파이프라인",
+    "sidecars": "Sidecar",
+    "collectors": "수집기",
+    "translation_feedback": "번역 피드백"
+  },
+  "security": {
+    "overview": "개요",
+    "user_activity": "사용자 활동",
+    "host_activity": "호스트 활동",
+    "network_activity": "네트워크 활동",
+    "anomalies": "이상 징후"
+  },
+  "help": {
+    "title": "도움말",
+    "documentation": "문서",
+    "design_system": "디자인 시스템",
+    "keyboard_shortcuts": "키보드 단축키",
+    "api_browser": "API 브라우저"
+  },
+  "user_menu": {
+    "title": "{{name}}님의 사용자 메뉴",
+    "language": "언어",
+    "show_profile": "프로필 보기",
+    "edit_profile": "프로필 편집",
+    "log_out": "로그아웃"
+  },
+  "shell": {
+    "welcome": "환영합니다",
+    "main": "메인",
+    "utility": "유틸리티",
+    "toggle_navigation": "탐색 전환",
+    "scratchpad": "메모장"
+  },
+  "page_navigation": {
+    "cluster_configuration": "클러스터 구성",
+    "certificate_management": "인증서 관리",
+    "data_node_dashboard": "Data Node 대시보드",
+    "data_node_upgrade": "Data Node 업그레이드",
+    "data_node_migration": "Data Node 마이그레이션",
+    "overview": "개요",
+    "notifications": "알림",
+    "lookup_tables": "조회 테이블",
+    "caches": "캐시",
+    "data_adapters": "데이터 어댑터",
+    "users_overview": "사용자 개요",
+    "token_management": "토큰 관리",
+    "administration": "관리",
+    "configuration": "구성",
+    "failure_tracking": "실패 추적",
+    "alerts_and_events": "경고 및 이벤트",
+    "event_definitions": "이벤트 정의"
+  }
+}

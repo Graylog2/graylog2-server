@@ -68,6 +68,7 @@ registerTranslations('aggregation', enAggregation, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-aggregation" */ 'locales/zh-TW/aggregation.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-aggregation" */ 'locales/ja/aggregation.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-aggregation" */ 'locales/uk/aggregation.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-aggregation" */ 'locales/ko/aggregation.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-aggregation" */ 'locales/pl/aggregation.json'),
   es: () => import(/* webpackChunkName: "translations-es-aggregation" */ 'locales/es/aggregation.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-aggregation" */ 'locales/fr/aggregation.json'),
@@ -81,6 +82,7 @@ registerTranslations('api_browser', enApiBrowser, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-api-browser" */ 'locales/zh-TW/api_browser.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-api-browser" */ 'locales/ja/api_browser.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-api-browser" */ 'locales/uk/api_browser.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-api-browser" */ 'locales/ko/api_browser.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-api-browser" */ 'locales/pl/api_browser.json'),
   es: () => import(/* webpackChunkName: "translations-es-api-browser" */ 'locales/es/api_browser.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-api-browser" */ 'locales/fr/api_browser.json'),
@@ -95,6 +97,7 @@ registerTranslations('authentication', enAuthentication, {
     import(/* webpackChunkName: "translations-zh-tw-authentication" */ 'locales/zh-TW/authentication.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-authentication" */ 'locales/ja/authentication.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-authentication" */ 'locales/uk/authentication.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-authentication" */ 'locales/ko/authentication.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-authentication" */ 'locales/pl/authentication.json'),
   es: () => import(/* webpackChunkName: "translations-es-authentication" */ 'locales/es/authentication.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-authentication" */ 'locales/fr/authentication.json'),
@@ -110,6 +113,7 @@ registerTranslations('builtin_roles', enBuiltinRoles, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-builtin-roles" */ 'locales/zh-TW/builtin_roles.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-builtin-roles" */ 'locales/ja/builtin_roles.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-builtin-roles" */ 'locales/uk/builtin_roles.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-builtin-roles" */ 'locales/ko/builtin_roles.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-builtin-roles" */ 'locales/pl/builtin_roles.json'),
   es: () => import(/* webpackChunkName: "translations-es-builtin-roles" */ 'locales/es/builtin_roles.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-builtin-roles" */ 'locales/fr/builtin_roles.json'),
@@ -123,6 +127,7 @@ registerTranslations('certificates', enCertificates, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-certificates" */ 'locales/zh-TW/certificates.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-certificates" */ 'locales/ja/certificates.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-certificates" */ 'locales/uk/certificates.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-certificates" */ 'locales/ko/certificates.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-certificates" */ 'locales/pl/certificates.json'),
   es: () => import(/* webpackChunkName: "translations-es-certificates" */ 'locales/es/certificates.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-certificates" */ 'locales/fr/certificates.json'),
@@ -150,6 +155,10 @@ registerTranslations('cluster_certificate_management', enClusterCertificateManag
   uk: () =>
     import(
       /* webpackChunkName: "translations-uk-cluster-certificate-management" */ 'locales/uk/cluster_certificate_management.json'
+    ),
+  ko: () =>
+    import(
+      /* webpackChunkName: "translations-ko-cluster-certificate-management" */ 'locales/ko/cluster_certificate_management.json'
     ),
   pl: () =>
     import(
@@ -179,6 +188,7 @@ registerTranslations('collectors', enCollectors, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-collectors" */ 'locales/zh-TW/collectors.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-collectors" */ 'locales/ja/collectors.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-collectors" */ 'locales/uk/collectors.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-collectors" */ 'locales/ko/collectors.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-collectors" */ 'locales/pl/collectors.json'),
   es: () => import(/* webpackChunkName: "translations-es-collectors" */ 'locales/es/collectors.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-collectors" */ 'locales/fr/collectors.json'),
@@ -192,6 +202,7 @@ registerTranslations('common', enCommon, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-common" */ 'locales/zh-TW/common.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-common" */ 'locales/ja/common.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-common" */ 'locales/uk/common.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-common" */ 'locales/ko/common.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-common" */ 'locales/pl/common.json'),
   es: () => import(/* webpackChunkName: "translations-es-common" */ 'locales/es/common.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-common" */ 'locales/fr/common.json'),
@@ -206,6 +217,7 @@ registerTranslations('configurations', enConfigurations, {
     import(/* webpackChunkName: "translations-zh-tw-configurations" */ 'locales/zh-TW/configurations.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-configurations" */ 'locales/ja/configurations.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-configurations" */ 'locales/uk/configurations.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-configurations" */ 'locales/ko/configurations.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-configurations" */ 'locales/pl/configurations.json'),
   es: () => import(/* webpackChunkName: "translations-es-configurations" */ 'locales/es/configurations.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-configurations" */ 'locales/fr/configurations.json'),
@@ -221,6 +233,7 @@ registerTranslations('content_packs', enContentPacks, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-content-packs" */ 'locales/zh-TW/content_packs.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-content-packs" */ 'locales/ja/content_packs.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-content-packs" */ 'locales/uk/content_packs.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-content-packs" */ 'locales/ko/content_packs.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-content-packs" */ 'locales/pl/content_packs.json'),
   es: () => import(/* webpackChunkName: "translations-es-content-packs" */ 'locales/es/content_packs.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-content-packs" */ 'locales/fr/content_packs.json'),
@@ -234,6 +247,7 @@ registerTranslations('dashboards', enDashboards, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-dashboards" */ 'locales/zh-TW/dashboards.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-dashboards" */ 'locales/ja/dashboards.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-dashboards" */ 'locales/uk/dashboards.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-dashboards" */ 'locales/ko/dashboards.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-dashboards" */ 'locales/pl/dashboards.json'),
   es: () => import(/* webpackChunkName: "translations-es-dashboards" */ 'locales/es/dashboards.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-dashboards" */ 'locales/fr/dashboards.json'),
@@ -261,6 +275,10 @@ registerTranslations('data_nodes_cluster_management', enDataNodesClusterManageme
   uk: () =>
     import(
       /* webpackChunkName: "translations-uk-data-nodes-cluster-management" */ 'locales/uk/data_nodes_cluster_management.json'
+    ),
+  ko: () =>
+    import(
+      /* webpackChunkName: "translations-ko-data-nodes-cluster-management" */ 'locales/ko/data_nodes_cluster_management.json'
     ),
   pl: () =>
     import(
@@ -290,6 +308,7 @@ registerTranslations('datanode', enDatanode, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-datanode" */ 'locales/zh-TW/datanode.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-datanode" */ 'locales/ja/datanode.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-datanode" */ 'locales/uk/datanode.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-datanode" */ 'locales/ko/datanode.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-datanode" */ 'locales/pl/datanode.json'),
   es: () => import(/* webpackChunkName: "translations-es-datanode" */ 'locales/es/datanode.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-datanode" */ 'locales/fr/datanode.json'),
@@ -304,6 +323,7 @@ registerTranslations('entity_attributes', enEntityAttributes, {
     import(/* webpackChunkName: "translations-zh-tw-entity-attributes" */ 'locales/zh-TW/entity_attributes.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-entity-attributes" */ 'locales/ja/entity_attributes.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-entity-attributes" */ 'locales/uk/entity_attributes.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-entity-attributes" */ 'locales/ko/entity_attributes.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-entity-attributes" */ 'locales/pl/entity_attributes.json'),
   es: () => import(/* webpackChunkName: "translations-es-entity-attributes" */ 'locales/es/entity_attributes.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-entity-attributes" */ 'locales/fr/entity_attributes.json'),
@@ -320,6 +340,7 @@ registerTranslations('event_definitions', enEventDefinitions, {
     import(/* webpackChunkName: "translations-zh-tw-event-definitions" */ 'locales/zh-TW/event_definitions.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-event-definitions" */ 'locales/ja/event_definitions.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-event-definitions" */ 'locales/uk/event_definitions.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-event-definitions" */ 'locales/ko/event_definitions.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-event-definitions" */ 'locales/pl/event_definitions.json'),
   es: () => import(/* webpackChunkName: "translations-es-event-definitions" */ 'locales/es/event_definitions.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-event-definitions" */ 'locales/fr/event_definitions.json'),
@@ -336,6 +357,7 @@ registerTranslations('event_notifications', enEventNotifications, {
     import(/* webpackChunkName: "translations-zh-tw-event-notifications" */ 'locales/zh-TW/event_notifications.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-event-notifications" */ 'locales/ja/event_notifications.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-event-notifications" */ 'locales/uk/event_notifications.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-event-notifications" */ 'locales/ko/event_notifications.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-event-notifications" */ 'locales/pl/event_notifications.json'),
   es: () => import(/* webpackChunkName: "translations-es-event-notifications" */ 'locales/es/event_notifications.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-event-notifications" */ 'locales/fr/event_notifications.json'),
@@ -351,6 +373,7 @@ registerTranslations('events', enEvents, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-events" */ 'locales/zh-TW/events.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-events" */ 'locales/ja/events.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-events" */ 'locales/uk/events.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-events" */ 'locales/ko/events.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-events" */ 'locales/pl/events.json'),
   es: () => import(/* webpackChunkName: "translations-es-events" */ 'locales/es/events.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-events" */ 'locales/fr/events.json'),
@@ -364,6 +387,7 @@ registerTranslations('extractors', enExtractors, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-extractors" */ 'locales/zh-TW/extractors.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-extractors" */ 'locales/ja/extractors.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-extractors" */ 'locales/uk/extractors.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-extractors" */ 'locales/ko/extractors.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-extractors" */ 'locales/pl/extractors.json'),
   es: () => import(/* webpackChunkName: "translations-es-extractors" */ 'locales/es/extractors.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-extractors" */ 'locales/fr/extractors.json'),
@@ -377,6 +401,7 @@ registerTranslations('grokpatterns', enGrokpatterns, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-grokpatterns" */ 'locales/zh-TW/grokpatterns.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-grokpatterns" */ 'locales/ja/grokpatterns.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-grokpatterns" */ 'locales/uk/grokpatterns.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-grokpatterns" */ 'locales/ko/grokpatterns.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-grokpatterns" */ 'locales/pl/grokpatterns.json'),
   es: () => import(/* webpackChunkName: "translations-es-grokpatterns" */ 'locales/es/grokpatterns.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-grokpatterns" */ 'locales/fr/grokpatterns.json'),
@@ -391,6 +416,7 @@ registerTranslations('index_set_templates', enIndexSetTemplates, {
     import(/* webpackChunkName: "translations-zh-tw-index-set-templates" */ 'locales/zh-TW/index_set_templates.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-index-set-templates" */ 'locales/ja/index_set_templates.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-index-set-templates" */ 'locales/uk/index_set_templates.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-index-set-templates" */ 'locales/ko/index_set_templates.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-index-set-templates" */ 'locales/pl/index_set_templates.json'),
   es: () => import(/* webpackChunkName: "translations-es-index-set-templates" */ 'locales/es/index_set_templates.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-index-set-templates" */ 'locales/fr/index_set_templates.json'),
@@ -406,6 +432,7 @@ registerTranslations('indexsets', enIndexsets, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-indexsets" */ 'locales/zh-TW/indexsets.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-indexsets" */ 'locales/ja/indexsets.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-indexsets" */ 'locales/uk/indexsets.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-indexsets" */ 'locales/ko/indexsets.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-indexsets" */ 'locales/pl/indexsets.json'),
   es: () => import(/* webpackChunkName: "translations-es-indexsets" */ 'locales/es/indexsets.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-indexsets" */ 'locales/fr/indexsets.json'),
@@ -419,6 +446,7 @@ registerTranslations('inputs', enInputs, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-inputs" */ 'locales/zh-TW/inputs.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-inputs" */ 'locales/ja/inputs.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-inputs" */ 'locales/uk/inputs.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-inputs" */ 'locales/ko/inputs.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-inputs" */ 'locales/pl/inputs.json'),
   es: () => import(/* webpackChunkName: "translations-es-inputs" */ 'locales/es/inputs.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-inputs" */ 'locales/fr/inputs.json'),
@@ -432,6 +460,7 @@ registerTranslations('integrations', enIntegrations, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-integrations" */ 'locales/zh-TW/integrations.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-integrations" */ 'locales/ja/integrations.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-integrations" */ 'locales/uk/integrations.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-integrations" */ 'locales/ko/integrations.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-integrations" */ 'locales/pl/integrations.json'),
   es: () => import(/* webpackChunkName: "translations-es-integrations" */ 'locales/es/integrations.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-integrations" */ 'locales/fr/integrations.json'),
@@ -445,6 +474,7 @@ registerTranslations('loggers', enLoggers, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-loggers" */ 'locales/zh-TW/loggers.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-loggers" */ 'locales/ja/loggers.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-loggers" */ 'locales/uk/loggers.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-loggers" */ 'locales/ko/loggers.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-loggers" */ 'locales/pl/loggers.json'),
   es: () => import(/* webpackChunkName: "translations-es-loggers" */ 'locales/es/loggers.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-loggers" */ 'locales/fr/loggers.json'),
@@ -458,6 +488,7 @@ registerTranslations('login', enLogin, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-login" */ 'locales/zh-TW/login.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-login" */ 'locales/ja/login.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-login" */ 'locales/uk/login.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-login" */ 'locales/ko/login.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-login" */ 'locales/pl/login.json'),
   es: () => import(/* webpackChunkName: "translations-es-login" */ 'locales/es/login.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-login" */ 'locales/fr/login.json'),
@@ -471,6 +502,7 @@ registerTranslations('lookup_tables', enLookupTables, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-lookup-tables" */ 'locales/zh-TW/lookup_tables.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-lookup-tables" */ 'locales/ja/lookup_tables.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-lookup-tables" */ 'locales/uk/lookup_tables.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-lookup-tables" */ 'locales/ko/lookup_tables.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-lookup-tables" */ 'locales/pl/lookup_tables.json'),
   es: () => import(/* webpackChunkName: "translations-es-lookup-tables" */ 'locales/es/lookup_tables.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-lookup-tables" */ 'locales/fr/lookup_tables.json'),
@@ -485,6 +517,7 @@ registerTranslations('messageloaders', enMessageloaders, {
     import(/* webpackChunkName: "translations-zh-tw-messageloaders" */ 'locales/zh-TW/messageloaders.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-messageloaders" */ 'locales/ja/messageloaders.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-messageloaders" */ 'locales/uk/messageloaders.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-messageloaders" */ 'locales/ko/messageloaders.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-messageloaders" */ 'locales/pl/messageloaders.json'),
   es: () => import(/* webpackChunkName: "translations-es-messageloaders" */ 'locales/es/messageloaders.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-messageloaders" */ 'locales/fr/messageloaders.json'),
@@ -500,6 +533,7 @@ registerTranslations('navigation', enNavigation, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-navigation" */ 'locales/zh-TW/navigation.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-navigation" */ 'locales/ja/navigation.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-navigation" */ 'locales/uk/navigation.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-navigation" */ 'locales/ko/navigation.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-navigation" */ 'locales/pl/navigation.json'),
   es: () => import(/* webpackChunkName: "translations-es-navigation" */ 'locales/es/navigation.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-navigation" */ 'locales/fr/navigation.json'),
@@ -513,6 +547,7 @@ registerTranslations('pages', enPages, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-pages" */ 'locales/zh-TW/pages.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-pages" */ 'locales/ja/pages.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-pages" */ 'locales/uk/pages.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-pages" */ 'locales/ko/pages.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-pages" */ 'locales/pl/pages.json'),
   es: () => import(/* webpackChunkName: "translations-es-pages" */ 'locales/es/pages.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-pages" */ 'locales/fr/pages.json'),
@@ -533,6 +568,8 @@ registerTranslations('pipeline_rule_builder', enPipelineRuleBuilder, {
     import(/* webpackChunkName: "translations-ja-pipeline-rule-builder" */ 'locales/ja/pipeline_rule_builder.json'),
   uk: () =>
     import(/* webpackChunkName: "translations-uk-pipeline-rule-builder" */ 'locales/uk/pipeline_rule_builder.json'),
+  ko: () =>
+    import(/* webpackChunkName: "translations-ko-pipeline-rule-builder" */ 'locales/ko/pipeline_rule_builder.json'),
   pl: () =>
     import(/* webpackChunkName: "translations-pl-pipeline-rule-builder" */ 'locales/pl/pipeline_rule_builder.json'),
   es: () =>
@@ -555,6 +592,7 @@ registerTranslations('pipelines', enPipelines, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-pipelines" */ 'locales/zh-TW/pipelines.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-pipelines" */ 'locales/ja/pipelines.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-pipelines" */ 'locales/uk/pipelines.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-pipelines" */ 'locales/ko/pipelines.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-pipelines" */ 'locales/pl/pipelines.json'),
   es: () => import(/* webpackChunkName: "translations-es-pipelines" */ 'locales/es/pipelines.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-pipelines" */ 'locales/fr/pipelines.json'),
@@ -568,6 +606,7 @@ registerTranslations('preflight', enPreflight, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-preflight" */ 'locales/zh-TW/preflight.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-preflight" */ 'locales/ja/preflight.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-preflight" */ 'locales/uk/preflight.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-preflight" */ 'locales/ko/preflight.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-preflight" */ 'locales/pl/preflight.json'),
   es: () => import(/* webpackChunkName: "translations-es-preflight" */ 'locales/es/preflight.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-preflight" */ 'locales/fr/preflight.json'),
@@ -581,6 +620,7 @@ registerTranslations('search', enSearch, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-search" */ 'locales/zh-TW/search.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-search" */ 'locales/ja/search.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-search" */ 'locales/uk/search.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-search" */ 'locales/ko/search.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-search" */ 'locales/pl/search.json'),
   es: () => import(/* webpackChunkName: "translations-es-search" */ 'locales/es/search.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-search" */ 'locales/fr/search.json'),
@@ -594,6 +634,7 @@ registerTranslations('server_errors', enServerErrors, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-server-errors" */ 'locales/zh-TW/server_errors.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-server-errors" */ 'locales/ja/server_errors.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-server-errors" */ 'locales/uk/server_errors.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-server-errors" */ 'locales/ko/server_errors.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-server-errors" */ 'locales/pl/server_errors.json'),
   es: () => import(/* webpackChunkName: "translations-es-server-errors" */ 'locales/es/server_errors.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-server-errors" */ 'locales/fr/server_errors.json'),
@@ -607,6 +648,7 @@ registerTranslations('server_fields', enServerFields, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-server-fields" */ 'locales/zh-TW/server_fields.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-server-fields" */ 'locales/ja/server_fields.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-server-fields" */ 'locales/uk/server_fields.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-server-fields" */ 'locales/ko/server_fields.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-server-fields" */ 'locales/pl/server_fields.json'),
   es: () => import(/* webpackChunkName: "translations-es-server-fields" */ 'locales/es/server_fields.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-server-fields" */ 'locales/fr/server_fields.json'),
@@ -620,6 +662,7 @@ registerTranslations('sidecars', enSidecars, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-sidecars" */ 'locales/zh-TW/sidecars.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-sidecars" */ 'locales/ja/sidecars.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-sidecars" */ 'locales/uk/sidecars.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-sidecars" */ 'locales/ko/sidecars.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-sidecars" */ 'locales/pl/sidecars.json'),
   es: () => import(/* webpackChunkName: "translations-es-sidecars" */ 'locales/es/sidecars.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-sidecars" */ 'locales/fr/sidecars.json'),
@@ -634,6 +677,7 @@ registerTranslations('stream_rule_types', enStreamRuleTypes, {
     import(/* webpackChunkName: "translations-zh-tw-stream-rule-types" */ 'locales/zh-TW/stream_rule_types.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-stream-rule-types" */ 'locales/ja/stream_rule_types.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-stream-rule-types" */ 'locales/uk/stream_rule_types.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-stream-rule-types" */ 'locales/ko/stream_rule_types.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-stream-rule-types" */ 'locales/pl/stream_rule_types.json'),
   es: () => import(/* webpackChunkName: "translations-es-stream-rule-types" */ 'locales/es/stream_rule_types.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-stream-rule-types" */ 'locales/fr/stream_rule_types.json'),
@@ -656,6 +700,8 @@ registerTranslations('stream_rule_types_long', enStreamRuleTypesLong, {
     import(/* webpackChunkName: "translations-ja-stream-rule-types-long" */ 'locales/ja/stream_rule_types_long.json'),
   uk: () =>
     import(/* webpackChunkName: "translations-uk-stream-rule-types-long" */ 'locales/uk/stream_rule_types_long.json'),
+  ko: () =>
+    import(/* webpackChunkName: "translations-ko-stream-rule-types-long" */ 'locales/ko/stream_rule_types_long.json'),
   pl: () =>
     import(/* webpackChunkName: "translations-pl-stream-rule-types-long" */ 'locales/pl/stream_rule_types_long.json'),
   es: () =>
@@ -678,6 +724,7 @@ registerTranslations('streams', enStreams, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-streams" */ 'locales/zh-TW/streams.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-streams" */ 'locales/ja/streams.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-streams" */ 'locales/uk/streams.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-streams" */ 'locales/ko/streams.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-streams" */ 'locales/pl/streams.json'),
   es: () => import(/* webpackChunkName: "translations-es-streams" */ 'locales/es/streams.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-streams" */ 'locales/fr/streams.json'),
@@ -691,6 +738,7 @@ registerTranslations('system', enSystem, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-system" */ 'locales/zh-TW/system.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-system" */ 'locales/ja/system.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-system" */ 'locales/uk/system.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-system" */ 'locales/ko/system.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-system" */ 'locales/pl/system.json'),
   es: () => import(/* webpackChunkName: "translations-es-system" */ 'locales/es/system.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-system" */ 'locales/fr/system.json'),
@@ -704,6 +752,7 @@ registerTranslations('users', enUsers, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-users" */ 'locales/zh-TW/users.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-users" */ 'locales/ja/users.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-users" */ 'locales/uk/users.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-users" */ 'locales/ko/users.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-users" */ 'locales/pl/users.json'),
   es: () => import(/* webpackChunkName: "translations-es-users" */ 'locales/es/users.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-users" */ 'locales/fr/users.json'),
@@ -717,6 +766,7 @@ registerTranslations('welcome', enWelcome, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-welcome" */ 'locales/zh-TW/welcome.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-welcome" */ 'locales/ja/welcome.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-welcome" */ 'locales/uk/welcome.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-welcome" */ 'locales/ko/welcome.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-welcome" */ 'locales/pl/welcome.json'),
   es: () => import(/* webpackChunkName: "translations-es-welcome" */ 'locales/es/welcome.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-welcome" */ 'locales/fr/welcome.json'),
@@ -730,6 +780,7 @@ registerTranslations('widgets', enWidgets, {
   'zh-TW': () => import(/* webpackChunkName: "translations-zh-tw-widgets" */ 'locales/zh-TW/widgets.json'),
   ja: () => import(/* webpackChunkName: "translations-ja-widgets" */ 'locales/ja/widgets.json'),
   uk: () => import(/* webpackChunkName: "translations-uk-widgets" */ 'locales/uk/widgets.json'),
+  ko: () => import(/* webpackChunkName: "translations-ko-widgets" */ 'locales/ko/widgets.json'),
   pl: () => import(/* webpackChunkName: "translations-pl-widgets" */ 'locales/pl/widgets.json'),
   es: () => import(/* webpackChunkName: "translations-es-widgets" */ 'locales/es/widgets.json'),
   fr: () => import(/* webpackChunkName: "translations-fr-widgets" */ 'locales/fr/widgets.json'),
@@ -748,6 +799,8 @@ registerTranslations('translation_feedback', enTranslationFeedback, {
     import(/* webpackChunkName: "translations-ja-translation_feedback" */ 'locales/ja/translation_feedback.json'),
   uk: () =>
     import(/* webpackChunkName: "translations-uk-translation_feedback" */ 'locales/uk/translation_feedback.json'),
+  ko: () =>
+    import(/* webpackChunkName: "translations-ko-translation_feedback" */ 'locales/ko/translation_feedback.json'),
   pl: () =>
     import(/* webpackChunkName: "translations-pl-translation_feedback" */ 'locales/pl/translation_feedback.json'),
   es: () =>

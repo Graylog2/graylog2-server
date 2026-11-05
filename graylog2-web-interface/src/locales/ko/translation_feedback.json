@@ -1,0 +1,77 @@
+{
+  "menu": {
+    "report": "번역 신고…",
+    "native_menu_hint": "Shift + 우클릭하면 브라우저 메뉴가 열립니다"
+  },
+  "modal": {
+    "title": "번역 신고",
+    "text": "텍스트",
+    "text_help": "페이지에 표시된 텍스트입니다. 확인이 필요한 부분만 남기고 줄여 주십시오.",
+    "key": "번역",
+    "partial_match": "부분 일치",
+    "not_translated": "번역되지 않음",
+    "none_of_these": "해당 없음",
+    "no_key_found": "번역을 찾을 수 없습니다. 아직 번역되지 않은 텍스트일 수 있습니다.",
+    "english": "영어 원문:",
+    "current_translation": "현재 번역:",
+    "category": "문제",
+    "suggestion": "제안하는 번역",
+    "suggestion_help": "선택 사항입니다. 텍스트가 어떻게 표현되어야 하는지 입력하십시오.",
+    "comment": "의견",
+    "submit": "신고",
+    "submitting": "신고 중…"
+  },
+  "categories": {
+    "wrong": "잘못된 번역",
+    "untranslated": "번역되지 않음",
+    "awkward": "어색한 표현",
+    "layout": "레이아웃 깨짐 또는 텍스트 잘림",
+    "other": "기타"
+  },
+  "statuses": {
+    "open": "열림",
+    "fixed": "수정됨",
+    "wont_fix": "수정 안 함"
+  },
+  "list": {
+    "human_name": "번역 신고",
+    "search_placeholder": "번역 신고 검색",
+    "no_key": "키 없음",
+    "download_json": "JSON 다운로드",
+    "download_csv": "CSV 다운로드"
+  },
+  "actions": {
+    "mark_fixed": "수정됨으로 표시",
+    "reopen": "다시 열기",
+    "mark_wont_fix": "수정 안 함",
+    "confirm_delete": "\"{{text}}\"에 대한 신고를 삭제하시겠습니까?"
+  },
+  "page": {
+    "title": "Translation Feedback",
+    "description": "인터페이스 번역에 대한 신고입니다. 텍스트를 우클릭하여 신고할 수 있습니다."
+  },
+  "notifications": {
+    "created": "감사합니다! 신고가 저장되었습니다.",
+    "created_title": "번역 신고됨",
+    "create_failed": "신고 저장에 실패했습니다: {{error}}",
+    "create_failed_title": "번역을 신고할 수 없습니다",
+    "update_failed": "신고 업데이트에 실패했습니다: {{error}}",
+    "update_failed_title": "신고를 업데이트할 수 없습니다"
+  },
+  "bulk": {
+    "delete": "삭제",
+    "changed_other": "신고 {{count}}건이 변경되었습니다.",
+    "confirm_delete_other": "신고 {{count}}건을 삭제하시겠습니까?"
+  },
+  "upload": {
+    "button": "처리 결과 업로드",
+    "uploading": "업로드 중…",
+    "help": "처리 결과 파일을 업로드하여 여러 신고의 상태와 신고자에게 전달할 메모를 한 번에 설정합니다.",
+    "failed": "처리 결과 적용에 실패했습니다: {{error}}",
+    "failed_title": "처리 결과를 적용할 수 없습니다",
+    "invalid_file": "파일에 처리 결과 목록이 없습니다.",
+    "applied_title": "처리 결과 적용됨",
+    "applied_other": "신고 {{count}}건이 업데이트되었습니다.",
+    "applied_with_missing_other": "신고 {{count}}건이 업데이트되었고, {{notFound}}건을 찾을 수 없습니다."
+  }
+}

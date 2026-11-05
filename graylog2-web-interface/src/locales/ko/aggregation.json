@@ -1,0 +1,261 @@
+{
+  "wizard_common": {
+    "grouping": "그룹화",
+    "group_by": "그룹 기준",
+    "metric": "메트릭",
+    "metrics": "메트릭",
+    "sort": "정렬",
+    "visualization": "시각화",
+    "add": "추가",
+    "add_element": "요소 추가",
+    "add_named": "{{element}} 추가",
+    "remove_named": "{{element}} 제거",
+    "update_preview": "미리 보기 업데이트",
+    "updating_preview": "미리 보기를 업데이트하는 중...",
+    "color_hint": "색상 힌트",
+    "select_all_fields": "모든 필드 선택",
+    "deselect_all_fields": "모든 필드 선택 해제",
+    "field_required": "필드는 필수입니다.",
+    "must_be_greater_than_other": "0보다 커야 합니다."
+  },
+  "wizard_grouping": {
+    "settings": "설정",
+    "skip_empty_values": "빈 값 건너뛰기",
+    "skip_empty_values_help": "이 옵션을 사용하면 구성된 필드를 포함하지 않는 메시지는 건너뜁니다.",
+    "skip_empty_values_help_otherwise": "사용하지 않으면 \"(Empty Value)\" 버킷이 생성됩니다.",
+    "limit": "제한",
+    "rollup_columns": "롤업 열",
+    "rollup_columns_help": "롤업을 사용하면 개별 하위 트레이스의 합계를 나타내는 추가 트레이스가 포함됩니다.",
+    "direction": "방향",
+    "row": "행",
+    "column": "열",
+    "fields": "필드",
+    "add_field": "필드 추가",
+    "add_another_date_field": "날짜 필드 추가",
+    "add_another_field": "필드 추가",
+    "interval": "간격",
+    "auto": "자동",
+    "interval_types": "간격 유형",
+    "auto_bucket_size": "자동 버킷 크기",
+    "auto_bucket_size_help": "예: 1.5x. 세분성이 작을수록 값이 <strong>적게</strong> 표시되고, 반대로 클수록 <strong>많이</strong> 표시됩니다.",
+    "fixed_bucket_size": "고정 버킷 크기",
+    "fixed_bucket_size_help": "예: 2분. 시간은 이 타임스탬프 유형의 버킷 크기를 정의합니다.",
+    "scale": "{{scale}}x",
+    "scaling_required": "배율은 필수입니다.",
+    "scaling_range": "0보다 크고 10 이하여야 합니다.",
+    "value_required": "값은 필수입니다.",
+    "limit_required": "제한은 필수입니다."
+  },
+  "wizard_units": {
+    "time_units": {
+      "seconds": "초",
+      "minutes": "분",
+      "hours": "시간",
+      "days": "일",
+      "weeks": "주",
+      "months": "개월"
+    },
+    "unit_settings": "{{field}} 단위 설정",
+    "type": "유형",
+    "select_unit_type": "단위 유형 선택",
+    "unit": "단위",
+    "unit_help": "차트에 표시되는 값을 계산하는 데 사용하는 단위입니다.",
+    "select_unit": "단위 선택",
+    "predefined_unit": "필드 <bold>{{field}}</bold>에 단위 <bold>{{unit}}</bold>이(가) 구성되어 있습니다. 이 단위를 변경하면 차트에 데이터가 올바르지 않게 표시될 수 있습니다.",
+    "clear": "지우기",
+    "ok": "확인",
+    "unit_type_labels": {
+      "size": "크기",
+      "time": "시간",
+      "percent": "백분율",
+      "binary_size": "이진 크기"
+    },
+    "unit_labels": {
+      "byte": "바이트",
+      "kilobyte": "킬로바이트",
+      "megabyte": "메가바이트",
+      "gigabyte": "기가바이트",
+      "kibibyte": "키비바이트",
+      "mebibyte": "메비바이트",
+      "gibibyte": "기비바이트",
+      "nanosecond": "나노초",
+      "microsecond": "마이크로초",
+      "millisecond": "밀리초",
+      "second": "초",
+      "minute": "분",
+      "hour": "시간",
+      "day": "일",
+      "month": "개월",
+      "percent_decimal": "백분율(소수)",
+      "percent_1_100": "백분율(1..100)"
+    }
+  },
+  "wizard_metric": {
+    "function": "함수",
+    "select_function": "함수 선택",
+    "field": "필드",
+    "select_field": "필드 선택",
+    "percentile": "백분위수",
+    "select_percentile": "백분위수 선택",
+    "strategy": "전략",
+    "select_strategy": "전략 선택",
+    "strategies": {
+      "COUNT": "문서 수",
+      "SUM": "필드 합계"
+    },
+    "name": "이름",
+    "display_name_placeholder": "표시 이름 지정",
+    "show_thresholds": "선 임계값 표시",
+    "add_threshold": "임계값 추가",
+    "threshold_title": "제목",
+    "threshold_name_placeholder": "임계값 이름 지정",
+    "remove_threshold": "임계값 제거",
+    "threshold_value": "값",
+    "threshold_value_placeholder": "임계값 지정",
+    "value_unit": "값의 단위: {{unit}}",
+    "threshold_color": "임계값 색상 구성",
+    "function_required": "함수는 필수입니다.",
+    "field_required_for_function": "{{function}} 함수에는 필드가 필요합니다.",
+    "percentile_required": "백분위수는 필수입니다.",
+    "name_unique": "이름은 고유해야 합니다.",
+    "threshold_value_required": "임계값은 필수입니다."
+  },
+  "wizard_sort": {
+    "field": "필드",
+    "field_placeholder": "정렬 기준 필드/메트릭 지정",
+    "select_field": "정렬할 필드 선택",
+    "direction": "방향",
+    "select_direction": "정렬 방향 선택",
+    "ascending": "오름차순",
+    "descending": "내림차순",
+    "direction_required": "방향은 필수입니다.",
+    "time_row_unsupported": "시간 기반 행 그룹화가 있는 데이터 테이블이 아닌 시각화에서는 정렬이 작동하지 않습니다."
+  },
+  "wizard_visualization": {
+    "type": "유형",
+    "select_type": "시각화 유형 선택",
+    "show_event_annotations": "이벤트 주석 표시",
+    "help_for": "{{field}} 도움말",
+    "select_field": "{{field}} 선택",
+    "color_for": "{{field}} 색상 구성",
+    "axis_label_or_color": "하나 이상의 축에 레이블 또는 색상을 정의해야 합니다.",
+    "type_required": "유형은 필수입니다."
+  },
+  "builder_empty": {
+    "title": "빈 집계",
+    "editing": "현재 위젯을 편집하고 있습니다.",
+    "add_metric_hint": "결과를 보려면 메트릭을 하나 이상 추가하십시오. 행/열을 추가하여 데이터를 그룹화할 수 있습니다.",
+    "preview_hint": "\"{{button}}\"을(를) 클릭하여 위젯 검색 결과를 미리 볼 수 있습니다.",
+    "finish_hint": "완료하려면 \"{{update}}\"을(를) 클릭하여 저장하거나 \"{{cancel}}\"을(를) 클릭하여 변경 사항을 취소하십시오.",
+    "edit_hint_interactive": "여기에 결과를 보려면 위젯을 <editButton>편집</editButton>하십시오.",
+    "edit_hint": "여기에 결과를 보려면 위젯을 편집하십시오."
+  },
+  "vis_types": {
+    "area_chart": "영역 차트",
+    "bar_chart": "막대 차트",
+    "heatmap": "히트맵",
+    "line_chart": "꺾은선 차트",
+    "network_graph": "네트워크 그래프",
+    "pie_chart": "원형 차트",
+    "sankey": "Sankey",
+    "scatter_plot": "산점도",
+    "single_number": "단일 숫자",
+    "world_map": "세계 지도"
+  },
+  "vis_validation": {
+    "area_chart_requires_metric": "영역 차트에는 메트릭이 하나 이상 필요합니다",
+    "bar_chart_requires_metric": "막대 차트에는 메트릭이 하나 이상 필요합니다",
+    "line_chart_requires_metric": "꺾은선 차트에는 메트릭이 하나 이상 필요합니다",
+    "pie_chart_requires_metric": "원형 차트에는 메트릭이 하나 이상 필요합니다",
+    "scatter_plot_requires_metric": "산점도에는 메트릭이 하나 이상 필요합니다",
+    "sankey_requires_groupings": "Sankey에는 그룹화 필드가 두 개 이상 필요합니다.",
+    "sankey_single_metric": "Sankey는 메트릭 하나만 지원합니다.",
+    "network_requires_groupings": "네트워크 그래프에는 그룹화 필드가 두 개 이상 필요합니다."
+  },
+  "vis_common": {
+    "interpolation": "보간",
+    "interpolation_types": {
+      "linear": "선형",
+      "step-after": "step-after",
+      "spline": "스플라인"
+    },
+    "axis_type": "축 유형",
+    "axis_types": {
+      "linear": "선형",
+      "logarithmic": "로그"
+    },
+    "color_scale": "색상 스케일",
+    "reverse_scale": "스케일 반전",
+    "show_axis_labels": "축 레이블 표시",
+    "x_axis": "X축",
+    "y_axis_number": "Y-숫자",
+    "y_axis_percent": "Y-백분율",
+    "y_axis_time": "Y-시간",
+    "y_axis_size": "Y-크기",
+    "color_hint": "색상 힌트",
+    "legend_configuration": "{{label}} 구성"
+  },
+  "vis_heatmap": {
+    "auto_scale": "자동 스케일",
+    "min": "최소",
+    "max": "최대",
+    "use_smallest_as_default": "가장 작은 값을 기본값으로 사용",
+    "default_value": "기본값"
+  },
+  "vis_worldmap": {
+    "zoom": "확대/축소",
+    "latitude": "위도",
+    "longitude": "경도",
+    "name": "이름",
+    "coordinates": "좌표:",
+    "value": "값:"
+  },
+  "vis_bar": {
+    "mode": "모드",
+    "modes": {
+      "group": "그룹",
+      "stack": "누적",
+      "relative": "상대",
+      "overlay": "겹침"
+    },
+    "mode_help": {
+      "group": "각 시리즈가 차트에서 자체 막대로 표시됩니다.",
+      "stack": "모든 시리즈가 서로 위에 쌓여 하나의 막대가 됩니다.",
+      "relative": "모든 시리즈가 서로 위에 쌓여 하나의 차트가 됩니다. 단, 음수 시리즈는 0 아래에 배치됩니다.",
+      "overlay": "모든 시리즈가 막대로 서로 겹쳐 배치됩니다. 막대를 구분할 수 있도록 불투명도가 75%로 낮아집니다. 이 옵션은 시리즈 3개 이하에서 사용하는 것이 좋습니다."
+    }
+  },
+  "vis_number": {
+    "trend": "추세",
+    "trend_description": "이 숫자의 추세 정보를 표시합니다.",
+    "trend_help_enabled": "사용자가 추세를 사용하면 현재 값 아래에 별도의 상자가 표시되며, 변화 방향을 아이콘으로 나타내고 현재 값과 이전 값의 절대 차이 및 상대 차이를 보여 줍니다.",
+    "trend_help_previous": "이전 값은 백그라운드에서 검색 두 개를 수행하여 계산하며, 두 검색은 시간 범위를 제외하고 완전히 동일합니다. 첫 번째 검색의 시간 범위는 이 쿼리/위젯에 구성된 시간 범위와 같고, 두 번째 검색은 같은 시간 범위를 그 길이만큼 과거로 이동한 것입니다.",
+    "trend_preference": "추세 선호도",
+    "trend_preferences": {
+      "LOWER": "낮을수록 좋음",
+      "NEUTRAL": "중립",
+      "HIGHER": "높을수록 좋음"
+    },
+    "highlight": "강조 표시",
+    "highlight_options": {
+      "TREND_ONLY": "추세 정보만",
+      "FULL_WIDGET": "전체 위젯"
+    },
+    "not_available": "해당 없음",
+    "trend_label": "추세: 이전 값 {{previous}} 대비 {{absolute}} ({{relative}})",
+    "previous_value": "이전 값: {{previous}}"
+  },
+  "vis_popover": {
+    "related_values": "관련 값",
+    "data_points": "데이터 포인트",
+    "metric": "메트릭",
+    "groupings": "그룹화",
+    "back": "뒤로"
+  },
+  "vis_network": {
+    "no_connections": "표시할 연결이 없습니다. 검색 또는 그룹화를 조정하여 결과를 확인하십시오."
+  },
+  "vis_sankey": {
+    "no_flows": "표시할 흐름이 없습니다. 검색 또는 그룹화를 조정하여 결과를 확인하십시오."
+  }
+}

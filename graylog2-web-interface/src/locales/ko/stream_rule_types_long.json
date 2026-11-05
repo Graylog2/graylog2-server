@@ -1,0 +1,10 @@
+{
+  "match exactly": "정확히 일치해야 함",
+  "match regular expression": "정규식과 일치해야 함",
+  "be greater than": "다음보다 커야 함",
+  "be smaller than": "다음보다 작아야 함",
+  "be present": "존재해야 함",
+  "contain": "다음을 포함해야 함",
+  "always match": "항상 일치",
+  "match input": "입력과 일치해야 함"
+}

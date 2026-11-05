@@ -1,0 +1,14 @@
+{
+  "7 Days Hot, 90 Days Total": "7일 Hot, 총 90일",
+  "14 Days Hot, 90 Days Total.": "14일 Hot, 총 90일.",
+  "30 days Hot, 90 Days Total": "30일 Hot, 총 90일",
+  "7 Days Hot": "7일 Hot",
+  "14 Days Hot": "14일 Hot",
+  "30 Days Hot": "30일 Hot",
+  "Use case: minimal need for historical searches. This configuration has low memory and storage usage. Logs will be searchable for a minimum of 90 days.": "사용 사례: 과거 검색 필요성이 최소인 경우. 이 구성은 메모리와 스토리지 사용량이 낮습니다. 로그는 최소 90일 동안 검색할 수 있습니다.",
+  "Use case: regular need for historical searches. Logs will be searchable for a minimum of 90 days.": "사용 사례: 과거 검색이 정기적으로 필요한 경우. 로그는 최소 90일 동안 검색할 수 있습니다.",
+  "Use case: need for frequent and deep historical searches. This configuration has high memory and storage usage. Logs will be searchable for a minimum of 90 days.": "사용 사례: 빈번하고 심층적인 과거 검색이 필요한 경우. 이 구성은 메모리와 스토리지 사용량이 높습니다. 로그는 최소 90일 동안 검색할 수 있습니다.",
+  "Use case: rare historical searches. This configuration maintains a minimum of 7 days of logs in the Hot Tier.": "사용 사례: 과거 검색이 드문 경우. 이 구성은 Hot Tier에 최소 7일 분량의 로그를 유지합니다.",
+  "Use case: some historical searches. This configuration maintains a minimum of 14 days of logs in the Hot Tier.": "사용 사례: 과거 검색이 가끔 있는 경우. 이 구성은 Hot Tier에 최소 14일 분량의 로그를 유지합니다.",
+  "Use case: frequent historical searches. This configuration maintains a minimum of 30 days of logs in the Hot Tier.": "사용 사례: 과거 검색이 빈번한 경우. 이 구성은 Hot Tier에 최소 30일 분량의 로그를 유지합니다."
+}

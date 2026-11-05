@@ -1,0 +1,42 @@
+{
+  "human_name": "대시보드",
+  "full_screen": {
+    "menu": "전체 화면",
+    "title": "전체 화면 구성",
+    "start": "전체 화면 보기 시작",
+    "refresh_interval": "새로 고침 간격",
+    "refresh_interval_help": "대시보드를 몇 초마다 새로 고치시겠습니까?",
+    "tabs": "탭",
+    "tabs_help": "순환에 포함할 쿼리 탭을 선택하십시오.",
+    "cycle_interval": "탭 전환 간격",
+    "cycle_interval_help": "몇 초 후에 다음 탭을 표시하시겠습니까?"
+  },
+  "properties": {
+    "title": "제목",
+    "title_help": "대시보드의 제목입니다.",
+    "summary": "요약",
+    "summary_help": "대시보드에 대한 유용한 요약입니다.",
+    "description": "설명",
+    "description_help": "대시보드와 그 기능에 대한 자세한 설명입니다."
+  },
+  "overview": {
+    "missing_requirements": "누락된 요구 사항",
+    "user_defined": "사용자 정의",
+    "load_failed": "대시보드를 불러오지 못했습니다. 상태:",
+    "could_not_load": "대시보드를 불러올 수 없습니다"
+  },
+  "delete": {
+    "confirm": "\"{{title}}\"을(를) 삭제하시겠습니까?",
+    "success": "대시보드 \"{{title}}\"을(를) 삭제했습니다.",
+    "success_title": "성공!",
+    "failed": "대시보드 삭제에 실패했습니다: {{error}}",
+    "failed_title": "오류!"
+  },
+  "bulk_delete": {
+    "confirm_other": "대시보드 {{count}}개를 삭제하시겠습니까?",
+    "partial_failure_other": "선택한 대시보드 {{count}}개 중 {{failed}}개를 삭제하지 못했습니다.",
+    "success_other": "대시보드 {{count}}개를 삭제했습니다.",
+    "success_title": "성공",
+    "failed": "대시보드를 삭제하는 중 오류가 발생했습니다. {{error}}"
+  }
+}
