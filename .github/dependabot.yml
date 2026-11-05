@@ -30,6 +30,9 @@ updates:
       # Remove when switching to mcp-json-jackson3.
       - dependency-name: "com.networknt:json-schema-validator"
         versions: [">= 3"]
+      # victools jsonschema-generator 5.x requires Jackson 3. Remove when switching to Jackson 3.
+      - dependency-name: "com.github.victools:jsonschema-*"
+        versions: [">= 5"]
     groups:
       # The Google API and Cloud client libraries are released in lockstep,
       # so bumping them individually almost always trips the
