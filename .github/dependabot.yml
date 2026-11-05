@@ -26,6 +26,9 @@ updates:
       # Remove when upgrading to JDK 25.
       - dependency-name: "io.github.classgraph:classgraph"
         versions: [">= 6"]
+      # json-schema-validator 3.x requires Jackson 3. Remove when switching to Jackson 3.
+      - dependency-name: "com.networknt:json-schema-validator"
+        versions: [">= 3"]
     groups:
       # The Google API and Cloud client libraries are released in lockstep,
       # so bumping them individually almost always trips the
