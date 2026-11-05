@@ -22,7 +22,7 @@ import HelpText, { HelpTextList } from 'components/datanode/HelpText';
 
 const Container = styled(HelpText)(
   ({ theme }) => css`
-    margin-bottom: ${theme.spacings.md};
+    margin: 0 0 ${theme.spacings.md};
   `,
 );
 
