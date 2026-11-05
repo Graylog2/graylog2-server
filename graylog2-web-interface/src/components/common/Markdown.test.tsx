@@ -15,11 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import mermaid from 'mermaid';
 
 import { usePluginExports } from 'views/test/testPlugins';
+import asMock from 'helpers/mocking/AsMock';
+import MarkdownRenderTracker from 'components/common/markdown/MarkdownRenderTracker';
 
 import Markdown from './Markdown';
+
+jest.mock('mermaid', () => ({
+  __esModule: true,
+  default: { initialize: jest.fn(), render: jest.fn() },
+}));
 
 describe('Markdown', () => {
   // We are skipping this test, until we can implement a headless theme provider from @mantine/core
@@ -96,6 +104,79 @@ describe('Markdown', () => {
       render(<Markdown text="This is a #test#Hello world!#test# component." augment={false} />);
 
       await screen.findByText('This is a #test#Hello world!#test# component.');
+    });
+  });
+
+  describe('mermaid diagrams', () => {
+    const diagram = ['```mermaid', 'graph LR', '  A[Start] -->|"ok & done"| B{Is it > 1?}', '  B <--> C', '```'].join('\n');
+
+    beforeEach(() => {
+      asMock(mermaid.render).mockReset();
+      asMock(mermaid.render).mockResolvedValue({
+        svg: '<svg><g><text>Start</text></g><script>alert(1)</script></svg>',
+        diagramType: 'flowchart',
+      });
+    });
+
+    it('shows code blocks in the language "mermaid" as diagrams', async () => {
+      render(<Markdown text={diagram} />);
+
+      const svg = await screen.findByRole('img', { name: 'Diagram' });
+
+      expect(mermaid.render).toHaveBeenCalledWith(
+        expect.any(String),
+        'graph LR\n  A[Start] -->|"ok & done"| B{Is it > 1?}\n  B <--> C\n',
+      );
+      expect(screen.getByText('Start')).toBeInTheDocument();
+      expect(svg).not.toContainHTML('<script>');
+    });
+
+    it('shows the source with the error when a diagram is invalid', async () => {
+      asMock(mermaid.render).mockRejectedValue(new Error('Parse error on line 2'));
+
+      render(<Markdown text={diagram} />);
+
+      await screen.findByText(/could not be rendered: parse error on line 2/i);
+      expect(screen.getByText(/graph LR/)).toBeInTheDocument();
+    });
+
+    it('keeps other code blocks', async () => {
+      render(<Markdown text={['```json', '{"a": 1}', '```'].join('\n')} />);
+
+      await screen.findByText('{"a": 1}');
+      expect(mermaid.render).not.toHaveBeenCalled();
+    });
+
+    it('keeps a tracker waiting until the diagram is rendered', async () => {
+      let finishDiagram: (result: { svg: string; diagramType: string }) => void;
+      asMock(mermaid.render).mockReturnValue(
+        new Promise((resolve) => {
+          finishDiagram = resolve;
+        }),
+      );
+      let pending = 0;
+      const track = jest.fn(() => {
+        pending += 1;
+
+        return () => {
+          pending -= 1;
+        };
+      });
+
+      render(
+        <MarkdownRenderTracker.Provider value={track}>
+          <Markdown text={diagram} />
+        </MarkdownRenderTracker.Provider>,
+      );
+
+      await waitFor(() => expect(mermaid.render).toHaveBeenCalled());
+      expect(pending).toBe(1);
+
+      finishDiagram({ svg: '<svg><text>Start</text></svg>', diagramType: 'flowchart' });
+
+      await screen.findByRole('img', { name: 'Diagram' });
+      expect(pending).toBe(0);
+      expect(track).toHaveBeenCalled();
     });
   });
 });
