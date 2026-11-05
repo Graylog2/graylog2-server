@@ -124,7 +124,7 @@ public class LinkFieldDecorator implements SearchResponseDecorator {
     public SearchResponse apply(SearchResponse searchResponse) {
         final List<ResultMessageSummary> summaries = searchResponse.messages().stream()
                 .map(summary -> {
-                    if (!summary.message().containsKey(linkField)) {
+                    if (summary.message().get(linkField) == null) {
                         return summary;
                     }
                     return linkUrlTemplate == null ? decorateExistingUrl(summary) : decorateWithUrlTemplate(summary);
@@ -135,7 +135,7 @@ public class LinkFieldDecorator implements SearchResponseDecorator {
     }
 
     private ResultMessageSummary decorateExistingUrl(ResultMessageSummary summary) {
-        // Non-string values (numbers, lists, null) can't be URLs; leave them untouched instead of failing.
+        // Non-string values (numbers, lists) can't be URLs; leave them untouched instead of failing.
         if (!(summary.message().get(linkField) instanceof String href)) {
             return summary;
         }

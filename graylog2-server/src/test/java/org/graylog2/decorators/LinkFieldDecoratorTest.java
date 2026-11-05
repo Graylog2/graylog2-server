@@ -244,6 +244,18 @@ public class LinkFieldDecoratorTest {
     }
 
     @Test
+    public void leavesNullLinkFieldUnchangedWithUrlTemplate() {
+        decorator = createDecorator("https://ipam.example.com/search?ip=${src_ip}", null);
+        final Map<String, Object> fields = new HashMap<>();
+        fields.put(TEST_FIELD, null);
+        fields.put("src_ip", "10.0.0.1");
+
+        final Map<String, Object> message = decorator.apply(createSearchResponse(fields)).messages().get(0).message();
+
+        assertThat(message).containsEntry(TEST_FIELD, null);
+    }
+
+    @Test
     public void nonStringLinkFieldDoesNotPreventOtherDecorators() {
         final SearchResponseDecorator addMarker = response -> response.toBuilder()
                 .messages(response.messages().stream()
