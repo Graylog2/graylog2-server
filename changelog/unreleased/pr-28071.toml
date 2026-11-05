@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix permission handling when updating users."
+
+issues = ["Graylog2/graylog-plugin-enterprise#16219"]
+pulls = ["28071"]
