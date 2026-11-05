@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { Label } from 'components/bootstrap';
@@ -27,10 +28,14 @@ const StyledLabel = styled(Label)`
 /**
  * Marks the default entity in a list, e.g. the default stream. Render it next to the entity's title.
  */
-const DefaultLabel = () => (
-  <StyledLabel bsStyle="primary" bsSize="xsmall">
-    Default
-  </StyledLabel>
-);
+const DefaultLabel = () => {
+  const { t } = useTranslation('common');
+
+  return (
+    <StyledLabel bsStyle="primary" bsSize="xsmall">
+      {t('badges.default')}
+    </StyledLabel>
+  );
+};
 
 export default DefaultLabel;

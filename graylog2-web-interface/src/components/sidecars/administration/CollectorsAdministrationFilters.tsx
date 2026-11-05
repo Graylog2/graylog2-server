@@ -18,6 +18,7 @@ import React from 'react';
 import find from 'lodash/find';
 import uniq from 'lodash/uniq';
 import upperFirst from 'lodash/upperFirst';
+import { useTranslation } from 'react-i18next';
 
 import { SelectPopover } from 'components/common';
 import { Button, ButtonToolbar } from 'components/bootstrap';
@@ -45,6 +46,8 @@ type Props = {
 };
 
 const CollectorsAdministrationFilters = (props: Props) => {
+  const { t } = useTranslation('sidecars');
+
   const onFilterChange = (name: string, value: string, callback: () => void) => {
     const { filter } = props;
 
@@ -84,17 +87,17 @@ const CollectorsAdministrationFilters = (props: Props) => {
 
     return (
       <SelectPopover
-        title="Filter by collector"
+        title={t('administration.collectors_administration_filters.filter_by_collector')}
         triggerNode={
           <Button bsSize="small" bsStyle="link">
-            Collector <span className="caret" />
+            {t('administration.collectors_administration_filters.collector')} <span className="caret" />
           </Button>
         }
         items={collectorItems}
         itemFormatter={collectorFormatter}
         onItemSelect={filter}
         selectedItems={collectorFilter ? [collectorFilter] : []}
-        filterPlaceholder="Filter by collector"
+        filterPlaceholder={t('administration.collectors_administration_filters.filter_by_collector')}
       />
     );
   };
@@ -135,17 +138,17 @@ const CollectorsAdministrationFilters = (props: Props) => {
 
     return (
       <SelectPopover
-        title="Filter by configuration"
+        title={t('administration.collectors_administration_filters.filter_by_configuration')}
         triggerNode={
           <Button bsSize="small" bsStyle="link">
-            Configuration <span className="caret" />
+            {t('administration.collectors_administration_filters.configuration')} <span className="caret" />
           </Button>
         }
         items={configurationItems}
         itemFormatter={configurationFormatter}
         onItemSelect={filter}
         selectedItems={configurationFilter ? [configurationFilter] : []}
-        filterPlaceholder="Filter by configuration"
+        filterPlaceholder={t('administration.collectors_administration_filters.filter_by_configuration')}
       />
     );
   };
@@ -163,16 +166,16 @@ const CollectorsAdministrationFilters = (props: Props) => {
 
     return (
       <SelectPopover
-        title="Filter by OS"
+        title={t('administration.collectors_administration_filters.filter_by_os')}
         triggerNode={
           <Button bsSize="small" bsStyle="link">
-            OS <span className="caret" />
+            {t('administration.collectors_administration_filters.os')} <span className="caret" />
           </Button>
         }
         items={operatingSystems}
         onItemSelect={filter}
         selectedItems={osFilter ? [osFilter] : []}
-        filterPlaceholder="Filter by OS"
+        filterPlaceholder={t('administration.collectors_administration_filters.filter_by_os')}
       />
     );
   };
@@ -188,17 +191,17 @@ const CollectorsAdministrationFilters = (props: Props) => {
 
     return (
       <SelectPopover
-        title="Filter by collector status"
+        title={t('administration.collectors_administration_filters.filter_by_status')}
         triggerNode={
           <Button bsSize="small" bsStyle="link">
-            Collector Status <span className="caret" />
+            {t('administration.collectors_administration_filters.collector_status')} <span className="caret" />
           </Button>
         }
         items={status}
         itemFormatter={statusFormatter}
         onItemSelect={filter}
         selectedItems={statusFilter ? [statusFilter] : []}
-        filterPlaceholder="Filter by collector status"
+        filterPlaceholder={t('administration.collectors_administration_filters.filter_by_status')}
       />
     );
   };

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import DocumentTitle from 'components/common/DocumentTitle';
 import Spinner from 'components/common/Spinner';
@@ -24,12 +25,16 @@ type Props = {
   text?: string;
 };
 
-const LoadingPage = ({ text = 'Loading, please wait...' }: Props) => (
-  <DocumentTitle title="Loading...">
-    <LoginChrome>
-      <Spinner text={text} delay={0} />
-    </LoginChrome>
-  </DocumentTitle>
-);
+const LoadingPage = ({ text = undefined }: Props) => {
+  const { t } = useTranslation('pages');
+
+  return (
+    <DocumentTitle title={t('loading.title')}>
+      <LoginChrome>
+        <Spinner text={text ?? t('loading.text')} delay={0} />
+      </LoginChrome>
+    </DocumentTitle>
+  );
+};
 
 export default LoadingPage;

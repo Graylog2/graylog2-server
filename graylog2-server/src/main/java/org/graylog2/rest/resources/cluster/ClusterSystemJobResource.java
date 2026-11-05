@@ -31,6 +31,8 @@ import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.plugin.ServerStatus;
+import org.graylog2.plugin.rest.CodedException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.models.system.SystemJobSummary;
 import org.graylog2.rest.resources.system.jobs.RemoteSystemJobResource;
@@ -46,7 +48,6 @@ import jakarta.validation.constraints.NotEmpty;
 
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -128,7 +129,7 @@ public class ClusterSystemJobResource extends ProxiedResource {
             }
         }
 
-        throw new NotFoundException("System job with id " + jobId + " not found!");
+        throw new CodedNotFoundException("cluster_system_job.system_job_with_id_not_found", "System job with id " + jobId + " not found!", CodedException.paramsOf("jobId", jobId));
     }
 
     @DELETE
@@ -156,11 +157,11 @@ public class ClusterSystemJobResource extends ProxiedResource {
         // No SystemJob found. Try to cancel JobScheduler jobs
         if (!summaryResponse.isPresent() && ObjectId.isValid(jobId)) {
             final Optional<SystemJobSummary> systemJobSummary = jobResourceHandlerService.cancelJobWithSystemJobSummary(userContext, jobId);
-            return systemJobSummary.orElseThrow(() -> new NotFoundException("System job with ID <" + jobId + "> not found!"));
+            return systemJobSummary.orElseThrow(() -> new CodedNotFoundException("cluster_system_job.system_job_with_id_not_found_2", "System job with ID <" + jobId + "> not found!", CodedException.paramsOf("jobId", jobId)));
         }
 
         return summaryResponse
-                .orElseThrow(() -> new NotFoundException("System job with ID <" + jobId + "> not found!"))
+                .orElseThrow(() -> new CodedNotFoundException("cluster_system_job.system_job_with_id_not_found_2", "System job with ID <" + jobId + "> not found!", CodedException.paramsOf("jobId", jobId)))
                 .body();
     }
 

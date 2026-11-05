@@ -21,6 +21,7 @@ import { SystemInputs } from '@graylog/server-api';
 import type { Attribute, SearchParams } from 'stores/PaginationTypes';
 import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
 import { defaultOnError } from 'util/conditional/onError';
+import i18n from 'i18n';
 import type { InputStreamRule } from 'components/inputs/InputDiagnosis/types';
 
 const INITIAL_DATA = {
@@ -82,8 +83,8 @@ const useInputStreamRules = (
     queryFn: () =>
       defaultOnError(
         fetchInputStreamRules(inputId, searchParams),
-        'Loading input stream rules failed with status',
-        'Could not load input stream rules',
+        i18n.t('diagnosis.rules.load_stream_rules_failed', { ns: 'inputs' }),
+        i18n.t('diagnosis.rules.could_not_load_stream_rules', { ns: 'inputs' }),
       ),
     placeholderData: keepPreviousData,
     enabled,

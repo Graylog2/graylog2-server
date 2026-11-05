@@ -16,6 +16,7 @@
  */
 import React, { useState, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 import UserNotification from 'util/UserNotification';
 import { BootstrapModalForm, Input, Button } from 'components/bootstrap';
@@ -27,6 +28,7 @@ import useHistory from 'routing/useHistory';
 import style from './ContentPackUploadControls.css';
 
 const ContentPackUploadControls = () => {
+  const { t } = useTranslation('content_packs');
   const productName = useProductName();
   const queryClient = useQueryClient();
   const history = useHistory();
@@ -51,13 +53,13 @@ const ContentPackUploadControls = () => {
 
       createContentPack(request as string).then(
         (contentPack) => {
-          UserNotification.success(`Content pack "${contentPack.name}" imported successfully`, 'Success!');
+          UserNotification.success(t('import.success_named', { name: contentPack.name }), t('import.success_title'));
           queryClient.invalidateQueries({ queryKey: ['content-packs'] });
           history.push(Routes.SYSTEM.CONTENTPACKS.show(contentPack.id));
         },
         (response) => {
-          const message = `Error importing content pack, please ensure it is a valid JSON file. Check your ${productName} server logs for more information.`;
-          const title = 'Could not import content pack';
+          const message = t('import.error_message', { productName });
+          const title = t('import.error_title');
           let smallMessage = '';
 
           if (response.additional && response.additional.body && response.additional.body.message) {
@@ -81,20 +83,20 @@ const ContentPackUploadControls = () => {
         id="upload-content-pack-button"
         bsStyle="info"
         onClick={openModal}>
-        Upload
+        {t('upload.button')}
       </Button>
       <BootstrapModalForm
         onCancel={closeModal}
         show={isOpen}
         onSubmitForm={save}
-        title="Upload Content Pack"
-        submitButtonText="Upload">
+        title={t('upload.title')}
+        submitButtonText={t('upload.button')}>
         <Input
           ref={uploadInputRef}
           id="upload-content-pack"
-          label="Choose File"
+          label={t('upload.choose_file')}
           type="file"
-          help="Choose Content Pack from disk"
+          help={t('upload.choose_file_help')}
         />
       </BootstrapModalForm>
     </span>

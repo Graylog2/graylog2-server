@@ -34,7 +34,6 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -58,6 +57,7 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
@@ -147,7 +147,7 @@ public class FleetResource extends RestResource {
         checkPermission(CollectorsPermissions.FLEET_READ, fleetId);
         return fleetService.get(fleetId)
                 .map(FleetResponse::fromDTO)
-                .orElseThrow(() -> new NotFoundException("Fleet " + fleetId + " not found"));
+                .orElseThrow(() -> new CodedNotFoundException("fleet.not_found", "Fleet " + fleetId + " not found", Map.of("fleetId", fleetId)));
     }
 
     @GET
@@ -187,7 +187,7 @@ public class FleetResource extends RestResource {
     public FleetStatsResponse stats(@Parameter(name = "fleetId", required = true) @PathParam("fleetId") String fleetId) {
         checkPermission(CollectorsPermissions.FLEET_READ, fleetId);
         if (fleetService.get(fleetId).isEmpty()) {
-            throw new NotFoundException("Fleet " + fleetId + " not found");
+            throw new CodedNotFoundException("fleet.not_found", "Fleet " + fleetId + " not found", Map.of("fleetId", fleetId));
         }
         final var instances = instanceService.countByFleet(fleetId, Instant.now().minus(getOfflineThreshold()));
         final long totalSources = sourceService.countByFleet(fleetId);
@@ -220,7 +220,7 @@ public class FleetResource extends RestResource {
         checkPermission(CollectorsPermissions.FLEET_EDIT, fleetId);
         return fleetService.update(fleetId, request.name(), request.description())
                 .map(FleetResponse::fromDTO)
-                .orElseThrow(() -> new NotFoundException("Fleet " + fleetId + " not found"));
+                .orElseThrow(() -> new CodedNotFoundException("fleet.not_found", "Fleet " + fleetId + " not found", Map.of("fleetId", fleetId)));
     }
 
     @DELETE
@@ -234,7 +234,7 @@ public class FleetResource extends RestResource {
     public void delete(@Parameter(name = "fleetId", required = true) @PathParam("fleetId") String fleetId) {
         checkPermission(CollectorsPermissions.FLEET_DELETE, fleetId);
         final var fleet = fleetService.get(fleetId)
-                .orElseThrow(() -> new NotFoundException("Fleet " + fleetId + " not found"));
+                .orElseThrow(() -> new CodedNotFoundException("fleet.not_found", "Fleet " + fleetId + " not found", Map.of("fleetId", fleetId)));
         final long assignedInstances = fleetService.countAssignedInstances(fleetId);
         if (assignedInstances > 0) {
             throw new ClientErrorException(
@@ -243,7 +243,7 @@ public class FleetResource extends RestResource {
                     Response.Status.CONFLICT);
         }
         if (!fleetService.delete(fleetId)) {
-            throw new NotFoundException("Fleet " + fleetId + " not found");
+            throw new CodedNotFoundException("fleet.not_found", "Fleet " + fleetId + " not found", Map.of("fleetId", fleetId));
         }
         auditEventSender.success(AuditActor.user(getCurrentUser()), AuditEventTypes.COLLECTOR_FLEET_DELETE, Map.of(
                 "fleetId", fleetId,

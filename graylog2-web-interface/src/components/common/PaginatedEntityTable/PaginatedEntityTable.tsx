@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMemo, useEffect, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -49,6 +50,7 @@ import useOnRefresh from 'components/common/PaginatedEntityTable/useOnRefresh';
 import Slicing, { type SliceRenderers } from 'components/common/PaginatedEntityTable/slicing';
 import type { FetchSlices } from 'components/common/PaginatedEntityTable/slicing/useFetchSlices';
 import useAuthorizedAttributes from 'components/common/PaginatedEntityTable/hooks/useAuthorizedAttributes';
+import useServerText from 'util/serverText';
 import {
   ALPHABETICAL_SORT,
   defaultSortDirectionForMode,
@@ -192,6 +194,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   noColumnReordering = false,
   compactView = false,
 }: PaginatedEntityTableInnerProps<T, M>) => {
+  const { t } = useTranslation('common');
   const { searchParams, setQuery, onChangeFilters, onChangeSlicingFilter, paginationState } = useTableFilterContext();
   const { mutateAsync: updateTableLayout, resetAsync: resetTableLayout } = useUpdateUserLayoutPreferences(
     tableLayout.entityTableId,
@@ -240,12 +243,17 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
     resetTableLayout,
   });
 
+  const serverText = useServerText();
+  // Titles of the attributes (columns) are sent by the server in English
+  const serverAttributes = useMemo(
+    () =>
+      (paginatedEntities?.attributes ?? []).map((attribute) => ({ ...attribute, title: serverText(attribute.title) })),
+    [paginatedEntities?.attributes, serverText],
+  );
+
   const columnSchemas = useMemo(
-    () => [
-      ...(paginatedEntities?.attributes ?? []),
-      ...additionalAttributes.map((attribute) => ({ isDerived: true, ...attribute })),
-    ],
-    [additionalAttributes, paginatedEntities?.attributes],
+    () => [...serverAttributes, ...additionalAttributes.map((attribute) => ({ isDerived: true, ...attribute }))],
+    [additionalAttributes, serverAttributes],
   );
 
   const onSlicingPreferencesChange = useCallback(
@@ -268,7 +276,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
     [columnSchemas, searchParams.sliceCol, onChangeSlicingFilter, updateTableLayout],
   );
 
-  const attributes = useAuthorizedAttributes(paginatedEntities?.attributes ?? []);
+  const attributes = useAuthorizedAttributes(serverAttributes);
 
   const onPaginationChange = withoutURLParams
     ? (currentPage: number, pageSize: number) => paginationState.setPagination({ page: currentPage, pageSize })
@@ -313,7 +321,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
                   onSearch={onSearch}
                   onReset={onSearchReset}
                   query={searchParams.query}
-                  placeholder={searchPlaceholder ?? `Search for ${humanName}`}
+                  placeholder={searchPlaceholder ?? t('entity_table.search_placeholder', { humanName })}
                   queryHelpComponent={queryHelpComponent}>
                   {attributes.length > 0 && (
                     <div style={{ marginBottom: 5 }}>
@@ -335,7 +343,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
             {MiddleSection ? <MiddleSection searchParams={searchParams} setFilters={onChangeFilters} /> : null}
 
             {isError ? (
-              <FetchErrorAlert message={`Fetching ${humanName} failed`} error={error} />
+              <FetchErrorAlert message={t('entity_table.fetch_failed', { humanName })} error={error} />
             ) : (
               <PaginatedList
                 pageSize={layoutConfig.pageSize}
@@ -345,7 +353,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
                 useQueryParameter={!withoutURLParams}
                 onChange={onPaginationChange}>
                 {list?.length === 0 ? (
-                  <NoSearchResult>No {humanName} have been found.</NoSearchResult>
+                  <NoSearchResult>{t('entity_table.no_results', { humanName })}</NoSearchResult>
                 ) : (
                   <EntityDataTable<T, M>
                     entities={list}

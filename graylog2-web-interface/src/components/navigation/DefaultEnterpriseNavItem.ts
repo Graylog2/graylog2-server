@@ -20,6 +20,7 @@ import Routes from 'routing/Routes';
 
 const DefaultEnterpriseNavItem = {
   description: 'Enterprise',
+  titleKey: 'navigation:main.enterprise',
   position: { after: DASHBOARDS_LINK_TITLE },
   path: Routes.SYSTEM.ENTERPRISE,
 };

@@ -18,6 +18,7 @@ import * as React from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import type { DefaultTheme } from 'styled-components';
 import { useCallback, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import useConfigurationStep from 'preflight/hooks/useConfigurationStep';
 import { CONFIGURATION_STEPS, CONFIGURATION_STEPS_ORDER } from 'preflight/Constants';
@@ -83,21 +84,26 @@ type FetchErrorsOverviewProps = {
   errors: Array<{ entityName: string; error: FetchError }> | null;
 };
 
-const FetchErrorsOverview = ({ errors }: FetchErrorsOverviewProps) => (
-  <>
-    {errors.map(({ entityName, error }) => (
-      <Alert bsStyle="danger" key={entityName}>
-        There was an error fetching the {entityName}: {error.message}
-      </Alert>
-    ))}
-  </>
-);
+const FetchErrorsOverview = ({ errors }: FetchErrorsOverviewProps) => {
+  const { t } = useTranslation('preflight');
+
+  return (
+    <>
+      {errors.map(({ entityName, error }) => (
+        <Alert bsStyle="danger" key={entityName}>
+          {t('configuration_wizard.fetch_error', { entityName: t(entityName), message: error.message })}
+        </Alert>
+      ))}
+    </>
+  );
+};
 
 type Props = {
   setIsWaitingForStartup: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const ConfigurationWizard = ({ setIsWaitingForStartup }: Props) => {
+  const { t } = useTranslation('preflight');
   const [isSkippingProvisioning, setIsSkippingProvisioning] = useState(false);
   const {
     step: activeStepKey,
@@ -133,13 +139,17 @@ const ConfigurationWizard = ({ setIsWaitingForStartup }: Props) => {
                 key={configurationStepKey}
                 $isStepSkipped={isStepSkipped}
                 icon={<StepIcon name={iconName} $color={iconColor} size="xl" />}>
-                {description}
+                {t(description)}
               </StyledListItem>
             );
           })}
         </List>
         <Space h="md" />
-        You can always <RestartConfigurationButton /> the configuration
+        <Trans
+          t={t}
+          i18nKey="configuration_wizard.restart_hint"
+          components={{ restartButton: <RestartConfigurationButton /> }}
+        />
       </Grid.Col>
       <Grid.Col span={{ base: 12, md: 6, orderMd: 1 }}>
         {activeStepKey === CONFIGURATION_STEPS.CA_CONFIGURATION.key && <CAConfiguration />}

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMutation } from '@tanstack/react-query';
 
 import type FetchError from 'logic/errors/FetchError';
@@ -23,14 +24,15 @@ import { login as sessionLogin } from 'logic/session/SessionApi';
 const performLogin = ([username, password, host]: [string, string, string]) => sessionLogin(username, password, host);
 
 const useLogin = (onErrorChange: (message?: string) => void) => {
+  const { t } = useTranslation('login');
   const { mutateAsync, isPending: isLoading } = useMutation({
     mutationFn: performLogin,
 
     onError: (error: FetchError) => {
       if (error.additional.status === 401) {
-        onErrorChange('Invalid credentials, please verify them and retry.');
+        onErrorChange(t('invalid_credentials'));
       } else {
-        onErrorChange(`Error - the server returned: ${error.additional.status} - ${error.message}`);
+        onErrorChange(t('server_error', { status: error.additional.status, message: error.message }));
       }
     },
   });

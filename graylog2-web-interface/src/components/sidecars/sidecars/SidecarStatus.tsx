@@ -17,6 +17,8 @@
 import * as React from 'react';
 import { useState } from 'react';
 import isNumber from 'lodash/isNumber';
+import { Trans, useTranslation } from 'react-i18next';
+import i18n from 'i18n';
 
 import { Col, Row, Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
@@ -34,31 +36,34 @@ type Props = {
 
 const formatNodeDetails = (details: NodeDetails) => {
   if (!details) {
-    return (
-      <p>
-        Node details are currently unavailable. Please wait a moment and ensure the sidecar is correctly connected to
-        the server.
-      </p>
-    );
+    return <p>{i18n.t('sidecars.sidecar_status.node_details_unavailable', { ns: 'sidecars' })}</p>;
   }
 
   const { metrics } = details;
 
   return (
     <dl className={`${commonStyles.deflist} ${commonStyles.topMargin}`}>
-      <dt>IP Address</dt>
-      <dd>{details.ip ?? 'Not available'}</dd>
-      <dt>Operating System</dt>
-      <dd>{details.operating_system ?? 'Not available'}</dd>
-      <dt>CPU Idle</dt>
-      <dd>{isNumber(metrics?.cpu_idle) ? `${metrics?.cpu_idle}%` : 'Not available'}</dd>
-      <dt>Load</dt>
-      <dd>{metrics?.load_1 ?? 'Not available'}</dd>
-      <dt>Volumes &gt; 75% full</dt>
+      <dt>{i18n.t('sidecars.sidecar_status.ip_address', { ns: 'sidecars' })}</dt>
+      <dd>{details.ip ?? i18n.t('sidecars.sidecar_status.not_available', { ns: 'sidecars' })}</dd>
+      <dt>{i18n.t('sidecars.sidecar_status.operating_system', { ns: 'sidecars' })}</dt>
+      <dd>{details.operating_system ?? i18n.t('sidecars.sidecar_status.not_available', { ns: 'sidecars' })}</dd>
+      <dt>{i18n.t('sidecars.sidecar_status.cpu_idle', { ns: 'sidecars' })}</dt>
+      <dd>
+        {isNumber(metrics?.cpu_idle)
+          ? `${metrics?.cpu_idle}%`
+          : i18n.t('sidecars.sidecar_status.not_available', { ns: 'sidecars' })}
+      </dd>
+      <dt>{i18n.t('sidecars.sidecar_status.load', { ns: 'sidecars' })}</dt>
+      <dd>{metrics?.load_1 ?? i18n.t('sidecars.sidecar_status.not_available', { ns: 'sidecars' })}</dd>
+      <dt>{i18n.t('sidecars.sidecar_status.volumes_75', { ns: 'sidecars' })}</dt>
       {metrics?.disks_75 === undefined ? (
-        <dd>Not available</dd>
+        <dd>{i18n.t('sidecars.sidecar_status.not_available', { ns: 'sidecars' })}</dd>
       ) : (
-        <dd>{metrics?.disks_75.length > 0 ? metrics?.disks_75.join(', ') : 'None'}</dd>
+        <dd>
+          {metrics?.disks_75.length > 0
+            ? metrics?.disks_75.join(', ')
+            : i18n.t('sidecars.sidecar_status.none', { ns: 'sidecars' })}
+        </dd>
       )}
     </dl>
   );
@@ -70,19 +75,18 @@ const formatCollectorStatus = (
   _onShowVerbose: (name: string, verbose: string) => void,
 ) => {
   if (!details || !collectors) {
-    return (
-      <p>
-        Collectors status are currently unavailable. Please wait a moment and ensure the sidecar is correctly connected
-        to the server.
-      </p>
-    );
+    return <p>{i18n.t('sidecars.sidecar_status.collectors_status_unavailable', { ns: 'sidecars' })}</p>;
   }
 
   if (!details.status) {
     return (
       <p>
-        Did not receive collectors status, set the option <code>send_status: true</code> in the sidecar configuration to
-        see this information.
+        <Trans
+          i18n={i18n}
+          ns="sidecars"
+          i18nKey="sidecars.sidecar_status.no_status_received"
+          components={{ code: <code /> }}
+        />
       </p>
     );
   }
@@ -90,7 +94,7 @@ const formatCollectorStatus = (
   const collectorStatuses = details.status.collectors;
 
   if (collectorStatuses.length === 0) {
-    return <p>There are no collectors configured in this sidecar.</p>;
+    return <p>{i18n.t('sidecars.sidecar_status.no_collectors', { ns: 'sidecars' })}</p>;
   }
 
   const statuses = [];
@@ -105,7 +109,7 @@ const formatCollectorStatus = (
 
     switch (status.status) {
       case SidecarStatusEnum.RUNNING:
-        statusMessage = 'Collector is running.';
+        statusMessage = i18n.t('sidecars.sidecar_status.collector_running', { ns: 'sidecars' });
         statusClass = 'text-success';
         statusBadge = <Icon name="play_arrow" />;
         break;
@@ -117,7 +121,7 @@ const formatCollectorStatus = (
         if (status.verbose_message) {
           verboseButton = (
             <Button bsStyle="link" bsSize="xs" onClick={() => _onShowVerbose(collector.name, status.verbose_message)}>
-              Show Details
+              {i18n.t('sidecars.sidecar_status.show_details', { ns: 'sidecars' })}
             </Button>
           );
         }
@@ -129,7 +133,7 @@ const formatCollectorStatus = (
         statusBadge = <Icon name="stop" />;
         break;
       default:
-        statusMessage = 'Collector status is currently unknown.';
+        statusMessage = i18n.t('sidecars.sidecar_status.collector_unknown', { ns: 'sidecars' });
         statusClass = 'text-info';
         statusBadge = <Icon name="help" />;
     }
@@ -150,6 +154,7 @@ const formatCollectorStatus = (
 };
 
 const SidecarStatus = ({ sidecar, collectors }: Props) => {
+  const { t } = useTranslation('sidecars');
   const [showVerboseModal, setShowVerboseModal] = useState(false);
   const [collectorName, setCollectorName] = useState('');
   const [collectorVerbose, setCollectorVerbose] = useState('');
@@ -170,13 +175,13 @@ const SidecarStatus = ({ sidecar, collectors }: Props) => {
     <div>
       <Row className="content">
         <Col md={12}>
-          <h2>Node details</h2>
+          <h2>{t('sidecars.sidecar_status.node_details_title')}</h2>
           {formatNodeDetails(sidecar.node_details)}
         </Col>
       </Row>
       <Row className="content">
         <Col md={12}>
-          <h2>Collectors status</h2>
+          <h2>{t('sidecars.sidecar_status.collectors_status_title')}</h2>
           <div className={commonStyles.topMargin}>
             {formatCollectorStatus(sidecar.node_details, collectors, _onShowVerbose)}
           </div>
@@ -184,8 +189,8 @@ const SidecarStatus = ({ sidecar, collectors }: Props) => {
       </Row>
       <Row className="content" hidden={logFileList.length === 0}>
         <Col md={12}>
-          <h2>Log Files</h2>
-          <p className={commonStyles.topMargin}>Recently modified files will be highlighted in blue.</p>
+          <h2>{t('sidecars.sidecar_status.log_files_title')}</h2>
+          <p className={commonStyles.topMargin}>{t('sidecars.sidecar_status.recently_modified')}</p>
           <div>
             <SidecarStatusFileList files={logFileList} />
           </div>

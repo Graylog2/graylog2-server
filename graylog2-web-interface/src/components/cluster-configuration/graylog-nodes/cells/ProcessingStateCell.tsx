@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Label } from 'components/bootstrap';
 
@@ -26,11 +27,13 @@ type Props = {
 };
 
 const ProcessingStateCell = ({ node }: Props) => {
+  const { t } = useTranslation('system');
+
   if (node.is_processing == null) {
     return null;
   }
 
-  const status = node.is_processing ? 'ENABLED' : 'DISABLED';
+  const status = node.is_processing ? t('processing_state_cell.enabled') : t('processing_state_cell.disabled');
 
   return (
     <MetricsColumn>
@@ -38,7 +41,7 @@ const ProcessingStateCell = ({ node }: Props) => {
         <Label
           bsStyle={node.is_processing ? 'success' : 'warning'}
           bsSize="xs"
-          aria-label={`Message processing ${status}`}>
+          aria-label={t('processing_state_cell.aria_label', { status })}>
           {status}
         </Label>
       </MetricsRow>

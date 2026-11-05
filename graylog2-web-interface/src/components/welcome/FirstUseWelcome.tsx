@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -81,22 +82,26 @@ const Description = ({ children = undefined }: React.PropsWithChildren<{}>) => (
 );
 
 type Resource = {
+  /** Identifies the resource in telemetry, so it stays English. */
+  id: string;
   title: string;
   description: string;
   link: string;
   iconName: IconName;
 };
 
-const buildResources = (productName: string): Resource[] => [
+const resources: Resource[] = [
   {
-    title: 'Collector Documentation',
-    description: `Information on how to install and use ${productName} Collectors.`,
+    id: 'Collector Documentation',
+    title: 'onboarding.collector_docs',
+    description: 'onboarding.collector_docs_description',
     link: DocsHelper.PAGES.COLLECTORS,
     iconName: 'menu_book',
   },
   {
-    title: 'Community Forum',
-    description: 'Ask questions and browse solutions from other users.',
+    id: 'Community Forum',
+    title: 'onboarding.community_forum',
+    description: 'onboarding.community_forum_description',
     link: 'https://community.graylog.org/',
     iconName: 'chat',
   },
@@ -159,6 +164,7 @@ const SourcesBoxActions = styled(BoxActions)(
 );
 
 const FirstUseWelcome = () => {
+  const { t } = useTranslation('welcome');
   const productName = useProductName();
   const { isResourceSectionEnabledForBrand } = useOnboardingCustomization();
   const { mutate: dismiss } = useDismissOnboarding();
@@ -169,18 +175,17 @@ const FirstUseWelcome = () => {
     <>
       <ConfirmDialog
         show={showDismissConfirm}
-        title="Dismiss onboarding for everyone?"
-        btnConfirmText="Dismiss for everyone"
+        title={t('onboarding.dismiss_title')}
+        btnConfirmText={t('onboarding.dismiss_confirm')}
         onConfirm={() => {
           dismiss();
           setShowDismissConfirm(false);
         }}
         onCancel={() => setShowDismissConfirm(false)}>
-        This turns off the guided onboarding and shows the default welcome page instead for <strong>every user</strong>{' '}
-        of this installation.
+        <Trans t={t} i18nKey="onboarding.dismiss_text" components={{ strong: <strong /> }} />
       </ConfirmDialog>
       <PageHeader
-        title={`Welcome to ${productName}!`}
+        title={t('welcome_to', { productName })}
         topActions={
           <DismissButton
             bsStyle="transparent"
@@ -190,28 +195,25 @@ const FirstUseWelcome = () => {
               });
               setShowDismissConfirm(true);
             }}>
-            <Icon name="close" /> Dismiss onboarding
+            <Icon name="close" /> {t('onboarding.dismiss')}
           </DismissButton>
         }>
-        <span>{productName} connects to dozens of sources; servers, firewalls, cloud apps, and more. </span>
+        <span>{t('onboarding.sources', { productName })}</span>
       </PageHeader>
 
       <Row className={'content'}>
         <Col xs={12}>
-          <ActionsHeadline>Where would you like to start?</ActionsHeadline>
+          <ActionsHeadline>{t('onboarding.where_to_start')}</ActionsHeadline>
           <Section>
             <StyledSectionBox
-              title="Enroll Collector"
+              title={t('onboarding.enroll_collector')}
               titleAs="h3"
               header={
                 <>
-                  Enroll Collector <PreviewBadge />
+                  {t('onboarding.enroll_collector')} <PreviewBadge />
                 </>
               }>
-              <Description>
-                The {productName} Collector simplifies getting data from your servers. Enroll this lightweight agent
-                once, then manage its configuration centrally from {productName}.
-              </Description>
+              <Description>{t('onboarding.collector_description', { productName })}</Description>
               <PlatformIcons />
               <SourcesBoxActions>
                 <LinkContainer to={Routes.SYSTEM.COLLECTORS.OVERVIEW}>
@@ -222,17 +224,14 @@ const FirstUseWelcome = () => {
                         app_action_value: 'setup-collector-button',
                       })
                     }>
-                    Enroll Collector
+                    {t('onboarding.enroll_collector')}
                   </Button>
                 </LinkContainer>
               </SourcesBoxActions>
             </StyledSectionBox>
             <HideOnCloud>
-              <StyledSectionBox title="Set up Input" titleAs="h3">
-                <Description>
-                  Inputs are network listeners on your {productName} nodes that receive logs directly from your
-                  infrastructure over protocols like Syslog or GELF.
-                </Description>
+              <StyledSectionBox title={t('onboarding.set_up_input')} titleAs="h3">
+                <Description>{t('onboarding.input_description', { productName })}</Description>
                 <DataSourceIcons />
                 <BoxActions>
                   <LinkContainer to={Routes.SYSTEM.INPUTS}>
@@ -243,7 +242,7 @@ const FirstUseWelcome = () => {
                           app_action_value: 'configure-input-button',
                         })
                       }>
-                      Configure Input
+                      {t('onboarding.configure_input')}
                     </Button>
                   </LinkContainer>
                 </BoxActions>
@@ -255,29 +254,29 @@ const FirstUseWelcome = () => {
 
       {isResourceSectionEnabledForBrand && (
         <>
-          <SecondaryHeadline>Resources</SecondaryHeadline>
+          <SecondaryHeadline>{t('onboarding.resources')}</SecondaryHeadline>
 
           <Container>
-            {buildResources(productName).map((resource) => (
-              <ResourceTile className="content" key={resource.title}>
+            {resources.map((resource) => (
+              <ResourceTile className="content" key={resource.id}>
                 <StyledResourceCol>
                   <ResourceTileContent>
                     <IconCard>
                       <Icon name={resource.iconName} />
                     </IconCard>
                     <ResourceTileBody>
-                      <ResourceTitle>{resource.title}</ResourceTitle>
-                      <ResourceDescription>{resource.description}</ResourceDescription>
+                      <ResourceTitle>{t(resource.title)}</ResourceTitle>
+                      <ResourceDescription>{t(resource.description, { productName })}</ResourceDescription>
                       <BoxActions>
                         <ExternalLinkButton
                           href={DocsHelper.toString(resource.link)}
                           bsSize="xs"
                           onClick={() =>
                             sendTelemetry(TELEMETRY_EVENT_TYPE.WELCOME.RESOURCE_CONTINUE_CLICKED, {
-                              app_action_value: resource.title,
+                              app_action_value: resource.id,
                             })
                           }>
-                          Continue
+                          {t('onboarding.continue')}
                         </ExternalLinkButton>
                       </BoxActions>
                     </ResourceTileBody>

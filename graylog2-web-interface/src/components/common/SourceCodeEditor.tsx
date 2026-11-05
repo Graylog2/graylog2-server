@@ -19,6 +19,7 @@ import isFinite from 'lodash/isFinite';
 import { Resizable } from 'react-resizable';
 import AceEditor from 'react-ace';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 import type { IAnnotation } from 'react-ace';
 
 import { qualifyUrl } from 'util/URLUtils';
@@ -108,6 +109,80 @@ type State = {
   height?: number;
   width?: number;
   selectedText?: string;
+};
+
+type EditorToolbarProps = {
+  width: number | string;
+  selectedText: string;
+  overlayContainerRef: React.RefObject<HTMLDivElement>;
+  onCopy: () => void;
+  onUndo: () => void;
+  onRedo: () => void;
+  copyDisabled: boolean;
+  pasteDisabled: boolean;
+  undoDisabled: boolean;
+  redoDisabled: boolean;
+};
+
+const EditorToolbar = ({
+  width,
+  selectedText,
+  overlayContainerRef,
+  onCopy,
+  onUndo,
+  onRedo,
+  copyDisabled,
+  pasteDisabled,
+  undoDisabled,
+  redoDisabled,
+}: EditorToolbarProps) => {
+  const { t } = useTranslation('common');
+
+  return (
+    <Toolbar style={{ width }}>
+      <ButtonToolbar>
+        <ButtonGroup ref={overlayContainerRef}>
+          <ClipboardButton
+            title={<Icon name="content_copy" />}
+            bsStyle="link"
+            bsSize="sm"
+            onSuccess={onCopy}
+            text={selectedText}
+            buttonTitle={t('source_code_editor.copy')}
+            disabled={copyDisabled}
+          />
+          <OverlayTrigger
+            placement="top"
+            trigger="click"
+            overlay={t('source_code_editor.paste_hint')}
+            rootClose
+            width={250}>
+            <Button bsStyle="link" bsSize="sm" title={t('source_code_editor.paste')} disabled={pasteDisabled}>
+              <Icon name="content_copy" />
+            </Button>
+          </OverlayTrigger>
+        </ButtonGroup>
+        <ButtonGroup>
+          <Button
+            bsStyle="link"
+            bsSize="sm"
+            onClick={onUndo}
+            title={t('source_code_editor.undo')}
+            disabled={undoDisabled}>
+            <Icon name="undo" />
+          </Button>
+          <Button
+            bsStyle="link"
+            bsSize="sm"
+            onClick={onRedo}
+            title={t('source_code_editor.redo')}
+            disabled={redoDisabled}>
+            <Icon name="redo" />
+          </Button>
+        </ButtonGroup>
+      </ButtonToolbar>
+    </Toolbar>
+  );
 };
 
 class SourceCodeEditor extends React.Component<Props, State> {
@@ -241,55 +316,22 @@ class SourceCodeEditor extends React.Component<Props, State> {
       wrapEnabled,
     } = this.props;
     const validCssWidth = isFinite(width) ? width : '100%';
-    const overlay = (
-      <>Press Ctrl+V (&#8984;V in macOS) or select Edit&thinsp;&rarr;&thinsp;Paste to paste from clipboard.</>
-    );
 
     return (
       <div className="source-code-editor">
         {toolbar && (
-          <Toolbar style={{ width: validCssWidth }}>
-            <ButtonToolbar>
-              <ButtonGroup ref={this.overlayContainerRef}>
-                <ClipboardButton
-                  title={<Icon name="content_copy" />}
-                  bsStyle="link"
-                  bsSize="sm"
-                  onSuccess={this.focusEditor}
-                  text={selectedText}
-                  buttonTitle="Copy (Ctrl+C / &#8984;C)"
-                  disabled={this.isCopyDisabled()}
-                />
-                <OverlayTrigger placement="top" trigger="click" overlay={overlay} rootClose width={250}>
-                  <Button
-                    bsStyle="link"
-                    bsSize="sm"
-                    title="Paste (Ctrl+V / &#8984;V)"
-                    disabled={this.isPasteDisabled()}>
-                    <Icon name="content_copy" />
-                  </Button>
-                </OverlayTrigger>
-              </ButtonGroup>
-              <ButtonGroup>
-                <Button
-                  bsStyle="link"
-                  bsSize="sm"
-                  onClick={this.handleUndo}
-                  title="Undo (Ctrl+Z / &#8984;Z)"
-                  disabled={this.isUndoDisabled()}>
-                  <Icon name="undo" />
-                </Button>
-                <Button
-                  bsStyle="link"
-                  bsSize="sm"
-                  onClick={this.handleRedo}
-                  title="Redo (Ctrl+Shift+Z / &#8984;&#8679;Z)"
-                  disabled={this.isRedoDisabled()}>
-                  <Icon name="redo" />
-                </Button>
-              </ButtonGroup>
-            </ButtonToolbar>
-          </Toolbar>
+          <EditorToolbar
+            width={validCssWidth}
+            selectedText={selectedText}
+            overlayContainerRef={this.overlayContainerRef}
+            onCopy={this.focusEditor}
+            onUndo={this.handleUndo}
+            onRedo={this.handleRedo}
+            copyDisabled={this.isCopyDisabled()}
+            pasteDisabled={this.isPasteDisabled()}
+            undoDisabled={this.isUndoDisabled()}
+            redoDisabled={this.isRedoDisabled()}
+          />
         )}
         <Resizable height={height} width={width} minConstraints={[200, 200]} onResize={this.handleResize}>
           <SourceCodeContainer style={{ height: height, width: validCssWidth }} $resizable={resizable}>

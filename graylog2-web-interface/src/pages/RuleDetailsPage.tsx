@@ -16,6 +16,7 @@
  */
 import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import { DocumentTitle, Spinner } from 'components/common';
 import Rule from 'components/rules/Rule';
@@ -33,6 +34,7 @@ function filterPipelines(pipelines: Array<PipelineType> = [], title = '') {
 }
 
 const RuleDetailsPage = () => {
+  const { t } = useTranslation('pipelines');
   const { ruleId } = useParams<{ ruleId: string }>();
   const isNewRule = ruleId === 'new';
   const { data: pipelines, isInitialLoading: isInitialLoadingPipelines } = usePipelines({ enabled: !isNewRule });
@@ -46,7 +48,7 @@ const RuleDetailsPage = () => {
 
   const isRuleBuilder = rule_builder === 'true';
   const title = currentRule?.title || '';
-  const pageTitle = isNewRule ? 'New pipeline rule' : `Pipeline rule ${title}`;
+  const pageTitle = isNewRule ? t('rule_details_new_title') : t('rule_details_title', { title: title });
 
   const pipelinesUsingRule = isNewRule ? [] : filterPipelines(pipelines, title);
 
@@ -59,7 +61,7 @@ const RuleDetailsPage = () => {
   const isLoading = !isNewRule && (isInitialLoadingRule || isInitialLoadingPipelines);
 
   if (isLoading) {
-    return <Spinner text="Loading Rule Details..." />;
+    return <Spinner text={t('rule_details_loading')} />;
   }
 
   return (

@@ -15,27 +15,29 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { DocumentTitle, PageHeader } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
 import { IndicesPageNavigation } from 'components/indices';
 import CreateTemplate from 'components/indices/IndexSetTemplates/CreateTemplate';
 
-const IndexSetTemplateCreatePage = () => (
-  <DocumentTitle title="Create Index Set Template">
-    <IndicesPageNavigation />
-    <PageHeader title="Create Index Set Template">
-      <span>
-        Create a new Index Set Template. This is a set of configuration that can be applied when creating a new Index
-        Set.
-      </span>
-    </PageHeader>
-    <Row className="content">
-      <Col md={12}>
-        <CreateTemplate />
-      </Col>
-    </Row>
-  </DocumentTitle>
-);
+const IndexSetTemplateCreatePage = () => {
+  const { t } = useTranslation('indexsets');
+
+  return (
+    <DocumentTitle title={t('pages.template_create_title')}>
+      <IndicesPageNavigation />
+      <PageHeader title={t('pages.template_create_title')}>
+        <span>{t('pages.template_create_description')}</span>
+      </PageHeader>
+      <Row className="content">
+        <Col md={12}>
+          <CreateTemplate />
+        </Col>
+      </Row>
+    </DocumentTitle>
+  );
+};
 
 export default IndexSetTemplateCreatePage;

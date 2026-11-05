@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useHistory from 'routing/useHistory';
 import { Col, Row } from 'components/bootstrap';
@@ -28,6 +29,7 @@ import usePermissions from 'hooks/usePermissions';
 import useQuery from 'routing/useQuery';
 
 const CreateEventDefinitionPage = () => {
+  const { t } = useTranslation('event_definitions');
   const { isPermitted } = usePermissions();
   const { push } = useHistory();
 
@@ -44,8 +46,8 @@ const CreateEventDefinitionPage = () => {
   );
 
   const pageTitle = useMemo(
-    () => (eventDefinitionTitle ? `New Event Definition "${eventDefinitionTitle}"` : 'New Event Definition'),
-    [eventDefinitionTitle],
+    () => (eventDefinitionTitle ? t('page.new_named', { title: eventDefinitionTitle }) : t('page.new')),
+    [eventDefinitionTitle, t],
   );
 
   const goToOverview = useCallback(() => {
@@ -65,10 +67,10 @@ const CreateEventDefinitionPage = () => {
       <PageHeader
         title={pageTitle}
         documentationLink={{
-          title: 'Alerts documentation',
+          title: t('page.alerts_docs'),
           path: DocsHelper.PAGES.ALERTS,
         }}>
-        <span>Event Definitions allow you to create Alerts from different Conditions and alert on them.</span>
+        <span>{t('page.description_alerts')}</span>
       </PageHeader>
 
       <Row className="content">

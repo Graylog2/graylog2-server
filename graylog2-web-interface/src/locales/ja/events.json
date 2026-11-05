@@ -1,0 +1,122 @@
+{
+  "alerts_attributes": {
+    "additional_fields": "追加フィールド",
+    "aggregation_time_range": "集計期間",
+    "description": "説明",
+    "event_definition": "Event Definition",
+    "event_definition_type": "Event Definition タイプ",
+    "event_procedures": "Event Procedures",
+    "group_by_fields": "グループ化フィールド",
+    "id": "ID",
+    "key": "キー",
+    "message": "メッセージ",
+    "priority": "優先度",
+    "tags": "タグ",
+    "timestamp": "タイムスタンプ",
+    "type": "タイプ"
+  },
+  "alerts_list": {
+    "auto_refresh_unavailable": "パフォーマンスの問題を避けるため、スライス中は自動更新がオフになります。",
+    "auto_refresh_unavailable_title": "自動更新は利用できません",
+    "bulk_replay_search": "検索を再実行",
+    "collapse_metrics": "メトリクスを折りたたむ",
+    "details": "詳細",
+    "expand_metrics": "メトリクスを展開",
+    "histogram_failed": "イベントのヒストグラムの読み込みに失敗しました: {{error}}",
+    "metrics_title": "メトリクス",
+    "no_additional_fields": "このイベントには追加フィールドが追加されていません。",
+    "no_further_details": "詳細はありません",
+    "no_group_by_fields": "このイベントにはグループ化フィールドがありません。",
+    "no_key": "このイベントにはキーが設定されていません。",
+    "no_time_range": "期間なし",
+    "refresh_human_name": "イベント",
+    "replay_search": "検索を再実行",
+    "histogram_series_events": "イベント",
+    "histogram_series_alerts": "アラート"
+  },
+  "alerts_replay": {
+    "cannot_replay": "このイベントを再実行できません: {{reason}} 別のイベントを選択してください。",
+    "close_section": "{{title}} セクションを閉じる",
+    "details_title": "アラート / イベントの詳細",
+    "event_definition_details": "Event Definition の詳細",
+    "event_details": "イベントの詳細",
+    "no_remediation_steps": "修復手順はありません",
+    "open_section": "{{title}} セクションを開く",
+    "replay_details": "再実行の詳細",
+    "replayed_search": "再実行された検索",
+    "system_event": "このイベントはシステムイベントであり、クエリ / ストリーム / 期間は関連付けられていません。"
+  },
+  "alerts_types": {
+    "alert": "アラート",
+    "event": "イベント"
+  },
+  "definitions_bulk": {
+    "delete": {
+      "confirm_other": "{{count}} 件の Event Definition を本当に削除しますか？",
+      "error": "Event Definition の削除中にエラーが発生しました。{{error}}",
+      "failed_other": "選択した {{count}} 件の Event Definition のうち {{failed}} 件を削除できませんでした。",
+      "success_other": "{{count}} 件の Event Definition を正常に削除しました。",
+      "title": "Event Definition の削除"
+    },
+    "disable": {
+      "confirm_other": "{{count}} 件の Event Definition を本当に無効化しますか？",
+      "error": "Event Definition の無効化中にエラーが発生しました。{{error}}",
+      "failed_other": "選択した {{count}} 件の Event Definition のうち {{failed}} 件を無効化できませんでした。",
+      "success_other": "{{count}} 件の Event Definition を正常に無効化しました。",
+      "title": "Event Definition の無効化"
+    },
+    "enable": {
+      "confirm_other": "{{count}} 件の Event Definition を本当に有効化しますか？",
+      "error": "Event Definition の有効化中にエラーが発生しました。{{error}}",
+      "failed_other": "選択した {{count}} 件の Event Definition のうち {{failed}} 件を有効化できませんでした。",
+      "success_other": "{{count}} 件の Event Definition を正常に有効化しました。",
+      "title": "Event Definition の有効化"
+    },
+    "success_title": "成功"
+  },
+  "definitions_list": {
+    "disable": "無効化",
+    "enable": "有効化"
+  },
+  "definitions_page": {
+    "alerts_docs": "アラートのドキュメント",
+    "copy_confirm": "「{{title}}」のコピーを作成してもよろしいですか？",
+    "copy_title": "Event Definition のコピー",
+    "create_multiple": "Event Definition を作成",
+    "description_alerts": "Event Definition を使用すると、さまざまな条件からアラートを作成し、それらに対してアラートを発生させることができます。",
+    "description_events": "Event Definition を使用すると、さまざまな条件からイベントを作成し、それらに対してアラートを発生させることができます。",
+    "description_list": "さまざまな条件を検索し、それらに対してアラートを発生させることができる新しい Event Definition を作成します。",
+    "duplicate": "Event Definition を複製",
+    "edit": "Event Definition を編集",
+    "edit_named": "「{{title}}」Event Definition を編集",
+    "file_import": "Event Definition を作成 - ファイルからインポート",
+    "git_import": "Event Definition を作成 - Git からインポート",
+    "loading": "Event Definition を読み込んでいます...",
+    "new": "新しい Event Definition",
+    "new_named": "新しい Event Definition「{{title}}」",
+    "title": "Event Definition",
+    "view": "Event Definition を表示",
+    "view_named": "「{{title}}」Event Definition を表示"
+  },
+  "alerts_page": {
+    "description": "さまざまな条件でイベントを定義します。注意が必要なイベントには通知を追加して、アラートを作成します。",
+    "documentation_title": "アラートのドキュメント",
+    "title": "アラートとイベント"
+  },
+  "alerts_bulk_replay": {
+    "all_removed": "リストからすべてのイベントを削除しました。<backButton>イベントに戻る</backButton> をクリックすると元に戻ることができます。",
+    "all_reviewed": "すべてのイベントを確認しました。下に一覧表示されているすべてのイベントに適用する一括操作を選択できます。",
+    "list_description": "次のリストには、前の手順で選択したすべてのイベント / アラートが含まれており、それぞれの再実行された検索を確認できます。",
+    "mark_not_reviewed": "イベント「{{id}}」を未確認に設定",
+    "mark_reviewed": "イベント「{{id}}」を確認済みに設定",
+    "remove_event": "イベント「{{id}}」をリストから削除",
+    "replay_search": "検索を再実行",
+    "review_progress": "{{completed}}/{{total}} 件のイベントの確認が完了しました。",
+    "show_selected": "選択したイベントを表示",
+    "unknown_message": "不明"
+  },
+  "use_event_by_id_notifications": {
+    "load_failed": "イベントまたはアラートの読み込みに失敗しました。ステータス: {{error}}",
+    "load_failed_title": "イベントまたはアラートを読み込めませんでした"
+  }
+}

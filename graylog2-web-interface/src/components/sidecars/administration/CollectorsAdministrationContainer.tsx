@@ -20,6 +20,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import find from 'lodash/find';
 import isEmpty from 'lodash/isEmpty';
 import debounce from 'lodash/debounce';
+import { useTranslation } from 'react-i18next';
 
 import { naturalSortIgnoreCase } from 'util/SortUtils';
 import { Spinner } from 'components/common';
@@ -54,6 +55,7 @@ const CollectorsAdministrationContainer = ({ ...props }: Props) => {
 
   const { data: sidecars } = useSidecarsAdministration({ query, page, pageSize, filters });
   const { mutateAsync: setAction } = useSetSidecarAction();
+  const { t } = useTranslation('sidecars');
 
   const handlePageChange = useCallback((newPage: number, newPageSize: number) => {
     setPage(newPage);
@@ -146,7 +148,7 @@ const CollectorsAdministrationContainer = ({ ...props }: Props) => {
   }, [collectors, sidecars?.sidecars, configurations]);
 
   if (!sidecarCollectors) {
-    return <Spinner text="Loading collector list..." />;
+    return <Spinner text={t('administration.loading_collectors')} />;
   }
 
   return (

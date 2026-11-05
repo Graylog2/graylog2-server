@@ -1,0 +1,623 @@
+{
+  "actions": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "submit": "Submit",
+    "delete": "Delete",
+    "previous": "Previous",
+    "next": "Next",
+    "add": "Add",
+    "edit": "Edit",
+    "preview": "Preview",
+    "close": "Close",
+    "done": "Done",
+    "filter": "Filter",
+    "reset": "Reset",
+    "reset_search": "Reset search",
+    "more_actions": "More Actions",
+    "sort": "Sort",
+    "clear_selection": "Clear selection",
+    "remove_item": "Remove {{name}}"
+  },
+  "confirm_leave": {
+    "question": "Are you sure?"
+  },
+  "duration": {
+    "years_one": "{{count}} year",
+    "years_other": "{{count}} years",
+    "months_one": "{{count}} month",
+    "months_other": "{{count}} months",
+    "days_one": "{{count}} day",
+    "days_other": "{{count}} days",
+    "hours_one": "{{count}} hour",
+    "hours_other": "{{count}} hours",
+    "minutes_one": "{{count}} minute",
+    "minutes_other": "{{count}} minutes",
+    "seconds_one": "{{count}} second",
+    "seconds_other": "{{count}} seconds",
+    "milliseconds_one": "{{count}} millisecond",
+    "milliseconds_other": "{{count}} milliseconds",
+    "nanoseconds_one": "{{count}} nanosecond",
+    "nanoseconds_other": "{{count}} nanoseconds",
+    "microseconds_one": "{{count}} microsecond",
+    "microseconds_other": "{{count}} microseconds"
+  },
+  "bulk_actions": {
+    "title": "Bulk actions",
+    "cancel": "Cancel selection"
+  },
+  "refresh": {
+    "not_updating": "Not updating",
+    "every": "Every",
+    "pause": "Pause Refresh",
+    "start": "Start Refresh"
+  },
+  "create_entity": {
+    "title": "Create {{entityName}}",
+    "submit": "Create {{entityName, lowercase}}",
+    "submitting": "Creating {{entityName, lowercase}}...",
+    "save_failed": "Failed to save",
+    "unknown_error": "An error occurred. Please try again."
+  },
+  "key_value_table": {
+    "name": "Name",
+    "value": "Value",
+    "actions": "Actions"
+  },
+  "markdown_editor": {
+    "editor_title": "Markdown Editor",
+    "preview_title": "Markdown Preview",
+    "expand_preview": "Expand preview",
+    "expand_content": "Expand content"
+  },
+  "source_code_editor": {
+    "copy": "Copy (Ctrl+C / ⌘C)",
+    "paste": "Paste (Ctrl+V / ⌘V)",
+    "undo": "Undo (Ctrl+Z / ⌘Z)",
+    "redo": "Redo (Ctrl+Shift+Z / ⌘⇧Z)",
+    "paste_hint": "Press Ctrl+V (⌘V on macOS) or select Edit → Paste to paste from clipboard."
+  },
+  "loading": "Loading...",
+  "loading_long_wait": "This is taking a bit longer, please hold on...",
+  "errors": {
+    "runtime_error": "Runtime Error",
+    "unknown_error": "Unknown error",
+    "fetch_error": "{{message}}: {{error}}",
+    "page_error_title": "Error getting data",
+    "page_error_description": "We had trouble fetching some data required to build this page, so here is a picture instead.",
+    "page_error_logs": "Check your {{productName}} server logs for more information."
+  },
+  "empty": {
+    "no_data": "No data available.",
+    "no_entities": "No entities exist.",
+    "nothing_here": "Looks like there is nothing here, yet!",
+    "no_items": "No items to display",
+    "no_items_available": "No items available",
+    "no_items_found": "No items found to display.",
+    "filter_no_match": "Filter does not match any data."
+  },
+  "badges": {
+    "beta": "Beta",
+    "preview": "Preview",
+    "default": "Default",
+    "optional": "(Opt.)"
+  },
+  "clipboard": {
+    "copied": "Copied!"
+  },
+  "restricted_access": {
+    "view": "You don't have permissions to view this {{entityName}}."
+  },
+  "enterprise_plugin_not_found": {
+    "title": "Enterprise Feature",
+    "description": "To use the <bold>{{featureName}}</bold> functionality you need the <licenseLink>Graylog Enterprise license</licenseLink> and the <docsLink>Graylog Enterprise plugin</docsLink>."
+  },
+  "pagination": {
+    "first": "Open first page",
+    "previous": "Open previous page",
+    "next": "Open next page",
+    "last": "Open last page",
+    "page": "Open page {{page}}",
+    "active_page": "Active page"
+  },
+  "page_size": {
+    "rows_one": "{{count}} Row",
+    "rows_other": "{{count}} Rows",
+    "configure": "Configure page size",
+    "show": "Show <select/>"
+  },
+  "search_form": {
+    "placeholder": "Enter search query...",
+    "filter_placeholder": "Enter query to filter"
+  },
+  "select": {
+    "placeholder": "Select...",
+    "no_options": "No options",
+    "loading": "Loading...",
+    "loading_options": "Loading options...",
+    "type_to_filter": "Type to filter"
+  },
+  "entity_table": {
+    "selected_items_one": "{{count}} item selected",
+    "selected_items_other": "{{count}} items selected",
+    "columns": "Columns",
+    "configure_columns": "Configure visible columns",
+    "reset_columns": "Reset all columns",
+    "show_column": "Show {{column}}",
+    "hide_column_named": "Hide {{column}}",
+    "show_label": "Show",
+    "show_details": "Show details",
+    "collapse_section": "Collapse section",
+    "toggle_column_actions": "Toggle {{column}} actions",
+    "sort_ascending": "Sort ascending",
+    "sort_descending": "Sort descending",
+    "sort_column_ascending": "Sort {{column, lowercase}} ascending",
+    "sort_column_descending": "Sort {{column, lowercase}} descending",
+    "hide_column": "Hide column",
+    "resize_column": "Resize {{column}} column",
+    "slicing_by": "Slicing by {{column}}",
+    "select_entity": "Select entity",
+    "deselect_entity": "Deselect entity",
+    "select_all": "Select all visible entities",
+    "deselect_all": "Deselect all visible entities",
+    "more": "More",
+    "more_actions": "More actions",
+    "load_layout_failed": "Loading layout preferences for \"{{entityId}}\" overview failed with",
+    "update_layout_failed": "Updating table layout preferences failed with error: {{error}}",
+    "search_placeholder": "Search for {{humanName}}",
+    "fetch_failed": "Fetching {{humanName}} failed",
+    "fetch_failed_with_status": "Fetching {{humanName}} failed with status",
+    "could_not_retrieve": "Could not retrieve {{humanName}}",
+    "no_results": "No {{humanName}} have been found."
+  },
+  "slicing": {
+    "slice_by": "Slice by",
+    "slice_by_values": "Slice by values",
+    "no_slicing": "No slicing",
+    "unselect_slice": "Unselect slice",
+    "sort_by": "Sort by {{option}}",
+    "filter": "Filter {{column}}",
+    "filter_slices": "Filter slices",
+    "sort_ascending": "Sort ascending",
+    "sort_descending": "Sort descending",
+    "hide_empty": "Hide empty slices ({{count}})",
+    "show_empty": "Show empty slices ({{count}})",
+    "hide_empty_title": "Hide empty slices",
+    "show_empty_title": "Show empty slices",
+    "no_empty": "Empty slices (0)",
+    "fetch_failed": "Error fetching table slices"
+  },
+  "filters": {
+    "filters": "Filters",
+    "create_filter": "Create Filter",
+    "change_value": "Change filter value",
+    "delete_filter": "Delete filter",
+    "filter_ignored": "Filter ignored",
+    "slice_conflict": "This filter is ignored because a slice is active for this attribute. Clear the slice to apply the filter.",
+    "single_filter_only": "You can only create one filter for this attribute.",
+    "update_existing": "If you want to change the filter value, you can update the existing one.",
+    "create_attribute_filter": "Create {{attribute, lowercase}} filter",
+    "edit_attribute_filter": "Edit {{attribute, lowercase}} filter",
+    "create_submit": "Create filter",
+    "update_submit": "Update filter",
+    "value_placeholder": "Enter value to filter for",
+    "must_not_be_empty": "Must not be empty.",
+    "search_attribute": "Search for {{attribute, lowercase}}",
+    "no_entities_found": "No entities found",
+    "hold_shift": "Hold Shift to select multiple",
+    "load_suggestions_failed": "Loading suggestions for filter failed with status",
+    "could_not_load_suggestions": "Could not load filter suggestions",
+    "load_titles_failed": "Loading filter titles failed with status",
+    "could_not_load_titles": "Could not load filter titles",
+    "all_time": "All time",
+    "now": "Now",
+    "now_lowercase": "now",
+    "relative_range": "from {{from}} until {{until}}"
+  },
+  "time_units": {
+    "nanoseconds": "nanoseconds",
+    "microseconds": "microseconds",
+    "milliseconds": "milliseconds",
+    "seconds": "seconds",
+    "minutes": "minutes",
+    "hours": "hours",
+    "days": "days",
+    "months": "months",
+    "years": "years"
+  },
+  "time": {
+    "never": "Never",
+    "toggle_time": "Toggle time",
+    "time_unit_input": "Time unit input",
+    "browser_time_zone": "Browser's time zone",
+    "pick_time_zone": "Pick a time zone",
+    "unclassified_time_zones": "Unclassified",
+    "default_locale": "Default locale",
+    "pick_locale": "Pick a locale"
+  },
+  "page_header": {
+    "experimental": "Experimental",
+    "legacy": "Legacy",
+    "experimental_message": "This feature is new and should be considered experimental.",
+    "legacy_message": "This feature has been discontinued and will be removed in a future version."
+  },
+  "message": {
+    "collector_ingest": "Collector Ingest",
+    "deleted_input": "deleted input",
+    "received_by": "Received by",
+    "received_by_value": "<inputName/> on <node/>",
+    "filter_streams": "Filter streams",
+    "default_stream_not_testable": "Cannot test against the default stream",
+    "no_streams": "No streams available",
+    "test_against_stream": "Test against stream",
+    "show_changes": "Show changes",
+    "copy_id": "Copy ID",
+    "copy_message": "Copy message",
+    "not_stored": "Not stored",
+    "timestamp": "Timestamp",
+    "stored_in_index": "Stored in index",
+    "not_stored_in_index": "Message is not stored",
+    "routed_into_streams": "Routed into streams",
+    "edit_favorite_fields": "Edit favorite fields",
+    "show_remaining_fields_one": "Show {{count}} remaining field",
+    "show_remaining_fields_other": "Show {{count}} remaining fields",
+    "hide_remaining_fields_one": "Hide {{count}} remaining field",
+    "hide_remaining_fields_other": "Hide {{count}} remaining fields",
+    "favorite_fields_configuration": "Favorite fields configuration",
+    "favorite_fields_hint_one": "Favorite fields will appear in all streams this message belongs to, including stream <streams/> in which this message is routed.",
+    "favorite_fields_hint_other": "Favorite fields will appear in all streams this message belongs to, including streams <streams/> in which this message is routed.",
+    "save_configuration": "Save Configuration",
+    "reset_to_default": "Reset to default",
+    "reset_to_default_title": "Reset to default fields: {{fields}}",
+    "favorite_fields": "Favorite fields",
+    "remaining_fields": "Remaining fields",
+    "set_favorites_failed": "Setting fields to favorites failed with error: {{error}}",
+    "set_favorites_failed_title": "Could not set fields to favorites",
+    "add_favorite_failed": "Adding field to favorites failed with error: {{error}}",
+    "add_favorite_failed_title": "Could not add field to favorites",
+    "remove_favorite_failed": "Removing field from favorites failed with error: {{error}}",
+    "remove_favorite_failed_title": "Could not remove field from favorites",
+    "field_terms": "Field terms:",
+    "received_by_radio_value": "via <inputName/> on radio <node/>"
+  },
+  "entity_types": {
+    "user": "user",
+    "team": "team",
+    "dashboard": "dashboard",
+    "event_definition": "event definition",
+    "notification": "notification",
+    "search": "search",
+    "stream": "stream",
+    "search_filter": "search filter",
+    "report": "report",
+    "role": "role",
+    "output": "output",
+    "sigma_rule": "sigma rule",
+    "event_procedure": "event procedure",
+    "event_procedure_step": "event procedure step",
+    "collection": "collection",
+    "collection_entities": "collection entities"
+  },
+  "marketplace_link": "the {{productName}} Marketplace",
+  "chips_cell": {
+    "show_fewer": "Show fewer",
+    "show_all": "Show all",
+    "filter_by": "Filter by {{itemLabel}} \"{{value}}\""
+  },
+  "expandable_cell_list": {
+    "show_less": "Show less",
+    "show_more_one": "Show 1 more",
+    "show_more_other": "Show {{count}} more"
+  },
+  "expanded_section_count": {
+    "show": "Show {{label}}",
+    "hide": "Hide {{label}}"
+  },
+  "compact_pagination": {
+    "previous_page": "Previous page",
+    "select_page": "Select page",
+    "next_page": "Next page",
+    "of_pages": "of {{totalPages}}"
+  },
+  "expandable_checkbox_list_item": {
+    "select_item": "Select item"
+  },
+  "traffic_graph": {
+    "days": "Days",
+    "incoming": "Incoming traffic",
+    "outgoing": "Outgoing traffic",
+    "last_days": "Last {{days}} days: {{traffic}}"
+  },
+  "link_to_node": {
+    "unknown_node": "Unknown Node"
+  },
+  "markdown": {
+    "images_unsupported": "Images are not supported for security reasons. Please enable allowed sources <configurationLink>here</configurationLink>"
+  },
+  "public_notifications": {
+    "read_less": "Read Less",
+    "read_more": "Read More"
+  },
+  "refresh_controls": {
+    "controls_label": "Refresh {{humanName}} Controls",
+    "below_minimum": "Interval of <intervalDuration /> ({{interval}}) is below configured minimum interval of <minimumDuration /> ({{minimum}})."
+  },
+  "scroll_button": {
+    "back_to_top": "Back to top"
+  },
+  "section": {
+    "toggle_section": "Toggle {{title, lowercase}} section"
+  },
+  "selectable_list": {
+    "remove": "Remove"
+  },
+  "share_menu_item": {
+    "share": "Share"
+  },
+  "status_icon": {
+    "yes": "Yes",
+    "no": "No"
+  },
+  "type_ahead_field_input": {
+    "select_field": "Select Field"
+  },
+  "query_helper": {
+    "title": "Search Syntax Help",
+    "show_help": "Show search syntax help",
+    "available_fields": "Available search fields",
+    "field": "Field",
+    "description": "Description",
+    "examples": "Examples",
+    "example_description": "Find all {{entityName}}s with a description containing security:",
+    "example_id": "Find a {{entityName}} with the id 5f4dfb9c69be46153b9a9a7b:",
+    "example_query_description": "description:security",
+    "example_query_id": "id:5f4dfb9c69be46153b9a9a7b",
+    "common_fields": {
+      "id": "Id of the {{entityName}}, which is a unique reference.",
+      "title": "Title of the {{entityName}}.",
+      "name": "Name of the {{entityName}}.",
+      "description": "Short description of the {{entityName}}.",
+      "summary": "Long summary of the {{entityName}}."
+    }
+  },
+  "url_allow_list_modal": {
+    "add": "Add to URL allowlist",
+    "title": "Update Allowlist Configuration",
+    "submit": "Update configuration",
+    "urls": "Allowlist URLs"
+  },
+  "configuration_well": {
+    "empty": "<empty>",
+    "uploaded_file_content": "<uploaded file content>",
+    "no_configuration": "-- no configuration --"
+  },
+  "configuration_forms": {
+    "undo_reset": "Undo Reset",
+    "remove": "Remove",
+    "title": "Title",
+    "optional": "optional"
+  },
+  "enterprise_advertisement": {
+    "enterprise_title": "{{productName}} Enterprise",
+    "enterprise_description": "Designed to meet the needs of resource-constrained IT Operations and Software Engineering teams, {{productName}} Enterprise provides numerous productivity enhancements that will save you thousands of hours per year in collecting and analyzing log data to uncover the root cause of performance, outage, and error issues.",
+    "security_title": "{{productName}} Security",
+    "security_description": "Extend {{productName}} Open’s capabilities for detecting, investigating, and responding to cybersecurity threats with security-specific dashboards and alerts, anomaly detection AI/ML engine, integrations with other security tools, SOAR capabilities, and numerous compliance reporting features.",
+    "request_now": "Request now"
+  },
+  "plugin_list": {
+    "plugin_enterprise": "{{productName}} Plugin Enterprise",
+    "installed": "{{pluginName}} is installed",
+    "not_installed": "{{pluginName}} is not installed",
+    "status": "This is the status of {{productName}} Enterprise modules in this cluster:"
+  },
+  "reported_error": {
+    "title": "Something went wrong",
+    "description": "An unknown error has occurred. Please have a look at the following message and the {{productName}} server log for more information."
+  },
+  "hotkeys": {
+    "or": "or",
+    "title": "Keyboard shortcuts",
+    "view_all": "View all keyboard shortcuts"
+  },
+  "right_sidebar": {
+    "sidebar_label": "{{title}} sidebar",
+    "sidebar_label_collapsed": "{{title}} sidebar (collapsed)",
+    "close": "Close sidebar",
+    "expand": "Expand sidebar",
+    "collapse": "Collapse sidebar",
+    "go_back": "Go back",
+    "go_back_label": "Go back to previous content",
+    "go_forward": "Go forward",
+    "go_forward_label": "Go forward to next content"
+  },
+  "maxmind_adapter": {
+    "documentation": {
+      "intro": "The GeoIP data adapter supports reading MaxMind's GeoIP2 databases.",
+      "limitations_title": "Limitations",
+      "limitations_supported": "Currently the ASN, city and country databases are supported.",
+      "limitations_more": "For support of additional database types, please visit our support channels.",
+      "asn_fields": "ASN database fields",
+      "country_fields": "Country database fields",
+      "city_fields": "City database fields",
+      "city_additional_fields": "In addition to the fields provided by the country database, the city database also includes the following fields:",
+      "complete_documentation": "For a complete documentation of the fields, please see MaxMind's <docsLink>developer documentation</docsLink>"
+    },
+    "database_types": {
+      "asn": "ASN database",
+      "city": "City database",
+      "country": "Country database",
+      "ipinfo_location": "IPinfo location database",
+      "ipinfo_asn": "IPinfo ASN database"
+    },
+    "field_set": {
+      "file_path": "File path",
+      "file_path_help": "The path to the database file.",
+      "database_type": "Database type",
+      "database_type_help": "Select the type of the database file",
+      "database_type_placeholder": "Select the type of database file",
+      "refresh_file": "Refresh file",
+      "refresh_file_help": "If enabled, the database file is checked for modifications and refreshed when it changed on disk."
+    },
+    "summary": {
+      "database_file_path": "Database file path",
+      "database_type": "Database type",
+      "check_interval": "Check interval"
+    }
+  },
+  "abs_geoip": {
+    "container_name": "Azure Blob Container Name",
+    "container_name_help": "Your Azure Blob Container name.",
+    "endpoint_url": "Azure Blob Endpoint URL",
+    "endpoint_url_help": "Your Azure Blob Endpoint URL, only required if you want to override the default endpoint.",
+    "account_name": "Azure account name",
+    "account_name_placeholder": "your-account-name",
+    "account_name_help": "The name of your Azure storage account.",
+    "account_key_reset": "Azure Account Key",
+    "reset_password": "Reset password",
+    "account_key": "Azure account key",
+    "account_key_help": "The account key for your Azure storage account."
+  },
+  "gcs_geoip": {
+    "project_id": "Google Cloud Storage Project ID"
+  },
+  "geoip_resolver": {
+    "title": "Geo-Location Processor Configuration",
+    "description": "The Geo-Location Processor plugin scans all messages for fields containing <bold>exclusively</bold> an IP address, and puts their geo-location information (coordinates, ISO country code, and city name) into different fields. Read more in the <docsLink>documentation</docsLink>.",
+    "enabled_summary": "Enabled:",
+    "enforce_schema_summary": "Enforce default schema:",
+    "vendor_type_summary": "Database vendor type:",
+    "city_db_path_summary": "City database path:",
+    "asn_db_path_summary": "ASN database path:",
+    "refresh_interval_summary": "Database refresh interval:",
+    "pull_from_cloud_summary": "Pull files from cloud storage bucket:",
+    "edit": "Edit configuration",
+    "modal_title": "Update Geo-Location Processor Configuration",
+    "enable_processor": "Enable Geo-Location processor",
+    "enforce_schema": "Enforce default schema",
+    "vendor_select": "Select the GeoIP database vendor",
+    "city_db_path": "Path to the city database",
+    "asn_db_path": "Path to the ASN database",
+    "refresh_interval": "Database refresh interval",
+    "refresh_interval_help": "Interval at which the database files are checked for modifications and refreshed changes are detected on disk.",
+    "pull_from_cloud": "Pull files from cloud storage bucket",
+    "select_cloud_storage": "Select cloud storage",
+    "update_configuration": "Update configuration",
+    "updating_configuration": "Updating configuration..."
+  },
+  "links": {
+    "documentation": "documentation"
+  },
+  "quick_jump": {
+    "title": "Quick Jump",
+    "open": "Open Quick Jump",
+    "search_placeholder": "Search for pages/dashboards/streams ...",
+    "intro": "Please enter a search query to search for a page, stream, dashboard, input or other entities.",
+    "intro_hint": "To give you a head start, you will find a list of your <bold>last opened</bold> and <bold>favorite</bold> items below:",
+    "no_results": "No search results found. Please try different search terms.",
+    "recent": "Recent"
+  },
+  "scratchpad": {
+    "title": "Scratchpad",
+    "status_cleared": "Cleared.",
+    "status_auto_saved": "Auto saved.",
+    "got_it": "Got It!",
+    "sensitive_warning": "We recommend you do <bold>not</bold> store any sensitive information, such as passwords, in this area.",
+    "help_overlay": "You can use this space to store personal notes and other information, without leaving your browser window. For example, store timestamps, user IDs, or IP addresses you need in various investigations.",
+    "copy": "Copy",
+    "clear": "Clear",
+    "clear_confirm": "This will clear out your Scratchpad content, do you wish to proceed?"
+  },
+  "extractor_actions": {
+    "select_type": "Select extractor type",
+    "only_string_fields": "Extractors can only be used with string fields."
+  },
+  "surrounding_search": {
+    "button": "Show surrounding messages"
+  },
+  "support_sources": {
+    "title": "Need help?",
+    "help_text": "Do not hesitate to consult the {{productName}} community if your questions are not answered in the <docsLink>documentation</docsLink>.",
+    "community_support": "Community support",
+    "issue_tracker": "Issue tracker",
+    "professional_support": "Professional support"
+  },
+  "times_list": {
+    "title": "Time configuration",
+    "description": "Dealing with timezones can be confusing. Here you can see the timezone applied to different components of your system. You can check timezone settings of specific {{productName}} server nodes on their respective detail page.",
+    "user": "User <bold>{{username}}</bold>:",
+    "web_browser": "Your web browser:",
+    "server": "{{productName}} server:"
+  },
+  "widget_visualization_not_found": {
+    "description": "Widget Visualization (<italic>{{widgetClassName}}</italic>) not found. It looks like the plugin supplying this widget is not loaded."
+  },
+  "telemetry": {
+    "title": "Telemetry",
+    "enable_label": "Enable telemetry",
+    "enabled_checkbox": "enabled",
+    "update_preferences": "Update Preferences",
+    "update_button": "Update telemetry",
+    "info_modal_title": "Help us improve {{productName}}",
+    "ok": "OK",
+    "info": "We would like to collect anonymous usage data to help us prioritize improvements and make {{productName}} better in the future.",
+    "no_personal_data": "We do not collect personal data, sensitive information, or content such as logs in your instances.",
+    "learn_more": "Learn more on our <privacyLink>Privacy Policy</privacyLink>.",
+    "turn_off_profile": "You can turn data collection off or on any time <bold>in the user profile</bold>.",
+    "turn_off_here": "You can turn data collection off or on any time here."
+  },
+  "app_facade": {
+    "preparing": "We are preparing the web interface for you...",
+    "load_user_failed": "Loading your user failed",
+    "reload_page": "Reload page"
+  },
+  "suggest_reload": {
+    "title": "{{productName}} Version Changed",
+    "version_changed": "Your {{productName}} version has changed from <bold>{{version}}</bold> to <bold>{{newVersion}}</bold>.",
+    "save_work": "Please save your work and reload the page to avoid running into errors.",
+    "reload_now": "Reload now"
+  },
+  "footer": {
+    "system_info": "{{productName}} {{version}} on {{hostname}} ({{jvmInfo}})"
+  },
+  "notifications": {
+    "download_failed": "Downloading failed with status: {{error}}",
+    "download_failed_title": "Unable to download",
+    "export_failed": "Export failed",
+    "export_widget_failed": "Export for widget failed",
+    "telemetry_update_failed": "Update failed: {{error}}",
+    "telemetry_update_failed_title": "Could not update telemetry settings.",
+    "delete_property_confirm": "Are you sure you want to delete property '{{key}}'?",
+    "quick_jump_failed": "Fetch Entities Search Results failed with status",
+    "quick_jump_failed_title": "Could not Fetch Entity Search Results."
+  },
+  "use_favorite_item_mutation_notifications": {
+    "put_failed": "Adding item to favorites failed with status: {{error}}",
+    "put_failed_title": "Could not add item to favorites",
+    "delete_failed": "Deleting item from favorites failed with status: {{error}}",
+    "delete_failed_title": "Could not delete item from favorites"
+  },
+  "use_entity_titles_notifications": {
+    "load_failed": "Loading entity titles failed with status",
+    "load_failed_title": "Could not load entity titles"
+  },
+  "use_search_version_check_notifications": {
+    "fetch_failed_title": "Could not fetch override data"
+  },
+  "entity_creators": {
+    "event_definition": "Create event definition",
+    "notification": "Create notification",
+    "dashboard": "Create dashboard",
+    "stream": "Create stream",
+    "index_set": "Create index set",
+    "user": "Create user",
+    "pipeline": "Create pipeline",
+    "pipeline_rule": "Create pipeline rule",
+    "content_pack": "Create content pack",
+    "fleet": "Create fleet"
+  },
+  "user_notification": {
+    "success": "Success",
+    "error": "Error",
+    "attention": "Attention"
+  }
+}

@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { DocumentTitle } from 'components/common';
 import TeaserSearch from 'components/security/teaser/TeaserSearch';
@@ -28,39 +29,43 @@ const hotspots = [
   {
     positionX: '67%',
     positionY: '260px',
-    description: 'Quickly see if you have concerning trends in failed logons.',
+    descriptionKey: 'security_teaser.user_activity.hotspot_0',
   },
   {
     positionX: '40%',
     positionY: '500px',
-    description: 'Logon successes and failures by user can help you spot problem accounts and unusual activity.',
+    descriptionKey: 'security_teaser.user_activity.hotspot_1',
   },
   {
     positionX: '70%',
     positionY: '500px',
-    description: 'These are the top 15 user accounts generating high alerts!',
+    descriptionKey: 'security_teaser.user_activity.hotspot_2',
   },
   {
     positionX: '40%',
     positionY: '940px',
-    description: 'What are the most common identity and access control changes made in your environment?',
+    descriptionKey: 'security_teaser.user_activity.hotspot_3',
   },
   {
     positionX: '50%',
     positionY: '1300px',
-    description: 'Know the target of the most frequent access control changes.',
+    descriptionKey: 'security_teaser.user_activity.hotspot_4',
   },
 ];
 
-const UserActivity = () => (
-  <DocumentTitle title="User activity">
-    <TeaserSearch
-      viewJson={viewJson}
-      searchJson={searchJson as SearchJson}
-      searchJobResult={resultJson}
-      hotspots={hotspots}
-    />
-  </DocumentTitle>
-);
+const UserActivity = () => {
+  const { t } = useTranslation('users');
+
+  return (
+    <DocumentTitle title={t('security_teaser.user_activity.title')}>
+      <TeaserSearch
+        viewJson={viewJson}
+        searchJson={searchJson as SearchJson}
+        searchJobResult={resultJson}
+        hotspots={hotspots}
+      />
+    </DocumentTitle>
+  );
+};
 
 export default UserActivity;

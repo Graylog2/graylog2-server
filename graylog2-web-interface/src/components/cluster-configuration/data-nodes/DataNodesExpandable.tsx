@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { PaginatedEntityTable } from 'components/common';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
@@ -49,8 +50,12 @@ const DataNodesExpandable = ({
 }: Props) => {
   const [totalDataNodes, setTotalDataNodes] = useState<number | undefined>(undefined);
   const productName = useProductName();
+  const { t } = useTranslation('system');
 
-  const columnSchemas = useMemo<Array<ColumnSchema>>(() => createColumnDefinitions(), []);
+  const columnSchemas = useMemo<Array<ColumnSchema>>(
+    () => createColumnDefinitions().map((column) => ({ ...column, title: t(column.title) })),
+    [t],
+  );
   const columnRenderers = useMemo(() => createColumnRenderers(productName), [productName]);
 
   const renderActions = useCallback((entity: ClusterDataNode) => <DataNodeActions dataNode={entity} />, []);
@@ -69,7 +74,7 @@ const DataNodesExpandable = ({
 
   return (
     <ClusterNodesSectionWrapper
-      title="Data Nodes"
+      title={t('data_nodes_expandable.title')}
       titleCount={totalDataNodes}
       onTitleCountClick={onSelectNodeType ?? null}
       collapsible={collapsible}>
@@ -81,7 +86,7 @@ const DataNodesExpandable = ({
         columnRenderers={columnRenderers}
         entityAttributesAreCamelCase
         entityActions={renderActions}
-        humanName="Data Nodes"
+        humanName={t('data_nodes_expandable.title')}
         externalSearch={externalSearch}
         fetchOptions={fetchOptions}
         onDataLoaded={(data) => setTotalDataNodes(data.pagination?.total ?? data.list.length)}

@@ -15,13 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import ActionDropdown from 'views/components/common/ActionDropdown';
 import { IconButton } from 'components/common';
 
 const WidgetActionDropdown = ({ children }: React.PropsWithChildren) => {
+  const { t } = useTranslation('widgets');
   const widgetActionDropdownCaret = (
-    <IconButton name="keyboard_arrow_down" title="Open actions dropdown" showTooltip={false} />
+    <IconButton name="keyboard_arrow_down" title={t('widget_actions.open_dropdown')} showTooltip={false} />
   );
 
   return <ActionDropdown element={widgetActionDropdownCaret}>{children}</ActionDropdown>;

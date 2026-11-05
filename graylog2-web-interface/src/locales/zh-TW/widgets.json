@@ -1,0 +1,222 @@
+{
+  "copy_to_dashboard": {
+    "title": "將 Widget 複製到 Dashboard",
+    "no_dashboards": "找不到 Dashboard。",
+    "create_new": "建立新 Dashboard"
+  },
+  "edit_message_list": {
+    "fields": "欄位",
+    "message_preview": "訊息預覽",
+    "sorting": "排序",
+    "direction": "方向",
+    "decorators": "裝飾器"
+  },
+  "widget_frame": {
+    "loading": "正在載入 Widget ..."
+  },
+  "export_widget": {
+    "export_all": "匯出所有搜尋結果",
+    "title": "匯出 Widget",
+    "enterprise_explanation": "匯出彙總 Widget 功能適用於 Enterprise 版本。此功能提供將資料匯出為 CSV、JSON、YAML、XML 等常見檔案格式的選項。"
+  },
+  "field_sort": {
+    "placeholder": "無：點擊以新增欄位",
+    "aria_label": "選取要排序的欄位"
+  },
+  "fields_configuration": {
+    "add_field": "新增欄位",
+    "hide_selected_other": "隱藏 {{count}} 個已選取的欄位",
+    "show_selected_other": "顯示 {{count}} 個已選取的欄位"
+  },
+  "move_widget": {
+    "no_pages": "找不到頁面",
+    "copy": "複製 Widget",
+    "move": "移動 Widget",
+    "title": "選擇目標頁面",
+    "keep_copy": "在此頁面保留副本",
+    "keep_copy_help": "啟用「在頁面上保留副本」時，Widget 會被複製到另一個頁面，而非移動。"
+  },
+  "widget_edit": {
+    "update": "更新 Widget",
+    "updating": "正在更新 Widget..."
+  },
+  "execution_info": {
+    "executed_at": "執行時間：",
+    "executed_at_label": "執行時間",
+    "executed_in": "執行耗時：",
+    "duration": "{{duration}} 毫秒",
+    "effective_time_range": "實際時間範圍：",
+    "from": "從",
+    "to": "至",
+    "from_label": "實際時間範圍起始",
+    "to_label": "實際時間範圍結束",
+    "total_results": "結果總數：",
+    "title": "執行資訊",
+    "no_query_executed": "尚未執行查詢。"
+  },
+  "selected_fields": {
+    "fields": "欄位",
+    "edit_field": "編輯 {{field}} 欄位",
+    "remove_field": "移除 {{field}} 欄位"
+  },
+  "sort_direction": {
+    "ascending": "遞增",
+    "descending": "遞減",
+    "no_sorting": "未選取排序",
+    "select_direction": "點擊以選取方向"
+  },
+  "timerange_info": {
+    "global_override": "全域覆寫：{{timerange}}",
+    "effective_unavailable": "目前無法取得 Widget 的實際時間範圍。",
+    "independent": "此 Widget 的結果與目前的搜尋無關。",
+    "all_time": "所有時間"
+  },
+  "unknown_widget": {
+    "title": "未知的 Widget：{{type}}",
+    "cannot_render": "很抱歉，無法轉譯此 Widget，因為我們不知道如何處理類型為 <strong>{{type}}</strong> 的 Widget。可能是由以下情況造成：",
+    "missing_plugin": "您建立此 Widget 所使用的外掛已不存在。",
+    "legacy_dashboard": "此 Widget 屬於舊版 Dashboard，由已不再提供的外掛建立。",
+    "what_to_do": "您可以怎麼做？您可以重新載入外掛、聯絡原外掛作者以取得與目前版本 {{productName}} 相容的外掛，或在不需要時移除此 Widget。",
+    "copy_config": "無論如何，您都可以將 Widget 的設定複製到剪貼簿："
+  },
+  "widget_actions": {
+    "open_dropdown": "開啟操作下拉選單",
+    "unfocus": "取消聚焦 Widget",
+    "focus": "聚焦此 Widget",
+    "edit": "編輯",
+    "duplicate": "複製",
+    "copy_to_dashboard": "複製到 Dashboard",
+    "move_to_page": "移至頁面",
+    "copying": "正在複製 Widget...",
+    "copy": "複製 Widget",
+    "confirm_remove": "您確定要移除 Widget「{{title}}」嗎？",
+    "compress_width": "縮小寬度",
+    "stretch_width": "拉伸寬度",
+    "replay_search": "重新執行搜尋"
+  },
+  "widget_loading": {
+    "content": "正在載入 Widget 內容"
+  },
+  "widget_errors": {
+    "render_error": "轉譯此 Widget 時發生以下錯誤："
+  },
+  "widget_header": {
+    "no_description": "未提供 Widget 說明",
+    "show_description": "顯示 Widget 說明",
+    "description_placeholder": "請為 Widget 新增有用的說明",
+    "drag_handle": "{{title}} 的拖曳把手"
+  },
+  "warm_tier": {
+    "info": "資訊",
+    "loading_slow": "此 Widget 正從 Warm Tier 擷取資料，載入可能需要較長時間。"
+  },
+  "events_widget": {
+    "actions": "操作",
+    "replay_search": "重新執行搜尋",
+    "view_details": "檢視事件詳細資料",
+    "toggle_actions": "切換事件操作",
+    "details_title": "事件詳細資料",
+    "close": "關閉",
+    "unknown_visualization": "未知的 Widget 視覺化類型 {{mode}}",
+    "mode_list": "清單",
+    "mode_count": "計數",
+    "visualization": "視覺化",
+    "columns": "欄位",
+    "select_column": "選取新欄位",
+    "filter": "篩選",
+    "sorting": "排序",
+    "unknown_attribute": "未知",
+    "unknown_attribute_help": "此屬性目前無法使用，因為需要有效的授權。",
+    "select_event_definition": "選取 Event Definition",
+    "alert": "警示",
+    "event": "事件"
+  },
+  "overview_configuration": {
+    "remove_column": "移除 {{column}} 欄位",
+    "column": "欄位",
+    "select_column": "選取欄位",
+    "direction": "方向",
+    "select_direction": "選取方向",
+    "type": "類型",
+    "add_column": "新增欄位",
+    "configure_filter": "設定新篩選器",
+    "edit_filter": "編輯 {{column}} 篩選器",
+    "delete_filter": "刪除 {{column}} 篩選器"
+  },
+  "date_filter": {
+    "single_date": "單一日期",
+    "range": "範圍",
+    "select_single_date": "選取單一日期類型",
+    "select_range": "選取範圍類型",
+    "date_range": "{{from}} 至 {{to}}"
+  },
+  "message_table": {
+    "actions": "操作",
+    "loading": "載入中",
+    "decorated": "（已套用裝飾器）",
+    "stopped_node": "已停止的節點",
+    "cluster_node": "叢集節點 {{nodeId}} / {{hostname}}",
+    "decorators": {
+      "create_new": "建立新的 {{name}}",
+      "select_decorator": "選取裝飾器",
+      "none_configured": "尚未設定任何裝飾器。",
+      "actions": "操作",
+      "edit": "編輯",
+      "edit_named": "編輯 {{name}}",
+      "unknown_type": "未知的裝飾器類型",
+      "create": "建立",
+      "update": "更新",
+      "help_title": "什麼是訊息裝飾器？",
+      "help_description": "裝飾器可即時修改搜尋結果中顯示的訊息。這些變更不會被儲存，僅會顯示在搜尋結果中。裝飾器設定會<strong>依 Stream</strong>儲存。",
+      "help_order": "拖放即可調整裝飾器的處理順序。",
+      "help_docs": "在<docsLink>說明文件</docsLink>中閱讀更多關於訊息裝飾器的資訊。"
+    },
+    "show_message_in_new_row": "在新列中顯示訊息"
+  },
+  "data_table": {
+    "spacer": "間隔",
+    "display_name": "資料表格",
+    "pinned_columns_title": "固定欄位",
+    "show_row_numbers_title": "顯示列號"
+  },
+  "field_types": {
+    "missing_event_definition": "缺少 Event Definition：{{id}}"
+  },
+  "export": {
+    "title_search": "匯出所有搜尋結果",
+    "title_dashboard": "匯出訊息表格搜尋結果",
+    "select_different_table": "選取其他訊息表格",
+    "downloading": "下載中...",
+    "start_download": "開始下載",
+    "settings_based_on": "以下設定基於訊息表格：{{title}}",
+    "exporting_table": "您目前正在匯出訊息表格的搜尋結果：{{title}}",
+    "define_fields": "定義要匯出至檔案的欄位。",
+    "decorated_fields_hint": "匯出功能支援由訊息表格中的裝飾器建立的欄位，但這些欄位目前不會出現在欄位清單中。若要匯出已套用裝飾器的欄位，只需輸入其名稱即可。",
+    "finish_hint": "完成設定後，請點擊<quote>開始下載</quote>。",
+    "fields_to_export": "要匯出的欄位",
+    "messages_limit": "訊息數量上限",
+    "limit_help": "訊息會分批載入。若設定了上限，則會擷取所有批次，直到達到上限的那一批為止。因此，實際傳送的訊息總數可能會超過設定的上限。",
+    "search_contains_all": "匯出內容將包含目前搜尋的所有訊息。",
+    "search_select_table": "請選取訊息表格以沿用其欄位。您可以在下一步調整所有設定。",
+    "dashboard_select_table": "請選取要匯出搜尋結果的訊息表格。您可以在下一步調整其欄位。",
+    "dashboard_equals_action": "選取訊息表格等同於使用訊息表格操作選單中的「匯出為 CSV」選項。",
+    "select_message_table": "選取訊息表格",
+    "no_message_table": "您需要建立訊息表格 Widget 才能匯出其結果。",
+    "output_format": "輸出格式",
+    "untitled_view": "未命名的{{type}}"
+  },
+  "enterprise_widgets": {
+    "message_list": "訊息清單",
+    "results": "結果",
+    "events": "事件",
+    "text_markdown": "文字/Markdown"
+  },
+  "comma_separated_values_csv": "逗號分隔值 (CSV)",
+  "error_widget": {
+    "title": "擷取此 Widget 的資料時發生以下錯誤："
+  },
+  "notifications": {
+    "delete_decorator_confirm": "您確定要刪除此裝飾器嗎？",
+    "unsaved_changes_confirm": "設定表單中有未儲存的變更。此操作將會捨棄這些變更。"
+  }
+}

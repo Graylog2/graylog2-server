@@ -1,0 +1,249 @@
+{
+  "apply_parameter": {
+    "action": "操作",
+    "apply": "適用",
+    "choose": "選択...",
+    "choose_config_key": "設定キーを選択",
+    "clear": "クリア",
+    "config_key": "設定キー",
+    "create_parameter_first": "先にパラメーターを作成してください",
+    "no_parameter_of_type": "タイプ {{type}} のパラメーターはありません",
+    "parameter": "パラメーター"
+  },
+  "constraints": {
+    "fulfilled": "充足",
+    "name": "名前",
+    "title": "制約",
+    "type": "タイプ",
+    "version": "バージョン"
+  },
+  "details": {
+    "description": "説明",
+    "entities": "項目:",
+    "id": "ID:",
+    "name": "名前:",
+    "parameters": "パラメーター:",
+    "summary": "概要:",
+    "title": "詳細",
+    "url": "URL:",
+    "vendor": "ベンダー:",
+    "version": "バージョン:"
+  },
+  "download": {
+    "download": "ダウンロード",
+    "info": "下のダウンロードリンクを右クリックし、「名前を付けてリンク先を保存...」を選択して JSON ファイルをダウンロードしてください。",
+    "title": "コンテンツパックをダウンロード"
+  },
+  "edit": {
+    "steps": {
+      "parameters": "パラメーター",
+      "preview": "プレビュー",
+      "selection": "コンテンツの選択"
+    }
+  },
+  "edit_parameter": {
+    "create_title": "パラメーターを作成",
+    "default_value": "デフォルト値",
+    "default_value_help": "パラメーターが任意でない場合は、デフォルト値を指定してください。",
+    "description": "説明",
+    "description_help": "このパラメーターをどのように使用するかを説明してください。",
+    "description_required": "説明を入力してください。",
+    "edit_title": "パラメーターを編集",
+    "name": "名前",
+    "name_help": "パラメーターの参照に使用されます。スペースを含めることはできません。",
+    "name_invalid": "パラメーター名には A-Z、a-z、0-9、_ のみ使用できます",
+    "name_not_unique": "パラメーター名は一意である必要があります。",
+    "name_required": "名前を入力してください。",
+    "not_boolean": "真偽値ではありません。true または false を指定してください。",
+    "not_double": "倍精度浮動小数点数ではありません。",
+    "not_integer": "整数ではありません。",
+    "title": "タイトル",
+    "title_help": "このコンテンツパックをわかりやすく示すタイトルを入力してください。",
+    "title_required": "タイトルを入力してください。",
+    "value_type": "値のタイプ",
+    "value_type_help": "パラメーターのタイプを指定してください。"
+  },
+  "entities": {
+    "action": "操作",
+    "config_title": "項目の設定",
+    "description": "説明",
+    "edit_title": "編集",
+    "list_title": "項目一覧",
+    "origin": "取得元",
+    "origin_content_pack": "コンテンツパック",
+    "origin_server": "サーバー",
+    "show": "表示",
+    "title": "タイトル",
+    "type": "タイプ",
+    "used_parameters": "使用中のパラメーター"
+  },
+  "entity_config": {
+    "config_key": "設定キー",
+    "parameter_type": "パラメーター ({{type}})",
+    "type": "タイプ",
+    "value": "値"
+  },
+  "entity_index": {
+    "load_failed": "項目インデックスの読み込みに失敗しました。ステータス:",
+    "load_failed_title": "項目インデックスを読み込めませんでした"
+  },
+  "import": {
+    "error_message": "コンテンツパックのインポートに失敗しました。有効な JSON ファイルであることを確認してください。詳細は {{productName}} サーバーのログを確認してください。",
+    "error_title": "コンテンツパックをインポートできませんでした",
+    "success_message": "コンテンツパックをインポートしました",
+    "success_named": "コンテンツパック「{{name}}」をインポートしました",
+    "success_title": "完了しました"
+  },
+  "install": {
+    "comment": "インストールコメント",
+    "comment_help": "このコメントはコンテンツパックのインストールとともに保存され、インストールの理由を説明するために使用できます。",
+    "configure_parameters": "パラメーターを設定:",
+    "needs_to_be_filled": "入力が必要です。",
+    "share_description": "このコンテンツパックの項目の共同編集者として追加するユーザーまたはチームを検索してください。"
+  },
+  "install_entities": {
+    "installed": "インストール済みの項目",
+    "title": "タイトル",
+    "to_be_uninstalled": "アンインストールされる項目",
+    "type": "タイプ"
+  },
+  "install_view": {
+    "comment": "コメント:",
+    "general_information": "一般情報",
+    "installed_at": "インストール日時:",
+    "installed_by": "インストールしたユーザー:"
+  },
+  "installations": {
+    "action": "操作",
+    "comment": "コメント",
+    "uninstall": "アンインストール",
+    "version": "バージョン",
+    "view": "表示",
+    "view_title": "インストールを表示"
+  },
+  "list": {
+    "no_match": "一致するコンテンツパックが見つかりませんでした",
+    "none_found": "コンテンツパックが見つかりません。作成するか、アップロードしてください"
+  },
+  "list_item": {
+    "create_new_version": "新しいバージョンを作成",
+    "delete_all_versions": "すべてのバージョンを削除",
+    "install": "インストール",
+    "install_title": "コンテンツパックをインストール",
+    "latest_version": "最新バージョン: {{rev}}",
+    "show": "表示",
+    "update": "更新"
+  },
+  "notifications": {
+    "error": "エラー",
+    "success": "成功"
+  },
+  "overview": {
+    "button_text": "コンテンツパック",
+    "delete_confirmation": "このコンテンツパックを削除します。よろしいですか？",
+    "delete_error_message": "バンドルの削除に失敗しました: {{error}}",
+    "delete_success": "コンテンツパックを削除しました。",
+    "description": "コンテンツパックを使用すると、特定のデータソースのセットアップを効率化できます。コンテンツパックには Input/Extractor、ストリーム、ダッシュボードを含めることができます。",
+    "install_error_message": "コンテンツパックのインストールに失敗しました。ステータス: {{status}}。ID {{id}} のコンテンツパックをインストールできませんでした",
+    "install_success": "コンテンツパックをインストールしました。",
+    "title": "コンテンツパック",
+    "marketplace_prefix": "その他のコンテンツパックは次で探せます:"
+  },
+  "pages": {
+    "back_button": "コンテンツパック",
+    "create_title": "コンテンツパックを作成",
+    "description": "コンテンツパックを使用すると、特定のデータソースのセットアップを効率化できます。コンテンツパックには Input/Extractor、ストリーム、ダッシュボードを含めることができます。",
+    "document_title": "コンテンツパック",
+    "edit_title": "コンテンツパックを編集",
+    "marketplace_prefix": "その他のコンテンツパックは次で探せます:"
+  },
+  "parameter_list": {
+    "action": "操作",
+    "default_value": "デフォルト値",
+    "delete_parameter": "パラメーターを削除",
+    "description": "説明",
+    "edit_modal": "編集ダイアログ",
+    "list_title": "パラメーター一覧",
+    "modal_title": "パラメーター",
+    "name": "名前",
+    "no_data": "コンテンツパックでパラメーターを使用するには、まずパラメーターを作成し、項目に適用する必要があります。",
+    "still_in_use": "使用中",
+    "title": "タイトル",
+    "used": "使用中",
+    "value_type": "値のタイプ"
+  },
+  "parameters": {
+    "confirm_deletion": "削除の確認",
+    "delete_confirmation": "このパラメーター {{title}} を削除してもよろしいですか？"
+  },
+  "preview": {
+    "create": "作成",
+    "create_and_download": "作成してダウンロード"
+  },
+  "revisions": {
+    "fetch_error": "コンテンツパックのリビジョンの取得中にエラーが発生しました: {{error}}",
+    "fetch_error_title": "コンテンツパックを取得できません"
+  },
+  "selection": {
+    "description": "説明",
+    "description_help": "コンテンツパックの詳しい説明を Markdown で入力してください。",
+    "general_information": "一般情報",
+    "must_be_filled": "入力してください。",
+    "name": "名前",
+    "name_help": "必須です。このコンテンツパックをわかりやすく示す名前を入力してください。",
+    "no_pairs_hint": "このバージョンのコンテンツパックの項目はインストールされたことがないため、選択できるインストール済みの項目がありません。",
+    "select_entity": "少なくとも 1 つの項目を選択してください。",
+    "select_latest": "最新のインストール済みバージョンを選択",
+    "select_older": "古いコンテンツパックのバージョンを選択",
+    "summary": "概要",
+    "summary_help": "必須です。コンテンツパックの簡単な概要を入力してください。",
+    "title": "コンテンツパックの選択",
+    "url": "URL",
+    "url_help": "コンテンツパックの場所を入力してください。例: GitHub の URL",
+    "url_invalid": "無効な URL です",
+    "url_protocol": "http または https で始まる URL を使用してください。",
+    "vendor": "ベンダー",
+    "vendor_help": "必須です。このコンテンツパックの作成者と連絡先を入力してください。例: 名前とメールアドレス",
+    "version_help": "各項目について、最新のインストール済みバージョン（<latestIcon />）または古いコンテンツパックのバージョン（<olderIcon />）を選択できます。"
+  },
+  "show": {
+    "delete_revision_confirmation": "このコンテンツパックのリビジョンを削除しようとしています。よろしいですか？",
+    "delete_revision_error": "コンテンツパックの削除に失敗しました: {{error}}",
+    "delete_revision_success": "コンテンツパックのリビジョンを削除しました。",
+    "install_error": "コンテンツパックのインストールに失敗しました。ステータス: {{status}}。ID {{id}} のコンテンツパックをインストールできませんでした",
+    "installations": "インストール",
+    "not_found": "ID {{id}} のコンテンツパックが見つかりません。削除された可能性があります。",
+    "server_error": "内部サーバーエラーが発生しました。詳細はログファイルを確認してください",
+    "uninstall_confirmation": "このコンテンツパックを本当にアンインストールしますか？",
+    "uninstall_error": "コンテンツパックのアンインストールに失敗しました。詳細はログを確認してください。",
+    "uninstall_success": "コンテンツパックをアンインストールしました。",
+    "versions": "バージョン"
+  },
+  "status": {
+    "edited": "編集済み",
+    "error": "エラー",
+    "installed": "インストール済み",
+    "updatable": "更新可能"
+  },
+  "upload": {
+    "button": "アップロード",
+    "choose_file": "ファイルを選択",
+    "choose_file_help": "ディスクからコンテンツパックを選択",
+    "title": "コンテンツパックをアップロード"
+  },
+  "value_types": {
+    "boolean": "真偽値",
+    "double": "倍精度浮動小数点数",
+    "integer": "整数",
+    "string": "文字列"
+  },
+  "version_item": {
+    "actions": "操作",
+    "create_from_revision": "リビジョンから新規作成"
+  },
+  "versions": {
+    "action": "操作",
+    "revision": "リビジョン",
+    "select": "選択"
+  }
+}

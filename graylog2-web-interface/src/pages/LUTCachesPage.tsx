@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
@@ -24,15 +25,16 @@ import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
 
 function LUTCachesPage() {
   const { push } = useHistory();
+  const { t } = useTranslation('lookup_tables');
 
   return (
     <LUTPageLayout
-      documentTitle="Lookup Tables - Caches"
-      pageTitle="Caches for Lookup Tables"
-      pageDescription="Caches provide the actual values for lookup tables."
+      documentTitle={t('cache_document_title')}
+      pageTitle={t('cache_page_title')}
+      pageDescription={t('cache_create_description')}
       actions={
         <Button bsStyle="primary" onClick={() => push(Routes.SYSTEM.LOOKUPTABLES.CACHES.CREATE)}>
-          Create cache
+          {t('cache_create_button')}
         </Button>
       }>
       <CachesOverview />

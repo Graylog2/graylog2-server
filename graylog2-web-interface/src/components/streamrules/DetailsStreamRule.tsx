@@ -16,6 +16,7 @@
  */
 
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import UserNotification from 'util/UserNotification';
@@ -49,6 +50,7 @@ type Props = {
 };
 
 const DetailsStreamRule = ({ stream, streamRule, onSubmit = () => {}, onDelete = () => {} }: Props) => {
+  const { t } = useTranslation('streams');
   const { isPermitted } = usePermissions();
   const [showStreamRuleForm, setShowStreamRuleForm] = useState(false);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
@@ -59,14 +61,14 @@ const DetailsStreamRule = ({ stream, streamRule, onSubmit = () => {}, onDelete =
     removeStreamRule({ streamId: stream.id, streamRuleId: streamRule.id }).then(() => {
       onDelete(streamRule.id);
       setShowConfirmDelete(false);
-      UserNotification.success('Stream rule has been successfully deleted.', 'Success');
+      UserNotification.success(t('stream_rules.deleted'), t('stream_rules.success_title'));
     });
   };
 
   const _onSubmit = (streamRuleId: string, data: StreamRule) =>
     updateStreamRule({ streamId: stream.id, streamRuleId, data }).then(() => {
       onSubmit(streamRuleId, data);
-      UserNotification.success('Stream rule has been successfully updated.', 'Success');
+      UserNotification.success(t('stream_rules.updated'), t('stream_rules.success_title'));
     });
 
   const _formatActionItems = () => (
@@ -75,10 +77,14 @@ const DetailsStreamRule = ({ stream, streamRule, onSubmit = () => {}, onDelete =
         bsStyle="default"
         bsSize="xsmall"
         onClick={() => setShowStreamRuleForm(true)}
-        title="Edit stream rule">
+        title={t('stream_rules.edit_tooltip')}>
         <Icon name="edit_square" type="regular" />
       </StyledDeleteButton>
-      <Button bsStyle="danger" bsSize="xsmall" onClick={() => setShowConfirmDelete(true)} title="Delete stream rule">
+      <Button
+        bsStyle="danger"
+        bsSize="xsmall"
+        onClick={() => setShowConfirmDelete(true)}
+        title={t('stream_rules.delete_tooltip')}>
         <Icon name="delete" type="regular" />
       </Button>
     </ActionButtonsWrap>
@@ -99,9 +105,9 @@ const DetailsStreamRule = ({ stream, streamRule, onSubmit = () => {}, onDelete =
         <StreamRuleModal
           initialValues={streamRule}
           onClose={() => setShowStreamRuleForm(false)}
-          title="Edit Stream Rule"
-          submitButtonText="Update Rule"
-          submitLoadingText="Updating Rule..."
+          title={t('stream_rules.edit_title')}
+          submitButtonText={t('stream_rules.update_button')}
+          submitLoadingText={t('stream_rules.updating')}
           onSubmit={_onSubmit}
         />
       )}
@@ -110,9 +116,9 @@ const DetailsStreamRule = ({ stream, streamRule, onSubmit = () => {}, onDelete =
           show={showConfirmDelete}
           onConfirm={onConfirmDelete}
           onCancel={() => setShowConfirmDelete(false)}
-          title="Delete stream rule."
-          btnConfirmText="Ok">
-          Do you really want to delete this stream rule?
+          title={t('stream_rules.delete_title')}
+          btnConfirmText={t('stream_rules.delete_ok')}>
+          {t('stream_rules.delete_confirm')}
         </ConfirmDialog>
       )}
     </tr>

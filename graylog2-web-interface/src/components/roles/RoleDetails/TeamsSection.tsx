@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import type Role from 'logic/roles/Role';
@@ -26,12 +27,13 @@ type Props = {
 };
 
 const TeamsSection = ({ role }: Props) => {
+  const { t } = useTranslation('users');
   const teamsPlugin = PluginStore.exports('teams');
 
   const RoleTeamsAssignment = teamsPlugin?.[0]?.RoleTeamsAssignment;
 
   return (
-    <SectionComponent title="Teams">
+    <SectionComponent title={t('roles.teams')}>
       {RoleTeamsAssignment ? (
         <RoleTeamsAssignment role={role} readOnly />
       ) : (

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { Field, useField } from 'formik';
 import { useQuery } from '@tanstack/react-query';
@@ -73,6 +74,7 @@ const useKeywordPreview = (keyword: string, userTZ: string) => {
 };
 
 const KeywordTimeRangePreview = () => {
+  const { t } = useTranslation('search');
   const [
     {
       value: { keyword },
@@ -85,13 +87,13 @@ const KeywordTimeRangePreview = () => {
     <EffectiveTimeRangeTable>
       <tbody>
         <tr>
-          <td>From</td>
+          <td>{t('time_range.keyword_from')}</td>
           <td>
             <TimePreview dateTime={data?.from} isLoading={isFetching} />
           </td>
         </tr>
         <tr>
-          <td>To</td>
+          <td>{t('time_range.keyword_to')}</td>
           <td>
             <TimePreview dateTime={data?.to} isLoading={isFetching} />
           </td>
@@ -105,70 +107,78 @@ type Props = {
   disabled?: boolean;
 };
 
-const TabKeywordTimeRange = ({ disabled = false }: Props) => (
-  <Row className="no-bm">
-    <Col sm={5}>
-      <Headline>Time range:</Headline>
-      <Field name="timeRangeTabs.keyword.keyword">
-        {({ field: { name, value, onChange }, meta: { error } }) => (
-          <FormGroup
-            controlId="form-inline-keyword"
-            style={{ marginRight: 5, width: '100%', marginBottom: 0 }}
-            validationState={error ? 'error' : null}>
-            <KeywordInput
-              type="text"
-              className="input-sm mousetrap"
-              name={name}
-              disabled={disabled}
-              placeholder="Last week"
-              title="Keyword input"
-              aria-label="Keyword input"
-              onChange={onChange}
-              required
-              value={value}
-            />
-            <InputDescription error={error} help="Specify the time frame for the search in natural language." />
-          </FormGroup>
-        )}
-      </Field>
+// Keywords are parsed by the server, which only understands English. They must not be translated.
+const KEYWORD_PLACEHOLDER = 'Last week';
+const KEYWORD_EXAMPLES = [
+  { keyword: 'last month', description: 'time_range.keyword_example_last_month' },
+  { keyword: '4 hours ago', description: 'time_range.keyword_example_hours_ago' },
+  { keyword: '1st of april to 2 days ago', description: 'time_range.keyword_example_range' },
+  { keyword: 'yesterday midnight +0200 to today midnight +0200', description: 'time_range.keyword_example_timezone' },
+] as const;
 
-      <b>Preview</b>
-      <KeywordTimeRangePreview />
-    </Col>
+const KeywordDocumentationLink = ({ children = undefined }: React.PropsWithChildren) => {
+  const { t } = useTranslation('search');
 
-    <Col sm={7}>
-      <Panel>
-        <Panel.Body>
-          <p>
-            <code>last month</code> searches between one month ago and now
-          </p>
+  return (
+    <DocumentationLink
+      page={DocsHelper.PAGES.TIME_FRAME_SELECTOR}
+      title={t('time_range.keyword_docs_title')}
+      text={children}
+    />
+  );
+};
 
-          <p>
-            <code>4 hours ago</code> searches between four hours ago and now
-          </p>
+const TabKeywordTimeRange = ({ disabled = false }: Props) => {
+  const { t } = useTranslation('search');
 
-          <p>
-            <code>1st of april to 2 days ago</code> searches between 1st of April and 2 days ago
-          </p>
+  return (
+    <Row className="no-bm">
+      <Col sm={5}>
+        <Headline>{t('time_range.keyword_headline')}</Headline>
+        <Field name="timeRangeTabs.keyword.keyword">
+          {({ field: { name, value, onChange }, meta: { error } }) => (
+            <FormGroup
+              controlId="form-inline-keyword"
+              style={{ marginRight: 5, width: '100%', marginBottom: 0 }}
+              validationState={error ? 'error' : null}>
+              <KeywordInput
+                type="text"
+                className="input-sm mousetrap"
+                name={name}
+                disabled={disabled}
+                placeholder={KEYWORD_PLACEHOLDER}
+                title={t('time_range.keyword_input')}
+                aria-label={t('time_range.keyword_input')}
+                onChange={onChange}
+                required
+                value={value}
+              />
+              <InputDescription error={error} help={t('time_range.keyword_help')} />
+            </FormGroup>
+          )}
+        </Field>
 
-          <p>
-            <code>yesterday midnight +0200 to today midnight +0200</code> searches between yesterday midnight and today
-            midnight in timezone +0200 - will be 22:00 in UTC
-          </p>
+        <b>{t('time_range.keyword_preview')}</b>
+        <KeywordTimeRangePreview />
+      </Col>
 
-          <p>
-            Please consult the{' '}
-            <DocumentationLink
-              page={DocsHelper.PAGES.TIME_FRAME_SELECTOR}
-              title="Keyword Time Range Documentation"
-              text="documentation"
-            />{' '}
-            for more details.
-          </p>
-        </Panel.Body>
-      </Panel>
-    </Col>
-  </Row>
-);
+      <Col sm={7}>
+        <Panel>
+          <Panel.Body>
+            {KEYWORD_EXAMPLES.map(({ keyword, description }) => (
+              <p key={keyword}>
+                <Trans t={t} i18nKey={description} values={{ keyword }} components={{ code: <code /> }} />
+              </p>
+            ))}
+
+            <p>
+              <Trans t={t} i18nKey="time_range.keyword_docs" components={{ docsLink: <KeywordDocumentationLink /> }} />
+            </p>
+          </Panel.Body>
+        </Panel>
+      </Col>
+    </Row>
+  );
+};
 
 export default TabKeywordTimeRange;

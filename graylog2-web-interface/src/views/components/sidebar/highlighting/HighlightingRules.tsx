@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useContext, useState, forwardRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { DEFAULT_HIGHLIGHT_COLOR } from 'views/Constants';
 import HighlightingRulesContext from 'views/components/contexts/HighlightingRulesContext';
@@ -85,6 +86,7 @@ const HighlightingRules = ({
   onDeleteRule,
   showSearchHighlightInfo = true,
 }: Props) => {
+  const { t } = useTranslation('search');
   const [showForm, setShowForm] = useState(false);
   const rules = useContext(HighlightingRulesContext) ?? [];
   const rulesWithId = rules.map((rule) => ({
@@ -118,12 +120,12 @@ const HighlightingRules = ({
     <>
       <SectionInfo>{description}</SectionInfo>
       <SectionSubheadline>
-        Active highlights{' '}
+        {t('sidebar_highlighting.active_highlights')}{' '}
         <IconButton
           className="pull-right"
           name="add"
           onClick={() => setShowForm(!showForm)}
-          title="Add highlighting rule"
+          title={t('sidebar_highlighting.add_rule_title')}
         />
       </SectionSubheadline>
       {showForm && <HighlightForm onClose={() => setShowForm(false)} onSubmit={onCreateRule} />}
@@ -131,7 +133,7 @@ const HighlightingRules = ({
       {showSearchHighlightInfo && (
         <Container $displayBorder={!!rulesWithId?.length}>
           <ColorPreview color={DEFAULT_HIGHLIGHT_COLOR} />
-          <RuleContainer>Search terms</RuleContainer>
+          <RuleContainer>{t('sidebar_highlighting.search_terms')}</RuleContainer>
         </Container>
       )}
       <SortableList items={rulesWithId} onMoveItem={updateRules} customListItemRender={listItemRender} />

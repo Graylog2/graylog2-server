@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ExpandableListItem } from 'components/common';
 import { Checkbox } from 'components/bootstrap';
@@ -24,24 +25,28 @@ import { Checkbox } from 'components/bootstrap';
  * This component is useful, when you want to render the `ExpandableListItem` with a checkbox in the header.
  * If the children of this component are also selectable but not expandable, use simple checkboxes instead of an implementing another expandable list.
  */
-const Header = ({ checked, readOnly, onChange, children, indeterminate }) => (
-  // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
-  <span onClick={(e) => e.stopPropagation()}>
-    <Checkbox
-      indeterminate={indeterminate}
-      title="Select item"
-      checked={checked}
-      readOnly={readOnly}
-      onClick={(e) => e.stopPropagation()}
-      onChange={(e) => {
-        e.stopPropagation();
-        onChange(e);
-      }}
-      inline>
-      {children}
-    </Checkbox>
-  </span>
-);
+const Header = ({ checked, readOnly, onChange, children, indeterminate }) => {
+  const { t } = useTranslation('common');
+
+  return (
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
+    <span onClick={(e) => e.stopPropagation()}>
+      <Checkbox
+        indeterminate={indeterminate}
+        title={t('expandable_checkbox_list_item.select_item')}
+        checked={checked}
+        readOnly={readOnly}
+        onClick={(e) => e.stopPropagation()}
+        onChange={(e) => {
+          e.stopPropagation();
+          onChange(e);
+        }}
+        inline>
+        {children}
+      </Checkbox>
+    </span>
+  );
+};
 type Props = React.PropsWithChildren<{
   checked: boolean;
   expandable?: boolean;

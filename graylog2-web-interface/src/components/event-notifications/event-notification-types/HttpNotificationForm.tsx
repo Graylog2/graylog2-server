@@ -20,6 +20,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
 import styled from 'styled-components';
 
+import i18n from 'i18n';
 import { URLAllowListInput } from 'components/common';
 import { Button, Checkbox, Col, ControlLabel, Input, Row } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
@@ -32,6 +33,9 @@ const StyledButton = styled(Button)`
 `;
 
 type Props = React.ComponentProps<EventNotificationTypes['formComponent']>;
+
+// The form is a class component, so texts are translated at render time.
+const t = (key: string) => i18n.t(key, { ns: 'event_notifications' });
 
 class HttpNotificationForm extends React.Component<
   Props,
@@ -130,10 +134,10 @@ class HttpNotificationForm extends React.Component<
     return (
       <>
         <URLAllowListInput
-          label="URL"
+          label={t('http.url')}
           onChange={this.handleChange}
           validationState={validation.errors.url ? 'error' : null}
-          validationMessage={get(validation, 'errors.url[0]', 'The URL to POST to when an Event occurs.')}
+          validationMessage={get(validation, 'errors.url[0]', t('http.url_help'))}
           onValidationChange={this.onValidationChange}
           url={config.url}
           autofocus={false}
@@ -143,20 +147,20 @@ class HttpNotificationForm extends React.Component<
           name="skip_tls_verification"
           onChange={this.handleChange}
           checked={config.skip_tls_verification}>
-          Skip TLS verification
+          {t('http.skip_tls_verification')}
         </Checkbox>
         <Row>
           <Col md={12}>
             {basic_auth?.keep_value ? (
               <>
-                <ControlLabel>Basic authentication</ControlLabel>
+                <ControlLabel>{t('http.basic_auth')}</ControlLabel>
                 <StyledButton
                   bsStyle="default"
                   type="button"
                   onClick={() => {
                     this.resetSecret('basic_auth');
                   }}>
-                  Reset Secret
+                  {t('http.reset_secret')}
                 </StyledButton>
               </>
             ) : (
@@ -164,14 +168,14 @@ class HttpNotificationForm extends React.Component<
                 id="basicAuth"
                 label={
                   <span>
-                    Basic authentication <small className="text-muted">(Optional)</small>
+                    {t('http.basic_auth')} <small className="text-muted">{t('form.optional')}</small>
                   </span>
                 }
                 name="basic_auth"
                 type="password"
                 onChange={this.handleSecretInputChange}
                 value={this.state.basic_auth || ''}
-                help="The Basic authentication string needs to follow this format: '<username>:<password>'."
+                help={t('http.basic_auth_help')}
                 buttonAfter={
                   reset.basic_auth ? (
                     <Button
@@ -179,7 +183,7 @@ class HttpNotificationForm extends React.Component<
                       onClick={() => {
                         this.undoResetSecret('basic_auth');
                       }}>
-                      Undo Reset
+                      {t('http.undo_reset')}
                     </Button>
                   ) : undefined
                 }
@@ -194,13 +198,13 @@ class HttpNotificationForm extends React.Component<
               name="api_key"
               label={
                 <span>
-                  API Key <small className="text-muted">(Optional)</small>
+                  {t('http.api_key')} <small className="text-muted">{t('form.optional')}</small>
                 </span>
               }
               type="text"
               onChange={this.handleChange}
               bsStyle={validation.errors.api_key ? 'error' : null}
-              help={get(validation, 'errors.api_key[0]', 'If an API secret is set, an API key must also be set.')}
+              help={get(validation, 'errors.api_key[0]', t('http.api_key_help'))}
               value={config.api_key}
             />
           </Col>
@@ -209,14 +213,14 @@ class HttpNotificationForm extends React.Component<
           <Col md={12}>
             {api_secret?.keep_value ? (
               <>
-                <ControlLabel>API Secret</ControlLabel>
+                <ControlLabel>{t('http.api_secret')}</ControlLabel>
                 <StyledButton
                   bsStyle="default"
                   type="button"
                   onClick={() => {
                     this.resetSecret('api_secret');
                   }}>
-                  Reset Secret
+                  {t('http.reset_secret')}
                 </StyledButton>
               </>
             ) : (
@@ -224,14 +228,14 @@ class HttpNotificationForm extends React.Component<
                 id="apiSecret"
                 label={
                   <span>
-                    API Secret <small className="text-muted">(Optional)</small>
+                    {t('http.api_secret')} <small className="text-muted">{t('form.optional')}</small>
                   </span>
                 }
                 name="api_secret"
                 type="password"
                 onChange={this.handleSecretInputChange}
                 bsStyle={validation.errors.api_secret ? 'error' : null}
-                help={get(validation, 'errors.api_secret[0]', 'If an API key is set, an API secret must also be set.')}
+                help={get(validation, 'errors.api_secret[0]', t('http.api_secret_help'))}
                 value={this.state.api_secret || ''}
                 buttonAfter={
                   reset.api_secret ? (
@@ -240,7 +244,7 @@ class HttpNotificationForm extends React.Component<
                       onClick={() => {
                         this.undoResetSecret('api_secret');
                       }}>
-                      Undo Reset
+                      {t('http.undo_reset')}
                     </Button>
                   ) : undefined
                 }
@@ -251,7 +255,7 @@ class HttpNotificationForm extends React.Component<
               name="api_key_as_header"
               onChange={this.handleChange}
               checked={config.api_key_as_header}>
-              Send API Key/Secret as Header
+              {t('http.api_key_as_header')}
             </Checkbox>
           </Col>
         </Row>

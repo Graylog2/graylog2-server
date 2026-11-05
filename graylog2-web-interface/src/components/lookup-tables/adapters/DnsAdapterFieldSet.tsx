@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import ObjectUtils from 'util/ObjectUtils';
 import { Input } from 'components/bootstrap';
@@ -34,7 +36,7 @@ type DnsAdapterFieldSetProps = {
   handleFormEvent: (...args: any[]) => void;
   validationMessage: (...args: any[]) => string;
   validationState: (...args: any[]) => ValidationState;
-};
+} & WithTranslation;
 
 class DnsAdapterFieldSet extends React.Component<
   DnsAdapterFieldSetProps,
@@ -72,27 +74,27 @@ class DnsAdapterFieldSet extends React.Component<
   };
 
   render() {
-    const { config, handleFormEvent, validationMessage, validationState } = this.props;
+    const { config, handleFormEvent, validationMessage, validationState, t } = this.props;
     const lookupTypes = [
-      { label: 'Resolve hostname to IPv4 address (A)', value: 'A' },
-      { label: 'Resolve hostname to IPv6 address (AAAA)', value: 'AAAA' },
-      { label: 'Resolve hostname to IPv4 and IPv6 addresses (A and AAAA)', value: 'A_AAAA' },
-      { label: 'Reverse lookup (PTR)', value: 'PTR' },
-      { label: 'Text lookup (TXT)', value: 'TXT' },
+      { label: t('dns_adapter.lookup_type_a'), value: 'A' },
+      { label: t('dns_adapter.lookup_type_aaaa'), value: 'AAAA' },
+      { label: t('dns_adapter.lookup_type_a_aaaa'), value: 'A_AAAA' },
+      { label: t('dns_adapter.lookup_type_ptr'), value: 'PTR' },
+      { label: t('dns_adapter.lookup_type_txt'), value: 'TXT' },
     ];
 
     return (
       <fieldset>
         <Input
-          label="DNS Lookup Type"
+          label={t('dns_adapter.lookup_type_label')}
           id="lookup-type"
           required
           autoFocus
-          help="Select the type of DNS lookup to perform."
+          help={t('dns_adapter.lookup_type_help')}
           labelClassName="col-sm-3"
           wrapperClassName="col-sm-9">
           <Select
-            placeholder="Select the type of DNS lookup"
+            placeholder={t('dns_adapter.lookup_type_placeholder')}
             clearable={false}
             options={lookupTypes}
             onChange={this._onLookupTypeSelect}
@@ -103,9 +105,9 @@ class DnsAdapterFieldSet extends React.Component<
           type="text"
           id="server_ips"
           name="server_ips"
-          label="DNS Server IP Address"
+          label={t('dns_adapter.server_ips_label')}
           onChange={handleFormEvent}
-          help={validationMessage('server_ips', 'An optional comma-separated list of DNS server IP addresses.')}
+          help={validationMessage('server_ips', t('dns_adapter.server_ips_help'))}
           bsStyle={validationState('server_ips')}
           value={config.server_ips}
           labelClassName="col-sm-3"
@@ -115,18 +117,18 @@ class DnsAdapterFieldSet extends React.Component<
           type="number"
           id="request_timeout"
           name="request_timeout"
-          label="DNS Request Timeout"
+          label={t('dns_adapter.request_timeout_label')}
           required
           onChange={handleFormEvent}
-          help={validationMessage('request_timeout', 'DNS request timeout in milliseconds.')}
+          help={validationMessage('request_timeout', t('dns_adapter.request_timeout_help'))}
           bsStyle={validationState('request_timeout')}
           value={config.request_timeout}
           labelClassName="col-sm-3"
           wrapperClassName="col-sm-9"
         />
         <TimeUnitInput
-          label="Cache TTL Override"
-          help="If enabled, the cache TTL will be overridden with the specified value."
+          label={t('dns_adapter.cache_ttl_override')}
+          help={t('dns_adapter.cache_ttl_override_help')}
           update={this.updateCacheTTLOverride}
           value={config.cache_ttl_override}
           unit={config.cache_ttl_override_unit || 'MINUTES'}
@@ -140,4 +142,4 @@ class DnsAdapterFieldSet extends React.Component<
   }
 }
 
-export default DnsAdapterFieldSet;
+export default withTranslation('lookup_tables')(DnsAdapterFieldSet);

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useHistory from 'routing/useHistory';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -30,6 +31,7 @@ import { IndicesPageNavigation } from 'components/indices';
 import isIndexFieldTypeChangeAllowed from 'components/indices/helpers/isIndexFieldTypeChangeAllowed';
 
 const IndexSetFieldTypesPage = () => {
+  const { t } = useTranslation('indexsets');
   const { indexSetId } = useParams();
   const { push } = useHistory();
   const { data: indexSet, isInitialLoading } = useSingleIndexSet(indexSetId);
@@ -44,19 +46,16 @@ const IndexSetFieldTypesPage = () => {
   const indexFieldTypeChangeAllowed = useMemo(() => isIndexFieldTypeChangeAllowed(indexSet), [indexSet]);
 
   return (
-    <DocumentTitle title={`Index Set - ${indexSet ? indexSet.title : ''}`}>
+    <DocumentTitle title={t('overview.document_title', { title: indexSet ? indexSet.title : '' })}>
       <IndicesPageNavigation />
       <PageHeader
-        title={`Configure ${indexSet ? indexSet.title : 'Index Set'} Field Types`}
+        title={t('pages.field_types_title', { title: indexSet ? indexSet.title : t('pages.index_set_fallback') })}
         documentationLink={{
-          title: 'Index model documentation',
+          title: t('overview.header.documentation_link'),
           path: DocsHelper.PAGES.INDEX_MODEL,
         }}
         actions={indexFieldTypeChangeAllowed && <ChangeFieldTypeButton indexSetId={indexSetId} />}>
-        <span>
-          The data represents field types from 2 last indices and the fields with custom field type. You can modify the
-          current field types configuration for this index set.
-        </span>
+        <span>{t('pages.field_types_description')}</span>
       </PageHeader>
 
       <Row className="content">

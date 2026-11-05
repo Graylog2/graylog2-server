@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 
+import i18n from 'i18n';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
@@ -24,7 +25,7 @@ import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
 import NumberUtils from 'util/NumberUtils';
 import { formatReadableNumber } from 'util/NumberFormatting';
 
-import { INDEX_SET_CATEGORY_TITLES } from './Constants';
+import { getIndexSetCategoryTitle } from './Constants';
 import type { IndexSetCategory, IndexSetEntity } from './types';
 import TitleCell from './cells/TitleCell';
 import FieldTypeProfileCell from './cells/FieldTypeProfileCell';
@@ -53,7 +54,7 @@ const customColumnRenderers = (
       staticWidth: 'matchHeader',
     },
     category: {
-      renderCell: (category: IndexSetCategory) => INDEX_SET_CATEGORY_TITLES[category] ?? category,
+      renderCell: (category: IndexSetCategory) => getIndexSetCategoryTitle(category),
       staticWidth: 'matchHeader',
     },
     stream_count: {
@@ -74,7 +75,7 @@ const customColumnRenderers = (
     },
     field_type_refresh_interval: {
       renderCell: (_interval: unknown, indexSet: IndexSetEntity) => (
-        <>{indexSet.field_type_refresh_interval / 1000.0} seconds</>
+        <>{i18n.t('set_details.seconds', { ns: 'indexsets', count: indexSet.field_type_refresh_interval / 1000.0 })}</>
       ),
       staticWidth: 'matchHeader',
       textAlign: 'right',

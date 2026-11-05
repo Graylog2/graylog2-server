@@ -1,0 +1,210 @@
+{
+  "action_links": {
+    "create": "Crear servicio",
+    "edit_active": "Editar servicio activo",
+    "view_active": "Ver servicio activo"
+  },
+  "active_directory": {
+    "create_title": "Crear servicio de autenticación de Active Directory",
+    "edit_title": "Editar servicio de autenticación de Active Directory",
+    "help": {
+      "system_user_dn": "El nombre de usuario para la conexión inicial al servidor de Active Directory, p. ej. <code>ldapbind@some.domain</code>.<lineBreak/>Debe coincidir con el <code>userPrincipalName</code> de ese usuario.",
+      "system_user_password": "La contraseña para la conexión inicial al servidor de Active Directory.",
+      "user_full_name_attribute": "Atributo de Active Directory que se usará para el nombre completo de un usuario sincronizado, p. ej. <code>displayName</code>.<lineBreak/>",
+      "user_name_attribute": "Atributo de Active Directory que se usará para el nombre completo del usuario sincronizado, p. ej. <code>userPrincipalName</code>.<lineBreak/>Si no estás seguro de qué atributo usar, prueba a cargar un usuario de prueba en la sección de la barra lateral <emphasis>User Login Test</emphasis>.",
+      "user_search_base": "La rama base a la que limitar la consulta de búsqueda de Active Directory, p. ej. <code>cn=users,dc=example,dc=com</code>."
+    }
+  },
+  "active_page": {
+    "title": "Servicio de autenticación activo"
+  },
+  "authenticators": {
+    "description": "Configura la autenticación mediante cabecera de confianza.",
+    "documentation_title": "Documentación de autenticadores",
+    "edit": "Editar autenticadores",
+    "title": "Detalles de los autenticadores"
+  },
+  "backend_details_page": {
+    "edit_service": "Editar servicio",
+    "title": "Detalles del servicio de autenticación"
+  },
+  "backends_overview": {
+    "activate": "Activar",
+    "confirm_activate": "Realmente quieres activar el servicio de autenticación \"{{title}}\"",
+    "confirm_deactivate": "Realmente quieres desactivar el servicio de autenticación \"{{title}}\"",
+    "confirm_delete": "Realmente quieres eliminar el servicio de autenticación \"{{title}}\"",
+    "deactivate": "Desactivar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "filter_label": "Filtrar servicios",
+    "found_one": "Se ha encontrado {{count}} servicio de autenticación configurado en el sistema.",
+    "found_other": "Se han encontrado {{count}} servicios de autenticación configurados en el sistema.",
+    "headers": {
+      "actions": "Acciones",
+      "default_roles": "Roles predeterminados",
+      "description": "Descripción",
+      "title": "Título"
+    },
+    "query_example": "Buscar backends con un título que contenga LDAP:",
+    "role_not_found": "Rol no encontrado",
+    "title": "Servicios de autenticación configurados",
+    "found_many": "Se han encontrado {{count}} servicios de autenticación configurados en el sistema."
+  },
+  "config_details": {
+    "edit": "Editar",
+    "group_sync_feature_name": "sincronización de grupos",
+    "group_sync_title": "Sincronización de grupos"
+  },
+  "connection_test": {
+    "default_error": "Se ha producido un error",
+    "description": "Realiza en segundo plano una comprobación de conexión con la dirección y las credenciales definidas en el paso \"Configuración del servidor\".",
+    "submit": "Probar conexión con el servidor",
+    "title": "Comprobación de conexión con el servidor"
+  },
+  "create_page": {
+    "getting_started_title": "Crear nuevo servicio de autenticación",
+    "title": "Crear servicio de autenticación"
+  },
+  "directory_help": {
+    "default_roles": "Los roles predeterminados que obtendrán los usuarios sincronizados. Todos los usuarios necesitan el rol <code>Reader</code> para usar la interfaz web",
+    "default_user_timezone": "Elige la zona horaria predeterminada para los nuevos usuarios.",
+    "user_search_pattern": "Por ejemplo <exampleCode>{{example}}</exampleCode>. La cadena <code>{{placeholder}}</code> se reemplazará por el nombre de usuario introducido."
+  },
+  "getting_started": {
+    "description": "Además de los mecanismos de autenticación integrados, como la base de datos interna de usuarios o LDAP/Active Directory, los servicios de autenticación también pueden ampliarse con plugins para admitir otros mecanismos. Selecciona un servicio de autenticación para configurar uno nuevo.",
+    "select_service": "Selecciona un servicio",
+    "submit": "Empezar"
+  },
+  "ldap": {
+    "create_title": "Crear servicio de autenticación LDAP",
+    "edit_title": "Editar servicio de autenticación LDAP",
+    "help": {
+      "email_attributes": "Atributo LDAP que se usará para la dirección de correo del usuario, p. ej. <code>mail</code>.<lineBreak/>Puedes especificar varios atributos; pulsa <kbd>Tab</kbd> o <kbd>Enter</kbd> para aceptar el valor.",
+      "system_user_dn": "El nombre de usuario para la conexión inicial al servidor LDAP, p. ej. <code>cn=admin,dc=example,dc=com</code>. Puede ser opcional según tu servidor LDAP.",
+      "system_user_password": "La contraseña para la conexión inicial al servidor LDAP.",
+      "user_full_name_attribute": "Atributo LDAP que se usará para el nombre completo de un usuario sincronizado, p. ej. <code>cn</code>.<lineBreak/>",
+      "user_name_attribute": "Atributo LDAP que se usará para el nombre de usuario del usuario sincronizado, p. ej. <code>uid</code>.<lineBreak/>Si no estás seguro de qué atributo usar, prueba a cargar un usuario de prueba en la sección de la barra lateral <emphasis>User Login Test</emphasis>.",
+      "user_search_base": "La rama base a la que limitar la consulta de búsqueda LDAP, p. ej. <code>cn=users,dc=example,dc=com</code>.",
+      "user_unique_id_attribute": "Atributo LDAP que se usará para el ID de un usuario sincronizado, p. ej. <code>entryUUID</code>.<lineBreak/>"
+    }
+  },
+  "login_test": {
+    "description": "Verifica la configuración cargando la entrada del nombre de usuario indicado. Si omites la contraseña, no se intentará ninguna autenticación.",
+    "login_failed": "Error de inicio de sesión",
+    "password": "Contraseña",
+    "submit": "Probar inicio de sesión del usuario",
+    "title": "Prueba de inicio de sesión del usuario",
+    "user_attribute": "Atributo de usuario",
+    "user_does_not_exist": "El usuario no existe",
+    "username": "Nombre de usuario",
+    "value": "Valor"
+  },
+  "no_service_plugin": "No hay ningún plugin de servicio de autenticación configurado para el tipo \"{{type}}\"",
+  "no_service_plugin_for": "No hay ningún plugin de servicio de autenticación configurado para \"{{type}}\"",
+  "notifications": {
+    "create_failed": "Error al crear el servicio de autenticación con el estado: {{error}}",
+    "create_success": "El servicio de autenticación se ha creado correctamente.",
+    "error_title": "Error",
+    "success_title": "Éxito",
+    "update_failed": "Error al actualizar el servicio de autenticación con el estado: {{error}}",
+    "update_success": "El servicio de autenticación se ha actualizado correctamente."
+  },
+  "overview_page": {
+    "no_active_backend": "Ninguno de los servicios de autenticación configurados está activo actualmente.",
+    "title": "Todos los servicios de autenticación"
+  },
+  "page": {
+    "description": "Configura los servicios de autenticación de este clúster.",
+    "documentation_title": "Documentación de autenticación"
+  },
+  "page_navigation": {
+    "authenticators": "Autenticadores",
+    "services": "Servicios de autenticación"
+  },
+  "server_config": {
+    "description_label": "Descripción",
+    "hostname": "Nombre de host",
+    "port": "Puerto",
+    "reset_password": "Restablecer contraseña",
+    "server_address": "Dirección del servidor",
+    "system_password": "Contraseña del sistema",
+    "system_user_dn": "DN del usuario del sistema",
+    "system_username": "Nombre de usuario del sistema",
+    "title": "Configuración del servidor",
+    "title_label": "Título",
+    "transport_security": "Seguridad de transporte",
+    "transport_security_none": "Ninguna",
+    "undo_reset": "Deshacer restablecimiento",
+    "verify_certificates": "Verificar certificados"
+  },
+  "synced_teams": {
+    "feature_name": "equipos",
+    "title": "Equipos sincronizados"
+  },
+  "synced_users": {
+    "edit": "Editar",
+    "filter_label": "Filtrar usuarios",
+    "found_one": "Se ha encontrado {{count}} usuario sincronizado.",
+    "found_other": "Se han encontrado {{count}} usuarios sincronizados.",
+    "headers": {
+      "actions": "Acciones",
+      "full_name": "Nombre completo",
+      "roles": "Roles",
+      "username": "Nombre de usuario"
+    },
+    "none_found": "No se ha encontrado ningún usuario sincronizado.",
+    "role_not_found": "Rol no encontrado",
+    "title": "Usuarios sincronizados",
+    "found_many": "Se han encontrado {{count}} usuarios sincronizados."
+  },
+  "trusted_header": {
+    "description": "Este autenticador permite iniciar sesión a un usuario, basándose en una cabecera HTTP y sin más interacción.",
+    "enable_sso": "Habilitar el inicio de sesión único mediante cabecera HTTP",
+    "enabled": "Habilitado",
+    "title": "Autenticación mediante cabecera de confianza",
+    "trusted_proxies_hint": "Configura el ajuste <code>trusted_proxies</code> en el archivo de configuración del servidor de {{productName}}.",
+    "update_config": "Actualizar configuración",
+    "username_header": "Cabecera del nombre de usuario",
+    "username_header_help": "Cabecera HTTP que contiene el nombre del usuario, en el que se confía implícitamente. (La comparación de la cabecera no distingue mayúsculas de minúsculas)"
+  },
+  "user_sync": {
+    "browser_time_zone": "Zona horaria del navegador",
+    "default_assignments_hint": "Cambiar los roles y la zona horaria predeterminados solo afectará a los nuevos usuarios creados mediante {{serviceTitle}}!",
+    "default_roles": "Roles predeterminados",
+    "default_user_time_zone": "Zona horaria predeterminada del usuario",
+    "email_attribute": "Atributo de correo electrónico",
+    "email_attributes": "Atributos de correo electrónico",
+    "full_name_attribute": "Atributo de nombre completo",
+    "id_attribute": "Atributo de ID",
+    "name_attribute": "Atributo de nombre",
+    "role_not_found": "Rol no encontrado",
+    "search_base_dn": "DN base de búsqueda",
+    "search_pattern": "Patrón de búsqueda",
+    "search_roles": "Buscar roles",
+    "test_login_hint": "Te recomendamos probar el inicio de sesión de tu usuario en el panel lateral para verificar la configuración.",
+    "title": "Sincronización de usuarios"
+  },
+  "wizard": {
+    "confirm_remove_group_sync": "Realmente quieres eliminar la configuración de sincronización de grupos de este servicio de autenticación",
+    "create_failed": "Error al crear el servicio de autenticación",
+    "edit_failed": "Error al editar el servicio de autenticación",
+    "finish_and_save": "Finalizar y guardar servicio",
+    "finish_and_save_identity_service": "Finalizar y guardar servicio de identidad",
+    "next_group_sync": "Siguiente: sincronización de grupos",
+    "next_user_sync": "Siguiente: sincronización de usuarios",
+    "server_validation_error": "Error de validación del servidor: {{errors}}",
+    "steps": {
+      "group_sync": "Sincronización de grupos (Opc.)",
+      "server_config": "Configuración del servidor",
+      "user_sync": "Sincronización de usuarios"
+    }
+  },
+  "wizard_header": {
+    "edit_title": "Editar servicio de autenticación - <emphasis>{{backendTitle}}</emphasis>"
+  },
+  "http_header_notifications": {
+    "load_failed": "Error al cargar la configuración de autenticación mediante cabecera HTTP",
+    "update_success": "La configuración de autenticación mediante cabecera HTTP se ha actualizado correctamente",
+    "update_failed": "Error al actualizar la configuración de autenticación mediante cabecera HTTP con el estado: {{error}}"
+  }
+}

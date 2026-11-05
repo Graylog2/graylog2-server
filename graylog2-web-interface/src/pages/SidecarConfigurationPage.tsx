@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Col, Row } from 'components/bootstrap';
 import DocsHelper from 'util/DocsHelper';
@@ -23,32 +24,33 @@ import ConfigurationListContainer from 'components/sidecars/configurations/Confi
 import CollectorListContainer from 'components/sidecars/configurations/CollectorListContainer';
 import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
 
-const SidecarConfigurationPage = () => (
-  <DocumentTitle title="Collectors Configuration">
-    <SidecarsPageNavigation />
-    <PageHeader
-      title="Collectors Configuration"
-      documentationLink={{
-        title: 'Sidecar documentation',
-        path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
-      }}>
-      <span>
-        The Collector Sidecar runs next to your favourite log collector and configures it for you. Here you can manage
-        the Sidecar configurations.
-      </span>
-    </PageHeader>
+const SidecarConfigurationPage = () => {
+  const { t } = useTranslation('sidecars');
 
-    <Row className="content">
-      <Col md={12}>
-        <ConfigurationListContainer />
-      </Col>
-    </Row>
-    <Row className="content">
-      <Col md={12}>
-        <CollectorListContainer />
-      </Col>
-    </Row>
-  </DocumentTitle>
-);
+  return (
+    <DocumentTitle title={t('pages.configuration.title')}>
+      <SidecarsPageNavigation />
+      <PageHeader
+        title={t('pages.configuration.title')}
+        documentationLink={{
+          title: t('pages.documentation_title'),
+          path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
+        }}>
+        <span>{t('pages.configuration.description')}</span>
+      </PageHeader>
+
+      <Row className="content">
+        <Col md={12}>
+          <ConfigurationListContainer />
+        </Col>
+      </Row>
+      <Row className="content">
+        <Col md={12}>
+          <CollectorListContainer />
+        </Col>
+      </Row>
+    </DocumentTitle>
+  );
+};
 
 export default SidecarConfigurationPage;

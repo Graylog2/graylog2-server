@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo, useCallback, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import mapValues from 'lodash/mapValues';
 import { Formik, Form, Field } from 'formik';
@@ -63,7 +64,13 @@ type Props = {
   };
 };
 
+// `Trans` provides the link text as children.
+const FailureProcessingDocsLink = ({ children = undefined }: React.PropsWithChildren) => (
+  <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} displayIcon text={children} />
+);
+
 const FailureStreamLink = () => {
+  const { t } = useTranslation('search');
   const {
     data: failureStream,
     isFetching: isFetchingFailureStream,
@@ -82,10 +89,22 @@ const FailureStreamLink = () => {
       />
       <i>
         {' '}
-        (<Link to={Routes.SYSTEM.ENTERPRISE}>Enterprise Plugin</Link> required)
+        <Trans
+          t={t}
+          i18nKey="change_field_type.enterprise_plugin_required"
+          components={{ enterpriseLink: <Link to={Routes.SYSTEM.ENTERPRISE} /> }}
+        />
       </i>
     </span>
   );
+};
+
+const rotationHintKey = (type: string | undefined, fieldName: string | undefined) => {
+  if (type) {
+    return fieldName ? 'change_field_type.rotation_hint_type_field' : 'change_field_type.rotation_hint_type';
+  }
+
+  return fieldName ? 'change_field_type.rotation_hint_field' : 'change_field_type.rotation_hint';
 };
 
 export type FormValues = { field: string; field_type: string; rotate: boolean };
@@ -98,6 +117,7 @@ const ChangeFieldTypeModal = ({
   showFieldSelect = false,
   initialData = { fieldName: undefined, type: undefined },
 }: Props) => {
+  const { t } = useTranslation('search');
   const {
     data: { fieldTypes },
     isLoading: isLoadingFieldTypes,
@@ -183,7 +203,7 @@ const ChangeFieldTypeModal = ({
         <Form>
           <Modal.Header>
             <Modal.Title>
-              <span>Change {fieldName} Field Type</span>
+              <span>{t('change_field_type.modal_title', { fieldName })}</span>
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
@@ -195,18 +215,28 @@ const ChangeFieldTypeModal = ({
               </Field>
             )}
             <Alert bsStyle="warning">
-              Changing the type of the field <b>{fieldName}</b> can have a significant impact on the ingestion of future
-              log messages. If you declare a field to have a type which is incompatible with the logs you are ingesting,
-              it can lead to ingestion errors.
+              <Trans
+                t={t}
+                i18nKey="change_field_type.impact_warning"
+                values={{ fieldName }}
+                components={{ bold: <b /> }}
+              />
               {hasFailureStreamAccess && (
                 <>
-                  It is recommended to enable{' '}
-                  <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} displayIcon text="Failure Processing" />{' '}
-                  and watch the <FailureStreamLink /> stream closely afterwards.
+                  {' '}
+                  <Trans
+                    t={t}
+                    i18nKey="change_field_type.failure_processing_hint"
+                    components={{ docsLink: <FailureProcessingDocsLink />, failureStream: <FailureStreamLink /> }}
+                  />
                 </>
               )}
             </Alert>
-            <StyledLabel>{`Select Field Type For ${fieldName || 'Field'}`}</StyledLabel>
+            <StyledLabel>
+              {fieldName
+                ? t('change_field_type.select_field_type_for', { fieldName })
+                : t('change_field_type.select_field_type_for_field')}
+            </StyledLabel>
             <Field name="field_type">
               {({ field: { name, value, onChange } }) => (
                 <Input id={name}>
@@ -216,9 +246,9 @@ const ChangeFieldTypeModal = ({
                     name={name}
                     onChange={(newValue) => onChange({ target: { name, value: newValue } })}
                     value={value}
-                    placeholder="Select field type"
+                    placeholder={t('change_field_type.select_field_type')}
                     disabled={isLoadingFieldTypes}
-                    aria-label="Select Field Type For Field"
+                    aria-label={t('change_field_type.select_field_type_for_field')}
                     required
                   />
                 </Input>
@@ -226,11 +256,14 @@ const ChangeFieldTypeModal = ({
             </Field>
             {showSelectionTable && (
               <>
-                <StyledLabel>Select Targeted Index Sets</StyledLabel>
+                <StyledLabel>{t('change_field_type.select_index_sets')}</StyledLabel>
                 <p>
-                  By default the {type ? <b>{type}</b> : 'selected'} field type will be set for the <b>{fieldName}</b>{' '}
-                  field in all index sets of the current message/search. You can select for which index sets you would
-                  like to make the change.
+                  <Trans
+                    t={t}
+                    i18nKey={type ? 'change_field_type.index_sets_hint_with_type' : 'change_field_type.index_sets_hint'}
+                    values={{ type, fieldName }}
+                    components={{ bold: <b /> }}
+                  />
                 </p>
                 <IndexSetsTable
                   field={fieldName}
@@ -240,25 +273,20 @@ const ChangeFieldTypeModal = ({
                 />
               </>
             )}
-            <StyledLabel>Select Rotation Strategy</StyledLabel>
+            <StyledLabel>{t('change_field_type.select_rotation_strategy')}</StyledLabel>
             <p>
-              To see and use the {type ? <b>{type}</b> : 'selected field type'} as a field type
-              {fieldName ? (
-                <>
-                  {' '}
-                  for <b>{fieldName}</b>
-                </>
-              ) : (
-                ''
-              )}
-              , you have to rotate indices. You can automatically rotate affected indices after submitting this form or
-              do that manually later.
+              <Trans
+                t={t}
+                i18nKey={rotationHintKey(type, fieldName)}
+                values={{ type, fieldName }}
+                components={{ bold: <b /> }}
+              />
             </p>
             <Field name="rotate">
               {({ field: { name, onChange } }) => (
                 <FormikInput
                   type="checkbox"
-                  label="Rotate affected indices after change"
+                  label={t('change_field_type.rotate_indices')}
                   id={name}
                   name={name}
                   onChange={onChange}
@@ -270,7 +298,9 @@ const ChangeFieldTypeModal = ({
             <ModalSubmit
               disabledSubmit={fieldTypeMutationIsLoading || !indexSetSelection?.length}
               onCancel={onCancel}
-              submitButtonText={fieldTypeMutationIsLoading ? 'Changing field type...' : 'Change field type'}
+              submitButtonText={
+                fieldTypeMutationIsLoading ? t('change_field_type.changing') : t('change_field_type.change')
+              }
             />
           </Modal.Footer>
         </Form>

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { DataTable, Spinner, PaginatedList, SearchForm, QueryHelper } from 'components/common';
@@ -46,18 +47,33 @@ const Header = styled.div`
   display: flex;
 `;
 
-const PipelineFilter = ({ query, onSearch }: { query: string; onSearch: (query: string) => void }) => (
-  <SearchForm
-    query={query}
-    onSearch={onSearch}
-    queryHelpComponent={<QueryHelper entityName="Pipeline" />}
-    wrapperClass="has-bm"
-    onReset={() => onSearch('')}
-    topMargin={0}
-  />
-);
+const PipelineFilter = ({ query, onSearch }: { query: string; onSearch: (query: string) => void }) => {
+  const { t } = useTranslation('pipelines');
+
+  return (
+    <SearchForm
+      query={query}
+      onSearch={onSearch}
+      queryHelpComponent={<QueryHelper entityName={t('timeline.entity_name')} />}
+      wrapperClass="has-bm"
+      onReset={() => onSearch('')}
+      topMargin={0}
+    />
+  );
+};
+
+// The English header texts identify the columns, the displayed texts are translated.
+const HEADER_KEYS = {
+  Pipeline: 'timeline.headers.pipeline',
+  'Connected to Streams': 'timeline.headers.connected_streams',
+  'Processing Errors': 'timeline.headers.processing_errors',
+  'Pipeline Load (15m)': 'timeline.headers.pipeline_load',
+  'Processing Timeline': 'timeline.headers.processing_timeline',
+  Actions: 'timeline.headers.actions',
+};
 
 const ProcessingTimelineComponent = () => {
+  const { t } = useTranslation('pipelines');
   const { metricsEnabled } = useProcessingLoadContext();
   const { data: connections } = usePipelineConnections();
   const { page, pageSize: perPage, resetPage, setPagination } = usePaginationQueryParameter();
@@ -100,13 +116,13 @@ const ProcessingTimelineComponent = () => {
       className = 'actions';
     }
 
-    return <th className={className}>{header}</th>;
+    return <th className={className}>{t(HEADER_KEYS[header] ?? header)}</th>;
   };
 
   const _deletePipeline = (pipeline: PipelineType) => {
     // TODO: Replace with ConfirmDialog components
     // eslint-disable-next-line no-alert
-    if (window.confirm(`Do you really want to delete pipeline "${pipeline.title}"? This action cannot be undone.`)) {
+    if (window.confirm(t('timeline.delete_confirm', { title: pipeline.title }))) {
       deletePipeline({ pipelineId: pipeline.id }).then(() => {
         setPagination({ page: Math.max(DEFAULT_PAGINATION.page, page - 1) });
       });
@@ -140,8 +156,8 @@ const ProcessingTimelineComponent = () => {
           rows={pipelines}
           customFilter={searchFilter}
           filterKeys={[]}
-          filterLabel="Filter Pipelines"
-          noDataText="No pipelines have been found"
+          filterLabel={t('timeline.filter_label')}
+          noDataText={t('timeline.no_pipelines')}
           dataRowFormatter={dataRowFormater}
         />
       </StyledPaginatedList>

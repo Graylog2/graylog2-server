@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useRef } from 'react';
 import { useInfiniteLoader } from 'react-window-infinite-loader';
 import styled from 'styled-components';
@@ -29,11 +30,11 @@ const StyledDiv = styled.div`
   width: 100%;
 `;
 
-const getNoOptionMessage = () => (
-  <StyledDiv key="noOptions" className="menu-notice menu-notice--no-options">
-    No Options
-  </StyledDiv>
-);
+const NoOptionsMessage = () => {
+  const { t } = useTranslation('common');
+
+  return <StyledDiv className="menu-notice menu-notice--no-options">{t('select.no_options')}</StyledDiv>;
+};
 
 const AsyncCustomMenuList = ({
   children,
@@ -42,7 +43,7 @@ const AsyncCustomMenuList = ({
   children: Array<React.ReactNode>;
   selectProps: { loadOptions: (startIndex: number, stopIndex: number) => Promise<void>; total: number };
 }) => {
-  const items = children?.length ? children : [getNoOptionMessage()];
+  const items = children?.length ? children : [<NoOptionsMessage key="noOptions" />];
   const listRef = useRef(null);
 
   const onRowsRendered = useInfiniteLoader({

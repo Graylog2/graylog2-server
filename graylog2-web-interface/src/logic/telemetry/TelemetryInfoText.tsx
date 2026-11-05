@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { ExternalLink } from 'components/common';
 import { Alert } from 'components/bootstrap';
@@ -25,20 +26,28 @@ type Props = {
 };
 
 const TelemetryInfoText = ({ showProfile = undefined }: Props) => {
+  const { t } = useTranslation('common');
   const productName = useProductName();
 
   return (
     <Alert bsStyle="info">
-      We would like to collect anonymous usage data to help us prioritize improvements and make {productName} better in
-      the future.
+      {t('telemetry.info', { productName })}
       <br />
-      We do not collect personal data, sensitive information, or content such as logs in your instances.
+      {t('telemetry.no_personal_data')}
       <br />
-      Learn more on our <ExternalLink href="https://www.graylog.org/privacy-policy/">Privacy Policy</ExternalLink>.
+      <Trans
+        t={t}
+        i18nKey="telemetry.learn_more"
+        components={{
+          privacyLink: <ExternalLink href="https://www.graylog.org/privacy-policy/" />,
+        }}
+      />
       <br />
-      You can turn data collection off or on any time
-      {showProfile && <b> in the user profile</b>}
-      {!showProfile && ' here'}.
+      {showProfile ? (
+        <Trans t={t} i18nKey="telemetry.turn_off_profile" components={{ bold: <b /> }} />
+      ) : (
+        t('telemetry.turn_off_here')
+      )}
     </Alert>
   );
 };

@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { DocumentTitle } from 'components/common';
 import TeaserSearch from 'components/security/teaser/TeaserSearch';
@@ -28,40 +29,43 @@ const hotspots = [
   {
     positionX: '50%',
     positionY: '230px',
-    description: 'Instantly see spikes in data flows across your network.',
+    descriptionKey: 'security_teaser.network_activity.hotspot_0',
   },
   {
     positionX: '70%',
     positionY: '600px',
-    description: 'Quickly see where the data is coming from and where it is going.',
+    descriptionKey: 'security_teaser.network_activity.hotspot_1',
   },
   {
     positionX: '70%',
     positionY: '1030px',
-    description: 'Identify which users are sending the most amount of data across the network.',
+    descriptionKey: 'security_teaser.network_activity.hotspot_2',
   },
   {
     positionX: '70%',
     positionY: '1450px',
-    description:
-      'Determine if there is an unusual pattern in DNS query results like a particular error code suddenly showing up in the Top 15 list. ',
+    descriptionKey: 'security_teaser.network_activity.hotspot_3',
   },
   {
     positionX: '40%',
     positionY: '1850px',
-    description: 'The top 15 platforms generating DNS requests by event source.',
+    descriptionKey: 'security_teaser.network_activity.hotspot_4',
   },
 ];
 
-const NetworkActivity = () => (
-  <DocumentTitle title="Network activity">
-    <TeaserSearch
-      viewJson={viewJson}
-      searchJson={searchJson as SearchJson}
-      searchJobResult={resultJson}
-      hotspots={hotspots}
-    />
-  </DocumentTitle>
-);
+const NetworkActivity = () => {
+  const { t } = useTranslation('users');
+
+  return (
+    <DocumentTitle title={t('security_teaser.network_activity.title')}>
+      <TeaserSearch
+        viewJson={viewJson}
+        searchJson={searchJson as SearchJson}
+        searchJobResult={resultJson}
+        hotspots={hotspots}
+      />
+    </DocumentTitle>
+  );
+};
 
 export default NetworkActivity;

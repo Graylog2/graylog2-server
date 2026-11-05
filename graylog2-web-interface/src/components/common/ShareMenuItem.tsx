@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { MenuItem } from 'components/bootstrap';
 import SharingDisabledPopover from 'components/permissions/SharingDisabledPopover';
@@ -32,17 +33,24 @@ type Props = {
   title?: string;
 };
 
-const ShareMenuItem = ({ entityId, entityType, onClick, disabledInfo = undefined, title = undefined }: Props) => (
-  <HasOwnership id={entityId} type={entityType}>
-    {({ disabled: hasMissingPermissions }) => (
-      <MenuItem onSelect={onClick} disabled={!!disabledInfo || hasMissingPermissions} title="Share">
-        {title ?? 'Share'}{' '}
-        {(!!disabledInfo || hasMissingPermissions) && (
-          <SharingDisabledPopover type={entityType} description={disabledInfo} />
-        )}
-      </MenuItem>
-    )}
-  </HasOwnership>
-);
+const ShareMenuItem = ({ entityId, entityType, onClick, disabledInfo = undefined, title = undefined }: Props) => {
+  const { t } = useTranslation('common');
+
+  return (
+    <HasOwnership id={entityId} type={entityType}>
+      {({ disabled: hasMissingPermissions }) => (
+        <MenuItem
+          onSelect={onClick}
+          disabled={!!disabledInfo || hasMissingPermissions}
+          title={t('share_menu_item.share')}>
+          {title ?? t('share_menu_item.share')}{' '}
+          {(!!disabledInfo || hasMissingPermissions) && (
+            <SharingDisabledPopover type={entityType} description={disabledInfo} />
+          )}
+        </MenuItem>
+      )}
+    </HasOwnership>
+  );
+};
 
 export default ShareMenuItem;

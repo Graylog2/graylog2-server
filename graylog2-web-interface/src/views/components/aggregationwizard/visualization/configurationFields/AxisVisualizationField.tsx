@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useFormikContext } from 'formik';
 import { useTheme } from 'styled-components';
 
@@ -27,6 +28,7 @@ import { getDefaultLabelColor } from 'views/components/visualizations/utils/getD
 import type { ChartAxisConfig } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 
 const AxisVisualizationField = ({ name, field, title, inputHelp }: CustomFieldComponentProps) => {
+  const { t } = useTranslation('aggregation');
   const theme = useTheme();
   const { values, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
 
@@ -57,11 +59,11 @@ const AxisVisualizationField = ({ name, field, title, inputHelp }: CustomFieldCo
         !Object.values(axisConfig).some(({ color, title: axisTitle }) => color ?? axisTitle) &&
         !value;
 
-      if (hasError) return 'At least for one axis should be defined label or color.';
+      if (hasError) return t('wizard_visualization.axis_label_or_color');
 
       return null;
     },
-    [values.visualization.config],
+    [t, values.visualization.config],
   );
 
   return (
@@ -80,7 +82,7 @@ const AxisVisualizationField = ({ name, field, title, inputHelp }: CustomFieldCo
       />
       <Col sm={1}>
         <ColorConfigurationPopover
-          title={`Color configuration for ${field.title}`}
+          title={t('wizard_visualization.color_for', { field: field.title })}
           curColor={curColor}
           onColorSelect={onColorSelect}
         />

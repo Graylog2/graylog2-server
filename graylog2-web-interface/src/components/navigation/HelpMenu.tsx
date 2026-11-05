@@ -15,7 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
+import useNavigationTitle from 'components/navigation/useNavigationTitle';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { NavDropdown, MenuItem } from 'components/bootstrap';
 import useHotkeysContext from 'hooks/useHotkeysContext';
@@ -26,15 +28,17 @@ const HelpMenu = () => {
   const { setShowHotkeysModal } = useHotkeysContext();
   const menuItems = usePluginEntities('helpMenu');
   const { isPermitted } = usePermissions();
+  const navigationTitle = useNavigationTitle();
+  const { t } = useTranslation('navigation');
   const availableMenuItems = menuItems.filter((item) => isPermitted(item.permissions));
 
   return (
-    <NavDropdown title={<NavIcon type="help" />} hoverTitle="Help" noCaret>
+    <NavDropdown title={<NavIcon type="help" />} hoverTitle={t('help.title')} noCaret>
       {availableMenuItems.map((item) => {
         if ('externalLink' in item) {
           return (
             <MenuItem key={item.description} component="a" href={item.externalLink} target="_blank" icon="open_in_new">
-              {item.description}
+              {navigationTitle(item)}
             </MenuItem>
           );
         }
@@ -42,7 +46,7 @@ const HelpMenu = () => {
         if ('path' in item) {
           return (
             <MenuItem key={item.description} href={item.path}>
-              {item.description}
+              {navigationTitle(item)}
             </MenuItem>
           );
         }
@@ -52,7 +56,7 @@ const HelpMenu = () => {
             <MenuItem
               key={item.description}
               onClick={() => item.action({ showHotkeysModal: () => setShowHotkeysModal(true) })}>
-              {item.description}
+              {navigationTitle(item)}
             </MenuItem>
           );
         }

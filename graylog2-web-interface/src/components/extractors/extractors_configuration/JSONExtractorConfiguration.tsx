@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import { Icon } from 'components/common';
 import { Col, Row, Button, Input } from 'components/bootstrap';
@@ -37,7 +39,7 @@ type Props = {
   exampleMessage?: string;
   onChange: (newConfig: Configuration) => void;
   onExtractorPreviewLoad: (content: React.ReactNode) => void;
-};
+} & WithTranslation;
 type State = {
   configuration: Configuration;
   trying: boolean;
@@ -130,34 +132,36 @@ class JSONExtractorConfiguration extends React.Component<Props, State> {
   }
 
   render() {
+    const { t } = this.props;
+
     return (
       <div>
         <Input
           type="checkbox"
           id="flatten"
-          label="Flatten structures"
+          label={t('json.flatten')}
           wrapperClassName="col-md-offset-2 col-md-10"
           defaultChecked={this.state.configuration.flatten}
           onChange={this._onChange('flatten')}
-          help="Whether to flatten JSON objects into a single message field or to expand into multiple fields."
+          help={t('json.flatten_help')}
         />
 
         <Input
           type="text"
           id="list_separator"
-          label="List item separator"
+          label={t('json.list_separator')}
           labelClassName="col-md-2"
           wrapperClassName="col-md-10"
           defaultValue={this.state.configuration.list_separator}
           required
           onChange={this._onChange('list_separator')}
-          help="What string to use to concatenate items of a JSON list."
+          help={t('json.list_separator_help')}
         />
 
         <Input
           type="text"
           id="key_separator"
-          label="Key separator"
+          label={t('json.key_separator')}
           labelClassName="col-md-2"
           wrapperClassName="col-md-10"
           defaultValue={this.state.configuration.key_separator}
@@ -165,8 +169,7 @@ class JSONExtractorConfiguration extends React.Component<Props, State> {
           onChange={this._onChange('key_separator')}
           help={
             <span>
-              What string to use to concatenate different keys of a nested JSON object (only used if <em>not</em>{' '}
-              flattened).
+              <Trans t={t} i18nKey="json.key_separator_help" components={{ em: <em /> }} />
             </span>
           }
         />
@@ -174,53 +177,53 @@ class JSONExtractorConfiguration extends React.Component<Props, State> {
         <Input
           type="text"
           id="kv_separator"
-          label="Key/value separator"
+          label={t('json.kv_separator')}
           labelClassName="col-md-2"
           wrapperClassName="col-md-10"
           defaultValue={this.state.configuration.kv_separator}
           required
           onChange={this._onChange('kv_separator')}
-          help="What string to use when concatenating key/value pairs of a JSON object (only used if flattened)."
+          help={t('json.kv_separator_help')}
         />
 
         <Input
           type="text"
           id="key_prefix"
-          label="Key prefix"
+          label={t('json.key_prefix')}
           labelClassName="col-md-2"
           wrapperClassName="col-md-10"
           defaultValue={this.state.configuration.key_prefix}
           onChange={this._onChange('key_prefix')}
-          help="Text to prepend to each key extracted from the JSON object."
+          help={t('json.key_prefix_help')}
         />
 
         <Input
           type="checkbox"
           id="replace_key_whitespace"
-          label="Replace whitespaces in keys"
+          label={t('json.replace_key_whitespace')}
           wrapperClassName="col-md-offset-2 col-md-10"
           defaultChecked={this.state.configuration.replace_key_whitespace}
           onChange={this._onChange('replace_key_whitespace')}
-          help="Field keys containing whitespaces will be discarded when storing the extracted message. Check this box to replace whitespaces in JSON keys with another character."
+          help={t('json.replace_key_whitespace_help')}
         />
 
         <Input
           type="text"
           id="key_whitespace_replacement"
-          label="Key whitespace replacement"
+          label={t('json.key_whitespace_replacement')}
           labelClassName="col-md-2"
           wrapperClassName="col-md-10"
           defaultValue={this.state.configuration.key_whitespace_replacement}
           disabled={!this.state.configuration.replace_key_whitespace}
           required
           onChange={this._onChange('key_whitespace_replacement')}
-          help="What character to use when replacing whitespaces in message keys. Please ensure the replacement character is valid in Lucene, e.g. '-' or '_'."
+          help={t('json.key_whitespace_replacement_help')}
         />
 
         <Row>
           <Col mdOffset={2} md={10}>
             <Button bsStyle="info" onClick={this._onTryClick} disabled={this._isTryButtonDisabled()}>
-              {this.state.trying ? <Icon name="progress_activity" spin /> : 'Try'}
+              {this.state.trying ? <Icon name="progress_activity" spin /> : t('edit.try')}
             </Button>
           </Col>
         </Row>
@@ -229,4 +232,4 @@ class JSONExtractorConfiguration extends React.Component<Props, State> {
   }
 }
 
-export default JSONExtractorConfiguration;
+export default withTranslation('extractors')(JSONExtractorConfiguration);

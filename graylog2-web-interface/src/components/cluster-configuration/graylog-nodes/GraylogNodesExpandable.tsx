@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { PaginatedEntityTable } from 'components/common';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
@@ -48,9 +49,13 @@ const GraylogNodesExpandable = ({
   refetchInterval = undefined,
 }: Props) => {
   const productName = useProductName();
+  const { t } = useTranslation('system');
   const [totalGraylogNodes, setTotalGraylogNodes] = useState<number | undefined>(undefined);
 
-  const columnSchemas = useMemo<Array<ColumnSchema>>(() => createColumnDefinitions(), []);
+  const columnSchemas = useMemo<Array<ColumnSchema>>(
+    () => createColumnDefinitions().map((column) => ({ ...column, title: t(column.title) })),
+    [t],
+  );
   const columnRenderers = useMemo(() => createColumnRenderers(), []);
 
   const renderActions = useCallback((entity: ClusterGraylogNode) => <GraylogNodeActions node={entity} />, []);
@@ -69,7 +74,7 @@ const GraylogNodesExpandable = ({
 
   return (
     <ClusterNodesSectionWrapper
-      title={`${productName} Nodes`}
+      title={t('graylog_nodes_expandable.title', { productName })}
       titleCount={totalGraylogNodes}
       onTitleCountClick={onSelectNodeType ?? null}
       collapsible={collapsible}>
@@ -81,7 +86,7 @@ const GraylogNodesExpandable = ({
         columnRenderers={columnRenderers}
         entityActions={renderActions}
         entityAttributesAreCamelCase={false}
-        humanName={`${productName} Nodes`}
+        humanName={t('graylog_nodes_expandable.title', { productName })}
         externalSearch={externalSearch}
         fetchOptions={fetchOptions}
         onDataLoaded={(data) => setTotalGraylogNodes(data.pagination?.total ?? data.list.length)}

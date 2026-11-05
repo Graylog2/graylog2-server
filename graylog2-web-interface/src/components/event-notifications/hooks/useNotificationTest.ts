@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useProductName from 'brand-customization/useProductName';
 import type {
@@ -32,6 +33,7 @@ type UseNotificationTestType = {
 
 const useNotificationTest = (): UseNotificationTestType => {
   const [testResults, setTestResults] = useState(undefined);
+  const { t } = useTranslation('event_notifications');
   const productName = useProductName();
 
   const getNotificationTest = (notification: EventNotification) => {
@@ -44,7 +46,7 @@ const useNotificationTest = (): UseNotificationTestType => {
           ...result,
           id: notification.id,
           error: false,
-          message: 'Notification was executed successfully.',
+          message: t('test.success'),
         };
 
         setTestResults({ [notification.id]: result });
@@ -55,8 +57,7 @@ const useNotificationTest = (): UseNotificationTestType => {
         result = { isLoading: false, id: notification.id, error: true, message: undefined };
 
         if (errorResponse.status !== 400 || !errorResponse.additional.body || !errorResponse.additional.body.failed) {
-          result.message =
-            errorResponse.responseMessage || `Unknown errorResponse, please check your ${productName} server logs.`;
+          result.message = errorResponse.responseMessage || t('test.unknown_error_product', { productName });
         }
 
         setTestResults({ [notification.id]: result });

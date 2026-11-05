@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useMemo, useEffect } from 'react';
 import styled from 'styled-components';
 import Immutable from 'immutable';
@@ -39,9 +40,9 @@ import useEventAttributes from 'views/components/widgets/events/hooks/useEventAt
 import { SORT_DIRECTION_OPTIONS } from './Constants';
 
 const WIDGET_MODE_OPTIONS = [
-  { label: 'List', value: LIST_MODE },
-  { label: 'Count', value: NUMBER_MODE },
-];
+  { label: 'events_widget.mode_list', value: LIST_MODE },
+  { label: 'events_widget.mode_count', value: NUMBER_MODE },
+] as const;
 
 type FormValues = {
   mode: VisualizationType;
@@ -103,6 +104,7 @@ const SubmitOnChange = () => {
 };
 
 const EventsWidgetEdit = ({ children, onCancel, config, onChange }: EditWidgetComponentProps<EventsWidgetConfig>) => {
+  const { t } = useTranslation('widgets');
   const filterComponents = usePluginEntities('views.components.widgets.events.filterComponents');
   const eventAttributes = useEventAttributes();
 
@@ -165,20 +167,24 @@ const EventsWidgetEdit = ({ children, onCancel, config, onChange }: EditWidgetCo
               <FullHeightCol md={4} lg={3}>
                 <Container>
                   <StickyBottomActions actions={<SaveOrCancelButtons onCancel={onCancel} />} alignActionsAtBottom>
-                    <DescriptionBox description="Visualization">
-                      <WidgetModeConfiguration name="mode" onChange={onChangeType} options={WIDGET_MODE_OPTIONS} />
+                    <DescriptionBox description={t('events_widget.visualization')}>
+                      <WidgetModeConfiguration
+                        name="mode"
+                        onChange={onChangeType}
+                        options={WIDGET_MODE_OPTIONS.map(({ label, value }) => ({ label: t(label), value }))}
+                      />
                     </DescriptionBox>
                     {values.mode === LIST_MODE && (
-                      <DescriptionBox description="Columns">
+                      <DescriptionBox description={t('events_widget.columns')}>
                         <ColumnsConfiguration
                           columns={columns}
-                          createSelectPlaceholder="Select a new column"
+                          createSelectPlaceholder={t('events_widget.select_column')}
                           name="fields"
                           columnTitle={columnTitle}
                         />
                       </DescriptionBox>
                     )}
-                    <DescriptionBox description="Filter">
+                    <DescriptionBox description={t('events_widget.filter')}>
                       <FiltersConfiguration
                         columnTitle={columnTitle}
                         name="filters"
@@ -187,7 +193,7 @@ const EventsWidgetEdit = ({ children, onCancel, config, onChange }: EditWidgetCo
                     </DescriptionBox>
 
                     {values.mode === LIST_MODE && (
-                      <DescriptionBox description="Sorting">
+                      <DescriptionBox description={t('events_widget.sorting')}>
                         <SortConfiguration
                           columns={sortableColumns}
                           name="sort"

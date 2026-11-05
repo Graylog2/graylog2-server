@@ -22,6 +22,7 @@ import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 import CurrentUserPreferencesProvider from './CurrentUserPreferencesProvider';
 import CurrentUserProvider from './CurrentUserProvider';
 import UserDateTimeProvider from './UserDateTimeProvider';
+import UserLanguageProvider from './UserLanguageProvider';
 
 const ThemeAndUserProvider = ({ children = undefined }: React.PropsWithChildren<{}>) => (
   <CurrentUserProvider>
@@ -29,7 +30,7 @@ const ThemeAndUserProvider = ({ children = undefined }: React.PropsWithChildren<
       <CurrentUserPreferencesProvider>
         <GraylogThemeProvider userIsLoggedIn>
           <GlobalThemeStyles />
-          {children}
+          <UserLanguageProvider>{children}</UserLanguageProvider>
         </GraylogThemeProvider>
       </CurrentUserPreferencesProvider>
     </UserDateTimeProvider>

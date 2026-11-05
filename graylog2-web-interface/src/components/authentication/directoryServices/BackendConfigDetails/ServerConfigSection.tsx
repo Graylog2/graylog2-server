@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
 import { ReadOnlyFormGroup } from 'components/common';
@@ -29,6 +30,7 @@ type Props = {
 };
 
 const ServerConfigSection = ({ authenticationBackend }: Props) => {
+  const { t } = useTranslation('authentication');
   const {
     title,
     description,
@@ -38,15 +40,18 @@ const ServerConfigSection = ({ authenticationBackend }: Props) => {
 
   return (
     <SectionComponent
-      title="Server Configuration"
+      title={t('server_config.title')}
       headerActions={<EditLinkButton authenticationBackendId={authenticationBackend.id} stepKey={SERVER_CONFIG_KEY} />}>
-      <ReadOnlyFormGroup label="Title" value={title} />
-      <ReadOnlyFormGroup label="Description" value={description} />
-      <ReadOnlyFormGroup label="Server Address" value={serverUrls} />
-      <ReadOnlyFormGroup label="System Username" value={systemUserDn} />
-      <ReadOnlyFormGroup label="System Password" value={systemUserPassword?.isSet ? '******' : null} />
-      <ReadOnlyFormGroup label="Transport Security" value={transportSecurity} />
-      <ReadOnlyFormGroup label="Verify Certificates" value={verifyCertificates} />
+      <ReadOnlyFormGroup label={t('server_config.title_label')} value={title} />
+      <ReadOnlyFormGroup label={t('server_config.description_label')} value={description} />
+      <ReadOnlyFormGroup label={t('server_config.server_address')} value={serverUrls} />
+      <ReadOnlyFormGroup label={t('server_config.system_username')} value={systemUserDn} />
+      <ReadOnlyFormGroup
+        label={t('server_config.system_password')}
+        value={systemUserPassword?.isSet ? '******' : null}
+      />
+      <ReadOnlyFormGroup label={t('server_config.transport_security')} value={transportSecurity} />
+      <ReadOnlyFormGroup label={t('server_config.verify_certificates')} value={verifyCertificates} />
     </SectionComponent>
   );
 };

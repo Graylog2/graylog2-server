@@ -74,6 +74,8 @@ import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 import org.graylog2.plugin.lookup.LookupPreview;
 import org.graylog2.plugin.lookup.LookupResult;
+import org.graylog2.plugin.rest.CodedBadRequestException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.system.lookup.CacheApi;
@@ -191,7 +193,7 @@ public class LookupTableResource extends RestResource {
         if (idOrName.equals(toUpdate.id()) || idOrName.equals(toUpdate.name())) {
             return;
         }
-        throw new BadRequestException("URL parameter <" + idOrName + "> does not match parameter in request body");
+        throw new CodedBadRequestException("lookup.id_mismatch", "URL parameter <" + idOrName + "> does not match parameter in request body", Map.of("idOrName", idOrName));
     }
 
     private void checkLookupCacheId(String idOrName, CacheApi toUpdate) {
@@ -199,7 +201,7 @@ public class LookupTableResource extends RestResource {
         if (idOrName.equals(toUpdate.id()) || idOrName.equals(toUpdate.name())) {
             return;
         }
-        throw new BadRequestException("URL parameter <" + idOrName + "> does not match parameter in request body");
+        throw new CodedBadRequestException("lookup.id_mismatch", "URL parameter <" + idOrName + "> does not match parameter in request body", Map.of("idOrName", idOrName));
     }
 
     private void checkLookupAdapterId(String idOrName, DataAdapterApi toUpdate) {
@@ -207,7 +209,7 @@ public class LookupTableResource extends RestResource {
         if (idOrName.equals(toUpdate.id()) || idOrName.equals(toUpdate.name())) {
             return;
         }
-        throw new BadRequestException("URL parameter <" + idOrName + "> does not match parameter in request body");
+        throw new CodedBadRequestException("lookup.id_mismatch", "URL parameter <" + idOrName + "> does not match parameter in request body", Map.of("idOrName", idOrName));
     }
 
     @GET
@@ -233,7 +235,7 @@ public class LookupTableResource extends RestResource {
                              @Parameter(name = "key") @QueryParam("key") String key) {
         final Optional<LookupTableDto> lookupTableDto = dbTableService.get(idOrName);
         if (lookupTableDto.isEmpty()) {
-            throw new NotFoundException("Lookup table <" + idOrName + "> not found");
+            throw new CodedNotFoundException("lookup.table_not_found", "Lookup table <" + idOrName + "> not found", Map.of("idOrName", idOrName));
         }
 
         final Optional<CachePurge> cachePurge = lookupTableService.newCachePurge(lookupTableDto.get().name());
@@ -244,7 +246,7 @@ public class LookupTableResource extends RestResource {
                 cachePurge.get().purgeKey(key);
             }
         } else {
-            throw new NotFoundException("Lookup table <" + idOrName + "> not found");
+            throw new CodedNotFoundException("lookup.table_not_found", "Lookup table <" + idOrName + "> not found", Map.of("idOrName", idOrName));
         }
     }
 
@@ -403,7 +405,7 @@ public class LookupTableResource extends RestResource {
             //noinspection ConstantConditions
             if (!tableDto.id().equals(toValidate.id())) {
                 // a table exists with a different id, so the name is already in use, fail validation
-                validation.addError("name", "The lookup table name is already in use.");
+                validation.addError("name", "lookup_table.the_lookup_table_name_is_already_in", "The lookup table name is already in use.", Map.of());
             }
         }
 
@@ -629,7 +631,7 @@ public class LookupTableResource extends RestResource {
         if (!dataAdapters.isEmpty()) {
             return Iterables.getOnlyElement(dataAdapters).get(key);
         } else {
-            throw new NotFoundException("Unable to find data adapter " + name);
+            throw new CodedNotFoundException("lookup.adapter_not_found", "Unable to find data adapter " + name, Map.of("name", name));
         }
     }
 
@@ -672,7 +674,7 @@ public class LookupTableResource extends RestResource {
             unused = lookupTableStream.findAny().isEmpty();
         }
         if (!unused) {
-            throw new BadRequestException("The adapter is still in use, cannot delete.");
+            throw new CodedBadRequestException("lookup.adapter_in_use", "The adapter is still in use, cannot delete.");
         }
         dbDataAdapterService.deleteAndPostEvent(idOrName);
 
@@ -689,7 +691,7 @@ public class LookupTableResource extends RestResource {
         checkPermission(RestPermissions.LOOKUP_TABLES_EDIT, toUpdate.id());
 
         final DataAdapterDto existingDto = dbDataAdapterService.get(idOrName)
-                .orElseThrow(() -> new NotFoundException("Data adapter <" + idOrName + "> not found."));
+                .orElseThrow(() -> new CodedNotFoundException("lookup.adapter_not_found_by_name", "Data adapter <" + idOrName + "> not found.", Map.of("idOrName", idOrName)));
 
         final LookupDataAdapterConfiguration mergedConfig =
                 existingDto.config().prepareConfigUpdate(toUpdate.config());
@@ -718,7 +720,7 @@ public class LookupTableResource extends RestResource {
             //noinspection ConstantConditions
             if (!adapterDto.id().equals(toValidate.id())) {
                 // an adapter exists with a different id, so the name is already in use, fail validation
-                validation.addError("name", "The data adapter name is already in use.");
+                validation.addError("name", "lookup_table.the_data_adapter_name_is_already_in", "The data adapter name is already in use.", Map.of());
             }
         }
 
@@ -837,7 +839,7 @@ public class LookupTableResource extends RestResource {
             unused = lookupTableStream.findAny().isEmpty();
         }
         if (!unused) {
-            throw new BadRequestException("The cache is still in use, cannot delete.");
+            throw new CodedBadRequestException("lookup.cache_in_use", "The cache is still in use, cannot delete.");
         }
         dbCacheService.deleteAndPostEvent(idOrName);
 
@@ -874,7 +876,7 @@ public class LookupTableResource extends RestResource {
             //noinspection ConstantConditions
             if (!cacheDto.id().equals(toValidate.id())) {
                 // a ache exists with a different id, so the name is already in use, fail validation
-                validation.addError("name", "The cache name is already in use.");
+                validation.addError("name", "lookup_table.the_cache_name_is_already_in_use", "The cache name is already in use.", Map.of());
             }
         }
 

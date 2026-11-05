@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import i18n from 'i18n';
 import type { QueryId } from 'views/logic/queries/Query';
 import type { SearchTypeId } from 'views/logic/SearchType';
 import type SearchResult from 'views/logic/SearchResult';
@@ -63,7 +64,12 @@ export default class ResultWindowLimitError extends SearchError {
   ) {
     const pageSize = ResultWindowLimitError._getPageSizeFromResult(result, queryId, searchTypeId);
     const validPages = Math.floor(resultWindowLimit / pageSize);
-    const validPagesMessage = `Elasticsearch limits the search result to ${resultWindowLimit} messages. With a page size of ${pageSize} messages, you can use the first ${validPages} pages.`;
+    const validPagesMessage = i18n.t('views_logic.result_window_limit', {
+      ns: 'search',
+      limit: resultWindowLimit,
+      pageSize,
+      validPages,
+    });
 
     return `${validPagesMessage} ${description}`;
   }

@@ -17,6 +17,7 @@
 
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { useStore } from 'stores/connect';
@@ -36,9 +37,14 @@ const StyledH2 = styled.h2(
   `,
 );
 
-const Header = () => <StyledH2>Cluster</StyledH2>;
+const Header = () => {
+  const { t } = useTranslation('system');
+
+  return <StyledH2>{t('graylog_cluster_overview.cluster')}</StyledH2>;
+};
 
 const ClusterInfo = () => {
+  const { t } = useTranslation('system');
   const nodes = useStore(NodesStore);
 
   if (!nodes?.clusterId) {
@@ -49,9 +55,9 @@ const ClusterInfo = () => {
 
   return (
     <StyledDl className="system-dl">
-      <dt>Cluster ID:</dt>
-      <dd>{clusterId || 'Not available'}</dd>
-      <dt>Number of nodes:</dt>
+      <dt>{t('graylog_cluster_overview.cluster_id')}</dt>
+      <dd>{clusterId || t('graylog_cluster_overview.not_available')}</dd>
+      <dt>{t('graylog_cluster_overview.number_of_nodes')}</dt>
       <dd>{nodeCount}</dd>
     </StyledDl>
   );

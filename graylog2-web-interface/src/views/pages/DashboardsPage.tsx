@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
@@ -23,31 +24,32 @@ import DashboardsOverview from 'views/components/dashboard/DashboardsOverview';
 import CreateButton from 'components/common/CreateButton';
 import IfPermitted from 'components/common/IfPermitted';
 
-const DashboardsPage = () => (
-  <DocumentTitle title="Dashboards">
-    <PageHeader
-      title="Dashboards"
-      actions={
-        <IfPermitted permissions={['dashboards:create']}>
-          <CreateButton entityKey="Dashboard" />
-        </IfPermitted>
-      }
-      documentationLink={{
-        title: 'Dashboard documentation',
-        path: DocsHelper.PAGES.DASHBOARDS,
-      }}>
-      <span>
-        Use dashboards to create specific views on your messages. Create a new dashboard here and add any graph or chart
-        you create in other parts of the application with one click.
-      </span>
-    </PageHeader>
+const DashboardsPage = () => {
+  const { t } = useTranslation('search');
 
-    <Row className="content">
-      <Col md={12}>
-        <DashboardsOverview />
-      </Col>
-    </Row>
-  </DocumentTitle>
-);
+  return (
+    <DocumentTitle title={t('main.dashboards', { ns: 'navigation' })}>
+      <PageHeader
+        title={t('main.dashboards', { ns: 'navigation' })}
+        actions={
+          <IfPermitted permissions={['dashboards:create']}>
+            <CreateButton entityKey="Dashboard" />
+          </IfPermitted>
+        }
+        documentationLink={{
+          title: t('dashboards_page.documentation'),
+          path: DocsHelper.PAGES.DASHBOARDS,
+        }}>
+        <span>{t('dashboards_page.description')}</span>
+      </PageHeader>
+
+      <Row className="content">
+        <Col md={12}>
+          <DashboardsOverview />
+        </Col>
+      </Row>
+    </DocumentTitle>
+  );
+};
 
 export default DashboardsPage;

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Dispatch, SetStateAction } from 'react';
 import { useCallback, useState, useContext } from 'react';
 import * as Immutable from 'immutable';
@@ -56,19 +57,28 @@ const ListItem = ({
   onUpdateTitle: (id: string, title: string) => void;
   onRemove: (id: string) => void;
   disableDelete: boolean;
-}) => (
-  <ListItemContainer>
-    <EditableTitle
-      key={title}
-      disabled={!onUpdateTitle}
-      value={title}
-      onChange={(newTitle) => onUpdateTitle(id, newTitle)}
-    />
-    <div>
-      <IconButton title={`Remove page ${title}`} name="delete" onClick={() => onRemove(id)} disabled={disableDelete} />
-    </div>
-  </ListItemContainer>
-);
+}) => {
+  const { t } = useTranslation('search');
+
+  return (
+    <ListItemContainer>
+      <EditableTitle
+        key={title}
+        disabled={!onUpdateTitle}
+        value={title}
+        onChange={(newTitle) => onUpdateTitle(id, newTitle)}
+      />
+      <div>
+        <IconButton
+          title={t('query_tabs.remove_page', { title })}
+          name="delete"
+          onClick={() => onRemove(id)}
+          disabled={disableDelete}
+        />
+      </div>
+    </ListItemContainer>
+  );
+};
 
 type Props = {
   show: boolean;
@@ -79,6 +89,7 @@ type Props = {
 };
 
 const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, activeQueryId, dashboardId }: Props) => {
+  const { t } = useTranslation('search');
   const { setDashboardPage } = useContext(DashboardPageContext);
   const widgetIds = useWidgetIds();
   const [nextQueriesList, setNextQueriesList] = useState<Immutable.OrderedSet<PageListItem>>(queriesList);
@@ -175,15 +186,13 @@ const AdaptableQueryTabsConfiguration = ({ show, setShow, queriesList, activeQue
   return (
     <BootstrapModalConfirm
       showModal={show}
-      title="Update Dashboard Pages Configuration"
+      title={t('query_tabs.configuration_title')}
       onConfirm={onConfirmPagesConfiguration}
       onCancel={onPagesConfigurationModalClose}
-      confirmButtonText="Update configuration">
+      confirmButtonText={t('query_tabs.update_configuration')}>
       <>
-        <h3>Order</h3>
-        <p>
-          Use drag and drop to change the order of the dashboard pages. Double-click on a dashboard title to change it.
-        </p>
+        <h3>{t('query_tabs.order')}</h3>
+        <p>{t('query_tabs.order_help')}</p>
         <SortableList<PageListItem>
           items={nextQueriesList.toArray()}
           onMoveItem={updatePageSorting}

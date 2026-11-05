@@ -16,8 +16,9 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
-import ProductName from 'brand-customization/ProductName';
+import useProductName from 'brand-customization/useProductName';
 import { Alert } from 'components/bootstrap';
 import { ConfirmDialog } from 'components/common';
 
@@ -41,15 +42,6 @@ type Props = {
   onConfirm: () => void;
 };
 
-const versionSummary = (currentVersion: string | undefined, targetVersion: string | undefined) =>
-  currentVersion && targetVersion ? (
-    <>
-      from <strong>{currentVersion}</strong> to <strong>{targetVersion}</strong>
-    </>
-  ) : (
-    <>to the target version</>
-  );
-
 const StartUpgradeConfirmDialog = ({
   currentVersion,
   targetVersion,
@@ -58,59 +50,65 @@ const StartUpgradeConfirmDialog = ({
   isSubmitting,
   onCancel,
   onConfirm,
-}: Props) =>
-  isRollingUpgrade ? (
+}: Props) => {
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
+  const productName = useProductName();
+  const hasVersions = !!(currentVersion && targetVersion);
+  const versionValues = { count: numberOfDataNodes, currentVersion, targetVersion };
+  const strong = { strong: <strong /> };
+
+  return isRollingUpgrade ? (
     <ConfirmDialog
       show
-      title="Start OpenSearch rolling upgrade?"
-      btnConfirmText="Start rolling upgrade"
+      title={t('start_upgrade.rolling.title')}
+      btnConfirmText={t('start_upgrade.rolling.confirm')}
       isAsyncSubmit
       isSubmitting={isSubmitting}
       onCancel={onCancel}
       onConfirm={onConfirm}
-      submitLoadingText="Starting...">
-      <Alert bsStyle="warning" title="This restarts every Data Node, one at a time">
+      submitLoadingText={t('start_upgrade.starting')}>
+      <Alert bsStyle="warning" title={t('start_upgrade.rolling.alert_title')}>
         <Paragraph>
-          Each of your {numberOfDataNodes} Data Nodes will be upgraded and restarted one at a time to move its embedded
-          OpenSearch {versionSummary(currentVersion, targetVersion)}.
+          <Trans
+            t={t}
+            i18nKey={hasVersions ? 'start_upgrade.rolling.each_node_with_versions' : 'start_upgrade.rolling.each_node'}
+            values={versionValues}
+            components={strong}
+          />
         </Paragraph>
-        <Paragraph>
-          Shard allocation is paused during each restart, so the cluster stays available — but indexing and search may
-          be briefly degraded while a node leaves and rejoins.
-        </Paragraph>
-        <Paragraph>
-          After each node the upgrade waits for the cluster to return to green before continuing. If that takes too long
-          it pauses and waits for you to resume.
-        </Paragraph>
-        <Paragraph>Once started, it cannot be rolled back to the previous version.</Paragraph>
+        <Paragraph>{t('start_upgrade.rolling.shard_allocation')}</Paragraph>
+        <Paragraph>{t('start_upgrade.rolling.wait_for_green')}</Paragraph>
+        <Paragraph>{t('start_upgrade.no_rollback')}</Paragraph>
       </Alert>
-      <p>Make sure the cluster is healthy (green) before proceeding.</p>
+      <p>{t('start_upgrade.rolling.healthy_cluster')}</p>
     </ConfirmDialog>
   ) : (
     <ConfirmDialog
       show
-      title="Restart Data Nodes' OpenSearch?"
-      btnConfirmText="Restart"
+      title={t('start_upgrade.full.title')}
+      btnConfirmText={t('start_upgrade.full.confirm')}
       isAsyncSubmit
       isSubmitting={isSubmitting}
       onCancel={onCancel}
       onConfirm={onConfirm}
-      submitLoadingText="Restarting...">
-      <Alert bsStyle="danger" title="Fewer than 3 Data Nodes — this is a full restart, not a rolling one">
+      submitLoadingText={t('start_upgrade.full.submitting')}>
+      <Alert bsStyle="danger" title={t('start_upgrade.full.alert_title')}>
         <Paragraph>
-          With fewer than 3 Data Nodes, OpenSearch can&apos;t stay available by restarting one node at a time. All your
-          Data Nodes restart together to move OpenSearch {versionSummary(currentVersion, targetVersion)}, so the storage
-          backend is <strong>unavailable</strong> until they finish — search and indexing are interrupted.
+          <Trans
+            t={t}
+            i18nKey={
+              hasVersions ? 'start_upgrade.full.restart_together_with_versions' : 'start_upgrade.full.restart_together'
+            }
+            values={versionValues}
+            components={strong}
+          />
         </Paragraph>
-        <Paragraph>
-          While OpenSearch is down, incoming messages pile up in the disk journal on each <ProductName /> node. If the
-          outage outlasts the journal&apos;s size or age limit, ingestion stalls and messages can be dropped — only
-          proceed if the journal has enough headroom for the expected downtime.
-        </Paragraph>
-        <Paragraph>Once started, it cannot be rolled back to the previous version.</Paragraph>
+        <Paragraph>{t('start_upgrade.full.journal', { productName })}</Paragraph>
+        <Paragraph>{t('start_upgrade.no_rollback')}</Paragraph>
       </Alert>
-      <p>Proceed only if you can tolerate the downtime.</p>
+      <p>{t('start_upgrade.full.tolerate_downtime')}</p>
     </ConfirmDialog>
   );
+};
 
 export default StartUpgradeConfirmDialog;

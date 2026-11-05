@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { visT } from 'views/components/visualizations/visualizationTranslation';
 import type { VisualizationType } from 'views/types';
 import SankeyVisualization from 'views/components/visualizations/sankey/SankeyVisualization';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
@@ -23,11 +24,11 @@ const countGroupingFields = (formValues: WidgetConfigFormValues) =>
 
 const validate = (formValues: WidgetConfigFormValues) => {
   if (countGroupingFields(formValues) < 2) {
-    return { type: 'Sankey requires at least two grouping fields.' };
+    return { type: visT('vis_validation.sankey_requires_groupings') };
   }
 
   if ((formValues.metrics?.length ?? 0) > 1) {
-    return { type: 'Sankey supports only a single metric.' };
+    return { type: visT('vis_validation.sankey_single_metric') };
   }
 
   return {};
@@ -35,7 +36,9 @@ const validate = (formValues: WidgetConfigFormValues) => {
 
 const sankey: VisualizationType<typeof SankeyVisualization.type> = {
   type: SankeyVisualization.type,
-  displayName: 'Sankey',
+  get displayName() {
+    return visT('vis_types.sankey');
+  },
   component: SankeyVisualization,
   validate,
 };

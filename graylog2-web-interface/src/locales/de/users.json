@@ -1,0 +1,499 @@
+{
+  "users_overview": {
+    "title": "Benutzerübersicht",
+    "documentation_link_title": "Berechtigungsdokumentation",
+    "description": "Übersicht über alle registrierten Benutzer."
+  },
+  "user_create": {
+    "title": "Neuen Benutzer erstellen",
+    "documentation_link_title": "Berechtigungsdokumentation",
+    "description": "Verwenden Sie diese Seite, um neue Benutzer für die Web-Oberfläche oder die REST-API zu erstellen.",
+    "submit_button": "Benutzer erstellen",
+    "reader_role_description": "Gewährt grundlegende Berechtigungen für jeden {{productName}}-Benutzer (integriert)",
+    "role_required": "Sie müssen mindestens eine der Rollen <em>Reader</em> oder <em>Admin</em> auswählen.",
+    "failed_title": "Der Benutzer konnte nicht erstellt werden",
+    "submit": "Benutzer erstellen",
+    "submitting": "Benutzer wird erstellt..."
+  },
+  "user_edit": {
+    "title": "Benutzer {{username}} bearbeiten",
+    "title_prefix": "Benutzer bearbeiten",
+    "documentation_link_title": "Berechtigungsdokumentation",
+    "description": "Sie können die Benutzerdetails und das Passwort hier ändern und Rollen und Teams zuweisen.",
+    "segments": {
+      "profile": "Profil",
+      "preferences": "Einstellungen",
+      "teams_roles": "Teams und Rollen",
+      "shared_entities": "Geteilte Einträge"
+    },
+    "password": {
+      "new_password": "Neues Passwort",
+      "repeat_password": "Passwort wiederholen",
+      "old_password": "Altes Passwort",
+      "alert_title": "Passwort ändern",
+      "alert_text": "Wenn Sie das Passwort ändern, wird der Benutzer abgemeldet und alle seine aktuellen Sitzungen werden ungültig. Ändern Sie Ihr eigenes Passwort, werden Sie direkt nach dem Speichern abgemeldet. Speichern Sie in diesem Fall zuerst alle ausstehenden Änderungen.",
+      "change": "Passwort ändern"
+    },
+    "profile": {
+      "email": "E-Mail",
+      "full_name": "Vollständiger Name",
+      "update": "Profil aktualisieren"
+    },
+    "profile_info": {
+      "title": "Vor- und Nachname",
+      "text": "Mit {{productName}} 4.1 haben wir getrennte Felder für Vor- und Nachname eingeführt. Diese müssen angegeben werden, bevor das Profil des Benutzers gespeichert werden kann."
+    },
+    "read_only": "Der ausgewählte Benutzer {{fullName}} kann nicht bearbeitet werden.",
+    "roles_required": "Die Rollen müssen mindestens die Rolle Admin oder Reader enthalten.",
+    "external": {
+      "title": "Externer Benutzer",
+      "text": "Dieser Benutzer wurde von einem externen Server synchronisiert, daher können weder das Profil noch das Passwort geändert werden. Weitere Informationen erhalten Sie von Ihrem Administrator."
+    },
+    "preferences": {
+      "language_help": "Sprache der {{productName}}-Oberfläche. Mit Beta markierte Übersetzungen wurden noch nicht überprüft.",
+      "enable_autocompletion": "Autovervollständigung aktivieren",
+      "search_sidebar": "Seitenleiste der Suche",
+      "dashboard_sidebar": "Seitenleiste des Dashboards",
+      "is_pinned": "Ist angeheftet",
+      "search_sidebar_help": "Kann auch über das Pin-Symbol der Seitenleiste der Suche geändert werden",
+      "dashboard_sidebar_help": "Kann auch über das Pin-Symbol der Seitenleiste des Dashboards geändert werden",
+      "theme_mode_help": "Kann über den Schalter im Benutzermenü geändert werden",
+      "update": "Einstellungen aktualisieren"
+    },
+    "settings": {
+      "select_entity": "Bitte wählen Sie einen Eintrag aus.",
+      "update": "Einstellungen aktualisieren"
+    }
+  },
+  "roles_overview": {
+    "title": "Rollenübersicht",
+    "documentation_link_title": "Berechtigungsdokumentation",
+    "button_text": "Rollenübersicht",
+    "description": "Übersicht über alle verfügbaren Rollen in {{productName}}. Rollen ermöglichen es, Benutzern Fähigkeiten zu gewähren, wie z. B. das Erstellen von Dashboards oder Event Definitionen.",
+    "alert_title": "Berechtigungen vergeben",
+    "alert_body_prefix": "Die integrierten Rollen ermöglichen es, Benutzern Fähigkeiten zu gewähren, wie z. B. das Erstellen von Dashboards oder das Anzeigen des Archivkatalogs. Sie gewähren jedoch keine Berechtigungen für ein bestimmtes Dashboard oder einen bestimmten Stream. Es ist auch nicht möglich, eine eigene Rolle zu erstellen. Das Gewähren von Berechtigungen für eine bestimmte Entität kann über deren ",
+    "share_text": "Teilen",
+    "alert_body_suffix": "-Schaltfläche erfolgen. Sie finden die Schaltfläche z. B. auf der Übersicht der Entitäten. Wenn Sie Berechtigungen für eine Entität für mehrere Benutzer gleichzeitig vergeben möchten, Sie können Teams verwenden. Erfahren Sie mehr in der ",
+    "documentation_text": "Dokumentation"
+  },
+  "role_details": {
+    "title": "Details zur Rolle {{name}}",
+    "title_prefix": "Details zur Rolle",
+    "documentation_link_title": "Berechtigungsdokumentation",
+    "button_text": "Rollenübersicht",
+    "description": "Übersicht über Details wie Name, Beschreibung und zugewiesene Benutzer."
+  },
+  "role_edit": {
+    "title": "Rolle {{name}} bearbeiten",
+    "title_prefix": "Rolle bearbeiten",
+    "documentation_link_title": "Berechtigungsdokumentation",
+    "button_text": "Rollenübersicht",
+    "description": "Sie können die Rolle Benutzern zuweisen."
+  },
+  "user_tokens_edit": {
+    "title": "Token bearbeiten für Benutzer {{username}}",
+    "title_prefix": "Token bearbeiten für Benutzer",
+    "documentation_link_title": "Berechtigungsdokumentation",
+    "description": "Sie können neue Token erstellen oder alte löschen."
+  },
+  "token_management": {
+    "title": "Token-Verwaltung",
+    "documentation_link_title": "Berechtigungsdokumentation",
+    "description": "Übersicht über die für {{productName}} konfigurierten Zugriffstoken."
+  },
+  "token_list": {
+    "title": "Token erstellen und bearbeiten",
+    "token_created": "Token <em>{{name}}</em> wurde erstellt!",
+    "token_created_description": "Dies ist Ihr neues Token. Stellen Sie sicher, dass Sie es jetzt kopieren, da Sie es nicht mehr sehen können.",
+    "done_button": "Fertig",
+    "title_list": "Token",
+    "filter_label": "Filter",
+    "no_tokens_to_display": "Keine Token zum Anzeigen.",
+    "no_tokens_match_filter": "Keine Token entsprechen dem Filter.",
+    "column_name": "Token-Name",
+    "column_created": "Erstellt",
+    "column_last_access": "Letzter Zugriff",
+    "column_expires_at": "Läuft ab am",
+    "column_actions": "Aktionen",
+    "never_used": "Nie verwendet"
+  },
+  "permissions": {
+    "grantee_types": {
+      "user": "Benutzer",
+      "team": "Team",
+      "global": "Alle",
+      "error": "Fehler"
+    },
+    "dependencies_warning": {
+      "title": "Für die aktuelle Gruppe von Mitwirkenden fehlen Abhängigkeiten",
+      "needs_access": "{{type}} <granteeTitle>{{title}}</granteeTitle> benötigt Zugriff auf",
+      "dependency": "{{type}}: <dependencyTitle>{{title}}</dependencyTitle>",
+      "owners": "Eigentümer:",
+      "owner": "{{type}} <ownerTitle>{{title}}</ownerTitle>"
+    },
+    "share": {
+      "add_collaborator": "Mitwirkenden hinzufügen",
+      "search_placeholder": "Nach Benutzern und Teams suchen",
+      "collaborators": "Mitwirkende",
+      "direct_collaborators": "Direkte Mitwirkende",
+      "shared_via_collections": "Über Collections geteilt",
+      "update_sharing": "Freigabe aktualisieren",
+      "modal_title": "{{entityType}} teilen: <entityTitle>{{entityTitle}}</entityTitle>",
+      "confirm_not_added_named": "„{{title}}“ wurde ausgewählt, aber nie als Mitwirkender hinzugefügt. Möchten Sie trotzdem fortfahren?",
+      "confirm_not_added_unnamed": "Ein Eintrag (Name nicht gefunden) wurde ausgewählt, aber nie als Mitwirkender hinzugefügt. Möchten Sie trotzdem fortfahren?"
+    },
+    "grantees": {
+      "change_capability": "Berechtigung für {{title}} ändern",
+      "remove_sharing": "Freigabe für {{title}} entfernen",
+      "no_collaborators": "Für diesen Eintrag ({{entityType}}) gibt es keine Mitwirkenden."
+    },
+    "roles_selector": {
+      "search_placeholder": "Nach Rollen suchen",
+      "assign_role": "Rolle zuweisen"
+    },
+    "shareable_url": {
+      "copy_title": "Parameter in die Zwischenablage kopieren",
+      "hint": "Sie und alle zum Ansehen Berechtigten können auf diesen Link zugreifen."
+    },
+    "shared_entities": {
+      "entity_type": "Eintragstyp",
+      "filter_entity_types": "Eintragstypen filtern",
+      "capability": "Berechtigung",
+      "filter_capabilities": "Berechtigungen filtern",
+      "found": "{{total}} Einträge gefunden, die mit {{entityType}} geteilt sind.",
+      "no_results": "Es wurden keine geteilten Einträge gefunden.",
+      "headers": {
+        "entity_name": "Eintragsname",
+        "entity_type": "Eintragstyp",
+        "owner": "Eigentümer",
+        "capability": "Berechtigung"
+      },
+      "query_example": "Geteilte Einträge finden, deren Titel „security“ enthält:"
+    },
+    "sharing_disabled": {
+      "title": "Teilen nicht möglich",
+      "owners_only": "Nur Eigentümer dieses Eintrags ({{type}}) dürfen ihn teilen."
+    },
+    "validation_error": {
+      "ownerless": "Wenn Sie die folgenden Eigentümer entfernen, hat der Eintrag keinen Eigentümer mehr:"
+    },
+    "capabilities": {
+      "viewer": "Betrachter",
+      "manager": "Manager",
+      "owner": "Eigentümer"
+    },
+    "select_capability": "Berechtigung auswählen"
+  },
+  "roles": {
+    "profile": {
+      "title": "Profil",
+      "name": "Name",
+      "description": "Beschreibung"
+    },
+    "teams": "Teams",
+    "users": {
+      "title": "Benutzer",
+      "none_selected": "Es wurden keine ausgewählten Benutzer gefunden.",
+      "assign_users": "Benutzer zuweisen",
+      "selected_users": "Ausgewählte Benutzer",
+      "needs_reader_or_admin": "Der Benutzer '{{name}}' benötigt mindestens die Rolle Reader oder Admin."
+    },
+    "users_selector": {
+      "search_placeholder": "Nach Benutzern suchen",
+      "assign_user": "Benutzer zuweisen"
+    },
+    "actions": {
+      "edit_role_title": "Rolle {{name}} bearbeiten",
+      "delete_role_title": "Rolle {{name}} löschen",
+      "edit": "Bearbeiten",
+      "deleting": "Wird gelöscht",
+      "delete": "Löschen",
+      "confirm_delete": "Möchten Sie die Rolle „{{name}}“ wirklich löschen?",
+      "still_assigned": "Sie ist noch {{count}} Benutzern zugewiesen."
+    },
+    "overview": {
+      "title": "Rollen",
+      "found": "{{total}} Rollen im System gefunden.",
+      "none_found": "Es wurden keine Rollen gefunden."
+    },
+    "query_example": "Rollen finden, deren Name „manager“ enthält:",
+    "navigation": {
+      "view_details": "Details anzeigen",
+      "edit_role": "Rolle bearbeiten"
+    }
+  },
+  "security_teaser": {
+    "overview": {
+      "hotspot_0": "Finden Sie Ihre wichtigsten Sicherheitsinformationen schnell auf dem Tab „Overview“.",
+      "hotspot_1": "Hier sehen Sie hohe Alarme, die wichtigsten Eventquellen und mehr, die Ihnen Einblick in Ihre Sicherheitslage geben.",
+      "hotspot_2": "Bewegen Sie den Mauszeiger über diese Tooltips auf dieser Seite, um mehr über die Funktionen von {{productName}} Security zu erfahren",
+      "title": "Übersicht"
+    },
+    "anomalies": {
+      "hotspot_0": "Erhalten Sie eine Übersicht über die laufenden Anomalien, wie viele erkannt wurden und wie sich das im Vergleich zum vorherigen Zeitraum verhält.",
+      "hotspot_1": "Konfidenzintervalle zeigen, wie weit das Verhalten von der Norm abweicht.",
+      "hotspot_2": "Es gibt Detektoren für verschiedene Arten von Anomalien – sehen Sie schnell, welche davon Alarme erzeugen.",
+      "hotspot_3": "Erkennen Sie Benutzerkonten mit für sie ungewöhnlichem Verhalten bei Anmeldungen oder Sicherheitsevents.",
+      "title": "Anomalien"
+    },
+    "host_activity": {
+      "hotspot_0": "Verschaffen Sie sich einen Überblick über die Anzahl Ihrer hohen, mittleren und niedrigen Alarme samt Trend, um zu erkennen, ob es ein ganz normaler Tag im Büro ist . . . oder nicht.",
+      "hotspot_1": "Erkennen Sie sofort, welche Hosts die hohen Alarme erzeugen, um die MTTR zu verkürzen.",
+      "hotspot_2": "Sehen Sie, welche Technik die meisten Anmeldungen erzeugt.",
+      "hotspot_3": "Starten Sie eine Untersuchung, wenn Änderungen an Identitäts- und Zugriffskontrollen von unerwarteten Rechnern kommen.",
+      "hotspot_4": "Die Nachrichtenzahlen je Eventquelle zeigen Ihnen täglich die regulären Muster in den Daten; Ausreißer lösen Untersuchungen aus, warum sie auftreten.",
+      "title": "Host-Aktivität"
+    },
+    "network_activity": {
+      "hotspot_0": "Erkennen Sie sofort Spitzen bei den Datenflüssen in Ihrem Netzwerk.",
+      "hotspot_1": "Sehen Sie schnell, woher die Daten kommen und wohin sie gehen.",
+      "hotspot_2": "Erkennen Sie, welche Benutzer die größten Datenmengen über das Netzwerk senden.",
+      "hotspot_3": "Stellen Sie fest, ob ein ungewöhnliches Muster in den DNS-Abfrageergebnissen vorliegt, etwa ein bestimmter Fehlercode, der plötzlich in der Top-15-Liste auftaucht. ",
+      "hotspot_4": "Die 15 wichtigsten Plattformen, die DNS-Anfragen erzeugen, nach Eventquelle.",
+      "title": "Netzwerkaktivität"
+    },
+    "user_activity": {
+      "hotspot_0": "Erkennen Sie schnell, ob es besorgniserregende Trends bei fehlgeschlagenen Anmeldungen gibt.",
+      "hotspot_1": "Erfolgreiche und fehlgeschlagene Anmeldungen je Benutzer helfen Ihnen, problematische Konten und ungewöhnliche Aktivitäten zu erkennen.",
+      "hotspot_2": "Dies sind die 15 Benutzerkonten, die die meisten hohen Alarme erzeugen!",
+      "hotspot_3": "Was sind die häufigsten Änderungen an Identitäts- und Zugriffskontrollen in Ihrer Umgebung?",
+      "hotspot_4": "Kennen Sie das Ziel der häufigsten Änderungen an Zugriffskontrollen.",
+      "title": "Benutzeraktivität"
+    },
+    "demo": {
+      "items": {
+        "anomaly_detection_ai": "KI-Anomalieerkennung",
+        "cloud_option": "Cloud-Option",
+        "archiving": "Archivierung",
+        "audit_logs_cloud": "Audit-Logs für {{productName}} Cloud",
+        "dynamic_lookup_tables": "Dynamische Lookup-Tabellen",
+        "advanced_alerting": "Erweiterte Alarmierung mit Skripting",
+        "compliance_reporting": "Compliance-Reports",
+        "correlation_aggregation": "Korrelations- und Aggregationsevents",
+        "threat_intel": "Threat-Intel-Integrationen",
+        "incident_workspaces": "Arbeitsbereiche für Incident-Untersuchungen",
+        "prebuilt_parser_dashboards": "Vorgefertigte Security-Parser und Dashboards",
+        "sigma_rules": "Sigma-Regeln",
+        "parameterized_dashboards": "Parametrisierte Dashboards",
+        "input_output_integrations": "Input- und Output-Integrationen",
+        "threat_management": "Threat Management",
+        "search_workflow": "Such-Workflow, Vorlagen und Filter",
+        "soar_integrations": "SOAR-Integrationen"
+      },
+      "title": "Security-Demo",
+      "banner_text": "Weitere Informationen und die Buchung einer vollständigen Produktdemo finden Sie auf der {{productName}}-Website.",
+      "button": "{{productName}} Security",
+      "overview": "ÜBERSICHT",
+      "description": "{{productName}} Security wurde entwickelt, um die Cybersicherheit für IT-Teams zu revolutionieren, und vereint die Funktionen von SIEM, Security Analytics, Incident-Untersuchung und Anomalieerkennung. Mit unserer Plattform arbeiten Sie effizienter, erledigen kritische Aufgaben schneller und verringern das Risiko durch böswillige Akteure und Angriffe auf Basis von Zugangsdaten."
+    }
+  },
+  "user_fields": {
+    "username": "Benutzername",
+    "first_name": "Vorname",
+    "last_name": "Nachname",
+    "full_name": "Vollständiger Name",
+    "email": "E-Mail-Adresse",
+    "password": "Passwort",
+    "repeat_password": "Passwort wiederholen",
+    "time_zone": "Zeitzone",
+    "sessions_timeout": "Sitzungs-Timeout",
+    "profile": "Profil",
+    "settings": "Einstellungen",
+    "roles": "Rollen",
+    "assign_roles": "Rollen zuweisen",
+    "selected_roles": "Ausgewählte Rollen",
+    "teams": "Teams"
+  },
+  "user_form": {
+    "first_name_help": "Der Vorname des Benutzers.",
+    "last_name_help": "Der Nachname des Benutzers.",
+    "email_help": "Die E-Mail-Adresse des Benutzers.",
+    "username_help": "Wählen Sie einen eindeutigen Benutzernamen für die Anmeldung.",
+    "username_taken": "Der Benutzername ist bereits vergeben",
+    "passwords_mismatch": "Die Passwörter stimmen nicht überein",
+    "time_zone_help": "Wählen Sie Ihre lokale Zeitzone oder lassen Sie die Auswahl unverändert, um die Standardzeitzone des Browsers zu verwenden.",
+    "service_account": "Dienstkonto",
+    "service_account_label": "Der Benutzer ist ein Dienstkonto",
+    "service_account_help": "Wenn aktiviert, wird der Benutzer zu einem Dienstkonto und kann sich nicht an der Weboberfläche anmelden und seine Einstellungen nicht bearbeiten. (z. B. API-Tokens)",
+    "service_account_confirm_title": "Sind Sie sicher?",
+    "service_account_confirm": "Wenn Sie diesen Benutzer in ein Dienstkonto ändern, kann er sich nicht mehr an der Weboberfläche anmelden und seine Einstellungen nicht mehr bearbeiten. (z. B. API-Tokens) Möchten Sie fortfahren?",
+    "global_timeout_message": "Das Sitzungs-Timeout des Benutzers kann nicht bearbeitet werden, weil das <timeoutLink>globale Sitzungs-Timeout</timeoutLink> aktiviert ist."
+  },
+  "token_form": {
+    "token_name": "Token-Name",
+    "placeholder": "Wofür ist dieses Token?",
+    "ttl_label": "Token-TTL",
+    "ttl_invalid": "ungültig (min.: 1 Minute)",
+    "creating": "Wird erstellt...",
+    "create": "Token erstellen",
+    "ttl_help": "Beispiele für die TTL-Syntax: für 60 Sekunden: PT60S, für 60 Minuten: PT60M, für 24 Stunden: PT24H, für 30 Tage: P30D"
+  },
+  "permissions_info": {
+    "title": "Berechtigungen erteilen",
+    "text": "Berechtigungen für einen Eintrag wie Streams und Dashboards können über die Schaltfläche <shareLabel>Teilen</shareLabel> des Eintrags erteilt werden. Sie finden die Schaltfläche z. B. auf der Übersichtsseite der Einträge. Weitere Informationen finden Sie in der <docsLink>Dokumentation</docsLink>."
+  },
+  "startpage": {
+    "label": "Startseite",
+    "help": "Wählen Sie die Seite, die der Benutzer direkt nach der Anmeldung sieht. Es können nur Einträge ausgewählt werden, für die der Benutzer Berechtigungen hat.",
+    "select_type": "Typ auswählen",
+    "select_value": "{{type}} auswählen",
+    "entity": "Eintrag",
+    "types": {
+      "dashboard": "Dashboard",
+      "stream": "Stream",
+      "search": "Suche"
+    },
+    "new_search": "Neue Suche",
+    "threat_coverage": "Threat Coverage",
+    "missing_permission": "Dem Benutzer fehlt die Berechtigung für die konfigurierte Seite"
+  },
+  "timeout": {
+    "sessions_label": "Sitzungs-Timeout",
+    "alert_title": "Sitzungs-Timeout ändern",
+    "alert_text": "Wenn Sie das Timeout für Sitzungen ändern, wird der Benutzer abgemeldet und alle seine aktuellen Sitzungen werden ungültig. Ändern Sie die Einstellung für Ihren eigenen Benutzer, werden Sie beim Speichern abgemeldet. Speichern Sie in diesem Fall alle ausstehenden Änderungen, bevor Sie das Timeout ändern.",
+    "never_label": "Sitzungen laufen nicht ab",
+    "never_help": "Wenn aktiviert, laufen Sitzungen bei Inaktivität nie ab.",
+    "amount_placeholder": "Timeout-Dauer",
+    "help": "Sitzungen enden automatisch nach dieser Zeitspanne, sofern sie nicht aktiv genutzt werden.",
+    "unit_label": "Timeout-Einheit",
+    "units": {
+      "seconds": "Sekunden",
+      "minutes": "Minuten",
+      "hours": "Stunden",
+      "days": "Tage"
+    }
+  },
+  "user_details": {
+    "client_address": "Client-Adresse",
+    "last_activity": "Letzte Aktivität",
+    "logged_in": "Angemeldet",
+    "enabled": "Aktiviert",
+    "auth_service_disabled": "Der Authentifizierungsdienst ist deaktiviert, der Benutzer kann sich nicht anmelden",
+    "preferences": {
+      "title": "Einstellungen",
+      "search_autocompletion": "Autovervollständigung in der Suche",
+      "update_unfocused": "Aktualisierung ohne Fokus",
+      "pin_search_sidebar": "Seitenleiste der Suche anheften",
+      "pin_dashboard_sidebar": "Seitenleiste des Dashboards anheften",
+      "theme_mode": "Designmodus",
+      "not_configured": "Nicht konfiguriert",
+      "language": "Sprache"
+    },
+    "roles_none_selected": "Es wurden keine ausgewählten Rollen gefunden.",
+    "settings": {
+      "timezone": "Zeitzone",
+      "startpage": "Startseite",
+      "no_startpage": "Keine Startseite festgelegt",
+      "no_timeout": "Sitzungen laufen nicht ab",
+      "globally_set": "(<configLink>global festgelegt</configLink>)"
+    },
+    "shared_entities": "Geteilte Einträge"
+  },
+  "users_list": {
+    "client_address_help": "Die Adresse des Clients, mit dem die Sitzung ursprünglich aufgebaut wurde; nicht unbedingt seine aktuelle Adresse.",
+    "admin": {
+      "title": "Systemadministrator",
+      "description": "Der Systemadministrator kann nur in der {{productName}}-Konfigurationsdatei bearbeitet werden."
+    },
+    "headers": {
+      "full_name": "Vollständiger Name",
+      "username": "Benutzername",
+      "email": "E-Mail-Adresse",
+      "client_address": "Client-Adresse",
+      "enabled": "Aktiviert",
+      "role": "Rolle",
+      "actions": "Aktionen"
+    },
+    "title": "Benutzer",
+    "found": "{{total}} registrierte Benutzer im System gefunden.",
+    "none_found": "Es wurden keine Benutzer gefunden.",
+    "filter_label": "Benutzer filtern",
+    "actions": {
+      "edit_tokens_title": "Tokens des Benutzers {{name}} bearbeiten",
+      "edit_tokens": "Tokens bearbeiten",
+      "system_user_tooltip": "Systembenutzer können nur in der Serverkonfigurationsdatei geändert werden.",
+      "system_user": "Systembenutzer",
+      "confirm_disable": "Möchten Sie den Benutzer {{name}} wirklich deaktivieren? Alle aktuellen Sitzungen werden beendet.",
+      "confirm_delete": "Möchten Sie den Benutzer {{name}} wirklich löschen?",
+      "edit_title": "Benutzer {{name}} bearbeiten",
+      "edit": "Bearbeiten",
+      "set_status_title": "Neuen Kontostatus für {{name}} festlegen",
+      "disable": "Deaktivieren",
+      "enable": "Aktivieren",
+      "delete_title": "Benutzer {{name}} löschen"
+    },
+    "logged_in": {
+      "title": "Angemeldet",
+      "last_activity": "Letzte Aktivität: {{activity}}",
+      "client_address": "Client-Adresse: {{address}}",
+      "not_logged_in": "Nicht angemeldet"
+    },
+    "status": {
+      "user_is": "Der Benutzer ist {{status}}",
+      "auth_disabled": " (Authentifizierungsdienst ist deaktiviert)",
+      "enabled": "aktiviert",
+      "disabled": "deaktiviert"
+    },
+    "query_example": "Benutzer finden, deren E-Mail-Adresse example.com enthält:",
+    "fields": {
+      "full_name": "Der vollständige Name eines Benutzers",
+      "username": "Der Anmeldename des Benutzers.",
+      "email": "Die E-Mail-Adresse des Benutzers."
+    },
+    "select_users": "Benutzer auswählen..."
+  },
+  "user_navigation": {
+    "view_details": "Details anzeigen",
+    "edit_user": "Benutzer bearbeiten",
+    "edit_tokens": "Tokens bearbeiten"
+  },
+  "token_admin": {
+    "title": "Tokens",
+    "human_name": "Tokens",
+    "fields": {
+      "username": "Der Benutzername des Token-Eigentümers",
+      "name": "Der Name des Tokens",
+      "created": "Das Erstellungsdatum des Tokens",
+      "last_access": "Der Zeitpunkt der letzten Verwendung des Tokens",
+      "external_user": "Ob der Token-Eigentümer ein Benutzer aus einem externen Authentifizierungs-Backend ist",
+      "auth_backend": "Das Authentifizierungs-Backend des Benutzers. Nicht zutreffend für interne Benutzer"
+    },
+    "example_user": "Tokens finden, die von einem bestimmten Benutzer erstellt wurden:",
+    "example_name": "Token mit einem bestimmten Token-Namen finden:",
+    "deleting_title": "Token wird gelöscht",
+    "delete_confirm": "Sie sind dabei, das Token „{{name}}“ zu löschen. Sind Sie sicher?",
+    "delete": "Löschen",
+    "user_not_found": "Der Benutzer existiert nicht.",
+    "user_error_title": "Fehler beim Token-Benutzer",
+    "not_available": "k. A.",
+    "delete_failed": "Das Löschen des Tokens ist fehlgeschlagen: {{error}}",
+    "delete_failed_title": "Das Token konnte nicht gelöscht werden",
+    "deleted": "Das Token wurde erfolgreich gelöscht.",
+    "deleted_title": "Erfolg!"
+  },
+  "user_details_page": {
+    "title": "Benutzerdetails",
+    "title_with_name": "Benutzerdetails {{name}}",
+    "documentation_link_title": "Berechtigungs-Dokumentation",
+    "description": "Übersicht über Details wie Profilinformationen, Einstellungen, Teams und Rollen."
+  },
+  "password_rules": {
+    "min_length": "Das Passwort muss mindestens {{minLength}} Zeichen lang sein.",
+    "require_uppercase": "Das Passwort muss mindestens einen Großbuchstaben enthalten.",
+    "require_lowercase": "Das Passwort muss mindestens einen Kleinbuchstaben enthalten.",
+    "require_numbers": "Das Passwort muss mindestens eine Ziffer enthalten.",
+    "require_special_chars": "Das Passwort muss mindestens ein Sonderzeichen aus folgender Auswahl enthalten: {{characters}}"
+  },
+  "notifications": {
+    "save_success": "Benutzereinstellungen erfolgreich gespeichert",
+    "save_failed": "Speichern der Einstellungen für \"{{userName}}\" fehlgeschlagen mit Status: {{error}}",
+    "save_failed_title": "Benutzereinstellungen konnten nicht gespeichert werden",
+    "change_success": "Ihre Startseite wurde erfolgreich geändert",
+    "change_failed": "Ändern Ihrer Startseite fehlgeschlagen mit Fehler: {{error}}",
+    "change_failed_title": "Ihre Startseite konnte nicht geändert werden"
+  },
+  "use_basic_user_notifications": {
+    "load_failed": "Laden des Benutzers {{userId}} fehlgeschlagen mit Status",
+    "load_failed_title": "Der Benutzer {{userId}} konnte nicht geladen werden"
+  }
+}

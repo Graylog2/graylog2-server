@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useState, useCallback, useRef } from 'react';
 import styled, { css } from 'styled-components';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 import { Alert } from 'components/bootstrap';
 import useProductName from 'brand-customization/useProductName';
@@ -71,6 +72,7 @@ const formatDate = () => {
 };
 
 const FirstOnboarding = () => {
+  const { t } = useTranslation('collectors');
   const [phase, setPhase] = useState<Phase>('setup');
   const [selectedPlatform, setSelectedPlatform] = useState<PlatformId | null>(null);
   const [installCommand, setInstallCommand] = useState<string>('');
@@ -302,7 +304,7 @@ const FirstOnboarding = () => {
   if (!config) {
     return (
       <BodyContainer>
-        <Alert bsStyle="danger">Could not load Collectors config.</Alert>
+        <Alert bsStyle="danger">{t('overview.config_error')}</Alert>
       </BodyContainer>
     );
   }
@@ -317,10 +319,8 @@ const FirstOnboarding = () => {
   if (!canCompleteSetup) {
     return (
       <BodyContainer>
-        <Alert bsStyle="info" title="Collector ingest endpoint not set up">
-          Collectors enroll against an ingest endpoint that has not been set up yet. Setting it up requires permission
-          to edit the Collectors configuration and to create or change the Collector Ingest (HTTP) input, which your
-          account does not have. Ask an administrator to set up the endpoint first.
+        <Alert bsStyle="info" title={t('overview.endpoint_missing_title')}>
+          {t('overview.endpoint_missing')}
         </Alert>
       </BodyContainer>
     );
@@ -373,7 +373,7 @@ const FirstOnboarding = () => {
             actions={
               <ClipboardButton
                 text={enrollmentToken ?? ''}
-                title="Copy token only"
+                title={t('deployment.copy_token_only')}
                 bsSize="sm"
                 onSuccess={() =>
                   sendTelemetry(TELEMETRY_EVENT_TYPE.COLLECTORS.ENROLLMENT_TOKEN.TOKEN_COPIED, {

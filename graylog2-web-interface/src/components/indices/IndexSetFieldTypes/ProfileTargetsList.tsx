@@ -15,10 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { Badge, Table } from 'components/bootstrap';
-import StringUtils from 'util/StringUtils';
 
 import ScrollContainer from './ScrollContainer';
 import type { ProfileTargetIndexSet, SkippedIndexSet } from './profileTargets';
@@ -45,61 +45,70 @@ const Note = styled.span(
   `,
 );
 
-const pluralizeIndexSets = (count: number) => `${count} ${StringUtils.pluralize(count, 'index set', 'index sets')}`;
-
 type Props = {
   affected: Array<ProfileTargetIndexSet>;
   skipped: Array<SkippedIndexSet>;
   rotated: boolean;
 };
 
-const ProfileTargetsList = ({ affected, skipped, rotated }: Props) => (
-  <Container>
-    <h5>
-      <b>Index Sets</b>
-    </h5>
-    <Summary>
-      Applies to {pluralizeIndexSets(affected.length)}
-      {skipped.length > 0 && `, excludes ${skipped.length}`}.
-    </Summary>
-    <ScrollContainer $maxHeight={250}>
-      <Table condensed>
-        <thead>
-          <tr>
-            <th>Index set</th>
-            <StatusHeader>Status</StatusHeader>
-            <th>Note</th>
-          </tr>
-        </thead>
-        <tbody>
-          {affected.map(({ id, title, writable }) => (
-            <tr key={id}>
-              <td>{title}</td>
-              <td>
-                <Badge color="success" variant="light">
-                  Included
-                </Badge>
-              </td>
-              <td>{!writable && <Note>{rotated ? 'Read-only, not rotated' : 'Read-only'}</Note>}</td>
+const ProfileTargetsList = ({ affected, skipped, rotated }: Props) => {
+  const { t } = useTranslation('indexsets');
+
+  return (
+    <Container>
+      <h5>
+        <b>{t('field_types.targets_title')}</b>
+      </h5>
+      <Summary>
+        {skipped.length > 0
+          ? t('field_types.targets_summary_excluding', { count: affected.length, skipped: skipped.length })
+          : t('field_types.targets_summary', { count: affected.length })}
+      </Summary>
+      <ScrollContainer $maxHeight={250}>
+        <Table condensed>
+          <thead>
+            <tr>
+              <th>{t('field_types.targets_index_set')}</th>
+              <StatusHeader>{t('field_types.targets_status')}</StatusHeader>
+              <th>{t('field_types.targets_note')}</th>
             </tr>
-          ))}
-          {skipped.map(({ indexSet, reason }) => (
-            <tr key={indexSet.id}>
-              <td>{indexSet.title}</td>
-              <td>
-                <Badge color="gray" variant="light">
-                  Excluded
-                </Badge>
-              </td>
-              <td>
-                <Note>{reason}</Note>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
-    </ScrollContainer>
-  </Container>
-);
+          </thead>
+          <tbody>
+            {affected.map(({ id, title, writable }) => (
+              <tr key={id}>
+                <td>{title}</td>
+                <td>
+                  <Badge color="success" variant="light">
+                    {t('field_types.targets_included')}
+                  </Badge>
+                </td>
+                <td>
+                  {!writable && (
+                    <Note>
+                      {rotated ? t('field_types.targets_read_only_not_rotated') : t('field_types.targets_read_only')}
+                    </Note>
+                  )}
+                </td>
+              </tr>
+            ))}
+            {skipped.map(({ indexSet, reason }) => (
+              <tr key={indexSet.id}>
+                <td>{indexSet.title}</td>
+                <td>
+                  <Badge color="gray" variant="light">
+                    {t('field_types.targets_excluded')}
+                  </Badge>
+                </td>
+                <td>
+                  <Note>{reason}</Note>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </ScrollContainer>
+    </Container>
+  );
+};
 
 export default ProfileTargetsList;

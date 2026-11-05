@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { Badge } from 'components/bootstrap';
@@ -124,6 +125,7 @@ const ExpandableCellList = <ItemType,>({
   collapsedCount = DEFAULT_COLLAPSED_COUNT,
   layout = 'stacked',
 }: Props<ItemType>) => {
+  const { t } = useTranslation('common');
   const [isExpanded, setIsExpanded] = useState(false);
 
   if (!items?.length) {
@@ -151,7 +153,7 @@ const ExpandableCellList = <ItemType,>({
   };
 
   if (!isExpanded) {
-    const title = `Show ${hiddenCount} more`;
+    const title = t('expandable_cell_list.show_more', { count: hiddenCount });
 
     return (
       <CollapsedRow>
@@ -172,7 +174,7 @@ const ExpandableCellList = <ItemType,>({
     <Expanded>
       {renderAllItems(true)}
       <ToggleBadge color="gray" size="sm" onClick={toggle}>
-        Show less
+        {t('expandable_cell_list.show_less')}
         <Icon name="keyboard_arrow_up" size="sm" />
       </ToggleBadge>
     </Expanded>

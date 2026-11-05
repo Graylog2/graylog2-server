@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useContext, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import loadAsync from 'routing/loadAsync';
 import ErrorPage from 'components/errors/ErrorPage';
@@ -30,6 +31,8 @@ import ServerAvailabilityContext from 'contexts/ServerAvailabilityContext';
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 import Notifications from 'routing/Notifications';
+import LanguageProvider from 'contexts/LanguageProvider';
+import { lastLanguage } from 'util/applyLanguage';
 
 const LoginPage = loadAsync(() => import(/* webpackChunkName: "LoginPage" */ 'pages/LoginPage'));
 const LoadingPage = loadAsync(() => import(/* webpackChunkName: "LoadingPage" */ 'pages/LoadingPage'));
@@ -41,11 +44,12 @@ const LoggedOutThemeProvider = ({ children }: React.PropsWithChildren) => (
   <GraylogThemeProvider userIsLoggedIn={false}>
     <GlobalThemeStyles />
     <Notifications />
-    {children}
+    <LanguageProvider language={lastLanguage()}>{children}</LanguageProvider>
   </GraylogThemeProvider>
 );
 
 const AppFacade = () => {
+  const { t } = useTranslation('common');
   const currentUser = useExternalStore(CurrentUser, (state) => state.currentUser);
   const loadError = useExternalStore(CurrentUser, (state) => state.loadError);
   const { server, ping } = useContext(ServerAvailabilityContext);
@@ -76,20 +80,20 @@ const AppFacade = () => {
 
     if (loadError) {
       return (
-        <ErrorPage title="Loading your user failed" description={loadError.message} displayPageLayout={false}>
+        <ErrorPage title={t('app_facade.load_user_failed')} description={loadError.message} displayPageLayout={false}>
           <Button bsStyle="primary" onClick={() => window.location.reload()}>
-            Reload page
+            {t('app_facade.reload_page')}
           </Button>
         </ErrorPage>
       );
     }
 
     if (!currentUser) {
-      return <LoadingPage text="We are preparing the web interface for you..." />;
+      return <LoadingPage text={t('app_facade.preparing')} />;
     }
 
     return <LoggedInPage />;
-  }, [currentUser, loadError, server, username]);
+  }, [currentUser, loadError, server, username, t]);
 
   return <ThemeProvider>{content}</ThemeProvider>;
 };

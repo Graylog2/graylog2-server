@@ -26,7 +26,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -45,12 +44,15 @@ import org.graylog.plugins.sidecar.services.ConfigurationVariableService;
 import org.graylog.plugins.sidecar.services.EtagService;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.plugin.rest.CodedException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -160,8 +162,8 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
         final List<Configuration> configurations = this.configurationService.findByConfigurationVariable(configurationVariable);
         if (!configurations.isEmpty()) {
             final ValidationResult validationResult = new ValidationResult();
-            validationResult.addError("name", "Variable is still used in the following configurations: " +
-                    configurations.stream().map(c -> c.name()).collect(Collectors.joining(", ")));
+            validationResult.addError("name", "configuration_variable.variable_is_still_used_in_the_following", "Variable is still used in the following configurations: " +
+                    configurations.stream().map(c -> c.name()).collect(Collectors.joining(", ")), CodedException.paramsOf("configurations", configurations.stream().map(c -> c.name()).collect(Collectors.joining(", "))));
             return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();
         }
 
@@ -176,19 +178,19 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
     private ValidationResult validateConfigurationVariableHelper(ConfigurationVariable confVar) {
         final ValidationResult validationResult = new ValidationResult();
         if (confVar.name().isEmpty()) {
-            validationResult.addError("name", "Variable name can not be empty.");
+            validationResult.addError("name", "sidecar_variable.name_empty", "Variable name can not be empty.", Map.of());
         } else if (!VALID_NAME_PATTERN.matcher(confVar.name()).matches()) {
-            validationResult.addError("name", "Variable name can only contain the following characters: A-Z,a-z,0-9,_");
+            validationResult.addError("name", "sidecar_variable.name_invalid_chars", "Variable name can only contain the following characters: A-Z,a-z,0-9,_", Map.of());
         } else if (INVALID_NAME_PREFIX.matcher(confVar.name()).matches()) {
-            validationResult.addError("name", "Variable name can not start with numbers.");
+            validationResult.addError("name", "sidecar_variable.name_starts_with_number", "Variable name can not start with numbers.", Map.of());
         }
 
         if (configurationVariableService.hasConflict(confVar)) {
-            validationResult.addError("name", "A variable with that name already exists.");
+            validationResult.addError("name", "sidecar_variable.name_exists", "A variable with that name already exists.", Map.of());
         }
 
         if (confVar.content().isEmpty()) {
-            validationResult.addError("content", "Variable content can not be empty.");
+            validationResult.addError("content", "sidecar_variable.content_empty", "Variable content can not be empty.", Map.of());
         }
 
         return validationResult;
@@ -197,7 +199,7 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
     private ConfigurationVariable findVariableOrFail(String id) {
         final ConfigurationVariable configurationVariable = configurationVariableService.find(id);
         if (configurationVariable == null) {
-            throw new NotFoundException("Could not find ConfigurationVariable <" + id + ">.");
+            throw new CodedNotFoundException("sidecar.variable_not_found", "Could not find ConfigurationVariable <" + id + ">.", Map.of("id", id));
         }
         return configurationVariable;
     }

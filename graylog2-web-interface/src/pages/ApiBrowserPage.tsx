@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useCallback, useRef, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import fetch from 'logic/rest/FetchProvider';
@@ -75,34 +76,41 @@ const StyledExplorerContainer = styled.div(
   `,
 );
 
-const DownloadSpecSelect = () => (
-  <div
-    slot="overview-header"
-    style={{
-      padding: '16px 16px 0',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'flex-end',
-      gap: '8px',
-    }}>
-    <span>Download OpenAPI specification:</span>
-    <select
-      onChange={(e) => {
-        const path = e.target.value;
+// File format names are not translated.
+const FORMAT_LABELS = { json: 'JSON', yaml: 'YAML' };
 
-        if (path) {
-          createLinkAndDownload(qualifyUrl(path), `openapi${path.substring(path.lastIndexOf('.'))}`);
-        }
+const DownloadSpecSelect = () => {
+  const { t } = useTranslation('pages');
 
-        // eslint-disable-next-line no-param-reassign
-        e.target.value = '';
+  return (
+    <div
+      slot="overview-header"
+      style={{
+        padding: '16px 16px 0',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        gap: '8px',
       }}>
-      <option value="">Select format</option>
-      <option value="/openapi.json">JSON</option>
-      <option value="/openapi.yaml">YAML</option>
-    </select>
-  </div>
-);
+      <span>{t('api_browser.download_label')}</span>
+      <select
+        onChange={(e) => {
+          const path = e.target.value;
+
+          if (path) {
+            createLinkAndDownload(qualifyUrl(path), `openapi${path.substring(path.lastIndexOf('.'))}`);
+          }
+
+          // eslint-disable-next-line no-param-reassign
+          e.target.value = '';
+        }}>
+        <option value="">{t('api_browser.select_format')}</option>
+        <option value="/openapi.json">{FORMAT_LABELS.json}</option>
+        <option value="/openapi.yaml">{FORMAT_LABELS.yaml}</option>
+      </select>
+    </div>
+  );
+};
 
 const fetchSpec = () => fetch('GET', qualifyUrl('/openapi.json'));
 const addRequestedByHeader = (event: CustomEvent) => {
@@ -112,6 +120,7 @@ const addRequestedByHeader = (event: CustomEvent) => {
 type ExplorerElement = HTMLElement & { loadSpec: (spec: object) => void };
 
 const ApiBrowserPage = () => {
+  const { t } = useTranslation('pages');
   const explorerRef = useRef<ExplorerElement | null>(null);
   const [loaded, setLoaded] = useState(false);
   const {
@@ -146,18 +155,18 @@ const ApiBrowserPage = () => {
 
   if (!loaded || loadingSpec) {
     return (
-      <DocumentTitle title="API Browser - Loading API Spec">
-        <span>Loading API spec ...</span>
+      <DocumentTitle title={t('api_browser.loading_title')}>
+        <span>{t('api_browser.loading')}</span>
       </DocumentTitle>
     );
   }
 
   if (error) {
-    return <PageErrorOverview title="Fetching API spec failed!" error={error} />;
+    return <PageErrorOverview title={t('api_browser.fetch_failed')} error={error} />;
   }
 
   return (
-    <DocumentTitle title="API Browser">
+    <DocumentTitle title={t('api_browser.title')}>
       <StyledExplorerContainer>
         {/* @ts-ignore - openapi-explorer is a web component */}
         <openapi-explorer ref={attachExplorer} server-url="api/" hide-authentication hide-server-selection>

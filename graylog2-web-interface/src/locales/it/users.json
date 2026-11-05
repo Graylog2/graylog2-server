@@ -1,0 +1,499 @@
+{
+  "users_overview": {
+    "title": "Panoramica utenti",
+    "documentation_link_title": "Documentazione sui permessi",
+    "description": "Panoramica di tutti gli utenti registrati."
+  },
+  "user_create": {
+    "title": "Crea nuovo utente",
+    "documentation_link_title": "Documentazione sui permessi",
+    "description": "Usa questa pagina per creare nuovi utenti per l'interfaccia web o l'API REST.",
+    "submit_button": "Crea utente",
+    "reader_role_description": "Concede i permessi di base per ogni utente {{productName}} (integrato)",
+    "role_required": "Devi selezionare almeno uno dei ruoli <em>Reader</em> o <em>Admin</em>.",
+    "failed_title": "Creazione dell'utente non riuscita",
+    "submit": "Crea utente",
+    "submitting": "Creazione utente..."
+  },
+  "user_edit": {
+    "title": "Modifica utente {{username}}",
+    "title_prefix": "Modifica utente",
+    "documentation_link_title": "Documentazione sui permessi",
+    "description": "Qui puoi modificare i dettagli e la password dell'utente e assegnare ruoli e team.",
+    "segments": {
+      "profile": "Profilo",
+      "preferences": "Preferenze",
+      "teams_roles": "Team e ruoli",
+      "shared_entities": "Elementi condivisi"
+    },
+    "password": {
+      "new_password": "Nuova password",
+      "repeat_password": "Ripeti password",
+      "old_password": "Vecchia password",
+      "alert_title": "Modifica della password",
+      "alert_text": "Modificando la password l'utente verrà disconnesso e tutte le sue sessioni attive saranno invalidate. Se modifichi la tua password, verrai disconnesso subito dopo il salvataggio. In tal caso, assicurati di salvare prima eventuali modifiche in sospeso.",
+      "change": "Modifica password"
+    },
+    "profile": {
+      "email": "Email",
+      "full_name": "Nome completo",
+      "update": "Aggiorna profilo"
+    },
+    "profile_info": {
+      "title": "Nome e cognome",
+      "text": "Con {{productName}} 4.1 abbiamo aggiunto campi separati per nome e cognome. Devono essere compilati prima che il profilo dell'utente possa essere salvato."
+    },
+    "read_only": "L'utente selezionato {{fullName}} non può essere modificato.",
+    "roles_required": "I ruoli devono includere almeno il ruolo Admin o Reader.",
+    "external": {
+      "title": "Utente esterno",
+      "text": "Questo utente è stato sincronizzato da un server esterno, pertanto né il profilo né la password possono essere modificati. Contatta il tuo amministratore per maggiori informazioni."
+    },
+    "preferences": {
+      "language_help": "Lingua dell'interfaccia {{productName}}. Le traduzioni contrassegnate come Beta non sono ancora state verificate.",
+      "enable_autocompletion": "Abilita completamento automatico",
+      "search_sidebar": "Barra laterale di ricerca",
+      "dashboard_sidebar": "Barra laterale della dashboard",
+      "is_pinned": "Fissata",
+      "search_sidebar_help": "Può essere modificata anche usando l'icona di fissaggio della barra laterale di ricerca",
+      "dashboard_sidebar_help": "Può essere modificata anche usando l'icona di fissaggio della barra laterale della dashboard",
+      "theme_mode_help": "Può essere modificata usando l'interruttore nel menu utente",
+      "update": "Aggiorna preferenze"
+    },
+    "settings": {
+      "select_entity": "Seleziona un elemento.",
+      "update": "Aggiorna impostazioni"
+    }
+  },
+  "roles_overview": {
+    "title": "Panoramica dei ruoli",
+    "documentation_link_title": "Documentazione sui permessi",
+    "button_text": "Panoramica dei ruoli",
+    "description": "Panoramica di tutti i ruoli disponibili in {{productName}}. I ruoli consentono di concedere agli utenti funzionalità, come creare dashboard o definizioni di evento.",
+    "alert_title": "Concessione di permessi",
+    "alert_body_prefix": "I ruoli integrati consentono di concedere agli utenti funzionalità, come creare dashboard o visualizzare il catalogo degli archivi. Non concedono però permessi per una specifica dashboard o stream. Inoltre non è possibile creare un ruolo personalizzato. La concessione di permessi per un elemento specifico può essere effettuata usando il pulsante ",
+    "share_text": "Condividi",
+    "alert_body_suffix": ". Puoi trovare il pulsante, ad esempio, nella pagina di panoramica degli elementi. Se vuoi concedere permessi per un elemento a più utenti contemporaneamente, puoi usare i team. Maggiori informazioni nella ",
+    "documentation_text": "documentazione"
+  },
+  "role_details": {
+    "title": "Dettagli del ruolo {{name}}",
+    "title_prefix": "Dettagli del ruolo",
+    "documentation_link_title": "Documentazione sui permessi",
+    "button_text": "Panoramica dei ruoli",
+    "description": "Panoramica di dettagli come nome, descrizione e utenti assegnati."
+  },
+  "role_edit": {
+    "title": "Modifica ruolo {{name}}",
+    "title_prefix": "Modifica ruolo",
+    "documentation_link_title": "Documentazione sui permessi",
+    "button_text": "Panoramica dei ruoli",
+    "description": "Puoi assegnare il ruolo agli utenti."
+  },
+  "user_tokens_edit": {
+    "title": "Modifica token dell'utente {{username}}",
+    "title_prefix": "Modifica token dell'utente",
+    "documentation_link_title": "Documentazione sui permessi",
+    "description": "Puoi creare nuovi token o eliminare quelli esistenti."
+  },
+  "token_management": {
+    "title": "Gestione dei token",
+    "documentation_link_title": "Documentazione sui permessi",
+    "description": "Panoramica dei token di accesso configurati per {{productName}}."
+  },
+  "token_list": {
+    "title": "Crea e modifica token",
+    "token_created": "Token {{name}} creato!",
+    "token_created_description": "Questo è il tuo nuovo token. Assicurati di copiarlo ora: non potrai più vederlo.",
+    "done_button": "Fatto",
+    "title_list": "Token",
+    "filter_label": "Filtro",
+    "no_tokens_to_display": "Nessun token da visualizzare.",
+    "no_tokens_match_filter": "Nessun token corrisponde al filtro.",
+    "column_name": "Nome token",
+    "column_created": "Creato",
+    "column_last_access": "Ultimo accesso",
+    "column_expires_at": "Scade il",
+    "column_actions": "Azioni",
+    "never_used": "Mai utilizzato"
+  },
+  "permissions": {
+    "grantee_types": {
+      "user": "Utente",
+      "team": "Team",
+      "global": "Tutti",
+      "error": "Errore"
+    },
+    "dependencies_warning": {
+      "title": "Mancano dipendenze per l'insieme attuale di collaboratori",
+      "needs_access": "{{type}} <granteeTitle>{{title}}</granteeTitle> necessita di accesso a",
+      "dependency": "{{type}}: <dependencyTitle>{{title}}</dependencyTitle>",
+      "owners": "Proprietari:",
+      "owner": "{{type}} <ownerTitle>{{title}}</ownerTitle>"
+    },
+    "share": {
+      "add_collaborator": "Aggiungi collaboratore",
+      "search_placeholder": "Cerca utenti e team",
+      "collaborators": "Collaboratori",
+      "direct_collaborators": "Collaboratori diretti",
+      "shared_via_collections": "Condivisi tramite raccolte",
+      "update_sharing": "Aggiorna condivisione",
+      "modal_title": "Condivisione {{entityType}}: <entityTitle>{{entityTitle}}</entityTitle>",
+      "confirm_not_added_named": "\"{{title}}\" è stato selezionato ma non è mai stato aggiunto come collaboratore. Vuoi continuare comunque?",
+      "confirm_not_added_unnamed": "Un elemento (nome non trovato) è stato selezionato ma non è mai stato aggiunto come collaboratore. Vuoi continuare comunque?"
+    },
+    "grantees": {
+      "change_capability": "Modifica il livello di accesso per {{title}}",
+      "remove_sharing": "Rimuovi condivisione per {{title}}",
+      "no_collaborators": "Questo {{entityType}} non ha collaboratori."
+    },
+    "roles_selector": {
+      "search_placeholder": "Cerca ruoli",
+      "assign_role": "Assegna ruolo"
+    },
+    "shareable_url": {
+      "copy_title": "Copia parametro negli appunti",
+      "hint": "Tu o chiunque sia autorizzato alla visualizzazione può accedere a questo link."
+    },
+    "shared_entities": {
+      "entity_type": "Tipo di elemento",
+      "filter_entity_types": "Filtra tipi di elemento",
+      "capability": "Livello di accesso",
+      "filter_capabilities": "Filtra livelli di accesso",
+      "found": "Trovati {{total}} elementi condivisi con il {{entityType}}.",
+      "no_results": "Nessun elemento condiviso trovato.",
+      "headers": {
+        "entity_name": "Nome elemento",
+        "entity_type": "Tipo di elemento",
+        "owner": "Proprietario",
+        "capability": "Livello di accesso"
+      },
+      "query_example": "Trova elementi condivisi con un titolo che contiene security:"
+    },
+    "sharing_disabled": {
+      "title": "Condivisione non possibile",
+      "owners_only": "Solo i proprietari di questo {{type}} possono condividerlo."
+    },
+    "validation_error": {
+      "ownerless": "Rimuovendo i seguenti proprietari, l'elemento resterà senza proprietario:"
+    },
+    "capabilities": {
+      "viewer": "Visualizzatore",
+      "manager": "Gestore",
+      "owner": "Proprietario"
+    },
+    "select_capability": "Seleziona un livello di accesso"
+  },
+  "roles": {
+    "profile": {
+      "title": "Profilo",
+      "name": "Nome",
+      "description": "Descrizione"
+    },
+    "teams": "Team",
+    "users": {
+      "title": "Utenti",
+      "none_selected": "Nessun utente selezionato.",
+      "assign_users": "Assegna utenti",
+      "selected_users": "Utenti selezionati",
+      "needs_reader_or_admin": "L'utente '{{name}}' necessita almeno del ruolo Reader o Admin."
+    },
+    "users_selector": {
+      "search_placeholder": "Cerca utenti",
+      "assign_user": "Assegna utente"
+    },
+    "actions": {
+      "edit_role_title": "Modifica ruolo {{name}}",
+      "delete_role_title": "Elimina ruolo {{name}}",
+      "edit": "Modifica",
+      "deleting": "Eliminazione in corso",
+      "delete": "Elimina",
+      "confirm_delete": "Vuoi davvero eliminare il ruolo \"{{name}}\"?",
+      "still_assigned": "È ancora assegnato a {{count}} utenti."
+    },
+    "overview": {
+      "title": "Ruoli",
+      "found": "Trovati {{total}} ruoli nel sistema.",
+      "none_found": "Nessun ruolo trovato."
+    },
+    "query_example": "Trova ruoli con un nome che contiene manager:",
+    "navigation": {
+      "view_details": "Visualizza dettagli",
+      "edit_role": "Modifica ruolo"
+    }
+  },
+  "security_teaser": {
+    "overview": {
+      "hotspot_0": "Trova rapidamente le informazioni di sicurezza più importanti nella scheda Panoramica.",
+      "hotspot_1": "Trova avvisi critici, le principali sorgenti di eventi e altro ancora, per avere un quadro della tua postura di sicurezza.",
+      "hotspot_2": "Passa il mouse su questi suggerimenti in tutta la pagina per saperne di più sulle funzionalità di {{productName}} Security",
+      "title": "Panoramica"
+    },
+    "anomalies": {
+      "hotspot_0": "Ottieni un riepilogo delle anomalie in esecuzione, di quante ne sono state rilevate e del confronto con il periodo precedente.",
+      "hotspot_1": "Gli intervalli di confidenza indicano quanto il comportamento si discosta dalla norma.",
+      "hotspot_2": "Esistono rilevatori per diversi tipi di anomalie: vedi subito quali generano avvisi.",
+      "hotspot_3": "Identifica gli account utente con comportamenti insoliti per loro negli accessi o negli eventi di sicurezza.",
+      "title": "Anomalie"
+    },
+    "host_activity": {
+      "hotspot_0": "Ottieni una visione generale del numero di avvisi alti, medi e bassi, con informazioni sulle tendenze, per capire se questa è una giornata normale . . . o no.",
+      "hotspot_1": "Identifica subito quali host generano gli avvisi alti, per ridurre l'MTTR.",
+      "hotspot_2": "Scopri quale tecnologia genera il maggior numero di accessi.",
+      "hotspot_3": "Avvia un'indagine quando le modifiche al controllo di identità e accessi provengono da macchine inattese.",
+      "hotspot_4": "Il numero di messaggi per sorgente di eventi ti offre una visione giornaliera dei modelli regolari nei dati: i picchi anomali avvieranno indagini sulle cause.",
+      "title": "Attività host"
+    },
+    "network_activity": {
+      "hotspot_0": "Vedi subito i picchi nei flussi di dati sulla tua rete.",
+      "hotspot_1": "Scopri rapidamente da dove provengono i dati e dove vanno.",
+      "hotspot_2": "Identifica gli utenti che inviano la maggiore quantità di dati sulla rete.",
+      "hotspot_3": "Determina se c'è un modello insolito nei risultati delle query DNS, come un particolare codice di errore che improvvisamente compare nella Top 15. ",
+      "hotspot_4": "Le prime 15 piattaforme che generano richieste DNS per sorgente di eventi.",
+      "title": "Attività di rete"
+    },
+    "user_activity": {
+      "hotspot_0": "Vedi subito se ci sono tendenze preoccupanti negli accessi falliti.",
+      "hotspot_1": "Gli accessi riusciti e falliti per utente possono aiutarti a individuare account problematici e attività anomale.",
+      "hotspot_2": "Questi sono i primi 15 account utente che generano avvisi alti!",
+      "hotspot_3": "Quali sono le modifiche più comuni al controllo di identità e accessi nel tuo ambiente?",
+      "hotspot_4": "Scopri il bersaglio delle modifiche al controllo degli accessi più frequenti.",
+      "title": "Attività utente"
+    },
+    "demo": {
+      "items": {
+        "anomaly_detection_ai": "Anomaly Detection AI",
+        "cloud_option": "Cloud Option",
+        "archiving": "Archiviazione",
+        "audit_logs_cloud": "Registro di audit per {{productName}} Cloud",
+        "dynamic_lookup_tables": "Lookup Table dinamiche",
+        "advanced_alerting": "Avvisi avanzati con scripting",
+        "compliance_reporting": "Report di conformità",
+        "correlation_aggregation": "Eventi di correlazione e aggregazione",
+        "threat_intel": "Integrazioni di threat intelligence",
+        "incident_workspaces": "Spazi di lavoro per le indagini sugli incidenti",
+        "prebuilt_parser_dashboards": "Parser e dashboard di sicurezza predefiniti",
+        "sigma_rules": "Sigma Rules",
+        "parameterized_dashboards": "Dashboard parametrizzate",
+        "input_output_integrations": "Integrazioni di Input e Output",
+        "threat_management": "Gestione delle minacce",
+        "search_workflow": "Flusso di lavoro di ricerca, template e filtri",
+        "soar_integrations": "Integrazioni SOAR"
+      },
+      "title": "Demo di sicurezza",
+      "banner_text": "Per maggiori informazioni e per prenotare una demo completa del prodotto, visita il sito web di {{productName}}.",
+      "button": "{{productName}} Security",
+      "overview": "PANORAMICA",
+      "description": "{{productName}} Security è progettato per rivoluzionare la cybersicurezza per i team IT, offrendo le funzionalità combinate di SIEM, Security Analytics, indagine sugli incidenti e rilevamento delle anomalie. Usando la nostra piattaforma puoi lavorare in modo più efficiente, affrontare più rapidamente le attività critiche e mitigare i rischi causati da malintenzionati e attacchi basati sulle credenziali."
+    }
+  },
+  "user_fields": {
+    "username": "Nome utente",
+    "first_name": "Nome",
+    "last_name": "Cognome",
+    "full_name": "Nome completo",
+    "email": "Indirizzo email",
+    "password": "Password",
+    "repeat_password": "Ripeti password",
+    "time_zone": "Fuso orario",
+    "sessions_timeout": "Timeout sessioni",
+    "profile": "Profilo",
+    "settings": "Impostazioni",
+    "roles": "Ruoli",
+    "assign_roles": "Assegna ruoli",
+    "selected_roles": "Ruoli selezionati",
+    "teams": "Team"
+  },
+  "user_form": {
+    "first_name_help": "Il nome dell'utente.",
+    "last_name_help": "Il cognome dell'utente.",
+    "email_help": "L'indirizzo email dell'utente.",
+    "username_help": "Scegli un nome utente univoco con cui accedere.",
+    "username_taken": "Il nome utente è già in uso",
+    "passwords_mismatch": "Le password non corrispondono",
+    "time_zone_help": "Scegli il tuo fuso orario locale oppure lascia quello attuale per usare quello predefinito del browser.",
+    "service_account": "Account di servizio",
+    "service_account_label": "L'utente è un account di servizio",
+    "service_account_help": "Se selezionato, l'utente diventa un account di servizio e non potrà accedere all'interfaccia web né modificare le proprie impostazioni. (ad es. token API)",
+    "service_account_confirm_title": "Sei sicuro?",
+    "service_account_confirm": "Trasformare questo utente in un account di servizio gli impedirà di accedere all'interfaccia web e di modificare le proprie impostazioni (ad es. token API). Vuoi procedere?",
+    "global_timeout_message": "Il timeout della sessione utente non è modificabile perché il <timeoutLink>timeout globale delle sessioni</timeoutLink> è abilitato."
+  },
+  "token_form": {
+    "token_name": "Nome token",
+    "placeholder": "A cosa serve questo token?",
+    "ttl_label": "TTL token",
+    "ttl_invalid": "non valido (min: 1 minuto)",
+    "creating": "Creazione in corso...",
+    "create": "Crea token",
+    "ttl_help": "Esempi di sintassi TTL: per 60 secondi: PT60S, per 60 minuti: PT60M, per 24 ore: PT24H, per 30 giorni: P30D"
+  },
+  "permissions_info": {
+    "title": "Concessione di permessi",
+    "text": "La concessione di permessi per elementi come stream e dashboard può essere configurata usando il pulsante <shareLabel>Condividi</shareLabel> di un elemento. Puoi trovare il pulsante, ad esempio, nella pagina di panoramica degli elementi. Maggiori informazioni nella <docsLink>documentazione</docsLink>."
+  },
+  "startpage": {
+    "label": "Pagina iniziale",
+    "help": "Seleziona la pagina che l'utente vede subito dopo il login. Sono selezionabili solo gli elementi per cui l'utente ha dei permessi.",
+    "select_type": "Seleziona tipo",
+    "select_value": "Seleziona {{type, lowercase}}",
+    "entity": "elemento",
+    "types": {
+      "dashboard": "Dashboard",
+      "stream": "Stream",
+      "search": "Ricerca"
+    },
+    "new_search": "Nuova ricerca",
+    "threat_coverage": "Threat Coverage",
+    "missing_permission": "All'utente mancano i permessi per la pagina configurata"
+  },
+  "timeout": {
+    "sessions_label": "Timeout sessioni",
+    "alert_title": "Modifica del timeout di sessione",
+    "alert_text": "Modificando l'impostazione di timeout delle sessioni l'utente verrà disconnesso e tutte le sue sessioni attive saranno invalidate. Se modifichi l'impostazione per il tuo utente, verrai disconnesso nel momento in cui salvi. In tal caso, assicurati di salvare eventuali modifiche in sospeso prima di cambiare il timeout.",
+    "never_label": "Le sessioni non scadono",
+    "never_help": "Se selezionato, le sessioni non scadono mai per inattività.",
+    "amount_placeholder": "Quantità di timeout",
+    "help": "La sessione termina automaticamente dopo questo intervallo di tempo, a meno che non venga usata attivamente.",
+    "unit_label": "Unità di timeout",
+    "units": {
+      "seconds": "Secondi",
+      "minutes": "Minuti",
+      "hours": "Ore",
+      "days": "Giorni"
+    }
+  },
+  "user_details": {
+    "client_address": "Indirizzo client",
+    "last_activity": "Ultima attività",
+    "logged_in": "Connesso",
+    "enabled": "Abilitato",
+    "auth_service_disabled": "Il servizio di autenticazione è disabilitato, l'utente non può accedere",
+    "preferences": {
+      "title": "Preferenze",
+      "search_autocompletion": "Completamento automatico della ricerca",
+      "update_unfocused": "Aggiorna quando non in primo piano",
+      "pin_search_sidebar": "Fissa barra laterale di ricerca",
+      "pin_dashboard_sidebar": "Fissa barra laterale della dashboard",
+      "theme_mode": "Modalità tema",
+      "not_configured": "Non configurato",
+      "language": "Lingua"
+    },
+    "roles_none_selected": "Nessun ruolo selezionato.",
+    "settings": {
+      "timezone": "Fuso orario",
+      "startpage": "Pagina iniziale",
+      "no_startpage": "Nessuna pagina iniziale impostata",
+      "no_timeout": "Le sessioni non scadono",
+      "globally_set": "(<configLink>impostato globalmente</configLink>)"
+    },
+    "shared_entities": "Elementi condivisi"
+  },
+  "users_list": {
+    "client_address_help": "L'indirizzo del client usato per stabilire inizialmente la sessione, non necessariamente il suo indirizzo attuale.",
+    "admin": {
+      "title": "Amministratore di sistema",
+      "description": "L'amministratore di sistema può essere modificato solo nel file di configurazione di {{productName}}."
+    },
+    "headers": {
+      "full_name": "Nome completo",
+      "username": "Nome utente",
+      "email": "Indirizzo email",
+      "client_address": "Indirizzo client",
+      "enabled": "Abilitato",
+      "role": "Ruolo",
+      "actions": "Azioni"
+    },
+    "title": "Utenti",
+    "found": "Trovati {{total}} utenti registrati nel sistema.",
+    "none_found": "Nessun utente trovato.",
+    "filter_label": "Filtra utenti",
+    "actions": {
+      "edit_tokens_title": "Modifica token dell'utente {{name}}",
+      "edit_tokens": "Modifica token",
+      "system_user_tooltip": "Gli utenti di sistema possono essere modificati solo nel file di configurazione del server.",
+      "system_user": "Utente di sistema",
+      "confirm_disable": "Vuoi davvero disabilitare l'utente {{name}}? Tutte le sessioni attive verranno terminate.",
+      "confirm_delete": "Vuoi davvero eliminare l'utente {{name}}?",
+      "edit_title": "Modifica utente {{name}}",
+      "edit": "Modifica",
+      "set_status_title": "Imposta nuovo stato dell'account per {{name}}",
+      "disable": "Disabilita",
+      "enable": "Abilita",
+      "delete_title": "Elimina utente {{name}}"
+    },
+    "logged_in": {
+      "title": "Connesso",
+      "last_activity": "Ultima attività: {{activity}}",
+      "client_address": "Indirizzo client: {{address}}",
+      "not_logged_in": "Non connesso"
+    },
+    "status": {
+      "user_is": "L'utente è {{status}}",
+      "auth_disabled": " (il servizio di autenticazione è disabilitato)",
+      "enabled": "abilitato",
+      "disabled": "disabilitato"
+    },
+    "query_example": "Trova utenti con un'email che contiene example.com:",
+    "fields": {
+      "full_name": "Il nome completo di un utente",
+      "username": "Il nome utente con cui l'utente accede.",
+      "email": "L'email dell'utente."
+    },
+    "select_users": "Seleziona utente/i..."
+  },
+  "user_navigation": {
+    "view_details": "Visualizza dettagli",
+    "edit_user": "Modifica utente",
+    "edit_tokens": "Modifica token"
+  },
+  "token_admin": {
+    "title": "Token",
+    "human_name": "token",
+    "fields": {
+      "username": "Il nome utente del proprietario del token",
+      "name": "Il nome del token",
+      "created": "La data di creazione del token",
+      "last_access": "L'ultima volta in cui il token è stato usato",
+      "external_user": "Il proprietario del token è un utente di un backend di autenticazione esterno?",
+      "auth_backend": "Il backend di autenticazione dell'utente. N/A per gli utenti interni"
+    },
+    "example_user": "Trova token creati da un determinato utente:",
+    "example_name": "Trova token in base a un determinato nome:",
+    "deleting_title": "Eliminazione del token",
+    "delete_confirm": "Stai per eliminare il token: \"{{name}}\". Sei sicuro?",
+    "delete": "Elimina",
+    "user_not_found": "L'utente non esiste.",
+    "user_error_title": "Errore utente del token",
+    "not_available": "N/A",
+    "delete_failed": "Eliminazione del token non riuscita: {{error}}",
+    "delete_failed_title": "Impossibile eliminare il token",
+    "deleted": "Il token è stato eliminato con successo.",
+    "deleted_title": "Operazione riuscita!"
+  },
+  "user_details_page": {
+    "title": "Dettagli utente",
+    "title_with_name": "Dettagli utente {{name}}",
+    "documentation_link_title": "Documentazione sui permessi",
+    "description": "Panoramica di dettagli come informazioni del profilo, impostazioni, team e ruoli."
+  },
+  "password_rules": {
+    "min_length": "La password deve contenere almeno {{minLength}} caratteri.",
+    "require_uppercase": "La password deve contenere almeno una lettera maiuscola.",
+    "require_lowercase": "La password deve contenere almeno una lettera minuscola.",
+    "require_numbers": "La password deve contenere almeno un numero.",
+    "require_special_chars": "La password deve contenere almeno un carattere speciale tra: {{characters}}"
+  },
+  "notifications": {
+    "save_success": "Preferenze utente salvate con successo",
+    "save_failed": "Salvataggio delle preferenze per \"{{userName}}\" non riuscito con stato: {{error}}",
+    "save_failed_title": "Impossibile salvare le preferenze utente",
+    "change_success": "La tua pagina iniziale è stata modificata con successo",
+    "change_failed": "Modifica della tua pagina iniziale non riuscita con errore: {{error}}",
+    "change_failed_title": "Impossibile modificare la tua pagina iniziale"
+  },
+  "use_basic_user_notifications": {
+    "load_failed": "Caricamento dell'utente {{userId}} non riuscito con stato",
+    "load_failed_title": "Impossibile caricare l'utente {{userId}}"
+  }
+}

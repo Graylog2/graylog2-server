@@ -1,0 +1,558 @@
+{
+  "button": {
+    "perform_search": "検索を実行",
+    "perform_search_dirty": "検索を実行（前回の検索後に変更があります）"
+  },
+  "sidebar": {
+    "description": "説明",
+    "create": "作成",
+    "highlighting": "ハイライト",
+    "fields": "フィールド"
+  },
+  "empty_state": {
+    "no_widgets_search": "検索結果を可視化するウィジェットが定義されていません",
+    "no_widgets_dashboard": "このダッシュボードにはまだウィジェットがありません",
+    "create_widget_hint": "左側のサイドバーの「作成」セクションでウィジェットタイプを選択して、新しいウィジェットを作成します。",
+    "tips_title": "検索とダッシュボードを作成するためのヒント",
+    "tip_1": "まず、答えたい<bold>質問</bold>から始めます。解決したい問題を定義します。",
+    "tip_2": "<bold>制限</bold>して、表示したいデータポイントのみにデータを絞り込みます。",
+    "tip_3": "データを<bold>可視化</bold>します。質問に答えられていますか？",
+    "tip_4": "ダッシュボードを同僚と<bold>共有</bold>します。パラメーターを使用して<bold>再利用</bold>できるように準備します。"
+  },
+  "search_bar": {
+    "streams_placeholder": "検索に含めるストリームを選択します。空の場合はすべてのストリームを検索します。",
+    "refresh_human_name": "検索",
+    "query_history_title": "クエリ履歴を開く",
+    "filters_label": "フィルター",
+    "filters_tooltip_title": "検索フィルター",
+    "filters_enterprise_hint": "検索フィルターとパラメーターはEnterpriseバージョンで利用できます。",
+    "filters_hide_controls": "コントロールを非表示",
+    "scroll_hint": "検索バーまでスクロール",
+    "query_placeholder": "検索クエリを入力してEnterキーを押します。例: (\"not found\" AND http) OR http_response_code:[400 TO 404]"
+  },
+  "actions_menu": {
+    "saved_search": "保存済みの検索",
+    "save_search": "検索を保存",
+    "unsaved_changes": "未保存の変更",
+    "load_title": "以前に保存した検索を読み込む",
+    "load": "読み込み",
+    "share_disabled": "保存済みの検索のみ共有できます。",
+    "dropdown_aria_label": "検索アクションのドロップダウンを開く",
+    "edit_metadata": "メタデータを編集",
+    "export_to_dashboard": "ダッシュボードにエクスポート",
+    "export": "エクスポート",
+    "reset_search": "検索をリセット",
+    "editing_modal_title": "保存済みの検索を編集",
+    "update_search": "検索を更新",
+    "share_description": "この保存済みの検索の共同編集者として追加するユーザーまたはチームを検索します。",
+    "save_success": "ビュー \"{{title}}\" の保存に成功しました。",
+    "save_error": "ビューの保存に失敗しました: {{error}}",
+    "delete_success": "保存済みの検索 \"{{title}}\" の削除に成功しました。",
+    "delete_error": "保存済みの検索の削除に失敗しました: {{error}}"
+  },
+  "save_form": {
+    "popover_title": "検索名",
+    "dirty_warning": "検索パラメーター（期間、ストリーム、またはクエリ）に未確定の変更があります。今保存すると、これらの変更は破棄されます。意図したものでない場合は、保存する前に検索を実行して変更を適用してください。",
+    "title_label": "タイトル",
+    "title_placeholder": "タイトルを入力",
+    "share_description": "この検索の共同編集者として追加するユーザーまたはチームを検索します。",
+    "create_new": "新規作成",
+    "save_as": "名前を付けて保存",
+    "create_new_title": "新しい検索を作成",
+    "save_as_title": "新しい検索として名前を付けて保存",
+    "save": "保存",
+    "save_title": "検索を保存",
+    "cancel": "キャンセル"
+  },
+  "results": {
+    "loading": "検索結果を更新しています..."
+  },
+  "sidebar_description": {
+    "execution": "実行",
+    "ad_hoc_info": "検索を保存するか、ダッシュボードにエクスポートすると、カスタムの概要と説明を追加できます。",
+    "edit_metadata_hint": "この{{viewType}}の説明と概要を追加するには、検索バーの <icon/> アイコンをクリックしてアクションメニューを開きます。アクションメニューには「メタデータを編集」オプションがあります。",
+    "search_section": "検索",
+    "no_summary": "この{{viewType}}には概要がありません。",
+    "no_description": "この{{viewType}}には説明がありません。",
+    "no_query": "クエリはまだ実行されていません。",
+    "query_executed_in": "クエリの実行時間",
+    "effective_time_range": "有効な期間",
+    "varies_per_widget": "ウィジェットごとに異なります",
+    "time_from": "開始",
+    "time_to": "終了",
+    "total_results": "検索結果の合計"
+  },
+  "sidebar_create": {
+    "info": "以下のオプションを使用して、集計、ログビュー（Enterpriseの機能）、またはパラメーター（Enterpriseの機能）を検索に追加します。",
+    "generic": "汎用",
+    "predefined_aggregation": "定義済みの集計",
+    "investigations": "調査",
+    "events": "イベント"
+  },
+  "sidebar_highlighting": {
+    "description": "検索語とフィールド値をハイライトできます。検索クエリのハイライトを結果に表示するかどうかは、{{productName}}サーバーの設定で有効または無効にできます。任意のフィールド値は、その値をクリックして「この値をハイライト」を選択するとハイライトできます。\n用語または値に複数のルールがある場合は、最初に一致したルールが使用されます。",
+    "active_highlights": "有効なハイライト",
+    "add_rule_title": "ハイライトルールを追加",
+    "search_terms": "検索語"
+  },
+  "save_view": {
+    "save": "保存",
+    "save_as": "名前を付けて保存",
+    "save_as_new_dashboard_title": "新しいダッシュボードとして名前を付けて保存",
+    "save_dashboard_title": "ダッシュボードを保存"
+  },
+  "undo_redo": {
+    "undo": "元に戻す",
+    "redo": "やり直す"
+  },
+  "time_range": {
+    "tab_relative": "相対",
+    "tab_absolute": "絶対",
+    "tab_keyword": "キーワード",
+    "from_label": "開始:",
+    "until_label": "終了:",
+    "keyword_label": "キーワード:",
+    "no_override": "上書きなし",
+    "now": "現在",
+    "all_time": "全期間",
+    "ago": "前",
+    "range_ago": "{{time}}前",
+    "range_length_placeholder": "期間の長さを選択",
+    "load_preset": "プリセットを読み込む",
+    "no_available_presets": "利用可能なプリセットがありません",
+    "loading": "読み込み中...",
+    "configure_presets": "プリセットを設定",
+    "insert_current_date": "現在の日付を挿入",
+    "from_hours_label": "時間ラベルから",
+    "from_minutes_label": "開始の分",
+    "from_seconds_label": "開始の秒",
+    "to_hours_label": "終了の時間",
+    "to_minutes_label": "終了の分",
+    "to_seconds_label": "終了の秒",
+    "from_hour": "開始時",
+    "from_minutes": "開始分",
+    "from_seconds": "開始秒",
+    "to_hour": "終了時",
+    "to_minutes": "終了分",
+    "to_seconds": "終了秒",
+    "toggle_day_boundary": "一日の開始と終了を切り替え",
+    "set_current_time": "現在のローカル時刻に設定",
+    "set_range_value": "期間の値を設定",
+    "set_from_value": "開始値を設定",
+    "set_to_value": "終了値を設定",
+    "save_as_preset": "プリセットとして保存",
+    "save_current_as_preset": "現在の期間をプリセットとして保存",
+    "preset_description_placeholder": "説明を追加...",
+    "preset_description_label": "期間の説明",
+    "preset_description_required": "説明は必須です",
+    "preset_similar": "類似の期間が<configurationsLink>期間の設定</configurationsLink>にすでにあります",
+    "save_preset": "プリセットを保存",
+    "calendar": "カレンダー",
+    "timestamp": "タイムスタンプ",
+    "date_format": "日付は <code>{{format}}</code> の形式にしてください。",
+    "from_timestamp": "開始タイムスタンプ",
+    "to_timestamp": "終了タイムスタンプ",
+    "no_override_title": "日時の上書きが選択されていません。",
+    "no_override_hint": "上のタブを使用して、検索する日時範囲を選択します。",
+    "keyword_from": "開始",
+    "keyword_to": "終了",
+    "keyword_headline": "期間:",
+    "keyword_input": "キーワード入力",
+    "keyword_help": "検索の期間を自然言語で指定します。",
+    "keyword_preview": "プレビュー",
+    "keyword_example_last_month": "<code>{{keyword}}</code> は1か月前から現在までを検索します",
+    "keyword_example_hours_ago": "<code>{{keyword}}</code> は4時間前から現在までを検索します",
+    "keyword_example_range": "<code>{{keyword}}</code> は4月1日から2日前までを検索します",
+    "keyword_example_timezone": "<code>{{keyword}}</code> はタイムゾーン+0200での昨日の0時から今日の0時までを検索します（UTCでは22:00）",
+    "keyword_docs": "詳細は<docsLink>ドキュメント</docsLink>を参照してください。",
+    "keyword_docs_title": "キーワード期間のドキュメント",
+    "display_label": "検索期間、クリックで期間セレクターを開く",
+    "picker_title": "検索期間",
+    "admin_limit": "管理者により検索は{{duration}}に制限されています",
+    "update": "期間を更新",
+    "open_selector": "期間セレクターを開く",
+    "timezones_using": "使用中のすべてのタイムゾーン: <bold>{{timezone}}</bold>",
+    "unit_seconds": "秒",
+    "unit_minutes": "分",
+    "unit_hours": "時間",
+    "unit_days": "日"
+  },
+  "execution_info": {
+    "query_executed": "クエリは次の時刻に{{duration}}ミリ秒で実行されました:",
+    "total_results": "検索結果の合計: {{total}}",
+    "no_query": "クエリはまだ実行されていません。"
+  },
+  "highlight_form": {
+    "edit_title": "ハイライトルールを編集",
+    "create_title": "ハイライトルールを作成",
+    "field_label": "フィールド",
+    "field_placeholder": "フィールド名を選択または入力",
+    "field_required": "フィールドは必須です",
+    "condition_label": "条件",
+    "condition_placeholder": "条件を選択",
+    "condition_required": "条件は必須です",
+    "value_label": "値",
+    "value_required": "値は必須です",
+    "update_rule": "ルールを更新",
+    "create_rule": "ルールを作成"
+  },
+  "query_tabs": {
+    "create_page": "新しいページを作成",
+    "more_pages": "その他のダッシュボードページ",
+    "open_configuration": "ページ設定を開く",
+    "copy_page": "ページをコピー",
+    "copying_page": "ページをコピーしています...",
+    "copy_page_failed": "ダッシュボードページのコピーに失敗しました。エラー: {{error}}",
+    "remove_page": "ページ {{title}} を削除",
+    "configuration_title": "ダッシュボードページの設定を更新",
+    "update_configuration": "設定を更新",
+    "order": "順序",
+    "order_help": "ドラッグアンドドロップでダッシュボードページの順序を変更できます。ダッシュボードのタイトルをダブルクリックすると変更できます。"
+  },
+  "widget_creation": {
+    "title": "新しいウィジェットを作成",
+    "create_widget": "{{title}}ウィジェットを作成",
+    "placeholder": "ここに新しいウィジェットを作成",
+    "scroll_to_new_widget": "新しいウィジェットまでスクロール"
+  },
+  "dashboard_actions": {
+    "immutable": "このダッシュボードは{{productName}}によって管理されているため、読み取り専用です。「名前を付けて保存」を使用して編集可能なコピーを作成してください。",
+    "debug": "デバッグ",
+    "share_unsaved": "保存済みのダッシュボードのみ共有できます。",
+    "edit_metadata": "メタデータを編集",
+    "export": "エクスポート",
+    "save_new_title": "新しいダッシュボードを保存",
+    "create": "ダッシュボードを作成",
+    "edit_title": "ダッシュボードを編集",
+    "update": "ダッシュボードを更新",
+    "share_description": "このダッシュボードの共同編集者として追加するユーザーまたはチームを検索します。"
+  },
+  "dashboard_search_bar": {
+    "filter_placeholder": "すべてのウィジェットにフィルターを適用"
+  },
+  "debug": {
+    "title": "デバッグ情報"
+  },
+  "common_views": {
+    "empty_value": "<Empty Value>",
+    "add_to_query": "クエリに追加",
+    "time_range_validation": {
+      "invalid_date_format": "形式は {{format}} である必要があります。",
+      "range_limit": "期間が制限時間を超えています。",
+      "date_limit": "日付が制限時間を超えています。",
+      "until_before_from": "「終了」の日付は「開始」の日付より後である必要があります。",
+      "empty": "空にすることはできません。",
+      "keyword_empty": "キーワードを空にすることはできません。",
+      "keyword_unparsable": "キーワードを解析できません"
+    },
+    "remove_from_favorites": "お気に入りから削除",
+    "add_to_favorites": "お気に入りに追加",
+    "view_type": {
+      "search": "検索",
+      "dashboard": "ダッシュボード"
+    },
+    "unsaved_view": {
+      "search": "未保存の検索",
+      "dashboard": "未保存のダッシュボード"
+    }
+  },
+  "field_charts_migration": {
+    "title": "既存の検索ページのチャートを移行",
+    "found_charts_other": "以前のバージョンの検索用に作成された{{count}}件のチャートが見つかりました。これらのチャートを現在の検索に移行しますか？",
+    "save_hint": "移行を実行して新しく作成されたチャートを保持する場合は、現在の検索を新しいダッシュボードとして保存する必要があります。保存しないと、検索ページを離れるときにチャートが失われます。",
+    "migrate": "移行",
+    "discard": "チャートを破棄"
+  },
+  "query": {
+    "contained_in_enterprise": "（<enterpriseLink>Graylog Enterprise</enterpriseLink>に含まれます）",
+    "documentation_hint": "ウィジェットの作成について詳しくは、<docsLink>ドキュメント</docsLink>もご覧ください。"
+  },
+  "widget_query": {
+    "reset_global_filter": "グローバルフィルターをリセット"
+  },
+  "editable_title": {
+    "edit": "タイトルを編集",
+    "hint": "{{value}} - タイトルをダブルクリックして編集します。"
+  },
+  "message_permalink": {
+    "label": "パーマリンク"
+  },
+  "query_title": {
+    "page_actions": "ページのアクション",
+    "edit_title": "タイトルを編集",
+    "duplicate": "複製",
+    "copy_to_dashboard": "ダッシュボードにコピー",
+    "edit_modal_title": "ダッシュボードページのタイトルを編集",
+    "update_title": "タイトルを更新",
+    "title_help": "わかりやすいダッシュボードページのタイトルを入力してください。最大40文字です。",
+    "title": "タイトル"
+  },
+  "missing_requirements": {
+    "description_search": "残念ながら、この検索を実行できません。利用できない次の機能を使用しています:",
+    "description_dashboard": "残念ながら、このダッシュボードを実行できません。利用できない次の機能を使用しています:",
+    "included_in": "<requirementName>{{requirement}}</requirementName> - <pluginLink>{{plugin}}</pluginLink>に含まれています",
+    "back": "戻る"
+  },
+  "view_header": {
+    "alerts_and_events": "アラートとイベント",
+    "event_definitions": "イベント定義",
+    "edit_search_metadata": "検索 {{title}} のメタデータを編集",
+    "edit_dashboard_metadata": "ダッシュボード {{title}} のメタデータを編集",
+    "editing_search": "保存済みの検索を編集",
+    "editing_dashboard": "保存済みのダッシュボードを編集",
+    "save_search": "検索を保存",
+    "save_dashboard": "ダッシュボードを保存"
+  },
+  "execution": {
+    "not_executed": "クエリはまだ実行されていません。"
+  },
+  "dashboards_page": {
+    "documentation": "ダッシュボードのドキュメント",
+    "description": "ダッシュボードを使用して、メッセージの特定のビューを作成します。ここで新しいダッシュボードを作成し、アプリケーションの他の場所で作成したグラフやチャートをワンクリックで追加できます。"
+  },
+  "search_filter_banner": {
+    "explanation": "<italic>検索フィルター</italic>には独自のクエリが含まれ、<bold>AND</bold>演算子を使用してメインのクエリを拡張します。",
+    "explanation_saved": "フィルターは個別に保存して、保存済みの検索やダッシュボードで再利用できます。保存済みフィルターを更新すると、そのフィルターを含む検索の結果に自動的に反映されます。"
+  },
+  "widget_time_range": {
+    "reset_global_override": "グローバルの上書きをリセット"
+  },
+  "time_range_presets": {
+    "select_time_range": "期間を選択",
+    "open_preset_select": "期間プリセットの選択を開く"
+  },
+  "move_range": {
+    "show_previous": "前を表示",
+    "show_previous_duration": "前の{{duration}}を表示",
+    "show_next": "次を表示",
+    "show_next_duration": "次の{{duration}}を表示"
+  },
+  "query_validation": {
+    "toggle_warning": "検証の警告を切り替え",
+    "toggle_information": "検証の情報を切り替え",
+    "toggle_error": "検証エラーの説明を切り替え",
+    "syntax_documentation": "検索クエリの構文のドキュメント",
+    "error_documentation": "クエリエラーのドキュメント",
+    "status_warning": "警告",
+    "status_info": "情報",
+    "status_error": "エラー",
+    "validation_failed": "検索クエリの検証に失敗しました。ステータス: {{error}}",
+    "warm_tier_title": "ウォームティア検索",
+    "warm_tier_message": "選択した期間には、取得に時間がかかる場合があるウォームティアに保存されたデータが含まれています。表示されたタイムスタンプより古いデータは、そのストリームのウォームティアに含まれます:"
+  },
+  "saved_searches": {
+    "title": "保存済みの検索",
+    "confirm_bulk_delete_other": "{{count}}件の保存済みの検索を本当に削除しますか？",
+    "bulk_delete_partial_other": "選択した{{count}}件の保存済みの検索のうち、{{failed}}件を削除できませんでした。",
+    "bulk_delete_success_other": "{{count}}件の保存済みの検索が正常に削除されました。",
+    "success": "成功",
+    "bulk_delete_error": "保存済みの検索の削除中にエラーが発生しました。{{error}}",
+    "confirm_delete": "保存済みの検索 \"{{title}}\" を削除しようとしています。よろしいですか？",
+    "delete_search": "検索 {{title}} を削除",
+    "delete": "削除"
+  },
+  "search_meta": {
+    "buttons": "検索メタボタン"
+  },
+  "save_view_notifications": {
+    "success_title": "成功しました！",
+    "error_title": "エラーです！",
+    "plugin_initial_values_failed": "プラグインから検索バーの初期値を収集中にエラーが発生しました",
+    "plugin_validation_preparation_failed": "プラグインの検索バー検証を準備中にエラーが発生しました",
+    "plugin_validation_failed": "プラグインから検索バーの値を検証中にエラーが発生しました",
+    "plugin_submit_failed": "プラグインの送信ハンドラーの実行中にエラーが発生しました: {{error}}",
+    "load_saved_searches_failed": "保存済みの検索の読み込みに失敗しました。ステータス:",
+    "could_not_load_saved_searches": "保存済みの検索を読み込めませんでした",
+    "load_minimum_refresh_interval_failed": "システム設定「minimum_auto_refresh_interval」の読み込みに失敗しました。ステータス:",
+    "could_not_load_configuration": "設定オプションを読み込めませんでした"
+  },
+  "sidebar_layout": {
+    "display_as_overlay": "サイドバーをオーバーレイで表示",
+    "display_inline": "サイドバーをインラインで表示"
+  },
+  "search_result_overview": {
+    "duration_at": "{{duration}}ミリ秒、<timestamp/>",
+    "effective_from": "有効な期間の開始",
+    "effective_to": "有効な期間の終了"
+  },
+  "fields_overview": {
+    "filter_placeholder": "フィールドをフィルター",
+    "reset": "リセット",
+    "list_fields": "<current>現在のクエリ</current>、<all>すべて</all>、または<allReserved>予約済みを含むすべて</allReserved>のフィールドを一覧表示します。",
+    "current_title": "現在のクエリに含まれるフィールドを表示します。",
+    "all_title": "すべてのフィールドを表示しますが、予約済み（gl2_*）フィールドは除きます。",
+    "all_reserved_title": "予約済み（gl2_*）フィールドを含むすべてのフィールドを表示します。",
+    "no_field_information": "利用可能なフィールド情報がありません。",
+    "no_fields": "表示するフィールドがありません。フィルター条件を変更するか、上で別のフィールドセットを選択してください。"
+  },
+  "highlighting_color": {
+    "color": "色",
+    "gradient_name": "グラデーション名",
+    "gradient_placeholder": "グラデーションの色を選択",
+    "lowest_placeholder": "最小値を指定",
+    "lowest_label": "最小値",
+    "lowest_help": "フィールドまたは系列で想定される最小値です。",
+    "highest_aria": "最大値を指定",
+    "highest_label": "最大値",
+    "highest_help": "フィールドまたは系列で想定される最大値です。",
+    "coloring": "配色",
+    "static_color": "固定の色",
+    "gradient": "グラデーション",
+    "must_be_selected": "選択してください。",
+    "must_be_present": "入力してください。",
+    "must_be_number": "数値である必要があります。",
+    "must_be_higher": "最小値より大きい値である必要があります。",
+    "coloring_required": "配色は必須です",
+    "gradient_numeric_only": "グラデーションは数値フィールドに対してのみ定義できます。"
+  },
+  "highlighting_rule": {
+    "edit": "このハイライトルールを編集",
+    "remove": "このハイライトルールを削除",
+    "confirm_remove": "このハイライトを本当に削除しますか？"
+  },
+  "change_field_type": {
+    "no_permission_title": "権限がありません",
+    "no_permission_description": "この操作を実行する権限がありません",
+    "enterprise_plugin_required": "（<enterpriseLink>Enterpriseプラグイン</enterpriseLink>が必要です）",
+    "modal_title": "{{fieldName}} フィールドのタイプを変更",
+    "impact_warning": "フィールド <bold>{{fieldName}}</bold> のタイプを変更すると、今後取り込まれるログメッセージに大きな影響を与える可能性があります。取り込んでいるログと互換性のないタイプをフィールドに設定すると、取り込みエラーが発生する可能性があります。",
+    "failure_processing_hint": "<docsLink>Failure Processing</docsLink>を有効にし、その後は<failureStream/>ストリームを注意深く監視することをお勧めします。",
+    "select_field_type_for": "{{fieldName}} のフィールドタイプを選択",
+    "select_field_type_for_field": "フィールドのフィールドタイプを選択",
+    "select_field_type": "フィールドタイプを選択",
+    "select_index_sets": "対象のインデックスセットを選択",
+    "index_sets_hint_with_type": "デフォルトでは、現在のメッセージ/検索のすべてのインデックスセットで、<bold>{{fieldName}}</bold> フィールドに <bold>{{type}}</bold> フィールドタイプが設定されます。変更を適用するインデックスセットを選択できます。",
+    "index_sets_hint": "デフォルトでは、現在のメッセージ/検索のすべてのインデックスセットで、<bold>{{fieldName}}</bold> フィールドに選択したフィールドタイプが設定されます。変更を適用するインデックスセットを選択できます。",
+    "select_rotation_strategy": "ローテーション戦略を選択",
+    "rotation_hint_type_field": "<bold>{{fieldName}}</bold> のフィールドタイプとして <bold>{{type}}</bold> を表示して使用するには、インデックスをローテーションする必要があります。このフォームを送信した後に影響を受けるインデックスを自動的にローテーションするか、後で手動で行うことができます。",
+    "rotation_hint_type": "フィールドタイプとして <bold>{{type}}</bold> を表示して使用するには、インデックスをローテーションする必要があります。このフォームを送信した後に影響を受けるインデックスを自動的にローテーションするか、後で手動で行うことができます。",
+    "rotation_hint_field": "<bold>{{fieldName}}</bold> のフィールドタイプとして選択したフィールドタイプを表示して使用するには、インデックスをローテーションする必要があります。このフォームを送信した後に影響を受けるインデックスを自動的にローテーションするか、後で手動で行うことができます。",
+    "rotation_hint": "フィールドタイプとして選択したフィールドタイプを表示して使用するには、インデックスをローテーションする必要があります。このフォームを送信した後に影響を受けるインデックスを自動的にローテーションするか、後で手動で行うことができます。",
+    "rotate_indices": "変更後に影響を受けるインデックスをローテーション",
+    "changing": "フィールドタイプを変更しています...",
+    "change": "フィールドタイプを変更",
+    "select_field": "フィールドを選択",
+    "select_field_placeholder": "フィールドを選択または入力",
+    "type_not_defined": "タイプが定義されていません",
+    "previous_values": "（以前の値: {{values}}）",
+    "load_index_field_types_failed": "インデックスのフィールドタイプの読み込みに失敗しました。ステータス:",
+    "could_not_load_index_field_types": "インデックスのフィールドタイプを読み込めませんでした",
+    "load_field_type_options_failed": "フィールドタイプのオプションの読み込みに失敗しました。ステータス:",
+    "could_not_load_field_type_options": "フィールドタイプのオプションを読み込めませんでした",
+    "load_field_types_failed": "{{field}} のタイプの読み込みに失敗しました。ステータス:",
+    "could_not_load_field_types": "フィールドタイプを読み込めませんでした",
+    "load_index_sets_failed": "フィールドタイプの変更に対応したインデックスセットの読み込みに失敗しました。ステータス:",
+    "could_not_load_index_sets": "フィールドタイプの変更に対応したインデックスセットを読み込めませんでした",
+    "change_failed": "フィールドタイプの変更に失敗しました。ステータス: {{error}}",
+    "change_failed_title": "フィールドタイプを変更できませんでした",
+    "change_success": "フィールドタイプが正常に変更されました",
+    "success_title": "成功しました！"
+  },
+  "value_actions": {
+    "select_extractor_type": "エクストラクタータイプを選択",
+    "exclude": "結果から除外",
+    "add_to_query": "クエリに追加",
+    "show_documents": "この値のドキュメントを表示",
+    "create_extractor": "エクストラクターを作成",
+    "highlight_value": "この値をハイライト",
+    "create_event_definition": "イベント定義を作成",
+    "copy_value": "値をクリップボードにコピー"
+  },
+  "create_event_definition": {
+    "title": "新しいイベント定義を設定",
+    "hide_details": "ストラテジーの詳細を非表示",
+    "show_details": "ストラテジーの詳細を表示",
+    "continue": "設定を続行",
+    "strategy_by": "ストラテジー:",
+    "description": "説明:",
+    "sections": {
+      "aggregation": "集計の設定",
+      "search": "検索クエリ"
+    },
+    "items": {
+      "rowValuePath": "テーブルの行からのクエリ",
+      "columnValuePath": "テーブルの列からのクエリ",
+      "columnGroupBy": "列の値でグループ化",
+      "rowGroupBy": "行の値でグループ化",
+      "aggCondition": "条件",
+      "queryWithReplacedParams": "検索からのクエリ",
+      "searchFilterQuery": "検索フィルターからのクエリ",
+      "streams": "ストリーム",
+      "searchWithinMs": "検索範囲（ミリ秒）",
+      "lutParameters": "ルックアップテーブルのパラメーター",
+      "searchFromValue": "値からのクエリ"
+    },
+    "item_label": "{{label}}: ",
+    "strategies": {
+      "EXACT": {
+        "label": "この値のみ",
+        "description": "ストラテジーには、現在の検索ビューに関連するすべての検索クエリ、フィルターなどが含まれます"
+      },
+      "ROW": {
+        "label": "行内のいずれか",
+        "description": "ストラテジーには行のピボットが含まれます"
+      },
+      "COL": {
+        "label": "列内のいずれか",
+        "description": "ストラテジーには列のピボットが含まれます"
+      },
+      "ALL": {
+        "label": "ウィジェット内のいずれか",
+        "description": "ストラテジーには、選択した値に関連するすべての行と列のピボット値が含まれます"
+      },
+      "CUSTOM": {
+        "label": "カスタム",
+        "description": "任意の検索部分を選択できます"
+      }
+    }
+  },
+  "view_errors": {
+    "something_went_wrong": "問題が発生しました",
+    "unknown_error": "不明なエラーが発生しました。詳細については、次のメッセージと{{productName}}サーバーのログを確認してください。"
+  },
+  "views_notifications": {
+    "delete_view_failed": "ビュー {{title}} の削除に失敗しました。ステータス: {{error}}",
+    "delete_view_failed_title": "ビューを削除できませんでした",
+    "apply_widget_changes_failed": "ウィジェットの変更の適用に失敗しました。ステータス: {{error}}",
+    "load_message_failed": "メッセージ情報の読み込みに失敗しました。ステータス:",
+    "could_not_load_message": "メッセージ情報を読み込めませんでした"
+  },
+  "field_actions": {
+    "chart": "チャート",
+    "show_top_values": "上位の値を表示",
+    "statistics": "統計",
+    "add_to_table": "テーブルに追加",
+    "remove_from_table": "テーブルから削除",
+    "add_to_all_tables": "すべてのテーブルに追加",
+    "remove_from_all_tables": "すべてのテーブルから削除",
+    "change_field_type": "フィールドタイプを変更",
+    "copy_field_name": "フィールド名をクリップボードにコピー",
+    "add_to_favorites": "フィールドをお気に入りに追加",
+    "remove_from_favorites": "フィールドをお気に入りから削除"
+  },
+  "aggregation": {
+    "summary_by": "{{series}} を {{fields}} で集計しています",
+    "summary_only": "{{series}} を集計しています"
+  },
+  "widget_creators": {
+    "message_count": "メッセージ数",
+    "message_table": "メッセージテーブル",
+    "custom_aggregation": "カスタム集計",
+    "aggregation": "集計",
+    "events_overview": "イベントの概要",
+    "text_markdown": "テキスト/Markdown"
+  },
+  "message_details": {
+    "deleted_input": "削除された入力",
+    "timestamp": "タイムスタンプ",
+    "not_stored": "保存されていません",
+    "not_stored_message": "メッセージは保存されていません",
+    "received_by": "受信元",
+    "stored_in_index": "保存先インデックス",
+    "routed_into_streams": "ルーティングされたストリーム"
+  },
+  "views_logic": {
+    "result_window_limit": "Elasticsearchは検索結果を{{limit}}件のメッセージに制限します。ページサイズが{{pageSize}}件のメッセージの場合、最初の{{validPages}}ページを使用できます。",
+    "confirm_delete_dashboard_page": "このダッシュボードページを本当に削除しますか？"
+  }
+}

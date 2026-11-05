@@ -24,6 +24,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type FetchError from 'logic/errors/FetchError';
 import { onError } from 'util/conditional/onError';
+import i18n from 'i18n';
 
 export type ValueExpr = '>' | '<' | '>=' | '<=' | '==';
 
@@ -123,8 +124,8 @@ const useEventDefinition = (
         if (onErrorHandler) onErrorHandler(errorThrown);
 
         UserNotification.error(
-          `Loading event definition failed with status: ${errorThrown}`,
-          'Could not load event definition',
+          i18n.t('use_event_definition_notifications.load_failed', { ns: 'event_definitions', error: errorThrown }),
+          i18n.t('use_event_definition_notifications.load_failed_title', { ns: 'event_definitions' }),
         );
       }),
 

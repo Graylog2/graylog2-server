@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import type { List } from 'immutable';
 import { OrderedSet } from 'immutable';
@@ -75,12 +76,13 @@ type FormState = {
 };
 
 const ExportModal = ({ closeModal = () => {}, view, directExportWidgetId = null }: Props) => {
+  const { t } = useTranslation('widgets');
   const executionState = useSearchExecutionState();
   const sendTelemetry = useSendTelemetry('widget');
   const { state: viewStates } = view;
   const {
     shouldEnableDownload,
-    title,
+    titleKey,
     initialWidget,
     shouldShowWidgetSelection,
     shouldAllowWidgetSelection,
@@ -145,7 +147,7 @@ const ExportModal = ({ closeModal = () => {}, view, directExportWidgetId = null 
           <BootstrapModalWrapper showModal onHide={closeModal}>
             <Form>
               <Modal.Header>
-                <Modal.Title>{title}</Modal.Title>
+                <Modal.Title>{t(titleKey)}</Modal.Title>
               </Modal.Header>
               <Modal.Body>
                 <Content>
@@ -176,7 +178,7 @@ const ExportModal = ({ closeModal = () => {}, view, directExportWidgetId = null 
                   leftCol={
                     allowWidgetSelection && (
                       <Button bsStyle="link" onClick={resetSelectedWidget} className="pull-left">
-                        Select different message table
+                        {t('export.select_different_table')}
                       </Button>
                     )
                   }
@@ -184,9 +186,9 @@ const ExportModal = ({ closeModal = () => {}, view, directExportWidgetId = null 
                   disabledSubmit={!enableDownload}
                   isSubmitting={loading}
                   isAsyncSubmit
-                  submitLoadingText="Downloading..."
+                  submitLoadingText={t('export.downloading')}
                   submitIcon="download"
-                  submitButtonText="Start Download"
+                  submitButtonText={t('export.start_download')}
                 />
               </Modal.Footer>
             </Form>

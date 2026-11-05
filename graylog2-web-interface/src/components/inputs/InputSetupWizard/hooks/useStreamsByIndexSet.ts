@@ -22,6 +22,7 @@ import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 import type { Stream } from 'logic/streams/types';
 import UserNotification from 'util/UserNotification';
+import i18n from 'i18n';
 import { onError } from 'util/conditional/onError';
 
 export const STREAMS_BY_INDEX_SET_ID = 'streams_by_index_set_id';
@@ -50,7 +51,9 @@ const useStreamsByIndexSet = (
     queryFn: () =>
       onError(fetchStreamsByIndexSet(indexSetId), (errorThrown: FetchError) => {
         if (!(errorThrown.status === 404)) {
-          UserNotification.error(`Loading streams by index set failed with: ${errorThrown}`);
+          UserNotification.error(
+            i18n.t('setup_wizard.load_streams_by_index_set_failed', { ns: 'inputs', error: errorThrown }),
+          );
         }
       }),
 

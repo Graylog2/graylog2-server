@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Field } from 'formik';
 import * as Immutable from 'immutable';
 
@@ -33,37 +34,41 @@ type Props = {
 const ColumnsConfiguration = ({
   columnTitle,
   columns,
-  createSelectPlaceholder = 'Add a column',
+  createSelectPlaceholder = undefined,
   displaySortableListOverlayInPortal = false,
   name,
-}: Props) => (
-  <Field name={name}>
-    {({ field: { value, onChange } }) => (
-      <>
-        <SelectedColumnsList
-          selectedColumns={value.toArray()}
-          columnTitle={columnTitle}
-          displayOverlayInPortal={displaySortableListOverlayInPortal}
-          onChange={(newColumns) => onChange({ target: { value: Immutable.OrderedSet(newColumns), name } })}
-        />
-        <ColumnSelect
-          id="column-create-select"
-          columnTitle={columnTitle}
-          columns={columns}
-          onChange={(newColumn) =>
-            onChange({ target: { value: Immutable.OrderedSet([...value.toArray(), newColumn]), name } })
-          }
-          clearable={false}
-          persistSelection={false}
-          name="column-create-select"
-          value={undefined}
-          excludedColumns={value}
-          placeholder={createSelectPlaceholder}
-          ariaLabel={createSelectPlaceholder}
-        />
-      </>
-    )}
-  </Field>
-);
+}: Props) => {
+  const { t } = useTranslation('widgets');
+
+  return (
+    <Field name={name}>
+      {({ field: { value, onChange } }) => (
+        <>
+          <SelectedColumnsList
+            selectedColumns={value.toArray()}
+            columnTitle={columnTitle}
+            displayOverlayInPortal={displaySortableListOverlayInPortal}
+            onChange={(newColumns) => onChange({ target: { value: Immutable.OrderedSet(newColumns), name } })}
+          />
+          <ColumnSelect
+            id="column-create-select"
+            columnTitle={columnTitle}
+            columns={columns}
+            onChange={(newColumn) =>
+              onChange({ target: { value: Immutable.OrderedSet([...value.toArray(), newColumn]), name } })
+            }
+            clearable={false}
+            persistSelection={false}
+            name="column-create-select"
+            value={undefined}
+            excludedColumns={value}
+            placeholder={createSelectPlaceholder ?? t('overview_configuration.add_column')}
+            ariaLabel={createSelectPlaceholder ?? t('overview_configuration.add_column')}
+          />
+        </>
+      )}
+    </Field>
+  );
+};
 
 export default ColumnsConfiguration;

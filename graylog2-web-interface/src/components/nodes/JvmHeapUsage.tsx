@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import ProgressBar from 'components/common/ProgressBar';
 import { Spinner } from 'components/common';
@@ -74,6 +75,7 @@ const metricNames = {
 const metricValues = Object.values(metricNames);
 
 const JvmHeapUsage = ({ nodeId }: Props) => {
+  const { t } = useTranslation('system');
   const { data: nodeMetrics } = useNodeMetrics(nodeId, metricValues);
 
   const extractedMetrics = useMemo(() => {
@@ -101,13 +103,13 @@ const JvmHeapUsage = ({ nodeId }: Props) => {
   let progressBarConfig: Array<{ value: number; bsStyle?: 'primary' | 'warning' }> = [{ value: 0 }];
   let detail = (
     <p>
-      <Spinner text="Loading heap usage information..." />
+      <Spinner text={t('jvm_heap_usage.loading')} />
     </p>
   );
 
   if (usedPercentage || committedPercentage) {
     if (Object.keys(extractedMetrics).length === 0) {
-      detail = <p>Heap information unavailable.</p>;
+      detail = <p>{t('jvm_heap_usage.unavailable')}</p>;
     } else {
       progressBarConfig = [
         { value: usedPercentage, bsStyle: 'primary' },
@@ -116,11 +118,21 @@ const JvmHeapUsage = ({ nodeId }: Props) => {
 
       detail = (
         <p>
-          The JVM is using <Blob className="used-memory" />
-          <strong> {NumberUtils.formatBytes(usedMemory)}</strong> of <Blob className="committed-memory" />
-          <strong> {NumberUtils.formatBytes(committedMemory)}</strong> heap space and will not attempt to use more than{' '}
-          <Blob className="max-memory" />
-          <strong> {NumberUtils.formatBytes(maxMemory)}</strong>
+          <Trans
+            t={t}
+            i18nKey="jvm_heap_usage.usage"
+            values={{
+              used: NumberUtils.formatBytes(usedMemory),
+              committed: NumberUtils.formatBytes(committedMemory),
+              max: NumberUtils.formatBytes(maxMemory),
+            }}
+            components={{
+              usedBlob: <Blob className="used-memory" />,
+              committedBlob: <Blob className="committed-memory" />,
+              maxBlob: <Blob className="max-memory" />,
+              strong: <strong />,
+            }}
+          />
         </p>
       );
     }

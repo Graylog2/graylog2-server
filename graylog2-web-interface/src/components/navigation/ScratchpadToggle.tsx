@@ -15,18 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
 import NavIcon from 'components/navigation/NavIcon';
 import NavigationButton from 'components/navigation/NavigationButton';
 
 const ScratchpadToggle = () => {
+  const { t } = useTranslation('navigation');
   const { toggleScratchpadVisibility } = useContext(ScratchpadContext);
 
   return (
     <li role="presentation">
-      <NavigationButton aria-label="Scratchpad" id="scratchpad-toggle" onClick={toggleScratchpadVisibility}>
-        <NavIcon type="scratchpad" title="Scratchpad" />
+      <NavigationButton aria-label={t('shell.scratchpad')} id="scratchpad-toggle" onClick={toggleScratchpadVisibility}>
+        <NavIcon type="scratchpad" title={t('shell.scratchpad')} />
       </NavigationButton>
     </li>
   );

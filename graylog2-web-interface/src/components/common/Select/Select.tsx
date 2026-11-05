@@ -23,6 +23,7 @@ import type { DefaultTheme } from 'styled-components';
 import { withTheme } from 'styled-components';
 import CreatableSelect from 'react-select/creatable';
 
+import i18n from 'i18n';
 import CustomMenuList from 'components/common/Select/CustomMenuList';
 import Icon from 'components/common/Icon';
 import { INPUT_BORDER_RADIUS } from 'theme/constants';
@@ -580,13 +581,17 @@ class Select<OptionValue> extends React.Component<Props<OptionValue>, State> {
       loadOptions: () => void;
       total: number;
     } = {
+      // react-select's own defaults are English. They are set first, so callers can still override them.
+      noOptionsMessage: () => i18n.t('select.no_options', { ns: 'common' }),
+      loadingMessage: () => i18n.t('select.loading', { ns: 'common' }),
       ...rest,
       options: sortedOptions,
       onChange: onReactSelectChange || this._onChange,
       onInputChange: this._onInputChange,
       inputValue,
+      // Only an explicit placeholder may label the select, otherwise it would override a `<label>` of the input.
       'aria-label': ariaLabel ?? placeholder,
-      placeholder,
+      placeholder: placeholder ?? i18n.t('select.placeholder', { ns: 'common' }),
       async,
       isMulti,
       isDisabled,

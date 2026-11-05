@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useMemo, useState } from 'react';
 import { useFormikContext } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { Spinner } from 'components/common';
 import { RowContainer, ColContainer } from 'components/lookup-tables/layout-componets';
@@ -28,6 +29,7 @@ import type { LookupTable, LookupTableCache } from 'logic/lookup-tables/types';
 import CacheShow from 'components/lookup-tables/cache-view/cache-show';
 
 function CacheFormStep() {
+  const { t } = useTranslation('lookup_tables');
   const { values, setFieldValue } = useFormikContext<LookupTable>();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(values);
   const { allCaches, loadingAllCaches } = useFetchAllCaches();
@@ -59,7 +61,7 @@ function CacheFormStep() {
     <ColContainer $gap="lg" $align="center">
       {loadingAllCaches ? (
         <RowContainer>
-          <Spinner text="Loading caches..." />
+          <Spinner text={t('lookup_table_form.loading_caches')} />
         </RowContainer>
       ) : (
         <>

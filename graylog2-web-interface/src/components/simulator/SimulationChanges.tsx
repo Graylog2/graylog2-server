@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Col, Row } from 'components/bootstrap';
-import { Pluralize } from 'components/common';
 
 const SimulationChangesWrap = styled.div`
   padding-top: 15px;
@@ -93,6 +93,7 @@ type Props = {
 };
 
 const SimulationChanges = (props: Props) => {
+  const { t } = useTranslation('pipelines');
   const _isOriginalMessageRemoved = (originalMessage, processedMessages) =>
     !processedMessages.find((message) => message.id === originalMessage.id);
 
@@ -120,7 +121,7 @@ const SimulationChanges = (props: Props) => {
 
     return (
       <FieldResultWrap resultType="added">
-        <h4>Added fields</h4>
+        <h4>{t('simulation_changes.added_fields')}</h4>
         <dl>{formattedFields}</dl>
       </FieldResultWrap>
     );
@@ -142,7 +143,7 @@ const SimulationChanges = (props: Props) => {
 
     return (
       <FieldResultWrap resultType="removed">
-        <h4>Removed fields</h4>
+        <h4>{t('simulation_changes.removed_fields')}</h4>
         <dl>{formattedFields}</dl>
       </FieldResultWrap>
     );
@@ -165,7 +166,7 @@ const SimulationChanges = (props: Props) => {
 
     return (
       <FieldResultWrap resultType="mutated">
-        <h4>Mutated fields</h4>
+        <h4>{t('simulation_changes.mutated_fields')}</h4>
         <dl>{formattedFields}</dl>
       </FieldResultWrap>
     );
@@ -176,7 +177,7 @@ const SimulationChanges = (props: Props) => {
     const processedMessages = simulationResults.messages;
 
     if (_isOriginalMessageRemoved(originalMessage, processedMessages)) {
-      return <p>Original message would be dropped during processing.</p>;
+      return <p>{t('simulation_changes.dropped')}</p>;
     }
 
     const processedMessage = processedMessages.find((message) => message.id === originalMessage.id);
@@ -186,7 +187,7 @@ const SimulationChanges = (props: Props) => {
     const formattedMutatedFields = _formatMutatedFields(processedMessage.decoration_stats.changed_fields);
 
     if (!formattedAddedFields && !formattedRemovedFields && !formattedMutatedFields) {
-      return <p>Original message would be not be modified during processing.</p>;
+      return <p>{t('simulation_changes.not_modified')}</p>;
     }
 
     return (
@@ -205,10 +206,12 @@ const SimulationChanges = (props: Props) => {
       <Row className="row-sm">
         <Col md={12}>
           <h3>
-            Changes in original message{' '}
-            <small>
-              <em>{originalMessage.id}</em>
-            </small>
+            <Trans
+              t={t}
+              i18nKey="simulation_changes.original_changes"
+              values={{ id: originalMessage.id }}
+              components={{ idSmall: <small />, idEm: <em /> }}
+            />
           </h3>
           {_getOriginalMessageChanges()}
         </Col>
@@ -228,12 +231,14 @@ const SimulationChanges = (props: Props) => {
     return (
       <Row className="row-sm">
         <Col md={12}>
-          <h3>Other changes</h3>
+          <h3>{t('simulation_changes.other_changes')}</h3>
           <p>
-            There would be {createdMessages.length}{' '}
-            <Pluralize singular="message" plural="messages" value={createdMessages.length} /> created. Switch to the{' '}
-            <em>Results preview</em> view option to see{' '}
-            <Pluralize singular="it" plural="them" value={createdMessages.length} />.
+            <Trans
+              t={t}
+              i18nKey="simulation_changes.other_changes_description"
+              count={createdMessages.length}
+              components={{ previewOption: <em /> }}
+            />
           </p>
         </Col>
       </Row>

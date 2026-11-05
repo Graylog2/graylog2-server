@@ -20,7 +20,9 @@ import type { FormikTouched, FormikErrors } from 'formik';
 import { Formik, Form } from 'formik';
 import isEqual from 'lodash/isEqual';
 import moment from 'moment';
+import { Trans, useTranslation } from 'react-i18next';
 
+import i18n from 'i18n';
 import { HelpBlock, Input } from 'components/bootstrap';
 import Modal from 'components/bootstrap/Modal';
 import { FormikInput, InputDescription } from 'components/common';
@@ -91,11 +93,11 @@ const validateMacOSUnifiedLogging = (
   const errors: FormikErrors<MacOSUnifiedLoggingSourceConfig> = {};
 
   if (moment.duration(config.max_poll_interval).asSeconds() <= 0) {
-    errors.max_poll_interval = 'Max poll interval must be at least 1 seconds.';
+    errors.max_poll_interval = i18n.t('source_form.max_poll_interval_error', { ns: 'collectors' });
   }
 
   if (moment.duration(config.max_log_age).asSeconds() < 0) {
-    errors.max_log_age = 'Max log age must be 0 or a positive value.';
+    errors.max_log_age = i18n.t('source_form.max_log_age_error', { ns: 'collectors' });
   }
 
   return errors;
@@ -105,7 +107,7 @@ const validate = (values: FormValues) => {
   const errors: FormikErrors<FormValues> = {};
 
   if (!values.name) {
-    errors.name = 'Name is required';
+    errors.name = i18n.t('fleet_form.name_required', { ns: 'collectors' });
   }
 
   if (values.source_type === 'macos_unified_logging') {
@@ -125,6 +127,17 @@ export const splitToList = (value: string | undefined): Array<string> =>
     .map((c) => c.trim())
     .filter(Boolean);
 
+const ReadModeOptions = () => {
+  const { t } = useTranslation('collectors');
+
+  return (
+    <>
+      <option value="end">{t('source_form.read_mode_end')}</option>
+      <option value="beginning">{t('source_form.read_mode_beginning')}</option>
+    </>
+  );
+};
+
 const FileConfigFields = ({
   config,
   setFieldValue,
@@ -135,6 +148,7 @@ const FileConfigFields = ({
   // Keep a raw input buffer so the user can freely type commas and spaces.
   // splitToList would strip a trailing comma on every keystroke otherwise,
   // making it impossible to enter multiple comma-separated values.
+  const { t } = useTranslation('collectors');
   const [pathsInput, setPathsInput] = useState(() => config.paths?.join(', ') ?? '');
 
   return (
@@ -142,8 +156,8 @@ const FileConfigFields = ({
       <Input
         id="file-paths"
         type="text"
-        label="File Path(s)"
-        help="Glob patterns supported (e.g., /var/log/*.log, /var/log/**/*.log). The Collector watches matched files for new lines."
+        label={t('source_form.file_paths')}
+        help={t('source_form.file_paths_help')}
         value={pathsInput}
         onChange={(e) => {
           setPathsInput(e.target.value);
@@ -154,12 +168,11 @@ const FileConfigFields = ({
       <Input
         id="file-read-mode"
         type="select"
-        label="Read Mode"
-        help="From end: only collect new lines after the Collector starts. From beginning: collect all existing lines first, then continue tailing."
+        label={t('source_form.read_mode')}
+        help={t('source_form.read_mode_file_help')}
         value={config.read_mode}
         onChange={(e) => setFieldValue('config', { ...config, read_mode: e.target.value as 'beginning' | 'end' })}>
-        <option value="end">From end (tail)</option>
-        <option value="beginning">From beginning</option>
+        <ReadModeOptions />
       </Input>
     </>
   );
@@ -171,44 +184,47 @@ const JournaldConfigFields = ({
 }: {
   config: JournaldSourceConfig;
   setFieldValue: (field: string, value: unknown) => void;
-}) => (
-  <>
-    <Input
-      id="journald-read-mode"
-      type="select"
-      label="Read Mode"
-      help="From end: only collect new entries after the Collector starts. From beginning: collect all existing entries first, then continue tailing."
-      value={config.read_mode}
-      onChange={(e) => setFieldValue('config', { ...config, read_mode: e.target.value as 'beginning' | 'end' })}>
-      <option value="end">From end (tail)</option>
-      <option value="beginning">From beginning</option>
-    </Input>
-    <Input
-      id="journald-priority"
-      type="select"
-      label="Priority"
-      help="Minimum severity level to collect. For example, selecting Error also collects Critical, Alert, and Emergency entries."
-      value={config.priority}
-      onChange={(e) => setFieldValue('config', { ...config, priority: e.target.value as JournaldPriority })}>
-      <option value="emerg">Emergency</option>
-      <option value="alert">Alert</option>
-      <option value="crit">Critical</option>
-      <option value="err">Error</option>
-      <option value="warning">Warning</option>
-      <option value="notice">Notice</option>
-      <option value="info">Info</option>
-      <option value="debug">Debug</option>
-    </Input>
-    <Input
-      id="journald-match-pattern"
-      type="text"
-      label="Match Pattern"
-      help="Optional journald match expression to filter entries by unit, process, etc. Example: _SYSTEMD_UNIT=nginx.service"
-      value={config.match_pattern || ''}
-      onChange={(e) => setFieldValue('config', { ...config, match_pattern: e.target.value || undefined })}
-    />
-  </>
-);
+}) => {
+  const { t } = useTranslation('collectors');
+
+  return (
+    <>
+      <Input
+        id="journald-read-mode"
+        type="select"
+        label={t('source_form.read_mode')}
+        help={t('source_form.read_mode_journald_help')}
+        value={config.read_mode}
+        onChange={(e) => setFieldValue('config', { ...config, read_mode: e.target.value as 'beginning' | 'end' })}>
+        <ReadModeOptions />
+      </Input>
+      <Input
+        id="journald-priority"
+        type="select"
+        label={t('source_form.priority')}
+        help={t('source_form.priority_help')}
+        value={config.priority}
+        onChange={(e) => setFieldValue('config', { ...config, priority: e.target.value as JournaldPriority })}>
+        <option value="emerg">{t('source_form.priority_emerg')}</option>
+        <option value="alert">{t('source_form.priority_alert')}</option>
+        <option value="crit">{t('source_form.priority_crit')}</option>
+        <option value="err">{t('source_form.priority_err')}</option>
+        <option value="warning">{t('source_form.priority_warning')}</option>
+        <option value="notice">{t('source_form.priority_notice')}</option>
+        <option value="info">{t('source_form.priority_info')}</option>
+        <option value="debug">{t('source_form.priority_debug')}</option>
+      </Input>
+      <Input
+        id="journald-match-pattern"
+        type="text"
+        label={t('source_form.match_pattern')}
+        help={t('source_form.match_pattern_help')}
+        value={config.match_pattern || ''}
+        onChange={(e) => setFieldValue('config', { ...config, match_pattern: e.target.value || undefined })}
+      />
+    </>
+  );
+};
 
 const WindowsEventLogConfigFields = ({
   config,
@@ -217,6 +233,7 @@ const WindowsEventLogConfigFields = ({
   config: WindowsEventLogSourceConfig;
   setFieldValue: (field: string, value: unknown) => void;
 }) => {
+  const { t } = useTranslation('collectors');
   const [channelsInput, setChannelsInput] = useState(() => config.channels.join(', '));
 
   return (
@@ -224,8 +241,8 @@ const WindowsEventLogConfigFields = ({
       <Input
         id="win-channels"
         type="text"
-        label="Channels"
-        help="Comma-separated channel names (e.g., Application, Security, System)"
+        label={t('source_form.channels')}
+        help={t('source_form.channels_help')}
         value={channelsInput}
         onChange={(e) => {
           setChannelsInput(e.target.value);
@@ -239,9 +256,12 @@ const WindowsEventLogConfigFields = ({
       <Input
         id="win-include-default-channels"
         type="checkbox"
-        label="Include default channels"
+        label={t('source_form.include_default_channels')}
         // if you update this, also update WindowsEventLogReceiverConfig.java
-        help="Defaults are: Application, System, Security, Setup, Microsoft-Windows-Windows Defender/Operational, Microsoft-Windows-PowerShell/Operational, Windows PowerShell"
+        help={t('source_form.include_default_channels_help', {
+          channels:
+            'Application, System, Security, Setup, Microsoft-Windows-Windows Defender/Operational, Microsoft-Windows-PowerShell/Operational, Windows PowerShell',
+        })}
         checked={config.include_default_channels}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
           setFieldValue('config', { ...config, include_default_channels: e.target.checked })
@@ -250,11 +270,10 @@ const WindowsEventLogConfigFields = ({
       <Input
         id="win-read-mode"
         type="select"
-        label="Read Mode"
+        label={t('source_form.read_mode')}
         value={config.read_mode}
         onChange={(e) => setFieldValue('config', { ...config, read_mode: e.target.value as 'beginning' | 'end' })}>
-        <option value="end">From end (tail)</option>
-        <option value="beginning">From beginning</option>
+        <ReadModeOptions />
       </Input>
     </>
   );
@@ -273,6 +292,7 @@ const MacOSUnifiedLoggingConfigFields = ({
   setFieldValue: (field: string, value: unknown) => void;
   errors?: FormikErrors<MacOSUnifiedLoggingSourceConfig>;
 }) => {
+  const { t } = useTranslation('collectors');
   const pollInterval = extractDurationAndUnit(config.max_poll_interval, POLL_INTERVAL_UNITS);
   const logAge = extractDurationAndUnit(config.max_log_age, LOG_AGE_UNITS);
 
@@ -289,47 +309,44 @@ const MacOSUnifiedLoggingConfigFields = ({
       <Input
         id="macos-predicate"
         type="textarea"
-        label="Predicate"
+        label={t('source_form.predicate')}
         help={
           <span>
-            Optional macOS unified logging filter predicate passed to the <code>log</code> command. Leaving this empty
-            collects all logs from the system! <code>info</code> or <code>debug</code> levels are not currently
-            collected, as they are very noisy and carry very little valuable information. Example:{' '}
-            <code>subsystem == &#39;com.apple.securityd&#39;</code>
+            <Trans
+              t={t}
+              i18nKey="source_form.predicate_help"
+              values={{ example: "subsystem == 'com.apple.securityd'" }}
+              components={{ code: <code /> }}
+            />
           </span>
         }
         value={config.predicate || ''}
         onChange={(e) => setFieldValue('config', { ...config, predicate: e.target.value || undefined })}
       />
       <TimeUnitInput
-        label="Max poll interval"
+        label={t('source_form.max_poll_interval')}
         update={updateDuration('max_poll_interval')}
         value={pollInterval.duration}
         unit={pollInterval.unit}
         units={POLL_INTERVAL_UNITS}
         required
       />
-      <InputDescription
-        error={errors?.max_poll_interval}
-        help="How often the Collector checks for new log entries. Must be at least 1 second."
-      />
+      <InputDescription error={errors?.max_poll_interval} help={t('source_form.max_poll_interval_help')} />
       <TimeUnitInput
-        label="Max log age"
+        label={t('source_form.max_log_age')}
         update={updateDuration('max_log_age')}
         value={logAge.duration}
         unit={logAge.unit}
         units={LOG_AGE_UNITS}
         required
       />
-      <InputDescription
-        error={errors?.max_log_age}
-        help="On first start, how far back to backfill logs. Set to 0 to disable backfilling."
-      />
+      <InputDescription error={errors?.max_log_age} help={t('source_form.max_log_age_help')} />
     </>
   );
 };
 
 const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props) => {
+  const { t } = useTranslation('collectors');
   const isEdit = !!source;
   const sendTelemetry = useSendCollectorsTelemetry();
 
@@ -444,17 +461,14 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props
           return (
             <Form>
               <Modal.Header>
-                <Modal.Title>{isEdit ? 'Edit Source' : 'New Source'}</Modal.Title>
+                <Modal.Title>{isEdit ? t('source_form.edit_title') : t('source_form.new_title')}</Modal.Title>
               </Modal.Header>
               <Modal.Body>
-                <p>
-                  A source defines what data Collectors in this fleet should collect. Each source type corresponds to a
-                  different collection method.
-                </p>
+                <p>{t('source_form.description')}</p>
                 <Input
                   id="source-type"
                   type="select"
-                  label="Source Type"
+                  label={t('source_form.source_type')}
                   value={values.source_type}
                   onChange={(e) => {
                     const newType = e.target.value as SourceType;
@@ -463,36 +477,35 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props
                     setFieldValue('config', defaultConfigs[newType]);
                   }}
                   disabled={isEdit}>
-                  {Object.entries(SOURCE_TYPE_LABELS).map(([value, label]) => (
+                  {Object.entries(SOURCE_TYPE_LABELS).map(([value, labelKey]) => (
                     <option key={value} value={value}>
-                      {label}
+                      {t(labelKey)}
                     </option>
                   ))}
                 </Input>
-                {values.source_type === 'file' && (
-                  <HelpBlock>
-                    Collect log lines from files on the host. Supports glob patterns for matching multiple files.
-                  </HelpBlock>
-                )}
-                {values.source_type === 'journald' && (
-                  <HelpBlock>Collect entries from the systemd journal (Linux only).</HelpBlock>
-                )}
+                {values.source_type === 'file' && <HelpBlock>{t('source_form.file_type_help')}</HelpBlock>}
+                {values.source_type === 'journald' && <HelpBlock>{t('source_form.journald_type_help')}</HelpBlock>}
                 {values.source_type === 'windows_event_log' && (
-                  <HelpBlock>Collect events from Windows Event Viewer channels.</HelpBlock>
+                  <HelpBlock>{t('source_form.windows_type_help')}</HelpBlock>
                 )}
                 {values.source_type === 'macos_unified_logging' && (
                   <HelpBlock>
-                    Collect from the macOS unified logging system via the <code>log</code> command (macOS only).
+                    <Trans t={t} i18nKey="source_form.macos_type_help" components={{ code: <code /> }} />
                   </HelpBlock>
                 )}
-                <FormikInput id="source-name" label="Name" name="name" required />
-                <FormikInput id="source-description" label="Description" name="description" type="textarea" />
+                <FormikInput id="source-name" label={t('fleet_form.name')} name="name" required />
+                <FormikInput
+                  id="source-description"
+                  label={t('fleet_form.description')}
+                  name="description"
+                  type="textarea"
+                />
                 <FormikInput
                   id="source-enabled"
-                  label="Enabled"
+                  label={t('source_columns.enabled')}
                   name="enabled"
                   type="checkbox"
-                  help="Disabled sources are not sent to Collectors. Use this to temporarily stop collection without removing the source."
+                  help={t('source_form.enabled_help')}
                 />
                 {values.source_type === 'file' && (
                   <FileConfigFields config={values.config as FileSourceConfig} setFieldValue={setFieldValue} />
@@ -516,8 +529,8 @@ const SourceFormModal = ({ fleetId, source = undefined, onClose, onSave }: Props
               </Modal.Body>
               <Modal.Footer>
                 <ModalSubmit
-                  submitButtonText={isEdit ? 'Update source' : 'Create source'}
-                  submitLoadingText={isEdit ? 'Updating...' : 'Creating...'}
+                  submitButtonText={isEdit ? t('source_form.update') : t('source_form.create')}
+                  submitLoadingText={isEdit ? t('fleet_form.updating') : t('fleet_form.creating')}
                   onCancel={handleClose}
                   disabledSubmit={isValidating || !isValid}
                   isSubmitting={isSubmitting}

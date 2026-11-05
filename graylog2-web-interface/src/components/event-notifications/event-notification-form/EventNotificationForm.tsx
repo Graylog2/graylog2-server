@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -26,6 +27,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import EntityCreateShareFormGroup from 'components/permissions/EntityCreateShareFormGroup';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
+import notificationTypeTitle from 'components/event-notifications/notificationTypeTitle';
 
 const getNotificationPlugin = (type: string) => {
   if (type === undefined) {
@@ -36,7 +38,10 @@ const getNotificationPlugin = (type: string) => {
 };
 
 const formattedEventNotificationTypes = () =>
-  PluginStore.exports('eventNotificationTypes').map((type) => ({ label: type.displayName, value: type.type }));
+  PluginStore.exports('eventNotificationTypes').map((type) => ({
+    label: notificationTypeTitle(type),
+    value: type.type,
+  }));
 
 type EventNotificationFormProps = {
   action?: 'create' | 'edit';
@@ -67,6 +72,7 @@ const EventNotificationForm = ({
   onChange,
   onTest,
 }: EventNotificationFormProps) => {
+  const { t } = useTranslation('event_notifications');
   const sendTelemetry = useSendTelemetry();
   const [isSubmitEnabled, setIsSubmitEnabled] = useState(true);
 
@@ -133,7 +139,7 @@ const EventNotificationForm = ({
     : null;
 
   const isNew = action === 'create';
-  const testButtonText = testResult.isLoading ? <Spinner text="Testing..." /> : 'Execute Test Notification';
+  const testButtonText = testResult.isLoading ? <Spinner text={t('form.testing')} /> : t('form.execute_test');
 
   return (
     <Row>
@@ -142,10 +148,10 @@ const EventNotificationForm = ({
           <Input
             id="notification-title"
             name="title"
-            label="Title"
+            label={t('form.title')}
             type="text"
             bsStyle={validation.errors.title ? 'error' : null}
-            help={validation?.errors?.title?.[0] ?? 'Title to identify this Notification.'}
+            help={validation?.errors?.title?.[0] ?? t('form.title_help')}
             value={notification.title}
             onChange={handleChange}
             required
@@ -157,18 +163,18 @@ const EventNotificationForm = ({
             name="description"
             label={
               <span>
-                Description <small className="text-muted">(Optional)</small>
+                {t('form.description')} <small className="text-muted">{t('form.optional')}</small>
               </span>
             }
             type="textarea"
-            help="Longer description for this Notification."
+            help={t('form.description_help')}
             value={notification.description}
             onChange={handleChange}
             rows={2}
           />
 
           <FormGroup controlId="notification-type" validationState={validation.errors.config ? 'error' : null}>
-            <ControlLabel>Notification Type</ControlLabel>
+            <ControlLabel>{t('form.type')}</ControlLabel>
             <Select
               id="notification-type"
               options={formattedEventNotificationTypes()}
@@ -177,7 +183,7 @@ const EventNotificationForm = ({
               clearable={false}
               required
             />
-            <HelpBlock>{validation?.errors?.config?.[0] ?? 'Choose the type of Notification to create.'}</HelpBlock>
+            <HelpBlock>{validation?.errors?.config?.[0] ?? t('form.type_help')}</HelpBlock>
           </FormGroup>
 
           {notificationFormComponent}
@@ -185,7 +191,7 @@ const EventNotificationForm = ({
           {notificationFormComponent && (
             <FormGroup>
               <ControlLabel>
-                Test Notification <small className="text-muted">(Optional)</small>
+                {t('form.test')} <small className="text-muted">{t('form.optional')}</small>
               </ControlLabel>
               <FormControl.Static>
                 <Button bsStyle="info" bsSize="small" disabled={testResult.isLoading} onClick={handleTestTrigger}>
@@ -195,16 +201,16 @@ const EventNotificationForm = ({
               {testResult.message && (
                 <Alert
                   bsStyle={testResult.error ? 'danger' : 'success'}
-                  title={testResult.error ? 'Error: ' : 'Success: '}>
+                  title={testResult.error ? t('form.error_prefix') : t('form.success_prefix')}>
                   {testResult.message}
                 </Alert>
               )}
-              <HelpBlock>Execute this Notification with a test Alert.</HelpBlock>
+              <HelpBlock>{t('form.test_help')}</HelpBlock>
             </FormGroup>
           )}
           {isNew && (
             <EntityCreateShareFormGroup
-              description="Search for a User or Team to add as collaborator on this notification."
+              description={t('form.share_description')}
               entityType="notification"
               entityTitle=""
               onSetEntityShare={handleEntityShareChange}
@@ -214,7 +220,7 @@ const EventNotificationForm = ({
           {!embedded && (
             <FormSubmit
               disabledSubmit={!isSubmitEnabled}
-              submitButtonText={`${isNew ? 'Create' : 'Update'} notification`}
+              submitButtonText={isNew ? t('form.create') : t('form.update')}
               onCancel={onCancel}
             />
           )}

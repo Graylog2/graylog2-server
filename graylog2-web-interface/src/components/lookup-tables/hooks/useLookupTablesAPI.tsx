@@ -16,6 +16,7 @@
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 import type { SearchParams } from 'stores/PaginationTypes';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
@@ -50,12 +51,16 @@ import {
 } from './api/lookupTablesAPI';
 
 export { fetchPaginatedLookupTables };
-export const lookupTablesKeyFn = (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams];
+export const lookupTablesKeyFn = (searchParams: SearchParams) => ['lookup_tables', 'search', searchParams];
 
 export function useFetchLookupTable(idOrName: string) {
   const { data, isLoading } = useQuery({
     queryKey: ['lookup-table-details', idOrName],
-    queryFn: () => defaultOnError(fetchLookupTable(idOrName), 'Failed to fetch lookup table'),
+    queryFn: () =>
+      defaultOnError(
+        fetchLookupTable(idOrName),
+        i18n.t('notifications.fetch_lookup_table_failed', { ns: 'lookup_tables' }),
+      ),
     retry: false,
     enabled: !!idOrName,
   });
@@ -74,9 +79,9 @@ export function useCreateLookupTable() {
   const { mutateAsync, isPending: isLoading } = useMutation({
     mutationFn: createLookupTable,
     onSuccess: () => {
-      UserNotification.success('Lookup Table created successfully');
+      UserNotification.success(i18n.t('notifications.lookup_table_created', { ns: 'lookup_tables' }));
       queryClient.invalidateQueries({
-        queryKey: ['lookup-tables'],
+        queryKey: ['lookup_tables'],
         refetchType: 'active',
       });
       queryClient.invalidateQueries({
@@ -99,9 +104,9 @@ export function useUpdateLookupTable() {
   const { mutateAsync, isPending: isLoading } = useMutation({
     mutationFn: updateLookupTable,
     onSuccess: () => {
-      UserNotification.success('Lookup Table updated successfully');
+      UserNotification.success(i18n.t('notifications.lookup_table_updated', { ns: 'lookup_tables' }));
       queryClient.invalidateQueries({
-        queryKey: ['lookup-tables'],
+        queryKey: ['lookup_tables'],
         refetchType: 'active',
       });
       queryClient.invalidateQueries({
@@ -131,7 +136,7 @@ export function usePurgeLookupTableKey() {
   const { mutateAsync, isPending } = useMutation({
     mutationFn: purgeLookupTableKey,
     onSuccess: () => {
-      UserNotification.success('Lookup table key purged successfully');
+      UserNotification.success(i18n.t('notifications.key_purged', { ns: 'lookup_tables' }));
     },
     onError: (error: Error) => UserNotification.error(error.message),
   });
@@ -146,7 +151,7 @@ export function usePurgeAllLookupTableKey() {
   const { mutateAsync, isPending } = useMutation({
     mutationFn: purgeAllLookupTableKey,
     onSuccess: () => {
-      UserNotification.success('Lookup table purged successfully');
+      UserNotification.success(i18n.t('notifications.table_purged', { ns: 'lookup_tables' }));
     },
     onError: (error: Error) => UserNotification.error(error.message),
   });
@@ -172,7 +177,11 @@ export function useTestLookupTableKey() {
 export function useFetchLookupPreview(idOrName: string, enabled: boolean = false, size: number = 5) {
   const { data, isLoading } = useQuery({
     queryKey: ['lookup-preview', idOrName, size, enabled],
-    queryFn: () => defaultOnError(fetchLookupPreview(idOrName, size), 'Failed to fetch lookup preview'),
+    queryFn: () =>
+      defaultOnError(
+        fetchLookupPreview(idOrName, size),
+        i18n.t('notifications.fetch_preview_failed', { ns: 'lookup_tables' }),
+      ),
     retry: false,
     enabled,
   });
@@ -189,7 +198,7 @@ export function useDeleteLookupTable() {
   const { mutateAsync, isPending } = useMutation({
     mutationFn: deleteLookupTable,
     onSuccess: () => {
-      UserNotification.success('Lookup table deleted successfully');
+      UserNotification.success(i18n.t('notifications.table_deleted', { ns: 'lookup_tables' }));
       refetch();
     },
     onError: (error: Error) => UserNotification.error(error.message),
@@ -217,7 +226,7 @@ export function useFetchAllCaches() {
           query: null,
           sort: { attributeId: 'name', direction: 'asc' },
         }),
-        'Failed to fetch all caches',
+        i18n.t('notifications.fetch_caches_failed', { ns: 'lookup_tables' }),
       ),
     retry: false,
   });
@@ -231,7 +240,8 @@ export function useFetchAllCaches() {
 export function useFetchCache(idOrName: string) {
   const { data, isLoading } = useQuery({
     queryKey: ['cache-details', idOrName],
-    queryFn: () => defaultOnError(fetchCache(idOrName), 'Failed to fetch cache'),
+    queryFn: () =>
+      defaultOnError(fetchCache(idOrName), i18n.t('notifications.fetch_cache_failed', { ns: 'lookup_tables' })),
     retry: false,
     enabled: !!idOrName,
   });
@@ -266,7 +276,7 @@ export function useCreateCache() {
   const { mutateAsync, isPending: isLoading } = useMutation({
     mutationFn: createCache,
     onSuccess: () => {
-      UserNotification.success('Cache created successfully');
+      UserNotification.success(i18n.t('notifications.cache_created', { ns: 'lookup_tables' }));
       queryClient.invalidateQueries({
         queryKey: ['caches'],
         refetchType: 'active',
@@ -295,7 +305,7 @@ export function useUpdateCache() {
   const { mutateAsync, isPending: isLoading } = useMutation({
     mutationFn: updateCache,
     onSuccess: () => {
-      UserNotification.success('Cache updated successfully');
+      UserNotification.success(i18n.t('notifications.cache_updated', { ns: 'lookup_tables' }));
       queryClient.invalidateQueries({
         queryKey: ['caches'],
         refetchType: 'active',
@@ -324,7 +334,7 @@ export function useDeleteCache() {
   const { mutateAsync, isPending } = useMutation({
     mutationFn: deleteCache,
     onSuccess: () => {
-      UserNotification.success('Cache deleted successfully');
+      UserNotification.success(i18n.t('notifications.cache_deleted', { ns: 'lookup_tables' }));
       refetch();
     },
     onError: (error: Error) => UserNotification.error(error.message),
@@ -352,7 +362,7 @@ export function useFetchAllDataAdapters() {
           query: null,
           sort: { attributeId: 'name', direction: 'asc' },
         }),
-        'Failed to fetch all data adapters',
+        i18n.t('notifications.fetch_data_adapters_failed', { ns: 'lookup_tables' }),
       ),
     retry: false,
   });
@@ -375,7 +385,11 @@ export function useFetchDataAdapterTypes() {
 export function useFetchDataAdapter(idOrName: string) {
   const { data, isFetching } = useQuery({
     queryKey: ['data-adapter-details', idOrName],
-    queryFn: () => defaultOnError(fetchDataAdapter(idOrName), 'Failed to fetch data adapter'),
+    queryFn: () =>
+      defaultOnError(
+        fetchDataAdapter(idOrName),
+        i18n.t('notifications.fetch_data_adapter_failed', { ns: 'lookup_tables' }),
+      ),
     retry: false,
     enabled: !!idOrName,
   });
@@ -392,7 +406,7 @@ export function useCreateAdapter() {
   const { mutateAsync, isPending: isLoading } = useMutation({
     mutationFn: createDataAdapter,
     onSuccess: () => {
-      UserNotification.success('Data Adapter created successfully');
+      UserNotification.success(i18n.t('notifications.adapter_created', { ns: 'lookup_tables' }));
       queryClient.invalidateQueries({
         queryKey: ['adapters'],
         refetchType: 'active',
@@ -421,7 +435,7 @@ export function useUpdateAdapter() {
   const { mutateAsync, isPending: isLoading } = useMutation({
     mutationFn: updateDataAdapter,
     onSuccess: () => {
-      UserNotification.success('Data Adapter updated successfully');
+      UserNotification.success(i18n.t('notifications.adapter_updated', { ns: 'lookup_tables' }));
       queryClient.invalidateQueries({
         queryKey: ['adapters'],
         refetchType: 'active',
@@ -459,7 +473,7 @@ export function useDeleteDataAdapter() {
   const { mutateAsync, isPending } = useMutation({
     mutationFn: deleteDataAdapter,
     onSuccess: () => {
-      UserNotification.success('Data Adapter deleted successfully');
+      UserNotification.success(i18n.t('notifications.adapter_deleted', { ns: 'lookup_tables' }));
       refetch();
     },
     onError: (error: Error) => UserNotification.error(error.message),

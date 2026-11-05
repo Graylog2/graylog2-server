@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 
 import withParams from 'routing/withParams';
@@ -32,18 +33,23 @@ type Props = {
   };
 };
 
-const PageTitle = ({ fullName }: { fullName: string | null | undefined }) => (
-  <>
-    Edit User{' '}
-    {fullName && (
-      <>
-        - <i>{fullName}</i>
-      </>
-    )}
-  </>
-);
+const PageTitle = ({ fullName }: { fullName: string | null | undefined }) => {
+  const { t } = useTranslation('users');
+
+  return (
+    <>
+      {t('user_edit.title_prefix')}{' '}
+      {fullName && (
+        <>
+          - <i>{fullName}</i>
+        </>
+      )}
+    </>
+  );
+};
 
 const UserEditPage = ({ params }: Props) => {
+  const { t } = useTranslation('users');
   const userId = params?.userId;
 
   // Child components (e.g. the roles section) trigger a user state update by invalidating this query.
@@ -58,16 +64,16 @@ const UserEditPage = ({ params }: Props) => {
   const userToEdit = userId === loadedUser?.id ? loadedUser : undefined;
 
   return (
-    <DocumentTitle title={`Edit User ${fullName}`}>
+    <DocumentTitle title={t('user_edit.title', { username: fullName })}>
       <UsersPageNavigation />
       <PageHeader
         title={<PageTitle fullName={fullName} />}
         actions={<UserActionLinks userId={userId} username={loadedUser?.username ?? ''} userIsReadOnly={readOnly} />}
         documentationLink={{
-          title: 'Permissions documentation',
+          title: t('user_edit.documentation_link_title'),
           path: DocsHelper.PAGES.USERS_ROLES,
         }}>
-        <span>You can change the user details and password here and assign roles and teams.</span>
+        <span>{t('user_edit.description')}</span>
       </PageHeader>
       <UserEdit user={userToEdit} />
     </DocumentTitle>

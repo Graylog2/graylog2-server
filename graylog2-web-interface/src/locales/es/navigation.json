@@ -1,0 +1,77 @@
+{
+  "main": {
+    "search": "Búsqueda",
+    "streams": "Streams",
+    "alerts": "Alertas",
+    "dashboards": "Dashboards",
+    "system": "Sistema",
+    "enterprise": "Enterprise",
+    "security": "Seguridad"
+  },
+  "system": {
+    "overview": "Resumen",
+    "configurations": "Configuraciones",
+    "cluster_configuration": "Configuración del clúster",
+    "inputs": "Inputs",
+    "outputs": "Outputs",
+    "indices": "Índices",
+    "logging": "Registro",
+    "users_and_teams": "Usuarios y equipos",
+    "roles": "Roles",
+    "authentication": "Autenticación",
+    "content_packs": "Content Packs",
+    "grok_patterns": "Patrones Grok",
+    "lookup_tables": "Lookup Tables",
+    "pipelines": "Pipelines",
+    "sidecars": "Sidecars",
+    "collectors": "Collectors",
+    "translation_feedback": "Comentarios de traducción"
+  },
+  "security": {
+    "overview": "Resumen",
+    "user_activity": "Actividad de usuarios",
+    "host_activity": "Actividad de hosts",
+    "network_activity": "Actividad de red",
+    "anomalies": "Anomalías"
+  },
+  "help": {
+    "title": "Ayuda",
+    "documentation": "Documentación",
+    "design_system": "Sistema de diseño",
+    "keyboard_shortcuts": "Atajos de teclado",
+    "api_browser": "Explorador de API"
+  },
+  "user_menu": {
+    "title": "Menú de usuario de {{name}}",
+    "language": "Idioma",
+    "show_profile": "Mostrar perfil",
+    "edit_profile": "Editar perfil",
+    "log_out": "Cerrar sesión"
+  },
+  "shell": {
+    "welcome": "Bienvenido",
+    "main": "Principal",
+    "utility": "Utilidades",
+    "toggle_navigation": "Mostrar u ocultar la navegación",
+    "scratchpad": "Scratchpad"
+  },
+  "page_navigation": {
+    "cluster_configuration": "Configuración del clúster",
+    "certificate_management": "Gestión de certificados",
+    "data_node_dashboard": "Panel de Data Node",
+    "data_node_upgrade": "Actualización de Data Node",
+    "data_node_migration": "Migración de Data Node",
+    "overview": "Resumen",
+    "notifications": "Notificaciones",
+    "lookup_tables": "Tablas de búsqueda",
+    "caches": "Cachés",
+    "data_adapters": "Adaptadores de datos",
+    "users_overview": "Resumen de usuarios",
+    "token_management": "Gestión de tokens",
+    "administration": "Administración",
+    "configuration": "Configuración",
+    "failure_tracking": "Seguimiento de fallos",
+    "alerts_and_events": "Alertas y eventos",
+    "event_definitions": "Definiciones de eventos"
+  }
+}

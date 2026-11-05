@@ -15,14 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import type { ExpandedSectionProps } from 'components/indices/IndexSetFieldTypes/types';
 
-const OverriddenProfileExpandedSection = ({ type }: ExpandedSectionProps) => (
-  <span>
-    Field type <i>{type}</i> comes from the individual, custom field type mapping. It overrides possible mappings from
-    the search engine index mapping, either immediately (if index was rotated) or during the next rotation.
-  </span>
-);
+const OverriddenProfileExpandedSection = ({ type }: ExpandedSectionProps) => {
+  const { t } = useTranslation('indexsets');
+
+  return (
+    <span>
+      <Trans t={t} i18nKey="field_types.origin_overridden_custom" values={{ type }} components={{ i: <i /> }} />
+    </span>
+  );
+};
 
 export default OverriddenProfileExpandedSection;

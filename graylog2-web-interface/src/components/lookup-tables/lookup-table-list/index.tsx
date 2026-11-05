@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Row, Col } from 'components/bootstrap';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
@@ -31,24 +32,27 @@ import columnRenderers from './column-renderers';
 import ErrorsConsumer from './errors-consumer';
 import useActions from './use-actions';
 
-const queryHelpComponent = (
-  <QueryHelper
-    entityName="lookup table"
-    commonFields={['id', 'title', 'name', 'description']}
-    example={
-      <p>
-        searching without a field name matches against the <code>title</code> field:
-        <br />
-        <kbd>geoip</kbd> <br />
-        is the same as
-        <br />
-        <kbd>title:geoip</kbd>
-      </p>
-    }
-  />
-);
+const exampleQuery = 'geoip';
+const exampleFieldQuery = 'title:geoip';
 
 function LookupTableList() {
+  const { t } = useTranslation('lookup_tables');
+  const queryHelpComponent = (
+    <QueryHelper
+      entityName="lookup table"
+      commonFields={['id', 'title', 'name', 'description']}
+      example={
+        <p>
+          <Trans t={t} i18nKey="shared.query_example_intro" components={{ fieldCode: <code /> }} />
+          <br />
+          <kbd>{exampleQuery}</kbd> <br />
+          {t('shared.query_example_same')}
+          <br />
+          <kbd>{exampleFieldQuery}</kbd>
+        </p>
+      }
+    />
+  );
   const [{ lutNames, cacheNames, adapterNames }, setNames] = useState<{
     lutNames?: Array<string>;
     cacheNames?: Array<string>;
@@ -110,7 +114,7 @@ function LookupTableList() {
       <Row className="content">
         <Col md={12}>
           <PaginatedEntityTable<LookupTableEntity>
-            humanName="lookup tables"
+            humanName={t('lut_list.human_name')}
             entityActions={renderActions}
             queryHelpComponent={queryHelpComponent}
             tableLayout={lutListElements.defaultLayout}

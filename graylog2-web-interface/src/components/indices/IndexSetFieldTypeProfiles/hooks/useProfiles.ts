@@ -16,6 +16,7 @@
  */
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
+import i18n from 'i18n';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { Attribute, SearchParams } from 'stores/PaginationTypes';
@@ -58,7 +59,7 @@ export const fetchIndexSetFieldTypeProfiles = async (searchParams: SearchParams)
         id: 'index_set_ids',
         searchable: false,
         sortable: false,
-        title: 'Used in',
+        title: i18n.t('hooks.profiles_used_in', { ns: 'indexsets' }),
         type: 'STRING',
       },
     ],
@@ -83,8 +84,8 @@ const useProfiles = (
     queryFn: () =>
       defaultOnError(
         fetchIndexSetFieldTypeProfiles(searchParams),
-        'Loading index field type profiles failed with status',
-        'Could not load index field type profiles',
+        i18n.t('hooks.profiles_load_failed', { ns: 'indexsets' }),
+        i18n.t('hooks.profiles_load_failed_title', { ns: 'indexsets' }),
       ),
     placeholderData: keepPreviousData,
     enabled,

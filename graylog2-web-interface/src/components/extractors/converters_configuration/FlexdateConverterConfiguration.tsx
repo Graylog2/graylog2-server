@@ -15,12 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans } from 'react-i18next';
 
+import i18n from 'i18n';
 import { getValueFromInput } from 'util/FormsUtils';
 import { TimezoneSelect } from 'components/common';
 import { Row, Col, Input } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
+
+const DocsLink = ({ children = undefined }: { children?: React.ReactNode }) => (
+  <DocumentationLink page={DocsHelper.PAGES.PAGE_FLEXIBLE_DATE_CONVERTER} text={children} />
+);
 
 type FlexdateConverterConfigurationProps = {
   type: string;
@@ -64,8 +70,7 @@ class FlexdateConverterConfiguration extends React.Component<
   render() {
     const timezoneHelpMessage = (
       <span>
-        Time zone to apply to date. Read more in the{' '}
-        <DocumentationLink page={DocsHelper.PAGES.PAGE_FLEXIBLE_DATE_CONVERTER} text="documentation" />.
+        <Trans i18nKey="converters.time_zone_help" ns="extractors" components={{ docsLink: <DocsLink /> }} />
       </span>
     );
 
@@ -74,7 +79,7 @@ class FlexdateConverterConfiguration extends React.Component<
         <Input
           type="checkbox"
           id={`enable-${this.props.type}-converter`}
-          label="Flexibly parse date"
+          label={i18n.t('converters.flexdate_enable', { ns: 'extractors' })}
           wrapperClassName="col-md-offset-2 col-md-10"
           defaultChecked
           onChange={this._toggleConverter}
@@ -83,7 +88,7 @@ class FlexdateConverterConfiguration extends React.Component<
           <Col md={9} mdOffset={2}>
             <div className="xtrc-converter-subfields">
               <Input
-                label="Time Zone"
+                label={i18n.t('converters.time_zone', { ns: 'extractors' })}
                 id={`${this.props.type}_converter_timezone`}
                 labelClassName="col-sm-3"
                 wrapperClassName="col-sm-9"

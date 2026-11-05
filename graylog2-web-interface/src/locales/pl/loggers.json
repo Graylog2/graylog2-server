@@ -1,0 +1,4 @@
+{
+  "title": "Logowanie",
+  "description": "Ta sekcja kontroluje logowanie architektury Graylog i pozwala na bieżąco zmieniać poziomy logów. Pamiętaj, że poziomy logów są resetowane do wartości domyślnych po ponownym uruchomieniu danej usługi."
+}

@@ -32,33 +32,25 @@
  */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import StreamRuleList from 'components/streamrules/StreamRuleList';
 import type { Stream } from 'logic/streams/types';
-import { Pluralize } from 'components/common';
-
-const verbalMatchingType = (matchingType: 'OR' | 'AND') => {
-  switch (matchingType) {
-    case 'OR':
-      return 'at least one';
-    case 'AND':
-    default:
-      return 'all';
-  }
-};
 
 type Props = {
   stream: Stream;
 };
 
-const ExpandedRulesSection = ({ stream }: Props) => (
-  <>
-    <p>
-      Must match {verbalMatchingType(stream.matching_type)} of the {stream.rules.length} configured stream{' '}
-      <Pluralize value={stream.rules.length} plural="rules" singular="rule" />.
-    </p>
-    <StreamRuleList stream={stream} />
-  </>
-);
+const ExpandedRulesSection = ({ stream }: Props) => {
+  const { t } = useTranslation('streams');
+  const matchingType = stream.matching_type === 'OR' ? 'or' : 'and';
+
+  return (
+    <>
+      <p>{t(`streams_overview.expanded.rules_summary_${matchingType}`, { count: stream.rules.length })}</p>
+      <StreamRuleList stream={stream} />
+    </>
+  );
+};
 
 export default ExpandedRulesSection;

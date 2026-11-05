@@ -1,0 +1,10 @@
+{
+  "match exactly": "完全符合",
+  "match regular expression": "符合正規表示式",
+  "greater than": "大於",
+  "smaller than": "小於",
+  "field presence": "欄位存在",
+  "contain": "包含",
+  "always match": "一律符合",
+  "match input": "符合 Input"
+}

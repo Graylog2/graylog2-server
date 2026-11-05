@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Formik, Form } from 'formik';
 import styled from 'styled-components';
 
@@ -47,14 +48,15 @@ const StyledReadOnlyFormGroup = styled(ReadOnlyFormGroup)`
 `;
 
 const ProfileSection = ({ user, onSubmit }: Props) => {
+  const { t } = useTranslation('users');
   const { username, fullName, firstName, lastName, email } = user;
 
   const _getUserNameGroup = () => {
     if (isCloud) {
-      return <StyledReadOnlyFormGroup label="Email" value={email} />;
+      return <StyledReadOnlyFormGroup label={t('user_edit.profile.email')} value={email} />;
     }
 
-    return <StyledReadOnlyFormGroup label="Username" value={username} />;
+    return <StyledReadOnlyFormGroup label={t('user_fields.username')} value={username} />;
   };
 
   const _getEmailGroup = () => {
@@ -68,12 +70,12 @@ const ProfileSection = ({ user, onSubmit }: Props) => {
   const isOldUser = () => fullName && !firstName && !lastName;
 
   return (
-    <SectionComponent title="Profile">
+    <SectionComponent title={t('user_fields.profile')}>
       {isOldUser() && <ProfileUpdateInfo />}
       <Formik onSubmit={onSubmit} initialValues={{ email, first_name: firstName, last_name: lastName }}>
         {({ isSubmitting, isValid }) => (
           <Form className="form form-horizontal">
-            {isOldUser() && <StyledReadOnlyFormGroup label="Full Name" value={fullName} />}
+            {isOldUser() && <StyledReadOnlyFormGroup label={t('user_edit.profile.full_name')} value={fullName} />}
             <FirstNameFormGroup />
             <LastNameFormGroup />
             {_getUserNameGroup()}
@@ -81,8 +83,12 @@ const ProfileSection = ({ user, onSubmit }: Props) => {
             <Row className="no-bm">
               <Col xs={12}>
                 <div className="pull-right">
-                  <Button bsStyle="primary" disabled={isSubmitting || !isValid} title="Update Profile" type="submit">
-                    Update Profile
+                  <Button
+                    bsStyle="primary"
+                    disabled={isSubmitting || !isValid}
+                    title={t('user_edit.profile.update')}
+                    type="submit">
+                    {t('user_edit.profile.update')}
                   </Button>
                 </div>
               </Col>

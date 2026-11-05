@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { DEFAULT_LAYOUT, ADDITIONAL_ATTRIBUTES } from 'components/users/UsersTokenManagement/constants';
@@ -37,7 +38,11 @@ const Header = styled.div`
   align-items: center;
 `;
 
+const EXAMPLE_USER_QUERY = 'username:givenName';
+const EXAMPLE_NAME_QUERY = 'name:tokenName';
+
 const TokenManagement = () => {
+  const { t } = useTranslation('users');
   const tokenAction = useCallback(
     ({ user_id, username, id: tokenId, NAME: tokenName }: Token) => (
       <TokenActions userId={user_id} username={username} tokenId={tokenId} tokenName={tokenName} />
@@ -46,25 +51,25 @@ const TokenManagement = () => {
   );
   const columnRenderers = useMemo(() => CustomColumnRenderers(), []);
   const fieldMap = {
-    username: 'The username of the token owner',
-    name: 'The name of the token',
-    created: 'The date of the token creation',
-    last_access: 'The last time the token was used',
-    external_user: 'Is the token owner a user from an external authentication backend',
-    auth_backend: 'The user authentication bakend. N/A for internal users',
+    username: t('token_admin.fields.username'),
+    name: t('token_admin.fields.name'),
+    created: t('token_admin.fields.created'),
+    last_access: t('token_admin.fields.last_access'),
+    external_user: t('token_admin.fields.external_user'),
+    auth_backend: t('token_admin.fields.auth_backend'),
   };
   const tokenExamples = (
     <>
       <p>
-        Find tokens created by a given user:
+        {t('token_admin.example_user')}
         <br />
-        <code>username:givenName</code>
+        <code>{EXAMPLE_USER_QUERY}</code>
         <br />
       </p>
       <p>
-        Find token by a given token name:
+        {t('token_admin.example_name')}
         <br />
-        <code>name:tokenName</code>
+        <code>{EXAMPLE_NAME_QUERY}</code>
         <br />
       </p>
     </>
@@ -75,10 +80,10 @@ const TokenManagement = () => {
       <Row className="content">
         <Col xs={12}>
           <Header>
-            <h2>Tokens</h2>
+            <h2>{t('token_admin.title')}</h2>
           </Header>
           <PaginatedEntityTable<Token>
-            humanName="tokens"
+            humanName={t('token_admin.human_name')}
             queryHelpComponent={
               <QueryHelper entityName="token" commonFields={[]} fieldMap={fieldMap} example={tokenExamples} />
             }

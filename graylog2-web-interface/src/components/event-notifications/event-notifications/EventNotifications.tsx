@@ -34,23 +34,25 @@ import {
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import { Col, DropdownButton, MenuItem, Row, Button, DeleteMenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
+import i18n from 'i18n';
 import EventNotificationLink from 'components/event-notifications/event-notifications/EventNotificationLink';
+import notificationTypeTitle from 'components/event-notifications/notificationTypeTitle';
 
 import styles from './EventNotifications.css';
 
 export const PAGE_SIZES = [10, 25, 50];
 
+// The list is a class component, so texts are translated at render time.
+const t = (key: string) => i18n.t(key, { ns: 'event_notifications' });
+
 const renderEmptyContent = () => (
   <Row>
     <Col md={4} mdOffset={4}>
       <EmptyEntity>
-        <p>
-          Configure Event Notifications that can alert you when an Event occurs. You can also use Notifications to
-          integrate Alerts with an external alerting system you use.
-        </p>
+        <p>{t('list.empty_description')}</p>
         <IfPermitted permissions="eventnotifications:create">
           <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
-            <Button bsStyle="primary">Get Started!</Button>
+            <Button bsStyle="primary">{t('list.get_started')}</Button>
           </LinkContainer>
         </IfPermitted>
       </EmptyEntity>
@@ -108,10 +110,10 @@ class EventNotifications extends React.Component<
         testResult.id === notification.id ? (
           <Col md={12}>
             {testResult.isLoading ? (
-              <Spinner text="Testing Notification..." />
+              <Spinner text={t('list.testing_notification')} />
             ) : (
               <p className={testResult.error ? 'text-danger' : 'text-success'}>
-                <b>{testResult.error ? 'Error' : 'Success'}:</b> {testResult.message}
+                <b>{testResult.error ? t('list.test_error') : t('list.test_success')}</b> {testResult.message}
               </p>
             )}
           </Col>
@@ -121,8 +123,8 @@ class EventNotifications extends React.Component<
         <EntityListItem
           key={`event-definition-${notification.id}`}
           title={<EventNotificationLink id={notification.id} title={notification.title} />}
-          titleSuffix={plugin?.displayName || notification.config.type}
-          description={notification.description || <em>No description given</em>}
+          titleSuffix={notificationTypeTitle(plugin) || notification.config.type}
+          description={notification.description || <em>{t('summary.no_description')}</em>}
           actions={actions}
           contentRow={content}
         />
@@ -138,7 +140,7 @@ class EventNotifications extends React.Component<
         <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.edit(notification.id)}>
           <IfPermitted permissions={`eventnotifications:edit:${notification.id}`}>
             <Button>
-              <Icon name="edit_square" /> Edit
+              <Icon name="edit_square" /> {i18n.t('actions.edit', { ns: 'common' })}
             </Button>
           </IfPermitted>
         </LinkContainer>
@@ -150,10 +152,10 @@ class EventNotifications extends React.Component<
         <IfPermitted
           permissions={[`eventnotifications:edit:${notification.id}`, `eventnotifications:delete:${notification.id}`]}
           anyPermissions>
-          <DropdownButton id={`more-dropdown-${notification.id}`} title="More" pullRight>
+          <DropdownButton id={`more-dropdown-${notification.id}`} title={t('list.more')} pullRight>
             <IfPermitted permissions={`eventnotifications:edit:${notification.id}`}>
               <MenuItem disabled={isTestLoading} onClick={onTest(notification)}>
-                {isTestLoading ? 'Testing...' : 'Test Notification'}
+                {isTestLoading ? t('form.testing') : t('form.test')}
               </MenuItem>
             </IfPermitted>
             <MenuItem divider />
@@ -184,7 +186,7 @@ class EventNotifications extends React.Component<
               query={query}
               onSearch={onQueryChange}
               onReset={onQueryChange}
-              placeholder="Find Notifications"
+              placeholder={t('list.search_placeholder')}
               wrapperClass={styles.inline}
               queryHelpComponent={<QueryHelper entityName="notification" />}
               topMargin={0}
@@ -202,7 +204,7 @@ class EventNotifications extends React.Component<
           <EntityShareModal
             entityId={notificationToShare.id}
             entityType="notification"
-            description="Search for a User or Team to add as collaborator on this notification."
+            description={t('form.share_description')}
             entityTitle={notificationToShare.title}
             onClose={() => setNotificationToShare(undefined)}
           />

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Label } from 'components/bootstrap';
 import type { DataNode } from 'components/datanode/Types';
@@ -24,6 +25,7 @@ type Props = {
 };
 
 const DataNodeStatusCell = ({ dataNode }: Props) => {
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const datanodeDisabled = dataNode.datanode_status !== 'AVAILABLE';
 
   return (
@@ -37,7 +39,7 @@ const DataNodeStatusCell = ({ dataNode }: Props) => {
       &nbsp;
       {dataNode.action_queue && (
         <Label bsStyle="warning" title={dataNode.datanode_status} aria-label={dataNode.datanode_status}>
-          queued for {dataNode.action_queue}
+          {t('data_node_status.queued_for', { action: dataNode.action_queue })}
         </Label>
       )}
     </>

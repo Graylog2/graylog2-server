@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Label } from 'components/bootstrap';
 
@@ -33,9 +34,10 @@ type Props = {
 const InstanceStatusLabel = ({ status }: Props) => {
   // A status the frontend does not know about reads as offline, matching the previous behaviour of
   // the `status === 'online'` checks this replaced.
-  const { label, style } = INSTANCE_STATUS_LABELS[status] ?? INSTANCE_STATUS_LABELS.offline;
+  const { t } = useTranslation('collectors');
+  const { labelKey, style } = INSTANCE_STATUS_LABELS[status] ?? INSTANCE_STATUS_LABELS.offline;
 
-  return <Label bsStyle={style}>{label}</Label>;
+  return <Label bsStyle={style}>{t(labelKey)}</Label>;
 };
 
 export default InstanceStatusLabel;

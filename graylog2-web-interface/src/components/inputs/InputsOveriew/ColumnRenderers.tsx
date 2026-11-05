@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 
+import i18n from 'i18n';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import type { InputSummary } from 'hooks/usePaginatedInputs';
 import type { InputTypesSummary } from 'hooks/useInputTypes';
@@ -40,7 +41,9 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
   attributes: {
     title: {
       renderCell: (_title: string, input: InputSummary) => (
-        <Link to={Routes.SYSTEM.INPUT_DIAGNOSIS(input.id)} title={`show input diagnosis for ${input.title}`}>
+        <Link
+          to={Routes.SYSTEM.INPUT_DIAGNOSIS(input.id)}
+          title={i18n.t('overview.show_diagnosis_for', { ns: 'inputs', title: input.title })}>
           {input.title}
         </Link>
       ),
@@ -67,11 +70,13 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
       textAlign: 'right',
     },
     address: {
-      renderCell: (_address: string, input: InputSummary) => input.attributes?.bind_address || 'N/A',
+      renderCell: (_address: string, input: InputSummary) =>
+        input.attributes?.bind_address || i18n.t('overview.not_available', { ns: 'inputs' }),
       staticWidth: 125,
     },
     port: {
-      renderCell: (_port: string, input: InputSummary) => input.attributes?.port || 'N/A',
+      renderCell: (_port: string, input: InputSummary) =>
+        input.attributes?.port || i18n.t('overview.not_available', { ns: 'inputs' }),
       staticWidth: 'matchHeader',
       textAlign: 'right',
     },

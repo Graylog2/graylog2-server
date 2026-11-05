@@ -1,0 +1,13 @@
+{
+  "welcome": "Bienvenue sur {{productName}}",
+  "username": "Nom d'utilisateur",
+  "password": "Mot de passe",
+  "sign_in": "Se connecter",
+  "signing_in": "Connexion en cours...",
+  "invalid_credentials": "Identifiants invalides, veuillez les vérifier et réessayer.",
+  "server_error": "Erreur : le serveur a renvoyé : {{status}} - {{message}}",
+  "fallback_error_cloud": "Erreur lors du chargement de l'écran de connexion, veuillez contacter votre gestionnaire de compte {{productName}}.",
+  "fallback_error": "Erreur lors de l'utilisation de la connexion du service d'authentification actif. Veuillez vérifier sa configuration ou contacter votre gestionnaire de compte {{productName}}. Détails de l'erreur :",
+  "login_with_default": "Se connecter avec la méthode par défaut",
+  "login_with": "Se connecter avec {{method}}"
+}

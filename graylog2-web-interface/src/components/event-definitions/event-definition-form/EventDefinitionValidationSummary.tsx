@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Alert, Col, Row } from 'components/bootstrap';
 
@@ -33,6 +34,7 @@ const EventDefinitionValidationSummary = ({
     errors: [],
   },
 }: Props) => {
+  const { t } = useTranslation('event_definitions');
   const fieldsWithErrors = Object.keys(validation.errors);
 
   if (fieldsWithErrors.length === 0) {
@@ -42,8 +44,8 @@ const EventDefinitionValidationSummary = ({
   return (
     <Row>
       <Col md={12}>
-        <Alert bsStyle="danger" className={commonStyles.validationSummary} title="We found some errors!">
-          <p>Please correct the following errors before saving this Event Definition:</p>
+        <Alert bsStyle="danger" className={commonStyles.validationSummary} title={t('validation_summary.title')}>
+          <p>{t('fields_form.errors_description')}</p>
           <ul>
             {fieldsWithErrors.map((field) =>
               validation.errors[field].map((error) => {

@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Panel } from 'components/bootstrap';
 
@@ -32,21 +33,23 @@ export const StyledPanel = styled(Panel)<{ bsStyle: string }>(
   `,
 );
 
-const InPlaceMigrationInfo = () => (
-  <StyledPanel bsStyle="info">
-    <Panel.Heading>
-      <Panel.Title componentClass="h3">In-Place migration</Panel.Title>
-    </Panel.Heading>
-    <Panel.Body>
-      For In-Place migrations, please ensure the configuration of your Data Nodes in <code>datanode.conf</code>,
-      specifically the <code>opensearch_data_location</code> configuration option, points to the correct existing
-      OpenSearch data directory on every node.
-      <br />
-      During the time of the migration, both the Data Node&apos;s and the OpenSearch&apos;s system user will need to be
-      able to access and write to the data directory. To ensure this, you can run for example
-      <br />
-      <code>sudo chmod -R 757 &lt;your_data_directory&gt;</code>
-    </Panel.Body>
-  </StyledPanel>
-);
+const InPlaceMigrationInfo = () => {
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
+
+  return (
+    <StyledPanel bsStyle="info">
+      <Panel.Heading>
+        <Panel.Title componentClass="h3">{t('in_place_migration.title')}</Panel.Title>
+      </Panel.Heading>
+      <Panel.Body>
+        <Trans t={t} i18nKey="in_place_migration_info.configuration" components={{ codeSnippet: <code /> }} />
+        <br />
+        {t('in_place_migration_info.permissions')}
+        <br />
+        {/* eslint-disable-next-line graylog/no-untranslated-text -- shell command */}
+        <code>sudo chmod -R 757 &lt;your_data_directory&gt;</code>
+      </Panel.Body>
+    </StyledPanel>
+  );
+};
 export default InPlaceMigrationInfo;

@@ -24,6 +24,7 @@ import {
   OpAMPEnrollment,
 } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import UserNotification from 'util/UserNotification';
 
 import type { CollectorsConfigRequest, Fleet, Source } from '../types';
@@ -40,12 +41,20 @@ type UpdateSourceInput = {
   updates: Omit<Source, 'id' | 'fleet_id'>;
 };
 
+const t = (key: string, options: Record<string, unknown> = {}) => i18n.t(key, { ns: 'collectors', ...options });
+
+/** `action` is the section of `mutation_errors` in the `collectors` namespace, e.g. `create_fleet`. */
 const onMutationError = (action: string) => (errorThrown: unknown) => {
-  UserNotification.error(`${action} failed: ${errorThrown}`, `Could not ${action.toLowerCase()}`);
+  UserNotification.error(
+    t(`mutation_errors.${action}.message`, { error: String(errorThrown) }),
+    t(`mutation_errors.${action}.title`),
+  );
 };
 
-const onMutationSuccess = (message: string, invalidate: () => Promise<void>) => () => {
-  UserNotification.success(message, 'Success!');
+const successTitle = () => t('notifications.success_title');
+
+const onMutationSuccess = (messageKey: string, invalidate: () => Promise<void>) => () => {
+  UserNotification.success(t(messageKey), successTitle());
 
   return invalidate();
 };
@@ -58,7 +67,7 @@ const useCollectorsMutations = () => {
   // lives under ONBOARDING_KEY_PREFIX instead — see useCollectorLogPreview.
   const invalidateCollectorsQueries = () => queryClient.invalidateQueries({ queryKey: ['collectors'] });
 
-  const onSuccess = (message: string) => onMutationSuccess(message, invalidateCollectorsQueries);
+  const onSuccess = (messageKey: string) => onMutationSuccess(messageKey, invalidateCollectorsQueries);
 
   // Fleet mutations
   const createFleetMutation = useMutation({
@@ -67,9 +76,9 @@ const useCollectorsMutations = () => {
         name: input.name,
         description: input.description,
       }),
-    onError: onMutationError('Creating fleet'),
+    onError: onMutationError('create_fleet'),
     onSuccess: (fleet) => {
-      UserNotification.success(`Fleet "${fleet.name}" has been created.`, 'Success!');
+      UserNotification.success(t('notifications.fleet_created', { name: fleet.name }), successTitle());
 
       return invalidateCollectorsQueries();
     },
@@ -81,9 +90,9 @@ const useCollectorsMutations = () => {
         name: updates.name,
         description: updates.description,
       }),
-    onError: onMutationError('Updating fleet'),
+    onError: onMutationError('update_fleet'),
     onSuccess: (fleet) => {
-      UserNotification.success(`Fleet "${fleet.name}" has been updated.`, 'Success!');
+      UserNotification.success(t('notifications.fleet_updated', { name: fleet.name }), successTitle());
 
       return invalidateCollectorsQueries();
     },
@@ -91,8 +100,8 @@ const useCollectorsMutations = () => {
 
   const deleteFleetMutation = useMutation({
     mutationFn: (fleetId: string) => CollectorsFleets.remove(fleetId),
-    onError: onMutationError('Deleting fleet'),
-    onSuccess: onSuccess('Fleet has been deleted.'),
+    onError: onMutationError('delete_fleet'),
+    onSuccess: onSuccess('notifications.fleet_deleted'),
   });
 
   // Source mutations
@@ -104,10 +113,10 @@ const useCollectorsMutations = () => {
         enabled: source.enabled,
         config: { type: source.type, ...source.config },
       }) as Promise<Source>,
-    onError: onMutationError('Creating source'),
+    onError: onMutationError('create_source'),
     onSuccess: (source, { silent }) => {
       if (!silent) {
-        UserNotification.success(`Source "${source.name}" has been created.`, 'Success!');
+        UserNotification.success(t('notifications.source_created', { name: source.name }), successTitle());
       }
 
       return invalidateCollectorsQueries();
@@ -122,9 +131,9 @@ const useCollectorsMutations = () => {
         enabled: updates.enabled,
         config: { type: updates.type, ...updates.config },
       }) as Promise<Source>,
-    onError: onMutationError('Updating source'),
+    onError: onMutationError('update_source'),
     onSuccess: (source) => {
-      UserNotification.success(`Source "${source.name}" has been updated.`, 'Success!');
+      UserNotification.success(t('notifications.source_updated', { name: source.name }), successTitle());
 
       return invalidateCollectorsQueries();
     },
@@ -133,8 +142,8 @@ const useCollectorsMutations = () => {
   const deleteSourceMutation = useMutation({
     mutationFn: ({ fleetId, sourceId }: { fleetId: string; sourceId: string }) =>
       CollectorsSources.remove(fleetId, sourceId),
-    onError: onMutationError('Deleting source'),
-    onSuccess: onSuccess('Source has been deleted.'),
+    onError: onMutationError('delete_source'),
+    onSuccess: onSuccess('notifications.source_deleted'),
   });
 
   // Enrollment token mutations
@@ -145,35 +154,35 @@ const useCollectorsMutations = () => {
         fleet_id: input.fleetId,
         expires_in: input.expiresIn,
       }),
-    onError: onMutationError('Creating enrollment token'),
+    onError: onMutationError('create_enrollment_token'),
     onSuccess: () => invalidateCollectorsQueries(),
   });
 
   const deleteEnrollmentTokenMutation = useMutation({
     mutationFn: (tokenId: string) => OpAMPEnrollment.remove(tokenId),
-    onError: onMutationError('Deleting enrollment token'),
-    onSuccess: onSuccess('Enrollment token has been deleted.'),
+    onError: onMutationError('delete_enrollment_token'),
+    onSuccess: onSuccess('notifications.enrollment_token_deleted'),
   });
 
   const bulkDeleteEnrollmentTokensMutation = useMutation({
     mutationFn: (entityIds: string[]) => OpAMPEnrollment.bulkDelete({ entity_ids: entityIds }),
-    onError: onMutationError('Deleting enrollment tokens'),
-    onSuccess: onSuccess('Enrollment tokens have been deleted.'),
+    onError: onMutationError('delete_enrollment_tokens'),
+    onSuccess: onSuccess('notifications.enrollment_tokens_deleted'),
   });
 
   // Instance reassignment mutation
   const reassignInstancesMutation = useMutation({
     mutationFn: (input: { instanceUids: string[]; fleetId: string }) =>
       Collectors.reassignInstances({ instance_uids: input.instanceUids, fleet_id: input.fleetId }),
-    onError: onMutationError('Reassigning instances'),
-    onSuccess: onSuccess('Instances have been reassigned.'),
+    onError: onMutationError('reassign_instances'),
+    onSuccess: onSuccess('notifications.instances_reassigned'),
   });
 
   // Instance delete mutation
   const deleteInstanceMutation = useMutation({
     mutationFn: (instanceUid: string) => Collectors.deleteInstance(instanceUid),
-    onError: onMutationError('Deleting instance'),
-    onSuccess: onSuccess('Instance has been deleted.'),
+    onError: onMutationError('delete_instance'),
+    onSuccess: onSuccess('notifications.instance_deleted'),
   });
 
   // Config mutation
@@ -189,9 +198,12 @@ const useCollectorsMutations = () => {
         return;
       }
 
-      UserNotification.error(`Saving collectors config failed: ${errorThrown}`, 'Could not save config');
+      UserNotification.error(
+        t('mutation_errors.save_config.message', { error: String(errorThrown) }),
+        t('mutation_errors.save_config.title'),
+      );
     },
-    onSuccess: onSuccess('Collectors config saved.'),
+    onSuccess: onSuccess('notifications.config_saved'),
   });
 
   return {

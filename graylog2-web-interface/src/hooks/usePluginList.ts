@@ -19,6 +19,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ClusterPlugins } from '@graylog/server-api';
 
 import { defaultOnError } from 'util/conditional/onError';
+import i18n from 'i18n';
 
 const usePluginList = (nodeId: string) => {
   const { data, isInitialLoading } = useQuery({
@@ -26,8 +27,8 @@ const usePluginList = (nodeId: string) => {
     queryFn: () =>
       defaultOnError(
         ClusterPlugins.list(nodeId),
-        `Getting plugins on node "${nodeId}" failed`,
-        'Could not get plugins',
+        i18n.t('use_plugin_list_notifications.fetch_failed', { ns: 'system', nodeId }),
+        i18n.t('use_plugin_list_notifications.fetch_failed_title', { ns: 'system' }),
       ),
   });
 

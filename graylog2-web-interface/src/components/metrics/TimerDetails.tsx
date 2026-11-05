@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import numeral from 'numeral';
+import { useTranslation } from 'react-i18next';
 
 import type { TimerMetric } from 'types/metrics';
 
@@ -26,43 +27,54 @@ const TimerDetails = ({
   metric: {
     metric: { time: timing },
   },
-}: Props) => (
-  <dl className="metric-def metric-timer">
-    <dt>95th percentile:</dt>
-    <dd>
-      <span>{numeral(timing['95th_percentile']).format('0,0.[00]')}</span>&#956;s
-    </dd>
+}: Props) => {
+  const { t } = useTranslation('system');
 
-    <dt>98th percentile:</dt>
-    <dd>
-      <span>{numeral(timing['98th_percentile']).format('0,0.[00]')}</span>&#956;s
-    </dd>
+  return (
+    <dl className="metric-def metric-timer">
+      <dt>{t('metric_details.percentile_95')}</dt>
+      <dd>
+        <span>{numeral(timing['95th_percentile']).format('0,0.[00]')}</span>
+        {t('metric_details.microseconds')}
+      </dd>
 
-    <dt>99th percentile:</dt>
-    <dd>
-      <span>{numeral(timing['99th_percentile']).format('0,0.[00]')}</span>&#956;s
-    </dd>
+      <dt>{t('metric_details.percentile_98')}</dt>
+      <dd>
+        <span>{numeral(timing['98th_percentile']).format('0,0.[00]')}</span>
+        {t('metric_details.microseconds')}
+      </dd>
 
-    <dt>Standard deviation:</dt>
-    <dd>
-      <span>{numeral(timing.std_dev).format('0,0.[00]')}</span>&#956;s
-    </dd>
+      <dt>{t('metric_details.percentile_99')}</dt>
+      <dd>
+        <span>{numeral(timing['99th_percentile']).format('0,0.[00]')}</span>
+        {t('metric_details.microseconds')}
+      </dd>
 
-    <dt>Mean:</dt>
-    <dd>
-      <span>{numeral(timing.mean).format('0,0.[00]')}</span>&#956;s
-    </dd>
+      <dt>{t('metric_details.standard_deviation')}</dt>
+      <dd>
+        <span>{numeral(timing.std_dev).format('0,0.[00]')}</span>
+        {t('metric_details.microseconds')}
+      </dd>
 
-    <dt>Minimum:</dt>
-    <dd>
-      <span>{numeral(timing.min).format('0,0.[00]')}</span>&#956;s
-    </dd>
+      <dt>{t('metric_details.mean')}</dt>
+      <dd>
+        <span>{numeral(timing.mean).format('0,0.[00]')}</span>
+        {t('metric_details.microseconds')}
+      </dd>
 
-    <dt>Maximum:</dt>
-    <dd>
-      <span>{numeral(timing.max).format('0,0.[00]')}</span>&#956;s
-    </dd>
-  </dl>
-);
+      <dt>{t('metric_details.minimum')}</dt>
+      <dd>
+        <span>{numeral(timing.min).format('0,0.[00]')}</span>
+        {t('metric_details.microseconds')}
+      </dd>
+
+      <dt>{t('metric_details.maximum')}</dt>
+      <dd>
+        <span>{numeral(timing.max).format('0,0.[00]')}</span>
+        {t('metric_details.microseconds')}
+      </dd>
+    </dl>
+  );
+};
 
 export default TimerDetails;

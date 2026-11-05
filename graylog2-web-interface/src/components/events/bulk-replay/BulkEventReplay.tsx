@@ -15,7 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo } from 'react';
 import styled from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 
 import useSelectedEvents from 'components/events/bulk-replay/useSelectedEvents';
 import EventReplaySelectedProvider from 'contexts/EventReplaySelectedProvider';
@@ -50,21 +53,23 @@ const AlertWrapper = styled(Alert)(
 `,
 );
 
-const replaySection: SidebarSection = {
-  key: 'eventDescription',
-  title: null,
-  hoverTitle: 'Replayed Search',
-  icon: 'play_arrow',
-  content: SidebarBulkEventReplay,
-};
+const createSearchPageLayout = (t: TFunction): Partial<LayoutState> => {
+  const replaySection: SidebarSection = {
+    key: 'eventDescription',
+    title: null,
+    hoverTitle: t('alerts_replay.replayed_search'),
+    icon: 'play_arrow',
+    content: SidebarBulkEventReplay,
+  };
 
-const searchPageLayout: Partial<LayoutState> = {
-  sidebar: {
-    isShown: true,
-    title: 'Replay Search',
-    sections: [replaySection, ...sidebarSections],
-  },
-  synchronizeUrl: false,
+  return {
+    sidebar: {
+      isShown: true,
+      title: t('alerts_bulk_replay.replay_search'),
+      sections: [replaySection, ...sidebarSections],
+    },
+    synchronizeUrl: false,
+  };
 };
 
 const ReplayedSearch = ({
@@ -72,6 +77,8 @@ const ReplayedSearch = ({
 }: React.PropsWithChildren<{
   onReturnClick: () => void;
 }>) => {
+  const { t } = useTranslation('events');
+  const searchPageLayout = useMemo(() => createSearchPageLayout(t), [t]);
   const { eventIds, selectedId, eventsData } = useSelectedEvents();
   const selectedEvent = eventsData?.[selectedId];
   const { data: eventDefinitionMappedData } = useEventDefinition(selectedEvent?.event?.event_definition_id);
@@ -80,10 +87,11 @@ const ReplayedSearch = ({
   if (total === 0) {
     return (
       <AlertWrapper bsStyle="info">
-        You have removed all events from the list. You can now return back by clicking{' '}
-        <Button bsStyle="link" onClick={onReturnClick}>
-          Back to events
-        </Button>{' '}
+        <Trans
+          t={t}
+          i18nKey="alerts_bulk_replay.all_removed"
+          components={{ backButton: <Button bsStyle="link" onClick={onReturnClick} /> }}
+        />
       </AlertWrapper>
     );
   }

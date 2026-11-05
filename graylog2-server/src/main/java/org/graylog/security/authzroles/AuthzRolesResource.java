@@ -31,7 +31,6 @@ import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotAllowedException;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -49,6 +48,8 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.plugin.rest.CodedException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
@@ -202,7 +203,7 @@ public class AuthzRolesResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public AuthzRoleDTO get(@Parameter(name = "roleId") @PathParam("roleId") @NotBlank String roleId) {
         AuthzRoleDTO authzRoleDTO = authzRolesService.get(roleId).orElseThrow(
-                () -> new NotFoundException("Could not find role with id: " + roleId));
+                () -> new CodedNotFoundException("authz_roles.could_not_find_role_with_id", "Could not find role with id: " + roleId, CodedException.paramsOf("roleId", roleId)));
         checkPermission(RestPermissions.ROLES_READ, authzRoleDTO.name());
         return authzRoleDTO;
     }
@@ -233,7 +234,7 @@ public class AuthzRolesResource extends RestResource {
 
         checkPermission(RestPermissions.USERS_READ, username);
         final User user = Optional.ofNullable(userService.load(username))
-                .orElseThrow(() -> new NotFoundException("Couldn't find user: " + username));
+                .orElseThrow(() -> new CodedNotFoundException("authz_roles.couldnt_find_user", "Couldn't find user: " + username, CodedException.paramsOf("username", username)));
         final Predicate<String> roleNamePermissionPredicate = getRoleNamePermissionPredicate();
         final PaginatedList<AuthzRoleDTO> result = authzRolesService.findPaginatedByIds(roleNamePermissionPredicate,
                 searchQuery, page, perPage, sort, order, user.getRoleIds());
@@ -281,12 +282,12 @@ public class AuthzRolesResource extends RestResource {
 
             final User user = userService.load(username);
             if (user == null) {
-                throw new NotFoundException("Cannot find user with name: " + username);
+                throw new CodedNotFoundException("authz_roles.cannot_find_user_with_name", "Cannot find user with name: " + username, CodedException.paramsOf("username", username));
             }
             String roleName;
             final Optional<AuthzRoleDTO> authzRoleDTO = authzRolesService.get(roleId);
             if (authzRoleDTO.isEmpty()) {
-                throw new NotFoundException("Cannot find role with id: " + roleId);
+                throw new CodedNotFoundException("authz_roles.cannot_find_role_with_id", "Cannot find role with id: " + roleId, CodedException.paramsOf("roleId", roleId));
             } else {
                 roleName = authzRoleDTO.get().name();
                 checkPermission(RestPermissions.ROLES_ASSIGN, roleName);
@@ -318,7 +319,7 @@ public class AuthzRolesResource extends RestResource {
     public void delete(@Parameter(name = "roleId") @PathParam("roleId") @NotBlank String roleId) {
         checkPermission(RestPermissions.ROLES_EDIT);
         final AuthzRoleDTO roleDTO = authzRolesService.get(roleId).orElseThrow(
-                () -> new NotFoundException("Could not delete role with id: " + roleId));
+                () -> new CodedNotFoundException("authz_roles.could_not_delete_role_with_id", "Could not delete role with id: " + roleId, CodedException.paramsOf("roleId", roleId)));
         if (roleDTO.readOnly()) {
             throw new NotAllowedException("Cannot delete read only role with id: " + roleId);
         }

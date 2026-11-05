@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useHistory from 'routing/useHistory';
 import { DocumentTitle, PageHeader } from 'components/common';
@@ -26,6 +27,7 @@ import usePermissions from 'hooks/usePermissions';
 import Routes from 'routing/Routes';
 
 const ClusterConfigurationPage = () => {
+  const { t } = useTranslation('system');
   const { isPermitted } = usePermissions();
   const { push } = useHistory();
 
@@ -36,16 +38,11 @@ const ClusterConfigurationPage = () => {
   }, [isPermitted, push]);
 
   return (
-    <DocumentTitle title="Cluster Configuration">
+    <DocumentTitle title={t('cluster_configuration_page.title')}>
       <ClusterConfigurationPageNavigation />
       <div>
-        <PageHeader title="Cluster Configuration">
-          <span>
-            This page provides a real-time overview of the nodes in your cluster. You can pause message processing at
-            any time. The process buffers will not accept any new messages until you resume it. If the message journal
-            is enabled for a node, which it is by default, incoming messages will be persisted to disk, even when
-            processing is disabled.
-          </span>
+        <PageHeader title={t('cluster_configuration_page.title')}>
+          <span>{t('cluster_configuration_page.description')}</span>
         </PageHeader>
         <HideOnCloud>
           <IndexerClusterHealth minimal />

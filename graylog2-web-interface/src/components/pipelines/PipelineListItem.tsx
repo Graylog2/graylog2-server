@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { Link, LinkContainer, Spinner } from 'components/common';
@@ -96,6 +97,7 @@ const PipelineListItem = ({
   processingLoad: processingLoadProp = undefined,
   processingLoadError: processingLoadErrorProp = undefined,
 }: Props) => {
+  const { t } = useTranslation('pipelines');
   const {
     metricsEnabled,
     processingLoad: processingLoadContext,
@@ -126,16 +128,20 @@ const PipelineListItem = ({
         if (stageNumbers.indexOf(usedStage) === -1) {
           return (
             <PipelineStage key={`${pipeline.id}-stage${usedStage}`} $idle>
-              Idle
+              {t('list_item.idle')}
             </PipelineStage>
           );
         }
 
-        return <PipelineStage key={`${pipeline.id}-stage${usedStage}`}>Stage {usedStage}</PipelineStage>;
+        return (
+          <PipelineStage key={`${pipeline.id}-stage${usedStage}`}>
+            {t('list_item.stage', { stage: usedStage })}
+          </PipelineStage>
+        );
       });
   };
   if (loadingScopePermissions) {
-    return <Spinner text="Loading pipeline..." />;
+    return <Spinner text={t('list_item.loading')} />;
   }
 
   return (
@@ -146,7 +152,7 @@ const PipelineListItem = ({
         </Link>
         {isManaged && (
           <DefaultLabel bsStyle="default" bsSize="xsmall">
-            Managed by Application
+            {t('list_item.managed')}
           </DefaultLabel>
         )}
         <RuleDeprecationInfo pipelineId={pipeline.id} showFor="pipeline" />
@@ -154,7 +160,7 @@ const PipelineListItem = ({
         {description}
         <br />
         <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Pipeline.${id}.executed`}>
-          <CounterRate prefix="Throughput:" suffix="msg/s" />
+          <CounterRate prefix={t('list_item.throughput_prefix')} suffix={t('list_item.throughput_suffix')} />
         </MetricContainer>
       </PipelineNameTD>
       <StreamListTD>
@@ -163,7 +169,7 @@ const PipelineListItem = ({
           connections={connections}
           streams={streams}
           streamsFormatter={_formatConnectedStreams}
-          noConnectionsMessage={<em>Not connected</em>}
+          noConnectionsMessage={<em>{t('list_item.not_connected')}</em>}
         />
       </StreamListTD>
       <td>
@@ -180,18 +186,18 @@ const PipelineListItem = ({
       <td>{_formatStages()}</td>
       <td>
         <ButtonToolbar>
-          <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(id)} aria-label="Edit Pipeline">
+          <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(id)} aria-label={t('list_item.edit_aria')}>
             <Button disabled={!isPermitted('pipeline:edit')} bsSize="xsmall">
-              Edit
+              {t('list_item.edit')}
             </Button>
           </LinkContainer>
           <Button
-            aria-label="Delete Pipeline"
+            aria-label={t('list_item.delete_aria')}
             disabled={!isPermitted('pipeline:delete') || isNotDeletable}
             bsStyle="danger"
             bsSize="xsmall"
             onClick={() => onDeletePipeline()}>
-            Delete
+            {t('list_item.delete')}
           </Button>
         </ButtonToolbar>
       </td>

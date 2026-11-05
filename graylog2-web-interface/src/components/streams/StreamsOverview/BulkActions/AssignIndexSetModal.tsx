@@ -17,6 +17,7 @@
 
 import * as React from 'react';
 import { Formik, Form } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { Streams } from '@graylog/server-api';
 
@@ -27,10 +28,9 @@ import UserNotification from 'util/UserNotification';
 import { Modal } from 'components/bootstrap';
 import ModalSubmit from 'components/common/ModalSubmit';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
-import StringUtils from 'util/StringUtils';
+import i18n from 'i18n';
 
 type ModalProps = {
-  descriptor: string;
   indexSets: Array<IndexSet>;
   refetchStreams: () => void;
   toggleShowModal: () => void;
@@ -40,29 +40,33 @@ type AssignIndexSetFormValues = {
   index_set_id: string | undefined;
 };
 
-const AssignIndexSetModal = ({ toggleShowModal, indexSets, refetchStreams, descriptor }: ModalProps) => {
+const AssignIndexSetModal = ({ toggleShowModal, indexSets, refetchStreams }: ModalProps) => {
+  const { t } = useTranslation('streams');
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
-  const modalTitle = `Assign Index Set To ${selectedEntities.length} ${StringUtils.capitalizeFirstLetter(descriptor)}`;
+  const modalTitle = t('streams_overview.bulk.assign_title', { count: selectedEntities.length });
   const onSubmit = ({ index_set_id: indexSetId }: AssignIndexSetFormValues) =>
     Streams.assignToIndexSet(indexSetId, selectedEntities)
       .then(() => {
         refetchStreams();
         UserNotification.success(
-          `Index set was assigned to ${selectedEntities.length} ${descriptor} successfully.`,
-          'Success',
+          t('streams_overview.bulk.assign_success', { count: selectedEntities.length }),
+          t('streams_overview.bulk.success_title'),
         );
         setSelectedEntities([]);
         toggleShowModal();
       })
       .catch((error: FetchError) => {
-        UserNotification.error(`Assigning index set failed with status: ${error}`, 'Error');
+        UserNotification.error(
+          t('streams_overview.bulk.assign_failed', { error }),
+          t('streams_overview.bulk.assign_failed_title'),
+        );
       });
 
   const validate = ({ index_set_id }: AssignIndexSetFormValues) => {
     let errors = {};
 
     if (!index_set_id) {
-      errors = { ...errors, index_set_id: 'Index set is required' };
+      errors = { ...errors, index_set_id: i18n.t('streams_overview.bulk.index_set_required', { ns: 'streams' }) };
     }
 
     return errors;
@@ -77,15 +81,12 @@ const AssignIndexSetModal = ({ toggleShowModal, indexSets, refetchStreams, descr
               <Modal.Title>{modalTitle}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <IndexSetSelect
-                indexSets={indexSets}
-                help="Messages that match the selected streams will be written to the configured index set."
-              />
+              <IndexSetSelect indexSets={indexSets} help={t('streams_overview.bulk.assign_help')} />
             </Modal.Body>
             <Modal.Footer>
               <ModalSubmit
-                submitButtonText="Assign index set"
-                submitLoadingText="Assigning index set..."
+                submitButtonText={t('streams_overview.bulk.assign_submit')}
+                submitLoadingText={t('streams_overview.bulk.assign_loading')}
                 onCancel={toggleShowModal}
                 disabledSubmit={isValidating}
                 isSubmitting={isSubmitting}

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
@@ -27,6 +28,7 @@ import useHistory from 'routing/useHistory';
 import PageDescription from 'components/event-notifications/PageDescription';
 
 const CreateEventDefinitionPage = () => {
+  const { t } = useTranslation('event_notifications');
   const { isPermitted } = usePermissions();
   const history = useHistory();
 
@@ -35,12 +37,12 @@ const CreateEventDefinitionPage = () => {
   }
 
   return (
-    <DocumentTitle title="New Notification">
+    <DocumentTitle title={t('pages.new')}>
       <EventsPageNavigation />
       <PageHeader
-        title="New Notification"
+        title={t('pages.new')}
         documentationLink={{
-          title: 'Alerts documentation',
+          title: t('pages.alerts_docs'),
           path: DocsHelper.PAGES.ALERTS,
         }}>
         <PageDescription />

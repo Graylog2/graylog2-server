@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 const Wrapper = styled.div`
@@ -26,11 +27,15 @@ const Wrapper = styled.div`
   }
 `;
 
-const TabDisabledTimeRange = () => (
-  <Wrapper>
-    <h5>No Date/Time Override chosen.</h5>
-    <p>Use the tabs above to choose a Date & Time Range to Search.</p>
-  </Wrapper>
-);
+const TabDisabledTimeRange = () => {
+  const { t } = useTranslation('search');
+
+  return (
+    <Wrapper>
+      <h5>{t('time_range.no_override_title')}</h5>
+      <p>{t('time_range.no_override_hint')}</p>
+    </Wrapper>
+  );
+};
 
 export default TabDisabledTimeRange;

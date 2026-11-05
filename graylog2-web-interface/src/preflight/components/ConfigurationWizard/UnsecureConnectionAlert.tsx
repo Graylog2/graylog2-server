@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Alert from 'components/bootstrap/Alert';
 import isSecureConnection from 'preflight/util/IsSecureConnection';
@@ -25,6 +26,7 @@ type Props = {
 };
 
 const UnsecureConnectionAlert = ({ renderIfSecure = undefined }: Props) => {
+  const { t } = useTranslation('preflight');
   const connectionIsSecure = isSecureConnection();
 
   if (connectionIsSecure === 'YES') {
@@ -33,12 +35,8 @@ const UnsecureConnectionAlert = ({ renderIfSecure = undefined }: Props) => {
 
   return (
     <Alert bsStyle="warning">
-      {connectionIsSecure === 'NO' && (
-        <>Your connection is not secure. Please be aware the information will be sent to the server unencrypted.</>
-      )}
-      {connectionIsSecure === 'MAYBE' && (
-        <>Your connection may not be secure. Please be aware the information may be sent to the server unencrypted.</>
-      )}
+      {connectionIsSecure === 'NO' && <>{t('unsecure_connection.not_secure')}</>}
+      {connectionIsSecure === 'MAYBE' && <>{t('unsecure_connection.maybe_not_secure')}</>}
     </Alert>
   );
 };

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { SystemJobsList } from 'components/systemjobs';
 import { Col, Row } from 'components/bootstrap';
@@ -23,6 +24,7 @@ import useProductName from 'brand-customization/useProductName';
 import useSystemJobs from 'components/systemjobs/useSystemJobs';
 
 const SystemJobsComponent = () => {
+  const { t } = useTranslation('system');
   const productName = useProductName();
   const jobs = useSystemJobs();
   const jobList = useMemo(
@@ -37,11 +39,8 @@ const SystemJobsComponent = () => {
   return (
     <Row className="content">
       <Col md={12}>
-        <h2>System jobs</h2>
-        <p className="description">
-          A system job is a long-running task a {productName} server node executes for maintenance reasons. Some jobs
-          provide progress information or can be stopped.
-        </p>
+        <h2>{t('system_jobs_component.title')}</h2>
+        <p className="description">{t('system_jobs_component.description', { productName })}</p>
 
         <SystemJobsList jobs={jobList} />
       </Col>

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { ReadOnlyFormGroup } from 'components/common';
 import { Well } from 'components/bootstrap';
@@ -32,15 +33,25 @@ const NewExampleWell = styled(Well)(
   `,
 );
 
-const TeamsNotificationDetails = ({ notification }: TeamsNotificationSummaryV2Type) => (
-  <>
-    <ReadOnlyFormGroup label="Webhook URL" value={notification.config.webhook_url} />
-    <ReadOnlyFormGroup
-      label="Adaptive Card Template"
-      value={<NewExampleWell bsSize="small">{notification.config.adaptive_card}</NewExampleWell>}
-    />
-    <ReadOnlyFormGroup label="Message Backlog Limit" value={notification.config.backlog_size} />
-  </>
-);
+const TeamsNotificationDetails = ({ notification }: TeamsNotificationSummaryV2Type) => {
+  const { t } = useTranslation('integrations');
+
+  return (
+    <>
+      <ReadOnlyFormGroup
+        label={t('teams_notification_v2_details.webhook_url_label')}
+        value={notification.config.webhook_url}
+      />
+      <ReadOnlyFormGroup
+        label={t('teams_notification_v2_details.adaptive_card_label')}
+        value={<NewExampleWell bsSize="small">{notification.config.adaptive_card}</NewExampleWell>}
+      />
+      <ReadOnlyFormGroup
+        label={t('teams_notification_v2_details.backlog_limit_label')}
+        value={notification.config.backlog_size}
+      />
+    </>
+  );
+};
 
 export default TeamsNotificationDetails;

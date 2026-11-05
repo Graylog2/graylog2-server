@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useRef } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
-import ProductName from 'brand-customization/ProductName';
+import useProductName from 'brand-customization/useProductName';
 import { Row, Col, Button, Alert, Modal } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Title } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
@@ -41,14 +42,23 @@ import UpgradeStatusAlert from 'components/datanode/data-node-upgrade/UpgradeSta
 
 const OPEN_SEARCH_SECTION_STATUSES = ['outdated', 'upgrading', 'unconfirmed'] as const;
 
-const upgradeInstructionsDocumentationMessage = (
-  <p>
-    To upgrade your Data Nodes manually, please follow the instructions in the&nbsp;
-    <DocumentationLink text="documentation" page={DocsHelper.PAGES.GRAYLOG_DATA_NODE} />.
-  </p>
+const DataNodeDocsLink = ({ children = undefined }: React.PropsWithChildren) => (
+  <DocumentationLink text={children} page={DocsHelper.PAGES.GRAYLOG_DATA_NODE} />
 );
 
+const UpgradeInstructionsDocumentationMessage = () => {
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
+
+  return (
+    <p>
+      <Trans t={t} i18nKey="upgrade_page.manual_instructions" components={{ docsLink: <DataNodeDocsLink /> }} />
+    </p>
+  );
+};
+
 const DataNodeUpgradePage = () => {
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
+  const productName = useProductName();
   const upgradeListRef = useRef<HTMLTableSectionElement>(null);
 
   const { data, isInitialLoading } = useDataNodeUpgradeStatus();
@@ -78,14 +88,17 @@ const DataNodeUpgradePage = () => {
   const manualUpgradeAlert = (nodeInProgress: string) => (
     <Alert bsStyle="warning">
       <p>
-        Once you have completed the manual upgrade of {nodeInProgress ? <b>{nodeInProgress}</b> : 'your Data Node'} on
-        the system, wait until it reconnects and apears in the <b>Upgraded Nodes</b> panel, then click on&nbsp;
-        <Button onClick={confirmNodeUpgrade} bsStyle="link" bsSize="large">
-          <b>Confirm Upgrade</b>
-        </Button>
-        &nbsp; and continue with next node.
+        <Trans
+          t={t}
+          i18nKey={nodeInProgress ? 'upgrade_page.manual_upgrade_of_node' : 'upgrade_page.manual_upgrade_of_data_node'}
+          values={{ node: nodeInProgress }}
+          components={{
+            bold: <b />,
+            confirmButton: <Button onClick={confirmNodeUpgrade} bsStyle="link" bsSize="large" />,
+          }}
+        />
       </p>
-      {upgradeInstructionsDocumentationMessage}
+      <UpgradeInstructionsDocumentationMessage />
     </Alert>
   );
 
@@ -102,18 +115,15 @@ const DataNodeUpgradePage = () => {
     isOpenSearchPhase && OPEN_SEARCH_SECTION_STATUSES.some((status) => status === openSearchStatus);
 
   return (
-    <DocumentTitle title="Data Node Upgrade">
+    <DocumentTitle title={t('pages.upgrade_title')}>
       <ClusterConfigurationPageNavigation />
       <PageHeader
-        title="Data Node Upgrade"
+        title={t('pages.upgrade_title')}
         documentationLink={{
-          title: 'Data Nodes documentation',
+          title: t('pages.documentation_title'),
           path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
         }}>
-        <span>
-          <ProductName /> Data Nodes offer a better integration with <ProductName /> and simplify future updates. They
-          allow you to index and search through all the messages in your <ProductName /> message database.
-        </span>
+        <span>{t('pages.description', { productName })}</span>
       </PageHeader>
       {isInitialLoading ? (
         <Spinner />
@@ -122,7 +132,7 @@ const DataNodeUpgradePage = () => {
           <Col xs={12}>
             {!isOpenSearchPhase && (
               <>
-                <Title order={1}>Select Upgrade Strategy</Title>
+                <Title order={1}>{t('upgrade_page.select_strategy')}</Title>
                 <br />
                 <UpgradeMethodSelector upgradeMethod={upgradeMethod} onChange={setUpgradeMethod} />
                 {!data?.shard_replication_enabled && manualUpgradeAlert(nodeInProgress)}
@@ -137,7 +147,7 @@ const DataNodeUpgradePage = () => {
             )}
             {showOpenSearchUpgradeSection && (
               <>
-                <Title order={1}>Upgrade Data Node</Title>
+                <Title order={1}>{t('upgrade_page.upgrade_data_node')}</Title>
                 <br />
               </>
             )}
@@ -169,7 +179,7 @@ const DataNodeUpgradePage = () => {
                 onHide={() => setOpenUpgradeConfirmDialog(false)}
                 rootProps={{ lockScroll: false }}>
                 <Modal.Header>
-                  <Modal.Title>Data Node Manual Upgrade</Modal.Title>
+                  <Modal.Title>{t('upgrade_page.manual_upgrade_title')}</Modal.Title>
                 </Modal.Header>
 
                 <Modal.Body>{manualUpgradeAlert(nodeInProgress)}</Modal.Body>

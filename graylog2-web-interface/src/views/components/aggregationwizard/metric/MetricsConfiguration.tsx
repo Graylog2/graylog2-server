@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback } from 'react';
 import { useFormikContext, FieldArray } from 'formik';
 
@@ -25,6 +26,7 @@ import ElementConfigurationContainer from '../ElementConfigurationContainer';
 import type { WidgetConfigFormValues } from '../WidgetConfigForm';
 
 const MetricsConfiguration = () => {
+  const { t } = useTranslation('aggregation');
   const {
     values: { metrics },
     setValues,
@@ -48,7 +50,7 @@ const MetricsConfiguration = () => {
             <ElementConfigurationContainer
               key={`metrics-${index}`}
               onRemove={removeMetric(index)}
-              elementTitle={MetricElement.title}>
+              elementTitle={t('wizard_common.metric')}>
               <MetricConfiguration index={index} />
             </ElementConfigurationContainer>
           ))}

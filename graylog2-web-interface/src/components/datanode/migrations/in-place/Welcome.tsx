@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Col, Row } from 'components/bootstrap';
 import { DocumentationLink } from 'components/support';
@@ -26,19 +27,22 @@ import JournalSizeWarning from 'components/datanode/migrations/in-place/JournalS
 import InPlaceMigrationInfo from 'components/datanode/migrations/common/InPlaceMigrationInfo';
 import JwtAuthenticationInfo from 'components/datanode/migrations/common/JwtAuthenticationInfo';
 
+const DataNodeDocsLink = ({ children = undefined }: React.PropsWithChildren) => (
+  <DocumentationLink page="graylog-data-node" text={children} />
+);
+
 const Welcome = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const { data: dataNodes } = useDataNodes();
 
   return (
     <>
       <Row>
         <Col md={6}>
-          <h3>Welcome</h3>
-          <p>An In-Place migration will migrate the data folder of your existing cluster to a Data Node cluster.</p>
+          <h3>{t('in_place_welcome.title')}</h3>
+          <p>{t('in_place_welcome.description')}</p>
           <p>
-            To start please install Data Node on every OS/ES node from your previous setup. You can find more
-            information on how to download and install the Data Node{' '}
-            <DocumentationLink page="graylog-data-node" text="here" />.
+            <Trans t={t} i18nKey="in_place_welcome.install" components={{ docsLink: <DataNodeDocsLink /> }} />
           </p>
           <MigrationDatanodeList />
         </Col>

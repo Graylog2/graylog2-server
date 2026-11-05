@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import type { Pagination } from 'stores/PaginationTypes';
@@ -27,7 +28,7 @@ import usePluggableSharedEntityTableElements from 'hooks/usePluggableSharedEntit
 import SharedEntitiesFilter from './SharedEntitiesFilter';
 import SharedEntitiesOverviewItem from './SharedEntitiesOverviewItem';
 
-const TABLE_HEADERS = ['Entity Name', 'Entity Type', 'Owner', 'Capability'];
+const TABLE_HEADER_KEYS = ['entity_name', 'entity_type', 'owner', 'capability'];
 const DEFAULT_PAGINATION = {
   page: 1,
   perPage: 10,
@@ -63,6 +64,7 @@ const _loadSharedEntities = (pagination, searchPaginated, setPaginatedEntityShar
 };
 
 const SharedEntitiesOverview = ({ entityType, searchPaginated, setLoading }: Props) => {
+  const { t } = useTranslation('users');
   const [paginatedEntityShares, setPaginatedEntityShares] = useState<PaginatedEntityShares | undefined>();
   const [pagination, setPagination] = useState<Pagination>(DEFAULT_PAGINATION);
   const { list, context, pagination: { total } = { total: 0 } } = paginatedEntityShares || {};
@@ -74,8 +76,11 @@ const SharedEntitiesOverview = ({ entityType, searchPaginated, setLoading }: Pro
     [pagination, searchPaginated, setLoading],
   );
   const tableHeaders = useMemo(
-    () => [...TABLE_HEADERS, ...(pluggableAttributes && pluggableAttributes.attributeNames)],
-    [pluggableAttributes],
+    () => [
+      ...TABLE_HEADER_KEYS.map((key) => t(`permissions.shared_entities.headers.${key}`)),
+      ...(pluggableAttributes && pluggableAttributes.attributeNames),
+    ],
+    [pluggableAttributes, t],
   );
   const _handleSearch = (newQuery: string) => setPagination({ ...pagination, query: newQuery });
   const _handleFilter = (param: string, value: string) =>
@@ -87,9 +92,7 @@ const SharedEntitiesOverview = ({ entityType, searchPaginated, setLoading }: Pro
 
   return (
     <>
-      <p className="description">
-        Found {total} entities which are shared with the {entityType}.
-      </p>
+      <p className="description">{t('permissions.shared_entities.found', { total, entityType })}</p>
       <StyledPaginatedList
         activePage={page}
         totalItems={total}
@@ -99,7 +102,7 @@ const SharedEntitiesOverview = ({ entityType, searchPaginated, setLoading }: Pro
           customFilter={<SharedEntitiesFilter onSearch={_handleSearch} onFilter={_handleFilter} />}
           dataRowFormatter={(sharedEntity) => _sharedEntityOverviewItem(sharedEntity, context)}
           filterKeys={[]}
-          noDataText={<NoSearchResult>No shared entities have been found.</NoSearchResult>}
+          noDataText={<NoSearchResult>{t('permissions.shared_entities.no_results')}</NoSearchResult>}
           headers={tableHeaders}
           id="shared-entities"
           rowClassName="no-bm"

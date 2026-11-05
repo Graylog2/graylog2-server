@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import styled, { css } from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import Routes from 'routing/Routes';
 import { Link, Select } from 'components/common';
@@ -72,6 +73,7 @@ const StyledAlert = styled(Alert)`
 `;
 
 const SetupRoutingStep = () => {
+  const { t } = useTranslation('inputs');
   const [showSelectStream, setShowSelectStream] = useState<boolean>(false);
   const [showCreateStream, setShowCreateStream] = useState<boolean>(false);
   const currentStepName = useMemo(() => INPUT_WIZARD_STEPS.SETUP_ROUTING, []);
@@ -210,9 +212,8 @@ const SetupRoutingStep = () => {
       {selectedStreamId && streamHasConnectedPipelines && (
         <Row>
           <Col md={12}>
-            <StyledAlert bsStyle="warning" title="Pipelines connected to target Stream">
-              We recommending checking the impact of these prior to completing the Input Setup. The target Stream has
-              the following Pipelines connected to it:
+            <StyledAlert bsStyle="warning" title={t('setup_wizard.routing.connected_pipelines_title')}>
+              {t('setup_wizard.routing.connected_pipelines')}
               <StyledList>
                 {streamPipelinesData.map((pipeline) => (
                   <li key={pipeline.title}>
@@ -231,18 +232,23 @@ const SetupRoutingStep = () => {
           <Row>
             <DescriptionCol md={12}>
               <StyledList>
-                <li>Select a destination Stream to route messages from this input to.</li>
+                <li>{t('setup_wizard.routing.select_destination')}</li>
                 <li>
-                  <strong>We recommend creating a new stream for each new input.</strong> This will help categorise your
-                  messages into a basic schema.
+                  <Trans
+                    t={t}
+                    i18nKey="setup_wizard.routing.recommend_new_stream"
+                    components={{ strong: <strong /> }}
+                  />
                 </li>
                 <li>
-                  Messages that are not routed to any Stream will be routed to the <strong>Default Stream</strong>.
+                  <Trans
+                    t={t}
+                    i18nKey="setup_wizard.routing.default_stream_fallback"
+                    components={{ strong: <strong /> }}
+                  />
                 </li>
                 <li>
-                  Pipeline rules can be automatically created and attached to the <strong>Default Stream</strong> by
-                  this Wizard. These rules will be placed in the system managed Default Routing Pipeline, and will be
-                  automatically renamed (or deleted) to accurately reflect the state of this Input.
+                  <Trans t={t} i18nKey="setup_wizard.routing.pipeline_rules_info" components={{ strong: <strong /> }} />
                 </li>
               </StyledList>
             </DescriptionCol>
@@ -251,17 +257,17 @@ const SetupRoutingStep = () => {
           <Row>
             {!selectedStreamId && (
               <CreateStreamCol md={6}>
-                <StyledHeading>Route to a new Stream</StyledHeading>
-                <RecommendedTooltip opened withArrow position="bottom" label="Recommended!">
+                <StyledHeading>{t('setup_wizard.routing.new_stream_heading')}</StyledHeading>
+                <RecommendedTooltip opened withArrow position="bottom" label={t('setup_wizard.routing.recommended')}>
                   <Button onClick={handleCreateStream} bsStyle="primary">
-                    Create Stream
+                    {t('setup_wizard.routing.create_stream')}
                   </Button>
                 </RecommendedTooltip>
               </CreateStreamCol>
             )}
             <ExistingStreamCol md={selectedStreamId ? 12 : 6}>
-              <StyledHeading>Route to an existing Stream</StyledHeading>
-              <Button onClick={handleSelectStream}>Select Stream</Button>
+              <StyledHeading>{t('setup_wizard.routing.existing_stream_heading')}</StyledHeading>
+              <Button onClick={handleSelectStream}>{t('setup_wizard.routing.select_stream')}</Button>
             </ExistingStreamCol>
           </Row>
         </>
@@ -270,7 +276,7 @@ const SetupRoutingStep = () => {
       {showNewStreamSection && (
         <Row>
           <Col md={12}>
-            <StyledHeading>Create new Stream</StyledHeading>
+            <StyledHeading>{t('setup_wizard.routing.create_new_stream')}</StyledHeading>
             <CreateStreamForm
               submitForm={submitStreamCreation}
               handleBackClick={handleBackClick}
@@ -284,11 +290,15 @@ const SetupRoutingStep = () => {
         <>
           <Row>
             <DescriptionCol md={12}>
-              <StyledLabel htmlFor="streams">Choose an existing Stream</StyledLabel>
+              <StyledLabel htmlFor="streams">{t('setup_wizard.routing.choose_existing_stream')}</StyledLabel>
               <StyledList>
-                <li>Route messages from this input to an existing stream is selected.</li>
+                <li>{t('setup_wizard.routing.existing_stream_selected')}</li>
                 <li>
-                  Pipeline Rules will be created when the <strong>Start Input</strong> button is pressed.
+                  <Trans
+                    t={t}
+                    i18nKey="setup_wizard.routing.pipeline_rules_created"
+                    components={{ strong: <strong /> }}
+                  />
                 </li>
               </StyledList>
             </DescriptionCol>
@@ -300,22 +310,18 @@ const SetupRoutingStep = () => {
                   inputId="streams"
                   onChange={handleStreamSelect}
                   options={options}
-                  aria-label="Default Stream"
+                  aria-label={t('setup_wizard.routing.default_stream')}
                   clearable
-                  placeholder="Default Stream"
+                  placeholder={t('setup_wizard.routing.default_stream')}
                   value={selectedStreamId ?? getStepData(stepsData, currentStepName, 'streamId')}
                 />
                 {!isDefaultStream && (
                   <Input
                     id="existing_remove_matches_from_default_stream"
                     type="checkbox"
-                    label="Remove matches from &lsquo;Default Stream&rsquo;"
-                    title="Remove matches from &lsquo;Default Stream&rsquo;"
-                    help={
-                      <span>
-                        Don&apos;t assign messages that match this stream to the &lsquo;Default Stream&rsquo;.
-                      </span>
-                    }
+                    label={t('setup_wizard.routing.remove_from_default')}
+                    title={t('setup_wizard.routing.remove_from_default')}
+                    help={<span>{t('setup_wizard.routing.remove_from_default_help')}</span>}
                     name="existing_remove_matches_from_default_stream"
                     checked={removeFromDefaultStreamChecked}
                     onChange={handleCheckRemoveFromDefaultStream}
@@ -330,10 +336,12 @@ const SetupRoutingStep = () => {
       {(((hasPreviousStep || hasNextStep) && !showNewStreamSection) || showSelectStreamSection) && (
         <Row>
           <ButtonCol md={12}>
-            {(hasPreviousStep || showSelectStreamSection) && <Button onClick={handleBackClick}>Back</Button>}
+            {(hasPreviousStep || showSelectStreamSection) && (
+              <Button onClick={handleBackClick}>{t('setup_wizard.back')}</Button>
+            )}
             {hasNextStep && (
               <Button disabled={!isStepValid()} onClick={onNextStep} bsStyle="primary">
-                Next
+                {t('common:actions.next')}
               </Button>
             )}
           </ButtonCol>

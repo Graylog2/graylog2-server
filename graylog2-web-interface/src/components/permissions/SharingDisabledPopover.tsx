@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import HoverForHelp from 'components/common/HoverForHelp';
 
@@ -24,11 +25,12 @@ type Props = {
 };
 
 const SharingDisabledPopover = ({ type, description = undefined }: Props) => {
+  const { t } = useTranslation('users');
   const getReadableType = (_type: string) => _type.replaceAll('_', ' ');
 
   return (
-    <HoverForHelp title="Sharing not possible" pullRight={false}>
-      {description || `Only owners of this ${getReadableType(type)} are allowed to share it.`}
+    <HoverForHelp title={t('permissions.sharing_disabled.title')} pullRight={false}>
+      {description || t('permissions.sharing_disabled.owners_only', { type: getReadableType(type) })}
     </HoverForHelp>
   );
 };

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import NumberUtils from 'util/NumberUtils';
 
@@ -24,10 +25,14 @@ type Props = {
   count: number | undefined | null;
 };
 
-const CountCell = ({ count }: Props) => (
-  <SecondaryText>
-    <span>{count == null ? 'N/A' : NumberUtils.formatNumber(count)}</span>
-  </SecondaryText>
-);
+const CountCell = ({ count }: Props) => {
+  const { t } = useTranslation('system');
+
+  return (
+    <SecondaryText>
+      <span>{count == null ? t('shared.not_available') : NumberUtils.formatNumber(count)}</span>
+    </SecondaryText>
+  );
+};
 
 export default CountCell;

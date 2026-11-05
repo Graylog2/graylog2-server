@@ -20,6 +20,7 @@ import type { Stream } from 'logic/streams/types';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 
 const fetchStream = (streamId: string) => {
@@ -42,7 +43,12 @@ const useStream = (
 } => {
   const { data, refetch, isFetching, isError } = useQuery({
     queryKey: ['stream', streamId],
-    queryFn: () => defaultOnError(fetchStream(streamId), 'Loading stream failed with status', 'Could not load Stream'),
+    queryFn: () =>
+      defaultOnError(
+        fetchStream(streamId),
+        i18n.t('stream_hooks.load_stream_failed', { ns: 'streams' }),
+        i18n.t('stream_hooks.load_stream_failed_title', { ns: 'streams' }),
+      ),
     placeholderData: keepPreviousData,
     enabled,
     refetchInterval,

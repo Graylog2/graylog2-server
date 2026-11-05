@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useParams from 'routing/useParams';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -24,23 +25,21 @@ import EditTemplate from 'components/indices/IndexSetTemplates/EditTemplate';
 import useTemplate from 'components/indices/IndexSetTemplates/hooks/useTemplate';
 
 const IndexSetTemplateEditPage = () => {
+  const { t } = useTranslation('indexsets');
   const { templateId } = useParams();
   const { data, isFetching, isSuccess, isError } = useTemplate(templateId);
 
   return (
-    <DocumentTitle title="Edit Index Set Template">
+    <DocumentTitle title={t('pages.template_edit_title')}>
       <IndicesPageNavigation />
-      <PageHeader title="Edit Index Set Template">
-        <span>
-          Edit an existing Index Set Template. This is a set of configuration that can be applied when creating a new
-          Index Set.
-        </span>
+      <PageHeader title={t('pages.template_edit_title')}>
+        <span>{t('pages.template_edit_description')}</span>
       </PageHeader>
       <Row className="content">
         <Col md={12}>
           {isFetching && <Spinner />}
           {isSuccess && <EditTemplate template={data} />}
-          {isError && <p>There was an error when loading the template.</p>}
+          {isError && <p>{t('pages.template_load_error')}</p>}
         </Col>
       </Row>
     </DocumentTitle>

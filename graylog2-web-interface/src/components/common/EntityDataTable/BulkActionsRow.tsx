@@ -15,9 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-
-import StringUtils from 'util/StringUtils';
 
 import useSelectedEntities from './hooks/useSelectedEntities';
 
@@ -36,6 +35,7 @@ type Props = {
 };
 
 const BulkActionsRow = ({ bulkActions, className = undefined }: Props) => {
+  const { t } = useTranslation('common');
   const { selectedEntities } = useSelectedEntities();
 
   return (
@@ -43,7 +43,7 @@ const BulkActionsRow = ({ bulkActions, className = undefined }: Props) => {
       {bulkActions}
       {!!selectedEntities.length && (
         <SelectedEntitiesAmount>
-          {selectedEntities.length} {StringUtils.pluralize(selectedEntities.length, 'item', 'items')} selected
+          {t('entity_table.selected_items', { count: selectedEntities.length })}
         </SelectedEntitiesAmount>
       )}
     </Container>

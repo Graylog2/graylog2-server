@@ -16,6 +16,8 @@
  */
 import type { SyntheticEvent } from 'react';
 import React from 'react';
+import { withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import { Input } from 'components/bootstrap';
 import { URLAllowListInput, KeyValueTable } from 'components/common';
@@ -37,7 +39,7 @@ type Props = {
   handleFormEvent: (event: SyntheticEvent<EventTarget>) => void;
   validationState: (state: string) => 'error' | 'warning' | 'success';
   validationMessage: (field: string, message: string) => string;
-};
+} & WithTranslation;
 
 class HTTPJSONPathAdapterFieldSet extends React.Component<Props> {
   onHTTPHeaderUpdate = (headers: Headers) => {
@@ -49,17 +51,14 @@ class HTTPJSONPathAdapterFieldSet extends React.Component<Props> {
   };
 
   render() {
-    const { config, handleFormEvent, validationMessage, validationState } = this.props;
+    const { config, handleFormEvent, validationMessage, validationState, t } = this.props;
 
     return (
       <fieldset>
         <URLAllowListInput
-          label="Lookup URL"
+          label={t('http_doc.lookup_url_label')}
           onChange={handleFormEvent}
-          validationMessage={validationMessage(
-            'url',
-            'The URL for the lookup. (this is a template - see documentation)',
-          )}
+          validationMessage={validationMessage('url', t('http_fields.url_validation'))}
           validationState={validationState('url')}
           url={config.url}
           labelClassName="col-sm-3"
@@ -70,13 +69,10 @@ class HTTPJSONPathAdapterFieldSet extends React.Component<Props> {
           type="text"
           id="single_value_jsonpath"
           name="single_value_jsonpath"
-          label="Single value JSONPath"
+          label={t('http_doc.single_value_label')}
           required
           onChange={handleFormEvent}
-          help={validationMessage(
-            'single_value_jsonpath',
-            'The JSONPath string to get the single value from the response.',
-          )}
+          help={validationMessage('single_value_jsonpath', t('http_fields.single_value_help'))}
           bsStyle={validationState('single_value_jsonpath')}
           value={config.single_value_jsonpath}
           labelClassName="col-sm-3"
@@ -86,12 +82,9 @@ class HTTPJSONPathAdapterFieldSet extends React.Component<Props> {
           type="text"
           id="multi_value_jsonpath"
           name="multi_value_jsonpath"
-          label="Multi value JSONPath"
+          label={t('http_doc.multi_value_label')}
           onChange={handleFormEvent}
-          help={validationMessage(
-            'multi_value_jsonpath',
-            'The JSONPath string to get the multi value from the response. Needs to return a list or map. (optional)',
-          )}
+          help={validationMessage('multi_value_jsonpath', t('http_fields.multi_value_help'))}
           bsStyle={validationState('multi_value_jsonpath')}
           value={config.multi_value_jsonpath}
           labelClassName="col-sm-3"
@@ -101,18 +94,18 @@ class HTTPJSONPathAdapterFieldSet extends React.Component<Props> {
           type="text"
           id="user_agent"
           name="user_agent"
-          label="HTTP User-Agent"
+          label={t('http_doc.http_useragent_label')}
           required
           onChange={handleFormEvent}
-          help="The User-Agent header to use for the HTTP request."
+          help={t('http_fields.user_agent_help')}
           value={config.user_agent}
           labelClassName="col-sm-3"
           wrapperClassName="col-sm-9"
         />
         <Input
           id="http_headers"
-          label="HTTP Headers"
-          help="The custom HTTP headers to use for the HTTP request. Multiple values must be comma-separated."
+          label={t('http_fields.headers_label')}
+          help={t('http_fields.headers_help')}
           labelClassName="col-sm-3"
           wrapperClassName="col-sm-9">
           <KeyValueTable pairs={config.headers || {}} editable onChange={this.onHTTPHeaderUpdate} />
@@ -122,4 +115,4 @@ class HTTPJSONPathAdapterFieldSet extends React.Component<Props> {
   }
 }
 
-export default HTTPJSONPathAdapterFieldSet;
+export default withTranslation('lookup_tables')(HTTPJSONPathAdapterFieldSet);

@@ -14,7 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import i18n from 'i18n';
 import type { ViewType } from 'views/logic/views/View';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
 
-export default (title: string, type: ViewType) => title ?? `Unsaved ${ViewTypeLabel({ type, capitalize: true })}`;
+const UNSAVED_VIEW_TITLES = {
+  SEARCH: 'common_views.unsaved_view.search',
+  DASHBOARD: 'common_views.unsaved_view.dashboard',
+} as const;
+
+const unsavedViewTitle = (type: ViewType) =>
+  UNSAVED_VIEW_TITLES[type]
+    ? i18n.t(UNSAVED_VIEW_TITLES[type], { ns: 'search' })
+    : `Unsaved ${ViewTypeLabel({ type, capitalize: true })}`;
+
+/** Translates at call time, so callers have to compute it again when the language changes. */
+export default (title: string, type: ViewType) => title ?? unsavedViewTitle(type);

@@ -1,0 +1,453 @@
+{
+  "create_input": {
+    "select_input": "Sélectionner un Input",
+    "launch_new": "Lancer un nouvel Input",
+    "launch_new_type": "Lancer un nouvel Input <type>{{type}}</type>",
+    "launch": "Lancer l'Input",
+    "no_inputs_available": "Aucun Input disponible"
+  },
+  "edit_input": {
+    "edit": "Modifier l'Input",
+    "editing": "Modification de l'Input {{title}}",
+    "update": "Mettre à jour l'Input"
+  },
+  "input_dropdown": {
+    "label": "Sélection d'Input serveur",
+    "select": "Sélectionner un Input",
+    "unknown_type": "Type d'Input inconnu",
+    "option": "{{title}} ({{type}})"
+  },
+  "input_states": {
+    "title": "États de l'Input {{title}}",
+    "count_one": "{{count}} {{state}}",
+    "count_other": "{{count}} {{state}}",
+    "CREATED": "Créé",
+    "INITIALIZED": "Initialisé",
+    "INVALID_CONFIGURATION": "Configuration invalide",
+    "STARTING": "Démarrage",
+    "RUNNING": "En cours d'exécution",
+    "FAILED": "Échec",
+    "FAILING": "En échec",
+    "SETUP": "Configuration",
+    "STOPPING": "Arrêt en cours",
+    "STOPPED": "Arrêté",
+    "TERMINATED": "Terminé",
+    "count_many": "{{count}} {{state}}"
+  },
+  "state_control": {
+    "set_up": "Configurer l'Input",
+    "stopping": "Arrêt...",
+    "stop": "Arrêter l'Input",
+    "starting": "Démarrage...",
+    "start": "Démarrer l'Input"
+  },
+  "static_fields": {
+    "title": "Champs statiques",
+    "add": "Ajouter un champ statique",
+    "add_field": "Ajouter un champ",
+    "add_success": "Champ statique « {{field}} » ajouté avec succès à « {{input}} »",
+    "add_failed": "L'ajout du champ statique à l'Input a échoué : {{error}}",
+    "add_failed_title": "Impossible d'ajouter le champ statique à l'Input « {{input}} »",
+    "remove_success": "Champ statique « {{field}} » supprimé avec succès de « {{input}} »",
+    "remove_failed": "La suppression du champ statique de l'Input a échoué : {{error}}",
+    "remove_failed_title": "Impossible de supprimer le champ statique « {{field}} » de l'Input « {{input}} »",
+    "delete_title": "Supprimer le champ statique",
+    "delete_confirm": "Voulez-vous vraiment supprimer le champ statique « {{field}} » de « {{input}} » ?",
+    "description": "Définissez un champ statique ajouté à chaque message reçu via cet Input. Le champ n'est pas écrasé si le message contient déjà cette clé. La clé ne doit contenir que des caractères alphanumériques ou des tirets bas et ne doit pas être un champ réservé.",
+    "field_name": "Nom du champ",
+    "field_name_title": "Ne doit contenir que des caractères alphanumériques et des tirets bas.",
+    "field_value": "Valeur du champ"
+  },
+  "notifications": {
+    "warning": "Avertissement",
+    "failed": "Les Inputs en échec ne recevront aucun trafic tant qu'ils ne sont pas démarrés.",
+    "setup": "Les Inputs actuellement en mode configuration ne recevront aucun trafic tant qu'ils ne sont pas démarrés.",
+    "stopped": "Les Inputs actuellement arrêtés ne recevront aucun trafic tant qu'ils ne sont pas démarrés.",
+    "show_failed": "Afficher les Inputs en échec",
+    "show_setup": "Afficher les Inputs en mode configuration",
+    "show_stopped": "Afficher les Inputs arrêtés"
+  },
+  "node_select": {
+    "node": "Nœud",
+    "node_help": "Sur quel nœud cet Input doit-il démarrer ?",
+    "select_node": "Sélectionner un nœud",
+    "global": "Global",
+    "global_help": "Cet Input doit-il démarrer sur tous les nœuds ?"
+  },
+  "pages": {
+    "inputs": "Inputs",
+    "docs": "Documentation des Inputs",
+    "description": "Les nœuds {{productName}} reçoivent des données via des Inputs. Lancez ou arrêtez autant d'Inputs que vous le souhaitez ici.",
+    "cloud_description": "Le cloud {{productName}} reçoit des données via des Inputs. Il existe de nombreux types d'Inputs, mais seuls certains peuvent fonctionner directement dans le cloud. Vous pouvez les lancer et les arrêter sur cette page.",
+    "cloud_forwarder_hint": "Si un type d'Input ne figure pas dans la liste des Inputs disponibles sur cette page, vous pouvez démarrer l'Input sur un <forwarderLink>Forwarder</forwarderLink>.",
+    "back": "Retour",
+    "diagnosis_title": "Diagnostic de l'Input : {{name}}",
+    "diagnosis_description": "Le diagnostic d'Input permet de tester les Inputs et l'analyse sans écrire de données dans le cluster de recherche.",
+    "tab_overview": "Vue d'ensemble",
+    "tab_rules": "Règles",
+    "node_inputs_title": "Inputs du nœud {{nodeId}} / {{hostname}}",
+    "node_inputs_description": "Les nœuds {{productName}} reçoivent des données via des Inputs. Sur cette page, vous pouvez voir quels Inputs sont en cours d'exécution sur ce nœud précis.",
+    "node_inputs_hint": "Vous pouvez lancer et arrêter des Inputs sur votre cluster <inputsLink>ici</inputsLink>.",
+    "local_inputs": "Inputs locaux",
+    "global_inputs": "Inputs globaux"
+  },
+  "diagnosis": {
+    "help": {
+      "listening_on_title": "Cet Input écoute sur :",
+      "listening_on": "Notez que l'adresse de liaison doit pointer vers le service {{productName}}. Notez que le port sélectionné doit être libre et ne pas entrer en conflit avec un autre Input sur chaque nœud. Gardez à l'esprit qu'un Input local sur un seul nœud peut entrer en conflit avec un Input global s'exécutant sur tous les nœuds, ce qui peut faire échouer l'Input sur un seul nœud.",
+      "listening_for_title": "Cet Input écoute pour :",
+      "listening_for": "Notez que le trafic UDP envoyé à un Input TCP, ou le trafic TCP envoyé à un Input UDP, apparaîtra comme des E/S réseau, mais aucun message ne sera reçu.",
+      "empty_messages_discarded_title": "Messages vides ignorés :",
+      "empty_messages_discarded": "Les messages dont la charge utile a une longueur de 0 seront ignorés par l'Input.",
+      "network_io_title": "E/S réseau :",
+      "network_io": "Notez que cette valeur peut servir à détecter les tentatives de connexion et le trafic invalide vers un Input.",
+      "input_state": "Un Input à l'état en cours d'exécution est prêt à recevoir des messages. Un Input à l'état en échec ou en cours d'échec a rencontré un problème ; cliquez sur le bouton ci-dessous pour afficher le message d'erreur associé.",
+      "message_error_at_input_title": "Erreur de message au niveau de l'Input :",
+      "message_error_at_input": "Chaque type d'Input attend de recevoir des messages dans un format particulier. Les messages qui ne respectent pas ce format peuvent être rejetés par l'Input, auquel cas ils ne seront pas traités. Pour résoudre ces cas, examinez les messages envoyés. Des erreurs plus descriptives se trouvent dans le fichier server.log de {{productName}}.",
+      "message_failed_to_process_title": "Échec du traitement du message :",
+      "message_failed_to_process": "Les extracteurs et les pipelines peuvent être utilisés pour effectuer des opérations de traitement sur les messages, comme l'extraction de champs. Une règle de pipeline qui tente une opération absurde, ou qui modifie les propriétés d'un champ du message dans un format en conflit avec le type de données ou les limites de longueur de ce champ, peut échouer au traitement. Les messages qui échouent au traitement de cette manière peuvent être consultés dans le Stream « Processing and Indexing Failures ».",
+      "message_failed_to_index_title": "Erreurs de message :",
+      "message_failed_to_index": "Dans le cluster de recherche, un message ne peut être enregistré dans un index que s'il respecte le schéma de cet index. Chaque champ d'OpenSearch a un type et une limite de caractères ; si l'un ou l'autre est dépassé, le message ne sera pas indexé. Les messages qui échouent à l'indexation de cette manière peuvent être consultés dans le Stream « Processing and Indexing Failures ».",
+      "received_message_count_by_stream": "Utilisez cette vue pour comprendre où les règles de Stream et de pipeline dirigent les messages de cet Input. Un message peut être dupliqué dans plusieurs Streams ; si cela entraîne son enregistrement dans plusieurs index, l'utilisation de la licence peut également être multipliée. Cette vue peut être utile pour détecter ces duplications."
+    },
+    "node": {
+      "node_id": "ID du nœud :",
+      "message": "Message :",
+      "last_failed": "Dernier échec :",
+      "state_label": "{{state}} :",
+      "state_nodes": "{{count}}/{{total}} nœuds",
+      "state_count": "{{count}}/{{total}}"
+    },
+    "information": {
+      "title": "Informations",
+      "description": "L'adresse sur laquelle l'Input est exécuté.",
+      "input_title": "Titre de l'Input :",
+      "input_type": "Type d'Input :",
+      "running_on": "Cet Input s'exécute sur :",
+      "all_nodes": "tous les nœuds {{productName}}",
+      "listening_on": "Cet Input écoute sur :",
+      "listening_on_value": "Adresse de liaison {{bindAddress}}, port {{port}}.",
+      "listening_for": "Cet Input écoute pour :"
+    },
+    "state": {
+      "title": "État",
+      "description": "Nombre de nœuds {{productName}} sur lesquels l'Input est configuré pour s'exécuter, et nombre de nœuds sur lesquels il s'exécute. Si certains ne s'exécutent pas, cliquez pour afficher les messages d'erreur associés.",
+      "failed_starts": "Démarrages en échec (15 dernières min) :",
+      "not_running": "L'Input ne s'exécute pas."
+    },
+    "troubleshooting": {
+      "title": "Dépannage",
+      "failed_title": "Si l'Input est en échec.",
+      "failed_message_field": "Lorsqu'un Input échoue sur un ou plusieurs nœuds {{productName}}, le champ Message du panneau État affiche un bref message d'erreur ; le message d'erreur complet se trouve dans le fichier server.log de {{productName}}.",
+      "failed_port": "Un Input configuré pour utiliser un port spécifique échouera si ce port est privilégié (et si {{productName}} ne s'exécute pas en tant que root), ou s'il est déjà utilisé par un autre Input ou une autre application.",
+      "failed_route": "Un Input échouera s'il ne peut pas router vers l'adresse IP spécifiée.",
+      "failed_internet": "Un Input qui nécessite une connexion Internet pour se connecter à une API échouera s'il n'a pas de connexion Internet ou s'il ne peut pas router vers cette API.",
+      "failed_certificate": "Un Input TCP échouera s'il utilise un certificat invalide ou expiré.",
+      "failed_external_api": "Les Inputs qui se connectent à une API externe (par exemple l'Input Microsoft Azure) nécessitent des modifications de configuration à la source pour permettre à {{productName}} de collecter les journaux. Les étapes requises sont détaillées sur la sous-page de documentation correspondante de cet Input. Un Input qui se connecte à une API externe échouera s'il est mal configuré côté {{productName}} ou, le cas échéant, côté hébergeant l'API.",
+      "no_messages_title": "Si l'Input s'exécute sur tous les nœuds, mais que les messages n'atteignent pas l'Input.",
+      "no_messages_network_io": "Vérifiez le champ E/S réseau du panneau Trafic reçu. Si aucun trafic n'apparaît ici, cela indique un problème de connectivité.",
+      "no_messages_connectivity": "Si aucun trafic n'apparaît, commencez par dépanner la connectivité réseau entre le ou les serveurs {{productName}} et la source de journaux. Vous pouvez pour cela exécuter les commandes ping, telnet ou tracert.",
+      "no_messages_external_api": "Pour les Inputs qui se connectent à une API externe, consultez le fichier server.log de {{productName}} : les échecs d'authentification (identifiants invalides ou droits insuffisants pour effectuer l'action sur l'API) y sont affichés en intégralité.",
+      "no_messages_format": "Si du trafic apparaît dans le champ E/S réseau du panneau Trafic reçu, mais qu'aucun message n'a été reçu, cela indique que les messages ne sont pas envoyés dans un format adapté à l'Input.",
+      "no_messages_protocol": "Un Input TCP ne peut pas lire le trafic UDP, et inversement.",
+      "no_messages_empty": "Un message sans contenu sera ignoré. Vous pouvez le surveiller via le champ Messages vides ignorés.",
+      "no_messages_listener": "Les Inputs de type Listener attendent des messages dans une gamme restreinte de formats et peuvent être incapables de lire des messages dans des formats étrangers. À des fins de dépannage, l'Input Raw Text a les exigences les plus permissives.",
+      "message_errors_title": "Si l'Input s'exécute sur tous les nœuds, que les messages atteignent l'Input, mais que certains (ou tous) apparaissent comme des erreurs de message.",
+      "message_errors_failure_processing": "Sur les clusters Enterprise sous licence, le traitement des échecs peut être activé pour permettre le stockage des messages en erreur à chaque étape (Input, traitement et écriture dans le cluster de recherche), ainsi que les détails de l'échec, voir les champs failure_cause et failure_details. Accédez au panneau Erreur de message et cliquez sur le nombre de messages pour examiner les messages en échec individuellement."
+    },
+    "received_traffic": {
+      "title": "Trafic reçu",
+      "description": "Messages et trafic réseau parvenus à l'Input. Remarque : les métriques ne couvrent que les 15 dernières minutes.",
+      "total_messages": "Total des messages reçus par l'Input :",
+      "events": "{{count}} événements",
+      "empty_messages": "Messages vides ignorés :",
+      "active_connections": "Connexions actives :",
+      "connections_value": "{{open}}  ({{total}} au total)",
+      "network_io": "E/S réseau :"
+    },
+    "message_count_by_stream": {
+      "title": "Nombre de messages reçus par Stream",
+      "description": "Messages ingérés avec succès depuis cet Input au cours des 15 dernières minutes. Cliquez sur le Stream pour inspecter les messages.",
+      "stream": "{{streamName}} :",
+      "none": "Aucun message de cet Input n'a été routé vers des Streams au cours des 15 dernières minutes."
+    },
+    "message_errors": {
+      "title": "Erreurs de message",
+      "description": "Les messages peuvent échouer au traitement au niveau de l'Input, dans le pipeline de traitement, ou lors de leur indexation dans le cluster de recherche.",
+      "at_input": "Erreur de message au niveau de l'Input :",
+      "failed_to_process": "Échec du traitement du message :",
+      "failed_to_index": "Échec de l'indexation du message :"
+    },
+    "rules": {
+      "pipeline_rules_title": "L'Input apparaît dans les règles de pipeline",
+      "pipeline_rules_description": "Les règles de pipeline détaillées ci-dessous font explicitement référence à cet Input (par exemple via from_input, from_forwarder_input, ou une correspondance sur gl2_source_input/gl2_forwarder_input).",
+      "pipeline_rules_human_name": "règles de pipeline",
+      "pipeline_rules_search": "Rechercher une règle de pipeline",
+      "stream_rules_title": "L'Input apparaît dans les règles de Stream",
+      "stream_rules_description": "Les règles de Stream détaillées ci-dessous contiennent une fonction match input qui cible explicitement cet Input. Les règles de Stream qui peuvent capturer des messages de cet Input sans utiliser explicitement la fonction match input ne sont pas listées.",
+      "stream_rules_human_name": "règles de Stream",
+      "stream_rules_search": "Rechercher une règle de Stream",
+      "load_pipeline_rules_failed": "Le chargement des règles de pipeline de l'Input a échoué avec le statut",
+      "could_not_load_pipeline_rules": "Impossible de charger les règles de pipeline de l'Input",
+      "load_stream_rules_failed": "Le chargement des règles de Stream de l'Input a échoué avec le statut",
+      "could_not_load_stream_rules": "Impossible de charger les règles de Stream de l'Input"
+    },
+    "network_stats": {
+      "total_prefix": " (total : ",
+      "total_suffix": ")"
+    },
+    "show_received_messages": "Afficher les messages reçus",
+    "fetch_failed": "La récupération des diagnostics de l'Input a échoué avec le statut",
+    "could_not_fetch": "Impossible de récupérer les diagnostics de l'Input"
+  },
+  "setup_wizard": {
+    "title": "Assistant de configuration de l'Input",
+    "back": "Retour",
+    "finish": "Terminer",
+    "steps": {
+      "routing": "Routage",
+      "launch": "Lancement",
+      "diagnosis": "Diagnostic"
+    },
+    "diagnosis_step": {
+      "description": "Testez les Inputs et l'analyse sans écrire de données dans le cluster de recherche.",
+      "go_to_diagnosis": "Accéder au diagnostic d'Input"
+    },
+    "load_streams_failed": "Le chargement des Streams a échoué : {{error}}",
+    "load_input_references_failed": "Le chargement des références d'Input a échoué : {{error}}",
+    "load_streams_by_index_set_failed": "Le chargement des Streams par ensemble d'index a échoué : {{error}}",
+    "routing": {
+      "connected_pipelines_title": "Pipelines connectés au Stream cible",
+      "connected_pipelines": "Nous recommandons de vérifier l'impact de ces éléments avant de terminer la configuration de l'Input. Le Stream cible a les Pipelines suivants connectés :",
+      "select_destination": "Sélectionnez un Stream de destination vers lequel router les messages de cet Input.",
+      "recommend_new_stream": "<strong>Nous recommandons de créer un nouveau Stream pour chaque nouvel Input.</strong> Cela vous aidera à classer vos messages selon un schéma de base.",
+      "default_stream_fallback": "Les messages qui ne sont routés vers aucun Stream seront routés vers le <strong>Stream par défaut</strong>.",
+      "pipeline_rules_info": "Cet assistant peut créer automatiquement des règles de pipeline et les rattacher au <strong>Stream par défaut</strong>. Ces règles seront placées dans le pipeline de routage par défaut géré par le système, et seront automatiquement renommées (ou supprimées) pour refléter fidèlement l'état de cet Input.",
+      "new_stream_heading": "Router vers un nouveau Stream",
+      "recommended": "Recommandé !",
+      "create_stream": "Créer un Stream",
+      "existing_stream_heading": "Router vers un Stream existant",
+      "select_stream": "Sélectionner un Stream",
+      "create_new_stream": "Créer un nouveau Stream",
+      "choose_existing_stream": "Choisir un Stream existant",
+      "existing_stream_selected": "Le routage des messages de cet Input vers un Stream existant est sélectionné.",
+      "pipeline_rules_created": "Les règles de pipeline seront créées lorsque vous cliquerez sur le bouton <strong>Démarrer l'Input</strong>.",
+      "default_stream": "Stream par défaut",
+      "remove_from_default": "Retirer les correspondances du « Stream par défaut »",
+      "remove_from_default_help": "Ne pas affecter les messages correspondant à ce Stream au « Stream par défaut »."
+    },
+    "start": {
+      "description": "Configurez et démarrez l'Input selon la configuration effectuée.",
+      "rolling_back": "Annulation de l'Input...",
+      "setting_up": "Configuration de l'Input...",
+      "not_ready": "Votre Input n'est pas encore prêt à être configuré. Veuillez effectuer les étapes précédentes.",
+      "start_input": "Démarrer l'Input",
+      "rollback_input": "Annuler l'Input",
+      "launch_diagnosis": "Lancer le diagnostic d'Input"
+    },
+    "progress": {
+      "details": "Détails :",
+      "loading": {
+        "create_stream": "Création du Stream...",
+        "create_stream_named": "Création du Stream « {{name}} »...",
+        "start_stream": "Démarrage du Stream...",
+        "start_stream_named": "Démarrage du Stream « {{name}} »...",
+        "create_pipeline": "Création du Pipeline...",
+        "create_pipeline_named": "Création du Pipeline « {{name}} »...",
+        "setup_routing": "Configuration du routage...",
+        "delete_stream": "Suppression du Stream...",
+        "delete_stream_named": "Suppression du Stream « {{name}} »...",
+        "delete_pipeline": "Suppression du Pipeline...",
+        "delete_pipeline_named": "Suppression du Pipeline « {{name}} »...",
+        "delete_routing": "Suppression du routage...",
+        "connect_pipeline": "Connexion du Pipeline au Stream..."
+      },
+      "error": {
+        "create_stream": "Échec de la création du Stream !",
+        "create_stream_named": "Échec de la création du Stream « {{name}} » !",
+        "start_stream": "Échec du démarrage du Stream !",
+        "start_stream_named": "Échec du démarrage du Stream « {{name}} » !",
+        "create_pipeline": "Échec de la création du Pipeline !",
+        "create_pipeline_named": "Échec de la création du Pipeline « {{name}} » !",
+        "setup_routing": "Échec de la configuration du routage !",
+        "result": "Le démarrage de l'Input a échoué. Veuillez l'annuler pour le nettoyer.",
+        "delete_stream": "Échec de la suppression du Stream !",
+        "delete_stream_named": "Échec de la suppression du Stream « {{name}} » !",
+        "delete_pipeline": "Échec de la suppression du Pipeline !",
+        "delete_pipeline_named": "Échec de la suppression du Pipeline « {{name}} » !",
+        "delete_routing": "Échec de la suppression du routage !",
+        "connect_pipeline": "Échec de la connexion du Pipeline au Stream !"
+      },
+      "success": {
+        "create_stream": "Stream créé !",
+        "create_stream_named": "Stream « {{name}} » créé !",
+        "start_stream": "Stream démarré !",
+        "start_stream_named": "Stream « {{name}} » démarré !",
+        "create_pipeline": "Pipeline créé !",
+        "create_pipeline_named": "Pipeline « {{name}} » créé !",
+        "setup_routing": "Routage configuré !",
+        "result": "Input démarré avec succès !",
+        "delete_stream": "Stream supprimé !",
+        "delete_stream_named": "Stream « {{name}} » supprimé !",
+        "delete_pipeline": "Pipeline supprimé !",
+        "delete_pipeline_named": "Pipeline « {{name}} » supprimé !",
+        "delete_routing": "Routage supprimé !",
+        "connect_pipeline": "Pipeline connecté au Stream avec succès !"
+      }
+    },
+    "create_stream": {
+      "title": "Titre",
+      "title_help": "Un nom descriptif du nouveau Stream",
+      "title_required": "Le titre est obligatoire",
+      "index_set_required": "L'ensemble d'index est obligatoire",
+      "description": "Description",
+      "description_help": "Quel type de messages est routé vers ce Stream ?",
+      "create_pipeline": "Créer un nouveau Pipeline pour ce Stream",
+      "select_index_set": "Sélectionner un ensemble d'index",
+      "index_set_info": "Les messages correspondant à ce Stream seront écrits dans l'ensemble d'index configuré. Les ensembles d'index permettent de partitionner rationnellement les données afin d'accélérer les recherches.",
+      "index_set_recommendation": "Nous recommandons de créer un nouvel ensemble d'index pour chaque type d'Input.",
+      "create_index_set": "Créer un nouvel ensemble d'index"
+    },
+    "input_in_use": {
+      "title": "Input déjà utilisé : risque de duplication des messages !",
+      "stream_refs": "Cet Input est déjà référencé dans les règles de Stream des Streams suivants :",
+      "pipeline_refs": "Cet Input est déjà référencé dans les règles de pipeline des Pipelines suivants :",
+      "prevent_duplication": "Pour éviter une duplication potentielle, supprimez tout routage existant avant de continuer."
+    },
+    "index_set_alert": {
+      "default_title": "Ensemble d'index par défaut sélectionné",
+      "default_selected": "Vous avez sélectionné l'ensemble d'index par défaut.",
+      "default_recommendation": "Nous le déconseillons : en tant que destinataire potentiel de messages de nombreux formats différents (tout message sans routage, via le Stream par défaut), l'ensemble d'index par défaut risque d'atteindre la limite maximale de champs par index du backend de recherche s'il est utilisé intensivement.",
+      "in_use_title": "L'ensemble d'index sélectionné est déjà associé à un autre Stream",
+      "in_use": "L'ensemble d'index sélectionné est déjà associé à un ou plusieurs autres Streams.",
+      "field_limit": "Notez que chaque index a une limite de champs propre, fixée par défaut à 1000.",
+      "organise_recommendation": "Pour cette raison, nous recommandons d'organiser les Streams par format de journal, réparti sur plusieurs ensembles d'index lorsque c'est possible."
+    }
+  },
+  "overview": {
+    "columns": {
+      "traffic": "Trafic de la dernière minute",
+      "input_failures": "Échecs d'Input",
+      "address": "Adresse",
+      "port": "Port",
+      "messages_per_stream": "Nombre de messages (dernières 24 h)",
+      "extractor_count": "Extracteurs",
+      "associated_streams": "Streams associés (dernières 24 h)",
+      "configuration": "Configuration"
+    },
+    "not_available": "N/D",
+    "show_diagnosis_for": "afficher le diagnostic d'Input pour {{title}}",
+    "show_diagnosis_for_capitalized": "Afficher le diagnostic d'Input pour {{title}}",
+    "cells": {
+      "no_associated_streams": "Aucun Stream associé disponible pour l'Input {{title}}",
+      "show_associated_streams": "Afficher les Streams associés à {{title}}",
+      "hide_associated_streams": "Masquer les Streams associés à {{title}}",
+      "no_extractor_count": "Aucun nombre d'extracteurs disponible pour l'Input {{title}}",
+      "show_extractors": "Afficher les extracteurs de {{title}}",
+      "hide_extractors": "Masquer les extracteurs de {{title}}",
+      "no_message_count": "Aucun nombre de messages disponible pour l'Input {{title}}",
+      "show_messages_per_stream": "Afficher les messages par Stream pour {{title}}",
+      "hide_messages_per_stream": "Masquer les messages par Stream pour {{title}}",
+      "show_metrics": "Afficher les métriques",
+      "hide_metrics": "Masquer les métriques",
+      "throughput": "{{value}} msg/s",
+      "associated_streams_label": "streams associés à {{title}}",
+      "extractors_label": "extracteurs de {{title}}",
+      "messages_per_stream_label": "messages par stream pour {{title}}"
+    },
+    "sections": {
+      "could_not_load_associated_streams": "Impossible de charger les Streams associés.",
+      "no_associated_streams": "Aucun Stream n'est associé à cet Input au cours des dernières 24 heures.",
+      "deleted_stream": "{{streamId}} (supprimé)",
+      "active_connections": "Connexions actives : <active>{{open}} </active>(<total>{{total}}</total> au total)",
+      "throughput_metrics": "Débit / Métriques",
+      "manage_extractors": "Gérer les extracteurs",
+      "load_extractors_failed": "Le chargement des extracteurs a échoué avec le statut",
+      "could_not_load_extractors_title": "Impossible de charger les extracteurs",
+      "could_not_load_extractors": "Impossible de charger les extracteurs.",
+      "no_extractors": "Cet Input n'a aucun extracteur configuré.",
+      "extractor_title": "Titre",
+      "extractor_type": "Type",
+      "source_field": "Champ source",
+      "target_field": "Champ cible",
+      "could_not_load_messages_per_stream": "Impossible de charger les messages par Stream.",
+      "no_messages_per_stream": "Aucun Stream n'a reçu de messages de cet Input au cours des dernières 24 heures.",
+      "stream": "Stream",
+      "messages": "Messages",
+      "network_io": "E/S réseau : ",
+      "total_prefix": " (total : ",
+      "total_suffix": " )",
+      "empty_messages_discarded": "Messages vides ignorés : {{value}}",
+      "no_node_metrics": "Aucune métrique disponible pour ce nœud",
+      "no_input_metrics": "Aucune métrique disponible pour cet Input",
+      "show_details": "Afficher les détails",
+      "hide_details": "Masquer les détails"
+    },
+    "actions": {
+      "received_messages": "Messages reçus",
+      "input_diagnosis": "Diagnostic d'Input",
+      "exit_setup_mode": "Quitter le mode configuration",
+      "enter_setup_mode": "Passer en mode configuration",
+      "show_metrics": "Afficher les métriques",
+      "delete_input": "Supprimer l'Input",
+      "delete_title": "Suppression de l'Input",
+      "delete_confirm": "Voulez-vous vraiment supprimer l'Input {{title}} ?"
+    }
+  },
+  "dot_badge": {
+    "problematic_inputs": "Certains Inputs sont en échec ou en mode configuration."
+  },
+  "use_input_notifications": {
+    "load_failed": "Le chargement de l'Input a échoué avec le statut",
+    "load_failed_title": "Impossible de charger l'Input"
+  },
+  "use_input_details_notifications": {
+    "load_failed": "Le chargement des détails de l'Input a échoué avec le statut",
+    "load_failed_title": "Impossible de charger les détails de l'Input"
+  },
+  "use_input_metrics_notifications": {
+    "load_failed": "Le chargement des métriques de l'Input a échoué avec le statut",
+    "load_failed_title": "Impossible de charger les métriques de l'Input"
+  },
+  "use_input_state_summary_notifications": {
+    "load_failed": "Le chargement du résumé des états de l'Input a échoué avec le statut",
+    "load_failed_title": "Impossible de charger le résumé des états de l'Input."
+  },
+  "use_input_state_mutations_notifications": {
+    "start_failed": "Erreur lors du démarrage de l'Input « {{title}} » : {{error}}",
+    "start_failed_title": "L'Input « {{title}} » n'a pas pu être démarré",
+    "started_success": "L'Input a été démarré avec succès.",
+    "stop_failed": "Erreur lors de l'arrêt de l'Input « {{title}} » : {{error}}",
+    "stop_failed_title": "L'Input « {{title}} » n'a pas pu être arrêté",
+    "stopped_success": "L'Input a été arrêté avec succès.",
+    "setup_failed": "Erreur lors du passage en mode configuration de « {{title}} » : {{error}}",
+    "setup_failed_title": "L'Input « {{title}} » n'a pas pu être passé en mode configuration",
+    "deleted_success": "L'Input a été supprimé avec succès.",
+    "success_title": "Succès !"
+  },
+  "use_input_mutations_notifications": {
+    "save_failed": "L'enregistrement de l'Input a échoué avec le statut : {{error}}",
+    "save_failed_title": "Impossible d'enregistrer l'Input",
+    "update_failed": "La mise à jour de l'Input a échoué avec le statut : {{error}}",
+    "update_failed_title": "Impossible de mettre à jour l'Input",
+    "delete_failed": "La suppression de l'Input a échoué avec le statut : {{error}}",
+    "delete_failed_title": "Impossible de supprimer l'Input",
+    "created_success": "L'Input a été créé avec succès.",
+    "updated_success": "L'Input a été mis à jour avec succès.",
+    "deleted_success": "L'Input a été supprimé avec succès.",
+    "success_title": "Succès !"
+  },
+  "use_inputs_notifications": {
+    "launched_success": "L'Input « {{title}} » a été lancé avec succès",
+    "launch_failed": "Le lancement de l'Input « {{title}} » a échoué avec le statut : {{error}}",
+    "launch_failed_title": "Impossible de lancer l'Input",
+    "updated_success": "L'Input « {{title}} » a été mis à jour avec succès",
+    "update_failed": "La mise à jour de l'Input « {{title}} » a échoué avec le statut : {{error}}",
+    "update_failed_title": "Impossible de mettre à jour l'Input",
+    "deleted_success": "L'Input « {{title}} » a été supprimé avec succès",
+    "delete_failed": "La suppression de l'Input « {{title}} » a échoué avec le statut : {{error}}",
+    "delete_failed_title": "Impossible de supprimer l'Input",
+    "fetch_failed": "La récupération des Inputs a échoué avec le statut : {{error}}",
+    "fetch_failed_title": "Impossible de récupérer les Inputs"
+  }
+}

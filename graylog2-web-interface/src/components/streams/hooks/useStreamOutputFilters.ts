@@ -21,6 +21,7 @@ import { StreamDestinationsFilters } from '@graylog/server-api';
 
 import type { PaginatedList, Pagination } from 'stores/PaginationTypes';
 import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 
 type PaginatedResponse = {
@@ -81,8 +82,8 @@ const useStreamOutputFilters = (
           ...pagination,
           query: destinationType ? `destination_type:${destinationType}` : pagination.query,
         }),
-        'Loading stream output filters failed with status',
-        'Could not load stream output filters',
+        i18n.t('stream_hooks.load_output_filters_failed', { ns: 'streams' }),
+        i18n.t('stream_hooks.load_output_filters_failed_title', { ns: 'streams' }),
       ),
     placeholderData: keepPreviousData,
   });

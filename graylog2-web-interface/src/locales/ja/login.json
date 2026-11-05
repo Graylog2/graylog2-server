@@ -1,0 +1,13 @@
+{
+  "welcome": "{{productName}}へようこそ",
+  "username": "ユーザー名",
+  "password": "パスワード",
+  "sign_in": "サインイン",
+  "signing_in": "サインインしています...",
+  "invalid_credentials": "資格情報が無効です。確認してから再試行してください。",
+  "server_error": "エラー - サーバーの応答: {{status}} - {{message}}",
+  "fallback_error_cloud": "ログイン画面の読み込み中にエラーが発生しました。{{productName}}のアカウントマネージャーに連絡してください。",
+  "fallback_error": "有効な認証サービスでのログイン中にエラーが発生しました。その設定を確認するか、{{productName}}のアカウントマネージャーに連絡してください。エラーの詳細:",
+  "login_with_default": "デフォルトの方法でログイン",
+  "login_with": "{{method}}でログイン"
+}

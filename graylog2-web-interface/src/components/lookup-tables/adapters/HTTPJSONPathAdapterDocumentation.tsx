@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-/* eslint-disable no-template-curly-in-string */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Col, Row, MantineAccordion } from 'components/bootstrap';
 
@@ -64,57 +64,58 @@ then
   set_field("user_cellphone", userData["cellphone"]);
 end`;
 
+const jsonPathFullName = '$.user.full_name';
+const jsonPathUser = '$.user';
+const jsonPathRoles = '$.user.roles[*]';
+const jsonPathContact = '$.user.contact';
+const jsonPathContactEmail = '$.user.contact.email';
+const exampleName = 'Jane Doe';
+const exampleEmail = 'jane@example.com';
+
 const HTTPJSONPathAdapterDocumentation = () => {
+  const { t } = useTranslation('lookup_tables');
   const accordionItems = [
     {
       value: 'lookup_url',
-      label: 'Lookup URL',
+      label: t('http_doc.lookup_url_label'),
       content: (
         <div>
           <p style={{ marginBottom: 10, padding: 0 }}>
-            The URL that will be used for the HTTP request. To use the <em>lookup key</em> in the URL, the
-            <code>{'${key}'}</code>
-            value can be used. This variable will be replaced by the actual key that is passed to a lookup function.{' '}
-            <br />
-            (example: <code>{'https://example.com/api/lookup?key=${key}'}</code>)
+            <Trans t={t} i18nKey="http_doc.lookup_url_text" components={{ emphasis: <em />, code: <code /> }} /> <br />
+            <Trans t={t} i18nKey="http_doc.lookup_url_example" components={{ code: <code /> }} />
           </p>
         </div>
       ),
     },
     {
       value: 'single_value',
-      label: 'Single value JSONPath',
+      label: t('http_doc.single_value_label'),
       content: (
         <div>
           <p style={{ marginBottom: 10, padding: 0 }}>
-            This JSONPath expression will be used to parse the <em>single value</em> of the lookup result. (example:{' '}
-            <code>$.user.full_name</code>)
+            <Trans t={t} i18nKey="http_doc.single_value_text" components={{ emphasis: <em />, code: <code /> }} />
           </p>
         </div>
       ),
     },
     {
       value: 'multi_value',
-      label: 'Multi value JSONPath',
+      label: t('http_doc.multi_value_label'),
       content: (
         <div>
           <p style={{ marginBottom: 10, padding: 0 }}>
-            This JSONPath expression will be used to parse the <em>multi value</em> of the lookup result. (example:{' '}
-            <code>$.users[*]</code>) The multi value JSONPath setting is <em>optional</em>. Without it, the single value
-            is also present in the multi value result.
+            <Trans t={t} i18nKey="http_doc.multi_value_text" components={{ emphasis: <em />, code: <code /> }} />
           </p>
         </div>
       ),
     },
     {
       value: 'http_useragent',
-      label: 'HTTP User-Agent',
+      label: t('http_doc.http_useragent_label'),
       content: (
         <div>
           <p style={{ marginBottom: 10, padding: 0 }}>
-            This is the <em>User-Agent</em> header that will be used for the HTTP requests. You should include some
-            contact details so owners of the services you query know whom to contact if issues arise. (like excessive
-            API requests from your cluster)
+            <Trans t={t} i18nKey="http_doc.http_useragent_text" components={{ emphasis: <em /> }} />
           </p>
         </div>
       ),
@@ -124,115 +125,111 @@ const HTTPJSONPathAdapterDocumentation = () => {
   return (
     <div>
       <p>
-        The HTTPJSONPath data adapter executes <em>HTTP GET</em> requests to lookup a key and parses the result based on
-        configured JSONPath expressions.
+        <Trans t={t} i18nKey="http_doc.intro" components={{ emphasis: <em /> }} />
       </p>
 
       <p>
-        Every lookup table result has two values. A <em>single value</em> and a <em>multi value</em>. The single value
-        will be used when the lookup result is expected to be a string, number or boolean. The multi value will be used
-        when the lookup result is expected to be a map or list.
+        <Trans t={t} i18nKey="http_doc.two_values" components={{ emphasis: <em /> }} />
       </p>
 
-      <h3 style={{ marginBottom: 10 }}>Configuration</h3>
+      <h3 style={{ marginBottom: 10 }}>{t('shared.configuration')}</h3>
 
       <MantineAccordion accordionItems={accordionItems} defaultValue="lookup_url" />
 
       <hr />
 
-      <h3 style={{ marginBottom: 10 }}>Example</h3>
+      <h3 style={{ marginBottom: 10 }}>{t('http_doc.example_title')}</h3>
       <p>
-        This shows an example configuration and the values that will be returned from a lookup.
+        {t('http_doc.example_intro')}
         <br />
-        The configured URL is <strong>{'https://example.com/api/users/${key}'}</strong> and the <code>{'${key}'}</code>
-        gets replaced by <strong>jane</strong> during the lookup request.
+        <Trans t={t} i18nKey="http_doc.example_url" components={{ bold: <strong />, code: <code /> }} />
       </p>
-      <p>This is the resulting JSON document:</p>
+      <p>{t('http_doc.example_result')}</p>
       <pre>{exampleJSON}</pre>
 
       <Row>
         <Col md={4}>
-          <h5 style={{ marginBottom: 10 }}>Configuration</h5>
+          <h5 style={{ marginBottom: 10 }}>{t('shared.configuration')}</h5>
           <p style={{ marginBottom: 10, padding: 0 }}>
-            Single value JSONPath: <code>$.user.full_name</code>
+            {t('http_doc.single_value_jsonpath')} <code>{jsonPathFullName}</code>
             <br />
-            Multi value JSONPath: <em>empty</em>
+            {t('http_doc.multi_value_jsonpath')} <em>{t('http_doc.empty')}</em>
             <br />
           </p>
         </Col>
         <Col md={8}>
-          <h5 style={{ marginBottom: 10 }}>Result</h5>
+          <h5 style={{ marginBottom: 10 }}>{t('http_doc.result_title')}</h5>
           <p style={{ marginBottom: 10, padding: 0 }}>
-            Single value: <code>Jane Doe</code>
+            {t('http_doc.single_value_result')} <code>{exampleName}</code>
             <br />
-            Multi value:
+            {t('http_doc.multi_value_result')}
           </p>
           <pre>{noMultiResult}</pre>
         </Col>
       </Row>
       <Row>
         <Col md={4}>
-          <h5 style={{ marginBottom: 10 }}>Configuration</h5>
+          <h5 style={{ marginBottom: 10 }}>{t('shared.configuration')}</h5>
           <p style={{ marginBottom: 10, padding: 0 }}>
-            Single value JSONPath: <code>$.user.full_name</code>
+            {t('http_doc.single_value_jsonpath')} <code>{jsonPathFullName}</code>
             <br />
-            Multi value JSONPath: <code>$.user</code>
+            {t('http_doc.multi_value_jsonpath')} <code>{jsonPathUser}</code>
             <br />
           </p>
         </Col>
         <Col md={8}>
-          <h5 style={{ marginBottom: 10 }}>Result</h5>
+          <h5 style={{ marginBottom: 10 }}>{t('http_doc.result_title')}</h5>
           <p style={{ marginBottom: 10, padding: 0 }}>
-            Single value: <code>Jane Doe</code>
+            {t('http_doc.single_value_result')} <code>{exampleName}</code>
             <br />
-            Multi value:
+            {t('http_doc.multi_value_result')}
           </p>
           <pre>{mapResult}</pre>
         </Col>
       </Row>
       <Row>
         <Col md={4}>
-          <h5 style={{ marginBottom: 10 }}>Configuration</h5>
+          <h5 style={{ marginBottom: 10 }}>{t('shared.configuration')}</h5>
           <p style={{ marginBottom: 10, padding: 0 }}>
-            Single value JSONPath: <code>$.user.contact.email</code>
+            {t('http_doc.single_value_jsonpath')} <code>{jsonPathContactEmail}</code>
             <br />
-            Multi value JSONPath: <code>$.user.roles[*]</code>
+            {t('http_doc.multi_value_jsonpath')} <code>{jsonPathRoles}</code>
             <br />
           </p>
         </Col>
         <Col md={8}>
-          <h5 style={{ marginBottom: 10 }}>Result</h5>
+          <h5 style={{ marginBottom: 10 }}>{t('http_doc.result_title')}</h5>
           <p style={{ marginBottom: 10, padding: 0 }}>
-            Single value: <code>jane@example.com</code>
+            {t('http_doc.single_value_result')} <code>{exampleEmail}</code>
             <br />
-            Multi value:
+            {t('http_doc.multi_value_result')}
           </p>
           <pre>{listResult}</pre>
         </Col>
       </Row>
       <Row>
         <Col md={4}>
-          <h5 style={{ marginBottom: 10 }}>Configuration</h5>
+          <h5 style={{ marginBottom: 10 }}>{t('shared.configuration')}</h5>
           <p style={{ marginBottom: 10, padding: 0 }}>
-            Single value JSONPath: <code>$.user.full_name</code>
+            {t('http_doc.single_value_jsonpath')} <code>{jsonPathFullName}</code>
             <br />
-            Multi value JSONPath: <code>$.user.contact</code>
+            {t('http_doc.multi_value_jsonpath')} <code>{jsonPathContact}</code>
             <br />
           </p>
         </Col>
         <Col md={8}>
-          <h5 style={{ marginBottom: 10 }}>Result</h5>
+          <h5 style={{ marginBottom: 10 }}>{t('http_doc.result_title')}</h5>
           <p style={{ marginBottom: 10, padding: 0 }}>
-            Single value: <code>Jane Doe</code>
+            {t('http_doc.single_value_result')} <code>{exampleName}</code>
             <br />
-            Multi value:
+            {t('http_doc.multi_value_result')}
           </p>
           <pre>{smallMapResult}</pre>
         </Col>
       </Row>
 
-      <h5 style={{ marginBottom: 10 }}>Pipeline Rule</h5>
-      <p>This is an example pipeline rule that uses the example data from our last configuration example.</p>
+      <h5 style={{ marginBottom: 10 }}>{t('http_doc.pipeline_rule_title')}</h5>
+      <p>{t('http_doc.pipeline_rule_intro')}</p>
       <pre>{pipelineRule}</pre>
     </div>
   );

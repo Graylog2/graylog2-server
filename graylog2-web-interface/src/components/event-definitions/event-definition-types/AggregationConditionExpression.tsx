@@ -17,6 +17,7 @@
 import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 
+import i18n from 'i18n';
 import { ClearFloat, Icon } from 'components/common';
 import { Button, ButtonToolbar, Col, FormGroup } from 'components/bootstrap';
 import {
@@ -215,14 +216,20 @@ class AggregationConditionExpression extends React.Component<
               <FormGroup>
                 <div className={renderLabel ? styles.formControlNoLabel : undefined}>
                   <ButtonToolbar>
-                    <Button bsSize="sm" onClick={this.handleDeleteExpression} title="Delete Expression">
+                    <Button
+                      bsSize="sm"
+                      onClick={this.handleDeleteExpression}
+                      title={i18n.t('conditions.delete_expression', { ns: 'event_definitions' })}>
                       <Icon name="remove" />
                     </Button>
-                    <Button bsSize="sm" onClick={this.handleAddExpression} title="Add Expression">
+                    <Button
+                      bsSize="sm"
+                      onClick={this.handleAddExpression}
+                      title={i18n.t('conditions.add_expression', { ns: 'event_definitions' })}>
                       <Icon name="add" />
                     </Button>
                     <Button bsSize="sm" onClick={this.handleAddGroup}>
-                      Add Group
+                      {i18n.t('conditions.add_group', { ns: 'event_definitions' })}
                     </Button>
                   </ButtonToolbar>
                 </div>
@@ -236,8 +243,8 @@ class AggregationConditionExpression extends React.Component<
       return (
         <>
           <BooleanOperatorSelector
-            initialText="Messages must meet"
-            placeholder="Global boolean operator"
+            initialText={i18n.t('conditions.messages_must_meet', { ns: 'event_definitions' })}
+            placeholder={i18n.t('conditions.global_boolean_operator', { ns: 'event_definitions' })}
             operator={this.getEffectiveGlobalGroupOperator()}
             onOperatorChange={this.handleOperatorChange}
           />

@@ -18,6 +18,7 @@ import { hashKey, useQuery } from '@tanstack/react-query';
 
 import { Collectors } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import type { SearchParams } from 'stores/PaginationTypes';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
 import { defaultOnError } from 'util/conditional/onError';
@@ -98,8 +99,8 @@ export const fetchPaginatedInstances = async (
       pagination: response.pagination,
       attributes: response.attributes,
     })),
-    'Loading instances failed with status',
-    'Could not load instances',
+    i18n.t('load_errors.instances.message', { ns: 'collectors' }),
+    i18n.t('load_errors.instances.title', { ns: 'collectors' }),
   );
 
 export const useInstances = (fleetId?: string, options: { refetchInterval?: number; silent?: boolean } = {}) =>
@@ -116,8 +117,8 @@ export const useInstances = (fleetId?: string, options: { refetchInterval?: numb
         ? promise
         : defaultOnError(
             promise,
-            'Loading Collector instances failed with status',
-            'Could not load Collector instances',
+            i18n.t('load_errors.collector_instances.message', { ns: 'collectors' }),
+            i18n.t('load_errors.collector_instances.title', { ns: 'collectors' }),
           );
     },
     refetchInterval: options.refetchInterval,

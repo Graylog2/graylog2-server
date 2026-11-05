@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import Routes from 'routing/Routes';
 import { Link } from 'components/common';
@@ -39,6 +40,7 @@ const StyledAlert = styled(Alert)`
 `;
 
 const InputInUseAlert = ({ inputId }: Props = { inputId: undefined }) => {
+  const { t } = useTranslation('inputs');
   const { data: inputReferencesData, isLoading: isLoadingInputReferences } = useInputReferences(inputId);
 
   if (isLoadingInputReferences) return null;
@@ -48,10 +50,10 @@ const InputInUseAlert = ({ inputId }: Props = { inputId: undefined }) => {
   return (
     <Row>
       <Col md={12}>
-        <StyledAlert bsStyle="danger" title="Input already in use - Message Duplication Risk!">
+        <StyledAlert bsStyle="danger" title={t('setup_wizard.input_in_use.title')}>
           {inputReferencesData.stream_refs.length > 0 && (
             <StreamListWrapper>
-              This Input is already referenced within the Stream Rules of the following Streams:
+              {t('setup_wizard.input_in_use.stream_refs')}
               <StyledList>
                 {inputReferencesData.stream_refs.map((stream) => (
                   <li key={stream.id}>
@@ -65,7 +67,7 @@ const InputInUseAlert = ({ inputId }: Props = { inputId: undefined }) => {
           )}
           {inputReferencesData.pipeline_refs.length > 0 && (
             <>
-              This Input is already referenced within the Pipeline Rules of the following Pipelines:
+              {t('setup_wizard.input_in_use.pipeline_refs')}
               <StyledList>
                 {inputReferencesData.pipeline_refs.map((pipeline) => (
                   <li key={pipeline.id}>
@@ -77,7 +79,7 @@ const InputInUseAlert = ({ inputId }: Props = { inputId: undefined }) => {
               </StyledList>
             </>
           )}
-          To prevent potential duplication, remove any existing routing before continuing.
+          {t('setup_wizard.input_in_use.prevent_duplication')}
         </StyledAlert>
       </Col>
     </Row>

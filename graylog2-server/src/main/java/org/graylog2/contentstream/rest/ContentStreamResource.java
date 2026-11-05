@@ -23,7 +23,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -35,6 +34,8 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.plugin.rest.CodedException;
+import org.graylog2.plugin.rest.CodedForbiddenException;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.users.UserService;
@@ -75,7 +76,7 @@ public class ContentStreamResource extends RestResource {
         if (isPermitted(USERS_EDIT, username)) {
             return contentStreamService.getUserSettings(loadUser(username));
         }
-        throw new ForbiddenException("Not allowed to view user " + username);
+        throw new CodedForbiddenException("content_stream.not_allowed_to_view_user", "Not allowed to view user " + username, CodedException.paramsOf("username", username));
     }
 
     @PUT
@@ -97,7 +98,7 @@ public class ContentStreamResource extends RestResource {
             contentStreamService.saveUserSettings(user, newSettings);
             return newSettings;
         }
-        throw new ForbiddenException("Not allowed to edit user " + username);
+        throw new CodedForbiddenException("content_stream.not_allowed_to_edit_user", "Not allowed to edit user " + username, CodedException.paramsOf("username", username));
     }
 
     private User loadUser(String userName) throws NotFoundException {

@@ -15,19 +15,24 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import QueryHelper from 'components/common/QueryHelper';
 
-const queryExample = (
-  <p>
-    Find shared entities with a title containing security:
-    <br />
-    <kbd>title:security</kbd>
-    <br />
-  </p>
-);
-const SharedEntitiesQueryHelper = () => (
-  <QueryHelper entityName="shared entity" commonFields={['title']} example={queryExample} />
-);
+const EXAMPLE_QUERY = 'title:security';
+
+const SharedEntitiesQueryHelper = () => {
+  const { t } = useTranslation('users');
+  const queryExample = (
+    <p>
+      {t('permissions.shared_entities.query_example')}
+      <br />
+      <kbd>{EXAMPLE_QUERY}</kbd>
+      <br />
+    </p>
+  );
+
+  return <QueryHelper entityName="shared entity" commonFields={['title']} example={queryExample} />;
+};
 
 export default SharedEntitiesQueryHelper;

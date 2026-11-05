@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import AppConfig from 'util/AppConfig';
@@ -29,19 +30,13 @@ const ToggleDetails = styled.div`
   font-weight: normal;
 `;
 
-const description = (
-  <>
-    <p>It seems like the page you navigated to contained an error.</p>
-    <p>You can use the navigation to reach other parts of the product, refresh the page or submit an error report.</p>
-  </>
-);
-
 type Props = {
   error: Error;
   componentStack: string;
 };
 
 const RuntimeErrorPage = ({ error, componentStack }: Props) => {
+  const { t } = useTranslation('pages');
   const [showDetails, setShowDetails] = useState(AppConfig.gl2DevMode());
   const errorDetails = `\n\nStack Trace:\n\n${error.stack}\n\nComponent Stack:\n${componentStack}`;
   const productName = useProductName();
@@ -52,8 +47,15 @@ const RuntimeErrorPage = ({ error, componentStack }: Props) => {
     setShowDetails((cur) => !cur);
   }, []);
 
+  const description = (
+    <>
+      <p>{t('runtime_error.description_intro')}</p>
+      <p>{t('runtime_error.description_hint')}</p>
+    </>
+  );
+
   return (
-    <ErrorPage title="Something went wrong." description={description}>
+    <ErrorPage title={t('runtime_error.title')} description={description}>
       {isDefaultProduct && (
         <div className="content" style={{ padding: '2em' }}>
           <SupportSources />
@@ -61,10 +63,10 @@ const RuntimeErrorPage = ({ error, componentStack }: Props) => {
       )}
       <dl>
         <dt>
-          Error:
+          {t('runtime_error.error_label')}
           <ToggleDetails className="pull-right">
             <Button bsStyle="link" tabIndex={0} onClick={_toggleDetails}>
-              {showDetails ? 'Show less' : 'Show more'}
+              {showDetails ? t('runtime_error.show_less') : t('runtime_error.show_more')}
             </Button>
           </ToggleDetails>
         </dt>
@@ -75,7 +77,7 @@ const RuntimeErrorPage = ({ error, componentStack }: Props) => {
                 title={<Icon name="content_copy" />}
                 bsSize="sm"
                 text={`${error.message}\n${errorDetails}`}
-                buttonTitle="Copy error details to clipboard"
+                buttonTitle={t('errors.copy_error_details')}
               />
             </div>
             {error.message}

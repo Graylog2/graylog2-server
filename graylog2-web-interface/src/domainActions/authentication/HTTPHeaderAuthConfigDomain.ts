@@ -16,6 +16,7 @@
  */
 import { SystemAuthenticationHTTPHeaderAuthConfig } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import type { HTTPHeaderAuthConfigJSON } from 'logic/authentication/HTTPHeaderAuthConfig';
 import HTTPHeaderAuthConfig from 'logic/authentication/HTTPHeaderAuthConfig';
 import UserNotification from 'util/UserNotification';
@@ -24,7 +25,7 @@ import { defaultOnError } from 'util/conditional/onError';
 const load = (): Promise<HTTPHeaderAuthConfig> =>
   defaultOnError(
     SystemAuthenticationHTTPHeaderAuthConfig.getConfig().then(HTTPHeaderAuthConfig.fromJSON),
-    'Loading HTTP header authentication config failed',
+    i18n.t('http_header_notifications.load_failed', { ns: 'authentication' }),
   );
 
 const update = (payload: HTTPHeaderAuthConfigJSON): Promise<HTTPHeaderAuthConfig> => {
@@ -32,12 +33,12 @@ const update = (payload: HTTPHeaderAuthConfigJSON): Promise<HTTPHeaderAuthConfig
 
   return promise
     .then((result) => {
-      UserNotification.success('Successfully updated HTTP header authentication config');
+      UserNotification.success(i18n.t('http_header_notifications.update_success', { ns: 'authentication' }));
 
       return result;
     })
     .catch((error) => {
-      UserNotification.error(`Updating HTTP header authentication config failed with status: ${error}`);
+      UserNotification.error(i18n.t('http_header_notifications.update_failed', { ns: 'authentication', error }));
       throw error;
     });
 };

@@ -17,6 +17,7 @@
 import UserNotification from 'util/UserNotification';
 import { createNotFoundError } from 'logic/errors/ReportedErrors';
 import ErrorsActions from 'actions/errors/ErrorsActions';
+import translateApiError from 'util/translateApiError';
 
 type Notification = {
   title?: string;
@@ -28,7 +29,8 @@ const _displaySuccessNotification = <T, Args extends Array<T>>(
   ...args: Args
 ) => {
   const { message, title } = successNotification(...args);
-  UserNotification.success(message, title || 'Success');
+  // an empty title gets the default title of the notification
+  UserNotification.success(message, title || undefined);
 };
 
 const _displayErrorNotification = <T, Args extends Array<T>>(
@@ -39,11 +41,11 @@ const _displayErrorNotification = <T, Args extends Array<T>>(
   let errorMessage = String(error);
 
   if ((error?.status === 400 || error?.status === 500) && error?.additional?.body?.message) {
-    errorMessage = `${error.additional.body.message} - ${error.message}`;
+    errorMessage = `${translateApiError(error) ?? error.additional.body.message} - ${error.message}`;
   }
 
   const { message, title } = errorNotification(errorMessage, ...args);
-  UserNotification.error(message, title || 'Error');
+  UserNotification.error(message, title || undefined);
 };
 
 type Props<F extends (...args: Array<any>) => any> = {

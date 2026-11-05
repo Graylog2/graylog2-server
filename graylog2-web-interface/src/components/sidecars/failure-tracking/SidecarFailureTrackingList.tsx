@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Button, Col, Row, Table } from 'components/bootstrap';
 import { PaginatedList, NoSearchResult, NoEntitiesExist, SortIcon } from 'components/common';
@@ -61,11 +62,12 @@ type Props = {
 };
 
 const NoMatchingListAlert = ({ onlyActive, query }: { onlyActive: boolean; query: string }) => {
-  const showInactiveHint = onlyActive && ' and/or click on "Include inactive sidecars"';
+  const { t } = useTranslation('sidecars');
+  const showInactiveHint = onlyActive && t('failure_tracking.list.include_inactive_hint');
 
   return (
     <NoSearchResult>
-      {`There are no sidecars with failures matching the search criteria. Try adjusting your search filter: ${query} ${showInactiveHint}`}
+      {t('failure_tracking.list.no_matching_sidecars', { query, inactiveHint: showInactiveHint })}
     </NoSearchResult>
   );
 };
@@ -79,13 +81,14 @@ const SidecarTable = ({
   sort: SortType;
   onSortChange: (sortField: string) => void;
 }) => {
+  const { t } = useTranslation('sidecars');
   const columns = {
-    node_name: 'Sidecar',
-    collector: 'Collector',
-    last_seen: 'Last Seen',
-    'node_details.status.status': 'Status',
-    message: 'Error Message',
-    verbose_message: 'Verbose Message',
+    node_name: t('failure_tracking.list.columns.sidecar'),
+    collector: t('failure_tracking.list.columns.collector'),
+    last_seen: t('failure_tracking.list.columns.last_seen'),
+    'node_details.status.status': t('failure_tracking.list.columns.status'),
+    message: t('failure_tracking.list.columns.error_message'),
+    verbose_message: t('failure_tracking.list.columns.verbose_message'),
   };
   const sortableColumns = ['node_name', 'last_seen'];
 
@@ -123,11 +126,13 @@ const SidecarTable = ({
 };
 
 const EmptyList = ({ query, onlyActive }: { query: string; onlyActive: boolean }) => {
+  const { t } = useTranslation('sidecars');
+
   if (query) {
     return <NoMatchingListAlert onlyActive={onlyActive} query={query} />;
   }
 
-  return <NoEntitiesExist>There are no sidecars with failures.</NoEntitiesExist>;
+  return <NoEntitiesExist>{t('failure_tracking.list.no_failures')}</NoEntitiesExist>;
 };
 
 const SidecarFailureTrackingList = ({
@@ -154,14 +159,16 @@ const SidecarFailureTrackingList = ({
       onShowDetails={setCollectorDetailsToShow}
     />
   ));
-  const showOrHideInactive = onlyActive ? 'Include' : 'Hide';
+  const { t } = useTranslation('sidecars');
 
   return (
     <div>
       <div>
         <SidecarSearchForm query={query} onSearch={onQueryChange} onReset={onQueryChange}>
           <Button bsStyle="primary" onClick={toggleShowInactive}>
-            {showOrHideInactive} inactive sidecars
+            {onlyActive
+              ? t('failure_tracking.list.include_inactive_sidecars')
+              : t('failure_tracking.list.hide_inactive_sidecars')}
           </Button>
         </SidecarSearchForm>
       </div>

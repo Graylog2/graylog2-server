@@ -15,34 +15,43 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { TimeUnit } from 'components/common';
 import { Alert } from 'components/bootstrap';
 
 const BLOCKLIST_TYPE = {
-  DOMAINS: 'Domain blocklist',
-  URLS: 'URL blocklist',
-  IPS: 'IP blocklist',
+  DOMAINS: 'abusech_ransom_adapter_summary.domains_blocklist',
+  URLS: 'abusech_ransom_adapter_summary.urls_blocklist',
+  IPS: 'abusech_ransom_adapter_summary.ips_blocklist',
 };
 
 type Props = {
   dataAdapter: any;
 };
 
-const AbuseChRansomAdapterSummary = ({ dataAdapter: { config } }: Props) => (
-  <div>
-    <dl>
-      <dt>Blocklist type</dt>
-      <dd>{BLOCKLIST_TYPE[config.blocklist_type]}</dd>
-      <dt>Update interval</dt>
-      <dd>
-        <TimeUnit value={config.refresh_interval} unit={config.refresh_interval_unit} />
-      </dd>
-    </dl>
-    <Alert style={{ marginBottom: 10 }} bsStyle="warning" title="Deprecation Warning">
-      <p>The abuse.ch Ransomware Tracker was shut down on 2019-12-08. This Data Adapter should not be used.</p>
-    </Alert>
-  </div>
-);
+const AbuseChRansomAdapterSummary = ({ dataAdapter: { config } }: Props) => {
+  const { t } = useTranslation('integrations');
+  const blocklistTypeKey = BLOCKLIST_TYPE[config.blocklist_type];
+
+  return (
+    <div>
+      <dl>
+        <dt>{t('abusech_ransom_adapter_summary.blocklist_type_label')}</dt>
+        <dd>{blocklistTypeKey && t(blocklistTypeKey)}</dd>
+        <dt>{t('abusech_ransom_adapter_summary.update_interval_label')}</dt>
+        <dd>
+          <TimeUnit value={config.refresh_interval} unit={config.refresh_interval_unit} />
+        </dd>
+      </dl>
+      <Alert
+        style={{ marginBottom: 10 }}
+        bsStyle="warning"
+        title={t('abusech_ransom_adapter_summary.deprecation_title')}>
+        <p>{t('abusech_ransom_adapter_summary.deprecation_text')}</p>
+      </Alert>
+    </div>
+  );
+};
 
 export default AbuseChRansomAdapterSummary;

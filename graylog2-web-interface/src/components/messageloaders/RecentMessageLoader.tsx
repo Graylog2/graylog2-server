@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type * as Immutable from 'immutable';
 import styled from 'styled-components';
 
@@ -47,22 +48,24 @@ type ServerInputSelectProps = {
   isLoading: boolean;
 };
 
-const ServerInputSelect = ({ selectedInputId, inputs, onChange, isLoading }: ServerInputSelectProps) => (
-  <fieldset>
-    <Description>
-      {selectedInputId
-        ? 'Click on "Load Message" to load the most recent message received by this input within the last hour.'
-        : 'Select an Input from the list below and click "Load Message" to load the most recent message received by this input within the last hour.'}
-    </Description>
-    <InputDropdown
-      inputs={inputs}
-      preselectedInputId={selectedInputId}
-      onLoadMessage={onChange}
-      title={isLoading ? 'Loading message...' : 'Load Message'}
-      disabled={isLoading}
-    />
-  </fieldset>
-);
+const ServerInputSelect = ({ selectedInputId, inputs, onChange, isLoading }: ServerInputSelectProps) => {
+  const { t } = useTranslation('messageloaders');
+
+  return (
+    <fieldset>
+      <Description>
+        {selectedInputId ? t('recent.server_description_selected') : t('recent.server_description')}
+      </Description>
+      <InputDropdown
+        inputs={inputs}
+        preselectedInputId={selectedInputId}
+        onLoadMessage={onChange}
+        title={isLoading ? t('loading_message_button') : t('recent.load_message')}
+        disabled={isLoading}
+      />
+    </fieldset>
+  );
+};
 
 type ForwaderInputSelectProps = {
   onChange: (inputId: string) => void;
@@ -71,19 +74,17 @@ type ForwaderInputSelectProps = {
 };
 
 const ForwarderInputSelect = ({ selectedInputId, onChange, isLoading }: ForwaderInputSelectProps) => {
+  const { t } = useTranslation('messageloaders');
   const { ForwarderInputDropdown } = useForwarderMessageLoaders();
 
   return (
     <fieldset>
-      <Description>
-        Select an Input profile from the list below then select an then select an Input and click on &quot;Load
-        message&quot; to load most recent message received by this input within the last hour.
-      </Description>
+      <Description>{t('recent.forwarder_description')}</Description>
       <Row>
         <Col md={8}>
           <ForwarderInputDropdown
             onLoadMessage={onChange}
-            title={isLoading ? 'Loading message...' : 'Load Message'}
+            title={isLoading ? t('loading_message_button') : t('recent.load_message')}
             preselectedInputId={selectedInputId}
             loadButtonDisabled={isLoading}
           />
@@ -100,6 +101,7 @@ type Props = {
 };
 
 const RecentMessageLoader = ({ inputs = undefined, onMessageLoaded, selectedInputId = undefined }: Props) => {
+  const { t } = useTranslation('messageloaders');
   const [loading, setLoading] = useState<boolean>(false);
   const { ForwarderInputDropdown } = useForwarderMessageLoaders();
 
@@ -119,8 +121,8 @@ const RecentMessageLoader = ({ inputs = undefined, onMessageLoaded, selectedInpu
 
     if (selectedInputType === 'server' && !input) {
       UserNotification.error(
-        `Invalid input selected: ${inputId}`,
-        `Could not load message from invalid Input ${inputId}`,
+        t('recent.invalid_input_selected', { inputId }),
+        t('recent.invalid_input_title', { inputId }),
       );
 
       return;
@@ -143,7 +145,7 @@ const RecentMessageLoader = ({ inputs = undefined, onMessageLoaded, selectedInpu
       if (response.total_results > 0) {
         onMessageLoaded(response.messages[0]);
       } else {
-        UserNotification.error('Input did not return a recent message.');
+        UserNotification.error(t('recent.no_recent_message'));
         onMessageLoaded(undefined);
       }
     } finally {
@@ -164,19 +166,19 @@ const RecentMessageLoader = ({ inputs = undefined, onMessageLoaded, selectedInpu
       {ForwarderInputDropdown ? (
         <>
           <fieldset>
-            <Description>Select the Input type you want to load the message from.</Description>
+            <Description>{t('select_input_type_help')}</Description>
             <StyledSelect
               id="inputTypeSelect"
-              aria-label="input type select"
+              aria-label={t('recent.input_type_select_label')}
               type="select"
               value={selectedInputType ?? 'placeholder'}
               disabled={!!selectedInputId}
               onChange={(e) => setSelectedInputType(e.target.value as 'forwarder' | 'server')}>
               <option value="placeholder" disabled>
-                Select an Input type
+                {t('select_input_type_placeholder')}
               </option>
-              <option value="server">Server Input</option>
-              <option value="forwarder">Forwarder Input</option>
+              <option value="server">{t('server_input')}</option>
+              <option value="forwarder">{t('forwarder_input')}</option>
             </StyledSelect>
           </fieldset>
 

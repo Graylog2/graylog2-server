@@ -18,6 +18,7 @@ import Reflux from 'reflux';
 
 import { SystemClusterConfig, SystemMessageProcessors, SystemUrlAllowlist } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -263,12 +264,15 @@ export const ConfigurationsStore = singletonStore('core.Configuration', () =>
         () => {
           this.configuration = { ...this.configuration, [configType]: config };
           this.propagateChanges();
-          UserNotification.success('Index defaults configuration updated successfully');
+          UserNotification.success(i18n.t('notifications.index_defaults_success', { ns: 'configurations' }));
 
           return config;
         },
         (error) => {
-          UserNotification.error(error.additional.body.message, 'Index defaults configuration update failed');
+          UserNotification.error(
+            error.additional.body.message,
+            i18n.t('notifications.index_defaults_failed_title', { ns: 'configurations' }),
+          );
         },
       );
 
@@ -282,14 +286,14 @@ export const ConfigurationsStore = singletonStore('core.Configuration', () =>
         (response) => {
           this.configuration = { ...this.configuration, [configType]: response };
           this.propagateChanges();
-          UserNotification.success('Configuration updated successfully');
+          UserNotification.success(i18n.t('notifications.update_success', { ns: 'configurations' }));
 
           return response;
         },
         (error) => {
           UserNotification.error(
-            `Search config update failed: ${error}`,
-            `Could not update search config: ${configType}`,
+            i18n.t('notifications.search_update_failed', { ns: 'configurations', error }),
+            i18n.t('notifications.search_update_failed_title', { ns: 'configurations', configType }),
           );
         },
       );
@@ -304,14 +308,14 @@ export const ConfigurationsStore = singletonStore('core.Configuration', () =>
         () => {
           this.configuration = { ...this.configuration, [configType]: config };
           this.propagateChanges();
-          UserNotification.success('Url allowlist Configuration updated successfully');
+          UserNotification.success(i18n.t('notifications.allowlist_update_success', { ns: 'configurations' }));
 
           return config;
         },
         (error) => {
           UserNotification.error(
-            `Url allowlist config update failed: ${error}`,
-            `Could not update Url allowlist: ${configType}`,
+            i18n.t('notifications.allowlist_update_failed', { ns: 'configurations', error }),
+            i18n.t('notifications.allowlist_update_failed_title', { ns: 'configurations', configType }),
           );
         },
       );
@@ -326,14 +330,14 @@ export const ConfigurationsStore = singletonStore('core.Configuration', () =>
         (response) => {
           this.configuration = { ...this.configuration, [configType]: response };
           this.propagateChanges();
-          UserNotification.success('Configuration updated successfully');
+          UserNotification.success(i18n.t('notifications.update_success', { ns: 'configurations' }));
 
           return response;
         },
         (error) => {
           UserNotification.error(
-            `Message processors config update failed: ${error}`,
-            `Could not update config: ${configType}`,
+            i18n.t('notifications.processors_update_failed', { ns: 'configurations', error }),
+            i18n.t('notifications.processors_update_failed_title', { ns: 'configurations', configType }),
           );
         },
       );

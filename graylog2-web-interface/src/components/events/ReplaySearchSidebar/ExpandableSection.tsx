@@ -16,6 +16,7 @@
  */
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { IconButton } from 'components/common';
 
@@ -34,6 +35,7 @@ const Header = styled.div`
 `;
 
 const ExpandableSection = ({ title, children = null }: React.PropsWithChildren<{ title: string }>) => {
+  const { t } = useTranslation('events');
   const [open, setOpen] = useState<boolean>(true);
   const onToggle = () => setOpen((cur) => !cur);
 
@@ -43,7 +45,7 @@ const ExpandableSection = ({ title, children = null }: React.PropsWithChildren<{
         <h2>{title}</h2>
         <IconButton
           onClick={onToggle}
-          title={`${open ? 'Close' : 'Open'} ${title} section`}
+          title={open ? t('alerts_replay.close_section', { title }) : t('alerts_replay.open_section', { title })}
           name={open ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
         />
       </Header>

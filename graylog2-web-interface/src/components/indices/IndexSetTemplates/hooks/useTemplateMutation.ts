@@ -18,6 +18,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { SystemIndexSetDefaults, SystemIndexSetsTemplates } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
@@ -65,13 +66,16 @@ const useTemplate = () => {
 
     onError: (errorThrown) => {
       UserNotification.error(
-        `Creating index set template failed with status: ${errorThrown}`,
-        'Could not create index set template',
+        i18n.t('hooks.template_create_failed', { ns: 'indexsets', error: errorThrown }),
+        i18n.t('hooks.template_create_failed_title', { ns: 'indexsets' }),
       );
     },
 
     onSuccess: () => {
-      UserNotification.success('Index set template has been successfully created.', 'Success!');
+      UserNotification.success(
+        i18n.t('hooks.template_create_success', { ns: 'indexsets' }),
+        i18n.t('hooks.success_title', { ns: 'indexsets' }),
+      );
 
       return queryClient.refetchQueries({ queryKey: ['indexSetTemplates'], type: 'active' });
     },
@@ -82,13 +86,16 @@ const useTemplate = () => {
 
     onError: (errorThrown) => {
       UserNotification.error(
-        `Updating index set template failed with status: ${errorThrown}`,
-        'Could not update index set template',
+        i18n.t('hooks.template_update_failed', { ns: 'indexsets', error: errorThrown }),
+        i18n.t('hooks.template_update_failed_title', { ns: 'indexsets' }),
       );
     },
 
     onSuccess: () => {
-      UserNotification.success('Index set template has been successfully updated.', 'Success!');
+      UserNotification.success(
+        i18n.t('hooks.template_update_success', { ns: 'indexsets' }),
+        i18n.t('hooks.success_title', { ns: 'indexsets' }),
+      );
       queryClient.invalidateQueries({
         queryKey: ['indexSetTemplate'],
       });
@@ -102,13 +109,16 @@ const useTemplate = () => {
 
     onError: (errorThrown) => {
       UserNotification.error(
-        `Setting template as default failed with status: ${errorThrown}`,
-        'Could set template as default',
+        i18n.t('hooks.template_default_failed', { ns: 'indexsets', error: errorThrown }),
+        i18n.t('hooks.template_default_failed_title', { ns: 'indexsets' }),
       );
     },
 
     onSuccess: () => {
-      UserNotification.success('Template has successfully been set as default.', 'Success!');
+      UserNotification.success(
+        i18n.t('hooks.template_default_success', { ns: 'indexsets' }),
+        i18n.t('hooks.success_title', { ns: 'indexsets' }),
+      );
 
       return queryClient.refetchQueries({ queryKey: ['indexSetTemplates'], type: 'active' });
     },
@@ -119,13 +129,16 @@ const useTemplate = () => {
 
     onError: (errorThrown) => {
       UserNotification.error(
-        `Deleting index set template failed with status: ${errorThrown}`,
-        'Could not delete index set template',
+        i18n.t('hooks.template_delete_failed', { ns: 'indexsets', error: errorThrown }),
+        i18n.t('hooks.template_delete_failed_title', { ns: 'indexsets' }),
       );
     },
 
     onSuccess: () => {
-      UserNotification.success('Index set template has been successfully deleted.', 'Success!');
+      UserNotification.success(
+        i18n.t('hooks.template_delete_success', { ns: 'indexsets' }),
+        i18n.t('hooks.success_title', { ns: 'indexsets' }),
+      );
 
       return queryClient.refetchQueries({ queryKey: ['indexSetTemplates'], type: 'active' });
     },

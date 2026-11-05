@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { PageHeader, DocumentTitle } from 'components/common';
 import UsersPageNavigation from 'components/users/navigation/UsersPageNavigation';
@@ -22,13 +23,14 @@ import TokenManagement from 'components/users/UsersTokenManagement/TokenManageme
 import useProductName from 'brand-customization/useProductName';
 
 const TokenManagementPage = () => {
+  const { t } = useTranslation('users');
   const productName = useProductName();
 
   return (
-    <DocumentTitle title="Token Management">
+    <DocumentTitle title={t('token_management.title')}>
       <UsersPageNavigation />
-      <PageHeader title="Token Management">
-        <span>Access tokens overview configured for {productName}.</span>
+      <PageHeader title={t('token_management.title')}>
+        <span>{t('token_management.description', { productName })}</span>
       </PageHeader>
 
       <TokenManagement />

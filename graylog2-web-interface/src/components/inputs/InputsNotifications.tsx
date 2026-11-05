@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback } from 'react';
 
 import { Button } from 'components/bootstrap';
@@ -27,6 +28,13 @@ import { useQueryParams, ArrayParam, NumberParam, StringParam } from 'routing/Qu
 import { RUNTIME_STATUS_FILTER, FAILED_MESSAGE, SETUP_MESSAGE, STOPPED_MESSAGE } from './Constants';
 import NotificationBanner from './NotificationBanner';
 import type { NotificationItem } from './NotificationBanner';
+
+// The English messages identify the notification items, they are translated when rendered.
+const MESSAGE_TEXTS = {
+  [FAILED_MESSAGE]: 'notifications.failed',
+  [SETUP_MESSAGE]: 'notifications.setup',
+  [STOPPED_MESSAGE]: 'notifications.stopped',
+} as const;
 
 const INPUT_STATES = {
   FAILED: 'FAILED',
@@ -73,6 +81,7 @@ const getNotificationItems = (
 };
 
 const InputsNotifications = () => {
+  const { t } = useTranslation('inputs');
   const { data: inputStates, isLoading } = useInputsStates();
   const { data: inputs } = useInputsList();
   const [, setQueryParams] = useQueryParams({
@@ -101,9 +110,9 @@ const InputsNotifications = () => {
         id: 'failed',
         message: (
           <>
-            {FAILED_MESSAGE}{' '}
+            {t(MESSAGE_TEXTS[FAILED_MESSAGE])}{' '}
             <Button bsStyle="link" onClick={() => applyRuntimeStatusFilter('FAILED')}>
-              Show failed inputs
+              {t('notifications.show_failed')}
             </Button>
             .
           </>
@@ -117,9 +126,9 @@ const InputsNotifications = () => {
         id: 'setup',
         message: (
           <>
-            {SETUP_MESSAGE}{' '}
+            {t(MESSAGE_TEXTS[SETUP_MESSAGE])}{' '}
             <Button bsStyle="link" onClick={() => applyRuntimeStatusFilter('SETUP')}>
-              Show inputs in setup mode
+              {t('notifications.show_setup')}
             </Button>
             .
           </>
@@ -133,9 +142,9 @@ const InputsNotifications = () => {
         id: 'stopped',
         message: (
           <>
-            {STOPPED_MESSAGE}{' '}
+            {t(MESSAGE_TEXTS[STOPPED_MESSAGE])}{' '}
             <Button bsStyle="link" onClick={() => applyRuntimeStatusFilter('NOT_RUNNING')}>
-              Show stopped inputs
+              {t('notifications.show_stopped')}
             </Button>
             .
           </>
@@ -146,7 +155,7 @@ const InputsNotifications = () => {
     return item;
   });
 
-  return <NotificationBanner title="Warning" items={items} />;
+  return <NotificationBanner title={t('notifications.warning')} items={items} />;
 };
 
 export default InputsNotifications;

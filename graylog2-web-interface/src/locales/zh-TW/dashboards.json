@@ -1,0 +1,42 @@
+{
+  "human_name": "Dashboards",
+  "full_screen": {
+    "menu": "全螢幕",
+    "title": "設定全螢幕",
+    "start": "開始全螢幕檢視",
+    "refresh_interval": "重新整理間隔",
+    "refresh_interval_help": "Dashboard 要在幾秒後重新整理？",
+    "tabs": "分頁",
+    "tabs_help": "選取要輪流顯示的查詢分頁。",
+    "cycle_interval": "分頁輪換間隔",
+    "cycle_interval_help": "要在幾秒後顯示下一個分頁？"
+  },
+  "properties": {
+    "title": "標題",
+    "title_help": "Dashboard 的標題。",
+    "summary": "摘要",
+    "summary_help": "Dashboard 的簡要摘要。",
+    "description": "說明",
+    "description_help": "Dashboard 及其功能的較詳細說明。"
+  },
+  "overview": {
+    "missing_requirements": "缺少必要條件",
+    "user_defined": "使用者定義",
+    "load_failed": "載入 Dashboards 失敗，狀態",
+    "could_not_load": "無法載入 Dashboards"
+  },
+  "delete": {
+    "confirm": "您確定要刪除「{{title}}」嗎？",
+    "success": "已成功刪除 Dashboard「{{title}}」！",
+    "success_title": "成功！",
+    "failed": "刪除 Dashboard 失敗：{{error}}",
+    "failed_title": "錯誤！"
+  },
+  "bulk_delete": {
+    "confirm_other": "您確定要移除 {{count}} 個 Dashboards 嗎？",
+    "partial_failure_other": "所選的 {{count}} 個 Dashboards 中，有 {{failed}} 個無法刪除。",
+    "success_other": "已成功刪除 {{count}} 個 Dashboards。",
+    "success_title": "成功",
+    "failed": "刪除 Dashboards 時發生錯誤。{{error}}"
+  }
+}

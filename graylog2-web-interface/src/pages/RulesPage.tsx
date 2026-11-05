@@ -17,6 +17,7 @@
 import React, { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import PipelinesPageNavigation from 'components/pipelines/PipelinesPageNavigation';
 import {
@@ -53,6 +54,7 @@ const rulesButtonToolbar = (
 );
 
 const RulesPage = () => {
+  const { t } = useTranslation('pipelines');
   const { page, pageSize: perPage, resetPage, setPagination } = usePaginationQueryParameter();
   const queryClient = useQueryClient();
   const [query, setQuery] = useState('');
@@ -67,7 +69,7 @@ const RulesPage = () => {
   const handleDelete = (rule: RuleType) => () => {
     // TODO: Replace with custom confirm dialog
     // eslint-disable-next-line no-alert
-    if (window.confirm(`Do you really want to delete rule "${rule.title}"?`)) {
+    if (window.confirm(t('rules_delete_confirm', { title: rule.title }))) {
       deleteRule(rule)
         .then(() => {
           queryClient.invalidateQueries({ queryKey: RULES_QUERY_KEY });
@@ -100,19 +102,16 @@ const RulesPage = () => {
   );
 
   return (
-    <DocumentTitle title="Pipeline rules">
+    <DocumentTitle title={t('rules_page_title')}>
       <PipelinesPageNavigation />
       <PageHeader
-        title="Pipeline Rules"
+        title={t('rules_page_header_title')}
         actions={rulesButtonToolbar}
         documentationLink={{
-          title: 'Pipeline rules documentation',
+          title: t('rules_page_documentation_link'),
           path: DocsHelper.PAGES.PIPELINE_RULES,
         }}>
-        <span>
-          Rules are a way of applying changes to messages. A rule consists of a condition and a list of actions. The
-          condition is evaluated against a message, and the actions are executed if the condition is satisfied.
-        </span>
+        <span>{t('rules_page_description')}</span>
       </PageHeader>
 
       <Row className="content">

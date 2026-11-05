@@ -30,6 +30,7 @@ import ConfigurationHelper from 'components/sidecars/configuration-forms/Configu
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { useTranslation } from 'react-i18next';
 
 import SourceViewModal from './SourceViewModal';
 import ConfigurationTagsSelect from './ConfigurationTagsSelect';
@@ -71,6 +72,7 @@ const ConfigurationForm = ({
   const defaultTemplates = useRef({});
   const history = useHistory();
   const sendTelemetry = useSendTelemetry('configuration');
+  const { t } = useTranslation('sidecars');
 
   const _isTemplateSet = (template: string) => template !== undefined && template !== '';
 
@@ -82,7 +84,7 @@ const ConfigurationForm = ({
 
       if (checkForRequiredFields && !_isTemplateSet(nextFormData.template)) {
         // @ts-expect-error
-        nextValidation.errors.template = ['Please fill out the configuration field.'];
+        nextValidation.errors.template = [t('configuration_forms.configuration_form.template_required')];
         nextValidation.failed = true;
       }
 
@@ -184,7 +186,7 @@ const ConfigurationForm = ({
     if (
       !nextFormData.template ||
       // eslint-disable-next-line no-alert
-      window.confirm('Do you want to use the default template for the selected Configuration?')
+      window.confirm(t('configuration_forms.configuration_form.use_default_template_confirm'))
     ) {
       _onTemplateChange(defaultTemplate);
       nextFormData.template = defaultTemplate;
@@ -208,7 +210,12 @@ const ConfigurationForm = ({
   };
 
   const _formatCollector = (collector: Collector) =>
-    collector ? `${collector.name} on ${upperFirst(collector.node_operating_system)}` : 'Unknown collector';
+    collector
+      ? t('configuration_forms.configuration_form.collector_on_os', {
+          name: collector.name,
+          os: upperFirst(collector.node_operating_system),
+        })
+      : t('configuration_forms.configuration_form.unknown_collector');
 
   const _formatCollectorOptions = () => {
     const options = [];
@@ -218,7 +225,7 @@ const ConfigurationForm = ({
         options.push({ value: collector.id, label: _formatCollector(collector) });
       });
     } else {
-      options.push({ value: 'none', label: 'Loading collector list...', disable: true });
+      options.push({ value: 'none', label: t('administration.loading_collectors'), disable: true });
     }
 
     return options;
@@ -253,10 +260,7 @@ const ConfigurationForm = ({
       return (
         <>
           <FormControl.Static>{_formatCollector(collector)}</FormControl.Static>
-          <InputDescription
-            error="Log Collector cannot change while the Configuration is in use. Clone the Configuration to test
-            it using another Collector."
-          />
+          <InputDescription error={t('configuration_forms.configuration_form.collector_in_use')} />
         </>
       );
     }
@@ -268,10 +272,10 @@ const ConfigurationForm = ({
           options={_formatCollectorOptions()}
           value={collectorId}
           onChange={_onCollectorChange}
-          placeholder="Collector"
+          placeholder={t('configuration_forms.configuration_form.collector_placeholder')}
           required
         />
-        <HelpBlock>Choose the log collector this configuration is meant for.</HelpBlock>
+        <HelpBlock>{t('configuration_forms.configuration_form.collector_help')}</HelpBlock>
       </>
     );
   };
@@ -285,16 +289,16 @@ const ConfigurationForm = ({
               <Input
                 type="text"
                 id="name"
-                label="Name"
+                label={t('configuration_forms.configuration_form.name')}
                 onChange={_onNameChange}
                 bsStyle={_validationState('name')}
-                help={_formatValidationMessage('name', 'Required. Name for this configuration')}
+                help={_formatValidationMessage('name', t('configuration_forms.configuration_form.name_help'))}
                 value={formData.name || ''}
                 autoFocus
                 required
               />
               <FormGroup controlId="color">
-                <ControlLabel>Configuration color</ControlLabel>
+                <ControlLabel>{t('configuration_forms.configuration_form.color')}</ControlLabel>
                 <div>
                   <ColorLabel color={formData.color} />
                   <div style={{ display: 'inline-block', marginLeft: 15 }}>
@@ -302,16 +306,18 @@ const ConfigurationForm = ({
                       id="color"
                       placement="right"
                       color={formData.color}
-                      triggerNode={<Button bsSize="xsmall">Change color</Button>}
+                      triggerNode={
+                        <Button bsSize="xsmall">{t('configuration_forms.configuration_form.change_color')}</Button>
+                      }
                       onChange={_formDataUpdate('color')}
                     />
                   </div>
                 </div>
-                <HelpBlock>Choose a color to use for this configuration.</HelpBlock>
+                <HelpBlock>{t('configuration_forms.configuration_form.color_help')}</HelpBlock>
               </FormGroup>
 
               <FormGroup controlId="tags">
-                <ControlLabel>Configuration Assignment Tags</ControlLabel>
+                <ControlLabel>{t('configuration_forms.configuration_form.tags')}</ControlLabel>
                 <div>
                   <ConfigurationTagsSelect
                     availableTags={formData.tags.map((tag) => ({ name: tag }))}
@@ -319,18 +325,16 @@ const ConfigurationForm = ({
                     onChange={_onTagsChange}
                   />
                 </div>
-                <HelpBlock>
-                  Sidecars which are configured with a matching tag will automatically receive this configuration.
-                </HelpBlock>
+                <HelpBlock>{t('configuration_forms.configuration_form.tags_help')}</HelpBlock>
               </FormGroup>
 
               <FormGroup controlId="collector_id">
-                <ControlLabel>Collector</ControlLabel>
+                <ControlLabel>{t('configuration_forms.configuration_form.collector')}</ControlLabel>
                 {_renderCollectorTypeField(formData.collector_id, collectors, configurationSidecars)}
               </FormGroup>
 
               <FormGroup controlId="template" validationState={_validationState('template')}>
-                <ControlLabel>Configuration</ControlLabel>
+                <ControlLabel>{t('configuration_forms.configuration_form.template')}</ControlLabel>
                 <SourceCodeEditor
                   id="template"
                   height={400}
@@ -338,13 +342,10 @@ const ConfigurationForm = ({
                   onChange={_onTemplateChange}
                 />
                 <Button className="pull-right" bsStyle="link" bsSize="sm" onClick={_onShowSource}>
-                  Preview
+                  {t('configuration_forms.configuration_form.preview')}
                 </Button>
                 <HelpBlock>
-                  {_formatValidationMessage(
-                    'template',
-                    'Required. Collector configuration, see quick reference for more information.',
-                  )}
+                  {_formatValidationMessage('template', t('configuration_forms.configuration_form.template_help'))}
                 </HelpBlock>
               </FormGroup>
             </fieldset>
@@ -352,7 +353,11 @@ const ConfigurationForm = ({
             <Row>
               <Col md={12}>
                 <FormSubmit
-                  submitButtonText={`${action === 'create' ? 'Create' : 'Update'} configuration`}
+                  submitButtonText={
+                    action === 'create'
+                      ? t('configuration_forms.configuration_form.create_configuration')
+                      : t('configuration_forms.configuration_form.update_configuration')
+                  }
                   disabledSubmit={_hasErrors()}
                   onCancel={_onCancel}
                 />

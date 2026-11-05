@@ -15,12 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext, useEffect } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { Button } from 'components/bootstrap';
 import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
-import { UPDATE_WIDGET_BTN_TEXT } from 'views/components/widgets/SaveOrCancelButtons';
-import { UPDATE_WIDGET_PREVIEW_BTN_TEXT } from 'views/components/aggregationwizard/ElementsConfigurationActions';
 
 import { useIsInteractiveMode } from '../contexts/InteractiveContext';
 
@@ -44,6 +43,7 @@ const SpacedHeading = styled.h2(
 );
 
 const EmptyAggregationContent = ({ toggleEdit, editing = false }: Props) => {
+  const { t } = useTranslation('aggregation');
   const onRenderComplete = useContext(RenderCompletionCallback);
 
   useEffect(() => {
@@ -55,32 +55,32 @@ const EmptyAggregationContent = ({ toggleEdit, editing = false }: Props) => {
   const interactive = useIsInteractiveMode();
   const text = editing ? (
     <p>
-      You are now editing the widget.
+      {t('builder_empty.editing')}
       <br />
-      To see results, add at least one metric. You can group data by adding rows/columns.
+      {t('builder_empty.add_metric_hint')}
       <br />
-      You can preview widget search results by clicking on &quot;{UPDATE_WIDGET_PREVIEW_BTN_TEXT}&quot;.
+      {t('builder_empty.preview_hint', { button: t('wizard_common.update_preview') })}
       <br />
-      To finish, click &quot;{UPDATE_WIDGET_BTN_TEXT}&quot; to save, &quot;Cancel&quot; to abandon changes.
+      {t('builder_empty.finish_hint', { update: t('widgets:widget_edit.update'), cancel: t('common:actions.cancel') })}
     </p>
   ) : (
     <p>
-      Please{' '}
       {interactive ? (
-        <Button bsStyle="info" onClick={toggleEdit}>
-          Edit
-        </Button>
+        <Trans
+          t={t}
+          i18nKey="builder_empty.edit_hint_interactive"
+          components={{ editButton: <Button bsStyle="info" onClick={toggleEdit} /> }}
+        />
       ) : (
-        'edit'
-      )}{' '}
-      the widget to see results here.
+        t('builder_empty.edit_hint')
+      )}
     </p>
   );
 
   return (
     <Container>
       <div>
-        <SpacedHeading>Empty Aggregation</SpacedHeading>
+        <SpacedHeading>{t('builder_empty.title')}</SpacedHeading>
 
         {text}
       </div>

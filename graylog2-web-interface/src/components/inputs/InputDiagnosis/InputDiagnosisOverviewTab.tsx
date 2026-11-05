@@ -17,6 +17,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 import capitalize from 'lodash/capitalize';
+import { useTranslation } from 'react-i18next';
 
 import { LinkToNode, RelativeTime, Section, Link } from 'components/common';
 import { Alert, ListGroup, ListGroupItem } from 'components/bootstrap';
@@ -34,7 +35,6 @@ import type { Input } from 'components/messageloaders/Types';
 import SectionGrid from 'components/common/Section/SectionGrid';
 import StatusColorIndicator from 'components/common/StatusColorIndicator';
 import DiagnosisMessageErrors from 'components/inputs/InputDiagnosis/DiagnosisMessageErrors';
-import { DIAGNOSIS_HELP } from 'components/inputs/InputDiagnosis/Constants';
 import HelpPopoverButton from 'components/common/HelpPopoverButton';
 
 const StyledListGroupItem = styled(ListGroupItem)`
@@ -149,6 +149,8 @@ const NodeListItem = ({
   lastFailedAt?: InputNodeStateInfo['last_failed_at'];
   nodeId: InputNodeStateInfo['node_id'];
 }) => {
+  const { t } = useTranslation('inputs');
+
   if (!detailedMessage && !nodeId && !lastFailedAt) return null;
 
   return (
@@ -156,19 +158,19 @@ const NodeListItem = ({
       <NodeListItemContent>
         {nodeId && (
           <NodeDetailsRow>
-            <StyledTitle>Node ID:</StyledTitle>
+            <StyledTitle>{t('diagnosis.node.node_id')}</StyledTitle>
             <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(nodeId)}>{nodeId}</Link>
           </NodeDetailsRow>
         )}
         {detailedMessage && (
           <NodeDetailsRow>
-            <StyledTitle>Message:</StyledTitle>
+            <StyledTitle>{t('diagnosis.node.message')}</StyledTitle>
             <InputMessage>{detailedMessage}</InputMessage>
           </NodeDetailsRow>
         )}
         {lastFailedAt && (
           <NodeDetailsRow>
-            <StyledTitle>Last failed:</StyledTitle>
+            <StyledTitle>{t('diagnosis.node.last_failed')}</StyledTitle>
             <RelativeTime dateTime={lastFailedAt} />
           </NodeDetailsRow>
         )}
@@ -178,6 +180,7 @@ const NodeListItem = ({
 };
 
 const StateListItem = ({ inputNodeStates, state }: { inputNodeStates: InputNodeStates; state: InputState }) => {
+  const { t } = useTranslation('inputs');
   const showNodesList = (nodeState: InputState) => {
     const statesWithShowableInfos = inputNodeStates.states[nodeState].filter(
       (stateInfo: InputNodeStateInfo) => stateInfo.detailed_message || stateInfo.node_id,
@@ -190,8 +193,11 @@ const StateListItem = ({ inputNodeStates, state }: { inputNodeStates: InputNodeS
     return (
       <>
         <StyledListGroupItem>
-          <StyledTitle>{capitalize(state)}:</StyledTitle>
-          {inputNodeStates.states[state].length}/{inputNodeStates.total} nodes
+          <StyledTitle>{t('diagnosis.node.state_label', { state: capitalize(state) })}</StyledTitle>
+          {t('diagnosis.node.state_nodes', {
+            count: inputNodeStates.states[state].length,
+            total: inputNodeStates.total,
+          })}
         </StyledListGroupItem>
         {inputNodeStates.states[state].map(({ detailed_message, last_failed_at, node_id }) => (
           <NodeListItem
@@ -207,8 +213,8 @@ const StateListItem = ({ inputNodeStates, state }: { inputNodeStates: InputNodeS
 
   return (
     <StyledListGroupItem>
-      <StyledTitle>{state}:</StyledTitle>
-      {inputNodeStates.states[state].length}/{inputNodeStates.total}
+      <StyledTitle>{t('diagnosis.node.state_label', { state })}</StyledTitle>
+      {t('diagnosis.node.state_count', { count: inputNodeStates.states[state].length, total: inputNodeStates.total })}
     </StyledListGroupItem>
   );
 };
@@ -235,246 +241,213 @@ const InputDiagnosisOverviewTab = ({
   isInputStateDown,
   hasReceivedMessageMetrics,
   hasReceivedMessage,
-}: Props) => (
-  <StyledSectionGrid $columns="1fr 1fr" $rows="1fr 1fr">
-    <StyledSectionGrid $columns="1fr" $rows="1fr 1fr">
-      <Section
-        title="Information"
-        preHeaderSection={<StatusColorIndicator radius="50%" />}
-        headerLeftSection={
-          <HelpPopoverButton
-            helpText={`This Input Is Listening On:
-                        ${DIAGNOSIS_HELP.INPUT_LISTENING_ON(productName)}
+}: Props) => {
+  const { t } = useTranslation('inputs');
 
-                        This Input is Listening For:
-                        ${DIAGNOSIS_HELP.INPUT_LISTENING_FOR}
-                        `}
-          />
-        }>
-        <StyledP>The address on which the Input is being run.</StyledP>
-        <StyledListGroup>
-          <StyledListGroupItem>
-            <StyledTitle>Input Title:</StyledTitle>
-            {input.title}
-          </StyledListGroupItem>
-          <StyledListGroupItem>
-            <StyledTitle>Input Type:</StyledTitle>
-            {input.name}
-          </StyledListGroupItem>
-          <StyledListGroupItem>
-            <StyledTitle>This Input is running on:</StyledTitle>
-            {input.global ? `all ${productName} nodes` : <LinkToNode nodeId={input.node} />}
-          </StyledListGroupItem>
-          {input.attributes?.bind_address && input.attributes?.port && (
-            <>
-              <StyledListGroupItem>
-                <StyledTitle>This Input is listening on:</StyledTitle>Bind address {input.attributes?.bind_address},
-                Port {input.attributes?.port}.
-              </StyledListGroupItem>
-              {listeningProtocol && (
-                <StyledListGroupItem>
-                  <StyledTitle>This Input is listening for:</StyledTitle>
-                  {listeningProtocol}
-                </StyledListGroupItem>
-              )}
-            </>
-          )}
-        </StyledListGroup>
-      </Section>
-      <Section
-        title="State"
-        preHeaderSection={
-          <StatusColorIndicator
-            radius="50%"
-            data-testid="state-indicator"
-            bsStyle={isInputStateDown ? 'danger' : 'success'}
-          />
-        }
-        headerLeftSection={<HelpPopoverButton helpText={DIAGNOSIS_HELP.INPUT_STATE} />}>
-        <StyledP>
-          Number of {productName} nodes the Input is configured to run, and on how many it is running. If any are not
-          running, click to see any associated error messages.
-        </StyledP>
-        <StyledListGroup>
-          {inputMetrics.failedStarts15mCount !== undefined && (
-            <StyledListGroupItem>
-              <StyledTitle>Failed starts (last 15min):</StyledTitle>
-              {inputMetrics.failedStarts15mCount}
-            </StyledListGroupItem>
-          )}
-          {Object.keys(inputNodeStates.states).map((state: InputState) => (
-            <StateListItem key={state} state={state} inputNodeStates={inputNodeStates} />
-          ))}
-          {Object.keys(inputNodeStates.states).length === 0 && (
-            <StyledListGroupItem>Input is not running.</StyledListGroupItem>
-          )}
-        </StyledListGroup>
-      </Section>
-    </StyledSectionGrid>
-    <Section title="Troubleshooting">
-      <TroubleshootingContainer>
-        <Alert>
-          <p>
-            <strong>If Input is in a failed state.</strong>
-          </p>
-          <StyledList>
-            <li>
-              When an Input fails on one or more {productName} nodes, the Message field of the State panel will show a
-              short error message; a full length error message may be found in the {productName} server.log file.
-            </li>
-            <li>
-              An input configured to use a specified port will fail if that port is privileged (and {productName} is not
-              running as root), or already in use by another Input or application.
-            </li>
-            <li>An input will fail if it is unable to route to the specified IP.</li>
-            <li>
-              An input that requires an internet connection in order to connect to an API will fail if it has no
-              internet connection or else is unable to route to that API.
-            </li>
-            <li>A TCP input will fail if it has an invalid or expired certificate.</li>
-            <li>
-              Inputs that connect to an external API (for example, the Microsoft Azure Input) require configuration
-              changes at the source to enable {productName} to collect logs. The steps required will be detailed on the
-              appropriate documentation sub-page for that Input. An input that connects to an external API will fail if
-              incorrectly configured at either the {productName} side, or (as applicable) the side hosting the API.
-            </li>
-          </StyledList>
-          <br />
-          <p>
-            <strong>If Input is running on all nodes, but messages are not reaching the Input.</strong>
-          </p>
-          <StyledList>
-            <li>
-              Check the Network I/O field of the Received Traffic panel. If no traffic is showing here, that suggests a
-              connectivity problem.
-              <StyledList>
-                <li>
-                  If no traffic is showing, first troubleshoot network connectivity between the {productName} server(s)
-                  and the log source. This may be achieved by running ping, telnet or tracert commands.
-                </li>
-                <li>
-                  For Inputs that connect to an external API, check the {productName} server.log file - authentication
-                  failures (invalid logins or permissions to perform the action on the API) will be printed in full
-                  here.
-                </li>
-              </StyledList>
-            </li>
+  return (
+    <StyledSectionGrid $columns="1fr 1fr" $rows="1fr 1fr">
+      <StyledSectionGrid $columns="1fr" $rows="1fr 1fr">
+        <Section
+          title={t('diagnosis.information.title')}
+          preHeaderSection={<StatusColorIndicator radius="50%" />}
+          headerLeftSection={
+            <HelpPopoverButton
+              helpText={`${t('diagnosis.help.listening_on_title')}
+${t('diagnosis.help.listening_on', { productName })}
 
-            <li>
-              If traffic is showing on the Network I/O field of the Received Traffic panel, but no messages have been
-              received, this suggests the messages are not being sent in a format appropriate to the Input.
-              <StyledList>
-                <li>TCP input cannot read UDP traffic, and vice versa.</li>
-                <li>
-                  A message with no content will be discarded. This can be monitored via the Empty Messages Discarded
-                  field.
-                </li>
-                <li>
-                  Listener Inputs expect messages in a limited range of formats and may be unable to read messages in
-                  foreign formats. For troubleshooting purposes, the Raw Text Input has the most permissive
-                  requirements.
-                </li>
-              </StyledList>
-            </li>
-          </StyledList>
-          <br />
-          <p>
-            <strong>
-              If Input is running on all nodes, messages are reaching the Input, but some (or all) are showing as
-              Message Errors.
-            </strong>
-          </p>
-          <StyledList>
-            <li>
-              On Licensed Enterprise clusters, Failure Processing can be enabled to allow storage of messages that error
-              at each stage - input, processing, and writing to the search cluster, along with details of the failure -
-              see the failure_cause and failure_details fields. Navigate to the Message Error panel and click on the
-              message count to examine individual failed messages.
-            </li>
-          </StyledList>
-        </Alert>
-      </TroubleshootingContainer>
-    </Section>
-    <StyledSectionGrid $columns="1fr" $rows="1fr 1fr">
-      <Section
-        preHeaderSection={
-          <StatusColorIndicator radius="50%" bsStyle={hasReceivedMessageMetrics ? 'success' : 'gray'} />
-        }
-        headerLeftSection={
-          <HelpPopoverButton
-            helpText={`Empty Messages discarded:
-                ${DIAGNOSIS_HELP.EMPTY_MESSAGES_DISCARDED}
-
-                Network I/O:
-                ${DIAGNOSIS_HELP.NETWORK_IO}`}
-          />
-        }
-        title="Received Traffic">
-        <StyledP>
-          Messages and network traffic that has reached the input. Note: metrics show the last 15 minutes only.
-        </StyledP>
-        {inputMetrics && (
+${t('diagnosis.help.listening_for_title')}
+${t('diagnosis.help.listening_for')}`}
+            />
+          }>
+          <StyledP>{t('diagnosis.information.description')}</StyledP>
           <StyledListGroup>
             <StyledListGroupItem>
-              <StyledTitle>Total Messages received by Input:</StyledTitle>
-              {inputMetrics.incomingMessagesTotal} events
+              <StyledTitle>{t('diagnosis.information.input_title')}</StyledTitle>
+              {input.title}
             </StyledListGroupItem>
             <StyledListGroupItem>
-              <StyledTitle>Empty Messages discarded:</StyledTitle>
-              {inputMetrics.emptyMessages}
+              <StyledTitle>{t('diagnosis.information.input_type')}</StyledTitle>
+              {input.name}
             </StyledListGroupItem>
-            {Number.isInteger(inputMetrics.open_connections) && Number.isInteger(inputMetrics.total_connections) && (
-              <StyledListGroupItem>
-                <StyledTitle>Active Connections:</StyledTitle>
-                {inputMetrics.open_connections}&nbsp; ({inputMetrics.total_connections} total)
-              </StyledListGroupItem>
-            )}
-            {Number.isInteger(inputMetrics.read_bytes_1sec) && Number.isInteger(inputMetrics.read_bytes_total) && (
-              <StyledListGroupItem>
-                <StyledTitle>Network I/O:</StyledTitle>
-                <NetworkStats
-                  readBytes1Sec={inputMetrics.read_bytes_1sec}
-                  readBytesTotal={inputMetrics.read_bytes_total}
-                  writtenBytes1Sec={inputMetrics.write_bytes_1sec}
-                  writtenBytesTotal={inputMetrics.write_bytes_total}
-                />
-              </StyledListGroupItem>
+            <StyledListGroupItem>
+              <StyledTitle>{t('diagnosis.information.running_on')}</StyledTitle>
+              {input.global ? (
+                t('diagnosis.information.all_nodes', { productName })
+              ) : (
+                <LinkToNode nodeId={input.node} />
+              )}
+            </StyledListGroupItem>
+            {input.attributes?.bind_address && input.attributes?.port && (
+              <>
+                <StyledListGroupItem>
+                  <StyledTitle>{t('diagnosis.information.listening_on')}</StyledTitle>
+                  {t('diagnosis.information.listening_on_value', {
+                    bindAddress: input.attributes?.bind_address,
+                    port: input.attributes?.port,
+                  })}
+                </StyledListGroupItem>
+                {listeningProtocol && (
+                  <StyledListGroupItem>
+                    <StyledTitle>{t('diagnosis.information.listening_for')}</StyledTitle>
+                    {listeningProtocol}
+                  </StyledListGroupItem>
+                )}
+              </>
             )}
           </StyledListGroup>
+        </Section>
+        <Section
+          title={t('diagnosis.state.title')}
+          preHeaderSection={
+            <StatusColorIndicator
+              radius="50%"
+              data-testid="state-indicator"
+              bsStyle={isInputStateDown ? 'danger' : 'success'}
+            />
+          }
+          headerLeftSection={<HelpPopoverButton helpText={t('diagnosis.help.input_state')} />}>
+          <StyledP>{t('diagnosis.state.description', { productName })}</StyledP>
+          <StyledListGroup>
+            {inputMetrics.failedStarts15mCount !== undefined && (
+              <StyledListGroupItem>
+                <StyledTitle>{t('diagnosis.state.failed_starts')}</StyledTitle>
+                {inputMetrics.failedStarts15mCount}
+              </StyledListGroupItem>
+            )}
+            {Object.keys(inputNodeStates.states).map((state: InputState) => (
+              <StateListItem key={state} state={state} inputNodeStates={inputNodeStates} />
+            ))}
+            {Object.keys(inputNodeStates.states).length === 0 && (
+              <StyledListGroupItem>{t('diagnosis.state.not_running')}</StyledListGroupItem>
+            )}
+          </StyledListGroup>
+        </Section>
+      </StyledSectionGrid>
+      <Section title={t('diagnosis.troubleshooting.title')}>
+        <TroubleshootingContainer>
+          <Alert>
+            <p>
+              <strong>{t('diagnosis.troubleshooting.failed_title')}</strong>
+            </p>
+            <StyledList>
+              <li>{t('diagnosis.troubleshooting.failed_message_field', { productName })}</li>
+              <li>{t('diagnosis.troubleshooting.failed_port', { productName })}</li>
+              <li>{t('diagnosis.troubleshooting.failed_route')}</li>
+              <li>{t('diagnosis.troubleshooting.failed_internet')}</li>
+              <li>{t('diagnosis.troubleshooting.failed_certificate')}</li>
+              <li>{t('diagnosis.troubleshooting.failed_external_api', { productName })}</li>
+            </StyledList>
+            <br />
+            <p>
+              <strong>{t('diagnosis.troubleshooting.no_messages_title')}</strong>
+            </p>
+            <StyledList>
+              <li>
+                {t('diagnosis.troubleshooting.no_messages_network_io')}
+                <StyledList>
+                  <li>{t('diagnosis.troubleshooting.no_messages_connectivity', { productName })}</li>
+                  <li>{t('diagnosis.troubleshooting.no_messages_external_api', { productName })}</li>
+                </StyledList>
+              </li>
+
+              <li>
+                {t('diagnosis.troubleshooting.no_messages_format')}
+                <StyledList>
+                  <li>{t('diagnosis.troubleshooting.no_messages_protocol')}</li>
+                  <li>{t('diagnosis.troubleshooting.no_messages_empty')}</li>
+                  <li>{t('diagnosis.troubleshooting.no_messages_listener')}</li>
+                </StyledList>
+              </li>
+            </StyledList>
+            <br />
+            <p>
+              <strong>{t('diagnosis.troubleshooting.message_errors_title')}</strong>
+            </p>
+            <StyledList>
+              <li>{t('diagnosis.troubleshooting.message_errors_failure_processing')}</li>
+            </StyledList>
+          </Alert>
+        </TroubleshootingContainer>
+      </Section>
+      <StyledSectionGrid $columns="1fr" $rows="1fr 1fr">
+        <Section
+          preHeaderSection={
+            <StatusColorIndicator radius="50%" bsStyle={hasReceivedMessageMetrics ? 'success' : 'gray'} />
+          }
+          headerLeftSection={
+            <HelpPopoverButton
+              helpText={`${t('diagnosis.help.empty_messages_discarded_title')}
+${t('diagnosis.help.empty_messages_discarded')}
+
+${t('diagnosis.help.network_io_title')}
+${t('diagnosis.help.network_io')}`}
+            />
+          }
+          title={t('diagnosis.received_traffic.title')}>
+          <StyledP>{t('diagnosis.received_traffic.description')}</StyledP>
+          {inputMetrics && (
+            <StyledListGroup>
+              <StyledListGroupItem>
+                <StyledTitle>{t('diagnosis.received_traffic.total_messages')}</StyledTitle>
+                {t('diagnosis.received_traffic.events', { count: inputMetrics.incomingMessagesTotal })}
+              </StyledListGroupItem>
+              <StyledListGroupItem>
+                <StyledTitle>{t('diagnosis.received_traffic.empty_messages')}</StyledTitle>
+                {inputMetrics.emptyMessages}
+              </StyledListGroupItem>
+              {Number.isInteger(inputMetrics.open_connections) && Number.isInteger(inputMetrics.total_connections) && (
+                <StyledListGroupItem>
+                  <StyledTitle>{t('diagnosis.received_traffic.active_connections')}</StyledTitle>
+                  {t('diagnosis.received_traffic.connections_value', {
+                    open: inputMetrics.open_connections,
+                    total: inputMetrics.total_connections,
+                  })}
+                </StyledListGroupItem>
+              )}
+              {Number.isInteger(inputMetrics.read_bytes_1sec) && Number.isInteger(inputMetrics.read_bytes_total) && (
+                <StyledListGroupItem>
+                  <StyledTitle>{t('diagnosis.received_traffic.network_io')}</StyledTitle>
+                  <NetworkStats
+                    readBytes1Sec={inputMetrics.read_bytes_1sec}
+                    readBytesTotal={inputMetrics.read_bytes_total}
+                    writtenBytes1Sec={inputMetrics.write_bytes_1sec}
+                    writtenBytesTotal={inputMetrics.write_bytes_total}
+                  />
+                </StyledListGroupItem>
+              )}
+            </StyledListGroup>
+          )}
+        </Section>
+        <DiagnosisMessageErrors messageErrors={inputMetrics.message_errors} inputId={inputId} />
+      </StyledSectionGrid>
+      <Section
+        preHeaderSection={<StatusColorIndicator radius="50%" bsStyle={hasReceivedMessage ? 'success' : 'gray'} />}
+        title={t('diagnosis.message_count_by_stream.title')}
+        headerLeftSection={<HelpPopoverButton helpText={t('diagnosis.help.received_message_count_by_stream')} />}
+        actions={<ShowReceivedMessagesButton input={input} />}>
+        <StyledP>{t('diagnosis.message_count_by_stream.description')}</StyledP>
+        {inputMetrics.stream_message_count?.length ? (
+          <StyledListGroup>
+            {inputMetrics.stream_message_count.map((stream: StreamMessageCount) => (
+              <StyledListGroupItem key={stream.stream_id}>
+                <StyledTitleLink
+                  to={Routes.search_with_query(`gl2_source_input:${input.id}`, 'relative', { relative: 900 }, [
+                    stream.stream_id,
+                  ])}>
+                  <strong>{t('diagnosis.message_count_by_stream.stream', { streamName: stream.stream_name })}</strong>
+                </StyledTitleLink>
+                <StyledSpan>{stream.count}</StyledSpan>
+              </StyledListGroupItem>
+            ))}
+          </StyledListGroup>
+        ) : (
+          <StyledP>
+            <em>{t('diagnosis.message_count_by_stream.none')}</em>
+          </StyledP>
         )}
       </Section>
-      <DiagnosisMessageErrors messageErrors={inputMetrics.message_errors} inputId={inputId} />
     </StyledSectionGrid>
-    <Section
-      preHeaderSection={<StatusColorIndicator radius="50%" bsStyle={hasReceivedMessage ? 'success' : 'gray'} />}
-      title="Received Message count by Stream"
-      headerLeftSection={<HelpPopoverButton helpText={DIAGNOSIS_HELP.RECEIVED_MESSAGE_COUNT_BY_STREAM} />}
-      actions={<ShowReceivedMessagesButton input={input} />}>
-      <StyledP>
-        Messages successfully ingested from this Input in the last 15 minutes. Click on the Stream to inspect the
-        messages.
-      </StyledP>
-      {inputMetrics.stream_message_count?.length ? (
-        <StyledListGroup>
-          {inputMetrics.stream_message_count.map((stream: StreamMessageCount) => (
-            <StyledListGroupItem key={stream.stream_id}>
-              <StyledTitleLink
-                to={Routes.search_with_query(`gl2_source_input:${input.id}`, 'relative', { relative: 900 }, [
-                  stream.stream_id,
-                ])}>
-                <strong>{stream.stream_name}:</strong>
-              </StyledTitleLink>
-              <StyledSpan>{stream.count}</StyledSpan>
-            </StyledListGroupItem>
-          ))}
-        </StyledListGroup>
-      ) : (
-        <StyledP>
-          <em>No messages from this Input were routed into Streams in the last 15 minutes.</em>
-        </StyledP>
-      )}
-    </Section>
-  </StyledSectionGrid>
-);
+  );
+};
 
 export default InputDiagnosisOverviewTab;

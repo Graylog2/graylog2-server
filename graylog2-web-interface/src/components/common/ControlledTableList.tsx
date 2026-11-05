@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ListGroup } from 'components/bootstrap';
 
@@ -22,10 +23,11 @@ import ControlledTableListHeader from './ControlledTableListHeader';
 import ControlledTableListItem from './ControlledTableListItem';
 
 const ControlledTableList = ({ children }: { children: Array<React.ReactNode> }) => {
+  const { t } = useTranslation('common');
   let effectiveChildren;
 
   if (children.length === 0) {
-    effectiveChildren = <ControlledTableListItem>No items to display</ControlledTableListItem>;
+    effectiveChildren = <ControlledTableListItem>{t('empty.no_items')}</ControlledTableListItem>;
   } else {
     effectiveChildren = children;
   }

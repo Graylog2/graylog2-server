@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { LinkContainer, Link, RelativeTime, OverlayTrigger, CountBadge, Spinner } from 'components/common';
@@ -67,6 +68,7 @@ const RuleListEntry = ({
   processingLoad: processingLoadProp = undefined,
   processingLoadError: processingLoadErrorProp = undefined,
 }: Props) => {
+  const { t } = useTranslation('pipelines');
   const {
     metricsEnabled,
     processingLoad: processingLoadContext,
@@ -84,10 +86,10 @@ const RuleListEntry = ({
   const actions = (
     <ButtonToolbar>
       <LinkContainer to={`${Routes.SYSTEM.PIPELINES.RULE(id)}${isRuleBuilder}`}>
-        <Button bsSize="xsmall">Edit</Button>
+        <Button bsSize="xsmall">{t('rule_list_entry.edit')}</Button>
       </LinkContainer>
-      <Button bsStyle="danger" bsSize="xsmall" onClick={onDelete(rule)} title="Delete rule">
-        Delete
+      <Button bsStyle="danger" bsSize="xsmall" onClick={onDelete(rule)} title={t('rule_list_entry.delete_title')}>
+        {t('rule_list_entry.delete')}
       </Button>
     </ButtonToolbar>
   );
@@ -108,7 +110,7 @@ const RuleListEntry = ({
       </React.Fragment>
     ));
   if (loadingScopePermissions) {
-    return <Spinner text="Loading Rule" />;
+    return <Spinner text={t('loading_rule')} />;
   }
 
   return (
@@ -117,7 +119,7 @@ const RuleListEntry = ({
         <Link to={`${Routes.SYSTEM.PIPELINES.RULE(id)}${isRuleBuilder}`}>{title}</Link>
         {isManaged && (
           <DefaultLabel bsStyle="default" bsSize="xsmall">
-            Managed by Application
+            {t('rule_list_entry.managed')}
           </DefaultLabel>
         )}
         <RuleDeprecationInfo ruleId={id} />
@@ -131,12 +133,12 @@ const RuleListEntry = ({
       </td>
       <td>
         <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Rule.${id}.executed`} zeroOnMissing>
-          <CounterRate suffix="msg/s" />
+          <CounterRate suffix={t('rule_list_entry.throughput_suffix')} />
         </MetricContainer>
       </td>
       <td>
         <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Rule.${id}.failed`}>
-          <CounterRate showTotal suffix="errors/s" hideOnMissing />
+          <CounterRate showTotal suffix={t('rule_list_entry.errors_suffix')} hideOnMissing />
         </MetricContainer>
       </td>
       {showLoadColumn && (

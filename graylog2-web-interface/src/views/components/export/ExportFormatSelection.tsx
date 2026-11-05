@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Field } from 'formik';
 import sortBy from 'lodash/sortBy';
 
@@ -23,6 +24,7 @@ import Select from 'components/common/Select';
 import { defaultCompare } from 'logic/DefaultCompare';
 
 const ExportFormatSelection = () => {
+  const { t } = useTranslation('widgets');
   const exportFormats = usePluginEntities('views.export.formats');
 
   const exportFormatOptions = sortBy(
@@ -39,7 +41,7 @@ const ExportFormatSelection = () => {
     <Field name="format">
       {({ field: { name, value, onChange } }) => (
         <>
-          <label htmlFor={name}>Output Format</label>
+          <label htmlFor={name}>{t('export.output_format')}</label>
           <Select
             name={name}
             value={value}

@@ -26,9 +26,10 @@ const bindings: PluginExports = {
     {
       description: PAGE_NAV_TITLE,
       children: [
-        { description: 'Overview', path: Routes.SYSTEM.OVERVIEW },
+        { description: 'Overview', titleKey: 'navigation:page_navigation.overview', path: Routes.SYSTEM.OVERVIEW },
         {
           description: 'Notifications',
+          titleKey: 'navigation:page_navigation.notifications',
           path: Routes.SYSTEM.NOTIFICATIONS,
           permissions: 'notifications:read',
           BadgeComponent: NotificationsNavTab,

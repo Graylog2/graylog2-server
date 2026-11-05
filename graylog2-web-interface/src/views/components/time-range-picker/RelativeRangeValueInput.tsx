@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Input from 'components/bootstrap/Input';
 
@@ -27,19 +28,29 @@ type Props = {
   value: number | null;
 };
 
-const RelativeRangeValueInput = React.memo(({ fieldName, unsetRange, value, onChange, disabled, error }: Props) => (
-  <Input
-    id={`relative-timerange-${fieldName}-value`}
-    name={`relative-timerange-${fieldName}-value`}
-    disabled={disabled || unsetRange}
-    type="number"
-    min="1"
-    value={value === null ? '' : value}
-    className="mousetrap"
-    title={`Set the ${fieldName} value`}
-    onChange={onChange}
-    bsStyle={error ? 'error' : null}
-  />
-));
+const VALUE_TITLES = {
+  range: 'time_range.set_range_value',
+  from: 'time_range.set_from_value',
+  to: 'time_range.set_to_value',
+} as const;
+
+const RelativeRangeValueInput = React.memo(({ fieldName, unsetRange, value, onChange, disabled, error }: Props) => {
+  const { t } = useTranslation('search');
+
+  return (
+    <Input
+      id={`relative-timerange-${fieldName}-value`}
+      name={`relative-timerange-${fieldName}-value`}
+      disabled={disabled || unsetRange}
+      type="number"
+      min="1"
+      value={value === null ? '' : value}
+      className="mousetrap"
+      title={t(VALUE_TITLES[fieldName])}
+      onChange={onChange}
+      bsStyle={error ? 'error' : null}
+    />
+  );
+});
 
 export default RelativeRangeValueInput;

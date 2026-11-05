@@ -16,15 +16,20 @@
  */
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import { LinkContainer } from 'components/common';
 
-const CreateProfileButton = () => (
-  <LinkContainer to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.CREATE}>
-    <Button bsStyle="primary">Create profile</Button>
-  </LinkContainer>
-);
+const CreateProfileButton = () => {
+  const { t } = useTranslation('indexsets');
+
+  return (
+    <LinkContainer to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.CREATE}>
+      <Button bsStyle="primary">{t('profiles.create')}</Button>
+    </LinkContainer>
+  );
+};
 
 export default CreateProfileButton;

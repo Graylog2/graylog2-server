@@ -16,8 +16,9 @@
  */
 import React from 'react';
 import numeral from 'numeral';
+import { Trans, useTranslation } from 'react-i18next';
 
-import { Pluralize, Spinner } from 'components/common';
+import { Spinner } from 'components/common';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 import { useNodeMetrics } from 'hooks/useMetrics';
 
@@ -34,25 +35,33 @@ const metricNames = {
 const metricValues = Object.values(metricNames);
 
 const JournalState = ({ nodeId }: Props) => {
+  const { t } = useTranslation('system');
   const { data: nodeMetrics, isLoading } = useNodeMetrics(nodeId, metricValues);
   const _isLoading = isLoading || !nodeMetrics;
 
   if (_isLoading) {
-    return <Spinner text="Loading journal metrics..." />;
+    return <Spinner text={t('journal_state.loading')} />;
   }
 
   const _metrics = MetricsExtractor.getValuesForNode(nodeMetrics, metricNames);
 
   if (Object.keys(_metrics).length === 0) {
-    return <span>Journal metrics unavailable.</span>;
+    return <span>{t('journal_state.unavailable')}</span>;
   }
 
   return (
     <span>
-      The journal contains <strong>{numeral(_metrics.entriesUncommitted).format('0,0')} unprocessed messages</strong> in{' '}
-      {_metrics.segments} <Pluralize value={_metrics.segments} singular="segment" plural="segments" />.{' '}
-      <strong>{numeral(_metrics.append).format('0,0')} messages</strong> appended,{' '}
-      <strong>{numeral(_metrics.read).format('0,0')} messages</strong> read in the last second.
+      <Trans
+        t={t}
+        i18nKey="journal_state.summary"
+        count={_metrics.segments}
+        values={{
+          messages: numeral(_metrics.entriesUncommitted).format('0,0'),
+          appended: numeral(_metrics.append).format('0,0'),
+          read: numeral(_metrics.read).format('0,0'),
+        }}
+        components={{ strong: <strong /> }}
+      />
     </span>
   );
 };

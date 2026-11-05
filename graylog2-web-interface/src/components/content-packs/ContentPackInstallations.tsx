@@ -16,10 +16,13 @@
  */
 import React from 'react';
 
+import i18n from 'i18n';
 import { DataTable } from 'components/common';
 import { BootstrapModalWrapper, Button, ButtonToolbar, Modal } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
 import ContentPackInstallationView from 'components/content-packs/ContentPackInstallView';
+
+const t = (key: string) => i18n.t(key, { ns: 'content_packs' });
 
 type ContentPackInstallationsProps = {
   installations?: any[];
@@ -59,13 +62,13 @@ class ContentPackInstallations extends React.Component<
     const installModal = (
       <BootstrapModalWrapper showModal={this.state.showInstallModal} onHide={closeShowModal} bsSize="large">
         <Modal.Header>
-          <Modal.Title>View Installation</Modal.Title>
+          <Modal.Title>{t('installations.view_title')}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <ContentPackInstallationView install={item} />
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={closeShowModal}>Close</Button>
+          <Button onClick={closeShowModal}>{t('common:actions.close')}</Button>
         </Modal.Footer>
       </BootstrapModalWrapper>
     );
@@ -83,10 +86,10 @@ class ContentPackInstallations extends React.Component<
                 onClick={() => {
                   onUninstall(item.content_pack_id, item._id);
                 }}>
-                Uninstall
+                {t('installations.uninstall')}
               </Button>
               <Button bsStyle="info" bsSize="small" onClick={openShowModal}>
-                View
+                {t('installations.view')}
               </Button>
               {installModal}
             </ButtonToolbar>
@@ -98,7 +101,7 @@ class ContentPackInstallations extends React.Component<
 
   // eslint-disable-next-line class-methods-use-this
   headerFormater = (header) => {
-    if (header === 'Action') {
+    if (header === t('installations.action')) {
       return <th className="text-right">{header}</th>;
     }
 
@@ -112,7 +115,7 @@ class ContentPackInstallations extends React.Component<
       return <Spinner />;
     }
 
-    const headers = ['Comment', 'Version', 'Action'];
+    const headers = [t('installations.comment'), t('installations.version'), t('installations.action')];
 
     return (
       <DataTable

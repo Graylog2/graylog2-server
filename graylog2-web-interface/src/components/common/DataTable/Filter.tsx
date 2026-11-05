@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import TypeAheadDataFilter from 'components/common/TypeAheadDataFilter';
@@ -42,13 +43,15 @@ const Filter = ({
   onDataFiltered,
   rows,
 }: FilterProps) => {
+  const { t } = useTranslation('common');
+
   if (filterKeys.length !== 0) {
     return (
       <Wrapper className="row">
         <div className="col-md-8">
           <TypeAheadDataFilter
             id={`${id}-data-filter`}
-            label={label}
+            label={label ?? t('actions.filter')}
             data={rows}
             searchInKeys={filterKeys}
             onDataFiltered={onDataFiltered}

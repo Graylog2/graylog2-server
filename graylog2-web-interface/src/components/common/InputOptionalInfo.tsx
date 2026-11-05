@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 const StyledSpan = styled.span(
@@ -24,6 +25,10 @@ const StyledSpan = styled.span(
 `,
 );
 
-const InputOptionalInfo = () => <StyledSpan>(Opt.)</StyledSpan>;
+const InputOptionalInfo = () => {
+  const { t } = useTranslation('common');
+
+  return <StyledSpan>{t('badges.optional')}</StyledSpan>;
+};
 
 export default InputOptionalInfo;

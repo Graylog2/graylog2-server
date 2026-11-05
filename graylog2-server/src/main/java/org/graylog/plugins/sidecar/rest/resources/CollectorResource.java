@@ -60,6 +60,9 @@ import org.graylog.plugins.sidecar.services.EtagService;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.plugin.rest.CodedBadRequestException;
+import org.graylog2.plugin.rest.CodedException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.rest.models.SortOrder;
@@ -75,6 +78,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -128,7 +132,7 @@ public class CollectorResource extends RestResource implements PluginRestResourc
 
         final Collector collector = this.collectorService.find(id);
         if (collector == null) {
-            throw new NotFoundException("Cound not find collector <" + id + ">.");
+            throw new CodedNotFoundException("sidecar.collector_not_found", "Could not find collector <" + id + ">.", Map.of("id", id));
         }
 
         return collector;
@@ -264,7 +268,7 @@ public class CollectorResource extends RestResource implements PluginRestResourc
                 .filter(configuration -> configuration.collectorId().equals(id))
                 .count();
         if (configurationsForCollector > 0) {
-            throw new BadRequestException("Collector still in use, cannot delete.");
+            throw new CodedBadRequestException("sidecar.collector_in_use", "Collector still in use, cannot delete.");
         }
 
         int deleted = collectorService.delete(id);
@@ -292,23 +296,23 @@ public class CollectorResource extends RestResource implements PluginRestResourc
         final ValidationResult validation = new ValidationResult();
 
         if (toValidate.name().isEmpty()) {
-            validation.addError("name", "Collector name cannot be empty.");
+            validation.addError("name", "sidecar_collector.name_empty", "Collector name cannot be empty.", Map.of());
         } else if (!validateCollectorName(toValidate.name())) {
-            validation.addError("name", "Collector name can only contain the following characters: A-Z,a-z,0-9,_,-,.");
+            validation.addError("name", "sidecar_collector.name_invalid_chars", "Collector name can only contain the following characters: A-Z,a-z,0-9,_,-,.", Map.of());
         }
 
         if (toValidate.executablePath().isEmpty()) {
-            validation.addError("executable_path", "Collector binary path cannot be empty.");
+            validation.addError("executable_path", "sidecar_collector.path_empty", "Collector binary path cannot be empty.", Map.of());
         } else if (!validatePath(toValidate.executablePath())) {
-            validation.addError("executable_path", "Collector binary path cannot contain the following characters: ; * ? \" < > | &");
+            validation.addError("executable_path", "sidecar_collector.path_invalid_chars", "Collector binary path cannot contain the following characters: ; * ? \" < > | &", Map.of());
         }
 
         if (toValidate.nodeOperatingSystem() != null) {
             if (!validateOperatingSystem(toValidate.nodeOperatingSystem())) {
-                validation.addError("node_operating_system", StringUtils.f("Operating system can only be one of %s.", VALID_OPERATING_SYSTEMS));
+                validation.addError("node_operating_system", "collector.operating_system_can_only_be_one_of", StringUtils.f("Operating system can only be one of %s.", VALID_OPERATING_SYSTEMS), CodedException.paramsOf("valid_operating_systems", VALID_OPERATING_SYSTEMS));
             }
             if (!validateServiceType(toValidate.serviceType(), toValidate.nodeOperatingSystem())) {
-                validation.addError("service_type", "Only Windows collectors support 'Windows service'.");
+                validation.addError("service_type", "sidecar_collector.service_type_windows_only", "Only Windows collectors support 'Windows service'.", Map.of());
             }
             collectorOptional = Optional.ofNullable(collectorService.findByNameAndOs(toValidate.name(), toValidate.nodeOperatingSystem()));
         } else {
@@ -318,7 +322,7 @@ public class CollectorResource extends RestResource implements PluginRestResourc
             collector = collectorOptional.get();
             if (!collector.id().equals(toValidate.id())) {
                 // a collector exists with a different id, so the name is already in use, fail validation
-                validation.addError("name", "Collector \"" + toValidate.name() + "\" already exists for the \"" + collector.nodeOperatingSystem() + "\" operating system.");
+                validation.addError("name", "collector.collector_already_exists_for_the_operating_system", "Collector \"" + toValidate.name() + "\" already exists for the \"" + collector.nodeOperatingSystem() + "\" operating system.", CodedException.paramsOf("name", toValidate.name(), "nodeOperatingSystem", collector.nodeOperatingSystem()));
             }
         }
         return validation;

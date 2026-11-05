@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Col, Row, SegmentedControl } from 'components/bootstrap';
 import { IfPermitted, Spinner } from 'components/common';
@@ -40,13 +41,19 @@ type Props = {
 
 export type UserSegment = 'profile' | 'settings_preferences' | 'teams_roles' | 'shared_entities' | (string & {});
 
-export const editableUserSegments: Array<{ value: UserSegment; label: string }> = [
-  { value: 'profile', label: 'Profile' },
-  { value: 'settings_preferences', label: 'Preferences' },
-  { value: 'teams_roles', label: 'Teams & Roles' },
-];
+export const useEditableUserSegments = (): Array<{ value: UserSegment; label: string }> => {
+  const { t } = useTranslation('users');
+
+  return [
+    { value: 'profile', label: t('user_edit.segments.profile') },
+    { value: 'settings_preferences', label: t('user_edit.segments.preferences') },
+    { value: 'teams_roles', label: t('user_edit.segments.teams_roles') },
+  ];
+};
 
 const UserDetails = ({ user }: Props) => {
+  const { t } = useTranslation('users');
+  const editableUserSegments = useEditableUserSegments();
   const currentUser = useCurrentUser();
   const { isPermitted } = usePermissions();
   const pluggableSegments = usePluginEntities('users.details.segments');
@@ -55,7 +62,7 @@ const UserDetails = ({ user }: Props) => {
   const userSegments: Array<{ value: UserSegment; label: string }> = [
     ...editableUserSegments,
     ...activePluggableSegments.map((s) => ({ value: s.value, label: s.label })),
-    { value: 'shared_entities', label: 'Shared Entities' },
+    { value: 'shared_entities', label: t('user_edit.segments.shared_entities') },
   ];
   const editPermissionRequiredSections = [
     'profile',

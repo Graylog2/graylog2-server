@@ -19,6 +19,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { DataNodeRollingRestart } from '@graylog/server-api';
 
 import FetchError from 'logic/errors/FetchError';
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 import extractErrorMessage from 'util/extractErrorMessage';
 import UserNotification from 'util/UserNotification';
@@ -74,8 +75,8 @@ export const useCurrentRollingRestart = () => {
     queryFn: () =>
       defaultOnError(
         fetchCurrentRollingRestart(),
-        'Loading OpenSearch rolling upgrade status failed',
-        'Could not load OpenSearch rolling upgrade status',
+        i18n.t('data_node_notifications.loading_rolling_upgrade_failed', { ns: 'datanode' }),
+        i18n.t('data_node_notifications.loading_rolling_upgrade_failed_title', { ns: 'datanode' }),
       ),
     refetchInterval: (query) => {
       const rollingRestart = query.state.data;
@@ -103,7 +104,10 @@ const useOpenSearchRollingRestart = () => {
 
       // Overridable failures surface as the caller's force-confirm dialog instead of a toast.
       if (force || !startError.canRetryWithForce) {
-        UserNotification.error(startError.message, 'Could not start OpenSearch rolling upgrade');
+        UserNotification.error(
+          startError.message,
+          i18n.t('data_node_notifications.start_rolling_upgrade_failed_title', { ns: 'datanode' }),
+        );
       }
     },
   });
@@ -113,10 +117,13 @@ const useOpenSearchRollingRestart = () => {
     mutationFn: () => DataNodeRollingRestart.resume(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ROLLING_RESTART_QUERY_KEY });
-      UserNotification.success('OpenSearch rolling upgrade was resumed.');
+      UserNotification.success(i18n.t('data_node_notifications.resume_rolling_upgrade_success', { ns: 'datanode' }));
     },
     onError: (error) => {
-      UserNotification.error(extractErrorMessage(error), 'Could not resume OpenSearch rolling upgrade');
+      UserNotification.error(
+        extractErrorMessage(error),
+        i18n.t('data_node_notifications.resume_rolling_upgrade_failed_title', { ns: 'datanode' }),
+      );
     },
   });
 

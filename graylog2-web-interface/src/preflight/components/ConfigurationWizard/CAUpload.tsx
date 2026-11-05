@@ -19,7 +19,9 @@ import styled from 'styled-components';
 import { useCallback } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Formik, Form, Field } from 'formik';
+import { useTranslation } from 'react-i18next';
 
+import i18n from 'i18n';
 import Icon from 'components/common/Icon';
 import { fetchMultiPartFormData } from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
@@ -80,11 +82,11 @@ const validate = (formValues: FormValues) => {
   let errors = {};
 
   if (!formValues.files?.length) {
-    errors = { ...errors, files: 'Please upload a file.' };
+    errors = { ...errors, files: i18n.t('ca_upload.validation_missing_file', { ns: 'preflight' }) };
   }
 
   if (formValues.files?.length > 1) {
-    errors = { ...errors, files: 'Please upload only a single file.' };
+    errors = { ...errors, files: i18n.t('ca_upload.validation_multiple_files', { ns: 'preflight' }) };
   }
 
   return errors;
@@ -95,21 +97,22 @@ const Explanation = styled.p`
 `;
 
 const CAUpload = () => {
+  const { t } = useTranslation('preflight');
   const queryClient = useQueryClient();
   const onRejectUpload = useCallback(() => {
-    UserNotification.error('CA upload failed');
-  }, []);
+    UserNotification.error(t('ca_upload.rejected'));
+  }, [t]);
 
   const { mutateAsync: onProcessUpload, isPending: isLoading } = useMutation({
     mutationFn: submitUpload,
 
     onSuccess: () => {
-      UserNotification.success('CA uploaded successfully');
+      UserNotification.success(t('ca_upload.success'));
       queryClient.invalidateQueries({ queryKey: DATA_NODES_CA_QUERY_KEY });
     },
 
     onError: (error) => {
-      UserNotification.error(`CA upload failed with error: ${error}`);
+      UserNotification.error(t('ca_upload.error', { error: String(error) }));
     },
   });
 
@@ -122,16 +125,12 @@ const CAUpload = () => {
     <Formik<FormValues> initialValues={{}} onSubmit={onSubmit} validate={validate}>
       {({ isSubmitting, isValid }) => (
         <Form>
-          <Explanation>
-            Here you can upload your existing CA. You need to upload a single file containing both private key
-            (encrypted or unencrypted), the CA certificate as well as any intermediate certificates. The file can be in
-            PEM or in PKCS#12 format. If your private key is encrypted, you also need to supply its password.
-          </Explanation>
+          <Explanation>{t('ca_upload.explanation')}</Explanation>
           <Field name="files">
             {({ field: { name, onChange, value }, meta: { error } }) => (
               <>
                 <Input.Label required htmlFor="ca-dropzone">
-                  Certificate Authority
+                  {t('ca_upload.certificate_authority')}
                 </Input.Label>
                 <CADropzone
                   onDrop={(files) => onChange({ target: { name, value: files } })}
@@ -148,7 +147,7 @@ const CAUpload = () => {
                     <Dropzone.Idle>
                       <Icon name="draft" type="regular" size="2x" />
                     </Dropzone.Idle>
-                    <div>Drag CA here or click to select file</div>
+                    <div>{t('ca_upload.drop_hint')}</div>
                   </DropzoneInner>
                 </CADropzone>
                 <Files>
@@ -172,10 +171,15 @@ const CAUpload = () => {
             )}
           </Field>
 
-          <FormikInput placeholder="Password" name="password" type="password" label="Password" />
+          <FormikInput
+            placeholder={t('ca_upload.password')}
+            name="password"
+            type="password"
+            label={t('ca_upload.password')}
+          />
           <UnsecureConnectionAlert renderIfSecure={<Space h="md" />} />
           <Button disabled={!isValid} type="submit" bsStyle="info">
-            {isSubmitting ? 'Uploading CA...' : 'Upload CA'}
+            {isSubmitting ? t('ca_upload.uploading') : t('ca_upload.upload')}
           </Button>
         </Form>
       )}

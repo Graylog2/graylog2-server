@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Col, Row } from 'components/bootstrap';
 import { Pagination, PageSizeSelect, NoSearchResult, NoEntitiesExist } from 'components/common';
@@ -50,6 +51,7 @@ const ContentPacksList = ({
   onDeletePack = () => {},
   onInstall = () => {},
 }: Props) => {
+  const { t } = useTranslation('content_packs');
   const [filteredContentPacks, setFilteredContentPacks] = useState(contentPacks);
   const [paginationOption, setPaginationOption] = useState(DEFAULT_PAGINATION);
 
@@ -98,9 +100,9 @@ const ContentPacksList = ({
 
   const noContentMessage =
     contentPacks.length <= 0 ? (
-      <NoEntitiesExist>No content packs found. Please create or upload one</NoEntitiesExist>
+      <NoEntitiesExist>{t('list.none_found')}</NoEntitiesExist>
     ) : (
-      <NoSearchResult>No matching content packs have been found</NoSearchResult>
+      <NoSearchResult>{t('list.no_match')}</NoSearchResult>
     );
 
   const content =
@@ -119,7 +121,7 @@ const ContentPacksList = ({
         <Col md={5}>
           <TypeAheadDataFilter
             id="content-packs-filter"
-            label="Filter"
+            label={t('common:actions.filter')}
             data={contentPacks}
             onDataFiltered={filterContentPacks}
             searchInKeys={['name', 'summary']}

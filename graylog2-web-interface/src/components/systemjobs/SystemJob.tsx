@@ -17,6 +17,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 import { ClusterJobs, SystemJobs } from '@graylog/server-api';
 
@@ -25,6 +26,7 @@ import { Button, Badge } from 'components/bootstrap';
 import type { BadgeColor } from 'components/bootstrap/Badge';
 import UserNotification from 'util/UserNotification';
 import { SYSTEM_JOBS_QUERY_KEY } from 'components/systemjobs/useSystemJobs';
+import translateApiError from 'util/translateApiError';
 
 enum JobStatus {
   Cancelled = 'cancelled',
@@ -80,6 +82,7 @@ type SystemJobProps = {
 };
 
 const SystemJob = ({ job }: SystemJobProps) => {
+  const { t } = useTranslation('system');
   const queryClient = useQueryClient();
   const jobIsOver =
     job.job_status === JobStatus.Complete ||
@@ -96,7 +99,7 @@ const SystemJob = ({ job }: SystemJobProps) => {
         queryClient.invalidateQueries({ queryKey: SYSTEM_JOBS_QUERY_KEY });
       })
       .catch((error) => {
-        UserNotification.error(error.responseMessage, 'Unable to acknowledge the job');
+        UserNotification.error(translateApiError(error) ?? error.responseMessage, t('system_job.acknowledge_failed'));
       });
   };
 
@@ -104,13 +107,13 @@ const SystemJob = ({ job }: SystemJobProps) => {
     e.preventDefault();
 
     // eslint-disable-next-line no-alert
-    if (window.confirm(`Are you sure you want to cancel system job "${job.info}"?`)) {
+    if (window.confirm(t('system_job.cancel_confirm', { info: job.info }))) {
       ClusterJobs.cancelJob(job.id)
         .then(() => {
           queryClient.invalidateQueries({ queryKey: SYSTEM_JOBS_QUERY_KEY });
         })
         .catch((error) => {
-          UserNotification.error(error.responseMessage, 'Unable to cancel the job');
+          UserNotification.error(translateApiError(error) ?? error.responseMessage, t('system_job.cancel_failed'));
         });
     }
   };
@@ -122,15 +125,15 @@ const SystemJob = ({ job }: SystemJobProps) => {
         <span data-toggle="tooltip" title={job.name}>
           {job.info}
         </span>{' '}
-        - on <LinkToNode nodeId={job.node_id} /> <RelativeTime dateTime={job.started_at} />{' '}
-        <span data-toggle="tooltip" title={`runtime: ${job.execution_duration}`}>
+        {t('system_job.on_node')} <LinkToNode nodeId={job.node_id} /> <RelativeTime dateTime={job.started_at} />{' '}
+        <span data-toggle="tooltip" title={t('system_job.runtime', { duration: job.execution_duration })}>
           <Badge color={BADGE_COLOR_BY_STATUS[mappedJobStatus] ?? 'gray'} variant="light" dot style={{ marginLeft: 4 }}>
             {mappedJobStatus}
           </Badge>
         </span>
         {!jobIsOver && job.is_cancelable ? (
           <Button type="button" bsSize="xs" bsStyle="primary" className="pull-right" onClick={_onCancel()}>
-            Cancel
+            {t('system_job.cancel')}
           </Button>
         ) : (
           <AcknowledgeButton
@@ -139,7 +142,7 @@ const SystemJob = ({ job }: SystemJobProps) => {
             onClick={_onAcknowledge()}
             bsSize="xs"
             className="pull-right"
-            title="Acknowledge">
+            title={t('system_job.acknowledge')}>
             <Icon name="close" />
           </AcknowledgeButton>
         )}

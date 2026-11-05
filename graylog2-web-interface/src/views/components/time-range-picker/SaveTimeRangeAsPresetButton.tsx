@@ -15,11 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import isEqual from 'lodash/isEqual';
 import styled from 'styled-components';
 import { useFormikContext, Formik, Form } from 'formik';
 
+import i18n from 'i18n';
 import { Button } from 'components/bootstrap';
 import Popover from 'components/common/Popover';
 import { Icon, ModalSubmit, FormikInput, Link } from 'components/common';
@@ -55,9 +57,16 @@ const isTimerangeEqual = (firstTimerange: TimeRange, secondTimerange: TimeRange)
   return isEqual(firstTimerange, secondTimerange);
 };
 
+// `Trans` provides the link text as children.
+const ConfigurationsLink = ({ children = undefined }: React.PropsWithChildren) => (
+  <Link to={Routes.SYSTEM.CONFIGURATIONS} target="_blank">
+    {children}
+  </Link>
+);
+
 const validate = ({ description }: FormValues) => {
   if (!description) {
-    return { description: 'Description is required' };
+    return { description: i18n.t('time_range.preset_description_required', { ns: 'search' }) };
   }
 
   return {};
@@ -70,6 +79,7 @@ type Props = React.PropsWithChildren<{
 }>;
 
 const TimeRangeAddToQuickListForm = ({ children = undefined, addTimerange, toggleModal, show }: Props) => {
+  const { t } = useTranslation('search');
   const { userTimezone } = useUserDateTime();
   const { config } = useSearchConfiguration();
   const {
@@ -97,7 +107,10 @@ const TimeRangeAddToQuickListForm = ({ children = undefined, addTimerange, toggl
   return (
     <Popover position="left" withArrow opened={show} withinPortal={false}>
       <Popover.Target>{children}</Popover.Target>
-      <Popover.Dropdown title="Save as preset" id="time-range-preset-popover" data-testid="time-range-preset-popover">
+      <Popover.Dropdown
+        title={t('time_range.save_as_preset')}
+        id="time-range-preset-popover"
+        data-testid="time-range-preset-popover">
         <Formik<FormValues> onSubmit={onSubmit} initialValues={{ description: '' }} validate={validate}>
           {({ isValid, submitForm }) => (
             <Form>
@@ -105,17 +118,18 @@ const TimeRangeAddToQuickListForm = ({ children = undefined, addTimerange, toggl
                 type="text"
                 name="description"
                 id="time-range-preset-description"
-                placeholder="Add description..."
-                aria-label="Time range description"
+                placeholder={t('time_range.preset_description_placeholder')}
+                aria-label={t('time_range.preset_description_label')}
                 formGroupClassName=""
               />
               {!!equalTimerange && (
                 <p>
-                  <Icon name="warning" />
-                  You already have similar time range in{' '}
-                  <Link to={Routes.SYSTEM.CONFIGURATIONS} target="_blank">
-                    Range configuration
-                  </Link>
+                  <Icon name="warning" />{' '}
+                  <Trans
+                    t={t}
+                    i18nKey="time_range.preset_similar"
+                    components={{ configurationsLink: <ConfigurationsLink /> }}
+                  />
                   <br />
                   <i>({equalTimerange.description})</i>
                 </p>
@@ -124,7 +138,7 @@ const TimeRangeAddToQuickListForm = ({ children = undefined, addTimerange, toggl
                 disabledSubmit={!isValid}
                 submitButtonType="button"
                 onSubmit={submitForm}
-                submitButtonText="Save preset"
+                submitButtonText={t('time_range.save_preset')}
                 isAsyncSubmit={false}
                 displayCancel
                 onCancel={toggleModal}
@@ -139,6 +153,7 @@ const TimeRangeAddToQuickListForm = ({ children = undefined, addTimerange, toggl
 };
 
 const SaveTimeRangeAsPresetButton = () => {
+  const { t } = useTranslation('search');
   const { userTimezone } = useUserDateTime();
   const {
     values: { timeRangeTabs, activeTab },
@@ -195,11 +210,11 @@ const SaveTimeRangeAsPresetButton = () => {
     <TimeRangeAddToQuickListForm show={showForm} addTimerange={addTimerange} toggleModal={toggleModal}>
       <Button
         disabled={!isValidTimeRange}
-        title="Save current time range as preset"
+        title={t('time_range.save_current_as_preset')}
         ref={formTarget}
         bsSize="small"
         onClick={toggleModal}>
-        Save as preset
+        {t('time_range.save_as_preset')}
       </Button>
     </TimeRangeAddToQuickListForm>
   );

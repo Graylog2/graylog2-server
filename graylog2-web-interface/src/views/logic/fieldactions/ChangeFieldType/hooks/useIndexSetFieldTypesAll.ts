@@ -18,6 +18,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { SystemIndexSetsTypes } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import type { IndexSetFieldTypeJson } from 'components/indices/IndexSetFieldTypes/types';
 import { defaultOnError } from 'util/conditional/onError';
 
@@ -56,8 +57,8 @@ const useIndexSetFieldTypesAll = (
     queryFn: () =>
       defaultOnError(
         fetchIndexSetFieldTypesAll(indexSetId),
-        'Loading index field types failed with status',
-        'Could not load index field types',
+        i18n.t('change_field_type.load_index_field_types_failed', { ns: 'search' }),
+        i18n.t('change_field_type.could_not_load_index_field_types', { ns: 'search' }),
       ),
 
     placeholderData: keepPreviousData,

@@ -1,0 +1,14 @@
+{
+  "title": "API-Browser",
+  "description": "Durchsuchen Sie die Graylog REST-API",
+  "search_placeholder": "Suchen Sie nach einem Endpunkt...",
+  "no_results": "Keine Endpunkte gefunden, die Ihrer Suche entsprechen.",
+  "error_loading": "Fehler beim Laden des API-Browsers.",
+  "error_fetching_endpoint": "Fehler beim Abrufen der Endpunktdetails.",
+  "endpoint_name": "Endpunkt-Name",
+  "endpoint_path": "Pfad",
+  "endpoint_method": "Methode",
+  "endpoint_description": "Beschreibung",
+  "endpoint_parameters": "Parameter",
+  "endpoint_response": "Antwort"
+}

@@ -14,9 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import i18n from 'i18n';
+
 const SidebarEventDetails = (alertId: string, definitionId: string) => ({
   id: 'alert-event-details',
-  title: 'Alert/Event Details',
+  title: i18n.t('alerts_replay.details_title', { ns: 'events' }),
   componentKey: 'replay-search-sidebar',
   props: { alertId, definitionId },
 });

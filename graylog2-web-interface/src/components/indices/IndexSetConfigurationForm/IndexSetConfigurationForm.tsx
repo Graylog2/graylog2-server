@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo, useState, useCallback } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import moment from 'moment';
 import { Formik, Form, Field } from 'formik';
 import type { FormikHelpers } from 'formik';
@@ -102,6 +103,7 @@ const IndexSetConfigurationForm = ({
   submitButtonText,
   submitLoadingText = undefined,
 }: Props) => {
+  const { t } = useTranslation('indexsets');
   const history = useHistory();
   const productName = useProductName();
   const { isPermitted } = usePermissions();
@@ -286,7 +288,7 @@ const IndexSetConfigurationForm = ({
           <ConfirmDialog
             show
             title={confirmation.title}
-            btnConfirmText="Save"
+            btnConfirmText={t('index_set_form.save')}
             onCancel={cancelConfirmation}
             onConfirm={acceptConfirmation}>
             {confirmation.message}
@@ -297,27 +299,27 @@ const IndexSetConfigurationForm = ({
             <IndexRetentionProvider>
               <Form>
                 <FlexWrapper>
-                  <Section title="Configuration Information">
+                  <Section title={t('index_set_form.configuration_information')}>
                     <FormikInput
                       type="text"
-                      label="Title"
+                      label={t('index_set_form.title_label')}
                       id="title"
                       name="title"
-                      help="Descriptive name of the index set."
+                      help={t('index_set_form.title_help')}
                       onChange={(event) => handleTitleChange(event, setFieldValue)}
                       required
                     />
                     <FormikInput
                       type="text"
                       id="description"
-                      label="Description"
+                      label={t('index_set_form.description_label')}
                       name="description"
-                      help="Add a description of this index set."
+                      help={t('index_set_form.description_help')}
                       required
                     />
                   </Section>
                   {detailsSectionRenderable() && (
-                    <Section title="Details">
+                    <Section title={t('index_set_form.details')}>
                       {create && (
                         <IndexSetReadOnlyConfiguration
                           hiddenFields={hiddenFields}
@@ -333,33 +335,29 @@ const IndexSetConfigurationForm = ({
                           <FormikInput
                             type="number"
                             id="shards"
-                            label="Index Shards"
+                            label={t('index_set_form.shards_label')}
                             name="shards"
-                            help="Number of search cluster Shards used per index in this Index Set. Increasing the Index Shards improves the search cluster write speed of data stored to this Index Set by distributing the active write Index over multiple search nodes. Increasing the Index Shards can degrade search performance and increases the memory footprint of the Index. This value should not be set higher than the number of search nodes."
+                            help={t('index_set_form.shards_help')}
                             required
                             disabled={immutableFields?.includes('shards') && !ignoreFieldRestrictions}
                           />
                           <FormikInput
                             type="number"
                             id="replicas"
-                            label="Index Replica"
+                            label={t('index_set_form.replicas_label')}
                             name="replicas"
-                            help="Number of search cluster Replica Shards used per Index in this Index Set. Adding Replica Shards improves search performance during parallel reads of the index, such as occurs on dashboards, and is a component of HA and backup strategy. Each Replica Shard set multiplies the storage requirement and memory footprint of the index. This value should not be set higher than the number of search nodes, and typically not higher than 1.                                   "
+                            help={t('index_set_form.replicas_help')}
                             required
                             disabled={immutableFields?.includes('replicas') && !ignoreFieldRestrictions}
                           />
                           <FormikInput
                             type="number"
                             id="max-number-segments"
-                            label="Maximum Number of Segments"
+                            label={t('index_set_form.max_segments_label')}
                             name="index_optimization_max_num_segments"
                             minLength={1}
                             help={
-                              <>
-                                <em>Advanced Option.</em> Maximum number of segments per Search Cluster Index after
-                                optimization (force merge). Setting higher values decreases the compression ratio of
-                                Index Optimization.
-                              </>
+                              <Trans t={t} i18nKey="index_set_form.max_segments_help" components={{ em: <em /> }} />
                             }
                             required
                             disabled={
@@ -370,16 +368,14 @@ const IndexSetConfigurationForm = ({
                           <FormikInput
                             type="checkbox"
                             id="index-optimization-disabled"
-                            label="Disable Index Optimization after Rotation"
+                            label={t('index_set_form.disable_optimization_label')}
                             name="index_optimization_disabled"
                             help={
-                              <>
-                                <em>Advanced Option.</em> Index Optimization is a compression process that occurs after
-                                an active Index has been rotated and reduces the size of an Index on disk. It manifests
-                                as a CPU intensive maintenance task performed by the search cluster after Index
-                                rotation. Compressing Indexes improves search performance and decreases the storage
-                                footprint of Index Sets.
-                              </>
+                              <Trans
+                                t={t}
+                                i18nKey="index_set_form.disable_optimization_help"
+                                components={{ em: <em /> }}
+                              />
                             }
                             disabled={
                               immutableFields?.includes('index_optimization_disabled') && !ignoreFieldRestrictions
@@ -388,14 +384,14 @@ const IndexSetConfigurationForm = ({
                           <Field name="field_type_refresh_interval">
                             {({ field: { name, value, onChange } }) => (
                               <TimeUnitInput
-                                label="Field Type Refresh Interval"
+                                label={t('index_set_form.field_type_refresh_label')}
                                 help={
-                                  <>
-                                    <em>Advanced Option.</em> How often the Field Type Information for the active write
-                                    Index will be updated. Setting this value higher can marginally reduce search
-                                    cluster overhead and improve performance, but will result in new data messages
-                                    longer to be searchable in {productName}.
-                                  </>
+                                  <Trans
+                                    t={t}
+                                    i18nKey="index_set_form.field_type_refresh_help"
+                                    values={{ productName }}
+                                    components={{ em: <em /> }}
+                                  />
                                 }
                                 value={moment.duration(value, 'milliseconds').as(fieldTypeRefreshIntervalUnit)}
                                 unit={fieldTypeRefreshIntervalUnit.toUpperCase()}
@@ -429,7 +425,7 @@ const IndexSetConfigurationForm = ({
                     setSelectedRetentionSegment={setSelectedRetentionSegment}
                   />
                   {isIndexFieldTypeChangeAllowed(indexSet) && (
-                    <Section title="Field Type Profile">
+                    <Section title={t('index_set_form.field_type_profile')}>
                       <Field name="field_type_profile">
                         {({ field: { name, value } }) => (
                           <IndexSetProfileConfiguration
@@ -443,11 +439,8 @@ const IndexSetConfigurationForm = ({
                       </Field>
                     </Section>
                   )}
-                  <Section title="Important Note">
-                    <Alert bsStyle="info">
-                      These changes do not apply to any existing indices. They only apply to newly created indices. To
-                      apply this to the current index set immediately, rotate the index.
-                    </Alert>
+                  <Section title={t('index_set_form.important_note')}>
+                    <Alert bsStyle="info">{t('index_set_form.important_note_text')}</Alert>
                   </Section>
                   <SubmitWrapper>
                     <FormSubmit

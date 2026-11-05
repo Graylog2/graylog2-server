@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useEffect, useImperativeHandle, useState } from 'react';
 import { useFormikContext } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { Input } from 'components/bootstrap';
 import { FormikFormGroup, TimeUnitInput } from 'components/common';
@@ -28,6 +29,7 @@ type Props = {
 };
 
 const CaffeineCacheFieldSet = ({ config }: Props, ref: any) => {
+  const { t } = useTranslation('lookup_tables');
   const { values, setValues, errors }: { values: Partial<LookupTableCache>; setValues: any; errors: any } =
     useFormikContext();
   const [stateConfig, setStateConfig] = useState<LookupTableCacheConfig>({ ...config });
@@ -38,8 +40,8 @@ const CaffeineCacheFieldSet = ({ config }: Props, ref: any) => {
   const validateConfig = () => {
     const configErrors: any = {};
 
-    if (!values.config.max_size) configErrors.max_size = 'Required';
-    if (values.config.max_size < 0) configErrors.max_size = 'Must be 0 or a positive number';
+    if (!values.config.max_size) configErrors.max_size = t('caffeine_fields.required');
+    if (values.config.max_size < 0) configErrors.max_size = t('caffeine_fields.must_be_positive');
 
     return configErrors;
   };
@@ -74,15 +76,15 @@ const CaffeineCacheFieldSet = ({ config }: Props, ref: any) => {
       <FormikFormGroup
         type="text"
         name="config.max_size"
-        label="* Maximum entries"
+        label={t('caffeine_fields.max_size_label')}
         required
-        help={errors.config?.max_size ? null : 'The limit of the number of entries the cache keeps in memory.'}
+        help={errors.config?.max_size ? null : t('caffeine_fields.max_size_help')}
         labelClassName="col-sm-3"
         wrapperClassName="col-sm-9"
       />
       <TimeUnitInput
-        label="Expire after access"
-        help="If enabled, entries are removed from the cache after the specified time from when they were last used."
+        label={t('caffeine_doc.expire_access_title')}
+        help={t('caffeine_fields.expire_access_help')}
         update={handleUpdate('expire_after_access')}
         name="config.expire_after_access"
         unitName="config.expire_after_access_unit"
@@ -93,8 +95,8 @@ const CaffeineCacheFieldSet = ({ config }: Props, ref: any) => {
         wrapperClassName="col-sm-9"
       />
       <TimeUnitInput
-        label="Expire after write"
-        help="If enabled, entries are removed from the cache after the specified time from when they were first used."
+        label={t('caffeine_doc.expire_write_title')}
+        help={t('caffeine_fields.expire_write_help')}
         update={handleUpdate('expire_after_write')}
         name="config.expire_after_write"
         unitName="config.expire_after_write_unit"
@@ -108,15 +110,15 @@ const CaffeineCacheFieldSet = ({ config }: Props, ref: any) => {
         type="checkbox"
         id="ignore_null"
         name="ignore_null"
-        label="Ignore empty results"
+        label={t('caffeine_fields.ignore_null_label')}
         checked={stateConfig.ignore_null}
         onChange={handleIgnoreNullChange}
-        help="When enabled, empty lookup results will be ignored and not cached."
+        help={t('caffeine_fields.ignore_null_help')}
         wrapperClassName="col-md-offset-3 col-md-9"
       />
       <TimeUnitInput
-        label="TTL for empty results"
-        help="Empty results are removed from the cache after the specified time."
+        label={t('caffeine_fields.ttl_empty_label')}
+        help={t('caffeine_fields.ttl_empty_help')}
         update={handleUpdate('ttl_empty')}
         name="config.ttl_empty"
         unitName="config.ttl_empty_unit"

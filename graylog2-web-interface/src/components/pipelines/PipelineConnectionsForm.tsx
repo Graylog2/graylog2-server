@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Link, SelectableList } from 'components/common';
@@ -42,6 +43,7 @@ const formatStreams = (streams: Stream[]): FormattedStream[] =>
   streams.map((s) => ({ value: s.id, label: s.title })).sort((s1, s2) => naturalSort(s1.label, s2.label));
 
 const PipelineConnectionsForm = ({ pipeline, connections, streams, save, disableEdit }: Props) => {
+  const { t } = useTranslation('pipelines');
   const { isPermitted } = usePermissions();
   const [showModal, setShowModal] = useState<boolean>(false);
 
@@ -85,30 +87,34 @@ const PipelineConnectionsForm = ({ pipeline, connections, streams, save, disable
 
   const streamsHelp = (
     <span>
-      Select the streams you want to connect to this pipeline, or create one in the{' '}
-      <Link to={Routes.STREAMS}>Streams page</Link>.
+      <Trans t={t} i18nKey="connections_form.streams_help" components={{ streamsLink: <Link to={Routes.STREAMS} /> }} />
     </span>
   );
 
   return (
     <span>
       <Button disabled={!isPermitted('pipeline_connection:edit') || disableEdit} onClick={_openModal} bsStyle="info">
-        <span>Edit connections</span>
+        <span>{t('connections_form.edit')}</span>
       </Button>
       <BootstrapModalForm
         show={showModal}
         title={
           <span>
-            Edit connections for <em>{pipeline.title}</em>
+            <Trans
+              t={t}
+              i18nKey="connections_form.title"
+              values={{ title: pipeline.title }}
+              components={{ pipelineTitle: <em /> }}
+            />
           </span>
         }
         data-telemetry-title="Edit connections for pipeline"
         onSubmitForm={_save}
         onCancel={_closeModal}
-        submitButtonText="Update connections">
+        submitButtonText={t('connections_form.submit')}>
         <fieldset>
           <FormGroup id="streamsConnections">
-            <ControlLabel>Streams</ControlLabel>
+            <ControlLabel>{t('connections_form.streams')}</ControlLabel>
             <SelectableList
               options={formatStreams(notConnectedStreams)}
               onChange={_onStreamsChange}

@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import styled, { css } from 'styled-components';
 import { Form, Formik } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import type { UserConfigType } from 'stores/configurations/ConfigurationsStore';
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
@@ -50,6 +51,7 @@ const LabelSpan = styled.span(
 );
 
 const UserConfig = () => {
+  const { t } = useTranslation('configurations');
   const [showModal, setShowModal] = useState<boolean>(false);
   const [viewConfig, setViewConfig] = useState<UserConfigType | undefined>(undefined);
   const [formConfig, setFormConfig] = useState<UserConfigType | undefined>(undefined);
@@ -85,27 +87,25 @@ const UserConfig = () => {
   const timeoutIntervalValidator = (milliseconds: number) => milliseconds >= 1000;
   const defaultTokenTtlValidator = (milliseconds: number) => milliseconds >= 86400000;
 
-  const modalTitle = 'Update User Configuration';
-
   return (
     <div>
-      <h2>Users Configuration</h2>
-      <p>These settings can be used to set a global session timeout value.</p>
+      <h2>{t('user.title')}</h2>
+      <p>{t('user.description')}</p>
 
       {!viewConfig ? (
         <Spinner />
       ) : (
         <>
           <StyledDefList>
-            <dt>Global session timeout:</dt>
-            <dd>{viewConfig.enable_global_session_timeout ? 'Enabled' : 'Disabled'}</dd>
-            <dt>Timeout interval:</dt>
+            <dt>{t('user.global_session_timeout')}:</dt>
+            <dd>{viewConfig.enable_global_session_timeout ? t('markdown.enabled') : t('markdown.disabled')}</dd>
+            <dt>{t('user.timeout_interval')}:</dt>
             <dd>{viewConfig.enable_global_session_timeout ? viewConfig.global_session_timeout_interval : '-'}</dd>
-            <dt>Allow users to create personal access tokens:&nbsp;</dt>
-            <dd>{!viewConfig.restrict_access_token_to_admins ? 'Enabled' : 'Disabled'}</dd>
-            <dt>Allow access token for external users:&nbsp;</dt>
-            <dd>{viewConfig.allow_access_token_for_external_user ? 'Enabled' : 'Disabled'}</dd>
-            <dt>Default TTL for new tokens:</dt>
+            <dt>{t('user.allow_personal_tokens')}:&nbsp;</dt>
+            <dd>{!viewConfig.restrict_access_token_to_admins ? t('markdown.enabled') : t('markdown.disabled')}</dd>
+            <dt>{t('user.allow_external_tokens')}:&nbsp;</dt>
+            <dd>{viewConfig.allow_access_token_for_external_user ? t('markdown.enabled') : t('markdown.disabled')}</dd>
+            <dt>{t('user.default_token_ttl')}:</dt>
             <dd>{viewConfig.default_ttl_for_new_tokens ? viewConfig.default_ttl_for_new_tokens : '-'}</dd>
           </StyledDefList>
 
@@ -118,7 +118,7 @@ const UserConfig = () => {
                 onClick={() => {
                   setShowModal(true);
                 }}>
-                Edit configuration
+                {t('shared.edit_configuration')}
               </Button>
             </p>
           </IfPermitted>
@@ -128,7 +128,7 @@ const UserConfig = () => {
               {({ isSubmitting, values, setFieldValue }) => (
                 <Form>
                   <Modal.Header>
-                    <Modal.Title>{modalTitle}</Modal.Title>
+                    <Modal.Title>{t('user.update_title')}</Modal.Title>
                   </Modal.Header>
 
                   <Modal.Body>
@@ -139,9 +139,9 @@ const UserConfig = () => {
                             type="checkbox"
                             name="enable_global_session_timeout"
                             id="enable_global_session_timeout"
-                            label={<LabelSpan>Enable global session timeout</LabelSpan>}
+                            label={<LabelSpan>{t('user.enable_global_session_timeout')}</LabelSpan>}
                           />
-                          <InputDescription help="If enabled, it will be set for all the users." />
+                          <InputDescription help={t('user.enable_global_session_timeout_help')} />
                         </Col>
                         <Col sm={12}>
                           <fieldset>
@@ -149,10 +149,10 @@ const UserConfig = () => {
                               id="global_session_timeout_interval"
                               duration={values.global_session_timeout_interval}
                               update={(value) => setFieldValue('global_session_timeout_interval', value)}
-                              label="Global session timeout interval (as ISO8601 Duration)"
-                              help="Session automatically end after this amount of time, unless they are actively used. Example, for 60 seconds: PT60S, for 60 minutes: PT60M"
+                              label={t('user.session_timeout_interval_label')}
+                              help={t('user.session_timeout_interval_help')}
                               validator={timeoutIntervalValidator}
-                              errorText="invalid (min: 1 second)"
+                              errorText={t('sidecar.inactive_threshold_error')}
                               disabled={!values.enable_global_session_timeout}
                               required
                             />
@@ -163,18 +163,18 @@ const UserConfig = () => {
                             type="checkbox"
                             name="restrict_access_token_to_admins"
                             id="restrict_access_token_to_admins"
-                            label={<LabelSpan>Allow users to create personal access tokens</LabelSpan>}
+                            label={<LabelSpan>{t('user.allow_personal_tokens')}</LabelSpan>}
                           />
-                          <InputDescription help="If enabled, it will allow users to create access tokens." />
+                          <InputDescription help={t('user.allow_personal_tokens_help')} />
                         </Col>
                         <Col sm={12}>
                           <FormikInput
                             type="checkbox"
                             name="allow_access_token_for_external_user"
                             id="allow_access_token_for_external_user"
-                            label={<LabelSpan>Allow access token for external users</LabelSpan>}
+                            label={<LabelSpan>{t('user.allow_external_tokens')}</LabelSpan>}
                           />
-                          <InputDescription help="If enabled, it will allow external users to create access tokens." />
+                          <InputDescription help={t('user.allow_external_tokens_help')} />
                         </Col>
                         <Col sm={12}>
                           <fieldset>
@@ -182,10 +182,10 @@ const UserConfig = () => {
                               id="default_ttl_for_new_tokens"
                               duration={values.default_ttl_for_new_tokens}
                               update={(value) => setFieldValue('default_ttl_for_new_tokens', value)}
-                              label="Default TTL for new tokens (as ISO8601 Duration)"
-                              help="Tokens will be automatically invalidated after this amount of time. Example, for 24 hours: PT24H, for 30 days: P30D"
+                              label={t('user.default_token_ttl_label')}
+                              help={t('user.default_token_ttl_help')}
                               validator={defaultTokenTtlValidator}
-                              errorText="invalid (min: 1 day)"
+                              errorText={t('user.default_token_ttl_error')}
                               disabled={!values.default_ttl_for_new_tokens}
                               required
                             />
@@ -200,8 +200,8 @@ const UserConfig = () => {
                       onCancel={resetConfig}
                       isSubmitting={isSubmitting}
                       isAsyncSubmit
-                      submitLoadingText="Update configuration"
-                      submitButtonText="Update configuration"
+                      submitLoadingText={t('shared.update_configuration')}
+                      submitButtonText={t('shared.update_configuration')}
                     />
                   </Modal.Footer>
                 </Form>

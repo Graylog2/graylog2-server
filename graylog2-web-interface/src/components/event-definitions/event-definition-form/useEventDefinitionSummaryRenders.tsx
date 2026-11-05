@@ -16,11 +16,11 @@
  */
 import React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import moment from 'moment';
-import 'moment-duration-format';
 import type { ReactElement } from 'react';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
+import { Trans, useTranslation } from 'react-i18next';
 
+import i18n from 'i18n';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import usePluginEntities from 'hooks/usePluginEntities';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
@@ -29,9 +29,12 @@ import { Alert } from 'components/bootstrap';
 import { MarkdownPreview } from 'components/common/MarkdownEditor';
 import type User from 'logic/users/User';
 import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
+import notificationTypeTitle from 'components/event-notifications/notificationTypeTitle';
 
 import commonStyles from '../common/commonStyles.css';
 import type { EventDefinition } from '../event-definitions-types';
+import { eventDefinitionTypeTitle } from '../pluginTitles';
+import formatDuration from '../formatDuration';
 
 type EventProcedureSummaryComponentsType = {
   eventProcedureId?: string;
@@ -53,6 +56,7 @@ export function useEventProcedureSummaryComponents({
   eventProcedureId = undefined,
   remediationSteps = undefined,
 }: EventProcedureSummaryComponentsType) {
+  const { t } = useTranslation('event_definitions');
   const pluggableEventProcedureSummary = usePluginEntities('views.components.eventProcedureSummary');
   const {
     data: { valid: validSecurityLicense },
@@ -62,7 +66,7 @@ export function useEventProcedureSummaryComponents({
   let Component: ReactElement | null = null;
 
   if (validSecurityLicense) {
-    label = 'Event Procedure Summary';
+    label = t('summary_renders.event_procedure_summary');
 
     if (eventProcedureId) {
       const first = pluggableEventProcedureSummary?.[0];
@@ -71,20 +75,20 @@ export function useEventProcedureSummaryComponents({
       Component = PluggableEventProcedureSummary ? (
         <PluggableEventProcedureSummary eventProcedureId={eventProcedureId} key={first?.key} />
       ) : (
-        <p>Event Procedure Summary component is not available.</p>
+        <p>{t('summary_renders.event_procedure_summary_unavailable')}</p>
       );
     } else {
-      Component = <p>This Event does not have any Event Procedures.</p>;
+      Component = <p>{t('summary_renders.no_event_procedures')}</p>;
     }
   } else {
-    label = 'Remediation Steps';
+    label = t('summary_renders.remediation_steps');
     Component = (
       <MarkdownPreview
         show
         withFullView
         noBorder
         noBackground
-        value={remediationSteps || 'No remediation steps given'}
+        value={remediationSteps || t('summary_renders.no_remediation_steps')}
       />
     );
   }
@@ -107,13 +111,19 @@ export function renderCondition(eventDefinition: EventDefinition, definitionId: 
     })
   ) : (
     <p>
-      Condition plugin <em>{config.type}</em> does not provide a summary.
+      <Trans
+        i18n={i18n}
+        ns="event_definitions"
+        i18nKey="summary_renders.condition_plugin_no_summary"
+        values={{ type: config.type }}
+        components={{ em: <em /> }}
+      />
     </p>
   );
 
   return (
     <>
-      <h3 className={commonStyles.title}>{conditionPlugin?.displayName || config.type}</h3>
+      <h3 className={commonStyles.title}>{eventDefinitionTypeTitle(conditionPlugin) || config.type}</h3>
       {component}
     </>
   );
@@ -126,7 +136,9 @@ export function renderField(
   currentUser: User,
 ) {
   if (!config.providers || config.providers.length === 0) {
-    return <span key={fieldName}>No field value provider configured.</span>;
+    return (
+      <span key={fieldName}>{i18n.t('summary_renders.no_field_value_provider', { ns: 'event_definitions' })}</span>
+    );
   }
 
   const provider = config.providers[0];
@@ -142,7 +154,13 @@ export function renderField(
     })
   ) : (
     <p key={fieldName}>
-      Provider plugin <em>{provider.type}</em> does not provide a summary.
+      <Trans
+        i18n={i18n}
+        ns="event_definitions"
+        i18nKey="summary_renders.provider_plugin_no_summary"
+        values={{ type: provider.type }}
+        components={{ em: <em /> }}
+      />
     </p>
   );
 }
@@ -156,8 +174,8 @@ function renderFieldList(
   return (
     <>
       <dl>
-        <dt>Keys</dt>
-        <dd>{keys.length > 0 ? keys.join(', ') : 'No Keys configured for Events based on this Definition.'}</dd>
+        <dt>{i18n.t('summary_renders.keys', { ns: 'event_definitions' })}</dt>
+        <dd>{keys.length > 0 ? keys.join(', ') : i18n.t('summary_renders.no_keys', { ns: 'event_definitions' })}</dd>
       </dl>
       {fieldNames.sort(naturalSort).map((fieldName) => renderField(fieldName, fields[fieldName], keys, currentUser))}
     </>
@@ -173,9 +191,9 @@ export function renderFields(
 
   return (
     <>
-      <h3 className={commonStyles.title}>Fields</h3>
+      <h3 className={commonStyles.title}>{i18n.t('summary_renders.fields', { ns: 'event_definitions' })}</h3>
       {fieldNames.length === 0 ? (
-        <p>No Fields configured for Events based on this Definition.</p>
+        <p>{i18n.t('summary_renders.no_fields', { ns: 'event_definitions' })}</p>
       ) : (
         renderFieldList(fieldNames, fields, keys, currentUser)
       )}
@@ -196,19 +214,31 @@ function renderNotification(
 
     content = notificationPlugin.summaryComponent ? (
       React.createElement(notificationPlugin.summaryComponent, {
-        type: notificationPlugin.displayName,
+        type: notificationTypeTitle(notificationPlugin),
         notification,
         definitionNotification,
       })
     ) : (
       <p>
-        Notification plugin <em>{notification.config.type}</em> does not provide a summary.
+        <Trans
+          i18n={i18n}
+          ns="event_definitions"
+          i18nKey="summary_renders.notification_plugin_no_summary"
+          values={{ type: notification.config.type }}
+          components={{ em: <em /> }}
+        />
       </p>
     );
   } else {
     content = (
       <p>
-        Could not find information for Notification <em>{definitionNotification.notification_id}</em>.
+        <Trans
+          i18n={i18n}
+          ns="event_definitions"
+          i18nKey="summary_renders.notification_not_found"
+          values={{ id: definitionNotification.notification_id }}
+          components={{ em: <em /> }}
+        />
       </p>
     );
   }
@@ -217,21 +247,19 @@ function renderNotification(
 }
 
 function renderNotificationSettings(notificationSettings: { grace_period_ms: number; backlog_size: number | null }) {
-  const formattedDuration = moment
-    .duration(notificationSettings.grace_period_ms)
-    .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all' });
+  const formattedDuration = formatDuration(notificationSettings.grace_period_ms);
 
   const formattedGracePeriod = notificationSettings.grace_period_ms
-    ? `Grace Period is set to ${formattedDuration}`
-    : 'Grace Period is disabled';
+    ? i18n.t('summary_renders.grace_period_set', { ns: 'event_definitions', duration: formattedDuration })
+    : i18n.t('summary_renders.grace_period_disabled', { ns: 'event_definitions' });
 
   const formattedBacklogSize = notificationSettings.backlog_size
-    ? `Notifications will include ${notificationSettings.backlog_size} messages`
-    : 'Notifications will not include any messages.';
+    ? i18n.t('summary_renders.backlog_included', { ns: 'event_definitions', count: notificationSettings.backlog_size })
+    : i18n.t('summary_renders.backlog_none', { ns: 'event_definitions' });
 
   return (
     <>
-      <h4>Settings</h4>
+      <h4>{i18n.t('summary_renders.settings', { ns: 'event_definitions' })}</h4>
       <dl>
         <dd>{formattedGracePeriod}</dd>
         <dd>{formattedBacklogSize}</dd>
@@ -257,7 +285,7 @@ export function renderNotifications(
   const warning =
     notificationsWithMissingPermissions.length > 0 ? (
       <Alert bsStyle="warning">
-        Missing Notifications Permissions for:
+        {i18n.t('summary_renders.missing_notification_permissions', { ns: 'event_definitions' })}
         <br />
         {notificationsWithMissingPermissions.map((n) => n.notification_id).join(', ')}
       </Alert>
@@ -265,10 +293,10 @@ export function renderNotifications(
 
   return (
     <>
-      <h3 className={commonStyles.title}>Notifications</h3>
+      <h3 className={commonStyles.title}>{i18n.t('summary_renders.notifications', { ns: 'event_definitions' })}</h3>
       <span>{warning}</span>
       {effectiveDefinitionNotifications.length === 0 && notificationsWithMissingPermissions.length <= 0 ? (
-        <p>This Event is not configured to trigger any Notifications.</p>
+        <p>{i18n.t('summary_renders.no_notifications', { ns: 'event_definitions' })}</p>
       ) : (
         <>
           {renderNotificationSettings(notificationSettings)}

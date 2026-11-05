@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import Routes from 'routing/Routes';
 import NumberUtils from 'util/NumberUtils';
@@ -50,6 +51,7 @@ type Props = {
 };
 
 const BufferUsage = ({ nodeId, bufferType, title }: Props) => {
+  const { t } = useTranslation('system');
   const prefix = _metricPrefix(bufferType);
   const metricNames = useMemo(() => [`${prefix}.usage`, `${prefix}.size`], [prefix]);
   const { data: nodeMetrics } = useNodeMetrics(nodeId, metricNames);
@@ -70,7 +72,7 @@ const BufferUsage = ({ nodeId, bufferType, title }: Props) => {
     <div>
       <LinkContainer to={Routes.filtered_metrics(nodeId, _metricFilter(bufferType))}>
         <Button bsSize="xsmall" className="pull-right">
-          Metrics
+          {t('buffer_usage.metrics')}
         </Button>
       </LinkContainer>
       <h3>{title}</h3>
@@ -86,7 +88,12 @@ const BufferUsage = ({ nodeId, bufferType, title }: Props) => {
         />
       </NodeBufferUsage>
       <span>
-        <strong>{usage} messages</strong> in {title.toLowerCase()}, {percentLabel} utilized.
+        <Trans
+          t={t}
+          i18nKey="buffer_usage.utilization"
+          values={{ usage, title: title.toLowerCase(), percentage: percentLabel }}
+          components={{ strong: <strong /> }}
+        />
       </span>
     </div>
   );

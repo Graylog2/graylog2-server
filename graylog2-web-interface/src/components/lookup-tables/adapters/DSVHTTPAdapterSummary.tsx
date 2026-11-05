@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 type DSVHTTPAdapterConfig = {
   url: string;
@@ -35,36 +36,37 @@ type Props = {
 };
 
 const DSVHTTPAdapterSummary = ({ dataAdapter }: Props) => {
+  const { t } = useTranslation('lookup_tables');
   const { config } = dataAdapter;
 
   return (
     <dl>
-      <dt>File URL</dt>
+      <dt>{t('dsv_adapter.file_url')}</dt>
       <dd>{config.url}</dd>
-      <dt>Separator</dt>
+      <dt>{t('adapter_fields.separator')}</dt>
       <dd>
         <code>{config.separator}</code>
       </dd>
-      <dt>Line Separator</dt>
+      <dt>{t('adapter_fields.line_separator')}</dt>
       <dd>
         <code>{config.line_separator}</code>
       </dd>
-      <dt>Quote character</dt>
+      <dt>{t('adapter_fields.quote_character')}</dt>
       <dd>
         <code>{config.quotechar}</code>
       </dd>
-      <dt>Ignore lines starting with</dt>
+      <dt>{t('dsv_adapter.ignore_lines_starting_with')}</dt>
       <dd>
         <code>{config.ignorechar}</code>
       </dd>
-      <dt>Key column</dt>
+      <dt>{t('adapter_fields.key_column')}</dt>
       <dd>{config.key_column}</dd>
-      <dt>Value column</dt>
+      <dt>{t('adapter_fields.value_column')}</dt>
       <dd>{config.value_column}</dd>
-      <dt>Check interval</dt>
-      <dd>{config.check_interval} seconds</dd>
-      <dt>Case-insensitive lookup</dt>
-      <dd>{config.case_insensitive_lookup ? 'yes' : 'no'}</dd>
+      <dt>{t('adapter_fields.check_interval')}</dt>
+      <dd>{t('adapter_fields.seconds', { count: config.check_interval })}</dd>
+      <dt>{t('adapter_fields.case_insensitive_summary')}</dt>
+      <dd>{config.case_insensitive_lookup ? t('shared.yes') : t('shared.no')}</dd>
     </dl>
   );
 };

@@ -93,7 +93,7 @@ describe('InputStateControl', () => {
 
     renderSUT(setupStates);
 
-    expect(await screen.findByRole('button', { name: /set-up input/i })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: /set up input/i })).toBeInTheDocument();
   });
 
   it('falls back to start when feature is disabled and input state is not loaded yet', async () => {

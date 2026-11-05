@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button, Col, ControlLabel, FormControl, FormGroup, Row, Input } from 'components/bootstrap';
 import { ConfirmLeaveDialog, SourceCodeEditor, FormSubmit } from 'components/common';
@@ -31,6 +32,7 @@ type Props = {
 };
 
 const RuleForm = ({ create = false, isManaged = false }: Props) => {
+  const { t } = useTranslation('pipelines');
   const {
     description,
     handleDescription,
@@ -48,7 +50,7 @@ const RuleForm = ({ create = false, isManaged = false }: Props) => {
   const handleError = (error: { responseMessage: string }) => {
     if (error?.responseMessage?.includes('duplicate key error')) {
       const duplicatedTitle = error.responseMessage.match(/title: "(.*)"/i)[1];
-      setErrorMessage(`Rule title "${duplicatedTitle}" already exists!`);
+      setErrorMessage(t('rule_form.duplicate_title', { title: duplicatedTitle }));
     }
   };
 
@@ -88,33 +90,29 @@ const RuleForm = ({ create = false, isManaged = false }: Props) => {
     <form onSubmit={handleSubmit}>
       <fieldset>
         <FormGroup id="ruleTitleInformation">
-          <ControlLabel>Title</ControlLabel>
-          <FormControl.Static>
-            You can set the rule title in the rule source. See the quick reference for more information.
-          </FormControl.Static>
+          <ControlLabel>{t('rule_form.title')}</ControlLabel>
+          <FormControl.Static>{t('rule_form.title_help')}</FormControl.Static>
         </FormGroup>
 
-        {isDirty && (
-          <ConfirmLeaveDialog question="Do you really want to abandon this page and lose your changes? This action cannot be undone." />
-        )}
+        {isDirty && <ConfirmLeaveDialog question={t('rule_form.leave_question')} />}
 
         <Input
           type="textarea"
           id="description"
-          label="Description"
+          label={t('rule_form.description')}
           value={description}
           onChange={handleDescriptionChange}
           autoFocus
           rows={1}
-          help="Rule description (optional)."
+          help={t('rule_form.description_help')}
         />
 
         <PipelinesUsingRule create={create} />
 
         <Input
           id="rule-source-editor"
-          label="Rule source"
-          help="Rule source, see quick reference for more information."
+          label={t('rule_form.source')}
+          help={t('rule_form.source_help')}
           error={errorMessage}>
           <SourceCodeEditor
             id={`source${create ? '-create' : '-edit'}`}
@@ -132,12 +130,12 @@ const RuleForm = ({ create = false, isManaged = false }: Props) => {
       <Row>
         <Col md={12}>
           <FormSubmit
-            submitButtonText={create ? 'Create rule' : 'Update rule & close'}
+            submitButtonText={create ? t('rule_form.create_submit') : t('rule_form.update_close_submit')}
             disabledSubmit={isManaged}
             centerCol={
               !create && (
                 <Button type="button" bsStyle="info" disabled={isManaged} onClick={handleApply}>
-                  Update rule
+                  {t('rule_form.update')}
                 </Button>
               )
             }

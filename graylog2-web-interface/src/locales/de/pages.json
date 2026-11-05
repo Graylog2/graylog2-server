@@ -1,0 +1,64 @@
+{
+  "api_browser": {
+    "download_label": "OpenAPI-Spezifikation herunterladen:",
+    "fetch_failed": "Die API-Spezifikation konnte nicht abgerufen werden!",
+    "loading": "API-Spezifikation wird geladen ...",
+    "loading_title": "API-Browser - API-Spezifikation wird geladen",
+    "select_format": "Format auswählen",
+    "title": "API-Browser"
+  },
+  "configlet": {
+    "error": "Etwas ist schiefgelaufen:"
+  },
+  "errors": {
+    "copy_error_details": "Fehlerdetails in die Zwischenablage kopieren"
+  },
+  "keyboard_shortcuts": {
+    "description": "Eine Liste aller verfügbaren Tastenkombinationen",
+    "title": "Tastenkombinationen"
+  },
+  "loading": {
+    "text": "Wird geladen, bitte warten...",
+    "title": "Wird geladen..."
+  },
+  "not_found": {
+    "back_hint": "Sie können zur <mainPageLink>Startseite</mainPageLink> zurückkehren und von dort aus navigieren.",
+    "description": "Die gesuchte Seite existiert (nicht mehr).",
+    "title": "Seite nicht gefunden"
+  },
+  "runtime_error": {
+    "description_hint": "Sie können über die Navigation andere Bereiche des Produkts erreichen, die Seite neu laden oder einen Fehlerbericht senden.",
+    "description_intro": "Die aufgerufene Seite enthält anscheinend einen Fehler.",
+    "error_label": "Fehler:",
+    "show_less": "Weniger anzeigen",
+    "show_more": "Mehr anzeigen",
+    "title": "Etwas ist schiefgelaufen."
+  },
+  "server_unavailable": {
+    "document_title": "Server nicht erreichbar",
+    "error_message": "Fehlermeldung",
+    "full_error_message": "Vollständige Fehlermeldung",
+    "intro": "Es gibt Probleme bei der Verbindung zum {{productName}}-Server unter <serverAddress>{{address}}</serverAddress>. Bitte prüfen Sie, ob der Server fehlerfrei läuft.",
+    "last_response": "Dies ist die letzte Antwort, die wir vom Server erhalten haben:",
+    "less_details": "Weniger Details",
+    "modal_title": "Server derzeit nicht erreichbar",
+    "more_details": "Mehr Details",
+    "need_help": "Benötigen Sie Hilfe? <helpLink>Wir helfen Ihnen gerne</helpLink>.",
+    "no_information": "Es sind keine Informationen verfügbar.",
+    "original_request": "Ursprüngliche Anfrage",
+    "redirect_hint": "Sie werden automatisch zur vorherigen Seite weitergeleitet, sobald wir eine Verbindung zum Server herstellen können.",
+    "status_code": "Statuscode"
+  },
+  "show_message": {
+    "document_title": "Nachricht {{messageId}} in {{index}}",
+    "not_found_description": "Der angegebene Index oder die angegebene Nachricht wurde nicht gefunden. Wahrscheinlich wurde der Index, der die referenzierte Nachricht enthielt, gelöscht. Die vollständige Fehlermeldung lautet:",
+    "not_found_title": "Index/Nachricht nicht gefunden"
+  },
+  "unauthorized": {
+    "description_hint": "Bitte wenden Sie sich an Ihre Administratorin oder Ihren Administrator und geben Sie die Fehlerdetails an.",
+    "description_intro": "Sie haben nicht die erforderlichen Berechtigungen, um diese Ressource anzuzeigen.",
+    "page_details": "Die Berechtigungsprüfung für die folgende Anfrage ist fehlgeschlagen,\nwährend versucht wurde, auf {{pathname}} zuzugreifen.",
+    "page_details_no_request": "Die Berechtigungsprüfung ist beim Zugriff auf {{pathname}} fehlgeschlagen.",
+    "title": "Fehlende Berechtigungen"
+  }
+}

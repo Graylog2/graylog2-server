@@ -1,0 +1,64 @@
+{
+  "api_browser": {
+    "download_label": "Descargar la especificación OpenAPI:",
+    "fetch_failed": "Error al obtener la especificación de la API.",
+    "loading": "Cargando la especificación de la API ...",
+    "loading_title": "Explorador de API - Cargando la especificación de la API",
+    "select_format": "Selecciona el formato",
+    "title": "Explorador de API"
+  },
+  "configlet": {
+    "error": "Algo salió mal:"
+  },
+  "errors": {
+    "copy_error_details": "Copiar los detalles del error al portapapeles"
+  },
+  "keyboard_shortcuts": {
+    "description": "Lista de todos los atajos disponibles",
+    "title": "Atajos de teclado"
+  },
+  "loading": {
+    "text": "Cargando, espera un momento...",
+    "title": "Cargando..."
+  },
+  "not_found": {
+    "back_hint": "Puedes volver a la <mainPageLink>página principal</mainPageLink> y navegar desde allí.",
+    "description": "La página que buscas ya no existe.",
+    "title": "Página no encontrada"
+  },
+  "runtime_error": {
+    "description_hint": "Puedes usar la navegación para ir a otras partes del producto, actualizar la página o enviar un informe de error.",
+    "description_intro": "Parece que la página a la que has accedido contiene un error.",
+    "error_label": "Error:",
+    "show_less": "Mostrar menos",
+    "show_more": "Mostrar más",
+    "title": "Algo salió mal."
+  },
+  "server_unavailable": {
+    "document_title": "Servidor no disponible",
+    "error_message": "Mensaje de error",
+    "full_error_message": "Mensaje de error completo",
+    "intro": "Tenemos problemas para conectarnos al servidor de {{productName}} que se ejecuta en <serverAddress>{{address}}</serverAddress>. Comprueba que el servidor funciona correctamente.",
+    "last_response": "Esta es la última respuesta que hemos recibido del servidor:",
+    "less_details": "Menos detalles",
+    "modal_title": "Servidor no disponible actualmente",
+    "more_details": "Más detalles",
+    "need_help": "¿Necesitas ayuda? <helpLink>Podemos ayudarte</helpLink>.",
+    "no_information": "No hay información disponible.",
+    "original_request": "Solicitud original",
+    "redirect_hint": "Se te redirigirá automáticamente a la página anterior en cuanto podamos conectarnos al servidor.",
+    "status_code": "Código de estado"
+  },
+  "show_message": {
+    "document_title": "Mensaje {{messageId}} en {{index}}",
+    "not_found_description": "No se ha encontrado el índice o el mensaje especificado. Lo más probable es que el índice que contiene el mensaje referenciado se haya eliminado. El mensaje de error completo es:",
+    "not_found_title": "Índice o mensaje no encontrado"
+  },
+  "unauthorized": {
+    "description_hint": "Ponte en contacto con tu administrador y proporciónale los detalles del error.",
+    "description_intro": "No tienes los permisos necesarios para ver este recurso.",
+    "page_details": "La comprobación de permisos de la siguiente solicitud ha fallado\nal intentar acceder a {{pathname}}.",
+    "page_details_no_request": "La comprobación de permisos falló al intentar acceder a {{pathname}}.",
+    "title": "Faltan permisos"
+  }
+}

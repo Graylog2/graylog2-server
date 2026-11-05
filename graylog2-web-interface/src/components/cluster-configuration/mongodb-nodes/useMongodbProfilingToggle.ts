@@ -18,6 +18,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { SystemMongodb } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import UserNotification from 'util/UserNotification';
 
 export const MONGODB_NODES_QUERY_KEY_PREFIX = ['mongodbNodes'] as const;
@@ -82,16 +83,6 @@ export const getClusterProfilingState = (statusByLevel?: MongodbProfilingStatusB
 export const getProfilingActionForState = (state: MongodbProfilingState): MongodbProfilingToggleAction =>
   state === 'enabled' ? 'disable' : 'enable';
 
-const actionText = {
-  enable: 'enable',
-  disable: 'disable',
-} as const;
-
-const successMessage = {
-  enable: 'MongoDB profiling enabled successfully.',
-  disable: 'MongoDB profiling disabled successfully.',
-} as const;
-
 const DEFAULT_MONGODB_PROFILING_REFETCH_INTERVAL_MS = 10000;
 
 const useMongodbProfilingToggle = (
@@ -110,13 +101,19 @@ const useMongodbProfilingToggle = (
     mutationFn: (toggleAction: MongodbProfilingToggleAction) =>
       toggleAction === 'enable' ? enableMongodbProfiling() : disableMongodbProfiling(),
     onSuccess: async (_response, toggleAction) => {
-      UserNotification.success(successMessage[toggleAction]);
+      UserNotification.success(
+        toggleAction === 'enable'
+          ? i18n.t('notifications.profiling_enabled', { ns: 'system' })
+          : i18n.t('notifications.profiling_disabled', { ns: 'system' }),
+      );
       await queryClient.invalidateQueries({ queryKey: MONGODB_NODES_QUERY_KEY_PREFIX });
     },
     onError: (error, toggleAction) => {
       UserNotification.error(
-        `Failed to ${actionText[toggleAction]} MongoDB profiling: ${error}`,
-        'Could not update MongoDB profiling.',
+        toggleAction === 'enable'
+          ? i18n.t('notifications.profiling_enable_failed', { ns: 'system', error })
+          : i18n.t('notifications.profiling_disable_failed', { ns: 'system', error }),
+        i18n.t('notifications.profiling_update_failed_title', { ns: 'system' }),
       );
     },
   });

@@ -19,6 +19,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { SystemIndexSetsTypes } from '@graylog/server-api';
 
 import type { Attribute, SearchParams } from 'stores/PaginationTypes';
+import i18n from 'i18n';
 import type { FieldTypeUsage } from 'views/logic/fieldactions/ChangeFieldType/types';
 import { defaultOnError } from 'util/conditional/onError';
 
@@ -90,8 +91,8 @@ const useFieldTypeUsages = (
     queryFn: () =>
       defaultOnError(
         fetchFieldTypeUsages({ streams, field }, searchParams),
-        `Loading ${field} types failed with status`,
-        'Could not load field types',
+        i18n.t('change_field_type.load_field_types_failed', { ns: 'search', field }),
+        i18n.t('change_field_type.could_not_load_field_types', { ns: 'search' }),
       ),
 
     placeholderData: keepPreviousData,

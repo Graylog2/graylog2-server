@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import upperFirst from 'lodash/upperFirst';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { Col, Label } from 'components/bootstrap';
@@ -74,10 +74,10 @@ const Description = styled.p`
   }
 `;
 
-const LIFECYCLE_DEFAULT_MESSAGES = {
-  experimental: 'This feature is new and should be considered experimental.',
-  legacy: 'This feature has been discontinued and will be removed in a future version.',
-};
+const LIFECYCLE_TEXTS = {
+  experimental: { label: 'page_header.experimental', message: 'page_header.experimental_message' },
+  legacy: { label: 'page_header.legacy', message: 'page_header.legacy_message' },
+} as const;
 
 const LifecycleIndicator = ({
   lifecycle,
@@ -86,13 +86,14 @@ const LifecycleIndicator = ({
   lifecycle: 'experimental' | 'legacy' | undefined;
   lifecycleMessage: React.ReactNode | undefined;
 }) => {
+  const { t } = useTranslation('common');
+
   if (lifecycle === undefined) {
     return null;
   }
 
-  const label = upperFirst(lifecycle);
-  const defaultMessage =
-    lifecycle === 'experimental' ? LIFECYCLE_DEFAULT_MESSAGES.experimental : LIFECYCLE_DEFAULT_MESSAGES.legacy;
+  const label = t(LIFECYCLE_TEXTS[lifecycle].label);
+  const defaultMessage = t(LIFECYCLE_TEXTS[lifecycle].message);
 
   return (
     <LifecycleIndicatorContainer>

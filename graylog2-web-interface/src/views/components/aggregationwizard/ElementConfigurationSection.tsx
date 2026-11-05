@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import IconButton from 'components/common/IconButton';
@@ -118,6 +119,7 @@ const ElementConfigurationSection = ({
   onCreate,
   sectionTitle = undefined,
 }: Props) => {
+  const { t } = useTranslation('aggregation');
   const title = sectionTitle ?? elementTitle;
 
   return (
@@ -125,7 +127,13 @@ const ElementConfigurationSection = ({
       <Header $isEmpty={isEmpty}>
         <ElementTitle $isEmpty={isEmpty}>{title}</ElementTitle>
         <ElementActions>
-          {allowCreate && <StyledIconButton title={`Add a ${elementTitle}`} name="add" onClick={onCreate} />}
+          {allowCreate && (
+            <StyledIconButton
+              title={t('wizard_common.add_named', { element: elementTitle })}
+              name="add"
+              onClick={onCreate}
+            />
+          )}
         </ElementActions>
       </Header>
       <div>{children}</div>

@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Button, Panel } from 'components/bootstrap';
 import { Icon } from 'components/common';
@@ -45,26 +46,30 @@ const AggregationConditionsFormSummary = ({
   expressionValidation = { isValid: true },
   showInlineValidation = false,
   toggleShowValidation,
-}: AggregationConditionsFormSummaryProps) => (
-  <div>
-    <StyledPanel header="Condition summary">
-      {expressionValidation.isValid ? (
-        <p className="text-success">
-          <Icon name="check_box" />
-          &nbsp;Condition is valid
-        </p>
-      ) : (
-        <p className="text-danger">
-          <Icon name="warning" />
-          &nbsp;Condition is not valid
-          <StyledButton bsSize="xsmall" onClick={toggleShowValidation}>
-            {showInlineValidation ? 'Hide errors' : 'Show errors'}
-          </StyledButton>
-        </p>
-      )}
-      <b>Preview:</b> <AggregationConditionSummary series={series} conditions={conditions} />
-    </StyledPanel>
-  </div>
-);
+}: AggregationConditionsFormSummaryProps) => {
+  const { t } = useTranslation('event_definitions');
+
+  return (
+    <div>
+      <StyledPanel header={t('condition_summary.title')}>
+        {expressionValidation.isValid ? (
+          <p className="text-success">
+            <Icon name="check_box" />
+            &nbsp;{t('condition_summary.valid')}
+          </p>
+        ) : (
+          <p className="text-danger">
+            <Icon name="warning" />
+            &nbsp;{t('condition_summary.invalid')}
+            <StyledButton bsSize="xsmall" onClick={toggleShowValidation}>
+              {showInlineValidation ? t('condition_summary.hide_errors') : t('condition_summary.show_errors')}
+            </StyledButton>
+          </p>
+        )}
+        <b>{t('condition_summary.preview')}</b> <AggregationConditionSummary series={series} conditions={conditions} />
+      </StyledPanel>
+    </div>
+  );
+};
 
 export default AggregationConditionsFormSummary;

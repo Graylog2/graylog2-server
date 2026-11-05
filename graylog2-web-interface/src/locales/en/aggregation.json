@@ -1,0 +1,261 @@
+{
+  "wizard_common": {
+    "grouping": "Grouping",
+    "group_by": "Group By",
+    "metric": "Metric",
+    "metrics": "Metrics",
+    "sort": "Sort",
+    "visualization": "Visualization",
+    "add": "Add",
+    "add_element": "Add an element",
+    "add_named": "Add a {{element}}",
+    "remove_named": "Remove {{element}}",
+    "update_preview": "Update preview",
+    "updating_preview": "Updating preview...",
+    "color_hint": "Color Hint",
+    "select_all_fields": "Select all fields",
+    "deselect_all_fields": "Deselect all fields",
+    "field_required": "Field is required.",
+    "must_be_greater_than_zero": "Must be greater than 0."
+  },
+  "wizard_grouping": {
+    "settings": "Settings",
+    "skip_empty_values": "Skip Empty Values",
+    "skip_empty_values_help": "When this is enabled, messages which do not contain the configured fields will be skipped.",
+    "skip_empty_values_help_otherwise": "Otherwise an \"(Empty Value)\" bucket will be created.",
+    "limit": "Limit",
+    "rollup_columns": "Rollup Columns",
+    "rollup_columns_help": "When rollup is enabled, an additional trace totalling individual subtraces will be included.",
+    "direction": "Direction",
+    "row": "Row",
+    "column": "Column",
+    "fields": "Fields",
+    "add_field": "Add a field",
+    "add_another_date_field": "Add another date field",
+    "add_another_field": "Add another field",
+    "interval": "Interval",
+    "auto": "Auto",
+    "interval_types": "Interval Types",
+    "auto_bucket_size": "Auto bucket size",
+    "auto_bucket_size_help": "For example, 1.5x. A smaller granularity leads to <strong>less</strong>; conversely, a larger one shows <strong>more</strong> values.",
+    "fixed_bucket_size": "Fixed bucket size",
+    "fixed_bucket_size_help": "For example, 2 minutes. The time defines the size of the buckets for this timestamp type.",
+    "scale": "{{scale}}x",
+    "scaling_required": "Scaling is required.",
+    "scaling_range": "Must be greater than 0 and smaller or equals 10.",
+    "value_required": "Value is required.",
+    "limit_required": "Limit is required."
+  },
+  "wizard_units": {
+    "time_units": {
+      "seconds": "Seconds",
+      "minutes": "Minutes",
+      "hours": "Hours",
+      "days": "Days",
+      "weeks": "Weeks",
+      "months": "Months"
+    },
+    "unit_settings": "{{field}} unit settings",
+    "type": "Type",
+    "select_unit_type": "Select a unit type",
+    "unit": "Unit",
+    "unit_help": "Unit used to calculate the displayed value on charts.",
+    "select_unit": "Select a unit",
+    "predefined_unit": "Unit <bold>{{unit}}</bold> was configured for field <bold>{{field}}</bold>. Changing this unit might represent data incorrectly on the charts.",
+    "clear": "Clear",
+    "ok": "OK",
+    "unit_type_labels": {
+      "size": "Size",
+      "time": "Time",
+      "percent": "Percent",
+      "binary_size": "Binary size"
+    },
+    "unit_labels": {
+      "byte": "Byte",
+      "kilobyte": "Kilobyte",
+      "megabyte": "Megabyte",
+      "gigabyte": "Gigabyte",
+      "kibibyte": "Kibibyte",
+      "mebibyte": "Mebibyte",
+      "gibibyte": "Gibibyte",
+      "nanosecond": "Nanosecond",
+      "microsecond": "Microsecond",
+      "millisecond": "Millisecond",
+      "second": "Second",
+      "minute": "Minute",
+      "hour": "Hour",
+      "day": "Day",
+      "month": "Month",
+      "percent_decimal": "Percent (decimal)",
+      "percent_1_100": "Percent (1..100)"
+    }
+  },
+  "wizard_metric": {
+    "function": "Function",
+    "select_function": "Select a function",
+    "field": "Field",
+    "select_field": "Select a field",
+    "percentile": "Percentile",
+    "select_percentile": "Select percentile",
+    "strategy": "Strategy",
+    "select_strategy": "Select strategy",
+    "strategies": {
+      "COUNT": "Document Count",
+      "SUM": "Field Sum"
+    },
+    "name": "Name",
+    "display_name_placeholder": "Specify display name",
+    "show_thresholds": "Show line thresholds",
+    "add_threshold": "Add a threshold",
+    "threshold_title": "Title",
+    "threshold_name_placeholder": "Specify threshold name",
+    "remove_threshold": "Remove threshold",
+    "threshold_value": "Value",
+    "threshold_value_placeholder": "Specify threshold value",
+    "value_unit": "Value is in {{unit}}s",
+    "threshold_color": "Color configuration for threshold",
+    "function_required": "Function is required.",
+    "field_required_for_function": "Field is required for function {{function}}.",
+    "percentile_required": "Percentile is required.",
+    "name_unique": "Name must be unique.",
+    "threshold_value_required": "Threshold value is required."
+  },
+  "wizard_sort": {
+    "field": "Field",
+    "field_placeholder": "Specify field/metric to be sorted on",
+    "select_field": "Select field for sorting",
+    "direction": "Direction",
+    "select_direction": "Select direction for sorting",
+    "ascending": "Ascending",
+    "descending": "Descending",
+    "direction_required": "Direction is required.",
+    "time_row_unsupported": "Sort on non data table with time based row grouping does not work."
+  },
+  "wizard_visualization": {
+    "type": "Type",
+    "select_type": "Select visualization type",
+    "show_event_annotations": "Show Event annotations",
+    "help_for": "Help for {{field}}",
+    "select_field": "Select {{field}}",
+    "color_for": "Color configuration for {{field}}",
+    "axis_label_or_color": "At least for one axis should be defined label or color.",
+    "type_required": "Type is required."
+  },
+  "builder_empty": {
+    "title": "Empty Aggregation",
+    "editing": "You are now editing the widget.",
+    "add_metric_hint": "To see results, add at least one metric. You can group data by adding rows/columns.",
+    "preview_hint": "You can preview widget search results by clicking on \"{{button}}\".",
+    "finish_hint": "To finish, click \"{{update}}\" to save, \"{{cancel}}\" to abandon changes.",
+    "edit_hint_interactive": "Please <editButton>Edit</editButton> the widget to see results here.",
+    "edit_hint": "Please edit the widget to see results here."
+  },
+  "vis_types": {
+    "area_chart": "Area Chart",
+    "bar_chart": "Bar Chart",
+    "heatmap": "Heatmap",
+    "line_chart": "Line Chart",
+    "network_graph": "Network Graph",
+    "pie_chart": "Pie Chart",
+    "sankey": "Sankey",
+    "scatter_plot": "Scatter Plot",
+    "single_number": "Single Number",
+    "world_map": "World Map"
+  },
+  "vis_validation": {
+    "area_chart_requires_metric": "Area chart requires at least one metric",
+    "bar_chart_requires_metric": "Bar chart requires at least one metric",
+    "line_chart_requires_metric": "Line chart requires at least one metric",
+    "pie_chart_requires_metric": "Pie chart requires at least one metric",
+    "scatter_plot_requires_metric": "Scatter plot requires at least one metric",
+    "sankey_requires_groupings": "Sankey requires at least two grouping fields.",
+    "sankey_single_metric": "Sankey supports only a single metric.",
+    "network_requires_groupings": "Network graph requires at least two grouping fields."
+  },
+  "vis_common": {
+    "interpolation": "Interpolation",
+    "interpolation_types": {
+      "linear": "linear",
+      "step-after": "step-after",
+      "spline": "spline"
+    },
+    "axis_type": "Axis Type",
+    "axis_types": {
+      "linear": "linear",
+      "logarithmic": "logarithmic"
+    },
+    "color_scale": "Color Scale",
+    "reverse_scale": "Reverse Scale",
+    "show_axis_labels": "Show axis labels",
+    "x_axis": "X-axis",
+    "y_axis_number": "Y-Number",
+    "y_axis_percent": "Y-Percent",
+    "y_axis_time": "Y-Time",
+    "y_axis_size": "Y-Size",
+    "color_hint": "Color Hint",
+    "legend_configuration": "Configuration for {{label}}"
+  },
+  "vis_heatmap": {
+    "auto_scale": "Auto Scale",
+    "min": "Min",
+    "max": "Max",
+    "use_smallest_as_default": "Use smallest as default",
+    "default_value": "Default Value"
+  },
+  "vis_worldmap": {
+    "zoom": "Zoom",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "name": "Name",
+    "coordinates": "Coordinates:",
+    "value": "Value:"
+  },
+  "vis_bar": {
+    "mode": "Mode",
+    "modes": {
+      "group": "Group",
+      "stack": "Stack",
+      "relative": "Relative",
+      "overlay": "Overlay"
+    },
+    "mode_help": {
+      "group": "Every series is represented by its own bar in the chart.",
+      "stack": "All series are stacked upon each other resulting in one bar.",
+      "relative": "All series are stacked upon each other resulting in one chart. But negative series are placed below zero.",
+      "overlay": "All series are placed as bars upon each other. To be able to see the bars the opacity is reduced to 75%. It is recommended to use this option with not more than 3 series."
+    }
+  },
+  "vis_number": {
+    "trend": "Trend",
+    "trend_description": "Show trend information for this number.",
+    "trend_help_enabled": "If the user enables trending, a separate box is shown below the current value, indicating the direction of the change by an icon as well as the absolute and the relative differences between the current value and the previous one.",
+    "trend_help_previous": "The previous value is calculated by performing two searches in the background, which are completely identical besides the timerange. The timerange of the first search is identical to the one configured for this query/this widget, the second one is the same timerange, but with an offset of the timerange length shifted to the past.",
+    "trend_preference": "Trend Preference",
+    "trend_preferences": {
+      "LOWER": "Lower",
+      "NEUTRAL": "Neutral",
+      "HIGHER": "Higher"
+    },
+    "highlight": "Highlight",
+    "highlight_options": {
+      "TREND_ONLY": "Trend info only",
+      "FULL_WIDGET": "Entire widget"
+    },
+    "not_available": "N/A",
+    "trend_label": "Trend: {{absolute}} ({{relative}}) compared to previous value of {{previous}}",
+    "previous_value": "Previous value: {{previous}}"
+  },
+  "vis_popover": {
+    "related_values": "Related values",
+    "data_points": "Data Points",
+    "metric": "Metric",
+    "groupings": "Groupings",
+    "back": "Back"
+  },
+  "vis_network": {
+    "no_connections": "No connections to display. Adjust your search or grouping to see results."
+  },
+  "vis_sankey": {
+    "no_flows": "No flows to display. Adjust your search or grouping to see results."
+  }
+}

@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import Menu from 'components/bootstrap/Menu';
@@ -79,6 +80,7 @@ const HeaderActionsDropdown = ({
   anchorPosition = undefined,
   textAlign,
 }: Props) => {
+  const { t } = useTranslation('common');
   const sendTelemetry = useSendTelemetry(appSection);
   const hasActions = Boolean(onChangeSlicing || onSort || onHideColumn);
 
@@ -111,7 +113,7 @@ const HeaderActionsDropdown = ({
       {/* Not the Menu.Target: opening/positioning is driven by the whole header's click handler
           (see AttributeHeader) so this only needs to render the label -- clicking it still opens
           the menu, since the click bubbles up to that handler. */}
-      <DropdownTrigger title={`Toggle ${label} actions`}>
+      <DropdownTrigger title={t('entity_table.toggle_column_actions', { column: label })}>
         {textAlign === 'right' && <DropdownCaret name="arrow_drop_down" size="xs" className="header-action" />}
         {children}
         {textAlign !== 'right' && <DropdownCaret name="arrow_drop_down" size="xs" className="header-action" />}
@@ -120,24 +122,24 @@ const HeaderActionsDropdown = ({
       <Menu.Dropdown>
         {onSort && (
           <MenuItem onClick={() => onSort(false)} icon="arrow_upward">
-            <MenuItemLabel $active={activeSort === 'asc'}>Sort ascending</MenuItemLabel>
+            <MenuItemLabel $active={activeSort === 'asc'}>{t('entity_table.sort_ascending')}</MenuItemLabel>
           </MenuItem>
         )}
         {onSort && (
           <MenuItem onClick={() => onSort(true)} icon="arrow_downward">
-            <MenuItemLabel $active={activeSort === 'desc'}>Sort descending</MenuItemLabel>
+            <MenuItemLabel $active={activeSort === 'desc'}>{t('entity_table.sort_descending')}</MenuItemLabel>
           </MenuItem>
         )}
         {onSort && onChangeSlicing && <MenuItem divider />}
         {onChangeSlicing && (
           <MenuItem onClick={onToggleSlicing} icon="surgical">
-            {isSliceActive ? 'No slicing' : 'Slice by values'}
+            {isSliceActive ? t('slicing.no_slicing') : t('slicing.slice_by_values')}
           </MenuItem>
         )}
         {(onSort || onChangeSlicing) && onHideColumn && <MenuItem divider />}
         {onHideColumn && (
           <MenuItem onClick={onHideColumn} icon="visibility_off">
-            Hide column
+            {t('entity_table.hide_column')}
           </MenuItem>
         )}
       </Menu.Dropdown>

@@ -15,9 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import numeral from 'numeral';
 import moment from 'moment';
 import styled from 'styled-components';
+import type { TFunction } from 'i18next';
 
 import { LinkContainer, Spinner } from 'components/common';
 import { Alert, Col, Row, Button } from 'components/bootstrap';
@@ -31,26 +33,27 @@ const Header = styled.div`
   justify-content: space-between;
 `;
 
-const formatTextForFailureCount = (count: number) => {
+const formatTextForFailureCount = (count: number, t: TFunction) => {
   if (count === 0) {
-    return 'No failed indexing attempts in the last 24 hours.';
+    return t('indexers.failures.none');
   }
 
-  return <strong>There were {numeral(count).format('0,0')} failed indexing attempts in the last 24 hours.</strong>;
+  return <strong>{t('indexers.failures.count', { count, formattedCount: numeral(count).format('0,0') })}</strong>;
 };
 
 const IndexerFailuresComponent = () => {
+  const { t } = useTranslation('indexsets');
   const since = useMemo(() => moment().subtract(24, 'hours').format('YYYY-MM-DDTHH:mm:ss.SSS'), []);
   const { data: total, isLoading } = useIndexerFailuresCount(since);
 
   const failuresSummary =
     total !== undefined ? (
       <Alert bsStyle={total === 0 ? 'success' : 'danger'}>
-        {formatTextForFailureCount(total)}
+        {formatTextForFailureCount(total, t)}
 
         <LinkContainer to={Routes.SYSTEM.INDICES.FAILURES}>
           <Button bsStyle="info" bsSize="xs" className="pull-right">
-            Show errors
+            {t('indexers.failures.show_errors')}
           </Button>
         </LinkContainer>
       </Alert>
@@ -60,16 +63,10 @@ const IndexerFailuresComponent = () => {
     <Row className="content">
       <Col md={12}>
         <Header>
-          <h2>Indexer failures</h2>
-          <DocumentationLink
-            page={DocsHelper.PAGES.INDEXER_FAILURES}
-            text="Indexer failures documentation"
-            displayIcon
-          />
+          <h2>{t('indexers.failures.title')}</h2>
+          <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} text={t('indexers.failures.docs')} displayIcon />
         </Header>
-        <p className="description">
-          Every message that was not successfully indexed will be logged as an indexer failure.
-        </p>
+        <p className="description">{t('indexers.failures.description')}</p>
         {isLoading ? <Spinner /> : failuresSummary}
       </Col>
     </Row>

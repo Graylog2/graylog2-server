@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useFormikContext } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { useValidateCache } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import { FormikFormGroup } from 'components/common';
@@ -25,6 +26,7 @@ import type { LookupTableCache, validationErrorsType } from 'logic/lookup-tables
 import CacheConfigFormFields from './CacheConfigFormFields';
 
 function CacheFormFields() {
+  const { t } = useTranslation('lookup_tables');
   const { errors, values, touched, setValues, setErrors } = useFormikContext<LookupTableCache>();
   const { validateCache } = useValidateCache();
   const configRef = useRef(null);
@@ -61,9 +63,9 @@ function CacheFormFields() {
       <FormikFormGroup
         type="text"
         name="title"
-        label="* Title"
+        label={t('cache_form.title_label')}
         required
-        help={touched.title && errors.title ? null : 'A short title for this cache.'}
+        help={touched.title && errors.title ? null : t('cache_form.title_help')}
         onChange={handleTitleChange}
         labelClassName="col-sm-3"
         wrapperClassName="col-sm-9"
@@ -71,21 +73,19 @@ function CacheFormFields() {
       <FormikFormGroup
         type="text"
         name="description"
-        label="Description"
-        help="Cache description."
+        label={t('shared.description')}
+        help={t('cache_form.description_help')}
         labelClassName="col-sm-3"
         wrapperClassName="col-sm-9"
       />
       <FormikFormGroup
         type="text"
         name="name"
-        label="* Name"
+        label={t('cache_form.name_label')}
         required
         error={touched.name && errors.name ? errors.name : null}
         onChange={() => setGenerateName(!touched.name)}
-        help={
-          touched.name && errors.name ? null : 'The name that is being used to refer to this cache. Must be unique.'
-        }
+        help={touched.name && errors.name ? null : t('cache_form.name_help')}
         labelClassName="col-sm-3"
         wrapperClassName="col-sm-9"
       />

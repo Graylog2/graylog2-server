@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import NumberUtils from 'util/NumberUtils';
 
@@ -34,6 +35,8 @@ const CpuMetricsCell = ({
   warningThreshold = Number.NaN,
   dangerThreshold = Number.NaN,
 }: Props) => {
+  const { t } = useTranslation('system');
+
   if (cpuPercent == null && loadAverage == null) {
     return <MetricPlaceholder />;
   }
@@ -47,7 +50,7 @@ const CpuMetricsCell = ({
       )}
       {loadLabel && (
         <MetricsRow>
-          <span>Load (1m)</span>
+          <span>{t('cpu_metrics_cell.load_1m')}</span>
           <SecondaryText>
             <span>{loadLabel}</span>
           </SecondaryText>

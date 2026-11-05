@@ -17,11 +17,14 @@
 import React from 'react';
 import remove from 'lodash/remove';
 
+import i18n from 'i18n';
 import { Row, Col, BootstrapModalConfirm } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 
 import ContentPackEntitiesList from './ContentPackEntitiesList';
 import ContentPackParameterList from './ContentPackParameterList';
+
+const t = (key: string, options?: { [key: string]: unknown }) => i18n.t(key, { ns: 'content_packs', ...options });
 
 type ContentPackParametersProps = {
   contentPack: any;
@@ -118,12 +121,12 @@ class ContentPackParameters extends React.Component<
   _confirmationModal = () => (
     <BootstrapModalConfirm
       showModal={this.state.showParameterModal}
-      title="Confirm deletion"
+      title={t('parameters.confirm_deletion')}
       onConfirm={() => {
         this._deleteParameter(this.state.parameterToDelete);
       }}
       onCancel={this._closeConfirmModal}>
-      {`Are you sure you want to do delete this parameter: ${(this.state.parameterToDelete || {}).title}?`}
+      {t('parameters.delete_confirmation', { title: (this.state.parameterToDelete || {}).title })}
     </BootstrapModalConfirm>
   );
 

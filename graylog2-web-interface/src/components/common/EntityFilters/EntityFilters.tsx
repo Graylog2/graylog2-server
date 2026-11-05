@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { OrderedMap } from 'immutable';
 
@@ -61,6 +62,7 @@ const EntityFilters = ({
   activeSliceCol = undefined,
   activeSlice = undefined,
 }: Props) => {
+  const { t } = useTranslation('common');
   const sendTelemetry = useSendTelemetry(appSection);
 
   const { data: activeFilters, onChange: onChangeFiltersWithTitle } = useFiltersWithTitle(
@@ -144,7 +146,7 @@ const EntityFilters = ({
   return (
     <>
       <FilterCreation>
-        Filters
+        {t('filters.filters')}
         <CreateFilterDropdown
           filterableAttributes={filterableAttributes}
           onCreateFilter={onCreateFilter}

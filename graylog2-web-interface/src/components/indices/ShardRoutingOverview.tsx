@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
@@ -67,24 +68,25 @@ type ShardRoutingOverviewProps = {
   indexName: string;
 };
 
-const ShardRoutingOverview = ({ indexName, routing }: ShardRoutingOverviewProps) => (
-  <ShardRoutingWrap>
-    <h3>Shard routing</h3>
+const ShardRoutingOverview = ({ indexName, routing }: ShardRoutingOverviewProps) => {
+  const { t } = useTranslation('indexsets');
 
-    <ul className="shards">
-      {routing
-        .sort((shard1, shard2) => naturalSort(shard1.id, shard2.id))
-        .map((route) => (
-          <ShardRouting key={`${indexName}-shard-route-${route.node_id}-${route.id}`} route={route} />
-        ))}
-    </ul>
-    <br style={{ clear: 'both' }} />
+  return (
+    <ShardRoutingWrap>
+      <h3>{t('shards.routing_title')}</h3>
 
-    <div className="description">
-      Bold shards are primaries, others are replicas. Replicas are elected to primaries automatically when primaries
-      leave the cluster. Size and document counts only reflect primary shards and no possible replica duplication.
-    </div>
-  </ShardRoutingWrap>
-);
+      <ul className="shards">
+        {routing
+          .sort((shard1, shard2) => naturalSort(shard1.id, shard2.id))
+          .map((route) => (
+            <ShardRouting key={`${indexName}-shard-route-${route.node_id}-${route.id}`} route={route} />
+          ))}
+      </ul>
+      <br style={{ clear: 'both' }} />
+
+      <div className="description">{t('shards.routing_description')}</div>
+    </ShardRoutingWrap>
+  );
+};
 
 export default ShardRoutingOverview;

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { MultiSelect } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
@@ -39,6 +40,7 @@ type Props = {
 };
 
 const AggregationForm = ({ aggregationFunctions, eventDefinition, validation, onChange }: Props) => {
+  const { t } = useTranslation('event_definitions');
   const { data: allFieldTypes } = useFieldTypes(eventDefinition?.config?.streams ?? [], ALL_MESSAGES_TIMERANGE);
   // Memoize function to only format fields when they change. Use joined fieldNames as cache key.
   const formattedFields = useMemo(() => allFieldTypes ?? [], [allFieldTypes]);
@@ -80,16 +82,13 @@ const AggregationForm = ({ aggregationFunctions, eventDefinition, validation, on
 
   return (
     <fieldset>
-      <h2 className={commonStyles.title}>Aggregation</h2>
-      <p>
-        Summarize log messages matching the Filter defined above by using a function. You can optionally group the
-        Filter results by identical field values.
-      </p>
+      <h2 className={commonStyles.title}>{t('aggregation_form.title')}</h2>
+      <p>{t('aggregation_form.description')}</p>
       <Row>
         <Col lg={7}>
           <FormGroup controlId="group-by">
             <ControlLabel>
-              Group by Field(s) <small className="text-muted">(Optional)</small>
+              {t('summary.group_by')} <small className="text-muted">{t('filter_form.optional')}</small>
             </ControlLabel>
             <MultiSelect
               id="group-by"
@@ -100,15 +99,9 @@ const AggregationForm = ({ aggregationFunctions, eventDefinition, validation, on
               allowCreate
             />
             <HelpBlock>
-              Select fields to group filter results when they have identical values. <b>Example:</b>
+              <Trans t={t} i18nKey="aggregation_form.group_by_help" components={{ bold: <b /> }} />
               <br />
-              Assuming you created a Filter with all failed log-in attempts in your network, an alert could be triggered
-              when there are more than 5 failed log-in attempts overall. Now, add <code>username</code> as Group by
-              Field and an alert will be triggered{' '}
-              <em>
-                for each <code>username</code>
-              </em>{' '}
-              with more than 5 failed log-in attempts.
+              <Trans t={t} i18nKey="aggregation_form.group_by_example" components={{ code: <code />, em: <em /> }} />
             </HelpBlock>
           </FormGroup>
         </Col>

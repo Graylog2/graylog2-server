@@ -17,18 +17,19 @@
 
 import type { ItemKey, StrategyId } from 'views/logic/valueactions/createEventDefinition/types';
 
+// Translation keys of the `search` namespace.
 export const labels: { [key in ItemKey]: string } = {
-  rowValuePath: 'Query from table row',
-  columnValuePath: 'Query from table column',
-  columnGroupBy: 'Group by column values',
-  rowGroupBy: 'Group by row values',
-  aggCondition: 'Condition',
-  queryWithReplacedParams: 'Query from search',
-  searchFilterQuery: 'Query from search filters',
-  streams: 'Streams',
-  searchWithinMs: 'Search within ms',
-  lutParameters: 'Lookup-table parameters',
-  searchFromValue: 'Query from value',
+  rowValuePath: 'create_event_definition.items.rowValuePath',
+  columnValuePath: 'create_event_definition.items.columnValuePath',
+  columnGroupBy: 'create_event_definition.items.columnGroupBy',
+  rowGroupBy: 'create_event_definition.items.rowGroupBy',
+  aggCondition: 'create_event_definition.items.aggCondition',
+  queryWithReplacedParams: 'create_event_definition.items.queryWithReplacedParams',
+  searchFilterQuery: 'create_event_definition.items.searchFilterQuery',
+  streams: 'create_event_definition.items.streams',
+  searchWithinMs: 'create_event_definition.items.searchWithinMs',
+  lutParameters: 'create_event_definition.items.lutParameters',
+  searchFromValue: 'create_event_definition.items.searchFromValue',
 };
 
 export const aggregationGroup: Array<ItemKey> = ['columnGroupBy', 'rowGroupBy', 'aggCondition'];
@@ -39,16 +40,26 @@ export const searchGroup: Array<ItemKey> = [
   'searchFilterQuery',
   'searchFromValue',
 ];
+// Translation keys of the `search` namespace.
 export const strategiesLabels: { [key in StrategyId]: { label: string; description: string } } = {
   EXACT: {
-    label: 'Exactly this value',
-    description: 'Strategy includes all search queries, filters, etc which relate to current search view',
+    label: 'create_event_definition.strategies.EXACT.label',
+    description: 'create_event_definition.strategies.EXACT.description',
   },
-  ROW: { label: 'Any in row', description: 'Strategy includes row pivots' },
-  COL: { label: 'Any in column', description: 'Strategy includes column pivots' },
+  ROW: {
+    label: 'create_event_definition.strategies.ROW.label',
+    description: 'create_event_definition.strategies.ROW.description',
+  },
+  COL: {
+    label: 'create_event_definition.strategies.COL.label',
+    description: 'create_event_definition.strategies.COL.description',
+  },
   ALL: {
-    label: 'Any in widget',
-    description: 'Strategy includes all row and column pivot values, related to selected value',
+    label: 'create_event_definition.strategies.ALL.label',
+    description: 'create_event_definition.strategies.ALL.description',
   },
-  CUSTOM: { label: 'Custom', description: 'You can select any search part' },
+  CUSTOM: {
+    label: 'create_event_definition.strategies.CUSTOM.label',
+    description: 'create_event_definition.strategies.CUSTOM.description',
+  },
 };

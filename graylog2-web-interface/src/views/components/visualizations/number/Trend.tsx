@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import Icon from 'components/common/Icon';
@@ -106,6 +107,7 @@ const Trend = (
   { current, previous, unit = undefined, trend = undefined }: Props,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) => {
+  const { t } = useTranslation('aggregation');
   const { differenceConverted, differencePercent, unitAbbrevString, previousConverted } = getTrendConvertedValues(
     current,
     previous,
@@ -127,8 +129,12 @@ const Trend = (
         <Icon name={trendIcon} data-testid="trend-icon" />{' '}
         <span
           data-testid="trend-value"
-          aria-label={`Trend: ${absoluteDifference} (${relativeDifference}) compared to previous value of ${previousConverted}`}
-          title={`Previous value: ${previousConverted}`}>
+          aria-label={t('vis_number.trend_label', {
+            absolute: absoluteDifference,
+            relative: relativeDifference,
+            previous: previousConverted,
+          })}
+          title={t('vis_number.previous_value', { previous: previousConverted })}>
           {absoluteDifference} / {relativeDifference}
         </span>
       </TextContainer>

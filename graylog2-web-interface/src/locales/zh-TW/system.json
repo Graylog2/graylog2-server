@@ -1,0 +1,512 @@
+{
+  "shared": {
+    "leader": "領導者",
+    "not_available": "N/A"
+  },
+  "cluster_configuration_nodes": {
+    "loading_search_backend": "正在載入搜尋後端節點...",
+    "search_backend_unknown": "無法判定已設定的搜尋後端。",
+    "search_placeholder": "搜尋節點…",
+    "all_nodes": "所有節點",
+    "data_nodes": "資料節點",
+    "opensearch_nodes": "OpenSearch 節點",
+    "mongodb_nodes": "MongoDB 節點"
+  },
+  "cluster_column_titles": {
+    "cpu": "CPU",
+    "memory": "記憶體",
+    "jvm": "JVM",
+    "indexing": "索引",
+    "storage": "儲存空間",
+    "buffers": "緩衝區",
+    "journal": "Journal",
+    "data_lake_journal": "Data Lake Journal",
+    "throughput": "吞吐量"
+  },
+  "data_nodes_expandable": {
+    "title": "資料節點"
+  },
+  "indexing_metrics_cell": {
+    "docs": "文件數",
+    "latency": "延遲"
+  },
+  "node_actions": {
+    "thread_dump": "取得執行緒傾印",
+    "process_buffer_dump": "取得處理緩衝區傾印",
+    "metrics": "指標"
+  },
+  "graylog_node_actions": {
+    "pause_message_processing": "暫停訊息處理",
+    "resume_message_processing": "恢復訊息處理",
+    "override_load_balancer_dead": "將負載平衡器狀態覆寫為 DEAD",
+    "override_load_balancer_alive": "將負載平衡器狀態覆寫為 ALIVE",
+    "local_message_inputs": "本機訊息輸入",
+    "recent_system_logs": "取得最近的系統日誌訊息",
+    "message_processing_title": "訊息處理",
+    "pause_confirm": "即將<b>暫停</b>節點 <b>{{nodeName}}</b> 的訊息處理，確定要繼續嗎？",
+    "resume_confirm": "即將<b>恢復</b>節點 <b>{{nodeName}}</b> 的訊息處理，確定要繼續嗎？",
+    "load_balancer_title": "負載平衡器",
+    "load_balancer_confirm": "即將將節點 <b>{{nodeName}}</b> 的負載平衡器狀態變更為 <b>{{status}}</b>，確定要繼續嗎？"
+  },
+  "graylog_nodes_expandable": {
+    "title": "{{productName}} 節點"
+  },
+  "load_balancer_status_cell": {
+    "aria_label": "負載平衡器 {{status}}",
+    "status_alive": "上線",
+    "status_dead": "離線",
+    "status_throttled": "已限流"
+  },
+  "processing_state_cell": {
+    "aria_label": "訊息處理 {{status}}",
+    "enabled": "已啟用",
+    "disabled": "已停用"
+  },
+  "mongodb_nodes_expandable": {
+    "title": "MongoDB 節點"
+  },
+  "mongodb_profiling_action": {
+    "description": "MongoDB 效能分析可協助找出慢速查詢，並排除叢集節點之間的效能問題。",
+    "enabling_profiling": "正在啟用效能分析...",
+    "enable_confirm": "要在所有 MongoDB 節點上啟用 <b>Slow Ops</b> 效能分析（{{threshold}}）嗎？設定會立即生效且無需重新啟動，但除非在啟動時設定，否則重新啟動後會重設。",
+    "enable_profiling": "啟用效能分析",
+    "disable_profiling": "停用效能分析",
+    "enabling": "正在啟用...",
+    "disabling": "正在停用...",
+    "loading_status": "正在載入狀態...",
+    "loading_status_title": "正在載入 MongoDB 效能分析狀態",
+    "enable_title": "在所有 MongoDB 節點上將效能分析設定為 Slow Ops",
+    "disable_title": "在所有 MongoDB 節點上停用效能分析",
+    "status_loading": "正在載入各 MongoDB 節點目前的效能分析狀態...",
+    "status_off": "所有 MongoDB 節點的效能分析皆已關閉（{{summary}}）。啟用後可收集慢查詢診斷資訊。",
+    "status_mixed": "各 MongoDB 節點的效能分析設定不一致（{{summary}}）。啟用效能分析可讓診斷保持一致。",
+    "status_enabled": "所有 MongoDB 節點的效能分析皆已開啟（{{summary}}）。排查完成後請將其停用，以降低 MongoDB 負擔。",
+    "status_unavailable_with_summary": "效能分析狀態無法使用（{{summary}}）。如有需要，您仍然可以變更它。",
+    "status_unavailable": "效能分析狀態無法使用。如有需要，您仍然可以變更它。",
+    "threshold_level": "等級 1",
+    "threshold_level_with_ms": "等級 1，閾值 {{slowMs}} 毫秒",
+    "distribution": "OFF {{off}}，SLOW_OPS {{slowOps}}，ALL {{all}}",
+    "nodes_profiled_other": "已分析 {{enabledCount}}/{{count}} 個節點"
+  },
+  "opensearch_nodes_expandable": {
+    "title": "OpenSearch 節點"
+  },
+  "cluster_nodes_section_wrapper": {
+    "show_title": "顯示{{title}}"
+  },
+  "cpu_metrics_cell": {
+    "load_1m": "負載（1 分鐘）"
+  },
+  "graylog_cluster_overview": {
+    "cluster": "叢集",
+    "cluster_id": "叢集 ID：",
+    "not_available": "無法使用",
+    "number_of_nodes": "節點數量："
+  },
+  "cluster_support_bundle_info": {
+    "description": "建立一個 zip 檔案，內含 Graylog 叢集的實用除錯資訊。",
+    "enterprise_customers": "Graylog Enterprise 客戶可將支援套件附加至支援工單，協助 Graylog 技術支援團隊分析並診斷問題。",
+    "examine_content": "分享前請先檢查套件內容，其中可能包含 IP 位址、主機名稱，甚至密碼等敏感資料！",
+    "paid_license_only": "只有付費授權的使用者才能使用 Graylog Enterprise 支援。您仍可將此檔案用於其他除錯用途。"
+  },
+  "cluster_support_bundle_overview": {
+    "title": "叢集支援套件",
+    "create": "建立支援套件",
+    "download": "下載",
+    "delete": "刪除",
+    "filename": "檔案名稱",
+    "size": "大小",
+    "no_bundles": "找不到任何支援套件。",
+    "delete_title": "刪除支援套件",
+    "delete_confirm": "確定要刪除 <strong>{{name}}</strong> 嗎？"
+  },
+  "log_level_metrics": {
+    "level": "等級：{{level}}",
+    "total_written": "寫入總數：",
+    "mean_rate": "平均速率：",
+    "one_minute_rate": "1 分鐘速率：",
+    "per_second": "/ 秒"
+  },
+  "logging_subsystem": {
+    "subsystem": "子系統：{{name}}"
+  },
+  "node_loggers": {
+    "show_log_level_metrics": "顯示日誌等級指標",
+    "hide_log_level_metrics": "隱藏日誌等級指標",
+    "total_log_messages": "總共寫入 <strong>{{throughput}} 則內部日誌訊息。</strong>"
+  },
+  "metric_details": {
+    "value": "值：",
+    "count": "計數：",
+    "mean": "平均值：",
+    "minimum": "最小值：",
+    "maximum": "最大值：",
+    "standard_deviation": "標準差：",
+    "percentile_95": "第 95 百分位數：",
+    "percentile_98": "第 98 百分位數：",
+    "percentile_99": "第 99 百分位數：",
+    "invalid_type": "無效的指標類型：{{type}}",
+    "microseconds": "μs"
+  },
+  "meter_details": {
+    "total": "總計：",
+    "events": "事件",
+    "one_minute_avg": "1 分鐘平均：",
+    "five_minute_avg": "5 分鐘平均：",
+    "fifteen_minute_avg": "15 分鐘平均："
+  },
+  "counter_rate": {
+    "calculating": "計算中...",
+    "total": "（總計 {{total}}）",
+    "per_second": "每秒"
+  },
+  "metric_container": {
+    "loading": "載入中..."
+  },
+  "metrics_component": {
+    "fetch_error": "無法從節點擷取指標：伺服器回傳 <em>{{responseMessage}}</em>，狀態碼為 {{status}}。",
+    "fetch_problem": "擷取節點指標時發生問題。",
+    "retry_in_background": "系統將在背景持續嘗試擷取。",
+    "fetch_error_last_metrics": "無法從節點擷取指標：伺服器回傳 <em>{{responseMessage}}</em>，狀態碼為 {{status}}。正在顯示最後可用的指標。",
+    "filter_placeholder": "輸入指標名稱以篩選…"
+  },
+  "metrics_list": {
+    "no_metrics": "沒有符合篩選條件的指標。請確認您使用的是有效的正規表示式"
+  },
+  "buffer_usage": {
+    "metrics": "指標",
+    "utilization": "<strong>{{usage}} 則訊息</strong>位於 {{title}} 中，使用率為 {{percentage}}。"
+  },
+  "input_types_data_table": {
+    "loading": "正在載入輸入類型...",
+    "unavailable": "輸入類型無法使用。",
+    "documentation": "文件",
+    "name": "名稱",
+    "type": "類型",
+    "filter": "篩選"
+  },
+  "journal_details": {
+    "loading": "正在載入 Journal 指標...",
+    "disabled": "此節點已停用磁碟 Journal。",
+    "unavailable": "無法使用 Journal 指標。",
+    "overcommitted": "<strong>警告！</strong>Journal 使用率已超過定義的最大大小。<overviewLink>點擊此處</overviewLink>以取得更多資訊。",
+    "configuration": "設定",
+    "path": "路徑：",
+    "earliest_entry": "最早的項目：",
+    "maximum_size": "最大大小：",
+    "maximum_age": "最長保留時間：",
+    "flush_policy": "刷新原則：",
+    "flush_policy_value": "每 {{messages}} 則訊息或 {{duration}}",
+    "maximum_age_format": "d [days] h [hours] m [minutes]",
+    "flush_duration_format": "h [hours] m [minutes] s [seconds]",
+    "utilization": "使用率",
+    "unprocessed_messages": "<strong>{{messages}} 則未處理的訊息</strong>目前位於 Journal 中，分布在 {{segments}} 個區段。",
+    "appended_and_read": "過去一秒內已寫入 <strong>{{appended}} 則訊息</strong>，已讀取 <strong>{{read}} 則訊息</strong>。"
+  },
+  "journal_state": {
+    "loading": "正在載入 Journal 指標...",
+    "unavailable": "無法使用 Journal 指標。",
+    "summary_other": "Journal 中有 {{count}} 個區段，共含 <strong>{{messages}} 則未處理的訊息</strong>。過去一秒內已寫入 <strong>{{appended}} 則訊息</strong>，已讀取 <strong>{{read}} 則訊息</strong>。"
+  },
+  "jvm_heap_usage": {
+    "loading": "正在載入堆積記憶體使用資訊...",
+    "unavailable": "無法取得堆積記憶體資訊。",
+    "usage": "JVM 目前使用 <usedBlob /><strong> {{used}}</strong> 的堆積空間（已提交 <committedBlob /><strong> {{committed}}</strong>），且不會嘗試使用超過 <maxBlob /><strong> {{max}}</strong> 的空間"
+  },
+  "node_list_item": {
+    "system_info_unavailable": "目前無法取得系統資訊。"
+  },
+  "node_maintenance_dropdown": {
+    "actions": "操作",
+    "configure_internal_logging": "設定內部日誌"
+  },
+  "node_overview": {
+    "plugins_installed_other": "已安裝 {{count}} 個外掛",
+    "inputs_running_other": "此節點上有 {{count}} 個輸入正在執行",
+    "memory_heap_usage": "記憶體 / 堆積使用量",
+    "buffers": "緩衝區",
+    "buffers_description": "緩衝區用於在訊息經過不同處理器時，以極短時間（通常為毫秒）暫存少量訊息。",
+    "input_buffer": "輸入緩衝區",
+    "process_buffer": "處理緩衝區",
+    "output_buffer": "輸出緩衝區",
+    "disk_journal": "磁碟 Journal",
+    "disk_journal_description": "傳入的訊息會寫入磁碟 Journal，以確保伺服器故障時訊息仍安全保存。當任何輸出的處理速度跟不上訊息速率，或傳入訊息出現高峰時，Journal 也有助於維持運作。它能確保記憶體不會過載，並藉此避免過長的垃圾回收暫停。",
+    "system": "系統",
+    "rest_api": "REST API",
+    "installed_plugins": "已安裝的外掛",
+    "manage_inputs": "管理輸入",
+    "available_input_types": "可用的輸入類型"
+  },
+  "nodes_actions": {
+    "details": "詳細資料",
+    "metrics": "指標",
+    "more_actions": "更多操作",
+    "pause_message_processing": "暫停訊息處理",
+    "resume_message_processing": "恢復訊息處理",
+    "pause_confirm": "即將暫停此節點的訊息處理，確定要繼續嗎？",
+    "resume_confirm": "即將恢復此節點的訊息處理，確定要繼續嗎？",
+    "override_lb_status": "覆寫負載平衡器狀態",
+    "status_alive": "ALIVE",
+    "status_dead": "DEAD",
+    "load_balancer_confirm": "即將將此節點的負載平衡器狀態變更為 {{status}}，確定要繼續嗎？",
+    "local_message_inputs": "本機訊息輸入",
+    "thread_dump": "取得執行緒傾印",
+    "process_buffer_dump": "取得處理緩衝區傾印",
+    "recent_system_logs": "取得最近的系統日誌訊息"
+  },
+  "nodes_list": {
+    "active_nodes_other": "目前有 {{count}} 個作用中的節點",
+    "no_active_nodes": "目前沒有任何作用中的節點。"
+  },
+  "plugins_data_table": {
+    "loading": "正在載入此節點上的外掛...",
+    "no_plugins": "此節點未安裝任何外掛。",
+    "name": "名稱",
+    "version": "版本",
+    "author": "作者",
+    "description": "描述",
+    "website": "網站",
+    "filter": "篩選"
+  },
+  "rest_api_overview": {
+    "transport_address": "傳輸位址：",
+    "last_seen": "最後上線時間："
+  },
+  "system_information": {
+    "pid_info": "PID {{pid}}，{{info}}",
+    "jvm_unavailable": "無法取得此節點的 JVM 資訊。",
+    "hostname": "主機名稱：",
+    "node_id": "節點 ID：",
+    "version": "版本：",
+    "version_codename": "{{version}}，代號 <em>{{codename}}</em>",
+    "jvm": "JVM：",
+    "time": "時間："
+  },
+  "system_overview_details": {
+    "pause_confirm": "即將暫停此節點的訊息處理，確定要繼續嗎？",
+    "resume_confirm": "即將恢復此節點的訊息處理，確定要繼續嗎？",
+    "what_does_this_mean": "這代表什麼意思？",
+    "lifecycle_state": "生命週期狀態：<strong>{{lifecycle}}</strong>",
+    "marked_as_lb_status": "已在負載平衡器中標記為 <strong>{{status}}</strong>",
+    "pause_processing": "暫停處理",
+    "resume_processing": "恢復處理",
+    "not_processing": "節點<strong>未</strong>處理訊息"
+  },
+  "system_overview_summary": {
+    "current_lifecycle_state": "目前生命週期狀態：",
+    "message_processing": "訊息處理：",
+    "enabled": "已啟用",
+    "disabled": "已停用",
+    "lb_indication": "負載平衡器指示："
+  },
+  "bulk_actions": {
+    "dismiss": "關閉"
+  },
+  "system_notifications_table": {
+    "title": "通知",
+    "human_name": "通知"
+  },
+  "actions_cell": {
+    "dismiss": "關閉"
+  },
+  "title_cell": {
+    "show_full_message": "顯示完整訊息：{{title}}"
+  },
+  "system_job": {
+    "acknowledge_failed": "無法確認工作",
+    "cancel_failed": "無法取消工作",
+    "cancel_confirm": "確定要取消系統工作「{{info}}」嗎？",
+    "on_node": "- 位於",
+    "runtime": "執行時間：{{duration}}",
+    "cancel": "取消",
+    "acknowledge": "確認"
+  },
+  "system_jobs_component": {
+    "title": "系統工作",
+    "description": "系統工作是 {{productName}} 伺服器節點為了維護而執行的長時間任務。部分工作會提供進度資訊，或可以停止。"
+  },
+  "system_jobs_list": {
+    "no_active_jobs": "目前沒有作用中的系統工作。"
+  },
+  "system_messages_component": {
+    "title": "系統訊息",
+    "description": "系統訊息由 {{productName}} 伺服器節點在特定事件發生時產生，這些事件可能對 {{productName}} 管理員有參考價值。您無須主動處理此處的任何事件，因為需要採取行動的事件都會發出通知。"
+  },
+  "system_messages_list": {
+    "timestamp": "時間戳記",
+    "node": "節點",
+    "message": "訊息"
+  },
+  "global_throughput": {
+    "aria_label": "吞吐量：輸入 {{input}} / 輸出 {{output}} 則訊息/秒",
+    "in_title": "每秒傳入訊息數",
+    "out_title": "每秒傳出訊息數"
+  },
+  "node_throughput": {
+    "loading": "正在載入吞吐量...",
+    "unable_to_load": "無法載入吞吐量。",
+    "processing_long": "正在處理 <strong>{{totalIn}}</strong> 則傳入訊息與 <strong>{{totalOut}}</strong> 則傳出訊息/秒。",
+    "short": "輸入 {{totalIn}} / 輸出 {{totalOut}} 則訊息/秒。"
+  },
+  "telemetry_debug_entry_row": {
+    "delta": " (+{{delta}}ms)",
+    "pii_suspect": "疑似個資：{{suspect}}",
+    "copy_as_json": "將事件複製為 JSON"
+  },
+  "telemetry_debug_overlay": {
+    "badge_label": "遙測除錯",
+    "badge": "遙測除錯：{{count}}",
+    "drawer_label": "遙測除錯面板",
+    "resize_label": "調整遙測除錯面板大小",
+    "title": "遙測除錯（{{count}}）",
+    "filter_label": "篩選事件",
+    "filter_placeholder": "依事件名稱或酬載篩選...",
+    "resume": "繼續",
+    "pause": "暫停",
+    "clear": "清除",
+    "export_session": "匯出工作階段",
+    "collapse": "收合",
+    "no_events": "尚未記錄任何遙測事件，請操作應用程式即可在此查看。",
+    "time": "時間",
+    "event": "事件",
+    "action": "動作",
+    "status": "狀態"
+  },
+  "cluster_configuration_page": {
+    "title": "叢集設定",
+    "description": "此頁面提供叢集中各節點的即時總覽。您可以隨時暫停訊息處理。在恢復之前，處理緩衝區不會接受任何新訊息。若節點已啟用訊息 Journal（預設即為啟用），即使處理已停用，傳入的訊息仍會持久化寫入磁碟。"
+  },
+  "configurations_page": {
+    "title": "設定",
+    "description": "您可以在此頁面為不同子系統設定系統設定。",
+    "plugins": "外掛程式"
+  },
+  "enterprise_page": {
+    "document_title": "{{productName}} Enterprise",
+    "page_title": "<upsell>試用</upsell> {{productName}} Enterprise",
+    "learn_more": "<upsell><productLink>進一步了解</productLink> {{productName}} Enterprise 功能。</upsell>"
+  },
+  "process_buffer_dump_page": {
+    "title": "節點 {{shortNodeId}} / {{hostname}} 的處理緩衝區傾印",
+    "taken_at": "擷取時間：<0/>"
+  },
+  "show_metrics_page": {
+    "title": "節點 {{shortNodeId}} / {{hostname}} 的指標",
+    "description": "所有 {{productName}} 節點都提供一組內部指標，用於診斷、除錯與監控。您也可以透過 JMX 存取所有指標。",
+    "total_metrics_other": "此節點總共回報 {{count}} 個指標。"
+  },
+  "node_page": {
+    "title": "節點 {{shortNodeId}} / {{hostname}}",
+    "description": "此頁面顯示叢集中作用中且可連線的 {{productName}} 伺服器節點詳細資料。",
+    "leader_node": "這是領導者節點。",
+    "not_leader_node": "這<em>不是</em>領導者節點。"
+  },
+  "system_logs_page": {
+    "title": "節點 {{shortNodeId}} / {{hostname}} 最近的系統日誌（上限 {{limit}} 筆）",
+    "taken_at": "擷取時間：<0/>",
+    "reload": "重新載入",
+    "back": "返回",
+    "document_title": "節點 {{shortNodeId}} / {{hostname}} 的系統日誌"
+  },
+  "system_notifications_page": {
+    "title": "系統通知"
+  },
+  "system_overview_page": {
+    "title": "系統總覽"
+  },
+  "thread_dump_page": {
+    "title": "節點 {{shortNodeId}} / {{hostname}} 的執行緒傾印",
+    "taken_at": "擷取時間：<0/>"
+  },
+  "notifications": {
+    "lb_change_success": "已成功將節點 '{{nodeId}}' 的負載平衡器狀態變更為 '{{status}}'",
+    "lb_change_failed": "變更節點 '{{nodeId}}' 的負載平衡器狀態失敗：{{error}}",
+    "lb_change_failed_title": "無法將節點 '{{nodeId}}' 的負載平衡器狀態變更為 '{{status}}'",
+    "processing_pause_success": "已成功暫停 '{{nodeId}}' 的訊息處理",
+    "processing_pause_failed": "暫停 '{{nodeId}}' 的訊息處理失敗：{{error}}",
+    "processing_pause_failed_title": "無法暫停節點 '{{nodeId}}' 的訊息處理",
+    "processing_resume_success": "已成功恢復 '{{nodeId}}' 的訊息處理",
+    "processing_resume_failed": "恢復 '{{nodeId}}' 的訊息處理失敗：{{error}}",
+    "processing_resume_failed_title": "無法恢復節點 '{{nodeId}}' 的訊息處理",
+    "nothing_selected": "未選取任何通知。",
+    "nothing_to_dismiss_title": "沒有可關閉的項目",
+    "bulk_dismiss_failed": "關閉通知失敗，請再試一次。",
+    "dismiss_failed": "關閉通知失敗，請再試一次。",
+    "dismiss_failed_title": "關閉失敗",
+    "profiling_enabled": "已成功啟用 MongoDB 效能分析。",
+    "profiling_disabled": "已成功停用 MongoDB 效能分析。",
+    "profiling_enable_failed": "啟用 MongoDB 效能分析失敗：{{error}}",
+    "profiling_disable_failed": "停用 MongoDB 效能分析失敗：{{error}}",
+    "profiling_update_failed_title": "無法更新 MongoDB 效能分析。",
+    "data_node_metrics_failed": "載入資料節點 \"{{hostname}}\" 的指標失敗",
+    "data_node_metrics_failed_title": "無法載入資料節點指標。",
+    "graylog_node_metrics_failed": "載入 Graylog 節點指標失敗，狀態為",
+    "graylog_node_metrics_failed_title": "無法載入 Graylog 節點指標。",
+    "cluster_traffic_failed": "載入叢集流量失敗，狀態為",
+    "cluster_traffic_failed_title": "無法載入叢集流量",
+    "journal_failed": "無法取得 Journal 資訊",
+    "system_jobs_failed": "載入系統工作失敗，狀態為",
+    "system_jobs_failed_title": "無法載入系統工作"
+  },
+  "use_cluster_overview_notifications": {
+    "jvm_failed": "取得節點 '{{nodeId}}' 的 JVM 資訊失敗：{{error}}",
+    "jvm_failed_title": "無法取得 JVM 資訊",
+    "thread_dump_failed": "取得節點 '{{nodeId}}' 的執行緒傾印失敗：{{error}}",
+    "thread_dump_failed_title": "無法取得執行緒傾印",
+    "process_buffer_dump_failed": "取得節點 '{{nodeId}}' 的處理緩衝區傾印失敗：{{error}}",
+    "process_buffer_dump_failed_title": "無法取得處理緩衝區傾印",
+    "system_logs_failed": "取得節點 '{{nodeId}}' 的系統日誌訊息失敗：{{error}}",
+    "system_logs_failed_title": "無法取得系統日誌訊息",
+    "overview_failed": "取得叢集總覽失敗：{{error}}",
+    "overview_failed_title": "無法取得叢集總覽"
+  },
+  "use_cluster_support_bundle_notifications": {
+    "create_failed": "建立支援套件失敗，狀態為：{{error}}",
+    "create_failed_title": "無法建立支援套件。",
+    "delete_failed": "刪除支援套件失敗，狀態為：{{error}}",
+    "delete_failed_title": "無法刪除支援套件。",
+    "download_failed": "下載支援套件失敗，狀態為：{{error}}",
+    "download_failed_title": "無法下載支援套件。",
+    "load_list_failed": "載入支援套件清單失敗，狀態為",
+    "load_list_failed_title": "無法載入支援套件清單。"
+  },
+  "use_plugin_list_notifications": {
+    "fetch_failed": "取得節點 \"{{nodeId}}\" 上的外掛失敗",
+    "fetch_failed_title": "無法取得外掛"
+  },
+  "node_lifecycle": {
+    "uninitialized": "未初始化",
+    "starting": "正在啟動",
+    "running": "執行中",
+    "failed": "失敗",
+    "halting": "正在停止",
+    "paused": "已暫停",
+    "throttled": "已限流",
+    "override_lb_alive": "負載平衡器：強制上線",
+    "override_lb_dead": "負載平衡器：強制離線",
+    "override_lb_throttled": "負載平衡器：強制限流"
+  },
+  "buffers_metrics_cell": {
+    "input": "輸入",
+    "process": "處理",
+    "output": "輸出"
+  },
+  "throughput_metrics_cell": {
+    "in": "流入",
+    "out": "流出"
+  },
+  "mongodb_nodes": {
+    "profiling_levels": {
+      "off": "關閉",
+      "slow_ops": "Slow Ops",
+      "all": "全部",
+      "unknown": "未知（{{level}}）"
+    },
+    "roles": {
+      "primary": "主要節點",
+      "secondary": "次要節點",
+      "arbiter": "仲裁節點",
+      "standalone": "獨立節點"
+    }
+  }
+}

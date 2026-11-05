@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { MenuItem } from 'components/bootstrap';
 import { IfPermitted } from 'components/common';
@@ -23,6 +24,7 @@ import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSele
 import useNotificationBulkDismiss from 'components/notifications/hooks/useNotificationBulkDismiss';
 
 const BulkActions = () => {
+  const { t } = useTranslation('system');
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const { mutate: bulkDismiss } = useNotificationBulkDismiss();
 
@@ -38,7 +40,7 @@ const BulkActions = () => {
   return (
     <BulkActionsDropdown>
       <IfPermitted permissions="notifications:delete">
-        <MenuItem onSelect={handleBulkDismiss}>Dismiss</MenuItem>
+        <MenuItem onSelect={handleBulkDismiss}>{t('bulk_actions.dismiss')}</MenuItem>
       </IfPermitted>
     </BulkActionsDropdown>
   );

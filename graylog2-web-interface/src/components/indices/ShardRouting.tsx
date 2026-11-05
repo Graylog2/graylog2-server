@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 
 import { OverlayTrigger } from 'components/common';
@@ -30,16 +31,20 @@ type Props = {
 };
 
 const ShardRouting = ({ route }: Props) => {
+  const { t } = useTranslation('indexsets');
   const tooltip = (
-    <>
-      State: <i>{route.state}</i> on {route.node_hostname} ({route.node_name})
-    </>
+    <Trans
+      t={t}
+      i18nKey="shards.tooltip"
+      values={{ state: route.state, hostname: route.node_hostname, name: route.node_name }}
+      components={{ i: <i /> }}
+    />
   );
 
   return (
     <li className={classNames('shard', `shard-${route.state}`, { 'shard-primary': route.primary })}>
       <OverlayTrigger placement="top" overlay={tooltip}>
-        <span className="id">S{route.id}</span>
+        <span className="id">{t('shards.shard_id', { id: route.id })}</span>
       </OverlayTrigger>
     </li>
   );

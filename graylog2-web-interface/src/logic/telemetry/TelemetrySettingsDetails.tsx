@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import SectionComponent from 'components/common/Section/SectionComponent';
 import { Spinner, ReadOnlyFormGroup } from 'components/common';
@@ -23,6 +24,7 @@ import TelemetryInfoText from 'logic/telemetry/TelemetryInfoText';
 import AppConfig from 'util/AppConfig';
 
 const TelemetrySettingsDetailsComponent = () => {
+  const { t } = useTranslation('common');
   const { data: settings } = useTelemetrySettings();
 
   if (!settings) {
@@ -30,9 +32,9 @@ const TelemetrySettingsDetailsComponent = () => {
   }
 
   return (
-    <SectionComponent title="Telemetry">
+    <SectionComponent title={t('telemetry.title')}>
       <TelemetryInfoText />
-      <ReadOnlyFormGroup label="Telemetry" value={settings.telemetry_enabled ?? false} />
+      <ReadOnlyFormGroup label={t('telemetry.title')} value={settings.telemetry_enabled ?? false} />
     </SectionComponent>
   );
 };

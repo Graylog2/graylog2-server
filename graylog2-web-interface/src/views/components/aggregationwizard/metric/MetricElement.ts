@@ -16,6 +16,7 @@
  */
 import isNumber from 'lodash/isNumber';
 
+import i18n from 'i18n';
 import type { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series, { parseSeries } from 'views/logic/aggregationbuilder/Series';
@@ -49,26 +50,30 @@ const validateMetrics = (values: WidgetConfigFormValues) => {
     const metricError: MetricError = {};
 
     if (!metric.function) {
-      metricError.function = 'Function is required.';
+      metricError.function = i18n.t('wizard_metric.function_required', { ns: 'aggregation' });
     }
 
     const isFieldRequired =
       metric.function !== 'count' && (metric.function !== 'percentage' || metric.strategy === 'SUM');
 
     if (isFieldRequired && !metric.field) {
-      metricError.field = `Field is required for function ${metric.function}.`;
+      metricError.field = i18n.t('wizard_metric.field_required_for_function', {
+        ns: 'aggregation',
+        function: metric.function,
+      });
     }
 
     if (metric.function === 'percentile' && !metric.percentile) {
-      metricError.percentile = 'Percentile is required.';
+      metricError.percentile = i18n.t('wizard_metric.percentile_required', { ns: 'aggregation' });
     }
 
     if (metric.name && values.metrics.filter(({ name }) => name === metric.name).length > 1) {
-      metricError.name = 'Name must be unique.';
+      metricError.name = i18n.t('wizard_metric.name_unique', { ns: 'aggregation' });
     }
 
     const thresholdErrors: MetricError['thresholds'] = metric?.thresholds?.map((threshold) => {
-      if (!isNumber(threshold?.value)) return { value: 'Threshold value is required.' };
+      if (!isNumber(threshold?.value))
+        return { value: i18n.t('wizard_metric.threshold_value_required', { ns: 'aggregation' }) };
 
       return undefined;
     });
@@ -150,7 +155,9 @@ export const seriesToMetrics = (series: Array<Series>) =>
 
 const MetricElement: AggregationElement<'metrics'> = {
   sectionTitle: 'Metrics',
+  sectionTitleKey: 'wizard_common.metrics',
   title: 'Metric',
+  titleKey: 'wizard_common.metric',
   key: 'metrics',
   order: 2,
   allowCreate: () => true,

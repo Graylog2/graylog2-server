@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useRef, useState, useEffect, useCallback } from 'react';
 import debounce from 'lodash/debounce';
 
@@ -40,6 +41,7 @@ type Props = Omit<React.ComponentProps<typeof Select>, 'options'> & {
 };
 
 const PaginatedSelect = ({ onLoadOptions, ...rest }: Props) => {
+  const { t } = useTranslation('common');
   const selectRef = useRef();
   const [paginatedOptions, setPaginatedOptions] = useState<PaginatedOptions | undefined>();
   const [isLoading, setIsLoading] = useState(false);
@@ -88,7 +90,7 @@ const PaginatedSelect = ({ onLoadOptions, ...rest }: Props) => {
   }, []);
 
   if (!paginatedOptions) {
-    return <Spinner text="Loading options..." />;
+    return <Spinner text={t('select.loading_options')} />;
   }
 
   return (

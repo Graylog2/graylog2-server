@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { NodeMaintenanceDropdown, NodeOverview } from 'components/nodes';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -29,6 +30,7 @@ import usePluginList from 'hooks/usePluginList';
 import useProductName from 'brand-customization/useProductName';
 
 const ShowNodePage = () => {
+  const { t } = useTranslation('system');
   const productName = useProductName();
   const { nodeId } = useParams<{ nodeId: string }>();
   const { data: inputDescriptions } = useInputTypesDescriptions();
@@ -65,24 +67,20 @@ const ShowNodePage = () => {
     return <Spinner />;
   }
 
-  const title = (
-    <span>
-      Node {node.short_node_id} / {node.hostname}
-    </span>
-  );
+  const title = <span>{t('node_page.title', { shortNodeId: node.short_node_id, hostname: node.hostname })}</span>;
 
   return (
-    <DocumentTitle title={`Node ${node.short_node_id} / ${node.hostname}`}>
+    <DocumentTitle title={t('node_page.title', { shortNodeId: node.short_node_id, hostname: node.hostname })}>
       <div>
         <PageHeader title={title} actions={<NodeMaintenanceDropdown node={node} />}>
           <span>
-            This page shows details of a {productName} server node that is active and reachable in your cluster.
+            {t('node_page.description', { productName })}
             <br />
             {node.is_leader ? (
-              <span>This is the leader node.</span>
+              <span>{t('node_page.leader_node')}</span>
             ) : (
               <span>
-                This is <em>not</em> the leader node.
+                <Trans t={t} i18nKey="node_page.not_leader_node" components={{ em: <em /> }} />
               </span>
             )}
           </span>

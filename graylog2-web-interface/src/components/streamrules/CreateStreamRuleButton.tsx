@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from 'components/bootstrap';
 import type { BsSize } from 'components/bootstrap/types';
@@ -42,13 +43,14 @@ type Props = {
 const CreateStreamRuleButton = ({
   bsSize = undefined,
   bsStyle = undefined,
-  buttonText = 'Create Rule',
+  buttonText = undefined,
   className = undefined,
   disabled = false,
   streamId,
   streamTitle = undefined,
   streamIsPaused = false,
 }: Props) => {
+  const { t } = useTranslation('streams');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const toggleCreateModal = useCallback(() => setShowCreateModal((cur) => !cur), []);
   const sendTelemetry = useSendTelemetry();
@@ -79,14 +81,14 @@ const CreateStreamRuleButton = ({
         disabled={disabled}
         className={className}
         onClick={openCreateStreamRuleModal}>
-        {buttonText}
+        {buttonText ?? t('stream_rules.create_button')}
       </Button>
       {showCreateModal && (
         <StreamRuleModal
           onClose={toggleCreateModal}
-          title="New Stream Rule"
-          submitButtonText="Create Rule"
-          submitLoadingText="Creating Rule..."
+          title={t('stream_rules.new_title')}
+          submitButtonText={t('stream_rules.create_button')}
+          submitLoadingText={t('stream_rules.creating')}
           onSubmit={onSaveStreamRule}
         />
       )}

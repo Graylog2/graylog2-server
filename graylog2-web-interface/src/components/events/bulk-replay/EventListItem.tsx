@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import IconButton from 'components/common/IconButton';
 import type { Event } from 'components/events/events/types';
@@ -80,6 +81,7 @@ const EventListItem = ({
   className = '',
   isDropdown = false,
 }: EventListItemProps) => {
+  const { t } = useTranslation('events');
   const _removeItem = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
 
@@ -96,19 +98,27 @@ const EventListItem = ({
       $selected={selected}
       onClick={onClick}
       className={className}
-      title={isDropdown ? 'Show Selected Events' : undefined}>
+      title={isDropdown ? t('alerts_bulk_replay.show_selected') : undefined}>
       <CompletedButton
         onClick={_markItemAsDone}
-        title={`Mark event "${event?.id}" as ${done ? 'not' : ''} reviewed`}
+        title={
+          done
+            ? t('alerts_bulk_replay.mark_not_reviewed', { id: event?.id })
+            : t('alerts_bulk_replay.mark_reviewed', { id: event?.id })
+        }
         name="verified"
         iconType={done ? 'solid' : 'regular'}
         $done={done}
       />
-      <Summary $done={done}>{event?.message ?? <i>Unknown</i>}</Summary>
+      <Summary $done={done}>{event?.message ?? <i>{t('alerts_bulk_replay.unknown_message')}</i>}</Summary>
       {isDropdown ? (
         <Icon name="arrow_drop_down" />
       ) : (
-        <IconButton onClick={_removeItem} title={`Remove event "${event?.id}" from list`} name="delete" />
+        <IconButton
+          onClick={_removeItem}
+          title={t('alerts_bulk_replay.remove_event', { id: event?.id })}
+          name="delete"
+        />
       )}
     </StyledItem>
   );

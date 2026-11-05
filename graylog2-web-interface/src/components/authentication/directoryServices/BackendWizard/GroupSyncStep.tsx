@@ -17,6 +17,7 @@
 import * as React from 'react';
 import type * as Immutable from 'immutable';
 import type { FormikProps } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { Row, Col, Button, ButtonToolbar } from 'components/bootstrap';
 import { EnterprisePluginNotFound } from 'components/common';
@@ -52,6 +53,7 @@ const GroupSyncStep = ({
   excludedFields,
 }: Props) => {
   const sendTelemetry = useSendTelemetry('directory-service');
+  const { t } = useTranslation('authentication');
 
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   const GroupSyncForm = enterpriseGroupSyncPlugin?.components?.GroupSyncForm;
@@ -61,7 +63,7 @@ const GroupSyncStep = ({
       <>
         <Row>
           <Col xs={12}>
-            <EnterprisePluginNotFound featureName="group synchronization" />
+            <EnterprisePluginNotFound featureName={t('config_details.group_sync_feature_name')} />
           </Col>
         </Row>
         <ButtonToolbar className="pull-right">
@@ -74,7 +76,7 @@ const GroupSyncStep = ({
 
               onSubmitAll(false);
             }}>
-            Finish & Save Service
+            {t('wizard.finish_and_save')}
           </Button>
         </ButtonToolbar>
       </>

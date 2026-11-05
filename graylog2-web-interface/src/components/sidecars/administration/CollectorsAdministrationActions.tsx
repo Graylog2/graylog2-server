@@ -17,6 +17,7 @@
 import React, { useState, useCallback } from 'react';
 import uniq from 'lodash/uniq';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { ButtonToolbar, Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
@@ -51,20 +52,23 @@ const CollectorsAdministrationActions = ({
 }: Props) => {
   const [showConfigurationModal, setShowConfigurationModal] = useState(false);
   const onCancelConfigurationModal = useCallback(() => setShowConfigurationModal(false), []);
+  const { t } = useTranslation('sidecars');
 
   const selectedLogCollectorsNames = uniq(selectedSidecarCollectorPairs.map(({ collector }) => collector.name));
   const disableConfigButton = !selectedSidecarCollectorPairs.length || selectedLogCollectorsNames.length !== 1;
 
   const getConfigButtonTooltip = () => {
     if (!selectedSidecarCollectorPairs.length) {
-      return 'Incompatible collectors, please check your sidecar configuration.';
+      return t('administration.collectors_administration_actions.incompatible_collectors');
     }
 
     if (selectedLogCollectorsNames.length !== 1) {
-      return `Cannot change configurations of ${selectedLogCollectorsNames.join(', ')} collectors simultaneously.`;
+      return t('administration.collectors_administration_actions.cannot_change_configurations', {
+        collectors: selectedLogCollectorsNames.join(', '),
+      });
     }
 
-    return 'Assign Configurations';
+    return t('administration.collectors_administration_actions.assign_configurations');
   };
 
   return (
@@ -75,7 +79,7 @@ const CollectorsAdministrationActions = ({
         bsSize="small"
         disabled={disableConfigButton}
         onClick={() => setShowConfigurationModal(true)}>
-        <Icon name="edit_square" /> Assign Configurations
+        <Icon name="edit_square" /> {t('administration.collectors_administration_actions.assign_configurations')}
       </ConfigurationButton>
       <CollectorConfigurationModalContainer
         collectors={collectors}

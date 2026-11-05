@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import useHistory from 'routing/useHistory';
 import { Button, Row, Col } from 'components/bootstrap';
@@ -44,16 +45,17 @@ const FlexCol = styled(Col)`
 
 function LUTCacheDetailsPage() {
   const { goBack } = useHistory();
+  const { t } = useTranslation('lookup_tables');
 
   return (
     <FlexContainer>
       <LUTPageLayout
-        documentTitle="Lookup Tables - Caches Details"
-        pageTitle="Caches Details for Lookup Tables"
-        pageDescription="Caches store values for lookup tables to improve performance."
+        documentTitle={t('cache_details_document_title')}
+        pageTitle={t('cache_details_page_title')}
+        pageDescription={t('cache_description')}
         actions={
           <Button bsStyle="primary" onClick={() => goBack()}>
-            Back to list
+            {t('back_to_list')}
           </Button>
         }>
         <Row className="content" style={{ flexGrow: 1 }}>

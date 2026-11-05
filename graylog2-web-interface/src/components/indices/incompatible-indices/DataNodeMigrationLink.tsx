@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Icon from 'components/common/Icon';
 import Link from 'components/common/Link';
@@ -22,16 +23,17 @@ import Routes from 'routing/Routes';
 import AppConfig from 'util/AppConfig';
 
 type Props = {
-  text: string;
+  text: React.ReactNode;
 };
 
 const DataNodeMigrationLink = ({ text }: Props) => {
+  const { t } = useTranslation('indexsets');
   const migrationRouteAvailable = !AppConfig.isCloud() && AppConfig.isFeatureEnabled('data_node_migration');
 
   return migrationRouteAvailable ? (
     <Link to={Routes.SYSTEM.CLUSTER.DATANODE_MIGRATION} target="_blank" rel="noopener noreferrer">
       {text} <Icon name="open_in_new" size="xs" />
-      <span className="sr-only"> (opens in a new tab)</span>
+      <span className="sr-only">{t('incompatible.opens_in_new_tab')}</span>
     </Link>
   ) : (
     text

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { LinkContainer, PageHeader, DocumentTitle } from 'components/common';
 import Routes from 'routing/Routes';
@@ -23,25 +24,29 @@ import { Button } from 'components/bootstrap';
 import UserCreate from 'components/users/UserCreate';
 import UsersPageNavigation from 'components/users/navigation/UsersPageNavigation';
 
-const UserCreatePage = () => (
-  <DocumentTitle title="Create New User">
-    <UsersPageNavigation />
-    <PageHeader
-      title="Create New User"
-      actions={
-        <LinkContainer to={Routes.SYSTEM.USERS.CREATE}>
-          <Button bsStyle="primary">Create user</Button>
-        </LinkContainer>
-      }
-      documentationLink={{
-        title: 'Permissions documentation',
-        path: DocsHelper.PAGES.USERS_ROLES,
-      }}>
-      <span>Use this page to create new users for the web interface or the REST API.</span>
-    </PageHeader>
+const UserCreatePage = () => {
+  const { t } = useTranslation('users');
 
-    <UserCreate />
-  </DocumentTitle>
-);
+  return (
+    <DocumentTitle title={t('user_create.title')}>
+      <UsersPageNavigation />
+      <PageHeader
+        title={t('user_create.title')}
+        actions={
+          <LinkContainer to={Routes.SYSTEM.USERS.CREATE}>
+            <Button bsStyle="primary">{t('user_create.submit_button')}</Button>
+          </LinkContainer>
+        }
+        documentationLink={{
+          title: t('user_create.documentation_link_title'),
+          path: DocsHelper.PAGES.USERS_ROLES,
+        }}>
+        <span>{t('user_create.description')}</span>
+      </PageHeader>
+
+      <UserCreate />
+    </DocumentTitle>
+  );
+};
 
 export default UserCreatePage;

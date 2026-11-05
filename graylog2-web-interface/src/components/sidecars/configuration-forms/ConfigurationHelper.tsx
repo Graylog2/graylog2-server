@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Col, Panel, Row, Tabs } from 'components/bootstrap';
 
@@ -26,73 +27,81 @@ type Props = {
   onVariableRename: (...args: any[]) => void;
 };
 
-const ConfigurationHelper = ({ onVariableRename }: Props) => (
-  <Panel header="Collector Configuration Reference">
-    <Row className="row-sm">
-      <Col md={12}>
-        <Tabs defaultValue="runtime-variables">
-          <Tabs.List>
-            <Tabs.Tab value="runtime-variables">Runtime Variables</Tabs.Tab>
-            <Tabs.Tab value="variables">Variables</Tabs.Tab>
-            <Tabs.Tab value="reference">Reference</Tabs.Tab>
-          </Tabs.List>
-          <Tabs.Panel value="runtime-variables">
-            <p className={ConfigurationHelperStyle.marginQuickReferenceText}>
-              These variables will be filled with the runtime information from each Sidecar
-            </p>
-            <TemplatesHelper />
-          </Tabs.Panel>
-          <Tabs.Panel value="variables">
-            <p className={ConfigurationHelperStyle.marginQuickReferenceText}>
-              Use variables to share text snippets across multiple configurations.
-              <br />
-              If your configuration format needs to use literals like <code>$&#123;foo&#125;</code>, which shall not act
-              as a variable, you will have to write it as
-              <code>$&#123;&apos;$&apos;&#125;&#123;foo&#125;</code>.
-            </p>
-            <ConfigurationVariablesHelper onVariableRename={onVariableRename} />
-          </Tabs.Panel>
-          <Tabs.Panel value="reference">
-            <Row className="row-sm">
-              <Col md={12}>
-                <p className={ConfigurationHelperStyle.marginQuickReferenceText}>
-                  We provide collector configuration templates to get you started.
-                  <br />
-                  For further information please refer to the official documentation of your collector.
-                </p>
-                <ul className={ConfigurationHelperStyle.ulStyle}>
-                  <li>
-                    <a
-                      href="https://www.elastic.co/guide/en/beats/filebeat/current/index.html"
-                      target="_blank"
-                      rel="noopener noreferrer">
-                      Filebeat Reference
-                    </a>{' '}
-                  </li>
-                  <li>
-                    <a
-                      href="https://www.elastic.co/guide/en/beats/winlogbeat/current/index.html"
-                      target="_blank"
-                      rel="noopener noreferrer">
-                      Winlogbeat Reference
-                    </a>{' '}
-                  </li>
-                  <li>
-                    <a
-                      href="https://nxlog.co/docs/nxlog-ce/nxlog-reference-manual.html"
-                      target="_blank"
-                      rel="noopener noreferrer">
-                      NXLog Reference Manual
-                    </a>{' '}
-                  </li>
-                </ul>
-              </Col>
-            </Row>
-          </Tabs.Panel>
-        </Tabs>
-      </Col>
-    </Row>
-  </Panel>
-);
+const ConfigurationHelper = ({ onVariableRename }: Props) => {
+  const { t } = useTranslation('sidecars');
+
+  return (
+    <Panel header={t('configuration_forms.configuration_helper.title')}>
+      <Row className="row-sm">
+        <Col md={12}>
+          <Tabs defaultValue="runtime-variables">
+            <Tabs.List>
+              <Tabs.Tab value="runtime-variables">
+                {t('configuration_forms.configuration_helper.tab_runtime_variables')}
+              </Tabs.Tab>
+              <Tabs.Tab value="variables">{t('configuration_forms.configuration_helper.tab_variables')}</Tabs.Tab>
+              <Tabs.Tab value="reference">{t('configuration_forms.configuration_helper.tab_reference')}</Tabs.Tab>
+            </Tabs.List>
+            <Tabs.Panel value="runtime-variables">
+              <p className={ConfigurationHelperStyle.marginQuickReferenceText}>
+                {t('configuration_forms.configuration_helper.runtime_variables_help')}
+              </p>
+              <TemplatesHelper />
+            </Tabs.Panel>
+            <Tabs.Panel value="variables">
+              <p className={ConfigurationHelperStyle.marginQuickReferenceText}>
+                <Trans
+                  t={t}
+                  i18nKey="configuration_forms.configuration_helper.variables_help"
+                  components={{ lineBreak: <br />, code: <code /> }}
+                />
+              </p>
+              <ConfigurationVariablesHelper onVariableRename={onVariableRename} />
+            </Tabs.Panel>
+            <Tabs.Panel value="reference">
+              <Row className="row-sm">
+                <Col md={12}>
+                  <p className={ConfigurationHelperStyle.marginQuickReferenceText}>
+                    <Trans
+                      t={t}
+                      i18nKey="configuration_forms.configuration_helper.reference_help"
+                      components={{ lineBreak: <br /> }}
+                    />
+                  </p>
+                  <ul className={ConfigurationHelperStyle.ulStyle}>
+                    <li>
+                      <a
+                        href="https://www.elastic.co/guide/en/beats/filebeat/current/index.html"
+                        target="_blank"
+                        rel="noopener noreferrer">
+                        {t('configuration_forms.configuration_helper.filebeat_reference')}
+                      </a>{' '}
+                    </li>
+                    <li>
+                      <a
+                        href="https://www.elastic.co/guide/en/beats/winlogbeat/current/index.html"
+                        target="_blank"
+                        rel="noopener noreferrer">
+                        {t('configuration_forms.configuration_helper.winlogbeat_reference')}
+                      </a>{' '}
+                    </li>
+                    <li>
+                      <a
+                        href="https://nxlog.co/docs/nxlog-ce/nxlog-reference-manual.html"
+                        target="_blank"
+                        rel="noopener noreferrer">
+                        {t('configuration_forms.configuration_helper.nxlog_reference')}
+                      </a>{' '}
+                    </li>
+                  </ul>
+                </Col>
+              </Row>
+            </Tabs.Panel>
+          </Tabs>
+        </Col>
+      </Row>
+    </Panel>
+  );
+};
 
 export default ConfigurationHelper;

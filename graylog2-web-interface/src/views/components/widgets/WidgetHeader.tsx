@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { Spinner, Icon, OverlayTrigger } from 'components/common';
@@ -139,17 +140,22 @@ const DescriptionInput = styled(Input)(
   `,
 );
 
-const DescriptionPopover = ({ description }: { description: string }) => (
-  <OverlayTrigger
-    trigger="click"
-    rootClose
-    placement="bottom"
-    overlay={description ?? <i>No widget description provided</i>}>
-    <IconButton title="Show description for widget" name="help" />
-  </OverlayTrigger>
-);
+const DescriptionPopover = ({ description }: { description: string }) => {
+  const { t } = useTranslation('widgets');
+
+  return (
+    <OverlayTrigger
+      trigger="click"
+      rootClose
+      placement="bottom"
+      overlay={description ?? <i>{t('widget_header.no_description')}</i>}>
+      <IconButton title={t('widget_header.show_description')} name="help" />
+    </OverlayTrigger>
+  );
+};
 
 const WidgetDescription = ({ onChange = undefined, editing, description }: WidgetDescriptionProps) => {
+  const { t } = useTranslation('widgets');
   if (typeof onChange !== 'function') {
     return <Title>{description}</Title>;
   }
@@ -162,7 +168,7 @@ const WidgetDescription = ({ onChange = undefined, editing, description }: Widge
       <DescriptionInput
         type="text"
         id="widget-description"
-        placeholder="Please add a helpful description to the widget"
+        placeholder={t('widget_header.description_placeholder')}
         onChange={(e) => onChange(e.target.value)}
         defaultValue={description}
         required
@@ -194,13 +200,14 @@ const WidgetHeader = ({
   onRename = undefined,
   onUpdateDescription = undefined,
 }: Props) => {
+  const { t } = useTranslation('widgets');
   const interactive = useIsInteractiveMode();
 
   return (
     <Container>
       <Col>
         {hideDragHandle || (
-          <DragHandleContainer className={widgetDragHandleClass} title={`Drag handle for ${title}`}>
+          <DragHandleContainer className={widgetDragHandleClass} title={t('widget_header.drag_handle', { title })}>
             <WidgetDragHandle name="drag_indicator" />
           </DragHandleContainer>
         )}

@@ -17,6 +17,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 
+import i18n from 'i18n';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import { defaultOnError } from 'util/conditional/onError';
@@ -28,8 +29,8 @@ const useMinimumRefreshInterval = () => {
     queryFn: () =>
       defaultOnError(
         fetch('GET', qualifyUrl('/system/configuration/minimum_auto_refresh_interval')),
-        'Loading system configuration "minimum_auto_refresh_interval" failed with status',
-        'Could not load configuration option',
+        i18n.t('save_view_notifications.load_minimum_refresh_interval_failed', { ns: 'search' }),
+        i18n.t('save_view_notifications.could_not_load_configuration', { ns: 'search' }),
       ),
   });
 

@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import moment from 'moment';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Col, Row } from 'components/bootstrap';
 import { Spinner, Timestamp, BrowserTime } from 'components/common';
@@ -25,6 +26,7 @@ import useSystemInfo from 'hooks/useSystemStore';
 import useProductName from 'brand-customization/useProductName';
 
 const TimesList = () => {
+  const { t } = useTranslation('common');
   const productName = useProductName();
   const [time, setTime] = useState(moment());
   const currentUser = useCurrentUser();
@@ -46,26 +48,27 @@ const TimesList = () => {
   return (
     <Row className="content">
       <Col md={12}>
-        <h2>Time configuration</h2>
+        <h2>{t('times_list.title')}</h2>
 
-        <p className="description">
-          Dealing with timezones can be confusing. Here you can see the timezone applied to different components of your
-          system. You can check timezone settings of specific {productName} server nodes on their respective detail
-          page.
-        </p>
+        <p className="description">{t('times_list.description', { productName })}</p>
 
         <dl className="system-dl">
           <dt>
-            User <em>{currentUser.username}</em>:
+            <Trans
+              t={t}
+              i18nKey="times_list.user"
+              values={{ username: currentUser.username }}
+              components={{ bold: <em /> }}
+            />
           </dt>
           <dd>
             <Timestamp dateTime={time} format={timeFormat} />
           </dd>
-          <dt>Your web browser:</dt>
+          <dt>{t('times_list.web_browser')}</dt>
           <dd>
             <BrowserTime dateTime={time} format={timeFormat} />
           </dd>
-          <dt>{productName} server:</dt>
+          <dt>{t('times_list.server', { productName })}</dt>
           <dd>
             <Timestamp dateTime={time} format={timeFormat} tz={serverTimezone} />
           </dd>

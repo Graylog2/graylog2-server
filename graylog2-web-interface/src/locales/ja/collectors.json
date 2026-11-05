@@ -1,0 +1,1113 @@
+{
+  "pages": {
+    "documentation_title": "コレクタードキュメント",
+    "deployment": {
+      "title": "コレクターのデプロイ",
+      "description": "任意の台数のホストでコマンドを実行します。ホストは選択したフリートに登録され、チェックインすると表示されます。",
+      "deploy_tab": "デプロイ",
+      "tokens_tab": "登録トークン",
+      "tokens_description": "トークンは、新しいコレクターがフリートに登録することを許可します。トークンを削除しても、登録済みのコレクターには影響しません。"
+    },
+    "fleets": {
+      "document_title": "コレクターフリート",
+      "title": "フリート",
+      "description": "フリートは、同じ設定を共有するコレクターのグループです。フリート内のすべてのコレクターは同じソースからデータを収集します。環境、チーム、用途ごとにコレクターを整理するためにフリートを使用します。"
+    },
+    "fleet_detail": {
+      "title": "フリートの詳細"
+    },
+    "instances": {
+      "document_title": "コレクターインスタンス",
+      "title": "インスタンス",
+      "description": "コレクターインスタンスは、リモートホスト上で実行中のコレクタープロセスを表します。インスタンスは登録トークンを使ってフリートに登録され、フリートのソース設定を自動的に受け取ります。"
+    },
+    "onboarding": {
+      "title": "コレクターオンボーディング",
+      "description": "新しく接続されたコレクターのステータスです。",
+      "load_error": "コレクターインスタンスを読み込めませんでした: {{error}}",
+      "not_found": "コレクターインスタンスが見つかりません。削除された可能性があります。すべての<instancesLink>インスタンス</instancesLink>を確認してください。"
+    },
+    "overview": {
+      "title": "コレクターの概要",
+      "description": "コレクターは、インフラストラクチャ全体に配置される軽量のサービスで、ログを収集して {{productName}} に転送します。フリートに編成され、収集するデータを定義するソースで設定されます。"
+    },
+    "settings": {
+      "title": "コレクターの設定",
+      "description": "管理対象のコレクターのエンドポイントとライフサイクル設定を構成します。コレクターはこれらのエンドポイントに接続して設定の更新を受け取り、収集したログデータを送信します。"
+    }
+  },
+  "navigation": {
+    "overview": "概要",
+    "fleets": "フリート",
+    "instances": "インスタンス",
+    "deployment": "デプロイ",
+    "settings": "設定"
+  },
+  "activity": {
+    "deleted_target": "[削除済み]",
+    "by_actor": "{{name}} による",
+    "by_system": "システムによる",
+    "config_changed": {
+      "fleet": "フリート <targetLink /> の設定が更新されました",
+      "fleet_with_others_other": "フリート <targetLink /> および他 {{count}} 件のフリートの設定が更新されました",
+      "collector": "コレクター <targetLink /> の設定が更新されました",
+      "collector_with_others_other": "コレクター <targetLink /> および他 {{count}} 件のコレクターの設定が更新されました"
+    },
+    "ingest_config_changed": {
+      "fleet": "フリート <targetLink /> の取り込み設定が更新されました",
+      "fleet_with_others_other": "フリート <targetLink /> および他 {{count}} 件のフリートの取り込み設定が更新されました",
+      "collector": "コレクター <targetLink /> の取り込み設定が更新されました",
+      "collector_with_others_other": "コレクター <targetLink /> および他 {{count}} 件のコレクターの取り込み設定が更新されました"
+    },
+    "restart": {
+      "fleet": "フリート <targetLink /> の再起動が要求されました",
+      "fleet_with_others_other": "フリート <targetLink /> および他 {{count}} 件のフリートの再起動が要求されました",
+      "collector": "コレクター <targetLink /> の再起動が要求されました",
+      "collector_with_others_other": "コレクター <targetLink /> および他 {{count}} 件のコレクターの再起動が要求されました"
+    },
+    "discovery_run": {
+      "fleet": "フリート <targetLink /> の検出実行がトリガーされました",
+      "fleet_with_others_other": "フリート <targetLink /> および他 {{count}} 件のフリートで検出実行がトリガーされました",
+      "collector": "コレクター <targetLink /> の検出実行がトリガーされました",
+      "collector_with_others_other": "コレクター <targetLink /> および他 {{count}} 件のコレクターで検出実行がトリガーされました"
+    },
+    "reassigned": {
+      "collector": "コレクター <targetLink /> が再割り当てされました",
+      "collector_with_others_other": "コレクター <targetLink /> および他 {{count}} 件のコレクターが再割り当てされました"
+    },
+    "reassigned_to_fleet": {
+      "collector": "コレクター <targetLink /> がフリート <destinationLink /> に再割り当てされました",
+      "collector_with_others_other": "コレクター <targetLink /> および他 {{count}} 件のコレクターがフリート <destinationLink /> に再割り当てされました"
+    }
+  },
+  "fleet_reference": {
+    "moving_title": "コレクターは次回チェックイン時にこのフリートに移動します。",
+    "moving_from": "({{fleet}} から移動中)",
+    "moving_from_removed": "(削除されたフリートから移動中)",
+    "removed_title": "このフリートは削除されました。",
+    "removed": "フリートが削除されました ({{fleetId}})"
+  },
+  "sync_state": {
+    "pending_title": "同期保留中 — 変更はコレクターの次回チェックイン時に適用されます",
+    "pending": "同期保留中",
+    "in_sync_title": "同期済み — すべての変更が適用されています",
+    "in_sync": "同期済み"
+  },
+  "instance_status": {
+    "online": "オンライン",
+    "offline": "オフライン"
+  },
+  "os": {
+    "unknown": "不明"
+  },
+  "enrollment_tokens": {
+    "bulk_delete_title": "登録トークンを削除",
+    "bulk_delete_confirm_other": "{{count}} 件の登録トークンを削除してもよろしいですか？ 新しいコレクターは、削除されたトークンを使用して登録できなくなります。",
+    "never": "なし",
+    "expired": "期限切れ",
+    "human_name": "登録トークン",
+    "delete_title": "登録トークンを削除",
+    "delete_confirm": "この登録トークンを削除してもよろしいですか？ 新しいコレクターはこのトークンを使用して登録できなくなります。登録済みのコレクターは引き続き正常に動作します。"
+  },
+  "deployment": {
+    "select_fleet_step": "フリートを選択",
+    "generate_token_step": "トークンを生成",
+    "install_step": "コレクターをインストール",
+    "open_in_search": "検索で開く",
+    "generate_token_first": "上でトークンを生成すると、インストールコマンドが表示されます。",
+    "copy_token_only": "トークンのみコピー"
+  },
+  "enrolling_hosts": {
+    "receiving": "受信中",
+    "listening": "待機中…",
+    "title": "登録中のホスト",
+    "connected_other": "{{count}} 件接続済み · 追加を待機中…",
+    "listening_subtitle": "待機中…",
+    "view_all": "インスタンスですべて表示",
+    "host": "ホスト",
+    "status": "ステータス",
+    "first_messages": "最初のメッセージ",
+    "enrolled": "登録済み",
+    "actions": "操作",
+    "hide_setup": "セットアップを非表示",
+    "view_setup": "セットアップを表示",
+    "empty": "コマンドを実行したホストは、チェックインするとここに表示されます。",
+    "connection_problem": "サーバーに接続できません — 自動的に再試行しています"
+  },
+  "token_step": {
+    "summary_expires": "トークン <emphasis>{{tokenName}}</emphasis> が生成されました — 期限 <expiresAt />",
+    "summary_expires_with_fleet": "トークン <emphasis>{{tokenName}}</emphasis> が生成されました — 期限 <expiresAt /> — フリート <emphasis>{{fleetName}}</emphasis> にスコープ設定済み",
+    "summary_never_expires": "トークン <emphasis>{{tokenName}}</emphasis> が生成されました — 無期限",
+    "summary_never_expires_with_fleet": "トークン <emphasis>{{tokenName}}</emphasis> が生成されました — 無期限 — フリート <emphasis>{{fleetName}}</emphasis> にスコープ設定済み",
+    "change_token": "トークンを変更",
+    "short_lived": "短期間のトークン (1 日で期限切れ)",
+    "custom": "カスタムトークン",
+    "expiry_24_hours": "24 時間",
+    "expiry_7_days": "7 日",
+    "expiry_30_days": "30 日",
+    "expiry_never": "有効期限なし",
+    "name": "名前",
+    "name_placeholder": "例: web-servers rollout",
+    "custom_hint": "カスタムトークンは登録トークンタブに表示され、いつでも取り消すことができます。",
+    "no_permission": "このフリートの登録トークンを作成する権限がありません",
+    "generating": "生成中...",
+    "generate": "トークンを生成",
+    "select_fleet_first": "まず上でフリートを選択してください。"
+  },
+  "fleet_actions": {
+    "received_messages": "受信したメッセージ",
+    "delete": "削除",
+    "delete_blocked_other": "このフリートには {{count}} 件の割り当て済みインスタンスがあります。フリートを削除する前に、それらを再割り当てまたは削除してください。",
+    "delete_title": "フリートを削除",
+    "delete_confirm": "フリート <emphasis>{{fleetName}}</emphasis> を削除してもよろしいですか？ そのソース設定と登録トークンも削除されます。"
+  },
+  "fleet_form": {
+    "name_required": "名前は必須です",
+    "edit_title": "フリートを編集",
+    "new_title": "新しいフリート",
+    "name": "名前",
+    "name_help": "このフリートの一意の名前",
+    "description": "説明",
+    "description_help": "このフリートの用途に関する任意の説明",
+    "update": "フリートを更新",
+    "create": "フリートを作成",
+    "updating": "更新中...",
+    "creating": "作成中..."
+  },
+  "fleet_settings": {
+    "general": "一般設定",
+    "fleet_name": "フリート名",
+    "save": "変更を保存",
+    "saving": "保存中...",
+    "information": "フリート情報",
+    "fleet_id": "フリート ID：",
+    "created": "作成日時：",
+    "updated": "更新日時："
+  },
+  "fleets": {
+    "human_name": "フリート"
+  },
+  "fleet_detail": {
+    "tab_sources": "ソース",
+    "tab_instances": "インスタンス",
+    "tab_settings": "設定",
+    "edit_source": "編集",
+    "not_found": "フリートが見つかりません",
+    "deploy_collector": "新しいコレクターをデプロイ",
+    "stat_instances": "インスタンス",
+    "stat_instances_help": "このフリートに登録されているコレクタープロセスです。",
+    "stat_online": "オンライン",
+    "stat_online_help": "オフラインのしきい値内にハートビートを報告したインスタンスです。",
+    "stat_offline": "オフライン",
+    "stat_offline_help": "ハートビートが途絶えたインスタンスです。ホストの接続またはコレクタープロセスのステータスを確認してください。",
+    "stat_sources": "ソース",
+    "stat_sources_help": "このフリートに割り当てられているデータ収集の設定です。",
+    "sources_description": "ソースはこのフリート内のすべてのコレクターに自動的にプッシュされます。変更は数秒以内に反映されます。",
+    "add_source": "ソースを追加",
+    "sources_human_name": "ソース",
+    "instances_description": "このフリートに登録されているコレクターインスタンスです。各インスタンスは有効なすべてのソースを実行します。インスタンスを追加するには、このフリートの登録トークンを使用して<deployLink>コレクターをデプロイ</deployLink>してください。",
+    "instances_human_name": "インスタンス",
+    "delete_source_title": "ソースを削除",
+    "delete_source_confirm": "ソース <emphasis>{{sourceName}}</emphasis> を削除してもよろしいですか？ このフリート内のコレクターは、数秒以内にこのソースからのデータ収集を停止します。"
+  },
+  "instance_actions": {
+    "reassign": "フリートに再割り当て",
+    "view_system_logs": "システムログを表示",
+    "details": "詳細",
+    "delete_title": "コレクターインスタンスを削除",
+    "delete_confirm": "インスタンス <emphasis>{{instanceName}}</emphasis> を削除してもよろしいですか？<lineBreak />コレクターは再び表示されるために、再度登録する必要があります。"
+  },
+  "reassign_fleet": {
+    "fleet_required": "フリートは必須です",
+    "title_other": "{{count}} 件のインスタンスをフリートに再割り当て",
+    "no_other_fleet_other": "これらのコレクターを割り当てられる他のフリートはありません。",
+    "no_permission": "他のフリートにコレクターを割り当てる権限がありません。",
+    "select_placeholder": "フリートを選択...",
+    "submit_other": "インスタンスを再割り当て",
+    "submitting": "再割り当て中..."
+  },
+  "instance_health": {
+    "title": "ヘルス",
+    "unknown": "不明",
+    "no_report": "このコレクターはヘルス情報を報告していません。",
+    "healthy": "正常",
+    "unhealthy": "異常",
+    "last_known": "最終確認時の状態: {{state}}",
+    "since": "<duration /> の間"
+  },
+  "instance_drawer": {
+    "action_reassign": "別のフリートに再割り当て",
+    "action_reload_config": "設定を再読み込み",
+    "action_reload_ingest_config": "取り込み設定を再読み込み",
+    "action_restart": "再起動",
+    "action_discovery": "ソースの検出を実行",
+    "status": "ステータス：",
+    "sync": "同期：",
+    "fleet": "フリート：",
+    "os": "OS：",
+    "last_seen": "最終確認：",
+    "enrolled": "登録日時：",
+    "version": "バージョン：",
+    "logs": "ログ：",
+    "messages": "メッセージ：",
+    "attributes": "属性",
+    "active_sources_other": "アクティブなソース（{{count}}）",
+    "sources_inherited": "ソースは、このインスタンスのフリート設定から継承されます。",
+    "no_sources": "このフリートにはソースが設定されていません。データの収集を開始するには、フリートの詳細ページでソースを追加してください。",
+    "synchronization": "同期",
+    "pending_load_error": "保留中の変更を読み込めませんでした。しばらくしてから再試行してください。",
+    "queued_actions": "次のアクションは、コレクターが同期するまでキューに入れられます:",
+    "hide_transactions": "キューに入ったトランザクションを非表示",
+    "show_transactions_other": "キューに入ったトランザクションを表示（{{count}}）",
+    "changes_queued": "変更はキューに入れられ、コレクターの次回チェックイン時に適用されます。",
+    "all_applied": "コレクターはキューに入ったすべてのアクションを適用しました。"
+  },
+  "overview": {
+    "stat_instances_help": "すべてのフリートで実行中のコレクタープロセスです。",
+    "stat_fleets": "フリート",
+    "stat_fleets_help": "同じソース設定を共有するコレクターの論理グループです。",
+    "stat_sources_help": "すべてのフリートにわたるデータ収集の設定（ファイルパス、journald、Windows イベントログ）です。",
+    "fleet_stats_error": "フリートの統計を読み込めませんでした。",
+    "stats_error": "コレクターの統計を読み込めませんでした。",
+    "fleets_title": "フリート",
+    "filter_placeholder": "フリートをフィルター...",
+    "config_error": "コレクターの設定を読み込めませんでした。",
+    "endpoint_missing_title": "コレクターの取り込みエンドポイントが設定されていません",
+    "endpoint_missing": "コレクターは、まだ設定されていない取り込みエンドポイントに登録します。設定するには、コレクター設定の編集権限と、Collector Ingest (HTTP) 入力の作成または変更権限が必要ですが、お使いのアカウントにはこれらの権限がありません。まず管理者にエンドポイントの設定を依頼してください。"
+  },
+  "fleet_card": {
+    "healthy": "このフリートのすべてのインスタンスがオンラインです",
+    "degraded": "このフリートの一部のインスタンスがオフラインです",
+    "down": "このフリートのすべてのインスタンスがオフラインです",
+    "empty": "このフリートにはまだコレクターインスタンスが登録されていません",
+    "instances_other": "インスタンス",
+    "online_other": "● {{count}} 件オンライン",
+    "offline_other": "● {{count}} 件オフライン",
+    "sources_other": "{{count}} 件のソース"
+  },
+  "fleet_cards": {
+    "empty_title": "フリートはまだありません",
+    "contact_admin": "最初のコレクターを設定するには、管理者に連絡してください。",
+    "empty_description": "フリートを使うと、共有設定を持つコレクターのグループを管理できます。最初のフリートを作成し、そのコレクターが収集すべきデータを定義するソースを追加してください。設定後、登録トークンを使用して<deployLink>コレクターをデプロイ</deployLink>してください。",
+    "create": "フリートを作成",
+    "no_match": "フィルターに一致するフリートはありません"
+  },
+  "recent_activity": {
+    "title": "最近のアクティビティ",
+    "empty": "最近のアクティビティはありません。"
+  },
+  "collector_facts": {
+    "title": "コレクター",
+    "host": "ホスト",
+    "os": "OS",
+    "version": "バージョン",
+    "fleet": "フリート",
+    "enrolled": "登録日時",
+    "last_seen": "最終確認",
+    "show_attributes_other": "すべての {{count}} 件の属性を表示",
+    "hide_attributes": "属性を非表示"
+  },
+  "connection_success": {
+    "offline": "コレクターは一度接続しましたが、<lastSeen /> 以降レポートがありません。",
+    "receiving": "コレクターは接続されており、メッセージを送信しています。",
+    "waiting": "もうすぐです。コレクターは接続されており、最初のメッセージを待機しています。",
+    "title": "{{host}} をセットアップ中",
+    "view_instances": "インスタンスを表示",
+    "check_again": "再確認",
+    "log_preview": "ログプレビュー",
+    "caption_messages": "{{duration}} 以内に受信したメッセージを表示しています",
+    "caption_messages_checking": "{{duration}} 以内に受信したメッセージを表示しています - 数秒ごとに確認中",
+    "caption_system": "{{duration}} 以内に受信したコレクターのシステムメッセージを表示しています",
+    "caption_system_checking": "{{duration}} 以内に受信したコレクターのシステムメッセージを表示しています - 数秒ごとに確認中"
+  },
+  "fleet_choice": {
+    "selected_heading": "このコレクターのフリート",
+    "change": "フリートを変更",
+    "heading": "このコレクターのフリートを選択",
+    "create_new": "新しいフリートを作成",
+    "or": "または",
+    "select_existing": "既存のフリートを選択",
+    "select_existing_placeholder": "既存のフリートを選択..."
+  },
+  "ingest_endpoint": {
+    "setting_up": "コレクターをセットアップ中...",
+    "confirm": "エンドポイントを確認",
+    "create_input": "入力を作成",
+    "save": "エンドポイントを保存",
+    "hostname": "外部ホスト名",
+    "hostname_placeholder": "例: otlp.example.com",
+    "port": "外部ポート",
+    "cancel": "キャンセル",
+    "reachability_hint": "コレクターはこのアドレスにログを送信します。すべてのコレクターホストから到達可能である必要があります。ロードバランサー、またはこのサーバーのアドレスを指定してください。",
+    "confirm_title": "コレクターがこのクラスターにデータを送信する方法を確認",
+    "change": "エンドポイントを変更",
+    "sending_to": "コレクターは <endpoint /> のこのクラスターにデータを送信します",
+    "no_input_title": "取り込み入力が存在しません",
+    "no_input": "コレクターは登録できますが、入力が作成されるまでデータを送信できません。",
+    "not_running_title": "<endpoint /> の取り込み入力が実行されていません",
+    "not_running": "コレクターは登録できますが、入力が実行されるまでデータを送信できません。",
+    "manage_input": "入力を管理"
+  },
+  "install_command": {
+    "title": "{{platform}} でこのコマンドを実行",
+    "copy": "コマンドをコピー",
+    "note_expires": "コレクターをダウンロードしてインストールし、選択したフリートに登録して、サービスを開始します。管理者権限が必要です。トークンの有効期限は {{duration}} です。",
+    "note_never_expires": "コレクターをダウンロードしてインストールし、選択したフリートに登録して、サービスを開始します。管理者権限が必要です。このトークンに有効期限はありません。"
+  },
+  "log_preview": {
+    "unavailable": "ログプレビューを利用できません — {{error}}",
+    "loading": "ログプレビューを読み込み中...",
+    "empty": "まだメッセージはありません — 数秒ごとに確認中"
+  },
+  "next_steps": {
+    "explore": "データを探索",
+    "explore_description": "このコレクターで絞り込んだ検索を開きます",
+    "configure_sources": "ソースを設定",
+    "configure_sources_description": "このフリートが収集する対象を追加または調整します",
+    "manage_fleets": "フリートを管理",
+    "manage_fleets_description": "このコレクターを恒久的なフリートに移動します",
+    "install_another": "別のコレクターをインストール",
+    "install_another_description": "別のホストで同じセットアップを繰り返します",
+    "offline_title": "オンラインに戻す",
+    "check_service": "ホスト上でコレクターサービスが実行中かどうかを確認してください。",
+    "check_reachability": "ホストがこの {{productName}} サーバーに到達できることを確認してください。",
+    "check_logs": "接続エラーがないか、下のプレビューでコレクター自身のログを確認してください。",
+    "title": "次のステップ"
+  },
+  "timeline": {
+    "connection_lost": "接続が失われました",
+    "last_heartbeat": "最終ハートビート <lastSeen />",
+    "first_messages": "最初のメッセージ",
+    "receiving_other": "受信中 - {{duration}} 以内に {{count}} 件のメッセージ",
+    "listening": "待機中... 通常は1分以内です",
+    "enrolled": "登録済み",
+    "enrolled_detail": "登録トークンで登録されました - <enrolledAt />",
+    "connected": "接続済み",
+    "connected_detail": "ハートビートを受信しました - <lastSeen />",
+    "sources_configured": "ソースを設定済み",
+    "sources_detail_other": "フリート <fleetLink>{{fleetName}}</fleetLink> の {{count}} 件のソース"
+  },
+  "platform_picker": {
+    "title": "コレクターを始める",
+    "description": "インフラストラクチャ全体に軽量のコレクターをデプロイし、ログを {{productName}} に転送します。"
+  },
+  "source_status": {
+    "messages_other": "{{formattedCount}} 件のメッセージ",
+    "disabled": "無効",
+    "not_applicable": "{{os}} では対象外です",
+    "unrecognised": "認識されないソースタイプです",
+    "paused": "一時停止中 — コレクターがオフラインです",
+    "no_messages": "まだメッセージはありません",
+    "waiting": "最初のメッセージを待機中...",
+    "title": "ログソース",
+    "no_sources": "このフリートにはまだソースが設定されていません。"
+  },
+  "waiting_for_connection": {
+    "status": "接続を待機中... {{seconds}} 秒"
+  },
+  "settings": {
+    "getting_started": "コレクターを始める",
+    "getting_started_cloud": "コレクターは、データを送信するためにマネージドの取り込みエンドポイントに接続します。コレクターの設定を保存すると、コレクターインフラストラクチャが初期化されます。セットアップ後、フリートを作成し、ソースを追加して、コレクターをホストにデプロイできます。",
+    "getting_started_self_managed": "コレクターは、収集したデータを受信するために取り込みエンドポイントが必要です。以下で HTTP エンドポイントを設定して保存すると、コレクターインフラストラクチャが初期化されます。セットアップ後、フリートを作成し、ソースを追加して、コレクターをホストにデプロイできます。",
+    "ingest_endpoint": "取り込みエンドポイント",
+    "ingest_endpoint_cloud": "取り込みエンドポイントはシステムによって管理されます。コレクターはここに自動的に接続します。",
+    "ingest_endpoint_help": "取り込みエンドポイントは、OpenTelemetry (OTLP) を介してコレクターからログデータを受信します。マネージドコレクターにデータの送信先として通知される外部アドレスです。実行中のコレクター取り込み入力に到達する必要があります。通常は、ロードバランサーまたはサーバー自体のアドレスです。",
+    "hostname_help": "コレクターが接続に使用するホスト名または IP アドレスです。コレクターホストから到達可能である必要があります。",
+    "create_input": "取り込み入力を作成",
+    "lifecycle": "コレクターのライフサイクル",
+    "offline_threshold": "オフラインのしきい値",
+    "offline_threshold_help": "この時間内にレポートしなかったコレクターは、オフラインとして表示されます。",
+    "default_visibility": "既定の表示設定",
+    "default_visibility_help": "この時間内にレポートしなかったコレクターは、既定のビューから非表示になります。ユーザーはインスタンステーブルでこのフィルターを調整または削除できます。",
+    "expiration_threshold": "有効期限のしきい値",
+    "expiration_threshold_help": "この時間内にレポートしなかったコレクターは、完全に削除されます。",
+    "confirm": "設定を確定"
+  },
+  "ingest_inputs": {
+    "title": "取り込み入力",
+    "none": "コレクターの取り込み入力が存在しません。入力が作成されるまで、コレクターはデータを送信できません。",
+    "unreadable_other": "{{count}} 件のコレクターの取り込み入力が存在しますが、それらを表示する権限がありません。",
+    "none_running": "コレクターの取り込み入力は存在しますが、現在実行中のものはありません。コレクターはデータを送信できません。",
+    "name": "名前",
+    "status": "ステータス",
+    "bind_address": "バインドアドレス",
+    "port": "ポート",
+    "manage": "管理",
+    "additional_unreadable_other": "権限のため表示されない追加の入力が {{count}} 件あります。"
+  },
+  "port_mismatch": {
+    "message_other": "コレクターの取り込み入力が異なるポート（{{ports}}）に存在します。外部ポートが入力のポートと異なる場合は、ネットワークがトラフィックを正しくルーティングしていることを確認してください。"
+  },
+  "source_types": {
+    "file": "ファイル",
+    "journald": "Journald",
+    "windows_event_log": "Windows イベントログ",
+    "macos_unified_logging": "macOS 統合ロギング"
+  },
+  "source_columns": {
+    "enabled": "有効"
+  },
+  "source_form": {
+    "max_poll_interval_error": "最大ポーリング間隔は 1 秒以上である必要があります。",
+    "max_log_age_error": "最大ログ保持期間は 0 または正の値である必要があります。",
+    "read_mode_end": "末尾から (tail)",
+    "read_mode_beginning": "先頭から",
+    "file_paths": "ファイルパス",
+    "file_paths_help": "グロブパターンに対応しています (例: /var/log/*.log, /var/log/**/*.log)。コレクターは一致したファイルに新しい行がないか監視します。",
+    "read_mode": "読み取りモード",
+    "read_mode_file_help": "末尾から: コレクターの起動後に追加された新しい行のみを収集します。先頭から: 既存のすべての行を先に収集し、その後は末尾の監視を続けます。",
+    "read_mode_journald_help": "末尾から: コレクターの起動後に追加された新しいエントリのみを収集します。先頭から: 既存のすべてのエントリを先に収集し、その後は末尾の監視を続けます。",
+    "priority": "優先度",
+    "priority_help": "収集する最低の重要度です。たとえば「エラー」を選択すると、重大、アラート、緊急のエントリも収集されます。",
+    "priority_emerg": "緊急",
+    "priority_alert": "アラート",
+    "priority_crit": "重大",
+    "priority_err": "エラー",
+    "priority_warning": "警告",
+    "priority_notice": "通知",
+    "priority_info": "情報",
+    "priority_debug": "デバッグ",
+    "match_pattern": "一致パターン",
+    "match_pattern_help": "ユニットやプロセスなどでエントリをフィルターするための任意の journald マッチ式です。例: _SYSTEMD_UNIT=nginx.service",
+    "channels": "チャネル",
+    "channels_help": "カンマ区切りのチャネル名です (例: Application, Security, System)",
+    "include_default_channels": "既定のチャネルを含める",
+    "include_default_channels_help": "既定値は {{channels}} です",
+    "predicate": "述語",
+    "predicate_help": "<code>log</code> コマンドに渡される、任意の macOS 統合ロギング用のフィルター述語です。空のままにすると、システムのすべてのログが収集されます。<code>info</code> および <code>debug</code> レベルは、ノイズが多く価値のある情報がほとんどないため、現在収集されません。例: <code>{{example}}</code>",
+    "max_poll_interval": "最大ポーリング間隔",
+    "max_poll_interval_help": "コレクターが新しいログエントリを確認する頻度です。1 秒以上である必要があります。",
+    "max_log_age": "最大ログ保持期間",
+    "max_log_age_help": "初回起動時に、どこまで遡ってログを取り込むかを指定します。0 に設定すると、遡った取り込みを無効にします。",
+    "edit_title": "ソースを編集",
+    "new_title": "新しいソース",
+    "description": "ソースは、このフリートのコレクターが収集すべきデータを定義します。ソースタイプごとに異なる収集方法に対応しています。",
+    "source_type": "ソースタイプ",
+    "file_type_help": "ホスト上のファイルからログ行を収集します。複数のファイルに一致させるためのグロブパターンに対応しています。",
+    "journald_type_help": "systemd journal からエントリを収集します (Linux のみ)。",
+    "windows_type_help": "Windows イベントビューアーのチャネルからイベントを収集します。",
+    "macos_type_help": "<code>log</code> コマンドを介して macOS 統合ロギングシステムから収集します (macOS のみ)。",
+    "enabled_help": "無効にしたソースはコレクターに送信されません。ソースを削除せずに一時的に収集を停止するために使用します。",
+    "update": "ソースを更新",
+    "create": "ソースを作成"
+  },
+  "load_errors": {
+    "recent_activity": {
+      "message": "最近のアクティビティの読み込みに失敗しました。ステータス:",
+      "title": "最近のアクティビティを読み込めませんでした"
+    },
+    "input_ids": {
+      "message": "コレクターの入力 ID の読み込みに失敗しました。ステータス:",
+      "title": "コレクターの入力 ID を読み込めませんでした。"
+    },
+    "stats": {
+      "message": "コレクターの統計の読み込みに失敗しました。ステータス:",
+      "title": "コレクターの統計を読み込めませんでした。"
+    },
+    "config": {
+      "message": "コレクターの設定の読み込みに失敗しました。ステータス:",
+      "title": "コレクターの設定を読み込めませんでした。"
+    },
+    "enrollment_tokens": {
+      "message": "登録トークンの読み込みに失敗しました。ステータス:",
+      "title": "登録トークンを読み込めませんでした"
+    },
+    "pending_changes": {
+      "message": "保留中の変更の読み込みに失敗しました。ステータス:",
+      "title": "保留中の変更を読み込めませんでした"
+    },
+    "instances": {
+      "message": "インスタンスの読み込みに失敗しました。ステータス:",
+      "title": "インスタンスを読み込めませんでした"
+    },
+    "collector_instances": {
+      "message": "コレクターインスタンスの読み込みに失敗しました。ステータス:",
+      "title": "コレクターインスタンスを読み込めませんでした"
+    },
+    "fleets": {
+      "message": "フリートの読み込みに失敗しました。ステータス:",
+      "title": "フリートを読み込めませんでした"
+    },
+    "fleet": {
+      "message": "フリートの読み込みに失敗しました。ステータス:",
+      "title": "フリートを読み込めませんでした"
+    },
+    "fleet_stats": {
+      "message": "フリートの統計の読み込みに失敗しました。ステータス:",
+      "title": "フリートの統計を読み込めませんでした"
+    },
+    "sources": {
+      "message": "ソースの読み込みに失敗しました。ステータス:",
+      "title": "ソースを読み込めませんでした"
+    },
+    "input_details": {
+      "message": "コレクターの入力の詳細の読み込みに失敗しました。ステータス: {{error}}",
+      "title": "コレクターの入力の詳細を読み込めませんでした。"
+    }
+  },
+  "mutation_errors": {
+    "create_fleet": {
+      "message": "フリートの作成に失敗しました: {{error}}",
+      "title": "フリートを作成できませんでした"
+    },
+    "update_fleet": {
+      "message": "フリートの更新に失敗しました: {{error}}",
+      "title": "フリートを更新できませんでした"
+    },
+    "delete_fleet": {
+      "message": "フリートの削除に失敗しました: {{error}}",
+      "title": "フリートを削除できませんでした"
+    },
+    "create_source": {
+      "message": "ソースの作成に失敗しました: {{error}}",
+      "title": "ソースを作成できませんでした"
+    },
+    "update_source": {
+      "message": "ソースの更新に失敗しました: {{error}}",
+      "title": "ソースを更新できませんでした"
+    },
+    "delete_source": {
+      "message": "ソースの削除に失敗しました: {{error}}",
+      "title": "ソースを削除できませんでした"
+    },
+    "create_enrollment_token": {
+      "message": "登録トークンの作成に失敗しました: {{error}}",
+      "title": "登録トークンを作成できませんでした"
+    },
+    "delete_enrollment_token": {
+      "message": "登録トークンの削除に失敗しました: {{error}}",
+      "title": "登録トークンを削除できませんでした"
+    },
+    "delete_enrollment_tokens": {
+      "message": "登録トークンの削除に失敗しました: {{error}}",
+      "title": "登録トークンを削除できませんでした"
+    },
+    "reassign_instances": {
+      "message": "インスタンスの再割り当てに失敗しました: {{error}}",
+      "title": "インスタンスを再割り当てできませんでした"
+    },
+    "delete_instance": {
+      "message": "インスタンスの削除に失敗しました: {{error}}",
+      "title": "インスタンスを削除できませんでした"
+    },
+    "save_config": {
+      "message": "コレクターの設定の保存に失敗しました: {{error}}",
+      "title": "設定を保存できませんでした"
+    },
+    "create_input": {
+      "message": "コレクターの取り込み入力の作成に失敗しました: {{error}}",
+      "title": "コレクターの取り込み入力を作成できませんでした"
+    },
+    "update_input": {
+      "message": "コレクターの取り込み入力の更新に失敗しました: {{error}}",
+      "title": "コレクターの取り込み入力を更新できませんでした"
+    }
+  },
+  "notifications": {
+    "success_title": "成功しました",
+    "fleet_created": "フリート \"{{name}}\" を作成しました。",
+    "fleet_updated": "フリート \"{{name}}\" を更新しました。",
+    "fleet_deleted": "フリートを削除しました。",
+    "source_created": "ソース \"{{name}}\" を作成しました。",
+    "source_updated": "ソース \"{{name}}\" を更新しました。",
+    "source_deleted": "ソースを削除しました。",
+    "enrollment_token_deleted": "登録トークンを削除しました。",
+    "enrollment_tokens_deleted": "登録トークンを削除しました。",
+    "instances_reassigned": "インスタンスを再割り当てしました。",
+    "instance_deleted": "インスタンスを削除しました。",
+    "config_saved": "コレクターの設定を保存しました。",
+    "input_created": "コレクターの取り込み入力を作成しました。",
+    "input_moved": "コレクターの取り込み入力を新しいポートに移動しました。"
+  },
+  "datanode": {
+    "compatibility_check": {
+      "compatible": "既存の OpenSearch データは Data Node に移行できます。",
+      "error": "互換性の確認中にエラーが発生しました",
+      "incompatible": "既存の OpenSearch データは Data Node に移行できません。",
+      "loading": "互換性チェックの結果を読み込み中...",
+      "title": "ディレクトリの互換性チェック",
+      "version_incompatible": "OpenSearch クラスターは互換性がないため、この Data Node バージョンに移行できません。"
+    },
+    "migration_steps_text": {
+      "renewal_step_required": "次に進む前に、証明書の更新ポリシーを作成してください。",
+      "finished": "移行が完了しました！",
+      "ca_step_required": "次に進む前に、証明機関を作成してください。"
+    },
+    "migration_welcome": {
+      "earlier_deployments": "v5.2 より前のデプロイ、または Data Node なしでインストールされたデプロイでは、メッセージデータベースを Data Node に移行する必要があります。",
+      "incompatible_backend": "互換性のない検索バックエンドです。移行ウィザードを使用するには、OpenSearch にアップグレードしてください。",
+      "intro": "{{productName}} Data Node は、{{productName}} で使用するために OpenSearch を設定および最適化する管理コンポーネントです。管理の負荷を軽減し、今後のアップデートを簡素化します。",
+      "more_information": "Data Node への移行については、<docsLink>ドキュメント</docsLink>で詳細を確認できます。",
+      "required_steps": "Data Node への移行には、現在の OS/ES クラスター内と設定ファイルの両方で、OS 上でいくつかの手順を実行する必要があります。",
+      "title": "Data Node の移行",
+      "tool_description": "この移行ツールは、お使いのコンポーネントの互換性を確認し、既存の OpenSearch データを Data Node に移行する手順を案内します。"
+    },
+    "migration_wizard": {
+      "loading": "読み込み中 ..."
+    },
+    "compatibility_status": {
+      "creation_date": "作成日",
+      "datanode_opensearch_version": "Data Node の OpenSearch バージョン",
+      "index_version": "インデックスバージョン",
+      "indices": "インデックス",
+      "node_title_other": "ノード: {{hostname}}、バージョン: {{version}}、{{count}} 件のインデックス",
+      "opensearch_data_location": "OpenSearch データの場所",
+      "shard_count_other": "{{count}} 個のシャード",
+      "shards": "シャード"
+    },
+    "in_place_migration": {
+      "description": "既存の OpenSearch 2.x または 1.3.x クラスターを Data Node に移行するには、次の手順に従ってください。",
+      "title": "インプレース移行"
+    },
+    "migration_data_nodes": {
+      "certificate_valid_until": "証明書の有効期限",
+      "found_other": "見つかった Data Node: {{count}}",
+      "hostname": "ホスト名",
+      "incompatible": "現在の {{productName}} バージョンと互換性のないバージョンで実行されている Data Node があります。{{productName}} と Data Node で同じバージョンを使用してください。",
+      "incompatible_title": "互換性のない Data Node が見つかりました",
+      "loading": "Data Node を読み込み中",
+      "looking": "Data Node を検索中...",
+      "no_certificate": "証明書なし",
+      "none_found": "Data Node が見つかりません。",
+      "none_found_title": "Data Node が見つかりません",
+      "start_data_node": "移行を続けるには、少なくとも 1 つの Data Node を起動してください。Data Node の起動方法の詳細は、<docsLink>ドキュメント</docsLink>を参照してください。",
+      "status": "ステータス",
+      "transport_address": "トランスポートアドレス",
+      "version": "バージョン",
+      "version_incompatible": "このバージョンは、現在の {{productName}} バージョンと互換性がありません。"
+    },
+    "manual_migration": {
+      "migration_type": "移行タイプ",
+      "migration_type_help": "実行する移行のタイプです。",
+      "select_migration_type": "移行タイプを選択"
+    },
+    "stop_processing": {
+      "change_owner": "Data Node をデータディレクトリに向けて既存の OpenSearch データを移行する場合は、データディレクトリの所有者を Data Node を実行するユーザー（通常は graylog-datanode）に変更し、正しいパーミッションを再設定してください。たとえば、次を実行して",
+      "stop_cluster": "次に進む前に、OpenSearch クラスターを停止してください。",
+      "stop_opensearch": "OpenSearch を停止",
+      "stopped": "{{productName}} の処理が停止しました。"
+    },
+    "journal_size_warning": {
+      "description": "移行中は {{productName}} ノードでの処理を停止する必要があるため、ジャーナルのサイズが増加することにご注意ください。そのため、ジャーナルサイズの縮小ステップまたはそれ以前に、ジャーナルボリュームのサイズを増やす必要があります。",
+      "title": "ジャーナルサイズの警告"
+    },
+    "journal_downtime": {
+      "current_size": "現在のジャーナルサイズは <bold>{{size}} MB</bold>、現在のジャーナルのスループットは <bold>{{throughput}} KB/分</bold> です。",
+      "estimation_error": "ジャーナルのスループットの推定中にエラーが発生しました: {{message}}",
+      "increase_size": "そのため、ジャーナルボリュームのサイズを増やす必要がある場合があります。",
+      "max_downtime": "Data Node を指すように {{productName}} を再構成するための現在の最大ダウンタイムは <bold>{{duration}}</bold> です。",
+      "processing_stops": "移行中は {{productName}} ノードでデータの処理が停止し、ジャーナルのサイズが増加することにご注意ください。",
+      "sufficient_size": "次に進む前に、ジャーナルボリュームのサイズが十分であることを確認してください。",
+      "title": "ジャーナルのダウンタイムサイズの警告"
+    },
+    "in_place_welcome": {
+      "description": "インプレース移行では、既存のクラスターのデータフォルダーを Data Node クラスターに移行します。",
+      "install": "始めるには、以前のセットアップのすべての OS/ES ノードに Data Node をインストールしてください。Data Node のダウンロードとインストールの詳細は、<docsLink>こちら</docsLink>を参照してください。",
+      "title": "ようこそ"
+    },
+    "restart_graylog": {
+      "almost_there": "もうすぐです！",
+      "example": "例:",
+      "remove_hosts": "<codeSnippet>server.conf</codeSnippet> から <codeSnippet>elasticsearch_hosts</codeSnippet> の行を削除してください",
+      "restart": "完了したら、移行を完了するために {{productName}} を再起動してください。",
+      "wait_for_available": "すべての Data Node が「AVAILABLE」になるまで待ってください。1～2 分以内に利用可能にならない場合は、Data Node のログを確認してください。"
+    },
+    "in_place_migration_info": {
+      "configuration": "インプレース移行では、<codeSnippet>datanode.conf</codeSnippet> にある Data Node の設定、特に <codeSnippet>opensearch_data_location</codeSnippet> の設定オプションが、すべてのノードの既存の OpenSearch データディレクトリを正しく指していることを確認してください。",
+      "permissions": "移行中は、Data Node と OpenSearch のシステムユーザーの両方がデータディレクトリにアクセスして書き込めるようにする必要があります。これを確保するために、たとえば次を実行できます"
+    },
+    "certificates_provisioning": {
+      "ca_configured": "証明機関が正常に設定されました。",
+      "finished": "Data Node のプロビジョニングが完了しました。",
+      "loading": "移行の状態を読み込み中。",
+      "provision_now": "Data Node の証明書をプロビジョニングできるようになりました。",
+      "provisioning": "証明書をプロビジョニング中"
+    },
+    "jwt_authentication": {
+      "add_snippet": "これを行うには、次のスニペットを <codeSnippet>opensearch-security/config.yml</codeSnippet> に追加してください",
+      "description": "既存のクラスターの保護方法によっては、セキュリティ設定に事前の変更が必要になる場合があります。{{productName}} から OpenSearch にアクセスするために JWT 認証を使用します。次の手順で、既存の OpenSearch クラスターで JWT 認証を手動で有効にし、Data Node でデータにアクセスできるようにしてください。",
+      "replace_signing_key": "署名キーを、base64 エンコードされた <codeSnippet>GRAYLOG_PASSWORD_SECRET</codeSnippet> に置き換えてください。エンコードするには、次を実行できます",
+      "title": "JWT 認証"
+    },
+    "reset_migration": {
+      "button": "移行をリセット",
+      "confirm": "移行をリセットしてもよろしいですか？",
+      "failed": "移行の状態のリセットに失敗しました。ステータス: {{error}}",
+      "failed_title": "移行の状態をリセットできませんでした。",
+      "success": "移行の状態のリセットに成功しました。"
+    },
+    "migration_actions": {
+      "next": "次へ",
+      "show_renewal_policy_creation": "証明書の更新ポリシーを設定",
+      "show_migration_selection": "移行の手順に進む",
+      "run_directory_compatibility_check": "ディレクトリの互換性チェックを実行",
+      "provision_datanode_certificates": "Data Node に証明書をプロビジョニング"
+    },
+    "force_start": {
+      "confirm": "それでも開始",
+      "description": "通常の事前チェックに合格しなかったことをバックエンドが報告しました。",
+      "submitting": "開始中...",
+      "title": "それでも OpenSearch のアップグレードを開始しますか？"
+    },
+    "rolling_upgrade_nodes": {
+      "abort_requested": "中止が要求されました。現在のステップの完了後にアップグレードが停止します。",
+      "no_remaining_nodes": "残りのノードはありません。",
+      "no_upgraded_nodes": "アップグレード済みのノードはまだありません。",
+      "not_started": "OpenSearch のローリングアップグレードはまだ開始されていません。",
+      "title": "OpenSearch のローリングアップグレード",
+      "upgraded_heading": "ターゲットの OpenSearch にアップグレード済み",
+      "waiting_heading": "OpenSearch のアップグレードを待機中",
+      "current": "現在",
+      "data_node": "Data Node",
+      "manager": "マネージャー",
+      "opensearch_version": "OpenSearch バージョン",
+      "status": "ステータス",
+      "unknown": "不明",
+      "node_status": {
+        "pending": "待機中",
+        "restarting": "再起動中",
+        "started": "開始済み",
+        "completed": "アップグレード済み",
+        "failed": "失敗",
+        "skipped": "スキップ"
+      },
+      "state": {
+        "preparing_cluster": "クラスターを準備中",
+        "selecting_next_node": "次のノードを選択中",
+        "upgrading_node": "ノードをアップグレード中",
+        "waiting_node_joined": "ノードの再参加を待機中",
+        "reenabling_allocation": "割り当てを再有効化中",
+        "waiting_green": "グリーンクラスターを待機中",
+        "paused_waiting_green": "グリーンクラスターの待機で一時停止中",
+        "finalizing": "最終処理中",
+        "completed": "完了",
+        "aborted": "中止されました",
+        "failed": "失敗",
+        "in_progress": "進行中"
+      }
+    },
+    "opensearch_upgrade_info": {
+      "current_version": "現在の OpenSearch バージョン：",
+      "data_nodes": "Data Node：",
+      "data_nodes_summary": "{{total}} ({{available}} 台利用可能)",
+      "loading": "読み込み中...",
+      "target_version": "ターゲットの OpenSearch バージョン：",
+      "unknown": "不明"
+    },
+    "start_upgrade": {
+      "full": {
+        "alert_title": "Data Node が 3 台未満です。これはローリング再起動ではなく、全体の再起動になります",
+        "confirm": "再起動",
+        "journal": "OpenSearch の停止中は、受信したメッセージが各 {{productName}} ノードのディスクジャーナルに蓄積されます。停止時間がジャーナルのサイズまたは保持期間の上限を超えると、取り込みが停止し、メッセージが失われる可能性があります。想定される停止時間に対してジャーナルに十分な余裕がある場合にのみ続行してください。",
+        "submitting": "再起動中...",
+        "title": "Data Node の OpenSearch を再起動しますか？",
+        "tolerate_downtime": "停止時間を許容できる場合にのみ続行してください。",
+        "restart_together_with_versions_other": "Data Node が 3 台未満の場合、一度に 1 台ずつ再起動しても OpenSearch を利用可能な状態に保つことはできません。OpenSearch を <strong>{{currentVersion}}</strong> から <strong>{{targetVersion}}</strong> に移行するため、すべての Data Node が一緒に再起動します。完了するまでストレージバックエンドは<strong>利用できず</strong>、検索とインデックス作成が中断されます。",
+        "restart_together_other": "Data Node が 3 台未満の場合、一度に 1 台ずつ再起動しても OpenSearch を利用可能な状態に保つことはできません。OpenSearch をターゲットバージョンに移行するため、すべての Data Node が一緒に再起動します。完了するまでストレージバックエンドは<strong>利用できず</strong>、検索とインデックス作成が中断されます。"
+      },
+      "no_rollback": "開始後は、以前のバージョンにロールバックできません。",
+      "rolling": {
+        "alert_title": "これにより、すべての Data Node が 1 台ずつ再起動されます",
+        "confirm": "ローリングアップグレードを開始",
+        "healthy_cluster": "続行する前に、クラスターが正常（グリーン）であることを確認してください。",
+        "shard_allocation": "各再起動中はシャードの割り当てが一時停止されるため、クラスターは利用可能な状態を維持します。ただし、ノードが離脱して再参加する間、インデックス作成と検索が一時的に低下する場合があります。",
+        "title": "OpenSearch のローリングアップグレードを開始しますか？",
+        "wait_for_green": "各ノードの後、アップグレードは続行する前にクラスターがグリーンに戻るのを待機します。時間がかかりすぎる場合は一時停止し、再開するまで待機します。",
+        "each_node_with_versions_other": "{{count}} 台の Data Node はそれぞれ、組み込みの OpenSearch を <strong>{{currentVersion}}</strong> から <strong>{{targetVersion}}</strong> に移行するため、1 台ずつアップグレードおよび再起動されます。",
+        "each_node_other": "{{count}} 台の Data Node はそれぞれ、組み込みの OpenSearch をターゲットバージョンに移行するため、1 台ずつアップグレードおよび再起動されます。"
+      },
+      "starting": "開始中..."
+    },
+    "opensearch_upgrade": {
+      "already_up_to_date": "Data Node に組み込まれた OpenSearch は、すでに最新です。",
+      "automatic_upgrade": "各 Data Node は、組み込みの OpenSearch をターゲットバージョンに自動的にアップグレードします。",
+      "backup": "スムーズなロールバックの経路を確保するため、アップグレード前に MongoDB、Data Node、Data Lake のストレージをバックアップしてください。",
+      "before_upgrading": "アップグレード前",
+      "check_failed": "OpenSearch のアップグレードの可否を確認できませんでした。",
+      "full_restart": "アップグレードを有効にするには、すべての Data Node を再起動する必要があります。",
+      "full_search_unavailable": "Data Node の再起動中、検索とインデックス作成は利用できません。",
+      "incompatible_indices": "非互換のインデックス",
+      "old_indices_unreadable": "OpenSearch 3 は、OpenSearch 2 より前のバージョンで作成されたインデックスを読み取ることができません。アップグレード中にこれらのインデックスが残っている場合、そのデータは利用できなくなります。",
+      "resolve_indices_first": "先にすべての非互換のインデックスを解決してください。",
+      "restarting": "再起動中...",
+      "resume": "再開",
+      "resuming": "再開中...",
+      "rolling_restart": "影響を最小限に抑えるため、Data Node は 1 台ずつ再起動されます。",
+      "rolling_search_impaired": "Data Node の再起動中、検索機能が低下する場合があります。",
+      "start_rolling_upgrade": "OpenSearch のローリングアップグレードを開始",
+      "start_upgrade_and_restart": "OpenSearch のアップグレードを開始して再起動",
+      "starting_rolling_upgrade": "OpenSearch のローリングアップグレードを開始中...",
+      "title": "Data Node の組み込み OpenSearch をアップグレード",
+      "unconfirmed_other": "{{count}} 台の Data Node が利用できない間は、非互換のインデックスとアップグレードの状態を確認できません。すべての Data Node が利用可能になると、再度表示されます。",
+      "upgrade_process": "アップグレードの手順",
+      "use_table": "続行する前に、下の表を使用してシステムインデックスをリインデックスし、データインデックスをアーカイブまたは削除してください。"
+    },
+    "client_certificate": {
+      "certificate_lifetime": "証明書の有効期間",
+      "close": "閉じる",
+      "create_title": "クライアント証明書を作成",
+      "password": "パスワード",
+      "principal": "プリンシパル",
+      "principal_placeholder": "プリンシパル",
+      "role": "ロール",
+      "role_help": "OpenSearch のロールマッピングを表します。",
+      "role_placeholder": "ロール",
+      "submit": "証明書を作成",
+      "submitting": "証明書を作成中...",
+      "unencrypted": "暗号化なし",
+      "ca_certificate": "CA 証明書",
+      "certificate": "証明書",
+      "copy_to_clipboard": "クリップボードにコピー",
+      "private_key": "秘密鍵",
+      "view_principal": "プリンシパル：",
+      "view_role": "ロール：",
+      "generate": "クライアント証明書を生成",
+      "description": "サードパーティツール用のクライアント証明書を生成します",
+      "title": "クライアント証明書"
+    },
+    "cluster_health": {
+      "cluster_manager": "クラスターマネージャー：",
+      "disabled": "無効",
+      "enabled": "有効",
+      "nodes_summary": "{{total}} （{{outdated}} 台が古い、{{upgraded}} 台がアップグレード済み）",
+      "number_of_nodes": "ノード数：",
+      "number_of_shards": "シャード数：",
+      "server_version": "サーバーバージョン：",
+      "shard_replication": "シャードレプリケーション：",
+      "shard_replication_help": {
+        "confirm": "ノードがアップグレードされた後に<emphasis><bold>アップグレードを確定</bold></emphasis>をクリックすると、シャードレプリケーションが再度有効になり、アップグレード中のノードが原因で利用できなかったすべてのシャードが再割り当てされます。",
+        "force_disabled": "強制的に無効",
+        "force_enabled": "強制的に有効",
+        "start": "ノードの<emphasis><bold>アップグレードプロセスを開始</bold></emphasis>をクリックすると、シャードの割り当てがレプリケーションなしに設定され、OpenSearch は利用可能なシャードのみを使用するようになります。"
+      },
+      "shards_summary": "{{active}} アクティブ、{{initializing}} 初期化中、{{relocating}} 再配置中、{{unassigned}} 未割り当て",
+      "state_help": {
+        "green": "ノードがアップグレードされた後に<emphasis>アップグレードを確定</emphasis>をクリックすると、シャードレプリケーションが再度有効になり、アップグレード中のノードが原因で利用できなかったすべてのシャードが再割り当てされ、クラスターは GREEN の状態に戻ります。",
+        "question": "ローリングアップグレード中、クラスターの状態はどのように変化しますか？",
+        "red": "RED - レプリケーションのないインデックスを使用していて、そのインデックスのシャードをホストしているノードをアップグレードすると、クラスターは red の状態になり、これらのインデックスへのデータの取り込みも、これらのインデックスからの検索もできなくなります。",
+        "yellow": "YELLOW - ノードのアップグレードを開始した後、OpenSearch が利用可能なシャードのみを使用できるように、シャードの割り当てがレプリケーションなしに設定されます。"
+      }
+    },
+    "upgrade_method": {
+      "cluster_restart": "クラスターの再起動",
+      "cluster_restart_description": "クラスターの再起動方式を使用する場合、すべての Data Node を一度にアップグレードします。この間、メッセージはジャーナルにバッファリングされ、Data Node クラスターがオンラインに戻ると処理されます。Data Node の停止中に想定されるメッセージ量に合わせてジャーナルサイズが設定されていれば、データは失われません。",
+      "cluster_restart_less_than_three": "Data Node クラスターのノード数が 3 未満の場合、利用可能な方式はクラスターの再起動のみです。",
+      "cluster_restart_three_or_more": "Data Node クラスターのノード数が 3 以上の場合、ジャーナルサイズとメッセージのスループットを考慮したうえで、クラスターの再起動方式を選択できます。",
+      "rolling_upgrade": "ローリングアップグレード",
+      "rolling_upgrade_description": "ローリングアップグレードは、<bold>3 台以上のノード</bold>で実行中の Data Node クラスターでのみ実行でき、ダウンタイムはほぼありません。",
+      "rolling_upgrade_process": "各 Data Node は個別に停止され、その場でアップグレードされます。あるいは、新しいバージョンを実行しているホストで Data Node を 1 台ずつ停止して置き換えることもできます。この処理中も、クラスター内のデータのインデックス作成とクエリを続行できます。"
+    },
+    "upgrade_status": {
+      "all_data_nodes_up_to_date": "すべての Data Node は最新です。",
+      "checking": "OpenSearch の状態を確認中...",
+      "error": "Data Node の組み込み OpenSearch バージョンを確認できませんでした。",
+      "outdated": "Data Node の組み込み OpenSearch は最新ではありません。",
+      "unconfirmed_other": "{{count}} 台の Data Node が利用できない間は、Data Node の組み込み OpenSearch の状態を確認できません。",
+      "up_to_date": "Data Node の組み込み OpenSearch は最新です。",
+      "up_to_date_with_version": "Data Node の組み込み OpenSearch は最新です <bold>({{version}})。</bold>",
+      "upgrading": "OpenSearch のローリングアップグレードが進行中です。"
+    },
+    "upgrade_nodes": {
+      "manager": "マネージャー",
+      "no_outdated_nodes": "古いノードは見つかりませんでした。",
+      "no_upgraded_nodes": "アップグレード済みのノードは見つかりませんでした。",
+      "outdated_nodes": "古いノード",
+      "start_upgrade": "アップグレードプロセスを開始",
+      "upgraded": "アップグレード済み",
+      "upgraded_nodes": "アップグレード済みのノード"
+    },
+    "data_node_actions": {
+      "rejoin": "再参加",
+      "remove": "削除",
+      "renew_certificate": "証明書を更新",
+      "show_logs": "ログを表示",
+      "start": "開始",
+      "stop": "停止",
+      "rejoin_title": "Data Node を再参加",
+      "rejoin_confirm": "Data Node \"{{hostname}}\" を再参加させてもよろしいですか？",
+      "remove_title": "Data Node を削除",
+      "remove_confirm": "Data Node \"{{hostname}}\" を削除してもよろしいですか？",
+      "stop_title": "Data Node を停止",
+      "stop_confirm": "Data Node \"{{hostname}}\" を停止してもよろしいですか？"
+    },
+    "data_node_badge": {
+      "short_node_id": "ノード ID（短縮）"
+    },
+    "data_node_status": {
+      "queued_for": "{{action}} のキューに登録済み"
+    },
+    "data_node_logs": {
+      "no_logs": "ログはありません。",
+      "title": "{{hostname}} のログ"
+    },
+    "cluster_management": {
+      "teaser_hotspot": "Data Node と管理対象の OpenSearch クラスターのパフォーマンスメトリクスを表示します。",
+      "teaser_license_warning": "Data Node と管理対象の OpenSearch クラスターのパフォーマンスメトリクスを表示するには、有効なライセンスと設定済みの Data Node があることを確認してください。"
+    },
+    "ca_configuration": {
+      "create_tab": "新しい CA を作成",
+      "description_provision": "証明機関が Data Node の証明書をより簡単にプロビジョニングおよび管理します。",
+      "description_upload_or_create": "この手順では、新しい証明機関をアップロードするか作成できます。",
+      "reusing_certificates": "既存のクラスターで証明書を使用している場合、デフォルトでは、次の手順で Data Node をプロビジョニングする際に、{{productName}} の CA と自動生成された証明書に置き換えられます。独自の CA を含める場合は、既存の証明書をアップロードできます。詳細は <docsLink>{{productName}} Data Node - はじめに</docsLink>を参照してください。",
+      "reusing_certificates_title": "証明書の再利用",
+      "title": "証明機関を設定",
+      "upload_tab": "CA をアップロード"
+    },
+    "ca_upload": {
+      "certificate_authority": "証明機関",
+      "dropzone": "CA をここにドラッグするか、クリックしてファイルを選択",
+      "explanation": "ここでは既存の CA をアップロードできます。秘密鍵（暗号化または非暗号化）、CA 証明書、および中間証明書をすべて含む 1 つのファイルをアップロードする必要があります。ファイルは PEM または PKCS#12 形式である必要があります。秘密鍵が暗号化されている場合は、そのパスワードも指定する必要があります。",
+      "failed": "CA のアップロードに失敗しました。エラー: {{error}}",
+      "password": "パスワード",
+      "rejected": "CA のアップロードに失敗しました",
+      "submit": "CA をアップロード",
+      "submitting": "CA をアップロード中...",
+      "success": "CA のアップロードに成功しました"
+    },
+    "ca_create": {
+      "description": "“Create CA” ボタンをクリックすると、{{productName}} Data Node 用の新しい証明機関をすばやく作成できます。",
+      "failed": "CA の作成に失敗しました。エラー: {{error}}",
+      "organization_name": "組織名",
+      "submit": "CA を作成",
+      "submitting": "CA を作成中...",
+      "success": "CA の作成に成功しました"
+    },
+    "renewal_policy": {
+      "certificate_lifetime": "証明書の有効期間：",
+      "certificate_lifetime_label": "証明書の有効期間",
+      "configure": "証明書の更新ポリシーを設定",
+      "description": "これらの設定は、証明書の期限切れを検出する際や、証明書を更新する際に使用されます。",
+      "edit": "設定を編集",
+      "lifetime_explanation": "証明書の有効期間は、新しく作成された証明書の有効期間の長さに使用されます。",
+      "mode_explanation": "更新ポリシーを「Automatic」に設定すると、ユーザーの操作なしに期限切れのすべての証明書が更新されます。「Manual」に設定すると、1 つ以上の証明書の期限が近づいたときにシステム通知が作成され、更新を確認できるようになります。",
+      "renewal_mode": "更新モード：",
+      "renewal_mode_label": "証明書の更新モード",
+      "select_mode": "証明書の更新モードを選択",
+      "submit": "設定を更新",
+      "submitting": "設定を更新中",
+      "title": "証明書の更新ポリシー設定",
+      "update_failed": "証明書の更新ポリシーの更新中にエラーが発生しました: {{error}}",
+      "update_failed_title": "証明書の更新ポリシーを更新できません",
+      "modes": {
+        "automatic": "自動",
+        "manual": "手動"
+      }
+    },
+    "details_page": {
+      "certificate_valid_until": "証明書の有効期限：",
+      "configuration_warnings": "設定の警告",
+      "datanode_version": "Datanode バージョン：",
+      "details": "詳細：",
+      "error": "エラー: {{message}}",
+      "hostname": "ホスト名：",
+      "not_available": "該当なし",
+      "status": "ステータス：",
+      "title": "Data Node: {{hostname}}",
+      "transport_address": "トランスポートアドレス："
+    },
+    "pages": {
+      "description": "{{productName}} Data Node は、{{productName}} とのより優れた統合を提供し、今後のアップデートを簡素化します。{{productName}} のメッセージデータベース内のすべてのメッセージを、インデックス作成と検索できるようになります。",
+      "upgrade_title": "Data Node のアップグレード",
+      "cluster_management_title": "Data Node ダッシュボード",
+      "certificate_management_title": "証明書の管理",
+      "migration_title": "Data Node の移行",
+      "documentation_title": "Data Node ドキュメント"
+    },
+    "upgrade_page": {
+      "manual_instructions": "Data Node を手動でアップグレードするには、<docsLink>ドキュメント</docsLink>の手順に従ってください。",
+      "manual_upgrade_title": "Data Node の手動アップグレード",
+      "select_strategy": "アップグレード戦略を選択",
+      "upgrade_data_node": "Data Node をアップグレード",
+      "manual_upgrade_of_node": "システム上で <bold>{{node}}</bold> の手動アップグレードが完了したら、再接続されて <bold>アップグレード済みのノード</bold>パネルに表示されるまで待ち、<confirmButton><bold>アップグレードを確定</bold></confirmButton>をクリックして次のノードに進んでください。",
+      "manual_upgrade_of_data_node": "システム上で Data Node の手動アップグレードが完了したら、再接続されて <bold>アップグレード済みのノード</bold>パネルに表示されるまで待ち、<confirmButton><bold>アップグレードを確定</bold></confirmButton>をクリックして次のノードに進んでください。"
+    },
+    "migration_steps": {
+      "ca_configuration": "証明機関を設定",
+      "renewal_policy_configuration": "更新ポリシーを設定",
+      "compatibility_check": "Data Node との OpenSearch の互換性を確認",
+      "manual_migration_step": "移行の手順。",
+      "migration_finished": "移行が完了しました"
+    },
+    "migration_states": {
+      "new": "移行",
+      "migration_welcome_page": "ようこそ",
+      "ca_creation_page": "証明機関",
+      "renewal_policy_creation_page": "証明書の更新ポリシー",
+      "migration_selection_page": "移行の手順",
+      "rolling_upgrade_migration_welcome_page": "インプレース移行へようこそ",
+      "ask_to_shutdown_old_cluster": "古いクラスターを停止",
+      "manually_remove_old_connection_string_from_config": "接続文字列を削除",
+      "message_processing_stop": "メッセージの処理を停止",
+      "replace_cluster": "既存のクラスターを置き換え",
+      "restart_graylog": "設定ファイルを更新して {{productName}} を再起動",
+      "directory_compatibility_check_page": "ディレクトリの互換性チェック",
+      "provision_rolling_upgrade_nodes_with_certificates": "証明書のプロビジョニングの概要",
+      "provision_rolling_upgrade_nodes_running": "Data Node の証明書をプロビジョニングします。",
+      "journal_size_downtime_warning": "ジャーナルサイズとダウンタイムの警告",
+      "failed": "移行に失敗しました",
+      "finished": "移行が完了しました"
+    },
+    "certificate_renewal": {
+      "loading_failed": "Data Node の読み込みに失敗しました。ステータス",
+      "loading_failed_title": "Data Node を読み込めませんでした",
+      "renew": {
+        "button": "証明書を更新",
+        "button_loading": "証明書を更新中",
+        "success": "証明書を更新しました",
+        "failed": "証明書の更新に失敗しました。エラー: {{error}}"
+      },
+      "provision": {
+        "button": "証明書をプロビジョニング",
+        "button_loading": "証明書をプロビジョニング中...",
+        "success": "証明書をプロビジョニングしました",
+        "failed": "証明書のプロビジョニングに失敗しました。エラー: {{error}}"
+      },
+      "title": "証明書の更新とプロビジョニング",
+      "description": "ここでは、{{productName}} Data Node の証明書の更新またはプロビジョニングを手動で開始できます。手動でのプロビジョニングが必要になるのは、更新ポリシーのモードが「Manual」に設定されていて、最初の証明書のプロビジョニング後に Data Node が起動された場合のみです。",
+      "transport_address": "トランスポートアドレス",
+      "hostname": "ホスト名",
+      "valid_until": "{{relativeTime}} まで有効",
+      "no_data_nodes": "Data Node が見つかりませんでした。"
+    }
+  },
+  "use_collector_configurations_notifications": {
+    "fetch_failed": "コレクターの設定の取得に失敗しました。ステータス: {{error}}",
+    "fetch_failed_title": "設定を取得できませんでした",
+    "fetch_configuration_failed": "設定の取得に失敗しました。ステータス: {{error}}",
+    "configuration_not_found": "ID <{{configurationId}}> の設定が見つかりません。削除されていないかご確認ください。",
+    "fetch_configuration_failed_title": "設定を取得できませんでした",
+    "preview_failed": "設定のプレビューの取得に失敗しました。ステータス: {{error}}",
+    "preview_failed_title": "プレビューを取得できませんでした",
+    "created_success": "設定を作成しました",
+    "create_failed": "設定の作成に失敗しました。ステータス: {{error}}",
+    "create_failed_title": "設定を保存できませんでした",
+    "updated_success": "設定を更新しました",
+    "update_failed": "設定の更新に失敗しました: {{error}}",
+    "update_failed_title": "設定 {{name}} を更新できませんでした",
+    "copied_success": "設定 \"{{name}}\" をコピーしました",
+    "copy_failed": "設定 \"{{name}}\" の保存に失敗しました。ステータス: {{error}}",
+    "copy_failed_title": "設定を保存できませんでした",
+    "deleted_success": "設定 \"{{name}}\" を削除しました",
+    "delete_failed": "設定の削除に失敗しました: {{error}}",
+    "delete_failed_title": "設定 {{name}} を削除できませんでした",
+    "validate_failed": "設定 \"{{name}}\" の検証に失敗しました。ステータス: {{error}}",
+    "validate_failed_title": "設定を検証できませんでした"
+  },
+  "use_collectors_notifications": {
+    "fetch_failed": "コレクターの取得に失敗しました。ステータス: {{error}}",
+    "fetch_failed_title": "コレクターを取得できませんでした",
+    "not_found": "ID <{{collectorId}}> のコレクターが見つかりません。削除されていないかご確認ください。",
+    "fetch_collector_failed": "コレクターの取得に失敗しました。ステータス: {{error}}",
+    "fetch_collector_failed_title": "コレクターを取得できませんでした",
+    "created_success": "コレクターを作成しました",
+    "updated_success": "コレクターを更新しました",
+    "deleted_success": "コレクター \"{{name}}\" を削除しました",
+    "delete_failed": "コレクターの削除に失敗しました: {{error}}",
+    "delete_failed_title": "コレクター \"{{name}}\" を削除できませんでした",
+    "copied_success": "コレクター \"{{name}}\" をコピーしました",
+    "copy_failed": "コレクター \"{{name}}\" の保存に失敗しました。ステータス: {{error}}",
+    "copy_failed_title": "コレクターを保存できませんでした",
+    "validate_failed": "コレクター \"{{name}}\" の検証に失敗しました。ステータス: {{error}}",
+    "validate_failed_title": "コレクターを検証できませんでした"
+  }
+}

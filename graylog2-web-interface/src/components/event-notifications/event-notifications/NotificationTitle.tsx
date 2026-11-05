@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { EventNotification, TestResults } from 'components/event-notifications/hooks/useEventNotifications';
 import { Spinner } from 'components/common';
@@ -26,6 +27,7 @@ type Props = {
 };
 
 const NotificationTitle = ({ notification, testResults }: Props) => {
+  const { t } = useTranslation('event_notifications');
   const result = testResults?.[notification.id];
 
   return (
@@ -34,10 +36,10 @@ const NotificationTitle = ({ notification, testResults }: Props) => {
       {result?.id === notification.id ? (
         <div>
           {result.isLoading ? (
-            <Spinner text="Testing Notification..." />
+            <Spinner text={t('list.testing_notification')} />
           ) : (
             <p className={result.error ? 'text-danger' : 'text-success'}>
-              <b>{result.error ? 'Error' : 'Success'}:</b> {result.message}
+              <b>{result.error ? t('list.test_error') : t('list.test_success')}</b> {result.message}
             </p>
           )}
         </div>

@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import i18n from 'i18n';
 import type { IncompatibleIndex } from 'components/indices/hooks/useIncompatibleIndices';
 
 import type { PendingIndexStatus } from './hooks/usePendingIncompatibleIndexActions';
@@ -27,7 +28,8 @@ type BulkActionCopy = {
   buttonLabel: string;
   confirmTitle: string;
   confirmText: string;
-  targetVerb: string;
+  confirmBody: (count: number) => string;
+  errorTitle: string;
   successMessage: (count: number) => string;
 };
 
@@ -42,35 +44,21 @@ export type BulkIndexActionNotification = {
   title?: string;
 };
 
-const BULK_ACTION_COPY: Record<BulkCapableIndexAction, BulkActionCopy> = {
-  delete: {
-    buttonLabel: 'Delete',
-    confirmTitle: 'Delete incompatible indices',
-    confirmText: 'Delete all',
-    targetVerb: 'delete',
-    successMessage: (count) => `${count} incompatible ${count === 1 ? 'index was' : 'indices were'} deleted.`,
-  },
-  'reindex-system-index': {
-    buttonLabel: 'Reindex system indices',
-    confirmTitle: 'Reindex system indices',
-    confirmText: 'Reindex all',
-    targetVerb: 'reindex',
-    successMessage: (count) => `Reindex started for ${count} system ${count === 1 ? 'index' : 'indices'}.`,
-  },
-  'archive-delete': {
-    buttonLabel: 'Archive and delete',
-    confirmTitle: 'Archive and delete indices',
-    confirmText: 'Archive and delete all',
-    targetVerb: 'archive and delete',
-    successMessage: (count) => `Archive and delete started for ${count} ${count === 1 ? 'index' : 'indices'}.`,
-  },
-  rotate: {
-    buttonLabel: 'Rotate active write indices',
-    confirmTitle: 'Rotate active write indices',
-    confirmText: 'Rotate all',
-    targetVerb: 'rotate',
-    successMessage: (count) => `${count} ${count === 1 ? 'index was' : 'indices were'} rotated.`,
-  },
+const bulkActionKey = (action: BulkCapableIndexAction) => action.replace('-system-index', '').replace('-', '_');
+
+const getBulkActionCopy = (action: BulkCapableIndexAction): BulkActionCopy => {
+  const key = `incompatible.bulk.${bulkActionKey(action)}`;
+  const translate = (suffix: string, options: Record<string, unknown> = {}) =>
+    i18n.t(`${key}.${suffix}`, { ns: 'indexsets', ...options });
+
+  return {
+    buttonLabel: translate('button'),
+    confirmTitle: translate('title'),
+    confirmText: translate('confirm'),
+    confirmBody: (count) => translate('body', { count }),
+    errorTitle: translate('error'),
+    successMessage: (count) => translate('success', { count }),
+  };
 };
 
 export const buildPartialBulkNotification = ({
@@ -94,11 +82,15 @@ export const buildPartialBulkNotification = ({
     .slice(0, 3)
     .map(({ name, explanation }) => `${name}: ${explanation}`)
     .join('\n');
-  const more = failures.length > 3 ? `\n...and ${failures.length - 3} more.` : '';
-  const message =
+  const more =
+    failures.length > 3
+      ? `\n${i18n.t('incompatible.partial_more', { ns: 'indexsets', count: failures.length - 3 })}`
+      : '';
+  const summary =
     succeeded > 0
-      ? `${succeeded} succeeded, ${failures.length} failed.\n${details}${more}`
-      : `${failures.length} ${failures.length === 1 ? 'index' : 'indices'} failed.\n${details}${more}`;
+      ? i18n.t('incompatible.partial_summary', { ns: 'indexsets', succeeded, failed: failures.length })
+      : i18n.t('incompatible.all_failed', { ns: 'indexsets', count: failures.length });
+  const message = `${summary}\n${details}${more}`;
 
   return succeeded > 0
     ? { type: 'warning', message, title: partialSuccessTitle }
@@ -138,6 +130,6 @@ export const getBulkIndexActionCandidates = ({
     return {
       action,
       targetIndices,
-      ...BULK_ACTION_COPY[action],
+      ...getBulkActionCopy(action),
     };
   }).filter((candidate) => candidate.targetIndices.length > 0);

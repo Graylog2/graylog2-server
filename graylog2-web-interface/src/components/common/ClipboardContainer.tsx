@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useState } from 'react';
 
 import useTimeout from 'util/hooks/useTimeout';
@@ -57,18 +58,22 @@ const Copy = ({ children, value, timeout }: CopyProps) => {
   return children({ copied, copy });
 };
 
-const ClipboardContainer = ({ children, text }: Props) => (
-  <Copy value={text} timeout={2000}>
-    {({ copied, copy }) =>
-      copied ? (
-        <Tooltip label="Copied!" withArrow position="top" opened>
-          {children({ copy })}
-        </Tooltip>
-      ) : (
-        children({ copy })
-      )
-    }
-  </Copy>
-);
+const ClipboardContainer = ({ children, text }: Props) => {
+  const { t } = useTranslation('common');
+
+  return (
+    <Copy value={text} timeout={2000}>
+      {({ copied, copy }) =>
+        copied ? (
+          <Tooltip label={t('clipboard.copied')} withArrow position="top" opened>
+            {children({ copy })}
+          </Tooltip>
+        ) : (
+          children({ copy })
+        )
+      }
+    </Copy>
+  );
+};
 
 export default ClipboardContainer;

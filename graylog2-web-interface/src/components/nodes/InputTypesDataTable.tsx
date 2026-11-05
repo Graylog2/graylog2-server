@@ -15,7 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
+import i18n from 'i18n';
 import { Alert } from 'components/bootstrap';
 import { DataTable, ExternalLink, Spinner } from 'components/common';
 
@@ -25,7 +27,11 @@ const inputTypeFormatter = (inputType: { name: string; type: string; link_to_doc
     <td className="limited">{inputType.name}</td>
     <td className="limited">{inputType.type}</td>
     <td className="limited" style={{ width: 150 }}>
-      {inputType.link_to_docs && <ExternalLink href={inputType.link_to_docs}>Documentation</ExternalLink>}
+      {inputType.link_to_docs && (
+        <ExternalLink href={inputType.link_to_docs}>
+          {i18n.t('input_types_data_table.documentation', { ns: 'system' })}
+        </ExternalLink>
+      )}
     </td>
   </tr>
 );
@@ -35,15 +41,21 @@ type Props = {
 };
 
 const InputTypesDataTable = ({ inputDescriptions = undefined }: Props) => {
+  const { t } = useTranslation('system');
+
   if (!inputDescriptions) {
-    return <Spinner text="Loading input types..." />;
+    return <Spinner text={t('input_types_data_table.loading')} />;
   }
 
   if (Object.keys(inputDescriptions).length === 0) {
-    return <Alert bsStyle="warning">Input types are unavailable.</Alert>;
+    return <Alert bsStyle="warning">{t('input_types_data_table.unavailable')}</Alert>;
   }
 
-  const headers = ['Name', 'Type', 'Documentation'];
+  const headers = [
+    t('input_types_data_table.name'),
+    t('input_types_data_table.type'),
+    t('input_types_data_table.documentation'),
+  ];
 
   const rows = Object.keys(inputDescriptions).map((key) => inputDescriptions[key]);
 
@@ -57,7 +69,7 @@ const InputTypesDataTable = ({ inputDescriptions = undefined }: Props) => {
       sortByKey="name"
       rows={rows}
       dataRowFormatter={inputTypeFormatter}
-      filterLabel="Filter"
+      filterLabel={t('input_types_data_table.filter')}
       filterKeys={[]}
     />
   );

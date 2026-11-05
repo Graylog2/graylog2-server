@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import SegmentedControl from 'components/bootstrap/SegmentedControl';
@@ -41,16 +42,17 @@ const NarrowSegmentedControl = styled(SegmentedControl)`
   width: fit-content;
 `;
 
-const SEGMENTS = [
-  { label: 'Default', value: INDEX_SET_VIEW_VARIANTS.default },
-  { label: 'Configuration', value: INDEX_SET_VIEW_VARIANTS.configuration },
-  { label: 'Routing', value: INDEX_SET_VIEW_VARIANTS.routing },
-];
-
 type VariantValue = (typeof INDEX_SET_VIEW_VARIANTS)[keyof typeof INDEX_SET_VIEW_VARIANTS];
 
 const IndexSetViewButtons = () => {
+  const { t } = useTranslation('indexsets');
   const { activeLayoutVariant, selectLayoutVariant } = useLayoutVariant();
+
+  const segments = [
+    { label: t('overview_table.view_default'), value: INDEX_SET_VIEW_VARIANTS.default },
+    { label: t('overview_table.view_configuration'), value: INDEX_SET_VIEW_VARIANTS.configuration },
+    { label: t('overview_table.view_routing'), value: INDEX_SET_VIEW_VARIANTS.routing },
+  ];
 
   const onChange = (value: VariantValue) => {
     if (value === INDEX_SET_VIEW_VARIANTS.default) {
@@ -62,9 +64,9 @@ const IndexSetViewButtons = () => {
 
   return (
     <Container>
-      <Label>View:</Label>
+      <Label>{t('overview_table.view')}</Label>
       <NarrowSegmentedControl<VariantValue>
-        data={SEGMENTS}
+        data={segments}
         value={activeLayoutVariant as VariantValue}
         onChange={onChange}
       />

@@ -31,6 +31,8 @@ import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.Plugin;
+import org.graylog2.plugin.rest.CodedException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.rest.RestTools;
 import org.graylog2.shared.rest.NonApiResource;
 import org.graylog2.shared.rest.resources.csp.CSP;
@@ -119,7 +121,7 @@ public class WebInterfaceAssetsResource {
                         @PathParam("plugin") String pluginName,
                         @PathParam("filename") String filename) {
         final Plugin plugin = getPluginForName(pluginName)
-                .orElseThrow(() -> new NotFoundException("Couldn't find plugin " + pluginName));
+                .orElseThrow(() -> new CodedNotFoundException("web_interface_assets.couldnt_find_plugin", "Couldn't find plugin " + pluginName, CodedException.paramsOf("pluginName", pluginName)));
         final var filenameWithoutSuffix = trimBasePath(filename, headers);
 
         try {

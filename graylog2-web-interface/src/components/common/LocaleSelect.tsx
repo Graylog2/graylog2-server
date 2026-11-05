@@ -15,7 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
+import i18n from 'i18n';
 import Select from 'components/common/Select';
 import type { Locales } from 'hooks/useSystemStore';
 import { useSystemLocales } from 'hooks/useSystemStore';
@@ -40,7 +42,7 @@ const _formatLocales = (locales: Array<Locales>) => {
       return 0;
     });
 
-  return [{ value: 'und', label: 'Default locale' }].concat(sortedLocales);
+  return [{ value: 'und', label: i18n.t('time.default_locale', { ns: 'common' }) }].concat(sortedLocales);
 };
 
 type Option = {
@@ -48,7 +50,7 @@ type Option = {
   label: string;
 };
 const _renderOption = (option: Option) => (
-  <span key={option.value} title="{option.value} [{option.value}]">
+  <span key={option.value} title={option.value}>
     {option.label} [{option.value}]
   </span>
 );
@@ -60,6 +62,7 @@ const _renderOption = (option: Option) => (
 const LocaleSelect = (
   props: Omit<React.ComponentProps<typeof Select>, 'placeholder' | 'options' | 'optionRenderer'>,
 ) => {
+  const { t } = useTranslation('common');
   const locales = useSystemLocales();
 
   if (!locales.data) {
@@ -68,7 +71,7 @@ const LocaleSelect = (
 
   const _locales = _formatLocales(locales.data);
 
-  return <Select {...props} placeholder="Pick a locale" options={_locales} optionRenderer={_renderOption} />;
+  return <Select {...props} placeholder={t('time.pick_locale')} options={_locales} optionRenderer={_renderOption} />;
 };
 
 export default LocaleSelect;

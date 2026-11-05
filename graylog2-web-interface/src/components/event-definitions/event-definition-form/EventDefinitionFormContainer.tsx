@@ -18,6 +18,7 @@ import React, { useCallback, useState } from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import cloneDeep from 'lodash/cloneDeep';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 import { ConfirmLeaveDialog, Spinner } from 'components/common';
 import CurrentUser from 'logic/users/CurrentUser';
@@ -36,6 +37,7 @@ import useEventDefinitionSteps, { INITIAL_EVENT_DEFINITION } from './useEventDef
 import EventDetailsForm from './EventDetailsForm';
 import EventConditionForm from './EventConditionForm';
 import EventDefinitionForm, { getStepKeys } from './EventDefinitionForm';
+import type { EventDefinitionStep } from './EventDefinitionForm';
 
 import useEventDefinitionMutations from '../hooks/useEventDefinitionMutations';
 import {
@@ -44,6 +46,8 @@ import {
   useGetListEventsClusterConfig,
   EVENT_DEFINITIONS_QUERY_KEY,
 } from '../hooks/useEventDefinitions';
+import { eventDefinitionTypeTitle } from '../pluginTitles';
+import { translateValidationResult } from 'util/translateApiError';
 
 const STEP_KEYS = {
   EVENT_DETAILS: 'event-details',
@@ -80,6 +84,7 @@ const EventDefinitionFormContainer = ({
   onEventDefinitionChange = () => {},
   onSubmit = undefined,
 }: Props) => {
+  const { t } = useTranslation('event_definitions');
   const [activeStep, setActiveStep] = useState(initialStep);
   const { configFromLocalStorage, hasLocalStorageConfig } = useEventDefinitionConfigFromLocalStorage();
   // Merge the optional localStorage-stored config into the initial event definition once, at
@@ -154,10 +159,11 @@ const EventDefinitionFormContainer = ({
   const canEdit = scopePermissions.is_mutable;
   const canEditCondition = canEdit || eventDefinition._scope.toUpperCase() === 'ILLUMINATE';
 
-  const viewSteps = [
+  const viewSteps: Array<EventDefinitionStep> = [
     {
       key: STEP_KEYS.EVENT_DETAILS,
-      title: 'Event Details',
+      title: t('details_form.title'),
+      telemetryTitle: 'Event Details',
       component: (
         <EventDetailsForm
           {...commonStepProps}
@@ -168,7 +174,8 @@ const EventDefinitionFormContainer = ({
     },
     {
       key: STEP_KEYS.CONDITION,
-      title: eventDefinitionType?.displayName ?? 'Condition',
+      title: eventDefinitionTypeTitle(eventDefinitionType) ?? t('steps.condition'),
+      telemetryTitle: eventDefinitionType?.displayName ?? 'Condition',
       component: <EventConditionForm {...commonStepProps} canEdit={canEditCondition} />,
     },
   ];
@@ -190,7 +197,7 @@ const EventDefinitionFormContainer = ({
   };
 
   const showValidationErrors = (errors: { errors: unknown }) => {
-    setValidation(errors);
+    setValidation(translateValidationResult(errors as Parameters<typeof translateValidationResult>[0]) as typeof errors);
     setActiveStep(currentStepKeys[currentStepKeys.length - 1]);
   };
 
@@ -211,7 +218,7 @@ const EventDefinitionFormContainer = ({
           body.message.includes('org.graylog.events.processor.aggregation.AggregationSeries')
         ) {
           showValidationErrors({
-            errors: { conditions: ['Aggregation condition is not valid'] },
+            errors: { conditions: [t('form_container.aggregation_condition_invalid')] },
           });
 
           return;
@@ -219,7 +226,7 @@ const EventDefinitionFormContainer = ({
 
         if (body.message.includes('embryonic')) {
           showValidationErrors({
-            errors: { query_parameters: ['Query parameters must be declared'] },
+            errors: { query_parameters: [t('form_container.query_parameters_undeclared')] },
           });
         }
       }
@@ -267,7 +274,7 @@ const EventDefinitionFormContainer = ({
   };
 
   if (isLoading || loadingScopePermissions) {
-    return <Spinner text="Loading Event information..." />;
+    return <Spinner text={t('form_container.loading')} />;
   }
 
   return (

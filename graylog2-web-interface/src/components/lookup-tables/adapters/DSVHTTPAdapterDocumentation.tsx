@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { MantineAccordion } from 'components/bootstrap';
 import useProductName from 'brand-customization/useProductName';
@@ -28,41 +29,42 @@ const csvFile2 = `'127.0.0.1';'e4:b2:11:d1:38:14'
 '10.0.0.2';'e4:b2:11:d1:58:34'`;
 
 const DSVHTTPAdapterDocumentation = () => {
+  const { t } = useTranslation('lookup_tables');
   const productName = useProductName();
 
   const accordionItems = [
     {
       value: 'example_1',
-      label: 'Example 1',
+      label: t('doc.example', { number: 1 }),
       content: (
         <div>
-          <h5 style={{ marginBottom: 10 }}>Configuration</h5>
+          <h5 style={{ marginBottom: 10 }}>{t('shared.configuration')}</h5>
           <p style={{ marginBottom: 10, padding: 0 }}>
-            Separator: <code>,</code>
+            {t('adapter_fields.separator')}: <code>,</code>
             <br />
-            Quote character: <code>&#34;</code>
+            {t('adapter_fields.quote_character')}: <code>&#34;</code>
             <br />
           </p>
 
-          <h5 style={{ marginBottom: 10 }}>DSV File</h5>
+          <h5 style={{ marginBottom: 10 }}>{t('dsv_doc.dsv_file')}</h5>
           <pre>{csvFile1}</pre>
         </div>
       ),
     },
     {
       value: 'example_2',
-      label: 'Example 2',
+      label: t('doc.example', { number: 2 }),
       content: (
         <div>
-          <h5 style={{ marginBottom: 10 }}>Configuration</h5>
+          <h5 style={{ marginBottom: 10 }}>{t('shared.configuration')}</h5>
           <p style={{ marginBottom: 10, padding: 0 }}>
-            Separator: <code>;</code>
+            {t('adapter_fields.separator')}: <code>;</code>
             <br />
-            Quote character: <code>&#39;</code>
+            {t('adapter_fields.quote_character')}: <code>&#39;</code>
             <br />
           </p>
 
-          <h5 style={{ marginBottom: 10 }}>DSV File</h5>
+          <h5 style={{ marginBottom: 10 }}>{t('dsv_doc.dsv_file')}</h5>
           <pre>{csvFile2}</pre>
         </div>
       ),
@@ -71,15 +73,15 @@ const DSVHTTPAdapterDocumentation = () => {
 
   return (
     <div>
-      <p>The DSV data adapter can read key value pairs (or check for the presence of a key) from a DSV file.</p>
-      <p>Please make sure your DSV file is formatted according to your configuration settings.</p>
+      <p>{t('dsv_doc.intro')}</p>
+      <p>{t('dsv_doc.formatting_hint')}</p>
 
-      <h4>CSV file requirements</h4>
+      <h4>{t('doc.requirements_title')}</h4>
       <p>
-        The file uses <strong>utf-8</strong> encoding
+        <Trans t={t} i18nKey="doc.utf8" components={{ bold: <strong /> }} />
       </p>
       <p>
-        The file is accessible using the same URL by <strong>every</strong> {productName} server node
+        <Trans t={t} i18nKey="dsv_doc.accessible" values={{ productName }} components={{ bold: <strong /> }} />
       </p>
 
       <hr />

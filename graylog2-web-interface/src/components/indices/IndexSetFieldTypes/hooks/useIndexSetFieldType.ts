@@ -16,6 +16,7 @@
  */
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
+import i18n from 'i18n';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { SearchParams } from 'stores/PaginationTypes';
@@ -71,8 +72,8 @@ const useIndexSetFieldTypes = (
     queryFn: () =>
       defaultOnError(
         fetchIndexSetFieldTypes(indexSetId, searchParams),
-        'Loading index field types failed with status',
-        'Could not load index field types',
+        i18n.t('hooks.field_types_load_failed', { ns: 'indexsets' }),
+        i18n.t('hooks.field_types_load_failed_title', { ns: 'indexsets' }),
       ),
     placeholderData: keepPreviousData,
     enabled,

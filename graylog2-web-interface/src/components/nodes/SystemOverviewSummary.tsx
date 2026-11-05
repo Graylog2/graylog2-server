@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import StringUtils from 'util/StringUtils';
 
@@ -37,15 +38,18 @@ type SystemOverviewSummaryProps = {
 };
 
 export const SystemOverviewSummary = ({ information }: SystemOverviewSummaryProps) => {
+  const { t } = useTranslation('system');
   const lbStatus = information.lb_status.toUpperCase();
 
   return (
     <NodeState>
-      <dt>Current lifecycle state:</dt>
+      <dt>{t('system_overview_summary.current_lifecycle_state')}</dt>
       <dd>{StringUtils.capitalizeFirstLetter(information.lifecycle)}</dd>
-      <dt>Message processing:</dt>
-      <dd>{information.is_processing ? 'Enabled' : 'Disabled'}</dd>
-      <dt>Load balancer indication:</dt>
+      <dt>{t('system_overview_summary.message_processing')}</dt>
+      <dd>
+        {information.is_processing ? t('system_overview_summary.enabled') : t('system_overview_summary.disabled')}
+      </dd>
+      <dt>{t('system_overview_summary.lb_indication')}</dt>
       <dd className={lbStatus === 'DEAD' ? 'text-danger' : ''}>{lbStatus}</dd>
     </NodeState>
   );

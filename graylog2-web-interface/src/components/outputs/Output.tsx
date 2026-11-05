@@ -16,6 +16,8 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import { Alert, Col, Row, Button } from 'components/bootstrap';
 import { IfPermitted, Spinner, Icon } from 'components/common';
@@ -85,7 +87,7 @@ type OutputProps = {
   onUpdate?: (...args: any[]) => void;
   removeOutputFromStream: (...args: any[]) => void;
   removeOutputGlobally: (...args: any[]) => void;
-};
+} & WithTranslation;
 
 class Output extends React.Component<
   OutputProps,
@@ -136,7 +138,7 @@ class Output extends React.Component<
 
   render() {
     const { typeDefinition } = this.state;
-    const { onUpdate, getTypeDefinition } = this.props;
+    const { onUpdate, getTypeDefinition, t } = this.props;
 
     if (!this._typeNotAvailable() && !typeDefinition) {
       return <Spinner />;
@@ -144,7 +146,7 @@ class Output extends React.Component<
 
     const { output } = this.props;
     const contentPack = output.content_pack ? (
-      <span title="Created from content pack">
+      <span title={t('outputs.content_pack_title')}>
         <Icon name="redeem" />
       </span>
     ) : null;
@@ -153,12 +155,7 @@ class Output extends React.Component<
     let configurationWell;
 
     if (this._typeNotAvailable()) {
-      alert = (
-        <Alert bsStyle="danger">
-          The plugin required for this output is not loaded. Editing it is not possible. Please load the plugin or
-          delete the output.
-        </Alert>
-      );
+      alert = <Alert bsStyle="danger">{t('outputs.plugin_error')}</Alert>;
     } else {
       configurationWell = (
         <ConfigurationWell
@@ -177,7 +174,7 @@ class Output extends React.Component<
       deleteFromStreamButton = (
         <IfPermitted permissions="stream_outputs:delete">
           <Button bsStyle="info" onClick={this._onDeleteFromStream}>
-            Delete from stream
+            {t('outputs.delete_from_stream')}
           </Button>
         </IfPermitted>
       );
@@ -192,9 +189,9 @@ class Output extends React.Component<
             <Col md={6}>
               <h2 className="extractor-title">
                 {output.title} {contentPack}
-                <small>ID: {output.id}</small>
+                <small>{t('outputs.id_label', { id: output.id })}</small>
               </h2>
-              Type: {output.type}
+              {t('outputs.type_label', { type: output.type })}
             </Col>
             <Col md={6}>
               <NodeRowInfo className="text-right pull-right">
@@ -207,7 +204,7 @@ class Output extends React.Component<
                 {deleteFromStreamButton}
                 <IfPermitted permissions="outputs:terminate">
                   <Button bsStyle="danger" onClick={this._onDeleteGlobally}>
-                    Delete globally
+                    {t('outputs.delete_globally')}
                   </Button>
                 </IfPermitted>
               </NodeRowInfo>
@@ -225,4 +222,4 @@ class Output extends React.Component<
   }
 }
 
-export default Output;
+export default withTranslation('streams')(Output);

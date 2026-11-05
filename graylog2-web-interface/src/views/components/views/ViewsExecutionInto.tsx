@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import isEmpty from 'lodash/isEmpty';
 
 import useViewsSelector from 'views/stores/useViewsSelector';
@@ -22,10 +23,11 @@ import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
 import ExecutionInfo from 'views/components/views/ExecutionInfo';
 
 const ViewsExecutionInfo = () => {
+  const { t } = useTranslation('search');
   const result = useViewsSelector(selectCurrentQueryResults);
 
   if (isEmpty(result)) {
-    return <i>No query executed yet.</i>;
+    return <i>{t('execution.not_executed')}</i>;
   }
 
   const total = result?.searchTypes && Object.values(result?.searchTypes)?.find((e) => e.total)?.total;

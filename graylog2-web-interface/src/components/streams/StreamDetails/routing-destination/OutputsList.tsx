@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Table } from 'components/bootstrap';
 import type { Output } from 'hooks/useOutputs';
@@ -35,6 +36,7 @@ type Props = {
 };
 
 const OutputsList = ({ outputs, streamId, getTypeDefinition, isLoadingOutputTypes }: Props) => {
+  const { t } = useTranslation('streams');
   const sendTelemetry = useSendTelemetry();
   const { updateOutput } = useOutputMutations();
 
@@ -51,7 +53,7 @@ const OutputsList = ({ outputs, streamId, getTypeDefinition, isLoadingOutputType
     <Table condensed>
       <thead>
         <tr>
-          <th colSpan={2}>Name</th>
+          <th colSpan={2}>{t('routing_destination.outputs_list.name')}</th>
         </tr>
       </thead>
       <tbody>
@@ -68,7 +70,7 @@ const OutputsList = ({ outputs, streamId, getTypeDefinition, isLoadingOutputType
 
         {outputs.length <= 0 && (
           <tr>
-            <td colSpan={2}>No output defined.</td>
+            <td colSpan={2}>{t('routing_destination.outputs_list.none')}</td>
           </tr>
         )}
       </tbody>

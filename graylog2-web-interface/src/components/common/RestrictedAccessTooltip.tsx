@@ -15,13 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { Icon, Tooltip } from 'components/common';
 
 type Props = {
   entityName: string;
-  capabilityName: string;
+  capabilityName: 'view';
 };
 
 const StyledIcon = styled(Icon)(
@@ -30,10 +31,18 @@ const StyledIcon = styled(Icon)(
   `,
 );
 
-const RestrictedAccessTooltip = ({ entityName, capabilityName }: Props) => (
-  <Tooltip label={`You don't have permissions to ${capabilityName} this ${entityName}.`}>
-    <StyledIcon size="xs" name="lock" />
-  </Tooltip>
-);
+const CAPABILITY_TEXTS = {
+  view: 'restricted_access.view',
+} as const;
+
+const RestrictedAccessTooltip = ({ entityName, capabilityName }: Props) => {
+  const { t } = useTranslation('common');
+
+  return (
+    <Tooltip label={t(CAPABILITY_TEXTS[capabilityName], { entityName })}>
+      <StyledIcon size="xs" name="lock" />
+    </Tooltip>
+  );
+};
 
 export default RestrictedAccessTooltip;

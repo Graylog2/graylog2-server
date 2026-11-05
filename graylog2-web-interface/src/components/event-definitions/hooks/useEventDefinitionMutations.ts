@@ -21,6 +21,7 @@ import omit from 'lodash/omit';
 
 import { EventsDefinitions } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import UserNotification from 'util/UserNotification';
 import type { EntityShare } from 'actions/permissions/EntityShareActions';
 
@@ -55,14 +56,14 @@ const useEventDefinitionMutations = () => {
     mutationFn: createEventDefinition,
     onError: (errorThrown) => {
       UserNotification.error(
-        `Saving EventDefinition failed with status: ${errorThrown}`,
-        'Could not save EventDefinition',
+        i18n.t('hook_notifications.save_failed', { ns: 'event_definitions', error: errorThrown }),
+        i18n.t('hook_notifications.save_failed_title', { ns: 'event_definitions' }),
       );
     },
     onSuccess: (eventDefinition: EventDefinition) => {
       UserNotification.success(
-        'Event Definition created successfully',
-        `Event Definition "${eventDefinition.title}" was created successfully.`,
+        i18n.t('hook_notifications.create_success_title', { ns: 'event_definitions' }),
+        i18n.t('hook_notifications.create_success', { ns: 'event_definitions', title: eventDefinition.title }),
       );
     },
   });

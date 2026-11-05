@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Spinner from 'components/common/Spinner';
 import { DataTable } from 'components/common';
@@ -30,14 +31,15 @@ const ContentPackInstallEntityList = ({
   entities = undefined,
   uninstall = false,
 }: ContentPackInstallEntityListProps) => {
+  const { t } = useTranslation('content_packs');
   const rowFormatter = (entity: InstalledEntity) => (
     <tr>
       <td>{entity.title}</td>
       <td>{entity.type.name}</td>
     </tr>
   );
-  const headers = ['Title', 'Type'];
-  const headerTitle = uninstall ? 'Entites to be uninstalled' : 'Installed Entities';
+  const headers = [t('install_entities.title'), t('install_entities.type')];
+  const headerTitle = uninstall ? t('install_entities.to_be_uninstalled') : t('install_entities.installed');
 
   if (!entities) {
     return <Spinner />;

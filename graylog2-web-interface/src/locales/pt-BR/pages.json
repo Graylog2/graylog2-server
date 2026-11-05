@@ -1,0 +1,64 @@
+{
+  "api_browser": {
+    "download_label": "Baixar especificação OpenAPI:",
+    "fetch_failed": "Falha ao buscar a especificação da API!",
+    "loading": "Carregando especificação da API ...",
+    "loading_title": "Navegador de API - Carregando especificação da API",
+    "select_format": "Selecionar formato",
+    "title": "Navegador de API"
+  },
+  "configlet": {
+    "error": "Algo deu errado:"
+  },
+  "errors": {
+    "copy_error_details": "Copiar detalhes do erro para a área de transferência"
+  },
+  "keyboard_shortcuts": {
+    "description": "Uma lista de todos os atalhos disponíveis",
+    "title": "Atalhos de teclado"
+  },
+  "loading": {
+    "text": "Carregando, aguarde...",
+    "title": "Carregando..."
+  },
+  "not_found": {
+    "back_hint": "Você pode voltar para a <mainPageLink>Página principal</mainPageLink> e navegar a partir dela.",
+    "description": "A página que você está procurando não existe (ou não existe mais).",
+    "title": "Página não encontrada"
+  },
+  "runtime_error": {
+    "description_hint": "Você pode usar a navegação para acessar outras partes do produto, atualizar a página ou enviar um relatório de erro.",
+    "description_intro": "Parece que a página para a qual você navegou apresentou um erro.",
+    "error_label": "Erro:",
+    "show_less": "Mostrar menos",
+    "show_more": "Mostrar mais",
+    "title": "Algo deu errado."
+  },
+  "server_unavailable": {
+    "document_title": "Servidor indisponível",
+    "error_message": "Mensagem de erro",
+    "full_error_message": "Mensagem de erro completa",
+    "intro": "Estamos enfrentando problemas para conectar ao servidor do {{productName}} em execução em <serverAddress>{{address}}</serverAddress>. Verifique se o servidor está íntegro e funcionando corretamente.",
+    "last_response": "Esta é a última resposta que recebemos do servidor:",
+    "less_details": "Menos detalhes",
+    "modal_title": "Servidor temporariamente indisponível",
+    "more_details": "Mais detalhes",
+    "need_help": "Precisa de ajuda? <helpLink>Podemos ajudar você</helpLink>.",
+    "no_information": "Não há informações disponíveis.",
+    "original_request": "Requisição original",
+    "redirect_hint": "Você será redirecionado automaticamente para a página anterior assim que for possível conectar ao servidor.",
+    "status_code": "Código de status"
+  },
+  "show_message": {
+    "document_title": "Mensagem {{messageId}} em {{index}}",
+    "not_found_description": "O índice ou a mensagem especificada não foi encontrado. O motivo mais provável é que o índice que contém a mensagem referenciada foi excluído. A mensagem de erro completa é:",
+    "not_found_title": "Índice/Mensagem não encontrado"
+  },
+  "unauthorized": {
+    "description_hint": "Entre em contato com o administrador e informe os detalhes do erro.",
+    "description_intro": "Você não tem as permissões necessárias para visualizar este recurso.",
+    "page_details": "A verificação de permissões para a seguinte requisição falhou,\nao tentar acessar {{pathname}}.",
+    "page_details_no_request": "A verificação de permissões falhou ao tentar acessar {{pathname}}.",
+    "title": "Permissões ausentes"
+  }
+}

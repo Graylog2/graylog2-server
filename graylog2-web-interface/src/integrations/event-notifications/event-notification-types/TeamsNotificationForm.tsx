@@ -16,6 +16,7 @@
  */
 import React, { useState } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { getValueFromInput } from 'util/FormsUtils';
 import { Input, Button, ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'components/bootstrap';
@@ -77,6 +78,7 @@ export const defaultConfig: ConfigType = {
 };
 
 const TeamsNotificationForm = ({ config, validation, onChange }: TeamsNotificationFormType) => {
+  const { t } = useTranslation('integrations');
   const defaultBacklogSize = config.backlog_size;
   const [isBacklogSizeEnabled, setIsBacklogSizeEnabled] = useState(defaultBacklogSize > 0);
   const [backlogSize, setBacklogSize] = useState(defaultBacklogSize);
@@ -120,15 +122,22 @@ const TeamsNotificationForm = ({ config, validation, onChange }: TeamsNotificati
 
   const element = (
     <p>
-      Custom message to be appended below the alert title. See{' '}
-      <DocumentationLink page={DocsHelper.PAGES.ALERTS} text="docs " /> for more details.
+      <Trans
+        t={t}
+        i18nKey="slack_notification_form.custom_message_help"
+        components={{
+          docsLink: (
+            <DocumentationLink page={DocsHelper.PAGES.ALERTS} text={t('slack_notification_form.docs_link_text')} />
+          ),
+        }}
+      />
     </p>
   );
 
   return (
     <>
       <FormGroup controlId="color">
-        <ControlLabel>Configuration color</ControlLabel>
+        <ControlLabel>{t('slack_notification_form.configuration_color_label')}</ControlLabel>
         <div>
           <ColorLabel color={config.color} />
           <div style={{ display: 'inline-block', marginLeft: 15 }}>
@@ -136,20 +145,20 @@ const TeamsNotificationForm = ({ config, validation, onChange }: TeamsNotificati
               id="color"
               color={config.color || '#f06292'}
               placement="right"
-              triggerNode={<Button bsSize="xsmall">Change color</Button>}
+              triggerNode={<Button bsSize="xsmall">{t('slack_notification_form.change_color_button')}</Button>}
               onChange={handleColorChange}
             />
           </div>
         </div>
-        <HelpBlock>Choose a color to use for this configuration.</HelpBlock>
+        <HelpBlock>{t('slack_notification_form.color_help')}</HelpBlock>
       </FormGroup>
       <Input
         id="notification-webhookUrl"
         name="webhook_url"
-        label="Webhook URL"
+        label={t('teams_notification_details.webhook_url_label')}
         type="text"
         bsStyle={validation.errors.webhook_url ? 'error' : null}
-        help={validation?.errors?.webhook_url?.[0] ?? 'Teams "Incoming Webhook" URL'}
+        help={validation?.errors?.webhook_url?.[0] ?? t('teams_notification_form.webhook_url_help')}
         value={config.webhook_url || ''}
         onChange={handleChange}
         required
@@ -157,7 +166,7 @@ const TeamsNotificationForm = ({ config, validation, onChange }: TeamsNotificati
       <Input
         id="notification-customMessage"
         name="custom_message"
-        label="Custom Message (optional)"
+        label={t('slack_notification_form.custom_message_label')}
         type="textarea"
         bsStyle={validation.errors.custom_message ? 'error' : null}
         help={validation?.errors?.custom_message?.[0] ?? element}
@@ -168,8 +177,8 @@ const TeamsNotificationForm = ({ config, validation, onChange }: TeamsNotificati
       <FormGroup>
         <Input
           id="notification-time-zone"
-          help="Time zone used for timestamps in the notification body."
-          label="Time zone for date/time values">
+          help={t('slack_notification_form.time_zone_help')}
+          label={t('slack_notification_form.time_zone_label')}>
           <TimezoneSelect
             className="timezone-select"
             name="time_zone"
@@ -178,7 +187,7 @@ const TeamsNotificationForm = ({ config, validation, onChange }: TeamsNotificati
             clearable={false}
           />
         </Input>
-        <ControlLabel>Message Backlog Limit (optional)</ControlLabel>
+        <ControlLabel>{t('slack_notification_form.backlog_limit_label')}</ControlLabel>
         <InputGroup>
           <InputGroup.Addon>
             <input
@@ -198,19 +207,16 @@ const TeamsNotificationForm = ({ config, validation, onChange }: TeamsNotificati
             disabled={!isBacklogSizeEnabled}
           />
         </InputGroup>
-        <HelpBlock>
-          Limit the number of backlog messages sent as part of the Microsoft Teams notification. If set to 0, no limit
-          will be enforced.
-        </HelpBlock>
+        <HelpBlock>{t('teams_notification_form.backlog_limit_help')}</HelpBlock>
       </FormGroup>
 
       <Input
         id="notification-iconUrl"
         name="icon_url"
-        label="Icon URL (optional)"
+        label={t('slack_notification_form.icon_url_label')}
         type="text"
         bsStyle={validation.errors.icon_url ? 'error' : null}
-        help={validation?.errors?.icon_url?.[0] ?? 'Image to use as the icon for this message'}
+        help={validation?.errors?.icon_url?.[0] ?? t('slack_notification_form.icon_url_help')}
         value={config.icon_url || ''}
         onChange={handleChange}
       />

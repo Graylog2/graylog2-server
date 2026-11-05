@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { create, keyResolver, windowScheduler } from '@yornaath/batshit';
 import { useQuery } from '@tanstack/react-query';
 
@@ -29,6 +30,7 @@ const fetchEventDefinition = create({
 });
 
 const EventDefinition = ({ value }: { value: string }) => {
+  const { t } = useTranslation('widgets');
   const { data: eventDefinition, isLoading } = useQuery({
     queryKey: ['event-definitions', 'batched', value],
 
@@ -39,7 +41,11 @@ const EventDefinition = ({ value }: { value: string }) => {
     return <Spinner />;
   }
 
-  return eventDefinition?.title ? <span>{eventDefinition.title}</span> : <i>Missing Event Definition: {value}</i>;
+  return eventDefinition?.title ? (
+    <span>{eventDefinition.title}</span>
+  ) : (
+    <i>{t('field_types.missing_event_definition', { id: value })}</i>
+  );
 };
 
 export default EventDefinition;

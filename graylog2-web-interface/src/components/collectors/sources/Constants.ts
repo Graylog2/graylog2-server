@@ -28,9 +28,10 @@ export const DEFAULT_LAYOUT = {
   defaultColumnOrder: ['name', 'type', 'enabled', 'description'],
 };
 
+/** Translation keys (`collectors` namespace) of the source type names. */
 export const SOURCE_TYPE_LABELS: Record<SourceType, string> = {
-  file: 'File',
-  journald: 'Journald',
-  windows_event_log: 'Windows Event Log',
-  macos_unified_logging: 'macOS Unified Logging',
+  file: 'source_types.file',
+  journald: 'source_types.journald',
+  windows_event_log: 'source_types.windows_event_log',
+  macos_unified_logging: 'source_types.macos_unified_logging',
 };

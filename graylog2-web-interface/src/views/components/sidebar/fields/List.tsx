@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { List as VirtualList, type RowComponentProps } from 'react-window';
 import type { List as ImmutableList } from 'immutable';
 import styled from 'styled-components';
@@ -66,8 +67,9 @@ const RowComponent = ({ index, style, fieldList, activeQueryFields }: RowCompone
 );
 
 const List = ({ filter, activeQueryFields, allFields, currentGroup }: Props) => {
+  const { t } = useTranslation('search');
   if (!activeQueryFields) {
-    return <span>No field information available.</span>;
+    return <span>{t('fields_overview.no_field_information')}</span>;
   }
 
   const fieldFilter = filter
@@ -80,7 +82,7 @@ const List = ({ filter, activeQueryFields, allFields, currentGroup }: Props) => 
     .toList();
 
   if (fieldList.isEmpty()) {
-    return <i>No fields to show. Try changing your filter term or select a different field set above.</i>;
+    return <i>{t('fields_overview.no_fields')}</i>;
   }
 
   return (

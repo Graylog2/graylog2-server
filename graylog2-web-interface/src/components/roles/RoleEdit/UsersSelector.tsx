@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useEffect, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Formik, Form, Field } from 'formik';
 import styled, { css } from 'styled-components';
 import compact from 'lodash/compact';
@@ -72,6 +73,7 @@ const _renderOption = ({ label }: { label: string }) => <SelectOption>{label}</S
 const _isRequired = (field) => (value) => (!value ? `The ${field} is required` : undefined);
 
 const UsersSelector = ({ role, onSubmit, refreshVersion = 0 }: Props) => {
+  const { t } = useTranslation('users');
   const [users, setUsers] = useState<Immutable.List<UserOverview>>(Immutable.List.of());
   const [options, setOptions] = useState([]);
   const [error, setError] = useState<string | undefined>();
@@ -136,13 +138,17 @@ const UsersSelector = ({ role, onSubmit, refreshVersion = 0 }: Props) => {
                     optionRenderer={_renderOption}
                     multi
                     options={options}
-                    placeholder="Search for users"
+                    placeholder={t('roles.users_selector.search_placeholder')}
                     value={value}
                   />
                 )}
               </Field>
-              <SubmitButton bsStyle="primary" disabled={isSubmitting || !isValid} title="Assign User" type="submit">
-                Assign User
+              <SubmitButton
+                bsStyle="primary"
+                disabled={isSubmitting || !isValid}
+                title={t('roles.users_selector.assign_user')}
+                type="submit">
+                {t('roles.users_selector.assign_user')}
               </SubmitButton>
             </FormElements>
             {errors && (

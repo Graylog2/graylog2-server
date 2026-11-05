@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import { Row, Col, Button, Input } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
@@ -22,7 +24,7 @@ import { importExtractors } from 'hooks/useExtractors';
 
 type ImportExtractorsProps = {
   input: any;
-};
+} & WithTranslation;
 
 class ImportExtractors extends React.Component<
   ImportExtractorsProps,
@@ -42,8 +44,8 @@ class ImportExtractors extends React.Component<
       importExtractors(this.props.input.id, extractors);
     } catch (error) {
       UserNotification.error(
-        `There was an error while parsing extractors. Are they in JSON format? ${error}`,
-        'Could not import extractors',
+        this.props.t('import.parse_error', { error: String(error) }),
+        this.props.t('import.parse_error_title'),
       );
     }
   };
@@ -54,7 +56,7 @@ class ImportExtractors extends React.Component<
         <Col md={12}>
           <Row>
             <Col md={12}>
-              <h2>Extractors JSON</h2>
+              <h2>{this.props.t('export.json_title')}</h2>
             </Col>
           </Row>
           <Row>
@@ -69,7 +71,7 @@ class ImportExtractors extends React.Component<
                   rows={30}
                 />
                 <Button type="submit" bsStyle="primary">
-                  Add extractors to input
+                  {this.props.t('import.submit')}
                 </Button>
               </form>
             </Col>
@@ -80,4 +82,4 @@ class ImportExtractors extends React.Component<
   }
 }
 
-export default ImportExtractors;
+export default withTranslation('extractors')(ImportExtractors);

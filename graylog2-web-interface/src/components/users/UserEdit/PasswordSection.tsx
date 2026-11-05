@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { Formik, Form } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -70,6 +71,7 @@ const _onSubmit = (formData, userId) => {
 };
 
 const PasswordGroup = ({ passwordComplexityConfig }: PasswordGroupProps) => {
+  const { t } = useTranslation('users');
   const minLength = passwordComplexityConfig.min_length;
   const effectiveHelpText = usePasswordHelpText({ passwordComplexityConfig });
 
@@ -84,7 +86,7 @@ const PasswordGroup = ({ passwordComplexityConfig }: PasswordGroupProps) => {
   return (
     <>
       <FormikFormGroup
-        label="New Password"
+        label={t('user_edit.password.new_password')}
         name="password"
         type="password"
         help={effectiveHelpText}
@@ -96,7 +98,7 @@ const PasswordGroup = ({ passwordComplexityConfig }: PasswordGroupProps) => {
         required
       />
       <FormikFormGroup
-        label="Repeat Password"
+        label={t('user_edit.password.repeat_password')}
         name="password_repeat"
         type="password"
         minLength={minLength}
@@ -115,6 +117,7 @@ const InvisibleInput = styled.input`
 `;
 
 const PasswordSection = ({ user: { id } }: Props) => {
+  const { t } = useTranslation('users');
   const currentUser = useCurrentUser();
   const { isPermitted } = usePermissions();
   const passwordComplexityConfig = usePasswordComplexityConfig();
@@ -127,11 +130,9 @@ const PasswordSection = ({ user: { id } }: Props) => {
   }
 
   return (
-    <SectionComponent title="Password">
-      <Alert bsStyle="info" title="Changing the Password">
-        Changing the password will log the user out and will invalidate all their current sessions. If you are changing
-        your own password, you will be logged out right after saving. In that case, make sure to save any pending
-        changes first.
+    <SectionComponent title={t('user_fields.password')}>
+      <Alert bsStyle="info" title={t('user_edit.password.alert_title')}>
+        {t('user_edit.password.alert_text')}
       </Alert>
       <Formik onSubmit={(formData) => _onSubmit(formData, id)} validate={validate} initialValues={{}}>
         {({ isSubmitting, isValid }) => (
@@ -145,7 +146,7 @@ const PasswordSection = ({ user: { id } }: Props) => {
             />
             {requiresOldPassword && (
               <FormikFormGroup
-                label="Old Password"
+                label={t('user_edit.password.old_password')}
                 name="old_password"
                 type="password"
                 maxLength={100}
@@ -159,8 +160,12 @@ const PasswordSection = ({ user: { id } }: Props) => {
             <Row className="no-bm">
               <Col xs={12}>
                 <div className="pull-right">
-                  <Button bsStyle="primary" disabled={isSubmitting || !isValid} title="Change Password" type="submit">
-                    Change Password
+                  <Button
+                    bsStyle="primary"
+                    disabled={isSubmitting || !isValid}
+                    title={t('user_edit.password.change')}
+                    type="submit">
+                    {t('user_edit.password.change')}
                   </Button>
                 </div>
               </Col>

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import isEmpty from 'lodash/isEmpty';
 
 import { ListGroup, Alert } from 'components/bootstrap';
@@ -25,7 +26,13 @@ import useContentStream from 'components/content-stream/hook/useContentStream';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
+// `Trans` provides the link text as children.
+const ReleasesLink = ({ children = undefined }: React.PropsWithChildren) => (
+  <ExternalLink href="https://www.graylog.org/post/tag/release-info">{children}</ExternalLink>
+);
+
 const ContentStreamReleasesSection = () => {
+  const { t } = useTranslation('welcome');
   const path = 'release-info';
   const { feedList, isLoadingFeed, error } = useContentStream(path);
   const sendTelemetry = useSendTelemetry('content-stream');
@@ -48,8 +55,7 @@ const ContentStreamReleasesSection = () => {
     return (
       <Alert bsStyle="info">
         <p>
-          Unable to load RSS feed at the moment ! You can read more on{' '}
-          <ExternalLink href="https://www.graylog.org/post/tag/release-info">Graylog.org</ExternalLink>.
+          <Trans t={t} i18nKey="content_stream.releases_unavailable" components={{ releasesLink: <ReleasesLink /> }} />
         </p>
       </Alert>
     );

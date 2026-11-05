@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Modal } from 'components/bootstrap';
 import ModalSubmit from 'components/common/ModalSubmit';
@@ -39,7 +40,7 @@ type Props = {
  */
 const ConfirmDialog = ({
   btnConfirmDisabled = false,
-  btnConfirmText = 'Confirm',
+  btnConfirmText = undefined,
   children,
   hideCancelButton = false,
   isAsyncSubmit = undefined,
@@ -50,6 +51,8 @@ const ConfirmDialog = ({
   submitLoadingText = undefined,
   title,
 }: Props) => {
+  const { t } = useTranslation('common');
+  const confirmText = btnConfirmText ?? t('actions.confirm');
   const onHide = hideCancelButton ? onConfirm : onCancel;
 
   const submit = hideCancelButton ? (
@@ -58,7 +61,7 @@ const ConfirmDialog = ({
       onSubmit={onConfirm}
       submitButtonType="button"
       disabledSubmit={btnConfirmDisabled}
-      submitButtonText={btnConfirmText}
+      submitButtonText={confirmText}
     />
   ) : (
     <ModalSubmit
@@ -69,7 +72,7 @@ const ConfirmDialog = ({
       isSubmitting={isSubmitting}
       onCancel={onCancel}
       onSubmit={onConfirm}
-      submitButtonText={btnConfirmText}
+      submitButtonText={confirmText}
       submitButtonType="button"
       submitLoadingText={submitLoadingText}
     />

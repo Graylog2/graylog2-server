@@ -23,6 +23,7 @@ const graylogPlugin = {
     'use-arrow-function-for-event-handlers-in-classes': require('./rules/use-arrow-function-for-event-handlers-in-classes'),
     'prefer-direct-react-hook-import': require('./rules/prefer-direct-react-hook-import'),
     'no-literal-product-name': require('./rules/no-literal-product-name'),
+    'no-untranslated-text': require('./rules/no-untranslated-text'),
   },
 };
 

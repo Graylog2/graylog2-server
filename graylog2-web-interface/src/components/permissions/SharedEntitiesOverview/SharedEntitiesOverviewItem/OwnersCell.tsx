@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import type Grantee from 'logic/permissions/Grantee';
@@ -54,6 +55,7 @@ type OwnerTitleProps = {
 };
 
 const OwnerTitle = ({ owner: { type, id: grn, title } }: OwnerTitleProps) => {
+  const { t } = useTranslation('users');
   const { isPermitted } = usePermissions();
   const { id: ownerId } = getValuesFromGRN(grn);
 
@@ -77,7 +79,7 @@ const OwnerTitle = ({ owner: { type, id: grn, title } }: OwnerTitleProps) => {
 
       return <TitleWithLink title={title} entityGrn={grn} />;
     case 'global':
-      return <span>Everyone</span>;
+      return <span>{t('permissions.grantee_types.global')}</span>;
     default:
       return assertUnreachable(type);
   }

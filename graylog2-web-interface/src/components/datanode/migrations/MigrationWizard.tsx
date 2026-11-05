@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Spinner, Wizard } from 'components/common';
 import CAStep from 'components/datanode/migrations/CAStep';
@@ -30,9 +31,10 @@ import MigrationFinishedStep from 'components/datanode/migrations/MigrationFinis
 const MigrationWizard = () => {
   const { step: currentStep, isLoading } = useMigrationWizardStep();
   const { onTriggerNextState } = useTriggerMigrationState();
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
 
   if (isLoading) {
-    return <Spinner text="Loading ..." />;
+    return <Spinner text={t('migration_wizard.loading')} />;
   }
 
   const onTriggerStep = async (step: MigrationActions, args: StepArgs = {}) => onTriggerNextState({ step, args });
@@ -42,27 +44,27 @@ const MigrationWizard = () => {
   const steps = [
     {
       key: MIGRATION_STATE.MIGRATION_WELCOME_PAGE.key,
-      title: MIGRATION_STATE.MIGRATION_WELCOME_PAGE.description,
+      title: t(MIGRATION_STATE.MIGRATION_WELCOME_PAGE.descriptionKey),
       component: <MigrationWelcomeStep currentStep={currentStep} onTriggerStep={onTriggerStep} />,
     },
     {
       key: MIGRATION_STATE.CA_CREATION_PAGE.key,
-      title: MIGRATION_STATE.CA_CREATION_PAGE.description,
+      title: t(MIGRATION_STATE.CA_CREATION_PAGE.descriptionKey),
       component: <CAStep currentStep={currentStep} onTriggerStep={onTriggerStep} />,
     },
     {
       key: MIGRATION_STATE.RENEWAL_POLICY_CREATION_PAGE.key,
-      title: MIGRATION_STATE.RENEWAL_POLICY_CREATION_PAGE.description,
+      title: t(MIGRATION_STATE.RENEWAL_POLICY_CREATION_PAGE.descriptionKey),
       component: <CertificateRenewalStep currentStep={currentStep} onTriggerStep={onTriggerStep} />,
     },
     {
       key: MIGRATION_STATE.MIGRATION_SELECTION_PAGE.key,
-      title: MIGRATION_STATE.MIGRATION_SELECTION_PAGE.description,
+      title: t(MIGRATION_STATE.MIGRATION_SELECTION_PAGE.descriptionKey),
       component: <ManualMigrationStep />,
     },
     {
       key: MIGRATION_STATE.FINISHED.key,
-      title: MIGRATION_STATE.FINISHED.description,
+      title: t(MIGRATION_STATE.FINISHED.descriptionKey),
       component: <MigrationFinishedStep />,
     },
   ];

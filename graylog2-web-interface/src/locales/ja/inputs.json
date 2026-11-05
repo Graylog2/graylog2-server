@@ -1,0 +1,451 @@
+{
+  "create_input": {
+    "select_input": "Input を選択",
+    "launch_new": "新しい Input を起動",
+    "launch_new_type": "新しい <type>{{type}}</type> Input を起動",
+    "launch": "Input を起動",
+    "no_inputs_available": "利用可能な Input がありません"
+  },
+  "edit_input": {
+    "edit": "Input を編集",
+    "editing": "Input {{title}} を編集中",
+    "update": "Input を更新"
+  },
+  "input_dropdown": {
+    "label": "サーバー Input の選択",
+    "select": "Input を選択",
+    "unknown_type": "不明な Input タイプ",
+    "option": "{{title}} ({{type}})"
+  },
+  "input_states": {
+    "title": "{{title}} の Input 状態",
+    "count_other": "{{count}} 件の {{state}}",
+    "CREATED": "作成済み",
+    "INITIALIZED": "初期化済み",
+    "INVALID_CONFIGURATION": "無効な設定",
+    "STARTING": "起動中",
+    "RUNNING": "実行中",
+    "FAILED": "失敗",
+    "FAILING": "失敗中",
+    "SETUP": "セットアップ",
+    "STOPPING": "停止中",
+    "STOPPED": "停止済み",
+    "TERMINATED": "終了済み"
+  },
+  "state_control": {
+    "set_up": "Input をセットアップ",
+    "stopping": "停止中...",
+    "stop": "Input を停止",
+    "starting": "起動中...",
+    "start": "Input を開始"
+  },
+  "static_fields": {
+    "title": "静的フィールド",
+    "add": "静的フィールドを追加",
+    "add_field": "フィールドを追加",
+    "add_success": "静的フィールド '{{field}}' を '{{input}}' に追加しました",
+    "add_failed": "Input への静的フィールドの追加に失敗しました: {{error}}",
+    "add_failed_title": "Input '{{input}}' に静的フィールドを追加できませんでした",
+    "remove_success": "静的フィールド '{{field}}' を '{{input}}' から削除しました",
+    "remove_failed": "Input からの静的フィールドの削除に失敗しました: {{error}}",
+    "remove_failed_title": "Input '{{input}}' から静的フィールド '{{field}}' を削除できませんでした",
+    "delete_title": "静的フィールドを削除",
+    "delete_confirm": "'{{input}}' から静的フィールド '{{field}}' を削除してもよろしいですか？",
+    "description": "この Input 経由で受信するすべてのメッセージに追加される静的フィールドを定義します。メッセージに同じキーがすでに存在する場合、フィールドは上書きされません。キーには英数字とアンダースコアのみを使用でき、予約済みのフィールドにすることはできません。",
+    "field_name": "フィールド名",
+    "field_name_title": "英数字とアンダースコアのみで構成する必要があります。",
+    "field_value": "フィールドの値"
+  },
+  "notifications": {
+    "warning": "警告",
+    "failed": "失敗した Input は、起動されるまでトラフィックを受信しません。",
+    "setup": "セットアップモード中の Input は、起動されるまでトラフィックを受信しません。",
+    "stopped": "停止中の Input は、起動されるまでトラフィックを受信しません。",
+    "show_failed": "失敗した Input を表示",
+    "show_setup": "セットアップモードの Input を表示",
+    "show_stopped": "停止中の Input を表示"
+  },
+  "node_select": {
+    "node": "ノード",
+    "node_help": "この Input をどのノードで起動するか",
+    "select_node": "ノードを選択",
+    "global": "グローバル",
+    "global_help": "この Input をすべてのノードで起動するかどうか"
+  },
+  "pages": {
+    "inputs": "Input",
+    "docs": "Input のドキュメント",
+    "description": "{{productName}} のノードは Input を介してデータを受信します。ここで必要な数の Input を起動または終了できます。",
+    "cloud_description": "{{productName}} Cloud は Input を介してデータを受信します。多くの種類の Input から選択できますが、クラウド上で直接実行できるのは一部のみです。このページで Input を起動および終了できます。",
+    "cloud_forwarder_hint": "このページの利用可能な Input の一覧に目的の Input タイプがない場合は、<forwarderLink>Forwarder</forwarderLink> で Input を起動できます。",
+    "back": "戻る",
+    "diagnosis_title": "Input 診断: {{name}}",
+    "diagnosis_description": "Input 診断は、検索クラスターにデータを書き込まずに Input とパースをテストするために使用できます。",
+    "tab_overview": "概要",
+    "tab_rules": "ルール",
+    "node_inputs_title": "ノード {{nodeId}} / {{hostname}} の Input",
+    "node_inputs_description": "{{productName}} のノードは Input を介してデータを受信します。このページでは、この特定のノードで実行中の Input を確認できます。",
+    "node_inputs_hint": "クラスター上の Input は <inputsLink>こちら</inputsLink> から起動および終了できます。",
+    "local_inputs": "ローカル Input",
+    "global_inputs": "グローバル Input"
+  },
+  "diagnosis": {
+    "help": {
+      "listening_on_title": "この Input の待ち受け先:",
+      "listening_on": "バインドアドレスは {{productName}} サービスに向けられている必要があります。選択したポートは、各ノード上の別の Input とポートが競合しないようにしてください。ローカル Input が、全ノードで実行されるグローバル Input と競合すると、単一ノードで Input が失敗する可能性があることに注意してください。",
+      "listening_for_title": "この Input の受信対象:",
+      "listening_for": "TCP Input に送信された UDP トラフィック、または UDP Input に送信された TCP トラフィックは、ネットワーク I/O として表示されますが、メッセージは受信されません。",
+      "empty_messages_discarded_title": "空のメッセージの破棄:",
+      "empty_messages_discarded": "メッセージペイロードの長さが 0 のメッセージは、Input によって破棄されます。",
+      "network_io_title": "ネットワーク I/O:",
+      "network_io": "この値は、Input への接続試行や無効なトラフィックを検出するために使用できます。",
+      "input_state": "実行中の状態の Input はメッセージを受信できる状態です。失敗中または失敗状態の Input では問題が発生しています。下のボタンをクリックすると、関連するエラーメッセージを表示できます。",
+      "message_error_at_input_title": "Input でのメッセージエラー:",
+      "message_error_at_input": "各 Input タイプは特定の形式のメッセージを受信することを想定しています。この形式に従わないメッセージは Input によって拒否される場合があり、その場合は処理に進みません。これを解決するには、送信されているメッセージを確認してください。より詳細なエラーは {{productName}} サーバーの server.log ファイルで確認できます。",
+      "message_failed_to_process_title": "メッセージの処理に失敗:",
+      "message_failed_to_process": "エクストラクターやパイプラインを使用して、フィールドのパースなどのメッセージ処理を実行できます。無効な操作を実行しようとするパイプラインルール、またはフィールドのデータ型やフィールド長の上限と競合する形式にフィールドのプロパティを変更するパイプラインルールは、処理に失敗する場合があります。このように処理に失敗したメッセージは、Processing and Indexing Failures ストリームで確認できます。",
+      "message_failed_to_index_title": "メッセージエラー:",
+      "message_failed_to_index": "検索クラスター内では、メッセージはインデックスのスキーマに適合する場合にのみ保存できます。OpenSearch の各フィールドにはフィールドタイプと文字数の上限があり、いずれかを超えるとメッセージのインデックス登録に失敗します。このように失敗したメッセージは、Processing and Indexing Failures ストリームで確認できます。",
+      "received_message_count_by_stream": "このビューを使用すると、ストリームとパイプラインルールがこの Input からのメッセージをどこに振り分けているかを確認できます。メッセージは複数のストリームに複製される場合があり、その結果メッセージが複数のインデックスに保存されると、ライセンスの使用量も増える可能性があります。このビューは、そのような重複を検出するのに役立ちます。"
+    },
+    "node": {
+      "node_id": "ノード ID:",
+      "message": "メッセージ:",
+      "last_failed": "最終失敗:",
+      "state_label": "{{state}}:",
+      "state_nodes": "{{count}}/{{total}} ノード",
+      "state_count": "{{count}}/{{total}}"
+    },
+    "information": {
+      "title": "情報",
+      "description": "Input が実行されているアドレスです。",
+      "input_title": "Input タイトル:",
+      "input_type": "Input タイプ:",
+      "running_on": "この Input の実行先:",
+      "all_nodes": "すべての {{productName}} ノード",
+      "listening_on": "この Input の待ち受け先:",
+      "listening_on_value": "バインドアドレス {{bindAddress}}、ポート {{port}}。",
+      "listening_for": "この Input の受信対象:"
+    },
+    "state": {
+      "title": "状態",
+      "description": "Input が実行されるように設定されている {{productName}} ノードの数と、そのうち実行中のノードの数です。実行されていないノードがある場合は、クリックして関連するエラーメッセージを確認できます。",
+      "failed_starts": "起動の失敗 (直近 15 分):",
+      "not_running": "Input は実行されていません。"
+    },
+    "troubleshooting": {
+      "title": "トラブルシューティング",
+      "failed_title": "Input が失敗状態の場合。",
+      "failed_message_field": "Input が 1 つ以上の {{productName}} ノードで失敗すると、状態パネルのメッセージフィールドに短いエラーメッセージが表示されます。完全なエラーメッセージは {{productName}} の server.log ファイルで確認できます。",
+      "failed_port": "指定されたポートを使用するように設定された Input は、そのポートが特権ポートである場合 ({{productName}} が root として実行されていない場合)、または別の Input やアプリケーションがすでに使用している場合に失敗します。",
+      "failed_route": "指定された IP にルーティングできない場合、Input は失敗します。",
+      "failed_internet": "API に接続するためにインターネット接続が必要な Input は、インターネット接続がない場合、またはその API にルーティングできない場合に失敗します。",
+      "failed_certificate": "証明書が無効または期限切れの場合、TCP Input は失敗します。",
+      "failed_external_api": "外部 API に接続する Input (例: Microsoft Azure Input) では、{{productName}} がログを収集できるように、ソース側で設定を変更する必要があります。必要な手順は、該当する Input のドキュメントのサブページに記載されています。{{productName}} 側、または (該当する場合) API をホストする側で設定が誤っていると、外部 API に接続する Input は失敗します。",
+      "no_messages_title": "Input がすべてのノードで実行されているにもかかわらず、メッセージが Input に届いていない場合。",
+      "no_messages_network_io": "受信トラフィックパネルのネットワーク I/O フィールドを確認してください。ここにトラフィックが表示されない場合は、接続の問題が考えられます。",
+      "no_messages_connectivity": "トラフィックが表示されない場合は、まず {{productName}} サーバーとログソースの間のネットワーク接続をトラブルシューティングしてください。ping、telnet、tracert コマンドを実行して確認できます。",
+      "no_messages_external_api": "外部 API に接続する Input の場合は、{{productName}} の server.log ファイルを確認してください。認証の失敗 (無効なログイン情報、または API に対して操作を実行する権限がないこと) は、ここに詳細が出力されます。",
+      "no_messages_format": "受信トラフィックパネルのネットワーク I/O フィールドにトラフィックが表示されているのにメッセージが受信されていない場合は、Input に適していない形式でメッセージが送信されている可能性があります。",
+      "no_messages_protocol": "TCP Input は UDP トラフィックを読み取れず、その逆も同様です。",
+      "no_messages_empty": "内容のないメッセージは破棄されます。これは空のメッセージの破棄フィールドで監視できます。",
+      "no_messages_listener": "Listener Input は限られた範囲の形式のメッセージを想定しており、対応していない形式のメッセージを読み取れない場合があります。トラブルシューティングの目的では、Raw Text Input が最も制限の少ない要件です。",
+      "message_errors_title": "Input がすべてのノードで実行されており、メッセージも Input に届いているが、一部 (またはすべて) がメッセージエラーとして表示されている場合。",
+      "message_errors_failure_processing": "ライセンス付きの Enterprise クラスターでは、Failure Processing を有効にすると、入力、処理、検索クラスターへの書き込みの各段階でエラーになったメッセージを、失敗の詳細とともに保存できます。失敗の詳細は failure_cause および failure_details フィールドで確認できます。メッセージエラーパネルに移動し、メッセージ数をクリックすると、個々の失敗メッセージを確認できます。"
+    },
+    "received_traffic": {
+      "title": "受信トラフィック",
+      "description": "Input に到達したメッセージとネットワークトラフィックです。注: メトリクスは直近 15 分間のみを表示します。",
+      "total_messages": "Input が受信したメッセージの合計:",
+      "events": "{{count}} イベント",
+      "empty_messages": "空のメッセージの破棄:",
+      "active_connections": "アクティブな接続:",
+      "connections_value": "{{open}} (合計 {{total}})",
+      "network_io": "ネットワーク I/O:"
+    },
+    "message_count_by_stream": {
+      "title": "ストリーム別の受信メッセージ数",
+      "description": "直近 15 分間にこの Input から正常に取り込まれたメッセージです。ストリームをクリックするとメッセージを確認できます。",
+      "stream": "{{streamName}}:",
+      "none": "直近 15 分間にこの Input からのメッセージはストリームに振り分けられていません。"
+    },
+    "message_errors": {
+      "title": "メッセージエラー",
+      "description": "メッセージは、Input、処理パイプライン、または検索クラスターへのインデックス登録時に処理に失敗する場合があります。",
+      "at_input": "Input でのメッセージエラー:",
+      "failed_to_process": "メッセージの処理に失敗:",
+      "failed_to_index": "メッセージのインデックス登録に失敗:"
+    },
+    "rules": {
+      "pipeline_rules_title": "Input がパイプラインルールに含まれています",
+      "pipeline_rules_description": "以下のパイプラインルールは、この Input を明示的に参照しています (例: from_input、from_forwarder_input、または gl2_source_input/gl2_forwarder_input との一致による)。",
+      "pipeline_rules_human_name": "パイプラインルール",
+      "pipeline_rules_search": "パイプラインルールを検索",
+      "stream_rules_title": "Input がストリームルールに含まれています",
+      "stream_rules_description": "以下のストリームルールには、この Input を明示的に対象とする match input 関数が含まれています。match input 関数を明示的に使用せずに、この Input からメッセージを取り込む可能性のあるストリームルールは一覧に表示されません。",
+      "stream_rules_human_name": "ストリームルール",
+      "stream_rules_search": "ストリームルールを検索",
+      "load_pipeline_rules_failed": "Input のパイプラインルールの読み込みに失敗しました。ステータス:",
+      "could_not_load_pipeline_rules": "Input のパイプラインルールを読み込めませんでした",
+      "load_stream_rules_failed": "Input のストリームルールの読み込みに失敗しました。ステータス:",
+      "could_not_load_stream_rules": "Input のストリームルールを読み込めませんでした"
+    },
+    "network_stats": {
+      "total_prefix": " (合計: ",
+      "total_suffix": ")"
+    },
+    "show_received_messages": "受信したメッセージを表示",
+    "fetch_failed": "Input 診断の取得に失敗しました。ステータス:",
+    "could_not_fetch": "Input 診断を取得できませんでした"
+  },
+  "setup_wizard": {
+    "title": "Input セットアップウィザード",
+    "back": "戻る",
+    "finish": "完了",
+    "steps": {
+      "routing": "ルーティング",
+      "launch": "起動",
+      "diagnosis": "診断"
+    },
+    "diagnosis_step": {
+      "description": "検索クラスターにデータを書き込まずに Input とパースをテストします。",
+      "go_to_diagnosis": "Input 診断に移動"
+    },
+    "load_streams_failed": "ストリームの読み込みに失敗しました: {{error}}",
+    "load_input_references_failed": "Input 参照の読み込みに失敗しました: {{error}}",
+    "load_streams_by_index_set_failed": "インデックスセット別のストリームの読み込みに失敗しました: {{error}}",
+    "routing": {
+      "connected_pipelines_title": "ターゲットストリームに接続されているパイプライン",
+      "connected_pipelines": "Input セットアップを完了する前に、これらの影響を確認することをお勧めします。ターゲットストリームには、次のパイプラインが接続されています:",
+      "select_destination": "この Input からメッセージをルーティングする先のストリームを選択してください。",
+      "recommend_new_stream": "<strong>新しい Input ごとに新しいストリームを作成することをお勧めします。</strong> これにより、メッセージを基本的なスキーマに分類しやすくなります。",
+      "default_stream_fallback": "どのストリームにもルーティングされないメッセージは、<strong>Default Stream</strong> にルーティングされます。",
+      "pipeline_rules_info": "このウィザードでは、パイプラインルールを自動的に作成して <strong>Default Stream</strong> に関連付けることができます。これらのルールはシステム管理の Default Routing Pipeline に配置され、この Input の状態を正確に反映するように自動的に名前が変更される (または削除される) ようになります。",
+      "new_stream_heading": "新しいストリームにルーティング",
+      "recommended": "おすすめ!",
+      "create_stream": "ストリームを作成",
+      "existing_stream_heading": "既存のストリームにルーティング",
+      "select_stream": "ストリームを選択",
+      "create_new_stream": "新しいストリームを作成",
+      "choose_existing_stream": "既存のストリームを選択",
+      "existing_stream_selected": "この Input からのメッセージを既存のストリームにルーティングする設定が選択されています。",
+      "pipeline_rules_created": "<strong>Input を開始</strong> ボタンを押すと、パイプラインルールが作成されます。",
+      "default_stream": "Default Stream",
+      "remove_from_default": "「Default Stream」からの一致を削除",
+      "remove_from_default_help": "このストリームに一致するメッセージを「Default Stream」に割り当てないでください。"
+    },
+    "start": {
+      "description": "設定に従って Input をセットアップして起動します。",
+      "rolling_back": "Input をロールバックしています...",
+      "setting_up": "Input をセットアップしています...",
+      "not_ready": "Input はまだセットアップの準備ができていません。前の手順を完了してください。",
+      "start_input": "Input を開始",
+      "rollback_input": "Input をロールバック",
+      "launch_diagnosis": "Input 診断を起動"
+    },
+    "progress": {
+      "details": "詳細:",
+      "loading": {
+        "create_stream": "ストリームを作成しています...",
+        "create_stream_named": "ストリーム「{{name}}」を作成しています...",
+        "start_stream": "ストリームを開始しています...",
+        "start_stream_named": "ストリーム「{{name}}」を開始しています...",
+        "create_pipeline": "パイプラインを作成しています...",
+        "create_pipeline_named": "パイプライン「{{name}}」を作成しています...",
+        "setup_routing": "ルーティングをセットアップしています...",
+        "delete_stream": "ストリームを削除しています...",
+        "delete_stream_named": "ストリーム「{{name}}」を削除しています...",
+        "delete_pipeline": "パイプラインを削除しています...",
+        "delete_pipeline_named": "パイプライン「{{name}}」を削除しています...",
+        "delete_routing": "ルーティングを削除しています...",
+        "connect_pipeline": "パイプラインをストリームに接続しています..."
+      },
+      "error": {
+        "create_stream": "ストリームの作成に失敗しました！",
+        "create_stream_named": "ストリーム「{{name}}」の作成に失敗しました！",
+        "start_stream": "ストリームの開始に失敗しました！",
+        "start_stream_named": "ストリーム「{{name}}」の開始に失敗しました！",
+        "create_pipeline": "パイプラインの作成に失敗しました！",
+        "create_pipeline_named": "パイプライン「{{name}}」の作成に失敗しました！",
+        "setup_routing": "ルーティングのセットアップに失敗しました！",
+        "result": "Input の開始に失敗しました。クリーンアップするにはロールバックしてください。",
+        "delete_stream": "ストリームの削除に失敗しました！",
+        "delete_stream_named": "ストリーム「{{name}}」の削除に失敗しました！",
+        "delete_pipeline": "パイプラインの削除に失敗しました！",
+        "delete_pipeline_named": "パイプライン「{{name}}」の削除に失敗しました！",
+        "delete_routing": "ルーティングの削除に失敗しました！",
+        "connect_pipeline": "パイプラインのストリームへの接続に失敗しました！"
+      },
+      "success": {
+        "create_stream": "ストリームを作成しました！",
+        "create_stream_named": "ストリーム「{{name}}」を作成しました！",
+        "start_stream": "ストリームを開始しました！",
+        "start_stream_named": "ストリーム「{{name}}」を開始しました！",
+        "create_pipeline": "パイプラインを作成しました！",
+        "create_pipeline_named": "パイプライン「{{name}}」を作成しました！",
+        "setup_routing": "ルーティングをセットアップしました！",
+        "result": "Input が正常に開始されました！",
+        "delete_stream": "ストリームを削除しました！",
+        "delete_stream_named": "ストリーム「{{name}}」を削除しました！",
+        "delete_pipeline": "パイプラインを削除しました！",
+        "delete_pipeline_named": "パイプライン「{{name}}」を削除しました！",
+        "delete_routing": "ルーティングを削除しました！",
+        "connect_pipeline": "パイプラインをストリームに正常に接続しました！"
+      }
+    },
+    "create_stream": {
+      "title": "タイトル",
+      "title_help": "新しいストリームのわかりやすい名前",
+      "title_required": "タイトルは必須です",
+      "index_set_required": "インデックスセットは必須です",
+      "description": "説明",
+      "description_help": "どの種類のメッセージをこのストリームにルーティングしますか？",
+      "create_pipeline": "このストリーム用の新しいパイプラインを作成",
+      "select_index_set": "インデックスセットを選択",
+      "index_set_info": "このストリームに一致するメッセージは、設定されたインデックスセットに書き込まれます。インデックスセットは、データを合理的に分割して検索を高速化するために使用されます。",
+      "index_set_recommendation": "Input の種類ごとに新しいインデックスセットを作成することをお勧めします。",
+      "create_index_set": "新しいインデックスセットを作成"
+    },
+    "input_in_use": {
+      "title": "Input はすでに使用中です - メッセージの重複リスク！",
+      "stream_refs": "この Input は、次のストリームのストリームルール内ですでに参照されています:",
+      "pipeline_refs": "この Input は、次のパイプラインのパイプラインルール内ですでに参照されています:",
+      "prevent_duplication": "重複の可能性を防ぐため、続行する前に既存のルーティングをすべて削除してください。"
+    },
+    "index_set_alert": {
+      "default_title": "デフォルトのインデックスセットが選択されています",
+      "default_selected": "デフォルトのインデックスセットを選択しています。",
+      "default_recommendation": "この選択はお勧めしません。(Default Stream を経由して) 形式の異なる多数のメッセージを受け取る可能性がある (ルーティングされていないメッセージはすべて対象となる) ため、デフォルトのインデックスセットを広く使用すると、検索バックエンドのインデックスごとのフィールド上限に達しやすくなります。",
+      "in_use_title": "選択したインデックスセットはすでに別のストリームに関連付けられています",
+      "in_use": "選択したインデックスセットは、すでに他のストリームに関連付けられています。",
+      "field_limit": "各インデックスには固有のフィールド上限があり、デフォルトは 1000 です。",
+      "organise_recommendation": "このため、可能な場合は、ログ形式ごとにストリームを複数のインデックスセットに分けて整理することをお勧めします。"
+    }
+  },
+  "overview": {
+    "columns": {
+      "traffic": "直近 1 分のトラフィック",
+      "input_failures": "Input の失敗",
+      "address": "アドレス",
+      "port": "ポート",
+      "messages_per_stream": "メッセージ数 (直近 24 時間)",
+      "extractor_count": "エクストラクター",
+      "associated_streams": "関連付けられたストリーム (直近 24 時間)",
+      "configuration": "設定"
+    },
+    "not_available": "N/A",
+    "show_diagnosis_for": "{{title}} の Input 診断を表示",
+    "show_diagnosis_for_capitalized": "{{title}} の Input 診断を表示",
+    "cells": {
+      "no_associated_streams": "Input {{title}} に関連付けられたストリームはありません",
+      "show_associated_streams": "{{title}} の関連付けられたストリームを表示",
+      "hide_associated_streams": "{{title}} の関連付けられたストリームを非表示",
+      "no_extractor_count": "Input {{title}} のエクストラクター数はありません",
+      "show_extractors": "{{title}} のエクストラクターを表示",
+      "hide_extractors": "{{title}} のエクストラクターを非表示",
+      "no_message_count": "Input {{title}} のメッセージ数はありません",
+      "show_messages_per_stream": "{{title}} のストリーム別メッセージを表示",
+      "hide_messages_per_stream": "{{title}} のストリーム別メッセージを非表示",
+      "show_metrics": "メトリクスを表示",
+      "hide_metrics": "メトリクスを非表示",
+      "throughput": "{{value}} msg/s",
+      "associated_streams_label": "{{title}} に関連付けられたストリーム",
+      "extractors_label": "{{title}} のエクストラクター",
+      "messages_per_stream_label": "{{title}} のストリームごとのメッセージ"
+    },
+    "sections": {
+      "could_not_load_associated_streams": "関連付けられたストリームを読み込めませんでした。",
+      "no_associated_streams": "直近 24 時間にこの Input に関連付けられたストリームはありません。",
+      "deleted_stream": "{{streamId}} (削除済み)",
+      "active_connections": "アクティブな接続: <active>{{open}} </active>(合計 <total>{{total}}</total>)",
+      "throughput_metrics": "スループット / メトリクス",
+      "manage_extractors": "エクストラクターを管理",
+      "load_extractors_failed": "エクストラクターの読み込みに失敗しました。ステータス:",
+      "could_not_load_extractors_title": "エクストラクターを読み込めませんでした",
+      "could_not_load_extractors": "エクストラクターを読み込めませんでした。",
+      "no_extractors": "この Input には設定されたエクストラクターがありません。",
+      "extractor_title": "タイトル",
+      "extractor_type": "タイプ",
+      "source_field": "ソースフィールド",
+      "target_field": "ターゲットフィールド",
+      "could_not_load_messages_per_stream": "ストリーム別のメッセージを読み込めませんでした。",
+      "no_messages_per_stream": "直近 24 時間にこの Input からメッセージを受信したストリームはありません。",
+      "stream": "ストリーム",
+      "messages": "メッセージ",
+      "network_io": "ネットワーク I/O: ",
+      "total_prefix": " (合計: ",
+      "total_suffix": ")",
+      "empty_messages_discarded": "空のメッセージの破棄: {{value}}",
+      "no_node_metrics": "このノードで利用可能なメトリクスはありません",
+      "no_input_metrics": "この Input で利用可能なメトリクスはありません",
+      "show_details": "詳細を表示",
+      "hide_details": "詳細を非表示"
+    },
+    "actions": {
+      "received_messages": "受信したメッセージ",
+      "input_diagnosis": "Input 診断",
+      "exit_setup_mode": "セットアップモードを終了",
+      "enter_setup_mode": "セットアップモードに入る",
+      "show_metrics": "メトリクスを表示",
+      "delete_input": "Input を削除",
+      "delete_title": "Input の削除",
+      "delete_confirm": "Input {{title}} を本当に削除しますか？"
+    }
+  },
+  "dot_badge": {
+    "problematic_inputs": "失敗状態またはセットアップモードの Input があります。"
+  },
+  "use_input_notifications": {
+    "load_failed": "Input の読み込みに失敗しました。ステータス:",
+    "load_failed_title": "Input を読み込めませんでした"
+  },
+  "use_input_details_notifications": {
+    "load_failed": "Input の詳細の読み込みに失敗しました。ステータス:",
+    "load_failed_title": "Input の詳細を読み込めませんでした"
+  },
+  "use_input_metrics_notifications": {
+    "load_failed": "Input のメトリクスの読み込みに失敗しました。ステータス:",
+    "load_failed_title": "Input のメトリクスを読み込めませんでした"
+  },
+  "use_input_state_summary_notifications": {
+    "load_failed": "Input の状態サマリーの読み込みに失敗しました。ステータス:",
+    "load_failed_title": "Input の状態サマリーを読み込めませんでした。"
+  },
+  "use_input_state_mutations_notifications": {
+    "start_failed": "Input '{{title}}' の開始中にエラーが発生しました: {{error}}",
+    "start_failed_title": "Input '{{title}}' を開始できませんでした",
+    "started_success": "Input が正常に開始されました。",
+    "stop_failed": "Input '{{title}}' の停止中にエラーが発生しました: {{error}}",
+    "stop_failed_title": "Input '{{title}}' を停止できませんでした",
+    "stopped_success": "Input が正常に停止されました。",
+    "setup_failed": "Input '{{title}}' のセットアップモードへの移行中にエラーが発生しました: {{error}}",
+    "setup_failed_title": "Input '{{title}}' をセットアップモードに設定できませんでした",
+    "deleted_success": "Input が正常に削除されました。",
+    "success_title": "成功！"
+  },
+  "use_input_mutations_notifications": {
+    "save_failed": "Input の保存に失敗しました。ステータス: {{error}}",
+    "save_failed_title": "Input を保存できませんでした",
+    "update_failed": "Input の更新に失敗しました。ステータス: {{error}}",
+    "update_failed_title": "Input を更新できませんでした",
+    "delete_failed": "Input の削除に失敗しました。ステータス: {{error}}",
+    "delete_failed_title": "Input を削除できませんでした",
+    "created_success": "Input が正常に作成されました。",
+    "updated_success": "Input が正常に更新されました。",
+    "deleted_success": "Input が正常に削除されました。",
+    "success_title": "成功！"
+  },
+  "use_inputs_notifications": {
+    "launched_success": "Input '{{title}}' を正常に起動しました",
+    "launch_failed": "Input '{{title}}' の起動に失敗しました。ステータス: {{error}}",
+    "launch_failed_title": "Input を起動できませんでした",
+    "updated_success": "Input '{{title}}' を正常に更新しました",
+    "update_failed": "Input '{{title}}' の更新に失敗しました。ステータス: {{error}}",
+    "update_failed_title": "Input を更新できませんでした",
+    "deleted_success": "Input '{{title}}' を正常に削除しました",
+    "delete_failed": "Input '{{title}}' の削除に失敗しました。ステータス: {{error}}",
+    "delete_failed_title": "Input を削除できませんでした",
+    "fetch_failed": "Input の取得に失敗しました。ステータス: {{error}}",
+    "fetch_failed_title": "Input を取得できませんでした"
+  }
+}

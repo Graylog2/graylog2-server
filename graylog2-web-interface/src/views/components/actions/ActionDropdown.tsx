@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { MenuItem } from 'components/bootstrap';
@@ -99,6 +100,7 @@ const ActionDropdown = ({
   overflowingComponents,
   onMenuToggle,
 }: Props) => {
+  const { t } = useTranslation('widgets');
   const internalActions = useInternalActions(type, handlerArgs);
   const { externalActions, isLoading } = useExternalActions(type, handlerArgs);
 
@@ -112,7 +114,7 @@ const ActionDropdown = ({
           <MenuItem divider />
         </>
       )}
-      <MenuItem header>Actions</MenuItem>
+      <MenuItem header>{t('message_table.actions')}</MenuItem>
       {internalActions.map((action) => (
         <ActionMenuItem
           action={action}
@@ -128,7 +130,7 @@ const ActionDropdown = ({
         <>
           <MenuItem divider />
           <MenuItem disabled>
-            <Spinner text="Loading" />
+            <Spinner text={t('message_table.loading')} />
           </MenuItem>
         </>
       )}

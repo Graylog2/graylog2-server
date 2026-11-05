@@ -1,0 +1,129 @@
+{
+  "navigation": {
+    "initial_setup": "{{productName}} 初始設定",
+    "get_help": "取得協助",
+    "documentation": "說明文件",
+    "changelogs": "更新日誌",
+    "operations_changelogs": "營運更新日誌",
+    "support": "技術支援"
+  },
+  "setup": {
+    "welcome": "歡迎！",
+    "first_start": "看起來您是第一次啟動 {{productName}}，而且尚未設定資料節點。",
+    "data_nodes_allow": "資料節點可讓您為 {{productName}} 訊息資料庫中的所有訊息建立索引，並進行搜尋。",
+    "data_node_setup": "您可以部署 <dataNodeLink>{{productName}} 資料節點</dataNodeLink>（建議），或手動設定 <openSearchLink>OpenSearch</openSearchLink> 節點。若要手動設定 OpenSearch，您需要調整 {{productName}} 的設定並重新啟動 {{productName}} 伺服器。重新啟動後，此頁面將不再顯示。",
+    "data_nodes_title": "{{productName}} 資料節點"
+  },
+  "data_nodes": {
+    "description": "{{productName}} 資料節點能與 {{productName}} 更緊密整合，並簡化未來的更新。一旦 {{productName}} 資料節點開始運作，且您已設定憑證授權單位，即可繼續啟動。",
+    "registered": "以下是目前已註冊的資料節點。此清單會持續更新。",
+    "transport_address": "傳輸位址",
+    "hostname": "主機名稱",
+    "separator": " – ",
+    "none_found": "找不到任何資料節點。"
+  },
+  "waiting_for_startup": {
+    "title": "設定成功",
+    "description": "{{productName}} 伺服器目前正在啟動。視您的環境而定，可能需要幾分鐘。一旦可以連線到 {{productName}} 伺服器，此頁面將自動重新整理。您隨時可以手動重新整理，但請注意，之後此頁面將不再顯示。",
+    "spinner": "正在等待 {{productName}} 伺服器 ..."
+  },
+  "error_boundary": {
+    "title": "發生錯誤",
+    "description": "發生未知錯誤。請查看以下訊息及 {{productName}} 伺服器日誌以取得更多資訊。"
+  },
+  "resume_startup": {
+    "button": "繼續啟動",
+    "confirm": "您確定要在沒有執行中的 {{productName}} 資料節點的情況下繼續啟動嗎？這會使設定改為使用 localhost:9200 上的 Opensearch 執行個體。",
+    "error": "繼續啟動失敗，錯誤：{{error}}",
+    "error_title": "無法繼續啟動"
+  },
+  "restart_configuration": {
+    "confirm": "您確定要重新開始設定嗎？所有先前的變更都將被刪除。",
+    "restart": "重新開始",
+    "restarting": "正在重新開始..."
+  },
+  "configuration_wizard": {
+    "restart_hint": "您隨時可以<restartButton>重新開始</restartButton>設定",
+    "fetch_error": "擷取{{entityName}}時發生錯誤：{{message}}"
+  },
+  "entities": {
+    "data_nodes": "資料節點",
+    "certificate_authority": "憑證授權單位",
+    "renewal_policy": "更新政策"
+  },
+  "steps": {
+    "ca_configuration": "設定憑證授權單位",
+    "renewal_policy_configuration": "設定更新政策",
+    "certificate_provisioning": "為資料節點佈建憑證",
+    "configuration_finished": "設定完成"
+  },
+  "ca_configuration": {
+    "title": "設定憑證授權單位",
+    "explanation_upload_or_create": "在此第一步，您可以上傳或建立新的憑證授權單位。",
+    "explanation_provisioning": "我們可以透過它輕鬆地為您的資料節點佈建憑證。",
+    "create_tab": "建立新的 CA",
+    "upload_tab": "上傳 CA"
+  },
+  "ca_create": {
+    "description": "您可以在此快速建立新的憑證授權單位。只需點選「建立 CA」按鈕即可。此 CA 僅應用於保護您的 {{productName}} 資料節點。",
+    "organization_name": "組織名稱",
+    "creating": "正在建立 CA...",
+    "create": "建立 CA",
+    "success": "CA 建立成功",
+    "error": "CA 建立失敗，錯誤：{{error}}"
+  },
+  "ca_upload": {
+    "explanation": "您可以在此上傳現有的 CA。您需要上傳單一檔案，其中包含私密金鑰（加密或未加密）、CA 憑證，以及任何中繼憑證。檔案可為 PEM 或 PKCS#12 格式。若您的私密金鑰已加密，還需提供其密碼。",
+    "certificate_authority": "憑證授權單位",
+    "drop_hint": "將 CA 拖曳至此，或點選以選擇檔案",
+    "rejected": "CA 上傳失敗",
+    "password": "密碼",
+    "uploading": "正在上傳 CA...",
+    "upload": "上傳 CA",
+    "success": "CA 上傳成功",
+    "error": "CA 上傳失敗，錯誤：{{error}}",
+    "validation_missing_file": "請上傳檔案。",
+    "validation_multiple_files": "請僅上傳一個檔案。"
+  },
+  "certificate_provisioning": {
+    "title": "佈建憑證",
+    "configured": "憑證授權單位已成功設定。",
+    "ready": "您現在可以為資料節點佈建憑證。",
+    "data_node_required": "必須至少有一個 {{productName}} 資料節點執行中，才能佈建憑證。",
+    "started": "已成功開始佈建憑證",
+    "error": "開始佈建憑證失敗，錯誤：{{error}}",
+    "provisioning": "正在佈建憑證...",
+    "provision": "佈建憑證並繼續",
+    "skip": "略過佈建"
+  },
+  "renewal_policy": {
+    "title": "設定更新政策",
+    "explanation_automatic": "在此步驟中，您可以設定即將到期的憑證是否應自動更新。",
+    "explanation_manual": "若您選擇手動更新，當到期日接近時將顯示系統通知，要求您確認更新。",
+    "policy": "更新政策",
+    "select_policy": "選擇更新政策",
+    "automatic": "自動",
+    "manual": "手動",
+    "certificate_lifetime": "憑證有效期限",
+    "enter_lifetime": "輸入有效期限",
+    "select_unit": "選擇單位",
+    "unit_hours": "小時",
+    "unit_days": "天",
+    "unit_months": "個月",
+    "unit_years": "年",
+    "min_lifetime": "至少必須為 {{duration}}",
+    "creating": "正在建立政策...",
+    "create": "建立政策",
+    "success": "更新政策建立成功",
+    "error": "更新政策建立失敗，錯誤：{{error}}"
+  },
+  "unsecure_connection": {
+    "not_secure": "您的連線並不安全。請注意，資訊將以未加密的方式傳送至伺服器。",
+    "maybe_not_secure": "您的連線可能不安全。請注意，資訊可能會以未加密的方式傳送至伺服器。"
+  },
+  "configuration_finished": {
+    "title": "設定完成",
+    "skipped_provisioning": "您已成功完成設定。您仍可以<goBackButton>返回</goBackButton>以佈建憑證。",
+    "provisioned": "佈建已成功完成，所有資料節點均已受到保護且可連線。"
+  }
+}

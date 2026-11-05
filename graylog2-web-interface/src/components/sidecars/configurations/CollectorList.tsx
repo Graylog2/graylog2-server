@@ -15,6 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
+import i18n from 'i18n';
 
 import { LinkContainer, DataTable, PaginatedList, SearchForm } from 'components/common';
 import { Col, Row, Button } from 'components/bootstrap';
@@ -38,10 +41,11 @@ type CollectorListProps = {
   onPageChange: (page: number, pageSize: number) => void;
   onQueryChange: () => void;
   validateCollector: (collector: Collector) => Promise<{ errors: { name: string[] } }>;
-};
+} & WithTranslation;
 
 const headerCellFormatter = (header: React.ReactNode) => {
-  const className = header === 'Actions' ? style.actionsColumn : '';
+  const actionsHeader = i18n.t('configurations.collector_list.actions', { ns: 'sidecars' });
+  const className = header === actionsHeader ? style.actionsColumn : '';
 
   return <th className={className}>{header}</th>;
 };
@@ -56,9 +60,13 @@ class CollectorList extends React.Component<CollectorListProps> {
   };
 
   render() {
-    const { collectors, pagination, query, total, onPageChange, onQueryChange } = this.props;
+    const { collectors, pagination, query, total, onPageChange, onQueryChange, t } = this.props;
 
-    const headers = ['Name', 'Operating System', 'Actions'];
+    const headers = [
+      t('configurations.collector_list.name'),
+      t('configurations.collector_list.operating_system'),
+      t('configurations.collector_list.actions'),
+    ];
 
     return (
       <div>
@@ -67,16 +75,17 @@ class CollectorList extends React.Component<CollectorListProps> {
             <div className="pull-right">
               <LinkContainer to={Routes.SYSTEM.SIDECARS.NEW_COLLECTOR}>
                 <Button bsStyle="primary" bsSize="small">
-                  Create Log Collector
+                  {t('configurations.collector_list.create_collector')}
                 </Button>
               </LinkContainer>
             </div>
             <h2>
-              Log Collectors <small>{total} total</small>
+              {t('configurations.collector_list.title')}{' '}
+              <small>{t('configurations.collector_list.total', { total })}</small>
             </h2>
           </Col>
           <Col md={12}>
-            <p>Manage Log Collectors that you can configure and supervise through sidecars and the web interface.</p>
+            <p>{t('configurations.collector_list.description')}</p>
           </Col>
         </Row>
 
@@ -86,7 +95,7 @@ class CollectorList extends React.Component<CollectorListProps> {
               query={query}
               onSearch={onQueryChange}
               onReset={onQueryChange}
-              placeholder="Find collectors"
+              placeholder={t('configurations.collector_list.placeholder')}
               wrapperClass={style.inline}
               topMargin={0}
               useLoadingState
@@ -106,7 +115,7 @@ class CollectorList extends React.Component<CollectorListProps> {
                   headerCellFormatter={headerCellFormatter}
                   rows={collectors}
                   dataRowFormatter={this.collectorFormatter}
-                  noDataText="There are no log collectors to display, why don't you create one?"
+                  noDataText={t('configurations.collector_list.no_data')}
                   filterLabel=""
                   filterKeys={[]}
                   useResponsiveTable={false}
@@ -120,4 +129,4 @@ class CollectorList extends React.Component<CollectorListProps> {
   }
 }
 
-export default CollectorList;
+export default withTranslation('sidecars')(CollectorList);

@@ -15,47 +15,45 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { SearchForm } from 'components/common';
 import QueryHelper from 'components/common/QueryHelper';
 import useProductName from 'brand-customization/useProductName';
 
-const queryExamples = (
-  <>
-    <p>
-      Find sidecars that have not communicated since a specific date:
-      <br />
-      <kbd>{'last_seen:<=2018-04-10'}</kbd>
-      <br />
-    </p>
-    <p>
-      Find sidecars with <code>failing</code> or <code>unknown</code> status:
-      <br />
-      <kbd>status:failing status:unknown</kbd>
-      <br />
-    </p>
-  </>
-);
-
-const fieldMap = (productName: string) => ({
-  status: 'Status of the sidecar as it appears in the list, i.e. running, failing, or unknown',
-  operating_system: 'Operating system the sidecar is running on',
-  last_seen: `Date and time when the sidecar last communicated with ${productName}`,
-  node_id: 'Identifier of the sidecar',
-  sidecar_version: 'Sidecar version',
-});
+const LAST_SEEN_QUERY_EXAMPLE = 'last_seen:<=2018-04-10';
+const STATUS_QUERY_EXAMPLE = 'status:failing status:unknown';
 
 const SidecarQueryHelper = () => {
   const productName = useProductName();
+  const { t } = useTranslation('sidecars');
 
-  return (
-    <QueryHelper
-      entityName="sidecar"
-      example={queryExamples}
-      commonFields={['name']}
-      fieldMap={fieldMap(productName)}
-    />
+  const queryExamples = (
+    <>
+      <p>
+        {t('common.sidecar_search_form.last_seen_example')}
+        <br />
+        <kbd>{LAST_SEEN_QUERY_EXAMPLE}</kbd>
+        <br />
+      </p>
+      <p>
+        <Trans t={t} i18nKey="common.sidecar_search_form.status_example" components={{ code: <code /> }} />
+        <br />
+        <kbd>{STATUS_QUERY_EXAMPLE}</kbd>
+        <br />
+      </p>
+    </>
   );
+
+  const fieldMap = {
+    status: t('common.sidecar_search_form.field_status'),
+    operating_system: t('common.sidecar_search_form.field_operating_system'),
+    last_seen: t('common.sidecar_search_form.field_last_seen', { productName }),
+    node_id: t('common.sidecar_search_form.field_node_id'),
+    sidecar_version: t('common.sidecar_search_form.field_sidecar_version'),
+  };
+
+  return <QueryHelper entityName="sidecar" example={queryExamples} commonFields={['name']} fieldMap={fieldMap} />;
 };
 
 type Props = React.PropsWithChildren<{
@@ -64,17 +62,21 @@ type Props = React.PropsWithChildren<{
   onReset: () => void;
 }>;
 
-const SidecarSearchForm = ({ query, onSearch, onReset, children = undefined }: Props) => (
-  <SearchForm
-    query={query}
-    onSearch={onSearch}
-    onReset={onReset}
-    placeholder="Find sidecars"
-    queryHelpComponent={<SidecarQueryHelper />}
-    topMargin={0}
-    useLoadingState>
-    {children}
-  </SearchForm>
-);
+const SidecarSearchForm = ({ query, onSearch, onReset, children = undefined }: Props) => {
+  const { t } = useTranslation('sidecars');
+
+  return (
+    <SearchForm
+      query={query}
+      onSearch={onSearch}
+      onReset={onReset}
+      placeholder={t('common.sidecar_search_form.placeholder')}
+      queryHelpComponent={<SidecarQueryHelper />}
+      topMargin={0}
+      useLoadingState>
+      {children}
+    </SearchForm>
+  );
+};
 
 export default SidecarSearchForm;

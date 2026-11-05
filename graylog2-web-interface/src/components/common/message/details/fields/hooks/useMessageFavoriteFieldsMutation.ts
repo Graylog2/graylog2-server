@@ -20,6 +20,7 @@ import mapValues from 'lodash/mapValues';
 
 import { FavoriteFields } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import { STREAMS_QUERY_KEY } from 'components/streams/hooks/useAllStreams';
 import UserNotification from 'util/UserNotification';
 import useSendFavoriteFieldTelemetry from 'components/common/message/details/fields/hooks/useSendFavoriteFieldTelemetry';
@@ -52,8 +53,8 @@ const useMessageFavoriteFieldsMutation = (
     },
     onError: (errorThrown) =>
       UserNotification.error(
-        `Setting fields to favorites failed with error: ${errorThrown}`,
-        'Could not set fields to favorites',
+        i18n.t('message.set_favorites_failed', { ns: 'common', error: errorThrown }),
+        i18n.t('message.set_favorites_failed_title', { ns: 'common' }),
       ),
   });
 
@@ -68,8 +69,8 @@ const useMessageFavoriteFieldsMutation = (
     },
     onError: (errorThrown) =>
       UserNotification.error(
-        `Adding field to favorites failed with error: ${errorThrown}`,
-        'Could not add field to favorites',
+        i18n.t('message.add_favorite_failed', { ns: 'common', error: errorThrown }),
+        i18n.t('message.add_favorite_failed_title', { ns: 'common' }),
       ),
   });
 
@@ -84,8 +85,8 @@ const useMessageFavoriteFieldsMutation = (
     },
     onError: (errorThrown) =>
       UserNotification.error(
-        `Removing field from favorites failed with error: ${errorThrown}`,
-        'Could not remove field from favorites',
+        i18n.t('message.remove_favorite_failed', { ns: 'common', error: errorThrown }),
+        i18n.t('message.remove_favorite_failed_title', { ns: 'common' }),
       ),
   });
 

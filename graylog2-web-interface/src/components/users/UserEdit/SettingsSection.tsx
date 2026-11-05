@@ -15,12 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Formik, Form } from 'formik';
 import styled from 'styled-components';
 
-import Routes from 'routing/Routes';
+import i18n from 'i18n';
+import GlobalSessionTimeoutText from 'components/users/GlobalSessionTimeoutText';
 import { Button, Row, Col } from 'components/bootstrap';
-import { IfPermitted, Link, NoSearchResult, ReadOnlyFormGroup } from 'components/common';
+import { IfPermitted, NoSearchResult, ReadOnlyFormGroup } from 'components/common';
 import type User from 'logic/users/User';
 import type { StartPage } from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
@@ -57,7 +59,7 @@ const _validate = async (values) => {
   const { type, id } = values.startpage ?? {};
 
   if (type && type !== 'graylog_security_welcome' && !id) {
-    errors = { startpage: 'Please select an entity.' };
+    errors = { startpage: i18n.t('user_edit.settings.select_entity', { ns: 'users' }) };
   }
 
   return errors;
@@ -67,10 +69,11 @@ const SettingsSection = ({
   user: { id, timezone, sessionTimeoutMs, startpage, permissions, serviceAccount },
   onSubmit,
 }: Props) => {
+  const { t } = useTranslation('users');
   const isGlobalTimeoutEnabled = useIsGlobalTimeoutEnabled();
 
   return (
-    <SectionComponent title="Settings">
+    <SectionComponent title={t('user_fields.settings')}>
       <Formik<SettingsFormValues>
         onSubmit={onSubmit}
         validate={_validate}
@@ -80,14 +83,10 @@ const SettingsSection = ({
             <IfPermitted permissions="*">
               {isGlobalTimeoutEnabled ? (
                 <GlobalTimeoutMessage
-                  label="Sessions Timeout"
+                  label={t('user_fields.sessions_timeout')}
                   value={
                     <NoSearchResult>
-                      User session timeout is not editable because the{' '}
-                      <IfPermitted permissions={['clusterconfigentry:read']}>
-                        <Link to={Routes.SYSTEM.CONFIGURATIONS}>global session timeout</Link>
-                      </IfPermitted>{' '}
-                      is enabled.
+                      <GlobalSessionTimeoutText />
                     </NoSearchResult>
                   }
                 />
@@ -104,8 +103,12 @@ const SettingsSection = ({
             <Row className="no-bm">
               <Col xs={12}>
                 <div className="pull-right">
-                  <Button bsStyle="primary" disabled={isSubmitting || !isValid} title="Update Settings" type="submit">
-                    Update Settings
+                  <Button
+                    bsStyle="primary"
+                    disabled={isSubmitting || !isValid}
+                    title={t('user_edit.settings.update')}
+                    type="submit">
+                    {t('user_edit.settings.update')}
                   </Button>
                 </div>
               </Col>

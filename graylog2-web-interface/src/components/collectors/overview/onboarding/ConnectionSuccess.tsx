@@ -20,6 +20,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import styled, { css } from 'styled-components';
 import { Grid } from '@mantine/core';
 import moment from 'moment/moment';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Button } from 'components/bootstrap';
 import { Group, LinkContainer, RelativeTime, Stack } from 'components/common';
@@ -86,6 +87,7 @@ const ONBOARDING_STATE_EVENTS: Record<OnboardingOutcome, { eventType: TelemetryE
 };
 
 const ConnectionSuccess = ({ instance, fleetName }: Props) => {
+  const { t } = useTranslation('collectors');
   const { selfLogs, sourceLogs, sourceCounts, selfLogsError, sourceLogsError, isLoading } = useCollectorLogPreview(
     instance.instance_uid,
   );
@@ -96,6 +98,7 @@ const ConnectionSuccess = ({ instance, fleetName }: Props) => {
 
   const online = instance.status === 'online';
   const receiving = (sourceLogs?.total ?? 0) > 0;
+  const previewDuration = moment.duration(PREVIEW_RANGE_SECONDS, 'seconds').humanize();
   const sourceLogsUrl = collectorReceivedMessagesUrl(AGENT_ID_FIELD, instance.instance_uid);
 
   // Which of the page's three states the user is looking at; attached to every click event so
@@ -152,13 +155,15 @@ const ConnectionSuccess = ({ instance, fleetName }: Props) => {
   const subtitle = () => {
     if (!online)
       return (
-        <>
-          The collector connected once but hasn&apos;t reported in since <RelativeTime dateTime={instance.last_seen} />.
-        </>
+        <Trans
+          t={t}
+          i18nKey="connection_success.offline"
+          components={{ lastSeen: <RelativeTime dateTime={instance.last_seen} /> }}
+        />
       );
-    if (receiving) return <>The collector is connected and delivering messages.</>;
+    if (receiving) return t('connection_success.receiving');
 
-    return <>Almost there &mdash; the collector is connected and we&apos;re listening for its first messages.</>;
+    return t('connection_success.waiting');
   };
 
   return (
@@ -166,7 +171,7 @@ const ConnectionSuccess = ({ instance, fleetName }: Props) => {
       <Group justify="space-between" align="flex-start">
         <div>
           <Group gap="sm">
-            <Title>Setting Up {instance.hostname ?? instance.instance_uid}</Title>
+            <Title>{t('connection_success.title', { host: instance.hostname ?? instance.instance_uid })}</Title>
             {!online && <InstanceStatusLabel status={instance.status} />}
           </Group>
           <Subtitle>{subtitle()}</Subtitle>
@@ -174,13 +179,15 @@ const ConnectionSuccess = ({ instance, fleetName }: Props) => {
         {online ? (
           <LinkContainer to={sourceLogsUrl}>
             <Button bsStyle="success" onClick={() => reportNextStep('onboarding-open-in-search', 'search')}>
-              Open in search
+              {t('deployment.open_in_search')}
             </Button>
           </LinkContainer>
         ) : (
           <Group gap="xs">
             <LinkContainer to={Routes.SYSTEM.COLLECTORS.INSTANCES}>
-              <Button onClick={() => reportNextStep('onboarding-view-instances', 'instances')}>View instances</Button>
+              <Button onClick={() => reportNextStep('onboarding-view-instances', 'instances')}>
+                {t('connection_success.view_instances')}
+              </Button>
             </LinkContainer>
             <Button
               bsStyle="info"
@@ -192,7 +199,7 @@ const ConnectionSuccess = ({ instance, fleetName }: Props) => {
 
                 queryClient.invalidateQueries({ queryKey: instanceKeyFn(instance.instance_uid) });
               }}>
-              Check again
+              {t('connection_success.check_again')}
             </Button>
           </Group>
         )}
@@ -238,22 +245,29 @@ const ConnectionSuccess = ({ instance, fleetName }: Props) => {
           collector's own logs usually hold the reason, so they take over. */}
       {online ? (
         <LogPreviewSection
-          title="Log Preview"
+          title={t('connection_success.log_preview')}
           searchUrl={sourceLogsUrl}
           preview={sourceLogs}
           isLoading={isLoading}
           error={sourceLogsError}
-          caption={`Showing messages received since ${moment.duration(PREVIEW_RANGE_SECONDS, 'seconds').humanize()}${receiving ? '' : ' - checking every few seconds'}`}
+          caption={t(
+            receiving ? 'connection_success.caption_messages' : 'connection_success.caption_messages_checking',
+            {
+              duration: previewDuration,
+            },
+          )}
           onOpenSearch={() => reportNextStep('onboarding-log-preview-search', 'log-preview')}
         />
       ) : (
         <LogPreviewSection
-          title="Log Preview"
+          title={t('connection_success.log_preview')}
           searchUrl={canReadSystemLogs ? collectorSystemLogsUrl(instance.instance_uid) : undefined}
           preview={selfLogs}
           isLoading={isLoading}
           error={selfLogsError}
-          caption={`Showing Collector system messages received since ${moment.duration(PREVIEW_RANGE_SECONDS, 'seconds').humanize()}${receiving ? '' : ' - checking every few seconds'}`}
+          caption={t(receiving ? 'connection_success.caption_system' : 'connection_success.caption_system_checking', {
+            duration: previewDuration,
+          })}
           onOpenSearch={() => reportNextStep('onboarding-log-preview-search', 'log-preview')}
         />
       )}

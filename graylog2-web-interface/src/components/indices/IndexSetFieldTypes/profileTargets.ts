@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import i18n from 'i18n';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
 export type ProfileTargetIndexSet = Pick<IndexSet, 'id' | 'title' | 'writable' | 'field_type_profile'> & {
@@ -26,10 +27,10 @@ export type SkippedIndexSet = { indexSet: ProfileTargetIndexSet; reason: string 
 
 const skipReason = (indexSet: ProfileTargetIndexSet, action: ProfileAction) => {
   if (action === 'set') {
-    return indexSet.can_have_profile ? undefined : 'Field types of this index set type cannot be changed';
+    return indexSet.can_have_profile ? undefined : i18n.t('field_types.skip_reason_cannot_change', { ns: 'indexsets' });
   }
 
-  return indexSet.field_type_profile ? undefined : 'No field type profile set';
+  return indexSet.field_type_profile ? undefined : i18n.t('field_types.skip_reason_no_profile', { ns: 'indexsets' });
 };
 
 export const splitProfileTargets = (indexSets: Array<ProfileTargetIndexSet>, action: ProfileAction) => {

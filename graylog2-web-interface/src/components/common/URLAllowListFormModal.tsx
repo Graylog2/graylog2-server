@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useEffect, useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import usePermissions from 'hooks/usePermissions';
 import { useStore } from 'stores/connect';
@@ -38,6 +39,7 @@ type Props = {
 };
 
 const URLAllowListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate = () => {} }: Props) => {
+  const { t } = useTranslation('common');
   const prevNewUrlEntry = useRef<string>();
   const [config, setConfig] = useState<AllowListConfig>({ entries: [], disabled: false });
   const [isValid, setIsValid] = useState<boolean>(false);
@@ -128,18 +130,18 @@ const URLAllowListFormModal = ({ newUrlEntry = '', urlType = undefined, onUpdate
       <>
         <IfPermitted permissions="urlallowlist:write">
           <Button bsStyle="info" bsSize="xs" onClick={openModal}>
-            Add to URL allowlist
+            {t('url_allow_list_modal.add')}
           </Button>
         </IfPermitted>
         <BootstrapModalForm
           show={showConfigModal}
           bsSize="lg"
-          title="Update Allowlist Configuration"
+          title={t('url_allow_list_modal.title')}
           onCancel={closeModal}
           onSubmitForm={saveConfig}
           submitButtonDisabled={!isValid}
-          submitButtonText="Update configuration">
-          <h3>Allowlist URLs</h3>
+          submitButtonText={t('url_allow_list_modal.submit')}>
+          <h3>{t('url_allow_list_modal.urls')}</h3>
           <UrlAllowListForm
             key={newUrlEntryId}
             urls={entries}

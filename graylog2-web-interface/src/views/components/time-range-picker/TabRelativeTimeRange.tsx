@@ -17,6 +17,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { useFormikContext } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 import { RELATIVE_ALL_TIME, DEFAULT_RELATIVE_FROM, DEFAULT_RELATIVE_TO } from 'views/Constants';
@@ -47,6 +48,7 @@ const StyledIcon = styled(Icon)`
 `;
 
 const TabRelativeTimeRange = ({ disabled = false, limitDuration = 0 }: Props) => {
+  const { t } = useTranslation('search');
   const {
     values: { timeRangeTabs },
     setFieldValue,
@@ -68,8 +70,8 @@ const TabRelativeTimeRange = ({ disabled = false, limitDuration = 0 }: Props) =>
             onUnsetRange={() => {
               setFieldValue('timeRangeTabs.relative.to', RELATIVE_CLASSIFIED_ALL_TIME_RANGE);
             }}
-            title="From:"
-            unsetRangeLabel="All Time"
+            title={t('time_range.from_label')}
+            unsetRangeLabel={t('time_range.all_time')}
           />
           <StyledIcon name="arrow_right_alt" />
 
@@ -79,8 +81,8 @@ const TabRelativeTimeRange = ({ disabled = false, limitDuration = 0 }: Props) =>
             disabled={disableUntil}
             fieldName="to"
             limitDuration={limitDuration}
-            title="Until:"
-            unsetRangeLabel="Now"
+            title={t('time_range.until_label')}
+            unsetRangeLabel={t('time_range.now')}
           />
         </>
       </RelativeWrapper>

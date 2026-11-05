@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import isEmpty from 'lodash/isEmpty';
 
 import { Carousel, Spinner, ExternalLink } from 'components/common';
@@ -24,7 +25,13 @@ import { Alert } from 'components/bootstrap';
 
 export const CAROUSEL_ID = 'content-stream-news';
 
+// `Trans` provides the link text as children.
+const BlogLink = ({ children = undefined }: React.PropsWithChildren) => (
+  <ExternalLink href="https://www.graylog.org/blog/">{children}</ExternalLink>
+);
+
 const ContentStreamNews = () => {
+  const { t } = useTranslation('welcome');
   const { feedList, isLoadingFeed, error } = useContentStream();
 
   if (isLoadingFeed) {
@@ -35,8 +42,7 @@ const ContentStreamNews = () => {
     return (
       <Alert bsStyle="info">
         <p>
-          Unable to load RSS feed at the moment ! You can read more on{' '}
-          <ExternalLink href="https://www.graylog.org/blog/">Graylog</ExternalLink>.
+          <Trans t={t} i18nKey="content_stream.rss_unavailable" components={{ blogLink: <BlogLink /> }} />
         </p>
       </Alert>
     );

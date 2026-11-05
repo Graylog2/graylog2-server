@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { Button, ControlLabel, FormControl, FormGroup, HelpBlock } from 'components/bootstrap';
@@ -53,6 +54,7 @@ const CreateTokenForm = ({
   disableTtl = false,
   onCreate,
 }: Props) => {
+  const { t } = useTranslation('users');
   const [tokenName, setTokenName] = useState('');
   const { tokenTtl, setTokenTtl, resetTokenTtl } = useTokenTTL(forceDefaultTtl);
 
@@ -68,11 +70,11 @@ const CreateTokenForm = ({
   return (
     <StyledForm className="form-inline" onSubmit={createToken}>
       <FormGroup controlId="create-token-input">
-        <ControlLabel>Token Name</ControlLabel>
+        <ControlLabel>{t('token_form.token_name')}</ControlLabel>
         <FormControl
           type="text"
           disabled={disableForm}
-          placeholder="What is this token for?"
+          placeholder={t('token_form.placeholder')}
           value={tokenName}
           onChange={(event) => setTokenName((event.target as HTMLInputElement).value)}
         />
@@ -82,10 +84,10 @@ const CreateTokenForm = ({
           id="token_creation_ttl"
           duration={tokenTtl}
           update={(value) => setTokenTtl(value)}
-          label="Token TTL"
+          label={t('token_form.ttl_label')}
           help=""
           validator={ttlValidator}
-          errorText="invalid (min: 1 minute)"
+          errorText={t('token_form.ttl_invalid')}
           disabled={disableForm}
           required
         />
@@ -95,11 +97,9 @@ const CreateTokenForm = ({
         disabled={disableForm || tokenName === '' || creatingToken}
         type="submit"
         bsStyle="primary">
-        {creatingToken ? <Spinner text="Creating..." /> : 'Create Token'}
+        {creatingToken ? <Spinner text={t('token_form.creating')} /> : t('token_form.create')}
       </Button>
-      <HelpBlock>
-        TTL Syntax Examples: for 60 seconds: PT60S, for 60 minutes: PT60M, for 24 hours: PT24H, for 30 days: P30D
-      </HelpBlock>
+      <HelpBlock>{t('token_form.ttl_help')}</HelpBlock>
     </StyledForm>
   );
 };

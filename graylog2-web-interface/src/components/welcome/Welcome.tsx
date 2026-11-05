@@ -15,15 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
+import useProductName from 'brand-customization/useProductName';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import ContentStreamContainer from 'components/content-stream/ContentStreamContainer';
 import usePermissions from 'hooks/usePermissions';
 import useFeature from 'hooks/useFeature';
 import SectionHeader from 'components/welcome/SectionHeader';
 import VisuallyHidden from 'components/common/VisuallyHidden';
-import useProductName from 'brand-customization/useProductName';
 
 import LastOpenList from './LastOpenList';
 import FavoriteItemsList from './FavoriteItemsList';
@@ -39,6 +40,7 @@ const StyledSectionComponent = styled(SectionComponent)`
 `;
 
 const Welcome = () => {
+  const { t } = useTranslation('welcome');
   const { isAdmin } = usePermissions();
   const onboardingEnabled = useFeature('onboarding_experience');
   const { metricsEnabled } = useWelcomePageConfig();
@@ -47,28 +49,26 @@ const Welcome = () => {
   return (
     <>
       <VisuallyHidden>
-        <h1>Welcome to {productName}!</h1>
+        <h1>{t('welcome_to', { productName })}</h1>
       </VisuallyHidden>
       {onboardingEnabled && <OnboardingBanner />}
       {metricsEnabled && <WelcomeMetricsSection />}
       <SectionHeader>
-        <h2>Search and Usage</h2>
+        <h2>{t('search_and_usage')}</h2>
       </SectionHeader>
       <SectionGrid $columns="1fr 1fr 1fr">
-        <StyledSectionComponent title="Favorite Items" titleAs="h3">
-          <p className="description">Overview of your favorite saved searches and dashboards.</p>
+        <StyledSectionComponent title={t('favorite_items')} titleAs="h3">
+          <p className="description">{t('favorite_items_description')}</p>
           <FavoriteItemsList />
         </StyledSectionComponent>
-        <StyledSectionComponent title="Recent Activity" titleAs="h3">
+        <StyledSectionComponent title={t('recent_activity')} titleAs="h3">
           <p className="description">
-            {isAdmin
-              ? 'This list includes all actions users performed, like creating or sharing an entity.'
-              : 'Overview of actions you made with entities or somebody else made with entities which relates to you, like creating or sharing an entity.'}
+            {isAdmin ? t('recent_activity_description_admin') : t('recent_activity_description')}
           </p>
           <RecentActivityList />
         </StyledSectionComponent>
-        <StyledSectionComponent title="Last Opened" titleAs="h3">
-          <p className="description">Overview of recently visited saved searches and dashboards.</p>
+        <StyledSectionComponent title={t('last_opened')} titleAs="h3">
+          <p className="description">{t('last_opened_description')}</p>
           <LastOpenList />
         </StyledSectionComponent>
       </SectionGrid>

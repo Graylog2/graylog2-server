@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import styled from 'styled-components';
 
@@ -43,6 +44,7 @@ const StyledSpan = styled.span`
 `;
 
 const ExpandedConfigurationSection = ({ input, inputTypeDescriptions }: Props) => {
+  const { t } = useTranslation('inputs');
   const definition = inputTypeDescriptions[input.type] as any;
   const [showConfigurationForm, setShowConfigurationForm] = useState<boolean>(false);
   const sendTelemetry = useSendTelemetry();
@@ -69,14 +71,14 @@ const ExpandedConfigurationSection = ({ input, inputTypeDescriptions }: Props) =
           </span>
           <StyledSpan>
             <Button bsStyle="primary" bsSize="xsmall" onClick={editInput} disabled={definition === undefined}>
-              Edit input
+              {t('edit_input.edit')}
             </Button>
           </StyledSpan>
         </SectionGrid>
         <ConfigurationWell id={input.id} configuration={input.attributes} typeDefinition={definition} />
       </div>
       <div>
-        <span>Throughput / Metrics</span>
+        <span>{t('overview.sections.throughput_metrics')}</span>
         <br />
         <ThroughputSection input={input} />
         <InputStaticFields input={input} />
@@ -89,12 +91,12 @@ const ExpandedConfigurationSection = ({ input, inputTypeDescriptions }: Props) =
           nodeValue={input.node}
           configFields={definition.requested_configuration as unknown as any}
           description={definition?.description}
-          title={`Editing Input ${input.title}`}
+          title={t('edit_input.editing', { title: input.title })}
           titleValue={input.title}
           typeName={input.type}
           includeTitleField
           handleSubmit={hanleInputUpdate}
-          submitButtonText="Update input"
+          submitButtonText={t('edit_input.update')}
           values={input.attributes}
         />
       )}

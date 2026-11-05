@@ -25,7 +25,8 @@ import ExpandedRulesActions from 'components/streams/StreamsOverview/ExpandedRul
 import ExpandedDestinationFilterRulesSection from 'components/streams/StreamsOverview/ExpandedDestinationFilterRulesSection';
 import ExpandedDestinationFilterRulesActions from 'components/streams/StreamsOverview/ExpandedDestinationFilterRulesActions';
 import ExpandedAssociatedInputsSection from 'components/streams/StreamsOverview/ExpandedAssociatedInputsSection';
-import { METRIC_COLUMN_IDS, METRIC_COLUMN_TITLES } from 'components/streams/StreamsOverview/metricColumns';
+import i18n from 'i18n';
+import { METRIC_COLUMN_IDS, getMetricColumnTitle } from 'components/streams/StreamsOverview/metricColumns';
 import ExpandedOutputsSection from 'components/streams/StreamsOverview/ExpandedOutputsSection';
 import ExpandedOutputsActions from 'components/streams/StreamsOverview/ExpandedOutputsActions';
 import type { ExpandedSectionRenderer } from 'components/common/EntityDataTable/types';
@@ -43,25 +44,25 @@ const useTableElements = ({
   const renderExpandedRulesActions = (stream: Stream) => <ExpandedRulesActions stream={stream} />;
   const expandedSections = {
     rules: {
-      title: 'Rules',
+      title: i18n.t('streams_overview.expanded_titles.rules', { ns: 'streams' }),
       content: renderExpandedRules,
       actions: renderExpandedRulesActions,
       isAvailable: (stream: Stream) => !stream.is_default && stream.is_editable,
     },
     destination_filters: {
-      title: 'Filter Rules',
+      title: i18n.t('streams_overview.expanded_titles.destination_filters', { ns: 'streams' }),
       content: (stream: Stream) => <ExpandedDestinationFilterRulesSection stream={stream} />,
       actions: (stream: Stream) => <ExpandedDestinationFilterRulesActions stream={stream} />,
       isAvailable: (stream: Stream) => !stream.is_default && stream.is_editable,
     },
     outputs: {
-      title: 'Outputs',
+      title: i18n.t('streams_overview.expanded_titles.outputs', { ns: 'streams' }),
       content: (stream: Stream) => <ExpandedOutputsSection stream={stream} />,
       actions: (stream: Stream) => <ExpandedOutputsActions stream={stream} />,
       isAvailable: (stream: Stream) => stream.is_editable,
     },
     [METRIC_COLUMN_IDS.associatedInputs]: {
-      title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.associatedInputs],
+      title: getMetricColumnTitle(METRIC_COLUMN_IDS.associatedInputs),
       content: (stream: Stream) => <ExpandedAssociatedInputsSection stream={stream} />,
     },
     ...pluggableExpandedSections,

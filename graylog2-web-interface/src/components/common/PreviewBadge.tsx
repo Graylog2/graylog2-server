@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import Badge from 'components/bootstrap/Badge';
@@ -24,6 +25,10 @@ const StyledBadge = styled(Badge)`
   margin-top: -2%;
 `;
 
-const PreviewBadge = () => <StyledBadge bsStyle="info">Preview</StyledBadge>;
+const PreviewBadge = () => {
+  const { t } = useTranslation('common');
+
+  return <StyledBadge bsStyle="info">{t('badges.preview')}</StyledBadge>;
+};
 
 export default PreviewBadge;

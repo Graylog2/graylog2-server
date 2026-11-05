@@ -1,0 +1,14 @@
+{
+  "7 Days Hot, 90 Days Total": "7 Tage Hot, 90 Tage gesamt",
+  "14 Days Hot, 90 Days Total.": "14 Tage Hot, 90 Tage gesamt",
+  "30 days Hot, 90 Days Total": "30 Tage Hot, 90 Tage gesamt",
+  "7 Days Hot": "7 Tage Hot",
+  "14 Days Hot": "14 Tage Hot",
+  "30 Days Hot": "30 Tage Hot",
+  "Use case: minimal need for historical searches. This configuration has low memory and storage usage. Logs will be searchable for a minimum of 90 days.": "Anwendungsfall: geringer Bedarf an historischen Suchen. Diese Konfiguration hat einen geringen Arbeitsspeicher- und Speicherbedarf. Logs sind mindestens 90 Tage lang durchsuchbar.",
+  "Use case: regular need for historical searches. Logs will be searchable for a minimum of 90 days.": "Anwendungsfall: regelmäßiger Bedarf an historischen Suchen. Logs sind mindestens 90 Tage lang durchsuchbar.",
+  "Use case: need for frequent and deep historical searches. This configuration has high memory and storage usage. Logs will be searchable for a minimum of 90 days.": "Anwendungsfall: Bedarf an häufigen und tiefgehenden historischen Suchen. Diese Konfiguration hat einen hohen Arbeitsspeicher- und Speicherbedarf. Logs sind mindestens 90 Tage lang durchsuchbar.",
+  "Use case: rare historical searches. This configuration maintains a minimum of 7 days of logs in the Hot Tier.": "Anwendungsfall: seltene historische Suchen. Diese Konfiguration hält Logs mindestens 7 Tage lang im Hot Tier vor.",
+  "Use case: some historical searches. This configuration maintains a minimum of 14 days of logs in the Hot Tier.": "Anwendungsfall: gelegentliche historische Suchen. Diese Konfiguration hält Logs mindestens 14 Tage lang im Hot Tier vor.",
+  "Use case: frequent historical searches. This configuration maintains a minimum of 30 days of logs in the Hot Tier.": "Anwendungsfall: häufige historische Suchen. Diese Konfiguration hält Logs mindestens 30 Tage lang im Hot Tier vor."
+}

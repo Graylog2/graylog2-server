@@ -49,6 +49,8 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.plugin.rest.CodedBadRequestException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.rest.models.roles.responses.RoleMembershipResponse;
 import org.graylog2.rest.models.roles.responses.RoleResponse;
 import org.graylog2.rest.models.roles.responses.RolesResponse;
@@ -68,6 +70,7 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -126,7 +129,7 @@ public class RolesResource extends RestResource {
     public Response create(@RequestBody(description = "The new role to create", required = true) @Valid @NotNull RoleResponse roleResponse,
                            @Context UserContext userContext) {
         if (roleService.exists(roleResponse.name())) {
-            throw new BadRequestException("Role " + roleResponse.name() + " already exists.");
+            throw new CodedBadRequestException("role.already_exists", "Role " + roleResponse.name() + " already exists.", Map.of("name", roleResponse.name()));
         }
 
         privilegeEscalationGuard.validatePermissions(roleResponse.permissions(), userContext);
@@ -167,7 +170,7 @@ public class RolesResource extends RestResource {
 
         final Role role = roleService.load(name);
         if (role.isReadOnly()) {
-            throw new BadRequestException("Cannot update read only role " + name);
+            throw new CodedBadRequestException("role.update_read_only", "Cannot update read only role " + name, Map.of("name", name));
         }
 
         role.setName(roleRepresentation.name());
@@ -193,12 +196,12 @@ public class RolesResource extends RestResource {
 
         final Role role = roleService.load(name);
         if (role.isReadOnly()) {
-            throw new BadRequestException("Cannot delete read only system role " + name);
+            throw new CodedBadRequestException("role.delete_read_only", "Cannot delete read only system role " + name, Map.of("name", name));
         }
         userService.dissociateAllUsersFromRole(role);
 
         if (roleService.delete(name) == 0) {
-            throw new NotFoundException("Couldn't find role " + name);
+            throw new CodedNotFoundException("role.not_found", "Couldn't find role " + name, Map.of("name", name));
         }
     }
 
@@ -271,7 +274,7 @@ public class RolesResource extends RestResource {
 
         final User user = userService.load(username);
         if (user == null) {
-            throw new NotFoundException("User " + username + " has not been found.");
+            throw new CodedNotFoundException("user.not_found_by_name", "User " + username + " has not been found.", Map.of("username", username));
         }
 
         // verify that the role exists
@@ -303,7 +306,7 @@ public class RolesResource extends RestResource {
 
         final User user = userService.load(username);
         if (user == null) {
-            throw new NotFoundException("User " + username + " has not been found.");
+            throw new CodedNotFoundException("user.not_found_by_name", "User " + username + " has not been found.", Map.of("username", username));
         }
 
         // verify that the role exists

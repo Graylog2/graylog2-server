@@ -1,0 +1,249 @@
+{
+  "apply_parameter": {
+    "action": "動作",
+    "apply": "套用",
+    "choose": "選擇...",
+    "choose_config_key": "選擇設定鍵",
+    "clear": "清除",
+    "config_key": "設定鍵",
+    "create_parameter_first": "請先建立參數",
+    "no_parameter_of_type": "沒有類型為 {{type}} 的參數",
+    "parameter": "參數"
+  },
+  "constraints": {
+    "fulfilled": "已滿足",
+    "name": "名稱",
+    "title": "限制條件",
+    "type": "類型",
+    "version": "版本"
+  },
+  "details": {
+    "description": "描述",
+    "entities": "項目：",
+    "id": "ID：",
+    "name": "名稱：",
+    "parameters": "參數：",
+    "summary": "摘要：",
+    "title": "詳細資訊",
+    "url": "URL：",
+    "vendor": "供應商：",
+    "version": "版本："
+  },
+  "download": {
+    "download": "下載",
+    "info": "請在下方的下載連結上按右鍵，然後選擇「另存連結為...」以下載 JSON 檔案。",
+    "title": "下載 Content Pack"
+  },
+  "edit": {
+    "steps": {
+      "parameters": "參數",
+      "preview": "預覽",
+      "selection": "內容選擇"
+    }
+  },
+  "edit_parameter": {
+    "create_title": "建立參數",
+    "default_value": "預設值",
+    "default_value_help": "若參數並非選填，請提供預設值。",
+    "description": "描述",
+    "description_help": "請說明將如何處理此參數。",
+    "description_required": "必須設定描述。",
+    "edit_title": "編輯參數",
+    "name": "名稱",
+    "name_help": "此名稱用作參數參照，不得包含空格。",
+    "name_invalid": "參數名稱只能包含 A-Z、a-z、0-9 和 _",
+    "name_not_unique": "參數名稱必須是唯一的。",
+    "name_required": "必須設定名稱。",
+    "not_boolean": "這不是布林值，必須為 true 或 false。",
+    "not_double": "這不是雙精度浮點數值。",
+    "not_integer": "這不是整數值。",
+    "title": "標題",
+    "title_help": "請為此 Content Pack 提供描述性的標題。",
+    "title_required": "必須設定標題。",
+    "value_type": "值類型",
+    "value_type_help": "請指定參數的類型。"
+  },
+  "entities": {
+    "action": "動作",
+    "config_title": "項目設定",
+    "description": "描述",
+    "edit_title": "編輯",
+    "list_title": "項目清單",
+    "origin": "來源",
+    "origin_content_pack": "Content Pack",
+    "origin_server": "伺服器",
+    "show": "顯示",
+    "title": "標題",
+    "type": "類型",
+    "used_parameters": "已使用的參數"
+  },
+  "entity_config": {
+    "config_key": "設定鍵",
+    "parameter_type": "參數 ({{type}})",
+    "type": "類型",
+    "value": "值"
+  },
+  "entity_index": {
+    "load_failed": "載入項目索引失敗，狀態碼：",
+    "load_failed_title": "無法載入項目索引"
+  },
+  "import": {
+    "error_message": "匯入 Content Pack 時發生錯誤，請確認檔案為有效的 JSON 檔案。詳細資訊請查看 {{productName}} 伺服器日誌。",
+    "error_title": "無法匯入 Content Pack",
+    "success_message": "Content Pack 匯入成功",
+    "success_named": "Content Pack「{{name}}」匯入成功",
+    "success_title": "成功！"
+  },
+  "install": {
+    "comment": "安裝註解",
+    "comment_help": "此註解將與 Content Pack 安裝一併儲存，可用來說明此次安裝的原因。",
+    "configure_parameters": "設定參數：",
+    "needs_to_be_filled": "需要填寫。",
+    "share_description": "搜尋要新增為此 Content Pack 項目協作者的使用者或團隊。"
+  },
+  "install_entities": {
+    "installed": "已安裝的項目",
+    "title": "標題",
+    "to_be_uninstalled": "即將解除安裝的項目",
+    "type": "類型"
+  },
+  "install_view": {
+    "comment": "註解：",
+    "general_information": "一般資訊",
+    "installed_at": "安裝時間：",
+    "installed_by": "安裝者："
+  },
+  "installations": {
+    "action": "動作",
+    "comment": "註解",
+    "uninstall": "解除安裝",
+    "version": "版本",
+    "view": "檢視",
+    "view_title": "檢視安裝"
+  },
+  "list": {
+    "no_match": "找不到符合的 Content Pack",
+    "none_found": "找不到 Content Pack，請建立或上傳 Content Pack"
+  },
+  "list_item": {
+    "create_new_version": "建立新版本",
+    "delete_all_versions": "刪除所有版本",
+    "install": "安裝",
+    "install_title": "安裝 Content Pack",
+    "latest_version": "最新版本：{{rev}}",
+    "show": "顯示",
+    "update": "更新"
+  },
+  "notifications": {
+    "error": "錯誤",
+    "success": "成功"
+  },
+  "overview": {
+    "button_text": "Content Packs",
+    "delete_confirmation": "您即將刪除此 Content Pack，確定要繼續嗎？",
+    "delete_error_message": "刪除 Content Pack 失敗：{{error}}",
+    "delete_success": "Content Pack 已成功刪除。",
+    "description": "Content Pack 可加快特定資料來源的設定流程。Content Pack 可包含 Input/Extractor、Stream 與 Dashboard。",
+    "install_error_message": "安裝 Content Pack 失敗，狀態：{{status}}。無法安裝 ID 為 {{id}} 的 Content Pack",
+    "install_success": "Content Pack 已成功安裝。",
+    "title": "Content Packs",
+    "marketplace_prefix": "在以下位置尋找更多 Content Pack："
+  },
+  "pages": {
+    "back_button": "Content Packs",
+    "create_title": "建立 Content Pack",
+    "description": "Content Pack 可加快特定資料來源的設定流程。Content Pack 可包含 Input/Extractor、Stream 與 Dashboard。",
+    "document_title": "Content Packs",
+    "edit_title": "編輯 Content Pack",
+    "marketplace_prefix": "在以下位置尋找更多 Content Pack："
+  },
+  "parameter_list": {
+    "action": "動作",
+    "default_value": "預設值",
+    "delete_parameter": "刪除參數",
+    "description": "描述",
+    "edit_modal": "編輯對話框",
+    "list_title": "參數清單",
+    "modal_title": "參數",
+    "name": "名稱",
+    "no_data": "若要在 Content Pack 中使用參數，請先建立參數，然後將其套用至項目。",
+    "still_in_use": "仍在使用中",
+    "title": "標題",
+    "used": "已使用",
+    "value_type": "值類型"
+  },
+  "parameters": {
+    "confirm_deletion": "確認刪除",
+    "delete_confirmation": "確定要刪除此參數：{{title}}？"
+  },
+  "preview": {
+    "create": "建立",
+    "create_and_download": "建立並下載"
+  },
+  "revisions": {
+    "fetch_error": "擷取 Content Pack 修訂版本時發生錯誤：{{error}}",
+    "fetch_error_title": "無法擷取 Content Pack"
+  },
+  "selection": {
+    "description": "描述",
+    "description_help": "請以 Markdown 格式提供 Content Pack 的詳細描述。",
+    "general_information": "一般資訊",
+    "must_be_filled": "必須填寫。",
+    "name": "名稱",
+    "name_help": "必填。請為此 Content Pack 提供描述性名稱。",
+    "no_pairs_hint": "此版本的 Content Pack 中的項目從未安裝，因此沒有可選取的已安裝項目。",
+    "select_entity": "請至少選取一個項目。",
+    "select_latest": "選取最新安裝的版本",
+    "select_older": "選取較舊的 Content Pack 版本",
+    "summary": "摘要",
+    "summary_help": "必填。請為 Content Pack 提供簡短摘要。",
+    "title": "Content Pack 選擇",
+    "url": "URL",
+    "url_help": "可在何處找到此 Content Pack，例如 GitHub 網址。",
+    "url_invalid": "URL 無效",
+    "url_protocol": "URL 必須以 http 或 https 開頭。",
+    "vendor": "供應商",
+    "vendor_help": "必填。請提供此 Content Pack 的作者及聯絡方式，例如名稱與電子郵件。",
+    "version_help": "對於每個項目，您可以選取最新安裝的版本（<latestIcon />）或較舊的 Content Pack 版本（<olderIcon />）。"
+  },
+  "show": {
+    "delete_revision_confirmation": "您即將刪除此 Content Pack 修訂版本，確定要繼續嗎？",
+    "delete_revision_error": "刪除 Content Pack 失敗：{{error}}",
+    "delete_revision_success": "Content Pack 修訂版本已成功刪除。",
+    "install_error": "安裝 Content Pack 失敗，狀態：{{status}}。無法安裝 ID 為 {{id}} 的 Content Pack",
+    "installations": "安裝紀錄",
+    "not_found": "找不到 ID 為 {{id}} 的 Content Pack，可能已被刪除。",
+    "server_error": "發生內部伺服器錯誤，請查看日誌檔以取得詳細資訊",
+    "uninstall_confirmation": "您確定要解除安裝此 Content Pack 嗎？",
+    "uninstall_error": "解除安裝 Content Pack 失敗，請查看日誌以取得詳細資訊。",
+    "uninstall_success": "Content Pack 已成功解除安裝。",
+    "versions": "版本"
+  },
+  "status": {
+    "edited": "已編輯",
+    "error": "錯誤",
+    "installed": "已安裝",
+    "updatable": "可更新"
+  },
+  "upload": {
+    "button": "上傳",
+    "choose_file": "選擇檔案",
+    "choose_file_help": "從磁碟選擇 Content Pack",
+    "title": "上傳 Content Pack"
+  },
+  "value_types": {
+    "boolean": "布林值",
+    "double": "雙精度浮點數",
+    "integer": "整數",
+    "string": "字串"
+  },
+  "version_item": {
+    "actions": "動作",
+    "create_from_revision": "從修訂版本建立新版本"
+  },
+  "versions": {
+    "action": "動作",
+    "revision": "修訂版本",
+    "select": "選取"
+  }
+}

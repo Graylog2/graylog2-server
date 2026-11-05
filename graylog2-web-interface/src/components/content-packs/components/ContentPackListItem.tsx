@@ -17,6 +17,7 @@
 
 import * as React from 'react';
 import { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button, Col, DropdownButton, MenuItem, Row, ButtonToolbar, DeleteMenuItem, Modal } from 'components/bootstrap';
 import { ModalSubmit, LinkContainer, Link } from 'components/common';
@@ -37,6 +38,7 @@ type Props = {
 };
 
 const ContentPackListItem = ({ pack, contentPackMetadata, onDeletePack, onInstall: onInstallProp }: Props) => {
+  const { t } = useTranslation('content_packs');
   const [showInstallModal, setShowInstallModal] = useState(false);
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const installRef = useRef(null);
@@ -45,7 +47,7 @@ const ContentPackListItem = ({ pack, contentPackMetadata, onDeletePack, onInstal
   const states = installed ? ['installed'] : [];
   const updateButton = states.includes('updatable') ? (
     <Button bsSize="small" bsStyle="primary">
-      Update
+      {t('list_item.update')}
     </Button>
   ) : (
     ''
@@ -74,7 +76,8 @@ const ContentPackListItem = ({ pack, contentPackMetadata, onDeletePack, onInstal
           <h3>
             <Link to={Routes.SYSTEM.CONTENTPACKS.show(pack.id)}>{pack.name}</Link>{' '}
             <small>
-              Latest Version: {pack.rev} <ContentPackStatus contentPackId={pack.id} states={states} />
+              {t('list_item.latest_version', { rev: pack.rev })}{' '}
+              <ContentPackStatus contentPackId={pack.id} states={states} />
             </small>
           </h3>
         </Col>
@@ -82,19 +85,23 @@ const ContentPackListItem = ({ pack, contentPackMetadata, onDeletePack, onInstal
           <ButtonToolbar className="pull-right">
             {updateButton}
             <Button bsSize="small" onClick={handleInstall}>
-              Install
+              {t('list_item.install')}
             </Button>
-            <DropdownButton id={`more-actions-${pack.id}`} title="More Actions" bsSize="small" pullRight>
+            <DropdownButton
+              id={`more-actions-${pack.id}`}
+              title={t('common:actions.more_actions')}
+              bsSize="small"
+              pullRight>
               <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.show(pack.id)}>
-                <MenuItem>Show</MenuItem>
+                <MenuItem>{t('list_item.show')}</MenuItem>
               </LinkContainer>
               <LinkContainer
                 to={Routes.SYSTEM.CONTENTPACKS.edit(encodeURIComponent(pack.id), encodeURIComponent(pack.rev))}>
-                <MenuItem>Create New Version</MenuItem>
+                <MenuItem>{t('list_item.create_new_version')}</MenuItem>
               </LinkContainer>
-              <MenuItem onSelect={handleDownload}>Download</MenuItem>
+              <MenuItem onSelect={handleDownload}>{t('download.download')}</MenuItem>
               <MenuItem divider />
-              <DeleteMenuItem onSelect={handleDeleteAllVersions}>Delete All Versions</DeleteMenuItem>
+              <DeleteMenuItem onSelect={handleDeleteAllVersions}>{t('list_item.delete_all_versions')}</DeleteMenuItem>
             </DropdownButton>
           </ButtonToolbar>
         </Col>
@@ -105,13 +112,17 @@ const ContentPackListItem = ({ pack, contentPackMetadata, onDeletePack, onInstal
       {showInstallModal && (
         <Modal show={showInstallModal} onHide={onCloseInstallModal} bsSize="large">
           <Modal.Header>
-            <Modal.Title>Install Content Pack</Modal.Title>
+            <Modal.Title>{t('list_item.install_title')}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <ContentPackInstall ref={installRef} contentPack={pack} onInstall={onInstallProp} />
           </Modal.Body>
           <Modal.Footer>
-            <ModalSubmit submitButtonText="Install" onSubmit={onInstall} onCancel={onCloseInstallModal} />
+            <ModalSubmit
+              submitButtonText={t('list_item.install')}
+              onSubmit={onInstall}
+              onCancel={onCloseInstallModal}
+            />
           </Modal.Footer>
         </Modal>
       )}

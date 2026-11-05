@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useParams from 'routing/useParams';
 import Routes from 'routing/Routes';
@@ -23,13 +24,16 @@ import { Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
 import { IndicesPageNavigation } from 'components/indices';
 import TemplateDetails from 'components/indices/IndexSetTemplates/TemplateDetails';
 import useTemplate from 'components/indices/IndexSetTemplates/hooks/useTemplate';
+import useTemplateText from 'components/indices/IndexSetTemplates/hooks/useTemplateText';
 
 const IndexSetTemplatePage = () => {
+  const { t } = useTranslation('indexsets');
   const { templateId } = useParams();
   const { data, isFetching, isSuccess, isError } = useTemplate(templateId);
+  const templateText = useTemplateText();
 
-  const title = !isFetching ? data.title : 'Index Set Template';
-  const description = !isFetching ? data.description : 'Viewing Index Set Template Details';
+  const title = !isFetching ? templateText(data, data.title) : t('pages.template_title');
+  const description = !isFetching ? templateText(data, data.description) : t('pages.template_view_description');
 
   return (
     <DocumentTitle title={title}>
@@ -41,12 +45,12 @@ const IndexSetTemplatePage = () => {
             {!isFetching && !data.built_in && (
               <IfPermitted permissions="indexset_templates:edit">
                 <LinkContainer to={Routes.SYSTEM.INDICES.TEMPLATES.edit(templateId)}>
-                  <Button bsStyle="primary">Edit</Button>
+                  <Button bsStyle="primary">{t('common:actions.edit')}</Button>
                 </LinkContainer>
               </IfPermitted>
             )}
             <LinkContainer to={Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW}>
-              <Button>Overview</Button>
+              <Button>{t('pages.template_overview')}</Button>
             </LinkContainer>
           </ButtonToolbar>
         }>
@@ -56,7 +60,7 @@ const IndexSetTemplatePage = () => {
         <Col md={12}>
           {isFetching && <Spinner />}
           {isSuccess && <TemplateDetails template={data} />}
-          {isError && <p>There was an error when loading the template.</p>}
+          {isError && <p>{t('pages.template_load_error')}</p>}
         </Col>
       </Row>
     </DocumentTitle>

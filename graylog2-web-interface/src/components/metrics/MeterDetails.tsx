@@ -16,35 +16,40 @@
  */
 import React from 'react';
 import numeral from 'numeral';
+import { useTranslation } from 'react-i18next';
 
 import type { MeterMetric } from 'types/metrics';
 
 type Props = {
   metric: MeterMetric;
 };
-const MeterDetails = ({ metric: { metric: meter } }: Props) => (
-  <dl className="metric-def metric-meter">
-    <dt>Total:</dt>
-    <dd>
-      <span className="number-format">{numeral(meter.rate.total).format('0,0')}</span> events
-    </dd>
-    <dt>Mean:</dt>
-    <dd>
-      <span className="number-format">{numeral(meter.rate.mean).format('0,0.[00]')}</span> {meter.rate_unit}
-    </dd>
-    <dt>1 minute avg:</dt>
-    <dd>
-      <span className="number-format">{numeral(meter.rate.one_minute).format('0,0.[00]')}</span> {meter.rate_unit}
-    </dd>
-    <dt>5 minute avg:</dt>
-    <dd>
-      <span className="number-format">{numeral(meter.rate.five_minute).format('0,0.[00]')}</span> {meter.rate_unit}
-    </dd>
-    <dt>15 minute avg:</dt>
-    <dd>
-      <span className="number-format">{numeral(meter.rate.fifteen_minute).format('0,0.[00]')}</span> {meter.rate_unit}
-    </dd>
-  </dl>
-);
+const MeterDetails = ({ metric: { metric: meter } }: Props) => {
+  const { t } = useTranslation('system');
+
+  return (
+    <dl className="metric-def metric-meter">
+      <dt>{t('meter_details.total')}</dt>
+      <dd>
+        <span className="number-format">{numeral(meter.rate.total).format('0,0')}</span> {t('meter_details.events')}
+      </dd>
+      <dt>{t('metric_details.mean')}</dt>
+      <dd>
+        <span className="number-format">{numeral(meter.rate.mean).format('0,0.[00]')}</span> {meter.rate_unit}
+      </dd>
+      <dt>{t('meter_details.one_minute_avg')}</dt>
+      <dd>
+        <span className="number-format">{numeral(meter.rate.one_minute).format('0,0.[00]')}</span> {meter.rate_unit}
+      </dd>
+      <dt>{t('meter_details.five_minute_avg')}</dt>
+      <dd>
+        <span className="number-format">{numeral(meter.rate.five_minute).format('0,0.[00]')}</span> {meter.rate_unit}
+      </dd>
+      <dt>{t('meter_details.fifteen_minute_avg')}</dt>
+      <dd>
+        <span className="number-format">{numeral(meter.rate.fifteen_minute).format('0,0.[00]')}</span> {meter.rate_unit}
+      </dd>
+    </dl>
+  );
+};
 
 export default MeterDetails;

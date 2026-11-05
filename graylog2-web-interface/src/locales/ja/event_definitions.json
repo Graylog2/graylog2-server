@@ -1,0 +1,526 @@
+{
+  "add_notification_form": {
+    "add": "通知を追加",
+    "choose": "通知を選択",
+    "create_new": "新しい通知を作成...",
+    "help": "このアラートの種類で使用する通知を選択するか、後で他のアラートでも使用できる新しい通知を作成します。",
+    "select": "通知を選択",
+    "title": "通知を追加"
+  },
+  "aggregation_form": {
+    "description": "上で定義したフィルターに一致するログメッセージを、関数を使って集計します。必要に応じて、フィルター結果を同一のフィールド値でグループ化できます。",
+    "group_by_example": "ネットワーク内のすべてのログイン失敗を対象とするフィルターを作成したとします。全体でログイン失敗が5回を超えた場合にアラートをトリガーするには、<code>username</code> をグループ化フィールドとして追加します。すると、<em>各 <code>username</code></em> について、ログイン失敗が5回を超えるとアラートがトリガーされます。",
+    "group_by_help": "同一の値を持つ場合にフィルター結果をグループ化するフィールドを選択します。<bold>例:</bold>",
+    "title": "集計"
+  },
+  "bulk_actions": {
+    "delete": {
+      "confirm_other": "{{count}} 件の Event Definition を削除してもよろしいですか？",
+      "error": "イベント定義の削除中にエラーが発生しました。{{error}}",
+      "failed_other": "選択された Event Definition {{count}} 件のうち {{failed}} 件を削除できませんでした。",
+      "success_other": "{{count}} 件の Event Definition を正常に削除しました。",
+      "title": "イベント定義を削除"
+    },
+    "disable": {
+      "confirm_other": "{{count}} 件の Event Definition を無効化してもよろしいですか？",
+      "error": "イベント定義の無効化中にエラーが発生しました。{{error}}",
+      "failed_other": "選択された Event Definition {{count}} 件のうち {{failed}} 件を無効化できませんでした。",
+      "success_other": "{{count}} 件の Event Definition を正常に無効化しました。",
+      "title": "イベント定義を無効化"
+    },
+    "disable_action": "無効化",
+    "enable": {
+      "confirm_other": "{{count}} 件の Event Definition を有効化してもよろしいですか？",
+      "error": "イベント定義の有効化中にエラーが発生しました。{{error}}",
+      "failed_other": "選択された Event Definition {{count}} 件のうち {{failed}} 件を有効化できませんでした。",
+      "success_other": "{{count}} 件の Event Definition を正常に有効化しました。",
+      "title": "イベント定義を有効化"
+    },
+    "enable_action": "有効化",
+    "success_title": "成功"
+  },
+  "condition_form": {
+    "available_conditions": "利用可能な条件",
+    "condition_type": "条件の種類",
+    "condition_type_help": "このイベントの条件の種類を選択します。",
+    "description": "この種類のイベントがどのように作成されるかを定義します。後で、それらのイベントを他の条件の入力として使用でき、他の条件に基づく強力な条件を作成できます。",
+    "no_description": "説明はありません。",
+    "not_editable": "このイベント定義の種類の条件は編集できません。",
+    "select_condition_type": "条件の種類を選択",
+    "title": "イベント条件"
+  },
+  "condition_summary": {
+    "and": "AND",
+    "create_events": "定義のイベントを作成",
+    "errors_found": "エラーが見つかりました",
+    "hide_errors": "エラーを非表示",
+    "invalid": "条件が無効です",
+    "no_condition": "条件が設定されていません",
+    "no_series": "系列が選択されていません",
+    "or": "OR",
+    "preview": "プレビュー:",
+    "show_errors": "エラーを表示",
+    "title": "条件の概要",
+    "valid": "条件は有効です"
+  },
+  "conditions": {
+    "add_expression": "式を追加",
+    "add_group": "グループを追加",
+    "all": "すべて",
+    "any": "いずれか",
+    "boolean_operator": "ブール演算子",
+    "boolean_operator_group": "ブール演算子グループ {{level}}",
+    "delete_expression": "式を削除",
+    "global_boolean_operator": "全体のブール演算子",
+    "if": "条件",
+    "is": "次と一致",
+    "messages_must_meet": "メッセージは次のルールの",
+    "of_the_following_rules": "に一致する必要があります:",
+    "select_condition": "条件を選択",
+    "select_field": "フィールドを選択（任意）",
+    "select_function": "関数を選択",
+    "select_percentile": "パーセンタイルを選択",
+    "select_strategy": "戦略を選択（任意）",
+    "threshold": "しきい値"
+  },
+  "definition_summary": {
+    "details": "詳細",
+    "no_description": "説明がありません",
+    "no_tags": "タグなし",
+    "no_title": "タイトルがありません",
+    "title": "イベントの概要"
+  },
+  "details_form": {
+    "add_event_procedure": "イベント手順を追加",
+    "description": "説明",
+    "description_help": "このイベント定義の詳細な説明です。",
+    "no_event_procedures": "このイベント定義にはまだイベント手順がありません。",
+    "no_remediation_steps": "是正手順がありません",
+    "optional": "（任意）",
+    "priority": "優先度",
+    "priority_help": "この定義から作成されるイベントの優先度を選択します。",
+    "remediation_steps": "是正手順",
+    "remediation_steps_help": "このイベントを是正する手順です。Markdown 形式がサポートされています。",
+    "summary_template": "イベントの概要テンプレート",
+    "summary_template_help": "イベントとアラートの概要を生成するために使用されるテンプレートです。",
+    "title": "イベントの詳細",
+    "title_help": "このイベント定義のタイトルです。",
+    "title_label": "タイトル"
+  },
+  "event_key_help": {
+    "event_count": "<bold>フィルターと集計</bold>の定義で作成されるイベントの数を制御するには、「集計結果がしきい値に達した場合に定義のイベントを作成」を使用し、グループ化フィールドを設定します。",
+    "example": "<bold>例:</bold> 2つの定義、<em>ログイン失敗</em>と<em>権限昇格</em>があり、どちらもイベントキーは <code>username</code> です。両方のイベントが同じユーザー名を持つ場合にのみ、2つの相関が発生します。",
+    "intro": "イベントキーは、値が結合されてイベントのキーになるカスタムフィールドです（値は <code>|</code> で結合されます）。キーは、イベントが対象とするエンティティを識別します。作成されるイベントの数は変わりません。",
+    "where_it_matters": "<bold>キーが重要になる場合:</bold> <bold>イベント相関</bold>は、同じキーを共有するソースイベントとのみ一致し、検索期間内でキーごとに最大1つのイベントを作成します。キーは、相関そのものではなく、相関させたいイベント定義に設定してください。"
+  },
+  "expanded_notifications": {
+    "description": "このイベント定義がトリガーされたときに送信される通知です。",
+    "loading": "通知を読み込み中...",
+    "missing_permissions": "次の通知権限がありません:",
+    "missing_permission_title": "権限がありません"
+  },
+  "field_form": {
+    "add": "カスタムフィールドを追加",
+    "data_type": "フィールドのデータ型",
+    "data_type_string": "文字列",
+    "key_help": "このフィールドをキーにするかどうか、およびその順序を示します。",
+    "more_about_keys": "イベントキーの詳細",
+    "name": "名前",
+    "name_help": "このフィールドの名前です。",
+    "provider_unavailable": "選択されたプロバイダーは利用できません。",
+    "select_value_source": "値のソースを選択",
+    "set_value_from": "値の取得元",
+    "title_edit": "カスタムフィールド \"{{fieldName}}\"",
+    "title_new": "新しいカスタムフィールド",
+    "update": "カスタムフィールドを更新",
+    "use_as_key": "フィールドをイベントキーとして使用",
+    "value_source_help": "このフィールドの値のソースを選択します。"
+  },
+  "field_value_providers": {
+    "lookup_table": {
+      "title": "ルックアップテーブル"
+    },
+    "template": {
+      "title": "テンプレート"
+    }
+  },
+  "fields_form": {
+    "description": "カスタムフィールドを追加して、このイベント定義から生成されるイベントに追加情報を含めます。これにより、イベントの検索や、通知を受け取る際のコンテキストの把握に役立ちます。",
+    "errors_description": "このイベント定義を保存する前に、次のエラーを修正してください:",
+    "errors_title": "エラーのあるフィールド",
+    "event_fields": "イベントフィールド",
+    "no_keys": "キーはまだ設定されていません。",
+    "not_editable": "このイベント定義の種類のイベントフィールドは編集できません。",
+    "optional": "（任意）",
+    "tags": "タグ",
+    "tags_description": "このイベント定義にラベルを付けます。タグは生成されるすべてのイベントに引き継がれ、アラートとイベントの一覧でのフィルタリングやグループ化を容易にします。"
+  },
+  "fields_list": {
+    "configuration": "設定",
+    "data_type": "データ型",
+    "field_name": "フィールド名",
+    "is_key": "キーですか？",
+    "no": "いいえ",
+    "no_fields": "このイベントにはまだカスタムフィールドがありません。",
+    "remove": "フィールドを削除",
+    "value_source": "値のソース",
+    "yes": "はい"
+  },
+  "filter_aggregation_form": {
+    "aggregation_reaches_threshold": "集計結果がしきい値に達する",
+    "create_events_if": "次の場合に定義のイベントを作成:",
+    "event_limit": "イベントの上限",
+    "event_limit_help": "このイベント定義の実行ごとに作成されるイベントの最大数です。上限を超えたイベントは抑制されます。",
+    "filter_has_results": "フィルターに結果がある"
+  },
+  "filter_form": {
+    "cron_expression": "Cron 式",
+    "cron_expression_help": "イベントを実行するタイミングを決定する Quartz Cron 式です。",
+    "cron_time_zone": "Cron タイムゾーン",
+    "declare_missing_parameters": "上のボタンをクリックして、不足しているクエリパラメーターを宣言してください。",
+    "description": "このイベント定義に関連するログメッセージをフィルタリングするための情報を追加します。",
+    "enable": "有効化",
+    "enable_help": "このイベント定義を自動的に実行しますか？",
+    "execute_every": "検索を次の間隔で実行",
+    "lookup_table_permission_missing": "このアカウントには、ルックアップテーブルからクエリパラメーターを宣言する権限がありません。",
+    "optional": "（任意）",
+    "query_parameters": "クエリパラメーター",
+    "search_filters": "検索フィルター",
+    "search_query": "検索クエリ",
+    "search_query_help": "メッセージが一致する必要がある検索クエリです。検索ページと同じ構文を使用できます。<code>{{syntax}}</code> 構文を使用して、ルックアップテーブルからクエリパラメーターを宣言することも含まれます。",
+    "search_within": "次の期間内を検索",
+    "streams_and_categories": "ストリームとカテゴリ",
+    "streams_help": "検索に含めるストリームを選択します。",
+    "title": "フィルター",
+    "use_cron": "Cron スケジュールを使用",
+    "use_cron_help": "Quartz Cron 式でこのイベントをスケジュールします",
+    "warm_tier_title": "Warm Tier の警告",
+    "warm_tier_warning": "選択した期間には Warm Tier に保存されたデータが含まれます。Warm Tier から頻繁にデータを取得する必要があるイベントは、パフォーマンスの問題を引き起こす可能性があります。<strong>次の期間内を検索</strong>に、次の期間を超える値を指定すると、Warm Tier の対象になります: <timestamp></timestamp>。"
+  },
+  "filter_preview": {
+    "help_aggregation": "集計結果が条件を満たすたびに1つのイベント",
+    "help_aggregation_groups": "集計結果が条件を満たすグループごとに1つのイベント",
+    "help_aggregation_groups_label": "グループありの集計:",
+    "help_aggregation_label": "グループなしの集計:",
+    "help_description": "フィルターと集計の条件は、設定内容に応じて作成されるイベントの数が異なります:",
+    "help_filter": "フィルターに一致するメッセージごとに1つのイベント",
+    "help_filter_label": "フィルター:",
+    "help_title": "フィルターと集計によって作成されるイベントの数は？",
+    "loading": "フィルターのプレビューを読み込み中...",
+    "message": "メッセージ",
+    "no_messages": "現在の検索条件に一致するメッセージが見つかりませんでした。",
+    "no_streams_access": "フィルターをプレビューできません。ユーザーはどのストリームにもアクセスできません。",
+    "timestamp": "タイムスタンプ",
+    "title": "フィルターのプレビュー"
+  },
+  "form_container": {
+    "aggregation_condition_invalid": "集計条件が無効です",
+    "loading": "イベント情報を読み込み中...",
+    "query_parameters_undeclared": "クエリパラメーターを宣言する必要があります"
+  },
+  "form_controls": {
+    "create": "イベント定義を作成",
+    "creating": "作成中...",
+    "previous": "前へ",
+    "update": "イベント定義を更新",
+    "updating": "更新中..."
+  },
+  "hook_notifications": {
+    "clear_queue_failed": "キューに入っている通知の消去に失敗しました。ステータス: {{error}}",
+    "clear_queue_failed_title": "キューに入っている通知を消去できませんでした",
+    "clear_queue_success": "キューに入っている通知を正常に消去しました。",
+    "clear_queue_success_title": "キューに入っている通知を消去しました。",
+    "cluster_config_failed": "イベント定義一覧のイベントのクラスター設定の読み込みに失敗しました。ステータス:",
+    "cluster_config_failed_title": "イベント定義一覧のイベントのクラスター設定を読み込めませんでした",
+    "create_failed": "イベント定義 \"{{title}}\" の作成に失敗しました。ステータス: {{error}}",
+    "create_failed_title": "イベント定義を保存できませんでした",
+    "create_success": "イベント定義 \"{{title}}\" を正常に作成しました。",
+    "create_success_title": "イベント定義を正常に作成しました",
+    "disable_failed": "イベント定義 \"{{title}}\" の無効化に失敗しました。ステータス: {{error}}",
+    "disable_failed_title": "イベント定義を無効化できませんでした",
+    "disable_success": "イベント定義 \"{{title}}\" を正常に無効化しました。",
+    "disable_success_title": "イベント定義を正常に無効化しました",
+    "duplicate_failed": "イベント定義 \"{{title}}\" の複製に失敗しました。ステータス: {{error}}",
+    "duplicate_failed_title": "イベント定義を複製できませんでした",
+    "duplicate_success": "イベント定義 \"{{title}}\" を正常に作成しました。",
+    "duplicate_success_title": "イベント定義を正常に複製しました",
+    "enable_failed": "イベント定義 \"{{title}}\" の有効化に失敗しました。ステータス: {{error}}",
+    "enable_failed_title": "イベント定義を有効化できませんでした",
+    "enable_success": "イベント定義 \"{{title}}\" を正常に有効化しました。",
+    "enable_success_title": "イベント定義を正常に有効化しました",
+    "entity_types_failed": "イベント定義のエンティティ種類の読み込みに失敗しました。ステータス:",
+    "entity_types_failed_title": "イベント定義のエンティティ種類を読み込めませんでした",
+    "load_failed_title": "イベント定義を読み込めませんでした",
+    "load_list_failed": "イベント定義の読み込みに失敗しました。ステータス:",
+    "load_one_failed": "イベント定義の読み込みに失敗しました。ステータス:",
+    "not_found": "ID <{{id}}> のイベント定義が見つかりません。削除されていないかご確認ください。",
+    "not_found_title": "イベント定義を取得できませんでした",
+    "save_failed": "EventDefinition の保存に失敗しました。ステータス: {{error}}",
+    "save_failed_title": "EventDefinition を保存できませんでした",
+    "update_failed": "イベント定義 \"{{title}}\" の更新に失敗しました。ステータス: {{error}}",
+    "update_failed_title": "イベント定義を更新できませんでした",
+    "update_success": "イベント定義 \"{{title}}\" を正常に更新しました。",
+    "update_success_title": "イベント定義を正常に更新しました"
+  },
+  "notification_list": {
+    "no_notifications": "このイベントは、まだ通知をトリガーするように設定されていません。",
+    "not_found": "通知 <em>{{title}}</em> の情報が見つかりませんでした",
+    "notification": "通知",
+    "type": "種類"
+  },
+  "notification_settings": {
+    "grace_period": "猶予期間",
+    "grace_period_help": "アラートの通知は、発生するたびに送信されます。猶予期間を設定すると、次の通知を送信するまでの待機時間を制御できます。キーを持つイベントは、キーの値ごとに個別の猶予期間が適用されることに注意してください。",
+    "message_backlog": "メッセージの保留分",
+    "message_backlog_help": "通知に含めるメッセージの数です。",
+    "toggle_message_backlog": "メッセージの保留分を切り替え"
+  },
+  "notifications_form": {
+    "description": "このイベントは、確認が必要なほど重要ですか？通知を追加してアラートにしてください。",
+    "manage": "通知を管理"
+  },
+  "overview": {
+    "human_name": "イベント定義",
+    "user_defined": "ユーザー定義"
+  },
+  "page": {
+    "alerts_docs": "アラートのドキュメント",
+    "copy_confirm": "\"{{title}}\" のコピーを作成してもよろしいですか？",
+    "copy_title": "イベント定義をコピー",
+    "create_multiple": "イベント定義を作成",
+    "description_alerts": "イベント定義を使用すると、さまざまな条件からアラートを作成し、それらに対してアラートを発行できます。",
+    "description_events": "イベント定義を使用すると、さまざまな条件からイベントを作成し、それらに対してアラートを発行できます。",
+    "description_list": "さまざまな条件を検索し、それらに対してアラートを発行できる新しいイベント定義を作成します。",
+    "duplicate": "イベント定義を複製",
+    "edit": "イベント定義を編集",
+    "edit_named": "イベント定義 \"{{title}}\" を編集",
+    "file_import": "イベント定義を作成 - ファイルからインポート",
+    "git_import": "イベント定義を作成 - Git からインポート",
+    "loading": "イベント定義を読み込み中...",
+    "new": "新しいイベント定義",
+    "new_named": "新しいイベント定義 \"{{title}}\"",
+    "title": "イベント定義",
+    "view": "イベント定義を表示",
+    "view_named": "イベント定義 \"{{title}}\" を表示"
+  },
+  "priorities": {
+    "critical": "重大",
+    "high": "高",
+    "info": "情報",
+    "low": "低",
+    "medium": "中"
+  },
+  "provider_summary": {
+    "less_details": "詳細を縮小",
+    "lookup_table_key_field": "ルックアップテーブルのキーフィールド",
+    "more_details": "詳細を表示",
+    "validate_template_values": "すべてのテンプレートの値が設定されていることを検証",
+    "value_source": "値のソース"
+  },
+  "query_parameter_modal": {
+    "save": "保存",
+    "title": "クエリパラメーター \"{{name}}\" を宣言",
+    "type": "種類",
+    "types": {
+      "lookup_table": "ルックアップテーブル"
+    },
+    "undeclared": ": 未宣言"
+  },
+  "replay_search": {
+    "attributes": {
+      "description": "説明",
+      "edited_after_event": "このイベントの発生後に、イベント定義 <definitionTitle>{{title}}</definitionTitle> が編集されました。一部の集計ウィジェットは、このイベントを正確に表していない可能性があります。",
+      "event_definition": "イベント定義",
+      "execute_every": "検索を次の間隔で実行",
+      "notifications": "通知",
+      "priority": "優先度",
+      "search_within": "次の期間内を検索",
+      "timestamp": "タイムスタンプ",
+      "updated_at": "イベント定義の更新日時"
+    },
+    "not_provided": "未指定",
+    "replay_link": "検索を再生"
+  },
+  "row_actions": {
+    "delete_confirm": "\"{{title}}\" を削除してもよろしいですか？",
+    "delete_failed": "イベント定義 \"{{title}}\" の削除に失敗しました。ステータス: {{status}}",
+    "delete_failed_title": "イベント定義を削除できませんでした",
+    "delete_success": "イベント定義 \"{{title}}\" を正常に削除しました。",
+    "delete_success_title": "イベント定義を正常に削除しました",
+    "delete_title": "イベント定義を削除",
+    "disable": "無効化",
+    "disable_confirm": "\"{{title}}\" を無効化してもよろしいですか？",
+    "disable_title": "イベント定義を無効化",
+    "duplicate": "複製",
+    "edit": "編集",
+    "enable": "有効化",
+    "enable_confirm": "\"{{title}}\" を有効化してもよろしいですか？",
+    "enable_title": "イベント定義を有効化",
+    "entity_type_title": "イベント定義",
+    "share_description": "このイベント定義の共同編集者として追加するユーザーまたはチームを検索します。",
+    "system_cannot_be_deleted": "システムのイベント定義は削除できません",
+    "system_cannot_be_disabled": "システムのイベント定義は無効化できません"
+  },
+  "scheduling": {
+    "clear": "消去",
+    "clear_confirm": "\"{{title}}\" のキューに入っている通知を消去してもよろしいですか？",
+    "details": "{{title}} の詳細。",
+    "every": "{{duration}} ごと",
+    "last_execution": "前回の実行:",
+    "next_execution": "次回の実行:",
+    "next_time_range": "次の期間:",
+    "not_scheduled": "スケジュールされていません。",
+    "queued_notifications": "キューに入っている通知:",
+    "runs": "{{schedule}} に実行されます。",
+    "runs_searching_within": "{{schedule}} に実行され、直近 {{duration}} 以内を検索します。",
+    "status": "ステータス:"
+  },
+  "share": {
+    "collaborators": "共同編集者",
+    "description": "このイベント定義の共同編集者として追加するユーザーまたはチームを検索します。",
+    "no_collaborators": "このイベント定義には共同編集者がいません。"
+  },
+  "sidebar": {
+    "details_title": "定義の詳細"
+  },
+  "status_cell": {
+    "disable": "無効化",
+    "disable_confirm": "イベント定義 '{{title}}' を本当に無効化しますか？",
+    "disable_title": "イベント定義を無効化",
+    "disabled": "無効",
+    "enable": "有効化",
+    "enabled": "有効"
+  },
+  "steps": {
+    "additional_details": "追加の詳細",
+    "condition": "条件",
+    "notifications": "通知",
+    "share": "共有",
+    "summary": "概要"
+  },
+  "summary": {
+    "actions": "アクション",
+    "condition_invalid": "条件が無効です: {{errors}}",
+    "condition_types": {
+      "aggregation": "集計",
+      "filter": "フィルター"
+    },
+    "create_events_if": "次の場合にイベントを作成",
+    "cron_description": "Cron の説明",
+    "cron_expression": "Cron 式",
+    "enable_scheduling": "スケジュールを有効化",
+    "event_limit": "イベントの上限",
+    "execute_every": "検索を次の間隔で実行",
+    "group_by": "グループ化フィールド",
+    "missing_stream_permissions": "次のストリームの権限がありません:",
+    "no": "いいえ",
+    "no_cron_expression": "エラー: Cron 式が指定されていません！",
+    "no_filters": "フィルターが設定されていません",
+    "no_group_by": "グループ化が設定されていません",
+    "no_streams": "ストリームが選択されていないため、すべてのストリームを検索します",
+    "search_filters": "検索フィルター",
+    "search_query": "検索クエリ",
+    "search_within": "次の期間内を検索",
+    "stream_categories": "ストリームカテゴリ",
+    "streams": "ストリーム",
+    "time_zone": "タイムゾーン",
+    "type": "種類",
+    "undeclared_parameters": "未宣言のクエリパラメーターがあります: {{parameters}}",
+    "use_cron": "Cron スケジュールを使用",
+    "yes": "はい"
+  },
+  "summary_renders": {
+    "backlog_included_other": "通知には {{count}} 件のメッセージが含まれます",
+    "backlog_none": "通知にはメッセージが含まれません。",
+    "condition_plugin_no_summary": "条件プラグイン <em>{{type}}</em> は概要を提供していません。",
+    "event_procedure_summary": "イベント手順の概要",
+    "event_procedure_summary_unavailable": "イベント手順の概要コンポーネントは利用できません。",
+    "fields": "フィールド",
+    "grace_period_disabled": "猶予期間は無効です",
+    "grace_period_set": "猶予期間は {{duration}} に設定されています",
+    "keys": "キー",
+    "missing_notification_permissions": "次の通知権限がありません:",
+    "no_event_procedures": "このイベントにはイベント手順がありません。",
+    "no_field_value_provider": "フィールド値プロバイダーが設定されていません。",
+    "no_fields": "この定義に基づくイベントには、フィールドが設定されていません。",
+    "no_keys": "この定義に基づくイベントには、キーが設定されていません。",
+    "no_notifications": "このイベントは、通知をトリガーするように設定されていません。",
+    "no_remediation_steps": "是正手順がありません",
+    "notification_not_found": "通知 <em>{{id}}</em> の情報が見つかりませんでした。",
+    "notification_plugin_no_summary": "通知プラグイン <em>{{type}}</em> は概要を提供していません。",
+    "notifications": "通知",
+    "provider_plugin_no_summary": "プロバイダープラグイン <em>{{type}}</em> は概要を提供していません。",
+    "remediation_steps": "是正手順",
+    "settings": "設定"
+  },
+  "summary_template_help": {
+    "aggregation_events": "集計イベント: グループ化の値と集計結果。",
+    "aggregation_example": "ユーザーごとのログイン失敗回数の集計:",
+    "aggregation_example_template": "<userVariable></userVariable> が <countVariable></countVariable> 回ログインに失敗しました",
+    "button_aria_label": "イベントの概要テンプレートのヘルプを表示",
+    "button_title": "概要テンプレートのヘルプ",
+    "custom_fields": "カスタムフィールド",
+    "custom_fields_description": "イベント定義で定義されたカスタムフィールドは、<code>fields</code> の下で利用できます。",
+    "event_definition_variables": "イベント定義の変数",
+    "examples": "例",
+    "filter_events": "フィルターイベント: 元のログメッセージのフィールド。",
+    "filter_example": "特定のログメッセージでフィルタリング:",
+    "filter_example_template": "<hostVariable></hostVariable> でエラー: <messageVariable></messageVariable>",
+    "group_by_field": "（グループ化フィールド）",
+    "hostname": "（ホスト名）",
+    "intro": "テンプレートを使用すると、イベントの作成時にアラートとイベントのページに表示される説明をカスタマイズできます。テンプレートでは <jmteLink>JMTE</jmteLink> の置換を使用します。変数は <variable></variable> で囲みます。",
+    "source_context": "ソースのコンテキスト",
+    "source_context_description": "<code>source</code> 変数には、トリガーとなったデータのコンテキストが含まれます。その内容はイベント定義の種類によって異なります:",
+    "title": "イベントの概要テンプレート"
+  },
+  "tags_editor": {
+    "aria_label": "イベント定義のタグ",
+    "duplicate": "タグ \"{{tag}}\" はすでに追加されています。",
+    "help": "Enter キーまたは Tab キーを押して追加します。タグは小文字に変換され、重複は除外されます。使用できるのは、小文字の英字、数字、ハイフン、アンダースコア、ドットのみです。",
+    "invalid_characters_other": "タグ {{tags}} に無効な文字が含まれています。使用できるのは、小文字の英字、数字、ハイフン、アンダースコア、ドットのみです。",
+    "max_reached": "タグの上限 {{max}} 個に達しました。",
+    "placeholder": "例: authentication, brute-force, compliance",
+    "too_long_other": "タグ {{tags}} が最大文字数 {{max}} を超えています。"
+  },
+  "template_preview": {
+    "aggregation": "グループ化で設定されたフィールド（元の名前のまま）",
+    "aggregation_label": "集計:",
+    "available_fields": "テンプレートで利用できるフィールドは、イベントを作成した条件によって異なります:",
+    "correlation": "最後に一致した否定されていないイベントのすべてのフィールド",
+    "correlation_label": "相関:",
+    "description": "作成されるイベントに動的な値を追加できます。イベントのコンテキストのフィールドには <code>{{syntax}}</code> でアクセスできます。",
+    "filter": "元のログメッセージのすべてのフィールド",
+    "filter_label": "フィルター:",
+    "title": "テンプレートで利用できるフィールド"
+  },
+  "template_provider_form": {
+    "exclude_empty_fields": "空のフィールドを除外",
+    "exclude_empty_fields_help": "テンプレートが空の値を出力した場合に、フィールドをイベントから完全に除外するにはこのオプションをオンにします。オフの場合、フィールドは空の値とともにイベントに追加されます。すべてのテンプレートの値が必須の場合は、常にオンになります。",
+    "require_values": "すべてのテンプレートの値の設定を必須にする",
+    "require_values_help": "テンプレートで使用されるすべての変数に値があるかどうかを検証するには、このオプションをオンにします。",
+    "template": "テンプレート",
+    "template_help": "このフィールドに設定する固定テキストを入力するか、<jmteLink>JMTE 構文</jmteLink>を使用して動的な値を追加します。"
+  },
+  "types": {
+    "aggregation": {
+      "description": "ログメッセージをフィルタリングし、（任意で）結果を集計して指定の条件に一致させることで、イベントを作成します。これらのイベントは、相関ルールの入力として使用できます。",
+      "title": "フィルターと集計"
+    },
+    "system": {
+      "description": "{{productName}} がシステム通知をイベントとして報告するために使用する組み込みのイベント定義です。",
+      "title": "システムのイベント定義"
+    }
+  },
+  "validation": {
+    "cannot_be_empty": "空にすることはできません",
+    "field_cannot_be_empty": "フィールドを空にすることはできません。",
+    "field_positive_number": "フィールドには正の数を入力する必要があります。"
+  },
+  "validation_summary": {
+    "title": "いくつかのエラーが見つかりました。"
+  },
+  "use_event_definition_notifications": {
+    "load_failed": "イベント定義の読み込みに失敗しました。ステータス: {{error}}",
+    "load_failed_title": "Event Definition を読み込めませんでした"
+  }
+}

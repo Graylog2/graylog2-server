@@ -16,6 +16,7 @@
  */
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
+import i18n from 'i18n';
 import Routes from 'routing/Routes';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import AppConfig from 'util/AppConfig';
@@ -29,17 +30,29 @@ const bindings: PluginExports = AppConfig.isFeatureEnabled('collectors')
       pageNavigation: [
         {
           description: PAGE_NAV_TITLE,
+          titleKey: 'navigation:system.collectors',
           children: [
-            { description: 'Overview', path: Routes.SYSTEM.COLLECTORS.OVERVIEW, exactPathMatch: true },
-            { description: 'Fleets', path: Routes.SYSTEM.COLLECTORS.FLEETS },
-            { description: 'Instances', path: Routes.SYSTEM.COLLECTORS.INSTANCES },
+            {
+              description: 'Overview',
+              titleKey: 'collectors:navigation.overview',
+              path: Routes.SYSTEM.COLLECTORS.OVERVIEW,
+              exactPathMatch: true,
+            },
+            { description: 'Fleets', titleKey: 'collectors:navigation.fleets', path: Routes.SYSTEM.COLLECTORS.FLEETS },
+            {
+              description: 'Instances',
+              titleKey: 'collectors:navigation.instances',
+              path: Routes.SYSTEM.COLLECTORS.INSTANCES,
+            },
             {
               description: 'Deployment',
+              titleKey: 'collectors:navigation.deployment',
               path: Routes.SYSTEM.COLLECTORS.DEPLOYMENT,
               useCondition: useCanAccessDeployment,
             },
             {
               description: 'Settings',
+              titleKey: 'collectors:navigation.settings',
               path: Routes.SYSTEM.COLLECTORS.SETTINGS,
               permissions: [COLLECTOR_PERMISSIONS.CONFIGURATION_READ],
             },
@@ -49,7 +62,10 @@ const bindings: PluginExports = AppConfig.isFeatureEnabled('collectors')
       entityCreators: [
         {
           id: 'Fleet',
-          title: 'Create fleet',
+          // Read lazily, so the title is translated when it is displayed and not when the module loads.
+      get title() {
+        return i18n.t('entity_creators.fleet', { ns: 'common' });
+      },
           path: Routes.SYSTEM.COLLECTORS.FLEETS_NEW,
           telemetryEvent: {
             type: TELEMETRY_EVENT_TYPE.COLLECTORS.FLEET.CREATE_OPENED,

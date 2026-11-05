@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -60,6 +61,7 @@ type Props = {
 };
 
 const DateFilter = ({ values: valuesProps, onChange }: Props) => {
+  const { t } = useTranslation('widgets');
   const [currentDate, setCurrentDate] = useState<string>(null);
   const [dateRange, setDateRange] = useState<boolean>(false);
 
@@ -105,17 +107,17 @@ const DateFilter = ({ values: valuesProps, onChange }: Props) => {
   return (
     <Column>
       <Row>
-        <span>Single Date</span>
+        <span>{t('date_filter.single_date')}</span>
         <Switch
           checked={dateRange}
-          aria-label={`Select type ${dateRange ? 'single date' : 'range'}`}
+          aria-label={dateRange ? t('date_filter.select_single_date') : t('date_filter.select_range')}
           onChange={toggleDateRange}
         />
-        <span>Range</span>
+        <span>{t('date_filter.range')}</span>
       </Row>
       {values.length > 0 && (
         <DateRow>
-          {values.join(' to ')}
+          {values.length === 2 ? t('date_filter.date_range', { from: values[0], to: values[1] }) : values.join(', ')}
           <ClearDate data-testid="clear-date" name="close" size="xs" onClick={() => onChange([])} />
         </DateRow>
       )}

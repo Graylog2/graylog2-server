@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import ThrottlingCheckbox from 'integrations/components/ThrottlingCheckbox';
 import { Input } from 'components/bootstrap';
@@ -30,6 +31,7 @@ type FormAdvancedOptionsProps = {
 };
 
 const FormAdvancedOptions = ({ onChange, handleSqsMessageBatchSizeChange }: FormAdvancedOptionsProps) => {
+  const { t } = useTranslation('integrations');
   const { formData } = useContext(FormDataContext);
   const { isAdvancedOptionsVisible, setAdvancedOptionsVisibility } = useContext(AdvancedOptionsContext);
 
@@ -46,12 +48,15 @@ const FormAdvancedOptions = ({ onChange, handleSqsMessageBatchSizeChange }: Form
     if (value >= 1 && value <= 10) {
       handleSqsMessageBatchSizeChange('');
     } else {
-      handleSqsMessageBatchSizeChange('Please select SQS Message Batch Size between 1 - 10.');
+      handleSqsMessageBatchSizeChange(t('aws_cloudtrail_advanced_options.sqs_batch_size_error'));
     }
   };
 
   return (
-    <AdditionalFields title="Advanced Options" visible={isAdvancedOptionsVisible} onToggle={handleToggle}>
+    <AdditionalFields
+      title={t('aws_cloudtrail_advanced_options.title')}
+      visible={isAdvancedOptionsVisible}
+      onToggle={handleToggle}>
       <ThrottlingCheckbox
         id="awsCloudTrailThrottleEnabled"
         defaultChecked={awsCloudTrailThrottleEnabled?.value}
@@ -63,8 +68,8 @@ const FormAdvancedOptions = ({ onChange, handleSqsMessageBatchSizeChange }: Form
         type="text"
         value={overrideSource?.value}
         onChange={onChange}
-        label="Override Source (optional)"
-        help="The source is set to aws-cloudtrail by default. If desired, you may override it with a custom value."
+        label={t('aws_cloudtrail_advanced_options.override_source_label')}
+        help={t('aws_cloudtrail_advanced_options.override_source_help')}
       />
 
       <Input
@@ -73,8 +78,8 @@ const FormAdvancedOptions = ({ onChange, handleSqsMessageBatchSizeChange }: Form
         min="1"
         value={sqsMessageBatchSize?.value}
         onChange={internalHandleSqsBatchSizeChange}
-        label="SQS Message Batch Size"
-        help="The maximum number of messages to query from SQS at a time. The maximum acceptable value is 10."
+        label={t('aws_cloudtrail_advanced_options.sqs_batch_size_label')}
+        help={t('aws_cloudtrail_advanced_options.sqs_batch_size_help')}
       />
 
       <Input
@@ -82,8 +87,8 @@ const FormAdvancedOptions = ({ onChange, handleSqsMessageBatchSizeChange }: Form
         type="checkbox"
         checked={includeFullMessageJson?.value}
         onChange={onChange}
-        label="Include full_message_json?"
-        help="Store the complete CloudTrail event as JSON in the full_message_json field?"
+        label={t('aws_cloudtrail_advanced_options.include_full_message_json_label')}
+        help={t('aws_cloudtrail_advanced_options.include_full_message_json_help')}
       />
     </AdditionalFields>
   );

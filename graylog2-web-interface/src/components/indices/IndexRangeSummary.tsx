@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import RelativeTime from 'components/common/RelativeTime';
 
@@ -23,17 +24,24 @@ type Props = {
 };
 
 const IndexRangeSummary = ({ indexRange }: Props) => {
+  const { t } = useTranslation('indexsets');
+
   if (!indexRange) {
     return (
       <span>
-        <i>No index range available.</i>
+        <i>{t('indices.range_summary.none')}</i>
       </span>
     );
   }
 
   return (
     <span>
-      Range re-calculated <RelativeTime dateTime={indexRange.calculated_at} /> in {indexRange.took_ms}ms.
+      <Trans
+        t={t}
+        i18nKey="indices.range_summary.recalculated"
+        values={{ ms: indexRange.took_ms }}
+        components={{ relativeTime: <RelativeTime dateTime={indexRange.calculated_at} /> }}
+      />
     </span>
   );
 };

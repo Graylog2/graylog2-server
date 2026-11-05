@@ -26,7 +26,6 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -42,6 +41,8 @@ import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileData;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileIdAndName;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileWithUsages;
+import org.graylog2.plugin.rest.CodedException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -76,7 +77,7 @@ public class IndexFieldTypeProfileResource extends RestResource {
     public IndexFieldTypeProfileWithUsages retrieveById(@Parameter(name = "profile_id") @PathParam("profile_id") String profileId) {
         checkPermission(RestPermissions.MAPPING_PROFILES_READ, profileId);
         return profileService.getWithUsages(profileId)
-                .orElseThrow(() -> new NotFoundException("No profile with id : " + profileId));
+                .orElseThrow(() -> new CodedNotFoundException("index_field_type_profile.no_profile_with_id", "No profile with id : " + profileId, CodedException.paramsOf("profileId", profileId)));
     }
 
     @GET
@@ -127,7 +128,7 @@ public class IndexFieldTypeProfileResource extends RestResource {
         checkPermission(RestPermissions.MAPPING_PROFILES_EDIT, profile.id());
         final boolean updated = profileService.update(profile.id(), profile);
         if (!updated) {
-            throw new NotFoundException("Profile does not exist : " + profile.id());
+            throw new CodedNotFoundException("index_field_type_profile.profile_does_not_exist", "Profile does not exist : " + profile.id(), CodedException.paramsOf("id", profile.id()));
         }
     }
 

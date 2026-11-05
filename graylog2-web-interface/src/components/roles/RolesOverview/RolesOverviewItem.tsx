@@ -22,9 +22,13 @@ import { Link, TextOverflowEllipsis } from 'components/common';
 import Routes from 'routing/Routes';
 import type Role from 'logic/roles/Role';
 import type { UserContext } from 'hooks/useAuthzRoles';
+import useServerText from 'util/serverText';
 
 import ActionsCell from './ActionsCell';
 import UsersCell from './UsersCell';
+
+// Built-in roles are read-only, their English descriptions come from the server.
+const BUILT_IN_ROLES_NAMESPACES = ['builtin_roles'];
 
 const DescriptionCell = styled.td`
   max-width: 300px;
@@ -36,17 +40,21 @@ type Props = {
   onDeleted?: () => void;
 };
 
-const RolesOverviewItem = ({ role: { id, name, description, readOnly }, users, onDeleted }: Props) => (
-  <tr key={id}>
-    <td className="limited">
-      <Link to={Routes.SYSTEM.AUTHZROLES.show(id)}>{name}</Link>
-    </td>
-    <DescriptionCell>
-      <TextOverflowEllipsis>{description}</TextOverflowEllipsis>
-    </DescriptionCell>
-    <UsersCell users={Immutable.Set(users)} />
-    <ActionsCell roleId={id} roleName={name} readOnly={readOnly} onDeleted={onDeleted} />
-  </tr>
-);
+const RolesOverviewItem = ({ role: { id, name, description, readOnly }, users, onDeleted = undefined }: Props) => {
+  const serverText = useServerText(BUILT_IN_ROLES_NAMESPACES);
+
+  return (
+    <tr key={id}>
+      <td className="limited">
+        <Link to={Routes.SYSTEM.AUTHZROLES.show(id)}>{name}</Link>
+      </td>
+      <DescriptionCell>
+        <TextOverflowEllipsis>{readOnly ? serverText(description) : description}</TextOverflowEllipsis>
+      </DescriptionCell>
+      <UsersCell users={Immutable.Set(users)} />
+      <ActionsCell roleId={id} roleName={name} readOnly={readOnly} onDeleted={onDeleted} />
+    </tr>
+  );
+};
 
 export default RolesOverviewItem;

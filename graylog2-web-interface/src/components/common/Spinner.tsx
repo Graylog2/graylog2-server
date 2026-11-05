@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import type { IconName } from 'components/common/Icon';
@@ -45,13 +46,18 @@ type Props = {
 /**
  * Simple spinner to use while waiting for something to load.
  */
-const Spinner = ({ name = 'progress_activity', text = 'Loading...', delay = 200, ...rest }: Props) => (
-  <Delayed delay={delay}>
-    <Container>
-      <StyledIcon {...rest} name={name} $displayMargin={!!text?.trim()} spin />
-      {text}
-    </Container>
-  </Delayed>
-);
+const Spinner = ({ name = 'progress_activity', text = undefined, delay = 200, ...rest }: Props) => {
+  const { t } = useTranslation('common');
+  const displayedText = text ?? t('loading');
+
+  return (
+    <Delayed delay={delay}>
+      <Container>
+        <StyledIcon {...rest} name={name} $displayMargin={!!displayedText?.trim()} spin />
+        {displayedText}
+      </Container>
+    </Delayed>
+  );
+};
 
 export default Spinner;

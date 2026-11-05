@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY } from 'hooks/useIndices';
 
@@ -26,19 +27,23 @@ type DeletionRetentionStrategySummaryProps = {
 const DeletionRetentionStrategySummary = ({
   config,
   rotationStrategyClass = undefined,
-}: DeletionRetentionStrategySummaryProps) => (
-  <div>
-    <dl>
-      <dt>Index retention strategy:</dt>
-      <dd>Delete</dd>
-      {rotationStrategyClass !== TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY && (
-        <>
-          <dt>Max number of indices:</dt>
-          <dd>{config.max_number_of_indices}</dd>
-        </>
-      )}
-    </dl>
-  </div>
-);
+}: DeletionRetentionStrategySummaryProps) => {
+  const { t } = useTranslation('indexsets');
+
+  return (
+    <div>
+      <dl>
+        <dt>{t('strategies.retention_summary_strategy')}</dt>
+        <dd>{t('strategies.retention_summary_delete')}</dd>
+        {rotationStrategyClass !== TIME_BASED_SIZE_OPTIMIZING_ROTATION_STRATEGY && (
+          <>
+            <dt>{t('strategies.retention_summary_max_indices')}</dt>
+            <dd>{config.max_number_of_indices}</dd>
+          </>
+        )}
+      </dl>
+    </div>
+  );
+};
 
 export default DeletionRetentionStrategySummary;

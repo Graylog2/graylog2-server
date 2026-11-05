@@ -24,10 +24,24 @@ const bindings: PluginExports = {
   pageNavigation: [
     {
       description: PAGE_NAV_TITLE,
+      titleKey: 'navigation:system.pipelines',
       children: [
-        { description: 'Manage pipelines', path: Routes.SYSTEM.PIPELINES.OVERVIEW, exactPathMatch: true },
-        { description: 'Manage rules', path: Routes.SYSTEM.PIPELINES.RULES },
-        { description: 'Simulator', path: Routes.SYSTEM.PIPELINES.SIMULATOR },
+        {
+          description: 'Manage pipelines',
+          titleKey: 'pipelines:page_navigation.manage_pipelines',
+          path: Routes.SYSTEM.PIPELINES.OVERVIEW,
+          exactPathMatch: true,
+        },
+        {
+          description: 'Manage rules',
+          titleKey: 'pipelines:page_navigation.manage_rules',
+          path: Routes.SYSTEM.PIPELINES.RULES,
+        },
+        {
+          description: 'Simulator',
+          titleKey: 'pipelines:page_navigation.simulator',
+          path: Routes.SYSTEM.PIPELINES.SIMULATOR,
+        },
       ],
     },
   ],

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Row, Col, ButtonToolbar } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
@@ -28,35 +29,36 @@ import {
   ProcessingLoadProvider,
 } from 'components/pipelines/processing-load';
 
-const PipelinesOverviewPage = () => (
-  <DocumentTitle title="Pipelines">
-    <PipelinesPageNavigation />
-    <PageHeader
-      title="Pipelines overview"
-      actions={
-        <ButtonToolbar>
-          <EnableDebugMetricsButton />
-          <CreateButton entityKey="Pipeline" />
-        </ButtonToolbar>
-      }
-      documentationLink={{
-        title: 'Pipelines documentation',
-        path: DocsHelper.PAGES.PIPELINES,
-      }}>
-      <span>
-        Pipelines let you transform and process messages coming from streams. Pipelines consist of stages where rules
-        are evaluated and applied. Messages can go through one or more stages.
-      </span>
-    </PageHeader>
-    <Row className="content">
-      <Col md={12}>
-        <ProcessingLoadProvider>
-          <ProcessingLoadDebugMetricsBanner />
-          <ProcessingTimelineComponent />
-        </ProcessingLoadProvider>
-      </Col>
-    </Row>
-  </DocumentTitle>
-);
+const PipelinesOverviewPage = () => {
+  const { t } = useTranslation('pipelines');
+
+  return (
+    <DocumentTitle title={t('title')}>
+      <PipelinesPageNavigation />
+      <PageHeader
+        title={t('overview_header_title')}
+        actions={
+          <ButtonToolbar>
+            <EnableDebugMetricsButton />
+            <CreateButton entityKey="Pipeline" />
+          </ButtonToolbar>
+        }
+        documentationLink={{
+          title: t('documentation_link_title'),
+          path: DocsHelper.PAGES.PIPELINES,
+        }}>
+        <span>{t('overview_description')}</span>
+      </PageHeader>
+      <Row className="content">
+        <Col md={12}>
+          <ProcessingLoadProvider>
+            <ProcessingLoadDebugMetricsBanner />
+            <ProcessingTimelineComponent />
+          </ProcessingLoadProvider>
+        </Col>
+      </Row>
+    </DocumentTitle>
+  );
+};
 
 export default PipelinesOverviewPage;

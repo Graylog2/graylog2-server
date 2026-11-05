@@ -1,0 +1,10 @@
+{
+  "match exactly": "完全匹配",
+  "match regular expression": "匹配正则表达式",
+  "be greater than": "大于",
+  "be smaller than": "小于",
+  "be present": "存在",
+  "contain": "包含",
+  "always match": "始终匹配",
+  "match input": "匹配 Input"
+}

@@ -15,12 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { PREFERENCES_THEME_MODE } from 'theme/constants';
 import { ReadOnlyFormGroup } from 'components/common';
 import Store from 'logic/local-storage/Store';
 import type User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
+import { DEFAULT_LANGUAGE, getLanguage } from 'components/users/languages/Languages';
+import LanguageLabel from 'components/users/languages/LanguageLabel';
 
 type Props = {
   user: User;
@@ -31,9 +34,11 @@ const defaultPreferences = {
   updateUnfocussed: false,
   searchSidebarIsPinned: false,
   dashboardSidebarIsPinned: false,
+  language: DEFAULT_LANGUAGE,
 };
 
 const PreferencesSection = ({ user: { preferences: databasePreferences, readOnly } }: Props) => {
+  const { t } = useTranslation('users');
   let preferences = databasePreferences || defaultPreferences;
 
   if (readOnly) {
@@ -41,19 +46,37 @@ const PreferencesSection = ({ user: { preferences: databasePreferences, readOnly
       searchSidebarIsPinned: Store.get<boolean>('searchSidebarIsPinned'),
       dashboardSidebarIsPinned: Store.get<boolean>('dashboardSidebarIsPinned'),
       [PREFERENCES_THEME_MODE]: Store.get<string>(PREFERENCES_THEME_MODE),
+      language: Store.get<string>('language'),
     };
-    preferences = { ...preferences, ...localStoragePreferences };
+    preferences = { ...preferences, ...localStoragePreferences } as typeof preferences;
   }
 
-  const { enableSmartSearch, updateUnfocussed, searchSidebarIsPinned, dashboardSidebarIsPinned } = preferences;
+  const { enableSmartSearch, updateUnfocussed, searchSidebarIsPinned, dashboardSidebarIsPinned, language } =
+    preferences;
 
   return (
-    <SectionComponent title="Preferences">
-      <ReadOnlyFormGroup label="Search autocompletion" value={enableSmartSearch ?? false} />
-      <ReadOnlyFormGroup label="Update unfocused" value={updateUnfocussed ?? false} />
-      <ReadOnlyFormGroup label="Pin search sidebar" value={searchSidebarIsPinned ?? false} />
-      <ReadOnlyFormGroup label="Pin dashboard sidebar" value={dashboardSidebarIsPinned ?? false} />
-      <ReadOnlyFormGroup label="Theme mode" value={preferences?.[PREFERENCES_THEME_MODE] ?? 'Not configured'} />
+    <SectionComponent title={t('user_details.preferences.title')}>
+      <ReadOnlyFormGroup
+        label={t('user_details.preferences.search_autocompletion')}
+        value={enableSmartSearch ?? false}
+      />
+      <ReadOnlyFormGroup label={t('user_details.preferences.update_unfocused')} value={updateUnfocussed ?? false} />
+      <ReadOnlyFormGroup
+        label={t('user_details.preferences.pin_search_sidebar')}
+        value={searchSidebarIsPinned ?? false}
+      />
+      <ReadOnlyFormGroup
+        label={t('user_details.preferences.pin_dashboard_sidebar')}
+        value={dashboardSidebarIsPinned ?? false}
+      />
+      <ReadOnlyFormGroup
+        label={t('user_details.preferences.theme_mode')}
+        value={preferences?.[PREFERENCES_THEME_MODE] ?? t('user_details.preferences.not_configured')}
+      />
+      <ReadOnlyFormGroup
+        label={t('user_details.preferences.language')}
+        value={<LanguageLabel language={getLanguage(language)} />}
+      />
     </SectionComponent>
   );
 };

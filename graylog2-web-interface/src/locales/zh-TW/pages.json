@@ -1,0 +1,64 @@
+{
+  "api_browser": {
+    "download_label": "下載 OpenAPI 規格：",
+    "fetch_failed": "擷取 API 規格失敗！",
+    "loading": "正在載入 API 規格 ...",
+    "loading_title": "API 瀏覽器 - 正在載入 API 規格",
+    "select_format": "選擇格式",
+    "title": "API 瀏覽器"
+  },
+  "configlet": {
+    "error": "發生錯誤："
+  },
+  "errors": {
+    "copy_error_details": "將錯誤詳細資訊複製到剪貼簿"
+  },
+  "keyboard_shortcuts": {
+    "description": "所有可用快捷鍵的清單",
+    "title": "鍵盤快捷鍵"
+  },
+  "loading": {
+    "text": "正在載入，請稍候...",
+    "title": "載入中..."
+  },
+  "not_found": {
+    "back_hint": "您可以返回<mainPageLink>首頁</mainPageLink>，再從那裡瀏覽。",
+    "description": "您要尋找的頁面不存在（或已不存在）。",
+    "title": "找不到頁面"
+  },
+  "runtime_error": {
+    "description_hint": "您可以使用導覽列前往產品的其他部分、重新整理頁面，或提交錯誤報告。",
+    "description_intro": "您瀏覽的頁面似乎發生了錯誤。",
+    "error_label": "錯誤：",
+    "show_less": "顯示較少",
+    "show_more": "顯示更多",
+    "title": "發生錯誤。"
+  },
+  "server_unavailable": {
+    "document_title": "伺服器無法使用",
+    "error_message": "錯誤訊息",
+    "full_error_message": "完整錯誤訊息",
+    "intro": "我們無法連線到位於 <serverAddress>{{address}}</serverAddress> 的 {{productName}} 伺服器。請確認伺服器運作正常。",
+    "last_response": "這是我們從伺服器收到的最後一次回應：",
+    "less_details": "顯示較少詳細資訊",
+    "modal_title": "伺服器目前無法使用",
+    "more_details": "顯示更多詳細資訊",
+    "need_help": "需要協助嗎？<helpLink>我們可以幫您</helpLink>。",
+    "no_information": "沒有可用的資訊。",
+    "original_request": "原始要求",
+    "redirect_hint": "一旦我們能連線到伺服器，將自動重新導向至上一頁。",
+    "status_code": "狀態碼"
+  },
+  "show_message": {
+    "document_title": "{{index}} 中的訊息 {{messageId}}",
+    "not_found_description": "找不到指定的索引或訊息。最可能的原因是包含該訊息的索引已被刪除。完整錯誤訊息如下：",
+    "not_found_title": "找不到索引／訊息"
+  },
+  "unauthorized": {
+    "description_hint": "請聯絡您的管理員，並提供錯誤詳細資訊。",
+    "description_intro": "您沒有檢視此資源所需的權限。",
+    "page_details": "以下要求的權限檢查失敗，\n在嘗試存取 {{pathname}} 時。",
+    "page_details_no_request": "嘗試存取 {{pathname}} 時權限檢查失敗。",
+    "title": "缺少權限"
+  }
+}

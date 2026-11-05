@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import type { TimeRange } from 'views/logic/queries/Query';
@@ -68,6 +69,7 @@ type Props = {
 };
 
 const WidgetTimeRangeOverride = ({ value, onReset }: Props) => {
+  const { t } = useTranslation('search');
   const { formatTime } = useUserDateTime();
   const localTimeWithMS = timerangeToString(value, (dateTime: DateTime) => formatTime(dateTime, 'complete'));
   const internalTime = timerangeToString(value, (dateTime: DateTime) => formatTime(dateTime, 'internal'));
@@ -78,7 +80,7 @@ const WidgetTimeRangeOverride = ({ value, onReset }: Props) => {
       <TimeRangeInfo>
         <TimeRangeString title={internalTime}>{localTimeWithMS}</TimeRangeString>
         <ResetButton bsSize="xs" bsStyle="primary" onClick={onReset} data-testid="reset-global-time-range">
-          Reset Global Override
+          {t('widget_time_range.reset_global_override')}
         </ResetButton>
       </TimeRangeInfo>
     </Wrapper>

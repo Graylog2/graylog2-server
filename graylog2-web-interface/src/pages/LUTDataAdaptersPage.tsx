@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
@@ -24,15 +25,16 @@ import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
 
 function LUTDataAdaptersPage() {
   const { push } = useHistory();
+  const { t } = useTranslation('lookup_tables');
 
   return (
     <LUTPageLayout
-      documentTitle="Lookup Tables - Data Adapters"
-      pageTitle="Data Adapters for Lookup Tables"
-      pageDescription="Data adapters provide the actual values for lookup tables."
+      documentTitle={t('adapter_document_title')}
+      pageTitle={t('adapter_page_title')}
+      pageDescription={t('adapter_description')}
       actions={
         <Button bsStyle="primary" onClick={() => push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE)}>
-          Create data adapter
+          {t('adapter_create_button')}
         </Button>
       }>
       <DataAdaptersOverview />

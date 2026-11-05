@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Button, Input, SegmentedControl } from 'components/bootstrap';
 import { RelativeTime } from 'components/common';
@@ -110,6 +111,7 @@ const SHORT_LIVED_EXPIRY = 'P1D';
 const SHORT_LIVED_NAME = 'deployment';
 
 const TokenStep = ({ fleet, generatedToken, onGenerated, onChangeToken }: Props) => {
+  const { t } = useTranslation('collectors');
   const [mode, setMode] = useState<'short-lived' | 'custom'>('short-lived');
   // null = the user has not touched the field; the displayed name then follows the selected
   // fleet ("<fleet> rollout"). Anything the user typed (even an emptied field) wins.
@@ -125,21 +127,19 @@ const TokenStep = ({ fleet, generatedToken, onGenerated, onChangeToken }: Props)
     return (
       <SummaryBox>
         <span>
-          Token <strong>{generatedToken.name}</strong> generated
-          {generatedToken.expiresAt ? (
-            <>
-              {' '}
-              - expires <RelativeTime dateTime={generatedToken.expiresAt} />
-            </>
-          ) : (
-            <> - never expires</>
-          )}
-          {fleet && (
-            <>
-              {' '}
-              - scoped to fleet <strong>{fleet.name}</strong>
-            </>
-          )}
+          <Trans
+            t={t}
+            i18nKey={[
+              'token_step.summary',
+              generatedToken.expiresAt ? '_expires' : '_never_expires',
+              fleet ? '_with_fleet' : '',
+            ].join('')}
+            values={{ tokenName: generatedToken.name, fleetName: fleet?.name }}
+            components={{
+              emphasis: <strong />,
+              expiresAt: <RelativeTime dateTime={generatedToken.expiresAt} />,
+            }}
+          />
         </span>
         <Button
           onClick={() => {
@@ -149,7 +149,7 @@ const TokenStep = ({ fleet, generatedToken, onGenerated, onChangeToken }: Props)
 
             onChangeToken();
           }}>
-          Change token
+          {t('token_step.change_token')}
         </Button>
       </SummaryBox>
     );
@@ -203,7 +203,7 @@ const TokenStep = ({ fleet, generatedToken, onGenerated, onChangeToken }: Props)
             type="radio"
             id="token-mode-short-lived"
             name="token-mode"
-            label="Short-lived token (expires in 1 day)"
+            label={t('token_step.short_lived')}
             checked={mode === 'short-lived'}
             onChange={() => handleModeChange('short-lived')}
           />
@@ -211,7 +211,7 @@ const TokenStep = ({ fleet, generatedToken, onGenerated, onChangeToken }: Props)
             type="radio"
             id="token-mode-custom"
             name="token-mode"
-            label="Custom token"
+            label={t('token_step.custom')}
             checked={mode === 'custom'}
             onChange={() => handleModeChange('custom')}
           />
@@ -229,10 +229,10 @@ const TokenStep = ({ fleet, generatedToken, onGenerated, onChangeToken }: Props)
                   setExpiry(v as TokenExpiry);
                 }}
                 data={[
-                  { value: 'PT24H', label: '24 hours' },
-                  { value: 'P7D', label: '7 days' },
-                  { value: 'P30D', label: '30 days' },
-                  { value: 'never', label: 'No expiry' },
+                  { value: 'PT24H', label: t('token_step.expiry_24_hours') },
+                  { value: 'P7D', label: t('token_step.expiry_7_days') },
+                  { value: 'P30D', label: t('token_step.expiry_30_days') },
+                  { value: 'never', label: t('token_step.expiry_never') },
                 ]}
               />
             </div>
@@ -240,27 +240,23 @@ const TokenStep = ({ fleet, generatedToken, onGenerated, onChangeToken }: Props)
               type="text"
               id="custom-token-name"
               name="custom-token-name"
-              label="Name"
-              placeholder="e.g. web-servers rollout"
+              label={t('token_step.name')}
+              placeholder={t('token_step.name_placeholder')}
               value={effectiveName}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCustomName(e.target.value)}
             />
           </CustomFields>
         )}
-        <MutedText>Custom tokens appear on the Enrollment tokens tab and can be revoked any time.</MutedText>
+        <MutedText>{t('token_step.custom_hint')}</MutedText>
       </OptionsBox>
       <Button
         bsStyle="primary"
         onClick={handleGenerate}
         disabled={!canGenerate || isCreatingEnrollmentToken || !isTokenCreationPermitted}
-        title={
-          fleet && !isTokenCreationPermitted
-            ? 'You do not have permission to create enrollment tokens for this fleet'
-            : undefined
-        }>
-        {isCreatingEnrollmentToken ? 'Generating...' : 'Generate token'}
+        title={fleet && !isTokenCreationPermitted ? t('token_step.no_permission') : undefined}>
+        {isCreatingEnrollmentToken ? t('token_step.generating') : t('token_step.generate')}
       </Button>
-      {!fleet && <MutedText>Select a fleet above first.</MutedText>}
+      {!fleet && <MutedText>{t('token_step.select_fleet_first')}</MutedText>}
     </div>
   );
 };

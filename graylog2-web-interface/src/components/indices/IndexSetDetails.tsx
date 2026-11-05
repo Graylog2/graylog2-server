@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { Col } from 'components/bootstrap';
@@ -31,6 +32,7 @@ type Props = {
 };
 
 const IndexSetDetails = ({ indexSet }: Props) => {
+  const { t } = useTranslation('indexsets');
   const {
     data: { name: profileName },
     isFetching,
@@ -40,17 +42,17 @@ const IndexSetDetails = ({ indexSet }: Props) => {
     <StyledIndexSetDetailsRow>
       <Col lg={3}>
         <dl>
-          <dt>Index prefix:</dt>
+          <dt>{t('set_details.index_prefix')}</dt>
           <dd>{indexSet.index_prefix}</dd>
           <HideOnCloud>
-            <dt>Shards:</dt>
+            <dt>{t('set_details.shards')}</dt>
             <dd>{indexSet.shards}</dd>
-            <dt>Replicas:</dt>
+            <dt>{t('set_details.replicas')}</dt>
             <dd>{indexSet.replicas}</dd>
           </HideOnCloud>
-          <dt>Field type refresh interval:</dt>
-          <dd>{indexSet.field_type_refresh_interval / 1000.0} seconds</dd>
-          <dt>Field type profile:</dt>
+          <dt>{t('set_details.field_type_refresh_interval')}</dt>
+          <dd>{t('set_details.seconds', { count: indexSet.field_type_refresh_interval / 1000.0 })}</dd>
+          <dt>{t('set_details.field_type_profile')}</dt>
           {!isFetching && (
             <dd>
               {indexSet.field_type_profile ? (
@@ -58,7 +60,7 @@ const IndexSetDetails = ({ indexSet }: Props) => {
                   {profileName}
                 </Link>
               ) : (
-                <i>Not set</i>
+                <i>{t('set_details.not_set')}</i>
               )}
             </dd>
           )}

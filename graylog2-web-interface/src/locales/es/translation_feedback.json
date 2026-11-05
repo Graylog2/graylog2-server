@@ -1,0 +1,85 @@
+{
+  "menu": {
+    "report": "Notificar traducción…",
+    "native_menu_hint": "Mayús + clic derecho abre el menú del navegador"
+  },
+  "modal": {
+    "title": "Notificar traducción",
+    "text": "Texto",
+    "text_help": "El texto tal como aparece en la página. Acórtelo a la parte que requiere atención.",
+    "key": "Traducción",
+    "partial_match": "coincidencia parcial",
+    "not_translated": "sin traducir",
+    "none_of_these": "Ninguna de estas",
+    "no_key_found": "No se encontró ninguna traducción; probablemente el texto aún no está traducido.",
+    "english": "Original en inglés:",
+    "current_translation": "Traducción actual:",
+    "category": "Problema",
+    "suggestion": "Traducción sugerida",
+    "suggestion_help": "Opcional. Cómo debería decir el texto.",
+    "comment": "Comentario",
+    "submit": "Notificar",
+    "submitting": "Notificando…"
+  },
+  "categories": {
+    "wrong": "Traducción incorrecta",
+    "untranslated": "Sin traducir",
+    "awkward": "Redacción poco natural",
+    "layout": "Diseño roto o texto cortado",
+    "other": "Otro"
+  },
+  "statuses": {
+    "open": "Abierto",
+    "fixed": "Corregido",
+    "wont_fix": "No se corregirá"
+  },
+  "list": {
+    "human_name": "informes de traducción",
+    "search_placeholder": "Buscar informes de traducción",
+    "no_key": "Sin clave",
+    "download_json": "Descargar JSON",
+    "download_csv": "Descargar CSV"
+  },
+  "actions": {
+    "mark_fixed": "Marcar como corregido",
+    "reopen": "Reabrir",
+    "mark_wont_fix": "No se corregirá",
+    "confirm_delete": "¿Realmente desea eliminar el informe sobre «{{text}}»?"
+  },
+  "page": {
+    "title": "Comentarios de traducción",
+    "description": "Informes sobre las traducciones de la interfaz. Haga clic derecho en cualquier texto para notificarlo."
+  },
+  "notifications": {
+    "created": "¡Gracias! Su informe se ha guardado.",
+    "created_title": "Traducción notificada",
+    "create_failed": "No se pudo guardar el informe: {{error}}",
+    "create_failed_title": "No se pudo notificar la traducción",
+    "update_failed": "No se pudo actualizar el informe: {{error}}",
+    "update_failed_title": "No se pudo actualizar el informe"
+  },
+  "bulk": {
+    "delete": "Eliminar",
+    "changed_one": "Se modificó {{count}} informe.",
+    "changed_many": "Se modificaron {{count}} informes.",
+    "changed_other": "Se modificaron {{count}} informes.",
+    "confirm_delete_one": "¿Realmente desea eliminar {{count}} informe?",
+    "confirm_delete_many": "¿Realmente desea eliminar {{count}} informes?",
+    "confirm_delete_other": "¿Realmente desea eliminar {{count}} informes?"
+  },
+  "upload": {
+    "button": "Subir resoluciones",
+    "uploading": "Subiendo…",
+    "help": "Suba un archivo de resoluciones para establecer el estado y una nota para quien informó en varios informes a la vez.",
+    "failed": "No se pudieron aplicar las resoluciones: {{error}}",
+    "failed_title": "No se pudieron aplicar las resoluciones",
+    "invalid_file": "El archivo no contiene una lista de resoluciones.",
+    "applied_title": "Resoluciones aplicadas",
+    "applied_one": "Se actualizó {{count}} informe.",
+    "applied_many": "Se actualizaron {{count}} informes.",
+    "applied_other": "Se actualizaron {{count}} informes.",
+    "applied_with_missing_one": "Se actualizó {{count}} informe; {{notFound}} no se encontraron.",
+    "applied_with_missing_many": "Se actualizaron {{count}} informes; {{notFound}} no se encontraron.",
+    "applied_with_missing_other": "Se actualizaron {{count}} informes; {{notFound}} no se encontraron."
+  }
+}

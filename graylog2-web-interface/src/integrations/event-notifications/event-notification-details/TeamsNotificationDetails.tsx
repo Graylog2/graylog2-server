@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { ReadOnlyFormGroup } from 'components/common';
 import { Well } from 'components/bootstrap';
@@ -32,19 +33,34 @@ const NewExampleWell = styled(Well)(
   `,
 );
 
-const TeamsNotificationDetails = ({ notification }: TeamsNotificationSummaryType) => (
-  <>
-    <ReadOnlyFormGroup label="Webhook URL" value={notification.config.webhook_url} />
-    <ReadOnlyFormGroup
-      label="Custom Message Template "
-      value={
-        <NewExampleWell bsSize="small">{notification.config.custom_message || <em>Empty body</em>}</NewExampleWell>
-      }
-    />
-    <ReadOnlyFormGroup label="Message Backlog Limit" value={notification.config.backlog_size} />
-    <ReadOnlyFormGroup label="Icon URL" value={notification.config.icon_url} />
-    <ReadOnlyFormGroup label="Time Zone" value={notification.config.time_zone} />
-  </>
-);
+const TeamsNotificationDetails = ({ notification }: TeamsNotificationSummaryType) => {
+  const { t } = useTranslation('integrations');
+
+  return (
+    <>
+      <ReadOnlyFormGroup
+        label={t('teams_notification_details.webhook_url_label')}
+        value={notification.config.webhook_url}
+      />
+      <ReadOnlyFormGroup
+        label={t('teams_notification_details.custom_message_label')}
+        value={
+          <NewExampleWell bsSize="small">
+            {notification.config.custom_message || <em>{t('teams_notification_details.empty_body')}</em>}
+          </NewExampleWell>
+        }
+      />
+      <ReadOnlyFormGroup
+        label={t('teams_notification_details.backlog_limit_label')}
+        value={notification.config.backlog_size}
+      />
+      <ReadOnlyFormGroup label={t('teams_notification_details.icon_url_label')} value={notification.config.icon_url} />
+      <ReadOnlyFormGroup
+        label={t('teams_notification_details.time_zone_label')}
+        value={notification.config.time_zone}
+      />
+    </>
+  );
+};
 
 export default TeamsNotificationDetails;

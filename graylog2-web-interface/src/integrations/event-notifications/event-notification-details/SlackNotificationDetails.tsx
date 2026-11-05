@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import type { SlackNotificationSummaryType } from 'integrations/event-notifications/types';
 import { ReadOnlyFormGroup } from 'components/common';
@@ -32,31 +33,61 @@ const NewExampleWell = styled(Well)(
   `,
 );
 
-const SlackNotificationDetails = ({ notification }: SlackNotificationSummaryType) => (
-  <>
-    <ReadOnlyFormGroup label="Webhook URL" value={notification.config.webhook_url} />
-    <ReadOnlyFormGroup label="Channel" value={notification.config.channel} />
-    <ReadOnlyFormGroup
-      label="Custom Message Template "
-      value={
-        <NewExampleWell bsSize="small">{notification.config.custom_message || <em>Empty body</em>}</NewExampleWell>
-      }
-    />
-    {usePluggableLicenseCheck('/license/security')?.data?.valid && (
+const SlackNotificationDetails = ({ notification }: SlackNotificationSummaryType) => {
+  const { t } = useTranslation('integrations');
+
+  return (
+    <>
       <ReadOnlyFormGroup
-        label="Include Event Procedure in Email Body"
-        value={notification.config.include_event_procedure}
+        label={t('slack_notification_details.webhook_url_label')}
+        value={notification.config.webhook_url}
       />
-    )}
-    <ReadOnlyFormGroup label="Message Backlog Limit" value={notification.config.backlog_size} />
-    <ReadOnlyFormGroup label="User Name" value={notification.config.user_name} />
-    <ReadOnlyFormGroup label="Include Title" value={notification.config.include_title} />
-    <ReadOnlyFormGroup label="Notify Channel" value={notification.config.notify_channel} />
-    <ReadOnlyFormGroup label="Link Names" value={notification.config.link_names} />
-    <ReadOnlyFormGroup label="Icon URL" value={notification.config.icon_url} />
-    <ReadOnlyFormGroup label="Icon Emoji" value={notification.config.icon_emoji} />
-    <ReadOnlyFormGroup label="Time Zone" value={notification.config.time_zone} />
-  </>
-);
+      <ReadOnlyFormGroup label={t('slack_notification_details.channel_label')} value={notification.config.channel} />
+      <ReadOnlyFormGroup
+        label={t('slack_notification_details.custom_message_label')}
+        value={
+          <NewExampleWell bsSize="small">
+            {notification.config.custom_message || <em>{t('slack_notification_details.empty_body')}</em>}
+          </NewExampleWell>
+        }
+      />
+      {usePluggableLicenseCheck('/license/security')?.data?.valid && (
+        <ReadOnlyFormGroup
+          label={t('slack_notification_details.include_event_procedure_label')}
+          value={notification.config.include_event_procedure}
+        />
+      )}
+      <ReadOnlyFormGroup
+        label={t('slack_notification_details.backlog_limit_label')}
+        value={notification.config.backlog_size}
+      />
+      <ReadOnlyFormGroup
+        label={t('slack_notification_details.user_name_label')}
+        value={notification.config.user_name}
+      />
+      <ReadOnlyFormGroup
+        label={t('slack_notification_details.include_title_label')}
+        value={notification.config.include_title}
+      />
+      <ReadOnlyFormGroup
+        label={t('slack_notification_details.notify_channel_label')}
+        value={notification.config.notify_channel}
+      />
+      <ReadOnlyFormGroup
+        label={t('slack_notification_details.link_names_label')}
+        value={notification.config.link_names}
+      />
+      <ReadOnlyFormGroup label={t('slack_notification_details.icon_url_label')} value={notification.config.icon_url} />
+      <ReadOnlyFormGroup
+        label={t('slack_notification_details.icon_emoji_label')}
+        value={notification.config.icon_emoji}
+      />
+      <ReadOnlyFormGroup
+        label={t('slack_notification_details.time_zone_label')}
+        value={notification.config.time_zone}
+      />
+    </>
+  );
+};
 
 export default SlackNotificationDetails;

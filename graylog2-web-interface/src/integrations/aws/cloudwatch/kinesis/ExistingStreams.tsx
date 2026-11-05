@@ -16,6 +16,7 @@
  */
 import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Button, Modal, Panel } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -61,6 +62,7 @@ type KinesisStreamsProps = {
 };
 
 const KinesisStreams = ({ onChange, onSubmit, toggleSetup = () => {} }: KinesisStreamsProps) => {
+  const { t } = useTranslation('integrations');
   const { formData } = useContext(FormDataContext);
   const [formError, setFormError] = useState(null);
   const { availableStreams, setLogData } = useContext(ApiContext);
@@ -81,18 +83,11 @@ const KinesisStreams = ({ onChange, onSubmit, toggleSetup = () => {} }: KinesisS
 
   useEffect(() => {
     setSidebar(
-      <Panel bsStyle="info" header={<span>Don&apos;t see the stream you need?</span>}>
+      <Panel bsStyle="info" header={<span>{t('aws_kinesis_existing_streams.sidebar_title')}</span>}>
         <AutoSetupContent>
-          <p>
-            At least one Kinesis stream must exist in the specified region in order to continue with the setup. The log
-            stream must contain at least a few log messages.
-          </p>
+          <p>{t('aws_kinesis_existing_streams.sidebar_requirement')}</p>
 
-          <p>
-            {productName} also supports the ability to create a Kinesis stream for you and subscribe it to a CloudWatch
-            log group of your choice. Please be aware that this option will create additional resources in your AWS
-            environment that will incur billing charges.
-          </p>
+          <p>{t('aws_kinesis_existing_streams.sidebar_auto_setup', { productName })}</p>
         </AutoSetupContent>
 
         <Button
@@ -101,11 +96,11 @@ const KinesisStreams = ({ onChange, onSubmit, toggleSetup = () => {} }: KinesisS
             toggleSetup();
           }}
           type="button">
-          Setup Kinesis Automatically
+          {t('aws_kinesis_existing_streams.setup_automatically_button')}
         </Button>
       </Panel>,
     );
-  }, [clearSidebar, productName, setSidebar, toggleSetup]);
+  }, [clearSidebar, productName, setSidebar, t, toggleSetup]);
 
   useEffect(() => {
     if (logDataStatus.error) {
@@ -113,12 +108,10 @@ const KinesisStreams = ({ onChange, onSubmit, toggleSetup = () => {} }: KinesisS
 
       setFormError({
         full_message: logDataStatus.error,
-        nice_message: (
-          <span>We were unable to find any logs in this Kinesis stream. Please select a different Kinesis stream.</span>
-        ),
+        nice_message: <span>{t('aws_kinesis_existing_streams.no_logs_error')}</span>,
       });
     }
-  }, [logDataStatus.error, setLogDataUrl]);
+  }, [logDataStatus.error, setLogDataUrl, t]);
 
   const handleSubmit = () => {
     setLogDataUrl(ApiRoutes.INTEGRATIONS.AWS.KINESIS.HEALTH_CHECK);
@@ -129,27 +122,33 @@ const KinesisStreams = ({ onChange, onSubmit, toggleSetup = () => {} }: KinesisS
       <Modal show={logDataStatus.loading} bsSize="small" onHide={() => {}} closable={false}>
         <LoadingContent>
           <StyledSpinner />
-          <LoadingMessage>This request may take a few moments.</LoadingMessage>
+          <LoadingMessage>{t('aws_kinesis_existing_streams.loading_message')}</LoadingMessage>
         </LoadingContent>
       </Modal>
 
       <FormWrap
         onSubmit={handleSubmit}
-        buttonContent="Verify Stream &amp; Format"
+        buttonContent={t('aws_kinesis_existing_streams.verify_button')}
         loading={logDataStatus.loading}
         error={formError}
         disabled={formValidation.isFormValid(['awsCloudWatchKinesisStream'], formData)}
-        title="Select Kinesis Stream"
+        title={t('aws_kinesis_existing_streams.title')}
         description={
           <>
-            <p>Below is a list of all Kinesis streams found within the specified AWS account.</p>
+            <p>{t('aws_kinesis_existing_streams.description_list')}</p>
             <p>
-              Please select the stream you would like to read messages from, or follow the&nbsp;
-              <DocumentationLink
-                page={DocsRoutes.INTEGRATIONS.AWS.AWS_KINESIS_CLOUDWATCH_INPUTS}
-                text="AWS Kinesis/CloudWatch Input "
+              <Trans
+                t={t}
+                i18nKey="aws_kinesis_existing_streams.description_docs"
+                components={{
+                  docsLink: (
+                    <DocumentationLink
+                      page={DocsRoutes.INTEGRATIONS.AWS.AWS_KINESIS_CLOUDWATCH_INPUTS}
+                      text={t('aws_kinesis_existing_streams.docs_link_text')}
+                    />
+                  ),
+                }}
               />
-              documentation for more details on this set up.
             </p>
           </>
         }>
@@ -158,9 +157,9 @@ const KinesisStreams = ({ onChange, onSubmit, toggleSetup = () => {} }: KinesisS
           type="select"
           fieldData={formData.awsCloudWatchKinesisStream}
           onChange={onChange}
-          label="Select Stream"
+          label={t('aws_kinesis_existing_streams.select_stream_label')}
           required>
-          {renderOptions(availableStreams, 'Select Kinesis Stream')}
+          {renderOptions(availableStreams, t('aws_kinesis_existing_streams.select_stream_placeholder'))}
         </ValidatedInput>
 
         <FormAdvancedOptions onChange={onChange} />

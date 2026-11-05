@@ -17,6 +17,7 @@
 import React from 'react';
 import Immutable from 'immutable';
 import styled from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Link, MessageDetailsDefinitionList, ClipboardButton, Icon, Timestamp } from 'components/common';
 import { ButtonGroup, Col, Label, Row } from 'components/bootstrap';
@@ -34,18 +35,23 @@ const Span = styled.span`
   word-break: break-word;
 `;
 
-const MessageActions = ({ messageIndex, messageId }: { messageIndex: string | undefined; messageId: string }) => (
-  <ButtonGroup className="pull-right">
-    <MessagePermalinkButton messageIndex={messageIndex} messageId={messageId} />
+const MessageActions = ({ messageIndex, messageId }: { messageIndex: string | undefined; messageId: string }) => {
+  const { t } = useTranslation('search');
 
-    <ClipboardButton title="Copy ID" bsSize="small" text={messageId} />
-  </ButtonGroup>
-);
+  return (
+    <ButtonGroup className="pull-right">
+      <MessagePermalinkButton messageIndex={messageIndex} messageId={messageId} />
+
+      <ClipboardButton title={t('common:message.copy_id')} bsSize="small" text={messageId} />
+    </ButtonGroup>
+  );
+};
 
 const InputName = ({ inputs, inputId }: { inputs: Immutable.Map<string, Input> | undefined; inputId: string }) => {
+  const { t } = useTranslation('search');
   const input = inputs?.get(inputId);
 
-  return input ? <Span>{input.title}</Span> : <>deleted input</>;
+  return input ? <Span>{input.title}</Span> : <>{t('message_details.deleted_input')}</>;
 };
 
 const StreamLinks = ({
@@ -99,10 +105,11 @@ const MessageDetail = ({
   message,
   customFieldActions = undefined,
 }: Props) => {
+  const { t } = useTranslation('search');
   const streamIds = Immutable.Set(message.stream_ids);
   const rawTimestamp = message.fields.timestamp;
   const timestamp = [
-    <dt key={`dt-${rawTimestamp}`}>Timestamp</dt>,
+    <dt key={`dt-${rawTimestamp}`}>{t('message_details.timestamp')}</dt>,
     <dd key={`dd-${rawTimestamp}`}>
       <Timestamp dateTime={rawTimestamp} />
     </dd>,
@@ -124,7 +131,7 @@ const MessageDetail = ({
               <Link to={Routes.message_show(message.index, message.id)}>{message.id}</Link>
             ) : (
               <span>
-                {message.id} <Label bsStyle="warning">Not stored</Label>
+                {message.id} <Label bsStyle="warning">{t('message_details.not_stored')}</Label>
               </span>
             )}
           </MessageDetailsTitle>
@@ -136,22 +143,37 @@ const MessageDetail = ({
             {timestamp}
             {message.source_input_id && message.source_node_id && (
               <div>
-                <dt>Received by</dt>
+                <dt>{t('message_details.received_by')}</dt>
                 <dd>
-                  <em>
-                    <InputName inputs={inputs} inputId={message.source_input_id} />
-                  </em>{' '}
-                  on <NodeName nodeId={message.source_node_id} />
+                  <Trans
+                    t={t}
+                    i18nKey="common:message.received_by_value"
+                    components={{
+                      inputName: (
+                        <em>
+                          <InputName inputs={inputs} inputId={message.source_input_id} />
+                        </em>
+                      ),
+                      node: <NodeName nodeId={message.source_node_id} />,
+                    }}
+                  />
                   {/* Legacy */}
                   {message.source_radio_id && (
                     <>
                       <br />
                       <span>
-                        via{' '}
-                        <em>
-                          <InputName inputs={inputs} inputId={message.source_radio_input_id} />
-                        </em>{' '}
-                        on radio <NodeName nodeId={message.source_radio_id} />
+                        <Trans
+                          t={t}
+                          i18nKey="common:message.received_by_radio_value"
+                          components={{
+                            inputName: (
+                              <em>
+                                <InputName inputs={inputs} inputId={message.source_radio_input_id} />
+                              </em>
+                            ),
+                            node: <NodeName nodeId={message.source_radio_id} />,
+                          }}
+                        />
                       </span>
                     </>
                   )}
@@ -159,12 +181,12 @@ const MessageDetail = ({
               </div>
             )}
 
-            <dt>Stored in index</dt>
-            <dd>{message.index ? message.index : 'Message is not stored'}</dd>
+            <dt>{t('message_details.stored_in_index')}</dt>
+            <dd>{message.index ? message.index : t('message_details.not_stored_message')}</dd>
 
             {streamIds.size > 0 && (
               <>
-                <dt>Routed into streams</dt>
+                <dt>{t('message_details.routed_into_streams')}</dt>
                 <dd className="stream-list">
                   <ul>
                     <StreamLinks messageStreams={message.streams} streamIds={streamIds} streams={streams} />

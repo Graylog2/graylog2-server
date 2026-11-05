@@ -1,0 +1,530 @@
+{
+  "shared": {
+    "leader": "Lider",
+    "not_available": "N/D"
+  },
+  "cluster_configuration_nodes": {
+    "loading_search_backend": "Ładowanie węzłów backendu wyszukiwania...",
+    "search_backend_unknown": "Nie udało się ustalić skonfigurowanego backendu wyszukiwania.",
+    "search_placeholder": "Szukaj węzłów…",
+    "all_nodes": "Wszystkie węzły",
+    "data_nodes": "Data Nodes",
+    "opensearch_nodes": "Węzły OpenSearch",
+    "mongodb_nodes": "Węzły MongoDB"
+  },
+  "cluster_column_titles": {
+    "cpu": "CPU",
+    "memory": "Pamięć",
+    "jvm": "JVM",
+    "indexing": "Indeksowanie",
+    "storage": "Magazyn",
+    "buffers": "Bufory",
+    "journal": "Journal",
+    "data_lake_journal": "Data Lake Journal",
+    "throughput": "Przepustowość"
+  },
+  "data_nodes_expandable": {
+    "title": "Data Nodes"
+  },
+  "indexing_metrics_cell": {
+    "docs": "Dokumenty",
+    "latency": "Opóźnienie"
+  },
+  "node_actions": {
+    "thread_dump": "Pobierz zrzut wątków",
+    "process_buffer_dump": "Pobierz zrzut bufora przetwarzania",
+    "metrics": "Metryki"
+  },
+  "graylog_node_actions": {
+    "pause_message_processing": "Wstrzymaj przetwarzanie wiadomości",
+    "resume_message_processing": "Wznów przetwarzanie wiadomości",
+    "override_load_balancer_dead": "Nadpisz status load balancera na DEAD",
+    "override_load_balancer_alive": "Nadpisz status load balancera na ALIVE",
+    "local_message_inputs": "Lokalne wejścia wiadomości",
+    "recent_system_logs": "Pobierz ostatnie wiadomości logów systemowych",
+    "message_processing_title": "Przetwarzanie wiadomości",
+    "pause_confirm": "Zamierzasz <b>wstrzymać</b> przetwarzanie wiadomości na węźle <b>{{nodeName}}</b>. Czy na pewno?",
+    "resume_confirm": "Zamierzasz <b>wznowić</b> przetwarzanie wiadomości na węźle <b>{{nodeName}}</b>. Czy na pewno?",
+    "load_balancer_title": "Load Balancer",
+    "load_balancer_confirm": "Zamierzasz zmienić status load balancera dla węzła <b>{{nodeName}}</b> na <b>{{status}}</b>. Czy na pewno?"
+  },
+  "graylog_nodes_expandable": {
+    "title": "Węzły {{productName}}"
+  },
+  "load_balancer_status_cell": {
+    "aria_label": "Load balancer {{status}}",
+    "status_alive": "Aktywny",
+    "status_dead": "Nieaktywny",
+    "status_throttled": "Ograniczony"
+  },
+  "processing_state_cell": {
+    "aria_label": "Przetwarzanie wiadomości {{status}}",
+    "enabled": "Włączone",
+    "disabled": "Wyłączone"
+  },
+  "mongodb_nodes_expandable": {
+    "title": "Węzły MongoDB"
+  },
+  "mongodb_profiling_action": {
+    "description": "Profilowanie MongoDB pomaga wykrywać wolne zapytania i diagnozować problemy z wydajnością na węzłach klastra.",
+    "enabling_profiling": "Włączanie profilowania...",
+    "enable_confirm": "Włączyć profilowanie <b>Slow Ops</b> ({{threshold}}) na wszystkich węzłach MongoDB? Zmiana zostanie zastosowana natychmiast, bez restartu, ale zostanie zresetowana po restarcie, chyba że zostanie skonfigurowana podczas uruchamiania.",
+    "enable_profiling": "Włącz profilowanie",
+    "disable_profiling": "Wyłącz profilowanie",
+    "enabling": "Włączanie...",
+    "disabling": "Wyłączanie...",
+    "loading_status": "Ładowanie statusu...",
+    "loading_status_title": "Ładowanie statusu profilowania MongoDB",
+    "enable_title": "Ustaw profilowanie na Slow Ops na wszystkich węzłach MongoDB",
+    "disable_title": "Wyłącz profilowanie na wszystkich węzłach MongoDB",
+    "status_loading": "Ładowanie bieżącego statusu profilowania węzłów MongoDB...",
+    "status_off": "Profilowanie jest wyłączone na wszystkich węzłach MongoDB ({{summary}}). Włącz je, aby zbierać diagnostykę wolnych zapytań.",
+    "status_mixed": "Profilowanie różni się między węzłami MongoDB ({{summary}}). Włącz profilowanie, aby diagnostyka była spójna.",
+    "status_enabled": "Profilowanie jest włączone na wszystkich węzłach MongoDB ({{summary}}). Wyłącz je po zakończeniu diagnozy, aby zmniejszyć obciążenie MongoDB.",
+    "status_unavailable_with_summary": "Status profilowania jest niedostępny ({{summary}}). W razie potrzeby nadal możesz go zmienić.",
+    "status_unavailable": "Status profilowania jest niedostępny. W razie potrzeby nadal możesz go zmienić.",
+    "threshold_level": "poziom 1",
+    "threshold_level_with_ms": "poziom 1, próg {{slowMs}} ms",
+    "distribution": "OFF {{off}}, SLOW_OPS {{slowOps}}, ALL {{all}}",
+    "nodes_profiled_one": "{{enabledCount}}/{{count}} węzeł profilowany",
+    "nodes_profiled_few": "{{enabledCount}}/{{count}} węzły profilowane",
+    "nodes_profiled_many": "{{enabledCount}}/{{count}} węzłów profilowanych",
+    "nodes_profiled_other": "{{enabledCount}}/{{count}} węzła profilowanego"
+  },
+  "opensearch_nodes_expandable": {
+    "title": "Węzły OpenSearch"
+  },
+  "cluster_nodes_section_wrapper": {
+    "show_title": "Pokaż {{title}}"
+  },
+  "cpu_metrics_cell": {
+    "load_1m": "Obciążenie (1 min)"
+  },
+  "graylog_cluster_overview": {
+    "cluster": "Klaster",
+    "cluster_id": "ID klastra:",
+    "not_available": "Niedostępne",
+    "number_of_nodes": "Liczba węzłów:"
+  },
+  "cluster_support_bundle_info": {
+    "description": "Utwórz plik ZIP zawierający przydatne informacje diagnostyczne o klastrze Graylog.",
+    "enterprise_customers": "Klienci Graylog Enterprise mogą dołączać pakiety do zgłoszeń do pomocy technicznej, co ułatwia zespołowi wsparcia technicznego Graylog analizę i diagnozowanie problemów.",
+    "examine_content": "Przed udostępnieniem pakietu sprawdź jego zawartość. Może ona zawierać dane wrażliwe, takie jak adresy IP, nazwy hostów, a nawet hasła!",
+    "paid_license_only": "Pomoc techniczna Graylog Enterprise przysługuje wyłącznie użytkownikom z płatną licencją. Plik można jednak wykorzystać do innych celów diagnostycznych."
+  },
+  "cluster_support_bundle_overview": {
+    "title": "Pakiet wsparcia klastra",
+    "create": "Utwórz pakiet wsparcia",
+    "download": "Pobierz",
+    "delete": "Usuń",
+    "filename": "Nazwa pliku",
+    "size": "Rozmiar",
+    "no_bundles": "Nie znaleziono pakietów wsparcia.",
+    "delete_title": "Usuń pakiet wsparcia",
+    "delete_confirm": "Czy na pewno chcesz usunąć <strong>{{name}}</strong>?"
+  },
+  "log_level_metrics": {
+    "level": "Poziom: {{level}}",
+    "total_written": "Łącznie zapisano:",
+    "mean_rate": "Średnia szybkość:",
+    "one_minute_rate": "Szybkość (1 min):",
+    "per_second": "/ sekundę"
+  },
+  "logging_subsystem": {
+    "subsystem": "Podsystem: {{name}}"
+  },
+  "node_loggers": {
+    "show_log_level_metrics": "Pokaż metryki poziomów logowania",
+    "hide_log_level_metrics": "Ukryj metryki poziomów logowania",
+    "total_log_messages": "Łącznie zapisano <strong>{{throughput}} wewnętrznych wiadomości logów.</strong>"
+  },
+  "metric_details": {
+    "value": "Wartość:",
+    "count": "Liczba:",
+    "mean": "Średnia:",
+    "minimum": "Minimum:",
+    "maximum": "Maksimum:",
+    "standard_deviation": "Odchylenie standardowe:",
+    "percentile_95": "95. percentyl:",
+    "percentile_98": "98. percentyl:",
+    "percentile_99": "99. percentyl:",
+    "invalid_type": "Nieprawidłowy typ metryki: {{type}}",
+    "microseconds": "μs"
+  },
+  "meter_details": {
+    "total": "Łącznie:",
+    "events": "zdarzeń",
+    "one_minute_avg": "Średnia (1 min):",
+    "five_minute_avg": "Średnia (5 min):",
+    "fifteen_minute_avg": "Średnia (15 min):"
+  },
+  "counter_rate": {
+    "calculating": "Obliczanie...",
+    "total": "(łącznie: {{total}})",
+    "per_second": "na sekundę"
+  },
+  "metric_container": {
+    "loading": "Ładowanie..."
+  },
+  "metrics_component": {
+    "fetch_error": "Nie udało się pobrać metryk z węzła: serwer zwrócił <em>{{responseMessage}}</em> z kodem statusu {{status}}.",
+    "fetch_problem": "Wystąpił problem podczas pobierania metryk węzła.",
+    "retry_in_background": "Próby ich pobrania będą kontynuowane w tle.",
+    "fetch_error_last_metrics": "Nie udało się pobrać metryk z węzła: serwer zwrócił <em>{{responseMessage}}</em> z kodem statusu {{status}}. Wyświetlono ostatnie dostępne metryki.",
+    "filter_placeholder": "Wpisz nazwę metryki, aby filtrować…"
+  },
+  "metrics_list": {
+    "no_metrics": "Żadna metryka nie pasuje do podanego filtra. Upewnij się, że używasz poprawnego wyrażenia regularnego"
+  },
+  "buffer_usage": {
+    "metrics": "Metryki",
+    "utilization": "<strong>{{usage}} wiadomości</strong> w {{title}}, wykorzystanie: {{percentage}}."
+  },
+  "input_types_data_table": {
+    "loading": "Ładowanie typów wejść...",
+    "unavailable": "Typy wejść są niedostępne.",
+    "documentation": "Dokumentacja",
+    "name": "Nazwa",
+    "type": "Typ",
+    "filter": "Filtr"
+  },
+  "journal_details": {
+    "loading": "Ładowanie metryk journala...",
+    "disabled": "Dyskowy journal jest wyłączony na tym węźle.",
+    "unavailable": "Metryki journala są niedostępne.",
+    "overcommitted": "<strong>Uwaga!</strong> Wykorzystanie journala przekracza zdefiniowany maksymalny rozmiar. <overviewLink>Kliknij tutaj</overviewLink>, aby uzyskać więcej informacji.",
+    "configuration": "Konfiguracja",
+    "path": "Ścieżka:",
+    "earliest_entry": "Najstarszy wpis:",
+    "maximum_size": "Maksymalny rozmiar:",
+    "maximum_age": "Maksymalny wiek:",
+    "flush_policy": "Polityka zapisu:",
+    "flush_policy_value": "Co {{messages}} wiadomości lub {{duration}}",
+    "maximum_age_format": "d [dni] h [godz.] m [min.]",
+    "flush_duration_format": "h [godz.] m [min.] s [sek.]",
+    "utilization": "Wykorzystanie",
+    "unprocessed_messages": "<strong>{{messages}} nieprzetworzonych wiadomości</strong> znajduje się obecnie w journalu, w {{segments}} segmentach.",
+    "appended_and_read": "<strong>{{appended}} wiadomości</strong> zostało dopisanych w ciągu ostatniej sekundy, <strong>{{read}} wiadomości</strong> zostało odczytanych w ciągu ostatniej sekundy."
+  },
+  "journal_state": {
+    "loading": "Ładowanie metryk journala...",
+    "unavailable": "Metryki journala są niedostępne.",
+    "summary_one": "Dziennik zawiera <strong>{{messages}} nieprzetworzonych wiadomości</strong> w {{count}} segmencie. <strong>{{appended}} wiadomości</strong> dopisano, <strong>{{read}} wiadomości</strong> odczytano w ciągu ostatniej sekundy.",
+    "summary_other": "Dziennik zawiera <strong>{{messages}} nieprzetworzonych wiadomości</strong> w {{count}} segmentu. <strong>{{appended}} wiadomości</strong> dopisano, <strong>{{read}} wiadomości</strong> odczytano w ciągu ostatniej sekundy.",
+    "summary_few": "Dziennik zawiera <strong>{{messages}} nieprzetworzonych wiadomości</strong> w {{count}} segmentach. <strong>{{appended}} wiadomości</strong> dopisano, <strong>{{read}} wiadomości</strong> odczytano w ciągu ostatniej sekundy.",
+    "summary_many": "Dziennik zawiera <strong>{{messages}} nieprzetworzonych wiadomości</strong> w {{count}} segmentach. <strong>{{appended}} wiadomości</strong> dopisano, <strong>{{read}} wiadomości</strong> odczytano w ciągu ostatniej sekundy."
+  },
+  "jvm_heap_usage": {
+    "loading": "Ładowanie informacji o zużyciu sterty...",
+    "unavailable": "Informacje o stercie są niedostępne.",
+    "usage": "JVM wykorzystuje <usedBlob /><strong> {{used}}</strong> z <committedBlob /><strong> {{committed}}</strong> przydzielonej przestrzeni sterty i nie będzie próbować użyć więcej niż <maxBlob /><strong> {{max}}</strong>"
+  },
+  "node_list_item": {
+    "system_info_unavailable": "Informacje o systemie są obecnie niedostępne."
+  },
+  "node_maintenance_dropdown": {
+    "actions": "Akcje",
+    "configure_internal_logging": "Konfiguruj logowanie wewnętrzne"
+  },
+  "node_overview": {
+    "plugins_installed_one": "Zainstalowano {{count}} wtyczkę",
+    "plugins_installed_other": "Zainstalowano {{count}} wtyczki",
+    "inputs_running_one": "{{count}} wejście działa na tym węźle",
+    "inputs_running_other": "{{count}} wejścia działa na tym węźle",
+    "memory_heap_usage": "Zużycie pamięci/sterty",
+    "buffers": "Bufory",
+    "buffers_description": "Bufory służą do krótkotrwałego (zazwyczaj przez kilka milisekund) przechowywania niewielkiej liczby wiadomości podczas ich przechodzenia przez kolejne procesory.",
+    "input_buffer": "Bufor wejścia",
+    "process_buffer": "Bufor przetwarzania",
+    "output_buffer": "Bufor wyjścia",
+    "disk_journal": "Dyskowy journal",
+    "disk_journal_description": "Przychodzące wiadomości są zapisywane w dyskowym journalu, aby zapewnić ich bezpieczeństwo w przypadku awarii serwera. Journal pomaga też utrzymać działanie systemu, gdy któreś z wyjść jest zbyt wolne, aby nadążyć za szybkością wiadomości, lub gdy pojawia się szczyt przychodzących wiadomości. Dzięki temu pamięć nie jest przeciążona, a pauzy odśmiecania pamięci nie są nadmiernie długie.",
+    "system": "System",
+    "rest_api": "REST API",
+    "installed_plugins": "Zainstalowane wtyczki",
+    "manage_inputs": "Zarządzaj wejściami",
+    "available_input_types": "Dostępne typy wejść",
+    "plugins_installed_few": "Zainstalowano {{count}} wtyczki",
+    "plugins_installed_many": "Zainstalowano {{count}} wtyczek",
+    "inputs_running_few": "{{count}} wejścia działają na tym węźle",
+    "inputs_running_many": "{{count}} wejść działa na tym węźle"
+  },
+  "nodes_actions": {
+    "details": "Szczegóły",
+    "metrics": "Metryki",
+    "more_actions": "Więcej akcji",
+    "pause_message_processing": "Wstrzymaj przetwarzanie wiadomości",
+    "resume_message_processing": "Wznów przetwarzanie wiadomości",
+    "pause_confirm": "Zamierzasz wstrzymać przetwarzanie wiadomości na tym węźle. Czy na pewno?",
+    "resume_confirm": "Zamierzasz wznowić przetwarzanie wiadomości na tym węźle. Czy na pewno?",
+    "override_lb_status": "Nadpisz status LB",
+    "status_alive": "ALIVE",
+    "status_dead": "DEAD",
+    "load_balancer_confirm": "Zamierzasz zmienić status load balancera dla tego węzła na {{status}}. Czy na pewno?",
+    "local_message_inputs": "Lokalne wejścia wiadomości",
+    "thread_dump": "Pobierz zrzut wątków",
+    "process_buffer_dump": "Pobierz zrzut bufora przetwarzania",
+    "recent_system_logs": "Pobierz ostatnie wiadomości logów systemowych"
+  },
+  "nodes_list": {
+    "active_nodes_one": "Jest {{count}} aktywny węzeł",
+    "active_nodes_other": "Liczba aktywnych węzłów: {{count}}",
+    "no_active_nodes": "Brak aktywnych węzłów.",
+    "active_nodes_few": "Są {{count}} aktywne węzły",
+    "active_nodes_many": "Jest {{count}} aktywnych węzłów"
+  },
+  "plugins_data_table": {
+    "loading": "Ładowanie wtyczek na tym węźle...",
+    "no_plugins": "Na tym węźle nie zainstalowano żadnych wtyczek.",
+    "name": "Nazwa",
+    "version": "Wersja",
+    "author": "Autor",
+    "description": "Opis",
+    "website": "Strona internetowa",
+    "filter": "Filtr"
+  },
+  "rest_api_overview": {
+    "transport_address": "Adres transportowy:",
+    "last_seen": "Ostatnio widziany:"
+  },
+  "system_information": {
+    "pid_info": "PID {{pid}}, {{info}}",
+    "jvm_unavailable": "Informacje o JVM dla tego węzła są niedostępne.",
+    "hostname": "Nazwa hosta:",
+    "node_id": "ID węzła:",
+    "version": "Wersja:",
+    "version_codename": "{{version}}, nazwa kodowa <em>{{codename}}</em>",
+    "jvm": "JVM:",
+    "time": "Czas:"
+  },
+  "system_overview_details": {
+    "pause_confirm": "Zamierzasz wstrzymać przetwarzanie wiadomości na tym węźle. Czy na pewno?",
+    "resume_confirm": "Zamierzasz wznowić przetwarzanie wiadomości na tym węźle. Czy na pewno?",
+    "what_does_this_mean": "Co to oznacza?",
+    "lifecycle_state": "Stan cyklu życia: <strong>{{lifecycle}}</strong>",
+    "marked_as_lb_status": "Oznaczony jako <strong>{{status}}</strong> dla load balancerów",
+    "pause_processing": "Wstrzymaj przetwarzanie",
+    "resume_processing": "Wznów przetwarzanie",
+    "not_processing": "Węzeł <strong>nie</strong> przetwarza wiadomości"
+  },
+  "system_overview_summary": {
+    "current_lifecycle_state": "Bieżący stan cyklu życia:",
+    "message_processing": "Przetwarzanie wiadomości:",
+    "enabled": "Włączone",
+    "disabled": "Wyłączone",
+    "lb_indication": "Wskazanie load balancera:"
+  },
+  "bulk_actions": {
+    "dismiss": "Odrzuć"
+  },
+  "system_notifications_table": {
+    "title": "Powiadomienia",
+    "human_name": "powiadomień"
+  },
+  "actions_cell": {
+    "dismiss": "Odrzuć"
+  },
+  "title_cell": {
+    "show_full_message": "Pokaż pełną wiadomość dla: {{title}}"
+  },
+  "system_job": {
+    "acknowledge_failed": "Nie udało się potwierdzić zadania",
+    "cancel_failed": "Nie udało się anulować zadania",
+    "cancel_confirm": "Czy na pewno chcesz anulować zadanie systemowe \"{{info}}\"?",
+    "on_node": "- na",
+    "runtime": "czas działania: {{duration}}",
+    "cancel": "Anuluj",
+    "acknowledge": "Potwierdź"
+  },
+  "system_jobs_component": {
+    "title": "Zadania systemowe",
+    "description": "Zadanie systemowe to długotrwałe zadanie wykonywane przez węzeł serwera {{productName}} ze względów konserwacyjnych. Niektóre zadania udostępniają informacje o postępie lub mogą zostać zatrzymane."
+  },
+  "system_jobs_list": {
+    "no_active_jobs": "Brak aktywnych zadań systemowych."
+  },
+  "system_messages_component": {
+    "title": "Wiadomości systemowe",
+    "description": "Wiadomości systemowe są generowane przez węzły serwera {{productName}} w przypadku określonych zdarzeń, które mogą być istotne dla administratorów {{productName}}. Nie musisz podejmować żadnych działań w odniesieniu do zdarzeń tutaj widocznych, ponieważ powiadomienia zostaną wygenerowane dla każdego zdarzenia wymagającego działania."
+  },
+  "system_messages_list": {
+    "timestamp": "Znacznik czasu",
+    "node": "Węzeł",
+    "message": "Wiadomość"
+  },
+  "global_throughput": {
+    "aria_label": "Przepustowość: wejście {{input}} / wyjście {{output}} msg/s",
+    "in_title": "Wiadomości przychodzące na sekundę",
+    "out_title": "Wiadomości wychodzące na sekundę"
+  },
+  "node_throughput": {
+    "loading": "Ładowanie przepustowości...",
+    "unable_to_load": "Nie udało się załadować przepustowości.",
+    "processing_long": "Przetwarzanie <strong>{{totalIn}}</strong> przychodzących i <strong>{{totalOut}}</strong> wychodzących msg/s.",
+    "short": "Wejście {{totalIn}} / wyjście {{totalOut}} msg/s."
+  },
+  "telemetry_debug_entry_row": {
+    "delta": " (+{{delta}} ms)",
+    "pii_suspect": "Podejrzenie danych osobowych: {{suspect}}",
+    "copy_as_json": "Kopiuj zdarzenie jako JSON"
+  },
+  "telemetry_debug_overlay": {
+    "badge_label": "Debug telemetrii",
+    "badge": "Debug telemetrii: {{count}}",
+    "drawer_label": "Panel debugowania telemetrii",
+    "resize_label": "Zmień rozmiar panelu debugowania telemetrii",
+    "title": "Debug telemetrii ({{count}})",
+    "filter_label": "Filtruj zdarzenia",
+    "filter_placeholder": "Filtruj według nazwy zdarzenia lub ładunku...",
+    "resume": "Wznów",
+    "pause": "Wstrzymaj",
+    "clear": "Wyczyść",
+    "export_session": "Eksportuj sesję",
+    "collapse": "Zwiń",
+    "no_events": "Nie zarejestrowano jeszcze żadnych zdarzeń telemetrii — korzystaj z aplikacji, aby zobaczyć je tutaj.",
+    "time": "Czas",
+    "event": "Zdarzenie",
+    "action": "Akcja",
+    "status": "Status"
+  },
+  "cluster_configuration_page": {
+    "title": "Konfiguracja klastra",
+    "description": "Ta strona zapewnia przegląd węzłów klastra w czasie rzeczywistym. Przetwarzanie wiadomości można wstrzymać w dowolnym momencie. Bufory przetwarzania nie będą przyjmować nowych wiadomości, dopóki przetwarzanie nie zostanie wznowione. Jeśli dziennik wiadomości jest włączony dla węzła (co jest domyślnym ustawieniem), przychodzące wiadomości będą zapisywane na dysku, nawet gdy przetwarzanie jest wyłączone."
+  },
+  "configurations_page": {
+    "title": "Konfiguracje",
+    "description": "Na tej stronie można konfigurować ustawienia systemu dla poszczególnych podsystemów.",
+    "plugins": "Wtyczki"
+  },
+  "enterprise_page": {
+    "document_title": "{{productName}} Enterprise",
+    "page_title": "<upsell>Wypróbuj</upsell> {{productName}} Enterprise",
+    "learn_more": "<upsell><productLink>Dowiedz się więcej</productLink> o funkcjach {{productName}} Enterprise.</upsell>"
+  },
+  "process_buffer_dump_page": {
+    "title": "Zrzut bufora przetwarzania węzła {{shortNodeId}} / {{hostname}}",
+    "taken_at": "Wykonano <0/>"
+  },
+  "show_metrics_page": {
+    "title": "Metryki węzła {{shortNodeId}} / {{hostname}}",
+    "description": "Wszystkie węzły {{productName}} udostępniają zestaw wewnętrznych metryk do diagnostyki, debugowania i monitorowania. Wszystkie metryki można również pobrać przez JMX.",
+    "total_metrics_one": "Ten węzeł raportuje łącznie {{count}} metrykę.",
+    "total_metrics_other": "Ten węzeł raportuje łącznie {{count}} metryki.",
+    "total_metrics_few": "Ten węzeł raportuje łącznie {{count}} metryki.",
+    "total_metrics_many": "Ten węzeł raportuje łącznie {{count}} metryk."
+  },
+  "node_page": {
+    "title": "Węzeł {{shortNodeId}} / {{hostname}}",
+    "description": "Ta strona przedstawia szczegóły aktywnego i dostępnego w klastrze węzła serwera {{productName}}.",
+    "leader_node": "To jest węzeł lider.",
+    "not_leader_node": "To <em>nie</em> jest węzeł lider."
+  },
+  "system_logs_page": {
+    "title": "Najnowsze logi systemowe (maksymalnie {{limit}}) węzła {{shortNodeId}} / {{hostname}}",
+    "taken_at": "Wykonano <0/>",
+    "reload": "Odśwież",
+    "back": "Wstecz",
+    "document_title": "Logi systemowe węzła {{shortNodeId}} / {{hostname}}"
+  },
+  "system_notifications_page": {
+    "title": "Powiadomienia systemowe"
+  },
+  "system_overview_page": {
+    "title": "Przegląd systemu"
+  },
+  "thread_dump_page": {
+    "title": "Zrzut wątków węzła {{shortNodeId}} / {{hostname}}",
+    "taken_at": "Wykonano <0/>"
+  },
+  "notifications": {
+    "lb_change_success": "Status load balancera został pomyślnie zmieniony na '{{status}}' w węźle '{{nodeId}}'",
+    "lb_change_failed": "Zmiana statusu load balancera w '{{nodeId}}' nie powiodła się: {{error}}",
+    "lb_change_failed_title": "Nie udało się zmienić statusu load balancera na '{{status}}' w węźle '{{nodeId}}'",
+    "processing_pause_success": "Przetwarzanie wiadomości zostało pomyślnie wstrzymane w '{{nodeId}}'",
+    "processing_pause_failed": "Wstrzymanie przetwarzania wiadomości w '{{nodeId}}' nie powiodło się: {{error}}",
+    "processing_pause_failed_title": "Nie udało się wstrzymać przetwarzania wiadomości w węźle '{{nodeId}}'",
+    "processing_resume_success": "Przetwarzanie wiadomości zostało pomyślnie wznowione w '{{nodeId}}'",
+    "processing_resume_failed": "Wznowienie przetwarzania wiadomości w '{{nodeId}}' nie powiodło się: {{error}}",
+    "processing_resume_failed_title": "Nie udało się wznowić przetwarzania wiadomości w węźle '{{nodeId}}'",
+    "nothing_selected": "Nie wybrano powiadomień.",
+    "nothing_to_dismiss_title": "Brak powiadomień do odrzucenia",
+    "bulk_dismiss_failed": "Nie udało się odrzucić powiadomień. Spróbuj ponownie.",
+    "dismiss_failed": "Nie udało się odrzucić powiadomienia. Spróbuj ponownie.",
+    "dismiss_failed_title": "Odrzucenie nie powiodło się",
+    "profiling_enabled": "Profilowanie MongoDB zostało pomyślnie włączone.",
+    "profiling_disabled": "Profilowanie MongoDB zostało pomyślnie wyłączone.",
+    "profiling_enable_failed": "Nie udało się włączyć profilowania MongoDB: {{error}}",
+    "profiling_disable_failed": "Nie udało się wyłączyć profilowania MongoDB: {{error}}",
+    "profiling_update_failed_title": "Nie udało się zaktualizować profilowania MongoDB.",
+    "data_node_metrics_failed": "Nie udało się załadować metryk Data Node \"{{hostname}}\"",
+    "data_node_metrics_failed_title": "Nie udało się załadować metryk Data Node.",
+    "graylog_node_metrics_failed": "Ładowanie metryk węzła Graylog nie powiodło się, status:",
+    "graylog_node_metrics_failed_title": "Nie udało się załadować metryk węzła Graylog.",
+    "cluster_traffic_failed": "Ładowanie ruchu w klastrze nie powiodło się, status:",
+    "cluster_traffic_failed_title": "Nie udało się załadować ruchu w klastrze",
+    "journal_failed": "Nie udało się pobrać informacji o journalu",
+    "system_jobs_failed": "Ładowanie zadań systemowych nie powiodło się, status:",
+    "system_jobs_failed_title": "Nie udało się załadować zadań systemowych"
+  },
+  "use_cluster_overview_notifications": {
+    "jvm_failed": "Pobranie informacji o JVM dla węzła '{{nodeId}}' nie powiodło się: {{error}}",
+    "jvm_failed_title": "Nie udało się pobrać informacji o JVM",
+    "thread_dump_failed": "Pobranie zrzutu wątków dla węzła '{{nodeId}}' nie powiodło się: {{error}}",
+    "thread_dump_failed_title": "Nie udało się pobrać zrzutu wątków",
+    "process_buffer_dump_failed": "Pobranie zrzutu bufora przetwarzania dla węzła '{{nodeId}}' nie powiodło się: {{error}}",
+    "process_buffer_dump_failed_title": "Nie udało się pobrać zrzutu bufora przetwarzania",
+    "system_logs_failed": "Pobranie wiadomości logów systemowych dla węzła '{{nodeId}}' nie powiodło się: {{error}}",
+    "system_logs_failed_title": "Nie udało się pobrać wiadomości logów systemowych",
+    "overview_failed": "Pobranie przeglądu klastra nie powiodło się: {{error}}",
+    "overview_failed_title": "Nie udało się pobrać przeglądu klastra"
+  },
+  "use_cluster_support_bundle_notifications": {
+    "create_failed": "Utworzenie pakietu wsparcia nie powiodło się, status: {{error}}",
+    "create_failed_title": "Nie udało się utworzyć pakietu wsparcia.",
+    "delete_failed": "Usunięcie pakietu wsparcia nie powiodło się, status: {{error}}",
+    "delete_failed_title": "Nie udało się usunąć pakietu wsparcia.",
+    "download_failed": "Pobranie pakietu wsparcia nie powiodło się, status: {{error}}",
+    "download_failed_title": "Nie udało się pobrać pakietu wsparcia.",
+    "load_list_failed": "Ładowanie listy pakietów wsparcia nie powiodło się, status:",
+    "load_list_failed_title": "Nie udało się załadować listy pakietów wsparcia."
+  },
+  "use_plugin_list_notifications": {
+    "fetch_failed": "Pobranie wtyczek na węźle \"{{nodeId}}\" nie powiodło się",
+    "fetch_failed_title": "Nie udało się pobrać wtyczek"
+  },
+  "node_lifecycle": {
+    "uninitialized": "Niezainicjowany",
+    "starting": "Uruchamianie",
+    "running": "Działa",
+    "failed": "Niepowodzenie",
+    "halting": "Zatrzymywanie",
+    "paused": "Wstrzymany",
+    "throttled": "Ograniczony",
+    "override_lb_alive": "Load balancer: aktywny (wymuszony)",
+    "override_lb_dead": "Load balancer: nieaktywny (wymuszony)",
+    "override_lb_throttled": "Load balancer: ograniczony (wymuszony)"
+  },
+  "buffers_metrics_cell": {
+    "input": "Wejście",
+    "process": "Przetwarzanie",
+    "output": "Wyjście"
+  },
+  "throughput_metrics_cell": {
+    "in": "Przychodzące",
+    "out": "Wychodzące"
+  },
+  "mongodb_nodes": {
+    "profiling_levels": {
+      "off": "Wyłączone",
+      "slow_ops": "Slow Ops",
+      "all": "Wszystkie",
+      "unknown": "Nieznany ({{level}})"
+    },
+    "roles": {
+      "primary": "PODSTAWOWY",
+      "secondary": "POMOCNICZY",
+      "arbiter": "ARBITER",
+      "standalone": "SAMODZIELNY"
+    }
+  }
+}

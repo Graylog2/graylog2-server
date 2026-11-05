@@ -15,25 +15,30 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { DocumentTitle, PageHeader } from 'components/common';
 import ConfigurationForm from 'components/sidecars/configuration-forms/ConfigurationForm';
 import SidecarsPageNavigation from 'components/sidecars/common/SidecarsPageNavigation';
 import DocsHelper from 'util/DocsHelper';
 
-const SidecarNewConfigurationPage = () => (
-  <DocumentTitle title="New Collector Configuration">
-    <SidecarsPageNavigation />
-    <PageHeader
-      title="New Collector Configuration"
-      documentationLink={{
-        title: 'Sidecar documentation',
-        path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
-      }}>
-      <span>Some words about collector configurations.</span>
-    </PageHeader>
-    <ConfigurationForm action="create" />
-  </DocumentTitle>
-);
+const SidecarNewConfigurationPage = () => {
+  const { t } = useTranslation('sidecars');
+
+  return (
+    <DocumentTitle title={t('pages.new_configuration.title')}>
+      <SidecarsPageNavigation />
+      <PageHeader
+        title={t('pages.new_configuration.title')}
+        documentationLink={{
+          title: t('pages.documentation_title'),
+          path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
+        }}>
+        <span>{t('pages.new_configuration.description')}</span>
+      </PageHeader>
+      <ConfigurationForm action="create" />
+    </DocumentTitle>
+  );
+};
 
 export default SidecarNewConfigurationPage;

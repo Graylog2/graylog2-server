@@ -15,15 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans } from 'react-i18next';
 
+import i18n from 'i18n';
 import { Alert, ControlLabel, FormGroup, HelpBlock } from 'components/bootstrap';
 import { Select } from 'components/common';
 import { ConfigurationFormField } from 'components/configurationforms';
 
 import commonStyles from './LegacyNotificationCommonStyles.css';
 
+// The form is a class component, so texts are translated at render time.
+const t = (key: string, options = {}) => i18n.t(key, { ns: 'event_notifications', ...options });
+
 const formatLegacyTypes = (legacyTypes) =>
-  Object.keys(legacyTypes).map((typeName) => ({ label: `Legacy ${legacyTypes[typeName].name}`, value: typeName }));
+  Object.keys(legacyTypes).map((typeName) => ({
+    label: t('legacy.type_option', { name: legacyTypes[typeName].name }),
+    value: typeName,
+  }));
 
 type LegacyNotificationFormProps = {
   config: any;
@@ -114,7 +122,12 @@ class LegacyNotificationForm extends React.Component<
     } else if (callbackType) {
       content = (
         <Alert bsStyle="danger" className={commonStyles.legacyNotificationAlert}>
-          Unknown legacy alarm callback type: <strong>{callbackType}</strong> Please make sure the plugin is installed.
+          <Trans
+            ns="event_notifications"
+            i18nKey="legacy.unknown_callback_type_form"
+            values={{ callbackType }}
+            components={{ strong: <strong /> }}
+          />
         </Alert>
       );
     }
@@ -125,24 +138,20 @@ class LegacyNotificationForm extends React.Component<
           <FormGroup
             controlId="notification-legacy-select"
             validationState={validation.errors.callback_type ? 'error' : null}>
-            <ControlLabel>Choose Legacy Notification</ControlLabel>
+            <ControlLabel>{t('legacy.choose')}</ControlLabel>
             <Select
               id="notification-legacy-select"
-              placeholder="Select Legacy Notification"
+              placeholder={t('legacy.select')}
               onChange={this.handleSelectNotificationChange}
               options={formatLegacyTypes(legacyTypes)}
               value={callbackType}
             />
-            <HelpBlock>
-              {validation?.errors?.callback_type?.[0] ??
-                'Select a Legacy Notification to use on this Event Definition.'}
-            </HelpBlock>
+            <HelpBlock>{validation?.errors?.callback_type?.[0] ?? t('legacy.select_help')}</HelpBlock>
           </FormGroup>
         </fieldset>
 
         <Alert bsStyle="danger" className={commonStyles.legacyNotificationAlert}>
-          Legacy alarm callbacks are deprecated and will be removed with the next major release. Please switch to the
-          new notification types as soon as possible!
+          {t('legacy.deprecated')}
         </Alert>
 
         {content}

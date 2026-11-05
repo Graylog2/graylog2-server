@@ -1,0 +1,226 @@
+{
+  "copy_to_dashboard": {
+    "title": "Copier le widget vers le tableau de bord",
+    "no_dashboards": "Aucun tableau de bord trouvé.",
+    "create_new": "Créer un nouveau tableau de bord"
+  },
+  "edit_message_list": {
+    "fields": "Champs",
+    "message_preview": "Aperçu du message",
+    "sorting": "Tri",
+    "direction": "Direction",
+    "decorators": "Décorateurs"
+  },
+  "widget_frame": {
+    "loading": "Chargement du widget ..."
+  },
+  "export_widget": {
+    "export_all": "Exporter tous les résultats de recherche",
+    "title": "Exporter le widget",
+    "enterprise_explanation": "La fonctionnalité d'export des widgets d'agrégation est disponible dans la version Enterprise. Elle permet d'exporter vos données dans des formats de fichiers courants tels que CSV, JSON, YAML, XML, etc."
+  },
+  "field_sort": {
+    "placeholder": "Aucun : cliquez pour ajouter des champs",
+    "aria_label": "Sélectionner le champ pour le tri"
+  },
+  "fields_configuration": {
+    "add_field": "Ajouter un champ",
+    "hide_selected_one": "Masquer {{count}} champ sélectionné",
+    "hide_selected_other": "Masquer {{count}} champs sélectionnés",
+    "show_selected_one": "Afficher {{count}} champ sélectionné",
+    "show_selected_other": "Afficher {{count}} champs sélectionnés",
+    "hide_selected_many": "Masquer {{count}} champs sélectionnés",
+    "show_selected_many": "Afficher {{count}} champs sélectionnés"
+  },
+  "move_widget": {
+    "no_pages": "Aucune page trouvée",
+    "copy": "Copier le widget",
+    "move": "Déplacer le widget",
+    "title": "Choisir la page cible",
+    "keep_copy": "Conserver une copie sur cette page",
+    "keep_copy_help": "Lorsque « Conserver une copie sur la page » est activé, le widget sera copié et non déplacé vers une autre page"
+  },
+  "widget_edit": {
+    "update": "Mettre à jour le widget",
+    "updating": "Mise à jour du widget..."
+  },
+  "execution_info": {
+    "executed_at": "Exécuté à :",
+    "executed_at_label": "Exécuté à",
+    "executed_in": "Exécuté en :",
+    "duration": "{{duration}}ms",
+    "effective_time_range": "Plage de temps effective :",
+    "from": "Du",
+    "to": "Au",
+    "from_label": "Plage de temps effective, début",
+    "to_label": "Plage de temps effective, fin",
+    "total_results": "Nombre total de résultats :",
+    "title": "Informations d'exécution",
+    "no_query_executed": "Aucune requête exécutée pour le moment."
+  },
+  "selected_fields": {
+    "fields": "Champs",
+    "edit_field": "Modifier le champ {{field}}",
+    "remove_field": "Supprimer le champ {{field}}"
+  },
+  "sort_direction": {
+    "ascending": "Croissant",
+    "descending": "Décroissant",
+    "no_sorting": "Aucun tri sélectionné",
+    "select_direction": "Cliquez pour sélectionner le sens"
+  },
+  "timerange_info": {
+    "global_override": "Remplacement global : {{timerange}}",
+    "effective_unavailable": "La plage de temps effective du widget n'est pas disponible actuellement.",
+    "independent": "Le résultat de ce widget est indépendant de la recherche en cours.",
+    "all_time": "Toute la période"
+  },
+  "unknown_widget": {
+    "title": "Widget inconnu : {{type}}",
+    "cannot_render": "Malheureusement, nous ne pouvons pas afficher ce widget, car nous ne savons pas traiter les widgets de type <strong>{{type}}</strong>. Cela peut être dû à l'une de ces situations :",
+    "missing_plugin": "Vous avez créé ce widget à l'aide d'un plugin qui n'est plus disponible.",
+    "legacy_dashboard": "Ce widget faisait partie d'un ancien tableau de bord et a été créé par un plugin qui n'est plus disponible.",
+    "what_to_do": "Que pouvez-vous faire ? Vous pouvez réinstaller le plugin, contacter l'auteur du plugin pour obtenir une version compatible avec la version actuelle de {{productName}}, ou supprimer le widget si vous n'en avez plus besoin.",
+    "copy_config": "Dans tous les cas, vous pouvez copier la configuration du widget dans le presse-papiers :"
+  },
+  "widget_actions": {
+    "open_dropdown": "Ouvrir le menu des actions",
+    "unfocus": "Quitter le mode focus du widget",
+    "focus": "Mettre ce widget en mode focus",
+    "edit": "Modifier",
+    "duplicate": "Dupliquer",
+    "copy_to_dashboard": "Copier vers le tableau de bord",
+    "move_to_page": "Déplacer vers la page",
+    "copying": "Copie du widget...",
+    "copy": "Copier le widget",
+    "confirm_remove": "Voulez-vous vraiment supprimer le widget « {{title}} » ?",
+    "compress_width": "Réduire la largeur",
+    "stretch_width": "Étendre la largeur",
+    "replay_search": "Rejouer la recherche"
+  },
+  "widget_loading": {
+    "content": "Chargement du contenu du widget"
+  },
+  "widget_errors": {
+    "render_error": "Lors de l'affichage de ce widget, l'erreur suivante s'est produite :"
+  },
+  "widget_header": {
+    "no_description": "Aucune description de widget fournie",
+    "show_description": "Afficher la description du widget",
+    "description_placeholder": "Veuillez ajouter une description utile au widget",
+    "drag_handle": "Poignée de déplacement pour {{title}}"
+  },
+  "warm_tier": {
+    "info": "Info",
+    "loading_slow": "Ce widget récupère des données depuis le Warm Tier et son chargement peut prendre plus de temps."
+  },
+  "events_widget": {
+    "actions": "Actions",
+    "replay_search": "Rejouer la recherche",
+    "view_details": "Voir les détails de l'événement",
+    "toggle_actions": "Afficher/masquer les actions de l'événement",
+    "details_title": "Détails de l'événement",
+    "close": "Fermer",
+    "unknown_visualization": "Type de visualisation de widget inconnu {{mode}}",
+    "mode_list": "Liste",
+    "mode_count": "Nombre",
+    "visualization": "Visualisation",
+    "columns": "Colonnes",
+    "select_column": "Sélectionner une nouvelle colonne",
+    "filter": "Filtre",
+    "sorting": "Tri",
+    "unknown_attribute": "Inconnu",
+    "unknown_attribute_help": "Cet attribut n'est pas disponible actuellement, car il nécessite une licence valide.",
+    "select_event_definition": "Sélectionner une Event Definition",
+    "alert": "Alerte",
+    "event": "Événement"
+  },
+  "overview_configuration": {
+    "remove_column": "Supprimer la colonne {{column}}",
+    "column": "Colonne",
+    "select_column": "Sélectionner une colonne",
+    "direction": "Direction",
+    "select_direction": "Sélectionner un sens",
+    "type": "Type",
+    "add_column": "Ajouter une colonne",
+    "configure_filter": "Configurer un nouveau filtre",
+    "edit_filter": "Modifier le filtre {{column}}",
+    "delete_filter": "Supprimer le filtre {{column}}"
+  },
+  "date_filter": {
+    "single_date": "Date unique",
+    "range": "Plage",
+    "select_single_date": "Sélectionner le type date unique",
+    "select_range": "Sélectionner le type plage",
+    "date_range": "{{from}} à {{to}}"
+  },
+  "message_table": {
+    "actions": "Actions",
+    "loading": "Chargement",
+    "decorated": "(décoré)",
+    "stopped_node": "nœud arrêté",
+    "cluster_node": "Nœud du cluster {{nodeId}} / {{hostname}}",
+    "decorators": {
+      "create_new": "Créer un nouveau {{name}}",
+      "select_decorator": "Sélectionner un décorateur",
+      "none_configured": "Aucun décorateur configuré.",
+      "actions": "Actions",
+      "edit": "Modifier",
+      "edit_named": "Modifier {{name}}",
+      "unknown_type": "Type de décorateur inconnu",
+      "create": "Créer",
+      "update": "Mettre à jour",
+      "help_title": "Que sont les décorateurs de messages ?",
+      "help_description": "Les décorateurs peuvent modifier à la volée les messages affichés dans les résultats de recherche. Ces modifications ne sont pas enregistrées et ne sont affichées que dans les résultats de recherche. La configuration des décorateurs est enregistrée <strong>par Stream</strong>.",
+      "help_order": "Utilisez le glisser-déposer pour modifier l'ordre de traitement des décorateurs.",
+      "help_docs": "En savoir plus sur les décorateurs de messages dans la <docsLink>documentation</docsLink>."
+    },
+    "show_message_in_new_row": "Afficher le message sur une nouvelle ligne"
+  },
+  "data_table": {
+    "spacer": "espace",
+    "display_name": "Tableau de données",
+    "pinned_columns_title": "Colonnes épinglées",
+    "show_row_numbers_title": "Afficher les numéros de ligne"
+  },
+  "field_types": {
+    "missing_event_definition": "Event Definition introuvable : {{id}}"
+  },
+  "export": {
+    "title_search": "Exporter tous les résultats de recherche",
+    "title_dashboard": "Exporter les résultats de recherche de la table de messages",
+    "select_different_table": "Sélectionner une autre table de messages",
+    "downloading": "Téléchargement...",
+    "start_download": "Lancer le téléchargement",
+    "settings_based_on": "Les paramètres suivants sont basés sur la table de messages : {{title}}",
+    "exporting_table": "Vous exportez actuellement les résultats de recherche de la table de messages : {{title}}",
+    "define_fields": "Définissez les champs de votre fichier.",
+    "decorated_fields_hint": "L'export prend en charge les champs créés par les décorateurs faisant partie de la table de messages, mais ils n'apparaissent pas actuellement dans la liste des champs. Si vous souhaitez exporter un champ décoré, saisissez simplement son nom.",
+    "finish_hint": "Une fois la configuration terminée, cliquez sur <quote>Lancer le téléchargement</quote>.",
+    "fields_to_export": "Champs à exporter",
+    "messages_limit": "Limite de messages",
+    "limit_help": "Les messages sont chargés par blocs. Si une limite est définie, tous les blocs jusqu'à celui où la limite est atteinte seront récupérés. Le nombre total de messages livrés peut donc être supérieur à la limite définie.",
+    "search_contains_all": "L'export contiendra tous les messages de votre recherche actuelle.",
+    "search_select_table": "Veuillez sélectionner une table de messages pour reprendre ses champs. Vous pourrez ajuster tous les paramètres à l'étape suivante.",
+    "dashboard_select_table": "Veuillez sélectionner la table de messages dont vous souhaitez exporter les résultats de recherche. Vous pourrez ajuster ses champs à l'étape suivante.",
+    "dashboard_equals_action": "Sélectionner une table de messages revient à utiliser l'option « Exporter en CSV » du menu d'actions d'une table de messages.",
+    "select_message_table": "Sélectionner une table de messages",
+    "no_message_table": "Vous devez créer un widget de table de messages pour exporter ses résultats.",
+    "output_format": "Format de sortie",
+    "untitled_view": "{{type}} sans titre"
+  },
+  "enterprise_widgets": {
+    "message_list": "Liste de messages",
+    "results": "Résultats",
+    "events": "Événements",
+    "text_markdown": "Texte/Markdown"
+  },
+  "comma_separated_values_csv": "Valeurs séparées par des virgules (CSV)",
+  "error_widget": {
+    "title": "Lors de la récupération des données de ce widget, les erreurs suivantes se sont produites :"
+  },
+  "notifications": {
+    "delete_decorator_confirm": "Voulez-vous vraiment supprimer ce décorateur ?",
+    "unsaved_changes_confirm": "Vous avez des modifications non enregistrées dans le formulaire de configuration. Cette action les annulera."
+  }
+}

@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import type { Column } from '@tanstack/react-table';
 
@@ -44,12 +45,13 @@ const SORT_DIRECTIONS = {
   DESC: 'desc',
 } as const;
 
-const SORT_ORDER_NAMES = {
-  asc: 'ascending',
-  desc: 'descending',
-};
+const SORT_TITLES = {
+  asc: 'entity_table.sort_column_ascending',
+  desc: 'entity_table.sort_column_descending',
+} as const;
 
 const SortIcon = <Entity extends EntityBase>({ column }: { column: Column<Entity> }) => {
+  const { t } = useTranslation('common');
   const nextSortDirection = column.getNextSortingOrder() || SORT_DIRECTIONS.ASC;
   const columnMeta = column.columnDef.meta as ColumnMetaContext<Entity>;
   const isRightAligned = columnMeta?.columnRenderer?.textAlign === 'right';
@@ -58,7 +60,7 @@ const SortIcon = <Entity extends EntityBase>({ column }: { column: Column<Entity
     <StyledCommonSortIcon
       activeDirection={column.getIsSorted() || null}
       onChange={() => column.toggleSorting()}
-      title={`Sort ${columnMeta.label.toLowerCase()} ${SORT_ORDER_NAMES[nextSortDirection]}`}
+      title={t(SORT_TITLES[nextSortDirection], { column: columnMeta.label })}
       ascId={SORT_DIRECTIONS.ASC}
       descId={SORT_DIRECTIONS.DESC}
       $isRightAligned={isRightAligned}

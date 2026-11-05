@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import FormDataContext from 'integrations/contexts/FormDataContext';
 import type { FormDataType } from 'integrations/types';
@@ -38,6 +39,7 @@ type Props = {
 };
 
 const CloudTrail = ({ externalInputSubmit, onSubmit = undefined }: Props) => {
+  const { t } = useTranslation('integrations');
   const { availableSteps, currentStep, isDisabledStep, setAvailableStep, setCurrentStep, setEnabledStep } =
     useContext<StepsContextType>(StepsContext);
 
@@ -83,19 +85,19 @@ const CloudTrail = ({ externalInputSubmit, onSubmit = undefined }: Props) => {
     return [
       {
         key: 'authorize',
-        title: <>AWS CloudTrail Connection Configuration</>,
+        title: t('aws_cloudtrail.step_authorize_title'),
         component: <StepAuthorize onSubmit={handleSubmit} onChange={handleFieldUpdate} />,
         disabled: isDisabledStep('authorize'),
       },
       {
         key: 'subscribe',
-        title: <>AWS CloudTrail Input Configuration</>,
+        title: t('aws_cloudtrail.step_subscribe_title'),
         component: <StepSubscribe onSubmit={handleSubmit} onChange={handleFieldUpdate} />,
         disabled: isDisabledStep('subscribe'),
       },
       {
         key: 'review',
-        title: <>AWS CloudTrail Final Review</>,
+        title: t('aws_cloudtrail.step_review_title'),
         component: <StepReview onSubmit={handleSubmit} externalInputSubmit={externalInputSubmit} />,
         disabled: isDisabledStep('review'),
       },
@@ -111,6 +113,7 @@ const CloudTrail = ({ externalInputSubmit, onSubmit = undefined }: Props) => {
     setCurrentStep,
     onSubmit,
     history,
+    t,
   ]);
 
   useEffect(() => {

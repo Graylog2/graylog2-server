@@ -31,18 +31,21 @@ PluginStore.register(
         {
           type: 'org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy',
           displayName: 'Delete Index',
+          displayNameKey: 'indexsets:strategies.name_retention_delete',
           configComponent: DeletionRetentionStrategyConfiguration,
           summaryComponent: DeletionRetentionStrategySummary,
         },
         {
           type: 'org.graylog2.indexer.retention.strategies.ClosingRetentionStrategy',
           displayName: 'Close Index',
+          displayNameKey: 'indexsets:strategies.name_retention_close',
           configComponent: ClosingRetentionStrategyConfiguration,
           summaryComponent: ClosingRetentionStrategySummary,
         },
         {
           type: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategy',
           displayName: 'Do nothing',
+          displayNameKey: 'indexsets:strategies.name_retention_noop',
           configComponent: NoopRetentionStrategyConfiguration,
           summaryComponent: NoopRetentionStrategySummary,
         },

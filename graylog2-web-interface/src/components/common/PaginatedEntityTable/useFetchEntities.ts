@@ -19,6 +19,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { OrderedMap } from 'immutable';
 
 import type { SearchParams, Attribute } from 'stores/PaginationTypes';
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 
 export type PaginatedResponse<T, M = unknown> = {
@@ -76,8 +77,8 @@ const useFetchEntities = <T, M = unknown>({
     queryFn: () =>
       defaultOnError(
         fetchEntities(slicesToFilters(searchParams)),
-        `Fetching ${humanName} failed with status`,
-        `Could not retrieve ${humanName}`,
+        i18n.t('entity_table.fetch_failed_with_status', { ns: 'common', humanName }),
+        i18n.t('entity_table.could_not_retrieve', { ns: 'common', humanName }),
       ),
     enabled,
     placeholderData: keepPreviousData,

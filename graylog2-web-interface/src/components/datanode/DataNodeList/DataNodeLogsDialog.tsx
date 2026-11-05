@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { BootstrapModalWrapper, Modal, SegmentedControl } from 'components/bootstrap';
 
@@ -49,6 +50,7 @@ type Props = {
 };
 
 const DataNodeLogsDialog = ({ show, hostname, onHide }: Props) => {
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const [logsType, setLogsType] = useState<LogsType>('stdout');
 
   const logs = useDataNodeLogs(hostname, show && !!hostname);
@@ -56,7 +58,7 @@ const DataNodeLogsDialog = ({ show, hostname, onHide }: Props) => {
   return (
     <BootstrapModalWrapper showModal={show} onHide={onHide} bsSize="large" backdrop>
       <Modal.Header>
-        <Modal.Title>{hostname} logs</Modal.Title>
+        <Modal.Title>{t('data_node_logs.title', { hostname })}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <SegmentedControl<LogsType> data={LogsTypeSegments} value={logsType} onChange={setLogsType} />
@@ -75,7 +77,7 @@ const DataNodeLogsDialog = ({ show, hostname, onHide }: Props) => {
               </table>
             </LogsContainer>
           ) : (
-            'No logs.'
+            t('data_node_logs.no_logs')
           )}
         </pre>
       </Modal.Body>

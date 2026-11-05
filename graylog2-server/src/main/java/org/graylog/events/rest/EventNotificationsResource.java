@@ -26,12 +26,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -60,6 +58,8 @@ import org.graylog2.configuration.EmailConfiguration;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.rest.CodedBadRequestException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.rest.models.PaginatedResponse;
@@ -181,7 +181,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     public NotificationDto get(@Parameter(name = "notificationId") @PathParam("notificationId") @NotBlank String notificationId) {
         checkPermission(RestPermissions.EVENT_NOTIFICATIONS_READ, notificationId);
         return dbNotificationService.get(notificationId)
-                .orElseThrow(() -> new NotFoundException("Notification " + notificationId + " doesn't exist"));
+                .orElseThrow(() -> new CodedNotFoundException("event_notification.not_found", "Notification " + notificationId + " doesn't exist", Map.of("notificationId", notificationId)));
     }
 
     @POST
@@ -214,11 +214,11 @@ public class EventNotificationsResource extends RestResource implements PluginRe
                            @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_NOTIFICATIONS_EDIT, notificationId);
         if (dbNotificationService.get(notificationId).isEmpty()) {
-            throw new NotFoundException("Notification " + notificationId + " doesn't exist");
+            throw new CodedNotFoundException("event_notification.not_found", "Notification " + notificationId + " doesn't exist", Map.of("notificationId", notificationId));
         }
 
         if (!notificationId.equals(dto.id())) {
-            throw new BadRequestException("Notification IDs don't match");
+            throw new CodedBadRequestException("event_notification.id_mismatch", "Notification IDs don't match");
         }
 
         final ValidationResult validationResult = dto.validate();
@@ -234,17 +234,17 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     private void validateEmailConfiguration(NotificationDto dto, ValidationResult validationResult) {
         if (dto.config() instanceof final EmailEventNotificationConfig emailEventNotificationConfig) {
             if (!emailConfiguration.isEnabled()) {
-                validationResult.addError("config", "Email transport is not configured in graylog.conf");
+                validationResult.addError("config", "event_notification.email_transport_missing", "Email transport is not configured in graylog.conf", Map.of());
             }
             if (isNullOrEmpty(emailConfiguration.getFromEmail()) && isNullOrEmpty(emailEventNotificationConfig.sender())) {
-                validationResult.addError("sender", "No default sender specified in graylog.conf. You must specify one here.");
+                validationResult.addError("sender", "event_notification.default_sender_missing", "No default sender specified in graylog.conf. You must specify one here.", Map.of());
             } else {
                 if (!isNullOrEmpty(emailEventNotificationConfig.sender())) {
                     try {
                         InternetAddress email = new InternetAddress(emailEventNotificationConfig.sender());
                         email.validate();
                     } catch (AddressException e) {
-                        validationResult.addError("sender", "Invalid email address.");
+                        validationResult.addError("sender", "event_notification.sender_invalid", "Invalid email address.", Map.of());
                     }
                 }
                 if (!isNullOrEmpty(emailConfiguration.getFromEmail())) {
@@ -252,7 +252,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
                         InternetAddress email = new InternetAddress(emailConfiguration.getFromEmail());
                         email.validate();
                     } catch (AddressException e) {
-                        validationResult.addError("sender", "Invalid default sender email address specified in graylog.conf.");
+                        validationResult.addError("sender", "event_notification.default_sender_invalid", "Invalid default sender email address specified in graylog.conf.", Map.of());
                     }
                 }
             }
@@ -286,7 +286,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
                          @PathParam("notificationId") @NotBlank String notificationId) {
         checkPermission(RestPermissions.EVENT_NOTIFICATIONS_EDIT, notificationId);
         final NotificationDto notificationDto =
-                dbNotificationService.get(notificationId).orElseThrow(() -> new NotFoundException("Notification " + notificationId + " doesn't exist"));
+                dbNotificationService.get(notificationId).orElseThrow(() -> new CodedNotFoundException("event_notification.not_found", "Notification " + notificationId + " doesn't exist", Map.of("notificationId", notificationId)));
 
         resourceHandler.test(notificationDto, getSubject().getPrincipal().toString());
 

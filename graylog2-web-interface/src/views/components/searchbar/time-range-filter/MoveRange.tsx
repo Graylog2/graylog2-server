@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import isEqual from 'lodash/isEqual';
 import { useFormikContext } from 'formik';
 import styled from 'styled-components';
@@ -90,6 +91,7 @@ const MoveRangeInner = ({
   children = undefined,
   initialTimerangeFormat,
 }: Props) => {
+  const { t } = useTranslation('search');
   const { formatTime, userTimezone } = useUserDateTime();
   const { submitForm, isValid } = useFormikContext<{ timerange: TimeRange }>();
 
@@ -134,14 +136,20 @@ const MoveRangeInner = ({
         onMoveRange={onMoveRange}
         disabled={disableButton}
         direction={DIRECTIONS.backward}
-        title={disableButton ? 'Show previous' : `Show previous ${readableDuration}`}
+        title={
+          disableButton
+            ? t('move_range.show_previous')
+            : t('move_range.show_previous_duration', { duration: readableDuration })
+        }
       />
       {children}
       <MoveRangeButton
         onMoveRange={onMoveRange}
         disabled={disableButton}
         direction={DIRECTIONS.forward}
-        title={disableButton ? 'Show next' : `Show next ${readableDuration}`}
+        title={
+          disableButton ? t('move_range.show_next') : t('move_range.show_next_duration', { duration: readableDuration })
+        }
       />
     </>
   );

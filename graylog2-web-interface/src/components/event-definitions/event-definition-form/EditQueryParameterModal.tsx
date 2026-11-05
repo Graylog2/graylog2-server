@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button, BootstrapModalForm, Input } from 'components/bootstrap';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -28,6 +29,11 @@ type Props = {
   embryonic: boolean;
 };
 
+// Parameter types provided by plugins show their `title`.
+const PARAMETER_TYPE_TITLE_KEYS: { [type: string]: string } = {
+  'lut-parameter-v1': 'query_parameter_modal.types.lookup_table',
+};
+
 const EMPTY_PARAM_JSON: Omit<ParameterJson, 'type'> = {
   name: '',
   title: 'new title',
@@ -39,12 +45,13 @@ const EMPTY_PARAM_JSON: Omit<ParameterJson, 'type'> = {
 };
 
 const EditQueryParameterModal = ({ queryParameters, onChange, queryParameter: initialParameter, embryonic }: Props) => {
+  const { t } = useTranslation('event_definitions');
   const [showModal, setShowModal] = useState(false);
   const [parameter, setParameter] = useState<Parameter>(initialParameter);
   const [validation, setValidation] = useState<Record<string, string | undefined>>({});
 
   const parameterTypes = usePluginEntities('eventDefinitionQueryParameterTypes');
-  const currentTypeDef = parameterTypes.find((t) => t.type === parameter.type) ?? parameterTypes[0];
+  const currentTypeDef = parameterTypes.find((typeDef) => typeDef.type === parameter.type) ?? parameterTypes[0];
 
   const openModal = useCallback(() => {
     setParameter(initialParameter);
@@ -60,7 +67,7 @@ const EditQueryParameterModal = ({ queryParameters, onChange, queryParameter: in
   const handleTypeChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const newType = e.target.value;
-      const newTypeDef = parameterTypes.find((t) => t.type === newType);
+      const newTypeDef = parameterTypes.find((typeDef) => typeDef.type === newType);
       if (!newTypeDef) return;
 
       const newParam = newTypeDef.fromJSON({
@@ -113,26 +120,26 @@ const EditQueryParameterModal = ({ queryParameters, onChange, queryParameter: in
     <>
       <Button bsSize="small" bsStyle={embryonic ? 'primary' : 'info'} onClick={openModal}>
         {initialParameter.name}
-        {embryonic && ': undeclared'}
+        {embryonic && t('query_parameter_modal.undeclared')}
       </Button>
 
       <BootstrapModalForm
         show={showModal}
-        title={`Declare Query Parameter "${initialParameter.name}"`}
+        title={t('query_parameter_modal.title', { name: initialParameter.name })}
         data-telemetry-title="Declare Query Parameter"
         onSubmitForm={handleSave}
         onCancel={handleClose}
-        submitButtonText="Save">
+        submitButtonText={t('query_parameter_modal.save')}>
         {parameterTypes.length > 1 && (
           <Input
             id={`parameter-type-${initialParameter.name}`}
             type="select"
-            label="Type"
+            label={t('query_parameter_modal.type')}
             value={parameter.type}
             onChange={handleTypeChange}>
             {parameterTypes.map(({ type, title }) => (
               <option key={type} value={type}>
-                {title}
+                {PARAMETER_TYPE_TITLE_KEYS[type] ? t(PARAMETER_TYPE_TITLE_KEYS[type]) : title}
               </option>
             ))}
           </Input>

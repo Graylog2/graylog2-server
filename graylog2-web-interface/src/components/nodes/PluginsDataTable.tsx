@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { DataTable, ExternalLink, Spinner } from 'components/common';
 import { Alert } from 'components/bootstrap';
@@ -26,33 +27,40 @@ const StyledExternalLink = styled(ExternalLink)`
 
 const headerCellFormatter = (header) => <th>{header}</th>;
 
-const pluginInfoFormatter = (plugin) => (
-  <tr key={plugin.name}>
-    <td className="limited">{plugin.name}</td>
-    <td className="limited">{plugin.version}</td>
-    <td className="limited">{plugin.author}</td>
-    <td className="limited" style={{ width: '50%' }}>
-      {plugin.description}
-      &nbsp;&nbsp;
-      <StyledExternalLink href={plugin.url}>Website</StyledExternalLink>
-    </td>
-  </tr>
-);
-
 type Props = {
   plugins?: any[];
 };
 
 const PluginsDataTable = ({ plugins = undefined }: Props) => {
+  const { t } = useTranslation('system');
+
   if (!plugins) {
-    return <Spinner text="Loading plugins on this node..." />;
+    return <Spinner text={t('plugins_data_table.loading')} />;
   }
 
   if (plugins.length === 0) {
-    return <Alert bsStyle="info">This node has not any installed plugins.</Alert>;
+    return <Alert bsStyle="info">{t('plugins_data_table.no_plugins')}</Alert>;
   }
 
-  const headers = ['Name', 'Version', 'Author', 'Description'];
+  const headers = [
+    t('plugins_data_table.name'),
+    t('plugins_data_table.version'),
+    t('plugins_data_table.author'),
+    t('plugins_data_table.description'),
+  ];
+
+  const pluginInfoFormatter = (plugin) => (
+    <tr key={plugin.name}>
+      <td className="limited">{plugin.name}</td>
+      <td className="limited">{plugin.version}</td>
+      <td className="limited">{plugin.author}</td>
+      <td className="limited" style={{ width: '50%' }}>
+        {plugin.description}
+        &nbsp;&nbsp;
+        <StyledExternalLink href={plugin.url}>{t('plugins_data_table.website')}</StyledExternalLink>
+      </td>
+    </tr>
+  );
 
   return (
     <DataTable
@@ -64,7 +72,7 @@ const PluginsDataTable = ({ plugins = undefined }: Props) => {
       sortByKey="name"
       rows={plugins}
       dataRowFormatter={pluginInfoFormatter}
-      filterLabel="Filter"
+      filterLabel={t('plugins_data_table.filter')}
       filterKeys={[]}
     />
   );

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import IconButton from 'components/common/IconButton';
@@ -57,6 +58,7 @@ const StyledIconButton = styled(IconButton)`
  * Renders a page select with previous/next buttons instead of a list of page buttons.
  */
 const CompactPagination = ({ currentPage, totalPages, disabled = false, onChange = () => {} }: Props) => {
+  const { t } = useTranslation('common');
   const pageOptions = useMemo(
     () => Array.from({ length: totalPages }, (_, index) => ({ label: String(index + 1), value: index + 1 })),
     [totalPages],
@@ -70,13 +72,13 @@ const CompactPagination = ({ currentPage, totalPages, disabled = false, onChange
     <Container data-testid="graylog-compact-pagination">
       <StyledIconButton
         name={ICON_NAMES.PREVIOUS}
-        title="Previous page"
+        title={t('compact_pagination.previous_page')}
         disabled={disabled || currentPage <= 1}
         onClick={() => onChange(currentPage - 1)}
       />
       <PageSelectWrapper>
         <Select
-          aria-label="Select page"
+          aria-label={t('compact_pagination.select_page')}
           options={pageOptions}
           value={currentPage}
           onChange={(page: number) => onChange(Number(page))}
@@ -85,11 +87,11 @@ const CompactPagination = ({ currentPage, totalPages, disabled = false, onChange
           size="small"
         />
       </PageSelectWrapper>
-      of {totalPages}
+      {t('compact_pagination.of_pages', { totalPages })}
       <StyledIconButton
         name={ICON_NAMES.NEXT}
         onClick={() => onChange(currentPage + 1)}
-        title="Next page"
+        title={t('compact_pagination.next_page')}
         disabled={disabled || currentPage >= totalPages}
       />
     </Container>

@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import type FetchError from 'logic/errors/FetchError';
 import { Spinner, Icon } from 'components/common';
@@ -44,6 +45,26 @@ const ErrorIcon = styled(Icon)(
   `,
 );
 
+const STEP_KEYS: { [key in ProcessingSteps]: string } = {
+  createStream: 'create_stream',
+  startStream: 'start_stream',
+  createPipeline: 'create_pipeline',
+  setupRouting: 'setup_routing',
+  result: 'result',
+  deleteStream: 'delete_stream',
+  deletePipeline: 'delete_pipeline',
+  deleteRouting: 'delete_routing',
+  connectPipeline: 'connect_pipeline',
+};
+
+const NAMED_STEPS: Array<ProcessingSteps> = [
+  'createStream',
+  'startStream',
+  'createPipeline',
+  'deleteStream',
+  'deletePipeline',
+];
+
 const ProgressMessage = ({
   stepName = undefined,
   isLoading,
@@ -54,46 +75,22 @@ const ProgressMessage = ({
   title = undefined,
   details = undefined,
 }: Props) => {
-  const loadingText: { [key in ProcessingSteps]: (entityName?: string) => string } = {
-    createStream: (entityName) => `Creating Stream${entityName !== undefined ? ` "${entityName}"` : ''}...`,
-    startStream: (entityName) => `Starting Stream${entityName !== undefined ? ` "${entityName}"` : ''}...`,
-    createPipeline: (entityName) => `Creating Pipeline${entityName !== undefined ? ` "${entityName}"` : ''}...`,
-    setupRouting: (_) => 'Setting up routing...',
-    result: (_) => '',
-    deleteStream: (entityName) => `Deleting Stream${entityName !== undefined ? ` "${entityName}"` : ''}...`,
-    deletePipeline: (entityName) => `Deleting Pipeline${entityName !== undefined ? ` "${entityName}"` : ''}...`,
-    deleteRouting: (_) => 'Removing routing...',
-    connectPipeline: (_) => 'Connecting pipeline to stream...',
-  };
+  const { t } = useTranslation('inputs');
 
-  const errorText: { [key in ProcessingSteps]: (name?: string) => string } = {
-    createStream: (entityName) => `Creating Stream${entityName !== undefined ? ` "${entityName}"` : ''} failed!`,
-    startStream: (entityName) => `Starting Stream${entityName !== undefined ? ` "${entityName}"` : ''} failed!`,
-    createPipeline: (entityName) => `Creating Pipeline${entityName !== undefined ? ` "${entityName}"` : ''} failed!`,
-    setupRouting: (_) => 'Setting up routing failed!',
-    result: (_) => 'Starting the Input has failed. Please roll it back to clean it up.',
-    deleteStream: (entityName) => `Deleting Stream${entityName !== undefined ? ` "${entityName}"` : ''} failed!`,
-    deletePipeline: (entityName) => `Deleting Pipeline${entityName !== undefined ? ` "${entityName}"` : ''} failed!`,
-    deleteRouting: (_) => 'Removing routing failed!',
-    connectPipeline: (_) => 'Connecting pipeline to stream failed!',
-  };
+  const text = (status: 'loading' | 'error' | 'success') => {
+    if (status === 'loading' && stepName === 'result') return '';
 
-  const successText: { [key in ProcessingSteps]: (entityName?: string) => string } = {
-    createStream: (entityName) => `Stream${entityName !== undefined ? ` "${entityName}"` : ''} created!`,
-    startStream: (entityName) => `Stream${entityName !== undefined ? ` "${entityName}"` : ''} started!`,
-    createPipeline: (entityName) => `Pipeline${entityName !== undefined ? ` "${entityName}"` : ''} created!`,
-    setupRouting: (_) => 'Routing set up!',
-    result: (_) => 'Input started successfully!',
-    deleteStream: (entityName) => `Stream${entityName !== undefined ? ` "${entityName}"` : ''} deleted!`,
-    deletePipeline: (entityName) => `Pipeline${entityName !== undefined ? ` "${entityName}"` : ''} deleted!`,
-    deleteRouting: (_) => 'Routing removed!',
-    connectPipeline: (_) => 'Pipeline connected to stream successfully!',
+    const key = STEP_KEYS[stepName];
+
+    return name !== undefined && NAMED_STEPS.includes(stepName)
+      ? t(`setup_wizard.progress.${status}.${key}_named`, { name })
+      : t(`setup_wizard.progress.${status}.${key}`);
   };
 
   if (isLoading) {
     return (
       <p>
-        <Spinner text={title ?? loadingText[stepName](name)} />
+        <Spinner text={title ?? text('loading')} />
       </p>
     );
   }
@@ -102,13 +99,13 @@ const ProgressMessage = ({
     return (
       <>
         <p>
-          <ErrorIcon name="close" title={title ?? errorText[stepName](name)} />
-          {title ?? errorText[stepName](name)}
+          <ErrorIcon name="close" title={title ?? text('error')} />
+          {title ?? text('error')}
         </p>
         {details ||
           (errorMessage && (
             <p>
-              <strong>Details:</strong> {details ?? errorMessage.message}
+              <strong>{t('setup_wizard.progress.details')}</strong> {details ?? errorMessage.message}
             </p>
           ))}
       </>
@@ -118,8 +115,8 @@ const ProgressMessage = ({
   if (isSuccess) {
     return (
       <p>
-        <SuccessIcon name="check" title={title ?? successText[stepName](name)} />
-        {title ?? successText[stepName](name)}
+        <SuccessIcon name="check" title={title ?? text('success')} />
+        {title ?? text('success')}
       </p>
     );
   }

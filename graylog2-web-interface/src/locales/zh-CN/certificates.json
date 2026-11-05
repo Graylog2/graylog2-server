@@ -1,0 +1,11 @@
+{
+  "title": "证书",
+  "certificate_list": "证书列表",
+  "certificate_name": "名称",
+  "certificate_expiration": "到期日期",
+  "certificate_details": "详情",
+  "certificate_status": "状态",
+  "certificate_active": "有效",
+  "certificate_expired": "已过期",
+  "certificate_revoked": "已吊销"
+}

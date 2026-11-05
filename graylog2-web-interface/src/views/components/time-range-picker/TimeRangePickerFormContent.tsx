@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { Col, Row } from 'components/bootstrap';
@@ -43,6 +44,7 @@ type Props = React.PropsWithChildren<{
 }>;
 
 const TimeRangePickerFormContent = ({ children = undefined, validTypes = allTimeRangeTypes, limitDuration }: Props) => {
+  const { t } = useTranslation('search');
   const { userTimezone } = useUserDateTime();
 
   return (
@@ -57,7 +59,12 @@ const TimeRangePickerFormContent = ({ children = undefined, validTypes = allTime
       <Row className="row-sm">
         <Col md={6}>
           <Timezone>
-            All timezones using: <b>{userTimezone}</b>
+            <Trans
+              t={t}
+              i18nKey="time_range.timezones_using"
+              values={{ timezone: userTimezone }}
+              components={{ bold: <b /> }}
+            />
           </Timezone>
         </Col>
         <Col md={6}>{children}</Col>

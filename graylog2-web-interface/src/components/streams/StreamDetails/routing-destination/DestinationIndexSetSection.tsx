@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { ARCHIVE_RETENTION_STRATEGY } from 'hooks/useIndices';
 import { Section, Spinner, Link } from 'components/common';
@@ -44,6 +45,7 @@ type Props = {
 };
 
 const DestinationIndexSetSection = ({ stream }: Props) => {
+  const { t } = useTranslation('streams');
   const productName = useProductName();
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const { data: indexSet, isInitialLoading: isLoadingIndexSet } = useSingleIndexSet(stream.index_set_id);
@@ -62,8 +64,7 @@ const DestinationIndexSetSection = ({ stream }: Props) => {
     pagination,
   );
   const { data: indexerOverview, isSuccess: isLoadingIndexerOverviewSuccess } = useIndexerOverview(stream.index_set_id);
-  /* eslint-disable no-constant-condition */
-  const title = true ? 'Enabled' : 'Disabled'; // TODO use api to check if enabled
+  const title = t('routing_destination.index_set.enabled'); // TODO use api to check if enabled
   const { data: indexSetStats, isSuccess: isStatsLoaded } = useIndexSetStats(stream.index_set_id);
 
   if (isLoadingStreamOutputFilters || isLoadingIndexSet) {
@@ -79,20 +80,22 @@ const DestinationIndexSetSection = ({ stream }: Props) => {
 
   return (
     <Section
-      title="Index Set"
+      title={t('routing_destination.index_set.title')}
       collapsible
       defaultClosed
       headerLeftSection={
         <>
           <DestinationSwitch
-            aria-label="Toggle index set"
+            aria-label={t('routing_destination.index_set.toggle_aria')}
             name="toggle-indexset"
             checked
             label={title}
             disabled
             onChange={() => {}}
           />
-          <SectionCountLabel>FILTERS {streamOutputFilters?.pagination?.total || 0}</SectionCountLabel>
+          <SectionCountLabel>
+            {t('routing_destination.index_set.filters', { count: streamOutputFilters?.pagination?.total || 0 })}
+          </SectionCountLabel>
         </>
       }
       actions={
@@ -103,17 +106,20 @@ const DestinationIndexSetSection = ({ stream }: Props) => {
         />
       }>
       <Alert bsStyle="default">
-        Messages routed to the <b>Search Cluster</b> will be searchable and count towards the {productName} License
-        usage. These messages will be stored in the defined Index Set until the retention policy criteria is met. Note:
-        Messages not routed to the <b>Search Cluster</b> will not be searchable.
+        <Trans
+          t={t}
+          i18nKey="routing_destination.index_set.info"
+          values={{ productName }}
+          components={{ boldText: <b /> }}
+        />
       </Alert>
       <Table>
         <thead>
           <tr>
-            <td>Name</td>
-            <td>Total size</td>
-            <td>Oldest Message (date)</td>
-            <td>Archiving</td>
+            <td>{t('routing_destination.index_set.col_name')}</td>
+            <td>{t('routing_destination.index_set.col_size')}</td>
+            <td>{t('routing_destination.index_set.col_oldest')}</td>
+            <td>{t('routing_destination.index_set.col_archiving')}</td>
           </tr>
         </thead>
         <tbody>

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import useLocation from 'routing/useLocation';
@@ -92,17 +93,18 @@ const Navigation = React.memo(({ pathname }: Props) => {
   const pluginBadges = usePluginEntities('navigation.badges');
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const activePluginBadges = pluginBadges.filter(({ useCondition }) => useCondition());
+  const { t } = useTranslation('navigation');
   const { navbarRef, brandRef, badgesRef, iconsRef, menuRef, collapsed } = useNavigationCollapse();
 
   return (
     <Navbar ref={navbarRef} role="navigation">
       {collapsed && <MainNavbar pathname={pathname} collapsed={collapsed} menuRef={menuRef} />}
       <Brand ref={brandRef}>
-        <BrandLink to={Routes.WELCOME} aria-label="Welcome">
+        <BrandLink to={Routes.WELCOME} aria-label={t('shell.welcome')}>
           <BrandNavLogo />
         </BrandLink>
       </Brand>
-      <MainNavAndNotificationBadge aria-label="Main">
+      <MainNavAndNotificationBadge aria-label={t('shell.main')}>
         {!collapsed && <MainNavbar pathname={pathname} collapsed={collapsed} menuRef={menuRef} />}
         <Badges ref={badgesRef}>
           {activePluginBadges.map(({ key, component: PluginBadge }) => (
@@ -112,7 +114,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
         </Badges>
       </MainNavAndNotificationBadge>
 
-      <Icons ref={iconsRef} aria-label="Utility">
+      <Icons ref={iconsRef} aria-label={t('shell.utility')}>
         <Nav>
           <li>{AppConfig.isFeatureEnabled(FEATURE_FLAG) ? <QuickJumpModalContainer /> : null}</li>
 

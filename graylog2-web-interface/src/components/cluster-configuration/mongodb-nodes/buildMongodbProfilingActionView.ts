@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { TFunction } from 'i18next';
+
 import type {
   MongodbProfilingState,
   MongodbProfilingStatusByLevel,
@@ -27,6 +29,8 @@ type Props = {
   slowMs: number | undefined;
   isStatusReady: boolean;
   isTogglingProfiling: boolean;
+  /** `t` of the `system` namespace */
+  t: TFunction;
 };
 
 export type MongodbProfilingActionView = {
@@ -41,23 +45,25 @@ export type MongodbProfilingActionView = {
 // slowMs reflects whatever the MongoDB nodes are already configured with -- Graylog no longer sets it when
 // enabling profiling (doing so requires elevated privileges as of MongoDB 8.0.29 / SERVER-130198), so it's
 // only known once the status call actually reports it.
-const getEnableThresholdLabel = (slowMs: number | undefined): string =>
-  slowMs === undefined ? 'level 1' : `level 1, ${slowMs}ms threshold`;
+const getEnableThresholdLabel = (slowMs: number | undefined, t: TFunction): string =>
+  slowMs === undefined
+    ? t('mongodb_profiling_action.threshold_level')
+    : t('mongodb_profiling_action.threshold_level_with_ms', { slowMs });
 
-const getActionLabel = (action: MongodbProfilingToggleAction | null): string =>
-  action === 'disable' ? 'Disable Profiling' : 'Enable Profiling';
+const getActionLabel = (action: MongodbProfilingToggleAction | null, t: TFunction): string =>
+  action === 'disable'
+    ? t('mongodb_profiling_action.disable_profiling')
+    : t('mongodb_profiling_action.enable_profiling');
 
-const getActionLoadingLabel = (action: MongodbProfilingToggleAction | null): string =>
-  action === 'disable' ? 'Disabling...' : 'Enabling...';
+const getActionLoadingLabel = (action: MongodbProfilingToggleAction | null, t: TFunction): string =>
+  action === 'disable' ? t('mongodb_profiling_action.disabling') : t('mongodb_profiling_action.enabling');
 
-const getActionTitle = (isStatusReady: boolean, enablingProfiling: boolean): string => {
+const getActionTitle = (isStatusReady: boolean, enablingProfiling: boolean, t: TFunction): string => {
   if (!isStatusReady) {
-    return 'Loading MongoDB profiling status';
+    return t('mongodb_profiling_action.loading_status_title');
   }
 
-  return enablingProfiling
-    ? 'Set profiling to Slow Ops on all MongoDB nodes'
-    : 'Disable profiling on all MongoDB nodes';
+  return enablingProfiling ? t('mongodb_profiling_action.enable_title') : t('mongodb_profiling_action.disable_title');
 };
 
 const getStatusSummary = ({
@@ -66,30 +72,32 @@ const getStatusSummary = ({
   profiledNodesSummary,
   distributionSummary,
   totalNodeCount,
+  t,
 }: {
   isStatusReady: boolean;
   state: MongodbProfilingState;
   profiledNodesSummary: string;
   distributionSummary: string;
   totalNodeCount: number;
+  t: TFunction;
 }) => {
   if (!isStatusReady) {
-    return 'Loading current profiling status across MongoDB nodes...';
+    return t('mongodb_profiling_action.status_loading');
   }
 
   switch (state) {
     case 'off':
-      return `Profiling is off for all MongoDB nodes (${profiledNodesSummary}). Enable it to collect slow-query diagnostics.`;
+      return t('mongodb_profiling_action.status_off', { summary: profiledNodesSummary });
     case 'mixed':
-      return `Profiling differs across MongoDB nodes (${distributionSummary}). Enable profiling to make diagnostics consistent.`;
+      return t('mongodb_profiling_action.status_mixed', { summary: distributionSummary });
     case 'enabled':
-      return `Profiling is on for all MongoDB nodes (${profiledNodesSummary}). Disable it after troubleshooting to reduce MongoDB overhead.`;
+      return t('mongodb_profiling_action.status_enabled', { summary: profiledNodesSummary });
     default:
       if (totalNodeCount > 0) {
-        return `Profiling state is unavailable (${distributionSummary}). You can still update it if needed.`;
+        return t('mongodb_profiling_action.status_unavailable_with_summary', { summary: distributionSummary });
       }
 
-      return 'Profiling state is unavailable. You can still update it if needed.';
+      return t('mongodb_profiling_action.status_unavailable');
   }
 };
 
@@ -100,17 +108,25 @@ const buildMongodbProfilingActionView = ({
   slowMs,
   isStatusReady,
   isTogglingProfiling,
+  t,
 }: Props): MongodbProfilingActionView => {
-  const actionLabel = getActionLabel(action);
-  const actionLoadingLabel = getActionLoadingLabel(action);
+  const actionLabel = getActionLabel(action, t);
+  const actionLoadingLabel = getActionLoadingLabel(action, t);
   const enablingProfiling = action === 'enable';
   const offCount = profilingStatusByLevel?.OFF ?? 0;
   const slowOpsCount = profilingStatusByLevel?.SLOW_OPS ?? 0;
   const allCount = profilingStatusByLevel?.ALL ?? 0;
   const enabledCount = slowOpsCount + allCount;
   const totalNodeCount = offCount + slowOpsCount + allCount;
-  const profiledNodesSummary = `${enabledCount}/${totalNodeCount} nodes profiled`;
-  const distributionSummary = `OFF ${offCount}, SLOW_OPS ${slowOpsCount}, ALL ${allCount}`;
+  const profiledNodesSummary = t('mongodb_profiling_action.nodes_profiled', {
+    count: totalNodeCount,
+    enabledCount,
+  });
+  const distributionSummary = t('mongodb_profiling_action.distribution', {
+    off: offCount,
+    slowOps: slowOpsCount,
+    all: allCount,
+  });
 
   const statusSummary = getStatusSummary({
     isStatusReady,
@@ -118,15 +134,16 @@ const buildMongodbProfilingActionView = ({
     profiledNodesSummary,
     distributionSummary,
     totalNodeCount,
+    t,
   });
 
-  let buttonLabel = 'Loading status...';
+  let buttonLabel = t('mongodb_profiling_action.loading_status');
   if (isStatusReady) {
     buttonLabel = isTogglingProfiling ? actionLoadingLabel : actionLabel;
   }
 
-  const actionTitle = getActionTitle(isStatusReady, enablingProfiling);
-  const enableThresholdLabel = getEnableThresholdLabel(slowMs);
+  const actionTitle = getActionTitle(isStatusReady, enablingProfiling, t);
+  const enableThresholdLabel = getEnableThresholdLabel(slowMs, t);
 
   return {
     actionLabel,

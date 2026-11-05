@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { Label } from 'components/bootstrap';
@@ -77,6 +78,7 @@ const ChipsCell = ({
   itemLabel,
   itemTitle = undefined,
 }: Props) => {
+  const { t } = useTranslation('common');
   const sorted = [...(items ?? [])].sort();
 
   const renderChip = (item: string) => {
@@ -90,7 +92,7 @@ const ChipsCell = ({
       );
     }
 
-    const filterLabel = `Filter by ${itemLabel} "${itemTitle ? itemTitle(item) : item}"`;
+    const filterLabel = t('chips_cell.filter_by', { itemLabel, value: itemTitle ? itemTitle(item) : item });
 
     return (
       <HoverableLabel

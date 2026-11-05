@@ -22,6 +22,9 @@ import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
+
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import pivotForField from 'views/logic/searchtypes/aggregation/PivotGenerator';
 import FieldType from 'views/logic/fieldtypes/FieldType';
@@ -38,8 +41,8 @@ import useWelcomeSearch, {
 import useMetricsTimeRange from './useMetricsTimeRange';
 import usePermittedAlertsEventsStreams from './usePermittedAlertsEventsStreams';
 
-const topSourcesWidget = (timeRange: RelativeTimeRangeWithEnd) => ({
-  title: 'Top 5 Sources',
+const topSourcesWidget = (timeRange: RelativeTimeRangeWithEnd, t: TFunction) => ({
+  title: t('metrics.top_sources'),
   widget: AggregationWidget.builder()
     .id(generateId())
     .timerange(timeRange)
@@ -61,14 +64,15 @@ const buildEntries = (
   permittedAlertsEventsStreams: Array<string>,
   timeRange: RelativeTimeRangeWithEnd,
   topSourcesOnly: boolean,
+  t: TFunction,
 ): Array<WelcomeSearchWidgetEntry> => {
-  const sources = topSourcesWidget(timeRange);
+  const sources = topSourcesWidget(timeRange, t);
 
   if (topSourcesOnly) {
     return [{ ...sources, position: new WidgetPosition(1, 1, 3, 12) }];
   }
 
-  const messages = numberWidget({ title: 'Messages Today', timeRange, link: messagesTodayLink(timeRange) });
+  const messages = numberWidget({ title: t('metrics.messages_today'), timeRange, link: messagesTodayLink(timeRange) });
 
   if (permittedAlertsEventsStreams.length === 0) {
     return [
@@ -80,14 +84,14 @@ const buildEntries = (
   const numberWidgets = [
     messages,
     numberWidget({
-      title: 'Alerts Today',
+      title: t('metrics.alerts_today'),
       timeRange,
       link: alertsOrEventsLink(timeRange, true),
       queryString: 'alert:true',
       streams: permittedAlertsEventsStreams,
     }),
     numberWidget({
-      title: 'Events Today',
+      title: t('metrics.events_today'),
       timeRange,
       link: alertsOrEventsLink(timeRange, false),
       queryString: 'alert:false',
@@ -106,6 +110,7 @@ const buildEntries = (
 };
 
 const useGeneralMetricsSearch = (topSourcesOnly: boolean = false) => {
+  const { t } = useTranslation('welcome');
   const rangeSeconds = useMetricsTimeRange();
   const permittedAlertsEventsStreams = usePermittedAlertsEventsStreams();
   const timeRange = useMemo<RelativeTimeRangeWithEnd>(() => ({ type: 'relative', from: rangeSeconds }), [rangeSeconds]);
@@ -113,8 +118,8 @@ const useGeneralMetricsSearch = (topSourcesOnly: boolean = false) => {
   // Building the entries assigns new widget ids, so the result has to be stable to avoid recreating the view
   // (and the search on the server) on every render.
   const entries = useMemo(
-    () => buildEntries(permittedAlertsEventsStreams, timeRange, topSourcesOnly),
-    [permittedAlertsEventsStreams, timeRange, topSourcesOnly],
+    () => buildEntries(permittedAlertsEventsStreams, timeRange, topSourcesOnly, t),
+    [permittedAlertsEventsStreams, timeRange, topSourcesOnly, t],
   );
 
   return useWelcomeSearch(entries, timeRange);

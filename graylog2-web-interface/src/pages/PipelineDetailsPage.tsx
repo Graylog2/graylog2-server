@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -41,6 +42,7 @@ import PipelinesPageNavigation from '../components/pipelines/PipelinesPageNaviga
 const _isNewPipeline = (pipelineId: string) => pipelineId === 'new';
 
 const PipelineDetailsPage = () => {
+  const { t } = useTranslation('pipelines');
   const params = useParams<{ pipelineId: string }>();
   const isNewPipeline = _isNewPipeline(params.pipelineId);
   const { data: pipeline } = usePipeline(params?.pipelineId, {
@@ -102,11 +104,9 @@ const PipelineDetailsPage = () => {
   }
 
   const title = isNewPipeline ? (
-    'New pipeline'
+    t('new_pipeline')
   ) : (
-    <span>
-      Pipeline <em>{pipeline.title}</em>
-    </span>
+    <span>{t('pipeline_details_title', { title: pipeline.title })}</span>
   );
 
   const content = isNewPipeline ? (
@@ -122,7 +122,7 @@ const PipelineDetailsPage = () => {
     />
   );
 
-  const pageTitle = isNewPipeline ? 'New pipeline' : `Pipeline ${pipeline.title}`;
+  const pageTitle = isNewPipeline ? t('new_pipeline') : t('pipeline_details_title', { title: pipeline.title });
 
   return (
     <DocumentTitle title={pageTitle}>
@@ -132,16 +132,10 @@ const PipelineDetailsPage = () => {
           title={title}
           actions={<EnableDebugMetricsButton />}
           documentationLink={{
-            title: 'Pipelines documentation',
+            title: t('documentation_link_title'),
             path: DocsHelper.PAGES.PIPELINES,
           }}>
-          <span>
-            Pipelines let you transform and process messages coming from streams. Pipelines consist of stages where
-            rules are evaluated and applied. Messages can go through one or more stages.
-            <br />
-            After each stage is completed, you can decide if messages matching all or one of the rules continue to the
-            next stage.
-          </span>
+          <span>{t('pipeline_details_description')}</span>
         </PageHeader>
 
         <Row className="content">

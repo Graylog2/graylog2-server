@@ -1,0 +1,77 @@
+{
+  "main": {
+    "search": "Wyszukiwanie",
+    "streams": "Strumienie",
+    "alerts": "Alerty",
+    "dashboards": "Panele",
+    "system": "System",
+    "enterprise": "Enterprise",
+    "security": "Bezpieczeństwo"
+  },
+  "system": {
+    "overview": "Przegląd",
+    "configurations": "Konfiguracje",
+    "cluster_configuration": "Konfiguracja klastra",
+    "inputs": "Wejścia",
+    "outputs": "Wyjścia",
+    "indices": "Indeksy",
+    "logging": "Logowanie",
+    "users_and_teams": "Użytkownicy i zespoły",
+    "roles": "Role",
+    "authentication": "Uwierzytelnianie",
+    "content_packs": "Pakiety treści",
+    "grok_patterns": "Wzorce Grok",
+    "lookup_tables": "Tabele wyszukiwania",
+    "pipelines": "Pipelines",
+    "sidecars": "Sidecars",
+    "collectors": "Collectors",
+    "translation_feedback": "Uwagi do tłumaczenia"
+  },
+  "security": {
+    "overview": "Przegląd",
+    "user_activity": "Aktywność użytkowników",
+    "host_activity": "Aktywność hostów",
+    "network_activity": "Aktywność sieciowa",
+    "anomalies": "Anomalie"
+  },
+  "help": {
+    "title": "Pomoc",
+    "documentation": "Dokumentacja",
+    "design_system": "Design System",
+    "keyboard_shortcuts": "Skróty klawiszowe",
+    "api_browser": "Przeglądarka API"
+  },
+  "user_menu": {
+    "title": "Menu użytkownika: {{name}}",
+    "language": "Język",
+    "show_profile": "Pokaż profil",
+    "edit_profile": "Edytuj profil",
+    "log_out": "Wyloguj się"
+  },
+  "shell": {
+    "welcome": "Witamy",
+    "main": "Główne",
+    "utility": "Narzędzia",
+    "toggle_navigation": "Przełącz nawigację",
+    "scratchpad": "Brudnopis"
+  },
+  "page_navigation": {
+    "cluster_configuration": "Konfiguracja klastra",
+    "certificate_management": "Zarządzanie certyfikatami",
+    "data_node_dashboard": "Panel Data Node",
+    "data_node_upgrade": "Aktualizacja Data Node",
+    "data_node_migration": "Migracja Data Node",
+    "overview": "Przegląd",
+    "notifications": "Powiadomienia",
+    "lookup_tables": "Tabele wyszukiwania",
+    "caches": "Pamięci podręczne",
+    "data_adapters": "Adaptery danych",
+    "users_overview": "Przegląd użytkowników",
+    "token_management": "Zarządzanie tokenami",
+    "administration": "Administracja",
+    "configuration": "Konfiguracja",
+    "failure_tracking": "Śledzenie awarii",
+    "alerts_and_events": "Alerty i zdarzenia",
+    "event_definitions": "Definicje zdarzeń"
+  }
+}

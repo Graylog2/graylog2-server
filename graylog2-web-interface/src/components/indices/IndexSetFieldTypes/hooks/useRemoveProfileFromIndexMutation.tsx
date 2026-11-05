@@ -18,6 +18,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { SystemFieldTypes } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import UserNotification from 'util/UserNotification';
 import type {
   ProfileChangeResponse,
@@ -50,14 +51,17 @@ const useRemoveProfileFromIndexMutation = (): {
 
     onError: (errorThrown) => {
       UserNotification.error(
-        `Removing profile from index failed with status: ${errorThrown}`,
-        'Could not remove profile from index',
+        i18n.t('hooks.profile_remove_failed', { ns: 'indexsets', error: errorThrown }),
+        i18n.t('hooks.profile_remove_failed_title', { ns: 'indexsets' }),
       );
     },
 
     onSuccess: (response) => {
       if (resultsWithProblems(response).length === 0) {
-        UserNotification.success('Removed profile from index successfully', 'Success!');
+        UserNotification.success(
+          i18n.t('hooks.profile_removed', { ns: 'indexsets' }),
+          i18n.t('hooks.success_title', { ns: 'indexsets' }),
+        );
       }
 
       return refetchAfterProfileChange(queryClient);

@@ -1,0 +1,558 @@
+{
+  "button": {
+    "perform_search": "執行搜尋",
+    "perform_search_dirty": "執行搜尋（上次執行後有變更）"
+  },
+  "sidebar": {
+    "description": "描述",
+    "create": "建立",
+    "highlighting": "醒目提示",
+    "fields": "欄位"
+  },
+  "empty_state": {
+    "no_widgets_search": "沒有定義任何 Widget 來視覺化搜尋結果",
+    "no_widgets_dashboard": "此 Dashboard 尚無 Widget",
+    "create_widget_hint": "在左側邊欄的「建立」區段中選取 Widget 類型，即可建立新的 Widget。",
+    "tips_title": "建立搜尋與 Dashboard 的幾點建議",
+    "tip_1": "從想回答的<bold>問題</bold>開始，定義要解決的問題。",
+    "tip_2": "<bold>限制</bold>資料範圍，只保留想檢視的資料點。",
+    "tip_3": "<bold>視覺化</bold>資料。它能回答問題嗎？",
+    "tip_4": "與同事<bold>分享</bold> Dashboard，並透過參數使其可供<bold>重複使用</bold>。"
+  },
+  "search_bar": {
+    "streams_placeholder": "選取搜尋應包含的 Stream。若為空，則搜尋所有 Stream。",
+    "refresh_human_name": "搜尋",
+    "query_history_title": "開啟查詢歷程記錄",
+    "filters_label": "篩選器",
+    "filters_tooltip_title": "搜尋篩選器",
+    "filters_enterprise_hint": "搜尋篩選器與參數適用於 Enterprise 版本。",
+    "filters_hide_controls": "隱藏控制項",
+    "scroll_hint": "捲動至搜尋列",
+    "query_placeholder": "在此輸入搜尋查詢並按下 Enter。例如：(\"not found\" AND http) OR http_response_code:[400 TO 404]"
+  },
+  "actions_menu": {
+    "saved_search": "已儲存的搜尋",
+    "save_search": "儲存搜尋",
+    "unsaved_changes": "未儲存的變更",
+    "load_title": "載入先前儲存的搜尋",
+    "load": "載入",
+    "share_disabled": "只有已儲存的搜尋可以分享。",
+    "dropdown_aria_label": "開啟搜尋動作下拉選單",
+    "edit_metadata": "編輯中繼資料",
+    "export_to_dashboard": "匯出至 Dashboard",
+    "export": "匯出",
+    "reset_search": "重設搜尋",
+    "editing_modal_title": "編輯已儲存的搜尋",
+    "update_search": "更新搜尋",
+    "share_description": "搜尋使用者或團隊，以新增為此已儲存搜尋的協作者。",
+    "save_success": "成功儲存檢視「{{title}}」！",
+    "save_error": "儲存檢視失敗：{{error}}",
+    "delete_success": "成功刪除已儲存的搜尋「{{title}}」！",
+    "delete_error": "刪除已儲存的搜尋失敗：{{error}}"
+  },
+  "save_form": {
+    "popover_title": "搜尋名稱",
+    "dirty_warning": "搜尋參數（時間範圍、Stream 或查詢）有未確認的變更。現在儲存將會捨棄這些變更。若非刻意為之，請先執行搜尋以套用變更，再進行儲存。",
+    "title_label": "標題",
+    "title_placeholder": "輸入標題",
+    "share_description": "搜尋使用者或團隊，以新增為此搜尋的協作者。",
+    "create_new": "建立新的",
+    "save_as": "另存為",
+    "create_new_title": "建立新搜尋",
+    "save_as_title": "另存為新搜尋",
+    "save": "儲存",
+    "save_title": "儲存搜尋",
+    "cancel": "取消"
+  },
+  "results": {
+    "loading": "正在更新搜尋結果..."
+  },
+  "sidebar_description": {
+    "execution": "執行",
+    "ad_hoc_info": "儲存搜尋或將其匯出至 Dashboard，即可新增自訂摘要與描述。",
+    "edit_metadata_hint": "若要為此{{viewType}}新增描述與摘要，請點擊搜尋列中的 <icon/> 圖示開啟動作選單。動作選單中包含「編輯中繼資料」選項。",
+    "search_section": "搜尋",
+    "no_summary": "此{{viewType}}沒有摘要。",
+    "no_description": "此{{viewType}}沒有描述。",
+    "no_query": "尚未執行任何查詢。",
+    "query_executed_in": "查詢執行時間",
+    "effective_time_range": "有效時間範圍",
+    "varies_per_widget": "依 Widget 而異",
+    "time_from": "從",
+    "time_to": "至",
+    "total_results": "結果總數"
+  },
+  "sidebar_create": {
+    "info": "使用下列選項，將彙總、日誌檢視（Enterprise 功能）或參數（Enterprise 功能）新增至搜尋。",
+    "generic": "一般",
+    "predefined_aggregation": "預先定義的彙總",
+    "investigations": "Investigations",
+    "events": "事件"
+  },
+  "sidebar_highlighting": {
+    "description": "可以醒目提示搜尋詞彙與欄位值。是否在結果中醒目提示搜尋查詢，可在 {{productName}} 伺服器設定中啟用或停用。任何欄位值都可以點擊後選取「醒目提示此值」來醒目提示。\n若某個詞彙或值有多個規則，則使用第一個符合的規則。",
+    "active_highlights": "使用中的醒目提示",
+    "add_rule_title": "新增醒目提示規則",
+    "search_terms": "搜尋詞彙"
+  },
+  "save_view": {
+    "save": "儲存",
+    "save_as": "另存為",
+    "save_as_new_dashboard_title": "另存為新 Dashboard",
+    "save_dashboard_title": "儲存 Dashboard"
+  },
+  "undo_redo": {
+    "undo": "復原",
+    "redo": "重做"
+  },
+  "time_range": {
+    "tab_relative": "相對",
+    "tab_absolute": "絕對",
+    "tab_keyword": "關鍵字",
+    "from_label": "從：",
+    "until_label": "至：",
+    "keyword_label": "關鍵字：",
+    "no_override": "不覆寫",
+    "now": "現在",
+    "all_time": "所有時間",
+    "ago": "前",
+    "range_ago": "{{time}} 前",
+    "range_length_placeholder": "選取範圍長度",
+    "load_preset": "載入預設集",
+    "no_available_presets": "沒有可用的預設集",
+    "loading": "載入中...",
+    "configure_presets": "設定預設集",
+    "insert_current_date": "插入目前日期",
+    "from_hours_label": "起始小時標籤",
+    "from_minutes_label": "起始分鐘標籤",
+    "from_seconds_label": "起始秒數標籤",
+    "to_hours_label": "結束小時標籤",
+    "to_minutes_label": "結束分鐘標籤",
+    "to_seconds_label": "結束秒數標籤",
+    "from_hour": "起始小時",
+    "from_minutes": "起始分鐘",
+    "from_seconds": "起始秒數",
+    "to_hour": "結束小時",
+    "to_minutes": "結束分鐘",
+    "to_seconds": "結束秒數",
+    "toggle_day_boundary": "在當天的開始與結束之間切換",
+    "set_current_time": "設定為目前的本地時間",
+    "set_range_value": "設定範圍值",
+    "set_from_value": "設定起始值",
+    "set_to_value": "設定結束值",
+    "save_as_preset": "另存為預設集",
+    "save_current_as_preset": "將目前的時間範圍另存為預設集",
+    "preset_description_placeholder": "新增描述...",
+    "preset_description_label": "時間範圍描述",
+    "preset_description_required": "必須填寫描述",
+    "preset_similar": "您已在<configurationsLink>範圍設定</configurationsLink>中有類似的時間範圍",
+    "save_preset": "儲存預設集",
+    "calendar": "日曆",
+    "timestamp": "時間戳記",
+    "date_format": "日期格式應為 <code>{{format}}</code>。",
+    "from_timestamp": "起始時間戳記",
+    "to_timestamp": "結束時間戳記",
+    "no_override_title": "未選擇日期／時間覆寫。",
+    "no_override_hint": "請使用上方的標籤選擇要搜尋的日期與時間範圍。",
+    "keyword_from": "從",
+    "keyword_to": "至",
+    "keyword_headline": "時間範圍：",
+    "keyword_input": "關鍵字輸入",
+    "keyword_help": "以自然語言指定搜尋的時間範圍。",
+    "keyword_preview": "預覽",
+    "keyword_example_last_month": "<code>{{keyword}}</code> 會搜尋從一個月前到現在的範圍",
+    "keyword_example_hours_ago": "<code>{{keyword}}</code> 會搜尋從四小時前到現在的範圍",
+    "keyword_example_range": "<code>{{keyword}}</code> 會搜尋從 4 月 1 日到 2 天前的範圍",
+    "keyword_example_timezone": "<code>{{keyword}}</code> 會搜尋時區 +0200 中從昨天午夜到今天午夜的範圍，即 UTC 時間 22:00",
+    "keyword_docs": "詳細資訊請參閱<docsLink>說明文件</docsLink>。",
+    "keyword_docs_title": "關鍵字時間範圍說明文件",
+    "display_label": "搜尋時間範圍，點擊即可開啟時間範圍選取器",
+    "picker_title": "搜尋時間範圍",
+    "admin_limit": "管理員已將搜尋限制為 {{duration}}",
+    "update": "更新時間範圍",
+    "open_selector": "開啟時間範圍選取器",
+    "timezones_using": "所有使用以下時區的項目：<bold>{{timezone}}</bold>",
+    "unit_seconds": "秒",
+    "unit_minutes": "分鐘",
+    "unit_hours": "小時",
+    "unit_days": "天"
+  },
+  "execution_info": {
+    "query_executed": "查詢執行時間為 {{duration}} 毫秒，執行時間點為",
+    "total_results": "結果總數：{{total}}",
+    "no_query": "尚未執行任何查詢。"
+  },
+  "highlight_form": {
+    "edit_title": "編輯醒目提示規則",
+    "create_title": "建立醒目提示規則",
+    "field_label": "欄位",
+    "field_placeholder": "選取或輸入欄位名稱",
+    "field_required": "必須填寫欄位",
+    "condition_label": "條件",
+    "condition_placeholder": "選擇條件",
+    "condition_required": "必須填寫條件",
+    "value_label": "值",
+    "value_required": "必須填寫值",
+    "update_rule": "更新規則",
+    "create_rule": "建立規則"
+  },
+  "query_tabs": {
+    "create_page": "建立新頁面",
+    "more_pages": "更多 Dashboard 頁面",
+    "open_configuration": "開啟頁面設定",
+    "copy_page": "複製頁面",
+    "copying_page": "正在複製頁面...",
+    "copy_page_failed": "複製 Dashboard 頁面失敗，錯誤：{{error}}",
+    "remove_page": "移除頁面 {{title}}",
+    "configuration_title": "更新 Dashboard 頁面設定",
+    "update_configuration": "更新設定",
+    "order": "順序",
+    "order_help": "使用拖放功能變更 Dashboard 頁面的順序。連按兩下 Dashboard 標題即可變更標題。"
+  },
+  "widget_creation": {
+    "title": "建立新的 Widget",
+    "create_widget": "建立 {{title}} Widget",
+    "placeholder": "在此建立新的 Widget",
+    "scroll_to_new_widget": "捲動至新的 Widget"
+  },
+  "dashboard_actions": {
+    "immutable": "此 Dashboard 由 {{productName}} 管理，因此為唯讀。請使用「另存為」建立可編輯的複本。",
+    "debug": "除錯",
+    "share_unsaved": "只有已儲存的 Dashboard 可以分享。",
+    "edit_metadata": "編輯中繼資料",
+    "export": "匯出",
+    "save_new_title": "儲存新 Dashboard",
+    "create": "建立 Dashboard",
+    "edit_title": "編輯 Dashboard",
+    "update": "更新 Dashboard",
+    "share_description": "搜尋使用者或團隊，以新增為此 Dashboard 的協作者。"
+  },
+  "dashboard_search_bar": {
+    "filter_placeholder": "套用篩選器至所有 Widget"
+  },
+  "debug": {
+    "title": "除錯資訊"
+  },
+  "common_views": {
+    "empty_value": "<Empty Value>",
+    "add_to_query": "新增至查詢",
+    "time_range_validation": {
+      "invalid_date_format": "格式必須為：{{format}}。",
+      "range_limit": "範圍超出限制時長。",
+      "date_limit": "日期超出限制時長。",
+      "until_before_from": "「至」日期必須晚於「從」日期。",
+      "empty": "不能為空。",
+      "keyword_empty": "關鍵字不能為空！",
+      "keyword_unparsable": "無法解析關鍵字"
+    },
+    "remove_from_favorites": "從我的最愛移除",
+    "add_to_favorites": "加入我的最愛",
+    "view_type": {
+      "search": "搜尋",
+      "dashboard": "Dashboard"
+    },
+    "unsaved_view": {
+      "search": "未儲存的搜尋",
+      "dashboard": "未儲存的 Dashboard"
+    }
+  },
+  "field_charts_migration": {
+    "title": "遷移現有搜尋頁面的圖表",
+    "found_charts_other": "我們找到 {{count}} 個為舊版搜尋建立的圖表。您要為目前的搜尋遷移這些圖表嗎？",
+    "save_hint": "完成遷移並想保留新建立的圖表時，必須將目前的搜尋另存為新 Dashboard。否則離開搜尋頁面時，圖表將會遺失。",
+    "migrate": "遷移",
+    "discard": "捨棄圖表"
+  },
+  "query": {
+    "contained_in_enterprise": "（包含於 <enterpriseLink>Graylog Enterprise</enterpriseLink>）",
+    "documentation_hint": "您也可以參閱<docsLink>說明文件</docsLink>，進一步了解如何建立 Widget。"
+  },
+  "widget_query": {
+    "reset_global_filter": "重設全域篩選器"
+  },
+  "editable_title": {
+    "edit": "編輯標題",
+    "hint": "{{value}} - 連按兩下標題即可編輯。"
+  },
+  "message_permalink": {
+    "label": "永久連結"
+  },
+  "query_title": {
+    "page_actions": "頁面動作",
+    "edit_title": "編輯標題",
+    "duplicate": "複製",
+    "copy_to_dashboard": "複製到 Dashboard",
+    "edit_modal_title": "編輯 Dashboard 頁面標題",
+    "update_title": "更新標題",
+    "title_help": "請輸入有意義的 Dashboard 頁面標題，最多 40 個字元。",
+    "title": "標題"
+  },
+  "missing_requirements": {
+    "description_search": "很抱歉，無法執行此搜尋。它使用了下列無法使用的功能：",
+    "description_dashboard": "很抱歉，無法執行此 Dashboard。它使用了下列無法使用的功能：",
+    "included_in": "<requirementName>{{requirement}}</requirementName> - 包含於 <pluginLink>{{plugin}}</pluginLink>",
+    "back": "返回"
+  },
+  "view_header": {
+    "alerts_and_events": "警示與事件",
+    "event_definitions": "Event Definition",
+    "edit_search_metadata": "編輯搜尋 {{title}} 的中繼資料",
+    "edit_dashboard_metadata": "編輯 Dashboard {{title}} 的中繼資料",
+    "editing_search": "編輯已儲存的搜尋",
+    "editing_dashboard": "編輯已儲存的 Dashboard",
+    "save_search": "儲存搜尋",
+    "save_dashboard": "儲存 Dashboard"
+  },
+  "execution": {
+    "not_executed": "尚未執行任何查詢。"
+  },
+  "dashboards_page": {
+    "documentation": "Dashboard 說明文件",
+    "description": "使用 Dashboard 建立訊息的特定檢視。在此建立新的 Dashboard，並可一鍵新增您在應用程式其他部分建立的任何圖表或統計圖。"
+  },
+  "search_filter_banner": {
+    "explanation": "<italic>搜尋篩選器</italic>包含各自的查詢，並使用 <bold>AND</bold> 運算子擴充主要查詢。",
+    "explanation_saved": "篩選器可以單獨儲存，並在已儲存的搜尋與 Dashboard 中重複使用。更新已儲存的篩選器，會自動影響包含該篩選器之搜尋的結果。"
+  },
+  "widget_time_range": {
+    "reset_global_override": "重設全域覆寫"
+  },
+  "time_range_presets": {
+    "select_time_range": "選取時間範圍",
+    "open_preset_select": "開啟時間範圍預設集選取器"
+  },
+  "move_range": {
+    "show_previous": "顯示前一段",
+    "show_previous_duration": "顯示前一個 {{duration}}",
+    "show_next": "顯示下一段",
+    "show_next_duration": "顯示下一個 {{duration}}"
+  },
+  "query_validation": {
+    "toggle_warning": "切換驗證警告",
+    "toggle_information": "切換驗證資訊",
+    "toggle_error": "切換驗證錯誤說明",
+    "syntax_documentation": "搜尋查詢語法說明文件",
+    "error_documentation": "查詢錯誤說明文件",
+    "status_warning": "警告",
+    "status_info": "資訊",
+    "status_error": "錯誤",
+    "validation_failed": "驗證搜尋查詢失敗，狀態：{{error}}",
+    "warm_tier_title": "Warm Tier 搜尋",
+    "warm_tier_message": "所選時間範圍包含儲存於 Warm Tier 的資料，擷取速度可能較慢。早於下列時間戳記的資料，在該 Stream 中屬於 Warm Tier："
+  },
+  "saved_searches": {
+    "title": "已儲存的搜尋",
+    "confirm_bulk_delete_other": "您確定要移除 {{count}} 個已儲存的搜尋嗎？",
+    "bulk_delete_partial_other": "所選的 {{count}} 個已儲存搜尋中，有 {{failed}} 個無法刪除。",
+    "bulk_delete_success_other": "已成功刪除 {{count}} 個已儲存的搜尋。",
+    "success": "成功",
+    "bulk_delete_error": "刪除已儲存的搜尋時發生錯誤。{{error}}",
+    "confirm_delete": "您即將刪除已儲存的搜尋：「{{title}}」。確定要繼續嗎？",
+    "delete_search": "刪除搜尋 {{title}}",
+    "delete": "刪除"
+  },
+  "search_meta": {
+    "buttons": "搜尋中繼資料按鈕"
+  },
+  "save_view_notifications": {
+    "success_title": "成功！",
+    "error_title": "錯誤！",
+    "plugin_initial_values_failed": "從外掛程式收集搜尋列初始表單值時發生錯誤",
+    "plugin_validation_preparation_failed": "為外掛程式準備搜尋列驗證時發生錯誤",
+    "plugin_validation_failed": "驗證外掛程式的搜尋列值時發生錯誤",
+    "plugin_submit_failed": "執行外掛程式的提交處理常式時發生錯誤：{{error}}",
+    "load_saved_searches_failed": "載入已儲存的搜尋失敗，狀態為",
+    "could_not_load_saved_searches": "無法載入已儲存的搜尋",
+    "load_minimum_refresh_interval_failed": "載入系統設定「minimum_auto_refresh_interval」失敗，狀態為",
+    "could_not_load_configuration": "無法載入設定選項"
+  },
+  "sidebar_layout": {
+    "display_as_overlay": "以覆蓋層顯示側邊欄",
+    "display_inline": "以內嵌方式顯示側邊欄"
+  },
+  "search_result_overview": {
+    "duration_at": "{{duration}} 毫秒，執行時間點為 <timestamp/>",
+    "effective_from": "有效時間範圍起始於",
+    "effective_to": "有效時間範圍結束於"
+  },
+  "fields_overview": {
+    "filter_placeholder": "篩選欄位",
+    "reset": "重設",
+    "list_fields": "列出 <current>目前查詢</current>、<all>所有</all>或<allReserved>包含保留欄位在內的所有</allReserved>欄位。",
+    "current_title": "此處顯示目前查詢中出現的欄位。",
+    "all_title": "此處顯示所有欄位，但不含保留欄位（gl2_*）。",
+    "all_reserved_title": "此處顯示所有欄位，包含保留欄位（gl2_*）。",
+    "no_field_information": "沒有可用的欄位資訊。",
+    "no_fields": "沒有可顯示的欄位。請嘗試變更篩選詞彙，或在上方選取其他欄位集。"
+  },
+  "highlighting_color": {
+    "color": "顏色",
+    "gradient_name": "漸層名稱",
+    "gradient_placeholder": "選取漸層顏色",
+    "lowest_placeholder": "指定最低值",
+    "lowest_label": "最低值",
+    "lowest_help": "欄位／序列中預期的最低值。",
+    "highest_aria": "指定最高值",
+    "highest_label": "最高值",
+    "highest_help": "欄位／序列中預期的最高值。",
+    "coloring": "著色",
+    "static_color": "固定顏色",
+    "gradient": "漸層",
+    "must_be_selected": "必須選取。",
+    "must_be_present": "必須填寫。",
+    "must_be_number": "必須為數字。",
+    "must_be_higher": "必須高於最低值。",
+    "coloring_required": "必須選擇著色方式",
+    "gradient_numeric_only": "只能為數值欄位定義漸層。"
+  },
+  "highlighting_rule": {
+    "edit": "編輯此醒目提示規則",
+    "remove": "移除此醒目提示規則",
+    "confirm_remove": "您確定要移除此醒目提示嗎？"
+  },
+  "change_field_type": {
+    "no_permission_title": "沒有權限",
+    "no_permission_description": "您沒有執行此動作的權限",
+    "enterprise_plugin_required": "（需要 <enterpriseLink>Enterprise 外掛程式</enterpriseLink>）",
+    "modal_title": "變更 {{fieldName}} 欄位類型",
+    "impact_warning": "變更欄位 <bold>{{fieldName}}</bold> 的類型，可能會對後續日誌訊息的擷取造成重大影響。若您宣告的欄位類型與擷取的日誌不相容，可能會導致擷取錯誤。",
+    "failure_processing_hint": "建議啟用<docsLink>失敗處理</docsLink>，並在之後密切監控 <failureStream/> Stream。",
+    "select_field_type_for": "選取 {{fieldName}} 的欄位類型",
+    "select_field_type_for_field": "為欄位選取欄位類型",
+    "select_field_type": "選取欄位類型",
+    "select_index_sets": "選取目標 Index Set",
+    "index_sets_hint_with_type": "預設情況下，目前訊息／搜尋所有 Index Set 中的 <bold>{{fieldName}}</bold> 欄位都會設定為 <bold>{{type}}</bold> 欄位類型。您可以選取要套用變更的 Index Set。",
+    "index_sets_hint": "預設情況下，目前訊息／搜尋所有 Index Set 中的 <bold>{{fieldName}}</bold> 欄位都會設定為所選的欄位類型。您可以選取要套用變更的 Index Set。",
+    "select_rotation_strategy": "選取輪替策略",
+    "rotation_hint_type_field": "若要查看並將 <bold>{{type}}</bold> 用作 <bold>{{fieldName}}</bold> 的欄位類型，必須輪替索引。提交此表單後可自動輪替受影響的索引，或稍後手動輪替。",
+    "rotation_hint_type": "若要查看並將 <bold>{{type}}</bold> 用作欄位類型，必須輪替索引。提交此表單後可自動輪替受影響的索引，或稍後手動輪替。",
+    "rotation_hint_field": "若要查看並將所選欄位類型用作 <bold>{{fieldName}}</bold> 的欄位類型，必須輪替索引。提交此表單後可自動輪替受影響的索引，或稍後手動輪替。",
+    "rotation_hint": "若要查看並將所選欄位類型用作欄位類型，必須輪替索引。提交此表單後可自動輪替受影響的索引，或稍後手動輪替。",
+    "rotate_indices": "變更後輪替受影響的索引",
+    "changing": "正在變更欄位類型...",
+    "change": "變更欄位類型",
+    "select_field": "選取欄位",
+    "select_field_placeholder": "選取或輸入欄位",
+    "type_not_defined": "未定義類型",
+    "previous_values": "（先前的值：{{values}}）",
+    "load_index_field_types_failed": "載入索引欄位類型失敗，狀態為",
+    "could_not_load_index_field_types": "無法載入索引欄位類型",
+    "load_field_type_options_failed": "載入欄位類型選項失敗，狀態為",
+    "could_not_load_field_type_options": "無法載入欄位類型選項",
+    "load_field_types_failed": "載入 {{field}} 類型失敗，狀態為",
+    "could_not_load_field_types": "無法載入欄位類型",
+    "load_index_sets_failed": "載入支援欄位類型變更的 Index Set 失敗，狀態為",
+    "could_not_load_index_sets": "無法載入支援欄位類型變更的 Index Set",
+    "change_failed": "變更欄位類型失敗，狀態：{{error}}",
+    "change_failed_title": "無法變更欄位類型",
+    "change_success": "欄位類型已成功變更",
+    "success_title": "成功！"
+  },
+  "value_actions": {
+    "select_extractor_type": "選取擷取器類型",
+    "exclude": "從結果中排除",
+    "add_to_query": "新增至查詢",
+    "show_documents": "顯示此值的文件",
+    "create_extractor": "建立擷取器",
+    "highlight_value": "醒目提示此值",
+    "create_event_definition": "建立 Event Definition",
+    "copy_value": "將值複製到剪貼簿"
+  },
+  "create_event_definition": {
+    "title": "設定新的 Event Definition",
+    "hide_details": "隱藏策略詳細資訊",
+    "show_details": "顯示策略詳細資訊",
+    "continue": "繼續設定",
+    "strategy_by": "策略依據：",
+    "description": "描述：",
+    "sections": {
+      "aggregation": "彙總設定",
+      "search": "搜尋查詢"
+    },
+    "items": {
+      "rowValuePath": "從表格列查詢",
+      "columnValuePath": "從表格欄查詢",
+      "columnGroupBy": "依欄值分組",
+      "rowGroupBy": "依列值分組",
+      "aggCondition": "條件",
+      "queryWithReplacedParams": "從搜尋查詢",
+      "searchFilterQuery": "從搜尋篩選器查詢",
+      "streams": "Stream",
+      "searchWithinMs": "在毫秒內搜尋",
+      "lutParameters": "Lookup Table 參數",
+      "searchFromValue": "從值查詢"
+    },
+    "item_label": "{{label}}：",
+    "strategies": {
+      "EXACT": {
+        "label": "僅此值",
+        "description": "此策略包含與目前搜尋檢視相關的所有搜尋查詢、篩選器等"
+      },
+      "ROW": {
+        "label": "列中的任一值",
+        "description": "此策略包含列樞紐"
+      },
+      "COL": {
+        "label": "欄中的任一值",
+        "description": "此策略包含欄樞紐"
+      },
+      "ALL": {
+        "label": "Widget 中的任一值",
+        "description": "此策略包含與所選值相關的所有列與欄樞紐值"
+      },
+      "CUSTOM": {
+        "label": "自訂",
+        "description": "您可以選取任何搜尋部分"
+      }
+    }
+  },
+  "view_errors": {
+    "something_went_wrong": "發生錯誤",
+    "unknown_error": "發生未知錯誤。請參閱下列訊息以及 {{productName}} 伺服器日誌以取得更多資訊。"
+  },
+  "views_notifications": {
+    "delete_view_failed": "刪除檢視 {{title}} 失敗，狀態：{{error}}",
+    "delete_view_failed_title": "無法刪除檢視",
+    "apply_widget_changes_failed": "套用 Widget 變更失敗，狀態：{{error}}",
+    "load_message_failed": "載入訊息資訊失敗，狀態為",
+    "could_not_load_message": "無法載入訊息資訊"
+  },
+  "field_actions": {
+    "chart": "圖表",
+    "show_top_values": "顯示前幾名的值",
+    "statistics": "統計資料",
+    "add_to_table": "新增至表格",
+    "remove_from_table": "從表格移除",
+    "add_to_all_tables": "新增至所有表格",
+    "remove_from_all_tables": "從所有表格移除",
+    "change_field_type": "變更欄位類型",
+    "copy_field_name": "將欄位名稱複製到剪貼簿",
+    "add_to_favorites": "將欄位加入我的最愛",
+    "remove_from_favorites": "將欄位從我的最愛移除"
+  },
+  "aggregation": {
+    "summary_by": "正在依 {{fields}} 彙總 {{series}}",
+    "summary_only": "正在彙總 {{series}}"
+  },
+  "widget_creators": {
+    "message_count": "訊息數量",
+    "message_table": "訊息表格",
+    "custom_aggregation": "自訂彙總",
+    "aggregation": "彙總",
+    "events_overview": "事件總覽",
+    "text_markdown": "文字／Markdown"
+  },
+  "message_details": {
+    "deleted_input": "已刪除的輸入",
+    "timestamp": "時間戳記",
+    "not_stored": "未儲存",
+    "not_stored_message": "訊息未儲存",
+    "received_by": "接收來源",
+    "stored_in_index": "儲存於索引",
+    "routed_into_streams": "路由至 Stream"
+  },
+  "views_logic": {
+    "result_window_limit": "Elasticsearch 將搜尋結果限制為 {{limit}} 則訊息。以每頁 {{pageSize}} 則訊息計算，您可以使用前 {{validPages}} 頁。",
+    "confirm_delete_dashboard_page": "您確定要刪除此 Dashboard 頁面嗎？"
+  }
+}

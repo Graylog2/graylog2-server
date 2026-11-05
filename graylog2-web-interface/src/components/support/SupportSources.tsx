@@ -16,9 +16,11 @@
  */
 import React from 'react';
 import styled from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import Icon from 'components/common/Icon';
 import DocsHelper from 'util/DocsHelper';
+import useProductName from 'brand-customization/useProductName';
 
 import DocumentationLink from './DocumentationLink';
 
@@ -28,38 +30,50 @@ const SourcesList = styled.ul`
   margin-top: 5px;
 `;
 
-const SupportSources = () => (
-  <div className="support-sources">
-    <h2>Need help?</h2>
-    <p>
-      Do not hesitate to consult the Graylog community if your questions are not answered in the{' '}
-      <DocumentationLink page={DocsHelper.PAGES.WELCOME} text="documentation" />.
-    </p>
+const SupportSources = () => {
+  const { t } = useTranslation('common');
+  const productName = useProductName();
 
-    <SourcesList>
-      <li>
-        <Icon name="group" />
-        &nbsp;
-        <a href="https://www.graylog.org/community-support/" target="_blank" rel="noopener noreferrer">
-          Community support
-        </a>
-      </li>
-      <li>
-        <Icon name="bug_report" />
-        &nbsp;&nbsp;
-        <a href="https://github.com/Graylog2/graylog2-server/issues" target="_blank" rel="noopener noreferrer">
-          Issue tracker
-        </a>
-      </li>
-      <li>
-        <Icon name="favorite" />
-        &nbsp;
-        <a href="https://www.graylog.org/professional-support" target="_blank" rel="noopener noreferrer">
-          Professional support
-        </a>
-      </li>
-    </SourcesList>
-  </div>
-);
+  return (
+    <div className="support-sources">
+      <h2>{t('support_sources.title')}</h2>
+      <p>
+        <Trans
+          t={t}
+          i18nKey="support_sources.help_text"
+          values={{ productName }}
+          components={{
+            docsLink: <DocumentationLink page={DocsHelper.PAGES.WELCOME} text={t('links.documentation')} />,
+          }}
+        />
+      </p>
+
+      <SourcesList>
+        <li>
+          <Icon name="group" />
+          &nbsp;
+          <a href="https://www.graylog.org/community-support/" target="_blank" rel="noopener noreferrer">
+            {t('support_sources.community_support')}
+          </a>
+        </li>
+        <li>
+          <Icon name="bug_report" />
+          &nbsp;&nbsp;
+          {/* eslint-disable-next-line graylog/no-literal-product-name -- GitHub repository URL, not displayed text */}
+          <a href="https://github.com/Graylog2/graylog2-server/issues" target="_blank" rel="noopener noreferrer">
+            {t('support_sources.issue_tracker')}
+          </a>
+        </li>
+        <li>
+          <Icon name="favorite" />
+          &nbsp;
+          <a href="https://www.graylog.org/professional-support" target="_blank" rel="noopener noreferrer">
+            {t('support_sources.professional_support')}
+          </a>
+        </li>
+      </SourcesList>
+    </div>
+  );
+};
 
 export default SupportSources;

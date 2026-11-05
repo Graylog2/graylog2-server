@@ -20,6 +20,7 @@ import { SystemIndicesRotation, SystemIndicesRetention } from '@graylog/server-a
 
 import type { RotationStrategyResponse, RetentionStrategyResponse } from 'components/indices/Types';
 import { defaultOnError } from 'util/conditional/onError';
+import i18n from 'i18n';
 
 type Options = {
   enabled?: boolean;
@@ -34,8 +35,8 @@ const useIndicesConfiguration = ({ enabled = true }: Options = {}) => {
     queryFn: () =>
       defaultOnError(
         SystemIndicesRotation.list() as unknown as Promise<RotationStrategyResponse>,
-        'Fetching rotation strategies failed',
-        'Could not retrieve rotation strategies',
+        i18n.t('use_indices_configuration_notifications.fetch_rotation_failed', { ns: 'indexsets' }),
+        i18n.t('use_indices_configuration_notifications.fetch_rotation_failed_title', { ns: 'indexsets' }),
       ),
     enabled,
   });
@@ -45,8 +46,8 @@ const useIndicesConfiguration = ({ enabled = true }: Options = {}) => {
     queryFn: () =>
       defaultOnError(
         SystemIndicesRetention.list() as unknown as Promise<RetentionStrategyResponse>,
-        'Fetching retention strategies failed',
-        'Could not retrieve retention strategies',
+        i18n.t('use_indices_configuration_notifications.fetch_retention_failed', { ns: 'indexsets' }),
+        i18n.t('use_indices_configuration_notifications.fetch_retention_failed_title', { ns: 'indexsets' }),
       ),
     enabled,
   });

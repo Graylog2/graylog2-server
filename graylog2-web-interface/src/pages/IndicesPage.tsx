@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Col, Row, ButtonToolbar } from 'components/bootstrap';
 import HideOnCloud from 'util/conditional/HideOnCloud';
@@ -26,40 +27,40 @@ import { IndexerClusterHealth } from 'components/indexers';
 import AllIndicesMaintenanceDropdown from 'components/indices/AllIndicesMaintenanceDropdown';
 import CreateButton from 'components/common/CreateButton';
 
-const IndicesPage = () => (
-  <DocumentTitle title="Indices and Index Sets">
-    <IndicesPageNavigation />
-    <PageHeader
-      title="Indices & Index Sets"
-      actions={
-        <ButtonToolbar>
-          <CreateButton entityKey="Index Set" />
-          <IfPermitted permissions="indexranges:rebuild">
-            <AllIndicesMaintenanceDropdown />
-          </IfPermitted>
-        </ButtonToolbar>
-      }
-      documentationLink={{
-        title: 'Index model documentation',
-        path: DocsHelper.PAGES.INDEX_MODEL,
-      }}>
-      <span>
-        A stream writes messages to an index set, which is a configuration for retention, sharding, and replication of
-        the stored data. By configuring index sets, you could, for example, have different retention times for certain
-        streams.
-      </span>
-    </PageHeader>
+const IndicesPage = () => {
+  const { t } = useTranslation('indexsets');
 
-    <HideOnCloud>
-      <IndexerClusterHealth minimal />
-    </HideOnCloud>
+  return (
+    <DocumentTitle title={t('pages.indices_document_title')}>
+      <IndicesPageNavigation />
+      <PageHeader
+        title={t('pages.indices_title')}
+        actions={
+          <ButtonToolbar>
+            <CreateButton entityKey="Index Set" />
+            <IfPermitted permissions="indexranges:rebuild">
+              <AllIndicesMaintenanceDropdown />
+            </IfPermitted>
+          </ButtonToolbar>
+        }
+        documentationLink={{
+          title: t('overview.header.documentation_link'),
+          path: DocsHelper.PAGES.INDEX_MODEL,
+        }}>
+        <span>{t('pages.indices_description')}</span>
+      </PageHeader>
 
-    <Row className="content">
-      <Col md={12}>
-        <IndexSetsOverview />
-      </Col>
-    </Row>
-  </DocumentTitle>
-);
+      <HideOnCloud>
+        <IndexerClusterHealth minimal />
+      </HideOnCloud>
+
+      <Row className="content">
+        <Col md={12}>
+          <IndexSetsOverview />
+        </Col>
+      </Row>
+    </DocumentTitle>
+  );
+};
 
 export default IndicesPage;

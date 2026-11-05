@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import moment from 'moment';
 import { useFormikContext } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -144,6 +145,7 @@ const DataTieringConfiguration = <ValuesPrefix extends string | undefined>({
   immutableFields?: string[];
   ignoreFieldRestrictions: boolean;
 }) => {
+  const { t } = useTranslation('indexsets');
   const dataTieringPlugin = PluginStore.exports('dataTiering').find((plugin) => plugin.type === 'hot_warm');
 
   const { values } = useFormikContext<FormValues<ValuesPrefix>>();
@@ -167,7 +169,7 @@ const DataTieringConfiguration = <ValuesPrefix extends string | undefined>({
 
   const validateMaxDaysInStorage = (value) => {
     if (value < 0) {
-      return 'Negative numbers are not allowed.';
+      return t('data_tiering.error_negative');
     }
 
     return '';
@@ -177,15 +179,15 @@ const DataTieringConfiguration = <ValuesPrefix extends string | undefined>({
     const errors = [];
 
     if (value < 0) {
-      errors.push('Negative numbers are not allowed.');
+      errors.push(t('data_tiering.error_negative'));
     }
 
     if (value > formValue('index_lifetime_max')) {
-      errors.push('Min. days in storage needs to be smaller than max. days in storage.');
+      errors.push(t('data_tiering.error_min_smaller'));
     }
 
     if (formValue('warm_tier_enabled') && value < formValue('index_hot_lifetime_min')) {
-      errors.push('Min. days in storage needs to be bigger than min. days in hot tier.');
+      errors.push(t('data_tiering.error_min_bigger_hot'));
     }
 
     if (errors.length > 0) {
@@ -201,10 +203,10 @@ const DataTieringConfiguration = <ValuesPrefix extends string | undefined>({
         <FormikInput
           type="number"
           id="data-tiering-index-lifetime-max"
-          label="Max. days in storage"
+          label={t('data_tiering.max_days_label')}
           name={fieldName('index_lifetime_max')}
           min={0}
-          help="After how many days your data should be deleted."
+          help={t('data_tiering.max_days_help')}
           validate={validateMaxDaysInStorage}
           required
           disabled={
@@ -216,12 +218,12 @@ const DataTieringConfiguration = <ValuesPrefix extends string | undefined>({
         <FormikInput
           type="number"
           id="data-tiering-index-lifetime-min"
-          label="Min. days in storage"
+          label={t('data_tiering.min_days_label')}
           name={fieldName('index_lifetime_min')}
           min={0}
           max={formValue('index_lifetime_max')}
           validate={validateMinDaysInStorage}
-          help="How many days at minimum your data should be stored."
+          help={t('data_tiering.min_days_help')}
           required
           disabled={
             (immutableFields.includes('data_tiering.index_lifetime_min') || sectionDisabled) && !ignoreFieldRestrictions
@@ -235,9 +237,9 @@ const DataTieringConfiguration = <ValuesPrefix extends string | undefined>({
             <FormikInput
               type="checkbox"
               id="data_tiering-archive-before-deletion"
-              label="Archive before deletion"
+              label={t('data_tiering.archive_label')}
               name={fieldName('archive_before_deletion')}
-              help="Archive this index before it is deleted?"
+              help={t('data_tiering.archive_help')}
               disabled={
                 (immutableFields.includes('data_tiering.archive_before_deletion') || sectionDisabled) &&
                 !ignoreFieldRestrictions

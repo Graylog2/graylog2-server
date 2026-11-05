@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import { LinkContainer } from 'components/common';
 import { Button, ButtonToolbar, MenuItem, DeleteMenuItem } from 'components/bootstrap';
@@ -35,7 +37,7 @@ type ConfigurationRowProps = {
   validateConfiguration: (config: { name: string }) => Promise<{ errors: { name: string[] } }>;
   onDelete: (...args: any[]) => void;
   sendTelemetry?: (...args: any[]) => void;
-};
+} & WithTranslation;
 
 class ConfigurationRow extends React.Component<
   ConfigurationRowProps,
@@ -65,20 +67,20 @@ class ConfigurationRow extends React.Component<
   };
 
   _handleDelete = async () => {
-    const { configuration, onDelete, sendTelemetry } = this.props;
+    const { configuration, onDelete, sendTelemetry, t } = this.props;
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.SIDECARS.CONFIGURATION_DELETED, {
       app_pathname: 'sidecars',
     });
 
     // eslint-disable-next-line no-alert
-    if (window.confirm(`You are about to delete configuration "${configuration.name}". Are you sure?`)) {
+    if (window.confirm(t('configurations.configuration_row.delete_confirm', { name: configuration.name }))) {
       await onDelete(configuration);
     }
   };
 
   render() {
-    const { collector, configuration, validateConfiguration, onCopy } = this.props;
+    const { collector, configuration, validateConfiguration, onCopy, t } = this.props;
     const { showModal } = this.state;
 
     return (
@@ -89,7 +91,7 @@ class ConfigurationRow extends React.Component<
         </td>
         <td>
           <CollectorIndicator
-            collector={collector.name || 'Unknown collector'}
+            collector={collector.name || t('configurations.configuration_row.unknown_collector')}
             operatingSystem={collector.node_operating_system}
           />
         </td>
@@ -97,11 +99,11 @@ class ConfigurationRow extends React.Component<
           <ButtonToolbar>
             <LinkContainer to={Routes.SYSTEM.SIDECARS.EDIT_CONFIGURATION(configuration.id)}>
               <Button onClick={this.openModal} bsStyle="info" bsSize="xsmall">
-                Edit
+                {t('configurations.configuration_row.edit')}
               </Button>
             </LinkContainer>
             <MoreActions>
-              <MenuItem onSelect={() => this.openModal()}>Clone</MenuItem>
+              <MenuItem onSelect={() => this.openModal()}>{t('configurations.configuration_row.clone')}</MenuItem>
 
               <MenuItem divider />
               <DeleteMenuItem onSelect={this._handleDelete} />
@@ -122,4 +124,4 @@ class ConfigurationRow extends React.Component<
   }
 }
 
-export default withTelemetry(ConfigurationRow, 'configuration');
+export default withTelemetry(withTranslation('sidecars')(ConfigurationRow), 'configuration');

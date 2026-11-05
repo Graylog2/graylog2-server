@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import Routes from 'routing/Routes';
@@ -31,20 +32,24 @@ type Props = {
   indexSet: IndexSet;
 };
 
-const TitleCell = ({ indexSet }: Props) => (
-  <span>
-    <Link to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id)}>{indexSet.title}</Link>
-    {indexSet.default && (
-      <StatusLabel bsStyle="primary" bsSize="xsmall">
-        Default
-      </StatusLabel>
-    )}
-    {!indexSet.writable && (
-      <StatusLabel bsStyle="info" bsSize="xsmall">
-        Read only
-      </StatusLabel>
-    )}
-  </span>
-);
+const TitleCell = ({ indexSet }: Props) => {
+  const { t } = useTranslation('indexsets');
+
+  return (
+    <span>
+      <Link to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id)}>{indexSet.title}</Link>
+      {indexSet.default && (
+        <StatusLabel bsStyle="primary" bsSize="xsmall">
+          {t('overview_table.default')}
+        </StatusLabel>
+      )}
+      {!indexSet.writable && (
+        <StatusLabel bsStyle="info" bsSize="xsmall">
+          {t('overview_table.read_only')}
+        </StatusLabel>
+      )}
+    </span>
+  );
+};
 
 export default TitleCell;

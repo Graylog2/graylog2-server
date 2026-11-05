@@ -17,8 +17,9 @@
 import * as React from 'react';
 import { Space } from '@mantine/core';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
-import ProductName from 'brand-customization/ProductName';
+import useProductName from 'brand-customization/useProductName';
 import { Badge, List } from 'preflight/components/common';
 import Spinner from 'components/common/Spinner';
 import Alert from 'components/bootstrap/Alert';
@@ -39,6 +40,8 @@ const Error = ({ message }: { message: string }) => (
 );
 
 const DataNodesOverview = () => {
+  const { t } = useTranslation('preflight');
+  const productName = useProductName();
   const {
     data: dataNodes,
     isFetching: isFetchingDataNodes,
@@ -47,13 +50,9 @@ const DataNodesOverview = () => {
 
   return (
     <>
+      <P>{t('data_nodes.description', { productName })}</P>
       <P>
-        <ProductName /> data nodes offer a better integration with <ProductName /> and simplify future updates. Once a{' '}
-        <ProductName /> data node is running and you configured the certificate authority, you can resume startup.
-      </P>
-      <P>
-        These are the data nodes which are currently registered. The list is constantly updated.{' '}
-        {isFetchingDataNodes && <Spinner text="" />}
+        {t('data_nodes.registered')} {isFetchingDataNodes && <Spinner text="" />}
       </P>
       {!!dataNodes.length && (
         <>
@@ -62,16 +61,16 @@ const DataNodesOverview = () => {
             {dataNodes.map(({ hostname, transport_address, short_node_id, status, error_msg }) => (
               <List.Item key={short_node_id}>
                 <DataNodeBadge status={status} nodeId={short_node_id} transportAddress={transport_address} />
-                <span title="Transport address">{transport_address}</span>
-                {' – '}
-                <span title="Hostname">{hostname}</span>
+                <span title={t('data_nodes.transport_address')}>{transport_address}</span>
+                {t('data_nodes.separator')}
+                <span title={t('data_nodes.hostname')}>{hostname}</span>
                 {error_msg && <Error message={error_msg} />}
               </List.Item>
             ))}
           </List>
         </>
       )}
-      {!dataNodes.length && !isInitialLoadingDataNodes && <Alert bsStyle="info">No data nodes have been found.</Alert>}
+      {!dataNodes.length && !isInitialLoadingDataNodes && <Alert bsStyle="info">{t('data_nodes.none_found')}</Alert>}
       <Space h="md" />
     </>
   );

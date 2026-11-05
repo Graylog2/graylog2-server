@@ -16,22 +16,23 @@
  */
 import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
+import { useTranslation } from 'react-i18next';
 
 import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 import type { ValidationState } from 'components/common/types';
 
 const OTX_INDICATORS = [
-  { label: 'IP Auto-Detect', value: 'IPAutoDetect' },
-  { label: 'IP v4', value: 'IPv4' },
-  { label: 'IP v6', value: 'IPv6' },
-  { label: 'Domain', value: 'domain' },
-  { label: 'Hostname', value: 'hostname' },
-  { label: 'File', value: 'file' },
-  { label: 'URL', value: 'url' },
-  { label: 'CVE', value: 'cve' },
-  { label: 'NIDS', value: 'nids' },
-  { label: 'Correlation-Rule', value: 'correlation-rule' },
+  { label: 'otx_adapter_field_set.option_ip_auto_detect', value: 'IPAutoDetect' },
+  { label: 'otx_adapter_field_set.option_ip_v4', value: 'IPv4' },
+  { label: 'otx_adapter_field_set.option_ip_v6', value: 'IPv6' },
+  { label: 'otx_adapter_field_set.option_domain', value: 'domain' },
+  { label: 'otx_adapter_field_set.option_hostname', value: 'hostname' },
+  { label: 'otx_adapter_field_set.option_file', value: 'file' },
+  { label: 'otx_adapter_field_set.option_url', value: 'url' },
+  { label: 'otx_adapter_field_set.option_cve', value: 'cve' },
+  { label: 'otx_adapter_field_set.option_nids', value: 'nids' },
+  { label: 'otx_adapter_field_set.option_correlation_rule', value: 'correlation-rule' },
 ];
 
 type Props = {
@@ -51,6 +52,7 @@ type Props = {
 };
 
 const OTXAdapterFieldSet = ({ updateConfig, config, handleFormEvent, validationState, validationMessage }: Props) => {
+  const { t } = useTranslation('integrations');
   const handleSelect = (fieldName: string) => (selectedIndicator: string) => {
     const newConfig = cloneDeep(config);
     newConfig[fieldName] = selectedIndicator;
@@ -61,17 +63,17 @@ const OTXAdapterFieldSet = ({ updateConfig, config, handleFormEvent, validationS
     <fieldset>
       <Input
         id="indicator"
-        label="Indicator"
+        label={t('otx_adapter_field_set.indicator_label')}
         required
         onChange={handleFormEvent}
-        help={validationMessage('indicator', 'The OTX indicator type that should be used for lookups.')}
+        help={validationMessage('indicator', t('otx_adapter_field_set.indicator_help'))}
         bsStyle={validationState('indicator')}
         labelClassName="col-sm-3"
         wrapperClassName="col-sm-9">
         <Select
-          placeholder="Select indicator"
+          placeholder={t('otx_adapter_field_set.indicator_placeholder')}
           clearable={false}
-          options={OTX_INDICATORS}
+          options={OTX_INDICATORS.map((indicator) => ({ ...indicator, label: t(indicator.label) }))}
           onChange={handleSelect('indicator')}
           value={config.indicator}
         />
@@ -80,9 +82,9 @@ const OTXAdapterFieldSet = ({ updateConfig, config, handleFormEvent, validationS
         type="text"
         id="api_key"
         name="api_key"
-        label="OTX API Key"
+        label={t('otx_adapter_field_set.api_key_label')}
         onChange={handleFormEvent}
-        help={validationMessage('api_key', 'Your OTX API key.')}
+        help={validationMessage('api_key', t('otx_adapter_field_set.api_key_help'))}
         bsStyle={validationState('api_key')}
         value={config.api_key}
         labelClassName="col-sm-3"
@@ -92,9 +94,9 @@ const OTXAdapterFieldSet = ({ updateConfig, config, handleFormEvent, validationS
         type="text"
         id="api_url"
         name="api_url"
-        label="OTX API URL"
+        label={t('otx_adapter_field_set.api_url_label')}
         onChange={handleFormEvent}
-        help={validationMessage('api_url', 'URL of the OTX API server.')}
+        help={validationMessage('api_url', t('otx_adapter_field_set.api_url_help'))}
         bsStyle={validationState('api_url')}
         value={config.api_url}
         labelClassName="col-sm-3"
@@ -104,10 +106,10 @@ const OTXAdapterFieldSet = ({ updateConfig, config, handleFormEvent, validationS
         type="text"
         id="http_user_agent"
         name="http_user_agent"
-        label="HTTP User-Agent"
+        label={t('otx_adapter_field_set.user_agent_label')}
         required
         onChange={handleFormEvent}
-        help={validationMessage('http_user_agent', 'The User-Agent header that should be used for the HTTP request.')}
+        help={validationMessage('http_user_agent', t('otx_adapter_field_set.user_agent_help'))}
         bsStyle={validationState('http_user_agent')}
         value={config.http_user_agent}
         labelClassName="col-sm-3"
@@ -117,10 +119,10 @@ const OTXAdapterFieldSet = ({ updateConfig, config, handleFormEvent, validationS
         type="number"
         id="http_connect_timeout"
         name="http_connect_timeout"
-        label="HTTP Connect Timeout"
+        label={t('otx_adapter_field_set.connect_timeout_label')}
         required
         onChange={handleFormEvent}
-        help={validationMessage('http_connect_timeout', 'HTTP connection timeout in milliseconds.')}
+        help={validationMessage('http_connect_timeout', t('otx_adapter_field_set.connect_timeout_help'))}
         bsStyle={validationState('http_connect_timeout')}
         value={config.http_connect_timeout}
         labelClassName="col-sm-3"
@@ -130,10 +132,10 @@ const OTXAdapterFieldSet = ({ updateConfig, config, handleFormEvent, validationS
         type="number"
         id="http_write_timeout"
         name="http_write_timeout"
-        label="HTTP Write Timeout"
+        label={t('otx_adapter_field_set.write_timeout_label')}
         required
         onChange={handleFormEvent}
-        help={validationMessage('http_write_timeout', 'HTTP write timeout in milliseconds.')}
+        help={validationMessage('http_write_timeout', t('otx_adapter_field_set.write_timeout_help'))}
         bsStyle={validationState('http_write_timeout')}
         value={config.http_write_timeout}
         labelClassName="col-sm-3"
@@ -143,10 +145,10 @@ const OTXAdapterFieldSet = ({ updateConfig, config, handleFormEvent, validationS
         type="number"
         id="http_read_timeout"
         name="http_read_timeout"
-        label="HTTP Read Timeout"
+        label={t('otx_adapter_field_set.read_timeout_label')}
         required
         onChange={handleFormEvent}
-        help={validationMessage('http_read_timeout', 'HTTP read timeout in milliseconds.')}
+        help={validationMessage('http_read_timeout', t('otx_adapter_field_set.read_timeout_help'))}
         bsStyle={validationState('http_read_timeout')}
         value={config.http_read_timeout}
         labelClassName="col-sm-3"

@@ -15,9 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Select } from 'components/common';
 import type { CapabilityType } from 'logic/permissions/types';
+import capabilityLabel from 'logic/permissions/capabilityLabel';
 import type { CapabilitiesList } from 'logic/permissions/EntityShareState';
 
 type Props = {
@@ -28,15 +30,16 @@ type Props = {
 };
 
 const _capabilitiesOptions = (capabilities: CapabilitiesList) =>
-  capabilities.map((capability) => ({ label: capability.title, value: capability.id })).toJS();
+  capabilities.map((capability) => ({ label: capabilityLabel(capability.title), value: capability.id })).toJS();
 
 const EntityCreateCapabilitySelect = ({
   capabilities,
   onChange,
   value,
-  title = 'Select a capability',
+  title = undefined,
   ...rest
 }: Props) => {
+  const { t } = useTranslation('users');
   const capabilitiesOptions = _capabilitiesOptions(capabilities);
 
   return (
@@ -44,7 +47,7 @@ const EntityCreateCapabilitySelect = ({
       clearable={false}
       onChange={onChange}
       options={capabilitiesOptions}
-      placeholder={title}
+      placeholder={title ?? t('permissions.select_capability')}
       value={value}
       {...rest}
     />

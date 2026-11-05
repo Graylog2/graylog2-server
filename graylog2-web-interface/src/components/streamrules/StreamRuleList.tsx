@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { Stream, MatchData } from 'logic/streams/types';
 import StreamRule from 'components/streamrules/StreamRule';
@@ -29,6 +30,8 @@ type Props = {
 };
 
 const StreamRuleList = ({ matchData = undefined, onDelete = () => {}, onSubmit = () => {}, stream }: Props) => {
+  const { t } = useTranslation('streams');
+
   if (!stream) {
     return <Spinner />;
   }
@@ -49,7 +52,7 @@ const StreamRuleList = ({ matchData = undefined, onDelete = () => {}, onSubmit =
           />
         ))}
 
-      {!hasStreamRules && <ListGroupItem>No rules defined.</ListGroupItem>}
+      {!hasStreamRules && <ListGroupItem>{t('stream_rules.no_rules')}</ListGroupItem>}
     </ListGroup>
   );
 };

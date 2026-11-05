@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import {
   BooleanField,
@@ -26,6 +26,7 @@ import {
   TextField,
 } from 'components/configurationforms';
 import type { ConfigurationField, FieldValue, EncryptedFieldValue } from 'components/configurationforms/types';
+import useServerText from 'util/serverText';
 
 type Props = {
   typeName: string;
@@ -46,16 +47,27 @@ const ConfigurationFormField = ({
   autoFocus = false,
   onChange,
 }: Props) => {
+  const serverText = useServerText();
+  // Labels and descriptions of the fields are sent by the server in English
+  const field = useMemo(
+    () =>
+      ({
+        ...configField,
+        human_name: serverText(configField.human_name),
+        description: serverText(configField.description),
+      }) as ConfigurationField,
+    [configField, serverText],
+  );
   const elementKey = `${typeName}-${configKey}`;
 
-  switch (configField.type) {
+  switch (field.type) {
     case 'text':
       return (
         <TextField
           key={elementKey}
           typeName={typeName}
           title={configKey}
-          field={configField}
+          field={field}
           value={configValue as string | EncryptedFieldValue<string>}
           dirty={dirty}
           onChange={onChange}
@@ -68,7 +80,7 @@ const ConfigurationFormField = ({
           key={elementKey}
           typeName={typeName}
           title={configKey}
-          field={configField}
+          field={field}
           value={configValue as number}
           onChange={onChange}
           autoFocus={autoFocus}
@@ -80,7 +92,7 @@ const ConfigurationFormField = ({
           key={elementKey}
           typeName={typeName}
           title={configKey}
-          field={configField}
+          field={field}
           value={configValue as boolean}
           onChange={onChange}
           autoFocus={autoFocus}
@@ -92,7 +104,7 @@ const ConfigurationFormField = ({
           key={elementKey}
           typeName={typeName}
           title={configKey}
-          field={configField}
+          field={field}
           value={configValue as string}
           onChange={onChange}
           autoFocus={autoFocus}
@@ -105,7 +117,7 @@ const ConfigurationFormField = ({
           key={elementKey}
           typeName={typeName}
           title={configKey}
-          field={configField}
+          field={field}
           value={configValue as Array<string> | string}
           onChange={onChange}
           autoFocus={autoFocus}
@@ -117,7 +129,7 @@ const ConfigurationFormField = ({
           key={elementKey}
           typeName={typeName}
           title={configKey}
-          field={configField}
+          field={field}
           value={configValue as EncryptedFieldValue<string>}
           dirty={dirty}
           onChange={onChange}

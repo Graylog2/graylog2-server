@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import startCase from 'lodash/startCase';
 
@@ -56,6 +57,7 @@ const DashboardFavoriteItem = ({ favorite, dashboardId }: { favorite: boolean; d
 };
 
 export const useColumnRenderers = (pluggableColumnRenderers?: ColumnRenderersByAttribute<View>) => {
+  const { t } = useTranslation('dashboards');
   const requirementsProvided = usePluginEntities('views.requires.provided');
   const customColumnRenderers: ColumnRenderers<View> = useMemo(
     () => ({
@@ -73,7 +75,7 @@ export const useColumnRenderers = (pluggableColumnRenderers?: ColumnRenderersByA
             <span>
               {dashboard._value.entitySource
                 ? startCase(dashboard._value.entitySource.source.toString().toLowerCase())
-                : 'User Defined'}
+                : t('overview.user_defined')}
             </span>
           ),
           staticWidth: 110,
@@ -86,7 +88,7 @@ export const useColumnRenderers = (pluggableColumnRenderers?: ColumnRenderersByA
         ...(pluggableColumnRenderers || {}),
       },
     }),
-    [requirementsProvided, pluggableColumnRenderers],
+    [requirementsProvided, pluggableColumnRenderers, t],
   );
 
   return customColumnRenderers;

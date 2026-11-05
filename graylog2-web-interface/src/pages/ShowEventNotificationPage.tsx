@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import usePermissions from 'hooks/usePermissions';
@@ -34,6 +35,7 @@ import PageDescription from 'components/event-notifications/PageDescription';
 import useHistory from '../routing/useHistory';
 
 const ShowEventDefinitionPage = () => {
+  const { t } = useTranslation('event_notifications');
   const { isPermitted } = usePermissions();
   const [notification, setNotification] = useState<EventNotification | undefined>();
   const { notificationId } = useParams();
@@ -56,10 +58,10 @@ const ShowEventDefinitionPage = () => {
 
   if (!notification) {
     return (
-      <DocumentTitle title="Notification Details">
+      <DocumentTitle title={t('pages.details')}>
         <span>
-          <PageHeader title="Notification Details">
-            <Spinner text="Loading Notification information..." />
+          <PageHeader title={t('pages.details')}>
+            <Spinner text={t('pages.loading')} />
           </PageHeader>
         </span>
       </DocumentTitle>
@@ -67,13 +69,13 @@ const ShowEventDefinitionPage = () => {
   }
 
   return (
-    <DocumentTitle title={`View "${notification.title}" Notification`}>
+    <DocumentTitle title={t('pages.view_named', { title: notification.title })}>
       <EventsPageNavigation />
       <PageHeader
-        title={`View "${notification.title}" Notification`}
+        title={t('pages.view_named', { title: notification.title })}
         actions={notification && <EventNotificationActionLinks notificationId={notification.id} />}
         documentationLink={{
-          title: 'Alerts documentation',
+          title: t('pages.alerts_docs'),
           path: DocsHelper.PAGES.ALERTS,
         }}>
         <PageDescription />

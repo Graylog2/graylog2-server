@@ -21,7 +21,6 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ForbiddenException;
 import org.apache.commons.collections.CollectionUtils;
 import org.glassfish.jersey.server.ChunkedOutput;
@@ -54,6 +53,9 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.plugin.rest.CodedBadRequestException;
+import org.graylog2.plugin.rest.CodedException;
+import org.graylog2.plugin.rest.CodedForbiddenException;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
@@ -117,7 +119,7 @@ public abstract class SearchResource extends RestResource {
     protected List<String> parseFields(String fields) {
         if (isNullOrEmpty(fields)) {
             LOG.warn("Missing fields parameter. Returning HTTP 400");
-            throw new BadRequestException("Missing required parameter `fields`");
+            throw new CodedBadRequestException("search.missing_required_parameter_fields", "Missing required parameter `fields`");
         }
         return parseOptionalFields(fields);
     }
@@ -236,18 +238,18 @@ public abstract class SearchResource extends RestResource {
             checkPermission(searchPermission);
         } else {
             if (!filter.startsWith("streams:")) {
-                throw new ForbiddenException("Not allowed to search with filter: [" + filter + "]");
+                throw new CodedForbiddenException("search.not_allowed_to_search_with_filter", "Not allowed to search with filter: [" + filter + "]", CodedException.paramsOf("filter", filter));
             }
 
             String[] parts = filter.split(":");
             if (parts.length <= 1) {
-                throw new ForbiddenException("Not allowed to search with filter: [" + filter + "]");
+                throw new CodedForbiddenException("search.not_allowed_to_search_with_filter", "Not allowed to search with filter: [" + filter + "]", CodedException.paramsOf("filter", filter));
             }
 
             String streamList = parts[1];
             String[] streams = streamList.split(",");
             if (streams.length == 0) {
-                throw new ForbiddenException("Not allowed to search with filter: [" + filter + "]");
+                throw new CodedForbiddenException("search.not_allowed_to_search_with_filter", "Not allowed to search with filter: [" + filter + "]", CodedException.paramsOf("filter", filter));
             }
 
             for (String streamId : streams) {

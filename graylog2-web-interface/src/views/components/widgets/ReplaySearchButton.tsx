@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useCallback, useMemo } from 'react';
 import type * as Immutable from 'immutable';
@@ -99,7 +100,8 @@ export const ReplaySearchButtonComponent = ({
   component?: React.ComponentType<CustomComponentProps>;
   newTab?: boolean;
 }) => {
-  const title = 'Replay search';
+  const { t } = useTranslation('widgets');
+  const title = t('widget_actions.replay_search');
   const newTabProps = newTab
     ? { href: searchLink, target: '_blank' as const, rel: 'noopener noreferrer' as const }
     : {};

@@ -18,6 +18,7 @@ import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-quer
 import { useCallback } from 'react';
 import { OrderedMap } from 'immutable';
 
+import i18n from 'i18n';
 import fetch from 'logic/rest/FetchProvider';
 import URLUtils from 'util/URLUtils';
 import useUserDateTime from 'hooks/useUserDateTime';
@@ -224,7 +225,11 @@ const useFiltersWithTitle = (
     queryKey: ['entity_titles', payload],
 
     queryFn: () =>
-      defaultOnError(fetchFilterTitles(payload), 'Loading filter titles failed with status', 'Could not load streams'),
+      defaultOnError(
+        fetchFilterTitles(payload),
+        i18n.t('filters.load_titles_failed', { ns: 'common' }),
+        i18n.t('filters.could_not_load_titles', { ns: 'common' }),
+      ),
 
     placeholderData: keepPreviousData,
     enabled: enabled && !!payload.entities.length,

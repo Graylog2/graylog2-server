@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
@@ -24,15 +25,16 @@ import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
 
 function LUTTablesPage() {
   const { push } = useHistory();
+  const { t } = useTranslation('lookup_tables');
 
   return (
     <LUTPageLayout
-      documentTitle="Lookup Tables"
-      pageTitle="Lookup Tables"
-      pageDescription="Lookup tables can be used in extractors, converters and processing pipelines to translate message fields or to enrich messages."
+      documentTitle={t('title')}
+      pageTitle={t('title')}
+      pageDescription={t('description')}
       actions={
         <Button bsStyle="primary" onClick={() => push(Routes.SYSTEM.LOOKUPTABLES.CREATE)}>
-          Create lookup table
+          {t('create_button')}
         </Button>
       }>
       <LookupTablesOverview />

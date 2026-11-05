@@ -1,0 +1,562 @@
+{
+  "add_notification_form": {
+    "add": "Dodaj powiadomienie",
+    "choose": "Wybierz powiadomienie",
+    "create_new": "Utwórz nowe powiadomienie...",
+    "help": "Wybierz powiadomienie do użycia w alertach tego typu lub utwórz nowe, które będzie można później wykorzystać w innych alertach.",
+    "select": "Wybierz powiadomienie",
+    "title": "Dodaj powiadomienie"
+  },
+  "aggregation_form": {
+    "description": "Podsumuj wiadomości z logów pasujące do Filtra zdefiniowanego powyżej, korzystając z funkcji. Opcjonalnie możesz pogrupować wyniki Filtra według identycznych wartości pól.",
+    "group_by_example": "Załóżmy, że utworzono Filtr obejmujący wszystkie nieudane próby logowania w sieci. Alert może zostać wyzwolony, gdy łącznie wystąpi więcej niż 5 nieudanych prób logowania. Jeśli teraz dodasz <code>username</code> jako pole grupowania, alert zostanie wyzwolony <em>dla każdego <code>username</code></em>, dla którego wystąpi więcej niż 5 nieudanych prób logowania.",
+    "group_by_help": "Wybierz pola, według których mają być grupowane wyniki Filtra, gdy mają identyczne wartości. <bold>Przykład:</bold>",
+    "title": "Agregacja"
+  },
+  "bulk_actions": {
+    "delete": {
+      "confirm_one": "Czy na pewno chcesz usunąć {{count}} definicję zdarzenia?",
+      "confirm_other": "Czy na pewno chcesz usunąć {{count}} definicji zdarzeń?",
+      "error": "Wystąpił błąd podczas usuwania definicji zdarzeń. {{error}}",
+      "failed_one": "Nie udało się usunąć {{failed}} z {{count}} zaznaczonej definicji zdarzenia.",
+      "failed_other": "Nie udało się usunąć {{failed}} z {{count}} zaznaczonych definicji zdarzeń.",
+      "success_one": "Pomyślnie usunięto {{count}} definicję zdarzenia.",
+      "success_other": "Pomyślnie usunięto {{count}} definicji zdarzeń.",
+      "title": "Usuń definicje zdarzeń",
+      "confirm_few": "Czy na pewno chcesz usunąć {{count}} definicje zdarzeń?",
+      "confirm_many": "Czy na pewno chcesz usunąć {{count}} definicji zdarzeń?",
+      "failed_few": "Nie udało się usunąć {{failed}} z {{count}} zaznaczonych definicji zdarzeń.",
+      "failed_many": "Nie udało się usunąć {{failed}} z {{count}} zaznaczonych definicji zdarzeń.",
+      "success_few": "Pomyślnie usunięto {{count}} definicje zdarzeń.",
+      "success_many": "Pomyślnie usunięto {{count}} definicji zdarzeń."
+    },
+    "disable": {
+      "confirm_one": "Czy na pewno chcesz wyłączyć {{count}} definicję zdarzenia?",
+      "confirm_other": "Czy na pewno chcesz wyłączyć {{count}} definicji zdarzeń?",
+      "error": "Wystąpił błąd podczas wyłączania definicji zdarzeń. {{error}}",
+      "failed_one": "Nie udało się wyłączyć {{failed}} z {{count}} zaznaczonej definicji zdarzenia.",
+      "failed_other": "Nie udało się wyłączyć {{failed}} z {{count}} zaznaczonych definicji zdarzeń.",
+      "success_one": "Pomyślnie wyłączono {{count}} definicję zdarzenia.",
+      "success_other": "Pomyślnie wyłączono {{count}} definicji zdarzeń.",
+      "title": "Wyłącz definicje zdarzeń",
+      "confirm_few": "Czy na pewno chcesz wyłączyć {{count}} definicje zdarzeń?",
+      "confirm_many": "Czy na pewno chcesz wyłączyć {{count}} definicji zdarzeń?",
+      "failed_few": "Nie udało się wyłączyć {{failed}} z {{count}} zaznaczonych definicji zdarzeń.",
+      "failed_many": "Nie udało się wyłączyć {{failed}} z {{count}} zaznaczonych definicji zdarzeń.",
+      "success_few": "Pomyślnie wyłączono {{count}} definicje zdarzeń.",
+      "success_many": "Pomyślnie wyłączono {{count}} definicji zdarzeń."
+    },
+    "disable_action": "Wyłącz",
+    "enable": {
+      "confirm_one": "Czy na pewno chcesz włączyć {{count}} definicję zdarzenia?",
+      "confirm_other": "Czy na pewno chcesz włączyć {{count}} definicji zdarzeń?",
+      "error": "Wystąpił błąd podczas włączania definicji zdarzeń. {{error}}",
+      "failed_one": "Nie udało się włączyć {{failed}} z {{count}} zaznaczonej definicji zdarzenia.",
+      "failed_other": "Nie udało się włączyć {{failed}} z {{count}} zaznaczonych definicji zdarzeń.",
+      "success_one": "Pomyślnie włączono {{count}} definicję zdarzenia.",
+      "success_other": "Pomyślnie włączono {{count}} definicji zdarzeń.",
+      "title": "Włącz definicje zdarzeń",
+      "confirm_few": "Czy na pewno chcesz włączyć {{count}} definicje zdarzeń?",
+      "confirm_many": "Czy na pewno chcesz włączyć {{count}} definicji zdarzeń?",
+      "failed_few": "Nie udało się włączyć {{failed}} z {{count}} zaznaczonych definicji zdarzeń.",
+      "failed_many": "Nie udało się włączyć {{failed}} z {{count}} zaznaczonych definicji zdarzeń.",
+      "success_few": "Pomyślnie włączono {{count}} definicje zdarzeń.",
+      "success_many": "Pomyślnie włączono {{count}} definicji zdarzeń."
+    },
+    "enable_action": "Włącz",
+    "success_title": "Sukces"
+  },
+  "condition_form": {
+    "available_conditions": "Dostępne warunki",
+    "condition_type": "Typ warunku",
+    "condition_type_help": "Wybierz typ warunku dla tego zdarzenia.",
+    "description": "Określ, jak mają być tworzone zdarzenia tego typu. Zdarzenia te można później wykorzystać jako dane wejściowe w innych warunkach, co pozwala budować rozbudowane warunki oparte na innych.",
+    "no_description": "Brak dostępnego opisu.",
+    "not_editable": "Warunków tego typu definicji zdarzeń nie można edytować.",
+    "select_condition_type": "Wybierz typ warunku",
+    "title": "Warunek zdarzenia"
+  },
+  "condition_summary": {
+    "and": "ORAZ",
+    "create_events": "Twórz zdarzenia dla definicji",
+    "errors_found": "Znaleziono błędy",
+    "hide_errors": "Ukryj błędy",
+    "invalid": "Warunek jest nieprawidłowy",
+    "no_condition": "Nie skonfigurowano warunku",
+    "no_series": "Nie wybrano serii",
+    "or": "LUB",
+    "preview": "Podgląd:",
+    "show_errors": "Pokaż błędy",
+    "title": "Podsumowanie warunku",
+    "valid": "Warunek jest prawidłowy"
+  },
+  "conditions": {
+    "add_expression": "Dodaj wyrażenie",
+    "add_group": "Dodaj grupę",
+    "all": "wszystkie",
+    "any": "którąkolwiek",
+    "boolean_operator": "Operator logiczny",
+    "boolean_operator_group": "Grupa operatorów logicznych, poziom {{level}}",
+    "delete_expression": "Usuń wyrażenie",
+    "global_boolean_operator": "Globalny operator logiczny",
+    "if": "Jeśli",
+    "is": "Jest",
+    "messages_must_meet": "Wiadomości muszą spełniać",
+    "of_the_following_rules": "z poniższych reguł:",
+    "select_condition": "Wybierz warunek",
+    "select_field": "Wybierz pole (opcjonalnie)",
+    "select_function": "Wybierz funkcję",
+    "select_percentile": "Wybierz percentyl",
+    "select_strategy": "Wybierz strategię (opcjonalnie)",
+    "threshold": "Próg"
+  },
+  "definition_summary": {
+    "details": "Szczegóły",
+    "no_description": "Nie podano opisu",
+    "no_tags": "Brak tagów",
+    "no_title": "Nie podano tytułu",
+    "title": "Podsumowanie zdarzenia"
+  },
+  "details_form": {
+    "add_event_procedure": "Dodaj procedurę zdarzeń",
+    "description": "Opis",
+    "description_help": "Dłuższy opis tej definicji zdarzenia.",
+    "no_event_procedures": "Ta definicja zdarzenia nie ma jeszcze żadnych procedur zdarzeń.",
+    "no_remediation_steps": "Nie podano kroków naprawczych",
+    "optional": "(opcjonalnie)",
+    "priority": "Priorytet",
+    "priority_help": "Wybierz priorytet zdarzeń tworzonych na podstawie tej definicji.",
+    "remediation_steps": "Kroki naprawcze",
+    "remediation_steps_help": "Kroki służące do naprawy tego zdarzenia. Obsługiwane jest formatowanie Markdown.",
+    "summary_template": "Szablon podsumowania zdarzenia",
+    "summary_template_help": "Szablon używany do generowania podsumowań zdarzeń i alertów.",
+    "title": "Szczegóły zdarzenia",
+    "title_help": "Tytuł tej definicji zdarzenia.",
+    "title_label": "Tytuł"
+  },
+  "event_key_help": {
+    "event_count": "Aby kontrolować liczbę zdarzeń tworzonych przez definicję <bold>Filtr i agregacja</bold>, użyj opcji „Twórz zdarzenia dla definicji, jeśli...” z opcją „Agregacja wyników osiąga próg” i skonfiguruj pola grupowania.",
+    "example": "<bold>Przykład:</bold> dwie definicje, <em>Nieudane logowanie</em> i <em>Eskalacja uprawnień</em>, obie z kluczem zdarzenia <code>username</code>. Korelacja obu zdarzeń uruchamia się tylko wtedy, gdy oba zdarzenia mają ten sam username.",
+    "intro": "Klucze zdarzeń to pola niestandardowe, których wartości są łączone w klucz zdarzenia (wartości oddzielone znakiem <code>|</code>). Klucz identyfikuje podmiot, którego dotyczy zdarzenie. Nie wpływa na liczbę tworzonych zdarzeń.",
+    "where_it_matters": "<bold>Gdzie klucz ma znaczenie:</bold> <bold>Korelacja zdarzeń</bold> dopasowuje tylko zdarzenia źródłowe o tym samym kluczu i tworzy najwyżej jedno zdarzenie na klucz w swoim oknie wyszukiwania. Klucze ustawiaj w definicjach zdarzeń, które chcesz korelować, a nie w samej korelacji."
+  },
+  "expanded_notifications": {
+    "description": "Powiadomienia uruchamiane, gdy ta definicja zdarzenia zostanie wyzwolona.",
+    "loading": "Ładowanie powiadomień...",
+    "missing_permissions": "Brak uprawnień do powiadomień dla:",
+    "missing_permission_title": "Brak uprawnień"
+  },
+  "field_form": {
+    "add": "Dodaj pole niestandardowe",
+    "data_type": "Typ danych pola",
+    "data_type_string": "Ciąg znaków",
+    "key_help": "Określa, czy to pole ma być kluczem, oraz jego kolejność.",
+    "more_about_keys": "Więcej o kluczach zdarzeń",
+    "name": "Nazwa",
+    "name_help": "Nazwa tego pola.",
+    "provider_unavailable": "Wybrane źródło nie jest dostępne.",
+    "select_value_source": "Wybierz źródło wartości",
+    "set_value_from": "Ustaw wartość z",
+    "title_edit": "Pole niestandardowe \"{{fieldName}}\"",
+    "title_new": "Nowe pole niestandardowe",
+    "update": "Zaktualizuj pole niestandardowe",
+    "use_as_key": "Użyj pola jako klucza zdarzenia",
+    "value_source_help": "Wybierz źródło wartości tego pola."
+  },
+  "field_value_providers": {
+    "lookup_table": {
+      "title": "Tabela wyszukiwania"
+    },
+    "template": {
+      "title": "Szablon"
+    }
+  },
+  "fields_form": {
+    "description": "Dołącz dodatkowe informacje do zdarzeń generowanych przez tę definicję, dodając pola niestandardowe. Ułatwia to wyszukiwanie zdarzeń i dostarcza więcej kontekstu w powiadomieniach.",
+    "errors_description": "Przed zapisaniem tej definicji zdarzenia popraw następujące błędy:",
+    "errors_title": "Pola z błędami",
+    "event_fields": "Pola zdarzenia",
+    "no_keys": "Nie skonfigurowano jeszcze żadnych kluczy.",
+    "not_editable": "Pól zdarzeń tego typu definicji nie można edytować.",
+    "optional": "(opcjonalne)",
+    "tags": "Tagi",
+    "tags_description": "Dołącz etykiety do tej definicji zdarzenia. Tagi są przypisywane do każdego zdarzenia, które ona tworzy, i ułatwiają filtrowanie oraz grupowanie na liście alertów i zdarzeń."
+  },
+  "fields_list": {
+    "configuration": "Konfiguracja",
+    "data_type": "Typ danych",
+    "field_name": "Nazwa pola",
+    "is_key": "Klucz?",
+    "no": "Nie",
+    "no_fields": "To zdarzenie nie ma jeszcze żadnych pól niestandardowych.",
+    "remove": "Usuń pole",
+    "value_source": "Źródło wartości",
+    "yes": "Tak"
+  },
+  "filter_aggregation_form": {
+    "aggregation_reaches_threshold": "Agregacja wyników osiąga próg",
+    "create_events_if": "Twórz zdarzenia dla definicji, jeśli...",
+    "event_limit": "Limit zdarzeń",
+    "event_limit_help": "Maksymalna liczba zdarzeń tworzonych przy każdym wykonaniu tej definicji zdarzenia. Nadmiarowe zdarzenia zostaną pominięte.",
+    "filter_has_results": "Filtr zwraca wyniki"
+  },
+  "filter_form": {
+    "cron_expression": "Wyrażenie cron",
+    "cron_expression_help": "Wyrażenie cron w formacie Quartz określające, kiedy zdarzenie ma być uruchamiane.",
+    "cron_time_zone": "Strefa czasowa cron",
+    "declare_missing_parameters": "Zadeklaruj brakujące parametry zapytania, klikając przyciski powyżej.",
+    "description": "Dodaj informacje filtrujące wiadomości z logów, istotne dla tej definicji zdarzenia.",
+    "enable": "Włącz",
+    "enable_help": "Czy ta definicja zdarzenia ma być wykonywana automatycznie?",
+    "execute_every": "Wykonuj wyszukiwanie co",
+    "lookup_table_permission_missing": "To konto nie ma uprawnień do deklarowania parametrów zapytania z tabel wyszukiwania.",
+    "optional": "(opcjonalnie)",
+    "query_parameters": "Parametry zapytania",
+    "search_filters": "Filtry wyszukiwania",
+    "search_query": "Zapytanie wyszukiwania",
+    "search_query_help": "Zapytanie wyszukiwania, do którego mają pasować wiadomości. Można użyć tej samej składni co na stronie wyszukiwania, w tym deklarowania parametrów zapytania z tabel wyszukiwania za pomocą składni <code>{{syntax}}</code>.",
+    "search_within": "Szukaj w ciągu ostatnich",
+    "streams_and_categories": "Strumienie i kategorie",
+    "streams_help": "Wybierz strumienie, które mają być uwzględnione w wyszukiwaniu.",
+    "title": "Filtr",
+    "use_cron": "Użyj harmonogramu cron",
+    "use_cron_help": "Zaplanuj to zdarzenie za pomocą wyrażenia cron w formacie Quartz",
+    "warm_tier_title": "Ostrzeżenie o warstwie Warm",
+    "warm_tier_warning": "Wybrany zakres czasu obejmuje dane przechowywane w warstwie Warm. Zdarzenia, które często pobierają dane z warstwy Warm, mogą powodować problemy z wydajnością. Wartość w polu <strong>Szukaj w ciągu ostatnich</strong> przekraczająca poniższy okres trafi do warstwy Warm: <timestamp></timestamp>."
+  },
+  "filter_preview": {
+    "help_aggregation": "Jedno zdarzenie za każdym razem, gdy wynik agregacji spełnia warunek",
+    "help_aggregation_groups": "Jedno zdarzenie dla każdej grupy, której wynik agregacji spełnia warunek",
+    "help_aggregation_groups_label": "Agregacja z grupami:",
+    "help_aggregation_label": "Agregacja bez grup:",
+    "help_description": "Warunek Filtr i agregacja utworzy różną liczbę zdarzeń w zależności od konfiguracji:",
+    "help_filter": "Jedno zdarzenie dla każdej wiadomości pasującej do filtra",
+    "help_filter_label": "Filtr:",
+    "help_title": "Ile zdarzeń utworzy Filtr i agregacja?",
+    "loading": "Ładowanie podglądu filtra...",
+    "message": "Wiadomość",
+    "no_messages": "Nie znaleziono żadnych wiadomości dla bieżących kryteriów wyszukiwania.",
+    "no_streams_access": "Nie można wyświetlić podglądu filtra, ponieważ użytkownik nie ma dostępu do żadnych strumieni.",
+    "timestamp": "Znacznik czasu",
+    "title": "Podgląd filtra"
+  },
+  "form_container": {
+    "aggregation_condition_invalid": "Warunek agregacji jest nieprawidłowy",
+    "loading": "Ładowanie informacji o zdarzeniu...",
+    "query_parameters_undeclared": "Parametry zapytania muszą zostać zadeklarowane"
+  },
+  "form_controls": {
+    "create": "Utwórz definicję zdarzenia",
+    "creating": "Tworzenie...",
+    "previous": "Wstecz",
+    "update": "Zaktualizuj definicję zdarzenia",
+    "updating": "Aktualizowanie..."
+  },
+  "hook_notifications": {
+    "clear_queue_failed": "Czyszczenie kolejki powiadomień nie powiodło się, status: {{error}}",
+    "clear_queue_failed_title": "Nie udało się wyczyścić kolejki powiadomień",
+    "clear_queue_success": "Kolejka powiadomień została pomyślnie wyczyszczona.",
+    "clear_queue_success_title": "Wyczyszczono kolejkę powiadomień.",
+    "cluster_config_failed": "Ładowanie konfiguracji klastra zdarzeń listy definicji zdarzeń nie powiodło się, status:",
+    "cluster_config_failed_title": "Nie udało się wczytać konfiguracji klastra zdarzeń listy definicji zdarzeń",
+    "create_failed": "Tworzenie definicji zdarzenia \"{{title}}\" nie powiodło się, status: {{error}}",
+    "create_failed_title": "Nie udało się zapisać definicji zdarzenia",
+    "create_success": "Definicja zdarzenia \"{{title}}\" została utworzona pomyślnie.",
+    "create_success_title": "Definicja zdarzenia utworzona pomyślnie",
+    "disable_failed": "Wyłączanie definicji zdarzenia \"{{title}}\" nie powiodło się, status: {{error}}",
+    "disable_failed_title": "Nie udało się wyłączyć definicji zdarzenia",
+    "disable_success": "Definicja zdarzenia \"{{title}}\" została pomyślnie wyłączona.",
+    "disable_success_title": "Definicja zdarzenia wyłączona pomyślnie",
+    "duplicate_failed": "Duplikowanie definicji zdarzenia \"{{title}}\" nie powiodło się, status: {{error}}",
+    "duplicate_failed_title": "Nie udało się zduplikować definicji zdarzenia",
+    "duplicate_success": "Definicja zdarzenia \"{{title}}\" została utworzona pomyślnie.",
+    "duplicate_success_title": "Definicja zdarzenia zduplikowana pomyślnie",
+    "enable_failed": "Włączanie definicji zdarzenia \"{{title}}\" nie powiodło się, status: {{error}}",
+    "enable_failed_title": "Nie udało się włączyć definicji zdarzenia",
+    "enable_success": "Definicja zdarzenia \"{{title}}\" została pomyślnie włączona.",
+    "enable_success_title": "Definicja zdarzenia włączona pomyślnie",
+    "entity_types_failed": "Ładowanie typów encji definicji zdarzeń nie powiodło się, status:",
+    "entity_types_failed_title": "Nie udało się wczytać typów encji definicji zdarzeń",
+    "load_failed_title": "Nie udało się wczytać definicji zdarzenia",
+    "load_list_failed": "Ładowanie definicji zdarzeń nie powiodło się, status:",
+    "load_one_failed": "Ładowanie definicji zdarzenia nie powiodło się, status:",
+    "not_found": "Nie znaleziono definicji zdarzenia o identyfikatorze <{{id}}>. Upewnij się, że nie została usunięta.",
+    "not_found_title": "Nie udało się pobrać definicji zdarzenia",
+    "save_failed": "Zapisywanie EventDefinition nie powiodło się, status: {{error}}",
+    "save_failed_title": "Nie udało się zapisać EventDefinition",
+    "update_failed": "Aktualizacja definicji zdarzenia \"{{title}}\" nie powiodła się, status: {{error}}",
+    "update_failed_title": "Nie udało się zaktualizować definicji zdarzenia",
+    "update_success": "Definicja zdarzenia \"{{title}}\" została pomyślnie zaktualizowana.",
+    "update_success_title": "Definicja zdarzenia zaktualizowana pomyślnie"
+  },
+  "notification_list": {
+    "no_notifications": "To zdarzenie nie jest jeszcze skonfigurowane do wyzwalania żadnych powiadomień.",
+    "not_found": "Nie udało się znaleźć informacji o powiadomieniu <em>{{title}}</em>",
+    "notification": "Powiadomienie",
+    "type": "Typ"
+  },
+  "notification_settings": {
+    "grace_period": "Okres ochronny",
+    "grace_period_help": "Powiadomienia o alertach są wysyłane za każdym razem, gdy alert wystąpi. Ustaw okres ochronny, aby określić, jak długo czekać przed ponownym wysłaniem powiadomień. Zdarzenia z kluczami mają okres ochronny osobno dla każdej wartości klucza.",
+    "message_backlog": "Historia wiadomości",
+    "message_backlog_help": "Liczba wiadomości, które mają zostać uwzględnione w powiadomieniach.",
+    "toggle_message_backlog": "Przełącz historię wiadomości"
+  },
+  "notifications_form": {
+    "description": "Czy zdarzenie jest na tyle istotne, że wymaga uwagi? Zamień je w alert, dodając do niego powiadomienia.",
+    "manage": "Zarządzaj powiadomieniami"
+  },
+  "overview": {
+    "human_name": "definicje zdarzeń",
+    "user_defined": "Zdefiniowane przez użytkownika"
+  },
+  "page": {
+    "alerts_docs": "Dokumentacja alertów",
+    "copy_confirm": "Czy na pewno chcesz utworzyć kopię \"{{title}}\"?",
+    "copy_title": "Kopiuj definicję zdarzenia",
+    "create_multiple": "Utwórz definicje zdarzeń",
+    "description_alerts": "Definicje zdarzeń pozwalają tworzyć alerty na podstawie różnych warunków.",
+    "description_events": "Definicje zdarzeń pozwalają tworzyć zdarzenia na podstawie różnych warunków i ustawiać dla nich alerty.",
+    "description_list": "Utwórz nowe definicje zdarzeń, które pozwolą wyszukiwać różne warunki i ustawiać dla nich alerty.",
+    "duplicate": "Duplikuj definicję zdarzenia",
+    "edit": "Edytuj definicję zdarzenia",
+    "edit_named": "Edytuj definicję zdarzenia \"{{title}}\"",
+    "file_import": "Utwórz definicje zdarzeń – import z pliku",
+    "git_import": "Utwórz definicje zdarzeń – import z Git",
+    "loading": "Ładowanie definicji zdarzenia...",
+    "new": "Nowa definicja zdarzenia",
+    "new_named": "Nowa definicja zdarzenia \"{{title}}\"",
+    "title": "Definicje zdarzeń",
+    "view": "Wyświetl definicję zdarzenia",
+    "view_named": "Wyświetl definicję zdarzenia \"{{title}}\""
+  },
+  "priorities": {
+    "critical": "Krytyczny",
+    "high": "Wysoki",
+    "info": "Informacyjny",
+    "low": "Niski",
+    "medium": "Średni"
+  },
+  "provider_summary": {
+    "less_details": "Mniej szczegółów",
+    "lookup_table_key_field": "Pole klucza tabeli wyszukiwania",
+    "more_details": "Więcej szczegółów",
+    "validate_template_values": "Sprawdź, czy ustawiono wszystkie wartości szablonu",
+    "value_source": "Źródło wartości"
+  },
+  "query_parameter_modal": {
+    "save": "Zapisz",
+    "title": "Zadeklaruj parametr zapytania \"{{name}}\"",
+    "type": "Typ",
+    "types": {
+      "lookup_table": "Tabela wyszukiwania"
+    },
+    "undeclared": ": niezadeklarowany"
+  },
+  "replay_search": {
+    "attributes": {
+      "description": "Opis",
+      "edited_after_event": "Definicja zdarzenia <definitionTitle>{{title}}</definitionTitle> została edytowana po wystąpieniu tego zdarzenia. Niektóre widgety agregacji mogą nie być reprezentatywne dla tego zdarzenia.",
+      "event_definition": "Definicja zdarzenia",
+      "execute_every": "Wykonuj wyszukiwanie co",
+      "notifications": "Powiadomienia",
+      "priority": "Priorytet",
+      "search_within": "Szukaj w ciągu",
+      "timestamp": "Znacznik czasu",
+      "updated_at": "Definicja zdarzenia zaktualizowana"
+    },
+    "not_provided": "Nie podano",
+    "replay_link": "Odtwórz wyszukiwanie"
+  },
+  "row_actions": {
+    "delete_confirm": "Czy na pewno chcesz usunąć \"{{title}}\"?",
+    "delete_failed": "Usuwanie definicji zdarzenia \"{{title}}\" nie powiodło się, status: {{status}}",
+    "delete_failed_title": "Nie udało się usunąć definicji zdarzenia",
+    "delete_success": "Definicja zdarzenia \"{{title}}\" została pomyślnie usunięta.",
+    "delete_success_title": "Definicja zdarzenia usunięta pomyślnie",
+    "delete_title": "Usuń definicję zdarzenia",
+    "disable": "Wyłącz",
+    "disable_confirm": "Czy na pewno chcesz wyłączyć \"{{title}}\"?",
+    "disable_title": "Wyłącz definicję zdarzenia",
+    "duplicate": "Duplikuj",
+    "edit": "Edytuj",
+    "enable": "Włącz",
+    "enable_confirm": "Czy na pewno chcesz włączyć \"{{title}}\"?",
+    "enable_title": "Włącz definicję zdarzenia",
+    "entity_type_title": "definicja zdarzenia",
+    "share_description": "Wyszukaj użytkownika lub zespół, aby dodać go jako współpracownika tej definicji zdarzenia.",
+    "system_cannot_be_deleted": "Systemowej definicji zdarzenia nie można usunąć",
+    "system_cannot_be_disabled": "Systemowej definicji zdarzenia nie można wyłączyć"
+  },
+  "scheduling": {
+    "clear": "wyczyść",
+    "clear_confirm": "Czy na pewno chcesz wyczyścić powiadomienia w kolejce dla \"{{title}}\"?",
+    "details": "Szczegóły: {{title}}.",
+    "every": "co {{duration}}",
+    "last_execution": "Ostatnie wykonanie:",
+    "next_execution": "Następne wykonanie:",
+    "next_time_range": "Następny zakres czasu:",
+    "not_scheduled": "Nie zaplanowano.",
+    "queued_notifications": "Powiadomienia w kolejce:",
+    "runs": "Uruchamia się {{schedule}}.",
+    "runs_searching_within": "Uruchamia się {{schedule}}, wyszukując dane z okresu {{duration}} wstecz.",
+    "status": "Status:"
+  },
+  "share": {
+    "collaborators": "Współpracownicy",
+    "description": "Wyszukaj użytkownika lub zespół, aby dodać go jako współpracownika tej definicji zdarzenia.",
+    "no_collaborators": "Ta definicja zdarzenia nie ma współpracowników."
+  },
+  "sidebar": {
+    "details_title": "Szczegóły definicji"
+  },
+  "status_cell": {
+    "disable": "Wyłącz",
+    "disable_confirm": "Czy na pewno chcesz wyłączyć definicję zdarzenia '{{title}}'?",
+    "disable_title": "Wyłącz definicję zdarzenia",
+    "disabled": "Wyłączona",
+    "enable": "Włącz",
+    "enabled": "Włączona"
+  },
+  "steps": {
+    "additional_details": "Dodatkowe szczegóły",
+    "condition": "Warunek",
+    "notifications": "Powiadomienia",
+    "share": "Współdzielenie",
+    "summary": "Podsumowanie"
+  },
+  "summary": {
+    "actions": "Akcje",
+    "condition_invalid": "Warunek jest nieprawidłowy: {{errors}}",
+    "condition_types": {
+      "aggregation": "Agregacja",
+      "filter": "Filtr"
+    },
+    "create_events_if": "Twórz zdarzenia, jeśli",
+    "cron_description": "Opis cron",
+    "cron_expression": "Wyrażenie cron",
+    "enable_scheduling": "Włącz harmonogram",
+    "event_limit": "Limit zdarzeń",
+    "execute_every": "Wykonuj wyszukiwanie co",
+    "group_by": "Grupuj według pól",
+    "missing_stream_permissions": "Brak uprawnień do strumieni dla:",
+    "no": "nie",
+    "no_cron_expression": "Błąd: nie określono wyrażenia cron!",
+    "no_filters": "Nie skonfigurowano filtrów",
+    "no_group_by": "Nie skonfigurowano grupowania",
+    "no_streams": "Nie wybrano strumieni, wyszukiwanie obejmuje wszystkie strumienie",
+    "search_filters": "Filtry wyszukiwania",
+    "search_query": "Zapytanie wyszukiwania",
+    "search_within": "Szukaj w ciągu",
+    "stream_categories": "Kategorie strumieni",
+    "streams": "Strumienie",
+    "time_zone": "Strefa czasowa",
+    "type": "Typ",
+    "undeclared_parameters": "Istnieją niezadeklarowane parametry zapytania: {{parameters}}",
+    "use_cron": "Użyj harmonogramu cron",
+    "yes": "tak"
+  },
+  "summary_renders": {
+    "backlog_included_one": "Powiadomienia będą zawierać {{count}} wiadomość",
+    "backlog_included_other": "Powiadomienia będą zawierać {{count}} wiadomości",
+    "backlog_none": "Powiadomienia nie będą zawierać żadnych wiadomości.",
+    "condition_plugin_no_summary": "Wtyczka warunku <em>{{type}}</em> nie udostępnia podsumowania.",
+    "event_procedure_summary": "Podsumowanie procedury zdarzeń",
+    "event_procedure_summary_unavailable": "Komponent podsumowania procedury zdarzeń jest niedostępny.",
+    "fields": "Pola",
+    "grace_period_disabled": "Okres ochronny jest wyłączony",
+    "grace_period_set": "Okres ochronny ustawiono na {{duration}}",
+    "keys": "Klucze",
+    "missing_notification_permissions": "Brak uprawnień do powiadomień dla:",
+    "no_event_procedures": "To zdarzenie nie ma żadnych procedur zdarzeń.",
+    "no_field_value_provider": "Nie skonfigurowano dostawcy wartości pól.",
+    "no_fields": "Nie skonfigurowano pól dla zdarzeń tworzonych na podstawie tej definicji.",
+    "no_keys": "Nie skonfigurowano kluczy dla zdarzeń tworzonych na podstawie tej definicji.",
+    "no_notifications": "To zdarzenie nie jest skonfigurowane do wyzwalania żadnych powiadomień.",
+    "no_remediation_steps": "Nie podano kroków naprawczych",
+    "notification_not_found": "Nie udało się znaleźć informacji o powiadomieniu <em>{{id}}</em>.",
+    "notification_plugin_no_summary": "Wtyczka powiadomień <em>{{type}}</em> nie udostępnia podsumowania.",
+    "notifications": "Powiadomienia",
+    "provider_plugin_no_summary": "Wtyczka dostawcy <em>{{type}}</em> nie udostępnia podsumowania.",
+    "remediation_steps": "Kroki naprawcze",
+    "settings": "Ustawienia",
+    "backlog_included_few": "Powiadomienia będą zawierać {{count}} wiadomości",
+    "backlog_included_many": "Powiadomienia będą zawierać {{count}} wiadomości"
+  },
+  "summary_template_help": {
+    "aggregation_events": "Zdarzenia agregacji: wartości grupowania i wyniki agregacji.",
+    "aggregation_example": "Agregacja liczby nieudanych logowań na użytkownika:",
+    "aggregation_example_template": "<userVariable></userVariable> – nieudanych prób logowania: <countVariable></countVariable>",
+    "button_aria_label": "Pokaż pomoc dotyczącą szablonu podsumowania zdarzenia",
+    "button_title": "Pomoc dotycząca szablonu podsumowania",
+    "custom_fields": "Pola niestandardowe",
+    "custom_fields_description": "Pola niestandardowe zdefiniowane w definicji zdarzenia są dostępne pod <code>fields</code>.",
+    "event_definition_variables": "Zmienne definicji zdarzenia",
+    "examples": "Przykłady",
+    "filter_events": "Filtruj zdarzenia: oryginalne pola wiadomości z logów.",
+    "filter_example": "Filtrowanie dla konkretnej wiadomości z logów:",
+    "filter_example_template": "Błąd na <hostVariable></hostVariable>: <messageVariable></messageVariable>",
+    "group_by_field": "(pole grupowania)",
+    "hostname": "(nazwa hosta)",
+    "intro": "Użyj szablonu, aby dostosować opis wyświetlany na stronie Alerty i zdarzenia po utworzeniu zdarzenia. Szablony korzystają z podstawiania <jmteLink>JMTE</jmteLink> – zmienne są ujęte w <variable></variable>.",
+    "source_context": "Kontekst źródłowy",
+    "source_context_description": "Zmienna <code>source</code> zawiera kontekst z danych wyzwalających. Jej zawartość zależy od typu definicji zdarzenia:",
+    "title": "Szablon podsumowania zdarzenia"
+  },
+  "tags_editor": {
+    "aria_label": "Tagi definicji zdarzenia",
+    "duplicate": "Tag \"{{tag}}\" został już dodany.",
+    "help": "Naciśnij Enter lub Tab, aby dodać. Tagi są zapisywane małymi literami i nie mogą się powtarzać. Dozwolone są wyłącznie małe litery, cyfry, myślniki, podkreślenia i kropki.",
+    "invalid_characters_one": "Tag {{tags}} zawiera niedozwolone znaki. Dozwolone są wyłącznie małe litery, cyfry, myślniki, podkreślenia i kropki.",
+    "invalid_characters_other": "Tagi {{tags}} zawierają niedozwolone znaki. Dozwolone są wyłącznie małe litery, cyfry, myślniki, podkreślenia i kropki.",
+    "max_reached": "Osiągnięto maksymalną liczbę tagów: {{max}}.",
+    "placeholder": "np. uwierzytelnianie, brute-force, zgodność",
+    "too_long_one": "Tag {{tags}} przekracza maksymalną długość {{max}} znaków.",
+    "too_long_other": "Tagi {{tags}} przekraczają maksymalną długość {{max}} znaków.",
+    "invalid_characters_few": "Tagi {{tags}} zawierają niedozwolone znaki. Dozwolone są wyłącznie małe litery, cyfry, myślniki, podkreślenia i kropki.",
+    "invalid_characters_many": "Tagi {{tags}} zawierają niedozwolone znaki. Dozwolone są wyłącznie małe litery, cyfry, myślniki, podkreślenia i kropki.",
+    "too_long_few": "Tagi {{tags}} przekraczają maksymalną długość {{max}} znaków.",
+    "too_long_many": "Tagi {{tags}} przekraczają maksymalną długość {{max}} znaków."
+  },
+  "template_preview": {
+    "aggregation": "Pola ustawione w grupowaniu, pod oryginalnymi nazwami",
+    "aggregation_label": "Agregacja:",
+    "available_fields": "Dostępne pola w szablonie zależą od warunku, który utworzył zdarzenie:",
+    "correlation": "Wszystkie pola z ostatniego dopasowanego, niezanegowanego zdarzenia",
+    "correlation_label": "Korelacja:",
+    "description": "Wygenerowane zdarzenia można wzbogacać o wartości dynamiczne. Dostęp do pól z kontekstu zdarzenia uzyskasz za pomocą <code>{{syntax}}</code>.",
+    "filter": "Wszystkie pola z oryginalnej wiadomości z logów",
+    "filter_label": "Filtr:",
+    "title": "Dostępne pola w szablonie"
+  },
+  "template_provider_form": {
+    "exclude_empty_fields": "Pomijaj puste pola",
+    "exclude_empty_fields_help": "Zaznacz tę opcję, aby pominąć pole w zdarzeniu, gdy szablon zwraca pustą wartość. Jeśli opcja jest odznaczona, pole zostanie dodane do zdarzenia z pustą wartością. Opcja jest zawsze włączona, gdy wymagane są wszystkie wartości szablonu.",
+    "require_values": "Wymagaj ustawienia wszystkich wartości szablonu",
+    "require_values_help": "Zaznacz tę opcję, aby sprawdzić, czy wszystkie zmienne użyte w szablonie mają wartości.",
+    "template": "Szablon",
+    "template_help": "Wpisz tekst, który ma zostać ustawiony w tym polu, lub użyj <jmteLink>składni JMTE</jmteLink>, aby dodać wartość dynamiczną."
+  },
+  "types": {
+    "aggregation": {
+      "description": "Twórz zdarzenia z wiadomości z logów, filtrując je i (opcjonalnie) agregując wyniki zgodnie z określonym warunkiem. Zdarzenia te mogą być używane jako dane wejściowe dla reguły korelacji.",
+      "title": "Filtr i agregacja"
+    },
+    "system": {
+      "description": "Wbudowana definicja zdarzenia, której {{productName}} używa do raportowania powiadomień systemowych jako zdarzeń.",
+      "title": "Systemowa definicja zdarzenia"
+    }
+  },
+  "validation": {
+    "cannot_be_empty": "Nie może być puste",
+    "field_cannot_be_empty": "Pole nie może być puste.",
+    "field_positive_number": "Pole musi być dodatnią liczbą."
+  },
+  "validation_summary": {
+    "title": "Znaleziono błędy!"
+  },
+  "use_event_definition_notifications": {
+    "load_failed": "Ładowanie definicji zdarzenia nie powiodło się, status: {{error}}",
+    "load_failed_title": "Nie udało się wczytać definicji zdarzenia"
+  }
+}

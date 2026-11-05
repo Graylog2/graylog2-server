@@ -18,17 +18,17 @@
 import * as React from 'react';
 
 import type { Slice, SliceRenderers } from 'components/common/PaginatedEntityTable/slicing/Slicing';
-import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
+import EventDefinitionPriorityEnum, { getPriorityName } from 'logic/alerts/EventDefinitionPriorityEnum';
 import PriorityName from 'components/events/events/PriorityName';
 import EventTypeLabel from 'components/events/events/EventTypeLabel';
-import StringUtils from 'util/StringUtils';
+import i18n from 'i18n';
 
 const extendPrioritySlices = (slices: Array<Slice>) => {
   const countsByValue = new Map(slices.map((slice) => [String(slice.value), slice.count]));
 
-  return Object.entries(EventDefinitionPriorityEnum.properties).map(([value, { name }]) => ({
+  return Object.keys(EventDefinitionPriorityEnum.properties).map((value) => ({
     value,
-    title: StringUtils.capitalizeFirstLetter(name),
+    title: getPriorityName(value),
     count: countsByValue.get(String(value)) ?? 0,
   }));
 };
@@ -36,8 +36,8 @@ const extendPrioritySlices = (slices: Array<Slice>) => {
 const extendTypeSlices = (slices: Array<Slice>) => {
   const countsByValue = new Map(slices.map((slice) => [String(slice.value), slice.count]));
   const values = [
-    { value: 'true', title: 'Alert' },
-    { value: 'false', title: 'Event' },
+    { value: 'true', title: i18n.t('alerts_types.alert', { ns: 'events' }) },
+    { value: 'false', title: i18n.t('alerts_types.event', { ns: 'events' }) },
   ];
 
   return values.map(({ value, title }) => ({

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Rnd } from 'react-rnd';
 import styled, { css } from 'styled-components';
 import debounce from 'lodash/debounce';
@@ -134,6 +135,7 @@ const InteractableModal = ({
   title = '',
   wrapperClassName = undefined,
 }: React.PropsWithChildren<Props>) => {
+  const { t } = useTranslation('common');
   const dragHandleRef = useRef(null);
   const [dragHandleClassName, setDragHandleClassName] = useState(null);
   const [dragPosition, setDragPosition] = useState(position);
@@ -243,7 +245,7 @@ const InteractableModal = ({
             {title}
           </Title>
 
-          <CloseButton bsStyle="link" onClick={onClose} bsSize="small" title="Close">
+          <CloseButton bsStyle="link" onClick={onClose} bsSize="small" title={t('actions.close')}>
             <Icon name="close" size="lg" />
           </CloseButton>
         </Header>

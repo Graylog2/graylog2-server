@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import { Label } from 'components/bootstrap';
+import i18n from 'i18n';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 
 import type { MongodbNode } from './fetchClusterMongodbNodes';
@@ -24,6 +24,7 @@ import CountCell from './cells/CountCell';
 import PercentRatioCell from './cells/PercentRatioCell';
 import ProfilingLevelCell from './cells/ProfilingLevelCell';
 import ReplicationLagCell from './cells/ReplicationLagCell';
+import RoleCell from './cells/RoleCell';
 
 import { SecondaryText } from '../shared-components/NodeMetricsLayout';
 
@@ -51,28 +52,16 @@ export const createColumnRenderers = (): ColumnRenderers<MongodbNode> => ({
       staticWidth: 'matchHeader',
     },
     name: {
-      renderCell: (_value, entity) => entity.name ?? 'N/A',
+      renderCell: (_value, entity) => entity.name ?? i18n.t('shared.not_available', { ns: 'system' }),
     },
     role: {
-      renderCell: (_value, entity) => {
-        const role = entity.role?.toUpperCase();
-
-        if (!role) {
-          return (
-            <SecondaryText>
-              <span>N/A</span>
-            </SecondaryText>
-          );
-        }
-
-        return <Label bsSize="xs">{role}</Label>;
-      },
+      renderCell: (_value, entity) => <RoleCell role={entity.role} />,
       staticWidth: 110,
     },
     version: {
       renderCell: (_value, entity) => (
         <SecondaryText>
-          <span>{entity.version ?? 'N/A'}</span>
+          <span>{entity.version ?? i18n.t('shared.not_available', { ns: 'system' })}</span>
         </SecondaryText>
       ),
       staticWidth: 'matchHeader',

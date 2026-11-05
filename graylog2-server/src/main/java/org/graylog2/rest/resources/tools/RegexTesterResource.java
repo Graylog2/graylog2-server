@@ -33,11 +33,13 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.plugin.rest.CodedBadRequestException;
 import org.graylog2.rest.models.tools.requests.RegexTestRequest;
 import org.graylog2.rest.models.tools.responses.RegexTesterResponse;
 import org.graylog2.rest.models.tools.responses.RegexValidationResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.PatternSyntaxException;
 
@@ -102,7 +104,7 @@ public class RegexTesterResource extends RestResource {
         } catch (PatternSyntaxException e) {
             throw new BadRequestException("Invalid regular expression: " + e.getMessage(), e);
         } catch (TimeLimitedCharSequence.TimeoutException e) {
-            throw new BadRequestException("Regular expression matching timed out — the pattern may be susceptible to catastrophic backtracking");
+            throw new CodedBadRequestException("regex_tester.regular_expression_matching_timed_out_the_pattern", "Regular expression matching timed out — the pattern may be susceptible to catastrophic backtracking");
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e.getMessage(), e);
         }

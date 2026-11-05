@@ -15,7 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans } from 'react-i18next';
 
+import i18n from 'i18n';
 import { Row, Col, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 
@@ -62,9 +64,7 @@ class SplitAndCountConverterConfiguration extends React.Component<
   render() {
     const splitByHelpMessage = (
       <span>
-        The Split & Count converter is splitting the extracted part by the defined character and stores the token count
-        as field. <strong>Example:</strong> <em>?fields=first_name,last_name,zip</em> split by <em>,</em> results in{' '}
-        <em>3</em>. You just counted the requested fields of a GET user REST request.
+        <Trans i18nKey="converters.split_by_help" ns="extractors" components={{ strong: <strong />, em: <em /> }} />
       </span>
     );
 
@@ -76,7 +76,7 @@ class SplitAndCountConverterConfiguration extends React.Component<
             this.converterEnabled = converterEnabled;
           }}
           id={`enable-${this.props.type}-converter`}
-          label="Split & Count"
+          label={i18n.t('converters.split_and_count', { ns: 'extractors' })}
           wrapperClassName="col-md-offset-2 col-md-10"
           defaultChecked
           onChange={this._toggleConverter}
@@ -87,7 +87,7 @@ class SplitAndCountConverterConfiguration extends React.Component<
               <Input
                 type="text"
                 id={`${this.props.type}_converter_split_by`}
-                label="Split by"
+                label={i18n.t('converters.split_by', { ns: 'extractors' })}
                 defaultValue={this.props.configuration.split_by}
                 labelClassName="col-md-3"
                 wrapperClassName="col-md-9"

@@ -16,7 +16,7 @@
  */
 import type * as React from 'react';
 
-export type RecentActivityType = 'create' | 'update' | 'share' | 'delete';
+export type RecentActivityType = 'create' | 'update' | 'share' | 'unshare' | 'delete';
 export type Pagination = {
   page: number;
   per_page: number;
@@ -95,7 +95,9 @@ export type WelcomePageMetricsPluginContext = {
 };
 
 export type WelcomePageMetricsPlugin = {
-  label: string;
+  /** Identifies the tab. Needed when `label` is not a string, e.g. a component rendering a translated text. */
+  id?: string;
+  label: React.ReactNode;
   component: React.ComponentType;
   isEnabled?: (context: WelcomePageMetricsPluginContext) => boolean;
 };

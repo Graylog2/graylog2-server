@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Text } from 'preflight/components/common';
 import Button from 'components/bootstrap/Button';
@@ -34,6 +35,7 @@ const StyledButton = styled(Button)(
 );
 
 const HelpMenu = () => {
+  const { t } = useTranslation('preflight');
   const { enabled, url } = useResourceCustomization('contact_support');
 
   return (
@@ -41,32 +43,32 @@ const HelpMenu = () => {
       <Menu.Target>
         <StyledButton>
           <Text fw={500} size="sm" mr={3}>
-            Get Help
+            {t('navigation.get_help')}
           </Text>
           <Icon name="keyboard_arrow_down" />
         </StyledButton>
       </Menu.Target>
       <Menu.Dropdown>
         <MenuItem component="a" href={DocsHelper.versionedDocsHomePage()} target="_blank" icon="open_in_new">
-          Documentation
+          {t('navigation.documentation')}
         </MenuItem>
         <MenuItem
           component="a"
           href={DocsHelper.toString(DocsHelper.PAGES.CHANGELOG)}
           target="_blank"
           icon="open_in_new">
-          Changelogs
+          {t('navigation.changelogs')}
         </MenuItem>
         <MenuItem
           component="a"
           href={DocsHelper.toString(DocsHelper.PAGES.OPERATIONS_CHANGELOG)}
           target="_blank"
           icon="open_in_new">
-          Operations changelogs
+          {t('navigation.operations_changelogs')}
         </MenuItem>
         {enabled && (
           <MenuItem component="a" href={url} target="_blank" icon="open_in_new">
-            Support
+            {t('navigation.support')}
           </MenuItem>
         )}
       </Menu.Dropdown>

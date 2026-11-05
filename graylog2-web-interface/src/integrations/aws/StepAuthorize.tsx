@@ -16,6 +16,7 @@
  */
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import FormDataContext from 'integrations/contexts/FormDataContext';
 import { ApiContext } from 'integrations/aws/context/Api';
@@ -45,6 +46,7 @@ type StepAuthorizeProps = {
 };
 
 const StepAuthorize = ({ onChange, onSubmit, sidebarComponent = null }: StepAuthorizeProps) => {
+  const { t } = useTranslation('integrations');
   const { formData } = useContext(FormDataContext);
   const { clearSidebar, setSidebar } = useContext(SidebarContext);
   const { availableRegions, setRegions, setStreams } = useContext(ApiContext);
@@ -73,16 +75,14 @@ const StepAuthorize = ({ onChange, onSubmit, sidebarComponent = null }: StepAuth
       if (fetchStreamsStatus.error.match(badKey)) {
         return {
           full_message: fetchStreamsStatus.error,
-          nice_message:
-            'Invalid AWS Key, check out your AWS account for the 20-character long, alphanumeric string that usually starts with the letters "AK"',
+          nice_message: t('aws_step_authorize.invalid_key_message'),
         };
       }
 
       if (fetchStreamsStatus.error.match(badSecret)) {
         return {
           full_message: fetchStreamsStatus.error,
-          nice_message:
-            'Invalid AWS Secret, it is usually a 40-character long, base-64 encoded string, but you only get to view it once when you create the Key',
+          nice_message: t('aws_step_authorize.invalid_secret_message'),
         };
       }
 
@@ -90,7 +90,7 @@ const StepAuthorize = ({ onChange, onSubmit, sidebarComponent = null }: StepAuth
     }
 
     return null;
-  }, [fetchRegionsStatus.error, fetchStreamsStatus.error]);
+  }, [fetchRegionsStatus.error, fetchStreamsStatus.error, t]);
 
   // Side-effect only: navigate forward when streams returns empty (no setState here).
   useEffect(() => {
@@ -149,12 +149,12 @@ const StepAuthorize = ({ onChange, onSubmit, sidebarComponent = null }: StepAuth
   return (
     <FormWrap
       onSubmit={handleSubmit}
-      buttonContent="Authorize &amp; Choose Stream"
+      buttonContent={t('aws_step_authorize.authorize_button')}
       loading={fetchRegionsStatus.loading || fetchStreamsStatus.loading}
       disabled={isFormValid}
       error={formError}
-      title="Create Input &amp; Authorize AWS"
-      description="This integration allows reading messages directly from a Kinesis stream. CloudWatch messages can optionally be forwarded to Kinesis via CloudWatch subscriptions and then processed.">
+      title={t('aws_step_authorize.title')}
+      description={t('aws_step_authorize.description')}>
       <DisappearingInput id="name" type="text" />
       <DisappearingInput id="password" type="password" />
 
@@ -163,8 +163,8 @@ const StepAuthorize = ({ onChange, onSubmit, sidebarComponent = null }: StepAuth
         type="text"
         fieldData={formData.awsCloudWatchName}
         onChange={onChange}
-        placeholder="Input Name"
-        label="Input Name"
+        placeholder={t('aws_step_authorize.input_name')}
+        label={t('aws_step_authorize.input_name')}
         autoComplete="off"
         required
       />
@@ -176,11 +176,11 @@ const StepAuthorize = ({ onChange, onSubmit, sidebarComponent = null }: StepAuth
         type="select"
         fieldData={formData.awsCloudWatchAwsRegion}
         onChange={onChange}
-        label="AWS Region"
-        help="The AWS Region your service is running in."
+        label={t('aws_step_authorize.aws_region')}
+        help={t('aws_step_authorize.aws_region_help')}
         disabled={fetchRegionsStatus.loading}
         required>
-        {renderOptions(availableRegions, 'Choose AWS Region', fetchRegionsStatus.loading)}
+        {renderOptions(availableRegions, t('aws_step_authorize.choose_region'), fetchRegionsStatus.loading)}
       </ValidatedInput>
 
       <AWSCustomEndpoints onChange={onChange} />

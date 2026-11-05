@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import type * as Immutable from 'immutable';
 
@@ -67,10 +68,11 @@ const PaginatedItemOverview = ({
   overrideList = undefined,
   onDeleteItem = undefined,
   queryHelper = undefined,
-  noDataText = 'No items found to display.',
+  noDataText = undefined,
   resultsWrapperComponent: ResultsWrapperComponent = ({ children }) => <div>{children}</div>,
   overrideItemComponent: OverrideItemComponent = undefined,
 }: Props) => {
+  const { t } = useTranslation('common');
   const [paginatedList, setPaginatedList] = useState<PaginatedListType | undefined>();
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   useEffect(() => overrideList && setPaginatedList(overrideList), [overrideList]);
@@ -93,7 +95,7 @@ const PaginatedItemOverview = ({
     return <Spinner />;
   }
 
-  const emptyResult = <NoSearchResult>{noDataText}</NoSearchResult>;
+  const emptyResult = <NoSearchResult>{noDataText ?? t('empty.no_items_found')}</NoSearchResult>;
   let itemList;
 
   if (paginatedList.list && paginatedList.list.size >= 1) {
@@ -117,10 +119,10 @@ const PaginatedItemOverview = ({
       {!disableSearchFilter && (
         <SearchForm
           onSearch={(newQuery) => setPagination({ ...pagination, page: INITIAL_PAGE, query: newQuery })}
-          label="Filter"
+          label={t('actions.filter')}
           queryWidth={300}
           wrapperClass="has-bm"
-          placeholder="Enter query to filter"
+          placeholder={t('search_form.filter_placeholder')}
           queryHelpComponent={queryHelper}
         />
       )}

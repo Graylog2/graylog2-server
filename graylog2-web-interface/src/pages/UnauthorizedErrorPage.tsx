@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type FetchError from 'logic/errors/FetchError';
 import { Icon, ClipboardButton } from 'components/common';
@@ -40,25 +41,29 @@ type Props = {
 const UnauthorizedErrorPage = ({
   error = undefined,
   errorDetails = undefined,
-  title = 'Missing Permissions',
+  title = undefined,
   description = undefined,
   displayPageLayout = true,
   location: { pathname },
 }: Props) => {
+  const { t } = useTranslation('pages');
   const errorMessage = error ? (error.message ?? JSON.stringify(error)) : undefined;
   const pageDetails = error
-    ? `The permissions check for the following request failed,\nwhile trying to access ${pathname}.`
-    : `The permissions check failed while trying to access ${pathname}.`;
+    ? t('unauthorized.page_details', { pathname })
+    : t('unauthorized.page_details_no_request', { pathname });
   const defaultDescription = (
     <>
-      <p>You do not have the required permissions to view this resource.</p>
-      <p>Please contact your administrator and provide the error details.</p>
+      <p>{t('unauthorized.description_intro')}</p>
+      <p>{t('unauthorized.description_hint')}</p>
     </>
   );
   const errorMessageString = createErrorMessageString(errorDetails, pageDetails, errorMessage);
 
   return (
-    <ErrorPage title={title} description={description ?? defaultDescription} displayPageLayout={displayPageLayout}>
+    <ErrorPage
+      title={title ?? t('unauthorized.title')}
+      description={description ?? defaultDescription}
+      displayPageLayout={displayPageLayout}>
       <dl>
         <dd>
           <pre className="content">
@@ -67,7 +72,7 @@ const UnauthorizedErrorPage = ({
                 title={<Icon name="content_copy" />}
                 bsSize="sm"
                 text={errorMessageString}
-                buttonTitle="Copy error details to clipboard"
+                buttonTitle={t('errors.copy_error_details')}
               />
             </div>
             {errorDetails && <p>{errorDetails}</p>}

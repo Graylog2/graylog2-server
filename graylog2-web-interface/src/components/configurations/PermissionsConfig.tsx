@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { Form, Formik } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { useStore } from 'stores/connect';
 import type { PermissionsConfigType } from 'stores/configurations/ConfigurationsStore';
@@ -50,6 +51,7 @@ const LabelSpan = styled.span(
 );
 
 const PermissionsConfig = () => {
+  const { t } = useTranslation('configurations');
   const [showModal, setShowModal] = useState<boolean>(false);
   const [config, setConfig] = useState<PermissionsConfigType | undefined>(undefined);
   const configuration = useStore(ConfigurationsStore, (state) => state?.configuration);
@@ -76,22 +78,20 @@ const PermissionsConfig = () => {
     setShowModal(false);
   };
 
-  const modalTitle = 'Configure Permissions';
-
   return (
     <div>
-      <h2>Permissions Configuration</h2>
-      <p>These settings can be used to control which entity sharing options are available.</p>
+      <h2>{t('permissions.title')}</h2>
+      <p>{t('permissions.description')}</p>
 
       {!config ? (
         <Spinner />
       ) : (
         <>
           <StyledDefList>
-            <dt>Share with everyone:</dt>
-            <dd>{config.allow_sharing_with_everyone ? 'Enabled' : 'Disabled'}</dd>
-            <dt>Share with users:</dt>
-            <dd>{config.allow_sharing_with_users ? 'Enabled' : 'Disabled'}</dd>
+            <dt>{t('permissions.share_with_everyone')}:</dt>
+            <dd>{config.allow_sharing_with_everyone ? t('markdown.enabled') : t('markdown.disabled')}</dd>
+            <dt>{t('permissions.share_with_users')}:</dt>
+            <dd>{config.allow_sharing_with_users ? t('markdown.enabled') : t('markdown.disabled')}</dd>
           </StyledDefList>
 
           <IfPermitted permissions="clusterconfigentry:edit">
@@ -103,7 +103,7 @@ const PermissionsConfig = () => {
                 onClick={() => {
                   setShowModal(true);
                 }}>
-                Edit configuration
+                {t('shared.edit_configuration')}
               </Button>
             </p>
           </IfPermitted>
@@ -113,7 +113,7 @@ const PermissionsConfig = () => {
               {({ isSubmitting }) => (
                 <Form>
                   <Modal.Header>
-                    <Modal.Title>{modalTitle}</Modal.Title>
+                    <Modal.Title>{t('permissions.update_title')}</Modal.Title>
                   </Modal.Header>
 
                   <Modal.Body>
@@ -124,18 +124,18 @@ const PermissionsConfig = () => {
                             type="checkbox"
                             name="allow_sharing_with_everyone"
                             id="shareWithEveryone"
-                            label={<LabelSpan>Share with everyone</LabelSpan>}
+                            label={<LabelSpan>{t('permissions.share_with_everyone')}</LabelSpan>}
                           />
-                          <InputDescription help="Control whether it is possible to share with everyone." />
+                          <InputDescription help={t('permissions.share_with_everyone_help')} />
                         </Col>
                         <Col sm={12}>
                           <FormikInput
                             type="checkbox"
                             name="allow_sharing_with_users"
                             id="shareWithUsers"
-                            label={<LabelSpan>Share with users</LabelSpan>}
+                            label={<LabelSpan>{t('permissions.share_with_users')}</LabelSpan>}
                           />
-                          <InputDescription help="Control whether it is possible to share with single users." />
+                          <InputDescription help={t('permissions.share_with_users_help')} />
                         </Col>
                       </Row>
                     </div>
@@ -146,8 +146,8 @@ const PermissionsConfig = () => {
                       onCancel={resetConfig}
                       isSubmitting={isSubmitting}
                       isAsyncSubmit
-                      submitLoadingText="Update configuration"
-                      submitButtonText="Update configuration"
+                      submitLoadingText={t('shared.update_configuration')}
+                      submitButtonText={t('shared.update_configuration')}
                     />
                   </Modal.Footer>
                 </Form>

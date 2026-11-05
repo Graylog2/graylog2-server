@@ -18,6 +18,7 @@ import * as React from 'react';
 import { Dialog } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import Button from 'components/bootstrap/Button';
 import useServerVersion from 'routing/useServerVersion';
@@ -32,6 +33,7 @@ const ButtonContainer = styled.div`
 `;
 const defaultReload = () => window.location.reload();
 const SuggestReloadIfVersionChanged = ({ reload = defaultReload }: Props) => {
+  const { t } = useTranslation('common');
   const productName = useProductName();
   const [versionChanged, setVersionChanged] = useState<boolean>(false);
   const [dismissed, setDismissed] = useState<boolean>(false);
@@ -61,14 +63,19 @@ const SuggestReloadIfVersionChanged = ({ reload = defaultReload }: Props) => {
       radius="md"
       position={{ top: 55, right: 20 }}>
       <p>
-        <strong>{productName} Version Changed</strong>
+        <strong>{t('suggest_reload.title', { productName })}</strong>
       </p>
       <p>
-        Your {productName} version has changed from <strong>{version}</strong> to <strong>{newVersion}</strong>.
+        <Trans
+          t={t}
+          i18nKey="suggest_reload.version_changed"
+          values={{ productName, version, newVersion }}
+          components={{ bold: <strong /> }}
+        />
       </p>
-      <p>Please save your work and reload the page to avoid running into errors.</p>
+      <p>{t('suggest_reload.save_work')}</p>
       <ButtonContainer>
-        <Button onClick={reload}>Reload now</Button>
+        <Button onClick={reload}>{t('suggest_reload.reload_now')}</Button>
       </ButtonContainer>
     </Dialog>
   ) : null;

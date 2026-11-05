@@ -65,8 +65,13 @@ const STEP_TELEMETRY_KEYS = [
   TELEMETRY_EVENT_TYPE.EVENTDEFINITION_SUMMARY.STEP_CLICKED,
 ];
 
+// `title` is displayed and may be translated, telemetry uses the English `telemetryTitle`.
+export type EventDefinitionStep = StepType<string> & { telemetryTitle?: string };
+
+const telemetryStepTitle = (step: EventDefinitionStep | undefined) => step?.telemetryTitle ?? step?.title;
+
 type Props = {
-  steps: Array<StepType<string>>;
+  steps: Array<EventDefinitionStep>;
   activeStep: string;
   action?: 'edit' | 'create';
   onChangeStep: (step: string) => void;
@@ -100,7 +105,7 @@ const EventDefinitionForm = ({
   const handleStepChange = (nextStep: string) => {
     sendTelemetry(STEP_TELEMETRY_KEYS[currentStepKeys.indexOf(nextStep)], {
       app_action_value: 'event-definition-step',
-      current_step: steps[activeStepIndex]?.title,
+      current_step: telemetryStepTitle(steps[activeStepIndex]),
     });
 
     onChangeStep(nextStep);
@@ -109,7 +114,7 @@ const EventDefinitionForm = ({
   const openPrevPage = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_PREVIOUS_CLICKED, {
       app_action_value: 'previous-button',
-      current_step: steps[activeStepIndex]?.title,
+      current_step: telemetryStepTitle(steps[activeStepIndex]),
     });
 
     const previousStep = activeStepIndex > 0 ? currentStepKeys[activeStepIndex - 1] : undefined;
@@ -119,7 +124,7 @@ const EventDefinitionForm = ({
   const openNextPage = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NEXT_CLICKED, {
       app_action_value: 'next-button',
-      current_step: steps[activeStepIndex]?.title,
+      current_step: telemetryStepTitle(steps[activeStepIndex]),
     });
 
     const nextStep = currentStepKeys[activeStepIndex + 1];

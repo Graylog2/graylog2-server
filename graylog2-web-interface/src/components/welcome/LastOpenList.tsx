@@ -16,6 +16,7 @@
  */
 
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { ListGroup } from 'components/bootstrap';
 import { DEFAULT_PAGINATION } from 'components/welcome/Constants';
@@ -25,6 +26,7 @@ import Routes from 'routing/Routes';
 import useLastOpened from 'components/welcome/hooks/useLastOpened';
 
 const LastOpenList = () => {
+  const { t } = useTranslation('welcome');
   const {
     data: { lastOpened },
     isFetching,
@@ -35,10 +37,16 @@ const LastOpenList = () => {
   if (lastOpened.length === 0) {
     return (
       <NoSearchResult>
-        You have not opened any searches/dashboards yet.
+        {t('no_last_opened')}
         <br />
-        From now on, whenever you open a saved search/dashboard, it will show up here. In the meantime, you can start a
-        new <Link to={Routes.SEARCH}>Search</Link> or <Link to={Routes.DASHBOARD.NEW}>Dashboard</Link>.
+        <Trans
+          t={t}
+          i18nKey="no_last_opened_hint"
+          components={{
+            searchLink: <Link to={Routes.SEARCH} />,
+            dashboardLink: <Link to={Routes.DASHBOARD.NEW} />,
+          }}
+        />
       </NoSearchResult>
     );
   }

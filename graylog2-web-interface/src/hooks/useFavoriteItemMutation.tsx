@@ -20,6 +20,7 @@ import { useMutation } from '@tanstack/react-query';
 import { Favorites } from '@graylog/server-api';
 
 import UserNotification from 'util/UserNotification';
+import i18n from 'i18n';
 
 const putFavoriteItem = async (grn: string) => Favorites.addItemToFavorites(grn);
 
@@ -31,8 +32,8 @@ const useFavoriteItemMutation = () => {
 
     onError: (errorThrown) => {
       UserNotification.error(
-        `Adding item to favorites failed with status: ${errorThrown}`,
-        'Could not add item to favorites',
+        i18n.t('use_favorite_item_mutation_notifications.put_failed', { ns: 'common', error: errorThrown }),
+        i18n.t('use_favorite_item_mutation_notifications.put_failed_title', { ns: 'common' }),
       );
     },
   });
@@ -42,8 +43,8 @@ const useFavoriteItemMutation = () => {
 
     onError: (errorThrown) => {
       UserNotification.error(
-        `Deleting item from favorites failed with status: ${errorThrown}`,
-        'Could not delete item from favorites',
+        i18n.t('use_favorite_item_mutation_notifications.delete_failed', { ns: 'common', error: errorThrown }),
+        i18n.t('use_favorite_item_mutation_notifications.delete_failed_title', { ns: 'common' }),
       );
     },
   });

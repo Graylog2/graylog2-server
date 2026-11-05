@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import type { InputSummary } from 'hooks/usePaginatedInputs';
@@ -47,6 +48,7 @@ const MessageCountCell = styled.td`
 `;
 
 const MessagesPerStreamSection = ({ input }: Props) => {
+  const { t } = useTranslation('inputs');
   const { metricsByInputId, isInitialLoading, isError } = useInputMetrics([input.id], ['messages_per_stream']);
   const messagesPerStream = metricsByInputId[input.id]?.messages_per_stream;
 
@@ -59,11 +61,11 @@ const MessagesPerStreamSection = ({ input }: Props) => {
   }
 
   if (isError) {
-    return <p>Could not load messages per stream.</p>;
+    return <p>{t('overview.sections.could_not_load_messages_per_stream')}</p>;
   }
 
   if (!messagesPerStream || streamIds.length === 0) {
-    return <p>No streams have received messages from this input in the last 24 hours.</p>;
+    return <p>{t('overview.sections.no_messages_per_stream')}</p>;
   }
 
   const sortedEntries = Object.entries(messagesPerStream).sort(([, a], [, b]) => b - a);
@@ -76,14 +78,14 @@ const MessagesPerStreamSection = ({ input }: Props) => {
       </colgroup>
       <thead>
         <tr>
-          <th>Stream</th>
-          <MessageCountHeadCell>Messages</MessageCountHeadCell>
+          <th>{t('overview.sections.stream')}</th>
+          <MessageCountHeadCell>{t('overview.sections.messages')}</MessageCountHeadCell>
         </tr>
       </thead>
       <tbody>
         {sortedEntries.map(([streamId, count]) => {
           const title = titlesById[streamId];
-          const label = title ?? (areTitlesLoading ? streamId : `${streamId} (deleted)`);
+          const label = title ?? (areTitlesLoading ? streamId : t('overview.sections.deleted_stream', { streamId }));
 
           return (
             <tr key={streamId}>

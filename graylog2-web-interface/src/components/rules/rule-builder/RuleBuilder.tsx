@@ -16,6 +16,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import styled, { css } from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
@@ -80,6 +81,7 @@ const getLastOutputIndexFromRule = (rule: RuleBuilderRule): number => {
 };
 
 const RuleBuilder = () => {
+  const { t } = useTranslation('pipelines');
   const {
     rule: initialRule,
     conditionsDict,
@@ -311,16 +313,16 @@ const RuleBuilder = () => {
             <RuleBuilderForm rule={rule} onChange={setRule} />
           </Col>
           <Col xs={8}>
-            <label htmlFor="rule_builder">Rule Builder</label>
+            <label htmlFor="rule_builder">{t('builder.title')}</label>
             <StyledPanel expanded={conditionsExpanded}>
               <StyledPanelHeading>
-                <Panel.Title toggle>When</Panel.Title>
+                <Panel.Title toggle>{t('builder.when')}</Panel.Title>
                 <WhenOperator>
                   <Radio checked={rule.rule_builder.operator === 'AND'} onChange={() => updateWhenOperator('AND')}>
-                    and
+                    {t('builder.and')}
                   </Radio>
                   <Radio checked={rule.rule_builder.operator === 'OR'} onChange={() => updateWhenOperator('OR')}>
-                    or
+                    {t('builder.or')}
                   </Radio>
                 </WhenOperator>
               </StyledPanelHeading>
@@ -357,7 +359,7 @@ const RuleBuilder = () => {
             <br />
             <StyledPanel expanded={actionsExpanded}>
               <StyledPanelHeading>
-                <Panel.Title toggle>Then</Panel.Title>
+                <Panel.Title toggle>{t('builder.then')}</Panel.Title>
               </StyledPanelHeading>
               <Panel.Collapse>
                 <StyledPanelBody>
@@ -394,16 +396,16 @@ const RuleBuilder = () => {
           <ActionsCol xs={12}>
             <FormSubmit
               disabledSubmit={hasRuleBuilderErrors(rule)}
-              submitButtonText={!initialRule ? 'Create rule' : 'Update rule & close'}
+              submitButtonText={!initialRule ? t('rule_form.create_submit') : t('rule_form.update_close_submit')}
               centerCol={
                 initialRule && (
                   <>
                     <Button type="button" bsStyle="info" onClick={handleSave} disabled={hasRuleBuilderErrors(rule)}>
-                      Update rule
+                      {t('rule_form.update')}
                     </Button>
                     <Button
                       bsStyle="info"
-                      title="Convert Rule Builder to Source Code"
+                      title={t('builder.convert_title')}
                       disabled={hasRuleBuilderErrors(rule)}
                       onClick={() => {
                         sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.CONVERT_TO_SOURCE_CODE_CLICKED, {
@@ -412,7 +414,7 @@ const RuleBuilder = () => {
 
                         setRuleSourceCodeToShow(rule);
                       }}>
-                      Convert to Source Code
+                      {t('builder.convert')}
                     </Button>
                   </>
                 )
@@ -423,20 +425,23 @@ const RuleBuilder = () => {
         </Row>
         {blockToDelete && (
           <ConfirmDialog
-            title={`Delete ${blockToDelete.type}`}
+            title={blockToDelete.type === 'condition' ? t('builder.delete_condition') : t('builder.delete_action')}
             show
             onConfirm={() => {
               deleteBlock(blockToDelete.orderIndex, blockToDelete.type);
               setBlockToDelete(null);
             }}
             onCancel={() => setBlockToDelete(null)}>
-            <>
-              Are you sure you want to delete{' '}
-              <strong>
-                {blockToDelete.type} N° {blockToDelete.orderIndex + 1}
-              </strong>
-              ?
-            </>
+            <Trans
+              t={t}
+              i18nKey={
+                blockToDelete.type === 'condition'
+                  ? 'builder.delete_condition_confirm'
+                  : 'builder.delete_action_confirm'
+              }
+              values={{ order: blockToDelete.orderIndex + 1 }}
+              components={{ blockName: <strong /> }}
+            />
           </ConfirmDialog>
         )}
         {ruleSourceCodeToShow && (

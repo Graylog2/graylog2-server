@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
@@ -24,25 +25,29 @@ import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import PageDescription from 'components/event-notifications/PageDescription';
 import CreateButton from 'components/common/CreateButton';
 
-const EventNotificationsPage = () => (
-  <DocumentTitle title="Notifications">
-    <EventsPageNavigation />
-    <PageHeader
-      title="Notifications"
-      actions={<CreateButton entityKey="Event Notification" />}
-      documentationLink={{
-        title: 'Alerts documentation',
-        path: DocsHelper.PAGES.ALERTS,
-      }}>
-      <PageDescription />
-    </PageHeader>
+const EventNotificationsPage = () => {
+  const { t } = useTranslation('event_notifications');
 
-    <Row className="content">
-      <Col md={12}>
-        <EventNotificationsContainer />
-      </Col>
-    </Row>
-  </DocumentTitle>
-);
+  return (
+    <DocumentTitle title={t('pages.title')}>
+      <EventsPageNavigation />
+      <PageHeader
+        title={t('pages.title')}
+        actions={<CreateButton entityKey="Event Notification" />}
+        documentationLink={{
+          title: t('pages.alerts_docs'),
+          path: DocsHelper.PAGES.ALERTS,
+        }}>
+        <PageDescription />
+      </PageHeader>
+
+      <Row className="content">
+        <Col md={12}>
+          <EventNotificationsContainer />
+        </Col>
+      </Row>
+    </DocumentTitle>
+  );
+};
 
 export default EventNotificationsPage;

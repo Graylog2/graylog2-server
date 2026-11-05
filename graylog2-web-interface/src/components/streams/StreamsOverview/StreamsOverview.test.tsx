@@ -190,7 +190,7 @@ describe('StreamsOverview', () => {
 
     await userEvent.click(within(tableRow).getByTitle('Show stream rules'));
 
-    await screen.findByText(/must match all of the 2 configured stream \./i);
+    await screen.findByText(/must match all of the 2 configured stream rules\./i);
     const deleteStreamRuleButtons = await screen.findAllByRole('button', { name: /delete stream rule/i });
     const editStreamRuleButtons = await screen.findAllByRole('button', { name: /edit stream rule/i });
 

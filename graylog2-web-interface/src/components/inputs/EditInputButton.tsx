@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -38,6 +39,7 @@ type Props = {
 };
 
 const EditInputButton = ({ input }: Props) => {
+  const { t } = useTranslation('inputs');
   const [showConfigurationForm, setShowConfigurationForm] = useState<boolean>(false);
   const { data: inputTypeDescriptions } = useInputTypesDescriptions();
   const { updateInput } = useInputMutations();
@@ -64,7 +66,7 @@ const EditInputButton = ({ input }: Props) => {
   return (
     <IfPermitted permissions={[`inputs:edit:${input.id}`, `input_types:create:${input.type}`]}>
       <StyledButton bsStyle="primary" onClick={editInput} disabled={definition === undefined}>
-        Edit input
+        {t('edit_input.edit')}
       </StyledButton>
       {definition && showConfigurationForm && (
         <InputForm
@@ -74,12 +76,12 @@ const EditInputButton = ({ input }: Props) => {
           nodeValue={input.node}
           configFields={definition.requested_configuration as unknown as any}
           description={definition?.description}
-          title={`Editing Input ${input.title}`}
+          title={t('edit_input.editing', { title: input.title })}
           titleValue={input.title}
           typeName={input.type}
           includeTitleField
           handleSubmit={handleInputUpdate}
-          submitButtonText="Update input"
+          submitButtonText={t('edit_input.update')}
           values={input.attributes}
         />
       )}

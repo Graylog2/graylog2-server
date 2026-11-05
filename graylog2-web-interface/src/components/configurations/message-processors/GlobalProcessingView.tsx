@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
   gracePeriod: string;
@@ -39,20 +40,21 @@ const StyledDefList = styled.dl.attrs({ className: 'deflist' })(
   `,
 );
 
-const GlobalProcessingView = ({ gracePeriod }: Props) => (
-  <Wrapper>
-    <h2>Global Processing Rules Configuration</h2>
-    <p>
-      Global Processing Rules are applied after receipt by an Input, and before processing rules applied by Message
-      Processors.
-    </p>
-    <StyledDefList>
-      <dt>Future Timestamp Normalization:</dt>
-      <dd>{gracePeriod ? 'Enabled' : 'Disabled'}</dd>
-      <dt>Grace Period:</dt>
-      <dd>{gracePeriod}</dd>
-    </StyledDefList>
-  </Wrapper>
-);
+const GlobalProcessingView = ({ gracePeriod }: Props) => {
+  const { t } = useTranslation('configurations');
+
+  return (
+    <Wrapper>
+      <h2>{t('message_processors.global_title')}</h2>
+      <p>{t('message_processors.global_description')}</p>
+      <StyledDefList>
+        <dt>{t('message_processors.future_timestamp_normalization')}:</dt>
+        <dd>{gracePeriod ? t('markdown.enabled') : t('markdown.disabled')}</dd>
+        <dt>{t('message_processors.grace_period')}:</dt>
+        <dd>{gracePeriod}</dd>
+      </StyledDefList>
+    </Wrapper>
+  );
+};
 
 export default GlobalProcessingView;

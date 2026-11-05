@@ -33,24 +33,28 @@ PluginStore.register(
         {
           type: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy',
           displayName: 'Index Message Count',
+          displayNameKey: 'indexsets:strategies.name_rotation_message_count',
           configComponent: MessageCountRotationStrategyConfiguration,
           summaryComponent: MessageCountRotationStrategySummary,
         },
         {
           type: 'org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy',
           displayName: 'Index Size',
+          displayNameKey: 'indexsets:strategies.name_rotation_size',
           configComponent: SizeBasedRotationStrategyConfiguration,
           summaryComponent: SizeBasedRotationStrategySummary,
         },
         {
           type: 'org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy',
           displayName: 'Index Time',
+          displayNameKey: 'indexsets:strategies.name_rotation_time',
           configComponent: TimeBasedRotationStrategyConfiguration,
           summaryComponent: TimeBasedRotationStrategySummary,
         },
         {
           type: 'org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategy',
           displayName: 'Index Time Size Optimizing',
+          displayNameKey: 'indexsets:strategies.name_rotation_time_size_optimizing',
           configComponent: TimeBasedSizeOptimizingStrategyConfiguration,
           summaryComponent: TimeBasedSizeOptimizingStrategySummary,
         },

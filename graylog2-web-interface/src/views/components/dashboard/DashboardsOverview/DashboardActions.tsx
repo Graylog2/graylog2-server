@@ -15,14 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useCallback, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import i18n from 'i18n';
 import UserNotification from 'util/UserNotification';
 import { ShareButton } from 'components/common';
 import { MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import type View from 'views/logic/views/View';
 import EntityShareModal from 'components/permissions/EntityShareModal';
-import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import iterateConfirmationHooks from 'views/hooks/IterateConfirmationHooks';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -36,7 +37,7 @@ import { deleteView } from 'views/api/views';
 
 const defaultDashboardDeletionHook = async (view: View) =>
   // eslint-disable-next-line no-alert
-  window.confirm(`Are you sure you want to delete "${view.title}"?`);
+  window.confirm(i18n.t('delete.confirm', { ns: 'dashboards', title: view.title }));
 
 const _extractErrorMessage = (error: FetchError) =>
   error && error.additional && error.additional.body && error.additional.body.message
@@ -86,6 +87,7 @@ const DashboardDeleteAction = ({
   refetchDashboards: () => void;
   hideDelete?: boolean;
 }) => {
+  const { t } = useTranslation('dashboards');
   const { deselectEntity } = useSelectedEntities();
   const paginationQueryParameter = usePaginationQueryParameter();
 
@@ -100,21 +102,22 @@ const DashboardDeleteAction = ({
     if (result) {
       deleteView(dashboard)
         .then(() => {
-          UserNotification.success(`Deleting dashboard "${dashboard.title}" was successful!`, 'Success!');
+          UserNotification.success(t('delete.success', { title: dashboard.title }), t('delete.success_title'));
           deselectEntity(dashboard.id);
           refetchDashboards();
           paginationQueryParameter.resetPage();
         })
         .catch((error) => {
-          UserNotification.error(`Deleting dashboard failed: ${_extractErrorMessage(error)}`, 'Error!');
+          UserNotification.error(t('delete.failed', { error: _extractErrorMessage(error) }), t('delete.failed_title'));
         });
     }
-  }, [dashboard, deselectEntity, refetchDashboards, paginationQueryParameter]);
+  }, [dashboard, deselectEntity, refetchDashboards, paginationQueryParameter, t]);
 
   return hideDelete ? null : <DeleteMenuItem onClick={onDashboardDelete} />;
 };
 
 const DashboardActions = ({ dashboard, hideDelete = false, hideShare = false }: Props) => {
+  const { t } = useTranslation('dashboards');
   const [showShareModal, setShowShareModal] = useState(false);
   const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableDashboardActions(dashboard);
   const { isAnyPermitted } = usePermissions();
@@ -151,7 +154,7 @@ const DashboardActions = ({ dashboard, hideDelete = false, hideShare = false }: 
         <EntityShareModal
           entityId={dashboard.id}
           entityType="dashboard"
-          description={`Search for a User or Team to add as collaborator on this ${ViewTypeLabel({ type: dashboard.type })}.`}
+          description={t('search:dashboard_actions.share_description')}
           entityTitle={dashboard.title}
           onClose={() => setShowShareModal(false)}
         />

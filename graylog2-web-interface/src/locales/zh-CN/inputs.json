@@ -1,0 +1,451 @@
+{
+  "create_input": {
+    "select_input": "选择 Input",
+    "launch_new": "启动新 Input",
+    "launch_new_type": "启动新的 <type>{{type}}</type> Input",
+    "launch": "启动 Input",
+    "no_inputs_available": "没有可用的 Input"
+  },
+  "edit_input": {
+    "edit": "编辑 Input",
+    "editing": "正在编辑 Input {{title}}",
+    "update": "更新 Input"
+  },
+  "input_dropdown": {
+    "label": "服务器 Input 选择",
+    "select": "选择一个 Input",
+    "unknown_type": "未知的 Input 类型",
+    "option": "{{title}} ({{type}})"
+  },
+  "input_states": {
+    "title": "{{title}} 的 Input 状态",
+    "count_other": "{{count}} 个{{state}}",
+    "CREATED": "已创建",
+    "INITIALIZED": "已初始化",
+    "INVALID_CONFIGURATION": "配置无效",
+    "STARTING": "正在启动",
+    "RUNNING": "运行中",
+    "FAILED": "失败",
+    "FAILING": "失败中",
+    "SETUP": "设置中",
+    "STOPPING": "正在停止",
+    "STOPPED": "已停止",
+    "TERMINATED": "已终止"
+  },
+  "state_control": {
+    "set_up": "设置 Input",
+    "stopping": "正在停止...",
+    "stop": "停止 Input",
+    "starting": "正在启动...",
+    "start": "启动 Input"
+  },
+  "static_fields": {
+    "title": "静态字段",
+    "add": "添加静态字段",
+    "add_field": "添加字段",
+    "add_success": "已成功将静态字段 '{{field}}' 添加到 '{{input}}'",
+    "add_failed": "向 Input 添加静态字段失败：{{error}}",
+    "add_failed_title": "无法向 Input '{{input}}' 添加静态字段",
+    "remove_success": "已成功从 '{{input}}' 中移除静态字段 '{{field}}'",
+    "remove_failed": "从 Input 移除静态字段失败：{{error}}",
+    "remove_failed_title": "无法从 Input '{{input}}' 中移除静态字段 '{{field}}'",
+    "delete_title": "删除静态字段",
+    "delete_confirm": "确定要从 '{{input}}' 中移除静态字段 '{{field}}' 吗？",
+    "description": "定义一个静态字段，它会被添加到通过此 Input 接收的每条消息中。如果消息已包含该键，则不会覆盖该字段。键只能包含字母数字字符或下划线，且不能是保留字段。",
+    "field_name": "字段名称",
+    "field_name_title": "只能包含字母数字字符和下划线。",
+    "field_value": "字段值"
+  },
+  "notifications": {
+    "warning": "警告",
+    "failed": "失败的 Input 将无法接收流量，直到启动为止。",
+    "setup": "处于设置模式的 Input 将无法接收流量，直到启动为止。",
+    "stopped": "已停止的 Input 将无法接收流量，直到启动为止。",
+    "show_failed": "显示失败的 Input",
+    "show_setup": "显示处于设置模式的 Input",
+    "show_stopped": "显示已停止的 Input"
+  },
+  "node_select": {
+    "node": "节点",
+    "node_help": "此 Input 应在哪个节点上启动",
+    "select_node": "选择节点",
+    "global": "全局",
+    "global_help": "此 Input 是否应在所有节点上启动"
+  },
+  "pages": {
+    "inputs": "Inputs",
+    "docs": "Inputs 文档",
+    "description": "{{productName}} 节点通过 Input 接收数据。您可以在此启动或终止任意数量的 Input。",
+    "cloud_description": "{{productName}} Cloud 通过 Input 接收数据。可选择的 Input 类型众多，但只有部分可以直接在云端运行。您可以在此页面启动和终止它们。",
+    "cloud_forwarder_hint": "如果在此页面的可用 Input 列表中找不到某个 Input 类型，您可以在 <forwarderLink>Forwarder</forwarderLink> 上启动该 Input。",
+    "back": "返回",
+    "diagnosis_title": "Input 诊断：{{name}}",
+    "diagnosis_description": "Input 诊断可用于测试 Input 和解析，而无需将任何数据写入搜索集群。",
+    "tab_overview": "概览",
+    "tab_rules": "规则",
+    "node_inputs_title": "节点 {{nodeId}} / {{hostname}} 的 Inputs",
+    "node_inputs_description": "{{productName}} 节点通过 Input 接收数据。在此页面，您可以查看哪些 Input 正在该特定节点上运行。",
+    "node_inputs_hint": "您可以在<inputsLink>此处</inputsLink>启动和终止集群中的 Input。",
+    "local_inputs": "本地 Inputs",
+    "global_inputs": "全局 Inputs"
+  },
+  "diagnosis": {
+    "help": {
+      "listening_on_title": "此 Input 监听于：",
+      "listening_on": "请注意，绑定地址需要指向 {{productName}} 服务。所选端口不得与每个节点上的其他 Input 发生端口冲突。请记住，单个节点上的本地 Input 可能与在所有节点上运行的全局 Input 冲突，导致该节点上的 Input 失败。",
+      "listening_for_title": "此 Input 监听的内容：",
+      "listening_for": "请注意，发送到 TCP Input 的 UDP 流量，或发送到 UDP Input 的 TCP 流量，会显示为网络 I/O，但不会接收到任何消息。",
+      "empty_messages_discarded_title": "已丢弃的空消息：",
+      "empty_messages_discarded": "消息负载长度为 0 的消息将被 Input 丢弃。",
+      "network_io_title": "网络 I/O：",
+      "network_io": "请注意，此值可用于检测对 Input 的连接尝试和无效流量。",
+      "input_state": "处于运行状态的 Input 已准备好接收消息。处于失败或失败中状态的 Input 遇到了问题；请点击下方按钮查看相关的错误消息。",
+      "message_error_at_input_title": "Input 处的消息错误：",
+      "message_error_at_input": "每种 Input 类型都要求以特定格式接收消息。不符合该格式的消息可能会被 Input 拒绝，此时它们不会进入处理阶段。要解决这些问题，请检查正在发送的消息。更详细的错误信息可在 {{productName}} 服务器的 server.log 文件中找到。",
+      "message_failed_to_process_title": "消息处理失败：",
+      "message_failed_to_process": "Extractor 和 Pipeline 可用于对消息执行处理操作，例如解析字段。如果 Pipeline 规则尝试执行无意义的操作，或将字段的属性修改为与该字段的数据类型或字段长度限制相冲突的格式，则处理可能会失败。以这种方式处理失败的消息可以在 Processing and Indexing Failures 流中查看。",
+      "message_failed_to_index_title": "消息错误：",
+      "message_failed_to_index": "在搜索集群中，消息只有符合索引的 schema 才能保存到该索引中。OpenSearch 中的每个字段都有字段类型和字符限制；如果超出其中任何一项，消息将无法建立索引。以这种方式建立索引失败的消息可以在 Processing and Indexing Failures 流中查看。",
+      "received_message_count_by_stream": "使用此视图可以了解流和 Pipeline 规则将来自此 Input 的消息导向何处。一条消息可以被复制到多个流中；如果这导致消息被保存到多个索引中，也会使许可证用量成倍增加。此视图有助于发现这种重复。"
+    },
+    "node": {
+      "node_id": "节点 ID：",
+      "message": "消息：",
+      "last_failed": "上次失败：",
+      "state_label": "{{state}}：",
+      "state_nodes": "{{count}}/{{total}} 个节点",
+      "state_count": "{{count}}/{{total}}"
+    },
+    "information": {
+      "title": "信息",
+      "description": "Input 运行所在的地址。",
+      "input_title": "Input 标题：",
+      "input_type": "Input 类型：",
+      "running_on": "此 Input 运行于：",
+      "all_nodes": "所有 {{productName}} 节点",
+      "listening_on": "此 Input 监听于：",
+      "listening_on_value": "绑定地址 {{bindAddress}}，端口 {{port}}。",
+      "listening_for": "此 Input 监听："
+    },
+    "state": {
+      "title": "状态",
+      "description": "Input 配置运行的 {{productName}} 节点数量，以及其中正在运行的节点数量。如有节点未在运行，请点击查看相关错误消息。",
+      "failed_starts": "启动失败次数（最近 15 分钟）：",
+      "not_running": "Input 未在运行。"
+    },
+    "troubleshooting": {
+      "title": "故障排除",
+      "failed_title": "如果 Input 处于失败状态。",
+      "failed_message_field": "当 Input 在一个或多个 {{productName}} 节点上失败时，状态面板中的消息字段将显示简短的错误消息；完整的错误消息可在 {{productName}} 的 server.log 文件中找到。",
+      "failed_port": "如果 Input 配置使用的端口是特权端口（且 {{productName}} 并非以 root 身份运行），或该端口已被其他 Input 或应用程序占用，则 Input 将失败。",
+      "failed_route": "如果 Input 无法路由到指定的 IP，则 Input 将失败。",
+      "failed_internet": "需要互联网连接才能访问 API 的 Input，如果没有互联网连接或无法路由到该 API，则会失败。",
+      "failed_certificate": "如果 TCP Input 的证书无效或已过期，则 Input 将失败。",
+      "failed_external_api": "连接外部 API 的 Input（例如 Microsoft Azure Input）需要在数据源端进行配置更改，{{productName}} 才能收集日志。所需步骤会在该 Input 对应的文档子页面中详细说明。如果 {{productName}} 端或（如适用）API 所在端的配置有误，连接外部 API 的 Input 将失败。",
+      "no_messages_title": "如果 Input 已在所有节点上运行，但消息未到达 Input。",
+      "no_messages_network_io": "请检查“已接收流量”面板中的网络 I/O 字段。如果此处未显示任何流量，则表明存在连接问题。",
+      "no_messages_connectivity": "如果未显示任何流量，请先排查 {{productName}} 服务器与日志源之间的网络连接。可以通过运行 ping、telnet 或 tracert 命令来完成。",
+      "no_messages_external_api": "对于连接外部 API 的 Input，请检查 {{productName}} 的 server.log 文件，其中会完整记录身份验证失败的情况（登录信息无效，或无权在 API 上执行该操作）。",
+      "no_messages_format": "如果“已接收流量”面板的网络 I/O 字段显示有流量，但未收到任何消息，则表明消息的发送格式不适用于该 Input。",
+      "no_messages_protocol": "TCP Input 无法读取 UDP 流量，反之亦然。",
+      "no_messages_empty": "内容为空的消息将被丢弃。可通过“已丢弃的空消息”字段进行监控。",
+      "no_messages_listener": "Listener Input 只接受有限范围内的消息格式，可能无法读取其他格式的消息。出于故障排除的目的，Raw Text Input 的要求最为宽松。",
+      "message_errors_title": "如果 Input 已在所有节点上运行，消息也已到达 Input，但部分（或全部）消息显示为消息错误。",
+      "message_errors_failure_processing": "在已授权的 Enterprise 集群上，可以启用失败处理，以保存在各个阶段（Input、处理以及写入搜索集群）出错的消息，并附带失败详情，参见 failure_cause 和 failure_details 字段。转到“消息错误”面板并点击消息数量，即可检查各条失败的消息。"
+    },
+    "received_traffic": {
+      "title": "已接收流量",
+      "description": "已到达 Input 的消息和网络流量。注意：指标仅显示最近 15 分钟的数据。",
+      "total_messages": "Input 接收的消息总数：",
+      "events": "{{count}} 个事件",
+      "empty_messages": "已丢弃的空消息：",
+      "active_connections": "活动连接：",
+      "connections_value": "{{open}}（共 {{total}} 个）",
+      "network_io": "网络 I/O："
+    },
+    "message_count_by_stream": {
+      "title": "按 Stream 统计的已接收消息数",
+      "description": "最近 15 分钟内从此 Input 成功摄入的消息。点击 Stream 可查看其中的消息。",
+      "stream": "{{streamName}}：",
+      "none": "最近 15 分钟内，没有来自此 Input 的消息被路由到 Stream 中。"
+    },
+    "message_errors": {
+      "title": "消息错误",
+      "description": "消息可能在 Input 处、处理 Pipeline 中，或写入搜索集群（索引）时处理失败。",
+      "at_input": "Input 处的消息错误：",
+      "failed_to_process": "消息处理失败：",
+      "failed_to_index": "消息索引失败："
+    },
+    "rules": {
+      "pipeline_rules_title": "Input 出现在 Pipeline 规则中",
+      "pipeline_rules_description": "下方列出的 Pipeline 规则明确引用了此 Input（例如通过 from_input、from_forwarder_input，或匹配 gl2_source_input/gl2_forwarder_input）。",
+      "pipeline_rules_human_name": "Pipeline 规则",
+      "pipeline_rules_search": "搜索 Pipeline 规则",
+      "stream_rules_title": "Input 出现在 Stream 规则中",
+      "stream_rules_description": "下方列出的 Stream 规则包含明确指向此 Input 的 match input 函数。注意：未显式使用 match input 函数、但可能捕获此 Input 消息的 Stream 规则不会被列出。",
+      "stream_rules_human_name": "Stream 规则",
+      "stream_rules_search": "搜索 Stream 规则",
+      "load_pipeline_rules_failed": "加载 Input Pipeline 规则失败，状态：",
+      "could_not_load_pipeline_rules": "无法加载 Input Pipeline 规则",
+      "load_stream_rules_failed": "加载 Input Stream 规则失败，状态：",
+      "could_not_load_stream_rules": "无法加载 Input Stream 规则"
+    },
+    "network_stats": {
+      "total_prefix": " （总计：",
+      "total_suffix": "）"
+    },
+    "show_received_messages": "显示已接收的消息",
+    "fetch_failed": "获取 Input 诊断信息失败，状态：",
+    "could_not_fetch": "无法获取 Input 诊断信息"
+  },
+  "setup_wizard": {
+    "title": "Input 设置向导",
+    "back": "返回",
+    "finish": "完成",
+    "steps": {
+      "routing": "路由",
+      "launch": "启动",
+      "diagnosis": "诊断"
+    },
+    "diagnosis_step": {
+      "description": "在不向搜索集群写入任何数据的情况下测试 Input 和解析。",
+      "go_to_diagnosis": "前往 Input 诊断"
+    },
+    "load_streams_failed": "加载 Stream 失败：{{error}}",
+    "load_input_references_failed": "加载 Input 引用失败：{{error}}",
+    "load_streams_by_index_set_failed": "按索引集加载 Stream 失败：{{error}}",
+    "routing": {
+      "connected_pipelines_title": "已连接到目标 Stream 的 Pipeline",
+      "connected_pipelines": "建议在完成 Input 设置前检查这些 Pipeline 的影响。目标 Stream 已连接以下 Pipeline：",
+      "select_destination": "选择一个目标 Stream，用于路由此 Input 的消息。",
+      "recommend_new_stream": "<strong>建议为每个新 Input 创建一个新的 Stream。</strong>这有助于将消息归类为基本的 schema。",
+      "default_stream_fallback": "未路由到任何 Stream 的消息将被路由到 <strong>Default Stream</strong>。",
+      "pipeline_rules_info": "本向导可以自动创建 Pipeline 规则，并将其附加到 <strong>Default Stream</strong>。这些规则将放置在系统管理的 Default Routing Pipeline 中，并会被自动重命名（或删除），以准确反映此 Input 的状态。",
+      "new_stream_heading": "路由到新 Stream",
+      "recommended": "推荐！",
+      "create_stream": "创建 Stream",
+      "existing_stream_heading": "路由到现有 Stream",
+      "select_stream": "选择 Stream",
+      "create_new_stream": "创建新 Stream",
+      "choose_existing_stream": "选择现有 Stream",
+      "existing_stream_selected": "已选择将此 Input 的消息路由到现有 Stream。",
+      "pipeline_rules_created": "按下 <strong>启动 Input</strong> 按钮时将创建 Pipeline 规则。",
+      "default_stream": "默认 Stream",
+      "remove_from_default": "从‘Default Stream’中移除匹配项",
+      "remove_from_default_help": "不要将匹配此 Stream 的消息分配到‘Default Stream’。"
+    },
+    "start": {
+      "description": "根据所做的配置设置并启动 Input。",
+      "rolling_back": "正在回滚 Input...",
+      "setting_up": "正在设置 Input...",
+      "not_ready": "Input 尚未准备好进行设置。请先完成前面的步骤。",
+      "start_input": "启动 Input",
+      "rollback_input": "回滚 Input",
+      "launch_diagnosis": "启动 Input 诊断"
+    },
+    "progress": {
+      "details": "详细信息：",
+      "loading": {
+        "create_stream": "正在创建 Stream...",
+        "create_stream_named": "正在创建 Stream “{{name}}”...",
+        "start_stream": "正在启动 Stream...",
+        "start_stream_named": "正在启动 Stream “{{name}}”...",
+        "create_pipeline": "正在创建 Pipeline...",
+        "create_pipeline_named": "正在创建 Pipeline “{{name}}”...",
+        "setup_routing": "正在设置路由...",
+        "delete_stream": "正在删除 Stream...",
+        "delete_stream_named": "正在删除 Stream “{{name}}”...",
+        "delete_pipeline": "正在删除 Pipeline...",
+        "delete_pipeline_named": "正在删除 Pipeline “{{name}}”...",
+        "delete_routing": "正在移除路由...",
+        "connect_pipeline": "正在将 Pipeline 连接到 Stream..."
+      },
+      "error": {
+        "create_stream": "创建 Stream 失败！",
+        "create_stream_named": "创建 Stream “{{name}}”失败！",
+        "start_stream": "启动 Stream 失败！",
+        "start_stream_named": "启动 Stream “{{name}}”失败！",
+        "create_pipeline": "创建 Pipeline 失败！",
+        "create_pipeline_named": "创建 Pipeline “{{name}}”失败！",
+        "setup_routing": "设置路由失败！",
+        "result": "启动 Input 失败。请将其回滚以进行清理。",
+        "delete_stream": "删除 Stream 失败！",
+        "delete_stream_named": "删除 Stream “{{name}}”失败！",
+        "delete_pipeline": "删除 Pipeline 失败！",
+        "delete_pipeline_named": "删除 Pipeline “{{name}}”失败！",
+        "delete_routing": "移除路由失败！",
+        "connect_pipeline": "将 Pipeline 连接到 Stream 失败！"
+      },
+      "success": {
+        "create_stream": "Stream 已创建！",
+        "create_stream_named": "Stream “{{name}}”已创建！",
+        "start_stream": "Stream 已启动！",
+        "start_stream_named": "Stream “{{name}}”已启动！",
+        "create_pipeline": "Pipeline 已创建！",
+        "create_pipeline_named": "Pipeline “{{name}}”已创建！",
+        "setup_routing": "路由已设置！",
+        "result": "Input 已成功启动！",
+        "delete_stream": "Stream 已删除！",
+        "delete_stream_named": "Stream “{{name}}”已删除！",
+        "delete_pipeline": "Pipeline 已删除！",
+        "delete_pipeline_named": "Pipeline “{{name}}”已删除！",
+        "delete_routing": "路由已移除！",
+        "connect_pipeline": "Pipeline 已成功连接到 Stream！"
+      }
+    },
+    "create_stream": {
+      "title": "标题",
+      "title_help": "新 Stream 的描述性名称",
+      "title_required": "标题为必填项",
+      "index_set_required": "索引集为必填项",
+      "description": "描述",
+      "description_help": "哪些类型的消息会被路由到此 Stream？",
+      "create_pipeline": "为此 Stream 创建新的 Pipeline",
+      "select_index_set": "选择索引集",
+      "index_set_info": "匹配此 Stream 的消息将写入已配置的索引集。索引集用于合理划分数据，以加快搜索速度。",
+      "index_set_recommendation": "建议为每种 Input 类型创建一个新的索引集。",
+      "create_index_set": "创建新的索引集"
+    },
+    "input_in_use": {
+      "title": "Input 已被使用，存在消息重复风险！",
+      "stream_refs": "此 Input 已在以下 Stream 的 Stream 规则中被引用：",
+      "pipeline_refs": "此 Input 已在以下 Pipeline 的 Pipeline 规则中被引用：",
+      "prevent_duplication": "为防止可能的重复，请在继续之前移除所有现有路由。"
+    },
+    "index_set_alert": {
+      "default_title": "已选择默认索引集",
+      "default_selected": "您选择了默认索引集。",
+      "default_recommendation": "不建议这样做：默认索引集可能会接收许多不同格式的消息（任何未路由的消息都会通过 Default Stream 进入）。如果大量使用，它很容易达到搜索后端每个索引的字段数上限。",
+      "in_use_title": "所选索引集已关联到其他 Stream",
+      "in_use": "所选索引集已关联到其他 Stream。",
+      "field_limit": "请注意，每个索引都有各自的字段数上限，默认为 1000。",
+      "organise_recommendation": "因此，如有可能，建议按日志格式将 Stream 组织到多个索引集中。"
+    }
+  },
+  "overview": {
+    "columns": {
+      "traffic": "最近一分钟流量",
+      "input_failures": "Input 失败次数",
+      "address": "地址",
+      "port": "端口",
+      "messages_per_stream": "消息数（最近 24 小时）",
+      "extractor_count": "Extractor",
+      "associated_streams": "关联的 Stream（最近 24 小时）",
+      "configuration": "配置"
+    },
+    "not_available": "不适用",
+    "show_diagnosis_for": "显示 {{title}} 的 Input 诊断",
+    "show_diagnosis_for_capitalized": "显示 {{title}} 的 Input 诊断",
+    "cells": {
+      "no_associated_streams": "Input {{title}} 没有可用的关联 Stream",
+      "show_associated_streams": "显示 {{title}} 的关联 Stream",
+      "hide_associated_streams": "隐藏 {{title}} 的关联 Stream",
+      "no_extractor_count": "Input {{title}} 没有可用的 Extractor 数量",
+      "show_extractors": "显示 {{title}} 的 Extractor",
+      "hide_extractors": "隐藏 {{title}} 的 Extractor",
+      "no_message_count": "Input {{title}} 没有可用的消息数",
+      "show_messages_per_stream": "显示 {{title}} 按 Stream 统计的消息数",
+      "hide_messages_per_stream": "隐藏 {{title}} 按 Stream 统计的消息数",
+      "show_metrics": "显示指标",
+      "hide_metrics": "隐藏指标",
+      "throughput": "{{value}} 条消息/秒",
+      "associated_streams_label": "{{title}} 的关联 Stream",
+      "extractors_label": "{{title}} 的 Extractor",
+      "messages_per_stream_label": "{{title}} 每个 Stream 的消息"
+    },
+    "sections": {
+      "could_not_load_associated_streams": "无法加载关联的 Stream。",
+      "no_associated_streams": "过去 24 小时内没有 Stream 与此 Input 关联。",
+      "deleted_stream": "{{streamId}}（已删除）",
+      "active_connections": "活动连接：<active>{{open}} </active>（共 <total>{{total}}</total> 个）",
+      "throughput_metrics": "吞吐量 / 指标",
+      "manage_extractors": "管理 Extractor",
+      "load_extractors_failed": "加载 Extractor 失败，状态：",
+      "could_not_load_extractors_title": "无法加载 Extractor",
+      "could_not_load_extractors": "无法加载 Extractor。",
+      "no_extractors": "此 Input 没有已配置的 Extractor。",
+      "extractor_title": "标题",
+      "extractor_type": "类型",
+      "source_field": "源字段",
+      "target_field": "目标字段",
+      "could_not_load_messages_per_stream": "无法加载按 Stream 统计的消息数。",
+      "no_messages_per_stream": "过去 24 小时内没有 Stream 接收到来自此 Input 的消息。",
+      "stream": "Stream",
+      "messages": "消息",
+      "network_io": "网络 I/O：",
+      "total_prefix": " （总计：",
+      "total_suffix": " ）",
+      "empty_messages_discarded": "已丢弃的空消息：{{value}}",
+      "no_node_metrics": "此节点没有可用的指标",
+      "no_input_metrics": "此 Input 没有可用的指标",
+      "show_details": "显示详细信息",
+      "hide_details": "隐藏详细信息"
+    },
+    "actions": {
+      "received_messages": "已接收的消息",
+      "input_diagnosis": "Input 诊断",
+      "exit_setup_mode": "退出设置模式",
+      "enter_setup_mode": "进入设置模式",
+      "show_metrics": "显示指标",
+      "delete_input": "删除 Input",
+      "delete_title": "删除 Input",
+      "delete_confirm": "您确定要删除 Input {{title}} 吗？"
+    }
+  },
+  "dot_badge": {
+    "problematic_inputs": "部分 Input 处于失败状态或设置模式。"
+  },
+  "use_input_notifications": {
+    "load_failed": "加载 Input 失败，状态：",
+    "load_failed_title": "无法加载 Input"
+  },
+  "use_input_details_notifications": {
+    "load_failed": "加载 Input 详细信息失败，状态：",
+    "load_failed_title": "无法加载 Input 详细信息"
+  },
+  "use_input_metrics_notifications": {
+    "load_failed": "加载 Input 指标失败，状态：",
+    "load_failed_title": "无法加载 Input 指标"
+  },
+  "use_input_state_summary_notifications": {
+    "load_failed": "加载 Input 状态摘要失败，状态：",
+    "load_failed_title": "无法加载 Input 状态摘要。"
+  },
+  "use_input_state_mutations_notifications": {
+    "start_failed": "启动 Input “{{title}}”时出错：{{error}}",
+    "start_failed_title": "无法启动 Input “{{title}}”",
+    "started_success": "Input 已成功启动。",
+    "stop_failed": "停止 Input “{{title}}”时出错：{{error}}",
+    "stop_failed_title": "无法停止 Input “{{title}}”",
+    "stopped_success": "Input 已成功停止。",
+    "setup_failed": "将 Input “{{title}}”切换到设置模式时出错：{{error}}",
+    "setup_failed_title": "无法将 Input “{{title}}”设置为设置模式",
+    "deleted_success": "Input 已成功删除。",
+    "success_title": "成功！"
+  },
+  "use_input_mutations_notifications": {
+    "save_failed": "保存 Input 失败，状态：{{error}}",
+    "save_failed_title": "无法保存 Input",
+    "update_failed": "更新 Input 失败，状态：{{error}}",
+    "update_failed_title": "无法更新 Input",
+    "delete_failed": "删除 Input 失败，状态：{{error}}",
+    "delete_failed_title": "无法删除 Input",
+    "created_success": "Input 已成功创建。",
+    "updated_success": "Input 已成功更新。",
+    "deleted_success": "Input 已成功删除。",
+    "success_title": "成功！"
+  },
+  "use_inputs_notifications": {
+    "launched_success": "Input “{{title}}”已成功启动",
+    "launch_failed": "启动 Input “{{title}}”失败，状态：{{error}}",
+    "launch_failed_title": "无法启动 Input",
+    "updated_success": "Input “{{title}}”已成功更新",
+    "update_failed": "更新 Input “{{title}}”失败，状态：{{error}}",
+    "update_failed_title": "无法更新 Input",
+    "deleted_success": "Input “{{title}}”已成功删除",
+    "delete_failed": "删除 Input “{{title}}”失败，状态：{{error}}",
+    "delete_failed_title": "无法删除 Input",
+    "fetch_failed": "获取 Input 失败，状态：{{error}}",
+    "fetch_failed_title": "无法获取 Input"
+  }
+}

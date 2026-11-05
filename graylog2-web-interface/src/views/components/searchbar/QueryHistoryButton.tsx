@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { SearchSuggestions } from '@graylog/server-api';
 
@@ -67,6 +68,7 @@ type Props = {
 };
 
 const QueryHistoryButton = ({ editorRef }: Props) => {
+  const { t } = useTranslation('search');
   const showQueryHistory = async () => {
     if (editorRef.current) {
       editorRef.current.focus();
@@ -77,7 +79,7 @@ const QueryHistoryButton = ({ editorRef }: Props) => {
 
   return (
     <ButtonContainer>
-      <IconButton name="history" onClick={showQueryHistory} title="Open query history" />
+      <IconButton name="history" onClick={showQueryHistory} title={t('search_bar.query_history_title')} />
     </ButtonContainer>
   );
 };

@@ -16,6 +16,7 @@
  */
 import type { SyntheticEvent } from 'react';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Input } from 'components/bootstrap';
 import type { LookupTableDataAdapterConfig } from 'logic/lookup-tables/types';
@@ -28,10 +29,11 @@ type Props = {
 };
 
 const CSVFileAdapterFieldSet = ({ config, handleFormEvent, validationState, validationMessage }: Props) => {
-  const valueLabel = config.multi_value_lookup ? 'Value columns' : 'Value column';
+  const { t } = useTranslation('lookup_tables');
+  const valueLabel = config.multi_value_lookup ? t('adapter_fields.value_columns') : t('adapter_fields.value_column');
   const valueHelp = config.multi_value_lookup
-    ? 'The column names that should be used as the values for a key, or leave empty for all columns except the key.'
-    : 'The column name that should be used as the value for a key.';
+    ? t('csv_adapter.value_columns_help')
+    : t('csv_adapter.value_column_help');
 
   return (
     <fieldset>
@@ -39,11 +41,11 @@ const CSVFileAdapterFieldSet = ({ config, handleFormEvent, validationState, vali
         type="text"
         id="path"
         name="path"
-        label="File path"
+        label={t('csv_adapter.file_path')}
         autoFocus
         required
         onChange={handleFormEvent}
-        help={validationMessage('path', 'The path to the CSV file.')}
+        help={validationMessage('path', t('csv_adapter.file_path_help'))}
         bsStyle={validationState('path')}
         value={config.path}
         labelClassName="col-sm-3"
@@ -53,10 +55,10 @@ const CSVFileAdapterFieldSet = ({ config, handleFormEvent, validationState, vali
         type="number"
         id="check_interval"
         name="check_interval"
-        label="Check interval"
+        label={t('adapter_fields.check_interval')}
         required
         onChange={handleFormEvent}
-        help="The interval to check if the CSV file needs a reload. (in seconds)"
+        help={t('csv_adapter.check_interval_help')}
         value={config.check_interval}
         labelClassName="col-sm-3"
         wrapperClassName="col-sm-9"
@@ -65,10 +67,10 @@ const CSVFileAdapterFieldSet = ({ config, handleFormEvent, validationState, vali
         type="text"
         id="separator"
         name="separator"
-        label="Separator"
+        label={t('adapter_fields.separator')}
         required
         onChange={handleFormEvent}
-        help="The delimiter to use for separating entries."
+        help={t('csv_adapter.separator_help')}
         value={config.separator}
         labelClassName="col-sm-3"
         wrapperClassName="col-sm-9"
@@ -77,10 +79,10 @@ const CSVFileAdapterFieldSet = ({ config, handleFormEvent, validationState, vali
         type="text"
         id="quotechar"
         name="quotechar"
-        label="Quote character"
+        label={t('adapter_fields.quote_character')}
         required
         onChange={handleFormEvent}
-        help="The character to use for quoted elements."
+        help={t('adapter_fields.quote_help')}
         value={config.quotechar}
         labelClassName="col-sm-3"
         wrapperClassName="col-sm-9"
@@ -89,10 +91,10 @@ const CSVFileAdapterFieldSet = ({ config, handleFormEvent, validationState, vali
         type="text"
         id="key_column"
         name="key_column"
-        label="Key column"
+        label={t('adapter_fields.key_column')}
         required
         onChange={handleFormEvent}
-        help="The column name that should be used for the key lookup."
+        help={t('csv_adapter.key_column_help')}
         value={config.key_column}
         labelClassName="col-sm-3"
         wrapperClassName="col-sm-9"
@@ -113,30 +115,30 @@ const CSVFileAdapterFieldSet = ({ config, handleFormEvent, validationState, vali
         type="checkbox"
         id="multi_value_lookup"
         name="multi_value_lookup"
-        label="Multi-value lookup"
+        label={t('adapter_fields.multi_value_lookup')}
         checked={config.multi_value_lookup}
         onChange={handleFormEvent}
-        help="Enable for multiple value columns."
+        help={t('csv_adapter.multi_value_help')}
         wrapperClassName="col-md-offset-3 col-md-9"
       />
       <Input
         type="checkbox"
         id="case_insensitive_lookup"
         name="case_insensitive_lookup"
-        label="Allow case-insensitive lookups"
+        label={t('adapter_fields.case_insensitive_label')}
         checked={config.case_insensitive_lookup}
         onChange={handleFormEvent}
-        help="Enable if the key lookup should be case-insensitive."
+        help={t('adapter_fields.case_insensitive_help')}
         wrapperClassName="col-md-offset-3 col-md-9"
       />
       <Input
         type="checkbox"
         id="cidr_lookup"
         name="cidr_lookup"
-        label="CIDR lookup"
+        label={t('adapter_fields.cidr_lookup')}
         checked={config.cidr_lookup}
         onChange={handleFormEvent}
-        help="Enable if the keys in the lookup table are in CIDR notation and lookups will be done with IPs"
+        help={t('csv_adapter.cidr_help')}
         wrapperClassName="col-md-offset-3 col-md-9"
       />
     </fieldset>

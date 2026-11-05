@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { Button } from 'components/bootstrap';
@@ -31,6 +32,7 @@ type Props = {
 };
 
 const FilterDeleteButton = ({ streamId, filterOutputRule }: Props) => {
+  const { t } = useTranslation('streams');
   const [showDialog, setShowDialog] = useState(false);
   const { removeStreamOutputRule } = useStreamOutputRuleMutation();
   const queryClient = useQueryClient();
@@ -56,12 +58,16 @@ const FilterDeleteButton = ({ streamId, filterOutputRule }: Props) => {
 
   return (
     <>
-      <Button bsStyle="danger" bsSize="xsmall" onClick={onDelete} title="View">
+      <Button bsStyle="danger" bsSize="xsmall" onClick={onDelete} title={t('output_filter.delete_tooltip')}>
         <Icon name="delete" type="regular" />
       </Button>
       {showDialog && (
-        <ConfirmDialog title="Delete Rule" show onConfirm={onConfirmDelete} onCancel={() => setShowDialog(false)}>
-          {`Are you sure you want to delete  ${filterOutputRule.title} rule ?`}
+        <ConfirmDialog
+          title={t('output_filter.delete_title')}
+          show
+          onConfirm={onConfirmDelete}
+          onCancel={() => setShowDialog(false)}>
+          {t('output_filter.delete_confirm', { title: filterOutputRule.title })}
         </ConfirmDialog>
       )}
     </>

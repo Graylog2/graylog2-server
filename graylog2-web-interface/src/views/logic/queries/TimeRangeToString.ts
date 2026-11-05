@@ -16,37 +16,45 @@
  */
 
 import moment from 'moment';
-import 'moment-duration-format';
-import 'moment-precise-range-plugin';
 
+import 'moment-duration-format';
+import i18n from 'i18n';
 import type { AbsoluteTimeRange, KeywordTimeRange, RelativeTimeRange, TimeRange } from 'views/logic/queries/Query';
 import { isTypeRelativeWithStartOnly } from 'views/typeGuards/timeRange';
 import type { EffectiveTimeRange } from 'components/events/EventsHistogram';
+import { preciseDifference } from 'util/DateTime';
 
-export const readableRange = (timerange: TimeRange, fieldName: 'range' | 'from' | 'to', placeholder = 'All Time') => {
+export const readableRange = (timerange: TimeRange, fieldName: 'range' | 'from' | 'to', placeholder?: string) => {
   const rangeAsSeconds = timerange?.[fieldName];
+  const allTimeLabel = i18n.t('time_range.all_time', { ns: 'search', defaultValue: 'All Time' });
+  const nowLabel = i18n.t('time_range.now', { ns: 'search', defaultValue: 'Now' });
+  const defaultFallback = fieldName === 'to' ? nowLabel : allTimeLabel;
+  const fallback = placeholder ?? defaultFallback;
 
   if (!rangeAsSeconds) {
-    return placeholder;
+    return fallback;
   }
 
   const reference = moment();
   const dateAgo = moment(reference).subtract(rangeAsSeconds, 'seconds');
-  const rangeTimespan = moment.preciseDiff(reference, dateAgo);
+  const rangeTimespan = preciseDifference(dateAgo, reference, { ago: true });
 
-  return `${rangeTimespan} ago`;
+  return i18n.t('time_range.range_ago', { ns: 'search', time: rangeTimespan, defaultValue: '{{time}} ago' });
 };
 
 const relativeTimeRangeToString = (timerange: RelativeTimeRange): string => {
+  const nowLabel = i18n.t('time_range.now', { ns: 'search', defaultValue: 'Now' });
+  const allTimeLabel = i18n.t('time_range.all_time', { ns: 'search', defaultValue: 'All Time' });
+
   if (isTypeRelativeWithStartOnly(timerange)) {
     if (timerange.range === 0) {
-      return 'All Time';
+      return allTimeLabel;
     }
 
-    return `${readableRange(timerange, 'range')} - Now`;
+    return `${readableRange(timerange, 'range')} - ${nowLabel}`;
   }
 
-  return `${readableRange(timerange, 'from')} - ${readableRange(timerange, 'to', 'Now')}`;
+  return `${readableRange(timerange, 'from')} - ${readableRange(timerange, 'to')}`;
 };
 
 const absoluteTimeRangeToString = (

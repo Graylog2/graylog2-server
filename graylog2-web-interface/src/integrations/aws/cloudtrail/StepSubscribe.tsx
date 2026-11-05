@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import FormDataContext from 'integrations/contexts/FormDataContext';
 import { Input } from 'components/bootstrap';
@@ -30,6 +31,7 @@ interface Props {
 }
 
 const StepSubscribe = ({ onSubmit, onChange }: Props) => {
+  const { t } = useTranslation('integrations');
   const { formData } = useContext(FormDataContext);
   const [formError, setFormError] = useState<ErrorMessageType>(null);
 
@@ -44,8 +46,8 @@ const StepSubscribe = ({ onSubmit, onChange }: Props) => {
     // Validate polling interval
     if (pollingInterval.value < 1) {
       setFormError({
-        full_message: 'Please provide valid polling interval',
-        nice_message: 'Minimum allowable polling interval is 1 minute.',
+        full_message: t('aws_cloudtrail_step_subscribe.polling_interval_error_full'),
+        nice_message: t('aws_cloudtrail_step_subscribe.polling_interval_error'),
       });
 
       return;
@@ -54,8 +56,8 @@ const StepSubscribe = ({ onSubmit, onChange }: Props) => {
     // Validate batch size if it has a value
     if (sqsMessageBatchSize?.value && (sqsMessageBatchSize.value < 1 || sqsMessageBatchSize.value > 10)) {
       setFormError({
-        full_message: 'Please provide valid SQS Message Batch Size.',
-        nice_message: 'Please select SQS Message Batch Size between 1 - 10.',
+        full_message: t('aws_cloudtrail_step_subscribe.batch_size_error_full'),
+        nice_message: t('aws_cloudtrail_step_subscribe.batch_size_error'),
       });
 
       return;
@@ -77,7 +79,12 @@ const StepSubscribe = ({ onSubmit, onChange }: Props) => {
   };
 
   return (
-    <FormWrap onSubmit={handleSubmit} buttonContent="Proceed" title="" error={formError} description="">
+    <FormWrap
+      onSubmit={handleSubmit}
+      buttonContent={t('aws_cloudtrail_step_subscribe.proceed_button')}
+      title=""
+      error={formError}
+      description="">
       <Input
         id="pollingInterval"
         name="pollingInterval"
@@ -88,8 +95,8 @@ const StepSubscribe = ({ onSubmit, onChange }: Props) => {
         step="1"
         onChange={onChange}
         required
-        help="Determines how often (in minutes) new data will be checked for in AWS CloudTrail. The smallest allowable interval is 1 minute."
-        label="Polling Interval"
+        help={t('aws_cloudtrail_step_subscribe.polling_interval_help')}
+        label={t('aws_cloudtrail_step_subscribe.polling_interval_label')}
       />
 
       <FormAdvancedOptions onChange={onChange} handleSqsMessageBatchSizeChange={handleSqsMessageBatchSizeChange} />

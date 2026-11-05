@@ -1,0 +1,13 @@
+{
+  "welcome": "歡迎使用 {{productName}}",
+  "username": "使用者名稱",
+  "password": "密碼",
+  "sign_in": "登入",
+  "signing_in": "登入中...",
+  "invalid_credentials": "帳號或密碼無效，請確認後重試。",
+  "server_error": "錯誤：伺服器回傳 {{status}} - {{message}}",
+  "fallback_error_cloud": "載入登入畫面時發生錯誤，請聯絡您的 {{productName}} 帳戶管理員。",
+  "fallback_error": "使用目前的驗證服務登入時發生錯誤。請檢查其設定，或聯絡您的 {{productName}} 帳戶管理員。錯誤詳細資訊：",
+  "login_with_default": "使用預設方式登入",
+  "login_with": "使用 {{method}} 登入"
+}

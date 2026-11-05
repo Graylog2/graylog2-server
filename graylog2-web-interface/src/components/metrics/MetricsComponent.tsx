@@ -16,6 +16,8 @@
  */
 import React from 'react';
 import styled from 'styled-components';
+import { Trans, withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import { Alert, Col, Row } from 'components/bootstrap';
 import { Icon } from 'components/common';
@@ -40,7 +42,7 @@ type Props = {
     responseMessage: string;
     status: number;
   };
-};
+} & WithTranslation;
 
 const safelyFilterNames = (filter: string, names: Array<Metric>) => {
   try {
@@ -84,7 +86,7 @@ class MetricsComponent extends React.Component<Props, State> {
 
   render() {
     const { filter } = this.state;
-    const { names, error } = this.props;
+    const { names, error, t } = this.props;
 
     if (!names) {
       return (
@@ -93,13 +95,17 @@ class MetricsComponent extends React.Component<Props, State> {
             <Alert bsStyle="danger">
               {error ? (
                 <span>
-                  Could not fetch metrics from node: server returned <em>{error.responseMessage || ''}</em> with a{' '}
-                  {error.status} status code.
+                  <Trans
+                    t={t}
+                    i18nKey="metrics_component.fetch_error"
+                    values={{ responseMessage: error.responseMessage || '', status: error.status }}
+                    components={{ em: <em /> }}
+                  />
                 </span>
               ) : (
-                <span>There was a problem fetching node metrics.</span>
+                <span>{t('metrics_component.fetch_problem')}</span>
               )}{' '}
-              Attempts to retrieve them will continue in the background.
+              {t('metrics_component.retry_in_background')}
             </Alert>
           </Col>
         </Row>
@@ -115,8 +121,13 @@ class MetricsComponent extends React.Component<Props, State> {
             {error && (
               <>
                 <Icon name="warning" />
-                &nbsp; Could not fetch metrics from node: server returned <em>{error.responseMessage || ''}</em> with a{' '}
-                {error.status} status code. Displaying last metrics available.
+                &nbsp;{' '}
+                <Trans
+                  t={t}
+                  i18nKey="metrics_component.fetch_error_last_metrics"
+                  values={{ responseMessage: error.responseMessage || '', status: error.status }}
+                  components={{ em: <em /> }}
+                />
               </>
             )}
           </StyledWarningDiv>
@@ -124,7 +135,7 @@ class MetricsComponent extends React.Component<Props, State> {
             query={filter}
             onSearch={this.onFilterChange}
             queryWidth={300}
-            placeholder="Type a metric name to filter&hellip;">
+            placeholder={t('metrics_component.filter_placeholder')}>
             <MetricsListContainer>
               <MetricsList names={filteredNames} namespace={this.props.namespace} nodeId={this.props.nodeId} />
             </MetricsListContainer>
@@ -135,4 +146,4 @@ class MetricsComponent extends React.Component<Props, State> {
   }
 }
 
-export default MetricsComponent;
+export default withTranslation('system')(MetricsComponent);

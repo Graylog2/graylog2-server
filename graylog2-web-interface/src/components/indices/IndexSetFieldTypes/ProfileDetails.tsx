@@ -15,13 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { Spinner } from 'components/common';
 import { Table } from 'components/bootstrap';
 import useProfile from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfile';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
-import StringUtils from 'util/StringUtils';
 
 import ScrollContainer from './ScrollContainer';
 
@@ -36,6 +36,7 @@ type Props = {
 };
 
 const ProfileDetails = ({ profileId }: Props) => {
+  const { t } = useTranslation('indexsets');
   const {
     data: { id, description, customFieldMappings, indexSetIds },
     isFetching,
@@ -51,7 +52,7 @@ const ProfileDetails = ({ profileId }: Props) => {
   if (id !== profileId) {
     return (
       <Container>
-        <i>Could not load the details of this profile.</i>
+        <i>{t('field_types.profile_details_failed')}</i>
       </Container>
     );
   }
@@ -61,15 +62,13 @@ const ProfileDetails = ({ profileId }: Props) => {
   return (
     <Container>
       {description && <p>{description}</p>}
-      <p>
-        Already used by {usageCount} {StringUtils.pluralize(usageCount, 'index set', 'index sets')}.
-      </p>
+      <p>{t('field_types.used_by', { count: usageCount })}</p>
       <ScrollContainer $maxHeight={200}>
         <Table condensed striped>
           <thead>
             <tr>
-              <th>Field</th>
-              <th>Type</th>
+              <th>{t('field_types.field')}</th>
+              <th>{t('field_types.type')}</th>
             </tr>
           </thead>
           <tbody>

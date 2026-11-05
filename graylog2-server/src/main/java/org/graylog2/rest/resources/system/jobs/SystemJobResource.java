@@ -36,7 +36,6 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -50,6 +49,8 @@ import org.graylog.scheduler.system.SystemJobManager;
 import org.graylog.security.UserContext;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.plugin.rest.CodedForbiddenException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.models.system.SystemJobSummary;
 import org.graylog2.rest.models.system.jobs.requests.TriggerRequest;
@@ -168,7 +169,7 @@ public class SystemJobResource extends RestResource {
             return systemJobSummary.get();
         }
 
-        throw new NotFoundException("No system job with ID <" + jobId + "> found");
+        throw new CodedNotFoundException("system_job.not_found", "No system job with ID <" + jobId + "> found", Map.of("jobId", jobId));
     }
 
     @POST
@@ -220,7 +221,7 @@ public class SystemJobResource extends RestResource {
             if (systemJob.isCancelable()) {
                 systemJob.requestCancel();
             } else {
-                throw new ForbiddenException("System job with ID <" + jobId + "> cannot be cancelled");
+                throw new CodedForbiddenException("system_job.cannot_cancel", "System job with ID <" + jobId + "> cannot be canceled", Map.of("jobId", jobId));
             }
 
             return SystemJobSummary.create(
@@ -241,12 +242,12 @@ public class SystemJobResource extends RestResource {
         // permission checks. Mirrors the guard in list() and get().
         final SystemJobSummary summary = systemJobManager.getRunningJob(jobId)
                 .filter(job -> !jobResourceHandlerService.handlesJobType(job.jobType()))
-                .orElseThrow(() -> new NotFoundException("No system job with ID <" + jobId + "> found"));
+                .orElseThrow(() -> new CodedNotFoundException("system_job.not_found", "No system job with ID <" + jobId + "> found", Map.of("jobId", jobId)));
 
         checkPermission(RestPermissions.SYSTEMJOBS_DELETE, summary.jobType());
 
         if (!summary.isCancelable()) {
-            throw new ForbiddenException("System job with ID <" + jobId + "> cannot be cancelled");
+            throw new CodedForbiddenException("system_job.cannot_cancel", "System job with ID <" + jobId + "> cannot be canceled", Map.of("jobId", jobId));
         }
 
         systemJobManager.cancel(jobId);
@@ -261,7 +262,7 @@ public class SystemJobResource extends RestResource {
                                    @Parameter(name = "jobId", required = true) @PathParam("jobId") @NotEmpty String jobId) {
         final int n = jobResourceHandlerService.acknowledgeJob(userContext, jobId);
         if (n < 1) {
-            throw new NotFoundException("System job with ID <" + jobId + "> not found!");
+            throw new CodedNotFoundException("system_job.not_found_cancel", "System job with ID <" + jobId + "> not found!", Map.of("jobId", jobId));
         }
         return Response.accepted().build();
     }

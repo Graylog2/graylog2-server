@@ -20,6 +20,7 @@ import { useMutation } from '@tanstack/react-query';
 import { StreamOutputs } from '@graylog/server-api';
 
 import UserNotification from 'util/UserNotification';
+import i18n from 'i18n';
 
 const addStreamOutput = async ({ streamId, outputs }: { streamId: string; outputs: { outputs: Array<string> } }) =>
   StreamOutputs.add(streamId, outputs);
@@ -32,13 +33,16 @@ const useStreamOutputMutation = () => {
 
     onError: (errorThrown) => {
       UserNotification.error(
-        `Adding output to stream failed with status: ${errorThrown}`,
-        'Could not add output to stream',
+        i18n.t('use_stream_output_mutations_notifications.add_failed', { ns: 'streams', error: errorThrown }),
+        i18n.t('use_stream_output_mutations_notifications.add_failed_title', { ns: 'streams' }),
       );
     },
 
     onSuccess: () => {
-      UserNotification.success('Output has been successfully added to Stream.', 'Success!');
+      UserNotification.success(
+        i18n.t('use_stream_output_mutations_notifications.added_success', { ns: 'streams' }),
+        i18n.t('use_stream_output_mutations_notifications.success_title', { ns: 'streams' }),
+      );
     },
   });
 
@@ -47,13 +51,16 @@ const useStreamOutputMutation = () => {
 
     onError: (errorThrown) => {
       UserNotification.error(
-        `Deleting output from stream failed with status: ${errorThrown}`,
-        'Could not delete output from stream',
+        i18n.t('use_stream_output_mutations_notifications.remove_failed', { ns: 'streams', error: errorThrown }),
+        i18n.t('use_stream_output_mutations_notifications.remove_failed_title', { ns: 'streams' }),
       );
     },
 
     onSuccess: () => {
-      UserNotification.success('Output has been successfully removed from stream.', 'Success!');
+      UserNotification.success(
+        i18n.t('use_stream_output_mutations_notifications.removed_success', { ns: 'streams' }),
+        i18n.t('use_stream_output_mutations_notifications.success_title', { ns: 'streams' }),
+      );
     },
   });
 

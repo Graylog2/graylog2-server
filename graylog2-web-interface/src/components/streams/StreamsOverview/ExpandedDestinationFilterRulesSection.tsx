@@ -16,18 +16,18 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import * as Immutable from 'immutable';
 
 import type { Stream } from 'logic/streams/types';
 import { DEFAULT_PAGINATION } from 'stores/PaginationTypes';
 import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
-import { DataTable, NoSearchResult, PaginatedList, Spinner, Text, Pluralize } from 'components/common';
+import i18n from 'i18n';
+import { DataTable, NoSearchResult, PaginatedList, Spinner, Text } from 'components/common';
 import { DEFAULT_PAGE_SIZES } from 'hooks/usePaginationQueryParameter';
 import useStreamOutputFilters from 'components/streams/hooks/useStreamOutputFilters';
 import FilterStatusCell from 'components/streams/StreamDetails/output-filter/FilterStatusCell';
-
-const TABLE_HEADERS = ['Title', 'Destination', 'Status'];
 
 const StyledText = styled(Text)(
   ({ theme }) => css`
@@ -37,14 +37,14 @@ const StyledText = styled(Text)(
 
 const destinationTitle = (destinationType: string) => {
   if (destinationType === 'indexer') {
-    return 'Index Set';
+    return i18n.t('streams_overview.expanded.destination_index_set', { ns: 'streams' });
   }
 
   if (destinationType === 'data-lake') {
-    return 'Data Lake';
+    return i18n.t('streams_overview.expanded.destination_data_lake', { ns: 'streams' });
   }
 
-  return 'Output';
+  return i18n.t('streams_overview.expanded.destination_output', { ns: 'streams' });
 };
 
 const _headerCellFormatter = (header: string) => <th>{header}</th>;
@@ -67,6 +67,12 @@ type Props = {
 };
 
 const ExpandedDestinationFilterRulesSection = ({ stream }: Props) => {
+  const { t } = useTranslation('streams');
+  const tableHeaders = [
+    t('streams_overview.expanded.filter_rules_header_title'),
+    t('streams_overview.expanded.filter_rules_header_destination'),
+    t('streams_overview.expanded.filter_rules_header_status'),
+  ];
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const { data: paginatedFilters, isLoading } = useStreamOutputFilters(stream.id, undefined, pagination);
 
@@ -86,10 +92,7 @@ const ExpandedDestinationFilterRulesSection = ({ stream }: Props) => {
 
   return (
     <>
-      <p>
-        Showing {total} configured filter <Pluralize value={total} singular="rule" plural="rules" /> across all
-        destinations.
-      </p>
+      <p>{t('streams_overview.expanded.filter_rules_summary', { count: total })}</p>
       <PaginatedList
         totalItems={total}
         pageSize={DEFAULT_PAGE_SIZES[0]}
@@ -100,10 +103,10 @@ const ExpandedDestinationFilterRulesSection = ({ stream }: Props) => {
           id="stream-filter-rule-list"
           className="striped"
           rowClassName="no-bm"
-          headers={TABLE_HEADERS}
+          headers={tableHeaders}
           headerCellFormatter={_headerCellFormatter}
           sortByKey="title"
-          noDataText={<NoSearchResult>No filter rules have been found.</NoSearchResult>}
+          noDataText={<NoSearchResult>{t('streams_overview.expanded.no_filter_rules')}</NoSearchResult>}
           rows={filters.toJS()}
           dataRowFormatter={filterRuleItem}
         />

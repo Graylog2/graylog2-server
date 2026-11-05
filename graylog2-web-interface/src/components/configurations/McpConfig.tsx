@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { useStore } from 'stores/connect';
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
@@ -34,7 +35,12 @@ type McpConfigState = {
   enable_input_validation: boolean;
 };
 
+const McpDocsLink = ({ children = undefined }: React.PropsWithChildren<{}>) => (
+  <DocumentationLink text={children} page={DocsHelper.PAGES.MCP_SERVER} displayIcon={false} />
+);
+
 const McpConfig = () => {
+  const { t } = useTranslation('configurations');
   const [showConfigModal, setShowConfigModal] = useState<boolean>(false);
   const [modalConfig, setModalConfig] = useState<McpConfigState | undefined>(undefined);
   const [viewConfig, setViewConfig] = useState<McpConfigState | undefined>(undefined);
@@ -81,29 +87,27 @@ const McpConfig = () => {
 
   return (
     <div>
-      <h2>MCP Server Configuration</h2>
+      <h2>{t('mcp.title')}</h2>
       <br />
-      <p>Activate MCP (Model Context Protocol) to enable LLM-powered communication and automation with your cluster.</p>
+      <p>{t('mcp.description')}</p>
       <p>
-        See the{' '}
-        <DocumentationLink text="MCP connection documentation" page={DocsHelper.PAGES.MCP_SERVER} displayIcon={false} />{' '}
-        for client setup instructions.
+        <Trans t={t} i18nKey="mcp.documentation_hint" components={{ docsLink: <McpDocsLink /> }} />
       </p>
       <hr />
       <dl className="deflist">
-        <dt>Remote MCP access</dt>
-        <dd>{viewConfig.enable_remote_access ? 'Enabled' : 'Disabled'}</dd>
+        <dt>{t('mcp.remote_access')}</dt>
+        <dd>{viewConfig.enable_remote_access ? t('markdown.enabled') : t('markdown.disabled')}</dd>
         <br />
-        <dt>Output schema</dt>
-        <dd>{viewConfig.enable_output_schema ? 'Enabled' : 'Disabled'}</dd>
+        <dt>{t('mcp.output_schema')}</dt>
+        <dd>{viewConfig.enable_output_schema ? t('markdown.enabled') : t('markdown.disabled')}</dd>
         <br />
-        <dt>Input validation</dt>
-        <dd>{viewConfig.enable_input_validation ? 'Enabled' : 'Disabled'}</dd>
+        <dt>{t('mcp.input_validation')}</dt>
+        <dd>{viewConfig.enable_input_validation ? t('markdown.enabled') : t('markdown.disabled')}</dd>
       </dl>
 
       <IfPermitted permissions="clusterconfigentry:edit">
         <Button bsStyle="info" bsSize="xs" onClick={openModal}>
-          Edit configuration
+          {t('shared.edit_configuration')}
         </Button>
       </IfPermitted>
 
@@ -111,15 +115,15 @@ const McpConfig = () => {
         <BootstrapModalForm
           show
           bsSize="large"
-          title="Update MCP Server Configuration"
+          title={t('mcp.update_title')}
           onSubmitForm={onModalSave}
           onCancel={onModalCancel}
-          submitButtonText="Update configuration">
+          submitButtonText={t('shared.update_configuration')}>
           <fieldset>
             <Input
               id="enable-remote-access-checkbox"
               type="checkbox"
-              label="Enable remote MCP access"
+              label={t('mcp.enable_remote_access')}
               name="enabled"
               checked={modalConfig.enable_remote_access}
               onChange={onModalClickEnableRemoteAccess}
@@ -128,7 +132,7 @@ const McpConfig = () => {
               id="enable-output-schema-checkbox"
               disabled={!modalConfig.enable_remote_access}
               type="checkbox"
-              label="Enable Output Schema generation"
+              label={t('mcp.enable_output_schema')}
               name="output-schema-enabled"
               checked={modalConfig.enable_output_schema}
               onChange={onModalClickEnableOutputSchema}
@@ -137,7 +141,7 @@ const McpConfig = () => {
               id="enable-input-validation-checkbox"
               disabled={!modalConfig.enable_remote_access}
               type="checkbox"
-              label="Enable Tool Input Validation"
+              label={t('mcp.enable_input_validation')}
               name="input-validation-enabled"
               checked={modalConfig.enable_input_validation}
               onChange={onModalClickEnableInputValidation}

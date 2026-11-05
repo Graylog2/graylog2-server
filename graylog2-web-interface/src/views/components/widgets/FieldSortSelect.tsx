@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMemo } from 'react';
 import type * as Immutable from 'immutable';
 
@@ -61,15 +62,16 @@ const onOptionChange = (options: Array<Option>, onChange, value) => {
 };
 
 const FieldSortSelect = ({ fields, onChange, sort }: Props) => {
+  const { t } = useTranslation('widgets');
   const options = useMemo(() => sortedOptions(fields), [fields]);
 
   return (
     <Select
-      placeholder="None: click to add fields"
+      placeholder={t('field_sort.placeholder')}
       onChange={(newValue) => onOptionChange(options, onChange, newValue)}
       options={options}
       clearable={false}
-      aria-label="Select field for sorting"
+      aria-label={t('field_sort.aria_label')}
       value={currentValue(sort, options)}
     />
   );

@@ -15,12 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import capitalize from 'lodash/capitalize';
+import { Trans, useTranslation } from 'react-i18next';
 
+import ViewTypeLabel from 'views/components/ViewTypeLabel';
+import View from 'views/logic/views/View';
 import type { PluginMetadata, Requirements } from 'views/logic/views/View';
 import { Col, Row, Button } from 'components/bootstrap';
 import fixup from 'views/pages/StyleFixups.css';
-import type View from 'views/logic/views/View';
 import useHistory from 'routing/useHistory';
 
 type Props = {
@@ -28,27 +29,41 @@ type Props = {
   missingRequirements: Requirements;
 };
 
+// `Trans` provides the link text as children.
+const PluginLink = ({ url, children = undefined }: React.PropsWithChildren<{ url: string }>) => (
+  <a href={url} target="_blank" rel="noopener noreferrer">
+    {children}
+  </a>
+);
+
 const MissingRequirements = ({ view, missingRequirements }: Props) => {
+  const { t } = useTranslation('search');
   const history = useHistory();
 
   return (
     <Row className="content">
       <Col md={6} mdOffset={3} className={fixup.bootstrapHeading}>
         <h1>
-          {capitalize(view.type)}: <em>{view.title}</em>
+          {ViewTypeLabel({ type: view.type, capitalize: true })}: <em>{view.title}</em>
         </h1>
         <p>
-          Unfortunately executing this {view.type?.toLowerCase()} is not possible. It uses the following capabilities
-          which are not available:
+          {view.type === View.Type.Dashboard
+            ? t('missing_requirements.description_dashboard')
+            : t('missing_requirements.description_search')}
         </p>
 
         <ul>
           {Object.entries(missingRequirements).map(([require, plugin]: [string, PluginMetadata]) => (
             <li key={require}>
-              <strong>{require}</strong> - included in
-              <a href={plugin.url} target="_blank" rel="noopener noreferrer">
-                {plugin.name}
-              </a>
+              <Trans
+                t={t}
+                i18nKey="missing_requirements.included_in"
+                values={{ requirement: require, plugin: plugin.name }}
+                components={{
+                  requirementName: <strong />,
+                  pluginLink: <PluginLink url={plugin.url} />,
+                }}
+              />
             </li>
           ))}
         </ul>
@@ -56,7 +71,7 @@ const MissingRequirements = ({ view, missingRequirements }: Props) => {
 
       <Col md={1} mdOffset={8}>
         <Button bsStyle="primary" onClick={() => history.goBack()}>
-          Back
+          {t('missing_requirements.back')}
         </Button>
       </Col>
     </Row>

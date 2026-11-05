@@ -16,6 +16,7 @@
  */
 import { fetchFile } from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
+import i18n from 'i18n';
 import UserNotification from 'util/UserNotification';
 import ApiRoutes from 'routing/ApiRoutes';
 import type { TimeRange } from 'views/logic/queries/Query';
@@ -48,7 +49,7 @@ export const exportSearchMessages = (
   return fetchFile('POST', qualifyUrl(url), exportPayload, mimeType)
     .then((result: string) => downloadFile(result, filename))
     .catch(() => {
-      UserNotification.error('Export failed');
+      UserNotification.error(i18n.t('notifications.export_failed', { ns: 'common' }));
     });
 };
 
@@ -64,6 +65,6 @@ export const exportSearchTypeMessages = (
   return fetchFile('POST', qualifyUrl(url), exportPayload, mimeType)
     .then((result: string) => downloadFile(result, filename))
     .catch(() => {
-      UserNotification.error('Export for widget failed');
+      UserNotification.error(i18n.t('notifications.export_widget_failed', { ns: 'common' }));
     });
 };

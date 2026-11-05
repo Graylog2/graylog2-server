@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Alert, Col, Row } from 'components/bootstrap';
 import useStreamsByIndexSet from 'components/inputs/InputSetupWizard/hooks/useStreamsByIndexSet';
@@ -32,6 +33,7 @@ const StyledAlert = styled(Alert)`
 `;
 
 const SelectedIndexSetAlert = ({ selectedIndexSetId = undefined, indexSets }: Props) => {
+  const { t } = useTranslation('inputs');
   const { data: streamsByIndexSetIdData } = useStreamsByIndexSet(selectedIndexSetId, !!selectedIndexSetId);
 
   const isDefaultIndexSet = () => {
@@ -52,12 +54,10 @@ const SelectedIndexSetAlert = ({ selectedIndexSetId = undefined, indexSets }: Pr
     return (
       <Row>
         <Col md={12}>
-          <StyledAlert title="Default Index Set selected" bsStyle="info">
-            You have selected the Default Index Set.
+          <StyledAlert title={t('setup_wizard.index_set_alert.default_title')} bsStyle="info">
+            {t('setup_wizard.index_set_alert.default_selected')}
             <br />
-            We recommend against this: as the potential recipient of messages of many different formats (any message
-            with no routing, via the Default Stream), the Default Index Set is susceptible to reaching the maximum
-            per-Index field limit of the search backend if used extensively.
+            {t('setup_wizard.index_set_alert.default_recommendation')}
           </StyledAlert>
         </Col>
       </Row>
@@ -68,13 +68,12 @@ const SelectedIndexSetAlert = ({ selectedIndexSetId = undefined, indexSets }: Pr
     return (
       <Row>
         <Col md={12}>
-          <Alert title="Selected index set already associated with another stream" bsStyle="info">
-            The selected index set is already associated with another stream(s).
+          <Alert title={t('setup_wizard.index_set_alert.in_use_title')} bsStyle="info">
+            {t('setup_wizard.index_set_alert.in_use')}
             <br />
-            Note that each Index has a unique field limit, defaulting to 1000.
+            {t('setup_wizard.index_set_alert.field_limit')}
             <br />
-            For this reason, we recommend that streams be organised by log format across multiple Index Sets where
-            possible.
+            {t('setup_wizard.index_set_alert.organise_recommendation')}
           </Alert>
         </Col>
       </Row>

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -44,22 +45,30 @@ const EditTokensAction = ({
 }: {
   user: UserOverview;
   wrapperComponent: React.ComponentType<any>;
-}) => (
-  <LinkContainer to={Routes.SYSTEM.USERS.TOKENS.edit(id)}>
-    <WrapperComponent id={`edit-tokens-${id}`} bsSize="xs" title={`Edit tokens of user ${fullName}`}>
-      Edit tokens
-    </WrapperComponent>
-  </LinkContainer>
-);
+}) => {
+  const { t } = useTranslation('users');
+
+  return (
+    <LinkContainer to={Routes.SYSTEM.USERS.TOKENS.edit(id)}>
+      <WrapperComponent
+        id={`edit-tokens-${id}`}
+        bsSize="xs"
+        title={t('users_list.actions.edit_tokens_title', { name: fullName })}>
+        {t('users_list.actions.edit_tokens')}
+      </WrapperComponent>
+    </LinkContainer>
+  );
+};
 
 const ReadOnlyActions = ({ user }: { user: UserOverview }) => {
-  const tooltip = <>System users can only be modified in the server configuration file.</>;
+  const { t } = useTranslation('users');
+  const tooltip = <>{t('users_list.actions.system_user_tooltip')}</>;
 
   return (
     <>
       <OverlayTrigger placement="left" overlay={tooltip} trigger={['hover']}>
         <Button bsSize="xs" bsStyle="info" disabled>
-          System user
+          {t('users_list.actions.system_user')}
         </Button>
       </OverlayTrigger>
       <EditTokensAction user={user} wrapperComponent={Button} />
@@ -77,6 +86,7 @@ const EditActions = ({
   onDeleted: () => void;
   onStatusChange: () => void;
 }) => {
+  const { t } = useTranslation('users');
   const currentUser = useCurrentUser();
   const sendTelemetry = useSendTelemetry();
 
@@ -87,7 +97,7 @@ const EditActions = ({
       });
 
       // eslint-disable-next-line no-alert
-      if (window.confirm(`Do you really want to disable user ${fullName}? All current sessions will be terminated.`)) {
+      if (window.confirm(t('users_list.actions.confirm_disable', { name: fullName }))) {
         UsersDomain.setStatus(id, 'disabled').then(() => onStatusChange());
       }
 
@@ -107,7 +117,7 @@ const EditActions = ({
     });
 
     // eslint-disable-next-line no-alert
-    if (window.confirm(`Do you really want to delete user ${fullName}?`)) {
+    if (window.confirm(t('users_list.actions.confirm_delete', { name: fullName }))) {
       UsersDomain.delete(id, fullName).then(() => onDeleted());
     }
   };
@@ -118,8 +128,8 @@ const EditActions = ({
     <>
       <IfPermitted permissions={[`users:edit:${username}`]}>
         <LinkContainer to={Routes.SYSTEM.USERS.edit(id)}>
-          <Button id={`edit-user-${id}`} bsSize="xs" title={`Edit user ${fullName}`}>
-            Edit
+          <Button id={`edit-user-${id}`} bsSize="xs" title={t('users_list.actions.edit_title', { name: fullName })}>
+            {t('users_list.actions.edit')}
           </Button>
         </LinkContainer>
       </IfPermitted>
@@ -132,11 +142,15 @@ const EditActions = ({
             <MenuItem
               id={`set-status-user-${id}`}
               onClick={_toggleStatus}
-              title={`Set new account status for ${fullName}`}>
-              {accountStatus === 'enabled' ? 'Disable' : 'Enable'}
+              title={t('users_list.actions.set_status_title', { name: fullName })}>
+              {accountStatus === 'enabled' ? t('users_list.actions.disable') : t('users_list.actions.enable')}
             </MenuItem>
           )}
-          <DeleteMenuItem id={`delete-user-${id}`} title={`Delete user ${fullName}`} onClick={_deleteUser} />
+          <DeleteMenuItem
+            id={`delete-user-${id}`}
+            title={t('users_list.actions.delete_title', { name: fullName })}
+            onClick={_deleteUser}
+          />
         </IfPermitted>
       </MoreActions>
     </>

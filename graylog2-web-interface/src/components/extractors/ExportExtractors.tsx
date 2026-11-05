@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 import * as API from '@graylog/server-api';
 
@@ -37,6 +38,7 @@ type Props = {
 const skippedAttributes = ['id', 'metrics', 'creator_user_id', 'exceptions', 'converter_exceptions'];
 
 const ExportExtractors = ({ id }: Props) => {
+  const { t } = useTranslation('extractors');
   const { data: extractors, isLoading } = useExtractors(id);
 
   if (isLoading) {
@@ -63,10 +65,10 @@ const ExportExtractors = ({ id }: Props) => {
       <Col md={12}>
         <Row>
           <Col md={8}>
-            <h2>Extractors JSON</h2>
+            <h2>{t('export.json_title')}</h2>
           </Col>
           <Col md={4}>
-            <ClipboardButton title="Copy extractors" className="pull-right" text={formattedJSON} />
+            <ClipboardButton title={t('export.copy')} className="pull-right" text={formattedJSON} />
           </Col>
         </Row>
         <Row>

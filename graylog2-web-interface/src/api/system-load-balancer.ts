@@ -16,17 +16,18 @@
  */
 import { ClusterLoadBalancers } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import UserNotification from 'util/UserNotification';
 
 export const overrideLoadBalancerStatus = (nodeId: string, status: string): Promise<void> =>
   ClusterLoadBalancers.override(nodeId, status).then(
     () => {
-      UserNotification.success(`Load balancer status successfully changed do '${status}' in node '${nodeId}'`);
+      UserNotification.success(i18n.t('notifications.lb_change_success', { ns: 'system', status, nodeId }));
     },
     (error: unknown) => {
       UserNotification.error(
-        `Changing load balancer status in '${nodeId}' failed: ${error}`,
-        `Could not change load balancer status to '${status}' in node '${nodeId}'`,
+        i18n.t('notifications.lb_change_failed', { ns: 'system', nodeId, error }),
+        i18n.t('notifications.lb_change_failed_title', { ns: 'system', status, nodeId }),
       );
     },
   );

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useFormikContext } from 'formik';
 
@@ -39,6 +40,7 @@ type Props = {
 };
 
 const FieldSelect = ({ indexSetId, field, name }: Props) => {
+  const { t } = useTranslation('search');
   const { setFieldValue } = useFormikContext<FormValues>();
 
   const {
@@ -56,7 +58,7 @@ const FieldSelect = ({ indexSetId, field, name }: Props) => {
 
   return (
     <>
-      <StyledLabel>Select Field</StyledLabel>
+      <StyledLabel>{t('change_field_type.select_field')}</StyledLabel>
       <Input id={name}>
         <StyledSelect
           inputId={name}
@@ -64,9 +66,9 @@ const FieldSelect = ({ indexSetId, field, name }: Props) => {
           options={options}
           value={field}
           onChange={_onFieldChange}
-          placeholder="Select or type the field"
+          placeholder={t('change_field_type.select_field_placeholder')}
           disabled={isLoading}
-          aria-label="Select Field"
+          aria-label={t('change_field_type.select_field')}
           required
           allowCreate
         />

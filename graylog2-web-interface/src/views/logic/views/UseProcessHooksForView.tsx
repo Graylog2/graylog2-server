@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import * as React from 'react';
 
 import ErrorPage from 'components/errors/ErrorPage';
@@ -26,6 +27,7 @@ import type View from './View';
 import processHooks from './processHooks';
 
 const LoadViewError = ({ error }: { error: Error }) => {
+  const { t } = useTranslation('search');
   const productName = useProductName();
   useEffect(() => {
     // eslint-disable-next-line no-console
@@ -34,13 +36,8 @@ const LoadViewError = ({ error }: { error: Error }) => {
 
   return (
     <ErrorPage
-      title="Something went wrong"
-      description={
-        <p>
-          An unknown error has occurred. Please have a look at the following message and the {productName} server log
-          for more information.
-        </p>
-      }>
+      title={t('view_errors.something_went_wrong')}
+      description={<p>{t('view_errors.unknown_error', { productName })}</p>}>
       <pre>{error?.message}</pre>
     </ErrorPage>
   );

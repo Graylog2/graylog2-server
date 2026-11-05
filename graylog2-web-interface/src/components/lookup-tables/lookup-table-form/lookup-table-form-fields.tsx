@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import { useFormikContext } from 'formik';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import useScopePermissions from 'hooks/useScopePermissions';
 import { Input } from 'components/bootstrap';
@@ -42,6 +43,7 @@ const StyledDefaultValueSection = styled.div(
 );
 
 function LookupTableFormFields() {
+  const { t } = useTranslation('lookup_tables');
   const { setValues, values, touched, errors } = useFormikContext<LookupTable>();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(values);
   const { defaultValueErrors, validateDefaultValues, clearDefaultValueError } = useDefaultValueValidation();
@@ -64,8 +66,8 @@ function LookupTableFormFields() {
       <FormikFormGroup
         type="text"
         name="title"
-        label="Title *"
-        help={touched.title && errors.title ? undefined : 'A short title for this lookup table.'}
+        label={t('lut_fields.title_label')}
+        help={touched.title && errors.title ? undefined : t('lut_fields.title_help')}
         labelClassName="d-block mb-1"
         wrapperClassName="d-block"
         formGroupClassName="mb-3"
@@ -75,8 +77,8 @@ function LookupTableFormFields() {
       <FormikFormGroup
         type="text"
         name="description"
-        label="Description"
-        help="Description of the lookup table."
+        label={t('shared.description')}
+        help={t('lut_fields.description_help')}
         labelClassName="d-block mb-1"
         wrapperClassName="d-block"
         formGroupClassName="mb-3"
@@ -86,12 +88,8 @@ function LookupTableFormFields() {
       <FormikFormGroup
         type="text"
         name="name"
-        label="Name *"
-        help={
-          touched.name && errors.name
-            ? undefined
-            : 'The name that is being used to refer to this lookup table. Must be unique.'
-        }
+        label={t('lut_fields.name_label')}
+        help={touched.name && errors.name ? undefined : t('lut_fields.name_help')}
         labelClassName="d-block mb-1"
         wrapperClassName="d-block"
         formGroupClassName="mb-3"
@@ -103,8 +101,8 @@ function LookupTableFormFields() {
           id="enable_single_value"
           name="enable_single_value"
           type="checkbox"
-          label="Enable single default value"
-          help="Enable if the lookup table should provide a default for the single value."
+          label={t('lut_fields.enable_single_label')}
+          help={t('lut_fields.enable_single_help')}
           labelClassName="d-block mb-1"
           wrapperClassName="d-block"
           formGroupClassName="mb-3"
@@ -121,11 +119,8 @@ function LookupTableFormFields() {
         />
         {singleValueEnabled && (
           <StyledJSONValueInput
-            label="Default single value *"
-            help={
-              defaultValueErrors.default_single_value ||
-              'The single value that is being used as lookup result if the data adapter or cache does not find a value.'
-            }
+            label={t('lut_fields.default_single_label')}
+            help={defaultValueErrors.default_single_value || t('lut_fields.default_single_help')}
             validationState={defaultValueErrors.default_single_value ? 'error' : undefined}
             onBlur={() => validateDefaultValues()}
             update={(value, valueType) => {
@@ -149,8 +144,8 @@ function LookupTableFormFields() {
           id="enable_multi_value"
           name="enable_multi_value"
           type="checkbox"
-          label="Enable multi default value"
-          help="Enable if the lookup table should provide a default for the multi value."
+          label={t('lut_fields.enable_multi_label')}
+          help={t('lut_fields.enable_multi_help')}
           labelClassName="d-block mb-1"
           wrapperClassName="d-block"
           formGroupClassName="mb-3"
@@ -167,11 +162,8 @@ function LookupTableFormFields() {
         />
         {multiValueEnabled && (
           <StyledJSONValueInput
-            label="Default multi value *"
-            help={
-              defaultValueErrors.default_multi_value ||
-              'The multi value that is being used as lookup result if the data adapter or cache does not find a value.'
-            }
+            label={t('lut_fields.default_multi_label')}
+            help={defaultValueErrors.default_multi_value || t('lut_fields.default_multi_help')}
             validationState={defaultValueErrors.default_multi_value ? 'error' : undefined}
             onBlur={() => validateDefaultValues()}
             update={(value, valueType) => {

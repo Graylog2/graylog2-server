@@ -15,10 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import moment from 'moment';
 import styled, { css } from 'styled-components';
 import { useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
+import i18n from 'i18n';
 import { describeExpression } from 'util/CronUtils';
 import { OverlayTrigger, Icon, Timestamp } from 'components/common';
 import Button from 'components/bootstrap/Button';
@@ -28,6 +29,9 @@ import {
 } from 'components/event-definitions/hooks/useEventDefinitions';
 
 import type { Scheduler, EventDefinition } from '../event-definitions-types';
+import formatDuration from '../formatDuration';
+
+const t = (key: string, options = {}) => i18n.t(key, { ns: 'event_definitions', ...options });
 
 type Props = {
   definition: EventDefinition;
@@ -61,7 +65,7 @@ const getTimeRange = (scheduler: Scheduler) => {
 
   return (
     <>
-      <DetailTitle>Next time range:</DetailTitle>
+      <DetailTitle>{t('scheduling.next_time_range')}</DetailTitle>
       <DetailValue>
         <Timestamp dateTime={from} /> <Icon name="arrow_circle_right" /> <Timestamp dateTime={to} />
       </DetailValue>
@@ -77,18 +81,16 @@ const describeSchedule = (isCron: boolean, value: number | string) => {
     return cronDescription.charAt(0).toLowerCase() + cronDescription.slice(1);
   }
 
-  return `every ${moment
-    .duration(value)
-    .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all', usePlural: false })}`;
+  return t('scheduling.every', { duration: formatDuration(value as number) });
 };
 
 const detailsPopover = (scheduler: Scheduler, clearNotifications: () => void) => (
   <dl>
-    <DetailTitle>Status:</DetailTitle>
+    <DetailTitle>{t('scheduling.status')}</DetailTitle>
     <DetailValue>{scheduler.status}</DetailValue>
     {scheduler.triggered_at && (
       <>
-        <DetailTitle>Last execution:</DetailTitle>
+        <DetailTitle>{t('scheduling.last_execution')}</DetailTitle>
         <DetailValue>
           <Timestamp dateTime={scheduler.triggered_at} />
         </DetailValue>
@@ -96,19 +98,19 @@ const detailsPopover = (scheduler: Scheduler, clearNotifications: () => void) =>
     )}
     {scheduler.next_time && (
       <>
-        <DetailTitle>Next execution:</DetailTitle>
+        <DetailTitle>{t('scheduling.next_execution')}</DetailTitle>
         <DetailValue>
           <Timestamp dateTime={scheduler.next_time} />
         </DetailValue>
       </>
     )}
     {getTimeRange(scheduler)}
-    <DetailTitle>Queued notifications:</DetailTitle>
+    <DetailTitle>{t('scheduling.queued_notifications')}</DetailTitle>
     <DetailValue>
       {scheduler.queued_notifications}
       {scheduler.queued_notifications > 0 && (
         <Button bsStyle="link" bsSize="xsmall" onClick={() => clearNotifications()}>
-          clear
+          {t('scheduling.clear')}
         </Button>
       )}
     </DetailValue>
@@ -136,37 +138,41 @@ const SchedulingInfo = ({
     useCronScheduling,
     useCronScheduling ? cronExpression : executeEveryMs,
   );
-  const searchWithinFormatted = moment
-    .duration(searchWithinMs)
-    .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all' });
-  const searchWithinMessage = searchWithinMs ? `, searching within the last ${searchWithinFormatted}.` : '.';
+  const { t: translate } = useTranslation('event_definitions');
+  const description = searchWithinMs
+    ? translate('scheduling.runs_searching_within', {
+        schedule: executeEveryFormatted,
+        duration: formatDuration(searchWithinMs),
+      })
+    : translate('scheduling.runs', { schedule: executeEveryFormatted });
 
   return (
     <>
-      {`Runs ${executeEveryFormatted}${searchWithinMessage} `}
+      {`${description} `}
       <DetailsOverlayTrigger
         trigger="click"
         rootClose
         placement="left"
-        title={`${title} details.`}
+        title={translate('scheduling.details', { title })}
         overlay={detailsPopover(scheduler, clearNotifications)}
         width={500}>
-        <Icon name="info" title={`${title} details.`} bsStyle={'info'} />
+        <Icon name="info" title={translate('scheduling.details', { title })} bsStyle={'info'} />
       </DetailsOverlayTrigger>
     </>
   );
 };
 
 const SchedulingCell = ({ definition }: Props) => {
+  const { t: translate } = useTranslation('event_definitions');
   const queryClient = useQueryClient();
 
   if (!definition?.config?.search_within_ms && !definition?.config?.execute_every_ms) {
-    return <>Not Scheduled.</>;
+    return <>{translate('scheduling.not_scheduled')}</>;
   }
 
   const clearNotifications = (eventDefinition: EventDefinition) => () => {
     // eslint-disable-next-line no-alert
-    if (window.confirm(`Are you sure you want to clear queued notifications for "${eventDefinition.title}"?`)) {
+    if (window.confirm(translate('scheduling.clear_confirm', { title: eventDefinition.title }))) {
       clearNotificationQueue(eventDefinition).then(
         () => queryClient.invalidateQueries({ queryKey: EVENT_DEFINITIONS_QUERY_KEY }),
         () => {

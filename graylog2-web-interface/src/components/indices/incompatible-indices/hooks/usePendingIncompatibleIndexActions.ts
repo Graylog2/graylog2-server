@@ -16,6 +16,7 @@
  */
 import { useEffect, useState } from 'react';
 
+import i18n from 'i18n';
 import useIndexArchive from 'components/indices/archive/useIndexArchive';
 import type { IncompatibleIndex } from 'components/indices/hooks/useIncompatibleIndices';
 import Store from 'logic/local-storage/Store';
@@ -101,7 +102,11 @@ const resolveArchiveAction = (
   const job = action.systemJobId ? jobsById.get(action.systemJobId) : undefined;
 
   if (job?.job_status === 'error') {
-    return { kind: 'failed', message: job.info || job.description, label: 'Archive failed' };
+    return {
+      kind: 'failed',
+      message: job.info || job.description,
+      label: i18n.t('incompatible.archive_failed', { ns: 'indexsets' }),
+    };
   }
 
   if (job?.job_status === 'complete' || job?.job_status === 'cancelled') {
@@ -124,7 +129,11 @@ const resolveReindexAction = (
   );
 
   if (job?.job_status === 'error') {
-    return { kind: 'failed', message: job.info || job.description, label: 'Reindex failed' };
+    return {
+      kind: 'failed',
+      message: job.info || job.description,
+      label: i18n.t('incompatible.reindex_failed', { ns: 'indexsets' }),
+    };
   }
 
   if (job?.job_status === 'complete' || job?.job_status === 'cancelled') {

@@ -16,12 +16,14 @@
  */
 import * as React from 'react';
 import { useFormikContext } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { FormikInput, InputOptionalInfo } from 'components/common';
 import GCSSetupInfo from 'components/gcs/GCSSetupInfo';
 import type { GeoIpConfigType } from 'components/maps/configurations/types';
 
 const GCSGeoIpFormGroup = () => {
+  const { t } = useTranslation('common');
   const { values } = useFormikContext<GeoIpConfigType>();
 
   return (
@@ -33,7 +35,7 @@ const GCSGeoIpFormGroup = () => {
         disabled={!values.enabled}
         label={
           <>
-            Google Cloud Storage Project ID <InputOptionalInfo />
+            {t('gcs_geoip.project_id')} <InputOptionalInfo />
           </>
         }
         name="gcs_project_id"

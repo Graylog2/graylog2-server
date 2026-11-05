@@ -15,20 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import QueryHelper from 'components/common/QueryHelper';
 
-const queryExample = (
-  <p>
-    Find backends with a title containing LDAP:
-    <br />
-    <kbd>title:LDAP</kbd>
-    <br />
-  </p>
-);
+const BackendQueryHelper = () => {
+  const { t } = useTranslation('authentication');
+  const queryExample = (
+    <p>
+      {t('backends_overview.query_example')}
+      <br />
+      {/* eslint-disable-next-line graylog/no-untranslated-text -- query syntax */}
+      <kbd>title:LDAP</kbd>
+      <br />
+    </p>
+  );
 
-const BackendQueryHelper = () => (
-  <QueryHelper entityName="backend" example={queryExample} commonFields={['title', 'description']} />
-);
+  return <QueryHelper entityName="backend" example={queryExample} commonFields={['title', 'description']} />;
+};
 
 export default BackendQueryHelper;

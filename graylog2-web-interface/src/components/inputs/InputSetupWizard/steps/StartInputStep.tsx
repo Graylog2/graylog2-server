@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useState, useMemo } from 'react';
 import type { UseMutationResult } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 import { ClusterInputState } from '@graylog/server-api';
 
@@ -49,6 +50,7 @@ export type ProcessingSteps =
   | 'result';
 
 const StartInputStep = () => {
+  const { t } = useTranslation('inputs');
   const inputSetupWizards = usePluginEntities('inputSetupWizard');
   const ExtraSetupWizardStep = useMemo(
     () => inputSetupWizards?.find((plugin) => !!plugin.ExtraSetupWizardStep)?.ExtraSetupWizardStep,
@@ -340,7 +342,7 @@ const StartInputStep = () => {
     if (currentStartInputStatus === 'NOT_STARTED' || currentStartInputStatus === 'ROLLED_BACK') {
       return (
         <Button onClick={handleStart} disabled={!isInputStartable()} bsStyle="primary">
-          Start Input
+          {t('setup_wizard.start.start_input')}
         </Button>
       );
     }
@@ -348,7 +350,7 @@ const StartInputStep = () => {
     if (currentStartInputStatus === 'FAILED' || currentStartInputStatus === 'ROLLING_BACK') {
       return (
         <Button disabled={currentStartInputStatus === 'ROLLING_BACK'} onClick={handleRollback} bsStyle="primary">
-          Rollback Input
+          {t('setup_wizard.start.rollback_input')}
         </Button>
       );
     }
@@ -356,7 +358,7 @@ const StartInputStep = () => {
     if (hasNextStep) {
       return (
         <Button disabled={currentStartInputStatus === 'RUNNING'} onClick={goToInputDiagnosis} bsStyle="primary">
-          Launch Input Diagnosis
+          {t('setup_wizard.start.launch_diagnosis')}
         </Button>
       );
     }
@@ -368,7 +370,7 @@ const StartInputStep = () => {
     <StepWrapper>
       <Row>
         <DescriptionCol md={12}>
-          <p>Set up and start the Input according to the configuration made.</p>
+          <p>{t('setup_wizard.start.description')}</p>
         </DescriptionCol>
       </Row>
       <Row>
@@ -376,12 +378,12 @@ const StartInputStep = () => {
           {hasBeenStarted &&
             (isRollback ? (
               <>
-                <StyledHeading>Rolling back Input...</StyledHeading>
+                <StyledHeading>{t('setup_wizard.start.rolling_back')}</StyledHeading>
                 {renderProgressMessages(rollBackMutations)}
               </>
             ) : (
               <>
-                <StyledHeading>Setting up Input...</StyledHeading>
+                <StyledHeading>{t('setup_wizard.start.setting_up')}</StyledHeading>
                 {renderProgressMessages(stepMutations)}
                 {currentStartInputStatus && (
                   <ProgressMessage
@@ -395,9 +397,7 @@ const StartInputStep = () => {
               </>
             ))}
 
-          {!hasBeenStarted && !isInputStartable() && (
-            <p>Your Input is not ready to be setup yet. Please complete the previous steps.</p>
-          )}
+          {!hasBeenStarted && !isInputStartable() && <p>{t('setup_wizard.start.not_ready')}</p>}
         </Col>
       </Row>
 
@@ -406,7 +406,7 @@ const StartInputStep = () => {
           <ButtonCol md={12}>
             {hasPreviousStep && (
               <Button disabled={isRunning} onClick={handleBackClick}>
-                Back
+                {t('setup_wizard.back')}
               </Button>
             )}
             {renderNextButton()}

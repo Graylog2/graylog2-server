@@ -17,6 +17,7 @@
 
 import * as React from 'react';
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useProductName from 'brand-customization/useProductName';
 import fetch from 'logic/rest/FetchProvider';
@@ -31,7 +32,8 @@ type Props = {
   compact?: boolean;
 };
 
-const ResumeStartupButton = ({ setIsWaitingForStartup, children = 'Resume startup', compact = false }: Props) => {
+const ResumeStartupButton = ({ setIsWaitingForStartup, children = null, compact = false }: Props) => {
+  const { t } = useTranslation('preflight');
   const productName = useProductName();
   const { data: dataNodes } = useDataNodes();
 
@@ -39,9 +41,7 @@ const ResumeStartupButton = ({ setIsWaitingForStartup, children = 'Resume startu
     if (
       dataNodes?.length ||
       // eslint-disable-next-line no-alert
-      window.confirm(
-        `Are you sure you want to resume startup without a running ${productName} data node? This will cause the configuration to fall back to using an Opensearch instance on localhost:9200.`,
-      )
+      window.confirm(t('resume_startup.confirm', { productName }))
     ) {
       const status = dataNodes?.length ? 'finish' : 'skip';
 
@@ -52,14 +52,14 @@ const ResumeStartupButton = ({ setIsWaitingForStartup, children = 'Resume startu
         .catch((error) => {
           setIsWaitingForStartup(false);
 
-          UserNotification.error(`Resuming startup failed with error: ${error}`, 'Could not resume startup');
+          UserNotification.error(t('resume_startup.error', { error: String(error) }), t('resume_startup.error_title'));
         });
     }
-  }, [dataNodes?.length, productName, setIsWaitingForStartup]);
+  }, [dataNodes?.length, productName, setIsWaitingForStartup, t]);
 
   return (
     <Button bsStyle="info" bsSize={compact ? 'xs' : 'small'} onClick={onResumeStartup}>
-      {children}
+      {children ?? t('resume_startup.button')}
     </Button>
   );
 };

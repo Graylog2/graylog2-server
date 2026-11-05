@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Input } from 'components/bootstrap';
 
@@ -36,28 +37,32 @@ const ARN = ({
     value: '',
   },
   onChange,
-}: ARNProps) => (
-  <>
-    <Input
-      id="awsAssumeRoleARN"
-      type="text"
-      value={awsARN.value}
-      onChange={onChange}
-      label="AWS Assume Role (ARN)"
-      help="Amazon Resource Name with required cross account permission"
-      placeholder="arn:aws:sts::123456789012:assumed-role/some-role"
-      maxLength={2048}
-    />
-    <Input
-      id="awsExternalId"
-      type="text"
-      name="awsExternalId"
-      value={awsExternalId.value}
-      onChange={onChange}
-      label="AWS External ID (optional)"
-      help="An external ID added to the AssumeRole request to prevent the confused deputy problem. Required only if your role trust policy enforces it."
-    />
-  </>
-);
+}: ARNProps) => {
+  const { t } = useTranslation('integrations');
+
+  return (
+    <>
+      <Input
+        id="awsAssumeRoleARN"
+        type="text"
+        value={awsARN.value}
+        onChange={onChange}
+        label={t('aws_arn.assume_role_label')}
+        help={t('aws_arn.assume_role_help')}
+        placeholder={t('aws_arn.assume_role_placeholder')}
+        maxLength={2048}
+      />
+      <Input
+        id="awsExternalId"
+        type="text"
+        name="awsExternalId"
+        value={awsExternalId.value}
+        onChange={onChange}
+        label={t('aws_arn.external_id_label')}
+        help={t('aws_arn.external_id_help')}
+      />
+    </>
+  );
+};
 
 export default ARN;

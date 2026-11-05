@@ -20,6 +20,7 @@ import * as Immutable from 'immutable';
 import { Field } from 'formik';
 import styled from 'styled-components';
 import moment from 'moment';
+import { useTranslation } from 'react-i18next';
 
 import useView from 'views/hooks/useView';
 import StreamsContext from 'contexts/StreamsContext';
@@ -178,6 +179,7 @@ type Props = {
 };
 
 const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props) => {
+  const { t } = useTranslation('search');
   const editorRef = useRef<Editor>(null);
   const view = useView();
   const streams = useContext(StreamsContext);
@@ -262,7 +264,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
                   <ScrollToHint
                     scrollContainer={scrollContainer}
                     ifValueChanges={query.query_string}
-                    title="Scroll to search bar"
+                    title={t('search_bar.scroll_hint')}
                   />
                   <SearchBarContainer>
                     <TimeRangeRow>
@@ -320,7 +322,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit, scrollContainer }: Props)
                                         streams={values.streamsAndCategories?.streams}
                                         name={name}
                                         onChange={onChange}
-                                        placeholder='Type your search query here and press enter. E.g.: ("not found" AND http) OR http_response_code:[400 TO 404]'
+                                        placeholder={t('search_bar.query_placeholder')}
                                         error={error}
                                         isValidating={isValidating}
                                         warning={warnings.queryString}

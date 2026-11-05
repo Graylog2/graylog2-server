@@ -16,6 +16,7 @@
  */
 import { useQuery } from '@tanstack/react-query';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { LinkContainer, Icon } from 'components/common';
@@ -59,6 +60,7 @@ type Props = {
 };
 
 const StreamRulesEditor = ({ streamId, messageId = '', index = '' }: Props) => {
+  const { t } = useTranslation('streams');
   const [showStreamRuleForm, setShowStreamRuleForm] = useState(false);
   const [message, setMessage] = useState<Message | undefined>();
   const { data: stream, refetch } = useStream(streamId);
@@ -96,7 +98,7 @@ const StreamRulesEditor = ({ streamId, messageId = '', index = '' }: Props) => {
   return (
     <Row className="content">
       <Col md={12} className="streamrule-sample-message">
-        <h2>1. Load a message to test rules</h2>
+        <h2>{t('stream_rules.editor.load_message_title')}</h2>
 
         <div className="stream-loader">
           <LoaderTabs messageId={messageId} index={index} onMessageLoaded={onMessageLoaded} />
@@ -106,40 +108,39 @@ const StreamRulesEditor = ({ streamId, messageId = '', index = '' }: Props) => {
 
         <div className="buttons pull-right">
           <Button bsStyle="primary" className="show-stream-rule" onClick={_onAddStreamRule}>
-            Add stream rule
+            {t('stream_rules.editor.add_rule')}
           </Button>
           {showStreamRuleForm && (
             <StreamRuleModal
-              title="New Stream Rule"
+              title={t('stream_rules.new_title')}
               onClose={() => setShowStreamRuleForm(false)}
-              submitButtonText="Create Rule"
-              submitLoadingText="Creating Rule..."
+              submitButtonText={t('stream_rules.create_button')}
+              submitLoadingText={t('stream_rules.creating')}
               onSubmit={onCreateStreamRule}
             />
           )}
         </div>
 
-        <h2>2. Manage stream rules</h2>
+        <h2>{t('stream_rules.editor.manage_title')}</h2>
 
         <MatchingTypeSwitcher stream={stream} onChange={refetch} />
         <Panel bsStyle={styles}>
           <StreamAlertHeader>
             {matchData?.matches && (
               <>
-                <MatchIcon $matches name="check" /> This message would be routed to this stream!
+                <MatchIcon $matches name="check" /> {t('stream_rules.editor.would_match')}
               </>
             )}
 
             {matchData && !matchData.matches && (
               <>
-                <MatchIcon name="close" /> This message would not be routed to this stream.
+                <MatchIcon name="close" /> {t('stream_rules.editor.would_not_match')}
               </>
             )}
 
             {!matchData && (
               <>
-                <MatchIcon $empty name="error" /> Please load a message in Step 1 above to check if it would match
-                against these rules.
+                <MatchIcon $empty name="error" /> {t('stream_rules.editor.load_message_hint')}
               </>
             )}
           </StreamAlertHeader>
@@ -148,7 +149,7 @@ const StreamRulesEditor = ({ streamId, messageId = '', index = '' }: Props) => {
 
         <p>
           <LinkContainer to={Routes.STREAMS}>
-            <Button bsStyle="primary">I&apos;m done!</Button>
+            <Button bsStyle="primary">{t('stream_rules.editor.done')}</Button>
           </LinkContainer>
         </p>
         <StartStreamAfterRuleCreateDialog

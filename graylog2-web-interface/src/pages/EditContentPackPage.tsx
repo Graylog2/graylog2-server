@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import groupBy from 'lodash/groupBy';
+import { useTranslation } from 'react-i18next';
 
 import { SystemCatalog } from '@graylog/server-api';
 
@@ -40,6 +41,7 @@ import useContentPackInstallations from 'components/content-packs/hooks/useConte
 import { pairEntities } from 'logic/content-packs/pairEntities';
 
 const EditContentPackPage = () => {
+  const { t } = useTranslation('content_packs');
   const productName = useProductName();
   const { entityIndex } = useEntityIndex();
   const { contentPackId, contentPackRev } = useParams<{ contentPackId: string; contentPackRev: string }>();
@@ -150,14 +152,12 @@ const EditContentPackPage = () => {
   const _onSave = () => {
     createContentPack(contentPack.toJSON()).then(
       () => {
-        UserNotification.success('Content pack imported successfully', 'Success!');
+        UserNotification.success(t('import.success_message'), t('import.success_title'));
         history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
       },
       (response) => {
-        const message =
-          'Error importing content pack, please ensure it is a valid JSON file. Check your ' +
-          `${productName} server logs for more information.`;
-        const title = 'Could not import content pack';
+        const message = t('import.error_message', { productName });
+        const title = t('import.error_title');
         let smallMessage = '';
 
         if (response.additional && response.additional.body && response.additional.body.message) {
@@ -189,20 +189,19 @@ const EditContentPackPage = () => {
   };
 
   return (
-    <DocumentTitle title="Content packs">
+    <DocumentTitle title={t('pages.document_title')}>
       <span>
         <PageHeader
-          title="Edit content pack"
+          title={t('pages.edit_title')}
           topActions={
             <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
-              <Button bsStyle="info">Content Packs</Button>
+              <Button bsStyle="info">{t('pages.back_button')}</Button>
             </LinkContainer>
           }>
           <span>
-            Content packs accelerate the set up process for a specific data source. A content pack can include
-            inputs/extractors, streams, and dashboards.
+            {t('pages.description')}
             <br />
-            <MarketplaceLink prefix="Find more content packs in" />
+            <MarketplaceLink prefix={t('pages.marketplace_prefix')} />
           </span>
         </PageHeader>
         <ContentPackEdit

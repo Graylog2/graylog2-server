@@ -17,6 +17,7 @@
 import React from 'react';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
+import i18n from 'i18n';
 import type { WidgetComponentProps, AdditionalViewsActionHandlerArguments } from 'views/types';
 import Routes from 'routing/Routes';
 import App from 'routing/App';
@@ -198,7 +199,7 @@ const exports: PluginExports = {
   enterpriseWidgets: [
     {
       type: 'MESSAGES',
-      displayName: 'Message List',
+      displayName: i18n.t('widgets:enterprise_widgets.message_list'),
       defaultHeight: 5,
       defaultWidth: 6,
       // TODO: Subtyping needs to be taken into account
@@ -212,7 +213,7 @@ const exports: PluginExports = {
     },
     {
       type: 'AGGREGATION',
-      displayName: 'Results',
+      displayName: i18n.t('widgets:enterprise_widgets.results'),
       defaultHeight: 4,
       defaultWidth: 4,
       visualizationComponent: AggregationBuilder,
@@ -228,11 +229,16 @@ const exports: PluginExports = {
       searchTypes: PivotConfigGenerator,
       titleGenerator: (widget: Widget) => {
         if (widget.config.rowPivots.length > 0) {
-          return `Aggregating ${widget.config.series.map((s) => s.effectiveName).join(', ')} by ${widget.config.rowPivots.flatMap(({ fields }) => fields).join(', ')}`;
+          return i18n.t('search:aggregation.summary_by', {
+            series: widget.config.series.map((s) => s.effectiveName).join(', '),
+            fields: widget.config.rowPivots.flatMap(({ fields }) => fields).join(', '),
+          });
         }
 
         if (widget.config.series.length > 0) {
-          return `Aggregating ${widget.config.series.map((s) => s.effectiveName).join(', ')}`;
+          return i18n.t('search:aggregation.summary_only', {
+            series: widget.config.series.map((s) => s.effectiveName).join(', '),
+          });
         }
 
         return AggregationWidget.defaultTitle;
@@ -240,7 +246,7 @@ const exports: PluginExports = {
     },
     {
       type: 'EVENTS',
-      displayName: 'Events',
+      displayName: i18n.t('widgets:enterprise_widgets.events'),
       defaultHeight: 4,
       defaultWidth: 6,
       hasEditSubmitButton: true,
@@ -253,7 +259,7 @@ const exports: PluginExports = {
     },
     {
       type: 'TEXT',
-      displayName: 'Text/Markdown',
+      displayName: i18n.t('widgets:enterprise_widgets.text_markdown'),
       defaultHeight: 3,
       defaultWidth: 3,
       hasEditSubmitButton: false,
@@ -296,6 +302,7 @@ const exports: PluginExports = {
     {
       type: 'chart',
       title: 'Chart',
+      titleKey: 'search:field_actions.chart',
       thunk: ChartActionHandler,
       isEnabled: ({ type }) => type.isNumeric(),
       resetFocus: true,
@@ -303,6 +310,7 @@ const exports: PluginExports = {
     {
       type: 'aggregate',
       title: 'Show top values',
+      titleKey: 'search:field_actions.show_top_values',
       thunk: AggregateActionHandler,
       isEnabled: ({ field, type, contexts: { analysisDisabledFields } }) =>
         !isFunction(field) &&
@@ -314,6 +322,7 @@ const exports: PluginExports = {
     {
       type: 'statistics',
       title: 'Statistics',
+      titleKey: 'search:field_actions.statistics',
       isEnabled: ({ field, type, contexts: { analysisDisabledFields } }) =>
         !isFunction(field) && !type.isDecorated() && !isAnalysisDisabled(field, analysisDisabledFields),
       thunk: FieldStatisticsHandler,
@@ -322,6 +331,7 @@ const exports: PluginExports = {
     {
       type: 'add-to-table',
       title: 'Add to table',
+      titleKey: 'search:field_actions.add_to_table',
       thunk: AddToTableActionHandler,
       isEnabled: AddToTableActionHandler.isEnabled,
       isHidden: AddToTableActionHandler.isHidden,
@@ -330,6 +340,7 @@ const exports: PluginExports = {
     {
       type: 'remove-from-table',
       title: 'Remove from table',
+      titleKey: 'search:field_actions.remove_from_table',
       thunk: RemoveFromTableActionHandler,
       isEnabled: RemoveFromTableActionHandler.isEnabled,
       isHidden: RemoveFromTableActionHandler.isHidden,
@@ -338,6 +349,7 @@ const exports: PluginExports = {
     {
       type: 'add-to-all-tables',
       title: 'Add to all tables',
+      titleKey: 'search:field_actions.add_to_all_tables',
       thunk: AddToAllTablesActionHandler,
       isEnabled: ({ field, type }) => !isFunction(field) && !type.isDecorated(),
       resetFocus: false,
@@ -345,6 +357,7 @@ const exports: PluginExports = {
     {
       type: 'remove-from-all-tables',
       title: 'Remove from all tables',
+      titleKey: 'search:field_actions.remove_from_all_tables',
       thunk: RemoveFromAllTablesActionHandler,
       isEnabled: ({ field, type }) => !isFunction(field) && !type.isDecorated(),
       resetFocus: false,
@@ -353,6 +366,7 @@ const exports: PluginExports = {
     {
       type: 'change-field-type',
       title: 'Change field type',
+      titleKey: 'search:field_actions.change_field_type',
       isEnabled: isChangeFieldTypeEnabled,
       resetFocus: false,
       component: ChangeFieldType,
@@ -366,6 +380,7 @@ const exports: PluginExports = {
       {
         type: 'exclude',
         title: 'Exclude from results',
+        titleKey: 'search:value_actions.exclude',
         thunk: ExcludeFromQueryHandler,
         isEnabled: ({ field, type, contexts }) =>
           (!isFunction(field) || hasMultipleValueForActions(contexts)) && !type.isDecorated(),
@@ -374,6 +389,7 @@ const exports: PluginExports = {
       {
         type: 'add-to-query',
         title: 'Add to query',
+        titleKey: 'search:value_actions.add_to_query',
         thunk: AddToQueryHandler,
         isEnabled: ({ field, type, contexts }) =>
           (!isFunction(field) || hasMultipleValueForActions(contexts)) && !type.isDecorated(),
@@ -382,6 +398,7 @@ const exports: PluginExports = {
       {
         type: 'show-bucket',
         title: 'Show documents for value',
+        titleKey: 'search:value_actions.show_documents',
         thunk: ShowDocumentsHandler,
         isEnabled: ShowDocumentsHandler.isEnabled,
         resetFocus: true,
@@ -389,6 +406,7 @@ const exports: PluginExports = {
       {
         type: 'create-extractor',
         title: 'Create extractor',
+        titleKey: 'search:value_actions.create_extractor',
         isEnabled: ({ type, contexts }) => !!contexts.message && !type.isDecorated() && !!contexts.isLocalNode,
         component: SelectExtractorType,
         resetFocus: false,
@@ -396,6 +414,7 @@ const exports: PluginExports = {
       {
         type: 'highlight-value',
         title: 'Highlight this value',
+        titleKey: 'search:value_actions.highlight_value',
         thunk: HighlightValueHandler,
         isEnabled: HighlightValueHandler.isEnabled,
         resetFocus: false,
@@ -404,6 +423,7 @@ const exports: PluginExports = {
       {
         type: 'create-event-definition-from-value',
         title: 'Create event definition',
+        titleKey: 'search:value_actions.create_event_definition',
         isEnabled: () => true,
         resetFocus: false,
         component: CreateEventDefinition,
@@ -417,26 +437,31 @@ const exports: PluginExports = {
   widgetCreators: [
     {
       title: 'Message Count',
+      titleKey: 'search:widget_creators.message_count',
       func: CreateMessageCount,
       icon: () => <Icon name="tag" />,
     },
     {
       title: 'Message Table',
+      titleKey: 'search:widget_creators.message_table',
       func: CreateMessagesWidget,
       icon: () => <Icon name="list" />,
     },
     {
       title: 'Custom Aggregation',
+      titleKey: 'search:widget_creators.custom_aggregation',
       func: CreateCustomAggregation,
       icon: () => <Icon name="monitoring" />,
     },
     {
       title: 'Events Overview',
+      titleKey: 'search:widget_creators.events_overview',
       func: CreateEventsWidget,
       icon: () => <Icon name="report" type="regular" />,
     },
     {
       title: 'Text/Markdown',
+      titleKey: 'search:widget_creators.text_markdown',
       func: CreateTextWidget,
       icon: () => <Icon name="description" />,
     },
@@ -445,26 +470,31 @@ const exports: PluginExports = {
     {
       type: 'preset',
       title: 'Message Count',
+      titleKey: 'search:widget_creators.message_count',
       func: AddMessageCountActionHandler,
     },
     {
       type: 'preset',
       title: 'Message Table',
+      titleKey: 'search:widget_creators.message_table',
       func: AddMessageTableActionHandler,
     },
     {
       type: 'generic',
       title: 'Aggregation',
+      titleKey: 'search:widget_creators.aggregation',
       func: AddCustomAggregation,
     },
     {
       type: 'events' as const,
       title: 'Events Overview',
+      titleKey: 'search:widget_creators.events_overview',
       func: AddEventsWidgetActionHandler,
     },
     {
       type: 'generic',
       title: 'Text/Markdown',
+      titleKey: 'search:widget_creators.text_markdown',
       func: AddTextWidget,
     },
   ],
@@ -481,14 +511,14 @@ const exports: PluginExports = {
   'views.export.formats': [
     {
       type: 'csv',
-      displayName: () => 'Comma-Separated Values (CSV)',
+      displayName: () => i18n.t('widgets:comma_separated_values_csv'),
       mimeType: 'text/csv',
       fileExtension: 'csv',
     },
   ],
   'views.components.widgets.messageTable.previewOptions': [
     {
-      title: 'Show message in new row',
+      title: i18n.t('widgets:message_table.show_message_in_new_row'),
       isChecked: (config) => config.showMessageRow,
       isDisabled: () => false,
       onChange: (config, onConfigChange) => {

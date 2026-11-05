@@ -16,19 +16,24 @@
  */
 import React from 'react';
 import numeral from 'numeral';
+import { useTranslation } from 'react-i18next';
 
 import type { GaugeMetric } from 'types/metrics';
 
 type Props = {
   metric: GaugeMetric;
 };
-const GaugeDetails = ({ metric: { metric: gauge } }: Props) => (
-  <dl className="metric-def metric-gauge">
-    <dt>Value:</dt>
-    <dd>
-      <span className="number-format">{numeral(gauge.value).format('0,0')}</span>
-    </dd>
-  </dl>
-);
+const GaugeDetails = ({ metric: { metric: gauge } }: Props) => {
+  const { t } = useTranslation('system');
+
+  return (
+    <dl className="metric-def metric-gauge">
+      <dt>{t('metric_details.value')}</dt>
+      <dd>
+        <span className="number-format">{numeral(gauge.value).format('0,0')}</span>
+      </dd>
+    </dl>
+  );
+};
 
 export default GaugeDetails;

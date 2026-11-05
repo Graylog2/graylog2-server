@@ -16,6 +16,7 @@
  */
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { ConfirmDialog } from 'components/common';
 import { Alert, Button } from 'components/bootstrap';
@@ -50,6 +51,7 @@ const ActionBlock = styled.div`
 `;
 
 const MongodbProfilingAction = () => {
+  const { t } = useTranslation('system');
   const [showProfilingDialog, setShowProfilingDialog] = useState(false);
   const { action, state, profilingStatusByLevel, slowMs, isStatusReady, isTogglingProfiling, runToggleAction } =
     useMongodbProfilingToggle();
@@ -62,6 +64,7 @@ const MongodbProfilingAction = () => {
       slowMs,
       isStatusReady,
       isTogglingProfiling,
+      t,
     });
 
   const onConfirmProfilingAction = async () => {
@@ -91,9 +94,7 @@ const MongodbProfilingAction = () => {
       <Alert bsStyle="info">
         <AlertContent>
           <MessageBlock>
-            <p>
-              MongoDB profiling helps identify slow queries and troubleshoot performance issues across cluster nodes.
-            </p>
+            <p>{t('mongodb_profiling_action.description')}</p>
             <p>{statusSummary}</p>
           </MessageBlock>
           <ActionBlock>
@@ -114,13 +115,17 @@ const MongodbProfilingAction = () => {
           show
           title={actionLabel}
           btnConfirmText={actionLabel}
-          submitLoadingText="Enabling profiling..."
+          submitLoadingText={t('mongodb_profiling_action.enabling_profiling')}
           isAsyncSubmit
           isSubmitting={isTogglingProfiling}
           onConfirm={onConfirmProfilingAction}
           onCancel={() => setShowProfilingDialog(false)}>
-          Enable <b>Slow Ops</b> profiling ({enableThresholdLabel}) on all MongoDB nodes? It applies immediately without
-          restart, but resets after restart unless configured at startup.
+          <Trans
+            t={t}
+            i18nKey="mongodb_profiling_action.enable_confirm"
+            values={{ threshold: enableThresholdLabel }}
+            components={{ b: <b /> }}
+          />
         </ConfirmDialog>
       )}
     </>

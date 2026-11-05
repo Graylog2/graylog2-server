@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import type { IndexInfo } from 'hooks/useIndices';
@@ -136,6 +137,7 @@ const StatList = styled.dl`
 `;
 
 const IndexSection = ({ headline, subheading, indices, indexDetails, indexSetId = undefined }: Props) => {
+  const { t } = useTranslation('indexsets');
   const size = indices.map((index) => index.size?.bytes || 0).reduce((partialSum, a) => partialSum + a, 0) || 0;
   const shards = indices.map((index) => index.shard_count).reduce((partialSum, a) => partialSum + a, 0) || 0;
 
@@ -148,11 +150,11 @@ const IndexSection = ({ headline, subheading, indices, indexDetails, indexSetId 
         </Col>
         <Col md={6}>
           <StatList>
-            <dt>Indices:</dt>
+            <dt>{t('indices.section.indices')}</dt>
             <dd>{indices.length}</dd>
-            <dt>Shards:</dt>
+            <dt>{t('indices.section.shards')}</dt>
             <dd>{shards}</dd>
-            <dt>Total Size:</dt>
+            <dt>{t('indices.section.total_size')}</dt>
             <dd>{NumberUtils.formatBytes(size)}</dd>
           </StatList>
         </Col>

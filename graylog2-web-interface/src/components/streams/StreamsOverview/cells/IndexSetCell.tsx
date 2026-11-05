@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { Stream } from 'logic/streams/types';
 import usePermissions from 'hooks/usePermissions';
@@ -28,6 +29,7 @@ type Props = {
 };
 
 const IndexSetCell = ({ stream, indexSets }: Props) => {
+  const { t } = useTranslation('streams');
   const { isPermitted } = usePermissions();
 
   if (!isPermitted(['indexsets:read'])) {
@@ -36,7 +38,11 @@ const IndexSetCell = ({ stream, indexSets }: Props) => {
 
   const indexSet = indexSets.find((is) => is.id === stream.index_set_id) || indexSets.find((is) => is.default);
 
-  return indexSet ? <Link to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id)}>{indexSet.title}</Link> : <i>not found</i>;
+  return indexSet ? (
+    <Link to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id)}>{indexSet.title}</Link>
+  ) : (
+    <i>{t('streams_overview.cells.index_set_not_found')}</i>
+  );
 };
 
 export default IndexSetCell;

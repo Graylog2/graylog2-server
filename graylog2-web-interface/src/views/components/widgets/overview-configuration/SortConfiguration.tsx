@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useMemo } from 'react';
 import { Field, useFormikContext } from 'formik';
@@ -43,6 +44,7 @@ const SortConfiguration = ({
   columnTitle = (column: string) => column,
   directionTitle = (direction: string) => direction,
 }: Props) => {
+  const { t } = useTranslation('widgets');
   const { values } = useFormikContext();
   const columnOptions = useMemo(
     () =>
@@ -66,10 +68,14 @@ const SortConfiguration = ({
     <Container>
       <Field name={`${attributeName}.field`}>
         {({ field: { value, onChange, name } }) => (
-          <Input id="sort-configuration-column" label="Column" labelClassName="col-sm-3" wrapperClassName="col-sm-9">
+          <Input
+            id="sort-configuration-column"
+            label={t('overview_configuration.column')}
+            labelClassName="col-sm-3"
+            wrapperClassName="col-sm-9">
             <Select
               id="sort-configuration-column-select"
-              placeholder="Select a column"
+              placeholder={t('overview_configuration.select_column')}
               options={columnOptions}
               clearable={false}
               size="small"
@@ -84,12 +90,12 @@ const SortConfiguration = ({
         {({ field: { value, onChange, name } }) => (
           <Input
             id="sort-configuration-direction"
-            label="Direction"
+            label={t('overview_configuration.direction')}
             labelClassName="col-sm-3"
             wrapperClassName="col-sm-9">
             <Select
               id="sort-configuration-direction-select"
-              placeholder="Select a direction"
+              placeholder={t('overview_configuration.select_direction')}
               options={directionOptions}
               clearable={false}
               size="small"

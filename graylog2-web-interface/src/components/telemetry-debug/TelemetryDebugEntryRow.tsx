@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Button, Label } from 'components/bootstrap';
 import copyToClipboard from 'util/copyToClipboard';
@@ -72,18 +73,24 @@ const STATUS_STYLE = {
 const formatTime = (timestamp: number) => new Date(timestamp).toISOString().slice(11, 23);
 
 const PayloadLine = ({ property, value }: { property: string; value: unknown }) => {
+  const { t } = useTranslation('system');
   const suspect = detectPiiSuspect(value);
   const rendered = JSON.stringify(value);
 
   return (
     <div>
       &quot;{property}&quot;:{' '}
-      {suspect ? <SuspectValue title={`PII suspect: ${suspect}`}>{rendered}</SuspectValue> : rendered}
+      {suspect ? (
+        <SuspectValue title={t('telemetry_debug_entry_row.pii_suspect', { suspect })}>{rendered}</SuspectValue>
+      ) : (
+        rendered
+      )}
     </div>
   );
 };
 
 const TelemetryDebugEntryRow = ({ entry, deltaMs, expanded, onToggle }: Props) => {
+  const { t } = useTranslation('system');
   const appActionValue = (entry.payload as { app_action_value?: string }).app_action_value;
 
   return (
@@ -91,7 +98,7 @@ const TelemetryDebugEntryRow = ({ entry, deltaMs, expanded, onToggle }: Props) =
       <tr>
         <TimeCell>
           {formatTime(entry.timestamp)}
-          {deltaMs !== null && ` (+${deltaMs}ms)`}
+          {deltaMs !== null && t('telemetry_debug_entry_row.delta', { delta: deltaMs })}
         </TimeCell>
         <ClickableCell onClick={onToggle}>{entry.eventType}</ClickableCell>
         <td>{appActionValue}</td>
@@ -120,7 +127,7 @@ const TelemetryDebugEntryRow = ({ entry, deltaMs, expanded, onToggle }: Props) =
                   ),
                 )
               }>
-              Copy event as JSON
+              {t('telemetry_debug_entry_row.copy_as_json')}
             </Button>
           </td>
         </tr>

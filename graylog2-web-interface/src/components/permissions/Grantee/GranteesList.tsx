@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type SharedEntity from 'logic/permissions/SharedEntity';
 import { Alert } from 'components/bootstrap';
@@ -70,6 +71,7 @@ const GranteesList = ({
   title,
   isCreating = false,
 }: Props) => {
+  const { t } = useTranslation('users');
   const initialPageSize = DEFAULT_PAGE_SIZES[0];
   const [pageSize, setPageSize] = useState(initialPageSize);
   const [currentPage, setCurrentPage] = useState(1);
@@ -107,7 +109,7 @@ const GranteesList = ({
             .toArray()}
         </StyledGranteeList>
       ) : (
-        <Alert>This {entityTypeTitle || entityType} has no collaborators.</Alert>
+        <Alert>{t('permissions.grantees.no_collaborators', { entityType: entityTypeTitle || entityType })}</Alert>
       )}
       <GranteeListPaginationWrapper>
         <GranteeListStyledPagination totalPages={totalPages} currentPage={currentPage} onChange={setCurrentPage} />

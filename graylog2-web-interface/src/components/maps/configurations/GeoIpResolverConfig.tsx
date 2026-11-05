@@ -16,6 +16,7 @@
  */
 import React, { useState } from 'react';
 import { Field, Form, Formik } from 'formik';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { IfPermitted, Select, TimeUnitInput, ModalSubmit, InputOptionalInfo } from 'components/common';
 import { Button, Col, Input, Modal, Row } from 'components/bootstrap';
@@ -50,6 +51,7 @@ const defaultConfig: GeoIpConfigType = {
 };
 
 const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) => {
+  const { t } = useTranslation('common');
   const [showModal, setShowModal] = useState(false);
 
   const sendTelemetry = useSendTelemetry('geolocation-processor');
@@ -93,40 +95,45 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
 
   const activeVendorType = (type: GeoVendorType) => availableVendorTypes().filter((t) => t.value === type)[0].label;
 
-  const modalTitle = 'Update Geo-Location Processor Configuration';
+  const modalTitle = t('geoip_resolver.modal_title');
 
   return (
     <div>
-      <h3>Geo-Location Processor Configuration</h3>
+      <h3>{t('geoip_resolver.title')}</h3>
 
       <p>
-        The Geo-Location Processor plugin scans all messages for fields containing <strong>exclusively</strong> an IP
-        address, and puts their geo-location information (coordinates, ISO country code, and city name) into different
-        fields. Read more in the <DocumentationLink page="geolocation" text="documentation" />.
+        <Trans
+          t={t}
+          i18nKey="geoip_resolver.description"
+          components={{
+            bold: <strong />,
+            docsLink: <DocumentationLink page="geolocation" text={t('links.documentation')} />,
+          }}
+        />
       </p>
 
       <dl className="deflist">
-        <dt>Enabled:</dt>
-        <dd>{config.enabled === true ? 'Yes' : 'No'}</dd>
+        <dt>{t('geoip_resolver.enabled_summary')}</dt>
+        <dd>{config.enabled === true ? t('status_icon.yes') : t('status_icon.no')}</dd>
         {config.enabled && (
           <>
-            <dt>Enforce default schema:</dt>
-            <dd>{config.enforce_graylog_schema === true ? 'Yes' : 'No'}</dd>
-            <dt>Database vendor type:</dt>
+            <dt>{t('geoip_resolver.enforce_schema_summary')}</dt>
+            <dd>{config.enforce_graylog_schema === true ? t('status_icon.yes') : t('status_icon.no')}</dd>
+            <dt>{t('geoip_resolver.vendor_type_summary')}</dt>
             <dd>{activeVendorType(config.db_vendor_type)}</dd>
-            <dt>City database path:</dt>
+            <dt>{t('geoip_resolver.city_db_path_summary')}</dt>
             <dd>{config.city_db_path}</dd>
-            <dt>ASN database path:</dt>
+            <dt>{t('geoip_resolver.asn_db_path_summary')}</dt>
             <dd>{config.asn_db_path === '' ? '-' : config.asn_db_path}</dd>
-            <dt>Database refresh interval:</dt>
+            <dt>{t('geoip_resolver.refresh_interval_summary')}</dt>
             <dd>
               {config.refresh_interval} {config.refresh_interval_unit}
             </dd>
-            <dt>Pull files from cloud storage bucket:</dt>
+            <dt>{t('geoip_resolver.pull_from_cloud_summary')}</dt>
             <dd>
               {config.pull_from_cloud
                 ? cloudStorageOptions.find((option) => option.value === config.pull_from_cloud)?.label
-                : 'No'}
+                : t('status_icon.no')}
             </dd>
           </>
         )}
@@ -139,7 +146,7 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
           onClick={() => {
             setShowModal(true);
           }}>
-          Edit configuration
+          {t('geoip_resolver.edit')}
         </Button>
       </IfPermitted>
       <Modal show={showModal} onHide={resetConfig}>
@@ -152,26 +159,31 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
               <Modal.Body>
                 <Row>
                   <Col sm={6}>
-                    <FormikInput id="enabled" type="checkbox" label="Enable Geo-Location processor" name="enabled" />
+                    <FormikInput
+                      id="enabled"
+                      type="checkbox"
+                      label={t('geoip_resolver.enable_processor')}
+                      name="enabled"
+                    />
                   </Col>
                   <Col sm={6}>
                     <FormikInput
                       id="enforce_graylog_schema"
                       type="checkbox"
                       disabled={!values.enabled}
-                      label="Enforce default schema"
+                      label={t('geoip_resolver.enforce_schema')}
                       name="enforce_graylog_schema"
                     />
                   </Col>
                 </Row>
                 <Field id="db_vendor_type_select" name="db_vendor_type_field">
                   {() => (
-                    <Input id="db_vendor_type_input" label="Select the GeoIP database vendor">
+                    <Input id="db_vendor_type_input" label={t('geoip_resolver.vendor_select')}>
                       <Select
                         id="db_vendor_type"
                         name="db_vendor_type"
                         clearable={false}
-                        placeholder="Select the GeoIP database vendor"
+                        placeholder={t('geoip_resolver.vendor_select')}
                         required
                         disabled={!values.enabled}
                         options={availableVendorTypes()}
@@ -187,7 +199,7 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
                   id="city_db_path"
                   type="text"
                   disabled={!values.enabled}
-                  label="Path to the city database"
+                  label={t('geoip_resolver.city_db_path')}
                   name="city_db_path"
                   required
                 />
@@ -195,16 +207,16 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
                   id="asn_db_path"
                   type="text"
                   disabled={!values.enabled}
-                  label="Path to the ASN database"
+                  label={t('geoip_resolver.asn_db_path')}
                   name="asn_db_path"
                 />
                 <TimeUnitInput
-                  label="Database refresh interval"
+                  label={t('geoip_resolver.refresh_interval')}
                   update={(value, unit) => {
                     setFieldValue('refresh_interval', value);
                     setFieldValue('refresh_interval_unit', unit);
                   }}
-                  help="Interval at which the database files are checked for modifications and refreshed changes are detected on disk."
+                  help={t('geoip_resolver.refresh_interval_help')}
                   value={values.refresh_interval}
                   unit={values.refresh_interval_unit || 'MINUTES'}
                   defaultEnabled={values.enabled}
@@ -219,13 +231,13 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
                       id="pull_from_cloud_input"
                       label={
                         <>
-                          Pull files from cloud storage bucket <InputOptionalInfo />
+                          {t('geoip_resolver.pull_from_cloud')} <InputOptionalInfo />
                         </>
                       }>
                       <Select
                         id="pull_from_cloud"
                         name="pull_from_cloud"
-                        placeholder="Select cloud storage"
+                        placeholder={t('geoip_resolver.select_cloud_storage')}
                         disabled={!values.enabled}
                         options={cloudStorageOptions}
                         value={values.pull_from_cloud}
@@ -251,8 +263,8 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
                   onCancel={resetConfig}
                   isSubmitting={isSubmitting}
                   isAsyncSubmit
-                  submitButtonText="Update configuration"
-                  submitLoadingText="Updating configuration..."
+                  submitButtonText={t('geoip_resolver.update_configuration')}
+                  submitLoadingText={t('geoip_resolver.updating_configuration')}
                 />
               </Modal.Footer>
             </Form>

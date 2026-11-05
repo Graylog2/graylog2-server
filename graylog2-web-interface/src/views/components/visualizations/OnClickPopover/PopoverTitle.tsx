@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { IconButton } from 'components/common';
@@ -44,11 +45,17 @@ const StyledLabel = styled.span(
 
 type Props = React.PropsWithChildren<{ onBackClick?: (() => void) | false }>;
 
-const PopoverTitle = ({ children = null, onBackClick = false }: Props) => (
-  <Title>
-    {onBackClick && <StyledIconButton size="xs" name="arrow_back" title="Back" onClick={onBackClick} />}
-    <StyledLabel>{children}</StyledLabel>
-  </Title>
-);
+const PopoverTitle = ({ children = null, onBackClick = false }: Props) => {
+  const { t } = useTranslation('aggregation');
+
+  return (
+    <Title>
+      {onBackClick && (
+        <StyledIconButton size="xs" name="arrow_back" title={t('vis_popover.back')} onClick={onBackClick} />
+      )}
+      <StyledLabel>{children}</StyledLabel>
+    </Title>
+  );
+};
 
 export default PopoverTitle;

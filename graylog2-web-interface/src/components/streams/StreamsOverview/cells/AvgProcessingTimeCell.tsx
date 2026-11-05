@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { Stream } from 'logic/streams/types';
 import { Spinner } from 'components/common';
@@ -26,6 +27,7 @@ type Props = {
 };
 
 const AvgProcessingTimeCell = ({ stream }: Props) => {
+  const { t } = useTranslation('streams');
   const { metrics, isInitialLoading, isError } = useStreamMetricsFor(stream.id);
 
   if (isInitialLoading && !metrics) {
@@ -39,7 +41,7 @@ const AvgProcessingTimeCell = ({ stream }: Props) => {
   return (
     <ProcessingTimeBadge
       ms={metrics.avg_processing_time_ms}
-      title={`Average processing time: ${metrics.avg_processing_time_ms.toFixed(2)} ms (last 15 minutes)`}
+      title={t('streams_overview.cells.avg_processing_time', { ms: metrics.avg_processing_time_ms.toFixed(2) })}
     />
   );
 };

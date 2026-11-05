@@ -20,6 +20,7 @@ import { StreamDestinationsFiltersBuilder } from '@graylog/server-api';
 
 import type { BlockDict, RuleBuilderRule } from 'components/rules/rule-builder/types';
 import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 
 type ConditionsResponse = { conditions: Array<BlockDict> };
@@ -52,8 +53,8 @@ const useStreamOutputRuleBuilder = () => {
     queryFn: () =>
       defaultOnError(
         fetchRuleConditions(),
-        'Loading Stream Output Filter Rule Builder Conditions list failed with status',
-        'Could not load Stream Output Filter Rule Builder Conditions list.',
+        i18n.t('stream_hooks.load_rule_builder_failed', { ns: 'streams' }),
+        i18n.t('stream_hooks.load_rule_builder_failed_title', { ns: 'streams' }),
       ),
 
     placeholderData: keepPreviousData,

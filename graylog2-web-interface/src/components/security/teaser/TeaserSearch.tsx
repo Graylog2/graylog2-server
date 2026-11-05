@@ -15,9 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import 'wicg-inert';
 
+import useProductName from 'brand-customization/useProductName';
 import Hotspot from 'components/security/teaser/Hotspot';
 import NoSidebarSearchLayout from 'views/components/NoSidebarSearchLayout';
 import type { SearchJobResult } from 'views/logic/SearchResult';
@@ -27,8 +29,16 @@ import StaticSearch from 'views/components/StaticSearch';
 type HotspotMeta = {
   positionX: string;
   positionY: string;
-  description: string;
-};
+} & (
+  | {
+      /** Translation key (namespace users) of the hotspot text */
+      descriptionKey: string;
+    }
+  | {
+      /** Already translated hotspot text */
+      description: string;
+    }
+);
 
 const ReadOnlyContainer = styled.div`
   height: 100%;
@@ -51,20 +61,25 @@ type Props = {
   hotspots: Array<HotspotMeta>;
 };
 
-const TeaserSearch = ({ searchJson, viewJson, searchJobResult, hotspots }: Props) => (
-  <NoSidebarSearchLayout>
-    <DashboardOverlay>
-      {hotspots.map(({ description, positionX, positionY }, index) => (
-        // eslint-disable-next-line react/no-array-index-key
-        <Hotspot positionX={positionX} positionY={positionY} index={index} key={`hotspot-${index}`}>
-          {description}
-        </Hotspot>
-      ))}
-    </DashboardOverlay>
-    <ReadOnlyContainer inert="">
-      <StaticSearch searchJson={searchJson} viewJson={viewJson} searchJobResult={searchJobResult} />
-    </ReadOnlyContainer>
-  </NoSidebarSearchLayout>
-);
+const TeaserSearch = ({ searchJson, viewJson, searchJobResult, hotspots }: Props) => {
+  const { t } = useTranslation('users');
+  const productName = useProductName();
+
+  return (
+    <NoSidebarSearchLayout>
+      <DashboardOverlay>
+        {hotspots.map((hotspot, index) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <Hotspot positionX={hotspot.positionX} positionY={hotspot.positionY} index={index} key={`hotspot-${index}`}>
+            {'descriptionKey' in hotspot ? t(hotspot.descriptionKey, { productName }) : hotspot.description}
+          </Hotspot>
+        ))}
+      </DashboardOverlay>
+      <ReadOnlyContainer inert="">
+        <StaticSearch searchJson={searchJson} viewJson={viewJson} searchJobResult={searchJobResult} />
+      </ReadOnlyContainer>
+    </NoSidebarSearchLayout>
+  );
+};
 
 export default TeaserSearch;

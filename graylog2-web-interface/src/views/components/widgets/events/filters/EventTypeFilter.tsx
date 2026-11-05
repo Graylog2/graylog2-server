@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ListGroup, ListGroupItem } from 'components/bootstrap';
 
@@ -24,16 +25,17 @@ type Props = {
 };
 
 const EventTypeFilter = ({ onSelect, selectedValues }: Props) => {
+  const { t } = useTranslation('widgets');
   const disabledAlertOption = selectedValues.includes('true');
   const disabledEventOption = selectedValues.includes('false');
 
   return (
     <ListGroup className="no-bm">
       <ListGroupItem onClick={() => !disabledAlertOption && onSelect('true')} disabled={disabledAlertOption}>
-        Alert
+        {t('events_widget.alert')}
       </ListGroupItem>
       <ListGroupItem onClick={() => !disabledEventOption && onSelect('false')} disabled={disabledEventOption}>
-        Event
+        {t('events_widget.event')}
       </ListGroupItem>
     </ListGroup>
   );

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import QueryHelper from 'components/common/QueryHelper';
 import type { Stream } from 'logic/streams/types';
@@ -46,6 +47,7 @@ type Props = {
 };
 
 const StreamsOverview = ({ indexSets }: Props) => {
+  const { t } = useTranslation('streams');
   const { isPipelineColumnPermitted } = usePipelineColumn();
   const {
     columnRenderers: extensionColumnRenderers,
@@ -98,7 +100,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
   return (
     <StreamMetricsProvider streamIds={visibleStreamIds} fields={requestedFields}>
       <PaginatedEntityTable<Stream>
-        humanName="streams"
+        humanName={t('streams_overview.human_name')}
         additionalAttributes={additionalAttributes}
         queryHelpComponent={<QueryHelper entityName="stream" />}
         entityActions={entityActions}

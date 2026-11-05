@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Alert } from 'components/bootstrap';
 
@@ -42,14 +43,18 @@ type Props = {
   message?: string;
 };
 
-const ConnectionErrors = ({ errors, message = 'There was an error' }: Props) => (
-  <NotificationContainer bsStyle="danger" title={message}>
-    <ErrorsList>
-      {errors.map((error) => (
-        <li key={String(error)}>{String(error)}</li>
-      ))}
-    </ErrorsList>
-  </NotificationContainer>
-);
+const ConnectionErrors = ({ errors, message = undefined }: Props) => {
+  const { t } = useTranslation('authentication');
+
+  return (
+    <NotificationContainer bsStyle="danger" title={message ?? t('connection_test.default_error')}>
+      <ErrorsList>
+        {errors.map((error) => (
+          <li key={String(error)}>{String(error)}</li>
+        ))}
+      </ErrorsList>
+    </NotificationContainer>
+  );
+};
 
 export default ConnectionErrors;

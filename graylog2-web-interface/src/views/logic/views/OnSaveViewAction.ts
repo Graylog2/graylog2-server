@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import i18n from 'i18n';
 import UserNotification from 'util/UserNotification';
 import type View from 'views/logic/views/View';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
@@ -32,8 +33,14 @@ export default (view: View, entityShare?: EntitySharePayload) => async (dispatch
     await updateView(view, entityShare);
     dispatch(setIsNew(false));
     dispatch(setIsDirty(false));
-    UserNotification.success(`Saving view "${view.title}" was successful!`, 'Success!');
+    UserNotification.success(
+      i18n.t('actions_menu.save_success', { ns: 'search', title: view.title }),
+      i18n.t('save_view_notifications.success_title', { ns: 'search' }),
+    );
   } catch (error) {
-    UserNotification.error(`Saving view failed: ${_extractErrorMessage(error)}`, 'Error!');
+    UserNotification.error(
+      i18n.t('actions_menu.save_error', { ns: 'search', error: _extractErrorMessage(error) }),
+      i18n.t('save_view_notifications.error_title', { ns: 'search' }),
+    );
   }
 };

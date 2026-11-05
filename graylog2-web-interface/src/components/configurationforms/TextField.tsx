@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button, Input } from 'components/bootstrap';
 import { hasAttribute, optionableLabel } from 'components/configurationforms/FieldHelpers';
@@ -33,6 +34,7 @@ type Props = {
 };
 
 const TextField = ({ field, title, typeName, dirty = false, onChange, value = '', autoFocus = false }: Props) => {
+  const { t } = useTranslation('common');
   const isRequired = !field.is_optional;
   const showReadOnlyEncrypted = field.is_encrypted && !dirty && typeof value !== 'string' && value.is_set;
   const fieldType =
@@ -79,7 +81,7 @@ const TextField = ({ field, title, typeName, dirty = false, onChange, value = ''
     if (isResetted) {
       return (
         <Button type="button" onClick={handleUndoReset}>
-          Undo Reset
+          {t('configuration_forms.undo_reset')}
         </Button>
       );
     }
@@ -90,7 +92,7 @@ const TextField = ({ field, title, typeName, dirty = false, onChange, value = ''
 
     return (
       <Button type="button" onClick={handleReset}>
-        Reset
+        {t('actions.reset')}
       </Button>
     );
   };

@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { visT } from 'views/components/visualizations/visualizationTranslation';
 import type { VisualizationType } from 'views/types';
 import NetworkGraphVisualization from 'views/components/visualizations/network/NetworkGraphVisualization';
 import NetworkVisualizationConfig, {
@@ -32,7 +33,7 @@ const countGroupingFields = (formValues: WidgetConfigFormValues) =>
 
 const validate = (formValues: WidgetConfigFormValues) => {
   if (countGroupingFields(formValues) < 2) {
-    return { type: 'Network graph requires at least two grouping fields.' };
+    return { type: visT('vis_validation.network_requires_groupings') };
   }
 
   return {};
@@ -44,7 +45,9 @@ const networkGraph: VisualizationType<
   NetworkVisualizationConfigFormValues
 > = {
   type: NetworkGraphVisualization.type,
-  displayName: 'Network Graph',
+  get displayName() {
+    return visT('vis_types.network_graph');
+  },
   component: NetworkGraphVisualization,
   config: {
     fromConfig: (config: NetworkVisualizationConfig = NetworkVisualizationConfig.empty()) => ({
@@ -57,7 +60,9 @@ const networkGraph: VisualizationType<
     fields: [
       {
         name: 'colorScale',
-        title: 'Color Scale',
+        get title() {
+          return visT('vis_common.color_scale');
+        },
         required: true,
         type: 'select',
         options: [...COLORSCALES].sort(defaultCompare),
@@ -65,7 +70,9 @@ const networkGraph: VisualizationType<
       {
         name: 'reverseScale',
         type: 'boolean',
-        title: 'Reverse Scale',
+        get title() {
+          return visT('vis_common.reverse_scale');
+        },
       },
     ],
   },

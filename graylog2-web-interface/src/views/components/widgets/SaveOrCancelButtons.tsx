@@ -15,19 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useContext, useState } from 'react';
 
 import WidgetEditApplyAllChangesContext from 'views/components/contexts/WidgetEditApplyAllChangesContext';
 import { ModalSubmit } from 'components/common';
 import DisableSubmissionStateContext from 'views/components/contexts/DisableSubmissionStateContext';
 
-export const UPDATE_WIDGET_BTN_TEXT = 'Update widget';
-
 type Props = {
   onCancel: () => void;
 };
 
 const SaveOrCancelButtons = ({ onCancel }: Props) => {
+  const { t } = useTranslation('widgets');
   const { applyAllWidgetChanges } = useContext(WidgetEditApplyAllChangesContext);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { disabled: disabledSubmit } = useContext(DisableSubmissionStateContext);
@@ -47,8 +47,8 @@ const SaveOrCancelButtons = ({ onCancel }: Props) => {
   return (
     <ModalSubmit
       isAsyncSubmit
-      submitButtonText={UPDATE_WIDGET_BTN_TEXT}
-      submitLoadingText="Updating widget..."
+      submitButtonText={t('widget_edit.update')}
+      submitLoadingText={t('widget_edit.updating')}
       onSubmit={_onSubmit}
       submitButtonType="button"
       disabledSubmit={disabledSubmit}

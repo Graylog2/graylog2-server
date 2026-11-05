@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { getValueFromInput } from 'util/FormsUtils';
 import { Input } from 'components/bootstrap';
@@ -32,6 +33,7 @@ const SizeBasedRotationStrategyConfiguration = ({
   updateConfig,
   disabled = false,
 }: SizeBasedRotationStrategyConfigurationProps) => {
+  const { t } = useTranslation('indexsets');
   const { max_size } = config;
   const [maxSize, setMaxSize] = useState(max_size);
 
@@ -52,10 +54,10 @@ const SizeBasedRotationStrategyConfiguration = ({
         disabled={disabled}
         type="number"
         id="max-size"
-        label="Max size per index (in bytes)"
+        label={t('strategies.rotation_max_size_label')}
         onChange={_onInputUpdate('max_size')}
         value={maxSize}
-        help="Maximum size of an index before it gets rotated"
+        help={t('strategies.rotation_max_size_help')}
         addonAfter={_formatSize()}
         required
       />

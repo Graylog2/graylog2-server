@@ -22,7 +22,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
@@ -33,11 +32,14 @@ import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.TooManyAliasesException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.rest.models.system.indexer.responses.IndexerOverview;
 import org.graylog2.rest.resources.system.DeflectorResource;
 import org.graylog2.rest.resources.system.IndexRangesResource;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
+
+import java.util.Map;
 
 @RequiresAuthentication
 @PublicCloudAPI
@@ -78,7 +80,7 @@ public class IndexerOverviewResource extends RestResource {
             IndexSet indexSet = indexSetRegistry.getDefault();
             return indexerOverviewService.getIndexerOverview(indexSet, deflectorResource.deflector(indexSet.getConfig().id()), indexRangesResource.list().ranges());
         } catch (IllegalStateException e) {
-            throw new NotFoundException("Default index set not found");
+            throw new CodedNotFoundException("indexer_overview.default_index_set_not_found", "Default index set not found");
         }
     }
 

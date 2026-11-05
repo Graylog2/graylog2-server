@@ -22,6 +22,7 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import { defaultOnError } from 'util/conditional/onError';
+import i18n from 'i18n';
 
 export type Output = {
   id: string;
@@ -58,7 +59,12 @@ const useOutputs = (
 } => {
   const { data, refetch, isInitialLoading } = useQuery({
     queryKey: keyFn(),
-    queryFn: () => defaultOnError(fetchOutputs(), 'Loading outputs failed with status', 'Could not load outputs'),
+    queryFn: () =>
+      defaultOnError(
+        fetchOutputs(),
+        i18n.t('use_outputs_notifications.load_failed', { ns: 'streams' }),
+        i18n.t('use_outputs_notifications.load_failed_title', { ns: 'streams' }),
+      ),
     placeholderData: keepPreviousData,
     enabled,
   });

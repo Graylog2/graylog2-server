@@ -67,6 +67,8 @@ import org.graylog.plugins.sidecar.template.RenderTemplateException;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.plugin.rest.CodedBadRequestException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.rest.models.SortOrder;
@@ -80,6 +82,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -155,7 +158,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
                                            @PathParam("id") String id) {
         final Configuration configuration = this.configurationService.find(id);
         if (configuration == null) {
-            throw new NotFoundException("Could not find Configuration <" + id + ">.");
+            throw new CodedNotFoundException("sidecar.configuration_not_found", "Could not find Configuration <" + id + ">.", Map.of("id", id));
         }
         return configuration;
     }
@@ -169,7 +172,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
                                                                   @PathParam("id") String id) {
         final Configuration configuration = this.configurationService.find(id);
         if (configuration == null) {
-            throw new NotFoundException("Could not find Configuration <" + id + ">.");
+            throw new CodedNotFoundException("sidecar.configuration_not_found", "Could not find Configuration <" + id + ">.", Map.of("id", id));
         }
         final List<String> sidecarsWithConfiguration = sidecarService.all().stream()
                 .filter(sidecar -> isConfigurationAssignedToSidecar(configuration.id(), sidecar))
@@ -217,11 +220,11 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
         if (!etagCached) {
             Sidecar sidecar = sidecarService.findByNodeId(sidecarId);
             if (sidecar == null) {
-                throw new NotFoundException("Couldn't find Sidecar by ID: " + sidecarId);
+                throw new CodedNotFoundException("sidecar.not_found_by_id", "Couldn't find Sidecar by ID: " + sidecarId, Map.of("sidecarId", sidecarId));
             }
             Configuration configuration = configurationService.find(configurationId);
             if (configuration == null) {
-                throw new NotFoundException("Couldn't find configuration by ID: " + configurationId);
+                throw new CodedNotFoundException("sidecar.configuration_not_found_by_id", "Couldn't find configuration by ID: " + configurationId, Map.of("configurationId", configurationId));
             }
 
             Configuration collectorConfiguration = this.configurationService.renderConfigurationForCollector(sidecar, configuration);
@@ -312,13 +315,13 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
                                         @Valid @NotNull Configuration request) {
         final Configuration previousConfiguration = configurationService.find(id);
         if (previousConfiguration == null) {
-            throw new NotFoundException("Could not find Configuration <" + id + ">.");
+            throw new CodedNotFoundException("sidecar.configuration_not_found", "Could not find Configuration <" + id + ">.", Map.of("id", id));
         }
 
         // Only allow changing the associated collector ID if the configuration is not in use
         if (!previousConfiguration.collectorId().equals(request.collectorId())) {
             if (isConfigurationInUse(id)) {
-                throw new BadRequestException("Configuration still in use, cannot change collector type.");
+                throw new CodedBadRequestException("sidecar.configuration_in_use_type", "Configuration still in use, cannot change collector type.");
             }
         }
 
@@ -350,7 +353,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     public Response deleteConfiguration(@Parameter(name = "id", required = true)
                                         @PathParam("id") String id) {
         if (isConfigurationInUse(id)) {
-            throw new BadRequestException("Configuration still in use, cannot delete.");
+            throw new CodedBadRequestException("sidecar.configuration_in_use_delete", "Configuration still in use, cannot delete.");
         }
 
         int deleted = configurationService.delete(id);
@@ -371,26 +374,26 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
             configuration = configurationOptional.get();
             if (!configuration.id().equals(toValidate.id())) {
                 // a configuration exists with a different id, so the name is already in use, fail validation
-                validation.addError("name", "Configuration \"" + toValidate.name() + "\" already exists");
+                validation.addError("name", "sidecar_configuration.name_exists", "Configuration \"" + toValidate.name() + "\" already exists", Map.of("name", toValidate.name()));
             }
         }
 
         if (toValidate.name().isEmpty()) {
-            validation.addError("name", "Configuration name cannot be empty.");
+            validation.addError("name", "sidecar_configuration.name_empty", "Configuration name cannot be empty.", Map.of());
         } else if (!VALID_NAME_PATTERN.matcher(toValidate.name()).matches()) {
-            validation.addError("name", "Configuration name can not include the following characters: ; * ? \" < > | &");
+            validation.addError("name", "sidecar_configuration.name_invalid_chars", "Configuration name can not include the following characters: ; * ? \" < > | &", Map.of());
         }
 
         if (toValidate.collectorId().isEmpty()) {
-            validation.addError("collector_id", "Associated collector ID cannot be empty.");
+            validation.addError("collector_id", "sidecar_configuration.collector_empty", "Associated collector ID cannot be empty.", Map.of());
         }
 
         if (toValidate.color().isEmpty()) {
-            validation.addError("color", "Collector color cannot be empty.");
+            validation.addError("color", "sidecar_configuration.color_empty", "Collector color cannot be empty.", Map.of());
         }
 
         if (toValidate.template().isEmpty()) {
-            validation.addError("template", "Collector template cannot be empty.");
+            validation.addError("template", "sidecar_configuration.template_empty", "Collector template cannot be empty.", Map.of());
         }
 
         try {

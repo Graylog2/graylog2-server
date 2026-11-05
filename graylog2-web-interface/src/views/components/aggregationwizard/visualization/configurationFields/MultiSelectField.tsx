@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useEffect, useMemo } from 'react';
 import isFunction from 'lodash/isFunction';
 
@@ -49,6 +50,7 @@ const createEvent = (name: string, value: any) =>
   }) as React.ChangeEvent<any>;
 
 const MultiSelectField = ({ name, field, title, error, value, onChange, values, inputHelp }: FieldComponentProps) => {
+  const { t } = useTranslation('aggregation');
   if (field.type !== 'multi-select') {
     throw new Error('Invalid field type passed!');
   }
@@ -87,7 +89,7 @@ const MultiSelectField = ({ name, field, title, error, value, onChange, values, 
         value={selectedValue}
         multi
         onChange={onSelect}
-        aria-label={`Select ${field.title}`}
+        aria-label={t('wizard_visualization.select_field', { field: field.title })}
         displayKey="key"
         inputId="multi-select-visualization"
       />

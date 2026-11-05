@@ -1,0 +1,518 @@
+{
+  "shared": {
+    "leader": "Leader",
+    "not_available": "N/A"
+  },
+  "cluster_configuration_nodes": {
+    "loading_search_backend": "Loading search backend nodes...",
+    "search_backend_unknown": "Could not determine the configured search backend.",
+    "search_placeholder": "Search nodes…",
+    "all_nodes": "All Nodes",
+    "data_nodes": "Data Nodes",
+    "opensearch_nodes": "OpenSearch Nodes",
+    "mongodb_nodes": "MongoDB Nodes"
+  },
+  "cluster_column_titles": {
+    "cpu": "CPU",
+    "memory": "Memory",
+    "jvm": "JVM",
+    "indexing": "Indexing",
+    "storage": "Storage",
+    "buffers": "Buffers",
+    "journal": "Journal",
+    "data_lake_journal": "Data Lake Journal",
+    "throughput": "Throughput"
+  },
+  "data_nodes_expandable": {
+    "title": "Data Nodes"
+  },
+  "indexing_metrics_cell": {
+    "docs": "Docs",
+    "latency": "Latency"
+  },
+  "node_actions": {
+    "thread_dump": "Get thread dump",
+    "process_buffer_dump": "Get process-buffer dump",
+    "metrics": "Metrics"
+  },
+  "graylog_node_actions": {
+    "pause_message_processing": "Pause message processing",
+    "resume_message_processing": "Resume message processing",
+    "override_load_balancer_dead": "Override load balancer status to DEAD",
+    "override_load_balancer_alive": "Override load balancer status to ALIVE",
+    "local_message_inputs": "Local message inputs",
+    "recent_system_logs": "Get recent system log messages",
+    "message_processing_title": "Message Processing",
+    "pause_confirm": "You are about to <b>pause</b> message processing in <b>{{nodeName}}</b> node. Are you sure?",
+    "resume_confirm": "You are about to <b>resume</b> message processing in <b>{{nodeName}}</b> node. Are you sure?",
+    "load_balancer_title": "Load Balancer",
+    "load_balancer_confirm": "You are about to change the load balancer status for <b>{{nodeName}}</b> node to <b>{{status}}</b>. Are you sure?"
+  },
+  "graylog_nodes_expandable": {
+    "title": "{{productName}} Nodes"
+  },
+  "load_balancer_status_cell": {
+    "aria_label": "Load balancer {{status}}",
+    "status_alive": "ALIVE",
+    "status_dead": "DEAD",
+    "status_throttled": "THROTTLED"
+  },
+  "processing_state_cell": {
+    "aria_label": "Message processing {{status}}",
+    "enabled": "ENABLED",
+    "disabled": "DISABLED"
+  },
+  "mongodb_nodes_expandable": {
+    "title": "MongoDB Nodes"
+  },
+  "mongodb_profiling_action": {
+    "description": "MongoDB profiling helps identify slow queries and troubleshoot performance issues across cluster nodes.",
+    "enabling_profiling": "Enabling profiling...",
+    "enable_confirm": "Enable <b>Slow Ops</b> profiling ({{threshold}}) on all MongoDB nodes? It applies immediately without restart, but resets after restart unless configured at startup.",
+    "enable_profiling": "Enable Profiling",
+    "disable_profiling": "Disable Profiling",
+    "enabling": "Enabling...",
+    "disabling": "Disabling...",
+    "loading_status": "Loading status...",
+    "loading_status_title": "Loading MongoDB profiling status",
+    "enable_title": "Set profiling to Slow Ops on all MongoDB nodes",
+    "disable_title": "Disable profiling on all MongoDB nodes",
+    "status_loading": "Loading current profiling status across MongoDB nodes...",
+    "status_off": "Profiling is off for all MongoDB nodes ({{summary}}). Enable it to collect slow-query diagnostics.",
+    "status_mixed": "Profiling differs across MongoDB nodes ({{summary}}). Enable profiling to make diagnostics consistent.",
+    "status_enabled": "Profiling is on for all MongoDB nodes ({{summary}}). Disable it after troubleshooting to reduce MongoDB overhead.",
+    "status_unavailable_with_summary": "Profiling state is unavailable ({{summary}}). You can still update it if needed.",
+    "status_unavailable": "Profiling state is unavailable. You can still update it if needed.",
+    "threshold_level": "level 1",
+    "threshold_level_with_ms": "level 1, {{slowMs}}ms threshold",
+    "distribution": "OFF {{off}}, SLOW_OPS {{slowOps}}, ALL {{all}}",
+    "nodes_profiled_one": "{{enabledCount}}/{{count}} node profiled",
+    "nodes_profiled_other": "{{enabledCount}}/{{count}} nodes profiled"
+  },
+  "opensearch_nodes_expandable": {
+    "title": "OpenSearch Nodes"
+  },
+  "cluster_nodes_section_wrapper": {
+    "show_title": "Show {{title}}"
+  },
+  "cpu_metrics_cell": {
+    "load_1m": "Load (1m)"
+  },
+  "graylog_cluster_overview": {
+    "cluster": "Cluster",
+    "cluster_id": "Cluster ID:",
+    "not_available": "Not available",
+    "number_of_nodes": "Number of nodes:"
+  },
+  "cluster_support_bundle_info": {
+    "description": "Create a zip file which contains useful debugging information from your Graylog cluster.",
+    "enterprise_customers": "Graylog Enterprise customers can attach bundles to their support ticket, which will help the Graylog technical support team with analyzing and diagnosing issues.",
+    "examine_content": "Please examine the bundle content before sharing it. It might contain sensitive data like IP addresses, hostnames or even passwords!",
+    "paid_license_only": "Only paid license users are entitled to use Graylog enterprise support. You may however use this file for other means of debugging."
+  },
+  "cluster_support_bundle_overview": {
+    "title": "Cluster Support Bundle",
+    "create": "Create Support Bundle",
+    "download": "Download",
+    "delete": "Delete",
+    "filename": "Filename",
+    "size": "Size",
+    "no_bundles": "No Support Bundles have been found.",
+    "delete_title": "Delete Support Bundle",
+    "delete_confirm": "Are you sure you want to delete <strong>{{name}}</strong>?"
+  },
+  "log_level_metrics": {
+    "level": "Level: {{level}}",
+    "total_written": "Total written:",
+    "mean_rate": "Mean rate:",
+    "one_minute_rate": "1 min rate:",
+    "per_second": "/ second"
+  },
+  "logging_subsystem": {
+    "subsystem": "Subsystem: {{name}}"
+  },
+  "node_loggers": {
+    "show_log_level_metrics": "Show log level metrics",
+    "hide_log_level_metrics": "Hide log level metrics",
+    "total_log_messages": "Has written a total of <strong>{{throughput}} internal log messages.</strong>"
+  },
+  "metric_details": {
+    "value": "Value:",
+    "count": "Count:",
+    "mean": "Mean:",
+    "minimum": "Minimum:",
+    "maximum": "Maximum:",
+    "standard_deviation": "Standard deviation:",
+    "percentile_95": "95th percentile:",
+    "percentile_98": "98th percentile:",
+    "percentile_99": "99th percentile:",
+    "invalid_type": "Invalid metric type: {{type}}",
+    "microseconds": "μs"
+  },
+  "meter_details": {
+    "total": "Total:",
+    "events": "events",
+    "one_minute_avg": "1 minute avg:",
+    "five_minute_avg": "5 minute avg:",
+    "fifteen_minute_avg": "15 minute avg:"
+  },
+  "counter_rate": {
+    "calculating": "Calculating...",
+    "total": "({{total}} total)",
+    "per_second": "per second"
+  },
+  "metric_container": {
+    "loading": "Loading..."
+  },
+  "metrics_component": {
+    "fetch_error": "Could not fetch metrics from node: server returned <em>{{responseMessage}}</em> with a {{status}} status code.",
+    "fetch_problem": "There was a problem fetching node metrics.",
+    "retry_in_background": "Attempts to retrieve them will continue in the background.",
+    "fetch_error_last_metrics": "Could not fetch metrics from node: server returned <em>{{responseMessage}}</em> with a {{status}} status code. Displaying last metrics available.",
+    "filter_placeholder": "Type a metric name to filter…"
+  },
+  "metrics_list": {
+    "no_metrics": "No metrics match the given filter. Please ensure you use a valid regular expression"
+  },
+  "buffer_usage": {
+    "metrics": "Metrics",
+    "utilization": "<strong>{{usage}} messages</strong> in {{title}}, {{percentage}} utilized."
+  },
+  "input_types_data_table": {
+    "loading": "Loading input types...",
+    "unavailable": "Input types are unavailable.",
+    "documentation": "Documentation",
+    "name": "Name",
+    "type": "Type",
+    "filter": "Filter"
+  },
+  "journal_details": {
+    "loading": "Loading journal metrics...",
+    "disabled": "The disk journal is disabled on this node.",
+    "unavailable": "Journal metrics unavailable.",
+    "overcommitted": "<strong>Warning!</strong> The journal utilization is exceeding the maximum size defined. <overviewLink>Click here</overviewLink> for more information.",
+    "configuration": "Configuration",
+    "path": "Path:",
+    "earliest_entry": "Earliest entry:",
+    "maximum_size": "Maximum size:",
+    "maximum_age": "Maximum age:",
+    "flush_policy": "Flush policy:",
+    "flush_policy_value": "Every {{messages}} messages or {{duration}}",
+    "maximum_age_format": "d [days] h [hours] m [minutes]",
+    "flush_duration_format": "h [hours] m [minutes] s [seconds]",
+    "utilization": "Utilization",
+    "unprocessed_messages": "<strong>{{messages}} unprocessed messages</strong> are currently in the journal, in {{segments}} segments.",
+    "appended_and_read": "<strong>{{appended}} messages</strong> have been appended in the last second, <strong>{{read}} messages</strong> have been read in the last second."
+  },
+  "journal_state": {
+    "loading": "Loading journal metrics...",
+    "unavailable": "Journal metrics unavailable.",
+    "summary_one": "The journal contains <strong>{{messages}} unprocessed messages</strong> in {{count}} segment. <strong>{{appended}} messages</strong> appended, <strong>{{read}} messages</strong> read in the last second.",
+    "summary_other": "The journal contains <strong>{{messages}} unprocessed messages</strong> in {{count}} segments. <strong>{{appended}} messages</strong> appended, <strong>{{read}} messages</strong> read in the last second."
+  },
+  "jvm_heap_usage": {
+    "loading": "Loading heap usage information...",
+    "unavailable": "Heap information unavailable.",
+    "usage": "The JVM is using <usedBlob /><strong> {{used}}</strong> of <committedBlob /><strong> {{committed}}</strong> heap space and will not attempt to use more than <maxBlob /><strong> {{max}}</strong>"
+  },
+  "node_list_item": {
+    "system_info_unavailable": "System information is currently unavailable."
+  },
+  "node_maintenance_dropdown": {
+    "actions": "Actions",
+    "configure_internal_logging": "Configure internal logging"
+  },
+  "node_overview": {
+    "plugins_installed_one": "{{count}} plugin installed",
+    "plugins_installed_other": "{{count}} plugins installed",
+    "inputs_running_one": "{{count}} input running on this node",
+    "inputs_running_other": "{{count}} inputs running on this node",
+    "memory_heap_usage": "Memory/Heap usage",
+    "buffers": "Buffers",
+    "buffers_description": "Buffers are built to cache small amounts of messages for a very short time (usually milliseconds) on their way through the different processors.",
+    "input_buffer": "Input buffer",
+    "process_buffer": "Process buffer",
+    "output_buffer": "Output buffer",
+    "disk_journal": "Disk Journal",
+    "disk_journal_description": "Incoming messages are written to the disk journal to ensure they are kept safe in case of a server failure. The journal also helps maintain functionality if any of the outputs is too slow to keep up with the message rate or whenever there is a peak in incoming messages. It makes sure that memory is not overloaded and avoids overly long garbage collection pauses that way.",
+    "system": "System",
+    "rest_api": "REST API",
+    "installed_plugins": "Installed plugins",
+    "manage_inputs": "Manage inputs",
+    "available_input_types": "Available input types"
+  },
+  "nodes_actions": {
+    "details": "Details",
+    "metrics": "Metrics",
+    "more_actions": "More actions",
+    "pause_message_processing": "Pause message processing",
+    "resume_message_processing": "Resume message processing",
+    "pause_confirm": "You are about to pause message processing in this node. Are you sure?",
+    "resume_confirm": "You are about to resume message processing in this node. Are you sure?",
+    "override_lb_status": "Override LB status",
+    "status_alive": "ALIVE",
+    "status_dead": "DEAD",
+    "load_balancer_confirm": "You are about to change the load balancer status for this node to {{status}}. Are you sure?",
+    "local_message_inputs": "Local message inputs",
+    "thread_dump": "Get thread dump",
+    "process_buffer_dump": "Get process-buffer dump",
+    "recent_system_logs": "Get recent system log messages"
+  },
+  "nodes_list": {
+    "active_nodes_one": "There is {{count}} active node",
+    "active_nodes_other": "There are {{count}} active nodes",
+    "no_active_nodes": "There are no active nodes."
+  },
+  "plugins_data_table": {
+    "loading": "Loading plugins on this node...",
+    "no_plugins": "This node has not any installed plugins.",
+    "name": "Name",
+    "version": "Version",
+    "author": "Author",
+    "description": "Description",
+    "website": "Website",
+    "filter": "Filter"
+  },
+  "rest_api_overview": {
+    "transport_address": "Transport address:",
+    "last_seen": "Last seen:"
+  },
+  "system_information": {
+    "pid_info": "PID {{pid}}, {{info}}",
+    "jvm_unavailable": "JMV information for this node is unavailable.",
+    "hostname": "Hostname:",
+    "node_id": "Node ID:",
+    "version": "Version:",
+    "version_codename": "{{version}}, codename <em>{{codename}}</em>",
+    "jvm": "JVM:",
+    "time": "Time:"
+  },
+  "system_overview_details": {
+    "pause_confirm": "You are about to pause message processing in this node. Are you sure?",
+    "resume_confirm": "You are about to resume message processing in this node. Are you sure?",
+    "what_does_this_mean": "What does this mean?",
+    "lifecycle_state": "Lifecycle state: <strong>{{lifecycle}}</strong>",
+    "marked_as_lb_status": "Marked as <strong>{{status}}</strong> for load balancers",
+    "pause_processing": "Pause processing",
+    "resume_processing": "Resume processing",
+    "not_processing": "Node is <strong>not</strong> processing messages"
+  },
+  "system_overview_summary": {
+    "current_lifecycle_state": "Current lifecycle state:",
+    "message_processing": "Message processing:",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "lb_indication": "Load balancer indication:"
+  },
+  "bulk_actions": {
+    "dismiss": "Dismiss"
+  },
+  "system_notifications_table": {
+    "title": "Notifications",
+    "human_name": "notifications"
+  },
+  "actions_cell": {
+    "dismiss": "Dismiss"
+  },
+  "title_cell": {
+    "show_full_message": "Show full message for: {{title}}"
+  },
+  "system_job": {
+    "acknowledge_failed": "Unable to acknowledge the job",
+    "cancel_failed": "Unable to cancel the job",
+    "cancel_confirm": "Are you sure you want to cancel system job \"{{info}}\"?",
+    "on_node": "- on",
+    "runtime": "runtime: {{duration}}",
+    "cancel": "Cancel",
+    "acknowledge": "Acknowledge"
+  },
+  "system_jobs_component": {
+    "title": "System jobs",
+    "description": "A system job is a long-running task a {{productName}} server node executes for maintenance reasons. Some jobs provide progress information or can be stopped."
+  },
+  "system_jobs_list": {
+    "no_active_jobs": "No active system jobs."
+  },
+  "system_messages_component": {
+    "title": "System messages",
+    "description": "System messages are generated by {{productName}} server nodes on certain events that may be interesting for the {{productName}} administrators. You don't need to actively act upon any events in here because notifications will be raised for any events that required action."
+  },
+  "system_messages_list": {
+    "timestamp": "Timestamp",
+    "node": "Node",
+    "message": "Message"
+  },
+  "global_throughput": {
+    "aria_label": "Throughput: In {{input}} / Out {{output}} msg/s",
+    "in_title": "Incoming messages per second",
+    "out_title": "Outgoing messages per second"
+  },
+  "node_throughput": {
+    "loading": "Loading throughput...",
+    "unable_to_load": "Unable to load throughput.",
+    "processing_long": "Processing <strong>{{totalIn}}</strong> incoming and <strong>{{totalOut}}</strong> outgoing msg/s.",
+    "short": "In {{totalIn}} / Out {{totalOut}} msg/s."
+  },
+  "telemetry_debug_entry_row": {
+    "delta": " (+{{delta}}ms)",
+    "pii_suspect": "PII suspect: {{suspect}}",
+    "copy_as_json": "Copy event as JSON"
+  },
+  "telemetry_debug_overlay": {
+    "badge_label": "Telemetry debug",
+    "badge": "Telemetry debug: {{count}}",
+    "drawer_label": "Telemetry debug panel",
+    "resize_label": "Resize telemetry debug panel",
+    "title": "Telemetry Debug ({{count}})",
+    "filter_label": "Filter events",
+    "filter_placeholder": "Filter by event name or payload...",
+    "resume": "Resume",
+    "pause": "Pause",
+    "clear": "Clear",
+    "export_session": "Export session",
+    "collapse": "Collapse",
+    "no_events": "No telemetry events recorded yet — interact with the app to see them here.",
+    "time": "Time",
+    "event": "Event",
+    "action": "Action",
+    "status": "Status"
+  },
+  "cluster_configuration_page": {
+    "title": "Cluster Configuration",
+    "description": "This page provides a real-time overview of the nodes in your cluster. You can pause message processing at any time. The process buffers will not accept any new messages until you resume it. If the message journal is enabled for a node, which it is by default, incoming messages will be persisted to disk, even when processing is disabled."
+  },
+  "configurations_page": {
+    "title": "Configurations",
+    "description": "You can configure system settings for different sub systems on this page.",
+    "plugins": "Plugins"
+  },
+  "enterprise_page": {
+    "document_title": "{{productName}} Enterprise",
+    "page_title": "<upsell>Try</upsell> {{productName}} Enterprise",
+    "learn_more": "<upsell><productLink>Learn More</productLink> about {{productName}} Enterprise features.</upsell>"
+  },
+  "process_buffer_dump_page": {
+    "title": "Process-buffer dump of node {{shortNodeId}} / {{hostname}}",
+    "taken_at": "Taken at <0/>"
+  },
+  "show_metrics_page": {
+    "title": "Metrics of node {{shortNodeId}} / {{hostname}}",
+    "description": "All {{productName}} nodes provide a set of internal metrics for diagnosis, debugging and monitoring. Note that you can access all metrics via JMX, too.",
+    "total_metrics_one": "This node is reporting a total of {{count}} metric.",
+    "total_metrics_other": "This node is reporting a total of {{count}} metrics."
+  },
+  "node_page": {
+    "title": "Node {{shortNodeId}} / {{hostname}}",
+    "description": "This page shows details of a {{productName}} server node that is active and reachable in your cluster.",
+    "leader_node": "This is the leader node.",
+    "not_leader_node": "This is <em>not</em> the leader node."
+  },
+  "system_logs_page": {
+    "title": "The most recent system logs (limited to {{limit}}) of node {{shortNodeId}} / {{hostname}}",
+    "taken_at": "Taken at <0/>",
+    "reload": "Reload",
+    "back": "Back",
+    "document_title": "System Logs of node {{shortNodeId}} / {{hostname}}"
+  },
+  "system_notifications_page": {
+    "title": "System notifications"
+  },
+  "system_overview_page": {
+    "title": "System overview"
+  },
+  "thread_dump_page": {
+    "title": "Thread dump of node {{shortNodeId}} / {{hostname}}",
+    "taken_at": "Taken at <0/>"
+  },
+  "notifications": {
+    "lb_change_success": "Load balancer status successfully changed do '{{status}}' in node '{{nodeId}}'",
+    "lb_change_failed": "Changing load balancer status in '{{nodeId}}' failed: {{error}}",
+    "lb_change_failed_title": "Could not change load balancer status to '{{status}}' in node '{{nodeId}}'",
+    "processing_pause_success": "Message processing paused successfully in '{{nodeId}}'",
+    "processing_pause_failed": "Pausing message processing in '{{nodeId}}' failed: {{error}}",
+    "processing_pause_failed_title": "Could not pause message processing in node '{{nodeId}}'",
+    "processing_resume_success": "Message processing resumed successfully in '{{nodeId}}'",
+    "processing_resume_failed": "Resuming message processing in '{{nodeId}}' failed: {{error}}",
+    "processing_resume_failed_title": "Could not resume message processing in node '{{nodeId}}'",
+    "nothing_selected": "No notifications selected.",
+    "nothing_to_dismiss_title": "Nothing to dismiss",
+    "bulk_dismiss_failed": "Failed to dismiss notifications. Please try again.",
+    "dismiss_failed": "Failed to dismiss notification. Please try again.",
+    "dismiss_failed_title": "Dismiss failed",
+    "profiling_enabled": "MongoDB profiling enabled successfully.",
+    "profiling_disabled": "MongoDB profiling disabled successfully.",
+    "profiling_enable_failed": "Failed to enable MongoDB profiling: {{error}}",
+    "profiling_disable_failed": "Failed to disable MongoDB profiling: {{error}}",
+    "profiling_update_failed_title": "Could not update MongoDB profiling.",
+    "data_node_metrics_failed": "Loading metrics for Data Node \"{{hostname}}\" failed",
+    "data_node_metrics_failed_title": "Could not load Data Node metrics.",
+    "graylog_node_metrics_failed": "Loading Graylog node metrics failed with status",
+    "graylog_node_metrics_failed_title": "Could not load Graylog node metrics.",
+    "cluster_traffic_failed": "Loading cluster traffic failed with status",
+    "cluster_traffic_failed_title": "Could not load cluster traffic",
+    "journal_failed": "Could not get journal information",
+    "system_jobs_failed": "Loading system jobs failed with status",
+    "system_jobs_failed_title": "Could not load system jobs"
+  },
+  "use_cluster_overview_notifications": {
+    "jvm_failed": "Getting JVM information for node '{{nodeId}}' failed: {{error}}",
+    "jvm_failed_title": "Could not get JVM information",
+    "thread_dump_failed": "Getting thread dump for node '{{nodeId}}' failed: {{error}}",
+    "thread_dump_failed_title": "Could not get thread dump",
+    "process_buffer_dump_failed": "Getting process buffer dump for node '{{nodeId}}' failed: {{error}}",
+    "process_buffer_dump_failed_title": "Could not get process buffer dump",
+    "system_logs_failed": "Getting system log messages for node '{{nodeId}}' failed: {{error}}",
+    "system_logs_failed_title": "Could not get system log messages",
+    "overview_failed": "Getting cluster overview failed: {{error}}",
+    "overview_failed_title": "Could not get cluster overview"
+  },
+  "use_cluster_support_bundle_notifications": {
+    "create_failed": "Creating the Support Bundle failed with status: {{error}}",
+    "create_failed_title": "Could not create the Support Bundle.",
+    "delete_failed": "Deleting the Support Bundle failed with status: {{error}}",
+    "delete_failed_title": "Could not delete the Support Bundle.",
+    "download_failed": "Downloading the Support Bundle failed with status: {{error}}",
+    "download_failed_title": "Could not download the Support Bundle.",
+    "load_list_failed": "Loading Support Bundle list failed with status",
+    "load_list_failed_title": "Could not load Support Bundle list."
+  },
+  "use_plugin_list_notifications": {
+    "fetch_failed": "Getting plugins on node \"{{nodeId}}\" failed",
+    "fetch_failed_title": "Could not get plugins"
+  },
+  "node_lifecycle": {
+    "uninitialized": "UNINITIALIZED",
+    "starting": "STARTING",
+    "running": "RUNNING",
+    "failed": "FAILED",
+    "halting": "HALTING",
+    "paused": "PAUSED",
+    "throttled": "THROTTLED",
+    "override_lb_alive": "OVERRIDE_LB_ALIVE",
+    "override_lb_dead": "OVERRIDE_LB_DEAD",
+    "override_lb_throttled": "OVERRIDE_LB_THROTTLED"
+  },
+  "buffers_metrics_cell": {
+    "input": "Input",
+    "process": "Process",
+    "output": "Output"
+  },
+  "throughput_metrics_cell": {
+    "in": "In",
+    "out": "Out"
+  },
+  "mongodb_nodes": {
+    "profiling_levels": {
+      "off": "Off",
+      "slow_ops": "Slow Ops",
+      "all": "All",
+      "unknown": "Unknown ({{level}})"
+    },
+    "roles": {
+      "primary": "PRIMARY",
+      "secondary": "SECONDARY",
+      "arbiter": "ARBITER",
+      "standalone": "STANDALONE"
+    }
+  }
+}

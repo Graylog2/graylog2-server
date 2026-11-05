@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { IfPermitted, PaginatedEntityTable } from 'components/common';
 import type { FetchOptions } from 'components/common/PaginatedEntityTable/useFetchEntities';
@@ -43,6 +44,7 @@ const MongodbNodesExpandable = ({
   pageSizeLimit = undefined,
   refetchInterval = undefined,
 }: Props) => {
+  const { t } = useTranslation('system');
   const [totalMongodbNodes, setTotalMongodbNodes] = useState<number | undefined>(undefined);
   const handleDataLoaded = (data: MongodbNodesResponse) => {
     setTotalMongodbNodes(data.pagination?.total ?? data.list.length);
@@ -62,7 +64,7 @@ const MongodbNodesExpandable = ({
 
   return (
     <ClusterNodesSectionWrapper
-      title="MongoDB Nodes"
+      title={t('mongodb_nodes_expandable.title')}
       titleCount={totalMongodbNodes}
       onTitleCountClick={onSelectNodeType ?? null}
       collapsible={collapsible}>
@@ -74,7 +76,7 @@ const MongodbNodesExpandable = ({
         fetchEntities={fetchMongodbNodes}
         keyFn={clusterMongodbNodesKeyFn}
         columnRenderers={columnRenderers}
-        humanName="MongoDB Nodes"
+        humanName={t('mongodb_nodes_expandable.title')}
         externalSearch={externalSearch}
         fetchOptions={fetchOptions}
         onDataLoaded={handleDataLoaded}

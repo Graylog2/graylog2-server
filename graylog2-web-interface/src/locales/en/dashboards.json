@@ -1,0 +1,45 @@
+{
+  "human_name": "dashboards",
+  "full_screen": {
+    "menu": "Full Screen",
+    "title": "Configuring Full Screen",
+    "start": "Start full screen view",
+    "refresh_interval": "Refresh Interval",
+    "refresh_interval_help": "After how many seconds should the dashboard refresh?",
+    "tabs": "Tabs",
+    "tabs_help": "Select the query tabs to include in rotation.",
+    "cycle_interval": "Tab cycle interval",
+    "cycle_interval_help": "After how many seconds should the next tab be shown?"
+  },
+  "properties": {
+    "title": "Title",
+    "title_help": "The title of the dashboard.",
+    "summary": "Summary",
+    "summary_help": "A helpful summary of the dashboard.",
+    "description": "Description",
+    "description_help": "A longer, helpful description of the dashboard and its functionality."
+  },
+  "overview": {
+    "missing_requirements": "Missing Requirements",
+    "user_defined": "User Defined",
+    "load_failed": "Loading dashboards failed with status",
+    "could_not_load": "Could not load dashboards"
+  },
+  "delete": {
+    "confirm": "Are you sure you want to delete \"{{title}}\"?",
+    "success": "Deleting dashboard \"{{title}}\" was successful!",
+    "success_title": "Success!",
+    "failed": "Deleting dashboard failed: {{error}}",
+    "failed_title": "Error!"
+  },
+  "bulk_delete": {
+    "confirm_one": "Do you really want to remove {{count}} dashboard?",
+    "confirm_other": "Do you really want to remove {{count}} dashboards?",
+    "partial_failure_one": "{{failed}} out of {{count}} selected dashboard could not be deleted.",
+    "partial_failure_other": "{{failed}} out of {{count}} selected dashboards could not be deleted.",
+    "success_one": "{{count}} dashboard was deleted successfully.",
+    "success_other": "{{count}} dashboards were deleted successfully.",
+    "success_title": "Success",
+    "failed": "An error occurred while deleting dashboards. {{error}}"
+  }
+}

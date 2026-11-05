@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { styled } from 'styled-components';
 
 import useIndexProfileWithMappingsByField from 'components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField';
@@ -35,22 +36,23 @@ type Props = {
 };
 
 const IndexSetProfile = ({ indexSet }: Props) => {
+  const { t } = useTranslation('indexsets');
   const { name, id, description } = useIndexProfileWithMappingsByField();
   const [showSetModal, setShowSetModal] = useState(false);
   const toggleModal = () => setShowSetModal((cur) => !cur);
-  const title = id ? description : 'Field type mapping profile not set yet';
+  const title = id ? description : t('field_types.profile_not_set_yet');
 
   return (
     <Container title={title}>
-      <b>Field type mapping profile:</b>
+      <b>{t('field_types.profile_label')}</b>
       {id ? (
         <Link target="_blank" to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(id)}>
           {name}
         </Link>
       ) : (
-        <i>Not set</i>
+        <i>{t('field_types.not_set')}</i>
       )}
-      <IconButton name="edit_square" onClick={toggleModal} title="Set field type profile" />
+      <IconButton name="edit_square" onClick={toggleModal} title={t('field_types.set_profile_title')} />
       {showSetModal && (
         <SetProfileModal
           show={showSetModal}

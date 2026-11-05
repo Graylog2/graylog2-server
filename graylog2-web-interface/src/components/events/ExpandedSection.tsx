@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import { useTranslation } from 'react-i18next';
 
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import useMetaDataContext from 'components/common/EntityDataTable/hooks/useMetaDataContext';
@@ -25,7 +26,11 @@ import type { DefaultLayout } from 'components/common/EntityDataTable/types';
 import usePermissions from 'hooks/usePermissions';
 import TagsDetailRow from 'components/events/TagsDetailRow';
 
-const noDetails = <em>No further details</em>;
+const NoDetails = () => {
+  const { t } = useTranslation('events');
+
+  return <em>{t('alerts_list.no_further_details')}</em>;
+};
 
 type Props = {
   defaultLayout: DefaultLayout;
@@ -46,7 +51,7 @@ const GeneralEventDetails = ({ defaultLayout, event }: Props) => {
   const nonDisplayedAttributes = useNonDisplayedAttributes(defaultLayout);
   const hasTags = !!event.tags?.length;
 
-  if (!nonDisplayedAttributes.length && !hasTags) return noDetails;
+  if (!nonDisplayedAttributes.length && !hasTags) return <NoDetails />;
 
   return (
     <>
@@ -62,7 +67,7 @@ const GeneralEventDetails = ({ defaultLayout, event }: Props) => {
 const ExpandedSection = ({ defaultLayout, event }: Props) => {
   const { isPermitted } = usePermissions();
   if (!isPermitted(`eventdefinitions:read:${event.event_definition_id}`)) {
-    return noDetails;
+    return <NoDetails />;
   }
 
   return <GeneralEventDetails defaultLayout={defaultLayout} event={event} />;

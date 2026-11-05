@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import mockedPermissions from 'logic/permissions/mocked';
@@ -68,36 +69,40 @@ const capabilityOptions = Object.entries(mockedPermissions.availableCapabilities
   value: key,
 }));
 
-const SharedEntitiesFilter = ({ onSearch, onFilter }: Props) => (
-  <>
-    <StyledSearchForm
-      onReset={() => onSearch('')}
-      onSearch={onSearch}
-      queryHelpComponent={<SharedEntitiesQueryHelper />}
-      topMargin={0}
-    />
+const SharedEntitiesFilter = ({ onSearch, onFilter }: Props) => {
+  const { t } = useTranslation('users');
 
-    <Filters>
-      <SelectWrapper>
-        <label htmlFor="entity-type-select">Entity Type</label>
-        <StyledSelect
-          inputId="entity-type-select"
-          onChange={(entityType: string) => onFilter('entity_type', entityType)}
-          options={entityTypeOptions}
-          placeholder="Filter entity types"
-        />
-      </SelectWrapper>
-      <SelectWrapper>
-        <label htmlFor="capability-select">Capability</label>
-        <StyledSelect
-          inputId="capability-select"
-          onChange={(capability: string) => onFilter('capability', capability)}
-          options={capabilityOptions}
-          placeholder="Filter capabilities"
-        />
-      </SelectWrapper>
-    </Filters>
-  </>
-);
+  return (
+    <>
+      <StyledSearchForm
+        onReset={() => onSearch('')}
+        onSearch={onSearch}
+        queryHelpComponent={<SharedEntitiesQueryHelper />}
+        topMargin={0}
+      />
+
+      <Filters>
+        <SelectWrapper>
+          <label htmlFor="entity-type-select">{t('permissions.shared_entities.entity_type')}</label>
+          <StyledSelect
+            inputId="entity-type-select"
+            onChange={(entityType: string) => onFilter('entity_type', entityType)}
+            options={entityTypeOptions}
+            placeholder={t('permissions.shared_entities.filter_entity_types')}
+          />
+        </SelectWrapper>
+        <SelectWrapper>
+          <label htmlFor="capability-select">{t('permissions.shared_entities.capability')}</label>
+          <StyledSelect
+            inputId="capability-select"
+            onChange={(capability: string) => onFilter('capability', capability)}
+            options={capabilityOptions}
+            placeholder={t('permissions.shared_entities.filter_capabilities')}
+          />
+        </SelectWrapper>
+      </Filters>
+    </>
+  );
+};
 
 export default SharedEntitiesFilter;

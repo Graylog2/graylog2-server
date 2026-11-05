@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 import upperFirst from 'lodash/upperFirst';
+import { useTranslation } from 'react-i18next';
 
 import { LinkContainer } from 'components/common';
 import { ButtonToolbar, MenuItem, Button, DeleteMenuItem } from 'components/bootstrap';
@@ -35,12 +36,13 @@ type Props = {
 };
 
 const CollectorRow = ({ collector, onClone, onDelete, validateCollector }: Props) => {
+  const { t } = useTranslation('sidecars');
   const handleDelete = useCallback(() => {
     // eslint-disable-next-line no-alert
-    if (window.confirm(`You are about to delete collector "${collector.name}". Are you sure?`)) {
+    if (window.confirm(t('configurations.collector_row.delete_confirm', { name: collector.name }))) {
       onDelete(collector);
     }
-  }, [collector, onDelete]);
+  }, [collector, onDelete, t]);
 
   return (
     <tr>
@@ -52,7 +54,7 @@ const CollectorRow = ({ collector, onClone, onDelete, validateCollector }: Props
       <td>
         <ButtonToolbar>
           <LinkContainer to={Routes.SYSTEM.SIDECARS.EDIT_COLLECTOR(collector.id)}>
-            <Button bsSize="xsmall">Edit</Button>
+            <Button bsSize="xsmall">{t('configurations.collector_row.edit')}</Button>
           </LinkContainer>
           <MoreActions>
             <CopyCollectorModal collector={collector} validateCollector={validateCollector} copyCollector={onClone} />

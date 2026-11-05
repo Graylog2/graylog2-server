@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { Formik, Form } from 'formik';
 
@@ -65,6 +66,7 @@ const GranteesListItem = ({
   onDelete,
   onCapabilityChange,
 }: Props) => {
+  const { t } = useTranslation('users');
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = () => {
@@ -84,13 +86,17 @@ const GranteesListItem = ({
           <StyledCapabilitySelect
             onChange={(newCapabilityId) => onCapabilityChange({ granteeId: id, capabilityId: newCapabilityId })}
             capabilities={availableCapabilities}
-            title={`Change the capability for ${title}`}
+            title={t('permissions.grantees.change_capability', { title })}
           />
           <Actions>
             {isDeleting ? (
               <Spinner text="" />
             ) : (
-              <IconButton name="delete" onClick={handleDelete} title={`Remove sharing for ${title}`} />
+              <IconButton
+                name="delete"
+                onClick={handleDelete}
+                title={t('permissions.grantees.remove_sharing', { title })}
+              />
             )}
           </Actions>
         </GranteeListItemContainer>

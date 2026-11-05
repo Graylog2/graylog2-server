@@ -1,0 +1,550 @@
+{
+  "add_notification_form": {
+    "add": "Adicionar notificação",
+    "choose": "Escolher notificação",
+    "create_new": "Criar nova notificação...",
+    "help": "Selecione uma Notificação para usar em Alertas deste tipo ou crie uma nova Notificação que poderá ser usada depois em outros Alertas.",
+    "select": "Selecionar notificação",
+    "title": "Adicionar notificação"
+  },
+  "aggregation_form": {
+    "description": "Resuma as mensagens de log que correspondem ao Filtro definido acima usando uma função. Opcionalmente, você pode agrupar os resultados do Filtro por valores de campo idênticos.",
+    "group_by_example": "Supondo que você tenha criado um Filtro com todas as tentativas de login malsucedidas na sua rede, um alerta pode ser disparado quando houver mais de 5 tentativas de login malsucedidas no total. Agora, adicione <code>username</code> como campo de agrupamento e um alerta será disparado <em>para cada <code>username</code></em> com mais de 5 tentativas de login malsucedidas.",
+    "group_by_help": "Selecione campos para agrupar os resultados do filtro quando tiverem valores idênticos. <bold>Exemplo:</bold>",
+    "title": "Agregação"
+  },
+  "bulk_actions": {
+    "delete": {
+      "confirm_one": "Tem certeza de que deseja excluir {{count}} Event Definition?",
+      "confirm_other": "Tem certeza de que deseja excluir {{count}} Event Definitions?",
+      "error": "Ocorreu um erro ao excluir Event Definitions. {{error}}",
+      "failed_one": "{{failed}} de {{count}} Event Definition selecionada não pôde ser excluída.",
+      "failed_other": "{{failed}} de {{count}} Event Definitions selecionadas não puderam ser excluídas.",
+      "success_one": "{{count}} Event Definition foi excluída com sucesso.",
+      "success_other": "{{count}} Event Definitions foram excluídas com sucesso.",
+      "title": "Excluir Event Definitions",
+      "confirm_many": "Tem certeza de que deseja excluir {{count}} Event Definitions?",
+      "failed_many": "{{failed}} de {{count}} Event Definitions selecionadas não puderam ser excluídas.",
+      "success_many": "{{count}} Event Definitions foram excluídas com sucesso."
+    },
+    "disable": {
+      "confirm_one": "Tem certeza de que deseja desativar {{count}} Event Definition?",
+      "confirm_other": "Tem certeza de que deseja desativar {{count}} Event Definitions?",
+      "error": "Ocorreu um erro ao desativar Event Definitions. {{error}}",
+      "failed_one": "{{failed}} de {{count}} Event Definition selecionada não pôde ser desativada.",
+      "failed_other": "{{failed}} de {{count}} Event Definitions selecionadas não puderam ser desativadas.",
+      "success_one": "{{count}} Event Definition foi desativada com sucesso.",
+      "success_other": "{{count}} Event Definitions foram desativadas com sucesso.",
+      "title": "Desativar Event Definitions",
+      "confirm_many": "Tem certeza de que deseja desativar {{count}} Event Definitions?",
+      "failed_many": "{{failed}} de {{count}} Event Definitions selecionadas não puderam ser desativadas.",
+      "success_many": "{{count}} Event Definitions foram desativadas com sucesso."
+    },
+    "disable_action": "Desativar",
+    "enable": {
+      "confirm_one": "Tem certeza de que deseja ativar {{count}} Event Definition?",
+      "confirm_other": "Tem certeza de que deseja ativar {{count}} Event Definitions?",
+      "error": "Ocorreu um erro ao ativar Event Definitions. {{error}}",
+      "failed_one": "{{failed}} de {{count}} Event Definition selecionada não pôde ser ativada.",
+      "failed_other": "{{failed}} de {{count}} Event Definitions selecionadas não puderam ser ativadas.",
+      "success_one": "{{count}} Event Definition foi ativada com sucesso.",
+      "success_other": "{{count}} Event Definitions foram ativadas com sucesso.",
+      "title": "Ativar Event Definitions",
+      "confirm_many": "Tem certeza de que deseja ativar {{count}} Event Definitions?",
+      "failed_many": "{{failed}} de {{count}} Event Definitions selecionadas não puderam ser ativadas.",
+      "success_many": "{{count}} Event Definitions foram ativadas com sucesso."
+    },
+    "enable_action": "Ativar",
+    "success_title": "Sucesso"
+  },
+  "condition_form": {
+    "available_conditions": "Condições disponíveis",
+    "condition_type": "Tipo de condição",
+    "condition_type_help": "Escolha o tipo de condição para este Evento.",
+    "description": "Defina como os Eventos deste tipo devem ser criados. Depois, você pode usar esses Eventos como entrada em outras condições, possibilitando criar condições poderosas com base em outras.",
+    "no_description": "Nenhuma descrição disponível.",
+    "not_editable": "As condições deste tipo de Event Definition não podem ser editadas.",
+    "select_condition_type": "Selecione um tipo de condição",
+    "title": "Condição do evento"
+  },
+  "condition_summary": {
+    "and": "E",
+    "create_events": "Criar eventos para a definição",
+    "errors_found": "Erros encontrados",
+    "hide_errors": "Ocultar erros",
+    "invalid": "A condição não é válida",
+    "no_condition": "Nenhuma condição configurada",
+    "no_series": "Nenhuma série selecionada",
+    "or": "OU",
+    "preview": "Pré-visualização:",
+    "show_errors": "Exibir erros",
+    "title": "Resumo da condição",
+    "valid": "A condição é válida"
+  },
+  "conditions": {
+    "add_expression": "Adicionar expressão",
+    "add_group": "Adicionar grupo",
+    "all": "todas",
+    "any": "qualquer",
+    "boolean_operator": "Operador booleano",
+    "boolean_operator_group": "Grupo de operador booleano {{level}}",
+    "delete_expression": "Excluir expressão",
+    "global_boolean_operator": "Operador booleano global",
+    "if": "Se",
+    "is": "É",
+    "messages_must_meet": "As mensagens devem atender",
+    "of_the_following_rules": "das seguintes regras:",
+    "select_condition": "Selecionar condição",
+    "select_field": "Selecionar campo (opcional)",
+    "select_function": "Selecionar função",
+    "select_percentile": "Selecionar percentil",
+    "select_strategy": "Selecionar estratégia (opcional)",
+    "threshold": "Limite"
+  },
+  "definition_summary": {
+    "details": "Detalhes",
+    "no_description": "Nenhuma descrição informada",
+    "no_tags": "Sem tags",
+    "no_title": "Nenhum título informado",
+    "title": "Resumo do evento"
+  },
+  "details_form": {
+    "add_event_procedure": "Adicionar procedimento de evento",
+    "description": "Descrição",
+    "description_help": "Descrição mais longa para esta Event Definition.",
+    "no_event_procedures": "Esta Event Definition ainda não possui procedimentos de evento.",
+    "no_remediation_steps": "Nenhuma etapa de correção informada",
+    "optional": "(Opcional)",
+    "priority": "Prioridade",
+    "priority_help": "Escolha a prioridade dos Eventos criados a partir desta Event Definition.",
+    "remediation_steps": "Etapas de correção",
+    "remediation_steps_help": "Etapas para corrigir este Evento. Formatação Markdown é suportada.",
+    "summary_template": "Modelo de resumo do evento",
+    "summary_template_help": "Modelo usado para gerar os resumos de Evento e Alerta.",
+    "title": "Detalhes do evento",
+    "title_help": "Título para esta Event Definition.",
+    "title_label": "Título"
+  },
+  "event_key_help": {
+    "event_count": "Para controlar quantos Eventos uma definição de <bold>Filtro e Agregação</bold> cria, use \"Criar eventos para a definição se...\" com \"Agregação dos resultados atinge um limite\" e configure o(s) campo(s) de agrupamento.",
+    "example": "<bold>Exemplo:</bold> duas Event Definitions, <em>Falha de login</em> e <em>Escalonamento de privilégio</em>, ambas com a Event Key <code>username</code>. Uma correlação das duas só é disparada quando os dois Eventos têm o mesmo username.",
+    "intro": "As Event Keys são campos personalizados cujos valores são combinados na chave do Evento (valores unidos por <code>|</code>). A chave identifica a entidade à qual o Evento se refere. Ela não altera quantos Eventos são criados.",
+    "where_it_matters": "<bold>Onde a chave importa:</bold> a <bold>Correlação de eventos</bold> só corresponde a Eventos de origem que compartilham a mesma chave e cria no máximo um Evento por chave dentro de sua janela de pesquisa. Defina as Event Keys nas Event Definitions que você pretende correlacionar, e não na própria correlação."
+  },
+  "expanded_notifications": {
+    "description": "Notificações disparadas quando esta Event Definition é acionada.",
+    "loading": "Carregando notificações...",
+    "missing_permissions": "Faltam permissões de Notificações para:",
+    "missing_permission_title": "Permissões ausentes"
+  },
+  "field_form": {
+    "add": "Adicionar campo personalizado",
+    "data_type": "Tipo de dado do campo",
+    "data_type_string": "Texto",
+    "key_help": "Indica se este campo deve ser uma chave e qual é a sua ordem.",
+    "more_about_keys": "Saiba mais sobre Event Keys",
+    "name": "Nome",
+    "name_help": "Nome para este campo.",
+    "provider_unavailable": "O provedor selecionado não está disponível.",
+    "select_value_source": "Selecionar origem do valor",
+    "set_value_from": "Definir valor a partir de",
+    "title_edit": "Campo personalizado \"{{fieldName}}\"",
+    "title_new": "Novo campo personalizado",
+    "update": "Atualizar campo personalizado",
+    "use_as_key": "Usar campo como Event Key",
+    "value_source_help": "Selecione uma origem para o valor deste campo."
+  },
+  "field_value_providers": {
+    "lookup_table": {
+      "title": "Lookup Table"
+    },
+    "template": {
+      "title": "Modelo"
+    }
+  },
+  "fields_form": {
+    "description": "Inclua informações adicionais nos Eventos gerados por esta Event Definition adicionando campos personalizados. Isso pode ajudar a pesquisar Eventos ou a ter mais contexto ao receber Notificações.",
+    "errors_description": "Corrija os seguintes erros antes de salvar esta Event Definition:",
+    "errors_title": "Campos com erros",
+    "event_fields": "Campos do evento",
+    "no_keys": "Nenhuma Event Key configurada ainda.",
+    "not_editable": "Os campos de evento deste tipo de Event Definition não podem ser editados.",
+    "optional": "(opcional)",
+    "tags": "Tags",
+    "tags_description": "Anexe rótulos a esta Event Definition. As tags são propagadas para todos os Eventos que ela produz e facilitam a filtragem e o agrupamento na lista de Alertas e Eventos."
+  },
+  "fields_list": {
+    "configuration": "Configuração",
+    "data_type": "Tipo de dado",
+    "field_name": "Nome do campo",
+    "is_key": "É chave?",
+    "no": "Não",
+    "no_fields": "Este Evento ainda não possui campos personalizados.",
+    "remove": "Remover campo",
+    "value_source": "Origem do valor",
+    "yes": "Sim"
+  },
+  "filter_aggregation_form": {
+    "aggregation_reaches_threshold": "Agregação dos resultados atinge um limite",
+    "create_events_if": "Criar eventos para a definição se...",
+    "event_limit": "Limite de eventos",
+    "event_limit_help": "Número máximo de eventos a serem criados por execução desta Event Definition. Os eventos excedentes serão suprimidos.",
+    "filter_has_results": "O filtro tem resultados"
+  },
+  "filter_form": {
+    "cron_expression": "Expressão cron",
+    "cron_expression_help": "Uma expressão cron do Quartz para determinar quando o evento deve ser executado.",
+    "cron_time_zone": "Fuso horário do cron",
+    "declare_missing_parameters": "Declare os parâmetros de consulta ausentes clicando nos botões acima.",
+    "description": "Adicione informações para filtrar as mensagens de log relevantes para esta Event Definition.",
+    "enable": "Ativar",
+    "enable_help": "Esta Event Definition deve ser executada automaticamente?",
+    "execute_every": "Executar pesquisa a cada",
+    "lookup_table_permission_missing": "Esta conta não tem permissão para declarar Parâmetros de consulta a partir de Lookup Tables.",
+    "optional": "(Opcional)",
+    "query_parameters": "Parâmetros de consulta",
+    "search_filters": "Filtros de pesquisa",
+    "search_query": "Consulta de pesquisa",
+    "search_query_help": "Consulta de pesquisa que as Mensagens devem atender. Você pode usar a mesma sintaxe da página Pesquisa, inclusive declarando Parâmetros de consulta a partir de Lookup Tables com a sintaxe <code>{{syntax}}</code>.",
+    "search_within": "Pesquisar nos últimos",
+    "streams_and_categories": "Streams e categorias",
+    "streams_help": "Selecione os streams que a pesquisa deve incluir.",
+    "title": "Filtro",
+    "use_cron": "Usar agendamento cron",
+    "use_cron_help": "Agende este evento com uma expressão cron do Quartz",
+    "warm_tier_title": "Aviso de Warm Tier",
+    "warm_tier_warning": "O intervalo de tempo selecionado incluirá dados armazenados no Warm Tier. Eventos que precisem recuperar dados do Warm Tier com frequência podem causar problemas de desempenho. Um valor para <strong>Pesquisar nos últimos</strong> que exceda a duração a seguir cairá no Warm Tier: <timestamp></timestamp>."
+  },
+  "filter_preview": {
+    "help_aggregation": "Um Evento sempre que o resultado da agregação satisfizer a condição",
+    "help_aggregation_groups": "Um Evento por grupo cujo resultado da agregação satisfaça a condição",
+    "help_aggregation_groups_label": "Agregação com grupos:",
+    "help_aggregation_label": "Agregação sem grupos:",
+    "help_description": "A condição de Filtro e Agregação gerará quantidades diferentes de Eventos, dependendo de como for configurada:",
+    "help_filter": "Um Evento por mensagem que corresponda ao filtro",
+    "help_filter_label": "Filtro:",
+    "help_title": "Quantos Eventos o Filtro e Agregação criará?",
+    "loading": "Carregando pré-visualização do filtro...",
+    "message": "Mensagem",
+    "no_messages": "Não foi possível encontrar mensagens com os critérios de pesquisa atuais.",
+    "no_streams_access": "Não é possível exibir a pré-visualização do filtro: o usuário não tem acesso a nenhum stream.",
+    "timestamp": "Timestamp",
+    "title": "Pré-visualização do filtro"
+  },
+  "form_container": {
+    "aggregation_condition_invalid": "A condição de agregação não é válida",
+    "loading": "Carregando informações do evento...",
+    "query_parameters_undeclared": "Os parâmetros de consulta devem ser declarados"
+  },
+  "form_controls": {
+    "create": "Criar Event Definition",
+    "creating": "Criando...",
+    "previous": "Anterior",
+    "update": "Atualizar Event Definition",
+    "updating": "Atualizando..."
+  },
+  "hook_notifications": {
+    "clear_queue_failed": "Falha ao limpar as notificações na fila com status: {{error}}",
+    "clear_queue_failed_title": "Não foi possível limpar as notificações na fila",
+    "clear_queue_success": "As notificações na fila foram limpas com sucesso.",
+    "clear_queue_success_title": "Notificações na fila limpas.",
+    "cluster_config_failed": "Falha ao carregar a configuração de cluster da lista de eventos de Event Definitions com status",
+    "cluster_config_failed_title": "Não foi possível carregar a configuração de cluster da lista de eventos de Event Definitions",
+    "create_failed": "Falha ao criar a Event Definition \"{{title}}\" com status: {{error}}",
+    "create_failed_title": "Não foi possível salvar a Event Definition",
+    "create_success": "A Event Definition \"{{title}}\" foi criada com sucesso.",
+    "create_success_title": "Event Definition criada com sucesso",
+    "disable_failed": "Falha ao desativar a Event Definition \"{{title}}\" com status: {{error}}",
+    "disable_failed_title": "Não foi possível desativar a Event Definition",
+    "disable_success": "A Event Definition \"{{title}}\" foi desativada com sucesso.",
+    "disable_success_title": "Event Definition desativada com sucesso",
+    "duplicate_failed": "Falha ao duplicar a Event Definition \"{{title}}\" com status: {{error}}",
+    "duplicate_failed_title": "Não foi possível duplicar a Event Definition",
+    "duplicate_success": "A Event Definition \"{{title}}\" foi criada com sucesso.",
+    "duplicate_success_title": "Event Definition duplicada com sucesso",
+    "enable_failed": "Falha ao ativar a Event Definition \"{{title}}\" com status: {{error}}",
+    "enable_failed_title": "Não foi possível ativar a Event Definition",
+    "enable_success": "A Event Definition \"{{title}}\" foi ativada com sucesso.",
+    "enable_success_title": "Event Definition ativada com sucesso",
+    "entity_types_failed": "Falha ao carregar os tipos de entidade de Event Definitions com status",
+    "entity_types_failed_title": "Não foi possível carregar os tipos de entidade de Event Definitions",
+    "load_failed_title": "Não foi possível carregar a Event Definition",
+    "load_list_failed": "Falha ao carregar Event Definitions com status",
+    "load_one_failed": "Falha ao carregar a Event Definition com status",
+    "not_found": "Não foi possível encontrar a Event Definition com id <{{id}}>. Verifique se ela não foi excluída.",
+    "not_found_title": "Não foi possível recuperar a Event Definition",
+    "save_failed": "Falha ao salvar EventDefinition com status: {{error}}",
+    "save_failed_title": "Não foi possível salvar EventDefinition",
+    "update_failed": "Falha ao atualizar a Event Definition \"{{title}}\" com status: {{error}}",
+    "update_failed_title": "Não foi possível atualizar a Event Definition",
+    "update_success": "A Event Definition \"{{title}}\" foi atualizada com sucesso.",
+    "update_success_title": "Event Definition atualizada com sucesso"
+  },
+  "notification_list": {
+    "no_notifications": "Este Evento ainda não está configurado para disparar Notificações.",
+    "not_found": "Não foi possível encontrar informações para a Notificação <em>{{title}}</em>",
+    "notification": "Notificação",
+    "type": "Tipo"
+  },
+  "notification_settings": {
+    "grace_period": "Período de carência",
+    "grace_period_help": "As notificações de alertas são enviadas toda vez que ocorrem. Defina um Período de carência para controlar por quanto tempo esperar antes de enviar as Notificações novamente. Observe que Eventos com chaves terão um Período de carência para cada valor de chave diferente.",
+    "message_backlog": "Backlog de mensagens",
+    "message_backlog_help": "Número de mensagens a serem incluídas nas Notificações.",
+    "toggle_message_backlog": "Alternar backlog de mensagens"
+  },
+  "notifications_form": {
+    "description": "Este Evento é importante o bastante para exigir sua atenção? Transforme-o em um Alerta adicionando Notificações a ele.",
+    "manage": "Gerenciar Notificações"
+  },
+  "overview": {
+    "human_name": "event definitions",
+    "user_defined": "Definido pelo usuário"
+  },
+  "page": {
+    "alerts_docs": "Documentação de alertas",
+    "copy_confirm": "Tem certeza de que deseja criar uma cópia de \"{{title}}\"?",
+    "copy_title": "Copiar Event Definition",
+    "create_multiple": "Criar Event Definitions",
+    "description_alerts": "As Event Definitions permitem criar Alertas a partir de diferentes Condições e disparar alertas com base neles.",
+    "description_events": "As Event Definitions permitem criar Eventos a partir de diferentes Condições e disparar alertas com base neles.",
+    "description_list": "Crie novas Event Definitions que permitirão pesquisar diferentes Condições e disparar alertas com base nelas.",
+    "duplicate": "Duplicar Event Definition",
+    "edit": "Editar Event Definition",
+    "edit_named": "Editar Event Definition \"{{title}}\"",
+    "file_import": "Criar Event Definitions - Importação de arquivo",
+    "git_import": "Criar Event Definitions - Importação do Git",
+    "loading": "Carregando Event Definition...",
+    "new": "Nova Event Definition",
+    "new_named": "Nova Event Definition \"{{title}}\"",
+    "title": "Event Definitions",
+    "view": "Visualizar Event Definition",
+    "view_named": "Visualizar Event Definition \"{{title}}\""
+  },
+  "priorities": {
+    "critical": "Crítica",
+    "high": "Alta",
+    "info": "Informativa",
+    "low": "Baixa",
+    "medium": "Média"
+  },
+  "provider_summary": {
+    "less_details": "Menos detalhes",
+    "lookup_table_key_field": "Campo de chave da Lookup Table",
+    "more_details": "Mais detalhes",
+    "validate_template_values": "Validar se todos os valores do Modelo estão definidos",
+    "value_source": "Origem do valor"
+  },
+  "query_parameter_modal": {
+    "save": "Salvar",
+    "title": "Declarar parâmetro de consulta \"{{name}}\"",
+    "type": "Tipo",
+    "types": {
+      "lookup_table": "Lookup Table"
+    },
+    "undeclared": ": não declarado"
+  },
+  "replay_search": {
+    "attributes": {
+      "description": "Descrição",
+      "edited_after_event": "A Event Definition <definitionTitle>{{title}}</definitionTitle> foi editada depois que este evento ocorreu. Alguns widgets de agregação podem não ser representativos para este evento.",
+      "event_definition": "Event Definition",
+      "execute_every": "Executar pesquisa a cada",
+      "notifications": "Notificações",
+      "priority": "Prioridade",
+      "search_within": "Pesquisar nos últimos",
+      "timestamp": "Timestamp",
+      "updated_at": "Event Definition atualizada em"
+    },
+    "not_provided": "Não informado",
+    "replay_link": "Repetir pesquisa"
+  },
+  "row_actions": {
+    "delete_confirm": "Tem certeza de que deseja excluir \"{{title}}\"?",
+    "delete_failed": "Falha ao excluir a Event Definition \"{{title}}\" com status: {{status}}",
+    "delete_failed_title": "Não foi possível excluir a Event Definition",
+    "delete_success": "A Event Definition \"{{title}}\" foi excluída com sucesso.",
+    "delete_success_title": "Event Definition excluída com sucesso",
+    "delete_title": "Excluir Event Definition",
+    "disable": "Desativar",
+    "disable_confirm": "Tem certeza de que deseja desativar \"{{title}}\"?",
+    "disable_title": "Desativar Event Definition",
+    "duplicate": "Duplicar",
+    "edit": "Editar",
+    "enable": "Ativar",
+    "enable_confirm": "Tem certeza de que deseja ativar \"{{title}}\"?",
+    "enable_title": "Ativar Event Definition",
+    "entity_type_title": "event definition",
+    "share_description": "Pesquise um usuário ou equipe para adicionar como colaborador desta event definition.",
+    "system_cannot_be_deleted": "Uma Event Definition do sistema não pode ser excluída",
+    "system_cannot_be_disabled": "Uma Event Definition do sistema não pode ser desativada"
+  },
+  "scheduling": {
+    "clear": "limpar",
+    "clear_confirm": "Tem certeza de que deseja limpar as notificações na fila para \"{{title}}\"?",
+    "details": "Detalhes de {{title}}.",
+    "every": "a cada {{duration}}",
+    "last_execution": "Última execução:",
+    "next_execution": "Próxima execução:",
+    "next_time_range": "Próximo intervalo de tempo:",
+    "not_scheduled": "Não agendada.",
+    "queued_notifications": "Notificações na fila:",
+    "runs": "Executa {{schedule}}.",
+    "runs_searching_within": "Executa {{schedule}}, pesquisando nos últimos {{duration}}.",
+    "status": "Status:"
+  },
+  "share": {
+    "collaborators": "Colaboradores",
+    "description": "Pesquise um usuário ou equipe para adicionar como colaborador desta event definition.",
+    "no_collaborators": "Esta event definition não tem colaboradores."
+  },
+  "sidebar": {
+    "details_title": "Detalhes da definição"
+  },
+  "status_cell": {
+    "disable": "Desativar",
+    "disable_confirm": "Tem certeza de que deseja desativar a event definition '{{title}}'?",
+    "disable_title": "Desativar event definition",
+    "disabled": "Desativada",
+    "enable": "Ativar",
+    "enabled": "Ativada"
+  },
+  "steps": {
+    "additional_details": "Detalhes adicionais",
+    "condition": "Condição",
+    "notifications": "Notificações",
+    "share": "Compartilhar",
+    "summary": "Resumo"
+  },
+  "summary": {
+    "actions": "Ações",
+    "condition_invalid": "A condição não é válida: {{errors}}",
+    "condition_types": {
+      "aggregation": "Agregação",
+      "filter": "Filtro"
+    },
+    "create_events_if": "Criar eventos se",
+    "cron_description": "Descrição do cron",
+    "cron_expression": "Expressão cron",
+    "enable_scheduling": "Ativar agendamento",
+    "event_limit": "Limite de eventos",
+    "execute_every": "Executar pesquisa a cada",
+    "group_by": "Campo(s) de agrupamento",
+    "missing_stream_permissions": "Faltam permissões de Stream para:",
+    "no": "não",
+    "no_cron_expression": "Erro: nenhuma expressão cron especificada!",
+    "no_filters": "Nenhum filtro configurado",
+    "no_group_by": "Nenhum agrupamento configurado",
+    "no_streams": "Nenhum Stream selecionado, pesquisa em todos os Streams",
+    "search_filters": "Filtros de pesquisa",
+    "search_query": "Consulta de pesquisa",
+    "search_within": "Pesquisar nos últimos",
+    "stream_categories": "Categorias de Streams",
+    "streams": "Streams",
+    "time_zone": "Fuso horário",
+    "type": "Tipo",
+    "undeclared_parameters": "Há parâmetros de consulta não declarados: {{parameters}}",
+    "use_cron": "Usar agendamento cron",
+    "yes": "sim"
+  },
+  "summary_renders": {
+    "backlog_included_one": "As notificações incluirão {{count}} mensagem",
+    "backlog_included_other": "As notificações incluirão {{count}} mensagens",
+    "backlog_none": "As notificações não incluirão nenhuma mensagem.",
+    "condition_plugin_no_summary": "O plugin de condição <em>{{type}}</em> não fornece um resumo.",
+    "event_procedure_summary": "Resumo do procedimento de evento",
+    "event_procedure_summary_unavailable": "O componente de resumo do procedimento de evento não está disponível.",
+    "fields": "Campos",
+    "grace_period_disabled": "O Período de carência está desativado",
+    "grace_period_set": "O Período de carência está definido como {{duration}}",
+    "keys": "Chaves",
+    "missing_notification_permissions": "Faltam permissões de Notificações para:",
+    "no_event_procedures": "Este Evento não possui Procedimentos de evento.",
+    "no_field_value_provider": "Nenhum provedor de valor de campo configurado.",
+    "no_fields": "Nenhum campo configurado para Eventos baseados nesta definição.",
+    "no_keys": "Nenhuma chave configurada para Eventos baseados nesta definição.",
+    "no_notifications": "Este Evento não está configurado para disparar Notificações.",
+    "no_remediation_steps": "Nenhuma etapa de correção informada",
+    "notification_not_found": "Não foi possível encontrar informações para a Notificação <em>{{id}}</em>.",
+    "notification_plugin_no_summary": "O plugin de notificação <em>{{type}}</em> não fornece um resumo.",
+    "notifications": "Notificações",
+    "provider_plugin_no_summary": "O plugin provedor <em>{{type}}</em> não fornece um resumo.",
+    "remediation_steps": "Etapas de correção",
+    "settings": "Configurações",
+    "backlog_included_many": "As notificações incluirão {{count}} mensagens"
+  },
+  "summary_template_help": {
+    "aggregation_events": "Eventos de agregação: valores de agrupamento e resultados da agregação.",
+    "aggregation_example": "Agregação da contagem de logins malsucedidos por usuário:",
+    "aggregation_example_template": "<userVariable></userVariable> falhou ao fazer login <countVariable></countVariable> vezes",
+    "button_aria_label": "Exibir ajuda do modelo de resumo do evento",
+    "button_title": "Ajuda do modelo de resumo",
+    "custom_fields": "Campos personalizados",
+    "custom_fields_description": "Os campos personalizados definidos na Event Definition ficam disponíveis em <code>fields</code>.",
+    "event_definition_variables": "Variáveis da Event Definition",
+    "examples": "Exemplos",
+    "filter_events": "Eventos de filtro: campos originais da mensagem de log.",
+    "filter_example": "Filtro de uma mensagem de log específica:",
+    "filter_example_template": "Erro em <hostVariable></hostVariable>: <messageVariable></messageVariable>",
+    "group_by_field": "(campo de agrupamento)",
+    "hostname": "(nome do host)",
+    "intro": "Use um modelo para personalizar a descrição exibida na página Alertas e Eventos quando um evento for criado. Os modelos usam substituição <jmteLink>JMTE</jmteLink>, com variáveis envolvidas por <variable></variable>.",
+    "source_context": "Contexto da origem",
+    "source_context_description": "A variável <code>source</code> contém o contexto dos dados que dispararam o evento. Seu conteúdo depende do tipo da Event Definition:",
+    "title": "Modelo de resumo do evento"
+  },
+  "tags_editor": {
+    "aria_label": "Tags da Event Definition",
+    "duplicate": "A tag \"{{tag}}\" já foi adicionada.",
+    "help": "Pressione Enter ou Tab para adicionar. As tags são convertidas para minúsculas e sem duplicatas. Somente letras minúsculas, dígitos, hífens, sublinhados e pontos são permitidos.",
+    "invalid_characters_one": "A tag {{tags}} contém caracteres inválidos. Somente letras minúsculas, dígitos, hífens, sublinhados e pontos são permitidos.",
+    "invalid_characters_other": "As tags {{tags}} contêm caracteres inválidos. Somente letras minúsculas, dígitos, hífens, sublinhados e pontos são permitidos.",
+    "max_reached": "Máximo de {{max}} tags atingido.",
+    "placeholder": "ex.: autenticação, força-bruta, conformidade",
+    "too_long_one": "A tag {{tags}} excede o comprimento máximo de {{max}} caracteres.",
+    "too_long_other": "As tags {{tags}} excedem o comprimento máximo de {{max}} caracteres.",
+    "invalid_characters_many": "As tags {{tags}} contêm caracteres inválidos. Somente letras minúsculas, dígitos, hífens, sublinhados e pontos são permitidos.",
+    "too_long_many": "As tags {{tags}} excedem o comprimento máximo de {{max}} caracteres."
+  },
+  "template_preview": {
+    "aggregation": "Campos definidos em Group By com seus nomes originais",
+    "aggregation_label": "Agregação:",
+    "available_fields": "Os campos disponíveis no Modelo dependem da condição que criou o Evento:",
+    "correlation": "Todos os campos do último Evento correspondente e não negado",
+    "correlation_label": "Correlação:",
+    "description": "É possível enriquecer os Eventos gerados com valores dinâmicos. Você pode acessar os campos do contexto do Evento com <code>{{syntax}}</code>.",
+    "filter": "Todos os campos da mensagem de log original",
+    "filter_label": "Filtro:",
+    "title": "Campos disponíveis no modelo"
+  },
+  "template_provider_form": {
+    "exclude_empty_fields": "Excluir campos vazios",
+    "exclude_empty_fields_help": "Marque esta opção para deixar o campo fora do Evento quando o Modelo renderizar um valor vazio. Quando desmarcada, o campo é adicionado ao Evento com valor vazio. Fica sempre ativa quando todos os valores do Modelo são obrigatórios.",
+    "require_values": "Exigir que todos os valores do modelo sejam definidos",
+    "require_values_help": "Marque esta opção para validar se todas as variáveis usadas no Modelo têm valores.",
+    "template": "Modelo",
+    "template_help": "Digite um texto literal para definir neste campo ou use a <jmteLink>sintaxe JMTE</jmteLink> para adicionar um valor dinâmico."
+  },
+  "types": {
+    "aggregation": {
+      "description": "Crie Eventos a partir de mensagens de log, filtrando-as e (opcionalmente) agregando seus resultados para atender a uma condição definida. Esses Eventos podem ser usados como entrada para uma Regra de correlação.",
+      "title": "Filtro e Agregação"
+    },
+    "system": {
+      "description": "Event Definition integrada que o {{productName}} usa para reportar notificações do sistema como Eventos.",
+      "title": "Event Definition do sistema"
+    }
+  },
+  "validation": {
+    "cannot_be_empty": "Não pode estar vazio",
+    "field_cannot_be_empty": "O campo não pode estar vazio.",
+    "field_positive_number": "O campo deve ser um número positivo."
+  },
+  "validation_summary": {
+    "title": "Encontramos alguns erros!"
+  },
+  "use_event_definition_notifications": {
+    "load_failed": "Falha ao carregar a Event Definition com status: {{error}}",
+    "load_failed_title": "Não foi possível carregar a Event Definition"
+  }
+}

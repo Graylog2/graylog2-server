@@ -16,8 +16,10 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import IconButton from 'components/common/IconButton';
+import useServerText from 'util/serverText';
 
 import type { DescriptiveItem } from './PaginatedItemOverview';
 
@@ -51,16 +53,21 @@ const StyledDeleteButton = styled(IconButton)`
   flex: 0 0 auto;
 `;
 
+// The items are e.g. roles or teams. The descriptions of built-in roles are English texts of the server.
+const BUILT_IN_ROLES_NAMESPACES = ['builtin_roles'];
+
 const PaginatedItem = ({ item: { name, description }, onDeleteItem = undefined, item }: Props) => {
+  const { t } = useTranslation('common');
+  const serverText = useServerText(BUILT_IN_ROLES_NAMESPACES);
   const deleteButton =
     typeof onDeleteItem === 'function' ? (
-      <StyledDeleteButton onClick={() => onDeleteItem(item)} name="close" title={`Remove ${name}`} />
+      <StyledDeleteButton onClick={() => onDeleteItem(item)} name="close" title={t('actions.remove_item', { name })} />
     ) : null;
 
   return (
     <Container>
       <Header>{name}</Header>
-      <Description>{description}</Description>
+      <Description>{serverText(description)}</Description>
       {deleteButton}
     </Container>
   );

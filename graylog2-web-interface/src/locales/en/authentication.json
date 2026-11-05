@@ -1,0 +1,208 @@
+{
+  "action_links": {
+    "create": "Create service",
+    "edit_active": "Edit active service",
+    "view_active": "View active service"
+  },
+  "active_directory": {
+    "create_title": "Create Active Directory Authentication Service",
+    "edit_title": "Edit Active Directory Authentication Service",
+    "help": {
+      "system_user_dn": "The username for the initial connection to the Active Directory server, e.g. <code>ldapbind@some.domain</code>.<lineBreak/>This needs to match the <code>userPrincipalName</code> of that user.",
+      "system_user_password": "The password for the initial connection to the Active Directory server.",
+      "user_full_name_attribute": "Which Active Directory attribute to use for the full name of a synchronized user, e.g. <code>displayName</code>.<lineBreak/>",
+      "user_name_attribute": "Which Active Directory attribute to use for the username of the synchronized user, e.g. <code>userPrincipalName</code>.<lineBreak/>Try to load a test user in the sidebar section <emphasis>User Login Test</emphasis>, if you are unsure which attribute to use.",
+      "user_search_base": "The base tree to limit the Active Directory search query to, e.g. <code>cn=users,dc=example,dc=com</code>."
+    }
+  },
+  "active_page": {
+    "title": "Active Authentication Service"
+  },
+  "authenticators": {
+    "description": "Configure the trusted header authentication.",
+    "documentation_title": "Authenticators documentation",
+    "edit": "Edit Authenticators",
+    "title": "Authenticators Details"
+  },
+  "backend_details_page": {
+    "edit_service": "Edit Service",
+    "title": "Authentication Service Details"
+  },
+  "backends_overview": {
+    "activate": "Activate",
+    "confirm_activate": "Do you really want to activate the authentication service \"{{title}}\"",
+    "confirm_deactivate": "Do you really want to deactivate the authentication service \"{{title}}\"",
+    "confirm_delete": "Do you really want to delete the authentication service \"{{title}}\"",
+    "deactivate": "Deactivate",
+    "delete": "Delete",
+    "edit": "Edit",
+    "filter_label": "Filter services",
+    "found_one": "Found {{count}} configured authentication services on the system.",
+    "found_other": "Found {{count}} configured authentication services on the system.",
+    "headers": {
+      "actions": "Actions",
+      "default_roles": "Default Roles",
+      "description": "Description",
+      "title": "Title"
+    },
+    "query_example": "Find backends with a title containing LDAP:",
+    "role_not_found": "Role not found",
+    "title": "Configured Authentication Services"
+  },
+  "config_details": {
+    "edit": "Edit",
+    "group_sync_feature_name": "group synchronization",
+    "group_sync_title": "Group Synchronization"
+  },
+  "connection_test": {
+    "default_error": "There was an error",
+    "description": "Performs a background connection check with the address and credentials defined in the step \"Server Configuration\".",
+    "submit": "Test Server Connection",
+    "title": "Server Connection Check"
+  },
+  "create_page": {
+    "getting_started_title": "Create New Authentication Service",
+    "title": "Create Authentication Service"
+  },
+  "directory_help": {
+    "default_roles": "The default roles synchronized user will obtain. All users need the <code>Reader</code> role, to use the web interface",
+    "default_user_timezone": "Choose the default time zone for new users.",
+    "user_search_pattern": "For example <exampleCode>{{example}}</exampleCode>. The string <code>{{placeholder}}</code> will be replaced by the entered username."
+  },
+  "getting_started": {
+    "description": "Beside the built-in authentication mechanisms like its internal user database or LDAP/Active Directory, authentication services can also be extended by plugins to support other authentication mechanisms. Select an authentication service to setup a new one.",
+    "select_service": "Select a service",
+    "submit": "Get started"
+  },
+  "ldap": {
+    "create_title": "Create LDAP Authentication Service",
+    "edit_title": "Edit LDAP Authentication Service",
+    "help": {
+      "email_attributes": "Which LDAP attribute to use for the user's email address, e.g. <code>mail</code>.<lineBreak/>You can specify multiple attributes, type <kbd>Tab</kbd> or <kbd>Enter</kbd> to accept your value.",
+      "system_user_dn": "The username for the initial connection to the LDAP server, e.g. <code>cn=admin,dc=example,dc=com</code>, this might be optional depending on your LDAP server.",
+      "system_user_password": "The password for the initial connection to the LDAP server.",
+      "user_full_name_attribute": "Which LDAP attribute to use for the full name of a synchronized user, e.g. <code>cn</code>.<lineBreak/>",
+      "user_name_attribute": "Which LDAP attribute to use for the username of the synchronized user, e.g <code>uid</code>.<lineBreak/>Try to load a test user in the sidebar section <emphasis>User Login Test</emphasis>, if you are unsure which attribute to use.",
+      "user_search_base": "The base tree to limit the LDAP search query to, e.g. <code>cn=users,dc=example,dc=com</code>.",
+      "user_unique_id_attribute": "Which LDAP attribute to use for the ID of a synchronized user, e.g. <code>entryUUID</code>.<lineBreak/>"
+    }
+  },
+  "login_test": {
+    "description": "Verify the settings by loading the entry for the given user name. If you omit the password, no authentication attempt will be made.",
+    "login_failed": "Login failed",
+    "password": "Password",
+    "submit": "Test User Login",
+    "title": "User Login Test",
+    "user_attribute": "User Attribute",
+    "user_does_not_exist": "User does not exist",
+    "username": "Username",
+    "value": "Value"
+  },
+  "no_service_plugin": "No authentication service plugin configured for type \"{{type}}\"",
+  "no_service_plugin_for": "No authentication service plugin configured for \"{{type}}\"",
+  "notifications": {
+    "create_failed": "Creating authentication service failed with status: {{error}}",
+    "create_success": "Authentication service was created successfully.",
+    "error_title": "Error",
+    "success_title": "Success",
+    "update_failed": "Updating authentication service failed with status: {{error}}",
+    "update_success": "Authentication service was updated successfully."
+  },
+  "overview_page": {
+    "no_active_backend": "None of the configured authentication services is currently active.",
+    "title": "All Authentication Services"
+  },
+  "page": {
+    "description": "Configure authentication services of this cluster.",
+    "documentation_title": "Authentication documentation"
+  },
+  "page_navigation": {
+    "authenticators": "Authenticators",
+    "services": "Authentication Services"
+  },
+  "server_config": {
+    "description_label": "Description",
+    "hostname": "Hostname",
+    "port": "Port",
+    "reset_password": "Reset Password",
+    "server_address": "Server Address",
+    "system_password": "System Password",
+    "system_user_dn": "System User DN",
+    "system_username": "System Username",
+    "title": "Server Configuration",
+    "title_label": "Title",
+    "transport_security": "Transport Security",
+    "transport_security_none": "None",
+    "undo_reset": "Undo Reset",
+    "verify_certificates": "Verify Certificates"
+  },
+  "synced_teams": {
+    "feature_name": "teams",
+    "title": "Synchronized Teams"
+  },
+  "synced_users": {
+    "edit": "Edit",
+    "filter_label": "Filter Users",
+    "found_one": "Found {{count}} synchronized users.",
+    "found_other": "Found {{count}} synchronized users.",
+    "headers": {
+      "actions": "Actions",
+      "full_name": "Full Name",
+      "roles": "Roles",
+      "username": "Username"
+    },
+    "none_found": "No synchronized users have been found.",
+    "role_not_found": "Role not found",
+    "title": "Synchronized Users"
+  },
+  "trusted_header": {
+    "description": "This authenticator enables you to login a user, based on a HTTP header without further interaction.",
+    "enable_sso": "Enable single sign-on via HTTP header",
+    "enabled": "Enabled",
+    "title": "Trusted Header Authentication",
+    "trusted_proxies_hint": "Please configure the <code>trusted_proxies</code> setting in the {{productName}} server configuration file.",
+    "update_config": "Update Config",
+    "username_header": "Username header",
+    "username_header_help": "HTTP header containing the implicitly trusted name of the user. (The header match is ignoring case sensitivity)"
+  },
+  "user_sync": {
+    "browser_time_zone": "Browser's time zone",
+    "default_assignments_hint": "Changing the default role and time zone assignments will only affect new users created via {{serviceTitle}}!",
+    "default_roles": "Default Roles",
+    "default_user_time_zone": "Default User Time Zone",
+    "email_attribute": "Email Attribute",
+    "email_attributes": "Email Attributes",
+    "full_name_attribute": "Full Name Attribute",
+    "id_attribute": "ID Attribute",
+    "name_attribute": "Name Attribute",
+    "role_not_found": "Role not found",
+    "search_base_dn": "Search Base DN",
+    "search_pattern": "Search Pattern",
+    "search_roles": "Search for roles",
+    "test_login_hint": "We recommend you test your user login in the sidebar panel to verify your settings.",
+    "title": "User Synchronization"
+  },
+  "wizard": {
+    "confirm_remove_group_sync": "Do you really want to remove the group synchronization config for this authentication service?",
+    "create_failed": "Failed to create authentication service",
+    "edit_failed": "Failed to edit authentication service",
+    "finish_and_save": "Finish & Save Service",
+    "finish_and_save_identity_service": "Finish & Save Identity Service",
+    "next_group_sync": "Next: Group Synchronization",
+    "next_user_sync": "Next: User Synchronization",
+    "server_validation_error": "Server validation error: {{errors}}",
+    "steps": {
+      "group_sync": "Group Synchronization (Opt.)",
+      "server_config": "Server Configuration",
+      "user_sync": "User Synchronization"
+    }
+  },
+  "wizard_header": {
+    "edit_title": "Edit Authentication Service - <emphasis>{{backendTitle}}</emphasis>"
+  },
+  "http_header_notifications": {
+    "load_failed": "Loading HTTP header authentication config failed",
+    "update_success": "Successfully updated HTTP header authentication config",
+    "update_failed": "Updating HTTP header authentication config failed with status: {{error}}"
+  }
+}

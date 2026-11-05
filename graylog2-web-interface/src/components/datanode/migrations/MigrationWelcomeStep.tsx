@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Col, Row, Panel, Alert } from 'components/bootstrap';
 import { DocumentationLink } from 'components/support';
@@ -45,7 +46,12 @@ export const StyledPanel = styled(Panel)<{ bsStyle: string }>(
   `,
 );
 
+const DataNodeDocsLink = ({ children = undefined }: React.PropsWithChildren) => (
+  <DocumentationLink page="graylog-data-node" text={children} />
+);
+
 const MigrationWelcomeStep = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const isElasticsearch = useIsElasticsearch();
   const productName = useProductName();
   const { data: dataNodes } = useDataNodes();
@@ -53,33 +59,18 @@ const MigrationWelcomeStep = ({ currentStep, onTriggerStep, hideActions }: Migra
   return (
     <Row>
       <Col md={12}>
-        {isElasticsearch && (
-          <Alert bsStyle="warning">
-            Incompatible search backend. Please upgrade to OpenSearch to be able to use the migration wizard.
-          </Alert>
-        )}
+        {isElasticsearch && <Alert bsStyle="warning">{t('migration_welcome.incompatible_backend')}</Alert>}
         <MigrationError errorMessage={currentStep.error_message} />
-        <Headline>Data Nodes Migration</Headline>
+        <Headline>{t('migration_welcome.title')}</Headline>
+        <p>{t('migration_welcome.intro', { productName })}</p>
+        <p>{t('migration_welcome.earlier_deployments')}</p>
         <p>
-          The {productName} Data Node is a management component designed to configure and optimize OpenSearch for use
-          with {productName}, reducing administrative overhead and simplifying future updates.
-        </p>
-        <p>
-          Deployments earlier than v5.2 or that opted to not install with a Data Node will need to migrate the message
-          databases to Data Nodes.
-        </p>
-        <p>
-          This migration tool will check the compatibility of your components and guide you through to migrate your
-          existing OpenSearch data to a Data Node.
+          {t('migration_welcome.tool_description')}
           <br />
         </p>
+        <p>{t('migration_welcome.required_steps')}</p>
         <p>
-          Migrating to Data Node will require some steps to be performed on the OS, within your current OS/ES cluster,
-          and in your configuration files.
-        </p>
-        <p>
-          You can get more information on the Data Node migration{' '}
-          <DocumentationLink page="graylog-data-node" text="documentation" />.
+          <Trans t={t} i18nKey="migration_welcome.more_information" components={{ docsLink: <DataNodeDocsLink /> }} />
         </p>
         <br />
         <MigrationDatanodeList />

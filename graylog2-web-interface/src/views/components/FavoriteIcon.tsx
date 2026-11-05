@@ -16,6 +16,7 @@
  */
 
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useFavoriteItemMutation from 'hooks/useFavoriteItemMutation';
 import CommonFavoriteIcon from 'views/components/common/CommonFavoriteIcon';
@@ -28,6 +29,7 @@ type Props = {
 };
 
 const FavoriteIcon = ({ isFavorite, grn, onChange, className = undefined }: Props) => {
+  const { t } = useTranslation('search');
   const { putItem, deleteItem } = useFavoriteItemMutation();
   const onClick = useCallback(() => {
     if (isFavorite) {
@@ -36,7 +38,7 @@ const FavoriteIcon = ({ isFavorite, grn, onChange, className = undefined }: Prop
       putItem(grn).then(() => onChange(true));
     }
   }, [isFavorite, deleteItem, grn, onChange, putItem]);
-  const title = isFavorite ? 'Remove from favorites' : 'Add to favorites';
+  const title = isFavorite ? t('common_views.remove_from_favorites') : t('common_views.add_to_favorites');
 
   return <CommonFavoriteIcon className={className} onClick={onClick} title={title} isFavorite={isFavorite} />;
 };

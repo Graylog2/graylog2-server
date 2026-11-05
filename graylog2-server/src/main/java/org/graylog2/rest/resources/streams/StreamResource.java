@@ -38,7 +38,6 @@ import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
@@ -82,6 +81,8 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.rest.CodedBadRequestException;
+import org.graylog2.plugin.rest.CodedForbiddenException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
@@ -660,7 +661,7 @@ public class StreamResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public List<PipelineCompactSource> getConnectedPipelines(@Parameter(name = "streamId", required = true) @PathParam("streamId") String streamId) throws NotFoundException {
         if (!isPermitted(RestPermissions.STREAMS_READ, streamId)) {
-            throw new ForbiddenException("Not allowed to read configuration for stream with id: " + streamId);
+            throw new CodedForbiddenException("stream.read_not_allowed", "Not allowed to read configuration for stream with id: " + streamId, Map.of("streamId", streamId));
         }
 
         PipelineConnections pipelineConnections = pipelineStreamConnectionsService.load(streamId);
@@ -686,7 +687,7 @@ public class StreamResource extends RestResource {
         final var streamIds = request.streamIds.stream()
                 .filter(streamId -> {
                     if (!isPermitted(RestPermissions.STREAMS_READ, streamId)) {
-                        throw new ForbiddenException("Not allowed to read configuration for stream with id: " + streamId);
+                        throw new CodedForbiddenException("stream.read_not_allowed", "Not allowed to read configuration for stream with id: " + streamId, Map.of("streamId", streamId));
                     }
                     return true;
                 })
@@ -718,7 +719,7 @@ public class StreamResource extends RestResource {
     public Map<String, Long> getDestinationFilterRuleCountsForStreams(@Parameter(name = "streamIds", required = true) GetDestinationFilterRuleCountsRequest request) {
         request.streamIds().forEach(streamId -> {
             if (!isPermitted(RestPermissions.STREAMS_READ, streamId)) {
-                throw new ForbiddenException(f("Not allowed to read configuration for stream with id: %s", streamId));
+                throw new CodedForbiddenException("stream.read_not_allowed", f("Not allowed to read configuration for stream with id: %s", streamId), Map.of("streamId", streamId));
             }
         });
 
@@ -827,9 +828,9 @@ public class StreamResource extends RestResource {
 
     private void checkIndexSet(IndexSet indexSet) {
         if (!indexSet.getConfig().isWritable()) {
-            throw new BadRequestException("Assigned index set must be writable!");
+            throw new CodedBadRequestException("stream.index_set_not_writable", "Assigned index set must be writable!");
         } else if (!indexSet.getConfig().isRegularIndex()) {
-            throw new BadRequestException("Assigned index set is not usable");
+            throw new CodedBadRequestException("stream.index_set_not_usable", "Assigned index set is not usable");
         }
     }
 

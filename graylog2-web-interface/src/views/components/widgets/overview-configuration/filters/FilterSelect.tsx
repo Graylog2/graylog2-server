@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 
@@ -22,8 +23,6 @@ import { Select } from 'components/common';
 import { defaultCompare } from 'logic/DefaultCompare';
 import { Menu } from 'components/bootstrap';
 import type { FilterComponents, Filter } from 'views/components/widgets/overview-configuration/filters/types';
-
-const SELECT_TITLE = 'Configure a new filter';
 
 const Container = styled.div`
   display: flex;
@@ -45,6 +44,7 @@ type Props = {
 };
 
 const FilterSelect = ({ filterComponents, columnTitle, onCreate, selectedFilters }: Props) => {
+  const { t } = useTranslation('widgets');
   const container = useRef(null);
   const [open, setOpen] = useState(false);
   const [selectedColumn, setSelectedColumn] = useState<string>(null);
@@ -100,8 +100,8 @@ const FilterSelect = ({ filterComponents, columnTitle, onCreate, selectedFilters
     <Container ref={container}>
       <Select
         id="filter-select"
-        placeholder={SELECT_TITLE}
-        aria-label={SELECT_TITLE}
+        placeholder={t('overview_configuration.configure_filter')}
+        aria-label={t('overview_configuration.configure_filter')}
         options={filterOptions}
         clearable={false}
         size="small"

@@ -21,6 +21,7 @@ import { StreamRoutingRules } from '@graylog/server-api';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
 import type { Attribute, SearchParams } from 'stores/PaginationTypes';
 import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 import type { StreamConnectedPipeline } from 'components/streams/StreamDetails/StreamDataRoutingIntake/types';
 
@@ -84,8 +85,8 @@ const useStreamConnectedPipelines = (
     queryFn: () =>
       defaultOnError(
         fetchStreamConnectedPipelines(streamId, searchParams),
-        'Loading connected Pipelines failed with status',
-        'Could not load connected Pipelines',
+        i18n.t('stream_hooks.load_connected_pipelines_failed', { ns: 'streams' }),
+        i18n.t('stream_hooks.load_connected_pipelines_failed_title', { ns: 'streams' }),
       ),
     placeholderData: keepPreviousData,
     enabled,

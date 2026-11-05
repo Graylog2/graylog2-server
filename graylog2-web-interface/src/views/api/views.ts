@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import i18n from 'i18n';
 import type View from 'views/logic/views/View';
 import type { ViewJson } from 'views/logic/views/View';
 import fetch from 'logic/rest/FetchProvider';
@@ -28,7 +29,10 @@ const viewsIdUrl = (id) => qualifyUrl(`/views/${id}`);
 export const getView = (viewId: string): Promise<ViewJson> => fetch('GET', viewsIdUrl(viewId));
 export const deleteView = (view: View): Promise<void> =>
   fetch('DELETE', viewsIdUrl(view.id)).catch((error) => {
-    UserNotification.error(`Deleting view ${view.title} failed with status: ${error}`, 'Could not delete view');
+    UserNotification.error(
+      i18n.t('views_notifications.delete_view_failed', { ns: 'search', title: view.title, error }),
+      i18n.t('views_notifications.delete_view_failed_title', { ns: 'search' }),
+    );
   });
 export const createView = (view: View, entityShare?: EntitySharePayload, clonedFrom?: string): Promise<View> => {
   const url = clonedFrom ? viewsIdUrl(clonedFrom) : viewsUrl;

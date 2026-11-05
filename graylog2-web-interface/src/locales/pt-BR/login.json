@@ -1,0 +1,13 @@
+{
+  "welcome": "Bem-vindo ao {{productName}}",
+  "username": "Nome de usuário",
+  "password": "Senha",
+  "sign_in": "Entrar",
+  "signing_in": "Entrando...",
+  "invalid_credentials": "Credenciais inválidas. Verifique-as e tente novamente.",
+  "server_error": "Erro - o servidor retornou: {{status}} - {{message}}",
+  "fallback_error_cloud": "Erro ao carregar a tela de login. Entre em contato com o gerente da sua conta {{productName}}.",
+  "fallback_error": "Erro ao usar o login do serviço de autenticação ativo. Verifique a configuração dele ou entre em contato com o gerente da sua conta {{productName}}. Detalhes do erro:",
+  "login_with_default": "Entrar com o método padrão",
+  "login_with": "Entrar com {{method}}"
+}

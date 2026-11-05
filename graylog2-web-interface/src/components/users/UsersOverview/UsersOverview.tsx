@@ -16,6 +16,8 @@
  */
 import * as React from 'react';
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import styled, { css } from 'styled-components';
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
 
@@ -32,7 +34,7 @@ import UsersFilter from './UsersFilter';
 import ClientAddressHead from './ClientAddressHead';
 import SystemAdministrator from './SystemAdministratorOverview';
 
-const TABLE_HEADERS = ['', 'Full name', 'Username', 'E-Mail Address', 'Client Address', 'Enabled', 'Role', 'Actions'];
+const TABLE_HEADERS = ['', 'full_name', 'username', 'email', 'client_address', 'enabled', 'role', 'actions'];
 
 const Container = styled.div`
   .data-table {
@@ -58,14 +60,16 @@ const StyledPaginatedList = styled(PaginatedList)`
   }
 `;
 
-const _headerCellFormatter = (header: string) => {
-  switch (header.toLowerCase()) {
-    case 'client address':
-      return <ClientAddressHead title={header} />;
+const _headerCellFormatter = (t: TFunction) => (header: string) => {
+  const title = header ? t(`users_list.headers.${header}`) : header;
+
+  switch (header) {
+    case 'client_address':
+      return <ClientAddressHead title={title} />;
     case 'actions':
-      return <th className="actions text-right">{header}</th>;
+      return <th className="actions text-right">{title}</th>;
     default:
-      return <th>{header}</th>;
+      return <th>{title}</th>;
   }
 };
 
@@ -84,6 +88,7 @@ const buildUsersOverviewItem =
   };
 
 const UsersOverview = () => {
+  const { t } = useTranslation('users');
   const { page, pageSize: perPage, resetPage } = usePaginationQueryParameter();
   const currentUser = useCurrentUser();
   const queryClient = useQueryClient();
@@ -124,30 +129,30 @@ const UsersOverview = () => {
         <SystemAdministrator
           adminUser={adminUser}
           dataRowFormatter={buildUsersOverviewItem(currentUser, onUserDeleted, onUserStatusChange)}
-          headerCellFormatter={_headerCellFormatter}
+          headerCellFormatter={_headerCellFormatter(t)}
           headers={TABLE_HEADERS}
         />
       )}
       <Row className="content">
         <Col xs={12}>
           <Header>
-            <h2>Users</h2>
+            <h2>{t('users_list.title')}</h2>
             {isFetching && <LoadingSpinner text="" delay={0} />}
           </Header>
-          <p className="description">Found {total} registered users on the system.</p>
+          <p className="description">{t('users_list.found', { total })}</p>
           <StyledPaginatedList totalItems={total}>
             <DataTable
               id="users-overview"
               rowClassName="no-bm"
               headers={TABLE_HEADERS}
-              headerCellFormatter={_headerCellFormatter}
+              headerCellFormatter={_headerCellFormatter(t)}
               sortByKey="fullName"
-              noDataText={<NoSearchResult>No users have been found.</NoSearchResult>}
+              noDataText={<NoSearchResult>{t('users_list.none_found')}</NoSearchResult>}
               rows={users.toJS()}
               customFilter={searchFilter}
               dataRowFormatter={buildUsersOverviewItem(currentUser, onUserDeleted, onUserStatusChange)}
               filterKeys={[]}
-              filterLabel="Filter Users"
+              filterLabel={t('users_list.filter_label')}
             />
           </StyledPaginatedList>
         </Col>

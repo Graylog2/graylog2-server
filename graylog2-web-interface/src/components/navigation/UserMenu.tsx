@@ -14,16 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import styled from 'styled-components';
+import React, { useContext } from 'react';
+import { useTranslation } from 'react-i18next';
+import styled, { css } from 'styled-components';
 
-import { LinkContainer } from 'components/common';
+import { Icon, LinkContainer } from 'components/common';
 import { NavDropdown, MenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import useCurrentUser from 'hooks/useCurrentUser';
 import Menu from 'components/bootstrap/Menu';
 import useLogout from 'hooks/useLogout';
 import NavIcon from 'components/navigation/NavIcon';
+import UserPreferencesContext from 'contexts/UserPreferencesContext';
+import { availableLanguages, getLanguage } from 'components/users/languages/Languages';
+import LanguageLabel from 'components/users/languages/LanguageLabel';
+import applyLanguage from 'util/applyLanguage';
 
 import ThemeModeToggle from './ThemeModeToggle';
 
@@ -32,15 +37,42 @@ const FullName = styled.span`
   font-weight: 700;
 `;
 
+const LanguageRow = styled.span(
+  ({ theme }) => css`
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacings.xs};
+    min-width: 220px;
+  `,
+);
+
+const CurrentLanguage = styled.span(
+  ({ theme }) => css`
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacings.xxs};
+    margin-left: auto;
+    color: ${theme.colors.text.secondary};
+  `,
+);
+
 const UserMenu = () => {
   const { fullName, readOnly, id: userId } = useCurrentUser();
+  const { language } = useContext(UserPreferencesContext);
   const route = readOnly ? Routes.SYSTEM.USERS.show(userId) : Routes.SYSTEM.USERS.edit(userId);
-  const label = readOnly ? 'Show profile' : 'Edit profile';
+  const { t, i18n } = useTranslation('navigation');
+  const label = readOnly ? t('user_menu.show_profile') : t('user_menu.edit_profile');
 
   const onLogoutClicked = useLogout();
+  // Read-only users, like the built-in admin, can't save preferences. They pick their language right here and it
+  // is kept in the browser, so the current language is the one that is active.
+  const currentLanguage = readOnly ? i18n.language : language;
+  const onSelectLanguage = (code: string) => {
+    applyLanguage(code).catch(() => {});
+  };
 
   return (
-    <NavDropdown title={<NavIcon type="user_menu" />} hoverTitle={`User Menu for ${fullName}`} noCaret>
+    <NavDropdown title={<NavIcon type="user_menu" />} hoverTitle={t('user_menu.title', { name: fullName })} noCaret>
       <Menu.Label>
         <FullName>{fullName}</FullName>
       </Menu.Label>
@@ -49,11 +81,34 @@ const UserMenu = () => {
         <ThemeModeToggle />
       </Menu.Label>
       <MenuItem divider />
+      {readOnly ? (
+        <>
+          <Menu.Label>{t('user_menu.language')}</Menu.Label>
+          {availableLanguages().map(({ code }) => (
+            <MenuItem key={code} active={code === currentLanguage} onClick={() => onSelectLanguage(code)}>
+              <LanguageLabel language={getLanguage(code)} showBeta />
+            </MenuItem>
+          ))}
+        </>
+      ) : (
+        <LinkContainer to={route}>
+          <MenuItem icon="translate">
+            <LanguageRow>
+              {t('user_menu.language')}
+              <CurrentLanguage>
+                <LanguageLabel language={getLanguage(currentLanguage)} />
+                <Icon name="chevron_right" />
+              </CurrentLanguage>
+            </LanguageRow>
+          </MenuItem>
+        </LinkContainer>
+      )}
+      <MenuItem divider />
       <LinkContainer to={route}>
         <MenuItem>{label}</MenuItem>
       </LinkContainer>
       <MenuItem onClick={onLogoutClicked} icon="logout">
-        Log out
+        {t('user_menu.log_out')}
       </MenuItem>
     </NavDropdown>
   );

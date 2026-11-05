@@ -1,0 +1,11 @@
+{
+  "title": "Certificats",
+  "certificate_list": "Liste des certificats",
+  "certificate_name": "Nom",
+  "certificate_expiration": "Date d'expiration",
+  "certificate_details": "Détails",
+  "certificate_status": "Statut",
+  "certificate_active": "Actif",
+  "certificate_expired": "Expiré",
+  "certificate_revoked": "Révoqué"
+}

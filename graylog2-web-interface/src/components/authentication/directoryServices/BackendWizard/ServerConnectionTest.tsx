@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
@@ -46,6 +47,7 @@ type Props = {
 
 const ServerConnectionTest = ({ prepareSubmitPayload }: Props) => {
   const { authBackendMeta } = useContext(BackendWizardContext);
+  const { t } = useTranslation('authentication');
   const [{ loading, success, message, errors }, setConnectionStatus] = useState({
     loading: false,
     success: false,
@@ -75,12 +77,9 @@ const ServerConnectionTest = ({ prepareSubmitPayload }: Props) => {
 
   return (
     <>
-      <p>
-        Performs a background connection check with the address and credentials defined in the step &quot;Server
-        Configuration&quot;.
-      </p>
+      <p>{t('connection_test.description')}</p>
       <Button onClick={_handleConnectionCheck} type="button">
-        {loading ? <Spinner delay={0} text="Test Server Connection" /> : 'Test Server Connection'}
+        {loading ? <Spinner delay={0} text={t('connection_test.submit')} /> : t('connection_test.submit')}
       </Button>
       {success && (
         <NotificationContainer bsStyle="success">

@@ -14,13 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import upperFirst from 'lodash/upperFirst';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { SidecarAdministration } from '@graylog/server-api';
 
 import UserNotification from 'util/UserNotification';
+import translateApiError from 'util/translateApiError';
 import type { SidecarSummary } from 'components/sidecars/types';
+import i18n from 'i18n';
 
 const QUERY_KEY = ['sidecars', 'administration'] as const;
 
@@ -62,8 +63,13 @@ const useSidecarsAdministration = ({ query = '', page = 1, pageSize = 50, filter
     queryFn: () =>
       fetchSidecarsAdministration({ query, page, pageSize, filters }).catch((error) => {
         UserNotification.error(
-          error.status === 400 ? error.responseMessage : `Fetching Sidecars failed with status: ${error.message}`,
-          'Could not retrieve Sidecars',
+          error.status === 400
+            ? (translateApiError(error) ?? error.responseMessage)
+            : i18n.t('use_sidecars_administration_notifications.fetch_sidecars_failed', {
+                ns: 'sidecars',
+                error: error.message,
+              }),
+          i18n.t('use_sidecars_administration_notifications.fetch_sidecars_failed_title', { ns: 'sidecars' }),
         );
 
         throw error;
@@ -101,11 +107,20 @@ export const useSetSidecarAction = () => {
     },
     onSuccess: (_data, { action, collectors }) => {
       const formattedCollectorsCount = Object.keys(collectors).length;
-      UserNotification.success('', `${upperFirst(action)} for ${formattedCollectorsCount} collectors requested`);
+      UserNotification.success(
+        '',
+        i18n.t(`use_sidecars_administration_notifications.requested.${action}`, {
+          ns: 'sidecars',
+          amount: formattedCollectorsCount,
+        }),
+      );
       queryClient.invalidateQueries({ queryKey: QUERY_KEY });
     },
     onError: (error: { message?: string }, { action }) => {
-      UserNotification.error(`Requesting ${action} failed with status: ${error}`, `Could not ${action} collectors`);
+      UserNotification.error(
+        i18n.t(`use_sidecars_administration_notifications.request_failed.${action}`, { ns: 'sidecars', error }),
+        i18n.t(`use_sidecars_administration_notifications.request_failed_title.${action}`, { ns: 'sidecars' }),
+      );
     },
   });
 };

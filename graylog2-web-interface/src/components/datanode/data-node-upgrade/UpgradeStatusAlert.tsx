@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Alert } from 'components/bootstrap';
 import { Icon, Spinner } from 'components/common';
@@ -37,43 +38,54 @@ const ALERT_STYLE: Record<OpenSearchUpgradeStatus, 'info' | 'success' | 'warning
 };
 
 const OpenSearchStatusLine = ({ currentOpenSearchVersion, status, unavailableDataNodeCount }: Props) => {
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
+
   switch (status) {
     case 'checking':
       return (
         <p>
-          <Spinner text="Checking OpenSearch status..." />
+          <Spinner text={t('upgrade_status.checking')} />
         </p>
       );
     case 'upgrading':
       return (
         <p>
-          <Icon name="info" /> OpenSearch rolling upgrade is in progress.
+          <Icon name="info" /> {t('upgrade_status.upgrading')}
         </p>
       );
     case 'error':
       return (
         <p>
-          <Icon name="warning" bsStyle="warning" /> Could not check Data Nodes&apos; embedded OpenSearch version.
+          <Icon name="warning" bsStyle="warning" /> {t('upgrade_status.error')}
         </p>
       );
     case 'unconfirmed':
       return (
         <p>
-          <Icon name="warning" bsStyle="warning" /> Data Nodes&apos; embedded OpenSearch state cannot be confirmed while{' '}
-          {unavailableDataNodeCount} Data {unavailableDataNodeCount === 1 ? 'Node is' : 'Nodes are'} unavailable.
+          <Icon name="warning" bsStyle="warning" />{' '}
+          {t('upgrade_status.unconfirmed', { count: unavailableDataNodeCount })}
         </p>
       );
     case 'up-to-date':
       return (
         <p>
-          <Icon name="check_circle" bsStyle="success" /> Data Nodes&apos; embedded OpenSearch is up to date
-          {currentOpenSearchVersion ? <b>{` (${currentOpenSearchVersion}).`}</b> : '.'}
+          <Icon name="check_circle" bsStyle="success" />{' '}
+          {currentOpenSearchVersion ? (
+            <Trans
+              t={t}
+              i18nKey="upgrade_status.up_to_date_with_version"
+              values={{ version: currentOpenSearchVersion }}
+              components={{ bold: <b /> }}
+            />
+          ) : (
+            t('upgrade_status.up_to_date')
+          )}
         </p>
       );
     case 'outdated':
       return (
         <p>
-          <Icon name="warning" bsStyle="warning" /> Data Nodes&apos; embedded OpenSearch is not up to date.
+          <Icon name="warning" bsStyle="warning" /> {t('upgrade_status.outdated')}
         </p>
       );
     default:
@@ -81,17 +93,21 @@ const OpenSearchStatusLine = ({ currentOpenSearchVersion, status, unavailableDat
   }
 };
 
-const UpgradeStatusAlert = ({ currentOpenSearchVersion, status, unavailableDataNodeCount }: Props) => (
-  <Alert bsStyle={ALERT_STYLE[status]} noIcon>
-    <p>
-      <Icon name="check_circle" bsStyle="success" /> All your Data Nodes are up to date.
-    </p>
-    <OpenSearchStatusLine
-      currentOpenSearchVersion={currentOpenSearchVersion}
-      status={status}
-      unavailableDataNodeCount={unavailableDataNodeCount}
-    />
-  </Alert>
-);
+const UpgradeStatusAlert = ({ currentOpenSearchVersion, status, unavailableDataNodeCount }: Props) => {
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
+
+  return (
+    <Alert bsStyle={ALERT_STYLE[status]} noIcon>
+      <p>
+        <Icon name="check_circle" bsStyle="success" /> {t('upgrade_status.all_data_nodes_up_to_date')}
+      </p>
+      <OpenSearchStatusLine
+        currentOpenSearchVersion={currentOpenSearchVersion}
+        status={status}
+        unavailableDataNodeCount={unavailableDataNodeCount}
+      />
+    </Alert>
+  );
+};
 
 export default UpgradeStatusAlert;

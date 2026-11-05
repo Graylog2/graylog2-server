@@ -19,6 +19,7 @@ import concat from 'lodash/concat';
 import isEqual from 'lodash/isEqual';
 import without from 'lodash/without';
 
+import i18n from 'i18n';
 import { FormControl, FormGroup, ListGroup, ListGroupItem } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
 import OverlayTrigger from 'components/common/OverlayTrigger';
@@ -76,6 +77,8 @@ class SelectPopover extends React.Component<
   }
 > {
   static defaultProps = {
+    filterPlaceholder: undefined,
+    clearSelectionText: undefined,
     placement: 'bottom',
     triggerAction: 'click',
     items: [],
@@ -83,8 +86,6 @@ class SelectPopover extends React.Component<
     multiple: false,
     selectedItems: [],
     displayDataFilter: true,
-    filterPlaceholder: 'Type to filter',
-    clearSelectionText: 'Clear selection',
     disabled: false,
   };
 
@@ -159,7 +160,7 @@ class SelectPopover extends React.Component<
       <FormGroup controlId="dataFilterInput" className={style.dataFilterInput}>
         <FormControl
           type="text"
-          placeholder={filterPlaceholder}
+          placeholder={filterPlaceholder ?? i18n.t('select.type_to_filter', { ns: 'common' })}
           value={filterText}
           onChange={this.handleFilterChange(items)}
         />
@@ -172,7 +173,8 @@ class SelectPopover extends React.Component<
 
     return (
       <ListGroupItem onClick={this.clearItemSelection}>
-        <Icon name="close" className="text-danger" /> {clearSelectionText}
+        <Icon name="close" className="text-danger" />{' '}
+        {clearSelectionText ?? i18n.t('actions.clear_selection', { ns: 'common' })}
       </ListGroupItem>
     );
   };

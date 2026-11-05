@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQueries } from '@tanstack/react-query';
 import styled from 'styled-components';
 
@@ -87,6 +88,7 @@ type Props = {
 };
 
 const IndexerClusterHealth = ({ minimal = false }: Props) => {
+  const { t } = useTranslation('indexsets');
   const { isPermitted } = usePermissions();
   const userHasRequiredPermissions = isPermitted('indexercluster:read');
   const { health, name, loading, error, isSuccess } = useLoadHealthAndName(userHasRequiredPermissions);
@@ -100,17 +102,17 @@ const IndexerClusterHealth = ({ minimal = false }: Props) => {
       <Col md={12}>
         {!minimal && (
           <Header>
-            <h2>{name?.distribution || 'Elasticsearch'} cluster</h2>
+            <h2>{t('indexers.cluster_health.title', { distribution: name?.distribution || 'Elasticsearch' })}</h2>
             {name?.distribution === 'OpenSearch' ? (
               <DocumentationLink
                 page={DocsHelper.PAGES.OPEN_SEARCH_SETUP}
-                text="OpenSearch setup documentation"
+                text={t('indexers.cluster_health.docs_open_search')}
                 displayIcon
               />
             ) : (
               <DocumentationLink
                 page={DocsHelper.PAGES.CONFIGURING_ES}
-                text="Elasticsearch setup documentation"
+                text={t('indexers.cluster_health.docs_elasticsearch')}
                 displayIcon
               />
             )}

@@ -16,6 +16,7 @@
  */
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
+import i18n from 'i18n';
 import type { ViewJson } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
 import type { SearchParams, PaginatedListJSON, Attribute } from 'stores/PaginationTypes';
@@ -81,8 +82,8 @@ const useDashboards = (
     queryFn: () =>
       defaultOnError(
         fetchDashboards(searchParams),
-        'Loading dashboards failed with status',
-        'Could not load dashboards',
+        i18n.t('overview.load_failed', { ns: 'dashboards' }),
+        i18n.t('overview.could_not_load', { ns: 'dashboards' }),
       ),
     placeholderData: keepPreviousData,
     enabled,

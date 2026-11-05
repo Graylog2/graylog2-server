@@ -246,7 +246,10 @@ export interface SystemConfiguration {
 }
 
 export interface CoreSystemConfiguration {
+  /** Identifies the section and is part of its URL. */
   name: string;
+  /** Translated label for the sidebar, `name` is used when missing. */
+  displayName?: string;
   SectionComponent: React.ComponentType;
   permissions?: Array<Permission>;
   showCaret?: boolean;
@@ -585,7 +588,10 @@ export interface WidgetCreatorArgs {
   view: View;
 }
 export interface WidgetCreator {
+  /** Identifies the creator, e.g. in telemetry, so it stays English. */
   title: string;
+  /** Translation key of the displayed title, e.g. `search:widget_creators.message_count`. */
+  titleKey?: string;
   func: (args: WidgetCreatorArgs) => Widget;
   icon: React.ComponentType<{}>;
 }

@@ -20,6 +20,7 @@ import type * as Immutable from 'immutable';
 import type { FormikProps } from 'formik';
 import { Formik, Form, Field } from 'formik';
 import styled from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import type Role from 'logic/roles/Role';
 import { validateField, formHasErrors } from 'util/FormsUtils';
@@ -74,6 +75,7 @@ const UserSyncStep = ({
   const { backendValidationErrors } = stepsState;
   const rolesOptions = roles.map((role) => ({ label: role.name, value: role.id })).toArray();
   const sendTelemetry = useSendTelemetry('directory-service');
+  const { t } = useTranslation('authentication');
 
   const _onSubmitAll = (validateForm) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.AUTHENTICATION.DIRECTORY_USER_SYNC_SAVE_CLICKED, {
@@ -105,28 +107,28 @@ const UserSyncStep = ({
         <Form className="form form-horizontal">
           <FormikFormGroup
             help={help.userSearchBase}
-            label="Search Base DN"
+            label={t('user_sync.search_base_dn')}
             error={backendValidationErrors?.userSearchBase}
             name="userSearchBase"
-            placeholder="Search Base DN"
+            placeholder={t('user_sync.search_base_dn')}
             validate={validateField(FORM_VALIDATION.userSearchBase)}
           />
 
           <FormikFormGroup
             help={help.userSearchPattern}
-            label="Search Pattern"
+            label={t('user_sync.search_pattern')}
             name="userSearchPattern"
             error={backendValidationErrors?.userSearchPattern}
-            placeholder="Search Pattern"
+            placeholder={t('user_sync.search_pattern')}
             validate={validateField(FORM_VALIDATION.userSearchPattern)}
           />
 
           <FormikFormGroup
             help={help.userNameAttribute}
-            label="Name Attribute"
+            label={t('user_sync.name_attribute')}
             name="userNameAttribute"
             error={backendValidationErrors?.userNameAttribute}
-            placeholder="Name Attribute"
+            placeholder={t('user_sync.name_attribute')}
             validate={validateField(FORM_VALIDATION.userNameAttribute)}
           />
 
@@ -138,12 +140,12 @@ const UserSyncStep = ({
                   help={help.emailAttributes}
                   error={error ?? backendValidationErrors?.emailAttributes}
                   id="email-attributes-input"
-                  label="Email Attributes"
+                  label={t('user_sync.email_attributes')}
                   labelClassName="col-sm-3"
                   wrapperClassName="col-sm-9">
                   <StyledInputList
                     id="userEmailAttributes"
-                    placeholder="Email Attributes"
+                    placeholder={t('user_sync.email_attributes')}
                     name={name}
                     values={value}
                     isClearable
@@ -155,9 +157,9 @@ const UserSyncStep = ({
           )}
           <FormikFormGroup
             help={help.userFullNameAttribute}
-            label="Full Name Attribute"
+            label={t('user_sync.full_name_attribute')}
             name="userFullNameAttribute"
-            placeholder="Full Name Attribute"
+            placeholder={t('user_sync.full_name_attribute')}
             error={backendValidationErrors?.userFullNameAttribute}
             validate={validateField(FORM_VALIDATION.userFullNameAttribute)}
           />
@@ -165,9 +167,9 @@ const UserSyncStep = ({
           {!excludedFields.userUniqueIdAttribute && (
             <FormikFormGroup
               help={help.userUniqueIdAttribute}
-              label="ID Attribute"
+              label={t('user_sync.id_attribute')}
               name="userUniqueIdAttribute"
-              placeholder="ID Attribute"
+              placeholder={t('user_sync.id_attribute')}
               error={backendValidationErrors?.userUniqueIdAttribute}
               validate={validateField(FORM_VALIDATION.userUniqueIdAttribute)}
             />
@@ -176,8 +178,11 @@ const UserSyncStep = ({
           <Row>
             <Col sm={9} smOffset={3}>
               <Panel bsStyle="info">
-                Changing the default role and time zone assignments will only affect new users created via{' '}
-                {stepsState.authBackendMeta.serviceTitle}!
+                <Trans
+                  t={t}
+                  i18nKey="user_sync.default_assignments_hint"
+                  values={{ serviceTitle: stepsState.authBackendMeta.serviceTitle }}
+                />
               </Panel>
             </Col>
           </Row>
@@ -189,7 +194,7 @@ const UserSyncStep = ({
                 help={help.defaultRoles}
                 error={error ?? backendValidationErrors?.defaultRoles}
                 id="default-roles-select"
-                label="Default Roles"
+                label={t('user_sync.default_roles')}
                 labelClassName="col-sm-3"
                 wrapperClassName="col-sm-9">
                 <Select
@@ -197,7 +202,7 @@ const UserSyncStep = ({
                   onBlur={onBlur}
                   onChange={(selectedRoles) => onChange({ target: { value: selectedRoles, name } })}
                   options={rolesOptions}
-                  placeholder="Search for roles"
+                  placeholder={t('user_sync.search_roles')}
                   value={value}
                 />
               </Input>
@@ -209,11 +214,11 @@ const UserSyncStep = ({
               <Input
                 id="default-user-timezone-select"
                 help={help.defaultUserTimezone}
-                label="Default User Time Zone"
+                label={t('user_sync.default_user_time_zone')}
                 labelClassName="col-sm-3"
                 wrapperClassName="col-sm-9">
                 <TimezoneSelect
-                  value={value || "Browser's time zone"}
+                  value={value || t('user_sync.browser_time_zone')}
                   name="timezone"
                   onChange={(newValue) => onChange({ target: { name, value: newValue } })}
                 />
@@ -223,9 +228,7 @@ const UserSyncStep = ({
 
           <Row>
             <Col sm={9} smOffset={3}>
-              <Alert bsStyle="info">
-                We recommend you test your user login in the sidebar panel to verify your settings.
-              </Alert>
+              <Alert bsStyle="info">{t('user_sync.test_login_hint')}</Alert>
             </Col>
           </Row>
 
@@ -233,7 +236,7 @@ const UserSyncStep = ({
 
           <ButtonToolbar className="pull-right">
             <Button disabled={isSubmitting} onClick={() => _onSubmitAll(validateForm)} type="button">
-              Finish & Save Identity Service
+              {t('wizard.finish_and_save_identity_service')}
             </Button>
             <Button
               bsStyle="primary"
@@ -244,7 +247,7 @@ const UserSyncStep = ({
                 });
               }}
               type="submit">
-              Next: Group Synchronization
+              {t('wizard.next_group_sync')}
             </Button>
           </ButtonToolbar>
         </Form>

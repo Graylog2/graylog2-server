@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useSendTelemetryOnMount from 'logic/telemetry/useSendTelemetryOnMount';
@@ -26,6 +27,7 @@ import Routes from 'routing/Routes';
 import useHistory from 'routing/useHistory';
 
 const CreateTemplate = () => {
+  const { t } = useTranslation('indexsets');
   const sendTelemetry = useSendTelemetry();
   const { createTemplate } = useTemplateMutation();
   const history = useHistory();
@@ -57,8 +59,8 @@ const CreateTemplate = () => {
   return (
     <TemplateForm
       onCancel={onCancel}
-      submitButtonText="Create template"
-      submitLoadingText="Creating template..."
+      submitButtonText={t('templates.create')}
+      submitLoadingText={t('templates.creating')}
       onSubmit={onSubmit}
     />
   );

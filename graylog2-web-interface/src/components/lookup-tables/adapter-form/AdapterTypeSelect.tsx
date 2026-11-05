@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -30,6 +31,7 @@ type Props = {
 };
 
 function AdapterTypeSelect({ adapterConfigType, onAdapterChange }: Props) {
+  const { t } = useTranslation('lookup_tables');
   const { types, fetchingDataAdapterTypes } = useFetchDataAdapterTypes();
   const plugins = usePluginEntities('lookupTableAdapters');
   const adapterPlugins = Object.fromEntries(plugins.map((p) => [p.type, p]));
@@ -49,7 +51,7 @@ function AdapterTypeSelect({ adapterConfigType, onAdapterChange }: Props) {
             return {
               value: typeItem.type,
               disabled: true,
-              label: `${typeItem.type} - missing or invalid plugin`,
+              label: t('adapter_form.type_missing_plugin', { type: typeItem.type }),
             };
           }
 
@@ -62,7 +64,7 @@ function AdapterTypeSelect({ adapterConfigType, onAdapterChange }: Props) {
     }
 
     return [];
-  }, [types, fetchingDataAdapterTypes, adapterPlugins]);
+  }, [types, fetchingDataAdapterTypes, adapterPlugins, t]);
 
   const handleTypeSelect = useCallback(
     (adapterType: string) => {
@@ -82,11 +84,11 @@ function AdapterTypeSelect({ adapterConfigType, onAdapterChange }: Props) {
   return (
     <Input
       id="data-adapter-type-select"
-      label="Data Adapter Type"
+      label={t('adapter_form.type_label')}
       required
-      help="The type of data adapter to configure.">
+      help={t('adapter_form.type_help')}>
       <Select
-        placeholder="Select Data Adapter Type"
+        placeholder={t('adapter_form.type_placeholder')}
         clearable={false}
         options={sortedAdapters}
         onChange={handleTypeSelect}

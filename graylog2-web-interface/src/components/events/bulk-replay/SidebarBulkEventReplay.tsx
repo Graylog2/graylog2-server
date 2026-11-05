@@ -17,6 +17,7 @@
 
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import EventListItem from 'components/events/bulk-replay/EventListItem';
 import useSelectedEvents from 'components/events/bulk-replay/useSelectedEvents';
@@ -61,17 +62,22 @@ const ActionsBar = styled(ButtonToolbar)`
   gap: 0.25em;
 `;
 
-const RemainingBulkActions = ({ completed, actions }: RemainingBulkActionsProps) => (
-  <DropdownButton
-    title="Bulk actions"
-    bsStyle={completed ? 'success' : 'default'}
-    id="bulk-actions-dropdown"
-    bsSize="xs">
-    {actions}
-  </DropdownButton>
-);
+const RemainingBulkActions = ({ completed, actions }: RemainingBulkActionsProps) => {
+  const { t } = useTranslation('events');
+
+  return (
+    <DropdownButton
+      title={t('common:bulk_actions.title')}
+      bsStyle={completed ? 'success' : 'default'}
+      id="bulk-actions-dropdown"
+      bsSize="xs">
+      {actions}
+    </DropdownButton>
+  );
+};
 
 const SidebarBulkEventReplay = () => {
+  const { t } = useTranslation('events');
   const initialEventIds: Array<string> = useSessionInitialEventIds();
 
   const { eventIds, eventsData: events, selectedId, removeItem, selectItem, markItemAsDone } = useSelectedEvents();
@@ -85,25 +91,16 @@ const SidebarBulkEventReplay = () => {
   return (
     <Container>
       <EventsListSidebar>
-        <p>
-          The following list contains all of the events/alerts you selected in the previous step, allowing you to review
-          the replayed search for each of them.
-        </p>
+        <p>{t('alerts_bulk_replay.list_description')}</p>
         <Row>
-          <i>
-            Review of {completed}/{total} events completed.
-          </i>
+          <i>{t('alerts_bulk_replay.review_progress', { completed, total })}</i>
           {actions && (
             <ActionsBar>
               <RemainingBulkActions actions={actions} completed={total > 0 && total === completed} />
             </ActionsBar>
           )}
         </Row>
-        {total === completed && (
-          <Alert bsStyle="info">
-            You have reviewed all events. You can now select a bulk action to apply to all events listed below.
-          </Alert>
-        )}
+        {total === completed && <Alert bsStyle="info">{t('alerts_bulk_replay.all_reviewed')}</Alert>}
         <StyledList>
           {eventIds.map(({ id: eventId, status: eventStatus }) => (
             <li key={`bulk-replay-search-item-${eventId}`}>

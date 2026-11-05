@@ -16,7 +16,9 @@
  */
 import React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
+import i18n from 'i18n';
 import { Button, Input, Table } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 
@@ -44,18 +46,23 @@ type KeyValueTableProps = {
   actionsSize?: 'large' | 'medium' | 'small' | 'xsmall';
 };
 
+type TableProps = KeyValueTableProps & {
+  headers: any[];
+  addLabel: string;
+  deleteLabel: string;
+};
+
 /**
  * KeyValueTable displays a table for all key-value pairs in a JS object. If the editable prop is set to true, it also
  * provides inputs to create, edit and delete key-value pairs.
  */
-class KeyValueTable extends React.Component<
-  KeyValueTableProps,
+class KeyValueTableComponent extends React.Component<
+  TableProps,
   {
     [key: string]: any;
   }
 > {
   static defaultProps = {
-    headers: ['Name', 'Value', 'Actions'],
     editable: false,
     actionsSize: 'xsmall',
     className: '',
@@ -96,7 +103,7 @@ class KeyValueTable extends React.Component<
 
   _deleteRow = (key) => () => {
     // eslint-disable-next-line no-alert
-    if (window.confirm(`Are you sure you want to delete property '${key}'?`)) {
+    if (window.confirm(i18n.t('notifications.delete_property_confirm', { ns: 'common', key }))) {
       const newPairs = ObjectUtils.clone(this.props.pairs);
 
       delete newPairs[key];
@@ -142,7 +149,7 @@ class KeyValueTable extends React.Component<
               bsStyle="danger"
               bsSize={this.props.actionsSize}
               onClick={this._deleteRow(key)}>
-              Delete
+              {this.props.deleteLabel}
             </Button>,
           );
 
@@ -195,7 +202,7 @@ class KeyValueTable extends React.Component<
         </td>
         <td>
           <Button bsStyle="primary" bsSize="small" onClick={this._addRow} disabled={addRowDisabled}>
-            Add
+            {this.props.addLabel}
           </Button>
         </td>
       </tr>
@@ -218,5 +225,18 @@ class KeyValueTable extends React.Component<
     );
   }
 }
+
+const KeyValueTable = ({ headers = undefined, ...props }: KeyValueTableProps) => {
+  const { t } = useTranslation('common');
+
+  return (
+    <KeyValueTableComponent
+      {...props}
+      headers={headers ?? [t('key_value_table.name'), t('key_value_table.value'), t('key_value_table.actions')]}
+      addLabel={t('actions.add')}
+      deleteLabel={t('actions.delete')}
+    />
+  );
+};
 
 export default KeyValueTable;

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { BrandIcon, Icon } from 'components/common';
@@ -58,15 +59,19 @@ const renderIcon = (source: DataSource) =>
   source.type === 'brand' ? <BrandIcon name={source.name} /> : <MaterialIcon name={source.name} />;
 
 // Static, non-interactive list of example data-source icons for the first-use welcome page.
-const DataSourceIcons = () => (
-  <Sources>
-    {DATA_SOURCES.map((source) => (
-      <IconCard key={source.label} title={source.label}>
-        {renderIcon(source)}
-      </IconCard>
-    ))}
-    <AndMore>And more</AndMore>
-  </Sources>
-);
+const DataSourceIcons = () => {
+  const { t } = useTranslation('welcome');
+
+  return (
+    <Sources>
+      {DATA_SOURCES.map((source) => (
+        <IconCard key={source.label} title={source.label}>
+          {renderIcon(source)}
+        </IconCard>
+      ))}
+      <AndMore>{t('onboarding.and_more')}</AndMore>
+    </Sources>
+  );
+};
 
 export default DataSourceIcons;

@@ -17,12 +17,15 @@
 import React from 'react';
 import findIndex from 'lodash/findIndex';
 
+import i18n from 'i18n';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Row, Col, Button, Input } from 'components/bootstrap';
 import DataTable from 'components/common/DataTable';
 import ValueReferenceData from 'util/ValueReferenceData';
 
 import Style from './ContentPackApplyParameter.css';
+
+const t = (key: string, options?: { [key: string]: unknown }) => i18n.t(key, { ns: 'content_packs', ...options });
 
 type ContentPackApplyParameterProps = {
   onParameterApply?: (...args: any[]) => void;
@@ -69,7 +72,7 @@ class ContentPackApplyParameter extends React.Component<
           onClick={() => {
             this._parameterClear(paramMap.configKey);
           }}>
-          Clear
+          {t('apply_parameter.clear')}
         </Button>
       </td>
     ) : (
@@ -130,7 +133,7 @@ class ContentPackApplyParameter extends React.Component<
         {name}
       </option>
     );
-    const configOptions = [emptyOption('Choose Config Key')].concat(
+    const configOptions = [emptyOption(t('apply_parameter.choose_config_key'))].concat(
       configKeys.map((key) => (
         <option key={key} value={key}>
           {key}
@@ -138,7 +141,7 @@ class ContentPackApplyParameter extends React.Component<
       )),
     );
     let { parameters } = this.props;
-    let emptyName = parameters.length <= 0 ? 'Create a parameter first' : 'Choose...';
+    let emptyName = parameters.length <= 0 ? t('apply_parameter.create_parameter_first') : t('apply_parameter.choose');
 
     if (this.state.config_key !== '' && parameters.length > 0) {
       const configKeyType = configPaths[this.state.config_key].getValueType();
@@ -147,7 +150,10 @@ class ContentPackApplyParameter extends React.Component<
         parameters = parameters.filter((parameter) => parameter.type === configKeyType);
       }
 
-      emptyName = parameters.length <= 0 ? `No parameter from type ${configKeyType}` : 'Choose...';
+      emptyName =
+        parameters.length <= 0
+          ? t('apply_parameter.no_parameter_of_type', { type: configKeyType })
+          : t('apply_parameter.choose');
     }
 
     const parameterOptions = [emptyOption(emptyName)].concat(
@@ -169,7 +175,7 @@ class ContentPackApplyParameter extends React.Component<
                 type="select"
                 value={this.state.config_key}
                 onChange={this._bindValue}
-                label="Config Key"
+                label={t('apply_parameter.config_key')}
                 required>
                 {configOptions}
               </Input>
@@ -181,7 +187,7 @@ class ContentPackApplyParameter extends React.Component<
                 type="select"
                 value={this.state.parameter}
                 onChange={this._bindValue}
-                label="Parameter"
+                label={t('apply_parameter.parameter')}
                 required>
                 {parameterOptions}
               </Input>
@@ -191,7 +197,7 @@ class ContentPackApplyParameter extends React.Component<
           <Row>
             <Col smOffset={10} sm={2}>
               <Button bsStyle="primary" disabled={!this._valuesSelected()} type="submit">
-                Apply
+                {t('apply_parameter.apply')}
               </Button>
             </Col>
           </Row>
@@ -200,7 +206,7 @@ class ContentPackApplyParameter extends React.Component<
           <Col smOffset={1} sm={10}>
             <DataTable
               id="config-key-list"
-              headers={['Config Key', 'Parameter', 'Action']}
+              headers={[t('apply_parameter.config_key'), t('apply_parameter.parameter'), t('apply_parameter.action')]}
               filterKeys={[]}
               rows={this.props.appliedParameter}
               dataRowFormatter={this._configKeyRowFormatter}

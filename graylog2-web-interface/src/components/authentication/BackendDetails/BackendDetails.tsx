@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { getAuthServicePlugin } from 'util/AuthenticationService';
 import type { PaginatedRoles } from 'hooks/useAuthzRoles';
@@ -40,15 +41,14 @@ type Props = {
 type TypedConfig = { type: string };
 
 const BackendDetails = ({ authenticationBackend }: Props) => {
+  const { t } = useTranslation('authentication');
   const authService = getAuthServicePlugin((authenticationBackend.config as TypedConfig).type);
   const [paginatedRoles, setPaginatedRoles] = useState<PaginatedRoles | undefined>();
 
   useEffect(() => _loadRoles(setPaginatedRoles), []);
 
   if (!authService) {
-    return (
-      <>{`No authentication service plugin configured for type "${(authenticationBackend.config as TypedConfig).type}"`}</>
-    );
+    return <>{t('no_service_plugin', { type: (authenticationBackend.config as TypedConfig).type })}</>;
   }
 
   if (!paginatedRoles) {

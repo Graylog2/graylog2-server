@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { Select } from 'components/common';
@@ -26,12 +27,17 @@ const TimeoutSelect = styled(Select)`
 `;
 
 const OPTIONS = [
-  { value: `${MS_SECOND}`, label: 'Seconds' },
-  { value: `${MS_MINUTE}`, label: 'Minutes' },
-  { value: `${MS_HOUR}`, label: 'Hours' },
-  { value: `${MS_DAY}`, label: 'Days' },
+  { value: `${MS_SECOND}`, key: 'seconds' },
+  { value: `${MS_MINUTE}`, key: 'minutes' },
+  { value: `${MS_HOUR}`, key: 'hours' },
+  { value: `${MS_DAY}`, key: 'days' },
 ];
 
-const TimeoutUnitSelect = (props) => <TimeoutSelect {...props} aria-label="Timeout unit" options={OPTIONS} />;
+const TimeoutUnitSelect = (props) => {
+  const { t } = useTranslation('users');
+  const options = OPTIONS.map(({ value, key }) => ({ value, label: t(`timeout.units.${key}`) }));
+
+  return <TimeoutSelect {...props} aria-label={t('timeout.unit_label')} options={options} />;
+};
 
 export default TimeoutUnitSelect;

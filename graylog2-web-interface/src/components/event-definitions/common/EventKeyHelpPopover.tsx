@@ -15,22 +15,24 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
-const EventKeyHelpPopover = () => (
-  <>
-    Event Keys are custom fields whose values are combined into the Event&apos;s key (values joined with <code>|</code>
-    ). The key identifies the entity an Event is about. It does not change how many Events are created.
-    <p />
-    <b>Where the key matters:</b> <b>Event Correlation</b> only matches source Events that share the same key, and
-    creates at most one Event per key within its search window. Set Keys on the Event Definitions you intend to
-    correlate, not on the correlation itself.
-    <p />
-    <b>Example:</b> two definitions, <em>Login failure</em> and <em>Privilege escalation</em>, both with Event Key{' '}
-    <code>username</code>. A correlation of the two only fires when both Events carry the same username.
-    <p />
-    To control how many Events a <b>Filter &amp; Aggregation</b> definition creates, use &quot;Create Events for
-    Definition if...&quot; with &quot;Aggregation of results reaches a threshold&quot; and configure Group by Field(s).
-  </>
-);
+const COMPONENTS = { bold: <b />, code: <code />, em: <em /> };
+
+const EventKeyHelpPopover = () => {
+  const { t } = useTranslation('event_definitions');
+
+  return (
+    <>
+      <Trans t={t} i18nKey="event_key_help.intro" components={COMPONENTS} />
+      <p />
+      <Trans t={t} i18nKey="event_key_help.where_it_matters" components={COMPONENTS} />
+      <p />
+      <Trans t={t} i18nKey="event_key_help.example" components={COMPONENTS} />
+      <p />
+      <Trans t={t} i18nKey="event_key_help.event_count" components={COMPONENTS} />
+    </>
+  );
+};
 
 export default EventKeyHelpPopover;

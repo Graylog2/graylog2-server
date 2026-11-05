@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import i18n from 'i18n';
 import type { StreamMetricField } from 'hooks/useStreamMetrics';
 
 export const METRIC_COLUMN_IDS = {
@@ -27,14 +28,9 @@ export const METRIC_COLUMN_IDS = {
 
 export type MetricColumnId = (typeof METRIC_COLUMN_IDS)[keyof typeof METRIC_COLUMN_IDS];
 
-export const METRIC_COLUMN_TITLES: Record<MetricColumnId, string> = {
-  [METRIC_COLUMN_IDS.messageCount]: 'Message Count (Last 24H)',
-  [METRIC_COLUMN_IDS.avgProcessingTime]: 'Avg Processing Time (Last 15min)',
-  [METRIC_COLUMN_IDS.maxProcessingTime]: 'Max Processing Time (Last 15min)',
-  [METRIC_COLUMN_IDS.associatedInputs]: 'Associated Inputs (Last 24H)',
-  [METRIC_COLUMN_IDS.pipelines]: 'Pipelines',
-  [METRIC_COLUMN_IDS.routingPipelines]: 'Routing Pipelines',
-};
+// Translated when called, so call it while rendering.
+export const getMetricColumnTitle = (id: MetricColumnId) =>
+  i18n.t(`streams_overview.metric_columns.${id}`, { ns: 'streams' });
 
 const REQUIRED_BACKEND_FIELDS: Record<MetricColumnId, Array<StreamMetricField>> = {
   [METRIC_COLUMN_IDS.messageCount]: ['message_count'],

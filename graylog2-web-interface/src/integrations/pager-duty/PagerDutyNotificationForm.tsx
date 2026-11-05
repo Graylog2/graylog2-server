@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
+import { useTranslation } from 'react-i18next';
 
 import { Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
@@ -43,6 +44,7 @@ type PagerDutyNotificationFormProps = {
 
 const PagerDutyNotificationForm = ({ config, validation, onChange }: PagerDutyNotificationFormProps) => {
   const productName = useProductName();
+  const { t } = useTranslation('integrations');
   const propagateChange = (key: string, value: unknown) => {
     const nextConfig = cloneDeep(config);
     if ((key === 'pager_duty_title' || key === 'incident_key') && value === '') {
@@ -63,10 +65,10 @@ const PagerDutyNotificationForm = ({ config, validation, onChange }: PagerDutyNo
       <Input
         id="pagerduty-notification-v2-routing_key"
         name="routing_key"
-        label="Routing Key"
+        label={t('pager_duty_notification_form.routing_key_label')}
         type="text"
         bsStyle={validation.errors.routing_key ? 'error' : null}
-        help={validation.errors?.routing_key?.[0] ?? 'The Pager Duty integration Routing Key.'}
+        help={validation.errors?.routing_key?.[0] ?? t('pager_duty_notification_form.routing_key_help')}
         value={config.routing_key}
         onChange={handleChange}
         required
@@ -74,12 +76,12 @@ const PagerDutyNotificationForm = ({ config, validation, onChange }: PagerDutyNo
       <Input
         id="pagerduty-notification-v2-pager_duty_title"
         name="pager_duty_title"
-        label="Incident Title"
+        label={t('pager_duty_notification_form.incident_title_label')}
         type="text"
         bsStyle={validation.errors.pager_duty_title ? 'error' : null}
         help={
           validation.errors?.pager_duty_title?.[0] ??
-          `Custom title for the incident in Pager Duty. Will be the event title as shown in ${productName} if not set.`
+          t('pager_duty_notification_form.incident_title_help', { productName })
         }
         value={config.pager_duty_title}
         onChange={handleChange}
@@ -87,48 +89,41 @@ const PagerDutyNotificationForm = ({ config, validation, onChange }: PagerDutyNo
       <Input
         id="pagerduty-notification-v2-custom_incident"
         name="custom_incident"
-        label="Use Custom Incident Key"
+        label={t('pager_duty_notification_form.custom_incident_label')}
         type="checkbox"
         bsStyle={validation.errors.custom_incident ? 'error' : null}
-        help={validation.errors?.custom_incident?.[0] ?? 'Generate a custom incident key.'}
+        help={validation.errors?.custom_incident?.[0] ?? t('pager_duty_notification_form.custom_incident_help')}
         checked={config.custom_incident}
         onChange={handleChange}
       />
       <Input
         id="pagerduty-notification-v2-key_prefix"
         name="key_prefix"
-        label="Incident Key Prefix"
+        label={t('pager_duty_notification_form.key_prefix_label')}
         type="text"
         bsStyle={validation.errors.key_prefix ? 'error' : null}
-        help={
-          validation.errors?.key_prefix?.[0] ??
-          'Incident key prefix that will be followed by Stream(s) and the Event Definition title. Use Incident Key to customize entire key.'
-        }
+        help={validation.errors?.key_prefix?.[0] ?? t('pager_duty_notification_form.key_prefix_help')}
         value={config.key_prefix}
         onChange={handleChange}
       />
       <Input
         id="pagerduty-notification-v2-incident_key"
         name="incident_key"
-        label="Incident Key"
+        label={t('pager_duty_notification_form.incident_key_label')}
         type="text"
         bsStyle={validation.errors.incident_key ? 'error' : null}
-        help={
-          validation.errors?.incident_key?.[0] ??
-          'Full key to identify the incident. Will be used instead of prefix, if provided.'
-        }
+        help={validation.errors?.incident_key?.[0] ?? t('pager_duty_notification_form.incident_key_help')}
         value={config.incident_key}
         onChange={handleChange}
       />
       <Input
         id="pagerduty-notification-v2-client_name"
         name="client_name"
-        label="Client Name"
+        label={t('pager_duty_notification_form.client_name_label')}
         type="text"
         bsStyle={validation.errors.client_name ? 'error' : null}
         help={
-          validation.errors?.client_name?.[0] ??
-          `The name of the ${productName} system that is triggering the PagerDuty event.`
+          validation.errors?.client_name?.[0] ?? t('pager_duty_notification_form.client_name_help', { productName })
         }
         value={config.client_name}
         onChange={handleChange}
@@ -137,13 +132,10 @@ const PagerDutyNotificationForm = ({ config, validation, onChange }: PagerDutyNo
       <Input
         id="pagerduty-notification-v2-client_url"
         name="client_url"
-        label="Client URL"
+        label={t('pager_duty_notification_form.client_url_label')}
         type="text"
         bsStyle={validation.errors.client_url ? 'error' : null}
-        help={
-          validation.errors?.client_url?.[0] ??
-          `The URL of the ${productName} system that is triggering the PagerDuty event.`
-        }
+        help={validation.errors?.client_url?.[0] ?? t('pager_duty_notification_form.client_url_help', { productName })}
         value={config.client_url}
         onChange={handleChange}
         required

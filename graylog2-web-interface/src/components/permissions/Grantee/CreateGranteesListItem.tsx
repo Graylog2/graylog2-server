@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { CapabilitiesList } from 'logic/permissions/EntityShareState';
 import type EntityShareState from 'logic/permissions/EntityShareState';
@@ -51,6 +52,7 @@ const CreateGranteesListItem = ({
   onDelete,
   onCapabilityChange,
 }: Props) => {
+  const { t } = useTranslation('users');
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = () => {
@@ -68,14 +70,18 @@ const CreateGranteesListItem = ({
       <StyledEntityCreateCapabilitySelect
         onChange={(newCapabilityId) => onCapabilityChange({ granteeId: id, capabilityId: newCapabilityId })}
         capabilities={availableCapabilities}
-        title={`Change the capability for ${title}`}
+        title={t('permissions.grantees.change_capability', { title })}
         value={capabilityId}
       />
       <GranteeListItemActions>
         {isDeleting ? (
           <Spinner />
         ) : (
-          <IconButton name="delete" onClick={handleDelete} title={`Remove sharing for ${title}`} />
+          <IconButton
+            name="delete"
+            onClick={handleDelete}
+            title={t('permissions.grantees.remove_sharing', { title })}
+          />
         )}
       </GranteeListItemActions>
     </GranteeListItemContainer>

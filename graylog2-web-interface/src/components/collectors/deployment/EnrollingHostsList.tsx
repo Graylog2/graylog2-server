@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Button, Table } from 'components/bootstrap';
 import { Link, RelativeTime } from 'components/common';
@@ -87,11 +88,13 @@ const Receiving = styled.span(
 );
 
 const FirstMessagesCell = ({ count }: { count: number | undefined }) => {
+  const { t } = useTranslation('collectors');
+
   if ((count ?? 0) > 0) {
-    return <Receiving>Receiving</Receiving>;
+    return <Receiving>{t('enrolling_hosts.receiving')}</Receiving>;
   }
 
-  return <MutedText as="span">Listening&hellip;</MutedText>;
+  return <MutedText as="span">{t('enrolling_hosts.listening')}</MutedText>;
 };
 
 /**
@@ -101,6 +104,7 @@ const FirstMessagesCell = ({ count }: { count: number | undefined }) => {
  * browser time avoids clock-skew bugs (same approach as WaitingForConnection).
  */
 const EnrollingHostsList = ({ fleetId, fleetName }: Props) => {
+  const { t } = useTranslation('collectors');
   const { data: instances, error } = useInstances(fleetId, { refetchInterval: POLL_INTERVAL_MS, silent: true });
   // One aggregation for all hosts, not a query per row.
   const { counts: receivingCounts } = useFleetReceivingCounts(fleetId);
@@ -157,9 +161,11 @@ const EnrollingHostsList = ({ fleetId, fleetName }: Props) => {
       <Header>
         <TitleGroup>
           <PulsingDot />
-          <Title>Enrolling Hosts</Title>
+          <Title>{t('enrolling_hosts.title')}</Title>
           <Subtitle>
-            {enrolling.length > 0 ? `${connectedCount} connected · listening for more…` : 'listening…'}
+            {enrolling.length > 0
+              ? t('enrolling_hosts.connected', { count: connectedCount })
+              : t('enrolling_hosts.listening_subtitle')}
           </Subtitle>
         </TitleGroup>
         <Link
@@ -170,18 +176,18 @@ const EnrollingHostsList = ({ fleetId, fleetName }: Props) => {
               link: 'instances',
             })
           }>
-          View all in Instances
+          {t('enrolling_hosts.view_all')}
         </Link>
       </Header>
       {enrolling.length > 0 ? (
         <Table condensed>
           <thead>
             <tr>
-              <th>Host</th>
-              <th>Status</th>
-              <th>First messages</th>
-              <th>Enrolled</th>
-              <th aria-label="Actions" />
+              <th>{t('enrolling_hosts.host')}</th>
+              <th>{t('enrolling_hosts.status')}</th>
+              <th>{t('enrolling_hosts.first_messages')}</th>
+              <th>{t('enrolling_hosts.enrolled')}</th>
+              <th aria-label={t('enrolling_hosts.actions')} />
             </tr>
           </thead>
           <tbody>
@@ -203,7 +209,7 @@ const EnrollingHostsList = ({ fleetId, fleetName }: Props) => {
                     </td>
                     <td>
                       <Button bsStyle="link" bsSize="xsmall" onClick={() => handleToggleSetup(i, expanded)}>
-                        {expanded ? 'Hide setup' : 'View setup'}
+                        {expanded ? t('enrolling_hosts.hide_setup') : t('enrolling_hosts.view_setup')}
                       </Button>
                     </td>
                   </tr>
@@ -220,11 +226,9 @@ const EnrollingHostsList = ({ fleetId, fleetName }: Props) => {
           </tbody>
         </Table>
       ) : (
-        <MutedText>Hosts running the command appear here as they check in.</MutedText>
+        <MutedText>{t('enrolling_hosts.empty')}</MutedText>
       )}
-      {Boolean(error) && (
-        <MutedText role="status">Having trouble reaching the server &mdash; retrying automatically</MutedText>
-      )}
+      {Boolean(error) && <MutedText role="status">{t('enrolling_hosts.connection_problem')}</MutedText>}
     </Container>
   );
 };

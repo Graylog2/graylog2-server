@@ -1,0 +1,526 @@
+{
+  "add_notification_form": {
+    "add": "新增通知",
+    "choose": "選擇通知",
+    "create_new": "建立新通知...",
+    "help": "選擇要用於此類警示的通知，或建立新的通知以供日後其他警示使用。",
+    "select": "選取通知",
+    "title": "新增通知"
+  },
+  "aggregation_form": {
+    "description": "使用函式彙總符合上方所定義篩選器的日誌訊息。您可以選擇依相同的欄位值對篩選器結果進行分組。",
+    "group_by_example": "假設您建立了一個篩選器，用來擷取網路中所有登入失敗的嘗試，則可以設定當登入失敗總次數超過 5 次時觸發警示。接著，將 <code>username</code> 新增為分組欄位，警示就會<em>針對每個登入失敗次數超過 5 次的 <code>username</code></em> 分別觸發。",
+    "group_by_help": "選取欄位，當篩選結果的欄位值相同時進行分組。<bold>範例：</bold>",
+    "title": "彙總"
+  },
+  "bulk_actions": {
+    "delete": {
+      "confirm_other": "您確定要刪除 {{count}} 個 Event Definitions 嗎？",
+      "error": "刪除 Event Definitions 時發生錯誤。{{error}}",
+      "failed_other": "所選的 {{count}} 個 Event Definitions 中，有 {{failed}} 個無法刪除。",
+      "success_other": "已成功刪除 {{count}} 個 Event Definitions。",
+      "title": "刪除 Event Definitions"
+    },
+    "disable": {
+      "confirm_other": "您確定要停用 {{count}} 個 Event Definitions 嗎？",
+      "error": "停用 Event Definitions 時發生錯誤。{{error}}",
+      "failed_other": "所選的 {{count}} 個 Event Definitions 中，有 {{failed}} 個無法停用。",
+      "success_other": "已成功停用 {{count}} 個 Event Definitions。",
+      "title": "停用 Event Definitions"
+    },
+    "disable_action": "停用",
+    "enable": {
+      "confirm_other": "您確定要啟用 {{count}} 個 Event Definitions 嗎？",
+      "error": "啟用 Event Definitions 時發生錯誤。{{error}}",
+      "failed_other": "所選的 {{count}} 個 Event Definitions 中，有 {{failed}} 個無法啟用。",
+      "success_other": "已成功啟用 {{count}} 個 Event Definitions。",
+      "title": "啟用 Event Definitions"
+    },
+    "enable_action": "啟用",
+    "success_title": "成功"
+  },
+  "condition_form": {
+    "available_conditions": "可用條件",
+    "condition_type": "條件類型",
+    "condition_type_help": "選擇此事件的條件類型。",
+    "description": "定義此類型的事件應如何建立。日後您可以將這些事件作為其他條件的輸入，藉此建立以其他條件為基礎的強大條件。",
+    "no_description": "沒有可用的說明。",
+    "not_editable": "此 Event Definition 類型的條件無法編輯。",
+    "select_condition_type": "選取條件類型",
+    "title": "事件條件"
+  },
+  "condition_summary": {
+    "and": "AND",
+    "create_events": "為 Event Definition 建立事件",
+    "errors_found": "發現錯誤",
+    "hide_errors": "隱藏錯誤",
+    "invalid": "條件無效",
+    "no_condition": "未設定條件",
+    "no_series": "未選取序列",
+    "or": "OR",
+    "preview": "預覽：",
+    "show_errors": "顯示錯誤",
+    "title": "條件摘要",
+    "valid": "條件有效"
+  },
+  "conditions": {
+    "add_expression": "新增運算式",
+    "add_group": "新增群組",
+    "all": "全部",
+    "any": "任一",
+    "boolean_operator": "布林運算子",
+    "boolean_operator_group": "布林運算子群組 {{level}}",
+    "delete_expression": "刪除運算式",
+    "global_boolean_operator": "全域布林運算子",
+    "if": "若",
+    "is": "是",
+    "messages_must_meet": "訊息必須符合",
+    "of_the_following_rules": "下列規則：",
+    "select_condition": "選取條件",
+    "select_field": "選取欄位（選填）",
+    "select_function": "選取函式",
+    "select_percentile": "選取百分位數",
+    "select_strategy": "選取策略（選填）",
+    "threshold": "閾值"
+  },
+  "definition_summary": {
+    "details": "詳細資料",
+    "no_description": "未提供說明",
+    "no_tags": "沒有標籤",
+    "no_title": "未提供標題",
+    "title": "事件摘要"
+  },
+  "details_form": {
+    "add_event_procedure": "新增事件程序",
+    "description": "說明",
+    "description_help": "此 Event Definition 的較詳細說明。",
+    "no_event_procedures": "此 Event Definition 尚無任何事件程序。",
+    "no_remediation_steps": "未提供修復步驟",
+    "optional": "（選填）",
+    "priority": "優先順序",
+    "priority_help": "選擇由此 Event Definition 建立的事件之優先順序。",
+    "remediation_steps": "修復步驟",
+    "remediation_steps_help": "用於修復此事件的步驟。支援 Markdown 格式。",
+    "summary_template": "事件摘要範本",
+    "summary_template_help": "用於產生事件與警示摘要的範本。",
+    "title": "事件詳細資料",
+    "title_help": "此 Event Definition 的標題。",
+    "title_label": "標題"
+  },
+  "event_key_help": {
+    "event_count": "若要控制 <bold>篩選與彙總</bold> 定義建立的事件數量，請使用「若彙總結果達到閾值則建立 Event Definition 事件」，並設定分組欄位。",
+    "example": "<bold>範例：</bold>兩個定義，<em>登入失敗</em>與<em>權限提升</em>，都將事件鍵設為 <code>username</code>。只有當兩個事件帶有相同的 username 時，關聯才會觸發。",
+    "intro": "事件鍵是自訂欄位，其值會合併為事件的鍵（值以 <code>|</code> 連接）。事件鍵用來識別事件所涉及的實體，不會改變建立的事件數量。",
+    "where_it_matters": "<bold>事件鍵的重要性：</bold><bold>事件關聯</bold>只會比對具有相同鍵的來源事件，並且在其搜尋時間窗口內，每個鍵最多建立一個事件。請在您打算進行關聯的 Event Definitions 上設定鍵，而不是在關聯本身上設定。"
+  },
+  "expanded_notifications": {
+    "description": "此 Event Definition 觸發時所發送的通知。",
+    "loading": "正在載入通知...",
+    "missing_permissions": "缺少以下通知的權限：",
+    "missing_permission_title": "缺少權限"
+  },
+  "field_form": {
+    "add": "新增自訂欄位",
+    "data_type": "欄位資料類型",
+    "data_type_string": "字串",
+    "key_help": "指定此欄位是否為鍵，以及其順序。",
+    "more_about_keys": "關於事件鍵的更多資訊",
+    "name": "名稱",
+    "name_help": "此欄位的名稱。",
+    "provider_unavailable": "所選的提供者無法使用。",
+    "select_value_source": "選取值來源",
+    "set_value_from": "設定值來源",
+    "title_edit": "自訂欄位「{{fieldName}}」",
+    "title_new": "新增自訂欄位",
+    "update": "更新自訂欄位",
+    "use_as_key": "將欄位用作事件鍵",
+    "value_source_help": "選取此欄位值的來源。"
+  },
+  "field_value_providers": {
+    "lookup_table": {
+      "title": "Lookup Table"
+    },
+    "template": {
+      "title": "範本"
+    }
+  },
+  "fields_form": {
+    "description": "透過新增自訂欄位，在此 Event Definition 所產生的事件中加入額外資訊。這有助於搜尋事件，或在接收通知時提供更多背景資訊。",
+    "errors_description": "儲存此 Event Definition 前，請先修正下列錯誤：",
+    "errors_title": "含有錯誤的欄位",
+    "event_fields": "事件欄位",
+    "no_keys": "尚未設定任何鍵。",
+    "not_editable": "此 Event Definition 類型的事件欄位無法編輯。",
+    "optional": "（選填）",
+    "tags": "標籤",
+    "tags_description": "為此 Event Definition 附加標籤。標籤會套用到其產生的每個事件，讓在「警示與事件」清單中篩選和分組更加容易。"
+  },
+  "fields_list": {
+    "configuration": "設定",
+    "data_type": "資料類型",
+    "field_name": "欄位名稱",
+    "is_key": "是否為鍵？",
+    "no": "否",
+    "no_fields": "此事件尚未有任何自訂欄位。",
+    "remove": "移除欄位",
+    "value_source": "值來源",
+    "yes": "是"
+  },
+  "filter_aggregation_form": {
+    "aggregation_reaches_threshold": "彙總結果達到閾值",
+    "create_events_if": "若符合以下條件則為 Event Definition 建立事件……",
+    "event_limit": "事件數量上限",
+    "event_limit_help": "此 Event Definition 每次執行時可建立的事件數量上限。超出的事件將被抑制。",
+    "filter_has_results": "篩選器有結果"
+  },
+  "filter_form": {
+    "cron_expression": "Cron 運算式",
+    "cron_expression_help": "用於決定事件執行時機的 Quartz Cron 運算式。",
+    "cron_time_zone": "Cron 時區",
+    "declare_missing_parameters": "請點選上方按鈕，宣告缺少的查詢參數。",
+    "description": "新增資訊以篩選與此 Event Definition 相關的日誌訊息。",
+    "enable": "啟用",
+    "enable_help": "是否應自動執行此 Event Definition？",
+    "execute_every": "搜尋執行間隔",
+    "lookup_table_permission_missing": "此帳號沒有權限從 Lookup Table 宣告查詢參數。",
+    "optional": "（選填）",
+    "query_parameters": "查詢參數",
+    "search_filters": "搜尋篩選器",
+    "search_query": "搜尋查詢",
+    "search_query_help": "訊息應符合的搜尋查詢。您可以使用與搜尋頁面相同的語法，包括使用 <code>{{syntax}}</code> 語法從 Lookup Table 宣告查詢參數。",
+    "search_within": "搜尋範圍為過去",
+    "streams_and_categories": "Stream 與分類",
+    "streams_help": "選取搜尋應包含的 Stream。",
+    "title": "篩選器",
+    "use_cron": "使用 Cron 排程",
+    "use_cron_help": "使用 Quartz Cron 運算式排程此事件",
+    "warm_tier_title": "Warm Tier 警告",
+    "warm_tier_warning": "所選的時間範圍將包含儲存於 Warm Tier 的資料。頻繁從 Warm Tier 擷取資料的事件可能會造成效能問題。<strong>搜尋範圍為過去</strong>的值若超過下列期間，將會落入 Warm Tier：<timestamp></timestamp>。"
+  },
+  "filter_preview": {
+    "help_aggregation": "每當彙總結果符合條件時建立一個事件",
+    "help_aggregation_groups": "每個符合條件的彙總分組建立一個事件",
+    "help_aggregation_groups_label": "有分組的彙總：",
+    "help_aggregation_label": "無分組的彙總：",
+    "help_description": "「篩選與彙總」條件所產生的事件數量，取決於其設定方式：",
+    "help_filter": "每則符合篩選器的訊息建立一個事件",
+    "help_filter_label": "篩選器：",
+    "help_title": "「篩選與彙總」會建立多少個事件？",
+    "loading": "正在載入篩選器預覽...",
+    "message": "訊息",
+    "no_messages": "在目前的搜尋條件下找不到任何訊息。",
+    "no_streams_access": "無法預覽篩選器，使用者沒有任何 Stream 的存取權限。",
+    "timestamp": "時間戳記",
+    "title": "篩選器預覽"
+  },
+  "form_container": {
+    "aggregation_condition_invalid": "彙總條件無效",
+    "loading": "正在載入事件資訊...",
+    "query_parameters_undeclared": "必須宣告查詢參數"
+  },
+  "form_controls": {
+    "create": "建立 Event Definition",
+    "creating": "正在建立...",
+    "previous": "上一步",
+    "update": "更新 Event Definition",
+    "updating": "正在更新..."
+  },
+  "hook_notifications": {
+    "clear_queue_failed": "清除佇列中的通知失敗，狀態：{{error}}",
+    "clear_queue_failed_title": "無法清除佇列中的通知",
+    "clear_queue_success": "已成功清除佇列中的通知。",
+    "clear_queue_success_title": "已清除佇列中的通知。",
+    "cluster_config_failed": "載入 Event Definition 清單事件的叢集設定失敗，狀態",
+    "cluster_config_failed_title": "無法載入 Event Definition 清單事件的叢集設定",
+    "create_failed": "建立 Event Definition「{{title}}」失敗，狀態：{{error}}",
+    "create_failed_title": "無法儲存 Event Definition",
+    "create_success": "已成功建立 Event Definition「{{title}}」。",
+    "create_success_title": "已成功建立 Event Definition",
+    "disable_failed": "停用 Event Definition「{{title}}」失敗，狀態：{{error}}",
+    "disable_failed_title": "無法停用 Event Definition",
+    "disable_success": "已成功停用 Event Definition「{{title}}」。",
+    "disable_success_title": "已成功停用 Event Definition",
+    "duplicate_failed": "複製 Event Definition「{{title}}」失敗，狀態：{{error}}",
+    "duplicate_failed_title": "無法複製 Event Definition",
+    "duplicate_success": "已成功建立 Event Definition「{{title}}」。",
+    "duplicate_success_title": "已成功複製 Event Definition",
+    "enable_failed": "啟用 Event Definition「{{title}}」失敗，狀態：{{error}}",
+    "enable_failed_title": "無法啟用 Event Definition",
+    "enable_success": "已成功啟用 Event Definition「{{title}}」。",
+    "enable_success_title": "已成功啟用 Event Definition",
+    "entity_types_failed": "載入 Event Definition 實體類型失敗，狀態",
+    "entity_types_failed_title": "無法載入 Event Definition 實體類型",
+    "load_failed_title": "無法載入 Event Definition",
+    "load_list_failed": "載入 Event Definitions 失敗，狀態",
+    "load_one_failed": "載入 Event Definition 失敗，狀態",
+    "not_found": "找不到 ID 為 <{{id}}> 的 Event Definition，請確認其未被刪除。",
+    "not_found_title": "無法擷取 Event Definition",
+    "save_failed": "儲存 EventDefinition 失敗，狀態：{{error}}",
+    "save_failed_title": "無法儲存 EventDefinition",
+    "update_failed": "更新 Event Definition「{{title}}」失敗，狀態：{{error}}",
+    "update_failed_title": "無法更新 Event Definition",
+    "update_success": "已成功更新 Event Definition「{{title}}」。",
+    "update_success_title": "已成功更新 Event Definition"
+  },
+  "notification_list": {
+    "no_notifications": "此事件尚未設定任何會觸發的通知。",
+    "not_found": "找不到通知 <em>{{title}}</em> 的相關資訊",
+    "notification": "通知",
+    "type": "類型"
+  },
+  "notification_settings": {
+    "grace_period": "寬限期",
+    "grace_period_help": "警示的通知會在每次發生時發送。設定寬限期可控制再次發送通知前需等待的時間。請注意，帶有鍵的事件，每個不同的鍵值都會有各自的寬限期。",
+    "message_backlog": "訊息積壓",
+    "message_backlog_help": "通知中要包含的訊息數量。",
+    "toggle_message_backlog": "切換訊息積壓"
+  },
+  "notifications_form": {
+    "description": "此事件是否重要到需要您關注？新增通知，即可將其設為警示。",
+    "manage": "管理通知"
+  },
+  "overview": {
+    "human_name": "Event Definitions",
+    "user_defined": "使用者定義"
+  },
+  "page": {
+    "alerts_docs": "警示說明文件",
+    "copy_confirm": "您確定要建立「{{title}}」的副本嗎？",
+    "copy_title": "複製 Event Definition",
+    "create_multiple": "建立 Event Definitions",
+    "description_alerts": "Event Definitions 可讓您根據不同條件建立警示，並對其發出警示。",
+    "description_events": "Event Definitions 可讓您根據不同條件建立事件，並對其發出警示。",
+    "description_list": "建立新的 Event Definitions，以搜尋不同的條件並對其發出警示。",
+    "duplicate": "複製 Event Definition",
+    "edit": "編輯 Event Definition",
+    "edit_named": "編輯 Event Definition「{{title}}」",
+    "file_import": "建立 Event Definitions - 檔案匯入",
+    "git_import": "建立 Event Definitions - Git 匯入",
+    "loading": "正在載入 Event Definition...",
+    "new": "新增 Event Definition",
+    "new_named": "新增 Event Definition「{{title}}」",
+    "title": "Event Definitions",
+    "view": "檢視 Event Definition",
+    "view_named": "檢視 Event Definition「{{title}}」"
+  },
+  "priorities": {
+    "critical": "嚴重",
+    "high": "高",
+    "info": "資訊",
+    "low": "低",
+    "medium": "中"
+  },
+  "provider_summary": {
+    "less_details": "收合詳細資料",
+    "lookup_table_key_field": "Lookup Table 鍵欄位",
+    "more_details": "展開詳細資料",
+    "validate_template_values": "驗證所有範本值皆已設定",
+    "value_source": "值來源"
+  },
+  "query_parameter_modal": {
+    "save": "儲存",
+    "title": "宣告查詢參數「{{name}}」",
+    "type": "類型",
+    "types": {
+      "lookup_table": "Lookup Table"
+    },
+    "undeclared": "：未宣告"
+  },
+  "replay_search": {
+    "attributes": {
+      "description": "說明",
+      "edited_after_event": "Event Definition <definitionTitle>{{title}}</definitionTitle> 在此事件發生後已被編輯。部分彙總 Widget 可能無法準確反映此事件。",
+      "event_definition": "Event Definition",
+      "execute_every": "搜尋執行間隔",
+      "notifications": "通知",
+      "priority": "優先順序",
+      "search_within": "搜尋範圍",
+      "timestamp": "時間戳記",
+      "updated_at": "Event Definition 更新時間"
+    },
+    "not_provided": "未提供",
+    "replay_link": "重播搜尋"
+  },
+  "row_actions": {
+    "delete_confirm": "您確定要刪除「{{title}}」嗎？",
+    "delete_failed": "刪除 Event Definition「{{title}}」失敗，狀態：{{status}}",
+    "delete_failed_title": "無法刪除 Event Definition",
+    "delete_success": "已成功刪除 Event Definition「{{title}}」。",
+    "delete_success_title": "已成功刪除 Event Definition",
+    "delete_title": "刪除 Event Definition",
+    "disable": "停用",
+    "disable_confirm": "您確定要停用「{{title}}」嗎？",
+    "disable_title": "停用 Event Definition",
+    "duplicate": "複製",
+    "edit": "編輯",
+    "enable": "啟用",
+    "enable_confirm": "您確定要啟用「{{title}}」嗎？",
+    "enable_title": "啟用 Event Definition",
+    "entity_type_title": "Event Definition",
+    "share_description": "搜尋使用者或團隊，將其新增為此 Event Definition 的協作者。",
+    "system_cannot_be_deleted": "系統 Event Definition 無法刪除",
+    "system_cannot_be_disabled": "系統 Event Definition 無法停用"
+  },
+  "scheduling": {
+    "clear": "清除",
+    "clear_confirm": "您確定要清除「{{title}}」佇列中的通知嗎？",
+    "details": "{{title}} 詳細資料。",
+    "every": "每 {{duration}}",
+    "last_execution": "上次執行：",
+    "next_execution": "下次執行：",
+    "next_time_range": "下一個時間範圍：",
+    "not_scheduled": "未排程。",
+    "queued_notifications": "佇列中的通知：",
+    "runs": "執行{{schedule}}。",
+    "runs_searching_within": "執行{{schedule}}，搜尋範圍為過去 {{duration}}。",
+    "status": "狀態："
+  },
+  "share": {
+    "collaborators": "協作者",
+    "description": "搜尋使用者或團隊，將其新增為此 Event Definition 的協作者。",
+    "no_collaborators": "此 Event Definition 沒有任何協作者。"
+  },
+  "sidebar": {
+    "details_title": "定義詳細資料"
+  },
+  "status_cell": {
+    "disable": "停用",
+    "disable_confirm": "您確定要停用 Event Definition「{{title}}」嗎？",
+    "disable_title": "停用 Event Definition",
+    "disabled": "已停用",
+    "enable": "啟用",
+    "enabled": "已啟用"
+  },
+  "steps": {
+    "additional_details": "其他詳細資料",
+    "condition": "條件",
+    "notifications": "通知",
+    "share": "分享",
+    "summary": "摘要"
+  },
+  "summary": {
+    "actions": "動作",
+    "condition_invalid": "條件無效：{{errors}}",
+    "condition_types": {
+      "aggregation": "彙總",
+      "filter": "篩選器"
+    },
+    "create_events_if": "若符合以下條件則建立事件",
+    "cron_description": "Cron 說明",
+    "cron_expression": "Cron 運算式",
+    "enable_scheduling": "啟用排程",
+    "event_limit": "事件數量上限",
+    "execute_every": "搜尋執行間隔",
+    "group_by": "分組欄位",
+    "missing_stream_permissions": "缺少以下 Stream 的權限：",
+    "no": "否",
+    "no_cron_expression": "錯誤：未指定 Cron 運算式！",
+    "no_filters": "未設定篩選器",
+    "no_group_by": "未設定分組",
+    "no_streams": "未選取 Stream，將搜尋所有 Stream",
+    "search_filters": "搜尋篩選器",
+    "search_query": "搜尋查詢",
+    "search_within": "搜尋範圍為過去",
+    "stream_categories": "Stream 分類",
+    "streams": "Streams",
+    "time_zone": "時區",
+    "type": "類型",
+    "undeclared_parameters": "有未宣告的查詢參數：{{parameters}}",
+    "use_cron": "使用 Cron 排程",
+    "yes": "是"
+  },
+  "summary_renders": {
+    "backlog_included_other": "通知將包含 {{count}} 則訊息",
+    "backlog_none": "通知將不包含任何訊息。",
+    "condition_plugin_no_summary": "條件外掛程式 <em>{{type}}</em> 未提供摘要。",
+    "event_procedure_summary": "事件程序摘要",
+    "event_procedure_summary_unavailable": "事件程序摘要元件無法使用。",
+    "fields": "欄位",
+    "grace_period_disabled": "寬限期已停用",
+    "grace_period_set": "寬限期設定為 {{duration}}",
+    "keys": "鍵",
+    "missing_notification_permissions": "缺少以下通知的權限：",
+    "no_event_procedures": "此事件沒有任何事件程序。",
+    "no_field_value_provider": "未設定欄位值提供者。",
+    "no_fields": "此 Event Definition 所產生的事件未設定任何欄位。",
+    "no_keys": "此 Event Definition 所產生的事件未設定任何鍵。",
+    "no_notifications": "此事件未設定任何會觸發的通知。",
+    "no_remediation_steps": "未提供修復步驟",
+    "notification_not_found": "找不到通知 <em>{{id}}</em> 的相關資訊。",
+    "notification_plugin_no_summary": "通知外掛程式 <em>{{type}}</em> 未提供摘要。",
+    "notifications": "通知",
+    "provider_plugin_no_summary": "提供者外掛程式 <em>{{type}}</em> 未提供摘要。",
+    "remediation_steps": "修復步驟",
+    "settings": "設定"
+  },
+  "summary_template_help": {
+    "aggregation_events": "彙總事件：分組值與彙總結果。",
+    "aggregation_example": "每位使用者登入失敗次數的彙總：",
+    "aggregation_example_template": "<userVariable></userVariable> 登入失敗 <countVariable></countVariable> 次",
+    "button_aria_label": "顯示事件摘要範本說明",
+    "button_title": "摘要範本說明",
+    "custom_fields": "自訂欄位",
+    "custom_fields_description": "在 Event Definition 中定義的自訂欄位可透過 <code>fields</code> 存取。",
+    "event_definition_variables": "Event Definition 變數",
+    "examples": "範例",
+    "filter_events": "篩選事件：原始日誌訊息的欄位。",
+    "filter_example": "篩選特定日誌訊息：",
+    "filter_example_template": "<hostVariable></hostVariable> 發生錯誤：<messageVariable></messageVariable>",
+    "group_by_field": "（分組欄位）",
+    "hostname": "（主機名稱）",
+    "intro": "使用範本自訂事件建立時，在「警示與事件」頁面上顯示的說明。範本使用 <jmteLink>JMTE</jmteLink> 替換語法，變數需以 <variable></variable> 包起來。",
+    "source_context": "來源背景資訊",
+    "source_context_description": "<code>source</code> 變數包含觸發資料的背景資訊，其內容取決於 Event Definition 類型：",
+    "title": "事件摘要範本"
+  },
+  "tags_editor": {
+    "aria_label": "Event Definition 標籤",
+    "duplicate": "標籤「{{tag}}」已新增。",
+    "help": "按下 Enter 或 Tab 鍵即可新增。標籤會轉換為小寫並去除重複項目。僅允許小寫字母、數字、連字號、底線與點。",
+    "invalid_characters_other": "標籤 {{tags}} 包含無效字元。僅允許小寫字母、數字、連字號、底線與點。",
+    "max_reached": "已達到標籤數量上限 {{max}} 個。",
+    "placeholder": "例如：authentication、brute-force、compliance",
+    "too_long_other": "標籤 {{tags}} 超過 {{max}} 個字元的長度上限。"
+  },
+  "template_preview": {
+    "aggregation": "在分組中設定的欄位，保留其原始名稱",
+    "aggregation_label": "彙總：",
+    "available_fields": "範本中可用的欄位取決於建立事件的條件：",
+    "correlation": "最後一個符合且未被否定的事件中的所有欄位",
+    "correlation_label": "關聯：",
+    "description": "您可以使用動態值豐富產生的事件內容。使用 <code>{{syntax}}</code> 即可存取事件內容中的欄位。",
+    "filter": "原始日誌訊息中的所有欄位",
+    "filter_label": "篩選器：",
+    "title": "範本中可用的欄位"
+  },
+  "template_provider_form": {
+    "exclude_empty_fields": "排除空白欄位",
+    "exclude_empty_fields_help": "勾選此選項後，當範本轉譯出空值時，將完全不在事件中包含該欄位。未勾選時，欄位會以空值加入事件。當所有範本值皆為必填時，此選項一律啟用。",
+    "require_values": "要求設定所有範本值",
+    "require_values_help": "勾選此選項以驗證範本中使用的所有變數皆已設定值。",
+    "template": "範本",
+    "template_help": "輸入要設定給此欄位的文字，或使用 <jmteLink>JMTE 語法</jmteLink> 新增動態值。"
+  },
+  "types": {
+    "aggregation": {
+      "description": "透過篩選日誌訊息，並（選擇性地）彙總其結果以符合特定條件，從而建立事件。這些事件可作為關聯規則的輸入。",
+      "title": "篩選與彙總"
+    },
+    "system": {
+      "description": "內建的 Event Definition，{{productName}} 用以將系統通知以事件形式回報。",
+      "title": "系統 Event Definition"
+    }
+  },
+  "validation": {
+    "cannot_be_empty": "不可為空",
+    "field_cannot_be_empty": "欄位不可為空。",
+    "field_positive_number": "欄位必須為正數。"
+  },
+  "validation_summary": {
+    "title": "發現一些錯誤！"
+  },
+  "use_event_definition_notifications": {
+    "load_failed": "載入 Event Definition 失敗，狀態：{{error}}",
+    "load_failed_title": "無法載入 Event Definition"
+  }
+}

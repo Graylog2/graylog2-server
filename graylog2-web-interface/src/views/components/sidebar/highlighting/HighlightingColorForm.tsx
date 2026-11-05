@@ -15,11 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback } from 'react';
 import styled from 'styled-components';
 import trim from 'lodash/trim';
 import { Field, useFormikContext } from 'formik';
 
+import i18n from 'i18n';
 import { Input } from 'components/bootstrap';
 import { ColorPickerPopover, Select } from 'components/common';
 import { DEFAULT_CUSTOM_HIGHLIGHT_RANGE } from 'views/Constants';
@@ -51,25 +53,29 @@ export type GradientColorObject = {
 
 export type ColorType = StaticColorObject['type'] | GradientColorObject['type'];
 
-const StaticColorPicker = () => (
-  <Field name="color.color">
-    {({ field: { name, value, onChange }, meta }) => (
-      <Input id={name} error={meta?.error} label="Color">
-        <ColorPickerPopover
-          id="formatting-rule-color"
-          placement="right"
-          color={value}
-          colors={DEFAULT_CUSTOM_HIGHLIGHT_RANGE.map((c) => [c])}
-          triggerNode={<ColorPreview color={StaticColor.create(value)} />}
-          onChange={(newColor, _, hidePopover) => {
-            hidePopover();
-            onChange({ target: { name, value: newColor } });
-          }}
-        />
-      </Input>
-    )}
-  </Field>
-);
+const StaticColorPicker = () => {
+  const { t } = useTranslation('search');
+
+  return (
+    <Field name="color.color">
+      {({ field: { name, value, onChange }, meta }) => (
+        <Input id={name} error={meta?.error} label={t('highlighting_color.color')}>
+          <ColorPickerPopover
+            id="formatting-rule-color"
+            placement="right"
+            color={value}
+            colors={DEFAULT_CUSTOM_HIGHLIGHT_RANGE.map((c) => [c])}
+            triggerNode={<ColorPreview color={StaticColor.create(value)} />}
+            onChange={(newColor, _, hidePopover) => {
+              hidePopover();
+              onChange({ target: { name, value: newColor } });
+            }}
+          />
+        </Input>
+      )}
+    </Field>
+  );
+};
 
 const OptionContainer = styled.div`
   display: flex;
@@ -95,79 +101,83 @@ const validateColor = (values) => {
 
   if (values?.type === 'gradient') {
     if (trim(values?.gradient) === '') {
-      errors.gradient = 'Must be selected.';
+      errors.gradient = i18n.t('highlighting_color.must_be_selected', { ns: 'search' });
     }
 
     if (trim(values?.lower) === '') {
-      errors.lower = 'Must be present.';
+      errors.lower = i18n.t('highlighting_color.must_be_present', { ns: 'search' });
     } else if (!numericRegex.test(values?.lower)) {
-      errors.lower = 'Must be a number.';
+      errors.lower = i18n.t('highlighting_color.must_be_number', { ns: 'search' });
     }
 
     if (trim(values?.upper) === '') {
-      errors.upper = 'Must be present.';
+      errors.upper = i18n.t('highlighting_color.must_be_present', { ns: 'search' });
     } else if (!numericRegex.test(values?.upper)) {
-      errors.upper = 'Must be a number.';
+      errors.upper = i18n.t('highlighting_color.must_be_number', { ns: 'search' });
     }
 
     if (values?.upper <= values?.lower) {
-      errors.upper = 'Must be higher than lowest value.';
+      errors.upper = i18n.t('highlighting_color.must_be_higher', { ns: 'search' });
     }
   }
 
   return Object.keys(errors).length > 0 ? errors : undefined;
 };
 
-const GradientColorPicker = () => (
-  <Field name="color" validate={validateColor}>
-    {() => (
-      <>
-        <Field name="color.gradient">
-          {({ field: { name, value, onChange }, meta }) => (
-            <Input id={`${name}-name`} error={meta?.error} label="Gradient Name">
-              <Select
-                options={GRADIENTS}
-                placeholder="Select gradient colors"
+const GradientColorPicker = () => {
+  const { t } = useTranslation('search');
+
+  return (
+    <Field name="color" validate={validateColor}>
+      {() => (
+        <>
+          <Field name="color.gradient">
+            {({ field: { name, value, onChange }, meta }) => (
+              <Input id={`${name}-name`} error={meta?.error} label={t('highlighting_color.gradient_name')}>
+                <Select
+                  options={GRADIENTS}
+                  placeholder={t('highlighting_color.gradient_placeholder')}
+                  value={value}
+                  onChange={(newGradient) => onChange({ target: { name, value: newGradient } })}
+                />
+              </Input>
+            )}
+          </Field>
+          <Field name="color.lower">
+            {({ field: { name, value, onChange }, meta }) => (
+              <Input
+                id={name}
+                placeholder={t('highlighting_color.lowest_placeholder')}
+                label={t('highlighting_color.lowest_label')}
+                type="number"
                 value={value}
-                onChange={(newGradient) => onChange({ target: { name, value: newGradient } })}
+                error={meta?.error}
+                onChange={onChange}
+                help={t('highlighting_color.lowest_help')}
+                required
               />
-            </Input>
-          )}
-        </Field>
-        <Field name="color.lower">
-          {({ field: { name, value, onChange }, meta }) => (
-            <Input
-              id={name}
-              placeholder="Specify lowest value"
-              label="Lowest Value"
-              type="number"
-              value={value}
-              error={meta?.error}
-              onChange={onChange}
-              help="The lowest value expected in the field/series."
-              required
-            />
-          )}
-        </Field>
-        <Field name="color.upper">
-          {({ field: { name, value, onChange }, meta }) => (
-            <Input
-              id={name}
-              aria-label="Specify highest value"
-              label="Highest Value"
-              type="number"
-              value={value}
-              error={meta?.error}
-              onChange={onChange}
-              help="The highest value expected in the field/series."
-              required
-            />
-          )}
-        </Field>
-      </>
-    )}
-  </Field>
-);
+            )}
+          </Field>
+          <Field name="color.upper">
+            {({ field: { name, value, onChange }, meta }) => (
+              <Input
+                id={name}
+                aria-label={t('highlighting_color.highest_aria')}
+                label={t('highlighting_color.highest_label')}
+                type="number"
+                value={value}
+                error={meta?.error}
+                onChange={onChange}
+                help={t('highlighting_color.highest_help')}
+                required
+              />
+            )}
+          </Field>
+        </>
+      )}
+    </Field>
+  );
+};
 
 const ColorForm = ({ type }: ColorPickerProps) => {
   switch (type) {
@@ -209,17 +219,18 @@ export const createNewColor = (newType: ColorType): StaticColorObject | Gradient
 
 export const validateColoringType = (value, fieldIsNumeric) => {
   if (!value || value === '') {
-    return 'Coloring is required';
+    return i18n.t('highlighting_color.coloring_required', { ns: 'search' });
   }
 
   if (!fieldIsNumeric && value === 'gradient') {
-    return 'A gradient can only be defined for numeric fields.';
+    return i18n.t('highlighting_color.gradient_numeric_only', { ns: 'search' });
   }
 
   return undefined;
 };
 
 const HighlightingColorForm = ({ field }: Props) => {
+  const { t } = useTranslation('search');
   const isNumeric = field?.type?.isNumeric() ?? false;
 
   const { setFieldValue } = useFormikContext();
@@ -238,13 +249,13 @@ const HighlightingColorForm = ({ field }: Props) => {
     <Field name="color.type" validate={(value) => validateColoringType(value, isNumeric)}>
       {({ field: { name, value }, meta }) => (
         <>
-          <Input id={`${name}-coloring`} label="Coloring" error={meta?.error}>
+          <Input id={`${name}-coloring`} label={t('highlighting_color.coloring')} error={meta?.error}>
             <Container>
               <Input
                 checked={value === 'static'}
                 formGroupClassName=""
                 id={name}
-                label="Static Color"
+                label={t('highlighting_color.static_color')}
                 onChange={onChangeType}
                 type="radio"
                 value="static"
@@ -254,7 +265,7 @@ const HighlightingColorForm = ({ field }: Props) => {
                 formGroupClassName=""
                 id={name}
                 disabled={!isNumeric}
-                label="Gradient"
+                label={t('highlighting_color.gradient')}
                 onChange={onChangeType}
                 type="radio"
                 value="gradient"

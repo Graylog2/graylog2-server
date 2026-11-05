@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import DOMPurify from 'dompurify';
@@ -138,6 +139,7 @@ const useLoginBackground = () =>
 const useShowLogo = () => useMemo(() => AppConfig.branding()?.login?.show_logo ?? true, []);
 
 const LoginChrome = ({ children }: Props) => {
+  const { t } = useTranslation('login');
   const productName = useProductName();
   const loginBackground = useLoginBackground();
   const showLogo = useShowLogo();
@@ -145,7 +147,7 @@ const LoginChrome = ({ children }: Props) => {
   return (
     <LoginContainer>
       <LoginBox>
-        <WelcomeMessage>Welcome to {productName}</WelcomeMessage>
+        <WelcomeMessage>{t('welcome', { productName })}</WelcomeMessage>
         {children}
       </LoginBox>
       <Background>

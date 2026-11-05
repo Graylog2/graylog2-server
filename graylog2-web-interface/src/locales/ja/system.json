@@ -1,0 +1,512 @@
+{
+  "shared": {
+    "leader": "リーダー",
+    "not_available": "N/A"
+  },
+  "cluster_configuration_nodes": {
+    "loading_search_backend": "検索バックエンドのノードを読み込んでいます...",
+    "search_backend_unknown": "設定されている検索バックエンドを特定できませんでした。",
+    "search_placeholder": "ノードを検索…",
+    "all_nodes": "すべてのノード",
+    "data_nodes": "データノード",
+    "opensearch_nodes": "OpenSearchノード",
+    "mongodb_nodes": "MongoDBノード"
+  },
+  "cluster_column_titles": {
+    "cpu": "CPU",
+    "memory": "メモリ",
+    "jvm": "JVM",
+    "indexing": "インデックス作成",
+    "storage": "ストレージ",
+    "buffers": "バッファー",
+    "journal": "ジャーナル",
+    "data_lake_journal": "Data Lake ジャーナル",
+    "throughput": "スループット"
+  },
+  "data_nodes_expandable": {
+    "title": "データノード"
+  },
+  "indexing_metrics_cell": {
+    "docs": "ドキュメント",
+    "latency": "レイテンシー"
+  },
+  "node_actions": {
+    "thread_dump": "スレッドダンプを取得",
+    "process_buffer_dump": "プロセスバッファーのダンプを取得",
+    "metrics": "メトリクス"
+  },
+  "graylog_node_actions": {
+    "pause_message_processing": "メッセージ処理を一時停止",
+    "resume_message_processing": "メッセージ処理を再開",
+    "override_load_balancer_dead": "ロードバランサーのステータスをDEADに上書き",
+    "override_load_balancer_alive": "ロードバランサーのステータスをALIVEに上書き",
+    "local_message_inputs": "ローカルのメッセージInput",
+    "recent_system_logs": "最新のシステムログメッセージを取得",
+    "message_processing_title": "メッセージ処理",
+    "pause_confirm": "<b>{{nodeName}}</b> ノードのメッセージ処理を<b>一時停止</b>しようとしています。よろしいですか？",
+    "resume_confirm": "<b>{{nodeName}}</b> ノードのメッセージ処理を<b>再開</b>しようとしています。よろしいですか？",
+    "load_balancer_title": "ロードバランサー",
+    "load_balancer_confirm": "<b>{{nodeName}}</b> ノードのロードバランサーのステータスを<b>{{status}}</b>に変更しようとしています。よろしいですか？"
+  },
+  "graylog_nodes_expandable": {
+    "title": "{{productName}}ノード"
+  },
+  "load_balancer_status_cell": {
+    "aria_label": "ロードバランサー {{status}}",
+    "status_alive": "アクティブ",
+    "status_dead": "非アクティブ",
+    "status_throttled": "スロットリング中"
+  },
+  "processing_state_cell": {
+    "aria_label": "メッセージ処理 {{status}}",
+    "enabled": "有効",
+    "disabled": "無効"
+  },
+  "mongodb_nodes_expandable": {
+    "title": "MongoDBノード"
+  },
+  "mongodb_profiling_action": {
+    "description": "MongoDBのプロファイリングは、クラスター内のノード全体で低速なクエリを特定し、パフォーマンスの問題を解決するのに役立ちます。",
+    "enabling_profiling": "プロファイリングを有効にしています...",
+    "enable_confirm": "すべてのMongoDBノードで<b>Slow Ops</b>のプロファイリング（{{threshold}}）を有効にしますか？再起動なしで直ちに適用されますが、起動時に設定しない限り再起動後にリセットされます。",
+    "enable_profiling": "プロファイリングを有効化",
+    "disable_profiling": "プロファイリングを無効化",
+    "enabling": "有効にしています...",
+    "disabling": "無効にしています...",
+    "loading_status": "ステータスを読み込んでいます...",
+    "loading_status_title": "MongoDBのプロファイリングステータスを読み込んでいます",
+    "enable_title": "すべてのMongoDBノードでプロファイリングをSlow Opsに設定",
+    "disable_title": "すべてのMongoDBノードでプロファイリングを無効化",
+    "status_loading": "MongoDBノード全体の現在のプロファイリングステータスを読み込んでいます...",
+    "status_off": "すべてのMongoDBノードでプロファイリングはオフです（{{summary}}）。有効にすると低速クエリの診断情報を収集できます。",
+    "status_mixed": "MongoDBノード間でプロファイリングの設定が異なります（{{summary}}）。プロファイリングを有効にして診断を統一してください。",
+    "status_enabled": "すべてのMongoDBノードでプロファイリングはオンです（{{summary}}）。トラブルシューティング後は無効にしてMongoDBの負荷を軽減してください。",
+    "status_unavailable_with_summary": "プロファイリングのステータスを取得できません（{{summary}}）。必要に応じて変更することはできます。",
+    "status_unavailable": "プロファイリングのステータスを取得できません。必要に応じて変更することはできます。",
+    "threshold_level": "レベル1",
+    "threshold_level_with_ms": "レベル1、しきい値 {{slowMs}}ms",
+    "distribution": "OFF {{off}}、SLOW_OPS {{slowOps}}、ALL {{all}}",
+    "nodes_profiled_other": "{{enabledCount}}/{{count}} ノードでプロファイリング中"
+  },
+  "opensearch_nodes_expandable": {
+    "title": "OpenSearchノード"
+  },
+  "cluster_nodes_section_wrapper": {
+    "show_title": "{{title}}を表示"
+  },
+  "cpu_metrics_cell": {
+    "load_1m": "負荷（1分）"
+  },
+  "graylog_cluster_overview": {
+    "cluster": "クラスター",
+    "cluster_id": "クラスターID:",
+    "not_available": "利用不可",
+    "number_of_nodes": "ノード数:"
+  },
+  "cluster_support_bundle_info": {
+    "description": "Graylogクラスターのデバッグに役立つ情報を含むZIPファイルを作成します。",
+    "enterprise_customers": "Graylog Enterpriseのお客様は、バンドルをサポートチケットに添付できます。これにより、Graylogテクニカルサポートチームが問題の分析と診断を行いやすくなります。",
+    "examine_content": "共有する前にバンドルの内容を確認してください。IPアドレス、ホスト名、さらにはパスワードなどの機密データが含まれている可能性があります。",
+    "paid_license_only": "Graylog Enterpriseのサポートを利用できるのは有償ライセンスのユーザーのみです。ただし、このファイルはその他のデバッグ目的でご利用いただけます。"
+  },
+  "cluster_support_bundle_overview": {
+    "title": "クラスターサポートバンドル",
+    "create": "サポートバンドルを作成",
+    "download": "ダウンロード",
+    "delete": "削除",
+    "filename": "ファイル名",
+    "size": "サイズ",
+    "no_bundles": "サポートバンドルが見つかりません。",
+    "delete_title": "サポートバンドルを削除",
+    "delete_confirm": "<strong>{{name}}</strong> を削除してもよろしいですか？"
+  },
+  "log_level_metrics": {
+    "level": "レベル: {{level}}",
+    "total_written": "書き込み合計:",
+    "mean_rate": "平均レート:",
+    "one_minute_rate": "1分レート:",
+    "per_second": "/ 秒"
+  },
+  "logging_subsystem": {
+    "subsystem": "サブシステム: {{name}}"
+  },
+  "node_loggers": {
+    "show_log_level_metrics": "ログレベルのメトリクスを表示",
+    "hide_log_level_metrics": "ログレベルのメトリクスを非表示",
+    "total_log_messages": "内部ログメッセージを合計<strong>{{throughput}}件</strong>書き込みました。"
+  },
+  "metric_details": {
+    "value": "値:",
+    "count": "カウント:",
+    "mean": "平均:",
+    "minimum": "最小:",
+    "maximum": "最大:",
+    "standard_deviation": "標準偏差:",
+    "percentile_95": "95パーセンタイル:",
+    "percentile_98": "98パーセンタイル:",
+    "percentile_99": "99パーセンタイル:",
+    "invalid_type": "無効なメトリクスタイプ: {{type}}",
+    "microseconds": "μs"
+  },
+  "meter_details": {
+    "total": "合計:",
+    "events": "イベント",
+    "one_minute_avg": "1分平均:",
+    "five_minute_avg": "5分平均:",
+    "fifteen_minute_avg": "15分平均:"
+  },
+  "counter_rate": {
+    "calculating": "計算中...",
+    "total": "（合計 {{total}}）",
+    "per_second": "毎秒"
+  },
+  "metric_container": {
+    "loading": "読み込み中..."
+  },
+  "metrics_component": {
+    "fetch_error": "ノードからメトリクスを取得できませんでした。サーバーがステータスコード {{status}} で <em>{{responseMessage}}</em> を返しました。",
+    "fetch_problem": "ノードのメトリクスの取得中に問題が発生しました。",
+    "retry_in_background": "取得の再試行はバックグラウンドで続行されます。",
+    "fetch_error_last_metrics": "ノードからメトリクスを取得できませんでした。サーバーがステータスコード {{status}} で <em>{{responseMessage}}</em> を返しました。利用可能な最後のメトリクスを表示しています。",
+    "filter_placeholder": "フィルターするメトリクス名を入力…"
+  },
+  "metrics_list": {
+    "no_metrics": "指定したフィルターに一致するメトリクスがありません。有効な正規表現を使用してください"
+  },
+  "buffer_usage": {
+    "metrics": "メトリクス",
+    "utilization": "{{title}} に <strong>{{usage}} 件のメッセージ</strong>があり、{{percentage}} 使用されています。"
+  },
+  "input_types_data_table": {
+    "loading": "Inputタイプを読み込んでいます...",
+    "unavailable": "Inputタイプを利用できません。",
+    "documentation": "ドキュメント",
+    "name": "名前",
+    "type": "タイプ",
+    "filter": "フィルター"
+  },
+  "journal_details": {
+    "loading": "ジャーナルのメトリクスを読み込んでいます...",
+    "disabled": "このノードではディスクジャーナルが無効になっています。",
+    "unavailable": "ジャーナルのメトリクスを利用できません。",
+    "overcommitted": "<strong>警告！</strong>ジャーナルの使用率が定義された最大サイズを超えています。詳細は<overviewLink>こちらをクリック</overviewLink>してください。",
+    "configuration": "設定",
+    "path": "パス:",
+    "earliest_entry": "最も古いエントリー:",
+    "maximum_size": "最大サイズ:",
+    "maximum_age": "最大保持期間:",
+    "flush_policy": "フラッシュポリシー:",
+    "flush_policy_value": "{{messages}} 件ごと、または {{duration}} ごと",
+    "maximum_age_format": "d [days] h [hours] m [minutes]",
+    "flush_duration_format": "h [hours] m [minutes] s [seconds]",
+    "utilization": "使用率",
+    "unprocessed_messages": "現在、ジャーナルに<strong>{{messages}} 件の未処理メッセージ</strong>があり、{{segments}} 個のセグメントに分かれています。",
+    "appended_and_read": "直近1秒間に<strong>{{appended}} 件のメッセージ</strong>が追加され、直近1秒間に<strong>{{read}} 件のメッセージ</strong>が読み取られました。"
+  },
+  "journal_state": {
+    "loading": "ジャーナルのメトリクスを読み込んでいます...",
+    "unavailable": "ジャーナルのメトリクスを利用できません。",
+    "summary_other": "ジャーナルには、{{count}} 個のセグメントに<strong>{{messages}} 件の未処理メッセージ</strong>があります。直近1秒間に<strong>{{appended}} 件のメッセージ</strong>が追加され、<strong>{{read}} 件のメッセージ</strong>が読み取られました。"
+  },
+  "jvm_heap_usage": {
+    "loading": "ヒープ使用状況の情報を読み込んでいます...",
+    "unavailable": "ヒープの情報を利用できません。",
+    "usage": "JVMは<committedBlob /><strong> {{committed}}</strong> のヒープ領域のうち<usedBlob /><strong> {{used}}</strong> を使用しており、<maxBlob /><strong> {{max}}</strong> を超えて使用しようとはしません"
+  },
+  "node_list_item": {
+    "system_info_unavailable": "システム情報は現在利用できません。"
+  },
+  "node_maintenance_dropdown": {
+    "actions": "操作",
+    "configure_internal_logging": "内部ログを設定"
+  },
+  "node_overview": {
+    "plugins_installed_other": "インストール済みのプラグイン: {{count}} 件",
+    "inputs_running_other": "このノードで実行中のInput: {{count}} 件",
+    "memory_heap_usage": "メモリ/ヒープ使用量",
+    "buffers": "バッファー",
+    "buffers_description": "バッファーは、メッセージが各プロセッサーを通過する際に、少量のメッセージを非常に短時間（通常はミリ秒単位）キャッシュするために設計されています。",
+    "input_buffer": "Inputバッファー",
+    "process_buffer": "処理バッファー",
+    "output_buffer": "Outputバッファー",
+    "disk_journal": "ディスクジャーナル",
+    "disk_journal_description": "受信メッセージは、サーバー障害時に安全に保持されるよう、ディスクジャーナルに書き込まれます。また、いずれかのOutputの処理が遅く、メッセージのレートに追いつけない場合や、受信メッセージがピークに達した場合にも機能を維持するのに役立ちます。これにより、メモリの過負荷を防ぎ、ガベージコレクションの一時停止が長くなりすぎるのを回避します。",
+    "system": "システム",
+    "rest_api": "REST API",
+    "installed_plugins": "インストール済みのプラグイン",
+    "manage_inputs": "Inputを管理",
+    "available_input_types": "利用可能なInputタイプ"
+  },
+  "nodes_actions": {
+    "details": "詳細",
+    "metrics": "メトリクス",
+    "more_actions": "その他の操作",
+    "pause_message_processing": "メッセージ処理を一時停止",
+    "resume_message_processing": "メッセージ処理を再開",
+    "pause_confirm": "このノードのメッセージ処理を一時停止しようとしています。よろしいですか？",
+    "resume_confirm": "このノードのメッセージ処理を再開しようとしています。よろしいですか？",
+    "override_lb_status": "LBステータスを上書き",
+    "status_alive": "ALIVE",
+    "status_dead": "DEAD",
+    "load_balancer_confirm": "このノードのロードバランサーのステータスを {{status}} に変更しようとしています。よろしいですか？",
+    "local_message_inputs": "ローカルのメッセージInput",
+    "thread_dump": "スレッドダンプを取得",
+    "process_buffer_dump": "処理バッファーのダンプを取得",
+    "recent_system_logs": "最新のシステムログメッセージを取得"
+  },
+  "nodes_list": {
+    "active_nodes_other": "アクティブなノードは {{count}} 件あります",
+    "no_active_nodes": "アクティブなノードはありません。"
+  },
+  "plugins_data_table": {
+    "loading": "このノードのプラグインを読み込んでいます...",
+    "no_plugins": "このノードにはインストール済みのプラグインがありません。",
+    "name": "名前",
+    "version": "バージョン",
+    "author": "作成者",
+    "description": "説明",
+    "website": "Webサイト",
+    "filter": "フィルター"
+  },
+  "rest_api_overview": {
+    "transport_address": "トランスポートアドレス:",
+    "last_seen": "最終確認:"
+  },
+  "system_information": {
+    "pid_info": "PID {{pid}}、{{info}}",
+    "jvm_unavailable": "このノードのJVM情報を利用できません。",
+    "hostname": "ホスト名:",
+    "node_id": "ノードID:",
+    "version": "バージョン:",
+    "version_codename": "{{version}}、コードネーム <em>{{codename}}</em>",
+    "jvm": "JVM:",
+    "time": "時刻:"
+  },
+  "system_overview_details": {
+    "pause_confirm": "このノードのメッセージ処理を一時停止しようとしています。よろしいですか？",
+    "resume_confirm": "このノードのメッセージ処理を再開しようとしています。よろしいですか？",
+    "what_does_this_mean": "これは何を意味しますか？",
+    "lifecycle_state": "ライフサイクルの状態: <strong>{{lifecycle}}</strong>",
+    "marked_as_lb_status": "ロードバランサー向けに <strong>{{status}}</strong> としてマークされています",
+    "pause_processing": "処理を一時停止",
+    "resume_processing": "処理を再開",
+    "not_processing": "ノードはメッセージを<strong>処理していません</strong>"
+  },
+  "system_overview_summary": {
+    "current_lifecycle_state": "現在のライフサイクルの状態:",
+    "message_processing": "メッセージ処理:",
+    "enabled": "有効",
+    "disabled": "無効",
+    "lb_indication": "ロードバランサーの表示:"
+  },
+  "bulk_actions": {
+    "dismiss": "閉じる"
+  },
+  "system_notifications_table": {
+    "title": "通知",
+    "human_name": "通知"
+  },
+  "actions_cell": {
+    "dismiss": "閉じる"
+  },
+  "title_cell": {
+    "show_full_message": "{{title}} の全文を表示"
+  },
+  "system_job": {
+    "acknowledge_failed": "ジョブを確認できませんでした",
+    "cancel_failed": "ジョブをキャンセルできませんでした",
+    "cancel_confirm": "システムジョブ \"{{info}}\" をキャンセルしてもよろしいですか？",
+    "on_node": "- ノード:",
+    "runtime": "実行時間: {{duration}}",
+    "cancel": "キャンセル",
+    "acknowledge": "確認"
+  },
+  "system_jobs_component": {
+    "title": "システムジョブ",
+    "description": "システムジョブは、メンテナンスのために {{productName}} サーバーノードが実行する長時間のタスクです。一部のジョブは進捗情報を提供するか、停止できます。"
+  },
+  "system_jobs_list": {
+    "no_active_jobs": "アクティブなシステムジョブはありません。"
+  },
+  "system_messages_component": {
+    "title": "システムメッセージ",
+    "description": "システムメッセージは、{{productName}} サーバーノードが特定のイベントで生成するもので、{{productName}} 管理者にとって重要な場合があります。ここにあるイベントに対して操作を行う必要はありません。対応が必要なイベントについては通知が表示されます。"
+  },
+  "system_messages_list": {
+    "timestamp": "タイムスタンプ",
+    "node": "ノード",
+    "message": "メッセージ"
+  },
+  "global_throughput": {
+    "aria_label": "スループット: 入力 {{input}} / 出力 {{output}} メッセージ/秒",
+    "in_title": "1 秒あたりの受信メッセージ数",
+    "out_title": "1 秒あたりの送信メッセージ数"
+  },
+  "node_throughput": {
+    "loading": "スループットを読み込んでいます...",
+    "unable_to_load": "スループットを読み込めませんでした。",
+    "processing_long": "受信 <strong>{{totalIn}}</strong> / 送信 <strong>{{totalOut}}</strong> メッセージ/秒を処理しています。",
+    "short": "入力 {{totalIn}} / 出力 {{totalOut}} メッセージ/秒"
+  },
+  "telemetry_debug_entry_row": {
+    "delta": " (+{{delta}}ms)",
+    "pii_suspect": "個人情報の疑い: {{suspect}}",
+    "copy_as_json": "イベントをJSONとしてコピー"
+  },
+  "telemetry_debug_overlay": {
+    "badge_label": "テレメトリーのデバッグ",
+    "badge": "テレメトリーのデバッグ: {{count}}",
+    "drawer_label": "テレメトリーのデバッグパネル",
+    "resize_label": "テレメトリーのデバッグパネルのサイズを変更",
+    "title": "テレメトリーのデバッグ ({{count}})",
+    "filter_label": "イベントをフィルター",
+    "filter_placeholder": "イベント名またはペイロードでフィルター...",
+    "resume": "再開",
+    "pause": "一時停止",
+    "clear": "クリア",
+    "export_session": "セッションをエクスポート",
+    "collapse": "折りたたむ",
+    "no_events": "テレメトリーイベントはまだ記録されていません。アプリを操作すると、ここに表示されます。",
+    "time": "時刻",
+    "event": "イベント",
+    "action": "アクション",
+    "status": "ステータス"
+  },
+  "cluster_configuration_page": {
+    "title": "クラスター設定",
+    "description": "このページでは、クラスター内のノードのリアルタイムの概要を確認できます。メッセージ処理はいつでも一時停止できます。再開するまで、処理バッファーは新しいメッセージを受け付けません。ノードでメッセージジャーナルが有効になっている場合（デフォルトで有効です）、処理が無効になっていても、受信メッセージはディスクに保存されます。"
+  },
+  "configurations_page": {
+    "title": "設定",
+    "description": "このページでは、さまざまなサブシステムのシステム設定を行えます。",
+    "plugins": "プラグイン"
+  },
+  "enterprise_page": {
+    "document_title": "{{productName}} Enterprise",
+    "page_title": "{{productName}} Enterprise を<upsell>お試しください</upsell>",
+    "learn_more": "<upsell>{{productName}} Enterpriseの機能について<productLink>詳しく見る</productLink>。</upsell>"
+  },
+  "process_buffer_dump_page": {
+    "title": "ノード {{shortNodeId}} / {{hostname}} の処理バッファーダンプ",
+    "taken_at": "取得日時: <0/>"
+  },
+  "show_metrics_page": {
+    "title": "ノード {{shortNodeId}} / {{hostname}} のメトリクス",
+    "description": "すべての {{productName}} ノードは、診断、デバッグ、モニタリングのための内部メトリクスを提供しています。JMX経由でもすべてのメトリクスにアクセスできることに注意してください。",
+    "total_metrics_other": "このノードは合計 {{count}} 件のメトリクスを報告しています。"
+  },
+  "node_page": {
+    "title": "ノード {{shortNodeId}} / {{hostname}}",
+    "description": "このページでは、クラスター内でアクティブかつ到達可能な {{productName}} サーバーノードの詳細を表示します。",
+    "leader_node": "これはリーダーノードです。",
+    "not_leader_node": "これは<em>リーダーノードではありません</em>。"
+  },
+  "system_logs_page": {
+    "title": "ノード {{shortNodeId}} / {{hostname}} の最新のシステムログ（{{limit}} 件まで）",
+    "taken_at": "取得日時: <0/>",
+    "reload": "再読み込み",
+    "back": "戻る",
+    "document_title": "ノード {{shortNodeId}} / {{hostname}} のシステムログ"
+  },
+  "system_notifications_page": {
+    "title": "システム通知"
+  },
+  "system_overview_page": {
+    "title": "システムの概要"
+  },
+  "thread_dump_page": {
+    "title": "ノード {{shortNodeId}} / {{hostname}} のスレッドダンプ",
+    "taken_at": "取得日時: <0/>"
+  },
+  "notifications": {
+    "lb_change_success": "ノード '{{nodeId}}' のロードバランサーのステータスを '{{status}}' に変更しました",
+    "lb_change_failed": "'{{nodeId}}' のロードバランサーのステータスの変更に失敗しました: {{error}}",
+    "lb_change_failed_title": "ノード '{{nodeId}}' のロードバランサーのステータスを '{{status}}' に変更できませんでした",
+    "processing_pause_success": "'{{nodeId}}' のメッセージ処理を一時停止しました",
+    "processing_pause_failed": "'{{nodeId}}' のメッセージ処理の一時停止に失敗しました: {{error}}",
+    "processing_pause_failed_title": "ノード '{{nodeId}}' のメッセージ処理を一時停止できませんでした",
+    "processing_resume_success": "'{{nodeId}}' のメッセージ処理を再開しました",
+    "processing_resume_failed": "'{{nodeId}}' のメッセージ処理の再開に失敗しました: {{error}}",
+    "processing_resume_failed_title": "ノード '{{nodeId}}' のメッセージ処理を再開できませんでした",
+    "nothing_selected": "通知が選択されていません。",
+    "nothing_to_dismiss_title": "閉じる通知がありません",
+    "bulk_dismiss_failed": "通知を閉じられませんでした。もう一度お試しください。",
+    "dismiss_failed": "通知を閉じられませんでした。もう一度お試しください。",
+    "dismiss_failed_title": "閉じる操作に失敗しました",
+    "profiling_enabled": "MongoDBのプロファイリングを有効にしました。",
+    "profiling_disabled": "MongoDBのプロファイリングを無効にしました。",
+    "profiling_enable_failed": "MongoDBのプロファイリングを有効にできませんでした: {{error}}",
+    "profiling_disable_failed": "MongoDBのプロファイリングを無効にできませんでした: {{error}}",
+    "profiling_update_failed_title": "MongoDBのプロファイリングを更新できませんでした。",
+    "data_node_metrics_failed": "データノード \"{{hostname}}\" のメトリクスの読み込みに失敗しました",
+    "data_node_metrics_failed_title": "データノードのメトリクスを読み込めませんでした。",
+    "graylog_node_metrics_failed": "Graylogノードのメトリクスの読み込みがステータス付きで失敗しました",
+    "graylog_node_metrics_failed_title": "Graylogノードのメトリクスを読み込めませんでした。",
+    "cluster_traffic_failed": "クラスタートラフィックの読み込みがステータス付きで失敗しました",
+    "cluster_traffic_failed_title": "クラスタートラフィックを読み込めませんでした",
+    "journal_failed": "ジャーナルの情報を取得できませんでした",
+    "system_jobs_failed": "システムジョブの読み込みがステータス付きで失敗しました",
+    "system_jobs_failed_title": "システムジョブを読み込めませんでした"
+  },
+  "use_cluster_overview_notifications": {
+    "jvm_failed": "ノード '{{nodeId}}' のJVM情報の取得に失敗しました: {{error}}",
+    "jvm_failed_title": "JVM情報を取得できませんでした",
+    "thread_dump_failed": "ノード '{{nodeId}}' のスレッドダンプの取得に失敗しました: {{error}}",
+    "thread_dump_failed_title": "スレッドダンプを取得できませんでした",
+    "process_buffer_dump_failed": "ノード '{{nodeId}}' の処理バッファーダンプの取得に失敗しました: {{error}}",
+    "process_buffer_dump_failed_title": "処理バッファーダンプを取得できませんでした",
+    "system_logs_failed": "ノード '{{nodeId}}' のシステムログメッセージの取得に失敗しました: {{error}}",
+    "system_logs_failed_title": "システムログメッセージを取得できませんでした",
+    "overview_failed": "クラスターの概要の取得に失敗しました: {{error}}",
+    "overview_failed_title": "クラスターの概要を取得できませんでした"
+  },
+  "use_cluster_support_bundle_notifications": {
+    "create_failed": "サポートバンドルの作成がステータス {{error}} で失敗しました",
+    "create_failed_title": "サポートバンドルを作成できませんでした。",
+    "delete_failed": "サポートバンドルの削除がステータス {{error}} で失敗しました",
+    "delete_failed_title": "サポートバンドルを削除できませんでした。",
+    "download_failed": "サポートバンドルのダウンロードがステータス {{error}} で失敗しました",
+    "download_failed_title": "サポートバンドルをダウンロードできませんでした。",
+    "load_list_failed": "サポートバンドルの一覧の読み込みがステータス付きで失敗しました",
+    "load_list_failed_title": "サポートバンドルの一覧を読み込めませんでした。"
+  },
+  "use_plugin_list_notifications": {
+    "fetch_failed": "ノード \"{{nodeId}}\" のプラグインの取得に失敗しました",
+    "fetch_failed_title": "プラグインを取得できませんでした"
+  },
+  "node_lifecycle": {
+    "uninitialized": "未初期化",
+    "starting": "起動中",
+    "running": "実行中",
+    "failed": "失敗",
+    "halting": "停止中",
+    "paused": "一時停止",
+    "throttled": "スロットリング中",
+    "override_lb_alive": "ロードバランサー：強制的にアクティブ",
+    "override_lb_dead": "ロードバランサー：強制的に非アクティブ",
+    "override_lb_throttled": "ロードバランサー：強制的にスロットリング"
+  },
+  "buffers_metrics_cell": {
+    "input": "入力",
+    "process": "処理",
+    "output": "出力"
+  },
+  "throughput_metrics_cell": {
+    "in": "受信",
+    "out": "送信"
+  },
+  "mongodb_nodes": {
+    "profiling_levels": {
+      "off": "オフ",
+      "slow_ops": "Slow Ops",
+      "all": "すべて",
+      "unknown": "不明（{{level}}）"
+    },
+    "roles": {
+      "primary": "プライマリ",
+      "secondary": "セカンダリ",
+      "arbiter": "アービター",
+      "standalone": "スタンドアロン"
+    }
+  }
+}

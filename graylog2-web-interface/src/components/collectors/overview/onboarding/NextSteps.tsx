@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import useProductName from 'brand-customization/useProductName';
 import { Icon, Link } from 'components/common';
@@ -58,35 +59,36 @@ const TroubleshootingList = styled.ol(
   `,
 );
 
+// `title` and `description` are translation keys in the `collectors` namespace.
 type NextLink = { key: string; icon: IconName; title: string; description: string; to: string };
 
 const nextLinks = (instance: CollectorInstanceView): Array<NextLink> => [
   {
     key: 'search',
     icon: 'search',
-    title: 'Explore your data',
-    description: 'Open search filtered to this collector',
+    title: 'next_steps.explore',
+    description: 'next_steps.explore_description',
     to: collectorReceivedMessagesUrl(AGENT_ID_FIELD, instance.instance_uid),
   },
   {
     key: 'configure-sources',
     icon: 'settings',
-    title: 'Configure sources',
-    description: 'Add or tune what this fleet collects',
+    title: 'next_steps.configure_sources',
+    description: 'next_steps.configure_sources_description',
     to: Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id),
   },
   {
     key: 'fleets',
     icon: 'hub',
-    title: 'Manage fleets',
-    description: 'Move this collector to a permanent fleet',
+    title: 'next_steps.manage_fleets',
+    description: 'next_steps.manage_fleets_description',
     to: Routes.SYSTEM.COLLECTORS.FLEETS,
   },
   {
     key: 'install-another',
     icon: 'add_circle',
-    title: 'Install another collector',
-    description: 'Repeat this setup on another host',
+    title: 'next_steps.install_another',
+    description: 'next_steps.install_another_description',
     to: Routes.SYSTEM.COLLECTORS.OVERVIEW,
   },
 ];
@@ -96,15 +98,16 @@ const nextLinks = (instance: CollectorInstanceView): Array<NextLink> => [
  * healthy, or recovery steps when the collector has gone offline.
  */
 const NextSteps = ({ instance, onLinkClick = undefined }: Props) => {
+  const { t } = useTranslation('collectors');
   const productName = useProductName();
   if (instance.status !== 'online') {
     return (
       <div>
-        <PanelTitle>Get It Back Online</PanelTitle>
+        <PanelTitle>{t('next_steps.offline_title')}</PanelTitle>
         <TroubleshootingList>
-          <li>Check that the collector service is running on the host.</li>
-          <li>Verify the host can reach this {productName} server.</li>
-          <li>Review the collector&apos;s own logs in the preview below for connection errors.</li>
+          <li>{t('next_steps.check_service')}</li>
+          <li>{t('next_steps.check_reachability', { productName })}</li>
+          <li>{t('next_steps.check_logs')}</li>
         </TroubleshootingList>
       </div>
     );
@@ -112,16 +115,16 @@ const NextSteps = ({ instance, onLinkClick = undefined }: Props) => {
 
   return (
     <div>
-      <PanelTitle>What&apos;s Next</PanelTitle>
+      <PanelTitle>{t('next_steps.title')}</PanelTitle>
       <IconRowList>
         {nextLinks(instance).map(({ key, icon, title, description, to }) => (
           <IconRow key={key}>
             <Icon name={icon} />
             <div>
               <Link to={to} onClick={() => onLinkClick?.(key)}>
-                {title}
+                {t(title)}
               </Link>
-              <LinkDescription>{description}</LinkDescription>
+              <LinkDescription>{t(description)}</LinkDescription>
             </div>
           </IconRow>
         ))}

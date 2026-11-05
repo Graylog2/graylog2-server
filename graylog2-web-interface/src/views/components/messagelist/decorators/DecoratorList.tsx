@@ -17,6 +17,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
+import i18n from 'i18n';
 import { Alert } from 'components/bootstrap';
 import { SortableList } from 'components/common';
 
@@ -57,7 +58,7 @@ class DecoratorList extends React.Component<Props> {
       return (
         <AlertContainer>
           <Alert bsStyle="info" className={DecoratorStyles.noDecoratorsAlert}>
-            No decorators configured.
+            {i18n.t('message_table.decorators.none_configured', { ns: 'widgets' })}
           </Alert>
         </AlertContainer>
       );

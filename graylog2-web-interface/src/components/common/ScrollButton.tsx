@@ -17,6 +17,8 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
+import i18n from 'i18n';
+
 import Icon from './Icon';
 
 const ScrollBtn = styled.button(
@@ -118,7 +120,11 @@ class ScrollButton extends React.Component<
     }
 
     return (
-      <ScrollBtn title="Back to top" type="button" className={position} onClick={this.scrollToTop}>
+      <ScrollBtn
+        title={i18n.t('scroll_button.back_to_top', { ns: 'common' })}
+        type="button"
+        className={position}
+        onClick={this.scrollToTop}>
         <ArrowUpIcon name="keyboard_arrow_up" />
       </ScrollBtn>
     );

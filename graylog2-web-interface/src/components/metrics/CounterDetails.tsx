@@ -16,19 +16,24 @@
  */
 import React from 'react';
 import numeral from 'numeral';
+import { useTranslation } from 'react-i18next';
 
 import type { CounterMetric } from 'types/metrics';
 
 type Props = {
   metric: CounterMetric;
 };
-const CounterDetails = ({ metric: { metric } }: Props) => (
-  <dl className="metric-def metric-counter">
-    <dt>Value:</dt>
-    <dd>
-      <span className="number-format">{numeral(metric.count).format('0,0')}</span>
-    </dd>
-  </dl>
-);
+const CounterDetails = ({ metric: { metric } }: Props) => {
+  const { t } = useTranslation('system');
+
+  return (
+    <dl className="metric-def metric-counter">
+      <dt>{t('metric_details.value')}</dt>
+      <dd>
+        <span className="number-format">{numeral(metric.count).format('0,0')}</span>
+      </dd>
+    </dl>
+  );
+};
 
 export default CounterDetails;

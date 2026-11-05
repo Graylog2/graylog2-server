@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import styled from 'styled-components';
 import { Formik, Form } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { Col, Row, RowContainer } from 'components/lookup-tables/layout-componets';
 import { FormSubmit } from 'components/common';
@@ -72,6 +73,7 @@ type Props = {
 };
 
 function CacheForm({ type, saved, title, onCancel, create = false, cache = INIT_CACHE }: Props) {
+  const { t } = useTranslation('lookup_tables');
   const sendTelemetry = useSendTelemetry('lut_cache');
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(cache);
   const { createCache, creatingCache } = useCreateCache();
@@ -123,8 +125,8 @@ function CacheForm({ type, saved, title, onCancel, create = false, cache = INIT_
               {canModify && (
                 <Row $align="center" $justify="flex-end">
                   <FormSubmit
-                    submitButtonText={create ? 'Create cache' : 'Update cache'}
-                    submitLoadingText={create ? 'Creating cache...' : 'Updating cache...'}
+                    submitButtonText={create ? t('cache_form.create_submit') : t('cache_form.update_submit')}
+                    submitLoadingText={create ? t('cache_form.creating_submit') : t('cache_form.updating_submit')}
                     isSubmitting={isSubmitting || creatingCache || updatingCache}
                     disabledSubmit={isSubmitting || creatingCache || updatingCache || !isValid}
                     isAsyncSubmit

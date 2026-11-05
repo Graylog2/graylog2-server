@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import i18n from 'i18n';
 import ApiRoutes from 'routing/ApiRoutes';
 import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
@@ -32,12 +33,12 @@ export const setStartpage = (userId: string, type: string, id: string): Promise<
   return fetch('PUT', url, { startpage: payload }).then(
     () => {
       CurrentUser.reload();
-      UserNotification.success('Your start page was changed successfully');
+      UserNotification.success(i18n.t('notifications.change_success', { ns: 'users' }));
     },
     (error: unknown) =>
       UserNotification.error(
-        `Changing your start page failed with error: ${error}`,
-        'Could not change your start page',
+        i18n.t('notifications.change_failed', { ns: 'users', error }),
+        i18n.t('notifications.change_failed_title', { ns: 'users' }),
       ),
   );
 };

@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { Formik, Form } from 'formik';
+import { useTranslation } from 'react-i18next';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { CA } from '@graylog/server-api';
@@ -36,6 +37,7 @@ type FormValues = {
 const createCA = (caData: FormValues) => CA.createCA(caData);
 
 const CaCreateForm = () => {
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const queryClient = useQueryClient();
   const sendTelemetry = useSendTelemetry('migration');
   const productName = useProductName();
@@ -44,13 +46,13 @@ const CaCreateForm = () => {
     mutationFn: createCA,
 
     onSuccess: () => {
-      UserNotification.success('CA created successfully');
+      UserNotification.success(t('ca_create.success'));
       queryClient.invalidateQueries({ queryKey: DATA_NODES_CA_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: MIGRATION_STATE_QUERY_KEY });
     },
 
     onError: (error) => {
-      UserNotification.error(`CA creation failed with error: ${error}`);
+      UserNotification.error(t('ca_create.failed', { error }));
     },
   });
 
@@ -64,10 +66,7 @@ const CaCreateForm = () => {
 
   return (
     <div>
-      <p>
-        Click on the &ldquo;Create CA&rdquo; button to quickly create a new certificate authority for your {productName}{' '}
-        Data Nodes.
-      </p>
+      <p>{t('ca_create.description', { productName })}</p>
       <Formik
         initialValues={{ organization: `${productName} CA` }}
         onSubmit={(formValues: FormValues) => onSubmit(formValues)}>
@@ -75,13 +74,13 @@ const CaCreateForm = () => {
           <Form>
             <FormikInput
               id="organization"
-              placeholder="Organization Name"
+              placeholder={t('ca_create.organization_name')}
               name="organization"
-              label="Organization Name"
+              label={t('ca_create.organization_name')}
               required
             />
             <Button bsStyle="primary" bsSize="small" disabled={isSubmitting || !isValid} type="submit">
-              {isSubmitting ? 'Creating CA...' : 'Create CA'}
+              {isSubmitting ? t('ca_create.submitting') : t('ca_create.submit')}
             </Button>
           </Form>
         )}

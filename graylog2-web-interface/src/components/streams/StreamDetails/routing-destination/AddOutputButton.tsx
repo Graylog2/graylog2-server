@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import styled, { css } from 'styled-components';
 
@@ -54,6 +55,7 @@ const SegmentedContainer = styled.div(
 type SegmentType = 'create' | 'assign';
 
 const AddOutputButton = ({ stream, getTypeDefinition, assignableOutputs, availableOutputTypes }: Props) => {
+  const { t } = useTranslation('streams');
   const [showAddOutput, setShowAddOutput] = useState(false);
   const sendTelemetry = useSendTelemetry();
   const { addStreamOutput } = useStreamOutputMutation();
@@ -66,11 +68,11 @@ const AddOutputButton = ({ stream, getTypeDefinition, assignableOutputs, availab
   const SEGMENTS = [
     {
       value: 'create' as const,
-      label: 'Create new output',
+      label: t('routing_destination.add_output.create_segment'),
     },
     {
       value: 'assign' as const,
-      label: 'Assign existing output',
+      label: t('routing_destination.add_output.assign_segment'),
     },
   ];
 
@@ -113,13 +115,17 @@ const AddOutputButton = ({ stream, getTypeDefinition, assignableOutputs, availab
 
   return (
     <>
-      <Button bsStyle="default" bsSize="sm" onClick={onShowAddOutput} title="Edit Output">
-        <Icon name="add" size="sm" /> Add output
+      <Button
+        bsStyle="default"
+        bsSize="sm"
+        onClick={onShowAddOutput}
+        title={t('routing_destination.add_output.tooltip')}>
+        <Icon name="add" size="sm" /> {t('routing_destination.add_output.button')}
       </Button>
       {showAddOutput && (
         <BootstrapModalWrapper showModal onHide={() => setShowAddOutput(false)}>
           <Modal.Header>
-            <Modal.Title>Add output to stream</Modal.Title>
+            <Modal.Title>{t('routing_destination.add_output.modal_title')}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <SegmentedControl<SegmentType> data={SEGMENTS} value={currentSegment} onChange={setCurrentSegment} />
@@ -138,7 +144,7 @@ const AddOutputButton = ({ stream, getTypeDefinition, assignableOutputs, availab
           </Modal.Body>
           <Modal.Footer>
             <Button type="button" onClick={onCancel}>
-              Cancel
+              {t('common:actions.cancel')}
             </Button>
           </Modal.Footer>
         </BootstrapModalWrapper>

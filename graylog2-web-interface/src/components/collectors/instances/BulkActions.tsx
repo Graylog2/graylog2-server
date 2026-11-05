@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { MenuItem } from 'components/bootstrap';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
@@ -46,6 +47,7 @@ export const useHasBulkActions = () => {
 };
 
 const BulkActions = () => {
+  const { t } = useTranslation('collectors');
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const [showReassignModal, setShowReassignModal] = useState(false);
   const canReassignAnywhere = useHasBulkActions();
@@ -62,7 +64,7 @@ const BulkActions = () => {
     <>
       {canReassignAnywhere && (
         <BulkActionsDropdown>
-          <MenuItem onSelect={toggleReassignModal}>Reassign to fleet</MenuItem>
+          <MenuItem onSelect={toggleReassignModal}>{t('instance_actions.reassign')}</MenuItem>
         </BulkActionsDropdown>
       )}
       {showReassignModal && (

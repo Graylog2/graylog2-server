@@ -15,10 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Table } from 'components/bootstrap';
 
+const TAGS_EXAMPLE_IF_OPEN = '<#if sidecar.tags.webserver??>';
+const TAGS_EXAMPLE_PATH = '- /var/log/apache/*.log';
+const TAGS_EXAMPLE_IF_CLOSE = '</#if>';
+
 const TemplatesHelper = () => {
+  const { t } = useTranslation('sidecars');
   const _buildVariableName = (name) => `\${sidecar.${name}}`;
 
   return (
@@ -26,8 +32,8 @@ const TemplatesHelper = () => {
       <Table responsive>
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Description</th>
+            <th>{t('configuration_forms.templates_helper.name')}</th>
+            <th>{t('configuration_forms.templates_helper.description')}</th>
           </tr>
         </thead>
         <tbody>
@@ -36,48 +42,51 @@ const TemplatesHelper = () => {
               <code>{_buildVariableName('operatingSystem')}</code>
             </td>
             <td>
-              Name of the operating system the sidecar is running on, e.g.{' '}
-              <code>&quot;Linux&quot;, &quot;Windows&quot;</code>
+              <Trans
+                t={t}
+                i18nKey="configuration_forms.templates_helper.operating_system"
+                components={{ code: <code /> }}
+              />
             </td>
           </tr>
           <tr>
             <td>
               <code>{_buildVariableName('nodeName')}</code>
             </td>
-            <td>The name of the sidecar, defaults to hostname if not set.</td>
+            <td>{t('configuration_forms.templates_helper.node_name')}</td>
           </tr>
           <tr>
             <td>
               <code>{_buildVariableName('nodeId')}</code>
             </td>
-            <td>UUID of the sidecar.</td>
+            <td>{t('configuration_forms.templates_helper.node_id')}</td>
           </tr>
           <tr>
             <td>
               <code>{_buildVariableName('sidecarVersion')}</code>
             </td>
-            <td>Version string of the running sidecar.</td>
+            <td>{t('configuration_forms.templates_helper.sidecar_version')}</td>
           </tr>
           <tr>
             <td>
               <code>{_buildVariableName('spoolDir')}</code>
             </td>
-            <td>A directory that is unique per configuration and can be used to store collector data.</td>
+            <td>{t('configuration_forms.templates_helper.spool_dir')}</td>
           </tr>
           <tr>
             <td>
               <code>{_buildVariableName('tags.<tag>')}</code>
             </td>
             <td>
-              A map of tags that are set for the sidecar. This can be used to render conditional configuration snippets.
-              e.g.: <br />
+              {t('configuration_forms.templates_helper.tags')}
+              <br />
               <code>
                 {' '}
-                &lt;#if sidecar.tags.webserver??&gt;
+                {TAGS_EXAMPLE_IF_OPEN}
                 <br />
-                &nbsp;&nbsp;- /var/log/apache/*.log
+                &nbsp;&nbsp;{TAGS_EXAMPLE_PATH}
                 <br />
-                &lt;/#if&gt;{' '}
+                {TAGS_EXAMPLE_IF_CLOSE}{' '}
               </code>
             </td>
           </tr>

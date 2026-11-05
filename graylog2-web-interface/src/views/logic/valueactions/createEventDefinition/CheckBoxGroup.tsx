@@ -28,13 +28,15 @@ const CHECKBOX_STATES = {
 };
 
 type Props = {
+  /** Identifies the group in the expanded sections of the surrounding list. */
+  groupKey: string;
   groupLabel: string;
   checked: Checked;
   labels: { [name: string]: JSX.Element };
   onChange: (newChecked: Checked) => void;
 };
 
-const CheckBoxGroup = ({ groupLabel, checked, onChange, labels }: Props) => {
+const CheckBoxGroup = ({ groupKey, groupLabel, checked, onChange, labels }: Props) => {
   const value = useMemo(() => {
     if (Object.values(checked).every((val) => val)) {
       return CHECKBOX_STATES.Checked;
@@ -73,7 +75,7 @@ const CheckBoxGroup = ({ groupLabel, checked, onChange, labels }: Props) => {
   return (
     <ExpandableCheckboxListItem
       header={groupLabel}
-      value={groupLabel}
+      value={groupKey}
       checked={value === CHECKBOX_STATES.Checked}
       indeterminate={value === CHECKBOX_STATES.Indeterminate}
       onChange={groupOnChange}>

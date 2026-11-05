@@ -1,0 +1,1189 @@
+{
+  "pages": {
+    "documentation_title": "Documentación de Collectors",
+    "deployment": {
+      "title": "Desplegar Collectors",
+      "description": "Ejecuta el comando en cualquier número de hosts: se inscribirán en el Fleet que elijas y aparecerán en cuanto se conecten.",
+      "deploy_tab": "Desplegar",
+      "tokens_tab": "Tokens de inscripción",
+      "tokens_description": "Los tokens autorizan a nuevos Collectors a inscribirse en un Fleet. Eliminar un token no afecta a los Collectors ya inscritos."
+    },
+    "fleets": {
+      "document_title": "Fleets de Collectors",
+      "title": "Fleets",
+      "description": "Un Fleet es un grupo de collectors que comparten la misma configuración. Todos los collectors de un Fleet recopilan datos de las mismas fuentes. Usa los Fleets para organizar los collectors por entorno, equipo o finalidad."
+    },
+    "fleet_detail": {
+      "title": "Detalle del Fleet"
+    },
+    "instances": {
+      "document_title": "Instancias de Collectors",
+      "title": "Instancias",
+      "description": "Una instancia de collector representa un proceso de collector en ejecución en un host remoto. Las instancias se inscriben en un Fleet mediante un token de inscripción y reciben automáticamente la configuración de fuentes de su Fleet."
+    },
+    "onboarding": {
+      "title": "Incorporación de Collectors",
+      "description": "Estado de tu nuevo collector conectado.",
+      "load_error": "No se ha podido cargar la instancia del collector: {{error}}",
+      "not_found": "No se ha encontrado la instancia del collector. Es posible que se haya eliminado; consulta todas las <instancesLink>Instancias</instancesLink>."
+    },
+    "overview": {
+      "title": "Resumen de Collectors",
+      "description": "Los Collectors son servicios ligeros desplegados en tu infraestructura para recopilar logs y reenviarlos a {{productName}}. Se organizan en Fleets y se configuran con fuentes que definen qué datos recopilar."
+    },
+    "settings": {
+      "title": "Configuración de Collectors",
+      "description": "Configura los endpoints y los ajustes del ciclo de vida de los Collectors gestionados. Los Collectors se conectan a estos endpoints para recibir actualizaciones de configuración y enviar los datos de logs recopilados."
+    }
+  },
+  "navigation": {
+    "overview": "Resumen",
+    "fleets": "Fleets",
+    "instances": "Instancias",
+    "deployment": "Despliegue",
+    "settings": "Configuración"
+  },
+  "activity": {
+    "deleted_target": "[eliminado]",
+    "by_actor": "por {{name}}",
+    "by_system": "por el sistema",
+    "config_changed": {
+      "fleet": "Configuración actualizada para el Fleet <targetLink />",
+      "fleet_with_others_one": "Configuración actualizada para el Fleet <targetLink /> y {{count}} Fleet más",
+      "fleet_with_others_other": "Configuración actualizada para el Fleet <targetLink /> y {{count}} Fleets más",
+      "collector": "Configuración actualizada para el collector <targetLink />",
+      "collector_with_others_one": "Configuración actualizada para el collector <targetLink /> y {{count}} collector más",
+      "collector_with_others_other": "Configuración actualizada para el collector <targetLink /> y {{count}} collectors más",
+      "fleet_with_others_many": "Configuración actualizada para el Fleet <targetLink /> y {{count}} Fleets más",
+      "collector_with_others_many": "Configuración actualizada para el collector <targetLink /> y {{count}} collectors más"
+    },
+    "ingest_config_changed": {
+      "fleet": "Configuración de ingesta actualizada para el Fleet <targetLink />",
+      "fleet_with_others_one": "Configuración de ingesta actualizada para el Fleet <targetLink /> y {{count}} Fleet más",
+      "fleet_with_others_other": "Configuración de ingesta actualizada para el Fleet <targetLink /> y {{count}} Fleets más",
+      "collector": "Configuración de ingesta actualizada para el collector <targetLink />",
+      "collector_with_others_one": "Configuración de ingesta actualizada para el collector <targetLink /> y {{count}} collector más",
+      "collector_with_others_other": "Configuración de ingesta actualizada para el collector <targetLink /> y {{count}} collectors más",
+      "fleet_with_others_many": "Configuración de ingesta actualizada para el Fleet <targetLink /> y {{count}} Fleets más",
+      "collector_with_others_many": "Configuración de ingesta actualizada para el collector <targetLink /> y {{count}} collectors más"
+    },
+    "restart": {
+      "fleet": "Reinicio solicitado para el Fleet <targetLink />",
+      "fleet_with_others_one": "Reinicio solicitado para el Fleet <targetLink /> y {{count}} Fleet más",
+      "fleet_with_others_other": "Reinicio solicitado para el Fleet <targetLink /> y {{count}} Fleets más",
+      "collector": "Reinicio solicitado para el collector <targetLink />",
+      "collector_with_others_one": "Reinicio solicitado para el collector <targetLink /> y {{count}} collector más",
+      "collector_with_others_other": "Reinicio solicitado para el collector <targetLink /> y {{count}} collectors más",
+      "fleet_with_others_many": "Reinicio solicitado para el Fleet <targetLink /> y {{count}} Fleets más",
+      "collector_with_others_many": "Reinicio solicitado para el collector <targetLink /> y {{count}} collectors más"
+    },
+    "discovery_run": {
+      "fleet": "Ejecución de descubrimiento iniciada para el Fleet <targetLink />",
+      "fleet_with_others_one": "Ejecución de descubrimiento iniciada para el Fleet <targetLink /> y {{count}} Fleet más",
+      "fleet_with_others_other": "Ejecución de descubrimiento iniciada para el Fleet <targetLink /> y {{count}} Fleets más",
+      "collector": "Ejecución de descubrimiento iniciada para el collector <targetLink />",
+      "collector_with_others_one": "Ejecución de descubrimiento iniciada para el collector <targetLink /> y {{count}} collector más",
+      "collector_with_others_other": "Ejecución de descubrimiento iniciada para el collector <targetLink /> y {{count}} collectors más",
+      "fleet_with_others_many": "Ejecución de descubrimiento iniciada para el Fleet <targetLink /> y {{count}} Fleets más",
+      "collector_with_others_many": "Ejecución de descubrimiento iniciada para el collector <targetLink /> y {{count}} collectors más"
+    },
+    "reassigned": {
+      "collector": "Collector <targetLink /> reasignado",
+      "collector_with_others_one": "Collector <targetLink /> y {{count}} collector más reasignados",
+      "collector_with_others_other": "Collector <targetLink /> y {{count}} collectors más reasignados",
+      "collector_with_others_many": "Collector <targetLink /> y {{count}} collectors más reasignados"
+    },
+    "reassigned_to_fleet": {
+      "collector": "Collector <targetLink /> reasignado al Fleet <destinationLink />",
+      "collector_with_others_one": "Collector <targetLink /> y {{count}} collector más reasignados al Fleet <destinationLink />",
+      "collector_with_others_other": "Collector <targetLink /> y {{count}} collectors más reasignados al Fleet <destinationLink />",
+      "collector_with_others_many": "Collector <targetLink /> y {{count}} collectors más reasignados al Fleet <destinationLink />"
+    }
+  },
+  "fleet_reference": {
+    "moving_title": "El collector se moverá a este Fleet la próxima vez que se conecte.",
+    "moving_from": "(moviéndose desde {{fleet}})",
+    "moving_from_removed": "(moviéndose desde un Fleet eliminado)",
+    "removed_title": "Este Fleet se ha eliminado.",
+    "removed": "Fleet eliminado ({{fleetId}})"
+  },
+  "sync_state": {
+    "pending_title": "Sincronización pendiente: los cambios se aplicarán en la próxima conexión del collector",
+    "pending": "Sincronización pendiente",
+    "in_sync_title": "Sincronizado: todos los cambios se han aplicado",
+    "in_sync": "Sincronizado"
+  },
+  "instance_status": {
+    "online": "En línea",
+    "offline": "Sin conexión"
+  },
+  "os": {
+    "unknown": "Desconocido"
+  },
+  "enrollment_tokens": {
+    "bulk_delete_title": "Eliminar tokens de inscripción",
+    "bulk_delete_confirm_one": "¿Seguro que quieres eliminar {{count}} token de inscripción? Los nuevos Collectors no podrán inscribirse con el token eliminado.",
+    "bulk_delete_confirm_other": "¿Seguro que quieres eliminar {{count}} tokens de inscripción? Los nuevos Collectors no podrán inscribirse con los tokens eliminados.",
+    "never": "Nunca",
+    "expired": "Caducado",
+    "human_name": "tokens de inscripción",
+    "delete_title": "Eliminar token de inscripción",
+    "delete_confirm": "¿Seguro que quieres eliminar este token de inscripción? Los nuevos Collectors no podrán inscribirse con este token. Los Collectors ya inscritos seguirán funcionando con normalidad.",
+    "bulk_delete_confirm_many": "¿Seguro que quieres eliminar {{count}} tokens de inscripción? Los nuevos Collectors no podrán inscribirse con los tokens eliminados."
+  },
+  "deployment": {
+    "select_fleet_step": "Selecciona un Fleet",
+    "generate_token_step": "Genera un token",
+    "install_step": "Instala el Collector",
+    "open_in_search": "Abrir en la búsqueda",
+    "generate_token_first": "Genera un token arriba para ver el comando de instalación.",
+    "copy_token_only": "Copiar solo el token"
+  },
+  "enrolling_hosts": {
+    "receiving": "Recibiendo",
+    "listening": "Escuchando…",
+    "title": "Inscribiendo hosts",
+    "connected_one": "{{count}} conectado · escuchando más…",
+    "connected_other": "{{count}} conectados · escuchando más…",
+    "listening_subtitle": "escuchando…",
+    "view_all": "Ver todo en Instancias",
+    "host": "Host",
+    "status": "Estado",
+    "first_messages": "Primeros mensajes",
+    "enrolled": "Inscrito",
+    "actions": "Acciones",
+    "hide_setup": "Ocultar configuración",
+    "view_setup": "Ver configuración",
+    "empty": "Los hosts que ejecuten el comando aparecerán aquí en cuanto se conecten.",
+    "connection_problem": "Hay problemas para conectar con el servidor; se reintentará automáticamente",
+    "connected_many": "{{count}} conectados · escuchando más…"
+  },
+  "token_step": {
+    "summary_expires": "Token <emphasis>{{tokenName}}</emphasis> generado; caduca <expiresAt />",
+    "summary_expires_with_fleet": "Token <emphasis>{{tokenName}}</emphasis> generado; caduca <expiresAt />; asignado al Fleet <emphasis>{{fleetName}}</emphasis>",
+    "summary_never_expires": "Token <emphasis>{{tokenName}}</emphasis> generado; no caduca nunca",
+    "summary_never_expires_with_fleet": "Token <emphasis>{{tokenName}}</emphasis> generado; no caduca nunca; asignado al Fleet <emphasis>{{fleetName}}</emphasis>",
+    "change_token": "Cambiar token",
+    "short_lived": "Token de corta duración (caduca en 1 día)",
+    "custom": "Token personalizado",
+    "expiry_24_hours": "24 horas",
+    "expiry_7_days": "7 días",
+    "expiry_30_days": "30 días",
+    "expiry_never": "Sin caducidad",
+    "name": "Nombre",
+    "name_placeholder": "p. ej., despliegue de servidores web",
+    "custom_hint": "Los tokens personalizados aparecen en la pestaña Tokens de inscripción y se pueden revocar en cualquier momento.",
+    "no_permission": "No tienes permiso para crear tokens de inscripción para este Fleet",
+    "generating": "Generando...",
+    "generate": "Generar token",
+    "select_fleet_first": "Selecciona antes un Fleet arriba."
+  },
+  "fleet_actions": {
+    "received_messages": "Mensajes recibidos",
+    "delete": "Eliminar",
+    "delete_blocked_one": "Este Fleet tiene {{count}} instancia asignada. Reasígnala o elimínala antes de eliminar el Fleet.",
+    "delete_blocked_other": "Este Fleet tiene {{count}} instancias asignadas. Reasígnalas o elimínalas antes de eliminar el Fleet.",
+    "delete_title": "Eliminar Fleet",
+    "delete_confirm": "¿Seguro que quieres eliminar el Fleet <emphasis>{{fleetName}}</emphasis>? Se eliminarán sus configuraciones de fuentes y sus tokens de inscripción.",
+    "delete_blocked_many": "Este Fleet tiene {{count}} instancias asignadas. Reasígnalas o elimínalas antes de eliminar el Fleet."
+  },
+  "fleet_form": {
+    "name_required": "El nombre es obligatorio",
+    "edit_title": "Editar Fleet",
+    "new_title": "Nuevo Fleet",
+    "name": "Nombre",
+    "name_help": "Un nombre único para este Fleet",
+    "description": "Descripción",
+    "description_help": "Descripción opcional de la finalidad de este Fleet",
+    "update": "Actualizar Fleet",
+    "create": "Crear Fleet",
+    "updating": "Actualizando...",
+    "creating": "Creando..."
+  },
+  "fleet_settings": {
+    "general": "Configuración general",
+    "fleet_name": "Nombre del Fleet",
+    "save": "Guardar cambios",
+    "saving": "Guardando...",
+    "information": "Información del Fleet",
+    "fleet_id": "ID del Fleet:",
+    "created": "Creado:",
+    "updated": "Actualizado:"
+  },
+  "fleets": {
+    "human_name": "Fleets"
+  },
+  "fleet_detail": {
+    "tab_sources": "Fuentes",
+    "tab_instances": "Instancias",
+    "tab_settings": "Configuración",
+    "edit_source": "Editar",
+    "not_found": "No se ha encontrado el Fleet",
+    "deploy_collector": "Desplegar un nuevo Collector",
+    "stat_instances": "Instancias",
+    "stat_instances_help": "Procesos de collector inscritos en este Fleet.",
+    "stat_online": "En línea",
+    "stat_online_help": "Instancias que han enviado un heartbeat dentro del umbral de desconexión.",
+    "stat_offline": "Sin conexión",
+    "stat_offline_help": "Instancias que no han enviado su heartbeat. Comprueba la conectividad del host o el estado del proceso del Collector.",
+    "stat_sources": "Fuentes",
+    "stat_sources_help": "Configuraciones de recopilación de datos asignadas a este Fleet.",
+    "sources_description": "Las fuentes se envían automáticamente a todos los Collectors de este Fleet. Los cambios se aplican en segundos.",
+    "add_source": "Añadir fuente",
+    "sources_human_name": "fuentes",
+    "instances_description": "Instancias de collector inscritas en este Fleet. Cada instancia ejecuta todas las fuentes habilitadas. Para añadir más instancias, <deployLink>despliega Collectors</deployLink> con un token de inscripción para este Fleet.",
+    "instances_human_name": "instancias",
+    "delete_source_title": "Eliminar fuente",
+    "delete_source_confirm": "¿Seguro que quieres eliminar la fuente <emphasis>{{sourceName}}</emphasis>? Los Collectors de este Fleet dejarán de recopilar datos de esta fuente en cuestión de segundos."
+  },
+  "instance_actions": {
+    "reassign": "Reasignar a un Fleet",
+    "view_system_logs": "Ver los logs del sistema",
+    "details": "Detalles",
+    "delete_title": "Eliminar instancia de Collector",
+    "delete_confirm": "¿Seguro que quieres eliminar la instancia <emphasis>{{instanceName}}</emphasis>?<lineBreak />El Collector tendrá que volver a inscribirse para aparecer de nuevo."
+  },
+  "reassign_fleet": {
+    "fleet_required": "El Fleet es obligatorio",
+    "title_one": "Reasignar {{count}} instancia a un Fleet",
+    "title_other": "Reasignar {{count}} instancias a un Fleet",
+    "no_other_fleet_one": "No hay otro Fleet al que asignar este Collector.",
+    "no_other_fleet_other": "No hay otro Fleet al que asignar estos Collectors.",
+    "no_permission": "No tienes permiso para asignar Collectors a ningún otro Fleet.",
+    "select_placeholder": "Selecciona un Fleet...",
+    "submit_one": "Reasignar instancia",
+    "submit_other": "Reasignar instancias",
+    "submitting": "Reasignando...",
+    "title_many": "Reasignar {{count}} instancias a un Fleet",
+    "no_other_fleet_many": "No hay otro Fleet al que asignar estos Collectors.",
+    "submit_many": "Reasignar instancias"
+  },
+  "instance_health": {
+    "title": "Estado de salud",
+    "unknown": "Desconocido",
+    "no_report": "Este collector no ha enviado información de salud.",
+    "healthy": "Correcto",
+    "unhealthy": "Con problemas",
+    "last_known": "Último estado conocido: {{state}}",
+    "since": "durante <duration />"
+  },
+  "instance_drawer": {
+    "action_reassign": "Reasignar a otro Fleet",
+    "action_reload_config": "Recargar configuración",
+    "action_reload_ingest_config": "Recargar la configuración de ingesta",
+    "action_restart": "Reiniciar",
+    "action_discovery": "Ejecutar el descubrimiento de fuentes",
+    "status": "Estado:",
+    "sync": "Sincronización:",
+    "fleet": "Fleet:",
+    "os": "SO:",
+    "last_seen": "Visto por última vez:",
+    "enrolled": "Inscrito:",
+    "version": "Versión:",
+    "logs": "Logs:",
+    "messages": "Mensajes:",
+    "attributes": "Atributos",
+    "active_sources_one": "Fuentes activas ({{count}})",
+    "active_sources_other": "Fuentes activas ({{count}})",
+    "sources_inherited": "Las fuentes se heredan de la configuración del Fleet de esta instancia.",
+    "no_sources": "No hay fuentes configuradas para este Fleet. Añade fuentes en la página de detalle del Fleet para empezar a recopilar datos.",
+    "synchronization": "Sincronización",
+    "pending_load_error": "No se han podido cargar los cambios pendientes. Inténtalo de nuevo más tarde.",
+    "queued_actions": "Las siguientes acciones están en cola hasta que el collector se sincronice:",
+    "hide_transactions": "Ocultar transacciones en cola",
+    "show_transactions_one": "Mostrar transacciones en cola ({{count}})",
+    "show_transactions_other": "Mostrar transacciones en cola ({{count}})",
+    "changes_queued": "Los cambios están en cola y se aplicarán en la próxima conexión del collector.",
+    "all_applied": "El collector ha aplicado todas las acciones en cola.",
+    "active_sources_many": "Fuentes activas ({{count}})",
+    "show_transactions_many": "Mostrar transacciones en cola ({{count}})"
+  },
+  "overview": {
+    "stat_instances_help": "Procesos de Collector en ejecución en todos los Fleets.",
+    "stat_fleets": "Fleets",
+    "stat_fleets_help": "Grupos lógicos de Collectors que comparten la misma configuración de fuentes.",
+    "stat_sources_help": "Configuraciones de recopilación de datos (rutas de archivos, journald, logs de eventos de Windows) en todos los Fleets.",
+    "fleet_stats_error": "No se han podido cargar las estadísticas de los Fleets.",
+    "stats_error": "No se han podido cargar las estadísticas de Collectors.",
+    "fleets_title": "Fleets",
+    "filter_placeholder": "Filtrar Fleets...",
+    "config_error": "No se ha podido cargar la configuración de Collectors.",
+    "endpoint_missing_title": "El endpoint de ingesta de Collectors no está configurado",
+    "endpoint_missing": "Los Collectors se inscriben en un endpoint de ingesta que todavía no se ha configurado. Para configurarlo necesitas permiso para editar la configuración de Collectors y para crear o modificar la entrada Collector Ingest (HTTP), y tu cuenta no lo tiene. Pide a un administrador que configure primero el endpoint."
+  },
+  "fleet_card": {
+    "healthy": "Todas las instancias de este Fleet están en línea",
+    "degraded": "Algunas instancias de este Fleet están sin conexión",
+    "down": "Todas las instancias de este Fleet están sin conexión",
+    "empty": "Todavía no se ha inscrito ninguna instancia de Collector en este Fleet",
+    "instances_one": "instancia",
+    "instances_other": "instancias",
+    "online_one": "● {{count}} en línea",
+    "online_other": "● {{count}} en línea",
+    "offline_one": "● {{count}} sin conexión",
+    "offline_other": "● {{count}} sin conexión",
+    "sources_one": "{{count}} fuente",
+    "sources_other": "{{count}} fuentes",
+    "instances_many": "instancias",
+    "online_many": "● {{count}} en línea",
+    "offline_many": "● {{count}} sin conexión",
+    "sources_many": "{{count}} fuentes"
+  },
+  "fleet_cards": {
+    "empty_title": "Todavía no hay Fleets",
+    "contact_admin": "Ponte en contacto con un administrador para configurar los primeros Collectors.",
+    "empty_description": "Los Fleets te permiten gestionar grupos de Collectors con una configuración compartida. Crea tu primer Fleet y, después, añade fuentes para definir qué datos deben recopilar sus Collectors. Una vez configurado, <deployLink>despliega Collectors</deployLink> con un token de inscripción.",
+    "create": "Crear Fleet",
+    "no_match": "No hay Fleets que coincidan con el filtro"
+  },
+  "recent_activity": {
+    "title": "Actividad reciente",
+    "empty": "No hay actividad reciente."
+  },
+  "collector_facts": {
+    "title": "Collector",
+    "host": "Host",
+    "os": "SO",
+    "version": "Versión",
+    "fleet": "Fleet",
+    "enrolled": "Inscrito",
+    "last_seen": "Visto por última vez",
+    "show_attributes_one": "Mostrar el atributo ({{count}})",
+    "show_attributes_other": "Mostrar los {{count}} atributos",
+    "hide_attributes": "Ocultar atributos",
+    "show_attributes_many": "Mostrar los {{count}} atributos"
+  },
+  "connection_success": {
+    "offline": "El collector se conectó una vez, pero no ha enviado información desde <lastSeen />.",
+    "receiving": "El collector está conectado y envía mensajes.",
+    "waiting": "Casi listo: el collector está conectado y estamos a la espera de sus primeros mensajes.",
+    "title": "Configurando {{host}}",
+    "view_instances": "Ver instancias",
+    "check_again": "Comprobar de nuevo",
+    "log_preview": "Vista previa de logs",
+    "caption_messages": "Mostrando los mensajes recibidos desde hace {{duration}}",
+    "caption_messages_checking": "Mostrando los mensajes recibidos desde hace {{duration}}; comprobando cada pocos segundos",
+    "caption_system": "Mostrando los mensajes de sistema del Collector recibidos desde hace {{duration}}",
+    "caption_system_checking": "Mostrando los mensajes de sistema del Collector recibidos desde hace {{duration}}; comprobando cada pocos segundos"
+  },
+  "fleet_choice": {
+    "selected_heading": "Fleet para este Collector",
+    "change": "Cambiar Fleet",
+    "heading": "Elige un Fleet para este Collector",
+    "create_new": "Crear nuevo Fleet",
+    "or": "o",
+    "select_existing": "Seleccionar un Fleet existente",
+    "select_existing_placeholder": "Selecciona un Fleet existente..."
+  },
+  "ingest_endpoint": {
+    "setting_up": "Configurando Collectors...",
+    "confirm": "Confirmar endpoint",
+    "create_input": "Crear input",
+    "save": "Guardar endpoint",
+    "hostname": "Nombre de host externo",
+    "hostname_placeholder": "p. ej., otlp.example.com",
+    "port": "Puerto externo",
+    "cancel": "Cancelar",
+    "reachability_hint": "Los Collectors envían sus logs a esta dirección. Debe ser accesible desde todos los hosts de Collectors: un balanceador de carga o este servidor.",
+    "confirm_title": "Confirma cómo envían los Collectors los datos a este clúster",
+    "change": "Cambiar endpoint",
+    "sending_to": "Los Collectors envían datos a este clúster en <endpoint />",
+    "no_input_title": "No existe ningún input de ingesta",
+    "no_input": "Los Collectors pueden inscribirse, pero no podrán enviar datos hasta que se cree un input.",
+    "not_running_title": "El input de ingesta en <endpoint /> no está en ejecución",
+    "not_running": "Los Collectors pueden inscribirse, pero no podrán enviar datos hasta que haya un input en ejecución.",
+    "manage_input": "Gestionar input"
+  },
+  "install_command": {
+    "title": "Ejecuta esto en {{platform}}",
+    "copy": "Copiar comando",
+    "note_expires": "Descarga e instala el collector, lo inscribe en el Fleet seleccionado e inicia el servicio. Requiere privilegios de administrador. El token caduca en {{duration}}.",
+    "note_never_expires": "Descarga e instala el collector, lo inscribe en el Fleet seleccionado e inicia el servicio. Requiere privilegios de administrador. Este token no caduca nunca."
+  },
+  "log_preview": {
+    "unavailable": "Vista previa de logs no disponible: {{error}}",
+    "loading": "Cargando la vista previa de logs...",
+    "empty": "Todavía no hay mensajes; comprobando cada pocos segundos"
+  },
+  "next_steps": {
+    "explore": "Explora tus datos",
+    "explore_description": "Abre la búsqueda filtrada por este collector",
+    "configure_sources": "Configurar fuentes",
+    "configure_sources_description": "Añade o ajusta lo que recopila este Fleet",
+    "manage_fleets": "Gestionar Fleets",
+    "manage_fleets_description": "Mueve este collector a un Fleet permanente",
+    "install_another": "Instalar otro collector",
+    "install_another_description": "Repite esta configuración en otro host",
+    "offline_title": "Vuelve a ponerlo en línea",
+    "check_service": "Comprueba que el servicio del collector se está ejecutando en el host.",
+    "check_reachability": "Verifica que el host puede acceder a este servidor de {{productName}}.",
+    "check_logs": "Revisa los logs propios del collector en la vista previa siguiente por si hay errores de conexión.",
+    "title": "Próximos pasos"
+  },
+  "timeline": {
+    "connection_lost": "Conexión perdida",
+    "last_heartbeat": "Último heartbeat <lastSeen />",
+    "first_messages": "Primeros mensajes",
+    "receiving_one": "Recibiendo: {{count}} mensaje desde hace {{duration}}",
+    "receiving_other": "Recibiendo: {{count}} mensajes desde hace {{duration}}",
+    "listening": "Escuchando... normalmente menos de un minuto",
+    "enrolled": "Inscrito",
+    "enrolled_detail": "Registrado con un token de inscripción - <enrolledAt />",
+    "connected": "Conectado",
+    "connected_detail": "Heartbeat recibido - <lastSeen />",
+    "sources_configured": "Fuentes configuradas",
+    "sources_detail_one": "{{count}} fuente del Fleet <fleetLink>{{fleetName}}</fleetLink>",
+    "sources_detail_other": "{{count}} fuentes del Fleet <fleetLink>{{fleetName}}</fleetLink>",
+    "receiving_many": "Recibiendo: {{count}} mensajes desde hace {{duration}}",
+    "sources_detail_many": "{{count}} fuentes del Fleet <fleetLink>{{fleetName}}</fleetLink>"
+  },
+  "platform_picker": {
+    "title": "Primeros pasos con Collectors",
+    "description": "Despliega collectors ligeros en tu infraestructura para reenviar logs a {{productName}}."
+  },
+  "source_status": {
+    "messages_one": "{{formattedCount}} mensaje",
+    "messages_other": "{{formattedCount}} mensajes",
+    "disabled": "Deshabilitada",
+    "not_applicable": "No aplicable en {{os}}",
+    "unrecognised": "Tipo de fuente no reconocido",
+    "paused": "En pausa: collector sin conexión",
+    "no_messages": "Todavía no hay mensajes",
+    "waiting": "Esperando los primeros mensajes...",
+    "title": "Fuentes de logs",
+    "no_sources": "Todavía no hay fuentes configuradas para este Fleet.",
+    "messages_many": "{{formattedCount}} mensajes"
+  },
+  "waiting_for_connection": {
+    "status": "Esperando la conexión... {{seconds}} s"
+  },
+  "settings": {
+    "getting_started": "Primeros pasos con Collectors",
+    "getting_started_cloud": "Los Collectors se conectan a un endpoint de ingesta gestionado para enviar sus datos. Guarda la configuración de tus collectors para inicializar la infraestructura de collectors. Después de la configuración, podrás crear Fleets, añadir fuentes y desplegar collectors en tus hosts.",
+    "getting_started_self_managed": "Los Collectors necesitan endpoints de ingesta para recibir los datos recopilados. Configura el endpoint HTTP que aparece abajo y guarda para inicializar la infraestructura de collectors. Después de la configuración, podrás crear Fleets, añadir fuentes y desplegar collectors en tus hosts.",
+    "ingest_endpoint": "Endpoint de ingesta",
+    "ingest_endpoint_cloud": "El endpoint de ingesta lo gestiona el sistema. Los Collectors se conectan aquí automáticamente.",
+    "ingest_endpoint_help": "Los endpoints de ingesta reciben datos de log de los collectors mediante OpenTelemetry (OTLP). Es la dirección externa que se envía a los collectors gestionados como destino de sus datos. Debe apuntar a un input de ingesta de collectors en ejecución. Normalmente es la dirección de un balanceador de carga o del propio servidor.",
+    "hostname_help": "El nombre de host o la dirección IP que usarán los Collectors para conectarse. Debe ser accesible desde los hosts de Collectors.",
+    "create_input": "Crear input de ingesta",
+    "lifecycle": "Ciclo de vida de los Collectors",
+    "offline_threshold": "Umbral de desconexión",
+    "offline_threshold_help": "Los Collectors que no hayan enviado información en este tiempo se mostrarán como sin conexión.",
+    "default_visibility": "Visibilidad predeterminada",
+    "default_visibility_help": "Los Collectors que no hayan enviado información en este tiempo se ocultan de la vista predeterminada. Los usuarios pueden ajustar o quitar este filtro en la tabla de instancias.",
+    "expiration_threshold": "Umbral de caducidad",
+    "expiration_threshold_help": "Los Collectors que no hayan enviado información en este tiempo se eliminarán de forma permanente.",
+    "confirm": "Confirmar configuración"
+  },
+  "ingest_inputs": {
+    "title": "Inputs de ingesta",
+    "none": "No existe ningún input de ingesta de Collectors. Los Collectors no podrán enviar datos hasta que se cree un input.",
+    "unreadable_one": "Existe {{count}} input de ingesta de Collectors, pero no tienes permiso para verlo.",
+    "unreadable_other": "Existen {{count}} inputs de ingesta de Collectors, pero no tienes permiso para verlos.",
+    "none_running": "Existen inputs de ingesta de Collectors, pero ninguno está en ejecución. Los Collectors no podrán enviar datos.",
+    "name": "Nombre",
+    "status": "Estado",
+    "bind_address": "Dirección de enlace",
+    "port": "Puerto",
+    "manage": "Gestionar",
+    "additional_unreadable_one": "{{count}} input adicional no visible por falta de permisos.",
+    "additional_unreadable_other": "{{count}} inputs adicionales no visibles por falta de permisos.",
+    "unreadable_many": "Existen {{count}} inputs de ingesta de Collectors, pero no tienes permiso para verlos.",
+    "additional_unreadable_many": "{{count}} inputs adicionales no visibles por falta de permisos."
+  },
+  "port_mismatch": {
+    "message_one": "Existe un input de ingesta de Collectors en un puerto distinto: {{ports}}. Si el puerto externo es distinto del puerto del input, asegúrate de que tu red encamina el tráfico correctamente.",
+    "message_other": "Existen inputs de ingesta de Collectors en puertos distintos: {{ports}}. Si el puerto externo es distinto del puerto de un input, asegúrate de que tu red encamina el tráfico correctamente.",
+    "message_many": "Existen inputs de ingesta de Collectors en puertos distintos: {{ports}}. Si el puerto externo es distinto del puerto de un input, asegúrate de que tu red encamina el tráfico correctamente."
+  },
+  "source_types": {
+    "file": "Archivo",
+    "journald": "Journald",
+    "windows_event_log": "Registro de eventos de Windows",
+    "macos_unified_logging": "Unified Logging de macOS"
+  },
+  "source_columns": {
+    "enabled": "Habilitada"
+  },
+  "source_form": {
+    "max_poll_interval_error": "El intervalo máximo de sondeo debe ser de al menos 1 segundo.",
+    "max_log_age_error": "La antigüedad máxima de los logs debe ser 0 o un valor positivo.",
+    "read_mode_end": "Desde el final (tail)",
+    "read_mode_beginning": "Desde el principio",
+    "file_paths": "Ruta(s) de archivo",
+    "file_paths_help": "Se admiten patrones glob (p. ej., /var/log/*.log, /var/log/**/*.log). El Collector vigila los archivos encontrados por si aparecen líneas nuevas.",
+    "read_mode": "Modo de lectura",
+    "read_mode_file_help": "Desde el final: solo recopila las líneas nuevas después de que se inicie el Collector. Desde el principio: recopila primero todas las líneas existentes y después sigue leyendo al final.",
+    "read_mode_journald_help": "Desde el final: solo recopila las entradas nuevas después de que se inicie el Collector. Desde el principio: recopila primero todas las entradas existentes y después sigue leyendo al final.",
+    "priority": "Prioridad",
+    "priority_help": "Nivel de gravedad mínimo que se va a recopilar. Por ejemplo, si seleccionas Error, también se recopilarán las entradas Critical, Alert y Emergency.",
+    "priority_emerg": "Emergency",
+    "priority_alert": "Alert",
+    "priority_crit": "Critical",
+    "priority_err": "Error",
+    "priority_warning": "Warning",
+    "priority_notice": "Notice",
+    "priority_info": "Info",
+    "priority_debug": "Debug",
+    "match_pattern": "Patrón de coincidencia",
+    "match_pattern_help": "Expresión de coincidencia de journald opcional para filtrar las entradas por unidad, proceso, etc. Ejemplo: _SYSTEMD_UNIT=nginx.service",
+    "channels": "Canales",
+    "channels_help": "Nombres de canales separados por comas (p. ej., Application, Security, System)",
+    "include_default_channels": "Incluir los canales predeterminados",
+    "include_default_channels_help": "Los canales predeterminados son: {{channels}}",
+    "predicate": "Predicado",
+    "predicate_help": "Filtro de predicado opcional de Unified Logging de macOS que se pasa al comando <code>log</code>. Si se deja vacío, se recopilan todos los logs del sistema. Los niveles <code>info</code> y <code>debug</code> no se recopilan actualmente, porque generan mucho ruido y aportan muy poca información útil. Ejemplo: <code>{{example}}</code>",
+    "max_poll_interval": "Intervalo máximo de sondeo",
+    "max_poll_interval_help": "Con qué frecuencia comprueba el Collector si hay entradas de log nuevas. Debe ser de al menos 1 segundo.",
+    "max_log_age": "Antigüedad máxima de los logs",
+    "max_log_age_help": "Al iniciarse por primera vez, hasta qué punto en el pasado se recuperarán logs. Pon 0 para desactivar la recuperación.",
+    "edit_title": "Editar fuente",
+    "new_title": "Nueva fuente",
+    "description": "Una fuente define qué datos deben recopilar los Collectors de este Fleet. Cada tipo de fuente corresponde a un método de recopilación distinto.",
+    "source_type": "Tipo de fuente",
+    "file_type_help": "Recopila líneas de log de archivos del host. Admite patrones glob para encontrar varios archivos.",
+    "journald_type_help": "Recopila entradas del journal de systemd (solo Linux).",
+    "windows_type_help": "Recopila eventos de los canales del Visor de eventos de Windows.",
+    "macos_type_help": "Recopila datos del sistema Unified Logging de macOS mediante el comando <code>log</code> (solo macOS).",
+    "enabled_help": "Las fuentes deshabilitadas no se envían a los Collectors. Úsalo para detener la recopilación temporalmente sin eliminar la fuente.",
+    "update": "Actualizar fuente",
+    "create": "Crear fuente"
+  },
+  "load_errors": {
+    "recent_activity": {
+      "message": "Error al cargar la actividad reciente. Estado:",
+      "title": "No se ha podido cargar la actividad reciente"
+    },
+    "input_ids": {
+      "message": "Error al cargar los ID de los inputs de Collectors. Estado:",
+      "title": "No se han podido cargar los ID de los inputs de Collectors."
+    },
+    "stats": {
+      "message": "Error al cargar las estadísticas de Collectors. Estado:",
+      "title": "No se han podido cargar las estadísticas de Collectors."
+    },
+    "config": {
+      "message": "Error al cargar la configuración de collectors. Estado:",
+      "title": "No se ha podido cargar la configuración de collectors."
+    },
+    "enrollment_tokens": {
+      "message": "Error al cargar los tokens de inscripción. Estado:",
+      "title": "No se han podido cargar los tokens de inscripción"
+    },
+    "pending_changes": {
+      "message": "Error al cargar los cambios pendientes. Estado:",
+      "title": "No se han podido cargar los cambios pendientes"
+    },
+    "instances": {
+      "message": "Error al cargar las instancias. Estado:",
+      "title": "No se han podido cargar las instancias"
+    },
+    "collector_instances": {
+      "message": "Error al cargar las instancias de Collectors. Estado:",
+      "title": "No se han podido cargar las instancias de Collectors"
+    },
+    "fleets": {
+      "message": "Error al cargar los Fleets. Estado:",
+      "title": "No se han podido cargar los Fleets"
+    },
+    "fleet": {
+      "message": "Error al cargar el Fleet. Estado:",
+      "title": "No se ha podido cargar el Fleet"
+    },
+    "fleet_stats": {
+      "message": "Error al cargar las estadísticas del Fleet. Estado:",
+      "title": "No se han podido cargar las estadísticas del Fleet"
+    },
+    "sources": {
+      "message": "Error al cargar las fuentes. Estado:",
+      "title": "No se han podido cargar las fuentes"
+    },
+    "input_details": {
+      "message": "Error al cargar los detalles del input de Collectors. Estado: {{error}}",
+      "title": "No se han podido cargar los detalles del input de Collectors."
+    }
+  },
+  "mutation_errors": {
+    "create_fleet": {
+      "message": "Error al crear el Fleet: {{error}}",
+      "title": "No se ha podido crear el Fleet"
+    },
+    "update_fleet": {
+      "message": "Error al actualizar el Fleet: {{error}}",
+      "title": "No se ha podido actualizar el Fleet"
+    },
+    "delete_fleet": {
+      "message": "Error al eliminar el Fleet: {{error}}",
+      "title": "No se ha podido eliminar el Fleet"
+    },
+    "create_source": {
+      "message": "Error al crear la fuente: {{error}}",
+      "title": "No se ha podido crear la fuente"
+    },
+    "update_source": {
+      "message": "Error al actualizar la fuente: {{error}}",
+      "title": "No se ha podido actualizar la fuente"
+    },
+    "delete_source": {
+      "message": "Error al eliminar la fuente: {{error}}",
+      "title": "No se ha podido eliminar la fuente"
+    },
+    "create_enrollment_token": {
+      "message": "Error al crear el token de inscripción: {{error}}",
+      "title": "No se ha podido crear el token de inscripción"
+    },
+    "delete_enrollment_token": {
+      "message": "Error al eliminar el token de inscripción: {{error}}",
+      "title": "No se ha podido eliminar el token de inscripción"
+    },
+    "delete_enrollment_tokens": {
+      "message": "Error al eliminar los tokens de inscripción: {{error}}",
+      "title": "No se han podido eliminar los tokens de inscripción"
+    },
+    "reassign_instances": {
+      "message": "Error al reasignar las instancias: {{error}}",
+      "title": "No se han podido reasignar las instancias"
+    },
+    "delete_instance": {
+      "message": "Error al eliminar la instancia: {{error}}",
+      "title": "No se ha podido eliminar la instancia"
+    },
+    "save_config": {
+      "message": "Error al guardar la configuración de collectors: {{error}}",
+      "title": "No se ha podido guardar la configuración"
+    },
+    "create_input": {
+      "message": "Error al crear el input de ingesta de Collectors: {{error}}",
+      "title": "No se ha podido crear el input de ingesta de Collectors"
+    },
+    "update_input": {
+      "message": "Error al actualizar el input de ingesta de Collectors: {{error}}",
+      "title": "No se ha podido actualizar el input de ingesta de Collectors"
+    }
+  },
+  "notifications": {
+    "success_title": "¡Correcto!",
+    "fleet_created": "El Fleet \"{{name}}\" se ha creado.",
+    "fleet_updated": "El Fleet \"{{name}}\" se ha actualizado.",
+    "fleet_deleted": "El Fleet se ha eliminado.",
+    "source_created": "La fuente \"{{name}}\" se ha creado.",
+    "source_updated": "La fuente \"{{name}}\" se ha actualizado.",
+    "source_deleted": "La fuente se ha eliminado.",
+    "enrollment_token_deleted": "El token de inscripción se ha eliminado.",
+    "enrollment_tokens_deleted": "Los tokens de inscripción se han eliminado.",
+    "instances_reassigned": "Las instancias se han reasignado.",
+    "instance_deleted": "La instancia se ha eliminado.",
+    "config_saved": "Configuración de collectors guardada.",
+    "input_created": "Input de ingesta de Collectors creado.",
+    "input_moved": "El input de ingesta de Collectors se ha movido al nuevo puerto."
+  },
+  "datanode": {
+    "compatibility_check": {
+      "compatible": "Tus datos existentes de OpenSearch se pueden migrar a Data Node.",
+      "error": "Se ha producido un error al comprobar la compatibilidad",
+      "incompatible": "Tus datos existentes de OpenSearch no se pueden migrar a Data Node.",
+      "loading": "Cargando los resultados de la comprobación de compatibilidad...",
+      "title": "Comprobación de compatibilidad del directorio",
+      "version_incompatible": "Tu clúster de OpenSearch no se puede migrar a esta versión de Data Node porque no es compatible."
+    },
+    "migration_steps_text": {
+      "renewal_step_required": "Crea una política de renovación de certificados antes de continuar.",
+      "finished": "¡La migración ha finalizado!",
+      "ca_step_required": "Crea una autoridad de certificación antes de continuar."
+    },
+    "migration_welcome": {
+      "earlier_deployments": "Las instalaciones anteriores a la v5.2, o las que optaron por no instalar un Data Node, necesitarán migrar las bases de datos de mensajes a Data Nodes.",
+      "incompatible_backend": "Backend de búsqueda incompatible. Actualiza a OpenSearch para poder usar el asistente de migración.",
+      "intro": "El Data Node de {{productName}} es un componente de gestión diseñado para configurar y optimizar OpenSearch para su uso con {{productName}}, lo que reduce la carga administrativa y simplifica las actualizaciones futuras.",
+      "more_information": "Puedes consultar más información sobre la migración a Data Node en la <docsLink>documentación</docsLink>.",
+      "required_steps": "La migración a Data Node requerirá realizar algunos pasos en el sistema operativo, dentro de tu clúster OS/ES actual y en tus archivos de configuración.",
+      "title": "Migración de Data Nodes",
+      "tool_description": "Esta herramienta de migración comprobará la compatibilidad de tus componentes y te guiará para migrar tus datos existentes de OpenSearch a un Data Node."
+    },
+    "migration_wizard": {
+      "loading": "Cargando..."
+    },
+    "compatibility_status": {
+      "creation_date": "Fecha de creación",
+      "datanode_opensearch_version": "Versión de OpenSearch del Data Node",
+      "index_version": "Versión del índice",
+      "indices": "Índices",
+      "node_title_one": "Nodo: {{hostname}}, versión: {{version}}, {{count}} índice",
+      "node_title_other": "Nodo: {{hostname}}, versión: {{version}}, {{count}} índices",
+      "opensearch_data_location": "Ubicación de los datos de OpenSearch",
+      "shard_count_one": "{{count}} shard",
+      "shard_count_other": "{{count}} shards",
+      "shards": "Shards",
+      "node_title_many": "Nodo: {{hostname}}, versión: {{version}}, {{count}} índices",
+      "shard_count_many": "{{count}} shards"
+    },
+    "in_place_migration": {
+      "description": "Sigue estos pasos para migrar tu clúster existente de OpenSearch 2.x o 1.3.x a Data Nodes.",
+      "title": "Migración in situ"
+    },
+    "migration_data_nodes": {
+      "certificate_valid_until": "Certificado válido hasta",
+      "found_one": "Data Nodes encontrados: {{count}}",
+      "found_other": "Data Nodes encontrados: {{count}}",
+      "hostname": "Nombre de host",
+      "incompatible": "Hay Data Nodes en ejecución con versiones incompatibles con tu versión actual de {{productName}}. Asegúrate de usar la misma versión tanto de {{productName}} como de Data Node.",
+      "incompatible_title": "Se han encontrado Data Nodes incompatibles",
+      "loading": "Cargando Data Nodes",
+      "looking": "Buscando Data Nodes...",
+      "no_certificate": "Sin certificado",
+      "none_found": "No se ha encontrado ningún Data Node.",
+      "none_found_title": "No se han encontrado Data Nodes",
+      "start_data_node": "Inicia al menos un Data Node para continuar con el proceso de migración. Puedes encontrar más información sobre cómo iniciar Data Nodes en nuestra <docsLink>documentación</docsLink>.",
+      "status": "Estado",
+      "transport_address": "Dirección de transporte",
+      "version": "Versión",
+      "version_incompatible": "Esta versión es incompatible con tu versión actual de {{productName}}.",
+      "found_many": "Data Nodes encontrados: {{count}}"
+    },
+    "manual_migration": {
+      "migration_type": "Tipo de migración",
+      "migration_type_help": "El tipo de migración que quieres realizar.",
+      "select_migration_type": "Selecciona el tipo de migración"
+    },
+    "stop_processing": {
+      "change_owner": "Si estás migrando datos existentes de OpenSearch apuntando el Data Node a su directorio de datos, asegúrate de cambiar el propietario del directorio de datos al usuario que ejecuta el Data Node (normalmente graylog-datanode) y restablece los permisos correctos, por ejemplo, ejecutando",
+      "stop_cluster": "Detén tu clúster de OpenSearch antes de continuar.",
+      "stop_opensearch": "Detener OpenSearch",
+      "stopped": "El procesamiento de {{productName}} está detenido."
+    },
+    "journal_size_warning": {
+      "description": "Ten en cuenta que durante la migración tendrás que detener el procesamiento en tu nodo de {{productName}}, lo que hará que el journal crezca de tamaño. Por tanto, tendrás que aumentar el tamaño del volumen del journal durante el paso de reducción del tamaño del journal o antes.",
+      "title": "Aviso de tamaño del journal"
+    },
+    "journal_downtime": {
+      "current_size": "El tamaño actual de tu journal es: <bold>{{size}} MB</bold> y su rendimiento actual es: <bold>{{throughput}} KB/min</bold>",
+      "estimation_error": "Se ha producido un error al estimar el rendimiento de tu journal: {{message}}",
+      "increase_size": "Por tanto, es posible que necesites aumentar el tamaño del volumen del journal.",
+      "max_downtime": "El tiempo de inactividad máximo actual para reconfigurar {{productName}} y apuntar al Data Node es: <bold>{{duration}}</bold>",
+      "processing_stops": "Ten en cuenta que durante la migración el procesamiento de datos se detendrá en tu nodo de {{productName}}, lo que hará que el journal crezca de tamaño.",
+      "sufficient_size": "Asegúrate de que el tamaño del volumen del journal es suficiente antes de continuar.",
+      "title": "Aviso de tamaño por tiempo de inactividad del journal"
+    },
+    "in_place_welcome": {
+      "description": "Una migración in situ migrará la carpeta de datos de tu clúster existente a un clúster de Data Nodes.",
+      "install": "Para empezar, instala el Data Node en cada nodo OS/ES de tu configuración anterior. Puedes encontrar más información sobre cómo descargar e instalar el Data Node <docsLink>aquí</docsLink>.",
+      "title": "Bienvenido"
+    },
+    "restart_graylog": {
+      "almost_there": "¡Ya casi está!",
+      "example": "P. ej.,",
+      "remove_hosts": "Elimina la línea <codeSnippet>elasticsearch_hosts</codeSnippet> de tu <codeSnippet>server.conf</codeSnippet>",
+      "restart": "Cuando termines, reinicia {{productName}} para finalizar la migración.",
+      "wait_for_available": "Espera a que todos los data nodes pasen a 'AVAILABLE'. Revisa el log del data node si no se vuelven disponibles en 1 o 2 minutos."
+    },
+    "in_place_migration_info": {
+      "configuration": "En las migraciones in situ, asegúrate de que la configuración de tus Data Nodes en <codeSnippet>datanode.conf</codeSnippet>, en concreto la opción <codeSnippet>opensearch_data_location</codeSnippet>, apunta al directorio de datos de OpenSearch existente correcto en cada nodo.",
+      "permissions": "Durante la migración, tanto el usuario del sistema del Data Node como el de OpenSearch necesitarán poder acceder y escribir en el directorio de datos. Para garantizarlo, puedes ejecutar, por ejemplo,"
+    },
+    "certificates_provisioning": {
+      "ca_configured": "La autoridad de certificación se ha configurado correctamente.",
+      "finished": "El aprovisionamiento del Data Node ha finalizado.",
+      "loading": "Cargando el estado de la migración.",
+      "provision_now": "Ya puedes aprovisionar certificados para tus Data Nodes.",
+      "provisioning": "Aprovisionando certificado"
+    },
+    "jwt_authentication": {
+      "add_snippet": "Para ello, añade el siguiente fragmento a tu <codeSnippet>opensearch-security/config.yml</codeSnippet>",
+      "description": "Según cómo hayas protegido tu clúster existente, es necesario realizar algunos cambios preliminares en la configuración de seguridad. Usamos la autenticación JWT para acceder a OpenSearch desde {{productName}}. En el siguiente paso, tendrás que habilitar manualmente la autenticación JWT en tu clúster de OpenSearch existente para asegurarte de que los datos son accesibles desde el Data Node.",
+      "replace_signing_key": "Sustituye la clave de firma por tu <codeSnippet>GRAYLOG_PASSWORD_SECRET</codeSnippet> codificada en base64. Para codificarla, puedes ejecutar",
+      "title": "Autenticación JWT"
+    },
+    "reset_migration": {
+      "button": "Restablecer migración",
+      "confirm": "¿Seguro que quieres restablecer la migración?",
+      "failed": "Error al restablecer el estado de la migración. Estado: {{error}}",
+      "failed_title": "No se ha podido restablecer el estado de la migración.",
+      "success": "El estado de la migración se ha restablecido correctamente."
+    },
+    "migration_actions": {
+      "next": "Siguiente",
+      "show_renewal_policy_creation": "Configurar la política de renovación de certificados",
+      "show_migration_selection": "Ir a los pasos de la migración",
+      "run_directory_compatibility_check": "Ejecutar la comprobación de compatibilidad del directorio",
+      "provision_datanode_certificates": "Aprovisionar los Data Nodes con certificados"
+    },
+    "force_start": {
+      "confirm": "Iniciar de todos modos",
+      "description": "El backend indicó que las comprobaciones previas normales no se han superado.",
+      "submitting": "Iniciando...",
+      "title": "¿Iniciar la actualización de OpenSearch de todos modos?"
+    },
+    "rolling_upgrade_nodes": {
+      "abort_requested": "Se ha solicitado la cancelación. La actualización se detendrá después del paso actual.",
+      "no_remaining_nodes": "No quedan nodos.",
+      "no_upgraded_nodes": "Todavía no hay nodos actualizados.",
+      "not_started": "Todavía no se ha iniciado ninguna actualización progresiva de OpenSearch.",
+      "title": "Actualización progresiva de OpenSearch",
+      "upgraded_heading": "Actualizados a la versión objetivo de OpenSearch",
+      "waiting_heading": "Esperando la actualización de OpenSearch",
+      "current": "actual",
+      "data_node": "Data Node",
+      "manager": "gestor",
+      "opensearch_version": "Versión de OpenSearch",
+      "status": "Estado",
+      "unknown": "Desconocido",
+      "node_status": {
+        "pending": "En espera",
+        "restarting": "Reiniciando",
+        "started": "Iniciado",
+        "completed": "Actualizado",
+        "failed": "Fallido",
+        "skipped": "Omitido"
+      },
+      "state": {
+        "preparing_cluster": "Preparando el clúster",
+        "selecting_next_node": "Seleccionando el siguiente nodo",
+        "upgrading_node": "Actualizando el nodo",
+        "waiting_node_joined": "Esperando a que el nodo se vuelva a unir",
+        "reenabling_allocation": "Reactivando la asignación",
+        "waiting_green": "Esperando a que el clúster esté en verde",
+        "paused_waiting_green": "En pausa, esperando a que el clúster esté en verde",
+        "finalizing": "Finalizando",
+        "completed": "Completada",
+        "aborted": "Cancelada",
+        "failed": "Fallida",
+        "in_progress": "En curso"
+      }
+    },
+    "opensearch_upgrade_info": {
+      "current_version": "Versión actual de OpenSearch:",
+      "data_nodes": "Data Nodes:",
+      "data_nodes_summary": "{{total}} ({{available}} disponibles)",
+      "loading": "Cargando...",
+      "target_version": "Versión objetivo de OpenSearch:",
+      "unknown": "Desconocida"
+    },
+    "start_upgrade": {
+      "full": {
+        "alert_title": "Hay menos de 3 Data Nodes: se trata de un reinicio completo, no progresivo",
+        "confirm": "Reiniciar",
+        "journal": "Mientras OpenSearch está apagado, los mensajes entrantes se acumulan en el journal de disco de cada nodo de {{productName}}. Si la interrupción supera el límite de tamaño o antigüedad del journal, la ingesta se detendrá y se pueden perder mensajes. Continúa solo si el journal tiene suficiente margen para el tiempo de inactividad previsto.",
+        "submitting": "Reiniciando...",
+        "title": "¿Reiniciar OpenSearch de los Data Nodes?",
+        "tolerate_downtime": "Continúa solo si puedes tolerar el tiempo de inactividad.",
+        "restart_together_with_versions_one": "Con menos de 3 Data Nodes, OpenSearch no puede seguir disponible si se reinicia un nodo cada vez. Todos tus Data Nodes se reinician a la vez para pasar OpenSearch de <strong>{{currentVersion}}</strong> a <strong>{{targetVersion}}</strong>, así que el backend de almacenamiento estará <strong>no disponible</strong> hasta que terminen; la búsqueda y la indexación se interrumpirán.",
+        "restart_together_with_versions_other": "Con menos de 3 Data Nodes, OpenSearch no puede seguir disponible si se reinicia un nodo cada vez. Todos tus Data Nodes se reinician a la vez para pasar OpenSearch de <strong>{{currentVersion}}</strong> a <strong>{{targetVersion}}</strong>, así que el backend de almacenamiento estará <strong>no disponible</strong> hasta que terminen; la búsqueda y la indexación se interrumpirán.",
+        "restart_together_one": "Con menos de 3 Data Nodes, OpenSearch no puede seguir disponible si se reinicia un nodo cada vez. Todos tus Data Nodes se reinician a la vez para pasar OpenSearch a la versión objetivo, así que el backend de almacenamiento estará <strong>no disponible</strong> hasta que terminen; la búsqueda y la indexación se interrumpirán.",
+        "restart_together_other": "Con menos de 3 Data Nodes, OpenSearch no puede seguir disponible si se reinicia un nodo cada vez. Todos tus Data Nodes se reinician a la vez para pasar OpenSearch a la versión objetivo, así que el backend de almacenamiento estará <strong>no disponible</strong> hasta que terminen; la búsqueda y la indexación se interrumpirán.",
+        "restart_together_with_versions_many": "Con menos de 3 Data Nodes, OpenSearch no puede seguir disponible si se reinicia un nodo cada vez. Todos tus Data Nodes se reinician a la vez para pasar OpenSearch de <strong>{{currentVersion}}</strong> a <strong>{{targetVersion}}</strong>, así que el backend de almacenamiento estará <strong>no disponible</strong> hasta que terminen; la búsqueda y la indexación se interrumpirán.",
+        "restart_together_many": "Con menos de 3 Data Nodes, OpenSearch no puede seguir disponible si se reinicia un nodo cada vez. Todos tus Data Nodes se reinician a la vez para pasar OpenSearch a la versión objetivo, así que el backend de almacenamiento estará <strong>no disponible</strong> hasta que terminen; la búsqueda y la indexación se interrumpirán."
+      },
+      "no_rollback": "Una vez iniciada, no se puede revertir a la versión anterior.",
+      "rolling": {
+        "alert_title": "Esto reinicia cada Data Node, uno a uno",
+        "confirm": "Iniciar actualización progresiva",
+        "healthy_cluster": "Asegúrate de que el clúster esté en buen estado (verde) antes de continuar.",
+        "shard_allocation": "La asignación de shards se pausa durante cada reinicio, así que el clúster sigue disponible; sin embargo, la indexación y la búsqueda pueden verse ligeramente afectadas mientras un nodo sale y vuelve a unirse.",
+        "title": "¿Iniciar la actualización progresiva de OpenSearch?",
+        "wait_for_green": "Tras cada nodo, la actualización espera a que el clúster vuelva a estar en verde antes de continuar. Si tarda demasiado, se pausa y espera a que la reanudes.",
+        "each_node_with_versions_one": "Cada uno de tus {{count}} Data Nodes se actualizará y se reiniciará de uno en uno para pasar su OpenSearch integrado de <strong>{{currentVersion}}</strong> a <strong>{{targetVersion}}</strong>.",
+        "each_node_with_versions_other": "Cada uno de tus {{count}} Data Nodes se actualizará y se reiniciará de uno en uno para pasar su OpenSearch integrado de <strong>{{currentVersion}}</strong> a <strong>{{targetVersion}}</strong>.",
+        "each_node_one": "Cada uno de tus {{count}} Data Nodes se actualizará y se reiniciará de uno en uno para pasar su OpenSearch integrado a la versión objetivo.",
+        "each_node_other": "Cada uno de tus {{count}} Data Nodes se actualizará y se reiniciará de uno en uno para pasar su OpenSearch integrado a la versión objetivo.",
+        "each_node_with_versions_many": "Cada uno de tus {{count}} Data Nodes se actualizará y se reiniciará de uno en uno para pasar su OpenSearch integrado de <strong>{{currentVersion}}</strong> a <strong>{{targetVersion}}</strong>.",
+        "each_node_many": "Cada uno de tus {{count}} Data Nodes se actualizará y se reiniciará de uno en uno para pasar su OpenSearch integrado a la versión objetivo."
+      },
+      "starting": "Iniciando..."
+    },
+    "opensearch_upgrade": {
+      "already_up_to_date": "El OpenSearch integrado de los Data Nodes ya está actualizado.",
+      "automatic_upgrade": "Cada Data Node actualiza automáticamente su OpenSearch integrado a la versión objetivo.",
+      "backup": "Haz una copia de seguridad de MongoDB, del Data Node y del almacenamiento de Data Lake antes de actualizar para asegurar una ruta de reversión sin problemas.",
+      "before_upgrading": "Antes de actualizar",
+      "check_failed": "No se ha podido comprobar la disponibilidad de actualizaciones de OpenSearch.",
+      "full_restart": "Todos los Data Nodes deben reiniciarse para que la actualización surta efecto.",
+      "full_search_unavailable": "La búsqueda y la indexación no están disponibles mientras se reinician los Data Nodes.",
+      "incompatible_indices": "Índices incompatibles",
+      "old_indices_unreadable": "OpenSearch 3 no puede leer los índices creados con versiones anteriores a OpenSearch 2. Si estos índices permanecen durante la actualización, sus datos quedarán no disponibles.",
+      "resolve_indices_first": "Resuelve antes todos los índices incompatibles.",
+      "restarting": "Reiniciando...",
+      "resume": "Reanudar",
+      "resuming": "Reanudando...",
+      "rolling_restart": "Los Data Nodes se reinician uno a uno para minimizar el impacto.",
+      "rolling_search_impaired": "La funcionalidad de búsqueda puede verse afectada mientras se reinician los Data Nodes.",
+      "start_rolling_upgrade": "Iniciar actualización progresiva de OpenSearch",
+      "start_upgrade_and_restart": "Iniciar actualización de OpenSearch y reiniciar",
+      "starting_rolling_upgrade": "Iniciando la actualización progresiva de OpenSearch...",
+      "title": "Actualizar el OpenSearch integrado de los Data Nodes",
+      "unconfirmed_one": "No se pueden comprobar los índices incompatibles ni el estado de la actualización mientras {{count}} Data Node no esté disponible; volverán a aparecer cuando todos los Data Nodes estén disponibles.",
+      "unconfirmed_other": "No se pueden comprobar los índices incompatibles ni el estado de la actualización mientras {{count}} Data Nodes no estén disponibles; volverán a aparecer cuando todos los Data Nodes estén disponibles.",
+      "upgrade_process": "Proceso de actualización",
+      "use_table": "Usa la tabla siguiente para reindexar los índices del sistema y archivar o eliminar los índices de datos antes de continuar.",
+      "unconfirmed_many": "No se pueden comprobar los índices incompatibles ni el estado de la actualización mientras {{count}} Data Nodes no estén disponibles; volverán a aparecer cuando todos los Data Nodes estén disponibles."
+    },
+    "client_certificate": {
+      "certificate_lifetime": "Vigencia del certificado",
+      "close": "Cerrar",
+      "create_title": "Crear certificado de cliente",
+      "password": "Contraseña",
+      "principal": "Principal",
+      "principal_placeholder": "principal",
+      "role": "Rol",
+      "role_help": "Representa la asignación de roles de OpenSearch.",
+      "role_placeholder": "rol",
+      "submit": "Crear certificado",
+      "submitting": "Creando certificado...",
+      "unencrypted": "Sin cifrar",
+      "ca_certificate": "Certificado de la CA",
+      "certificate": "Certificado",
+      "copy_to_clipboard": "Copiar al portapapeles",
+      "private_key": "Clave privada",
+      "view_principal": "Principal:",
+      "view_role": "Rol:",
+      "generate": "Generar certificado de cliente",
+      "description": "Genera certificados de cliente para herramientas de terceros",
+      "title": "Certificado de cliente"
+    },
+    "cluster_health": {
+      "cluster_manager": "Cluster Manager:",
+      "disabled": "Deshabilitada",
+      "enabled": "Habilitada",
+      "nodes_summary": "{{total}} ({{outdated}} desactualizados, {{upgraded}} actualizados)",
+      "number_of_nodes": "Número de nodos:",
+      "number_of_shards": "Número de shards:",
+      "server_version": "Versión del servidor:",
+      "shard_replication": "Replicación de shards:",
+      "shard_replication_help": {
+        "confirm": "Cuando un nodo se haya actualizado y hagas clic en <emphasis><bold>Confirmar actualización</bold></emphasis>, se volverá a habilitar la replicación de shards y se reasignarán todos los shards que no estaban disponibles porque el nodo se estaba actualizando.",
+        "force_disabled": "Forzada a deshabilitada",
+        "force_enabled": "Forzada a habilitada",
+        "start": "Cuando hagas clic en <emphasis><bold>Iniciar proceso de actualización</bold></emphasis> de un nodo, la asignación de shards se configurará sin replicación para que OpenSearch use solo los shards disponibles."
+      },
+      "shards_summary": "{{active}} activos, {{initializing}} inicializándose, {{relocating}} reubicándose, {{unassigned}} sin asignar",
+      "state_help": {
+        "green": "Cuando un nodo se haya actualizado y hagas clic en <emphasis>Confirmar actualización</emphasis>, se volverá a habilitar la replicación de shards, se reasignarán todos los shards que no estaban disponibles porque el nodo se estaba actualizando y el clúster volverá al estado VERDE.",
+        "question": "¿Cómo cambia el estado de mi clúster durante la actualización progresiva?",
+        "red": "ROJO: si usas índices sin replicación y actualizas el nodo que aloja los shards de esos índices, el clúster pasará a estado rojo y no se ingerirán datos en esos índices ni se podrán buscar en ellos.",
+        "yellow": "AMARILLO: tras iniciar la actualización de un nodo, la asignación de shards se configurará sin replicación para que OpenSearch use solo los shards disponibles."
+      }
+    },
+    "upgrade_method": {
+      "cluster_restart": "Reinicio del clúster",
+      "cluster_restart_description": "Con el método de reinicio del clúster, actualizarás todos los Data Nodes a la vez. Durante este tiempo, los mensajes se almacenarán en el journal y se procesarán cuando el clúster de Data Nodes vuelva a estar en línea, sin pérdida de datos siempre que el tamaño del journal esté configurado para el volumen de mensajes previsto durante el tiempo de inactividad de los Data Nodes.",
+      "cluster_restart_less_than_three": "Si tienes un clúster de Data Nodes con menos de tres nodos, el método de reinicio del clúster es el único disponible.",
+      "cluster_restart_three_or_more": "Si tienes un clúster de Data Nodes con tres o más nodos, puedes optar por el método de reinicio del clúster después de tener en cuenta el tamaño del journal y el rendimiento de mensajes.",
+      "rolling_upgrade": "Actualización progresiva",
+      "rolling_upgrade_description": "Las actualizaciones progresivas solo se pueden realizar en un clúster de Data Nodes en ejecución con <bold>tres o más nodos</bold>, prácticamente sin tiempo de inactividad.",
+      "rolling_upgrade_process": "Los Data Nodes se detienen y se actualizan in situ de uno en uno. Alternativamente, los Data Nodes pueden detenerse y sustituirse, uno a uno, por hosts que ejecuten la nueva versión. Durante este proceso puedes seguir indexando y consultando datos en tu clúster."
+    },
+    "upgrade_status": {
+      "all_data_nodes_up_to_date": "Todos tus Data Nodes están actualizados.",
+      "checking": "Comprobando el estado de OpenSearch...",
+      "error": "No se ha podido comprobar la versión del OpenSearch integrado de los Data Nodes.",
+      "outdated": "El OpenSearch integrado de los Data Nodes no está actualizado.",
+      "unconfirmed_one": "No se puede confirmar el estado del OpenSearch integrado de los Data Nodes mientras {{count}} Data Node no esté disponible.",
+      "unconfirmed_other": "No se puede confirmar el estado del OpenSearch integrado de los Data Nodes mientras {{count}} Data Nodes no estén disponibles.",
+      "up_to_date": "El OpenSearch integrado de los Data Nodes está actualizado.",
+      "up_to_date_with_version": "El OpenSearch integrado de los Data Nodes está actualizado <bold>({{version}}).</bold>",
+      "upgrading": "La actualización progresiva de OpenSearch está en curso.",
+      "unconfirmed_many": "No se puede confirmar el estado del OpenSearch integrado de los Data Nodes mientras {{count}} Data Nodes no estén disponibles."
+    },
+    "upgrade_nodes": {
+      "manager": "gestor",
+      "no_outdated_nodes": "No se han encontrado nodos desactualizados.",
+      "no_upgraded_nodes": "No se han encontrado nodos actualizados.",
+      "outdated_nodes": "Nodos desactualizados",
+      "start_upgrade": "Iniciar proceso de actualización",
+      "upgraded": "Actualizado",
+      "upgraded_nodes": "Nodos actualizados"
+    },
+    "data_node_actions": {
+      "rejoin": "Volver a unir",
+      "remove": "Eliminar",
+      "renew_certificate": "Renovar certificado",
+      "show_logs": "Mostrar logs",
+      "start": "Iniciar",
+      "stop": "Detener",
+      "rejoin_title": "Volver a unir el Data Node",
+      "rejoin_confirm": "¿Seguro que quieres volver a unir el Data Node \"{{hostname}}\"?",
+      "remove_title": "Eliminar Data Node",
+      "remove_confirm": "¿Seguro que quieres eliminar el Data Node \"{{hostname}}\"?",
+      "stop_title": "Detener Data Node",
+      "stop_confirm": "¿Seguro que quieres detener el Data Node \"{{hostname}}\"?"
+    },
+    "data_node_badge": {
+      "short_node_id": "ID corto del nodo"
+    },
+    "data_node_status": {
+      "queued_for": "en cola para {{action}}"
+    },
+    "data_node_logs": {
+      "no_logs": "No hay logs.",
+      "title": "Logs de {{hostname}}"
+    },
+    "cluster_management": {
+      "teaser_hotspot": "Muestra las métricas de rendimiento de tu Data Node y de tu clúster de OpenSearch gestionado.",
+      "teaser_license_warning": "Asegúrate de tener una licencia válida y un Data Node configurado para ver las métricas de rendimiento de tu Data Node y de tu clúster de OpenSearch gestionado."
+    },
+    "ca_configuration": {
+      "create_tab": "Crear una nueva CA",
+      "description_provision": "La autoridad de certificación facilitará el aprovisionamiento y la gestión de certificados para tus Data Nodes.",
+      "description_upload_or_create": "En este paso puedes subir una autoridad de certificación existente o crear una nueva.",
+      "reusing_certificates": "Si tu clúster existente usa certificados, estos se sustituirán por defecto por la CA de {{productName}} y por certificados generados automáticamente durante el aprovisionamiento de los data nodes en el siguiente paso. Si quieres incluir tu propia CA, puedes subir un certificado existente. Consulta <docsLink>{{productName}} Data Node - Primeros pasos</docsLink> para más información.",
+      "reusing_certificates_title": "Reutilización de certificados",
+      "title": "Configurar la autoridad de certificación",
+      "upload_tab": "Subir CA"
+    },
+    "ca_upload": {
+      "certificate_authority": "Autoridad de certificación",
+      "dropzone": "Arrastra la CA aquí o haz clic para seleccionar un archivo",
+      "explanation": "Aquí puedes subir tu CA existente. Debes subir un único archivo que contenga la clave privada (cifrada o sin cifrar), el certificado de la CA y los certificados intermedios que haya. El archivo puede estar en formato PEM o PKCS#12. Si tu clave privada está cifrada, también debes indicar su contraseña.",
+      "failed": "Error al subir la CA: {{error}}",
+      "password": "Contraseña",
+      "rejected": "Error al subir la CA",
+      "submit": "Subir CA",
+      "submitting": "Subiendo CA...",
+      "success": "CA subida correctamente"
+    },
+    "ca_create": {
+      "description": "Haz clic en el botón “Crear CA” para crear rápidamente una nueva autoridad de certificación para tus Data Nodes de {{productName}}.",
+      "failed": "Error al crear la CA: {{error}}",
+      "organization_name": "Nombre de la organización",
+      "submit": "Crear CA",
+      "submitting": "Creando CA...",
+      "success": "CA creada correctamente"
+    },
+    "renewal_policy": {
+      "certificate_lifetime": "Vigencia del certificado:",
+      "certificate_lifetime_label": "Vigencia del certificado",
+      "configure": "Configurar la política de renovación de certificados",
+      "description": "Estos ajustes se usarán para detectar la caducidad de los certificados o para renovarlos.",
+      "edit": "Editar configuración",
+      "lifetime_explanation": "La vigencia del certificado determinará la duración de validez de los certificados recién creados.",
+      "mode_explanation": "Si estableces la política de renovación en \"Automática\", se renovarán todos los certificados que caduquen sin intervención del usuario. Si la estableces en \"Manual\", se creará una notificación del sistema cuando uno o más certificados estén a punto de caducar, para que puedas confirmar su renovación.",
+      "renewal_mode": "Modo de renovación:",
+      "renewal_mode_label": "Modo de renovación de certificados",
+      "select_mode": "Selecciona el modo de renovación de certificados",
+      "submit": "Actualizar configuración",
+      "submitting": "Actualizando configuración",
+      "title": "Configuración de la política de renovación de certificados",
+      "update_failed": "Error al actualizar la política de renovación de certificados: {{error}}",
+      "update_failed_title": "No se puede actualizar la política de renovación de certificados",
+      "modes": {
+        "automatic": "Automático",
+        "manual": "Manual"
+      }
+    },
+    "details_page": {
+      "certificate_valid_until": "Certificado válido hasta:",
+      "configuration_warnings": "Advertencias de configuración",
+      "datanode_version": "Versión de Data Node:",
+      "details": "Detalles:",
+      "error": "Error: {{message}}",
+      "hostname": "Nombre de host:",
+      "not_available": "N/D",
+      "status": "Estado:",
+      "title": "Data Nodes: {{hostname}}",
+      "transport_address": "Dirección de transporte:"
+    },
+    "pages": {
+      "description": "{{productName}} Data Nodes ofrece una mejor integración con {{productName}} y simplifica las actualizaciones futuras. Permite indexar y buscar en todos los mensajes de tu base de datos de mensajes de {{productName}}.",
+      "upgrade_title": "Actualización de Data Nodes",
+      "cluster_management_title": "Panel de Data Nodes",
+      "certificate_management_title": "Gestión de certificados",
+      "migration_title": "Migración de Data Nodes",
+      "documentation_title": "Documentación de Data Nodes"
+    },
+    "upgrade_page": {
+      "manual_instructions": "Para actualizar tus Data Nodes manualmente, sigue las instrucciones de la <docsLink>documentación</docsLink>.",
+      "manual_upgrade_title": "Actualización manual de Data Node",
+      "select_strategy": "Selecciona la estrategia de actualización",
+      "upgrade_data_node": "Actualizar Data Node",
+      "manual_upgrade_of_node": "Cuando hayas completado la actualización manual de <bold>{{node}}</bold> en el sistema, espera a que se vuelva a conectar y aparezca en el panel <bold>Nodos actualizados</bold>; después, haz clic en <confirmButton><bold>Confirmar actualización</bold></confirmButton> y continúa con el siguiente nodo.",
+      "manual_upgrade_of_data_node": "Cuando hayas completado la actualización manual de tu Data Node en el sistema, espera a que se vuelva a conectar y aparezca en el panel <bold>Nodos actualizados</bold>; después, haz clic en <confirmButton><bold>Confirmar actualización</bold></confirmButton> y continúa con el siguiente nodo."
+    },
+    "migration_steps": {
+      "ca_configuration": "Configurar una autoridad de certificación",
+      "renewal_policy_configuration": "Configurar una política de renovación",
+      "compatibility_check": "Comprobar la compatibilidad de OpenSearch con el Data Node",
+      "manual_migration_step": "Pasos de la migración.",
+      "migration_finished": "Migración finalizada"
+    },
+    "migration_states": {
+      "new": "Migración",
+      "migration_welcome_page": "Bienvenido",
+      "ca_creation_page": "Autoridad de certificación",
+      "renewal_policy_creation_page": "Política de renovación de certificados",
+      "migration_selection_page": "Pasos de la migración",
+      "rolling_upgrade_migration_welcome_page": "Bienvenido a la migración in situ",
+      "ask_to_shutdown_old_cluster": "Apagar el clúster antiguo",
+      "manually_remove_old_connection_string_from_config": "Eliminar la cadena de conexión",
+      "message_processing_stop": "Detener el procesamiento de mensajes",
+      "replace_cluster": "Sustituir el clúster existente",
+      "restart_graylog": "Actualizar el archivo de configuración y reiniciar {{productName}}",
+      "directory_compatibility_check_page": "Comprobación de compatibilidad del directorio",
+      "provision_rolling_upgrade_nodes_with_certificates": "Resumen del aprovisionamiento de certificados",
+      "provision_rolling_upgrade_nodes_running": "Aprovisiona el certificado del Data Node.",
+      "journal_size_downtime_warning": "Aviso de tamaño del journal por tiempo de inactividad",
+      "failed": "Migración fallida",
+      "finished": "Migración finalizada"
+    },
+    "certificate_renewal": {
+      "loading_failed": "Error al cargar los Data Nodes. Estado:",
+      "loading_failed_title": "No se han podido cargar los Data Nodes",
+      "renew": {
+        "button": "Renovar certificado",
+        "button_loading": "Renovando certificado",
+        "success": "Certificado renovado correctamente",
+        "failed": "Error al renovar el certificado: {{error}}"
+      },
+      "provision": {
+        "button": "Aprovisionar certificado",
+        "button_loading": "Aprovisionando certificado...",
+        "success": "Certificado aprovisionado correctamente",
+        "failed": "Error al aprovisionar el certificado: {{error}}"
+      },
+      "title": "Renovación y aprovisionamiento de certificados",
+      "description": "Aquí puedes iniciar manualmente la renovación o el aprovisionamiento de certificados para los Data Nodes de {{productName}}. Solo es necesario aprovisionar certificados manualmente cuando la política de renovación está en modo \"Manual\" y los Data Nodes se han iniciado después del aprovisionamiento inicial de certificados.",
+      "transport_address": "Dirección de transporte",
+      "hostname": "Nombre de host",
+      "valid_until": "válido hasta {{relativeTime}}",
+      "no_data_nodes": "No se ha encontrado ningún Data Node."
+    }
+  },
+  "use_collector_configurations_notifications": {
+    "fetch_failed": "Error al obtener las configuraciones de collectors. Estado: {{error}}",
+    "fetch_failed_title": "No se han podido obtener las configuraciones",
+    "fetch_configuration_failed": "Error al obtener la configuración. Estado: {{error}}",
+    "configuration_not_found": "No se ha encontrado ninguna configuración con el ID <{{configurationId}}>. Comprueba que no se haya eliminado.",
+    "fetch_configuration_failed_title": "No se ha podido obtener la configuración",
+    "preview_failed": "Error al obtener la vista previa de la configuración. Estado: {{error}}",
+    "preview_failed_title": "No se ha podido obtener la vista previa",
+    "created_success": "Configuración creada correctamente",
+    "create_failed": "Error al crear la configuración. Estado: {{error}}",
+    "create_failed_title": "No se ha podido guardar la configuración",
+    "updated_success": "Configuración actualizada correctamente",
+    "update_failed": "Error al actualizar la configuración: {{error}}",
+    "update_failed_title": "No se ha podido actualizar la configuración {{name}}",
+    "copied_success": "La configuración \"{{name}}\" se ha copiado correctamente",
+    "copy_failed": "Error al guardar la configuración \"{{name}}\". Estado: {{error}}",
+    "copy_failed_title": "No se ha podido guardar la configuración",
+    "deleted_success": "La configuración \"{{name}}\" se ha eliminado correctamente",
+    "delete_failed": "Error al eliminar la configuración: {{error}}",
+    "delete_failed_title": "No se ha podido eliminar la configuración {{name}}",
+    "validate_failed": "Error al validar la configuración \"{{name}}\". Estado: {{error}}",
+    "validate_failed_title": "No se ha podido validar la configuración"
+  },
+  "use_collectors_notifications": {
+    "fetch_failed": "Error al obtener los collectors. Estado: {{error}}",
+    "fetch_failed_title": "No se han podido obtener los collectors",
+    "not_found": "No se ha encontrado ningún collector con el ID <{{collectorId}}>. Comprueba que no se haya eliminado.",
+    "fetch_collector_failed": "Error al obtener el Collector. Estado: {{error}}",
+    "fetch_collector_failed_title": "No se ha podido obtener el Collector",
+    "created_success": "Collector creado correctamente",
+    "updated_success": "Collector actualizado correctamente",
+    "deleted_success": "El Collector \"{{name}}\" se ha eliminado correctamente",
+    "delete_failed": "Error al eliminar el Collector: {{error}}",
+    "delete_failed_title": "No se ha podido eliminar el Collector \"{{name}}\"",
+    "copied_success": "El Collector \"{{name}}\" se ha copiado correctamente",
+    "copy_failed": "Error al guardar el collector \"{{name}}\". Estado: {{error}}",
+    "copy_failed_title": "No se ha podido guardar el Collector",
+    "validate_failed": "Error al validar el collector \"{{name}}\". Estado: {{error}}",
+    "validate_failed_title": "No se ha podido validar el collector"
+  }
+}

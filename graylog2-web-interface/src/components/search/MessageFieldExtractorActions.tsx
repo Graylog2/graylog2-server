@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import { LinkContainer } from 'components/common';
 import { DropdownButton, MenuItem } from 'components/bootstrap';
@@ -26,7 +28,7 @@ type MessageFieldExtractorActionsProps = {
 };
 
 class MessageFieldExtractorActions extends React.Component<
-  MessageFieldExtractorActionsProps,
+  MessageFieldExtractorActionsProps & WithTranslation,
   {
     [key: string]: any;
   }
@@ -58,7 +60,7 @@ class MessageFieldExtractorActions extends React.Component<
   );
 
   render() {
-    const { fieldName, message } = this.props;
+    const { fieldName, message, t } = this.props;
     const messageField = message.fields[fieldName];
 
     if (typeof messageField === 'string') {
@@ -67,7 +69,7 @@ class MessageFieldExtractorActions extends React.Component<
           <DropdownButton
             pullRight
             bsSize="xsmall"
-            title="Select extractor type"
+            title={t('extractor_actions.select_type')}
             key={1}
             id={`select-extractor-type-dropdown-field-${fieldName}`}>
             {ExtractorUtils.EXTRACTOR_TYPES.map((extractorType) => this._formatExtractorMenuItem(extractorType))}
@@ -81,11 +83,11 @@ class MessageFieldExtractorActions extends React.Component<
         <DropdownButton
           pullRight
           bsSize="xsmall"
-          title="Select extractor type"
+          title={t('extractor_actions.select_type')}
           key={1}
           id={`select-extractor-type-dropdown-field-${fieldName}`}>
           <MenuItem key="select-extractor-type-disabled" disabled>
-            Extractors can only be used with string fields.
+            {t('extractor_actions.only_string_fields')}
           </MenuItem>
         </DropdownButton>
       </div>
@@ -93,4 +95,4 @@ class MessageFieldExtractorActions extends React.Component<
   }
 }
 
-export default MessageFieldExtractorActions;
+export default withTranslation('common')(MessageFieldExtractorActions);

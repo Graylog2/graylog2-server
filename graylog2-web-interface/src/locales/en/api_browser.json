@@ -1,0 +1,14 @@
+{
+  "title": "API browser",
+  "description": "Browse the Graylog REST API",
+  "search_placeholder": "Search for an endpoint...",
+  "no_results": "No endpoints found matching your search.",
+  "error_loading": "Error loading the API browser.",
+  "error_fetching_endpoint": "Error fetching endpoint details.",
+  "endpoint_name": "Endpoint Name",
+  "endpoint_path": "Path",
+  "endpoint_method": "Method",
+  "endpoint_description": "Description",
+  "endpoint_parameters": "Parameters",
+  "endpoint_response": "Response"
+}

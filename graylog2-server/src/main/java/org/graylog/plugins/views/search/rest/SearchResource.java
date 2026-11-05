@@ -59,6 +59,7 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -69,6 +70,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -152,7 +154,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @Produces({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
     public SearchDTO getSearch(@Parameter(name = "id") @PathParam("id") String searchId, @Context SearchUser searchUser) {
         final Search search = searchDomain.getForUser(searchId, searchUser)
-                .orElseThrow(() -> new NotFoundException("Search with id " + searchId + " does not exist"));
+                .orElseThrow(() -> new CodedNotFoundException("search.not_found", "Search with id " + searchId + " does not exist", Map.of("searchId", searchId)));
         return SearchDTO.fromSearch(search);
     }
 

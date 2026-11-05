@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import take from 'lodash/take';
 import last from 'lodash/last';
@@ -31,6 +32,7 @@ const RestTypesContainer = styled.i(
 );
 
 export const useColumnRenderers = (fieldTypes: FieldTypes) => {
+  const { t } = useTranslation('search');
   const customColumnRenderers: ColumnRenderers<FieldTypeUsage> = useMemo(
     () => ({
       attributes: {
@@ -41,14 +43,18 @@ export const useColumnRenderers = (fieldTypes: FieldTypes) => {
           renderCell: (items: Array<TypeHistoryItem>) => {
             const latest = fieldTypes[last(items)] || last(items);
             const rest = take(items, items.length - 1).map((item) => fieldTypes[item] || item);
-            if (!latest) return <i>type is not defined</i>;
+            if (!latest) return <i>{t('change_field_type.type_not_defined')}</i>;
 
             return (
               <div>
                 <span>
                   <b>{latest}</b>
                 </span>
-                {!!rest.length && <RestTypesContainer>(previous values: {rest.join(', ')})</RestTypesContainer>}
+                {!!rest.length && (
+                  <RestTypesContainer>
+                    {t('change_field_type.previous_values', { values: rest.join(', ') })}
+                  </RestTypesContainer>
+                )}
               </div>
             );
           },
@@ -56,7 +62,7 @@ export const useColumnRenderers = (fieldTypes: FieldTypes) => {
         },
       },
     }),
-    [fieldTypes],
+    [fieldTypes, t],
   );
 
   return customColumnRenderers;

@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { SystemIndexSetsTypes } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 
 export type SimpleIndexSet = { id: string; type: string };
@@ -47,8 +48,8 @@ const useAllIndexSetIds = (
     queryFn: () =>
       defaultOnError(
         fetchAllIndexSetIds(streams),
-        'Loading index sets with field type change support failed with status',
-        'Could not load index sets with field type change support',
+        i18n.t('change_field_type.load_index_sets_failed', { ns: 'search' }),
+        i18n.t('change_field_type.could_not_load_index_sets', { ns: 'search' }),
       ),
   });
 

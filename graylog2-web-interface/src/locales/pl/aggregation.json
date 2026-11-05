@@ -1,0 +1,265 @@
+{
+  "wizard_common": {
+    "grouping": "Grupowanie",
+    "group_by": "Grupowanie według",
+    "metric": "Metryka",
+    "metrics": "Metryki",
+    "sort": "Sortowanie",
+    "visualization": "Wizualizacja",
+    "add": "Dodaj",
+    "add_element": "Dodaj element",
+    "add_named": "Dodaj {{element}}",
+    "remove_named": "Usuń {{element}}",
+    "update_preview": "Odśwież podgląd",
+    "updating_preview": "Aktualizowanie podglądu...",
+    "color_hint": "Wskazówka dotycząca koloru",
+    "select_all_fields": "Wybierz wszystkie pola",
+    "deselect_all_fields": "Odznacz wszystkie pola",
+    "field_required": "Pole jest wymagane.",
+    "must_be_greater_than_zero": "Musi być większe niż 0.",
+    "must_be_greater_than_one": "Wartość musi być większa niż 0.",
+    "must_be_greater_than_few": "Wartość musi być większa niż 0.",
+    "must_be_greater_than_many": "Wartość musi być większa niż 0.",
+    "must_be_greater_than_other": "Wartość musi być większa niż 0."
+  },
+  "wizard_grouping": {
+    "settings": "Ustawienia",
+    "skip_empty_values": "Pomiń puste wartości",
+    "skip_empty_values_help": "Jeśli ta opcja jest włączona, wiadomości, które nie zawierają skonfigurowanych pól, zostaną pominięte.",
+    "skip_empty_values_help_otherwise": "W przeciwnym razie zostanie utworzony kubełek \"(Empty Value)\".",
+    "limit": "Limit",
+    "rollup_columns": "Podsumuj kolumny",
+    "rollup_columns_help": "Jeśli podsumowywanie jest włączone, zostanie wyświetlona dodatkowa linia z sumą poszczególnych podlinii.",
+    "direction": "Kierunek",
+    "row": "Wiersz",
+    "column": "Kolumna",
+    "fields": "Pola",
+    "add_field": "Dodaj pole",
+    "add_another_date_field": "Dodaj kolejne pole daty",
+    "add_another_field": "Dodaj kolejne pole",
+    "interval": "Interwał",
+    "auto": "Automatycznie",
+    "interval_types": "Typy interwałów",
+    "auto_bucket_size": "Automatyczny rozmiar kubełka",
+    "auto_bucket_size_help": "Na przykład 1,5x. Mniejsza szczegółowość prowadzi do <strong>mniejszej</strong> liczby wartości, większa pokazuje <strong>więcej</strong> wartości.",
+    "fixed_bucket_size": "Stały rozmiar kubełka",
+    "fixed_bucket_size_help": "Na przykład 2 minuty. Czas określa rozmiar kubełków dla tego typu znacznika czasu.",
+    "scale": "{{scale}}x",
+    "scaling_required": "Skalowanie jest wymagane.",
+    "scaling_range": "Musi być większe niż 0 i mniejsze lub równe 10.",
+    "value_required": "Wartość jest wymagana.",
+    "limit_required": "Limit jest wymagany."
+  },
+  "wizard_units": {
+    "time_units": {
+      "seconds": "Sekundy",
+      "minutes": "Minuty",
+      "hours": "Godziny",
+      "days": "Dni",
+      "weeks": "Tygodnie",
+      "months": "Miesiące"
+    },
+    "unit_settings": "Ustawienia jednostki dla {{field}}",
+    "type": "Typ",
+    "select_unit_type": "Wybierz typ jednostki",
+    "unit": "Jednostka",
+    "unit_help": "Jednostka, za pomocą której obliczana jest wyświetlana wartość na wykresach.",
+    "select_unit": "Wybierz jednostkę",
+    "predefined_unit": "Dla pola <bold>{{field}}</bold> skonfigurowano jednostkę <bold>{{unit}}</bold>. Zmiana tej jednostki może spowodować błędne wyświetlanie danych na wykresach.",
+    "clear": "Resetuj",
+    "ok": "OK",
+    "unit_type_labels": {
+      "size": "Rozmiar",
+      "time": "Czas",
+      "percent": "Procent",
+      "binary_size": "Rozmiar binarny"
+    },
+    "unit_labels": {
+      "byte": "Bajt",
+      "kilobyte": "Kilobajt",
+      "megabyte": "Megabajt",
+      "gigabyte": "Gigabajt",
+      "kibibyte": "Kibibajt",
+      "mebibyte": "Mebibajt",
+      "gibibyte": "Gibibajt",
+      "nanosecond": "Nanosekunda",
+      "microsecond": "Mikrosekunda",
+      "millisecond": "Milisekunda",
+      "second": "Sekunda",
+      "minute": "Minuta",
+      "hour": "Godzina",
+      "day": "Dzień",
+      "month": "Miesiąc",
+      "percent_decimal": "Procent (dziesiętny)",
+      "percent_1_100": "Procent (1..100)"
+    }
+  },
+  "wizard_metric": {
+    "function": "Funkcja",
+    "select_function": "Wybierz funkcję",
+    "field": "Pole",
+    "select_field": "Wybierz pole",
+    "percentile": "Percentyl",
+    "select_percentile": "Wybierz percentyl",
+    "strategy": "Strategia",
+    "select_strategy": "Wybierz strategię",
+    "strategies": {
+      "COUNT": "Liczba dokumentów",
+      "SUM": "Suma pola"
+    },
+    "name": "Nazwa",
+    "display_name_placeholder": "Podaj nazwę wyświetlaną",
+    "show_thresholds": "Pokaż linie progów",
+    "add_threshold": "Dodaj próg",
+    "threshold_title": "Tytuł",
+    "threshold_name_placeholder": "Podaj nazwę progu",
+    "remove_threshold": "Usuń próg",
+    "threshold_value": "Wartość",
+    "threshold_value_placeholder": "Podaj wartość progu",
+    "value_unit": "Wartość w {{unit}}",
+    "threshold_color": "Skonfiguruj kolor progu",
+    "function_required": "Funkcja jest wymagana.",
+    "field_required_for_function": "Dla funkcji {{function}} wymagane jest pole.",
+    "percentile_required": "Percentyl jest wymagany.",
+    "name_unique": "Nazwa musi być unikalna.",
+    "threshold_value_required": "Próg jest wymagany."
+  },
+  "wizard_sort": {
+    "field": "Pole",
+    "field_placeholder": "Podaj pole lub metrykę do sortowania",
+    "select_field": "Wybierz pole do sortowania",
+    "direction": "Kierunek",
+    "select_direction": "Wybierz kierunek sortowania",
+    "ascending": "Rosnąco",
+    "descending": "Malejąco",
+    "direction_required": "Kierunek jest wymagany.",
+    "time_row_unsupported": "Sortowanie nie działa dla wizualizacji innych niż tabele danych, gdy wiersze są grupowane według czasu."
+  },
+  "wizard_visualization": {
+    "type": "Typ",
+    "select_type": "Wybierz typ wizualizacji",
+    "show_event_annotations": "Pokaż adnotacje zdarzeń",
+    "help_for": "Pomoc dla {{field}}",
+    "select_field": "Wybierz {{field}}",
+    "color_for": "Skonfiguruj kolor dla {{field}}",
+    "axis_label_or_color": "Dla co najmniej jednej osi należy określić etykietę lub kolor.",
+    "type_required": "Typ jest wymagany."
+  },
+  "builder_empty": {
+    "title": "Pusta agregacja",
+    "editing": "Właśnie edytujesz widget.",
+    "add_metric_hint": "Dodaj co najmniej jedną metrykę, aby zobaczyć wyniki. Możesz grupować dane, dodając wiersze lub kolumny.",
+    "preview_hint": "Podgląd wyników wyszukiwania widgetu otrzymasz za pomocą \"{{button}}\".",
+    "finish_hint": "Aby zakończyć, kliknij \"{{update}}\", aby zapisać, lub \"{{cancel}}\", aby odrzucić zmiany.",
+    "edit_hint_interactive": "Proszę <editButton>edytować</editButton> widget, aby zobaczyć tutaj wyniki.",
+    "edit_hint": "Proszę edytować widget, aby zobaczyć tutaj wyniki."
+  },
+  "vis_types": {
+    "area_chart": "Wykres obszarowy",
+    "bar_chart": "Wykres słupkowy",
+    "heatmap": "Mapa ciepła",
+    "line_chart": "Wykres liniowy",
+    "network_graph": "Graf sieciowy",
+    "pie_chart": "Wykres kołowy",
+    "sankey": "Wykres Sankeya",
+    "scatter_plot": "Wykres punktowy",
+    "single_number": "Pojedyncza liczba",
+    "world_map": "Mapa świata"
+  },
+  "vis_validation": {
+    "area_chart_requires_metric": "Wykres obszarowy wymaga co najmniej jednej metryki",
+    "bar_chart_requires_metric": "Wykres słupkowy wymaga co najmniej jednej metryki",
+    "line_chart_requires_metric": "Wykres liniowy wymaga co najmniej jednej metryki",
+    "pie_chart_requires_metric": "Wykres kołowy wymaga co najmniej jednej metryki",
+    "scatter_plot_requires_metric": "Wykres punktowy wymaga co najmniej jednej metryki",
+    "sankey_requires_groupings": "Wykres Sankeya wymaga co najmniej dwóch pól grupowania.",
+    "sankey_single_metric": "Wykres Sankeya obsługuje tylko jedną metrykę.",
+    "network_requires_groupings": "Graf sieciowy wymaga co najmniej dwóch pól grupowania."
+  },
+  "vis_common": {
+    "interpolation": "Interpolacja",
+    "interpolation_types": {
+      "linear": "liniowa",
+      "step-after": "schodkowa po",
+      "spline": "spline"
+    },
+    "axis_type": "Typ osi",
+    "axis_types": {
+      "linear": "liniowy",
+      "logarithmic": "logarytmiczny"
+    },
+    "color_scale": "Skala kolorów",
+    "reverse_scale": "Odwróć skalę",
+    "show_axis_labels": "Pokaż etykiety osi",
+    "x_axis": "Oś X",
+    "y_axis_number": "Oś Y (liczba)",
+    "y_axis_percent": "Oś Y (procent)",
+    "y_axis_time": "Oś Y (czas)",
+    "y_axis_size": "Oś Y (rozmiar)",
+    "color_hint": "Wskazówka dotycząca koloru",
+    "legend_configuration": "Konfiguracja dla {{label}}"
+  },
+  "vis_heatmap": {
+    "auto_scale": "Automatyczne skalowanie",
+    "min": "Min",
+    "max": "Max",
+    "use_smallest_as_default": "Użyj najmniejszej wartości jako domyślnej",
+    "default_value": "Wartość domyślna"
+  },
+  "vis_worldmap": {
+    "zoom": "Powiększenie",
+    "latitude": "Szerokość geograficzna",
+    "longitude": "Długość geograficzna",
+    "name": "Nazwa",
+    "coordinates": "Współrzędne:",
+    "value": "Wartość:"
+  },
+  "vis_bar": {
+    "mode": "Tryb",
+    "modes": {
+      "group": "Pogrupowane",
+      "stack": "Skumulowane",
+      "relative": "Względne",
+      "overlay": "Nakładane"
+    },
+    "mode_help": {
+      "group": "Każda seria jest reprezentowana przez własny słupek na wykresie.",
+      "stack": "Wszystkie serie są skumulowane jedna nad drugą, tworząc jeden słupek.",
+      "relative": "Wszystkie serie są skumulowane jedna nad drugą, tworząc wykres. Serie ujemne są jednak wyświetlane poniżej zera.",
+      "overlay": "Wszystkie serie są nakładane na siebie jako słupki. Aby słupki były widoczne, przezroczystość zostanie zredukowana do 75%. Zaleca się używanie tej opcji dla maksymalnie 3 serii."
+    }
+  },
+  "vis_number": {
+    "trend": "Trend",
+    "trend_description": "Pokaż informacje o trendzie dla tej liczby.",
+    "trend_help_enabled": "Jeśli trend jest włączony, pod aktualną wartością pojawi się oddzielne pole, które za pomocą symbolu pokaże kierunek zmiany oraz absolutną i relatywną różnicę między aktualną a poprzednią wartością.",
+    "trend_help_previous": "Poprzednia wartość jest obliczana na podstawie dwóch wyszukiwań w tle, które są identyczne z wyjątkiem zakresu czasu. Zakres czasu pierwszego wyszukiwania odpowiada skonfigurowanemu dla tego zapytania lub widgetu, drugie wyszukiwanie używa tego samego zakresu, ale przesuniętego wstecz.",
+    "trend_preference": "Preferencja trendu",
+    "trend_preferences": {
+      "LOWER": "Niższy",
+      "NEUTRAL": "Neutralny",
+      "HIGHER": "Wyższy"
+    },
+    "highlight": "Podświetlenie",
+    "highlight_options": {
+      "TREND_ONLY": "Tylko informacje o trendzie",
+      "FULL_WIDGET": "Cały widget"
+    },
+    "not_available": "brak danych",
+    "trend_label": "Trend: {{absolute}} ({{relative}}) w porównaniu do poprzedniej wartości {{previous}}",
+    "previous_value": "Poprzednia wartość: {{previous}}"
+  },
+  "vis_popover": {
+    "related_values": "Powiązane wartości",
+    "data_points": "Punkty danych",
+    "metric": "Metryka",
+    "groupings": "Grupowania",
+    "back": "Wstecz"
+  },
+  "vis_network": {
+    "no_connections": "Brak połączeń. Dostosuj wyszukiwanie lub grupowanie, aby uzyskać wyniki."
+  },
+  "vis_sankey": {
+    "no_flows": "Brak przepływów. Dostosuj wyszukiwanie lub grupowanie, aby uzyskać wyniki."
+  }
+}

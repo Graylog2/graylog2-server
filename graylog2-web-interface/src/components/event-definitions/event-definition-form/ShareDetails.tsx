@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
 import capitalize from 'lodash/capitalize';
+import { useTranslation } from 'react-i18next';
 
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import useEntityShareState from 'hooks/useEntityShareState';
@@ -81,6 +82,7 @@ const getPaginatedGrantees = (selectedGrantees: SelectedGrantees, pageSize: numb
 };
 
 const ShareDetails = ({ shareState = null, entityId = undefined }: Props) => {
+  const { t } = useTranslation('event_definitions');
   const entityGRN = entityId ? createGRN('event_definition', entityId) : null;
   const { data: entityShareState } = useEntityShareState(entityGRN);
 
@@ -106,8 +108,8 @@ const ShareDetails = ({ shareState = null, entityId = undefined }: Props) => {
 
   return (
     <>
-      <h3>Share</h3>
-      <p>Collaborators</p>
+      <h3>{t('steps.share')}</h3>
+      <p>{t('share.collaborators')}</p>
       {showPageSizeSelect && (
         <StyledPageSizeSelect onChange={(newPageSize) => setPageSize(newPageSize)} pageSize={pageSize} />
       )}
@@ -130,7 +132,7 @@ const ShareDetails = ({ shareState = null, entityId = undefined }: Props) => {
             .toArray()}
         </List>
       ) : (
-        <Alert>This Event definition has no collaborators.</Alert>
+        <Alert>{t('share.no_collaborators')}</Alert>
       )}
       <PaginationWrapper>
         <StyledPagination totalPages={totalPages} currentPage={currentPage} onChange={setCurrentPage} />

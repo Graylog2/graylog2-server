@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useMemo, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useLocation from 'routing/useLocation';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
@@ -32,6 +33,7 @@ import { fetchPaginatedFleets, fleetsKeyFn, useCollectorsMutations, useCollector
 import type { Fleet } from '../types';
 
 const CollectorsFleets = () => {
+  const { t } = useTranslation('collectors');
   const { createFleet } = useCollectorsMutations();
   const { canCreateFleet } = useCollectorPermissions();
   const { pathname } = useLocation();
@@ -57,7 +59,7 @@ const CollectorsFleets = () => {
   return (
     <>
       <PaginatedEntityTable<Fleet>
-        humanName="fleets"
+        humanName={t('fleets.human_name')}
         tableLayout={DEFAULT_LAYOUT}
         fetchEntities={fetchEntities}
         keyFn={fleetsKeyFn}

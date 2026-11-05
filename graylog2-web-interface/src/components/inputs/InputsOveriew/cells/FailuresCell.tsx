@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import type { InputSummary } from 'hooks/usePaginatedInputs';
@@ -39,6 +40,7 @@ const StyledLink = styled(Link)<{ $hasFailures: boolean }>(
 );
 
 const FailuresCell = ({ input }: Props) => {
+  const { t } = useTranslation('inputs');
   const metricNames = FAILURE_SUFFIXES.map((suffix) => buildMetricName(input.id, suffix));
   const { data: metrics, isLoading } = useMetrics(metricNames);
 
@@ -58,7 +60,7 @@ const FailuresCell = ({ input }: Props) => {
   return (
     <StyledLink
       to={Routes.SYSTEM.INPUT_DIAGNOSIS(input.id)}
-      title={`Show input diagnosis for ${input.title}`}
+      title={t('overview.show_diagnosis_for_capitalized', { title: input.title })}
       $hasFailures={totalFailures > 0}>
       {formatCount(totalFailures)}
     </StyledLink>

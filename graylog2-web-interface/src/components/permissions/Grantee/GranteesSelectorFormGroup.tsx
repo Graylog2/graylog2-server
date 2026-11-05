@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Field } from 'formik';
 import styled from 'styled-components';
 
@@ -60,6 +61,7 @@ const _renderGranteesSelectOption = ({ label, granteeType }: { label: string; gr
   </GranteesSelectOption>
 );
 const GranteesSelectorFormGroup = ({ availableGrantees, availableCapabilities }: Props) => {
+  const { t } = useTranslation('users');
   const granteesOptions = _granteesOptions(availableGrantees);
 
   return (
@@ -70,7 +72,7 @@ const GranteesSelectorFormGroup = ({ availableGrantees, availableCapabilities }:
             onChange={(granteeId) => onChange({ target: { value: granteeId, name } })}
             optionRenderer={_renderGranteesSelectOption}
             options={granteesOptions}
-            placeholder="Search for users and teams"
+            placeholder={t('permissions.share.search_placeholder')}
             value={value}
           />
         )}

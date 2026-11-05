@@ -52,3 +52,6 @@ declare module 'jest-preset-graylog/lib/timeouts' {
   export const timeoutMultiplier: () => number;
   export const applyTimeoutMultiplier: (x: number) => number;
 }
+
+// The locale file is only imported for its side effect of registering the locale.
+declare module 'moment/locale/de';

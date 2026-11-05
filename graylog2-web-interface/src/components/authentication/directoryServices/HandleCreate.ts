@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import i18n from 'i18n';
 import UserNotification from 'util/UserNotification';
 import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
@@ -28,9 +29,16 @@ export default (
   shouldUpdateGroupSync: boolean | undefined = true,
 ) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
-  const notifyOnSuccess = () => UserNotification.success('Authentication service was created successfully.', 'Success');
+  const notifyOnSuccess = () =>
+    UserNotification.success(
+      i18n.t('notifications.create_success', { ns: 'authentication' }),
+      i18n.t('notifications.success_title', { ns: 'authentication' }),
+    );
   const notifyOnError = (error) =>
-    UserNotification.error(`Creating authentication service failed with status: ${error}`, 'Error');
+    UserNotification.error(
+      i18n.t('notifications.create_failed', { ns: 'authentication', error }),
+      i18n.t('notifications.error_title', { ns: 'authentication' }),
+    );
 
   return createAuthBackend(payload)
     .then((result) => {

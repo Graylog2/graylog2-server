@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { Collapse } from '@mantine/core';
 
@@ -95,6 +96,7 @@ const Section = ({
   className = undefined,
   bsSize = 'md',
 }: Props) => {
+  const { t } = useTranslation('common');
   const [opened, { toggle }] = useDisclosure(!defaultClosed);
 
   const onToggle = () => {
@@ -107,7 +109,7 @@ const Section = ({
   const collapseButton = collapsible && (
     <IconButton
       data-testid="collapseButton"
-      title={`Toggle ${title.toLowerCase()} section`}
+      title={t('section.toggle_section', { title })}
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();

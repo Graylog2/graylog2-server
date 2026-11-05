@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import type * as Immutable from 'immutable';
+import { useTranslation } from 'react-i18next';
 
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
 import type { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
@@ -34,15 +35,16 @@ type Props = {
 };
 
 const GroupSyncSection = ({ authenticationBackend, roles, excludedFields = undefined }: Props) => {
+  const { t } = useTranslation('authentication');
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   const GroupSyncSectionPlugin = enterpriseGroupSyncPlugin?.components.GroupSyncSection;
 
   if (!GroupSyncSectionPlugin) {
     return (
       <SectionComponent
-        title="Group Synchronization"
+        title={t('config_details.group_sync_title')}
         headerActions={<EditLinkButton authenticationBackendId={authenticationBackend.id} stepKey={GROUP_SYNC_KEY} />}>
-        <EnterprisePluginNotFound featureName="group synchronization" />
+        <EnterprisePluginNotFound featureName={t('config_details.group_sync_feature_name')} />
       </SectionComponent>
     );
   }

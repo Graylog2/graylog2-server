@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type UserOverview from 'logic/users/UserOverview';
 import { DataTable } from 'components/common';
@@ -29,15 +30,14 @@ type Props = {
 };
 
 const SystemAdministratorOverview = ({ adminUser, dataRowFormatter, headers, headerCellFormatter }: Props) => {
+  const { t } = useTranslation('users');
   const productName = useProductName();
 
   return (
     <Row className="content">
       <Col xs={12}>
-        <h2>System Administrator</h2>
-        <p className="description">
-          The system administrator can only be edited in the {productName} configuration file.
-        </p>
+        <h2>{t('users_list.admin.title')}</h2>
+        <p className="description">{t('users_list.admin.description', { productName })}</p>
         <DataTable
           id="users-overview"
           headers={headers}

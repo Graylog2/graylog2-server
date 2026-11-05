@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import StreamsContext from 'contexts/StreamsContext';
@@ -27,12 +28,13 @@ type FilterPreviewContainerProps = {
   eventDefinition: EventDefinition;
 };
 const FilterPreviewContainer = ({ eventDefinition }: FilterPreviewContainerProps) => {
+  const { t } = useTranslation('event_definitions');
   const streams = useContext(StreamsContext);
 
   return streams?.length ? (
     <FilterPreview config={eventDefinition?.config} />
   ) : (
-    <FilterPreviewResults>Unable to preview filter, user does not have access to any streams.</FilterPreviewResults>
+    <FilterPreviewResults>{t('filter_preview.no_streams_access')}</FilterPreviewResults>
   );
 };
 

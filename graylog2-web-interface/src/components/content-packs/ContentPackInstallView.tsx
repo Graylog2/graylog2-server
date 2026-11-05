@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Timestamp } from 'components/common';
 import { Row, Col } from 'components/bootstrap';
@@ -32,19 +33,20 @@ type ContentPackInstallViewProps = {
 };
 
 const ContentPackInstallView = ({ install }: ContentPackInstallViewProps) => {
+  const { t } = useTranslation('content_packs');
   const { comment, created_at: createdAt, created_by: createdBy, entities } = install;
 
   return (
     <div>
       <Row>
         <Col smOffset={1} sm={10}>
-          <h3>General information</h3>
+          <h3>{t('install_view.general_information')}</h3>
           <dl className="deflist">
-            <dt>Comment:</dt>
+            <dt>{t('install_view.comment')}</dt>
             <dd>{comment}</dd>
-            <dt>Installed by:</dt>
+            <dt>{t('install_view.installed_by')}</dt>
             <dd>{createdBy}&nbsp;</dd>
-            <dt>Installed at:</dt>
+            <dt>{t('install_view.installed_at')}</dt>
             <dd>
               <Timestamp dateTime={createdAt} />
             </dd>

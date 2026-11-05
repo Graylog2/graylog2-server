@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Table, Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
@@ -29,6 +30,7 @@ type Props = {
 };
 
 const CommonFieldValueProviderSummary = ({ fieldName, config, keys, children }: Props) => {
+  const { t } = useTranslation('event_definitions');
   const [displayDetails, setDisplayDetails] = useState(false);
 
   const toggleDisplayDetails = () => {
@@ -42,17 +44,17 @@ const CommonFieldValueProviderSummary = ({ fieldName, config, keys, children }: 
         <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={toggleDisplayDetails}>
           <Icon name={`arrow_${displayDetails ? 'drop_down' : 'right'}`} />
           &nbsp;
-          {displayDetails ? 'Less details' : 'More details'}
+          {displayDetails ? t('provider_summary.less_details') : t('provider_summary.more_details')}
         </Button>
         {displayDetails && (
           <Table condensed className={styles.fixedTable}>
             <tbody>
               <tr>
-                <td>Is Key?</td>
-                <td>{keys.includes(fieldName) ? 'Yes' : 'No'}</td>
+                <td>{t('fields_list.is_key')}</td>
+                <td>{keys.includes(fieldName) ? t('fields_list.yes') : t('fields_list.no')}</td>
               </tr>
               <tr>
-                <td>Data Type</td>
+                <td>{t('fields_list.data_type')}</td>
                 <td>{config.data_type}</td>
               </tr>
               {children}

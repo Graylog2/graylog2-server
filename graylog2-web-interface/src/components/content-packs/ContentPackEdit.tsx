@@ -16,6 +16,7 @@
  */
 import React from 'react';
 
+import i18n from 'i18n';
 import { Spinner, Wizard, ScrollButton } from 'components/common';
 import ValueReferenceData from 'util/ValueReferenceData';
 import ContentPackSelection from 'components/content-packs/ContentPackSelection';
@@ -23,6 +24,8 @@ import ContentPackDetails from 'components/content-packs/ContentPackDetails';
 import ContentPackPreview from 'components/content-packs/ContentPackPreview';
 import ContentPackParameters from 'components/content-packs/ContentPackParameters';
 import type { EntityPair } from 'logic/content-packs/pairEntities';
+
+const t = (key: string) => i18n.t(key, { ns: 'content_packs' });
 
 type ContentPackEditProps = {
   contentPack?: any;
@@ -154,9 +157,14 @@ class ContentPackEdit extends React.Component<
     );
     const previewComponent = <ContentPackPreview contentPack={this.props.contentPack} onSave={this.props.onSave} />;
     const steps = [
-      { key: 'selection', title: 'Content Selection', component: selectionComponent },
-      { key: 'parameters', title: 'Parameters', component: parameterComponent, disabled: this._disableParameters() },
-      { key: 'preview', title: 'Preview', component: previewComponent, disabled: this._disablePreview() },
+      { key: 'selection', title: t('edit.steps.selection'), component: selectionComponent },
+      {
+        key: 'parameters',
+        title: t('edit.steps.parameters'),
+        component: parameterComponent,
+        disabled: this._disableParameters(),
+      },
+      { key: 'preview', title: t('edit.steps.preview'), component: previewComponent, disabled: this._disablePreview() },
     ];
 
     return (

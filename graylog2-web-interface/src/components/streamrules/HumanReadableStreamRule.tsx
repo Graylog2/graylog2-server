@@ -15,13 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
+import i18n from 'i18n';
 import type { Input } from 'components/messageloaders/Types';
 import type { StreamRule } from 'logic/streams/types';
 import STREAM_RULE_TYPES from 'logic/streams/streamRuleTypes';
 import useStreamRuleTypes from 'components/streams/hooks/useStreamRuleTypes';
+import useServerText from 'util/serverText';
 
-const EMPTY_TAG = '<empty>';
+const getEmptyTag = () => i18n.t('stream_rules.human.empty', { ns: 'streams' });
 
 const formatRuleValue = (inputs: Array<Input> | undefined, streamRule: Partial<StreamRule>) => {
   if (streamRule.type === STREAM_RULE_TYPES.MATCH_INPUT) {
@@ -31,7 +34,7 @@ const formatRuleValue = (inputs: Array<Input> | undefined, streamRule: Partial<S
       return `${input.title} (${input.name}: ${input.id})`;
     }
 
-    return `<deleted input>: ${streamRule.value})`;
+    return i18n.t('stream_rules.human.deleted_input', { ns: 'streams', value: streamRule.value });
   }
 
   if (streamRule.type !== STREAM_RULE_TYPES.FIELD_PRESENCE) {
@@ -39,7 +42,7 @@ const formatRuleValue = (inputs: Array<Input> | undefined, streamRule: Partial<S
       return streamRule.value;
     }
 
-    return EMPTY_TAG;
+    return getEmptyTag();
   }
 
   return null;
@@ -54,7 +57,7 @@ const formatRuleField = (streamRule: Partial<StreamRule>) => {
     return 'gl_source_input';
   }
 
-  return EMPTY_TAG;
+  return getEmptyTag();
 };
 
 type Props = {
@@ -62,20 +65,31 @@ type Props = {
   inputs: Array<Input> | undefined;
 };
 
+const STREAM_RULE_TYPE_DESCRIPTIONS = ['stream_rule_types_long'];
+
 const HumanReadableStreamRule = ({ streamRule, inputs }: Props) => {
+  const { t } = useTranslation('streams');
+  const serverText = useServerText(STREAM_RULE_TYPE_DESCRIPTIONS);
   const { data: streamRuleTypes } = useStreamRuleTypes();
   const streamRuleType = streamRuleTypes?.find(({ id }) => id === streamRule.type);
-  const negation = streamRule.inverted ? 'not ' : null;
-  const longDesc = streamRuleType ? streamRuleType.long_desc : null;
+  const longDesc = streamRuleType ? serverText(streamRuleType.long_desc) : null;
 
   if (streamRule.type === STREAM_RULE_TYPES.ALWAYS_MATCHES) {
-    return <span>Rule always matches</span>;
+    return <span>{t('stream_rules.human.always_matches')}</span>;
   }
 
   return (
     <span>
-      <em>{formatRuleField(streamRule)}</em> <strong>must {negation}</strong>
-      {longDesc} <em>{formatRuleValue(inputs, streamRule)}</em>
+      <Trans
+        t={t}
+        i18nKey={streamRule.inverted ? 'stream_rules.human.must_not' : 'stream_rules.human.must'}
+        values={{
+          field: formatRuleField(streamRule),
+          description: longDesc ?? '',
+          value: formatRuleValue(inputs, streamRule) ?? '',
+        }}
+        components={{ ruleField: <em />, mustPart: <strong />, ruleValue: <em /> }}
+      />
     </span>
   );
 };

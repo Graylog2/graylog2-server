@@ -16,6 +16,7 @@
  */
 import React, { useContext } from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import FormDataContext from 'integrations/contexts/FormDataContext';
 import useFetch from 'integrations/hooks/useFetch';
@@ -70,6 +71,7 @@ type Props = {
 };
 
 const StepReview = ({ onSubmit, externalInputSubmit = false }: Props) => {
+  const { t } = useTranslation('integrations');
   const { formData } = useContext(FormDataContext);
 
   const throttleEnabled = !!formData.awsCloudTrailThrottleEnabled?.value;
@@ -91,7 +93,7 @@ const StepReview = ({ onSubmit, externalInputSubmit = false }: Props) => {
   const formError = saveInput.error
     ? {
         full_message: saveInput.error,
-        nice_message: <span>We were unable to save your Input, please try again in a few moments.</span>,
+        nice_message: <span>{t('aws_cloudtrail_step_review.save_error')}</span>,
       }
     : null;
 
@@ -108,57 +110,57 @@ const StepReview = ({ onSubmit, externalInputSubmit = false }: Props) => {
   return (
     <FormWrap
       onSubmit={handleSubmit}
-      buttonContent="Save and Start Input"
+      buttonContent={t('aws_cloudtrail_step_review.save_button')}
       loading={saveInput.loading}
       error={formError}
-      description="Check out everything below to make sure it's correct, then click the button below to complete your AWS CloudTrail setup!">
+      description={t('aws_cloudtrail_step_review.description')}>
       <Container>
-        <Subheader>Input Configuration</Subheader>
+        <Subheader>{t('aws_cloudtrail_step_review.input_configuration')}</Subheader>
         <ReviewItems>
           <li>
-            <strong>Name </strong>
+            <strong>{t('aws_cloudtrail_step_review.label_name')}</strong>
             <span>{formData.awsCloudTrailName.value}</span>
           </li>
           {formData.awsAccessKey?.value && (
             <li>
-              <strong>AWS Access Key </strong>
+              <strong>{t('aws_cloudtrail_step_review.label_access_key')}</strong>
               <span>{formData.awsAccessKey?.value}</span>
             </li>
           )}
           <li>
-            <strong>SQS Region </strong>
+            <strong>{t('aws_cloudtrail_step_review.label_sqs_region')}</strong>
             <span>{formData.awsCloudTrailSqsRegion.value}</span>
           </li>
           <li>
-            <strong>S3 Region </strong>
+            <strong>{t('aws_cloudtrail_step_review.label_s3_region')}</strong>
             <span>{formData.awsCloudTrailS3Region.value}</span>
           </li>
           {formData.awsAssumeRoleARN?.value && (
             <li>
-              <strong>AWS Assume Role (ARN) </strong>
+              <strong>{t('aws_cloudtrail_step_review.label_assume_role_arn')}</strong>
               <span>{formData.awsAssumeRoleARN?.value}</span>
             </li>
           )}
           {formData.awsExternalId?.value && (
             <li>
-              <strong>AWS External ID </strong>
+              <strong>{t('aws_cloudtrail_step_review.label_external_id')}</strong>
               <span>{formData.awsExternalId?.value}</span>
             </li>
           )}
           <li>
-            <strong>AWS SQS Queue name </strong>
+            <strong>{t('aws_cloudtrail_step_review.label_sqs_queue_name')}</strong>
             <span>{formData.awsCloudTrailSqsQueueName?.value}</span>
           </li>
           <li>
-            <strong>SQS Message Batch Size </strong>
+            <strong>{t('aws_cloudtrail_step_review.label_sqs_batch_size')}</strong>
             <span>{formData.sqsMessageBatchSize?.value}</span>
           </li>
           <li>
-            <strong>Polling Interval </strong>
+            <strong>{t('aws_cloudtrail_step_review.label_polling_interval')}</strong>
             <span>{formData.pollingInterval.value}</span>
           </li>
           <li>
-            <strong>Enable Throttling</strong>
+            <strong>{t('aws_cloudtrail_step_review.label_enable_throttling')}</strong>
             <span>
               <StatusIcon active={throttleEnabled} />
             </span>

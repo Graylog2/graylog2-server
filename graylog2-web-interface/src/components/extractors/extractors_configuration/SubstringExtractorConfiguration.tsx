@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Button, Col, Row, Input } from 'components/bootstrap';
 import { Icon } from 'components/common';
@@ -44,6 +45,7 @@ const SubstringExtractorConfiguration = ({
   onChange,
   onExtractorPreviewLoad,
 }: Props) => {
+  const { t } = useTranslation('extractors');
   const [configuration, setConfig] = useState(_getEffectiveConfiguration(initialConfig));
   const [trying, setTrying] = useState(false);
   const [beginIndex, setBeginIndex] = useState<Input>();
@@ -97,7 +99,7 @@ const SubstringExtractorConfiguration = ({
 
       promise.then((result) => {
         if (!result.successful) {
-          UserNotification.warning('We were not able to run the substring extraction. Please check index boundaries.');
+          UserNotification.warning(t('substring.no_match'));
 
           return;
         }
@@ -119,8 +121,7 @@ const SubstringExtractorConfiguration = ({
 
   const endIndexHelpMessage = (
     <span>
-      Where to end extracting. (Exclusive) <strong>Example:</strong> <em>1,5</em> cuts <em>love</em> from the string{' '}
-      <em>ilovelogs</em>.
+      <Trans t={t} i18nKey="substring.end_index_help" components={{ strong: <strong />, em: <em /> }} />
     </span>
   );
 
@@ -132,14 +133,14 @@ const SubstringExtractorConfiguration = ({
           setBeginIndex(_beginIndex);
         }}
         id="begin_index"
-        label="Begin index"
+        label={t('substring.begin_index')}
         labelClassName="col-md-2"
         wrapperClassName="col-md-10"
         defaultValue={configuration.begin_index}
         onChange={_onChange('begin_index')}
         min="0"
         required
-        help="Character position from where to start extracting. (Inclusive)"
+        help={t('substring.begin_index_help')}
       />
 
       <Input
@@ -148,7 +149,7 @@ const SubstringExtractorConfiguration = ({
           setEndIndex(_endIndex);
         }}
         id="end_index"
-        label="End index"
+        label={t('substring.end_index')}
         labelClassName="col-md-2"
         wrapperClassName="col-md-10"
         defaultValue={configuration.end_index}
@@ -161,7 +162,7 @@ const SubstringExtractorConfiguration = ({
       <Row>
         <Col mdOffset={2} md={10}>
           <Button bsStyle="info" onClick={_onTryClick} disabled={_isTryButtonDisabled}>
-            {trying ? <Icon name="progress_activity" spin /> : 'Try'}
+            {trying ? <Icon name="progress_activity" spin /> : t('edit.try')}
           </Button>
         </Col>
       </Row>

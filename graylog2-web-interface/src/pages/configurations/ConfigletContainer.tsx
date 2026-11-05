@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
+import { useTranslation } from 'react-i18next';
 
 import { Col } from 'components/bootstrap';
 
@@ -26,13 +27,17 @@ type ErrorFallbackProps = {
   title: string;
 };
 
-const ErrorFallback = ({ error, title }: ErrorFallbackProps) => (
-  <>
-    <h2>{title}</h2>
-    <p>Something went wrong:</p>
-    <pre>{error.message}</pre>
-  </>
-);
+const ErrorFallback = ({ error, title }: ErrorFallbackProps) => {
+  const { t } = useTranslation('pages');
+
+  return (
+    <>
+      <h2>{title}</h2>
+      <p>{t('configlet.error')}</p>
+      <pre>{error.message}</pre>
+    </>
+  );
+};
 
 type BoundaryProps = {
   children: React.ReactNode;

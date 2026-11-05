@@ -22,6 +22,7 @@ import type {
   TableLayoutPreferencesJSON,
   TableLayoutDefaultFiltersJSON,
 } from 'components/common/EntityDataTable/types';
+import i18n from 'i18n';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import { defaultOnError } from 'util/conditional/onError';
@@ -90,7 +91,7 @@ const useUserLayoutPreferences = <T>(
     queryFn: () =>
       defaultOnError(
         fetchUserLayoutPreferences(entityId, layoutVariant),
-        `Loading layout preferences for "${entityId}" overview failed with`,
+        i18n.t('entity_table.load_layout_failed', { ns: 'common', entityId }),
       ),
     placeholderData: keepPreviousData,
     // 1 hour

@@ -1,0 +1,64 @@
+{
+  "api_browser": {
+    "download_label": "下载 OpenAPI 规范：",
+    "fetch_failed": "获取 API 规范失败！",
+    "loading": "正在加载 API 规范...",
+    "loading_title": "API 浏览器 - 正在加载 API 规范",
+    "select_format": "选择格式",
+    "title": "API 浏览器"
+  },
+  "configlet": {
+    "error": "出现错误："
+  },
+  "errors": {
+    "copy_error_details": "将错误详情复制到剪贴板"
+  },
+  "keyboard_shortcuts": {
+    "description": "所有可用快捷键的列表",
+    "title": "键盘快捷键"
+  },
+  "loading": {
+    "text": "正在加载，请稍候...",
+    "title": "正在加载..."
+  },
+  "not_found": {
+    "back_hint": "您可以返回<mainPageLink>主页</mainPageLink>，然后从那里进行导航。",
+    "description": "您要访问的页面不存在（或已不存在）。",
+    "title": "未找到页面"
+  },
+  "runtime_error": {
+    "description_hint": "您可以使用导航前往产品的其他部分、刷新页面或提交错误报告。",
+    "description_intro": "您访问的页面似乎包含错误。",
+    "error_label": "错误：",
+    "show_less": "收起",
+    "show_more": "展开",
+    "title": "出现错误。"
+  },
+  "server_unavailable": {
+    "document_title": "服务器不可用",
+    "error_message": "错误消息",
+    "full_error_message": "完整错误消息",
+    "intro": "无法连接到运行于 <serverAddress>{{address}}</serverAddress> 的 {{productName}} 服务器。请检查服务器是否运行正常。",
+    "last_response": "以下是我们从服务器收到的最后一次响应：",
+    "less_details": "收起详情",
+    "modal_title": "服务器当前不可用",
+    "more_details": "展开详情",
+    "need_help": "需要帮助吗？<helpLink>我们可以为您提供帮助</helpLink>。",
+    "no_information": "没有可用信息。",
+    "original_request": "原始请求",
+    "redirect_hint": "服务器恢复连接后，将自动跳转回上一页。",
+    "status_code": "状态码"
+  },
+  "show_message": {
+    "document_title": "{{index}} 中的消息 {{messageId}}",
+    "not_found_description": "未找到指定的索引或消息。最可能的原因是包含所引用消息的索引已被删除。完整错误消息如下：",
+    "not_found_title": "未找到索引或消息"
+  },
+  "unauthorized": {
+    "description_hint": "请联系管理员并提供错误详情。",
+    "description_intro": "您没有查看此资源所需的权限。",
+    "page_details": "在访问 {{pathname}} 时，以下请求的权限检查失败。\n",
+    "page_details_no_request": "尝试访问 {{pathname}} 时权限检查失败。",
+    "title": "缺少权限"
+  }
+}

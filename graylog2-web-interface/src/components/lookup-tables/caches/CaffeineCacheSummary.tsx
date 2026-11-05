@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { TimeUnit } from 'components/common';
 import type { LookupTableCache } from 'logic/lookup-tables/types';
@@ -25,31 +26,35 @@ type Props = {
   cache: LookupTableCache;
 };
 
-const CaffeineCacheSummary = ({ cache }: Props) => (
-  <SummaryContainer>
-    <SummaryRow>
-      <Title>Maximum entries:</Title>
-      <Value style={{ borderBottom: '1px solid #eee' }}>{cache.config.max_size}</Value>
-    </SummaryRow>
-    <SummaryRow>
-      <Title>Expire after access:</Title>
-      <Value style={{ borderBottom: '1px solid #eee' }}>
-        <TimeUnit value={cache.config.expire_after_access} unit={cache.config.expire_after_access_unit} />
-      </Value>
-    </SummaryRow>
-    <SummaryRow>
-      <Title>Expire after write:</Title>
-      <Value>
-        <TimeUnit value={cache.config.expire_after_write} unit={cache.config.expire_after_write_unit} />
-      </Value>
-    </SummaryRow>
-    <SummaryRow>
-      <Title>TTL for empty results:</Title>
-      <Value>
-        <TimeUnit value={cache.config.ttl_empty || 0} unit={cache.config.ttl_empty_unit || 'SECONDS'} />
-      </Value>
-    </SummaryRow>
-  </SummaryContainer>
-);
+const CaffeineCacheSummary = ({ cache }: Props) => {
+  const { t } = useTranslation('lookup_tables');
+
+  return (
+    <SummaryContainer>
+      <SummaryRow>
+        <Title>{t('max_entries')}</Title>
+        <Value style={{ borderBottom: '1px solid #eee' }}>{cache.config.max_size}</Value>
+      </SummaryRow>
+      <SummaryRow>
+        <Title>{t('expire_after_access')}</Title>
+        <Value style={{ borderBottom: '1px solid #eee' }}>
+          <TimeUnit value={cache.config.expire_after_access} unit={cache.config.expire_after_access_unit} />
+        </Value>
+      </SummaryRow>
+      <SummaryRow>
+        <Title>{t('expire_after_write')}</Title>
+        <Value>
+          <TimeUnit value={cache.config.expire_after_write} unit={cache.config.expire_after_write_unit} />
+        </Value>
+      </SummaryRow>
+      <SummaryRow>
+        <Title>{t('ttl_empty_results')}</Title>
+        <Value>
+          <TimeUnit value={cache.config.ttl_empty || 0} unit={cache.config.ttl_empty_unit || 'SECONDS'} />
+        </Value>
+      </SummaryRow>
+    </SummaryContainer>
+  );
+};
 
 export default CaffeineCacheSummary;

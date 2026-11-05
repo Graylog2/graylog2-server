@@ -15,7 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
+import i18n from 'i18n';
 import { OverlayTrigger, LinkToNode, Spinner } from 'components/common';
 import { Badge } from 'components/bootstrap';
 import type { BadgeColor } from 'components/bootstrap/Badge';
@@ -59,12 +61,20 @@ const getBadgeColorForState = (
   }
 };
 
+const stateLabel = (state: string) =>
+  i18n.t(`input_states.${state}`, { ns: 'inputs', defaultValue: StringUtils.toTitleCase(state) });
+
 const getTextForState = (sortedStates, input: InputSummary) =>
-  StringUtils.toTitleCase(
-    input.global ? sortedStates.map((state) => `${state.count} ${state.state}`).join(', ') : sortedStates[0].state,
-  );
+  input.global
+    ? sortedStates
+        .map((state) =>
+          i18n.t('input_states.count', { ns: 'inputs', count: state.count, state: stateLabel(state.state) }),
+        )
+        .join(', ')
+    : stateLabel(sortedStates[0].state);
 
 const InputStateBadge = ({ input, inputStates = undefined }: Props) => {
+  const { t } = useTranslation('inputs');
   const { nodes } = useStore(NodesStore);
 
   const isLoading = !(inputStates && nodes);
@@ -115,7 +125,7 @@ const InputStateBadge = ({ input, inputStates = undefined }: Props) => {
         placement="bottom"
         overlay={popOverText}
         rootClose
-        title={`Input States for ${input.title}`}>
+        title={t('input_states.title', { title: input.title })}>
         <Badge
           color={getBadgeColorForState(sorted, input, nodes, isOnlyOnePerCluster)}
           variant="light"

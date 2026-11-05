@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import type { WithTranslation } from 'react-i18next';
+import { withTranslation } from 'react-i18next';
 
 import { Button, Input } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
@@ -26,7 +28,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 type BulkLoadPatternModalProps = {
   onSuccess: (...args: any[]) => void;
   sendTelemetry?: (...args: any[]) => void;
-};
+} & WithTranslation;
 
 class BulkLoadPatternModal extends React.Component<
   BulkLoadPatternModalProps,
@@ -68,7 +70,7 @@ class BulkLoadPatternModal extends React.Component<
       const request = loaded.target.result;
 
       bulkImportGrokPatterns(request as string, importStrategy).then(() => {
-        UserNotification.success('Grok Patterns imported successfully', 'Success!');
+        UserNotification.success(this.props.t('import_success'), this.props.t('import_success_title'));
         this._closeModal();
 
         this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.GROK_PATTERN.IMPORTED, {
@@ -88,13 +90,13 @@ class BulkLoadPatternModal extends React.Component<
     return (
       <span>
         <Button bsStyle="info" style={{ marginRight: 5 }} onClick={this._openModal}>
-          Import pattern file
+          {this.props.t('button_import_file')}
         </Button>
 
         <BootstrapModalForm
           show={this.state.showModal}
-          title="Import Grok patterns from file"
-          submitButtonText="Upload"
+          title={this.props.t('modal_import_title')}
+          submitButtonText={this.props.t('button_upload')}
           onCancel={this._closeModal}
           onSubmitForm={this._onSubmit}>
           <Input
@@ -104,8 +106,8 @@ class BulkLoadPatternModal extends React.Component<
               this.patternFile = patternFile;
             }}
             name="patterns"
-            label="Pattern file"
-            help="A file containing Grok patterns, one per line. Name and patterns should be separated by whitespace."
+            label={this.props.t('input_file_label')}
+            help={this.props.t('input_file_help')}
             required
           />
           <Input
@@ -113,7 +115,7 @@ class BulkLoadPatternModal extends React.Component<
             type="radio"
             name="import-strategy"
             value="ABORT_ON_CONFLICT"
-            label="Abort import if a pattern with the same name already exists"
+            label={this.props.t('import_strategy_abort')}
             defaultChecked
             onChange={(e) => this._onImportStrategyChange(e)}
           />
@@ -122,7 +124,7 @@ class BulkLoadPatternModal extends React.Component<
             type="radio"
             name="import-strategy"
             value="REPLACE_ON_CONFLICT"
-            label="Replace existing patterns with the same name"
+            label={this.props.t('import_strategy_replace')}
             onChange={(e) => this._onImportStrategyChange(e)}
           />
           <Input
@@ -130,7 +132,7 @@ class BulkLoadPatternModal extends React.Component<
             type="radio"
             name="import-strategy"
             value="DROP_ALL_EXISTING"
-            label="Drop all existing patterns before import"
+            label={this.props.t('import_strategy_drop')}
             onChange={(e) => this._onImportStrategyChange(e)}
           />
         </BootstrapModalForm>
@@ -139,4 +141,4 @@ class BulkLoadPatternModal extends React.Component<
   }
 }
 
-export default withTelemetry(BulkLoadPatternModal, 'grokpatterns');
+export default withTelemetry(withTranslation('grokpatterns')(BulkLoadPatternModal), 'grokpatterns');

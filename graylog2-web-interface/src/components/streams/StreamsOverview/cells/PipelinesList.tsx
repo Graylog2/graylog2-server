@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 
+import i18n from 'i18n';
 import useEntityTitles from 'hooks/useEntityTitles';
 import { Link, Spinner } from 'components/common';
 import ExpandableCellList from 'components/common/ExpandableCellList';
@@ -31,10 +32,10 @@ type PipelineItem = {
 
 const renderPipeline = ({ id, title, isPermitted }: PipelineItem) => {
   if (!isPermitted) {
-    return <i title="Missing permissions">{id}</i>;
+    return <i title={i18n.t('streams_overview.expanded.missing_permissions', { ns: 'streams' })}>{id}</i>;
   }
 
-  return title ? <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(id)}>{title}</Link> : `${id} (deleted)`;
+  return title ? <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(id)}>{title}</Link> : i18n.t('streams_overview.expanded.deleted', { ns: 'streams', id });
 };
 
 // Pipelines the user can't read have no title, so they go last as plain IDs.

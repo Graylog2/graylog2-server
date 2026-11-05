@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { InputSummary } from 'hooks/usePaginatedInputs';
 import { useMetric } from 'hooks/useMetrics';
@@ -28,6 +29,7 @@ type Props = {
 const METRIC_NAME = 'incomingMessages';
 
 const ThroughputCell = ({ input }: Props) => {
+  const { t } = useTranslation('inputs');
   const metricName = prefixMetric(input, METRIC_NAME);
   const { data: metrics, isLoading } = useMetric(metricName);
   if (isLoading || Object.keys(metrics).length === 0) {
@@ -49,7 +51,7 @@ const ThroughputCell = ({ input }: Props) => {
       return previous;
     }, NaN) || 0;
 
-  return <>{!isNaN(incomingMessages) ? formatCount(incomingMessages) : 0} msg/s</>;
+  return <>{t('overview.cells.throughput', { value: !isNaN(incomingMessages) ? formatCount(incomingMessages) : 0 })}</>;
 };
 
 export default ThroughputCell;

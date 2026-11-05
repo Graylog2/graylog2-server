@@ -14,11 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import i18n from 'i18n';
 import type { Attribute, Sort } from 'stores/PaginationTypes';
 import AppConfig from 'util/AppConfig';
 
 import type { ExtensionColumnGroups } from './hooks/useIndexSetsOverviewExtensions';
-import { METRIC_COLUMN_IDS, METRIC_COLUMN_TITLES } from './metricColumns';
+import { METRIC_COLUMN_IDS, getMetricColumnTitle } from './metricColumns';
 import type { IndexSetCategory } from './types';
 
 export const INDEX_SET_VIEW_VARIANTS = {
@@ -44,11 +45,8 @@ export const filterCloudHiddenAttributes = <T extends string | { id: string }>(i
 
 export const CATEGORY_ATTRIBUTE = 'category';
 
-export const INDEX_SET_CATEGORY_TITLES: Record<IndexSetCategory, string> = {
-  user: 'User-defined',
-  illuminate: 'Illuminate',
-  system: 'System',
-};
+export const getIndexSetCategoryTitle = (category: IndexSetCategory): string =>
+  i18n.t(`overview_table.category.${category}`, { ns: 'indexsets', defaultValue: category });
 
 const SHARED_LAYOUT = {
   entityTableId: 'index-sets',
@@ -124,8 +122,12 @@ const getIndexSetTableElements = (
   };
 
   const additionalAttributes: Array<Attribute> = [
-    { id: 'field_type_refresh_interval', title: 'Field Type Refresh Interval', sortable: false },
-    ...DISPLAYED_METRIC_COLUMN_IDS.map((id) => ({ id, title: METRIC_COLUMN_TITLES[id], sortable: false })),
+    {
+      id: 'field_type_refresh_interval',
+      title: i18n.t('overview_table.field_type_refresh_interval', { ns: 'indexsets' }),
+      sortable: false,
+    },
+    ...DISPLAYED_METRIC_COLUMN_IDS.map((id) => ({ id, title: getMetricColumnTitle(id), sortable: false })),
     ...extensionAttributes,
   ];
 

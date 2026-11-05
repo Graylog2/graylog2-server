@@ -1,0 +1,252 @@
+{
+  "extractors_of": "{{title}} 的 Extractor",
+  "actions": "操作",
+  "import_extractors": "导入 Extractor",
+  "export_extractors": "导出 Extractor",
+  "documentation_title": "Extractor 文档",
+  "description": "Extractor 会应用于此输入接收到的每条消息。用于将任意文本数据提取并转换为字段，便于之后轻松过滤和分析。示例：从日志消息中提取 HTTP 响应码，将其转换为数字字段，并作为 {{field}} 附加到消息上。",
+  "list_item": {
+    "subtitle_copy": "尝试从 <em>{{source}}</em> 提取数据到 <em>{{target}}</em>，保留原始内容。",
+    "subtitle_cut": "尝试从 <em>{{source}}</em> 提取数据到 <em>{{target}}</em>，不保留原始内容。",
+    "condition": "条件",
+    "condition_string": "仅当消息包含字符串 <em>{{value}}</em> 时才尝试运行",
+    "condition_regex": "仅当消息匹配正则表达式 <em>{{value}}</em> 时才尝试运行",
+    "confirm_delete": "确定要删除 Extractor \"{{title}}\" 吗？",
+    "details": "详情",
+    "edit": "编辑",
+    "delete": "删除",
+    "no_configuration": "无配置选项",
+    "configuration": "配置",
+    "converters": "转换器"
+  },
+  "metrics": {
+    "title": "指标",
+    "percentile_95": "第 95 百分位：",
+    "percentile_98": "第 98 百分位：",
+    "percentile_99": "第 99 百分位：",
+    "std_dev": "标准差：",
+    "mean": "平均值：",
+    "minimum": "最小值：",
+    "maximum": "最大值：",
+    "invocations": "自启动以来共 {{total}} 次调用，平均值：{{oneMinute}}、{{fiveMinutes}}、{{fifteenMinutes}}。",
+    "hits_misses": "{{hits}} 次命中，{{misses}} 次未命中",
+    "no_messages": "尚无消息经过此处。",
+    "total_time": "总耗时",
+    "condition_time": "条件耗时",
+    "execution_time": "执行耗时",
+    "converter_time": "转换器耗时",
+    "microseconds": "{{value}}μs"
+  },
+  "edit": {
+    "condition_string_label": "字段包含字符串",
+    "condition_string_help": "输入字段应包含的字符串，以便尝试提取。",
+    "condition_regex_label": "字段匹配正则表达式",
+    "condition_regex_help": "输入字段应匹配的正则表达式，以便尝试提取。",
+    "condition_matches": "匹配！Extractor 将针对此示例运行。",
+    "condition_no_match": "不匹配！Extractor 将不会运行。",
+    "try": "试运行",
+    "condition_type_help": "仅从符合特定条件的消息中提取，可以避免错误或不必要的提取，还能节省 CPU 资源。",
+    "cursor_strategy_help": "是从源字段复制还是剪切？标准字段（如 <em>message</em> 和 <em>source</em>）不能使用剪切功能。",
+    "target_field_help": "选择用于存储提取值的字段名。只能包含 <b>字母数字字符和下划线</b>。示例：<em>http_response_code</em>。",
+    "store_as_field": "存储为字段",
+    "example_message": "示例消息",
+    "configuration": "Extractor 配置",
+    "extractor_type": "Extractor 类型",
+    "source_field": "源字段",
+    "condition": "条件",
+    "condition_none": "始终尝试提取",
+    "condition_string": "仅当字段包含字符串时才尝试提取",
+    "condition_regex": "仅当字段匹配正则表达式时才尝试提取",
+    "extraction_strategy": "提取策略",
+    "copy": "复制",
+    "cut": "剪切",
+    "title": "Extractor 标题",
+    "title_help": "此 Extractor 的描述性名称。",
+    "create": "创建 Extractor",
+    "update": "更新 Extractor"
+  },
+  "converters": {
+    "csv_enable": "将 CSV 列添加为字段",
+    "csv_field_names": "字段名称",
+    "csv_separator": "分隔符",
+    "csv_quote": "引号字符",
+    "csv_escape": "转义字符",
+    "csv_escape_help": "用于转义分隔符和引号字符的字符。",
+    "csv_strict_quotes": "使用严格引号",
+    "csv_strict_quotes_help": "忽略引号外的内容。",
+    "csv_trim": "去除前导空白",
+    "date_enable": "转换为日期类型",
+    "date_format": "格式字符串",
+    "time_zone": "时区",
+    "locale": "区域设置",
+    "flexdate_enable": "灵活解析日期",
+    "hash": "根据值生成 MD5 哈希",
+    "ip_anonymizer": "替换最后一个八位字节以匿名化 IPv4 地址",
+    "lookup_table_enable": "使用 Lookup Table 转换值",
+    "lookup_table": "Lookup Table",
+    "lookup_table_placeholder": "选择 Lookup Table",
+    "lowercase": "将值转换为小写",
+    "numeric": "转换为数值",
+    "split_and_count": "拆分并计数",
+    "split_by": "拆分依据",
+    "syslog_pri_facility": "将 PRI 转换为 syslog 设施",
+    "syslog_pri_level": "将 PRI 转换为 syslog 级别",
+    "tokenizer": "将键=值对添加为字段",
+    "uppercase": "将值转换为大写",
+    "csv_separator_help": "例如 <code>,</code>、<code>\\n</code> 和 <code>\\t</code> 会被转换为单个字符。",
+    "date_format_help": "日期使用的格式字符串。详见 <docsLink>文档</docsLink>。",
+    "time_zone_help": "应用于日期的时区。详见 <docsLink>文档</docsLink>。",
+    "locale_help": "解析日期时使用的区域设置。详见 <docsLink>文档</docsLink>。",
+    "lookup_table_help": "可在<lookupTablesLink>此处</lookupTablesLink>创建 Lookup Table。",
+    "split_by_help": "Split & Count 转换器会按定义的字符拆分提取的部分，并将词元数量存储为字段。<strong>示例：</strong>按 <em>,</em> 拆分 <em>?fields=first_name,last_name,zip</em> 的结果为 <em>3</em>。您统计的是 GET 用户 REST 请求中请求的字段数。"
+  },
+  "wizard": {
+    "title": "添加 Extractor",
+    "description": "首先加载一条消息作为示例。您可以选择加载此输入最近接收的消息，或通过 ID 手动选择消息。",
+    "create": "创建 Extractor"
+  },
+  "configuration": {
+    "preview": "Extractor 预览",
+    "nothing_extracted": "将不提取任何内容",
+    "try_example": "使用示例试运行"
+  },
+  "converters_editor": {
+    "not_supported": "无法为 <em>{{type}}</em> 类型的 Extractor 添加转换器。",
+    "add_label": "添加转换器",
+    "add_help": "添加转换器以转换提取的值。",
+    "select_placeholder": "选择转换器",
+    "add": "添加"
+  },
+  "export": {
+    "json_title": "Extractor JSON",
+    "copy": "复制 Extractor"
+  },
+  "example_message": {
+    "not_loaded": "无法加载字段 ‘{{field}}’ 的示例。更新前无法测试 Extractor。"
+  },
+  "sort": {
+    "title": "为 <em>{{title}}</em> 排序 Extractor",
+    "description": "拖放列表中的 Extractor 以更改其应用顺序。",
+    "submit": "更新排序"
+  },
+  "list": {
+    "sort": "排序 Extractor",
+    "title": "已配置的 Extractor",
+    "no_extractors": "此输入未配置任何 Extractor。"
+  },
+  "import": {
+    "parse_error": "解析 Extractor 时出错。它们是否为 JSON 格式？{{error}}",
+    "parse_error_title": "无法导入 Extractor",
+    "submit": "将 Extractor 添加到输入"
+  },
+  "message_loader": {
+    "load": "加载消息",
+    "loading": "正在加载消息...",
+    "wrong_example": "示例不正确？",
+    "load_another": "加载其他消息",
+    "message_id": "消息 ID",
+    "index": "索引"
+  },
+  "copy_input": {
+    "description": "整个输入将被原样复制。"
+  },
+  "grok": {
+    "error": "由于以下错误，无法运行 Grok 提取：{{error}}",
+    "no_match": "无法运行 Grok 提取。请检查您的参数。",
+    "named_captures_only": "仅命名捕获",
+    "named_captures_only_help": "仅将明确命名的捕获放入消息中。",
+    "pattern": "Grok 模式"
+  },
+  "json": {
+    "flatten": "展平结构",
+    "flatten_help": "是将 JSON 对象展平为单个消息字段，还是展开为多个字段。",
+    "list_separator": "列表项分隔符",
+    "list_separator_help": "用于连接 JSON 列表各项的字符串。",
+    "key_separator": "键分隔符",
+    "key_separator_help": "用于连接嵌套 JSON 对象不同键的字符串（仅在<em>未</em>展平时使用）。",
+    "kv_separator": "键/值分隔符",
+    "kv_separator_help": "连接 JSON 对象键/值对时使用的字符串（仅在展平时使用）。",
+    "key_prefix": "键前缀",
+    "key_prefix_help": "添加到从 JSON 对象提取的每个键前的文本。",
+    "replace_key_whitespace": "替换键中的空白字符",
+    "replace_key_whitespace_help": "存储提取的消息时，包含空白字符的字段键将被丢弃。勾选此项可将 JSON 键中的空白字符替换为其他字符。",
+    "key_whitespace_replacement": "键空白字符替换",
+    "key_whitespace_replacement_help": "替换消息键中空白字符时使用的字符。请确保替换字符在 Lucene 中有效，例如 '-' 或 '_'。"
+  },
+  "lookup_table": {
+    "error": "无法运行查找：{{error}}"
+  },
+  "regex": {
+    "no_match": "正则表达式未匹配。",
+    "no_group": "正则表达式不包含任何用于提取的匹配组。",
+    "help": "用于提取的正则表达式。使用第一个匹配组。详见<docsLink>文档</docsLink>。",
+    "label": "正则表达式"
+  },
+  "regex_replace": {
+    "regex_help": "用于提取的正则表达式。详见<docsLink>文档</docsLink>。",
+    "replacement_help": "用于替换匹配文本的内容。可用选项请参阅 <matcherLink>Matcher</matcherLink> API 文档。",
+    "replacement": "替换内容",
+    "replace_all": "替换模式的所有匹配项",
+    "replace_all_help": "是替换给定模式的所有匹配项，还是仅替换第一个匹配项。"
+  },
+  "split_and_index": {
+    "no_match": "无法运行拆分并索引提取。请检查您的参数。",
+    "split_by_help": "用于拆分的字符。<strong>示例：</strong>使用空白字符会将 <em>foo bar baz</em> 拆分为 <em>[foo,bar,baz]</em>。",
+    "index_help": "您要使用拆分后字符串的哪一部分？<strong>示例：</strong>按空白字符拆分时，<em>2</em> 会从 <em>foo bar baz</em> 中选取 <em>bar</em>。",
+    "index": "目标索引"
+  },
+  "substring": {
+    "no_match": "无法运行子字符串提取。请检查索引边界。",
+    "end_index_help": "提取结束的位置（不包含）。<strong>示例：</strong><em>1,5</em> 会从字符串 <em>ilovelogs</em> 中截取 <em>love</em>。",
+    "begin_index": "起始索引",
+    "begin_index_help": "开始提取的字符位置（包含）。",
+    "end_index": "结束索引"
+  },
+  "pages": {
+    "new_title": "为输入 {{title}} 新建 Extractor",
+    "new_header": "为输入 <em>{{title}}</em> 新建 Extractor",
+    "edit_title": "编辑 Extractor {{title}}",
+    "edit_header": "编辑输入 <em>{{inputTitle}}</em> 的 Extractor <em>{{title}}</em>",
+    "description": "Extractor 会应用于输入接收到的每条消息。用于将任意文本数据提取并转换为字段，便于之后轻松过滤和分析。",
+    "export_title": "导出 {{title}} 的 Extractor",
+    "export_header": "导出 <em>{{title}}</em> 的 Extractor",
+    "export_marketplace_prefix": "输入的 Extractor 可以导出为 JSON，用于导入其他设置或在",
+    "import_title": "导入 Extractor 到 {{title}}",
+    "import_header": "导入 Extractor 到 <em>{{title}}</em>",
+    "import_description": "导出的 Extractor 可以导入到输入中。",
+    "import_marketplace_prefix": "您只需要任何其他 {{productName}} 设置中的 Extractor JSON 导出文件，或来自"
+  },
+  "tools_api": {
+    "details": "详情：{{error}}",
+    "natural_date_failed": "加载关键字预览失败，状态：{{error}}",
+    "natural_date_failed_title": "无法加载关键字预览",
+    "grok_failed_title": "无法运行 Grok 提取。请检查您的参数。",
+    "json_failed_title": "无法运行 JSON 提取。请检查您的参数。",
+    "regex_invalid_title": "无法验证正则表达式。请确保其有效。",
+    "allowlist_check_title": "无法验证该 URL 是否在允许列表中。",
+    "regex_generate_title": "无法生成正则表达式。",
+    "regex_try_title": "无法试运行正则表达式。请确保其有效。",
+    "split_index_failed_title": "无法运行拆分并索引提取。请检查您的参数。",
+    "substring_failed_title": "无法运行子字符串提取。请检查索引边界。",
+    "contains_string_failed_title": "无法检查字段是否包含该字符串",
+    "lookup_table_failed_title": "无法检查 Lookup Table 是否转换该字符串"
+  },
+  "use_extractors_notifications": {
+    "created_success": "Extractor {{title}} 创建成功",
+    "create_failed": "创建 Extractor 失败：{{error}}",
+    "create_failed_title": "无法创建 Extractor",
+    "updated_success": "Extractor \"{{title}}\" 更新成功",
+    "update_failed": "更新 Extractor 失败：{{error}}",
+    "update_failed_title": "无法更新 Extractor",
+    "deleted_success": "Extractor \"{{title}}\" 删除成功",
+    "delete_failed": "删除 Extractor 失败：{{error}}",
+    "delete_failed_title": "无法删除 Extractor {{title}}",
+    "positions_updated_success": "Extractor 顺序更新成功",
+    "positions_failed": "更改 Extractor 顺序失败：{{error}}",
+    "positions_failed_title": "无法更新 Extractor 顺序",
+    "import_success": "导入结果：已导入 {{successful}} 个 Extractor。",
+    "import_success_title": "导入操作成功",
+    "import_warning": "导入结果：已导入 {{successful}} 个 Extractor，出现 {{failed}} 个错误。",
+    "import_warning_title": "导入操作已完成"
+  }
+}

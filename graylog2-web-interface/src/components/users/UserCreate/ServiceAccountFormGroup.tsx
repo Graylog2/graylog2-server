@@ -16,12 +16,14 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Field } from 'formik';
 
 import { Input, BootstrapModalConfirm } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 
 const ServiceAccountFormGroup = () => {
+  const { t } = useTranslation('users');
   const [showModal, setShowModal] = useState<boolean>(false);
 
   return (
@@ -53,25 +55,24 @@ const ServiceAccountFormGroup = () => {
               id="service-account-controls"
               labelClassName="col-sm-3"
               wrapperClassName="col-sm-9"
-              label="Service Account">
+              label={t('user_form.service_account')}>
               <Input
-                label="User is a Service Account"
+                label={t('user_form.service_account_label')}
                 id="service_account"
                 type="checkbox"
                 wrapperClassName="col-sm-9"
                 name="service_account"
                 checked={value ?? false}
-                help="When checked, the user becomes a Service Account and will be unable to log into the web interface and edit their settings. (e.g., API tokens)"
+                help={t('user_form.service_account_help')}
                 onChange={(newValue) => onValueChange(newValue)}
               />
             </Input>
             <BootstrapModalConfirm
               showModal={showModal}
-              title="Are you sure?"
+              title={t('user_form.service_account_confirm_title')}
               onConfirm={handleCheckServiceAccount}
               onCancel={handleCancel}>
-              Changing this user to a Service Account prevents the user from logging into the web interface and editing
-              their settings. (e.g., API tokens) Do you wish to proceed?
+              {t('user_form.service_account_confirm')}
             </BootstrapModalConfirm>
           </>
         );

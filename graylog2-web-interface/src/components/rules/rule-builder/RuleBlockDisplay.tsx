@@ -16,6 +16,7 @@
  */
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Button, Col, Label, Row, MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import { IconButton } from 'components/common';
@@ -117,6 +118,7 @@ const RuleBlockDisplay = ({
   selectedBlockDict = undefined,
   type,
 }: Props) => {
+  const { t } = useTranslation('pipelines');
   const [showActions, setShowActions] = useState<boolean>(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [highlightedOutput, setHighlightedOutput] = useRuleBuilder().useHighlightedOutput;
@@ -129,7 +131,7 @@ const RuleBlockDisplay = ({
   const readableReturnType = (_type: RuleBuilderTypes): string | undefined => {
     switch (_type) {
       case RuleBuilderTypes.Number:
-        return 'Number';
+        return t('block_display.number');
       default:
         return _type?.slice((_type?.lastIndexOf('.') || 0) + 1);
     }
@@ -174,7 +176,7 @@ const RuleBlockDisplay = ({
                     e.target.blur();
                     onNegate();
                   }}>
-                  Not
+                  {t('block_display.not')}
                 </NegationButton>
               )}
               {highlightedOutput ? highlightedRuleTitle(highlightedOutput, block?.step_title) : block?.step_title}
@@ -182,7 +184,7 @@ const RuleBlockDisplay = ({
                 <span>
                   &nbsp;
                   <DeprecatedLabel bsStyle="warning" bsSize="xs">
-                    Deprecated
+                    {t('block_display.deprecated')}
                   </DeprecatedLabel>
                 </span>
               )}
@@ -205,30 +207,30 @@ const RuleBlockDisplay = ({
       <Col xs={3} md={2} className="text-right">
         {showActions && type === 'condition' && (
           <ActionsContainer>
-            <IconButton name="edit_square" onClick={onEdit} title="Edit" />
-            <IconButton name="delete" onClick={onDelete} title="Delete" />
+            <IconButton name="edit_square" onClick={onEdit} title={t('block_display.edit')} />
+            <IconButton name="delete" onClick={onDelete} title={t('block_display.delete')} />
           </ActionsContainer>
         )}
         {showActions && type === 'action' && (
           <ActionsContainer>
-            <EditIconButton name="edit_square" onClick={onEdit} title="Edit" />
+            <EditIconButton name="edit_square" onClick={onEdit} title={t('block_display.edit')} />
             <OverlayDropdownButton
               title={MORE_ACTIONS_TITLE}
               buttonTitle={MORE_ACTIONS_HOVER_TITLE}
               bsSize="xsmall"
               onToggle={handleDropdownToggle}
               dropdownZIndex={1500}>
-              <MenuItem onClick={onEdit}>Edit</MenuItem>
+              <MenuItem onClick={onEdit}>{t('block_display.edit')}</MenuItem>
               <MenuItem
                 onClick={() => {
                   onDuplicate();
                   handleDropdownToggle();
                 }}>
-                Duplicate
+                {t('block_display.duplicate')}
               </MenuItem>
               <MenuItem divider />
-              <MenuItem onClick={onInsertAbove}>Insert above</MenuItem>
-              <MenuItem onClick={onInsertBelow}>Insert below</MenuItem>
+              <MenuItem onClick={onInsertAbove}>{t('block_display.insert_above')}</MenuItem>
+              <MenuItem onClick={onInsertBelow}>{t('block_display.insert_below')}</MenuItem>
               <MenuItem divider />
               <DeleteMenuItem onClick={onDelete} />
             </OverlayDropdownButton>

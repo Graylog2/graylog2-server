@@ -15,7 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
+import i18n from 'i18n';
 import NumberUtils from 'util/NumberUtils';
 
 import type { ClusterGraylogNode } from '../fetchClusterGraylogNodes';
@@ -39,15 +41,16 @@ const renderThroughputRow = (label: string, formattedValue: string | undefined |
   <MetricsRow key={label}>
     <span>{label}</span>
     <SecondaryText>
-      <span>{formattedValue || 'N/A'}</span>
+      <span>{formattedValue || i18n.t('shared.not_available', { ns: 'system' })}</span>
     </SecondaryText>
   </MetricsRow>
 );
 
 const ThroughputMetricsCell = ({ node }: Props) => {
+  const { t } = useTranslation('system');
   const rows = [
-    { label: 'In', value: formatThroughput(node.metrics?.throughputIn) },
-    { label: 'Out', value: formatThroughput(node.metrics?.throughputOut) },
+    { label: t('throughput_metrics_cell.in'), value: formatThroughput(node.metrics?.throughputIn) },
+    { label: t('throughput_metrics_cell.out'), value: formatThroughput(node.metrics?.throughputOut) },
   ];
 
   const hasThroughput = rows.some(({ value }) => value);

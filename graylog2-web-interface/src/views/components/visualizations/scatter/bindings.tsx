@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { translatedOptions, visT } from 'views/components/visualizations/visualizationTranslation';
 import type { VisualizationType } from 'views/types';
 import ScatterVisualization from 'views/components/visualizations/scatter/ScatterVisualization';
 import { hasAtLeastOneMetric } from 'views/components/visualizations/validations';
@@ -32,7 +33,7 @@ type ScatterVisualizationConfigFormValues = {
   showAxisLabels: boolean;
 };
 
-const validate = hasAtLeastOneMetric('Scatter plot');
+const validate = hasAtLeastOneMetric('vis_validation.scatter_plot_requires_metric');
 
 const scatterChart: VisualizationType<
   typeof ScatterVisualization.type,
@@ -40,7 +41,9 @@ const scatterChart: VisualizationType<
   ScatterVisualizationConfigFormValues
 > = {
   type: ScatterVisualization.type,
-  displayName: 'Scatter Plot',
+  get displayName() {
+    return visT('vis_types.scatter_plot');
+  },
   component: ScatterVisualization,
   config: {
     createConfig: () => ({ axisType: DEFAULT_AXIS_TYPE, axisConfig: DEFAULT_AXIS_CONFIG }),
@@ -56,9 +59,13 @@ const scatterChart: VisualizationType<
     fields: [
       {
         name: 'axisType',
-        title: 'Axis Type',
+        get title() {
+          return visT('vis_common.axis_type');
+        },
         type: 'select',
-        options: axisTypes,
+        get options() {
+          return translatedOptions(axisTypes, 'vis_common.axis_types');
+        },
         required: true,
       },
       ...xyAxisConfigFields,

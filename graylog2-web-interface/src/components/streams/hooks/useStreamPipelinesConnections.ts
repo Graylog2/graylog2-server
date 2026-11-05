@@ -16,6 +16,7 @@
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import i18n from 'i18n';
 import ApiRoutes from 'routing/ApiRoutes';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
@@ -46,15 +47,15 @@ const useStreamPipelinesConnectionMutation = (): {
       });
 
       UserNotification.success(
-        'Saving stream pipelines connection was successful.',
-        'Saving stream pipeline connection.',
+        i18n.t('pipelines_connection_form.save_success', { ns: 'streams' }),
+        i18n.t('pipelines_connection_form.save_title', { ns: 'streams' }),
       );
     },
 
     onError: (errorThrown) => {
       UserNotification.error(
-        `Saving stream pipelines connection failed with status: ${errorThrown}`,
-        'Saving stream pipeline connection.',
+        i18n.t('pipelines_connection_form.save_failed', { ns: 'streams', error: errorThrown }),
+        i18n.t('pipelines_connection_form.save_title', { ns: 'streams' }),
       );
     },
   });

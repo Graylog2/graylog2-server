@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useContext } from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import Spinner from 'components/common/Spinner';
 import Query from 'views/components/Query';
@@ -40,8 +41,9 @@ const StyledCol = styled(Col)`
 
 const SearchLoadingIndicator = () => {
   const isLoading = useIsLoading();
+  const { t } = useTranslation('search');
 
-  return isLoading && <LoadingIndicator text="Updating search results..." />;
+  return isLoading && <LoadingIndicator text={t('results.loading')} />;
 };
 
 type Props = {

@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -52,6 +53,7 @@ const FormGroup = styled.div`
 export const SETUP_WIZARD_INPUT_ID_KEY = 'setup_wizard_input_id';
 
 const CreateInputControl = () => {
+  const { t } = useTranslation('inputs');
   const [showConfigurationForm, setShowConfigurationForm] = useState<boolean>(false);
   const [selectedInput, setSelectedInput] = useState<string | undefined>(undefined);
   const [selectedInputDefinition, setSelectedInputDefinition] = useState<InputDescription | undefined>(undefined);
@@ -122,7 +124,7 @@ const CreateInputControl = () => {
         inputTypeA.label.toLowerCase().localeCompare(inputTypeB.label.toLowerCase()),
       );
     } else {
-      options.push({ value: 'none', label: 'No inputs available', disabled: true });
+      options.push({ value: 'none', label: t('create_input.no_inputs_available'), disabled: true });
     }
 
     return options;
@@ -200,7 +202,7 @@ const CreateInputControl = () => {
         <StyledForm className="form-inline" onSubmit={handleInputTypeSubmit}>
           <FormGroup>
             <Select
-              placeholder="Select input"
+              placeholder={t('create_input.select_input')}
               options={formatSelectOptions()}
               onChange={onInputSelect}
               value={selectedInput}
@@ -208,7 +210,7 @@ const CreateInputControl = () => {
           </FormGroup>
           &nbsp;
           <Button bsStyle="primary" type="submit" disabled={!selectedInput || hasPendingStorageWizard}>
-            Launch new input
+            {t('create_input.launch_new')}
           </Button>
         </StyledForm>
         {selectedInputDefinition &&
@@ -223,10 +225,15 @@ const CreateInputControl = () => {
                 description={selectedInputDefinition.description}
                 title={
                   <span>
-                    Launch new <em>{inputTypes[selectedInput] ?? ''}</em> input
+                    <Trans
+                      t={t}
+                      i18nKey="create_input.launch_new_type"
+                      values={{ type: inputTypes[selectedInput] ?? '' }}
+                      components={{ type: <em /> }}
+                    />
                   </span>
                 }
-                submitButtonText="Launch Input"
+                submitButtonText={t('create_input.launch')}
                 typeName={selectedInput}
                 handleSubmit={createInput}
               />

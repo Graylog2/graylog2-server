@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import ExpandedSectionCount from 'components/common/EntityDataTable/ExpandedSectionCount';
 
@@ -25,13 +26,17 @@ type Props = {
   indexSet: IndexSetEntity;
 };
 
-const StreamCountCell = ({ indexSet }: Props) => (
-  <ExpandedSectionCount
-    entityId={indexSet.id}
-    section={STREAMS_SECTION}
-    count={indexSet.stream_count}
-    label={`associated streams for ${indexSet.title}`}
-  />
-);
+const StreamCountCell = ({ indexSet }: Props) => {
+  const { t } = useTranslation('indexsets');
+
+  return (
+    <ExpandedSectionCount
+      entityId={indexSet.id}
+      section={STREAMS_SECTION}
+      count={indexSet.stream_count}
+      label={t('overview_table.streams_label', { title: indexSet.title })}
+    />
+  );
+};
 
 export default StreamCountCell;

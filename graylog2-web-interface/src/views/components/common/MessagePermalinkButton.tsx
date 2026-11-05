@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
@@ -25,11 +26,12 @@ type Props = {
 };
 
 const MessagePermalinkButton = ({ messageIndex, messageId }: Props) => {
+  const { t } = useTranslation('search');
   const messageUrl = messageIndex ? Routes.message_show(messageIndex, messageId) : '#';
 
   return (
     <Button href={messageUrl} disabled={!messageIndex} bsSize="small">
-      Permalink
+      {t('message_permalink.label')}
     </Button>
   );
 };

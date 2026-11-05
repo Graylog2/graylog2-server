@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import SectionGrid from 'components/common/Section/SectionGrid';
@@ -51,6 +52,7 @@ const StyledReleaseSectionComponent = styled(SectionComponent)<{ $enabled: boole
 );
 
 const ContentStreamSection = () => {
+  const { t } = useTranslation('welcome');
   const { isReleaseSectionEnabledForBrand, isNewsSectionEnabledForBrand } = useWelcomeCustomization();
   const { username } = useCurrentUser();
   const sendTelemetry = useSendTelemetry('content-stream');
@@ -114,7 +116,7 @@ const ContentStreamSection = () => {
     <SectionGrid $columns="1fr 1fr 1fr">
       {isNewsSectionEnabledForBrand && (
         <StyledNewsSectionComponent
-          title="News"
+          title={t('content_stream.news')}
           $enabled={contentStreamEnabled}
           headerActions={<ToggleActionButton onClick={toggleNews} isOpen={contentStreamEnabled} />}>
           {contentStreamEnabled && (
@@ -127,7 +129,7 @@ const ContentStreamSection = () => {
       )}
       {isReleaseSectionEnabledForBrand && (
         <StyledReleaseSectionComponent
-          title="Releases"
+          title={t('content_stream.releases')}
           $enabled={releasesSectionEnabled}
           headerActions={<ToggleActionButton onClick={toggleRelease} isOpen={releasesSectionEnabled} />}>
           {releasesSectionEnabled && <ContentStreamReleasesSection />}

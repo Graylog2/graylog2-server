@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { DataTable } from 'components/common';
 import type { RuleType, RulesContext } from 'components/rules/hooks/useRules';
@@ -22,7 +23,18 @@ import { useProcessingLoadContext, type ProcessingLoadResponse } from 'component
 
 import RuleListEntry from './RuleListEntry';
 
-const headerCellFormatter = (header: React.ReactNode) => <th>{header}</th>;
+// The English header texts identify the columns, the displayed texts are translated.
+const HEADER_KEYS = {
+  Title: 'rule_list.headers.title',
+  Description: 'rule_list.headers.description',
+  Created: 'rule_list.headers.created',
+  'Last modified': 'rule_list.headers.last_modified',
+  Throughput: 'rule_list.headers.throughput',
+  Errors: 'rule_list.headers.errors',
+  'Pipeline Load (15m)': 'rule_list.headers.pipeline_load',
+  Pipelines: 'rule_list.headers.pipelines',
+  Actions: 'rule_list.headers.actions',
+};
 
 type Props = {
   rules: Array<RuleType>;
@@ -43,6 +55,7 @@ const RuleList = ({
   processingLoad: processingLoadProp = undefined,
   processingLoadError: processingLoadErrorProp = undefined,
 }: Props) => {
+  const { t } = useTranslation('pipelines');
   const {
     metricsEnabled,
     processingLoad: processingLoadContext,
@@ -62,6 +75,8 @@ const RuleList = ({
     'Pipelines',
     'Actions',
   ];
+
+  const headerCellFormatter = (header: string) => <th>{t(HEADER_KEYS[header] ?? header)}</th>;
 
   const ruleInfoFormatter = (rule: RuleType) => (
     <RuleListEntry

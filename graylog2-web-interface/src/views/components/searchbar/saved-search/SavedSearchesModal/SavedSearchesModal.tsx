@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Modal, Button } from 'components/bootstrap';
 import type View from 'views/logic/views/View';
@@ -27,22 +28,26 @@ type Props = {
   activeSavedSearchId: string;
 };
 
-const SavedSearchesModal = ({ toggleModal, deleteSavedSearch, activeSavedSearchId }: Props) => (
-  <Modal show bsSize="large" onHide={toggleModal}>
-    <Modal.Header>
-      <Modal.Title>Saved Searches</Modal.Title>
-    </Modal.Header>
-    <Modal.Body>
-      <SavedSearchesOverview
-        deleteSavedSearch={deleteSavedSearch}
-        activeSavedSearchId={activeSavedSearchId}
-        onLoadSavedSearch={toggleModal}
-      />
-    </Modal.Body>
-    <Modal.Footer>
-      <Button onClick={toggleModal}>Cancel</Button>
-    </Modal.Footer>
-  </Modal>
-);
+const SavedSearchesModal = ({ toggleModal, deleteSavedSearch, activeSavedSearchId }: Props) => {
+  const { t } = useTranslation('search');
+
+  return (
+    <Modal show bsSize="large" onHide={toggleModal}>
+      <Modal.Header>
+        <Modal.Title>{t('saved_searches.title')}</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <SavedSearchesOverview
+          deleteSavedSearch={deleteSavedSearch}
+          activeSavedSearchId={activeSavedSearchId}
+          onLoadSavedSearch={toggleModal}
+        />
+      </Modal.Body>
+      <Modal.Footer>
+        <Button onClick={toggleModal}>{t('actions.cancel', { ns: 'common' })}</Button>
+      </Modal.Footer>
+    </Modal>
+  );
+};
 
 export default SavedSearchesModal;

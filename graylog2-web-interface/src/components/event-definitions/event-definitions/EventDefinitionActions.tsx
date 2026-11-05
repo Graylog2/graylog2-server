@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 
 import useHistory from 'routing/useHistory';
@@ -60,26 +61,15 @@ const DIALOG_TYPES = {
 
 type DialogType = (typeof DIALOG_TYPES)[keyof typeof DIALOG_TYPES];
 
-const DIALOG_TEXT = {
-  [DIALOG_TYPES.COPY]: {
-    dialogTitle: 'Copy Event Definition',
-    dialogBody: (definitionTitle: string) => `Are you sure you want to create a copy of "${definitionTitle}"?`,
-  },
-  [DIALOG_TYPES.DELETE]: {
-    dialogTitle: 'Delete Event Definition',
-    dialogBody: (definitionTitle: string) => `Are you sure you want to delete "${definitionTitle}"?`,
-  },
-  [DIALOG_TYPES.DISABLE]: {
-    dialogTitle: 'Disable Event Definition',
-    dialogBody: (definitionTitle: string) => `Are you sure you want to disable "${definitionTitle}"?`,
-  },
-  [DIALOG_TYPES.ENABLE]: {
-    dialogTitle: 'Enable Event Definition',
-    dialogBody: (definitionTitle: string) => `Are you sure you want to enable "${definitionTitle}"?`,
-  },
+const DIALOG_TEXT_KEYS = {
+  [DIALOG_TYPES.COPY]: { dialogTitle: 'page.copy_title', dialogBody: 'page.copy_confirm' },
+  [DIALOG_TYPES.DELETE]: { dialogTitle: 'row_actions.delete_title', dialogBody: 'row_actions.delete_confirm' },
+  [DIALOG_TYPES.DISABLE]: { dialogTitle: 'row_actions.disable_title', dialogBody: 'row_actions.disable_confirm' },
+  [DIALOG_TYPES.ENABLE]: { dialogTitle: 'row_actions.enable_title', dialogBody: 'row_actions.enable_confirm' },
 };
 
 const EventDefinitionActions = ({ eventDefinition }: Props) => {
+  const { t } = useTranslation('event_definitions');
   const queryClient = useQueryClient();
   const { deselectEntity } = useSelectedEntities();
   const { scopePermissions } = useGetPermissionsByScope(eventDefinition);
@@ -107,7 +97,7 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
 
   const getDeleteActionTitle = () => {
     if (isSystemEventDefinition(eventDefinition)) {
-      return 'System Event Definition cannot be deleted';
+      return t('row_actions.system_cannot_be_deleted');
     }
 
     return undefined;
@@ -212,16 +202,16 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
               deselectEntity(currentDefinition.id);
 
               UserNotification.success(
-                'Event Definition deleted successfully',
-                `Event Definition "${eventDefinition.title}" was deleted successfully.`,
+                t('row_actions.delete_success_title'),
+                t('row_actions.delete_success', { title: eventDefinition.title }),
               );
             },
             (error) => {
               const errorStatus = error?.additional?.body?.errors?.dependency.join(' ') || error;
 
               UserNotification.error(
-                `Deleting Event Definition "${eventDefinition.title}" failed with status: ${errorStatus}`,
-                'Could not delete Event Definition',
+                t('row_actions.delete_failed', { title: eventDefinition.title, status: errorStatus }),
+                t('row_actions.delete_failed_title'),
               );
             },
           )
@@ -272,12 +262,14 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
           <MoreActions>
             <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
               <MenuItem onClick={onEditEventDefinition} data-testid="edit-button">
-                Edit
+                {t('row_actions.edit')}
               </MenuItem>
             </IfPermitted>
             <IfPermitted permissions="eventdefinitions:create">
               {!isSystemEventDefinition(eventDefinition) && (
-                <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>
+                <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>
+                  {t('row_actions.duplicate')}
+                </MenuItem>
               )}
               <MenuItem divider />
             </IfPermitted>
@@ -285,14 +277,14 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
               <MenuItem
                 disabled={isSystemEventDefinition(eventDefinition)}
                 title={
-                  isSystemEventDefinition(eventDefinition) ? 'System Event Definition cannot be disabled' : undefined
+                  isSystemEventDefinition(eventDefinition) ? t('row_actions.system_cannot_be_disabled') : undefined
                 }
                 onClick={
                   isSystemEventDefinition(eventDefinition)
                     ? undefined
                     : () => handleAction(isEnabled ? DIALOG_TYPES.DISABLE : DIALOG_TYPES.ENABLE, eventDefinition)
                 }>
-                {isEnabled ? 'Disable' : 'Enable'}
+                {isEnabled ? t('row_actions.disable') : t('row_actions.enable')}
               </MenuItem>
             </IfPermitted>
             {showActions() && (
@@ -329,20 +321,20 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
       </ButtonToolbar>
       {showDialog && (
         <ConfirmDialog
-          title={DIALOG_TEXT[dialogType].dialogTitle}
+          title={t(DIALOG_TEXT_KEYS[dialogType].dialogTitle)}
           show
           onConfirm={handleConfirm}
           onCancel={handleClearState}>
-          {DIALOG_TEXT[dialogType].dialogBody(currentDefinition.title)}
+          {t(DIALOG_TEXT_KEYS[dialogType].dialogBody, { title: currentDefinition.title })}
         </ConfirmDialog>
       )}
       {showEntityShareModal && (
         <EntityShareModal
           entityId={eventDefinition.id}
           entityType="event_definition"
-          entityTypeTitle="event definition"
+          entityTypeTitle={t('row_actions.entity_type_title')}
           entityTitle={eventDefinition.title}
-          description="Search for a User or Team to add as collaborator on this event definition."
+          description={t('row_actions.share_description')}
           onClose={() => setShowEntityShareModal(false)}
         />
       )}

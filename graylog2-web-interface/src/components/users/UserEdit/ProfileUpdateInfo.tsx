@@ -15,14 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Alert } from 'components/bootstrap';
+import useProductName from 'brand-customization/useProductName';
 
-const ProfileUpdateInfo = () => (
-  <Alert bsStyle="info" title="First and Last Name">
-    With Graylog 4.1, we&apos;ve added distinct first and last name fields. These must be provided before the user’s
-    profile can be saved.
-  </Alert>
-);
+const ProfileUpdateInfo = () => {
+  const { t } = useTranslation('users');
+  const productName = useProductName();
+
+  return (
+    <Alert bsStyle="info" title={t('user_edit.profile_info.title')}>
+      {t('user_edit.profile_info.text', { productName })}
+    </Alert>
+  );
+};
 
 export default ProfileUpdateInfo;

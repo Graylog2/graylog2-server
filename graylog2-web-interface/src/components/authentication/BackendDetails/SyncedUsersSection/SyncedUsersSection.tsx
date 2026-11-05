@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import type * as Immutable from 'immutable';
+import { useTranslation } from 'react-i18next';
 
 import type Role from 'logic/roles/Role';
 import type { PaginatedUsers } from 'hooks/useUsers';
@@ -31,19 +32,16 @@ import SyncedUsersOverviewItem from './SyncedUsersOverviewItem';
 import SyncedUsersFilter from './SyncedUsersFilter';
 
 const TABLE_HEADERS = ['Username', 'Full Name', 'Roles', 'Actions'];
+const HEADER_TITLE_KEYS = {
+  Username: 'synced_users.headers.username',
+  'Full Name': 'synced_users.headers.full_name',
+  Roles: 'synced_users.headers.roles',
+  Actions: 'synced_users.headers.actions',
+};
 const DEFAULT_PAGINATION = {
   page: 1,
   perPage: 10,
   query: '',
-};
-
-const _headerCellFormatter = (header: string) => {
-  switch (header.toLowerCase()) {
-    case 'actions':
-      return <th className="actions text-right">{header}</th>;
-    default:
-      return <th>{header}</th>;
-  }
 };
 
 const _loadSyncedTeams = (
@@ -71,6 +69,7 @@ const SyncedUsersSection = ({ roles, authenticationBackend }: Props) => {
   const [pagination, setPagination] = useState(DEFAULT_PAGINATION);
   const { list: users } = paginatedUsers || {};
   const { page } = pagination;
+  const { t } = useTranslation('authentication');
 
   useEffect(
     () => _loadSyncedTeams(authenticationBackend.id, pagination, setLoading, setPaginatedUsers),
@@ -83,9 +82,20 @@ const SyncedUsersSection = ({ roles, authenticationBackend }: Props) => {
 
   const _userOverviewItem = (user: UserOverview) => <SyncedUsersOverviewItem user={user} roles={roles} />;
 
+  const _headerCellFormatter = (header: string) => {
+    const title = t(HEADER_TITLE_KEYS[header]);
+
+    switch (header.toLowerCase()) {
+      case 'actions':
+        return <th className="actions text-right">{title}</th>;
+      default:
+        return <th>{title}</th>;
+    }
+  };
+
   return (
-    <SectionComponent title="Synchronized Users" showLoading={loading}>
-      <p className="description">Found {paginatedUsers.pagination.total} synchronized users.</p>
+    <SectionComponent title={t('synced_users.title')} showLoading={loading}>
+      <p className="description">{t('synced_users.found', { count: paginatedUsers.pagination.total })}</p>
       <PaginatedList
         activePage={page}
         totalItems={paginatedUsers.pagination.total}
@@ -99,11 +109,11 @@ const SyncedUsersSection = ({ roles, authenticationBackend }: Props) => {
           }
           dataRowFormatter={_userOverviewItem}
           filterKeys={[]}
-          filterLabel="Filter Users"
+          filterLabel={t('synced_users.filter_label')}
           headerCellFormatter={_headerCellFormatter}
           headers={TABLE_HEADERS}
           id="synced-users-overview"
-          noDataText={<NoSearchResult>No synchronized users have been found.</NoSearchResult>}
+          noDataText={<NoSearchResult>{t('synced_users.none_found')}</NoSearchResult>}
           rowClassName="no-bm"
           rows={users.toJS()}
           sortByKey="username"

@@ -15,7 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
-const NullCacheSummary = () => <p>This cache has no configuration.</p>;
+const NullCacheSummary = () => {
+  const { t } = useTranslation('lookup_tables');
+
+  return <p>{t('cache_summary.no_configuration')}</p>;
+};
 
 export default NullCacheSummary;

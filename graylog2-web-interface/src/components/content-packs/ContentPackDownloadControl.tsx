@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -31,6 +32,7 @@ type Props = {
 };
 
 const ContentPackDownloadControl = ({ contentPackId, revision, show = false, onHide = () => {} }: Props) => {
+  const { t } = useTranslation('content_packs');
   const [showDownloadModal, setShowDownloadModal] = useState(show);
 
   const getDownloadUrl = () => qualifyUrl(ApiRoutes.ContentPacksController.downloadRev(contentPackId, revision).url);
@@ -40,24 +42,21 @@ const ContentPackDownloadControl = ({ contentPackId, revision, show = false, onH
     onHide();
   };
 
-  const infoText = 'Please right click the download link below and choose "Save Link As..." to download the JSON file.';
-  const modalTitle = 'Download Content Pack';
-
   return (
     <BootstrapModalWrapper showModal={showDownloadModal} onHide={closeModal} bsSize="large">
       <Modal.Header>
-        <Modal.Title>{modalTitle}</Modal.Title>
+        <Modal.Title>{t('download.title')}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p>{infoText}</p>
+        <p>{t('download.info')}</p>
         <p>
           <a href={getDownloadUrl()} target="_blank" rel="noopener noreferrer">
-            <Icon name="download" /> Download
+            <Icon name="download" /> {t('download.download')}
           </a>
         </p>
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={closeModal}>Close</Button>
+        <Button onClick={closeModal}>{t('common:actions.close')}</Button>
       </Modal.Footer>
     </BootstrapModalWrapper>
   );

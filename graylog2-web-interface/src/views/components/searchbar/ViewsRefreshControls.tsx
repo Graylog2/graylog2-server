@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useCallback, useEffect } from 'react';
 import { useFormikContext } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -44,6 +45,7 @@ type Props = {
 const ViewsRefreshControls = ({ disable = false }: Props) => {
   const { dirty, submitForm } = useFormikContext();
   const sendTelemetry = useSendTelemetry('search-bar');
+  const { t } = useTranslation('search');
   const { config } = useSearchConfiguration();
   const autoRefreshTimerangeOptions = config?.auto_refresh_timerange_options;
   const { data: minimumRefreshInterval, isInitialLoading: isLoadingMinimumInterval } = useMinimumRefreshInterval();
@@ -89,7 +91,7 @@ const ViewsRefreshControls = ({ disable = false }: Props) => {
       isLoadingMinimumInterval={isLoadingMinimumInterval}
       minimumRefreshInterval={minimumRefreshInterval}
       defaultInterval={defaultInterval}
-      humanName="Search"
+      humanName={t('search_bar.refresh_human_name')}
       onToggle={onToggle}
       onEnable={submitForm}
       onSelectInterval={onSelectInterval}

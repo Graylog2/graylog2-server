@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Label } from 'components/bootstrap';
 import { Link } from 'components/common';
@@ -38,6 +39,7 @@ const getNodeDisplayName = (node: ClusterGraylogNode) => {
 };
 
 const HostnameCell = ({ node }: Props) => {
+  const { t } = useTranslation('system');
   const nodeId = node.node_id;
   const nodeName = getNodeDisplayName(node);
 
@@ -46,7 +48,7 @@ const HostnameCell = ({ node }: Props) => {
       {nodeId ? <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(nodeId)}>{nodeName}</Link> : nodeName}
       {node.is_leader && (
         <SecondaryText>
-          <Label bsSize="xs">Leader</Label>
+          <Label bsSize="xs">{t('shared.leader')}</Label>
         </SecondaryText>
       )}
     </NodePrimary>

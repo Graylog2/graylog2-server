@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import UserNotification from 'util/UserNotification';
+import translateApiError from 'util/translateApiError';
 
 export async function onError<T, E = Error>(promise: Promise<T>, handler: (e: E) => void) {
   try {
@@ -42,7 +43,7 @@ export async function onSettled<T, R, E = Error>(
 }
 
 export function defaultOnError<T>(promise: Promise<T>, message: string, title?: string) {
-  return onError(promise, (error: Error) => UserNotification.error(`${message}: ${error}`, title));
+  return onError(promise, (error: Error) => UserNotification.error(`${message}: ${translateApiError(error) ?? error}`, title));
 }
 
 export const wrapWithOnError =

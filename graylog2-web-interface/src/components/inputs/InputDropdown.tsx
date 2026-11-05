@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import * as Immutable from 'immutable';
@@ -45,10 +46,11 @@ type InputType = {
 };
 
 const InputOption = ({ input }: { input: InputType }) => {
+  const { t } = useTranslation('inputs');
   const inputTypes = useInputTypes();
-  const inputType = inputTypes?.[input.type] ?? 'Unknown Input Type';
+  const inputType = inputTypes?.[input.type] ?? t('input_dropdown.unknown_type');
 
-  return <option value={input.id}>{`${input.title} (${inputType})`}</option>;
+  return <option value={input.id}>{t('input_dropdown.option', { title: input.title, type: inputType })}</option>;
 };
 
 const _formatInput = (input: InputType) => <InputOption key={input.id} input={input} />;
@@ -76,6 +78,7 @@ const InputDropdown = ({
   preselectedInputId = undefined,
   title,
 }: Props) => {
+  const { t } = useTranslation('inputs');
   const [selectedInput, setSelectedInput] = useState(preselectedInputId || PLACEHOLDER);
   const onSelectedInputChange = useCallback((event) => setSelectedInput(event.target.value), []);
   const _onLoadMessage = useCallback(() => onLoadMessage(selectedInput), [onLoadMessage, selectedInput]);
@@ -102,11 +105,11 @@ const InputDropdown = ({
         <StyledInputDropdown
           id="placeholder-select"
           type="select"
-          aria-label="server input select"
+          aria-label={t('input_dropdown.label')}
           value={selectedInput}
           onChange={onSelectedInputChange}
           placeholder={PLACEHOLDER}>
-          <option value={PLACEHOLDER}>Select an Input</option>
+          <option value={PLACEHOLDER}>{t('input_dropdown.select')}</option>
           {inputOptions.toArray()}
         </StyledInputDropdown>
 

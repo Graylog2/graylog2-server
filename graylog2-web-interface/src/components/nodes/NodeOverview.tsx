@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import { useTranslation } from 'react-i18next';
 
 import { LinkContainer } from 'components/common';
 import { Row, Col, Button } from 'components/bootstrap';
@@ -85,12 +86,13 @@ const NodeOverview = ({
   jvmInformation = null,
   systemOverview,
 }: Props) => {
+  const { t } = useTranslation('system');
   const DataLakeJournal = PluginStore.exports('dataLake')?.[0]?.DataLakeJournal;
-  const pluginCount = `${plugins?.length || 0} plugins installed`;
+  const pluginCount = t('node_overview.plugins_installed', { count: plugins?.length || 0 });
 
   const runningInputs = inputStates?.filter((inputState) => inputState.state.toUpperCase() === 'RUNNING');
 
-  const inputCount = `${runningInputs?.length || 0} inputs running on this node`;
+  const inputCount = t('node_overview.inputs_running', { count: runningInputs?.length || 0 });
 
   return (
     <div>
@@ -102,27 +104,24 @@ const NodeOverview = ({
 
       <Row className="content">
         <Col md={12}>
-          <h2 style={{ marginBottom: 5 }}>Memory/Heap usage</h2>
+          <h2 style={{ marginBottom: 5 }}>{t('node_overview.memory_heap_usage')}</h2>
           <JvmHeapUsage nodeId={node.node_id} />
         </Col>
       </Row>
 
       <Row className="content">
         <Col md={12}>
-          <h2>Buffers</h2>
-          <p className="description">
-            Buffers are built to cache small amounts of messages for a very short time (usually milliseconds) on their
-            way through the different processors.
-          </p>
+          <h2>{t('node_overview.buffers')}</h2>
+          <p className="description">{t('node_overview.buffers_description')}</p>
           <Row>
             <Col md={4}>
-              <BufferUsage nodeId={node.node_id} title="Input buffer" bufferType="input" />
+              <BufferUsage nodeId={node.node_id} title={t('node_overview.input_buffer')} bufferType="input" />
             </Col>
             <Col md={4}>
-              <BufferUsage nodeId={node.node_id} title="Process buffer" bufferType="process" />
+              <BufferUsage nodeId={node.node_id} title={t('node_overview.process_buffer')} bufferType="process" />
             </Col>
             <Col md={4}>
-              <BufferUsage nodeId={node.node_id} title="Output buffer" bufferType="output" />
+              <BufferUsage nodeId={node.node_id} title={t('node_overview.output_buffer')} bufferType="output" />
             </Col>
           </Row>
         </Col>
@@ -130,24 +129,19 @@ const NodeOverview = ({
 
       <Row className="content">
         <Col md={12}>
-          <h2>Disk Journal</h2>
-          <p className="description">
-            Incoming messages are written to the disk journal to ensure they are kept safe in case of a server failure.
-            The journal also helps maintain functionality if any of the outputs is too slow to keep up with the message
-            rate or whenever there is a peak in incoming messages. It makes sure that memory is not overloaded and
-            avoids overly long garbage collection pauses that way.
-          </p>
+          <h2>{t('node_overview.disk_journal')}</h2>
+          <p className="description">{t('node_overview.disk_journal_description')}</p>
           <JournalDetails nodeId={node.node_id} />
         </Col>
       </Row>
       {DataLakeJournal && <DataLakeJournal nodeId={node.node_id} />}
       <Row className="content">
         <Col md={6}>
-          <h2>System</h2>
+          <h2>{t('node_overview.system')}</h2>
           <SystemInformation node={node} systemInformation={systemOverview} jvmInformation={jvmInformation} />
         </Col>
         <Col md={6}>
-          <h2>REST API</h2>
+          <h2>{t('node_overview.rest_api')}</h2>
           <RestApiOverview node={node} />
         </Col>
       </Row>
@@ -155,7 +149,7 @@ const NodeOverview = ({
       <Row className="content">
         <Col md={12}>
           <h2>
-            Installed plugins <small>{pluginCount}</small>
+            {t('node_overview.installed_plugins')} <small>{pluginCount}</small>
           </h2>
           <PluginsDataTable plugins={plugins} />
         </Col>
@@ -167,13 +161,13 @@ const NodeOverview = ({
             <span className="pull-right">
               <LinkContainer to={Routes.node_inputs(node.node_id)}>
                 <Button bsStyle="primary" bsSize="small">
-                  Manage inputs
+                  {t('node_overview.manage_inputs')}
                 </Button>
               </LinkContainer>
             </span>
           </HideOnCloud>
           <h2 style={{ marginBottom: 15 }}>
-            Available input types <small>{inputCount}</small>
+            {t('node_overview.available_input_types')} <small>{inputCount}</small>
           </h2>
           <InputTypesDataTable inputDescriptions={inputDescriptions} />
         </Col>

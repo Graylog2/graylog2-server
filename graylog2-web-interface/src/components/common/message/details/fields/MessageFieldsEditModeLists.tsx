@@ -16,6 +16,7 @@
  */
 
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { SortableList } from 'components/common';
@@ -47,6 +48,7 @@ const MessageFieldsEditModeFavoritesList = ({
   onFavoriteToggle,
   reorderFavoriteFields,
 }: MessageFieldsListProps) => {
+  const { t } = useTranslation('common');
   const customContentRender = useCallback(
     ({ item: { field, value, type } }) => (
       <MessageFieldEditModeListItem
@@ -65,7 +67,7 @@ const MessageFieldsEditModeFavoritesList = ({
 
   return (
     <>
-      <h3>Favorite fields</h3>
+      <h3>{t('message.favorite_fields')}</h3>
       <Container>
         <SortableList<FormattedField>
           items={fields}
@@ -80,11 +82,12 @@ const MessageFieldsEditModeFavoritesList = ({
 };
 
 const MessageFieldsEditModeRestList = ({ fields, onFavoriteToggle }: MessageFieldsListProps) => {
+  const { t } = useTranslation('common');
   if (!fields.length) return null;
 
   return (
     <>
-      <h3>Remaining fields</h3>
+      <h3>{t('message.remaining_fields')}</h3>
       <Container>
         {fields.map(({ field, type, value }) => (
           <ItemContainer key={field}>

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { Button } from 'components/bootstrap';
@@ -34,11 +35,15 @@ const StyledButton = styled(Button)(
     }
   `,
 );
-const ToggleActionButton = ({ onClick, isOpen }: Props) => (
-  <StyledButton bsStyle="link" onClick={() => onClick()} type="button">
-    {isOpen ? 'Close' : 'Open'}
-    <Icon name={isOpen ? 'keyboard_arrow_down' : 'chevron_right'} />
-  </StyledButton>
-);
+const ToggleActionButton = ({ onClick, isOpen }: Props) => {
+  const { t } = useTranslation('welcome');
+
+  return (
+    <StyledButton bsStyle="link" onClick={() => onClick()} type="button">
+      {isOpen ? t('content_stream.close') : t('content_stream.open')}
+      <Icon name={isOpen ? 'keyboard_arrow_down' : 'chevron_right'} />
+    </StyledButton>
+  );
+};
 
 export default ToggleActionButton;

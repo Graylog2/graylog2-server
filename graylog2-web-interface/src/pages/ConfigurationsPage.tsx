@@ -18,6 +18,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { Navigate, Routes, Route, useResolvedPath } from 'react-router-dom';
 import URI from 'urijs';
+import { useTranslation } from 'react-i18next';
 
 import type { CoreSystemConfiguration } from 'views/types';
 import ConfigletRow from 'pages/configurations/ConfigletRow';
@@ -41,10 +42,11 @@ const SubNavIconOpen = styled(Icon)`
 
 type SectionLinkProps = {
   name: string;
+  label?: string;
   showCaret: boolean;
 };
 
-const SectionLink = ({ name, showCaret }: SectionLinkProps) => {
+const SectionLink = ({ name, label = undefined, showCaret }: SectionLinkProps) => {
   const absolutePath = useResolvedPath(name);
   const location = useLocation();
 
@@ -54,8 +56,8 @@ const SectionLink = ({ name, showCaret }: SectionLinkProps) => {
   return (
     <SectionNavItem className={isActive ? 'active' : undefined}>
       <LinkContainer key={`nav-${name}`} to={name}>
-        <NavItem title={name} withMinHeight={false}>
-          {name}
+        <NavItem title={label ?? name} withMinHeight={false}>
+          {label ?? name}
           {showCaret &&
             (isActive ? <SubNavIconClosed name="arrow_right" /> : <SubNavIconOpen name="arrow_drop_down" />)}
         </NavItem>
@@ -65,6 +67,7 @@ const SectionLink = ({ name, showCaret }: SectionLinkProps) => {
 };
 
 const ConfigurationsPage = () => {
+  const { t } = useTranslation('system');
   const coreSystemConfigurations = usePluginEntities('coreSystemConfigurations');
   const { isPermitted } = usePermissions();
 
@@ -72,6 +75,7 @@ const ConfigurationsPage = () => {
     ...coreSystemConfigurations,
     {
       name: 'Plugins',
+      displayName: t('configurations_page.plugins'),
       SectionComponent: PluginsConfig,
       showCaret: true,
       catchAll: true,
@@ -79,16 +83,16 @@ const ConfigurationsPage = () => {
   ].filter(({ permissions }) => (permissions ? isPermitted(permissions) : true));
 
   return (
-    <DocumentTitle title="Configurations">
-      <PageHeader title="Configurations">
-        <span>You can configure system settings for different sub systems on this page.</span>
+    <DocumentTitle title={t('configurations_page.title')}>
+      <PageHeader title={t('configurations_page.title')}>
+        <span>{t('configurations_page.description')}</span>
       </PageHeader>
 
       <ConfigletRow className="content">
         <Col md={2}>
           <SectionNav>
-            {configurationSections.map(({ name, showCaret }) => (
-              <SectionLink key={`nav-${name}`} name={name} showCaret={showCaret} />
+            {configurationSections.map(({ name, displayName, showCaret }) => (
+              <SectionLink key={`nav-${name}`} name={name} label={displayName} showCaret={showCaret} />
             ))}
           </SectionNav>
         </Col>

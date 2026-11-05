@@ -16,37 +16,38 @@
  */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { MantineAccordion } from 'components/bootstrap';
 import useProductName from 'brand-customization/useProductName';
 
 const CaffeineCacheDocumentation = () => {
+  const { t } = useTranslation('lookup_tables');
   const productName = useProductName();
 
   const accordionItems = [
     {
       value: 'cache_size',
-      label: 'Cache Size',
-      content: <p>Every cache has a maximum number of entries, unbounded caches are not supported.</p>,
+      label: t('caffeine_doc.cache_size_label'),
+      content: <p>{t('caffeine_doc.cache_size_text')}</p>,
     },
     {
       value: 'time_based_expiration',
-      label: 'Time Based Expiration',
+      label: t('caffeine_doc.time_based_label'),
       content: (
         <div>
-          <h5 style={{ marginBottom: 10 }}>Expire after access</h5>
+          <h5 style={{ marginBottom: 10 }}>{t('caffeine_doc.expire_access_title')}</h5>
           <p style={{ marginBottom: 10, padding: 0 }}>
-            The cache will remove entries after a fixed time since they have been used the last time.
+            {t('caffeine_doc.expire_access_text')}
             <br />
-            This results in the cache behaving as a space limited least recently used cache.
+            {t('caffeine_doc.expire_access_result')}
           </p>
 
-          <h5 style={{ marginBottom: 10 }}>Expire after write</h5>
+          <h5 style={{ marginBottom: 10 }}>{t('caffeine_doc.expire_write_title')}</h5>
           <p style={{ marginBottom: 10, padding: 0 }}>
-            The cache will remove entries after a fixed time since they have been entered into the cache.
+            {t('caffeine_doc.expire_write_text')}
             <br />
-            This results in entries that are never older than the given time, which can be important for regularly
-            changing data, such as configuration state of external systems.
+            {t('caffeine_doc.expire_write_result')}
           </p>
         </div>
       ),
@@ -55,14 +56,11 @@ const CaffeineCacheDocumentation = () => {
 
   return (
     <div>
-      <p>The in-memory cache maintains recently used values from data adapters.</p>
-      <p>
-        Please make sure your {productName} servers have enough heap to accommodate the cached entries and monitor the
-        cache efficiency.
-      </p>
+      <p>{t('caffeine_doc.intro')}</p>
+      <p>{t('caffeine_doc.heap_hint', { productName })}</p>
 
-      <p>The cache is local to each {productName} server, they do not share the entries.</p>
-      <p>For example, if you have two servers, they will maintain a completely independent cache from each other.</p>
+      <p>{t('caffeine_doc.local_hint', { productName })}</p>
+      <p>{t('caffeine_doc.example')}</p>
 
       <hr />
 

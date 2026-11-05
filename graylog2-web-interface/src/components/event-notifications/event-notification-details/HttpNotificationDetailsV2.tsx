@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ReadOnlyFormGroup } from 'components/common';
 import type { HttpEventNotificationV2 } from 'components/event-notifications/types';
@@ -27,28 +28,35 @@ type Props = {
 };
 
 const HttpNotificationDetailsV2 = ({ notification }: Props) => {
+  const { t } = useTranslation('event_notifications');
   const apiKeySet: boolean = notification.config.api_secret?.is_set;
-  const apiSentAs: string = notification.config.api_key_as_header ? 'Header' : 'Query Parameter';
+  const apiSentAs: string = notification.config.api_key_as_header
+    ? t('http_details.header')
+    : t('http_details.query_parameter');
 
   return (
     <>
-      <ReadOnlyFormGroup label="URL" value={notification.config.url} />
+      <ReadOnlyFormGroup label={t('http_details.url')} value={notification.config.url} />
       <ReadOnlyFormGroup
-        label="Basic Authentication"
+        label={t('http_details.basic_auth')}
         value={notification.config.basic_auth?.is_set ? '******' : null}
       />
-      <ReadOnlyFormGroup label="API Key/Secret Sent As" value={apiKeySet ? apiSentAs : null} />
-      <ReadOnlyFormGroup label="API Key" value={notification.config.api_key} />
-      <ReadOnlyFormGroup label="API Secret" value={apiKeySet ? '******' : null} />
-      <ReadOnlyFormGroup label="Method" value={notification.config.method} />
-      {notification.config.time_zone && <ReadOnlyFormGroup label="Time Zone" value={notification.config.time_zone} />}
-      {notification.config.content_type && (
-        <ReadOnlyFormGroup label="Content Type" value={notification.config.content_type} />
+      <ReadOnlyFormGroup label={t('http_details.api_key_sent_as')} value={apiKeySet ? apiSentAs : null} />
+      <ReadOnlyFormGroup label={t('http_details.api_key')} value={notification.config.api_key} />
+      <ReadOnlyFormGroup label={t('http_details.api_secret')} value={apiKeySet ? '******' : null} />
+      <ReadOnlyFormGroup label={t('http_details.method')} value={notification.config.method} />
+      {notification.config.time_zone && (
+        <ReadOnlyFormGroup label={t('http_details.time_zone')} value={notification.config.time_zone} />
       )}
-      {notification.config.headers && <ReadOnlyFormGroup label="Headers" value={notification.config.headers} />}
+      {notification.config.content_type && (
+        <ReadOnlyFormGroup label={t('http_details.content_type')} value={notification.config.content_type} />
+      )}
+      {notification.config.headers && (
+        <ReadOnlyFormGroup label={t('http_details.headers')} value={notification.config.headers} />
+      )}
       {notification.config.body_template && (
         <ReadOnlyFormGroup
-          label="Body Template"
+          label={t('http_details.body_template')}
           value={
             <Well bsSize="small" className={styles.bodyPreview}>
               {notification.config.body_template}

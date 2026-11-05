@@ -17,6 +17,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
@@ -42,23 +43,24 @@ function LUTDataAdaptersFormPage() {
   const { adapterIdOrName } = useParams<{ adapterIdOrName: string }>();
   const { dataAdapter, loadingDataAdapter } = useFetchDataAdapter(adapterIdOrName);
   const { push } = useHistory();
+  const { t } = useTranslation('lookup_tables');
   const navigateBack = () => push(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW);
 
   return (
     <FlexContainer>
       <LUTPageLayout
-        documentTitle="Lookup Tables - Data Adapters Create"
-        pageTitle="Create Data Adapters for Lookup Tables"
-        pageDescription="Data adapters provide the actual values for lookup tables."
+        documentTitle={t('adapter_create_document_title')}
+        pageTitle={t('adapter_create_page_title')}
+        pageDescription={t('adapter_create_description')}
         actions={
           <Button bsStyle="primary" onClick={navigateBack}>
-            Back to list
+            {t('back_to_list')}
           </Button>
         }>
         <Row className="content" style={{ flexGrow: 1 }}>
           <FlexCol md={12}>
             {loadingDataAdapter ? (
-              <Spinner text="Loading Data Adapter" />
+              <Spinner text={t('loading_adapter')} />
             ) : (
               <DataAdapterFormView onCancel={navigateBack} saved={navigateBack} adapter={dataAdapter} />
             )}

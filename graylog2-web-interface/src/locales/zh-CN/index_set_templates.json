@@ -1,0 +1,14 @@
+{
+  "7 Days Hot, 90 Days Total": "Hot 7 天，共 90 天",
+  "14 Days Hot, 90 Days Total.": "Hot 14 天，共 90 天",
+  "30 days Hot, 90 Days Total": "Hot 30 天，共 90 天",
+  "7 Days Hot": "Hot 7 天",
+  "14 Days Hot": "Hot 14 天",
+  "30 Days Hot": "Hot 30 天",
+  "Use case: minimal need for historical searches. This configuration has low memory and storage usage. Logs will be searchable for a minimum of 90 days.": "使用场景：极少需要历史搜索。此配置的内存和存储占用较低。日志至少可搜索 90 天。",
+  "Use case: regular need for historical searches. Logs will be searchable for a minimum of 90 days.": "使用场景：定期需要历史搜索。日志至少可搜索 90 天。",
+  "Use case: need for frequent and deep historical searches. This configuration has high memory and storage usage. Logs will be searchable for a minimum of 90 days.": "使用场景：需要频繁且深入的历史搜索。此配置的内存和存储占用较高。日志至少可搜索 90 天。",
+  "Use case: rare historical searches. This configuration maintains a minimum of 7 days of logs in the Hot Tier.": "使用场景：很少进行历史搜索。此配置在 Hot Tier 中至少保留 7 天的日志。",
+  "Use case: some historical searches. This configuration maintains a minimum of 14 days of logs in the Hot Tier.": "使用场景：偶尔进行历史搜索。此配置在 Hot Tier 中至少保留 14 天的日志。",
+  "Use case: frequent historical searches. This configuration maintains a minimum of 30 days of logs in the Hot Tier.": "使用场景：频繁进行历史搜索。此配置在 Hot Tier 中至少保留 30 天的日志。"
+}

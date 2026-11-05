@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import styled, { css, useTheme } from 'styled-components';
 
 import Tooltip from 'components/common/Tooltip';
@@ -114,6 +115,7 @@ const DataTieringVisualisation = ({
   minDaysInHot = 0,
   warmTierEnabled = false,
 }: Props) => {
+  const { t } = useTranslation('indexsets');
   const theme = useTheme();
 
   const percentageFor = (days: number) => {
@@ -131,15 +133,17 @@ const DataTieringVisualisation = ({
     <VisualisationWrapper>
       <BarWrapper>
         <AnnotationBar>
-          {minDaysPercentage > 0 && <Label value={minDaysPercentage}>{minDays} days</Label>}
+          {minDaysPercentage > 0 && (
+            <Label value={minDaysPercentage}>{t('data_tiering.days', { count: minDays })}</Label>
+          )}
           {showHotTier && minDaysInHotPercentage !== minDaysPercentage && (
-            <Label value={minDaysInHotPercentage}>{minDaysInHot} days</Label>
+            <Label value={minDaysInHotPercentage}>{t('data_tiering.days', { count: minDaysInHot })}</Label>
           )}
         </AnnotationBar>
 
         <LifeCycleBar>
           <Tooltip
-            label="Min. # of days in storage"
+            label={t('data_tiering.tooltip_min_storage')}
             position={minDaysPercentage <= PERCENTAGE_SPACING_THRESHOLD ? 'bottom-start' : 'bottom-end'}
             withArrow>
             <Bar value={minDaysPercentage} color={theme.colors.variant.info} />
@@ -148,8 +152,8 @@ const DataTieringVisualisation = ({
             <Tooltip
               label={
                 minDaysInHotPercentage === minDaysPercentage
-                  ? 'Min. # of days in Hot Tier and storage'
-                  : 'Min. # of days in Hot Tier'
+                  ? t('data_tiering.tooltip_min_hot_and_storage')
+                  : t('data_tiering.tooltip_min_hot')
               }
               position={minDaysInHotPercentage <= PERCENTAGE_SPACING_THRESHOLD ? 'bottom-start' : 'bottom-end'}
               withArrow>
@@ -159,7 +163,12 @@ const DataTieringVisualisation = ({
         </LifeCycleBar>
       </BarWrapper>
       <MaxDaysLabel>
-        {archiveData ? 'Archived and deleted' : 'Deleted'} after <strong>{maxDays} days</strong>
+        <Trans
+          t={t}
+          i18nKey={archiveData ? 'data_tiering.archived_deleted_after' : 'data_tiering.deleted_after'}
+          count={maxDays}
+          components={{ strong: <strong /> }}
+        />
       </MaxDaysLabel>
     </VisualisationWrapper>
   );

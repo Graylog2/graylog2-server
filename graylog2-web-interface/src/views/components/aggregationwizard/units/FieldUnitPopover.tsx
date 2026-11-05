@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useMemo, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { styled, css } from 'styled-components';
 import { Field, useFormikContext } from 'formik';
-import capitalize from 'lodash/capitalize';
 
 import Select from 'components/common/Select';
 import Popover from 'components/common/Popover';
@@ -28,6 +28,7 @@ import { mappedUnitsFromJSONForAggregation as units } from 'views/components/vis
 import type { FieldUnitsFormValues } from 'views/types';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 import getUnitTextLabel from 'views/components/visualizations/utils/getUnitTextLabel';
+import { unitNameLabel, unitTypeLabel } from 'views/components/visualizations/utils/unitLabels';
 
 const Container = styled.div`
   display: flex;
@@ -65,15 +66,22 @@ const StyledButton = styled(Button)(
 );
 
 const FieldUnitPopover = ({ field, predefinedUnit }: { field: string; predefinedUnit: FieldUnit }) => {
+  const { t } = useTranslation('aggregation');
   const [show, setShow] = useState(false);
   const { setFieldValue, values } = useFormikContext<{ units: FieldUnitsFormValues }>();
   const currentUnitType = useMemo<string>(() => values?.units?.[field]?.unitType, [values, field]);
-  const unitTypesOptions = useMemo(() => Object.keys(units).map((key) => ({ value: key, label: capitalize(key) })), []);
+  // `t` is a dependency, so the labels follow the language of the UI.
+  const unitTypesOptions = useMemo(
+    () => Object.keys(units).map((key) => ({ value: key, label: unitTypeLabel(key) })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [t],
+  );
   const unitOptions = useMemo(
     () =>
       currentUnitType &&
-      units[currentUnitType].map(({ abbrev, name }: Unit) => ({ value: abbrev, label: capitalize(name) })),
-    [currentUnitType],
+      units[currentUnitType].map(({ abbrev, name }: Unit) => ({ value: abbrev, label: unitNameLabel(name) })),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentUnitType, t],
   );
   const toggleShow = () => setShow((cur) => !cur);
   const onUnitTypeChange = useCallback(
@@ -93,15 +101,19 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string; predefined
   const predefinedInfo = useMemo(() => {
     if (!predefinedUnit?.isDefined) return null;
 
-    const unitName = units[predefinedUnit?.unitType].find(({ abbrev }) => abbrev === predefinedUnit?.abbrev).name;
+    const unitName = unitNameLabel(
+      units[predefinedUnit?.unitType].find(({ abbrev }) => abbrev === predefinedUnit?.abbrev).name,
+    );
 
     return (
-      <>
-        Unit <b>{unitName}</b> was configured for field <b>{field}</b>. Changing this unit might represent data
-        incorrectly on the charts.
-      </>
+      <Trans
+        t={t}
+        i18nKey="wizard_units.predefined_unit"
+        values={{ unit: unitName, field }}
+        components={{ bold: <b /> }}
+      />
     );
-  }, [field, predefinedUnit?.abbrev, predefinedUnit?.isDefined, predefinedUnit?.unitType]);
+  }, [field, predefinedUnit?.abbrev, predefinedUnit?.isDefined, predefinedUnit?.unitType, t]);
 
   const onClear = useCallback(() => {
     setFieldValue(`units.${field}`, undefined);
@@ -112,18 +124,18 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string; predefined
     <Popover position="right" opened={show} withArrow>
       <Popover.Target>
         <ButtonContainer>
-          <StyledButton bsSize="xs" onClick={toggleShow} title={`${field} unit settings`}>
+          <StyledButton bsSize="xs" onClick={toggleShow} title={t('wizard_units.unit_settings', { field })}>
             {badgeLabel}
           </StyledButton>
         </ButtonContainer>
       </Popover.Target>
-      <Popover.Dropdown title={`${field} unit settings`}>
+      <Popover.Dropdown title={t('wizard_units.unit_settings', { field })}>
         <Container>
           <Field name={`units.${field}.unitType`}>
             {({ field: { name, value }, meta: { error } }) => (
               <Input
                 id="metric-unit-type-field"
-                label="Type"
+                label={t('wizard_units.type')}
                 error={error}
                 labelClassName="col-sm-3"
                 wrapperClassName="col-sm-9">
@@ -132,7 +144,7 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string; predefined
                   onChange={onUnitTypeChange}
                   name={name}
                   value={value}
-                  aria-label="Select a unit type"
+                  aria-label={t('wizard_units.select_unit_type')}
                   options={unitTypesOptions}
                   size="small"
                 />
@@ -146,10 +158,8 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string; predefined
                   id="metric-unit-field"
                   label={
                     <span>
-                      Unit{' '}
-                      <HoverForHelp displayLeftMargin>
-                        Unit used to calculate the displayed value on charts.
-                      </HoverForHelp>
+                      {t('wizard_units.unit')}{' '}
+                      <HoverForHelp displayLeftMargin>{t('wizard_units.unit_help')}</HoverForHelp>
                     </span>
                   }
                   error={error}
@@ -160,7 +170,7 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string; predefined
                     onChange={(fieldName) => onChange({ target: { name, value: fieldName } })}
                     name={name}
                     value={value}
-                    aria-label="Select a unit"
+                    aria-label={t('wizard_units.select_unit')}
                     options={unitOptions}
                     size="small"
                   />
@@ -171,10 +181,10 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string; predefined
           {predefinedInfo && <Alert bsStyle="info">{predefinedInfo}</Alert>}
           <ModalButtonToolbar>
             <Button bsSize="xs" onClick={onClear}>
-              Clear
+              {t('wizard_units.clear')}
             </Button>
             <Button bsSize="xs" bsStyle="primary" onClick={toggleShow}>
-              OK
+              {t('wizard_units.ok')}
             </Button>
           </ModalButtonToolbar>
         </Container>

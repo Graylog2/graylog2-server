@@ -18,6 +18,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { ContentStream } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import UserNotification from 'util/UserNotification';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { CONTENT_STREAM_CONTENT_KEY } from 'components/content-stream/hook/useContentStream';
@@ -74,8 +75,8 @@ const useContentStreamSettings = (): {
     queryFn: () =>
       defaultOnError(
         getContentStreamUserSettings(currentUser.username),
-        'Loading content stream config failed with status',
-        'Could not load content stream.',
+        i18n.t('content_stream.load_config_failed', { ns: 'welcome' }),
+        i18n.t('content_stream.load_config_failed_title', { ns: 'welcome' }),
       ),
   });
   const {
@@ -89,8 +90,8 @@ const useContentStreamSettings = (): {
     queryFn: () =>
       defaultOnError(
         getContentStreamTags(),
-        'Loading content stream tag failed with status',
-        'Could not load content stream tags.',
+        i18n.t('content_stream.load_tags_failed', { ns: 'welcome' }),
+        i18n.t('content_stream.load_tags_failed_title', { ns: 'welcome' }),
       ),
   });
   const { mutateAsync: onSaveContentStreamSetting } = useMutation({
@@ -105,8 +106,8 @@ const useContentStreamSettings = (): {
 
     onError: (errorThrown) => {
       UserNotification.error(
-        `Enabling content stream failed with status: ${errorThrown}`,
-        'Could not cancel instant archiving jobs',
+        i18n.t('content_stream.update_failed', { ns: 'welcome', error: errorThrown }),
+        i18n.t('content_stream.update_failed_title', { ns: 'welcome' }),
       );
     },
   });

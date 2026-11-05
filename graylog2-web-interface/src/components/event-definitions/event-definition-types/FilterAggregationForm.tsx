@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import isEmpty from 'lodash/isEmpty';
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -65,6 +66,7 @@ type Props = {
 };
 
 const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validation, onChange }: Props) => {
+  const { t } = useTranslation('event_definitions');
   const { group_by, series, conditions } = eventDefinition.config;
   const expression = conditions?.expression ?? {};
   const [conditionType, setConditionType] = useState(
@@ -129,14 +131,14 @@ const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validati
 
           {onlyFilters || (
             <FormGroup>
-              <ControlLabel>Create Events for Definition if...</ControlLabel>
+              <ControlLabel>{t('filter_aggregation_form.create_events_if')}</ControlLabel>
               <Radio
                 id="filter-type"
                 name="conditionType"
                 value={conditionTypes.FILTER}
                 checked={conditionType === conditionTypes.FILTER}
                 onChange={handleTypeChange}>
-                Filter has results
+                {t('filter_aggregation_form.filter_has_results')}
               </Radio>
               <Radio
                 id="aggregation-type"
@@ -144,7 +146,7 @@ const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validati
                 value={conditionTypes.AGGREGATION}
                 checked={conditionType === conditionTypes.AGGREGATION}
                 onChange={handleTypeChange}>
-                Aggregation of results reaches a threshold
+                {t('filter_aggregation_form.aggregation_reaches_threshold')}
               </Radio>
             </FormGroup>
           )}
@@ -154,13 +156,10 @@ const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validati
                 <Input
                   id="event-limit"
                   name="event_limit"
-                  label="Event Limit"
+                  label={t('filter_aggregation_form.event_limit')}
                   type="number"
                   bsStyle={validation.errors.event_limit ? 'error' : null}
-                  help={
-                    (validation?.errors?.event_limit ??
-                      'Maximum number of events to be created per execution of this event definition. Excess events will be suppressed.') as string
-                  }
+                  help={(validation?.errors?.event_limit ?? t('filter_aggregation_form.event_limit_help')) as string}
                   value={eventDefinition.config.event_limit}
                   onChange={handleConfigChange}
                   required

@@ -70,6 +70,7 @@ const bindings = {
     {
       type: 'pagerduty-notification-v2',
       displayName: 'PagerDuty Notification [Official]',
+      displayNameKey: 'event_notifications:types.pagerduty',
       formComponent: PagerDutyNotificationForm,
       summaryComponent: PagerDutyNotificationSummary,
       detailsComponent: PagerDutyNotificationDetails,
@@ -78,6 +79,7 @@ const bindings = {
     {
       type: 'slack-notification-v1',
       displayName: 'Slack Notification',
+      displayNameKey: 'event_notifications:types.slack',
       formComponent: SlackNotificationForm,
       summaryComponent: SlackNotificationSummary,
       detailsComponent: SlackNotificationDetails,
@@ -86,6 +88,7 @@ const bindings = {
     {
       type: 'teams-notification-v1',
       displayName: 'Microsoft Teams Notification (Deprecated - use V2)',
+      displayNameKey: 'event_notifications:types.teams',
       formComponent: TeamsNotificationForm,
       summaryComponent: TeamsNotificationSummary,
       detailsComponent: TeamsNotificationDetails,
@@ -94,6 +97,7 @@ const bindings = {
     {
       type: 'teams-notification-v2',
       displayName: 'Microsoft Teams Notification V2',
+      displayNameKey: 'event_notifications:types.teams_v2',
       formComponent: TeamsNotificationV2Form,
       summaryComponent: TeamsNotificationV2Summary,
       detailsComponent: TeamsNotificationV2Details,

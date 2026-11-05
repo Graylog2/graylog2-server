@@ -15,10 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useFormikContext } from 'formik';
 
 import { Users } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
 import { FormikFormGroup } from 'components/common';
 
@@ -37,21 +39,22 @@ const validateUsername = async (value: string | undefined) => {
   return Users.checkUsernameAvailability(value).then((response: UsernameData) => {
     if (response.available) return '';
 
-    return 'Username is already taken';
+    return i18n.t('user_form.username_taken', { ns: 'users' });
   });
 };
 
 const debouncedValidateUsername = debounceWithPromise(validateUsername, debounceTimeoutMs);
 
 const UsernameFormGroup = () => {
+  const { t } = useTranslation('users');
   const { setFieldTouched } = useFormikContext();
 
   return (
     <FormikFormGroup
-      label="Username"
+      label={t('user_fields.username')}
       name="username"
       required
-      help="Select a unique user name used to log in with."
+      help={t('user_form.username_help')}
       validate={debouncedValidateUsername}
       onChange={() => setFieldTouched('username')}
     />

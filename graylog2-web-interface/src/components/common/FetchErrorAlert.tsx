@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Alert } from 'components/bootstrap';
 
@@ -28,10 +29,14 @@ type Props = {
  * Use for user-facing error states where a data fetch rejected and there is no
  * way to recover automatically — e.g. in place of a table body or a chart.
  */
-const FetchErrorAlert = ({ message, error = null }: Props) => (
-  <Alert bsStyle="danger">
-    {message}: {error?.message ?? 'Unknown error'}
-  </Alert>
-);
+const FetchErrorAlert = ({ message, error = null }: Props) => {
+  const { t } = useTranslation('common');
+
+  return (
+    <Alert bsStyle="danger">
+      {t('errors.fetch_error', { message, error: error?.message ?? t('errors.unknown_error') })}
+    </Alert>
+  );
+};
 
 export default FetchErrorAlert;

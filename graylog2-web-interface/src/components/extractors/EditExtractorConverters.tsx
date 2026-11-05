@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import { Select } from 'components/common';
 import { Row, Col, Panel, Button, Input } from 'components/bootstrap';
@@ -39,7 +41,7 @@ type EditExtractorConvertersProps = {
   extractorType: string;
   converters: any[];
   onChange: (...args: any[]) => void;
-};
+} & WithTranslation;
 
 class EditExtractorConverters extends React.Component<
   EditExtractorConvertersProps,
@@ -255,7 +257,7 @@ class EditExtractorConverters extends React.Component<
   };
 
   render() {
-    const { extractorType } = this.props;
+    const { extractorType, t } = this.props;
     const { selectedConverter } = this.state;
 
     if (extractorType === ExtractorUtils.ExtractorTypes.GROK || extractorType === ExtractorUtils.ExtractorTypes.JSON) {
@@ -263,7 +265,12 @@ class EditExtractorConverters extends React.Component<
         <div className="form-group">
           <div className="col-md-offset-2 col-md-10">
             <Panel bsStyle="info" style={{ marginBottom: 0 }}>
-              Cannot add converters to <em>{ExtractorUtils.getReadableExtractorTypeName(extractorType)}</em> extractors.
+              <Trans
+                t={t}
+                i18nKey="converters_editor.not_supported"
+                values={{ type: ExtractorUtils.getReadableExtractorTypeName(extractorType) }}
+                components={{ em: <em /> }}
+              />
             </Panel>
           </div>
         </div>
@@ -274,15 +281,15 @@ class EditExtractorConverters extends React.Component<
       <div>
         <Input
           id="add-converter"
-          label="Add converter"
+          label={t('converters_editor.add_label')}
           labelClassName="col-md-2"
           wrapperClassName="col-md-10"
-          help="Add converters to transform the extracted value.">
+          help={t('converters_editor.add_help')}>
           <Row className="row-sm">
             <Col md={11}>
               <Select
                 id="add-converter"
-                placeholder="Select a converter"
+                placeholder={t('converters_editor.select_placeholder')}
                 options={this._getConverterOptions()}
                 value={selectedConverter}
                 onChange={this._onConverterSelect}
@@ -290,7 +297,7 @@ class EditExtractorConverters extends React.Component<
             </Col>
             <Col md={1} className="text-right">
               <Button bsStyle="info" onClick={this._onConverterAdd} disabled={!selectedConverter}>
-                Add
+                {t('converters_editor.add')}
               </Button>
             </Col>
           </Row>
@@ -302,4 +309,4 @@ class EditExtractorConverters extends React.Component<
   }
 }
 
-export default EditExtractorConverters;
+export default withTranslation('extractors')(EditExtractorConverters);

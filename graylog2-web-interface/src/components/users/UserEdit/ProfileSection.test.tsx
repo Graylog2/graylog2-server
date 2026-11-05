@@ -60,7 +60,7 @@ describe('<ProfileSection />', () => {
 
     const firstNameInput = screen.getByLabelText('First Name');
     const lastNameInput = screen.getByLabelText('Last Name');
-    const emailInput = screen.getByLabelText('E-Mail Address');
+    const emailInput = screen.getByLabelText('Email Address');
     const submitButton = screen.getByText('Update Profile');
 
     await userEvent.clear(firstNameInput);

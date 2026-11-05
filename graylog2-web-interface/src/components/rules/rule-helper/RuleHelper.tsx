@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import ObjectUtils from 'util/ObjectUtils';
 import { PaginatedList, Spinner, SearchForm } from 'components/common';
@@ -39,12 +40,17 @@ then
   set_field("transaction_year", new_date.year);
 end`;
 
+const FullDocsLink = ({ children = undefined }: React.PropsWithChildren<{}>) => (
+  <DocumentationLink page={DocsHelper.PAGES.PIPELINE_RULES} text={children} />
+);
+
 type Props = {
   paginationQueryParameter: any;
   hideExampleTab?: boolean;
 };
 
 const RuleHelper = ({ paginationQueryParameter, hideExampleTab = false }: Props) => {
+  const { t } = useTranslation('pipelines');
   const { data: functionDescriptors } = useRuleFunctionDescriptors();
   const [expanded, setExpanded] = useState<{ [key: string]: boolean }>({});
   const [currentPage, setCurrentPage] = useState<number>(paginationQueryParameter.page);
@@ -103,12 +109,11 @@ const RuleHelper = ({ paginationQueryParameter, hideExampleTab = false }: Props)
   const pagedEntries = ruleDescriptors.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
-    <Panel header="Rules quick reference">
+    <Panel header={t('helper.title')}>
       <Row className="row-sm rule-ref-descriptions">
         <Col md={12}>
           <p className={RuleHelperStyle.marginQuickReferenceText}>
-            Read the <DocumentationLink page={DocsHelper.PAGES.PIPELINE_RULES} text="full documentation" /> to gain a
-            better understanding of how pipeline rules work.
+            <Trans t={t} i18nKey="helper.docs_hint" components={{ docsLink: <FullDocsLink /> }} />
           </p>
         </Col>
       </Row>
@@ -130,23 +135,20 @@ const RuleHelper = ({ paginationQueryParameter, hideExampleTab = false }: Props)
           <Col md={12}>
             <Tabs defaultValue="functions">
               <Tabs.List>
-                <Tabs.Tab value="functions">Functions</Tabs.Tab>
-                <Tabs.Tab value="example">Example</Tabs.Tab>
+                <Tabs.Tab value="functions">{t('helper.functions')}</Tabs.Tab>
+                <Tabs.Tab value="example">{t('helper.example')}</Tabs.Tab>
               </Tabs.List>
               <Tabs.Panel value="functions">
                 <Row className="rule-ref-descriptions">
                   <Col sm={12}>
-                    <p className={RuleHelperStyle.marginTab}>
-                      This is a list of all available functions in pipeline rules. Click on a row to see more
-                      information about the function parameters.
-                    </p>
+                    <p className={RuleHelperStyle.marginTab}>{t('helper.functions_description')}</p>
                   </Col>
                 </Row>
                 <Row>
                   <Col sm={12}>
                     <SearchForm
                       onSearch={filterDescriptors}
-                      label="Filter rules"
+                      label={t('helper.filter_rules')}
                       topMargin={0}
                       onReset={onFilterReset}
                     />
@@ -167,9 +169,7 @@ const RuleHelper = ({ paginationQueryParameter, hideExampleTab = false }: Props)
                 </Row>
               </Tabs.Panel>
               <Tabs.Panel value="example">
-                <p className={RuleHelperStyle.marginTab}>
-                  Do you want to see how a pipeline rule looks like? Take a look at this example:
-                </p>
+                <p className={RuleHelperStyle.marginTab}>{t('helper.example_description')}</p>
                 <pre className={`${RuleHelperStyle.marginTab} ${RuleHelperStyle.exampleFunction}`}>{ruleTemplate}</pre>
               </Tabs.Panel>
             </Tabs>

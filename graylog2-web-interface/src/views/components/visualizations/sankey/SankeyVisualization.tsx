@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
@@ -169,6 +170,7 @@ const buildSankeyTrace = (
 const layout = { margin: { t: 20, b: 20, l: 20, r: 20 } };
 
 const SankeyVisualization = makeVisualization(({ config, data }: VisualizationComponentProps) => {
+  const { t } = useTranslation('aggregation');
   const rows = retrieveChartData(data);
   const mapKeys = useMapKeys();
   const { onChartClick, initializeGraphDivRef, popover } = usePlotOnClickPopover({ ...sankeyOnClickPopover, config });
@@ -204,7 +206,7 @@ const SankeyVisualization = makeVisualization(({ config, data }: VisualizationCo
           onInitialized={initializeGraphDivRef}
         />
       ) : (
-        <EmptyState>No flows to display. Adjust your search or grouping to see results.</EmptyState>
+        <EmptyState>{t('vis_sankey.no_flows')}</EmptyState>
       )}
       {popover}
     </Container>

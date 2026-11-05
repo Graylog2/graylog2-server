@@ -17,8 +17,10 @@
 
 import { styled } from 'styled-components';
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Formik, Form, FieldArray, Field } from 'formik';
 import countBy from 'lodash/countBy';
+import type { TFunction } from 'i18next';
 
 import type { IndexSetFieldTypeProfileForm } from 'components/indices/IndexSetFieldTypeProfiles/types';
 import { FormikInput, IconButton, Select, FormSubmit, Spinner, InputOptionalInfo } from 'components/common';
@@ -62,19 +64,19 @@ type Props = {
   onSubmit: (profile: IndexSetFieldTypeProfileForm) => void;
 };
 
-const getFieldError = (field: string, occurrences: number) => {
-  if (!field) return 'Field is required';
-  if (isReservedField(field)) return 'Field is reserved';
-  if (occurrences > 1) return 'This field occurs several times';
+const getFieldError = (field: string, occurrences: number, t: TFunction) => {
+  if (!field) return t('profiles.error_field_required');
+  if (isReservedField(field)) return t('profiles.error_field_reserved');
+  if (occurrences > 1) return t('profiles.error_field_duplicate');
 
   return undefined;
 };
 
-const validate = (formValues: IndexSetFieldTypeProfileForm) => {
+const validate = (formValues: IndexSetFieldTypeProfileForm, t: TFunction) => {
   const errors: { name?: string; customFieldMappings?: Array<{ field?: string; type?: string }> } = {};
 
   if (!formValues.name) {
-    errors.name = 'Profile name is required';
+    errors.name = t('profiles.error_name_required');
   }
 
   const fieldsOccurrences = countBy(formValues.customFieldMappings, 'field');
@@ -84,8 +86,8 @@ const validate = (formValues: IndexSetFieldTypeProfileForm) => {
       if (field && type && fieldsOccurrences[field] === 1) return undefined;
 
       return {
-        field: getFieldError(field, fieldsOccurrences[field]),
-        type: !type ? 'Type is required' : undefined,
+        field: getFieldError(field, fieldsOccurrences[field], t),
+        type: !type ? t('profiles.error_type_required') : undefined,
       };
     },
   );
@@ -115,23 +117,27 @@ const ProfileFormSelect = ({
   value,
   placeholder,
   allowCreate,
-}: ProfileFormSelectProps) => (
-  <SelectContainer>
-    <Input error={error} name={name} id={name}>
-      <Select
-        options={options}
-        value={value}
-        inputId={name}
-        onChange={(newVal) => {
-          onChange({ target: { value: newVal, name } });
-        }}
-        aria-label={`Select ${name}`}
-        placeholder={placeholder}
-        allowCreate={allowCreate}
-      />
-    </Input>
-  </SelectContainer>
-);
+}: ProfileFormSelectProps) => {
+  const { t } = useTranslation('indexsets');
+
+  return (
+    <SelectContainer>
+      <Input error={error} name={name} id={name}>
+        <Select
+          options={options}
+          value={value}
+          inputId={name}
+          onChange={(newVal) => {
+            onChange({ target: { value: newVal, name } });
+          }}
+          aria-label={t('profiles.select_aria', { name })}
+          placeholder={placeholder}
+          allowCreate={allowCreate}
+        />
+      </Input>
+    </SelectContainer>
+  );
+};
 
 const ProfileForm = ({
   initialValues = { name: '', description: '', customFieldMappings: [{ type: '', field: '' }] },
@@ -140,6 +146,7 @@ const ProfileForm = ({
   onCancel,
   onSubmit,
 }: Props) => {
+  const { t } = useTranslation('indexsets');
   const { data, isLoading } = useFieldTypes(undefined, undefined);
   const {
     data: { fieldTypes },
@@ -172,37 +179,37 @@ const ProfileForm = ({
       <Formik<IndexSetFieldTypeProfileForm>
         initialValues={initialValues}
         onSubmit={_onSubmit}
-        validate={validate}
+        validate={(formValues) => validate(formValues, t)}
         validateOnChange>
         {({ isSubmitting, isValid, isValidating, values: { customFieldMappings } }) => (
           <Form>
             <FormikInput
               name="name"
-              label="Profile name"
+              label={t('profiles.name_label')}
               id="index-set-field-type-profile-name"
-              placeholder="Type a profile name"
-              help="A descriptive name of the new profile"
+              placeholder={t('profiles.name_placeholder')}
+              help={t('profiles.name_help')}
               required
             />
             <FormikInput
               name="description"
               id="index-set-field-type-profile-description"
-              placeholder="Type a profile description"
+              placeholder={t('profiles.description_placeholder')}
               label={
                 <>
-                  Description <InputOptionalInfo />
+                  {t('profiles.description_label')} <InputOptionalInfo />
                 </>
               }
               type="textarea"
-              help="Longer description for profile"
+              help={t('profiles.description_help')}
               rows={6}
             />
             <FieldArray
               name="customFieldMappings"
               render={({ remove, push }) => (
                 <>
-                  <StyledLabel>Set up mappings</StyledLabel>
-                  <HelpBlock>Here you can set up type mapping to any field.</HelpBlock>
+                  <StyledLabel>{t('profiles.setup_mappings')}</StyledLabel>
+                  <HelpBlock>{t('profiles.setup_mappings_help')}</HelpBlock>
                   <List>
                     {isLoading || isLoadingFieldTypes ? (
                       <Spinner />
@@ -218,7 +225,7 @@ const ProfileForm = ({
                                   options={fields}
                                   name={name}
                                   error={error}
-                                  placeholder="Select or type field name"
+                                  placeholder={t('profiles.field_placeholder')}
                                   allowCreate
                                 />
                               )}
@@ -231,21 +238,25 @@ const ProfileForm = ({
                                   options={fieldTypeOptions}
                                   name={name}
                                   error={error}
-                                  placeholder="Select field type"
+                                  placeholder={t('profiles.type_placeholder')}
                                   allowCreate={false}
                                 />
                               )}
                             </Field>
                           </SelectGroup>
                           {customFieldMappings.length > 1 && (
-                            <IconButton name="delete" onClick={() => remove(index)} title="Remove mapping" />
+                            <IconButton
+                              name="delete"
+                              onClick={() => remove(index)}
+                              title={t('profiles.remove_mapping')}
+                            />
                           )}
                         </Item>
                       ))
                     )}
                   </List>
-                  <Button bsSize="xs" onClick={() => push({})} name="plus" title="Add mapping">
-                    Add mapping
+                  <Button bsSize="xs" onClick={() => push({})} name="plus" title={t('profiles.add_mapping')}>
+                    {t('profiles.add_mapping')}
                   </Button>
                 </>
               )}

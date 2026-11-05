@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import type { EditWidgetComponentProps, WidgetComponentProps } from 'views/types';
@@ -52,6 +53,7 @@ const OrderedList = styled.ol`
 
 type Props = WidgetComponentProps & EditWidgetComponentProps;
 const UnknownWidget = ({ config, type }: Props) => {
+  const { t } = useTranslation('widgets');
   const productName = useProductName();
 
   return (
@@ -61,26 +63,22 @@ const UnknownWidget = ({ config, type }: Props) => {
       </IconContainer>
       <Description>
         <Row>
-          <strong>Unknown Widget: {type}</strong>
+          <strong>{t('unknown_widget.title', { type })}</strong>
         </Row>
         <Row>
-          Unfortunately we are not able to render this widget, because we do not know how to handle widgets of type{' '}
-          <strong>{type}</strong>. This might be caused by one of these situations:
+          <Trans t={t} i18nKey="unknown_widget.cannot_render" values={{ type }} components={{ strong: <strong /> }} />
         </Row>
 
         <Row>
           <OrderedList>
-            <li>You created this widget using a plugin that is now missing.</li>
-            <li>This widget was part of a legacy dashboard and created by a plugin that is not available anymore.</li>
+            <li>{t('unknown_widget.missing_plugin')}</li>
+            <li>{t('unknown_widget.legacy_dashboard')}</li>
           </OrderedList>
         </Row>
 
+        <Row>{t('unknown_widget.what_to_do', { productName })}</Row>
         <Row>
-          What can you do about it? You can load the plugin again, contact the original plugin author for a plugin that
-          works with the current version of {productName}, or remove the widget if you do not need it anymore.
-        </Row>
-        <Row>
-          Either way, you can copy the widget&rsquo;s config to the clipboard:{' '}
+          {t('unknown_widget.copy_config')}{' '}
           <ClipboardButton
             title={<Icon name="content_copy" size="sm" />}
             text={JSON.stringify(config, null, 2)}

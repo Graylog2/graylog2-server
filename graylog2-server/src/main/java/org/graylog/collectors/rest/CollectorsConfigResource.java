@@ -22,7 +22,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -51,6 +50,7 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.validators.ValidationResult;
+import org.graylog2.plugin.rest.CodedBadRequestException;
 import org.graylog2.rest.RestTools;
 import org.graylog2.shared.rest.HideOnCloud;
 import org.graylog2.shared.rest.PublicCloudAPI;
@@ -139,7 +139,7 @@ public class CollectorsConfigResource extends RestResource {
     @HideOnCloud
     public CollectorInputIdsResponse createInput() throws ValidationException {
         final var config = collectorsConfigService.get()
-                .orElseThrow(() -> new BadRequestException("Collectors config has not been initialized yet"));
+                .orElseThrow(() -> new CodedBadRequestException("collectors.config_not_initialized", "Collectors config has not been initialized yet"));
         collectorIngestInputService.createInput(getSubject(), getCurrentUser().getName(), config.http().port());
         return new CollectorInputIdsResponse(collectorIngestInputService.getInputIds());
     }

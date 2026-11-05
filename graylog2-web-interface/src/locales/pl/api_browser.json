@@ -1,0 +1,14 @@
+{
+  "title": "Przeglądarka API",
+  "description": "Przeglądaj Graylog REST API",
+  "search_placeholder": "Szukaj punktu końcowego...",
+  "no_results": "Nie znaleziono żadnych punktów końcowych pasujących do wyszukiwania.",
+  "error_loading": "Błąd podczas ładowania przeglądarki API.",
+  "error_fetching_endpoint": "Błąd podczas pobierania szczegółów punktu końcowego.",
+  "endpoint_name": "Nazwa punktu końcowego",
+  "endpoint_path": "Ścieżka",
+  "endpoint_method": "Metoda",
+  "endpoint_description": "Opis",
+  "endpoint_parameters": "Parametry",
+  "endpoint_response": "Odpowiedź"
+}

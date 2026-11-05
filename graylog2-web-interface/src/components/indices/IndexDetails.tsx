@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { SystemIndexRanges } from '@graylog/server-api';
@@ -40,42 +41,43 @@ type Props = {
 };
 
 const IndexDetails = ({ index, indexName, indexRange = undefined, indexSetId = undefined, isDeflector }: Props) => {
+  const { t } = useTranslation('indexsets');
   const queryClient = useQueryClient();
 
   const _invalidate = useCallback(() => queryClient.invalidateQueries({ queryKey: INDICES_QUERY_KEY }), [queryClient]);
 
   const _onRecalculateIndex = useCallback(() => {
     // eslint-disable-next-line no-alert
-    if (window.confirm(`Really recalculate the index ranges for index ${indexName}?`)) {
+    if (window.confirm(t('indices.details.confirm_recalculate', { indexName }))) {
       defaultOnError(
         SystemIndexRanges.rebuildIndex(indexName),
-        `Could not create a job to start index ranges recalculation for ${indexName}`,
-        `Error starting index ranges recalculation for ${indexName}`,
+        t('indices.details.recalculate_failed', { indexName }),
+        t('indices.details.recalculate_failed_title', { indexName }),
       ).then(() => {
         if (indexSetId) {
           _invalidate();
         }
       });
     }
-  }, [indexName, indexSetId, _invalidate]);
+  }, [indexName, indexSetId, _invalidate, t]);
 
   const _onDeleteIndex = useCallback(() => {
     // eslint-disable-next-line no-alert
-    if (window.confirm(`Really delete index ${indexName}?`)) {
+    if (window.confirm(t('indices.details.confirm_delete', { indexName }))) {
       deleteIndex(indexName).then(() => {
         if (indexSetId) {
           _invalidate();
         }
       });
     }
-  }, [indexName, indexSetId, _invalidate]);
+  }, [indexName, indexSetId, _invalidate, t]);
 
   const actionButtons = useMemo(() => {
     if (isDeflector) {
       return (
         <span>
           <Button bsStyle="danger" bsSize="xs" disabled>
-            Active write index cannot be deleted
+            {t('indices.details.active_write_index')}
           </Button>
         </span>
       );
@@ -84,14 +86,14 @@ const IndexDetails = ({ index, indexName, indexRange = undefined, indexSetId = u
     return (
       <span>
         <Button bsStyle="warning" bsSize="xs" onClick={_onRecalculateIndex}>
-          Recalculate index ranges
+          {t('indices.details.recalculate')}
         </Button>{' '}
         <Button bsStyle="danger" bsSize="xs" onClick={_onDeleteIndex}>
-          Delete index
+          {t('indices.details.delete')}
         </Button>
       </span>
     );
-  }, [isDeflector, _onDeleteIndex, _onRecalculateIndex]);
+  }, [isDeflector, _onDeleteIndex, _onRecalculateIndex, t]);
 
   if (!index || !index.all_shards) {
     return <Spinner />;
@@ -101,15 +103,17 @@ const IndexDetails = ({ index, indexName, indexRange = undefined, indexSetId = u
     <div className="index-info">
       <IndexRangeSummary indexRange={indexRange} />{' '}
       <HideOnCloud>
-        {NumberUtils.formatNumber(index.all_shards.segments)} segments,{' '}
-        {NumberUtils.formatNumber(index.all_shards.open_search_contexts)} open search contexts,{' '}
-        {NumberUtils.formatNumber(index.all_shards.documents.deleted)} deleted messages
+        {t('indices.details.stats', {
+          segments: NumberUtils.formatNumber(index.all_shards.segments),
+          contexts: NumberUtils.formatNumber(index.all_shards.open_search_contexts),
+          deleted: NumberUtils.formatNumber(index.all_shards.documents.deleted),
+        })}
         <Row style={{ marginBottom: '10' }}>
           <Col md={4} className="shard-meters">
-            <ShardMeter title="Primary shard operations" shardMeter={index.primary_shards} />
+            <ShardMeter title={t('indices.details.primary_shard_operations')} shardMeter={index.primary_shards} />
           </Col>
           <Col md={4} className="shard-meters">
-            <ShardMeter title="Total shard operations" shardMeter={index.all_shards} />
+            <ShardMeter title={t('indices.details.total_shard_operations')} shardMeter={index.all_shards} />
           </Col>
         </Row>
         <ShardRoutingOverview routing={index.routing} indexName={indexName} />

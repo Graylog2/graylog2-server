@@ -1,0 +1,249 @@
+{
+  "apply_parameter": {
+    "action": "Ação",
+    "apply": "Aplicar",
+    "choose": "Escolher...",
+    "choose_config_key": "Escolher chave de configuração",
+    "clear": "Limpar",
+    "config_key": "Chave de configuração",
+    "create_parameter_first": "Crie um parâmetro primeiro",
+    "no_parameter_of_type": "Nenhum parâmetro do tipo {{type}}",
+    "parameter": "Parâmetro"
+  },
+  "constraints": {
+    "fulfilled": "Atendida",
+    "name": "Nome",
+    "title": "Restrições",
+    "type": "Tipo",
+    "version": "Versão"
+  },
+  "details": {
+    "description": "Descrição",
+    "entities": "Entidades:",
+    "id": "ID:",
+    "name": "Nome:",
+    "parameters": "Parâmetros:",
+    "summary": "Resumo:",
+    "title": "Detalhes",
+    "url": "URL:",
+    "vendor": "Fornecedor:",
+    "version": "Versão:"
+  },
+  "download": {
+    "download": "Baixar",
+    "info": "Clique com o botão direito no link de download abaixo e escolha \"Salvar link como...\" para baixar o arquivo JSON.",
+    "title": "Baixar Content Pack"
+  },
+  "edit": {
+    "steps": {
+      "parameters": "Parâmetros",
+      "preview": "Pré-visualização",
+      "selection": "Seleção de conteúdo"
+    }
+  },
+  "edit_parameter": {
+    "create_title": "Criar parâmetro",
+    "default_value": "Valor padrão",
+    "default_value_help": "Informe um valor padrão caso o parâmetro não seja opcional.",
+    "description": "Descrição",
+    "description_help": "Informe uma descrição explicando o que será feito com este parâmetro.",
+    "description_required": "A descrição deve ser definida.",
+    "edit_title": "Editar parâmetro",
+    "name": "Nome",
+    "name_help": "Usado como referência do parâmetro e não pode conter espaços.",
+    "name_invalid": "O nome do parâmetro deve conter apenas A-Z, a-z, 0-9 e _",
+    "name_not_unique": "O nome do parâmetro deve ser único.",
+    "name_required": "O nome deve ser definido.",
+    "not_boolean": "Este não é um valor booleano. Deve ser true ou false.",
+    "not_double": "Este não é um valor double.",
+    "not_integer": "Este não é um valor inteiro.",
+    "title": "Título",
+    "title_help": "Informe um título descritivo para este Content Pack.",
+    "title_required": "O título deve ser definido.",
+    "value_type": "Tipo de valor",
+    "value_type_help": "Informe o tipo do parâmetro."
+  },
+  "entities": {
+    "action": "Ação",
+    "config_title": "Configuração da entidade",
+    "description": "Descrição",
+    "edit_title": "Editar",
+    "list_title": "Lista de entidades",
+    "origin": "Origem",
+    "origin_content_pack": "Content Pack",
+    "origin_server": "Servidor",
+    "show": "Exibir",
+    "title": "Título",
+    "type": "Tipo",
+    "used_parameters": "Parâmetros utilizados"
+  },
+  "entity_config": {
+    "config_key": "Chave de configuração",
+    "parameter_type": "parâmetro ({{type}})",
+    "type": "Tipo",
+    "value": "Valor"
+  },
+  "entity_index": {
+    "load_failed": "Falha ao carregar o índice de entidades com o status",
+    "load_failed_title": "Não foi possível carregar o índice de entidades"
+  },
+  "import": {
+    "error_message": "Erro ao importar o Content Pack. Verifique se é um arquivo JSON válido. Consulte os logs do servidor {{productName}} para mais informações.",
+    "error_title": "Não foi possível importar o Content Pack",
+    "success_message": "Content Pack importado com sucesso",
+    "success_named": "Content Pack \"{{name}}\" importado com sucesso",
+    "success_title": "Sucesso!"
+  },
+  "install": {
+    "comment": "Comentário da instalação",
+    "comment_help": "Este comentário será armazenado junto com a instalação do Content Pack e pode ser usado para descrever o motivo desta instalação.",
+    "configure_parameters": "Configurar parâmetro(s):",
+    "needs_to_be_filled": "Precisa ser preenchido.",
+    "share_description": "Pesquise um usuário ou equipe para adicionar como colaborador nas entidades deste Content Pack."
+  },
+  "install_entities": {
+    "installed": "Entidades instaladas",
+    "title": "Título",
+    "to_be_uninstalled": "Entidades a serem desinstaladas",
+    "type": "Tipo"
+  },
+  "install_view": {
+    "comment": "Comentário:",
+    "general_information": "Informações gerais",
+    "installed_at": "Instalado em:",
+    "installed_by": "Instalado por:"
+  },
+  "installations": {
+    "action": "Ação",
+    "comment": "Comentário",
+    "uninstall": "Desinstalar",
+    "version": "Versão",
+    "view": "Visualizar",
+    "view_title": "Visualizar instalação"
+  },
+  "list": {
+    "no_match": "Nenhum Content Pack correspondente foi encontrado",
+    "none_found": "Nenhum Content Pack encontrado. Crie ou envie um."
+  },
+  "list_item": {
+    "create_new_version": "Criar nova versão",
+    "delete_all_versions": "Excluir todas as versões",
+    "install": "Instalar",
+    "install_title": "Instalar Content Pack",
+    "latest_version": "Versão mais recente: {{rev}}",
+    "show": "Exibir",
+    "update": "Atualizar"
+  },
+  "notifications": {
+    "error": "Erro",
+    "success": "Sucesso"
+  },
+  "overview": {
+    "button_text": "Content Packs",
+    "delete_confirmation": "Você está prestes a excluir este Content Pack. Tem certeza?",
+    "delete_error_message": "Falha ao excluir o pacote: {{error}}",
+    "delete_success": "Content Pack excluído com sucesso.",
+    "description": "Os Content Packs agilizam a configuração de uma fonte de dados específica. Um Content Pack pode incluir inputs/extractors, streams e dashboards.",
+    "install_error_message": "A instalação do Content Pack falhou com o status: {{status}}. Não foi possível instalar o Content Pack com o ID: {{id}}",
+    "install_success": "Content Pack instalado com sucesso.",
+    "title": "Content Packs",
+    "marketplace_prefix": "Encontre mais Content Packs em"
+  },
+  "pages": {
+    "back_button": "Content Packs",
+    "create_title": "Criar Content Pack",
+    "description": "Os Content Packs agilizam a configuração de uma fonte de dados específica. Um Content Pack pode incluir inputs/extractors, streams e dashboards.",
+    "document_title": "Content Packs",
+    "edit_title": "Editar Content Pack",
+    "marketplace_prefix": "Encontre mais Content Packs em"
+  },
+  "parameter_list": {
+    "action": "Ação",
+    "default_value": "Valor padrão",
+    "delete_parameter": "Excluir parâmetro",
+    "description": "Descrição",
+    "edit_modal": "Modal de edição",
+    "list_title": "Lista de parâmetros",
+    "modal_title": "Parâmetro",
+    "name": "Nome",
+    "no_data": "Para usar parâmetros em Content Packs, primeiro é preciso criar um parâmetro, que poderá então ser aplicado a um item.",
+    "still_in_use": "Ainda em uso",
+    "title": "Título",
+    "used": "Em uso",
+    "value_type": "Tipo de valor"
+  },
+  "parameters": {
+    "confirm_deletion": "Confirmar exclusão",
+    "delete_confirmation": "Tem certeza de que deseja excluir este parâmetro: {{title}}?"
+  },
+  "preview": {
+    "create": "Criar",
+    "create_and_download": "Criar e baixar"
+  },
+  "revisions": {
+    "fetch_error": "Erro ao buscar as revisões do Content Pack: {{error}}",
+    "fetch_error_title": "Não foi possível buscar o Content Pack"
+  },
+  "selection": {
+    "description": "Descrição",
+    "description_help": "Informe uma descrição detalhada do Content Pack em markdown.",
+    "general_information": "Informações gerais",
+    "must_be_filled": "Deve ser preenchido.",
+    "name": "Nome",
+    "name_help": "Obrigatório. Informe um nome descritivo para este Content Pack.",
+    "no_pairs_hint": "Os itens desta versão do Content Pack nunca foram instalados, portanto não há itens instalados para selecionar.",
+    "select_entity": "Selecione pelo menos um item.",
+    "select_latest": "Selecionar as versões instaladas mais recentes",
+    "select_older": "Selecionar versões anteriores do Content Pack",
+    "summary": "Resumo",
+    "summary_help": "Obrigatório. Informe um resumo curto do Content Pack.",
+    "title": "Seleção de Content Pack",
+    "url": "URL",
+    "url_help": "Onde encontrar o Content Pack, por exemplo, uma URL do GitHub.",
+    "url_invalid": "URL inválida",
+    "url_protocol": "A URL deve começar com http ou https.",
+    "vendor": "Fornecedor",
+    "vendor_help": "Obrigatório. Quem criou este Content Pack e como entrar em contato, por exemplo, nome e e-mail.",
+    "version_help": "Para cada item, você pode selecionar a versão instalada mais recente (<latestIcon />) ou a versão anterior do Content Pack (<olderIcon />)."
+  },
+  "show": {
+    "delete_revision_confirmation": "Você está prestes a excluir esta revisão do Content Pack. Tem certeza?",
+    "delete_revision_error": "Falha ao excluir o Content Pack: {{error}}",
+    "delete_revision_success": "Revisão do Content Pack excluída com sucesso.",
+    "install_error": "A instalação do Content Pack falhou com o status: {{status}}. Não foi possível instalar o Content Pack com o ID: {{id}}",
+    "installations": "Instalações",
+    "not_found": "Não foi possível encontrar o Content Pack com o ID {{id}}. Ele pode ter sido excluído.",
+    "server_error": "Ocorreu um erro interno no servidor. Consulte os arquivos de log para mais informações",
+    "uninstall_confirmation": "Você realmente deseja desinstalar este Content Pack?",
+    "uninstall_error": "Falha ao desinstalar o Content Pack. Consulte os logs para mais informações.",
+    "uninstall_success": "Content Pack desinstalado com sucesso.",
+    "versions": "Versões"
+  },
+  "status": {
+    "edited": "editado",
+    "error": "erro",
+    "installed": "instalado",
+    "updatable": "atualizável"
+  },
+  "upload": {
+    "button": "Carregar",
+    "choose_file": "Escolher arquivo",
+    "choose_file_help": "Escolher Content Pack do disco",
+    "title": "Carregar Content Pack"
+  },
+  "value_types": {
+    "boolean": "Boolean",
+    "double": "Double",
+    "integer": "Integer",
+    "string": "String"
+  },
+  "version_item": {
+    "actions": "Ações",
+    "create_from_revision": "Criar novo a partir da revisão"
+  },
+  "versions": {
+    "action": "Ação",
+    "revision": "Revisão",
+    "select": "Selecionar"
+  }
+}

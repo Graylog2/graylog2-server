@@ -16,8 +16,9 @@
  */
 import React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
-import ProductName from 'brand-customization/ProductName';
+import useProductName from 'brand-customization/useProductName';
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
@@ -44,26 +45,28 @@ const StyledCol = styled(Col)`
   }
 `;
 
-const DataNodesClusterManagementPage = () => (
-  <DocumentTitle title="Data Node Dashboard">
-    <ClusterConfigurationPageNavigation />
-    <PageHeader
-      title="Data Node Dashboard"
-      documentationLink={{
-        title: 'Data Nodes documentation',
-        path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
-      }}>
-      <span>
-        <ProductName /> Data Nodes offer a better integration with <ProductName /> and simplify future updates. They
-        allow you to index and search through all the messages in your <ProductName /> message database.
-      </span>
-    </PageHeader>
-    <Row className="content">
-      <StyledCol md={12}>
-        <ClusterManagementOverview />
-      </StyledCol>
-    </Row>
-  </DocumentTitle>
-);
+const DataNodesClusterManagementPage = () => {
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
+  const productName = useProductName();
+
+  return (
+    <DocumentTitle title={t('pages.cluster_management_title')}>
+      <ClusterConfigurationPageNavigation />
+      <PageHeader
+        title={t('pages.cluster_management_title')}
+        documentationLink={{
+          title: t('pages.documentation_title'),
+          path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
+        }}>
+        <span>{t('pages.description', { productName })}</span>
+      </PageHeader>
+      <Row className="content">
+        <StyledCol md={12}>
+          <ClusterManagementOverview />
+        </StyledCol>
+      </Row>
+    </DocumentTitle>
+  );
+};
 
 export default DataNodesClusterManagementPage;

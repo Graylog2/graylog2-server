@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import { Col, ControlLabel, FormControl, FormGroup, Row, Button, Input } from 'components/bootstrap';
 import ExtractorUtils from 'util/ExtractorUtils';
@@ -43,7 +45,7 @@ type EditExtractorProps = {
   inputId: string;
   exampleMessage?: string;
   onSave: (...args: any[]) => void;
-};
+} & WithTranslation;
 
 type EditExtractorState = {
   updatedExtractor?: EditExtractorProps['extractor'];
@@ -148,6 +150,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
 
   _getExtractorConditionControls = () => {
     const { conditionTestResult, updatedExtractor } = this.state;
+    const { t } = this.props;
 
     if (!updatedExtractor.condition_type || updatedExtractor.condition_type === 'none') {
       return <div />;
@@ -157,22 +160,21 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
     let conditionInputHelp;
 
     if (updatedExtractor.condition_type === 'string') {
-      conditionInputLabel = 'Field contains string';
-      conditionInputHelp = 'Type a string that the field should contain in order to attempt the extraction.';
+      conditionInputLabel = t('edit.condition_string_label');
+      conditionInputHelp = t('edit.condition_string_help');
     } else {
-      conditionInputLabel = 'Field matches regular expression';
-      conditionInputHelp =
-        'Type a regular expression that the field should contain in order to attempt the extraction.';
+      conditionInputLabel = t('edit.condition_regex_label');
+      conditionInputHelp = t('edit.condition_regex_help');
     }
 
     let inputStyle;
 
     if (conditionTestResult === true) {
       inputStyle = 'success';
-      conditionInputHelp = 'Matches! Extractor would run against this example.';
+      conditionInputHelp = t('edit.condition_matches');
     } else if (conditionTestResult === false) {
       inputStyle = 'error';
-      conditionInputHelp = 'Does not match! Extractor would not run.';
+      conditionInputHelp = t('edit.condition_no_match');
     }
 
     return (
@@ -197,7 +199,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
             </Col>
             <Col md={1} className="text-right">
               <Button bsStyle="info" onClick={this._testCondition} disabled={this._tryButtonDisabled()}>
-                Try
+                {t('edit.try')}
               </Button>
             </Col>
           </Row>
@@ -217,22 +219,18 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
 
   render() {
     const { updatedExtractor, exampleMessage } = this.state;
-    const { action } = this.props;
-    const conditionTypeHelpMessage =
-      'Extracting only from messages that match a certain condition helps you ' +
-      'avoiding wrong or unnecessary extractions and can also save CPU resources.';
+    const { action, t } = this.props;
+    const conditionTypeHelpMessage = t('edit.condition_type_help');
 
     const cursorStrategyHelpMessage = (
       <span>
-        Do you want to copy or cut from source? You cannot use the cutting feature on standard fields like{' '}
-        <em>message</em> and <em>source</em>.
+        <Trans t={t} i18nKey="edit.cursor_strategy_help" components={{ em: <em /> }} />
       </span>
     );
 
     const targetFieldHelpMessage = (
       <span>
-        Choose a field name to store the extracted value. It can only contain{' '}
-        <b>alphanumeric characters and underscores</b>. Example: <em>http_response_code</em>.
+        <Trans t={t} i18nKey="edit.target_field_help" components={{ b: <b />, em: <em /> }} />
       </span>
     );
 
@@ -250,7 +248,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
             this.targetField = targetField;
           }}
           id="target_field"
-          label="Store as field"
+          label={t('edit.store_as_field')}
           defaultValue={updatedExtractor.target_field}
           labelClassName="col-md-2"
           wrapperClassName="col-md-10"
@@ -265,7 +263,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
       <div>
         <Row className="content extractor-list">
           <Col md={12}>
-            <h2>Example message</h2>
+            <h2>{t('edit.example_message')}</h2>
             <Row style={{ marginTop: 5 }}>
               <Col md={12}>
                 <ExtractorExampleMessage
@@ -275,15 +273,15 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
                 />
               </Col>
             </Row>
-            <h2>Extractor configuration</h2>
+            <h2>{t('edit.configuration')}</h2>
             <Row>
               <Col md={8}>
                 <form className="extractor-form form-horizontal" method="POST" onSubmit={this._saveExtractor}>
                   <StaticField
-                    label="Extractor type"
+                    label={t('edit.extractor_type')}
                     text={ExtractorUtils.getReadableExtractorTypeName(updatedExtractor.type)}
                   />
-                  <StaticField label="Source field" text={updatedExtractor.source_field} />
+                  <StaticField label={t('edit.source_field')} text={updatedExtractor.source_field} />
 
                   <EditExtractorConfiguration
                     extractorType={updatedExtractor.type}
@@ -294,7 +292,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
 
                   <Input
                     id="condition-type"
-                    label="Condition"
+                    label={t('edit.condition')}
                     labelClassName="col-md-2"
                     wrapperClassName="col-md-10"
                     help={conditionTypeHelpMessage}>
@@ -311,7 +309,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
                               !updatedExtractor.condition_type || updatedExtractor.condition_type === 'none'
                             }
                           />
-                          Always try to extract
+                          {t('edit.condition_none')}
                         </label>
                       </div>
                       <div className="radio">
@@ -324,7 +322,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
                             onChange={this._onFieldChange('condition_type')}
                             defaultChecked={updatedExtractor.condition_type === 'string'}
                           />
-                          Only attempt extraction if field contains string
+                          {t('edit.condition_string')}
                         </label>
                       </div>
                       <div className="radio">
@@ -337,7 +335,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
                             onChange={this._onFieldChange('condition_type')}
                             defaultChecked={updatedExtractor.condition_type === 'regex'}
                           />
-                          Only attempt extraction if field matches regular expression
+                          {t('edit.condition_regex')}
                         </label>
                       </div>
                     </span>
@@ -348,7 +346,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
 
                   <Input
                     id="extraction-strategy"
-                    label="Extraction strategy"
+                    label={t('edit.extraction_strategy')}
                     labelClassName="col-md-2"
                     wrapperClassName="col-md-10"
                     help={cursorStrategyHelpMessage}>
@@ -364,7 +362,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
                             !updatedExtractor.cursor_strategy || updatedExtractor.cursor_strategy === 'copy'
                           }
                         />
-                        Copy
+                        {t('edit.copy')}
                       </label>
                       <label className="radio-inline" htmlFor="cursor_strategy_cut">
                         <input
@@ -375,7 +373,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
                           onChange={this._onFieldChange('cursor_strategy')}
                           defaultChecked={updatedExtractor.cursor_strategy === 'cut'}
                         />
-                        Cut
+                        {t('edit.cut')}
                       </label>
                     </span>
                   </Input>
@@ -383,13 +381,13 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
                   <Input
                     type="text"
                     id="title"
-                    label="Extractor title"
+                    label={t('edit.title')}
                     defaultValue={updatedExtractor.title}
                     labelClassName="col-md-2"
                     wrapperClassName="col-md-10"
                     onChange={this._onFieldChange('title')}
                     required
-                    help="A descriptive name for this extractor."
+                    help={t('edit.title_help')}
                   />
 
                   <div style={{ marginBottom: 20 }}>
@@ -403,7 +401,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
                   <Row>
                     <Col mdOffset={2} md={10}>
                       <Button type="submit" bsStyle="primary">
-                        {action === 'create' ? 'Create extractor' : 'Update extractor'}
+                        {action === 'create' ? t('edit.create') : t('edit.update')}
                       </Button>
                     </Col>
                   </Row>
@@ -417,4 +415,4 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
   }
 }
 
-export default EditExtractor;
+export default withTranslation('extractors')(EditExtractor);

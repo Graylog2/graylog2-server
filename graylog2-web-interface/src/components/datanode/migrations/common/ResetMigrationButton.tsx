@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 import { Migration } from '@graylog/server-api';
 
@@ -31,6 +32,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 const resetMigration = async () => Migration.resetState();
 
 const ResetMigrationButton = () => {
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const queryClient = useQueryClient();
   const [showDialog, setShowDialog] = useState(false);
   const sendTelemetry = useSendTelemetry('migration');
@@ -39,16 +41,13 @@ const ResetMigrationButton = () => {
     mutationFn: resetMigration,
 
     onSuccess: () => {
-      UserNotification.success('Migration state reset successful.');
+      UserNotification.success(t('reset_migration.success'));
       queryClient.invalidateQueries({ queryKey: DATA_NODES_CA_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: MIGRATION_STATE_QUERY_KEY });
     },
 
     onError: (error) => {
-      UserNotification.error(
-        `Resetting migration state failed with status: ${error}`,
-        'Could not reset the migration state.',
-      );
+      UserNotification.error(t('reset_migration.failed', { error }), t('reset_migration.failed_title'));
     },
   });
 
@@ -72,15 +71,15 @@ const ResetMigrationButton = () => {
   return (
     <>
       <Button bsStyle="primary" bsSize="small" onClick={handleResetClick}>
-        Reset Migration
+        {t('reset_migration.button')}
       </Button>
       {showDialog && (
         <ConfirmDialog
-          title="Reset Migration"
+          title={t('reset_migration.button')}
           show
           onConfirm={handleConfirmClick}
           onCancel={() => setShowDialog(false)}>
-          Are you sure you want to reset the migration?
+          {t('reset_migration.confirm')}
         </ConfirmDialog>
       )}
     </>

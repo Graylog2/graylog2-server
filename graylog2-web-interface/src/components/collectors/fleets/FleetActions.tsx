@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { ButtonToolbar, DeleteMenuItem } from 'components/bootstrap';
 import { ConfirmDialog, HoverForHelp, IconButton, LinkContainer } from 'components/common';
@@ -33,6 +34,7 @@ type Props = {
 };
 
 const FleetActions = ({ fleet }: Props) => {
+  const { t } = useTranslation('collectors');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const { deleteFleet } = useCollectorsMutations();
   const { canDeleteFleet } = useCollectorPermissions();
@@ -58,7 +60,7 @@ const FleetActions = ({ fleet }: Props) => {
         <LinkContainer to={collectorReceivedMessagesUrl(AGENT_FLEET_ID_FIELD, fleet.id)}>
           <IconButton
             name="search"
-            title="Received messages"
+            title={t('fleet_actions.received_messages')}
             bsStyle="default"
             size="xsmall"
             onClick={() =>
@@ -72,11 +74,10 @@ const FleetActions = ({ fleet }: Props) => {
         {canDelete && (
           <MoreActions>
             <DeleteMenuItem onSelect={() => setShowDeleteConfirm(true)} disabled={!isDeletable}>
-              Delete
+              {t('fleet_actions.delete')}
               {assignedInstances > 0 && (
                 <HoverForHelp displayLeftMargin>
-                  This fleet has {assignedInstances} assigned instance{assignedInstances === 1 ? '' : 's'}. Reassign or
-                  delete them before deleting the fleet.
+                  {t('fleet_actions.delete_blocked', { count: assignedInstances })}
                 </HoverForHelp>
               )}
             </DeleteMenuItem>
@@ -85,12 +86,16 @@ const FleetActions = ({ fleet }: Props) => {
       </ButtonToolbar>
       {showDeleteConfirm && (
         <ConfirmDialog
-          title="Delete fleet"
+          title={t('fleet_actions.delete_title')}
           show
           onConfirm={handleConfirmDelete}
           onCancel={() => setShowDeleteConfirm(false)}>
-          Are you sure you want to delete fleet <strong>{fleet.name}</strong>? Its source configurations and enrollment
-          tokens will be removed.
+          <Trans
+            t={t}
+            i18nKey="fleet_actions.delete_confirm"
+            values={{ fleetName: fleet.name }}
+            components={{ emphasis: <strong /> }}
+          />
         </ConfirmDialog>
       )}
     </>

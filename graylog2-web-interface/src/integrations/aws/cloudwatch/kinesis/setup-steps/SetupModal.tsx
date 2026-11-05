@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useCallback } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Alert, Button, Modal } from 'components/bootstrap';
 import { ModalSubmit } from 'components/common';
@@ -29,13 +30,21 @@ type SetupModalProps = {
   streamName: string;
 };
 
+const DocsAnchor = ({ href, children }: { href: string; children?: React.ReactNode }) => (
+  <a href={href} target="_blank" rel="noopener noreferrer">
+    {children}
+  </a>
+);
+
 const SetupModal = ({ onSubmit, onCancel, groupName, streamName }: SetupModalProps) => {
+  const { t } = useTranslation('integrations');
   const [agreed, setAgreed] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(false);
 
-  const buttonOtherText = !error && !success ? 'Creating...' : 'Close';
-  const buttonText = success ? 'Continue Setup' : buttonOtherText;
+  const buttonOtherText =
+    !error && !success ? t('aws_kinesis_setup_modal.creating_button') : t('aws_kinesis_setup_modal.close_button');
+  const buttonText = success ? t('aws_kinesis_setup_modal.continue_button') : buttonOtherText;
 
   const handleSuccess = () => {
     setSuccess(true);
@@ -50,7 +59,9 @@ const SetupModal = ({ onSubmit, onCancel, groupName, streamName }: SetupModalPro
   return (
     <Modal show onHide={() => {}}>
       <Modal.Header>
-        <Modal.Title>{agreed ? 'Executing Auto-Setup' : 'Kinesis Auto Setup Agreement'}</Modal.Title>
+        <Modal.Title>
+          {agreed ? t('aws_kinesis_setup_modal.executing_title') : t('aws_kinesis_setup_modal.agreement_title')}
+        </Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
@@ -62,16 +73,15 @@ const SetupModal = ({ onSubmit, onCancel, groupName, streamName }: SetupModalPro
 
         {agreed && success && (
           <Alert key="delayedLogs" bsStyle="warning">
-            It may take up to ten minutes for the first messages to arrive in the Kinesis stream. The Kinesis Health
-            Check in the following step will not complete successfully until messages are present in the stream. Please
-            see the official{' '}
-            <a
-              href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/Subscriptions.html"
-              target="_blank"
-              rel="noopener noreferrer">
-              CloudWatch Subscriptions
-            </a>{' '}
-            documentation for more information.
+            <Trans
+              t={t}
+              i18nKey="aws_kinesis_setup_modal.delayed_logs"
+              components={{
+                cloudWatchLink: (
+                  <DocsAnchor href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/Subscriptions.html" />
+                ),
+              }}
+            />
           </Alert>
         )}
       </Modal.Body>
@@ -83,7 +93,7 @@ const SetupModal = ({ onSubmit, onCancel, groupName, streamName }: SetupModalPro
           </Button>
         ) : (
           <ModalSubmit
-            submitButtonText="I Agree! Create these AWS resources now."
+            submitButtonText={t('aws_kinesis_setup_modal.agree_button')}
             onSubmit={() => setAgreed(true)}
             submitButtonType="button"
             onCancel={onCancel}

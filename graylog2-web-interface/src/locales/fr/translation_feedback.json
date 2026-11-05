@@ -1,0 +1,85 @@
+{
+  "menu": {
+    "report": "Signaler la traduction…",
+    "native_menu_hint": "Maj + clic droit ouvre le menu du navigateur"
+  },
+  "modal": {
+    "title": "Signaler la traduction",
+    "text": "Texte",
+    "text_help": "Le texte tel qu'il apparaît sur la page. Raccourcissez-le à la partie concernée.",
+    "key": "Traduction",
+    "partial_match": "correspondance partielle",
+    "not_translated": "non traduit",
+    "none_of_these": "Aucune de celles-ci",
+    "no_key_found": "Aucune traduction trouvée, le texte n'est probablement pas encore traduit.",
+    "english": "Original anglais :",
+    "current_translation": "Traduction actuelle :",
+    "category": "Problème",
+    "suggestion": "Traduction suggérée",
+    "suggestion_help": "Facultatif. Comment le texte devrait être formulé.",
+    "comment": "Commentaire",
+    "submit": "Signaler",
+    "submitting": "Envoi…"
+  },
+  "categories": {
+    "wrong": "Traduction incorrecte",
+    "untranslated": "Non traduit",
+    "awkward": "Formulation maladroite",
+    "layout": "Mise en page cassée ou texte tronqué",
+    "other": "Autre"
+  },
+  "statuses": {
+    "open": "Ouvert",
+    "fixed": "Corrigé",
+    "wont_fix": "Ne sera pas corrigé"
+  },
+  "list": {
+    "human_name": "signalements de traduction",
+    "search_placeholder": "Rechercher des signalements de traduction",
+    "no_key": "Aucune clé",
+    "download_json": "Télécharger JSON",
+    "download_csv": "Télécharger CSV"
+  },
+  "actions": {
+    "mark_fixed": "Marquer comme corrigé",
+    "reopen": "Rouvrir",
+    "mark_wont_fix": "Ne sera pas corrigé",
+    "confirm_delete": "Voulez-vous vraiment supprimer le signalement concernant « {{text}} » ?"
+  },
+  "page": {
+    "title": "Retours sur la traduction",
+    "description": "Signalements concernant les traductions de l'interface. Faites un clic droit sur n'importe quel texte pour le signaler."
+  },
+  "notifications": {
+    "created": "Merci ! Votre signalement a été enregistré.",
+    "created_title": "Traduction signalée",
+    "create_failed": "Impossible d'enregistrer le signalement : {{error}}",
+    "create_failed_title": "Impossible de signaler la traduction",
+    "update_failed": "Impossible de mettre à jour le signalement : {{error}}",
+    "update_failed_title": "Impossible de mettre à jour le signalement"
+  },
+  "bulk": {
+    "delete": "Supprimer",
+    "changed_one": "{{count}} signalement modifié.",
+    "changed_many": "{{count}} signalements modifiés.",
+    "changed_other": "{{count}} signalements modifiés.",
+    "confirm_delete_one": "Voulez-vous vraiment supprimer {{count}} signalement ?",
+    "confirm_delete_many": "Voulez-vous vraiment supprimer {{count}} signalements ?",
+    "confirm_delete_other": "Voulez-vous vraiment supprimer {{count}} signalements ?"
+  },
+  "upload": {
+    "button": "Importer les résolutions",
+    "uploading": "Importation…",
+    "help": "Importez un fichier de résolutions pour définir le statut et une note pour l'auteur de plusieurs signalements à la fois.",
+    "failed": "Impossible d'appliquer les résolutions : {{error}}",
+    "failed_title": "Impossible d'appliquer les résolutions",
+    "invalid_file": "Le fichier ne contient pas de liste de résolutions.",
+    "applied_title": "Résolutions appliquées",
+    "applied_one": "{{count}} signalement mis à jour.",
+    "applied_many": "{{count}} signalements mis à jour.",
+    "applied_other": "{{count}} signalements mis à jour.",
+    "applied_with_missing_one": "{{count}} signalement mis à jour, {{notFound}} introuvables.",
+    "applied_with_missing_many": "{{count}} signalements mis à jour, {{notFound}} introuvables.",
+    "applied_with_missing_other": "{{count}} signalements mis à jour, {{notFound}} introuvables."
+  }
+}

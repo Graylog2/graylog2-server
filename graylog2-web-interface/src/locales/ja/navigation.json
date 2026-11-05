@@ -1,0 +1,77 @@
+{
+  "main": {
+    "search": "検索",
+    "streams": "ストリーム",
+    "alerts": "アラート",
+    "dashboards": "ダッシュボード",
+    "system": "システム",
+    "enterprise": "Enterprise",
+    "security": "セキュリティ"
+  },
+  "system": {
+    "overview": "概要",
+    "configurations": "設定",
+    "cluster_configuration": "クラスター設定",
+    "inputs": "入力",
+    "outputs": "出力",
+    "indices": "インデックス",
+    "logging": "ログ",
+    "users_and_teams": "ユーザーとチーム",
+    "roles": "ロール",
+    "authentication": "認証",
+    "content_packs": "コンテンツパック",
+    "grok_patterns": "Grok パターン",
+    "lookup_tables": "ルックアップテーブル",
+    "pipelines": "パイプライン",
+    "sidecars": "サイドカー",
+    "collectors": "コレクター",
+    "translation_feedback": "翻訳フィードバック"
+  },
+  "security": {
+    "overview": "概要",
+    "user_activity": "ユーザーアクティビティ",
+    "host_activity": "ホストアクティビティ",
+    "network_activity": "ネットワークアクティビティ",
+    "anomalies": "異常"
+  },
+  "help": {
+    "title": "ヘルプ",
+    "documentation": "ドキュメント",
+    "design_system": "デザインシステム",
+    "keyboard_shortcuts": "キーボードショートカット",
+    "api_browser": "API ブラウザー"
+  },
+  "user_menu": {
+    "title": "{{name}} のユーザーメニュー",
+    "language": "言語",
+    "show_profile": "プロフィールを表示",
+    "edit_profile": "プロフィールを編集",
+    "log_out": "ログアウト"
+  },
+  "shell": {
+    "welcome": "ようこそ",
+    "main": "メイン",
+    "utility": "ユーティリティ",
+    "toggle_navigation": "ナビゲーションの切り替え",
+    "scratchpad": "スクラッチパッド"
+  },
+  "page_navigation": {
+    "cluster_configuration": "クラスター設定",
+    "certificate_management": "証明書管理",
+    "data_node_dashboard": "Data Node ダッシュボード",
+    "data_node_upgrade": "Data Node アップグレード",
+    "data_node_migration": "Data Node 移行",
+    "overview": "概要",
+    "notifications": "通知",
+    "lookup_tables": "ルックアップテーブル",
+    "caches": "キャッシュ",
+    "data_adapters": "データアダプター",
+    "users_overview": "ユーザー概要",
+    "token_management": "トークン管理",
+    "administration": "管理",
+    "configuration": "設定",
+    "failure_tracking": "失敗の追跡",
+    "alerts_and_events": "アラートとイベント",
+    "event_definitions": "イベント定義"
+  }
+}

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { SyntheticEvent } from 'react';
 import { useCallback, useMemo } from 'react';
 import styled, { css } from 'styled-components';
@@ -121,6 +122,7 @@ const FieldSelect = ({
   showDeSelectAll = false,
   options,
 }: Props) => {
+  const { t } = useTranslation('aggregation');
   const fieldOptions = useMemo(
     () =>
       options
@@ -170,12 +172,12 @@ const FieldSelect = ({
         <ButtonRow>
           {_showSelectAllRest && (
             <Button bsSize="xs" onClick={_onSelectAllRest}>
-              Select all fields
+              {t('wizard_common.select_all_fields')}
             </Button>
           )}
           {_showDeSelectAll && (
             <Button bsSize="xs" onClick={onDeSelectAll}>
-              Deselect all fields
+              {t('wizard_common.deselect_all_fields')}
             </Button>
           )}
         </ButtonRow>

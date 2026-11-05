@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Col as BSCol, Alert } from 'components/bootstrap';
 import { Col, Row, DataWell, RowContainer } from 'components/lookup-tables/layout-componets';
@@ -43,6 +44,7 @@ type Props = {
 };
 
 function LookupTableShow({ table, cache = undefined, dataAdapter = undefined }: Props) {
+  const { t } = useTranslation('lookup_tables');
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(table);
 
   const canEdit = useMemo(
@@ -55,29 +57,29 @@ function LookupTableShow({ table, cache = undefined, dataAdapter = undefined }: 
       <Col $gap="lg" $width="50%" style={{ flexShrink: 0 }}>
         <LookupTableDetails table={table} canEdit={canEdit} />
         <Col $gap="xs">
-          <h2>Attached</h2>
+          <h2>{t('lut_view.attached')}</h2>
           <DataWell style={{ overflow: 'auto' }}>
             <Col $gap="xs">
               <Row>
-                <span style={{ width: 100, flexShrink: 0 }}>Cache</span>
+                <span style={{ width: 100, flexShrink: 0 }}>{t('lut_view.cache_label')}</span>
                 <Row $justify="space-between" $align="center">
                   {cache ? (
-                    <span aria-label="cache details">{cache.title}</span>
+                    <span aria-label={t('lut_view.cache_details_label')}>{cache.title}</span>
                   ) : (
                     <i>
-                      <Description>No cache</Description>
+                      <Description>{t('lut_view.no_cache')}</Description>
                     </i>
                   )}
                 </Row>
               </Row>
               <Row>
-                <span style={{ width: 100, flexShrink: 0 }}>Data Adapter</span>
+                <span style={{ width: 100, flexShrink: 0 }}>{t('lut_view.adapter_label')}</span>
                 <Row $justify="space-between" $align="center">
                   {dataAdapter ? (
-                    <span aria-label="adapter details">{dataAdapter.title}</span>
+                    <span aria-label={t('lut_view.adapter_details_label')}>{dataAdapter.title}</span>
                   ) : (
                     <i>
-                      <Description>No data adapter</Description>
+                      <Description>{t('lut_view.no_adapter')}</Description>
                     </i>
                   )}
                 </Row>
@@ -90,18 +92,18 @@ function LookupTableShow({ table, cache = undefined, dataAdapter = undefined }: 
       </Col>
       <Col $gap="lg" $width="50%">
         <Col $gap="sm">
-          <h2>Cache</h2>
+          <h2>{t('lut_view.cache_label')}</h2>
           <BSCol style={{ width: '100%' }}>
-            {cache ? <Cache cache={cache} /> : <Alert bsStyle="info">No cache set</Alert>}
+            {cache ? <Cache cache={cache} /> : <Alert bsStyle="info">{t('lut_view.no_cache_set')}</Alert>}
           </BSCol>
         </Col>
         <Col $gap="sm">
-          <h2>Data Adapter</h2>
+          <h2>{t('lut_view.adapter_label')}</h2>
           <BSCol style={{ width: '100%' }}>
             {dataAdapter ? (
               <DataAdapter dataAdapter={dataAdapter} />
             ) : (
-              <Alert bsStyle="info">No data adapter set</Alert>
+              <Alert bsStyle="info">{t('lut_view.no_adapter_set')}</Alert>
             )}
           </BSCol>
         </Col>

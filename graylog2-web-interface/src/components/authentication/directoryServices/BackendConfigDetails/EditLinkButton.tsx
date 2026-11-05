@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { LinkContainer } from 'components/common';
 import Routes from 'routing/Routes';
@@ -25,12 +26,16 @@ type Props = {
   stepKey: string;
 };
 
-const EditLinkButton = ({ authenticationBackendId, stepKey }: Props) => (
-  <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(authenticationBackendId, stepKey)}>
-    <Button bsStyle="primary" bsSize="small">
-      Edit
-    </Button>
-  </LinkContainer>
-);
+const EditLinkButton = ({ authenticationBackendId, stepKey }: Props) => {
+  const { t } = useTranslation('authentication');
+
+  return (
+    <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(authenticationBackendId, stepKey)}>
+      <Button bsStyle="primary" bsSize="small">
+        {t('config_details.edit')}
+      </Button>
+    </LinkContainer>
+  );
+};
 
 export default EditLinkButton;

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import i18n from 'i18n';
 import UserNotification from 'util/UserNotification';
 import { fetchBlobFile, fetchFile } from 'logic/rest/FetchProvider';
 import type { Method } from 'routing/types';
@@ -42,7 +43,10 @@ export const downloadBLOB = (contents: BlobPart, metadata: { fileName: string; c
 };
 
 const errorHandler = (errorThrown: Error) => {
-  UserNotification.error(`Downloading failed with status: ${errorThrown}`, 'Unable to download');
+  UserNotification.error(
+    i18n.t('notifications.download_failed', { ns: 'common', error: errorThrown }),
+    i18n.t('notifications.download_failed_title', { ns: 'common' }),
+  );
 };
 
 export const fetchTextFile = async <Body>(

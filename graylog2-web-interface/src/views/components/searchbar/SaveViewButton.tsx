@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Icon, Tooltip } from 'components/common';
 import useIsDirty from 'views/hooks/useIsDirty';
@@ -39,6 +40,7 @@ const SaveViewButton = (
   { title, onClick, disabled = false, disabledInfo = undefined }: Props,
   ref: React.ForwardedRef<HTMLButtonElement>,
 ) => {
+  const { t } = useTranslation('search');
   const isDirty = useIsDirty();
   const showDisabledInfo = disabled && !!disabledInfo;
 
@@ -46,7 +48,7 @@ const SaveViewButton = (
     return (
       <Tooltip label={disabledInfo} position="bottom" withArrow>
         <Button aria-label={title} aria-disabled ref={ref} disabled allowClickWhenDisabled>
-          <StyledIcon name="save" type="regular" $isDirty={false} /> Save
+          <StyledIcon name="save" type="regular" $isDirty={false} /> {t('save_view.save')}
         </Button>
       </Tooltip>
     );
@@ -54,7 +56,8 @@ const SaveViewButton = (
 
   return (
     <Button title={title} ref={ref} onClick={onClick} disabled={disabled}>
-      <StyledIcon name="save" type={isDirty ? 'solid' : 'regular'} $isDirty={!disabled && isDirty} /> Save
+      <StyledIcon name="save" type={isDirty ? 'solid' : 'regular'} $isDirty={!disabled && isDirty} />{' '}
+      {t('save_view.save')}
     </Button>
   );
 };

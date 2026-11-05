@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import UsersDomain from 'domainActions/users/UsersDomain';
 import usePermissions from 'hooks/usePermissions';
@@ -31,6 +32,7 @@ type Props = {
 };
 
 const UsersSelectField = ({ value, onChange }: Props) => {
+  const { t } = useTranslation('users');
   const { isPermitted } = usePermissions();
 
   const loadUsers = useCallback(
@@ -56,7 +58,7 @@ const UsersSelectField = ({ value, onChange }: Props) => {
     <PaginatedSelect
       id="user-select-list"
       value={value}
-      placeholder="Select user(s)..."
+      placeholder={t('users_list.select_users')}
       onLoadOptions={loadUsers}
       multi
       onChange={onChange}

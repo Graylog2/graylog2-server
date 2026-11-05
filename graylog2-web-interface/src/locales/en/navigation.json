@@ -1,0 +1,77 @@
+{
+  "main": {
+    "search": "Search",
+    "streams": "Streams",
+    "alerts": "Alerts",
+    "dashboards": "Dashboards",
+    "system": "System",
+    "enterprise": "Enterprise",
+    "security": "Security"
+  },
+  "system": {
+    "overview": "Overview",
+    "configurations": "Configurations",
+    "cluster_configuration": "Cluster Configuration",
+    "inputs": "Inputs",
+    "outputs": "Outputs",
+    "indices": "Indices",
+    "logging": "Logging",
+    "users_and_teams": "Users and Teams",
+    "roles": "Roles",
+    "authentication": "Authentication",
+    "content_packs": "Content Packs",
+    "grok_patterns": "Grok Patterns",
+    "lookup_tables": "Lookup Tables",
+    "pipelines": "Pipelines",
+    "sidecars": "Sidecars",
+    "collectors": "Collectors",
+    "translation_feedback": "Translation Feedback"
+  },
+  "security": {
+    "overview": "Overview",
+    "user_activity": "User Activity",
+    "host_activity": "Host Activity",
+    "network_activity": "Network Activity",
+    "anomalies": "Anomalies"
+  },
+  "help": {
+    "title": "Help",
+    "documentation": "Documentation",
+    "design_system": "Design System",
+    "keyboard_shortcuts": "Keyboard Shortcuts",
+    "api_browser": "API browser"
+  },
+  "user_menu": {
+    "title": "User Menu for {{name}}",
+    "language": "Language",
+    "show_profile": "Show profile",
+    "edit_profile": "Edit profile",
+    "log_out": "Log out"
+  },
+  "shell": {
+    "welcome": "Welcome",
+    "main": "Main",
+    "utility": "Utility",
+    "toggle_navigation": "Toggle navigation",
+    "scratchpad": "Scratchpad"
+  },
+  "page_navigation": {
+    "cluster_configuration": "Cluster Configuration",
+    "certificate_management": "Certificate Management",
+    "data_node_dashboard": "Data Node Dashboard",
+    "data_node_upgrade": "Data Node Upgrade",
+    "data_node_migration": "Data Node Migration",
+    "overview": "Overview",
+    "notifications": "Notifications",
+    "lookup_tables": "Lookup Tables",
+    "caches": "Caches",
+    "data_adapters": "Data Adapters",
+    "users_overview": "Users Overview",
+    "token_management": "Token Management",
+    "administration": "Administration",
+    "configuration": "Configuration",
+    "failure_tracking": "Failure Tracking",
+    "alerts_and_events": "Alerts & Events",
+    "event_definitions": "Event Definitions"
+  }
+}

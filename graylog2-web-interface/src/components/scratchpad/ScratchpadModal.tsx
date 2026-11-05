@@ -18,6 +18,7 @@ import React, { useContext, useState, useEffect, useRef } from 'react';
 import styled, { css } from 'styled-components';
 import chroma from 'chroma-js';
 import debounce from 'lodash/debounce';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { OverlayTrigger } from 'components/common';
 import { Alert, Button, ButtonGroup, BootstrapModalConfirm } from 'components/bootstrap';
@@ -30,9 +31,10 @@ import copyToClipboard from 'util/copyToClipboard';
 
 const DEFAULT_SCRATCHDATA = '';
 const TEXTAREA_ID = 'scratchpad-text-content';
-const STATUS_CLEARED = 'Cleared.';
-const STATUS_COPIED = 'Copied!';
-const STATUS_AUTOSAVED = 'Auto saved.';
+// Status messages are stored as translation keys and translated where they are rendered.
+const STATUS_CLEARED = 'scratchpad.status_cleared';
+const STATUS_COPIED = 'clipboard.copied';
+const STATUS_AUTOSAVED = 'scratchpad.status_auto_saved';
 const STATUS_DEFAULT = '';
 
 type Position = { x: number; y: number };
@@ -108,6 +110,7 @@ const StatusMessage = styled.span<{ $visible: boolean }>(
 );
 
 const Scratchpad = () => {
+  const { t } = useTranslation('common');
   const textareaRef = useRef<HTMLTextAreaElement>();
   const statusTimeout = useRef<ReturnType<typeof setTimeout>>();
   const { setScratchpadVisibility, localStorageItem } = useContext(ScratchpadContext);
@@ -210,7 +213,7 @@ const Scratchpad = () => {
 
   return (
     <InteractableModal
-      title="Scratchpad"
+      title={t('scratchpad.title')}
       onClose={() => setScratchpadVisibility(false)}
       onDrag={handleDrag}
       onResize={handleSize}
@@ -220,10 +223,10 @@ const Scratchpad = () => {
         {!isSecurityWarningConfirmed && (
           <StyledAlert bsStyle="warning">
             <AlertNote>
-              We recommend you do <strong>not</strong> store any sensitive information, such as passwords, in this area.
+              <Trans t={t} i18nKey="scratchpad.sensitive_warning" components={{ bold: <strong /> }} />
             </AlertNote>
             <Button bsStyle="link" bsSize="sm" onClick={handleGotIt}>
-              Got It!
+              {t('scratchpad.got_it')}
             </Button>
           </StyledAlert>
         )}
@@ -237,29 +240,22 @@ const Scratchpad = () => {
         />
 
         <Footer>
-          <OverlayTrigger
-            placement="right"
-            trigger={['hover', 'focus']}
-            overlay={
-              <>
-                You can use this space to store personal notes and other information, without leaving your browser
-                window. For example, store timestamps, user IDs, or IP addresses you need in various investigations.
-              </>
-            }>
+          <OverlayTrigger placement="right" trigger={['hover', 'focus']} overlay={<>{t('scratchpad.help_overlay')}</>}>
             <Button bsStyle="link">
               <Icon name="help" />
             </Button>
           </OverlayTrigger>
 
           <StatusMessage $visible={showStatusMessage}>
-            <Icon name={statusMessage === STATUS_COPIED ? 'content_copy' : 'save'} type="regular" /> {statusMessage}
+            <Icon name={statusMessage === STATUS_COPIED ? 'content_copy' : 'save'} type="regular" />{' '}
+            {statusMessage && t(statusMessage)}
           </StatusMessage>
 
           <ButtonGroup>
-            <Button id="scratchpad-actions" onClick={copyCallback} title="Copy">
+            <Button id="scratchpad-actions" onClick={copyCallback} title={t('scratchpad.copy')}>
               <Icon name="content_copy" />
             </Button>
-            <Button onClick={openConfirmClear} title="Clear">
+            <Button onClick={openConfirmClear} title={t('scratchpad.clear')}>
               <Icon name="delete" />
             </Button>
           </ButtonGroup>
@@ -268,10 +264,10 @@ const Scratchpad = () => {
 
       <BootstrapModalConfirm
         showModal={showModal}
-        title="Are you sure?"
+        title={t('confirm_leave.question')}
         onConfirm={handleClearText}
         onCancel={handleCancelClear}>
-        This will clear out your Scratchpad content, do you wish to proceed?
+        {t('scratchpad.clear_confirm')}
       </BootstrapModalConfirm>
     </InteractableModal>
   );

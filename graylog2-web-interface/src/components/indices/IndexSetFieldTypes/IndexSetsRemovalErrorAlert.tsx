@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type {
   RemovalResponse,
@@ -31,43 +32,47 @@ const IndexSetRemovalErrors = ({
   errors: IndexSetResponse['errors'];
   failures: IndexSetResponse['failures'];
   title: string;
-}) => (
-  <div>
-    <h4>
-      <b>{title}:</b>
-    </h4>
-    <ul>
-      {!!errors.length && (
-        <li>
-          <h5>
-            <b>General errors:</b>
-          </h5>
-          <ul>
-            {errors.map((error) => (
-              <li key={error}>
-                <i>{error}</i>
-              </li>
-            ))}
-          </ul>
-        </li>
-      )}
-      {!!failures.length && (
-        <li>
-          <h4>
-            <b>Field errors:</b>
-          </h4>
-          <ul>
-            {failures.map(({ entityId, failureExplanation }) => (
-              <li key={entityId}>
-                <b>{entityId}</b> - <i>{failureExplanation}</i>
-              </li>
-            ))}
-          </ul>
-        </li>
-      )}
-    </ul>
-  </div>
-);
+}) => {
+  const { t } = useTranslation('indexsets');
+
+  return (
+    <div>
+      <h4>
+        <b>{title}:</b>
+      </h4>
+      <ul>
+        {!!errors.length && (
+          <li>
+            <h5>
+              <b>{t('field_types.general_errors')}</b>
+            </h5>
+            <ul>
+              {errors.map((error) => (
+                <li key={error}>
+                  <i>{error}</i>
+                </li>
+              ))}
+            </ul>
+          </li>
+        )}
+        {!!failures.length && (
+          <li>
+            <h4>
+              <b>{t('field_types.field_errors')}</b>
+            </h4>
+            <ul>
+              {failures.map(({ entityId, failureExplanation }) => (
+                <li key={entityId}>
+                  <b>{entityId}</b> - <i>{failureExplanation}</i>
+                </li>
+              ))}
+            </ul>
+          </li>
+        )}
+      </ul>
+    </div>
+  );
+};
 
 const IndexSetsRemovalErrorAlert = ({
   removalResponse,
@@ -75,12 +80,21 @@ const IndexSetsRemovalErrorAlert = ({
 }: {
   removalResponse: RemovalResponse;
   indexSets: Record<string, IndexSet>;
-}) => (
-  <Alert bsStyle="danger" title="Removing some of field type overrides failed">
-    {Object.values(removalResponse).map(({ indexSetId, failures, errors }) => (
-      <IndexSetRemovalErrors key={indexSetId} failures={failures} errors={errors} title={indexSets[indexSetId].title} />
-    ))}
-  </Alert>
-);
+}) => {
+  const { t } = useTranslation('indexsets');
+
+  return (
+    <Alert bsStyle="danger" title={t('field_types.removal_failed_title')}>
+      {Object.values(removalResponse).map(({ indexSetId, failures, errors }) => (
+        <IndexSetRemovalErrors
+          key={indexSetId}
+          failures={failures}
+          errors={errors}
+          title={indexSets[indexSetId].title}
+        />
+      ))}
+    </Alert>
+  );
+};
 
 export default IndexSetsRemovalErrorAlert;

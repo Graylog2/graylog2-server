@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 type WhoisAdapterSummaryProps = {
   dataAdapter: {
@@ -26,14 +27,19 @@ type WhoisAdapterSummaryProps = {
 };
 
 const WhoisAdapterSummary = ({ dataAdapter }: WhoisAdapterSummaryProps) => {
+  const { t } = useTranslation('integrations');
   const { config } = dataAdapter;
 
   return (
     <dl>
-      <dt>Connect timeout</dt>
-      <dd>{config.connect_timeout} ms</dd>
-      <dt>Read timeout</dt>
-      <dd>{config.read_timeout} ms</dd>
+      <dt>{t('whois_adapter_field_set.connect_timeout_label')}</dt>
+      <dd>
+        {config.connect_timeout} {t('whois_adapter_summary.unit_ms')}
+      </dd>
+      <dt>{t('whois_adapter_field_set.read_timeout_label')}</dt>
+      <dd>
+        {config.read_timeout} {t('whois_adapter_summary.unit_ms')}
+      </dd>
     </dl>
   );
 };

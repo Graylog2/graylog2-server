@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { ConfirmDialog, IconButton } from 'components/common';
@@ -29,6 +30,7 @@ type Props = {
 };
 
 const RemoveOutputButton = ({ output, streamId }: Props) => {
+  const { t } = useTranslation('streams');
   const [showConfirmRemove, setShowConfirmRemove] = useState(false);
   const { removeStreamOutput } = useStreamOutputMutation();
   const queryClient = useQueryClient();
@@ -44,7 +46,7 @@ const RemoveOutputButton = ({ output, streamId }: Props) => {
       <IconButton
         name="delete"
         iconType="regular"
-        title="Remove Output"
+        title={t('routing_destination.remove_output.title')}
         bsStyle="danger"
         onClick={() => setShowConfirmRemove(true)}
       />
@@ -52,8 +54,8 @@ const RemoveOutputButton = ({ output, streamId }: Props) => {
         show={showConfirmRemove}
         onConfirm={onConfirmRemoveOutput}
         onCancel={() => setShowConfirmRemove(false)}
-        title="Remove Output">
-        <p>Do you really want to remove this output from the stream?</p>
+        title={t('routing_destination.remove_output.title')}>
+        <p>{t('routing_destination.remove_output.confirm')}</p>
       </ConfirmDialog>
     </>
   );

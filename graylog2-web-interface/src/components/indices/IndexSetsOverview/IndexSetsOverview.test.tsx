@@ -205,7 +205,7 @@ describe('IndexSetsOverview', () => {
     render(<IndexSetsOverview />);
 
     within(await findRow(defaultIndexSet)).getByText('Default');
-    within(await findRow(readOnlyIndexSet)).getByText('Read only');
+    within(await findRow(readOnlyIndexSet)).getByText('Read-only');
 
     expect(within(await findRow(exampleIndexSet)).queryByText('Default')).not.toBeInTheDocument();
   });

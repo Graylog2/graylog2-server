@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Column } from '@tanstack/react-table';
 import { forwardRef, type ForwardedRef, useContext } from 'react';
 import styled, { css } from 'styled-components';
@@ -76,6 +77,7 @@ const ThGhostInner = <Entity extends EntityBase>(
   { column }: { column: Column<Entity> },
   ref: React.ForwardedRef<HTMLDivElement>,
 ) => {
+  const { t } = useTranslation('common');
   const activeSliceCol = useContext(ActiveSliceColContext);
   const columnMeta = column.columnDef?.meta as ColumnMetaContext<any>;
   const columnLabel = columnMeta?.label ?? column.id;
@@ -107,7 +109,11 @@ const ThGhostInner = <Entity extends EntityBase>(
   );
 
   const sliceIndicator = isSliceActive && (
-    <ActiveSliceIcon name="surgical" title={`Slicing by ${columnLabel}`} $isRightAligned={isRightAligned} />
+    <ActiveSliceIcon
+      name="surgical"
+      title={t('entity_table.slicing_by', { column: columnLabel })}
+      $isRightAligned={isRightAligned}
+    />
   );
   const sortIndicator = sortDirection && <SortIcon<Entity> column={column} />;
 

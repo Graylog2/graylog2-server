@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { DropdownButton, MenuItem } from 'components/bootstrap';
@@ -47,12 +48,13 @@ const PageSizeSelect = ({
   className = '',
   showLabel = true,
 }: Props) => {
+  const { t } = useTranslation('common');
   const select = (
     <StyledDropdownButton
       className={className}
       id="page-size-select"
-      title={`${pageSize} Rows`}
-      aria-label="Configure page size"
+      title={t('page_size.rows', { count: pageSize })}
+      aria-label={t('page_size.configure')}
       pullRight
       bsSize="small"
       bsStyle="default">
@@ -67,8 +69,7 @@ const PageSizeSelect = ({
   if (showLabel) {
     return (
       <Container className={className}>
-        Show
-        {select}
+        <Trans t={t} i18nKey="page_size.show" components={{ select }} />
       </Container>
     );
   }

@@ -1,0 +1,4 @@
+{
+  "title": "Logging",
+  "description": "Questa sezione controlla il logging dell'architettura di Graylog e consente di modificare al volo i livelli di log. Nota che i livelli di log vengono ripristinati ai valori predefiniti dopo il riavvio del servizio interessato."
+}

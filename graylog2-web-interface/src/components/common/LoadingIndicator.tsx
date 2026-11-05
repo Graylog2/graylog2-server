@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { useEffect, useState } from 'react';
 
@@ -57,20 +58,19 @@ type Props = {
  * Use this component when you want to load something in the background, but still provide some feedback that
  * an action is happening.
  */
-const LoadingIndicator = ({
-  text = 'Loading...',
-  longWaitText = 'This is taking a bit longer, please hold on...',
-  longWaitTimeout = 20000,
-}: Props) => {
-  const [indicatorText, setIndicatorText] = useState(text);
+const LoadingIndicator = ({ text = undefined, longWaitText = undefined, longWaitTimeout = 20000 }: Props) => {
+  const { t } = useTranslation('common');
+  const [isLongWait, setIsLongWait] = useState(false);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      setIndicatorText(longWaitText);
+      setIsLongWait(true);
     }, longWaitTimeout);
 
     return () => clearTimeout(timeoutId);
-  }, [longWaitText, longWaitTimeout]);
+  }, [longWaitTimeout]);
+
+  const indicatorText = isLongWait ? (longWaitText ?? t('loading_long_wait')) : (text ?? t('loading'));
 
   return (
     <Delayed delay={500}>

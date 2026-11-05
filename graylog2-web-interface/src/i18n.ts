@@ -1,0 +1,136 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import i18next from 'i18next';
+import { initReactI18next } from 'react-i18next';
+
+import { singleton } from 'logic/singleton';
+import pseudoLocalize, { PSEUDO_LANGUAGE } from 'util/pseudoLocalize';
+import { recordTranslation } from 'util/i18n/renderedTranslations';
+
+type Translations = { [key: string]: unknown };
+type ResolvedTranslation = { usedNS?: string; usedKey?: string; usedLng?: string };
+export type TranslationsLoader = () => Promise<{ default: Translations }>;
+
+const DEFAULT_LANGUAGE = 'en';
+
+// Plugins are separate bundles which compile their own copy of this module. Sharing the instance and the loaders
+// through `window.singletons` lets them add their own namespaces and follow language changes of the core.
+const i18n = singleton('i18n', () => {
+  const instance = i18next.createInstance();
+
+  instance
+    .use(initReactI18next)
+    .use({
+      type: 'postProcessor',
+      name: 'pseudo',
+      process: (value: string, _key: unknown, _options: unknown, translator: { language: string }) =>
+        translator.language === PSEUDO_LANGUAGE ? pseudoLocalize(value) : value,
+    })
+    .use({
+      type: 'postProcessor',
+      name: 'record',
+      process: (value: string, _key: unknown, options: { i18nResolved?: ResolvedTranslation }) => {
+        const { usedNS, usedKey, usedLng } = options?.i18nResolved ?? {};
+
+        if (usedNS && usedKey) {
+          recordTranslation(value, { namespace: usedNS, key: usedKey, usedLanguage: usedLng });
+        }
+
+        return value;
+      },
+    })
+    .init({
+      resources: {},
+      // `record` runs last, so it remembers the text as it is rendered.
+      postProcess: ['pseudo', 'record'],
+      postProcessPassResolved: true,
+      lng: DEFAULT_LANGUAGE,
+      fallbackLng: DEFAULT_LANGUAGE,
+      interpolation: { escapeValue: false },
+      // Translations of plugins can arrive after the language was set, e.g. when a plugin registers its namespaces
+      // later. Rendering again when they are added replaces texts which fell back to English in the meantime,
+      // including labels which plugin bindings read with `i18n.t` while rendering.
+      react: { bindI18n: 'languageChanged', bindI18nStore: 'added' },
+    });
+
+  // Lets languages which don't capitalize nouns lower case values, e.g. `Create {{entityName, lowercase}}`.
+  instance.services.formatter.add('lowercase', (value: string) => value.toLowerCase());
+  // Lets languages which start sentences with a lower case value capitalize it, e.g. `{{type, capitalize}} was created`.
+  instance.services.formatter.add('capitalize', (value: string) => value.charAt(0).toUpperCase() + value.slice(1));
+
+  return instance;
+});
+
+const loadersByLanguage = singleton('i18n.loaders', () => new Map<string, Map<string, TranslationsLoader>>());
+
+const loadTranslations = async (language: string, namespace: string, loader: TranslationsLoader) => {
+  if (i18n.hasResourceBundle(language, namespace)) {
+    return;
+  }
+
+  const { default: translations } = await loader();
+  i18n.addResourceBundle(language, namespace, translations);
+};
+
+/**
+ * Registers the translations of a namespace. English is bundled, because it is the fallback for missing translations.
+ * Other languages are loaded on demand, e.g. `{ de: () => import('locales/de/search.json') }`.
+ */
+export const registerTranslations = (
+  namespace: string,
+  english: Translations,
+  otherLanguages: { [language: string]: TranslationsLoader },
+) => {
+  i18n.addResourceBundle(DEFAULT_LANGUAGE, namespace, english);
+
+  Object.entries(otherLanguages).forEach(([language, loader]) => {
+    if (!loadersByLanguage.has(language)) {
+      loadersByLanguage.set(language, new Map());
+    }
+
+    loadersByLanguage.get(language).set(namespace, loader);
+  });
+
+  // Plugins can register their translations after the language has been changed already.
+  const currentLanguageLoader = otherLanguages[i18n.language];
+
+  return currentLanguageLoader ? loadTranslations(i18n.language, namespace, currentLanguageLoader) : Promise.resolve();
+};
+
+/**
+ * Loads the translations of all registered namespaces before switching, so no texts change twice.
+ * A namespace which can't be loaded, e.g. because the file of a plugin is missing, stays in English instead of
+ * keeping the whole interface from switching.
+ */
+export const changeLanguage = async (language: string) => {
+  const loaders = [...(loadersByLanguage.get(language) ?? new Map<string, TranslationsLoader>())];
+
+  const results = await Promise.allSettled(
+    loaders.map(([namespace, loader]) => loadTranslations(language, namespace, loader)),
+  );
+
+  results.forEach((result, index) => {
+    if (result.status === 'rejected') {
+      // eslint-disable-next-line no-console
+      console.error(`Could not load the "${language}" translations of "${loaders[index][0]}":`, result.reason);
+    }
+  });
+
+  return i18n.changeLanguage(language);
+};
+
+export default i18n;

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { ListGroup, ListGroupItem } from 'components/bootstrap';
@@ -36,21 +37,25 @@ type Props = {
   metricMapper: (clickPoint: ClickPoint) => { value: string; metric: string };
 };
 
-const ClickPointSelector = ({ clickPointsInRadius, onSelect, metricMapper }: Props) => (
-  <Popover.Dropdown title={<PopoverTitle>Data Points</PopoverTitle>}>
-    <StyledListGroup>
-      {clickPointsInRadius.map((clickPoint: ClickPoint) => {
-        const { value, metric } = metricMapper(clickPoint);
-        const traceColor = getHoverSwatchColor(clickPoint);
+const ClickPointSelector = ({ clickPointsInRadius, onSelect, metricMapper }: Props) => {
+  const { t } = useTranslation('aggregation');
 
-        return (
-          <ListGroupItem onClick={() => onSelect(clickPoint)} key={metric}>
-            <ValueRenderer value={value} field={metric} traceColor={traceColor} />
-          </ListGroupItem>
-        );
-      })}
-    </StyledListGroup>
-  </Popover.Dropdown>
-);
+  return (
+    <Popover.Dropdown title={<PopoverTitle>{t('vis_popover.data_points')}</PopoverTitle>}>
+      <StyledListGroup>
+        {clickPointsInRadius.map((clickPoint: ClickPoint) => {
+          const { value, metric } = metricMapper(clickPoint);
+          const traceColor = getHoverSwatchColor(clickPoint);
+
+          return (
+            <ListGroupItem onClick={() => onSelect(clickPoint)} key={metric}>
+              <ValueRenderer value={value} field={metric} traceColor={traceColor} />
+            </ListGroupItem>
+          );
+        })}
+      </StyledListGroup>
+    </Popover.Dropdown>
+  );
+};
 
 export default ClickPointSelector;

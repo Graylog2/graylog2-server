@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Input } from 'components/bootstrap';
 import useProductName from 'brand-customization/useProductName';
@@ -26,6 +27,7 @@ type Props = {
 };
 
 const ThrottlingCheckbox = ({ id, defaultChecked, onChange }: Props) => {
+  const { t } = useTranslation('integrations');
   const productName = useProductName();
 
   return (
@@ -35,8 +37,8 @@ const ThrottlingCheckbox = ({ id, defaultChecked, onChange }: Props) => {
       value="enable-throttling"
       defaultChecked={defaultChecked}
       onChange={onChange}
-      label="Enable Throttling"
-      help={`If enabled, no new messages will be read from this input until the ${productName} server catches up with its message load. This is typically useful for inputs reading from files or message queue systems like AMQP or Kafka. If you regularly poll an external system, e.g. via HTTP, you normally want to leave this disabled.`}
+      label={t('throttling_checkbox.label')}
+      help={t('throttling_checkbox.help', { productName })}
     />
   );
 };

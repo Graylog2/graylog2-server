@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
@@ -38,27 +39,29 @@ const CreateButtonWithSigma = () => {
   );
 };
 
-const EventDefinitionsPage = () => (
-  <DocumentTitle title="Event Definitions">
-    <EventsPageNavigation />
-    <PageHeader
-      title="Event Definitions"
-      actions={<CreateButtonWithSigma />}
-      documentationLink={{
-        title: 'Alerts documentation',
-        path: DocsHelper.PAGES.ALERTS,
-      }}>
-      <span>
-        Create new Event Definitions that will allow you to search for different Conditions and alert on them.
-      </span>
-    </PageHeader>
+const EventDefinitionsPage = () => {
+  const { t } = useTranslation('event_definitions');
 
-    <Row className="content">
-      <Col md={12}>
-        <EventDefinitionsContainer />
-      </Col>
-    </Row>
-  </DocumentTitle>
-);
+  return (
+    <DocumentTitle title={t('page.title')}>
+      <EventsPageNavigation />
+      <PageHeader
+        title={t('page.title')}
+        actions={<CreateButtonWithSigma />}
+        documentationLink={{
+          title: t('page.alerts_docs'),
+          path: DocsHelper.PAGES.ALERTS,
+        }}>
+        <span>{t('page.description_list')}</span>
+      </PageHeader>
+
+      <Row className="content">
+        <Col md={12}>
+          <EventDefinitionsContainer />
+        </Col>
+      </Row>
+    </DocumentTitle>
+  );
+};
 
 export default EventDefinitionsPage;

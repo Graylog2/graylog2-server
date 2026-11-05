@@ -16,6 +16,7 @@
  */
 import React, { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Col, Row, SegmentedControl } from 'components/bootstrap';
 import { SearchForm, Spinner } from 'components/common';
@@ -46,8 +47,12 @@ const ControlsWrapper = styled.div`
 
 type NodeType = 'all' | 'graylog' | 'data' | 'mongodb' | 'opensearch';
 type SearchNodesConfig =
-  | { nodeType: 'data'; label: 'Data Nodes'; component: typeof DataNodesExpandable }
-  | { nodeType: 'opensearch'; label: 'OpenSearch Nodes'; component: typeof OpensearchNodesExpandable };
+  | { nodeType: 'data'; label: 'cluster_configuration_nodes.data_nodes'; component: typeof DataNodesExpandable }
+  | {
+      nodeType: 'opensearch';
+      label: 'cluster_configuration_nodes.opensearch_nodes';
+      component: typeof OpensearchNodesExpandable;
+    };
 
 const ALL_NODES_PAGE_SIZE = 10;
 const SINGLE_NODE_TYPE_PAGE_SIZE = 100;
@@ -60,12 +65,17 @@ const getSearchNodesConfig = (runsWithDataNode: boolean | undefined): SearchNode
   }
 
   return runsWithDataNode
-    ? { nodeType: 'data', label: 'Data Nodes', component: DataNodesExpandable }
-    : { nodeType: 'opensearch', label: 'OpenSearch Nodes', component: OpensearchNodesExpandable };
+    ? { nodeType: 'data', label: 'cluster_configuration_nodes.data_nodes', component: DataNodesExpandable }
+    : {
+        nodeType: 'opensearch',
+        label: 'cluster_configuration_nodes.opensearch_nodes',
+        component: OpensearchNodesExpandable,
+      };
 };
 
 const ClusterConfigurationNodes = () => {
   const productName = useProductName();
+  const { t } = useTranslation('system');
   const [activeNodeType, setActiveNodeType] = useState<NodeType>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const { data: runsWithDataNode, isLoading: isLoadingSearchBackend } = useRunsWithDataNode();
@@ -73,10 +83,10 @@ const ClusterConfigurationNodes = () => {
   const searchNodeType = searchNodesConfig?.nodeType;
   const SearchNodesExpandable = searchNodesConfig?.component;
   const nodeTypeOptions: Array<{ label: string; value: NodeType }> = [
-    { label: 'All Nodes', value: 'all' },
+    { label: t('cluster_configuration_nodes.all_nodes'), value: 'all' },
     { label: `${productName} Nodes`, value: 'graylog' },
-    ...(searchNodesConfig ? [{ label: searchNodesConfig.label, value: searchNodesConfig.nodeType }] : []),
-    { label: 'MongoDB Nodes', value: 'mongodb' },
+    ...(searchNodesConfig ? [{ label: t(searchNodesConfig.label), value: searchNodesConfig.nodeType }] : []),
+    { label: t('cluster_configuration_nodes.mongodb_nodes'), value: 'mongodb' },
   ];
   const normalizedSearch = useMemo(() => searchQuery.trim(), [searchQuery]);
   const handleSearch = useCallback((query: string) => setSearchQuery(query), []);
@@ -91,11 +101,11 @@ const ClusterConfigurationNodes = () => {
 
   const renderSearchNodes = () => {
     if (isLoadingSearchBackend) {
-      return <Spinner text="Loading search backend nodes..." />;
+      return <Spinner text={t('cluster_configuration_nodes.loading_search_backend')} />;
     }
 
     if (!SearchNodesExpandable || !searchNodeType) {
-      return <p>Could not determine the configured search backend.</p>;
+      return <p>{t('cluster_configuration_nodes.search_backend_unknown')}</p>;
     }
 
     return (
@@ -115,7 +125,7 @@ const ClusterConfigurationNodes = () => {
         <ControlsWrapper>
           <SearchForm
             query={searchQuery}
-            placeholder="Search nodes…"
+            placeholder={t('cluster_configuration_nodes.search_placeholder')}
             wrapperClass=""
             queryWidth={400}
             topMargin={0}

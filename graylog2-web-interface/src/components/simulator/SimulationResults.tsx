@@ -16,6 +16,8 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
+import { Trans, withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import { Alert, Col, DropdownButton, MenuItem, Row } from 'components/bootstrap';
 import { Spinner } from 'components/common';
@@ -40,7 +42,7 @@ type SimulationResultsProps = {
   simulationResults?: any;
   isLoading?: boolean;
   error?: any;
-};
+} & WithTranslation;
 
 class SimulationResults extends React.Component<
   SimulationResultsProps,
@@ -77,11 +79,15 @@ class SimulationResults extends React.Component<
     this.setState({ viewOption: VIEW_OPTIONS[selectedOption] });
   };
 
-  _getViewOptionsMenuItems = () => [
-    this._getViewOptionsMenuItem(VIEW_OPTIONS.SIMULATION_SUMMARY, 'Changes summary'),
-    this._getViewOptionsMenuItem(VIEW_OPTIONS.SIMULATION_PREVIEW, 'Results preview'),
-    this._getViewOptionsMenuItem(VIEW_OPTIONS.SIMULATION_TRACE, 'Simulation trace'),
-  ];
+  _getViewOptionsMenuItems = () => {
+    const { t } = this.props;
+
+    return [
+      this._getViewOptionsMenuItem(VIEW_OPTIONS.SIMULATION_SUMMARY, t('simulation_results.changes_summary')),
+      this._getViewOptionsMenuItem(VIEW_OPTIONS.SIMULATION_PREVIEW, t('simulation_results.results_preview')),
+      this._getViewOptionsMenuItem(VIEW_OPTIONS.SIMULATION_TRACE, t('simulation_results.simulation_trace')),
+    ];
+  };
 
   _getViewOptionsMenuItem = (option, text) => {
     const { viewOption } = this.state;
@@ -117,7 +123,7 @@ class SimulationResults extends React.Component<
   };
 
   render() {
-    const { stream, simulationResults, isLoading, error, originalMessage } = this.props;
+    const { stream, simulationResults, isLoading, error, originalMessage, t } = this.props;
 
     if (!originalMessage && !simulationResults) {
       return null;
@@ -135,11 +141,14 @@ class SimulationResults extends React.Component<
     ) : null;
 
     const errorMessage = error ? (
-      <Alert bsStyle="danger" title="Error simulating message processing">
+      <Alert bsStyle="danger" title={t('simulation_results.error_title')}>
         <p>
-          Could not simulate processing of message <em>{originalMessage.id}</em> in stream <em>{stream.title}</em>.
-          <br />
-          Please try loading the message again, or use another message for the simulation.
+          <Trans
+            t={t}
+            i18nKey="simulation_results.error"
+            values={{ id: originalMessage.id, stream: stream.title }}
+            components={{ emphasis: <em />, lineBreak: <br /> }}
+          />
         </p>
       </Alert>
     ) : null;
@@ -150,25 +159,27 @@ class SimulationResults extends React.Component<
           <hr />
         </Col>
         <Col md={6}>
-          <h1>Original message</h1>
+          <h1>{t('simulation_results.original_message')}</h1>
           <div className="message-preview-wrapper">{originalMessagePreview}</div>
         </Col>
         <Col md={6}>
           <div className="pull-right">
             <DropdownButton
               id="simulation-view-options"
-              title="More results"
+              title={t('simulation_results.more_results')}
               bsStyle="default"
               bsSize="small"
               pullRight>
               {this._getViewOptionsMenuItems()}
             </DropdownButton>
           </div>
-          <h1>Simulation results</h1>
+          <h1>{t('simulation_results.title')}</h1>
           <p>
             {isLoading
-              ? 'Simulating message processing, please wait a moment.'
-              : `These are the results of processing the loaded message. Processing took ${NumberUtils.formatNumber(simulationResults?.took_microseconds)} µs.`}
+              ? t('simulation_results.simulating')
+              : t('simulation_results.results_description', {
+                  took: NumberUtils.formatNumber(simulationResults?.took_microseconds),
+                })}
           </p>
           {errorMessage}
           {this._getViewComponent(streams)}
@@ -178,4 +189,4 @@ class SimulationResults extends React.Component<
   }
 }
 
-export default SimulationResults;
+export default withTranslation('pipelines')(SimulationResults);

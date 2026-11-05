@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import styled from 'styled-components';
 import moment from 'moment';
@@ -74,6 +75,7 @@ const FlexWrap = styled.div`
 `;
 
 const TabAbsoluteTimeRange = ({ disabled = false, limitDuration = 0 }: Props) => {
+  const { t } = useTranslation('search');
   const {
     values: { timeRangeTabs },
   } = useFormikContext<TimeRangePickerFormValues>();
@@ -96,7 +98,7 @@ const TabAbsoluteTimeRange = ({ disabled = false, limitDuration = 0 }: Props) =>
         id="absolute-time-ranges"
         data-testid="absolute-time-ranges"
         activeKey={activeAccordion}>
-        <AccordionItem name="Calendar">
+        <AccordionItem name={t('time_range.calendar')} id="calendar">
           <RangeWrapper>
             <AbsoluteCalendar startDate={fromStartDate} timeRange={activeTabTimeRange} range="from" />
           </RangeWrapper>
@@ -110,10 +112,15 @@ const TabAbsoluteTimeRange = ({ disabled = false, limitDuration = 0 }: Props) =>
           </RangeWrapper>
         </AccordionItem>
 
-        <AccordionItem name="Timestamp">
+        <AccordionItem name={t('time_range.timestamp')} id="timestamp">
           <TimestampContent>
             <p>
-              Date should be formatted as <code>YYYY-MM-DD [HH:mm:ss[.SSS]]</code>.
+              <Trans
+                t={t}
+                i18nKey="time_range.date_format"
+                values={{ format: 'YYYY-MM-DD [HH:mm:ss[.SSS]]' }}
+                components={{ code: <code /> }}
+              />
             </p>
             <FlexWrap>
               <RangeWrapper>
@@ -121,7 +128,7 @@ const TabAbsoluteTimeRange = ({ disabled = false, limitDuration = 0 }: Props) =>
                   disabled={disabled}
                   timeRange={activeTabTimeRange}
                   range="from"
-                  label="From timestamp"
+                  label={t('time_range.from_timestamp')}
                 />
               </RangeWrapper>
 
@@ -130,7 +137,12 @@ const TabAbsoluteTimeRange = ({ disabled = false, limitDuration = 0 }: Props) =>
               </IconWrap>
 
               <RangeWrapper>
-                <AbsoluteTimestamp disabled={disabled} timeRange={activeTabTimeRange} range="to" label="To timestamp" />
+                <AbsoluteTimestamp
+                  disabled={disabled}
+                  timeRange={activeTabTimeRange}
+                  range="to"
+                  label={t('time_range.to_timestamp')}
+                />
               </RangeWrapper>
             </FlexWrap>
           </TimestampContent>

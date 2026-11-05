@@ -17,6 +17,7 @@
 
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import MenuItem from './MenuItem';
 
@@ -28,8 +29,10 @@ const StyledMenuItem = styled(MenuItem)(
 
 type Props = React.ComponentProps<typeof MenuItem>;
 
-const DeleteMenuItem = ({ children = 'Delete', ...props }: Props) => (
-  <StyledMenuItem {...props}>{children}</StyledMenuItem>
-);
+const DeleteMenuItem = ({ children = undefined, ...props }: Props) => {
+  const { t } = useTranslation('common');
+
+  return <StyledMenuItem {...props}>{children ?? t('actions.delete')}</StyledMenuItem>;
+};
 
 export default DeleteMenuItem;

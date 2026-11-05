@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import AuthenticationPageNavigation from 'components/authentication/AuthenticationPageNavigation';
 import withParams from 'routing/withParams';
@@ -35,8 +36,8 @@ type Props = {
   };
 };
 
-const _pageTitle = (authBackendTitle, returnString = false) => {
-  const pageName = 'Authentication Service Details';
+const _pageTitle = (t: any, authBackendTitle: string, returnString = false) => {
+  const pageName = t('backend_details_page.title');
   const backendTitle = StringUtils.truncateWithEllipses(authBackendTitle, 30);
 
   if (returnString) {
@@ -51,6 +52,7 @@ const _pageTitle = (authBackendTitle, returnString = false) => {
 };
 
 const AuthenticationBackendDetailsPage = ({ params: { backendId } }: Props) => {
+  const { t } = useTranslation('authentication');
   const [authBackend, setAuthBackend] = useState<AuthenticationBackend | undefined>();
 
   useEffect(() => {
@@ -62,22 +64,22 @@ const AuthenticationBackendDetailsPage = ({ params: { backendId } }: Props) => {
   }
 
   return (
-    <DocumentTitle title={_pageTitle(authBackend.title, true)}>
+    <DocumentTitle title={_pageTitle(t, authBackend.title, true)}>
       <AuthenticationPageNavigation />
       <PageHeader
-        title={_pageTitle(authBackend.title)}
+        title={_pageTitle(t, authBackend.title)}
         actions={
           <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(authBackend?.id)}>
             <Button bsStyle="primary" type="button">
-              Edit Service
+              {t('backend_details_page.edit_service')}
             </Button>
           </LinkContainer>
         }
         documentationLink={{
-          title: 'Authentication documentation',
+          title: t('page.documentation_title'),
           path: DocsHelper.PAGES.USERS_ROLES,
         }}>
-        <span>Configure authentication services of this cluster.</span>
+        <span>{t('page.description')}</span>
       </PageHeader>
       <BackendDetails authenticationBackend={authBackend} />
     </DocumentTitle>

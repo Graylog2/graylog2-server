@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import pickBy from 'lodash/pickBy';
 import keyBy from 'lodash/keyBy';
@@ -57,6 +58,7 @@ const FilterValueRenderers = {
 };
 
 const IndexSetFieldTypesList = () => {
+  const { t } = useTranslation('indexsets');
   const { indexSetId } = useParams();
   const { data: indexSet } = useSingleIndexSet(indexSetId);
   const [selectedEntitiesData, setSelectedEntitiesData] = useState<Record<string, IndexSetFieldType>>({});
@@ -102,7 +104,7 @@ const IndexSetFieldTypesList = () => {
 
   return (
     <PaginatedEntityTable<IndexSetFieldType>
-      humanName="index set field types"
+      humanName={t('hooks.field_types_human_name')}
       entityActions={indexFieldTypeChangeAllowed && renderActions}
       tableLayout={DEFAULT_LAYOUT}
       topRightCol={indexFieldTypeChangeAllowed && <IndexSetProfile indexSet={indexSet} />}

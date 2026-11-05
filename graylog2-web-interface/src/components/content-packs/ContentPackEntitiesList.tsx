@@ -16,6 +16,7 @@
  */
 import React from 'react';
 
+import i18n from 'i18n';
 import { Button, Modal, ButtonToolbar } from 'components/bootstrap';
 import { SearchForm, DataTable, Icon } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
@@ -23,6 +24,8 @@ import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import ContentPackApplyParameter from './ContentPackApplyParameter';
 import ContentPackEntityConfig from './ContentPackEntityConfig';
 import ContentPackEntitiesListStyle from './ContentPackEntitiesList.css';
+
+const t = (key: string) => i18n.t(key, { ns: 'content_packs' });
 
 type EntityIconProps = {
   entity: any;
@@ -32,14 +35,18 @@ const EntityIcon = ({ entity }: EntityIconProps) => {
   if (!entity.fromServer) {
     return (
       <span>
-        <Icon title="Content Pack" name="inventory_2" className={ContentPackEntitiesListStyle.contentPackEntity} />
+        <Icon
+          title={t('entities.origin_content_pack')}
+          name="inventory_2"
+          className={ContentPackEntitiesListStyle.contentPackEntity}
+        />
       </span>
     );
   }
 
   return (
     <span>
-      <Icon title="Server" name="dns" />
+      <Icon title={t('entities.origin_server')} name="dns" />
     </span>
   );
 };
@@ -130,11 +137,11 @@ class ContentPackEntitiesList extends React.Component<
         onHide={closeModal}
         bsSize="large">
         <Modal.Header>
-          <Modal.Title>Edit</Modal.Title>
+          <Modal.Title>{t('entities.edit_title')}</Modal.Title>
         </Modal.Header>
         <Modal.Body>{applyParamComponent}</Modal.Body>
         <Modal.Footer>
-          <Button onClick={closeModal}>Close</Button>
+          <Button onClick={closeModal}>{t('common:actions.close')}</Button>
         </Modal.Footer>
       </BootstrapModalWrapper>
     );
@@ -161,11 +168,11 @@ class ContentPackEntitiesList extends React.Component<
         onHide={closeShowModal}
         bsSize="large">
         <Modal.Header>
-          <Modal.Title>Entity Config</Modal.Title>
+          <Modal.Title>{t('entities.config_title')}</Modal.Title>
         </Modal.Header>
         <Modal.Body>{entityComponent}</Modal.Body>
         <Modal.Footer>
-          <Button onClick={closeShowModal}>Close</Button>
+          <Button onClick={closeShowModal}>{t('common:actions.close')}</Button>
         </Modal.Footer>
       </BootstrapModalWrapper>
     );
@@ -194,7 +201,7 @@ class ContentPackEntitiesList extends React.Component<
                 onClick={() => {
                   open();
                 }}>
-                Edit
+                {t('common:actions.edit')}
               </Button>
             )}
             <Button
@@ -202,7 +209,7 @@ class ContentPackEntitiesList extends React.Component<
               onClick={() => {
                 openShowModal(entity.id);
               }}>
-              Show
+              {t('entities.show')}
             </Button>
           </ButtonToolbar>
           {!readOnly && applyModal}
@@ -217,12 +224,19 @@ class ContentPackEntitiesList extends React.Component<
     const { filteredEntities } = this.state;
 
     const headers = readOnly
-      ? ['Title', 'Type', 'Description', 'Action']
-      : ['Title', 'Type', 'Description', 'Origin', 'Used Parameters', 'Action'];
+      ? [t('entities.title'), t('entities.type'), t('entities.description'), t('entities.action')]
+      : [
+          t('entities.title'),
+          t('entities.type'),
+          t('entities.description'),
+          t('entities.origin'),
+          t('entities.used_parameters'),
+          t('entities.action'),
+        ];
 
     return (
       <div>
-        <h2>Entity list</h2>
+        <h2>{t('entities.list_title')}</h2>
         <br />
         <SearchForm
           onSearch={this._filterEntities}

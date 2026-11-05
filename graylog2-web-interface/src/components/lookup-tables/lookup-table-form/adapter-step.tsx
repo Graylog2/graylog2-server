@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useMemo, useState } from 'react';
 import { useFormikContext } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { Spinner } from 'components/common';
 import { RowContainer, ColContainer } from 'components/lookup-tables/layout-componets';
@@ -28,6 +29,7 @@ import type { LookupTable, LookupTableAdapter } from 'logic/lookup-tables/types'
 import AdapterShow from 'components/lookup-tables/adapter-view/adapter-show';
 
 function DataAdapterFormStep() {
+  const { t } = useTranslation('lookup_tables');
   const { values, setFieldValue } = useFormikContext<LookupTable>();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(values);
   const { allDataAdapters, loadingAllDataAdapters } = useFetchAllDataAdapters();
@@ -59,7 +61,7 @@ function DataAdapterFormStep() {
     <ColContainer $gap="lg" $align="center">
       {loadingAllDataAdapters ? (
         <RowContainer>
-          <Spinner text="Loading data adapters..." />
+          <Spinner text={t('lookup_table_form.loading_adapters')} />
         </RowContainer>
       ) : (
         <>

@@ -25,6 +25,7 @@ import useInputsStates from 'hooks/useInputsStates';
 import type { InputStateByNode, InputState } from 'hooks/useInputsStates';
 import type { Input } from 'components/messageloaders/Types';
 import { defaultOnError } from 'util/conditional/onError';
+import i18n from 'i18n';
 
 export type InputDiagnosisMetrics = {
   incomingMessagesTotal: number;
@@ -107,8 +108,8 @@ const useInputDiagnosis = (
     queryFn: () =>
       defaultOnError(
         fetchInputDiagnostics(inputId),
-        'Fetching Input Diagnostics failed with status',
-        'Could not fetch Input Diagnostics',
+        i18n.t('diagnosis.fetch_failed', { ns: 'inputs' }),
+        i18n.t('diagnosis.could_not_fetch', { ns: 'inputs' }),
       ),
 
     refetchInterval: 5000,

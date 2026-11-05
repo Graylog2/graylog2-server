@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import Select from 'components/common/Select';
 import type { Stream } from 'logic/streams/types';
@@ -35,8 +36,9 @@ type Props = {
 };
 
 const StreamSelect = ({ onChange, value, streams }: Props) => {
+  const { t } = useTranslation('configurations');
   const options = [
-    { label: 'Default Search', value: DEFAULT_SEARCH_ID },
+    { label: t('decorators_update.default_search'), value: DEFAULT_SEARCH_ID },
     ...streams
       .sort(({ title: key1 }, { title: key2 }) => defaultCompare(key1, key2))
       .map(({ title, id }) => ({ label: title, value: id })),
@@ -49,7 +51,7 @@ const StreamSelect = ({ onChange, value, streams }: Props) => {
         onChange={onChange}
         options={options}
         clearable={false}
-        placeholder="There are no decorators configured for any stream."
+        placeholder={t('decorators_update.no_decorators_placeholder')}
         value={options.map(({ value: id }) => id).includes(value) ? value : ''}
       />
     </SelectContainer>

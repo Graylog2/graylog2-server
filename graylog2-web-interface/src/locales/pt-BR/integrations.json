@@ -1,0 +1,521 @@
+{
+  "aws_plugin_configuration": {
+    "title": "Configuração do plugin AWS",
+    "description": "Configuração base para todos os plugins fornecidos pelo módulo AWS. Observe que alguns parâmetros serão armazenados no MongoDB sem criptografia. Usuários com as permissões necessárias poderão lê-los na caixa de diálogo de configuração desta página.",
+    "status_instance_detail_lookups": "Consultas de detalhes de instâncias:",
+    "status_connect_through_proxy": "Conectar por meio de proxy:",
+    "status_lookup_regions": "Regiões de consulta:",
+    "status_access_key": "Chave de acesso:",
+    "status_secret_key": "Chave secreta:",
+    "status_enabled": "Ativado",
+    "status_disabled": "Desativado",
+    "status_not_set": "[não definido]",
+    "edit_configuration": "Editar configuração",
+    "modal_title": "Atualizar configuração do plugin AWS",
+    "submit_configuration": "Atualizar configuração",
+    "lookups_enabled_label": "Executar consultas de detalhes de instâncias AWS para endereços IP?",
+    "lookups_enabled_help": "Quando ativado, um processador de mensagens tentará identificar os endereços IP das suas entidades AWS (como EC2, ELB, RDS, ...) e adicionar informações sobre o serviço ou a instância por trás deles. Pode levar até um minuto para que uma alteração entre em vigor.",
+    "access_key_label": "Chave de acesso AWS",
+    "access_key_help": "Observe que ela só será usada em conexões criptografadas, mas armazenada em texto simples. Consulte a documentação para ver as permissões sugeridas para o usuário IAM subjacente.",
+    "secret_key_label": "Chave secreta AWS",
+    "secret_key_help": "Observe que ela só será usada em conexões criptografadas e será armazenada criptografada (usando o segredo do sistema). Consulte a documentação para ver as permissões sugeridas para o usuário IAM subjacente.",
+    "lookup_regions_label": "Regiões de consulta",
+    "lookup_regions_help": "O processador de mensagens de consulta de instâncias AWS mantém uma tabela de instâncias para tradução rápida de endereços. Defina as regiões AWS que você deseja incluir nas tabelas. Devem ser todas as regiões onde você executa serviços AWS. Lembre-se de que seu usuário IAM precisa de permissão para essas regiões, caso contrário você verá avisos nos logs do servidor {{productName}}.",
+    "proxy_enabled_label": "Usar proxy HTTP?",
+    "proxy_enabled_help": "Quando ativado, acessaremos as APIs da AWS por meio do proxy HTTP configurado (<code>http_proxy_uri</code>) no arquivo de configuração do {{productName}}.<lineBreak/><em>Importante:</em> é preciso reiniciar todos os inputs AWS para que esta configuração entre em vigor.",
+    "save_error_message": "Falha na configuração do plugin AWS com status: {{error}}",
+    "save_error_title": "Não foi possível salvar a configuração do plugin AWS."
+  },
+  "gcs_setup_info": {
+    "intro": "Para configurar um backend do Google Cloud Storage, siga estas etapas:",
+    "step_bucket": "Crie um bucket do Google Cloud Storage com um nome exclusivo - consulte a documentação do Google sobre <bucketsLink>Buckets</bucketsLink>. Recomenda-se a classe de armazenamento Standard padrão.",
+    "step_service_account": "Crie uma conta de serviço do Google Cloud, com permissões para ler, gravar e excluir desse bucket - consulte a documentação do Google sobre <serviceAccountsLink>Contas de serviço</serviceAccountsLink>.",
+    "step_credentials": "Configure as Application Default Credentials em todos os nós do Graylog. O método varia conforme a forma como seu cluster é hospedado - consulte a documentação do Google sobre <adcLink>Como configurar as Application Default Credentials</adcLink>.",
+    "step_setup_backend": "Nesta página, você já pode configurar um backend do Google Cloud Storage. Será necessário informar o nome exclusivo do Google Cloud Storage criado na primeira etapa."
+  },
+  "aws_step_authorize": {
+    "invalid_key_message": "Chave AWS inválida. Verifique na sua conta AWS a string alfanumérica de 20 caracteres que normalmente começa com as letras \"AK\"",
+    "invalid_secret_message": "Segredo AWS inválido. Normalmente é uma string codificada em base64 de 40 caracteres, mas ele só pode ser visualizado uma vez, no momento em que a chave é criada",
+    "authorize_button": "Autorizar e escolher Stream",
+    "title": "Criar input e autorizar AWS",
+    "description": "Esta integração permite ler mensagens diretamente de um stream do Kinesis. Mensagens do CloudWatch podem, opcionalmente, ser encaminhadas ao Kinesis por meio de assinaturas do CloudWatch e processadas em seguida.",
+    "input_name": "Nome do input",
+    "aws_region": "Região AWS",
+    "aws_region_help": "A região AWS em que seu serviço está em execução.",
+    "choose_region": "Escolher região AWS"
+  },
+  "aws_arn": {
+    "assume_role_label": "Assumir função AWS (ARN)",
+    "assume_role_help": "Amazon Resource Name com a permissão de conta cruzada necessária",
+    "assume_role_placeholder": "arn:aws:sts::123456789012:assumed-role/some-role",
+    "external_id_label": "ID externo AWS (opcional)",
+    "external_id_help": "Um ID externo adicionado à solicitação AssumeRole para evitar o problema do \"confused deputy\". Necessário apenas se a política de confiança da sua função o exigir."
+  },
+  "aws_authentication_types": {
+    "label": "Tipo de autenticação AWS"
+  },
+  "aws_custom_endpoints": {
+    "title": "Endpoints de VPC da AWS (opcionais)",
+    "section_title": "Substitui a URL padrão do endpoint da API AWS com a qual o {{productName}} se comunica.",
+    "note": "Especifique isso somente se estiver usando <vpcEndpointsLink>Endpoints de VPC</vpcEndpointsLink> para serviços AWS.",
+    "input_message": "O domínio deve começar com 'https://'",
+    "cloudwatch_label": "Substituição do endpoint da API CloudWatch",
+    "iam_label": "Substituição do endpoint da API IAM",
+    "dynamodb_label": "Substituição do endpoint da API DynamoDB",
+    "kinesis_label": "Substituição do endpoint da API Kinesis"
+  },
+  "aws_automatic": {
+    "section_title": "A autenticação automática tentará cada um dos seguintes métodos na ordem listada.",
+    "env_variables_label": "Variáveis de ambiente",
+    "env_variables_value": "<code>AWS_ACCESS_KEY_ID</code> e <code>AWS_SECRET_ACCESS_KEY</code>",
+    "java_properties_label": "Propriedades do sistema Java",
+    "java_properties_value": "<code>aws.accessKeyId</code> e <code>aws.secretKey</code>",
+    "profiles_label": "Arquivo padrão de perfis de credenciais",
+    "profiles_value": "Normalmente localizado em <code>~/.aws/credentials</code>",
+    "ecs_label": "Credenciais de contêiner do Amazon ECS",
+    "ecs_value": "Carregadas do Amazon ECS se a variável de ambiente <code>AWS_CONTAINER_CREDENTIALS_RELATIVE_URI</code> estiver definida",
+    "instance_label": "Credenciais de perfil de instância",
+    "instance_value": "Usadas em instâncias EC2 e fornecidas pelo serviço de metadados da Amazon EC2",
+    "more_info": "Para mais informações, consulte a <docsLink>Documentação de configuração de credenciais AWS <openIcon/></docsLink>."
+  },
+  "aws_key_secret": {
+    "access_key_label": "Chave de acesso AWS",
+    "access_key_placeholder": "AK****************",
+    "access_key_help": "Sua chave AWS deve ser uma string alfanumérica de 20 caracteres que começa com as letras \"AK\".",
+    "access_key_help_optional": "Sua chave AWS deve ser uma string alfanumérica de 20 caracteres que começa com as letras \"AK\". (Opcional - a configuração legada do plugin AWS será usada se não for informada)",
+    "secret_key_label": "Chave secreta AWS",
+    "secret_key_placeholder": "***********",
+    "secret_key_help": "Seu segredo AWS normalmente é uma string codificada em base64 de 40 caracteres.",
+    "secret_key_help_optional": "Seu segredo AWS normalmente é uma string codificada em base64 de 40 caracteres. (Opcional - a configuração legada do plugin AWS será usada se não for informado)"
+  },
+  "aws_cloudtrail": {
+    "step_authorize_title": "Configuração da conexão com o AWS CloudTrail",
+    "step_subscribe_title": "Configuração do input AWS CloudTrail",
+    "step_review_title": "Revisão final do AWS CloudTrail"
+  },
+  "aws_cloudtrail_app": {
+    "title": "Integrações com AWS CloudTrail",
+    "description": "Este recurso recupera registros de log da plataforma AWS CloudTrail.",
+    "requirement": "Você precisa ter o <cloudTrailLink>AWS CloudTrail</cloudTrailLink>."
+  },
+  "aws_cloudtrail_advanced_options": {
+    "title": "Opções avançadas",
+    "sqs_batch_size_error": "Selecione um tamanho de lote de mensagens SQS entre 1 e 10.",
+    "override_source_label": "Substituir origem (opcional)",
+    "override_source_help": "A origem é definida como aws-cloudtrail por padrão. Se desejar, você pode substituí-la por um valor personalizado.",
+    "sqs_batch_size_label": "Tamanho do lote de mensagens SQS",
+    "sqs_batch_size_help": "O número máximo de mensagens a consultar do SQS por vez. O valor máximo aceito é 10.",
+    "include_full_message_json_label": "Incluir full_message_json?",
+    "include_full_message_json_help": "Armazenar o evento completo do CloudTrail como JSON no campo full_message_json?"
+  },
+  "aws_cloudtrail_step_authorize": {
+    "connection_error": "Não foi possível conectar ao AWS CloudTrail com a configuração informada.",
+    "verify_button": "Verificar conexão e continuar",
+    "input_name": "Nome do input",
+    "input_name_help": "Selecione um nome para o novo input que o descreva.",
+    "sqs_region_help": "Região AWS em que a fila SQS está localizada.",
+    "sqs_region_label": "Região AWS SQS",
+    "choose_sqs_region": "Escolher região SQS",
+    "s3_region_help": "Região AWS em que o bucket S3 está localizado.",
+    "s3_region_label": "Região AWS S3",
+    "choose_s3_region": "Escolher região S3",
+    "sqs_queue_name_help": "Nome da fila SQS criada pelo assinante do CloudTrail",
+    "sqs_queue_name_label": "Nome da fila SQS"
+  },
+  "aws_cloudtrail_step_review": {
+    "save_error": "Não foi possível salvar seu input. Tente novamente em alguns instantes.",
+    "save_button": "Salvar e iniciar input",
+    "description": "Confira tudo abaixo para garantir que está correto e, em seguida, clique no botão abaixo para concluir a configuração do AWS CloudTrail!",
+    "input_configuration": "Configuração do input",
+    "label_name": "Nome",
+    "label_access_key": "Chave de acesso AWS",
+    "label_sqs_region": "Região SQS",
+    "label_s3_region": "Região S3",
+    "label_assume_role_arn": "Assumir função AWS (ARN)",
+    "label_external_id": "ID externo AWS",
+    "label_sqs_queue_name": "Nome da fila SQS AWS",
+    "label_sqs_batch_size": "Tamanho do lote de mensagens SQS",
+    "label_polling_interval": "Intervalo de consulta",
+    "label_enable_throttling": "Ativar limitação de taxa"
+  },
+  "aws_cloudtrail_step_subscribe": {
+    "polling_interval_error_full": "Informe um intervalo de consulta válido",
+    "polling_interval_error": "O intervalo mínimo permitido para consulta é de 1 minuto.",
+    "batch_size_error_full": "Informe um tamanho de lote de mensagens SQS válido.",
+    "batch_size_error": "Selecione um tamanho de lote de mensagens SQS entre 1 e 10.",
+    "proceed_button": "Continuar",
+    "polling_interval_help": "Define a frequência (em minutos) com que novos dados serão verificados no AWS CloudTrail. O menor intervalo permitido é de 1 minuto.",
+    "polling_interval_label": "Intervalo de consulta"
+  },
+  "aws_cloudwatch_app": {
+    "title": "Integrações AWS",
+    "description": "Este recurso recupera mensagens de log de diversas fontes AWS."
+  },
+  "aws_cloudwatch_advanced_options": {
+    "title": "Opções avançadas",
+    "flow_log_prefix_label": "Adicionar prefixo ao nome dos campos do Flow Log",
+    "flow_log_prefix_help": "Adiciona um campo com o prefixo do Flow Log, ex.: \"src_addr\" -> \"flow_log_src_addr\".",
+    "store_full_message_label": "Armazenar mensagem completa?",
+    "store_full_message_help": "Armazena o payload original do evento de log do Kinesis/CloudWatch no campo full_message.",
+    "override_source_label": "Substituir origem (opcional)",
+    "override_source_help": "A origem da mensagem é definida como aws-kinesis-raw-logs por padrão. Se desejar, você pode substituí-la por um valor personalizado.",
+    "batch_size_label": "Tamanho do lote de registros do Kinesis",
+    "batch_size_help": "O número de registros do Kinesis a buscar por vez. Cada registro pode ter até 1 MB. O padrão da AWS é 10.000. Informe um valor menor para processar blocos menores por vez."
+  },
+  "aws_sidebar_permissions": {
+    "title": "Permissões de política AWS",
+    "description": "Consulte a <docsLink/> para informações sobre as permissões AWS necessárias.",
+    "docs_link_text": "documentação oficial"
+  },
+  "aws_step_health_check": {
+    "no_response_title": "Ainda não recebemos uma resposta da Amazon.",
+    "waiting_description": "Aguarde alguns instantes enquanto continuamos verificando seu stream AWS em busca de logs. Os servidores da Amazon processam logs a cada 10 minutos, então pegue um café, pois isso pode levar algum tempo!",
+    "checking_again_in": "Verificando novamente em: <countdown/>",
+    "checking_button": "Verificando...",
+    "check_now_button": "Verificar agora",
+    "do_not_refresh": "Não atualize o navegador. Continuamos verificando seus logs e esta página será atualizada automaticamente quando eles estiverem disponíveis.",
+    "review_button": "Revisar e finalizar",
+    "title": "Criar stream do Kinesis",
+    "sample_description": "Se disponível, uma mensagem {{logType}} analisada do stream será exibida abaixo.",
+    "formatted_log_label": "Mensagem de log formatada",
+    "no_messages": "Nenhuma mensagem encontrada no stream."
+  },
+  "aws_cloudwatch_step_review": {
+    "default_label": "(padrão)",
+    "save_error": "Não foi possível salvar seu input. Tente novamente em alguns instantes.",
+    "complete_button": "Concluir configuração do CloudWatch",
+    "title": "Revisão final",
+    "description": "Confira tudo abaixo para garantir que está correto e, em seguida, clique no botão abaixo para concluir a configuração do CloudWatch!",
+    "setting_up_cloudwatch": "Configurando o CloudWatch",
+    "edit": "Editar",
+    "label_name": "Nome",
+    "label_authorization_type": "Tipo de autorização",
+    "label_aws_key": "Chave AWS",
+    "label_assumed_role_arn": "Função AWS assumida (ARN)",
+    "label_external_id": "ID externo AWS",
+    "label_cloudwatch_endpoint": "Endpoint de VPC do CloudWatch",
+    "label_dynamodb_endpoint": "Endpoint de VPC do DynamoDB",
+    "label_iam_endpoint": "Endpoint de VPC do IAM",
+    "label_kinesis_endpoint": "Endpoint de VPC do Kinesis",
+    "label_aws_region": "Região AWS",
+    "setting_up_kinesis": "Configurando o Kinesis",
+    "label_kinesis_stream": "Stream do Kinesis",
+    "label_kinesis_stream_arn": "ARN do stream do Kinesis",
+    "stream_arn_error": "Erro: não foi possível obter o ARN do stream. Verifique se a função IAM inclui a permissão kinesis:DescribeStream.",
+    "label_global_input": "Input global",
+    "label_record_batch_size": "Tamanho do lote de registros",
+    "label_enable_throttling": "Ativar limitação de taxa",
+    "label_flow_log_prefix": "Adicionar prefixo do Flow Log aos nomes dos campos",
+    "label_store_full_message": "Armazenar mensagem completa",
+    "label_override_source": "Substituir origem",
+    "formatting": "Formatação",
+    "label_log_type": "Tipo de log",
+    "pipeline_hint": "Se você precisar que os logs sejam analisados de outra forma, confira nossa <pipelineLink>Regra de pipeline</pipelineLink> para mais detalhes e instruções.",
+    "no_response": "Ainda não recebemos uma resposta da Amazon."
+  },
+  "aws_kinesis_existing_streams": {
+    "sidebar_title": "Não encontrou o stream de que precisa?",
+    "sidebar_requirement": "Pelo menos um stream do Kinesis deve existir na região especificada para continuar a configuração. O stream de logs deve conter pelo menos algumas mensagens de log.",
+    "sidebar_auto_setup": "O {{productName}} também permite criar um stream do Kinesis para você e assiná-lo a um grupo de logs do CloudWatch de sua escolha. Esteja ciente de que esta opção criará recursos adicionais no seu ambiente AWS, que geram cobranças.",
+    "setup_automatically_button": "Configurar Kinesis automaticamente",
+    "no_logs_error": "Não foi possível encontrar nenhum log neste stream do Kinesis. Selecione outro stream do Kinesis.",
+    "loading_message": "Esta solicitação pode levar alguns instantes.",
+    "verify_button": "Verificar stream e formato",
+    "title": "Selecionar stream do Kinesis",
+    "description_list": "Abaixo está a lista de todos os streams do Kinesis encontrados na conta AWS especificada.",
+    "description_docs": "Selecione o stream do qual deseja ler mensagens ou siga a <docsLink/> para mais detalhes sobre esta configuração.",
+    "docs_link_text": "Input AWS Kinesis/CloudWatch",
+    "select_stream_label": "Selecionar stream",
+    "select_stream_placeholder": "Selecionar stream do Kinesis"
+  },
+  "aws_kinesis_setup_new_stream": {
+    "no_groups_error": "Não encontramos nenhum grupo na região escolhida. Tente selecionar outra região.",
+    "begin_button": "Iniciar configuração automatizada",
+    "title": "Configurar Kinesis automaticamente",
+    "intro": "Preencha os campos abaixo para iniciar a configuração automatizada do Kinesis. Isso executará as seguintes operações na sua conta AWS. Consulte <docsLink>Usando filtros de assinatura de logs do CloudWatch</docsLink> na documentação da AWS para mais informações.",
+    "step_create_stream": "Criar um novo stream do Kinesis com o nome especificado.",
+    "step_create_role": "Criar a função/política do IAM necessária para assinar o stream do Kinesis no grupo de logs do CloudWatch.",
+    "step_subscribe": "Assinar o novo stream do Kinesis no grupo de logs.",
+    "stream_name_label": "Nome do stream do Kinesis",
+    "stream_name_placeholder": "Nome do stream",
+    "stream_name_help": "De 1 a 128 caracteres alfanuméricos e os caracteres especiais sublinhado (_), ponto (.) e hífen (-).",
+    "group_name_label": "Nome do grupo do CloudWatch",
+    "choose_group": "Escolher grupo do CloudWatch",
+    "back_button": "Voltar para a seleção de stream"
+  },
+  "aws_kinesis_setup_agree": {
+    "description": "Esta configuração automática criará os seguintes recursos AWS. Clique abaixo para confirmar que você entende que esses recursos serão criados e que você é o único responsável pelas taxas da AWS decorrentes deles. Observe que, se não forem necessários, todos os recursos deverão ser excluídos manualmente por você.",
+    "step_stream": "Criar um stream do Kinesis com <strong>1</strong> shard.",
+    "step_role": "Criar uma função e uma política do IAM para permitir que o grupo do CloudWatch <strong>{{groupName}}</strong> publique mensagens de log no stream do Kinesis <strong>{{streamName}}</strong>",
+    "step_subscription": "Criar uma assinatura do CloudWatch, que publica mensagens de log no stream do Kinesis."
+  },
+  "aws_kinesis_setup_step": {
+    "waiting": "Aguardando...",
+    "creating": "Criando {{label}}",
+    "create": "Criar {{label}}"
+  },
+  "aws_kinesis_setup_steps": {
+    "stream_label": "Stream do Kinesis",
+    "policy_label": "Política de assinatura",
+    "subscription_label": "Assinatura"
+  },
+  "aws_kinesis_setup_modal": {
+    "creating_button": "Criando...",
+    "close_button": "Fechar",
+    "continue_button": "Continuar configuração",
+    "executing_title": "Executando configuração automática",
+    "agreement_title": "Contrato de configuração automática do Kinesis",
+    "delayed_logs": "As primeiras mensagens podem levar até dez minutos para chegar ao stream do Kinesis. A verificação de integridade do Kinesis na etapa seguinte só será concluída com sucesso quando houver mensagens no stream. Consulte a documentação oficial sobre <cloudWatchLink>Assinaturas do CloudWatch</cloudWatchLink> para mais informações.",
+    "agree_button": "Concordo! Criar estes recursos AWS agora."
+  },
+  "form_wrap": {
+    "more_info": "Mais informações",
+    "additional_information": "Informações adicionais:",
+    "loading_button": "Carregando...",
+    "submit_button": "Enviar"
+  },
+  "aws_skip_health_check": {
+    "title": "Ignorar verificação de integridade",
+    "confirm_button": "Confirmar",
+    "form_title": "Escolher tipo de log e ignorar verificação de integridade",
+    "description": "Se você tem certeza dos dados contidos no seu novo stream <strong>{{streamName}}</strong>, escolha uma opção abaixo para ignorar nossa verificação automática.",
+    "input_type_label": "Escolher tipo de input AWS",
+    "choose_log_type": "Escolher tipo de log"
+  },
+  "throttling_checkbox": {
+    "label": "Ativar limitação de taxa",
+    "help": "Se ativado, nenhuma nova mensagem será lida deste input até que o servidor {{productName}} acompanhe a carga de mensagens. Isso costuma ser útil para inputs que leem de arquivos ou de sistemas de filas como AMQP ou Kafka. Se você consulta regularmente um sistema externo, por exemplo via HTTP, normalmente deve deixar esta opção desativada."
+  },
+  "grey_noise_adapter_documentation": {
+    "description": "O adaptador de dados GreyNoise Quick IP Lookup usa a <greynoiseLink>API do Greynoise</greynoiseLink> para consultar indicadores para a chave informada e retorna os valores do endpoint IP Quick Context. Consulte <quickContextLink>IP Quick Context</quickContextLink>"
+  },
+  "grey_noise_adapter_field_set": {
+    "user_password_label": "Senha do usuário",
+    "reset_token_button": "Redefinir token",
+    "api_token_label": "Token de API",
+    "undo_reset_button": "Desfazer redefinição",
+    "api_token_help": "O token de API."
+  },
+  "grey_noise_adapter_summary": {
+    "api_token_label": "Token de API"
+  },
+  "slack_notification_details": {
+    "webhook_url_label": "URL do webhook",
+    "channel_label": "Canal",
+    "custom_message_label": "Modelo de mensagem personalizada",
+    "empty_body": "Corpo vazio",
+    "include_event_procedure_label": "Incluir procedimento do evento no corpo do e-mail",
+    "backlog_limit_label": "Limite de backlog de mensagens",
+    "user_name_label": "Nome de usuário",
+    "include_title_label": "Incluir título",
+    "notify_channel_label": "Notificar canal",
+    "link_names_label": "Vincular nomes",
+    "icon_url_label": "URL do ícone",
+    "icon_emoji_label": "Emoji do ícone",
+    "time_zone_label": "Fuso horário"
+  },
+  "teams_notification_details": {
+    "webhook_url_label": "URL do webhook",
+    "custom_message_label": "Modelo de mensagem personalizada",
+    "empty_body": "Corpo vazio",
+    "backlog_limit_label": "Limite de backlog de mensagens",
+    "icon_url_label": "URL do ícone",
+    "time_zone_label": "Fuso horário"
+  },
+  "teams_notification_v2_details": {
+    "webhook_url_label": "URL do webhook",
+    "adaptive_card_label": "Modelo de Adaptive Card",
+    "backlog_limit_label": "Limite de backlog de mensagens"
+  },
+  "slack_notification_form": {
+    "configuration_color_label": "Cor da configuração",
+    "change_color_button": "Alterar cor",
+    "color_help": "Escolha uma cor para usar nesta configuração.",
+    "custom_message_help": "Mensagem personalizada a ser exibida abaixo do título do alerta. Consulte a <docsLink/> para mais detalhes.",
+    "docs_link_text": "documentação",
+    "webhook_url_help": "URL de \"Incoming Webhook\" do Slack",
+    "channel_help": "Nome do canal #channel do Slack ou @usuário para uma mensagem direta",
+    "custom_message_label": "Mensagem personalizada (opcional)",
+    "time_zone_help": "Fuso horário usado nas datas e horários do corpo da notificação.",
+    "time_zone_label": "Fuso horário para valores de data/hora",
+    "backlog_limit_label": "Limite de backlog de mensagens (opcional)",
+    "backlog_limit_help": "Limita o número de mensagens de backlog enviadas como parte da notificação do Slack. Se definido como 0, nenhum limite será aplicado.",
+    "user_name_label": "Nome de usuário (opcional)",
+    "user_name_help": "Nome de usuário do remetente no Slack",
+    "include_title_help": "Incluir o título e a descrição da definição de evento na notificação",
+    "notify_channel_help": "Notifica todos os usuários do canal ao adicionar @channel à mensagem",
+    "notify_here_label": "Notificar aqui",
+    "notify_here_help": "Notifica os usuários ativos do canal ao adicionar @here à mensagem",
+    "link_names_help": "Encontrar e vincular nomes de canais e nomes de usuários",
+    "icon_url_label": "URL do ícone (opcional)",
+    "icon_url_help": "Imagem a ser usada como ícone desta mensagem",
+    "icon_emoji_label": "Emoji do ícone (opcional)",
+    "icon_emoji_help": "Emoji a ser usado como ícone desta mensagem (substitui a URL do ícone)"
+  },
+  "event_procedure_checkbox": {
+    "label": "Incluir procedimento do evento",
+    "help": "Anexa uma versão formatada do procedimento do evento da definição de evento ao final do corpo da notificação."
+  },
+  "slack_notification_summary": {
+    "color_label": "Cor",
+    "custom_message_label": "Mensagem personalizada",
+    "yes": "Sim",
+    "no": "Não"
+  },
+  "teams_notification_summary": {
+    "color_label": "Cor",
+    "custom_message_label": "Mensagem personalizada"
+  },
+  "teams_notification_form": {
+    "webhook_url_help": "URL de \"Incoming Webhook\" do Teams",
+    "backlog_limit_help": "Limita o número de mensagens de backlog enviadas como parte da notificação do Microsoft Teams. Se definido como 0, nenhum limite será aplicado."
+  },
+  "teams_notification_v2_form": {
+    "adaptive_card_help": "Adaptive Card a ser publicado no Teams. Consulte a <docsLink/> para mais detalhes.",
+    "backlog_toggle_aria_label": "Ativar limite de backlog de mensagens"
+  },
+  "pager_duty_notification_details": {
+    "routing_key_label": "Chave de roteamento",
+    "incident_title_label": "Título do incidente",
+    "custom_incident_label": "Incidente personalizado",
+    "key_prefix_label": "Prefixo da chave",
+    "incident_key_label": "Chave do incidente",
+    "client_name_label": "Nome do cliente",
+    "client_url_label": "URL do cliente"
+  },
+  "pager_duty_notification_form": {
+    "routing_key_label": "Chave de roteamento",
+    "routing_key_help": "A Chave de roteamento da integração com o PagerDuty.",
+    "incident_title_label": "Título do incidente",
+    "incident_title_help": "Título personalizado do incidente no PagerDuty. Se não for definido, será usado o título do evento, como exibido no {{productName}}.",
+    "custom_incident_label": "Usar chave de incidente personalizada",
+    "custom_incident_help": "Gera uma chave de incidente personalizada.",
+    "key_prefix_label": "Prefixo da chave de incidente",
+    "key_prefix_help": "Prefixo da chave de incidente, seguido pelo(s) Stream(s) e pelo título da definição de evento. Use a Chave do incidente para personalizar a chave inteira.",
+    "incident_key_label": "Chave do incidente",
+    "incident_key_help": "Chave completa para identificar o incidente. Será usada no lugar do prefixo, se informada.",
+    "client_name_label": "Nome do cliente",
+    "client_name_help": "O nome do sistema {{productName}} que está acionando o evento do PagerDuty.",
+    "client_url_label": "URL do cliente",
+    "client_url_help": "A URL do sistema {{productName}} que está acionando o evento do PagerDuty."
+  },
+  "pager_duty_notification_summary": {
+    "routing_key_label": "Chave de roteamento",
+    "incident_title_label": "Título do incidente",
+    "default_value": "Padrão",
+    "use_custom_incident_key_label": "Usar chave de incidente personalizada",
+    "yes": "Sim",
+    "no": "Não",
+    "key_prefix_label": "Prefixo da chave de incidente",
+    "incident_key_label": "Chave do incidente",
+    "client_name_label": "Nome do cliente",
+    "client_url_label": "URL do cliente"
+  },
+  "threat_intel_plugin_config": {
+    "title": "Configuração de consulta de inteligência de ameaças",
+    "description": "Configuração do plugin de consulta de inteligência de ameaças.",
+    "tor_exit_nodes_label": "Nós de saída do Tor:",
+    "spamhaus_label": "Spamhaus:",
+    "enabled": "Ativado",
+    "disabled": "Desativado",
+    "modal_title": "Atualizar configuração do plugin de inteligência de ameaças",
+    "tor_checkbox_label": "Permitir consultas de nós de saída do Tor?",
+    "tor_checkbox_help": "Ative para incluir a consulta de nós de saída do Tor na função de pipeline global. Desativar também interrompe a atualização dos dados.",
+    "spamhaus_checkbox_label": "Permitir consultas Spamhaus DROP/EDROP?",
+    "spamhaus_checkbox_help": "Ative para incluir a consulta Spamhaus na função de pipeline global. Desativar também interrompe a atualização dos dados."
+  },
+  "abusech_ransom_adapter_documentation": {
+    "deprecation_title": "Aviso de descontinuação",
+    "deprecation_text": "O Ransomware Tracker da abuse.ch foi desativado em 08/12/2019. Este adaptador de dados não deve ser usado."
+  },
+  "abusech_ransom_adapter_field_set": {
+    "domains_blocklist": "Lista de bloqueio de domínios",
+    "urls_blocklist": "Lista de bloqueio de URLs",
+    "ips_blocklist": "Lista de bloqueio de IPs",
+    "blocklist_type_label": "Tipo de lista de bloqueio",
+    "blocklist_type_help": "Selecione o tipo da lista de bloqueio de ransomware do abuse.ch",
+    "blocklist_type_placeholder": "Selecione o tipo de lista de bloqueio",
+    "refresh_blocklist_label": "Atualizar lista de bloqueio",
+    "refresh_blocklist_help": "Se ativado, a lista de bloqueio de ransomware do abuse.ch será atualizada quando houver alterações."
+  },
+  "abusech_ransom_adapter_summary": {
+    "domains_blocklist": "Lista de bloqueio de domínios",
+    "urls_blocklist": "Lista de bloqueio de URLs",
+    "ips_blocklist": "Lista de bloqueio de IPs",
+    "blocklist_type_label": "Tipo de lista de bloqueio",
+    "update_interval_label": "Intervalo de atualização",
+    "deprecation_title": "Aviso de descontinuação",
+    "deprecation_text": "O Ransomware Tracker da abuse.ch foi desativado em 08/12/2019. Este adaptador de dados não deve ser usado."
+  },
+  "otx_adapter_documentation": {
+    "intro": "O adaptador de dados AlienVault OTX usa a <otxLink>API do OTX</otxLink> para consultar indicadores para a chave informada.",
+    "configuration_title": "Configuração",
+    "indicator_title": "Indicador",
+    "indicator_description": "A API do OTX oferece vários indicadores de comprometimento (IOCs) diferentes. Você deve selecionar qual indicador será usado por este adaptador de dados.",
+    "ip_auto_detect": "O indicador <code>IP Auto-Detect</code> não é oficial. Nós o adicionamos para permitir detectar automaticamente o tipo de endereço IP e usar o mesmo adaptador de dados para endereços IPv4 e IPv6.",
+    "api_key_title": "Chave de API do OTX",
+    "api_key_description": "A chave de API do OTX é usada para autenticar as requisições à API. As requisições também funcionam sem chave de API, mas provavelmente você terá um limite de requisições menor. <strong>Se você usar este adaptador de dados com tráfego de produção, registre-se em uma conta do OTX e obtenha uma chave de API.</strong>",
+    "api_url_title": "URL da API do OTX",
+    "api_url_description": "URL HTTP do servidor da API do OTX. A configuração padrão <code>https://otx.alienvault.com</code> não deve ser alterada, exceto se você quiser executar testes com um servidor personalizado.",
+    "user_agent_title": "User-Agent HTTP",
+    "user_agent_description": "Define o cabeçalho HTTP <code>User-Agent</code> das requisições à API do OTX. Você pode modificá-lo para incluir seus dados de contato, para que os operadores da API do OTX possam entrar em contato caso haja problemas com suas requisições.",
+    "connection_timeout_title": "Tempo limite de conexão HTTP",
+    "connection_timeout_description": "O tempo limite de conexão HTTP, em milissegundos, para a requisição à API do OTX. Se você definir um valor alto e a conexão com a API do OTX estiver lenta, o desempenho do processamento pode ser afetado.",
+    "write_timeout_title": "Tempo limite de gravação HTTP",
+    "write_timeout_description": "O tempo limite de gravação HTTP, em milissegundos, para a requisição à API do OTX. Se você definir um valor alto e a conexão com a API do OTX estiver lenta, o desempenho do processamento pode ser afetado.",
+    "read_timeout_title": "Tempo limite de leitura HTTP",
+    "read_timeout_description": "O tempo limite de leitura HTTP, em milissegundos, para a requisição à API do OTX. Se você definir um valor alto e a conexão com a API do OTX estiver lenta, o desempenho do processamento pode ser afetado."
+  },
+  "otx_adapter_field_set": {
+    "option_ip_auto_detect": "IP Auto-Detect",
+    "option_ip_v4": "IP v4",
+    "option_ip_v6": "IP v6",
+    "option_domain": "Domínio",
+    "option_hostname": "Nome de host",
+    "option_file": "Arquivo",
+    "option_url": "URL",
+    "option_cve": "CVE",
+    "option_nids": "NIDS",
+    "option_correlation_rule": "Regra de correlação",
+    "indicator_label": "Indicador",
+    "indicator_help": "O tipo de indicador do OTX a ser usado nas consultas.",
+    "indicator_placeholder": "Selecione o indicador",
+    "api_key_label": "Chave de API do OTX",
+    "api_key_help": "Sua chave de API do OTX.",
+    "api_url_label": "URL da API do OTX",
+    "api_url_help": "URL do servidor da API do OTX.",
+    "user_agent_label": "User-Agent HTTP",
+    "user_agent_help": "O cabeçalho User-Agent a ser usado na requisição HTTP.",
+    "connect_timeout_label": "Tempo limite de conexão HTTP",
+    "connect_timeout_help": "Tempo limite de conexão HTTP, em milissegundos.",
+    "write_timeout_label": "Tempo limite de gravação HTTP",
+    "write_timeout_help": "Tempo limite de gravação HTTP, em milissegundos.",
+    "read_timeout_label": "Tempo limite de leitura HTTP",
+    "read_timeout_help": "Tempo limite de leitura HTTP, em milissegundos."
+  },
+  "otx_adapter_summary": {
+    "not_available": "n/d",
+    "unit_ms": "ms"
+  },
+  "spamhaus_edrop_adapter_summary": {
+    "no_configuration": "Nenhuma configuração necessária."
+  },
+  "tor_exit_node_adapter_summary": {
+    "no_configuration": "Nenhuma configuração necessária"
+  },
+  "whois_adapter_documentation": {
+    "intro": "O adaptador de dados de consulta de IP whois pode solicitar informações de propriedade de rede de um endereço IP.",
+    "configuration_title": "Configuração",
+    "connect_timeout_description": "O tempo limite de conexão do socket com o servidor whois, em milissegundos. Se você definir um valor alto, isso pode afetar o desempenho do processamento.",
+    "read_timeout_description": "O tempo limite de leitura da conexão do socket com o servidor whois, em milissegundos. Se você definir um valor alto, isso pode afetar o desempenho do processamento."
+  },
+  "whois_adapter_field_set": {
+    "connect_timeout_label": "Tempo limite de conexão",
+    "connect_timeout_help": "Tempo limite de conexão do WHOIS, em milissegundos.",
+    "read_timeout_label": "Tempo limite de leitura",
+    "read_timeout_help": "Tempo limite de leitura da conexão do WHOIS, em milissegundos."
+  },
+  "whois_adapter_summary": {
+    "unit_ms": "ms"
+  }
+}

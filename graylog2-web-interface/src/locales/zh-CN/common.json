@@ -1,0 +1,608 @@
+{
+  "actions": {
+    "cancel": "取消",
+    "confirm": "确认",
+    "submit": "提交",
+    "delete": "删除",
+    "previous": "上一个",
+    "next": "下一个",
+    "add": "添加",
+    "edit": "编辑",
+    "preview": "预览",
+    "close": "关闭",
+    "done": "完成",
+    "filter": "过滤",
+    "reset": "重置",
+    "reset_search": "重置搜索",
+    "more_actions": "更多操作",
+    "sort": "排序",
+    "clear_selection": "清除选择",
+    "remove_item": "移除 {{name}}"
+  },
+  "confirm_leave": {
+    "question": "您确定吗？"
+  },
+  "duration": {
+    "years_other": "{{count}} 年",
+    "months_other": "{{count}} 个月",
+    "days_other": "{{count}} 天",
+    "hours_other": "{{count}} 小时",
+    "minutes_other": "{{count}} 分钟",
+    "seconds_other": "{{count}} 秒",
+    "milliseconds_other": "{{count}} 毫秒",
+    "nanoseconds_other": "{{count}} 纳秒",
+    "microseconds_other": "{{count}} 微秒"
+  },
+  "bulk_actions": {
+    "title": "批量操作",
+    "cancel": "取消选择"
+  },
+  "refresh": {
+    "not_updating": "未更新",
+    "every": "每",
+    "pause": "暂停刷新",
+    "start": "开始刷新"
+  },
+  "create_entity": {
+    "title": "创建{{entityName}}",
+    "submit": "创建{{entityName, lowercase}}",
+    "submitting": "正在创建{{entityName, lowercase}}...",
+    "save_failed": "保存失败",
+    "unknown_error": "发生错误，请重试。"
+  },
+  "key_value_table": {
+    "name": "名称",
+    "value": "值",
+    "actions": "操作"
+  },
+  "markdown_editor": {
+    "editor_title": "Markdown 编辑器",
+    "preview_title": "Markdown 预览",
+    "expand_preview": "展开预览",
+    "expand_content": "展开内容"
+  },
+  "source_code_editor": {
+    "copy": "复制（Ctrl+C / ⌘C）",
+    "paste": "粘贴（Ctrl+V / ⌘V）",
+    "undo": "撤销（Ctrl+Z / ⌘Z）",
+    "redo": "重做（Ctrl+Shift+Z / ⌘⇧Z）",
+    "paste_hint": "按 Ctrl+V（macOS 上为 ⌘V）或选择“编辑” → “粘贴”，从剪贴板粘贴。"
+  },
+  "loading": "加载中...",
+  "loading_long_wait": "耗时稍长，请稍候...",
+  "errors": {
+    "runtime_error": "运行时错误",
+    "unknown_error": "未知错误",
+    "fetch_error": "{{message}}：{{error}}",
+    "page_error_title": "获取数据时出错",
+    "page_error_description": "获取构建此页面所需的部分数据时出现问题，因此改为显示此图片。",
+    "page_error_logs": "更多信息请查看您的 {{productName}} 服务器日志。"
+  },
+  "empty": {
+    "no_data": "暂无可用数据。",
+    "no_entities": "不存在任何条目。",
+    "nothing_here": "这里空空如也，暂时没有内容！",
+    "no_items": "没有可显示的条目",
+    "no_items_available": "没有可用条目",
+    "no_items_found": "未找到可显示的条目。",
+    "filter_no_match": "没有与过滤条件匹配的数据。"
+  },
+  "badges": {
+    "beta": "测试版",
+    "preview": "预览版",
+    "default": "默认",
+    "optional": "（可选）"
+  },
+  "clipboard": {
+    "copied": "已复制！"
+  },
+  "restricted_access": {
+    "view": "您没有查看此{{entityName}}的权限。"
+  },
+  "enterprise_plugin_not_found": {
+    "title": "企业版功能",
+    "description": "要使用<bold>{{featureName}}</bold>功能，您需要<licenseLink>Graylog Enterprise 许可证</licenseLink>和<docsLink>Graylog Enterprise 插件</docsLink>。"
+  },
+  "pagination": {
+    "first": "打开第一页",
+    "previous": "打开上一页",
+    "next": "打开下一页",
+    "last": "打开最后一页",
+    "page": "打开第 {{page}} 页",
+    "active_page": "当前页"
+  },
+  "page_size": {
+    "rows_other": "{{count}} 行",
+    "configure": "配置每页条数",
+    "show": "每页显示 <select/> 条"
+  },
+  "search_form": {
+    "placeholder": "输入搜索查询...",
+    "filter_placeholder": "输入查询以过滤"
+  },
+  "select": {
+    "placeholder": "请选择...",
+    "no_options": "无可选项",
+    "loading": "加载中...",
+    "loading_options": "正在加载选项...",
+    "type_to_filter": "输入以过滤"
+  },
+  "entity_table": {
+    "selected_items_other": "已选择 {{count}} 个条目",
+    "columns": "列",
+    "configure_columns": "配置可见列",
+    "reset_columns": "重置所有列",
+    "show_column": "显示{{column}}",
+    "hide_column_named": "隐藏{{column}}",
+    "show_label": "显示",
+    "show_details": "显示详情",
+    "collapse_section": "折叠部分",
+    "toggle_column_actions": "切换{{column}}操作",
+    "sort_ascending": "升序排序",
+    "sort_descending": "降序排序",
+    "sort_column_ascending": "按{{column, lowercase}}升序排序",
+    "sort_column_descending": "按{{column, lowercase}}降序排序",
+    "hide_column": "隐藏列",
+    "resize_column": "调整{{column}}列宽度",
+    "slicing_by": "按{{column}}分片",
+    "select_entity": "选择条目",
+    "deselect_entity": "取消选择条目",
+    "select_all": "选择所有可见条目",
+    "deselect_all": "取消选择所有可见条目",
+    "more": "更多",
+    "more_actions": "更多操作",
+    "load_layout_failed": "加载“{{entityId}}”概览的布局偏好设置失败，错误为",
+    "update_layout_failed": "更新表格布局偏好设置失败，错误：{{error}}",
+    "search_placeholder": "搜索{{humanName}}",
+    "fetch_failed": "获取{{humanName}}失败",
+    "fetch_failed_with_status": "获取{{humanName}}失败，状态为",
+    "could_not_retrieve": "无法获取{{humanName}}",
+    "no_results": "未找到{{humanName}}。"
+  },
+  "slicing": {
+    "slice_by": "按分片",
+    "slice_by_values": "按分片值",
+    "no_slicing": "不分片",
+    "unselect_slice": "取消选择分片",
+    "sort_by": "按{{option}}排序",
+    "filter": "过滤{{column}}",
+    "filter_slices": "过滤分片",
+    "sort_ascending": "升序排序",
+    "sort_descending": "降序排序",
+    "hide_empty": "隐藏空分片（{{count}}）",
+    "show_empty": "显示空分片（{{count}}）",
+    "hide_empty_title": "隐藏空分片",
+    "show_empty_title": "显示空分片",
+    "no_empty": "空分片（0）",
+    "fetch_failed": "获取表格分片时出错"
+  },
+  "filters": {
+    "filters": "过滤器",
+    "create_filter": "创建过滤器",
+    "change_value": "更改过滤器值",
+    "delete_filter": "删除过滤器",
+    "filter_ignored": "过滤器已忽略",
+    "slice_conflict": "由于该属性已启用分片，此过滤器已被忽略。请清除分片以应用过滤器。",
+    "single_filter_only": "该属性只能创建一个过滤器。",
+    "update_existing": "如需更改过滤器值，请更新现有过滤器。",
+    "create_attribute_filter": "创建{{attribute, lowercase}}过滤器",
+    "edit_attribute_filter": "编辑{{attribute, lowercase}}过滤器",
+    "create_submit": "创建过滤器",
+    "update_submit": "更新过滤器",
+    "value_placeholder": "输入要过滤的值",
+    "must_not_be_empty": "不能为空。",
+    "search_attribute": "搜索{{attribute, lowercase}}",
+    "no_entities_found": "未找到条目",
+    "hold_shift": "按住 Shift 键可多选",
+    "load_suggestions_failed": "加载过滤器建议失败，状态为",
+    "could_not_load_suggestions": "无法加载过滤器建议",
+    "load_titles_failed": "加载过滤器标题失败，状态为",
+    "could_not_load_titles": "无法加载过滤器标题",
+    "all_time": "全部时间",
+    "now": "现在",
+    "now_lowercase": "现在",
+    "relative_range": "从 {{from}} 到 {{until}}"
+  },
+  "time_units": {
+    "nanoseconds": "纳秒",
+    "microseconds": "微秒",
+    "milliseconds": "毫秒",
+    "seconds": "秒",
+    "minutes": "分钟",
+    "hours": "小时",
+    "days": "天",
+    "months": "月",
+    "years": "年"
+  },
+  "time": {
+    "never": "从不",
+    "toggle_time": "切换时间",
+    "time_unit_input": "时间单位输入",
+    "browser_time_zone": "浏览器时区",
+    "pick_time_zone": "选择时区",
+    "unclassified_time_zones": "未分类",
+    "default_locale": "默认语言区域",
+    "pick_locale": "选择语言区域"
+  },
+  "page_header": {
+    "experimental": "实验性",
+    "legacy": "旧版",
+    "experimental_message": "此功能为新功能，应视为实验性功能。",
+    "legacy_message": "此功能已停止维护，并将在未来版本中移除。"
+  },
+  "message": {
+    "collector_ingest": "Collector Ingest",
+    "deleted_input": "已删除的输入",
+    "received_by": "接收方",
+    "received_by_value": "<node/> 上的 <inputName/>",
+    "filter_streams": "过滤 Streams",
+    "default_stream_not_testable": "无法针对默认 Stream 进行测试",
+    "no_streams": "没有可用的 Streams",
+    "test_against_stream": "针对 Stream 测试",
+    "show_changes": "显示更改",
+    "copy_id": "复制 ID",
+    "copy_message": "复制消息",
+    "not_stored": "未存储",
+    "timestamp": "时间戳",
+    "stored_in_index": "已存储在索引中",
+    "not_stored_in_index": "消息未存储",
+    "routed_into_streams": "已路由至 Streams",
+    "edit_favorite_fields": "编辑收藏字段",
+    "show_remaining_fields_other": "显示其余 {{count}} 个字段",
+    "hide_remaining_fields_other": "隐藏其余 {{count}} 个字段",
+    "favorite_fields_configuration": "收藏字段配置",
+    "favorite_fields_hint_other": "收藏字段将显示在此消息所属的所有 Stream 中，包括此消息被路由到的 Streams <streams/>。",
+    "save_configuration": "保存配置",
+    "reset_to_default": "重置为默认",
+    "reset_to_default_title": "重置为默认字段：{{fields}}",
+    "favorite_fields": "收藏字段",
+    "remaining_fields": "其余字段",
+    "set_favorites_failed": "将字段设为收藏失败，错误：{{error}}",
+    "set_favorites_failed_title": "无法将字段设为收藏",
+    "add_favorite_failed": "添加收藏字段失败，错误：{{error}}",
+    "add_favorite_failed_title": "无法添加字段到收藏",
+    "remove_favorite_failed": "移除收藏字段失败，错误：{{error}}",
+    "remove_favorite_failed_title": "无法从收藏中移除字段",
+    "field_terms": "字段词条：",
+    "received_by_radio_value": "通过 radio <node/> 上的 <inputName/>"
+  },
+  "entity_types": {
+    "user": "用户",
+    "team": "团队",
+    "dashboard": "Dashboard",
+    "event_definition": "Event Definition",
+    "notification": "通知",
+    "search": "搜索",
+    "stream": "Stream",
+    "search_filter": "搜索过滤器",
+    "report": "报告",
+    "role": "角色",
+    "output": "Output",
+    "sigma_rule": "Sigma 规则",
+    "event_procedure": "事件流程",
+    "event_procedure_step": "事件流程步骤",
+    "collection": "Collection",
+    "collection_entities": "Collection 条目"
+  },
+  "marketplace_link": "{{productName}} 市场",
+  "chips_cell": {
+    "show_fewer": "收起",
+    "show_all": "显示全部",
+    "filter_by": "按 {{itemLabel}} “{{value}}”过滤"
+  },
+  "expandable_cell_list": {
+    "show_less": "显示更少",
+    "show_more_other": "再显示 {{count}} 项"
+  },
+  "expanded_section_count": {
+    "show": "显示{{label}}",
+    "hide": "隐藏{{label}}"
+  },
+  "compact_pagination": {
+    "previous_page": "上一页",
+    "select_page": "选择页",
+    "next_page": "下一页",
+    "of_pages": "共 {{totalPages}} 页"
+  },
+  "expandable_checkbox_list_item": {
+    "select_item": "选择项"
+  },
+  "traffic_graph": {
+    "days": "天数",
+    "incoming": "入站流量",
+    "outgoing": "出站流量",
+    "last_days": "最近 {{days}} 天：{{traffic}}"
+  },
+  "link_to_node": {
+    "unknown_node": "未知节点"
+  },
+  "markdown": {
+    "images_unsupported": "出于安全原因，不支持图片。请在<configurationLink>此处</configurationLink>启用允许的来源。"
+  },
+  "public_notifications": {
+    "read_less": "收起",
+    "read_more": "展开"
+  },
+  "refresh_controls": {
+    "controls_label": "{{humanName}} 刷新控件",
+    "below_minimum": "<intervalDuration /> （{{interval}}）的间隔低于配置的最小间隔 <minimumDuration /> （{{minimum}}）。"
+  },
+  "scroll_button": {
+    "back_to_top": "返回顶部"
+  },
+  "section": {
+    "toggle_section": "切换{{title, lowercase}}部分"
+  },
+  "selectable_list": {
+    "remove": "移除"
+  },
+  "share_menu_item": {
+    "share": "共享"
+  },
+  "status_icon": {
+    "yes": "是",
+    "no": "否"
+  },
+  "type_ahead_field_input": {
+    "select_field": "选择字段"
+  },
+  "query_helper": {
+    "title": "搜索语法帮助",
+    "show_help": "显示搜索语法帮助",
+    "available_fields": "可用搜索字段",
+    "field": "字段",
+    "description": "描述",
+    "examples": "示例",
+    "example_description": "查找描述中包含 security 的所有{{entityName}}：",
+    "example_id": "查找 ID 为 5f4dfb9c69be46153b9a9a7b 的{{entityName}}：",
+    "example_query_description": "description:security",
+    "example_query_id": "id:5f4dfb9c69be46153b9a9a7b",
+    "common_fields": {
+      "id": "{{entityName}}的 ID，是唯一标识。",
+      "title": "{{entityName}}的标题。",
+      "name": "{{entityName}}的名称。",
+      "description": "{{entityName}}的简短描述。",
+      "summary": "{{entityName}}的详细摘要。"
+    }
+  },
+  "url_allow_list_modal": {
+    "add": "添加到 URL 允许列表",
+    "title": "更新允许列表配置",
+    "submit": "更新配置",
+    "urls": "允许列表 URL"
+  },
+  "configuration_well": {
+    "empty": "<empty>",
+    "uploaded_file_content": "<uploaded file content>",
+    "no_configuration": "-- 无配置 --"
+  },
+  "configuration_forms": {
+    "undo_reset": "撤销重置",
+    "remove": "移除",
+    "title": "标题",
+    "optional": "可选"
+  },
+  "enterprise_advertisement": {
+    "enterprise_title": "{{productName}} Enterprise",
+    "enterprise_description": "专为资源有限的 IT 运维和软件工程团队设计，{{productName}} Enterprise 提供大量效率增强功能，帮助您每年节省数千小时用于收集和分析日志数据，从而找出性能、故障和错误问题的根本原因。",
+    "security_title": "{{productName}} Security",
+    "security_description": "借助安全专用 Dashboard 和告警、异常检测 AI/ML 引擎、与其他安全工具的集成、SOAR 功能以及众多合规报告功能，扩展 {{productName}} Open 在检测、调查和响应网络安全威胁方面的能力。",
+    "request_now": "立即申请"
+  },
+  "plugin_list": {
+    "plugin_enterprise": "{{productName}} Enterprise 插件",
+    "installed": "{{pluginName}} 已安装",
+    "not_installed": "{{pluginName}} 未安装",
+    "status": "以下是此集群中 {{productName}} Enterprise 模块的状态："
+  },
+  "reported_error": {
+    "title": "出现问题",
+    "description": "发生未知错误。请查看以下消息以及 {{productName}} 服务器日志以获取更多信息。"
+  },
+  "hotkeys": {
+    "or": "或",
+    "title": "键盘快捷键",
+    "view_all": "查看所有键盘快捷键"
+  },
+  "right_sidebar": {
+    "sidebar_label": "{{title}}侧边栏",
+    "sidebar_label_collapsed": "{{title}}侧边栏（已折叠）",
+    "close": "关闭侧边栏",
+    "expand": "展开侧边栏",
+    "collapse": "折叠侧边栏",
+    "go_back": "后退",
+    "go_back_label": "返回上一内容",
+    "go_forward": "前进",
+    "go_forward_label": "前进到下一内容"
+  },
+  "maxmind_adapter": {
+    "documentation": {
+      "intro": "GeoIP 数据适配器支持读取 MaxMind 的 GeoIP2 数据库。",
+      "limitations_title": "限制",
+      "limitations_supported": "目前支持 ASN、城市和国家数据库。",
+      "limitations_more": "如需支持其他数据库类型，请访问我们的支持渠道。",
+      "asn_fields": "ASN 数据库字段",
+      "country_fields": "国家数据库字段",
+      "city_fields": "城市数据库字段",
+      "city_additional_fields": "除国家数据库提供的字段外，城市数据库还包含以下字段：",
+      "complete_documentation": "有关字段的完整文档，请参阅 MaxMind 的<docsLink>开发者文档</docsLink>"
+    },
+    "database_types": {
+      "asn": "ASN 数据库",
+      "city": "城市数据库",
+      "country": "国家数据库",
+      "ipinfo_location": "IPinfo 位置数据库",
+      "ipinfo_asn": "IPinfo ASN 数据库"
+    },
+    "field_set": {
+      "file_path": "文件路径",
+      "file_path_help": "数据库文件的路径。",
+      "database_type": "数据库类型",
+      "database_type_help": "选择数据库文件的类型",
+      "database_type_placeholder": "选择数据库文件类型",
+      "refresh_file": "刷新文件",
+      "refresh_file_help": "启用后，将检查数据库文件是否有修改，并在磁盘上的文件发生变化时刷新。"
+    },
+    "summary": {
+      "database_file_path": "数据库文件路径",
+      "database_type": "数据库类型",
+      "check_interval": "检查间隔"
+    }
+  },
+  "abs_geoip": {
+    "container_name": "Azure Blob 容器名称",
+    "container_name_help": "您的 Azure Blob 容器名称。",
+    "endpoint_url": "Azure Blob 端点 URL",
+    "endpoint_url_help": "您的 Azure Blob 端点 URL，仅在需要覆盖默认端点时才需要填写。",
+    "account_name": "Azure 账户名称",
+    "account_name_placeholder": "your-account-name",
+    "account_name_help": "您的 Azure 存储账户名称。",
+    "account_key_reset": "Azure 账户密钥",
+    "reset_password": "重置密码",
+    "account_key": "Azure 账户密钥",
+    "account_key_help": "您的 Azure 存储账户的账户密钥。"
+  },
+  "gcs_geoip": {
+    "project_id": "Google Cloud Storage 项目 ID"
+  },
+  "geoip_resolver": {
+    "title": "Geo-Location Processor 配置",
+    "description": "Geo-Location Processor 插件会扫描所有消息，查找<bold>仅包含</bold> IP 地址的字段，并将其地理位置信息（坐标、ISO 国家代码和城市名称）写入其他字段。更多信息请参阅<docsLink>文档</docsLink>。",
+    "enabled_summary": "已启用：",
+    "enforce_schema_summary": "强制默认架构：",
+    "vendor_type_summary": "数据库供应商类型：",
+    "city_db_path_summary": "城市数据库路径：",
+    "asn_db_path_summary": "ASN 数据库路径：",
+    "refresh_interval_summary": "数据库刷新间隔：",
+    "pull_from_cloud_summary": "从云存储桶拉取文件：",
+    "edit": "编辑配置",
+    "modal_title": "更新 Geo-Location Processor 配置",
+    "enable_processor": "启用 Geo-Location 处理器",
+    "enforce_schema": "强制默认架构",
+    "vendor_select": "选择 GeoIP 数据库供应商",
+    "city_db_path": "城市数据库路径",
+    "asn_db_path": "ASN 数据库路径",
+    "refresh_interval": "数据库刷新间隔",
+    "refresh_interval_help": "检查数据库文件是否有修改的时间间隔，磁盘上的变更会被检测并刷新。",
+    "pull_from_cloud": "从云存储桶拉取文件",
+    "select_cloud_storage": "选择云存储",
+    "update_configuration": "更新配置",
+    "updating_configuration": "正在更新配置..."
+  },
+  "links": {
+    "documentation": "文档"
+  },
+  "quick_jump": {
+    "title": "快速跳转",
+    "open": "打开快速跳转",
+    "search_placeholder": "搜索页面/Dashboard/Streams ...",
+    "intro": "请输入搜索查询，以搜索页面、Stream、Dashboard、输入或其他条目。",
+    "intro_hint": "为方便您快速开始，下方列出了您<bold>最近打开</bold>和<bold>收藏</bold>的条目：",
+    "no_results": "未找到搜索结果，请尝试其他搜索词。",
+    "recent": "最近"
+  },
+  "scratchpad": {
+    "title": "草稿板",
+    "status_cleared": "已清除。",
+    "status_auto_saved": "已自动保存。",
+    "got_it": "知道了！",
+    "sensitive_warning": "我们建议您<bold>不要</bold>在此区域存储密码等任何敏感信息。",
+    "help_overlay": "您可以使用此区域存储个人笔记和其他信息，无需离开浏览器窗口。例如，可以存储调查中需要的时间戳、用户 ID 或 IP 地址。",
+    "copy": "复制",
+    "clear": "清除",
+    "clear_confirm": "此操作将清除草稿板中的内容，是否继续？"
+  },
+  "extractor_actions": {
+    "select_type": "选择 Extractor 类型",
+    "only_string_fields": "Extractor 只能用于字符串字段。"
+  },
+  "surrounding_search": {
+    "button": "显示上下文消息"
+  },
+  "support_sources": {
+    "title": "需要帮助？",
+    "help_text": "如果您的问题未在<docsLink>文档</docsLink>中得到解答，请随时咨询 {{productName}} 社区。",
+    "community_support": "社区支持",
+    "issue_tracker": "问题跟踪",
+    "professional_support": "专业支持"
+  },
+  "times_list": {
+    "title": "时间配置",
+    "description": "处理时区可能会比较复杂。您可以在此查看系统各组件所应用的时区。如需查看特定 {{productName}} 服务器节点的时区设置，请前往其详情页面。",
+    "user": "用户 <bold>{{username}}</bold>：",
+    "web_browser": "您的 Web 浏览器：",
+    "server": "{{productName}} 服务器："
+  },
+  "widget_visualization_not_found": {
+    "description": "未找到组件可视化（<italic>{{widgetClassName}}</italic>）。看起来提供此组件的插件未加载。"
+  },
+  "telemetry": {
+    "title": "遥测",
+    "enable_label": "启用遥测",
+    "enabled_checkbox": "已启用",
+    "update_preferences": "更新偏好设置",
+    "update_button": "更新遥测设置",
+    "info_modal_title": "帮助我们改进 {{productName}}",
+    "ok": "确定",
+    "info": "我们希望收集匿名使用数据，以帮助我们确定改进优先级，并在未来让 {{productName}} 变得更好。",
+    "no_personal_data": "我们不会收集您实例中的个人数据、敏感信息或日志等内容。",
+    "learn_more": "更多信息请参阅我们的<privacyLink>隐私政策</privacyLink>。",
+    "turn_off_profile": "您可以随时在<bold>用户个人资料</bold>中开启或关闭数据收集。",
+    "turn_off_here": "您可以随时在此处开启或关闭数据收集。"
+  },
+  "app_facade": {
+    "preparing": "正在为您准备 Web 界面...",
+    "load_user_failed": "加载您的用户失败",
+    "reload_page": "重新加载页面"
+  },
+  "suggest_reload": {
+    "title": "{{productName}} 版本已更改",
+    "version_changed": "您的 {{productName}} 版本已从 <bold>{{version}}</bold> 更改为 <bold>{{newVersion}}</bold>。",
+    "save_work": "请保存您的工作并重新加载页面，以避免出现错误。",
+    "reload_now": "立即重新加载"
+  },
+  "footer": {
+    "system_info": "{{productName}} {{version}}，运行于 {{hostname}}（{{jvmInfo}}）"
+  },
+  "notifications": {
+    "download_failed": "下载失败，状态：{{error}}",
+    "download_failed_title": "无法下载",
+    "export_failed": "导出失败",
+    "export_widget_failed": "组件导出失败",
+    "telemetry_update_failed": "更新失败：{{error}}",
+    "telemetry_update_failed_title": "无法更新遥测设置。",
+    "delete_property_confirm": "确定要删除属性“{{key}}”吗？",
+    "quick_jump_failed": "获取条目搜索结果失败，状态为",
+    "quick_jump_failed_title": "无法获取条目搜索结果。"
+  },
+  "use_favorite_item_mutation_notifications": {
+    "put_failed": "添加条目到收藏失败，状态：{{error}}",
+    "put_failed_title": "无法将条目添加到收藏",
+    "delete_failed": "从收藏中删除条目失败，状态：{{error}}",
+    "delete_failed_title": "无法从收藏中删除条目"
+  },
+  "use_entity_titles_notifications": {
+    "load_failed": "加载条目标题失败，状态为",
+    "load_failed_title": "无法加载条目标题"
+  },
+  "use_search_version_check_notifications": {
+    "fetch_failed_title": "无法获取覆盖数据"
+  },
+  "entity_creators": {
+    "event_definition": "创建 Event Definition",
+    "notification": "创建通知",
+    "dashboard": "创建 Dashboard",
+    "stream": "创建 Stream",
+    "index_set": "创建索引集",
+    "user": "创建用户",
+    "pipeline": "创建 Pipeline",
+    "pipeline_rule": "创建 Pipeline 规则",
+    "content_pack": "创建内容包",
+    "fleet": "创建 Fleet"
+  },
+  "user_notification": {
+    "success": "成功",
+    "error": "错误",
+    "attention": "注意"
+  }
+}

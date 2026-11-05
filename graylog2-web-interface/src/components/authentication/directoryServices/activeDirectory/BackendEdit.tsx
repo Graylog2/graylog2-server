@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { DirectoryServiceBackend } from 'logic/authentication/directoryServices/types';
 import { DocumentTitle, Spinner } from 'components/common';
@@ -35,6 +36,7 @@ type Props = {
 const _optionalWizardProps = (initialStepKey: string | null | undefined) => ({ initialStepKey });
 
 const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
+  const { t } = useTranslation('authentication');
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   const {
     help: groupSyncHelp = {},
@@ -75,7 +77,7 @@ const BackendEdit = ({ authenticationBackend, initialStepKey }: Props) => {
     );
 
   return (
-    <DocumentTitle title="Edit Active Directory Authentication Service">
+    <DocumentTitle title={t('active_directory.edit_title')}>
       <WizardPageHeader authenticationBackend={authenticationBackend} />
       <BackendWizard
         {..._optionalWizardProps(initialStepKey)}

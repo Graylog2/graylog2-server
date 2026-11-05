@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import pick from 'lodash/pick';
 import isArray from 'lodash/isArray';
@@ -91,12 +92,13 @@ type Props = {
 };
 
 const HotkeysModal = ({ onToggle }: Props) => {
+  const { t } = useTranslation('common');
   const enabledCollection = useEnabledCollections();
 
   return (
     <Modal onHide={onToggle} show bsSize="large">
       <Modal.Header>
-        <Modal.Title>Keyboard shortcuts</Modal.Title>
+        <Modal.Title>{t('hotkeys.title')}</Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
@@ -111,9 +113,9 @@ const HotkeysModal = ({ onToggle }: Props) => {
       <Modal.Footer>
         <Footer>
           <Link to={Routes.KEYBOARD_SHORTCUTS} target="_blank">
-            View all keyboard shortcuts
+            {t('hotkeys.view_all')}
           </Link>
-          <Button onClick={() => onToggle()}>Close</Button>
+          <Button onClick={() => onToggle()}>{t('actions.close')}</Button>
         </Footer>
       </Modal.Footer>
     </Modal>

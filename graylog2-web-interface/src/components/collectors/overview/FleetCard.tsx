@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { HoverForHelp } from 'components/common';
 
@@ -131,33 +132,36 @@ type Props = {
   onClick: () => void;
 };
 
-const healthTooltips: Record<HealthStatus, string> = {
-  healthy: 'All instances in this fleet are online',
-  degraded: 'Some instances in this fleet are offline',
-  down: 'All instances in this fleet are offline',
-  empty: 'No Collector instances have enrolled in this fleet yet',
+const HEALTH_TOOLTIP_KEYS: Record<HealthStatus, string> = {
+  healthy: 'fleet_card.healthy',
+  degraded: 'fleet_card.degraded',
+  down: 'fleet_card.down',
+  empty: 'fleet_card.empty',
 };
 
 const FleetCard = ({ stats, onClick }: Props) => {
+  const { t } = useTranslation('collectors');
   const health = getHealthStatus(stats);
 
   return (
     <Card onClick={onClick} data-testid="fleet-card" $status={health}>
       <HelpCorner>
         <HoverForHelp title={stats.fleet_name} placement="right" pullRight={false}>
-          {healthTooltips[health]}
+          {t(HEALTH_TOOLTIP_KEYS[health])}
         </HoverForHelp>
       </HelpCorner>
       <FleetName>{stats.fleet_name}</FleetName>
       <HeroNumber>{stats.total_instances}</HeroNumber>
-      <SubLabel>instances</SubLabel>
+      <SubLabel>{t('fleet_card.instances', { count: stats.total_instances })}</SubLabel>
       <Breakdown>
-        {stats.online_instances > 0 && <OnlineCount>● {stats.online_instances} online</OnlineCount>}
-        {stats.offline_instances > 0 && <OfflineCount>● {stats.offline_instances} offline</OfflineCount>}
+        {stats.online_instances > 0 && (
+          <OnlineCount>{t('fleet_card.online', { count: stats.online_instances })}</OnlineCount>
+        )}
+        {stats.offline_instances > 0 && (
+          <OfflineCount>{t('fleet_card.offline', { count: stats.offline_instances })}</OfflineCount>
+        )}
       </Breakdown>
-      <SourceFooter>
-        {stats.total_sources} {stats.total_sources === 1 ? 'source' : 'sources'}
-      </SourceFooter>
+      <SourceFooter>{t('fleet_card.sources', { count: stats.total_sources })}</SourceFooter>
     </Card>
   );
 };

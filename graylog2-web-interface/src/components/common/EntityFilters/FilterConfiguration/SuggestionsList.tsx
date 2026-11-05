@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import debounce from 'lodash/debounce';
 import styled, { css } from 'styled-components';
 
@@ -99,6 +100,7 @@ const SuggestionsList = ({
   suggestions,
   total,
 }: Props) => {
+  const { t } = useTranslation('common');
   const isShiftHeld = useIsKeyHeld('Shift');
   const handleSearchChange = useCallback(
     (newSearchQuery: string) => {
@@ -123,7 +125,7 @@ const SuggestionsList = ({
           type="text"
           id="search-filters-input"
           formGroupClassName=""
-          placeholder={`Search for ${attribute.title.toLowerCase()}`}
+          placeholder={t('filters.search_attribute', { attribute: attribute.title })}
           onChange={({ target: { value } }) => debounceOnSearch(value)}
         />
         {isLoading && <Spinner />}
@@ -171,11 +173,11 @@ const SuggestionsList = ({
         </StyledPaginatedList>
       )}
       <PaddingContainer>
-        {!suggestions?.length && <NoSearchResult>No entities found</NoSearchResult>}
+        {!suggestions?.length && <NoSearchResult>{t('filters.no_entities_found')}</NoSearchResult>}
 
         {multiSelect && (
           <Hint>
-            <i>Hold Shift to select multiple</i>
+            <i>{t('filters.hold_shift')}</i>
           </Hint>
         )}
       </PaddingContainer>

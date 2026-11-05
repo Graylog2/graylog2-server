@@ -15,10 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useState, useContext, useCallback } from 'react';
 import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import i18n from 'i18n';
 import type { BackendWidgetPosition } from 'views/types';
 import ExportModal from 'views/components/export/ExportModal';
 import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
@@ -139,7 +141,7 @@ const _onMoveWidgetToPage = async (
 
 const defaultOnDeleteWidget = async (_widget: Widget, _view: View, title: string) =>
   // eslint-disable-next-line no-alert
-  window.confirm(`Are you sure you want to remove the widget "${title}"?`);
+  window.confirm(i18n.t('widget_actions.confirm_remove', { ns: 'widgets', title }));
 
 const _onDelete = (widget: Widget, view: View, title: string) => async (dispatch: ViewsDispatch) => {
   const pluggableWidgetDeletionHooks = PluginStore.exports('views.hooks.confirmDeletingWidget');
@@ -166,6 +168,7 @@ type Props = {
 };
 
 const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, toggleEdit }: Props) => {
+  const { t } = useTranslation('widgets');
   const widget = useContext(WidgetContext);
   const view = useView();
   const { query, timerange, streams, streamCategories } = useContext(DrilldownContext);
@@ -248,7 +251,9 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
               newTab
             />
           </IfDashboard>
-          {isFocused && <IconButton name="fullscreen_exit" title="Un-focus widget" onClick={unsetWidgetFocusing} />}
+          {isFocused && (
+            <IconButton name="fullscreen_exit" title={t('widget_actions.unfocus')} onClick={unsetWidgetFocusing} />
+          )}
         </IfInteractive>
         <ExtraMenuWidgetActions widget={widget} />
         <IfInteractive>
@@ -260,19 +265,19 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
                 onStretch={onPositionsChange}
                 position={position}
               />
-              <IconButton name="fullscreen" title="Focus this widget" onClick={focusWidget} />
+              <IconButton name="fullscreen" title={t('widget_actions.focus')} onClick={focusWidget} />
             </>
           )}
 
-          <IconButton name="edit_square" title="Edit" iconType="regular" onClick={toggleEdit} />
+          <IconButton name="edit_square" title={t('widget_actions.edit')} iconType="regular" onClick={toggleEdit} />
 
           <WidgetActionDropdown>
-            <MenuItem onSelect={onDuplicate}>Duplicate</MenuItem>
+            <MenuItem onSelect={onDuplicate}>{t('widget_actions.duplicate')}</MenuItem>
             <IfSearch>
-              <MenuItem onSelect={() => setShowCopyToDashboard(true)}>Copy to Dashboard</MenuItem>
+              <MenuItem onSelect={() => setShowCopyToDashboard(true)}>{t('widget_actions.copy_to_dashboard')}</MenuItem>
             </IfSearch>
             <IfDashboard>
-              <MenuItem onSelect={() => setShowMoveWidgetToTab(true)}>Move to Page</MenuItem>
+              <MenuItem onSelect={() => setShowMoveWidgetToTab(true)}>{t('widget_actions.move_to_page')}</MenuItem>
             </IfDashboard>
             <ExtraDropdownWidgetActions widget={widget} setComponents={setOverflowingComponents} />
             <MenuItem divider />
@@ -283,8 +288,8 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
             <CopyToDashboard
               onCopyToDashboard={(dashboardId) => onCopyToDashboard(widget.id, dashboardId)}
               onCancel={() => setShowCopyToDashboard(false)}
-              submitLoadingText="Copying widget..."
-              submitButtonText="Copy widget"
+              submitLoadingText={t('widget_actions.copying')}
+              submitButtonText={t('widget_actions.copy')}
               onCreateNewDashboard={onCreateNewDashboard}
             />
           )}

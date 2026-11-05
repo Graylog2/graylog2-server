@@ -450,7 +450,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                             CK_TLS_CLIENT_AUTH_TRUSTED_CERT_FILE,
                             "TLS Client Auth Trusted Certs",
                             "",
-                            "TLS Client Auth Trusted Certs  (File or Directory)",
+                            "TLS Client Auth Trusted Certs (File or Directory)",
                             ConfigurationField.Optional.OPTIONAL)
             );
             x.addField(

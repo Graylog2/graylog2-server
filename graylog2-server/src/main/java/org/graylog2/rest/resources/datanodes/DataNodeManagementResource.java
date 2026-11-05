@@ -29,7 +29,6 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -48,6 +47,8 @@ import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.configuration.RunsWithDataNode;
 import org.graylog2.datanode.DataNodeCommandService;
+import org.graylog2.plugin.rest.CodedException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.rest.bulk.AuditParams;
 import org.graylog2.rest.bulk.BulkExecutor;
 import org.graylog2.rest.bulk.SequentialBulkExecutor;
@@ -56,6 +57,7 @@ import org.graylog2.rest.bulk.model.BulkOperationResponse;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
+
 
 import static org.graylog2.audit.AuditEventTypes.DATANODE_REMOVE;
 import static org.graylog2.audit.AuditEventTypes.DATANODE_RESET;
@@ -106,7 +108,7 @@ public class DataNodeManagementResource extends RestResource {
         try {
             return nodeService.byNodeId(nodeId);
         } catch (NodeNotFoundException e) {
-            throw new NotFoundException("Node " + nodeId + " not found");
+            throw new CodedNotFoundException("data_node_management.node_not_found", "Node " + nodeId + " not found", CodedException.paramsOf("nodeId", nodeId));
         }
     }
 
@@ -120,7 +122,7 @@ public class DataNodeManagementResource extends RestResource {
         try {
             return dataNodeCommandService.removeNode(nodeId);
         } catch (NodeNotFoundException e) {
-            throw new NotFoundException("Node " + nodeId + " not found");
+            throw new CodedNotFoundException("data_node_management.node_not_found", "Node " + nodeId + " not found", CodedException.paramsOf("nodeId", nodeId));
         }
     }
 
@@ -155,7 +157,7 @@ public class DataNodeManagementResource extends RestResource {
         try {
             return dataNodeCommandService.resetNode(nodeId);
         } catch (NodeNotFoundException e) {
-            throw new NotFoundException("Node " + nodeId + " not found");
+            throw new CodedNotFoundException("data_node_management.node_not_found", "Node " + nodeId + " not found", CodedException.paramsOf("nodeId", nodeId));
         }
     }
 
@@ -169,7 +171,7 @@ public class DataNodeManagementResource extends RestResource {
         try {
             return dataNodeCommandService.stopNode(nodeId);
         } catch (NodeNotFoundException e) {
-            throw new NotFoundException("Node " + nodeId + " not found");
+            throw new CodedNotFoundException("data_node_management.node_not_found", "Node " + nodeId + " not found", CodedException.paramsOf("nodeId", nodeId));
         }
     }
 
@@ -206,7 +208,7 @@ public class DataNodeManagementResource extends RestResource {
         try {
             return dataNodeCommandService.startNode(nodeId);
         } catch (NodeNotFoundException e) {
-            throw new NotFoundException("Node " + nodeId + " not found");
+            throw new CodedNotFoundException("data_node_management.node_not_found", "Node " + nodeId + " not found", CodedException.paramsOf("nodeId", nodeId));
         }
     }
 

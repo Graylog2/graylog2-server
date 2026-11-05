@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type SharedEntity from 'logic/permissions/SharedEntity';
 import useEntityShareState, { useSetEntityShareState } from 'hooks/useEntityShareState';
@@ -100,6 +101,7 @@ const EntityCreateShareFormGroup = ({
   dependenciesGRN = null,
   defaultSharePayload = undefined,
 }: Props) => {
+  const { t } = useTranslation('users');
   const entityGRN = entityId && createGRN(entityType, entityId);
   const { data: entityShareState } = useEntityShareState(entityGRN);
   const setEntityShareState = useSetEntityShareState();
@@ -186,7 +188,7 @@ const EntityCreateShareFormGroup = ({
       {entityShareState ? (
         <>
           <ShareFormSection>
-            <GranteesSelectorHeadline>Add Collaborator</GranteesSelectorHeadline>
+            <GranteesSelectorHeadline>{t('permissions.share.add_collaborator')}</GranteesSelectorHeadline>
             <p>{description}</p>
             <ShareFormElements>
               <GranteesSelect
@@ -195,7 +197,7 @@ const EntityCreateShareFormGroup = ({
                 options={_granteesOptions(
                   getAvailableGrantee(entityShareState.availableGrantees, entityShareState.selectedGranteeCapabilities),
                 )}
-                placeholder="Search for users and teams"
+                placeholder={t('permissions.share.search_placeholder')}
                 value={shareSelection.granteeId}
               />
               <EntityCreateCapabilitySelect
@@ -205,10 +207,10 @@ const EntityCreateShareFormGroup = ({
               />
               <ShareSubmitButton
                 bsStyle="primary"
-                title="Add Collaborator"
+                title={t('permissions.share.add_collaborator')}
                 onClick={handleAddCollaborator}
                 disabled={disableSubmit || !shareSelection.granteeId}>
-                Add Collaborator
+                {t('permissions.share.add_collaborator')}
               </ShareSubmitButton>
             </ShareFormElements>
           </ShareFormSection>
@@ -221,7 +223,7 @@ const EntityCreateShareFormGroup = ({
               onDelete={handleDeletion}
               onCapabilityChange={handleSelection}
               selectedGrantees={entityShareState?.selectedGrantees}
-              title="Collaborators"
+              title={t('permissions.share.collaborators')}
               isCreating
             />
           </ShareFormSection>

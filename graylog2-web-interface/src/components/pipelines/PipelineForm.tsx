@@ -16,6 +16,7 @@
  */
 import React, { useState } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
+import { useTranslation } from 'react-i18next';
 
 import { Row, Col, Button, Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
@@ -43,6 +44,7 @@ const PipelineForm = ({
   onCancel = () => {},
   disableEdit = false,
 }: Props) => {
+  const { t } = useTranslation('pipelines');
   const { isPermitted } = usePermissions();
   const [nextPipeline, setNextPipeline] = useState<PipelineType>(cloneDeep(pipeline));
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -81,10 +83,10 @@ const PipelineForm = ({
         type="text"
         id="title"
         name="title"
-        label="Title"
+        label={t('form.title')}
         required
         onChange={_onChange}
-        help="Pipeline name."
+        help={t('form.title_help')}
         value={nextPipeline.title}
       />
 
@@ -92,9 +94,9 @@ const PipelineForm = ({
         type="text"
         id="description"
         name="description"
-        label="Description"
+        label={t('form.description')}
         onChange={_onChange}
-        help="Pipeline description."
+        help={t('form.description_help')}
         value={nextPipeline.description}
       />
     </fieldset>
@@ -104,15 +106,19 @@ const PipelineForm = ({
     return (
       <span>
         <Button disabled={!isPermitted('pipeline:edit') || disableEdit} onClick={_openModal} bsStyle="primary">
-          {create ? 'Add new pipeline' : 'Edit pipeline details'}
+          {create ? t('form.add_button') : t('form.edit_button')}
         </Button>
         <BootstrapModalForm
           show={showModal}
-          title={`${create ? 'Add new' : 'Edit'} pipeline ${nextPipeline.title}`}
+          title={
+            create
+              ? t('form.add_title', { title: nextPipeline.title })
+              : t('form.edit_title', { title: nextPipeline.title })
+          }
           data-telemetry-title={`${create ? 'Add new' : 'Edit'} pipeline`}
           onSubmitForm={_handleSubmit}
           onCancel={_closeModal}
-          submitButtonText={create ? 'Add pipeline' : 'Update pipeline'}>
+          submitButtonText={create ? t('form.add_submit') : t('form.update_submit')}>
           {content}
         </BootstrapModalForm>
       </span>
@@ -124,7 +130,10 @@ const PipelineForm = ({
       {content}
       <Row>
         <Col md={12}>
-          <FormSubmit submitButtonText={create ? 'Create pipeline' : 'Update pipeline'} onCancel={onCancel} />
+          <FormSubmit
+            submitButtonText={create ? t('form.create_submit') : t('form.update_submit')}
+            onCancel={onCancel}
+          />
         </Col>
       </Row>
     </form>

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import ImportExtractors from 'components/extractors/ImportExtractors';
@@ -29,6 +30,7 @@ import MarketplaceLink from 'components/support/MarketplaceLink';
 type Props = ParamsContext;
 
 const ImportExtractorsPage = ({ params }: Props) => {
+  const { t } = useTranslation('extractors');
   const productName = useProductName();
   const [input, setInput] = useState<Input>();
 
@@ -43,20 +45,17 @@ const ImportExtractorsPage = ({ params }: Props) => {
   }
 
   return (
-    <DocumentTitle title={`Import extractors to ${input.title}`}>
+    <DocumentTitle title={t('pages.import_title', { title: input.title })}>
       <div>
         <PageHeader
           title={
             <span>
-              Import extractors to <em>{input.title}</em>
+              <Trans t={t} i18nKey="pages.import_header" values={{ title: input.title }} components={{ em: <em /> }} />
             </span>
           }>
           <span>
-            Exported extractors can be imported to an input.{' '}
-            <MarketplaceLink
-              prefix={`All you need is the JSON export of extractors from any
-            other ${productName} setup or from`}
-            />
+            {t('pages.import_description')}{' '}
+            <MarketplaceLink prefix={t('pages.import_marketplace_prefix', { productName })} />
           </span>
         </PageHeader>
         <ImportExtractors input={input} />

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 
 import {
@@ -29,12 +30,18 @@ import usePermissions from 'hooks/usePermissions';
 import type { EventDefinition } from '../event-definitions-types';
 import { isSystemEventDefinition } from '../event-definitions-types';
 
-const _title = (disabled: boolean, disabledChange: boolean, description: string) => {
+const _title = (
+  disabled: boolean,
+  disabledChange: boolean,
+  description: string,
+  enableText: string,
+  disableText: string,
+) => {
   if (disabledChange) {
     return description;
   }
 
-  return disabled ? 'Enable' : 'Disable';
+  return disabled ? enableText : disableText;
 };
 
 type Props = {
@@ -42,14 +49,15 @@ type Props = {
 };
 
 const StatusCell = ({ eventDefinition }: Props) => {
+  const { t } = useTranslation('event_definitions');
   const [showConfirmDisableModal, setShowConfirmDisableModal] = useState<boolean>(false);
   const queryClient = useQueryClient();
   const isEnabled = eventDefinition?.state === 'ENABLED';
   const { isPermitted } = usePermissions();
   const disableChange =
     isSystemEventDefinition(eventDefinition) || !isPermitted(`eventdefinitions:edit:${eventDefinition.id}`);
-  const description = isEnabled ? 'Enabled' : 'Disabled';
-  const title = _title(!isEnabled, disableChange, description);
+  const description = isEnabled ? t('status_cell.enabled') : t('status_cell.disabled');
+  const title = _title(!isEnabled, disableChange, description, t('status_cell.enable'), t('status_cell.disable'));
   const toggleIcon = isEnabled ? 'pause' : 'play_arrow';
 
   const toggleEventDefinitionStatus = useCallback(async () => {
@@ -81,10 +89,10 @@ const StatusCell = ({ eventDefinition }: Props) => {
       {showConfirmDisableModal && (
         <BootstrapModalConfirm
           showModal
-          title="Disable event definition"
+          title={t('status_cell.disable_title')}
           onConfirm={handleConfirmDisable}
           onCancel={() => setShowConfirmDisableModal(false)}>
-          {`Do you really want to disable event definition '${eventDefinition.title}'?`}
+          {t('status_cell.disable_confirm', { title: eventDefinition.title })}
         </BootstrapModalConfirm>
       )}
     </>

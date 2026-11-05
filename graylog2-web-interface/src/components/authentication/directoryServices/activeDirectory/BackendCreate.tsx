@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { DocumentTitle } from 'components/common';
 import { getEnterpriseGroupSyncPlugin } from 'util/AuthenticationService';
@@ -23,51 +24,25 @@ import type { WizardFormValues } from 'components/authentication/directoryServic
 import WizardPageHeader from './WizardPageHeader';
 
 import BackendWizard from '../BackendWizard';
+import HelpText from '../HelpText';
 import handleCreate from '../HandleCreate';
 
 export const HELP = {
   // server config help
-  systemUserDn: (
-    <span>
-      The username for the initial connection to the Active Directory server, e.g. <code>ldapbind@some.domain</code>.
-      <br />
-      This needs to match the <code>userPrincipalName</code> of that user.
-    </span>
-  ),
-  systemUserPassword: 'The password for the initial connection to the Active Directory server.',
+  systemUserDn: <HelpText i18nKey="active_directory.help.system_user_dn" />,
+  systemUserPassword: <HelpText i18nKey="active_directory.help.system_user_password" />,
   // user sync help
-  userSearchBase: (
-    <span>
-      The base tree to limit the Active Directory search query to, e.g. <code>cn=users,dc=example,dc=com</code>.
-    </span>
-  ),
+  userSearchBase: <HelpText i18nKey="active_directory.help.user_search_base" />,
   userSearchPattern: (
-    <span>
-      For example{' '}
-      <code className="text-nowrap">{'(&(objectClass=user)(|(sAMAccountName={0})(userPrincipalName={0})))'}</code>. The
-      string <code>{'{0}'}</code> will be replaced by the entered username.
-    </span>
+    <HelpText
+      i18nKey="directory_help.user_search_pattern"
+      values={{ example: '(&(objectClass=user)(|(sAMAccountName={0})(userPrincipalName={0})))', placeholder: '{0}' }}
+    />
   ),
-  userNameAttribute: (
-    <span>
-      Which Active Directory attribute to use for the full name of the synchronized user, e.g.{' '}
-      <code>userPrincipalName</code>.<br />
-      Try to load a test user in the sidebar section <i>User Login Test</i>, if you are unsure which attribute to use.
-    </span>
-  ),
-  userFullNameAttribute: (
-    <span>
-      Which Active Directory attribute to use for the full name of a synchronized user, e.g. <code>displayName</code>.
-      <br />
-    </span>
-  ),
-  defaultRoles: (
-    <span>
-      The default roles synchronized user will obtain. All users need the <code>Reader</code> role, to use the web
-      interface
-    </span>
-  ),
-  defaultUserTimezone: <span>Choose the default time zone for new users.</span>,
+  userNameAttribute: <HelpText i18nKey="active_directory.help.user_name_attribute" />,
+  userFullNameAttribute: <HelpText i18nKey="active_directory.help.user_full_name_attribute" />,
+  defaultRoles: <HelpText i18nKey="directory_help.default_roles" />,
+  defaultUserTimezone: <HelpText i18nKey="directory_help.default_user_timezone" />,
 };
 
 export const AUTH_BACKEND_META = {
@@ -87,6 +62,7 @@ const INITIAL_VALUES: Partial<WizardFormValues> = {
 };
 
 const BackendCreate = () => {
+  const { t } = useTranslation('authentication');
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   const {
     help: groupSyncHelp = {},
@@ -98,7 +74,7 @@ const BackendCreate = () => {
   const excludedFields = { ...groupSyncExcludedFields, userUniqueIdAttribute: true, emailAttributes: true };
 
   return (
-    <DocumentTitle title="Create Active Directory Authentication Services">
+    <DocumentTitle title={t('active_directory.create_title')}>
       <WizardPageHeader />
       <BackendWizard
         authBackendMeta={AUTH_BACKEND_META}

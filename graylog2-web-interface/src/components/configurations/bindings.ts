@@ -16,6 +16,8 @@
  */
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
+import i18n from 'i18n';
+
 import ConfigurationSection from 'pages/configurations/ConfigurationSection';
 import SearchesConfig from 'components/configurations/SearchesConfig';
 import MessageProcessorsConfig from 'components/configurations/MessageProcessorsConfig';
@@ -34,99 +36,171 @@ const bindings: PluginExports = {
   coreSystemConfigurations: [
     {
       name: 'Search',
+      // Read lazily, so the label is translated when the page renders and not when the module loads.
+      get displayName() {
+        return i18n.t('sections.search', { ns: 'configurations' });
+      },
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: SearchesConfig,
-        title: 'Search',
+        get title() {
+          return i18n.t('sections.search', { ns: 'configurations' });
+        },
       },
     },
     {
       name: 'Message Processors',
+      // Read lazily, so the label is translated when the page renders and not when the module loads.
+      get displayName() {
+        return i18n.t('sections.message_processors', { ns: 'configurations' });
+      },
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: MessageProcessorsConfig,
-        title: 'Message Processors',
+        get title() {
+          return i18n.t('sections.message_processors', { ns: 'configurations' });
+        },
       },
     },
     {
       name: 'Sidecars',
+      // Read lazily, so the label is translated when the page renders and not when the module loads.
+      get displayName() {
+        return i18n.t('sections.sidecars', { ns: 'configurations' });
+      },
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: SidecarConfig,
-        title: 'Sidecars',
+        get title() {
+          return i18n.t('sections.sidecars', { ns: 'configurations' });
+        },
       },
     },
     {
       name: 'Events',
+      // Read lazily, so the label is translated when the page renders and not when the module loads.
+      get displayName() {
+        return i18n.t('sections.events', { ns: 'configurations' });
+      },
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: EventsConfig,
-        title: 'Events',
+        get title() {
+          return i18n.t('sections.events', { ns: 'configurations' });
+        },
       },
     },
     {
       name: 'URL Allowlist',
+      // Read lazily, so the label is translated when the page renders and not when the module loads.
+      get displayName() {
+        return i18n.t('sections.url_allowlist', { ns: 'configurations' });
+      },
       permissions: ['urlallowlist:read'],
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: UrlAllowListConfig,
-        title: 'URL allowlist',
+        get title() {
+          return i18n.t('sections.url_allowlist_title', { ns: 'configurations' });
+        },
       },
     },
     {
       name: 'Decorators',
+      // Read lazily, so the label is translated when the page renders and not when the module loads.
+      get displayName() {
+        return i18n.t('sections.decorators', { ns: 'configurations' });
+      },
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: DecoratorsConfig,
-        title: 'Decorators',
+        get title() {
+          return i18n.t('sections.decorators', { ns: 'configurations' });
+        },
       },
     },
     {
       name: 'Permissions',
+      // Read lazily, so the label is translated when the page renders and not when the module loads.
+      get displayName() {
+        return i18n.t('sections.permissions', { ns: 'configurations' });
+      },
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: PermissionsConfig,
-        title: 'Permissions',
+        get title() {
+          return i18n.t('sections.permissions', { ns: 'configurations' });
+        },
       },
     },
     {
       name: 'Password Policy',
+      // Read lazily, so the label is translated when the page renders and not when the module loads.
+      get displayName() {
+        return i18n.t('sections.password_policy', { ns: 'configurations' });
+      },
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: PasswordComplexityConfig,
-        title: 'Password Policy',
+        get title() {
+          return i18n.t('sections.password_policy', { ns: 'configurations' });
+        },
       },
     },
     {
       name: 'Users',
+      // Read lazily, so the label is translated when the page renders and not when the module loads.
+      get displayName() {
+        return i18n.t('sections.users', { ns: 'configurations' });
+      },
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: UserConfig,
-        title: 'Index Set Defaults',
+        get title() {
+          return i18n.t('sections.users_title', { ns: 'configurations' });
+        },
       },
     },
     {
       name: 'Markdown',
+      // Read lazily, so the label is translated when the page renders and not when the module loads.
+      get displayName() {
+        return i18n.t('sections.markdown', { ns: 'configurations' });
+      },
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: MarkdownConfig,
-        title: 'Markdown',
+        get title() {
+          return i18n.t('sections.markdown', { ns: 'configurations' });
+        },
       },
     },
     {
       name: 'Welcome Page',
+      // Read lazily, so the label is translated when the page renders and not when the module loads.
+      get displayName() {
+        return i18n.t('sections.welcome_page', { ns: 'configurations' });
+      },
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: WelcomePageConfig,
-        title: 'Welcome Page',
+        get title() {
+          return i18n.t('sections.welcome_page', { ns: 'configurations' });
+        },
       },
     },
     {
       name: 'MCP',
+      // Read lazily, so the label is translated when the page renders and not when the module loads.
+      get displayName() {
+        return i18n.t('sections.mcp', { ns: 'configurations' });
+      },
       SectionComponent: ConfigurationSection,
       props: {
         ConfigurationComponent: McpConfig,
-        title: 'MCP',
+        get title() {
+          return i18n.t('sections.mcp', { ns: 'configurations' });
+        },
       },
     },
   ],

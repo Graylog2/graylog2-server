@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
 import merge from 'lodash/merge';
@@ -58,6 +59,7 @@ type FormatTime = UserDateTimeContextType['formatTime'];
 
 const generateChart = (
   type: 'Alerts' | 'Events',
+  name: string,
   buckets: Awaited<ResultPromise>['results']['buckets']['alerts' | 'events'],
   formatTime: FormatTime,
 ) => {
@@ -66,7 +68,7 @@ const generateChart = (
 
   return {
     type: 'scatter',
-    name: type,
+    name,
     x,
     y,
     fill: 'tozeroy',
@@ -135,12 +137,13 @@ const EventsGraph = ({
   height: string;
   readOnly: boolean;
 }) => {
+  const { t } = useTranslation('events');
   const chartData = useMemo(
     () => [
-      ...(['include', 'exclude'].includes(alerts) ? [generateChart('Events', results.buckets.events, formatTime)] : []),
-      ...(['include', 'only'].includes(alerts) ? [generateChart('Alerts', results.buckets.alerts, formatTime)] : []),
+      ...(['include', 'exclude'].includes(alerts) ? [generateChart('Events', t('alerts_list.histogram_series_events'), results.buckets.events, formatTime)] : []),
+      ...(['include', 'only'].includes(alerts) ? [generateChart('Alerts', t('alerts_list.histogram_series_alerts'), results.buckets.alerts, formatTime)] : []),
     ],
-    [alerts, results.buckets.alerts, results.buckets.events, formatTime],
+    [alerts, results.buckets.alerts, results.buckets.events, formatTime, t],
   );
 
   const baseLayout = useMemo(
@@ -192,6 +195,7 @@ const EventsHistogram = ({
   readOnly = false,
   onEffectiveTimeRangeChange = undefined,
 }: Props) => {
+  const { t } = useTranslation('events');
   const { userTimezone, formatTime } = useUserDateTime();
   const { data, isLoading, refetch, isError, error } = useQuery({
     queryKey: ['events', 'histogram', searchParams],
@@ -226,7 +230,11 @@ const EventsHistogram = ({
   }
 
   if (isError || !data) {
-    return <Alert bsStyle="danger">Loading events histogram failed: {error?.message ?? 'Unknown error'}</Alert>;
+    return (
+      <Alert bsStyle="danger">
+        {t('alerts_list.histogram_failed', { error: error?.message ?? t('common:errors.unknown_error') })}
+      </Alert>
+    );
   }
 
   return (

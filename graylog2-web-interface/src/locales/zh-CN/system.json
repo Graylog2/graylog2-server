@@ -1,0 +1,512 @@
+{
+  "shared": {
+    "leader": "Leader",
+    "not_available": "N/A"
+  },
+  "cluster_configuration_nodes": {
+    "loading_search_backend": "正在加载搜索后端节点...",
+    "search_backend_unknown": "无法确定已配置的搜索后端。",
+    "search_placeholder": "搜索节点…",
+    "all_nodes": "所有节点",
+    "data_nodes": "数据节点",
+    "opensearch_nodes": "OpenSearch 节点",
+    "mongodb_nodes": "MongoDB 节点"
+  },
+  "cluster_column_titles": {
+    "cpu": "CPU",
+    "memory": "内存",
+    "jvm": "JVM",
+    "indexing": "索引",
+    "storage": "存储",
+    "buffers": "缓冲区",
+    "journal": "Journal",
+    "data_lake_journal": "Data Lake Journal",
+    "throughput": "吞吐量"
+  },
+  "data_nodes_expandable": {
+    "title": "数据节点"
+  },
+  "indexing_metrics_cell": {
+    "docs": "文档数",
+    "latency": "延迟"
+  },
+  "node_actions": {
+    "thread_dump": "获取线程转储",
+    "process_buffer_dump": "获取处理缓冲区转储",
+    "metrics": "指标"
+  },
+  "graylog_node_actions": {
+    "pause_message_processing": "暂停消息处理",
+    "resume_message_processing": "恢复消息处理",
+    "override_load_balancer_dead": "将负载均衡器状态覆盖为 DEAD",
+    "override_load_balancer_alive": "将负载均衡器状态覆盖为 ALIVE",
+    "local_message_inputs": "本地消息输入",
+    "recent_system_logs": "获取最近的系统日志消息",
+    "message_processing_title": "消息处理",
+    "pause_confirm": "即将<b>暂停</b> <b>{{nodeName}}</b> 节点上的消息处理，确定继续吗？",
+    "resume_confirm": "即将<b>恢复</b> <b>{{nodeName}}</b> 节点上的消息处理，确定继续吗？",
+    "load_balancer_title": "负载均衡器",
+    "load_balancer_confirm": "即将把 <b>{{nodeName}}</b> 节点的负载均衡器状态更改为 <b>{{status}}</b>，确定继续吗？"
+  },
+  "graylog_nodes_expandable": {
+    "title": "{{productName}} 节点"
+  },
+  "load_balancer_status_cell": {
+    "aria_label": "负载均衡器 {{status}}",
+    "status_alive": "在线",
+    "status_dead": "离线",
+    "status_throttled": "已限流"
+  },
+  "processing_state_cell": {
+    "aria_label": "消息处理 {{status}}",
+    "enabled": "已启用",
+    "disabled": "已禁用"
+  },
+  "mongodb_nodes_expandable": {
+    "title": "MongoDB 节点"
+  },
+  "mongodb_profiling_action": {
+    "description": "MongoDB 性能分析有助于识别慢查询，并排查集群各节点的性能问题。",
+    "enabling_profiling": "正在启用性能分析...",
+    "enable_confirm": "要在所有 MongoDB 节点上启用 <b>Slow Ops</b> 性能分析（{{threshold}}）吗？设置会立即生效且无需重启，但重启后会重置，除非在启动时进行配置。",
+    "enable_profiling": "启用性能分析",
+    "disable_profiling": "禁用性能分析",
+    "enabling": "正在启用...",
+    "disabling": "正在禁用...",
+    "loading_status": "正在加载状态...",
+    "loading_status_title": "正在加载 MongoDB 性能分析状态",
+    "enable_title": "在所有 MongoDB 节点上将性能分析设置为 Slow Ops",
+    "disable_title": "在所有 MongoDB 节点上禁用性能分析",
+    "status_loading": "正在加载各 MongoDB 节点当前的性能分析状态...",
+    "status_off": "所有 MongoDB 节点的性能分析均已关闭（{{summary}}）。启用后可收集慢查询诊断信息。",
+    "status_mixed": "各 MongoDB 节点的性能分析设置不一致（{{summary}}）。启用性能分析可使诊断保持一致。",
+    "status_enabled": "所有 MongoDB 节点的性能分析均已开启（{{summary}}）。排查完成后请将其禁用，以降低 MongoDB 开销。",
+    "status_unavailable_with_summary": "性能分析状态不可用（{{summary}}）。如有需要，您仍然可以更改它。",
+    "status_unavailable": "性能分析状态不可用。如有需要，您仍然可以更改它。",
+    "threshold_level": "级别 1",
+    "threshold_level_with_ms": "级别 1，阈值 {{slowMs}} 毫秒",
+    "distribution": "OFF {{off}}，SLOW_OPS {{slowOps}}，ALL {{all}}",
+    "nodes_profiled_other": "已分析 {{enabledCount}}/{{count}} 个节点"
+  },
+  "opensearch_nodes_expandable": {
+    "title": "OpenSearch 节点"
+  },
+  "cluster_nodes_section_wrapper": {
+    "show_title": "显示{{title}}"
+  },
+  "cpu_metrics_cell": {
+    "load_1m": "负载（1 分钟）"
+  },
+  "graylog_cluster_overview": {
+    "cluster": "集群",
+    "cluster_id": "集群 ID：",
+    "not_available": "不可用",
+    "number_of_nodes": "节点数量："
+  },
+  "cluster_support_bundle_info": {
+    "description": "创建一个包含 Graylog 集群调试信息的 zip 文件。",
+    "enterprise_customers": "Graylog Enterprise 客户可以将支持包附加到支持工单中，以帮助 Graylog 技术支持团队分析和诊断问题。",
+    "examine_content": "分享前请仔细检查支持包内容，其中可能包含 IP 地址、主机名甚至密码等敏感数据！",
+    "paid_license_only": "只有付费许可用户才能使用 Graylog Enterprise 支持。您也可以将此文件用于其他调试用途。"
+  },
+  "cluster_support_bundle_overview": {
+    "title": "集群支持包",
+    "create": "创建支持包",
+    "download": "下载",
+    "delete": "删除",
+    "filename": "文件名",
+    "size": "大小",
+    "no_bundles": "未找到任何支持包。",
+    "delete_title": "删除支持包",
+    "delete_confirm": "确定要删除 <strong>{{name}}</strong> 吗？"
+  },
+  "log_level_metrics": {
+    "level": "级别：{{level}}",
+    "total_written": "写入总数：",
+    "mean_rate": "平均速率：",
+    "one_minute_rate": "1 分钟速率：",
+    "per_second": "/ 秒"
+  },
+  "logging_subsystem": {
+    "subsystem": "子系统：{{name}}"
+  },
+  "node_loggers": {
+    "show_log_level_metrics": "显示日志级别指标",
+    "hide_log_level_metrics": "隐藏日志级别指标",
+    "total_log_messages": "共写入 <strong>{{throughput}} 条内部日志消息。</strong>"
+  },
+  "metric_details": {
+    "value": "值：",
+    "count": "计数：",
+    "mean": "平均值：",
+    "minimum": "最小值：",
+    "maximum": "最大值：",
+    "standard_deviation": "标准差：",
+    "percentile_95": "第 95 百分位：",
+    "percentile_98": "第 98 百分位：",
+    "percentile_99": "第 99 百分位：",
+    "invalid_type": "无效的指标类型：{{type}}",
+    "microseconds": "μs"
+  },
+  "meter_details": {
+    "total": "总计：",
+    "events": "事件",
+    "one_minute_avg": "1 分钟平均值：",
+    "five_minute_avg": "5 分钟平均值：",
+    "fifteen_minute_avg": "15 分钟平均值："
+  },
+  "counter_rate": {
+    "calculating": "计算中...",
+    "total": "（共 {{total}}）",
+    "per_second": "每秒"
+  },
+  "metric_container": {
+    "loading": "加载中..."
+  },
+  "metrics_component": {
+    "fetch_error": "无法从节点获取指标：服务器返回了 {{status}} 状态码，响应消息为 <em>{{responseMessage}}</em>。",
+    "fetch_problem": "获取节点指标时出现问题。",
+    "retry_in_background": "系统将在后台继续尝试获取。",
+    "fetch_error_last_metrics": "无法从节点获取指标：服务器返回了 {{status}} 状态码，响应消息为 <em>{{responseMessage}}</em>。正在显示最近一次可用的指标。",
+    "filter_placeholder": "输入指标名称进行过滤…"
+  },
+  "metrics_list": {
+    "no_metrics": "没有与给定过滤条件匹配的指标。请确保使用有效的正则表达式"
+  },
+  "buffer_usage": {
+    "metrics": "指标",
+    "utilization": "<strong>{{usage}} 条消息</strong>位于 {{title}} 中，利用率为 {{percentage}}。"
+  },
+  "input_types_data_table": {
+    "loading": "正在加载输入类型...",
+    "unavailable": "输入类型不可用。",
+    "documentation": "文档",
+    "name": "名称",
+    "type": "类型",
+    "filter": "过滤"
+  },
+  "journal_details": {
+    "loading": "正在加载 Journal 指标...",
+    "disabled": "此节点上已禁用磁盘 Journal。",
+    "unavailable": "Journal 指标不可用。",
+    "overcommitted": "<strong>警告！</strong>Journal 利用率已超过定义的最大大小。<overviewLink>点击此处</overviewLink>了解更多信息。",
+    "configuration": "配置",
+    "path": "路径：",
+    "earliest_entry": "最早条目：",
+    "maximum_size": "最大大小：",
+    "maximum_age": "最长保留时间：",
+    "flush_policy": "刷新策略：",
+    "flush_policy_value": "每 {{messages}} 条消息或每 {{duration}}",
+    "maximum_age_format": "d [天] h [小时] m [分钟]",
+    "flush_duration_format": "h [小时] m [分钟] s [秒]",
+    "utilization": "利用率",
+    "unprocessed_messages": "当前 Journal 中有 <strong>{{messages}} 条未处理消息</strong>，分布在 {{segments}} 个分段中。",
+    "appended_and_read": "过去一秒内已追加 <strong>{{appended}} 条消息</strong>，过去一秒内已读取 <strong>{{read}} 条消息</strong>。"
+  },
+  "journal_state": {
+    "loading": "正在加载 Journal 指标...",
+    "unavailable": "Journal 指标不可用。",
+    "summary_other": "Journal 中包含 {{count}} 个分段，其中有 <strong>{{messages}} 条未处理消息</strong>。过去一秒内已追加 <strong>{{appended}} 条消息</strong>，已读取 <strong>{{read}} 条消息</strong>。"
+  },
+  "jvm_heap_usage": {
+    "loading": "正在加载堆内存使用信息...",
+    "unavailable": "堆内存信息不可用。",
+    "usage": "JVM 正在使用 <usedBlob /><strong> {{used}}</strong>（共 <committedBlob /><strong> {{committed}}</strong> 堆空间），且不会尝试使用超过 <maxBlob /><strong> {{max}}</strong> 的内存"
+  },
+  "node_list_item": {
+    "system_info_unavailable": "系统信息当前不可用。"
+  },
+  "node_maintenance_dropdown": {
+    "actions": "操作",
+    "configure_internal_logging": "配置内部日志"
+  },
+  "node_overview": {
+    "plugins_installed_other": "已安装 {{count}} 个插件",
+    "inputs_running_other": "此节点上正在运行 {{count}} 个输入",
+    "memory_heap_usage": "内存/堆使用情况",
+    "buffers": "缓冲区",
+    "buffers_description": "缓冲区用于在消息经过各处理器时，短时间（通常为毫秒级）缓存少量消息。",
+    "input_buffer": "输入缓冲区",
+    "process_buffer": "处理缓冲区",
+    "output_buffer": "输出缓冲区",
+    "disk_journal": "磁盘 Journal",
+    "disk_journal_description": "传入的消息会写入磁盘 Journal，以确保服务器发生故障时消息安全保留。当某个输出的处理速度跟不上消息速率，或传入消息出现峰值时，Journal 也有助于维持正常运行。它还能防止内存过载，从而避免过长的垃圾回收暂停。",
+    "system": "系统",
+    "rest_api": "REST API",
+    "installed_plugins": "已安装的插件",
+    "manage_inputs": "管理输入",
+    "available_input_types": "可用的输入类型"
+  },
+  "nodes_actions": {
+    "details": "详情",
+    "metrics": "指标",
+    "more_actions": "更多操作",
+    "pause_message_processing": "暂停消息处理",
+    "resume_message_processing": "恢复消息处理",
+    "pause_confirm": "即将暂停此节点上的消息处理，确定继续吗？",
+    "resume_confirm": "即将恢复此节点上的消息处理，确定继续吗？",
+    "override_lb_status": "覆盖负载均衡器状态",
+    "status_alive": "ALIVE",
+    "status_dead": "DEAD",
+    "load_balancer_confirm": "即将把此节点的负载均衡器状态更改为 {{status}}，确定继续吗？",
+    "local_message_inputs": "本地消息输入",
+    "thread_dump": "获取线程转储",
+    "process_buffer_dump": "获取处理缓冲区转储",
+    "recent_system_logs": "获取最近的系统日志消息"
+  },
+  "nodes_list": {
+    "active_nodes_other": "当前有 {{count}} 个活动节点",
+    "no_active_nodes": "没有活动节点。"
+  },
+  "plugins_data_table": {
+    "loading": "正在加载此节点上的插件...",
+    "no_plugins": "此节点未安装任何插件。",
+    "name": "名称",
+    "version": "版本",
+    "author": "作者",
+    "description": "描述",
+    "website": "网站",
+    "filter": "过滤"
+  },
+  "rest_api_overview": {
+    "transport_address": "传输地址：",
+    "last_seen": "最后在线时间："
+  },
+  "system_information": {
+    "pid_info": "PID {{pid}}，{{info}}",
+    "jvm_unavailable": "该节点的 JVM 信息不可用。",
+    "hostname": "主机名：",
+    "node_id": "节点 ID：",
+    "version": "版本：",
+    "version_codename": "{{version}}，代号 <em>{{codename}}</em>",
+    "jvm": "JVM：",
+    "time": "时间："
+  },
+  "system_overview_details": {
+    "pause_confirm": "即将暂停此节点上的消息处理，确定继续吗？",
+    "resume_confirm": "即将恢复此节点上的消息处理，确定继续吗？",
+    "what_does_this_mean": "这是什么意思？",
+    "lifecycle_state": "生命周期状态：<strong>{{lifecycle}}</strong>",
+    "marked_as_lb_status": "已为负载均衡器标记为 <strong>{{status}}</strong>",
+    "pause_processing": "暂停处理",
+    "resume_processing": "恢复处理",
+    "not_processing": "节点<strong>未</strong>处理消息"
+  },
+  "system_overview_summary": {
+    "current_lifecycle_state": "当前生命周期状态：",
+    "message_processing": "消息处理：",
+    "enabled": "已启用",
+    "disabled": "已禁用",
+    "lb_indication": "负载均衡器指示："
+  },
+  "bulk_actions": {
+    "dismiss": "忽略"
+  },
+  "system_notifications_table": {
+    "title": "通知",
+    "human_name": "通知"
+  },
+  "actions_cell": {
+    "dismiss": "忽略"
+  },
+  "title_cell": {
+    "show_full_message": "显示 {{title}} 的完整消息"
+  },
+  "system_job": {
+    "acknowledge_failed": "无法确认该任务",
+    "cancel_failed": "无法取消该任务",
+    "cancel_confirm": "确定要取消系统任务“{{info}}”吗？",
+    "on_node": "- 在",
+    "runtime": "运行时长：{{duration}}",
+    "cancel": "取消",
+    "acknowledge": "确认"
+  },
+  "system_jobs_component": {
+    "title": "系统任务",
+    "description": "系统任务是 {{productName}} 服务器节点为维护目的而执行的长时间运行任务。部分任务会提供进度信息，或可以被停止。"
+  },
+  "system_jobs_list": {
+    "no_active_jobs": "没有正在运行的系统任务。"
+  },
+  "system_messages_component": {
+    "title": "系统消息",
+    "description": "系统消息由 {{productName}} 服务器节点在某些事件发生时生成，这些事件可能对 {{productName}} 管理员有参考价值。您无需主动处理此处的任何事件，因为需要采取行动的事件都会触发通知。"
+  },
+  "system_messages_list": {
+    "timestamp": "时间戳",
+    "node": "节点",
+    "message": "消息"
+  },
+  "global_throughput": {
+    "aria_label": "吞吐量：输入 {{input}} / 输出 {{output}} 条消息/秒",
+    "in_title": "每秒传入消息数",
+    "out_title": "每秒传出消息数"
+  },
+  "node_throughput": {
+    "loading": "正在加载吞吐量...",
+    "unable_to_load": "无法加载吞吐量。",
+    "processing_long": "正在处理 <strong>{{totalIn}}</strong> 条/秒的传入消息和 <strong>{{totalOut}}</strong> 条/秒的传出消息。",
+    "short": "输入 {{totalIn}} / 输出 {{totalOut}} 条消息/秒。"
+  },
+  "telemetry_debug_entry_row": {
+    "delta": " (+{{delta}}ms)",
+    "pii_suspect": "疑似个人信息：{{suspect}}",
+    "copy_as_json": "以 JSON 格式复制事件"
+  },
+  "telemetry_debug_overlay": {
+    "badge_label": "遥测调试",
+    "badge": "遥测调试：{{count}}",
+    "drawer_label": "遥测调试面板",
+    "resize_label": "调整遥测调试面板大小",
+    "title": "遥测调试（{{count}}）",
+    "filter_label": "过滤事件",
+    "filter_placeholder": "按事件名称或负载过滤...",
+    "resume": "继续",
+    "pause": "暂停",
+    "clear": "清空",
+    "export_session": "导出会话",
+    "collapse": "收起",
+    "no_events": "尚未记录任何遥测事件，与应用交互后即可在此处查看。",
+    "time": "时间",
+    "event": "事件",
+    "action": "操作",
+    "status": "状态"
+  },
+  "cluster_configuration_page": {
+    "title": "集群配置",
+    "description": "此页面实时展示集群中各节点的概况。您可以随时暂停消息处理。在恢复之前，处理缓冲区将不再接收任何新消息。如果节点启用了消息 Journal（默认启用），即使处理已暂停，传入的消息仍会持久化到磁盘。"
+  },
+  "configurations_page": {
+    "title": "配置",
+    "description": "您可以在此页面配置不同子系统的系统设置。",
+    "plugins": "插件"
+  },
+  "enterprise_page": {
+    "document_title": "{{productName}} Enterprise",
+    "page_title": "<upsell>试用</upsell> {{productName}} Enterprise",
+    "learn_more": "<upsell><productLink>了解更多</productLink>关于 {{productName}} Enterprise 的功能。</upsell>"
+  },
+  "process_buffer_dump_page": {
+    "title": "节点 {{shortNodeId}} / {{hostname}} 的处理缓冲区转储",
+    "taken_at": "获取时间：<0/>"
+  },
+  "show_metrics_page": {
+    "title": "节点 {{shortNodeId}} / {{hostname}} 的指标",
+    "description": "所有 {{productName}} 节点都提供一组用于诊断、调试和监控的内部指标。您也可以通过 JMX 访问所有指标。",
+    "total_metrics_other": "此节点共报告 {{count}} 个指标。"
+  },
+  "node_page": {
+    "title": "节点 {{shortNodeId}} / {{hostname}}",
+    "description": "此页面展示集群中处于活动且可访问状态的 {{productName}} 服务器节点的详细信息。",
+    "leader_node": "这是 Leader 节点。",
+    "not_leader_node": "这<em>不是</em> Leader 节点。"
+  },
+  "system_logs_page": {
+    "title": "节点 {{shortNodeId}} / {{hostname}} 最近的系统日志（最多 {{limit}} 条）",
+    "taken_at": "获取时间：<0/>",
+    "reload": "重新加载",
+    "back": "返回",
+    "document_title": "节点 {{shortNodeId}} / {{hostname}} 的系统日志"
+  },
+  "system_notifications_page": {
+    "title": "系统通知"
+  },
+  "system_overview_page": {
+    "title": "系统概览"
+  },
+  "thread_dump_page": {
+    "title": "节点 {{shortNodeId}} / {{hostname}} 的线程转储",
+    "taken_at": "获取时间：<0/>"
+  },
+  "notifications": {
+    "lb_change_success": "已成功将节点“{{nodeId}}”的负载均衡器状态更改为“{{status}}”",
+    "lb_change_failed": "更改节点“{{nodeId}}”的负载均衡器状态失败：{{error}}",
+    "lb_change_failed_title": "无法将节点“{{nodeId}}”的负载均衡器状态更改为“{{status}}”",
+    "processing_pause_success": "已成功暂停节点“{{nodeId}}”的消息处理",
+    "processing_pause_failed": "暂停节点“{{nodeId}}”的消息处理失败：{{error}}",
+    "processing_pause_failed_title": "无法暂停节点“{{nodeId}}”的消息处理",
+    "processing_resume_success": "已成功恢复节点“{{nodeId}}”的消息处理",
+    "processing_resume_failed": "恢复节点“{{nodeId}}”的消息处理失败：{{error}}",
+    "processing_resume_failed_title": "无法恢复节点“{{nodeId}}”的消息处理",
+    "nothing_selected": "未选择任何通知。",
+    "nothing_to_dismiss_title": "没有可忽略的内容",
+    "bulk_dismiss_failed": "忽略通知失败，请重试。",
+    "dismiss_failed": "忽略通知失败，请重试。",
+    "dismiss_failed_title": "忽略失败",
+    "profiling_enabled": "已成功启用 MongoDB 性能分析。",
+    "profiling_disabled": "已成功禁用 MongoDB 性能分析。",
+    "profiling_enable_failed": "启用 MongoDB 性能分析失败：{{error}}",
+    "profiling_disable_failed": "禁用 MongoDB 性能分析失败：{{error}}",
+    "profiling_update_failed_title": "无法更新 MongoDB 性能分析设置。",
+    "data_node_metrics_failed": "加载数据节点“{{hostname}}”的指标失败",
+    "data_node_metrics_failed_title": "无法加载数据节点指标。",
+    "graylog_node_metrics_failed": "加载 Graylog 节点指标失败，状态为",
+    "graylog_node_metrics_failed_title": "无法加载 Graylog 节点指标。",
+    "cluster_traffic_failed": "加载集群流量失败，状态为",
+    "cluster_traffic_failed_title": "无法加载集群流量",
+    "journal_failed": "无法获取 Journal 信息",
+    "system_jobs_failed": "加载系统任务失败，状态为",
+    "system_jobs_failed_title": "无法加载系统任务"
+  },
+  "use_cluster_overview_notifications": {
+    "jvm_failed": "获取节点“{{nodeId}}”的 JVM 信息失败：{{error}}",
+    "jvm_failed_title": "无法获取 JVM 信息",
+    "thread_dump_failed": "获取节点“{{nodeId}}”的线程转储失败：{{error}}",
+    "thread_dump_failed_title": "无法获取线程转储",
+    "process_buffer_dump_failed": "获取节点“{{nodeId}}”的处理缓冲区转储失败：{{error}}",
+    "process_buffer_dump_failed_title": "无法获取处理缓冲区转储",
+    "system_logs_failed": "获取节点“{{nodeId}}”的系统日志消息失败：{{error}}",
+    "system_logs_failed_title": "无法获取系统日志消息",
+    "overview_failed": "获取集群概览失败：{{error}}",
+    "overview_failed_title": "无法获取集群概览"
+  },
+  "use_cluster_support_bundle_notifications": {
+    "create_failed": "创建支持包失败，状态：{{error}}",
+    "create_failed_title": "无法创建支持包。",
+    "delete_failed": "删除支持包失败，状态：{{error}}",
+    "delete_failed_title": "无法删除支持包。",
+    "download_failed": "下载支持包失败，状态：{{error}}",
+    "download_failed_title": "无法下载支持包。",
+    "load_list_failed": "加载支持包列表失败，状态为",
+    "load_list_failed_title": "无法加载支持包列表。"
+  },
+  "use_plugin_list_notifications": {
+    "fetch_failed": "获取节点“{{nodeId}}”上的插件失败",
+    "fetch_failed_title": "无法获取插件"
+  },
+  "node_lifecycle": {
+    "uninitialized": "未初始化",
+    "starting": "正在启动",
+    "running": "运行中",
+    "failed": "失败",
+    "halting": "正在停止",
+    "paused": "已暂停",
+    "throttled": "已限流",
+    "override_lb_alive": "负载均衡器：强制在线",
+    "override_lb_dead": "负载均衡器：强制离线",
+    "override_lb_throttled": "负载均衡器：强制限流"
+  },
+  "buffers_metrics_cell": {
+    "input": "输入",
+    "process": "处理",
+    "output": "输出"
+  },
+  "throughput_metrics_cell": {
+    "in": "流入",
+    "out": "流出"
+  },
+  "mongodb_nodes": {
+    "profiling_levels": {
+      "off": "关闭",
+      "slow_ops": "Slow Ops",
+      "all": "全部",
+      "unknown": "未知（{{level}}）"
+    },
+    "roles": {
+      "primary": "主节点",
+      "secondary": "从节点",
+      "arbiter": "仲裁节点",
+      "standalone": "独立节点"
+    }
+  }
+}

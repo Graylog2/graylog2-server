@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import ModalSubmit from 'components/common/ModalSubmit';
 
@@ -45,7 +46,7 @@ const BootstrapModalConfirm = ({
   cancelButtonDisabled = false,
   children,
   confirmButtonDisabled = false,
-  confirmButtonText = 'Confirm',
+  confirmButtonText = undefined,
   isAsyncSubmit = undefined,
   isSubmitting = undefined,
   onCancel,
@@ -55,28 +56,32 @@ const BootstrapModalConfirm = ({
   submitLoadingText = undefined,
   title,
   ...restProps
-}: Props) => (
-  <BootstrapModalWrapper showModal={showModal} onHide={onCancel} bsSize={size} {...restProps}>
-    <Modal.Header>
-      <Modal.Title>{title}</Modal.Title>
-    </Modal.Header>
+}: Props) => {
+  const { t } = useTranslation('common');
 
-    <Modal.Body>{children}</Modal.Body>
+  return (
+    <BootstrapModalWrapper showModal={showModal} onHide={onCancel} bsSize={size} {...restProps}>
+      <Modal.Header>
+        <Modal.Title>{title}</Modal.Title>
+      </Modal.Header>
 
-    <Modal.Footer>
-      <ModalSubmit
-        disabledCancel={cancelButtonDisabled}
-        disabledSubmit={confirmButtonDisabled}
-        isAsyncSubmit={isAsyncSubmit}
-        submitLoadingText={submitLoadingText}
-        onCancel={onCancel}
-        onSubmit={onConfirm}
-        isSubmitting={isSubmitting}
-        submitButtonText={confirmButtonText}
-        submitButtonType="button"
-      />
-    </Modal.Footer>
-  </BootstrapModalWrapper>
-);
+      <Modal.Body>{children}</Modal.Body>
+
+      <Modal.Footer>
+        <ModalSubmit
+          disabledCancel={cancelButtonDisabled}
+          disabledSubmit={confirmButtonDisabled}
+          isAsyncSubmit={isAsyncSubmit}
+          submitLoadingText={submitLoadingText}
+          onCancel={onCancel}
+          onSubmit={onConfirm}
+          isSubmitting={isSubmitting}
+          submitButtonText={confirmButtonText ?? t('actions.confirm')}
+          submitButtonType="button"
+        />
+      </Modal.Footer>
+    </BootstrapModalWrapper>
+  );
+};
 
 export default BootstrapModalConfirm;

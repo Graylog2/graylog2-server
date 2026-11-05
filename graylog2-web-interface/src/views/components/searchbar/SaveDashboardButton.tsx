@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import OnSaveViewAction from 'views/logic/views/OnSaveViewAction';
@@ -34,6 +35,7 @@ type Props = {
 };
 
 const SaveDashboardButton = ({ userIsAllowedToEdit, openSaveAsModal, disabledInfo = undefined }: Props) => {
+  const { t } = useTranslation('search');
   const view = useView();
   const isNewView = useIsNew();
   const sendTelemetry = useSendTelemetry('dashboard');
@@ -57,7 +59,7 @@ const SaveDashboardButton = ({ userIsAllowedToEdit, openSaveAsModal, disabledInf
 
   return (
     <SaveViewButton
-      title="Save dashboard"
+      title={t('save_view.save_dashboard_title')}
       onClick={_onSaveView}
       disabled={hasUndeclaredParameters || isNewView || !userIsAllowedToEdit}
       disabledInfo={disabledInfo}

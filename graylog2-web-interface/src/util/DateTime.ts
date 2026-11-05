@@ -18,6 +18,8 @@ import type { Moment } from 'moment';
 import moment from 'moment-timezone';
 import 'moment-precise-range-plugin';
 
+import i18n from 'i18n';
+
 export type DateTime = string | number | Moment | Date;
 
 export type DateTimeFormats = keyof typeof DATE_TIME_FORMATS;
@@ -110,6 +112,22 @@ export const relativeDifference = (dateTime: DateTime, withoutSuffix: boolean = 
   return validateDateTime(dateObject, dateTime).fromNow(withoutSuffix);
 };
 
+const PRECISE_DIFFERENCE_UNITS = ['years', 'months', 'days', 'hours', 'minutes', 'seconds'] as const;
+
+/**
+ * Like `moment.preciseDiff`, but in the current language, e.g. "1 hour 5 minutes".
+ * Use `ago` when the result is used in a sentence like "{{time}} ago", which requires a different case in some languages.
+ */
+export const preciseDifference = (from: Moment, to: Moment, { ago = false }: { ago?: boolean } = {}) => {
+  const difference = moment.preciseDiff(from, to, true);
+
+  return PRECISE_DIFFERENCE_UNITS.filter((unit) => difference[unit] > 0)
+    .map((unit) =>
+      i18n.t(`duration.${unit}`, { ns: 'common', count: difference[unit], context: ago ? 'ago' : undefined }),
+    )
+    .join(' ');
+};
+
 /**
  * Returns the difference between two dates in a human-readable format.
  */
@@ -120,10 +138,10 @@ export const readableDifference = (from: DateTime, to: DateTime) => {
 
   // preciseDiff does not support ms
   if (differenceMS < 1000) {
-    return `${differenceMS} milliseconds`;
+    return i18n.t('duration.milliseconds', { ns: 'common', count: differenceMS });
   }
 
-  return moment.preciseDiff(fromObject, toObject);
+  return preciseDifference(fromObject, toObject);
 };
 
 /**

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Modal, ListGroup, ListGroupItem, Input } from 'components/bootstrap';
 import { PaginatedList, SearchForm, ModalSubmit, Spinner, NoSearchResult } from 'components/common';
@@ -38,6 +39,7 @@ const CopyToDashboardForm = ({
   activeDashboardId = undefined,
   onCreateNewDashboard = undefined,
 }: Props) => {
+  const { t } = useTranslation('widgets');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedDashboard, setSelectedDashboard] = useState<string | null>(null);
   const isMounted = useRef<boolean>();
@@ -111,7 +113,7 @@ const CopyToDashboardForm = ({
   return (
     <Modal show onHide={onCancel}>
       <Modal.Header>
-        <Modal.Title>Copy widget to dashboard</Modal.Title>
+        <Modal.Title>{t('copy_to_dashboard.title')}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {isLoadingDashboards && <Spinner />}
@@ -145,7 +147,7 @@ const CopyToDashboardForm = ({
                   })}
                 </ListGroup>
               ) : (
-                <NoSearchResult>No dashboards found.</NoSearchResult>
+                <NoSearchResult>{t('copy_to_dashboard.no_dashboards')}</NoSearchResult>
               )}
             </PaginatedList>
             {showCreateNewDashboardCheckbox && (
@@ -153,7 +155,7 @@ const CopyToDashboardForm = ({
                 type="checkbox"
                 id="create-new-dashboard"
                 name="createNewDashboard"
-                label="Create a new dashboard"
+                label={t('copy_to_dashboard.create_new')}
                 onChange={toggleCreateNewDashboard}
                 checked={createNewDashboard}
               />

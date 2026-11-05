@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useMemo, useState } from 'react';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Alert } from 'components/bootstrap';
 import { FULL_MESSAGE_FIELD, MESSAGE_FIELD } from 'views/Constants';
@@ -43,6 +44,7 @@ const MessageFieldDescription = ({
   message,
   renderForDisplay,
 }: MessageFieldDescriptionProps) => {
+  const { t } = useTranslation('common');
   const [messageTerms, setMessageTerms] = useState(Immutable.List<string>());
 
   const shouldShowTerms = useMemo(() => messageTerms.size !== 0, [messageTerms]);
@@ -65,7 +67,7 @@ const MessageFieldDescription = ({
       <div className="field-value">{renderForDisplay(fieldName)}</div>
       {shouldShowTerms && (
         <Alert bsStyle="info" onDismiss={() => setMessageTerms(Immutable.List())}>
-          Field terms: &nbsp;{formattedTerms}
+          {t('message.field_terms')} &nbsp;{formattedTerms}
         </Alert>
       )}
     </dd>

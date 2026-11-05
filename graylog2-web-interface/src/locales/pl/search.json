@@ -1,0 +1,570 @@
+{
+  "button": {
+    "perform_search": "Wykonaj wyszukiwanie",
+    "perform_search_dirty": "Wykonaj wyszukiwanie (zmiany zostały wprowadzone po ostatnim wykonaniu wyszukiwania)"
+  },
+  "sidebar": {
+    "description": "Opis",
+    "create": "Utwórz",
+    "highlighting": "Wyróżnianie",
+    "fields": "Pola"
+  },
+  "empty_state": {
+    "no_widgets_search": "Brak zdefiniowanych widgetów do wizualizacji wyniku wyszukiwania",
+    "no_widgets_dashboard": "Ten panel nie ma jeszcze żadnych widgetów",
+    "create_widget_hint": "Utwórz nowy widget, wybierając typ widgetu w lewym panelu bocznym, w sekcji „Utwórz”.",
+    "tips_title": "Kilka wskazówek dotyczących tworzenia wyszukiwań i paneli",
+    "tip_1": "Zacznij od <bold>pytania</bold>, na które chcesz uzyskać odpowiedź. Określ problem, który chcesz rozwiązać.",
+    "tip_2": "<bold>Ogranicz</bold> dane tylko do punktów danych, które chcesz zobaczyć.",
+    "tip_3": "<bold>Zwizualizuj</bold> dane. Czy odpowiadają na Twoje pytanie?",
+    "tip_4": "<bold>Udostępnij</bold> panel współpracownikom. Przygotuj go do <bold>ponownego użycia</bold>, wykorzystując parametry"
+  },
+  "search_bar": {
+    "streams_placeholder": "Wybierz strumienie, które ma uwzględniać wyszukiwanie. Jeśli pole jest puste, wyszukiwanie obejmie wszystkie strumienie.",
+    "refresh_human_name": "Wyszukiwanie",
+    "query_history_title": "Otwórz historię zapytań",
+    "filters_label": "Filtry",
+    "filters_tooltip_title": "Filtry wyszukiwania",
+    "filters_enterprise_hint": "Filtry i parametry wyszukiwania są dostępne w wersji enterprise.",
+    "filters_hide_controls": "Ukryj kontrolki",
+    "scroll_hint": "Przewiń do paska wyszukiwania",
+    "query_placeholder": "Wpisz tutaj zapytanie i naciśnij Enter. Np.: (\"not found\" AND http) OR http_response_code:[400 TO 404]"
+  },
+  "actions_menu": {
+    "saved_search": "Zapisane wyszukiwanie",
+    "save_search": "Zapisz wyszukiwanie",
+    "unsaved_changes": "Niezapisane zmiany",
+    "load_title": "Wczytaj wcześniej zapisane wyszukiwanie",
+    "load": "Wczytaj",
+    "share_disabled": "Udostępniać można tylko zapisane wyszukiwania.",
+    "dropdown_aria_label": "Otwórz listę akcji wyszukiwania",
+    "edit_metadata": "Edytuj metadane",
+    "export_to_dashboard": "Eksportuj do panelu",
+    "export": "Eksportuj",
+    "reset_search": "Resetuj wyszukiwanie",
+    "editing_modal_title": "Edycja zapisanego wyszukiwania",
+    "update_search": "Zaktualizuj wyszukiwanie",
+    "share_description": "Wyszukaj użytkownika lub zespół, który ma zostać współpracownikiem tego zapisanego wyszukiwania.",
+    "save_success": "Widok „{{title}}” został pomyślnie zapisany!",
+    "save_error": "Zapisywanie widoku nie powiodło się: {{error}}",
+    "delete_success": "Zapisane wyszukiwanie „{{title}}” zostało pomyślnie usunięte!",
+    "delete_error": "Usuwanie zapisanego wyszukiwania nie powiodło się: {{error}}"
+  },
+  "save_form": {
+    "popover_title": "Nazwa wyszukiwania",
+    "dirty_warning": "Parametry wyszukiwania (zakres czasu, strumienie lub zapytanie) zostały zmienione i nie zostały zatwierdzone. Zapisanie teraz spowoduje ich utratę. Jeśli nie jest to zamierzone, wykonaj wyszukiwanie, aby zastosować zmiany przed zapisaniem.",
+    "title_label": "Tytuł",
+    "title_placeholder": "Wpisz tytuł",
+    "share_description": "Wyszukaj użytkownika lub zespół, który ma zostać współpracownikiem tego wyszukiwania.",
+    "create_new": "Utwórz nowe",
+    "save_as": "Zapisz jako",
+    "create_new_title": "Utwórz nowe wyszukiwanie",
+    "save_as_title": "Zapisz jako nowe wyszukiwanie",
+    "save": "Zapisz",
+    "save_title": "Zapisz wyszukiwanie",
+    "cancel": "Anuluj"
+  },
+  "results": {
+    "loading": "Aktualizowanie wyników wyszukiwania..."
+  },
+  "sidebar_description": {
+    "execution": "Wykonanie",
+    "ad_hoc_info": "Zapisz wyszukiwanie lub wyeksportuj je do panelu, aby dodać niestandardowe podsumowanie i opis.",
+    "edit_metadata_hint": "Aby dodać opis i podsumowanie dla tego widoku typu {{viewType}}, kliknij ikonę <icon/> na pasku wyszukiwania, aby otworzyć jego menu akcji. Menu zawiera opcję „Edytuj metadane”.",
+    "search_section": "Wyszukiwanie",
+    "no_summary": "Ten widok typu {{viewType}} nie ma podsumowania.",
+    "no_description": "Ten widok typu {{viewType}} nie ma opisu.",
+    "no_query": "Nie wykonano jeszcze żadnego zapytania.",
+    "query_executed_in": "Zapytanie wykonane w",
+    "effective_time_range": "Efektywny zakres czasu",
+    "varies_per_widget": "Zależy od widgetu",
+    "time_from": "Od",
+    "time_to": "Do",
+    "total_results": "Łączna liczba wyników"
+  },
+  "sidebar_create": {
+    "info": "Użyj poniższych opcji, aby dodać do wyszukiwania agregację, widok logów (funkcja enterprise) lub parametry (funkcja enterprise).",
+    "generic": "Ogólne",
+    "predefined_aggregation": "Predefiniowana agregacja",
+    "investigations": "Investigations",
+    "events": "Zdarzenia"
+  },
+  "sidebar_highlighting": {
+    "description": "Można wyróżniać terminy wyszukiwania oraz wartości pól. Wyróżnianie zapytania w wynikach można włączyć lub wyłączyć w konfiguracji serwera {{productName}}. Dowolną wartość pola można wyróżnić, klikając ją i wybierając „Wyróżnij tę wartość”.\nJeśli termin lub wartość ma więcej niż jedną regułę, używana jest pierwsza pasująca reguła.",
+    "active_highlights": "Aktywne wyróżnienia",
+    "add_rule_title": "Dodaj regułę wyróżniania",
+    "search_terms": "Terminy wyszukiwania"
+  },
+  "save_view": {
+    "save": "Zapisz",
+    "save_as": "Zapisz jako",
+    "save_as_new_dashboard_title": "Zapisz jako nowy panel",
+    "save_dashboard_title": "Zapisz panel"
+  },
+  "undo_redo": {
+    "undo": "Cofnij",
+    "redo": "Ponów"
+  },
+  "time_range": {
+    "tab_relative": "Względny",
+    "tab_absolute": "Bezwzględny",
+    "tab_keyword": "Słowo kluczowe",
+    "from_label": "Od:",
+    "until_label": "Do:",
+    "keyword_label": "Słowo kluczowe:",
+    "no_override": "Bez zastąpienia",
+    "now": "Teraz",
+    "all_time": "Cały czas",
+    "ago": "temu",
+    "range_ago": "{{time}} temu",
+    "range_length_placeholder": "Wybierz długość zakresu",
+    "load_preset": "Wczytaj preset",
+    "no_available_presets": "Brak dostępnych presetów",
+    "loading": "Ładowanie...",
+    "configure_presets": "Skonfiguruj presety",
+    "insert_current_date": "Wstaw bieżącą datę",
+    "from_hours_label": "od godzin",
+    "from_minutes_label": "od minut",
+    "from_seconds_label": "od sekund",
+    "to_hours_label": "do godzin",
+    "to_minutes_label": "do minut",
+    "to_seconds_label": "do sekund",
+    "from_hour": "od godziny",
+    "from_minutes": "od minut",
+    "from_seconds": "od sekund",
+    "to_hour": "do godziny",
+    "to_minutes": "do minut",
+    "to_seconds": "do sekund",
+    "toggle_day_boundary": "Przełącz między początkiem a końcem dnia",
+    "set_current_time": "Ustaw na bieżący czas lokalny",
+    "set_range_value": "Ustaw wartość zakresu",
+    "set_from_value": "Ustaw wartość „od”",
+    "set_to_value": "Ustaw wartość „do”",
+    "save_as_preset": "Zapisz jako preset",
+    "save_current_as_preset": "Zapisz bieżący zakres czasu jako preset",
+    "preset_description_placeholder": "Dodaj opis...",
+    "preset_description_label": "Opis zakresu czasu",
+    "preset_description_required": "Opis jest wymagany",
+    "preset_similar": "Masz już podobny zakres czasu w <configurationsLink>konfiguracji zakresów</configurationsLink>",
+    "save_preset": "Zapisz preset",
+    "calendar": "Kalendarz",
+    "timestamp": "Znacznik czasu",
+    "date_format": "Data powinna mieć format <code>{{format}}</code>.",
+    "from_timestamp": "Znacznik czasu „od”",
+    "to_timestamp": "Znacznik czasu „do”",
+    "no_override_title": "Nie wybrano zastąpienia daty/godziny.",
+    "no_override_hint": "Użyj zakładek powyżej, aby wybrać zakres daty i godziny do wyszukiwania.",
+    "keyword_from": "Od",
+    "keyword_to": "Do",
+    "keyword_headline": "Zakres czasu:",
+    "keyword_input": "Pole słowa kluczowego",
+    "keyword_help": "Określ przedział czasu wyszukiwania językiem naturalnym.",
+    "keyword_preview": "Podgląd",
+    "keyword_example_last_month": "<code>{{keyword}}</code> wyszukuje od miesiąca temu do teraz",
+    "keyword_example_hours_ago": "<code>{{keyword}}</code> wyszukuje od czterech godzin temu do teraz",
+    "keyword_example_range": "<code>{{keyword}}</code> wyszukuje od 1 kwietnia do 2 dni temu",
+    "keyword_example_timezone": "<code>{{keyword}}</code> wyszukuje od północy wczoraj do północy dzisiaj w strefie czasowej +0200, czyli 22:00 w UTC",
+    "keyword_docs": "Więcej szczegółów znajdziesz w <docsLink>dokumentacji</docsLink>.",
+    "keyword_docs_title": "Dokumentacja zakresu czasu ze słowem kluczowym",
+    "display_label": "Zakres czasu wyszukiwania, po kliknięciu otwiera selektor zakresu czasu",
+    "picker_title": "Zakres czasu wyszukiwania",
+    "admin_limit": "Administrator ograniczył wyszukiwanie do {{duration}}",
+    "update": "Zaktualizuj zakres czasu",
+    "open_selector": "Otwórz selektor zakresu czasu",
+    "timezones_using": "Wszystkie strefy czasowe używające: <bold>{{timezone}}</bold>",
+    "unit_seconds": "Sekundy",
+    "unit_minutes": "Minuty",
+    "unit_hours": "Godziny",
+    "unit_days": "Dni"
+  },
+  "execution_info": {
+    "query_executed": "Zapytanie wykonane w {{duration}} ms o",
+    "total_results": "Łączna liczba wyników: {{total}}",
+    "no_query": "Nie wykonano jeszcze żadnego zapytania."
+  },
+  "highlight_form": {
+    "edit_title": "Edytuj regułę wyróżniania",
+    "create_title": "Utwórz regułę wyróżniania",
+    "field_label": "Pole",
+    "field_placeholder": "Wybierz lub wpisz nazwę pola",
+    "field_required": "Pole jest wymagane",
+    "condition_label": "Warunek",
+    "condition_placeholder": "Wybierz warunek",
+    "condition_required": "Warunek jest wymagany",
+    "value_label": "Wartość",
+    "value_required": "Wartość jest wymagana",
+    "update_rule": "Zaktualizuj regułę",
+    "create_rule": "Utwórz regułę"
+  },
+  "query_tabs": {
+    "create_page": "Utwórz nową stronę",
+    "more_pages": "Więcej stron panelu",
+    "open_configuration": "Otwórz konfigurację stron",
+    "copy_page": "Kopiuj stronę",
+    "copying_page": "Kopiowanie strony...",
+    "copy_page_failed": "Kopiowanie strony panelu nie powiodło się, błąd: {{error}}",
+    "remove_page": "Usuń stronę {{title}}",
+    "configuration_title": "Zaktualizuj konfigurację stron panelu",
+    "update_configuration": "Zaktualizuj konfigurację",
+    "order": "Kolejność",
+    "order_help": "Przeciągnij i upuść, aby zmienić kolejność stron panelu. Kliknij dwukrotnie tytuł panelu, aby go zmienić."
+  },
+  "widget_creation": {
+    "title": "Utwórz nowy widget",
+    "create_widget": "Utwórz widget: {{title}}",
+    "placeholder": "Utwórz tutaj nowy widget",
+    "scroll_to_new_widget": "Przewiń do nowego widgetu"
+  },
+  "dashboard_actions": {
+    "immutable": "Ten panel jest tylko do odczytu, ponieważ jest zarządzany przez {{productName}}. Użyj opcji „Zapisz jako”, aby utworzyć edytowalną kopię.",
+    "debug": "Debugowanie",
+    "share_unsaved": "Udostępniać można tylko zapisane panele.",
+    "edit_metadata": "Edytuj metadane",
+    "export": "Eksportuj",
+    "save_new_title": "Zapisz nowy panel",
+    "create": "Utwórz panel",
+    "edit_title": "Edycja panelu",
+    "update": "Zaktualizuj panel",
+    "share_description": "Wyszukaj użytkownika lub zespół, który ma zostać współpracownikiem tego panelu."
+  },
+  "dashboard_search_bar": {
+    "filter_placeholder": "Zastosuj filtr do wszystkich widgetów"
+  },
+  "debug": {
+    "title": "Informacje debugowania"
+  },
+  "common_views": {
+    "empty_value": "<Empty Value>",
+    "add_to_query": "Dodaj do zapytania",
+    "time_range_validation": {
+      "invalid_date_format": "Format musi być następujący: {{format}}.",
+      "range_limit": "Zakres wykracza poza limit czasu.",
+      "date_limit": "Data wykracza poza limit czasu.",
+      "until_before_from": "Data „Do” musi być późniejsza niż data „Od”.",
+      "empty": "Pole nie może być puste.",
+      "keyword_empty": "Słowo kluczowe nie może być puste!",
+      "keyword_unparsable": "Nie można przetworzyć słowa kluczowego"
+    },
+    "remove_from_favorites": "Usuń z ulubionych",
+    "add_to_favorites": "Dodaj do ulubionych",
+    "view_type": {
+      "search": "wyszukiwanie",
+      "dashboard": "panel"
+    },
+    "unsaved_view": {
+      "search": "Niezapisane wyszukiwanie",
+      "dashboard": "Niezapisany panel"
+    }
+  },
+  "field_charts_migration": {
+    "title": "Migruj istniejące wykresy ze strony wyszukiwania",
+    "found_charts_one": "Znaleźliśmy {{count}} wykres utworzony dla starszej wersji wyszukiwania. Czy chcesz zmigrować ten wykres dla bieżącego wyszukiwania?",
+    "found_charts_other": "Znaleźliśmy {{count}} wykresu utworzonego dla starszej wersji wyszukiwania. Czy chcesz zmigrować ten wykres dla bieżącego wyszukiwania?",
+    "save_hint": "Po uruchomieniu migracji, jeśli chcesz zachować nowo utworzone wykresy, musisz zapisać bieżące wyszukiwanie jako nowy panel. W przeciwnym razie wykresy zostaną utracone po opuszczeniu strony wyszukiwania.",
+    "migrate": "Migruj",
+    "discard": "Odrzuć wykresy",
+    "found_charts_few": "Znaleźliśmy {{count}} wykresy utworzone dla starszej wersji wyszukiwania. Czy chcesz zmigrować te wykresy dla bieżącego wyszukiwania?",
+    "found_charts_many": "Znaleźliśmy {{count}} wykresów utworzonych dla starszej wersji wyszukiwania. Czy chcesz zmigrować te wykresy dla bieżącego wyszukiwania?"
+  },
+  "query": {
+    "contained_in_enterprise": "(zawarte w <enterpriseLink>Graylog Enterprise</enterpriseLink>)",
+    "documentation_hint": "Więcej informacji o tworzeniu widgetów znajdziesz w <docsLink>dokumentacji</docsLink>."
+  },
+  "widget_query": {
+    "reset_global_filter": "Resetuj filtr globalny"
+  },
+  "editable_title": {
+    "edit": "Edytuj tytuł",
+    "hint": "{{value}} - Kliknij dwukrotnie tytuł, aby go edytować."
+  },
+  "message_permalink": {
+    "label": "Link stały"
+  },
+  "query_title": {
+    "page_actions": "Akcje strony",
+    "edit_title": "Edytuj tytuł",
+    "duplicate": "Duplikuj",
+    "copy_to_dashboard": "Kopiuj do panelu",
+    "edit_modal_title": "Edycja tytułu strony panelu",
+    "update_title": "Zaktualizuj tytuł",
+    "title_help": "Wpisz czytelny tytuł strony panelu. Maksymalna długość to 40 znaków.",
+    "title": "Tytuł"
+  },
+  "missing_requirements": {
+    "description_search": "Niestety wykonanie tego wyszukiwania nie jest możliwe. Wymaga ono następujących funkcji, które nie są dostępne:",
+    "description_dashboard": "Niestety wyświetlenie tego panelu nie jest możliwe. Wymaga ono następujących funkcji, które nie są dostępne:",
+    "included_in": "<requirementName>{{requirement}}</requirementName> - zawarte w <pluginLink>{{plugin}}</pluginLink>",
+    "back": "Wstecz"
+  },
+  "view_header": {
+    "alerts_and_events": "Alerty i zdarzenia",
+    "event_definitions": "Definicje zdarzeń",
+    "edit_search_metadata": "Edytuj metadane wyszukiwania {{title}}",
+    "edit_dashboard_metadata": "Edytuj metadane panelu {{title}}",
+    "editing_search": "Edycja zapisanego wyszukiwania",
+    "editing_dashboard": "Edycja zapisanego panelu",
+    "save_search": "Zapisz wyszukiwanie",
+    "save_dashboard": "Zapisz panel"
+  },
+  "execution": {
+    "not_executed": "Nie wykonano jeszcze żadnego zapytania."
+  },
+  "dashboards_page": {
+    "documentation": "Dokumentacja paneli",
+    "description": "Używaj paneli, aby tworzyć własne widoki wiadomości. Utwórz tutaj nowy panel i dodaj jednym kliknięciem dowolny wykres lub diagram utworzony w innych częściach aplikacji."
+  },
+  "search_filter_banner": {
+    "explanation": "<italic>Filtry wyszukiwania</italic> zawierają własne zapytanie i rozszerzają główne zapytanie za pomocą operatora <bold>AND</bold>.",
+    "explanation_saved": "Filtry można zapisywać osobno i ponownie wykorzystywać w zapisanych wyszukiwaniach i panelach. Aktualizacja zapisanego filtra automatycznie wpłynie na wyniki wyszukiwań, które go zawierają."
+  },
+  "widget_time_range": {
+    "reset_global_override": "Resetuj globalne zastąpienie"
+  },
+  "time_range_presets": {
+    "select_time_range": "Wybierz zakres czasu",
+    "open_preset_select": "Otwórz wybór presetu zakresu czasu"
+  },
+  "move_range": {
+    "show_previous": "Pokaż poprzedni",
+    "show_previous_duration": "Pokaż poprzednie {{duration}}",
+    "show_next": "Pokaż następny",
+    "show_next_duration": "Pokaż następne {{duration}}"
+  },
+  "query_validation": {
+    "toggle_warning": "Przełącz ostrzeżenie walidacji",
+    "toggle_information": "Przełącz informacje walidacji",
+    "toggle_error": "Przełącz wyjaśnienie błędu walidacji",
+    "syntax_documentation": "Dokumentacja składni zapytań wyszukiwania",
+    "error_documentation": "Dokumentacja błędów zapytań",
+    "status_warning": "Ostrzeżenie",
+    "status_info": "Informacja",
+    "status_error": "Błąd",
+    "validation_failed": "Walidacja zapytania wyszukiwania nie powiodła się, status: {{error}}",
+    "warm_tier_title": "Wyszukiwanie w Warm Tier",
+    "warm_tier_message": "Wybrany zakres czasu obejmuje dane przechowywane w Warm Tier, których pobranie może być wolne. Dane starsze niż podany znacznik czasu znajdują się w Warm Tier dla tego strumienia:"
+  },
+  "saved_searches": {
+    "title": "Zapisane wyszukiwania",
+    "confirm_bulk_delete_one": "Czy na pewno chcesz usunąć {{count}} zapisane wyszukiwanie?",
+    "confirm_bulk_delete_other": "Czy na pewno chcesz usunąć {{count}} zapisanego wyszukiwania?",
+    "bulk_delete_partial_one": "Nie udało się usunąć {{failed}} z {{count}} wybranego zapisanego wyszukiwania.",
+    "bulk_delete_partial_other": "Nie udało się usunąć {{failed}} z {{count}} wybranego zapisanego wyszukiwania.",
+    "bulk_delete_success_one": "{{count}} zapisane wyszukiwanie zostało pomyślnie usunięte.",
+    "bulk_delete_success_other": "{{count}} zapisanego wyszukiwania zostało pomyślnie usunięte.",
+    "success": "Sukces",
+    "bulk_delete_error": "Wystąpił błąd podczas usuwania zapisanych wyszukiwań. {{error}}",
+    "confirm_delete": "Za chwilę usuniesz zapisane wyszukiwanie: „{{title}}”. Czy na pewno chcesz kontynuować?",
+    "delete_search": "Usuń wyszukiwanie {{title}}",
+    "delete": "Usuń",
+    "confirm_bulk_delete_few": "Czy na pewno chcesz usunąć {{count}} zapisane wyszukiwania?",
+    "confirm_bulk_delete_many": "Czy na pewno chcesz usunąć {{count}} zapisanych wyszukiwań?",
+    "bulk_delete_partial_few": "Nie udało się usunąć {{failed}} z {{count}} wybranych zapisanych wyszukiwań.",
+    "bulk_delete_partial_many": "Nie udało się usunąć {{failed}} z {{count}} wybranych zapisanych wyszukiwań.",
+    "bulk_delete_success_few": "{{count}} zapisane wyszukiwania zostały pomyślnie usunięte.",
+    "bulk_delete_success_many": "{{count}} zapisanych wyszukiwań zostało pomyślnie usuniętych."
+  },
+  "search_meta": {
+    "buttons": "Przyciski metadanych wyszukiwania"
+  },
+  "save_view_notifications": {
+    "success_title": "Sukces!",
+    "error_title": "Błąd!",
+    "plugin_initial_values_failed": "Wystąpił błąd podczas pobierania początkowych wartości formularza paska wyszukiwania z wtyczki",
+    "plugin_validation_preparation_failed": "Wystąpił błąd podczas przygotowywania walidacji paska wyszukiwania dla wtyczki",
+    "plugin_validation_failed": "Wystąpił błąd podczas walidacji wartości paska wyszukiwania z wtyczki",
+    "plugin_submit_failed": "Wystąpił błąd podczas wykonywania handlera wysyłania z wtyczki: {{error}}",
+    "load_saved_searches_failed": "Ładowanie zapisanych wyszukiwań nie powiodło się, status",
+    "could_not_load_saved_searches": "Nie udało się załadować zapisanych wyszukiwań",
+    "load_minimum_refresh_interval_failed": "Ładowanie opcji konfiguracji systemu „minimum_auto_refresh_interval” nie powiodło się, status",
+    "could_not_load_configuration": "Nie udało się załadować opcji konfiguracji"
+  },
+  "sidebar_layout": {
+    "display_as_overlay": "Wyświetl panel boczny jako nakładkę",
+    "display_inline": "Wyświetl panel boczny w linii"
+  },
+  "search_result_overview": {
+    "duration_at": "{{duration}}ms o <timestamp/>",
+    "effective_from": "Efektywny zakres czasu od",
+    "effective_to": "Efektywny zakres czasu do"
+  },
+  "fields_overview": {
+    "filter_placeholder": "Filtruj pola",
+    "reset": "Resetuj",
+    "list_fields": "Wyświetl pola <current>bieżącego zapytania</current>, <all>wszystkie</all> lub <allReserved>wszystkie wraz z zarezerwowanymi</allReserved>.",
+    "current_title": "Wyświetla pola, które występują w bieżącym zapytaniu.",
+    "all_title": "Wyświetla wszystkie pola, z wyjątkiem zarezerwowanych pól (gl2_*).",
+    "all_reserved_title": "Wyświetla wszystkie pola, łącznie z zarezerwowanymi polami (gl2_*).",
+    "no_field_information": "Brak dostępnych informacji o polach.",
+    "no_fields": "Brak pól do wyświetlenia. Spróbuj zmienić termin filtra lub wybrać inny zestaw pól powyżej."
+  },
+  "highlighting_color": {
+    "color": "Kolor",
+    "gradient_name": "Nazwa gradientu",
+    "gradient_placeholder": "Wybierz kolory gradientu",
+    "lowest_placeholder": "Podaj najniższą wartość",
+    "lowest_label": "Najniższa wartość",
+    "lowest_help": "Najniższa oczekiwana wartość w polu/serii.",
+    "highest_aria": "Podaj najwyższą wartość",
+    "highest_label": "Najwyższa wartość",
+    "highest_help": "Najwyższa oczekiwana wartość w polu/serii.",
+    "coloring": "Kolorowanie",
+    "static_color": "Kolor stały",
+    "gradient": "Gradient",
+    "must_be_selected": "Należy wybrać.",
+    "must_be_present": "Wymagane.",
+    "must_be_number": "Musi być liczbą.",
+    "must_be_higher": "Musi być wyższa od najniższej wartości.",
+    "coloring_required": "Kolorowanie jest wymagane",
+    "gradient_numeric_only": "Gradient można zdefiniować wyłącznie dla pól numerycznych."
+  },
+  "highlighting_rule": {
+    "edit": "Edytuj tę regułę wyróżniania",
+    "remove": "Usuń tę regułę wyróżniania",
+    "confirm_remove": "Czy na pewno chcesz usunąć to wyróżnienie?"
+  },
+  "change_field_type": {
+    "no_permission_title": "Brak uprawnień",
+    "no_permission_description": "Nie masz uprawnień do wykonania tej akcji",
+    "enterprise_plugin_required": "(wymagana jest <enterpriseLink>wtyczka Enterprise</enterpriseLink>)",
+    "modal_title": "Zmień typ pola {{fieldName}}",
+    "impact_warning": "Zmiana typu pola <bold>{{fieldName}}</bold> może znacząco wpłynąć na przetwarzanie przyszłych wiadomości logów. Jeśli zadeklarujesz dla pola typ niezgodny z przyjmowanymi logami, może to prowadzić do błędów przetwarzania.",
+    "failure_processing_hint": "Zalecamy włączenie <docsLink>Failure Processing</docsLink> i uważne obserwowanie strumienia <failureStream/> po zmianie.",
+    "select_field_type_for": "Wybierz typ pola dla {{fieldName}}",
+    "select_field_type_for_field": "Wybierz typ pola dla pola",
+    "select_field_type": "Wybierz typ pola",
+    "select_index_sets": "Wybierz docelowe zestawy indeksów",
+    "index_sets_hint_with_type": "Domyślnie typ pola <bold>{{type}}</bold> zostanie ustawiony dla pola <bold>{{fieldName}}</bold> we wszystkich index setach bieżącej wiadomości/wyszukiwania. Możesz wybrać, dla których index setów chcesz wprowadzić tę zmianę.",
+    "index_sets_hint": "Domyślnie wybrany typ pola zostanie ustawiony dla pola <bold>{{fieldName}}</bold> we wszystkich index setach bieżącej wiadomości/wyszukiwania. Możesz wybrać, dla których index setów chcesz wprowadzić tę zmianę.",
+    "select_rotation_strategy": "Wybierz strategię rotacji",
+    "rotation_hint_type_field": "Aby zobaczyć i użyć typu <bold>{{type}}</bold> jako typu pola dla <bold>{{fieldName}}</bold>, musisz wykonać rotację indeksów. Po wysłaniu formularza możesz automatycznie wykonać rotację danych indeksów lub zrobić to ręcznie później.",
+    "rotation_hint_type": "Aby zobaczyć i użyć typu <bold>{{type}}</bold> jako typu pola, musisz wykonać rotację indeksów. Po wysłaniu formularza możesz automatycznie wykonać rotację danych indeksów lub zrobić to ręcznie później.",
+    "rotation_hint_field": "Aby zobaczyć i użyć wybranego typu pola jako typu pola dla <bold>{{fieldName}}</bold>, musisz wykonać rotację indeksów. Po wysłaniu formularza możesz automatycznie wykonać rotację danych indeksów lub zrobić to ręcznie później.",
+    "rotation_hint": "Aby zobaczyć i użyć wybranego typu pola jako typu pola, musisz wykonać rotację indeksów. Po wysłaniu formularza możesz automatycznie wykonać rotację danych indeksów lub zrobić to ręcznie później.",
+    "rotate_indices": "Wykonaj rotację dotkniętych indeksów po zmianie",
+    "changing": "Zmienianie typu pola...",
+    "change": "Zmień typ pola",
+    "select_field": "Wybierz pole",
+    "select_field_placeholder": "Wybierz lub wpisz pole",
+    "type_not_defined": "typ nie jest zdefiniowany",
+    "previous_values": "(poprzednie wartości: {{values}})",
+    "load_index_field_types_failed": "Ładowanie typów pól indeksu nie powiodło się, status",
+    "could_not_load_index_field_types": "Nie udało się załadować typów pól indeksu",
+    "load_field_type_options_failed": "Ładowanie opcji typów pól nie powiodło się, status",
+    "could_not_load_field_type_options": "Nie udało się załadować opcji typów pól",
+    "load_field_types_failed": "Ładowanie typów pola {{field}} nie powiodło się, status",
+    "could_not_load_field_types": "Nie udało się załadować typów pól",
+    "load_index_sets_failed": "Ładowanie index setów obsługujących zmianę typu pola nie powiodło się, status",
+    "could_not_load_index_sets": "Nie udało się załadować index setów obsługujących zmianę typu pola",
+    "change_failed": "Zmiana typu pola nie powiodła się, status: {{error}}",
+    "change_failed_title": "Nie udało się zmienić typu pola",
+    "change_success": "Typ pola został pomyślnie zmieniony",
+    "success_title": "Sukces!"
+  },
+  "value_actions": {
+    "select_extractor_type": "Wybierz typ extractora",
+    "exclude": "Wyklucz z wyników",
+    "add_to_query": "Dodaj do zapytania",
+    "show_documents": "Pokaż dokumenty dla wartości",
+    "create_extractor": "Utwórz extractor",
+    "highlight_value": "Wyróżnij tę wartość",
+    "create_event_definition": "Utwórz definicję zdarzenia",
+    "copy_value": "Kopiuj wartość do schowka"
+  },
+  "create_event_definition": {
+    "title": "Konfiguracja nowej definicji zdarzenia",
+    "hide_details": "Ukryj szczegóły strategii",
+    "show_details": "Pokaż szczegóły strategii",
+    "continue": "Kontynuuj konfigurację",
+    "strategy_by": "Strategia według:",
+    "description": "Opis:",
+    "sections": {
+      "aggregation": "Ustawienia agregacji",
+      "search": "Zapytanie wyszukiwania"
+    },
+    "items": {
+      "rowValuePath": "Zapytanie z wiersza tabeli",
+      "columnValuePath": "Zapytanie z kolumny tabeli",
+      "columnGroupBy": "Grupuj według wartości kolumn",
+      "rowGroupBy": "Grupuj według wartości wierszy",
+      "aggCondition": "Warunek",
+      "queryWithReplacedParams": "Zapytanie z wyszukiwania",
+      "searchFilterQuery": "Zapytanie z filtrów wyszukiwania",
+      "streams": "Strumienie",
+      "searchWithinMs": "Szukaj w ciągu (ms)",
+      "lutParameters": "Parametry tabeli wyszukiwania",
+      "searchFromValue": "Zapytanie z wartości"
+    },
+    "item_label": "{{label}}: ",
+    "strategies": {
+      "EXACT": {
+        "label": "Dokładnie ta wartość",
+        "description": "Strategia obejmuje wszystkie zapytania wyszukiwania, filtry itp. powiązane z bieżącym widokiem wyszukiwania"
+      },
+      "ROW": {
+        "label": "Dowolna w wierszu",
+        "description": "Strategia obejmuje pivoty wierszy"
+      },
+      "COL": {
+        "label": "Dowolna w kolumnie",
+        "description": "Strategia obejmuje pivoty kolumn"
+      },
+      "ALL": {
+        "label": "Dowolna w widgecie",
+        "description": "Strategia obejmuje wszystkie wartości pivotów wierszy i kolumn powiązane z wybraną wartością"
+      },
+      "CUSTOM": {
+        "label": "Niestandardowa",
+        "description": "Możesz wybrać dowolną część wyszukiwania"
+      }
+    }
+  },
+  "view_errors": {
+    "something_went_wrong": "Coś poszło nie tak",
+    "unknown_error": "Wystąpił nieznany błąd. Więcej informacji znajdziesz w poniższej wiadomości oraz w logu serwera {{productName}}."
+  },
+  "views_notifications": {
+    "delete_view_failed": "Usuwanie widoku {{title}} nie powiodło się, status: {{error}}",
+    "delete_view_failed_title": "Nie udało się usunąć widoku",
+    "apply_widget_changes_failed": "Zastosowanie zmian widgetu nie powiodło się, status: {{error}}",
+    "load_message_failed": "Ładowanie informacji o wiadomości nie powiodło się, status",
+    "could_not_load_message": "Nie udało się załadować informacji o wiadomości"
+  },
+  "field_actions": {
+    "chart": "Wykres",
+    "show_top_values": "Pokaż najczęstsze wartości",
+    "statistics": "Statystyki",
+    "add_to_table": "Dodaj do tabeli",
+    "remove_from_table": "Usuń z tabeli",
+    "add_to_all_tables": "Dodaj do wszystkich tabel",
+    "remove_from_all_tables": "Usuń ze wszystkich tabel",
+    "change_field_type": "Zmień typ pola",
+    "copy_field_name": "Kopiuj nazwę pola do schowka",
+    "add_to_favorites": "Dodaj pole do ulubionych",
+    "remove_from_favorites": "Usuń pole z ulubionych"
+  },
+  "aggregation": {
+    "summary_by": "Agregacja {{series}} według {{fields}}",
+    "summary_only": "Agregacja {{series}}"
+  },
+  "widget_creators": {
+    "message_count": "Liczba wiadomości",
+    "message_table": "Tabela wiadomości",
+    "custom_aggregation": "Niestandardowa agregacja",
+    "aggregation": "Agregacja",
+    "events_overview": "Przegląd zdarzeń",
+    "text_markdown": "Tekst/Markdown"
+  },
+  "message_details": {
+    "deleted_input": "usunięte wejście",
+    "timestamp": "Znacznik czasu",
+    "not_stored": "Nie zapisano",
+    "not_stored_message": "Wiadomość nie jest zapisana",
+    "received_by": "Odebrana przez",
+    "stored_in_index": "Zapisana w indeksie",
+    "routed_into_streams": "Skierowana do strumieni"
+  },
+  "views_logic": {
+    "result_window_limit": "Elasticsearch ogranicza wynik wyszukiwania do {{limit}} wiadomości. Przy rozmiarze strony wynoszącym {{pageSize}} wiadomości możesz użyć pierwszych {{validPages}} stron.",
+    "confirm_delete_dashboard_page": "Czy na pewno chcesz usunąć tę stronę panelu?"
+  }
+}

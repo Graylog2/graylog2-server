@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
@@ -29,13 +30,14 @@ const RemediationStepRenderer = ({
   eventDefinitionId: string;
   meta: EventsAdditionalData;
 }) => {
+  const { t } = useTranslation('events');
   const { context: eventsContext } = meta;
   const eventDefinitionContext = eventsContext?.event_definitions?.[eventDefinitionId];
 
   return eventDefinitionContext?.remediation_steps ? (
     <MarkdownPreview show withFullView noBorder noBackground value={eventDefinitionContext.remediation_steps} />
   ) : (
-    <em>No remediation steps</em>
+    <em>{t('alerts_replay.no_remediation_steps')}</em>
   );
 };
 

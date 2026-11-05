@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ListGroup, ListGroupItem } from 'components/bootstrap';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
@@ -41,6 +42,7 @@ const _tabList = (view: View, queryIds): Array<TabEntry> =>
   });
 
 const MoveWidgetToTabModal = ({ view, onCancel, onSubmit, widgetId }: Props) => {
+  const { t } = useTranslation('widgets');
   const [selectedTab, setSelectedTab] = useState(null);
   const [keepCopy, setKeepCopy] = useState(false);
   const activeQuery = useActiveQueryId();
@@ -58,24 +60,25 @@ const MoveWidgetToTabModal = ({ view, onCancel, onSubmit, widgetId }: Props) => 
       {name}
     </ListGroupItem>
   ));
-  const renderResult = list && list.length > 0 ? <ListGroup>{tabList}</ListGroup> : <span>No pages found</span>;
+  const renderResult =
+    list && list.length > 0 ? <ListGroup>{tabList}</ListGroup> : <span>{t('move_widget.no_pages')}</span>;
 
   return (
     <BootstrapModalForm
       show
       onCancel={onCancel}
       submitButtonDisabled={!selectedTab}
-      submitButtonText={`${keepCopy ? 'Copy' : 'Move'} widget`}
+      submitButtonText={keepCopy ? t('move_widget.copy') : t('move_widget.move')}
       onSubmitForm={submit}
-      title="Choose Target Page">
+      title={t('move_widget.title')}>
       {renderResult}
       <Input
         type="checkbox"
         id="keepCopy"
         name="keepCopy"
-        label="Keep Copy on this Page"
+        label={t('move_widget.keep_copy')}
         onChange={onKeepCopy}
-        help="When 'Keep Copy on the Page' is enabled, the widget will be copied and not moved to another page"
+        help={t('move_widget.keep_copy_help')}
         checked={keepCopy}
       />
     </BootstrapModalForm>

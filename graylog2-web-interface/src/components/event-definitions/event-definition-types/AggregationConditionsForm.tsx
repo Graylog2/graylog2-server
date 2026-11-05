@@ -16,6 +16,8 @@
  */
 import React from 'react';
 import styled from 'styled-components';
+import type { WithTranslation } from 'react-i18next';
+import { withTranslation } from 'react-i18next';
 
 import { Alert, Row } from 'components/bootstrap';
 import { emptyComparisonExpressionConfig } from 'logic/alerts/AggregationExpressionConfig';
@@ -55,7 +57,7 @@ type AggregationConditionsFormProps = {
   formattedFields: FieldTypeMapping[];
   aggregationFunctions: any[];
   onChange: (...args: any[]) => void;
-};
+} & WithTranslation;
 
 class AggregationConditionsForm extends React.Component<
   AggregationConditionsFormProps,
@@ -115,9 +117,9 @@ class AggregationConditionsForm extends React.Component<
 
     return (
       <>
-        <h3 className={commonStyles.title}>Create Events for Definition</h3>
+        <h3 className={commonStyles.title}>{this.props.t('condition_summary.create_events')}</h3>
         {validation.errors.conditions && (
-          <StyledAlert bsStyle="danger" title="Errors found">
+          <StyledAlert bsStyle="danger" title={this.props.t('condition_summary.errors_found')}>
             <p>{validation?.errors?.conditions[0]}</p>
           </StyledAlert>
         )}
@@ -143,4 +145,4 @@ class AggregationConditionsForm extends React.Component<
   }
 }
 
-export default AggregationConditionsForm;
+export default withTranslation('event_definitions')(AggregationConditionsForm);

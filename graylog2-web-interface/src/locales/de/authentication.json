@@ -1,0 +1,208 @@
+{
+  "action_links": {
+    "create": "Dienst erstellen",
+    "edit_active": "Aktiven Dienst bearbeiten",
+    "view_active": "Aktiven Dienst anzeigen"
+  },
+  "active_directory": {
+    "create_title": "Active-Directory-Authentifizierungsdienst erstellen",
+    "edit_title": "Active-Directory-Authentifizierungsdienst bearbeiten",
+    "help": {
+      "system_user_dn": "Der Benutzername für die erste Verbindung zum Active-Directory-Server, z. B. <code>ldapbind@some.domain</code>.<lineBreak/>Er muss mit dem <code>userPrincipalName</code> dieses Benutzers übereinstimmen.",
+      "system_user_password": "Das Passwort für die erste Verbindung zum Active-Directory-Server.",
+      "user_full_name_attribute": "Welches Active-Directory-Attribut für den vollständigen Namen eines synchronisierten Benutzers verwendet wird, z. B. <code>displayName</code>.<lineBreak/>",
+      "user_name_attribute": "Welches Active-Directory-Attribut für den vollständigen Namen des synchronisierten Benutzers verwendet wird, z. B. <code>userPrincipalName</code>.<lineBreak/>Laden Sie einen Testbenutzer im Seitenleistenbereich <emphasis>Test der Benutzeranmeldung</emphasis>, wenn Sie nicht sicher sind, welches Attribut Sie verwenden sollen.",
+      "user_search_base": "Der Basisbaum, auf den die Active-Directory-Suchanfrage beschränkt wird, z. B. <code>cn=users,dc=example,dc=com</code>."
+    }
+  },
+  "active_page": {
+    "title": "Aktiver Authentifizierungsdienst"
+  },
+  "authenticators": {
+    "description": "Konfigurieren Sie die Authentifizierung über vertrauenswürdige Header.",
+    "documentation_title": "Authenticators-Dokumentation",
+    "edit": "Authenticators bearbeiten",
+    "title": "Authenticators-Details"
+  },
+  "backend_details_page": {
+    "edit_service": "Dienst bearbeiten",
+    "title": "Details zum Authentifizierungsdienst"
+  },
+  "backends_overview": {
+    "activate": "Aktivieren",
+    "confirm_activate": "Möchten Sie den Authentifizierungsdienst \"{{title}}\" wirklich aktivieren?",
+    "confirm_deactivate": "Möchten Sie den Authentifizierungsdienst \"{{title}}\" wirklich deaktivieren?",
+    "confirm_delete": "Möchten Sie den Authentifizierungsdienst \"{{title}}\" wirklich löschen?",
+    "deactivate": "Deaktivieren",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "filter_label": "Dienste filtern",
+    "found_one": "{{count}} konfigurierter Authentifizierungsdienst im System gefunden.",
+    "found_other": "{{count}} konfigurierte Authentifizierungsdienste im System gefunden.",
+    "headers": {
+      "actions": "Aktionen",
+      "default_roles": "Standardrollen",
+      "description": "Beschreibung",
+      "title": "Titel"
+    },
+    "query_example": "Backends finden, deren Titel LDAP enthält:",
+    "role_not_found": "Rolle nicht gefunden",
+    "title": "Konfigurierte Authentifizierungsdienste"
+  },
+  "config_details": {
+    "edit": "Bearbeiten",
+    "group_sync_feature_name": "Gruppensynchronisierung",
+    "group_sync_title": "Gruppensynchronisierung"
+  },
+  "connection_test": {
+    "default_error": "Es ist ein Fehler aufgetreten",
+    "description": "Führt im Hintergrund eine Verbindungsprüfung mit der Adresse und den Zugangsdaten aus dem Schritt \"Serverkonfiguration\" durch.",
+    "submit": "Serververbindung testen",
+    "title": "Prüfung der Serververbindung"
+  },
+  "create_page": {
+    "getting_started_title": "Neuen Authentifizierungsdienst erstellen",
+    "title": "Authentifizierungsdienst erstellen"
+  },
+  "directory_help": {
+    "default_roles": "Die Standardrollen, die synchronisierte Benutzer erhalten. Alle Benutzer benötigen die Rolle <code>Reader</code>, um die Weboberfläche zu verwenden",
+    "default_user_timezone": "Wählen Sie die Standard-Zeitzone für neue Benutzer.",
+    "user_search_pattern": "Zum Beispiel <exampleCode>{{example}}</exampleCode>. Die Zeichenkette <code>{{placeholder}}</code> wird durch den eingegebenen Benutzernamen ersetzt."
+  },
+  "getting_started": {
+    "description": "Neben den integrierten Authentifizierungsmechanismen wie der internen Benutzerdatenbank oder LDAP/Active Directory können Authentifizierungsdienste auch durch Plugins erweitert werden, um weitere Authentifizierungsmechanismen zu unterstützen. Wählen Sie einen Authentifizierungsdienst aus, um einen neuen einzurichten.",
+    "select_service": "Dienst auswählen",
+    "submit": "Loslegen"
+  },
+  "ldap": {
+    "create_title": "LDAP-Authentifizierungsdienst erstellen",
+    "edit_title": "LDAP-Authentifizierungsdienst bearbeiten",
+    "help": {
+      "email_attributes": "Welches LDAP-Attribut für die E-Mail-Adresse des Benutzers verwendet wird, z. B. <code>mail</code>.<lineBreak/>Sie können mehrere Attribute angeben. Drücken Sie <kbd>Tab</kbd> oder <kbd>Eingabe</kbd>, um Ihren Wert zu übernehmen.",
+      "system_user_dn": "Der Benutzername für die erste Verbindung zum LDAP-Server, z. B. <code>cn=admin,dc=example,dc=com</code>. Je nach LDAP-Server ist er eventuell optional.",
+      "system_user_password": "Das Passwort für die erste Verbindung zum LDAP-Server.",
+      "user_full_name_attribute": "Welches LDAP-Attribut für den vollständigen Namen eines synchronisierten Benutzers verwendet wird, z. B. <code>cn</code>.<lineBreak/>",
+      "user_name_attribute": "Welches LDAP-Attribut für den Benutzernamen des synchronisierten Benutzers verwendet wird, z. B. <code>uid</code>.<lineBreak/>Laden Sie einen Testbenutzer im Seitenleistenbereich <emphasis>Test der Benutzeranmeldung</emphasis>, wenn Sie nicht sicher sind, welches Attribut Sie verwenden sollen.",
+      "user_search_base": "Der Basisbaum, auf den die LDAP-Suchanfrage beschränkt wird, z. B. <code>cn=users,dc=example,dc=com</code>.",
+      "user_unique_id_attribute": "Welches LDAP-Attribut für die ID eines synchronisierten Benutzers verwendet wird, z. B. <code>entryUUID</code>.<lineBreak/>"
+    }
+  },
+  "login_test": {
+    "description": "Überprüfen Sie die Einstellungen, indem Sie den Eintrag für den angegebenen Benutzernamen laden. Wenn Sie das Passwort weglassen, wird kein Authentifizierungsversuch unternommen.",
+    "login_failed": "Anmeldung fehlgeschlagen",
+    "password": "Passwort",
+    "submit": "Benutzeranmeldung testen",
+    "title": "Test der Benutzeranmeldung",
+    "user_attribute": "Benutzerattribut",
+    "user_does_not_exist": "Benutzer existiert nicht",
+    "username": "Benutzername",
+    "value": "Wert"
+  },
+  "no_service_plugin": "Für den Typ \"{{type}}\" ist kein Plugin für Authentifizierungsdienste konfiguriert",
+  "no_service_plugin_for": "Für \"{{type}}\" ist kein Plugin für Authentifizierungsdienste konfiguriert",
+  "notifications": {
+    "create_failed": "Das Erstellen des Authentifizierungsdienstes ist fehlgeschlagen. Status: {{error}}",
+    "create_success": "Der Authentifizierungsdienst wurde erfolgreich erstellt.",
+    "error_title": "Fehler",
+    "success_title": "Erfolg",
+    "update_failed": "Das Aktualisieren des Authentifizierungsdienstes ist fehlgeschlagen. Status: {{error}}",
+    "update_success": "Der Authentifizierungsdienst wurde erfolgreich aktualisiert."
+  },
+  "overview_page": {
+    "no_active_backend": "Keiner der konfigurierten Authentifizierungsdienste ist derzeit aktiv.",
+    "title": "Alle Authentifizierungsdienste"
+  },
+  "page": {
+    "description": "Konfigurieren Sie die Authentifizierungsdienste dieses Clusters.",
+    "documentation_title": "Authentifizierungs-Dokumentation"
+  },
+  "page_navigation": {
+    "authenticators": "Authenticators",
+    "services": "Authentifizierungsdienste"
+  },
+  "server_config": {
+    "description_label": "Beschreibung",
+    "hostname": "Hostname",
+    "port": "Port",
+    "reset_password": "Passwort zurücksetzen",
+    "server_address": "Serveradresse",
+    "system_password": "System-Passwort",
+    "system_user_dn": "System-Benutzer-DN",
+    "system_username": "System-Benutzername",
+    "title": "Serverkonfiguration",
+    "title_label": "Titel",
+    "transport_security": "Transportverschlüsselung",
+    "transport_security_none": "Keine",
+    "undo_reset": "Zurücksetzen rückgängig machen",
+    "verify_certificates": "Zertifikate überprüfen"
+  },
+  "synced_teams": {
+    "feature_name": "Teams",
+    "title": "Synchronisierte Teams"
+  },
+  "synced_users": {
+    "edit": "Bearbeiten",
+    "filter_label": "Benutzer filtern",
+    "found_one": "{{count}} synchronisierter Benutzer gefunden.",
+    "found_other": "{{count}} synchronisierte Benutzer gefunden.",
+    "headers": {
+      "actions": "Aktionen",
+      "full_name": "Vollständiger Name",
+      "roles": "Rollen",
+      "username": "Benutzername"
+    },
+    "none_found": "Es wurden keine synchronisierten Benutzer gefunden.",
+    "role_not_found": "Rolle nicht gefunden",
+    "title": "Synchronisierte Benutzer"
+  },
+  "trusted_header": {
+    "description": "Dieser Authenticator ermöglicht es, Benutzer anhand eines HTTP-Headers ohne weitere Interaktion anzumelden.",
+    "enable_sso": "Single Sign-on über HTTP-Header aktivieren",
+    "enabled": "Aktiviert",
+    "title": "Authentifizierung über vertrauenswürdige Header",
+    "trusted_proxies_hint": "Bitte konfigurieren Sie die Einstellung <code>trusted_proxies</code> in der Konfigurationsdatei des {{productName}}-Servers.",
+    "update_config": "Konfiguration aktualisieren",
+    "username_header": "Benutzername-Header",
+    "username_header_help": "HTTP-Header, der den implizit vertrauenswürdigen Namen des Benutzers enthält. (Beim Abgleich des Headers wird die Groß-/Kleinschreibung ignoriert)"
+  },
+  "user_sync": {
+    "browser_time_zone": "Zeitzone des Browsers",
+    "default_assignments_hint": "Änderungen an den Standardrollen und der Standard-Zeitzone wirken sich nur auf neue Benutzer aus, die über {{serviceTitle}} erstellt werden!",
+    "default_roles": "Standardrollen",
+    "default_user_time_zone": "Standard-Zeitzone für Benutzer",
+    "email_attribute": "E-Mail-Attribut",
+    "email_attributes": "E-Mail-Attribute",
+    "full_name_attribute": "Attribut für vollständigen Namen",
+    "id_attribute": "ID-Attribut",
+    "name_attribute": "Namensattribut",
+    "role_not_found": "Rolle nicht gefunden",
+    "search_base_dn": "Such-Basis-DN",
+    "search_pattern": "Suchmuster",
+    "search_roles": "Nach Rollen suchen",
+    "test_login_hint": "Wir empfehlen, die Benutzeranmeldung in der Seitenleiste zu testen, um Ihre Einstellungen zu überprüfen.",
+    "title": "Benutzersynchronisierung"
+  },
+  "wizard": {
+    "confirm_remove_group_sync": "Möchten Sie die Konfiguration der Gruppensynchronisierung für diesen Authentifizierungsdienst wirklich entfernen?",
+    "create_failed": "Authentifizierungsdienst konnte nicht erstellt werden",
+    "edit_failed": "Authentifizierungsdienst konnte nicht bearbeitet werden",
+    "finish_and_save": "Dienst fertigstellen und speichern",
+    "finish_and_save_identity_service": "Identitätsdienst fertigstellen und speichern",
+    "next_group_sync": "Weiter: Gruppensynchronisierung",
+    "next_user_sync": "Weiter: Benutzersynchronisierung",
+    "server_validation_error": "Validierungsfehler des Servers: {{errors}}",
+    "steps": {
+      "group_sync": "Gruppensynchronisierung (opt.)",
+      "server_config": "Serverkonfiguration",
+      "user_sync": "Benutzersynchronisierung"
+    }
+  },
+  "wizard_header": {
+    "edit_title": "Authentifizierungsdienst bearbeiten - <emphasis>{{backendTitle}}</emphasis>"
+  },
+  "http_header_notifications": {
+    "load_failed": "Laden der HTTP-Header-Authentifizierungskonfiguration fehlgeschlagen",
+    "update_success": "HTTP-Header-Authentifizierungskonfiguration erfolgreich aktualisiert",
+    "update_failed": "Aktualisieren der HTTP-Header-Authentifizierungskonfiguration fehlgeschlagen mit Status: {{error}}"
+  }
+}

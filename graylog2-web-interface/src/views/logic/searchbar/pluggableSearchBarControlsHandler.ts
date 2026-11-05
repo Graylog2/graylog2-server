@@ -16,6 +16,7 @@
  */
 import merge from 'lodash/merge';
 
+import i18n from 'i18n';
 import UserNotification from 'util/UserNotification';
 import type { SearchBarControl, CombinedSearchBarFormValues, HandlerContext } from 'views/types';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -25,15 +26,15 @@ import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 
 const executeSafely = <T extends () => ReturnType<T>>(
   fn: T,
-  errorMessage: string,
+  errorMessageKey: string,
   fallbackResult?: ReturnType<T>,
 ): ReturnType<T> => {
   try {
     return fn();
   } catch (e) {
     // eslint-disable-next-line no-console
-    console.error(`${errorMessage}: ${e}`);
-    UserNotification.error(`${errorMessage}: ${e}`);
+    console.error(`${i18n.t(errorMessageKey, { ns: 'search', lng: 'en' })}: ${e}`);
+    UserNotification.error(`${i18n.t(errorMessageKey, { ns: 'search' })}: ${e}`);
   }
 
   return fallbackResult;
@@ -41,11 +42,7 @@ const executeSafely = <T extends () => ReturnType<T>>(
 
 const initialValues = <T>(currentQuery: T, initialValuesHandler: Array<(entity: T) => { [key: string]: any }>) => {
   const _initialValues = initialValuesHandler.map((useInitialValues) =>
-    executeSafely(
-      () => useInitialValues(currentQuery),
-      'An error occurred when collecting initial search bar form values from a plugin',
-      {},
-    ),
+    executeSafely(() => useInitialValues(currentQuery), 'save_view_notifications.plugin_initial_values_failed', {}),
   );
 
   return merge({}, ..._initialValues);
@@ -80,10 +77,9 @@ const executeSubmitHandler = async <T>(
   for (const submitHandler of submitHandlers) {
     // eslint-disable-next-line no-await-in-loop,no-loop-func
     const entityWithPluginData = await submitHandler(values, dispatch, updatedEntity).catch((e) => {
-      const errorMessage = `An error occurred when executing a submit handler from a plugin: ${e}`;
       // eslint-disable-next-line no-console
-      console.error(errorMessage);
-      UserNotification.error(errorMessage);
+      console.error(`An error occurred when executing a submit handler from a plugin: ${e}`);
+      UserNotification.error(i18n.t('save_view_notifications.plugin_submit_failed', { ns: 'search', error: e }));
 
       return updatedEntity;
     });
@@ -133,7 +129,7 @@ export const pluggableValidationPayload = (
   const validationPayload: Array<{ [key: string]: any }> = validationPayloadHandler.map((validationPayloadFn) =>
     executeSafely(
       () => validationPayloadFn(values, context),
-      'An error occurred when preparing search bar validation for a plugin',
+      'save_view_notifications.plugin_validation_preparation_failed',
       {},
     ),
   );
@@ -151,11 +147,7 @@ export const validatePluggableValues = (
     .filter((onValidate) => !!onValidate);
 
   const errors = validationHandler.map((onValidate) =>
-    executeSafely(
-      () => onValidate(values, context),
-      'An error occurred when validating search bar values from a plugin',
-      {},
-    ),
+    executeSafely(() => onValidate(values, context), 'save_view_notifications.plugin_validation_failed', {}),
   );
 
   return merge({}, ...errors);

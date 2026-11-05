@@ -16,6 +16,7 @@
  */
 import React, { useContext } from 'react';
 import styled from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import FormWrap from 'integrations/aws/common/FormWrap';
 import AdditionalFields from 'integrations/aws/common/AdditionalFields';
@@ -34,20 +35,24 @@ type SkipHealthCheckProps = {
 };
 
 const SkipHealthCheck = ({ onChange, onSubmit }: SkipHealthCheckProps) => {
+  const { t } = useTranslation('integrations');
   const { formData } = useContext(FormDataContext);
 
   return (
-    <AdditionalFields title="Skip Health Check">
+    <AdditionalFields title={t('aws_skip_health_check.title')}>
       <StyledFormWrap
         onSubmit={onSubmit}
-        buttonContent="Confirm"
-        title="Choose Log Type &amp; Skip Health Check"
+        buttonContent={t('aws_skip_health_check.confirm_button')}
+        title={t('aws_skip_health_check.form_title')}
         disabled={!(formData.awsCloudWatchKinesisInputType && formData.awsCloudWatchKinesisInputType.value)}
         description={
           <p>
-            If you&apos;re sure of the data contained within your new{' '}
-            <strong>{formData.awsCloudWatchKinesisStream.value}</strong> stream, then choose your option below to skip
-            our automated check.
+            <Trans
+              t={t}
+              i18nKey="aws_skip_health_check.description"
+              values={{ streamName: formData.awsCloudWatchKinesisStream.value }}
+              components={{ strong: <strong /> }}
+            />
           </p>
         }>
         <ValidatedInput
@@ -55,9 +60,9 @@ const SkipHealthCheck = ({ onChange, onSubmit }: SkipHealthCheckProps) => {
           type="select"
           fieldData={formData.awsCloudWatchKinesisInputType}
           onChange={onChange}
-          label="Choose AWS Input Type"
+          label={t('aws_skip_health_check.input_type_label')}
           required>
-          {renderOptions(KINESIS_LOG_TYPES, 'Choose Log Type')}
+          {renderOptions(KINESIS_LOG_TYPES, t('aws_skip_health_check.choose_log_type'))}
         </ValidatedInput>
       </StyledFormWrap>
     </AdditionalFields>

@@ -1,0 +1,14 @@
+{
+  "title": "API 浏览器",
+  "description": "浏览 Graylog REST API",
+  "search_placeholder": "搜索端点...",
+  "no_results": "未找到与搜索匹配的端点。",
+  "error_loading": "加载 API 浏览器时出错。",
+  "error_fetching_endpoint": "获取端点详情时出错。",
+  "endpoint_name": "端点名称",
+  "endpoint_path": "路径",
+  "endpoint_method": "方法",
+  "endpoint_description": "描述",
+  "endpoint_parameters": "参数",
+  "endpoint_response": "响应"
+}

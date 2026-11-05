@@ -14,7 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import i18n from 'i18n';
+
 import buildMongodbProfilingActionView from './buildMongodbProfilingActionView';
+
+const t = i18n.getFixedT(null, 'system');
 
 describe('buildMongodbProfilingActionView', () => {
   it('returns loading labels when profiling status is not ready', () => {
@@ -25,6 +29,7 @@ describe('buildMongodbProfilingActionView', () => {
       slowMs: undefined,
       isStatusReady: false,
       isTogglingProfiling: false,
+      t,
     });
 
     expect(view.actionLabel).toBe('Enable Profiling');
@@ -42,6 +47,7 @@ describe('buildMongodbProfilingActionView', () => {
       slowMs: 100,
       isStatusReady: true,
       isTogglingProfiling: false,
+      t,
     });
 
     expect(view.actionLabel).toBe('Enable Profiling');
@@ -61,6 +67,7 @@ describe('buildMongodbProfilingActionView', () => {
       slowMs: undefined,
       isStatusReady: true,
       isTogglingProfiling: false,
+      t,
     });
 
     expect(view.enableThresholdLabel).toBe('level 1');
@@ -74,6 +81,7 @@ describe('buildMongodbProfilingActionView', () => {
       slowMs: 100,
       isStatusReady: true,
       isTogglingProfiling: true,
+      t,
     });
 
     expect(view.actionLabel).toBe('Disable Profiling');

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import numeral from 'numeral';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Spinner } from 'components/common';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
@@ -33,32 +34,36 @@ const metricNames = {
 const metricValues = Object.values(metricNames);
 
 const NodeThroughput = ({ nodeId, longFormat = false }: Props) => {
+  const { t } = useTranslation('system');
   const { data: nodeMetrics, isLoading } = useNodeMetrics(nodeId, metricValues);
 
   if (isLoading || !nodeMetrics) {
-    return <Spinner text="Loading throughput..." />;
+    return <Spinner text={t('node_throughput.loading')} />;
   }
 
   const metrics = MetricsExtractor.getValuesForNode(nodeMetrics, metricNames);
 
   if (Object.keys(metrics).length === 0) {
-    return <span>Unable to load throughput.</span>;
+    return <span>{t('node_throughput.unable_to_load')}</span>;
   }
+
+  const totalIn = numeral(metrics.totalIn).format('0,0');
+  const totalOut = numeral(metrics.totalOut).format('0,0');
 
   if (longFormat) {
     return (
       <span>
-        Processing <strong>{numeral(metrics.totalIn).format('0,0')}</strong> incoming and{' '}
-        <strong>{numeral(metrics.totalOut).format('0,0')}</strong> outgoing msg/s.
+        <Trans
+          t={t}
+          i18nKey="node_throughput.processing_long"
+          values={{ totalIn, totalOut }}
+          components={{ strong: <strong /> }}
+        />
       </span>
     );
   }
 
-  return (
-    <span>
-      In {numeral(metrics.totalIn).format('0,0')} / Out {numeral(metrics.totalOut).format('0,0')} msg/s.
-    </span>
-  );
+  return <span>{t('node_throughput.short', { totalIn, totalOut })}</span>;
 };
 
 export default NodeThroughput;

@@ -17,7 +17,9 @@
 
 import React, { useMemo, useCallback } from 'react';
 import { Formik, Form } from 'formik';
+import { useTranslation } from 'react-i18next';
 
+import i18n from 'i18n';
 import type { Stream } from 'logic/streams/types';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { FormikInput, ModalSubmit, InputOptionalInfo } from 'components/common';
@@ -44,11 +46,11 @@ const validate = (values: FormValues) => {
   let errors = {};
 
   if (!values.title) {
-    errors = { ...errors, title: 'Title is required' };
+    errors = { ...errors, title: i18n.t('stream_modal.title_required', { ns: 'streams' }) };
   }
 
   if (!values.index_set_id) {
-    errors = { ...errors, index_set_id: 'Index set is required' };
+    errors = { ...errors, index_set_id: i18n.t('stream_modal.index_set_required', { ns: 'streams' }) };
   }
 
   return errors;
@@ -80,6 +82,7 @@ const StreamModal = ({
   indexSets,
   isNew = false,
 }: Props) => {
+  const { t } = useTranslation('streams');
   const _initialValues = useMemo(() => prepareInitialValues(initialValues, indexSets), [indexSets, initialValues]);
 
   const _onSubmit = useCallback((values: FormValues) => onSubmit(values).then(() => onClose()), [onClose, onSubmit]);
@@ -93,30 +96,33 @@ const StreamModal = ({
               <Modal.Title>{modalTitle}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              <FormikInput label="Title" name="title" id="title" help="A descriptive name of the new stream" />
+              <FormikInput
+                label={t('stream_modal.title')}
+                name="title"
+                id="title"
+                help={t('stream_modal.title_help')}
+              />
               <FormikInput
                 label={
                   <>
-                    Description <InputOptionalInfo />
+                    {t('stream_modal.description')} <InputOptionalInfo />
                   </>
                 }
                 name="description"
                 id="description"
-                help="What kind of messages are routed into this stream?"
+                help={t('stream_modal.description_help')}
               />
               <IndexSetSelect indexSets={indexSets} />
               <FormikInput
-                label={<>Remove matches from &lsquo;Default Stream&rsquo;</>}
-                help={
-                  <span>Don&apos;t assign messages that match this stream to the &lsquo;Default Stream&rsquo;.</span>
-                }
+                label={t('stream_modal.remove_matches_label')}
+                help={<span>{t('stream_modal.remove_matches_help')}</span>}
                 name="remove_matches_from_default_stream"
                 id="remove_matches_from_default_stream"
                 type="checkbox"
               />
               {isNew && (
                 <EntityCreateShareFormGroup
-                  description="Search for a User or Team to add as collaborator on this stream."
+                  description={t('stream_modal.share_description')}
                   entityType="stream"
                   entityTitle=""
                   onSetEntityShare={(payload) => setFieldValue('share_request', payload)}

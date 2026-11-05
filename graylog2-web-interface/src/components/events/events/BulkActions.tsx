@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import MenuItem from 'components/bootstrap/menuitem/MenuItem';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
@@ -28,6 +29,7 @@ type Props = {
 };
 
 const BulkActions = ({ selectedEntitiesData }: Props) => {
+  const { t } = useTranslation('events');
   const events = Object.values(selectedEntitiesData);
   const { actions, pluggableActionModals } = useEventBulkActions(events);
   const { isPermitted } = usePermissions();
@@ -40,7 +42,9 @@ const BulkActions = ({ selectedEntitiesData }: Props) => {
   return (
     <>
       <BulkActionsDropdown>
-        {replayableEvents.length > 0 && <MenuItem onClick={onReplaySearchClick}>Replay Search</MenuItem>}
+        {replayableEvents.length > 0 && (
+          <MenuItem onClick={onReplaySearchClick}>{t('alerts_list.bulk_replay_search')}</MenuItem>
+        )}
         {actions}
       </BulkActionsDropdown>
       {pluggableActionModals}

@@ -17,6 +17,7 @@
 import * as React from 'react';
 import type * as Immutable from 'immutable';
 import type { FormikProps } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import type { WizardSubmitPayload } from 'logic/authentication/directoryServices/types';
 import type Role from 'logic/roles/Role';
@@ -26,6 +27,25 @@ import ServerConfigStep, { STEP_KEY as SERVER_CONFIG_KEY } from './ServerConfigS
 import UserSyncStep, { STEP_KEY as USER_SYNC_KEY } from './UserSyncStep';
 import GroupSyncStep, { STEP_KEY as GROUP_SYNC_KEY } from './GroupSyncStep';
 import StepTitleWarning from './StepTitleWarning';
+
+const StepTitle = ({
+  invalidStepKeys,
+  stepKey,
+  titleKey,
+}: {
+  invalidStepKeys: Array<string>;
+  stepKey: string;
+  titleKey: string;
+}) => {
+  const { t } = useTranslation('authentication');
+
+  return (
+    <>
+      <StepTitleWarning invalidStepKeys={invalidStepKeys} stepKey={stepKey} />
+      {t(titleKey)}
+    </>
+  );
+};
 
 type Props = {
   formRefs: Record<
@@ -56,10 +76,7 @@ const wizardSteps = ({
   {
     key: SERVER_CONFIG_KEY,
     title: (
-      <>
-        <StepTitleWarning invalidStepKeys={invalidStepKeys} stepKey={SERVER_CONFIG_KEY} />
-        Server Configuration
-      </>
+      <StepTitle invalidStepKeys={invalidStepKeys} stepKey={SERVER_CONFIG_KEY} titleKey="wizard.steps.server_config" />
     ),
     component: (
       <ServerConfigStep
@@ -74,12 +91,7 @@ const wizardSteps = ({
   },
   {
     key: USER_SYNC_KEY,
-    title: (
-      <>
-        <StepTitleWarning invalidStepKeys={invalidStepKeys} stepKey={USER_SYNC_KEY} />
-        User Synchronization
-      </>
-    ),
+    title: <StepTitle invalidStepKeys={invalidStepKeys} stepKey={USER_SYNC_KEY} titleKey="wizard.steps.user_sync" />,
     component: (
       <UserSyncStep
         formRef={formRefs[USER_SYNC_KEY]}
@@ -95,12 +107,7 @@ const wizardSteps = ({
   },
   {
     key: GROUP_SYNC_KEY,
-    title: (
-      <>
-        <StepTitleWarning invalidStepKeys={invalidStepKeys} stepKey={GROUP_SYNC_KEY} />
-        Group Synchronization (Opt.)
-      </>
-    ),
+    title: <StepTitle invalidStepKeys={invalidStepKeys} stepKey={GROUP_SYNC_KEY} titleKey="wizard.steps.group_sync" />,
     component: (
       <GroupSyncStep
         formRef={formRefs[GROUP_SYNC_KEY]}

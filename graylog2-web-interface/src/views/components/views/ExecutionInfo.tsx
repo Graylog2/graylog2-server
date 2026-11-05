@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import numeral from 'numeral';
+import { useTranslation } from 'react-i18next';
 
 import { Timestamp } from 'components/common';
 
@@ -28,14 +29,17 @@ type Props = {
 };
 
 const ExecutionInfo = ({ duration, executedAt, total = undefined, showTotal = true, executionFinished }: Props) => {
+  const { t } = useTranslation('search');
+
   if (!executionFinished) {
-    return <i>No query executed yet.</i>;
+    return <i>{t('execution_info.no_query')}</i>;
   }
 
   return (
     <i>
-      Query executed in {numeral(duration).format('0,0')}ms at <Timestamp dateTime={executedAt} />{' '}
-      {showTotal && <>Total results: {numeral(total).format('0,0')}</>}
+      {t('execution_info.query_executed', { duration: numeral(duration).format('0,0') })}{' '}
+      <Timestamp dateTime={executedAt} />{' '}
+      {showTotal && t('execution_info.total_results', { total: numeral(total).format('0,0') })}
     </i>
   );
 };

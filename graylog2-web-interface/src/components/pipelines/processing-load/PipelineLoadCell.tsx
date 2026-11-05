@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Tooltip } from 'components/common';
 
@@ -23,15 +24,17 @@ type Props = {
   error?: boolean;
 };
 
-const ERROR_TOOLTIP = 'Pipeline Load is unavailable: failed to load processing-load metrics.';
-
 const formatLoadPercent = (loadPercent: number) => `${loadPercent.toFixed(2)}%`;
 
 const PipelineLoadCell = ({ loadPercent, error = false }: Props) => {
+  const { t } = useTranslation('pipelines');
+
   if (error) {
+    const errorTooltip = t('load_cell.error_tooltip');
+
     return (
-      <Tooltip label={ERROR_TOOLTIP}>
-        <span aria-label={ERROR_TOOLTIP}>—</span>
+      <Tooltip label={errorTooltip}>
+        <span aria-label={errorTooltip}>—</span>
       </Tooltip>
     );
   }

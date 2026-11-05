@@ -27,7 +27,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -37,6 +36,7 @@ import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 
@@ -105,7 +105,7 @@ public class TelemetryResource extends RestResource {
     private User getCurrentUserOrThrow() {
         User currentUser = getCurrentUser();
         if (currentUser == null) {
-            throw new NotFoundException("Couldn't find current user!");
+            throw new CodedNotFoundException("telemetry.couldnt_find_current_user", "Couldn't find current user!");
         }
         return currentUser;
     }

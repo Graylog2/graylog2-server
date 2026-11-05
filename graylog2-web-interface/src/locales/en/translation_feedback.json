@@ -1,0 +1,81 @@
+{
+  "menu": {
+    "report": "Report translation…",
+    "native_menu_hint": "Shift + right-click opens the browser menu"
+  },
+  "modal": {
+    "title": "Report translation",
+    "text": "Text",
+    "text_help": "The text as shown on the page. Shorten it to the part that needs attention.",
+    "key": "Translation",
+    "partial_match": "partial match",
+    "not_translated": "not translated",
+    "none_of_these": "None of these",
+    "no_key_found": "No translation found, the text is probably not translated yet.",
+    "english": "English original:",
+    "current_translation": "Current translation:",
+    "category": "Problem",
+    "suggestion": "Suggested translation",
+    "suggestion_help": "Optional. How the text should read.",
+    "comment": "Comment",
+    "submit": "Report",
+    "submitting": "Reporting…"
+  },
+  "categories": {
+    "wrong": "Wrong translation",
+    "untranslated": "Not translated",
+    "awkward": "Awkward wording",
+    "layout": "Layout broken or text cut off",
+    "other": "Other"
+  },
+  "statuses": {
+    "open": "Open",
+    "fixed": "Fixed",
+    "wont_fix": "Won't fix"
+  },
+  "list": {
+    "human_name": "translation reports",
+    "search_placeholder": "Search translation reports",
+    "no_key": "No key",
+    "download_json": "Download JSON",
+    "download_csv": "Download CSV"
+  },
+  "actions": {
+    "mark_fixed": "Mark fixed",
+    "reopen": "Reopen",
+    "mark_wont_fix": "Won't fix",
+    "confirm_delete": "Do you really want to delete the report for \"{{text}}\"?"
+  },
+  "page": {
+    "title": "Translation Feedback",
+    "description": "Reports about the translations of the interface. Right-click any text to report it."
+  },
+  "notifications": {
+    "created": "Thank you! Your report was saved.",
+    "created_title": "Translation reported",
+    "create_failed": "Saving the report failed: {{error}}",
+    "create_failed_title": "Could not report translation",
+    "update_failed": "Updating the report failed: {{error}}",
+    "update_failed_title": "Could not update report"
+  },
+  "bulk": {
+    "delete": "Delete",
+    "changed_one": "{{count}} report changed.",
+    "changed_other": "{{count}} reports changed.",
+    "confirm_delete_one": "Do you really want to delete {{count}} report?",
+    "confirm_delete_other": "Do you really want to delete {{count}} reports?"
+  },
+  "upload": {
+    "button": "Upload resolutions",
+    "uploading": "Uploading…",
+    "help": "Upload a resolutions file to set the status and a note for the reporter of several reports at once.",
+    "failed": "Applying the resolutions failed: {{error}}",
+    "failed_title": "Could not apply resolutions",
+    "invalid_file": "The file does not contain a list of resolutions.",
+    "applied_title": "Resolutions applied",
+    "applied_one": "{{count}} report updated.",
+    "applied_other": "{{count}} reports updated.",
+    "applied_with_missing_one": "{{count}} report updated, {{notFound}} not found.",
+    "applied_with_missing_other": "{{count}} reports updated, {{notFound}} not found."
+  }
+}

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { IfPermitted, LinkContainer } from 'components/common';
 import type User from 'logic/users/User';
@@ -27,26 +28,30 @@ type Props = {
   username: User['username'];
 };
 
-const UserActionLinks = ({ userId, userIsReadOnly, username }: Props) => (
-  <ButtonToolbar>
-    <IfPermitted permissions={`users:edit:${username}`}>
-      <LinkContainer to={Routes.SYSTEM.USERS.show(userId)}>
-        <Button>View Details</Button>
-      </LinkContainer>
-    </IfPermitted>
-    {!userIsReadOnly && (
+const UserActionLinks = ({ userId, userIsReadOnly, username }: Props) => {
+  const { t } = useTranslation('users');
+
+  return (
+    <ButtonToolbar>
       <IfPermitted permissions={`users:edit:${username}`}>
-        <LinkContainer to={Routes.SYSTEM.USERS.edit(userId)}>
-          <Button bsStyle="primary">Edit User</Button>
+        <LinkContainer to={Routes.SYSTEM.USERS.show(userId)}>
+          <Button>{t('user_navigation.view_details')}</Button>
         </LinkContainer>
       </IfPermitted>
-    )}
-    <IfPermitted permissions={[`users:tokenlist:${username}`]}>
-      <LinkContainer to={Routes.SYSTEM.USERS.TOKENS.edit(userId)}>
-        <Button bsStyle="primary">Edit Tokens</Button>
-      </LinkContainer>
-    </IfPermitted>
-  </ButtonToolbar>
-);
+      {!userIsReadOnly && (
+        <IfPermitted permissions={`users:edit:${username}`}>
+          <LinkContainer to={Routes.SYSTEM.USERS.edit(userId)}>
+            <Button bsStyle="primary">{t('user_navigation.edit_user')}</Button>
+          </LinkContainer>
+        </IfPermitted>
+      )}
+      <IfPermitted permissions={[`users:tokenlist:${username}`]}>
+        <LinkContainer to={Routes.SYSTEM.USERS.TOKENS.edit(userId)}>
+          <Button bsStyle="primary">{t('user_navigation.edit_tokens')}</Button>
+        </LinkContainer>
+      </IfPermitted>
+    </ButtonToolbar>
+  );
+};
 
 export default UserActionLinks;

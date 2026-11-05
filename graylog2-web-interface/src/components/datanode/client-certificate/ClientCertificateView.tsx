@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import type { ClientCertCreateResponse } from 'components/datanode/hooks/useCreateDataNodeClientCert';
 import copyToClipboard from 'util/copyToClipboard';
@@ -43,40 +44,44 @@ const Textarea = styled.textarea(
   `,
 );
 
-const ClientCertificateView = ({ clientCerts }: Props) => (
-  <>
-    <dt>Principal:</dt>
-    <dd>{clientCerts.principal}</dd>
-    <dt>Role:</dt>
-    <dd>{clientCerts.role}</dd>
-    <dt>
-      CA certificate{' '}
-      <Button bsStyle="info" bsSize="xs" onClick={() => copyToClipboard(clientCerts.ca_certificate)}>
-        Copy to clipboard
-      </Button>
-    </dt>
-    <dd>
-      <Textarea id="ca_certificate" value={clientCerts.ca_certificate} spellCheck={false} />
-    </dd>
-    <dt>
-      Private key{' '}
-      <Button bsStyle="info" bsSize="xs" onClick={() => copyToClipboard(clientCerts.private_key)}>
-        Copy to clipboard
-      </Button>
-    </dt>
-    <dd>
-      <Textarea id="private_key" value={clientCerts.private_key} spellCheck={false} />
-    </dd>
-    <dt>
-      Certificate{' '}
-      <Button bsStyle="info" bsSize="xs" onClick={() => copyToClipboard(clientCerts.certificate)}>
-        Copy to clipboard
-      </Button>
-    </dt>
-    <dd>
-      <Textarea id="certificate" value={clientCerts.certificate} spellCheck={false} />
-    </dd>
-  </>
-);
+const ClientCertificateView = ({ clientCerts }: Props) => {
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
+
+  return (
+    <>
+      <dt>{t('client_certificate.view_principal')}</dt>
+      <dd>{clientCerts.principal}</dd>
+      <dt>{t('client_certificate.view_role')}</dt>
+      <dd>{clientCerts.role}</dd>
+      <dt>
+        {t('client_certificate.ca_certificate')}{' '}
+        <Button bsStyle="info" bsSize="xs" onClick={() => copyToClipboard(clientCerts.ca_certificate)}>
+          {t('client_certificate.copy_to_clipboard')}
+        </Button>
+      </dt>
+      <dd>
+        <Textarea id="ca_certificate" value={clientCerts.ca_certificate} spellCheck={false} />
+      </dd>
+      <dt>
+        {t('client_certificate.private_key')}{' '}
+        <Button bsStyle="info" bsSize="xs" onClick={() => copyToClipboard(clientCerts.private_key)}>
+          {t('client_certificate.copy_to_clipboard')}
+        </Button>
+      </dt>
+      <dd>
+        <Textarea id="private_key" value={clientCerts.private_key} spellCheck={false} />
+      </dd>
+      <dt>
+        {t('client_certificate.certificate')}{' '}
+        <Button bsStyle="info" bsSize="xs" onClick={() => copyToClipboard(clientCerts.certificate)}>
+          {t('client_certificate.copy_to_clipboard')}
+        </Button>
+      </dt>
+      <dd>
+        <Textarea id="certificate" value={clientCerts.certificate} spellCheck={false} />
+      </dd>
+    </>
+  );
+};
 
 export default ClientCertificateView;

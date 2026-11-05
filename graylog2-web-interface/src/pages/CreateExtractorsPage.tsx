@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import EditExtractor from 'components/extractors/EditExtractor';
@@ -37,6 +38,7 @@ type QueryParameters = {
 };
 
 const CreateExtractorsPage = () => {
+  const { t } = useTranslation('extractors');
   const params = useParams();
   const history = useHistory();
   const {
@@ -65,22 +67,19 @@ const CreateExtractorsPage = () => {
   const stringifiedExampleMessage = StringUtils.stringify(exampleMessage.fields[field]);
 
   return (
-    <DocumentTitle title={`New extractor for input ${input.title}`}>
+    <DocumentTitle title={t('pages.new_title', { title: input.title })}>
       <div>
         <PageHeader
           title={
             <span>
-              New extractor for input <em>{input.title}</em>
+              <Trans t={t} i18nKey="pages.new_header" values={{ title: input.title }} components={{ em: <em /> }} />
             </span>
           }
           documentationLink={{
-            title: 'Extractors documentation',
+            title: t('documentation_title'),
             path: DocsHelper.PAGES.EXTRACTORS,
           }}>
-          <span>
-            Extractors are applied on every message that is received by an input. Use them to extract and transform any
-            text data into fields that allow you easy filtering and analysis later on.
-          </span>
+          <span>{t('pages.description')}</span>
         </PageHeader>
         <EditExtractor
           action="create"

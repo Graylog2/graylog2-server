@@ -19,6 +19,7 @@ import { useQuery, keepPreviousData } from '@tanstack/react-query';
 
 import { QuickJump } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 import { useGetEntityRoute } from 'routing/hooks/useShowRouteForEntity';
 import useNavItems from 'components/quick-jump/hooks/useNavItems';
@@ -94,8 +95,8 @@ const useQuickJumpSearch = (searchQuery: string) => {
             compareSearchItems,
           );
         })(),
-        'Fetch Entities Search Results failed with status',
-        'Could not Fetch Entity Search Results.',
+        i18n.t('notifications.quick_jump_failed', { ns: 'common' }),
+        i18n.t('notifications.quick_jump_failed_title', { ns: 'common' }),
       ),
     placeholderData: keepPreviousData,
     refetchOnMount: 'always',

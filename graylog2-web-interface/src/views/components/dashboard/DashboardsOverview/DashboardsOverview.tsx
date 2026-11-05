@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import QueryHelper from 'components/common/QueryHelper';
 import type View from 'views/logic/views/View';
@@ -37,6 +38,7 @@ type Props = {
 };
 
 const DashboardsOverview = ({ hideAdditionalColumns = false, hideShare = false, hideDelete = false }: Props) => {
+  const { t } = useTranslation('dashboards');
   const { pluggableColumnRenderers, pluggableAttributes, pluggableExpandedSections } =
     usePluggableEntityTableElements<View>(null, 'dashboard');
   const { getDefaultLayout, additionalAttributes } = getDashboardTableElements(pluggableAttributes);
@@ -61,7 +63,7 @@ const DashboardsOverview = ({ hideAdditionalColumns = false, hideShare = false, 
 
   return (
     <PaginatedEntityTable<View>
-      humanName="dashboards"
+      humanName={t('human_name')}
       queryHelpComponent={
         <QueryHelper entityName="dashboard" commonFields={['id', 'title', 'description', 'summary']} />
       }

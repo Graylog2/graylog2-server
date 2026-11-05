@@ -15,11 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { FormikFormGroup } from 'components/common';
 
-const LastNameFormGroup = () => (
-  <FormikFormGroup label="Last Name" name="last_name" maxLength={200} required help="The user's last name." />
-);
+const LastNameFormGroup = () => {
+  const { t } = useTranslation('users');
+
+  return (
+    <FormikFormGroup
+      label={t('user_fields.last_name')}
+      name="last_name"
+      maxLength={200}
+      required
+      help={t('user_form.last_name_help')}
+    />
+  );
+};
 
 export default LastNameFormGroup;

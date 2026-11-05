@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';
 import type { MigrationStepComponentProps } from 'components/datanode/Types';
@@ -25,10 +26,11 @@ import MigrationDatanodeList from 'components/datanode/migrations/MigrationDatan
 import { Alert } from 'components/bootstrap';
 
 const CertificatesProvisioning = ({ currentStep, onTriggerStep, hideActions }: MigrationStepComponentProps) => {
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const { currentStep: step, isLoading } = useMigrationState({ refetchInterval: 3000 });
 
   if (isLoading) {
-    return <Spinner text="Loading migration state." />;
+    return <Spinner text={t('certificates_provisioning.loading')} />;
   }
 
   const isProvisioningOverview = step.state === MIGRATION_STATE.PROVISION_ROLLING_UPGRADE_NODES_WITH_CERTIFICATES.key;
@@ -39,13 +41,15 @@ const CertificatesProvisioning = ({ currentStep, onTriggerStep, hideActions }: M
     <>
       {isProvisioningOverview && (
         <p>
-          Certificate authority has been configured successfully.
+          {t('certificates_provisioning.ca_configured')}
           <br />
-          You can now provision certificate for your Data Nodes.
+          {t('certificates_provisioning.provision_now')}
         </p>
       )}
-      {isProvisioningRunning && !haveNextStep && <Spinner text="Provisioning certificate" />}
-      {isProvisioningRunning && haveNextStep && <Alert bsStyle="success">Provisioning the Data Node finished.</Alert>}
+      {isProvisioningRunning && !haveNextStep && <Spinner text={t('certificates_provisioning.provisioning')} />}
+      {isProvisioningRunning && haveNextStep && (
+        <Alert bsStyle="success">{t('certificates_provisioning.finished')}</Alert>
+      )}
       <MigrationDatanodeList />
       <br />
       <MigrationStepTriggerButtonToolbar

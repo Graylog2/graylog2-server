@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useMemo } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import countBy from 'lodash/countBy';
 import intersection from 'lodash/intersection';
 import uniq from 'lodash/uniq';
@@ -56,6 +57,7 @@ const CollectorConfigurationModalContainer = ({
   onCancel,
   onSubmitConfigurationModal,
 }: Props) => {
+  const { t } = useTranslation('sidecars');
   const [nextAssignedConfigurations, setNextAssignedConfigurations] = useState<string[]>([]);
   const [nextPartiallyAssignedConfigurations, setNextPartiallyAssignedConfigurations] = useState<string[]>([]);
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
@@ -187,18 +189,25 @@ const CollectorConfigurationModalContainer = ({
 
   const renderConfigurationSummary = () => {
     const sidecarsSummary = selectedSidecarCollectorPairs.map(({ sidecar }) => sidecar.node_name).join(', ');
-    const numberOfSidecarsSummary = `${selectedSidecarCollectorPairs.length} sidecars`;
+    const numberOfSidecarsSummary = t('administration.configuration_summary.sidecars_summary', {
+      count: selectedSidecarCollectorPairs.length,
+    });
     const summary = selectedSidecarCollectorPairs.length <= 5 ? sidecarsSummary : numberOfSidecarsSummary;
 
     return (
       <BootstrapModalConfirm
         showModal={showConfirmModal}
-        title="Configuration summary"
+        title={t('administration.configuration_summary.title')}
         onConfirm={confirmConfigurationChange}
         onCancel={cancelConfigurationChange}>
         <ConfigurationSummary>
           <p>
-            Are you sure you want to proceed with this action for <b>{summary}</b>?
+            <Trans
+              t={t}
+              i18nKey="administration.configuration_summary.confirm"
+              values={{ summary }}
+              components={{ summaryText: <b /> }}
+            />
           </p>
         </ConfigurationSummary>
       </BootstrapModalConfirm>

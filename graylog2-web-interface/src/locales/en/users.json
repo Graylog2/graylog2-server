@@ -1,0 +1,499 @@
+{
+  "users_overview": {
+    "title": "Users Overview",
+    "documentation_link_title": "Permissions documentation",
+    "description": "Overview of all registered users."
+  },
+  "user_create": {
+    "title": "Create New User",
+    "documentation_link_title": "Permissions documentation",
+    "description": "Use this page to create new users for the web interface or the REST API.",
+    "submit_button": "Create user",
+    "reader_role_description": "Grants basic permissions for every {{productName}} user (built-in)",
+    "role_required": "You need to select at least one of the <em>Reader</em> or <em>Admin</em> roles.",
+    "failed_title": "Failed to create user",
+    "submit": "Create user",
+    "submitting": "Creating user..."
+  },
+  "user_edit": {
+    "title": "Edit User {{username}}",
+    "title_prefix": "Edit User",
+    "documentation_link_title": "Permissions documentation",
+    "description": "You can change the user details and password here and assign roles and teams.",
+    "segments": {
+      "profile": "Profile",
+      "preferences": "Preferences",
+      "teams_roles": "Teams & Roles",
+      "shared_entities": "Shared Entities"
+    },
+    "password": {
+      "new_password": "New Password",
+      "repeat_password": "Repeat Password",
+      "old_password": "Old Password",
+      "alert_title": "Changing the Password",
+      "alert_text": "Changing the password will log the user out and will invalidate all their current sessions. If you are changing your own password, you will be logged out right after saving. In that case, make sure to save any pending changes first.",
+      "change": "Change Password"
+    },
+    "profile": {
+      "email": "Email",
+      "full_name": "Full Name",
+      "update": "Update Profile"
+    },
+    "profile_info": {
+      "title": "First and Last Name",
+      "text": "With {{productName}} 4.1, we've added distinct first and last name fields. These must be provided before the user’s profile can be saved."
+    },
+    "read_only": "The selected user {{fullName}} can't be edited.",
+    "roles_required": "Roles must at least contain Admin or Reader role.",
+    "external": {
+      "title": "External User",
+      "text": "This user was synced from an external server, therefore neither the profile nor the password can be changed. Please contact your administrator for more information."
+    },
+    "preferences": {
+      "language_help": "Language of the {{productName}} interface. Translations marked Beta have not been reviewed yet.",
+      "enable_autocompletion": "Enable autocompletion",
+      "search_sidebar": "Search sidebar",
+      "dashboard_sidebar": "Dashboard sidebar",
+      "is_pinned": "Is pinned",
+      "search_sidebar_help": "Can also be changed by using the search sidebar pin icon",
+      "dashboard_sidebar_help": "Can also be changed by using the dashboard sidebar pin icon",
+      "theme_mode_help": "Can be changed by using the toggle in the user dropdown",
+      "update": "Update Preferences"
+    },
+    "settings": {
+      "select_entity": "Please select an entity.",
+      "update": "Update Settings"
+    }
+  },
+  "roles_overview": {
+    "title": "Roles Overview",
+    "documentation_link_title": "Permissions documentation",
+    "button_text": "Roles Overview",
+    "description": "Overview of all roles available in {{productName}}. Roles allow granting capabilities to users, like creating dashboards or event definitions.",
+    "alert_title": "Granting Permissions",
+    "alert_body_prefix": "The built-in roles allow granting capabilities to users, like creating dashboards or viewing the archive catalog. But they do not grant permissions for a specific dashboard or stream. It is also not possible to create an own role. Granting permissions for a specific entity can be done by using its ",
+    "share_text": "Share",
+    "alert_body_suffix": " button. You can find the button e.g. on the entities overview page. If you want to grant permissions for an entity to multiple users at once, you can use teams. Learn more in the ",
+    "documentation_text": "documentation"
+  },
+  "role_details": {
+    "title": "Role Details {{name}}",
+    "title_prefix": "Role Details",
+    "documentation_link_title": "Permissions documentation",
+    "button_text": "Roles Overview",
+    "description": "Overview of details like name, description and assigned users."
+  },
+  "role_edit": {
+    "title": "Edit Role {{name}}",
+    "title_prefix": "Edit Role",
+    "documentation_link_title": "Permissions documentation",
+    "button_text": "Roles Overview",
+    "description": "You can assign the role to users."
+  },
+  "user_tokens_edit": {
+    "title": "Edit Tokens Of User {{username}}",
+    "title_prefix": "Edit Tokens Of User",
+    "documentation_link_title": "Permissions documentation",
+    "description": "You can create new tokens or delete old ones."
+  },
+  "token_management": {
+    "title": "Token Management",
+    "documentation_link_title": "Permissions documentation",
+    "description": "Access tokens overview configured for {{productName}}."
+  },
+  "token_list": {
+    "title": "Create And Edit Tokens",
+    "token_created": "Token {{name}} created!",
+    "token_created_description": "This is your new token. Make sure to copy it now, you will not be able to see it again.",
+    "done_button": "Done",
+    "title_list": "Tokens",
+    "filter_label": "Filter",
+    "no_tokens_to_display": "No tokens to display.",
+    "no_tokens_match_filter": "No tokens match the filter.",
+    "column_name": "Token Name",
+    "column_created": "Created",
+    "column_last_access": "Last Access",
+    "column_expires_at": "Expires At",
+    "column_actions": "Actions",
+    "never_used": "Never used"
+  },
+  "permissions": {
+    "grantee_types": {
+      "user": "User",
+      "team": "Team",
+      "global": "Everyone",
+      "error": "Error"
+    },
+    "dependencies_warning": {
+      "title": "There are missing dependencies for the current set of collaborators",
+      "needs_access": "{{type}} <granteeTitle>{{title}}</granteeTitle> needs access to",
+      "dependency": "{{type}}: <dependencyTitle>{{title}}</dependencyTitle>",
+      "owners": "Owners:",
+      "owner": "{{type}} <ownerTitle>{{title}}</ownerTitle>"
+    },
+    "share": {
+      "add_collaborator": "Add Collaborator",
+      "search_placeholder": "Search for users and teams",
+      "collaborators": "Collaborators",
+      "direct_collaborators": "Direct Collaborators",
+      "shared_via_collections": "Shared via Collections",
+      "update_sharing": "Update sharing",
+      "modal_title": "Sharing {{entityType}}: <entityTitle>{{entityTitle}}</entityTitle>",
+      "confirm_not_added_named": "\"{{title}}\" got selected but was never added as a collaborator. Do you want to continue anyway?",
+      "confirm_not_added_unnamed": "An entity (name not found) got selected but was never added as a collaborator. Do you want to continue anyway?"
+    },
+    "grantees": {
+      "change_capability": "Change the capability for {{title}}",
+      "remove_sharing": "Remove sharing for {{title}}",
+      "no_collaborators": "This {{entityType}} has no collaborators."
+    },
+    "roles_selector": {
+      "search_placeholder": "Search for roles",
+      "assign_role": "Assign Role"
+    },
+    "shareable_url": {
+      "copy_title": "Copy parameter to clipboard",
+      "hint": "You or anyone authorized to view can access this link."
+    },
+    "shared_entities": {
+      "entity_type": "Entity Type",
+      "filter_entity_types": "Filter entity types",
+      "capability": "Capability",
+      "filter_capabilities": "Filter capabilities",
+      "found": "Found {{total}} entities which are shared with the {{entityType}}.",
+      "no_results": "No shared entities have been found.",
+      "headers": {
+        "entity_name": "Entity Name",
+        "entity_type": "Entity Type",
+        "owner": "Owner",
+        "capability": "Capability"
+      },
+      "query_example": "Find shared entities with a title containing security:"
+    },
+    "sharing_disabled": {
+      "title": "Sharing not possible",
+      "owners_only": "Only owners of this {{type}} are allowed to share it."
+    },
+    "validation_error": {
+      "ownerless": "Removing the following owners will leave the entity ownerless:"
+    },
+    "capabilities": {
+      "viewer": "Viewer",
+      "manager": "Manager",
+      "owner": "Owner"
+    },
+    "select_capability": "Select a capability"
+  },
+  "roles": {
+    "profile": {
+      "title": "Profile",
+      "name": "Name",
+      "description": "Description"
+    },
+    "teams": "Teams",
+    "users": {
+      "title": "Users",
+      "none_selected": "No selected users have been found.",
+      "assign_users": "Assign Users",
+      "selected_users": "Selected Users",
+      "needs_reader_or_admin": "User '{{name}}' needs at least a Reader or Admin role."
+    },
+    "users_selector": {
+      "search_placeholder": "Search for users",
+      "assign_user": "Assign User"
+    },
+    "actions": {
+      "edit_role_title": "Edit role {{name}}",
+      "delete_role_title": "Delete role {{name}}",
+      "edit": "Edit",
+      "deleting": "Deleting",
+      "delete": "Delete",
+      "confirm_delete": "Do you really want to delete role \"{{name}}\"?",
+      "still_assigned": "It is still assigned to {{count}} users."
+    },
+    "overview": {
+      "title": "Roles",
+      "found": "Found {{total}} roles on the system.",
+      "none_found": "No roles have been found."
+    },
+    "query_example": "Find role with a name containing manager:",
+    "navigation": {
+      "view_details": "View Details",
+      "edit_role": "Edit Role"
+    }
+  },
+  "security_teaser": {
+    "overview": {
+      "hotspot_0": "Quickly find your most critical security info in the Overview tab.",
+      "hotspot_1": "Find high alerts, top event sources, and more that give you insight into your security posture.",
+      "hotspot_2": "Hover these tool tips throughout this page to learn more about features of {{productName}} Security",
+      "title": "Overview"
+    },
+    "anomalies": {
+      "hotspot_0": "Get a summary of the anomalies that are running, how many have been detected, and how that compares to the previous time period.",
+      "hotspot_1": "Confidence intervals tell you how far off the normal the behavior is.",
+      "hotspot_2": "There are detectors for different types of anomalies – quickly see which ones are generating alerts.",
+      "hotspot_3": "Identify user accounts that have unusual-for-them behaviors for logons or security events.",
+      "title": "Anomalies"
+    },
+    "host_activity": {
+      "hotspot_0": "Get a top-level view of your high, medium, and low alert counts with trending information to know if this is a normal day at the office . . . or not.",
+      "hotspot_1": "Immediately identify which hosts are generating the high alerts, to shrink MTTR.",
+      "hotspot_2": "See which tech is generating the most log-ons.",
+      "hotspot_3": "Initiate an investigation when identity and access control changes come from unexpected machines.",
+      "hotspot_4": "Message counts by event source give you a daily view of regular patterns in data, spikes outside the norm will trigger investigations as to why.",
+      "title": "Host activity"
+    },
+    "network_activity": {
+      "hotspot_0": "Instantly see spikes in data flows across your network.",
+      "hotspot_1": "Quickly see where the data is coming from and where it is going.",
+      "hotspot_2": "Identify which users are sending the most amount of data across the network.",
+      "hotspot_3": "Determine if there is an unusual pattern in DNS query results like a particular error code suddenly showing up in the Top 15 list. ",
+      "hotspot_4": "The top 15 platforms generating DNS requests by event source.",
+      "title": "Network activity"
+    },
+    "user_activity": {
+      "hotspot_0": "Quickly see if you have concerning trends in failed logons.",
+      "hotspot_1": "Logon successes and failures by user can help you spot problem accounts and unusual activity.",
+      "hotspot_2": "These are the top 15 user accounts generating high alerts!",
+      "hotspot_3": "What are the most common identity and access control changes made in your environment?",
+      "hotspot_4": "Know the target of the most frequent access control changes.",
+      "title": "User activity"
+    },
+    "demo": {
+      "items": {
+        "anomaly_detection_ai": "Anomaly Detection AI",
+        "cloud_option": "Cloud Option",
+        "archiving": "Archiving",
+        "audit_logs_cloud": "Audit Logs for {{productName}} Cloud",
+        "dynamic_lookup_tables": "Dynamic Lookup Tables",
+        "advanced_alerting": "Advanced Alerting With Scripting",
+        "compliance_reporting": "Compliance Reporting",
+        "correlation_aggregation": "Correlation & Aggregation Events",
+        "threat_intel": "Threat Intel Integrations",
+        "incident_workspaces": "Incident Investigation Workspaces",
+        "prebuilt_parser_dashboards": "Pre-built Security Parser & Dashboards",
+        "sigma_rules": "Sigma Rules",
+        "parameterized_dashboards": "Parameterized Dashboarding",
+        "input_output_integrations": "Input & Output Integrations",
+        "threat_management": "Threat Management",
+        "search_workflow": "Search Workflow, Templates & Filters",
+        "soar_integrations": "SOAR Integrations"
+      },
+      "title": "Security Demo",
+      "banner_text": "For more information and booking a full demo of the product visit {{productName}} website.",
+      "button": "{{productName}} Security",
+      "overview": "OVERVIEW",
+      "description": "{{productName}} Security is designed to revolutionize cybersecurity for IT teams, offering the combined capabilities of SIEM, Security Analytics, Incident investigation, and Anomaly Detection. By using our platform, you can work more efficiently, tackling critical tasks quicker, and mitigating risk caused by malicious actors and credential-based attacks."
+    }
+  },
+  "user_fields": {
+    "username": "Username",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "full_name": "Full name",
+    "email": "Email Address",
+    "password": "Password",
+    "repeat_password": "Repeat password",
+    "time_zone": "Time Zone",
+    "sessions_timeout": "Sessions Timeout",
+    "profile": "Profile",
+    "settings": "Settings",
+    "roles": "Roles",
+    "assign_roles": "Assign Roles",
+    "selected_roles": "Selected Roles",
+    "teams": "Teams"
+  },
+  "user_form": {
+    "first_name_help": "The user's first name.",
+    "last_name_help": "The user's last name.",
+    "email_help": "The user's email address.",
+    "username_help": "Select a unique user name used to log in with.",
+    "username_taken": "Username is already taken",
+    "passwords_mismatch": "Passwords do not match",
+    "time_zone_help": "Choose your local time zone or leave it as it is to use the browser's default.",
+    "service_account": "Service Account",
+    "service_account_label": "User is a Service Account",
+    "service_account_help": "When checked, the user becomes a Service Account and will be unable to log into the web interface and edit their settings. (e.g., API tokens)",
+    "service_account_confirm_title": "Are you sure?",
+    "service_account_confirm": "Changing this user to a Service Account prevents the user from logging into the web interface and editing their settings. (e.g., API tokens) Do you wish to proceed?",
+    "global_timeout_message": "User session timeout is not editable because the <timeoutLink>global session timeout</timeoutLink> is enabled."
+  },
+  "token_form": {
+    "token_name": "Token Name",
+    "placeholder": "What is this token for?",
+    "ttl_label": "Token TTL",
+    "ttl_invalid": "invalid (min: 1 minute)",
+    "creating": "Creating...",
+    "create": "Create Token",
+    "ttl_help": "TTL Syntax Examples: for 60 seconds: PT60S, for 60 minutes: PT60M, for 24 hours: PT24H, for 30 days: P30D"
+  },
+  "permissions_info": {
+    "title": "Granting Permissions",
+    "text": "Granting permissions for an entity like streams and dashboards can be configured using the <shareLabel>Share</shareLabel> button of an entity. You can find the button e.g. on the entities overview page. Learn more in the <docsLink>documentation</docsLink>."
+  },
+  "startpage": {
+    "label": "Start page",
+    "help": "Select the page the user sees right after log in. Only entities are selectable which the user has permissions for.",
+    "select_type": "Select type",
+    "select_value": "Select {{type, lowercase}}",
+    "entity": "entity",
+    "types": {
+      "dashboard": "Dashboard",
+      "stream": "Stream",
+      "search": "Search"
+    },
+    "new_search": "New Search",
+    "threat_coverage": "Threat Coverage",
+    "missing_permission": "User is missing permission for the configured page"
+  },
+  "timeout": {
+    "sessions_label": "Sessions Timeout",
+    "alert_title": "Changing the session timeout",
+    "alert_text": "Changing the timeout setting for sessions will log the user out and will invalidate all their current sessions. If you are changing the setting for your own user, you will be logged out at the moment of saving the setting. In that case, make sure to save any pending changes before changing the timeout.",
+    "never_label": "Sessions do not time out",
+    "never_help": "When checked, sessions never time out due to inactivity.",
+    "amount_placeholder": "Timeout amount",
+    "help": "Session automatically end after this amount of time, unless they are actively used.",
+    "unit_label": "Timeout unit",
+    "units": {
+      "seconds": "Seconds",
+      "minutes": "Minutes",
+      "hours": "Hours",
+      "days": "Days"
+    }
+  },
+  "user_details": {
+    "client_address": "Client Address",
+    "last_activity": "Last Activity",
+    "logged_in": "Logged In",
+    "enabled": "Enabled",
+    "auth_service_disabled": "Authentication service is disabled, user cannot log in",
+    "preferences": {
+      "title": "Preferences",
+      "search_autocompletion": "Search autocompletion",
+      "update_unfocused": "Update unfocused",
+      "pin_search_sidebar": "Pin search sidebar",
+      "pin_dashboard_sidebar": "Pin dashboard sidebar",
+      "theme_mode": "Theme mode",
+      "not_configured": "Not configured",
+      "language": "Language"
+    },
+    "roles_none_selected": "No selected roles have been found.",
+    "settings": {
+      "timezone": "Timezone",
+      "startpage": "Startpage",
+      "no_startpage": "No start page set",
+      "no_timeout": "Sessions do not timeout",
+      "globally_set": "(<configLink>globally set</configLink>)"
+    },
+    "shared_entities": "Shared Entities"
+  },
+  "users_list": {
+    "client_address_help": "The address of the client used to initially establish the session, not necessarily its current address.",
+    "admin": {
+      "title": "System Administrator",
+      "description": "The system administrator can only be edited in the {{productName}} configuration file."
+    },
+    "headers": {
+      "full_name": "Full name",
+      "username": "Username",
+      "email": "Email Address",
+      "client_address": "Client Address",
+      "enabled": "Enabled",
+      "role": "Role",
+      "actions": "Actions"
+    },
+    "title": "Users",
+    "found": "Found {{total}} registered users on the system.",
+    "none_found": "No users have been found.",
+    "filter_label": "Filter Users",
+    "actions": {
+      "edit_tokens_title": "Edit tokens of user {{name}}",
+      "edit_tokens": "Edit tokens",
+      "system_user_tooltip": "System users can only be modified in the server configuration file.",
+      "system_user": "System user",
+      "confirm_disable": "Do you really want to disable user {{name}}? All current sessions will be terminated.",
+      "confirm_delete": "Do you really want to delete user {{name}}?",
+      "edit_title": "Edit user {{name}}",
+      "edit": "Edit",
+      "set_status_title": "Set new account status for {{name}}",
+      "disable": "Disable",
+      "enable": "Enable",
+      "delete_title": "Delete user {{name}}"
+    },
+    "logged_in": {
+      "title": "Logged in",
+      "last_activity": "Last activity: {{activity}}",
+      "client_address": "Client address: {{address}}",
+      "not_logged_in": "Not logged in"
+    },
+    "status": {
+      "user_is": "User is {{status}}",
+      "auth_disabled": " (authentication service is disabled)",
+      "enabled": "enabled",
+      "disabled": "disabled"
+    },
+    "query_example": "Find users with a email containing example.com:",
+    "fields": {
+      "full_name": "The full name of a user",
+      "username": "The users login username.",
+      "email": "The users email."
+    },
+    "select_users": "Select user(s)..."
+  },
+  "user_navigation": {
+    "view_details": "View Details",
+    "edit_user": "Edit User",
+    "edit_tokens": "Edit Tokens"
+  },
+  "token_admin": {
+    "title": "Tokens",
+    "human_name": "tokens",
+    "fields": {
+      "username": "The username of the token owner",
+      "name": "The name of the token",
+      "created": "The date of the token creation",
+      "last_access": "The last time the token was used",
+      "external_user": "Is the token owner a user from an external authentication backend",
+      "auth_backend": "The user authentication backend. N/A for internal users"
+    },
+    "example_user": "Find tokens created by a given user:",
+    "example_name": "Find token by a given token name:",
+    "deleting_title": "Deleting token",
+    "delete_confirm": "You are about to delete the token: \"{{name}}\". Are you sure?",
+    "delete": "Delete",
+    "user_not_found": "User does not exist.",
+    "user_error_title": "Token user error",
+    "not_available": "N/A",
+    "delete_failed": "Token deletion failed: {{error}}",
+    "delete_failed_title": "Could not delete token",
+    "deleted": "Token has been successfully deleted.",
+    "deleted_title": "Success!"
+  },
+  "user_details_page": {
+    "title": "User Details",
+    "title_with_name": "User Details {{name}}",
+    "documentation_link_title": "Permissions documentation",
+    "description": "Overview of details like profile information, settings, teams and roles."
+  },
+  "password_rules": {
+    "min_length": "Password must be at least {{minLength}} characters long.",
+    "require_uppercase": "Password must contain at least one uppercase letter.",
+    "require_lowercase": "Password must contain at least one lowercase letter.",
+    "require_numbers": "Password must contain at least one number.",
+    "require_special_chars": "Password must contain at least one special character from: {{characters}}"
+  },
+  "notifications": {
+    "save_success": "User preferences successfully saved",
+    "save_failed": "Saving of preferences for \"{{userName}}\" failed with status: {{error}}",
+    "save_failed_title": "Could not save user preferences",
+    "change_success": "Your start page was changed successfully",
+    "change_failed": "Changing your start page failed with error: {{error}}",
+    "change_failed_title": "Could not change your start page"
+  },
+  "use_basic_user_notifications": {
+    "load_failed": "Loading User {{userId}} failed with status",
+    "load_failed_title": "Could not load User {{userId}}"
+  }
+}

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { StreamOutputFilterRule } from 'components/streams/StreamDetails/output-filter/Types';
 
@@ -22,13 +23,17 @@ type Props = {
   rule: StreamOutputFilterRule;
 };
 
-const FilterRuleItem = ({ rule }: Props) => (
-  <tr>
-    <td>{rule.title}</td>
-    <td>enabled</td>
-    <td>throughput</td>
-    <td>errors</td>
-  </tr>
-);
+const FilterRuleItem = ({ rule }: Props) => {
+  const { t } = useTranslation('streams');
+
+  return (
+    <tr>
+      <td>{rule.title}</td>
+      <td>{t('output_filter.item.enabled')}</td>
+      <td>{t('output_filter.item.throughput')}</td>
+      <td>{t('output_filter.item.errors')}</td>
+    </tr>
+  );
+};
 
 export default FilterRuleItem;

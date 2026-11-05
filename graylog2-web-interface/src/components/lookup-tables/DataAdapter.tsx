@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useHistory from 'routing/useHistory';
 import * as JSON from 'util/json';
@@ -36,6 +37,7 @@ type Props = {
 };
 
 const DataAdapter = ({ dataAdapter, noEdit = false }: Props) => {
+  const { t } = useTranslation('lookup_tables');
   const [lookupKey, setLookupKey] = useState('');
   const [lookupResult, setLookupResult] = useState(null);
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(dataAdapter);
@@ -64,7 +66,7 @@ const DataAdapter = ({ dataAdapter, noEdit = false }: Props) => {
   );
 
   if (!plugin) {
-    return <p>Unknown data adapter type {dataAdapter.config.type}. Is the plugin missing?</p>;
+    return <p>{t('adapter_summary.unknown_type', { type: dataAdapter.config.type })}</p>;
   }
 
   const { description: adapterDescription } = dataAdapter;
@@ -77,44 +79,44 @@ const DataAdapter = ({ dataAdapter, noEdit = false }: Props) => {
           <Label>{plugin.displayName}</Label>
           {canEdit && (
             <Button bsStyle="primary" onClick={handleEdit} role="button" name="edit_square">
-              Edit
+              {t('common:actions.edit')}
             </Button>
           )}
         </div>
         <ConfigSummaryDefinitionListWrapper>
           <dl>
-            <dt>Description</dt>
-            <dd>{adapterDescription || <em>No description.</em>}</dd>
+            <dt>{t('shared.description')}</dt>
+            <dd>{adapterDescription || <em>{t('shared.no_description')}</em>}</dd>
           </dl>
         </ConfigSummaryDefinitionListWrapper>
         <hr />
-        <h4>Configuration</h4>
+        <h4>{t('shared.configuration')}</h4>
         <ConfigSummaryDefinitionListWrapper>
           {React.createElement(summary, { dataAdapter: dataAdapter })}
         </ConfigSummaryDefinitionListWrapper>
         <hr />
-        <h3>Test lookup</h3>
-        <p>You can manually trigger the data adapter using this form. The data will be not cached.</p>
+        <h3>{t('adapter_summary.test_lookup')}</h3>
+        <p>{t('adapter_summary.test_lookup_description')}</p>
         <form onSubmit={_lookupKey}>
           <fieldset>
             <Input
               type="text"
               id="key"
               name="key"
-              label="Key"
+              label={t('adapter_summary.key_label')}
               required
               onChange={_onChange}
-              help="Key to look up a value for."
+              help={t('adapter_summary.key_help')}
               value={lookupKey}
             />
             <Button type="submit" bsStyle="primary">
-              Look up
+              {t('adapter_summary.look_up')}
             </Button>
           </fieldset>
         </form>
         {lookupResult && (
           <div>
-            <h4>Lookup result</h4>
+            <h4>{t('adapter_summary.lookup_result')}</h4>
             <pre>{JSON.stringify(lookupResult, null, 2)}</pre>
           </div>
         )}

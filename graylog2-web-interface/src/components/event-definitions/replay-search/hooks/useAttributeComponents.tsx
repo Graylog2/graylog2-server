@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import moment from 'moment/moment';
 import styled, { css } from 'styled-components';
 
@@ -52,6 +53,7 @@ const EventDefinitionTitle = () => {
 };
 
 const useAttributeComponents = () => {
+  const { t } = useTranslation('event_definitions');
   const { alertId, definitionId, type } = useReplaySearchContext();
   const { eventData, eventDefinition } = useAlertAndEventDefinitionData(alertId, definitionId);
 
@@ -59,7 +61,13 @@ const useAttributeComponents = () => {
     const isEventDefinition = type === 'event_definition';
 
     if (!eventDefinition) {
-      return [{ title: 'Timestamp', content: <Timestamp dateTime={eventData?.timestamp} />, show: !isEventDefinition }];
+      return [
+        {
+          title: t('replay_search.attributes.timestamp'),
+          content: <Timestamp dateTime={eventData?.timestamp} />,
+          show: !isEventDefinition,
+        },
+      ];
     }
 
     const searchWithin = extractDurationAndUnit(eventDefinition.config.search_within_ms, TIME_UNITS);
@@ -73,46 +81,50 @@ const useAttributeComponents = () => {
       show?: boolean;
     }> = [
       {
-        title: 'Event definition updated at',
+        title: t('replay_search.attributes.updated_at'),
         content: (
           <>
             <AlertTimestamp dateTime={eventDefinition.updated_at} />
             <HoverForHelp displayLeftMargin iconSize="xs">
-              Event definition <i>{eventDefinition.title}</i> was edited after this event happened. Some of aggregations
-              widgets might not be representative for this event.
+              <Trans
+                t={t}
+                i18nKey="replay_search.attributes.edited_after_event"
+                values={{ title: eventDefinition.title }}
+                components={{ definitionTitle: <i /> }}
+              />
             </HoverForHelp>
           </>
         ),
         show: isEDUpdatedAfterEvent,
       },
       {
-        title: 'Event definition',
+        title: t('replay_search.attributes.event_definition'),
         content: <EventDefinitionTitle />,
         show: !isEventDefinition,
       },
       {
-        title: 'Priority',
+        title: t('replay_search.attributes.priority'),
         content: getPriorityName(eventDefinition.priority),
       },
       {
-        title: 'Execute search every',
+        title: t('replay_search.attributes.execute_every'),
         content:
           executeEvery?.duration && executeEvery?.unit && `${executeEvery.duration} ${executeEvery.unit.toLowerCase()}`,
       },
       {
-        title: 'Search within',
+        title: t('replay_search.attributes.search_within'),
         content:
           searchWithin?.duration && searchWithin?.unit && `${searchWithin.duration} ${searchWithin.unit.toLowerCase()}`,
       },
       {
-        title: 'Notifications',
+        title: t('replay_search.attributes.notifications'),
         content: <Notifications />,
       },
-      { title: 'Description', content: eventDefinition.description },
+      { title: t('replay_search.attributes.description'), content: eventDefinition.description },
     ];
 
     return components;
-  }, [eventData?.timestamp, eventDefinition, type]);
+  }, [eventData?.timestamp, eventDefinition, type, t]);
 };
 
 export default useAttributeComponents;

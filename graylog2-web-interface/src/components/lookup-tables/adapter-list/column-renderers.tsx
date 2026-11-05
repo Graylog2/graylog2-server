@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import useHistory from 'routing/useHistory';
@@ -46,6 +47,7 @@ const Title = styled.div`
 `;
 
 const TitleCol = ({ adapter, children }: { adapter: DataAdapterEntity; children: string }) => {
+  const { t } = useTranslation('lookup_tables');
   const { errors } = useErrorsContext();
   const adapterErrorText = errors?.adapterErrors[adapter.name];
   const { push } = useHistory();
@@ -56,17 +58,23 @@ const TitleCol = ({ adapter, children }: { adapter: DataAdapterEntity; children:
 
   return (
     <TitleRow>
-      {adapterErrorText && <ErrorPopover placement="right" errorText={adapterErrorText} title="Data Adapter problem" />}
+      {adapterErrorText && (
+        <ErrorPopover placement="right" errorText={adapterErrorText} title={t('adapter_list.problem')} />
+      )}
       <Title onClick={onClick}>{children}</Title>
     </TitleRow>
   );
 };
 
-const ThroughputCol = ({ adapter }: { adapter: DataAdapterEntity }) => (
-  <MetricContainer name={`org.graylog2.lookup.adapters.${adapter.id}.requests`}>
-    <CounterRate suffix="lookups/s" />
-  </MetricContainer>
-);
+const ThroughputCol = ({ adapter }: { adapter: DataAdapterEntity }) => {
+  const { t } = useTranslation('lookup_tables');
+
+  return (
+    <MetricContainer name={`org.graylog2.lookup.adapters.${adapter.id}.requests`}>
+      <CounterRate suffix={t('adapter_list.lookups_per_second')} />
+    </MetricContainer>
+  );
+};
 
 const columnRenderers: ColumnRenderers<DataAdapterEntity> = {
   attributes: {

@@ -16,6 +16,8 @@
  */
 import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
+import { Trans, withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import { Spinner } from 'components/common';
 import { Alert, BootstrapModalForm, Input } from 'components/bootstrap';
@@ -25,9 +27,9 @@ type RuleMetricsConfigProps = {
   config?: any;
   onChange: (...args: any[]) => Promise<unknown>;
   onClose?: (...args: any[]) => void;
-};
+} & WithTranslation;
 
-export default class RuleMetricsConfig extends React.Component<
+class RuleMetricsConfig extends React.Component<
   RuleMetricsConfigProps,
   {
     [key: string]: any;
@@ -72,13 +74,13 @@ export default class RuleMetricsConfig extends React.Component<
   };
 
   render() {
-    const { config } = this.props;
+    const { config, t } = this.props;
     const { nextConfig } = this.state;
 
     if (!config) {
       return (
         <p>
-          <Spinner text="Loading metrics config..." />
+          <Spinner text={t('metrics_config.loading')} />
         </p>
       );
     }
@@ -86,21 +88,18 @@ export default class RuleMetricsConfig extends React.Component<
     return (
       <BootstrapModalForm
         show
-        title="Rule Metrics Configuration"
+        title={t('metrics_config.title')}
         onSubmitForm={this.saveConfiguration}
         onCancel={this.closeModal}
-        submitButtonText="Update configuration">
-        <Alert bsStyle="warning">
-          Rule metrics should only be enabled to debug a performance issue because collecting the metrics will slow down
-          message processing and increase memory usage.
-        </Alert>
+        submitButtonText={t('metrics_config.submit')}>
+        <Alert bsStyle="warning">{t('metrics_config.warning')}</Alert>
         <fieldset>
           <Input
             type="radio"
             id="metrics-enabled"
             name="metrics_enabled"
             value="true"
-            label="Enable rule metrics"
+            label={t('metrics_config.enable')}
             onChange={this.handleChange}
             checked={nextConfig.metrics_enabled}
           />
@@ -110,22 +109,20 @@ export default class RuleMetricsConfig extends React.Component<
             id="metrics-disabled"
             name="metrics_enabled"
             value="false"
-            label="Disable rule metrics"
+            label={t('metrics_config.disable')}
             onChange={this.handleChange}
             checked={!nextConfig.metrics_enabled}
           />
         </fieldset>
         <p>
-          Enabling these metrics will add a new column to the Pipeline and Pipeline Rule pages called{' '}
-          <strong>Pipeline Load</strong>, which will contain % values showing relatively, which of your Pipelines is
-          consuming the most thread time.
+          <Trans t={t} i18nKey="metrics_config.pipeline_load_info" components={{ columnName: <strong /> }} />
         </p>
         <p>
-          Enabling these metrics will also add a new column to the Pipeline Detail page called{' '}
-          <strong>Rule Load</strong>, This will identify which Pipeline rules within the selected Pipeline are the most
-          expensive.
+          <Trans t={t} i18nKey="metrics_config.rule_load_info" components={{ columnName: <strong /> }} />
         </p>
       </BootstrapModalForm>
     );
   }
 }
+
+export default withTranslation('pipelines')(RuleMetricsConfig);

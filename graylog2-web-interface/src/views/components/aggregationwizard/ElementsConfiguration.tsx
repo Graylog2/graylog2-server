@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useFormikContext } from 'formik';
 import styled from 'styled-components';
 
@@ -62,6 +63,7 @@ type Props = {
 };
 
 const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChange, onCreate, onCancel }: Props) => {
+  const { t } = useTranslation('aggregation');
   const { values, setValues } = useFormikContext<WidgetConfigFormValues>();
 
   return (
@@ -91,8 +93,12 @@ const ElementsConfiguration = ({ aggregationElementsByKey, config, onConfigChang
                 allowCreate={aggregationElement.allowCreate(values)}
                 isEmpty={empty}
                 onCreate={() => onCreate(aggregationElement.key, values, setValues)}
-                elementTitle={aggregationElement.title}
-                sectionTitle={aggregationElement.sectionTitle}
+                elementTitle={aggregationElement.titleKey ? t(aggregationElement.titleKey) : aggregationElement.title}
+                sectionTitle={
+                  aggregationElement.sectionTitleKey
+                    ? t(aggregationElement.sectionTitleKey)
+                    : aggregationElement.sectionTitle
+                }
                 key={aggregationElement.key}>
                 <ConfigurationSection config={config} onConfigChange={onConfigChange} />
               </ElementConfigurationSection>

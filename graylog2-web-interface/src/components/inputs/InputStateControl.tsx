@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -41,6 +42,7 @@ const StateActionButton = styled(Button)(
 );
 
 const InputStateControl = ({ input, openWizard, inputStates }: Props) => {
+  const { t } = useTranslation('inputs');
   const sendTelemetry = useSendTelemetry();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
@@ -81,7 +83,7 @@ const InputStateControl = ({ input, openWizard, inputStates }: Props) => {
   if (inputSetupFeatureFlagIsEnabled && isInputInSetupMode(inputStates, input.id)) {
     return (
       <StateActionButton bsStyle="warning" bsSize="xsmall" onClick={setupInput}>
-        Set-up Input
+        {t('state_control.set_up')}
       </StateActionButton>
     );
   }
@@ -89,14 +91,14 @@ const InputStateControl = ({ input, openWizard, inputStates }: Props) => {
   if (isInputRunning(inputStates, input.id)) {
     return (
       <StateActionButton bsSize="xsmall" onClick={stopInput} disabled={isLoading}>
-        {isLoading ? 'Stopping...' : 'Stop input'}
+        {isLoading ? t('state_control.stopping') : t('state_control.stop')}
       </StateActionButton>
     );
   }
 
   return (
     <StateActionButton bsStyle="primary" bsSize="xsmall" onClick={startInput} disabled={isLoading}>
-      {isLoading ? 'Starting...' : 'Start input'}
+      {isLoading ? t('state_control.starting') : t('state_control.start')}
     </StateActionButton>
   );
 };

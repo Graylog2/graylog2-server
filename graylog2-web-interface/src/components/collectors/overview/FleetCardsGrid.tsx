@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Button } from 'components/bootstrap';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -52,6 +53,7 @@ type Props = {
 };
 
 const FleetCardsGrid = ({ fleets, filter }: Props) => {
+  const { t } = useTranslation('collectors');
   const history = useHistory();
   const sendTelemetry = useSendCollectorsTelemetry();
   const { canCreateFleet } = useCollectorPermissions();
@@ -68,28 +70,30 @@ const FleetCardsGrid = ({ fleets, filter }: Props) => {
     // theirs to perform, and the Deployment link goes to a page they cannot use either.
     if (!canCreateFleet) {
       return (
-        <EmptyEntity title="No Fleets Yet">
-          <p>Contact an administrator to set up the first Collectors.</p>
+        <EmptyEntity title={t('fleet_cards.empty_title')}>
+          <p>{t('fleet_cards.contact_admin')}</p>
         </EmptyEntity>
       );
     }
 
     return (
-      <EmptyEntity title="No Fleets Yet">
+      <EmptyEntity title={t('fleet_cards.empty_title')}>
         <p>
-          Fleets let you manage groups of Collectors with shared configuration. Create your first fleet, then add
-          sources to define what data its Collectors should collect. Once configured,{' '}
-          <Link to={Routes.SYSTEM.COLLECTORS.DEPLOYMENT}>deploy Collectors</Link> using an enrollment token.
+          <Trans
+            t={t}
+            i18nKey="fleet_cards.empty_description"
+            components={{ deployLink: <Link to={Routes.SYSTEM.COLLECTORS.DEPLOYMENT} /> }}
+          />
         </p>
         <Button bsStyle="success" onClick={() => history.push(Routes.SYSTEM.COLLECTORS.FLEETS_NEW)}>
-          Create Fleet
+          {t('fleet_cards.create')}
         </Button>
       </EmptyEntity>
     );
   }
 
   if (filtered.length === 0) {
-    return <EmptyState>No fleets matching filter</EmptyState>;
+    return <EmptyState>{t('fleet_cards.no_match')}</EmptyState>;
   }
 
   return (

@@ -19,6 +19,7 @@ import * as React from 'react';
 import type { PluginNavigation } from 'graylog-web-plugin';
 import styled, { css } from 'styled-components';
 
+import useNavigationTitle from 'components/navigation/useNavigationTitle';
 import usePermissions from 'hooks/usePermissions';
 import isActiveRoute from 'components/navigation/util/isActiveRoute';
 import { NavDropdown } from 'components/bootstrap';
@@ -31,15 +32,18 @@ const renderLinkTitle = (description: string, Badge: PluginNavigation['BadgeComp
 
 type PluginNavDropdownProps = {
   description: PluginNavigation['description'];
+  titleKey: PluginNavigation['titleKey'];
   BadgeComponent: PluginNavigation['BadgeComponent'];
   menuItems: PluginNavigation['children'];
   pathname: string;
 };
 
-const PluginNavDropdown = ({ menuItems, description, BadgeComponent, pathname }: PluginNavDropdownProps) => {
+const PluginNavDropdown = ({ menuItems, description, titleKey, BadgeComponent, pathname }: PluginNavDropdownProps) => {
   const { isPermitted } = usePermissions();
+  const navigationTitle = useNavigationTitle();
+  const dropdownTitle = navigationTitle({ description, titleKey });
   const activeMenuItem = menuItems.filter(({ path, end }) => path && isActiveRoute(pathname, path, end));
-  const title = activeMenuItem.length > 0 ? `${description} / ${activeMenuItem[0].description}` : description;
+  const title = activeMenuItem.length > 0 ? `${dropdownTitle} / ${navigationTitle(activeMenuItem[0])}` : dropdownTitle;
   const accessibleMenuItems = menuItems.filter(
     ({ requiredFeatureFlag, permissions, useCondition }) =>
       // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -53,12 +57,16 @@ const PluginNavDropdown = ({ menuItems, description, BadgeComponent, pathname }:
   const renderBadge = menuItems.some((menuItem) => menuItem?.BadgeComponent);
 
   return (
-    <NavDropdown key={title} title={title} Badge={renderBadge ? BadgeComponent : undefined} inactiveTitle={description}>
+    <NavDropdown
+      key={title}
+      title={title}
+      Badge={renderBadge ? BadgeComponent : undefined}
+      inactiveTitle={dropdownTitle}>
       {accessibleMenuItems.map((menuItem) => (
         <NavigationLink
           key={menuItem.description}
           Badge={menuItem.BadgeComponent}
-          description={menuItem.description}
+          description={navigationTitle(menuItem)}
           path={menuItem.path}
         />
       ))}
@@ -87,10 +95,11 @@ const NavListItem = styled.li(
 );
 
 const NavigationItem = ({
-  navigationItem: { requiredFeatureFlag, permissions, children, BadgeComponent, description, path },
+  navigationItem: { requiredFeatureFlag, permissions, children, BadgeComponent, description, titleKey, path },
   pathname,
 }: Props) => {
   const { isPermitted } = usePermissions();
+  const navigationTitle = useNavigationTitle();
 
   if (!shouldRenderNavigationItem(requiredFeatureFlag, permissions, isPermitted)) {
     return null;
@@ -101,6 +110,7 @@ const NavigationItem = ({
       <PluginNavDropdown
         menuItems={children}
         description={description}
+        titleKey={titleKey}
         BadgeComponent={BadgeComponent}
         pathname={pathname}
         key={description}
@@ -112,7 +122,7 @@ const NavigationItem = ({
     <NavListItem>
       <NavigationLink
         key={description}
-        description={renderLinkTitle(description, BadgeComponent)}
+        description={renderLinkTitle(navigationTitle({ description, titleKey }), BadgeComponent)}
         path={path}
         topLevel
       />

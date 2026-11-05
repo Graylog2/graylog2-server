@@ -36,6 +36,8 @@ import org.graylog.grn.GRNRegistry;
 import org.graylog.security.Capability;
 import org.graylog.security.CapabilityDescriptor;
 import org.graylog.security.CapabilityRegistry;
+import org.graylog2.plugin.rest.CodedException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.plugin.security.Permission;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -88,7 +90,7 @@ public class CapabilitiesResource extends RestResource {
                 .filter(descriptor -> descriptor.capability() == capability)
                 .map(CapabilityDescriptorResponse::new)
                 .findFirst()
-                .orElseThrow(() -> new NotFoundException("No descriptor found for capability: " + capabilityString));
+                .orElseThrow(() -> new CodedNotFoundException("capabilities.no_descriptor_found_for_capability", "No descriptor found for capability: " + capabilityString, CodedException.paramsOf("capabilityString", capabilityString)));
     }
 
     public record CapabilitiesResponse(@JsonProperty("capabilities") List<CapabilityDescriptorResponse> capabilities) {

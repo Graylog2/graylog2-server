@@ -15,14 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import CreateClientCertificateButton from 'components/datanode/client-certificate/CreateClientCertificateButton';
 
-const ClientCertificateConfig = () => (
-  <div>
-    <h2>Client Certificate</h2>
-    <p>Generate client certificates for 3rd party tool</p>
-    <CreateClientCertificateButton />
-  </div>
-);
+const ClientCertificateConfig = () => {
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
+
+  return (
+    <div>
+      <h2>{t('client_certificate.title')}</h2>
+      <p>{t('client_certificate.description')}</p>
+      <CreateClientCertificateButton />
+    </div>
+  );
+};
 export default ClientCertificateConfig;

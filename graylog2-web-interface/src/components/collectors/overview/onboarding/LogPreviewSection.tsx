@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Alert, Label } from 'components/bootstrap';
 import { Link, Section, Spinner, Timestamp } from 'components/common';
@@ -74,6 +75,8 @@ const Caption = styled.div(
 );
 
 const PreviewBody = ({ preview, isLoading, error }: Pick<Props, 'preview' | 'isLoading' | 'error'>) => {
+  const { t } = useTranslation('collectors');
+
   // Last good results win over transient refresh errors.
   if (preview && preview.messages.length > 0) {
     return (
@@ -94,20 +97,20 @@ const PreviewBody = ({ preview, isLoading, error }: Pick<Props, 'preview' | 'isL
     return (
       <div aria-live="polite">
         <Alert bsStyle="warning">
-          Log preview unavailable &mdash; {StringUtils.truncateWithEllipses(error.message, 120)}
+          {t('log_preview.unavailable', { error: StringUtils.truncateWithEllipses(error.message, 120) })}
         </Alert>
       </div>
     );
   }
 
   if (isLoading) {
-    return <Spinner text="Loading log preview..." delay={0} />;
+    return <Spinner text={t('log_preview.loading')} delay={0} />;
   }
 
   return (
     <EmptyState aria-live="polite">
       <PulsingDot />
-      No messages yet &mdash; checking every few seconds
+      {t('log_preview.empty')}
     </EmptyState>
   );
 };
@@ -121,22 +124,26 @@ const LogPreviewSection = ({
   collapsible = false,
   caption = undefined,
   onOpenSearch = undefined,
-}: Props) => (
-  <Section
-    title={title}
-    collapsible={collapsible}
-    defaultClosed={collapsible}
-    headerLeftSection={collapsible ? <Label bsStyle="default">{preview ? preview.total : '—'}</Label> : undefined}
-    actions={
-      searchUrl ? (
-        <Link to={searchUrl} onClick={onOpenSearch}>
-          Open in search
-        </Link>
-      ) : undefined
-    }>
-    <PreviewBody preview={preview} isLoading={isLoading} error={error} />
-    {caption && <Caption>{caption}</Caption>}
-  </Section>
-);
+}: Props) => {
+  const { t } = useTranslation('collectors');
+
+  return (
+    <Section
+      title={title}
+      collapsible={collapsible}
+      defaultClosed={collapsible}
+      headerLeftSection={collapsible ? <Label bsStyle="default">{preview ? preview.total : '—'}</Label> : undefined}
+      actions={
+        searchUrl ? (
+          <Link to={searchUrl} onClick={onOpenSearch}>
+            {t('deployment.open_in_search')}
+          </Link>
+        ) : undefined
+      }>
+      <PreviewBody preview={preview} isLoading={isLoading} error={error} />
+      {caption && <Caption>{caption}</Caption>}
+    </Section>
+  );
+};
 
 export default LogPreviewSection;

@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { DocumentTitle } from 'components/common';
 import TeaserSearch from 'components/security/teaser/TeaserSearch';
@@ -28,28 +29,32 @@ const hotspots = [
   {
     positionX: '15%',
     positionY: '50px',
-    description: 'Quickly find your most critical security info in the Overview tab.',
+    descriptionKey: 'security_teaser.overview.hotspot_0',
   },
   {
     positionX: '50%',
     positionY: '350px',
-    description: 'Find high alerts, top event sources, and more that give you insight into your security posture.',
+    descriptionKey: 'security_teaser.overview.hotspot_1',
   },
   {
     positionX: '75%',
     positionY: '580px',
-    description: 'Hover these tool tips throughout this page to learn more about features of Graylog Security',
+    descriptionKey: 'security_teaser.overview.hotspot_2',
   },
 ];
-const Overview = () => (
-  <DocumentTitle title="Overview">
-    <TeaserSearch
-      viewJson={viewJson}
-      searchJson={searchJson as SearchJson}
-      searchJobResult={resultJson}
-      hotspots={hotspots}
-    />
-  </DocumentTitle>
-);
+const Overview = () => {
+  const { t } = useTranslation('users');
+
+  return (
+    <DocumentTitle title={t('security_teaser.overview.title')}>
+      <TeaserSearch
+        viewJson={viewJson}
+        searchJson={searchJson as SearchJson}
+        searchJobResult={resultJson}
+        hotspots={hotspots}
+      />
+    </DocumentTitle>
+  );
+};
 
 export default Overview;

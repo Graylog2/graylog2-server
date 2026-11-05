@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import withParams from 'routing/withParams';
 import 'components/authentication/bindings'; // Bind all authentication plugins
@@ -27,10 +28,11 @@ type Props = {
 };
 
 const AuthenticationBackendCreatePage = ({ params: { name } }: Props) => {
+  const { t } = useTranslation('authentication');
   const authService = getAuthServicePlugin(name);
 
   if (!authService) {
-    return <>{`No authentication service plugin configured for type "${name}"`}</>;
+    return <>{t('no_service_plugin', { type: name })}</>;
   }
 
   const { createComponent: BackendCreate } = authService;

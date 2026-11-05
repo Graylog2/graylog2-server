@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { useEffect, useRef } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Row, Col, Alert } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Link } from 'components/common';
@@ -33,6 +33,7 @@ import useFinishOnboarding from 'components/welcome/hooks/useFinishOnboarding';
 import useOnboardingEligibility from 'components/welcome/hooks/useOnboardingEligibility';
 
 const CollectorsOnboardingInstancePage = () => {
+  const { t } = useTranslation('collectors');
   const { instanceUid } = useParams<{ instanceUid: string }>();
   const location = useLocation<{ fleetName?: string } | null>();
   // Set by the onboarding wizard's history push; absent on direct visits.
@@ -64,14 +65,17 @@ const CollectorsOnboardingInstancePage = () => {
     if (isLoading) return <Spinner />;
 
     if (error) {
-      return <Alert bsStyle="danger">Could not load collector instance: {extractErrorMessage(error)}</Alert>;
+      return <Alert bsStyle="danger">{t('pages.onboarding.load_error', { error: extractErrorMessage(error) })}</Alert>;
     }
 
     if (!instance) {
       return (
         <Alert bsStyle="warning">
-          Collector instance not found. It may have been removed &mdash; see all{' '}
-          <Link to={Routes.SYSTEM.COLLECTORS.INSTANCES}>Instances</Link>.
+          <Trans
+            t={t}
+            i18nKey="pages.onboarding.not_found"
+            components={{ instancesLink: <Link to={Routes.SYSTEM.COLLECTORS.INSTANCES} /> }}
+          />
         </Alert>
       );
     }
@@ -80,19 +84,19 @@ const CollectorsOnboardingInstancePage = () => {
   };
 
   return (
-    <DocumentTitle title="Collector Onboarding">
+    <DocumentTitle title={t('pages.onboarding.title')}>
       <CollectorsPageNavigation />
       <PageHeader
         title={
           <>
-            Collector Onboarding <PreviewBadge />
+            {t('pages.onboarding.title')} <PreviewBadge />
           </>
         }
         documentationLink={{
-          title: 'Collectors documentation',
+          title: t('pages.documentation_title'),
           path: DocsHelper.PAGES.COLLECTORS,
         }}>
-        <span>Status of your newly connected collector.</span>
+        <span>{t('pages.onboarding.description')}</span>
       </PageHeader>
       <Row className="content">
         <Col md={12}>{content()}</Col>

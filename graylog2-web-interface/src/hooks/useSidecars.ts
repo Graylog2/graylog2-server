@@ -22,7 +22,9 @@ import { Sidecar } from '@graylog/server-api';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
+import translateApiError from 'util/translateApiError';
 import type { SidecarSummary, SidecarCollectorPairType, Configuration } from 'components/sidecars/types';
+import i18n from 'i18n';
 
 const SOURCE_URL = '/sidecars';
 const QUERY_KEY = ['sidecars', 'list'] as const;
@@ -76,13 +78,13 @@ export const fetchSidecar = (sidecarId: string): Promise<SidecarSummary> => {
   const promise: Promise<SidecarSummary> = Sidecar.get(sidecarId);
 
   promise.catch((error) => {
-    let errorMessage = `Fetching Sidecar failed with status: ${error}`;
+    let errorMessage = i18n.t('use_sidecars_notifications.fetch_failed', { ns: 'sidecars', error });
 
     if (error.status === 404) {
-      errorMessage = `Unable to find a sidecar with ID <${sidecarId}>, maybe it was inactive for too long.`;
+      errorMessage = i18n.t('use_sidecars_notifications.not_found', { ns: 'sidecars', sidecarId });
     }
 
-    UserNotification.error(errorMessage, 'Could not retrieve Sidecar');
+    UserNotification.error(errorMessage, i18n.t('use_sidecars_notifications.fetch_failed_title', { ns: 'sidecars' }));
   });
 
   return promise;
@@ -93,8 +95,8 @@ export const fetchSidecarActions = (sidecarId: string): Promise<unknown> => {
 
   promise.catch((error) => {
     UserNotification.error(
-      `Fetching Sidecar actions failed with status: ${error}`,
-      'Could not retrieve Sidecar actions',
+      i18n.t('use_sidecars_notifications.fetch_actions_failed', { ns: 'sidecars', error }),
+      i18n.t('use_sidecars_notifications.fetch_actions_failed_title', { ns: 'sidecars' }),
     );
   });
 
@@ -109,7 +111,10 @@ export const restartCollector = (sidecarId: string, collector: string): Promise<
   const promise = fetch('PUT', qualifyUrl(`${SOURCE_URL}/${sidecarId}/action`), [action]);
 
   promise.catch((error) => {
-    UserNotification.error(`Restarting Sidecar failed with status: ${error}`, 'Could not restart Sidecar');
+    UserNotification.error(
+      i18n.t('use_sidecars_notifications.restart_failed', { ns: 'sidecars', error }),
+      i18n.t('use_sidecars_notifications.restart_failed_title', { ns: 'sidecars' }),
+    );
   });
 
   return promise;
@@ -135,14 +140,20 @@ export const assignConfigurations = (
 
   promise.then(
     (response) => {
-      UserNotification.success('', `Configuration change for ${sidecars.length} collectors requested`);
+      UserNotification.success(
+        '',
+        i18n.t('use_sidecars_notifications.configuration_change_requested', {
+          ns: 'sidecars',
+          amount: sidecars.length,
+        }),
+      );
 
       return response;
     },
     (error) => {
       UserNotification.error(
-        `Fetching Sidecar actions failed with status: ${error}`,
-        'Could not retrieve Sidecar actions',
+        i18n.t('use_sidecars_notifications.fetch_actions_failed', { ns: 'sidecars', error }),
+        i18n.t('use_sidecars_notifications.fetch_actions_failed_title', { ns: 'sidecars' }),
       );
     },
   );
@@ -156,8 +167,10 @@ export const useSidecarsListPaginated = (opts: Partial<PaginationOptions>) =>
     queryFn: () =>
       fetchSidecarsList(opts).catch((error) => {
         UserNotification.error(
-          error.status === 400 ? error.responseMessage : `Fetching Sidecars failed with status: ${error.message}`,
-          'Could not retrieve Sidecars',
+          error.status === 400
+            ? (translateApiError(error) ?? error.responseMessage)
+            : i18n.t('use_sidecars_notifications.fetch_sidecars_failed', { ns: 'sidecars', error: error.message }),
+          i18n.t('use_sidecars_notifications.fetch_sidecars_failed_title', { ns: 'sidecars' }),
         );
 
         throw error;

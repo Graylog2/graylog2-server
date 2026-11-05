@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { SystemContentPacks } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import ContentPackRevisions from 'logic/content-packs/ContentPackRevisions';
 import { onError } from 'util/conditional/onError';
 import UserNotification from 'util/UserNotification';
@@ -35,7 +36,10 @@ const fetchContentPackRevisions = async (id: string) => {
 };
 
 const defaultErrorHandler = (error: Error) =>
-  UserNotification.error(`Error while fetching content pack revisions: ${error}`, 'Unable to fetch content pack');
+  UserNotification.error(
+    i18n.t('revisions.fetch_error', { ns: 'content_packs', error }),
+    i18n.t('revisions.fetch_error_title', { ns: 'content_packs' }),
+  );
 
 const useContentPackRevisions = (id: string, onFetchError: (e: Error) => void = defaultErrorHandler) =>
   useQuery({

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import groupBy from 'lodash/groupBy';
 import { useQuery } from '@tanstack/react-query';
 
@@ -36,6 +37,7 @@ import DecoratorsUpdater from './decorators/DecoratorsUpdater';
 import formatDecorator from './decorators/FormatDecorator';
 
 const DecoratorsConfig = () => {
+  const { t } = useTranslation('configurations');
   const { data: streams, isLoading: streamsLoading } = useQuery<Array<Stream>>({
     queryKey: ['streamsMap'],
     queryFn: () => fetchStreams(),
@@ -62,12 +64,12 @@ const DecoratorsConfig = () => {
     (newDecorators: Array<Decorator>) =>
       DecoratorsUpdater(newDecorators, decorators)
         .then(
-          () => UserNotification.success('Updated decorators configuration.', 'Success!'),
-          (error) => UserNotification.error(`Unable to save new decorators: ${error}`, 'Saving decorators failed'),
+          () => UserNotification.success(t('decorators.save_success'), t('decorators.save_success_title')),
+          (error) => UserNotification.error(t('decorators.save_error', { error }), t('decorators.save_error_title')),
         )
         .then(() => refetchDecorators())
         .then(closeModal),
-    [closeModal, decorators, refetchDecorators],
+    [closeModal, decorators, refetchDecorators, t],
   );
 
   const decoratorMap = useMemo(() => {
@@ -76,7 +78,7 @@ const DecoratorsConfig = () => {
     }
 
     if (!decorators || decorators.length === 0) {
-      return <i>No decorators currently configured.</i>;
+      return <i>{t('decorators.none_configured')}</i>;
     }
 
     const decoratorsGroupedByStream = groupBy(decorators, (decorator) => decorator.stream || DEFAULT_SEARCH_ID);
@@ -100,7 +102,7 @@ const DecoratorsConfig = () => {
           </dd>
         </>
       ));
-  }, [decorators, decoratorsLoading, streamsMap, types, typesLoading]);
+  }, [decorators, decoratorsLoading, streamsMap, t, types, typesLoading]);
 
   if (streamsLoading || typesLoading || decoratorsLoading) {
     return <Spinner />;
@@ -108,12 +110,12 @@ const DecoratorsConfig = () => {
 
   return (
     <div>
-      <h2>Decorators Configuration</h2>
-      <p>These are the currently configured decorators grouped by stream:</p>
+      <h2>{t('decorators.title')}</h2>
+      <p>{t('decorators.description')}</p>
       <p>{decoratorMap}</p>
       <IfPermitted permissions="decorators:edit">
         <Button bsStyle="info" bsSize="xs" onClick={openModal}>
-          Edit configuration
+          {t('decorators.edit')}
         </Button>
       </IfPermitted>
       <DecoratorsConfigUpdate

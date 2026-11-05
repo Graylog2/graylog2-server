@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { Formik, Field } from 'formik';
+import { useTranslation } from 'react-i18next';
 
 import { BootstrapModalWrapper, Input, Modal } from 'components/bootstrap';
 import { FormikInput, ModalSubmit } from 'components/common';
@@ -33,16 +34,17 @@ type Props = {
 };
 
 const FilterRuleForm = ({ title, filterRule, onCancel, handleSubmit, destinationType }: Props) => {
+  const { t } = useTranslation('streams');
   const validate = (values: Partial<StreamOutputFilterRule>) => {
     const { title: currentTitle, rule } = values;
     let errors = {};
 
     if (!currentTitle) {
-      errors = { ...errors, title: 'The "Title" field is required.' };
+      errors = { ...errors, title: t('output_filter.form.title_required') };
     }
 
     if (!rule?.conditions || (rule?.conditions && rule.conditions.length <= 0)) {
-      errors = { ...errors, rule: 'Rule needs to contain at least one condition.' };
+      errors = { ...errors, rule: t('output_filter.form.condition_required') };
     }
 
     return errors;
@@ -87,14 +89,26 @@ const FilterRuleForm = ({ title, filterRule, onCancel, handleSubmit, destination
                 <Modal.Title>{title}</Modal.Title>
               </Modal.Header>
               <Modal.Body>
-                <FormikInput id="title" name="title" label="Title" help="Rule title" error={errors.title} required />
-                <FormikInput id="description" name="description" label="Description" help="Rule description" />
+                <FormikInput
+                  id="title"
+                  name="title"
+                  label={t('output_filter.form.title')}
+                  help={t('output_filter.form.title_help')}
+                  error={errors.title}
+                  required
+                />
+                <FormikInput
+                  id="description"
+                  name="description"
+                  label={t('output_filter.form.description')}
+                  help={t('output_filter.form.description_help')}
+                />
                 <Field name="status">
                   {({ field: { name, value }, meta }) => (
                     <Input
                       id={name}
                       error={meta?.error}
-                      label="Enabled"
+                      label={t('output_filter.form.enabled')}
                       type="checkbox"
                       onChange={onStatusChange}
                       checked={value === 'enabled'}
@@ -102,7 +116,7 @@ const FilterRuleForm = ({ title, filterRule, onCancel, handleSubmit, destination
                     />
                   )}
                 </Field>
-                <label htmlFor="rule_builder">Rule Builder</label>
+                <label htmlFor="rule_builder">{t('output_filter.form.rule_builder')}</label>
                 {errors?.rule && <p className="text-danger">{errors.rule as React.ReactNode}</p>}
                 <FilterRulesFields type="condition" />
                 <Modal.Footer>
@@ -112,8 +126,8 @@ const FilterRuleForm = ({ title, filterRule, onCancel, handleSubmit, destination
                     onSubmit={onSubmit}
                     onCancel={onCancel}
                     disabledSubmit={!isValid || values?.rule?.errors?.length > 0}
-                    submitButtonText={values?.id ? 'Update' : 'Create'}
-                    submitLoadingText={values?.id ? 'Updating filter' : 'Saving filter'}
+                    submitButtonText={values?.id ? t('output_filter.form.update') : t('output_filter.form.create')}
+                    submitLoadingText={values?.id ? t('output_filter.form.updating') : t('output_filter.form.saving')}
                   />
                 </Modal.Footer>
               </Modal.Body>

@@ -1,0 +1,64 @@
+{
+  "api_browser": {
+    "download_label": "Scarica la specifica OpenAPI:",
+    "fetch_failed": "Recupero della specifica API non riuscito!",
+    "loading": "Caricamento della specifica API ...",
+    "loading_title": "API Browser - Caricamento della specifica API",
+    "select_format": "Seleziona formato",
+    "title": "API Browser"
+  },
+  "configlet": {
+    "error": "Si è verificato un errore:"
+  },
+  "errors": {
+    "copy_error_details": "Copia i dettagli dell'errore negli appunti"
+  },
+  "keyboard_shortcuts": {
+    "description": "Un elenco di tutte le scorciatoie disponibili",
+    "title": "Scorciatoie da tastiera"
+  },
+  "loading": {
+    "text": "Caricamento in corso, attendi...",
+    "title": "Caricamento..."
+  },
+  "not_found": {
+    "back_hint": "Puoi tornare alla <mainPageLink>Pagina principale</mainPageLink> e navigare da lì.",
+    "description": "La pagina che stai cercando non esiste (o non esiste più).",
+    "title": "Pagina non trovata"
+  },
+  "runtime_error": {
+    "description_hint": "Puoi usare la navigazione per raggiungere altre parti del prodotto, aggiornare la pagina o inviare una segnalazione di errore.",
+    "description_intro": "Sembra che la pagina a cui sei passato contenga un errore.",
+    "error_label": "Errore:",
+    "show_less": "Mostra meno",
+    "show_more": "Mostra di più",
+    "title": "Si è verificato un errore."
+  },
+  "server_unavailable": {
+    "document_title": "Server non disponibile",
+    "error_message": "Messaggio di errore",
+    "full_error_message": "Messaggio di errore completo",
+    "intro": "Stiamo riscontrando problemi di connessione al server {{productName}} in esecuzione su <serverAddress>{{address}}</serverAddress>. Verifica che il server sia attivo e funzioni correttamente.",
+    "last_response": "Questa è l'ultima risposta ricevuta dal server:",
+    "less_details": "Meno dettagli",
+    "modal_title": "Server attualmente non disponibile",
+    "more_details": "Più dettagli",
+    "need_help": "Hai bisogno di aiuto? <helpLink>Possiamo aiutarti</helpLink>.",
+    "no_information": "Nessuna informazione disponibile.",
+    "original_request": "Richiesta originale",
+    "redirect_hint": "Verrai reindirizzato automaticamente alla pagina precedente non appena sarà possibile connettersi al server.",
+    "status_code": "Codice di stato"
+  },
+  "show_message": {
+    "document_title": "Messaggio {{messageId}} su {{index}}",
+    "not_found_description": "L'indice o il messaggio specificato non è stato trovato. Il motivo più probabile è che l'indice contenente il messaggio di riferimento sia stato eliminato. Il messaggio di errore completo è:",
+    "not_found_title": "Indice/Messaggio non trovato"
+  },
+  "unauthorized": {
+    "description_hint": "Contatta l'amministratore e fornisci i dettagli dell'errore.",
+    "description_intro": "Non disponi delle autorizzazioni necessarie per visualizzare questa risorsa.",
+    "page_details": "La verifica dei permessi per la seguente richiesta non è riuscita,\nmentre si tentava di accedere a {{pathname}}.",
+    "page_details_no_request": "Il controllo dei permessi non è riuscito durante l'accesso a {{pathname}}.",
+    "title": "Permessi mancanti"
+  }
+}

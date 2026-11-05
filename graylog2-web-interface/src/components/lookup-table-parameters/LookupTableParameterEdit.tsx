@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { Panel, Input } from 'components/bootstrap';
@@ -46,6 +47,10 @@ type Props = {
   };
 };
 
+const EXAMPLE_QUERY = '("foo" OR "bar" OR "baz")';
+const WILDCARD = '*';
+const MAX_CLAUSE_COUNT_SETTING = 'opensearch_indices_query_bool_max_clause_count';
+
 const LookupTableParameterEdit = ({
   validationState = {},
   onChange,
@@ -54,6 +59,7 @@ const LookupTableParameterEdit = ({
   parameter = {},
   defaultExpandHelp = true,
 }: Props) => {
+  const { t } = useTranslation('lookup_tables');
   const { lookupTable, key: tableKey, defaultValue, name } = parameter;
   const parameterSyntax = `$${name}$`;
 
@@ -67,7 +73,7 @@ const LookupTableParameterEdit = ({
       _handleChange(attributeName)(value);
 
   if (!lookupTables) {
-    return <Spinner text="Loading lookup tables" />;
+    return <Spinner text={t('parameter_edit.loading')} />;
   }
 
   const lookupTableOptions = lookupTables
@@ -79,12 +85,12 @@ const LookupTableParameterEdit = ({
       <Input
         id={`lookup-table-parameter-table-${identifier}`}
         name="query-param-table-name"
-        label="Lookup Table"
+        label={t('parameter_edit.table_label')}
         bsStyle={validationState?.lookupTable?.[0]}
         error={validationState?.lookupTable?.[1]}
-        help="Select the lookup table to use for retrieving the values.">
+        help={t('parameter_edit.table_help')}>
         <Select
-          placeholder="Select lookup table"
+          placeholder={t('parameter_edit.table_placeholder')}
           onChange={_handleChange('lookupTable')}
           options={lookupTableOptions}
           value={lookupTable}
@@ -96,12 +102,12 @@ const LookupTableParameterEdit = ({
       <Input
         type="text"
         id={`lookup-table-parameter-key-${identifier}`}
-        label="Lookup Table Key"
+        label={t('parameter_edit.key_label')}
         name="key"
         defaultValue={tableKey}
         onChange={_handleInputChange('key')}
         bsStyle={validationState?.key?.[0]}
-        help="Select the lookup table key"
+        help={t('parameter_edit.key_help')}
         error={validationState?.key?.[0] === 'error' ? validationState?.key?.[1] : undefined}
         spellCheck={false}
         required
@@ -110,8 +116,8 @@ const LookupTableParameterEdit = ({
         id={`lookup-table-parameter-default-value-${identifier}`}
         type="text"
         name="defaultValue"
-        label="Default Value"
-        help="Select a default value in case the lookup result is empty"
+        label={t('parameter_edit.default_value_label')}
+        help={t('parameter_edit.default_value_help')}
         defaultValue={defaultValue}
         spellCheck={false}
         onChange={_handleInputChange('defaultValue')}
@@ -119,32 +125,36 @@ const LookupTableParameterEdit = ({
 
       <Panel id="lookup-table-parameter-help" defaultExpanded={defaultExpandHelp}>
         <Panel.Heading>
-          <Panel.Title toggle>How to use lookup table parameters</Panel.Title>
+          <Panel.Title toggle>{t('parameter_edit.help_title')}</Panel.Title>
         </Panel.Heading>
         <Panel.Collapse>
           <Panel.Body>
-            <h5>General Usage</h5>
+            <h5>{t('parameter_edit.general_usage_title')}</h5>
             <p>
-              After declaring it, the parameter
-              <StyledInlineCode>{parameterSyntax}</StyledInlineCode>
-              in your query, will be replaced with the list of results from the lookup table. The list of results will
-              be presented in the form of a Lucene BooleanQuery. E.g.:
-              <StyledInlineCode>(&quot;foo&quot; OR &quot;bar&quot; OR &quot;baz&quot;)</StyledInlineCode>
+              <Trans
+                t={t}
+                i18nKey="parameter_edit.general_usage"
+                values={{ parameter: parameterSyntax, example: EXAMPLE_QUERY }}
+                components={{ inlineCode: <StyledInlineCode /> }}
+              />
             </p>
-            <h5>Behaviour on empty lookup result list</h5>
+            <h5>{t('parameter_edit.empty_result_title')}</h5>
             <p>
-              The event definition query is only executed if a value for the parameter is present. If the lookup result
-              is empty, the execution will be skipped and treated as if the <i>Search Query</i> found no messages. If an
-              execution is desired a <i>Default Value</i> that yields the desired search result needs to be provided.
-              For example, (depending on the use case) a wildcard like
-              <StyledInlineCode>*</StyledInlineCode>
-              can be a meaningful Default Value.
+              <Trans
+                t={t}
+                i18nKey="parameter_edit.empty_result"
+                values={{ wildcard: WILDCARD }}
+                components={{ emphasis: <i />, inlineCode: <StyledInlineCode /> }}
+              />
             </p>
-            <h5>Limitations</h5>
+            <h5>{t('parameter_edit.limitations_title')}</h5>
             <p>
-              Please note, the maximum number of supported results is depending on the
-              <StyledInlineCode>opensearch_indices_query_bool_max_clause_count</StyledInlineCode> setting. If the lookup
-              table returns more results, the query will fail in your indexer.
+              <Trans
+                t={t}
+                i18nKey="parameter_edit.limitations"
+                values={{ setting: MAX_CLAUSE_COUNT_SETTING }}
+                components={{ inlineCode: <StyledInlineCode /> }}
+              />
             </p>
           </Panel.Body>
         </Panel.Collapse>

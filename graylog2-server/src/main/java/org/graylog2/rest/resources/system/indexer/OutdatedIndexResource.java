@@ -25,13 +25,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
-import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -52,6 +49,10 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.indexer.indices.OutdatedIndex;
 import org.graylog2.indexer.indices.OutdatedIndexService;
 import org.graylog2.indexer.indices.ReindexOutdatedIndexJob;
+import org.graylog2.plugin.rest.CodedBadRequestException;
+import org.graylog2.plugin.rest.CodedException;
+import org.graylog2.plugin.rest.CodedForbiddenException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.rest.bulk.model.BulkOperationFailure;
 import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.rest.bulk.model.BulkOperationResponse;
@@ -178,7 +179,7 @@ public class OutdatedIndexResource extends RestResource {
         OutdatedIndex outdatedIndex = getOutdatedIndices().stream()
                 .filter(OutdatedIndex::isSystemIndex)
                 .filter(i -> i.indexName().equals(index))
-                .findAny().orElseThrow(() -> new NotFoundException("Index " + index + " not found or is no system index"));
+                .findAny().orElseThrow(() -> new CodedNotFoundException("outdated_index.index_not_found_or_is_no_system", "Index " + index + " not found or is no system index", CodedException.paramsOf("index", index)));
         final String triggeredBy = String.valueOf(getSubject().getPrincipal());
         systemJobManager.submit(ReindexOutdatedIndexJob.forIndex(outdatedIndex.indexName(), withReplication, triggeredBy));
         return Response.accepted().build();
@@ -221,7 +222,7 @@ public class OutdatedIndexResource extends RestResource {
         OutdatedIndex outdatedIndex = getOutdatedIndices().stream()
                 .filter(i -> !i.managedIndex())
                 .filter(i -> i.indexName().equals(index))
-                .findAny().orElseThrow(() -> new NotFoundException("Index " + index + " not found or is a managed index"));
+                .findAny().orElseThrow(() -> new CodedNotFoundException("outdated_index.index_not_found_or_is_a_managed", "Index " + index + " not found or is a managed index", CodedException.paramsOf("index", index)));
         outdatedIndexService.delete(outdatedIndex.indexName());
     }
 
@@ -233,7 +234,7 @@ public class OutdatedIndexResource extends RestResource {
     @NoAuditEvent("Each deleted index is audited individually below")
     public BulkOperationResponse bulkDeleteOutdated(@Parameter(name = "Entities to remove", required = true) BulkOperationRequest request) {
         if (request == null || request.entityIds() == null || request.entityIds().isEmpty()) {
-            throw new BadRequestException("No index names provided");
+            throw new CodedBadRequestException("outdated_index.no_index_names_provided", "No index names provided");
         }
 
         // Reject callers with no relevant permission at all before doing any work below. Managed indices can
@@ -243,7 +244,7 @@ public class OutdatedIndexResource extends RestResource {
         final boolean hasGeneralDeletePermission = isPermitted(RestPermissions.INDICES_DELETE);
         if (!hasGeneralDeletePermission
                 && request.entityIds().stream().noneMatch(index -> isPermitted(RestPermissions.INDICES_DELETE, index))) {
-            throw new ForbiddenException("Not authorized to delete indices");
+            throw new CodedForbiddenException("outdated_index.not_authorized_to_delete_indices", "Not authorized to delete indices");
         }
 
         final Map<String, OutdatedIndex> outdatedByName = getOutdatedIndices().stream()

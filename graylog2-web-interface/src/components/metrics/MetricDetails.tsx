@@ -17,6 +17,7 @@
 import * as React from 'react';
 import capitalize from 'lodash/capitalize';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import CounterDetails from 'components/metrics/CounterDetails';
 import GaugeDetails from 'components/metrics/GaugeDetails';
@@ -27,6 +28,8 @@ import type { Metric } from 'types/metrics';
 import { useNodeMetric } from 'hooks/useMetrics';
 
 const DetailsForType = ({ metric }: { metric: Metric }) => {
+  const { t } = useTranslation('system');
+
   switch (metric.type) {
     case 'counter':
       return <CounterDetails metric={metric} />;
@@ -39,7 +42,7 @@ const DetailsForType = ({ metric }: { metric: Metric }) => {
     case 'timer':
       return <TimerDetails metric={metric} />;
     default:
-      return <i>Invalid metric type: {metric}</i>;
+      return <i>{t('metric_details.invalid_type', { type: (metric as Metric).type })}</i>;
   }
 };
 

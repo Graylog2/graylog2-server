@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Tabs, Alert } from 'components/bootstrap';
 import CACreateForm from 'components/datanode/DataNodeConfiguration/CACreateForm';
@@ -32,9 +33,12 @@ const StyledAlert = styled(Alert)`
 
 const TAB_KEYS = ['create', 'upload'];
 
-const UploadCA = 'Upload CA';
+const GettingStartedLink = ({ children = undefined }: React.PropsWithChildren) => (
+  <DocumentationLink page="graylog-data-node" text={children} />
+);
 
 const CAConfiguration = () => {
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const sendTelemetry = useSendTelemetry('migration');
   const productName = useProductName();
 
@@ -51,23 +55,24 @@ const CAConfiguration = () => {
 
   return (
     <>
-      <h2>Configure Certificate Authority</h2>
+      <h2>{t('ca_configuration.title')}</h2>
       <p>
-        In this step you can either upload or create a new certificate authority.
+        {t('ca_configuration.description_upload_or_create')}
         <br />
-        The certificate authority will provision and manage certificates for your Data Nodes more easily.
+        {t('ca_configuration.description_provision')}
       </p>
-      <StyledAlert bsStyle="info" title="Reusing certificates">
-        If your existing cluster uses certificates, by default these will get replaced with the {productName} CA and
-        automatically generated certificates during provisioning of the data nodes in the next step. If you want to
-        include your own CA, you can upload an existing certificate. Please see{' '}
-        <DocumentationLink page="graylog-data-node" text={`${productName} Data Node - Getting Started`} /> for more
-        information.
+      <StyledAlert bsStyle="info" title={t('ca_configuration.reusing_certificates_title')}>
+        <Trans
+          t={t}
+          i18nKey="ca_configuration.reusing_certificates"
+          values={{ productName }}
+          components={{ docsLink: <GettingStartedLink /> }}
+        />
       </StyledAlert>
       <Tabs defaultValue={TAB_KEYS[0]} onChange={handleTabSwitch}>
         <Tabs.List>
-          <Tabs.Tab value={TAB_KEYS[0]}>Create new CA</Tabs.Tab>
-          <Tabs.Tab value={TAB_KEYS[1]}>{UploadCA}</Tabs.Tab>
+          <Tabs.Tab value={TAB_KEYS[0]}>{t('ca_configuration.create_tab')}</Tabs.Tab>
+          <Tabs.Tab value={TAB_KEYS[1]}>{t('ca_configuration.upload_tab')}</Tabs.Tab>
         </Tabs.List>
         <Tabs.Panel value={TAB_KEYS[0]}>
           <CACreateForm />

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
@@ -33,6 +34,7 @@ type ActionsProps = {
 };
 
 function Actions({ adapter }: ActionsProps) {
+  const { t } = useTranslation('lookup_tables');
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const sendTelemetry = useSendTelemetry('lut_data_adapter');
   const { deleteDataAdapter, deletingDataAdapter } = useDeleteDataAdapter();
@@ -57,21 +59,25 @@ function Actions({ adapter }: ActionsProps) {
 
   return (
     <>
-      <MoreActionsMenu id={adapter.id} size="lg" pullRight title={`More Actions for ${adapter.name}`}>
-        <MenuItem onSelect={handleEdit}>Edit</MenuItem>
+      <MoreActionsMenu
+        id={adapter.id}
+        size="lg"
+        pullRight
+        title={t('adapter_list.more_actions', { name: adapter.name })}>
+        <MenuItem onSelect={handleEdit}>{t('common:actions.edit')}</MenuItem>
         <MenuItem divider />
-        <DeleteMenuItem onSelect={() => setShowDeleteModal(true)}>Delete</DeleteMenuItem>
+        <DeleteMenuItem onSelect={() => setShowDeleteModal(true)}>{t('common:actions.delete')}</DeleteMenuItem>
       </MoreActionsMenu>
       {showDeleteModal && (
         <BootstrapModalConfirm
           showModal
-          title="Delete Data Adapter"
+          title={t('adapter_list.delete_title')}
           onCancel={() => setShowDeleteModal(false)}
           onConfirm={handleDelete}
           cancelButtonDisabled={deletingDataAdapter}
           confirmButtonDisabled={deletingDataAdapter}
-          confirmButtonText="Delete">
-          <p>Are you sure you want to delete the data adapter &quot;{adapter.title}&quot;?</p>
+          confirmButtonText={t('common:actions.delete')}>
+          <p>{t('adapter_list.delete_confirm', { title: adapter.title })}</p>
         </BootstrapModalConfirm>
       )}
     </>

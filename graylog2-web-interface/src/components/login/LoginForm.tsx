@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ModalSubmit } from 'components/common';
 import { Input } from 'components/bootstrap';
@@ -25,6 +26,7 @@ type Props = {
 };
 
 const LoginForm = ({ onErrorChange }: Props) => {
+  const { t } = useTranslation('login');
   const { login, isLoading } = useLogin(onErrorChange);
 
   const onSignInClicked = (event: React.FormEvent<HTMLFormElement>) => {
@@ -40,16 +42,16 @@ const LoginForm = ({ onErrorChange }: Props) => {
 
   return (
     <form onSubmit={onSignInClicked}>
-      <Input id="username" type="text" label="Username" autoComplete="username" autoFocus required />
+      <Input id="username" type="text" label={t('username')} autoComplete="username" autoFocus required />
 
-      <Input id="password" type="password" label="Password" autoComplete="current-password" required />
+      <Input id="password" type="password" label={t('password')} autoComplete="current-password" required />
 
       <ModalSubmit
         displayCancel={false}
         isSubmitting={isLoading}
         isAsyncSubmit
-        submitLoadingText="Signing in..."
-        submitButtonText="Sign in"
+        submitLoadingText={t('signing_in')}
+        submitButtonText={t('sign_in')}
       />
     </form>
   );

@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { Sidecar } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import { onError } from 'util/conditional/onError';
 import type FetchError from 'logic/errors/FetchError';
 import UserNotification from 'util/UserNotification';
@@ -51,7 +52,10 @@ const useBasicSidecarUser = (): {
     queryFn: () =>
       onError(getSidecarUser(), (error: FetchError) => {
         if (error.status !== 403) {
-          UserNotification.error(`Loading Sidecar User failed with status: ${error}`, 'Could not load Sidecar User');
+          UserNotification.error(
+            i18n.t('basic_sidecar_user.load_failed', { ns: 'sidecars', error: `${error}` }),
+            i18n.t('basic_sidecar_user.load_failed_title', { ns: 'sidecars' }),
+          );
         }
       }),
   });

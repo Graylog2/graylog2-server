@@ -19,6 +19,7 @@ import groupBy from 'lodash/groupBy';
 
 import { SystemCatalog } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import EntityIndex from 'logic/content-packs/EntityIndex';
 import { defaultOnError } from 'util/conditional/onError';
 
@@ -28,8 +29,8 @@ const useEntityIndex = () => {
     queryFn: () =>
       defaultOnError(
         SystemCatalog.showEntityIndex(),
-        'Loading entity index failed with status',
-        'Could not load entity index',
+        i18n.t('entity_index.load_failed', { ns: 'content_packs' }),
+        i18n.t('entity_index.load_failed_title', { ns: 'content_packs' }),
       ),
     select: (result) =>
       groupBy(

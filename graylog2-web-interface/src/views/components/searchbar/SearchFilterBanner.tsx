@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Button, ButtonGroup } from 'components/bootstrap';
 import { Icon, HoverForHelp } from 'components/common';
@@ -39,17 +40,18 @@ const SearchFilterHelp = styled((props: any) => <HoverForHelp {...props} />)`
   margin-left: 5px;
 `;
 
-export const SearchFilterExplanation = () => (
-  <>
-    <p>
-      <i>Search filters</i> contain their own query and extend the main query using the <b>AND</b> operator.
-    </p>
-    <p>
-      Filters can be saved separately and reused in saved searches and dashboards. Updating a saved filter will
-      automatically affect the search results of searches which include the filter.
-    </p>
-  </>
-);
+export const SearchFilterExplanation = () => {
+  const { t } = useTranslation('search');
+
+  return (
+    <>
+      <p>
+        <Trans t={t} i18nKey="search_filter_banner.explanation" components={{ italic: <i />, bold: <b /> }} />
+      </p>
+      <p>{t('search_filter_banner.explanation_saved')}</p>
+    </>
+  );
+};
 
 type Props = {
   onHide: () => void;
@@ -57,6 +59,7 @@ type Props = {
 };
 
 const SearchFilterBanner = ({ onHide, pluggableControls }: Props) => {
+  const { t } = useTranslation('search');
   const hasSearchFiltersPlugin = !!pluggableControls.find((control) => control.id === 'search-filters');
 
   if (hasSearchFiltersPlugin) {
@@ -65,13 +68,13 @@ const SearchFilterBanner = ({ onHide, pluggableControls }: Props) => {
 
   return (
     <Container>
-      Filters
-      <SearchFilterHelp title="Search Filters" trigger={['click']}>
+      {t('search_bar.filters_label')}
+      <SearchFilterHelp title={t('search_bar.filters_tooltip_title')} trigger={['click']}>
         <SearchFilterExplanation />
-        <p>Search filters and parameters are available for the enterprise version.</p>
+        <p>{t('search_bar.filters_enterprise_hint')}</p>
         <StyledButtonBar>
           <Button onClick={onHide} bsSize="xs">
-            Hide controls
+            {t('search_bar.filters_hide_controls')}
           </Button>
         </StyledButtonBar>
       </SearchFilterHelp>

@@ -16,6 +16,7 @@
  */
 /* eslint-disable react/no-unescaped-entities */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Alert } from 'components/bootstrap';
 
@@ -54,40 +55,45 @@ const ASN_FIELDS = `{
     "as_organization": "Google LLC"
 }`;
 
-const MaxmindAdapterDocumentation = () => (
-  <div>
-    <p>The GeoIP data adapter supports reading MaxMind's GeoIP2 databases.</p>
+const MaxmindAdapterDocumentation = () => {
+  const { t } = useTranslation('common');
 
-    <Alert style={{ marginBottom: 10 }} bsStyle="info" title="Limitations">
-      <p>Currently the ASN, city and country databases are supported.</p>
-      <p>For support of additional database types, please visit our support channels.</p>
-    </Alert>
+  return (
+    <div>
+      <p>{t('maxmind_adapter.documentation.intro')}</p>
 
-    <hr />
+      <Alert style={{ marginBottom: 10 }} bsStyle="info" title={t('maxmind_adapter.documentation.limitations_title')}>
+        <p>{t('maxmind_adapter.documentation.limitations_supported')}</p>
+        <p>{t('maxmind_adapter.documentation.limitations_more')}</p>
+      </Alert>
 
-    <h3 style={{ marginBottom: 10 }}>ASN database fields</h3>
+      <hr />
 
-    <pre>{ASN_FIELDS}</pre>
+      <h3 style={{ marginBottom: 10 }}>{t('maxmind_adapter.documentation.asn_fields')}</h3>
 
-    <h3 style={{ marginBottom: 10 }}>Country database fields</h3>
+      <pre>{ASN_FIELDS}</pre>
 
-    <pre>{COUNTRY_FIELDS}</pre>
+      <h3 style={{ marginBottom: 10 }}>{t('maxmind_adapter.documentation.country_fields')}</h3>
 
-    <h3 style={{ marginBottom: 10 }}>City database fields</h3>
+      <pre>{COUNTRY_FIELDS}</pre>
 
-    <p>
-      In addition to the fields provided by the country database, the city database also includes the following fields:
-    </p>
+      <h3 style={{ marginBottom: 10 }}>{t('maxmind_adapter.documentation.city_fields')}</h3>
 
-    <pre>{CITY_FIELDS}</pre>
+      <p>{t('maxmind_adapter.documentation.city_additional_fields')}</p>
 
-    <p>
-      For a complete documentation of the fields, please see MaxMind's{' '}
-      <a href="http://maxmind.github.io/GeoIP2-java/" target="_blank" rel="noopener noreferrer">
-        developer documentation
-      </a>
-    </p>
-  </div>
-);
+      <pre>{CITY_FIELDS}</pre>
+
+      <p>
+        <Trans
+          t={t}
+          i18nKey="maxmind_adapter.documentation.complete_documentation"
+          components={{
+            docsLink: <a href="http://maxmind.github.io/GeoIP2-java/" target="_blank" rel="noopener noreferrer" />,
+          }}
+        />
+      </p>
+    </div>
+  );
+};
 
 export default MaxmindAdapterDocumentation;

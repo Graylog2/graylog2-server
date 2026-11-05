@@ -18,6 +18,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import compact from 'lodash/compact';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import type { PaginatedRoles } from 'hooks/useAuthzRoles';
@@ -96,6 +97,7 @@ const RolesSelector = ({
   identifier = (role) => role.id,
   submitOnSelect = false,
 }: Props) => {
+  const { t } = useTranslation('users');
   const [paginatedRoles, setPaginatedRoles] = useState<PaginatedRoles | undefined>();
   const [selectedRoleNames, setselectedRoleNames] = useState<string | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -135,7 +137,7 @@ const RolesSelector = ({
           onChange={onChange}
           optionRenderer={_renderRoleOption}
           options={options}
-          placeholder="Search for roles"
+          placeholder={t('permissions.roles_selector.search_placeholder')}
           multi
           value={selectedRoleNames}
         />
@@ -144,9 +146,9 @@ const RolesSelector = ({
             bsStyle="primary"
             onClick={_onSubmit}
             disabled={isSubmitting || !selectedRoleNames}
-            title="Assign Role"
+            title={t('permissions.roles_selector.assign_role')}
             type="button">
-            Assign Role
+            {t('permissions.roles_selector.assign_role')}
           </SubmitButton>
         )}
       </FormElements>

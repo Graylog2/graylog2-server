@@ -1,0 +1,451 @@
+{
+  "create_input": {
+    "select_input": "選擇 Input",
+    "launch_new": "啟動新的 Input",
+    "launch_new_type": "啟動新的 <type>{{type}}</type> Input",
+    "launch": "啟動 Input",
+    "no_inputs_available": "沒有可用的 Input"
+  },
+  "edit_input": {
+    "edit": "編輯 Input",
+    "editing": "正在編輯 Input {{title}}",
+    "update": "更新 Input"
+  },
+  "input_dropdown": {
+    "label": "伺服器 Input 選擇",
+    "select": "選擇 Input",
+    "unknown_type": "未知的 Input 類型",
+    "option": "{{title}} ({{type}})"
+  },
+  "input_states": {
+    "title": "{{title}} 的 Input 狀態",
+    "count_other": "{{count}} 個 {{state}}",
+    "CREATED": "已建立",
+    "INITIALIZED": "已初始化",
+    "INVALID_CONFIGURATION": "設定無效",
+    "STARTING": "啟動中",
+    "RUNNING": "執行中",
+    "FAILED": "失敗",
+    "FAILING": "失敗中",
+    "SETUP": "設定中",
+    "STOPPING": "停止中",
+    "STOPPED": "已停止",
+    "TERMINATED": "已終止"
+  },
+  "state_control": {
+    "set_up": "設定 Input",
+    "stopping": "停止中...",
+    "stop": "停止 Input",
+    "starting": "啟動中...",
+    "start": "啟動 Input"
+  },
+  "static_fields": {
+    "title": "靜態欄位",
+    "add": "新增靜態欄位",
+    "add_field": "新增欄位",
+    "add_success": "已成功將靜態欄位「{{field}}」新增至「{{input}}」",
+    "add_failed": "將靜態欄位新增至 Input 失敗：{{error}}",
+    "add_failed_title": "無法將靜態欄位新增至 Input「{{input}}」",
+    "remove_success": "已成功從「{{input}}」移除靜態欄位「{{field}}」",
+    "remove_failed": "從 Input 移除靜態欄位失敗：{{error}}",
+    "remove_failed_title": "無法從 Input「{{input}}」移除靜態欄位「{{field}}」",
+    "delete_title": "刪除靜態欄位",
+    "delete_confirm": "確定要從「{{input}}」移除靜態欄位「{{field}}」嗎？",
+    "description": "定義一個靜態欄位，會新增至透過此 Input 傳入的每則訊息。若訊息已有相同的鍵，則不會覆寫該欄位。鍵只能包含英數字元或底線，且不能是保留欄位。",
+    "field_name": "欄位名稱",
+    "field_name_title": "只能包含英數字元和底線。",
+    "field_value": "欄位值"
+  },
+  "notifications": {
+    "warning": "警告",
+    "failed": "Input 已失敗，在啟動之前不會接收流量。",
+    "setup": "處於設定模式的 Input 在啟動之前不會接收流量。",
+    "stopped": "已停止的 Input 在啟動之前不會接收流量。",
+    "show_failed": "顯示失敗的 Input",
+    "show_setup": "顯示處於設定模式的 Input",
+    "show_stopped": "顯示已停止的 Input"
+  },
+  "node_select": {
+    "node": "節點",
+    "node_help": "此 Input 應在哪個節點上啟動",
+    "select_node": "選擇節點",
+    "global": "全域",
+    "global_help": "此 Input 是否應在所有節點上啟動"
+  },
+  "pages": {
+    "inputs": "Inputs",
+    "docs": "Input 文件",
+    "description": "{{productName}} 節點透過 Input 接收資料。您可以在此啟動或終止任意數量的 Input。",
+    "cloud_description": "{{productName}} 雲端透過 Input 接收資料。可選擇的 Input 類型很多，但只有部分可直接在雲端執行。您可以在此頁面啟動和終止它們。",
+    "cloud_forwarder_hint": "若在此頁面的可用 Input 清單中找不到某個 Input 類型，您可以在 <forwarderLink>Forwarder</forwarderLink> 上啟動該 Input。",
+    "back": "返回",
+    "diagnosis_title": "Input 診斷：{{name}}",
+    "diagnosis_description": "Input 診斷可用於測試 Input 和解析，而不會將任何資料寫入搜尋叢集。",
+    "tab_overview": "總覽",
+    "tab_rules": "規則",
+    "node_inputs_title": "節點 {{nodeId}} / {{hostname}} 的 Input",
+    "node_inputs_description": "{{productName}} 節點透過 Input 接收資料。在此頁面可以查看此特定節點上正在執行的 Input。",
+    "node_inputs_hint": "您可以在<inputsLink>這裡</inputsLink>於叢集上啟動和終止 Input。",
+    "local_inputs": "本機 Input",
+    "global_inputs": "全域 Input"
+  },
+  "diagnosis": {
+    "help": {
+      "listening_on_title": "此 Input 監聽於：",
+      "listening_on": "請注意，綁定位址必須指向 {{productName}} 服務。所選連接埠不得與每個節點上的其他 Input 發生連接埠衝突。請記得，單一節點上的本機 Input 可能與在所有節點上執行的全域 Input 衝突，導致該節點上的 Input 失敗。",
+      "listening_for_title": "此 Input 監聽的對象：",
+      "listening_for": "請注意，傳送至 TCP Input 的 UDP 流量，或傳送至 UDP Input 的 TCP 流量，會顯示為網路 I/O，但不會接收到任何訊息。",
+      "empty_messages_discarded_title": "已捨棄的空訊息：",
+      "empty_messages_discarded": "訊息內容長度為 0 的訊息會被 Input 捨棄。",
+      "network_io_title": "網路 I/O：",
+      "network_io": "請注意，此數值可用於偵測連線嘗試和 Input 的無效流量。",
+      "input_state": "處於執行中狀態的 Input 已準備好接收訊息。處於失敗或失敗中狀態的 Input 遇到了問題；請點擊下方按鈕查看相關的錯誤訊息。",
+      "message_error_at_input_title": "Input 的訊息錯誤：",
+      "message_error_at_input": "每種 Input 類型都預期接收特定格式的訊息。不符合此格式的訊息可能會被 Input 拒絕，在此情況下，它們不會進入處理階段。若要解決這些情況，請檢查正在傳送的訊息。更詳細的錯誤可在 {{productName}} 伺服器的 server.log 檔案中找到。",
+      "message_failed_to_process_title": "訊息處理失敗：",
+      "message_failed_to_process": "Extractor 和 Pipeline 可用於對訊息執行處理作業，例如解析出欄位。若 Pipeline 規則嘗試執行不合理的操作，或將訊息中欄位的屬性修改為與該欄位的資料類型或欄位長度限制衝突的格式，處理可能會失敗。以此方式處理失敗的訊息可在「Processing and Indexing Failures」Stream 中檢視。",
+      "message_failed_to_index_title": "訊息錯誤：",
+      "message_failed_to_index": "在搜尋叢集中，訊息只有在符合索引的結構描述時才能儲存至該索引。OpenSearch 中的每個欄位都有欄位類型和字元上限；若超過任一限制，訊息將無法建立索引。以此方式無法建立索引的訊息可在「Processing and Indexing Failures」Stream 中檢視。",
+      "received_message_count_by_stream": "使用此檢視來了解 Stream 和 Pipeline 規則如何導向此 Input 的訊息。一則訊息可能會被複製到多個 Stream；若因此導致該訊息儲存至多個索引，也會使授權用量倍增。此檢視有助於偵測此類重複。"
+    },
+    "node": {
+      "node_id": "節點 ID：",
+      "message": "訊息：",
+      "last_failed": "上次失敗：",
+      "state_label": "{{state}}：",
+      "state_nodes": "{{count}}/{{total}} 個節點",
+      "state_count": "{{count}}/{{total}}"
+    },
+    "information": {
+      "title": "資訊",
+      "description": "Input 執行所在的位址。",
+      "input_title": "Input 標題：",
+      "input_type": "Input 類型：",
+      "running_on": "此 Input 執行於：",
+      "all_nodes": "所有 {{productName}} 節點",
+      "listening_on": "此 Input 監聽於：",
+      "listening_on_value": "綁定位址 {{bindAddress}}，連接埠 {{port}}。",
+      "listening_for": "此 Input 監聽的對象："
+    },
+    "state": {
+      "title": "狀態",
+      "description": "此 Input 設定執行的 {{productName}} 節點數，以及實際正在執行的節點數。若有任何節點未在執行，請點擊以查看相關的錯誤訊息。",
+      "failed_starts": "啟動失敗次數（過去 15 分鐘）：",
+      "not_running": "Input 未在執行。"
+    },
+    "troubleshooting": {
+      "title": "疑難排解",
+      "failed_title": "若 Input 處於失敗狀態。",
+      "failed_message_field": "當 Input 在一個或多個 {{productName}} 節點上失敗時，狀態面板的訊息欄位會顯示簡短的錯誤訊息；完整的錯誤訊息可在 {{productName}} 的 server.log 檔案中找到。",
+      "failed_port": "若設定使用的連接埠為特權連接埠（且 {{productName}} 並非以 root 身分執行），或該連接埠已被其他 Input 或應用程式使用，則 Input 會失敗。",
+      "failed_route": "若 Input 無法路由至指定的 IP，則 Input 會失敗。",
+      "failed_internet": "若 Input 需要網際網路連線才能連接 API，但沒有網際網路連線或無法路由至該 API，則 Input 會失敗。",
+      "failed_certificate": "若 TCP Input 的憑證無效或已過期，則 Input 會失敗。",
+      "failed_external_api": "連接外部 API 的 Input（例如 Microsoft Azure Input）需要在來源端進行設定變更，{{productName}} 才能收集日誌。所需步驟會詳列於該 Input 對應的文件子頁面中。若在 {{productName}} 端或（如適用）API 所在端的設定有誤，連接外部 API 的 Input 會失敗。",
+      "no_messages_title": "若 Input 已在所有節點上執行，但訊息未能傳送到 Input。",
+      "no_messages_network_io": "請檢查接收流量面板的網路 I/O 欄位。若此處未顯示任何流量，則表示可能存在連線問題。",
+      "no_messages_connectivity": "若未顯示任何流量，請先排除 {{productName}} 伺服器與日誌來源之間的網路連線問題。可執行 ping、telnet 或 tracert 指令來進行檢查。",
+      "no_messages_external_api": "對於連接外部 API 的 Input，請檢查 {{productName}} 的 server.log 檔案。驗證失敗（登入資訊無效，或沒有在 API 上執行該操作的權限）會完整記錄於此。",
+      "no_messages_format": "若接收流量面板的網路 I/O 欄位有顯示流量，但未接收到任何訊息，則表示訊息的傳送格式可能不符合 Input 的要求。",
+      "no_messages_protocol": "TCP Input 無法讀取 UDP 流量，反之亦然。",
+      "no_messages_empty": "沒有內容的訊息會被捨棄。可透過「已捨棄的空訊息」欄位進行監控。",
+      "no_messages_listener": "Listener Input 只接受有限範圍內的格式，可能無法讀取其他格式的訊息。為便於疑難排解，Raw Text Input 的要求最為寬鬆。",
+      "message_errors_title": "若 Input 已在所有節點上執行，訊息也已到達 Input，但部分（或全部）訊息顯示為訊息錯誤。",
+      "message_errors_failure_processing": "在已授權的 Enterprise 叢集上，可啟用 Failure Processing，以儲存在各階段（Input、處理，以及寫入搜尋叢集）發生錯誤的訊息，並保留失敗的詳細資訊，請參閱 failure_cause 和 failure_details 欄位。前往訊息錯誤面板，點擊訊息數量即可檢查個別失敗的訊息。"
+    },
+    "received_traffic": {
+      "title": "接收流量",
+      "description": "已到達此 Input 的訊息和網路流量。注意：指標僅顯示過去 15 分鐘的資料。",
+      "total_messages": "Input 接收的訊息總數：",
+      "events": "{{count}} 個事件",
+      "empty_messages": "已捨棄的空訊息：",
+      "active_connections": "作用中的連線：",
+      "connections_value": "{{open}}（共 {{total}} 個）",
+      "network_io": "網路 I/O："
+    },
+    "message_count_by_stream": {
+      "title": "依 Stream 統計的接收訊息數",
+      "description": "過去 15 分鐘從此 Input 成功擷取的訊息。點擊 Stream 即可檢視其中的訊息。",
+      "stream": "{{streamName}}：",
+      "none": "過去 15 分鐘內，沒有來自此 Input 的訊息被導入 Stream。"
+    },
+    "message_errors": {
+      "title": "訊息錯誤",
+      "description": "訊息可能在 Input、處理 Pipeline，或寫入搜尋叢集時處理失敗。",
+      "at_input": "Input 的訊息錯誤：",
+      "failed_to_process": "訊息處理失敗：",
+      "failed_to_index": "訊息建立索引失敗："
+    },
+    "rules": {
+      "pipeline_rules_title": "Input 出現在 Pipeline 規則中",
+      "pipeline_rules_description": "以下列出明確參照此 Input 的 Pipeline 規則（例如透過 from_input、from_forwarder_input，或比對 gl2_source_input／gl2_forwarder_input）。",
+      "pipeline_rules_human_name": "Pipeline 規則",
+      "pipeline_rules_search": "搜尋 Pipeline 規則",
+      "stream_rules_title": "Input 出現在 Stream 規則中",
+      "stream_rules_description": "以下列出的 Stream 規則包含明確指向此 Input 的 match input 函式。注意：未明確使用 match input 函式、但可能擷取此 Input 訊息的 Stream 規則不會列出。",
+      "stream_rules_human_name": "Stream 規則",
+      "stream_rules_search": "搜尋 Stream 規則",
+      "load_pipeline_rules_failed": "載入 Input 的 Pipeline 規則失敗，狀態為",
+      "could_not_load_pipeline_rules": "無法載入 Input 的 Pipeline 規則",
+      "load_stream_rules_failed": "載入 Input 的 Stream 規則失敗，狀態為",
+      "could_not_load_stream_rules": "無法載入 Input 的 Stream 規則"
+    },
+    "network_stats": {
+      "total_prefix": " （總計：",
+      "total_suffix": "）"
+    },
+    "show_received_messages": "顯示接收的訊息",
+    "fetch_failed": "擷取 Input 診斷資訊失敗，狀態為",
+    "could_not_fetch": "無法擷取 Input 診斷資訊"
+  },
+  "setup_wizard": {
+    "title": "Input 設定精靈",
+    "back": "返回",
+    "finish": "完成",
+    "steps": {
+      "routing": "路由",
+      "launch": "啟動",
+      "diagnosis": "診斷"
+    },
+    "diagnosis_step": {
+      "description": "在不將任何資料寫入搜尋叢集的情況下，測試 Input 和解析。",
+      "go_to_diagnosis": "前往 Input 診斷"
+    },
+    "load_streams_failed": "載入 Stream 失敗：{{error}}",
+    "load_input_references_failed": "載入 Input 參照失敗：{{error}}",
+    "load_streams_by_index_set_failed": "依 Index Set 載入 Stream 失敗：{{error}}",
+    "routing": {
+      "connected_pipelines_title": "連接至目標 Stream 的 Pipeline",
+      "connected_pipelines": "建議在完成 Input 設定前，先檢查這些 Pipeline 的影響。目標 Stream 已連接以下 Pipeline：",
+      "select_destination": "選擇目標 Stream，以將此 Input 的訊息路由至該處。",
+      "recommend_new_stream": "<strong>建議為每個新的 Input 建立新的 Stream。</strong>這有助於將訊息分類為基本的結構描述。",
+      "default_stream_fallback": "未路由至任何 Stream 的訊息將會路由至 <strong>Default Stream</strong>。",
+      "pipeline_rules_info": "本精靈可自動建立 Pipeline 規則，並附加至 <strong>Default Stream</strong>。這些規則會放置於系統管理的 Default Routing Pipeline 中，並會自動重新命名（或刪除），以準確反映此 Input 的狀態。",
+      "new_stream_heading": "路由至新的 Stream",
+      "recommended": "建議！",
+      "create_stream": "建立 Stream",
+      "existing_stream_heading": "路由至現有的 Stream",
+      "select_stream": "選擇 Stream",
+      "create_new_stream": "建立新的 Stream",
+      "choose_existing_stream": "選擇現有的 Stream",
+      "existing_stream_selected": "已選取將此 Input 的訊息路由至現有 Stream。",
+      "pipeline_rules_created": "按下 <strong>Start Input</strong> 按鈕時會建立 Pipeline 規則。",
+      "default_stream": "Default Stream",
+      "remove_from_default": "從「Default Stream」移除符合項目",
+      "remove_from_default_help": "不要將符合此 Stream 的訊息指派至「Default Stream」。"
+    },
+    "start": {
+      "description": "依照所做的設定來設定並啟動 Input。",
+      "rolling_back": "正在復原 Input...",
+      "setting_up": "正在設定 Input...",
+      "not_ready": "您的 Input 尚未準備好進行設定。請完成先前的步驟。",
+      "start_input": "啟動 Input",
+      "rollback_input": "復原 Input",
+      "launch_diagnosis": "啟動 Input 診斷"
+    },
+    "progress": {
+      "details": "詳細資訊：",
+      "loading": {
+        "create_stream": "正在建立 Stream...",
+        "create_stream_named": "正在建立 Stream「{{name}}」...",
+        "start_stream": "正在啟動 Stream...",
+        "start_stream_named": "正在啟動 Stream「{{name}}」...",
+        "create_pipeline": "正在建立 Pipeline...",
+        "create_pipeline_named": "正在建立 Pipeline「{{name}}」...",
+        "setup_routing": "正在設定路由...",
+        "delete_stream": "正在刪除 Stream...",
+        "delete_stream_named": "正在刪除 Stream「{{name}}」...",
+        "delete_pipeline": "正在刪除 Pipeline...",
+        "delete_pipeline_named": "正在刪除 Pipeline「{{name}}」...",
+        "delete_routing": "正在移除路由...",
+        "connect_pipeline": "正在將 Pipeline 連接至 Stream..."
+      },
+      "error": {
+        "create_stream": "建立 Stream 失敗！",
+        "create_stream_named": "建立 Stream「{{name}}」失敗！",
+        "start_stream": "啟動 Stream 失敗！",
+        "start_stream_named": "啟動 Stream「{{name}}」失敗！",
+        "create_pipeline": "建立 Pipeline 失敗！",
+        "create_pipeline_named": "建立 Pipeline「{{name}}」失敗！",
+        "setup_routing": "設定路由失敗！",
+        "result": "啟動 Input 失敗。請將其復原以清除殘留設定。",
+        "delete_stream": "刪除 Stream 失敗！",
+        "delete_stream_named": "刪除 Stream「{{name}}」失敗！",
+        "delete_pipeline": "刪除 Pipeline 失敗！",
+        "delete_pipeline_named": "刪除 Pipeline「{{name}}」失敗！",
+        "delete_routing": "移除路由失敗！",
+        "connect_pipeline": "將 Pipeline 連接至 Stream 失敗！"
+      },
+      "success": {
+        "create_stream": "已建立 Stream！",
+        "create_stream_named": "已建立 Stream「{{name}}」！",
+        "start_stream": "Stream 已啟動！",
+        "start_stream_named": "Stream「{{name}}」已啟動！",
+        "create_pipeline": "已建立 Pipeline！",
+        "create_pipeline_named": "已建立 Pipeline「{{name}}」！",
+        "setup_routing": "已設定路由！",
+        "result": "Input 已成功啟動！",
+        "delete_stream": "已刪除 Stream！",
+        "delete_stream_named": "已刪除 Stream「{{name}}」！",
+        "delete_pipeline": "已刪除 Pipeline！",
+        "delete_pipeline_named": "已刪除 Pipeline「{{name}}」！",
+        "delete_routing": "已移除路由！",
+        "connect_pipeline": "已成功將 Pipeline 連接至 Stream！"
+      }
+    },
+    "create_stream": {
+      "title": "標題",
+      "title_help": "新 Stream 的描述性名稱",
+      "title_required": "必須填寫標題",
+      "index_set_required": "必須選擇 Index Set",
+      "description": "描述",
+      "description_help": "哪些類型的訊息會路由至此 Stream？",
+      "create_pipeline": "為此 Stream 建立新的 Pipeline",
+      "select_index_set": "選擇 Index Set",
+      "index_set_info": "符合此 Stream 的訊息會寫入所設定的 Index Set。Index Set 用於合理地分割資料，以加快搜尋速度。",
+      "index_set_recommendation": "建議為每種 Input 類型建立新的 Index Set。",
+      "create_index_set": "建立新的 Index Set"
+    },
+    "input_in_use": {
+      "title": "Input 已在使用中 - 有訊息重複的風險！",
+      "stream_refs": "此 Input 已在下列 Stream 的 Stream 規則中被參照：",
+      "pipeline_refs": "此 Input 已在下列 Pipeline 的 Pipeline 規則中被參照：",
+      "prevent_duplication": "為防止可能的重複，請在繼續之前移除任何現有的路由。"
+    },
+    "index_set_alert": {
+      "default_title": "已選取預設 Index Set",
+      "default_selected": "您已選取預設 Index Set。",
+      "default_recommendation": "不建議這麼做：預設 Index Set 會接收多種不同格式的訊息（任何未路由的訊息都會透過 Default Stream 進入），若大量使用，可能會達到搜尋後端每個索引的欄位數量上限。",
+      "in_use_title": "所選的 Index Set 已與另一個 Stream 關聯",
+      "in_use": "所選的 Index Set 已與其他 Stream 關聯。",
+      "field_limit": "請注意，每個索引都有獨立的欄位數量上限，預設為 1000。",
+      "organise_recommendation": "因此，建議在可能的情況下，依日誌格式將 Stream 分別整理到多個 Index Set 中。"
+    }
+  },
+  "overview": {
+    "columns": {
+      "traffic": "過去一分鐘的流量",
+      "input_failures": "Input 失敗",
+      "address": "位址",
+      "port": "連接埠",
+      "messages_per_stream": "訊息數量（過去 24 小時）",
+      "extractor_count": "Extractor",
+      "associated_streams": "關聯的 Stream（過去 24 小時）",
+      "configuration": "設定"
+    },
+    "not_available": "無",
+    "show_diagnosis_for": "顯示 {{title}} 的 Input 診斷",
+    "show_diagnosis_for_capitalized": "顯示 {{title}} 的 Input 診斷",
+    "cells": {
+      "no_associated_streams": "Input {{title}} 沒有可用的關聯 Stream",
+      "show_associated_streams": "顯示 {{title}} 的關聯 Stream",
+      "hide_associated_streams": "隱藏 {{title}} 的關聯 Stream",
+      "no_extractor_count": "Input {{title}} 沒有可用的 Extractor 數量",
+      "show_extractors": "顯示 {{title}} 的 Extractor",
+      "hide_extractors": "隱藏 {{title}} 的 Extractor",
+      "no_message_count": "Input {{title}} 沒有可用的訊息數量",
+      "show_messages_per_stream": "顯示 {{title}} 依 Stream 統計的訊息數",
+      "hide_messages_per_stream": "隱藏 {{title}} 依 Stream 統計的訊息數",
+      "show_metrics": "顯示指標",
+      "hide_metrics": "隱藏指標",
+      "throughput": "{{value}} 則訊息/秒",
+      "associated_streams_label": "{{title}} 的關聯 Stream",
+      "extractors_label": "{{title}} 的擷取器",
+      "messages_per_stream_label": "{{title}} 每個 Stream 的訊息"
+    },
+    "sections": {
+      "could_not_load_associated_streams": "無法載入關聯的 Stream。",
+      "no_associated_streams": "過去 24 小時內，沒有 Stream 與此 Input 關聯。",
+      "deleted_stream": "{{streamId}}（已刪除）",
+      "active_connections": "作用中的連線：<active>{{open}} </active>（共 <total>{{total}}</total> 個）",
+      "throughput_metrics": "吞吐量／指標",
+      "manage_extractors": "管理 Extractor",
+      "load_extractors_failed": "載入 Extractor 失敗，狀態為",
+      "could_not_load_extractors_title": "無法載入 Extractor",
+      "could_not_load_extractors": "無法載入 Extractor。",
+      "no_extractors": "此 Input 沒有設定任何 Extractor。",
+      "extractor_title": "標題",
+      "extractor_type": "類型",
+      "source_field": "來源欄位",
+      "target_field": "目標欄位",
+      "could_not_load_messages_per_stream": "無法載入依 Stream 統計的訊息數。",
+      "no_messages_per_stream": "過去 24 小時內，沒有 Stream 從此 Input 接收到訊息。",
+      "stream": "Stream",
+      "messages": "訊息",
+      "network_io": "網路 I/O： ",
+      "total_prefix": " （總計：",
+      "total_suffix": " ）",
+      "empty_messages_discarded": "已捨棄的空訊息：{{value}}",
+      "no_node_metrics": "此節點沒有可用的指標",
+      "no_input_metrics": "此 Input 沒有可用的指標",
+      "show_details": "顯示詳細資訊",
+      "hide_details": "隱藏詳細資訊"
+    },
+    "actions": {
+      "received_messages": "接收的訊息",
+      "input_diagnosis": "Input 診斷",
+      "exit_setup_mode": "結束設定模式",
+      "enter_setup_mode": "進入設定模式",
+      "show_metrics": "顯示指標",
+      "delete_input": "刪除 Input",
+      "delete_title": "正在刪除 Input",
+      "delete_confirm": "確定要刪除 Input {{title}} 嗎？"
+    }
+  },
+  "dot_badge": {
+    "problematic_inputs": "部分 Input 處於失敗狀態或設定模式。"
+  },
+  "use_input_notifications": {
+    "load_failed": "載入 Input 失敗，狀態為",
+    "load_failed_title": "無法載入 Input"
+  },
+  "use_input_details_notifications": {
+    "load_failed": "載入 Input 詳細資訊失敗，狀態為",
+    "load_failed_title": "無法載入 Input 詳細資訊"
+  },
+  "use_input_metrics_notifications": {
+    "load_failed": "載入 Input 指標失敗，狀態為",
+    "load_failed_title": "無法載入 Input 指標"
+  },
+  "use_input_state_summary_notifications": {
+    "load_failed": "載入 Input 狀態摘要失敗，狀態為",
+    "load_failed_title": "無法載入 Input 狀態摘要。"
+  },
+  "use_input_state_mutations_notifications": {
+    "start_failed": "啟動 Input「{{title}}」時發生錯誤：{{error}}",
+    "start_failed_title": "無法啟動 Input「{{title}}」",
+    "started_success": "Input 已成功啟動。",
+    "stop_failed": "停止 Input「{{title}}」時發生錯誤：{{error}}",
+    "stop_failed_title": "無法停止 Input「{{title}}」",
+    "stopped_success": "Input 已成功停止。",
+    "setup_failed": "進入 Input「{{title}}」設定模式時發生錯誤：{{error}}",
+    "setup_failed_title": "無法將 Input「{{title}}」設為設定模式",
+    "deleted_success": "Input 已成功刪除。",
+    "success_title": "成功！"
+  },
+  "use_input_mutations_notifications": {
+    "save_failed": "儲存 Input 失敗，狀態為：{{error}}",
+    "save_failed_title": "無法儲存 Input",
+    "update_failed": "更新 Input 失敗，狀態為：{{error}}",
+    "update_failed_title": "無法更新 Input",
+    "delete_failed": "刪除 Input 失敗，狀態為：{{error}}",
+    "delete_failed_title": "無法刪除 Input",
+    "created_success": "Input 已成功建立。",
+    "updated_success": "Input 已成功更新。",
+    "deleted_success": "Input 已成功刪除。",
+    "success_title": "成功！"
+  },
+  "use_inputs_notifications": {
+    "launched_success": "Input「{{title}}」已成功啟動",
+    "launch_failed": "啟動 Input「{{title}}」失敗，狀態為：{{error}}",
+    "launch_failed_title": "無法啟動 Input",
+    "updated_success": "Input「{{title}}」已成功更新",
+    "update_failed": "更新 Input「{{title}}」失敗，狀態為：{{error}}",
+    "update_failed_title": "無法更新 Input",
+    "deleted_success": "Input「{{title}}」已成功刪除",
+    "delete_failed": "刪除 Input「{{title}}」失敗，狀態為：{{error}}",
+    "delete_failed_title": "無法刪除 Input",
+    "fetch_failed": "擷取 Input 失敗，狀態為：{{error}}",
+    "fetch_failed_title": "無法取得 Input"
+  }
+}

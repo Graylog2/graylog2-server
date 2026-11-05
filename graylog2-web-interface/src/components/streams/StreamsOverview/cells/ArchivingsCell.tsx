@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { Stream } from 'logic/streams/types';
 import { StatusIcon, Tooltip } from 'components/common';
@@ -29,6 +30,7 @@ type Props = {
 };
 
 const ArchivingsCell = ({ stream, indexSets }: Props) => {
+  const { t } = useTranslation('streams');
   const excludedStreams = useExcludedArchiveStreams();
 
   // No is_default/is_editable guard: archiving status applies to every stream, unlike the sibling action cells.
@@ -45,7 +47,7 @@ const ArchivingsCell = ({ stream, indexSets }: Props) => {
   }
 
   return (
-    <Tooltip withArrow position="right" label="Archiving is enabled">
+    <Tooltip withArrow position="right" label={t('streams_overview.cells.archiving_enabled')}>
       <StatusIcon active />
     </Tooltip>
   );

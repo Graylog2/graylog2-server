@@ -16,22 +16,22 @@
  */
 import * as React from 'react';
 
-type Props = {
+// The link text is provided as children, e.g. by `Trans`.
+type Props = React.PropsWithChildren<{
   group: string;
   onSelect: (newGroup: string) => void;
   selected: boolean;
-  text: string;
   title: string;
-};
+}>;
 
-const FieldGroup = ({ onSelect, selected, group, text, title }: Props) => (
+const FieldGroup = ({ onSelect, selected, group, title, children = undefined }: Props) => (
   <a
     onClick={() => onSelect(group)}
     role="button"
     style={{ fontWeight: selected ? 'bold' : 'normal' }}
     tabIndex={0}
     title={title}>
-    {text}
+    {children}
   </a>
 );
 

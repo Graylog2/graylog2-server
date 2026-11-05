@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { Field } from 'formik';
 
@@ -51,25 +52,37 @@ type Props = {
   index: number;
 };
 
-const IntervalCheckboxDesc = () => (
-  <IntervalCheckboxDescWithHelp>
-    Auto
-    <IntervalHoverForHelp title="Interval Types">
-      <ul>
-        <li>
-          <h4>Auto bucket size</h4>
-          For example, 1.5x. A smaller granularity leads to <strong>less</strong>; conversely, a larger one shows{' '}
-          <strong>more</strong> values.
-        </li>
+const TIME_UNIT_LABELS = {
+  seconds: 'wizard_units.time_units.seconds',
+  minutes: 'wizard_units.time_units.minutes',
+  hours: 'wizard_units.time_units.hours',
+  days: 'wizard_units.time_units.days',
+  weeks: 'wizard_units.time_units.weeks',
+  months: 'wizard_units.time_units.months',
+} as const satisfies Record<keyof typeof TimeUnits, string>;
 
-        <li>
-          <h4>Fixed bucket size</h4>
-          For example, 2 minutes. The time defines the size of the buckets for this timestamp type.
-        </li>
-      </ul>
-    </IntervalHoverForHelp>
-  </IntervalCheckboxDescWithHelp>
-);
+const IntervalCheckboxDesc = () => {
+  const { t } = useTranslation('aggregation');
+
+  return (
+    <IntervalCheckboxDescWithHelp>
+      {t('wizard_grouping.auto')}
+      <IntervalHoverForHelp title={t('wizard_grouping.interval_types')}>
+        <ul>
+          <li>
+            <h4>{t('wizard_grouping.auto_bucket_size')}</h4>
+            <Trans t={t} i18nKey="wizard_grouping.auto_bucket_size_help" components={{ strong: <strong /> }} />
+          </li>
+
+          <li>
+            <h4>{t('wizard_grouping.fixed_bucket_size')}</h4>
+            {t('wizard_grouping.fixed_bucket_size_help')}
+          </li>
+        </ul>
+      </IntervalHoverForHelp>
+    </IntervalCheckboxDescWithHelp>
+  );
+};
 
 const toggleIntervalType = (name, currentType, onChange) => {
   if (currentType === 'auto') {
@@ -84,65 +97,74 @@ const StyledFormControl = styled(FormControl)`
   border: 0;
 `;
 
-const Time = ({ index }: Props) => (
-  <Field name={`groupBy.groupings.${index}.interval`}>
-    {({ field: { name, value, onChange }, meta: { error } }) => (
-      <Input
-        id="group-by-interval"
-        label="Interval"
-        error={error}
-        labelClassName="col-sm-3"
-        wrapperClassName="col-sm-9">
-        <TypeCheckboxWrapper>
-          <Checkbox onChange={() => toggleIntervalType(name, value.type, onChange)} checked={value.type === 'auto'}>
-            <IntervalCheckboxDesc />
-          </Checkbox>
-        </TypeCheckboxWrapper>
+const Time = ({ index }: Props) => {
+  const { t } = useTranslation('aggregation');
 
-        {value.type === 'auto' && (
-          <RangeSelect>
-            <Icon name="zoom_out" size="lg" style={{ paddingRight: '0.5rem' }} />
-            <StyledFormControl
-              type="range"
-              min={0.5}
-              max={10}
-              step={0.5}
-              value={value.scaling ? 1 / value.scaling : 1.0}
-              onChange={(e) =>
-                onChange({
-                  target: { name, value: { ...value, scaling: 1 / parseFloat((e.target as HTMLInputElement).value) } },
-                })
-              }
-            />
-            <Icon name="zoom_in" size="lg" style={{ paddingLeft: '0.5rem' }} />
-            <CurrentScale>{value.scaling ? 1 / value.scaling : 1.0}x</CurrentScale>
-          </RangeSelect>
-        )}
-        {value.type !== 'auto' && (
-          <InputGroup>
-            <FormControl
-              type="number"
-              value={value.value}
-              step="1"
-              min="1"
-              onChange={(e) =>
-                onChange({ target: { name, value: { ...value, value: (e.target as HTMLInputElement).value } } })
-              }
-            />
-            <InputGroup.Button>
-              <DropdownButton title={TimeUnits[value.unit] || ''}>
-                {Object.keys(TimeUnits).map((unit) => (
-                  <MenuItem key={unit} onSelect={() => onChange({ target: { name, value: { ...value, unit } } })}>
-                    {TimeUnits[unit]}
-                  </MenuItem>
-                ))}
-              </DropdownButton>
-            </InputGroup.Button>
-          </InputGroup>
-        )}
-      </Input>
-    )}
-  </Field>
-);
+  return (
+    <Field name={`groupBy.groupings.${index}.interval`}>
+      {({ field: { name, value, onChange }, meta: { error } }) => (
+        <Input
+          id="group-by-interval"
+          label={t('wizard_grouping.interval')}
+          error={error}
+          labelClassName="col-sm-3"
+          wrapperClassName="col-sm-9">
+          <TypeCheckboxWrapper>
+            <Checkbox onChange={() => toggleIntervalType(name, value.type, onChange)} checked={value.type === 'auto'}>
+              <IntervalCheckboxDesc />
+            </Checkbox>
+          </TypeCheckboxWrapper>
+
+          {value.type === 'auto' && (
+            <RangeSelect>
+              <Icon name="zoom_out" size="lg" style={{ paddingRight: '0.5rem' }} />
+              <StyledFormControl
+                type="range"
+                min={0.5}
+                max={10}
+                step={0.5}
+                value={value.scaling ? 1 / value.scaling : 1.0}
+                onChange={(e) =>
+                  onChange({
+                    target: {
+                      name,
+                      value: { ...value, scaling: 1 / parseFloat((e.target as HTMLInputElement).value) },
+                    },
+                  })
+                }
+              />
+              <Icon name="zoom_in" size="lg" style={{ paddingLeft: '0.5rem' }} />
+              <CurrentScale>
+                {t('wizard_grouping.scale', { scale: value.scaling ? 1 / value.scaling : 1.0 })}
+              </CurrentScale>
+            </RangeSelect>
+          )}
+          {value.type !== 'auto' && (
+            <InputGroup>
+              <FormControl
+                type="number"
+                value={value.value}
+                step="1"
+                min="1"
+                onChange={(e) =>
+                  onChange({ target: { name, value: { ...value, value: (e.target as HTMLInputElement).value } } })
+                }
+              />
+              <InputGroup.Button>
+                <DropdownButton title={TimeUnits[value.unit] ? t(TIME_UNIT_LABELS[value.unit]) : ''}>
+                  {Object.keys(TimeUnits).map((unit) => (
+                    <MenuItem key={unit} onSelect={() => onChange({ target: { name, value: { ...value, unit } } })}>
+                      {t(TIME_UNIT_LABELS[unit])}
+                    </MenuItem>
+                  ))}
+                </DropdownButton>
+              </InputGroup.Button>
+            </InputGroup>
+          )}
+        </Input>
+      )}
+    </Field>
+  );
+};
 
 export default Time;

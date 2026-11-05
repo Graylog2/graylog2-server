@@ -16,6 +16,7 @@
  */
 import React, { useContext, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Button, ControlLabel, FormGroup, Input, ButtonGroup } from 'components/bootstrap';
 import MessageShow from 'components/search/MessageShow';
@@ -73,6 +74,7 @@ type Props = {
 };
 
 const RuleSimulation = ({ rule: currentRule = undefined, onSaveMessage = () => {} }: Props) => {
+  const { t } = useTranslation('pipelines');
   const {
     rule,
     simulateRule,
@@ -103,9 +105,7 @@ const RuleSimulation = ({ rule: currentRule = undefined, onSaveMessage = () => {
   }, [currentRule, setRuleSimulationResult, simulateRule, simulationFieldType]);
 
   const is_rule_builder = Boolean(currentRule?.rule_builder);
-  const ruleErrorMessage = hasRuleBuilderErrors(currentRule)
-    ? 'Could not run the rule simulation. Please fix the rule builder errors.'
-    : undefined;
+  const ruleErrorMessage = hasRuleBuilderErrors(currentRule) ? t('rule_simulation.error_builder') : undefined;
   const conditionsOutputKeys = Object.keys(ruleSimulationResult?.simulator_condition_variables || {}).sort(
     (a, b) => Number(a) - Number(b),
   );
@@ -113,13 +113,13 @@ const RuleSimulation = ({ rule: currentRule = undefined, onSaveMessage = () => {
   const getPlaceHolderByType = () => {
     switch (simulationFieldType) {
       case SimulationFieldType.Simple:
-        return 'simple message field';
+        return t('rule_simulation.placeholder_simple');
       case SimulationFieldType.KeyValue:
         return 'message: test\nsource: unknown\n';
       case SimulationFieldType.JSON:
         return '{\n\tmessage: test\n\tsource: unknown\n}';
       default:
-        return 'simple message field';
+        return t('rule_simulation.placeholder_simple');
     }
   };
 
@@ -130,7 +130,7 @@ const RuleSimulation = ({ rule: currentRule = undefined, onSaveMessage = () => {
       try {
         JSON.parse(rawMessageToSimulate);
       } catch {
-        setSimulationErrorMessage('Invalid JSON!');
+        setSimulationErrorMessage(t('rule_simulation.invalid_json'));
       }
     }
   };
@@ -170,24 +170,24 @@ const RuleSimulation = ({ rule: currentRule = undefined, onSaveMessage = () => {
   return (
     <StyledFormGroup>
       <ControlLabel>
-        Rule Simulation <small className="text-muted">(Optional)</small>
+        {t('rule_simulation.title')} <small className="text-muted">{t('rule_simulation.optional')}</small>
       </ControlLabel>
       <div>
         <ButtonGroup>
           <Button
             active={simulationFieldType === SimulationFieldType.JSON}
             onClick={() => handleFieldTypeChange(SimulationFieldType.JSON)}>
-            JSON
+            {t('rule_simulation.json')}
           </Button>
           <Button
             active={simulationFieldType === SimulationFieldType.KeyValue}
             onClick={() => handleFieldTypeChange(SimulationFieldType.KeyValue)}>
-            Key Value
+            {t('rule_simulation.key_value')}
           </Button>
           <Button
             active={simulationFieldType === SimulationFieldType.Simple}
             onClick={() => handleFieldTypeChange(SimulationFieldType.Simple)}>
-            Simple Message
+            {t('rule_simulation.simple_message')}
           </Button>
         </ButtonGroup>
         <Input
@@ -196,8 +196,8 @@ const RuleSimulation = ({ rule: currentRule = undefined, onSaveMessage = () => {
           placeholder={getPlaceHolderByType()}
           value={rawMessageToSimulate}
           onChange={handleRawMessageChange}
-          title="Simple message field, Key-Value pairs or JSON"
-          help="Enter a normal string to simulate the message field, Key-Value pairs or a JSON to simulate the whole message."
+          title={t('rule_simulation.input_title')}
+          help={t('rule_simulation.input_help')}
           error={ruleErrorMessage || simulationErrorMessage}
           rows={4}
         />
@@ -206,10 +206,10 @@ const RuleSimulation = ({ rule: currentRule = undefined, onSaveMessage = () => {
           bsSize="xsmall"
           disabled={!rawMessageToSimulate || Boolean(ruleErrorMessage)}
           onClick={handleRunRuleSimulation}>
-          Run rule simulation
+          {t('rule_simulation.run')}
         </Button>
         <ResetButton bsStyle="default" bsSize="xsmall" onClick={handleResetRuleSimulation}>
-          Reset
+          {t('rule_simulation.reset')}
         </ResetButton>
         {rawMessageToSimulate && ruleSimulationResult && (
           <>
@@ -220,7 +220,7 @@ const RuleSimulation = ({ rule: currentRule = undefined, onSaveMessage = () => {
               <>
                 {conditionsOutputKeys.length > 0 && (
                   <OutputContainer data-testid="conditions-output">
-                    <label htmlFor="simulation_conditions_output">Conditions Output</label>
+                    <label htmlFor="simulation_conditions_output">{t('rule_simulation.conditions_output')}</label>
                     {conditionsOutputKeys.map((conditionsOutputKey) => (
                       <OutputText key={conditionsOutputKey}>
                         <ActionOutputIndex>{conditionsOutputKey}</ActionOutputIndex>:{' '}
@@ -231,7 +231,7 @@ const RuleSimulation = ({ rule: currentRule = undefined, onSaveMessage = () => {
                 )}
                 {ruleSimulationResult?.simulator_action_variables?.length > 0 && (
                   <OutputContainer data-testid="actions-output">
-                    <label htmlFor="simulation_actions_output">Actions Output</label>
+                    <label htmlFor="simulation_actions_output">{t('rule_simulation.actions_output')}</label>
                     {ruleSimulationResult?.simulator_action_variables?.map(
                       (actionOutputKeyValue: Record<string, unknown>) => {
                         const keyValue = Object.entries(actionOutputKeyValue)[0];

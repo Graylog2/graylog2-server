@@ -21,6 +21,7 @@ import uniqBy from 'lodash/uniqBy';
 import { SystemCatalog } from '@graylog/server-api';
 
 import { defaultOnError } from 'util/conditional/onError';
+import i18n from 'i18n';
 
 export type EntityRef = { id: string; type: string };
 
@@ -34,8 +35,8 @@ const entityTitles = create({
   fetcher: (entities: Array<EntityRef>) =>
     defaultOnError(
       fetchEntityTitles(uniqBy(entities, ({ id, type }) => `${type}:${id}`)),
-      'Loading entity titles failed with status',
-      'Could not load entity titles',
+      i18n.t('use_entity_titles_notifications.load_failed', { ns: 'common' }),
+      i18n.t('use_entity_titles_notifications.load_failed_title', { ns: 'common' }),
     ),
   resolver: (response: TitlesResponse, { id }: EntityRef) => ({
     id,

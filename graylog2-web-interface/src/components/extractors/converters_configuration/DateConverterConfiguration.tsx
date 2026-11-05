@@ -15,12 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans } from 'react-i18next';
 
+import i18n from 'i18n';
 import { LocaleSelect, TimezoneSelect } from 'components/common';
 import { Row, Col, Input } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import { getValueFromInput } from 'util/FormsUtils';
+
+// Example value of the format, not translated.
+const DATE_FORMAT_EXAMPLE = 'yyyy-MM-dd HH:mm:ss.SSS';
+
+const DocsLink = ({ children = undefined }: { children?: React.ReactNode }) => (
+  <DocumentationLink page={DocsHelper.PAGES.PAGE_STANDARD_DATE_CONVERTER} text={children} />
+);
 
 type DateConverterConfigurationProps = {
   type: string;
@@ -66,22 +75,19 @@ class DateConverterConfiguration extends React.Component<
   render() {
     const dateFormatHelpMessage = (
       <span>
-        String format the date uses. Read more in the{' '}
-        <DocumentationLink page={DocsHelper.PAGES.PAGE_STANDARD_DATE_CONVERTER} text="documentation" />.
+        <Trans i18nKey="converters.date_format_help" ns="extractors" components={{ docsLink: <DocsLink /> }} />
       </span>
     );
 
     const timezoneHelpMessage = (
       <span>
-        Time zone to apply to date. Read more in the{' '}
-        <DocumentationLink page={DocsHelper.PAGES.PAGE_STANDARD_DATE_CONVERTER} text="documentation" />.
+        <Trans i18nKey="converters.time_zone_help" ns="extractors" components={{ docsLink: <DocsLink /> }} />
       </span>
     );
 
     const localeHelpMessage = (
       <span>
-        Locale to use when parsing the date. Read more in the{' '}
-        <DocumentationLink page={DocsHelper.PAGES.PAGE_STANDARD_DATE_CONVERTER} text="documentation" />.
+        <Trans i18nKey="converters.locale_help" ns="extractors" components={{ docsLink: <DocsLink /> }} />
       </span>
     );
 
@@ -93,7 +99,7 @@ class DateConverterConfiguration extends React.Component<
             this.converterEnabled = converterEnabled;
           }}
           id={`enable-${this.props.type}-converter`}
-          label="Convert to date type"
+          label={i18n.t('converters.date_enable', { ns: 'extractors' })}
           wrapperClassName="col-md-offset-2 col-md-10"
           defaultChecked
           onChange={this._toggleConverter}
@@ -104,18 +110,18 @@ class DateConverterConfiguration extends React.Component<
               <Input
                 type="text"
                 id={`${this.props.type}_converter_date_format`}
-                label="Format string"
+                label={i18n.t('converters.date_format', { ns: 'extractors' })}
                 defaultValue={this.props.configuration.date_format}
                 labelClassName="col-md-3"
                 wrapperClassName="col-md-9"
-                placeholder="yyyy-MM-dd HH:mm:ss.SSS"
+                placeholder={DATE_FORMAT_EXAMPLE}
                 onChange={this._onChange('date_format')}
                 required={this.converterEnabled && this.converterEnabled.getChecked()}
                 help={dateFormatHelpMessage}
               />
 
               <Input
-                label="Time Zone"
+                label={i18n.t('converters.time_zone', { ns: 'extractors' })}
                 id={`${this.props.type}_converter_timezone`}
                 labelClassName="col-sm-3"
                 wrapperClassName="col-sm-9"
@@ -128,7 +134,7 @@ class DateConverterConfiguration extends React.Component<
                 />
               </Input>
               <Input
-                label="Locale"
+                label={i18n.t('converters.locale', { ns: 'extractors' })}
                 id={`${this.props.type}_converter_locale`}
                 labelClassName="col-sm-3"
                 wrapperClassName="col-sm-9"

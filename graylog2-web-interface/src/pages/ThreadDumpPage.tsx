@@ -16,6 +16,7 @@
  */
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Timestamp } from 'components/common';
@@ -24,6 +25,7 @@ import { NodesStore } from 'stores/nodes/NodesStore';
 import { useStore } from 'stores/connect';
 
 const ThreadDumpPage = () => {
+  const { t } = useTranslation('system');
   const { nodeId } = useParams();
   const { nodes } = useStore(NodesStore);
   const [threadDump, setThreadDump] = useState<string>();
@@ -40,15 +42,15 @@ const ThreadDumpPage = () => {
   }
 
   return (
-    <DocumentTitle title={`Thread dump of node ${node.short_node_id} / ${node.hostname}`}>
+    <DocumentTitle title={t('thread_dump_page.title', { shortNodeId: node.short_node_id, hostname: node.hostname })}>
       <div>
         <PageHeader
           title={
             <span>
-              Thread dump of node {node.short_node_id} / {node.hostname}
+              {t('thread_dump_page.title', { shortNodeId: node.short_node_id, hostname: node.hostname })}
               &nbsp;
               <small>
-                Taken at <Timestamp dateTime={new Date()} />
+                <Trans t={t} i18nKey="thread_dump_page.taken_at" components={[<Timestamp dateTime={new Date()} />]} />
               </small>
             </span>
           }

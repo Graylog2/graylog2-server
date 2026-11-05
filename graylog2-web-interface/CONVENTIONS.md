@@ -119,6 +119,25 @@ The theme lives in `src/theme/sawmill`. `THEME_BASE.ts` defines the color shade 
 - New tokens need a name that describes their usage. Inform the designer when you add one. Add them to `styled-components/utils/colors.ts` and their type to `styled-components/types.ts`. Applying an opacity with `opacify` is fine.
 - The default themes are read from the generated `mantine/generated/theme.json` and `styled-components/generated/theme.json`. After changing `THEME_BASE.ts` or the color utils, run `yarn generate:themes` and commit the generated files. Custom themes from the customization page are generated at runtime.
 
+## Translations
+
+User-visible texts are translated with [i18next](https://www.i18next.com/) and `react-i18next`.
+
+- Texts live in `src/locales/<language>/<namespace>.json`, one namespace per area (`common` for shared components, `search`, `streams`, …). Register new namespaces in `src/locales/registerCoreTranslations.ts`; plugins call `registerTranslations` from `i18n` with their own namespaces.
+- Keys are nested, `snake_case` and describe the purpose, not the English text: `t('bulk_actions.cancel')`.
+- Translate whole sentences. Use interpolation (`{{name}}`) for values and `<Trans>` for markup, never concatenate translated fragments. Word order and grammar differ between languages.
+- `<Trans>` fills its components with the text between the tags, so pass components which render `children` (wrap components like `DocumentationLink` that take a `text` prop). Don't name tags like HTML void elements (`link`, `input`, `img`, …), their content gets lost.
+- Use plurals via `count` (`items_one`, `items_other`) instead of `StringUtils.pluralize`.
+- Translate at render time: call `t()` inside components, also for default prop values. Module-level constants hold keys, not texts. Outside of components, call `i18n.t()` from `i18n` when the text is needed.
+- Never translate user content (e.g. stream or dashboard titles) or technical values (field names, query syntax). Messages of thrown errors and console output are for developers and stay English.
+- German translations follow `src/locales/GLOSSARY.de.md`.
+- Navigation items (`navigation`, `pageNavigation`, `helpMenu` plugin exports) keep their English `description`, because it identifies them, e.g. to merge items of plugins or for `position.after`. Set `titleKey` (e.g. `navigation:main.search`) to translate the displayed title.
+- Format numbers, dates and durations with `util/NumberFormatting`, `util/DateTime` (e.g. `preciseDifference`) and `useUserDateTime`. They follow the UI language.
+- English texts are the fallback. Add every new key to all languages in `src/locales`; `locales.test.ts` fails otherwise. Untranslated drafts may be added in English and marked for review.
+- Tests fail when a component uses a key which does not exist. Keys are not type-checked, because i18next's key types require `strictNullChecks`.
+- Directories which are completely translated enable the `graylog/no-untranslated-text` lint rule in `eslint.config.mjs`.
+- In development mode, the "Pseudo" language shows translated texts with accents and extra length. Text without accents is not translated yet.
+
 ## Refactoring
 
 - Put refactoring in separate commits, and in a separate PR if it grows large.

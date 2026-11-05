@@ -16,12 +16,12 @@
  */
 
 import React, { useContext, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
 import { Icon } from 'components/common';
 import Store from 'logic/local-storage/Store';
-import StringUtils from 'util/StringUtils';
 
 import useFormattedFields from './hooks/useFormattedFields';
 import MessageFieldsViewModeList from './MessageFieldsViewModeList';
@@ -56,6 +56,7 @@ const IconSeparator = ({ expanded }: { expanded: boolean }) => (
   <Icon size="xs" name={expanded ? 'collapse_all' : 'expand_all'} type="regular" />
 );
 const Separator = ({ onClick, expanded, restLength }: Props) => {
+  const { t } = useTranslation('common');
   const onKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (e.key === 'Enter' || e.key === ' ') {
@@ -70,7 +71,11 @@ const Separator = ({ onClick, expanded, restLength }: Props) => {
     <SeparatorContainer onClick={onClick} role="button" tabIndex={0} onKeyDown={onKeyDown}>
       <Line />
       <IconSeparator expanded={expanded} />
-      <span>{`${expanded ? 'Hide' : 'Show'} ${restLength || ''} remaining ${StringUtils.pluralize(restLength, 'field', 'fields')}`}</span>
+      <span>
+        {expanded
+          ? t('message.hide_remaining_fields', { count: restLength })
+          : t('message.show_remaining_fields', { count: restLength })}
+      </span>
       <IconSeparator expanded={expanded} />
       <Line />
     </SeparatorContainer>

@@ -21,6 +21,7 @@ import { Telemetry } from '@graylog/server-api';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
+import i18n from 'i18n';
 import UserNotification from 'util/UserNotification';
 
 export type UserTelemetrySettings = {
@@ -51,7 +52,10 @@ export const useUpdateTelemetrySettings = () => {
     mutationFn: updateTelemetrySettings,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: TELEMETRY_SETTINGS_QUERY_KEY }),
     onError: (error) => {
-      UserNotification.error(`Update failed: ${error}`, 'Could not update telemetry settings.');
+      UserNotification.error(
+        i18n.t('notifications.telemetry_update_failed', { ns: 'common', error }),
+        i18n.t('notifications.telemetry_update_failed_title', { ns: 'common' }),
+      );
     },
   });
 };

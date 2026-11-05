@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { Field } from 'formik';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Select from 'components/common/Select';
 import { Input } from 'components/bootstrap';
@@ -28,11 +29,8 @@ type Props = {
   label?: React.ReactElement | string;
 };
 
-const IndexSetSelect = ({
-  indexSets,
-  label = 'Index Set',
-  help = 'Messages that match this stream will be written to the configured index set.',
-}: Props) => {
+const IndexSetSelect = ({ indexSets, label = undefined, help = undefined }: Props) => {
+  const { t } = useTranslation('streams');
   const indexSetOptions = useMemo(
     () =>
       indexSets
@@ -47,7 +45,11 @@ const IndexSetSelect = ({
   return (
     <Field name="index_set_id">
       {({ field: { name, value, onChange, onBlur }, meta: { error, touched } }) => (
-        <Input label={label} help={help} id={name} error={error && touched ? error : undefined}>
+        <Input
+          label={label ?? t('index_set_select.label')}
+          help={help ?? t('index_set_select.help')}
+          id={name}
+          error={error && touched ? error : undefined}>
           <Select
             onBlur={onBlur}
             onChange={(newValue: number) =>
@@ -57,7 +59,7 @@ const IndexSetSelect = ({
             }
             options={indexSetOptions}
             inputId={name}
-            placeholder="Select an index set"
+            placeholder={t('index_set_select.placeholder')}
             value={value}
           />
         </Input>

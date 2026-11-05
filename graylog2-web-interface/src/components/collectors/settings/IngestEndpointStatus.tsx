@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Button, Alert, Row, Col, Table } from 'components/bootstrap';
 import { Link } from 'components/common';
@@ -40,6 +41,7 @@ type Props = {
 };
 
 const IngestEndpointStatus = ({ isInitialSetup }: Props) => {
+  const { t } = useTranslation('collectors');
   const { isPermitted } = usePermissions();
   const { createCollectorInput } = useCollectorInputMutations();
   const { collectorInputIds, loadedInputs, unreadableCount, isLoading } = useCollectorInputDetails();
@@ -75,40 +77,35 @@ const IngestEndpointStatus = ({ isInitialSetup }: Props) => {
   return (
     <Row className="content">
       <Col md={12}>
-        <SectionTitle>Ingest Inputs</SectionTitle>
+        <SectionTitle>{t('ingest_inputs.title')}</SectionTitle>
         {!isInitialSetup && !hasInputs && (
           <Alert bsStyle="info">
-            No Collector ingest input exists. Collectors will not be able to send data until an input is created.
+            {t('ingest_inputs.none')}
             {canCreateInputs && (
               <>
                 {' '}
                 <Button bsSize="xsmall" onClick={handleCreateInput}>
-                  Create input
+                  {t('ingest_endpoint.create_input')}
                 </Button>
               </>
             )}
           </Alert>
         )}
         {loadedInputs.length === 0 && unreadableCount > 0 && (
-          <p>
-            {unreadableCount} collector ingest {unreadableCount === 1 ? 'input exists' : 'inputs exist'} but you do not
-            have permission to view {unreadableCount === 1 ? 'it' : 'them'}.
-          </p>
+          <p>{t('ingest_inputs.unreadable', { count: unreadableCount })}</p>
         )}
         {!isLoadingInputStates && !hasRunningInput && loadedInputs.length > 0 && (
-          <Alert bsStyle="info">
-            Collector ingest inputs exist but none are currently running. Collectors will not be able to send data.
-          </Alert>
+          <Alert bsStyle="info">{t('ingest_inputs.none_running')}</Alert>
         )}
         {loadedInputs.length > 0 && (
           <Table condensed>
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Status</th>
-                <th>Bind Address</th>
-                <th>Port</th>
-                <th />
+                <th>{t('ingest_inputs.name')}</th>
+                <th>{t('ingest_inputs.status')}</th>
+                <th>{t('ingest_inputs.bind_address')}</th>
+                <th>{t('ingest_inputs.port')}</th>
+                <th aria-label={t('enrolling_hosts.actions')} />
               </tr>
             </thead>
             <tbody>
@@ -137,7 +134,7 @@ const IngestEndpointStatus = ({ isInitialSetup }: Props) => {
                           input_running: isRunning,
                         });
                       }}>
-                      Manage
+                      {t('ingest_inputs.manage')}
                     </Link>
                   </td>
                 </tr>
@@ -146,9 +143,7 @@ const IngestEndpointStatus = ({ isInitialSetup }: Props) => {
           </Table>
         )}
         {unreadableCount > 0 && loadedInputs.length > 0 && (
-          <p>
-            {unreadableCount} additional {unreadableCount === 1 ? 'input' : 'inputs'} not visible due to permissions.
-          </p>
+          <p>{t('ingest_inputs.additional_unreadable', { count: unreadableCount })}</p>
         )}
       </Col>
     </Row>

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { Stream } from 'logic/streams/types';
 import { Button } from 'components/bootstrap';
@@ -30,6 +31,7 @@ type Props = {
 };
 
 const RulesSectionActions = ({ stream }: Props) => {
+  const { t } = useTranslation('streams');
   const [showAddRuleModal, setShowAddRuleModal] = useState(false);
 
   const isDefaultStream = stream.is_default;
@@ -50,21 +52,21 @@ const RulesSectionActions = ({ stream }: Props) => {
       <IfPermitted permissions={[`streams:edit:${stream.id}`]}>
         <LinkContainer to={Routes.stream_edit(stream.id)}>
           <Button bsStyle="link" bsSize="xsmall" disabled={isDefaultStream || isNotEditable}>
-            Manage Rules
+            {t('streams_overview.expanded.manage_rules')}
           </Button>
         </LinkContainer>
       </IfPermitted>
       <IfPermitted permissions={[`streams:edit:${stream.id}`]}>
         <Button bsStyle="info" bsSize="xsmall" disabled={isDefaultStream || isNotEditable} onClick={toggleAddRuleModal}>
-          Quick Add Rule
+          {t('streams_overview.expanded.quick_add_rule')}
         </Button>
       </IfPermitted>
       {showAddRuleModal && (
         <StreamRuleModal
           onClose={toggleAddRuleModal}
-          title="New Stream Rule"
-          submitButtonText="Create Rule"
-          submitLoadingText="Creating Rule..."
+          title={t('stream_rules.new_title')}
+          submitButtonText={t('stream_rules.create_button')}
+          submitLoadingText={t('stream_rules.creating')}
           onSubmit={onCreateStreamRule}
         />
       )}

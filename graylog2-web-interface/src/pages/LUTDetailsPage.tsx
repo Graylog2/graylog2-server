@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import useHistory from 'routing/useHistory';
 import { Button, Row, Col } from 'components/bootstrap';
@@ -44,16 +45,17 @@ const FlexCol = styled(Col)`
 
 function LUTDetailsPage() {
   const { goBack } = useHistory();
+  const { t } = useTranslation('lookup_tables');
 
   return (
     <FlexContainer>
       <LUTPageLayout
-        documentTitle="Lookup Table Details"
-        pageTitle="Lookup Tables Details"
-        pageDescription="Lookup tables can be used in extractors, converters and processing pipelines to translate message fields or to enrich messages."
+        documentTitle={t('details_document_title')}
+        pageTitle={t('details_page_title')}
+        pageDescription={t('description')}
         actions={
           <Button bsStyle="primary" onClick={() => goBack()}>
-            Back to list
+            {t('back_to_list')}
           </Button>
         }>
         <Row className="content" style={{ flexGrow: 1 }}>

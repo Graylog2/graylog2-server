@@ -19,6 +19,7 @@ import { useState } from 'react';
 
 import { CertificateRenewal } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import type { DataNode } from 'components/datanode/Types';
 import UserNotification from 'util/UserNotification';
 import { Button } from 'components/bootstrap';
@@ -28,8 +29,6 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 const renewalWording = {
   buttonTitle: 'Renew certificate',
   buttonLoadingTitle: 'Renewing certificate',
-  successActionTitle: 'renewed',
-  errorActionTitle: 'renewal',
   telemetryAppSection: 'renewing-certificate',
   buttonStyle: 'primary',
 } as const;
@@ -37,8 +36,6 @@ const renewalWording = {
 const provisioningWording = {
   buttonTitle: 'Provision certificate',
   buttonLoadingTitle: 'Provisioning certificate...',
-  successActionTitle: 'provisioned',
-  errorActionTitle: 'provisioning',
   telemetryAppSection: 'provisioning-certificate',
   buttonStyle: 'success',
 } as const;
@@ -46,8 +43,9 @@ const provisioningWording = {
 export const CertRenewalButton = ({ nodeId, status }: { nodeId: string; status: DataNode['status'] }) => {
   const sendTelemetry = useSendTelemetry('data-node');
   const [isRenewing, setIsRenewing] = useState(false);
-  const { buttonTitle, buttonLoadingTitle, successActionTitle, errorActionTitle, telemetryAppSection, buttonStyle } =
+  const { buttonTitle, buttonLoadingTitle, telemetryAppSection, buttonStyle } =
     status === 'UNCONFIGURED' ? provisioningWording : renewalWording;
+  const isProvisioning = status === 'UNCONFIGURED';
 
   const onCertificateRenewal = () => {
     setIsRenewing(true);
@@ -58,10 +56,24 @@ export const CertRenewalButton = ({ nodeId, status }: { nodeId: string; status: 
 
     CertificateRenewal.initiateCertRenewalForNode(nodeId)
       .then(() => {
-        UserNotification.success(`Certificate ${successActionTitle} successfully`);
+        UserNotification.success(
+          i18n.t(
+            isProvisioning
+              ? 'notifications.certificate_provisioned_success'
+              : 'notifications.certificate_renewed_success',
+            { ns: 'datanode' },
+          ),
+        );
       })
       .catch((error) => {
-        UserNotification.error(`Certificate ${errorActionTitle} failed with error: ${error}`);
+        UserNotification.error(
+          i18n.t(
+            isProvisioning
+              ? 'notifications.certificate_provisioning_failed'
+              : 'notifications.certificate_renewal_failed',
+            { ns: 'datanode', error },
+          ),
+        );
       })
       .finally(() => {
         setIsRenewing(false);

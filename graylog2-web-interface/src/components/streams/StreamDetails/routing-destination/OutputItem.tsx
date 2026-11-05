@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import type { Output } from 'hooks/useOutputs';
@@ -37,28 +38,32 @@ const StyledButtonToolbar = styled(ButtonToolbar)`
   justify-content: flex-end;
 `;
 
-const OutputItem = ({ output, streamId, isLoadingOutputTypes, onUpdate, getTypeDefinition }: Props) => (
-  <tr>
-    <td>
-      {output.title} <small>{`(Type: ${output.type})`}</small>{' '}
-    </td>
-    {}
-    <td>
-      <StyledButtonToolbar>
-        <IfPermitted permissions="stream_outputs:create">
-          <EditOutputButton
-            disabled={isLoadingOutputTypes}
-            output={output}
-            onUpdate={onUpdate}
-            getTypeDefinition={getTypeDefinition}
-          />
-        </IfPermitted>
-        <IfPermitted permissions="stream_outputs:delete">
-          <RemoveOutputButton output={output} streamId={streamId} />
-        </IfPermitted>
-      </StyledButtonToolbar>
-    </td>
-  </tr>
-);
+const OutputItem = ({ output, streamId, isLoadingOutputTypes, onUpdate, getTypeDefinition }: Props) => {
+  const { t } = useTranslation('streams');
+
+  return (
+    <tr>
+      <td>
+        {output.title} <small>{t('routing_destination.output_item.type', { type: output.type })}</small>{' '}
+      </td>
+      {}
+      <td>
+        <StyledButtonToolbar>
+          <IfPermitted permissions="stream_outputs:create">
+            <EditOutputButton
+              disabled={isLoadingOutputTypes}
+              output={output}
+              onUpdate={onUpdate}
+              getTypeDefinition={getTypeDefinition}
+            />
+          </IfPermitted>
+          <IfPermitted permissions="stream_outputs:delete">
+            <RemoveOutputButton output={output} streamId={streamId} />
+          </IfPermitted>
+        </StyledButtonToolbar>
+      </td>
+    </tr>
+  );
+};
 
 export default OutputItem;

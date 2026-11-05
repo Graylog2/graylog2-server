@@ -19,6 +19,7 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import styled from 'styled-components';
 import isEmpty from 'lodash/isEmpty';
+import { useTranslation } from 'react-i18next';
 
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import EventTypeLabel from 'components/events/events/EventTypeLabel';
@@ -32,6 +33,7 @@ import type { ColumnRenderersByAttribute, EntityBase } from 'components/common/E
 import EventDefinitionLink from 'components/events/events/EventDefinitionLink';
 import RemediationSteps from 'components/events/ReplaySearchSidebar/RemediationSteps';
 import ChipsCell from 'components/common/ChipsCell';
+import { eventDefinitionTypeTitle } from 'components/event-definitions/pluginTitles';
 import useAppendTagFilter from 'components/events/useAppendTagFilter';
 import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
@@ -57,14 +59,24 @@ export const EventDefinitionTypeRenderer = ({ type }: { type: string }) => {
     return eventDefinitionTypes.find((edt) => edt.type === type);
   }, [eventDefinitionTypes, type]);
 
-  return <>{(plugin && plugin.displayName) || type}</>;
+  return <>{(plugin && eventDefinitionTypeTitle(plugin)) || type}</>;
+};
+
+const EmptyValue = ({ textKey }: { textKey: string }) => {
+  const { t } = useTranslation('events');
+
+  return <em>{t(textKey)}</em>;
 };
 
 const FieldsRenderer = ({ fields }: { fields: { [fieldName: string]: string } }) =>
-  isEmpty(fields) ? <em>No additional Fields added to this Event.</em> : <EventFields fields={fields} />;
+  isEmpty(fields) ? <EmptyValue textKey="alerts_list.no_additional_fields" /> : <EventFields fields={fields} />;
 
 const GroupByFieldsRenderer = ({ groupByFields }: { groupByFields: Record<string, string> }) =>
-  isEmpty(groupByFields) ? <em>No group-by fields on this Event.</em> : <EventFields fields={groupByFields} />;
+  isEmpty(groupByFields) ? (
+    <EmptyValue textKey="alerts_list.no_group_by_fields" />
+  ) : (
+    <EventFields fields={groupByFields} />
+  );
 
 const StyledDiv = styled.div`
   cursor: pointer;
@@ -90,7 +102,7 @@ const TimeRangeRenderer = ({ eventData }: { eventData: Event }) =>
       <Timestamp dateTime={new Date(eventData.timerange_end)} />
     </div>
   ) : (
-    <em>No time range</em>
+    <EmptyValue textKey="alerts_list.no_time_range" />
   );
 
 export const TagsRenderer = ({
@@ -123,7 +135,7 @@ export const getGeneralEventAttributeRenderers = <T extends EntityBase, M = unkn
     renderCell: (message: string, event) => <MessageRenderer message={message} eventId={event.id} />,
   },
   key: {
-    renderCell: (key: string) => <span>{key || <em>No Key set for this Event.</em>}</span>,
+    renderCell: (key: string) => <span>{key || <EmptyValue textKey="alerts_list.no_key" />}</span>,
     staticWidth: 200,
   },
   event_id: {

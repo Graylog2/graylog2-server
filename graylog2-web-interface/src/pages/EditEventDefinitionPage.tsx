@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import URI from 'urijs';
 
@@ -34,6 +35,7 @@ import useQuery from 'routing/useQuery';
 import StreamPermissionErrorPage from './StreamPermissionErrorPage';
 
 const EditEventDefinitionPage = () => {
+  const { t } = useTranslation('event_definitions');
   const params = useParams<{ definitionId?: string }>();
   const { step } = useQuery();
   const { isPermitted } = usePermissions();
@@ -91,10 +93,10 @@ const EditEventDefinitionPage = () => {
 
   if (!eventDefinition) {
     return (
-      <DocumentTitle title="Edit Event Definition">
+      <DocumentTitle title={t('page.edit')}>
         <span>
-          <PageHeader title="Edit Event Definition">
-            <Spinner text="Loading Event Definition..." />
+          <PageHeader title={t('page.edit')}>
+            <Spinner text={t('page.loading')} />
           </PageHeader>
         </span>
       </DocumentTitle>
@@ -102,15 +104,15 @@ const EditEventDefinitionPage = () => {
   }
 
   return (
-    <DocumentTitle title={`Edit "${eventDefinition.title}" Event Definition`}>
+    <DocumentTitle title={t('page.edit_named', { title: eventDefinition.title })}>
       <EventsPageNavigation />
       <PageHeader
-        title={`Edit "${eventDefinition.title}" Event Definition`}
+        title={t('page.edit_named', { title: eventDefinition.title })}
         documentationLink={{
-          title: 'Alerts documentation',
+          title: t('page.alerts_docs'),
           path: DocsHelper.PAGES.ALERTS,
         }}>
-        <span>Event Definitions allow you to create Events from different Conditions and alert on them.</span>
+        <span>{t('page.description_events')}</span>
       </PageHeader>
       <Row className="content">
         <Col md={12}>

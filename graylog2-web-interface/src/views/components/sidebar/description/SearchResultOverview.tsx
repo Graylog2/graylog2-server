@@ -15,11 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import numeral from 'numeral';
 import isEmpty from 'lodash/isEmpty';
 import styled from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Timestamp } from 'components/common';
+import { formatNumber } from 'util/NumberFormatting';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
 import useViewType from 'views/hooks/useViewType';
 import View from 'views/logic/views/View';
@@ -42,11 +43,12 @@ type Props = {
 };
 
 const SearchResultOverview = ({ results }: Props) => {
+  const { t } = useTranslation('search');
   const { timerange: globalOverrideTimeRange } = useGlobalOverride() ?? {};
   const viewType = useViewType();
 
   if (isEmpty(results)) {
-    return <i>No query executed yet.</i>;
+    return <i>{t('sidebar_description.no_query')}</i>;
   }
 
   const { timestamp, duration, effectiveTimerange, searchTypes } = results;
@@ -56,26 +58,31 @@ const SearchResultOverview = ({ results }: Props) => {
   return (
     <>
       <p>
-        Query executed in <br />
-        {numeral(duration).format('0,0')}ms at <Timestamp dateTime={timestamp} />
+        {t('sidebar_description.query_executed_in')} <br />
+        <Trans
+          t={t}
+          i18nKey="search_result_overview.duration_at"
+          values={{ duration: formatNumber(duration, { digits: 0 }) }}
+          components={{ timestamp: <Timestamp dateTime={timestamp} /> }}
+        />
       </p>
       <EffectiveTimeRange>
-        Effective time range
+        {t('sidebar_description.effective_time_range')}
         <br />
         {isVariesPerWidget ? (
-          <i>Varies per widget</i>
+          <i>{t('sidebar_description.varies_per_widget')}</i>
         ) : (
           <EffectiveTimeRangeTable>
             <tbody>
               <tr>
-                <td>From</td>
-                <td aria-label="Effective time range from">
+                <td>{t('sidebar_description.time_from')}</td>
+                <td aria-label={t('search_result_overview.effective_from')}>
                   <Timestamp dateTime={effectiveTimerange.from} format="complete" />
                 </td>
               </tr>
               <tr>
-                <td>To</td>
-                <td aria-label="Effective time range to">
+                <td>{t('sidebar_description.time_to')}</td>
+                <td aria-label={t('search_result_overview.effective_to')}>
                   <Timestamp dateTime={effectiveTimerange.to} format="complete" />
                 </td>
               </tr>
@@ -84,9 +91,9 @@ const SearchResultOverview = ({ results }: Props) => {
         )}
       </EffectiveTimeRange>
       <p>
-        Total results
+        {t('sidebar_description.total_results')}
         <br />
-        {isVariesPerWidget ? <i>Varies per widget</i> : numeral(total).format('0,0')}
+        {isVariesPerWidget ? <i>{t('sidebar_description.varies_per_widget')}</i> : formatNumber(total, { digits: 0 })}
       </p>
     </>
   );

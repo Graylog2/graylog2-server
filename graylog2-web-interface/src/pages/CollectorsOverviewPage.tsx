@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
@@ -25,25 +26,23 @@ import { CollectorsOverview } from 'components/collectors/overview';
 import { CollectorsPageNavigation } from 'components/collectors/common';
 
 const CollectorsOverviewPage = () => {
+  const { t } = useTranslation('collectors');
   const productName = useProductName();
 
   return (
-    <DocumentTitle title="Collectors Overview">
+    <DocumentTitle title={t('pages.overview.title')}>
       <CollectorsPageNavigation />
       <PageHeader
         title={
           <>
-            Collectors Overview <PreviewBadge />
+            {t('pages.overview.title')} <PreviewBadge />
           </>
         }
         documentationLink={{
-          title: 'Collectors documentation',
+          title: t('pages.documentation_title'),
           path: DocsHelper.PAGES.COLLECTORS,
         }}>
-        <span>
-          Collectors are lightweight services deployed across your infrastructure to collect logs and forward them to{' '}
-          {productName}. They are organized into fleets and configured with sources that define what data to collect.
-        </span>
+        <span>{t('pages.overview.description', { productName })}</span>
       </PageHeader>
       <Row className="content">
         <Col md={12}>

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button, ButtonToolbar, DeleteMenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
@@ -24,12 +25,13 @@ import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSele
 import useProfileMutations from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileMutations';
 
 const ProfileActions = ({ profileId, profileName }: { profileId: string; profileName: string }) => {
+  const { t } = useTranslation('indexsets');
   const { deselectEntity } = useSelectedEntities();
   const { deleteProfile } = useProfileMutations();
 
   const onDelete = () => {
     // eslint-disable-next-line no-alert
-    if (window.confirm(`You are about to delete profile: "${profileName}". Are you sure?`)) {
+    if (window.confirm(t('profiles.confirm_delete', { profileName }))) {
       deleteProfile(profileId).then(() => {
         deselectEntity(profileId);
       });
@@ -39,7 +41,7 @@ const ProfileActions = ({ profileId, profileName }: { profileId: string; profile
   return (
     <ButtonToolbar>
       <LinkContainer to={Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.edit(profileId)}>
-        <Button bsSize="xs">Edit</Button>
+        <Button bsSize="xs">{t('common:actions.edit')}</Button>
       </LinkContainer>
       <MoreActions>
         <DeleteMenuItem onSelect={onDelete} />

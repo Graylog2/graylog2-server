@@ -18,6 +18,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { PipelinesConnections } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import UserNotification from 'util/UserNotification';
 import { defaultOnError } from 'util/conditional/onError';
 
@@ -35,8 +36,8 @@ const usePipelineConnections = () => {
     queryFn: () =>
       defaultOnError(
         PipelinesConnections.getAll() as Promise<PipelineConnectionsType[]>,
-        'Fetching pipeline connections failed with status',
-        'Could not retrieve pipeline connections',
+        i18n.t('pipeline_notifications.connections_failed', { ns: 'pipelines' }),
+        i18n.t('pipeline_notifications.connections_failed_title', { ns: 'pipelines' }),
       ),
   });
 
@@ -53,13 +54,13 @@ export const usePipelineConnectionMutation = () => {
         stream_ids: reverseConnection.streams,
       }),
     onSuccess: () => {
-      UserNotification.success('Pipeline connections updated successfully');
+      UserNotification.success(i18n.t('pipeline_notifications.connections_updated', { ns: 'pipelines' }));
       queryClient.invalidateQueries({ queryKey: PIPELINE_CONNECTIONS_QUERY_KEY });
     },
     onError: (error: Error) => {
       UserNotification.error(
-        `Updating pipeline connections failed with status: ${error.message}`,
-        'Could not update pipeline connections',
+        i18n.t('pipeline_notifications.connections_update_failed', { ns: 'pipelines', error: error.message }),
+        i18n.t('pipeline_notifications.connections_update_failed_title', { ns: 'pipelines' }),
       );
     },
   });

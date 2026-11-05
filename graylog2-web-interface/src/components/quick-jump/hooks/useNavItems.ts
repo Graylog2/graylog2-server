@@ -17,6 +17,7 @@
 import { useContext, useMemo } from 'react';
 import type { Permission } from 'graylog-web-plugin/plugin';
 
+import useNavigationTitle from 'components/navigation/useNavigationTitle';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { PAGE_TYPE, ACTION_TYPE, LINK_TYPE } from 'components/quick-jump/Constants';
 import usePermissions from 'hooks/usePermissions';
@@ -54,7 +55,7 @@ const useConfigurationPages = () => {
     .map((page) => ({
       type: PAGE_TYPE,
       link: prefixUrl(`${Routes.SYSTEM.CONFIGURATIONS}/${page.name}`),
-      title: `Configurations / ${page.name}`,
+      title: `Configurations / ${page.displayName ?? page.name}`,
     }));
 
   const pluginNavItems = pluginSystemConfigurations
@@ -129,6 +130,7 @@ const useQuickJumpLinks = () => {
 
 const useHelpMenuItems = () => {
   const menuItems = usePluginEntities('helpMenu');
+  const navigationTitle = useNavigationTitle();
   const { isPermitted } = usePermissions();
 
   return menuItems
@@ -138,14 +140,14 @@ const useHelpMenuItems = () => {
         return {
           type: LINK_TYPE,
           externalLink: item.externalLink,
-          title: item.description,
+          title: navigationTitle(item),
         };
       }
 
       if ('action' in item) {
         return {
           type: ACTION_TYPE,
-          title: item.description,
+          title: navigationTitle(item),
           action: item.action,
         };
       }
@@ -153,7 +155,7 @@ const useHelpMenuItems = () => {
       if ('path' in item) {
         return {
           type: PAGE_TYPE,
-          title: item.description,
+          title: navigationTitle(item),
           link: prefixUrl(item.path),
         };
       }
@@ -163,7 +165,7 @@ const useHelpMenuItems = () => {
 };
 
 type BaseNavigationItem = {
-  description: string;
+  title: string;
   path: QualifiedUrl<string>;
   permissions?: Permission | Array<Permission>;
 };
@@ -171,6 +173,7 @@ type BaseNavigationItem = {
 const useMainNavigationItems = () => {
   const { isPermitted } = usePermissions();
   const navigationItems = usePluginEntities('navigation');
+  const navigationTitle = useNavigationTitle();
 
   const allNavigationItems = navigationItems.flatMap((item) => {
     // Conditions are hooks, so they are evaluated for every item and child before the early return.
@@ -189,23 +192,24 @@ const useMainNavigationItems = () => {
     }
 
     if (!('children' in item)) {
-      return [item];
+      return [{ ...item, title: navigationTitle(item) }];
     }
 
     return visibleChildren.map<BaseNavigationItem>((child) => ({
       ...child,
-      description: `${item.description} / ${child.description}`,
+      title: `${navigationTitle(item)} / ${navigationTitle(child)}`,
     }));
   });
 
   return allNavigationItems
     .filter((item) => isPermitted(item.permissions))
-    .map((item) => ({ type: PAGE_TYPE, link: item.path, title: item.description }));
+    .map((item) => ({ type: PAGE_TYPE, link: item.path, title: item.title }));
 };
 
 const usePageNavigationItems = () => {
   const { isPermitted } = usePermissions();
   const pageNavigationItems = usePluginEntities('pageNavigation');
+  const navigationTitle = useNavigationTitle();
 
   return pageNavigationItems.flatMap((group) =>
     [...group.children]
@@ -216,7 +220,11 @@ const usePageNavigationItems = () => {
       )
       .filter((page) => isPermitted(page.permissions))
       .slice(1)
-      .map((page) => ({ type: PAGE_TYPE, link: page.path, title: `${group.description} / ${page.description}` })),
+      .map((page) => ({
+        type: PAGE_TYPE,
+        link: page.path,
+        title: `${navigationTitle(group)} / ${navigationTitle(page)}`,
+      })),
   );
 };
 

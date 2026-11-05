@@ -1,0 +1,222 @@
+{
+  "copy_to_dashboard": {
+    "title": "将组件复制到 Dashboard",
+    "no_dashboards": "未找到 Dashboard。",
+    "create_new": "创建新 Dashboard"
+  },
+  "edit_message_list": {
+    "fields": "字段",
+    "message_preview": "消息预览",
+    "sorting": "排序",
+    "direction": "方向",
+    "decorators": "装饰器"
+  },
+  "widget_frame": {
+    "loading": "正在加载组件 ..."
+  },
+  "export_widget": {
+    "export_all": "导出所有搜索结果",
+    "title": "导出组件",
+    "enterprise_explanation": "聚合组件导出功能适用于 Enterprise 版本。此功能提供将数据导出为 CSV、JSON、YAML、XML 等常用文件格式的选项。"
+  },
+  "field_sort": {
+    "placeholder": "无：点击添加字段",
+    "aria_label": "选择用于排序的字段"
+  },
+  "fields_configuration": {
+    "add_field": "添加字段",
+    "hide_selected_other": "隐藏 {{count}} 个所选字段",
+    "show_selected_other": "显示 {{count}} 个所选字段"
+  },
+  "move_widget": {
+    "no_pages": "未找到页面",
+    "copy": "复制组件",
+    "move": "移动组件",
+    "title": "选择目标页面",
+    "keep_copy": "在此页面保留副本",
+    "keep_copy_help": "启用“在页面上保留副本”后，组件将被复制到其他页面，而不是移动。"
+  },
+  "widget_edit": {
+    "update": "更新组件",
+    "updating": "正在更新组件..."
+  },
+  "execution_info": {
+    "executed_at": "执行时间：",
+    "executed_at_label": "执行时间",
+    "executed_in": "执行耗时：",
+    "duration": "{{duration}}ms",
+    "effective_time_range": "实际时间范围：",
+    "from": "开始",
+    "to": "结束",
+    "from_label": "实际时间范围开始",
+    "to_label": "实际时间范围结束",
+    "total_results": "结果总数：",
+    "title": "执行信息",
+    "no_query_executed": "尚未执行查询。"
+  },
+  "selected_fields": {
+    "fields": "字段",
+    "edit_field": "编辑 {{field}} 字段",
+    "remove_field": "移除 {{field}} 字段"
+  },
+  "sort_direction": {
+    "ascending": "升序",
+    "descending": "降序",
+    "no_sorting": "未选择排序",
+    "select_direction": "点击选择方向"
+  },
+  "timerange_info": {
+    "global_override": "全局覆盖：{{timerange}}",
+    "effective_unavailable": "当前无法获取组件的实际时间范围。",
+    "independent": "此组件的结果与当前搜索无关。",
+    "all_time": "全部时间"
+  },
+  "unknown_widget": {
+    "title": "未知组件：{{type}}",
+    "cannot_render": "很抱歉，无法渲染此组件，因为我们不知道如何处理类型为 <strong>{{type}}</strong> 的组件。可能是由以下情况之一导致的：",
+    "missing_plugin": "此组件由现已缺失的插件创建。",
+    "legacy_dashboard": "此组件属于旧版 Dashboard，由现已不再可用的插件创建。",
+    "what_to_do": "您可以怎么做？您可以重新加载该插件，联系原插件作者获取与当前版本 {{productName}} 兼容的插件，或者如果不再需要此组件，将其移除。",
+    "copy_config": "无论哪种情况，您都可以将组件的配置复制到剪贴板："
+  },
+  "widget_actions": {
+    "open_dropdown": "打开操作下拉菜单",
+    "unfocus": "取消聚焦组件",
+    "focus": "聚焦此组件",
+    "edit": "编辑",
+    "duplicate": "复制",
+    "copy_to_dashboard": "复制到 Dashboard",
+    "move_to_page": "移动到页面",
+    "copying": "正在复制组件...",
+    "copy": "复制组件",
+    "confirm_remove": "确定要移除组件 “{{title}}” 吗？",
+    "compress_width": "缩小宽度",
+    "stretch_width": "拉伸宽度",
+    "replay_search": "重新执行搜索"
+  },
+  "widget_loading": {
+    "content": "正在加载组件内容"
+  },
+  "widget_errors": {
+    "render_error": "渲染此组件时发生以下错误："
+  },
+  "widget_header": {
+    "no_description": "未提供组件描述",
+    "show_description": "显示组件的描述",
+    "description_placeholder": "请为组件添加有用的描述",
+    "drag_handle": "{{title}} 的拖动手柄"
+  },
+  "warm_tier": {
+    "info": "信息",
+    "loading_slow": "此组件正在从 Warm Tier 检索数据，加载时间可能较长。"
+  },
+  "events_widget": {
+    "actions": "操作",
+    "replay_search": "重新执行搜索",
+    "view_details": "查看事件详情",
+    "toggle_actions": "切换事件操作",
+    "details_title": "事件详情",
+    "close": "关闭",
+    "unknown_visualization": "未知的组件可视化类型 {{mode}}",
+    "mode_list": "列表",
+    "mode_count": "计数",
+    "visualization": "可视化",
+    "columns": "列",
+    "select_column": "选择新列",
+    "filter": "过滤",
+    "sorting": "排序",
+    "unknown_attribute": "未知",
+    "unknown_attribute_help": "此属性当前不可用，因为它需要有效的许可证。",
+    "select_event_definition": "选择 Event Definition",
+    "alert": "告警",
+    "event": "事件"
+  },
+  "overview_configuration": {
+    "remove_column": "移除 {{column}} 列",
+    "column": "列",
+    "select_column": "选择列",
+    "direction": "方向",
+    "select_direction": "选择方向",
+    "type": "类型",
+    "add_column": "添加列",
+    "configure_filter": "配置新过滤器",
+    "edit_filter": "编辑 {{column}} 过滤器",
+    "delete_filter": "删除 {{column}} 过滤器"
+  },
+  "date_filter": {
+    "single_date": "单个日期",
+    "range": "范围",
+    "select_single_date": "选择单个日期类型",
+    "select_range": "选择范围类型",
+    "date_range": "{{from}} 至 {{to}}"
+  },
+  "message_table": {
+    "actions": "操作",
+    "loading": "正在加载",
+    "decorated": "（已应用装饰器）",
+    "stopped_node": "已停止的节点",
+    "cluster_node": "集群节点 {{nodeId}} / {{hostname}}",
+    "decorators": {
+      "create_new": "创建新的 {{name}}",
+      "select_decorator": "选择装饰器",
+      "none_configured": "未配置装饰器。",
+      "actions": "操作",
+      "edit": "编辑",
+      "edit_named": "编辑 {{name}}",
+      "unknown_type": "未知的装饰器类型",
+      "create": "创建",
+      "update": "更新",
+      "help_title": "什么是消息装饰器？",
+      "help_description": "装饰器可以实时修改搜索结果中显示的消息。这些更改不会被保存，仅在搜索结果中显示。装饰器配置按<strong>每个 Stream</strong>保存。",
+      "help_order": "拖放以调整装饰器的处理顺序。",
+      "help_docs": "在<docsLink>文档</docsLink>中阅读更多关于消息装饰器的内容。"
+    },
+    "show_message_in_new_row": "在新行中显示消息"
+  },
+  "data_table": {
+    "spacer": "间隔",
+    "display_name": "数据表",
+    "pinned_columns_title": "固定列",
+    "show_row_numbers_title": "显示行号"
+  },
+  "field_types": {
+    "missing_event_definition": "缺少 Event Definition：{{id}}"
+  },
+  "export": {
+    "title_search": "导出所有搜索结果",
+    "title_dashboard": "导出消息表搜索结果",
+    "select_different_table": "选择其他消息表",
+    "downloading": "正在下载...",
+    "start_download": "开始下载",
+    "settings_based_on": "以下设置基于消息表：{{title}}",
+    "exporting_table": "您当前正在导出消息表 {{title}} 的搜索结果。",
+    "define_fields": "定义文件的字段。",
+    "decorated_fields_hint": "导出功能支持消息表中装饰器创建的字段，但这些字段目前不会出现在字段列表中。如需导出装饰后的字段，只需输入其名称。",
+    "finish_hint": "完成配置后，点击<quote>开始下载</quote>。",
+    "fields_to_export": "要导出的字段",
+    "messages_limit": "消息数量上限",
+    "limit_help": "消息是分块加载的。如果设置了上限，则会获取所有分块，直到达到上限所在的分块为止。因此，实际交付的消息总数可能高于设定的上限。",
+    "search_contains_all": "导出将包含当前搜索的所有消息。",
+    "search_select_table": "请选择一个消息表以采用其字段。您可以在下一步中调整所有设置。",
+    "dashboard_select_table": "请选择要导出搜索结果的消息表。您可以在下一步中调整其字段。",
+    "dashboard_equals_action": "选择消息表等同于在消息表操作菜单中使用“导出为 CSV”选项。",
+    "select_message_table": "选择消息表",
+    "no_message_table": "您需要创建一个消息表组件才能导出其结果。",
+    "output_format": "输出格式",
+    "untitled_view": "未命名{{type}}"
+  },
+  "enterprise_widgets": {
+    "message_list": "消息列表",
+    "results": "结果",
+    "events": "事件",
+    "text_markdown": "文本/Markdown"
+  },
+  "comma_separated_values_csv": "逗号分隔值 (CSV)",
+  "error_widget": {
+    "title": "获取此组件数据时发生以下错误："
+  },
+  "notifications": {
+    "delete_decorator_confirm": "确定要删除此装饰器吗？",
+    "unsaved_changes_confirm": "配置表单中有未保存的更改，此操作将撤销这些更改"
+  }
+}

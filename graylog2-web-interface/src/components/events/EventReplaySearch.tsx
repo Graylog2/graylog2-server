@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 
 import useCreateViewForEvent from 'views/logic/views/UseCreateViewForEvent';
 import type { EventDefinitionMappedData } from 'hooks/useEventDefinition';
@@ -27,14 +29,14 @@ import type { LayoutState } from 'views/components/contexts/SearchPageLayoutCont
 import sidebarSections from 'views/components/sidebar/sidebarSections';
 import SidebarEventDetails from 'components/events/SidebarEventDetails';
 
-const defaultSearchPageLayout: Partial<LayoutState> = {
+const createDefaultSearchPageLayout = (t: TFunction): Partial<LayoutState> => ({
   sidebar: {
     isShown: true,
     initialSectionCollapsed: true,
-    title: 'Replayed Search',
+    title: t('alerts_replay.replayed_search'),
     sections: [...sidebarSections],
   },
-};
+});
 
 type Props = {
   eventDefinitionMappedData: EventDefinitionMappedData;
@@ -45,7 +47,8 @@ type Props = {
 const EventReplaySearch = ({ eventDefinitionMappedData, eventData, searchPageLayout = undefined }: Props) => {
   const { eventDefinition, aggregations } = eventDefinitionMappedData;
   const { openSidebar } = useRightSidebar();
-  const effectiveLayout = searchPageLayout ?? defaultSearchPageLayout;
+  const { t } = useTranslation('events');
+  const effectiveLayout = useMemo(() => searchPageLayout ?? createDefaultSearchPageLayout(t), [searchPageLayout, t]);
 
   const view = useCreateViewForEvent({
     eventData,

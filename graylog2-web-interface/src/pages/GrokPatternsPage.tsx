@@ -15,14 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import GrokPatterns from 'components/grok-patterns/GrokPatterns';
 import { DocumentTitle } from 'components/common';
 
-const GrokPatternsPage = () => (
-  <DocumentTitle title="Grok patterns">
-    <GrokPatterns />
-  </DocumentTitle>
-);
+const GrokPatternsPage = () => {
+  const { t } = useTranslation('grokpatterns');
+
+  return (
+    <DocumentTitle title={t('title')}>
+      <GrokPatterns />
+    </DocumentTitle>
+  );
+};
 
 export default GrokPatternsPage;

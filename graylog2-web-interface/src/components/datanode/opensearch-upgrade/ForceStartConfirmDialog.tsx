@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ConfirmDialog } from 'components/common';
 
@@ -28,23 +29,27 @@ const ForceStartConfirmDialog = ({
   isSubmitting: boolean;
   onCancel: () => void;
   onConfirm: () => void;
-}) => (
-  <ConfirmDialog
-    show
-    title="Start OpenSearch upgrade anyway?"
-    btnConfirmText="Start anyway"
-    isAsyncSubmit
-    isSubmitting={isSubmitting}
-    onCancel={onCancel}
-    onConfirm={onConfirm}
-    submitLoadingText="Starting...">
-    <p>The backend reported that the normal preflight checks did not pass.</p>
-    <ul>
-      {failedChecks.map((failedCheck) => (
-        <li key={failedCheck}>{failedCheck}</li>
-      ))}
-    </ul>
-  </ConfirmDialog>
-);
+}) => {
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
+
+  return (
+    <ConfirmDialog
+      show
+      title={t('force_start.title')}
+      btnConfirmText={t('force_start.confirm')}
+      isAsyncSubmit
+      isSubmitting={isSubmitting}
+      onCancel={onCancel}
+      onConfirm={onConfirm}
+      submitLoadingText={t('force_start.submitting')}>
+      <p>{t('force_start.description')}</p>
+      <ul>
+        {failedChecks.map((failedCheck) => (
+          <li key={failedCheck}>{failedCheck}</li>
+        ))}
+      </ul>
+    </ConfirmDialog>
+  );
+};
 
 export default ForceStartConfirmDialog;

@@ -20,6 +20,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { PipelinesPipelines } from '@graylog/server-api';
 
 import type { NewPipelineType, PipelineType } from 'components/pipelines/types';
+import i18n from 'i18n';
 import { DEFAULT_PIPELINE } from 'components/pipelines/types';
 import UserNotification from 'util/UserNotification';
 import SourceGenerator from 'logic/pipelines/SourceGenerator';
@@ -51,11 +52,17 @@ const usePipelineMutations = () => {
     mutationFn: createPipeline,
 
     onError: (errorThrown) => {
-      UserNotification.error(`Creating pipeline failed with status: ${errorThrown}`, 'Could not create pipeline');
+      UserNotification.error(
+        i18n.t('pipeline_notifications.create_failed', { ns: 'pipelines', error: errorThrown }),
+        i18n.t('pipeline_notifications.create_failed_title', { ns: 'pipelines' }),
+      );
     },
 
     onSuccess: () => {
-      UserNotification.success('Pipeline has been successfully created.', 'Success!');
+      UserNotification.success(
+        i18n.t('pipeline_notifications.create_success', { ns: 'pipelines' }),
+        i18n.t('pipeline_notifications.success_title', { ns: 'pipelines' }),
+      );
       queryClient.invalidateQueries({ queryKey: PIPELINES_QUERY_KEY });
     },
   });
@@ -64,11 +71,17 @@ const usePipelineMutations = () => {
     mutationFn: updatePipeline,
 
     onError: (errorThrown) => {
-      UserNotification.error(`Updating pipeline failed with status: ${errorThrown}`, 'Could not update pipeline');
+      UserNotification.error(
+        i18n.t('pipeline_notifications.update_failed', { ns: 'pipelines', error: errorThrown }),
+        i18n.t('pipeline_notifications.update_failed_title', { ns: 'pipelines' }),
+      );
     },
 
     onSuccess: () => {
-      UserNotification.success('Pipeline has been successfully updated.', 'Success!');
+      UserNotification.success(
+        i18n.t('pipeline_notifications.update_success', { ns: 'pipelines' }),
+        i18n.t('pipeline_notifications.success_title', { ns: 'pipelines' }),
+      );
       queryClient.invalidateQueries({ queryKey: PIPELINES_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: PIPELINE_QUERY_KEY });
     },
@@ -78,11 +91,17 @@ const usePipelineMutations = () => {
     mutationFn: deletePipeline,
 
     onError: (errorThrown) => {
-      UserNotification.error(`Deleting pipeline failed with status: ${errorThrown}`, 'Could not delete pipeline');
+      UserNotification.error(
+        i18n.t('pipeline_notifications.delete_failed', { ns: 'pipelines', error: errorThrown }),
+        i18n.t('pipeline_notifications.delete_failed_title', { ns: 'pipelines' }),
+      );
     },
 
     onSuccess: () => {
-      UserNotification.success('Pipeline has been successfully deleted.', 'Success!');
+      UserNotification.success(
+        i18n.t('pipeline_notifications.delete_success', { ns: 'pipelines' }),
+        i18n.t('pipeline_notifications.success_title', { ns: 'pipelines' }),
+      );
       queryClient.invalidateQueries({ queryKey: PIPELINES_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: PIPELINE_QUERY_KEY });
     },

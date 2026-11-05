@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from 'components/bootstrap';
 import IfPermitted from 'components/common/IfPermitted';
@@ -25,12 +26,8 @@ import useDebugMetricsConfig from './useDebugMetricsConfig';
 
 const EDIT_PERMISSION = 'pipeline:edit';
 
-const HELP_TEXT =
-  'Pipeline Load (15m) shows the relative share of pipeline rule execution time across the cluster. ' +
-  'Enable debug metrics to start collecting timer data. Values may take up to about 15 minutes to populate ' +
-  'after enabling, and collection adds overhead to message processing.';
-
 const EnableDebugMetricsButton = () => {
+  const { t } = useTranslation('pipelines');
   const { metricsEnabled, isLoading, refresh } = useDebugMetricsConfig();
   const [showConfigModal, setShowConfigModal] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
@@ -54,11 +51,11 @@ const EnableDebugMetricsButton = () => {
             onFocus={() => setShowHelp(true)}
             onBlur={() => setShowHelp(false)}>
             <Button bsStyle="info" bsSize="md" onClick={() => setShowConfigModal(true)}>
-              Enable debug metrics
+              {t('debug_metrics.enable')}
             </Button>
           </span>
         </Popover.Target>
-        <Popover.Dropdown>{HELP_TEXT}</Popover.Dropdown>
+        <Popover.Dropdown>{t('debug_metrics.help')}</Popover.Dropdown>
       </Popover>
       {showConfigModal && <RuleMetricsConfigContainer onClose={closeConfigModal} />}
     </IfPermitted>

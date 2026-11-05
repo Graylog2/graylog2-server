@@ -73,6 +73,7 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.users.responses.BasicUserResponse;
@@ -200,7 +201,7 @@ public class SidecarResource extends RestResource implements PluginRestResource 
                               @PathParam("sidecarId") @NotEmpty String sidecarId) {
         final Sidecar sidecar = sidecarService.findByNodeId(sidecarId);
         if (sidecar == null) {
-            throw new NotFoundException("Could not find sidecar <" + sidecarId + ">");
+            throw new CodedNotFoundException("sidecar.not_found", "Could not find sidecar <" + sidecarId + ">", Map.of("sidecarId", sidecarId));
         }
         return sidecar.toSummary(activeSidecarFilter);
     }
@@ -315,7 +316,7 @@ public class SidecarResource extends RestResource implements PluginRestResource 
     public BasicUserResponse getBasicSidecarUser() {
         final User user = userManagementService.load(sidecarUserName);
         if (user == null) {
-            throw new NotFoundException("Couldn't find user " + sidecarUserName);
+            throw new CodedNotFoundException("sidecar.user_not_found", "Couldn't find user " + sidecarUserName, Map.of("username", sidecarUserName));
         }
         return BasicUserResponse.builder()
                 .id(user.getId())

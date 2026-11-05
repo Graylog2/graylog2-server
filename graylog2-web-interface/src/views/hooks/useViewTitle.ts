@@ -15,14 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { createSelector } from '@reduxjs/toolkit';
+import { useTranslation } from 'react-i18next';
 
 import viewTitle from 'views/logic/views/ViewTitle';
 import useViewsSelector from 'views/stores/useViewsSelector';
 import { selectView, selectViewType } from 'views/logic/slices/viewSelectors';
 
-const selectViewTitle = createSelector(selectView, selectViewType, (view, viewType) =>
-  viewTitle(view?.title, viewType),
-);
-const useViewTitle = () => useViewsSelector(selectViewTitle);
+const selectSavedTitle = createSelector(selectView, (view) => view?.title);
+
+const useViewTitle = () => {
+  // The default title of unsaved views is translated, so it has to follow language changes.
+  useTranslation('search');
+  const title = useViewsSelector(selectSavedTitle);
+  const viewType = useViewsSelector(selectViewType);
+
+  return viewTitle(title, viewType);
+};
 
 export default useViewTitle;

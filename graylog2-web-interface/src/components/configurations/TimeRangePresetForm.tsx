@@ -19,6 +19,7 @@ import React, { useCallback } from 'react';
 import styled from 'styled-components';
 import Immutable from 'immutable';
 import debounce from 'lodash/debounce';
+import { useTranslation } from 'react-i18next';
 
 import { Button, Input } from 'components/bootstrap';
 import { Icon, SortableList } from 'components/common';
@@ -70,6 +71,7 @@ const contextSettings = {
 };
 
 const TimeRangePresetFormItem = ({ idx, id, timerange, description, onChange, onRemove, limitDuration }: ItemProps) => {
+  const { t } = useTranslation('configurations');
   const handleOnChangeRange = useCallback(
     (newTimerange: TimeRange) => {
       onChange({ timerange: newTimerange, description, id }, idx);
@@ -102,15 +104,15 @@ const TimeRangePresetFormItem = ({ idx, id, timerange, description, onChange, on
         <StyledInput
           type="text"
           id={`quick-access-time-range-description-${id}`}
-          placeholder="Add description..."
-          title="Time range preset description"
-          aria-label="Time range preset description"
+          placeholder={t('time_range_presets.add_description')}
+          title={t('time_range_presets.description_label')}
+          aria-label={t('time_range_presets.description_label')}
           required
           defaultValue={description}
           onChange={({ target: { value } }) => debounceHandleOnChangeDescription(value)}
           formGroupClassName=""
         />
-        <IconWrapper className="input-group-addon" onClick={handleOnRemove} title="Remove preset">
+        <IconWrapper className="input-group-addon" onClick={handleOnRemove} title={t('time_range_presets.remove')}>
           <Icon name="delete" style={{ cursor: 'pointer' }} />
         </IconWrapper>
       </Description>
@@ -125,6 +127,7 @@ const TimeRangePresetForm = ({
   options: Immutable.List<TimeRangePreset>;
   onUpdate: Dispatch<Immutable.List<TimeRangePreset>>;
 }) => {
+  const { t } = useTranslation('configurations');
   const onChange = useCallback(
     (newPreset: TimeRangePreset, idx: number) => {
       const newState = options.set(idx, newPreset);
@@ -174,9 +177,9 @@ const TimeRangePresetForm = ({
 
   return (
     <div className="form-group">
-      <strong>Search Time Range Presets</strong>
+      <strong>{t('searches.time_range_presets')}</strong>
       <span className="help-block">
-        <span>Configure the available search time range presets.</span>
+        <span>{t('time_range_presets.help')}</span>
       </span>
       <div className="wrapper">
         <TimeRangeInputSettingsContext.Provider value={contextSettings}>
@@ -192,9 +195,9 @@ const TimeRangePresetForm = ({
       <Button
         bsSize="xs"
         onClick={addTimeRange}
-        title="Add new search time range preset"
-        aria-label="Add new search time range preset">
-        Add option
+        title={t('time_range_presets.add_new')}
+        aria-label={t('time_range_presets.add_new')}>
+        {t('time_range_options.add_option')}
       </Button>
     </div>
   );

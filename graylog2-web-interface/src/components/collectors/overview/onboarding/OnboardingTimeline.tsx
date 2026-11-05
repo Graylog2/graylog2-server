@@ -17,6 +17,7 @@
 import * as React from 'react';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Icon, Link, RelativeTime, Spinner, Timeline } from 'components/common';
 import Routes from 'routing/Routes';
@@ -54,6 +55,7 @@ const OnboardingTimeline = ({
   receivedTotal,
   onFleetLinkClick = undefined,
 }: Props) => {
+  const { t } = useTranslation('collectors');
   const offline = instance.status !== 'online';
   const receiving = (receivedTotal ?? 0) > 0;
   // Steps 0-2 are always in the past for an enrolled collector; step 3 joins them once messages
@@ -63,9 +65,16 @@ const OnboardingTimeline = ({
   const lastStep = () => {
     if (offline) {
       return (
-        <Timeline.Item title="Connection Lost" color="warning" bullet={<Icon name="priority_high" size="sm" />}>
+        <Timeline.Item
+          title={t('timeline.connection_lost')}
+          color="warning"
+          bullet={<Icon name="priority_high" size="sm" />}>
           <StepDetail>
-            Last heartbeat <RelativeTime dateTime={instance.last_seen} />
+            <Trans
+              t={t}
+              i18nKey="timeline.last_heartbeat"
+              components={{ lastSeen: <RelativeTime dateTime={instance.last_seen} /> }}
+            />
           </StepDetail>
         </Timeline.Item>
       );
@@ -73,19 +82,21 @@ const OnboardingTimeline = ({
 
     if (receiving) {
       return (
-        <Timeline.Item title="First Messages" bullet={<CheckBullet />}>
+        <Timeline.Item title={t('timeline.first_messages')} bullet={<CheckBullet />}>
           <StepDetail>
-            Receiving - {receivedTotal} {receivedTotal === 1 ? 'message' : 'messages'} since{' '}
-            {moment.duration(PREVIEW_RANGE_SECONDS, 'seconds').humanize()}
+            {t('timeline.receiving', {
+              count: receivedTotal,
+              duration: moment.duration(PREVIEW_RANGE_SECONDS, 'seconds').humanize(),
+            })}
           </StepDetail>
         </Timeline.Item>
       );
     }
 
     return (
-      <Timeline.Item title="First Messages">
+      <Timeline.Item title={t('timeline.first_messages')}>
         <StepDetail>
-          <Spinner text="Listening... usually under a minute" delay={0} />
+          <Spinner text={t('timeline.listening')} delay={0} />
         </StepDetail>
       </Timeline.Item>
     );
@@ -93,22 +104,35 @@ const OnboardingTimeline = ({
 
   return (
     <Timeline active={activeStep} bulletSize={26} color="success">
-      <Timeline.Item title="Enrolled" bullet={<CheckBullet />}>
+      <Timeline.Item title={t('timeline.enrolled')} bullet={<CheckBullet />}>
         <StepDetail>
-          Registered with an enrollment token - <RelativeTime dateTime={instance.enrolled_at} />
+          <Trans
+            t={t}
+            i18nKey="timeline.enrolled_detail"
+            components={{ enrolledAt: <RelativeTime dateTime={instance.enrolled_at} /> }}
+          />
         </StepDetail>
       </Timeline.Item>
-      <Timeline.Item title="Connected" bullet={<CheckBullet />}>
+      <Timeline.Item title={t('timeline.connected')} bullet={<CheckBullet />}>
         <StepDetail>
-          Heartbeat received - <RelativeTime dateTime={instance.last_seen} />
+          <Trans
+            t={t}
+            i18nKey="timeline.connected_detail"
+            components={{ lastSeen: <RelativeTime dateTime={instance.last_seen} /> }}
+          />
         </StepDetail>
       </Timeline.Item>
-      <Timeline.Item title="Sources Configured" bullet={<CheckBullet />}>
+      <Timeline.Item title={t('timeline.sources_configured')} bullet={<CheckBullet />}>
         <StepDetail>
-          {sourceCount} {sourceCount === 1 ? 'source' : 'sources'} from fleet{' '}
-          <Link to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)} onClick={onFleetLinkClick}>
-            {fleetName ?? 'Unknown'}
-          </Link>
+          <Trans
+            t={t}
+            i18nKey="timeline.sources_detail"
+            count={sourceCount}
+            values={{ fleetName: fleetName ?? t('os.unknown') }}
+            components={{
+              fleetLink: <Link to={Routes.SYSTEM.COLLECTORS.FLEET(instance.fleet_id)} onClick={onFleetLinkClick} />,
+            }}
+          />
         </StepDetail>
       </Timeline.Item>
       {lastStep()}

@@ -16,6 +16,7 @@
  */
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Alert, Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
 import { Title } from 'components/common';
@@ -103,45 +104,51 @@ const HelpTextList = styled.ul(
 const MIN_NODES_FOR_ROLLING_UPGRADE = 3;
 const TELEMETRY_DEFAULTS = { app_pathname: 'datanode' } as const;
 
-const IncompatibleIndicesInfo = () => (
-  <HelpText>
-    <HelpTextHeading>Before upgrading</HelpTextHeading>
-    <HelpTextList>
-      <li>
-        OpenSearch 3 cannot read indices created with versions earlier than OpenSearch 2. If these indices remain during
-        the upgrade, their data will become unavailable.
-      </li>
-      <li>Use the table below to reindex system indices and archive or delete data indices before continuing.</li>
-    </HelpTextList>
-  </HelpText>
-);
+const IncompatibleIndicesInfo = () => {
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
 
-const UpgradeProcessInfo = ({ isRollingUpgrade }: { isRollingUpgrade: boolean }) => (
-  <Row>
-    <Col xs={12}>
-      <HelpText>
-        <HelpTextHeading>Upgrade process</HelpTextHeading>
-        <HelpTextList>
-          <li>Each Data Node automatically upgrades its embedded OpenSearch to the target version.</li>
-          {isRollingUpgrade ? (
-            <>
-              <li>Data Nodes restart one at a time to minimize the impact.</li>
-              <li>Search functionality may be impaired while Data Nodes restart.</li>
-            </>
-          ) : (
-            <>
-              <li>All Data Nodes must restart for the upgrade to take effect.</li>
-              <li>Search and indexing are unavailable while Data Nodes restart.</li>
-            </>
-          )}
-          <li>Back up MongoDB, Data Node, and Data Lake storage before upgrading to ensure a smooth rollback path.</li>
-        </HelpTextList>
-      </HelpText>
-    </Col>
-  </Row>
-);
+  return (
+    <HelpText>
+      <HelpTextHeading>{t('opensearch_upgrade.before_upgrading')}</HelpTextHeading>
+      <HelpTextList>
+        <li>{t('opensearch_upgrade.old_indices_unreadable')}</li>
+        <li>{t('opensearch_upgrade.use_table')}</li>
+      </HelpTextList>
+    </HelpText>
+  );
+};
+
+const UpgradeProcessInfo = ({ isRollingUpgrade }: { isRollingUpgrade: boolean }) => {
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
+
+  return (
+    <Row>
+      <Col xs={12}>
+        <HelpText>
+          <HelpTextHeading>{t('opensearch_upgrade.upgrade_process')}</HelpTextHeading>
+          <HelpTextList>
+            <li>{t('opensearch_upgrade.automatic_upgrade')}</li>
+            {isRollingUpgrade ? (
+              <>
+                <li>{t('opensearch_upgrade.rolling_restart')}</li>
+                <li>{t('opensearch_upgrade.rolling_search_impaired')}</li>
+              </>
+            ) : (
+              <>
+                <li>{t('opensearch_upgrade.full_restart')}</li>
+                <li>{t('opensearch_upgrade.full_search_unavailable')}</li>
+              </>
+            )}
+            <li>{t('opensearch_upgrade.backup')}</li>
+          </HelpTextList>
+        </HelpText>
+      </Col>
+    </Row>
+  );
+};
 
 const OpenSearchUpgradeSection = () => {
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const {
     currentVersion,
     targetVersion,
@@ -178,9 +185,11 @@ const OpenSearchUpgradeSection = () => {
   const showUpgradeProcess = showStartAction && areIncompatibleIndicesResolved;
   const isStartActionDisabled = isStartingRollingRestart || !areIncompatibleIndicesResolved;
   const startActionLabel = isRollingUpgradePossible
-    ? 'Start OpenSearch Rolling Upgrade'
-    : 'Start OpenSearch Upgrade and Restart';
-  const startActionLoadingLabel = isRollingUpgradePossible ? 'Starting OpenSearch Rolling Upgrade...' : 'Restarting...';
+    ? t('opensearch_upgrade.start_rolling_upgrade')
+    : t('opensearch_upgrade.start_upgrade_and_restart');
+  const startActionLoadingLabel = isRollingUpgradePossible
+    ? t('opensearch_upgrade.starting_rolling_upgrade')
+    : t('opensearch_upgrade.restarting');
   const canResumeRollingRestart =
     isRollingRestartPaused(rollingRestart?.data?.sm_state) && !rollingRestart?.data?.abort_requested;
   const showRollingUpgradeStatus = hasRollingRestartJob;
@@ -226,7 +235,7 @@ const OpenSearchUpgradeSection = () => {
   if (openSearchStatus === 'unconfirmed') {
     return (
       <Section>
-        <Title order={1}>Upgrade Data Nodes&apos; embedded OpenSearch</Title>
+        <Title order={1}>{t('opensearch_upgrade.title')}</Title>
         <OpenSearchUpgradeInfo
           currentVersion={currentVersion}
           targetVersion={targetVersion}
@@ -234,18 +243,14 @@ const OpenSearchUpgradeSection = () => {
           availableDataNodes={numberOfDataNodes}
           unavailableDataNodes={unavailableDataNodeCount}
         />
-        <Alert bsStyle="warning">
-          Incompatible indices and upgrade status cannot be checked while {unavailableDataNodeCount} Data{' '}
-          {unavailableDataNodeCount === 1 ? 'Node is' : 'Nodes are'} unavailable — they will show again once all Data
-          Nodes are available.
-        </Alert>
+        <Alert bsStyle="warning">{t('opensearch_upgrade.unconfirmed', { count: unavailableDataNodeCount })}</Alert>
       </Section>
     );
   }
 
   return (
     <Section>
-      <Title order={1}>Upgrade Data Nodes&apos; embedded OpenSearch</Title>
+      <Title order={1}>{t('opensearch_upgrade.title')}</Title>
       <OpenSearchUpgradeInfo
         currentVersion={currentVersion}
         targetVersion={targetVersion}
@@ -257,7 +262,7 @@ const OpenSearchUpgradeSection = () => {
       {showIncompatibleIndices && (
         <Row>
           <Col xs={12}>
-            <Heading>Incompatible indices</Heading>
+            <Heading>{t('opensearch_upgrade.incompatible_indices')}</Heading>
             {hasIncompatibleIndices && <IncompatibleIndicesInfo />}
             <TableContainer>
               <IncompatibleIndicesTable />
@@ -282,18 +287,16 @@ const OpenSearchUpgradeSection = () => {
             )}
             {canResumeRollingRestart && (
               <Button bsStyle="primary" disabled={isResumingRollingRestart} onClick={handleResumeClick} type="button">
-                {isResumingRollingRestart ? 'Resuming...' : 'Resume'}
+                {isResumingRollingRestart ? t('opensearch_upgrade.resuming') : t('opensearch_upgrade.resume')}
               </Button>
             )}
           </ButtonToolbar>
           {showIncompatibleIndices && hasIncompatibleIndices && (
-            <DisabledHint>Resolve all incompatible indices first.</DisabledHint>
+            <DisabledHint>{t('opensearch_upgrade.resolve_indices_first')}</DisabledHint>
           )}
-          {openSearchStatus === 'error' && (
-            <DisabledHint>Could not check OpenSearch upgrade availability.</DisabledHint>
-          )}
+          {openSearchStatus === 'error' && <DisabledHint>{t('opensearch_upgrade.check_failed')}</DisabledHint>}
           {openSearchStatus === 'up-to-date' && (
-            <DisabledHint>Data Nodes&apos; embedded OpenSearch is already up to date.</DisabledHint>
+            <DisabledHint>{t('opensearch_upgrade.already_up_to_date')}</DisabledHint>
           )}
         </Col>
       </ActionsRow>

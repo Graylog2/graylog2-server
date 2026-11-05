@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 import styled from 'styled-components';
 
 import DocsHelper from 'util/DocsHelper';
@@ -38,22 +39,42 @@ type Props = {
   wrapperClassName?: string | null | undefined;
 };
 
-const EnterprisePluginNotFound = ({ featureName, wrapperClassName = 'no-bm' }: Props) => (
-  <Panel bsStyle="info" className={wrapperClassName}>
-    <Panel.Heading>
-      <Header>
-        <HeaderIcon name="enterprise" />
-        Enterprise Feature
-      </Header>
-    </Panel.Heading>
-    <Panel.Body>
-      To use the <b>{featureName}</b> functionality you need the{' '}
-      <a href="https://www.graylog.org/products/enterprise" rel="noopener noreferrer" target="_blank">
-        Graylog Enterprise license
-      </a>{' '}
-      and the <DocumentationLink page={DocsHelper.PAGES.ENTERPRISE_SETUP} text="Graylog Enterprise plugin" />.
-    </Panel.Body>
-  </Panel>
+// `Trans` provides the link texts as children.
+const LicenseLink = ({ children = undefined }: React.PropsWithChildren) => (
+  <a href="https://www.graylog.org/products/enterprise" rel="noopener noreferrer" target="_blank">
+    {children}
+  </a>
 );
+
+const EnterpriseSetupLink = ({ children = undefined }: React.PropsWithChildren) => (
+  <DocumentationLink page={DocsHelper.PAGES.ENTERPRISE_SETUP} text={children} />
+);
+
+const EnterprisePluginNotFound = ({ featureName, wrapperClassName = 'no-bm' }: Props) => {
+  const { t } = useTranslation('common');
+
+  return (
+    <Panel bsStyle="info" className={wrapperClassName}>
+      <Panel.Heading>
+        <Header>
+          <HeaderIcon name="enterprise" />
+          {t('enterprise_plugin_not_found.title')}
+        </Header>
+      </Panel.Heading>
+      <Panel.Body>
+        <Trans
+          t={t}
+          i18nKey="enterprise_plugin_not_found.description"
+          values={{ featureName }}
+          components={{
+            bold: <b />,
+            licenseLink: <LicenseLink />,
+            docsLink: <EnterpriseSetupLink />,
+          }}
+        />
+      </Panel.Body>
+    </Panel>
+  );
+};
 
 export default EnterprisePluginNotFound;

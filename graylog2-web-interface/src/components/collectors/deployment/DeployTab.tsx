@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import URI from 'urijs';
+import { useTranslation } from 'react-i18next';
 
 import { Icon, Spinner, Timeline } from 'components/common';
 import FleetChoice from 'components/collectors/overview/onboarding/FleetChoice';
@@ -49,6 +50,7 @@ const DeployTab = () => {
   // wizard with a fleet preselected. Same state-seeded-from-URL pattern as FleetDetail's tabs.
   // `undefined` = no decision yet (a lone fleet auto-selects); `null` = the user explicitly
   // cleared the selection ("Change fleet"), so auto-selection must not kick back in.
+  const { t } = useTranslation('collectors');
   const { fleet: fleetParam } = useQuery();
   const [selectedFleetId, setSelectedFleetId] = useState<string | null | undefined>(
     typeof fleetParam === 'string' ? fleetParam : undefined,
@@ -136,7 +138,7 @@ const DeployTab = () => {
       {/* Done steps get the filled check bullet; pending steps get Mantine's default hollow
           circle — same look as the first-run onboarding timeline. */}
       <Timeline active={activeStep} bulletSize={26} color="success">
-        <Timeline.Item title="Select Fleet" bullet={resolvedFleet ? <CheckBullet /> : undefined}>
+        <Timeline.Item title={t('deployment.select_fleet_step')} bullet={resolvedFleet ? <CheckBullet /> : undefined}>
           <StepBody>
             <FleetChoice
               fleets={fleets ?? []}
@@ -147,7 +149,9 @@ const DeployTab = () => {
             />
           </StepBody>
         </Timeline.Item>
-        <Timeline.Item title="Generate Token" bullet={generatedToken ? <CheckBullet /> : undefined}>
+        <Timeline.Item
+          title={t('deployment.generate_token_step')}
+          bullet={generatedToken ? <CheckBullet /> : undefined}>
           <StepBody>
             <TokenStep
               fleet={resolvedFleet}
@@ -157,7 +161,7 @@ const DeployTab = () => {
             />
           </StepBody>
         </Timeline.Item>
-        <Timeline.Item title="Install the Collector">
+        <Timeline.Item title={t('deployment.install_step')}>
           <StepBody>
             <InstallStep token={generatedToken} platformId={platformId} onPlatformChange={setPlatformId} />
             {generatedToken && resolvedFleet && (

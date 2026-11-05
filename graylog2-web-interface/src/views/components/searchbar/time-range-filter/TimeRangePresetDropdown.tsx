@@ -17,6 +17,7 @@
 import React, { useCallback, useState } from 'react';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Icon, IfPermitted } from 'components/common';
 import { DropdownButton, MenuItem } from 'components/bootstrap';
@@ -85,6 +86,7 @@ const preparePresetOptions = async (
   presets: SearchesConfig['quick_access_timerange_presets'],
   timeRangeLimit: number,
   disabled: boolean,
+  noPresetsLabel: string,
 ) => {
   const availableOptions = timeRangeLimit ? await filterOptionsByLimit(presets, timeRangeLimit) : presets;
 
@@ -100,19 +102,21 @@ const preparePresetOptions = async (
   return [
     {
       disabled: true,
-      label: 'No available presets',
+      label: noPresetsLabel,
       key: 'no-available-presets',
     },
   ];
 };
 
-const usePresetOptions = (disabled: boolean, limitDuration: number) => {
+const usePresetOptions = (disabled: boolean, limitDuration: number, noPresetsLabel: string) => {
   const { config } = useSearchConfiguration();
   const [presetOptions, setPresetOptions] = useState<Array<PresetOption> | undefined>();
 
   const onSetOptions = useCallback(async () => {
-    setPresetOptions(await preparePresetOptions(config?.quick_access_timerange_presets, limitDuration, disabled));
-  }, [config?.quick_access_timerange_presets, disabled, limitDuration]);
+    setPresetOptions(
+      await preparePresetOptions(config?.quick_access_timerange_presets, limitDuration, disabled, noPresetsLabel),
+    );
+  }, [config?.quick_access_timerange_presets, disabled, limitDuration, noPresetsLabel]);
 
   return { options: presetOptions, setOptions: onSetOptions };
 };
@@ -138,9 +142,14 @@ const TimeRangePresetDropdown = ({
   bsSize = 'small',
   header = undefined,
 }: Props) => {
+  const { t } = useTranslation('search');
   const sendTelemetry = useSendTelemetry('search-bar');
   const { formatTime } = useUserDateTime();
-  const { options, setOptions: setDropdownOptions } = usePresetOptions(disabled, limitDuration);
+  const { options, setOptions: setDropdownOptions } = usePresetOptions(
+    disabled,
+    limitDuration,
+    t('time_range.no_available_presets'),
+  );
 
   const _onChange = useCallback(
     (timerange: TimeRange) => {
@@ -171,9 +180,9 @@ const TimeRangePresetDropdown = ({
 
   return (
     <DropdownButton
-      title={displayTitle && 'Load Preset'}
+      title={displayTitle && t('time_range.load_preset')}
       id="relative-timerange-selector"
-      aria-label="Open time range preset select"
+      aria-label={t('time_range_presets.open_preset_select')}
       bsSize={bsSize}
       className={className}
       onToggle={onToggle}
@@ -187,13 +196,13 @@ const TimeRangePresetDropdown = ({
         ))
       ) : (
         <MenuItem eventKey="loading" key="loading" disabled>
-          Loading...
+          {t('time_range.loading')}
         </MenuItem>
       )}
       <IfPermitted permissions="clusterconfigentry:edit">
         <MenuItem divider />
         <AdminMenuItem href={Routes.SYSTEM.CONFIGURATIONS} target="_blank">
-          Configure presets <ExternalIcon name="open_in_new" />
+          {t('time_range.configure_presets')} <ExternalIcon name="open_in_new" />
         </AdminMenuItem>
       </IfPermitted>
     </DropdownButton>

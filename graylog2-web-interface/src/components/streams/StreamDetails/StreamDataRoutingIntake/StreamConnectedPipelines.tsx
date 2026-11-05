@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Col, Row } from 'components/bootstrap';
 import type { Sort } from 'stores/PaginationTypes';
@@ -42,22 +43,26 @@ export const DEFAULT_LAYOUT = {
   defaultColumnOrder: ['rule', 'pipeline', 'connected_streams'],
 };
 
-const StreamConnectedPipelines = ({ stream }: Props) => (
-  <Section title="Routing from other Streams" collapsible>
-    <Row>
-      <Col md={12}>
-        <PaginatedEntityTable<StreamConnectedPipeline>
-          humanName="pipelines"
-          tableLayout={DEFAULT_LAYOUT}
-          fetchEntities={(searchParams) => fetchStreamConnectedPipelines(stream.id, searchParams)}
-          keyFn={(searchParams) => keyFn(stream.id, searchParams)}
-          entityAttributesAreCamelCase={false}
-          externalSearch={EXTERNAL_SEARCH}
-          columnRenderers={customColumnRenderers}
-        />
-      </Col>
-    </Row>
-  </Section>
-);
+const StreamConnectedPipelines = ({ stream }: Props) => {
+  const { t } = useTranslation('streams');
+
+  return (
+    <Section title={t('stream_details.connected_pipelines_title')} collapsible>
+      <Row>
+        <Col md={12}>
+          <PaginatedEntityTable<StreamConnectedPipeline>
+            humanName={t('stream_details.connected_pipelines_human_name')}
+            tableLayout={DEFAULT_LAYOUT}
+            fetchEntities={(searchParams) => fetchStreamConnectedPipelines(stream.id, searchParams)}
+            keyFn={(searchParams) => keyFn(stream.id, searchParams)}
+            entityAttributesAreCamelCase={false}
+            externalSearch={EXTERNAL_SEARCH}
+            columnRenderers={customColumnRenderers}
+          />
+        </Col>
+      </Row>
+    </Section>
+  );
+};
 
 export default StreamConnectedPipelines;

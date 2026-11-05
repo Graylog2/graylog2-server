@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { useInstances } from 'components/collectors/hooks/useInstanceQueries';
 import type { CollectorInstanceView } from 'components/collectors/types';
@@ -56,6 +57,7 @@ const StatusText = styled.span(
 );
 
 const WaitingForConnection = ({ fleetId, onConnected }: Props) => {
+  const { t } = useTranslation('collectors');
   const [elapsed, setElapsed] = useState(0);
   const { data: instances, error } = useInstances(fleetId, { refetchInterval: POLL_INTERVAL_MS, silent: true });
   // Instances that already existed when this step mounted. Anything beyond these is "ours".
@@ -96,11 +98,9 @@ const WaitingForConnection = ({ fleetId, onConnected }: Props) => {
     <Container>
       <StatusRow>
         <PulsingDot />
-        <StatusText>Waiting for connection... {elapsed}s</StatusText>
+        <StatusText>{t('waiting_for_connection.status', { seconds: elapsed })}</StatusText>
       </StatusRow>
-      {Boolean(error) && (
-        <StatusText role="status">Having trouble reaching the server &mdash; retrying automatically</StatusText>
-      )}
+      {Boolean(error) && <StatusText role="status">{t('enrolling_hosts.connection_problem')}</StatusText>}
     </Container>
   );
 };

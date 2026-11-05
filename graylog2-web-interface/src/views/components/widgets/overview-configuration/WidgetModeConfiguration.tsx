@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { Field } from 'formik';
 
@@ -38,40 +39,44 @@ type Props = {
   options: Array<{ label: string; value: string }>;
 };
 
-const WidgetModeConfiguration = ({ name, onChange: onChangeProp, options }: Props) => (
-  <Field name={name}>
-    {({ field: { value, onChange, onBlur }, meta: { error } }) => {
-      const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        onChangeProp(event.target.value);
-        onChange(event);
-      };
+const WidgetModeConfiguration = ({ name, onChange: onChangeProp, options }: Props) => {
+  const { t } = useTranslation('widgets');
 
-      return (
-        <Input
-          id="widget-type-configuration"
-          label="Type"
-          error={error}
-          labelClassName="col-sm-3"
-          wrapperClassName="col-sm-9">
-          <DirectionOptions>
-            {options.map(({ value: optionValue, label }) => (
-              <Input
-                checked={value === optionValue}
-                key={optionValue}
-                formGroupClassName=""
-                id={name}
-                label={label}
-                onBlur={onBlur}
-                onChange={handleChange}
-                type="radio"
-                value={optionValue}
-              />
-            ))}
-          </DirectionOptions>
-        </Input>
-      );
-    }}
-  </Field>
-);
+  return (
+    <Field name={name}>
+      {({ field: { value, onChange, onBlur }, meta: { error } }) => {
+        const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+          onChangeProp(event.target.value);
+          onChange(event);
+        };
+
+        return (
+          <Input
+            id="widget-type-configuration"
+            label={t('overview_configuration.type')}
+            error={error}
+            labelClassName="col-sm-3"
+            wrapperClassName="col-sm-9">
+            <DirectionOptions>
+              {options.map(({ value: optionValue, label }) => (
+                <Input
+                  checked={value === optionValue}
+                  key={optionValue}
+                  formGroupClassName=""
+                  id={name}
+                  label={label}
+                  onBlur={onBlur}
+                  onChange={handleChange}
+                  type="radio"
+                  value={optionValue}
+                />
+              ))}
+            </DirectionOptions>
+          </Input>
+        );
+      }}
+    </Field>
+  );
+};
 
 export default WidgetModeConfiguration;

@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { SystemIndexSets } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 
 import { KEY_PREFIX } from '../fetchIndexSets';
@@ -32,8 +33,8 @@ const useIndexSetCategoryCounts = (): { data: IndexSetCategoryCounts | undefined
     queryFn: () =>
       defaultOnError(
         SystemIndexSets.getCategoryCounts(),
-        'Loading index set counts failed with status',
-        'Could not load index set counts',
+        i18n.t('hooks.category_counts_load_failed', { ns: 'indexsets' }),
+        i18n.t('hooks.category_counts_load_failed_title', { ns: 'indexsets' }),
       ),
   });
 

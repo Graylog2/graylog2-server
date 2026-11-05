@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useMemo, useContext, useLayoutEffect } from 'react';
 import type { createColumnHelper, Row, Column, HeaderContext, CellContext } from '@tanstack/react-table';
 import camelCase from 'lodash/camelCase';
@@ -148,6 +149,7 @@ const AttributeHeader = <Entity extends EntityBase>({
   onChangeSlicing: (sliceCol: string | undefined, slice?: string) => void;
   appSection: string;
 }) => {
+  const { t } = useTranslation('common');
   const activeSliceCol = useContext(ActiveSliceColContext);
   const colId = ctx.header.column.id;
   const columnMeta = ctx.column.columnDef.meta as ColumnMetaContext<Entity>;
@@ -183,7 +185,12 @@ const AttributeHeader = <Entity extends EntityBase>({
   };
 
   const sliceIndicator = isSliceActive && (
-    <ActiveSliceIcon name="surgical" title={`Slicing by ${columnLabel}`} size="xs" $isRightAligned={isRightAligned} />
+    <ActiveSliceIcon
+      name="surgical"
+      title={t('entity_table.slicing_by', { column: columnLabel })}
+      size="xs"
+      $isRightAligned={isRightAligned}
+    />
   );
   const sortIndicator = sortDirection && <SortIcon<Entity> column={ctx.header.column} />;
 

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { ReadOnlyFormGroup, Spinner } from 'components/common';
 import { Alert, Well } from 'components/bootstrap';
@@ -28,6 +29,7 @@ type LegacyNotificationDetailsProps = {
 };
 
 const LegacyNotificationDetails = ({ notification }: LegacyNotificationDetailsProps) => {
+  const { t } = useTranslation('event_notifications');
   const { data } = useLegacyEventNotificationTypes();
   const legacyTypes = data?.types;
   const configurationValues = notification.config.configuration;
@@ -37,7 +39,7 @@ const LegacyNotificationDetails = ({ notification }: LegacyNotificationDetailsPr
   if (!legacyTypes) {
     return (
       <p>
-        <Spinner text="Loading legacy notification information..." />
+        <Spinner text={t('legacy.loading')} />
       </p>
     );
   }
@@ -46,8 +48,12 @@ const LegacyNotificationDetails = ({ notification }: LegacyNotificationDetailsPr
     <>
       {!typeData && (
         <Alert bsStyle="danger" className={notificationStyles.legacyNotificationAlert}>
-          Error in {notification.title || 'Legacy Alarm Callback'}: Unknown type <code>{callbackType}</code>, please
-          ensure the plugin is installed.
+          <Trans
+            t={t}
+            i18nKey="legacy.unknown_type"
+            values={{ title: notification.title || t('legacy.default_title'), callbackType }}
+            components={{ code: <code /> }}
+          />
         </Alert>
       )}
       {typeData &&
@@ -59,7 +65,7 @@ const LegacyNotificationDetails = ({ notification }: LegacyNotificationDetailsPr
                 label={value.human_name}
                 value={
                   <Well bsSize="small" className={emailStyles.bodyPreview}>
-                    {configurationValues[key] || <em>Empty body</em>}
+                    {configurationValues[key] || <em>{t('email_summary.empty_body')}</em>}
                   </Well>
                 }
               />

@@ -18,6 +18,7 @@ import React from 'react';
 import styled from 'styled-components';
 import type { SelectInstance } from 'react-select';
 
+import i18n from 'i18n';
 import Select from 'components/common/Select';
 import { Button, ListGroup, ListGroupItem } from 'components/bootstrap';
 
@@ -120,7 +121,7 @@ class SelectableList extends React.Component<
       <StyledListGroupItem key={`${this._getOptionId(option)}-${idx}`}>
         <div>{this._getOptionDisplayValue(option)}</div>
         <Button bsStyle="danger" bsSize="xsmall" onClick={this._onRemoveOption(idx)}>
-          Remove
+          {i18n.t('selectable_list.remove', { ns: 'common' })}
         </Button>
       </StyledListGroupItem>
     ));

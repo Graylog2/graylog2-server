@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import lowerCase from 'lodash/lowerCase';
+import i18n from 'i18n';
 
 const assertUnreachable = (type: string): never => {
   throw new Error(`Can't find title for type: ${type ?? '(undefined)'}`);
@@ -40,7 +40,7 @@ const supportedTypes = new Set([
 ]);
 
 const getTitleForEntityType = (type: string, throwErrorOnUnknown = true) => {
-  if (supportedTypes.has(type)) return lowerCase(type);
+  if (supportedTypes.has(type)) return i18n.t(`entity_types.${type}`, { ns: 'common' });
 
   return throwErrorOnUnknown ? assertUnreachable(type) : undefined;
 };

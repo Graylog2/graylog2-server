@@ -16,6 +16,7 @@
  */
 import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { ApiRoutes } from 'integrations/aws/common/Routes';
 import useFetch from 'integrations/hooks/useFetch';
@@ -36,6 +37,7 @@ type KinesisSetupStepsProps = {
 };
 
 const KinesisSetupSteps = ({ onSuccess, onError }: KinesisSetupStepsProps) => {
+  const { t } = useTranslation('integrations');
   const { formData } = useContext(FormDataContext);
   const [streamArn, setStreamArn] = useState(null);
   const [roleArn, setRoleArn] = useState(null);
@@ -95,9 +97,9 @@ const KinesisSetupSteps = ({ onSuccess, onError }: KinesisSetupStepsProps) => {
 
   return (
     <StepItems>
-      <KinesisSetupStep label="Kinesis Stream" progress={createStreamProgress} />
-      <KinesisSetupStep label="Subscription Policy" progress={createPolicyProgress} />
-      <KinesisSetupStep label="Subscription" progress={createSubsciptionProgress} />
+      <KinesisSetupStep label={t('aws_kinesis_setup_steps.stream_label')} progress={createStreamProgress} />
+      <KinesisSetupStep label={t('aws_kinesis_setup_steps.policy_label')} progress={createPolicyProgress} />
+      <KinesisSetupStep label={t('aws_kinesis_setup_steps.subscription_label')} progress={createSubsciptionProgress} />
     </StepItems>
   );
 };

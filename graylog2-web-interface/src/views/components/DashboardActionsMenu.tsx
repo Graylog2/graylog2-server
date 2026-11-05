@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState, useCallback, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useHistory from 'routing/useHistory';
 import useLocation from 'routing/useLocation';
@@ -53,10 +54,8 @@ const _isAllowedToEdit = (view: View, isPermitted: IsPermitted) =>
   isPermitted([ViewPermissions.View.Edit(view.id)]) ||
   (view.type === View.Type.Dashboard && isPermitted([`dashboards:edit:${view.id}`]));
 
-const immutableDashboardInfo = (productName: string) =>
-  `This dashboard is read-only because it is managed by ${productName}. Use "Save as" to create an editable copy.`;
-
 const DashboardActionsMenu = () => {
+  const { t } = useTranslation('search');
   const view = useView();
   const isNewView = useIsNew();
   const { isPermitted } = usePermissions();
@@ -84,7 +83,7 @@ const DashboardActionsMenu = () => {
     <>
       <MenuItem divider />
       <MenuItem onSelect={() => setDebugOpen(true)} icon="code">
-        Debug
+        {t('dashboard_actions.debug')}
       </MenuItem>
     </>
   );
@@ -180,7 +179,7 @@ const DashboardActionsMenu = () => {
         <SaveDashboardButton
           userIsAllowedToEdit={allowedToEdit}
           openSaveAsModal={() => setSaveNewDashboardOpen(true)}
-          disabledInfo={isImmutable ? immutableDashboardInfo(productName) : undefined}
+          disabledInfo={isImmutable ? t('dashboard_actions.immutable', { productName }) : undefined}
         />
       )}
       {showSaveNewButton && (
@@ -195,7 +194,7 @@ const DashboardActionsMenu = () => {
           entityId={view.id}
           onClick={() => setShareViewOpen(true)}
           bsSize="md"
-          disabledInfo={isNewView && 'Only saved dashboards can be shared.'}
+          disabledInfo={isNewView && t('dashboard_actions.share_unsaved')}
         />
       )}
       {showDropDownButton && (
@@ -207,10 +206,10 @@ const DashboardActionsMenu = () => {
             </>
           )}
           <MenuItem onSelect={() => setEditDashboardOpen(true)} disabled={isNewView || !allowedToEdit} icon="edit">
-            Edit metadata
+            {t('dashboard_actions.edit_metadata')}
           </MenuItem>
           <MenuItem onSelect={() => setExportOpen(true)} icon="download">
-            Export
+            {t('dashboard_actions.export')}
           </MenuItem>
           {debugOverlay}
           <MenuItem divider />
@@ -223,8 +222,8 @@ const DashboardActionsMenu = () => {
           show
           view={view.toBuilder().newId().build()}
           dashboardId={view.id}
-          title="Save new dashboard"
-          submitButtonText="Create dashboard"
+          title={t('dashboard_actions.save_new_title')}
+          submitButtonText={t('dashboard_actions.create')}
           onClose={() => setSaveNewDashboardOpen(false)}
           onSave={(newDashboard, entityShare) => _onSaveNewDashboard(newDashboard, entityShare)}
         />
@@ -234,8 +233,8 @@ const DashboardActionsMenu = () => {
           show
           view={view}
           dashboardId={view.id}
-          title="Editing dashboard"
-          submitButtonText="Update dashboard"
+          title={t('dashboard_actions.edit_title')}
+          submitButtonText={t('dashboard_actions.update')}
           onClose={() => setEditDashboardOpen(false)}
           onSave={_onUpdateView}
         />
@@ -246,7 +245,7 @@ const DashboardActionsMenu = () => {
           entityId={view.id}
           entityType="dashboard"
           entityTitle={view.title}
-          description="Search for a User or Team to add as collaborator on this dashboard."
+          description={t('dashboard_actions.share_description')}
           onClose={() => setShareViewOpen(false)}
         />
       )}

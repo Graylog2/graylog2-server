@@ -17,6 +17,7 @@
 import React, { useState } from 'react';
 import { Formik, Form } from 'formik';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import Routes from 'routing/Routes';
 import { Button, Row } from 'components/bootstrap';
@@ -65,6 +66,7 @@ const CreateStreamForm = ({
   prevCreatedStream = undefined,
   prevShouldCreateNewPipeline = true,
 }: Props) => {
+  const { t } = useTranslation('inputs');
   const [indexSetsRefetchInterval, setIndexSetsRefetchInterval] = useState<false | number>(false);
   const { data: indexSetsData, isSuccess: isIndexSetsSuccess } = useIndexSetsList(
     false,
@@ -76,11 +78,11 @@ const CreateStreamForm = ({
     let errors = {};
 
     if (!values.title) {
-      errors = { ...errors, title: 'Title is required' };
+      errors = { ...errors, title: t('setup_wizard.create_stream.title_required') };
     }
 
     if (!values.index_set_id) {
-      errors = { ...errors, index_set_id: 'Index set is required' };
+      errors = { ...errors, index_set_id: t('setup_wizard.create_stream.index_set_required') };
     }
 
     return errors;
@@ -109,52 +111,58 @@ const CreateStreamForm = ({
     <Formik<FormValues> initialValues={initialFormValues} onSubmit={submitForm} validate={validate}>
       {({ isValid, isValidating, dirty, values }) => (
         <Form>
-          <FormikInput label="Title" name="title" id="title" help="A descriptive name of the new stream" />
+          <FormikInput
+            label={t('setup_wizard.create_stream.title')}
+            name="title"
+            id="title"
+            help={t('setup_wizard.create_stream.title_help')}
+          />
           <FormikInput
             label={
               <>
-                Description <InputOptionalInfo />
+                {t('setup_wizard.create_stream.description')} <InputOptionalInfo />
               </>
             }
             name="description"
             id="description"
-            help="What kind of messages are routed into this stream?"
+            help={t('setup_wizard.create_stream.description_help')}
           />
           <FormikInput
-            label={<>Remove matches from &lsquo;Default Stream&rsquo;</>}
-            help={<span>Don&apos;t assign messages that match this stream to the &lsquo;Default Stream&rsquo;.</span>}
+            label={<>{t('setup_wizard.routing.remove_from_default')}</>}
+            help={<span>{t('setup_wizard.routing.remove_from_default_help')}</span>}
             name="remove_matches_from_default_stream"
             id="remove_matches_from_default_stream"
             type="checkbox"
           />
 
           <FormikInput
-            label={<>Create a new pipeline for this stream</>}
+            label={<>{t('setup_wizard.create_stream.create_pipeline')}</>}
             name="create_new_pipeline"
             id="create_new_pipeline"
             type="checkbox"
           />
-          <SubHeadline>Select Index Set</SubHeadline>
+          <SubHeadline>{t('setup_wizard.create_stream.select_index_set')}</SubHeadline>
           <SelectedIndexSetAlert indexSets={indexSets} selectedIndexSetId={values.index_set_id} />
           <IndexSetInfoText>
-            Messages that match this stream will be written to the configured Index Set. Index Sets are used to
-            rationally partition data to allow faster searches.
+            {t('setup_wizard.create_stream.index_set_info')}
             <br />
-            We recommend creating a new Index Set for each Input type.
+            {t('setup_wizard.create_stream.index_set_recommendation')}
           </IndexSetInfoText>
-          <RecommendedTooltip opened withArrow position="right" label="Recommended!">
-            <NewIndexSetButton onClick={handleNewIndexSetClick}>Create a new Index Set</NewIndexSetButton>
+          <RecommendedTooltip opened withArrow position="right" label={t('setup_wizard.routing.recommended')}>
+            <NewIndexSetButton onClick={handleNewIndexSetClick}>
+              {t('setup_wizard.create_stream.create_index_set')}
+            </NewIndexSetButton>
           </RecommendedTooltip>
-          <IndexSetSelect label="Select Index Set" indexSets={indexSets} />
+          <IndexSetSelect label={t('setup_wizard.create_stream.select_index_set')} indexSets={indexSets} />
 
           <Row>
             <ButtonCol md={12}>
-              <Button onClick={handleBackClick}>Back</Button>
+              <Button onClick={handleBackClick}>{t('setup_wizard.back')}</Button>
               <Button
                 bsStyle="primary"
                 type="submit"
                 disabled={isValidating || !isValid || (!dirty && !prevCreatedStream)}>
-                Next
+                {t('common:actions.next')}
               </Button>
             </ButtonCol>
           </Row>

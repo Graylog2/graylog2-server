@@ -16,6 +16,8 @@
  */
 import React from 'react';
 import styled from 'styled-components';
+import { withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import { Button, Col, Row, Table } from 'components/bootstrap';
 import { Icon, SortIcon, PaginatedList, NoSearchResult, NoEntitiesExist } from 'components/common';
@@ -44,7 +46,7 @@ type SidecarListProps = {
   onQueryChange: (...args: any[]) => void;
   onSortChange: (...args: any[]) => (newDirection: string) => void;
   toggleShowInactive: (...args: any[]) => void;
-};
+} & WithTranslation;
 
 class SidecarList extends React.Component<
   SidecarListProps,
@@ -53,14 +55,14 @@ class SidecarList extends React.Component<
   }
 > {
   formatSidecarList = (sidecars: React.ReactElement[]) => {
-    const { onSortChange, sort } = this.props;
+    const { onSortChange, sort, t } = this.props;
     const sidecarCollection = {
-      node_name: 'Name',
-      'node_details.status.status': 'Status',
-      'node_details.operating_system': 'Operating System',
-      last_seen: 'Last Seen',
-      node_id: 'Node Id',
-      sidecar_version: 'Sidecar Version',
+      node_name: t('sidecars.sidecar_list.name'),
+      'node_details.status.status': t('sidecars.sidecar_list.status'),
+      'node_details.operating_system': t('sidecars.sidecar_list.operating_system'),
+      last_seen: t('sidecars.sidecar_list.last_seen'),
+      node_id: t('sidecars.sidecar_list.node_id'),
+      sidecar_version: t('sidecars.sidecar_list.sidecar_version'),
     };
 
     return (
@@ -87,31 +89,30 @@ class SidecarList extends React.Component<
   };
 
   formatNoMatchingListAlert = () => {
-    const { onlyActive } = this.props;
-    const showInactiveHint = onlyActive ? ' and/or click on "Include inactive sidecars"' : null;
+    const { onlyActive, t } = this.props;
+    const showInactiveHint = onlyActive ? t('sidecars.sidecar_list.include_inactive_hint') : '';
 
     return (
       <NoSearchResult>
         <Icon name="info" />
-        &nbsp;There are no sidecars matching the search criteria. Try adjusting your search filter{showInactiveHint}.
+        &nbsp;{t('sidecars.sidecar_list.no_matching_sidecars', { inactiveHint: showInactiveHint })}
       </NoSearchResult>
     );
   };
 
   renderEmptyList = () => {
-    const { query } = this.props;
+    const { query, t } = this.props;
 
     if (query) {
       return this.formatNoMatchingListAlert();
     }
 
-    return <NoEntitiesExist>There are no sidecars configured.</NoEntitiesExist>;
+    return <NoEntitiesExist>{t('sidecars.sidecar_list.no_sidecars')}</NoEntitiesExist>;
   };
 
   render() {
-    const { sidecars, onlyActive, pagination, query, onQueryChange, onPageChange, toggleShowInactive } = this.props;
+    const { sidecars, onlyActive, pagination, query, onQueryChange, onPageChange, toggleShowInactive, t } = this.props;
     const sidecarRows = sidecars.map((sidecar) => <SidecarRow key={sidecar.node_id} sidecar={sidecar} />);
-    const showOrHideInactive = onlyActive ? 'Include' : 'Hide';
     const sidecarList = sidecarRows.length > 0 ? this.formatSidecarList(sidecarRows) : this.renderEmptyList();
 
     return (
@@ -119,7 +120,9 @@ class SidecarList extends React.Component<
         <div className={style.sidecarsFilter}>
           <SidecarSearchForm query={query} onSearch={onQueryChange} onReset={onQueryChange}>
             <Button bsStyle="primary" onClick={toggleShowInactive} className={style.inactiveSidecarsButton}>
-              {showOrHideInactive} inactive sidecars
+              {onlyActive
+                ? t('sidecars.sidecar_list.include_inactive_sidecars')
+                : t('sidecars.sidecar_list.hide_inactive_sidecars')}
             </Button>
           </SidecarSearchForm>
         </div>
@@ -134,4 +137,4 @@ class SidecarList extends React.Component<
   }
 }
 
-export default SidecarList;
+export default withTranslation('sidecars')(SidecarList);

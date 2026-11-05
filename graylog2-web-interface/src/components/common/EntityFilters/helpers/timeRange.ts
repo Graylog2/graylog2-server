@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import i18n from 'i18n';
 import type { DateTime, DateTimeFormats } from 'util/DateTime';
 import type { TimeRangePickerFormValues } from 'views/components/time-range-picker/types';
 import {
@@ -110,20 +111,21 @@ export const parseStringTimerangeFilterValue = (filterValue: string): TimeRange 
 
 const relativeTimeRangeTitle = (timeRange: RelativeTimeRange) => {
   if (isTypeRelativeWithStartOnly(timeRange) && timeRange.range === 0) {
-    return 'All time';
+    return i18n.t('filters.all_time', { ns: 'common' });
   }
 
   const from = isTypeRelativeWithStartOnly(timeRange)
     ? readableRange(timeRange, 'range')
     : readableRange(timeRange, 'from');
-  const until = 'to' in timeRange ? readableRange(timeRange, 'to', 'now') : 'now';
+  const now = i18n.t('filters.now_lowercase', { ns: 'common' });
+  const until = 'to' in timeRange ? readableRange(timeRange, 'to', now) : now;
 
-  return `from ${from} until ${until}`;
+  return i18n.t('filters.relative_range', { ns: 'common', from, until });
 };
 
 const absoluteTimeRangeTitle = (timeRange: AbsoluteTimeRange, formatTime: FormatTime) => {
-  const from = timeRange.from ? formatTime(timeRange.from) : 'All time';
-  const until = timeRange.to ? formatTime(timeRange.to) : 'Now';
+  const from = timeRange.from ? formatTime(timeRange.from) : i18n.t('filters.all_time', { ns: 'common' });
+  const until = timeRange.to ? formatTime(timeRange.to) : i18n.t('filters.now', { ns: 'common' });
 
   return `${from} - ${until}`;
 };

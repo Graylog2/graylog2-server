@@ -17,6 +17,8 @@
 import React from 'react';
 import moment from 'moment';
 import styled from 'styled-components';
+import { Trans, withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import { Timestamp } from 'components/common';
 
@@ -39,7 +41,7 @@ type SystemInformationProps = {
   node: any;
   systemInformation: any;
   jvmInformation?: any;
-};
+} & WithTranslation;
 
 class SystemInformation extends React.Component<
   SystemInformationProps,
@@ -71,33 +73,37 @@ class SystemInformation extends React.Component<
       systemInformation: { hostname, version, codename, timezone },
       jvmInformation,
       node,
+      t,
     } = this.props;
     const { time } = this.state;
     let jvmInformationText;
 
     if (jvmInformation) {
       jvmInformationText = (
-        <span>
-          PID {jvmInformation.pid}, {jvmInformation.info}
-        </span>
+        <span>{t('system_information.pid_info', { pid: jvmInformation.pid, info: jvmInformation.info })}</span>
       );
     } else {
-      jvmInformationText = <span>JMV information for this node is unavailable.</span>;
+      jvmInformationText = <span>{t('system_information.jvm_unavailable')}</span>;
     }
 
     return (
       <StyledDl>
-        <dt>Hostname:</dt>
+        <dt>{t('system_information.hostname')}</dt>
         <dd>{hostname}</dd>
-        <dt>Node ID:</dt>
+        <dt>{t('system_information.node_id')}</dt>
         <dd>{node.node_id}</dd>
-        <dt>Version:</dt>
+        <dt>{t('system_information.version')}</dt>
         <dd>
-          {version}, codename <em>{codename}</em>
+          <Trans
+            t={t}
+            i18nKey="system_information.version_codename"
+            values={{ version, codename }}
+            components={{ em: <em /> }}
+          />
         </dd>
-        <dt>JVM:</dt>
+        <dt>{t('system_information.jvm')}</dt>
         <dd>{jvmInformationText}</dd>
-        <dt>Time:</dt>
+        <dt>{t('system_information.time')}</dt>
         <dd>
           <Timestamp dateTime={time} format="withTz" tz={timezone} />
         </dd>
@@ -106,4 +112,4 @@ class SystemInformation extends React.Component<
   }
 }
 
-export default SystemInformation;
+export default withTranslation('system')(SystemInformation);

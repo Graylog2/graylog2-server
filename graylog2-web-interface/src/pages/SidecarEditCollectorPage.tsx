@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -28,6 +29,7 @@ import useHistory from 'routing/useHistory';
 import type { Collector } from 'components/sidecars/types';
 
 const SidecarEditCollectorPage = () => {
+  const { t } = useTranslation('sidecars');
   const history = useHistory();
   const { collectorId } = useParams();
   const [collector, setCollector] = useState<Collector>();
@@ -52,15 +54,15 @@ const SidecarEditCollectorPage = () => {
   }
 
   return (
-    <DocumentTitle title="Log Collector">
+    <DocumentTitle title={t('pages.edit_collector.title')}>
       <SidecarsPageNavigation />
       <PageHeader
-        title="Log Collector"
+        title={t('pages.edit_collector.title')}
         documentationLink={{
-          title: 'Sidecar documentation',
+          title: t('pages.documentation_title'),
           path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
         }}>
-        <span>Some words about log collectors.</span>
+        <span>{t('pages.edit_collector.description')}</span>
       </PageHeader>
 
       <Row className="content">

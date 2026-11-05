@@ -16,6 +16,7 @@
  */
 import React from 'react';
 
+import i18n from 'i18n';
 import { Input } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 
@@ -53,7 +54,7 @@ class SyslogPriLevelConverterConfiguration extends React.Component<
         <Input
           type="checkbox"
           id={`enable-${this.props.type}-converter`}
-          label="Convert from PRI to syslog level"
+          label={i18n.t('converters.syslog_pri_level', { ns: 'extractors' })}
           wrapperClassName="col-md-offset-2 col-md-10"
           defaultChecked
           onChange={this._toggleConverter}

@@ -17,6 +17,7 @@
 import React from 'react';
 
 import TitleCell from 'components/indices/IndexSetTemplates/cells/TitleCell';
+import DescriptionCell from 'components/indices/IndexSetTemplates/cells/DescriptionCell';
 import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import { StatusIcon } from 'components/common';
@@ -25,8 +26,17 @@ const customColumnRenderers: ColumnRenderers<IndexSetTemplate> = {
   attributes: {
     title: {
       renderCell: (title: string, template: IndexSetTemplate) => (
-        <TitleCell title={title} id={template.id} isDefault={template.default} isEnabled={template.enabled} />
+        <TitleCell
+          title={title}
+          id={template.id}
+          isDefault={template.default}
+          isEnabled={template.enabled}
+          isBuiltIn={template.built_in}
+        />
       ),
+    },
+    description: {
+      renderCell: (_description: string, template: IndexSetTemplate) => <DescriptionCell template={template} />,
     },
     built_in: {
       renderCell: (built_in: boolean, _template) => <StatusIcon active={built_in} />,

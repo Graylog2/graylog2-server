@@ -15,31 +15,41 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Panel } from 'components/bootstrap';
 
 import styles from './TemplateFieldValueProviderPreview.css';
 
-const TemplateFieldValueProviderPreview = () => (
-  <Panel className={styles.templatePreview} header={<h3>Available Fields in Template</h3>}>
-    <p>
-      It is possible to enrich generated Events with dynamic values. You can access Fields from the Event context{' '}
-      {/* eslint-disable-next-line no-template-curly-in-string */}
-      with <code>{'${source.<fieldName>}'}</code>.
-      <br />
-      Available Fields in the Template depend on the condition that created the Event:
-    </p>
-    <ul>
-      <li>
-        <b>Filter:</b> All Fields in the original log message
-      </li>
-      <li>
-        <b>Aggregation:</b> Fields set in Group By with their original names
-      </li>
-      <li>
-        <b>Correlation:</b> All Fields in the last matched and non-negated Event
-      </li>
-    </ul>
-  </Panel>
-);
+const TemplateFieldValueProviderPreview = () => {
+  const { t } = useTranslation('event_definitions');
+
+  return (
+    <Panel className={styles.templatePreview} header={<h3>{t('template_preview.title')}</h3>}>
+      <p>
+        <Trans
+          t={t}
+          i18nKey="template_preview.description"
+          // eslint-disable-next-line no-template-curly-in-string
+          values={{ syntax: '${source.<fieldName>}' }}
+          components={{ code: <code /> }}
+        />
+        <br />
+        {t('template_preview.available_fields')}
+      </p>
+      <ul>
+        <li>
+          <b>{t('template_preview.filter_label')}</b> {t('template_preview.filter')}
+        </li>
+        <li>
+          <b>{t('template_preview.aggregation_label')}</b> {t('template_preview.aggregation')}
+        </li>
+        <li>
+          <b>{t('template_preview.correlation_label')}</b> {t('template_preview.correlation')}
+        </li>
+      </ul>
+    </Panel>
+  );
+};
+
 export default TemplateFieldValueProviderPreview;

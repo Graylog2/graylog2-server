@@ -1,0 +1,10 @@
+{
+  "match exactly": "dokładnie pasować do",
+  "match regular expression": "pasować do wyrażenia regularnego",
+  "be greater than": "być większe niż",
+  "be smaller than": "być mniejsze niż",
+  "be present": "być obecne",
+  "contain": "zawierać",
+  "always match": "zawsze pasować",
+  "match input": "pasować do wejścia"
+}

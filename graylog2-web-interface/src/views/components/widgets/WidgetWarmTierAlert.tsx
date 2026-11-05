@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useContext, useMemo } from 'react';
 
 import Popover from 'components/common/Popover';
@@ -28,6 +29,7 @@ type Props = {
 };
 
 const WidgetWarmTierAlert = ({ activeQuery, widgetId }: Props) => {
+  const { t } = useTranslation('widgets');
   const { getExplainForWidget } = useContext(SearchExplainContext);
   const view = useView();
   const explainedWidget = getExplainForWidget(activeQuery, widgetId, view.widgetMapping);
@@ -42,11 +44,9 @@ const WidgetWarmTierAlert = ({ activeQuery, widgetId }: Props) => {
   return (
     <Popover position="bottom">
       <Popover.Target>
-        <IconButton title="Info" name="info" />
+        <IconButton title={t('warm_tier.info')} name="info" />
       </Popover.Target>
-      <Popover.Dropdown title="Info">
-        This widget is retrieving data from the Warm Tier and may take longer to load.
-      </Popover.Dropdown>
+      <Popover.Dropdown title={t('warm_tier.info')}>{t('warm_tier.loading_slow')}</Popover.Dropdown>
     </Popover>
   );
 };

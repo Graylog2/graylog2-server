@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import { ConfirmDialog } from 'components/common';
@@ -29,6 +30,7 @@ type Props = {
 };
 
 const StreamDeleteModal = ({ onDelete, streamId, streamTitle, onCancel }: Props) => {
+  const { t } = useTranslation('streams');
   const DataLakeStreamDeleteWarning = usePluginEntities('dataLake')?.[0]?.DataLakeStreamDeleteWarning;
   const dataLakeState = useStreamDataLakeHasData(streamId, !!DataLakeStreamDeleteWarning);
   const isDataLakeEnabled = !!useIsStreamDataLakeEnabled(streamId, !!DataLakeStreamDeleteWarning);
@@ -43,7 +45,7 @@ const StreamDeleteModal = ({ onDelete, streamId, streamTitle, onCancel }: Props)
       onConfirm={onDelete}
       btnConfirmDisabled={shouldShowWarning}
       onCancel={onCancel}
-      title="Delete Stream">
+      title={t('streams_overview.actions.delete_modal_title')}>
       {shouldShowWarning ? (
         <DataLakeStreamDeleteWarning
           streamId={streamId}
@@ -52,7 +54,7 @@ const StreamDeleteModal = ({ onDelete, streamId, streamTitle, onCancel }: Props)
           hasRetrievals={hasRetrievals}
         />
       ) : (
-        `Do you really want to remove stream:  ${streamTitle}?`
+        t('streams_overview.actions.delete_modal_confirm', { title: streamTitle })
       )}
     </ConfirmDialog>
   );

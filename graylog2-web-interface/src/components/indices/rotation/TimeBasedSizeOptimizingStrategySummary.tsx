@@ -15,8 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-
-import { Pluralize } from 'components/common';
+import { useTranslation } from 'react-i18next';
 
 import type { TimeBasedSizeOptimizingStrategyConfig } from './TimeBasedSizeOptimizingStrategyConfiguration';
 import { durationToRoundedDays } from './TimeBasedSizeOptimizingStrategyConfiguration';
@@ -26,23 +25,22 @@ const TimeBasedSizeOptimizingStrategySummary = ({
 }: {
   config: TimeBasedSizeOptimizingStrategyConfig;
 }) => {
+  const { t } = useTranslation('indexsets');
   const minLifetimeAsDays = durationToRoundedDays(index_lifetime_min);
   const maxLifetimeAsDays = durationToRoundedDays(index_lifetime_max);
 
   return (
     <div>
       <dl>
-        <dt>Index rotation strategy:</dt>
-        <dd>Index Time Size Optimizing</dd>
-        <dt>Minimum lifetime:</dt>
+        <dt>{t('strategies.rotation_summary_strategy')}</dt>
+        <dd>{t('strategies.rotation_time_size_optimizing')}</dd>
+        <dt>{t('strategies.rotation_min_lifetime')}</dt>
         <dd>
-          {index_lifetime_min} ({minLifetimeAsDays} <Pluralize singular="day" plural="days" value={minLifetimeAsDays} />{' '}
-          )
+          {index_lifetime_min} ({t('data_tiering.days', { count: minLifetimeAsDays })})
         </dd>
-        <dt>Maximum lifetime:</dt>
+        <dt>{t('strategies.rotation_max_lifetime')}</dt>
         <dd>
-          {index_lifetime_max} ({maxLifetimeAsDays} <Pluralize singular="day" plural="days" value={maxLifetimeAsDays} />
-          )
+          {index_lifetime_max} ({t('data_tiering.days', { count: maxLifetimeAsDays })})
         </dd>
       </dl>
     </div>

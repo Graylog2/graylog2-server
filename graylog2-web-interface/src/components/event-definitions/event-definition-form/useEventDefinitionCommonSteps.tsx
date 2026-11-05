@@ -16,18 +16,19 @@
  */
 import React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import { useTranslation } from 'react-i18next';
 
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
-import type { StepType } from 'components/common/Wizard';
 
 import FieldsForm from './FieldsForm';
 import ShareForm from './ShareForm';
 import NotificationsForm from './NotificationsForm';
 import EventDefinitionSummary from './EventDefinitionSummary';
+import type { EventDefinitionStep } from './EventDefinitionForm';
 
 const COMMON_STEP_KEYS = {
   ADDITIONAL_DETAILS: 'additional-details',
@@ -97,7 +98,7 @@ const defaultCommonStepProps: CommonStepProps = {
 };
 
 type Args = {
-  viewSteps: Array<StepType<string>>;
+  viewSteps: Array<EventDefinitionStep>;
   commonStepProps?: CommonStepProps;
   notifications?: Array<EventNotification>;
   notificationDefaults?: { default_backlog_size: number };
@@ -114,7 +115,8 @@ function useEventDefinitionSteps({
   hideFieldsStep = false,
   canEdit = false,
   summaryComponent = undefined,
-}: Args): Array<StepType<string>> {
+}: Args): Array<EventDefinitionStep> {
+  const { t } = useTranslation('event_definitions');
   const isNew = commonStepProps.action === 'create';
   const conditionPlugin = getConditionPlugin(commonStepProps?.eventDefinition?.config?.type);
   const shouldHideFieldsStep = hideFieldsStep || (conditionPlugin?.hideFieldsStep ?? false);
@@ -128,26 +130,30 @@ function useEventDefinitionSteps({
     ...viewSteps,
     {
       key: COMMON_STEP_KEYS.ADDITIONAL_DETAILS,
-      title: 'Additional Details',
+      title: t('steps.additional_details'),
+      telemetryTitle: 'Additional Details',
       component: <FieldsForm {...resolvedCommonStepProps} canEdit={canEdit} />,
       hidden: shouldHideFieldsStep,
     },
     {
       key: COMMON_STEP_KEYS.NOTIFICATIONS,
-      title: 'Notifications',
+      title: t('steps.notifications'),
+      telemetryTitle: 'Notifications',
       component: (
         <NotificationsForm {...resolvedCommonStepProps} notifications={notifications} defaults={notificationDefaults} />
       ),
     },
     {
       key: COMMON_STEP_KEYS.SHARE,
-      title: 'Share',
+      title: t('steps.share'),
+      telemetryTitle: 'Share',
       component: <ShareForm {...resolvedCommonStepProps} />,
       hidden: !isNew,
     },
     {
       key: COMMON_STEP_KEYS.SUMMARY,
-      title: 'Summary',
+      title: t('steps.summary'),
+      telemetryTitle: 'Summary',
       component: summaryComponent ? (
         summaryComponent
       ) : (

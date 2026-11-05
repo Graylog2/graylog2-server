@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import withParams from 'routing/withParams';
 import { LinkContainer, PageHeader, DocumentTitle } from 'components/common';
@@ -33,18 +34,23 @@ type Props = {
   };
 };
 
-const PageTitle = ({ fullName }: { fullName: string | undefined | null }) => (
-  <>
-    Role Details{' '}
-    {fullName && (
-      <>
-        - <i>{fullName}</i>
-      </>
-    )}
-  </>
-);
+const PageTitle = ({ fullName }: { fullName: string | undefined | null }) => {
+  const { t } = useTranslation('users');
+
+  return (
+    <>
+      {t('role_details.title_prefix')}{' '}
+      {fullName && (
+        <>
+          - <i>{fullName}</i>
+        </>
+      )}
+    </>
+  );
+};
 
 const RoleDetailsPage = ({ params }: Props) => {
+  const { t } = useTranslation('users');
   const [loadedRole, setLoadedRole] = useState<Role | undefined>();
   const roleId = params?.roleId;
 
@@ -53,20 +59,20 @@ const RoleDetailsPage = ({ params }: Props) => {
   }, [roleId]);
 
   return (
-    <DocumentTitle title={`Role Details ${loadedRole?.name ?? ''}`}>
+    <DocumentTitle title={t('role_details.title', { name: loadedRole?.name ?? '' })}>
       <PageHeader
         title={<PageTitle fullName={loadedRole?.name} />}
         actions={<RoleActionLinks roleId={roleId} />}
         documentationLink={{
-          title: 'Permissions documentation',
+          title: t('role_details.documentation_link_title'),
           path: DocsHelper.PAGES.USERS_ROLES,
         }}
         topActions={
           <LinkContainer to={Routes.SYSTEM.AUTHZROLES.OVERVIEW}>
-            <Button bsStyle="info">Roles Overview</Button>
+            <Button bsStyle="info">{t('role_details.button_text')}</Button>
           </LinkContainer>
         }>
-        <span>Overview of details like name, description and assigned users.</span>
+        <span>{t('role_details.description')}</span>
       </PageHeader>
       <RoleDetails role={roleId === loadedRole?.id ? loadedRole : undefined} />
     </DocumentTitle>

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import StringUtils from 'util/StringUtils';
+import i18n from 'i18n';
 
 const EventDefinitionPriorityEnum = {
   INFO: 0,
@@ -34,7 +34,7 @@ const EventDefinitionPriorityEnum = {
 export const getPriorityName = (priority: number | string): string => {
   const properties = EventDefinitionPriorityEnum.properties[priority];
 
-  return properties ? StringUtils.capitalizeFirstLetter(properties.name) : String(priority);
+  return properties ? i18n.t(`priorities.${properties.name}`, { ns: 'event_definitions' }) : String(priority);
 };
 
 export default EventDefinitionPriorityEnum;

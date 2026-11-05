@@ -14,17 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { changeLanguage } from 'i18n';
 import View from 'views/logic/views/View';
 
 import ViewTitle from './ViewTitle';
 
 describe('ViewTitle', () => {
+  afterEach(() => changeLanguage('en'));
+
   it('returns default title for unsaved search', () => {
     expect(ViewTitle(undefined, View.Type.Search)).toBe('Unsaved Search');
   });
 
   it('returns default title for unsaved dashboard', () => {
     expect(ViewTitle(undefined, View.Type.Dashboard)).toBe('Unsaved Dashboard');
+  });
+
+  it('translates default title in the current language', async () => {
+    await changeLanguage('de');
+
+    expect(ViewTitle(undefined, View.Type.Search)).toBe('Ungespeicherte Suche');
+    expect(ViewTitle(undefined, View.Type.Dashboard)).toBe('Ungespeichertes Dashboard');
   });
 
   it('returns actual title if present', () => {

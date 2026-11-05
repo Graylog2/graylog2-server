@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import styled from 'styled-components';
 
@@ -44,24 +45,29 @@ type OverviewSectionProps = React.PropsWithChildren<{
   headerActions?: React.ReactNode;
 }>;
 
-const OverviewSection = ({ headerActions = undefined, children = undefined }: OverviewSectionProps) => (
-  <>
-    <SectionHeader>
-      <h2>Overview</h2>
-      {headerActions}
-    </SectionHeader>
-    <Container>{children}</Container>
-  </>
-);
+const OverviewSection = ({ headerActions = undefined, children = undefined }: OverviewSectionProps) => {
+  const { t } = useTranslation('welcome');
+
+  return (
+    <>
+      <SectionHeader>
+        <h2>{t('overview')}</h2>
+        {headerActions}
+      </SectionHeader>
+      <Container>{children}</Container>
+    </>
+  );
+};
 
 const MetricsTabs = ({ metricsPlugins }: { metricsPlugins: Array<WelcomePageMetricsPlugin> }) => {
+  const { t } = useTranslation('welcome');
   const [selectedTabValue, setSelectedTabValue] = useState<string>();
 
   const tabs = [
-    { label: 'General', value: GENERAL_TAB_VALUE, component: GeneralMetrics },
-    ...metricsPlugins.map(({ label, component }) => ({ label, value: label, component })),
+    { label: t('metrics.tab_general'), value: GENERAL_TAB_VALUE, component: GeneralMetrics },
+    ...metricsPlugins.map(({ id, label, component }) => ({ label, value: id ?? String(label), component })),
   ];
-  const activeTabValue = selectedTabValue ?? metricsPlugins[0].label;
+  const activeTabValue = selectedTabValue ?? tabs[1].value;
   const ActiveTabComponent = tabs.find(({ value }) => value === activeTabValue)?.component ?? GeneralMetrics;
 
   return (

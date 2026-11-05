@@ -1,0 +1,499 @@
+{
+  "users_overview": {
+    "title": "用户概览",
+    "documentation_link_title": "权限文档",
+    "description": "所有已注册用户的概览。"
+  },
+  "user_create": {
+    "title": "创建新用户",
+    "documentation_link_title": "权限文档",
+    "description": "使用此页面为 Web 界面或 REST API 创建新用户。",
+    "submit_button": "创建用户",
+    "reader_role_description": "为每个 {{productName}} 用户授予基本权限（内置）",
+    "role_required": "您需要至少选择 <em>Reader</em> 或 <em>Admin</em> 角色之一。",
+    "failed_title": "创建用户失败",
+    "submit": "创建用户",
+    "submitting": "正在创建用户..."
+  },
+  "user_edit": {
+    "title": "编辑用户 {{username}}",
+    "title_prefix": "编辑用户",
+    "documentation_link_title": "权限文档",
+    "description": "您可以在此更改用户详细信息和密码，并分配角色和团队。",
+    "segments": {
+      "profile": "个人资料",
+      "preferences": "偏好设置",
+      "teams_roles": "团队和角色",
+      "shared_entities": "共享条目"
+    },
+    "password": {
+      "new_password": "新密码",
+      "repeat_password": "重复密码",
+      "old_password": "旧密码",
+      "alert_title": "更改密码",
+      "alert_text": "更改密码将使该用户退出登录，并使其所有当前会话失效。如果您正在更改自己的密码，保存后将立即退出登录。在这种情况下，请先保存所有待处理的更改。",
+      "change": "更改密码"
+    },
+    "profile": {
+      "email": "电子邮件",
+      "full_name": "全名",
+      "update": "更新个人资料"
+    },
+    "profile_info": {
+      "title": "名和姓",
+      "text": "从 {{productName}} 4.1 开始，我们新增了独立的名和姓字段。保存用户个人资料前必须填写这些字段。"
+    },
+    "read_only": "所选用户 {{fullName}} 无法编辑。",
+    "roles_required": "角色必须至少包含 Admin 或 Reader 角色之一。",
+    "external": {
+      "title": "外部用户",
+      "text": "该用户是从外部服务器同步而来的，因此无法更改其个人资料或密码。如需更多信息，请联系管理员。"
+    },
+    "preferences": {
+      "language_help": "{{productName}} 界面的语言。标记为 Beta 的翻译尚未经过审核。",
+      "enable_autocompletion": "启用自动补全",
+      "search_sidebar": "搜索侧边栏",
+      "dashboard_sidebar": "Dashboard 侧边栏",
+      "is_pinned": "已固定",
+      "search_sidebar_help": "也可以通过搜索侧边栏的固定图标进行更改",
+      "dashboard_sidebar_help": "也可以通过 Dashboard 侧边栏的固定图标进行更改",
+      "theme_mode_help": "可以通过用户下拉菜单中的切换开关进行更改",
+      "update": "更新偏好设置"
+    },
+    "settings": {
+      "select_entity": "请选择一个条目。",
+      "update": "更新设置"
+    }
+  },
+  "roles_overview": {
+    "title": "角色概览",
+    "documentation_link_title": "权限文档",
+    "button_text": "角色概览",
+    "description": "{{productName}} 中所有可用角色的概览。角色允许向用户授予功能权限，例如创建 Dashboard 或 Event Definition。",
+    "alert_title": "授予权限",
+    "alert_body_prefix": "内置角色允许向用户授予功能权限，例如创建 Dashboard 或查看归档目录。但它们不会授予对特定 Dashboard 或 Stream 的权限，也无法创建自定义角色。要为特定条目授予权限，可以使用其 ",
+    "share_text": "共享",
+    "alert_body_suffix": " 按钮。例如，您可以在条目概览页面上找到该按钮。如果要同时为多个用户授予某个条目的权限，可以使用团队。更多信息请参阅",
+    "documentation_text": "文档"
+  },
+  "role_details": {
+    "title": "角色详情 {{name}}",
+    "title_prefix": "角色详情",
+    "documentation_link_title": "权限文档",
+    "button_text": "角色概览",
+    "description": "概览名称、描述和已分配用户等详细信息。"
+  },
+  "role_edit": {
+    "title": "编辑角色 {{name}}",
+    "title_prefix": "编辑角色",
+    "documentation_link_title": "权限文档",
+    "button_text": "角色概览",
+    "description": "您可以将该角色分配给用户。"
+  },
+  "user_tokens_edit": {
+    "title": "编辑用户 {{username}} 的令牌",
+    "title_prefix": "编辑用户的令牌",
+    "documentation_link_title": "权限文档",
+    "description": "您可以创建新令牌或删除旧令牌。"
+  },
+  "token_management": {
+    "title": "令牌管理",
+    "documentation_link_title": "权限文档",
+    "description": "为 {{productName}} 配置的访问令牌概览。"
+  },
+  "token_list": {
+    "title": "创建和编辑令牌",
+    "token_created": "令牌 {{name}} 已创建！",
+    "token_created_description": "这是您的新令牌。请立即复制，关闭后将无法再次查看。",
+    "done_button": "完成",
+    "title_list": "令牌",
+    "filter_label": "过滤器",
+    "no_tokens_to_display": "没有可显示的令牌。",
+    "no_tokens_match_filter": "没有与过滤器匹配的令牌。",
+    "column_name": "令牌名称",
+    "column_created": "创建时间",
+    "column_last_access": "最后访问",
+    "column_expires_at": "过期时间",
+    "column_actions": "操作",
+    "never_used": "从未使用"
+  },
+  "permissions": {
+    "grantee_types": {
+      "user": "用户",
+      "team": "团队",
+      "global": "所有人",
+      "error": "错误"
+    },
+    "dependencies_warning": {
+      "title": "当前协作者缺少依赖项",
+      "needs_access": "{{type}} <granteeTitle>{{title}}</granteeTitle> 需要访问",
+      "dependency": "{{type}}：<dependencyTitle>{{title}}</dependencyTitle>",
+      "owners": "所有者：",
+      "owner": "{{type}} <ownerTitle>{{title}}</ownerTitle>"
+    },
+    "share": {
+      "add_collaborator": "添加协作者",
+      "search_placeholder": "搜索用户和团队",
+      "collaborators": "协作者",
+      "direct_collaborators": "直接协作者",
+      "shared_via_collections": "通过 Collection 共享",
+      "update_sharing": "更新共享",
+      "modal_title": "共享{{entityType}}：<entityTitle>{{entityTitle}}</entityTitle>",
+      "confirm_not_added_named": "已选择\"{{title}}\"，但从未将其添加为协作者。是否仍要继续？",
+      "confirm_not_added_unnamed": "已选择一个条目（未找到名称），但从未将其添加为协作者。是否仍要继续？"
+    },
+    "grantees": {
+      "change_capability": "更改 {{title}} 的权限",
+      "remove_sharing": "移除 {{title}} 的共享",
+      "no_collaborators": "此{{entityType}}没有协作者。"
+    },
+    "roles_selector": {
+      "search_placeholder": "搜索角色",
+      "assign_role": "分配角色"
+    },
+    "shareable_url": {
+      "copy_title": "将参数复制到剪贴板",
+      "hint": "您以及任何有权查看的人都可以访问此链接。"
+    },
+    "shared_entities": {
+      "entity_type": "条目类型",
+      "filter_entity_types": "过滤条目类型",
+      "capability": "权限",
+      "filter_capabilities": "过滤权限",
+      "found": "找到 {{total}} 个与{{entityType}}共享的条目。",
+      "no_results": "未找到任何共享条目。",
+      "headers": {
+        "entity_name": "条目名称",
+        "entity_type": "条目类型",
+        "owner": "所有者",
+        "capability": "权限"
+      },
+      "query_example": "查找标题包含 security 的共享条目："
+    },
+    "sharing_disabled": {
+      "title": "无法共享",
+      "owners_only": "只有此{{type}}的所有者才能共享它。"
+    },
+    "validation_error": {
+      "ownerless": "移除以下所有者将导致该条目没有所有者："
+    },
+    "capabilities": {
+      "viewer": "查看者",
+      "manager": "管理者",
+      "owner": "所有者"
+    },
+    "select_capability": "选择权限级别"
+  },
+  "roles": {
+    "profile": {
+      "title": "个人资料",
+      "name": "名称",
+      "description": "描述"
+    },
+    "teams": "团队",
+    "users": {
+      "title": "用户",
+      "none_selected": "未找到已选择的用户。",
+      "assign_users": "分配用户",
+      "selected_users": "已选用户",
+      "needs_reader_or_admin": "用户\"{{name}}\"至少需要 Reader 或 Admin 角色。"
+    },
+    "users_selector": {
+      "search_placeholder": "搜索用户",
+      "assign_user": "分配用户"
+    },
+    "actions": {
+      "edit_role_title": "编辑角色 {{name}}",
+      "delete_role_title": "删除角色 {{name}}",
+      "edit": "编辑",
+      "deleting": "正在删除",
+      "delete": "删除",
+      "confirm_delete": "您确定要删除角色\"{{name}}\"吗？",
+      "still_assigned": "该角色仍分配给 {{count}} 个用户。"
+    },
+    "overview": {
+      "title": "角色",
+      "found": "系统中找到 {{total}} 个角色。",
+      "none_found": "未找到任何角色。"
+    },
+    "query_example": "查找名称包含 manager 的角色：",
+    "navigation": {
+      "view_details": "查看详情",
+      "edit_role": "编辑角色"
+    }
+  },
+  "security_teaser": {
+    "overview": {
+      "hotspot_0": "在\"概览\"选项卡中快速查找最关键的安全信息。",
+      "hotspot_1": "查找高级别告警、主要事件来源等信息，深入了解您的安全状况。",
+      "hotspot_2": "将鼠标悬停在本页面的提示上，即可了解 {{productName}} Security 功能的更多信息。",
+      "title": "概览"
+    },
+    "anomalies": {
+      "hotspot_0": "获取正在运行的异常检测概要，包括检测到的数量，以及与上一时间段的对比。",
+      "hotspot_1": "置信区间可以告诉您行为与正常情况的偏差程度。",
+      "hotspot_2": "系统提供针对不同类型异常的检测器，可快速查看哪些检测器正在生成告警。",
+      "hotspot_3": "识别在登录或安全事件中表现出异常行为的用户账户。",
+      "title": "异常"
+    },
+    "host_activity": {
+      "hotspot_0": "通过高、中、低级别告警数量及趋势信息，全面了解当前情况，判断今天是否属于正常工作状态。",
+      "hotspot_1": "快速识别生成高级别告警的主机，缩短平均修复时间（MTTR）。",
+      "hotspot_2": "查看哪些技术产生的登录次数最多。",
+      "hotspot_3": "当身份和访问控制更改来自异常机器时，发起调查。",
+      "hotspot_4": "按事件来源统计的消息数量可让您每日掌握数据中的常规模式，超出正常范围的峰值将触发调查，以查明原因。",
+      "title": "主机活动"
+    },
+    "network_activity": {
+      "hotspot_0": "即时查看网络中数据流量的峰值。",
+      "hotspot_1": "快速了解数据的来源和去向。",
+      "hotspot_2": "识别在网络中发送数据量最大的用户。",
+      "hotspot_3": "判断 DNS 查询结果中是否存在异常模式，例如某个错误代码突然出现在前 15 名列表中。",
+      "hotspot_4": "按事件来源列出生成 DNS 请求最多的前 15 个平台。",
+      "title": "网络活动"
+    },
+    "user_activity": {
+      "hotspot_0": "快速查看登录失败是否呈现值得关注的趋势。",
+      "hotspot_1": "按用户统计的登录成功和失败次数，有助于发现问题账户和异常活动。",
+      "hotspot_2": "这些是生成高级别告警最多的前 15 个用户账户！",
+      "hotspot_3": "您的环境中最常见的身份和访问控制更改有哪些？",
+      "hotspot_4": "了解最频繁的访问控制更改所针对的对象。",
+      "title": "用户活动"
+    },
+    "demo": {
+      "items": {
+        "anomaly_detection_ai": "异常检测 AI",
+        "cloud_option": "云端选项",
+        "archiving": "归档",
+        "audit_logs_cloud": "{{productName}} Cloud 的审计日志",
+        "dynamic_lookup_tables": "动态 Lookup Table",
+        "advanced_alerting": "借助脚本实现高级告警",
+        "compliance_reporting": "合规报告",
+        "correlation_aggregation": "事件关联与聚合",
+        "threat_intel": "威胁情报集成",
+        "incident_workspaces": "事件调查工作区",
+        "prebuilt_parser_dashboards": "预构建的安全解析器和 Dashboard",
+        "sigma_rules": "Sigma 规则",
+        "parameterized_dashboards": "参数化 Dashboard",
+        "input_output_integrations": "Input 和 Output 集成",
+        "threat_management": "威胁管理",
+        "search_workflow": "搜索工作流、模板和过滤器",
+        "soar_integrations": "SOAR 集成"
+      },
+      "title": "Security 演示",
+      "banner_text": "如需了解更多信息或预约完整产品演示，请访问 {{productName}} 官方网站。",
+      "button": "{{productName}} Security",
+      "overview": "概览",
+      "description": "{{productName}} Security 旨在为 IT 团队革新网络安全，融合了 SIEM、安全分析、事件调查和异常检测等能力。使用我们的平台，您可以更高效地工作，更快地处理关键任务，并降低恶意行为者和基于凭证的攻击带来的风险。"
+    }
+  },
+  "user_fields": {
+    "username": "用户名",
+    "first_name": "名",
+    "last_name": "姓",
+    "full_name": "全名",
+    "email": "电子邮件地址",
+    "password": "密码",
+    "repeat_password": "重复密码",
+    "time_zone": "时区",
+    "sessions_timeout": "会话超时",
+    "profile": "个人资料",
+    "settings": "设置",
+    "roles": "角色",
+    "assign_roles": "分配角色",
+    "selected_roles": "已选角色",
+    "teams": "团队"
+  },
+  "user_form": {
+    "first_name_help": "用户的名。",
+    "last_name_help": "用户的姓。",
+    "email_help": "用户的电子邮件地址。",
+    "username_help": "选择一个唯一的用户名，用于登录。",
+    "username_taken": "用户名已被占用",
+    "passwords_mismatch": "两次输入的密码不一致",
+    "time_zone_help": "选择您所在的本地时区，或保持不变以使用浏览器的默认时区。",
+    "service_account": "服务账户",
+    "service_account_label": "该用户为服务账户",
+    "service_account_help": "勾选后，该用户将成为服务账户，无法登录 Web 界面或编辑其设置（例如 API 令牌）。",
+    "service_account_confirm_title": "您确定吗？",
+    "service_account_confirm": "将此用户更改为服务账户后，该用户将无法登录 Web 界面或编辑其设置（例如 API 令牌）。是否继续？",
+    "global_timeout_message": "由于已启用<timeoutLink>全局会话超时</timeoutLink>，无法编辑用户会话超时时间。"
+  },
+  "token_form": {
+    "token_name": "令牌名称",
+    "placeholder": "此令牌用于什么？",
+    "ttl_label": "令牌 TTL",
+    "ttl_invalid": "无效（最小值：1 分钟）",
+    "creating": "正在创建...",
+    "create": "创建令牌",
+    "ttl_help": "TTL 语法示例：60 秒：PT60S，60 分钟：PT60M，24 小时：PT24H，30 天：P30D"
+  },
+  "permissions_info": {
+    "title": "授予权限",
+    "text": "可以使用条目的 <shareLabel>共享</shareLabel> 按钮为 Stream 和 Dashboard 等条目授予权限。例如，您可以在条目概览页面上找到该按钮。更多信息请参阅<docsLink>文档</docsLink>。"
+  },
+  "startpage": {
+    "label": "起始页",
+    "help": "选择用户登录后立即看到的页面。仅可选择用户具有权限的条目。",
+    "select_type": "选择类型",
+    "select_value": "选择{{type, lowercase}}",
+    "entity": "条目",
+    "types": {
+      "dashboard": "Dashboard",
+      "stream": "Stream",
+      "search": "搜索"
+    },
+    "new_search": "新建搜索",
+    "threat_coverage": "威胁覆盖",
+    "missing_permission": "用户缺少对所配置页面的权限"
+  },
+  "timeout": {
+    "sessions_label": "会话超时",
+    "alert_title": "更改会话超时",
+    "alert_text": "更改会话超时设置将使用户退出登录，并使其所有当前会话失效。如果您正在更改自己用户的此设置，保存设置时将立即退出登录。在这种情况下，请先保存所有待处理的更改，再更改超时设置。",
+    "never_label": "会话永不超时",
+    "never_help": "勾选后，会话不会因不活动而超时。",
+    "amount_placeholder": "超时时长",
+    "help": "除非会话仍在活跃使用，否则将在此时长后自动结束。",
+    "unit_label": "超时单位",
+    "units": {
+      "seconds": "秒",
+      "minutes": "分钟",
+      "hours": "小时",
+      "days": "天"
+    }
+  },
+  "user_details": {
+    "client_address": "客户端地址",
+    "last_activity": "最后活动",
+    "logged_in": "已登录",
+    "enabled": "已启用",
+    "auth_service_disabled": "身份验证服务已禁用，该用户无法登录",
+    "preferences": {
+      "title": "偏好设置",
+      "search_autocompletion": "搜索自动补全",
+      "update_unfocused": "失去焦点时更新",
+      "pin_search_sidebar": "固定搜索侧边栏",
+      "pin_dashboard_sidebar": "固定 Dashboard 侧边栏",
+      "theme_mode": "主题模式",
+      "not_configured": "未配置",
+      "language": "语言"
+    },
+    "roles_none_selected": "未找到已选择的角色。",
+    "settings": {
+      "timezone": "时区",
+      "startpage": "起始页",
+      "no_startpage": "未设置起始页",
+      "no_timeout": "会话不会超时",
+      "globally_set": "（<configLink>全局设置</configLink>）"
+    },
+    "shared_entities": "共享条目"
+  },
+  "users_list": {
+    "client_address_help": "最初用于建立会话的客户端地址，不一定是其当前地址。",
+    "admin": {
+      "title": "系统管理员",
+      "description": "系统管理员只能在 {{productName}} 配置文件中编辑。"
+    },
+    "headers": {
+      "full_name": "全名",
+      "username": "用户名",
+      "email": "电子邮件地址",
+      "client_address": "客户端地址",
+      "enabled": "已启用",
+      "role": "角色",
+      "actions": "操作"
+    },
+    "title": "用户",
+    "found": "系统中找到 {{total}} 个已注册用户。",
+    "none_found": "未找到任何用户。",
+    "filter_label": "过滤用户",
+    "actions": {
+      "edit_tokens_title": "编辑用户 {{name}} 的令牌",
+      "edit_tokens": "编辑令牌",
+      "system_user_tooltip": "系统用户只能在服务器配置文件中修改。",
+      "system_user": "系统用户",
+      "confirm_disable": "您确定要禁用用户 {{name}} 吗？所有当前会话都将被终止。",
+      "confirm_delete": "您确定要删除用户 {{name}} 吗？",
+      "edit_title": "编辑用户 {{name}}",
+      "edit": "编辑",
+      "set_status_title": "设置 {{name}} 的新账户状态",
+      "disable": "禁用",
+      "enable": "启用",
+      "delete_title": "删除用户 {{name}}"
+    },
+    "logged_in": {
+      "title": "已登录",
+      "last_activity": "最后活动：{{activity}}",
+      "client_address": "客户端地址：{{address}}",
+      "not_logged_in": "未登录"
+    },
+    "status": {
+      "user_is": "用户状态：{{status}}",
+      "auth_disabled": "（身份验证服务已禁用）",
+      "enabled": "已启用",
+      "disabled": "已禁用"
+    },
+    "query_example": "查找邮箱包含 example.com 的用户：",
+    "fields": {
+      "full_name": "用户的全名",
+      "username": "用户的登录用户名。",
+      "email": "用户的电子邮件。"
+    },
+    "select_users": "选择用户..."
+  },
+  "user_navigation": {
+    "view_details": "查看详情",
+    "edit_user": "编辑用户",
+    "edit_tokens": "编辑令牌"
+  },
+  "token_admin": {
+    "title": "令牌",
+    "human_name": "令牌",
+    "fields": {
+      "username": "令牌所有者的用户名",
+      "name": "令牌的名称",
+      "created": "令牌的创建日期",
+      "last_access": "令牌最后一次被使用的时间",
+      "external_user": "令牌所有者是否为来自外部身份验证后端的用户",
+      "auth_backend": "用户身份验证后端。内部用户不适用。"
+    },
+    "example_user": "查找由指定用户创建的令牌：",
+    "example_name": "按指定令牌名称查找令牌：",
+    "deleting_title": "正在删除令牌",
+    "delete_confirm": "您即将删除令牌：\"{{name}}\"。您确定吗？",
+    "delete": "删除",
+    "user_not_found": "用户不存在。",
+    "user_error_title": "令牌用户错误",
+    "not_available": "不适用",
+    "delete_failed": "令牌删除失败：{{error}}",
+    "delete_failed_title": "无法删除令牌",
+    "deleted": "令牌已成功删除。",
+    "deleted_title": "成功！"
+  },
+  "user_details_page": {
+    "title": "用户详情",
+    "title_with_name": "用户详情 {{name}}",
+    "documentation_link_title": "权限文档",
+    "description": "概览个人资料信息、设置、团队和角色等详细信息。"
+  },
+  "password_rules": {
+    "min_length": "密码长度至少为 {{minLength}} 个字符。",
+    "require_uppercase": "密码必须至少包含一个大写字母。",
+    "require_lowercase": "密码必须至少包含一个小写字母。",
+    "require_numbers": "密码必须至少包含一个数字。",
+    "require_special_chars": "密码必须至少包含以下特殊字符之一：{{characters}}"
+  },
+  "notifications": {
+    "save_success": "用户偏好设置已成功保存",
+    "save_failed": "保存\"{{userName}}\"的偏好设置失败，状态：{{error}}",
+    "save_failed_title": "无法保存用户偏好设置",
+    "change_success": "您的起始页已成功更改",
+    "change_failed": "更改起始页失败，错误：{{error}}",
+    "change_failed_title": "无法更改起始页"
+  },
+  "use_basic_user_notifications": {
+    "load_failed": "加载用户 {{userId}} 失败，状态：",
+    "load_failed_title": "无法加载用户 {{userId}}"
+  }
+}

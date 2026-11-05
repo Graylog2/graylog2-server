@@ -21,6 +21,7 @@ import { ClusterInputState } from '@graylog/server-api';
 import UserNotification from 'util/UserNotification';
 import type { InputSummary } from 'hooks/usePaginatedInputs';
 import { INPUT_STATES_QUERY_KEY } from 'hooks/useInputsStates';
+import i18n from 'i18n';
 
 type PROPS = {
   inputId: string;
@@ -37,12 +38,15 @@ const useInputStateMutations = (input: InputSummary) => {
     mutationFn: startInput,
     onError: (error) => {
       UserNotification.error(
-        `Error starting input '${input.title}': ${error}`,
-        `Input '${input.title}' could not be started`,
+        i18n.t('use_input_state_mutations_notifications.start_failed', { ns: 'inputs', title: input.title, error }),
+        i18n.t('use_input_state_mutations_notifications.start_failed_title', { ns: 'inputs', title: input.title }),
       );
     },
     onSuccess: () => {
-      UserNotification.success('Input has been successfully started.', 'Success!');
+      UserNotification.success(
+        i18n.t('use_input_state_mutations_notifications.started_success', { ns: 'inputs' }),
+        i18n.t('use_input_state_mutations_notifications.success_title', { ns: 'inputs' }),
+      );
       queryClient.invalidateQueries({ queryKey: INPUT_STATES_QUERY_KEY });
     },
   });
@@ -50,12 +54,15 @@ const useInputStateMutations = (input: InputSummary) => {
     mutationFn: stopInput,
     onError: (error) => {
       UserNotification.error(
-        `Error stopping input '${input.title}': ${error}`,
-        `Input '${input.title}' could not be stopped`,
+        i18n.t('use_input_state_mutations_notifications.stop_failed', { ns: 'inputs', title: input.title, error }),
+        i18n.t('use_input_state_mutations_notifications.stop_failed_title', { ns: 'inputs', title: input.title }),
       );
     },
     onSuccess: () => {
-      UserNotification.success('Input has been successfully stopped.', 'Success!');
+      UserNotification.success(
+        i18n.t('use_input_state_mutations_notifications.stopped_success', { ns: 'inputs' }),
+        i18n.t('use_input_state_mutations_notifications.success_title', { ns: 'inputs' }),
+      );
       queryClient.invalidateQueries({ queryKey: INPUT_STATES_QUERY_KEY });
     },
   });
@@ -63,12 +70,15 @@ const useInputStateMutations = (input: InputSummary) => {
     mutationFn: setupInput,
     onError: (error) => {
       UserNotification.error(
-        `Error entering setup mode '${input.title}': ${error}`,
-        `Input '${input.title}' could not set to setup mode`,
+        i18n.t('use_input_state_mutations_notifications.setup_failed', { ns: 'inputs', title: input.title, error }),
+        i18n.t('use_input_state_mutations_notifications.setup_failed_title', { ns: 'inputs', title: input.title }),
       );
     },
     onSuccess: () => {
-      UserNotification.success('Input has been successfully deleted.', 'Success!');
+      UserNotification.success(
+        i18n.t('use_input_state_mutations_notifications.deleted_success', { ns: 'inputs' }),
+        i18n.t('use_input_state_mutations_notifications.success_title', { ns: 'inputs' }),
+      );
       queryClient.invalidateQueries({ queryKey: INPUT_STATES_QUERY_KEY });
     },
   });

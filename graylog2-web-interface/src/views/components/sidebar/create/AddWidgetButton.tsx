@@ -20,6 +20,7 @@ import styled from 'styled-components';
 import sortBy from 'lodash/sortBy';
 import upperCase from 'lodash/upperCase';
 import groupBy from 'lodash/groupBy';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from 'components/bootstrap';
 import type View from 'views/logic/views/View';
@@ -57,7 +58,10 @@ type CreatorFunction = () => (dispatch: ViewsDispatch, getState: GetState) => Pr
 
 type FunctionalCreator = {
   func: CreatorFunction;
+  /** Identifies the creator, e.g. in telemetry, so it stays English. */
   title: string;
+  /** Translation key of the displayed title, e.g. `search:widget_creators.message_count`. */
+  titleKey?: string;
   type: CreatorType;
   useCondition?: () => boolean;
 };
@@ -69,7 +73,10 @@ type CreatorComponentProps = {
 type ComponentCreator = {
   component: React.ComponentType<CreatorComponentProps>;
   useCondition?: () => boolean;
+  /** Identifies the creator, e.g. in telemetry, so it stays English. */
   title: string;
+  /** Translation key of the displayed title. */
+  titleKey?: string;
   type: CreatorType;
 };
 
@@ -88,6 +95,7 @@ const CreateMenuItem = ({
   onClick: () => void;
   setOverflowingComponents: React.Dispatch<React.SetStateAction<OverflowingComponents>>;
 }) => {
+  const { t } = useTranslation('search');
   const sendTelemetry = useSendTelemetry('search-sidebar');
   const dispatch = useViewsDispatch();
   const disabled = creator.useCondition?.() === false;
@@ -155,7 +163,7 @@ const CreateMenuItem = ({
 
   return (
     <CreateButton key={creator.title} onClick={createHandlerFor()} disabled={disabled}>
-      {creator.title}
+      {creator.titleKey ? t(creator.titleKey) : creator.title}
     </CreateButton>
   );
 };
@@ -186,6 +194,7 @@ type Props = {
 };
 
 const AddWidgetButton = ({ onClick }: Props) => {
+  const { t } = useTranslation('search');
   const [overflowingComponents, setOverflowingComponents] = useState<OverflowingComponents>({});
   const creators = usePluginEntities('creators');
   const {
@@ -198,12 +207,9 @@ const AddWidgetButton = ({ onClick }: Props) => {
 
   return (
     <>
-      <SectionInfo>
-        Use the following options to add an aggregation, log view (enterprise feature) or parameters (enterprise
-        feature) to your search.
-      </SectionInfo>
+      <SectionInfo>{t('sidebar_create.info')}</SectionInfo>
       <Group>
-        <SectionSubheadline>Generic</SectionSubheadline>
+        <SectionSubheadline>{t('sidebar_create.generic')}</SectionSubheadline>
         <GroupCreateMenuItems
           creators={generic}
           onClick={onClick}
@@ -211,7 +217,7 @@ const AddWidgetButton = ({ onClick }: Props) => {
         />
       </Group>
       <Group>
-        <SectionSubheadline>Predefined Aggregation</SectionSubheadline>
+        <SectionSubheadline>{t('sidebar_create.predefined_aggregation')}</SectionSubheadline>
         <GroupCreateMenuItems
           creators={presets}
           onClick={onClick}
@@ -220,7 +226,7 @@ const AddWidgetButton = ({ onClick }: Props) => {
       </Group>
       {!!investigationsCreator?.length && (
         <Group>
-          <SectionSubheadline>Investigations</SectionSubheadline>
+          <SectionSubheadline>{t('sidebar_create.investigations')}</SectionSubheadline>
           <GroupCreateMenuItems
             creators={investigationsCreator}
             onClick={onClick}
@@ -230,7 +236,7 @@ const AddWidgetButton = ({ onClick }: Props) => {
       )}
       {!!eventsCreator?.length && (
         <Group>
-          <SectionSubheadline>Events</SectionSubheadline>
+          <SectionSubheadline>{t('sidebar_create.events')}</SectionSubheadline>
           <GroupCreateMenuItems
             creators={eventsCreator}
             onClick={onClick}

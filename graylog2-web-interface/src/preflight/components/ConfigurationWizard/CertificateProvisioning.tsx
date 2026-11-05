@@ -17,8 +17,9 @@
 import * as React from 'react';
 import { useQueryClient, useMutation } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
-import ProductName from 'brand-customization/ProductName';
+import useProductName from 'brand-customization/useProductName';
 import fetch from 'logic/rest/FetchProvider';
 import { Title, Group, Space } from 'preflight/components/common';
 import Alert from 'components/bootstrap/Alert';
@@ -34,6 +35,8 @@ type Props = {
 };
 
 const CertificateProvisioning = ({ onSkipProvisioning }: Props) => {
+  const { t } = useTranslation('preflight');
+  const productName = useProductName();
   const queryClient = useQueryClient();
   const { data: dataNodes, isInitialLoading } = useDataNodes();
   const [isProvisioning, setIsProvisioning] = useState(false);
@@ -42,12 +45,12 @@ const CertificateProvisioning = ({ onSkipProvisioning }: Props) => {
     mutationFn: onProvisionCertificate,
 
     onSuccess: () => {
-      UserNotification.success('Started certificate provisioning successfully');
+      UserNotification.success(t('certificate_provisioning.started'));
       queryClient.invalidateQueries({ queryKey: DATA_NODES_OVERVIEW_QUERY_KEY });
     },
 
     onError: (error) => {
-      UserNotification.error(`Starting certificate provisioning failed with error: ${error}`);
+      UserNotification.error(t('certificate_provisioning.error', { error: String(error) }));
       queryClient.invalidateQueries({ queryKey: DATA_NODES_OVERVIEW_QUERY_KEY });
       setIsProvisioning(false);
     },
@@ -60,25 +63,23 @@ const CertificateProvisioning = ({ onSkipProvisioning }: Props) => {
 
   return (
     <div>
-      <Title order={3}>Provision certificates</Title>
+      <Title order={3}>{t('certificate_provisioning.title')}</Title>
       <p>
-        Certificate authority has been configured successfully.
+        {t('certificate_provisioning.configured')}
         <br />
-        You can now provision certificate for your data nodes.
+        {t('certificate_provisioning.ready')}
       </p>
       {!dataNodes.length && !isInitialLoading ? (
-        <Alert bsStyle="warning">
-          At least one <ProductName /> data node needs to run before the certificate can be provisioned.
-        </Alert>
+        <Alert bsStyle="warning">{t('certificate_provisioning.data_node_required', { productName })}</Alert>
       ) : (
         <Space h="sm" />
       )}
       <Group>
         <Button bsStyle="info" onClick={() => onSubmit()} disabled={!dataNodes.length || isProvisioning}>
-          {isProvisioning ? 'Provisioning certificate...' : 'Provision certificate and continue'}
+          {isProvisioning ? t('certificate_provisioning.provisioning') : t('certificate_provisioning.provision')}
         </Button>
         <Button onClick={() => onSkipProvisioning()} disabled={isProvisioning}>
-          Skip provisioning
+          {t('certificate_provisioning.skip')}
         </Button>
       </Group>
     </div>

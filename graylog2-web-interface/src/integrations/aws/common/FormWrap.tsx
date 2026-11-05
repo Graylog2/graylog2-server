@@ -16,6 +16,7 @@
  */
 import React, { useEffect, useRef, useState } from 'react';
 import styled, { createGlobalStyle, css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Button, Panel } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
@@ -81,6 +82,7 @@ const MoreIcon = styled(Icon)<{ $expanded: boolean }>(
 );
 
 export const ErrorMessage = ({ fullMessage, niceMessage = null }: ErrorMessageProps) => {
+  const { t } = useTranslation('integrations');
   const [expanded, toggleExpanded] = useState(false);
 
   const Header = (
@@ -89,7 +91,7 @@ export const ErrorMessage = ({ fullMessage, niceMessage = null }: ErrorMessagePr
       <ErrorOutput>{niceMessage || fullMessage}</ErrorOutput>
       {niceMessage && (
         <ErrorToggleInfo onClick={() => toggleExpanded(!expanded)}>
-          More Info <MoreIcon name="chevron_right" $expanded={expanded} />
+          {t('form_wrap.more_info')} <MoreIcon name="chevron_right" $expanded={expanded} />
         </ErrorToggleInfo>
       )}
     </>
@@ -101,14 +103,14 @@ export const ErrorMessage = ({ fullMessage, niceMessage = null }: ErrorMessagePr
 
   return (
     <Panel header={Header} bsStyle="danger" collapsible expanded={expanded}>
-      <strong>Additional Information: </strong>
+      <strong>{t('form_wrap.additional_information')} </strong>
       {fullMessage}
     </Panel>
   );
 };
 
 const FormWrap = ({
-  buttonContent = 'Submit',
+  buttonContent = null,
   children,
   className = undefined,
   disabled = false,
@@ -118,6 +120,7 @@ const FormWrap = ({
   onSubmit = () => {},
   title = null,
 }: FormWrapProps) => {
+  const { t } = useTranslation('integrations');
   const formRef = useRef();
   const [disabledButton, setDisabledButton] = useState(disabled);
 
@@ -143,7 +146,7 @@ const FormWrap = ({
       {children}
 
       <Button type="button" onClick={disabledButton ? null : onSubmit} bsStyle="primary" disabled={disabledButton}>
-        {loading ? 'Loading...' : buttonContent}
+        {loading ? t('form_wrap.loading_button') : buttonContent || t('form_wrap.submit_button')}
       </Button>
     </form>
   );

@@ -1,0 +1,4 @@
+{
+  "title": "Journalisation",
+  "description": "Cette section contrôle la journalisation de l'architecture Graylog et vous permet de modifier les niveaux de log à la volée. Notez que les niveaux de log sont réinitialisés à leurs valeurs par défaut après le redémarrage du service concerné."
+}

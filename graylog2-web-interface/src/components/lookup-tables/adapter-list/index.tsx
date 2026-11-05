@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Row, Col } from 'components/bootstrap';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
@@ -30,24 +31,32 @@ import { adapterListElements } from './constants';
 import columnRenderers from './column-renderers';
 import useActions from './use-actions';
 
-const queryHelpComponent = (
-  <QueryHelper
-    entityName="data adapter"
-    commonFields={['id', 'title', 'name', 'description']}
-    example={
-      <p>
-        searching without a field name matches against the <code>title</code> field:
-        <br />
-        <kbd>geoip</kbd> <br />
-        is the same as
-        <br />
-        <kbd>title:geoip</kbd>
-      </p>
-    }
-  />
-);
+const EXAMPLE_TERM = 'geoip';
+const EXAMPLE_FIELD_QUERY = `title:${EXAMPLE_TERM}`;
+
+const QueryHelp = () => {
+  const { t } = useTranslation('lookup_tables');
+
+  return (
+    <QueryHelper
+      entityName="data adapter"
+      commonFields={['id', 'title', 'name', 'description']}
+      example={
+        <p>
+          <Trans t={t} i18nKey="shared.query_example_intro" components={{ fieldCode: <code /> }} />
+          <br />
+          <kbd>{EXAMPLE_TERM}</kbd> <br />
+          {t('shared.query_example_same')}
+          <br />
+          <kbd>{EXAMPLE_FIELD_QUERY}</kbd>
+        </p>
+      }
+    />
+  );
+};
 
 function DataAdapterList() {
+  const { t } = useTranslation('lookup_tables');
   const [{ adapterNames }, setNames] = useState<{
     adapterNames?: Array<string>;
   }>({ adapterNames: undefined });
@@ -103,9 +112,9 @@ function DataAdapterList() {
       <Row className="content">
         <Col md={12}>
           <PaginatedEntityTable<DataAdapterEntity>
-            humanName="data adapter"
+            humanName={t('adapter_list.human_name')}
             entityActions={renderActions}
-            queryHelpComponent={queryHelpComponent}
+            queryHelpComponent={<QueryHelp />}
             tableLayout={adapterListElements.defaultLayout}
             fetchEntities={handleFetchAdapters}
             keyFn={dataAdaptersKeyFn}

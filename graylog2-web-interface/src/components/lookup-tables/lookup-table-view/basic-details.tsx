@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
@@ -37,6 +38,7 @@ type Props = {
 };
 
 function LookupTableDetails({ table, canEdit = false }: Props) {
+  const { t } = useTranslation('lookup_tables');
   const { push } = useHistory();
 
   const handleEdit = useCallback(() => {
@@ -47,10 +49,10 @@ function LookupTableDetails({ table, canEdit = false }: Props) {
     <>
       <Col $gap="xs">
         <Row $align="flex-end" $justify="space-between">
-          <h2>Description</h2>
+          <h2>{t('shared.description')}</h2>
           {canEdit && (
             <Button bsStyle="primary" bsSize="sm" onClick={handleEdit} name="edit_square">
-              Edit
+              {t('lut_view.edit')}
             </Button>
           )}
         </Row>
@@ -61,7 +63,7 @@ function LookupTableDetails({ table, canEdit = false }: Props) {
           <Col $gap="xs">
             {table.default_single_value && (
               <Row>
-                <span style={{ width: 208 }}>Default single value</span>
+                <span style={{ width: 208 }}>{t('lut_view.default_single_label')}</span>
                 <Row $gap="md">
                   <code>{table.default_single_value}</code>
                   <span>
@@ -72,7 +74,7 @@ function LookupTableDetails({ table, canEdit = false }: Props) {
             )}
             {table.default_multi_value && (
               <Row>
-                <span style={{ width: 208 }}>Default multi value</span>
+                <span style={{ width: 208 }}>{t('lut_view.default_multi_label')}</span>
                 <Row $gap="md">
                   <code>{table.default_multi_value}</code>
                   <span>

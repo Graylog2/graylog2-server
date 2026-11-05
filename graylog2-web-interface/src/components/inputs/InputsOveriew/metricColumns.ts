@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import i18n from 'i18n';
 import type { InputMetricField } from 'hooks/useInputMetrics';
 
 export const METRIC_COLUMN_IDS = {
@@ -24,11 +25,13 @@ export const METRIC_COLUMN_IDS = {
 
 export type MetricColumnId = (typeof METRIC_COLUMN_IDS)[keyof typeof METRIC_COLUMN_IDS];
 
-export const METRIC_COLUMN_TITLES: Record<MetricColumnId, string> = {
-  [METRIC_COLUMN_IDS.messagesPerStream]: 'Message Count (Last 24H)',
-  [METRIC_COLUMN_IDS.extractorCount]: 'Extractors',
-  [METRIC_COLUMN_IDS.associatedStreams]: 'Associated Streams (Last 24H)',
+const METRIC_COLUMN_TITLE_KEYS: Record<MetricColumnId, string> = {
+  [METRIC_COLUMN_IDS.messagesPerStream]: 'overview.columns.messages_per_stream',
+  [METRIC_COLUMN_IDS.extractorCount]: 'overview.columns.extractor_count',
+  [METRIC_COLUMN_IDS.associatedStreams]: 'overview.columns.associated_streams',
 };
+
+export const getMetricColumnTitle = (id: MetricColumnId) => i18n.t(METRIC_COLUMN_TITLE_KEYS[id], { ns: 'inputs' });
 
 const REQUIRED_BACKEND_FIELDS: Record<MetricColumnId, Array<InputMetricField>> = {
   [METRIC_COLUMN_IDS.messagesPerStream]: ['messages_per_stream'],

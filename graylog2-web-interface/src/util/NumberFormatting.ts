@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import i18n from 'i18n';
+
 type Options = {
   signDisplay?: 'auto' | 'always' | 'exceptZero';
   digits?: number;
@@ -36,7 +38,7 @@ const fractionDigitsFor = (s: string | number, defaultDigits: number) => {
 };
 
 const format = (num: number, options: Intl.NumberFormatOptions) =>
-  new Intl.NumberFormat(undefined, options).format(num);
+  new Intl.NumberFormat(i18n.language, options).format(num);
 
 export const formatNumber = (num: number, { digits, ...options }: Options = {}) =>
   format(num, {
@@ -65,10 +67,13 @@ const defaultReadableNumberOptions = {
 
 export const formatReadableNumber = (num: number) => {
   if (Math.abs(num) < 1000) {
-    return new Intl.NumberFormat('en', {
+    return new Intl.NumberFormat(i18n.language, {
       maximumFractionDigits: fractionDigitsFor(num, desiredFractionDigits),
     }).format(num);
   }
 
-  return new Intl.NumberFormat('en', defaultReadableNumberOptions).format(num).toLowerCase();
+  const readableNumber = new Intl.NumberFormat(i18n.language, defaultReadableNumberOptions).format(num);
+
+  // Keeps the established lower case suffixes in English (e.g. "1.2k"). Other languages use words, e.g. "1,2 Tsd.".
+  return i18n.language === 'en' ? readableNumber.toLowerCase() : readableNumber;
 };

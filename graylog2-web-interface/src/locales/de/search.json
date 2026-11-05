@@ -1,0 +1,562 @@
+{
+  "button": {
+    "perform_search": "Suche ausführen",
+    "perform_search_dirty": "Suche ausführen (Änderungen seit letzter Ausführung)"
+  },
+  "sidebar": {
+    "description": "Beschreibung",
+    "create": "Erstellen",
+    "highlighting": "Hervorhebung",
+    "fields": "Felder"
+  },
+  "empty_state": {
+    "no_widgets_search": "Es sind keine Widgets zur Visualisierung der Suchergebnisse definiert",
+    "no_widgets_dashboard": "Dieses Dashboard hat noch keine Widgets",
+    "create_widget_hint": "Erstellen Sie ein neues Widget, indem Sie im linken Seitenbereich \"Erstellen\" einen Widget-Typ auswählen.",
+    "tips_title": "Einige Tipps zum Erstellen von Suchen und Dashboards",
+    "tip_1": "Beginnen Sie mit einer <bold>Frage</bold>, die Sie beantworten möchten. Definieren Sie das Problem, das Sie lösen möchten.",
+    "tip_2": "<bold>Beschränken</bold> Sie die Daten auf die Datenpunkte, die Sie sehen möchten.",
+    "tip_3": "<bold>Visualisieren</bold> Sie die Daten. Beantwortet es Ihre Frage?",
+    "tip_4": "<bold>Teilen</bold> Sie das Dashboard mit Ihren Kollegen. Bereiten Sie es für die <bold>Wiederverwendung</bold> mit Parametern vor"
+  },
+  "search_bar": {
+    "streams_placeholder": "Streams für die Suche auswählen. Sucht in allen Streams, wenn leer.",
+    "refresh_human_name": "Suche",
+    "query_history_title": "Suchanfrageverlauf öffnen",
+    "filters_label": "Filter",
+    "filters_tooltip_title": "Suchfilter",
+    "filters_enterprise_hint": "Suchfilter und Parameter sind in der Enterprise-Version verfügbar.",
+    "filters_hide_controls": "Steuerelemente ausblenden",
+    "scroll_hint": "Zur Suchleiste scrollen",
+    "query_placeholder": "Suchanfrage hier eingeben und Enter drücken. Z.B.: (\"nicht gefunden\" AND http) OR http_response_code:[400 TO 404]"
+  },
+  "actions_menu": {
+    "saved_search": "Gespeicherte Suche",
+    "save_search": "Suche speichern",
+    "unsaved_changes": "Ungespeicherte Änderungen",
+    "load_title": "Eine zuvor gespeicherte Suche laden",
+    "load": "Laden",
+    "share_disabled": "Nur gespeicherte Suchen können geteilt werden.",
+    "dropdown_aria_label": "Suchaktionen-Dropdown öffnen",
+    "edit_metadata": "Metadaten bearbeiten",
+    "export_to_dashboard": "Als Dashboard exportieren",
+    "export": "Exportieren",
+    "reset_search": "Suche zurücksetzen",
+    "editing_modal_title": "Gespeicherte Suche bearbeiten",
+    "update_search": "Suche aktualisieren",
+    "share_description": "Suchen Sie nach einem Benutzer oder Team, um ihn/es als Mitarbeiter für diese gespeicherte Suche hinzuzufügen.",
+    "save_success": "Ansicht \"{{title}}\" wurde erfolgreich gespeichert!",
+    "save_error": "Speichern der Ansicht fehlgeschlagen: {{error}}",
+    "delete_success": "Gespeicherte Suche \"{{title}}\" wurde erfolgreich gelöscht!",
+    "delete_error": "Löschen der gespeicherten Suche fehlgeschlagen: {{error}}"
+  },
+  "save_form": {
+    "popover_title": "Name der Suche",
+    "dirty_warning": "Es gibt unbestätigte Änderungen an den Suchparametern (Zeitbereich, Streams oder Abfrage). Das Speichern verwirft diese Änderungen. Falls nicht beabsichtigt, führen Sie die Suche zuerst aus, um die Änderungen zu übernehmen.",
+    "title_label": "Titel",
+    "title_placeholder": "Titel eingeben",
+    "share_description": "Suchen Sie nach einem Benutzer oder Team, um ihn/es als Mitarbeiter für diese Suche hinzuzufügen.",
+    "create_new": "Neu erstellen",
+    "save_as": "Speichern als",
+    "create_new_title": "Neue Suche erstellen",
+    "save_as_title": "Als neue Suche speichern",
+    "save": "Speichern",
+    "save_title": "Suche speichern",
+    "cancel": "Abbrechen"
+  },
+  "results": {
+    "loading": "Suchergebnisse werden aktualisiert..."
+  },
+  "sidebar_description": {
+    "execution": "Ausführung",
+    "ad_hoc_info": "Speichern Sie die Suche oder exportieren Sie sie in ein Dashboard, um eine eigene Zusammenfassung und Beschreibung hinzuzufügen.",
+    "edit_metadata_hint": "Um eine Beschreibung und Zusammenfassung für diese(n) {{viewType}} hinzuzufügen, klicken Sie auf das <icon/>-Symbol in der Suchleiste, um das Aktionsmenü zu öffnen. Das Aktionsmenü enthält die Option \"Metadaten bearbeiten\".",
+    "search_section": "Suche",
+    "no_summary": "Diese(r) {{viewType}} hat keine Zusammenfassung.",
+    "no_description": "Diese(r) {{viewType}} hat keine Beschreibung.",
+    "no_query": "Noch keine Abfrage ausgeführt.",
+    "query_executed_in": "Abfrage ausgeführt in",
+    "effective_time_range": "Effektiver Zeitbereich",
+    "varies_per_widget": "Variiert je nach Widget",
+    "time_from": "Von",
+    "time_to": "Bis",
+    "total_results": "Gesamte Ergebnisse"
+  },
+  "sidebar_create": {
+    "info": "Verwenden Sie die folgenden Optionen, um Ihrer Suche eine Aggregation, eine Log-Ansicht (Enterprise-Funktion) oder Parameter (Enterprise-Funktion) hinzuzufügen.",
+    "generic": "Generisch",
+    "predefined_aggregation": "Vordefinierte Aggregation",
+    "investigations": "Untersuchungen",
+    "events": "Events"
+  },
+  "sidebar_highlighting": {
+    "description": "Suchbegriffe und Feldwerte können hervorgehoben werden. Das Hervorheben Ihrer Suchanfrage in den Ergebnissen kann in der {{productName}}-Serverkonfiguration aktiviert/deaktiviert werden. Jeder Feldwert kann durch Klicken auf den Wert und Auswählen von \"Diesen Wert hervorheben\" hervorgehoben werden.\nWenn ein Begriff oder Wert mehr als eine Regel hat, wird die erste übereinstimmende Regel verwendet.",
+    "active_highlights": "Aktive Hervorhebungen",
+    "add_rule_title": "Hervorhebungsregel hinzufügen",
+    "search_terms": "Suchbegriffe"
+  },
+  "save_view": {
+    "save": "Speichern",
+    "save_as": "Speichern als",
+    "save_as_new_dashboard_title": "Als neues Dashboard speichern",
+    "save_dashboard_title": "Dashboard speichern"
+  },
+  "undo_redo": {
+    "undo": "Rückgängig",
+    "redo": "Wiederholen"
+  },
+  "time_range": {
+    "tab_relative": "Relativ",
+    "tab_absolute": "Absolut",
+    "tab_keyword": "Schlüsselwort",
+    "from_label": "Von:",
+    "until_label": "Bis:",
+    "keyword_label": "Schlüsselwort:",
+    "no_override": "Keine Überschreibung",
+    "now": "Jetzt",
+    "all_time": "Gesamte Zeit",
+    "ago": "zurück",
+    "range_ago": "vor {{time}}",
+    "range_length_placeholder": "Zeitbereich auswählen",
+    "load_preset": "Vorlage laden",
+    "no_available_presets": "Keine Vorlagen verfügbar",
+    "loading": "Laden...",
+    "configure_presets": "Vorlagen konfigurieren",
+    "insert_current_date": "Aktuelles Datum einfügen",
+    "from_hours_label": "Startzeit: Stunden",
+    "from_minutes_label": "Startzeit: Minuten",
+    "from_seconds_label": "Startzeit: Sekunden",
+    "to_hours_label": "Endzeit: Stunden",
+    "to_minutes_label": "Endzeit: Minuten",
+    "to_seconds_label": "Endzeit: Sekunden",
+    "from_hour": "Stunde der Startzeit",
+    "from_minutes": "Minuten der Startzeit",
+    "from_seconds": "Sekunden der Startzeit",
+    "to_hour": "Stunde der Endzeit",
+    "to_minutes": "Minuten der Endzeit",
+    "to_seconds": "Sekunden der Endzeit",
+    "toggle_day_boundary": "Zwischen Tagesbeginn und Tagesende wechseln",
+    "set_current_time": "Auf aktuelle Ortszeit setzen",
+    "set_range_value": "Wert für den Zeitbereich festlegen",
+    "set_from_value": "Startwert festlegen",
+    "set_to_value": "Endwert festlegen",
+    "save_as_preset": "Als Vorlage speichern",
+    "save_current_as_preset": "Aktuellen Zeitbereich als Vorlage speichern",
+    "preset_description_placeholder": "Beschreibung hinzufügen...",
+    "preset_description_label": "Beschreibung des Zeitbereichs",
+    "preset_description_required": "Eine Beschreibung ist erforderlich",
+    "preset_similar": "Ein ähnlicher Zeitbereich existiert bereits in der <configurationsLink>Zeitbereich-Konfiguration</configurationsLink>",
+    "save_preset": "Vorlage speichern",
+    "calendar": "Kalender",
+    "timestamp": "Zeitstempel",
+    "date_format": "Das Datum muss das Format <code>{{format}}</code> haben.",
+    "from_timestamp": "Startzeitpunkt",
+    "to_timestamp": "Endzeitpunkt",
+    "no_override_title": "Keine Überschreibung von Datum/Uhrzeit gewählt.",
+    "no_override_hint": "Wählen Sie über die Tabs oben einen Zeitbereich für die Suche.",
+    "keyword_from": "Von",
+    "keyword_to": "Bis",
+    "keyword_headline": "Zeitbereich:",
+    "keyword_input": "Schlüsselwort-Eingabe",
+    "keyword_help": "Geben Sie den Zeitbereich für die Suche in natürlicher Sprache an (auf Englisch).",
+    "keyword_preview": "Vorschau",
+    "keyword_example_last_month": "<code>{{keyword}}</code> sucht zwischen vor einem Monat und jetzt",
+    "keyword_example_hours_ago": "<code>{{keyword}}</code> sucht zwischen vor vier Stunden und jetzt",
+    "keyword_example_range": "<code>{{keyword}}</code> sucht zwischen dem 1. April und vor 2 Tagen",
+    "keyword_example_timezone": "<code>{{keyword}}</code> sucht zwischen gestern Mitternacht und heute Mitternacht in der Zeitzone +0200 – entspricht 22:00 Uhr UTC",
+    "keyword_docs": "Weitere Details finden Sie in der <docsLink>Dokumentation</docsLink>.",
+    "keyword_docs_title": "Dokumentation zu Schlüsselwort-Zeitbereichen",
+    "display_label": "Suchzeitbereich, öffnet beim Klicken die Zeitbereichsauswahl",
+    "picker_title": "Suchzeitbereich",
+    "admin_limit": "Die Suche ist vom Administrator auf {{duration}} begrenzt",
+    "update": "Zeitbereich aktualisieren",
+    "open_selector": "Zeitbereichsauswahl öffnen",
+    "timezones_using": "Alle Zeitzonen in: <bold>{{timezone}}</bold>",
+    "unit_seconds": "Sekunden",
+    "unit_minutes": "Minuten",
+    "unit_hours": "Stunden",
+    "unit_days": "Tage"
+  },
+  "execution_info": {
+    "query_executed": "Abfrage ausgeführt in {{duration}}ms um",
+    "total_results": "Gesamte Ergebnisse: {{total}}",
+    "no_query": "Noch keine Abfrage ausgeführt."
+  },
+  "highlight_form": {
+    "edit_title": "Hervorhebungsregel bearbeiten",
+    "create_title": "Hervorhebungsregel erstellen",
+    "field_label": "Feld",
+    "field_placeholder": "Feldname auswählen oder eingeben",
+    "field_required": "Feld ist erforderlich",
+    "condition_label": "Bedingung",
+    "condition_placeholder": "Bedingung auswählen",
+    "condition_required": "Bedingung ist erforderlich",
+    "value_label": "Wert",
+    "value_required": "Wert ist erforderlich",
+    "update_rule": "Regel aktualisieren",
+    "create_rule": "Regel erstellen"
+  },
+  "query_tabs": {
+    "create_page": "Neue Seite erstellen",
+    "more_pages": "Weitere Dashboard-Seiten",
+    "open_configuration": "Seitenkonfiguration öffnen",
+    "copy_page": "Seite kopieren",
+    "copying_page": "Seite wird kopiert...",
+    "copy_page_failed": "Kopieren der Dashboard-Seite fehlgeschlagen: {{error}}",
+    "remove_page": "Seite {{title}} entfernen",
+    "configuration_title": "Konfiguration der Dashboard-Seiten aktualisieren",
+    "update_configuration": "Konfiguration aktualisieren",
+    "order": "Reihenfolge",
+    "order_help": "Ändern Sie die Reihenfolge der Dashboard-Seiten per Drag-and-drop. Doppelklicken Sie auf einen Seitentitel, um ihn zu ändern."
+  },
+  "widget_creation": {
+    "title": "Neues Widget erstellen",
+    "create_widget": "Widget {{title}} erstellen",
+    "placeholder": "Hier ein neues Widget erstellen",
+    "scroll_to_new_widget": "Zum neuen Widget scrollen"
+  },
+  "dashboard_actions": {
+    "immutable": "Dieses Dashboard ist schreibgeschützt, weil es von {{productName}} verwaltet wird. Verwenden Sie \"Speichern als\", um eine bearbeitbare Kopie zu erstellen.",
+    "debug": "Debug",
+    "share_unsaved": "Nur gespeicherte Dashboards können geteilt werden.",
+    "edit_metadata": "Metadaten bearbeiten",
+    "export": "Exportieren",
+    "save_new_title": "Neues Dashboard speichern",
+    "create": "Dashboard erstellen",
+    "edit_title": "Dashboard bearbeiten",
+    "update": "Dashboard aktualisieren",
+    "share_description": "Suchen Sie nach einem Benutzer oder Team, um es als Mitarbeiter zu diesem Dashboard hinzuzufügen."
+  },
+  "dashboard_search_bar": {
+    "filter_placeholder": "Filter auf alle Widgets anwenden"
+  },
+  "debug": {
+    "title": "Debug-Informationen"
+  },
+  "common_views": {
+    "empty_value": "<Leerer Wert>",
+    "add_to_query": "Zur Abfrage hinzufügen",
+    "time_range_validation": {
+      "invalid_date_format": "Das Format muss {{format}} sein.",
+      "range_limit": "Der Zeitbereich liegt außerhalb der erlaubten Dauer.",
+      "date_limit": "Das Datum liegt außerhalb der erlaubten Dauer.",
+      "until_before_from": "Das \"Bis\"-Datum muss nach dem \"Von\"-Datum liegen.",
+      "empty": "Darf nicht leer sein.",
+      "keyword_empty": "Das Schlüsselwort darf nicht leer sein!",
+      "keyword_unparsable": "Das Schlüsselwort kann nicht ausgewertet werden"
+    },
+    "remove_from_favorites": "Aus Favoriten entfernen",
+    "add_to_favorites": "Zu Favoriten hinzufügen",
+    "view_type": {
+      "search": "Suche",
+      "dashboard": "Dashboard"
+    },
+    "unsaved_view": {
+      "search": "Ungespeicherte Suche",
+      "dashboard": "Ungespeichertes Dashboard"
+    }
+  },
+  "field_charts_migration": {
+    "title": "Vorhandene Diagramme der Suchseite migrieren",
+    "found_charts_one": "Es wurde {{count}} Diagramm gefunden, das für eine ältere Version der Suche erstellt wurde. Möchten Sie es für die aktuelle Suche migrieren?",
+    "found_charts_other": "Es wurden {{count}} Diagramme gefunden, die für eine ältere Version der Suche erstellt wurden. Möchten Sie diese für die aktuelle Suche migrieren?",
+    "save_hint": "Wenn Sie die Migration ausgeführt haben und die neu erstellten Diagramme behalten möchten, müssen Sie die aktuelle Suche als neues Dashboard speichern. Andernfalls gehen die Diagramme beim Verlassen der Suchseite verloren.",
+    "migrate": "Migrieren",
+    "discard": "Diagramme verwerfen"
+  },
+  "query": {
+    "contained_in_enterprise": "(enthalten in <enterpriseLink>Graylog Enterprise</enterpriseLink>)",
+    "documentation_hint": "Mehr über das Erstellen von Widgets erfahren Sie in der <docsLink>Dokumentation</docsLink>."
+  },
+  "widget_query": {
+    "reset_global_filter": "Globalen Filter zurücksetzen"
+  },
+  "editable_title": {
+    "edit": "Titel bearbeiten",
+    "hint": "{{value}} – Doppelklicken Sie auf den Titel, um ihn zu bearbeiten."
+  },
+  "message_permalink": {
+    "label": "Permalink"
+  },
+  "query_title": {
+    "page_actions": "Seitenaktionen",
+    "edit_title": "Titel bearbeiten",
+    "duplicate": "Duplizieren",
+    "copy_to_dashboard": "In Dashboard kopieren",
+    "edit_modal_title": "Titel der Dashboard-Seite bearbeiten",
+    "update_title": "Titel aktualisieren",
+    "title_help": "Geben Sie einen aussagekräftigen Titel für die Dashboard-Seite ein. Er darf höchstens 40 Zeichen lang sein.",
+    "title": "Titel"
+  },
+  "missing_requirements": {
+    "description_search": "Leider kann diese Suche nicht ausgeführt werden. Sie nutzt folgende Funktionen, die nicht verfügbar sind:",
+    "description_dashboard": "Leider kann dieses Dashboard nicht ausgeführt werden. Es nutzt folgende Funktionen, die nicht verfügbar sind:",
+    "included_in": "<requirementName>{{requirement}}</requirementName> – enthalten in <pluginLink>{{plugin}}</pluginLink>",
+    "back": "Zurück"
+  },
+  "view_header": {
+    "alerts_and_events": "Alarme & Events",
+    "event_definitions": "Event Definitionen",
+    "edit_search_metadata": "Metadaten der Suche {{title}} bearbeiten",
+    "edit_dashboard_metadata": "Metadaten des Dashboards {{title}} bearbeiten",
+    "editing_search": "Gespeicherte Suche bearbeiten",
+    "editing_dashboard": "Gespeichertes Dashboard bearbeiten",
+    "save_search": "Suche speichern",
+    "save_dashboard": "Dashboard speichern"
+  },
+  "execution": {
+    "not_executed": "Es wurde noch keine Abfrage ausgeführt."
+  },
+  "dashboards_page": {
+    "documentation": "Dashboard-Dokumentation",
+    "description": "Mit Dashboards erstellen Sie spezifische Ansichten auf Ihre Nachrichten. Erstellen Sie hier ein neues Dashboard und fügen Sie jedes Diagramm, das Sie in anderen Bereichen der Anwendung erstellen, mit einem Klick hinzu."
+  },
+  "search_filter_banner": {
+    "explanation": "<italic>Suchfilter</italic> enthalten eine eigene Abfrage und erweitern die Hauptabfrage mit dem Operator <bold>AND</bold>.",
+    "explanation_saved": "Filter können separat gespeichert und in gespeicherten Suchen und Dashboards wiederverwendet werden. Änderungen an einem gespeicherten Filter wirken sich automatisch auf die Ergebnisse aller Suchen aus, die diesen Filter enthalten."
+  },
+  "widget_time_range": {
+    "reset_global_override": "Globale Überschreibung zurücksetzen"
+  },
+  "time_range_presets": {
+    "select_time_range": "Zeitbereich auswählen",
+    "open_preset_select": "Auswahl der Zeitbereichsvorlagen öffnen"
+  },
+  "move_range": {
+    "show_previous": "Vorherigen Zeitbereich anzeigen",
+    "show_previous_duration": "Vorherige {{duration}} anzeigen",
+    "show_next": "Nächsten Zeitbereich anzeigen",
+    "show_next_duration": "Nächste {{duration}} anzeigen"
+  },
+  "query_validation": {
+    "toggle_warning": "Validierungswarnung ein-/ausblenden",
+    "toggle_information": "Validierungshinweis ein-/ausblenden",
+    "toggle_error": "Fehlererklärung der Validierung ein-/ausblenden",
+    "syntax_documentation": "Dokumentation zur Syntax von Suchabfragen",
+    "error_documentation": "Dokumentation zu Abfragefehlern",
+    "status_warning": "Warnung",
+    "status_info": "Hinweis",
+    "status_error": "Fehler",
+    "validation_failed": "Validierung der Suchabfrage fehlgeschlagen mit Status: {{error}}",
+    "warm_tier_title": "Suche im Warm Tier",
+    "warm_tier_message": "Der gewählte Zeitbereich enthält Daten aus dem Warm Tier, deren Abruf langsam sein kann. Daten, die älter als der angegebene Zeitstempel sind, liegen für den jeweiligen Stream im Warm Tier:"
+  },
+  "saved_searches": {
+    "title": "Gespeicherte Suchen",
+    "confirm_bulk_delete_one": "Möchten Sie {{count}} gespeicherte Suche wirklich entfernen?",
+    "confirm_bulk_delete_other": "Möchten Sie {{count}} gespeicherte Suchen wirklich entfernen?",
+    "bulk_delete_partial_one": "{{failed}} von {{count}} ausgewählten gespeicherten Suche konnte nicht gelöscht werden.",
+    "bulk_delete_partial_other": "{{failed}} von {{count}} ausgewählten gespeicherten Suchen konnten nicht gelöscht werden.",
+    "bulk_delete_success_one": "{{count}} gespeicherte Suche wurde erfolgreich gelöscht.",
+    "bulk_delete_success_other": "{{count}} gespeicherte Suchen wurden erfolgreich gelöscht.",
+    "success": "Erfolg",
+    "bulk_delete_error": "Beim Löschen der gespeicherten Suchen ist ein Fehler aufgetreten. {{error}}",
+    "confirm_delete": "Sie sind dabei, die gespeicherte Suche \"{{title}}\" zu löschen. Sind Sie sicher?",
+    "delete_search": "Suche {{title}} löschen",
+    "delete": "Löschen"
+  },
+  "search_meta": {
+    "buttons": "Aktionen der Suche"
+  },
+  "save_view_notifications": {
+    "success_title": "Erfolg!",
+    "error_title": "Fehler!",
+    "plugin_initial_values_failed": "Beim Ermitteln der Anfangswerte der Suchleiste durch ein Plugin ist ein Fehler aufgetreten",
+    "plugin_validation_preparation_failed": "Beim Vorbereiten der Validierung der Suchleiste für ein Plugin ist ein Fehler aufgetreten",
+    "plugin_validation_failed": "Beim Validieren der Werte der Suchleiste durch ein Plugin ist ein Fehler aufgetreten",
+    "plugin_submit_failed": "Beim Ausführen eines Speicher-Handlers eines Plugins ist ein Fehler aufgetreten: {{error}}",
+    "load_saved_searches_failed": "Laden der gespeicherten Suchen fehlgeschlagen mit Status",
+    "could_not_load_saved_searches": "Gespeicherte Suchen konnten nicht geladen werden",
+    "load_minimum_refresh_interval_failed": "Laden der Systemkonfiguration \"minimum_auto_refresh_interval\" fehlgeschlagen mit Status",
+    "could_not_load_configuration": "Konfigurationsoption konnte nicht geladen werden"
+  },
+  "sidebar_layout": {
+    "display_as_overlay": "Seitenleiste als Overlay anzeigen",
+    "display_inline": "Seitenleiste eingebettet anzeigen"
+  },
+  "search_result_overview": {
+    "duration_at": "{{duration}} ms am <timestamp/>",
+    "effective_from": "Tatsächlicher Zeitbereich von",
+    "effective_to": "Tatsächlicher Zeitbereich bis"
+  },
+  "fields_overview": {
+    "filter_placeholder": "Felder filtern",
+    "reset": "Zurücksetzen",
+    "list_fields": "Felder der <current>aktuellen Abfrage</current>, <all>alle</all> oder <allReserved>alle einschließlich reservierter</allReserved> Felder auflisten.",
+    "current_title": "Zeigt die Felder, die in Ihrer aktuellen Abfrage vorkommen.",
+    "all_title": "Zeigt alle Felder, aber keine reservierten (gl2_*) Felder.",
+    "all_reserved_title": "Zeigt alle Felder, einschließlich reservierter (gl2_*) Felder.",
+    "no_field_information": "Keine Feldinformationen verfügbar.",
+    "no_fields": "Keine Felder vorhanden. Ändern Sie den Filterbegriff oder wählen Sie oben eine andere Feldauswahl."
+  },
+  "highlighting_color": {
+    "color": "Farbe",
+    "gradient_name": "Name des Farbverlaufs",
+    "gradient_placeholder": "Farbverlauf auswählen",
+    "lowest_placeholder": "Niedrigsten Wert angeben",
+    "lowest_label": "Niedrigster Wert",
+    "lowest_help": "Der niedrigste erwartete Wert des Felds bzw. der Reihe.",
+    "highest_aria": "Höchsten Wert angeben",
+    "highest_label": "Höchster Wert",
+    "highest_help": "Der höchste erwartete Wert des Felds bzw. der Reihe.",
+    "coloring": "Färbung",
+    "static_color": "Feste Farbe",
+    "gradient": "Farbverlauf",
+    "must_be_selected": "Muss ausgewählt werden.",
+    "must_be_present": "Muss angegeben werden.",
+    "must_be_number": "Muss eine Zahl sein.",
+    "must_be_higher": "Muss höher als der niedrigste Wert sein.",
+    "coloring_required": "Eine Färbung ist erforderlich",
+    "gradient_numeric_only": "Ein Farbverlauf kann nur für numerische Felder festgelegt werden."
+  },
+  "highlighting_rule": {
+    "edit": "Diese Hervorhebungsregel bearbeiten",
+    "remove": "Diese Hervorhebungsregel entfernen",
+    "confirm_remove": "Möchten Sie diese Hervorhebung wirklich entfernen?"
+  },
+  "change_field_type": {
+    "no_permission_title": "Keine Berechtigung",
+    "no_permission_description": "Sie haben keine Berechtigung für diese Aktion",
+    "enterprise_plugin_required": "(<enterpriseLink>Enterprise-Plugin</enterpriseLink> erforderlich)",
+    "modal_title": "Feldtyp von {{fieldName}} ändern",
+    "impact_warning": "Das Ändern des Typs des Felds <bold>{{fieldName}}</bold> kann erhebliche Auswirkungen auf die Aufnahme zukünftiger Lognachrichten haben. Wenn Sie für ein Feld einen Typ festlegen, der nicht zu den aufgenommenen Logs passt, kann das zu Fehlern bei der Aufnahme führen.",
+    "failure_processing_hint": "Es wird empfohlen, die <docsLink>Fehlerverarbeitung</docsLink> zu aktivieren und anschließend den Stream <failureStream/> genau zu beobachten.",
+    "select_field_type_for": "Feldtyp für {{fieldName}} auswählen",
+    "select_field_type_for_field": "Feldtyp für das Feld auswählen",
+    "select_field_type": "Feldtyp auswählen",
+    "select_index_sets": "Betroffene Index-Sets auswählen",
+    "index_sets_hint_with_type": "Standardmäßig wird der Feldtyp <bold>{{type}}</bold> für das Feld <bold>{{fieldName}}</bold> in allen Index-Sets der aktuellen Nachricht bzw. Suche gesetzt. Sie können auswählen, für welche Index-Sets die Änderung gelten soll.",
+    "index_sets_hint": "Standardmäßig wird der ausgewählte Feldtyp für das Feld <bold>{{fieldName}}</bold> in allen Index-Sets der aktuellen Nachricht bzw. Suche gesetzt. Sie können auswählen, für welche Index-Sets die Änderung gelten soll.",
+    "select_rotation_strategy": "Rotationsstrategie auswählen",
+    "rotation_hint_type_field": "Um <bold>{{type}}</bold> als Feldtyp für <bold>{{fieldName}}</bold> zu sehen und zu verwenden, müssen Indizes rotiert werden. Sie können die betroffenen Indizes nach dem Absenden dieses Formulars automatisch rotieren oder dies später manuell tun.",
+    "rotation_hint_type": "Um <bold>{{type}}</bold> als Feldtyp zu sehen und zu verwenden, müssen Indizes rotiert werden. Sie können die betroffenen Indizes nach dem Absenden dieses Formulars automatisch rotieren oder dies später manuell tun.",
+    "rotation_hint_field": "Um den ausgewählten Feldtyp für <bold>{{fieldName}}</bold> zu sehen und zu verwenden, müssen Indizes rotiert werden. Sie können die betroffenen Indizes nach dem Absenden dieses Formulars automatisch rotieren oder dies später manuell tun.",
+    "rotation_hint": "Um den ausgewählten Feldtyp zu sehen und zu verwenden, müssen Indizes rotiert werden. Sie können die betroffenen Indizes nach dem Absenden dieses Formulars automatisch rotieren oder dies später manuell tun.",
+    "rotate_indices": "Betroffene Indizes nach der Änderung rotieren",
+    "changing": "Feldtyp wird geändert...",
+    "change": "Feldtyp ändern",
+    "select_field": "Feld auswählen",
+    "select_field_placeholder": "Feld auswählen oder eingeben",
+    "type_not_defined": "Typ ist nicht definiert",
+    "previous_values": "(frühere Werte: {{values}})",
+    "load_index_field_types_failed": "Laden der Feldtypen des Index fehlgeschlagen mit Status",
+    "could_not_load_index_field_types": "Feldtypen des Index konnten nicht geladen werden",
+    "load_field_type_options_failed": "Laden der Feldtyp-Optionen fehlgeschlagen mit Status",
+    "could_not_load_field_type_options": "Feldtyp-Optionen konnten nicht geladen werden",
+    "load_field_types_failed": "Laden der Typen von {{field}} fehlgeschlagen mit Status",
+    "could_not_load_field_types": "Feldtypen konnten nicht geladen werden",
+    "load_index_sets_failed": "Laden der Index-Sets mit Unterstützung für Feldtypänderungen fehlgeschlagen mit Status",
+    "could_not_load_index_sets": "Index-Sets mit Unterstützung für Feldtypänderungen konnten nicht geladen werden",
+    "change_failed": "Ändern des Feldtyps fehlgeschlagen mit Status: {{error}}",
+    "change_failed_title": "Feldtyp konnte nicht geändert werden",
+    "change_success": "Der Feldtyp wurde erfolgreich geändert",
+    "success_title": "Erfolg!"
+  },
+  "value_actions": {
+    "select_extractor_type": "Extractor-Typ auswählen",
+    "exclude": "Aus den Ergebnissen ausschließen",
+    "add_to_query": "Zur Abfrage hinzufügen",
+    "show_documents": "Dokumente für diesen Wert anzeigen",
+    "create_extractor": "Extractor erstellen",
+    "highlight_value": "Diesen Wert hervorheben",
+    "create_event_definition": "Event Definition erstellen",
+    "copy_value": "Wert in die Zwischenablage kopieren"
+  },
+  "create_event_definition": {
+    "title": "Neue Event Definition konfigurieren",
+    "hide_details": "Details der Strategie ausblenden",
+    "show_details": "Details der Strategie einblenden",
+    "continue": "Konfiguration fortsetzen",
+    "strategy_by": "Strategie:",
+    "description": "Beschreibung:",
+    "sections": {
+      "aggregation": "Aggregationseinstellungen",
+      "search": "Suchanfrage"
+    },
+    "items": {
+      "rowValuePath": "Abfrage aus Tabellenzeile",
+      "columnValuePath": "Abfrage aus Tabellenspalte",
+      "columnGroupBy": "Nach Spaltenwerten gruppieren",
+      "rowGroupBy": "Nach Zeilenwerten gruppieren",
+      "aggCondition": "Bedingung",
+      "queryWithReplacedParams": "Abfrage aus der Suche",
+      "searchFilterQuery": "Abfrage aus Suchfiltern",
+      "streams": "Streams",
+      "searchWithinMs": "Suche innerhalb von ms",
+      "lutParameters": "Lookup-Tabellen-Parameter",
+      "searchFromValue": "Abfrage aus Wert"
+    },
+    "item_label": "{{label}}: ",
+    "strategies": {
+      "EXACT": {
+        "label": "Genau dieser Wert",
+        "description": "Die Strategie umfasst alle Suchanfragen, Filter usw., die sich auf die aktuelle Suchansicht beziehen"
+      },
+      "ROW": {
+        "label": "Beliebig in der Zeile",
+        "description": "Die Strategie umfasst Zeilen-Pivots"
+      },
+      "COL": {
+        "label": "Beliebig in der Spalte",
+        "description": "Die Strategie umfasst Spalten-Pivots"
+      },
+      "ALL": {
+        "label": "Beliebig im Widget",
+        "description": "Die Strategie umfasst alle Werte der Zeilen- und Spalten-Pivots, die sich auf den ausgewählten Wert beziehen"
+      },
+      "CUSTOM": {
+        "label": "Benutzerdefiniert",
+        "description": "Sie können beliebige Teile der Suche auswählen"
+      }
+    }
+  },
+  "view_errors": {
+    "something_went_wrong": "Etwas ist schiefgelaufen",
+    "unknown_error": "Ein unbekannter Fehler ist aufgetreten. Bitte sehen Sie sich die folgende Meldung und das Server-Log von {{productName}} an, um weitere Informationen zu erhalten."
+  },
+  "views_notifications": {
+    "delete_view_failed": "Löschen der Ansicht {{title}} fehlgeschlagen mit Status: {{error}}",
+    "delete_view_failed_title": "Ansicht konnte nicht gelöscht werden",
+    "apply_widget_changes_failed": "Übernehmen der Widget-Änderungen fehlgeschlagen mit Status: {{error}}",
+    "load_message_failed": "Laden der Nachrichteninformationen fehlgeschlagen mit Status",
+    "could_not_load_message": "Nachrichteninformationen konnten nicht geladen werden"
+  },
+  "field_actions": {
+    "chart": "Diagramm",
+    "show_top_values": "Häufigste Werte anzeigen",
+    "statistics": "Statistiken",
+    "add_to_table": "Zur Tabelle hinzufügen",
+    "remove_from_table": "Aus der Tabelle entfernen",
+    "add_to_all_tables": "Zu allen Tabellen hinzufügen",
+    "remove_from_all_tables": "Aus allen Tabellen entfernen",
+    "change_field_type": "Feldtyp ändern",
+    "copy_field_name": "Feldnamen in die Zwischenablage kopieren",
+    "add_to_favorites": "Feld zu den Favoriten hinzufügen",
+    "remove_from_favorites": "Feld aus den Favoriten entfernen"
+  },
+  "aggregation": {
+    "summary_by": "Aggregieren nach {{series}} nach {{fields}}",
+    "summary_only": "Aggregieren nach {{series}}"
+  },
+  "widget_creators": {
+    "message_count": "Nachrichtenanzahl",
+    "message_table": "Nachrichtentabelle",
+    "custom_aggregation": "Benutzerdefinierte Aggregation",
+    "aggregation": "Aggregation",
+    "events_overview": "Eventübersicht",
+    "text_markdown": "Text/Markdown"
+  },
+  "message_details": {
+    "deleted_input": "gelöschter Input",
+    "timestamp": "Zeitstempel",
+    "not_stored": "Nicht gespeichert",
+    "not_stored_message": "Nachricht ist nicht gespeichert",
+    "received_by": "Empfangen von",
+    "stored_in_index": "In Index gespeichert",
+    "routed_into_streams": "In Streams geroutet"
+  },
+  "views_logic": {
+    "result_window_limit": "Elasticsearch begrenzt das Suchergebnis auf {{limit}} Nachrichten. Bei einer Seitengröße von {{pageSize}} Nachrichten können Sie die ersten {{validPages}} Seiten verwenden.",
+    "confirm_delete_dashboard_page": "Möchten Sie diese Dashboard-Seite wirklich löschen?"
+  }
+}

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import Tabs from 'components/bootstrap/Tabs';
 import { Title, Space } from 'preflight/components/common';
@@ -31,29 +32,33 @@ const StyledTabs = styled(Tabs)(
   `,
 );
 
-const CAConfiguration = () => (
-  <>
-    <Title order={3}>Configure Certificate Authority</Title>
-    <p>
-      In this first step you can either upload or create a new certificate authority.
-      <br />
-      Using it we can provision your data nodes with certificates easily.
-    </p>
-    <Space h="md" />
-    <StyledTabs defaultValue="create">
-      <Tabs.List>
-        <Tabs.Tab value="create">Create new CA</Tabs.Tab>
-        <Tabs.Tab value="upload">Upload CA</Tabs.Tab>
-      </Tabs.List>
+const CAConfiguration = () => {
+  const { t } = useTranslation('preflight');
 
-      <Tabs.Panel value="upload" pt="xs">
-        <CAUpload />
-      </Tabs.Panel>
-      <Tabs.Panel value="create" pt="xs">
-        <CACreateForm />
-      </Tabs.Panel>
-    </StyledTabs>
-  </>
-);
+  return (
+    <>
+      <Title order={3}>{t('ca_configuration.title')}</Title>
+      <p>
+        {t('ca_configuration.explanation_upload_or_create')}
+        <br />
+        {t('ca_configuration.explanation_provisioning')}
+      </p>
+      <Space h="md" />
+      <StyledTabs defaultValue="create">
+        <Tabs.List>
+          <Tabs.Tab value="create">{t('ca_configuration.create_tab')}</Tabs.Tab>
+          <Tabs.Tab value="upload">{t('ca_configuration.upload_tab')}</Tabs.Tab>
+        </Tabs.List>
+
+        <Tabs.Panel value="upload" pt="xs">
+          <CAUpload />
+        </Tabs.Panel>
+        <Tabs.Panel value="create" pt="xs">
+          <CACreateForm />
+        </Tabs.Panel>
+      </StyledTabs>
+    </>
+  );
+};
 
 export default CAConfiguration;

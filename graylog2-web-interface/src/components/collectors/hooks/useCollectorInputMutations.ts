@@ -18,6 +18,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { CollectorsConfig as CollectorsConfigApi, SystemInputs } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import UserNotification from 'util/UserNotification';
 
 import { COLLECTOR_INPUT_IDS_KEY_PREFIX } from './useCollectorInputIds';
@@ -39,12 +40,15 @@ const useCollectorInputMutations = () => {
     mutationFn: () => CollectorsConfigApi.createInput(),
     onError: (errorThrown: unknown) => {
       UserNotification.error(
-        `Creating Collector ingest input failed: ${errorThrown}`,
-        'Could not create Collector ingest input',
+        i18n.t('mutation_errors.create_input.message', { ns: 'collectors', error: String(errorThrown) }),
+        i18n.t('mutation_errors.create_input.title', { ns: 'collectors' }),
       );
     },
     onSuccess: () => {
-      UserNotification.success('Collector ingest input created.', 'Success!');
+      UserNotification.success(
+        i18n.t('notifications.input_created', { ns: 'collectors' }),
+        i18n.t('notifications.success_title', { ns: 'collectors' }),
+      );
 
       return queryClient.invalidateQueries({ queryKey: COLLECTOR_INPUT_IDS_KEY_PREFIX });
     },
@@ -66,12 +70,15 @@ const useCollectorInputMutations = () => {
       ),
     onError: (errorThrown: unknown) => {
       UserNotification.error(
-        `Updating Collector ingest input failed: ${errorThrown}`,
-        'Could not update Collector ingest input',
+        i18n.t('mutation_errors.update_input.message', { ns: 'collectors', error: String(errorThrown) }),
+        i18n.t('mutation_errors.update_input.title', { ns: 'collectors' }),
       );
     },
     onSuccess: () => {
-      UserNotification.success('Collector ingest input moved to the new port.', 'Success!');
+      UserNotification.success(
+        i18n.t('notifications.input_moved', { ns: 'collectors' }),
+        i18n.t('notifications.success_title', { ns: 'collectors' }),
+      );
 
       return Promise.all([
         queryClient.invalidateQueries({ queryKey: ['inputs'] }),

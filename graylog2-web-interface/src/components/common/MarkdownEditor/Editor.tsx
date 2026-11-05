@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -73,6 +74,7 @@ type Props = {
 };
 
 function Editor({ id = undefined, value, height, readOnly = false, onChange, onFullMode = () => {} }: Props) {
+  const { t } = useTranslation('common');
   const [localValue, setLocalValue] = useState<string>(value);
   const [showPreview, setShowPreview] = useState<boolean>(false);
   const [fullView, setFullView] = useState<boolean>(false);
@@ -97,10 +99,10 @@ function Editor({ id = undefined, value, height, readOnly = false, onChange, onF
       <div style={{ position: 'relative' }}>
         <TabsRow>
           <Tab $active={!showPreview} onClick={() => setShowPreview(false)}>
-            Edit
+            {t('actions.edit')}
           </Tab>
           <Tab $active={showPreview} onClick={() => setShowPreview(true)}>
-            Preview
+            {t('actions.preview')}
           </Tab>
         </TabsRow>
         {!showPreview && (
@@ -117,10 +119,10 @@ function Editor({ id = undefined, value, height, readOnly = false, onChange, onF
         <ExpandIconButton
           data-testid="expand-icon"
           name="expand_content"
-          title="Expand Preview"
+          title={t('markdown_editor.expand_preview')}
           onClick={() => handleOnFullMode(true)}
           size="sm"
-          aria-label="Expand preview"
+          aria-label={t('markdown_editor.expand_preview')}
         />
       </div>
       {fullView && (

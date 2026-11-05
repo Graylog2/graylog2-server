@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { Input } from 'components/bootstrap';
@@ -55,6 +56,7 @@ type Props = {
 };
 
 const MatchingTypeSwitcher = ({ stream, onChange }: Props) => {
+  const { t } = useTranslation('streams');
   const [matchingType, setMatchingType] = useState<'AND' | 'OR' | undefined>(undefined);
   const { isPermitted } = usePermissions();
   const { updateStream } = useStreamMutations();
@@ -67,8 +69,8 @@ const MatchingTypeSwitcher = ({ stream, onChange }: Props) => {
         onChange();
 
         UserNotification.success(
-          `Messages will now be routed into the stream when ${newValue === 'AND' ? 'all' : 'any'} rules are matched`,
-          'Success',
+          newValue === 'AND' ? t('matching_type.success_all') : t('matching_type.success_any'),
+          t('matching_type.success_title'),
         );
 
         setMatchingType(undefined);
@@ -82,7 +84,7 @@ const MatchingTypeSwitcher = ({ stream, onChange }: Props) => {
         <Input
           id="streamrule-and-connector"
           type="radio"
-          label="A message must match all of the following rules"
+          label={t('matching_type.all')}
           checked={stream.matching_type === 'AND'}
           onChange={() => setMatchingType('AND')}
           disabled={disabled}
@@ -90,7 +92,7 @@ const MatchingTypeSwitcher = ({ stream, onChange }: Props) => {
         <Input
           id="streamrule-or-connector"
           type="radio"
-          label="A message must match at least one of the following rules"
+          label={t('matching_type.any')}
           checked={stream.matching_type === 'OR'}
           onChange={() => setMatchingType('OR')}
           disabled={disabled}
@@ -99,11 +101,10 @@ const MatchingTypeSwitcher = ({ stream, onChange }: Props) => {
       {matchingType && (
         <ConfirmDialog
           show
-          title={`Switch matching type to ${matchingType === 'AND' ? 'ALL' : 'ANY'}`}
+          title={matchingType === 'AND' ? t('matching_type.switch_title_all') : t('matching_type.switch_title_any')}
           onConfirm={() => handleTypeChange(matchingType)}
           onCancel={() => setMatchingType(undefined)}>
-          You are about to change how rules are applied to this stream, do you want to continue? Changes will take
-          effect immediately.
+          {t('matching_type.confirm')}
         </ConfirmDialog>
       )}
     </StreamRuleConnector>

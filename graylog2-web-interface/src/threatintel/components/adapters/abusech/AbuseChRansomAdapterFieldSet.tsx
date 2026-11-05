@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import ObjectUtils from 'util/ObjectUtils';
 import { Input } from 'components/bootstrap';
@@ -29,7 +31,7 @@ type AbuseChRansomAdapterFieldSetProps = {
   validationState: (...args: any[]) => void;
   // eslint-disable-next-line react/no-unused-prop-types
   validationMessage: (...args: any[]) => void;
-};
+} & WithTranslation;
 
 class AbuseChRansomAdapterFieldSet extends React.Component<
   AbuseChRansomAdapterFieldSetProps,
@@ -55,25 +57,25 @@ class AbuseChRansomAdapterFieldSet extends React.Component<
   };
 
   render() {
-    const { config } = this.props;
+    const { config, t } = this.props;
     const blocklistTypes = [
-      { label: 'Domain blocklist', value: 'DOMAINS' },
-      { label: 'URL blocklist', value: 'URLS' },
-      { label: 'IP blocklist', value: 'IPS' },
+      { label: t('abusech_ransom_adapter_field_set.domains_blocklist'), value: 'DOMAINS' },
+      { label: t('abusech_ransom_adapter_field_set.urls_blocklist'), value: 'URLS' },
+      { label: t('abusech_ransom_adapter_field_set.ips_blocklist'), value: 'IPS' },
     ];
 
     return (
       <fieldset>
         <Input
-          label="Blocklist type"
+          label={t('abusech_ransom_adapter_field_set.blocklist_type_label')}
           id="blocklist-type-selector"
           required
           autoFocus
-          help="Select the type of the abuse.ch ransomware blocklist"
+          help={t('abusech_ransom_adapter_field_set.blocklist_type_help')}
           labelClassName="col-sm-3"
           wrapperClassName="col-sm-9">
           <Select
-            placeholder="Select the type of blocklist"
+            placeholder={t('abusech_ransom_adapter_field_set.blocklist_type_placeholder')}
             clearable={false}
             options={blocklistTypes}
             onChange={this._onBlocklistTypeSelect}
@@ -81,8 +83,8 @@ class AbuseChRansomAdapterFieldSet extends React.Component<
           />
         </Input>
         <TimeUnitInput
-          label="Refresh blocklist"
-          help="If enabled, the abuse.ch ransomware blocklist is refreshed when it changed."
+          label={t('abusech_ransom_adapter_field_set.refresh_blocklist_label')}
+          help={t('abusech_ransom_adapter_field_set.refresh_blocklist_help')}
           update={this.updateRefreshInterval}
           value={config.refresh_interval}
           unit={config.refresh_interval_unit || 'MINUTES'}
@@ -95,4 +97,4 @@ class AbuseChRansomAdapterFieldSet extends React.Component<
   }
 }
 
-export default AbuseChRansomAdapterFieldSet;
+export default withTranslation('integrations')(AbuseChRansomAdapterFieldSet);

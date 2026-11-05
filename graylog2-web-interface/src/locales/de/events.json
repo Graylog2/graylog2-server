@@ -1,0 +1,131 @@
+{
+  "alerts_attributes": {
+    "additional_fields": "Zusätzliche Felder",
+    "aggregation_time_range": "Aggregationszeitraum",
+    "description": "Beschreibung",
+    "event_definition": "Event Definition",
+    "event_definition_type": "Typ der Event Definition",
+    "event_procedures": "Eventprozeduren",
+    "group_by_fields": "Gruppierungsfelder",
+    "id": "ID",
+    "key": "Schlüssel",
+    "message": "Nachricht",
+    "priority": "Priorität",
+    "tags": "Tags",
+    "timestamp": "Zeitstempel",
+    "type": "Typ"
+  },
+  "alerts_list": {
+    "auto_refresh_unavailable": "Die automatische Aktualisierung ist während der Gruppierung deaktiviert, um Leistungsprobleme zu vermeiden.",
+    "auto_refresh_unavailable_title": "Automatische Aktualisierung nicht verfügbar",
+    "bulk_replay_search": "Suche wiederholen",
+    "collapse_metrics": "Metriken einklappen",
+    "details": "Details",
+    "expand_metrics": "Metriken ausklappen",
+    "histogram_failed": "Das Eventhistogramm konnte nicht geladen werden: {{error}}",
+    "metrics_title": "Metriken",
+    "no_additional_fields": "Diesem Event wurden keine zusätzlichen Felder hinzugefügt.",
+    "no_further_details": "Keine weiteren Details",
+    "no_group_by_fields": "Dieses Event hat keine Gruppierungsfelder.",
+    "no_key": "Für dieses Event ist kein Schlüssel gesetzt.",
+    "no_time_range": "Kein Zeitbereich",
+    "refresh_human_name": "Events",
+    "replay_search": "Suche wiederholen",
+    "histogram_series_events": "Events",
+    "histogram_series_alerts": "Alarme"
+  },
+  "alerts_replay": {
+    "cannot_replay": "Dieses Event kann nicht wiederholt werden: {{reason}} Bitte wählen Sie ein anderes aus.",
+    "close_section": "Abschnitt {{title}} schließen",
+    "details_title": "Alarm-/Eventdetails",
+    "event_definition_details": "Details der Event Definition",
+    "event_details": "Eventdetails",
+    "no_remediation_steps": "Keine Maßnahmen zur Behebung",
+    "open_section": "Abschnitt {{title}} öffnen",
+    "replay_details": "Details der Wiederholung",
+    "replayed_search": "Wiederholte Suche",
+    "system_event": "Das Event ist ein Systemevent, diesen sind keine Abfrage, kein Stream und kein Zeitbereich zugeordnet."
+  },
+  "alerts_types": {
+    "alert": "Alarm",
+    "event": "Event"
+  },
+  "definitions_bulk": {
+    "delete": {
+      "confirm_one": "Möchten Sie {{count}} Event Definition wirklich löschen?",
+      "confirm_other": "Möchten Sie {{count}} Event Definitionen wirklich löschen?",
+      "error": "Beim Löschen der Event Definitionen ist ein Fehler aufgetreten. {{error}}",
+      "failed_one": "{{failed}} von {{count}} ausgewählten Event Definition konnte nicht gelöscht werden.",
+      "failed_other": "{{failed}} von {{count}} ausgewählten Event Definitionen konnten nicht gelöscht werden.",
+      "success_one": "{{count}} Event Definition wurde erfolgreich gelöscht.",
+      "success_other": "{{count}} Event Definitionen wurden erfolgreich gelöscht.",
+      "title": "Event Definitionen löschen"
+    },
+    "disable": {
+      "confirm_one": "Möchten Sie {{count}} Event Definition wirklich deaktivieren?",
+      "confirm_other": "Möchten Sie {{count}} Event Definitionen wirklich deaktivieren?",
+      "error": "Beim Deaktivieren der Event Definitionen ist ein Fehler aufgetreten. {{error}}",
+      "failed_one": "{{failed}} von {{count}} ausgewählten Event Definition konnte nicht deaktiviert werden.",
+      "failed_other": "{{failed}} von {{count}} ausgewählten Event Definitionen konnten nicht deaktiviert werden.",
+      "success_one": "{{count}} Event Definition wurde erfolgreich deaktiviert.",
+      "success_other": "{{count}} Event Definitionen wurden erfolgreich deaktiviert.",
+      "title": "Event Definitionen deaktivieren"
+    },
+    "enable": {
+      "confirm_one": "Möchten Sie {{count}} Event Definition wirklich aktivieren?",
+      "confirm_other": "Möchten Sie {{count}} Event Definitionen wirklich aktivieren?",
+      "error": "Beim Aktivieren der Event Definitionen ist ein Fehler aufgetreten. {{error}}",
+      "failed_one": "{{failed}} von {{count}} ausgewählten Event Definition konnte nicht aktiviert werden.",
+      "failed_other": "{{failed}} von {{count}} ausgewählten Event Definitionen konnten nicht aktiviert werden.",
+      "success_one": "{{count}} Event Definition wurde erfolgreich aktiviert.",
+      "success_other": "{{count}} Event Definitionen wurden erfolgreich aktiviert.",
+      "title": "Event Definitionen aktivieren"
+    },
+    "success_title": "Erfolg"
+  },
+  "definitions_list": {
+    "disable": "Deaktivieren",
+    "enable": "Aktivieren"
+  },
+  "definitions_page": {
+    "alerts_docs": "Alarm-Dokumentation",
+    "copy_confirm": "Möchten Sie wirklich eine Kopie von \"{{title}}\" erstellen?",
+    "copy_title": "Event Definition kopieren",
+    "create_multiple": "Event Definitionen erstellen",
+    "description_alerts": "Mit Event Definitionen können Sie Alarme aus verschiedenen Bedingungen erstellen und darüber benachrichtigt werden.",
+    "description_events": "Mit Event Definitionen können Sie Events aus verschiedenen Bedingungen erstellen und darüber benachrichtigt werden.",
+    "description_list": "Erstellen Sie neue Event Definitionen, mit denen Sie nach verschiedenen Bedingungen suchen und darüber benachrichtigt werden können.",
+    "duplicate": "Event Definition duplizieren",
+    "edit": "Event Definition bearbeiten",
+    "edit_named": "Event Definition \"{{title}}\" bearbeiten",
+    "file_import": "Event Definitionen erstellen - Dateiimport",
+    "git_import": "Event Definitionen erstellen - Git-Import",
+    "loading": "Event Definition wird geladen...",
+    "new": "Neue Event Definition",
+    "new_named": "Neue Event Definition \"{{title}}\"",
+    "title": "Event Definitionen",
+    "view": "Event Definition anzeigen",
+    "view_named": "Event Definition \"{{title}}\" anzeigen"
+  },
+  "alerts_page": {
+    "description": "Definieren Sie Events über verschiedene Bedingungen. Fügen Sie Events, die Ihre Aufmerksamkeit erfordern, Benachrichtigungen hinzu, um Alarme zu erzeugen.",
+    "documentation_title": "Dokumentation zu Alarmen",
+    "title": "Alarme & Events"
+  },
+  "alerts_bulk_replay": {
+    "all_removed": "Sie haben alle Events aus der Liste entfernt. Sie können jetzt zurückkehren, indem Sie auf <backButton>Zurück zu den Events</backButton> klicken",
+    "all_reviewed": "Sie haben alle Events geprüft. Sie können jetzt eine Massenaktion auswählen, die auf alle unten aufgeführten Events angewendet wird.",
+    "list_description": "Die folgende Liste enthält alle Events/Alarme, die Sie im vorherigen Schritt ausgewählt haben. So können Sie die wiederholte Suche für jedes davon prüfen.",
+    "mark_not_reviewed": "Event \"{{id}}\" als nicht geprüft markieren",
+    "mark_reviewed": "Event \"{{id}}\" als geprüft markieren",
+    "remove_event": "Event \"{{id}}\" aus der Liste entfernen",
+    "replay_search": "Suche wiederholen",
+    "review_progress": "Prüfung von {{completed}}/{{total}} Events abgeschlossen.",
+    "show_selected": "Ausgewählte Events anzeigen",
+    "unknown_message": "Unbekannt"
+  },
+  "use_event_by_id_notifications": {
+    "load_failed": "Laden des Events oder Alarms fehlgeschlagen mit Status: {{error}}",
+    "load_failed_title": "Das Event oder der Alarm konnte nicht geladen werden"
+  }
+}

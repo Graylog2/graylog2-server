@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Row, Col, Input } from 'components/bootstrap';
 
@@ -33,6 +34,7 @@ const GrokPatternInput = ({
   onPatternChange = () => {},
   className = '',
 }: GrokPatternInputProps) => {
+  const { t } = useTranslation('grokpatterns');
   const patternInput = useRef<Input | null>(null);
 
   const addToPattern = (name) => {
@@ -56,8 +58,8 @@ const GrokPatternInput = ({
           }}
           type="textarea"
           id="pattern-input"
-          label="Pattern"
-          help="The pattern which will match the log line e.g: '%{IP:client}' or '.*?'"
+          label={t('input_pattern_label')}
+          help={t('input_pattern_help')}
           rows={9}
           onChange={handlePatternChange}
           value={pattern}

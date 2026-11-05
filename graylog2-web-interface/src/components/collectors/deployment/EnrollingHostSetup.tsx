@@ -17,6 +17,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 import { Grid } from '@mantine/core';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from 'components/bootstrap';
 import { LinkContainer, Stack } from 'components/common';
@@ -53,6 +54,7 @@ const TimelineContainer = styled.div`
  * and install command are not lost while verifying a host.
  */
 const EnrollingHostSetup = ({ instance, fleetName }: Props) => {
+  const { t } = useTranslation('collectors');
   const { sourceLogs, sourceCounts } = useCollectorLogPreview(instance.instance_uid);
   const { data: sources } = useSources(instance.fleet_id);
   const sendTelemetry = useSendCollectorsTelemetry();
@@ -95,7 +97,7 @@ const EnrollingHostSetup = ({ instance, fleetName }: Props) => {
                         instance_id: instance.instance_uid,
                       })
                     }>
-                    Open in search
+                    {t('deployment.open_in_search')}
                   </Button>
                 </LinkContainer>
               </div>

@@ -15,19 +15,24 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import useIndexProfileWithMappingsByField from 'components/indices/IndexSetFieldTypes/hooks/useIndexProfileWithMappingsByField';
 import type { ExpandedSectionProps } from 'components/indices/IndexSetFieldTypes/types';
 
 const OverriddenProfileExpandedSection = ({ type, fieldName }: ExpandedSectionProps) => {
+  const { t } = useTranslation('indexsets');
   const { customFieldMappingsByField, name: profileName } = useIndexProfileWithMappingsByField();
   const profileFieldType = customFieldMappingsByField?.[fieldName];
 
   return (
     <div>
-      Field type <i>{type}</i> comes from the individual, custom field type mapping. It overrides not only possible
-      mappings from the search engine index mapping, but also mapping <b>{fieldName}: </b>
-      <i>{profileFieldType}</i> present in profile {profileName}
+      <Trans
+        t={t}
+        i18nKey="field_types.origin_overridden_profile"
+        values={{ type, fieldName, profileFieldType, profileName }}
+        components={{ i: <i />, b: <b />, profileLink: <span /> }}
+      />
     </div>
   );
 };

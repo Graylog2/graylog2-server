@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useFormikContext } from 'formik';
 
 import { FormikFormGroup, TimeUnitInput } from 'components/common';
@@ -25,6 +26,7 @@ import type { LookupTableAdapter, validationErrorsType } from 'logic/lookup-tabl
 import AdapterConfigFormFields from './AdapterConfigFormFields';
 
 function AdapterFormFields() {
+  const { t } = useTranslation('lookup_tables');
   const { errors, values, touched, setFieldValue, setValues, setErrors } = useFormikContext<LookupTableAdapter>();
   const { validateDataAdapter } = useValidateDataAdapter();
   const configRef = useRef(null);
@@ -67,39 +69,35 @@ function AdapterFormFields() {
       <FormikFormGroup
         type="text"
         name="title"
-        label="* Title"
+        label={t('adapter_form.title_label')}
         required
         onChange={handleTitleChange}
-        help={touched.title && errors.title ? null : 'A short title for this data adapter.'}
+        help={touched.title && errors.title ? null : t('adapter_form.title_help')}
         labelClassName="col-sm-3"
         wrapperClassName="col-sm-9"
       />
       <FormikFormGroup
         type="text"
         name="description"
-        label="Description"
-        help="Data adapter description."
+        label={t('shared.description')}
+        help={t('adapter_form.description_help')}
         labelClassName="col-sm-3"
         wrapperClassName="col-sm-9"
       />
       <FormikFormGroup
         type="text"
         name="name"
-        label="* Name"
+        label={t('adapter_form.name_label')}
         required
         error={touched.name && errors.name ? errors.name : null}
         onChange={() => setGenerateName(!touched.name)}
-        help={
-          touched.name && errors.name
-            ? null
-            : 'The name that is being used to refer to this data adapter. Must be unique.'
-        }
+        help={touched.name && errors.name ? null : t('adapter_form.name_help')}
         labelClassName="col-sm-3"
         wrapperClassName="col-sm-9"
       />
       <TimeUnitInput
-        label="Custom Error TTL"
-        help="Define a custom TTL for caching erroneous results. Otherwise the default of 5 seconds is used"
+        label={t('adapter_form.error_ttl_label')}
+        help={t('adapter_form.error_ttl_help')}
         update={updateCustomErrorTTL}
         value={values.custom_error_ttl}
         unit={values.custom_error_ttl_unit || 'MINUTES'}

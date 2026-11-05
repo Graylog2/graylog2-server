@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import { Row, Col, Button } from 'components/bootstrap';
 import LoaderTabs from 'components/messageloaders/LoaderTabs';
@@ -22,7 +24,7 @@ import MessageFieldExtractorActions from 'components/search/MessageFieldExtracto
 
 type AddExtractorWizardProps = {
   inputId?: string;
-};
+} & WithTranslation;
 
 class AddExtractorWizard extends React.Component<
   AddExtractorWizardProps,
@@ -63,19 +65,16 @@ class AddExtractorWizard extends React.Component<
     return (
       <Row className="content">
         <Col md={12}>
-          <h2 style={{ marginBottom: 5 }}>Add extractor</h2>
+          <h2 style={{ marginBottom: 5 }}>{this.props.t('wizard.title')}</h2>
 
-          <p>
-            Start by loading a message to have an example to work on. You can decide whether to load a recent message
-            received by this input, or manually select a message giving its ID.
-          </p>
+          <p>{this.props.t('wizard.description')}</p>
           <p>
             <Button
               bsStyle="primary"
               bsSize="small"
               onClick={this._showAddExtractorForm}
               disabled={this.state.showExtractorForm}>
-              Create extractor
+              {this.props.t('wizard.create')}
             </Button>
           </p>
 
@@ -86,4 +85,4 @@ class AddExtractorWizard extends React.Component<
   }
 }
 
-export default AddExtractorWizard;
+export default withTranslation('extractors')(AddExtractorWizard);

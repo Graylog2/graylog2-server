@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useState, useMemo } from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import * as JSON from 'util/json';
 import useProductName from 'brand-customization/useProductName';
@@ -55,6 +56,7 @@ type Props = {
 };
 
 function TestLookup({ table }: Props) {
+  const { t } = useTranslation('lookup_tables');
   const { errors } = useErrorsContext();
   const lutError = errors?.lutErrors[table.name];
   const [lookupKey, setLookupKey] = useState<{ value: string; valid: boolean }>(INIT_INPUT);
@@ -67,10 +69,10 @@ function TestLookup({ table }: Props) {
   } = useFetchLookupPreview(table.id, !lutError, previewSize);
 
   const dataPreview = useMemo(() => {
-    if (total === 0) return 'No results to show';
+    if (total === 0) return t('lut_view.no_results');
 
     return JSON.stringify(results, null, 2);
-  }, [results, total]);
+  }, [results, total, t]);
 
   const onChange = (event: React.BaseSyntheticEvent) => {
     const newValue = { ...lookupKey };
@@ -117,11 +119,8 @@ function TestLookup({ table }: Props) {
   return (
     <Col $gap="sm">
       <Col $gap="xs">
-        <h2>Test lookup</h2>
-        <Description>
-          You can manually query the lookup table using this form. The data will be cached as configured by{' '}
-          {productName}.
-        </Description>
+        <h2>{t('lut_view.test_title')}</h2>
+        <Description>{t('lut_view.test_description', { productName })}</Description>
       </Col>
       <Col $gap="xs">
         <form onSubmit={handleLookupKey} style={{ width: '100%' }}>
@@ -130,17 +129,17 @@ function TestLookup({ table }: Props) {
               type="text"
               id="key"
               name="lookupkey"
-              placeholder="Insert key that should be looked up"
-              label="Key"
+              placeholder={t('lut_view.test_placeholder')}
+              label={t('lut_view.key_label')}
               required
               onKeyDown={onKeyDown}
               onChange={onChange}
-              help="Key to look up a value for."
+              help={t('adapter_summary.key_help')}
               value={lookupKey.value}
             />
             <Row $justify="flex-end">
               <Button name="reset" disabled={!lookupResult} onClick={onReset}>
-                Reset
+                {t('lut_view.reset')}
               </Button>
               <Button
                 type="submit"
@@ -148,7 +147,7 @@ function TestLookup({ table }: Props) {
                 bsStyle="primary"
                 data-testid="lookupbutton"
                 disabled={!lookupKey.valid}>
-                Look up
+                {t('adapter_summary.look_up')}
               </Button>
             </Row>
           </fieldset>
@@ -159,7 +158,7 @@ function TestLookup({ table }: Props) {
         <Col $gap="xs" style={{ marginTop: 20 }}>
           <h4 style={{ width: '100%' }}>
             <Row $align="center" $justify="space-between">
-              <span>Lookup result</span>
+              <span>{t('adapter_summary.lookup_result')}</span>
               {supported && total > 0 && !lookupResult && (
                 <Row $width="auto" $align="center">
                   <NoMarginInput>
@@ -173,7 +172,7 @@ function TestLookup({ table }: Props) {
                       max={total}
                     />
                   </NoMarginInput>
-                  <Description>of</Description>
+                  <Description>{t('lut_view.of')}</Description>
                   <Description>{total}</Description>
                 </Row>
               )}

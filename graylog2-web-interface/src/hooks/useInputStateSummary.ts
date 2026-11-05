@@ -19,6 +19,7 @@ import { useQuery } from '@tanstack/react-query';
 import { SystemInputStates } from '@graylog/server-api';
 
 import { defaultOnError } from 'util/conditional/onError';
+import i18n from 'i18n';
 
 type StateSummary = { [inputId: string]: Array<string> };
 
@@ -30,8 +31,8 @@ const useInputStateSummary = (): { hasProblematicInputs: boolean; isLoading: boo
     queryFn: () =>
       defaultOnError(
         SystemInputStates.summary({ requestShouldExtendSession: false }),
-        'Loading input state summary failed with status',
-        'Could not load input state summary.',
+        i18n.t('use_input_state_summary_notifications.load_failed', { ns: 'inputs' }),
+        i18n.t('use_input_state_summary_notifications.load_failed_title', { ns: 'inputs' }),
       ),
     refetchInterval: 5000,
     retry: false,

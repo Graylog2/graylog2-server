@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { LinkContainer, PageHeader, DocumentTitle, Icon } from 'components/common';
 import RolesOverview from 'components/roles/RolesOverview';
@@ -25,39 +26,34 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import useProductName from 'brand-customization/useProductName';
 
 const RolesOverviewPage = () => {
+  const { t } = useTranslation('users');
   const productName = useProductName();
 
   return (
-    <DocumentTitle title="Roles Overview">
+    <DocumentTitle title={t('roles_overview.title')}>
       <PageHeader
-        title="Roles Overview"
+        title={t('roles_overview.title')}
         documentationLink={{
-          title: 'Permissions documentation',
+          title: t('roles_overview.documentation_link_title'),
           path: DocsHelper.PAGES.USERS_ROLES,
         }}
         topActions={
           <LinkContainer to={Routes.SYSTEM.AUTHZROLES.OVERVIEW}>
-            <Button bsStyle="info">Roles Overview</Button>
+            <Button bsStyle="info">{t('roles_overview.button_text')}</Button>
           </LinkContainer>
         }>
-        <span>
-          Overview of all roles available in {productName}. Roles allow granting capabilities to users, like creating
-          dashboards or event definitions.
-        </span>
+        <span>{t('roles_overview.description', { productName })}</span>
       </PageHeader>
 
       <Row className="content">
         <Col xs={12}>
-          <Alert bsStyle="info" title={<>Granting Permissions</>}>
-            The built-in roles allow granting capabilities to users, like creating dashboards or viewing the archive
-            catalog. But they do not grant permissions for a specific dashboard or stream. It is also not possible to
-            create an own role. Granting permissions for a specific entity can be done by using its{' '}
-            <b>
-              <Icon name="person_add" /> Share
+          <Alert bsStyle="info" title={t('roles_overview.alert_title')}>
+            {t('roles_overview.alert_body_prefix')}
+            <b style={{ fontWeight: 'bold' }}>
+              <Icon name="person_add" /> {t('roles_overview.share_text')}
             </b>{' '}
-            button. You can find the button e.g. on the entities overview page. If you want to grant permissions for an
-            entity to multiple users at once, you can use teams. Learn more in the{' '}
-            <DocumentationLink page={DocsHelper.PAGES.PERMISSIONS} text="documentation" />.
+            {t('roles_overview.alert_body_suffix')}
+            <DocumentationLink page={DocsHelper.PAGES.PERMISSIONS} text={t('roles_overview.documentation_text')} />.
           </Alert>
         </Col>
       </Row>

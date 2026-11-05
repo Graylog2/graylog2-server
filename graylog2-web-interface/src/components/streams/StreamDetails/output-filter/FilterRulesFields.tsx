@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { useFormikContext } from 'formik';
 
@@ -64,6 +65,7 @@ const StyledPanelBody = styled(Panel.Body)`
 `;
 
 const FilterRulesFields = ({ type }: Props) => {
+  const { t } = useTranslation('streams');
   const { values, setFieldValue, setValues } = useFormikContext<StreamOutputFilterRule>();
   const [blockToDelete, setBlockToDelete] = useState<{ orderIndex: number; type: BlockType } | null>(null);
   const newConditionBlockIndex = values.rule?.conditions?.length;
@@ -110,20 +112,22 @@ const FilterRulesFields = ({ type }: Props) => {
   return (
     <StyledPanel expanded>
       <StyledPanelHeading>
-        <Panel.Title toggle>{type === 'condition' ? 'When' : 'Then'}</Panel.Title>
+        <Panel.Title toggle>
+          {type === 'condition' ? t('output_filter.fields.when') : t('output_filter.fields.then')}
+        </Panel.Title>
         {type === 'condition' && (
           <WhenOperator>
             <Radio
               name="operator"
               checked={values.rule?.operator === 'AND'}
               onChange={() => setFieldValue('rule.operator', 'AND')}>
-              and
+              {t('output_filter.fields.and')}
             </Radio>
             <Radio
               name="operator"
               checked={values.rule?.operator === 'OR'}
               onChange={() => setFieldValue('rule.operator', 'OR')}>
-              or
+              {t('output_filter.fields.or')}
             </Radio>
           </WhenOperator>
         )}
@@ -159,20 +163,24 @@ const FilterRulesFields = ({ type }: Props) => {
       </Panel.Collapse>
       {blockToDelete && (
         <ConfirmDialog
-          title={`Delete ${blockToDelete.type}`}
+          title={t('output_filter.fields.delete_title', {
+            blockType: t(`output_filter.fields.block_${blockToDelete.type}`),
+          })}
           show
           onConfirm={() => {
             deleteBlock(blockToDelete.orderIndex, blockToDelete.type);
             setBlockToDelete(null);
           }}
           onCancel={() => setBlockToDelete(null)}>
-          <>
-            Are you sure you want to delete{' '}
-            <strong>
-              {blockToDelete.type} N° {blockToDelete.orderIndex + 1}
-            </strong>
-            ?
-          </>
+          <Trans
+            t={t}
+            i18nKey="output_filter.fields.delete_confirm"
+            values={{
+              blockType: t(`output_filter.fields.block_${blockToDelete.type}`),
+              number: blockToDelete.orderIndex + 1,
+            }}
+            components={{ blockLabel: <strong /> }}
+          />
         </ConfirmDialog>
       )}
       <Errors objectWithErrors={values.rule} />

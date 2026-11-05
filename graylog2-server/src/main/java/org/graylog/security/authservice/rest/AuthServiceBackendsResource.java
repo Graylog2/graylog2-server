@@ -51,6 +51,9 @@ import org.graylog.security.authservice.DBAuthServiceBackendService;
 import org.graylog.security.authservice.GlobalAuthServiceConfig;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.plugin.rest.CodedBadRequestException;
+import org.graylog2.plugin.rest.CodedException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.plugin.rest.ValidationFailureException;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.rest.PaginationParameters;
@@ -179,7 +182,7 @@ public class AuthServiceBackendsResource extends RestResource {
         final AuthServiceBackendDTO config = loadConfig(backendId);
 
         if (usageCheck.isAuthServiceInUse(backendId)) {
-            throw new BadRequestException("Authentication service backend <" + backendId + "> is still in use");
+            throw new CodedBadRequestException("auth_service_backends.authentication_service_backend_is_still_in_use", "Authentication service backend <" + backendId + "> is still in use", CodedException.paramsOf("backendId", backendId));
         }
         dbService.delete(config.id());
     }
@@ -226,7 +229,7 @@ public class AuthServiceBackendsResource extends RestResource {
                     })
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         } catch (org.graylog2.database.NotFoundException e) {
-            throw new NotFoundException("Couldn't find roles: " + roleIds);
+            throw new CodedNotFoundException("auth_service_backends.couldnt_find_roles", "Couldn't find roles: " + roleIds, CodedException.paramsOf("roleIds", roleIds));
         }
     }
 
@@ -246,7 +249,7 @@ public class AuthServiceBackendsResource extends RestResource {
         checkArgument(!isNullOrEmpty(backendId), "backendId cannot be null or empty");
 
         return dbService.get(backendId)
-                .orElseThrow(() -> new NotFoundException("Couldn't find auth service backend " + backendId));
+                .orElseThrow(() -> new CodedNotFoundException("auth_service_backends.couldnt_find_auth_service_backend", "Couldn't find auth service backend " + backendId, CodedException.paramsOf("backendId", backendId)));
     }
 
     private void validateConfig(AuthServiceBackendDTO config) {

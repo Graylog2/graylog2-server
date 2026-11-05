@@ -18,6 +18,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { SystemFieldTypes } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import UserNotification from 'util/UserNotification';
 import type {
   ProfileChangeResponse,
@@ -51,14 +52,17 @@ const useSetIndexSetProfileMutation = (): {
 
     onError: (errorThrown) => {
       UserNotification.error(
-        `Setting index set profile failed with status: ${errorThrown}`,
-        'Could not set index set profile',
+        i18n.t('hooks.profile_set_failed', { ns: 'indexsets', error: errorThrown }),
+        i18n.t('hooks.profile_set_failed_title', { ns: 'indexsets' }),
       );
     },
 
     onSuccess: (response) => {
       if (resultsWithProblems(response).length === 0) {
-        UserNotification.success('Set index set profile successfully', 'Success!');
+        UserNotification.success(
+          i18n.t('hooks.profile_set_success', { ns: 'indexsets' }),
+          i18n.t('hooks.success_title', { ns: 'indexsets' }),
+        );
       }
 
       return refetchAfterProfileChange(queryClient);

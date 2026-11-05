@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import isArray from 'lodash/isArray';
 import flattenDeep from 'lodash/flattenDeep';
 import styled from 'styled-components';
@@ -77,6 +78,7 @@ type ShortcutKeysProps = {
 };
 
 const ShortcutKeys = ({ keys, splitKey, combinationKey, isMacOS }: ShortcutKeysProps) => {
+  const { t } = useTranslation('common');
   const shortcutsArray = isArray(keys) ? keys : [keys];
   const splitShortcutsArray = flattenDeep(shortcutsArray.map((key) => key.split(splitKey)));
 
@@ -98,7 +100,7 @@ const ShortcutKeys = ({ keys, splitKey, combinationKey, isMacOS }: ShortcutKeysP
                 </React.Fragment>
               );
             })}
-            {!isLastSplit && <KeySeparator>or</KeySeparator>}
+            {!isLastSplit && <KeySeparator>{t('hotkeys.or')}</KeySeparator>}
           </React.Fragment>
         );
       })}

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 
 import { Menu } from 'components/bootstrap';
@@ -43,6 +44,7 @@ const FilterEditButton = ({
   containerWidth,
   onDelete,
 }: Props) => {
+  const { t } = useTranslation('widgets');
   const [open, setOpen] = useState(false);
   const [editValue, setEditValue] = useState<string>(value);
 
@@ -88,7 +90,11 @@ const FilterEditButton = ({
       offset={{ alignmentAxis: -25 }}
       onClose={onClose}>
       <Menu.Target>
-        <IconButton name="edit" title={`Edit ${columnTitle(column)} filter`} onClick={() => setOpen(true)} />
+        <IconButton
+          name="edit"
+          title={t('overview_configuration.edit_filter', { column: columnTitle(column) })}
+          onClick={() => setOpen(true)}
+        />
       </Menu.Target>
       <Menu.Dropdown>
         {filterComponent.configuration(

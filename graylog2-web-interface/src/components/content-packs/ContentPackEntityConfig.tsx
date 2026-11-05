@@ -16,9 +16,12 @@
  */
 import React from 'react';
 
+import i18n from 'i18n';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import DataTable from 'components/common/DataTable';
 import ValueReferenceData from 'util/ValueReferenceData';
+
+const t = (key: string, options?: { [key: string]: unknown }) => i18n.t(key, { ns: 'content_packs', ...options });
 
 type ContentPackEntityConfigProps = {
   entity: any;
@@ -53,7 +56,7 @@ class ContentPackEntityConfig extends React.Component<
   _configKeyRowFormatter = (paths) => (configKey) => {
     const path = paths[configKey];
     const parameter = this._getParameterForConfigKey(configKey);
-    const type = parameter ? <b>{`parameter (${parameter.type})`}</b> : path.getValueType();
+    const type = parameter ? <b>{t('entity_config.parameter_type', { type: parameter.type })}</b> : path.getValueType();
     const value = parameter ? <b>{parameter.name}</b> : path.getValue();
 
     return (
@@ -74,7 +77,7 @@ class ContentPackEntityConfig extends React.Component<
       <div>
         <DataTable
           id="entiy-config-list"
-          headers={['Config Key', 'Type', 'Value']}
+          headers={[t('entity_config.config_key'), t('entity_config.type'), t('entity_config.value')]}
           filterKeys={[]}
           rows={configKeys}
           dataRowFormatter={this._configKeyRowFormatter(configPaths)}

@@ -21,18 +21,23 @@ import PageNavigation from 'components/common/PageNavigation';
 import { SystemNotificationsTable } from 'components/notifications';
 import { PAGE_NAV_TITLE } from 'components/system-overview/bindings';
 import { Row } from 'components/bootstrap';
+import { useTranslation } from 'react-i18next';
 
-const SystemNotificationsPage = () => (
-  <DocumentTitle title="System notifications">
-    <span>
-      <Row>
-        <PageNavigation page={PAGE_NAV_TITLE} />
-      </Row>
-      <IfPermitted permissions="notifications:read">
-        <SystemNotificationsTable />
-      </IfPermitted>
-    </span>
-  </DocumentTitle>
-);
+const SystemNotificationsPage = () => {
+  const { t } = useTranslation('system');
+
+  return (
+    <DocumentTitle title={t('system_notifications_page.title')}>
+      <span>
+        <Row>
+          <PageNavigation page={PAGE_NAV_TITLE} />
+        </Row>
+        <IfPermitted permissions="notifications:read">
+          <SystemNotificationsTable />
+        </IfPermitted>
+      </span>
+    </DocumentTitle>
+  );
+};
 
 export default SystemNotificationsPage;

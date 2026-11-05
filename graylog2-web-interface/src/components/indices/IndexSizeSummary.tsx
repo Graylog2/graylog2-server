@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import numeral from 'numeral';
 
 import NumberUtils from 'util/NumberUtils';
@@ -24,10 +25,16 @@ type Props = {
 };
 
 const IndexSizeSummary = ({ index }: Props) => {
+  const { t } = useTranslation('indexsets');
+
   if (index.size) {
     return (
       <span>
-        ({NumberUtils.formatBytes(index.size.bytes)} / {numeral(index.size.events).format('0,0')} messages){' '}
+        {t('index_summary.size', {
+          size: NumberUtils.formatBytes(index.size.bytes),
+          count: index.size.events,
+          formattedCount: numeral(index.size.events).format('0,0'),
+        })}{' '}
       </span>
     );
   }

@@ -23,7 +23,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -42,6 +41,7 @@ import org.graylog.plugins.views.search.engine.QueryEngine;
 import org.graylog.plugins.views.search.engine.validation.DataLakeSearchValidator;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -70,7 +70,7 @@ public class SearchMetadataResource extends RestResource implements PluginRestRe
     public SearchMetadata metadata(@io.swagger.v3.oas.annotations.Parameter(name = "searchId") @PathParam("searchId") String searchId, @Context SearchUser searchUser) {
         final SearchDTO search = searchDomain.getForUser(searchId, searchUser)
                 .map(SearchDTO::fromSearch)
-                .orElseThrow(() -> new NotFoundException("Search with id " + searchId + " does not exist"));
+                .orElseThrow(() -> new CodedNotFoundException("search.not_found", "Search with id " + searchId + " does not exist", Map.of("searchId", searchId)));
         return metadataForObject(search);
     }
 

@@ -16,6 +16,7 @@
  */
 import React, { useCallback, useState, useMemo } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
+import { useTranslation } from 'react-i18next';
 
 import usePermissions from 'hooks/usePermissions';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
@@ -62,6 +63,7 @@ const _updateOrder = (
 };
 
 const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCancel, onSave }: Props) => {
+  const { t } = useTranslation('configurations');
   const [currentStream, setCurrentStream] = useState(DEFAULT_STREAM_ID);
   const [modifiedDecorators, setModifiedDecorators] = useState(decorators);
   const sendTelemetry = useSendTelemetry('decorators');
@@ -115,24 +117,20 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
     onCancel();
   }, [decorators, onCancel]);
 
-  const modalTitle = 'Update Default Decorators Configuration';
-
   return (
     <BootstrapModalWrapper showModal={show} onHide={_onCancel}>
       <Modal.Header>
-        <Modal.Title>{modalTitle}</Modal.Title>
+        <Modal.Title>{t('decorators_update.title')}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p>Select the stream for which you want to change the set of default decorators.</p>
+        <p>{t('decorators_update.select_stream')}</p>
 
         <StreamSelect onChange={setCurrentStream} value={currentStream} streams={streams} />
 
-        {!canEditStream && currentStream && (
-          <Alert bsStyle="warning">Read only access - you need permission to edit the selected stream</Alert>
-        )}
+        {!canEditStream && currentStream && <Alert bsStyle="warning">{t('decorators_update.read_only')}</Alert>}
 
         <IfPermitted permissions="decorators:create">
-          <p>Select the type to create a new decorator for this stream:</p>
+          <p>{t('decorators_update.select_type')}</p>
           <AddDecoratorButton
             stream={currentStream}
             nextOrder={nextOrder}
@@ -143,7 +141,7 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
           />
         </IfPermitted>
 
-        <p>Use drag and drop to change the execution order of the decorators.</p>
+        <p>{t('decorators_update.drag_and_drop')}</p>
 
         <DecoratorList decorators={decoratorItems} onReorder={onReorder} />
       </Modal.Body>
@@ -151,7 +149,7 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
         <ModalSubmit
           onSubmit={onSubmit}
           onCancel={_onCancel}
-          submitButtonText="Update configuration"
+          submitButtonText={t('decorators_update.submit')}
           disabledSubmit={!canEditStream}
         />
       </Modal.Footer>

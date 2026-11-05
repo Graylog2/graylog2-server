@@ -19,6 +19,7 @@ import { useCallback } from 'react';
 import { Formik, Form, Field } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import Routes from 'routing/Routes';
 import { validateField } from 'util/FormsUtils';
@@ -53,6 +54,7 @@ const _onSubmit = (history: HistoryFunction, { authServiceType }: FormState) => 
 };
 
 const BackendCreateSelect = () => {
+  const { t } = useTranslation('authentication');
   const authServices = PluginStore.exports('authentication.services');
   const sortedAuthServices = authServices.sort((s1, s2) => defaultCompare(s1.displayName, s2.displayName));
   const authServicesOptions = sortedAuthServices.map((service) => ({
@@ -92,7 +94,7 @@ const BackendCreateSelect = () => {
                         onChange({ target: { value: authService, name } });
                       }}
                       options={authServicesOptions}
-                      placeholder="Select a service"
+                      placeholder={t('getting_started.select_service')}
                       value={value}
                     />
                     <InputDescription error={error} />
@@ -102,7 +104,7 @@ const BackendCreateSelect = () => {
             </FormGroup>
             &nbsp;
             <Button bsStyle="primary" disabled={isSubmitting || !isValid} type="submit">
-              Get started
+              {t('getting_started.submit')}
             </Button>
           </ElementsContainer>
         </StyledForm>

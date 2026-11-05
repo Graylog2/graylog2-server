@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Alert } from 'components/bootstrap';
 import type { IndexSetProfileChangeResult } from 'components/indices/IndexSetFieldTypes/types';
@@ -24,23 +25,27 @@ type Props = {
   titles: Record<string, string>;
 };
 
-const ProfileChangeErrorAlert = ({ results, titles }: Props) => (
-  <Alert bsStyle="danger" title="Changing the field type profile failed for some index sets">
-    <ul>
-      {results.map(({ indexSetId, failures, errors }) => (
-        <li key={indexSetId}>
-          <b>{titles[indexSetId] ?? indexSetId}</b>
-          <ul>
-            {[...failures, ...errors].map((message) => (
-              <li key={message}>
-                <i>{message}</i>
-              </li>
-            ))}
-          </ul>
-        </li>
-      ))}
-    </ul>
-  </Alert>
-);
+const ProfileChangeErrorAlert = ({ results, titles }: Props) => {
+  const { t } = useTranslation('indexsets');
+
+  return (
+    <Alert bsStyle="danger" title={t('field_types.profile_change_failed_title')}>
+      <ul>
+        {results.map(({ indexSetId, failures, errors }) => (
+          <li key={indexSetId}>
+            <b>{titles[indexSetId] ?? indexSetId}</b>
+            <ul>
+              {[...failures, ...errors].map((message) => (
+                <li key={message}>
+                  <i>{message}</i>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ul>
+    </Alert>
+  );
+};
 
 export default ProfileChangeErrorAlert;

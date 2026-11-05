@@ -16,17 +16,18 @@
  */
 import { ClusterDeflector, SystemDeflector, SystemIndexRanges } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 
 export const recalculateIndexRanges = (indexSetId: string) =>
   defaultOnError(
     SystemIndexRanges.rebuildIndexSet(indexSetId),
-    'Could not create a job to start index ranges recalculation',
-    'Error starting index ranges recalculation',
+    i18n.t('hooks.ranges_recalculation_failed', { ns: 'indexsets' }),
+    i18n.t('hooks.ranges_recalculation_failed_title', { ns: 'indexsets' }),
   );
 
 export const cycleActiveWriteIndex = (indexSetId: string) =>
   defaultOnError(
     ClusterDeflector.cycleByindexSetId(indexSetId).then(() => SystemDeflector.deflector(indexSetId)),
-    'Cycling deflector failed',
+    i18n.t('hooks.cycle_deflector_failed', { ns: 'indexsets' }),
   );

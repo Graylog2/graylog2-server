@@ -17,6 +17,7 @@
 import React from 'react';
 import findIndex from 'lodash/findIndex';
 
+import i18n from 'i18n';
 import { Button, Modal, ButtonToolbar } from 'components/bootstrap';
 import { DataTable, SearchForm, ModalSubmit, StatusIcon } from 'components/common';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
@@ -25,6 +26,8 @@ import ObjectUtils from 'util/ObjectUtils';
 
 import ContentPackParameterListStyle from './ContentPackParameterList.css';
 import ContentPackUtils from './ContentPackUtils';
+
+const t = (key: string) => i18n.t(key, { ns: 'content_packs' });
 
 type ContentPackParameterListProps = {
   contentPack: any;
@@ -76,7 +79,7 @@ class ContentPackParameterList extends React.Component<
   _parameterRowFormatter = (parameter) => {
     const { onDeleteParameter, readOnly } = this.props;
     const parameterApplied = this._parameterApplied(parameter.name);
-    const buttonTitle = parameterApplied ? 'Still in use' : 'Delete Parameter';
+    const buttonTitle = parameterApplied ? t('parameter_list.still_in_use') : t('parameter_list.delete_parameter');
 
     return (
       <tr key={parameter.title}>
@@ -99,7 +102,7 @@ class ContentPackParameterList extends React.Component<
                 onClick={() => {
                   onDeleteParameter(parameter);
                 }}>
-                Delete
+                {t('common:actions.delete')}
               </Button>
               {this._parameterModal(parameter)}
             </ButtonToolbar>
@@ -148,13 +151,13 @@ class ContentPackParameterList extends React.Component<
     };
 
     const size = parameter ? 'xsmall' : 'small';
-    const titleName = parameter ? 'Edit parameter' : 'Create parameter';
-    const triggerButtonName = parameter ? 'Edit' : 'Create parameter';
+    const titleName = parameter ? t('edit_parameter.edit_title') : t('edit_parameter.create_title');
+    const triggerButtonName = parameter ? t('common:actions.edit') : t('edit_parameter.create_title');
 
     const modal = (
       <BootstrapModalWrapper showModal={openModalKey === modalKey} onHide={closeModal} bsSize="large">
         <Modal.Header>
-          <Modal.Title>Parameter</Modal.Title>
+          <Modal.Title>{t('parameter_list.modal_title')}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <ContentPackEditParameter
@@ -177,7 +180,7 @@ class ContentPackParameterList extends React.Component<
 
     return (
       <>
-        <Button bsStyle="info" bsSize={size} title="Edit Modal" onClick={openModal}>
+        <Button bsStyle="info" bsSize={size} title={t('parameter_list.edit_modal')} onClick={openModal}>
           {triggerButtonName}
         </Button>
         {modal}
@@ -190,12 +193,27 @@ class ContentPackParameterList extends React.Component<
     const { filteredParameters } = this.state;
 
     const headers = readOnly
-      ? ['Title', 'Name', 'Description', 'Value Type', 'Default Value', 'Used']
-      : ['Title', 'Name', 'Description', 'Value Type', 'Default Value', 'Used', 'Action'];
+      ? [
+          t('parameter_list.title'),
+          t('parameter_list.name'),
+          t('parameter_list.description'),
+          t('parameter_list.value_type'),
+          t('parameter_list.default_value'),
+          t('parameter_list.used'),
+        ]
+      : [
+          t('parameter_list.title'),
+          t('parameter_list.name'),
+          t('parameter_list.description'),
+          t('parameter_list.value_type'),
+          t('parameter_list.default_value'),
+          t('parameter_list.used'),
+          t('parameter_list.action'),
+        ];
 
     return (
       <div>
-        <h2>Parameters list</h2>
+        <h2>{t('parameter_list.list_title')}</h2>
         <br />
         {!readOnly && this._parameterModal()}
         {!readOnly && (
@@ -215,7 +233,7 @@ class ContentPackParameterList extends React.Component<
           headers={headers}
           className={ContentPackParameterListStyle.scrollable}
           sortByKey="title"
-          noDataText="To use parameters for content packs, at first a parameter must be created and can then be applied to a entity."
+          noDataText={t('parameter_list.no_data')}
           filterKeys={[]}
           rows={filteredParameters}
           dataRowFormatter={this._parameterRowFormatter}

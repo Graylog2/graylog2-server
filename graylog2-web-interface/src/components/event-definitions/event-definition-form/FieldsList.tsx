@@ -17,6 +17,7 @@
 import React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import i18n from 'i18n';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { ButtonToolbar, Button } from 'components/bootstrap';
 import { DataTable } from 'components/common';
@@ -25,7 +26,18 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import styles from './FieldsList.css';
 
-const HEADERS = ['Field Name', 'Is Key?', 'Value Source', 'Data Type', 'Configuration', 'Actions'];
+import { fieldValueProviderTitle } from '../pluginTitles';
+
+const t = (key: string) => i18n.t(key, { ns: 'event_definitions' });
+
+const HEADER_KEYS = [
+  'fields_list.field_name',
+  'fields_list.is_key',
+  'fields_list.value_source',
+  'fields_list.data_type',
+  'fields_list.configuration',
+  'summary.actions',
+];
 
 const getFieldValueProviderPlugin = (type) => {
   if (type === undefined) {
@@ -96,19 +108,19 @@ class FieldsList extends React.Component<
     return (
       <tr key={fieldName}>
         <td>{fieldName}</td>
-        <td>{keyIndex < 0 ? 'No' : 'Yes'}</td>
-        <td>{fieldProviderPlugin?.displayName || config.providers[0].type}</td>
+        <td>{keyIndex < 0 ? t('fields_list.no') : t('fields_list.yes')}</td>
+        <td>{fieldValueProviderTitle(fieldProviderPlugin) || config.providers[0].type}</td>
         <td>{config.data_type}</td>
         <td>{providerFormatter(config.providers[0])}</td>
         <td className={styles.actions}>
           <ButtonToolbar>
             {}
             <Button bsStyle="danger" bsSize="xsmall" onClick={this.handleRemoveClick(fieldName)}>
-              Remove Field
+              {t('fields_list.remove')}
             </Button>
             {}
             <Button bsStyle="primary" bsSize="xsmall" onClick={this.handleEditClick(fieldName)}>
-              Edit
+              {i18n.t('common:actions.edit')}
             </Button>
           </ButtonToolbar>
         </td>
@@ -122,14 +134,14 @@ class FieldsList extends React.Component<
     const fieldNames = Object.keys(fields).sort(naturalSort);
     const addCustomFieldButton = (
       <Button bsStyle="primary" onClick={this.handleAddFieldClick}>
-        Add custom field
+        {t('field_form.add')}
       </Button>
     );
 
     if (fieldNames.length === 0) {
       return (
         <>
-          <p>This Event does not have any custom Fields yet.</p>
+          <p>{t('fields_list.no_fields')}</p>
           {addCustomFieldButton}
         </>
       );
@@ -139,7 +151,7 @@ class FieldsList extends React.Component<
       <>
         <DataTable
           id="event-definition-fields"
-          headers={HEADERS}
+          headers={HEADER_KEYS.map((key) => t(key))}
           rows={fieldNames}
           dataRowFormatter={this.fieldFormatter}
           filterKeys={[]}

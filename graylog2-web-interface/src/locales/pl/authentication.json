@@ -1,0 +1,212 @@
+{
+  "action_links": {
+    "create": "Utwórz usługę",
+    "edit_active": "Edytuj aktywną usługę",
+    "view_active": "Wyświetl aktywną usługę"
+  },
+  "active_directory": {
+    "create_title": "Utwórz usługę uwierzytelniania Active Directory",
+    "edit_title": "Edytuj usługę uwierzytelniania Active Directory",
+    "help": {
+      "system_user_dn": "Nazwa użytkownika dla pierwszego połączenia z serwerem Active Directory, np. <code>ldapbind@some.domain</code>.<lineBreak/>Musi ona odpowiadać <code>userPrincipalName</code> tego użytkownika.",
+      "system_user_password": "Hasło do pierwszego połączenia z serwerem Active Directory.",
+      "user_full_name_attribute": "Którego atrybutu Active Directory użyć dla pełnej nazwy zsynchronizowanego użytkownika, np. <code>displayName</code>.<lineBreak/>",
+      "user_name_attribute": "Którego atrybutu Active Directory użyć dla nazwy użytkownika zsynchronizowanego użytkownika, np. <code>userPrincipalName</code>.<lineBreak/>Wczytaj użytkownika testowego w panelu bocznym <emphasis>Test logowania użytkownika</emphasis>, jeśli nie jesteś pewien, którego atrybutu należy użyć.",
+      "user_search_base": "Podstawowe drzewo (Base DN), do którego ograniczane jest zapytanie wyszukiwania Active Directory, np. <code>cn=users,dc=example,dc=com</code>."
+    }
+  },
+  "active_page": {
+    "title": "Aktywna usługa uwierzytelniania"
+  },
+  "authenticators": {
+    "description": "Skonfiguruj uwierzytelnianie za pomocą zaufanych nagłówków.",
+    "documentation_title": "Dokumentacja uwierzytelniaczy",
+    "edit": "Edytuj uwierzytelniacze",
+    "title": "Szczegóły uwierzytelniaczy"
+  },
+  "backend_details_page": {
+    "edit_service": "Edytuj usługę",
+    "title": "Szczegóły usługi uwierzytelniania"
+  },
+  "backends_overview": {
+    "activate": "Aktywuj",
+    "confirm_activate": "Czy na pewno chcesz aktywować usługę uwierzytelniania \"{{title}}\"?",
+    "confirm_deactivate": "Czy na pewno chcesz dezaktywować usługę uwierzytelniania \"{{title}}\"?",
+    "confirm_delete": "Czy na pewno chcesz usunąć usługę uwierzytelniania \"{{title}}\"?",
+    "deactivate": "Dezaktywuj",
+    "delete": "Usuń",
+    "edit": "Edytuj",
+    "filter_label": "Filtruj usługi",
+    "found_one": "Znaleziono {{count}} skonfigurowaną usługę uwierzytelniania w systemie.",
+    "found_other": "Znaleziono {{count}} skonfigurowane usługi uwierzytelniania w systemie.",
+    "headers": {
+      "actions": "Akcje",
+      "default_roles": "Role domyślne",
+      "description": "Opis",
+      "title": "Tytuł"
+    },
+    "query_example": "Znajdź backendy, których tytuł zawiera LDAP:",
+    "role_not_found": "Nie znaleziono roli",
+    "title": "Skonfigurowane usługi uwierzytelniania",
+    "found_few": "Znaleziono {{count}} skonfigurowane usługi uwierzytelniania w systemie.",
+    "found_many": "Znaleziono {{count}} skonfigurowanych usług uwierzytelniania w systemie."
+  },
+  "config_details": {
+    "edit": "Edytuj",
+    "group_sync_feature_name": "Synchronizacja grup",
+    "group_sync_title": "Synchronizacja grup"
+  },
+  "connection_test": {
+    "default_error": "Wystąpił błąd",
+    "description": "Wykonuje w tle test połączenia przy użyciu adresu i danych logowania z kroku \"Konfiguracja serwera\".",
+    "submit": "Przetestuj połączenie z serwerem",
+    "title": "Testowanie połączenia z serwerem"
+  },
+  "create_page": {
+    "getting_started_title": "Utwórz nową usługę uwierzytelniania",
+    "title": "Utwórz usługę uwierzytelniania"
+  },
+  "directory_help": {
+    "default_roles": "Role domyślne, które otrzymają zsynchronizowani użytkownicy. Wszyscy użytkownicy potrzebują roli <code>Reader</code>, aby korzystać z interfejsu internetowego.",
+    "default_user_timezone": "Wybierz domyślną strefę czasową dla nowych użytkowników.",
+    "user_search_pattern": "Na przykład <exampleCode>{{example}}</exampleCode>. Ciąg <code>{{placeholder}}</code> zostanie zastąpiony wpisaną nazwą użytkownika."
+  },
+  "getting_started": {
+    "description": "Oprócz wbudowanych mechanizmów uwierzytelniania, takich jak wewnętrzna baza użytkowników lub LDAP/Active Directory, usługi uwierzytelniania mogą być rozszerzane za pomocą wtyczek, aby obsługiwać inne mechanizmy uwierzytelniania. Wybierz usługę uwierzytelniania, aby skonfigurować nową.",
+    "select_service": "Wybierz usługę",
+    "submit": "Rozpocznij"
+  },
+  "ldap": {
+    "create_title": "Utwórz usługę uwierzytelniania LDAP",
+    "edit_title": "Edytuj usługę uwierzytelniania LDAP",
+    "help": {
+      "email_attributes": "Którego atrybutu LDAP użyć dla adresu e-mail użytkownika, np. <code>mail</code>.<lineBreak/>Możesz podać wiele atrybutów. Naciśnij <kbd>Tab</kbd> lub <kbd>Enter</kbd>, aby zatwierdzić wartość.",
+      "system_user_dn": "Nazwa użytkownika dla pierwszego połączenia z serwerem LDAP, np. <code>cn=admin,dc=example,dc=com</code>. W zależności od serwera LDAP może być opcjonalna.",
+      "system_user_password": "Hasło do pierwszego połączenia z serwerem LDAP.",
+      "user_full_name_attribute": "Którego atrybutu LDAP użyć dla pełnej nazwy zsynchronizowanego użytkownika, np. <code>cn</code>.<lineBreak/>",
+      "user_name_attribute": "Którego atrybutu LDAP użyć dla nazwy użytkownika zsynchronizowanego użytkownika, np. <code>uid</code>.<lineBreak/>Wczytaj użytkownika testowego w panelu bocznym <emphasis>Test logowania użytkownika</emphasis>, jeśli nie jesteś pewien, którego atrybutu należy użyć.",
+      "user_search_base": "Podstawowe drzewo (Base DN), do którego ograniczane jest zapytanie wyszukiwania LDAP, np. <code>cn=users,dc=example,dc=com</code>.",
+      "user_unique_id_attribute": "Którego atrybutu LDAP użyć dla identyfikatora zsynchronizowanego użytkownika, np. <code>entryUUID</code>.<lineBreak/>"
+    }
+  },
+  "login_test": {
+    "description": "Sprawdź ustawienia, ładując wpis dla podanej nazwy użytkownika. Jeśli pominiesz hasło, nie zostanie podjęta próba uwierzytelnienia.",
+    "login_failed": "Logowanie nie powiodło się",
+    "password": "Hasło",
+    "submit": "Przetestuj logowanie użytkownika",
+    "title": "Test logowania użytkownika",
+    "user_attribute": "Atrybut użytkownika",
+    "user_does_not_exist": "Użytkownik nie istnieje",
+    "username": "Nazwa użytkownika",
+    "value": "Wartość"
+  },
+  "no_service_plugin": "Dla typu \"{{type}}\" nie skonfigurowano wtyczki dla usług uwierzytelniania",
+  "no_service_plugin_for": "Dla \"{{type}}\" nie skonfigurowano wtyczki dla usług uwierzytelniania",
+  "notifications": {
+    "create_failed": "Utworzenie usługi uwierzytelniania nie powiodło się. Status: {{error}}",
+    "create_success": "Usługa uwierzytelniania została pomyślnie utworzona.",
+    "error_title": "Błąd",
+    "success_title": "Sukces",
+    "update_failed": "Aktualizacja usługi uwierzytelniania nie powiodła się. Status: {{error}}",
+    "update_success": "Usługa uwierzytelniania została pomyślnie zaktualizowana."
+  },
+  "overview_page": {
+    "no_active_backend": "Żadna ze skonfigurowanych usług uwierzytelniania nie jest obecnie aktywna.",
+    "title": "Wszystkie usługi uwierzytelniania"
+  },
+  "page": {
+    "description": "Skonfiguruj usługi uwierzytelniania tego klastra.",
+    "documentation_title": "Dokumentacja uwierzytelniania"
+  },
+  "page_navigation": {
+    "authenticators": "Uwierzytelniacze",
+    "services": "Usługi uwierzytelniania"
+  },
+  "server_config": {
+    "description_label": "Opis",
+    "hostname": "Nazwa hosta",
+    "port": "Port",
+    "reset_password": "Zresetuj hasło",
+    "server_address": "Adres serwera",
+    "system_password": "Hasło systemowe",
+    "system_user_dn": "Systemowy DN użytkownika",
+    "system_username": "Systemowa nazwa użytkownika",
+    "title": "Konfiguracja serwera",
+    "title_label": "Tytuł",
+    "transport_security": "Szyfrowanie transportu",
+    "transport_security_none": "Brak",
+    "undo_reset": "Cofnij resetowanie",
+    "verify_certificates": "Sprawdź certyfikaty"
+  },
+  "synced_teams": {
+    "feature_name": "Zespoły",
+    "title": "Zsynchronizowane zespoły"
+  },
+  "synced_users": {
+    "edit": "Edytuj",
+    "filter_label": "Filtruj użytkowników",
+    "found_one": "Znaleziono {{count}} zsynchronizowanych użytkowników.",
+    "found_other": "Znaleziono {{count}} zsynchronizowanych użytkowników.",
+    "headers": {
+      "actions": "Akcje",
+      "full_name": "Pełna nazwa",
+      "roles": "Role",
+      "username": "Nazwa użytkownika"
+    },
+    "none_found": "Nie znaleziono żadnych zsynchronizowanych użytkowników.",
+    "role_not_found": "Nie znaleziono roli",
+    "title": "Zsynchronizowani użytkownicy",
+    "found_few": "Znaleziono {{count}} zsynchronizowanych użytkowników.",
+    "found_many": "Znaleziono {{count}} zsynchronizowanych użytkowników."
+  },
+  "trusted_header": {
+    "description": "Ten uwierzytelniacz umożliwia logowanie użytkowników za pomocą nagłówka HTTP bez dalszej interakcji.",
+    "enable_sso": "Włącz Single Sign-on za pomocą nagłówka HTTP",
+    "enabled": "Aktywne",
+    "title": "Uwierzytelnianie za pomocą zaufanych nagłówków",
+    "trusted_proxies_hint": "Proszę skonfigurować ustawienie <code>trusted_proxies</code> w pliku konfiguracyjnym serwera {{productName}}.",
+    "update_config": "Aktualizuj konfigurację",
+    "username_header": "Nagłówek nazwy użytkownika",
+    "username_header_help": "Nagłówek HTTP zawierający zaufaną nazwę użytkownika. (Podczas dopasowywania nagłówka wielkość liter jest ignorowana)"
+  },
+  "user_sync": {
+    "browser_time_zone": "Strefa czasowa przeglądarki",
+    "default_assignments_hint": "Zmiany w rolach domyślnych i domyślnej strefie czasowej wpłyną tylko na nowych użytkowników utworzonych za pomocą {{serviceTitle}}!",
+    "default_roles": "Role domyślne",
+    "default_user_time_zone": "Domyślna strefa czasowa dla użytkowników",
+    "email_attribute": "Atrybut e-mail",
+    "email_attributes": "Atrybuty e-mail",
+    "full_name_attribute": "Atrybut pełnej nazwy",
+    "id_attribute": "Atrybut identyfikatora",
+    "name_attribute": "Atrybut nazwy",
+    "role_not_found": "Nie znaleziono roli",
+    "search_base_dn": "Podstawowe drzewo wyszukiwania (Base DN)",
+    "search_pattern": "Wzorzec wyszukiwania",
+    "search_roles": "Szukaj ról",
+    "test_login_hint": "Zalecamy przetestowanie logowania użytkownika w panelu bocznym, aby sprawdzić swoje ustawienia.",
+    "title": "Synchronizacja użytkowników"
+  },
+  "wizard": {
+    "confirm_remove_group_sync": "Czy na pewno chcesz usunąć konfigurację synchronizacji grup dla tej usługi uwierzytelniania?",
+    "create_failed": "Nie udało się utworzyć usługi uwierzytelniania",
+    "edit_failed": "Nie udało się edytować usługi uwierzytelniania",
+    "finish_and_save": "Zakończ i zapisz usługę",
+    "finish_and_save_identity_service": "Zakończ i zapisz usługę tożsamości",
+    "next_group_sync": "Następne: Synchronizacja grup",
+    "next_user_sync": "Następne: Synchronizacja użytkowników",
+    "server_validation_error": "Błąd walidacji serwera: {{errors}}",
+    "steps": {
+      "group_sync": "Synchronizacja grup (opcjonalnie)",
+      "server_config": "Konfiguracja serwera",
+      "user_sync": "Synchronizacja użytkowników"
+    }
+  },
+  "wizard_header": {
+    "edit_title": "Edycja usługi uwierzytelniania - <emphasis>{{backendTitle}}</emphasis>"
+  },
+  "http_header_notifications": {
+    "load_failed": "Ładowanie konfiguracji uwierzytelniania nagłówkiem HTTP nie powiodło się",
+    "update_success": "Konfiguracja uwierzytelniania nagłówkiem HTTP została pomyślnie zaktualizowana",
+    "update_failed": "Aktualizacja konfiguracji uwierzytelniania nagłówkiem HTTP nie powiodła się, status: {{error}}"
+  }
+}

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useHistory from 'routing/useHistory';
 import { ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
@@ -22,6 +23,7 @@ import Routes from 'routing/Routes';
 import useHasTypeMappingPermission from 'hooks/useHasTypeMappingPermission';
 
 const IndicesConfigurationDropdown = ({ indexSetId }: { indexSetId: string }) => {
+  const { t } = useTranslation('indexsets');
   const hasMappingPermission = useHasTypeMappingPermission();
   const history = useHistory();
   const onShowFieldTypes = useCallback(() => {
@@ -32,8 +34,14 @@ const IndicesConfigurationDropdown = ({ indexSetId }: { indexSetId: string }) =>
 
   return (
     <ButtonGroup>
-      <DropdownButton bsStyle="info" title="Configuration" id="indices-configuration-actions" pullRight>
-        {hasMappingPermission && <MenuItem onClick={onShowFieldTypes}>Configure index field types</MenuItem>}
+      <DropdownButton
+        bsStyle="info"
+        title={t('indices_configuration.dropdown_title')}
+        id="indices-configuration-actions"
+        pullRight>
+        {hasMappingPermission && (
+          <MenuItem onClick={onShowFieldTypes}>{t('indices_configuration.configure_field_types')}</MenuItem>
+        )}
       </DropdownButton>
     </ButtonGroup>
   );

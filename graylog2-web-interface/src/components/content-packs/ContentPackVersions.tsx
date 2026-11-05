@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { DataTable } from 'components/common';
 import ContentPackVersionItem from 'components/content-packs/components/ContentPackVersionItem';
@@ -31,22 +32,23 @@ type Props = {
   onInstall?: (id: string, contentPackRev: number, parameters: unknown, shareRequest: EntitySharePayload) => void;
 };
 
-const headerFormatter = (header: React.ReactNode) => {
-  if (header === 'Action') {
-    return <th className="text-right">{header}</th>;
-  }
-
-  return <th>{header}</th>;
-};
-
 const ContentPackVersions = ({
   onDeletePack = () => {},
   contentPackRevisions,
   onInstall = () => {},
   onChange = () => {},
 }: Props) => {
+  const { t } = useTranslation('content_packs');
   const { contentPacks } = contentPackRevisions;
-  const headers = ['Select', 'Revision', 'Action'];
+  const actionHeader = t('versions.action');
+  const headers = [t('versions.select'), t('versions.revision'), actionHeader];
+  const headerFormatter = (header: React.ReactNode) => {
+    if (header === actionHeader) {
+      return <th className="text-right">{header}</th>;
+    }
+
+    return <th>{header}</th>;
+  };
   const rowFormatter = (item: ContentPackInstallation) => (
     <ContentPackVersionItem
       pack={item}

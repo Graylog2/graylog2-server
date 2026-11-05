@@ -15,29 +15,32 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import CommonNotificationSummary from 'components/event-notifications/event-notification-types/CommonNotificationSummary';
 
 import type { TeamsNotificationSummaryV2Type } from '../types';
 
 function TeamsNotificationSummary({ notification, ...restProps }: TeamsNotificationSummaryV2Type) {
+  const { t } = useTranslation('integrations');
+
   return (
     <CommonNotificationSummary {...restProps} notification={notification}>
       <tr>
-        <td>Webhook URL</td>
+        <td>{t('teams_notification_v2_details.webhook_url_label')}</td>
         <td>{notification.config.webhook_url}</td>
       </tr>
 
       <tr>
-        <td>Adaptive Card Template</td>
+        <td>{t('teams_notification_v2_details.adaptive_card_label')}</td>
         <td>{notification.config.adaptive_card}</td>
       </tr>
       <tr>
-        <td>Time Zone</td>
+        <td>{t('teams_notification_details.time_zone_label')}</td>
         <td>{notification.config.time_zone}</td>
       </tr>
       <tr>
-        <td>Message Backlog Limit</td>
+        <td>{t('teams_notification_v2_details.backlog_limit_label')}</td>
         <td>{notification.config.backlog_size}</td>
       </tr>
     </CommonNotificationSummary>

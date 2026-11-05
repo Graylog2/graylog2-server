@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import React from 'react';
 import { Navigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { Row, Col, Tabs, Badge } from 'components/bootstrap';
@@ -45,6 +46,7 @@ const SoftBorderTabs = styled(Tabs)(
 );
 
 const CollectorsDeploymentPage = () => {
+  const { t } = useTranslation('collectors');
   const { data: config, isLoading } = useCollectorsConfig();
   const tokenCount = useEnrollmentTokenCount();
   const { canDeployCollectors, canViewEnrollmentTokens } = useCollectorPermissions();
@@ -76,31 +78,28 @@ const CollectorsDeploymentPage = () => {
   }
 
   return (
-    <DocumentTitle title="Deploy Collectors">
+    <DocumentTitle title={t('pages.deployment.title')}>
       <CollectorsPageNavigation />
       <PageHeader
         title={
           <>
-            Deploy Collectors <PreviewBadge />
+            {t('pages.deployment.title')} <PreviewBadge />
           </>
         }
         documentationLink={{
-          title: 'Collectors documentation',
+          title: t('pages.documentation_title'),
           path: DocsHelper.PAGES.COLLECTORS,
         }}>
-        <span>
-          Run the command on any number of hosts &mdash; they enroll into the fleet you pick and appear as they check
-          in.
-        </span>
+        <span>{t('pages.deployment.description')}</span>
       </PageHeader>
       <Row className="content">
         <Col md={12}>
           <SoftBorderTabs defaultValue={canDeployCollectors ? 'deploy' : 'tokens'} onChange={handleTabChange}>
             <Tabs.List>
-              {canDeployCollectors && <Tabs.Tab value="deploy">Deploy</Tabs.Tab>}
+              {canDeployCollectors && <Tabs.Tab value="deploy">{t('pages.deployment.deploy_tab')}</Tabs.Tab>}
               {canViewEnrollmentTokens && (
                 <Tabs.Tab value="tokens">
-                  Enrollment tokens
+                  {t('pages.deployment.tokens_tab')}
                   {tokenCount !== undefined && (
                     <>
                       {' '}
@@ -117,10 +116,7 @@ const CollectorsDeploymentPage = () => {
             )}
             {canViewEnrollmentTokens && (
               <Tabs.Panel value="tokens">
-                <p className="description">
-                  Tokens authorize new Collectors to enroll into a fleet. Deleting a token does not affect
-                  already-enrolled Collectors.
-                </p>
+                <p className="description">{t('pages.deployment.tokens_description')}</p>
                 <EnrollmentTokenList />
               </Tabs.Panel>
             )}

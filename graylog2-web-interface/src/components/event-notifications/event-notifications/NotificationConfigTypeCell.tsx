@@ -18,6 +18,7 @@ import * as React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
+import notificationTypeTitle from 'components/event-notifications/notificationTypeTitle';
 
 type Props = {
   notification: EventNotification;
@@ -34,7 +35,7 @@ const getNotificationPlugin = (type: string) => {
 const NotificationConfigTypeCell = ({ notification }: Props) => {
   const plugin = getNotificationPlugin(notification.config.type);
 
-  return <div>{plugin?.displayName || notification.config.type}</div>;
+  return <div>{notificationTypeTitle(plugin) || notification.config.type}</div>;
 };
 
 export default NotificationConfigTypeCell;

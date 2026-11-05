@@ -1,0 +1,210 @@
+{
+  "action_links": {
+    "create": "Créer un service",
+    "edit_active": "Modifier le service actif",
+    "view_active": "Afficher le service actif"
+  },
+  "active_directory": {
+    "create_title": "Créer un service d'authentification Active Directory",
+    "edit_title": "Modifier le service d'authentification Active Directory",
+    "help": {
+      "system_user_dn": "Le nom d'utilisateur pour la connexion initiale au serveur Active Directory, par exemple <code>ldapbind@some.domain</code>.<lineBreak/>Il doit correspondre au <code>userPrincipalName</code> de cet utilisateur.",
+      "system_user_password": "Le mot de passe pour la connexion initiale au serveur Active Directory.",
+      "user_full_name_attribute": "Attribut Active Directory à utiliser pour le nom complet d'un utilisateur synchronisé, par exemple <code>displayName</code>.<lineBreak/>",
+      "user_name_attribute": "Attribut Active Directory à utiliser pour le nom d'utilisateur de l'utilisateur synchronisé, par exemple <code>userPrincipalName</code>.<lineBreak/>Essayez de charger un utilisateur test dans la section latérale <emphasis>Test de connexion utilisateur</emphasis> si vous ne savez pas quel attribut utiliser.",
+      "user_search_base": "La base de l'arborescence à laquelle limiter la requête de recherche Active Directory, par exemple <code>cn=users,dc=example,dc=com</code>."
+    }
+  },
+  "active_page": {
+    "title": "Service d'authentification actif"
+  },
+  "authenticators": {
+    "description": "Configurer l'authentification par en-tête de confiance.",
+    "documentation_title": "Documentation des authentificateurs",
+    "edit": "Modifier les authentificateurs",
+    "title": "Détails des authentificateurs"
+  },
+  "backend_details_page": {
+    "edit_service": "Modifier le service",
+    "title": "Détails du service d'authentification"
+  },
+  "backends_overview": {
+    "activate": "Activer",
+    "confirm_activate": "Voulez-vous vraiment activer le service d'authentification « {{title}} » ?",
+    "confirm_deactivate": "Voulez-vous vraiment désactiver le service d'authentification « {{title}} » ?",
+    "confirm_delete": "Voulez-vous vraiment supprimer le service d'authentification « {{title}} » ?",
+    "deactivate": "Désactiver",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "filter_label": "Filtrer les services",
+    "found_one": "{{count}} service d'authentification configuré trouvé sur le système.",
+    "found_other": "{{count}} services d'authentification configurés trouvés sur le système.",
+    "headers": {
+      "actions": "Actions",
+      "default_roles": "Rôles par défaut",
+      "description": "Description",
+      "title": "Titre"
+    },
+    "query_example": "Trouver les services dont le titre contient LDAP :",
+    "role_not_found": "Rôle introuvable",
+    "title": "Services d'authentification configurés",
+    "found_many": "{{count}} services d'authentification configurés trouvés sur le système."
+  },
+  "config_details": {
+    "edit": "Modifier",
+    "group_sync_feature_name": "synchronisation de groupes",
+    "group_sync_title": "Synchronisation des groupes"
+  },
+  "connection_test": {
+    "default_error": "Une erreur est survenue",
+    "description": "Effectue une vérification de connexion en arrière-plan avec l'adresse et les identifiants définis à l'étape « Configuration du serveur ».",
+    "submit": "Tester la connexion au serveur",
+    "title": "Vérification de la connexion au serveur"
+  },
+  "create_page": {
+    "getting_started_title": "Créer un nouveau service d'authentification",
+    "title": "Créer un service d'authentification"
+  },
+  "directory_help": {
+    "default_roles": "Les rôles par défaut obtenus par les utilisateurs synchronisés. Tous les utilisateurs ont besoin du rôle <code>Reader</code> pour utiliser l'interface web",
+    "default_user_timezone": "Choisissez le fuseau horaire par défaut des nouveaux utilisateurs.",
+    "user_search_pattern": "Par exemple <exampleCode>{{example}}</exampleCode>. La chaîne <code>{{placeholder}}</code> sera remplacée par le nom d'utilisateur saisi."
+  },
+  "getting_started": {
+    "description": "Outre les mécanismes d'authentification intégrés, comme la base de données d'utilisateurs interne ou LDAP/Active Directory, les services d'authentification peuvent aussi être étendus par des plugins pour prendre en charge d'autres mécanismes. Sélectionnez un service d'authentification pour en configurer un nouveau.",
+    "select_service": "Sélectionner un service",
+    "submit": "Commencer"
+  },
+  "ldap": {
+    "create_title": "Créer un service d'authentification LDAP",
+    "edit_title": "Modifier le service d'authentification LDAP",
+    "help": {
+      "email_attributes": "Attribut LDAP à utiliser pour l'adresse e-mail de l'utilisateur, par exemple <code>mail</code>.<lineBreak/>Vous pouvez spécifier plusieurs attributs ; saisissez <kbd>Tab</kbd> ou <kbd>Entrée</kbd> pour valider votre valeur.",
+      "system_user_dn": "Le nom d'utilisateur pour la connexion initiale au serveur LDAP, par exemple <code>cn=admin,dc=example,dc=com</code>. Cette valeur peut être facultative selon votre serveur LDAP.",
+      "system_user_password": "Le mot de passe pour la connexion initiale au serveur LDAP.",
+      "user_full_name_attribute": "Attribut LDAP à utiliser pour le nom complet d'un utilisateur synchronisé, par exemple <code>cn</code>.<lineBreak/>",
+      "user_name_attribute": "Attribut LDAP à utiliser pour le nom d'utilisateur de l'utilisateur synchronisé, par exemple <code>uid</code>.<lineBreak/>Essayez de charger un utilisateur test dans la section latérale <emphasis>Test de connexion utilisateur</emphasis> si vous ne savez pas quel attribut utiliser.",
+      "user_search_base": "L'arborescence de base à laquelle limiter la requête de recherche LDAP, par exemple <code>cn=users,dc=example,dc=com</code>.",
+      "user_unique_id_attribute": "Attribut LDAP à utiliser pour l'ID d'un utilisateur synchronisé, par exemple <code>entryUUID</code>.<lineBreak/>"
+    }
+  },
+  "login_test": {
+    "description": "Vérifiez les paramètres en chargeant l'entrée de l'utilisateur indiqué. Si vous omettez le mot de passe, aucune tentative d'authentification ne sera effectuée.",
+    "login_failed": "Échec de la connexion",
+    "password": "Mot de passe",
+    "submit": "Tester la connexion utilisateur",
+    "title": "Test de connexion utilisateur",
+    "user_attribute": "Attribut utilisateur",
+    "user_does_not_exist": "L'utilisateur n'existe pas",
+    "username": "Nom d'utilisateur",
+    "value": "Valeur"
+  },
+  "no_service_plugin": "Aucun plugin de service d'authentification configuré pour le type « {{type}} »",
+  "no_service_plugin_for": "Aucun plugin de service d'authentification configuré pour « {{type}} »",
+  "notifications": {
+    "create_failed": "La création du service d'authentification a échoué avec le statut : {{error}}",
+    "create_success": "Le service d'authentification a bien été créé.",
+    "error_title": "Erreur",
+    "success_title": "Succès",
+    "update_failed": "La mise à jour du service d'authentification a échoué avec le statut : {{error}}",
+    "update_success": "Le service d'authentification a bien été mis à jour."
+  },
+  "overview_page": {
+    "no_active_backend": "Aucun des services d'authentification configurés n'est actuellement actif.",
+    "title": "Tous les services d'authentification"
+  },
+  "page": {
+    "description": "Configurez les services d'authentification de ce cluster.",
+    "documentation_title": "Documentation de l'authentification"
+  },
+  "page_navigation": {
+    "authenticators": "Authentificateurs",
+    "services": "Services d'authentification"
+  },
+  "server_config": {
+    "description_label": "Description",
+    "hostname": "Nom d'hôte",
+    "port": "Port",
+    "reset_password": "Réinitialiser le mot de passe",
+    "server_address": "Adresse du serveur",
+    "system_password": "Mot de passe système",
+    "system_user_dn": "DN de l'utilisateur système",
+    "system_username": "Nom d'utilisateur système",
+    "title": "Configuration du serveur",
+    "title_label": "Titre",
+    "transport_security": "Sécurité du transport",
+    "transport_security_none": "Aucune",
+    "undo_reset": "Annuler la réinitialisation",
+    "verify_certificates": "Vérifier les certificats"
+  },
+  "synced_teams": {
+    "feature_name": "équipes",
+    "title": "Équipes synchronisées"
+  },
+  "synced_users": {
+    "edit": "Modifier",
+    "filter_label": "Filtrer les utilisateurs",
+    "found_one": "{{count}} utilisateur synchronisé trouvé.",
+    "found_other": "{{count}} utilisateurs synchronisés trouvés.",
+    "headers": {
+      "actions": "Actions",
+      "full_name": "Nom complet",
+      "roles": "Rôles",
+      "username": "Nom d'utilisateur"
+    },
+    "none_found": "Aucun utilisateur synchronisé n'a été trouvé.",
+    "role_not_found": "Rôle introuvable",
+    "title": "Utilisateurs synchronisés",
+    "found_many": "{{count}} utilisateurs synchronisés trouvés."
+  },
+  "trusted_header": {
+    "description": "Cet authentificateur permet de connecter un utilisateur sur la base d'un en-tête HTTP, sans interaction supplémentaire.",
+    "enable_sso": "Activer le single sign-on via un en-tête HTTP",
+    "enabled": "Activé",
+    "title": "Authentification par en-tête de confiance",
+    "trusted_proxies_hint": "Veuillez configurer le paramètre <code>trusted_proxies</code> dans le fichier de configuration du serveur {{productName}}.",
+    "update_config": "Mettre à jour la configuration",
+    "username_header": "En-tête du nom d'utilisateur",
+    "username_header_help": "En-tête HTTP contenant le nom de l'utilisateur, considéré comme implicitement fiable. (La correspondance de l'en-tête ne tient pas compte de la casse)"
+  },
+  "user_sync": {
+    "browser_time_zone": "Fuseau horaire du navigateur",
+    "default_assignments_hint": "La modification des rôles et fuseaux horaires par défaut n'affectera que les nouveaux utilisateurs créés via {{serviceTitle}} !",
+    "default_roles": "Rôles par défaut",
+    "default_user_time_zone": "Fuseau horaire par défaut des utilisateurs",
+    "email_attribute": "Attribut de l'e-mail",
+    "email_attributes": "Attributs de l'e-mail",
+    "full_name_attribute": "Attribut du nom complet",
+    "id_attribute": "Attribut de l'ID",
+    "name_attribute": "Attribut du nom",
+    "role_not_found": "Rôle introuvable",
+    "search_base_dn": "DN de base de la recherche",
+    "search_pattern": "Modèle de recherche",
+    "search_roles": "Rechercher des rôles",
+    "test_login_hint": "Nous vous recommandons de tester la connexion de votre utilisateur dans le panneau latéral pour vérifier vos paramètres.",
+    "title": "Synchronisation des utilisateurs"
+  },
+  "wizard": {
+    "confirm_remove_group_sync": "Voulez-vous vraiment supprimer la configuration de synchronisation de groupes de ce service d'authentification ?",
+    "create_failed": "Échec de la création du service d'authentification",
+    "edit_failed": "Échec de la modification du service d'authentification",
+    "finish_and_save": "Terminer et enregistrer le service",
+    "finish_and_save_identity_service": "Terminer et enregistrer le service d'identité",
+    "next_group_sync": "Suivant : synchronisation des groupes",
+    "next_user_sync": "Suivant : synchronisation des utilisateurs",
+    "server_validation_error": "Erreur de validation du serveur : {{errors}}",
+    "steps": {
+      "group_sync": "Synchronisation des groupes (facultatif)",
+      "server_config": "Configuration du serveur",
+      "user_sync": "Synchronisation des utilisateurs"
+    }
+  },
+  "wizard_header": {
+    "edit_title": "Modifier le service d'authentification - <emphasis>{{backendTitle}}</emphasis>"
+  },
+  "http_header_notifications": {
+    "load_failed": "Le chargement de la configuration de l'authentification par en-tête HTTP a échoué",
+    "update_success": "La configuration de l'authentification par en-tête HTTP a bien été mise à jour",
+    "update_failed": "La mise à jour de la configuration de l'authentification par en-tête HTTP a échoué avec le statut : {{error}}"
+  }
+}

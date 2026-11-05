@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation, Trans } from 'react-i18next';
 
 import DocsHelper from 'util/DocsHelper';
 import { Jumbotron } from 'components/bootstrap';
@@ -25,48 +26,60 @@ import WidgetGrid from 'views/components/WidgetGrid';
 import useWidgets from 'views/hooks/useWidgets';
 import usePluggableUpsellWrapper from 'hooks/usePluggableUpsellWrapper';
 
+// `Trans` provides the link texts as children.
+const EnterpriseLink = ({ children = undefined }: React.PropsWithChildren) => (
+  <a href="https://www.graylog.org/graylog-enterprise-edition" target="_blank" rel="noopener noreferrer">
+    {children}
+  </a>
+);
+
+const DashboardsDocumentationLink = ({ children = undefined }: React.PropsWithChildren) => (
+  <DocumentationLink page={DocsHelper.PAGES.DASHBOARDS} text={children} />
+);
+
 const NoWidgetsInfo = () => {
   const UpsellWrapper = usePluggableUpsellWrapper();
+  const { t } = useTranslation('search');
 
   return (
     <Jumbotron>
       <h2>
-        <IfDashboard>This dashboard has no widgets yet</IfDashboard>
-        <IfSearch>There are no widgets defined to visualize the search result</IfSearch>
+        <IfDashboard>{t('empty_state.no_widgets_dashboard')}</IfDashboard>
+        <IfSearch>{t('empty_state.no_widgets_search')}</IfSearch>
       </h2>
       <br />
       <p>
-        Create a new widget by selecting a widget type in the left sidebar section &quot;Create&quot;.
+        {t('empty_state.create_widget_hint')}
         <br />
       </p>
-      <p>A few tips for creating searches and dashboards</p>
+      <p>{t('empty_state.tips_title')}</p>
       <ul>
         <li>
           <p>
-            1. Start with a <b>question</b> you want to answer. Define the problem you want to solve.
+            1. <Trans i18nKey="empty_state.tip_1" ns="search" components={{ bold: <b /> }} />
           </p>
         </li>
         <li>
           <p>
-            2. <b>Limit</b> the data to only the data points you want to see.
+            2. <Trans i18nKey="empty_state.tip_2" ns="search" components={{ bold: <b /> }} />
           </p>
         </li>
         <li>
           <p>
-            3. <b>Visualize</b> the data. Does it answer your question?
+            3. <Trans i18nKey="empty_state.tip_3" ns="search" components={{ bold: <b /> }} />
           </p>
         </li>
         <IfDashboard>
           <li>
             <p>
-              4. <b>Share</b> the dashboard with your colleagues. Prepare it for <b>reuse</b> by using parameters
+              4. <Trans i18nKey="empty_state.tip_4" ns="search" components={{ bold: <b /> }} />
               <UpsellWrapper>
                 {' '}
-                (contained in{' '}
-                <a href="https://www.graylog.org/graylog-enterprise-edition" target="_blank" rel="noopener noreferrer">
-                  Graylog Enterprise
-                </a>
-                )
+                <Trans
+                  t={t}
+                  i18nKey="query.contained_in_enterprise"
+                  components={{ enterpriseLink: <EnterpriseLink /> }}
+                />
               </UpsellWrapper>
               .
             </p>
@@ -74,8 +87,7 @@ const NoWidgetsInfo = () => {
         </IfDashboard>
       </ul>
       <p>
-        You can also have a look at the <DocumentationLink page={DocsHelper.PAGES.DASHBOARDS} text="documentation" />,
-        to learn more about the widget creation.
+        <Trans t={t} i18nKey="query.documentation_hint" components={{ docsLink: <DashboardsDocumentationLink /> }} />
       </p>
     </Jumbotron>
   );

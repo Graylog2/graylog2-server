@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import moment from 'moment';
 
 import useMaxIndexRotationLimit from 'hooks/useMaxIndexRotationLimit';
@@ -61,6 +62,7 @@ const TimeBasedSizeOptimizingStrategyConfiguration = ({
   updateConfig,
   disabled = false,
 }: Props) => {
+  const { t } = useTranslation('indexsets');
   const timeSizeOptimizingFixedLeeway = useTimeSizeOptimizingFixedLeeway();
   const [indexLifetimeRange, setIndexLifetimeRange] = useState(
     getInitialRangeInDays(index_lifetime_min, index_lifetime_max, timeSizeOptimizingFixedLeeway),
@@ -84,7 +86,7 @@ const TimeBasedSizeOptimizingStrategyConfiguration = ({
     return 'error';
   };
 
-  const errorMessage = 'There needs to be at least 1 day between the minimum and maximum lifetime.';
+  const errorMessage = t('strategies.rotation_lifetime_error');
 
   const addYearToMaxRange = (currentMax: number, currentSelectedMax: number) => {
     if (!maxRotationPeriod && currentMax <= currentSelectedMax) {
@@ -107,26 +109,29 @@ const TimeBasedSizeOptimizingStrategyConfiguration = ({
     }
   };
 
-  const maxRotationPeriodHelpText = maxRotationPeriod
-    ? ` The max rotation period is set to ${durationToRoundedDays(maxRotationPeriod)} days by the Administrator.`
-    : '';
-  const rangeHelpTitle = timeSizeOptimizingFixedLeeway ? 'minimum' : 'minimum / maximum';
-  const fixedLeewayHint = timeSizeOptimizingFixedLeeway
-    ? ` The maximum number of days is ${durationToISOString(indexLifetimeRange[1])} because the fixed number of days between min and max is set to ${timeSizeOptimizingFixedLeeway}.`
-    : '';
+  const rangeHelpText = [
+    timeSizeOptimizingFixedLeeway
+      ? t('strategies.rotation_lifetime_help_minimum')
+      : t('strategies.rotation_lifetime_help_range'),
+    maxRotationPeriod &&
+      t('strategies.rotation_lifetime_max_rotation', { count: durationToRoundedDays(maxRotationPeriod) }),
+    timeSizeOptimizingFixedLeeway &&
+      t('strategies.rotation_lifetime_fixed_leeway', {
+        max: durationToISOString(indexLifetimeRange[1]),
+        leeway: timeSizeOptimizingFixedLeeway,
+      }),
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <div>
       <RangeInput
         disabled={disabled}
-        label="Lifetime in days"
+        label={t('strategies.rotation_lifetime_label')}
         id="lifetime-range"
         value={timeSizeOptimizingFixedLeeway ? indexLifetimeRange[0] : indexLifetimeRange}
-        help={
-          isValidRange(indexLifetimeRange)
-            ? `The ${rangeHelpTitle} number of days the data in this index is kept before it is retained. ${maxRotationPeriodHelpText} ${fixedLeewayHint}`
-            : errorMessage
-        }
+        help={isValidRange(indexLifetimeRange) ? rangeHelpText : errorMessage}
         min={1}
         step={1}
         bsStyle={validationState(indexLifetimeRange)}

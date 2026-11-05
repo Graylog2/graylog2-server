@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -30,6 +31,7 @@ type Props = {
 };
 
 const EditTemplate = ({ template }: Props) => {
+  const { t } = useTranslation('indexsets');
   const sendTelemetry = useSendTelemetry();
   const { push } = useHistory();
   const { updateTemplate } = useTemplateMutation();
@@ -61,8 +63,8 @@ const EditTemplate = ({ template }: Props) => {
   return (
     <TemplateForm
       onCancel={onCancel}
-      submitButtonText="Update template"
-      submitLoadingText="Updating template..."
+      submitButtonText={t('templates.update')}
+      submitLoadingText={t('templates.updating')}
       onSubmit={onSubmit}
       initialValues={template}
     />

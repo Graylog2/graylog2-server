@@ -1,0 +1,210 @@
+{
+  "action_links": {
+    "create": "Criar serviço",
+    "edit_active": "Editar serviço ativo",
+    "view_active": "Visualizar serviço ativo"
+  },
+  "active_directory": {
+    "create_title": "Criar serviço de autenticação Active Directory",
+    "edit_title": "Editar serviço de autenticação Active Directory",
+    "help": {
+      "system_user_dn": "O nome de usuário para a conexão inicial com o servidor Active Directory, por exemplo <code>ldapbind@some.domain</code>.<lineBreak/>Deve corresponder ao <code>userPrincipalName</code> desse usuário.",
+      "system_user_password": "A senha para a conexão inicial com o servidor Active Directory.",
+      "user_full_name_attribute": "Qual atributo do Active Directory usar para o nome completo de um usuário sincronizado, por exemplo <code>displayName</code>.<lineBreak/>",
+      "user_name_attribute": "Qual atributo do Active Directory usar para o nome completo do usuário sincronizado, por exemplo <code>userPrincipalName</code>.<lineBreak/>Tente carregar um usuário de teste na seção da barra lateral <emphasis>Teste de login do usuário</emphasis>, se não tiver certeza de qual atributo usar.",
+      "user_search_base": "A árvore base para limitar a consulta de pesquisa do Active Directory, por exemplo <code>cn=users,dc=example,dc=com</code>."
+    }
+  },
+  "active_page": {
+    "title": "Serviço de autenticação ativo"
+  },
+  "authenticators": {
+    "description": "Configure a autenticação por cabeçalho confiável.",
+    "documentation_title": "Documentação dos autenticadores",
+    "edit": "Editar autenticadores",
+    "title": "Detalhes dos autenticadores"
+  },
+  "backend_details_page": {
+    "edit_service": "Editar serviço",
+    "title": "Detalhes do serviço de autenticação"
+  },
+  "backends_overview": {
+    "activate": "Ativar",
+    "confirm_activate": "Você realmente deseja ativar o serviço de autenticação \"{{title}}\"",
+    "confirm_deactivate": "Você realmente deseja desativar o serviço de autenticação \"{{title}}\"",
+    "confirm_delete": "Você realmente deseja excluir o serviço de autenticação \"{{title}}\"",
+    "deactivate": "Desativar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "filter_label": "Filtrar serviços",
+    "found_one": "Foi encontrado {{count}} serviço de autenticação configurado no sistema.",
+    "found_other": "Foram encontrados {{count}} serviços de autenticação configurados no sistema.",
+    "headers": {
+      "actions": "Ações",
+      "default_roles": "Funções padrão",
+      "description": "Descrição",
+      "title": "Título"
+    },
+    "query_example": "Encontre backends com um título contendo LDAP:",
+    "role_not_found": "Função não encontrada",
+    "title": "Serviços de autenticação configurados",
+    "found_many": "Foram encontrados {{count}} serviços de autenticação configurados no sistema."
+  },
+  "config_details": {
+    "edit": "Editar",
+    "group_sync_feature_name": "sincronização de grupos",
+    "group_sync_title": "Sincronização de grupos"
+  },
+  "connection_test": {
+    "default_error": "Ocorreu um erro",
+    "description": "Executa uma verificação de conexão em segundo plano com o endereço e as credenciais definidos na etapa \"Configuração do servidor\".",
+    "submit": "Testar conexão com o servidor",
+    "title": "Verificação de conexão com o servidor"
+  },
+  "create_page": {
+    "getting_started_title": "Criar novo serviço de autenticação",
+    "title": "Criar serviço de autenticação"
+  },
+  "directory_help": {
+    "default_roles": "As funções padrão que os usuários sincronizados receberão. Todos os usuários precisam da função <code>Reader</code> para usar a interface web",
+    "default_user_timezone": "Escolha o fuso horário padrão para novos usuários.",
+    "user_search_pattern": "Por exemplo <exampleCode>{{example}}</exampleCode>. A string <code>{{placeholder}}</code> será substituída pelo nome de usuário informado."
+  },
+  "getting_started": {
+    "description": "Além dos mecanismos de autenticação integrados, como o banco de dados interno de usuários ou LDAP/Active Directory, os serviços de autenticação também podem ser estendidos por plugins para oferecer suporte a outros mecanismos de autenticação. Selecione um serviço de autenticação para configurar um novo.",
+    "select_service": "Selecione um serviço",
+    "submit": "Começar"
+  },
+  "ldap": {
+    "create_title": "Criar serviço de autenticação LDAP",
+    "edit_title": "Editar serviço de autenticação LDAP",
+    "help": {
+      "email_attributes": "Qual atributo LDAP usar para o endereço de e-mail do usuário, por exemplo <code>mail</code>.<lineBreak/>Você pode especificar vários atributos; digite <kbd>Tab</kbd> ou <kbd>Enter</kbd> para aceitar seu valor.",
+      "system_user_dn": "O nome de usuário para a conexão inicial com o servidor LDAP, por exemplo <code>cn=admin,dc=example,dc=com</code>; isso pode ser opcional, dependendo do seu servidor LDAP.",
+      "system_user_password": "A senha para a conexão inicial com o servidor LDAP.",
+      "user_full_name_attribute": "Qual atributo LDAP usar para o nome completo de um usuário sincronizado, por exemplo <code>cn</code>.<lineBreak/>",
+      "user_name_attribute": "Qual atributo LDAP usar para o nome de usuário do usuário sincronizado, por exemplo <code>uid</code>.<lineBreak/>Tente carregar um usuário de teste na seção da barra lateral <emphasis>Teste de login do usuário</emphasis>, se não tiver certeza de qual atributo usar.",
+      "user_search_base": "A árvore base para limitar a consulta de pesquisa LDAP, por exemplo <code>cn=users,dc=example,dc=com</code>.",
+      "user_unique_id_attribute": "Qual atributo LDAP usar para o ID de um usuário sincronizado, por exemplo <code>entryUUID</code>.<lineBreak/>"
+    }
+  },
+  "login_test": {
+    "description": "Verifique as configurações carregando a entrada do nome de usuário informado. Se você omitir a senha, nenhuma tentativa de autenticação será feita.",
+    "login_failed": "Falha no login",
+    "password": "Senha",
+    "submit": "Testar login do usuário",
+    "title": "Teste de login do usuário",
+    "user_attribute": "Atributo do usuário",
+    "user_does_not_exist": "O usuário não existe",
+    "username": "Nome de usuário",
+    "value": "Valor"
+  },
+  "no_service_plugin": "Nenhum plugin de serviço de autenticação configurado para o tipo \"{{type}}\"",
+  "no_service_plugin_for": "Nenhum plugin de serviço de autenticação configurado para \"{{type}}\"",
+  "notifications": {
+    "create_failed": "Falha ao criar o serviço de autenticação com status: {{error}}",
+    "create_success": "O serviço de autenticação foi criado com sucesso.",
+    "error_title": "Erro",
+    "success_title": "Sucesso",
+    "update_failed": "Falha ao atualizar o serviço de autenticação com status: {{error}}",
+    "update_success": "O serviço de autenticação foi atualizado com sucesso."
+  },
+  "overview_page": {
+    "no_active_backend": "Nenhum dos serviços de autenticação configurados está ativo no momento.",
+    "title": "Todos os serviços de autenticação"
+  },
+  "page": {
+    "description": "Configure os serviços de autenticação deste cluster.",
+    "documentation_title": "Documentação de autenticação"
+  },
+  "page_navigation": {
+    "authenticators": "Autenticadores",
+    "services": "Serviços de autenticação"
+  },
+  "server_config": {
+    "description_label": "Descrição",
+    "hostname": "Nome do host",
+    "port": "Porta",
+    "reset_password": "Redefinir senha",
+    "server_address": "Endereço do servidor",
+    "system_password": "Senha do sistema",
+    "system_user_dn": "DN do usuário do sistema",
+    "system_username": "Nome de usuário do sistema",
+    "title": "Configuração do servidor",
+    "title_label": "Título",
+    "transport_security": "Segurança de transporte",
+    "transport_security_none": "Nenhuma",
+    "undo_reset": "Desfazer redefinição",
+    "verify_certificates": "Verificar certificados"
+  },
+  "synced_teams": {
+    "feature_name": "equipes",
+    "title": "Equipes sincronizadas"
+  },
+  "synced_users": {
+    "edit": "Editar",
+    "filter_label": "Filtrar usuários",
+    "found_one": "Foi encontrado {{count}} usuário sincronizado.",
+    "found_other": "Foram encontrados {{count}} usuários sincronizados.",
+    "headers": {
+      "actions": "Ações",
+      "full_name": "Nome completo",
+      "roles": "Funções",
+      "username": "Nome de usuário"
+    },
+    "none_found": "Nenhum usuário sincronizado foi encontrado.",
+    "role_not_found": "Função não encontrada",
+    "title": "Usuários sincronizados",
+    "found_many": "Foram encontrados {{count}} usuários sincronizados."
+  },
+  "trusted_header": {
+    "description": "Este autenticador permite fazer login de um usuário com base em um cabeçalho HTTP, sem nenhuma interação adicional.",
+    "enable_sso": "Ativar login único por meio de cabeçalho HTTP",
+    "enabled": "Ativado",
+    "title": "Autenticação por cabeçalho confiável",
+    "trusted_proxies_hint": "Configure a opção <code>trusted_proxies</code> no arquivo de configuração do servidor {{productName}}.",
+    "update_config": "Atualizar configuração",
+    "username_header": "Cabeçalho de nome de usuário",
+    "username_header_help": "Cabeçalho HTTP que contém o nome do usuário implicitamente confiável. (A correspondência do cabeçalho não diferencia maiúsculas de minúsculas)"
+  },
+  "user_sync": {
+    "browser_time_zone": "Fuso horário do navegador",
+    "default_assignments_hint": "Alterar as atribuições padrão de função e fuso horário afetará apenas os novos usuários criados por meio de {{serviceTitle}}!",
+    "default_roles": "Funções padrão",
+    "default_user_time_zone": "Fuso horário padrão do usuário",
+    "email_attribute": "Atributo de e-mail",
+    "email_attributes": "Atributos de e-mail",
+    "full_name_attribute": "Atributo de nome completo",
+    "id_attribute": "Atributo de ID",
+    "name_attribute": "Atributo de nome",
+    "role_not_found": "Função não encontrada",
+    "search_base_dn": "DN base da pesquisa",
+    "search_pattern": "Padrão de pesquisa",
+    "search_roles": "Pesquisar funções",
+    "test_login_hint": "Recomendamos que você teste o login de um usuário no painel da barra lateral para verificar suas configurações.",
+    "title": "Sincronização de usuários"
+  },
+  "wizard": {
+    "confirm_remove_group_sync": "Você realmente deseja remover a configuração de sincronização de grupos deste serviço de autenticação?",
+    "create_failed": "Falha ao criar o serviço de autenticação",
+    "edit_failed": "Falha ao editar o serviço de autenticação",
+    "finish_and_save": "Concluir e salvar serviço",
+    "finish_and_save_identity_service": "Concluir e salvar serviço de identidade",
+    "next_group_sync": "Próximo: sincronização de grupos",
+    "next_user_sync": "Próximo: sincronização de usuários",
+    "server_validation_error": "Erro de validação do servidor: {{errors}}",
+    "steps": {
+      "group_sync": "Sincronização de grupos (Opc.)",
+      "server_config": "Configuração do servidor",
+      "user_sync": "Sincronização de usuários"
+    }
+  },
+  "wizard_header": {
+    "edit_title": "Editar serviço de autenticação - <emphasis>{{backendTitle}}</emphasis>"
+  },
+  "http_header_notifications": {
+    "load_failed": "Falha ao carregar a configuração de autenticação por cabeçalho HTTP",
+    "update_success": "Configuração de autenticação por cabeçalho HTTP atualizada com sucesso",
+    "update_failed": "Falha ao atualizar a configuração de autenticação por cabeçalho HTTP com status: {{error}}"
+  }
+}

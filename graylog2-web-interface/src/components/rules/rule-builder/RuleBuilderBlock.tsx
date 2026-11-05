@@ -16,6 +16,7 @@
  */
 import React, { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import RuleBlockDisplay from 'components/rules/rule-builder/RuleBlockDisplay';
 import RuleBlockForm from 'components/rules/rule-builder/RuleBlockForm';
@@ -25,6 +26,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import type { RuleBlock, BlockType, BlockDict, OutputVariables } from './types';
 import { getDictForFunction } from './helpers';
+import useRuleBuilderText from './useRuleBuilderText';
 
 const BlockContainer = styled.div(
   ({ theme }) => css`
@@ -54,6 +56,8 @@ const RuleBuilderBlock = ({
   updateBlock,
   deleteBlock,
 }: Props) => {
+  const { t } = useTranslation('pipelines');
+  const ruleBuilderText = useRuleBuilderText();
   const [currentBlockDict, setCurrentBlockDict] = useState<BlockDict>(undefined);
   const [editMode, setEditMode] = useState<boolean>(false);
   const [insertMode, setInsertMode] = useState<'above' | 'below' | undefined>(undefined);
@@ -200,9 +204,9 @@ const RuleBuilderBlock = ({
   const isBlockNegatable = (): boolean => type === 'condition';
 
   const options = blockDict.map(({ name, description, rule_builder_name, deprecated }) => ({
-    label: rule_builder_name,
+    label: ruleBuilderText(rule_builder_name),
     value: name,
-    description,
+    description: ruleBuilderText(description),
     deprecated,
   }));
 
@@ -241,7 +245,9 @@ const RuleBuilderBlock = ({
             <Modal show bsSize="lg" onHide={resetInsertBlock}>
               <Modal.Header>
                 <Modal.Title>
-                  Insert new action {insertMode} action N°{order + 1}
+                  {insertMode === 'above'
+                    ? t('block.insert_title_above', { order: order + 1 })
+                    : t('block.insert_title_below', { order: order + 1 })}
                 </Modal.Title>
               </Modal.Header>
               <Modal.Body>

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { PaginatedEntityTable } from 'components/common';
 import type { Sort } from 'stores/PaginationTypes';
@@ -32,6 +33,7 @@ export const DEFAULT_LAYOUT = {
 };
 
 const IndexSetTemplatesList = () => {
+  const { t } = useTranslation('indexsets');
   const templateActions = useCallback(
     ({ id, title, built_in, default: isDefault, enabled: isEnabled }: IndexSetTemplate) => (
       <TemplateActions id={id} title={title} built_in={built_in} isDefault={isDefault} isEnabled={isEnabled} />
@@ -41,14 +43,14 @@ const IndexSetTemplatesList = () => {
 
   return (
     <PaginatedEntityTable<IndexSetTemplate>
-      humanName="index set templates"
+      humanName={t('hooks.templates_human_name')}
       entityActions={templateActions}
       tableLayout={DEFAULT_LAYOUT}
       fetchEntities={fetchIndexSetTemplates}
       keyFn={keyFn}
       entityAttributesAreCamelCase={false}
       columnRenderers={customColumnRenderers}
-      searchPlaceholder="Search for index set template"
+      searchPlaceholder={t('hooks.templates_search_placeholder')}
     />
   );
 };

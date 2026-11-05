@@ -1,0 +1,524 @@
+{
+  "shared": {
+    "leader": "Leader",
+    "not_available": "N/D"
+  },
+  "cluster_configuration_nodes": {
+    "loading_search_backend": "Caricamento dei nodi del backend di ricerca...",
+    "search_backend_unknown": "Impossibile determinare il backend di ricerca configurato.",
+    "search_placeholder": "Cerca nodi…",
+    "all_nodes": "Tutti i nodi",
+    "data_nodes": "Nodi dati",
+    "opensearch_nodes": "Nodi OpenSearch",
+    "mongodb_nodes": "Nodi MongoDB"
+  },
+  "cluster_column_titles": {
+    "cpu": "CPU",
+    "memory": "Memoria",
+    "jvm": "JVM",
+    "indexing": "Indicizzazione",
+    "storage": "Archiviazione",
+    "buffers": "Buffer",
+    "journal": "Journal",
+    "data_lake_journal": "Journal del Data Lake",
+    "throughput": "Throughput"
+  },
+  "data_nodes_expandable": {
+    "title": "Nodi dati"
+  },
+  "indexing_metrics_cell": {
+    "docs": "Documenti",
+    "latency": "Latenza"
+  },
+  "node_actions": {
+    "thread_dump": "Ottieni thread dump",
+    "process_buffer_dump": "Ottieni dump del process buffer",
+    "metrics": "Metriche"
+  },
+  "graylog_node_actions": {
+    "pause_message_processing": "Metti in pausa l'elaborazione dei messaggi",
+    "resume_message_processing": "Riprendi l'elaborazione dei messaggi",
+    "override_load_balancer_dead": "Sovrascrivi lo stato del load balancer in DEAD",
+    "override_load_balancer_alive": "Sovrascrivi lo stato del load balancer in ALIVE",
+    "local_message_inputs": "Input di messaggi locali",
+    "recent_system_logs": "Ottieni i messaggi di log di sistema recenti",
+    "message_processing_title": "Elaborazione dei messaggi",
+    "pause_confirm": "Stai per <b>mettere in pausa</b> l'elaborazione dei messaggi nel nodo <b>{{nodeName}}</b>. Sei sicuro?",
+    "resume_confirm": "Stai per <b>riprendere</b> l'elaborazione dei messaggi nel nodo <b>{{nodeName}}</b>. Sei sicuro?",
+    "load_balancer_title": "Load Balancer",
+    "load_balancer_confirm": "Stai per modificare lo stato del load balancer del nodo <b>{{nodeName}}</b> in <b>{{status}}</b>. Sei sicuro?"
+  },
+  "graylog_nodes_expandable": {
+    "title": "Nodi {{productName}}"
+  },
+  "load_balancer_status_cell": {
+    "aria_label": "Load balancer {{status}}",
+    "status_alive": "Attivo",
+    "status_dead": "Inattivo",
+    "status_throttled": "Limitato"
+  },
+  "processing_state_cell": {
+    "aria_label": "Elaborazione dei messaggi {{status}}",
+    "enabled": "Abilitato",
+    "disabled": "Disabilitato"
+  },
+  "mongodb_nodes_expandable": {
+    "title": "Nodi MongoDB"
+  },
+  "mongodb_profiling_action": {
+    "description": "La profilazione di MongoDB aiuta a individuare le query lente e a risolvere i problemi di prestazioni sui nodi del cluster.",
+    "enabling_profiling": "Attivazione della profilazione...",
+    "enable_confirm": "Vuoi attivare la profilazione <b>Slow Ops</b> ({{threshold}}) su tutti i nodi MongoDB? Viene applicata subito senza riavvio, ma si reimposta dopo un riavvio se non è configurata all'avvio.",
+    "enable_profiling": "Attiva profiling",
+    "disable_profiling": "Disattiva profiling",
+    "enabling": "Attivazione...",
+    "disabling": "Disattivazione...",
+    "loading_status": "Caricamento stato...",
+    "loading_status_title": "Caricamento dello stato di profiling di MongoDB",
+    "enable_title": "Imposta il profiling su Slow Ops su tutti i nodi MongoDB",
+    "disable_title": "Disattiva il profiling su tutti i nodi MongoDB",
+    "status_loading": "Caricamento dello stato di profiling attuale dei nodi MongoDB...",
+    "status_off": "Il profiling è disattivato su tutti i nodi MongoDB ({{summary}}). Attivalo per raccogliere diagnostiche sulle query lente.",
+    "status_mixed": "Il profiling è diverso tra i nodi MongoDB ({{summary}}). Attiva il profiling per rendere coerenti le diagnostiche.",
+    "status_enabled": "Il profiling è attivo su tutti i nodi MongoDB ({{summary}}). Disattivalo dopo la risoluzione dei problemi per ridurre il carico su MongoDB.",
+    "status_unavailable_with_summary": "Lo stato del profiling non è disponibile ({{summary}}). Puoi comunque modificarlo se necessario.",
+    "status_unavailable": "Lo stato del profiling non è disponibile. Puoi comunque modificarlo se necessario.",
+    "threshold_level": "livello 1",
+    "threshold_level_with_ms": "livello 1, soglia di {{slowMs}} ms",
+    "distribution": "OFF {{off}}, SLOW_OPS {{slowOps}}, ALL {{all}}",
+    "nodes_profiled_one": "{{enabledCount}}/{{count}} nodo con profiling",
+    "nodes_profiled_many": "{{enabledCount}}/{{count}} nodi con profiling",
+    "nodes_profiled_other": "{{enabledCount}}/{{count}} nodi con profiling"
+  },
+  "opensearch_nodes_expandable": {
+    "title": "Nodi OpenSearch"
+  },
+  "cluster_nodes_section_wrapper": {
+    "show_title": "Mostra {{title}}"
+  },
+  "cpu_metrics_cell": {
+    "load_1m": "Carico (1m)"
+  },
+  "graylog_cluster_overview": {
+    "cluster": "Cluster",
+    "cluster_id": "ID cluster:",
+    "not_available": "Non disponibile",
+    "number_of_nodes": "Numero di nodi:"
+  },
+  "cluster_support_bundle_info": {
+    "description": "Crea un file zip con informazioni utili per il debug del tuo cluster Graylog.",
+    "enterprise_customers": "I clienti Graylog Enterprise possono allegare i bundle al proprio ticket di supporto, così il team di supporto tecnico Graylog può analizzare e diagnosticare i problemi.",
+    "examine_content": "Controlla il contenuto del bundle prima di condividerlo. Potrebbe contenere dati sensibili come indirizzi IP, nomi host o persino password!",
+    "paid_license_only": "Solo gli utenti con una licenza a pagamento hanno diritto al supporto Graylog Enterprise. Puoi comunque usare questo file per altri scopi di debug."
+  },
+  "cluster_support_bundle_overview": {
+    "title": "Bundle di supporto del cluster",
+    "create": "Crea bundle di supporto",
+    "download": "Scarica",
+    "delete": "Elimina",
+    "filename": "Nome file",
+    "size": "Dimensione",
+    "no_bundles": "Nessun bundle di supporto trovato.",
+    "delete_title": "Elimina bundle di supporto",
+    "delete_confirm": "Sei sicuro di voler eliminare <strong>{{name}}</strong>?"
+  },
+  "log_level_metrics": {
+    "level": "Livello: {{level}}",
+    "total_written": "Totale scritto:",
+    "mean_rate": "Frequenza media:",
+    "one_minute_rate": "Frequenza 1 min:",
+    "per_second": "/ secondo"
+  },
+  "logging_subsystem": {
+    "subsystem": "Sottosistema: {{name}}"
+  },
+  "node_loggers": {
+    "show_log_level_metrics": "Mostra metriche dei livelli di log",
+    "hide_log_level_metrics": "Nascondi metriche dei livelli di log",
+    "total_log_messages": "Ha scritto un totale di <strong>{{throughput}} messaggi di log interni.</strong>"
+  },
+  "metric_details": {
+    "value": "Valore:",
+    "count": "Conteggio:",
+    "mean": "Media:",
+    "minimum": "Minimo:",
+    "maximum": "Massimo:",
+    "standard_deviation": "Deviazione standard:",
+    "percentile_95": "95° percentile:",
+    "percentile_98": "98° percentile:",
+    "percentile_99": "99° percentile:",
+    "invalid_type": "Tipo di metrica non valido: {{type}}",
+    "microseconds": "μs"
+  },
+  "meter_details": {
+    "total": "Totale:",
+    "events": "eventi",
+    "one_minute_avg": "Media 1 minuto:",
+    "five_minute_avg": "Media 5 minuti:",
+    "fifteen_minute_avg": "Media 15 minuti:"
+  },
+  "counter_rate": {
+    "calculating": "Calcolo in corso...",
+    "total": "({{total}} in totale)",
+    "per_second": "al secondo"
+  },
+  "metric_container": {
+    "loading": "Caricamento..."
+  },
+  "metrics_component": {
+    "fetch_error": "Impossibile recuperare le metriche dal nodo: il server ha restituito <em>{{responseMessage}}</em> con codice di stato {{status}}.",
+    "fetch_problem": "Si è verificato un problema durante il recupero delle metriche del nodo.",
+    "retry_in_background": "I tentativi di recupero continueranno in background.",
+    "fetch_error_last_metrics": "Impossibile recuperare le metriche dal nodo: il server ha restituito <em>{{responseMessage}}</em> con codice di stato {{status}}. Vengono mostrate le ultime metriche disponibili.",
+    "filter_placeholder": "Digita il nome di una metrica da filtrare…"
+  },
+  "metrics_list": {
+    "no_metrics": "Nessuna metrica corrisponde al filtro indicato. Assicurati di usare un'espressione regolare valida"
+  },
+  "buffer_usage": {
+    "metrics": "Metriche",
+    "utilization": "<strong>{{usage}} messaggi</strong> in {{title}}, utilizzo al {{percentage}}."
+  },
+  "input_types_data_table": {
+    "loading": "Caricamento dei tipi di input...",
+    "unavailable": "I tipi di input non sono disponibili.",
+    "documentation": "Documentazione",
+    "name": "Nome",
+    "type": "Tipo",
+    "filter": "Filtra"
+  },
+  "journal_details": {
+    "loading": "Caricamento delle metriche del journal...",
+    "disabled": "Il journal su disco è disabilitato su questo nodo.",
+    "unavailable": "Metriche del journal non disponibili.",
+    "overcommitted": "<strong>Attenzione!</strong> L'utilizzo del journal supera la dimensione massima definita. <overviewLink>Clicca qui</overviewLink> per maggiori informazioni.",
+    "configuration": "Configurazione",
+    "path": "Percorso:",
+    "earliest_entry": "Voce più vecchia:",
+    "maximum_size": "Dimensione massima:",
+    "maximum_age": "Età massima:",
+    "flush_policy": "Politica di svuotamento:",
+    "flush_policy_value": "Ogni {{messages}} messaggi o {{duration}}",
+    "maximum_age_format": "d [giorni] h [ore] m [minuti]",
+    "flush_duration_format": "h [ore] m [minuti] s [secondi]",
+    "utilization": "Utilizzo",
+    "unprocessed_messages": "<strong>{{messages}} messaggi non elaborati</strong> sono attualmente nel journal, in {{segments}} segmenti.",
+    "appended_and_read": "<strong>{{appended}} messaggi</strong> sono stati aggiunti nell'ultimo secondo, <strong>{{read}} messaggi</strong> sono stati letti nell'ultimo secondo."
+  },
+  "journal_state": {
+    "loading": "Caricamento delle metriche del journal...",
+    "unavailable": "Metriche del journal non disponibili.",
+    "summary_one": "Il journal contiene <strong>{{messages}} messaggi non elaborati</strong> in {{count}} segmento. <strong>{{appended}} messaggi</strong> aggiunti e <strong>{{read}} messaggi</strong> letti nell'ultimo secondo.",
+    "summary_other": "Il journal contiene <strong>{{messages}} messaggi non elaborati</strong> in {{count}} segmenti. <strong>{{appended}} messaggi</strong> aggiunti e <strong>{{read}} messaggi</strong> letti nell'ultimo secondo.",
+    "summary_many": "Il journal contiene <strong>{{messages}} messaggi non elaborati</strong> in {{count}} segmenti. <strong>{{appended}} messaggi</strong> aggiunti e <strong>{{read}} messaggi</strong> letti nell'ultimo secondo."
+  },
+  "jvm_heap_usage": {
+    "loading": "Caricamento delle informazioni sull'utilizzo dell'heap...",
+    "unavailable": "Informazioni sull'heap non disponibili.",
+    "usage": "La JVM sta usando <usedBlob /><strong> {{used}}</strong> dello spazio heap di <committedBlob /><strong> {{committed}}</strong> e non tenterà di usarne più di <maxBlob /><strong> {{max}}</strong>"
+  },
+  "node_list_item": {
+    "system_info_unavailable": "Le informazioni di sistema non sono al momento disponibili."
+  },
+  "node_maintenance_dropdown": {
+    "actions": "Azioni",
+    "configure_internal_logging": "Configura il log interno"
+  },
+  "node_overview": {
+    "plugins_installed_one": "{{count}} plugin installato",
+    "plugins_installed_other": "{{count}} plugin installati",
+    "inputs_running_one": "{{count}} input in esecuzione su questo nodo",
+    "inputs_running_other": "{{count}} input in esecuzione su questo nodo",
+    "memory_heap_usage": "Utilizzo memoria/heap",
+    "buffers": "Buffer",
+    "buffers_description": "I buffer servono a memorizzare nella cache piccole quantità di messaggi per un tempo molto breve (di solito millisecondi) mentre attraversano i diversi processori.",
+    "input_buffer": "Buffer di input",
+    "process_buffer": "Buffer di elaborazione",
+    "output_buffer": "Buffer di output",
+    "disk_journal": "Journal su disco",
+    "disk_journal_description": "I messaggi in arrivo vengono scritti nel journal su disco per garantirne la conservazione in caso di guasto del server. Il journal aiuta anche a mantenere la funzionalità se un output è troppo lento per tenere il passo con la frequenza dei messaggi o in presenza di picchi di messaggi in arrivo. In questo modo la memoria non viene sovraccaricata e si evitano pause di garbage collection troppo lunghe.",
+    "system": "Sistema",
+    "rest_api": "REST API",
+    "installed_plugins": "Plugin installati",
+    "manage_inputs": "Gestisci input",
+    "available_input_types": "Tipi di input disponibili",
+    "plugins_installed_many": "{{count}} plugin installati",
+    "inputs_running_many": "{{count}} input in esecuzione su questo nodo"
+  },
+  "nodes_actions": {
+    "details": "Dettagli",
+    "metrics": "Metriche",
+    "more_actions": "Altre azioni",
+    "pause_message_processing": "Metti in pausa l'elaborazione dei messaggi",
+    "resume_message_processing": "Riprendi l'elaborazione dei messaggi",
+    "pause_confirm": "Stai per mettere in pausa l'elaborazione dei messaggi in questo nodo. Sei sicuro?",
+    "resume_confirm": "Stai per riprendere l'elaborazione dei messaggi in questo nodo. Sei sicuro?",
+    "override_lb_status": "Sovrascrivi stato LB",
+    "status_alive": "ALIVE",
+    "status_dead": "DEAD",
+    "load_balancer_confirm": "Stai per modificare lo stato del load balancer di questo nodo in {{status}}. Sei sicuro?",
+    "local_message_inputs": "Input di messaggi locali",
+    "thread_dump": "Ottieni thread dump",
+    "process_buffer_dump": "Ottieni dump del process buffer",
+    "recent_system_logs": "Ottieni i messaggi di log di sistema recenti"
+  },
+  "nodes_list": {
+    "active_nodes_one": "C'è {{count}} nodo attivo",
+    "active_nodes_other": "Ci sono {{count}} nodi attivi",
+    "no_active_nodes": "Non ci sono nodi attivi.",
+    "active_nodes_many": "Ci sono {{count}} nodi attivi"
+  },
+  "plugins_data_table": {
+    "loading": "Caricamento dei plugin su questo nodo...",
+    "no_plugins": "Questo nodo non ha plugin installati.",
+    "name": "Nome",
+    "version": "Versione",
+    "author": "Autore",
+    "description": "Descrizione",
+    "website": "Sito web",
+    "filter": "Filtra"
+  },
+  "rest_api_overview": {
+    "transport_address": "Indirizzo di trasporto:",
+    "last_seen": "Ultimo contatto:"
+  },
+  "system_information": {
+    "pid_info": "PID {{pid}}, {{info}}",
+    "jvm_unavailable": "Le informazioni JVM per questo nodo non sono disponibili.",
+    "hostname": "Nome host:",
+    "node_id": "ID nodo:",
+    "version": "Versione:",
+    "version_codename": "{{version}}, nome in codice <em>{{codename}}</em>",
+    "jvm": "JVM:",
+    "time": "Ora:"
+  },
+  "system_overview_details": {
+    "pause_confirm": "Stai per mettere in pausa l'elaborazione dei messaggi in questo nodo. Sei sicuro?",
+    "resume_confirm": "Stai per riprendere l'elaborazione dei messaggi in questo nodo. Sei sicuro?",
+    "what_does_this_mean": "Cosa significa?",
+    "lifecycle_state": "Stato del ciclo di vita: <strong>{{lifecycle}}</strong>",
+    "marked_as_lb_status": "Contrassegnato come <strong>{{status}}</strong> per i load balancer",
+    "pause_processing": "Metti in pausa l'elaborazione",
+    "resume_processing": "Riprendi l'elaborazione",
+    "not_processing": "Il nodo <strong>non</strong> sta elaborando messaggi"
+  },
+  "system_overview_summary": {
+    "current_lifecycle_state": "Stato del ciclo di vita attuale:",
+    "message_processing": "Elaborazione dei messaggi:",
+    "enabled": "Attiva",
+    "disabled": "Disattivata",
+    "lb_indication": "Indicazione del load balancer:"
+  },
+  "bulk_actions": {
+    "dismiss": "Ignora"
+  },
+  "system_notifications_table": {
+    "title": "Notifiche",
+    "human_name": "notifiche"
+  },
+  "actions_cell": {
+    "dismiss": "Ignora"
+  },
+  "title_cell": {
+    "show_full_message": "Mostra il messaggio completo per: {{title}}"
+  },
+  "system_job": {
+    "acknowledge_failed": "Impossibile confermare il job",
+    "cancel_failed": "Impossibile annullare il job",
+    "cancel_confirm": "Sei sicuro di voler annullare il job di sistema \"{{info}}\"?",
+    "on_node": "- su",
+    "runtime": "durata: {{duration}}",
+    "cancel": "Annulla",
+    "acknowledge": "Conferma"
+  },
+  "system_jobs_component": {
+    "title": "Job di sistema",
+    "description": "Un job di sistema è un'attività di lunga durata che un nodo server di {{productName}} esegue per motivi di manutenzione. Alcuni job forniscono informazioni sull'avanzamento o possono essere interrotti."
+  },
+  "system_jobs_list": {
+    "no_active_jobs": "Nessun job di sistema attivo."
+  },
+  "system_messages_component": {
+    "title": "Messaggi di sistema",
+    "description": "I messaggi di sistema vengono generati dai nodi server di {{productName}} in determinati eventi che possono interessare gli amministratori di {{productName}}. Non è necessario intervenire attivamente su questi eventi, perché per ogni evento che richiede un'azione viene generata una notifica."
+  },
+  "system_messages_list": {
+    "timestamp": "Data e ora",
+    "node": "Nodo",
+    "message": "Messaggio"
+  },
+  "global_throughput": {
+    "aria_label": "Throughput: in entrata {{input}} / in uscita {{output}} msg/s",
+    "in_title": "Messaggi in entrata al secondo",
+    "out_title": "Messaggi in uscita al secondo"
+  },
+  "node_throughput": {
+    "loading": "Caricamento del throughput...",
+    "unable_to_load": "Impossibile caricare il throughput.",
+    "processing_long": "Elaborazione di <strong>{{totalIn}}</strong> msg/s in entrata e <strong>{{totalOut}}</strong> msg/s in uscita.",
+    "short": "In entrata {{totalIn}} / In uscita {{totalOut}} msg/s."
+  },
+  "telemetry_debug_entry_row": {
+    "delta": " (+{{delta}}ms)",
+    "pii_suspect": "Possibili PII: {{suspect}}",
+    "copy_as_json": "Copia evento come JSON"
+  },
+  "telemetry_debug_overlay": {
+    "badge_label": "Debug telemetria",
+    "badge": "Debug telemetria: {{count}}",
+    "drawer_label": "Pannello di debug della telemetria",
+    "resize_label": "Ridimensiona il pannello di debug della telemetria",
+    "title": "Debug telemetria ({{count}})",
+    "filter_label": "Filtra eventi",
+    "filter_placeholder": "Filtra per nome evento o payload...",
+    "resume": "Riprendi",
+    "pause": "Metti in pausa",
+    "clear": "Cancella",
+    "export_session": "Esporta sessione",
+    "collapse": "Comprimi",
+    "no_events": "Nessun evento di telemetria registrato per ora: interagisci con l'app per vederli qui.",
+    "time": "Ora",
+    "event": "Evento",
+    "action": "Azione",
+    "status": "Stato"
+  },
+  "cluster_configuration_page": {
+    "title": "Configurazione del cluster",
+    "description": "Questa pagina fornisce una panoramica in tempo reale dei nodi del cluster. Puoi mettere in pausa l'elaborazione dei messaggi in qualsiasi momento. I process buffer non accettano nuovi messaggi finché non la riprendi. Se il journal dei messaggi è abilitato per un nodo, come avviene per impostazione predefinita, i messaggi in arrivo vengono salvati su disco anche quando l'elaborazione è disabilitata."
+  },
+  "configurations_page": {
+    "title": "Configurazioni",
+    "description": "In questa pagina puoi configurare le impostazioni di sistema per i diversi sottosistemi.",
+    "plugins": "Plugin"
+  },
+  "enterprise_page": {
+    "document_title": "{{productName}} Enterprise",
+    "page_title": "<upsell>Prova</upsell> {{productName}} Enterprise",
+    "learn_more": "<upsell><productLink>Scopri di più</productLink> sulle funzionalità di {{productName}} Enterprise.</upsell>"
+  },
+  "process_buffer_dump_page": {
+    "title": "Dump del process buffer del nodo {{shortNodeId}} / {{hostname}}",
+    "taken_at": "Acquisito il <0/>"
+  },
+  "show_metrics_page": {
+    "title": "Metriche del nodo {{shortNodeId}} / {{hostname}}",
+    "description": "Tutti i nodi di {{productName}} forniscono un insieme di metriche interne per diagnosi, debug e monitoraggio. Puoi accedere a tutte le metriche anche tramite JMX.",
+    "total_metrics_one": "Questo nodo riporta un totale di {{count}} metrica.",
+    "total_metrics_other": "Questo nodo riporta un totale di {{count}} metriche.",
+    "total_metrics_many": "Questo nodo riporta un totale di {{count}} metriche."
+  },
+  "node_page": {
+    "title": "Nodo {{shortNodeId}} / {{hostname}}",
+    "description": "Questa pagina mostra i dettagli di un nodo server di {{productName}} attivo e raggiungibile nel cluster.",
+    "leader_node": "Questo è il nodo leader.",
+    "not_leader_node": "Questo <em>non</em> è il nodo leader."
+  },
+  "system_logs_page": {
+    "title": "I log di sistema più recenti (limitati a {{limit}}) del nodo {{shortNodeId}} / {{hostname}}",
+    "taken_at": "Acquisito il <0/>",
+    "reload": "Ricarica",
+    "back": "Indietro",
+    "document_title": "Log di sistema del nodo {{shortNodeId}} / {{hostname}}"
+  },
+  "system_notifications_page": {
+    "title": "Notifiche di sistema"
+  },
+  "system_overview_page": {
+    "title": "Panoramica del sistema"
+  },
+  "thread_dump_page": {
+    "title": "Thread dump del nodo {{shortNodeId}} / {{hostname}}",
+    "taken_at": "Acquisito il <0/>"
+  },
+  "notifications": {
+    "lb_change_success": "Stato del load balancer modificato correttamente in '{{status}}' nel nodo '{{nodeId}}'",
+    "lb_change_failed": "Modifica dello stato del load balancer nel nodo '{{nodeId}}' non riuscita: {{error}}",
+    "lb_change_failed_title": "Impossibile modificare lo stato del load balancer in '{{status}}' nel nodo '{{nodeId}}'",
+    "processing_pause_success": "Elaborazione dei messaggi messa in pausa correttamente nel nodo '{{nodeId}}'",
+    "processing_pause_failed": "Messa in pausa dell'elaborazione dei messaggi nel nodo '{{nodeId}}' non riuscita: {{error}}",
+    "processing_pause_failed_title": "Impossibile mettere in pausa l'elaborazione dei messaggi nel nodo '{{nodeId}}'",
+    "processing_resume_success": "Elaborazione dei messaggi ripresa correttamente nel nodo '{{nodeId}}'",
+    "processing_resume_failed": "Ripresa dell'elaborazione dei messaggi nel nodo '{{nodeId}}' non riuscita: {{error}}",
+    "processing_resume_failed_title": "Impossibile riprendere l'elaborazione dei messaggi nel nodo '{{nodeId}}'",
+    "nothing_selected": "Nessuna notifica selezionata.",
+    "nothing_to_dismiss_title": "Nulla da ignorare",
+    "bulk_dismiss_failed": "Impossibile ignorare le notifiche. Riprova.",
+    "dismiss_failed": "Impossibile ignorare la notifica. Riprova.",
+    "dismiss_failed_title": "Ignorazione non riuscita",
+    "profiling_enabled": "Profilazione MongoDB attivata correttamente.",
+    "profiling_disabled": "Profilazione MongoDB disattivata correttamente.",
+    "profiling_enable_failed": "Attivazione della profilazione MongoDB non riuscita: {{error}}",
+    "profiling_disable_failed": "Disattivazione della profilazione MongoDB non riuscita: {{error}}",
+    "profiling_update_failed_title": "Impossibile aggiornare la profilazione MongoDB.",
+    "data_node_metrics_failed": "Caricamento delle metriche del Data Node \"{{hostname}}\" non riuscito",
+    "data_node_metrics_failed_title": "Impossibile caricare le metriche del Data Node.",
+    "graylog_node_metrics_failed": "Caricamento delle metriche del nodo Graylog non riuscito con stato",
+    "graylog_node_metrics_failed_title": "Impossibile caricare le metriche del nodo Graylog.",
+    "cluster_traffic_failed": "Caricamento del traffico del cluster non riuscito con stato",
+    "cluster_traffic_failed_title": "Impossibile caricare il traffico del cluster",
+    "journal_failed": "Impossibile ottenere le informazioni sul journal",
+    "system_jobs_failed": "Caricamento dei job di sistema non riuscito con stato",
+    "system_jobs_failed_title": "Impossibile caricare i job di sistema"
+  },
+  "use_cluster_overview_notifications": {
+    "jvm_failed": "Recupero delle informazioni JVM per il nodo '{{nodeId}}' non riuscito: {{error}}",
+    "jvm_failed_title": "Impossibile ottenere le informazioni JVM",
+    "thread_dump_failed": "Recupero del thread dump per il nodo '{{nodeId}}' non riuscito: {{error}}",
+    "thread_dump_failed_title": "Impossibile ottenere il thread dump",
+    "process_buffer_dump_failed": "Recupero del dump del process buffer per il nodo '{{nodeId}}' non riuscito: {{error}}",
+    "process_buffer_dump_failed_title": "Impossibile ottenere il dump del process buffer",
+    "system_logs_failed": "Recupero dei messaggi di log di sistema per il nodo '{{nodeId}}' non riuscito: {{error}}",
+    "system_logs_failed_title": "Impossibile ottenere i messaggi di log di sistema",
+    "overview_failed": "Recupero della panoramica del cluster non riuscito: {{error}}",
+    "overview_failed_title": "Impossibile ottenere la panoramica del cluster"
+  },
+  "use_cluster_support_bundle_notifications": {
+    "create_failed": "Creazione del bundle di supporto non riuscita con stato: {{error}}",
+    "create_failed_title": "Impossibile creare il bundle di supporto.",
+    "delete_failed": "Eliminazione del bundle di supporto non riuscita con stato: {{error}}",
+    "delete_failed_title": "Impossibile eliminare il bundle di supporto.",
+    "download_failed": "Download del bundle di supporto non riuscito con stato: {{error}}",
+    "download_failed_title": "Impossibile scaricare il bundle di supporto.",
+    "load_list_failed": "Caricamento dell'elenco dei bundle di supporto non riuscito con stato",
+    "load_list_failed_title": "Impossibile caricare l'elenco dei bundle di supporto."
+  },
+  "use_plugin_list_notifications": {
+    "fetch_failed": "Recupero dei plugin sul nodo \"{{nodeId}}\" non riuscito",
+    "fetch_failed_title": "Impossibile ottenere i plugin"
+  },
+  "node_lifecycle": {
+    "uninitialized": "Non inizializzato",
+    "starting": "Avvio in corso",
+    "running": "In esecuzione",
+    "failed": "Non riuscito",
+    "halting": "Arresto in corso",
+    "paused": "In pausa",
+    "throttled": "Limitato",
+    "override_lb_alive": "Bilanciatore: attivo (forzato)",
+    "override_lb_dead": "Bilanciatore: inattivo (forzato)",
+    "override_lb_throttled": "Bilanciatore: limitato (forzato)"
+  },
+  "buffers_metrics_cell": {
+    "input": "Ingresso",
+    "process": "Elaborazione",
+    "output": "Uscita"
+  },
+  "throughput_metrics_cell": {
+    "in": "In entrata",
+    "out": "In uscita"
+  },
+  "mongodb_nodes": {
+    "profiling_levels": {
+      "off": "Disattivato",
+      "slow_ops": "Slow Ops",
+      "all": "Tutte",
+      "unknown": "Sconosciuto ({{level}})"
+    },
+    "roles": {
+      "primary": "PRIMARIO",
+      "secondary": "SECONDARIO",
+      "arbiter": "ARBITRO",
+      "standalone": "AUTONOMO"
+    }
+  }
+}

@@ -19,6 +19,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
 import map from 'lodash/map';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import Input from 'components/bootstrap/Input';
 // Explicit import to fix eslint import/no-cycle
@@ -80,12 +81,13 @@ type Props = {
 };
 
 const UrlAllowListForm = ({ urls = [], onUpdate = () => {}, disabled = false, newEntryId = undefined }: Props) => {
+  const { t } = useTranslation('configurations');
   const productName = useProductName();
   const literal = 'literal';
   const regex = 'regex';
   const options = [
-    { value: literal, label: 'Exact match' },
-    { value: regex, label: 'Regex' },
+    { value: literal, label: t('url_allowlist.exact_match') },
+    { value: regex, label: t('url_allowlist.regex') },
   ];
   // eslint-disable-next-line prefer-const
   let inputs = {};
@@ -156,7 +158,7 @@ const UrlAllowListForm = ({ urls = [], onUpdate = () => {}, disabled = false, ne
   };
 
   const _getErrorMessage = (type: string) =>
-    type === regex ? 'Not a valid Java regular expression' : 'Not a valid URL';
+    type === regex ? t('url_allowlist_form.invalid_regex') : t('url_allowlist_form.invalid_url');
 
   const _getSummary = () =>
     config.entries.map((url, idx) => (
@@ -173,7 +175,7 @@ const UrlAllowListForm = ({ urls = [], onUpdate = () => {}, disabled = false, ne
               validationState.errors[idx] &&
               validationState.errors[idx].title &&
               !validationState.errors[idx].title.valid
-                ? 'Required field'
+                ? t('url_allowlist_form.required_field')
                 : null
             }
             name="title"
@@ -221,7 +223,7 @@ const UrlAllowListForm = ({ urls = [], onUpdate = () => {}, disabled = false, ne
             <Select
               clearable={false}
               options={options}
-              placeholder="Select url type"
+              placeholder={t('url_allowlist_form.select_type')}
               onChange={(option: string) => _onUpdateType(idx, option)}
               value={url.type}
             />
@@ -230,7 +232,7 @@ const UrlAllowListForm = ({ urls = [], onUpdate = () => {}, disabled = false, ne
         <td>
           <Button onClick={(event) => _onRemove(event, idx)}>
             <Icon name="delete" />
-            <span className="sr-only">Delete entry</span>
+            <span className="sr-only">{t('url_allowlist_form.delete_entry')}</span>
           </Button>
         </td>
       </tr>
@@ -268,28 +270,28 @@ const UrlAllowListForm = ({ urls = [], onUpdate = () => {}, disabled = false, ne
       <Input
         type="checkbox"
         id="allowlist-disabled"
-        label="Disable Allowlist"
+        label={t('url_allowlist_form.disable_allowlist')}
         checked={config.disabled}
         onChange={() => setConfig({ ...config, disabled: !config.disabled })}
-        help={`Disable the allowlist functionality. Warning: Disabling this option will allow users to enter any URL in ${productName} entities, which may pose a security risk.`}
+        help={t('url_allowlist_form.disable_allowlist_help', { productName })}
       />
       <Button bsSize="sm" onClick={(event) => _onAdd(event)}>
-        Add Url
+        {t('url_allowlist_form.add_url')}
       </Button>
       <StyledTable bordered>
         <thead>
           <tr>
             <th>#</th>
-            <th>Title</th>
-            <th>URL</th>
-            <th>Type</th>
-            <th>Actions</th>
+            <th>{t('url_allowlist.column_title')}</th>
+            <th>{t('url_allowlist.column_url')}</th>
+            <th>{t('url_allowlist.column_type')}</th>
+            <th>{t('url_allowlist_form.column_actions')}</th>
           </tr>
         </thead>
         <tbody>{_getSummary()}</tbody>
       </StyledTable>
       <Button bsSize="sm" onClick={(event) => _onAdd(event)}>
-        Add Url
+        {t('url_allowlist_form.add_url')}
       </Button>
     </>
   );

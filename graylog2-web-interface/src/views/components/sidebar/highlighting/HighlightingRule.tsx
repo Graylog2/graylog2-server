@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { forwardRef, useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
 
@@ -108,6 +109,7 @@ const HighlightingRule = (
   { rule, className = undefined, dragHandle = undefined, onUpdate, onDelete }: Props,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) => {
+  const { t } = useTranslation('search');
   const { field, value, color, condition } = rule;
   const [showForm, setShowForm] = useState(false);
   const sendTelemetry = useSendTelemetry();
@@ -125,7 +127,7 @@ const HighlightingRule = (
 
   const _onDelete = useCallback(() => {
     // eslint-disable-next-line no-alert
-    if (window.confirm('Do you really want to remove this highlighting?')) {
+    if (window.confirm(t('highlighting_rule.confirm_remove'))) {
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_SIDEBAR_HIGHLIGHT_DELETED, {
         app_action_value: 'search-sidebar-highlight-delete',
       });
@@ -134,7 +136,7 @@ const HighlightingRule = (
     }
 
     return Promise.resolve();
-  }, [onDelete, rule, sendTelemetry]);
+  }, [onDelete, rule, sendTelemetry, t]);
 
   return (
     <Container className={className} ref={ref}>
@@ -144,8 +146,8 @@ const HighlightingRule = (
           <strong>{field}</strong> {ConditionLabelMap[condition]} <i>&quot;{String(value)}&quot;</i>.
         </RuleContainer>
         <ButtonContainer>
-          <IconButton title="Edit this Highlighting Rule" name="edit_square" onClick={() => setShowForm(true)} />
-          <IconButton title="Remove this Highlighting Rule" name="delete" onClick={_onDelete} />
+          <IconButton title={t('highlighting_rule.edit')} name="edit_square" onClick={() => setShowForm(true)} />
+          <IconButton title={t('highlighting_rule.remove')} name="delete" onClick={_onDelete} />
           {dragHandle}
         </ButtonContainer>
       </RightCol>

@@ -16,6 +16,7 @@
  */
 import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import {
   ClipboardButton,
@@ -65,6 +66,7 @@ type Props = {
 };
 
 const TokenList = ({ creatingToken = false, onCreate, user, onDelete = () => {}, tokens = [] }: Props) => {
+  const { t } = useTranslation('users');
   const currentUser = useCurrentUser();
   const [createdToken, setCreatedToken] = useState<Token | undefined>();
   const [query, setQuery] = useState('');
@@ -86,7 +88,7 @@ const TokenList = ({ creatingToken = false, onCreate, user, onDelete = () => {},
   return (
     <>
       <IfPermitted permissions={[`users:tokencreate:${user.username}`]} anyPermissions>
-        <Headline>Create And Edit Tokens</Headline>
+        <Headline>{t('token_list.title')}</Headline>
         <CreateTokenForm
           onCreate={handleTokenCreation}
           creatingToken={creatingToken}
@@ -96,37 +98,42 @@ const TokenList = ({ creatingToken = false, onCreate, user, onDelete = () => {},
       {createdToken && (
         <StyledTokenPanel bsStyle="success">
           <Panel.Heading>
-            <Panel.Title>
-              Token <em>{createdToken.name}</em> created!
-            </Panel.Title>
+            <Panel.Title>{t('token_list.token_created', { name: createdToken.name })}</Panel.Title>
           </Panel.Heading>
           <Panel.Body>
-            <p>This is your new token. Make sure to copy it now, you will not be able to see it again.</p>
+            <p>{t('token_list.token_created_description')}</p>
             <pre>
               {createdToken.token}
               <StyledCopyTokenButton title={<Icon name="content_copy" />} text={createdToken.token} bsSize="xsmall" />
             </pre>
             <Button bsStyle="primary" onClick={() => setCreatedToken(undefined)}>
-              Done
+              {t('token_list.done_button')}
             </Button>
           </Panel.Body>
         </StyledTokenPanel>
       )}
       <hr />
 
-      <Headline>Tokens</Headline>
-      <StyledSearchForm onSearch={updateQuery} onReset={updateQuery} label="Filter" useLoadingState={false} />
+      <Headline>{t('token_list.title_list')}</Headline>
+      <StyledSearchForm
+        onSearch={updateQuery}
+        onReset={updateQuery}
+        label={t('token_list.filter_label')}
+        useLoadingState={false}
+      />
       {effectiveTokens.length === 0 ? (
-        <NoEntitiesExist>{query === '' ? 'No tokens to display.' : 'No tokens match the filter.'}</NoEntitiesExist>
+        <NoEntitiesExist>
+          {query === '' ? t('token_list.no_tokens_to_display') : t('token_list.no_tokens_match_filter')}
+        </NoEntitiesExist>
       ) : (
         <Table bordered condensed>
           <thead>
             <tr>
-              <th>Token Name</th>
-              <th>Created</th>
-              <th>Last Access</th>
-              <th>Expires At</th>
-              <th className="text-right">Actions</th>
+              <th>{t('token_list.column_name')}</th>
+              <th>{t('token_list.column_created')}</th>
+              <th>{t('token_list.column_last_access')}</th>
+              <th>{t('token_list.column_expires_at')}</th>
+              <th className="text-right">{t('token_list.column_actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -139,7 +146,7 @@ const TokenList = ({ creatingToken = false, onCreate, user, onDelete = () => {},
                   <td>
                     <Timestamp dateTime={token.created_at} />
                   </td>
-                  <td>{tokenNeverUsed ? 'Never used' : <RelativeTime dateTime={token.last_access} />}</td>
+                  <td>{tokenNeverUsed ? t('token_list.never_used') : <RelativeTime dateTime={token.last_access} />}</td>
                   <td>
                     <Timestamp dateTime={token.expires_at} />
                   </td>

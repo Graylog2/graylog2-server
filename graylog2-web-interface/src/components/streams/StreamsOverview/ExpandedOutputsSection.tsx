@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { Stream } from 'logic/streams/types';
-import { Link, Pluralize, Spinner } from 'components/common';
+import { Link, Spinner } from 'components/common';
 import { ListGroup, ListGroupItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
@@ -43,6 +44,7 @@ const OutputTitle = ({ streamId, output }: { streamId: string; output: Output })
 };
 
 const ExpandedOutputsSection = ({ stream }: Props) => {
+  const { t } = useTranslation('streams');
   const { data, isInitialLoading } = useStreamOutputs(stream.id);
 
   if (isInitialLoading) {
@@ -55,9 +57,7 @@ const ExpandedOutputsSection = ({ stream }: Props) => {
 
   return (
     <>
-      <p>
-        {outputs.length} connected <Pluralize value={outputs.length} singular="output" plural="outputs" />.
-      </p>
+      <p>{t('streams_overview.expanded.outputs_summary', { count: outputs.length })}</p>
       <ListGroup componentClass="ul">
         {outputs.map((output) => (
           <ListGroupItem key={output.id}>

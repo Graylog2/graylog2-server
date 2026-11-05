@@ -29,7 +29,6 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
@@ -48,6 +47,7 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
@@ -132,7 +132,7 @@ public class SourceResource extends RestResource {
         checkPermission(CollectorsPermissions.FLEET_READ, fleetId);
         return sourceService.get(fleetId, sourceId)
                 .map(SourceResponse::fromDTO)
-                .orElseThrow(() -> new NotFoundException("Source " + sourceId + " not found"));
+                .orElseThrow(() -> new CodedNotFoundException("collectors.source_not_found", "Source " + sourceId + " not found", Map.of("sourceId", sourceId)));
     }
 
     @POST
@@ -175,7 +175,7 @@ public class SourceResource extends RestResource {
             return sourceService.update(fleetId, sourceId, request.name(), request.description(), request.enabled(), request.config())
                     .map(SourceResponse::fromDTO)
                     .map(response -> Response.ok(response).build())
-                    .orElseThrow(() -> new NotFoundException("Source " + sourceId + " not found"));
+                    .orElseThrow(() -> new CodedNotFoundException("collectors.source_not_found", "Source " + sourceId + " not found", Map.of("sourceId", sourceId)));
         } catch (IllegalArgumentException e) {
             if (e.getMessage() != null && e.getMessage().contains("already exists")) {
                 return Response.status(Response.Status.CONFLICT)
@@ -196,9 +196,9 @@ public class SourceResource extends RestResource {
             @Parameter(name = "sourceId", required = true) @PathParam("sourceId") String sourceId) {
         checkPermission(CollectorsPermissions.SOURCE_DELETE, fleetId);
         final var source = sourceService.get(fleetId, sourceId)
-                .orElseThrow(() -> new NotFoundException("Source " + sourceId + " not found"));
+                .orElseThrow(() -> new CodedNotFoundException("collectors.source_not_found", "Source " + sourceId + " not found", Map.of("sourceId", sourceId)));
         if (!sourceService.delete(fleetId, sourceId)) {
-            throw new NotFoundException("Source " + sourceId + " not found");
+            throw new CodedNotFoundException("collectors.source_not_found", "Source " + sourceId + " not found", Map.of("sourceId", sourceId));
         }
         auditEventSender.success(AuditActor.user(getCurrentUser()), AuditEventTypes.COLLECTOR_SOURCE_DELETE, Map.of(
                 "sourceId", Objects.requireNonNull(source.id()),

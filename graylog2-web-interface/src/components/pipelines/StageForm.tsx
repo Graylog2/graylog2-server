@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useMemo, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Link, SelectableList } from 'components/common';
 import { Button, ControlLabel, FormGroup, BootstrapModalForm, Input } from 'components/bootstrap';
@@ -45,6 +46,7 @@ const StageForm = ({
   save,
   disableEdit = false,
 }: Props) => {
+  const { t } = useTranslation('pipelines');
   const { isPermitted } = usePermissions();
   const [showModal, setShowModal] = useState<boolean>(false);
 
@@ -102,8 +104,11 @@ const StageForm = ({
 
   const rulesHelp = (
     <span>
-      Select the rules evaluated on this stage, or create one in the{' '}
-      <Link to={Routes.SYSTEM.PIPELINES.RULES}>Pipeline Rules page</Link>.
+      <Trans
+        t={t}
+        i18nKey="stage_form.rules_help"
+        components={{ rulesLink: <Link to={Routes.SYSTEM.PIPELINES.RULES} /> }}
+      />
     </span>
   );
 
@@ -113,36 +118,36 @@ const StageForm = ({
         disabled={!isPermitted('pipeline:edit') || disableEdit}
         onClick={openModal}
         bsStyle={create ? 'primary' : 'info'}>
-        {create ? 'Add new stage' : 'Edit'}
+        {create ? t('stage_form.add_button') : t('list_item.edit')}
       </Button>
       <BootstrapModalForm
         show={showModal}
-        title={`${create ? 'Add new' : 'Edit'} stage ${nextStage.stage}`}
+        title={
+          create
+            ? t('stage_form.add_title', { stage: nextStage.stage })
+            : t('stage_form.edit_title', { stage: nextStage.stage })
+        }
         data-telemetry-title={`${create ? 'Add new' : 'Edit'} stage`}
         onSubmitForm={_handleSave}
         onCancel={_closeModal}
-        submitButtonText={create ? 'Add stage' : 'Update stage'}>
+        submitButtonText={create ? t('stage_form.add_submit') : t('stage_form.update_submit')}>
         <fieldset>
           <Input
             type="number"
             id="stage"
             name="stage"
-            label="Stage"
+            label={t('stage_form.stage')}
             autoFocus
             min={NumberUtils.JAVA_INTEGER_MIN_VALUE + 1}
             max={NumberUtils.JAVA_INTEGER_MAX_VALUE}
             onChange={_onChange}
             bsStyle={isOverridingStage ? 'error' : null}
-            help={
-              isOverridingStage
-                ? 'Stage is already in use, please use another number or edit the existing stage.'
-                : 'Stage priority. The lower the number, the earlier it will execute.'
-            }
+            help={isOverridingStage ? t('stage_form.stage_in_use') : t('stage_form.stage_help')}
             value={nextStage.stage}
           />
 
           <FormGroup>
-            <ControlLabel>Continue processing on next stage when</ControlLabel>
+            <ControlLabel>{t('stage_form.continue_when')}</ControlLabel>
           </FormGroup>
 
           <Input
@@ -150,7 +155,7 @@ const StageForm = ({
             id="match_all"
             name="match"
             value="ALL"
-            label="All rules on this stage match the message"
+            label={t('stage_form.match_all')}
             onChange={_onChange}
             checked={nextStage.match === 'ALL'}
           />
@@ -160,7 +165,7 @@ const StageForm = ({
             id="match_any"
             name="match"
             value="EITHER"
-            label="At least one of the rules on this stage matches the message"
+            label={t('stage_form.match_any')}
             onChange={_onChange}
             checked={nextStage.match === 'EITHER'}
           />
@@ -170,12 +175,12 @@ const StageForm = ({
             id="match_pass"
             name="match"
             value="PASS"
-            label="None or more rules on this stage match"
+            label={t('stage_form.match_pass')}
             onChange={_onChange}
             checked={nextStage.match === 'PASS'}
           />
 
-          <Input id="stage-rules-select" label="Stage rules" help={rulesHelp}>
+          <Input id="stage-rules-select" label={t('stage_form.stage_rules')} help={rulesHelp}>
             <SelectableList
               options={_getFormattedOptions()}
               onChange={_onRulesChange}

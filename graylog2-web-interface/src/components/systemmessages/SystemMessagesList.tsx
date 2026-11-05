@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Table } from 'components/bootstrap';
 import { SystemMessage } from 'components/systemmessages';
@@ -38,22 +39,26 @@ type SystemMessagesListProps = {
   messages: any[];
 };
 
-const SystemMessagesList = ({ messages }: SystemMessagesListProps) => (
-  <SystemMessagesTable condensed>
-    <thead>
-      <tr>
-        <TimestampTH>Timestamp</TimestampTH>
-        <th>Node</th>
-        <th>Message</th>
-      </tr>
-    </thead>
+const SystemMessagesList = ({ messages }: SystemMessagesListProps) => {
+  const { t } = useTranslation('system');
 
-    <tbody>
-      {messages.map((message) => (
-        <SystemMessage key={`message-${Math.random().toString(36).substring(7)}`} message={message} />
-      ))}
-    </tbody>
-  </SystemMessagesTable>
-);
+  return (
+    <SystemMessagesTable condensed>
+      <thead>
+        <tr>
+          <TimestampTH>{t('system_messages_list.timestamp')}</TimestampTH>
+          <th>{t('system_messages_list.node')}</th>
+          <th>{t('system_messages_list.message')}</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {messages.map((message) => (
+          <SystemMessage key={`message-${Math.random().toString(36).substring(7)}`} message={message} />
+        ))}
+      </tbody>
+    </SystemMessagesTable>
+  );
+};
 
 export default SystemMessagesList;

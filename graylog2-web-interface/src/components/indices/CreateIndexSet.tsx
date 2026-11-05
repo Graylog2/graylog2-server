@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import AppConfig from 'util/AppConfig';
 import { Spinner } from 'components/common';
@@ -36,6 +37,7 @@ type Props = {
 };
 
 const CreateIndexSet = ({ showSelectTemplateModal, setShowSelectTemplateModal }: Props) => {
+  const { t } = useTranslation('indexsets');
   const isCloud = AppConfig.isCloud();
   const history = useHistory();
   const sendTelemetry = useSendTelemetry();
@@ -69,8 +71,8 @@ const CreateIndexSet = ({ showSelectTemplateModal, setShowSelectTemplateModal }:
         retentionStrategiesContext={retentionStrategiesContext}
         rotationStrategies={rotationStrategies}
         retentionStrategies={retentionStrategies}
-        submitButtonText="Create index set"
-        submitLoadingText="Creating index set..."
+        submitButtonText={t('indices.create_index_set.submit')}
+        submitLoadingText={t('indices.create_index_set.submit_loading')}
         create
         cancelLink={Routes.SYSTEM.INDICES.LIST}
         onUpdate={_saveConfiguration}

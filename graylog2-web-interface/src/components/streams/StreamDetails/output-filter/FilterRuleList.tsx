@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import type { Permission } from 'graylog-web-plugin/plugin';
 
@@ -28,8 +29,6 @@ import type { PaginatedList as PaginatedListType } from 'stores/PaginationTypes'
 
 import FilterStatusCell from './FilterStatusCell';
 import FilterActions from './FilterActions';
-
-const TABLE_HEADERS = ['Title', 'Status', ''];
 
 export const StyledSectionComponent = styled(SectionComponent)(
   ({ theme }) => css`
@@ -104,6 +103,8 @@ const FilterRulesList = ({
   onPaginationChange,
   requiredPermissions,
 }: Props) => {
+  const { t } = useTranslation('streams');
+  const tableHeaders = [t('output_filter.list.header_title'), t('output_filter.list.header_status'), ''];
   const {
     list: filters,
     pagination: { total },
@@ -111,7 +112,7 @@ const FilterRulesList = ({
 
   return (
     <StyledSectionComponent
-      title="Filter Rules"
+      title={t('output_filter.list.title')}
       headerActions={
         <IfPermitted permissions={requiredPermissions}>
           <FilterRuleEditButton
@@ -122,8 +123,7 @@ const FilterRulesList = ({
         </IfPermitted>
       }>
       <Alert bsStyle="default">
-        Messages which meet the criteria of the following filter rule(s) will not be routed to the{' '}
-        {destinationType === 'indexer' ? 'Index Set' : 'Data Lake'}.
+        {destinationType === 'indexer' ? t('output_filter.list.info_indexer') : t('output_filter.list.info_data_lake')}
       </Alert>
       <PaginatedList
         totalItems={total}
@@ -135,10 +135,10 @@ const FilterRulesList = ({
           id="filter-list"
           className="striped"
           rowClassName="no-bm"
-          headers={TABLE_HEADERS}
+          headers={tableHeaders}
           headerCellFormatter={_headerCellFormatter}
           sortByKey="title"
-          noDataText={<NoSearchResult>No filter have been found.</NoSearchResult>}
+          noDataText={<NoSearchResult>{t('output_filter.list.no_filters')}</NoSearchResult>}
           rows={filters.toJS()}
           dataRowFormatter={buildFilterItem(destinationType, requiredPermissions)}
         />

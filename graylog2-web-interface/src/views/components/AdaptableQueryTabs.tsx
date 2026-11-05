@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ReactNode } from 'react';
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import styled, { css } from 'styled-components';
@@ -198,26 +199,34 @@ const QueryTab = ({ active, className = undefined, onClick, children, ...rest }:
   </li>
 );
 
-const NewTabLi = ({ onClick }: { onClick: () => void }) => (
-  <li className={NEW_TAB_BUTTON_CLASS}>
-    <Button bsStyle="transparent" title="Create New Page" onClick={onClick}>
-      <Icon name="add" />
-    </Button>
-  </li>
-);
+const NewTabLi = ({ onClick }: { onClick: () => void }) => {
+  const { t } = useTranslation('search');
 
-const MoreTabsLi = ({ menuItems }: { menuItems: OrderedSet<React.ReactNode> }) => (
-  <li className={MORE_TABS_LI_CLASS}>
-    <MoreActionsMenu
-      className={MORE_TABS_BUTTON_CLASS}
-      id="query-tabs-more"
-      aria-label="More Dashboard Pages"
-      keepMounted
-      pullRight>
-      {menuItems.toArray()}
-    </MoreActionsMenu>
-  </li>
-);
+  return (
+    <li className={NEW_TAB_BUTTON_CLASS}>
+      <Button bsStyle="transparent" title={t('query_tabs.create_page')} onClick={onClick}>
+        <Icon name="add" />
+      </Button>
+    </li>
+  );
+};
+
+const MoreTabsLi = ({ menuItems }: { menuItems: OrderedSet<React.ReactNode> }) => {
+  const { t } = useTranslation('search');
+
+  return (
+    <li className={MORE_TABS_LI_CLASS}>
+      <MoreActionsMenu
+        className={MORE_TABS_BUTTON_CLASS}
+        id="query-tabs-more"
+        aria-label={t('query_tabs.more_pages')}
+        keepMounted
+        pullRight>
+        {menuItems.toArray()}
+      </MoreActionsMenu>
+    </li>
+  );
+};
 
 const adjustTabsVisibility = (
   maxWidth: number,
@@ -347,6 +356,7 @@ const AdaptableQueryTabs = ({
   queryTitleEditModal,
   dashboardId,
 }: Props) => {
+  const { t } = useTranslation('search');
   const view = useView();
   const isNew = useIsNew();
   const activeQueryId = useCurrentQueryId();
@@ -367,9 +377,9 @@ const AdaptableQueryTabs = ({
       dispatch(_onCopyToDashboard(selectedDashboardId))
         .then(([newDashboard, newQueryId]) => loadDashboard(history, newDashboard.id, newQueryId))
         .catch((error) => {
-          UserNotification.error(`Copying dashboard page failed with error ${error}`);
+          UserNotification.error(t('query_tabs.copy_page_failed', { error }));
         }),
-    [dispatch, history],
+    [dispatch, history, t],
   );
 
   const onCreateNewDashboard = () => _onCreateNewDashboard(view, activeQueryId, history);
@@ -482,7 +492,7 @@ const AdaptableQueryTabs = ({
       </StyledQueryNav>
       <Button
         bsStyle="transparent"
-        title="Open pages configuration"
+        title={t('query_tabs.open_configuration')}
         ref={queriesConfigBtn}
         className="query-config-btn"
         onClick={() => {
@@ -510,8 +520,8 @@ const AdaptableQueryTabs = ({
           onCreateNewDashboard={isNew ? undefined : onCreateNewDashboard}
           onCancel={toggleCopyToDashboardModal}
           activeDashboardId={dashboardId}
-          submitButtonText="Copy page"
-          submitLoadingText="Copying page..."
+          submitButtonText={t('query_tabs.copy_page')}
+          submitLoadingText={t('query_tabs.copying_page')}
         />
       )}
     </Container>

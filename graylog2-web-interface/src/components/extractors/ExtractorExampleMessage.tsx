@@ -16,6 +16,8 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import { Well } from 'components/bootstrap';
 import FieldValue from 'components/common/message/details/fields/FieldValue';
@@ -41,7 +43,7 @@ type ExtractorExampleMessageProps = {
   field: string;
   example?: string;
   onExampleLoad?: (...args: any[]) => void;
-};
+} & WithTranslation;
 
 class ExtractorExampleMessage extends React.Component<
   ExtractorExampleMessageProps,
@@ -63,7 +65,7 @@ class ExtractorExampleMessage extends React.Component<
   };
 
   render() {
-    const { example, field } = this.props;
+    const { example, field, t } = this.props;
     const originalMessage = (
       <span id="xtrc-original-example" style={{ display: 'none' }}>
         {example}
@@ -81,10 +83,7 @@ class ExtractorExampleMessage extends React.Component<
       );
     } else {
       messagePreview = (
-        <NoExample className="alert alert-warning">
-          Could not load an example of field &lsquo;{field}&rsquo;. It is not possible to test the extractor before
-          updating it.
-        </NoExample>
+        <NoExample className="alert alert-warning">{t('example_message.not_loaded', { field })}</NoExample>
       );
     }
 
@@ -98,4 +97,4 @@ class ExtractorExampleMessage extends React.Component<
   }
 }
 
-export default ExtractorExampleMessage;
+export default withTranslation('extractors')(ExtractorExampleMessage);

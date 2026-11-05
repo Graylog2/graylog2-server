@@ -27,7 +27,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
@@ -55,6 +54,10 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.journal.RawMessage;
+import org.graylog2.plugin.rest.CodedBadRequestException;
+import org.graylog2.plugin.rest.CodedException;
+import org.graylog2.plugin.rest.CodedForbiddenException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.rest.models.messages.requests.MessageParseRequest;
 import org.graylog2.rest.models.messages.responses.MessageTokens;
 import org.graylog2.shared.rest.PublicCloudAPI;
@@ -114,7 +117,7 @@ public class MessageResource extends RestResource {
 
             return resultMessage;
         } catch (DocumentNotFoundException | IndexNotFoundException | ForbiddenException e) {
-            throw new NotFoundException("Specified message does not exist or the user does not have the required permissions");
+            throw new CodedNotFoundException("message.specified_message_does_not_exist_or_the", "Specified message does not exist or the user does not have the required permissions");
         }
     }
 
@@ -132,7 +135,7 @@ public class MessageResource extends RestResource {
             }
         }
         if (!permitted) {
-            throw new ForbiddenException("Not authorized to access message " + message.getId());
+            throw new CodedForbiddenException("message.not_authorized_to_access_message", "Not authorized to access message " + message.getId(), CodedException.paramsOf("id", message.getId()));
         }
     }
 
@@ -155,7 +158,7 @@ public class MessageResource extends RestResource {
             throw new NotFoundException("Codec type " + request.codec() + " does not exist.");
         }
         if (codecFactory.isMultiMessageCodec(request.codec())) {
-            throw new BadRequestException("Codec type " + request.codec() + " does not support parsing a single message.");
+            throw new CodedBadRequestException("message.codec_does_not_support_single_message", "Codec type " + request.codec() + " does not support parsing a single message.", CodedException.paramsOf("codec", request.codec()));
         }
 
         final Codec codec;
@@ -163,7 +166,7 @@ public class MessageResource extends RestResource {
             codec = codecFactory.create(request.codec(), new Configuration(request.configuration()));
         } catch (Exception e) {
             LOG.debug("Could not create codec <{}>", request.codec(), e);
-            throw new BadRequestException("Could not decode message");
+            throw new CodedBadRequestException("message.could_not_decode_message", "Could not decode message");
         }
 
         final ResolvableInetSocketAddress remoteAddress = ResolvableInetSocketAddress.wrap(new InetSocketAddress(request.remoteAddress(), 1234));
@@ -179,10 +182,10 @@ public class MessageResource extends RestResource {
         try {
             messageOpt = codec.decodeSafe(rawMessage);
         } catch (Exception e) {
-            throw new BadRequestException("Could not decode message");
+            throw new CodedBadRequestException("message.could_not_decode_message", "Could not decode message");
         }
 
-        Message message = messageOpt.orElseThrow(() -> new BadRequestException("Could not decode message"));
+        Message message = messageOpt.orElseThrow(() -> new CodedBadRequestException("message.could_not_decode_message", "Could not decode message"));
 
         // Ensure the decoded Message has a source, otherwise creating a ResultMessage will fail
         if (isNullOrEmpty(message.getSource())) {

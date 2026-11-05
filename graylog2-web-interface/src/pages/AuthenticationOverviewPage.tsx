@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import 'components/authentication/bindings'; // Bind all authentication plugins
 import { Alert, Row, Col } from 'components/bootstrap';
@@ -26,24 +27,25 @@ import BackendActionLinks from 'components/authentication/BackendActionLinks';
 import useActiveBackend from 'components/authentication/useActiveBackend';
 
 const AuthenticationOverviewPage = () => {
+  const { t } = useTranslation('authentication');
   const { finishedLoading, activeBackend, backendsTotal } = useActiveBackend();
 
   return (
-    <DocumentTitle title="All Authentication Services">
+    <DocumentTitle title={t('overview_page.title')}>
       <AuthenticationPageNavigation />
       <PageHeader
-        title="All Authentication Services"
+        title={t('overview_page.title')}
         actions={<BackendActionLinks activeBackend={activeBackend} finishedLoading={finishedLoading} />}
         documentationLink={{
-          title: 'Authentication documentation',
+          title: t('page.documentation_title'),
           path: DocsHelper.PAGES.USERS_ROLES,
         }}>
-        <span>Configure authentication services of this cluster.</span>
+        <span>{t('page.description')}</span>
       </PageHeader>
       {!!(backendsTotal && backendsTotal >= 1 && !activeBackend) && (
         <Row className="content">
           <Col xs={12}>
-            <Alert bsStyle="warning">None of the configured authentication services is currently active.</Alert>
+            <Alert bsStyle="warning">{t('overview_page.no_active_backend')}</Alert>
           </Col>
         </Row>
       )}

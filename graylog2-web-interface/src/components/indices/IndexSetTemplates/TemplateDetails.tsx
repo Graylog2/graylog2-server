@@ -15,8 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import type { TFunction } from 'i18next';
 
 import { Col, Row } from 'components/bootstrap';
 import { Section, StatusIcon } from 'components/common';
@@ -31,6 +33,7 @@ import {
   DataTieringVisualisation,
 } from 'components/indices/data-tiering';
 import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
+import useTemplateText from 'components/indices/IndexSetTemplates/hooks/useTemplateText';
 import usePluginEntities from 'hooks/usePluginEntities';
 
 type Props = {
@@ -86,17 +89,19 @@ const Grid = styled.div(
   `,
 );
 
-const formatRefreshInterval = (intervalInMs: number) => {
+const formatRefreshInterval = (intervalInMs: number, t: TFunction) => {
   const intervalInSeconds = intervalInMs / 1000;
 
   if (intervalInSeconds > 60) {
-    return `${intervalInSeconds / 60} minutes`;
+    return t('templates.minutes', { count: intervalInSeconds / 60 });
   }
 
-  return `${intervalInSeconds} seconds`;
+  return t('templates.seconds', { count: intervalInSeconds });
 };
 
 const TemplateDetails = ({ template, showDescription = false }: Props) => {
+  const { t } = useTranslation('indexsets');
+  const templateText = useTemplateText();
   const dataTieringPlugins = usePluginEntities('dataTiering');
   const dataTieringPlugin = dataTieringPlugins.find((plugin) => plugin.type === DATA_TIERING_TYPE.HOT_WARM);
   const dataTieringConfig = prepareDataTieringInitialValues(template.index_set_config.data_tiering, PluginStore, false);
@@ -121,8 +126,8 @@ const TemplateDetails = ({ template, showDescription = false }: Props) => {
         {template.description && showDescription && (
           <Row>
             <Col md={12}>
-              <Section title="Description">
-                <p>{template.description}</p>
+              <Section title={t('templates.description')}>
+                <p>{templateText(template, template.description)}</p>
               </Section>
             </Col>
           </Row>
@@ -130,25 +135,25 @@ const TemplateDetails = ({ template, showDescription = false }: Props) => {
         <Row>
           <Col md={12}>
             <Grid>
-              <Section title="Details">
+              <Section title={t('index_set_form.details')}>
                 <dl>
-                  <dt>Index Analyzer:</dt>
+                  <dt>{t('templates.index_analyzer')}</dt>
                   <dd>{template.index_set_config.index_analyzer}</dd>
-                  <dt>Index Shards:</dt>
+                  <dt>{t('templates.index_shards')}</dt>
                   <dd>{template.index_set_config.shards}</dd>
-                  <dt>Index Replica:</dt>
+                  <dt>{t('templates.index_replica')}</dt>
                   <dd>{template.index_set_config.replicas}</dd>
-                  <dt>Maximum Number of Segments:</dt>
+                  <dt>{t('templates.max_segments')}</dt>
                   <dd>{template.index_set_config.index_optimization_max_num_segments}</dd>
-                  <dt>Index Optimization after Rotation:</dt>
+                  <dt>{t('templates.optimization_after_rotation')}</dt>
                   <dd>
                     <StatusIcon active={!template.index_set_config.index_optimization_disabled} />
                   </dd>
-                  <dt>Field Type Refresh Interval:</dt>
-                  <dd>{formatRefreshInterval(template.index_set_config.field_type_refresh_interval)}</dd>
+                  <dt>{t('templates.field_type_refresh_interval')}</dt>
+                  <dd>{formatRefreshInterval(template.index_set_config.field_type_refresh_interval, t)}</dd>
                 </dl>
               </Section>
-              <Section title="Rotation & Retention">
+              <Section title={t('index_set_form.rotation_retention')}>
                 {template.index_set_config.use_legacy_rotation ? (
                   <>
                     <RotationSummaryWrapper>

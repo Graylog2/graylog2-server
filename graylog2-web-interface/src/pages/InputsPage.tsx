@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Link } from 'components/common';
@@ -32,6 +33,7 @@ const isCloud = AppConfig.isCloud();
 export const INPUTS_PAGE_NAV_TITLE = 'Inputs';
 
 const InputsPage = () => {
+  const { t } = useTranslation('inputs');
   const productName = useProductName();
   const { data: inputTypes, isLoading: isLoadingInputTypes } = useInputTypes();
   const { data: inputTypeDescriptions, isLoading: isLoadingInputTypesDescriptions } = useInputTypesDescriptions();
@@ -41,30 +43,29 @@ const InputsPage = () => {
   }
 
   return (
-    <DocumentTitle title="Inputs">
+    <DocumentTitle title={t('pages.inputs')}>
       <Row>
         <PageNavigation page={INPUTS_PAGE_NAV_TITLE} />
       </Row>
       <PageHeader
-        title="Inputs"
+        title={t('pages.inputs')}
         documentationLink={{
-          title: 'Inputs documentation',
+          title: t('pages.docs'),
           path: DocsHelper.PAGES.INPUTS,
         }}>
         {isCloud ? (
           <>
+            <p>{t('pages.cloud_description', { productName })}</p>
             <p>
-              {' '}
-              {productName} cloud accepts data via inputs. There are many types of inputs to choose from, but only some
-              can run directly in the cloud. You can launch and terminate them on this page.
-            </p>
-            <p>
-              If you are missing an input type on this page&apos;s list of available inputs, you can start the input on
-              a <Link to={Routes.SYSTEM.FORWARDERS}>Forwarder</Link>.
+              <Trans
+                t={t}
+                i18nKey="pages.cloud_forwarder_hint"
+                components={{ forwarderLink: <Link to={Routes.SYSTEM.FORWARDERS} /> }}
+              />
             </p>
           </>
         ) : (
-          <span>{productName} nodes accept data via inputs. Launch or terminate as many inputs as you want here.</span>
+          <span>{t('pages.description', { productName })}</span>
         )}
       </PageHeader>
       <Row className="content">

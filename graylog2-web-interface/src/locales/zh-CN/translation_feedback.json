@@ -1,0 +1,77 @@
+{
+  "menu": {
+    "report": "报告翻译问题…",
+    "native_menu_hint": "Shift + 右键打开浏览器菜单"
+  },
+  "modal": {
+    "title": "报告翻译问题",
+    "text": "文本",
+    "text_help": "页面上显示的文本。请缩减为需要关注的部分。",
+    "key": "翻译",
+    "partial_match": "部分匹配",
+    "not_translated": "未翻译",
+    "none_of_these": "都不是",
+    "no_key_found": "未找到翻译，该文本可能尚未翻译。",
+    "english": "英文原文：",
+    "current_translation": "当前翻译：",
+    "category": "问题类型",
+    "suggestion": "建议翻译",
+    "suggestion_help": "可选。文本应如何表述。",
+    "comment": "备注",
+    "submit": "报告",
+    "submitting": "正在报告…"
+  },
+  "categories": {
+    "wrong": "翻译错误",
+    "untranslated": "未翻译",
+    "awkward": "表述不自然",
+    "layout": "布局错乱或文本被截断",
+    "other": "其他"
+  },
+  "statuses": {
+    "open": "待处理",
+    "fixed": "已修复",
+    "wont_fix": "不予修复"
+  },
+  "list": {
+    "human_name": "翻译报告",
+    "search_placeholder": "搜索翻译报告",
+    "no_key": "无键",
+    "download_json": "下载 JSON",
+    "download_csv": "下载 CSV"
+  },
+  "actions": {
+    "mark_fixed": "标记为已修复",
+    "reopen": "重新打开",
+    "mark_wont_fix": "不予修复",
+    "confirm_delete": "确定要删除关于“{{text}}”的报告吗？"
+  },
+  "page": {
+    "title": "翻译反馈",
+    "description": "关于界面翻译的报告。右键单击任意文本即可报告。"
+  },
+  "notifications": {
+    "created": "谢谢！您的报告已保存。",
+    "created_title": "已报告翻译问题",
+    "create_failed": "保存报告失败：{{error}}",
+    "create_failed_title": "无法报告翻译问题",
+    "update_failed": "更新报告失败：{{error}}",
+    "update_failed_title": "无法更新报告"
+  },
+  "bulk": {
+    "delete": "删除",
+    "changed_other": "已更改 {{count}} 个报告。",
+    "confirm_delete_other": "确定要删除 {{count}} 个报告吗？"
+  },
+  "upload": {
+    "button": "上传处理结果",
+    "uploading": "正在上传…",
+    "help": "上传处理结果文件，一次性设置多个报告的状态并为报告人添加备注。",
+    "failed": "应用处理结果失败：{{error}}",
+    "failed_title": "无法应用处理结果",
+    "invalid_file": "该文件不包含处理结果列表。",
+    "applied_title": "已应用处理结果",
+    "applied_other": "已更新 {{count}} 个报告。",
+    "applied_with_missing_other": "已更新 {{count}} 个报告，{{notFound}} 个未找到。"
+  }
+}

@@ -17,6 +17,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import mapValues from 'lodash/mapValues';
 
+import i18n from 'i18n';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
@@ -68,8 +69,8 @@ const useRemoveCustomFieldTypeMutation = (params: {
 
     onError: (errorThrown) => {
       UserNotification.error(
-        `Removing custom field type failed with status: ${errorThrown}`,
-        'Could not remove custom field type',
+        i18n.t('hooks.custom_field_type_remove_failed', { ns: 'indexsets', error: errorThrown }),
+        i18n.t('hooks.custom_field_type_remove_failed_title', { ns: 'indexsets' }),
       );
     },
 
@@ -103,7 +104,10 @@ const useRemoveCustomFieldTypeMutation = (params: {
       queryClient.refetchQueries({ queryKey: ['indexSetFieldTypes'], type: 'active' });
 
       if (errorsQuantity === 0) {
-        UserNotification.success('Custom field type removed successfully', 'Success!');
+        UserNotification.success(
+          i18n.t('hooks.custom_field_type_removed', { ns: 'indexsets' }),
+          i18n.t('hooks.success_title', { ns: 'indexsets' }),
+        );
 
         return params.onSuccessHandler(mappedResponse);
       }

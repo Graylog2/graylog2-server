@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { forwardRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Badge } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
@@ -39,6 +40,7 @@ const ExpandedSectionCount = (
   { entityId, section, count, label, abbreviate = false }: Props,
   ref: React.ForwardedRef<HTMLElement>,
 ) => {
+  const { t } = useTranslation('common');
   const { expandedSections, toggleSection } = useExpandedSections();
   const isActive = expandedSections?.[entityId]?.includes(section) ?? false;
 
@@ -48,7 +50,7 @@ const ExpandedSectionCount = (
       color={isActive ? 'primary' : undefined}
       variant={isActive ? 'filled' : undefined}
       onClick={() => toggleSection(entityId, section)}
-      title={`${isActive ? 'Hide' : 'Show'} ${label}`}>
+      title={t(isActive ? 'expanded_section_count.hide' : 'expanded_section_count.show', { label })}>
       {abbreviate ? formatReadableNumber(count) : count}
       <Icon name="dock_to_bottom" size="xs" type="regular" />
     </Badge>

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import styled from 'styled-components';
 import type { List as ImmutableList } from 'immutable';
@@ -67,6 +68,7 @@ const FieldGroups = styled.div`
 `;
 
 const FieldsOverview = ({ allFields, activeQueryFields }: Props) => {
+  const { t } = useTranslation('search');
   const [currentGroup, setCurrentGroup] = useState('current');
   const [filter, setFilter] = useState(undefined);
   const handleSearch = (e) => setFilter(e.target.value);
@@ -82,7 +84,7 @@ const FieldsOverview = ({ allFields, activeQueryFields }: Props) => {
               className="query form-control"
               onChange={handleSearch}
               value={filter || ''}
-              placeholder="Filter fields"
+              placeholder={t('fields_overview.filter_placeholder')}
               type="text"
               autoComplete="off"
               spellCheck="false"
@@ -90,36 +92,41 @@ const FieldsOverview = ({ allFields, activeQueryFields }: Props) => {
           </FilterInputWrapper>
           <div className="form-group">
             <Button type="reset" className="reset-button" onClick={handleSearchReset}>
-              Reset
+              {t('fields_overview.reset')}
             </Button>
           </div>
         </FilterForm>
         <FieldGroups>
-          List fields of{' '}
-          <FieldGroup
-            selected={currentGroup === 'current'}
-            group="current"
-            text="current query"
-            title="This shows fields which occur in your current query."
-            onSelect={setCurrentGroup}
+          <Trans
+            t={t}
+            i18nKey="fields_overview.list_fields"
+            components={{
+              current: (
+                <FieldGroup
+                  selected={currentGroup === 'current'}
+                  group="current"
+                  title={t('fields_overview.current_title')}
+                  onSelect={setCurrentGroup}
+                />
+              ),
+              all: (
+                <FieldGroup
+                  selected={currentGroup === 'all'}
+                  group="all"
+                  title={t('fields_overview.all_title')}
+                  onSelect={setCurrentGroup}
+                />
+              ),
+              allReserved: (
+                <FieldGroup
+                  onSelect={setCurrentGroup}
+                  selected={currentGroup === 'allreserved'}
+                  group="allreserved"
+                  title={t('fields_overview.all_reserved_title')}
+                />
+              ),
+            }}
           />
-          {', '}
-          <FieldGroup
-            selected={currentGroup === 'all'}
-            group="all"
-            text="all"
-            title="This shows all fields, but no reserved (gl2_*) fields."
-            onSelect={setCurrentGroup}
-          />
-          {' or '}
-          <FieldGroup
-            onSelect={setCurrentGroup}
-            selected={currentGroup === 'allreserved'}
-            group="allreserved"
-            text="all including reserved"
-            title="This shows all fields, including reserved (gl2_*) fields."
-          />
-          {' fields.'}
         </FieldGroups>
         <hr />
       </div>

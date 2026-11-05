@@ -16,9 +16,18 @@
  */
 /* eslint-disable react/no-unescaped-entities */
 import React from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { MantineAccordion } from 'components/bootstrap';
 import useProductName from 'brand-customization/useProductName';
+
+const EXAMPLE_IPADDR = 'ipaddr';
+const EXAMPLE_HOSTNAME = 'hostname';
+const EXAMPLE_USER_ID = 'user_id';
+const EXAMPLE_FIRST_NAME_LAST_NAME_USERNAME = 'first_name,last_name,username';
+const EXAMPLE_TRUE = 'true';
+const EXAMPLE_CIDR = 'cidr';
+const EXAMPLE_SUBNET = 'subnet';
 
 const csvFile1 = `"ipaddr","hostname"
 "127.0.0.1","localhost"
@@ -40,108 +49,110 @@ const multiValueCsvFile = `"user_id","first_name","last_name","username","email"
 "000002","User","Two","user2","u2@company.net"
 "000003","Admin","One","admin1","admin@company.net"`;
 
+const CIDR_EXAMPLE_KEY = '192.168.101.64';
+const CIDR_EXAMPLE_RESULT = 'IT Department subnet';
+
 const CSVFileAdapterDocumentation = () => {
+  const { t } = useTranslation('lookup_tables');
   const productName = useProductName();
 
   const accordionItems = [
     {
       value: 'example_1',
-      label: 'Example 1',
+      label: t('doc.example', { number: 1 }),
       content: (
         <div>
-          <h5 style={{ marginBottom: 10 }}>Configuration</h5>
+          <h5 style={{ marginBottom: 10 }}>{t('shared.configuration')}</h5>
           <p style={{ marginBottom: 10, padding: 0 }}>
-            Separator: <code>,</code>
+            {t('adapter_fields.separator')}: <code>,</code>
             <br />
-            Quote character: <code>"</code>
+            {t('adapter_fields.quote_character')}: <code>"</code>
             <br />
-            Key column: <code>ipaddr</code>
+            {t('adapter_fields.key_column')}: <code>{EXAMPLE_IPADDR}</code>
             <br />
-            Value column: <code>hostname</code>
+            {t('adapter_fields.value_column')}: <code>{EXAMPLE_HOSTNAME}</code>
           </p>
 
-          <h5 style={{ marginBottom: 10 }}>CSV File</h5>
+          <h5 style={{ marginBottom: 10 }}>{t('csv_doc.csv_file')}</h5>
           <pre>{csvFile1}</pre>
         </div>
       ),
     },
     {
       value: 'example_2',
-      label: 'Example 2',
+      label: t('doc.example', { number: 2 }),
       content: (
         <div>
-          <h5 style={{ marginBottom: 10 }}>Configuration</h5>
+          <h5 style={{ marginBottom: 10 }}>{t('shared.configuration')}</h5>
           <p style={{ marginBottom: 10, padding: 0 }}>
-            Separator: <code>;</code>
+            {t('adapter_fields.separator')}: <code>;</code>
             <br />
-            Quote character: <code>'</code>
+            {t('adapter_fields.quote_character')}: <code>'</code>
             <br />
-            Key column: <code>ipaddr</code>
+            {t('adapter_fields.key_column')}: <code>{EXAMPLE_IPADDR}</code>
             <br />
-            Value column: <code>hostname</code>
+            {t('adapter_fields.value_column')}: <code>{EXAMPLE_HOSTNAME}</code>
           </p>
 
-          <h5 style={{ marginBottom: 10 }}>CSV File</h5>
+          <h5 style={{ marginBottom: 10 }}>{t('csv_doc.csv_file')}</h5>
           <pre>{csvFile2}</pre>
         </div>
       ),
     },
     {
       value: 'multi_value_example',
-      label: 'Multi Value Example',
+      label: t('csv_doc.multi_value_example'),
       content: (
         <div>
-          <h3 style={{ marginBottom: 10 }}>Multi-Value Example</h3>
+          <h3 style={{ marginBottom: 10 }}>{t('csv_doc.multi_value_heading')}</h3>
 
-          <h5 style={{ marginBottom: 10 }}>Configuration</h5>
+          <h5 style={{ marginBottom: 10 }}>{t('shared.configuration')}</h5>
           <p style={{ marginBottom: 10, padding: 0 }}>
-            Separator: <code>,</code>
+            {t('adapter_fields.separator')}: <code>,</code>
             <br />
-            Quote character: <code>"</code>
+            {t('adapter_fields.quote_character')}: <code>"</code>
             <br />
-            Key column: <code>user_id</code>
+            {t('adapter_fields.key_column')}: <code>{EXAMPLE_USER_ID}</code>
             <br />
-            Value columns: <code>first_name,last_name,username</code>
+            {t('adapter_fields.value_columns')}: <code>{EXAMPLE_FIRST_NAME_LAST_NAME_USERNAME}</code>
             <br />
-            Multi-value lookup: <code>true</code>
+            {t('adapter_fields.multi_value_lookup')}: <code>{EXAMPLE_TRUE}</code>
           </p>
 
-          <h5 style={{ marginBottom: 10 }}>CSV File</h5>
+          <h5 style={{ marginBottom: 10 }}>{t('csv_doc.csv_file')}</h5>
           <pre>{multiValueCsvFile}</pre>
         </div>
       ),
     },
     {
       value: 'cidr_lookups',
-      label: 'CIDR Lookups',
+      label: t('csv_doc.cidr_lookups'),
       content: (
         <div>
           <p style={{ marginBottom: 10, padding: 0 }}>
-            If this data adapter will be used to lookup IP address keys against CIDR addresses
+            {t('csv_doc.cidr_intro_1')}
             <br />
-            then it should be marked as a CIDR lookup. For example:
+            {t('csv_doc.cidr_intro_2')}
             <br />
           </p>
 
-          <h5 style={{ marginBottom: 10 }}>Configuration</h5>
+          <h5 style={{ marginBottom: 10 }}>{t('shared.configuration')}</h5>
           <p style={{ marginBottom: 10, padding: 0 }}>
-            Separator: <code>,</code>
+            {t('adapter_fields.separator')}: <code>,</code>
             <br />
-            Quote character: <code>"</code>
+            {t('adapter_fields.quote_character')}: <code>"</code>
             <br />
-            Key column: <code>cidr</code>
+            {t('adapter_fields.key_column')}: <code>{EXAMPLE_CIDR}</code>
             <br />
-            Value column: <code>subnet</code>
+            {t('adapter_fields.value_column')}: <code>{EXAMPLE_SUBNET}</code>
             <br />
-            CIDR lookup: <code>true</code>
+            {t('adapter_fields.cidr_lookup')}: <code>{EXAMPLE_TRUE}</code>
           </p>
 
-          <h5 style={{ marginBottom: 10 }}>CSV File</h5>
+          <h5 style={{ marginBottom: 10 }}>{t('csv_doc.csv_file')}</h5>
           <pre>{csvFile3}</pre>
 
-          <p>
-            Given this CSV file and configuration looking up the key 192.168.101.64 would return 'IT Department subnet'.
-          </p>
+          <p>{t('csv_doc.cidr_result', { key: CIDR_EXAMPLE_KEY, result: CIDR_EXAMPLE_RESULT })}</p>
         </div>
       ),
     },
@@ -149,16 +160,16 @@ const CSVFileAdapterDocumentation = () => {
 
   return (
     <div>
-      <p>The CSV data adapter can read key value pairs from a CSV file.</p>
-      <p>Please make sure your CSV file is formatted according to your configuration settings.</p>
+      <p>{t('csv_doc.intro')}</p>
+      <p>{t('csv_doc.formatting_hint')}</p>
 
-      <h4>CSV file requirements</h4>
-      <p>The first line in the CSV file needs to be a list of field/column names</p>
+      <h4>{t('doc.requirements_title')}</h4>
+      <p>{t('csv_doc.first_line')}</p>
       <p>
-        The file uses <strong>utf-8</strong> encoding
+        <Trans t={t} i18nKey="doc.utf8" components={{ bold: <strong /> }} />
       </p>
       <p>
-        The file is readable by <strong>every</strong> {productName} server node
+        <Trans t={t} i18nKey="csv_doc.readable" values={{ productName }} components={{ bold: <strong /> }} />
       </p>
 
       <hr />

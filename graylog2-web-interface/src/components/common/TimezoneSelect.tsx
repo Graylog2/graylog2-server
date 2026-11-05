@@ -19,6 +19,7 @@ import moment from 'moment-timezone';
 import uniq from 'lodash/uniq';
 import type { SelectInstance } from 'react-select';
 
+import i18n from 'i18n';
 import Select from 'components/common/Select';
 
 type TimezoneLabel = { label: string; disabled?: boolean; value: string };
@@ -75,6 +76,9 @@ class TimezoneSelect extends React.Component<
   // https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
   _UNCLASSIFIED_AREA = 'Unclassified';
 
+  _areaLabel = (area: string) =>
+    area === this._UNCLASSIFIED_AREA ? i18n.t('time.unclassified_time_zones', { ns: 'common' }) : area;
+
   private timezone: SelectInstance<unknown, boolean>;
 
   // eslint-disable-next-line react/no-unused-class-component-methods
@@ -96,13 +100,13 @@ class TimezoneSelect extends React.Component<
       timezones[area].push(location);
     });
 
-    const labels: TimezoneLabel[] = [{ label: "Browser's time zone", value: '' }];
+    const labels: TimezoneLabel[] = [{ label: i18n.t('time.browser_time_zone', { ns: 'common' }), value: '' }];
 
     Object.keys(timezones)
       .sort()
       .forEach((area) => {
         // Add disabled area option to use as TZ separator
-        labels.push({ label: area, disabled: true, value: area });
+        labels.push({ label: this._areaLabel(area), disabled: true, value: area });
 
         // Now add a label per timezone in the area
         const effectiveTimezones = uniq(timezones[area]).sort();
@@ -130,7 +134,7 @@ class TimezoneSelect extends React.Component<
         {...otherProps}
         inputId="timezone-select"
         onChange={onChange}
-        placeholder="Pick a time zone"
+        placeholder={i18n.t('time.pick_time_zone', { ns: 'common' })}
         options={timezones}
         optionRenderer={renderOption}
       />

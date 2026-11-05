@@ -68,6 +68,7 @@ import {
   InputDiagnosisPage,
   KeyboardShortcutsPage,
   LoggersPage,
+  TranslationFeedbackPage,
   LUTCacheDetailsPage,
   LUTCachesPage,
   LUTCachesFormPage,
@@ -334,6 +335,7 @@ const AppRouter = () => {
 
             !isCloud && { path: RoutePaths.SYSTEM.LOGGING, element: <LoggersPage /> },
             { path: RoutePaths.SYSTEM.METRICS(':nodeId'), element: <ShowMetricsPage /> },
+            { path: RoutePaths.SYSTEM.TRANSLATION_FEEDBACK, element: <TranslationFeedbackPage /> },
 
             !isCloud && { path: RoutePaths.SYSTEM.OUTPUTS, element: <SystemOutputsPage /> },
 

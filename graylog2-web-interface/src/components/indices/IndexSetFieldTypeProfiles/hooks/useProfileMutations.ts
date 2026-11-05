@@ -18,6 +18,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { SystemIndexSetsFieldTypeProfiles } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
@@ -61,13 +62,16 @@ const useProfileMutation = () => {
 
     onError: (errorThrown) => {
       UserNotification.error(
-        `Creating index set field type profile failed with status: ${errorThrown}`,
-        'Could not create index set field type profile',
+        i18n.t('hooks.profile_create_failed', { ns: 'indexsets', error: errorThrown }),
+        i18n.t('hooks.profile_create_failed_title', { ns: 'indexsets' }),
       );
     },
 
     onSuccess: () => {
-      UserNotification.success('Index set field type profile has been successfully created.', 'Success!');
+      UserNotification.success(
+        i18n.t('hooks.profile_create_success', { ns: 'indexsets' }),
+        i18n.t('hooks.success_title', { ns: 'indexsets' }),
+      );
 
       return queryClient.refetchQueries({ queryKey: ['indexSetFieldTypeProfiles'], type: 'active' });
     },
@@ -77,13 +81,16 @@ const useProfileMutation = () => {
 
     onError: (errorThrown) => {
       UserNotification.error(
-        `Updating index set field type profile failed with status: ${errorThrown}`,
-        'Could not update index set field type profile',
+        i18n.t('hooks.profile_update_failed', { ns: 'indexsets', error: errorThrown }),
+        i18n.t('hooks.profile_update_failed_title', { ns: 'indexsets' }),
       );
     },
 
     onSuccess: () => {
-      UserNotification.success('Index set field type profile has been successfully updated.', 'Success!');
+      UserNotification.success(
+        i18n.t('hooks.profile_update_success', { ns: 'indexsets' }),
+        i18n.t('hooks.success_title', { ns: 'indexsets' }),
+      );
 
       return queryClient.refetchQueries({ queryKey: ['indexSetFieldTypeProfiles'], type: 'active' });
     },
@@ -93,13 +100,16 @@ const useProfileMutation = () => {
 
     onError: (errorThrown) => {
       UserNotification.error(
-        `Deleting index set field type profile failed with status: ${errorThrown}`,
-        'Could not delete index set field type profile',
+        i18n.t('hooks.profile_delete_failed', { ns: 'indexsets', error: errorThrown }),
+        i18n.t('hooks.profile_delete_failed_title', { ns: 'indexsets' }),
       );
     },
 
     onSuccess: () => {
-      UserNotification.success('Index set field type profile has been successfully deleted.', 'Success!');
+      UserNotification.success(
+        i18n.t('hooks.profile_delete_success', { ns: 'indexsets' }),
+        i18n.t('hooks.success_title', { ns: 'indexsets' }),
+      );
 
       return queryClient.refetchQueries({ queryKey: ['indexSetFieldTypeProfiles'], type: 'active' });
     },

@@ -33,7 +33,7 @@ public class BadRequestExceptionMapper implements ExtendedExceptionMapper<BadReq
 
     @Override
     public Response toResponse(BadRequestException e) {
-        final ApiError apiError = ApiError.create(e.getMessage());
+        final ApiError apiError = ApiError.from(e);
 
         return Response.status(Response.Status.BAD_REQUEST)
                 .type(MediaType.APPLICATION_JSON_TYPE)

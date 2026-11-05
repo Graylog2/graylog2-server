@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Spinner } from 'components/common';
 import { useLegacyEventNotificationTypes } from 'components/event-notifications/hooks/useEventNotifications';
@@ -25,13 +26,14 @@ import LegacyNotificationForm from './LegacyNotificationForm';
 type LegacyNotificationFormContainerProps = React.ComponentProps<EventNotificationTypes['formComponent']>;
 
 const LegacyNotificationFormContainer = ({ ...props }: LegacyNotificationFormContainerProps) => {
+  const { t } = useTranslation('event_notifications');
   const { data } = useLegacyEventNotificationTypes();
   const allLegacyTypes = data?.types;
 
   if (!allLegacyTypes) {
     return (
       <p>
-        <Spinner text="Loading legacy notification information..." />
+        <Spinner text={t('legacy.loading')} />
       </p>
     );
   }

@@ -15,16 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import Routes from 'routing/Routes';
 import { DefaultLabel, Link } from 'components/common';
+import useTemplateText from 'components/indices/IndexSetTemplates/hooks/useTemplateText';
 
 type Props = {
   title: string;
   id: string;
   isDefault: boolean;
   isEnabled: boolean;
+  isBuiltIn: boolean;
 };
 
 const DisabledTitle = styled.span(
@@ -33,11 +36,15 @@ const DisabledTitle = styled.span(
   `,
 );
 
-const TitleCell = ({ title, id, isDefault, isEnabled }: Props) => {
+const TitleCell = ({ title: templateTitle, id, isDefault, isEnabled, isBuiltIn }: Props) => {
+  const { t } = useTranslation('indexsets');
+  const templateText = useTemplateText();
+  const title = templateText({ built_in: isBuiltIn }, templateTitle);
+
   if (!isEnabled) {
     return (
       <>
-        <DisabledTitle>{title} (disabled)</DisabledTitle>
+        <DisabledTitle>{t('templates.title_disabled', { title })}</DisabledTitle>
         {isDefault && <DefaultLabel />}
       </>
     );

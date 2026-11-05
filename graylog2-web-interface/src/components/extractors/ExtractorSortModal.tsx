@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { Trans, withTranslation } from 'react-i18next';
+import type { WithTranslation } from 'react-i18next';
 
 import { Row, Col, Modal, BootstrapModalWrapper } from 'components/bootstrap';
 import SortableList from 'components/common/SortableList';
@@ -26,7 +28,7 @@ type ExtractorSortModalProps = {
   extractors: any[];
   onClose: (...args: any[]) => void;
   onSort: (...args: any[]) => void;
-};
+} & WithTranslation;
 
 class ExtractorSortModal extends React.Component<
   ExtractorSortModalProps,
@@ -74,19 +76,19 @@ class ExtractorSortModal extends React.Component<
 
   render() {
     const { sortedExtractors } = this.state;
-    const { input } = this.props;
+    const { input, t } = this.props;
 
     return (
       <BootstrapModalWrapper showModal onHide={this._cancel}>
         <Modal.Header>
           <Modal.Title>
             <span>
-              Sort extractors for <em>{input.title}</em>
+              <Trans t={t} i18nKey="sort.title" values={{ title: input.title }} components={{ em: <em /> }} />
             </span>
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p>Drag and drop the extractors on the list to change the order in which they will be applied.</p>
+          <p>{t('sort.description')}</p>
           <Row className="row-sm">
             <Col md={12}>
               <SortableList items={sortedExtractors} onMoveItem={this._updateSorting} displayOverlayInPortal />
@@ -94,11 +96,11 @@ class ExtractorSortModal extends React.Component<
           </Row>
         </Modal.Body>
         <Modal.Footer>
-          <ModalSubmit onCancel={this._cancel} onSubmit={this._saveSorting} submitButtonText="Update sort" />
+          <ModalSubmit onCancel={this._cancel} onSubmit={this._saveSorting} submitButtonText={t('sort.submit')} />
         </Modal.Footer>
       </BootstrapModalWrapper>
     );
   }
 }
 
-export default ExtractorSortModal;
+export default withTranslation('extractors')(ExtractorSortModal);

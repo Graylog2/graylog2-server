@@ -1,0 +1,64 @@
+{
+  "api_browser": {
+    "download_label": "OpenAPI仕様をダウンロード:",
+    "fetch_failed": "API仕様の取得に失敗しました。",
+    "loading": "API仕様を読み込んでいます ...",
+    "loading_title": "API ブラウザー - API仕様を読み込み中",
+    "select_format": "形式を選択",
+    "title": "API ブラウザー"
+  },
+  "configlet": {
+    "error": "問題が発生しました:"
+  },
+  "errors": {
+    "copy_error_details": "エラーの詳細をクリップボードにコピー"
+  },
+  "keyboard_shortcuts": {
+    "description": "利用可能なすべてのショートカットの一覧",
+    "title": "キーボードショートカット"
+  },
+  "loading": {
+    "text": "読み込んでいます。しばらくお待ちください...",
+    "title": "読み込み中..."
+  },
+  "not_found": {
+    "back_hint": "<mainPageLink>メインページ</mainPageLink>に戻り、そこから移動できます。",
+    "description": "お探しのページは存在しないか、削除された可能性があります。",
+    "title": "ページが見つかりません"
+  },
+  "runtime_error": {
+    "description_hint": "ナビゲーションを使用して製品の他の部分に移動するか、ページを更新するか、エラーレポートを送信できます。",
+    "description_intro": "移動したページでエラーが発生したようです。",
+    "error_label": "エラー:",
+    "show_less": "簡易表示",
+    "show_more": "詳細を表示",
+    "title": "問題が発生しました。"
+  },
+  "server_unavailable": {
+    "document_title": "サーバーが利用できません",
+    "error_message": "エラーメッセージ",
+    "full_error_message": "完全なエラーメッセージ",
+    "intro": "<serverAddress>{{address}}</serverAddress>で実行中の{{productName}}サーバーに接続できない問題が発生しています。サーバーが正常に動作しているかご確認ください。",
+    "last_response": "サーバーから最後に受信した応答は次のとおりです:",
+    "less_details": "詳細を非表示",
+    "modal_title": "サーバーが現在利用できません",
+    "more_details": "詳細を表示",
+    "need_help": "お困りですか？ <helpLink>サポートいたします</helpLink>。",
+    "no_information": "利用可能な情報はありません。",
+    "original_request": "元のリクエスト",
+    "redirect_hint": "サーバーに再接続できるようになると、前のページに自動的に戻ります。",
+    "status_code": "ステータスコード"
+  },
+  "show_message": {
+    "document_title": "{{index}} のメッセージ {{messageId}}",
+    "not_found_description": "指定されたインデックスまたはメッセージが見つかりませんでした。主な原因は、参照されているメッセージを含むインデックスが削除されたことです。完全なエラーメッセージは次のとおりです:",
+    "not_found_title": "インデックス/メッセージが見つかりません"
+  },
+  "unauthorized": {
+    "description_hint": "管理者に連絡し、エラーの詳細を伝えてください。",
+    "description_intro": "このリソースを表示するために必要な権限がありません。",
+    "page_details": "次のリクエストの権限チェックに失敗しました。\n アクセス先: {{pathname}}。",
+    "page_details_no_request": "{{pathname}} へのアクセス時に権限チェックが失敗しました。",
+    "title": "権限が不足しています"
+  }
+}

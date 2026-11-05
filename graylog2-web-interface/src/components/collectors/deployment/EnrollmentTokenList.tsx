@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { DeleteMenuItem } from 'components/bootstrap';
 import { ConfirmDialog, Link, RelativeTime } from 'components/common';
@@ -60,15 +61,23 @@ const ExpiredText = styled.span`
   color: ${({ theme }) => theme.colors.variant.danger};
 `;
 
+const NeverCell = () => {
+  const { t } = useTranslation('collectors');
+
+  return <span>{t('enrollment_tokens.never')}</span>;
+};
+
 const ExpiresCell = ({ expiresAt }: { expiresAt: string | null }) => {
+  const { t } = useTranslation('collectors');
+
   if (!expiresAt) {
-    return <span>Never</span>;
+    return <NeverCell />;
   }
 
   const expDate = new Date(expiresAt);
 
   if (expDate < new Date()) {
-    return <ExpiredText>Expired</ExpiredText>;
+    return <ExpiredText>{t('enrollment_tokens.expired')}</ExpiredText>;
   }
 
   return <RelativeTime dateTime={expiresAt} />;
@@ -112,13 +121,14 @@ const customColumnRenderers = (fleetNames: Record<string, string>): ColumnRender
     },
     last_used_at: {
       renderCell: (_lastUsedAt: string | null, token: EnrollmentTokenMetadata) =>
-        token.last_used_at ? <RelativeTime dateTime={token.last_used_at} /> : <span>Never</span>,
+        token.last_used_at ? <RelativeTime dateTime={token.last_used_at} /> : <NeverCell />,
       staticWidth: COLUMN_WIDTH.relativeTime,
     },
   },
 });
 
 const EnrollmentTokenList = () => {
+  const { t } = useTranslation('collectors');
   const { deleteEnrollmentToken } = useCollectorsMutations();
   const { data: fleets } = useFleets();
   const { canDeleteToken } = useCollectorPermissions();
@@ -169,7 +179,7 @@ const EnrollmentTokenList = () => {
   return (
     <>
       <PaginatedEntityTable<EnrollmentTokenMetadata>
-        humanName="enrollment tokens"
+        humanName={t('enrollment_tokens.human_name')}
         tableLayout={DEFAULT_LAYOUT}
         fetchEntities={fetchPaginatedEnrollmentTokens}
         keyFn={enrollmentTokensKeyFn}
@@ -180,12 +190,11 @@ const EnrollmentTokenList = () => {
       />
       {deletingToken && (
         <ConfirmDialog
-          title="Delete enrollment token"
+          title={t('enrollment_tokens.delete_title')}
           show
           onConfirm={handleConfirmDelete}
           onCancel={() => setDeletingToken(null)}>
-          Are you sure you want to delete this enrollment token? New Collectors will not be able to enroll using this
-          token. Already-enrolled Collectors will continue to operate normally.
+          {t('enrollment_tokens.delete_confirm')}
         </ConfirmDialog>
       )}
     </>

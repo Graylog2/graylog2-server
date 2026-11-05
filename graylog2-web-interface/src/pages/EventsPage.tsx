@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
@@ -43,27 +44,28 @@ const AlertsOverview = () => {
   );
 };
 
-const EventsPage = () => (
-  <DocumentTitle title="Alerts &amp; Events">
-    <EventsPageNavigation />
-    <PageHeader
-      title="Alerts &amp; Events"
-      documentationLink={{
-        title: 'Alerts documentation',
-        path: DocsHelper.PAGES.ALERTS,
-      }}>
-      <span>
-        Define Events through different conditions. Add Notifications to Events that require your attention to create
-        Alerts.
-      </span>
-    </PageHeader>
+const EventsPage = () => {
+  const { t } = useTranslation('events');
 
-    <Row className="content">
-      <Col md={12}>
-        <AlertsOverview />
-      </Col>
-    </Row>
-  </DocumentTitle>
-);
+  return (
+    <DocumentTitle title={t('alerts_page.title')}>
+      <EventsPageNavigation />
+      <PageHeader
+        title={t('alerts_page.title')}
+        documentationLink={{
+          title: t('alerts_page.documentation_title'),
+          path: DocsHelper.PAGES.ALERTS,
+        }}>
+        <span>{t('alerts_page.description')}</span>
+      </PageHeader>
+
+      <Row className="content">
+        <Col md={12}>
+          <AlertsOverview />
+        </Col>
+      </Row>
+    </DocumentTitle>
+  );
+};
 
 export default EventsPage;

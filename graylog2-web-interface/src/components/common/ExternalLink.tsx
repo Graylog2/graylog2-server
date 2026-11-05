@@ -23,7 +23,7 @@ import Icon from './Icon';
 
 type Props = {
   href?: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   target?: string;
   iconName?: IconName;
   className?: string;

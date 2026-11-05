@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 
+import i18n from 'i18n';
 import type { IconName } from 'components/common/Icon';
 import ViewsHighlightingRules from 'views/components/sidebar/highlighting/ViewsHighlightingRules';
 
@@ -40,14 +41,18 @@ export type SidebarSection = {
 const sidebarSections: Array<SidebarSection> = [
   {
     key: 'viewDescription',
-    title: 'Description',
+    get title() {
+      return i18n.t('sidebar.description', { ns: 'search' });
+    },
     icon: 'info',
     content: ({ results }: SidebarSectionProps) => <ViewDescription results={results} />,
   },
   {
     key: 'create',
     icon: 'add',
-    title: 'Create',
+    get title() {
+      return i18n.t('sidebar.create', { ns: 'search' });
+    },
     content: ({ toggleSidebar, sidebarIsPinned }: SidebarSectionProps) => (
       <AddWidgetButton onClick={!sidebarIsPinned ? toggleSidebar : () => {}} />
     ),
@@ -55,13 +60,17 @@ const sidebarSections: Array<SidebarSection> = [
   {
     key: 'highlighting',
     icon: 'format_paragraph',
-    title: 'Highlighting',
+    get title() {
+      return i18n.t('sidebar.highlighting', { ns: 'search' });
+    },
     content: () => <ViewsHighlightingRules />,
   },
   {
     key: 'fieldList',
     icon: 'subscript',
-    title: 'Fields',
+    get title() {
+      return i18n.t('sidebar.fields', { ns: 'search' });
+    },
     content: ({ sidebarChildren }: SidebarSectionProps) => sidebarChildren,
   },
 ];

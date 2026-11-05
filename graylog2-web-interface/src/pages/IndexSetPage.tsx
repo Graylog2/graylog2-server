@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import numeral from 'numeral';
 
 import HideOnCloud from 'util/conditional/HideOnCloud';
@@ -40,6 +41,7 @@ import { useIndices } from 'hooks/useIndices';
 const REFRESH_INTERVAL = 2000;
 
 const ElasticsearchUnavailableInformation = () => {
+  const { t } = useTranslation('indexsets');
   const productName = useProductName();
 
   return (
@@ -50,17 +52,11 @@ const ElasticsearchUnavailableInformation = () => {
             bsStyle="danger"
             header={
               <span>
-                <Icon name="warning" /> Indices overview unavailable
+                <Icon name="warning" /> {t('overview.elasticsearch_unavailable.title')}
               </span>
             }>
-            <p>
-              We could not get the indices overview information. This usually means there was a problem connecting to
-              the indexer, and <strong>you should ensure the indexer is up and reachable from {productName}</strong>.
-            </p>
-            <p>
-              Messages will continue to be stored in the journal, but searching on them will not be possible until the
-              indexer is reachable again.
-            </p>
+            <p>{t('overview.elasticsearch_unavailable.description', { productName })}</p>
+            <p>{t('overview.elasticsearch_unavailable.journal_info')}</p>
           </Panel>
         </div>
       </Col>
@@ -69,6 +65,7 @@ const ElasticsearchUnavailableInformation = () => {
 };
 
 const IndexSetPage = () => {
+  const { t } = useTranslation('indexsets');
   const { indexSetId } = useParams<{ indexSetId?: string }>();
   const [indexSet, setIndexSet] = useState<IndexSet | undefined>(undefined);
   const { data: indexerOverview, error: indexerOverviewError, refetch } = useIndexerOverview(indexSetId);
@@ -93,24 +90,21 @@ const IndexSetPage = () => {
 
   const pageHeader = (
     <PageHeader
-      title={`Index Set: ${indexSet.title}`}
+      title={t('overview.header.index_set_title', { title: indexSet.title })}
       documentationLink={{
-        title: 'Index model documentation',
+        title: t('overview.header.documentation_link'),
         path: DocsHelper.PAGES.INDEX_MODEL,
       }}
       actions={
         <ButtonToolbar>
           <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(indexSet.id, 'details')}>
-            <Button bsStyle="info">Edit Index Set</Button>
+            <Button bsStyle="info">{t('overview.header.edit_button')}</Button>
           </LinkContainer>
           <IndicesMaintenanceDropdown indexSetId={indexSetId} indexSet={indexSet} />
           <IndicesConfigurationDropdown indexSetId={indexSetId} />
         </ButtonToolbar>
       }>
-      <span>
-        This is an overview of all indices (message stores) in this index set currently being considered for searches
-        and analysis.
-      </span>
+      <span>{t('overview.header.description')}</span>
     </PageHeader>
   );
 
@@ -132,9 +126,11 @@ const IndexSetPage = () => {
     indicesInfo = (
       <span>
         <Alert bsStyle="success" style={{ marginTop: '10' }}>
-          {indexerOverview.indices.length} indices with a total of{' '}
-          {numeral(indexerOverview.counts.events).format('0,0')} messages under management, current write-active index
-          is <i>{deflectorInfo.current_target}</i>.
+          {t('overview.indices_info.summary', {
+            count: indexerOverview.indices.length,
+            messageCount: numeral(indexerOverview.counts.events).format('0,0'),
+            currentTarget: deflectorInfo.current_target,
+          })}
         </Alert>
         <HideOnCloud>
           <IndexerClusterHealthSummary health={indexerOverview.indexer_cluster.health} />
@@ -151,7 +147,7 @@ const IndexSetPage = () => {
   }
 
   return (
-    <DocumentTitle title={`Index Set - ${indexSet ? indexSet.title : ''}`}>
+    <DocumentTitle title={t('overview.document_title', { title: indexSet?.title ?? '' })}>
       <IndicesPageNavigation />
       <div>
         {pageHeader}

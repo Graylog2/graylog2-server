@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Label } from 'components/bootstrap';
 
@@ -23,7 +24,14 @@ type Props = {
   isAlert: boolean;
 };
 
-const EventTypeLabel = ({ isAlert }: Props) =>
-  isAlert ? <Label bsStyle="warning">Alert</Label> : <Label bsStyle="info">Event</Label>;
+const EventTypeLabel = ({ isAlert }: Props) => {
+  const { t } = useTranslation('events');
+
+  return isAlert ? (
+    <Label bsStyle="warning">{t('alerts_types.alert')}</Label>
+  ) : (
+    <Label bsStyle="info">{t('alerts_types.event')}</Label>
+  );
+};
 
 export default EventTypeLabel;

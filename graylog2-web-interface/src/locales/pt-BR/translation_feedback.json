@@ -1,0 +1,85 @@
+{
+  "menu": {
+    "report": "Relatar tradução…",
+    "native_menu_hint": "Shift + clique direito abre o menu do navegador"
+  },
+  "modal": {
+    "title": "Relatar tradução",
+    "text": "Texto",
+    "text_help": "O texto como aparece na página. Reduza-o à parte que precisa de atenção.",
+    "key": "Tradução",
+    "partial_match": "correspondência parcial",
+    "not_translated": "não traduzido",
+    "none_of_these": "Nenhuma destas",
+    "no_key_found": "Nenhuma tradução encontrada, o texto provavelmente ainda não foi traduzido.",
+    "english": "Original em inglês:",
+    "current_translation": "Tradução atual:",
+    "category": "Problema",
+    "suggestion": "Tradução sugerida",
+    "suggestion_help": "Opcional. Como o texto deveria ficar.",
+    "comment": "Comentário",
+    "submit": "Relatar",
+    "submitting": "Relatando…"
+  },
+  "categories": {
+    "wrong": "Tradução incorreta",
+    "untranslated": "Não traduzido",
+    "awkward": "Redação estranha",
+    "layout": "Layout quebrado ou texto cortado",
+    "other": "Outro"
+  },
+  "statuses": {
+    "open": "Aberto",
+    "fixed": "Corrigido",
+    "wont_fix": "Não será corrigido"
+  },
+  "list": {
+    "human_name": "relatos de tradução",
+    "search_placeholder": "Pesquisar relatos de tradução",
+    "no_key": "Sem chave",
+    "download_json": "Baixar JSON",
+    "download_csv": "Baixar CSV"
+  },
+  "actions": {
+    "mark_fixed": "Marcar como corrigido",
+    "reopen": "Reabrir",
+    "mark_wont_fix": "Não será corrigido",
+    "confirm_delete": "Deseja realmente excluir o relato sobre \"{{text}}\"?"
+  },
+  "page": {
+    "title": "Feedback de tradução",
+    "description": "Relatos sobre as traduções da interface. Clique com o botão direito em qualquer texto para relatá-lo."
+  },
+  "notifications": {
+    "created": "Obrigado! Seu relato foi salvo.",
+    "created_title": "Tradução relatada",
+    "create_failed": "Não foi possível salvar o relato: {{error}}",
+    "create_failed_title": "Não foi possível relatar a tradução",
+    "update_failed": "Não foi possível atualizar o relato: {{error}}",
+    "update_failed_title": "Não foi possível atualizar o relato"
+  },
+  "bulk": {
+    "delete": "Excluir",
+    "changed_one": "{{count}} relato alterado.",
+    "changed_many": "{{count}} relatos alterados.",
+    "changed_other": "{{count}} relatos alterados.",
+    "confirm_delete_one": "Deseja realmente excluir {{count}} relato?",
+    "confirm_delete_many": "Deseja realmente excluir {{count}} relatos?",
+    "confirm_delete_other": "Deseja realmente excluir {{count}} relatos?"
+  },
+  "upload": {
+    "button": "Enviar resoluções",
+    "uploading": "Enviando…",
+    "help": "Envie um arquivo de resoluções para definir o status e uma nota para quem relatou em vários relatos de uma vez.",
+    "failed": "Não foi possível aplicar as resoluções: {{error}}",
+    "failed_title": "Não foi possível aplicar as resoluções",
+    "invalid_file": "O arquivo não contém uma lista de resoluções.",
+    "applied_title": "Resoluções aplicadas",
+    "applied_one": "{{count}} relato atualizado.",
+    "applied_many": "{{count}} relatos atualizados.",
+    "applied_other": "{{count}} relatos atualizados.",
+    "applied_with_missing_one": "{{count}} relato atualizado, {{notFound}} não encontrados.",
+    "applied_with_missing_many": "{{count}} relatos atualizados, {{notFound}} não encontrados.",
+    "applied_with_missing_other": "{{count}} relatos atualizados, {{notFound}} não encontrados."
+  }
+}

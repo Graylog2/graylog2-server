@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { Trans, useTranslation } from 'react-i18next';
 
 import { Label } from 'components/bootstrap';
 import { RelativeTime } from 'components/common';
@@ -73,18 +74,19 @@ const ErrorBlock = styled.pre(
 );
 
 const InstanceHealthSection = ({ health, online }: Props) => {
+  const { t } = useTranslation('collectors');
   let body: React.ReactNode;
 
   if (!health) {
     body = (
       <>
-        <Label bsStyle="default">Unknown</Label>{' '}
-        <EmptyText>This collector has not reported health information.</EmptyText>
+        <Label bsStyle="default">{t('instance_health.unknown')}</Label>{' '}
+        <EmptyText>{t('instance_health.no_report')}</EmptyText>
       </>
     );
   } else {
     const { healthy, last_error: lastError } = health.component_health;
-    const stateText = healthy ? 'Healthy' : 'Unhealthy';
+    const stateText = healthy ? t('instance_health.healthy') : t('instance_health.unhealthy');
 
     body = (
       <>
@@ -94,7 +96,7 @@ const InstanceHealthSection = ({ health, online }: Props) => {
           // Stale (offline) health must not read as a live signal: the muted default
           // label + "Last known:" wording carry the de-emphasis (theme-safe, unlike
           // opacity dimming, which has no precedent in the product).
-          <Label bsStyle="default">Last known: {stateText}</Label>
+          <Label bsStyle="default">{t('instance_health.last_known', { state: stateText })}</Label>
         )}
         {online && (
           <>
@@ -103,7 +105,11 @@ const InstanceHealthSection = ({ health, online }: Props) => {
                 (healthy for 1h, then offline 3 days is not "Healthy for 3 days");
                 the Last Seen row above conveys staleness for offline instances. */}
             <Duration>
-              for <RelativeTime dateTime={health.healthy_changed_at} withoutSuffix />
+              <Trans
+                t={t}
+                i18nKey="instance_health.since"
+                components={{ duration: <RelativeTime dateTime={health.healthy_changed_at} withoutSuffix /> }}
+              />
             </Duration>
           </>
         )}
@@ -116,7 +122,7 @@ const InstanceHealthSection = ({ health, online }: Props) => {
 
   return (
     <Section>
-      <SectionTitle>Health</SectionTitle>
+      <SectionTitle>{t('instance_health.title')}</SectionTitle>
       {body}
     </Section>
   );

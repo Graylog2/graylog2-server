@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { TextField } from 'components/configurationforms';
 
@@ -28,10 +29,11 @@ type Props = {
 };
 
 const TitleField = ({ typeName, helpText = '', value = '', onChange = () => {} }: Props) => {
+  const { t } = useTranslation('common');
   const titleField: TextFieldType = {
     is_optional: false,
     attributes: [],
-    human_name: 'Title',
+    human_name: t('configuration_forms.title'),
     description: helpText,
     is_encrypted: false,
     additional_info: {},
@@ -44,6 +46,7 @@ const TitleField = ({ typeName, helpText = '', value = '', onChange = () => {} }
     <TextField
       key={`${typeName}-title`}
       typeName={typeName}
+      // eslint-disable-next-line graylog/no-untranslated-text -- name of the form field, not displayed
       title="title"
       field={titleField}
       value={value}

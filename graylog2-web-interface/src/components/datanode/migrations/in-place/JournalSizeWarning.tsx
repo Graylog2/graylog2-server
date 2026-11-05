@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Icon } from 'components/common';
 import { Panel } from 'components/bootstrap';
@@ -27,21 +28,18 @@ const StyledHelpPanel = styled(StyledPanel)`
 `;
 
 const JournalSizeWarning = () => {
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const productName = useProductName();
 
   return (
     <StyledHelpPanel bsStyle="warning">
       <Panel.Heading>
         <Panel.Title componentClass="h3">
-          <Icon name="warning" /> Journal size warning
+          <Icon name="warning" /> {t('journal_size_warning.title')}
         </Panel.Title>
       </Panel.Heading>
       <Panel.Body>
-        <p>
-          Please note that during migration you will have to stop processing on your {productName} node, this will
-          result in the journal growing in size. Therefore you will have to increase your journal volume size during the
-          Journal size downsize step or earlier.
-        </p>
+        <p>{t('journal_size_warning.description', { productName })}</p>
       </Panel.Body>
     </StyledHelpPanel>
   );

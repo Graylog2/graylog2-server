@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 
 import { Row, Col } from 'components/bootstrap';
+import i18n from 'i18n';
 import UserNotification from 'util/UserNotification';
 import Spinner from 'components/common/Spinner';
 import useStreamOutputMutations from 'hooks/useStreamOutputMutations';
@@ -121,9 +122,12 @@ const OutputsComponent = ({ streamId = undefined }: Props) => {
       });
 
       // eslint-disable-next-line no-alert
-      if (window.confirm('Do you really want to terminate this output?')) {
+      if (window.confirm(i18n.t('notifications.output_terminate_confirm', { ns: 'streams' }))) {
         removeOutput(outputId).then(() => {
-          UserNotification.success('Output was terminated.', 'Success');
+          UserNotification.success(
+            i18n.t('notifications.output_terminated', { ns: 'streams' }),
+            i18n.t('notifications.success_title', { ns: 'streams' }),
+          );
           refetchAll();
         });
       }
@@ -138,7 +142,7 @@ const OutputsComponent = ({ streamId = undefined }: Props) => {
       });
 
       // eslint-disable-next-line no-alert
-      if (window.confirm('Do you really want to remove this output from the stream?')) {
+      if (window.confirm(i18n.t('notifications.output_remove_confirm', { ns: 'streams' }))) {
         // The hook handles the success/error toast; swallow rejection to avoid an unhandled rejection.
         removeStreamOutput({ streamId: _streamId, outputId })
           .then(() => refetchAll())

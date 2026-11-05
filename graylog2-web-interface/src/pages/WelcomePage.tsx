@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { DocumentTitle, Spinner } from 'components/common';
 import Welcome from 'components/welcome/Welcome';
@@ -22,13 +23,16 @@ import useShowOnboardingWizard from 'components/welcome/useShowOnboardingWizard'
 import FirstUseWelcome from 'components/welcome/FirstUseWelcome';
 
 const WelcomePage = () => {
+  const { t } = useTranslation('navigation');
   const showOnboardingWizard = useShowOnboardingWizard();
   if (showOnboardingWizard === 'LOADING') {
     return <Spinner />;
   }
 
   return (
-    <DocumentTitle title="Welcome">{showOnboardingWizard === 'SHOW' ? <FirstUseWelcome /> : <Welcome />}</DocumentTitle>
+    <DocumentTitle title={t('shell.welcome')}>
+      {showOnboardingWizard === 'SHOW' ? <FirstUseWelcome /> : <Welcome />}
+    </DocumentTitle>
   );
 };
 

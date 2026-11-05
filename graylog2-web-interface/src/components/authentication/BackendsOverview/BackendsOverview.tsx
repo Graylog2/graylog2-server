@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import styled, { css } from 'styled-components';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 import type { PaginatedRoles } from 'hooks/useAuthzRoles';
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
@@ -33,6 +34,12 @@ import BackendsFilter from './BackendsFilter';
 import BackendsOverviewItem from './BackendsOverviewItem';
 
 const TABLE_HEADERS = ['Title', 'Description', 'Default Roles', 'Actions'];
+const HEADER_TITLE_KEYS = {
+  Title: 'backends_overview.headers.title',
+  Description: 'backends_overview.headers.description',
+  'Default Roles': 'backends_overview.headers.default_roles',
+  Actions: 'backends_overview.headers.actions',
+};
 
 const Header = styled.div`
   display: flex;
@@ -45,15 +52,6 @@ const LoadingSpinner = styled(Spinner)(
     font-size: ${theme.fonts.size.h3};
   `,
 );
-
-const _headerCellFormatter = (header) => {
-  switch (header.toLowerCase()) {
-    case 'actions':
-      return <th className="actions text-right">{header}</th>;
-    default:
-      return <th>{header}</th>;
-  }
-};
 
 const _loadRoles = () => {
   const getUnlimited = { page: 1, perPage: 0, query: '' };
@@ -74,6 +72,7 @@ const _backendsOverviewItem = (
 );
 
 const BackendsOverview = () => {
+  const { t } = useTranslation('authentication');
   const { page, pageSize: perPage, resetPage } = usePaginationQueryParameter();
   const [paginatedRoles, setPaginatedRoles] = useState<PaginatedRoles | undefined>();
   const [query, setQuery] = useState('');
@@ -98,6 +97,17 @@ const BackendsOverview = () => {
     }
   };
 
+  const _headerCellFormatter = (header: string) => {
+    const title = t(HEADER_TITLE_KEYS[header]);
+
+    switch (header.toLowerCase()) {
+      case 'actions':
+        return <th className="actions text-right">{title}</th>;
+      default:
+        return <th>{title}</th>;
+    }
+  };
+
   if (!paginatedBackends || !paginatedRoles) {
     return <Spinner />;
   }
@@ -105,17 +115,15 @@ const BackendsOverview = () => {
   return (
     <Row className="content">
       <Col xs={12}>
-        <h2>Configured Authentication Services</h2>
+        <h2>{t('backends_overview.title')}</h2>
         <Header>{isFetching && <LoadingSpinner text="" delay={0} />}</Header>
-        <p className="description">
-          Found {paginatedBackends.pagination.total} configured authentication services on the system.
-        </p>
+        <p className="description">{t('backends_overview.found', { count: paginatedBackends.pagination.total })}</p>
         <PaginatedList totalItems={paginatedBackends.pagination.total}>
           <DataTable
             customFilter={<BackendsFilter onSearch={onSearch} />}
             dataRowFormatter={(authBackend) => _backendsOverviewItem(authBackend, context, paginatedRoles)}
             filterKeys={[]}
-            filterLabel="Filter services"
+            filterLabel={t('backends_overview.filter_label')}
             headerCellFormatter={_headerCellFormatter}
             headers={TABLE_HEADERS}
             id="auth-backends-overview"

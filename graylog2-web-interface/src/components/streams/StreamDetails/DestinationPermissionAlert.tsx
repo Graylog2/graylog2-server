@@ -15,17 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Alert } from 'components/bootstrap';
 
 type Props = {
-  sectionName: string;
+  section: 'index_set' | 'outputs' | 'data_lake';
 };
 
-const DestinationPermissionAlert = ({ sectionName }: Props) => (
-  <Alert bsStyle="danger">
-    {`You currently do not have the permissions to view or manage ${sectionName} destination.`}
-  </Alert>
-);
+const DestinationPermissionAlert = ({ section }: Props) => {
+  const { t } = useTranslation('streams');
+
+  return <Alert bsStyle="danger">{t(`destination_permission_alert.${section}`)}</Alert>;
+};
 
 export default DestinationPermissionAlert;

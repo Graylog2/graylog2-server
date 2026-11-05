@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import type UserOverview from 'logic/users/UserOverview';
@@ -32,26 +33,33 @@ const Td = styled.td`
   position: relative;
 `;
 
-const LoggedInCell = ({ lastActivity, sessionActive, clientAddress }: Props) => (
-  <Td>
-    <OverlayTrigger
-      trigger={['hover', 'focus']}
-      placement="right"
-      title={sessionActive ? 'Logged in' : undefined}
-      overlay={
-        sessionActive ? (
-          <>
-            <div>Last activity: {lastActivity ? <RelativeTime dateTime={lastActivity} /> : '-'}</div>
-            <div>Client address: {clientAddress ?? '-'}</div>
-          </>
-        ) : (
-          <>Not logged in</>
-        )
-      }
-      rootClose>
-      <StatusIcon active={sessionActive} />
-    </OverlayTrigger>
-  </Td>
-);
+const LoggedInCell = ({ lastActivity, sessionActive, clientAddress }: Props) => {
+  const { t } = useTranslation('users');
+
+  return (
+    <Td>
+      <OverlayTrigger
+        trigger={['hover', 'focus']}
+        placement="right"
+        title={sessionActive ? t('users_list.logged_in.title') : undefined}
+        overlay={
+          sessionActive ? (
+            <>
+              <div>
+                {t('users_list.logged_in.last_activity', { activity: '' })}
+                {lastActivity ? <RelativeTime dateTime={lastActivity} /> : '-'}
+              </div>
+              <div>{t('users_list.logged_in.client_address', { address: clientAddress ?? '-' })}</div>
+            </>
+          ) : (
+            <>{t('users_list.logged_in.not_logged_in')}</>
+          )
+        }
+        rootClose>
+        <StatusIcon active={sessionActive} />
+      </OverlayTrigger>
+    </Td>
+  );
+};
 
 export default LoggedInCell;

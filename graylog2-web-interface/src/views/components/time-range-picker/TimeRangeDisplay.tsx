@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import type {
   TimeRange as TimeRangeType,
@@ -98,7 +99,7 @@ export const range = (timerange: AbsoluteTimeRange | RelativeTimeRange | null | 
         from = readableRange(timerange, 'from');
       }
 
-      to = readableRange(timerange, 'to', 'Now');
+      to = readableRange(timerange, 'to');
 
       return {
         from,
@@ -119,10 +120,12 @@ const TimeRange = ({
   centerTimestamps: boolean;
   timerange: TimeRangeType | null | undefined;
 }) => {
+  const { t } = useTranslation('search');
+
   if (timerange?.type === 'keyword') {
     return (
       <TimeRangeCell $centerTimestamps={centerTimestamps} $fullWidth={centerTimestamps}>
-        Keyword: <b>{timerange.keyword}</b>
+        {t('time_range.keyword_label')} <b>{timerange.keyword}</b>
       </TimeRangeCell>
     );
   }
@@ -132,11 +135,11 @@ const TimeRange = ({
   return (
     <>
       <TimeRangeCell data-testid="from" $centerTimestamps={centerTimestamps} $gridColumn="1">
-        From: <b>{from}</b>
+        {t('time_range.from_label')} <b>{from}</b>
       </TimeRangeCell>
       <TimeRangeGap aria-hidden $centerTimestamps={centerTimestamps} />
       <TimeRangeCell data-testid="to" $centerTimestamps={centerTimestamps} $gridColumn="3">
-        Until: <b>{until}</b>
+        {t('time_range.until_label')} <b>{until}</b>
       </TimeRangeCell>
     </>
   );
@@ -148,20 +151,24 @@ type Props = {
   centerTimestamps?: boolean;
 };
 
-const TimeRangeDisplay = ({ timerange, toggleDropdownShow = undefined, centerTimestamps = false }: Props) => (
-  <TimeRangeWrapper
-    $centerTimestamps={centerTimestamps}
-    aria-label="Search Time Range, Opens Time Range Selector On Click"
-    role="button"
-    onClick={toggleDropdownShow}>
-    {isNoTimeRangeOverride(timerange) ? (
-      <TimeRangeCell $centerTimestamps={centerTimestamps} $fullWidth={centerTimestamps}>
-        No Override
-      </TimeRangeCell>
-    ) : (
-      <TimeRange centerTimestamps={centerTimestamps} timerange={timerange} />
-    )}
-  </TimeRangeWrapper>
-);
+const TimeRangeDisplay = ({ timerange, toggleDropdownShow = undefined, centerTimestamps = false }: Props) => {
+  const { t } = useTranslation('search');
+
+  return (
+    <TimeRangeWrapper
+      $centerTimestamps={centerTimestamps}
+      aria-label={t('time_range.display_label')}
+      role="button"
+      onClick={toggleDropdownShow}>
+      {isNoTimeRangeOverride(timerange) ? (
+        <TimeRangeCell $centerTimestamps={centerTimestamps} $fullWidth={centerTimestamps}>
+          {t('time_range.no_override')}
+        </TimeRangeCell>
+      ) : (
+        <TimeRange centerTimestamps={centerTimestamps} timerange={timerange} />
+      )}
+    </TimeRangeWrapper>
+  );
+};
 
 export default TimeRangeDisplay;

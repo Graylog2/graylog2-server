@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Label } from 'components/bootstrap';
 
@@ -26,11 +27,14 @@ type Props = {
 };
 
 const LifecycleCell = ({ node }: Props) => {
+  const { t } = useTranslation('system');
   const lifecycleStatus = node.lifecycle?.toUpperCase();
 
   if (!lifecycleStatus) {
     return null;
   }
+
+  const lifecycleLabel = t(`node_lifecycle.${lifecycleStatus.toLowerCase()}`, { defaultValue: lifecycleStatus });
 
   return (
     <MetricsColumn>
@@ -38,9 +42,9 @@ const LifecycleCell = ({ node }: Props) => {
         <Label
           bsStyle={lifecycleStatus === 'RUNNING' ? 'success' : 'warning'}
           bsSize="xs"
-          title={lifecycleStatus}
-          aria-label={lifecycleStatus}>
-          {lifecycleStatus}
+          title={lifecycleLabel}
+          aria-label={lifecycleLabel}>
+          {lifecycleLabel}
         </Label>
       </MetricsRow>
     </MetricsColumn>

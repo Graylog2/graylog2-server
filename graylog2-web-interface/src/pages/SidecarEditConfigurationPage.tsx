@@ -16,6 +16,7 @@
  */
 import React, { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
@@ -31,6 +32,7 @@ type SidecarEditConfigurationPageProps = {
 };
 
 const SidecarEditConfigurationPage = ({ params }: SidecarEditConfigurationPageProps) => {
+  const { t } = useTranslation('sidecars');
   const history = useHistory();
   const { configurationId } = params;
 
@@ -56,15 +58,15 @@ const SidecarEditConfigurationPage = ({ params }: SidecarEditConfigurationPagePr
   }
 
   return (
-    <DocumentTitle title="Collector Configuration">
+    <DocumentTitle title={t('pages.edit_configuration.title')}>
       <SidecarsPageNavigation />
       <PageHeader
-        title="Collector Configuration"
+        title={t('pages.edit_configuration.title')}
         documentationLink={{
-          title: 'Sidecar documentation',
+          title: t('pages.documentation_title'),
           path: DocsHelper.PAGES.COLLECTOR_SIDECAR,
         }}>
-        <span>Some words about collector configurations.</span>
+        <span>{t('pages.edit_configuration.description')}</span>
       </PageHeader>
       <ConfigurationForm configuration={configuration} configurationSidecars={configurationSidecars} />
     </DocumentTitle>

@@ -1,0 +1,252 @@
+{
+  "extractors_of": "Extractors von {{title}}",
+  "actions": "Aktionen",
+  "import_extractors": "Extractors importieren",
+  "export_extractors": "Extractors exportieren",
+  "documentation_title": "Extractors-Dokumentation",
+  "description": "Extractors werden auf jede Nachricht angewendet, die von diesem Input empfangen wird. Verwenden Sie sie, um beliebige Textdaten in Felder zu extrahieren und zu transformieren, die Ihnen später eine einfache Filterung und Analyse ermöglichen. Beispiel: Extrahieren Sie den HTTP-Response-Code aus einer Log-Nachricht, transformieren Sie ihn in ein numerisches Feld und hängen Sie ihn als {{field}} an die Nachricht an.",
+  "list_item": {
+    "subtitle_copy": "Versucht, Daten aus <em>{{source}}</em> in <em>{{target}}</em> zu extrahieren, und lässt das Original unverändert.",
+    "subtitle_cut": "Versucht, Daten aus <em>{{source}}</em> in <em>{{target}}</em> zu extrahieren, und lässt das Original nicht unverändert.",
+    "condition": "Bedingung",
+    "condition_string": "Wird nur ausgeführt, wenn die Nachricht die Zeichenkette <em>{{value}}</em> enthält",
+    "condition_regex": "Wird nur ausgeführt, wenn die Nachricht dem regulären Ausdruck <em>{{value}}</em> entspricht",
+    "confirm_delete": "Extractor „{{title}}“ wirklich entfernen?",
+    "details": "Details",
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "no_configuration": "Keine Konfigurationsoptionen",
+    "configuration": "Konfiguration",
+    "converters": "Konverter"
+  },
+  "metrics": {
+    "title": "Metriken",
+    "percentile_95": "95. Perzentil:",
+    "percentile_98": "98. Perzentil:",
+    "percentile_99": "99. Perzentil:",
+    "std_dev": "Standardabweichung:",
+    "mean": "Mittelwert:",
+    "minimum": "Minimum:",
+    "maximum": "Maximum:",
+    "invocations": "{{total}} Aufrufe insgesamt seit dem Start, Durchschnittswerte: {{oneMinute}}, {{fiveMinutes}}, {{fifteenMinutes}}.",
+    "hits_misses": "{{hits}} Treffer, {{misses}} Fehlschläge",
+    "no_messages": "Hier wurde noch keine Nachricht verarbeitet.",
+    "total_time": "Gesamtzeit",
+    "condition_time": "Zeit für Bedingung",
+    "execution_time": "Ausführungszeit",
+    "converter_time": "Zeit für Konverter",
+    "microseconds": "{{value}} μs"
+  },
+  "edit": {
+    "condition_string_label": "Feld enthält Zeichenkette",
+    "condition_string_help": "Geben Sie eine Zeichenkette ein, die das Feld enthalten muss, damit die Extraktion versucht wird.",
+    "condition_regex_label": "Feld entspricht regulärem Ausdruck",
+    "condition_regex_help": "Geben Sie einen regulären Ausdruck ein, dem das Feld entsprechen muss, damit die Extraktion versucht wird.",
+    "condition_matches": "Treffer! Der Extractor würde für dieses Beispiel ausgeführt.",
+    "condition_no_match": "Kein Treffer! Der Extractor würde nicht ausgeführt.",
+    "try": "Testen",
+    "condition_type_help": "Wenn Sie nur aus Nachrichten extrahieren, die eine bestimmte Bedingung erfüllen, vermeiden Sie falsche oder unnötige Extraktionen und sparen zudem CPU-Ressourcen.",
+    "cursor_strategy_help": "Möchten Sie aus der Quelle kopieren oder ausschneiden? Ausschneiden ist bei Standardfeldern wie <em>message</em> und <em>source</em> nicht möglich.",
+    "target_field_help": "Wählen Sie einen Feldnamen, unter dem der extrahierte Wert gespeichert wird. Er darf nur <b>alphanumerische Zeichen und Unterstriche</b> enthalten. Beispiel: <em>http_response_code</em>.",
+    "store_as_field": "Als Feld speichern",
+    "example_message": "Beispielnachricht",
+    "configuration": "Extractor-Konfiguration",
+    "extractor_type": "Extractor-Typ",
+    "source_field": "Quellfeld",
+    "condition": "Bedingung",
+    "condition_none": "Immer versuchen zu extrahieren",
+    "condition_string": "Nur extrahieren, wenn das Feld die Zeichenkette enthält",
+    "condition_regex": "Nur extrahieren, wenn das Feld dem regulären Ausdruck entspricht",
+    "extraction_strategy": "Extraktionsstrategie",
+    "copy": "Kopieren",
+    "cut": "Ausschneiden",
+    "title": "Extractor-Titel",
+    "title_help": "Ein aussagekräftiger Name für diesen Extractor.",
+    "create": "Extractor erstellen",
+    "update": "Extractor aktualisieren"
+  },
+  "converters": {
+    "csv_enable": "CSV-Spalten als Felder hinzufügen",
+    "csv_field_names": "Feldnamen",
+    "csv_separator": "Trennzeichen",
+    "csv_quote": "Anführungszeichen",
+    "csv_escape": "Escape-Zeichen",
+    "csv_escape_help": "Zeichen, mit dem Trenn- und Anführungszeichen maskiert werden.",
+    "csv_strict_quotes": "Strikte Anführungszeichen verwenden",
+    "csv_strict_quotes_help": "Inhalt außerhalb von Anführungszeichen ignorieren.",
+    "csv_trim": "Führende Leerzeichen entfernen",
+    "date_enable": "In Datumstyp umwandeln",
+    "date_format": "Formatzeichenkette",
+    "time_zone": "Zeitzone",
+    "locale": "Gebietsschema",
+    "flexdate_enable": "Datum flexibel parsen",
+    "hash": "MD5-Hash aus dem Wert bilden",
+    "ip_anonymizer": "IPv4-Adressen durch Ersetzen des letzten Oktetts anonymisieren",
+    "lookup_table_enable": "Wert mithilfe einer Lookup-Tabelle umwandeln",
+    "lookup_table": "Lookup-Tabelle",
+    "lookup_table_placeholder": "Lookup-Tabelle auswählen",
+    "lowercase": "Wert in Kleinbuchstaben umwandeln",
+    "numeric": "In numerischen Wert umwandeln",
+    "split_and_count": "Aufteilen & Zählen",
+    "split_by": "Aufteilen nach",
+    "syslog_pri_facility": "PRI in Syslog-Facility umwandeln",
+    "syslog_pri_level": "PRI in Syslog-Level umwandeln",
+    "tokenizer": "Schlüssel=Wert-Paare als Felder hinzufügen",
+    "uppercase": "Wert in Großbuchstaben umwandeln",
+    "csv_separator_help": "Zum Beispiel werden <code>,</code>, <code>\\n</code> und <code>\\t</code> in ein einzelnes Zeichen umgewandelt.",
+    "date_format_help": "Format-String, den das Datum verwendet. Mehr dazu in der <docsLink>Dokumentation</docsLink>.",
+    "time_zone_help": "Zeitzone, die auf das Datum angewendet wird. Mehr dazu in der <docsLink>Dokumentation</docsLink>.",
+    "locale_help": "Gebietsschema, das beim Einlesen des Datums verwendet wird. Mehr dazu in der <docsLink>Dokumentation</docsLink>.",
+    "lookup_table_help": "Lookup Tables können <lookupTablesLink>hier</lookupTablesLink> erstellt werden.",
+    "split_by_help": "Der Split-&-Count-Converter teilt den extrahierten Teil am angegebenen Zeichen und speichert die Anzahl der Teile als Feld. <strong>Beispiel:</strong> <em>?fields=first_name,last_name,zip</em> geteilt an <em>,</em> ergibt <em>3</em>. Damit haben Sie die angefragten Felder eines GET-User-REST-Requests gezählt."
+  },
+  "wizard": {
+    "title": "Extractor hinzufügen",
+    "description": "Laden Sie zuerst eine Nachricht, um ein Beispiel zum Arbeiten zu haben. Sie können eine aktuelle Nachricht laden, die dieser Input empfangen hat, oder eine Nachricht manuell über ihre ID auswählen.",
+    "create": "Extractor erstellen"
+  },
+  "configuration": {
+    "preview": "Extractor-Vorschau",
+    "nothing_extracted": "Es wird nichts extrahiert",
+    "try_example": "Mit Beispiel testen"
+  },
+  "converters_editor": {
+    "not_supported": "Zu <em>{{type}}</em>-Extractors können keine Converter hinzugefügt werden.",
+    "add_label": "Converter hinzufügen",
+    "add_help": "Fügen Sie Converter hinzu, um den extrahierten Wert umzuwandeln.",
+    "select_placeholder": "Converter auswählen",
+    "add": "Hinzufügen"
+  },
+  "export": {
+    "json_title": "Extractors-JSON",
+    "copy": "Extractors kopieren"
+  },
+  "example_message": {
+    "not_loaded": "Es konnte kein Beispiel für das Feld „{{field}}“ geladen werden. Der Extractor kann erst nach dem Aktualisieren getestet werden."
+  },
+  "sort": {
+    "title": "Extractors für <em>{{title}}</em> sortieren",
+    "description": "Ziehen Sie die Extractors in der Liste per Drag-and-drop, um die Reihenfolge zu ändern, in der sie angewendet werden.",
+    "submit": "Sortierung aktualisieren"
+  },
+  "list": {
+    "sort": "Extractors sortieren",
+    "title": "Konfigurierte Extractors",
+    "no_extractors": "Für diesen Input sind keine Extractors konfiguriert."
+  },
+  "import": {
+    "parse_error": "Beim Einlesen der Extractors ist ein Fehler aufgetreten. Liegen sie im JSON-Format vor? {{error}}",
+    "parse_error_title": "Extractors konnten nicht importiert werden",
+    "submit": "Extractors zum Input hinzufügen"
+  },
+  "message_loader": {
+    "load": "Nachricht laden",
+    "loading": "Nachricht wird geladen...",
+    "wrong_example": "Falsches Beispiel?",
+    "load_another": "Andere Nachricht laden",
+    "message_id": "Nachrichten-ID",
+    "index": "Index"
+  },
+  "copy_input": {
+    "description": "Der gesamte Input wird unverändert kopiert."
+  },
+  "grok": {
+    "error": "Die Grok-Extraktion konnte wegen des folgenden Fehlers nicht ausgeführt werden: {{error}}",
+    "no_match": "Die Grok-Extraktion konnte nicht ausgeführt werden. Bitte überprüfen Sie Ihre Parameter.",
+    "named_captures_only": "Nur benannte Captures",
+    "named_captures_only_help": "Nur die explizit benannten Captures in die Nachricht übernehmen.",
+    "pattern": "Grok-Pattern"
+  },
+  "json": {
+    "flatten": "Strukturen abflachen",
+    "flatten_help": "Ob JSON-Objekte in ein einzelnes Nachrichtenfeld abgeflacht oder in mehrere Felder aufgeteilt werden sollen.",
+    "list_separator": "Trennzeichen für Listeneinträge",
+    "list_separator_help": "Zeichenkette, mit der die Einträge einer JSON-Liste verbunden werden.",
+    "key_separator": "Trennzeichen für Schlüssel",
+    "key_separator_help": "Zeichenkette, mit der die Schlüssel eines verschachtelten JSON-Objekts verbunden werden (nur wenn <em>nicht</em> abgeflacht wird).",
+    "kv_separator": "Trennzeichen für Schlüssel/Wert",
+    "kv_separator_help": "Zeichenkette, mit der Schlüssel/Wert-Paare eines JSON-Objekts verbunden werden (nur wenn abgeflacht wird).",
+    "key_prefix": "Schlüssel-Präfix",
+    "key_prefix_help": "Text, der jedem aus dem JSON-Objekt extrahierten Schlüssel vorangestellt wird.",
+    "replace_key_whitespace": "Leerzeichen in Schlüsseln ersetzen",
+    "replace_key_whitespace_help": "Feldschlüssel mit Leerzeichen werden beim Speichern der extrahierten Nachricht verworfen. Aktivieren Sie diese Option, um Leerzeichen in JSON-Schlüsseln durch ein anderes Zeichen zu ersetzen.",
+    "key_whitespace_replacement": "Ersatzzeichen für Leerzeichen in Schlüsseln",
+    "key_whitespace_replacement_help": "Zeichen, durch das Leerzeichen in Nachrichtenschlüsseln ersetzt werden. Stellen Sie sicher, dass das Ersatzzeichen in Lucene gültig ist, z. B. '-' oder '_'."
+  },
+  "lookup_table": {
+    "error": "Der Lookup konnte nicht ausgeführt werden: {{error}}"
+  },
+  "regex": {
+    "no_match": "Der reguläre Ausdruck hat nicht gepasst.",
+    "no_group": "Der reguläre Ausdruck enthält keine Gruppe, die extrahiert werden kann.",
+    "help": "Der reguläre Ausdruck für die Extraktion. Die erste Gruppe wird verwendet. Mehr dazu in der <docsLink>Dokumentation</docsLink>.",
+    "label": "Regulärer Ausdruck"
+  },
+  "regex_replace": {
+    "regex_help": "Der reguläre Ausdruck für die Extraktion. Mehr dazu in der <docsLink>Dokumentation</docsLink>.",
+    "replacement_help": "Die Ersetzung für den passenden Text. Die möglichen Optionen finden Sie in der API-Dokumentation von <matcherLink>Matcher</matcherLink>.",
+    "replacement": "Ersetzung",
+    "replace_all": "Alle Vorkommen des Musters ersetzen",
+    "replace_all_help": "Ob alle Vorkommen des angegebenen Musters oder nur das erste ersetzt werden sollen."
+  },
+  "split_and_index": {
+    "no_match": "Die Split-&-Index-Extraktion konnte nicht ausgeführt werden. Bitte überprüfen Sie Ihre Parameter.",
+    "split_by_help": "An welchem Zeichen geteilt werden soll. <strong>Beispiel:</strong> Ein Leerzeichen teilt <em>foo bar baz</em> in <em>[foo,bar,baz]</em>.",
+    "index_help": "Welchen Teil der geteilten Zeichenkette möchten Sie verwenden? <strong>Beispiel:</strong> <em>2</em> wählt <em>bar</em> aus <em>foo bar baz</em>, wenn an Leerzeichen geteilt wird.",
+    "index": "Ziel-Index"
+  },
+  "substring": {
+    "no_match": "Die Substring-Extraktion konnte nicht ausgeführt werden. Bitte überprüfen Sie die Index-Grenzen.",
+    "end_index_help": "Wo die Extraktion endet. (Exklusiv) <strong>Beispiel:</strong> <em>1,5</em> schneidet <em>love</em> aus der Zeichenkette <em>ilovelogs</em>.",
+    "begin_index": "Start-Index",
+    "begin_index_help": "Zeichenposition, ab der extrahiert wird. (Inklusiv)",
+    "end_index": "End-Index"
+  },
+  "pages": {
+    "new_title": "Neuer Extractor für Input {{title}}",
+    "new_header": "Neuer Extractor für Input <em>{{title}}</em>",
+    "edit_title": "Extractor {{title}} bearbeiten",
+    "edit_header": "Extractor <em>{{title}}</em> für Input <em>{{inputTitle}}</em> bearbeiten",
+    "description": "Extractors werden auf jede Nachricht angewendet, die ein Input empfängt. Mit ihnen extrahieren und transformieren Sie beliebige Textdaten in Felder, die Ihnen später einfaches Filtern und Analysieren ermöglichen.",
+    "export_title": "Extractors von {{title}} exportieren",
+    "export_header": "Extractors von <em>{{title}}</em> exportieren",
+    "export_marketplace_prefix": "Die Extractors eines Inputs können als JSON exportiert werden, um sie in andere Installationen zu importieren oder zu teilen im",
+    "import_title": "Extractors in {{title}} importieren",
+    "import_header": "Extractors in <em>{{title}}</em> importieren",
+    "import_description": "Exportierte Extractors können in einen Input importiert werden.",
+    "import_marketplace_prefix": "Sie benötigen lediglich den JSON-Export der Extractors aus einer anderen {{productName}}-Installation oder aus dem"
+  },
+  "tools_api": {
+    "details": "Details: {{error}}",
+    "natural_date_failed": "Laden der Schlüsselwort-Vorschau fehlgeschlagen mit Status: {{error}}",
+    "natural_date_failed_title": "Schlüsselwort-Vorschau konnte nicht geladen werden",
+    "grok_failed_title": "Die Grok-Extraktion konnte nicht ausgeführt werden. Bitte überprüfen Sie Ihre Parameter.",
+    "json_failed_title": "Die JSON-Extraktion konnte nicht ausgeführt werden. Bitte überprüfen Sie Ihre Parameter.",
+    "regex_invalid_title": "Der reguläre Ausdruck konnte nicht validiert werden. Stellen Sie sicher, dass er gültig ist.",
+    "allowlist_check_title": "Es konnte nicht geprüft werden, ob die URL in der Allowlist enthalten ist.",
+    "regex_generate_title": "Der Regex konnte nicht generiert werden.",
+    "regex_try_title": "Der reguläre Ausdruck konnte nicht getestet werden. Stellen Sie sicher, dass er gültig ist.",
+    "split_index_failed_title": "Die Extraktion mit Aufteilen und Index konnte nicht ausgeführt werden. Bitte überprüfen Sie Ihre Parameter.",
+    "substring_failed_title": "Die Teilstring-Extraktion konnte nicht ausgeführt werden. Bitte überprüfen Sie die Indexgrenzen.",
+    "contains_string_failed_title": "Es konnte nicht geprüft werden, ob das Feld die Zeichenfolge enthält",
+    "lookup_table_failed_title": "Es konnte nicht geprüft werden, ob die Lookup-Tabelle die Zeichenfolge übersetzt"
+  },
+  "use_extractors_notifications": {
+    "created_success": "Extractor {{title}} erfolgreich erstellt",
+    "create_failed": "Erstellen des Extractors fehlgeschlagen: {{error}}",
+    "create_failed_title": "Der Extractor konnte nicht erstellt werden",
+    "updated_success": "Extractor \"{{title}}\" erfolgreich aktualisiert",
+    "update_failed": "Aktualisieren des Extractors fehlgeschlagen: {{error}}",
+    "update_failed_title": "Der Extractor konnte nicht aktualisiert werden",
+    "deleted_success": "Extractor \"{{title}}\" erfolgreich gelöscht",
+    "delete_failed": "Löschen des Extractors fehlgeschlagen: {{error}}",
+    "delete_failed_title": "Der Extractor {{title}} konnte nicht gelöscht werden",
+    "positions_updated_success": "Reihenfolge der Extractoren erfolgreich aktualisiert",
+    "positions_failed": "Ändern der Reihenfolge der Extractoren fehlgeschlagen: {{error}}",
+    "positions_failed_title": "Die Reihenfolge der Extractoren konnte nicht aktualisiert werden",
+    "import_success": "Importergebnis: {{successful}} Extractor(en) importiert.",
+    "import_success_title": "Import erfolgreich",
+    "import_warning": "Importergebnis: {{successful}} Extractor(en) importiert, {{failed}} Fehler.",
+    "import_warning_title": "Import abgeschlossen"
+  }
+}

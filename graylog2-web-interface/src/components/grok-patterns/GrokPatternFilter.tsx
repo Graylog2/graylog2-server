@@ -16,6 +16,8 @@
  */
 import React from 'react';
 import isEqual from 'lodash/isEqual';
+import type { WithTranslation } from 'react-i18next';
+import { withTranslation } from 'react-i18next';
 
 import { ListGroup, ListGroupItem, Button, Input } from 'components/bootstrap';
 
@@ -24,7 +26,7 @@ import GrokPatternFilterStyle from './GrokPatternFilter.css';
 type GrokPatternFilterProps = {
   addToPattern: (...args: any[]) => void;
   patterns: any[];
-};
+} & WithTranslation;
 
 class GrokPatternFilter extends React.Component<
   GrokPatternFilterProps,
@@ -116,7 +118,7 @@ class GrokPatternFilter extends React.Component<
 
   render() {
     const { activeListItem, patternFilter } = this.state;
-    const { addToPattern, patterns } = this.props;
+    const { addToPattern, patterns, t } = this.props;
     let regExp;
     let regExpError;
 
@@ -152,7 +154,7 @@ class GrokPatternFilter extends React.Component<
                   onClick={() => {
                     addToPattern(displayedPattern.name);
                   }}>
-                  Add
+                  {t('add')}
                 </Button>
               </span>
             </ListGroupItem>
@@ -165,7 +167,7 @@ class GrokPatternFilter extends React.Component<
         <Input
           type="text"
           id="pattern-selector"
-          label="Filter pattern"
+          label={t('filter_pattern')}
           onChange={this._onPatternFilterChange}
           autoComplete="off"
           formGroupClassName={GrokPatternFilterStyle.filterFormGroup}
@@ -179,4 +181,4 @@ class GrokPatternFilter extends React.Component<
   }
 }
 
-export default GrokPatternFilter;
+export default withTranslation('grokpatterns')(GrokPatternFilter);

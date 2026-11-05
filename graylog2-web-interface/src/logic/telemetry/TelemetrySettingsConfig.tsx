@@ -17,6 +17,7 @@
 import React, { useEffect } from 'react';
 import { Formik, Form } from 'formik';
 import { usePostHog } from 'posthog-js/react';
+import { useTranslation } from 'react-i18next';
 
 import SectionComponent from 'components/common/Section/SectionComponent';
 import { FormikFormGroup, Spinner } from 'components/common';
@@ -27,6 +28,7 @@ import AppConfig from 'util/AppConfig';
 import TelemetryInfoText from 'logic/telemetry/TelemetryInfoText';
 
 const TelemetrySettingsConfigComponent = () => {
+  const { t } = useTranslation('common');
   const { data: settings } = useTelemetrySettings();
   const { mutateAsync: updateSettings } = useUpdateTelemetrySettings();
   const posthog = usePostHog();
@@ -58,14 +60,18 @@ const TelemetrySettingsConfigComponent = () => {
   };
 
   return (
-    <SectionComponent title="Telemetry">
+    <SectionComponent title={t('telemetry.title')}>
       <TelemetryInfoText />
       <Formik<UserTelemetrySettings> onSubmit={onSubmit} initialValues={settings}>
         {({ isSubmitting, isValid }) => (
           <Form className="form form-horizontal">
-            <Input id="timeout-controls" labelClassName="col-sm-3" wrapperClassName="col-sm-9" label="Enable telemetry">
+            <Input
+              id="timeout-controls"
+              labelClassName="col-sm-3"
+              wrapperClassName="col-sm-9"
+              label={t('telemetry.enable_label')}>
               <FormikFormGroup
-                label="enabled"
+                label={t('telemetry.enabled_checkbox')}
                 name="telemetry_enabled"
                 formGroupClassName="form-group no-bm"
                 type="checkbox"
@@ -78,9 +84,9 @@ const TelemetrySettingsConfigComponent = () => {
                   <Button
                     bsStyle="primary"
                     disabled={isSubmitting || !isValid}
-                    title="Update Preferences"
+                    title={t('telemetry.update_preferences')}
                     type="submit">
-                    Update telemetry
+                    {t('telemetry.update_button')}
                   </Button>
                 </div>
               </Col>

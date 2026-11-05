@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import type { ColorVariant } from 'theme/sawmill';
@@ -47,6 +48,7 @@ const ErrorAlert = ({
   marginTopBottom = 15,
   runtimeError = false,
 }: Props) => {
+  const { t } = useTranslation('common');
   const finalBsStyle = runtimeError ? 'danger' : bsStyle;
 
   if (!children) {
@@ -58,7 +60,7 @@ const ErrorAlert = ({
       <Alert bsStyle={finalBsStyle}>
         <StyledRow>
           <Col md={11}>
-            {runtimeError && <h4>Runtime Error</h4>}
+            {runtimeError && <h4>{t('errors.runtime_error')}</h4>}
             {children}
           </Col>
           <Col md={1}>

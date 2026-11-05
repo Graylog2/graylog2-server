@@ -16,17 +16,18 @@
  */
 import { ClusterProcessing } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import UserNotification from 'util/UserNotification';
 
 export const pauseProcessing = (nodeId: string): Promise<void> =>
   ClusterProcessing.pause(nodeId).then(
     () => {
-      UserNotification.success(`Message processing paused successfully in '${nodeId}'`);
+      UserNotification.success(i18n.t('notifications.processing_pause_success', { ns: 'system', nodeId }));
     },
     (error: unknown) => {
       UserNotification.error(
-        `Pausing message processing in '${nodeId}' failed: ${error}`,
-        `Could not pause message processing in node '${nodeId}'`,
+        i18n.t('notifications.processing_pause_failed', { ns: 'system', nodeId, error }),
+        i18n.t('notifications.processing_pause_failed_title', { ns: 'system', nodeId }),
       );
     },
   );
@@ -34,12 +35,12 @@ export const pauseProcessing = (nodeId: string): Promise<void> =>
 export const resumeProcessing = (nodeId: string): Promise<void> =>
   ClusterProcessing.resume(nodeId).then(
     () => {
-      UserNotification.success(`Message processing resumed successfully in '${nodeId}'`);
+      UserNotification.success(i18n.t('notifications.processing_resume_success', { ns: 'system', nodeId }));
     },
     (error: unknown) => {
       UserNotification.error(
-        `Resuming message processing in '${nodeId}' failed: ${error}`,
-        `Could not resume message processing in node '${nodeId}'`,
+        i18n.t('notifications.processing_resume_failed', { ns: 'system', nodeId, error }),
+        i18n.t('notifications.processing_resume_failed_title', { ns: 'system', nodeId }),
       );
     },
   );

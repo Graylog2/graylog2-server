@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Routes from 'routing/Routes';
 import { Link } from 'components/common';
@@ -26,11 +27,21 @@ type Props = {
   token: Token;
 };
 
-const UsernameCell = ({ token }: Props) => (
-  <>
-    {token.user_deleted && <ErrorPopover placement="right" errorText="User does not exist." title="Token user error" />}
-    <Link to={Routes.SYSTEM.USERS.show(token.user_id)}>{token.username}</Link>
-  </>
-);
+const UsernameCell = ({ token }: Props) => {
+  const { t } = useTranslation('users');
+
+  return (
+    <>
+      {token.user_deleted && (
+        <ErrorPopover
+          placement="right"
+          errorText={t('token_admin.user_not_found')}
+          title={t('token_admin.user_error_title')}
+        />
+      )}
+      <Link to={Routes.SYSTEM.USERS.show(token.user_id)}>{token.username}</Link>
+    </>
+  );
+};
 
 export default UsernameCell;

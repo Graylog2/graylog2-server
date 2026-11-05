@@ -1,0 +1,77 @@
+{
+  "main": {
+    "search": "Recherche",
+    "streams": "Streams",
+    "alerts": "Alertes",
+    "dashboards": "Tableaux de bord",
+    "system": "Système",
+    "enterprise": "Enterprise",
+    "security": "Sécurité"
+  },
+  "system": {
+    "overview": "Vue d'ensemble",
+    "configurations": "Configurations",
+    "cluster_configuration": "Configuration du cluster",
+    "inputs": "Inputs",
+    "outputs": "Outputs",
+    "indices": "Index",
+    "logging": "Journalisation",
+    "users_and_teams": "Utilisateurs et équipes",
+    "roles": "Rôles",
+    "authentication": "Authentification",
+    "content_packs": "Content Packs",
+    "grok_patterns": "Grok Patterns",
+    "lookup_tables": "Lookup Tables",
+    "pipelines": "Pipelines",
+    "sidecars": "Sidecars",
+    "collectors": "Collectors",
+    "translation_feedback": "Retours sur la traduction"
+  },
+  "security": {
+    "overview": "Vue d'ensemble",
+    "user_activity": "Activité des utilisateurs",
+    "host_activity": "Activité des hôtes",
+    "network_activity": "Activité réseau",
+    "anomalies": "Anomalies"
+  },
+  "help": {
+    "title": "Aide",
+    "documentation": "Documentation",
+    "design_system": "Design System",
+    "keyboard_shortcuts": "Raccourcis clavier",
+    "api_browser": "Navigateur d'API"
+  },
+  "user_menu": {
+    "title": "Menu utilisateur de {{name}}",
+    "language": "Langue",
+    "show_profile": "Afficher le profil",
+    "edit_profile": "Modifier le profil",
+    "log_out": "Se déconnecter"
+  },
+  "shell": {
+    "welcome": "Bienvenue",
+    "main": "Principal",
+    "utility": "Utilitaire",
+    "toggle_navigation": "Afficher/masquer la navigation",
+    "scratchpad": "Scratchpad"
+  },
+  "page_navigation": {
+    "cluster_configuration": "Configuration du cluster",
+    "certificate_management": "Gestion des certificats",
+    "data_node_dashboard": "Tableau de bord Data Node",
+    "data_node_upgrade": "Mise à niveau de Data Node",
+    "data_node_migration": "Migration de Data Node",
+    "overview": "Vue d'ensemble",
+    "notifications": "Notifications",
+    "lookup_tables": "Tables de correspondance",
+    "caches": "Caches",
+    "data_adapters": "Adaptateurs de données",
+    "users_overview": "Aperçu des utilisateurs",
+    "token_management": "Gestion des jetons",
+    "administration": "Administration",
+    "configuration": "Configuration",
+    "failure_tracking": "Suivi des échecs",
+    "alerts_and_events": "Alertes et événements",
+    "event_definitions": "Définitions d'événements"
+  }
+}

@@ -16,6 +16,7 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
+import i18n from 'i18n';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import type { IndexSetsDefaultConfiguration } from 'components/indices/IndexSetTemplates/types';
@@ -27,7 +28,11 @@ const fetchIndexSetTemplateDefaults: () => Promise<IndexSetsDefaultConfiguration
 const useIndexSetTemplateDefaults = () => {
   const { data, isLoading } = useQuery({
     queryKey: ['index-templates-defaults'],
-    queryFn: () => defaultOnError(fetchIndexSetTemplateDefaults(), 'Error fetching index default template'),
+    queryFn: () =>
+      defaultOnError(
+        fetchIndexSetTemplateDefaults(),
+        i18n.t('hooks.template_defaults_load_failed', { ns: 'indexsets' }),
+      ),
     retry: 1,
   });
 

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { EventNotificationTypes } from 'components/event-notifications/types';
 
@@ -22,14 +23,18 @@ import CommonNotificationSummary from './CommonNotificationSummary';
 
 type HttpNotificationSummaryProps = React.ComponentProps<EventNotificationTypes['summaryComponent']>;
 
-const HttpNotificationSummary = ({ ...props }: HttpNotificationSummaryProps) => (
-  <CommonNotificationSummary {...props}>
-    <tr>
-      <td>URL</td>
-      <td>
-        <code>{props.notification.config.url}</code>
-      </td>
-    </tr>
-  </CommonNotificationSummary>
-);
+const HttpNotificationSummary = ({ ...props }: HttpNotificationSummaryProps) => {
+  const { t } = useTranslation('event_notifications');
+
+  return (
+    <CommonNotificationSummary {...props}>
+      <tr>
+        <td>{t('http_details.url')}</td>
+        <td>
+          <code>{props.notification.config.url}</code>
+        </td>
+      </tr>
+    </CommonNotificationSummary>
+  );
+};
 export default HttpNotificationSummary;

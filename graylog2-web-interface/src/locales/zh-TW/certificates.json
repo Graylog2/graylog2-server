@@ -1,0 +1,11 @@
+{
+  "title": "憑證",
+  "certificate_list": "憑證清單",
+  "certificate_name": "名稱",
+  "certificate_expiration": "到期日",
+  "certificate_details": "詳細資料",
+  "certificate_status": "狀態",
+  "certificate_active": "使用中",
+  "certificate_expired": "已過期",
+  "certificate_revoked": "已撤銷"
+}

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { Button } from 'components/bootstrap';
@@ -37,6 +38,7 @@ type Props = {
 };
 
 const DataAdapterFormView = ({ saved = undefined, onCancel, adapter = undefined, isStep = false }: Props) => {
+  const { t } = useTranslation('lookup_tables');
   const [dataAdapter, setDataAdapter] = useState<LookupTableAdapter>(adapter);
   const isCreate = useMemo(() => !dataAdapter?.id, [dataAdapter]);
 
@@ -48,7 +50,7 @@ const DataAdapterFormView = ({ saved = undefined, onCancel, adapter = undefined,
             adapterConfigType={dataAdapter ? dataAdapter.config.type : null}
             onAdapterChange={setDataAdapter}
           />
-          {isStep && <UseExistingButton onClick={onCancel}>Use Existing Data Adapter</UseExistingButton>}
+          {isStep && <UseExistingButton onClick={onCancel}>{t('adapter_form.use_existing')}</UseExistingButton>}
         </RowContainer>
       )}
       {dataAdapter && (
@@ -56,7 +58,7 @@ const DataAdapterFormView = ({ saved = undefined, onCancel, adapter = undefined,
           dataAdapter={dataAdapter}
           type={dataAdapter?.config?.type}
           create={isCreate}
-          title="Configure Adapter"
+          title={t('adapter_form.configure')}
           saved={saved}
           onCancel={onCancel}
         />

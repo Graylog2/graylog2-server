@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import { indicesInWarmTier, isSearchingWarmTier } from 'views/components/searchbar/queryvalidation/warmTierValidation';
@@ -26,6 +27,7 @@ type Props = {
 };
 
 const WarmTierQueryValidation = ({ validationState }: Props) => {
+  const { t } = useTranslation('search');
   const warmTierIndices = indicesInWarmTier(validationState);
 
   if (!isSearchingWarmTier(warmTierIndices)) return null;
@@ -33,7 +35,7 @@ const WarmTierQueryValidation = ({ validationState }: Props) => {
   return (
     <Explanation>
       <span>
-        <b>Warm Tier Search</b>: <WarmTierErrorMessage warmTierIndices={warmTierIndices} />
+        <b>{t('query_validation.warm_tier_title')}</b>: <WarmTierErrorMessage warmTierIndices={warmTierIndices} />
       </span>
     </Explanation>
   );

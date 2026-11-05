@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ButtonToolbar, MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import { IconButton, IfPermitted, LinkContainer } from 'components/common';
@@ -38,6 +39,7 @@ type Props = {
 };
 
 const IndexSetActions = ({ indexSet }: Props) => {
+  const { t } = useTranslation('indexsets');
   const history = useHistory();
   const sendTelemetry = useSendTelemetry('index-sets');
   const hasMappingPermission = useHasTypeMappingPermission();
@@ -65,29 +67,40 @@ const IndexSetActions = ({ indexSet }: Props) => {
     <ButtonToolbar>
       <IfPermitted permissions="searches:relative">
         <LinkContainer to={Routes.search(`_index:${indexSet.index_prefix}_*`, undefined)}>
-          <IconButton name="search" title={`Search in index set ${indexSet.title}`} bsStyle="default" size="xsmall" />
+          <IconButton
+            name="search"
+            title={t('overview_table.search_in_index_set', { title: indexSet.title })}
+            bsStyle="default"
+            size="xsmall"
+          />
         </LinkContainer>
       </IfPermitted>
       <MoreActions>
         <IfPermitted permissions={`indexsets:edit:${indexSet.id}`}>
-          <MenuItem onSelect={() => history.push(Routes.SYSTEM.INDEX_SETS.CONFIGURATION(indexSet.id))}>Edit</MenuItem>
+          <MenuItem onSelect={() => history.push(Routes.SYSTEM.INDEX_SETS.CONFIGURATION(indexSet.id))}>
+            {t('common:actions.edit')}
+          </MenuItem>
         </IfPermitted>
         {hasMappingPermission && (
           <MenuItem onSelect={() => history.push(Routes.SYSTEM.INDEX_SETS.FIELD_TYPES(indexSet.id))}>
-            Configure field types
+            {t('overview_table.configure_field_types')}
           </MenuItem>
         )}
         <IfPermitted permissions="indexranges:rebuild">
-          <MenuItem onSelect={() => setPendingAction('recalculateIndexRanges')}>Recalculate index ranges</MenuItem>
+          <MenuItem onSelect={() => setPendingAction('recalculateIndexRanges')}>
+            {t('overview_table.recalculate_index_ranges')}
+          </MenuItem>
         </IfPermitted>
         {indexSet.writable && (
           <IfPermitted permissions="deflector:cycle">
-            <MenuItem onSelect={() => setPendingAction('rotateActiveWriteIndex')}>Rotate active write index</MenuItem>
+            <MenuItem onSelect={() => setPendingAction('rotateActiveWriteIndex')}>
+              {t('overview_table.rotate_active_write_index')}
+            </MenuItem>
           </IfPermitted>
         )}
         <IfPermitted permissions={`indexsets:edit:${indexSet.id}`}>
           <MenuItem onSelect={onSetDefault} disabled={!indexSet.can_be_default || indexSet.default}>
-            Set as default
+            {t('overview_table.set_as_default')}
           </MenuItem>
         </IfPermitted>
         <IfPermitted permissions={`indexsets:delete:${indexSet.id}`}>

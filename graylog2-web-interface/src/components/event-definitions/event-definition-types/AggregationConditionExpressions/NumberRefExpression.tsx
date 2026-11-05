@@ -19,6 +19,7 @@ import { useCallback, useMemo } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import * as Immutable from 'immutable';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { defaultCompare as naturalSort, defaultCompare } from 'logic/DefaultCompare';
 import { Select } from 'components/common';
@@ -91,6 +92,7 @@ const NumberRefExpression = ({
   renderLabel,
   validation = {},
 }: NumberRefExpressionProps) => {
+  const { t } = useTranslation('event_definitions');
   const getSeries = useCallback(
     (seriesId) => eventDefinition?.config?.series?.find((series) => series.id === seriesId),
     [eventDefinition?.config?.series],
@@ -202,12 +204,12 @@ const NumberRefExpression = ({
   return (
     <Col md={6}>
       <FormGroup controlId="aggregation-function" validationState={validation.message ? 'error' : null}>
-        {renderLabel && <ControlLabel>If</ControlLabel>}
+        {renderLabel && <ControlLabel>{t('conditions.if')}</ControlLabel>}
         <Row className="row-sm">
           <Col md={12 / elements}>
             <Select
               className="aggregation-function"
-              placeholder="Select Function"
+              placeholder={t('conditions.select_function')}
               onChange={handleAggregationFunctionChange}
               options={formatFunctions(aggregationFunctions)}
               clearable={false}
@@ -218,9 +220,12 @@ const NumberRefExpression = ({
             <Col md={12 / elements}>
               <Select
                 className="aggregation-function-strategy"
-                placeholder="Select Strategy (Optional)"
+                placeholder={t('conditions.select_strategy')}
                 onChange={(newValue) => handleFieldChange('strategy', newValue)}
-                options={percentageStrategyOptions}
+                options={percentageStrategyOptions.map((option) => ({
+                  ...option,
+                  label: t(`aggregation:wizard_metric.strategies.${option.value}`),
+                }))}
                 value={series.strategy}
               />
             </Col>
@@ -229,7 +234,7 @@ const NumberRefExpression = ({
             <Select
               className="aggregation-function-field"
               ignoreAccents={false}
-              placeholder="Select Field (Optional)"
+              placeholder={t('conditions.select_field')}
               onChange={handleAggregationFieldChange}
               options={fieldOptions}
               optionRenderer={optionRenderer}
@@ -241,7 +246,7 @@ const NumberRefExpression = ({
             <Col md={12 / elements}>
               <Select
                 className="aggregation-function-percentile"
-                placeholder="Select Percentile"
+                placeholder={t('conditions.select_percentile')}
                 onChange={(newValue) => handleFieldChange('percentile', newValue)}
                 options={percentileOptions}
                 value={series.percentile}

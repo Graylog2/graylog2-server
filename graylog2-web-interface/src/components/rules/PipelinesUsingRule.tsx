@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Link } from 'components/common';
 import Routes from 'routing/Routes';
@@ -28,6 +29,7 @@ type PipelinesUsingRuleProps = {
 };
 
 const PipelinesUsingRule = ({ create }: PipelinesUsingRuleProps) => {
+  const { t } = useTranslation('pipelines');
   const { usedInPipelines } = useContext(PipelineRulesContext);
 
   if (create) {
@@ -42,13 +44,10 @@ const PipelinesUsingRule = ({ create }: PipelinesUsingRuleProps) => {
     ));
 
   return (
-    <Input
-      id="used-in-pipelines"
-      label="Used in pipelines"
-      help="Pipelines that use this rule in one or more of their stages.">
+    <Input id="used-in-pipelines" label={t('used_in_pipelines.label')} help={t('used_in_pipelines.help')}>
       <div className="form-control-static">
         {usedInPipelines.length === 0 ? (
-          'This rule is not being used in any pipelines.'
+          t('used_in_pipelines.none')
         ) : (
           <ul className={RuleFormStyle.usedInPipelines}>{formattedPipelines()}</ul>
         )}

@@ -16,6 +16,7 @@
  */
 import { flushSync } from 'react-dom';
 
+import i18n from 'i18n';
 import UserNotification from 'util/UserNotification';
 import { loadDashboardWithSearch } from 'views/logic/views/Actions';
 import type { HistoryFunction } from 'routing/useHistory';
@@ -43,8 +44,14 @@ export default (
       });
 
       loadDashboardWithSearch(history, savedView.id, search);
-      UserNotification.success(`Saving view "${view.title}" was successful!`, 'Success!');
+      UserNotification.success(
+        i18n.t('actions_menu.save_success', { ns: 'search', title: view.title }),
+        i18n.t('save_view_notifications.success_title', { ns: 'search' }),
+      );
     } catch (error) {
-      UserNotification.error(`Saving view failed: ${error}`, 'Error!');
+      UserNotification.error(
+        i18n.t('actions_menu.save_error', { ns: 'search', error }),
+        i18n.t('save_view_notifications.error_title', { ns: 'search' }),
+      );
     }
   };

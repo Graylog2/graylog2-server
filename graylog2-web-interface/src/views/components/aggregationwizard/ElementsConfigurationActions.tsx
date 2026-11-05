@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useFormikContext } from 'formik';
 import styled from 'styled-components';
 
@@ -25,8 +26,6 @@ import AggregationElementSelect from 'views/components/aggregationwizard/Aggrega
 
 import aggregationElements from './aggregationElementDefinitions';
 import type { WidgetConfigFormValues } from './WidgetConfigForm';
-
-export const UPDATE_WIDGET_PREVIEW_BTN_TEXT = 'Update preview';
 
 const aggregationElementsByKey = Object.fromEntries(aggregationElements.map((element) => [element.key, element]));
 
@@ -64,6 +63,7 @@ const ElementsConfigurationActions = () => {
     values,
     setValues,
   } = useFormikContext<WidgetConfigFormValues>();
+  const { t } = useTranslation('aggregation');
 
   return (
     <StyledButtonToolbar>
@@ -76,7 +76,11 @@ const ElementsConfigurationActions = () => {
       </SelectContainer>
 
       <Button bsStyle="info" className="pull-right" type="submit" disabled={!isValid || isUpdatingPreview || !dirty}>
-        {isUpdatingPreview ? <Spinner text="Updating preview..." delay={0} /> : UPDATE_WIDGET_PREVIEW_BTN_TEXT}
+        {isUpdatingPreview ? (
+          <Spinner text={t('wizard_common.updating_preview')} delay={0} />
+        ) : (
+          t('wizard_common.update_preview')
+        )}
       </Button>
     </StyledButtonToolbar>
   );

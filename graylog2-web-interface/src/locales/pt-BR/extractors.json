@@ -1,0 +1,252 @@
+{
+  "extractors_of": "Extratores de {{title}}",
+  "actions": "Ações",
+  "import_extractors": "Importar extratores",
+  "export_extractors": "Exportar extratores",
+  "documentation_title": "Documentação dos extratores",
+  "description": "Os extratores são aplicados a cada mensagem recebida por esta entrada. Use-os para extrair e transformar quaisquer dados de texto em campos que permitam filtrar e analisar facilmente depois. Exemplo: extrair o código de resposta HTTP de uma mensagem de log, transformá-lo em um campo numérico e anexá-lo como {{field}} à mensagem.",
+  "list_item": {
+    "subtitle_copy": "Tentando extrair dados de <em>{{source}}</em> para <em>{{target}}</em>, mantendo o original intacto.",
+    "subtitle_cut": "Tentando extrair dados de <em>{{source}}</em> para <em>{{target}}</em>, sem manter o original intacto.",
+    "condition": "Condição",
+    "condition_string": "Só tentará ser executado se a mensagem incluir a string <em>{{value}}</em>",
+    "condition_regex": "Só tentará ser executado se a mensagem corresponder à expressão regular <em>{{value}}</em>",
+    "confirm_delete": "Realmente remover o extrator \"{{title}}\"?",
+    "details": "Detalhes",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "no_configuration": "Sem opções de configuração",
+    "configuration": "Configuração",
+    "converters": "Conversores"
+  },
+  "metrics": {
+    "title": "Métricas",
+    "percentile_95": "95º percentil:",
+    "percentile_98": "98º percentil:",
+    "percentile_99": "99º percentil:",
+    "std_dev": "Desvio padrão:",
+    "mean": "Média:",
+    "minimum": "Mínimo:",
+    "maximum": "Máximo:",
+    "invocations": "{{total}} invocações totais desde a inicialização, médias: {{oneMinute}}, {{fiveMinutes}}, {{fifteenMinutes}}.",
+    "hits_misses": "{{hits}} acertos, {{misses}} erros",
+    "no_messages": "Nenhuma mensagem passou por aqui ainda.",
+    "total_time": "Tempo total",
+    "condition_time": "Tempo da condição",
+    "execution_time": "Tempo de execução",
+    "converter_time": "Tempo do conversor",
+    "microseconds": "{{value}}μs"
+  },
+  "edit": {
+    "condition_string_label": "Campo contém string",
+    "condition_string_help": "Digite uma string que o campo deve conter para tentar a extração.",
+    "condition_regex_label": "Campo corresponde à expressão regular",
+    "condition_regex_help": "Digite uma expressão regular que o campo deve conter para tentar a extração.",
+    "condition_matches": "Corresponde! O extrator seria executado sobre este exemplo.",
+    "condition_no_match": "Não corresponde! O extrator não seria executado.",
+    "try": "Testar",
+    "condition_type_help": "Extrair apenas de mensagens que correspondem a uma determinada condição ajuda a evitar extrações incorretas ou desnecessárias e também pode economizar recursos da CPU.",
+    "cursor_strategy_help": "Deseja copiar ou recortar da origem? Não é possível usar o recorte em campos padrão como <em>message</em> e <em>source</em>.",
+    "target_field_help": "Escolha um nome de campo para armazenar o valor extraído. Ele pode conter apenas <b>caracteres alfanuméricos e sublinhados</b>. Exemplo: <em>http_response_code</em>.",
+    "store_as_field": "Armazenar como campo",
+    "example_message": "Mensagem de exemplo",
+    "configuration": "Configuração do extrator",
+    "extractor_type": "Tipo de extrator",
+    "source_field": "Campo de origem",
+    "condition": "Condição",
+    "condition_none": "Sempre tentar extrair",
+    "condition_string": "Tentar extração somente se o campo contiver a string",
+    "condition_regex": "Tentar extração somente se o campo corresponder à expressão regular",
+    "extraction_strategy": "Estratégia de extração",
+    "copy": "Copiar",
+    "cut": "Recortar",
+    "title": "Título do extrator",
+    "title_help": "Um nome descritivo para este extrator.",
+    "create": "Criar extrator",
+    "update": "Atualizar extrator"
+  },
+  "converters": {
+    "csv_enable": "Adicionar colunas CSV como campos",
+    "csv_field_names": "Nomes dos campos",
+    "csv_separator": "Caractere separador",
+    "csv_quote": "Caractere de aspas",
+    "csv_escape": "Caractere de escape",
+    "csv_escape_help": "Caractere usado para escapar os caracteres separador e de aspas.",
+    "csv_strict_quotes": "Usar aspas estritas",
+    "csv_strict_quotes_help": "Ignorar conteúdo fora das aspas.",
+    "csv_trim": "Remover espaços em branco à esquerda",
+    "date_enable": "Converter para tipo data",
+    "date_format": "String de formato",
+    "time_zone": "Fuso horário",
+    "locale": "Localidade",
+    "flexdate_enable": "Analisar data de forma flexível",
+    "hash": "Gerar hash MD5 do valor",
+    "ip_anonymizer": "Anonimizar endereços IPv4 substituindo o último octeto",
+    "lookup_table_enable": "Converter valor usando tabela de consulta",
+    "lookup_table": "Lookup Table",
+    "lookup_table_placeholder": "Selecione uma Lookup Table",
+    "lowercase": "Converter valor para minúsculas",
+    "numeric": "Converter para valor numérico",
+    "split_and_count": "Dividir e contar",
+    "split_by": "Dividir por",
+    "syslog_pri_facility": "Converter de PRI para facility do syslog",
+    "syslog_pri_level": "Converter de PRI para nível do syslog",
+    "tokenizer": "Adicionar pares Chave=Valor como campos",
+    "uppercase": "Converter valor para maiúsculas",
+    "csv_separator_help": "Por exemplo, <code>,</code>, <code>\\n</code> e <code>\\t</code> serão convertidos em um único caractere.",
+    "date_format_help": "String de formato usada pela data. Leia mais na <docsLink>documentação</docsLink>.",
+    "time_zone_help": "Fuso horário a aplicar à data. Leia mais na <docsLink>documentação</docsLink>.",
+    "locale_help": "Localidade a usar ao analisar a data. Leia mais na <docsLink>documentação</docsLink>.",
+    "lookup_table_help": "Lookup Tables podem ser criadas <lookupTablesLink>aqui</lookupTablesLink>.",
+    "split_by_help": "O conversor Dividir e contar divide a parte extraída pelo caractere definido e armazena a contagem de tokens como campo. <strong>Exemplo:</strong> <em>?fields=first_name,last_name,zip</em> dividido por <em>,</em> resulta em <em>3</em>. Você acabou de contar os campos solicitados de uma requisição REST GET de usuário."
+  },
+  "wizard": {
+    "title": "Adicionar extrator",
+    "description": "Comece carregando uma mensagem para ter um exemplo com que trabalhar. Você pode escolher uma mensagem recente recebida por esta entrada ou selecionar manualmente uma mensagem pelo seu ID.",
+    "create": "Criar extrator"
+  },
+  "configuration": {
+    "preview": "Pré-visualização do extrator",
+    "nothing_extracted": "Nada será extraído",
+    "try_example": "Testar com exemplo"
+  },
+  "converters_editor": {
+    "not_supported": "Não é possível adicionar conversores a extratores do tipo <em>{{type}}</em>.",
+    "add_label": "Adicionar conversor",
+    "add_help": "Adicione conversores para transformar o valor extraído.",
+    "select_placeholder": "Selecione um conversor",
+    "add": "Adicionar"
+  },
+  "export": {
+    "json_title": "JSON dos extratores",
+    "copy": "Copiar extratores"
+  },
+  "example_message": {
+    "not_loaded": "Não foi possível carregar um exemplo do campo ‘{{field}}’. Não é possível testar o extrator antes de atualizá-lo."
+  },
+  "sort": {
+    "title": "Ordenar extratores de <em>{{title}}</em>",
+    "description": "Arraste e solte os extratores na lista para alterar a ordem em que serão aplicados.",
+    "submit": "Atualizar ordenação"
+  },
+  "list": {
+    "sort": "Ordenar extratores",
+    "title": "Extratores configurados",
+    "no_extractors": "Esta entrada não possui extratores configurados."
+  },
+  "import": {
+    "parse_error": "Ocorreu um erro ao analisar os extratores. Eles estão no formato JSON? {{error}}",
+    "parse_error_title": "Não foi possível importar os extratores",
+    "submit": "Adicionar extratores à entrada"
+  },
+  "message_loader": {
+    "load": "Carregar mensagem",
+    "loading": "Carregando mensagem...",
+    "wrong_example": "Exemplo incorreto?",
+    "load_another": "Carregar outra mensagem",
+    "message_id": "ID da mensagem",
+    "index": "Índice"
+  },
+  "copy_input": {
+    "description": "A entrada inteira será copiada literalmente."
+  },
+  "grok": {
+    "error": "Não foi possível executar a extração grok devido ao seguinte erro: {{error}}",
+    "no_match": "Não foi possível executar a extração grok. Verifique seus parâmetros.",
+    "named_captures_only": "Apenas capturas nomeadas",
+    "named_captures_only_help": "Incluir na mensagem apenas as capturas explicitamente nomeadas.",
+    "pattern": "Padrão grok"
+  },
+  "json": {
+    "flatten": "Achatar estruturas",
+    "flatten_help": "Se os objetos JSON devem ser achatados em um único campo de mensagem ou expandidos em vários campos.",
+    "list_separator": "Separador de itens de lista",
+    "list_separator_help": "Qual string usar para concatenar os itens de uma lista JSON.",
+    "key_separator": "Separador de chaves",
+    "key_separator_help": "Qual string usar para concatenar as diferentes chaves de um objeto JSON aninhado (usado apenas se <em>não</em> for achatado).",
+    "kv_separator": "Separador de chave/valor",
+    "kv_separator_help": "Qual string usar ao concatenar os pares chave/valor de um objeto JSON (usado apenas se for achatado).",
+    "key_prefix": "Prefixo da chave",
+    "key_prefix_help": "Texto a ser adicionado no início de cada chave extraída do objeto JSON.",
+    "replace_key_whitespace": "Substituir espaços em branco nas chaves",
+    "replace_key_whitespace_help": "As chaves de campos que contêm espaços em branco serão descartadas ao armazenar a mensagem extraída. Marque esta caixa para substituir os espaços em branco das chaves JSON por outro caractere.",
+    "key_whitespace_replacement": "Substituição de espaços em branco nas chaves",
+    "key_whitespace_replacement_help": "Qual caractere usar ao substituir espaços em branco nas chaves da mensagem. Certifique-se de que o caractere de substituição é válido no Lucene, por exemplo '-' ou '_'."
+  },
+  "lookup_table": {
+    "error": "Não foi possível executar a consulta: {{error}}"
+  },
+  "regex": {
+    "no_match": "A expressão regular não correspondeu.",
+    "no_group": "A expressão regular não contém nenhum grupo de correspondência para extrair.",
+    "help": "A expressão regular usada para a extração. É usado o primeiro grupo de correspondência. Saiba mais na <docsLink>documentação</docsLink>.",
+    "label": "Expressão regular"
+  },
+  "regex_replace": {
+    "regex_help": "A expressão regular usada para a extração. Saiba mais na <docsLink>documentação</docsLink>.",
+    "replacement_help": "A substituição usada para o texto correspondente. Consulte a documentação da API <matcherLink>Matcher</matcherLink> para as opções possíveis.",
+    "replacement": "Substituição",
+    "replace_all": "Substituir todas as ocorrências do padrão",
+    "replace_all_help": "Se deve substituir todas as ocorrências do padrão informado ou apenas a primeira ocorrência."
+  },
+  "split_and_index": {
+    "no_match": "Não foi possível executar a extração por divisão e índice. Verifique seus parâmetros.",
+    "split_by_help": "Qual caractere usar para dividir. <strong>Exemplo:</strong> um caractere de espaço em branco dividirá <em>foo bar baz</em> em <em>[foo,bar,baz]</em>.",
+    "index_help": "Qual parte da string dividida você deseja usar? <strong>Exemplo:</strong> <em>2</em> seleciona <em>bar</em> de <em>foo bar baz</em> quando dividido por espaço em branco.",
+    "index": "Índice de destino"
+  },
+  "substring": {
+    "no_match": "Não foi possível executar a extração de substring. Verifique os limites dos índices.",
+    "end_index_help": "Onde terminar a extração. (Exclusivo) <strong>Exemplo:</strong> <em>1,5</em> recorta <em>love</em> da string <em>ilovelogs</em>.",
+    "begin_index": "Índice inicial",
+    "begin_index_help": "Posição do caractere a partir de onde começar a extração. (Inclusivo)",
+    "end_index": "Índice final"
+  },
+  "pages": {
+    "new_title": "Novo extrator para a entrada {{title}}",
+    "new_header": "Novo extrator para a entrada <em>{{title}}</em>",
+    "edit_title": "Editar extrator {{title}}",
+    "edit_header": "Editar extrator <em>{{title}}</em> da entrada <em>{{inputTitle}}</em>",
+    "description": "Os extratores são aplicados a cada mensagem recebida por uma entrada. Use-os para extrair e transformar quaisquer dados de texto em campos que permitam filtrar e analisar facilmente depois.",
+    "export_title": "Exportar extratores de {{title}}",
+    "export_header": "Exportar extratores de <em>{{title}}</em>",
+    "export_marketplace_prefix": "Os extratores de uma entrada podem ser exportados para JSON para importação em outras configurações ou para compartilhamento no",
+    "import_title": "Importar extratores para {{title}}",
+    "import_header": "Importar extratores para <em>{{title}}</em>",
+    "import_description": "Extratores exportados podem ser importados para uma entrada.",
+    "import_marketplace_prefix": "Você só precisa da exportação JSON dos extratores de qualquer outra configuração de {{productName}} ou do"
+  },
+  "tools_api": {
+    "details": "Detalhes: {{error}}",
+    "natural_date_failed": "Falha ao carregar a pré-visualização da palavra-chave com o status: {{error}}",
+    "natural_date_failed_title": "Não foi possível carregar a pré-visualização da palavra-chave",
+    "grok_failed_title": "Não foi possível executar a extração grok. Verifique seus parâmetros.",
+    "json_failed_title": "Não foi possível executar a extração JSON. Verifique seus parâmetros.",
+    "regex_invalid_title": "Não foi possível validar a expressão regular. Verifique se ela é válida.",
+    "allowlist_check_title": "Não foi possível verificar se a URL está na lista de permissões.",
+    "regex_generate_title": "Não foi possível gerar a expressão regular.",
+    "regex_try_title": "Não foi possível testar a expressão regular. Verifique se ela é válida.",
+    "split_index_failed_title": "Não foi possível executar a extração por divisão e índice. Verifique seus parâmetros.",
+    "substring_failed_title": "Não foi possível executar a extração de substring. Verifique os limites dos índices.",
+    "contains_string_failed_title": "Não foi possível verificar se o campo contém a string",
+    "lookup_table_failed_title": "Não foi possível verificar se a Lookup Table traduz a string"
+  },
+  "use_extractors_notifications": {
+    "created_success": "Extrator {{title}} criado com sucesso",
+    "create_failed": "Falha ao criar o extrator: {{error}}",
+    "create_failed_title": "Não foi possível criar o extrator",
+    "updated_success": "Extrator \"{{title}}\" atualizado com sucesso",
+    "update_failed": "Falha ao atualizar o extrator: {{error}}",
+    "update_failed_title": "Não foi possível atualizar o extrator",
+    "deleted_success": "Extrator \"{{title}}\" excluído com sucesso",
+    "delete_failed": "Falha ao excluir o extrator: {{error}}",
+    "delete_failed_title": "Não foi possível excluir o extrator {{title}}",
+    "positions_updated_success": "Posições dos extratores atualizadas com sucesso",
+    "positions_failed": "Falha ao alterar as posições dos extratores: {{error}}",
+    "positions_failed_title": "Não foi possível atualizar as posições dos extratores",
+    "import_success": "Resultado da importação: {{successful}} extrator(es) importado(s).",
+    "import_success_title": "Operação de importação concluída com sucesso",
+    "import_warning": "Resultado da importação: {{successful}} extrator(es) importado(s), {{failed}} erro(s).",
+    "import_warning_title": "Operação de importação concluída"
+  }
+}

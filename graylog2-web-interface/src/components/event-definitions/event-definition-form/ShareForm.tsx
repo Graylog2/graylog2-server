@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Col, Row } from 'components/bootstrap';
 import EntityCreateShareFormGroup from 'components/permissions/EntityCreateShareFormGroup';
@@ -30,6 +31,7 @@ type Props = {
 };
 
 const ShareForm = ({ onChange, eventDefinition }: Props) => {
+  const { t } = useTranslation('event_definitions');
   const handleEntityShareSet = (entityShare?: EntitySharePayload) => onChange('share_request', entityShare);
   const streamDependenciesGRN =
     eventDefinition?.config?.streams?.map((streamId) => createGRN('stream', streamId)) || [];
@@ -41,10 +43,10 @@ const ShareForm = ({ onChange, eventDefinition }: Props) => {
     <Row>
       <Col md={6} lg={6}>
         <h2 className={commonStyles.title}>
-          Share <small>(optional)</small>
+          {t('steps.share')} <small>{t('fields_form.optional')}</small>
         </h2>
         <EntityCreateShareFormGroup
-          description="Search for a User or Team to add as collaborator on this event definition."
+          description={t('share.description')}
           onSetEntityShare={handleEntityShareSet}
           entityType="event_definition"
           entityTitle=""

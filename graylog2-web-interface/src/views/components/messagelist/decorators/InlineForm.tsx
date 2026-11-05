@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from 'components/bootstrap';
 
@@ -25,11 +26,12 @@ type Props = {
   onSubmitForm: (arg: any) => void;
 };
 
-const InlineForm = (submitTitle: string = 'Create'): React.ComponentType<Props> => {
+const InlineForm = (submitTitle: string | undefined = undefined): React.ComponentType<Props> => {
   const InlineFormInner = (
     { children, disabled = false, onCancel, onSubmitForm }: Props,
     ref: React.ForwardedRef<HTMLFormElement>,
   ) => {
+    const { t } = useTranslation('widgets');
     const onSubmit = (event) => {
       event.stopPropagation();
       const { target: formDOMNode } = event;
@@ -51,10 +53,10 @@ const InlineForm = (submitTitle: string = 'Create'): React.ComponentType<Props> 
       <form onSubmit={onSubmit} ref={ref}>
         {children}
         <Button type="submit" bsStyle="primary" disabled={disabled}>
-          {submitTitle}
+          {submitTitle ?? t('message_table.decorators.create')}
         </Button>{' '}
         <Button type="button" disabled={disabled} onClick={onCancel}>
-          Cancel
+          {t('actions.cancel', { ns: 'common' })}
         </Button>
       </form>
     );

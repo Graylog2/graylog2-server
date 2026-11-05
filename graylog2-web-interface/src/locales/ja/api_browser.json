@@ -1,0 +1,14 @@
+{
+  "title": "API ブラウザー",
+  "description": "Graylog REST API を参照",
+  "search_placeholder": "エンドポイントを検索...",
+  "no_results": "検索条件に一致するエンドポイントが見つかりませんでした。",
+  "error_loading": "API ブラウザーの読み込み中にエラーが発生しました。",
+  "error_fetching_endpoint": "エンドポイントの詳細の取得中にエラーが発生しました。",
+  "endpoint_name": "エンドポイント名",
+  "endpoint_path": "パス",
+  "endpoint_method": "メソッド",
+  "endpoint_description": "説明",
+  "endpoint_parameters": "パラメーター",
+  "endpoint_response": "レスポンス"
+}

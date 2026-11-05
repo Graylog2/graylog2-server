@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import moment from 'moment/moment';
 
 import type { IndexRotationConfigComponentProps } from 'components/indices/rotation/types';
@@ -31,6 +32,7 @@ const TimeBasedRotationStrategyConfiguration: React.FC<IndexRotationConfigCompon
   updateConfig,
   disabled = false,
 }) => {
+  const { t } = useTranslation('indexsets');
   const { max_rotation_period } = config;
 
   const [rotationPeriod, setRotationPeriod] = useState<string>(config.rotation_period);
@@ -55,13 +57,13 @@ const TimeBasedRotationStrategyConfiguration: React.FC<IndexRotationConfigCompon
   };
 
   const formatDuration = () => {
-    const maxRotationPeriodErrorMessage = max_rotation_period
-      ? ` and max ${moment.duration(max_rotation_period).humanize()}`
-      : '';
+    if (isValidPeriod()) {
+      return moment.duration(rotationPeriod).humanize();
+    }
 
-    return isValidPeriod()
-      ? moment.duration(rotationPeriod).humanize()
-      : `invalid (min 1 hour${maxRotationPeriodErrorMessage})`;
+    return max_rotation_period
+      ? t('strategies.rotation_period_invalid_max', { max: moment.duration(max_rotation_period).humanize() })
+      : t('strategies.rotation_period_invalid');
   };
 
   const handlePeriodUpdate = (e) => {
@@ -94,14 +96,16 @@ const TimeBasedRotationStrategyConfiguration: React.FC<IndexRotationConfigCompon
         disabled={disabled}
         id="rotation-period"
         type="text"
-        label="Rotation period (ISO8601 Duration)"
+        label={t('strategies.rotation_period_label')}
         value={rotationPeriod}
         onChange={handlePeriodUpdate}
-        help={`How long an index gets written to before it is rotated. (i.e. "P1D" for 1 day, "PT6H" for 6 hours).${
-          max_rotation_period
-            ? ` The max rotation period is set to ${moment.duration(max_rotation_period).humanize()} by Administrator.`
-            : ''
-        }`}
+        help={[
+          t('strategies.rotation_period_help'),
+          max_rotation_period &&
+            t('strategies.rotation_period_max_help', { max: moment.duration(max_rotation_period).humanize() }),
+        ]
+          .filter(Boolean)
+          .join(' ')}
         addonAfter={formatDuration()}
         bsStyle={validationState()}
         required
@@ -110,10 +114,10 @@ const TimeBasedRotationStrategyConfiguration: React.FC<IndexRotationConfigCompon
         disabled={disabled}
         id="rotate-empty-index-sets-checkbox"
         type="checkbox"
-        label="Rotate empty index set"
+        label={t('strategies.rotation_rotate_empty_label')}
         onChange={handleRotateEmptyIndexSetUpdate}
         checked={rotateEmptyIndexSet}
-        help="Apply the rotation strategy even when the index set is empty (not recommended)."
+        help={t('strategies.rotation_rotate_empty_help')}
       />
     </div>
   );

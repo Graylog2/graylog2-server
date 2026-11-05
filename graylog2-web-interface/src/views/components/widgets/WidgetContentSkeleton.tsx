@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 import type { DefaultTheme } from 'styled-components';
 
@@ -159,10 +160,14 @@ type Props = {
 /**
  * Placeholder for a widget's content while it is loading, roughly shaped like the given visualization.
  */
-const WidgetContentSkeleton = ({ visualization = undefined }: Props) => (
-  <Container aria-busy="true" aria-label="Loading widget content" role="status">
-    {skeletonForVisualization(visualization)}
-  </Container>
-);
+const WidgetContentSkeleton = ({ visualization = undefined }: Props) => {
+  const { t } = useTranslation('widgets');
+
+  return (
+    <Container aria-busy="true" aria-label={t('widget_loading.content')} role="status">
+      {skeletonForVisualization(visualization)}
+    </Container>
+  );
+};
 
 export default WidgetContentSkeleton;

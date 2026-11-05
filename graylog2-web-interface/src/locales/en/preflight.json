@@ -1,0 +1,129 @@
+{
+  "navigation": {
+    "initial_setup": "{{productName}} Initial Setup",
+    "get_help": "Get Help",
+    "documentation": "Documentation",
+    "changelogs": "Changelogs",
+    "operations_changelogs": "Operations changelogs",
+    "support": "Support"
+  },
+  "setup": {
+    "welcome": "Welcome!",
+    "first_start": "It looks like you are starting {{productName}} for the first time and have not configured a data node.",
+    "data_nodes_allow": "Data nodes allow you to index and search through all the messages in your {{productName}} message database.",
+    "data_node_setup": "You can either implement a <dataNodeLink>{{productName}} data node</dataNodeLink> (recommended) or you can configure an <openSearchLink>OpenSearch</openSearchLink> node manually. For the manual OpenSearch configuration you need to adjust the {{productName}} configuration and restart the {{productName}} server. After the restart this page will not show up again.",
+    "data_nodes_title": "{{productName}} Data Nodes"
+  },
+  "data_nodes": {
+    "description": "{{productName}} data nodes offer a better integration with {{productName}} and simplify future updates. Once a {{productName}} data node is running and you configured the certificate authority, you can resume startup.",
+    "registered": "These are the data nodes which are currently registered. The list is constantly updated.",
+    "transport_address": "Transport address",
+    "hostname": "Hostname",
+    "separator": " – ",
+    "none_found": "No data nodes have been found."
+  },
+  "waiting_for_startup": {
+    "title": "Configuration successful",
+    "description": "The {{productName}} server is currently starting. Depending on your setup it may take a few minutes. This page will automatically refresh once the {{productName}} server is reachable. You can always refresh manually, please be aware that this page will not be visible afterwards.",
+    "spinner": "Waiting for {{productName}} server ..."
+  },
+  "error_boundary": {
+    "title": "Something went wrong",
+    "description": "An unknown error has occurred. Please have a look at the following message and the {{productName}} server log for more information."
+  },
+  "resume_startup": {
+    "button": "Resume startup",
+    "confirm": "Are you sure you want to resume startup without a running {{productName}} data node? This will cause the configuration to fall back to using an OpenSearch instance on localhost:9200.",
+    "error": "Resuming startup failed with error: {{error}}",
+    "error_title": "Could not resume startup"
+  },
+  "restart_configuration": {
+    "confirm": "Are you sure you want to restart the configuration? All previous changes will be deleted.",
+    "restart": "restart",
+    "restarting": "restarting..."
+  },
+  "configuration_wizard": {
+    "restart_hint": "You can always <restartButton>restart</restartButton> the configuration",
+    "fetch_error": "There was an error fetching the {{entityName}}: {{message}}"
+  },
+  "entities": {
+    "data_nodes": "data nodes",
+    "certificate_authority": "certificate authority",
+    "renewal_policy": "renewal policy"
+  },
+  "steps": {
+    "ca_configuration": "Configure a certificate authority",
+    "renewal_policy_configuration": "Configure a renewal policy",
+    "certificate_provisioning": "Provision certificates for your data nodes",
+    "configuration_finished": "Configuration finished"
+  },
+  "ca_configuration": {
+    "title": "Configure Certificate Authority",
+    "explanation_upload_or_create": "In this first step you can either upload or create a new certificate authority.",
+    "explanation_provisioning": "Using it we can provision your data nodes with certificates easily.",
+    "create_tab": "Create new CA",
+    "upload_tab": "Upload CA"
+  },
+  "ca_create": {
+    "description": "Here you can quickly create a new certificate authority. All you need to do is to click on the “Create CA” button. The CA should only be used to secure your {{productName}} data nodes.",
+    "organization_name": "Organization Name",
+    "creating": "Creating CA...",
+    "create": "Create CA",
+    "success": "CA created successfully",
+    "error": "CA creation failed with error: {{error}}"
+  },
+  "ca_upload": {
+    "explanation": "Here you can upload your existing CA. You need to upload a single file containing both private key (encrypted or unencrypted), the CA certificate as well as any intermediate certificates. The file can be in PEM or in PKCS#12 format. If your private key is encrypted, you also need to supply its password.",
+    "certificate_authority": "Certificate Authority",
+    "drop_hint": "Drag CA here or click to select file",
+    "rejected": "CA upload failed",
+    "password": "Password",
+    "uploading": "Uploading CA...",
+    "upload": "Upload CA",
+    "success": "CA uploaded successfully",
+    "error": "CA upload failed with error: {{error}}",
+    "validation_missing_file": "Please upload a file.",
+    "validation_multiple_files": "Please upload only a single file."
+  },
+  "certificate_provisioning": {
+    "title": "Provision certificates",
+    "configured": "Certificate authority has been configured successfully.",
+    "ready": "You can now provision certificate for your data nodes.",
+    "data_node_required": "At least one {{productName}} data node needs to run before the certificate can be provisioned.",
+    "started": "Started certificate provisioning successfully",
+    "error": "Starting certificate provisioning failed with error: {{error}}",
+    "provisioning": "Provisioning certificate...",
+    "provision": "Provision certificate and continue",
+    "skip": "Skip provisioning"
+  },
+  "renewal_policy": {
+    "title": "Configure Renewal Policy",
+    "explanation_automatic": "In this step you can configure if certificates which are close to expiration should be renewed automatically.",
+    "explanation_manual": "If you choose manual renewal, a system notification will show up when the expiration date is near, requiring you to confirm renewal.",
+    "policy": "Renewal Policy",
+    "select_policy": "Select Renewal Policy",
+    "automatic": "Automatic",
+    "manual": "Manual",
+    "certificate_lifetime": "Certificate lifetime",
+    "enter_lifetime": "Enter lifetime",
+    "select_unit": "Select Unit",
+    "unit_hours": "Hour(s)",
+    "unit_days": "Day(s)",
+    "unit_months": "Month(s)",
+    "unit_years": "Year(s)",
+    "min_lifetime": "Must be at least {{duration}}",
+    "creating": "Creating policy...",
+    "create": "Create policy",
+    "success": "Renewal policy created successfully",
+    "error": "Renewal policy creation failed with error: {{error}}"
+  },
+  "unsecure_connection": {
+    "not_secure": "Your connection is not secure. Please be aware the information will be sent to the server unencrypted.",
+    "maybe_not_secure": "Your connection may not be secure. Please be aware the information may be sent to the server unencrypted."
+  },
+  "configuration_finished": {
+    "title": "Configuration finished",
+    "skipped_provisioning": "You've finished the configuration successfully. You can still <goBackButton>go back</goBackButton> to provision the certificates.",
+    "provisioned": "The provisioning has been successful and all data nodes are secured and reachable."
+  }
+}

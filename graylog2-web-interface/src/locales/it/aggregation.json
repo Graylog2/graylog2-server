@@ -1,0 +1,263 @@
+{
+  "wizard_common": {
+    "grouping": "Raggruppamento",
+    "group_by": "Raggruppa per",
+    "metric": "Metrica",
+    "metrics": "Metriche",
+    "sort": "Ordina",
+    "visualization": "Visualizzazione",
+    "add": "Aggiungi",
+    "add_element": "Aggiungi un elemento",
+    "add_named": "Aggiungi {{element}}",
+    "remove_named": "Rimuovi {{element}}",
+    "update_preview": "Aggiorna anteprima",
+    "updating_preview": "Aggiornamento anteprima...",
+    "color_hint": "Suggerimento colore",
+    "select_all_fields": "Seleziona tutti i campi",
+    "deselect_all_fields": "Deseleziona tutti i campi",
+    "field_required": "Il campo è obbligatorio.",
+    "must_be_greater_than_one": "Deve essere maggiore di 0.",
+    "must_be_greater_than_many": "Deve essere maggiore di 0.",
+    "must_be_greater_than_other": "Deve essere maggiore di 0."
+  },
+  "wizard_grouping": {
+    "settings": "Impostazioni",
+    "skip_empty_values": "Ignora valori vuoti",
+    "skip_empty_values_help": "Se abilitato, i messaggi che non contengono i campi configurati verranno ignorati.",
+    "skip_empty_values_help_otherwise": "Altrimenti verrà creato un gruppo \"(Valore vuoto)\".",
+    "limit": "Limite",
+    "rollup_columns": "Colonne di riepilogo",
+    "rollup_columns_help": "Quando il riepilogo è abilitato, verrà incluso un ulteriore totale che somma i singoli sottototali.",
+    "direction": "Direzione",
+    "row": "Riga",
+    "column": "Colonna",
+    "fields": "Campi",
+    "add_field": "Aggiungi un campo",
+    "add_another_date_field": "Aggiungi un altro campo data",
+    "add_another_field": "Aggiungi un altro campo",
+    "interval": "Intervallo",
+    "auto": "Automatico",
+    "interval_types": "Tipi di intervallo",
+    "auto_bucket_size": "Dimensione automatica del gruppo",
+    "auto_bucket_size_help": "Ad esempio, 1.5x. Una granularità più piccola porta a <strong>meno</strong> valori; viceversa, una più grande mostra <strong>più</strong> valori.",
+    "fixed_bucket_size": "Dimensione fissa del gruppo",
+    "fixed_bucket_size_help": "Ad esempio, 2 minuti. Il tempo definisce la dimensione dei gruppi per questo tipo di timestamp.",
+    "scale": "{{scale}}x",
+    "scaling_required": "Il fattore di scala è obbligatorio.",
+    "scaling_range": "Deve essere maggiore di 0 e minore o uguale a 10.",
+    "value_required": "Il valore è obbligatorio.",
+    "limit_required": "Il limite è obbligatorio."
+  },
+  "wizard_units": {
+    "time_units": {
+      "seconds": "Secondi",
+      "minutes": "Minuti",
+      "hours": "Ore",
+      "days": "Giorni",
+      "weeks": "Settimane",
+      "months": "Mesi"
+    },
+    "unit_settings": "Impostazioni unità di {{field}}",
+    "type": "Tipo",
+    "select_unit_type": "Seleziona un tipo di unità",
+    "unit": "Unità",
+    "unit_help": "Unità usata per calcolare il valore mostrato nei grafici.",
+    "select_unit": "Seleziona un'unità",
+    "predefined_unit": "L'unità <bold>{{unit}}</bold> è stata configurata per il campo <bold>{{field}}</bold>. Cambiare questa unità potrebbe rappresentare in modo errato i dati nei grafici.",
+    "clear": "Cancella",
+    "ok": "OK",
+    "unit_type_labels": {
+      "size": "Dimensione",
+      "time": "Tempo",
+      "percent": "Percentuale",
+      "binary_size": "Dimensione binaria"
+    },
+    "unit_labels": {
+      "byte": "Byte",
+      "kilobyte": "Kilobyte",
+      "megabyte": "Megabyte",
+      "gigabyte": "Gigabyte",
+      "kibibyte": "Kibibyte",
+      "mebibyte": "Mebibyte",
+      "gibibyte": "Gibibyte",
+      "nanosecond": "Nanosecondo",
+      "microsecond": "Microsecondo",
+      "millisecond": "Millisecondo",
+      "second": "Secondo",
+      "minute": "Minuto",
+      "hour": "Ora",
+      "day": "Giorno",
+      "month": "Mese",
+      "percent_decimal": "Percentuale (decimale)",
+      "percent_1_100": "Percentuale (1..100)"
+    }
+  },
+  "wizard_metric": {
+    "function": "Funzione",
+    "select_function": "Seleziona una funzione",
+    "field": "Campo",
+    "select_field": "Seleziona un campo",
+    "percentile": "Percentile",
+    "select_percentile": "Seleziona percentile",
+    "strategy": "Strategia",
+    "select_strategy": "Seleziona strategia",
+    "strategies": {
+      "COUNT": "Conteggio documenti",
+      "SUM": "Somma del campo"
+    },
+    "name": "Nome",
+    "display_name_placeholder": "Specifica il nome visualizzato",
+    "show_thresholds": "Mostra linee di soglia",
+    "add_threshold": "Aggiungi una soglia",
+    "threshold_title": "Titolo",
+    "threshold_name_placeholder": "Specifica il nome della soglia",
+    "remove_threshold": "Rimuovi soglia",
+    "threshold_value": "Valore",
+    "threshold_value_placeholder": "Specifica il valore della soglia",
+    "value_unit": "Il valore è in {{unit}}",
+    "threshold_color": "Configurazione colore per la soglia",
+    "function_required": "La funzione è obbligatoria.",
+    "field_required_for_function": "Il campo è obbligatorio per la funzione {{function}}.",
+    "percentile_required": "Il percentile è obbligatorio.",
+    "name_unique": "Il nome deve essere univoco.",
+    "threshold_value_required": "Il valore della soglia è obbligatorio."
+  },
+  "wizard_sort": {
+    "field": "Campo",
+    "field_placeholder": "Specifica il campo/metrica su cui ordinare",
+    "select_field": "Seleziona il campo per l'ordinamento",
+    "direction": "Direzione",
+    "select_direction": "Seleziona la direzione di ordinamento",
+    "ascending": "Crescente",
+    "descending": "Decrescente",
+    "direction_required": "La direzione è obbligatoria.",
+    "time_row_unsupported": "L'ordinamento su una tabella non dati con raggruppamento per righe temporali non funziona."
+  },
+  "wizard_visualization": {
+    "type": "Tipo",
+    "select_type": "Seleziona il tipo di visualizzazione",
+    "show_event_annotations": "Mostra annotazioni degli eventi",
+    "help_for": "Aiuto per {{field}}",
+    "select_field": "Seleziona {{field}}",
+    "color_for": "Configurazione colore per {{field}}",
+    "axis_label_or_color": "Almeno per un asse deve essere definita un'etichetta o un colore.",
+    "type_required": "Il tipo è obbligatorio."
+  },
+  "builder_empty": {
+    "title": "Aggregazione vuota",
+    "editing": "Stai ora modificando il widget.",
+    "add_metric_hint": "Per vedere i risultati, aggiungi almeno una metrica. Puoi raggruppare i dati aggiungendo righe o colonne.",
+    "preview_hint": "Puoi visualizzare in anteprima i risultati di ricerca del widget cliccando su \"{{button}}\".",
+    "finish_hint": "Per terminare, clicca su \"{{update}}\" per salvare, o su \"{{cancel}}\" per annullare le modifiche.",
+    "edit_hint_interactive": "Per favore <editButton>Modifica</editButton> il widget per vedere qui i risultati.",
+    "edit_hint": "Modifica il widget per vedere qui i risultati."
+  },
+  "vis_types": {
+    "area_chart": "Grafico ad area",
+    "bar_chart": "Grafico a barre",
+    "heatmap": "Heatmap",
+    "line_chart": "Grafico a linee",
+    "network_graph": "Grafo di rete",
+    "pie_chart": "Grafico a torta",
+    "sankey": "Sankey",
+    "scatter_plot": "Grafico a dispersione",
+    "single_number": "Numero singolo",
+    "world_map": "Mappa mondiale"
+  },
+  "vis_validation": {
+    "area_chart_requires_metric": "Il grafico ad area richiede almeno una metrica",
+    "bar_chart_requires_metric": "Il grafico a barre richiede almeno una metrica",
+    "line_chart_requires_metric": "Il grafico a linee richiede almeno una metrica",
+    "pie_chart_requires_metric": "Il grafico a torta richiede almeno una metrica",
+    "scatter_plot_requires_metric": "Il grafico a dispersione richiede almeno una metrica",
+    "sankey_requires_groupings": "Sankey richiede almeno due campi di raggruppamento.",
+    "sankey_single_metric": "Sankey supporta solo una singola metrica.",
+    "network_requires_groupings": "Il grafo di rete richiede almeno due campi di raggruppamento."
+  },
+  "vis_common": {
+    "interpolation": "Interpolazione",
+    "interpolation_types": {
+      "linear": "lineare",
+      "step-after": "a gradino (dopo)",
+      "spline": "spline"
+    },
+    "axis_type": "Tipo di asse",
+    "axis_types": {
+      "linear": "lineare",
+      "logarithmic": "logaritmico"
+    },
+    "color_scale": "Scala di colori",
+    "reverse_scale": "Inverti scala",
+    "show_axis_labels": "Mostra etichette degli assi",
+    "x_axis": "Asse X",
+    "y_axis_number": "Y-Numero",
+    "y_axis_percent": "Y-Percentuale",
+    "y_axis_time": "Y-Tempo",
+    "y_axis_size": "Y-Dimensione",
+    "color_hint": "Suggerimento colore",
+    "legend_configuration": "Configurazione per {{label}}"
+  },
+  "vis_heatmap": {
+    "auto_scale": "Scala automatica",
+    "min": "Min",
+    "max": "Max",
+    "use_smallest_as_default": "Usa il valore più piccolo come predefinito",
+    "default_value": "Valore predefinito"
+  },
+  "vis_worldmap": {
+    "zoom": "Zoom",
+    "latitude": "Latitudine",
+    "longitude": "Longitudine",
+    "name": "Nome",
+    "coordinates": "Coordinate:",
+    "value": "Valore:"
+  },
+  "vis_bar": {
+    "mode": "Modalità",
+    "modes": {
+      "group": "Raggruppa",
+      "stack": "Impila",
+      "relative": "Relativa",
+      "overlay": "Sovrapponi"
+    },
+    "mode_help": {
+      "group": "Ogni serie è rappresentata dalla propria barra nel grafico.",
+      "stack": "Tutte le serie sono impilate una sopra l'altra, risultando in una sola barra.",
+      "relative": "Tutte le serie sono impilate una sopra l'altra, risultando in un solo grafico. Le serie negative però sono posizionate sotto lo zero.",
+      "overlay": "Tutte le serie sono posizionate come barre una sopra l'altra. Per poter vedere le barre, l'opacità è ridotta al 75%. Si consiglia di usare questa opzione con non più di 3 serie."
+    }
+  },
+  "vis_number": {
+    "trend": "Tendenza",
+    "trend_description": "Mostra le informazioni sulla tendenza per questo numero.",
+    "trend_help_enabled": "Se l'utente abilita la tendenza, sotto il valore attuale viene mostrato un riquadro separato che indica la direzione della variazione tramite un'icona, nonché le differenze assolute e relative tra il valore attuale e il precedente.",
+    "trend_help_previous": "Il valore precedente viene calcolato eseguendo in background due ricerche identiche, tranne per l'intervallo di tempo. L'intervallo della prima ricerca è lo stesso configurato per questa query/questo widget; la seconda usa lo stesso intervallo, ma spostato indietro nel passato di una durata pari alla lunghezza dell'intervallo stesso.",
+    "trend_preference": "Preferenza di tendenza",
+    "trend_preferences": {
+      "LOWER": "Più bassa",
+      "NEUTRAL": "Neutra",
+      "HIGHER": "Più alta"
+    },
+    "highlight": "Evidenzia",
+    "highlight_options": {
+      "TREND_ONLY": "Solo info sulla tendenza",
+      "FULL_WIDGET": "Intero widget"
+    },
+    "not_available": "N/D",
+    "trend_label": "Tendenza: {{absolute}} ({{relative}}) rispetto al valore precedente di {{previous}}",
+    "previous_value": "Valore precedente: {{previous}}"
+  },
+  "vis_popover": {
+    "related_values": "Valori correlati",
+    "data_points": "Punti dati",
+    "metric": "Metrica",
+    "groupings": "Raggruppamenti",
+    "back": "Indietro"
+  },
+  "vis_network": {
+    "no_connections": "Nessuna connessione da visualizzare. Modifica la ricerca o il raggruppamento per vedere i risultati."
+  },
+  "vis_sankey": {
+    "no_flows": "Nessun flusso da visualizzare. Modifica la ricerca o il raggruppamento per vedere i risultati."
+  }
+}

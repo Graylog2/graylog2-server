@@ -1,0 +1,638 @@
+{
+  "actions": {
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "submit": "Envoyer",
+    "delete": "Supprimer",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "add": "Ajouter",
+    "edit": "Modifier",
+    "preview": "Aperçu",
+    "close": "Fermer",
+    "done": "Terminé",
+    "filter": "Filtrer",
+    "reset": "Réinitialiser",
+    "reset_search": "Réinitialiser la recherche",
+    "more_actions": "Plus d'actions",
+    "sort": "Trier",
+    "clear_selection": "Effacer la sélection",
+    "remove_item": "Supprimer {{name}}"
+  },
+  "confirm_leave": {
+    "question": "Êtes-vous sûr ?"
+  },
+  "duration": {
+    "years_one": "{{count}} année",
+    "years_other": "{{count}} années",
+    "months_one": "{{count}} mois",
+    "months_other": "{{count}} mois",
+    "days_one": "{{count}} jour",
+    "days_other": "{{count}} jours",
+    "hours_one": "{{count}} heure",
+    "hours_other": "{{count}} heures",
+    "minutes_one": "{{count}} minute",
+    "minutes_other": "{{count}} minutes",
+    "seconds_one": "{{count}} seconde",
+    "seconds_other": "{{count}} secondes",
+    "milliseconds_one": "{{count}} milliseconde",
+    "milliseconds_other": "{{count}} millisecondes",
+    "nanoseconds_one": "{{count}} nanoseconde",
+    "nanoseconds_other": "{{count}} nanosecondes",
+    "microseconds_one": "{{count}} microseconde",
+    "microseconds_other": "{{count}} microsecondes",
+    "years_many": "{{count}} années",
+    "months_many": "{{count}} mois",
+    "days_many": "{{count}} jours",
+    "hours_many": "{{count}} heures",
+    "minutes_many": "{{count}} minutes",
+    "seconds_many": "{{count}} secondes",
+    "milliseconds_many": "{{count}} millisecondes",
+    "nanoseconds_many": "{{count}} nanosecondes",
+    "microseconds_many": "{{count}} microsecondes"
+  },
+  "bulk_actions": {
+    "title": "Actions groupées",
+    "cancel": "Annuler la sélection"
+  },
+  "refresh": {
+    "not_updating": "Pas de mise à jour",
+    "every": "Toutes les",
+    "pause": "Suspendre l'actualisation",
+    "start": "Démarrer l'actualisation"
+  },
+  "create_entity": {
+    "title": "Créer {{entityName}}",
+    "submit": "Créer {{entityName, lowercase}}",
+    "submitting": "Création de {{entityName, lowercase}}...",
+    "save_failed": "Échec de l'enregistrement",
+    "unknown_error": "Une erreur s'est produite. Veuillez réessayer."
+  },
+  "key_value_table": {
+    "name": "Nom",
+    "value": "Valeur",
+    "actions": "Actions"
+  },
+  "markdown_editor": {
+    "editor_title": "Éditeur Markdown",
+    "preview_title": "Aperçu Markdown",
+    "expand_preview": "Développer l'aperçu",
+    "expand_content": "Développer le contenu"
+  },
+  "source_code_editor": {
+    "copy": "Copier (Ctrl+C / ⌘C)",
+    "paste": "Coller (Ctrl+V / ⌘V)",
+    "undo": "Annuler (Ctrl+Z / ⌘Z)",
+    "redo": "Rétablir (Ctrl+Maj+Z / ⌘⇧Z)",
+    "paste_hint": "Appuyez sur Ctrl+V (⌘V sous macOS) ou sélectionnez Édition → Coller pour coller depuis le presse-papiers."
+  },
+  "loading": "Chargement...",
+  "loading_long_wait": "Cela prend un peu plus de temps, veuillez patienter...",
+  "errors": {
+    "runtime_error": "Erreur d'exécution",
+    "unknown_error": "Erreur inconnue",
+    "fetch_error": "{{message}} : {{error}}",
+    "page_error_title": "Erreur lors de la récupération des données",
+    "page_error_description": "Nous avons rencontré des difficultés pour récupérer certaines données nécessaires à la création de cette page. Voici donc une image à la place.",
+    "page_error_logs": "Consultez les journaux du serveur {{productName}} pour plus d'informations."
+  },
+  "empty": {
+    "no_data": "Aucune donnée disponible.",
+    "no_entities": "Aucun élément n'existe.",
+    "nothing_here": "Il semble qu'il n'y ait rien ici pour le moment !",
+    "no_items": "Aucun élément à afficher",
+    "no_items_available": "Aucun élément disponible",
+    "no_items_found": "Aucun élément trouvé à afficher.",
+    "filter_no_match": "Le filtre ne correspond à aucune donnée."
+  },
+  "badges": {
+    "beta": "Bêta",
+    "preview": "Aperçu",
+    "default": "Par défaut",
+    "optional": "(Facult.)"
+  },
+  "clipboard": {
+    "copied": "Copié !"
+  },
+  "restricted_access": {
+    "view": "Vous n'avez pas les autorisations nécessaires pour afficher {{entityName}}."
+  },
+  "enterprise_plugin_not_found": {
+    "title": "Fonctionnalité Enterprise",
+    "description": "Pour utiliser la fonctionnalité <bold>{{featureName}}</bold>, vous avez besoin de la <licenseLink>licence Graylog Enterprise</licenseLink> et du <docsLink>plugin Graylog Enterprise</docsLink>."
+  },
+  "pagination": {
+    "first": "Ouvrir la première page",
+    "previous": "Ouvrir la page précédente",
+    "next": "Ouvrir la page suivante",
+    "last": "Ouvrir la dernière page",
+    "page": "Ouvrir la page {{page}}",
+    "active_page": "Page active"
+  },
+  "page_size": {
+    "rows_one": "{{count}} ligne",
+    "rows_other": "{{count}} lignes",
+    "configure": "Configurer la taille de page",
+    "show": "Afficher <select/>",
+    "rows_many": "{{count}} lignes"
+  },
+  "search_form": {
+    "placeholder": "Saisissez la requête de recherche...",
+    "filter_placeholder": "Saisissez une requête pour filtrer"
+  },
+  "select": {
+    "placeholder": "Sélectionner...",
+    "no_options": "Aucune option",
+    "loading": "Chargement...",
+    "loading_options": "Chargement des options...",
+    "type_to_filter": "Saisissez pour filtrer"
+  },
+  "entity_table": {
+    "selected_items_one": "{{count}} élément sélectionné",
+    "selected_items_other": "{{count}} éléments sélectionnés",
+    "columns": "Colonnes",
+    "configure_columns": "Configurer les colonnes visibles",
+    "reset_columns": "Réinitialiser toutes les colonnes",
+    "show_column": "Afficher {{column}}",
+    "hide_column_named": "Masquer {{column}}",
+    "show_label": "Afficher",
+    "show_details": "Afficher les détails",
+    "collapse_section": "Réduire la section",
+    "toggle_column_actions": "Basculer les actions de {{column}}",
+    "sort_ascending": "Trier par ordre croissant",
+    "sort_descending": "Trier par ordre décroissant",
+    "sort_column_ascending": "Trier {{column, lowercase}} par ordre croissant",
+    "sort_column_descending": "Trier {{column, lowercase}} par ordre décroissant",
+    "hide_column": "Masquer la colonne",
+    "resize_column": "Redimensionner la colonne {{column}}",
+    "slicing_by": "Segmentation par {{column}}",
+    "select_entity": "Sélectionner l'élément",
+    "deselect_entity": "Désélectionner l'élément",
+    "select_all": "Sélectionner tous les éléments visibles",
+    "deselect_all": "Désélectionner tous les éléments visibles",
+    "more": "Plus",
+    "more_actions": "Plus d'actions",
+    "load_layout_failed": "Le chargement des préférences de mise en page pour la vue d'ensemble de \"{{entityId}}\" a échoué avec",
+    "update_layout_failed": "La mise à jour des préférences de mise en page du tableau a échoué avec l'erreur : {{error}}",
+    "search_placeholder": "Rechercher {{humanName}}",
+    "fetch_failed": "Échec de la récupération de {{humanName}}",
+    "fetch_failed_with_status": "Échec de la récupération de {{humanName}} avec le statut",
+    "could_not_retrieve": "Impossible de récupérer {{humanName}}",
+    "no_results": "Aucun élément de type {{humanName}} n'a été trouvé.",
+    "selected_items_many": "{{count}} éléments sélectionnés"
+  },
+  "slicing": {
+    "slice_by": "Segmenter par",
+    "slice_by_values": "Segmenter par valeurs",
+    "no_slicing": "Aucune segmentation",
+    "unselect_slice": "Désélectionner le segment",
+    "sort_by": "Trier par {{option}}",
+    "filter": "Filtrer {{column}}",
+    "filter_slices": "Filtrer les segments",
+    "sort_ascending": "Trier par ordre croissant",
+    "sort_descending": "Trier par ordre décroissant",
+    "hide_empty": "Masquer les segments vides ({{count}})",
+    "show_empty": "Afficher les segments vides ({{count}})",
+    "hide_empty_title": "Masquer les segments vides",
+    "show_empty_title": "Afficher les segments vides",
+    "no_empty": "Segments vides (0)",
+    "fetch_failed": "Erreur lors de la récupération des segments du tableau"
+  },
+  "filters": {
+    "filters": "Filtres",
+    "create_filter": "Créer un filtre",
+    "change_value": "Modifier la valeur du filtre",
+    "delete_filter": "Supprimer le filtre",
+    "filter_ignored": "Filtre ignoré",
+    "slice_conflict": "Ce filtre est ignoré car un segment est actif pour cet attribut. Supprimez le segment pour appliquer le filtre.",
+    "single_filter_only": "Vous ne pouvez créer qu'un seul filtre pour cet attribut.",
+    "update_existing": "Si vous souhaitez modifier la valeur du filtre, vous pouvez mettre à jour le filtre existant.",
+    "create_attribute_filter": "Créer un filtre {{attribute, lowercase}}",
+    "edit_attribute_filter": "Modifier le filtre {{attribute, lowercase}}",
+    "create_submit": "Créer le filtre",
+    "update_submit": "Mettre à jour le filtre",
+    "value_placeholder": "Saisissez la valeur à filtrer",
+    "must_not_be_empty": "Ne doit pas être vide.",
+    "search_attribute": "Rechercher {{attribute, lowercase}}",
+    "no_entities_found": "Aucun élément trouvé",
+    "hold_shift": "Maintenez Maj enfoncé pour sélectionner plusieurs éléments",
+    "load_suggestions_failed": "Échec du chargement des suggestions de filtre avec le statut",
+    "could_not_load_suggestions": "Impossible de charger les suggestions de filtre",
+    "load_titles_failed": "Échec du chargement des titres de filtre avec le statut",
+    "could_not_load_titles": "Impossible de charger les titres de filtre",
+    "all_time": "Toute la période",
+    "now": "Maintenant",
+    "now_lowercase": "maintenant",
+    "relative_range": "de {{from}} à {{until}}"
+  },
+  "time_units": {
+    "nanoseconds": "nanosecondes",
+    "microseconds": "microsecondes",
+    "milliseconds": "millisecondes",
+    "seconds": "secondes",
+    "minutes": "minutes",
+    "hours": "heures",
+    "days": "jours",
+    "months": "mois",
+    "years": "années"
+  },
+  "time": {
+    "never": "Jamais",
+    "toggle_time": "Afficher/masquer l'heure",
+    "time_unit_input": "Saisie de l'unité de temps",
+    "browser_time_zone": "Fuseau horaire du navigateur",
+    "pick_time_zone": "Choisir un fuseau horaire",
+    "unclassified_time_zones": "Non classés",
+    "default_locale": "Langue par défaut",
+    "pick_locale": "Choisir une langue"
+  },
+  "page_header": {
+    "experimental": "Expérimental",
+    "legacy": "Ancien",
+    "experimental_message": "Cette fonctionnalité est nouvelle et doit être considérée comme expérimentale.",
+    "legacy_message": "Cette fonctionnalité a été abandonnée et sera supprimée dans une future version."
+  },
+  "message": {
+    "collector_ingest": "Ingestion Collector",
+    "deleted_input": "input supprimé",
+    "received_by": "Reçu par",
+    "received_by_value": "<inputName/> sur <node/>",
+    "filter_streams": "Filtrer les streams",
+    "default_stream_not_testable": "Impossible de tester avec le stream par défaut",
+    "no_streams": "Aucun stream disponible",
+    "test_against_stream": "Tester avec le stream",
+    "show_changes": "Afficher les modifications",
+    "copy_id": "Copier l'ID",
+    "copy_message": "Copier le message",
+    "not_stored": "Non stocké",
+    "timestamp": "Horodatage",
+    "stored_in_index": "Stocké dans l'index",
+    "not_stored_in_index": "Le message n'est pas stocké",
+    "routed_into_streams": "Acheminé vers les streams",
+    "edit_favorite_fields": "Modifier les champs favoris",
+    "show_remaining_fields_one": "Afficher {{count}} champ restant",
+    "show_remaining_fields_other": "Afficher {{count}} champs restants",
+    "hide_remaining_fields_one": "Masquer {{count}} champ restant",
+    "hide_remaining_fields_other": "Masquer {{count}} champs restants",
+    "favorite_fields_configuration": "Configuration des champs favoris",
+    "favorite_fields_hint_one": "Les champs favoris apparaîtront dans tous les streams auxquels ce message appartient, y compris le stream <streams/> dans lequel ce message est acheminé.",
+    "favorite_fields_hint_other": "Les champs favoris apparaîtront dans tous les streams auxquels ce message appartient, y compris les streams <streams/> dans lesquels ce message est acheminé.",
+    "save_configuration": "Enregistrer la configuration",
+    "reset_to_default": "Réinitialiser par défaut",
+    "reset_to_default_title": "Réinitialiser les champs par défaut : {{fields}}",
+    "favorite_fields": "Champs favoris",
+    "remaining_fields": "Autres champs",
+    "set_favorites_failed": "Échec de la définition des champs en favoris avec l'erreur : {{error}}",
+    "set_favorites_failed_title": "Impossible de définir les champs en favoris",
+    "add_favorite_failed": "Échec de l'ajout du champ aux favoris avec l'erreur : {{error}}",
+    "add_favorite_failed_title": "Impossible d'ajouter le champ aux favoris",
+    "remove_favorite_failed": "Échec de la suppression du champ des favoris avec l'erreur : {{error}}",
+    "remove_favorite_failed_title": "Impossible de supprimer le champ des favoris",
+    "field_terms": "Termes du champ :",
+    "received_by_radio_value": "via <inputName/> sur le radio <node/>",
+    "show_remaining_fields_many": "Afficher {{count}} champs restants",
+    "hide_remaining_fields_many": "Masquer {{count}} champs restants",
+    "favorite_fields_hint_many": "Les champs favoris apparaîtront dans tous les streams auxquels ce message appartient, y compris les streams <streams/> dans lesquels ce message est acheminé."
+  },
+  "entity_types": {
+    "user": "utilisateur",
+    "team": "équipe",
+    "dashboard": "tableau de bord",
+    "event_definition": "définition d'événement",
+    "notification": "notification",
+    "search": "recherche",
+    "stream": "stream",
+    "search_filter": "filtre de recherche",
+    "report": "rapport",
+    "role": "rôle",
+    "output": "output",
+    "sigma_rule": "règle Sigma",
+    "event_procedure": "procédure d'événement",
+    "event_procedure_step": "étape de procédure d'événement",
+    "collection": "collection",
+    "collection_entities": "entités de la collection"
+  },
+  "marketplace_link": "la Marketplace {{productName}}",
+  "chips_cell": {
+    "show_fewer": "Afficher moins",
+    "show_all": "Tout afficher",
+    "filter_by": "Filtrer par {{itemLabel}} \"{{value}}\""
+  },
+  "expandable_cell_list": {
+    "show_less": "Afficher moins",
+    "show_more_one": "Afficher 1 de plus",
+    "show_more_many": "Afficher {{count}} de plus",
+    "show_more_other": "Afficher {{count}} de plus"
+  },
+  "expanded_section_count": {
+    "show": "Afficher {{label}}",
+    "hide": "Masquer {{label}}"
+  },
+  "compact_pagination": {
+    "previous_page": "Page précédente",
+    "select_page": "Sélectionner la page",
+    "next_page": "Page suivante",
+    "of_pages": "sur {{totalPages}}"
+  },
+  "expandable_checkbox_list_item": {
+    "select_item": "Sélectionner l'élément"
+  },
+  "traffic_graph": {
+    "days": "Jours",
+    "incoming": "Trafic entrant",
+    "outgoing": "Trafic sortant",
+    "last_days": "Derniers {{days}} jours : {{traffic}}"
+  },
+  "link_to_node": {
+    "unknown_node": "Nœud inconnu"
+  },
+  "markdown": {
+    "images_unsupported": "Les images ne sont pas prises en charge pour des raisons de sécurité. Veuillez activer les sources autorisées <configurationLink>ici</configurationLink>"
+  },
+  "public_notifications": {
+    "read_less": "Lire moins",
+    "read_more": "Lire la suite"
+  },
+  "refresh_controls": {
+    "controls_label": "Commandes d'actualisation {{humanName}}",
+    "below_minimum": "L'intervalle de <intervalDuration /> ({{interval}}) est inférieur à l'intervalle minimal configuré de <minimumDuration /> ({{minimum}})."
+  },
+  "scroll_button": {
+    "back_to_top": "Retour en haut"
+  },
+  "section": {
+    "toggle_section": "Afficher/masquer la section {{title, lowercase}}"
+  },
+  "selectable_list": {
+    "remove": "Supprimer"
+  },
+  "share_menu_item": {
+    "share": "Partager"
+  },
+  "status_icon": {
+    "yes": "Oui",
+    "no": "Non"
+  },
+  "type_ahead_field_input": {
+    "select_field": "Sélectionner un champ"
+  },
+  "query_helper": {
+    "title": "Aide sur la syntaxe de recherche",
+    "show_help": "Afficher l'aide sur la syntaxe de recherche",
+    "available_fields": "Champs de recherche disponibles",
+    "field": "Champ",
+    "description": "Description",
+    "examples": "Exemples",
+    "example_description": "Trouver tous les {{entityName}} dont la description contient security :",
+    "example_id": "Trouver un {{entityName}} avec l'id 5f4dfb9c69be46153b9a9a7b :",
+    "example_query_description": "description:security",
+    "example_query_id": "id:5f4dfb9c69be46153b9a9a7b",
+    "common_fields": {
+      "id": "Identifiant de {{entityName}}, qui est une référence unique.",
+      "title": "Titre de {{entityName}}.",
+      "name": "Nom de {{entityName}}.",
+      "description": "Courte description de {{entityName}}.",
+      "summary": "Résumé détaillé de {{entityName}}."
+    }
+  },
+  "url_allow_list_modal": {
+    "add": "Ajouter à la liste d'autorisation des URL",
+    "title": "Mettre à jour la configuration de la liste d'autorisation",
+    "submit": "Mettre à jour la configuration",
+    "urls": "URL autorisées"
+  },
+  "configuration_well": {
+    "empty": "<empty>",
+    "uploaded_file_content": "<uploaded file content>",
+    "no_configuration": "-- aucune configuration --"
+  },
+  "configuration_forms": {
+    "undo_reset": "Annuler la réinitialisation",
+    "remove": "Supprimer",
+    "title": "Titre",
+    "optional": "facultatif"
+  },
+  "enterprise_advertisement": {
+    "enterprise_title": "{{productName}} Enterprise",
+    "enterprise_description": "Conçu pour répondre aux besoins des équipes d'exploitation informatique et d'ingénierie logicielle aux ressources limitées, {{productName}} Enterprise propose de nombreuses améliorations de productivité qui vous feront gagner des milliers d'heures par an dans la collecte et l'analyse des données de journaux pour identifier la cause des problèmes de performance, de panne et d'erreur.",
+    "security_title": "{{productName}} Security",
+    "security_description": "Étendez les capacités de {{productName}} Open pour détecter, analyser et répondre aux menaces de cybersécurité grâce à des tableaux de bord et des alertes spécifiques à la sécurité, un moteur de détection d'anomalies basé sur l'IA et le ML, des intégrations avec d'autres outils de sécurité, des fonctionnalités SOAR et de nombreuses fonctionnalités de reporting de conformité.",
+    "request_now": "Demander maintenant"
+  },
+  "plugin_list": {
+    "plugin_enterprise": "Plugin {{productName}} Enterprise",
+    "installed": "{{pluginName}} est installé",
+    "not_installed": "{{pluginName}} n'est pas installé",
+    "status": "Voici l'état des modules {{productName}} Enterprise dans ce cluster :"
+  },
+  "reported_error": {
+    "title": "Une erreur s'est produite",
+    "description": "Une erreur inconnue s'est produite. Veuillez consulter le message suivant et le journal du serveur {{productName}} pour plus d'informations."
+  },
+  "hotkeys": {
+    "or": "ou",
+    "title": "Raccourcis clavier",
+    "view_all": "Voir tous les raccourcis clavier"
+  },
+  "right_sidebar": {
+    "sidebar_label": "Panneau latéral {{title}}",
+    "sidebar_label_collapsed": "Panneau latéral {{title}} (réduit)",
+    "close": "Fermer le panneau latéral",
+    "expand": "Développer le panneau latéral",
+    "collapse": "Réduire le panneau latéral",
+    "go_back": "Retour",
+    "go_back_label": "Revenir au contenu précédent",
+    "go_forward": "Avancer",
+    "go_forward_label": "Aller au contenu suivant"
+  },
+  "maxmind_adapter": {
+    "documentation": {
+      "intro": "L'adaptateur de données GeoIP permet de lire les bases de données GeoIP2 de MaxMind.",
+      "limitations_title": "Limites",
+      "limitations_supported": "Actuellement, les bases de données ASN, ville et pays sont prises en charge.",
+      "limitations_more": "Pour la prise en charge d'autres types de bases de données, veuillez consulter nos canaux d'assistance.",
+      "asn_fields": "Champs de la base de données ASN",
+      "country_fields": "Champs de la base de données pays",
+      "city_fields": "Champs de la base de données ville",
+      "city_additional_fields": "En plus des champs fournis par la base de données pays, la base de données ville comprend également les champs suivants :",
+      "complete_documentation": "Pour une documentation complète des champs, consultez la <docsLink>documentation développeur</docsLink> de MaxMind"
+    },
+    "database_types": {
+      "asn": "Base de données ASN",
+      "city": "Base de données ville",
+      "country": "Base de données pays",
+      "ipinfo_location": "Base de données de localisation IPinfo",
+      "ipinfo_asn": "Base de données ASN IPinfo"
+    },
+    "field_set": {
+      "file_path": "Chemin du fichier",
+      "file_path_help": "Le chemin d'accès au fichier de base de données.",
+      "database_type": "Type de base de données",
+      "database_type_help": "Sélectionnez le type du fichier de base de données",
+      "database_type_placeholder": "Sélectionnez le type de fichier de base de données",
+      "refresh_file": "Actualiser le fichier",
+      "refresh_file_help": "Si cette option est activée, le fichier de base de données est vérifié pour détecter les modifications et actualisé lorsqu'il a changé sur le disque."
+    },
+    "summary": {
+      "database_file_path": "Chemin du fichier de base de données",
+      "database_type": "Type de base de données",
+      "check_interval": "Intervalle de vérification"
+    }
+  },
+  "abs_geoip": {
+    "container_name": "Nom du conteneur Azure Blob",
+    "container_name_help": "Le nom de votre conteneur Azure Blob.",
+    "endpoint_url": "URL du point de terminaison Azure Blob",
+    "endpoint_url_help": "L'URL de votre point de terminaison Azure Blob, requise uniquement si vous souhaitez remplacer le point de terminaison par défaut.",
+    "account_name": "Nom du compte Azure",
+    "account_name_placeholder": "votre-nom-de-compte",
+    "account_name_help": "Le nom de votre compte de stockage Azure.",
+    "account_key_reset": "Clé de compte Azure",
+    "reset_password": "Réinitialiser le mot de passe",
+    "account_key": "Clé de compte Azure",
+    "account_key_help": "La clé de compte de votre compte de stockage Azure."
+  },
+  "gcs_geoip": {
+    "project_id": "ID du projet Google Cloud Storage"
+  },
+  "geoip_resolver": {
+    "title": "Configuration du Geo-Location Processor",
+    "description": "Le Geo-Location Processor analyse tous les messages à la recherche de champs contenant <bold>exclusivement</bold> une adresse IP, et place leurs informations de géolocalisation (coordonnées, code pays ISO et nom de la ville) dans d'autres champs. Pour en savoir plus, consultez la <docsLink>documentation</docsLink>.",
+    "enabled_summary": "Activé :",
+    "enforce_schema_summary": "Appliquer le schéma par défaut :",
+    "vendor_type_summary": "Type de fournisseur de base de données :",
+    "city_db_path_summary": "Chemin de la base de données ville :",
+    "asn_db_path_summary": "Chemin de la base de données ASN :",
+    "refresh_interval_summary": "Intervalle d'actualisation de la base de données :",
+    "pull_from_cloud_summary": "Récupérer les fichiers depuis le bucket de stockage cloud :",
+    "edit": "Modifier la configuration",
+    "modal_title": "Mettre à jour la configuration du Geo-Location Processor",
+    "enable_processor": "Activer le Geo-Location Processor",
+    "enforce_schema": "Appliquer le schéma par défaut",
+    "vendor_select": "Sélectionnez le fournisseur de la base de données GeoIP",
+    "city_db_path": "Chemin de la base de données ville",
+    "asn_db_path": "Chemin de la base de données ASN",
+    "refresh_interval": "Intervalle d'actualisation de la base de données",
+    "refresh_interval_help": "Intervalle auquel les fichiers de base de données sont vérifiés pour détecter les modifications ; les changements constatés sur le disque sont actualisés.",
+    "pull_from_cloud": "Récupérer les fichiers depuis le bucket de stockage cloud",
+    "select_cloud_storage": "Sélectionner le stockage cloud",
+    "update_configuration": "Mettre à jour la configuration",
+    "updating_configuration": "Mise à jour de la configuration..."
+  },
+  "links": {
+    "documentation": "documentation"
+  },
+  "quick_jump": {
+    "title": "Accès rapide",
+    "open": "Ouvrir l'accès rapide",
+    "search_placeholder": "Rechercher des pages/tableaux de bord/streams ...",
+    "intro": "Veuillez saisir une requête de recherche pour trouver une page, un stream, un tableau de bord, un input ou d'autres éléments.",
+    "intro_hint": "Pour vous faciliter la tâche, vous trouverez ci-dessous la liste de vos éléments <bold>ouverts récemment</bold> et <bold>favoris</bold> :",
+    "no_results": "Aucun résultat trouvé. Veuillez essayer d'autres termes de recherche.",
+    "recent": "Récents"
+  },
+  "scratchpad": {
+    "title": "Bloc-notes",
+    "status_cleared": "Effacé.",
+    "status_auto_saved": "Enregistré automatiquement.",
+    "got_it": "Compris !",
+    "sensitive_warning": "Nous vous recommandons de <bold>ne pas</bold> stocker d'informations sensibles, telles que des mots de passe, dans cet espace.",
+    "help_overlay": "Vous pouvez utiliser cet espace pour stocker des notes personnelles et d'autres informations, sans quitter la fenêtre de votre navigateur. Par exemple, stockez les horodatages, les identifiants d'utilisateur ou les adresses IP dont vous avez besoin dans le cadre de vos investigations.",
+    "copy": "Copier",
+    "clear": "Effacer",
+    "clear_confirm": "Cette action effacera le contenu de votre bloc-notes. Voulez-vous continuer ?"
+  },
+  "extractor_actions": {
+    "select_type": "Sélectionner le type d'extracteur",
+    "only_string_fields": "Les extracteurs ne peuvent être utilisés qu'avec des champs de type chaîne."
+  },
+  "surrounding_search": {
+    "button": "Afficher les messages environnants"
+  },
+  "support_sources": {
+    "title": "Besoin d'aide ?",
+    "help_text": "N'hésitez pas à consulter la communauté {{productName}} si vos questions ne trouvent pas de réponse dans la <docsLink>documentation</docsLink>.",
+    "community_support": "Support communautaire",
+    "issue_tracker": "Suivi des problèmes",
+    "professional_support": "Support professionnel"
+  },
+  "times_list": {
+    "title": "Configuration de l'heure",
+    "description": "La gestion des fuseaux horaires peut prêter à confusion. Vous trouverez ici le fuseau horaire appliqué aux différents composants de votre système. Vous pouvez vérifier les paramètres de fuseau horaire de chaque nœud serveur {{productName}} sur sa page de détails.",
+    "user": "Utilisateur <bold>{{username}}</bold> :",
+    "web_browser": "Votre navigateur web :",
+    "server": "Serveur {{productName}} :"
+  },
+  "widget_visualization_not_found": {
+    "description": "Visualisation du widget (<italic>{{widgetClassName}}</italic>) introuvable. Il semble que le plugin fournissant ce widget ne soit pas chargé."
+  },
+  "telemetry": {
+    "title": "Télémétrie",
+    "enable_label": "Activer la télémétrie",
+    "enabled_checkbox": "activée",
+    "update_preferences": "Mettre à jour les préférences",
+    "update_button": "Mettre à jour la télémétrie",
+    "info_modal_title": "Aidez-nous à améliorer {{productName}}",
+    "ok": "OK",
+    "info": "Nous souhaiterions collecter des données d'utilisation anonymes afin de définir les priorités d'amélioration et de rendre {{productName}} meilleur à l'avenir.",
+    "no_personal_data": "Nous ne collectons aucune donnée personnelle, aucune information sensible ni aucun contenu tel que les journaux de vos instances.",
+    "learn_more": "En savoir plus dans notre <privacyLink>politique de confidentialité</privacyLink>.",
+    "turn_off_profile": "Vous pouvez désactiver ou activer la collecte de données à tout moment <bold>dans le profil utilisateur</bold>.",
+    "turn_off_here": "Vous pouvez désactiver ou activer la collecte de données à tout moment ici."
+  },
+  "app_facade": {
+    "preparing": "Nous préparons l'interface web pour vous...",
+    "load_user_failed": "Échec du chargement de votre utilisateur",
+    "reload_page": "Recharger la page"
+  },
+  "suggest_reload": {
+    "title": "La version de {{productName}} a changé",
+    "version_changed": "Votre version de {{productName}} est passée de <bold>{{version}}</bold> à <bold>{{newVersion}}</bold>.",
+    "save_work": "Veuillez enregistrer votre travail et recharger la page pour éviter les erreurs.",
+    "reload_now": "Recharger maintenant"
+  },
+  "footer": {
+    "system_info": "{{productName}} {{version}} sur {{hostname}} ({{jvmInfo}})"
+  },
+  "notifications": {
+    "download_failed": "Échec du téléchargement avec le statut : {{error}}",
+    "download_failed_title": "Échec du téléchargement",
+    "export_failed": "Échec de l'export",
+    "export_widget_failed": "Échec de l'export du widget",
+    "telemetry_update_failed": "Échec de la mise à jour : {{error}}",
+    "telemetry_update_failed_title": "Impossible de mettre à jour les paramètres de télémétrie.",
+    "delete_property_confirm": "Voulez-vous vraiment supprimer la propriété « {{key}} » ?",
+    "quick_jump_failed": "Échec de la récupération des résultats de recherche d'éléments avec le statut",
+    "quick_jump_failed_title": "Impossible de récupérer les résultats de recherche d'éléments."
+  },
+  "use_favorite_item_mutation_notifications": {
+    "put_failed": "Échec de l'ajout de l'élément aux favoris avec le statut : {{error}}",
+    "put_failed_title": "Impossible d'ajouter l'élément aux favoris",
+    "delete_failed": "Échec de la suppression de l'élément des favoris avec le statut : {{error}}",
+    "delete_failed_title": "Impossible de supprimer l'élément des favoris"
+  },
+  "use_entity_titles_notifications": {
+    "load_failed": "Échec du chargement des titres des éléments avec le statut",
+    "load_failed_title": "Impossible de charger les titres des éléments"
+  },
+  "use_search_version_check_notifications": {
+    "fetch_failed_title": "Impossible de récupérer les données de remplacement"
+  },
+  "entity_creators": {
+    "event_definition": "Créer une définition d'événement",
+    "notification": "Créer une notification",
+    "dashboard": "Créer un tableau de bord",
+    "stream": "Créer un stream",
+    "index_set": "Créer un Index Set",
+    "user": "Créer un utilisateur",
+    "pipeline": "Créer un pipeline",
+    "pipeline_rule": "Créer une règle de pipeline",
+    "content_pack": "Créer un Content Pack",
+    "fleet": "Créer une flotte"
+  },
+  "user_notification": {
+    "success": "Succès",
+    "error": "Erreur",
+    "attention": "Attention"
+  }
+}

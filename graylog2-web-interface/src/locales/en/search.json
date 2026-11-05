@@ -1,0 +1,562 @@
+{
+  "button": {
+    "perform_search": "Perform Search",
+    "perform_search_dirty": "Perform search (changes were made after last search execution)"
+  },
+  "sidebar": {
+    "description": "Description",
+    "create": "Create",
+    "highlighting": "Highlighting",
+    "fields": "Fields"
+  },
+  "empty_state": {
+    "no_widgets_search": "There are no widgets defined to visualize the search result",
+    "no_widgets_dashboard": "This dashboard has no widgets yet",
+    "create_widget_hint": "Create a new widget by selecting a widget type in the left sidebar section \"Create\".",
+    "tips_title": "A few tips for creating searches and dashboards",
+    "tip_1": "Start with a <bold>question</bold> you want to answer. Define the problem you want to solve.",
+    "tip_2": "<bold>Limit</bold> the data to only the data points you want to see.",
+    "tip_3": "<bold>Visualize</bold> the data. Does it answer your question?",
+    "tip_4": "<bold>Share</bold> the dashboard with your colleagues. Prepare it for <bold>reuse</bold> by using parameters"
+  },
+  "search_bar": {
+    "streams_placeholder": "Select streams the search should include. Searches in all streams if empty.",
+    "refresh_human_name": "Search",
+    "query_history_title": "Open query history",
+    "filters_label": "Filters",
+    "filters_tooltip_title": "Search Filters",
+    "filters_enterprise_hint": "Search filters and parameters are available for the enterprise version.",
+    "filters_hide_controls": "Hide controls",
+    "scroll_hint": "Scroll to search bar",
+    "query_placeholder": "Type your search query here and press enter. E.g.: (\"not found\" AND http) OR http_response_code:[400 TO 404]"
+  },
+  "actions_menu": {
+    "saved_search": "Saved search",
+    "save_search": "Save search",
+    "unsaved_changes": "Unsaved changes",
+    "load_title": "Load a previously saved search",
+    "load": "Load",
+    "share_disabled": "Only saved searches can be shared.",
+    "dropdown_aria_label": "Open search actions dropdown",
+    "edit_metadata": "Edit metadata",
+    "export_to_dashboard": "Export to dashboard",
+    "export": "Export",
+    "reset_search": "Reset search",
+    "editing_modal_title": "Editing saved search",
+    "update_search": "Update search",
+    "share_description": "Search for a User or Team to add as collaborator on this saved search.",
+    "save_success": "Saving view \"{{title}}\" was successful!",
+    "save_error": "Saving view failed: {{error}}",
+    "delete_success": "Deleting saved search \"{{title}}\" was successful!",
+    "delete_error": "Deleting saved search failed: {{error}}"
+  },
+  "save_form": {
+    "popover_title": "Name of search",
+    "dirty_warning": "There are unconfirmed changes to the search parameters (time range, streams, or query). Saving now will discard them. If this is not intentional, execute the search to apply your changes before saving.",
+    "title_label": "Title",
+    "title_placeholder": "Enter title",
+    "share_description": "Search for a User or Team to add as collaborator on this search.",
+    "create_new": "Create new",
+    "save_as": "Save as",
+    "create_new_title": "Create new search",
+    "save_as_title": "Save as new search",
+    "save": "Save",
+    "save_title": "Save search",
+    "cancel": "Cancel"
+  },
+  "results": {
+    "loading": "Updating search results..."
+  },
+  "sidebar_description": {
+    "execution": "Execution",
+    "ad_hoc_info": "Save the search or export it to a dashboard to add a custom summary and description.",
+    "edit_metadata_hint": "To add a description and summary for this {{viewType}} click on the <icon/> icon in the search bar to open its action menu. The action menu includes the option \"Edit metadata\".",
+    "search_section": "Search",
+    "no_summary": "This {{viewType}} has no summary.",
+    "no_description": "This {{viewType}} has no description.",
+    "no_query": "No query executed yet.",
+    "query_executed_in": "Query executed in",
+    "effective_time_range": "Effective time range",
+    "varies_per_widget": "Varies per widget",
+    "time_from": "From",
+    "time_to": "To",
+    "total_results": "Total results"
+  },
+  "sidebar_create": {
+    "info": "Use the following options to add an aggregation, log view (enterprise feature) or parameters (enterprise feature) to your search.",
+    "generic": "Generic",
+    "predefined_aggregation": "Predefined Aggregation",
+    "investigations": "Investigations",
+    "events": "Events"
+  },
+  "sidebar_highlighting": {
+    "description": "Search terms and field values can be highlighted. Highlighting your search query in the results can be enabled/disabled in the {{productName}} server config. Any field value can be highlighted by clicking on the value and selecting \"Highlight this value\".\nIf a term or a value has more than one rule, the first matching rule is used.",
+    "active_highlights": "Active highlights",
+    "add_rule_title": "Add highlighting rule",
+    "search_terms": "Search terms"
+  },
+  "save_view": {
+    "save": "Save",
+    "save_as": "Save as",
+    "save_as_new_dashboard_title": "Save as new dashboard",
+    "save_dashboard_title": "Save dashboard"
+  },
+  "undo_redo": {
+    "undo": "Undo",
+    "redo": "Redo"
+  },
+  "time_range": {
+    "tab_relative": "Relative",
+    "tab_absolute": "Absolute",
+    "tab_keyword": "Keyword",
+    "from_label": "From:",
+    "until_label": "Until:",
+    "keyword_label": "Keyword:",
+    "no_override": "No Override",
+    "now": "Now",
+    "all_time": "All Time",
+    "ago": "ago",
+    "range_ago": "{{time}} ago",
+    "range_length_placeholder": "Select a range length",
+    "load_preset": "Load Preset",
+    "no_available_presets": "No available presets",
+    "loading": "Loading...",
+    "configure_presets": "Configure presets",
+    "insert_current_date": "Insert current date",
+    "from_hours_label": "from hours label",
+    "from_minutes_label": "from minutes label",
+    "from_seconds_label": "from seconds label",
+    "to_hours_label": "to hours label",
+    "to_minutes_label": "to minutes label",
+    "to_seconds_label": "to seconds label",
+    "from_hour": "from hour",
+    "from_minutes": "from minutes",
+    "from_seconds": "from seconds",
+    "to_hour": "to hour",
+    "to_minutes": "to minutes",
+    "to_seconds": "to seconds",
+    "toggle_day_boundary": "Toggle between beginning and end of day",
+    "set_current_time": "Set to current local time",
+    "set_range_value": "Set the range value",
+    "set_from_value": "Set the from value",
+    "set_to_value": "Set the to value",
+    "save_as_preset": "Save as preset",
+    "save_current_as_preset": "Save current time range as preset",
+    "preset_description_placeholder": "Add description...",
+    "preset_description_label": "Time range description",
+    "preset_description_required": "Description is required",
+    "preset_similar": "You already have similar time range in <configurationsLink>Range configuration</configurationsLink>",
+    "save_preset": "Save preset",
+    "calendar": "Calendar",
+    "timestamp": "Timestamp",
+    "date_format": "Date should be formatted as <code>{{format}}</code>.",
+    "from_timestamp": "From timestamp",
+    "to_timestamp": "To timestamp",
+    "no_override_title": "No Date/Time Override chosen.",
+    "no_override_hint": "Use the tabs above to choose a Date & Time Range to Search.",
+    "keyword_from": "From",
+    "keyword_to": "To",
+    "keyword_headline": "Time range:",
+    "keyword_input": "Keyword input",
+    "keyword_help": "Specify the time frame for the search in natural language.",
+    "keyword_preview": "Preview",
+    "keyword_example_last_month": "<code>{{keyword}}</code> searches between one month ago and now",
+    "keyword_example_hours_ago": "<code>{{keyword}}</code> searches between four hours ago and now",
+    "keyword_example_range": "<code>{{keyword}}</code> searches between 1st of April and 2 days ago",
+    "keyword_example_timezone": "<code>{{keyword}}</code> searches between yesterday midnight and today midnight in timezone +0200 - will be 22:00 in UTC",
+    "keyword_docs": "Please consult the <docsLink>documentation</docsLink> for more details.",
+    "keyword_docs_title": "Keyword Time Range Documentation",
+    "display_label": "Search Time Range, Opens Time Range Selector On Click",
+    "picker_title": "Search Time Range",
+    "admin_limit": "Admin has limited searching to {{duration}}",
+    "update": "Update time range",
+    "open_selector": "Open Time Range Selector",
+    "timezones_using": "All timezones using: <bold>{{timezone}}</bold>",
+    "unit_seconds": "Seconds",
+    "unit_minutes": "Minutes",
+    "unit_hours": "Hours",
+    "unit_days": "Days"
+  },
+  "execution_info": {
+    "query_executed": "Query executed in {{duration}}ms at",
+    "total_results": "Total results: {{total}}",
+    "no_query": "No query executed yet."
+  },
+  "highlight_form": {
+    "edit_title": "Edit Highlighting Rule",
+    "create_title": "Create Highlighting Rule",
+    "field_label": "Field",
+    "field_placeholder": "Select or type field name",
+    "field_required": "Field is required",
+    "condition_label": "Condition",
+    "condition_placeholder": "Choose a condition",
+    "condition_required": "Condition is required",
+    "value_label": "Value",
+    "value_required": "Value is required",
+    "update_rule": "Update rule",
+    "create_rule": "Create rule"
+  },
+  "query_tabs": {
+    "create_page": "Create New Page",
+    "more_pages": "More Dashboard Pages",
+    "open_configuration": "Open pages configuration",
+    "copy_page": "Copy page",
+    "copying_page": "Copying page...",
+    "copy_page_failed": "Copying dashboard page failed with error {{error}}",
+    "remove_page": "Remove page {{title}}",
+    "configuration_title": "Update Dashboard Pages Configuration",
+    "update_configuration": "Update configuration",
+    "order": "Order",
+    "order_help": "Use drag and drop to change the order of the dashboard pages. Double-click on a dashboard title to change it."
+  },
+  "widget_creation": {
+    "title": "Create new widget",
+    "create_widget": "Create {{title}} Widget",
+    "placeholder": "Create a new widget here",
+    "scroll_to_new_widget": "Scroll to new widget"
+  },
+  "dashboard_actions": {
+    "immutable": "This dashboard is read-only because it is managed by {{productName}}. Use \"Save as\" to create an editable copy.",
+    "debug": "Debug",
+    "share_unsaved": "Only saved dashboards can be shared.",
+    "edit_metadata": "Edit metadata",
+    "export": "Export",
+    "save_new_title": "Save new dashboard",
+    "create": "Create dashboard",
+    "edit_title": "Editing dashboard",
+    "update": "Update dashboard",
+    "share_description": "Search for a User or Team to add as collaborator on this dashboard."
+  },
+  "dashboard_search_bar": {
+    "filter_placeholder": "Apply filter to all widgets"
+  },
+  "debug": {
+    "title": "Debug information"
+  },
+  "common_views": {
+    "empty_value": "<Empty Value>",
+    "add_to_query": "Add to query",
+    "time_range_validation": {
+      "invalid_date_format": "Format must be: {{format}}.",
+      "range_limit": "Range is outside limit duration.",
+      "date_limit": "Date is outside limit duration.",
+      "until_before_from": "The \"Until\" date must come after the \"From\" date.",
+      "empty": "Cannot be empty.",
+      "keyword_empty": "Keyword must not be empty!",
+      "keyword_unparsable": "Unable to parse keyword"
+    },
+    "remove_from_favorites": "Remove from favorites",
+    "add_to_favorites": "Add to favorites",
+    "view_type": {
+      "search": "search",
+      "dashboard": "dashboard"
+    },
+    "unsaved_view": {
+      "search": "Unsaved Search",
+      "dashboard": "Unsaved Dashboard"
+    }
+  },
+  "field_charts_migration": {
+    "title": "Migrate existing search page charts",
+    "found_charts_one": "We found {{count}} chart, created for an older version of the search. Do you want to migrate this chart for the current search?",
+    "found_charts_other": "We found {{count}} charts, created for an older version of the search. Do you want to migrate these charts for the current search?",
+    "save_hint": "When you have run the migration and want to keep the newly created charts, you will have to save the current search as a new dashboard. Otherwise the charts will get lost, when leaving the search page.",
+    "migrate": "Migrate",
+    "discard": "Discard charts"
+  },
+  "query": {
+    "contained_in_enterprise": "(contained in <enterpriseLink>Graylog Enterprise</enterpriseLink>)",
+    "documentation_hint": "You can also have a look at the <docsLink>documentation</docsLink>, to learn more about the widget creation."
+  },
+  "widget_query": {
+    "reset_global_filter": "Reset Global Filter"
+  },
+  "editable_title": {
+    "edit": "Edit title",
+    "hint": "{{value}} - Double click the title to edit it."
+  },
+  "message_permalink": {
+    "label": "Permalink"
+  },
+  "query_title": {
+    "page_actions": "Page Actions",
+    "edit_title": "Edit Title",
+    "duplicate": "Duplicate",
+    "copy_to_dashboard": "Copy to Dashboard",
+    "edit_modal_title": "Editing dashboard page title",
+    "update_title": "Update title",
+    "title_help": "Enter a helpful dashboard page title. It has a maximum length of 40 characters.",
+    "title": "Title"
+  },
+  "missing_requirements": {
+    "description_search": "Unfortunately executing this search is not possible. It uses the following capabilities which are not available:",
+    "description_dashboard": "Unfortunately executing this dashboard is not possible. It uses the following capabilities which are not available:",
+    "included_in": "<requirementName>{{requirement}}</requirementName> - included in <pluginLink>{{plugin}}</pluginLink>",
+    "back": "Back"
+  },
+  "view_header": {
+    "alerts_and_events": "Alerts & Events",
+    "event_definitions": "Event definitions",
+    "edit_search_metadata": "Edit search {{title}} metadata",
+    "edit_dashboard_metadata": "Edit dashboard {{title}} metadata",
+    "editing_search": "Editing saved search",
+    "editing_dashboard": "Editing saved dashboard",
+    "save_search": "Save search",
+    "save_dashboard": "Save dashboard"
+  },
+  "execution": {
+    "not_executed": "No query executed yet."
+  },
+  "dashboards_page": {
+    "documentation": "Dashboard documentation",
+    "description": "Use dashboards to create specific views on your messages. Create a new dashboard here and add any graph or chart you create in other parts of the application with one click."
+  },
+  "search_filter_banner": {
+    "explanation": "<italic>Search filters</italic> contain their own query and extend the main query using the <bold>AND</bold> operator.",
+    "explanation_saved": "Filters can be saved separately and reused in saved searches and dashboards. Updating a saved filter will automatically affect the search results of searches which include the filter."
+  },
+  "widget_time_range": {
+    "reset_global_override": "Reset Global Override"
+  },
+  "time_range_presets": {
+    "select_time_range": "Select time range",
+    "open_preset_select": "Open time range preset select"
+  },
+  "move_range": {
+    "show_previous": "Show previous",
+    "show_previous_duration": "Show previous {{duration}}",
+    "show_next": "Show next",
+    "show_next_duration": "Show next {{duration}}"
+  },
+  "query_validation": {
+    "toggle_warning": "Toggle validation warning",
+    "toggle_information": "Toggle validation information",
+    "toggle_error": "Toggle validation error explanation",
+    "syntax_documentation": "Search query syntax documentation",
+    "error_documentation": "Query error documentation",
+    "status_warning": "Warning",
+    "status_info": "Info",
+    "status_error": "Error",
+    "validation_failed": "Validating search query failed with status: {{error}}",
+    "warm_tier_title": "Warm Tier Search",
+    "warm_tier_message": "The selected time range includes data stored in the Warm Tier, which can be slow to retrieve. Data older than the listed timestamp falls within the Warm Tier for that stream:"
+  },
+  "saved_searches": {
+    "title": "Saved Searches",
+    "confirm_bulk_delete_one": "Do you really want to remove {{count}} saved search?",
+    "confirm_bulk_delete_other": "Do you really want to remove {{count}} saved searches?",
+    "bulk_delete_partial_one": "{{failed}} out of {{count}} selected saved search could not be deleted.",
+    "bulk_delete_partial_other": "{{failed}} out of {{count}} selected saved searches could not be deleted.",
+    "bulk_delete_success_one": "{{count}} saved search was deleted successfully.",
+    "bulk_delete_success_other": "{{count}} saved searches were deleted successfully.",
+    "success": "Success",
+    "bulk_delete_error": "An error occurred while deleting saved searches. {{error}}",
+    "confirm_delete": "You are about to delete saved search: \"{{title}}\". Are you sure?",
+    "delete_search": "Delete search {{title}}",
+    "delete": "Delete"
+  },
+  "search_meta": {
+    "buttons": "Search Meta Buttons"
+  },
+  "save_view_notifications": {
+    "success_title": "Success!",
+    "error_title": "Error!",
+    "plugin_initial_values_failed": "An error occurred when collecting initial search bar form values from a plugin",
+    "plugin_validation_preparation_failed": "An error occurred when preparing search bar validation for a plugin",
+    "plugin_validation_failed": "An error occurred when validating search bar values from a plugin",
+    "plugin_submit_failed": "An error occurred when executing a submit handler from a plugin: {{error}}",
+    "load_saved_searches_failed": "Loading saved searches failed with status",
+    "could_not_load_saved_searches": "Could not load saved searches",
+    "load_minimum_refresh_interval_failed": "Loading system configuration \"minimum_auto_refresh_interval\" failed with status",
+    "could_not_load_configuration": "Could not load configuration option"
+  },
+  "sidebar_layout": {
+    "display_as_overlay": "Display sidebar as overlay",
+    "display_inline": "Display sidebar inline"
+  },
+  "search_result_overview": {
+    "duration_at": "{{duration}}ms at <timestamp/>",
+    "effective_from": "Effective time range from",
+    "effective_to": "Effective time range to"
+  },
+  "fields_overview": {
+    "filter_placeholder": "Filter fields",
+    "reset": "Reset",
+    "list_fields": "List fields of <current>current query</current>, <all>all</all> or <allReserved>all including reserved</allReserved> fields.",
+    "current_title": "This shows fields which occur in your current query.",
+    "all_title": "This shows all fields, but no reserved (gl2_*) fields.",
+    "all_reserved_title": "This shows all fields, including reserved (gl2_*) fields.",
+    "no_field_information": "No field information available.",
+    "no_fields": "No fields to show. Try changing your filter term or select a different field set above."
+  },
+  "highlighting_color": {
+    "color": "Color",
+    "gradient_name": "Gradient Name",
+    "gradient_placeholder": "Select gradient colors",
+    "lowest_placeholder": "Specify lowest value",
+    "lowest_label": "Lowest Value",
+    "lowest_help": "The lowest value expected in the field/series.",
+    "highest_aria": "Specify highest value",
+    "highest_label": "Highest Value",
+    "highest_help": "The highest value expected in the field/series.",
+    "coloring": "Coloring",
+    "static_color": "Static Color",
+    "gradient": "Gradient",
+    "must_be_selected": "Must be selected.",
+    "must_be_present": "Must be present.",
+    "must_be_number": "Must be a number.",
+    "must_be_higher": "Must be higher than lowest value.",
+    "coloring_required": "Coloring is required",
+    "gradient_numeric_only": "A gradient can only be defined for numeric fields."
+  },
+  "highlighting_rule": {
+    "edit": "Edit this Highlighting Rule",
+    "remove": "Remove this Highlighting Rule",
+    "confirm_remove": "Do you really want to remove this highlighting?"
+  },
+  "change_field_type": {
+    "no_permission_title": "No permission",
+    "no_permission_description": "You don't have permission to do that action",
+    "enterprise_plugin_required": "(<enterpriseLink>Enterprise Plugin</enterpriseLink> required)",
+    "modal_title": "Change {{fieldName}} Field Type",
+    "impact_warning": "Changing the type of the field <bold>{{fieldName}}</bold> can have a significant impact on the ingestion of future log messages. If you declare a field to have a type which is incompatible with the logs you are ingesting, it can lead to ingestion errors.",
+    "failure_processing_hint": "It is recommended to enable <docsLink>Failure Processing</docsLink> and watch the <failureStream/> stream closely afterwards.",
+    "select_field_type_for": "Select Field Type For {{fieldName}}",
+    "select_field_type_for_field": "Select Field Type For Field",
+    "select_field_type": "Select field type",
+    "select_index_sets": "Select Targeted Index Sets",
+    "index_sets_hint_with_type": "By default the <bold>{{type}}</bold> field type will be set for the <bold>{{fieldName}}</bold> field in all index sets of the current message/search. You can select for which index sets you would like to make the change.",
+    "index_sets_hint": "By default the selected field type will be set for the <bold>{{fieldName}}</bold> field in all index sets of the current message/search. You can select for which index sets you would like to make the change.",
+    "select_rotation_strategy": "Select Rotation Strategy",
+    "rotation_hint_type_field": "To see and use the <bold>{{type}}</bold> as a field type for <bold>{{fieldName}}</bold>, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.",
+    "rotation_hint_type": "To see and use the <bold>{{type}}</bold> as a field type, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.",
+    "rotation_hint_field": "To see and use the selected field type as a field type for <bold>{{fieldName}}</bold>, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.",
+    "rotation_hint": "To see and use the selected field type as a field type, you have to rotate indices. You can automatically rotate affected indices after submitting this form or do that manually later.",
+    "rotate_indices": "Rotate affected indices after change",
+    "changing": "Changing field type...",
+    "change": "Change field type",
+    "select_field": "Select Field",
+    "select_field_placeholder": "Select or type the field",
+    "type_not_defined": "type is not defined",
+    "previous_values": "(previous values: {{values}})",
+    "load_index_field_types_failed": "Loading index field types failed with status",
+    "could_not_load_index_field_types": "Could not load index field types",
+    "load_field_type_options_failed": "Loading field type options failed with status",
+    "could_not_load_field_type_options": "Could not load field type options",
+    "load_field_types_failed": "Loading {{field}} types failed with status",
+    "could_not_load_field_types": "Could not load field types",
+    "load_index_sets_failed": "Loading index sets with field type change support failed with status",
+    "could_not_load_index_sets": "Could not load index sets with field type change support",
+    "change_failed": "Changing the field type failed with status: {{error}}",
+    "change_failed_title": "Could not change the field type",
+    "change_success": "The field type changed successfully",
+    "success_title": "Success!"
+  },
+  "value_actions": {
+    "select_extractor_type": "Select extractor type",
+    "exclude": "Exclude from results",
+    "add_to_query": "Add to query",
+    "show_documents": "Show documents for value",
+    "create_extractor": "Create extractor",
+    "highlight_value": "Highlight this value",
+    "create_event_definition": "Create event definition",
+    "copy_value": "Copy value to clipboard"
+  },
+  "create_event_definition": {
+    "title": "Configure new event definition",
+    "hide_details": "Hide strategy details",
+    "show_details": "Show strategy details",
+    "continue": "Continue configuration",
+    "strategy_by": "Strategy by:",
+    "description": "Description:",
+    "sections": {
+      "aggregation": "Aggregation settings",
+      "search": "Search query"
+    },
+    "items": {
+      "rowValuePath": "Query from table row",
+      "columnValuePath": "Query from table column",
+      "columnGroupBy": "Group by column values",
+      "rowGroupBy": "Group by row values",
+      "aggCondition": "Condition",
+      "queryWithReplacedParams": "Query from search",
+      "searchFilterQuery": "Query from search filters",
+      "streams": "Streams",
+      "searchWithinMs": "Search within ms",
+      "lutParameters": "Lookup-table parameters",
+      "searchFromValue": "Query from value"
+    },
+    "item_label": "{{label}}: ",
+    "strategies": {
+      "EXACT": {
+        "label": "Exactly this value",
+        "description": "Strategy includes all search queries, filters, etc which relate to current search view"
+      },
+      "ROW": {
+        "label": "Any in row",
+        "description": "Strategy includes row pivots"
+      },
+      "COL": {
+        "label": "Any in column",
+        "description": "Strategy includes column pivots"
+      },
+      "ALL": {
+        "label": "Any in widget",
+        "description": "Strategy includes all row and column pivot values, related to selected value"
+      },
+      "CUSTOM": {
+        "label": "Custom",
+        "description": "You can select any search part"
+      }
+    }
+  },
+  "view_errors": {
+    "something_went_wrong": "Something went wrong",
+    "unknown_error": "An unknown error has occurred. Please have a look at the following message and the {{productName}} server log for more information."
+  },
+  "views_notifications": {
+    "delete_view_failed": "Deleting view {{title}} failed with status: {{error}}",
+    "delete_view_failed_title": "Could not delete view",
+    "apply_widget_changes_failed": "Applying widget changes failed with status: {{error}}",
+    "load_message_failed": "Loading message information failed with status",
+    "could_not_load_message": "Could not load message information"
+  },
+  "field_actions": {
+    "chart": "Chart",
+    "show_top_values": "Show top values",
+    "statistics": "Statistics",
+    "add_to_table": "Add to table",
+    "remove_from_table": "Remove from table",
+    "add_to_all_tables": "Add to all tables",
+    "remove_from_all_tables": "Remove from all tables",
+    "change_field_type": "Change field type",
+    "copy_field_name": "Copy field name to clipboard",
+    "add_to_favorites": "Add field to favorites",
+    "remove_from_favorites": "Remove field from favorites"
+  },
+  "aggregation": {
+    "summary_by": "Aggregating {{series}} by {{fields}}",
+    "summary_only": "Aggregating {{series}}"
+  },
+  "widget_creators": {
+    "message_count": "Message Count",
+    "message_table": "Message Table",
+    "custom_aggregation": "Custom Aggregation",
+    "aggregation": "Aggregation",
+    "events_overview": "Events Overview",
+    "text_markdown": "Text/Markdown"
+  },
+  "message_details": {
+    "deleted_input": "deleted input",
+    "timestamp": "Timestamp",
+    "not_stored": "Not stored",
+    "not_stored_message": "Message is not stored",
+    "received_by": "Received by",
+    "stored_in_index": "Stored in index",
+    "routed_into_streams": "Routed into streams"
+  },
+  "views_logic": {
+    "result_window_limit": "Elasticsearch limits the search result to {{limit}} messages. With a page size of {{pageSize}} messages, you can use the first {{validPages}} pages.",
+    "confirm_delete_dashboard_page": "Do you really want to delete this dashboard page?"
+  }
+}

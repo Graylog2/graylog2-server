@@ -17,6 +17,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
+import i18n from 'i18n';
 import { DropdownButton, MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import { ConfigurationForm, ConfigurationWell } from 'components/configurationforms';
 import type { Decorator } from 'views/logic/widgets/MessagesWidgetConfig';
@@ -58,7 +59,7 @@ class DecoratorSummary extends React.Component<Props, State> {
     const { onDelete, decorator } = this.props;
 
     // eslint-disable-next-line no-alert
-    if (window.confirm('Do you really want to delete this decorator?')) {
+    if (window.confirm(i18n.t('notifications.delete_decorator_confirm', { ns: 'widgets' }))) {
       onDelete(decorator.id);
     }
   };
@@ -114,10 +115,16 @@ class DecoratorSummary extends React.Component<Props, State> {
 
     return (
       <SpacedActions>
-        <DropdownButton id={`decorator-${decorator.id}-actions`} bsStyle="default" bsSize="xsmall" title="Actions">
-          <MenuItem onSelect={this._handleEditClick}>Edit</MenuItem>
+        <DropdownButton
+          id={`decorator-${decorator.id}-actions`}
+          bsStyle="default"
+          bsSize="xsmall"
+          title={i18n.t('message_table.decorators.actions', { ns: 'widgets' })}>
+          <MenuItem onSelect={this._handleEditClick}>
+            {i18n.t('message_table.decorators.edit', { ns: 'widgets' })}
+          </MenuItem>
           <MenuItem divider />
-          <DeleteMenuItem onSelect={this._handleDeleteClick}>Delete</DeleteMenuItem>
+          <DeleteMenuItem onSelect={this._handleDeleteClick} />
         </DropdownButton>
       </SpacedActions>
     );
@@ -127,18 +134,20 @@ class DecoratorSummary extends React.Component<Props, State> {
     const { disableMenu = false, decorator, decoratorTypes, typeDefinition } = this.props;
     const { editing } = this.state;
     const config = this._resolveConfigurationIds(decorator.config);
-    const decoratorType = decoratorTypes[decorator.type] || { name: 'Unknown decorator type' };
+    const decoratorType = decoratorTypes[decorator.type] || {
+      name: i18n.t('message_table.decorators.unknown_type', { ns: 'widgets' }),
+    };
 
     const decoratorActionsMenu = disableMenu || this._formatActionsMenu();
     const { name, requested_configuration: requestedConfiguration } = typeDefinition;
-    const wrapperComponent = InlineForm('Update');
+    const wrapperComponent = InlineForm(i18n.t('message_table.decorators.update', { ns: 'widgets' }));
     const decoratorId = decorator.id || 'new';
 
     const content = editing ? (
       <ConfigurationForm<Decorator['config']>
         key="configuration-form-decorator"
         configFields={requestedConfiguration}
-        title={`Edit ${name}`}
+        title={i18n.t('message_table.decorators.edit_named', { ns: 'widgets', name })}
         typeName={decorator.type}
         includeTitleField={false}
         submitAction={this._handleSubmit}

@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Col, Row } from 'components/bootstrap';
 import { Section, PaginatedEntityTable } from 'components/common';
@@ -55,53 +56,50 @@ const StyledSectionGrid = styled(SectionGrid)<{ $rows?: string }>(
   `,
 );
 
-const InputDiagnosisRulesTab = ({ inputId }: Props) => (
-  <StyledSectionGrid $rows="1fr 1fr">
-    <Section title="Input appears in Pipeline Rules">
-      <p>
-        Pipeline rules detailed below explicitly reference this Input (e.g. via from_input, from_forwarder_input, or a
-        match on gl2_source_input/gl2_forwarder_input).
-      </p>
-      <Row>
-        <Col md={12}>
-          <PaginatedEntityTable<InputPipelineRule>
-            humanName="pipeline rules"
-            tableLayout={PIPELINE_RULES_LAYOUT}
-            fetchEntities={(searchParams) => fetchInputPipelineRules(inputId, searchParams)}
-            keyFn={(searchParams) => pipelineRulesKeyFn(inputId, searchParams)}
-            entityAttributesAreCamelCase={false}
-            searchPlaceholder="Search for pipeline rule"
-            columnRenderers={pipelineRulesColumnRenderers}
-            fetchOptions={{ refetchInterval: 5000 }}
-            withoutURLParams
-          />
-        </Col>
-      </Row>
-    </Section>
+const InputDiagnosisRulesTab = ({ inputId }: Props) => {
+  const { t } = useTranslation('inputs');
 
-    <Section title="Input appears in Stream Rules">
-      <p>
-        Stream rules detailed below contain a match input function which explicitly targets this Input. Note that Stream
-        Rules which may capture messages from this Input without the explicit use of the match input function will not
-        be listed.
-      </p>
-      <Row>
-        <Col md={12}>
-          <PaginatedEntityTable<InputStreamRule>
-            humanName="stream rules"
-            tableLayout={STREAM_RULES_LAYOUT}
-            fetchEntities={(searchParams) => fetchInputStreamRules(inputId, searchParams)}
-            keyFn={(searchParams) => streamRulesKeyFn(inputId, searchParams)}
-            entityAttributesAreCamelCase={false}
-            searchPlaceholder="Search for stream rule"
-            columnRenderers={streamRulesColumnRenderers}
-            fetchOptions={{ refetchInterval: 5000 }}
-            withoutURLParams
-          />
-        </Col>
-      </Row>
-    </Section>
-  </StyledSectionGrid>
-);
+  return (
+    <StyledSectionGrid $rows="1fr 1fr">
+      <Section title={t('diagnosis.rules.pipeline_rules_title')}>
+        <p>{t('diagnosis.rules.pipeline_rules_description')}</p>
+        <Row>
+          <Col md={12}>
+            <PaginatedEntityTable<InputPipelineRule>
+              humanName={t('diagnosis.rules.pipeline_rules_human_name')}
+              tableLayout={PIPELINE_RULES_LAYOUT}
+              fetchEntities={(searchParams) => fetchInputPipelineRules(inputId, searchParams)}
+              keyFn={(searchParams) => pipelineRulesKeyFn(inputId, searchParams)}
+              entityAttributesAreCamelCase={false}
+              searchPlaceholder={t('diagnosis.rules.pipeline_rules_search')}
+              columnRenderers={pipelineRulesColumnRenderers}
+              fetchOptions={{ refetchInterval: 5000 }}
+              withoutURLParams
+            />
+          </Col>
+        </Row>
+      </Section>
+
+      <Section title={t('diagnosis.rules.stream_rules_title')}>
+        <p>{t('diagnosis.rules.stream_rules_description')}</p>
+        <Row>
+          <Col md={12}>
+            <PaginatedEntityTable<InputStreamRule>
+              humanName={t('diagnosis.rules.stream_rules_human_name')}
+              tableLayout={STREAM_RULES_LAYOUT}
+              fetchEntities={(searchParams) => fetchInputStreamRules(inputId, searchParams)}
+              keyFn={(searchParams) => streamRulesKeyFn(inputId, searchParams)}
+              entityAttributesAreCamelCase={false}
+              searchPlaceholder={t('diagnosis.rules.stream_rules_search')}
+              columnRenderers={streamRulesColumnRenderers}
+              fetchOptions={{ refetchInterval: 5000 }}
+              withoutURLParams
+            />
+          </Col>
+        </Row>
+      </Section>
+    </StyledSectionGrid>
+  );
+};
 
 export default InputDiagnosisRulesTab;

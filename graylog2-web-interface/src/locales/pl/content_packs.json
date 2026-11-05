@@ -1,0 +1,249 @@
+{
+  "apply_parameter": {
+    "action": "Akcja",
+    "apply": "Zastosuj",
+    "choose": "Wybierz...",
+    "choose_config_key": "Wybierz klucz konfiguracji",
+    "clear": "Wyczyść",
+    "config_key": "Klucz konfiguracji",
+    "create_parameter_first": "Najpierw utwórz parametr",
+    "no_parameter_of_type": "Brak parametru typu {{type}}",
+    "parameter": "Parametr"
+  },
+  "constraints": {
+    "fulfilled": "Spełnione",
+    "name": "Nazwa",
+    "title": "Ograniczenia",
+    "type": "Typ",
+    "version": "Wersja"
+  },
+  "details": {
+    "description": "Opis",
+    "entities": "Encje:",
+    "id": "ID:",
+    "name": "Nazwa:",
+    "parameters": "Parametry:",
+    "summary": "Podsumowanie:",
+    "title": "Szczegóły",
+    "url": "URL:",
+    "vendor": "Dostawca:",
+    "version": "Wersja:"
+  },
+  "download": {
+    "download": "Pobierz",
+    "info": "Kliknij prawym przyciskiem myszy poniższy link do pobrania i wybierz \"Zapisz link jako...\", aby pobrać plik JSON.",
+    "title": "Pobierz pakiet treści"
+  },
+  "edit": {
+    "steps": {
+      "parameters": "Parametry",
+      "preview": "Podgląd",
+      "selection": "Wybór treści"
+    }
+  },
+  "edit_parameter": {
+    "create_title": "Utwórz parametr",
+    "default_value": "Wartość domyślna",
+    "default_value_help": "Podaj wartość domyślną, jeśli parametr nie jest opcjonalny.",
+    "description": "Opis",
+    "description_help": "Podaj opis wyjaśniający, co zostanie zrobione z tym parametrem.",
+    "description_required": "Opis jest wymagany.",
+    "edit_title": "Edytuj parametr",
+    "name": "Nazwa",
+    "name_help": "Nazwa jest używana jako odwołanie do parametru i nie może zawierać spacji.",
+    "name_invalid": "Nazwa parametru może zawierać wyłącznie znaki A-Z, a-z, 0-9 i _",
+    "name_not_unique": "Nazwa parametru musi być unikalna.",
+    "name_required": "Nazwa jest wymagana.",
+    "not_boolean": "To nie jest wartość logiczna. Musi to być true lub false.",
+    "not_double": "To nie jest wartość zmiennoprzecinkowa.",
+    "not_integer": "To nie jest wartość całkowita.",
+    "title": "Tytuł",
+    "title_help": "Podaj opisowy tytuł tego pakietu treści.",
+    "title_required": "Tytuł jest wymagany.",
+    "value_type": "Typ wartości",
+    "value_type_help": "Podaj typ parametru."
+  },
+  "entities": {
+    "action": "Akcja",
+    "config_title": "Konfiguracja encji",
+    "description": "Opis",
+    "edit_title": "Edytuj",
+    "list_title": "Lista encji",
+    "origin": "Źródło",
+    "origin_content_pack": "Pakiet treści",
+    "origin_server": "Serwer",
+    "show": "Pokaż",
+    "title": "Tytuł",
+    "type": "Typ",
+    "used_parameters": "Użyte parametry"
+  },
+  "entity_config": {
+    "config_key": "Klucz konfiguracji",
+    "parameter_type": "parametr ({{type}})",
+    "type": "Typ",
+    "value": "Wartość"
+  },
+  "entity_index": {
+    "load_failed": "Ładowanie indeksu encji nie powiodło się, status:",
+    "load_failed_title": "Nie udało się załadować indeksu encji"
+  },
+  "import": {
+    "error_message": "Błąd importu pakietu treści. Upewnij się, że jest to poprawny plik JSON. Więcej informacji znajdziesz w logach serwera {{productName}}.",
+    "error_title": "Nie udało się zaimportować pakietu treści",
+    "success_message": "Pakiet treści został zaimportowany pomyślnie",
+    "success_named": "Pakiet treści \"{{name}}\" został zaimportowany pomyślnie",
+    "success_title": "Sukces!"
+  },
+  "install": {
+    "comment": "Komentarz do instalacji",
+    "comment_help": "Ten komentarz zostanie zapisany wraz z instalacją pakietu treści i może opisywać powód tej instalacji.",
+    "configure_parameters": "Skonfiguruj parametr(y):",
+    "needs_to_be_filled": "Wymaga uzupełnienia.",
+    "share_description": "Wyszukaj użytkownika lub zespół, który zostanie dodany jako współpracownik encji tego pakietu treści."
+  },
+  "install_entities": {
+    "installed": "Zainstalowane encje",
+    "title": "Tytuł",
+    "to_be_uninstalled": "Encje do odinstalowania",
+    "type": "Typ"
+  },
+  "install_view": {
+    "comment": "Komentarz:",
+    "general_information": "Informacje ogólne",
+    "installed_at": "Zainstalowano:",
+    "installed_by": "Zainstalował:"
+  },
+  "installations": {
+    "action": "Akcja",
+    "comment": "Komentarz",
+    "uninstall": "Odinstaluj",
+    "version": "Wersja",
+    "view": "Wyświetl",
+    "view_title": "Wyświetl instalację"
+  },
+  "list": {
+    "no_match": "Nie znaleziono pasujących pakietów treści",
+    "none_found": "Nie znaleziono pakietów treści. Utwórz lub prześlij pakiet."
+  },
+  "list_item": {
+    "create_new_version": "Utwórz nową wersję",
+    "delete_all_versions": "Usuń wszystkie wersje",
+    "install": "Zainstaluj",
+    "install_title": "Zainstaluj pakiet treści",
+    "latest_version": "Najnowsza wersja: {{rev}}",
+    "show": "Pokaż",
+    "update": "Zaktualizuj"
+  },
+  "notifications": {
+    "error": "Błąd",
+    "success": "Sukces"
+  },
+  "overview": {
+    "button_text": "Pakiety treści",
+    "delete_confirmation": "Zamierzasz usunąć ten pakiet treści. Czy na pewno chcesz kontynuować?",
+    "delete_error_message": "Usuwanie pakietu nie powiodło się: {{error}}",
+    "delete_success": "Pakiet treści został usunięty.",
+    "description": "Pakiety treści przyspieszają konfigurację dla określonego źródła danych. Pakiet treści może zawierać wejścia/Extractory, strumienie i panele.",
+    "install_error_message": "Instalacja pakietu treści nie powiodła się, status: {{status}}. Nie udało się zainstalować pakietu treści o ID: {{id}}",
+    "install_success": "Pakiet treści został zainstalowany pomyślnie.",
+    "title": "Pakiety treści",
+    "marketplace_prefix": "Więcej pakietów treści znajdziesz w"
+  },
+  "pages": {
+    "back_button": "Pakiety treści",
+    "create_title": "Utwórz pakiety treści",
+    "description": "Pakiety treści przyspieszają konfigurację dla określonego źródła danych. Pakiet treści może zawierać wejścia/Extractory, strumienie i panele.",
+    "document_title": "Pakiety treści",
+    "edit_title": "Edytuj pakiet treści",
+    "marketplace_prefix": "Więcej pakietów treści znajdziesz w"
+  },
+  "parameter_list": {
+    "action": "Akcja",
+    "default_value": "Wartość domyślna",
+    "delete_parameter": "Usuń parametr",
+    "description": "Opis",
+    "edit_modal": "Edytuj okno",
+    "list_title": "Lista parametrów",
+    "modal_title": "Parametr",
+    "name": "Nazwa",
+    "no_data": "Aby używać parametrów w pakietach treści, najpierw należy utworzyć parametr, a następnie można go zastosować do encji.",
+    "still_in_use": "Nadal w użyciu",
+    "title": "Tytuł",
+    "used": "Użyty",
+    "value_type": "Typ wartości"
+  },
+  "parameters": {
+    "confirm_deletion": "Potwierdź usunięcie",
+    "delete_confirmation": "Czy na pewno chcesz usunąć ten parametr: {{title}}?"
+  },
+  "preview": {
+    "create": "Utwórz",
+    "create_and_download": "Utwórz i pobierz"
+  },
+  "revisions": {
+    "fetch_error": "Błąd podczas pobierania wersji pakietu treści: {{error}}",
+    "fetch_error_title": "Nie udało się pobrać pakietu treści"
+  },
+  "selection": {
+    "description": "Opis",
+    "description_help": "Podaj długi opis pakietu treści w formacie Markdown.",
+    "general_information": "Informacje ogólne",
+    "must_be_filled": "Pole jest wymagane.",
+    "name": "Nazwa",
+    "name_help": "Wymagane. Podaj opisową nazwę tego pakietu treści.",
+    "no_pairs_hint": "Encje w tej wersji pakietu treści nigdy nie zostały zainstalowane, więc nie ma zainstalowanych encji do wyboru.",
+    "select_entity": "Wybierz co najmniej jedną encję.",
+    "select_latest": "Wybierz najnowsze zainstalowane wersje",
+    "select_older": "Wybierz starsze wersje pakietu treści",
+    "summary": "Podsumowanie",
+    "summary_help": "Wymagane. Podaj krótkie podsumowanie pakietu treści.",
+    "title": "Wybór pakietu treści",
+    "url": "URL",
+    "url_help": "Gdzie można znaleźć pakiet treści, np. adres URL na GitHubie.",
+    "url_invalid": "Nieprawidłowy URL",
+    "url_protocol": "URL musi zaczynać się od http lub https.",
+    "vendor": "Dostawca",
+    "vendor_help": "Wymagane. Kto stworzył ten pakiet treści i jak można się z nim skontaktować, np. imię i nazwisko oraz adres e-mail.",
+    "version_help": "Dla każdej encji możesz wybrać najnowszą zainstalowaną wersję (<latestIcon />) lub starszą wersję pakietu treści (<olderIcon />)."
+  },
+  "show": {
+    "delete_revision_confirmation": "Zamierzasz usunąć tę wersję pakietu treści. Czy na pewno chcesz kontynuować?",
+    "delete_revision_error": "Usuwanie pakietu treści nie powiodło się: {{error}}",
+    "delete_revision_success": "Wersja pakietu treści została usunięta.",
+    "install_error": "Instalacja pakietu treści nie powiodła się, status: {{status}}. Nie udało się zainstalować pakietu treści o ID: {{id}}",
+    "installations": "Instalacje",
+    "not_found": "Nie można znaleźć pakietu treści o ID {{id}}. Mógł zostać usunięty.",
+    "server_error": "Wystąpił wewnętrzny błąd serwera. Więcej informacji znajdziesz w plikach logów.",
+    "uninstall_confirmation": "Czy na pewno chcesz odinstalować ten pakiet treści?",
+    "uninstall_error": "Odinstalowanie pakietu treści nie powiodło się. Więcej informacji znajdziesz w logach.",
+    "uninstall_success": "Pakiet treści został odinstalowany pomyślnie.",
+    "versions": "Wersje"
+  },
+  "status": {
+    "edited": "edytowany",
+    "error": "błąd",
+    "installed": "zainstalowany",
+    "updatable": "do aktualizacji"
+  },
+  "upload": {
+    "button": "Prześlij",
+    "choose_file": "Wybierz plik",
+    "choose_file_help": "Wybierz pakiet treści z dysku",
+    "title": "Prześlij pakiet treści"
+  },
+  "value_types": {
+    "boolean": "Wartość logiczna",
+    "double": "Liczba zmiennoprzecinkowa",
+    "integer": "Liczba całkowita",
+    "string": "Ciąg znaków"
+  },
+  "version_item": {
+    "actions": "Akcje",
+    "create_from_revision": "Utwórz nową z wersji"
+  },
+  "versions": {
+    "action": "Akcja",
+    "revision": "Wersja",
+    "select": "Wybierz"
+  }
+}

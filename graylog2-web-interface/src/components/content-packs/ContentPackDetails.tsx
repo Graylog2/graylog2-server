@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Col, Row, Well } from 'components/bootstrap';
 import ContentPackStatus from 'components/content-packs/ContentPackStatus';
@@ -40,6 +41,7 @@ const ContentPackDetails = ({
   constraints = [],
   showConstraints = false,
 }: ContentPackDetailsProps) => {
+  const { t } = useTranslation('content_packs');
   let contentPackAnchor = contentPack.url;
 
   try {
@@ -54,18 +56,18 @@ const ContentPackDetails = ({
     <Row>
       <Col smOffset={offset} sm={9}>
         <div id="content-pack-details">
-          <h2>Details</h2>
+          <h2>{t('details.title')}</h2>
           <br />
           <div>
             <dl className="deflist">
-              <dt>Version:</dt> <dd>{contentPack.rev}</dd>
-              <dt>Name:</dt> <dd>{contentPack.name}&nbsp;</dd>
-              <dt>Summary:</dt> <dd>{contentPack.summary}&nbsp;</dd>
-              <dt>Vendor:</dt> <dd>{contentPack.vendor}&nbsp;</dd>
-              <dt>URL:</dt> <dd>{contentPackAnchor}&nbsp;</dd>
+              <dt>{t('details.version')}</dt> <dd>{contentPack.rev}</dd>
+              <dt>{t('details.name')}</dt> <dd>{contentPack.name}&nbsp;</dd>
+              <dt>{t('details.summary')}</dt> <dd>{contentPack.summary}&nbsp;</dd>
+              <dt>{t('details.vendor')}</dt> <dd>{contentPack.vendor}&nbsp;</dd>
+              <dt>{t('details.url')}</dt> <dd>{contentPackAnchor}&nbsp;</dd>
               {contentPack.id && (
                 <span>
-                  <dt>ID:</dt>{' '}
+                  <dt>{t('details.id')}</dt>{' '}
                   <dd>
                     <code>{contentPack.id}</code>
                   </dd>
@@ -73,19 +75,19 @@ const ContentPackDetails = ({
               )}
               {contentPack.parameters && !verbose && (
                 <span>
-                  <dt>Parameters:</dt> <dd>{contentPack.parameters.length}</dd>
+                  <dt>{t('details.parameters')}</dt> <dd>{contentPack.parameters.length}</dd>
                 </span>
               )}
               {contentPack.entities && !verbose && (
                 <span>
-                  <dt>Entities:</dt> <dd>{contentPack.entities.length}</dd>
+                  <dt>{t('details.entities')}</dt> <dd>{contentPack.entities.length}</dd>
                 </span>
               )}
             </dl>
           </div>
           {contentPack.description && (
             <div>
-              <h2>Description</h2>
+              <h2>{t('details.description')}</h2>
               <br />
               <Well>
                 <Markdown text={contentPack.description} />

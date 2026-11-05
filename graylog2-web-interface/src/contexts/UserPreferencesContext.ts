@@ -28,6 +28,7 @@ export type UserPreferences = {
   dashboardSidebarIsPinned?: boolean;
   'views.widgetSummary.doNotAskAgain'?: boolean;
   [PREFERENCES_THEME_MODE]?: ColorScheme;
+  language?: string;
 };
 
 export const defaultUserPreferences = {
@@ -35,6 +36,7 @@ export const defaultUserPreferences = {
   updateUnfocussed: false,
   searchSidebarIsPinned: false,
   dashboardSidebarIsPinned: false,
+  language: 'en',
 };
 
 const UserPreferencesContext = React.createContext<UserPreferences>(defaultUserPreferences);

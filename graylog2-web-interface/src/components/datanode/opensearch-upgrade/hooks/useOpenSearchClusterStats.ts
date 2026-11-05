@@ -18,6 +18,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { DatanodeUpgrade } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import { defaultOnError } from 'util/conditional/onError';
 
 const CLUSTER_STATS_REFETCH_INTERVAL_MS = 5000;
@@ -36,8 +37,8 @@ const useOpenSearchClusterStats = () => {
     queryFn: () =>
       defaultOnError(
         DatanodeUpgrade.opensearchVersions({ requestShouldExtendSession: false }),
-        'Loading OpenSearch versions overview failed',
-        'Could not load OpenSearch versions overview',
+        i18n.t('data_node_notifications.loading_versions_failed', { ns: 'datanode' }),
+        i18n.t('data_node_notifications.loading_versions_failed_title', { ns: 'datanode' }),
       ),
     refetchInterval: CLUSTER_STATS_REFETCH_INTERVAL_MS,
   });

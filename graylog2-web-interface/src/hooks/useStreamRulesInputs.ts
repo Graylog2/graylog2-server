@@ -20,6 +20,7 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import type { Input } from 'components/messageloaders/Types';
+import i18n from 'i18n';
 
 const fetchStreamRulesInputs = (): Promise<{ inputs: Array<Input>; total: number }> =>
   fetch('GET', qualifyUrl('/streams/rules/inputs'));
@@ -30,8 +31,8 @@ const useStreamRulesInputs = () =>
     queryFn: () =>
       fetchStreamRulesInputs().catch((error) => {
         UserNotification.error(
-          `Fetching Stream Rule Inputs List failed with status: ${error}`,
-          'Could not retrieve Stream Rule Inputs',
+          i18n.t('use_stream_rules_inputs_notifications.fetch_failed', { ns: 'streams', error }),
+          i18n.t('use_stream_rules_inputs_notifications.fetch_failed_title', { ns: 'streams' }),
         );
 
         throw error;

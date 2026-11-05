@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import type UserOverview from 'logic/users/UserOverview';
@@ -31,22 +32,30 @@ const Td = styled.td`
   text-align: center;
 `;
 
-const StatusCell = ({ accountStatus, authServiceEnabled }: Props) => (
-  <Td>
-    <Tooltip
-      withArrow
-      position="right"
-      label={
-        <>
-          {`User is ${accountStatus}`}
-          {!authServiceEnabled ? ' (authentication service is disabled)' : ''}
-        </>
-      }>
-      <div>
-        <StatusIcon active={accountStatus === 'enabled'} />
-      </div>
-    </Tooltip>
-  </Td>
-);
+const StatusCell = ({ accountStatus, authServiceEnabled }: Props) => {
+  const { t, i18n } = useTranslation('users');
+
+  return (
+    <Td>
+      <Tooltip
+        withArrow
+        position="right"
+        label={
+          <>
+            {t('users_list.status.user_is', {
+              status: i18n.exists(`users_list.status.${accountStatus}`, { ns: 'users' })
+                ? t(`users_list.status.${accountStatus}`)
+                : accountStatus,
+            })}
+            {!authServiceEnabled ? t('users_list.status.auth_disabled') : ''}
+          </>
+        }>
+        <div>
+          <StatusIcon active={accountStatus === 'enabled'} />
+        </div>
+      </Tooltip>
+    </Td>
+  );
+};
 
 export default StatusCell;

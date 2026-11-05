@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import i18n from 'i18n';
+
 import type { IndexSetMetricField } from './hooks/useIndexSetMetrics';
 
 export const METRIC_COLUMN_IDS = {
@@ -26,13 +28,8 @@ export const METRIC_COLUMN_IDS = {
 
 export type MetricColumnId = (typeof METRIC_COLUMN_IDS)[keyof typeof METRIC_COLUMN_IDS];
 
-export const METRIC_COLUMN_TITLES: Record<MetricColumnId, string> = {
-  [METRIC_COLUMN_IDS.indexCount]: 'Indices',
-  [METRIC_COLUMN_IDS.documentCount]: 'Documents',
-  [METRIC_COLUMN_IDS.sizeBytes]: 'Size on Disk',
-  [METRIC_COLUMN_IDS.deflectorHealth]: 'Deflector',
-  [METRIC_COLUMN_IDS.fieldCount]: 'Fields',
-};
+export const getMetricColumnTitle = (id: MetricColumnId): string =>
+  i18n.t(`overview_table.metric.${id}`, { ns: 'indexsets' });
 
 const METRIC_COLUMN_ID_SET = new Set<string>(Object.values(METRIC_COLUMN_IDS));
 

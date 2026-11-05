@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { Alert } from 'components/bootstrap';
@@ -31,11 +32,17 @@ const IndexerClusterHealthError = ({
 }: {
   error: FetchError;
   name?: { name: string; distribution: string };
-}) => (
-  <ESClusterError bsStyle="danger">
-    Could not retrieve {name?.distribution || 'Elasticsearch'} cluster health. Fetching{' '}
-    {name?.distribution || 'Elasticsearch'} cluster health failed: {error.message}
-  </ESClusterError>
-);
+}) => {
+  const { t } = useTranslation('indexsets');
+
+  return (
+    <ESClusterError bsStyle="danger">
+      {t('indexers.cluster_health.error', {
+        distribution: name?.distribution || 'Elasticsearch',
+        message: error.message,
+      })}
+    </ESClusterError>
+  );
+};
 
 export default IndexerClusterHealthError;

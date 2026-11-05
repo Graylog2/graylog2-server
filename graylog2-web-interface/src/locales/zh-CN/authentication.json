@@ -1,0 +1,206 @@
+{
+  "action_links": {
+    "create": "创建服务",
+    "edit_active": "编辑活动服务",
+    "view_active": "查看活动服务"
+  },
+  "active_directory": {
+    "create_title": "创建 Active Directory 认证服务",
+    "edit_title": "编辑 Active Directory 认证服务",
+    "help": {
+      "system_user_dn": "用于与 Active Directory 服务器进行初始连接的用户名，例如 <code>ldapbind@some.domain</code>。<lineBreak/>该值需要与该用户的 <code>userPrincipalName</code> 一致。",
+      "system_user_password": "用于与 Active Directory 服务器进行初始连接的密码。",
+      "user_full_name_attribute": "用于同步用户全名的 Active Directory 属性，例如 <code>displayName</code>。<lineBreak/>",
+      "user_name_attribute": "用于同步用户的 Active Directory 属性，例如 <code>userPrincipalName</code>。<lineBreak/>如果不确定使用哪个属性，可在侧边栏的 <emphasis>用户登录测试</emphasis> 部分加载测试用户。",
+      "user_search_base": "用于限制 Active Directory 搜索查询范围的基础树，例如 <code>cn=users,dc=example,dc=com</code>。"
+    }
+  },
+  "active_page": {
+    "title": "活动认证服务"
+  },
+  "authenticators": {
+    "description": "配置受信任标头认证。",
+    "documentation_title": "认证器文档",
+    "edit": "编辑认证器",
+    "title": "认证器详情"
+  },
+  "backend_details_page": {
+    "edit_service": "编辑服务",
+    "title": "认证服务详情"
+  },
+  "backends_overview": {
+    "activate": "激活",
+    "confirm_activate": "您确定要激活认证服务“{{title}}”吗？",
+    "confirm_deactivate": "您确定要停用认证服务“{{title}}”吗？",
+    "confirm_delete": "您确定要删除认证服务“{{title}}”吗？",
+    "deactivate": "停用",
+    "delete": "删除",
+    "edit": "编辑",
+    "filter_label": "过滤服务",
+    "found_other": "系统上找到 {{count}} 个已配置的认证服务。",
+    "headers": {
+      "actions": "操作",
+      "default_roles": "默认角色",
+      "description": "描述",
+      "title": "标题"
+    },
+    "query_example": "查找标题包含 LDAP 的认证服务：",
+    "role_not_found": "未找到角色",
+    "title": "已配置的认证服务"
+  },
+  "config_details": {
+    "edit": "编辑",
+    "group_sync_feature_name": "组同步",
+    "group_sync_title": "组同步"
+  },
+  "connection_test": {
+    "default_error": "发生错误",
+    "description": "使用“服务器配置”步骤中定义的地址和凭据执行后台连接检查。",
+    "submit": "测试服务器连接",
+    "title": "服务器连接检查"
+  },
+  "create_page": {
+    "getting_started_title": "创建新认证服务",
+    "title": "创建认证服务"
+  },
+  "directory_help": {
+    "default_roles": "同步用户将获得的默认角色。所有用户都需要 <code>Reader</code> 角色才能使用 Web 界面",
+    "default_user_timezone": "为新用户选择默认时区。",
+    "user_search_pattern": "例如 <exampleCode>{{example}}</exampleCode>。字符串 <code>{{placeholder}}</code> 将被替换为输入的用户名。"
+  },
+  "getting_started": {
+    "description": "除内部用户数据库或 LDAP/Active Directory 等内置认证机制外，认证服务还可以通过插件扩展，以支持其他认证机制。请选择一个认证服务来设置新的服务。",
+    "select_service": "选择服务",
+    "submit": "开始使用"
+  },
+  "ldap": {
+    "create_title": "创建 LDAP 认证服务",
+    "edit_title": "编辑 LDAP 认证服务",
+    "help": {
+      "email_attributes": "用于用户电子邮件地址的 LDAP 属性，例如 <code>mail</code>。<lineBreak/>您可以指定多个属性，按 <kbd>Tab</kbd> 或 <kbd>Enter</kbd> 确认输入的值。",
+      "system_user_dn": "用于与 LDAP 服务器进行初始连接的用户名，例如 <code>cn=admin,dc=example,dc=com</code>，根据 LDAP 服务器的不同，此项可能是可选的。",
+      "system_user_password": "用于与 LDAP 服务器进行初始连接的密码。",
+      "user_full_name_attribute": "用于同步用户全名的 LDAP 属性，例如 <code>cn</code>。<lineBreak/>",
+      "user_name_attribute": "用于同步用户用户名的 LDAP 属性，例如 <code>uid</code>。<lineBreak/>如果不确定使用哪个属性，可在侧边栏的 <emphasis>用户登录测试</emphasis> 部分加载测试用户。",
+      "user_search_base": "用于限制 LDAP 搜索查询范围的基础树，例如 <code>cn=users,dc=example,dc=com</code>。",
+      "user_unique_id_attribute": "用于同步用户 ID 的 LDAP 属性，例如 <code>entryUUID</code>。<lineBreak/>"
+    }
+  },
+  "login_test": {
+    "description": "通过加载给定用户名的条目来验证设置。如果省略密码，将不会进行认证尝试。",
+    "login_failed": "登录失败",
+    "password": "密码",
+    "submit": "测试用户登录",
+    "title": "用户登录测试",
+    "user_attribute": "用户属性",
+    "user_does_not_exist": "用户不存在",
+    "username": "用户名",
+    "value": "值"
+  },
+  "no_service_plugin": "未为类型“{{type}}”配置认证服务插件",
+  "no_service_plugin_for": "未为“{{type}}”配置认证服务插件",
+  "notifications": {
+    "create_failed": "创建认证服务失败，状态：{{error}}",
+    "create_success": "认证服务创建成功。",
+    "error_title": "错误",
+    "success_title": "成功",
+    "update_failed": "更新认证服务失败，状态：{{error}}",
+    "update_success": "认证服务更新成功。"
+  },
+  "overview_page": {
+    "no_active_backend": "当前没有已配置的认证服务处于活动状态。",
+    "title": "所有认证服务"
+  },
+  "page": {
+    "description": "配置此集群的认证服务。",
+    "documentation_title": "认证文档"
+  },
+  "page_navigation": {
+    "authenticators": "认证器",
+    "services": "认证服务"
+  },
+  "server_config": {
+    "description_label": "描述",
+    "hostname": "主机名",
+    "port": "端口",
+    "reset_password": "重置密码",
+    "server_address": "服务器地址",
+    "system_password": "系统密码",
+    "system_user_dn": "系统用户 DN",
+    "system_username": "系统用户名",
+    "title": "服务器配置",
+    "title_label": "标题",
+    "transport_security": "传输安全",
+    "transport_security_none": "无",
+    "undo_reset": "撤销重置",
+    "verify_certificates": "验证证书"
+  },
+  "synced_teams": {
+    "feature_name": "团队",
+    "title": "同步的团队"
+  },
+  "synced_users": {
+    "edit": "编辑",
+    "filter_label": "过滤用户",
+    "found_other": "找到 {{count}} 个同步的用户。",
+    "headers": {
+      "actions": "操作",
+      "full_name": "全名",
+      "roles": "角色",
+      "username": "用户名"
+    },
+    "none_found": "未找到同步的用户。",
+    "role_not_found": "未找到角色",
+    "title": "同步的用户"
+  },
+  "trusted_header": {
+    "description": "此认证器可让您基于 HTTP 标头登录用户，无需进一步交互。",
+    "enable_sso": "通过 HTTP 标头启用单点登录",
+    "enabled": "已启用",
+    "title": "受信任标头认证",
+    "trusted_proxies_hint": "请在 {{productName}} 服务器配置文件中配置 <code>trusted_proxies</code> 设置。",
+    "update_config": "更新配置",
+    "username_header": "用户名标头",
+    "username_header_help": "包含用户隐式受信任名称的 HTTP 标头。（标头匹配不区分大小写）"
+  },
+  "user_sync": {
+    "browser_time_zone": "浏览器时区",
+    "default_assignments_hint": "更改默认角色和时区分配仅会影响通过 {{serviceTitle}} 新创建的用户！",
+    "default_roles": "默认角色",
+    "default_user_time_zone": "默认用户时区",
+    "email_attribute": "电子邮件属性",
+    "email_attributes": "电子邮件属性",
+    "full_name_attribute": "全名属性",
+    "id_attribute": "ID 属性",
+    "name_attribute": "名称属性",
+    "role_not_found": "未找到角色",
+    "search_base_dn": "搜索基础 DN",
+    "search_pattern": "搜索模式",
+    "search_roles": "搜索角色",
+    "test_login_hint": "建议在侧边栏面板中测试用户登录，以验证您的设置。",
+    "title": "用户同步"
+  },
+  "wizard": {
+    "confirm_remove_group_sync": "您确定要移除此认证服务的组同步配置吗？",
+    "create_failed": "创建认证服务失败",
+    "edit_failed": "编辑认证服务失败",
+    "finish_and_save": "完成并保存服务",
+    "finish_and_save_identity_service": "完成并保存身份服务",
+    "next_group_sync": "下一步：组同步",
+    "next_user_sync": "下一步：用户同步",
+    "server_validation_error": "服务器验证错误：{{errors}}",
+    "steps": {
+      "group_sync": "组同步（可选）",
+      "server_config": "服务器配置",
+      "user_sync": "用户同步"
+    }
+  },
+  "wizard_header": {
+    "edit_title": "编辑认证服务 - <emphasis>{{backendTitle}}</emphasis>"
+  },
+  "http_header_notifications": {
+    "load_failed": "加载 HTTP 标头认证配置失败",
+    "update_success": "成功更新 HTTP 标头认证配置",
+    "update_failed": "更新 HTTP 标头认证配置失败，状态：{{error}}"
+  }
+}

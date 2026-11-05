@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { InputSummary } from 'hooks/usePaginatedInputs';
 import { Spinner } from 'components/common';
@@ -31,6 +32,7 @@ const SECTION_NAME = METRIC_COLUMN_IDS.messagesPerStream;
 const sumValues = (counts: Record<string, number>) => Object.values(counts).reduce((sum, value) => sum + value, 0);
 
 const MessageCountCell = ({ input }: Props) => {
+  const { t } = useTranslation('inputs');
   const { metrics, isInitialLoading, isError } = useInputMetricsFor(input.id);
 
   if (isInitialLoading && !metrics) {
@@ -38,7 +40,7 @@ const MessageCountCell = ({ input }: Props) => {
   }
 
   if (isError || !metrics?.messages_per_stream) {
-    return <span aria-label={`No message count available for input ${input.title}`}>—</span>;
+    return <span aria-label={t('overview.cells.no_message_count', { title: input.title })}>—</span>;
   }
 
   const total = sumValues(metrics.messages_per_stream);
@@ -48,7 +50,7 @@ const MessageCountCell = ({ input }: Props) => {
       entityId={input.id}
       section={SECTION_NAME}
       count={total}
-      label={`messages per stream for ${input.title}`}
+      label={t('overview.cells.messages_per_stream_label', { title: input.title })}
       abbreviate
     />
   );

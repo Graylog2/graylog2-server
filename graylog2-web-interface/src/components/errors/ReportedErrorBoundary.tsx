@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useCallback, useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useLocation from 'routing/useLocation';
 import ErrorPage from 'components/errors/ErrorPage';
@@ -34,17 +35,13 @@ import StreamPermissionErrorPage from 'pages/StreamPermissionErrorPage';
 import useProductName from 'brand-customization/useProductName';
 
 const FallbackErrorPage = ({ reportedError }: { reportedError: ReportedError }) => {
+  const { t } = useTranslation('common');
   const productName = useProductName();
 
   return (
     <ErrorPage
-      title="Something went wrong"
-      description={
-        <p>
-          An unknown error has occurred. Please have a look at the following message and the {productName} server log
-          for more information.
-        </p>
-      }>
+      title={t('reported_error.title')}
+      description={<p>{t('reported_error.description', { productName })}</p>}>
       <pre>{JSON.stringify(reportedError)}</pre>
     </ErrorPage>
   );

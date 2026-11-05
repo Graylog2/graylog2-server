@@ -1,0 +1,13 @@
+{
+  "welcome": "欢迎使用 {{productName}}",
+  "username": "用户名",
+  "password": "密码",
+  "sign_in": "登录",
+  "signing_in": "正在登录...",
+  "invalid_credentials": "凭据无效，请检查后重试。",
+  "server_error": "错误：服务器返回 {{status}} - {{message}}",
+  "fallback_error_cloud": "加载登录页面时出错，请联系您的 {{productName}} 客户经理。",
+  "fallback_error": "使用当前身份验证服务登录时出错。请检查其配置或联系您的 {{productName}} 客户经理。错误详情：",
+  "login_with_default": "使用默认方式登录",
+  "login_with": "使用 {{method}} 登录"
+}

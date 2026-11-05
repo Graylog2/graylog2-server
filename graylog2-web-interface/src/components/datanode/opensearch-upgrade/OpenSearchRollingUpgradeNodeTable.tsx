@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Label, Table } from 'components/bootstrap';
 import { Icon } from 'components/common';
@@ -47,12 +48,12 @@ const NODE_STATUS_STYLE: Record<RollingRestartNodeStatus, 'default' | 'info' | '
 };
 
 const NODE_STATUS_LABELS: Record<RollingRestartNodeStatus, string> = {
-  PENDING: 'Waiting',
-  RESTARTING: 'Restarting',
-  STARTED: 'Started',
-  COMPLETED: 'Upgraded',
-  FAILED: 'Failed',
-  SKIPPED: 'Skipped',
+  PENDING: 'rolling_upgrade_nodes.node_status.pending',
+  RESTARTING: 'rolling_upgrade_nodes.node_status.restarting',
+  STARTED: 'rolling_upgrade_nodes.node_status.started',
+  COMPLETED: 'rolling_upgrade_nodes.node_status.completed',
+  FAILED: 'rolling_upgrade_nodes.node_status.failed',
+  SKIPPED: 'rolling_upgrade_nodes.node_status.skipped',
 };
 
 const IN_FLIGHT_NODE_STATUSES: Array<RollingRestartNodeStatus> = ['RESTARTING', 'STARTED'];
@@ -62,7 +63,7 @@ const nodeName = (node: RollingRestartNode, versionNode: OpenSearchVersionNode |
 
 const opensearchVersion = (node: RollingRestartNode, versionNode: OpenSearchVersionNode | undefined) => {
   if (!versionNode) {
-    return 'Unknown';
+    return undefined;
   }
 
   return node.status === 'COMPLETED'
@@ -79,6 +80,7 @@ const NodeIdentityCell = ({
   node: RollingRestartNode;
   versionNode?: OpenSearchVersionNode;
 }) => {
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
   const ip = versionNode?.datanode?.ip;
   const isManagerNode = versionNode?.datanode?.manager_node;
 
@@ -86,11 +88,11 @@ const NodeIdentityCell = ({
     <td>
       <div>
         {nodeName(node, versionNode)}&nbsp;
-        {isManagerNode && <Label bsStyle="default">manager</Label>}
+        {isManagerNode && <Label bsStyle="default">{t('rolling_upgrade_nodes.manager')}</Label>}
         {isCurrent && (
           <>
             &nbsp;
-            <Label bsStyle="primary">current</Label>
+            <Label bsStyle="primary">{t('rolling_upgrade_nodes.current')}</Label>
           </>
         )}
       </div>
@@ -110,20 +112,28 @@ const OpenSearchVersionCell = ({
 }: {
   node: RollingRestartNode;
   versionNode?: OpenSearchVersionNode;
-}) => <td>{opensearchVersion(node, versionNode)}</td>;
+}) => {
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
 
-const NodeStatusCell = ({ node, showProgress }: { node: RollingRestartNode; showProgress: boolean }) => (
-  <td align="right">
-    <Label bsStyle={NODE_STATUS_STYLE[node.status]}>
-      {NODE_STATUS_LABELS[node.status]}
-      &nbsp;
-      {node.status === 'COMPLETED' && <Icon name="check" />}
-      {showProgress && IN_FLIGHT_NODE_STATUSES.includes(node.status) && (
-        <Icon name="progress_activity" spin data-testid="node-upgrade-progress" />
-      )}
-    </Label>
-  </td>
-);
+  return <td>{opensearchVersion(node, versionNode) ?? t('rolling_upgrade_nodes.unknown')}</td>;
+};
+
+const NodeStatusCell = ({ node, showProgress }: { node: RollingRestartNode; showProgress: boolean }) => {
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
+
+  return (
+    <td align="right">
+      <Label bsStyle={NODE_STATUS_STYLE[node.status]}>
+        {t(NODE_STATUS_LABELS[node.status])}
+        &nbsp;
+        {node.status === 'COMPLETED' && <Icon name="check" />}
+        {showProgress && IN_FLIGHT_NODE_STATUSES.includes(node.status) && (
+          <Icon name="progress_activity" spin data-testid="node-upgrade-progress" />
+        )}
+      </Label>
+    </td>
+  );
+};
 
 const OpenSearchRollingUpgradeNodeTable = ({
   emptyMessage,
@@ -135,30 +145,34 @@ const OpenSearchRollingUpgradeNodeTable = ({
   nodes: Array<RollingUpgradeNodeWithContext>;
   currentNodeIndex: number;
   showProgress: boolean;
-}) => (
-  <Table>
-    <thead>
-      <tr>
-        <th>Data Node</th>
-        <th>OpenSearch version</th>
-        <th aria-label="Status" />
-      </tr>
-    </thead>
-    <tbody>
-      {nodes.map(({ node, index, versionNode }) => (
-        <tr key={node.datanode_id}>
-          <NodeIdentityCell node={node} versionNode={versionNode} isCurrent={index === currentNodeIndex} />
-          <OpenSearchVersionCell node={node} versionNode={versionNode} />
-          <NodeStatusCell node={node} showProgress={showProgress} />
-        </tr>
-      ))}
-      {!nodes.length && (
+}) => {
+  const { t } = useTranslation('collectors', { keyPrefix: 'datanode' });
+
+  return (
+    <Table>
+      <thead>
         <tr>
-          <td colSpan={3}>{emptyMessage}</td>
+          <th>{t('rolling_upgrade_nodes.data_node')}</th>
+          <th>{t('rolling_upgrade_nodes.opensearch_version')}</th>
+          <th aria-label={t('rolling_upgrade_nodes.status')} />
         </tr>
-      )}
-    </tbody>
-  </Table>
-);
+      </thead>
+      <tbody>
+        {nodes.map(({ node, index, versionNode }) => (
+          <tr key={node.datanode_id}>
+            <NodeIdentityCell node={node} versionNode={versionNode} isCurrent={index === currentNodeIndex} />
+            <OpenSearchVersionCell node={node} versionNode={versionNode} />
+            <NodeStatusCell node={node} showProgress={showProgress} />
+          </tr>
+        ))}
+        {!nodes.length && (
+          <tr>
+            <td colSpan={3}>{emptyMessage}</td>
+          </tr>
+        )}
+      </tbody>
+    </Table>
+  );
+};
 
 export default OpenSearchRollingUpgradeNodeTable;

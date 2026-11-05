@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Button } from 'components/bootstrap';
 import type { Input } from 'components/messageloaders/Types';
@@ -30,6 +31,7 @@ type Props = {
 };
 
 const ShowReceivedMessagesButton = ({ input }: Props) => {
+  const { t } = useTranslation('inputs');
   const { isPermitted } = usePermissions();
   const sendTelemetry = useSendTelemetry();
 
@@ -49,7 +51,7 @@ const ShowReceivedMessagesButton = ({ input }: Props) => {
               app_action_value: 'show-received-messages',
             });
           }}>
-          Show received messages
+          {t('diagnosis.show_received_messages')}
         </Button>
       </LinkContainer>
     );

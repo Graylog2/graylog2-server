@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled, { css } from 'styled-components';
 
 import { OverlayTrigger, Icon } from 'components/common';
@@ -31,15 +32,17 @@ const ErrorIcon = styled(Icon)(
   `,
 );
 
-const UnknownAttributeTitle = () => (
-  <UnknownFieldTitleContainer>
-    Unknown
-    <OverlayTrigger
-      overlay="This attribute is currently not available, because it requires a valid license."
-      placement="bottom">
-      <ErrorIcon name="error" />
-    </OverlayTrigger>
-  </UnknownFieldTitleContainer>
-);
+const UnknownAttributeTitle = () => {
+  const { t } = useTranslation('widgets');
+
+  return (
+    <UnknownFieldTitleContainer>
+      {t('events_widget.unknown_attribute')}
+      <OverlayTrigger overlay={t('events_widget.unknown_attribute_help')} placement="bottom">
+        <ErrorIcon name="error" />
+      </OverlayTrigger>
+    </UnknownFieldTitleContainer>
+  );
+};
 
 export default UnknownAttributeTitle;

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Routes from 'routing/Routes';
 import { Link } from 'components/common';
@@ -26,6 +27,7 @@ type Props = {
 };
 
 const FieldTypeProfileCell = ({ profileId }: Props) => {
+  const { t } = useTranslation('indexsets');
   const { isPermitted } = usePermissions();
   const canReadProfile = !!profileId && isPermitted(`mappingprofiles:read:${profileId}`);
   const {
@@ -34,7 +36,7 @@ const FieldTypeProfileCell = ({ profileId }: Props) => {
   } = useProfile(canReadProfile ? profileId : undefined);
 
   if (!profileId) {
-    return <i>Not set</i>;
+    return <i>{t('overview_table.not_set')}</i>;
   }
 
   if (!canReadProfile) {

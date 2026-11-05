@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 const Container = styled.div`
@@ -42,11 +43,15 @@ type Props = {
  * Component used to represent an empty entity in Graylog. This component allows us to display some larger
  * text to the user explaining what that entity is and a link to create a new one.
  */
-const EmptyEntity = ({ children, title = 'Looks like there is nothing here, yet!' }: Props) => (
-  <Container>
-    <Headline>{title}</Headline>
-    {children}
-  </Container>
-);
+const EmptyEntity = ({ children, title = undefined }: Props) => {
+  const { t } = useTranslation('common');
+
+  return (
+    <Container>
+      <Headline>{title ?? t('empty.nothing_here')}</Headline>
+      {children}
+    </Container>
+  );
+};
 
 export default EmptyEntity;

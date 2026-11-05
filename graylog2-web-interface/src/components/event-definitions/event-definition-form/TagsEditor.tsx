@@ -17,9 +17,11 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 import { EventsDefinitions } from '@graylog/server-api';
 
+import i18n from 'i18n';
 import { FormGroup } from 'components/bootstrap';
 import { InputDescription, Select, useChipInput } from 'components/common';
 import useDebouncedValue from 'hooks/useDebouncedValue';
@@ -44,9 +46,6 @@ type Props = {
   error?: React.ReactNode;
 };
 
-const HELP_TEXT =
-  'Press Enter or Tab to add. Tags are lowercased and deduplicated. Only lowercase letters, digits, hyphens, underscores, and dots are allowed.';
-
 const isTooLong = (tag: string): boolean => tag.length > MAX_TAG_LENGTH;
 const hasInvalidChars = (tag: string): boolean => !VALID_TAG_PATTERN.test(tag);
 
@@ -55,24 +54,22 @@ const quote = (s: string): string => `"${s}"`;
 const buildTooLongMessage = (tagsList: ReadonlyArray<string>): string | null => {
   if (tagsList.length === 0) return null;
 
-  const isPlural = tagsList.length > 1;
-
-  return (
-    `Tag${isPlural ? 's' : ''} ${tagsList.map(quote).join(', ')} ` +
-    `${isPlural ? 'exceed' : 'exceeds'} the maximum length of ${MAX_TAG_LENGTH} characters.`
-  );
+  return i18n.t('tags_editor.too_long', {
+    ns: 'event_definitions',
+    count: tagsList.length,
+    tags: tagsList.map(quote).join(', '),
+    max: MAX_TAG_LENGTH,
+  });
 };
 
 const buildInvalidCharsMessage = (tagsList: ReadonlyArray<string>): string | null => {
   if (tagsList.length === 0) return null;
 
-  const isPlural = tagsList.length > 1;
-
-  return (
-    `Tag${isPlural ? 's' : ''} ${tagsList.map(quote).join(', ')} ` +
-    `${isPlural ? 'contain' : 'contains'} invalid characters. ` +
-    'Only lowercase letters, digits, hyphens, underscores, and dots are allowed.'
-  );
+  return i18n.t('tags_editor.invalid_characters', {
+    ns: 'event_definitions',
+    count: tagsList.length,
+    tags: tagsList.map(quote).join(', '),
+  });
 };
 
 const validateTag = (tag: string): string | null => {
@@ -83,6 +80,7 @@ const validateTag = (tag: string): string | null => {
 };
 
 const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) => {
+  const { t } = useTranslation('event_definitions');
   // Mirrors the typed text so suggestions are built before the hook call that needs them.
   const [query, setQuery] = useState('');
   const [debouncedQuery] = useDebouncedValue(query, DEBOUNCE_MS);
@@ -115,12 +113,12 @@ const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) =
       ]
         .filter(Boolean)
         .join(' ') || null,
-    describeDuplicate: (tag) => `Tag "${tag}" has already been added.`,
+    describeDuplicate: (tag) => t('tags_editor.duplicate', { tag }),
     // Already offered as a suggestion, so a Create row would duplicate it.
     suppressCreate: (_raw, candidate) => suggestions.some((option) => option.value === candidate),
   });
 
-  const allMessages = [...messages, isAtMax ? `Maximum of ${MAX_TAGS} tags reached.` : null].filter(Boolean);
+  const allMessages = [...messages, isAtMax ? t('tags_editor.max_reached', { max: MAX_TAGS }) : null].filter(Boolean);
   const localValidationError =
     allMessages.length === 0 ? null : (
       <>
@@ -145,15 +143,15 @@ const TagsEditor = ({ tags, onChange, disabled = false, error = null }: Props) =
           },
         } as object)}
         inputId="event-definition-tags"
-        aria-label="Event Definition Tags"
+        aria-label={t('tags_editor.aria_label')}
         multi
         allowCreate
         options={suggestions}
         isLoading={isFetching}
         disabled={disabled}
-        placeholder="e.g. authentication, brute-force, compliance"
+        placeholder={t('tags_editor.placeholder')}
       />
-      <InputDescription error={combinedError} help={HELP_TEXT} />
+      <InputDescription error={combinedError} help={t('tags_editor.help')} />
     </FormGroup>
   );
 };

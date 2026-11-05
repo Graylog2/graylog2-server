@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Modal, Button } from 'components/bootstrap';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
@@ -26,19 +27,20 @@ type Props = {
 };
 
 const DebugOverlay = ({ show, onClose }: Props) => {
+  const { t } = useTranslation('search');
   const fullState = useViewsSelector((state) => state);
 
   return (
     <BootstrapModalWrapper showModal={show} onHide={onClose}>
       <Modal.Header>
-        <Modal.Title>Debug information</Modal.Title>
+        <Modal.Title>{t('debug.title')}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <textarea disabled style={{ height: '80vh', width: '100%' }} value={JSON.stringify(fullState, null, 2)} />
       </Modal.Body>
       <Modal.Footer>
         <Button type="button" onClick={() => onClose()}>
-          Close
+          {t('common:actions.close')}
         </Button>
       </Modal.Footer>
     </BootstrapModalWrapper>

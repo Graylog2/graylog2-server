@@ -1,0 +1,64 @@
+{
+  "api_browser": {
+    "download_label": "Télécharger la spécification OpenAPI :",
+    "fetch_failed": "Échec de la récupération de la spécification de l'API !",
+    "loading": "Chargement de la spécification de l'API ...",
+    "loading_title": "Navigateur d'API - Chargement de la spécification de l'API",
+    "select_format": "Sélectionner le format",
+    "title": "Navigateur d'API"
+  },
+  "configlet": {
+    "error": "Une erreur s'est produite :"
+  },
+  "errors": {
+    "copy_error_details": "Copier les détails de l'erreur dans le presse-papiers"
+  },
+  "keyboard_shortcuts": {
+    "description": "Liste de tous les raccourcis disponibles",
+    "title": "Raccourcis clavier"
+  },
+  "loading": {
+    "text": "Chargement, veuillez patienter...",
+    "title": "Chargement..."
+  },
+  "not_found": {
+    "back_hint": "Vous pouvez revenir à la <mainPageLink>page d'accueil</mainPageLink> et naviguer à partir de là.",
+    "description": "La page que vous recherchez n'existe pas (ou plus).",
+    "title": "Page introuvable"
+  },
+  "runtime_error": {
+    "description_hint": "Vous pouvez utiliser la navigation pour accéder à d'autres parties du produit, actualiser la page ou envoyer un rapport d'erreur.",
+    "description_intro": "Il semble que la page que vous avez ouverte contienne une erreur.",
+    "error_label": "Erreur :",
+    "show_less": "Afficher moins",
+    "show_more": "Afficher plus",
+    "title": "Une erreur s'est produite."
+  },
+  "server_unavailable": {
+    "document_title": "Serveur indisponible",
+    "error_message": "Message d'erreur",
+    "full_error_message": "Message d'erreur complet",
+    "intro": "Nous rencontrons des problèmes de connexion au serveur {{productName}} accessible à <serverAddress>{{address}}</serverAddress>. Veuillez vérifier que le serveur fonctionne correctement.",
+    "last_response": "Voici la dernière réponse reçue du serveur :",
+    "less_details": "Moins de détails",
+    "modal_title": "Serveur actuellement indisponible",
+    "more_details": "Plus de détails",
+    "need_help": "Besoin d'aide ? <helpLink>Nous pouvons vous aider</helpLink>.",
+    "no_information": "Aucune information disponible.",
+    "original_request": "Requête d'origine",
+    "redirect_hint": "Vous serez automatiquement redirigé vers la page précédente dès que la connexion au serveur sera rétablie.",
+    "status_code": "Code de statut"
+  },
+  "show_message": {
+    "document_title": "Message {{messageId}} sur {{index}}",
+    "not_found_description": "L'index ou le message indiqué est introuvable. La cause la plus probable est que l'index contenant le message référencé a été supprimé. Le message d'erreur complet est :",
+    "not_found_title": "Index/Message introuvable"
+  },
+  "unauthorized": {
+    "description_hint": "Veuillez contacter votre administrateur et lui fournir les détails de l'erreur.",
+    "description_intro": "Vous n'avez pas les permissions requises pour consulter cette ressource.",
+    "page_details": "La vérification des permissions pour la requête suivante a échoué,\nlors de la tentative d'accès à {{pathname}}.",
+    "page_details_no_request": "La vérification des autorisations a échoué lors de l'accès à {{pathname}}.",
+    "title": "Permissions manquantes"
+  }
+}

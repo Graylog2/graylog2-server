@@ -1,0 +1,122 @@
+{
+  "alerts_attributes": {
+    "additional_fields": "其他欄位",
+    "aggregation_time_range": "彙總時間範圍",
+    "description": "描述",
+    "event_definition": "Event Definition",
+    "event_definition_type": "Event Definition 類型",
+    "event_procedures": "事件程序",
+    "group_by_fields": "分組依據欄位",
+    "id": "ID",
+    "key": "鍵",
+    "message": "訊息",
+    "priority": "優先順序",
+    "tags": "標籤",
+    "timestamp": "時間戳記",
+    "type": "類型"
+  },
+  "alerts_list": {
+    "auto_refresh_unavailable": "分片期間已關閉自動重新整理，以避免效能問題。",
+    "auto_refresh_unavailable_title": "無法使用自動重新整理",
+    "bulk_replay_search": "重播搜尋",
+    "collapse_metrics": "收合指標",
+    "details": "詳細資訊",
+    "expand_metrics": "展開指標",
+    "histogram_failed": "載入事件直方圖失敗：{{error}}",
+    "metrics_title": "指標",
+    "no_additional_fields": "此事件沒有新增其他欄位。",
+    "no_further_details": "沒有其他詳細資訊",
+    "no_group_by_fields": "此事件沒有分組依據欄位。",
+    "no_key": "此事件未設定鍵。",
+    "no_time_range": "沒有時間範圍",
+    "refresh_human_name": "事件",
+    "replay_search": "重播搜尋",
+    "histogram_series_events": "事件",
+    "histogram_series_alerts": "警示"
+  },
+  "alerts_replay": {
+    "cannot_replay": "無法重播此事件：{{reason}} 請選擇其他事件。",
+    "close_section": "關閉 {{title}} 區段",
+    "details_title": "警示／事件詳細資訊",
+    "event_definition_details": "Event Definition 詳細資訊",
+    "event_details": "事件詳細資訊",
+    "no_remediation_steps": "沒有補救步驟",
+    "open_section": "開啟 {{title}} 區段",
+    "replay_details": "重播詳細資訊",
+    "replayed_search": "已重播的搜尋",
+    "system_event": "此為系統事件，這類事件沒有附加查詢、Stream 或時間範圍。"
+  },
+  "alerts_types": {
+    "alert": "警示",
+    "event": "事件"
+  },
+  "definitions_bulk": {
+    "delete": {
+      "confirm_other": "確定要刪除 {{count}} 個 Event Definition 嗎？",
+      "error": "刪除 Event Definition 時發生錯誤。{{error}}",
+      "failed_other": "所選的 {{count}} 個 Event Definition 中，有 {{failed}} 個無法刪除。",
+      "success_other": "已成功刪除 {{count}} 個 Event Definition。",
+      "title": "刪除 Event Definition"
+    },
+    "disable": {
+      "confirm_other": "確定要停用 {{count}} 個 Event Definition 嗎？",
+      "error": "停用 Event Definition 時發生錯誤。{{error}}",
+      "failed_other": "所選的 {{count}} 個 Event Definition 中，有 {{failed}} 個無法停用。",
+      "success_other": "已成功停用 {{count}} 個 Event Definition。",
+      "title": "停用 Event Definition"
+    },
+    "enable": {
+      "confirm_other": "確定要啟用 {{count}} 個 Event Definition 嗎？",
+      "error": "啟用 Event Definition 時發生錯誤。{{error}}",
+      "failed_other": "所選的 {{count}} 個 Event Definition 中，有 {{failed}} 個無法啟用。",
+      "success_other": "已成功啟用 {{count}} 個 Event Definition。",
+      "title": "啟用 Event Definition"
+    },
+    "success_title": "成功"
+  },
+  "definitions_list": {
+    "disable": "停用",
+    "enable": "啟用"
+  },
+  "definitions_page": {
+    "alerts_docs": "警示文件",
+    "copy_confirm": "確定要建立「{{title}}」的副本嗎？",
+    "copy_title": "複製 Event Definition",
+    "create_multiple": "建立 Event Definition",
+    "description_alerts": "Event Definition 讓您可以依不同條件建立警示，並對其發出通知。",
+    "description_events": "Event Definition 讓您可以依不同條件建立事件，並對其發出通知。",
+    "description_list": "建立新的 Event Definition，以搜尋不同條件並對其發出通知。",
+    "duplicate": "複製 Event Definition",
+    "edit": "編輯 Event Definition",
+    "edit_named": "編輯「{{title}}」Event Definition",
+    "file_import": "建立 Event Definition - 檔案匯入",
+    "git_import": "建立 Event Definition - Git 匯入",
+    "loading": "正在載入 Event Definition...",
+    "new": "新增 Event Definition",
+    "new_named": "新的 Event Definition「{{title}}」",
+    "title": "Event Definition",
+    "view": "檢視 Event Definition",
+    "view_named": "檢視「{{title}}」Event Definition"
+  },
+  "alerts_page": {
+    "description": "透過不同條件定義事件。為需要您關注的事件新增通知，以建立警示。",
+    "documentation_title": "警示文件",
+    "title": "警示與事件"
+  },
+  "alerts_bulk_replay": {
+    "all_removed": "您已將所有事件從清單中移除。您現在可以點擊 <backButton>返回事件</backButton> 來返回。",
+    "all_reviewed": "您已檢視所有事件。現在可以選擇要套用至以下所有事件的批次操作。",
+    "list_description": "以下清單包含您在上一步選取的所有事件／警示，讓您能檢視每一個事件的重播搜尋結果。",
+    "mark_not_reviewed": "將事件「{{id}}」標示為未檢視",
+    "mark_reviewed": "將事件「{{id}}」標示為已檢視",
+    "remove_event": "從清單中移除事件「{{id}}」",
+    "replay_search": "重播搜尋",
+    "review_progress": "已完成 {{completed}}/{{total}} 個事件的檢視。",
+    "show_selected": "顯示已選取的事件",
+    "unknown_message": "未知"
+  },
+  "use_event_by_id_notifications": {
+    "load_failed": "載入事件或警示失敗，狀態為：{{error}}",
+    "load_failed_title": "無法載入事件或警示"
+  }
+}

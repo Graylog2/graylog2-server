@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import NumberUtils from 'util/NumberUtils';
 
@@ -23,17 +24,16 @@ type SizeBasedRotationStrategySummaryProps = {
 };
 
 const SizeBasedRotationStrategySummary = ({ config }: SizeBasedRotationStrategySummaryProps) => {
+  const { t } = useTranslation('indexsets');
   const { max_size: maxSize } = config;
 
   return (
     <div>
       <dl>
-        <dt>Index rotation strategy:</dt>
-        <dd>Index Size</dd>
-        <dt>Max index size:</dt>
-        <dd>
-          {maxSize} bytes ({NumberUtils.formatBytes(maxSize)})
-        </dd>
+        <dt>{t('strategies.rotation_summary_strategy')}</dt>
+        <dd>{t('strategies.rotation_index_size')}</dd>
+        <dt>{t('strategies.rotation_max_size_summary')}</dt>
+        <dd>{t('strategies.rotation_bytes', { bytes: maxSize, formatted: NumberUtils.formatBytes(maxSize) })}</dd>
       </dl>
     </div>
   );

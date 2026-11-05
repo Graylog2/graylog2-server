@@ -15,12 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 const Container = styled.i`
   color: darkgray;
 `;
 
-const EmptyValue = () => <Container>&lt;Empty Value&gt;</Container>;
+const EmptyValue = () => {
+  const { t } = useTranslation('search');
+
+  return <Container>{t('common_views.empty_value')}</Container>;
+};
 
 export default EmptyValue;

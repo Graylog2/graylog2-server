@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import { Spinner, NoEntitiesExist } from 'components/common';
 
@@ -40,18 +41,19 @@ const SectionHeader = styled.div(
 );
 
 const RecentActivity = () => {
+  const { t } = useTranslation('collectors');
   const { data, isLoading } = useRecentActivity();
 
   return (
     <div>
       <SectionHeader>
-        <SectionTitle>Recent Activity</SectionTitle>
+        <SectionTitle>{t('recent_activity.title')}</SectionTitle>
       </SectionHeader>
 
       {isLoading && <Spinner />}
 
       {!isLoading && (!data?.activities || data.activities.length === 0) && (
-        <NoEntitiesExist>No recent activity.</NoEntitiesExist>
+        <NoEntitiesExist>{t('recent_activity.empty')}</NoEntitiesExist>
       )}
 
       {!isLoading && data?.activities && data.activities.length > 0 && <ActivityEntryList entries={data.activities} />}

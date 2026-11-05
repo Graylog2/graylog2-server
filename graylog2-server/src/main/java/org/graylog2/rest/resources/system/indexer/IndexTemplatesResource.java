@@ -25,7 +25,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -38,6 +37,8 @@ import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.Template;
+import org.graylog2.plugin.rest.CodedException;
+import org.graylog2.plugin.rest.CodedNotFoundException;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -66,7 +67,7 @@ public class IndexTemplatesResource extends RestResource {
         checkPermission(RestPermissions.INDEXSETS_READ, indexSetId);
 
         final IndexSet indexSet = indexSetRegistry.get(indexSetId)
-                .orElseThrow(() -> new NotFoundException("Index set " + indexSetId + " not found"));
+                .orElseThrow(() -> new CodedNotFoundException("index_templates.index_set_not_found", "Index set " + indexSetId + " not found", CodedException.paramsOf("indexSetId", indexSetId)));
 
         return createResponse(indexSet);
     }
@@ -92,7 +93,7 @@ public class IndexTemplatesResource extends RestResource {
         checkPermission(RestPermissions.INDEXSETS_EDIT, indexSetId);
 
         final IndexSet indexSet = indexSetRegistry.get(indexSetId)
-                .orElseThrow(() -> new NotFoundException("Index set " + indexSetId + " not found"));
+                .orElseThrow(() -> new CodedNotFoundException("index_templates.index_set_not_found", "Index set " + indexSetId + " not found", CodedException.paramsOf("indexSetId", indexSetId)));
 
         indices.ensureIndexTemplate(indexSet.indexTemplateConfig());
 
