@@ -51,8 +51,8 @@ const AssociatedStreamsSection = ({ indexSet }: Props) => {
   const hiddenCount = indexSet.stream_count - pagination.total;
   const hiddenNote = hiddenCount > 0 && (
     <p>
-      {hiddenCount} more {hiddenCount === 1 ? 'stream is' : 'streams are'} routed to this index set, but you do not
-      have permission to view {hiddenCount === 1 ? 'it' : 'them'}.
+      {hiddenCount} more {hiddenCount === 1 ? 'stream is' : 'streams are'} routed to this index set, but you do not have
+      permission to view {hiddenCount === 1 ? 'it' : 'them'}.
     </p>
   );
 

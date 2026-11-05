@@ -26,11 +26,11 @@ jest.mock('hooks/usePermissions');
 
 describe('EventDefinitionReplaySearchLink', () => {
   beforeEach(() => {
-    asMock(usePermissions).mockReturnValue({ isPermitted: () => false, isAnyPermitted: () => false });
+    asMock(usePermissions).mockReturnValue({ isPermitted: () => false, isAnyPermitted: () => false, isAdmin: false });
   });
 
   it('renders play button when user can read the event definition', async () => {
-    asMock(usePermissions).mockReturnValue({ isPermitted: () => true, isAnyPermitted: () => true });
+    asMock(usePermissions).mockReturnValue({ isPermitted: () => true, isAnyPermitted: () => true, isAdmin: false });
 
     render(<EventDefinitionReplaySearchLink eventDefinitionId="event-definition-id" />);
 

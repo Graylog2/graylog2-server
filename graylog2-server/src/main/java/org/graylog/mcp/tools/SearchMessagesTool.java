@@ -106,7 +106,8 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
                     parameters.sortOrder(),
                     parameters.offset(),
                     parameters.limit(),
-                    parameters.fields()
+                    parameters.fields(),
+                    parameters.includeUnresolvedIds()
             );
             // the query engine performs permission checks, so we don't have to do that here.
             final TabularResponse tabularResponse = scriptingApiService.executeQuery(spec, permissionHelper.getSearchUser());
@@ -189,6 +190,11 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
         @DefaultValue("desc")
         public abstract SortSpec.Direction sortOrder();
 
+        @JsonProperty("include_unresolved_ids")
+        @JsonPropertyDescription("Additionally return the unresolved ids of fields resolved to titles, e.g. `streams#id` next to the stream titles in `streams`.")
+        @DefaultValue("false")
+        public abstract boolean includeUnresolvedIds();
+
         public static Builder builder() {
             return Builder.create();
         }
@@ -206,7 +212,8 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
                         .limit(50)
                         .offset(0)
                         .rangeSeconds(3600)
-                        .sortOrder(SortSpec.Direction.Descending);
+                        .sortOrder(SortSpec.Direction.Descending)
+                        .includeUnresolvedIds(false);
             }
 
             @JsonProperty("query")
@@ -240,6 +247,9 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
 
             @JsonProperty("sort_order")
             public abstract Builder sortOrder(final SortSpec.Direction sortOrder);
+
+            @JsonProperty("include_unresolved_ids")
+            public abstract Builder includeUnresolvedIds(final boolean includeUnresolvedIds);
 
             public abstract Parameters build();
         }

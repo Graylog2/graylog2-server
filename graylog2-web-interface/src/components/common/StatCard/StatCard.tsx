@@ -17,8 +17,8 @@
 
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import type { ColorVariant } from '@graylog/sawmill';
 
+import type { ColorVariant } from 'theme/sawmill';
 import { HoverForHelp, AccessibleCard } from 'components/common';
 export type Variant = 'default' | 'success' | 'warning' | 'danger' | 'primary';
 

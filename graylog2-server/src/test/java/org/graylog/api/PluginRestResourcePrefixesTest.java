@@ -45,8 +45,7 @@ class PluginRestResourcePrefixesTest {
     void usesPackageOfRegisteringModule() {
         assertThat(prefixes).containsEntry(AWSConfigurationResource.class, "org.graylog.aws")
                 .containsEntry(AWSResource.class, "org.graylog.integrations")
-                .containsEntry(KinesisSetupResource.class, "org.graylog.integrations")
-                .containsEntry(CertificateRenewalResource.class, "org.graylog2.shared.security");
+                .containsEntry(KinesisSetupResource.class, "org.graylog.integrations");
     }
 
     @Test
@@ -56,6 +55,7 @@ class PluginRestResourcePrefixesTest {
 
     @Test
     void doesNotPrefixSystemResourcesOfPluginModules() {
-        assertThat(prefixes).doesNotContainKey(DashboardsResource.class);
+        assertThat(prefixes).doesNotContainKey(DashboardsResource.class)
+                .doesNotContainKey(CertificateRenewalResource.class);
     }
 }

@@ -15,12 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { ColorVariant } from '@graylog/sawmill';
 
+import type { ColorVariant } from 'theme/sawmill';
 import { Label } from 'components/bootstrap';
 import { Timestamp } from 'components/common';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import type { IncompatibleIndex } from 'components/indices/hooks/useIncompatibleIndices';
+import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 import type { IncompatibleIndexRow } from './fetchIncompatibleIndices';
 import { useIncompatibleIndicesContext } from './IncompatibleIndicesContext';
@@ -76,11 +77,11 @@ const IndexNameCell = ({ index }: { index: IncompatibleIndexRow }) => {
 export const createColumnRenderers = (): ColumnRenderers<IncompatibleIndexRow> => ({
   attributes: {
     index_name: {
-      minWidth: 300,
+      staticWidth: COLUMN_WIDTH.title,
       renderCell: (_value, index) => <IndexNameCell index={index} />,
     },
     category: {
-      staticWidth: 100,
+      staticWidth: 140,
       renderCell: (_value, index) => <span>{renderBadges(typeBadges(index))}</span>,
     },
     version: {

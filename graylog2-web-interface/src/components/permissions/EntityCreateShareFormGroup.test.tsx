@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import * as mockImmutable from 'immutable';
 import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
@@ -28,29 +27,8 @@ import useEntityShareState from 'hooks/useEntityShareState';
 
 import EntityCreateShareFormGroup from './EntityCreateShareFormGroup';
 
-jest.mock('domainActions/permissions/EntityShareDomain', () => ({
-  __esModule: true,
-  default: {
-    prepare: jest.fn(() => Promise.resolve()),
-    update: jest.fn(() => Promise.resolve()),
-    loadUserSharesPaginated: jest.fn(() =>
-      Promise.resolve({
-        list: mockImmutable.List(),
-        pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
-      }),
-    ),
-  },
-}));
-jest.mock('hooks/useEntityShareState', () => {
-  const mockSetEntityShareState = jest.fn();
-
-  return {
-    __esModule: true,
-    default: jest.fn(() => ({ data: undefined })),
-    useSetEntityShareState: jest.fn(() => mockSetEntityShareState),
-    entityShareQueryKey: jest.fn((grn) => ['entity-share', grn ?? 'new']),
-  };
-});
+jest.mock('domainActions/permissions/EntityShareDomain');
+jest.mock('hooks/useEntityShareState');
 
 const mockEntity = {
   description: 'Search for a User or Team to add as collaborator on this stream.',
@@ -75,7 +53,7 @@ const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTim
 
 describe('EntityCreateShareFormGroup', () => {
   beforeEach(() => {
-    asMock(useEntityShareState).mockReturnValue({ data: createEntityShareState } as any);
+    asMock(useEntityShareState).mockReturnValue({ data: createEntityShareState });
     asMock(usePluggableEntityShareFormGroup).mockReturnValue(() => <span />);
   });
 
@@ -91,7 +69,7 @@ describe('EntityCreateShareFormGroup', () => {
     render(<SUT />);
 
     await waitFor(() => {
-      expect(EntityShareDomain.prepare).toHaveBeenCalledWith(mockEntity.entityType, '', mockEntity.entityId, {
+      expect(EntityShareDomain.prepareCreate).toHaveBeenCalledWith(mockEntity.entityType, '', {
         prepare_request: null,
       });
     });
@@ -105,7 +83,7 @@ describe('EntityCreateShareFormGroup', () => {
     render(<SUT defaultSharePayload={{ selected_grantee_capabilities }} />);
 
     await waitFor(() => {
-      expect(EntityShareDomain.prepare).toHaveBeenCalledWith(mockEntity.entityType, '', mockEntity.entityId, {
+      expect(EntityShareDomain.prepareCreate).toHaveBeenCalledWith(mockEntity.entityType, '', {
         selected_grantee_capabilities,
         prepare_request: null,
       });
@@ -121,11 +99,33 @@ describe('EntityCreateShareFormGroup', () => {
     render(<SUT defaultSharePayload={{ selected_grantee_capabilities }} dependenciesGRN={dependenciesGRN} />);
 
     await waitFor(() => {
-      expect(EntityShareDomain.prepare).toHaveBeenCalledWith(mockEntity.entityType, '', mockEntity.entityId, {
+      expect(EntityShareDomain.prepareCreate).toHaveBeenCalledWith(mockEntity.entityType, '', {
         selected_grantee_capabilities,
         prepare_request: dependenciesGRN,
       });
     });
+  });
+
+  it('prepares shares of an existing entity without dependencies', async () => {
+    const selected_grantee_capabilities = createEntityShareState.selectedGranteeCapabilities.merge({
+      [everyone.id]: viewer.id,
+    });
+
+    render(
+      <SUT
+        entityId="stream-id"
+        defaultSharePayload={{ selected_grantee_capabilities }}
+        dependenciesGRN={['grn::::stream:stream-id']}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(EntityShareDomain.prepare).toHaveBeenCalledWith(mockEntity.entityType, '', 'grn::::stream:stream-id', {
+        selected_grantee_capabilities,
+      });
+    });
+
+    expect(EntityShareDomain.prepareCreate).not.toHaveBeenCalled();
   });
 
   it('updates entity share state on submit', async () => {
@@ -146,7 +146,7 @@ describe('EntityCreateShareFormGroup', () => {
     await setupUser().click(addCollaborator);
 
     await waitFor(() => {
-      expect(EntityShareDomain.prepare).toHaveBeenCalledWith('stream', '', null, {
+      expect(EntityShareDomain.prepareCreate).toHaveBeenCalledWith('stream', '', {
         selected_grantee_capabilities: createEntityShareState.selectedGranteeCapabilities.merge({
           [everyone.id]: viewer.id,
         }),

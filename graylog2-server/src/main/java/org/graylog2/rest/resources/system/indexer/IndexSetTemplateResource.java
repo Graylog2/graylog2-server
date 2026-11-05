@@ -232,6 +232,10 @@ public class IndexSetTemplateResource extends RestResource {
         if (violation != null) {
             throw new BadRequestException(violation.message());
         }
+
+        indexSetValidator.validatePluginConstraints(config).ifPresent(v -> {
+            throw new BadRequestException(v.message());
+        });
     }
 
     private IndexSetTemplateResponse getIndexSetTemplate(String templateId) {

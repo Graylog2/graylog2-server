@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import type { ColorVariant } from '@graylog/sawmill';
 import type { MantineRadius } from '@mantine/core';
 
+import type { ColorVariant } from 'theme/sawmill';
 import Indicator from 'components/bootstrap/Indicator';
 
 type Props = React.PropsWithChildren<{

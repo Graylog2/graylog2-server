@@ -17,7 +17,7 @@ import argparse
 import socket
 import time
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 class SocketSender(object):
@@ -59,8 +59,8 @@ class SocketSender(object):
 
     def send(self, message: str) -> None:
         syslog_message = "<14>1 %s PYTHON_TEST_SENDER - - - - %s\n" % (
-            datetime.utcnow().isoformat() + 'Z',
-            message
+            datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
+            message.rstrip('\r\n')
         )
         encoded = syslog_message.encode('utf-8')
 

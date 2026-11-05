@@ -20,14 +20,12 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import DefaultQueryClientProvider from 'DefaultQueryClientProvider';
 
 import { fetchMultiPartFormData } from 'logic/rest/FetchProvider';
-import { asMock, StoreMock as MockStore } from 'helpers/mocking';
+import { asMock } from 'helpers/mocking';
 import UserNotification from 'util/UserNotification';
 
 import CAUpload from './CAUpload';
 
 jest.mock('logic/rest/FetchProvider', () => ({ fetchMultiPartFormData: jest.fn() }));
-jest.mock('stores/sessions/SessionStore', () => ({ SessionStore: MockStore(['isLoggedIn', jest.fn()]) }));
-
 jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
   success: jest.fn(),

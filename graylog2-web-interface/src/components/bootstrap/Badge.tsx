@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { ColorVariant } from '@graylog/sawmill';
 import { Badge as MantineBadge } from '@mantine/core';
 import styled, { css, useTheme } from 'styled-components';
 import type { DefaultTheme } from 'styled-components';
 
+import type { ColorVariant } from 'theme/sawmill';
 import type { BsSize } from 'components/bootstrap/types';
 import Icon from 'components/common/Icon';
 import type { IconName } from 'components/common/Icon';

@@ -24,6 +24,7 @@ import type { SearchParams } from 'stores/PaginationTypes';
 import TableFilterContext, {
   type TableFilterContextValue,
 } from 'components/common/PaginatedEntityTable/TableFilterContext';
+import TableFetchContextProvider from 'components/common/PaginatedEntityTable/TableFetchContextProvider';
 import type { ColumnSchema } from 'components/common/EntityDataTable/types';
 import useCurrentUser from 'hooks/useCurrentUser';
 
@@ -82,13 +83,15 @@ describe('Slicing', () => {
 
     return (
       <TableFilterContext.Provider value={contextValue}>
-        <Slicing
-          appSection="test-app-section"
-          columnSchemas={columnSchemas}
-          onChangeSlicing={() => {}}
-          fetchSlices={() => Promise.resolve({ slices: [] })}
-          {...props}
-        />
+        <TableFetchContextProvider refetch={jest.fn()} attributes={[]} entityTableId="test_table">
+          <Slicing
+            appSection="test-app-section"
+            columnSchemas={columnSchemas}
+            onChangeSlicing={() => {}}
+            fetchSlices={() => Promise.resolve({ slices: [] })}
+            {...props}
+          />
+        </TableFetchContextProvider>
       </TableFilterContext.Provider>
     );
   };

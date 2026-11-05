@@ -16,7 +16,7 @@
  */
 package org.graylog2.rest.resources.datanodes;
 
-public class RequestNotAllowedException extends Exception {
+public class RequestNotAllowedException extends RuntimeException {
     public RequestNotAllowedException(String message) {
         super(message);
     }

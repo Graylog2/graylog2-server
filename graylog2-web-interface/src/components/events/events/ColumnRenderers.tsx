@@ -33,6 +33,7 @@ import EventDefinitionLink from 'components/events/events/EventDefinitionLink';
 import RemediationSteps from 'components/events/ReplaySearchSidebar/RemediationSteps';
 import ChipsCell from 'components/common/ChipsCell';
 import useAppendTagFilter from 'components/events/useAppendTagFilter';
+import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 const EventDefinitionRenderer = ({
   eventDefinitionId,
@@ -110,7 +111,7 @@ export const TagsRenderer = ({
 
 export const eventTypeAttribute = {
   renderCell: (alert: boolean) => <EventTypeLabel isAlert={alert} />,
-  staticWidth: 100,
+  staticWidth: 'matchHeader' as const,
 };
 
 export const getGeneralEventAttributeRenderers = <T extends EntityBase, M = unknown>(): ColumnRenderersByAttribute<
@@ -118,8 +119,7 @@ export const getGeneralEventAttributeRenderers = <T extends EntityBase, M = unkn
   M
 > => ({
   message: {
-    minWidth: 300,
-    width: 0.5,
+    staticWidth: COLUMN_WIDTH.description,
     renderCell: (message: string, event) => <MessageRenderer message={message} eventId={event.id} />,
   },
   key: {
@@ -130,7 +130,7 @@ export const getGeneralEventAttributeRenderers = <T extends EntityBase, M = unkn
     staticWidth: 260,
   },
   id: {
-    staticWidth: 300,
+    staticWidth: 260,
   },
   alert: eventTypeAttribute,
   priority: {
@@ -147,7 +147,7 @@ export const getGeneralEventAttributeRenderers = <T extends EntityBase, M = unkn
   },
   tags: {
     renderCell: (tags: string[]) => <TagsRenderer tags={tags} />,
-    width: 0.3,
+    staticWidth: COLUMN_WIDTH.tags,
   },
 });
 
@@ -155,7 +155,7 @@ const CustomColumnRenderers: ColumnRenderers<Event> = {
   attributes: {
     ...getGeneralEventAttributeRenderers<Event>(),
     event_definition_id: {
-      width: 0.3,
+      staticWidth: COLUMN_WIDTH.reference,
       renderCell: (eventDefinitionId: string, _, meta: EventsAdditionalData) => (
         <EventDefinitionRenderer meta={meta} eventDefinitionId={eventDefinitionId} />
       ),
@@ -168,7 +168,7 @@ const CustomColumnRenderers: ColumnRenderers<Event> = {
       renderCell: (_, event: Event, meta: EventsAdditionalData, eventProcedureId: string) => (
         <RemediationSteps event={event} eventDefinitionEventProcedureId={eventProcedureId} meta={meta} />
       ),
-      width: 0.3,
+      staticWidth: COLUMN_WIDTH.description,
     },
     timerange_start: {
       renderCell: (_, event: Event) => <TimeRangeRenderer eventData={event} />,

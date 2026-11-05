@@ -19,6 +19,20 @@ package org.graylog2.rest.resources.tools;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.ConfigurationException;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -29,29 +43,17 @@ import org.graylog2.rest.models.tools.requests.JsonTestRequest;
 import org.graylog2.rest.models.tools.responses.JsonTesterResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.MediaType;
-
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 
 @RequiresAuthentication
+@Tag(name = "Tools/JsonTester", description = "Test the JSON extractor")
 @Path("/tools/json_tester")
 @Produces(MediaType.APPLICATION_JSON)
 public class JsonTesterResource extends RestResource {
     @GET
+    @Operation(summary = "Test JSON extraction of a string")
     @Timed
     public JsonTesterResponse get(@QueryParam("string") @NotEmpty String string,
                                   @QueryParam("flatten") @DefaultValue("false") boolean flatten,
@@ -65,6 +67,7 @@ public class JsonTesterResource extends RestResource {
     }
 
     @POST
+    @Operation(summary = "Test JSON extraction of a string")
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @NoAuditEvent("only used for testing JSON extractor")

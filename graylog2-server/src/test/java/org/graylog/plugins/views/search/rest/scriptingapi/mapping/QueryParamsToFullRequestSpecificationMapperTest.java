@@ -123,7 +123,7 @@ class QueryParamsToFullRequestSpecificationMapperTest {
                 )
         );
 
-        final MessagesRequestSpec messagesRequestSpec = toTest.simpleQueryParamsToFullRequestSpecification(null, null, null, null, null, null, null, 0, 10);
+        final MessagesRequestSpec messagesRequestSpec = toTest.simpleQueryParamsToFullRequestSpecification(null, null, null, null, null, null, null, 0, 10, false);
         assertThat(messagesRequestSpec).isEqualTo(new MessagesRequestSpec(
                         "*",
                         Set.of(),
@@ -133,7 +133,8 @@ class QueryParamsToFullRequestSpecificationMapperTest {
                         DEFAULT_SORT_ORDER,
                         0,
                         10,
-                        List.of()
+                        List.of(),
+                        false
                 )
         );
     }

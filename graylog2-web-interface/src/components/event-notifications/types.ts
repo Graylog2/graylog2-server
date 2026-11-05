@@ -66,7 +66,7 @@ export interface EventNotificationTypes {
   detailsComponent: React.ComponentType<{
     notification: EventNotification;
   }>;
-  defaultConfig: EventNotification['config'];
+  defaultConfig: Omit<EventNotification['config'], 'type'>;
 }
 
 declare module 'graylog-web-plugin/plugin' {

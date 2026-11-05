@@ -23,7 +23,7 @@ import AppConfig from 'util/AppConfig';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import useCurrentUser from 'hooks/useCurrentUser';
 import usePermissions from 'hooks/usePermissions';
-import { Button, Row, Col } from 'components/bootstrap';
+import { Alert, Button, Row, Col } from 'components/bootstrap';
 import { FormikFormGroup } from 'components/common';
 import type User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
@@ -128,6 +128,11 @@ const PasswordSection = ({ user: { id } }: Props) => {
 
   return (
     <SectionComponent title="Password">
+      <Alert bsStyle="info" title="Changing the Password">
+        Changing the password will log the user out and will invalidate all their current sessions. If you are changing
+        your own password, you will be logged out right after saving. In that case, make sure to save any pending
+        changes first.
+      </Alert>
       <Formik onSubmit={(formData) => _onSubmit(formData, id)} validate={validate} initialValues={{}}>
         {({ isSubmitting, isValid }) => (
           <Form className="form form-horizontal">

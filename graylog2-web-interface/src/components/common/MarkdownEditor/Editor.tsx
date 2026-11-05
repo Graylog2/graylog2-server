@@ -19,6 +19,7 @@ import { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { IconButton } from 'components/common';
+import zIndices from 'theme/z-indices';
 
 import MDBaseEditor from './BaseEditor';
 import Preview from './Preview';
@@ -59,7 +60,7 @@ const ExpandIconButton = styled(IconButton)`
   right: 0;
   padding: 8px;
   cursor: pointer;
-  z-index: 10;
+  z-index: ${zIndices.expandButton};
 `;
 
 type Props = {

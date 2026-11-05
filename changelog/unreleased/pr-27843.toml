@@ -1,0 +1,5 @@
+type = "f"
+message = "Open relative links in the Markdown widget in the same tab instead of showing them as external links."
+
+issues = []
+pulls = ["27843"]

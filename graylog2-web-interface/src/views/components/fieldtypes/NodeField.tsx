@@ -15,37 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
 
-import useNodeSummaries from 'hooks/useNodeSummaries';
-import usePluginEntities from 'hooks/usePluginEntities';
+import { useNodeTitleResolver } from 'views/hooks/useInputAndNodeTitles';
 
 type Props = {
   value: string;
 };
 
-const useForwarderNode = (nodeId: string, enabled: boolean) => {
-  const { fetchForwarderNode } = usePluginEntities('forwarder')[0] ?? {};
-  const {
-    data: forwarderNode,
-    isError,
-    isLoading,
-  } = useQuery({
-    queryKey: ['forwarder', 'node', nodeId],
-    queryFn: () => fetchForwarderNode(nodeId),
-    enabled: fetchForwarderNode && enabled,
-  });
-
-  return isLoading || isError ? undefined : forwarderNode;
-};
-
 const NodeField = ({ value }: Props) => {
-  const nodes = useNodeSummaries();
-  const node = nodes?.[value];
-  const forwarderNode = useForwarderNode(value, nodes && !node);
-  const nodeTitle = (node ? `${node.short_node_id} / ${node.hostname}` : forwarderNode?.title) ?? value;
+  const resolveTitle = useNodeTitleResolver(useMemo(() => [value], [value]));
 
-  return <span title={value}>{nodeTitle}</span>;
+  return <span title={value}>{resolveTitle(value) ?? value}</span>;
 };
 
 export default NodeField;

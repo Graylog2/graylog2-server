@@ -25,16 +25,24 @@ type Props = React.PropsWithChildren<{
   attributes: Array<Attribute>;
   refetch: () => void;
   entityTableId: string;
+  layoutVariant?: string;
 }>;
 
-const TableFetchContextProvider = ({ children = undefined, refetch, attributes, entityTableId }: Props) => {
+const TableFetchContextProvider = ({
+  children = undefined,
+  refetch,
+  attributes,
+  entityTableId,
+  layoutVariant = undefined,
+}: Props) => {
   const contextValue = useMemo(
     () => ({
       refetch,
       attributes,
       entityTableId,
+      layoutVariant,
     }),
-    [refetch, attributes, entityTableId],
+    [refetch, attributes, entityTableId, layoutVariant],
   );
 
   return <TableFetchContext.Provider value={contextValue}>{children}</TableFetchContext.Provider>;

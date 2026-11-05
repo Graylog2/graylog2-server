@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
 import startCase from 'lodash/startCase';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -29,10 +28,10 @@ import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTab
 import type { SearchParams } from 'stores/PaginationTypes';
 import { TagsRenderer, EventDefinitionTypeRenderer } from 'components/events/events/ColumnRenderers';
 import PriorityName from 'components/events/events/PriorityName';
+import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 import EventDefinitionActions from './EventDefinitionActions';
 import EventDefinitionNotificationsCell from './EventDefinitionNotificationsCell';
-import ExpandedNotificationsSection from './ExpandedNotificationsSection';
 import SchedulingCell from './SchedulingCell';
 import StatusCell from './StatusCell';
 import useEventDefinitionOverviewSections from './useEventDefinitionOverviewSections';
@@ -54,8 +53,10 @@ const getCustomColumnRenderers = (
     matched_at: {
       renderCell: (_matched_at: string, eventDefinition: EventDefinition) =>
         eventDefinition.matched_at ? <RelativeTime dateTime={eventDefinition.matched_at} /> : 'Never',
+      staticWidth: COLUMN_WIDTH.relativeTime,
     },
     scheduling: {
+      staticWidth: 300,
       renderCell: (_scheduling: string, eventDefinition: EventDefinition) => (
         <SchedulingCell definition={eventDefinition} />
       ),
@@ -70,8 +71,7 @@ const getCustomColumnRenderers = (
       renderCell: (_type: string, eventDefinition: EventDefinition) => (
         <EventDefinitionTypeRenderer type={eventDefinition.config?.type} />
       ),
-      width: 0.15,
-      minWidth: 150,
+      staticWidth: 'matchHeader' as const,
     },
     priority: {
       renderCell: (priority: number) => <PriorityName priority={priority} />,
@@ -81,7 +81,7 @@ const getCustomColumnRenderers = (
       renderCell: (_notifications: EventDefinition['notifications'], eventDefinition: EventDefinition) => (
         <EventDefinitionNotificationsCell eventDefinition={eventDefinition} />
       ),
-      textAlign: 'right',
+      staticWidth: COLUMN_WIDTH.reference,
     },
     '_entity_source.source': {
       renderCell: (_title: string, eventDefinition: EventDefinition) => (
@@ -91,11 +91,11 @@ const getCustomColumnRenderers = (
             : 'User Defined'}
         </span>
       ),
+      staticWidth: 110,
     },
     tags: {
       renderCell: (_tags: string[], eventDefinition: EventDefinition) => <TagsRenderer tags={eventDefinition.tags} />,
-      width: 0.2,
-      minWidth: 160,
+      staticWidth: COLUMN_WIDTH.tags,
     },
     ...(tacticsTechniquesPlugin
       ? {
@@ -105,8 +105,7 @@ const getCustomColumnRenderers = (
 
               return <Cell entity={eventDefinition} />;
             },
-            width: 0.2,
-            minWidth: 160,
+            staticWidth: COLUMN_WIDTH.tags,
           },
         }
       : {}),
@@ -120,15 +119,6 @@ const bulkSelection = {
 const renderEventDefinitionActions = (listItem: EventDefinition) => (
   <EventDefinitionActions eventDefinition={listItem} />
 );
-
-const renderExpandedNotifications = (eventDefinition: EventDefinition) => (
-  <ExpandedNotificationsSection eventDefinition={eventDefinition} />
-);
-
-const notificationsExpandedSection = {
-  title: 'Notifications',
-  content: renderExpandedNotifications,
-};
 
 const EventDefinitionsContainer = () => {
   const { pluggableColumnRenderers, pluggableAttributes, pluggableExpandedSections } =
@@ -155,13 +145,6 @@ const EventDefinitionsContainer = () => {
   const filterValueRenderers = activeTacticsTechniquesPlugin?.filterValueRenderer
     ? { ...FilterValueRenderers, [tacticsTechniquesAttribute.id]: activeTacticsTechniquesPlugin.filterValueRenderer }
     : FilterValueRenderers;
-  const expandedSections = useMemo(
-    () => ({
-      notifications: notificationsExpandedSection,
-      ...pluggableExpandedSections,
-    }),
-    [pluggableExpandedSections],
-  );
   const overviewSections = useEventDefinitionOverviewSections();
 
   return (
@@ -178,7 +161,7 @@ const EventDefinitionsContainer = () => {
         entityActions={renderEventDefinitionActions}
         keyFn={keyFn}
         entityAttributesAreCamelCase={false}
-        expandedSectionRenderers={expandedSections}
+        expandedSectionRenderers={pluggableExpandedSections}
         filterValueRenderers={filterValueRenderers}
         columnRenderers={getCustomColumnRenderers(pluggableColumnRenderers, activeTacticsTechniquesPlugin)}
         bulkSelection={bulkSelection}

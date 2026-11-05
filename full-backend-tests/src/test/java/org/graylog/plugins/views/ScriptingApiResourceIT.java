@@ -53,6 +53,7 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
+import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.hasEntry;
 
@@ -799,6 +800,20 @@ public class ScriptingApiResourceIT {
 
         assertThat(response.size()).isEqualTo(expected.size());
         assertThat(expected.containsAll(response)).isTrue();
+    }
+
+    @FullBackendTest
+    void testMessagesGetRequestWithStreams() {
+        final ValidatableResponse validatableResponse = given()
+                .spec(api.requestSpecification())
+                .when()
+                .get(f("/search/messages?fields=source,facility,level&streams=%s", stream1Id))
+                .then()
+                .log().ifStatusCodeMatches(not(200))
+                .statusCode(200);
+
+        final List<List<Object>> rows = validatableResponse.extract().body().jsonPath().getList("datarows");
+        assertThat(rows).containsExactly(List.of("example.org", "test", 1));
     }
 
     @FullBackendTest

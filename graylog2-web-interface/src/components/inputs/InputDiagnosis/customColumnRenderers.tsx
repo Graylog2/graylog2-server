@@ -17,6 +17,7 @@
 import React from 'react';
 
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
+import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 import { Link } from 'components/common';
 import Routes from 'routing/Routes';
 import ConnectedPipelineLinkedCell from 'components/streams/StreamDetails/StreamDataRoutingIntake/cells/ConnectedPipelineLinkedCell';
@@ -70,6 +71,7 @@ export const streamRulesColumnRenderers: ColumnRenderers<InputStreamRule> = {
     },
     rule: {
       renderCell: (_rule: string, streamRule: InputStreamRule) => <StreamRuleCell streamRule={streamRule} />,
+      staticWidth: COLUMN_WIDTH.description,
     },
   },
 };

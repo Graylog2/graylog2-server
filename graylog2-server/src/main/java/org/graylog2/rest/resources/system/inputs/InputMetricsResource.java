@@ -18,6 +18,7 @@ package org.graylog2.rest.resources.system.inputs;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.ws.rs.GET;
@@ -39,6 +40,7 @@ import java.util.Set;
 import static org.graylog2.metrics.entity.EntityMetricsModule.ENTITY_TYPE_INPUTS;
 
 @RequiresAuthentication
+@Tag(name = "System/Inputs/Metrics", description = "Input metrics")
 @Path("/system/inputs/metrics")
 @Produces(MediaType.APPLICATION_JSON)
 public class InputMetricsResource extends RestResource {

@@ -35,7 +35,7 @@ const tableLayout = {
   defaultColumnOrder: ['title'],
 };
 
-const renderTable = () =>
+const renderTable = (props: Partial<React.ComponentProps<typeof PaginatedEntityTable<TestEntity>>> = {}) =>
   render(
     <PaginatedEntityTable<TestEntity>
       humanName="things"
@@ -45,6 +45,7 @@ const renderTable = () =>
       columnRenderers={{}}
       entityAttributesAreCamelCase={false}
       withoutURLParams
+      {...props}
     />,
   );
 
@@ -94,5 +95,37 @@ describe('PaginatedEntityTable', () => {
     renderTable();
 
     await screen.findByText(/No things have been found/);
+  });
+
+  describe('pagination', () => {
+    beforeEach(() => {
+      asMock(useFetchEntities).mockReturnValue({
+        isInitialLoading: false,
+        refetch: jest.fn(),
+        data: {
+          list: [{ id: 'thing-1', title: 'Thing 1' }],
+          pagination: { total: 120 },
+          attributes: [],
+        },
+        isError: false,
+        error: undefined,
+      });
+    });
+
+    it('renders the regular pagination by default', async () => {
+      renderTable();
+
+      await screen.findByTestId('graylog-pagination');
+
+      expect(screen.queryByTestId('graylog-compact-pagination')).not.toBeInTheDocument();
+    });
+
+    it('renders the compact pagination in compact view', async () => {
+      renderTable({ compactView: true });
+
+      await screen.findByTestId('graylog-compact-pagination');
+
+      expect(screen.queryByTestId('graylog-pagination')).not.toBeInTheDocument();
+    });
   });
 });

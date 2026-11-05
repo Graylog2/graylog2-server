@@ -57,6 +57,14 @@ public class OpensearchKeystoreCli extends AbstractOpensearchCli {
         runWithStdin(List.of(), "add-file", key, file.toAbsolutePath().toString()); // -x allows input from stdin, bypassing the prompt
     }
 
+    /**
+     * Add a file secret to the store without writing its content to disk. The add-file command accepts only a path,
+     * so it reads the content from its own STDIN and the content is piped there.
+     */
+    public void addFile(String key, byte[] content) {
+        runWithStdin(content, "add-file", key, "/dev/stdin");
+    }
+
     public List<String> list() {
         final String rawResponse = runWithStdin(Collections.emptyList(), "list");
         final String[] items = rawResponse.split("\n");
