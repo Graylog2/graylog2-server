@@ -27,6 +27,12 @@ const ESClusterStatus = styled(Alert)`
   margin-bottom: 5px;
 `;
 
+const HEALTH_STATUS_KEYS: Record<string, string> = {
+  green: 'indexers.cluster_health.status_green',
+  yellow: 'indexers.cluster_health.status_yellow',
+  red: 'indexers.cluster_health.status_red',
+};
+
 const IndexerClusterHealthSummary = ({
   health,
   name = undefined,
@@ -65,7 +71,9 @@ const IndexerClusterHealthSummary = ({
     const text = t('indexers.cluster_health.status', {
       distribution: name?.distribution || 'Elasticsearch',
       name: name?.name || '',
-      status: formattedHealthStatus,
+      status: HEALTH_STATUS_KEYS[formattedHealthStatus]
+        ? t(HEALTH_STATUS_KEYS[formattedHealthStatus])
+        : formattedHealthStatus,
     });
 
     switch (formattedHealthStatus) {

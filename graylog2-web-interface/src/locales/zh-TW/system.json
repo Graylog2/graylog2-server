@@ -68,7 +68,25 @@
   "mongodb_profiling_action": {
     "description": "MongoDB 效能分析可協助找出慢速查詢，並排除叢集節點之間的效能問題。",
     "enabling_profiling": "正在啟用效能分析...",
-    "enable_confirm": "要在所有 MongoDB 節點上啟用 <b>Slow Ops</b> 效能分析（{{threshold}}）嗎？設定會立即生效且無需重新啟動，但除非在啟動時設定，否則重新啟動後會重設。"
+    "enable_confirm": "要在所有 MongoDB 節點上啟用 <b>Slow Ops</b> 效能分析（{{threshold}}）嗎？設定會立即生效且無需重新啟動，但除非在啟動時設定，否則重新啟動後會重設。",
+    "enable_profiling": "啟用效能分析",
+    "disable_profiling": "停用效能分析",
+    "enabling": "正在啟用...",
+    "disabling": "正在停用...",
+    "loading_status": "正在載入狀態...",
+    "loading_status_title": "正在載入 MongoDB 效能分析狀態",
+    "enable_title": "在所有 MongoDB 節點上將效能分析設定為 Slow Ops",
+    "disable_title": "在所有 MongoDB 節點上停用效能分析",
+    "status_loading": "正在載入各 MongoDB 節點目前的效能分析狀態...",
+    "status_off": "所有 MongoDB 節點的效能分析皆已關閉（{{summary}}）。啟用後可收集慢查詢診斷資訊。",
+    "status_mixed": "各 MongoDB 節點的效能分析設定不一致（{{summary}}）。啟用效能分析可讓診斷保持一致。",
+    "status_enabled": "所有 MongoDB 節點的效能分析皆已開啟（{{summary}}）。排查完成後請將其停用，以降低 MongoDB 負擔。",
+    "status_unavailable_with_summary": "效能分析狀態無法使用（{{summary}}）。如有需要，您仍然可以變更它。",
+    "status_unavailable": "效能分析狀態無法使用。如有需要，您仍然可以變更它。",
+    "threshold_level": "等級 1",
+    "threshold_level_with_ms": "等級 1，閾值 {{slowMs}} 毫秒",
+    "distribution": "OFF {{off}}，SLOW_OPS {{slowOps}}，ALL {{all}}",
+    "nodes_profiled_other": "已分析 {{enabledCount}}/{{count}} 個節點"
   },
   "opensearch_nodes_expandable": {
     "title": "OpenSearch 節點"
@@ -476,5 +494,19 @@
   "throughput_metrics_cell": {
     "in": "流入",
     "out": "流出"
+  },
+  "mongodb_nodes": {
+    "profiling_levels": {
+      "off": "關閉",
+      "slow_ops": "Slow Ops",
+      "all": "全部",
+      "unknown": "未知（{{level}}）"
+    },
+    "roles": {
+      "primary": "主要節點",
+      "secondary": "次要節點",
+      "arbiter": "仲裁節點",
+      "standalone": "獨立節點"
+    }
   }
 }

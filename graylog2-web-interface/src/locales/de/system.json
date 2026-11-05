@@ -68,7 +68,26 @@
   "mongodb_profiling_action": {
     "description": "Das MongoDB-Profiling hilft dabei, langsame Abfragen zu erkennen und Performance-Probleme über alle Cluster-Knoten hinweg zu beheben.",
     "enabling_profiling": "Profiling wird aktiviert...",
-    "enable_confirm": "Profiling für <b>Slow Ops</b> ({{threshold}}) auf allen MongoDB-Knoten aktivieren? Die Einstellung wird sofort ohne Neustart übernommen, wird nach einem Neustart aber zurückgesetzt, sofern sie nicht beim Start konfiguriert ist."
+    "enable_confirm": "Profiling für <b>Slow Ops</b> ({{threshold}}) auf allen MongoDB-Knoten aktivieren? Die Einstellung wird sofort ohne Neustart übernommen, wird nach einem Neustart aber zurückgesetzt, sofern sie nicht beim Start konfiguriert ist.",
+    "enable_profiling": "Profiling aktivieren",
+    "disable_profiling": "Profiling deaktivieren",
+    "enabling": "Wird aktiviert...",
+    "disabling": "Wird deaktiviert...",
+    "loading_status": "Status wird geladen...",
+    "loading_status_title": "MongoDB-Profiling-Status wird geladen",
+    "enable_title": "Profiling auf allen MongoDB-Knoten auf Slow Ops setzen",
+    "disable_title": "Profiling auf allen MongoDB-Knoten deaktivieren",
+    "status_loading": "Aktueller Profiling-Status der MongoDB-Knoten wird geladen...",
+    "status_off": "Profiling ist für alle MongoDB-Knoten ausgeschaltet ({{summary}}). Aktivieren Sie es, um Diagnosedaten zu langsamen Abfragen zu sammeln.",
+    "status_mixed": "Das Profiling unterscheidet sich zwischen den MongoDB-Knoten ({{summary}}). Aktivieren Sie das Profiling, um einheitliche Diagnosedaten zu erhalten.",
+    "status_enabled": "Profiling ist für alle MongoDB-Knoten eingeschaltet ({{summary}}). Deaktivieren Sie es nach der Fehlerbehebung, um die Last auf MongoDB zu verringern.",
+    "status_unavailable_with_summary": "Der Profiling-Status ist nicht verfügbar ({{summary}}). Sie können ihn bei Bedarf trotzdem ändern.",
+    "status_unavailable": "Der Profiling-Status ist nicht verfügbar. Sie können ihn bei Bedarf trotzdem ändern.",
+    "threshold_level": "Level 1",
+    "threshold_level_with_ms": "Level 1, Schwellenwert {{slowMs}} ms",
+    "distribution": "OFF {{off}}, SLOW_OPS {{slowOps}}, ALL {{all}}",
+    "nodes_profiled_one": "{{enabledCount}}/{{count}} Knoten mit Profiling",
+    "nodes_profiled_other": "{{enabledCount}}/{{count}} Knoten mit Profiling"
   },
   "opensearch_nodes_expandable": {
     "title": "OpenSearch Nodes"
@@ -481,5 +500,19 @@
   "throughput_metrics_cell": {
     "in": "Eingehend",
     "out": "Ausgehend"
+  },
+  "mongodb_nodes": {
+    "profiling_levels": {
+      "off": "Aus",
+      "slow_ops": "Slow Ops",
+      "all": "Alle",
+      "unknown": "Unbekannt ({{level}})"
+    },
+    "roles": {
+      "primary": "PRIMÄR",
+      "secondary": "SEKUNDÄR",
+      "arbiter": "ARBITER",
+      "standalone": "EIGENSTÄNDIG"
+    }
   }
 }

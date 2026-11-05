@@ -29,6 +29,9 @@
       "docs_elasticsearch": "Elasticsearch 设置文档",
       "error": "无法获取 {{distribution}} 集群健康状态。获取 {{distribution}} 集群健康状态失败：{{message}}",
       "status": "{{distribution}} 集群 {{name}} 状态为 {{status}}。",
+      "status_green": "绿色",
+      "status_yellow": "黄色",
+      "status_red": "红色",
       "shards": "分片：{{active}} 个活动，{{initializing}} 个初始化中，{{relocating}} 个迁移中，{{unassigned}} 个未分配，",
       "what_does_this_mean": "这是什么意思？"
     },

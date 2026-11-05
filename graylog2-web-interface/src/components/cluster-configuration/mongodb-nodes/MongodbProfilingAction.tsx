@@ -64,6 +64,7 @@ const MongodbProfilingAction = () => {
       slowMs,
       isStatusReady,
       isTogglingProfiling,
+      t,
     });
 
   const onConfirmProfilingAction = async () => {

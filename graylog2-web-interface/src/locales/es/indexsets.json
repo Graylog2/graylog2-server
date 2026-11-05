@@ -29,6 +29,9 @@
       "docs_elasticsearch": "Documentación de configuración de Elasticsearch",
       "error": "No se pudo obtener el estado del clúster de {{distribution}}. Error al obtener el estado del clúster de {{distribution}}: {{message}}",
       "status": "El clúster {{name}} de {{distribution}} está {{status}}.",
+      "status_green": "verde",
+      "status_yellow": "amarillo",
+      "status_red": "rojo",
       "shards": "Shards: {{active}} activos, {{initializing}} inicializando, {{relocating}} reubicando, {{unassigned}} sin asignar,",
       "what_does_this_mean": "¿Qué significa esto?"
     },

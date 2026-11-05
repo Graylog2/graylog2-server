@@ -68,7 +68,26 @@
   "mongodb_profiling_action": {
     "description": "MongoDB profiling helps identify slow queries and troubleshoot performance issues across cluster nodes.",
     "enabling_profiling": "Enabling profiling...",
-    "enable_confirm": "Enable <b>Slow Ops</b> profiling ({{threshold}}) on all MongoDB nodes? It applies immediately without restart, but resets after restart unless configured at startup."
+    "enable_confirm": "Enable <b>Slow Ops</b> profiling ({{threshold}}) on all MongoDB nodes? It applies immediately without restart, but resets after restart unless configured at startup.",
+    "enable_profiling": "Enable Profiling",
+    "disable_profiling": "Disable Profiling",
+    "enabling": "Enabling...",
+    "disabling": "Disabling...",
+    "loading_status": "Loading status...",
+    "loading_status_title": "Loading MongoDB profiling status",
+    "enable_title": "Set profiling to Slow Ops on all MongoDB nodes",
+    "disable_title": "Disable profiling on all MongoDB nodes",
+    "status_loading": "Loading current profiling status across MongoDB nodes...",
+    "status_off": "Profiling is off for all MongoDB nodes ({{summary}}). Enable it to collect slow-query diagnostics.",
+    "status_mixed": "Profiling differs across MongoDB nodes ({{summary}}). Enable profiling to make diagnostics consistent.",
+    "status_enabled": "Profiling is on for all MongoDB nodes ({{summary}}). Disable it after troubleshooting to reduce MongoDB overhead.",
+    "status_unavailable_with_summary": "Profiling state is unavailable ({{summary}}). You can still update it if needed.",
+    "status_unavailable": "Profiling state is unavailable. You can still update it if needed.",
+    "threshold_level": "level 1",
+    "threshold_level_with_ms": "level 1, {{slowMs}}ms threshold",
+    "distribution": "OFF {{off}}, SLOW_OPS {{slowOps}}, ALL {{all}}",
+    "nodes_profiled_one": "{{enabledCount}}/{{count}} node profiled",
+    "nodes_profiled_other": "{{enabledCount}}/{{count}} nodes profiled"
   },
   "opensearch_nodes_expandable": {
     "title": "OpenSearch Nodes"
@@ -481,5 +500,19 @@
   "throughput_metrics_cell": {
     "in": "In",
     "out": "Out"
+  },
+  "mongodb_nodes": {
+    "profiling_levels": {
+      "off": "Off",
+      "slow_ops": "Slow Ops",
+      "all": "All",
+      "unknown": "Unknown ({{level}})"
+    },
+    "roles": {
+      "primary": "PRIMARY",
+      "secondary": "SECONDARY",
+      "arbiter": "ARBITER",
+      "standalone": "STANDALONE"
+    }
   }
 }

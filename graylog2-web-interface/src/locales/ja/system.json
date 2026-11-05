@@ -68,7 +68,25 @@
   "mongodb_profiling_action": {
     "description": "MongoDBのプロファイリングは、クラスター内のノード全体で低速なクエリを特定し、パフォーマンスの問題を解決するのに役立ちます。",
     "enabling_profiling": "プロファイリングを有効にしています...",
-    "enable_confirm": "すべてのMongoDBノードで<b>Slow Ops</b>のプロファイリング（{{threshold}}）を有効にしますか？再起動なしで直ちに適用されますが、起動時に設定しない限り再起動後にリセットされます。"
+    "enable_confirm": "すべてのMongoDBノードで<b>Slow Ops</b>のプロファイリング（{{threshold}}）を有効にしますか？再起動なしで直ちに適用されますが、起動時に設定しない限り再起動後にリセットされます。",
+    "enable_profiling": "プロファイリングを有効化",
+    "disable_profiling": "プロファイリングを無効化",
+    "enabling": "有効にしています...",
+    "disabling": "無効にしています...",
+    "loading_status": "ステータスを読み込んでいます...",
+    "loading_status_title": "MongoDBのプロファイリングステータスを読み込んでいます",
+    "enable_title": "すべてのMongoDBノードでプロファイリングをSlow Opsに設定",
+    "disable_title": "すべてのMongoDBノードでプロファイリングを無効化",
+    "status_loading": "MongoDBノード全体の現在のプロファイリングステータスを読み込んでいます...",
+    "status_off": "すべてのMongoDBノードでプロファイリングはオフです（{{summary}}）。有効にすると低速クエリの診断情報を収集できます。",
+    "status_mixed": "MongoDBノード間でプロファイリングの設定が異なります（{{summary}}）。プロファイリングを有効にして診断を統一してください。",
+    "status_enabled": "すべてのMongoDBノードでプロファイリングはオンです（{{summary}}）。トラブルシューティング後は無効にしてMongoDBの負荷を軽減してください。",
+    "status_unavailable_with_summary": "プロファイリングのステータスを取得できません（{{summary}}）。必要に応じて変更することはできます。",
+    "status_unavailable": "プロファイリングのステータスを取得できません。必要に応じて変更することはできます。",
+    "threshold_level": "レベル1",
+    "threshold_level_with_ms": "レベル1、しきい値 {{slowMs}}ms",
+    "distribution": "OFF {{off}}、SLOW_OPS {{slowOps}}、ALL {{all}}",
+    "nodes_profiled_other": "{{enabledCount}}/{{count}} ノードでプロファイリング中"
   },
   "opensearch_nodes_expandable": {
     "title": "OpenSearchノード"
@@ -476,5 +494,19 @@
   "throughput_metrics_cell": {
     "in": "受信",
     "out": "送信"
+  },
+  "mongodb_nodes": {
+    "profiling_levels": {
+      "off": "オフ",
+      "slow_ops": "Slow Ops",
+      "all": "すべて",
+      "unknown": "不明（{{level}}）"
+    },
+    "roles": {
+      "primary": "プライマリ",
+      "secondary": "セカンダリ",
+      "arbiter": "アービター",
+      "standalone": "スタンドアロン"
+    }
   }
 }

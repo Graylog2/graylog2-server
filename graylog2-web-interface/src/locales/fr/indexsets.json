@@ -29,6 +29,9 @@
       "docs_elasticsearch": "Documentation de configuration d'Elasticsearch",
       "error": "Impossible de récupérer l'état du cluster {{distribution}}. La récupération de l'état du cluster {{distribution}} a échoué : {{message}}",
       "status": "Le cluster {{distribution}} {{name}} est {{status}}.",
+      "status_green": "vert",
+      "status_yellow": "jaune",
+      "status_red": "rouge",
       "shards": "Shards : {{active}} actifs, {{initializing}} en cours d'initialisation, {{relocating}} en cours de relocalisation, {{unassigned}} non assignés,",
       "what_does_this_mean": "Que signifie cela ?"
     },

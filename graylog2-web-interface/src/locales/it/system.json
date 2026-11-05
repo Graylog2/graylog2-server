@@ -68,7 +68,27 @@
   "mongodb_profiling_action": {
     "description": "La profilazione di MongoDB aiuta a individuare le query lente e a risolvere i problemi di prestazioni sui nodi del cluster.",
     "enabling_profiling": "Attivazione della profilazione...",
-    "enable_confirm": "Vuoi attivare la profilazione <b>Slow Ops</b> ({{threshold}}) su tutti i nodi MongoDB? Viene applicata subito senza riavvio, ma si reimposta dopo un riavvio se non è configurata all'avvio."
+    "enable_confirm": "Vuoi attivare la profilazione <b>Slow Ops</b> ({{threshold}}) su tutti i nodi MongoDB? Viene applicata subito senza riavvio, ma si reimposta dopo un riavvio se non è configurata all'avvio.",
+    "enable_profiling": "Attiva profiling",
+    "disable_profiling": "Disattiva profiling",
+    "enabling": "Attivazione...",
+    "disabling": "Disattivazione...",
+    "loading_status": "Caricamento stato...",
+    "loading_status_title": "Caricamento dello stato di profiling di MongoDB",
+    "enable_title": "Imposta il profiling su Slow Ops su tutti i nodi MongoDB",
+    "disable_title": "Disattiva il profiling su tutti i nodi MongoDB",
+    "status_loading": "Caricamento dello stato di profiling attuale dei nodi MongoDB...",
+    "status_off": "Il profiling è disattivato su tutti i nodi MongoDB ({{summary}}). Attivalo per raccogliere diagnostiche sulle query lente.",
+    "status_mixed": "Il profiling è diverso tra i nodi MongoDB ({{summary}}). Attiva il profiling per rendere coerenti le diagnostiche.",
+    "status_enabled": "Il profiling è attivo su tutti i nodi MongoDB ({{summary}}). Disattivalo dopo la risoluzione dei problemi per ridurre il carico su MongoDB.",
+    "status_unavailable_with_summary": "Lo stato del profiling non è disponibile ({{summary}}). Puoi comunque modificarlo se necessario.",
+    "status_unavailable": "Lo stato del profiling non è disponibile. Puoi comunque modificarlo se necessario.",
+    "threshold_level": "livello 1",
+    "threshold_level_with_ms": "livello 1, soglia di {{slowMs}} ms",
+    "distribution": "OFF {{off}}, SLOW_OPS {{slowOps}}, ALL {{all}}",
+    "nodes_profiled_one": "{{enabledCount}}/{{count}} nodo con profiling",
+    "nodes_profiled_many": "{{enabledCount}}/{{count}} nodi con profiling",
+    "nodes_profiled_other": "{{enabledCount}}/{{count}} nodi con profiling"
   },
   "opensearch_nodes_expandable": {
     "title": "Nodi OpenSearch"
@@ -486,5 +506,19 @@
   "throughput_metrics_cell": {
     "in": "In entrata",
     "out": "In uscita"
+  },
+  "mongodb_nodes": {
+    "profiling_levels": {
+      "off": "Disattivato",
+      "slow_ops": "Slow Ops",
+      "all": "Tutte",
+      "unknown": "Sconosciuto ({{level}})"
+    },
+    "roles": {
+      "primary": "PRIMARIO",
+      "secondary": "SECONDARIO",
+      "arbiter": "ARBITRO",
+      "standalone": "AUTONOMO"
+    }
   }
 }

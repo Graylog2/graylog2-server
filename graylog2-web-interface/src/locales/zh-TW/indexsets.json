@@ -29,6 +29,9 @@
       "docs_elasticsearch": "Elasticsearch 設定說明文件",
       "error": "無法取得 {{distribution}} 叢集健康狀態。擷取 {{distribution}} 叢集健康狀態失敗：{{message}}",
       "status": "{{distribution}} 叢集 {{name}} 狀態為 {{status}}。",
+      "status_green": "綠色",
+      "status_yellow": "黃色",
+      "status_red": "紅色",
       "shards": "分片：{{active}} 個運作中、{{initializing}} 個初始化中、{{relocating}} 個搬移中、{{unassigned}} 個未指派，",
       "what_does_this_mean": "這代表什麼？"
     },

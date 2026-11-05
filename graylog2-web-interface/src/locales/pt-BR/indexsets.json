@@ -29,6 +29,9 @@
       "docs_elasticsearch": "Documentação de configuração do Elasticsearch",
       "error": "Não foi possível obter a integridade do cluster {{distribution}}. A busca pela integridade do cluster {{distribution}} falhou: {{message}}",
       "status": "O cluster {{distribution}} {{name}} está {{status}}.",
+      "status_green": "verde",
+      "status_yellow": "amarelo",
+      "status_red": "vermelho",
       "shards": "Shards: {{active}} ativos, {{initializing}} inicializando, {{relocating}} realocando, {{unassigned}} não atribuídos,",
       "what_does_this_mean": "O que isso significa?"
     },

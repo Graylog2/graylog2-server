@@ -7,6 +7,7 @@ const TRANSLATED_FILES = [
   'src/components/bootstrap/BootstrapModalConfirm.tsx',
   'src/components/bootstrap/BootstrapModalForm.tsx',
   'src/components/bootstrap/menuitem/DeleteMenuItem.tsx',
+  'src/components/cluster-configuration/mongodb-nodes/**',
   'src/components/collectors/**',
   'src/components/common/BetaBadge.tsx',
   'src/components/common/ClipboardContainer.tsx',

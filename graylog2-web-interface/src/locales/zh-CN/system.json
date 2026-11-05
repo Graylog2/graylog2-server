@@ -68,7 +68,25 @@
   "mongodb_profiling_action": {
     "description": "MongoDB 性能分析有助于识别慢查询，并排查集群各节点的性能问题。",
     "enabling_profiling": "正在启用性能分析...",
-    "enable_confirm": "要在所有 MongoDB 节点上启用 <b>Slow Ops</b> 性能分析（{{threshold}}）吗？设置会立即生效且无需重启，但重启后会重置，除非在启动时进行配置。"
+    "enable_confirm": "要在所有 MongoDB 节点上启用 <b>Slow Ops</b> 性能分析（{{threshold}}）吗？设置会立即生效且无需重启，但重启后会重置，除非在启动时进行配置。",
+    "enable_profiling": "启用性能分析",
+    "disable_profiling": "禁用性能分析",
+    "enabling": "正在启用...",
+    "disabling": "正在禁用...",
+    "loading_status": "正在加载状态...",
+    "loading_status_title": "正在加载 MongoDB 性能分析状态",
+    "enable_title": "在所有 MongoDB 节点上将性能分析设置为 Slow Ops",
+    "disable_title": "在所有 MongoDB 节点上禁用性能分析",
+    "status_loading": "正在加载各 MongoDB 节点当前的性能分析状态...",
+    "status_off": "所有 MongoDB 节点的性能分析均已关闭（{{summary}}）。启用后可收集慢查询诊断信息。",
+    "status_mixed": "各 MongoDB 节点的性能分析设置不一致（{{summary}}）。启用性能分析可使诊断保持一致。",
+    "status_enabled": "所有 MongoDB 节点的性能分析均已开启（{{summary}}）。排查完成后请将其禁用，以降低 MongoDB 开销。",
+    "status_unavailable_with_summary": "性能分析状态不可用（{{summary}}）。如有需要，您仍然可以更改它。",
+    "status_unavailable": "性能分析状态不可用。如有需要，您仍然可以更改它。",
+    "threshold_level": "级别 1",
+    "threshold_level_with_ms": "级别 1，阈值 {{slowMs}} 毫秒",
+    "distribution": "OFF {{off}}，SLOW_OPS {{slowOps}}，ALL {{all}}",
+    "nodes_profiled_other": "已分析 {{enabledCount}}/{{count}} 个节点"
   },
   "opensearch_nodes_expandable": {
     "title": "OpenSearch 节点"
@@ -476,5 +494,19 @@
   "throughput_metrics_cell": {
     "in": "流入",
     "out": "流出"
+  },
+  "mongodb_nodes": {
+    "profiling_levels": {
+      "off": "关闭",
+      "slow_ops": "Slow Ops",
+      "all": "全部",
+      "unknown": "未知（{{level}}）"
+    },
+    "roles": {
+      "primary": "主节点",
+      "secondary": "从节点",
+      "arbiter": "仲裁节点",
+      "standalone": "独立节点"
+    }
   }
 }

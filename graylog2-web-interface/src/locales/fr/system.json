@@ -68,7 +68,27 @@
   "mongodb_profiling_action": {
     "description": "Le profilage MongoDB permet d'identifier les requêtes lentes et de résoudre les problèmes de performance sur l'ensemble des nœuds du cluster.",
     "enabling_profiling": "Activation du profilage...",
-    "enable_confirm": "Activer le profilage <b>Slow Ops</b> ({{threshold}}) sur tous les nœuds MongoDB ? Il s'applique immédiatement sans redémarrage, mais est réinitialisé après un redémarrage, sauf s'il est configuré au démarrage."
+    "enable_confirm": "Activer le profilage <b>Slow Ops</b> ({{threshold}}) sur tous les nœuds MongoDB ? Il s'applique immédiatement sans redémarrage, mais est réinitialisé après un redémarrage, sauf s'il est configuré au démarrage.",
+    "enable_profiling": "Activer le profilage",
+    "disable_profiling": "Désactiver le profilage",
+    "enabling": "Activation...",
+    "disabling": "Désactivation...",
+    "loading_status": "Chargement du statut...",
+    "loading_status_title": "Chargement du statut de profilage MongoDB",
+    "enable_title": "Régler le profilage sur Slow Ops sur tous les nœuds MongoDB",
+    "disable_title": "Désactiver le profilage sur tous les nœuds MongoDB",
+    "status_loading": "Chargement du statut de profilage actuel des nœuds MongoDB...",
+    "status_off": "Le profilage est désactivé sur tous les nœuds MongoDB ({{summary}}). Activez-le pour collecter des diagnostics sur les requêtes lentes.",
+    "status_mixed": "Le profilage diffère selon les nœuds MongoDB ({{summary}}). Activez le profilage pour obtenir des diagnostics cohérents.",
+    "status_enabled": "Le profilage est activé sur tous les nœuds MongoDB ({{summary}}). Désactivez-le après le dépannage pour réduire la charge de MongoDB.",
+    "status_unavailable_with_summary": "Le statut de profilage n'est pas disponible ({{summary}}). Vous pouvez tout de même le modifier si nécessaire.",
+    "status_unavailable": "Le statut de profilage n'est pas disponible. Vous pouvez tout de même le modifier si nécessaire.",
+    "threshold_level": "niveau 1",
+    "threshold_level_with_ms": "niveau 1, seuil de {{slowMs}} ms",
+    "distribution": "OFF {{off}}, SLOW_OPS {{slowOps}}, ALL {{all}}",
+    "nodes_profiled_one": "{{enabledCount}}/{{count}} nœud profilé",
+    "nodes_profiled_many": "{{enabledCount}}/{{count}} nœuds profilés",
+    "nodes_profiled_other": "{{enabledCount}}/{{count}} nœuds profilés"
   },
   "opensearch_nodes_expandable": {
     "title": "Nœuds OpenSearch"
@@ -486,5 +506,19 @@
   "throughput_metrics_cell": {
     "in": "Entrant",
     "out": "Sortant"
+  },
+  "mongodb_nodes": {
+    "profiling_levels": {
+      "off": "Désactivé",
+      "slow_ops": "Slow Ops",
+      "all": "Toutes",
+      "unknown": "Inconnu ({{level}})"
+    },
+    "roles": {
+      "primary": "PRIMAIRE",
+      "secondary": "SECONDAIRE",
+      "arbiter": "ARBITRE",
+      "standalone": "AUTONOME"
+    }
   }
 }

@@ -29,6 +29,9 @@
       "docs_elasticsearch": "Elasticsearch セットアップのドキュメント",
       "error": "{{distribution}} クラスターの状態を取得できませんでした。{{distribution}} クラスターの状態の取得に失敗しました: {{message}}",
       "status": "{{distribution}} クラスター {{name}} は {{status}} です。",
+      "status_green": "グリーン",
+      "status_yellow": "イエロー",
+      "status_red": "レッド",
       "shards": "シャード: アクティブ {{active}}、初期化中 {{initializing}}、再配置中 {{relocating}}、未割り当て {{unassigned}}、",
       "what_does_this_mean": "これはどういう意味ですか？"
     },

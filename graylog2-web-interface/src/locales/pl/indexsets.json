@@ -29,6 +29,9 @@
       "docs_elasticsearch": "Dokumentacja konfiguracji Elasticsearch",
       "error": "Nie udało się pobrać stanu klastra {{distribution}}. Pobieranie stanu klastra {{distribution}} nie powiodło się: {{message}}",
       "status": "Klaster {{distribution}} {{name}} ma status: {{status}}.",
+      "status_green": "zielony",
+      "status_yellow": "żółty",
+      "status_red": "czerwony",
       "shards": "Shardy: {{active}} aktywnych, {{initializing}} inicjalizowanych, {{relocating}} przenoszonych, {{unassigned}} nieprzypisanych,",
       "what_does_this_mean": "Co to oznacza?"
     },

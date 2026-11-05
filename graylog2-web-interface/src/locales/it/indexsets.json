@@ -29,6 +29,9 @@
       "docs_elasticsearch": "Documentazione di configurazione di Elasticsearch",
       "error": "Impossibile recuperare lo stato del cluster {{distribution}}. Il recupero dello stato del cluster {{distribution}} non è riuscito: {{message}}",
       "status": "Il cluster {{distribution}} {{name}} è {{status}}.",
+      "status_green": "verde",
+      "status_yellow": "giallo",
+      "status_red": "rosso",
       "shards": "Shard: {{active}} attivi, {{initializing}} in inizializzazione, {{relocating}} in spostamento, {{unassigned}} non assegnati,",
       "what_does_this_mean": "Cosa significa?"
     },

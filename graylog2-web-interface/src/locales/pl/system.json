@@ -68,7 +68,28 @@
   "mongodb_profiling_action": {
     "description": "Profilowanie MongoDB pomaga wykrywać wolne zapytania i diagnozować problemy z wydajnością na węzłach klastra.",
     "enabling_profiling": "Włączanie profilowania...",
-    "enable_confirm": "Włączyć profilowanie <b>Slow Ops</b> ({{threshold}}) na wszystkich węzłach MongoDB? Zmiana zostanie zastosowana natychmiast, bez restartu, ale zostanie zresetowana po restarcie, chyba że zostanie skonfigurowana podczas uruchamiania."
+    "enable_confirm": "Włączyć profilowanie <b>Slow Ops</b> ({{threshold}}) na wszystkich węzłach MongoDB? Zmiana zostanie zastosowana natychmiast, bez restartu, ale zostanie zresetowana po restarcie, chyba że zostanie skonfigurowana podczas uruchamiania.",
+    "enable_profiling": "Włącz profilowanie",
+    "disable_profiling": "Wyłącz profilowanie",
+    "enabling": "Włączanie...",
+    "disabling": "Wyłączanie...",
+    "loading_status": "Ładowanie statusu...",
+    "loading_status_title": "Ładowanie statusu profilowania MongoDB",
+    "enable_title": "Ustaw profilowanie na Slow Ops na wszystkich węzłach MongoDB",
+    "disable_title": "Wyłącz profilowanie na wszystkich węzłach MongoDB",
+    "status_loading": "Ładowanie bieżącego statusu profilowania węzłów MongoDB...",
+    "status_off": "Profilowanie jest wyłączone na wszystkich węzłach MongoDB ({{summary}}). Włącz je, aby zbierać diagnostykę wolnych zapytań.",
+    "status_mixed": "Profilowanie różni się między węzłami MongoDB ({{summary}}). Włącz profilowanie, aby diagnostyka była spójna.",
+    "status_enabled": "Profilowanie jest włączone na wszystkich węzłach MongoDB ({{summary}}). Wyłącz je po zakończeniu diagnozy, aby zmniejszyć obciążenie MongoDB.",
+    "status_unavailable_with_summary": "Status profilowania jest niedostępny ({{summary}}). W razie potrzeby nadal możesz go zmienić.",
+    "status_unavailable": "Status profilowania jest niedostępny. W razie potrzeby nadal możesz go zmienić.",
+    "threshold_level": "poziom 1",
+    "threshold_level_with_ms": "poziom 1, próg {{slowMs}} ms",
+    "distribution": "OFF {{off}}, SLOW_OPS {{slowOps}}, ALL {{all}}",
+    "nodes_profiled_one": "{{enabledCount}}/{{count}} węzeł profilowany",
+    "nodes_profiled_few": "{{enabledCount}}/{{count}} węzły profilowane",
+    "nodes_profiled_many": "{{enabledCount}}/{{count}} węzłów profilowanych",
+    "nodes_profiled_other": "{{enabledCount}}/{{count}} węzła profilowanego"
   },
   "opensearch_nodes_expandable": {
     "title": "Węzły OpenSearch"
@@ -491,5 +512,19 @@
   "throughput_metrics_cell": {
     "in": "Przychodzące",
     "out": "Wychodzące"
+  },
+  "mongodb_nodes": {
+    "profiling_levels": {
+      "off": "Wyłączone",
+      "slow_ops": "Slow Ops",
+      "all": "Wszystkie",
+      "unknown": "Nieznany ({{level}})"
+    },
+    "roles": {
+      "primary": "PODSTAWOWY",
+      "secondary": "POMOCNICZY",
+      "arbiter": "ARBITER",
+      "standalone": "SAMODZIELNY"
+    }
   }
 }
