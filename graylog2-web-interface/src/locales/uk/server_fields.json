@@ -248,7 +248,7 @@
   "Threshold Type": "Тип порога",
   "Time Range": "Часовий діапазон",
   "Time Zone": "Часовий пояс",
-  "Time between every collector run. Select a time unit in the corresponding dropdown. Example: Run every 5 minutes.": "Час між кожним запуском колектора. Виберіть одиницю часу у відповідному випадному списку. Приклад: запускати кожні 5 хвилин.",
+  "Time between every collector run. Select a time unit in the corresponding dropdown. Example: Run every 5 minutes.": "Час між кожним запуском Collector. Виберіть одиницю часу у відповідному випадному списку. Приклад: запускати кожні 5 хвилин.",
   "Time to wait between reconnects in milliseconds": "Час очікування між повторними підключеннями в мілісекундах",
   "Time zone of the Palo Alto device": "Часовий пояс пристрою Palo Alto",
   "Timezone": "Часовий пояс",

@@ -6,26 +6,26 @@
       "description": "Виконайте команду на будь-якій кількості хостів — вони зареєструються у вибраному Fleet і з’являться після першого підключення.",
       "deploy_tab": "Розгортання",
       "tokens_tab": "Токени реєстрації",
-      "tokens_description": "Токени дозволяють новим колекторам реєструватися у Fleet. Видалення токена не впливає на вже зареєстровані колектори."
+      "tokens_description": "Токени дозволяють новим Collectors реєструватися у Fleet. Видалення токена не впливає на вже зареєстровані Collectors."
     },
     "fleets": {
-      "document_title": "Fleets колекторів",
+      "document_title": "Fleets Collectors",
       "title": "Fleets",
-      "description": "Fleet — це група колекторів зі спільною конфігурацією. Усі колектори у Fleet збирають дані з одних і тих самих джерел. Використовуйте Fleets, щоб упорядкувати колектори за середовищем, командою або призначенням."
+      "description": "Fleet — це група Collectors зі спільною конфігурацією. Усі Collectors у Fleet збирають дані з одних і тих самих джерел. Використовуйте Fleets, щоб упорядкувати Collectors за середовищем, командою або призначенням."
     },
     "fleet_detail": {
       "title": "Відомості про Fleet"
     },
     "instances": {
-      "document_title": "Екземпляри колекторів",
+      "document_title": "Екземпляри Collectors",
       "title": "Екземпляри",
-      "description": "Екземпляр колектора — це запущений процес колектора на віддаленому хості. Екземпляри реєструються у Fleet за допомогою токена реєстрації та автоматично отримують конфігурацію джерел свого Fleet."
+      "description": "Екземпляр Collector — це запущений процес Collector на віддаленому хості. Екземпляри реєструються у Fleet за допомогою токена реєстрації та автоматично отримують конфігурацію джерел свого Fleet."
     },
     "onboarding": {
-      "title": "Підключення колектора",
-      "description": "Стан вашого нещодавно підключеного колектора.",
-      "load_error": "Не вдалося завантажити екземпляр колектора: {{error}}",
-      "not_found": "Екземпляр колектора не знайдено. Можливо, його було видалено — перегляньте всі <instancesLink>екземпляри</instancesLink>."
+      "title": "Підключення Collector",
+      "description": "Стан вашого нещодавно підключеного Collector.",
+      "load_error": "Не вдалося завантажити екземпляр Collector: {{error}}",
+      "not_found": "Екземпляр Collector не знайдено. Можливо, його було видалено — перегляньте всі <instancesLink>екземпляри</instancesLink>."
     },
     "overview": {
       "title": "Огляд Collectors",
@@ -33,7 +33,7 @@
     },
     "settings": {
       "title": "Налаштування Collectors",
-      "description": "Налаштуйте кінцеві точки та параметри життєвого циклу керованих колекторів. Колектори підключаються до цих кінцевих точок, щоб отримувати оновлення конфігурації та надсилати зібрані дані журналів."
+      "description": "Налаштуйте кінцеві точки та параметри життєвого циклу керованих Collectors. Collectors підключаються до цих кінцевих точок, щоб отримувати оновлення конфігурації та надсилати зібрані дані журналів."
     }
   },
   "navigation": {
@@ -51,74 +51,74 @@
       "fleet": "Конфігурацію оновлено для Fleet <targetLink />",
       "fleet_with_others_one": "Конфігурацію оновлено для Fleet <targetLink /> та ще {{count}} Fleet",
       "fleet_with_others_other": "Конфігурацію оновлено для Fleet <targetLink /> та ще {{count}} Fleets",
-      "collector": "Конфігурацію оновлено для колектора <targetLink />",
-      "collector_with_others_one": "Конфігурацію оновлено для колектора <targetLink /> та ще {{count}} колектора",
-      "collector_with_others_other": "Конфігурацію оновлено для колектора <targetLink /> та ще {{count}} колектора",
+      "collector": "Конфігурацію оновлено для Collector <targetLink />",
+      "collector_with_others_one": "Конфігурацію оновлено для Collector <targetLink /> та ще {{count}} Collector",
+      "collector_with_others_other": "Конфігурацію оновлено для Collector <targetLink /> та ще {{count}} Collector",
       "fleet_with_others_few": "Конфігурацію оновлено для Fleet <targetLink /> та ще {{count}} Fleets",
       "fleet_with_others_many": "Конфігурацію оновлено для Fleet <targetLink /> та ще {{count}} Fleets",
-      "collector_with_others_few": "Конфігурацію оновлено для колектора <targetLink /> та ще {{count}} колекторів",
-      "collector_with_others_many": "Конфігурацію оновлено для колектора <targetLink /> та ще {{count}} колекторів"
+      "collector_with_others_few": "Конфігурацію оновлено для Collector <targetLink /> та ще {{count}} Collectors",
+      "collector_with_others_many": "Конфігурацію оновлено для Collector <targetLink /> та ще {{count}} Collectors"
     },
     "ingest_config_changed": {
       "fleet": "Конфігурацію прийому оновлено для Fleet <targetLink />",
       "fleet_with_others_one": "Конфігурацію прийому оновлено для Fleet <targetLink /> та ще {{count}} Fleet",
       "fleet_with_others_other": "Конфігурацію прийому оновлено для Fleet <targetLink /> та ще {{count}} Fleets",
-      "collector": "Конфігурацію прийому оновлено для колектора <targetLink />",
-      "collector_with_others_one": "Конфігурацію прийому оновлено для колектора <targetLink /> та ще {{count}} колектора",
-      "collector_with_others_other": "Конфігурацію прийому оновлено для колектора <targetLink /> та ще {{count}} колектора",
+      "collector": "Конфігурацію прийому оновлено для Collector <targetLink />",
+      "collector_with_others_one": "Конфігурацію прийому оновлено для Collector <targetLink /> та ще {{count}} Collector",
+      "collector_with_others_other": "Конфігурацію прийому оновлено для Collector <targetLink /> та ще {{count}} Collector",
       "fleet_with_others_few": "Конфігурацію прийому оновлено для Fleet <targetLink /> та ще {{count}} Fleets",
       "fleet_with_others_many": "Конфігурацію прийому оновлено для Fleet <targetLink /> та ще {{count}} Fleets",
-      "collector_with_others_few": "Конфігурацію прийому оновлено для колектора <targetLink /> та ще {{count}} колекторів",
-      "collector_with_others_many": "Конфігурацію прийому оновлено для колектора <targetLink /> та ще {{count}} колекторів"
+      "collector_with_others_few": "Конфігурацію прийому оновлено для Collector <targetLink /> та ще {{count}} Collectors",
+      "collector_with_others_many": "Конфігурацію прийому оновлено для Collector <targetLink /> та ще {{count}} Collectors"
     },
     "restart": {
       "fleet": "Запит на перезапуск для Fleet <targetLink />",
       "fleet_with_others_one": "Запит на перезапуск для Fleet <targetLink /> та ще {{count}} Fleet",
       "fleet_with_others_other": "Запит на перезапуск для Fleet <targetLink /> та ще {{count}} Fleets",
-      "collector": "Запит на перезапуск для колектора <targetLink />",
-      "collector_with_others_one": "Запит на перезапуск для колектора <targetLink /> та ще {{count}} колектора",
-      "collector_with_others_other": "Запит на перезапуск для колектора <targetLink /> та ще {{count}} колектора",
+      "collector": "Запит на перезапуск для Collector <targetLink />",
+      "collector_with_others_one": "Запит на перезапуск для Collector <targetLink /> та ще {{count}} Collector",
+      "collector_with_others_other": "Запит на перезапуск для Collector <targetLink /> та ще {{count}} Collector",
       "fleet_with_others_few": "Запит на перезапуск для Fleet <targetLink /> та ще {{count}} Fleets",
       "fleet_with_others_many": "Запит на перезапуск для Fleet <targetLink /> та ще {{count}} Fleets",
-      "collector_with_others_few": "Запит на перезапуск для колектора <targetLink /> та ще {{count}} колекторів",
-      "collector_with_others_many": "Запит на перезапуск для колектора <targetLink /> та ще {{count}} колекторів"
+      "collector_with_others_few": "Запит на перезапуск для Collector <targetLink /> та ще {{count}} Collectors",
+      "collector_with_others_many": "Запит на перезапуск для Collector <targetLink /> та ще {{count}} Collectors"
     },
     "discovery_run": {
       "fleet": "Запущено виявлення для Fleet <targetLink />",
       "fleet_with_others_one": "Запущено виявлення для Fleet <targetLink /> та ще {{count}} Fleet",
       "fleet_with_others_other": "Запущено виявлення для Fleet <targetLink /> та ще {{count}} Fleets",
-      "collector": "Запущено виявлення для колектора <targetLink />",
-      "collector_with_others_one": "Запущено виявлення для колектора <targetLink /> та ще {{count}} колектора",
-      "collector_with_others_other": "Запущено виявлення для колектора <targetLink /> та ще {{count}} колектора",
+      "collector": "Запущено виявлення для Collector <targetLink />",
+      "collector_with_others_one": "Запущено виявлення для Collector <targetLink /> та ще {{count}} Collector",
+      "collector_with_others_other": "Запущено виявлення для Collector <targetLink /> та ще {{count}} Collector",
       "fleet_with_others_few": "Запущено виявлення для Fleet <targetLink /> та ще {{count}} Fleets",
       "fleet_with_others_many": "Запущено виявлення для Fleet <targetLink /> та ще {{count}} Fleets",
-      "collector_with_others_few": "Запущено виявлення для колектора <targetLink /> та ще {{count}} колекторів",
-      "collector_with_others_many": "Запущено виявлення для колектора <targetLink /> та ще {{count}} колекторів"
+      "collector_with_others_few": "Запущено виявлення для Collector <targetLink /> та ще {{count}} Collectors",
+      "collector_with_others_many": "Запущено виявлення для Collector <targetLink /> та ще {{count}} Collectors"
     },
     "reassigned": {
-      "collector": "Колектор <targetLink /> перепризначено",
-      "collector_with_others_one": "Колектор <targetLink /> та ще {{count}} колектор перепризначено",
-      "collector_with_others_other": "Колектор <targetLink /> та ще {{count}} колектора перепризначено",
-      "collector_with_others_few": "Колектор <targetLink /> та ще {{count}} колектори перепризначено",
-      "collector_with_others_many": "Колектор <targetLink /> та ще {{count}} колекторів перепризначено"
+      "collector": "Collector <targetLink /> перепризначено",
+      "collector_with_others_one": "Collector <targetLink /> та ще {{count}} Collector перепризначено",
+      "collector_with_others_other": "Collector <targetLink /> та ще {{count}} Collector перепризначено",
+      "collector_with_others_few": "Collector <targetLink /> та ще {{count}} Collectors перепризначено",
+      "collector_with_others_many": "Collector <targetLink /> та ще {{count}} Collectors перепризначено"
     },
     "reassigned_to_fleet": {
-      "collector": "Колектор <targetLink /> перепризначено до Fleet <destinationLink />",
-      "collector_with_others_one": "Колектор <targetLink /> та ще {{count}} колектор перепризначено до Fleet <destinationLink />",
-      "collector_with_others_other": "Колектор <targetLink /> та ще {{count}} колектора перепризначено до Fleet <destinationLink />",
-      "collector_with_others_few": "Колектор <targetLink /> та ще {{count}} колектори перепризначено до Fleet <destinationLink />",
-      "collector_with_others_many": "Колектор <targetLink /> та ще {{count}} колекторів перепризначено до Fleet <destinationLink />"
+      "collector": "Collector <targetLink /> перепризначено до Fleet <destinationLink />",
+      "collector_with_others_one": "Collector <targetLink /> та ще {{count}} Collector перепризначено до Fleet <destinationLink />",
+      "collector_with_others_other": "Collector <targetLink /> та ще {{count}} Collector перепризначено до Fleet <destinationLink />",
+      "collector_with_others_few": "Collector <targetLink /> та ще {{count}} Collectors перепризначено до Fleet <destinationLink />",
+      "collector_with_others_many": "Collector <targetLink /> та ще {{count}} Collectors перепризначено до Fleet <destinationLink />"
     }
   },
   "fleet_reference": {
-    "moving_title": "Колектор перейде до цього Fleet під час наступного підключення.",
+    "moving_title": "Collector перейде до цього Fleet під час наступного підключення.",
     "moving_from": "(переходить із {{fleet}})",
     "moving_from_removed": "(переходить із видаленого Fleet)",
     "removed_title": "Цей Fleet було видалено.",
     "removed": "Fleet видалено ({{fleetId}})"
   },
   "sync_state": {
-    "pending_title": "Очікується синхронізація — зміни буде застосовано під час наступного підключення колектора",
+    "pending_title": "Очікується синхронізація — зміни буде застосовано під час наступного підключення Collector",
     "pending": "Очікується синхронізація",
     "in_sync_title": "Синхронізовано — усі зміни застосовано",
     "in_sync": "Синхронізовано"
@@ -132,15 +132,15 @@
   },
   "enrollment_tokens": {
     "bulk_delete_title": "Видалити токени реєстрації",
-    "bulk_delete_confirm_one": "Ви впевнені, що хочете видалити {{count}} токен реєстрації? Нові колектори не зможуть зареєструватися за допомогою видаленого токена.",
-    "bulk_delete_confirm_other": "Ви впевнені, що хочете видалити {{count}} токена реєстрації? Нові колектори не зможуть зареєструватися за допомогою видалених токенів.",
+    "bulk_delete_confirm_one": "Ви впевнені, що хочете видалити {{count}} токен реєстрації? Нові Collectors не зможуть зареєструватися за допомогою видаленого токена.",
+    "bulk_delete_confirm_other": "Ви впевнені, що хочете видалити {{count}} токена реєстрації? Нові Collectors не зможуть зареєструватися за допомогою видалених токенів.",
     "never": "Ніколи",
     "expired": "Термін дії завершився",
     "human_name": "токени реєстрації",
     "delete_title": "Видалити токен реєстрації",
-    "delete_confirm": "Ви впевнені, що хочете видалити цей токен реєстрації? Нові колектори не зможуть зареєструватися за допомогою цього токена. Уже зареєстровані колектори продовжать працювати як зазвичай.",
-    "bulk_delete_confirm_few": "Ви впевнені, що хочете видалити {{count}} токени реєстрації? Нові колектори не зможуть зареєструватися за допомогою видалених токенів.",
-    "bulk_delete_confirm_many": "Ви впевнені, що хочете видалити {{count}} токенів реєстрації? Нові колектори не зможуть зареєструватися за допомогою видалених токенів."
+    "delete_confirm": "Ви впевнені, що хочете видалити цей токен реєстрації? Нові Collectors не зможуть зареєструватися за допомогою цього токена. Уже зареєстровані Collectors продовжать працювати як зазвичай.",
+    "bulk_delete_confirm_few": "Ви впевнені, що хочете видалити {{count}} токени реєстрації? Нові Collectors не зможуть зареєструватися за допомогою видалених токенів.",
+    "bulk_delete_confirm_many": "Ви впевнені, що хочете видалити {{count}} токенів реєстрації? Нові Collectors не зможуть зареєструватися за допомогою видалених токенів."
   },
   "deployment": {
     "select_fleet_step": "Вибрати Fleet",
@@ -234,50 +234,50 @@
     "not_found": "Fleet не знайдено",
     "deploy_collector": "Розгорнути новий Collector",
     "stat_instances": "Екземпляри",
-    "stat_instances_help": "Процеси колекторів, зареєстровані в цьому Fleet.",
+    "stat_instances_help": "Процеси Collectors, зареєстровані в цьому Fleet.",
     "stat_online": "В мережі",
     "stat_online_help": "Екземпляри, які надіслали сигнал активності в межах порогу відсутності.",
     "stat_offline": "Не в мережі",
-    "stat_offline_help": "Екземпляри, які пропустили сигнал активності. Перевірте з’єднання хоста або стан процесу колектора.",
+    "stat_offline_help": "Екземпляри, які пропустили сигнал активності. Перевірте з’єднання хоста або стан процесу Collector.",
     "stat_sources": "Джерела",
     "stat_sources_help": "Конфігурації збору даних, призначені цьому Fleet.",
-    "sources_description": "Джерела автоматично передаються всім колекторам цього Fleet. Зміни набувають чинності протягом кількох секунд.",
+    "sources_description": "Джерела автоматично передаються всім Collectors цього Fleet. Зміни набувають чинності протягом кількох секунд.",
     "add_source": "Додати джерело",
     "sources_human_name": "джерела",
-    "instances_description": "Екземпляри колекторів, зареєстровані в цьому Fleet. Кожен екземпляр запускає всі ввімкнені джерела. Щоб додати більше екземплярів, <deployLink>розгорніть колектори</deployLink> за допомогою токена реєстрації для цього Fleet.",
+    "instances_description": "Екземпляри Collectors, зареєстровані в цьому Fleet. Кожен екземпляр запускає всі ввімкнені джерела. Щоб додати більше екземплярів, <deployLink>розгорніть Collectors</deployLink> за допомогою токена реєстрації для цього Fleet.",
     "instances_human_name": "екземпляри",
     "delete_source_title": "Видалити джерело",
-    "delete_source_confirm": "Ви впевнені, що хочете видалити джерело <emphasis>{{sourceName}}</emphasis>? Колектори цього Fleet припинять збір даних із цього джерела протягом кількох секунд."
+    "delete_source_confirm": "Ви впевнені, що хочете видалити джерело <emphasis>{{sourceName}}</emphasis>? Collectors цього Fleet припинять збір даних із цього джерела протягом кількох секунд."
   },
   "instance_actions": {
     "reassign": "Перепризначити до Fleet",
     "view_system_logs": "Переглянути системні журнали",
     "details": "Докладніше",
     "delete_title": "Видалити екземпляр Collector",
-    "delete_confirm": "Ви впевнені, що хочете видалити екземпляр <emphasis>{{instanceName}}</emphasis>?<lineBreak />Щоб колектор знову з’явився, його потрібно буде зареєструвати повторно."
+    "delete_confirm": "Ви впевнені, що хочете видалити екземпляр <emphasis>{{instanceName}}</emphasis>?<lineBreak />Щоб Collector знову з’явився, його потрібно буде зареєструвати повторно."
   },
   "reassign_fleet": {
     "fleet_required": "Потрібно вказати Fleet",
     "title_one": "Перепризначити {{count}} екземпляр до Fleet",
     "title_other": "Перепризначити {{count}} екземпляра до Fleet",
-    "no_other_fleet_one": "Немає іншого Fleet, до якого можна призначити цей колектор.",
-    "no_other_fleet_other": "Немає іншого Fleet, до якого можна призначити ці колектори.",
-    "no_permission": "У вас немає дозволу призначати колектори до іншого Fleet.",
+    "no_other_fleet_one": "Немає іншого Fleet, до якого можна призначити цей Collector.",
+    "no_other_fleet_other": "Немає іншого Fleet, до якого можна призначити ці Collectors.",
+    "no_permission": "У вас немає дозволу призначати Collectors до іншого Fleet.",
     "select_placeholder": "Виберіть Fleet...",
     "submit_one": "Перепризначити екземпляр",
     "submit_other": "Перепризначити екземпляри",
     "submitting": "Перепризначення...",
     "title_few": "Перепризначити {{count}} екземпляри до Fleet",
     "title_many": "Перепризначити {{count}} екземплярів до Fleet",
-    "no_other_fleet_few": "Немає іншого Fleet, до якого можна призначити ці колектори.",
-    "no_other_fleet_many": "Немає іншого Fleet, до якого можна призначити ці колектори.",
+    "no_other_fleet_few": "Немає іншого Fleet, до якого можна призначити ці Collectors.",
+    "no_other_fleet_many": "Немає іншого Fleet, до якого можна призначити ці Collectors.",
     "submit_few": "Перепризначити екземпляри",
     "submit_many": "Перепризначити екземпляри"
   },
   "instance_health": {
     "title": "Стан працездатності",
     "unknown": "Невідомо",
-    "no_report": "Цей колектор не надсилав інформації про стан працездатності.",
+    "no_report": "Цей Collector не надсилав інформації про стан працездатності.",
     "healthy": "Справний",
     "unhealthy": "Несправний",
     "last_known": "Останній відомий стан: {{state}}",
@@ -305,21 +305,21 @@
     "no_sources": "Для цього Fleet не налаштовано джерел. Додайте джерела на сторінці відомостей про Fleet, щоб почати збір даних.",
     "synchronization": "Синхронізація",
     "pending_load_error": "Не вдалося завантажити очікувані зміни. Спробуйте пізніше.",
-    "queued_actions": "Наступні дії очікують у черзі до синхронізації колектора:",
+    "queued_actions": "Наступні дії очікують у черзі до синхронізації Collector:",
     "hide_transactions": "Приховати транзакції в черзі",
     "show_transactions_one": "Показати транзакції в черзі ({{count}})",
     "show_transactions_other": "Показати транзакції в черзі ({{count}})",
-    "changes_queued": "Зміни поставлено в чергу, їх буде застосовано під час наступного підключення колектора.",
-    "all_applied": "Колектор застосував усі дії з черги.",
+    "changes_queued": "Зміни поставлено в чергу, їх буде застосовано під час наступного підключення Collector.",
+    "all_applied": "Collector застосував усі дії з черги.",
     "active_sources_few": "Активні джерела ({{count}})",
     "active_sources_many": "Активні джерела ({{count}})",
     "show_transactions_few": "Показати транзакції в черзі ({{count}})",
     "show_transactions_many": "Показати транзакції в черзі ({{count}})"
   },
   "overview": {
-    "stat_instances_help": "Запущені процеси колекторів у всіх Fleets.",
+    "stat_instances_help": "Запущені процеси Collectors у всіх Fleets.",
     "stat_fleets": "Fleets",
-    "stat_fleets_help": "Логічні групи колекторів зі спільною конфігурацією джерел.",
+    "stat_fleets_help": "Логічні групи Collectors зі спільною конфігурацією джерел.",
     "stat_sources_help": "Конфігурації збору даних (шляхи до файлів, journald, журнали подій Windows) у всіх Fleets.",
     "fleet_stats_error": "Не вдалося завантажити статистику Fleet.",
     "stats_error": "Не вдалося завантажити статистику Collector.",
@@ -327,7 +327,7 @@
     "filter_placeholder": "Фільтрувати Fleets...",
     "config_error": "Не вдалося завантажити конфігурацію Collectors.",
     "endpoint_missing_title": "Кінцеву точку прийому Collector не налаштовано",
-    "endpoint_missing": "Колектори реєструються через кінцеву точку прийому, яку ще не налаштовано. Для її налаштування потрібен дозвіл редагувати конфігурацію колекторів і створювати або змінювати вхід Collector Ingest (HTTP), якого у вашого облікового запису немає. Попросіть адміністратора спочатку налаштувати кінцеву точку."
+    "endpoint_missing": "Collectors реєструються через кінцеву точку прийому, яку ще не налаштовано. Для її налаштування потрібен дозвіл редагувати конфігурацію Collectors і створювати або змінювати вхід Collector Ingest (HTTP), якого у вашого облікового запису немає. Попросіть адміністратора спочатку налаштувати кінцеву точку."
   },
   "fleet_card": {
     "healthy": "Усі екземпляри цього Fleet в мережі",
@@ -353,8 +353,8 @@
   },
   "fleet_cards": {
     "empty_title": "Fleets ще немає",
-    "contact_admin": "Зверніться до адміністратора, щоб налаштувати перші колектори.",
-    "empty_description": "Fleets дають змогу керувати групами колекторів зі спільною конфігурацією. Створіть свій перший Fleet, а потім додайте джерела, щоб визначити, які дані мають збирати його колектори. Після налаштування <deployLink>розгорніть колектори</deployLink> за допомогою токена реєстрації.",
+    "contact_admin": "Зверніться до адміністратора, щоб налаштувати перші Collectors.",
+    "empty_description": "Fleets дають змогу керувати групами Collectors зі спільною конфігурацією. Створіть свій перший Fleet, а потім додайте джерела, щоб визначити, які дані мають збирати його Collectors. Після налаштування <deployLink>розгорніть Collectors</deployLink> за допомогою токена реєстрації.",
     "create": "Створити Fleet",
     "no_match": "Немає Fleets, що відповідають фільтру"
   },
@@ -377,9 +377,9 @@
     "show_attributes_many": "Показати всі {{count}} атрибутів"
   },
   "connection_success": {
-    "offline": "Колектор підключився один раз, але не надсилав даних із <lastSeen />.",
-    "receiving": "Колектор підключений і доставляє повідомлення.",
-    "waiting": "Майже готово — колектор підключений, і ми очікуємо його перші повідомлення.",
+    "offline": "Collector підключився один раз, але не надсилав даних із <lastSeen />.",
+    "receiving": "Collector підключений і доставляє повідомлення.",
+    "waiting": "Майже готово — Collector підключений, і ми очікуємо його перші повідомлення.",
     "title": "Налаштування {{host}}",
     "view_instances": "Переглянути екземпляри",
     "check_again": "Перевірити ще раз",
@@ -390,9 +390,9 @@
     "caption_system_checking": "Показано системні повідомлення Collector, отримані за останні {{duration}} - перевірка кожні кілька секунд"
   },
   "fleet_choice": {
-    "selected_heading": "Fleet для цього колектора",
+    "selected_heading": "Fleet для цього Collector",
     "change": "Змінити Fleet",
-    "heading": "Виберіть Fleet для цього колектора",
+    "heading": "Виберіть Fleet для цього Collector",
     "create_new": "Створити новий Fleet",
     "or": "або",
     "select_existing": "Вибрати наявний Fleet",
@@ -407,21 +407,21 @@
     "hostname_placeholder": "наприклад, otlp.example.com",
     "port": "Зовнішній порт",
     "cancel": "Скасувати",
-    "reachability_hint": "Колектори надсилають свої журнали на цю адресу. Вона має бути доступна з кожного хоста колектора: балансувальник навантаження або цей сервер.",
+    "reachability_hint": "Collectors надсилають свої журнали на цю адресу. Вона має бути доступна з кожного хоста Collector: балансувальник навантаження або цей сервер.",
     "confirm_title": "Підтвердьте, як Collectors надсилають дані в цей кластер",
     "change": "Змінити кінцеву точку",
-    "sending_to": "Колектори надсилають дані в цей кластер на адресу <endpoint />",
+    "sending_to": "Collectors надсилають дані в цей кластер на адресу <endpoint />",
     "no_input_title": "Вхід прийому не існує",
-    "no_input": "Колектори можуть реєструватися, але не зможуть надсилати дані, доки не буде створено вхід.",
+    "no_input": "Collectors можуть реєструватися, але не зможуть надсилати дані, доки не буде створено вхід.",
     "not_running_title": "Вхід прийому на <endpoint /> не запущено",
-    "not_running": "Колектори можуть реєструватися, але не зможуть надсилати дані, доки вхід не буде запущено.",
+    "not_running": "Collectors можуть реєструватися, але не зможуть надсилати дані, доки вхід не буде запущено.",
     "manage_input": "Керувати входом"
   },
   "install_command": {
     "title": "Виконайте це на {{platform}}",
     "copy": "Копіювати команду",
-    "note_expires": "Завантажує та встановлює колектор, реєструє його у вибраному Fleet і запускає службу. Потрібні права адміністратора. Токен діє {{duration}}.",
-    "note_never_expires": "Завантажує та встановлює колектор, реєструє його у вибраному Fleet і запускає службу. Потрібні права адміністратора. Цей токен безстроковий."
+    "note_expires": "Завантажує та встановлює Collector, реєструє його у вибраному Fleet і запускає службу. Потрібні права адміністратора. Токен діє {{duration}}.",
+    "note_never_expires": "Завантажує та встановлює Collector, реєструє його у вибраному Fleet і запускає службу. Потрібні права адміністратора. Цей токен безстроковий."
   },
   "log_preview": {
     "unavailable": "Попередній перегляд журналу недоступний — {{error}}",
@@ -430,17 +430,17 @@
   },
   "next_steps": {
     "explore": "Дослідити ваші дані",
-    "explore_description": "Відкрити пошук, відфільтрований за цим колектором",
+    "explore_description": "Відкрити пошук, відфільтрований за цим Collector",
     "configure_sources": "Налаштувати джерела",
     "configure_sources_description": "Додайте або змініть те, що збирає цей Fleet",
     "manage_fleets": "Керувати Fleets",
-    "manage_fleets_description": "Перемістіть цей колектор до постійного Fleet",
-    "install_another": "Установити інший колектор",
+    "manage_fleets_description": "Перемістіть цей Collector до постійного Fleet",
+    "install_another": "Установити інший Collector",
     "install_another_description": "Повторіть це налаштування на іншому хості",
     "offline_title": "Відновіть підключення",
-    "check_service": "Переконайтеся, що служба колектора працює на хості.",
+    "check_service": "Переконайтеся, що служба Collector працює на хості.",
     "check_reachability": "Переконайтеся, що хост має доступ до цього сервера {{productName}}.",
-    "check_logs": "Перегляньте власні журнали колектора в попередньому перегляді нижче, щоб знайти помилки підключення.",
+    "check_logs": "Перегляньте власні журнали Collector в попередньому перегляді нижче, щоб знайти помилки підключення.",
     "title": "Що далі"
   },
   "timeline": {
@@ -464,7 +464,7 @@
   },
   "platform_picker": {
     "title": "Початок роботи з Collectors",
-    "description": "Розгорніть легкі колектори у своїй інфраструктурі, щоб пересилати журнали до {{productName}}."
+    "description": "Розгорніть легкі Collectors у своїй інфраструктурі, щоб пересилати журнали до {{productName}}."
   },
   "source_status": {
     "messages_one": "{{formattedCount}} повідомлення",
@@ -472,7 +472,7 @@
     "disabled": "Вимкнено",
     "not_applicable": "Не застосовується для {{os}}",
     "unrecognised": "Нерозпізнаний тип джерела",
-    "paused": "Призупинено — колектор не в мережі",
+    "paused": "Призупинено — Collector не в мережі",
     "no_messages": "Повідомлень ще немає",
     "waiting": "Очікування перших повідомлень...",
     "title": "Джерела журналів",
@@ -485,28 +485,28 @@
   },
   "settings": {
     "getting_started": "Початок роботи з Collectors",
-    "getting_started_cloud": "Колектори підключаються до керованої кінцевої точки прийому, щоб надсилати свої дані. Збережіть налаштування колектора, щоб ініціалізувати інфраструктуру колекторів. Після налаштування ви зможете створювати Fleets, додавати джерела та розгортати колектори на своїх хостах.",
-    "getting_started_self_managed": "Колекторам потрібні кінцеві точки прийому для отримання зібраних даних. Налаштуйте HTTP-кінцеву точку нижче та збережіть, щоб ініціалізувати інфраструктуру колекторів. Після налаштування ви зможете створювати Fleets, додавати джерела та розгортати колектори на своїх хостах.",
+    "getting_started_cloud": "Collectors підключаються до керованої кінцевої точки прийому, щоб надсилати свої дані. Збережіть налаштування Collector, щоб ініціалізувати інфраструктуру Collectors. Після налаштування ви зможете створювати Fleets, додавати джерела та розгортати Collectors на своїх хостах.",
+    "getting_started_self_managed": "Collectors потрібні кінцеві точки прийому для отримання зібраних даних. Налаштуйте HTTP-кінцеву точку нижче та збережіть, щоб ініціалізувати інфраструктуру Collectors. Після налаштування ви зможете створювати Fleets, додавати джерела та розгортати Collectors на своїх хостах.",
     "ingest_endpoint": "Кінцева точка прийому",
-    "ingest_endpoint_cloud": "Кінцевою точкою прийому керує система. Колектори підключаються сюди автоматично.",
-    "ingest_endpoint_help": "Кінцеві точки прийому отримують дані журналів від колекторів через OpenTelemetry (OTLP). Це зовнішня адреса, яка передається керованим колекторам як місце призначення даних. Вона має вести до запущеного входу прийому колекторів. Зазвичай це адреса балансувальника навантаження або самого сервера.",
-    "hostname_help": "Ім’я хоста або IP-адреса, яку колектори використовуватимуть для підключення. Має бути доступною з хостів колекторів.",
+    "ingest_endpoint_cloud": "Кінцевою точкою прийому керує система. Collectors підключаються сюди автоматично.",
+    "ingest_endpoint_help": "Кінцеві точки прийому отримують дані журналів від Collectors через OpenTelemetry (OTLP). Це зовнішня адреса, яка передається керованим Collectors як місце призначення даних. Вона має вести до запущеного входу прийому Collectors. Зазвичай це адреса балансувальника навантаження або самого сервера.",
+    "hostname_help": "Ім’я хоста або IP-адреса, яку Collectors використовуватимуть для підключення. Має бути доступною з хостів Collectors.",
     "create_input": "Створити вхід прийому",
-    "lifecycle": "Життєвий цикл колектора",
+    "lifecycle": "Життєвий цикл Collector",
     "offline_threshold": "Поріг відсутності в мережі",
-    "offline_threshold_help": "Колектори, які не надсилали даних протягом цього часу, відображаються як такі, що не в мережі.",
+    "offline_threshold_help": "Collectors, які не надсилали даних протягом цього часу, відображаються як такі, що не в мережі.",
     "default_visibility": "Видимість за замовчуванням",
-    "default_visibility_help": "Колектори, які не надсилали даних протягом цього часу, приховуються з типового подання. Користувачі можуть змінити або вилучити цей фільтр у таблиці екземплярів.",
+    "default_visibility_help": "Collectors, які не надсилали даних протягом цього часу, приховуються з типового подання. Користувачі можуть змінити або вилучити цей фільтр у таблиці екземплярів.",
     "expiration_threshold": "Поріг завершення терміну",
-    "expiration_threshold_help": "Колектори, які не надсилали даних протягом цього часу, видаляються безповоротно.",
+    "expiration_threshold_help": "Collectors, які не надсилали даних протягом цього часу, видаляються безповоротно.",
     "confirm": "Підтвердити налаштування"
   },
   "ingest_inputs": {
     "title": "Входи прийому",
-    "none": "Входу прийому колекторів не існує. Колектори не зможуть надсилати дані, доки не буде створено вхід.",
-    "unreadable_one": "Існує {{count}} вхід прийому колекторів, але у вас немає дозволу на його перегляд.",
-    "unreadable_other": "Існує {{count}} входу прийому колекторів, але у вас немає дозволу на їх перегляд.",
-    "none_running": "Входи прийому колекторів існують, але жоден із них зараз не запущений. Колектори не зможуть надсилати дані.",
+    "none": "Входу прийому Collectors не існує. Collectors не зможуть надсилати дані, доки не буде створено вхід.",
+    "unreadable_one": "Існує {{count}} вхід прийому Collectors, але у вас немає дозволу на його перегляд.",
+    "unreadable_other": "Існує {{count}} входу прийому Collectors, але у вас немає дозволу на їх перегляд.",
+    "none_running": "Входи прийому Collectors існують, але жоден із них зараз не запущений. Collectors не зможуть надсилати дані.",
     "name": "Назва",
     "status": "Стан",
     "bind_address": "Адреса прив’язки",
@@ -514,16 +514,16 @@
     "manage": "Керувати",
     "additional_unreadable_one": "{{count}} додатковий вхід не видно через дозволи.",
     "additional_unreadable_other": "{{count}} додаткового входу не видно через дозволи.",
-    "unreadable_few": "Існує {{count}} входи прийому колекторів, але у вас немає дозволу на їх перегляд.",
-    "unreadable_many": "Існує {{count}} входів прийому колекторів, але у вас немає дозволу на їх перегляд.",
+    "unreadable_few": "Існує {{count}} входи прийому Collectors, але у вас немає дозволу на їх перегляд.",
+    "unreadable_many": "Існує {{count}} входів прийому Collectors, але у вас немає дозволу на їх перегляд.",
     "additional_unreadable_few": "{{count}} додаткові входи не видно через дозволи.",
     "additional_unreadable_many": "{{count}} додаткових входів не видно через дозволи."
   },
   "port_mismatch": {
-    "message_one": "Входи прийому колекторів існують на іншому порту: {{ports}}. Якщо зовнішній порт відрізняється від порту входу, переконайтеся, що ваша мережа правильно маршрутизує трафік.",
-    "message_other": "Входи прийому колекторів існують на інших портах: {{ports}}. Якщо зовнішній порт відрізняється від порту входу, переконайтеся, що ваша мережа правильно маршрутизує трафік.",
-    "message_few": "Входи прийому колекторів існують на інших портах: {{ports}}. Якщо зовнішній порт відрізняється від порту входу, переконайтеся, що ваша мережа правильно маршрутизує трафік.",
-    "message_many": "Входи прийому колекторів існують на інших портах: {{ports}}. Якщо зовнішній порт відрізняється від порту входу, переконайтеся, що ваша мережа правильно маршрутизує трафік."
+    "message_one": "Входи прийому Collectors існують на іншому порту: {{ports}}. Якщо зовнішній порт відрізняється від порту входу, переконайтеся, що ваша мережа правильно маршрутизує трафік.",
+    "message_other": "Входи прийому Collectors існують на інших портах: {{ports}}. Якщо зовнішній порт відрізняється від порту входу, переконайтеся, що ваша мережа правильно маршрутизує трафік.",
+    "message_few": "Входи прийому Collectors існують на інших портах: {{ports}}. Якщо зовнішній порт відрізняється від порту входу, переконайтеся, що ваша мережа правильно маршрутизує трафік.",
+    "message_many": "Входи прийому Collectors існують на інших портах: {{ports}}. Якщо зовнішній порт відрізняється від порту входу, переконайтеся, що ваша мережа правильно маршрутизує трафік."
   },
   "source_types": {
     "file": "Файл",
@@ -540,10 +540,10 @@
     "read_mode_end": "З кінця (tail)",
     "read_mode_beginning": "З початку",
     "file_paths": "Шлях(и) до файлів",
-    "file_paths_help": "Підтримуються glob-шаблони (наприклад, /var/log/*.log, /var/log/**/*.log). Колектор стежить за відповідними файлами для нових рядків.",
+    "file_paths_help": "Підтримуються glob-шаблони (наприклад, /var/log/*.log, /var/log/**/*.log). Collector стежить за відповідними файлами для нових рядків.",
     "read_mode": "Режим читання",
-    "read_mode_file_help": "З кінця: збирати лише нові рядки після запуску колектора. З початку: спочатку зібрати всі наявні рядки, потім продовжити стеження.",
-    "read_mode_journald_help": "З кінця: збирати лише нові записи після запуску колектора. З початку: спочатку зібрати всі наявні записи, потім продовжити стеження.",
+    "read_mode_file_help": "З кінця: збирати лише нові рядки після запуску Collector. З початку: спочатку зібрати всі наявні рядки, потім продовжити стеження.",
+    "read_mode_journald_help": "З кінця: збирати лише нові записи після запуску Collector. З початку: спочатку зібрати всі наявні записи, потім продовжити стеження.",
     "priority": "Пріоритет",
     "priority_help": "Мінімальний рівень серйозності для збору. Наприклад, вибір «Помилка» також збирає записи рівнів «Критичний», «Тривога» та «Аварія».",
     "priority_emerg": "Аварія",
@@ -563,18 +563,18 @@
     "predicate": "Предикат",
     "predicate_help": "Необов’язковий предикат фільтра уніфікованого журналювання macOS, що передається команді <code>log</code>. Якщо залишити порожнім, збиратимуться всі журнали системи! Рівні <code>info</code> та <code>debug</code> наразі не збираються, оскільки вони дуже шумні та містять мало корисної інформації. Приклад: <code>{{example}}</code>",
     "max_poll_interval": "Максимальний інтервал опитування",
-    "max_poll_interval_help": "Як часто колектор перевіряє нові записи журналу. Має бути не менше 1 секунди.",
+    "max_poll_interval_help": "Як часто Collector перевіряє нові записи журналу. Має бути не менше 1 секунди.",
     "max_log_age": "Максимальний вік журналу",
     "max_log_age_help": "Під час першого запуску — наскільки далеко в минуле доповнювати журнали. Встановіть 0, щоб вимкнути доповнення.",
     "edit_title": "Редагувати джерело",
     "new_title": "Нове джерело",
-    "description": "Джерело визначає, які дані мають збирати колектори цього Fleet. Кожен тип джерела відповідає окремому способу збору.",
+    "description": "Джерело визначає, які дані мають збирати Collectors цього Fleet. Кожен тип джерела відповідає окремому способу збору.",
     "source_type": "Тип джерела",
     "file_type_help": "Збирати рядки журналу з файлів на хості. Підтримує glob-шаблони для відповідності кільком файлам.",
     "journald_type_help": "Збирати записи з журналу systemd (лише Linux).",
     "windows_type_help": "Збирати події з каналів Windows Event Viewer.",
     "macos_type_help": "Збирати з системи уніфікованого журналювання macOS через команду <code>log</code> (лише macOS).",
-    "enabled_help": "Вимкнені джерела не надсилаються колекторам. Використовуйте це, щоб тимчасово зупинити збір без видалення джерела.",
+    "enabled_help": "Вимкнені джерела не надсилаються Collectors. Використовуйте це, щоб тимчасово зупинити збір без видалення джерела.",
     "update": "Оновити джерело",
     "create": "Створити джерело"
   },
@@ -585,15 +585,15 @@
     },
     "input_ids": {
       "message": "Не вдалося завантажити ідентифікатори входів Collector зі статусом",
-      "title": "Не вдалося завантажити ідентифікатори входів колекторів."
+      "title": "Не вдалося завантажити ідентифікатори входів Collectors."
     },
     "stats": {
       "message": "Не вдалося завантажити статистику Collector зі статусом",
       "title": "Не вдалося завантажити статистику Collector."
     },
     "config": {
-      "message": "Не вдалося завантажити конфігурацію колекторів зі статусом",
-      "title": "Не вдалося завантажити конфігурацію колекторів."
+      "message": "Не вдалося завантажити конфігурацію Collectors зі статусом",
+      "title": "Не вдалося завантажити конфігурацію Collectors."
     },
     "enrollment_tokens": {
       "message": "Не вдалося завантажити токени реєстрації зі статусом",
@@ -629,7 +629,7 @@
     },
     "input_details": {
       "message": "Не вдалося завантажити відомості про вхід Collector зі статусом: {{error}}",
-      "title": "Не вдалося завантажити відомості про вхід колектора."
+      "title": "Не вдалося завантажити відомості про вхід Collector."
     }
   },
   "mutation_errors": {
@@ -678,7 +678,7 @@
       "title": "Не вдалося видалити екземпляр"
     },
     "save_config": {
-      "message": "Не вдалося зберегти конфігурацію колекторів: {{error}}",
+      "message": "Не вдалося зберегти конфігурацію Collectors: {{error}}",
       "title": "Не вдалося зберегти конфігурацію"
     },
     "create_input": {
@@ -702,7 +702,7 @@
     "enrollment_tokens_deleted": "Токени реєстрації видалено.",
     "instances_reassigned": "Екземпляри перепризначено.",
     "instance_deleted": "Екземпляр видалено.",
-    "config_saved": "Конфігурацію колекторів збережено.",
+    "config_saved": "Конфігурацію Collectors збережено.",
     "input_created": "Вхід прийому Collector створено.",
     "input_moved": "Вхід прийому Collector переміщено на новий порт."
   },
@@ -1185,7 +1185,7 @@
     }
   },
   "use_collector_configurations_notifications": {
-    "fetch_failed": "Не вдалося отримати конфігурації колекторів зі статусом: {{error}}",
+    "fetch_failed": "Не вдалося отримати конфігурації Collectors зі статусом: {{error}}",
     "fetch_failed_title": "Не вдалося отримати конфігурації",
     "fetch_configuration_failed": "Не вдалося отримати конфігурацію зі статусом: {{error}}",
     "configuration_not_found": "Не вдалося знайти конфігурацію з ID <{{configurationId}}>, переконайтеся, що її не було видалено.",
@@ -1208,9 +1208,9 @@
     "validate_failed_title": "Не вдалося перевірити конфігурацію"
   },
   "use_collectors_notifications": {
-    "fetch_failed": "Не вдалося отримати колектори зі статусом: {{error}}",
-    "fetch_failed_title": "Не вдалося отримати колектори",
-    "not_found": "Не вдалося знайти колектор з ID <{{collectorId}}>, переконайтеся, що його не було видалено.",
+    "fetch_failed": "Не вдалося отримати Collectors зі статусом: {{error}}",
+    "fetch_failed_title": "Не вдалося отримати Collectors",
+    "not_found": "Не вдалося знайти Collector з ID <{{collectorId}}>, переконайтеся, що його не було видалено.",
     "fetch_collector_failed": "Не вдалося отримати Collector зі статусом: {{error}}",
     "fetch_collector_failed_title": "Не вдалося отримати Collector",
     "created_success": "Collector успішно створено",
@@ -1219,9 +1219,9 @@
     "delete_failed": "Не вдалося видалити Collector: {{error}}",
     "delete_failed_title": "Не вдалося видалити Collector «{{name}}»",
     "copied_success": "Collector «{{name}}» успішно скопійовано",
-    "copy_failed": "Не вдалося зберегти колектор «{{name}}» зі статусом: {{error}}",
+    "copy_failed": "Не вдалося зберегти Collector «{{name}}» зі статусом: {{error}}",
     "copy_failed_title": "Не вдалося зберегти Collector",
-    "validate_failed": "Не вдалося перевірити колектор «{{name}}» зі статусом: {{error}}",
-    "validate_failed_title": "Не вдалося перевірити колектор"
+    "validate_failed": "Не вдалося перевірити Collector «{{name}}» зі статусом: {{error}}",
+    "validate_failed_title": "Не вдалося перевірити Collector"
   }
 }
