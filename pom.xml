@@ -118,7 +118,7 @@
         <bouncycastle-pkix.version>1.86</bouncycastle-pkix.version>
         <byte-buddy.version>1.18.14</byte-buddy.version>
         <caffeine.version>3.3.1</caffeine.version>
-        <classgraph.version>5.0.0</classgraph.version>
+        <classgraph.version>5.0.1</classgraph.version>
         <commons-codec.version>1.22.1</commons-codec.version>
         <commons-collections4.version>4.6.0</commons-collections4.version>
         <commons-csv.version>1.14.1</commons-csv.version>
