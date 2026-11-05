@@ -21,6 +21,7 @@ import userEvent from '@testing-library/user-event';
 import { adminUser, bob } from 'fixtures/users';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import CurrentUser from 'logic/users/CurrentUser';
+import useQuery from 'routing/useQuery';
 
 import UserEdit from './UserEdit';
 
@@ -42,12 +43,14 @@ jest.mock('./RolesSection', () => ({ onSubmit }) => (
 jest.mock('./TeamsSection', () => () => <div>TeamsSection</div>);
 jest.mock('domainActions/users/UsersDomain');
 jest.mock('logic/users/CurrentUser');
+jest.mock('routing/useQuery', () => jest.fn(jest.requireActual('routing/useQuery').default));
 
 jest.useFakeTimers();
 const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
 
 describe('<UserEdit />', () => {
   afterEach(() => {
+    jest.mocked(useQuery).mockImplementation(jest.requireActual('routing/useQuery').default);
     jest.clearAllMocks();
     CurrentUser.reload = jest.fn();
   });
@@ -70,6 +73,14 @@ describe('<UserEdit />', () => {
 
     expect(screen.getByText(`The selected user ${readOnlyUser.fullName} can't be edited.`)).toBeInTheDocument();
     expect(screen.queryByText('Profile')).not.toBeInTheDocument();
+  });
+
+  it('opens the tab named in the URL, e.g. the preferences linked from the language menu', () => {
+    jest.mocked(useQuery).mockReturnValue({ segment: 'preferences' });
+    render(<UserEdit user={user} />);
+
+    expect(screen.getByText('PreferencesSection')).toBeInTheDocument();
+    expect(screen.queryByText('ProfileSection')).not.toBeInTheDocument();
   });
 
   it('should display profile and password section', () => {

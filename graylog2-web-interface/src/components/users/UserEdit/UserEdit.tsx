@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import UsersDomain from 'domainActions/users/UsersDomain';
@@ -27,6 +27,9 @@ import type User from 'logic/users/User';
 import CurrentUser from 'logic/users/CurrentUser';
 import TelemetrySettingsConfig from 'logic/telemetry/TelemetrySettingsConfig';
 import type { UserUpdate } from 'hooks/useUsers';
+import type Routes from 'routing/Routes';
+import useQuery from 'routing/useQuery';
+import useHistory from 'routing/useHistory';
 
 import ReadOnlyWarning from './ReadOnlyWarning';
 import SettingsSection from './SettingsSection';
@@ -44,11 +47,25 @@ type Props = {
   user: User;
 };
 
+// Names of the tabs in the URL (`?segment=preferences`), so each tab can be linked to.
+type SegmentParam = Parameters<typeof Routes.SYSTEM.USERS.edit>[1];
+const SEGMENT_PARAMS: Record<string, SegmentParam> = {
+  profile: 'profile',
+  settings_preferences: 'preferences',
+  teams_roles: 'teams_roles',
+};
+const segmentFromParam = (param: unknown): UserSegment =>
+  (Object.keys(SEGMENT_PARAMS).find((segment) => SEGMENT_PARAMS[segment] === param) as UserSegment) ?? 'profile';
+
 const UserEdit = ({ user }: Props) => {
   const { t } = useTranslation('users');
   const editableUserSegments = useEditableUserSegments();
   const currentUser = useCurrentUser();
-  const [selectedSegment, setSelectedSegment] = useState<UserSegment>('profile');
+  const { segment: segmentParam } = useQuery();
+  const history = useHistory();
+  const selectedSegment = segmentFromParam(segmentParam);
+  // Only the query changes, so the page stays where it is.
+  const setSelectedSegment = (segment: UserSegment) => history.replace(`?segment=${SEGMENT_PARAMS[segment]}`);
   const updateUser = useCallback(
     (data: UserUpdate) =>
       UsersDomain.update(user.id, { ...user.toJSON(), ...data }, user.fullName).then(() => {

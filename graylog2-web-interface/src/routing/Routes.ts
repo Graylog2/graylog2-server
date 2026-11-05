@@ -181,7 +181,9 @@ const Routes = {
     },
     USERS: {
       CREATE: '/system/users/new',
-      edit: (userId: string) => `/system/users/edit/${userId}`,
+      /** `segment` opens a tab of the edit page directly, e.g. the preferences with the language. */
+      edit: (userId: string, segment?: 'profile' | 'preferences' | 'teams_roles') =>
+        segment ? `/system/users/edit/${userId}?segment=${segment}` : `/system/users/edit/${userId}`,
       TOKENS: {
         edit: (userId: string) => `/system/users/tokens/${userId}`,
       },

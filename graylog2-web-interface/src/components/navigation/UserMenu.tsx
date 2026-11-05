@@ -91,7 +91,7 @@ const UserMenu = () => {
           ))}
         </>
       ) : (
-        <LinkContainer to={route}>
+        <LinkContainer to={Routes.SYSTEM.USERS.edit(userId, 'preferences')}>
           <MenuItem icon="translate">
             <LanguageRow>
               {t('user_menu.language')}

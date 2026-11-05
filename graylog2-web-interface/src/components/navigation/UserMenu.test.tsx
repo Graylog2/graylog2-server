@@ -50,6 +50,17 @@ describe('<UserMenu />', () => {
     await screen.findByRole('menuitem', { name: /language.*deutsch/i });
   });
 
+  it('links the language to the preferences of the profile', async () => {
+    renderUserMenu('de');
+
+    await userEvent.click(screen.getByTitle(`User Menu for ${defaultUser.fullName}`));
+
+    expect(await screen.findByRole('menuitem', { name: /language.*deutsch/i })).toHaveAttribute(
+      'href',
+      `/system/users/edit/${defaultUser.id}?segment=preferences`,
+    );
+  });
+
   it('falls back to English when no language is configured', async () => {
     renderUserMenu(undefined);
 
