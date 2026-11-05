@@ -265,7 +265,7 @@
         "anomaly_detection_ai": "Anomaly Detection AI",
         "cloud_option": "Cloud Option",
         "archiving": "封存",
-        "audit_logs_cloud": "{{productName}} Cloud 稽核日誌",
+        "audit_logs_cloud": "{{productName}} Cloud 稽核記錄",
         "dynamic_lookup_tables": "Dynamic Lookup Tables",
         "advanced_alerting": "搭配腳本的進階警示",
         "compliance_reporting": "合規報告",

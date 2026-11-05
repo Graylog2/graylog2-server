@@ -37,7 +37,7 @@ Terms used in the Traditional Chinese (Taiwan) translations (`zh-TW/*.json`), so
 | Time range | 時間範圍 |
 | Update (save changes) | 更新 |
 | Archive | 封存 |
-| Audit log | 稽核日誌 |
+| Audit log | 稽核記錄 |
 | Report | 報告 |
 | Retention | 保留 |
 | Risk score | 風險分數 |
