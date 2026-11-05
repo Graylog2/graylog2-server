@@ -48,13 +48,19 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MongoDBExtension.class)
@@ -323,6 +329,90 @@ class EntitySharesServiceTest {
         final Collection<EntityDescriptor> entityDescriptors = entityShareResponse.missingPermissionsOnDependencies().get(janeGRN);
         assertThat(entityDescriptors).hasSize(1);
         assertThat(entityDescriptors.iterator().next().id()).hasToString(STREAM_GRN_STRING);
+    }
+
+    @Test
+    @MongoDBFixtures("EntitySharesServiceSummaryTest.json")
+    void summarizeCountsVisibleGranteesPerCapability() {
+        final User viewer = createMockUser("hans");
+        mockVisibleGranteesExceptInvisible(viewer);
+
+        final GRN shared = grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0a01");
+        final GRN ownedByViewerOnly = grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0a02");
+        final GRN sharedWithInvisibleOnly = grnRegistry.parse("grn::::dashboard:54e3deadbeefdeadbeef0a03");
+        final GRN otherDashboard = grnRegistry.parse("grn::::dashboard:54e3deadbeefdeadbeef0a04");
+        final GRN inCollection = grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0a06");
+        final GRN withoutGrants = grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0a07");
+
+        final Map<GRN, ShareSummary> summaries = entitySharesService.summarize(
+                Set.of(shared, ownedByViewerOnly, sharedWithInvisibleOnly, otherDashboard, inCollection, withoutGrants), viewer);
+
+        assertThat(summaries).containsOnly(
+                // alice as owner; "Everyone", bob and carol as viewers. The viewer and the invisible user are not counted.
+                entry(shared, new ShareSummary(1, 0, 3)),
+                entry(otherDashboard, new ShareSummary(0, 1, 0)),
+                // The collection grant of carol targets the collection, not the stream.
+                entry(inCollection, new ShareSummary(0, 0, 1))
+        );
+    }
+
+    @Test
+    @MongoDBFixtures("EntitySharesServiceSummaryTest.json")
+    void summarizeDoesNotPassViewerAsCandidate() {
+        final User viewer = createMockUser("hans");
+        mockVisibleGranteesExceptInvisible(viewer);
+
+        entitySharesService.summarize(Set.of(grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0a01")), viewer);
+
+        verify(granteeService).getVisibleGrantees(eq(viewer), argThat(candidates ->
+                !candidates.contains(grnRegistry.newGRN(GRNTypes.USER, "hans"))));
+    }
+
+    @Test
+    @MongoDBFixtures("EntitySharesServiceSummaryTest.json")
+    void summarizeWithoutEntities() {
+        assertThat(entitySharesService.summarize(Set.of(), createMockUser("hans"))).isEmpty();
+        verify(granteeService, never()).getVisibleGrantees(any(), any());
+    }
+
+    @Test
+    @MongoDBFixtures("EntitySharesServiceSummaryTest.json")
+    void getGranteesListsVisibleGranteesWithCapability() {
+        final User viewer = createMockUser("hans");
+        mockVisibleGranteesExceptInvisible(viewer);
+
+        final List<GranteeShare> grantees = entitySharesService.getGrantees(grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0a01"), viewer);
+
+        assertThat(grantees).containsExactlyInAnyOrder(
+                new GranteeShare(Grantee.createUser(grnRegistry.newGRN(GRNTypes.USER, "alice"), "alice"), Capability.OWN),
+                new GranteeShare(Grantee.createGlobal(), Capability.VIEW),
+                new GranteeShare(Grantee.createUser(grnRegistry.newGRN(GRNTypes.USER, "bob"), "bob"), Capability.VIEW),
+                new GranteeShare(Grantee.createUser(grnRegistry.newGRN(GRNTypes.USER, "carol"), "carol"), Capability.VIEW)
+        );
+        assertThat(grantees).filteredOn(share -> share.grantee().grn().equals(GRNRegistry.GLOBAL_USER_GRN))
+                .singleElement()
+                .satisfies(share -> assertThat(share.grantee().type()).isEqualTo(Grantee.GRANTEE_TYPE_GLOBAL));
+    }
+
+    @Test
+    @MongoDBFixtures("EntitySharesServiceSummaryTest.json")
+    void getGranteesWithoutOtherGrantees() {
+        final User viewer = createMockUser("hans");
+        mockVisibleGranteesExceptInvisible(viewer);
+
+        assertThat(entitySharesService.getGrantees(grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0a02"), viewer)).isEmpty();
+        assertThat(entitySharesService.getGrantees(grnRegistry.parse("grn::::dashboard:54e3deadbeefdeadbeef0a03"), viewer)).isEmpty();
+        assertThat(entitySharesService.getGrantees(grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0a07"), viewer)).isEmpty();
+    }
+
+    private void mockVisibleGranteesExceptInvisible(User viewer) {
+        when(granteeService.getVisibleGrantees(eq(viewer), any())).thenAnswer(invocation -> {
+            final Set<GRN> candidates = invocation.getArgument(1);
+            return candidates.stream()
+                    .filter(grn -> !grn.entity().equals("invisible"))
+                    .map(grn -> grn.equals(GRNRegistry.GLOBAL_USER_GRN) ? Grantee.createGlobal() : Grantee.createUser(grn, grn.entity()))
+                    .collect(Collectors.toSet());
+        });
     }
 
     private User createMockUser(String name) {

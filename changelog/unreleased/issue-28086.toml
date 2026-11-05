@@ -1,0 +1,5 @@
+type = "a"
+message = "Add optional \"Shared With Others\" column to the streams and dashboards lists."
+
+issues = ["28086"]
+pulls = []
