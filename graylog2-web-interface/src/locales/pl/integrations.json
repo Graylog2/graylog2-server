@@ -38,7 +38,7 @@
     "invalid_secret_message": "Nieprawidłowy sekret AWS. Zwykle jest to 40-znakowy ciąg zakodowany w base-64, ale można go zobaczyć tylko raz, w momencie utworzenia klucza",
     "authorize_button": "Autoryzuj i wybierz strumień",
     "title": "Utwórz wejście i autoryzuj AWS",
-    "description": "Ta integracja umożliwia odczyt wiadomości bezpośrednio ze strumienia Kinesis. Wiadomości CloudWatch mogą być opcjonalnie przekazywane do Kinesis przez subskrypcje CloudWatch, a następnie przetwarzane.",
+    "description": "Ta integracja umożliwia odczyt wiadomości bezpośrednio ze streamu Kinesis. Wiadomości CloudWatch mogą być opcjonalnie przekazywane do Kinesis przez subskrypcje CloudWatch, a następnie przetwarzane.",
     "input_name": "Nazwa wejścia",
     "aws_region": "Region AWS",
     "aws_region_help": "Region AWS, w którym działa Twoja usługa.",
@@ -175,7 +175,7 @@
     "check_now_button": "Sprawdź teraz",
     "do_not_refresh": "Nie odświeżaj przeglądarki. Logi są sprawdzane w sposób ciągły, a ta strona automatycznie się odświeży, gdy logi będą dostępne.",
     "review_button": "Przejrzyj i zakończ",
-    "title": "Utwórz strumień Kinesis",
+    "title": "Utwórz stream Kinesis",
     "sample_description": "Jeśli jest dostępna, poniżej zostanie pokazana przetworzona przykładowa wiadomość {{logType}} ze strumienia.",
     "formatted_log_label": "Sformatowana wiadomość logu",
     "no_messages": "Nie znaleziono wiadomości w strumieniu."
@@ -199,9 +199,9 @@
     "label_kinesis_endpoint": "Endpoint VPC Kinesis",
     "label_aws_region": "Region AWS",
     "setting_up_kinesis": "Konfiguracja Kinesis",
-    "label_kinesis_stream": "Strumień Kinesis",
-    "label_kinesis_stream_arn": "ARN strumienia Kinesis",
-    "stream_arn_error": "Błąd: nie udało się pobrać ARN strumienia. Upewnij się, że rola IAM zawiera uprawnienie kinesis:DescribeStream.",
+    "label_kinesis_stream": "Stream Kinesis",
+    "label_kinesis_stream_arn": "ARN streamu Kinesis",
+    "stream_arn_error": "Błąd: nie udało się pobrać ARN streamu. Upewnij się, że rola IAM zawiera uprawnienie kinesis:DescribeStream.",
     "label_global_input": "Wejście globalne",
     "label_record_batch_size": "Rozmiar paczki rekordów",
     "label_enable_throttling": "Włącz ograniczanie przepustowości",
@@ -215,28 +215,28 @@
   },
   "aws_kinesis_existing_streams": {
     "sidebar_title": "Nie widzisz potrzebnego strumienia?",
-    "sidebar_requirement": "Aby kontynuować konfigurację, w określonym regionie musi istnieć co najmniej jeden strumień Kinesis. Strumień z logami powinien zawierać co najmniej kilka wiadomości.",
-    "sidebar_auto_setup": "{{productName}} umożliwia również automatyczne utworzenie strumienia Kinesis i zasubskrybowanie go do wybranej grupy logów CloudWatch. Pamiętaj, że ta opcja utworzy dodatkowe zasoby w Twoim środowisku AWS, za które będą naliczane opłaty.",
+    "sidebar_requirement": "Aby kontynuować konfigurację, w określonym regionie musi istnieć co najmniej jeden stream Kinesis. Stream z logami powinien zawierać co najmniej kilka wiadomości.",
+    "sidebar_auto_setup": "{{productName}} umożliwia również automatyczne utworzenie streamu Kinesis i zasubskrybowanie go do wybranej grupy logów CloudWatch. Pamiętaj, że ta opcja utworzy dodatkowe zasoby w Twoim środowisku AWS, za które będą naliczane opłaty.",
     "setup_automatically_button": "Skonfiguruj Kinesis automatycznie",
-    "no_logs_error": "Nie udało się znaleźć żadnych logów w tym strumieniu Kinesis. Wybierz inny strumień Kinesis.",
+    "no_logs_error": "Nie udało się znaleźć żadnych logów w tym streamie Kinesis. Wybierz inny stream Kinesis.",
     "loading_message": "To żądanie może potrwać chwilę.",
     "verify_button": "Zweryfikuj strumień i format",
-    "title": "Wybierz strumień Kinesis",
-    "description_list": "Poniżej znajduje się lista wszystkich strumieni Kinesis znalezionych w określonym koncie AWS.",
+    "title": "Wybierz stream Kinesis",
+    "description_list": "Poniżej znajduje się lista wszystkich streamów Kinesis znalezionych w określonym koncie AWS.",
     "description_docs": "Wybierz strumień, z którego chcesz odczytywać wiadomości, lub zapoznaj się z dokumentacją <docsLink/>, aby uzyskać więcej szczegółów na temat tej konfiguracji.",
     "docs_link_text": "wejście AWS Kinesis/CloudWatch",
     "select_stream_label": "Wybierz strumień",
-    "select_stream_placeholder": "Wybierz strumień Kinesis"
+    "select_stream_placeholder": "Wybierz stream Kinesis"
   },
   "aws_kinesis_setup_new_stream": {
     "no_groups_error": "Nie udało się znaleźć żadnych grup w wybranym regionie. Spróbuj wybrać inny region.",
     "begin_button": "Rozpocznij automatyczną konfigurację",
     "title": "Skonfiguruj Kinesis automatycznie",
     "intro": "Wypełnij poniższe pola, aby rozpocząć automatyczną konfigurację Kinesis. Spowoduje to wykonanie następujących operacji w Twoim koncie AWS. Więcej informacji znajdziesz w dokumentacji AWS: <docsLink>Using CloudWatch Logs Subscription Filters</docsLink>.",
-    "step_create_stream": "Utwórz nowy strumień Kinesis o podanej nazwie.",
-    "step_create_role": "Utwórz rolę/politykę IAM potrzebną do zasubskrybowania strumienia Kinesis do grupy logów CloudWatch.",
-    "step_subscribe": "Zasubskrybuj nowy strumień Kinesis do grupy logów.",
-    "stream_name_label": "Nazwa strumienia Kinesis",
+    "step_create_stream": "Utwórz nowy stream Kinesis o podanej nazwie.",
+    "step_create_role": "Utwórz rolę/politykę IAM potrzebną do zasubskrybowania streamu Kinesis do grupy logów CloudWatch.",
+    "step_subscribe": "Zasubskrybuj nowy stream Kinesis do grupy logów.",
+    "stream_name_label": "Nazwa streamu Kinesis",
     "stream_name_placeholder": "Nazwa strumienia",
     "stream_name_help": "1–128 znaków alfanumerycznych oraz znaki specjalne: podkreślenie (_), kropka (.) i myślnik (-).",
     "group_name_label": "Nazwa grupy CloudWatch",
@@ -245,9 +245,9 @@
   },
   "aws_kinesis_setup_agree": {
     "description": "Ta automatyczna konfiguracja utworzy następujące zasoby AWS. Kliknij poniżej, aby potwierdzić, że rozumiesz, iż zasoby te zostaną utworzone i że wyłącznie Ty ponosisz odpowiedzialność za związane z nimi opłaty AWS. Pamiętaj, że jeśli zasoby nie będą potrzebne, musisz usunąć je ręcznie.",
-    "step_stream": "Utwórz strumień Kinesis z <strong>1</strong> shardem.",
-    "step_role": "Utwórz rolę i politykę IAM, które pozwolą grupie CloudWatch <strong>{{groupName}}</strong> publikować wiadomości logów w strumieniu Kinesis <strong>{{streamName}}</strong>",
-    "step_subscription": "Utwórz subskrypcję CloudWatch, która publikuje wiadomości logów w strumieniu Kinesis."
+    "step_stream": "Utwórz stream Kinesis z <strong>1</strong> shardem.",
+    "step_role": "Utwórz rolę i politykę IAM, które pozwolą grupie CloudWatch <strong>{{groupName}}</strong> publikować wiadomości logów w streamie Kinesis <strong>{{streamName}}</strong>",
+    "step_subscription": "Utwórz subskrypcję CloudWatch, która publikuje wiadomości logów w streamie Kinesis."
   },
   "aws_kinesis_setup_step": {
     "waiting": "Oczekiwanie...",
@@ -255,7 +255,7 @@
     "create": "Utwórz: {{label}}"
   },
   "aws_kinesis_setup_steps": {
-    "stream_label": "Strumień Kinesis",
+    "stream_label": "Stream Kinesis",
     "policy_label": "Polityka subskrypcji",
     "subscription_label": "Subskrypcja"
   },
@@ -265,7 +265,7 @@
     "continue_button": "Kontynuuj konfigurację",
     "executing_title": "Wykonywanie automatycznej konfiguracji",
     "agreement_title": "Zgoda na automatyczną konfigurację Kinesis",
-    "delayed_logs": "Pierwsze wiadomości mogą dotrzeć do strumienia Kinesis nawet po dziesięciu minutach. Sprawdzenie stanu Kinesis w kolejnym kroku nie zakończy się pomyślnie, dopóki w strumieniu nie pojawią się wiadomości. Więcej informacji znajdziesz w oficjalnej dokumentacji <cloudWatchLink>subskrypcji CloudWatch</cloudWatchLink>.",
+    "delayed_logs": "Pierwsze wiadomości mogą dotrzeć do streamu Kinesis nawet po dziesięciu minutach. Sprawdzenie stanu Kinesis w kolejnym kroku nie zakończy się pomyślnie, dopóki w streamie nie pojawią się wiadomości. Więcej informacji znajdziesz w oficjalnej dokumentacji <cloudWatchLink>subskrypcji CloudWatch</cloudWatchLink>.",
     "agree_button": "Zgadzam się! Utwórz teraz te zasoby AWS."
   },
   "form_wrap": {

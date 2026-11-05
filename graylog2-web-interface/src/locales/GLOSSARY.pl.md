@@ -46,3 +46,4 @@ Terms used in the Polish translations (`pl/*.json`), so the whole interface uses
 | Retention | Retencja |
 | Risk score | Wynik ryzyka |
 | Anomaly | Anomalia |
+| Kinesis stream (AWS) | stream Kinesis (English, AWS product term; not strumień) |
