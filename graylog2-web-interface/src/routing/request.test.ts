@@ -47,6 +47,7 @@ describe('request', () => {
     mockSetHeaders.mockClear();
     mockJson.mockClear();
     mockBuild.mockClear();
+    // eslint-disable-next-line no-restricted-syntax -- Builder is a class, asMock only takes functions
     (Builder as unknown as jest.Mock).mockClear();
   });
 
