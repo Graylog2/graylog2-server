@@ -14,6 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import React from 'react';
+import { render, screen } from 'wrappedTestingLibrary';
+import { useTranslation } from 'react-i18next';
+
 import i18n, { changeLanguage, registerTranslations } from 'i18n';
 
 describe('i18n', () => {
@@ -81,5 +85,33 @@ describe('i18n', () => {
     );
 
     expect(i18n.t('greeting', { ns: 'test-late-plugin' })).toBe('Hallo');
+  });
+
+  it('renders again when translations registered later have been loaded', async () => {
+    // Like a plugin binding, which reads its label with `i18n.t` while a core component renders it.
+    const binding = {
+      get label() {
+        return i18n.t('title', { ns: 'test-late-binding' });
+      },
+    };
+    const CoreComponent = () => {
+      useTranslation('test-core');
+
+      return <span>{binding.label}</span>;
+    };
+
+    await changeLanguage('de');
+    i18n.addResourceBundle('en', 'test-late-binding', { title: 'Reporting' });
+    render(<CoreComponent />);
+
+    expect(screen.getByText('Reporting')).toBeInTheDocument();
+
+    await registerTranslations(
+      'test-late-binding',
+      { title: 'Reporting' },
+      { de: () => Promise.resolve({ default: { title: 'Berichte' } }) },
+    );
+
+    expect(await screen.findByText('Berichte')).toBeInTheDocument();
   });
 });

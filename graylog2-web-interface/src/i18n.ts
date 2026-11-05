@@ -61,6 +61,10 @@ const i18n = singleton('i18n', () => {
       lng: DEFAULT_LANGUAGE,
       fallbackLng: DEFAULT_LANGUAGE,
       interpolation: { escapeValue: false },
+      // Translations of plugins can arrive after the language was set, e.g. when a plugin registers its namespaces
+      // later. Rendering again when they are added replaces texts which fell back to English in the meantime,
+      // including labels which plugin bindings read with `i18n.t` while rendering.
+      react: { bindI18n: 'languageChanged', bindI18nStore: 'added' },
     });
 
   // Lets languages which don't capitalize nouns lower case values, e.g. `Create {{entityName, lowercase}}`.
