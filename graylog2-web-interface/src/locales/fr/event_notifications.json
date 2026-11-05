@@ -108,7 +108,11 @@
     "email": "Notification e-mail",
     "http": "Notification HTTP",
     "http_v2": "Notification HTTP personnalisée",
-    "legacy": "Anciens callbacks d'alarme"
+    "legacy": "Anciens callbacks d'alarme",
+    "pagerduty": "Notification PagerDuty [Officielle]",
+    "slack": "Notification Slack",
+    "teams": "Notification Microsoft Teams (obsolète – utilisez V2)",
+    "teams_v2": "Notification Microsoft Teams V2"
   },
   "http": {
     "url": "URL",

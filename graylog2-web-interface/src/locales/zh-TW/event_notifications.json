@@ -108,7 +108,11 @@
     "email": "電子郵件通知",
     "http": "HTTP 通知",
     "http_v2": "自訂 HTTP 通知",
-    "legacy": "舊版警示回呼"
+    "legacy": "舊版警示回呼",
+    "pagerduty": "PagerDuty 通知 [官方]",
+    "slack": "Slack 通知",
+    "teams": "Microsoft Teams 通知（已淘汰 - 請使用 V2）",
+    "teams_v2": "Microsoft Teams 通知 V2"
   },
   "http": {
     "url": "URL",

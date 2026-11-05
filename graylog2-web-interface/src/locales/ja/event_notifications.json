@@ -108,7 +108,11 @@
     "email": "メール通知",
     "http": "HTTP通知",
     "http_v2": "カスタムHTTP通知",
-    "legacy": "レガシーアラームコールバック"
+    "legacy": "レガシーアラームコールバック",
+    "pagerduty": "PagerDuty通知 [公式]",
+    "slack": "Slack通知",
+    "teams": "Microsoft Teams通知（非推奨 - V2を使用）",
+    "teams_v2": "Microsoft Teams通知 V2"
   },
   "http": {
     "url": "URL",

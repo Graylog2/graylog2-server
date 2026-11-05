@@ -21,6 +21,7 @@ import type { EventNotificationTypes } from './types';
 /** Displayed name of a notification type. Plugins without `displayNameKey` show their `displayName`. */
 const notificationTypeTitle = (
   plugin: Partial<Pick<EventNotificationTypes, 'displayName' | 'displayNameKey'>> | undefined,
-) => (plugin?.displayNameKey ? i18n.t(plugin.displayNameKey) : plugin?.displayName);
+) =>
+  plugin?.displayNameKey ? i18n.t(plugin.displayNameKey, { defaultValue: plugin.displayName }) : plugin?.displayName;
 
 export default notificationTypeTitle;

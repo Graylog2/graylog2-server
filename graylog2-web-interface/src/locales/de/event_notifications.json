@@ -108,7 +108,11 @@
     "email": "E-Mail-Benachrichtigung",
     "http": "HTTP-Benachrichtigung",
     "http_v2": "Benutzerdefinierte HTTP-Benachrichtigung",
-    "legacy": "Veraltete Alarm-Callbacks"
+    "legacy": "Veraltete Alarm-Callbacks",
+    "pagerduty": "PagerDuty-Benachrichtigung [Offiziell]",
+    "slack": "Slack-Benachrichtigung",
+    "teams": "Microsoft Teams-Benachrichtigung (Veraltet – V2 verwenden)",
+    "teams_v2": "Microsoft Teams-Benachrichtigung V2"
   },
   "http": {
     "url": "URL",
