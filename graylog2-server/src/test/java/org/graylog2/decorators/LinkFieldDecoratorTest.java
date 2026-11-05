@@ -30,6 +30,8 @@ import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.HashMap;
 import java.util.List;
@@ -209,6 +211,31 @@ public class LinkFieldDecoratorTest {
 
         assertThat(getDecoratedMessage("original value", Map.of("target", "https://evil.com")))
                 .containsEntry(TEST_FIELD, "original value");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"..", "."})
+    public void fieldValueCannotEscapeTemplatePathPrefix(String value) {
+        decorator = createDecorator("https://example.com/api/users/${user}/profile", null);
+
+        assertThat(getDecoratedMessage("original value", Map.of("user", value)))
+                .containsEntry(TEST_FIELD, "original value");
+    }
+
+    @Test
+    public void combinedFieldValuesCannotFormDotSegments() {
+        decorator = createDecorator("https://example.com/api/${a}${b}/admin", null);
+
+        assertThat(getDecoratedMessage("original value", Map.of("a", ".", "b", ".")))
+                .containsEntry(TEST_FIELD, "original value");
+    }
+
+    @Test
+    public void allowsDotsWithinPathSegmentsAndQuery() {
+        decorator = createDecorator("https://example.com/files/${name}?q=${q}", null);
+
+        assertThat(getDecoratedField("original value", Map.of("name", "report..v2.tar.gz", "q", "..")))
+                .containsEntry("href", "https://example.com/files/report..v2.tar.gz?q=..");
     }
 
     @Test

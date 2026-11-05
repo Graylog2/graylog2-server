@@ -20,10 +20,13 @@ import com.floreysoft.jmte.Engine;
 import com.floreysoft.jmte.template.Template;
 import com.floreysoft.jmte.template.VariableDescription;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.escape.Escaper;
+import com.google.common.net.PercentEscaper;
 import com.google.inject.assistedinject.Assisted;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
+import okhttp3.HttpUrl;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -34,7 +37,7 @@ import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 
 import java.net.URI;
-import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -42,13 +45,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
 
 public class LinkFieldDecorator implements SearchResponseDecorator {
     public static final String CK_LINK_FIELD = "link_field";
     public static final String CK_LINK_URL = "link_url";
     public static final String CK_LINK_TEXT = "link_text";
+    // Escapes everything except RFC 3986 unreserved characters, so values are safe in both path and query.
+    private static final Escaper URL_VALUE_ESCAPER = new PercentEscaper("-_.~", false);
     private final String linkField;
     @Nullable
     private final Template linkUrlTemplate;
@@ -151,7 +155,7 @@ public class LinkFieldDecorator implements SearchResponseDecorator {
             return summary;
         }
         final String href = linkUrlTemplate.transform(urlEncodedValues(fields), Locale.ENGLISH);
-        if (href == null || !isValidUrl(href)) {
+        if (href == null || !isValidUrl(href) || hasDotSegments(href)) {
             return summary;
         }
         return withLinkField(summary, linkFieldValue(href, fields));
@@ -176,8 +180,7 @@ public class LinkFieldDecorator implements SearchResponseDecorator {
         for (final VariableDescription variable : linkUrlVariables) {
             final Object value = fields.get(variable.name);
             if (value != null) {
-                // URLEncoder encodes spaces as "+", which is only valid in query strings; "%20" works everywhere.
-                encoded.put(variable.name, URLEncoder.encode(String.valueOf(value), UTF_8).replace("+", "%20"));
+                encoded.put(variable.name, URL_VALUE_ESCAPER.escape(String.valueOf(value)));
             }
         }
         return encoded;
@@ -198,6 +201,26 @@ public class LinkFieldDecorator implements SearchResponseDecorator {
     }
 
     /**
+     * URL-encoding field values does not encode dots, so values like ".." could form dot-segments and escape the
+     * template's fixed path prefix. Browsers resolve percent-encoded dots ("%2e") the same way, so reject any
+     * rendered URL whose path contains a "." or ".." segment.
+     */
+    private static boolean hasDotSegments(String url) {
+        final String path;
+        try {
+            path = URI.create(url).getRawPath();
+        } catch (IllegalArgumentException e) {
+            return true;
+        }
+        if (path == null) {
+            return false;
+        }
+        return Arrays.stream(path.split("[/\\\\]", -1))
+                .map(segment -> segment.replaceAll("(?i)%2e", "."))
+                .anyMatch(segment -> segment.equals(".") || segment.equals(".."));
+    }
+
+    /**
      * @param url a String URL.
      * @return true if the URL is valid and false if the URL is invalid.
      *
@@ -207,15 +230,7 @@ public class LinkFieldDecorator implements SearchResponseDecorator {
      * - alert()
      * - or any other javascript expressions.
      */
-    private boolean isValidUrl(String url) {
-        try {
-            // uppercase schema is fine per RFC2396 but the parsing in Java considers it an error, so we lowercase the beginning of the url for testing if necessary
-            final var fixedUrl = (url.startsWith("HTTP:") || url.startsWith("HTTPS:")) ?
-                    url.substring(0, 5).toLowerCase(Locale.ROOT) + url.substring(5): url;
-            final var uri = URI.create(fixedUrl);
-            return uri.getScheme() != null && (uri.getScheme().equals("http") || uri.getScheme().equals("https"));
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
+    private static boolean isValidUrl(String url) {
+        return HttpUrl.parse(url) != null;
     }
 }
