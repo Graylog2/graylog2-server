@@ -21,6 +21,7 @@ import type { DataTieringConfig } from 'components/indices/data-tiering';
 import type { IndexArchiveBinding } from 'components/indices/archive/types';
 import type { Attribute } from 'stores/PaginationTypes';
 import type { QualifiedUrl } from 'routing/Routes';
+import type { QuickJumpQueryAction } from 'components/quick-jump/Types';
 import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { Stream } from 'logic/streams/types';
@@ -474,6 +475,7 @@ declare module 'graylog-web-plugin/plugin' {
     'navigation.badges'?: Array<NavigationBadge>;
     globalNotifications?: Array<GlobalNotification>;
     helpMenu?: Array<HelpMenuItem>;
+    'quickJump.queryActions'?: Array<QuickJumpQueryAction>;
     fieldValueProviders?: Array<FieldValueProvider>;
     license?: Array<License>;
     inputSetupWizard?: Array<InputSetupWizard>;
