@@ -39,6 +39,7 @@ import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -95,7 +96,14 @@ public class IpfixAggregator implements RemoteAddressCodecAggregator {
             boolean packetBuffered = false;
 
             // the list of template keys to return in the result ( TODO this copies all of the templates all the time :( )
-            final Set<TemplateKey> templatesList = new HashSet<>(templateCache.asMap().keySet());
+            // only use the templates of the current exporter: the journal message keys templates by template id alone,
+            // so templates of other exporters using the same template id would overwrite the ones of this exporter
+            final Set<TemplateKey> templatesList = new HashSet<>();
+            for (TemplateKey templateKey : templateCache.asMap().keySet()) {
+                if (Objects.equals(templateKey.getRemoteAddress(), remoteAddress) && templateKey.getObservationDomainId() == observationDomainId) {
+                    templatesList.add(templateKey);
+                }
+            }
 
             bufferedTemplateIdList.addAll(messageDescription.referencedTemplateIds());
             LOG.debug("Finding the needed templates for the buffered and current packets");
