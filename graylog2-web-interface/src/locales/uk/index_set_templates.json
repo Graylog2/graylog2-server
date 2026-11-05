@@ -1,0 +1,14 @@
+{
+  "7 Days Hot, 90 Days Total": "7 днів Hot, усього 90 днів",
+  "14 Days Hot, 90 Days Total.": "14 днів Hot, усього 90 днів.",
+  "30 days Hot, 90 Days Total": "30 днів Hot, усього 90 днів",
+  "7 Days Hot": "7 днів Hot",
+  "14 Days Hot": "14 днів Hot",
+  "30 Days Hot": "30 днів Hot",
+  "Use case: minimal need for historical searches. This configuration has low memory and storage usage. Logs will be searchable for a minimum of 90 days.": "Сценарій використання: мінімальна потреба в пошуку за історичними даними. Ця конфігурація використовує мало пам’яті та сховища. Журнали будуть доступні для пошуку щонайменше 90 днів.",
+  "Use case: regular need for historical searches. Logs will be searchable for a minimum of 90 days.": "Сценарій використання: регулярна потреба в пошуку за історичними даними. Журнали будуть доступні для пошуку щонайменше 90 днів.",
+  "Use case: need for frequent and deep historical searches. This configuration has high memory and storage usage. Logs will be searchable for a minimum of 90 days.": "Сценарій використання: потреба в частому та глибокому пошуку за історичними даними. Ця конфігурація використовує багато пам’яті та сховища. Журнали будуть доступні для пошуку щонайменше 90 днів.",
+  "Use case: rare historical searches. This configuration maintains a minimum of 7 days of logs in the Hot Tier.": "Сценарій використання: рідкісний пошук за історичними даними. Ця конфігурація зберігає щонайменше 7 днів журналів у Hot Tier.",
+  "Use case: some historical searches. This configuration maintains a minimum of 14 days of logs in the Hot Tier.": "Сценарій використання: нечастий пошук за історичними даними. Ця конфігурація зберігає щонайменше 14 днів журналів у Hot Tier.",
+  "Use case: frequent historical searches. This configuration maintains a minimum of 30 days of logs in the Hot Tier.": "Сценарій використання: частий пошук за історичними даними. Ця конфігурація зберігає щонайменше 30 днів журналів у Hot Tier."
+}

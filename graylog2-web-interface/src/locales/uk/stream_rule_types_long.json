@@ -1,0 +1,10 @@
+{
+  "match exactly": "точно збігається",
+  "match regular expression": "збігається з регулярним виразом",
+  "be greater than": "більше за",
+  "be smaller than": "менше за",
+  "be present": "присутнє",
+  "contain": "містить",
+  "always match": "завжди збігається",
+  "match input": "збігається з входом"
+}

@@ -1,0 +1,418 @@
+{
+  "title": "Pipeline",
+  "overview_header_title": "Огляд Pipeline",
+  "documentation_link_title": "Документація Pipeline",
+  "overview_description": "Pipeline дозволяють перетворювати й обробляти повідомлення, що надходять із потоків. Pipeline складаються з етапів, на яких обчислюються та застосовуються правила. Повідомлення можуть проходити через один або кілька етапів.",
+  "new_pipeline": "Новий Pipeline",
+  "pipeline_details_title": "Pipeline {{title}}",
+  "pipeline_details_description": "Pipeline дозволяють перетворювати й обробляти повідомлення, що надходять із потоків. Pipeline складаються з етапів, на яких обчислюються та застосовуються правила. Повідомлення можуть проходити через один або кілька етапів.\nПісля завершення кожного етапу ви можете вирішити, чи переходитимуть до наступного етапу повідомлення, що відповідають усім правилам або одному з них.",
+  "rules_page_title": "Правила Pipeline",
+  "rules_page_header_title": "Правила Pipeline",
+  "rules_page_documentation_link": "Документація правил Pipeline",
+  "rules_page_description": "Правила — це спосіб застосування змін до повідомлень. Правило складається з умови та списку дій. Умова перевіряється для повідомлення, і якщо вона виконується, дії виконуються.",
+  "rules_delete_confirm": "Ви справді хочете видалити правило «{{title}}»?",
+  "rule_details_new_title": "Нове правило Pipeline",
+  "rule_details_title": "Правило Pipeline {{title}}",
+  "rule_details_loading": "Завантаження подробиць правила...",
+  "loading_rule": "Завантаження правила",
+  "create_pipeline_rule": "Створити правило Pipeline",
+  "pipeline_rule": "Правило Pipeline <ruleTitle>{{title}}</ruleTitle>",
+  "use_source_code_editor": "Використовувати редактор вихідного коду",
+  "rule_is_managed_warning": "Це правило керується застосунком. Ви не можете його редагувати.",
+  "switch_to_source_code_editor": "Перейти до редактора вихідного коду",
+  "switch_to_source_code_editor_confirm_text": "Ви збираєтеся залишити цю сторінку й перейти до редактора вихідного коду.",
+  "switch_to_source_code_editor_confirm_warning": "Переконайтеся, що у вас немає незбережених змін.",
+  "pipeline_new": {
+    "description": "Вкажіть назву та опис нового Pipeline. Етапи можна додати після збереження змін."
+  },
+  "processing_errors": {
+    "rate_suffix": "помилок/с",
+    "total": "(усього {{total}})"
+  },
+  "timeline": {
+    "entity_name": "Pipeline",
+    "delete_confirm": "Ви справді хочете видалити Pipeline «{{title}}»? Цю дію не можна скасувати.",
+    "filter_label": "Фільтрувати Pipeline",
+    "no_pipelines": "Pipeline не знайдено",
+    "headers": {
+      "pipeline": "Pipeline",
+      "connected_streams": "Підключено до потоків",
+      "processing_errors": "Помилки обробки",
+      "pipeline_load": "Навантаження Pipeline (15 хв)",
+      "processing_timeline": "Хронологія обробки",
+      "actions": "Дії"
+    }
+  },
+  "debug_metrics": {
+    "banner_title": "Метрики налагодження увімкнено",
+    "banner_text": "Метрики налагодження додають накладні витрати до обробки повідомлень і збільшують використання пам’яті. Вимкніть їх, коли завершите усунення несправностей. Значення навантаження Pipeline згладжуються в 15-хвилинному вікні, і після ввімкнення їм може знадобитися кілька хвилин, щоб стабілізуватися.",
+    "disable": "Вимкнути метрики налагодження",
+    "enable": "Увімкнути метрики налагодження",
+    "help": "Навантаження Pipeline (15 хв) показує відносну частку часу виконання правил Pipeline в усьому кластері. Увімкніть метрики налагодження, щоб почати збирати дані таймерів. Заповнення значень після ввімкнення може тривати приблизно до 15 хвилин, а збір додає накладні витрати до обробки повідомлень."
+  },
+  "pipeline": {
+    "not_connected": "Цей Pipeline наразі не підключено до жодного потоку. Щоб Pipeline обробляв вхідні повідомлення, його потрібно підключити принаймні до одного потоку. Зауважте, що це не потрібно, якщо ви збираєтеся використовувати цей Pipeline лише для перетворення результатів пошуку за допомогою декораторів.",
+    "delete_stage_confirm": "Ви збираєтеся видалити етап {{stage}}. Ви впевнені, що хочете продовжити?",
+    "list_and": " і ",
+    "processing_streams_one": "Цей Pipeline обробляє повідомлення з потоку {{streams}}.",
+    "processing_streams_other": "Цей Pipeline обробляє повідомлення з потоків {{streams}}.",
+    "managed_1": "Цей Pipeline керується системою, і його можна редагувати лише в обмежений спосіб.",
+    "managed_2": "Правила Pipeline можна додавати до цього Pipeline лише через майстер входів.",
+    "managed_3": "Правила Pipeline у цьому Pipeline буде автоматично перейменовано відповідно до змін у назві відповідного входу.",
+    "managed_4": "Правила Pipeline можна видаляти з цього Pipeline вручну, але не можна додавати вручну.",
+    "connections_title": "Підключення Pipeline",
+    "no_connections": "Виберіть потоки, які оброблятиме цей Pipeline.",
+    "stages_title": "Етапи Pipeline",
+    "stages_description": "Етапи — це групи умов і дій, які мають виконуватися по порядку та забезпечують потрібний потік керування, щоб вирішити, чи виконувати решту Pipeline.",
+    "no_rules_on_stage": "На цьому етапі немає правил.",
+    "processing_streams_few": "Цей Pipeline обробляє повідомлення з потоків {{streams}}.",
+    "processing_streams_many": "Цей Pipeline обробляє повідомлення з потоків {{streams}}."
+  },
+  "connections_form": {
+    "streams_help": "Виберіть потоки, які потрібно підключити до цього Pipeline, або створіть потік на <streamsLink>сторінці потоків</streamsLink>.",
+    "edit": "Редагувати підключення",
+    "title": "Редагування підключень для <pipelineTitle>{{title}}</pipelineTitle>",
+    "submit": "Оновити підключення",
+    "streams": "Потоки"
+  },
+  "details": {
+    "title": "Подробиці",
+    "title_label": "Заголовок",
+    "description": "Опис",
+    "created": "Створено",
+    "last_modified": "Востаннє змінено",
+    "throughput": "Поточна пропускна здатність",
+    "throughput_suffix": "пов/с"
+  },
+  "form": {
+    "title": "Заголовок",
+    "title_help": "Назва Pipeline.",
+    "description": "Опис",
+    "description_help": "Опис Pipeline.",
+    "add_button": "Додати новий Pipeline",
+    "edit_button": "Редагувати подробиці Pipeline",
+    "add_title": "Додавання нового Pipeline {{title}}",
+    "edit_title": "Редагування Pipeline {{title}}",
+    "add_submit": "Додати Pipeline",
+    "update_submit": "Оновити Pipeline",
+    "create_submit": "Створити Pipeline"
+  },
+  "list_item": {
+    "idle": "Простій",
+    "stage": "Етап {{stage}}",
+    "loading": "Завантаження Pipeline...",
+    "managed": "Керується застосунком",
+    "throughput_prefix": "Пропускна здатність:",
+    "throughput_suffix": "пов/с",
+    "not_connected": "Не підключено",
+    "edit_aria": "Редагувати Pipeline",
+    "edit": "Редагувати",
+    "delete_aria": "Видалити Pipeline",
+    "delete": "Видалити"
+  },
+  "stage_rules": {
+    "invalid_rule": "Правило {{name}} було перейменовано або видалено. Це правило буде пропущено.",
+    "throughput_suffix": "пов/с",
+    "errors_suffix": "помилок/с",
+    "remove_title": "Вилучити {{title}}",
+    "removing": "Вилучення...",
+    "remove": "Вилучити",
+    "no_rules": "На цьому етапі ще немає правил. Натисніть «Редагувати», щоб додати їх.",
+    "headers": {
+      "title": "Заголовок",
+      "description": "Опис",
+      "throughput": "Пропускна здатність",
+      "errors": "Помилки",
+      "rule_load": "Навантаження правила (15 хв)",
+      "actions": "Дії"
+    }
+  },
+  "stage": {
+    "contains_rules_one": "Містить {{count}} правило",
+    "contains_rules_other": "Містить {{count}} правила",
+    "last_stage": "У цьому Pipeline немає подальших етапів. Після застосування правил на цьому етапі Pipeline завершить обробку.",
+    "continue_all": "Повідомлення, що відповідають <matchText>усім правилам</matchText> на цьому етапі, переходитимуть до наступного етапу.",
+    "continue_either": "Повідомлення, що відповідають <matchText>принаймні одному правилу</matchText> на цьому етапі, переходитимуть до наступного етапу.",
+    "continue_pass": "Повідомлення, що відповідають <matchText>жодному або кільком правилам</matchText> на цьому етапі, переходитимуть до наступного етапу.",
+    "continue_unknown": "Повідомлення, що відповідають <matchText>НЕВІДОМО</matchText> на цьому етапі, переходитимуть до наступного етапу.",
+    "title": "Етап {{stage}}",
+    "remove_routing_rule_title": "Вилучити правило маршрутизації",
+    "remove_routing_rule_confirm": "Ви справді хочете вилучити правило маршрутизації <ruleTitle>{{title}}</ruleTitle>?",
+    "contains_rules_few": "Містить {{count}} правила",
+    "contains_rules_many": "Містить {{count}} правил"
+  },
+  "stage_form": {
+    "rules_help": "Виберіть правила, що обчислюються на цьому етапі, або створіть правило на <rulesLink>сторінці правил Pipeline</rulesLink>.",
+    "add_button": "Додати новий етап",
+    "add_title": "Додавання нового етапу {{stage}}",
+    "edit_title": "Редагування етапу {{stage}}",
+    "add_submit": "Додати етап",
+    "update_submit": "Оновити етап",
+    "stage": "Етап",
+    "stage_in_use": "Етап уже використовується, вкажіть інший номер або відредагуйте наявний етап.",
+    "stage_help": "Пріоритет етапу. Чим менше число, тим раніше він виконається.",
+    "continue_when": "Продовжувати обробку на наступному етапі, коли",
+    "match_all": "Усі правила на цьому етапі відповідають повідомленню",
+    "match_any": "Принаймні одне з правил на цьому етапі відповідає повідомленню",
+    "match_pass": "Жодне або кілька правил на цьому етапі відповідають",
+    "stage_rules": "Правила етапу"
+  },
+  "used_in_pipelines": {
+    "label": "Використовується в Pipeline",
+    "help": "Pipeline, що використовують це правило на одному або кількох своїх етапах.",
+    "none": "Це правило не використовується в жодному Pipeline."
+  },
+  "deprecation": {
+    "label": "Застаріла функція",
+    "title_rule": "Це правило містить принаймні одну застарілу функцію:",
+    "title_pipeline": "Цей Pipeline містить принаймні одну застарілу функцію:"
+  },
+  "rule_form": {
+    "duplicate_title": "Правило із заголовком «{{title}}» уже існує!",
+    "title": "Заголовок",
+    "title_help": "Заголовок правила можна задати у вихідному коді правила. Докладніше дивіться в короткому довіднику.",
+    "leave_question": "Ви справді хочете залишити цю сторінку й втратити свої зміни? Цю дію не можна скасувати.",
+    "description": "Опис",
+    "description_help": "Опис правила (необов’язково).",
+    "source": "Вихідний код правила",
+    "source_help": "Вихідний код правила, докладніше дивіться в короткому довіднику.",
+    "create_submit": "Створити правило",
+    "update_close_submit": "Оновити правило та закрити",
+    "update": "Оновити правило"
+  },
+  "rule_list_entry": {
+    "edit": "Редагувати",
+    "delete_title": "Видалити правило",
+    "delete": "Видалити",
+    "managed": "Керується застосунком",
+    "throughput_suffix": "пов/с",
+    "errors_suffix": "помилок/с"
+  },
+  "metrics_config": {
+    "loading": "Завантаження конфігурації метрик...",
+    "title": "Конфігурація метрик правил",
+    "submit": "Оновити конфігурацію",
+    "warning": "Метрики правил слід вмикати лише для налагодження проблем із продуктивністю, оскільки збір метрик уповільнює обробку повідомлень і збільшує використання пам’яті.",
+    "enable": "Увімкнути метрики правил",
+    "disable": "Вимкнути метрики правил",
+    "pipeline_load_info": "Увімкнення цих метрик додасть на сторінки Pipeline та правил Pipeline новий стовпець <columnName>Навантаження Pipeline</columnName> зі значеннями у відсотках, що відносно показують, який із ваших Pipeline споживає найбільше часу потоку.",
+    "rule_load_info": "Увімкнення цих метрик також додасть на сторінку подробиць Pipeline новий стовпець <columnName>Навантаження правила</columnName>. Він покаже, які правила Pipeline у вибраному Pipeline є найбільш витратними."
+  },
+  "rule_simulation": {
+    "error_builder": "Не вдалося запустити симуляцію правила. Виправте помилки конструктора правил.",
+    "placeholder_simple": "просте поле повідомлення",
+    "invalid_json": "Недійсний JSON!",
+    "title": "Симуляція правила",
+    "optional": "(Необов’язково)",
+    "json": "JSON",
+    "key_value": "Ключ-значення",
+    "simple_message": "Просте повідомлення",
+    "input_title": "Просте поле повідомлення, пари ключ-значення або JSON",
+    "input_help": "Введіть звичайний рядок, щоб симулювати поле повідомлення, пари ключ-значення або JSON, щоб симулювати все повідомлення.",
+    "run": "Запустити симуляцію правила",
+    "reset": "Скинути",
+    "conditions_output": "Вивід умов",
+    "actions_output": "Вивід дій"
+  },
+  "convert_modal": {
+    "no_title": "<no title>",
+    "no_code": "<no code>",
+    "create_rule": "Створити нове правило з коду",
+    "copied": "Вихідний код правила скопійовано до буфера обміну!",
+    "copy_close": "Копіювати та закрити"
+  },
+  "block_display": {
+    "number": "Число",
+    "not": "Не",
+    "deprecated": "Застаріле",
+    "edit": "Редагувати",
+    "delete": "Видалити",
+    "duplicate": "Дублювати",
+    "insert_above": "Вставити вище",
+    "insert_below": "Вставити нижче"
+  },
+  "block": {
+    "insert_title_above": "Вставити нову дію вище за дію №{{order}}",
+    "insert_title_below": "Вставити нову дію нижче за дію №{{order}}"
+  },
+  "builder_form": {
+    "title": "Заголовок",
+    "title_help": "Заголовок правила.",
+    "description": "Опис",
+    "description_help": "Опис правила (необов’язково)."
+  },
+  "block_form": {
+    "add_condition": "Додати умову",
+    "add_action": "Додати дію",
+    "syntax_help": "Довідка із синтаксису функції",
+    "update": "Оновити",
+    "add": "Додати"
+  },
+  "block_field": {
+    "no_dollar": "Поля, що починаються з '$', не дозволені.",
+    "use_previous_output": "Використати вивід попередніх кроків",
+    "set_custom": "Задати власне значення {{name}}",
+    "select_output": "Вибрати вивід зі списку",
+    "output_from_step": "Вивід кроку {{step}} ({{name}})",
+    "type_not_found": "Жодна попередня дія не повертає тип {{type}}",
+    "true": "true",
+    "false": "false"
+  },
+  "builder": {
+    "title": "Конструктор правил",
+    "when": "Коли",
+    "and": "і",
+    "or": "або",
+    "then": "Тоді",
+    "convert_title": "Перетворити конструктор правил на вихідний код",
+    "convert": "Перетворити на вихідний код",
+    "delete_condition": "Видалити умову",
+    "delete_action": "Видалити дію",
+    "delete_condition_confirm": "Ви впевнені, що хочете видалити <blockName>умову №{{order}}</blockName>?",
+    "delete_action_confirm": "Ви впевнені, що хочете видалити <blockName>дію №{{order}}</blockName>?"
+  },
+  "helper": {
+    "title": "Короткий довідник правил",
+    "docs_hint": "Прочитайте <docsLink>повну документацію</docsLink>, щоб краще зрозуміти, як працюють правила Pipeline.",
+    "functions": "Функції",
+    "example": "Приклад",
+    "functions_description": "Це список усіх доступних функцій у правилах Pipeline. Натисніть на рядок, щоб побачити більше інформації про параметри функції.",
+    "filter_rules": "Фільтрувати правила",
+    "example_description": "Хочете побачити, як виглядає правило Pipeline? Погляньте на цей приклад:"
+  },
+  "helper_table": {
+    "parameter": "Параметр",
+    "type": "Тип",
+    "required": "Обов’язковий",
+    "description": "Опис",
+    "function": "Функція"
+  },
+  "simulator": {
+    "no_streams_title": "Потоків не знайдено",
+    "no_streams": "Pipeline працюють із потоками, але у вашій системі наразі немає потоків. <streamsLink>Створіть потік</streamsLink> і поверніться сюди пізніше, щоб протестувати обробку повідомлень Pipeline у вашому новому потоці.",
+    "stream_help": "Виберіть потік для використання під час симуляції; за замовчуванням використовується потік <streamTitle>{{title}}</streamTitle>.",
+    "load_message": "Завантажити повідомлення",
+    "load_message_description": "Створіть приклад повідомлення, яке буде використано в симуляції. <notice>Жодні справжні повідомлення не буде змінено. Усі дії лише симулюються на тимчасових вхідних даних, які ви вкажете нижче.</notice>",
+    "stream": "Потік"
+  },
+  "simulation_changes": {
+    "added_fields": "Додані поля",
+    "removed_fields": "Вилучені поля",
+    "mutated_fields": "Змінені поля",
+    "dropped": "Початкове повідомлення було б відкинуто під час обробки.",
+    "not_modified": "Початкове повідомлення не було б змінено під час обробки.",
+    "original_changes": "Зміни в початковому повідомленні <idSmall><idEm>{{id}}</idEm></idSmall>",
+    "other_changes": "Інші зміни",
+    "other_changes_description_one": "Буде створено {{count}} повідомлення. Перейдіть до режиму перегляду <previewOption>Попередній перегляд результатів</previewOption>, щоб побачити його.",
+    "other_changes_description_other": "Буде створено {{count}} повідомлення. Перейдіть до режиму перегляду <previewOption>Попередній перегляд результатів</previewOption>, щоб побачити їх.",
+    "other_changes_description_few": "Буде створено {{count}} повідомлення. Перейдіть до режиму перегляду <previewOption>Попередній перегляд результатів</previewOption>, щоб побачити їх.",
+    "other_changes_description_many": "Буде створено {{count}} повідомлень. Перейдіть до режиму перегляду <previewOption>Попередній перегляд результатів</previewOption>, щоб побачити їх."
+  },
+  "simulation_preview": {
+    "dropped_title": "Повідомлення було б відкинуто",
+    "dropped": "Процесор Pipeline відкинув би таке повідомлення. Це означає, що повідомлення <notStored>не буде збережено</notStored>, і воно не буде доступне для пошуку, оповіщень, виходів чи панелей моніторингу."
+  },
+  "simulation_trace": {
+    "microseconds": "мкс"
+  },
+  "simulation_results": {
+    "changes_summary": "Підсумок змін",
+    "results_preview": "Попередній перегляд результатів",
+    "simulation_trace": "Трасування симуляції",
+    "error_title": "Помилка симуляції обробки повідомлення",
+    "error": "Не вдалося симулювати обробку повідомлення <emphasis>{{id}}</emphasis> у потоці <emphasis>{{stream}}</emphasis>.<lineBreak />Спробуйте завантажити повідомлення ще раз або використайте для симуляції інше повідомлення.",
+    "original_message": "Початкове повідомлення",
+    "more_results": "Більше результатів",
+    "title": "Результати симуляції",
+    "simulating": "Триває симуляція обробки повідомлення, зачекайте.",
+    "results_description": "Це результати обробки завантаженого повідомлення. Обробка тривала {{took}} мкс."
+  },
+  "simulator_page": {
+    "title": "Симуляція обробки",
+    "documentation_title": "Документація Pipeline",
+    "description": "Обробка повідомлень може бути складною. Використовуйте цю сторінку, щоб симулювати результат обробки вхідного повідомлення за допомогою вашого поточного набору Pipeline та правил."
+  },
+  "rule_notifications": {
+    "fetch_failed": "Не вдалося отримати правила, статус: {{error}}",
+    "fetch_failed_title": "Не вдалося отримати правила обробки",
+    "list_failed": "Не вдалося завантажити список правил, статус: {{error}}",
+    "list_failed_title": "Не вдалося завантажити правила.",
+    "fetch_rule_failed": "Не вдалося отримати правило «{{id}}», статус: {{error}}",
+    "fetch_rule_failed_title": "Не вдалося отримати правило обробки «{{id}}»",
+    "create_success": "Правило «{{title}}» успішно створено",
+    "create_failed": "Не вдалося зберегти правило «{{title}}», статус: {{error}}",
+    "create_failed_title": "Не вдалося зберегти правило обробки «{{title}}»",
+    "update_success": "Правило «{{title}}» успішно оновлено",
+    "update_failed": "Не вдалося оновити правило «{{title}}», статус: {{error}}",
+    "update_failed_title": "Не вдалося оновити правило обробки «{{title}}»",
+    "delete_success": "Правило «{{title}}» успішно видалено",
+    "delete_failed": "Не вдалося видалити правило «{{title}}», статус: {{error}}",
+    "delete_failed_title": "Не вдалося видалити правило обробки «{{title}}»",
+    "metrics_load_failed": "Не вдалося завантажити конфігурацію метрик правил: {{error}}",
+    "metrics_load_failed_title": "Не вдалося завантажити конфігурацію метрик правил",
+    "metrics_update_success": "Конфігурацію метрик правил успішно оновлено",
+    "metrics_update_failed": "Не вдалося оновити конфігурацію метрик правил: {{error}}",
+    "metrics_update_failed_title": "Не вдалося оновити конфігурацію метрик правил",
+    "metadata_failed": "Не вдалося завантажити метадані правил Pipeline, статус",
+    "metadata_failed_title": "Не вдалося завантажити метадані правил Pipeline",
+    "deprecated_failed": "Не вдалося завантажити застарілі функції для правила, статус",
+    "deprecated_failed_title": "Не вдалося завантажити застарілі функції для метаданих правила",
+    "builder_create_failed": "Не вдалося створити правило конструктора правил, статус: {{error}}",
+    "builder_create_failed_title": "Не вдалося створити правило конструктора правил.",
+    "builder_update_failed": "Не вдалося оновити правило конструктора правил, статус: {{error}}",
+    "builder_update_failed_title": "Не вдалося оновити правило конструктора правил.",
+    "builder_load_failed": "Не вдалося завантажити правило конструктора правил, статус",
+    "builder_load_failed_title": "Не вдалося завантажити правило конструктора правил.",
+    "builder_conditions_failed": "Не вдалося завантажити список умов конструктора правил, статус",
+    "builder_conditions_failed_title": "Не вдалося завантажити список умов конструктора правил.",
+    "builder_actions_failed": "Не вдалося завантажити список дій конструктора правил, статус",
+    "builder_actions_failed_title": "Не вдалося завантажити список дій конструктора правил."
+  },
+  "page_navigation": {
+    "manage_pipelines": "Керування Pipeline",
+    "manage_rules": "Керування правилами",
+    "simulator": "Симулятор"
+  },
+  "pipeline_notifications": {
+    "load_failed": "Не вдалося завантажити Pipeline, статус",
+    "load_failed_title": "Не вдалося завантажити Pipeline",
+    "load_paginated_failed": "Не вдалося завантажити Pipeline зі сторінковим поділом, статус",
+    "load_paginated_failed_title": "Не вдалося завантажити Pipeline зі сторінковим поділом",
+    "load_single_failed": "Не вдалося завантажити Pipeline, статус",
+    "load_single_failed_title": "Не вдалося завантажити Pipeline",
+    "connections_failed": "Не вдалося отримати підключення Pipeline, статус",
+    "connections_failed_title": "Не вдалося отримати підключення Pipeline",
+    "connections_updated": "Підключення Pipeline успішно оновлено",
+    "connections_update_failed": "Не вдалося оновити підключення Pipeline, статус: {{error}}",
+    "connections_update_failed_title": "Не вдалося оновити підключення Pipeline",
+    "create_failed": "Не вдалося створити Pipeline, статус: {{error}}",
+    "create_failed_title": "Не вдалося створити Pipeline",
+    "create_success": "Pipeline успішно створено.",
+    "update_failed": "Не вдалося оновити Pipeline, статус: {{error}}",
+    "update_failed_title": "Не вдалося оновити Pipeline",
+    "update_success": "Pipeline успішно оновлено.",
+    "delete_failed": "Не вдалося видалити Pipeline, статус: {{error}}",
+    "delete_failed_title": "Не вдалося видалити Pipeline",
+    "delete_success": "Pipeline успішно видалено.",
+    "success_title": "Успішно!"
+  },
+  "connections_list": {
+    "not_connected": "Pipeline не підключено до жодного потоку"
+  },
+  "rule_list": {
+    "headers": {
+      "title": "Заголовок",
+      "description": "Опис",
+      "created": "Створено",
+      "last_modified": "Востаннє змінено",
+      "throughput": "Пропускна здатність",
+      "errors": "Помилки",
+      "pipeline_load": "Навантаження Pipeline (15 хв)",
+      "pipelines": "Pipeline",
+      "actions": "Дії"
+    }
+  },
+  "load_cell": {
+    "error_tooltip": "Навантаження Pipeline недоступне: не вдалося завантажити метрики навантаження обробки."
+  }
+}

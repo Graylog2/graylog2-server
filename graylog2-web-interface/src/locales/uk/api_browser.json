@@ -1,0 +1,14 @@
+{
+  "title": "Оглядач API",
+  "description": "Переглядайте REST API Graylog",
+  "search_placeholder": "Шукати кінцеву точку...",
+  "no_results": "Кінцевих точок, що відповідають вашому пошуку, не знайдено.",
+  "error_loading": "Помилка завантаження оглядача API.",
+  "error_fetching_endpoint": "Помилка отримання відомостей про кінцеву точку.",
+  "endpoint_name": "Назва кінцевої точки",
+  "endpoint_path": "Шлях",
+  "endpoint_method": "Метод",
+  "endpoint_description": "Опис",
+  "endpoint_parameters": "Параметри",
+  "endpoint_response": "Відповідь"
+}

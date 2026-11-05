@@ -1,0 +1,11 @@
+{
+  "title": "Сертифікати",
+  "certificate_list": "Список сертифікатів",
+  "certificate_name": "Назва",
+  "certificate_expiration": "Дата завершення строку дії",
+  "certificate_details": "Подробиці",
+  "certificate_status": "Статус",
+  "certificate_active": "Активний",
+  "certificate_expired": "Строк дії завершився",
+  "certificate_revoked": "Відкликано"
+}

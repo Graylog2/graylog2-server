@@ -1,0 +1,1227 @@
+{
+  "pages": {
+    "documentation_title": "Документація Collectors",
+    "deployment": {
+      "title": "Розгортання Collectors",
+      "description": "Виконайте команду на будь-якій кількості хостів — вони зареєструються у вибраному Fleet і з’являться після першого підключення.",
+      "deploy_tab": "Розгортання",
+      "tokens_tab": "Токени реєстрації",
+      "tokens_description": "Токени дозволяють новим колекторам реєструватися у Fleet. Видалення токена не впливає на вже зареєстровані колектори."
+    },
+    "fleets": {
+      "document_title": "Fleets колекторів",
+      "title": "Fleets",
+      "description": "Fleet — це група колекторів зі спільною конфігурацією. Усі колектори у Fleet збирають дані з одних і тих самих джерел. Використовуйте Fleets, щоб упорядкувати колектори за середовищем, командою або призначенням."
+    },
+    "fleet_detail": {
+      "title": "Відомості про Fleet"
+    },
+    "instances": {
+      "document_title": "Екземпляри колекторів",
+      "title": "Екземпляри",
+      "description": "Екземпляр колектора — це запущений процес колектора на віддаленому хості. Екземпляри реєструються у Fleet за допомогою токена реєстрації та автоматично отримують конфігурацію джерел свого Fleet."
+    },
+    "onboarding": {
+      "title": "Підключення колектора",
+      "description": "Стан вашого нещодавно підключеного колектора.",
+      "load_error": "Не вдалося завантажити екземпляр колектора: {{error}}",
+      "not_found": "Екземпляр колектора не знайдено. Можливо, його було видалено — перегляньте всі <instancesLink>екземпляри</instancesLink>."
+    },
+    "overview": {
+      "title": "Огляд Collectors",
+      "description": "Collectors — це легкі служби, розгорнуті у вашій інфраструктурі для збору журналів і пересилання їх до {{productName}}. Вони організовані у Fleets і налаштовуються за допомогою джерел, що визначають, які дані збирати."
+    },
+    "settings": {
+      "title": "Налаштування Collectors",
+      "description": "Налаштуйте кінцеві точки та параметри життєвого циклу керованих колекторів. Колектори підключаються до цих кінцевих точок, щоб отримувати оновлення конфігурації та надсилати зібрані дані журналів."
+    }
+  },
+  "navigation": {
+    "overview": "Огляд",
+    "fleets": "Fleets",
+    "instances": "Екземпляри",
+    "deployment": "Розгортання",
+    "settings": "Налаштування"
+  },
+  "activity": {
+    "deleted_target": "[видалено]",
+    "by_actor": "від {{name}}",
+    "by_system": "від системи",
+    "config_changed": {
+      "fleet": "Конфігурацію оновлено для Fleet <targetLink />",
+      "fleet_with_others_one": "Конфігурацію оновлено для Fleet <targetLink /> та ще {{count}} Fleet",
+      "fleet_with_others_other": "Конфігурацію оновлено для Fleet <targetLink /> та ще {{count}} Fleets",
+      "collector": "Конфігурацію оновлено для колектора <targetLink />",
+      "collector_with_others_one": "Конфігурацію оновлено для колектора <targetLink /> та ще {{count}} колектора",
+      "collector_with_others_other": "Конфігурацію оновлено для колектора <targetLink /> та ще {{count}} колектора",
+      "fleet_with_others_few": "Конфігурацію оновлено для Fleet <targetLink /> та ще {{count}} Fleets",
+      "fleet_with_others_many": "Конфігурацію оновлено для Fleet <targetLink /> та ще {{count}} Fleets",
+      "collector_with_others_few": "Конфігурацію оновлено для колектора <targetLink /> та ще {{count}} колекторів",
+      "collector_with_others_many": "Конфігурацію оновлено для колектора <targetLink /> та ще {{count}} колекторів"
+    },
+    "ingest_config_changed": {
+      "fleet": "Конфігурацію прийому оновлено для Fleet <targetLink />",
+      "fleet_with_others_one": "Конфігурацію прийому оновлено для Fleet <targetLink /> та ще {{count}} Fleet",
+      "fleet_with_others_other": "Конфігурацію прийому оновлено для Fleet <targetLink /> та ще {{count}} Fleets",
+      "collector": "Конфігурацію прийому оновлено для колектора <targetLink />",
+      "collector_with_others_one": "Конфігурацію прийому оновлено для колектора <targetLink /> та ще {{count}} колектора",
+      "collector_with_others_other": "Конфігурацію прийому оновлено для колектора <targetLink /> та ще {{count}} колектора",
+      "fleet_with_others_few": "Конфігурацію прийому оновлено для Fleet <targetLink /> та ще {{count}} Fleets",
+      "fleet_with_others_many": "Конфігурацію прийому оновлено для Fleet <targetLink /> та ще {{count}} Fleets",
+      "collector_with_others_few": "Конфігурацію прийому оновлено для колектора <targetLink /> та ще {{count}} колекторів",
+      "collector_with_others_many": "Конфігурацію прийому оновлено для колектора <targetLink /> та ще {{count}} колекторів"
+    },
+    "restart": {
+      "fleet": "Запит на перезапуск для Fleet <targetLink />",
+      "fleet_with_others_one": "Запит на перезапуск для Fleet <targetLink /> та ще {{count}} Fleet",
+      "fleet_with_others_other": "Запит на перезапуск для Fleet <targetLink /> та ще {{count}} Fleets",
+      "collector": "Запит на перезапуск для колектора <targetLink />",
+      "collector_with_others_one": "Запит на перезапуск для колектора <targetLink /> та ще {{count}} колектора",
+      "collector_with_others_other": "Запит на перезапуск для колектора <targetLink /> та ще {{count}} колектора",
+      "fleet_with_others_few": "Запит на перезапуск для Fleet <targetLink /> та ще {{count}} Fleets",
+      "fleet_with_others_many": "Запит на перезапуск для Fleet <targetLink /> та ще {{count}} Fleets",
+      "collector_with_others_few": "Запит на перезапуск для колектора <targetLink /> та ще {{count}} колекторів",
+      "collector_with_others_many": "Запит на перезапуск для колектора <targetLink /> та ще {{count}} колекторів"
+    },
+    "discovery_run": {
+      "fleet": "Запущено виявлення для Fleet <targetLink />",
+      "fleet_with_others_one": "Запущено виявлення для Fleet <targetLink /> та ще {{count}} Fleet",
+      "fleet_with_others_other": "Запущено виявлення для Fleet <targetLink /> та ще {{count}} Fleets",
+      "collector": "Запущено виявлення для колектора <targetLink />",
+      "collector_with_others_one": "Запущено виявлення для колектора <targetLink /> та ще {{count}} колектора",
+      "collector_with_others_other": "Запущено виявлення для колектора <targetLink /> та ще {{count}} колектора",
+      "fleet_with_others_few": "Запущено виявлення для Fleet <targetLink /> та ще {{count}} Fleets",
+      "fleet_with_others_many": "Запущено виявлення для Fleet <targetLink /> та ще {{count}} Fleets",
+      "collector_with_others_few": "Запущено виявлення для колектора <targetLink /> та ще {{count}} колекторів",
+      "collector_with_others_many": "Запущено виявлення для колектора <targetLink /> та ще {{count}} колекторів"
+    },
+    "reassigned": {
+      "collector": "Колектор <targetLink /> перепризначено",
+      "collector_with_others_one": "Колектор <targetLink /> та ще {{count}} колектор перепризначено",
+      "collector_with_others_other": "Колектор <targetLink /> та ще {{count}} колектора перепризначено",
+      "collector_with_others_few": "Колектор <targetLink /> та ще {{count}} колектори перепризначено",
+      "collector_with_others_many": "Колектор <targetLink /> та ще {{count}} колекторів перепризначено"
+    },
+    "reassigned_to_fleet": {
+      "collector": "Колектор <targetLink /> перепризначено до Fleet <destinationLink />",
+      "collector_with_others_one": "Колектор <targetLink /> та ще {{count}} колектор перепризначено до Fleet <destinationLink />",
+      "collector_with_others_other": "Колектор <targetLink /> та ще {{count}} колектора перепризначено до Fleet <destinationLink />",
+      "collector_with_others_few": "Колектор <targetLink /> та ще {{count}} колектори перепризначено до Fleet <destinationLink />",
+      "collector_with_others_many": "Колектор <targetLink /> та ще {{count}} колекторів перепризначено до Fleet <destinationLink />"
+    }
+  },
+  "fleet_reference": {
+    "moving_title": "Колектор перейде до цього Fleet під час наступного підключення.",
+    "moving_from": "(переходить із {{fleet}})",
+    "moving_from_removed": "(переходить із видаленого Fleet)",
+    "removed_title": "Цей Fleet було видалено.",
+    "removed": "Fleet видалено ({{fleetId}})"
+  },
+  "sync_state": {
+    "pending_title": "Очікується синхронізація — зміни буде застосовано під час наступного підключення колектора",
+    "pending": "Очікується синхронізація",
+    "in_sync_title": "Синхронізовано — усі зміни застосовано",
+    "in_sync": "Синхронізовано"
+  },
+  "instance_status": {
+    "online": "В мережі",
+    "offline": "Не в мережі"
+  },
+  "os": {
+    "unknown": "Невідомо"
+  },
+  "enrollment_tokens": {
+    "bulk_delete_title": "Видалити токени реєстрації",
+    "bulk_delete_confirm_one": "Ви впевнені, що хочете видалити {{count}} токен реєстрації? Нові колектори не зможуть зареєструватися за допомогою видаленого токена.",
+    "bulk_delete_confirm_other": "Ви впевнені, що хочете видалити {{count}} токена реєстрації? Нові колектори не зможуть зареєструватися за допомогою видалених токенів.",
+    "never": "Ніколи",
+    "expired": "Термін дії завершився",
+    "human_name": "токени реєстрації",
+    "delete_title": "Видалити токен реєстрації",
+    "delete_confirm": "Ви впевнені, що хочете видалити цей токен реєстрації? Нові колектори не зможуть зареєструватися за допомогою цього токена. Уже зареєстровані колектори продовжать працювати як зазвичай.",
+    "bulk_delete_confirm_few": "Ви впевнені, що хочете видалити {{count}} токени реєстрації? Нові колектори не зможуть зареєструватися за допомогою видалених токенів.",
+    "bulk_delete_confirm_many": "Ви впевнені, що хочете видалити {{count}} токенів реєстрації? Нові колектори не зможуть зареєструватися за допомогою видалених токенів."
+  },
+  "deployment": {
+    "select_fleet_step": "Вибрати Fleet",
+    "generate_token_step": "Згенерувати токен",
+    "install_step": "Установити Collector",
+    "open_in_search": "Відкрити в пошуку",
+    "generate_token_first": "Згенеруйте токен вище, щоб побачити команду встановлення.",
+    "copy_token_only": "Копіювати лише токен"
+  },
+  "enrolling_hosts": {
+    "receiving": "Отримання",
+    "listening": "Очікування…",
+    "title": "Реєстрація хостів",
+    "connected_one": "Підключено {{count}} · очікування інших…",
+    "connected_other": "Підключено {{count}} · очікування інших…",
+    "listening_subtitle": "очікування…",
+    "view_all": "Переглянути всі в екземплярах",
+    "host": "Хост",
+    "status": "Стан",
+    "first_messages": "Перші повідомлення",
+    "enrolled": "Зареєстровано",
+    "actions": "Дії",
+    "hide_setup": "Приховати налаштування",
+    "view_setup": "Переглянути налаштування",
+    "empty": "Хости, на яких виконано команду, з’являтимуться тут після підключення.",
+    "connection_problem": "Проблеми зі з’єднанням із сервером — автоматична повторна спроба",
+    "connected_few": "Підключено {{count}} · очікування інших…",
+    "connected_many": "Підключено {{count}} · очікування інших…"
+  },
+  "token_step": {
+    "summary_expires": "Токен <emphasis>{{tokenName}}</emphasis> згенеровано - діє до <expiresAt />",
+    "summary_expires_with_fleet": "Токен <emphasis>{{tokenName}}</emphasis> згенеровано - діє до <expiresAt /> - обмежено Fleet <emphasis>{{fleetName}}</emphasis>",
+    "summary_never_expires": "Токен <emphasis>{{tokenName}}</emphasis> згенеровано - безстроковий",
+    "summary_never_expires_with_fleet": "Токен <emphasis>{{tokenName}}</emphasis> згенеровано - безстроковий - обмежено Fleet <emphasis>{{fleetName}}</emphasis>",
+    "change_token": "Змінити токен",
+    "short_lived": "Короткочасний токен (діє 1 день)",
+    "custom": "Власний токен",
+    "expiry_24_hours": "24 години",
+    "expiry_7_days": "7 днів",
+    "expiry_30_days": "30 днів",
+    "expiry_never": "Без терміну дії",
+    "name": "Назва",
+    "name_placeholder": "наприклад, розгортання web-servers",
+    "custom_hint": "Власні токени відображаються на вкладці «Токени реєстрації» та їх можна відкликати будь-коли.",
+    "no_permission": "У вас немає дозволу створювати токени реєстрації для цього Fleet",
+    "generating": "Генерація...",
+    "generate": "Згенерувати токен",
+    "select_fleet_first": "Спочатку виберіть Fleet вище."
+  },
+  "fleet_actions": {
+    "received_messages": "Отримані повідомлення",
+    "delete": "Видалити",
+    "delete_blocked_one": "У цьому Fleet є {{count}} призначений екземпляр. Перепризначте або видаліть їх, перш ніж видаляти Fleet.",
+    "delete_blocked_other": "У цьому Fleet є {{count}} призначеного екземпляра. Перепризначте або видаліть їх, перш ніж видаляти Fleet.",
+    "delete_title": "Видалити Fleet",
+    "delete_confirm": "Ви впевнені, що хочете видалити Fleet <emphasis>{{fleetName}}</emphasis>? Його конфігурації джерел і токени реєстрації буде видалено.",
+    "delete_blocked_few": "У цьому Fleet є {{count}} призначені екземпляри. Перепризначте або видаліть їх, перш ніж видаляти Fleet.",
+    "delete_blocked_many": "У цьому Fleet є {{count}} призначених екземплярів. Перепризначте або видаліть їх, перш ніж видаляти Fleet."
+  },
+  "fleet_form": {
+    "name_required": "Потрібно вказати назву",
+    "edit_title": "Редагувати Fleet",
+    "new_title": "Новий Fleet",
+    "name": "Назва",
+    "name_help": "Унікальна назва цього Fleet",
+    "description": "Опис",
+    "description_help": "Необов’язковий опис призначення цього Fleet",
+    "update": "Оновити Fleet",
+    "create": "Створити Fleet",
+    "updating": "Оновлення...",
+    "creating": "Створення..."
+  },
+  "fleet_settings": {
+    "general": "Загальні налаштування",
+    "fleet_name": "Назва Fleet",
+    "save": "Зберегти зміни",
+    "saving": "Збереження...",
+    "information": "Інформація про Fleet",
+    "fleet_id": "ID Fleet:",
+    "created": "Створено:",
+    "updated": "Оновлено:"
+  },
+  "fleets": {
+    "human_name": "Fleets"
+  },
+  "fleet_detail": {
+    "tab_sources": "Джерела",
+    "tab_instances": "Екземпляри",
+    "tab_settings": "Налаштування",
+    "edit_source": "Редагувати",
+    "not_found": "Fleet не знайдено",
+    "deploy_collector": "Розгорнути новий Collector",
+    "stat_instances": "Екземпляри",
+    "stat_instances_help": "Процеси колекторів, зареєстровані в цьому Fleet.",
+    "stat_online": "В мережі",
+    "stat_online_help": "Екземпляри, які надіслали сигнал активності в межах порогу відсутності.",
+    "stat_offline": "Не в мережі",
+    "stat_offline_help": "Екземпляри, які пропустили сигнал активності. Перевірте з’єднання хоста або стан процесу колектора.",
+    "stat_sources": "Джерела",
+    "stat_sources_help": "Конфігурації збору даних, призначені цьому Fleet.",
+    "sources_description": "Джерела автоматично передаються всім колекторам цього Fleet. Зміни набувають чинності протягом кількох секунд.",
+    "add_source": "Додати джерело",
+    "sources_human_name": "джерела",
+    "instances_description": "Екземпляри колекторів, зареєстровані в цьому Fleet. Кожен екземпляр запускає всі ввімкнені джерела. Щоб додати більше екземплярів, <deployLink>розгорніть колектори</deployLink> за допомогою токена реєстрації для цього Fleet.",
+    "instances_human_name": "екземпляри",
+    "delete_source_title": "Видалити джерело",
+    "delete_source_confirm": "Ви впевнені, що хочете видалити джерело <emphasis>{{sourceName}}</emphasis>? Колектори цього Fleet припинять збір даних із цього джерела протягом кількох секунд."
+  },
+  "instance_actions": {
+    "reassign": "Перепризначити до Fleet",
+    "view_system_logs": "Переглянути системні журнали",
+    "details": "Докладніше",
+    "delete_title": "Видалити екземпляр Collector",
+    "delete_confirm": "Ви впевнені, що хочете видалити екземпляр <emphasis>{{instanceName}}</emphasis>?<lineBreak />Щоб колектор знову з’явився, його потрібно буде зареєструвати повторно."
+  },
+  "reassign_fleet": {
+    "fleet_required": "Потрібно вказати Fleet",
+    "title_one": "Перепризначити {{count}} екземпляр до Fleet",
+    "title_other": "Перепризначити {{count}} екземпляра до Fleet",
+    "no_other_fleet_one": "Немає іншого Fleet, до якого можна призначити цей колектор.",
+    "no_other_fleet_other": "Немає іншого Fleet, до якого можна призначити ці колектори.",
+    "no_permission": "У вас немає дозволу призначати колектори до іншого Fleet.",
+    "select_placeholder": "Виберіть Fleet...",
+    "submit_one": "Перепризначити екземпляр",
+    "submit_other": "Перепризначити екземпляри",
+    "submitting": "Перепризначення...",
+    "title_few": "Перепризначити {{count}} екземпляри до Fleet",
+    "title_many": "Перепризначити {{count}} екземплярів до Fleet",
+    "no_other_fleet_few": "Немає іншого Fleet, до якого можна призначити ці колектори.",
+    "no_other_fleet_many": "Немає іншого Fleet, до якого можна призначити ці колектори.",
+    "submit_few": "Перепризначити екземпляри",
+    "submit_many": "Перепризначити екземпляри"
+  },
+  "instance_health": {
+    "title": "Стан працездатності",
+    "unknown": "Невідомо",
+    "no_report": "Цей колектор не надсилав інформації про стан працездатності.",
+    "healthy": "Справний",
+    "unhealthy": "Несправний",
+    "last_known": "Останній відомий стан: {{state}}",
+    "since": "протягом <duration />"
+  },
+  "instance_drawer": {
+    "action_reassign": "Перепризначити до іншого Fleet",
+    "action_reload_config": "Перезавантажити конфігурацію",
+    "action_reload_ingest_config": "Перезавантажити конфігурацію прийому",
+    "action_restart": "Перезапустити",
+    "action_discovery": "Запустити виявлення джерел",
+    "status": "Стан:",
+    "sync": "Синхронізація:",
+    "fleet": "Fleet:",
+    "os": "ОС:",
+    "last_seen": "Востаннє в мережі:",
+    "enrolled": "Зареєстровано:",
+    "version": "Версія:",
+    "logs": "Журнали:",
+    "messages": "Повідомлення:",
+    "attributes": "Атрибути",
+    "active_sources_one": "Активні джерела ({{count}})",
+    "active_sources_other": "Активні джерела ({{count}})",
+    "sources_inherited": "Джерела успадковуються від конфігурації Fleet цього екземпляра.",
+    "no_sources": "Для цього Fleet не налаштовано джерел. Додайте джерела на сторінці відомостей про Fleet, щоб почати збір даних.",
+    "synchronization": "Синхронізація",
+    "pending_load_error": "Не вдалося завантажити очікувані зміни. Спробуйте пізніше.",
+    "queued_actions": "Наступні дії очікують у черзі до синхронізації колектора:",
+    "hide_transactions": "Приховати транзакції в черзі",
+    "show_transactions_one": "Показати транзакції в черзі ({{count}})",
+    "show_transactions_other": "Показати транзакції в черзі ({{count}})",
+    "changes_queued": "Зміни поставлено в чергу, їх буде застосовано під час наступного підключення колектора.",
+    "all_applied": "Колектор застосував усі дії з черги.",
+    "active_sources_few": "Активні джерела ({{count}})",
+    "active_sources_many": "Активні джерела ({{count}})",
+    "show_transactions_few": "Показати транзакції в черзі ({{count}})",
+    "show_transactions_many": "Показати транзакції в черзі ({{count}})"
+  },
+  "overview": {
+    "stat_instances_help": "Запущені процеси колекторів у всіх Fleets.",
+    "stat_fleets": "Fleets",
+    "stat_fleets_help": "Логічні групи колекторів зі спільною конфігурацією джерел.",
+    "stat_sources_help": "Конфігурації збору даних (шляхи до файлів, journald, журнали подій Windows) у всіх Fleets.",
+    "fleet_stats_error": "Не вдалося завантажити статистику Fleet.",
+    "stats_error": "Не вдалося завантажити статистику Collector.",
+    "fleets_title": "Fleets",
+    "filter_placeholder": "Фільтрувати Fleets...",
+    "config_error": "Не вдалося завантажити конфігурацію Collectors.",
+    "endpoint_missing_title": "Кінцеву точку прийому Collector не налаштовано",
+    "endpoint_missing": "Колектори реєструються через кінцеву точку прийому, яку ще не налаштовано. Для її налаштування потрібен дозвіл редагувати конфігурацію колекторів і створювати або змінювати вхід Collector Ingest (HTTP), якого у вашого облікового запису немає. Попросіть адміністратора спочатку налаштувати кінцеву точку."
+  },
+  "fleet_card": {
+    "healthy": "Усі екземпляри цього Fleet в мережі",
+    "degraded": "Деякі екземпляри цього Fleet не в мережі",
+    "down": "Усі екземпляри цього Fleet не в мережі",
+    "empty": "У цьому Fleet ще не зареєстровано жодного екземпляра Collector",
+    "instances_one": "екземпляр",
+    "instances_other": "екземпляра",
+    "online_one": "● {{count}} в мережі",
+    "online_other": "● {{count}} в мережі",
+    "offline_one": "● {{count}} не в мережі",
+    "offline_other": "● {{count}} не в мережі",
+    "sources_one": "{{count}} джерело",
+    "sources_other": "{{count}} джерела",
+    "instances_few": "екземпляри",
+    "instances_many": "екземплярів",
+    "online_few": "● {{count}} в мережі",
+    "online_many": "● {{count}} в мережі",
+    "offline_few": "● {{count}} не в мережі",
+    "offline_many": "● {{count}} не в мережі",
+    "sources_few": "{{count}} джерела",
+    "sources_many": "{{count}} джерел"
+  },
+  "fleet_cards": {
+    "empty_title": "Fleets ще немає",
+    "contact_admin": "Зверніться до адміністратора, щоб налаштувати перші колектори.",
+    "empty_description": "Fleets дають змогу керувати групами колекторів зі спільною конфігурацією. Створіть свій перший Fleet, а потім додайте джерела, щоб визначити, які дані мають збирати його колектори. Після налаштування <deployLink>розгорніть колектори</deployLink> за допомогою токена реєстрації.",
+    "create": "Створити Fleet",
+    "no_match": "Немає Fleets, що відповідають фільтру"
+  },
+  "recent_activity": {
+    "title": "Остання активність",
+    "empty": "Немає недавньої активності."
+  },
+  "collector_facts": {
+    "title": "Collector",
+    "host": "Хост",
+    "os": "ОС",
+    "version": "Версія",
+    "fleet": "Fleet",
+    "enrolled": "Зареєстровано",
+    "last_seen": "Востаннє в мережі",
+    "show_attributes_one": "Показати всі {{count}} атрибут",
+    "show_attributes_other": "Показати всі {{count}} атрибута",
+    "hide_attributes": "Приховати атрибути",
+    "show_attributes_few": "Показати всі {{count}} атрибути",
+    "show_attributes_many": "Показати всі {{count}} атрибутів"
+  },
+  "connection_success": {
+    "offline": "Колектор підключився один раз, але не надсилав даних із <lastSeen />.",
+    "receiving": "Колектор підключений і доставляє повідомлення.",
+    "waiting": "Майже готово — колектор підключений, і ми очікуємо його перші повідомлення.",
+    "title": "Налаштування {{host}}",
+    "view_instances": "Переглянути екземпляри",
+    "check_again": "Перевірити ще раз",
+    "log_preview": "Попередній перегляд журналу",
+    "caption_messages": "Показано повідомлення, отримані за останні {{duration}}",
+    "caption_messages_checking": "Показано повідомлення, отримані за останні {{duration}} - перевірка кожні кілька секунд",
+    "caption_system": "Показано системні повідомлення Collector, отримані за останні {{duration}}",
+    "caption_system_checking": "Показано системні повідомлення Collector, отримані за останні {{duration}} - перевірка кожні кілька секунд"
+  },
+  "fleet_choice": {
+    "selected_heading": "Fleet для цього колектора",
+    "change": "Змінити Fleet",
+    "heading": "Виберіть Fleet для цього колектора",
+    "create_new": "Створити новий Fleet",
+    "or": "або",
+    "select_existing": "Вибрати наявний Fleet",
+    "select_existing_placeholder": "Виберіть наявний Fleet..."
+  },
+  "ingest_endpoint": {
+    "setting_up": "Налаштування Collectors...",
+    "confirm": "Підтвердити кінцеву точку",
+    "create_input": "Створити вхід",
+    "save": "Зберегти кінцеву точку",
+    "hostname": "Зовнішнє ім’я хоста",
+    "hostname_placeholder": "наприклад, otlp.example.com",
+    "port": "Зовнішній порт",
+    "cancel": "Скасувати",
+    "reachability_hint": "Колектори надсилають свої журнали на цю адресу. Вона має бути доступна з кожного хоста колектора: балансувальник навантаження або цей сервер.",
+    "confirm_title": "Підтвердьте, як Collectors надсилають дані в цей кластер",
+    "change": "Змінити кінцеву точку",
+    "sending_to": "Колектори надсилають дані в цей кластер на адресу <endpoint />",
+    "no_input_title": "Вхід прийому не існує",
+    "no_input": "Колектори можуть реєструватися, але не зможуть надсилати дані, доки не буде створено вхід.",
+    "not_running_title": "Вхід прийому на <endpoint /> не запущено",
+    "not_running": "Колектори можуть реєструватися, але не зможуть надсилати дані, доки вхід не буде запущено.",
+    "manage_input": "Керувати входом"
+  },
+  "install_command": {
+    "title": "Виконайте це на {{platform}}",
+    "copy": "Копіювати команду",
+    "note_expires": "Завантажує та встановлює колектор, реєструє його у вибраному Fleet і запускає службу. Потрібні права адміністратора. Токен діє {{duration}}.",
+    "note_never_expires": "Завантажує та встановлює колектор, реєструє його у вибраному Fleet і запускає службу. Потрібні права адміністратора. Цей токен безстроковий."
+  },
+  "log_preview": {
+    "unavailable": "Попередній перегляд журналу недоступний — {{error}}",
+    "loading": "Завантаження попереднього перегляду журналу...",
+    "empty": "Повідомлень ще немає — перевірка кожні кілька секунд"
+  },
+  "next_steps": {
+    "explore": "Дослідити ваші дані",
+    "explore_description": "Відкрити пошук, відфільтрований за цим колектором",
+    "configure_sources": "Налаштувати джерела",
+    "configure_sources_description": "Додайте або змініть те, що збирає цей Fleet",
+    "manage_fleets": "Керувати Fleets",
+    "manage_fleets_description": "Перемістіть цей колектор до постійного Fleet",
+    "install_another": "Установити інший колектор",
+    "install_another_description": "Повторіть це налаштування на іншому хості",
+    "offline_title": "Відновіть підключення",
+    "check_service": "Переконайтеся, що служба колектора працює на хості.",
+    "check_reachability": "Переконайтеся, що хост має доступ до цього сервера {{productName}}.",
+    "check_logs": "Перегляньте власні журнали колектора в попередньому перегляді нижче, щоб знайти помилки підключення.",
+    "title": "Що далі"
+  },
+  "timeline": {
+    "connection_lost": "З’єднання втрачено",
+    "last_heartbeat": "Останній сигнал активності <lastSeen />",
+    "first_messages": "Перші повідомлення",
+    "receiving_one": "Отримання - {{count}} повідомлення за {{duration}}",
+    "receiving_other": "Отримання - {{count}} повідомлення за {{duration}}",
+    "listening": "Очікування... зазвичай менше хвилини",
+    "enrolled": "Зареєстровано",
+    "enrolled_detail": "Зареєстровано за допомогою токена реєстрації - <enrolledAt />",
+    "connected": "Підключено",
+    "connected_detail": "Отримано сигнал активності - <lastSeen />",
+    "sources_configured": "Джерела налаштовано",
+    "sources_detail_one": "{{count}} джерело з Fleet <fleetLink>{{fleetName}}</fleetLink>",
+    "sources_detail_other": "{{count}} джерела з Fleet <fleetLink>{{fleetName}}</fleetLink>",
+    "receiving_few": "Отримання - {{count}} повідомлення за {{duration}}",
+    "receiving_many": "Отримання - {{count}} повідомлень за {{duration}}",
+    "sources_detail_few": "{{count}} джерела з Fleet <fleetLink>{{fleetName}}</fleetLink>",
+    "sources_detail_many": "{{count}} джерел з Fleet <fleetLink>{{fleetName}}</fleetLink>"
+  },
+  "platform_picker": {
+    "title": "Початок роботи з Collectors",
+    "description": "Розгорніть легкі колектори у своїй інфраструктурі, щоб пересилати журнали до {{productName}}."
+  },
+  "source_status": {
+    "messages_one": "{{formattedCount}} повідомлення",
+    "messages_other": "{{formattedCount}} повідомлення",
+    "disabled": "Вимкнено",
+    "not_applicable": "Не застосовується для {{os}}",
+    "unrecognised": "Нерозпізнаний тип джерела",
+    "paused": "Призупинено — колектор не в мережі",
+    "no_messages": "Повідомлень ще немає",
+    "waiting": "Очікування перших повідомлень...",
+    "title": "Джерела журналів",
+    "no_sources": "Для цього Fleet ще не налаштовано джерел.",
+    "messages_few": "{{formattedCount}} повідомлення",
+    "messages_many": "{{formattedCount}} повідомлень"
+  },
+  "waiting_for_connection": {
+    "status": "Очікування підключення... {{seconds}} с"
+  },
+  "settings": {
+    "getting_started": "Початок роботи з Collectors",
+    "getting_started_cloud": "Колектори підключаються до керованої кінцевої точки прийому, щоб надсилати свої дані. Збережіть налаштування колектора, щоб ініціалізувати інфраструктуру колекторів. Після налаштування ви зможете створювати Fleets, додавати джерела та розгортати колектори на своїх хостах.",
+    "getting_started_self_managed": "Колекторам потрібні кінцеві точки прийому для отримання зібраних даних. Налаштуйте HTTP-кінцеву точку нижче та збережіть, щоб ініціалізувати інфраструктуру колекторів. Після налаштування ви зможете створювати Fleets, додавати джерела та розгортати колектори на своїх хостах.",
+    "ingest_endpoint": "Кінцева точка прийому",
+    "ingest_endpoint_cloud": "Кінцевою точкою прийому керує система. Колектори підключаються сюди автоматично.",
+    "ingest_endpoint_help": "Кінцеві точки прийому отримують дані журналів від колекторів через OpenTelemetry (OTLP). Це зовнішня адреса, яка передається керованим колекторам як місце призначення даних. Вона має вести до запущеного входу прийому колекторів. Зазвичай це адреса балансувальника навантаження або самого сервера.",
+    "hostname_help": "Ім’я хоста або IP-адреса, яку колектори використовуватимуть для підключення. Має бути доступною з хостів колекторів.",
+    "create_input": "Створити вхід прийому",
+    "lifecycle": "Життєвий цикл колектора",
+    "offline_threshold": "Поріг відсутності в мережі",
+    "offline_threshold_help": "Колектори, які не надсилали даних протягом цього часу, відображаються як такі, що не в мережі.",
+    "default_visibility": "Видимість за замовчуванням",
+    "default_visibility_help": "Колектори, які не надсилали даних протягом цього часу, приховуються з типового подання. Користувачі можуть змінити або вилучити цей фільтр у таблиці екземплярів.",
+    "expiration_threshold": "Поріг завершення терміну",
+    "expiration_threshold_help": "Колектори, які не надсилали даних протягом цього часу, видаляються безповоротно.",
+    "confirm": "Підтвердити налаштування"
+  },
+  "ingest_inputs": {
+    "title": "Входи прийому",
+    "none": "Входу прийому колекторів не існує. Колектори не зможуть надсилати дані, доки не буде створено вхід.",
+    "unreadable_one": "Існує {{count}} вхід прийому колекторів, але у вас немає дозволу на його перегляд.",
+    "unreadable_other": "Існує {{count}} входу прийому колекторів, але у вас немає дозволу на їх перегляд.",
+    "none_running": "Входи прийому колекторів існують, але жоден із них зараз не запущений. Колектори не зможуть надсилати дані.",
+    "name": "Назва",
+    "status": "Стан",
+    "bind_address": "Адреса прив’язки",
+    "port": "Порт",
+    "manage": "Керувати",
+    "additional_unreadable_one": "{{count}} додатковий вхід не видно через дозволи.",
+    "additional_unreadable_other": "{{count}} додаткового входу не видно через дозволи.",
+    "unreadable_few": "Існує {{count}} входи прийому колекторів, але у вас немає дозволу на їх перегляд.",
+    "unreadable_many": "Існує {{count}} входів прийому колекторів, але у вас немає дозволу на їх перегляд.",
+    "additional_unreadable_few": "{{count}} додаткові входи не видно через дозволи.",
+    "additional_unreadable_many": "{{count}} додаткових входів не видно через дозволи."
+  },
+  "port_mismatch": {
+    "message_one": "Входи прийому колекторів існують на іншому порту: {{ports}}. Якщо зовнішній порт відрізняється від порту входу, переконайтеся, що ваша мережа правильно маршрутизує трафік.",
+    "message_other": "Входи прийому колекторів існують на інших портах: {{ports}}. Якщо зовнішній порт відрізняється від порту входу, переконайтеся, що ваша мережа правильно маршрутизує трафік.",
+    "message_few": "Входи прийому колекторів існують на інших портах: {{ports}}. Якщо зовнішній порт відрізняється від порту входу, переконайтеся, що ваша мережа правильно маршрутизує трафік.",
+    "message_many": "Входи прийому колекторів існують на інших портах: {{ports}}. Якщо зовнішній порт відрізняється від порту входу, переконайтеся, що ваша мережа правильно маршрутизує трафік."
+  },
+  "source_types": {
+    "file": "Файл",
+    "journald": "Journald",
+    "windows_event_log": "Журнал подій Windows",
+    "macos_unified_logging": "Уніфіковане журналювання macOS"
+  },
+  "source_columns": {
+    "enabled": "Ввімкнено"
+  },
+  "source_form": {
+    "max_poll_interval_error": "Максимальний інтервал опитування має бути не менше 1 секунди.",
+    "max_log_age_error": "Максимальний вік журналу має бути 0 або додатним значенням.",
+    "read_mode_end": "З кінця (tail)",
+    "read_mode_beginning": "З початку",
+    "file_paths": "Шлях(и) до файлів",
+    "file_paths_help": "Підтримуються glob-шаблони (наприклад, /var/log/*.log, /var/log/**/*.log). Колектор стежить за відповідними файлами для нових рядків.",
+    "read_mode": "Режим читання",
+    "read_mode_file_help": "З кінця: збирати лише нові рядки після запуску колектора. З початку: спочатку зібрати всі наявні рядки, потім продовжити стеження.",
+    "read_mode_journald_help": "З кінця: збирати лише нові записи після запуску колектора. З початку: спочатку зібрати всі наявні записи, потім продовжити стеження.",
+    "priority": "Пріоритет",
+    "priority_help": "Мінімальний рівень серйозності для збору. Наприклад, вибір «Помилка» також збирає записи рівнів «Критичний», «Тривога» та «Аварія».",
+    "priority_emerg": "Аварія",
+    "priority_alert": "Тривога",
+    "priority_crit": "Критичний",
+    "priority_err": "Помилка",
+    "priority_warning": "Попередження",
+    "priority_notice": "Примітка",
+    "priority_info": "Інформація",
+    "priority_debug": "Налагодження",
+    "match_pattern": "Шаблон збігу",
+    "match_pattern_help": "Необов’язковий вираз збігу journald для фільтрації записів за модулем, процесом тощо. Приклад: _SYSTEMD_UNIT=nginx.service",
+    "channels": "Канали",
+    "channels_help": "Назви каналів через кому (наприклад, Application, Security, System)",
+    "include_default_channels": "Включити канали за замовчуванням",
+    "include_default_channels_help": "За замовчуванням: {{channels}}",
+    "predicate": "Предикат",
+    "predicate_help": "Необов’язковий предикат фільтра уніфікованого журналювання macOS, що передається команді <code>log</code>. Якщо залишити порожнім, збиратимуться всі журнали системи! Рівні <code>info</code> та <code>debug</code> наразі не збираються, оскільки вони дуже шумні та містять мало корисної інформації. Приклад: <code>{{example}}</code>",
+    "max_poll_interval": "Максимальний інтервал опитування",
+    "max_poll_interval_help": "Як часто колектор перевіряє нові записи журналу. Має бути не менше 1 секунди.",
+    "max_log_age": "Максимальний вік журналу",
+    "max_log_age_help": "Під час першого запуску — наскільки далеко в минуле доповнювати журнали. Встановіть 0, щоб вимкнути доповнення.",
+    "edit_title": "Редагувати джерело",
+    "new_title": "Нове джерело",
+    "description": "Джерело визначає, які дані мають збирати колектори цього Fleet. Кожен тип джерела відповідає окремому способу збору.",
+    "source_type": "Тип джерела",
+    "file_type_help": "Збирати рядки журналу з файлів на хості. Підтримує glob-шаблони для відповідності кільком файлам.",
+    "journald_type_help": "Збирати записи з журналу systemd (лише Linux).",
+    "windows_type_help": "Збирати події з каналів Windows Event Viewer.",
+    "macos_type_help": "Збирати з системи уніфікованого журналювання macOS через команду <code>log</code> (лише macOS).",
+    "enabled_help": "Вимкнені джерела не надсилаються колекторам. Використовуйте це, щоб тимчасово зупинити збір без видалення джерела.",
+    "update": "Оновити джерело",
+    "create": "Створити джерело"
+  },
+  "load_errors": {
+    "recent_activity": {
+      "message": "Не вдалося завантажити останню активність зі статусом",
+      "title": "Не вдалося завантажити останню активність"
+    },
+    "input_ids": {
+      "message": "Не вдалося завантажити ідентифікатори входів Collector зі статусом",
+      "title": "Не вдалося завантажити ідентифікатори входів колекторів."
+    },
+    "stats": {
+      "message": "Не вдалося завантажити статистику Collector зі статусом",
+      "title": "Не вдалося завантажити статистику Collector."
+    },
+    "config": {
+      "message": "Не вдалося завантажити конфігурацію колекторів зі статусом",
+      "title": "Не вдалося завантажити конфігурацію колекторів."
+    },
+    "enrollment_tokens": {
+      "message": "Не вдалося завантажити токени реєстрації зі статусом",
+      "title": "Не вдалося завантажити токени реєстрації"
+    },
+    "pending_changes": {
+      "message": "Не вдалося завантажити очікувані зміни зі статусом",
+      "title": "Не вдалося завантажити очікувані зміни"
+    },
+    "instances": {
+      "message": "Не вдалося завантажити екземпляри зі статусом",
+      "title": "Не вдалося завантажити екземпляри"
+    },
+    "collector_instances": {
+      "message": "Не вдалося завантажити екземпляри Collector зі статусом",
+      "title": "Не вдалося завантажити екземпляри Collector"
+    },
+    "fleets": {
+      "message": "Не вдалося завантажити Fleets зі статусом",
+      "title": "Не вдалося завантажити Fleets"
+    },
+    "fleet": {
+      "message": "Не вдалося завантажити Fleet зі статусом",
+      "title": "Не вдалося завантажити Fleet"
+    },
+    "fleet_stats": {
+      "message": "Не вдалося завантажити статистику Fleet зі статусом",
+      "title": "Не вдалося завантажити статистику Fleet"
+    },
+    "sources": {
+      "message": "Не вдалося завантажити джерела зі статусом",
+      "title": "Не вдалося завантажити джерела"
+    },
+    "input_details": {
+      "message": "Не вдалося завантажити відомості про вхід Collector зі статусом: {{error}}",
+      "title": "Не вдалося завантажити відомості про вхід колектора."
+    }
+  },
+  "mutation_errors": {
+    "create_fleet": {
+      "message": "Не вдалося створити Fleet: {{error}}",
+      "title": "Не вдалося створити Fleet"
+    },
+    "update_fleet": {
+      "message": "Не вдалося оновити Fleet: {{error}}",
+      "title": "Не вдалося оновити Fleet"
+    },
+    "delete_fleet": {
+      "message": "Не вдалося видалити Fleet: {{error}}",
+      "title": "Не вдалося видалити Fleet"
+    },
+    "create_source": {
+      "message": "Не вдалося створити джерело: {{error}}",
+      "title": "Не вдалося створити джерело"
+    },
+    "update_source": {
+      "message": "Не вдалося оновити джерело: {{error}}",
+      "title": "Не вдалося оновити джерело"
+    },
+    "delete_source": {
+      "message": "Не вдалося видалити джерело: {{error}}",
+      "title": "Не вдалося видалити джерело"
+    },
+    "create_enrollment_token": {
+      "message": "Не вдалося створити токен реєстрації: {{error}}",
+      "title": "Не вдалося створити токен реєстрації"
+    },
+    "delete_enrollment_token": {
+      "message": "Не вдалося видалити токен реєстрації: {{error}}",
+      "title": "Не вдалося видалити токен реєстрації"
+    },
+    "delete_enrollment_tokens": {
+      "message": "Не вдалося видалити токени реєстрації: {{error}}",
+      "title": "Не вдалося видалити токени реєстрації"
+    },
+    "reassign_instances": {
+      "message": "Не вдалося перепризначити екземпляри: {{error}}",
+      "title": "Не вдалося перепризначити екземпляри"
+    },
+    "delete_instance": {
+      "message": "Не вдалося видалити екземпляр: {{error}}",
+      "title": "Не вдалося видалити екземпляр"
+    },
+    "save_config": {
+      "message": "Не вдалося зберегти конфігурацію колекторів: {{error}}",
+      "title": "Не вдалося зберегти конфігурацію"
+    },
+    "create_input": {
+      "message": "Не вдалося створити вхід прийому Collector: {{error}}",
+      "title": "Не вдалося створити вхід прийому Collector"
+    },
+    "update_input": {
+      "message": "Не вдалося оновити вхід прийому Collector: {{error}}",
+      "title": "Не вдалося оновити вхід прийому Collector"
+    }
+  },
+  "notifications": {
+    "success_title": "Успішно!",
+    "fleet_created": "Fleet «{{name}}» створено.",
+    "fleet_updated": "Fleet «{{name}}» оновлено.",
+    "fleet_deleted": "Fleet видалено.",
+    "source_created": "Джерело «{{name}}» створено.",
+    "source_updated": "Джерело «{{name}}» оновлено.",
+    "source_deleted": "Джерело видалено.",
+    "enrollment_token_deleted": "Токен реєстрації видалено.",
+    "enrollment_tokens_deleted": "Токени реєстрації видалено.",
+    "instances_reassigned": "Екземпляри перепризначено.",
+    "instance_deleted": "Екземпляр видалено.",
+    "config_saved": "Конфігурацію колекторів збережено.",
+    "input_created": "Вхід прийому Collector створено.",
+    "input_moved": "Вхід прийому Collector переміщено на новий порт."
+  },
+  "datanode": {
+    "compatibility_check": {
+      "compatible": "Ваші наявні дані OpenSearch можна перенести до Data Node.",
+      "error": "Під час перевірки сумісності сталася помилка",
+      "incompatible": "Ваші наявні дані OpenSearch не можна перенести до Data Node.",
+      "loading": "Завантаження результатів перевірки сумісності...",
+      "title": "Перевірка сумісності каталогу",
+      "version_incompatible": "Ваш кластер OpenSearch не можна перенести до цієї версії Data Node, оскільки вони несумісні."
+    },
+    "migration_steps_text": {
+      "renewal_step_required": "Створіть політику поновлення сертифікатів, перш ніж продовжувати.",
+      "finished": "Міграцію завершено!",
+      "ca_step_required": "Створіть центр сертифікації, перш ніж продовжувати."
+    },
+    "migration_welcome": {
+      "earlier_deployments": "Розгортання раніших версій, ніж v5.2, або ті, що відмовилися від встановлення з Data Node, потребуватимуть міграції баз даних повідомлень до Data Nodes.",
+      "incompatible_backend": "Несумісний бекенд пошуку. Оновіть до OpenSearch, щоб мати змогу скористатися майстром міграції.",
+      "intro": "{{productName}} Data Node — це компонент керування, призначений для налаштування та оптимізації OpenSearch для використання з {{productName}}, що зменшує адміністративні витрати та спрощує майбутні оновлення.",
+      "more_information": "Додаткову інформацію про міграцію на Data Node можна отримати в <docsLink>документації</docsLink>.",
+      "required_steps": "Міграція на Data Node потребуватиме виконання деяких кроків в ОС, у вашому поточному кластері OS/ES та у ваших файлах конфігурації.",
+      "title": "Міграція на Data Nodes",
+      "tool_description": "Цей інструмент міграції перевірить сумісність ваших компонентів і проведе вас через міграцію наявних даних OpenSearch до Data Node."
+    },
+    "migration_wizard": {
+      "loading": "Завантаження ..."
+    },
+    "compatibility_status": {
+      "creation_date": "Дата створення",
+      "datanode_opensearch_version": "Версія OpenSearch у Datanode",
+      "index_version": "Версія індексу",
+      "indices": "Індекси",
+      "node_title_one": "Вузол: {{hostname}}, версія: {{version}}, {{count}} індекс",
+      "node_title_other": "Вузол: {{hostname}}, версія: {{version}}, {{count}} індексу",
+      "opensearch_data_location": "Розташування даних OpenSearch",
+      "shard_count_one": "{{count}} шард",
+      "shard_count_other": "{{count}} шарда",
+      "shards": "Шарди",
+      "node_title_few": "Вузол: {{hostname}}, версія: {{version}}, {{count}} індекси",
+      "node_title_many": "Вузол: {{hostname}}, версія: {{version}}, {{count}} індексів",
+      "shard_count_few": "{{count}} шарди",
+      "shard_count_many": "{{count}} шардів"
+    },
+    "in_place_migration": {
+      "description": "Виконайте ці кроки, щоб перенести ваш наявний кластер OpenSearch 2.x або 1.3.x до Data Nodes.",
+      "title": "Міграція на місці"
+    },
+    "migration_data_nodes": {
+      "certificate_valid_until": "Сертифікат дійсний до",
+      "found_one": "Знайдено Data Nodes: {{count}}",
+      "found_other": "Знайдено Data Nodes: {{count}}",
+      "hostname": "Ім’я хоста",
+      "incompatible": "Запущено Data Nodes із версіями, несумісними з вашою поточною версією {{productName}}. Переконайтеся, що для {{productName}} і Data Node використовується та сама версія.",
+      "incompatible_title": "Знайдено несумісні Data Nodes",
+      "loading": "Завантаження Data Nodes",
+      "looking": "Пошук Data Nodes...",
+      "no_certificate": "Немає сертифіката",
+      "none_found": "Data Nodes не знайдено.",
+      "none_found_title": "Data Nodes не знайдено",
+      "start_data_node": "Запустіть принаймні один Data Node, щоб продовжити процес міграції. Додаткову інформацію про запуск Data Nodes можна знайти в нашій <docsLink>документації</docsLink>.",
+      "status": "Стан",
+      "transport_address": "Транспортна адреса",
+      "version": "Версія",
+      "version_incompatible": "Ця версія несумісна з вашою поточною версією {{productName}}.",
+      "found_few": "Знайдено Data Nodes: {{count}}",
+      "found_many": "Знайдено Data Nodes: {{count}}"
+    },
+    "manual_migration": {
+      "migration_type": "Тип міграції",
+      "migration_type_help": "Тип міграції, яку ви хочете виконати.",
+      "select_migration_type": "Виберіть тип міграції"
+    },
+    "stop_processing": {
+      "change_owner": "Якщо ви переносите наявні дані OpenSearch, вказавши Data Node на його каталог даних, змініть власника каталогу даних на користувача, від імені якого працює Data Node (зазвичай graylog-datanode), і відновіть правильні дозволи, наприклад, виконавши",
+      "stop_cluster": "Зупиніть свій кластер OpenSearch, перш ніж продовжувати.",
+      "stop_opensearch": "Зупинити OpenSearch",
+      "stopped": "Обробку в {{productName}} зупинено."
+    },
+    "journal_size_warning": {
+      "description": "Зверніть увагу, що під час міграції вам доведеться зупинити обробку на вузлі {{productName}}, через що журнал зростатиме в розмірі. Тому вам потрібно буде збільшити розмір тому журналу на кроці зменшення розміру журналу або раніше.",
+      "title": "Попередження про розмір журналу"
+    },
+    "journal_downtime": {
+      "current_size": "Поточний розмір вашого журналу: <bold>{{size}} МБ</bold>, а поточна пропускна здатність журналу: <bold>{{throughput}} КБ/хв</bold>",
+      "estimation_error": "Під час оцінювання пропускної здатності вашого журналу сталася помилка: {{message}}",
+      "increase_size": "Тому вам може знадобитися збільшити розмір тому журналу.",
+      "max_downtime": "Ваш поточний максимальний час простою для переналаштування {{productName}} на data node: <bold>{{duration}}</bold>",
+      "processing_stops": "Зверніть увагу, що під час міграції обробка даних на вашому вузлі {{productName}} зупиниться, через що журнал зростатиме в розмірі.",
+      "sufficient_size": "Переконайтеся, що розмір тому вашого журналу достатній, перш ніж продовжувати.",
+      "title": "Попередження про розмір журналу під час простою"
+    },
+    "in_place_welcome": {
+      "description": "Міграція на місці перенесе папку даних вашого наявного кластера до кластера Data Node.",
+      "install": "Щоб почати, установіть Data Node на кожному вузлі OS/ES із вашого попереднього налаштування. Додаткову інформацію про те, як завантажити та встановити Data Node, можна знайти <docsLink>тут</docsLink>.",
+      "title": "Ласкаво просимо"
+    },
+    "restart_graylog": {
+      "almost_there": "Майже готово!",
+      "example": "Наприклад,",
+      "remove_hosts": "Видаліть рядок <codeSnippet>elasticsearch_hosts</codeSnippet> зі свого <codeSnippet>server.conf</codeSnippet>",
+      "restart": "Після цього перезапустіть {{productName}}, щоб завершити міграцію.",
+      "wait_for_available": "Зачекайте, поки всі data nodes стануть «AVAILABLE». Якщо вони не стануть доступними протягом 1–2 хвилин, перевірте журнал data node."
+    },
+    "in_place_migration_info": {
+      "configuration": "Для міграції на місці переконайтеся, що конфігурація ваших Data Nodes у <codeSnippet>datanode.conf</codeSnippet>, зокрема параметр <codeSnippet>opensearch_data_location</codeSnippet>, вказує на правильний наявний каталог даних OpenSearch на кожному вузлі.",
+      "permissions": "Під час міграції і системний користувач Data Node, і системний користувач OpenSearch повинні мати змогу отримувати доступ до каталогу даних і записувати в нього. Щоб це забезпечити, можна виконати, наприклад,"
+    },
+    "certificates_provisioning": {
+      "ca_configured": "Центр сертифікації успішно налаштовано.",
+      "finished": "Підготовку Data Node завершено.",
+      "loading": "Завантаження стану міграції.",
+      "provision_now": "Тепер ви можете підготувати сертифікат для своїх Data Nodes.",
+      "provisioning": "Підготовка сертифіката"
+    },
+    "jwt_authentication": {
+      "add_snippet": "Для цього додайте наведений нижче фрагмент до свого <codeSnippet>opensearch-security/config.yml</codeSnippet>",
+      "description": "Залежно від того, як захищено ваш наявний кластер, можуть знадобитися попередні зміни конфігурації безпеки. Ми використовуємо автентифікацію JWT для доступу до OpenSearch із {{productName}}. На наступному кроці вам потрібно вручну ввімкнути автентифікацію JWT у вашому наявному кластері OpenSearch, щоб забезпечити доступ до даних у data node.",
+      "replace_signing_key": "Замініть ключ підпису на свій <codeSnippet>GRAYLOG_PASSWORD_SECRET</codeSnippet> у кодуванні base64. Щоб закодувати його, можна виконати",
+      "title": "Автентифікація JWT"
+    },
+    "reset_migration": {
+      "button": "Скинути міграцію",
+      "confirm": "Ви впевнені, що хочете скинути міграцію?",
+      "failed": "Не вдалося скинути стан міграції зі статусом: {{error}}",
+      "failed_title": "Не вдалося скинути стан міграції.",
+      "success": "Стан міграції успішно скинуто."
+    },
+    "migration_actions": {
+      "next": "Далі",
+      "show_renewal_policy_creation": "Налаштувати політику поновлення сертифікатів",
+      "show_migration_selection": "Перейти до кроків міграції",
+      "run_directory_compatibility_check": "Запустити перевірку сумісності каталогу",
+      "provision_datanode_certificates": "Підготувати сертифікати для Data Nodes"
+    },
+    "force_start": {
+      "confirm": "Усе одно запустити",
+      "description": "Бекенд повідомив, що звичайні попередні перевірки не пройдено.",
+      "submitting": "Запуск...",
+      "title": "Усе одно запустити оновлення OpenSearch?"
+    },
+    "rolling_upgrade_nodes": {
+      "abort_requested": "Запит на переривання отримано. Оновлення зупиниться після поточного кроку.",
+      "no_remaining_nodes": "Не залишилося вузлів.",
+      "no_upgraded_nodes": "Оновлених вузлів поки немає.",
+      "not_started": "Поетапне оновлення OpenSearch ще не запускалося.",
+      "title": "Поетапне оновлення OpenSearch",
+      "upgraded_heading": "Оновлено до цільової версії OpenSearch",
+      "waiting_heading": "Очікують оновлення OpenSearch",
+      "current": "поточний",
+      "data_node": "Data Node",
+      "manager": "менеджер",
+      "opensearch_version": "Версія OpenSearch",
+      "status": "Стан",
+      "unknown": "Невідомо",
+      "node_status": {
+        "pending": "Очікування",
+        "restarting": "Перезапуск",
+        "started": "Запущено",
+        "completed": "Оновлено",
+        "failed": "Помилка",
+        "skipped": "Пропущено"
+      },
+      "state": {
+        "preparing_cluster": "Підготовка кластера",
+        "selecting_next_node": "Вибір наступного вузла",
+        "upgrading_node": "Оновлення вузла",
+        "waiting_node_joined": "Очікування повторного приєднання вузла",
+        "reenabling_allocation": "Повторне ввімкнення розподілу",
+        "waiting_green": "Очікування зеленого стану кластера",
+        "paused_waiting_green": "Призупинено в очікуванні зеленого стану кластера",
+        "finalizing": "Завершення",
+        "completed": "Завершено",
+        "aborted": "Перервано",
+        "failed": "Помилка",
+        "in_progress": "Виконується"
+      }
+    },
+    "opensearch_upgrade_info": {
+      "current_version": "Поточна версія OpenSearch:",
+      "data_nodes": "Data Nodes:",
+      "data_nodes_summary": "{{total}} (доступно: {{available}})",
+      "loading": "Завантаження...",
+      "target_version": "Цільова версія OpenSearch:",
+      "unknown": "Невідомо"
+    },
+    "start_upgrade": {
+      "full": {
+        "alert_title": "Менше ніж 3 Data Nodes — це повний перезапуск, а не поетапний",
+        "confirm": "Перезапустити",
+        "journal": "Поки OpenSearch не працює, вхідні повідомлення накопичуються в дисковому журналі на кожному вузлі {{productName}}. Якщо простій перевищить обмеження розміру або віку журналу, прийом зупиниться, а повідомлення можуть бути втрачені — продовжуйте, лише якщо журнал має достатній запас для очікуваного простою.",
+        "submitting": "Перезапуск...",
+        "title": "Перезапустити OpenSearch на Data Nodes?",
+        "tolerate_downtime": "Продовжуйте, лише якщо можете допустити простій.",
+        "restart_together_with_versions_one": "Якщо Data Nodes менше 3, OpenSearch не може залишатися доступним під час перезапуску вузлів по одному. Усі ваші Data Nodes перезапускаються разом, щоб перевести OpenSearch з <strong>{{currentVersion}}</strong> на <strong>{{targetVersion}}</strong>, тому сховище <strong>недоступне</strong>, доки вони не завершать роботу — пошук та індексування перериваються.",
+        "restart_together_with_versions_other": "Якщо Data Nodes менше 3, OpenSearch не може залишатися доступним під час перезапуску вузлів по одному. Усі ваші Data Nodes перезапускаються разом, щоб перевести OpenSearch з <strong>{{currentVersion}}</strong> на <strong>{{targetVersion}}</strong>, тому сховище <strong>недоступне</strong>, доки вони не завершать роботу — пошук та індексування перериваються.",
+        "restart_together_one": "Якщо Data Nodes менше 3, OpenSearch не може залишатися доступним під час перезапуску вузлів по одному. Усі ваші Data Nodes перезапускаються разом, щоб перевести OpenSearch на цільову версію, тому сховище <strong>недоступне</strong>, доки вони не завершать роботу — пошук та індексування перериваються.",
+        "restart_together_other": "Якщо Data Nodes менше 3, OpenSearch не може залишатися доступним під час перезапуску вузлів по одному. Усі ваші Data Nodes перезапускаються разом, щоб перевести OpenSearch на цільову версію, тому сховище <strong>недоступне</strong>, доки вони не завершать роботу — пошук та індексування перериваються.",
+        "restart_together_with_versions_few": "Якщо Data Nodes менше 3, OpenSearch не може залишатися доступним під час перезапуску вузлів по одному. Усі ваші Data Nodes перезапускаються разом, щоб перевести OpenSearch з <strong>{{currentVersion}}</strong> на <strong>{{targetVersion}}</strong>, тому сховище <strong>недоступне</strong>, доки вони не завершать роботу — пошук та індексування перериваються.",
+        "restart_together_with_versions_many": "Якщо Data Nodes менше 3, OpenSearch не може залишатися доступним під час перезапуску вузлів по одному. Усі ваші Data Nodes перезапускаються разом, щоб перевести OpenSearch з <strong>{{currentVersion}}</strong> на <strong>{{targetVersion}}</strong>, тому сховище <strong>недоступне</strong>, доки вони не завершать роботу — пошук та індексування перериваються.",
+        "restart_together_few": "Якщо Data Nodes менше 3, OpenSearch не може залишатися доступним під час перезапуску вузлів по одному. Усі ваші Data Nodes перезапускаються разом, щоб перевести OpenSearch на цільову версію, тому сховище <strong>недоступне</strong>, доки вони не завершать роботу — пошук та індексування перериваються.",
+        "restart_together_many": "Якщо Data Nodes менше 3, OpenSearch не може залишатися доступним під час перезапуску вузлів по одному. Усі ваші Data Nodes перезапускаються разом, щоб перевести OpenSearch на цільову версію, тому сховище <strong>недоступне</strong>, доки вони не завершать роботу — пошук та індексування перериваються."
+      },
+      "no_rollback": "Після запуску відкотитися до попередньої версії неможливо.",
+      "rolling": {
+        "alert_title": "Це перезапускає кожен Data Node по черзі",
+        "confirm": "Запустити поетапне оновлення",
+        "healthy_cluster": "Переконайтеся, що кластер справний (зелений), перш ніж продовжувати.",
+        "shard_allocation": "Розподіл шардів призупиняється під час кожного перезапуску, тому кластер залишається доступним — але індексування та пошук можуть ненадовго погіршитися, поки вузол виходить і повертається.",
+        "title": "Запустити поетапне оновлення OpenSearch?",
+        "wait_for_green": "Після кожного вузла оновлення чекає, поки кластер повернеться до зеленого стану, перш ніж продовжити. Якщо це триває надто довго, воно призупиняється й очікує, поки ви його відновите.",
+        "each_node_with_versions_one": "Кількість Data Nodes: {{count}}. Кожен із них буде оновлено та перезапущено по одному, щоб перевести його вбудований OpenSearch з <strong>{{currentVersion}}</strong> на <strong>{{targetVersion}}</strong>.",
+        "each_node_with_versions_other": "Кількість Data Nodes: {{count}}. Кожен із них буде оновлено та перезапущено по одному, щоб перевести його вбудований OpenSearch з <strong>{{currentVersion}}</strong> на <strong>{{targetVersion}}</strong>.",
+        "each_node_one": "Кількість Data Nodes: {{count}}. Кожен із них буде оновлено та перезапущено по одному, щоб перевести його вбудований OpenSearch на цільову версію.",
+        "each_node_other": "Кількість Data Nodes: {{count}}. Кожен із них буде оновлено та перезапущено по одному, щоб перевести його вбудований OpenSearch на цільову версію.",
+        "each_node_with_versions_few": "Кількість Data Nodes: {{count}}. Кожен із них буде оновлено та перезапущено по одному, щоб перевести його вбудований OpenSearch з <strong>{{currentVersion}}</strong> на <strong>{{targetVersion}}</strong>.",
+        "each_node_with_versions_many": "Кількість Data Nodes: {{count}}. Кожен із них буде оновлено та перезапущено по одному, щоб перевести його вбудований OpenSearch з <strong>{{currentVersion}}</strong> на <strong>{{targetVersion}}</strong>.",
+        "each_node_few": "Кількість Data Nodes: {{count}}. Кожен із них буде оновлено та перезапущено по одному, щоб перевести його вбудований OpenSearch на цільову версію.",
+        "each_node_many": "Кількість Data Nodes: {{count}}. Кожен із них буде оновлено та перезапущено по одному, щоб перевести його вбудований OpenSearch на цільову версію."
+      },
+      "starting": "Запуск..."
+    },
+    "opensearch_upgrade": {
+      "already_up_to_date": "Вбудований OpenSearch на Data Nodes уже оновлено.",
+      "automatic_upgrade": "Кожен Data Node автоматично оновлює свій вбудований OpenSearch до цільової версії.",
+      "backup": "Перед оновленням створіть резервні копії MongoDB, Data Node і сховища Data Lake, щоб забезпечити безпечний шлях відкату.",
+      "before_upgrading": "Перед оновленням",
+      "check_failed": "Не вдалося перевірити доступність оновлення OpenSearch.",
+      "full_restart": "Щоб оновлення набуло чинності, усі Data Nodes необхідно перезапустити.",
+      "full_search_unavailable": "Пошук і індексування недоступні під час перезапуску Data Nodes.",
+      "incompatible_indices": "Несумісні індекси",
+      "old_indices_unreadable": "OpenSearch 3 не може читати індекси, створені у версіях раніших за OpenSearch 2. Якщо ці індекси залишаться під час оновлення, їхні дані стануть недоступними.",
+      "resolve_indices_first": "Спочатку усуньте всі несумісні індекси.",
+      "restarting": "Перезапуск...",
+      "resume": "Відновити",
+      "resuming": "Відновлення...",
+      "rolling_restart": "Data Nodes перезапускаються по черзі, щоб мінімізувати вплив.",
+      "rolling_search_impaired": "Функціональність пошуку може бути порушена під час перезапуску Data Nodes.",
+      "start_rolling_upgrade": "Запустити поетапне оновлення OpenSearch",
+      "start_upgrade_and_restart": "Запустити оновлення OpenSearch і перезапуск",
+      "starting_rolling_upgrade": "Запуск поетапного оновлення OpenSearch...",
+      "title": "Оновлення вбудованого OpenSearch на Data Nodes",
+      "unconfirmed_one": "Несумісні індекси та стан оновлення неможливо перевірити, поки недоступні Data Nodes (кількість: {{count}}) — вони з’являться знову, щойно всі Data Nodes стануть доступними.",
+      "unconfirmed_other": "Несумісні індекси та стан оновлення неможливо перевірити, поки недоступні Data Nodes (кількість: {{count}}) — вони з’являться знову, щойно всі Data Nodes стануть доступними.",
+      "upgrade_process": "Процес оновлення",
+      "use_table": "Скористайтеся таблицею нижче, щоб переіндексувати системні індекси та заархівувати або видалити індекси даних, перш ніж продовжувати.",
+      "unconfirmed_few": "Несумісні індекси та стан оновлення неможливо перевірити, поки недоступні Data Nodes (кількість: {{count}}) — вони з’являться знову, щойно всі Data Nodes стануть доступними.",
+      "unconfirmed_many": "Несумісні індекси та стан оновлення неможливо перевірити, поки недоступні Data Nodes (кількість: {{count}}) — вони з’являться знову, щойно всі Data Nodes стануть доступними."
+    },
+    "client_certificate": {
+      "certificate_lifetime": "Строк дії сертифіката",
+      "close": "Закрити",
+      "create_title": "Створити клієнтський сертифікат",
+      "password": "Пароль",
+      "principal": "Принципал",
+      "principal_placeholder": "principal",
+      "role": "Роль",
+      "role_help": "Відповідає зіставленню ролей OpenSearch.",
+      "role_placeholder": "role",
+      "submit": "Створити сертифікат",
+      "submitting": "Створення сертифіката...",
+      "unencrypted": "Незашифрований",
+      "ca_certificate": "Сертифікат ЦС",
+      "certificate": "Сертифікат",
+      "copy_to_clipboard": "Копіювати в буфер обміну",
+      "private_key": "Приватний ключ",
+      "view_principal": "Принципал:",
+      "view_role": "Роль:",
+      "generate": "Згенерувати клієнтський сертифікат",
+      "description": "Згенеруйте клієнтські сертифікати для стороннього інструмента",
+      "title": "Клієнтський сертифікат"
+    },
+    "cluster_health": {
+      "cluster_manager": "Менеджер кластера:",
+      "disabled": "Вимкнено",
+      "enabled": "Ввімкнено",
+      "nodes_summary": "{{total}} (застарілих: {{outdated}}, оновлених: {{upgraded}})",
+      "number_of_nodes": "Кількість вузлів:",
+      "number_of_shards": "Кількість шардів:",
+      "server_version": "Версія сервера:",
+      "shard_replication": "Реплікація шардів:",
+      "shard_replication_help": {
+        "confirm": "Після того як вузол оновлено і ви натиснули <emphasis><bold>Підтвердити оновлення</bold></emphasis>, реплікацію шардів буде знову ввімкнено, а всі шарди, які були недоступні через оновлення вузла, буде перерозподілено.",
+        "force_disabled": "Примусово вимкнено",
+        "force_enabled": "Примусово ввімкнено",
+        "start": "Після того як ви натиснете <emphasis><bold>Почати процес оновлення</bold></emphasis> для вузла, розподіл шардів буде встановлено без реплікації, щоб OpenSearch використовував лише доступні шарди."
+      },
+      "shards_summary": "активних: {{active}}, ініціалізується: {{initializing}}, переміщується: {{relocating}}, не призначено: {{unassigned}}",
+      "state_help": {
+        "green": "Після того як вузол оновлено і ви натиснули <emphasis>Підтвердити оновлення</emphasis>, реплікацію шардів буде знову ввімкнено, усі шарди, які були недоступні через оновлення вузла, буде перерозподілено, а кластер повернеться до стану GREEN.",
+        "question": "Як змінюється стан мого кластера під час поетапного оновлення?",
+        "red": "RED — якщо ви використовуєте індекси без реплікації та оновлюєте вузол, на якому розміщені шарди цих індексів, кластер перейде в червоний стан, і дані не прийматимуться в ці індекси та не будуть доступні для пошуку в них.",
+        "yellow": "YELLOW — після початку оновлення вузла розподіл шардів буде встановлено без реплікації, щоб OpenSearch використовував лише доступні шарди."
+      }
+    },
+    "upgrade_method": {
+      "cluster_restart": "Перезапуск кластера",
+      "cluster_restart_description": "У разі використання методу перезапуску кластера ви оновлюєте всі Data Nodes одночасно. Протягом цього часу повідомлення буферизуватимуться в журналі та обробляться, коли кластер Data Node повернеться в мережу, що не призведе до втрати даних, якщо розмір вашого журналу налаштовано під обсяг повідомлень, очікуваний під час простою Data Node.",
+      "cluster_restart_less_than_three": "Якщо ви використовуєте кластер Data Node з менш ніж трьома вузлами, метод перезапуску кластера є єдиним доступним.",
+      "cluster_restart_three_or_more": "Якщо ви використовуєте кластер Data Node із трьома або більше вузлами, ви можете обрати метод перезапуску кластера, зваживши розмір вашого журналу та пропускну здатність повідомлень.",
+      "rolling_upgrade": "Поетапне оновлення",
+      "rolling_upgrade_description": "Поетапні оновлення можна виконувати на запущеному кластері Data Node лише з <bold>трьома або більше вузлами</bold>, практично без простою.",
+      "rolling_upgrade_process": "Data Nodes зупиняються та оновлюються на місці по одному. Також Data Nodes можна зупиняти й замінювати по одному хостами з новою версією. Під час цього процесу ви можете й далі індексувати дані та виконувати запити у своєму кластері."
+    },
+    "upgrade_status": {
+      "all_data_nodes_up_to_date": "Усі ваші Data Nodes оновлені.",
+      "checking": "Перевірка стану OpenSearch...",
+      "error": "Не вдалося перевірити версію вбудованого OpenSearch на Data Nodes.",
+      "outdated": "Вбудований OpenSearch на Data Nodes не оновлений.",
+      "unconfirmed_one": "Стан вбудованого OpenSearch на Data Nodes неможливо підтвердити, поки недоступні Data Nodes (кількість: {{count}}).",
+      "unconfirmed_other": "Стан вбудованого OpenSearch на Data Nodes неможливо підтвердити, поки недоступні Data Nodes (кількість: {{count}}).",
+      "up_to_date": "Вбудований OpenSearch на Data Nodes оновлений.",
+      "up_to_date_with_version": "Вбудований OpenSearch на Data Nodes оновлений <bold>({{version}}).</bold>",
+      "upgrading": "Виконується поетапне оновлення OpenSearch.",
+      "unconfirmed_few": "Стан вбудованого OpenSearch на Data Nodes неможливо підтвердити, поки недоступні Data Nodes (кількість: {{count}}).",
+      "unconfirmed_many": "Стан вбудованого OpenSearch на Data Nodes неможливо підтвердити, поки недоступні Data Nodes (кількість: {{count}})."
+    },
+    "upgrade_nodes": {
+      "manager": "менеджер",
+      "no_outdated_nodes": "Застарілих вузлів не знайдено.",
+      "no_upgraded_nodes": "Оновлених вузлів не знайдено.",
+      "outdated_nodes": "Застарілі вузли",
+      "start_upgrade": "Почати процес оновлення",
+      "upgraded": "Оновлено",
+      "upgraded_nodes": "Оновлені вузли"
+    },
+    "data_node_actions": {
+      "rejoin": "Приєднати повторно",
+      "remove": "Вилучити",
+      "renew_certificate": "Поновити сертифікат",
+      "show_logs": "Показати журнали",
+      "start": "Запустити",
+      "stop": "Зупинити",
+      "rejoin_title": "Повторно приєднати Data Node",
+      "rejoin_confirm": "Ви впевнені, що хочете повторно приєднати Data Node «{{hostname}}»?",
+      "remove_title": "Вилучити Data Node",
+      "remove_confirm": "Ви впевнені, що хочете вилучити Data Node «{{hostname}}»?",
+      "stop_title": "Зупинити Data Node",
+      "stop_confirm": "Ви впевнені, що хочете зупинити Data Node «{{hostname}}»?"
+    },
+    "data_node_badge": {
+      "short_node_id": "Короткий ідентифікатор вузла"
+    },
+    "data_node_status": {
+      "queued_for": "у черзі: {{action}}"
+    },
+    "data_node_logs": {
+      "no_logs": "Немає журналів.",
+      "title": "Журнали {{hostname}}"
+    },
+    "cluster_management": {
+      "teaser_hotspot": "Показуйте показники продуктивності вашого Data Node і керованого кластера OpenSearch.",
+      "teaser_license_warning": "Переконайтеся, що у вас є дійсна ліцензія та налаштований Data Node, щоб бачити показники продуктивності вашого Data Node і керованого кластера OpenSearch."
+    },
+    "ca_configuration": {
+      "create_tab": "Створити новий ЦС",
+      "description_provision": "Центр сертифікації спрощує підготовку сертифікатів для ваших Data Nodes і керування ними.",
+      "description_upload_or_create": "На цьому кроці ви можете або завантажити, або створити новий центр сертифікації.",
+      "reusing_certificates": "Якщо ваш наявний кластер використовує сертифікати, за замовчуванням вони будуть замінені на ЦС {{productName}} і автоматично згенеровані сертифікати під час підготовки data nodes на наступному кроці. Якщо ви хочете використати власний ЦС, можна завантажити наявний сертифікат. Додаткову інформацію дивіться в <docsLink>{{productName}} Data Node - Getting Started</docsLink>.",
+      "reusing_certificates_title": "Повторне використання сертифікатів",
+      "title": "Налаштування центру сертифікації",
+      "upload_tab": "Завантажити ЦС"
+    },
+    "ca_upload": {
+      "certificate_authority": "Центр сертифікації",
+      "dropzone": "Перетягніть ЦС сюди або клацніть, щоб вибрати файл",
+      "explanation": "Тут ви можете завантажити свій наявний ЦС. Потрібно завантажити один файл, що містить приватний ключ (зашифрований або незашифрований), сертифікат ЦС, а також усі проміжні сертифікати. Файл може бути у форматі PEM або PKCS#12. Якщо ваш приватний ключ зашифровано, також потрібно вказати його пароль.",
+      "failed": "Не вдалося завантажити ЦС через помилку: {{error}}",
+      "password": "Пароль",
+      "rejected": "Не вдалося завантажити ЦС",
+      "submit": "Завантажити ЦС",
+      "submitting": "Завантаження ЦС...",
+      "success": "ЦС успішно завантажено"
+    },
+    "ca_create": {
+      "description": "Натисніть кнопку «Створити ЦС», щоб швидко створити новий центр сертифікації для ваших Data Nodes {{productName}}.",
+      "failed": "Не вдалося створити ЦС через помилку: {{error}}",
+      "organization_name": "Назва організації",
+      "submit": "Створити ЦС",
+      "submitting": "Створення ЦС...",
+      "success": "ЦС успішно створено"
+    },
+    "renewal_policy": {
+      "certificate_lifetime": "Строк дії сертифіката:",
+      "certificate_lifetime_label": "Строк дії сертифіката",
+      "configure": "Налаштувати політику поновлення сертифікатів",
+      "description": "Ці налаштування використовуватимуться під час виявлення завершення строку дії сертифікатів та/або їх поновлення.",
+      "edit": "Редагувати конфігурацію",
+      "lifetime_explanation": "Строк дії сертифіката використовуватиметься як тривалість чинності новостворених сертифікатів.",
+      "mode_explanation": "Якщо встановити політику поновлення «Автоматично», усі сертифікати, строк дії яких спливає, поновлюватимуться без участі користувача. Якщо встановити «Вручну», коли строк дії одного чи кількох сертифікатів добігатиме кінця, буде створено системне сповіщення, що дасть змогу підтвердити їх поновлення.",
+      "renewal_mode": "Режим поновлення:",
+      "renewal_mode_label": "Режим поновлення сертифікатів",
+      "select_mode": "Виберіть режим поновлення сертифікатів",
+      "submit": "Оновити конфігурацію",
+      "submitting": "Оновлення конфігурації",
+      "title": "Конфігурація політики поновлення сертифікатів",
+      "update_failed": "Помилка оновлення політики поновлення сертифікатів: {{error}}",
+      "update_failed_title": "Не вдалося оновити політику поновлення сертифікатів",
+      "modes": {
+        "automatic": "Автоматично",
+        "manual": "Вручну"
+      }
+    },
+    "details_page": {
+      "certificate_valid_until": "Сертифікат дійсний до:",
+      "configuration_warnings": "Попередження конфігурації",
+      "datanode_version": "Версія Datanode:",
+      "details": "Відомості:",
+      "error": "Помилка: {{message}}",
+      "hostname": "Ім’я хоста:",
+      "not_available": "Н/Д",
+      "status": "Стан:",
+      "title": "Data Nodes: {{hostname}}",
+      "transport_address": "Транспортна адреса:"
+    },
+    "pages": {
+      "description": "{{productName}} Data Nodes забезпечують кращу інтеграцію з {{productName}} і спрощують майбутні оновлення. Вони дають змогу індексувати та шукати всі повідомлення у вашій базі даних повідомлень {{productName}}.",
+      "upgrade_title": "Оновлення Data Node",
+      "cluster_management_title": "Панель моніторингу Data Node",
+      "certificate_management_title": "Керування сертифікатами",
+      "migration_title": "Міграція на Data Node",
+      "documentation_title": "Документація Data Nodes"
+    },
+    "upgrade_page": {
+      "manual_instructions": "Щоб оновити свої Data Nodes вручну, дотримуйтесь інструкцій у <docsLink>документації</docsLink>.",
+      "manual_upgrade_title": "Ручне оновлення Data Node",
+      "select_strategy": "Виберіть стратегію оновлення",
+      "upgrade_data_node": "Оновити Data Node",
+      "manual_upgrade_of_node": "Після завершення ручного оновлення <bold>{{node}}</bold> у системі зачекайте, поки він повторно підключиться та з’явиться на панелі <bold>Оновлені вузли</bold>, потім натисніть <confirmButton><bold>Підтвердити оновлення</bold></confirmButton> і переходьте до наступного вузла.",
+      "manual_upgrade_of_data_node": "Після завершення ручного оновлення вашого Data Node у системі зачекайте, поки він повторно підключиться та з’явиться на панелі <bold>Оновлені вузли</bold>, потім натисніть <confirmButton><bold>Підтвердити оновлення</bold></confirmButton> і переходьте до наступного вузла."
+    },
+    "migration_steps": {
+      "ca_configuration": "Налаштувати центр сертифікації",
+      "renewal_policy_configuration": "Налаштувати політику поновлення",
+      "compatibility_check": "Перевірити сумісність OpenSearch із datanode",
+      "manual_migration_step": "Кроки міграції.",
+      "migration_finished": "Міграцію завершено"
+    },
+    "migration_states": {
+      "new": "Міграція",
+      "migration_welcome_page": "Ласкаво просимо",
+      "ca_creation_page": "Центр сертифікації",
+      "renewal_policy_creation_page": "Політика поновлення сертифікатів",
+      "migration_selection_page": "Кроки міграції",
+      "rolling_upgrade_migration_welcome_page": "Ласкаво просимо до міграції на місці",
+      "ask_to_shutdown_old_cluster": "Вимкнути старий кластер",
+      "manually_remove_old_connection_string_from_config": "Видалити рядок підключення",
+      "message_processing_stop": "Зупинити обробку повідомлень",
+      "replace_cluster": "Замінити наявний кластер",
+      "restart_graylog": "Оновити файл конфігурації та перезапустити {{productName}}",
+      "directory_compatibility_check_page": "Перевірка сумісності каталогу",
+      "provision_rolling_upgrade_nodes_with_certificates": "Огляд підготовки сертифікатів",
+      "provision_rolling_upgrade_nodes_running": "Підготувати сертифікат Data Node.",
+      "journal_size_downtime_warning": "Попередження про розмір журналу під час простою",
+      "failed": "Міграція не вдалася",
+      "finished": "Міграцію завершено"
+    },
+    "certificate_renewal": {
+      "loading_failed": "Не вдалося завантажити Data Nodes зі статусом",
+      "loading_failed_title": "Не вдалося завантажити data nodes",
+      "renew": {
+        "button": "Поновити сертифікат",
+        "button_loading": "Поновлення сертифіката",
+        "success": "Сертифікат успішно поновлено",
+        "failed": "Не вдалося поновити сертифікат через помилку: {{error}}"
+      },
+      "provision": {
+        "button": "Підготувати сертифікат",
+        "button_loading": "Підготовка сертифіката...",
+        "success": "Сертифікат успішно підготовлено",
+        "failed": "Не вдалося підготувати сертифікат через помилку: {{error}}"
+      },
+      "title": "Поновлення та підготовка сертифікатів",
+      "description": "Тут ви можете вручну запустити поновлення або підготовку сертифікатів для {{productName}} Data Nodes. Ручна підготовка сертифікатів потрібна лише тоді, коли налаштовано режим політики поновлення «Вручну» і Data Nodes було запущено після початкової підготовки сертифікатів.",
+      "transport_address": "Транспортна адреса",
+      "hostname": "Ім’я хоста",
+      "valid_until": "дійсний до {{relativeTime}}",
+      "no_data_nodes": "Data Nodes не знайдено."
+    }
+  },
+  "use_collector_configurations_notifications": {
+    "fetch_failed": "Не вдалося отримати конфігурації колекторів зі статусом: {{error}}",
+    "fetch_failed_title": "Не вдалося отримати конфігурації",
+    "fetch_configuration_failed": "Не вдалося отримати конфігурацію зі статусом: {{error}}",
+    "configuration_not_found": "Не вдалося знайти конфігурацію з ID <{{configurationId}}>, переконайтеся, що її не було видалено.",
+    "fetch_configuration_failed_title": "Не вдалося отримати конфігурацію",
+    "preview_failed": "Не вдалося отримати попередній перегляд конфігурації зі статусом: {{error}}",
+    "preview_failed_title": "Не вдалося отримати попередній перегляд",
+    "created_success": "Конфігурацію успішно створено",
+    "create_failed": "Не вдалося створити конфігурацію зі статусом: {{error}}",
+    "create_failed_title": "Не вдалося зберегти конфігурацію",
+    "updated_success": "Конфігурацію успішно оновлено",
+    "update_failed": "Не вдалося оновити конфігурацію: {{error}}",
+    "update_failed_title": "Не вдалося оновити конфігурацію {{name}}",
+    "copied_success": "Конфігурацію «{{name}}» успішно скопійовано",
+    "copy_failed": "Не вдалося зберегти конфігурацію «{{name}}» зі статусом: {{error}}",
+    "copy_failed_title": "Не вдалося зберегти конфігурацію",
+    "deleted_success": "Конфігурацію «{{name}}» успішно видалено",
+    "delete_failed": "Не вдалося видалити конфігурацію: {{error}}",
+    "delete_failed_title": "Не вдалося видалити конфігурацію {{name}}",
+    "validate_failed": "Не вдалося перевірити конфігурацію «{{name}}» зі статусом: {{error}}",
+    "validate_failed_title": "Не вдалося перевірити конфігурацію"
+  },
+  "use_collectors_notifications": {
+    "fetch_failed": "Не вдалося отримати колектори зі статусом: {{error}}",
+    "fetch_failed_title": "Не вдалося отримати колектори",
+    "not_found": "Не вдалося знайти колектор з ID <{{collectorId}}>, переконайтеся, що його не було видалено.",
+    "fetch_collector_failed": "Не вдалося отримати Collector зі статусом: {{error}}",
+    "fetch_collector_failed_title": "Не вдалося отримати Collector",
+    "created_success": "Collector успішно створено",
+    "updated_success": "Collector успішно оновлено",
+    "deleted_success": "Collector «{{name}}» успішно видалено",
+    "delete_failed": "Не вдалося видалити Collector: {{error}}",
+    "delete_failed_title": "Не вдалося видалити Collector «{{name}}»",
+    "copied_success": "Collector «{{name}}» успішно скопійовано",
+    "copy_failed": "Не вдалося зберегти колектор «{{name}}» зі статусом: {{error}}",
+    "copy_failed_title": "Не вдалося зберегти Collector",
+    "validate_failed": "Не вдалося перевірити колектор «{{name}}» зі статусом: {{error}}",
+    "validate_failed_title": "Не вдалося перевірити колектор"
+  }
+}

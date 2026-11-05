@@ -1,0 +1,530 @@
+{
+  "shared": {
+    "leader": "Лідер",
+    "not_available": "Н/д"
+  },
+  "cluster_configuration_nodes": {
+    "loading_search_backend": "Завантаження вузлів пошукового бекенда...",
+    "search_backend_unknown": "Не вдалося визначити налаштований пошуковий бекенд.",
+    "search_placeholder": "Шукати вузли…",
+    "all_nodes": "Усі вузли",
+    "data_nodes": "Data Nodes",
+    "opensearch_nodes": "Вузли OpenSearch",
+    "mongodb_nodes": "Вузли MongoDB"
+  },
+  "cluster_column_titles": {
+    "cpu": "ЦП",
+    "memory": "Пам’ять",
+    "jvm": "JVM",
+    "indexing": "Індексування",
+    "storage": "Сховище",
+    "buffers": "Буфери",
+    "journal": "Журнал",
+    "data_lake_journal": "Журнал Data Lake",
+    "throughput": "Пропускна здатність"
+  },
+  "data_nodes_expandable": {
+    "title": "Data Nodes"
+  },
+  "indexing_metrics_cell": {
+    "docs": "Док.",
+    "latency": "Затримка"
+  },
+  "node_actions": {
+    "thread_dump": "Отримати дамп потоків",
+    "process_buffer_dump": "Отримати дамп буфера обробки",
+    "metrics": "Метрики"
+  },
+  "graylog_node_actions": {
+    "pause_message_processing": "Призупинити обробку повідомлень",
+    "resume_message_processing": "Відновити обробку повідомлень",
+    "override_load_balancer_dead": "Перевизначити стан балансувальника навантаження на DEAD",
+    "override_load_balancer_alive": "Перевизначити стан балансувальника навантаження на ALIVE",
+    "local_message_inputs": "Локальні входи повідомлень",
+    "recent_system_logs": "Отримати останні повідомлення системного журналу",
+    "message_processing_title": "Обробка повідомлень",
+    "pause_confirm": "Ви збираєтеся <b>призупинити</b> обробку повідомлень на вузлі <b>{{nodeName}}</b>. Ви впевнені?",
+    "resume_confirm": "Ви збираєтеся <b>відновити</b> обробку повідомлень на вузлі <b>{{nodeName}}</b>. Ви впевнені?",
+    "load_balancer_title": "Балансувальник навантаження",
+    "load_balancer_confirm": "Ви збираєтеся змінити стан балансувальника навантаження для вузла <b>{{nodeName}}</b> на <b>{{status}}</b>. Ви впевнені?"
+  },
+  "graylog_nodes_expandable": {
+    "title": "Вузли {{productName}}"
+  },
+  "load_balancer_status_cell": {
+    "aria_label": "Балансувальник навантаження: {{status}}",
+    "status_alive": "ALIVE",
+    "status_dead": "DEAD",
+    "status_throttled": "THROTTLED"
+  },
+  "processing_state_cell": {
+    "aria_label": "Обробка повідомлень: {{status}}",
+    "enabled": "УВІМКНЕНО",
+    "disabled": "ВИМКНЕНО"
+  },
+  "mongodb_nodes_expandable": {
+    "title": "Вузли MongoDB"
+  },
+  "mongodb_profiling_action": {
+    "description": "Профілювання MongoDB допомагає виявляти повільні запити та усувати проблеми продуктивності на вузлах кластера.",
+    "enabling_profiling": "Увімкнення профілювання...",
+    "enable_confirm": "Увімкнути профілювання <b>Slow Ops</b> ({{threshold}}) на всіх вузлах MongoDB? Воно застосовується негайно без перезапуску, але скидається після перезапуску, якщо не налаштовано під час запуску.",
+    "enable_profiling": "Увімкнути профілювання",
+    "disable_profiling": "Вимкнути профілювання",
+    "enabling": "Увімкнення...",
+    "disabling": "Вимкнення...",
+    "loading_status": "Завантаження стану...",
+    "loading_status_title": "Завантаження стану профілювання MongoDB",
+    "enable_title": "Встановити профілювання Slow Ops на всіх вузлах MongoDB",
+    "disable_title": "Вимкнути профілювання на всіх вузлах MongoDB",
+    "status_loading": "Завантаження поточного стану профілювання на вузлах MongoDB...",
+    "status_off": "Профілювання вимкнено на всіх вузлах MongoDB ({{summary}}). Увімкніть його, щоб збирати діагностику повільних запитів.",
+    "status_mixed": "Профілювання відрізняється на вузлах MongoDB ({{summary}}). Увімкніть профілювання, щоб діагностика була узгодженою.",
+    "status_enabled": "Профілювання ввімкнено на всіх вузлах MongoDB ({{summary}}). Вимкніть його після усунення несправностей, щоб зменшити навантаження на MongoDB.",
+    "status_unavailable_with_summary": "Стан профілювання недоступний ({{summary}}). За потреби ви все одно можете його змінити.",
+    "status_unavailable": "Стан профілювання недоступний. За потреби ви все одно можете його змінити.",
+    "threshold_level": "рівень 1",
+    "threshold_level_with_ms": "рівень 1, поріг {{slowMs}} мс",
+    "distribution": "OFF {{off}}, SLOW_OPS {{slowOps}}, ALL {{all}}",
+    "nodes_profiled_one": "{{enabledCount}}/{{count}} вузол профільовано",
+    "nodes_profiled_other": "{{enabledCount}}/{{count}} вузла профільовано",
+    "nodes_profiled_few": "{{enabledCount}}/{{count}} вузли профільовано",
+    "nodes_profiled_many": "{{enabledCount}}/{{count}} вузлів профільовано"
+  },
+  "opensearch_nodes_expandable": {
+    "title": "Вузли OpenSearch"
+  },
+  "cluster_nodes_section_wrapper": {
+    "show_title": "Показати: {{title}}"
+  },
+  "cpu_metrics_cell": {
+    "load_1m": "Навантаження (1 хв)"
+  },
+  "graylog_cluster_overview": {
+    "cluster": "Кластер",
+    "cluster_id": "Ідентифікатор кластера:",
+    "not_available": "Недоступно",
+    "number_of_nodes": "Кількість вузлів:"
+  },
+  "cluster_support_bundle_info": {
+    "description": "Створіть zip-файл, що містить корисну діагностичну інформацію з вашого кластера Graylog.",
+    "enterprise_customers": "Клієнти Graylog Enterprise можуть додавати пакети до своїх звернень у службу підтримки, що допоможе технічній підтримці Graylog аналізувати та діагностувати проблеми.",
+    "examine_content": "Перевірте вміст пакета перед тим, як ним ділитися. Він може містити конфіденційні дані, як-от IP-адреси, імена хостів або навіть паролі!",
+    "paid_license_only": "Лише користувачі з платною ліцензією мають право на підтримку Graylog Enterprise. Проте ви можете використати цей файл для інших способів діагностики."
+  },
+  "cluster_support_bundle_overview": {
+    "title": "Пакет підтримки кластера",
+    "create": "Створити пакет підтримки",
+    "download": "Завантажити",
+    "delete": "Видалити",
+    "filename": "Назва файлу",
+    "size": "Розмір",
+    "no_bundles": "Пакетів підтримки не знайдено.",
+    "delete_title": "Видалення пакета підтримки",
+    "delete_confirm": "Ви впевнені, що хочете видалити <strong>{{name}}</strong>?"
+  },
+  "log_level_metrics": {
+    "level": "Рівень: {{level}}",
+    "total_written": "Усього записано:",
+    "mean_rate": "Середня швидкість:",
+    "one_minute_rate": "Швидкість за 1 хв:",
+    "per_second": "/ секунду"
+  },
+  "logging_subsystem": {
+    "subsystem": "Підсистема: {{name}}"
+  },
+  "node_loggers": {
+    "show_log_level_metrics": "Показати метрики рівнів журналювання",
+    "hide_log_level_metrics": "Приховати метрики рівнів журналювання",
+    "total_log_messages": "Записано загалом <strong>{{throughput}} внутрішніх повідомлень журналу.</strong>"
+  },
+  "metric_details": {
+    "value": "Значення:",
+    "count": "Кількість:",
+    "mean": "Середнє:",
+    "minimum": "Мінімум:",
+    "maximum": "Максимум:",
+    "standard_deviation": "Стандартне відхилення:",
+    "percentile_95": "95-й перцентиль:",
+    "percentile_98": "98-й перцентиль:",
+    "percentile_99": "99-й перцентиль:",
+    "invalid_type": "Недійсний тип метрики: {{type}}",
+    "microseconds": "мкс"
+  },
+  "meter_details": {
+    "total": "Усього:",
+    "events": "подій",
+    "one_minute_avg": "Середнє за 1 хвилину:",
+    "five_minute_avg": "Середнє за 5 хвилин:",
+    "fifteen_minute_avg": "Середнє за 15 хвилин:"
+  },
+  "counter_rate": {
+    "calculating": "Обчислення...",
+    "total": "(усього {{total}})",
+    "per_second": "за секунду"
+  },
+  "metric_container": {
+    "loading": "Завантаження..."
+  },
+  "metrics_component": {
+    "fetch_error": "Не вдалося отримати метрики з вузла: сервер повернув <em>{{responseMessage}}</em> з кодом стану {{status}}.",
+    "fetch_problem": "Виникла проблема під час отримання метрик вузла.",
+    "retry_in_background": "Спроби отримати їх триватимуть у фоновому режимі.",
+    "fetch_error_last_metrics": "Не вдалося отримати метрики з вузла: сервер повернув <em>{{responseMessage}}</em> з кодом стану {{status}}. Показано останні доступні метрики.",
+    "filter_placeholder": "Введіть назву метрики для фільтрації…"
+  },
+  "metrics_list": {
+    "no_metrics": "Жодна метрика не відповідає заданому фільтру. Переконайтеся, що ви використовуєте дійсний регулярний вираз"
+  },
+  "buffer_usage": {
+    "metrics": "Метрики",
+    "utilization": "<strong>{{usage}} повідомлень</strong> у {{title}}, використано {{percentage}}."
+  },
+  "input_types_data_table": {
+    "loading": "Завантаження типів входів...",
+    "unavailable": "Типи входів недоступні.",
+    "documentation": "Документація",
+    "name": "Назва",
+    "type": "Тип",
+    "filter": "Фільтр"
+  },
+  "journal_details": {
+    "loading": "Завантаження метрик журналу...",
+    "disabled": "Дисковий журнал вимкнено на цьому вузлі.",
+    "unavailable": "Метрики журналу недоступні.",
+    "overcommitted": "<strong>Попередження!</strong> Використання журналу перевищує визначений максимальний розмір. <overviewLink>Натисніть тут</overviewLink>, щоб дізнатися більше.",
+    "configuration": "Конфігурація",
+    "path": "Шлях:",
+    "earliest_entry": "Найраніший запис:",
+    "maximum_size": "Максимальний розмір:",
+    "maximum_age": "Максимальний вік:",
+    "flush_policy": "Політика скидання:",
+    "flush_policy_value": "Кожні {{messages}} повідомлень або {{duration}}",
+    "maximum_age_format": "d [дн.] h [год.] m [хв.]",
+    "flush_duration_format": "h [год.] m [хв.] s [с.]",
+    "utilization": "Використання",
+    "unprocessed_messages": "У журналі наразі <strong>{{messages}} необроблених повідомлень</strong> у {{segments}} сегментах.",
+    "appended_and_read": "За останню секунду додано <strong>{{appended}} повідомлень</strong>, прочитано <strong>{{read}} повідомлень</strong>."
+  },
+  "journal_state": {
+    "loading": "Завантаження метрик журналу...",
+    "unavailable": "Метрики журналу недоступні.",
+    "summary_one": "Журнал містить <strong>{{messages}} необроблених повідомлень</strong> у {{count}} сегменті. За останню секунду додано <strong>{{appended}} повідомлень</strong>, прочитано <strong>{{read}} повідомлень</strong>.",
+    "summary_other": "Журнал містить <strong>{{messages}} необроблених повідомлень</strong> у {{count}} сегментах. За останню секунду додано <strong>{{appended}} повідомлень</strong>, прочитано <strong>{{read}} повідомлень</strong>.",
+    "summary_few": "Журнал містить <strong>{{messages}} необроблених повідомлень</strong> у {{count}} сегментах. За останню секунду додано <strong>{{appended}} повідомлень</strong>, прочитано <strong>{{read}} повідомлень</strong>.",
+    "summary_many": "Журнал містить <strong>{{messages}} необроблених повідомлень</strong> у {{count}} сегментах. За останню секунду додано <strong>{{appended}} повідомлень</strong>, прочитано <strong>{{read}} повідомлень</strong>."
+  },
+  "jvm_heap_usage": {
+    "loading": "Завантаження інформації про використання купи...",
+    "unavailable": "Інформація про купу недоступна.",
+    "usage": "JVM використовує <usedBlob /><strong> {{used}}</strong> із <committedBlob /><strong> {{committed}}</strong> простору купи та не намагатиметься використати більше ніж <maxBlob /><strong> {{max}}</strong>"
+  },
+  "node_list_item": {
+    "system_info_unavailable": "Системна інформація наразі недоступна."
+  },
+  "node_maintenance_dropdown": {
+    "actions": "Дії",
+    "configure_internal_logging": "Налаштувати внутрішнє журналювання"
+  },
+  "node_overview": {
+    "plugins_installed_one": "Установлено {{count}} плагін",
+    "plugins_installed_other": "Установлено {{count}} плагіна",
+    "inputs_running_one": "На цьому вузлі працює {{count}} вхід",
+    "inputs_running_other": "На цьому вузлі працює {{count}} входу",
+    "memory_heap_usage": "Використання пам’яті/купи",
+    "buffers": "Буфери",
+    "buffers_description": "Буфери призначені для кешування невеликої кількості повідомлень на дуже короткий час (зазвичай мілісекунди) на шляху через різні процесори.",
+    "input_buffer": "Вхідний буфер",
+    "process_buffer": "Буфер обробки",
+    "output_buffer": "Вихідний буфер",
+    "disk_journal": "Дисковий журнал",
+    "disk_journal_description": "Вхідні повідомлення записуються до дискового журналу, щоб гарантувати їхню збереженість у разі збою сервера. Журнал також допомагає зберегти працездатність, якщо будь-який із виходів надто повільний для поточної швидкості повідомлень або коли настає пік вхідних повідомлень. Так він запобігає перевантаженню пам’яті та надто довгим паузам збирання сміття.",
+    "system": "Система",
+    "rest_api": "REST API",
+    "installed_plugins": "Установлені плагіни",
+    "manage_inputs": "Керувати входами",
+    "available_input_types": "Доступні типи входів",
+    "plugins_installed_few": "Установлено {{count}} плагіни",
+    "plugins_installed_many": "Установлено {{count}} плагінів",
+    "inputs_running_few": "На цьому вузлі працюють {{count}} входи",
+    "inputs_running_many": "На цьому вузлі працює {{count}} входів"
+  },
+  "nodes_actions": {
+    "details": "Подробиці",
+    "metrics": "Метрики",
+    "more_actions": "Більше дій",
+    "pause_message_processing": "Призупинити обробку повідомлень",
+    "resume_message_processing": "Відновити обробку повідомлень",
+    "pause_confirm": "Ви збираєтеся призупинити обробку повідомлень на цьому вузлі. Ви впевнені?",
+    "resume_confirm": "Ви збираєтеся відновити обробку повідомлень на цьому вузлі. Ви впевнені?",
+    "override_lb_status": "Перевизначити стан LB",
+    "status_alive": "ALIVE",
+    "status_dead": "DEAD",
+    "load_balancer_confirm": "Ви збираєтеся змінити стан балансувальника навантаження для цього вузла на {{status}}. Ви впевнені?",
+    "local_message_inputs": "Локальні входи повідомлень",
+    "thread_dump": "Отримати дамп потоків",
+    "process_buffer_dump": "Отримати дамп буфера обробки",
+    "recent_system_logs": "Отримати останні повідомлення системного журналу"
+  },
+  "nodes_list": {
+    "active_nodes_one": "Є {{count}} активний вузол",
+    "active_nodes_other": "Є {{count}} активного вузла",
+    "no_active_nodes": "Немає активних вузлів.",
+    "active_nodes_few": "Є {{count}} активні вузли",
+    "active_nodes_many": "Є {{count}} активних вузлів"
+  },
+  "plugins_data_table": {
+    "loading": "Завантаження плагінів на цьому вузлі...",
+    "no_plugins": "На цьому вузлі не встановлено жодного плагіна.",
+    "name": "Назва",
+    "version": "Версія",
+    "author": "Автор",
+    "description": "Опис",
+    "website": "Вебсайт",
+    "filter": "Фільтр"
+  },
+  "rest_api_overview": {
+    "transport_address": "Транспортна адреса:",
+    "last_seen": "Востаннє бачили:"
+  },
+  "system_information": {
+    "pid_info": "PID {{pid}}, {{info}}",
+    "jvm_unavailable": "Інформація про JVM для цього вузла недоступна.",
+    "hostname": "Ім’я хоста:",
+    "node_id": "Ідентифікатор вузла:",
+    "version": "Версія:",
+    "version_codename": "{{version}}, кодова назва <em>{{codename}}</em>",
+    "jvm": "JVM:",
+    "time": "Час:"
+  },
+  "system_overview_details": {
+    "pause_confirm": "Ви збираєтеся призупинити обробку повідомлень на цьому вузлі. Ви впевнені?",
+    "resume_confirm": "Ви збираєтеся відновити обробку повідомлень на цьому вузлі. Ви впевнені?",
+    "what_does_this_mean": "Що це означає?",
+    "lifecycle_state": "Стан життєвого циклу: <strong>{{lifecycle}}</strong>",
+    "marked_as_lb_status": "Позначено як <strong>{{status}}</strong> для балансувальників навантаження",
+    "pause_processing": "Призупинити обробку",
+    "resume_processing": "Відновити обробку",
+    "not_processing": "Вузол <strong>не</strong> обробляє повідомлення"
+  },
+  "system_overview_summary": {
+    "current_lifecycle_state": "Поточний стан життєвого циклу:",
+    "message_processing": "Обробка повідомлень:",
+    "enabled": "Увімкнено",
+    "disabled": "Вимкнено",
+    "lb_indication": "Індикація балансувальника навантаження:"
+  },
+  "bulk_actions": {
+    "dismiss": "Закрити"
+  },
+  "system_notifications_table": {
+    "title": "Сповіщення",
+    "human_name": "сповіщення"
+  },
+  "actions_cell": {
+    "dismiss": "Закрити"
+  },
+  "title_cell": {
+    "show_full_message": "Показати повне повідомлення для: {{title}}"
+  },
+  "system_job": {
+    "acknowledge_failed": "Не вдалося підтвердити завдання",
+    "cancel_failed": "Не вдалося скасувати завдання",
+    "cancel_confirm": "Ви впевнені, що хочете скасувати системне завдання «{{info}}»?",
+    "on_node": "- на",
+    "runtime": "час виконання: {{duration}}",
+    "cancel": "Скасувати",
+    "acknowledge": "Підтвердити"
+  },
+  "system_jobs_component": {
+    "title": "Системні завдання",
+    "description": "Системне завдання - це тривала задача, яку вузол сервера {{productName}} виконує з метою обслуговування. Деякі завдання надають інформацію про хід виконання або їх можна зупинити."
+  },
+  "system_jobs_list": {
+    "no_active_jobs": "Немає активних системних завдань."
+  },
+  "system_messages_component": {
+    "title": "Системні повідомлення",
+    "description": "Системні повідомлення генеруються вузлами сервера {{productName}} під час певних подій, які можуть цікавити адміністраторів {{productName}}. Вам не потрібно активно реагувати на будь-які події тут, оскільки для подій, що потребують дій, буде створено сповіщення."
+  },
+  "system_messages_list": {
+    "timestamp": "Позначка часу",
+    "node": "Вузол",
+    "message": "Повідомлення"
+  },
+  "global_throughput": {
+    "aria_label": "Пропускна здатність: вхід {{input}} / вихід {{output}} повідомл./с",
+    "in_title": "Вхідні повідомлення за секунду",
+    "out_title": "Вихідні повідомлення за секунду"
+  },
+  "node_throughput": {
+    "loading": "Завантаження пропускної здатності...",
+    "unable_to_load": "Не вдалося завантажити пропускну здатність.",
+    "processing_long": "Обробка <strong>{{totalIn}}</strong> вхідних і <strong>{{totalOut}}</strong> вихідних повідомл./с.",
+    "short": "Вхід {{totalIn}} / вихід {{totalOut}} повідомл./с."
+  },
+  "telemetry_debug_entry_row": {
+    "delta": " (+{{delta}} мс)",
+    "pii_suspect": "Підозра на PII: {{suspect}}",
+    "copy_as_json": "Копіювати подію як JSON"
+  },
+  "telemetry_debug_overlay": {
+    "badge_label": "Налагодження телеметрії",
+    "badge": "Налагодження телеметрії: {{count}}",
+    "drawer_label": "Панель налагодження телеметрії",
+    "resize_label": "Змінити розмір панелі налагодження телеметрії",
+    "title": "Налагодження телеметрії ({{count}})",
+    "filter_label": "Фільтрувати події",
+    "filter_placeholder": "Фільтрувати за назвою події або корисним навантаженням...",
+    "resume": "Відновити",
+    "pause": "Призупинити",
+    "clear": "Очистити",
+    "export_session": "Експортувати сеанс",
+    "collapse": "Згорнути",
+    "no_events": "Подій телеметрії ще не записано — працюйте із застосунком, щоб побачити їх тут.",
+    "time": "Час",
+    "event": "Подія",
+    "action": "Дія",
+    "status": "Стан"
+  },
+  "cluster_configuration_page": {
+    "title": "Конфігурація кластера",
+    "description": "Ця сторінка надає огляд вузлів вашого кластера в режимі реального часу. Ви можете призупинити обробку повідомлень у будь-який момент. Буфери обробки не прийматимуть нових повідомлень, доки ви її не відновите. Якщо для вузла ввімкнено журнал повідомлень (що за замовчуванням так), вхідні повідомлення зберігатимуться на диск, навіть коли обробку вимкнено."
+  },
+  "configurations_page": {
+    "title": "Конфігурації",
+    "description": "На цій сторінці можна налаштувати системні параметри для різних підсистем.",
+    "plugins": "Плагіни"
+  },
+  "enterprise_page": {
+    "document_title": "{{productName}} Enterprise",
+    "page_title": "<upsell>Спробуйте</upsell> {{productName}} Enterprise",
+    "learn_more": "<upsell><productLink>Дізнайтеся більше</productLink> про функції {{productName}} Enterprise.</upsell>"
+  },
+  "process_buffer_dump_page": {
+    "title": "Дамп буфера обробки вузла {{shortNodeId}} / {{hostname}}",
+    "taken_at": "Зроблено о <0/>"
+  },
+  "show_metrics_page": {
+    "title": "Метрики вузла {{shortNodeId}} / {{hostname}}",
+    "description": "Усі вузли {{productName}} надають набір внутрішніх метрик для діагностики, налагодження та моніторингу. Зверніть увагу, що доступ до всіх метрик можна отримати й через JMX.",
+    "total_metrics_one": "Цей вузол повідомляє про {{count}} метрику.",
+    "total_metrics_other": "Цей вузол повідомляє про {{count}} метрики.",
+    "total_metrics_few": "Цей вузол повідомляє про {{count}} метрики.",
+    "total_metrics_many": "Цей вузол повідомляє про {{count}} метрик."
+  },
+  "node_page": {
+    "title": "Вузол {{shortNodeId}} / {{hostname}}",
+    "description": "Ця сторінка показує подробиці вузла сервера {{productName}}, який активний і доступний у вашому кластері.",
+    "leader_node": "Це вузол-лідер.",
+    "not_leader_node": "Це <em>не</em> вузол-лідер."
+  },
+  "system_logs_page": {
+    "title": "Найновіші системні журнали (обмежено {{limit}}) вузла {{shortNodeId}} / {{hostname}}",
+    "taken_at": "Зроблено о <0/>",
+    "reload": "Перезавантажити",
+    "back": "Назад",
+    "document_title": "Системні журнали вузла {{shortNodeId}} / {{hostname}}"
+  },
+  "system_notifications_page": {
+    "title": "Системні сповіщення"
+  },
+  "system_overview_page": {
+    "title": "Огляд системи"
+  },
+  "thread_dump_page": {
+    "title": "Дамп потоків вузла {{shortNodeId}} / {{hostname}}",
+    "taken_at": "Зроблено о <0/>"
+  },
+  "notifications": {
+    "lb_change_success": "Стан балансувальника навантаження успішно змінено на «{{status}}» на вузлі «{{nodeId}}»",
+    "lb_change_failed": "Не вдалося змінити стан балансувальника навантаження на «{{nodeId}}»: {{error}}",
+    "lb_change_failed_title": "Не вдалося змінити стан балансувальника навантаження на «{{status}}» на вузлі «{{nodeId}}»",
+    "processing_pause_success": "Обробку повідомлень на «{{nodeId}}» успішно призупинено",
+    "processing_pause_failed": "Не вдалося призупинити обробку повідомлень на «{{nodeId}}»: {{error}}",
+    "processing_pause_failed_title": "Не вдалося призупинити обробку повідомлень на вузлі «{{nodeId}}»",
+    "processing_resume_success": "Обробку повідомлень на «{{nodeId}}» успішно відновлено",
+    "processing_resume_failed": "Не вдалося відновити обробку повідомлень на «{{nodeId}}»: {{error}}",
+    "processing_resume_failed_title": "Не вдалося відновити обробку повідомлень на вузлі «{{nodeId}}»",
+    "nothing_selected": "Сповіщення не вибрано.",
+    "nothing_to_dismiss_title": "Нічого закривати",
+    "bulk_dismiss_failed": "Не вдалося закрити сповіщення. Повторіть спробу.",
+    "dismiss_failed": "Не вдалося закрити сповіщення. Повторіть спробу.",
+    "dismiss_failed_title": "Не вдалося закрити",
+    "profiling_enabled": "Профілювання MongoDB успішно ввімкнено.",
+    "profiling_disabled": "Профілювання MongoDB успішно вимкнено.",
+    "profiling_enable_failed": "Не вдалося ввімкнути профілювання MongoDB: {{error}}",
+    "profiling_disable_failed": "Не вдалося вимкнути профілювання MongoDB: {{error}}",
+    "profiling_update_failed_title": "Не вдалося оновити профілювання MongoDB.",
+    "data_node_metrics_failed": "Не вдалося завантажити метрики Data Node «{{hostname}}»",
+    "data_node_metrics_failed_title": "Не вдалося завантажити метрики Data Node.",
+    "graylog_node_metrics_failed": "Не вдалося завантажити метрики вузла Graylog, стан",
+    "graylog_node_metrics_failed_title": "Не вдалося завантажити метрики вузла Graylog.",
+    "cluster_traffic_failed": "Не вдалося завантажити трафік кластера, стан",
+    "cluster_traffic_failed_title": "Не вдалося завантажити трафік кластера",
+    "journal_failed": "Не вдалося отримати інформацію про журнал",
+    "system_jobs_failed": "Не вдалося завантажити системні завдання, стан",
+    "system_jobs_failed_title": "Не вдалося завантажити системні завдання"
+  },
+  "use_cluster_overview_notifications": {
+    "jvm_failed": "Не вдалося отримати інформацію про JVM для вузла «{{nodeId}}»: {{error}}",
+    "jvm_failed_title": "Не вдалося отримати інформацію про JVM",
+    "thread_dump_failed": "Не вдалося отримати дамп потоків для вузла «{{nodeId}}»: {{error}}",
+    "thread_dump_failed_title": "Не вдалося отримати дамп потоків",
+    "process_buffer_dump_failed": "Не вдалося отримати дамп буфера обробки для вузла «{{nodeId}}»: {{error}}",
+    "process_buffer_dump_failed_title": "Не вдалося отримати дамп буфера обробки",
+    "system_logs_failed": "Не вдалося отримати повідомлення системного журналу для вузла «{{nodeId}}»: {{error}}",
+    "system_logs_failed_title": "Не вдалося отримати повідомлення системного журналу",
+    "overview_failed": "Не вдалося отримати огляд кластера: {{error}}",
+    "overview_failed_title": "Не вдалося отримати огляд кластера"
+  },
+  "use_cluster_support_bundle_notifications": {
+    "create_failed": "Не вдалося створити пакет підтримки, стан: {{error}}",
+    "create_failed_title": "Не вдалося створити пакет підтримки.",
+    "delete_failed": "Не вдалося видалити пакет підтримки, стан: {{error}}",
+    "delete_failed_title": "Не вдалося видалити пакет підтримки.",
+    "download_failed": "Не вдалося завантажити пакет підтримки, стан: {{error}}",
+    "download_failed_title": "Не вдалося завантажити пакет підтримки.",
+    "load_list_failed": "Не вдалося завантажити список пакетів підтримки, стан",
+    "load_list_failed_title": "Не вдалося завантажити список пакетів підтримки."
+  },
+  "use_plugin_list_notifications": {
+    "fetch_failed": "Не вдалося отримати плагіни на вузлі «{{nodeId}}»",
+    "fetch_failed_title": "Не вдалося отримати плагіни"
+  },
+  "node_lifecycle": {
+    "uninitialized": "UNINITIALIZED",
+    "starting": "STARTING",
+    "running": "RUNNING",
+    "failed": "FAILED",
+    "halting": "HALTING",
+    "paused": "PAUSED",
+    "throttled": "THROTTLED",
+    "override_lb_alive": "OVERRIDE_LB_ALIVE",
+    "override_lb_dead": "OVERRIDE_LB_DEAD",
+    "override_lb_throttled": "OVERRIDE_LB_THROTTLED"
+  },
+  "buffers_metrics_cell": {
+    "input": "Вхід",
+    "process": "Обробка",
+    "output": "Вихід"
+  },
+  "throughput_metrics_cell": {
+    "in": "Вхід",
+    "out": "Вихід"
+  },
+  "mongodb_nodes": {
+    "profiling_levels": {
+      "off": "Вимкнено",
+      "slow_ops": "Slow Ops",
+      "all": "Усе",
+      "unknown": "Невідомо ({{level}})"
+    },
+    "roles": {
+      "primary": "PRIMARY",
+      "secondary": "SECONDARY",
+      "arbiter": "ARBITER",
+      "standalone": "STANDALONE"
+    }
+  }
+}

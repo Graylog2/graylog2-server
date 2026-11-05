@@ -25,6 +25,7 @@ import 'moment/locale/zh-cn';
 import 'moment/locale/zh-tw';
 import 'moment/locale/ja';
 import 'moment/locale/it';
+import 'moment/locale/uk';
 import 'numeral/locales/de';
 import 'numeral/locales/es';
 import 'numeral/locales/fr';
@@ -33,6 +34,7 @@ import 'numeral/locales/pt-br';
 import 'numeral/locales/chs';
 import 'numeral/locales/ja';
 import 'numeral/locales/it';
+import 'numeral/locales/uk-ua';
 
 import { changeLanguage } from 'i18n';
 import Store from 'logic/local-storage/Store';
@@ -41,7 +43,7 @@ import { DEFAULT_LANGUAGE } from 'components/users/languages/Languages';
 const LAST_LANGUAGE_KEY = 'language';
 
 // numeral names some locales differently than the language codes
-const NUMERAL_LOCALES: { [language: string]: string } = { 'pt-BR': 'pt-br', 'zh-CN': 'chs' };
+const NUMERAL_LOCALES: { [language: string]: string } = { 'pt-BR': 'pt-br', 'zh-CN': 'chs', uk: 'uk-ua' };
 
 /** Language of the last logged in user, used for pages shown before login. */
 export const lastLanguage = () => Store.get<string>(LAST_LANGUAGE_KEY) ?? DEFAULT_LANGUAGE;

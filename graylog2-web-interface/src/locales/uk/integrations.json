@@ -1,0 +1,521 @@
+{
+  "aws_plugin_configuration": {
+    "title": "Конфігурація плагіна AWS",
+    "description": "Базова конфігурація для всіх плагінів, які надає модуль AWS. Зверніть увагу, що деякі параметри зберігатимуться в MongoDB без шифрування. Користувачі з потрібними дозволами зможуть переглядати їх у діалоговому вікні конфігурації на цій сторінці.",
+    "status_instance_detail_lookups": "Пошук подробиць екземплярів:",
+    "status_connect_through_proxy": "Підключення через проксі:",
+    "status_lookup_regions": "Регіони пошуку:",
+    "status_access_key": "Ключ доступу:",
+    "status_secret_key": "Секретний ключ:",
+    "status_enabled": "Увімкнено",
+    "status_disabled": "Вимкнено",
+    "status_not_set": "[не задано]",
+    "edit_configuration": "Редагувати конфігурацію",
+    "modal_title": "Оновити конфігурацію плагіна AWS",
+    "submit_configuration": "Оновити конфігурацію",
+    "lookups_enabled_label": "Виконувати пошук подробиць екземплярів AWS для IP-адрес?",
+    "lookups_enabled_help": "Якщо ввімкнено, процесор повідомлень намагатиметься визначити IP-адреси ваших об’єктів AWS (таких як EC2, ELB, RDS, ...) і додавати додаткову інформацію про сервіс або екземпляр за ними. Щоб ця зміна набула чинності, може знадобитися до хвилини.",
+    "access_key_label": "Ключ доступу AWS",
+    "access_key_help": "Зверніть увагу, що він використовуватиметься лише в зашифрованих з’єднаннях, але зберігатиметься у відкритому вигляді. Ознайомтеся з документацією щодо рекомендованих прав для відповідного користувача IAM.",
+    "secret_key_label": "Секретний ключ AWS",
+    "secret_key_help": "Зверніть увагу, що він використовуватиметься лише в зашифрованих з’єднаннях і зберігатиметься в зашифрованому вигляді (із системним секретом). Ознайомтеся з документацією щодо рекомендованих прав для відповідного користувача IAM.",
+    "lookup_regions_label": "Регіони пошуку",
+    "lookup_regions_help": "Процесор повідомлень пошуку екземплярів AWS підтримує таблицю екземплярів для швидкого перетворення адрес. Визначте регіони AWS, які потрібно включити до таблиць. Це мають бути всі регіони, у яких працюють ваші сервіси AWS. Пам’ятайте, що вашому користувачу IAM потрібен дозвіл для цих регіонів, інакше ви бачитимете попередження в журналах сервера {{productName}}.",
+    "proxy_enabled_label": "Використовувати HTTP-проксі?",
+    "proxy_enabled_help": "Якщо ввімкнено, доступ до API AWS відбуватиметься через HTTP-проксі, налаштований (<code>http_proxy_uri</code>) у файлі конфігурації {{productName}}.<lineBreak/><em>Важливо:</em> щоб ця конфігурація набула чинності, потрібно перезапустити всі входи AWS.",
+    "save_error_message": "Не вдалося зберегти конфігурацію плагіна AWS, статус: {{error}}",
+    "save_error_title": "Не вдалося зберегти конфігурацію плагіна AWS."
+  },
+  "gcs_setup_info": {
+    "intro": "Щоб налаштувати бекенд Google Cloud Storage, виконайте такі кроки:",
+    "step_bucket": "Створіть бакет Google Cloud Storage з унікальною назвою — див. документацію Google щодо <bucketsLink>бакетів</bucketsLink>. Рекомендовано стандартний клас сховища Standard Storage.",
+    "step_service_account": "Створіть службовий обліковий запис Google Cloud з дозволами на читання/запис/видалення в цьому бакеті — див. документацію Google щодо <serviceAccountsLink>службових облікових записів</serviceAccountsLink>.",
+    "step_credentials": "Налаштуйте Application Default credentials на всіх вузлах Graylog. Спосіб залежить від того, де розміщено ваш кластер — див. документацію Google щодо <adcLink>налаштування Application Default credentials</adcLink>.",
+    "step_setup_backend": "На цій сторінці тепер можна налаштувати бекенд Google Cloud Storage. Вам потрібно буде вказати унікальну назву сховища Google Cloud, створеного на першому кроці."
+  },
+  "aws_step_authorize": {
+    "invalid_key_message": "Недійсний ключ AWS. Знайдіть у своєму обліковому записі AWS 20-символьний буквено-цифровий рядок, який зазвичай починається з літер «AK»",
+    "invalid_secret_message": "Недійсний секрет AWS. Зазвичай це 40-символьний рядок у кодуванні base-64, але переглянути його можна лише один раз, під час створення ключа",
+    "authorize_button": "Авторизувати та вибрати потік",
+    "title": "Створення входу та авторизація AWS",
+    "description": "Ця інтеграція дає змогу читати повідомлення безпосередньо з потоку Kinesis. Повідомлення CloudWatch за потреби можна пересилати до Kinesis через підписки CloudWatch, а потім обробляти.",
+    "input_name": "Назва входу",
+    "aws_region": "Регіон AWS",
+    "aws_region_help": "Регіон AWS, у якому працює ваш сервіс.",
+    "choose_region": "Виберіть регіон AWS"
+  },
+  "aws_arn": {
+    "assume_role_label": "AWS Assume Role (ARN)",
+    "assume_role_help": "Amazon Resource Name з потрібним міжоблiковим дозволом",
+    "assume_role_placeholder": "arn:aws:sts::123456789012:assumed-role/some-role",
+    "external_id_label": "AWS External ID (необов’язково)",
+    "external_id_help": "Зовнішній ідентифікатор, доданий до запиту AssumeRole для запобігання проблемі confused deputy. Потрібен, лише якщо цього вимагає політика довіри вашої ролі."
+  },
+  "aws_authentication_types": {
+    "label": "Тип автентифікації AWS"
+  },
+  "aws_custom_endpoints": {
+    "title": "Необов’язкові кінцеві точки AWS VPC",
+    "section_title": "Перевизначає URL кінцевої точки API AWS за замовчуванням, з якою взаємодіє {{productName}}.",
+    "note": "Вказуйте їх, лише якщо ви використовуєте <vpcEndpointsLink>кінцеві точки VPC</vpcEndpointsLink> для сервісів AWS.",
+    "input_message": "Домен має починатися з 'https://'",
+    "cloudwatch_label": "Перевизначення кінцевої точки API CloudWatch",
+    "iam_label": "Перевизначення кінцевої точки API IAM",
+    "dynamodb_label": "Перевизначення кінцевої точки API DynamoDB",
+    "kinesis_label": "Перевизначення кінцевої точки API Kinesis"
+  },
+  "aws_automatic": {
+    "section_title": "Автоматична автентифікація спробує кожен із наведених нижче способів у зазначеному порядку.",
+    "env_variables_label": "Змінні середовища",
+    "env_variables_value": "<code>AWS_ACCESS_KEY_ID</code> і <code>AWS_SECRET_ACCESS_KEY</code>",
+    "java_properties_label": "Системні властивості Java",
+    "java_properties_value": "<code>aws.accessKeyId</code> і <code>aws.secretKey</code>",
+    "profiles_label": "Файл профілів облікових даних за замовчуванням",
+    "profiles_value": "Зазвичай розташований за адресою <code>~/.aws/credentials</code>",
+    "ecs_label": "Облікові дані контейнера Amazon ECS",
+    "ecs_value": "Завантажуються з Amazon ECS, якщо задано змінну середовища <code>AWS_CONTAINER_CREDENTIALS_RELATIVE_URI</code>",
+    "instance_label": "Облікові дані профілю екземпляра",
+    "instance_value": "Використовуються на екземплярах EC2 і надаються через сервіс метаданих Amazon EC2",
+    "more_info": "Докладніше читайте в <docsLink>документації щодо конфігурації облікових даних AWS <openIcon/></docsLink>."
+  },
+  "aws_key_secret": {
+    "access_key_label": "Ключ доступу AWS",
+    "access_key_placeholder": "AK****************",
+    "access_key_help": "Ваш ключ AWS має бути 20-символьним буквено-цифровим рядком, що починається з літер «AK».",
+    "access_key_help_optional": "Ваш ключ AWS має бути 20-символьним буквено-цифровим рядком, що починається з літер «AK». (Необов’язково — якщо не вказано, використовуватиметься застаріла конфігурація плагіна AWS)",
+    "secret_key_label": "Секретний ключ AWS",
+    "secret_key_placeholder": "***********",
+    "secret_key_help": "Ваш секрет AWS зазвичай є 40-символьним рядком у кодуванні base-64.",
+    "secret_key_help_optional": "Ваш секрет AWS зазвичай є 40-символьним рядком у кодуванні base-64. (Необов’язково — якщо не вказано, використовуватиметься застаріла конфігурація плагіна AWS)"
+  },
+  "aws_cloudtrail": {
+    "step_authorize_title": "Конфігурація підключення AWS CloudTrail",
+    "step_subscribe_title": "Конфігурація входу AWS CloudTrail",
+    "step_review_title": "Остаточна перевірка AWS CloudTrail"
+  },
+  "aws_cloudtrail_app": {
+    "title": "Інтеграції AWS CloudTrail",
+    "description": "Ця функція отримує записи журналу з платформи AWS CloudTrail.",
+    "requirement": "Вам потрібен <cloudTrailLink>AWS CloudTrail</cloudTrailLink>."
+  },
+  "aws_cloudtrail_advanced_options": {
+    "title": "Додаткові параметри",
+    "sqs_batch_size_error": "Виберіть розмір пакета повідомлень SQS від 1 до 10.",
+    "override_source_label": "Перевизначити джерело (необов’язково)",
+    "override_source_help": "За замовчуванням джерело встановлено як aws-cloudtrail. За бажання його можна перевизначити власним значенням.",
+    "sqs_batch_size_label": "Розмір пакета повідомлень SQS",
+    "sqs_batch_size_help": "Максимальна кількість повідомлень, які запитуються з SQS за один раз. Максимально допустиме значення — 10.",
+    "include_full_message_json_label": "Включати full_message_json?",
+    "include_full_message_json_help": "Зберігати повну подію CloudTrail у форматі JSON у полі full_message_json?"
+  },
+  "aws_cloudtrail_step_authorize": {
+    "connection_error": "Не вдалося підключитися до AWS CloudTrail із наданою конфігурацією.",
+    "verify_button": "Перевірити підключення та продовжити",
+    "input_name": "Назва входу",
+    "input_name_help": "Виберіть назву для нового входу, яка його описує.",
+    "sqs_region_help": "Регіон AWS, у якому розташована черга SQS.",
+    "sqs_region_label": "Регіон AWS SQS",
+    "choose_sqs_region": "Виберіть регіон SQS",
+    "s3_region_help": "Регіон AWS, у якому розташований бакет S3.",
+    "s3_region_label": "Регіон AWS S3",
+    "choose_s3_region": "Виберіть регіон S3",
+    "sqs_queue_name_help": "Назва черги SQS, створеної CloudTrail Subscriber",
+    "sqs_queue_name_label": "Назва черги SQS"
+  },
+  "aws_cloudtrail_step_review": {
+    "save_error": "Не вдалося зберегти ваш вхід. Спробуйте ще раз за кілька хвилин.",
+    "save_button": "Зберегти та запустити вхід",
+    "description": "Перевірте все нижче, щоб переконатися, що воно правильне, а потім натисніть кнопку нижче, щоб завершити налаштування AWS CloudTrail!",
+    "input_configuration": "Конфігурація входу",
+    "label_name": "Назва",
+    "label_access_key": "Ключ доступу AWS",
+    "label_sqs_region": "Регіон SQS",
+    "label_s3_region": "Регіон S3",
+    "label_assume_role_arn": "AWS Assume Role (ARN)",
+    "label_external_id": "AWS External ID",
+    "label_sqs_queue_name": "Назва черги AWS SQS",
+    "label_sqs_batch_size": "Розмір пакета повідомлень SQS",
+    "label_polling_interval": "Інтервал опитування",
+    "label_enable_throttling": "Увімкнути обмеження швидкості"
+  },
+  "aws_cloudtrail_step_subscribe": {
+    "polling_interval_error_full": "Вкажіть коректний інтервал опитування",
+    "polling_interval_error": "Мінімально допустимий інтервал опитування — 1 хвилина.",
+    "batch_size_error_full": "Вкажіть коректний розмір пакета повідомлень SQS.",
+    "batch_size_error": "Виберіть розмір пакета повідомлень SQS від 1 до 10.",
+    "proceed_button": "Продовжити",
+    "polling_interval_help": "Визначає, як часто (у хвилинах) в AWS CloudTrail перевірятимуться нові дані. Найменший допустимий інтервал — 1 хвилина.",
+    "polling_interval_label": "Інтервал опитування"
+  },
+  "aws_cloudwatch_app": {
+    "title": "Інтеграції AWS",
+    "description": "Ця функція отримує повідомлення журналу з різних джерел AWS."
+  },
+  "aws_cloudwatch_advanced_options": {
+    "title": "Додаткові параметри",
+    "flow_log_prefix_label": "Додати префікс Flow Log до назв полів",
+    "flow_log_prefix_help": "Додати поле з префіксом Flow Log, наприклад \"src_addr\" -> \"flow_log_src_addr\".",
+    "store_full_message_label": "Зберігати повне повідомлення?",
+    "store_full_message_help": "Зберігати вихідні дані події журналу Kinesis/CloudWatch у полі full_message.",
+    "override_source_label": "Перевизначити джерело (необов’язково)",
+    "override_source_help": "За замовчуванням джерело повідомлення встановлено як aws-kinesis-raw-logs. За бажання його можна перевизначити власним значенням.",
+    "batch_size_label": "Розмір пакета записів Kinesis",
+    "batch_size_help": "Кількість записів Kinesis, що отримуються за один раз. Кожен запис може мати розмір до 1 МБ. Значення AWS за замовчуванням — 10 000. Введіть менше значення, щоб обробляти менші фрагменти за раз."
+  },
+  "aws_sidebar_permissions": {
+    "title": "Дозволи політики AWS",
+    "description": "Інформацію про потрібні дозволи AWS дивіться в розділі <docsLink/>.",
+    "docs_link_text": "офіційна документація"
+  },
+  "aws_step_health_check": {
+    "no_response_title": "Ми ще не отримали відповіді від Amazon.",
+    "waiting_description": "Зачекайте кілька хвилин, поки ми продовжуємо перевіряти ваш потік AWS на наявність журналів. Сервери Amazon розбирають журнали кожні 10 хвилин, тож візьміть чашку кави, бо це може тривати певний час!",
+    "checking_again_in": "Наступна перевірка через: <countdown/>",
+    "checking_button": "Перевірка...",
+    "check_now_button": "Перевірити зараз",
+    "do_not_refresh": "Не оновлюйте браузер: ми постійно перевіряємо наявність ваших журналів, і ця сторінка оновиться автоматично, коли журнали будуть доступні.",
+    "review_button": "Переглянути та завершити",
+    "title": "Створення потоку Kinesis",
+    "sample_description": "Якщо доступно, нижче буде показано розібраний зразок повідомлення {{logType}} із потоку.",
+    "formatted_log_label": "Відформатоване повідомлення журналу",
+    "no_messages": "У потоці не знайдено повідомлень."
+  },
+  "aws_cloudwatch_step_review": {
+    "default_label": "(за замовчуванням)",
+    "save_error": "Не вдалося зберегти ваш вхід. Спробуйте ще раз за кілька хвилин.",
+    "complete_button": "Завершити налаштування CloudWatch",
+    "title": "Остаточна перевірка",
+    "description": "Перевірте все нижче, щоб переконатися, що воно правильне, а потім натисніть кнопку нижче, щоб завершити налаштування CloudWatch!",
+    "setting_up_cloudwatch": "Налаштування CloudWatch",
+    "edit": "Редагувати",
+    "label_name": "Назва",
+    "label_authorization_type": "Тип авторизації",
+    "label_aws_key": "Ключ AWS",
+    "label_assumed_role_arn": "Роль AWS Assumed ARN",
+    "label_external_id": "AWS External ID",
+    "label_cloudwatch_endpoint": "Кінцева точка VPC CloudWatch",
+    "label_dynamodb_endpoint": "Кінцева точка VPC DynamoDB",
+    "label_iam_endpoint": "Кінцева точка VPC IAM",
+    "label_kinesis_endpoint": "Кінцева точка VPC Kinesis",
+    "label_aws_region": "Регіон AWS",
+    "setting_up_kinesis": "Налаштування Kinesis",
+    "label_kinesis_stream": "Потік Kinesis",
+    "label_kinesis_stream_arn": "ARN потоку Kinesis",
+    "stream_arn_error": "Помилка: не вдалося отримати ARN потоку. Переконайтеся, що роль IAM містить дозвіл kinesis:DescribeStream.",
+    "label_global_input": "Глобальний вхід",
+    "label_record_batch_size": "Розмір пакета записів",
+    "label_enable_throttling": "Увімкнути обмеження швидкості",
+    "label_flow_log_prefix": "Додати префікс Flow Log до назв полів",
+    "label_store_full_message": "Зберігати повне повідомлення",
+    "label_override_source": "Перевизначити джерело",
+    "formatting": "Форматування",
+    "label_log_type": "Тип журналу",
+    "pipeline_hint": "Якщо вам потрібно, щоб журнали розбиралися інакше, перегляньте наше <pipelineLink>правило Pipeline</pipelineLink> для додаткових подробиць та інструкцій.",
+    "no_response": "Ми ще не отримали відповіді від Amazon."
+  },
+  "aws_kinesis_existing_streams": {
+    "sidebar_title": "Не бачите потрібного потоку?",
+    "sidebar_requirement": "Щоб продовжити налаштування, у вказаному регіоні має існувати принаймні один потік Kinesis. Потік журналів має містити щонайменше кілька повідомлень журналу.",
+    "sidebar_auto_setup": "{{productName}} також може створити для вас потік Kinesis і підписати його на вибрану групу журналів CloudWatch. Зверніть увагу, що цей варіант створить додаткові ресурси у вашому середовищі AWS, за які стягуватиметься плата.",
+    "setup_automatically_button": "Налаштувати Kinesis автоматично",
+    "no_logs_error": "Не вдалося знайти жодних журналів у цьому потоці Kinesis. Виберіть інший потік Kinesis.",
+    "loading_message": "Цей запит може тривати кілька хвилин.",
+    "verify_button": "Перевірити потік і формат",
+    "title": "Виберіть потік Kinesis",
+    "description_list": "Нижче наведено список усіх потоків Kinesis, знайдених у вказаному обліковому записі AWS.",
+    "description_docs": "Виберіть потік, з якого потрібно читати повідомлення, або скористайтеся документацією <docsLink/>, щоб дізнатися більше про це налаштування.",
+    "docs_link_text": "AWS Kinesis/CloudWatch Input",
+    "select_stream_label": "Виберіть потік",
+    "select_stream_placeholder": "Виберіть потік Kinesis"
+  },
+  "aws_kinesis_setup_new_stream": {
+    "no_groups_error": "Не вдалося знайти жодних груп у вибраному регіоні. Спробуйте вибрати інший регіон.",
+    "begin_button": "Почати автоматичне налаштування",
+    "title": "Автоматичне налаштування Kinesis",
+    "intro": "Заповніть поля нижче, щоб розпочати автоматичне налаштування Kinesis. Воно виконає у вашому обліковому записі AWS наведені нижче операції. Докладніше див. <docsLink>Using CloudWatch Logs Subscription Filters</docsLink> у документації AWS.",
+    "step_create_stream": "Створити новий потік Kinesis із вказаною назвою.",
+    "step_create_role": "Створити роль/політику IAM, потрібну для підписки потоку Kinesis на групу журналів CloudWatch.",
+    "step_subscribe": "Підписати новий потік Kinesis на групу журналів.",
+    "stream_name_label": "Назва потоку Kinesis",
+    "stream_name_placeholder": "Назва потоку",
+    "stream_name_help": "1–128 буквено-цифрових символів, а також спеціальні символи: підкреслення (_), крапка (.) і дефіс (-).",
+    "group_name_label": "Назва групи CloudWatch",
+    "choose_group": "Виберіть групу CloudWatch",
+    "back_button": "Назад до вибору потоку"
+  },
+  "aws_kinesis_setup_agree": {
+    "description": "Це автоматичне налаштування створить такі ресурси AWS. Натисніть нижче, щоб підтвердити, що ви розумієте, що ці ресурси буде створено, і що ви самостійно несете відповідальність за пов’язану з ними плату AWS. Зверніть увагу, що всі ресурси потрібно буде видалити вручну, якщо вони більше не потрібні.",
+    "step_stream": "Створити потік Kinesis з <strong>1</strong> шардом.",
+    "step_role": "Створити роль і політику IAM, що дозволяють вказаній групі CloudWatch <strong>{{groupName}}</strong> публікувати повідомлення журналу в потік Kinesis <strong>{{streamName}}</strong>",
+    "step_subscription": "Створити підписку CloudWatch, яка публікує повідомлення журналу в потік Kinesis."
+  },
+  "aws_kinesis_setup_step": {
+    "waiting": "Очікування...",
+    "creating": "Створення: {{label}}",
+    "create": "Створити: {{label}}"
+  },
+  "aws_kinesis_setup_steps": {
+    "stream_label": "Потік Kinesis",
+    "policy_label": "Політика підписки",
+    "subscription_label": "Підписка"
+  },
+  "aws_kinesis_setup_modal": {
+    "creating_button": "Створення...",
+    "close_button": "Закрити",
+    "continue_button": "Продовжити налаштування",
+    "executing_title": "Виконання автоналаштування",
+    "agreement_title": "Угода про автоматичне налаштування Kinesis",
+    "delayed_logs": "Першим повідомленням може знадобитися до десяти хвилин, щоб надійти в потік Kinesis. Перевірка стану Kinesis на наступному кроці не завершиться успішно, доки в потоці не з’являться повідомлення. Докладніше дивіться в офіційній документації щодо <cloudWatchLink>підписок CloudWatch</cloudWatchLink>.",
+    "agree_button": "Погоджуюся! Створити ці ресурси AWS зараз."
+  },
+  "form_wrap": {
+    "more_info": "Докладніше",
+    "additional_information": "Додаткова інформація:",
+    "loading_button": "Завантаження...",
+    "submit_button": "Надіслати"
+  },
+  "aws_skip_health_check": {
+    "title": "Пропустити перевірку стану",
+    "confirm_button": "Підтвердити",
+    "form_title": "Виберіть тип журналу та пропустіть перевірку стану",
+    "description": "Якщо ви впевнені в даних, що містяться у вашому новому потоці <strong>{{streamName}}</strong>, виберіть нижче варіант, щоб пропустити нашу автоматичну перевірку.",
+    "input_type_label": "Виберіть тип входу AWS",
+    "choose_log_type": "Виберіть тип журналу"
+  },
+  "throttling_checkbox": {
+    "label": "Увімкнути обмеження швидкості",
+    "help": "Якщо ввімкнено, нові повідомлення з цього входу не читатимуться, доки сервер {{productName}} не впорається зі своїм навантаженням повідомлень. Це зазвичай корисно для входів, що читають із файлів або систем черг повідомлень, як-от AMQP чи Kafka. Якщо ви регулярно опитуєте зовнішню систему, наприклад через HTTP, зазвичай цей параметр слід залишити вимкненим."
+  },
+  "grey_noise_adapter_documentation": {
+    "description": "Адаптер даних GreyNoise Quick IP Lookup використовує <greynoiseLink>GreyNoise API</greynoiseLink> для пошуку індикаторів за заданим ключем і повертає значення кінцевої точки IP Quick Context. Див. <quickContextLink>IP Quick Context</quickContextLink>"
+  },
+  "grey_noise_adapter_field_set": {
+    "user_password_label": "Пароль користувача",
+    "reset_token_button": "Скинути токен",
+    "api_token_label": "Токен API",
+    "undo_reset_button": "Скасувати скидання",
+    "api_token_help": "Токен API."
+  },
+  "grey_noise_adapter_summary": {
+    "api_token_label": "Токен API"
+  },
+  "slack_notification_details": {
+    "webhook_url_label": "URL вебхука",
+    "channel_label": "Канал",
+    "custom_message_label": "Власний шаблон повідомлення",
+    "empty_body": "Порожнє тіло",
+    "include_event_procedure_label": "Включати процедуру події до тіла листа",
+    "backlog_limit_label": "Обмеження черги повідомлень",
+    "user_name_label": "Ім’я користувача",
+    "include_title_label": "Включати заголовок",
+    "notify_channel_label": "Сповіщати канал",
+    "link_names_label": "Посилання на імена",
+    "icon_url_label": "URL значка",
+    "icon_emoji_label": "Емодзі значка",
+    "time_zone_label": "Часовий пояс"
+  },
+  "teams_notification_details": {
+    "webhook_url_label": "URL вебхука",
+    "custom_message_label": "Власний шаблон повідомлення",
+    "empty_body": "Порожнє тіло",
+    "backlog_limit_label": "Обмеження черги повідомлень",
+    "icon_url_label": "URL значка",
+    "time_zone_label": "Часовий пояс"
+  },
+  "teams_notification_v2_details": {
+    "webhook_url_label": "URL вебхука",
+    "adaptive_card_label": "Шаблон Adaptive Card",
+    "backlog_limit_label": "Обмеження черги повідомлень"
+  },
+  "slack_notification_form": {
+    "configuration_color_label": "Колір конфігурації",
+    "change_color_button": "Змінити колір",
+    "color_help": "Виберіть колір для цієї конфігурації.",
+    "custom_message_help": "Власне повідомлення, що додається під заголовком оповіщення. Докладніше див. <docsLink/>.",
+    "docs_link_text": "документацію",
+    "webhook_url_help": "URL «Incoming Webhook» Slack",
+    "channel_help": "Назва #каналу Slack або @користувача для особистого повідомлення",
+    "custom_message_label": "Власне повідомлення (необов’язково)",
+    "time_zone_help": "Часовий пояс, що використовується для позначок часу в тілі сповіщення.",
+    "time_zone_label": "Часовий пояс для значень дати/часу",
+    "backlog_limit_label": "Обмеження черги повідомлень (необов’язково)",
+    "backlog_limit_help": "Обмежує кількість повідомлень черги, що надсилаються у складі сповіщення Slack. Якщо встановлено 0, обмеження не застосовується.",
+    "user_name_label": "Ім’я користувача (необов’язково)",
+    "user_name_help": "Ім’я користувача відправника в Slack",
+    "include_title_help": "Включити до сповіщення назву й опис визначення події",
+    "notify_channel_help": "Сповістити всіх користувачів каналу, додавши @channel до повідомлення",
+    "notify_here_label": "Сповіщати тих, хто тут",
+    "notify_here_help": "Сповістити активних користувачів каналу, додавши @here до повідомлення",
+    "link_names_help": "Знаходити та перетворювати на посилання назви каналів і імена користувачів",
+    "icon_url_label": "URL значка (необов’язково)",
+    "icon_url_help": "Зображення, яке використовується як значок цього повідомлення",
+    "icon_emoji_label": "Емодзі значка (необов’язково)",
+    "icon_emoji_help": "Емодзі, яке використовується як значок цього повідомлення (перевизначає URL значка)"
+  },
+  "event_procedure_checkbox": {
+    "label": "Включати процедуру події",
+    "help": "Додати відформатовану версію процедури події з визначення події в кінець тіла сповіщення."
+  },
+  "slack_notification_summary": {
+    "color_label": "Колір",
+    "custom_message_label": "Власне повідомлення",
+    "yes": "Так",
+    "no": "Ні"
+  },
+  "teams_notification_summary": {
+    "color_label": "Колір",
+    "custom_message_label": "Власне повідомлення"
+  },
+  "teams_notification_form": {
+    "webhook_url_help": "URL «Incoming Webhook» Teams",
+    "backlog_limit_help": "Обмежує кількість повідомлень черги, що надсилаються у складі сповіщення Microsoft Teams. Якщо встановлено 0, обмеження не застосовується."
+  },
+  "teams_notification_v2_form": {
+    "adaptive_card_help": "Adaptive Card для публікації в Teams. Докладніше див. <docsLink/>.",
+    "backlog_toggle_aria_label": "Увімкнути обмеження черги повідомлень"
+  },
+  "pager_duty_notification_details": {
+    "routing_key_label": "Ключ маршрутизації",
+    "incident_title_label": "Назва інциденту",
+    "custom_incident_label": "Власний інцидент",
+    "key_prefix_label": "Префікс ключа",
+    "incident_key_label": "Ключ інциденту",
+    "client_name_label": "Назва клієнта",
+    "client_url_label": "URL клієнта"
+  },
+  "pager_duty_notification_form": {
+    "routing_key_label": "Ключ маршрутизації",
+    "routing_key_help": "Ключ маршрутизації інтеграції Pager Duty.",
+    "incident_title_label": "Назва інциденту",
+    "incident_title_help": "Власна назва інциденту в Pager Duty. Якщо не задано, використовуватиметься назва події, показана в {{productName}}.",
+    "custom_incident_label": "Використовувати власний ключ інциденту",
+    "custom_incident_help": "Згенерувати власний ключ інциденту.",
+    "key_prefix_label": "Префікс ключа інциденту",
+    "key_prefix_help": "Префікс ключа інциденту, після якого йтимуть потік(и) та назва визначення події. Щоб налаштувати весь ключ, скористайтеся ключем інциденту.",
+    "incident_key_label": "Ключ інциденту",
+    "incident_key_help": "Повний ключ для ідентифікації інциденту. Якщо вказано, використовується замість префікса.",
+    "client_name_label": "Назва клієнта",
+    "client_name_help": "Назва системи {{productName}}, що ініціює подію PagerDuty.",
+    "client_url_label": "URL клієнта",
+    "client_url_help": "URL системи {{productName}}, що ініціює подію PagerDuty."
+  },
+  "pager_duty_notification_summary": {
+    "routing_key_label": "Ключ маршрутизації",
+    "incident_title_label": "Назва інциденту",
+    "default_value": "За замовчуванням",
+    "use_custom_incident_key_label": "Використовувати власний ключ інциденту",
+    "yes": "Так",
+    "no": "Ні",
+    "key_prefix_label": "Префікс ключа інциденту",
+    "incident_key_label": "Ключ інциденту",
+    "client_name_label": "Назва клієнта",
+    "client_url_label": "URL клієнта"
+  },
+  "threat_intel_plugin_config": {
+    "title": "Конфігурація пошуку Threat Intelligence",
+    "description": "Конфігурація плагіна пошуку Threat Intelligence.",
+    "tor_exit_nodes_label": "Вихідні вузли Tor:",
+    "spamhaus_label": "Spamhaus:",
+    "enabled": "Увімкнено",
+    "disabled": "Вимкнено",
+    "modal_title": "Оновити конфігурацію плагіна Threat Intelligence",
+    "tor_checkbox_label": "Дозволити пошук за вихідними вузлами Tor?",
+    "tor_checkbox_help": "Увімкніть, щоб включити пошук за вихідними вузлами Tor у глобальну функцію Pipeline; вимкнення також зупиняє оновлення даних.",
+    "spamhaus_checkbox_label": "Дозволити пошук Spamhaus DROP/EDROP?",
+    "spamhaus_checkbox_help": "Увімкніть, щоб включити пошук Spamhaus у глобальну функцію Pipeline; вимкнення також зупиняє оновлення даних."
+  },
+  "abusech_ransom_adapter_documentation": {
+    "deprecation_title": "Попередження про застарівання",
+    "deprecation_text": "abuse.ch Ransomware Tracker було закрито 2019-12-08. Цей адаптер даних не слід використовувати."
+  },
+  "abusech_ransom_adapter_field_set": {
+    "domains_blocklist": "Список блокування доменів",
+    "urls_blocklist": "Список блокування URL",
+    "ips_blocklist": "Список блокування IP",
+    "blocklist_type_label": "Тип списку блокування",
+    "blocklist_type_help": "Виберіть тип списку блокування програм-вимагачів abuse.ch",
+    "blocklist_type_placeholder": "Виберіть тип списку блокування",
+    "refresh_blocklist_label": "Оновлювати список блокування",
+    "refresh_blocklist_help": "Якщо ввімкнено, список блокування програм-вимагачів abuse.ch оновлюється після його зміни."
+  },
+  "abusech_ransom_adapter_summary": {
+    "domains_blocklist": "Список блокування доменів",
+    "urls_blocklist": "Список блокування URL",
+    "ips_blocklist": "Список блокування IP",
+    "blocklist_type_label": "Тип списку блокування",
+    "update_interval_label": "Інтервал оновлення",
+    "deprecation_title": "Попередження про застарівання",
+    "deprecation_text": "abuse.ch Ransomware Tracker було закрито 2019-12-08. Цей адаптер даних не слід використовувати."
+  },
+  "otx_adapter_documentation": {
+    "intro": "Адаптер даних AlienVault OTX використовує <otxLink>OTX API</otxLink> для пошуку індикаторів за заданим ключем.",
+    "configuration_title": "Конфігурація",
+    "indicator_title": "Індикатор",
+    "indicator_description": "OTX API пропонує кілька різних індикаторів компрометації (IOC). Потрібно вибрати, який індикатор використовувати для цього адаптера даних.",
+    "ip_auto_detect": "Індикатор <code>IP Auto-Detect</code> не є офіційним. Ми додали його, щоб можна було автоматично визначати тип IP-адреси й використовувати один адаптер даних для адрес IP v4 і v6.",
+    "api_key_title": "Ключ OTX API",
+    "api_key_description": "Ключ OTX API використовується для автентифікації запитів до API. Запити працюють і без ключа API, але ліміт запитів, найімовірніше, буде меншим. <strong>Якщо ви використовуєте цей адаптер даних для робочого трафіку, зареєструйте обліковий запис OTX і отримайте ключ API.</strong>",
+    "api_url_title": "URL OTX API",
+    "api_url_description": "HTTP URL сервера OTX API. Значення за замовчуванням <code>https://otx.alienvault.com</code> не слід змінювати, окрім випадків, коли ви хочете виконати тести з власним сервером.",
+    "user_agent_title": "HTTP User-Agent",
+    "user_agent_description": "Встановлює HTTP-заголовок <code>User-Agent</code> для запитів до OTX API. Ви можете змінити його, додавши свої контактні дані, щоб оператори OTX API могли зв’язатися з вами в разі проблем із вашими запитами до API.",
+    "connection_timeout_title": "Тайм-аут HTTP-з’єднання",
+    "connection_timeout_description": "Тайм-аут HTTP-з’єднання в мілісекундах для запиту до OTX API. Якщо встановити високе значення, а з’єднання з OTX API повільне, це може вплинути на продуктивність обробки.",
+    "write_timeout_title": "Тайм-аут запису HTTP",
+    "write_timeout_description": "Тайм-аут запису HTTP в мілісекундах для запиту до OTX API. Якщо встановити високе значення, а з’єднання з OTX API повільне, це може вплинути на продуктивність обробки.",
+    "read_timeout_title": "Тайм-аут читання HTTP",
+    "read_timeout_description": "Тайм-аут читання HTTP в мілісекундах для запиту до OTX API. Якщо встановити високе значення, а з’єднання з OTX API повільне, це може вплинути на продуктивність обробки."
+  },
+  "otx_adapter_field_set": {
+    "option_ip_auto_detect": "IP Auto-Detect",
+    "option_ip_v4": "IP v4",
+    "option_ip_v6": "IP v6",
+    "option_domain": "Домен",
+    "option_hostname": "Ім’я хоста",
+    "option_file": "Файл",
+    "option_url": "URL",
+    "option_cve": "CVE",
+    "option_nids": "NIDS",
+    "option_correlation_rule": "Правило кореляції",
+    "indicator_label": "Індикатор",
+    "indicator_help": "Тип індикатора OTX, який слід використовувати для пошуку.",
+    "indicator_placeholder": "Виберіть індикатор",
+    "api_key_label": "Ключ OTX API",
+    "api_key_help": "Ваш ключ OTX API.",
+    "api_url_label": "URL OTX API",
+    "api_url_help": "URL сервера OTX API.",
+    "user_agent_label": "HTTP User-Agent",
+    "user_agent_help": "Заголовок User-Agent, який слід використовувати для HTTP-запиту.",
+    "connect_timeout_label": "Тайм-аут HTTP-з’єднання",
+    "connect_timeout_help": "Тайм-аут HTTP-з’єднання в мілісекундах.",
+    "write_timeout_label": "Тайм-аут запису HTTP",
+    "write_timeout_help": "Тайм-аут запису HTTP в мілісекундах.",
+    "read_timeout_label": "Тайм-аут читання HTTP",
+    "read_timeout_help": "Тайм-аут читання HTTP в мілісекундах."
+  },
+  "otx_adapter_summary": {
+    "not_available": "н/д",
+    "unit_ms": "мс"
+  },
+  "spamhaus_edrop_adapter_summary": {
+    "no_configuration": "Конфігурація не потрібна."
+  },
+  "tor_exit_node_adapter_summary": {
+    "no_configuration": "Конфігурація не потрібна"
+  },
+  "whois_adapter_documentation": {
+    "intro": "Адаптер даних пошуку IP через whois може запитувати інформацію про власника мережі для IP-адреси.",
+    "configuration_title": "Конфігурація",
+    "connect_timeout_description": "Тайм-аут з’єднання сокета із сервером whois у мілісекундах. Якщо встановити високе значення, це може вплинути на продуктивність обробки.",
+    "read_timeout_description": "Тайм-аут читання з’єднання сокета із сервером whois у мілісекундах. Якщо встановити високе значення, це може вплинути на продуктивність обробки."
+  },
+  "whois_adapter_field_set": {
+    "connect_timeout_label": "Тайм-аут з’єднання",
+    "connect_timeout_help": "Тайм-аут з’єднання WHOIS у мілісекундах.",
+    "read_timeout_label": "Тайм-аут читання",
+    "read_timeout_help": "Тайм-аут читання з’єднання WHOIS у мілісекундах."
+  },
+  "whois_adapter_summary": {
+    "unit_ms": "мс"
+  }
+}

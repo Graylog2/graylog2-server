@@ -1,0 +1,653 @@
+{
+  "actions": {
+    "cancel": "Скасувати",
+    "confirm": "Підтвердити",
+    "submit": "Надіслати",
+    "delete": "Видалити",
+    "previous": "Назад",
+    "next": "Далі",
+    "add": "Додати",
+    "edit": "Редагувати",
+    "preview": "Попередній перегляд",
+    "close": "Закрити",
+    "done": "Готово",
+    "filter": "Фільтрувати",
+    "reset": "Скинути",
+    "reset_search": "Скинути пошук",
+    "more_actions": "Більше дій",
+    "sort": "Сортувати",
+    "clear_selection": "Скасувати вибір",
+    "remove_item": "Видалити {{name}}"
+  },
+  "confirm_leave": {
+    "question": "Ви впевнені?"
+  },
+  "duration": {
+    "years_one": "{{count}} рік",
+    "years_other": "{{count}} року",
+    "months_one": "{{count}} місяць",
+    "months_other": "{{count}} місяця",
+    "days_one": "{{count}} день",
+    "days_other": "{{count}} дня",
+    "hours_one": "{{count}} година",
+    "hours_other": "{{count}} години",
+    "minutes_one": "{{count}} хвилина",
+    "minutes_other": "{{count}} хвилини",
+    "seconds_one": "{{count}} секунда",
+    "seconds_other": "{{count}} секунди",
+    "milliseconds_one": "{{count}} мілісекунда",
+    "milliseconds_other": "{{count}} мілісекунди",
+    "nanoseconds_one": "{{count}} наносекунда",
+    "nanoseconds_other": "{{count}} наносекунди",
+    "microseconds_one": "{{count}} мікросекунда",
+    "microseconds_other": "{{count}} мікросекунди",
+    "years_few": "{{count}} роки",
+    "years_many": "{{count}} років",
+    "months_few": "{{count}} місяці",
+    "months_many": "{{count}} місяців",
+    "days_few": "{{count}} дні",
+    "days_many": "{{count}} днів",
+    "hours_few": "{{count}} години",
+    "hours_many": "{{count}} годин",
+    "minutes_few": "{{count}} хвилини",
+    "minutes_many": "{{count}} хвилин",
+    "seconds_few": "{{count}} секунди",
+    "seconds_many": "{{count}} секунд",
+    "milliseconds_few": "{{count}} мілісекунди",
+    "milliseconds_many": "{{count}} мілісекунд",
+    "nanoseconds_few": "{{count}} наносекунди",
+    "nanoseconds_many": "{{count}} наносекунд",
+    "microseconds_few": "{{count}} мікросекунди",
+    "microseconds_many": "{{count}} мікросекунд"
+  },
+  "bulk_actions": {
+    "title": "Групові дії",
+    "cancel": "Скасувати вибір"
+  },
+  "refresh": {
+    "not_updating": "Не оновлюється",
+    "every": "Кожні",
+    "pause": "Призупинити оновлення",
+    "start": "Почати оновлення"
+  },
+  "create_entity": {
+    "title": "Створити {{entityName}}",
+    "submit": "Створити {{entityName, lowercase}}",
+    "submitting": "Створення {{entityName, lowercase}}...",
+    "save_failed": "Не вдалося зберегти",
+    "unknown_error": "Сталася помилка. Спробуйте ще раз."
+  },
+  "key_value_table": {
+    "name": "Назва",
+    "value": "Значення",
+    "actions": "Дії"
+  },
+  "markdown_editor": {
+    "editor_title": "Редактор Markdown",
+    "preview_title": "Попередній перегляд Markdown",
+    "expand_preview": "Розгорнути попередній перегляд",
+    "expand_content": "Розгорнути вміст"
+  },
+  "source_code_editor": {
+    "copy": "Копіювати (Ctrl+C / ⌘C)",
+    "paste": "Вставити (Ctrl+V / ⌘V)",
+    "undo": "Скасувати (Ctrl+Z / ⌘Z)",
+    "redo": "Повторити (Ctrl+Shift+Z / ⌘⇧Z)",
+    "paste_hint": "Натисніть Ctrl+V (⌘V у macOS) або виберіть Редагувати → Вставити, щоб вставити з буфера обміну."
+  },
+  "loading": "Завантаження...",
+  "loading_long_wait": "Це триває трохи довше, зачекайте...",
+  "errors": {
+    "runtime_error": "Помилка виконання",
+    "unknown_error": "Невідома помилка",
+    "fetch_error": "{{message}}: {{error}}",
+    "page_error_title": "Помилка отримання даних",
+    "page_error_description": "Нам не вдалося отримати деякі дані, потрібні для створення цієї сторінки, тож ось замість неї картинка.",
+    "page_error_logs": "Додаткову інформацію шукайте в журналах сервера {{productName}}."
+  },
+  "empty": {
+    "no_data": "Немає доступних даних.",
+    "no_entities": "Елементів немає.",
+    "nothing_here": "Схоже, тут поки нічого немає!",
+    "no_items": "Немає елементів для відображення",
+    "no_items_available": "Немає доступних елементів",
+    "no_items_found": "Не знайдено елементів для відображення.",
+    "filter_no_match": "Фільтр не відповідає жодним даним."
+  },
+  "badges": {
+    "beta": "Beta",
+    "preview": "Попередній перегляд",
+    "default": "За замовчуванням",
+    "optional": "(Необов.)"
+  },
+  "clipboard": {
+    "copied": "Скопійовано!"
+  },
+  "restricted_access": {
+    "view": "У вас немає дозволів на перегляд цього елемента ({{entityName}})."
+  },
+  "enterprise_plugin_not_found": {
+    "title": "Функція Enterprise",
+    "description": "Щоб використовувати функціональність <bold>{{featureName}}</bold>, вам потрібні <licenseLink>ліцензія Graylog Enterprise</licenseLink> і <docsLink>плагін Graylog Enterprise</docsLink>."
+  },
+  "pagination": {
+    "first": "Відкрити першу сторінку",
+    "previous": "Відкрити попередню сторінку",
+    "next": "Відкрити наступну сторінку",
+    "last": "Відкрити останню сторінку",
+    "page": "Відкрити сторінку {{page}}",
+    "active_page": "Активна сторінка"
+  },
+  "page_size": {
+    "rows_one": "{{count}} рядок",
+    "rows_other": "{{count}} рядка",
+    "configure": "Налаштувати розмір сторінки",
+    "show": "Показувати <select/>",
+    "rows_few": "{{count}} рядки",
+    "rows_many": "{{count}} рядків"
+  },
+  "search_form": {
+    "placeholder": "Введіть пошуковий запит...",
+    "filter_placeholder": "Введіть запит для фільтрування"
+  },
+  "select": {
+    "placeholder": "Виберіть...",
+    "no_options": "Немає варіантів",
+    "loading": "Завантаження...",
+    "loading_options": "Завантаження варіантів...",
+    "type_to_filter": "Введіть для фільтрування"
+  },
+  "entity_table": {
+    "selected_items_one": "Вибрано {{count}} елемент",
+    "selected_items_other": "Вибрано {{count}} елемента",
+    "columns": "Стовпці",
+    "configure_columns": "Налаштувати видимі стовпці",
+    "reset_columns": "Скинути всі стовпці",
+    "show_column": "Показати {{column}}",
+    "hide_column_named": "Приховати {{column}}",
+    "show_label": "Показати",
+    "show_details": "Показати деталі",
+    "collapse_section": "Згорнути розділ",
+    "toggle_column_actions": "Перемкнути дії для {{column}}",
+    "sort_ascending": "Сортувати за зростанням",
+    "sort_descending": "Сортувати за спаданням",
+    "sort_column_ascending": "Сортувати {{column, lowercase}} за зростанням",
+    "sort_column_descending": "Сортувати {{column, lowercase}} за спаданням",
+    "hide_column": "Приховати стовпець",
+    "resize_column": "Змінити розмір стовпця {{column}}",
+    "slicing_by": "Розбиття за {{column}}",
+    "select_entity": "Вибрати елемент",
+    "deselect_entity": "Скасувати вибір елемента",
+    "select_all": "Вибрати всі видимі елементи",
+    "deselect_all": "Скасувати вибір усіх видимих елементів",
+    "more": "Більше",
+    "more_actions": "Більше дій",
+    "load_layout_failed": "Не вдалося завантажити параметри макета для огляду «{{entityId}}», помилка",
+    "update_layout_failed": "Не вдалося оновити параметри макета таблиці, помилка: {{error}}",
+    "search_placeholder": "Пошук: {{humanName}}",
+    "fetch_failed": "Не вдалося отримати {{humanName}}",
+    "fetch_failed_with_status": "Не вдалося отримати {{humanName}}, статус",
+    "could_not_retrieve": "Не вдалося отримати {{humanName}}",
+    "no_results": "Не знайдено: {{humanName}}.",
+    "selected_items_few": "Вибрано {{count}} елементи",
+    "selected_items_many": "Вибрано {{count}} елементів"
+  },
+  "slicing": {
+    "slice_by": "Розбити за",
+    "slice_by_values": "Розбити за значеннями",
+    "no_slicing": "Без розбиття",
+    "unselect_slice": "Скасувати вибір зрізу",
+    "sort_by": "Сортувати за {{option}}",
+    "filter": "Фільтрувати {{column}}",
+    "filter_slices": "Фільтрувати зрізи",
+    "sort_ascending": "Сортувати за зростанням",
+    "sort_descending": "Сортувати за спаданням",
+    "hide_empty": "Приховати порожні зрізи ({{count}})",
+    "show_empty": "Показати порожні зрізи ({{count}})",
+    "hide_empty_title": "Приховати порожні зрізи",
+    "show_empty_title": "Показати порожні зрізи",
+    "no_empty": "Порожні зрізи (0)",
+    "fetch_failed": "Помилка отримання зрізів таблиці"
+  },
+  "filters": {
+    "filters": "Фільтри",
+    "create_filter": "Створити фільтр",
+    "change_value": "Змінити значення фільтра",
+    "delete_filter": "Видалити фільтр",
+    "filter_ignored": "Фільтр проігноровано",
+    "slice_conflict": "Цей фільтр проігноровано, бо для цього атрибута активний зріз. Очистьте зріз, щоб застосувати фільтр.",
+    "single_filter_only": "Для цього атрибута можна створити лише один фільтр.",
+    "update_existing": "Якщо потрібно змінити значення фільтра, оновіть наявний.",
+    "create_attribute_filter": "Створити фільтр {{attribute, lowercase}}",
+    "edit_attribute_filter": "Редагувати фільтр {{attribute, lowercase}}",
+    "create_submit": "Створити фільтр",
+    "update_submit": "Оновити фільтр",
+    "value_placeholder": "Введіть значення для фільтрування",
+    "must_not_be_empty": "Не може бути порожнім.",
+    "search_attribute": "Пошук: {{attribute, lowercase}}",
+    "no_entities_found": "Елементів не знайдено",
+    "hold_shift": "Утримуйте Shift, щоб вибрати кілька",
+    "load_suggestions_failed": "Не вдалося завантажити пропозиції для фільтра, статус",
+    "could_not_load_suggestions": "Не вдалося завантажити пропозиції фільтра",
+    "load_titles_failed": "Не вдалося завантажити назви фільтрів, статус",
+    "could_not_load_titles": "Не вдалося завантажити назви фільтрів",
+    "all_time": "Увесь час",
+    "now": "Зараз",
+    "now_lowercase": "зараз",
+    "relative_range": "від {{from}} до {{until}}"
+  },
+  "time_units": {
+    "nanoseconds": "наносекунди",
+    "microseconds": "мікросекунди",
+    "milliseconds": "мілісекунди",
+    "seconds": "секунди",
+    "minutes": "хвилини",
+    "hours": "години",
+    "days": "дні",
+    "months": "місяці",
+    "years": "роки"
+  },
+  "time": {
+    "never": "Ніколи",
+    "toggle_time": "Перемкнути час",
+    "time_unit_input": "Поле одиниці часу",
+    "browser_time_zone": "Часовий пояс браузера",
+    "pick_time_zone": "Виберіть часовий пояс",
+    "unclassified_time_zones": "Без класифікації",
+    "default_locale": "Локаль за замовчуванням",
+    "pick_locale": "Виберіть локаль"
+  },
+  "page_header": {
+    "experimental": "Експериментальна",
+    "legacy": "Застаріла",
+    "experimental_message": "Ця функція нова й має вважатися експериментальною.",
+    "legacy_message": "Цю функцію припинено, і її буде видалено в одній із майбутніх версій."
+  },
+  "message": {
+    "collector_ingest": "Collector Ingest",
+    "deleted_input": "видалений вхід",
+    "received_by": "Отримано входом",
+    "received_by_value": "<inputName/> на <node/>",
+    "filter_streams": "Фільтрувати потоки",
+    "default_stream_not_testable": "Не можна тестувати на Default Stream",
+    "no_streams": "Немає доступних потоків",
+    "test_against_stream": "Тестувати на потоці",
+    "show_changes": "Показати зміни",
+    "copy_id": "Копіювати ID",
+    "copy_message": "Копіювати повідомлення",
+    "not_stored": "Не збережено",
+    "timestamp": "Позначка часу",
+    "stored_in_index": "Збережено в індексі",
+    "not_stored_in_index": "Повідомлення не збережено",
+    "routed_into_streams": "Спрямовано до потоків",
+    "edit_favorite_fields": "Редагувати обрані поля",
+    "show_remaining_fields_one": "Показати {{count}} поле, що залишилося",
+    "show_remaining_fields_other": "Показати {{count}} поля, що залишилося",
+    "hide_remaining_fields_one": "Приховати {{count}} поле, що залишилося",
+    "hide_remaining_fields_other": "Приховати {{count}} поля, що залишилося",
+    "favorite_fields_configuration": "Конфігурація обраних полів",
+    "favorite_fields_hint_one": "Обрані поля відображатимуться в усіх потоках, до яких належить це повідомлення, зокрема в потоці <streams/>, до якого це повідомлення спрямовано.",
+    "favorite_fields_hint_other": "Обрані поля відображатимуться в усіх потоках, до яких належить це повідомлення, зокрема в потоках <streams/>, до яких це повідомлення спрямовано.",
+    "save_configuration": "Зберегти конфігурацію",
+    "reset_to_default": "Скинути до значень за замовчуванням",
+    "reset_to_default_title": "Скинути до полів за замовчуванням: {{fields}}",
+    "favorite_fields": "Обрані поля",
+    "remaining_fields": "Решта полів",
+    "set_favorites_failed": "Не вдалося позначити поля як обрані, помилка: {{error}}",
+    "set_favorites_failed_title": "Не вдалося позначити поля як обрані",
+    "add_favorite_failed": "Не вдалося додати поле до обраних, помилка: {{error}}",
+    "add_favorite_failed_title": "Не вдалося додати поле до обраних",
+    "remove_favorite_failed": "Не вдалося видалити поле з обраних, помилка: {{error}}",
+    "remove_favorite_failed_title": "Не вдалося видалити поле з обраних",
+    "field_terms": "Терміни поля:",
+    "received_by_radio_value": "через <inputName/> на radio <node/>",
+    "show_remaining_fields_few": "Показати {{count}} поля, що залишилися",
+    "show_remaining_fields_many": "Показати {{count}} полів, що залишилися",
+    "hide_remaining_fields_few": "Приховати {{count}} поля, що залишилися",
+    "hide_remaining_fields_many": "Приховати {{count}} полів, що залишилися",
+    "favorite_fields_hint_few": "Обрані поля відображатимуться в усіх потоках, до яких належить це повідомлення, зокрема в потоках <streams/>, до яких це повідомлення спрямовано.",
+    "favorite_fields_hint_many": "Обрані поля відображатимуться в усіх потоках, до яких належить це повідомлення, зокрема в потоках <streams/>, до яких це повідомлення спрямовано."
+  },
+  "entity_types": {
+    "user": "користувач",
+    "team": "команда",
+    "dashboard": "панель моніторингу",
+    "event_definition": "визначення події",
+    "notification": "сповіщення",
+    "search": "пошук",
+    "stream": "потік",
+    "search_filter": "фільтр пошуку",
+    "report": "звіт",
+    "role": "роль",
+    "output": "вихід",
+    "sigma_rule": "правило Sigma",
+    "event_procedure": "процедура події",
+    "event_procedure_step": "крок процедури події",
+    "collection": "колекція",
+    "collection_entities": "елементи колекції"
+  },
+  "marketplace_link": "{{productName}} Marketplace",
+  "chips_cell": {
+    "show_fewer": "Показати менше",
+    "show_all": "Показати всі",
+    "filter_by": "Фільтрувати за {{itemLabel}} «{{value}}»"
+  },
+  "expandable_cell_list": {
+    "show_less": "Показати менше",
+    "show_more_one": "Показати ще 1",
+    "show_more_other": "Показати ще {{count}}",
+    "show_more_few": "Показати ще {{count}}",
+    "show_more_many": "Показати ще {{count}}"
+  },
+  "expanded_section_count": {
+    "show": "Показати {{label}}",
+    "hide": "Приховати {{label}}"
+  },
+  "compact_pagination": {
+    "previous_page": "Попередня сторінка",
+    "select_page": "Вибрати сторінку",
+    "next_page": "Наступна сторінка",
+    "of_pages": "з {{totalPages}}"
+  },
+  "expandable_checkbox_list_item": {
+    "select_item": "Вибрати елемент"
+  },
+  "traffic_graph": {
+    "days": "Дні",
+    "incoming": "Вхідний трафік",
+    "outgoing": "Вихідний трафік",
+    "last_days": "Останні {{days}} дн.: {{traffic}}"
+  },
+  "link_to_node": {
+    "unknown_node": "Невідомий вузол"
+  },
+  "markdown": {
+    "images_unsupported": "Зображення не підтримуються з міркувань безпеки. Увімкніть дозволені джерела <configurationLink>тут</configurationLink>"
+  },
+  "public_notifications": {
+    "read_less": "Читати менше",
+    "read_more": "Читати більше"
+  },
+  "refresh_controls": {
+    "controls_label": "Керування оновленням: {{humanName}}",
+    "below_minimum": "Інтервал <intervalDuration /> ({{interval}}) менший за налаштований мінімальний інтервал <minimumDuration /> ({{minimum}})."
+  },
+  "scroll_button": {
+    "back_to_top": "Нагору"
+  },
+  "section": {
+    "toggle_section": "Перемкнути розділ {{title, lowercase}}"
+  },
+  "selectable_list": {
+    "remove": "Видалити"
+  },
+  "share_menu_item": {
+    "share": "Поділитися"
+  },
+  "status_icon": {
+    "yes": "Так",
+    "no": "Ні"
+  },
+  "type_ahead_field_input": {
+    "select_field": "Виберіть поле"
+  },
+  "query_helper": {
+    "title": "Довідка із синтаксису пошуку",
+    "show_help": "Показати довідку із синтаксису пошуку",
+    "available_fields": "Доступні поля пошуку",
+    "field": "Поле",
+    "description": "Опис",
+    "examples": "Приклади",
+    "example_description": "Знайти всі елементи ({{entityName}}) з описом, що містить security:",
+    "example_id": "Знайти елемент ({{entityName}}) з id 5f4dfb9c69be46153b9a9a7b:",
+    "example_query_description": "description:security",
+    "example_query_id": "id:5f4dfb9c69be46153b9a9a7b",
+    "common_fields": {
+      "id": "Id елемента ({{entityName}}), який є унікальним посиланням.",
+      "title": "Назва елемента ({{entityName}}).",
+      "name": "Назва елемента ({{entityName}}).",
+      "description": "Короткий опис елемента ({{entityName}}).",
+      "summary": "Докладний підсумок елемента ({{entityName}})."
+    }
+  },
+  "url_allow_list_modal": {
+    "add": "Додати до списку дозволених URL",
+    "title": "Оновити конфігурацію списку дозволених",
+    "submit": "Оновити конфігурацію",
+    "urls": "URL-адреси списку дозволених"
+  },
+  "configuration_well": {
+    "empty": "<empty>",
+    "uploaded_file_content": "<uploaded file content>",
+    "no_configuration": "-- немає конфігурації --"
+  },
+  "configuration_forms": {
+    "undo_reset": "Скасувати скидання",
+    "remove": "Видалити",
+    "title": "Назва",
+    "optional": "необов’язково"
+  },
+  "enterprise_advertisement": {
+    "enterprise_title": "{{productName}} Enterprise",
+    "enterprise_description": "{{productName}} Enterprise, створений для потреб ІТ-операцій і команд розробки ПЗ з обмеженими ресурсами, надає чимало покращень продуктивності, які заощадять вам тисячі годин на рік під час збирання та аналізу даних журналів для виявлення першопричини проблем із продуктивністю, збоїв і помилок.",
+    "security_title": "{{productName}} Security",
+    "security_description": "Розширте можливості {{productName}} Open щодо виявлення кіберзагроз, розслідування та реагування на них за допомогою панелей моніторингу й оповіщень для безпеки, механізму виявлення аномалій на основі AI/ML, інтеграцій з іншими інструментами безпеки, можливостей SOAR і численних функцій звітності про відповідність вимогам.",
+    "request_now": "Надіслати запит"
+  },
+  "plugin_list": {
+    "plugin_enterprise": "Плагін {{productName}} Enterprise",
+    "installed": "{{pluginName}} установлено",
+    "not_installed": "{{pluginName}} не установлено",
+    "status": "Це стан модулів {{productName}} Enterprise у цьому кластері:"
+  },
+  "reported_error": {
+    "title": "Щось пішло не так",
+    "description": "Сталася невідома помилка. Перегляньте наведене нижче повідомлення та журнал сервера {{productName}}, щоб отримати додаткову інформацію."
+  },
+  "hotkeys": {
+    "or": "або",
+    "title": "Клавіатурні скорочення",
+    "view_all": "Переглянути всі клавіатурні скорочення"
+  },
+  "right_sidebar": {
+    "sidebar_label": "Бічна панель: {{title}}",
+    "sidebar_label_collapsed": "Бічна панель: {{title}} (згорнута)",
+    "close": "Закрити бічну панель",
+    "expand": "Розгорнути бічну панель",
+    "collapse": "Згорнути бічну панель",
+    "go_back": "Назад",
+    "go_back_label": "Повернутися до попереднього вмісту",
+    "go_forward": "Уперед",
+    "go_forward_label": "Перейти до наступного вмісту"
+  },
+  "maxmind_adapter": {
+    "documentation": {
+      "intro": "Адаптер даних GeoIP підтримує читання баз даних MaxMind GeoIP2.",
+      "limitations_title": "Обмеження",
+      "limitations_supported": "Наразі підтримуються бази даних ASN, міст і країн.",
+      "limitations_more": "Щоб отримати підтримку додаткових типів баз даних, зверніться до наших каналів підтримки.",
+      "asn_fields": "Поля бази даних ASN",
+      "country_fields": "Поля бази даних країн",
+      "city_fields": "Поля бази даних міст",
+      "city_additional_fields": "Окрім полів, що надає база даних країн, база даних міст також містить такі поля:",
+      "complete_documentation": "Повну документацію щодо полів дивіться в <docsLink>документації для розробників</docsLink> MaxMind"
+    },
+    "database_types": {
+      "asn": "База даних ASN",
+      "city": "База даних міст",
+      "country": "База даних країн",
+      "ipinfo_location": "База даних розташування IPinfo",
+      "ipinfo_asn": "База даних ASN IPinfo"
+    },
+    "field_set": {
+      "file_path": "Шлях до файлу",
+      "file_path_help": "Шлях до файлу бази даних.",
+      "database_type": "Тип бази даних",
+      "database_type_help": "Виберіть тип файлу бази даних",
+      "database_type_placeholder": "Виберіть тип файлу бази даних",
+      "refresh_file": "Оновлювати файл",
+      "refresh_file_help": "Якщо ввімкнено, файл бази даних перевіряється на зміни та оновлюється, коли він змінився на диску."
+    },
+    "summary": {
+      "database_file_path": "Шлях до файлу бази даних",
+      "database_type": "Тип бази даних",
+      "check_interval": "Інтервал перевірки"
+    }
+  },
+  "abs_geoip": {
+    "container_name": "Назва контейнера Azure Blob",
+    "container_name_help": "Назва вашого контейнера Azure Blob.",
+    "endpoint_url": "URL-адреса кінцевої точки Azure Blob",
+    "endpoint_url_help": "URL-адреса вашої кінцевої точки Azure Blob, потрібна лише якщо ви хочете перевизначити кінцеву точку за замовчуванням.",
+    "account_name": "Назва облікового запису Azure",
+    "account_name_placeholder": "your-account-name",
+    "account_name_help": "Назва вашого облікового запису сховища Azure.",
+    "account_key_reset": "Ключ облікового запису Azure",
+    "reset_password": "Скинути пароль",
+    "account_key": "Ключ облікового запису Azure",
+    "account_key_help": "Ключ облікового запису вашого сховища Azure."
+  },
+  "gcs_geoip": {
+    "project_id": "ID проєкту Google Cloud Storage"
+  },
+  "geoip_resolver": {
+    "title": "Конфігурація процесора геолокації",
+    "description": "Плагін процесора геолокації сканує всі повідомлення на наявність полів, що містять <bold>виключно</bold> IP-адресу, і записує інформацію про їхню геолокацію (координати, код країни ISO та назву міста) в окремі поля. Докладніше читайте в <docsLink>документації</docsLink>.",
+    "enabled_summary": "Увімкнено:",
+    "enforce_schema_summary": "Примусово застосовувати схему за замовчуванням:",
+    "vendor_type_summary": "Тип постачальника бази даних:",
+    "city_db_path_summary": "Шлях до бази даних міст:",
+    "asn_db_path_summary": "Шлях до бази даних ASN:",
+    "refresh_interval_summary": "Інтервал оновлення бази даних:",
+    "pull_from_cloud_summary": "Завантажувати файли з відра хмарного сховища:",
+    "edit": "Редагувати конфігурацію",
+    "modal_title": "Оновити конфігурацію процесора геолокації",
+    "enable_processor": "Увімкнути процесор геолокації",
+    "enforce_schema": "Примусово застосовувати схему за замовчуванням",
+    "vendor_select": "Виберіть постачальника бази даних GeoIP",
+    "city_db_path": "Шлях до бази даних міст",
+    "asn_db_path": "Шлях до бази даних ASN",
+    "refresh_interval": "Інтервал оновлення бази даних",
+    "refresh_interval_help": "Інтервал, з яким файли бази даних перевіряються на зміни та оновлюються, коли зміни виявлено на диску.",
+    "pull_from_cloud": "Завантажувати файли з відра хмарного сховища",
+    "select_cloud_storage": "Виберіть хмарне сховище",
+    "update_configuration": "Оновити конфігурацію",
+    "updating_configuration": "Оновлення конфігурації..."
+  },
+  "links": {
+    "documentation": "документація"
+  },
+  "quick_jump": {
+    "title": "Швидкий перехід",
+    "open": "Відкрити швидкий перехід",
+    "search_placeholder": "Пошук сторінок/панелей моніторингу/потоків ...",
+    "intro": "Введіть пошуковий запит, щоб знайти сторінку, потік, панель моніторингу, вхід або інші елементи.",
+    "intro_hint": "Щоб полегшити початок, нижче наведено список ваших <bold>останніх відкритих</bold> та <bold>обраних</bold> елементів:",
+    "no_results": "Результатів пошуку не знайдено. Спробуйте інші пошукові терміни.",
+    "recent": "Нещодавні"
+  },
+  "scratchpad": {
+    "title": "Чернетка",
+    "status_cleared": "Очищено.",
+    "status_auto_saved": "Автоматично збережено.",
+    "got_it": "Зрозуміло!",
+    "sensitive_warning": "Радимо <bold>не</bold> зберігати в цій області жодної конфіденційної інформації, як-от паролів.",
+    "help_overlay": "Ви можете використовувати цей простір для особистих нотаток та іншої інформації, не залишаючи вікна браузера. Наприклад, зберігайте позначки часу, ID користувачів або IP-адреси, потрібні вам у різних розслідуваннях.",
+    "copy": "Копіювати",
+    "clear": "Очистити",
+    "clear_confirm": "Це очистить вміст вашої чернетки. Бажаєте продовжити?"
+  },
+  "extractor_actions": {
+    "select_type": "Виберіть тип екстрактора",
+    "only_string_fields": "Екстрактори можна використовувати лише з рядковими полями."
+  },
+  "surrounding_search": {
+    "button": "Показати навколишні повідомлення"
+  },
+  "support_sources": {
+    "title": "Потрібна допомога?",
+    "help_text": "Звертайтеся до спільноти {{productName}}, якщо відповідей на ваші запитання немає в <docsLink>документації</docsLink>.",
+    "community_support": "Підтримка спільноти",
+    "issue_tracker": "Трекер проблем",
+    "professional_support": "Професійна підтримка"
+  },
+  "times_list": {
+    "title": "Конфігурація часу",
+    "description": "Робота з часовими поясами може бути заплутаною. Тут ви можете побачити часовий пояс, застосований до різних компонентів вашої системи. Налаштування часового поясу окремих вузлів сервера {{productName}} можна переглянути на їхніх сторінках відомостей.",
+    "user": "Користувач <bold>{{username}}</bold>:",
+    "web_browser": "Ваш веббраузер:",
+    "server": "Сервер {{productName}}:"
+  },
+  "widget_visualization_not_found": {
+    "description": "Візуалізацію віджета (<italic>{{widgetClassName}}</italic>) не знайдено. Схоже, плагін, що надає цей віджет, не завантажено."
+  },
+  "telemetry": {
+    "title": "Телеметрія",
+    "enable_label": "Увімкнути телеметрію",
+    "enabled_checkbox": "увімкнено",
+    "update_preferences": "Оновити параметри",
+    "update_button": "Оновити телеметрію",
+    "info_modal_title": "Допоможіть нам покращити {{productName}}",
+    "ok": "OK",
+    "info": "Ми хотіли б збирати анонімні дані про використання, щоб визначати пріоритети покращень і зробити {{productName}} кращим у майбутньому.",
+    "no_personal_data": "Ми не збираємо персональних даних, конфіденційної інформації чи вмісту, як-от журналів у ваших екземплярах.",
+    "learn_more": "Докладніше читайте в нашій <privacyLink>Політиці конфіденційності</privacyLink>.",
+    "turn_off_profile": "Ви можете вимкнути або ввімкнути збирання даних будь-коли <bold>у профілі користувача</bold>.",
+    "turn_off_here": "Ви можете вимкнути або ввімкнути збирання даних будь-коли тут."
+  },
+  "app_facade": {
+    "preparing": "Ми готуємо для вас вебінтерфейс...",
+    "load_user_failed": "Не вдалося завантажити вашого користувача",
+    "reload_page": "Перезавантажити сторінку"
+  },
+  "suggest_reload": {
+    "title": "Версію {{productName}} змінено",
+    "version_changed": "Вашу версію {{productName}} змінено з <bold>{{version}}</bold> на <bold>{{newVersion}}</bold>.",
+    "save_work": "Збережіть свою роботу та перезавантажте сторінку, щоб уникнути помилок.",
+    "reload_now": "Перезавантажити зараз"
+  },
+  "footer": {
+    "system_info": "{{productName}} {{version}} на {{hostname}} ({{jvmInfo}})"
+  },
+  "notifications": {
+    "download_failed": "Не вдалося завантажити, статус: {{error}}",
+    "download_failed_title": "Не вдалося завантажити",
+    "export_failed": "Не вдалося експортувати",
+    "export_widget_failed": "Не вдалося експортувати віджет",
+    "telemetry_update_failed": "Не вдалося оновити: {{error}}",
+    "telemetry_update_failed_title": "Не вдалося оновити налаштування телеметрії.",
+    "delete_property_confirm": "Ви впевнені, що хочете видалити властивість '{{key}}'?",
+    "quick_jump_failed": "Не вдалося отримати результати пошуку елементів, статус",
+    "quick_jump_failed_title": "Не вдалося отримати результати пошуку елементів."
+  },
+  "use_favorite_item_mutation_notifications": {
+    "put_failed": "Не вдалося додати елемент до обраних, статус: {{error}}",
+    "put_failed_title": "Не вдалося додати елемент до обраних",
+    "delete_failed": "Не вдалося видалити елемент з обраних, статус: {{error}}",
+    "delete_failed_title": "Не вдалося видалити елемент з обраних"
+  },
+  "use_entity_titles_notifications": {
+    "load_failed": "Не вдалося завантажити назви елементів, статус",
+    "load_failed_title": "Не вдалося завантажити назви елементів"
+  },
+  "use_search_version_check_notifications": {
+    "fetch_failed_title": "Не вдалося отримати дані перевизначення"
+  },
+  "entity_creators": {
+    "event_definition": "Створити визначення події",
+    "notification": "Створити сповіщення",
+    "dashboard": "Створити панель моніторингу",
+    "stream": "Створити потік",
+    "index_set": "Створити набір індексів",
+    "user": "Створити користувача",
+    "pipeline": "Створити Pipeline",
+    "pipeline_rule": "Створити правило Pipeline",
+    "content_pack": "Створити пакет вмісту",
+    "fleet": "Створити Fleet"
+  },
+  "user_notification": {
+    "success": "Успішно",
+    "error": "Помилка",
+    "attention": "Увага"
+  }
+}

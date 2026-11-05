@@ -1,0 +1,77 @@
+{
+  "main": {
+    "search": "Пошук",
+    "streams": "Потоки",
+    "alerts": "Оповіщення",
+    "dashboards": "Панелі моніторингу",
+    "system": "Система",
+    "enterprise": "Enterprise",
+    "security": "Security"
+  },
+  "system": {
+    "overview": "Огляд",
+    "configurations": "Конфігурації",
+    "cluster_configuration": "Конфігурація кластера",
+    "inputs": "Входи",
+    "outputs": "Виходи",
+    "indices": "Індекси",
+    "logging": "Журналювання",
+    "users_and_teams": "Користувачі та команди",
+    "roles": "Ролі",
+    "authentication": "Автентифікація",
+    "content_packs": "Пакети вмісту",
+    "grok_patterns": "Шаблони Grok",
+    "lookup_tables": "Таблиці підстановки",
+    "pipelines": "Pipelines",
+    "sidecars": "Sidecars",
+    "collectors": "Collectors",
+    "translation_feedback": "Відгуки про переклад"
+  },
+  "security": {
+    "overview": "Огляд",
+    "user_activity": "Активність користувачів",
+    "host_activity": "Активність хостів",
+    "network_activity": "Мережева активність",
+    "anomalies": "Аномалії"
+  },
+  "help": {
+    "title": "Довідка",
+    "documentation": "Документація",
+    "design_system": "Design System",
+    "keyboard_shortcuts": "Комбінації клавіш",
+    "api_browser": "Оглядач API"
+  },
+  "user_menu": {
+    "title": "Меню користувача для {{name}}",
+    "language": "Мова",
+    "show_profile": "Показати профіль",
+    "edit_profile": "Редагувати профіль",
+    "log_out": "Вийти"
+  },
+  "shell": {
+    "welcome": "Ласкаво просимо",
+    "main": "Головне",
+    "utility": "Службові",
+    "toggle_navigation": "Перемкнути навігацію",
+    "scratchpad": "Чернетка"
+  },
+  "page_navigation": {
+    "cluster_configuration": "Конфігурація кластера",
+    "certificate_management": "Керування сертифікатами",
+    "data_node_dashboard": "Панель моніторингу Data Node",
+    "data_node_upgrade": "Оновлення Data Node",
+    "data_node_migration": "Міграція Data Node",
+    "overview": "Огляд",
+    "notifications": "Сповіщення",
+    "lookup_tables": "Таблиці підстановки",
+    "caches": "Кеші",
+    "data_adapters": "Адаптери даних",
+    "users_overview": "Огляд користувачів",
+    "token_management": "Керування токенами",
+    "administration": "Адміністрування",
+    "configuration": "Конфігурація",
+    "failure_tracking": "Відстеження збоїв",
+    "alerts_and_events": "Оповіщення та події",
+    "event_definitions": "Визначення подій"
+  }
+}

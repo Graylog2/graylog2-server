@@ -1,0 +1,416 @@
+{
+  "administration": {
+    "collectors_administration": {
+      "edit_configuration": "Редагувати конфігурацію",
+      "inactive": "неактивний",
+      "no_collectors": "Немає Collectors для відображення",
+      "no_compatible_collectors": "Немає Collectors, сумісних з {{operatingSystem}}",
+      "no_filter_matches": "Жоден Collector не відповідає фільтрам",
+      "select_all": "Вибрати все",
+      "selected_one": "Вибрано: {{count}}",
+      "selected_other": "Вибрано: {{count}}",
+      "selected_few": "Вибрано: {{count}}",
+      "selected_many": "Вибрано: {{count}}"
+    },
+    "collectors_administration_actions": {
+      "assign_configurations": "Призначити конфігурації",
+      "cannot_change_configurations": "Неможливо одночасно змінити конфігурації для Collectors: {{collectors}}.",
+      "incompatible_collectors": "Несумісні Collectors, перевірте конфігурацію Sidecar."
+    },
+    "collectors_administration_filters": {
+      "collector": "Collector",
+      "collector_status": "Стан Collector",
+      "configuration": "Конфігурація",
+      "filter_by_collector": "Фільтрувати за Collector",
+      "filter_by_configuration": "Фільтрувати за конфігурацією",
+      "filter_by_os": "Фільтрувати за ОС",
+      "filter_by_status": "Фільтрувати за станом Collector",
+      "os": "ОС"
+    },
+    "configuration_modal": {
+      "add_configuration": "Додати нову конфігурацію",
+      "assigned_from_tags": "Призначено за тегами: {{tags}}",
+      "lock_info": "Конфігурації Collector із піктограмою замка  <lockIcon/>  призначено за допомогою тегів, і їх не можна змінити тут.",
+      "no_configurations": "Немає доступних конфігурацій для вибраного Collector журналів.",
+      "remove": "Видалити {{name}}",
+      "selected": "Вибрано {{name}}",
+      "sidecar_count_one": "{{count}} Sidecar: ",
+      "sidecar_count_other": "{{count}} Sidecars: ",
+      "title": "Редагування конфігурацій <collectorName>{{name}}</collectorName>",
+      "unknown_collector": "Невідомий Collector",
+      "sidecar_count_few": "{{count}} Sidecars: ",
+      "sidecar_count_many": "{{count}} Sidecars: "
+    },
+    "configuration_summary": {
+      "confirm": "Ви впевнені, що хочете виконати цю дію для <summaryText>{{summary}}</summaryText>?",
+      "sidecars_summary_one": "{{count}} Sidecar",
+      "sidecars_summary_other": "{{count}} Sidecars",
+      "title": "Підсумок конфігурації",
+      "sidecars_summary_few": "{{count}} Sidecars",
+      "sidecars_summary_many": "{{count}} Sidecars"
+    },
+    "filters_summary": {
+      "clear_all": "Очистити все",
+      "collector_on_os": "{{name}} на {{os}}",
+      "filters": "Фільтри"
+    },
+    "loading_collectors": "Завантаження списку Collectors...",
+    "process": {
+      "actions": {
+        "restart": "Перезапустити",
+        "start": "Запустити",
+        "stop": "Зупинити"
+      },
+      "button": "Процес",
+      "confirm": "Ви впевнені, що хочете виконати цю дію?",
+      "no_effect": {
+        "restart": "Перезапуск Collector без конфігурації не матиме ефекту.",
+        "start": "Запуск Collector без конфігурації не матиме ефекту.",
+        "stop": "Зупинка Collector без конфігурації не матиме ефекту."
+      },
+      "summary": {
+        "restart_one": "Ви збираєтеся <action>перезапустити</action> Collectors журналів у цьому Sidecar:",
+        "restart_other": "Ви збираєтеся <action>перезапустити</action> Collectors журналів у цих Sidecars:",
+        "start_one": "Ви збираєтеся <action>запустити</action> Collectors журналів у цьому Sidecar:",
+        "start_other": "Ви збираєтеся <action>запустити</action> Collectors журналів у цих Sidecars:",
+        "stop_one": "Ви збираєтеся <action>зупинити</action> Collectors журналів у цьому Sidecar:",
+        "stop_other": "Ви збираєтеся <action>зупинити</action> Collectors журналів у цих Sidecars:",
+        "restart_few": "Ви збираєтеся <action>перезапустити</action> Collectors журналів у цих Sidecars:",
+        "restart_many": "Ви збираєтеся <action>перезапустити</action> Collectors журналів у цих Sidecars:",
+        "start_few": "Ви збираєтеся <action>запустити</action> Collectors журналів у цих Sidecars:",
+        "start_many": "Ви збираєтеся <action>запустити</action> Collectors журналів у цих Sidecars:",
+        "stop_few": "Ви збираєтеся <action>зупинити</action> Collectors журналів у цих Sidecars:",
+        "stop_many": "Ви збираєтеся <action>зупинити</action> Collectors журналів у цих Sidecars:"
+      },
+      "summary_title": "Підсумок дії над процесом",
+      "title": "Керування процесами Collector",
+      "understood": "Зрозуміло, все одно продовжити",
+      "warning_text": "Принаймні один вибраний Collector ще не налаштовано. Щоб запустити новий Collector, призначте йому конфігурацію, і Sidecar запустить процес за вас.",
+      "warning_title": "Collectors без конфігурації"
+    }
+  },
+  "common": {
+    "clone_menu": {
+      "done": "Готово",
+      "name": "Назва",
+      "name_help": "Введіть назву для нового Collector",
+      "title": "Клонувати"
+    },
+    "collector_indicator": {
+      "on_os": "на {{operatingSystem}}"
+    },
+    "save": "Зберегти",
+    "sidecar_search_form": {
+      "field_last_seen": "Дата й час останньої взаємодії Sidecar із {{productName}}",
+      "field_node_id": "Ідентифікатор Sidecar",
+      "field_operating_system": "Операційна система, у якій працює Sidecar",
+      "field_sidecar_version": "Версія Sidecar",
+      "field_status": "Стан Sidecar, як він відображається у списку, тобто running, failing або unknown",
+      "last_seen_example": "Знайти Sidecars, які не взаємодіяли після певної дати:",
+      "placeholder": "Знайти Sidecars",
+      "status_example": "Знайти Sidecars зі станом <code>failing</code> або <code>unknown</code>:"
+    }
+  },
+  "configuration_forms": {
+    "collector_form": {
+      "create_collector": "Створити Collector",
+      "default_template": "Шаблон за замовчуванням",
+      "default_template_help": "Конфігурація Collector за замовчуванням.",
+      "execute_parameters": "Параметри виконання",
+      "execute_parameters_help": "Параметри, з якими запускається Collector.<strong> %s буде замінено шляхом до файлу конфігурації.</strong>",
+      "executable_path": "Шлях до виконуваного файлу",
+      "executable_path_help": "Шлях до виконуваного файлу Collector",
+      "name": "Назва",
+      "name_help": "Назва цього Collector",
+      "operating_system": "Операційна система",
+      "operating_system_help": "Виберіть операційну систему, для якої призначено цей Collector.",
+      "optional": "(Необов’язково)",
+      "process_management": "Керування процесами",
+      "service_type": "Тип служби",
+      "service_type_exec": "Виконання на передньому плані",
+      "service_type_help": "Виберіть тип служби, для якого призначено цей Collector.",
+      "service_type_svc": "Служба Windows",
+      "update_collector": "Оновити Collector",
+      "validation_parameters": "Параметри для перевірки конфігурації",
+      "validation_parameters_help": "Параметри, що перевіряють файл конфігурації. <strong> %s буде замінено шляхом до файлу конфігурації.</strong>"
+    },
+    "configuration_form": {
+      "change_color": "Змінити колір",
+      "collector": "Collector",
+      "collector_help": "Виберіть Collector журналів, для якого призначено цю конфігурацію.",
+      "collector_in_use": "Collector журналів не можна змінити, поки конфігурація використовується. Клонуйте конфігурацію, щоб протестувати її з іншим Collector.",
+      "collector_on_os": "{{name}} на {{os}}",
+      "collector_placeholder": "Collector",
+      "color": "Колір конфігурації",
+      "color_help": "Виберіть колір для цієї конфігурації.",
+      "create_configuration": "Створити конфігурацію",
+      "name": "Назва",
+      "name_help": "Обов’язково. Назва цієї конфігурації",
+      "preview": "Попередній перегляд",
+      "tags": "Теги призначення конфігурації",
+      "tags_help": "Sidecars, налаштовані з відповідним тегом, автоматично отримають цю конфігурацію.",
+      "template": "Конфігурація",
+      "template_help": "Обов’язково. Конфігурація Collector, докладніше див. у короткому довіднику.",
+      "template_required": "Заповніть поле конфігурації.",
+      "unknown_collector": "Невідомий Collector",
+      "update_configuration": "Оновити конфігурацію",
+      "use_default_template_confirm": "Чи хочете ви використати шаблон за замовчуванням для вибраної конфігурації?"
+    },
+    "configuration_helper": {
+      "filebeat_reference": "Довідник Filebeat",
+      "nxlog_reference": "Довідник NXLog",
+      "reference_help": "Ми надаємо шаблони конфігурації Collector, щоб ви могли швидко почати.<lineBreak/>Докладнішу інформацію дивіться в офіційній документації вашого Collector.",
+      "runtime_variables_help": "Ці змінні буде заповнено інформацією часу виконання від кожного Sidecar",
+      "tab_reference": "Довідник",
+      "tab_runtime_variables": "Змінні часу виконання",
+      "tab_variables": "Змінні",
+      "title": "Довідник конфігурації Collector",
+      "variables_help": "Використовуйте змінні, щоб спільно використовувати фрагменти тексту в кількох конфігураціях.<lineBreak/>Якщо ваш формат конфігурації потребує літералів на кшталт <code>${foo}</code>, які не мають діяти як змінна, їх потрібно записати як <code>${'$'}{foo}</code>.",
+      "winlogbeat_reference": "Довідник Winlogbeat"
+    },
+    "configuration_tags_select": {
+      "placeholder": "Виберіть теги..."
+    },
+    "source_view_modal": {
+      "close": "Закрити",
+      "empty_template": "<порожній шаблон>",
+      "error_fetching_configuration": "Помилка отримання конфігурації: {{error}}",
+      "error_rendering_preview": "Помилка відображення попереднього перегляду: {{error}}",
+      "title": "Конфігурація"
+    },
+    "configuration_variables_helper": {
+      "actions": "Дії",
+      "close": "Закрити",
+      "delete": "Видалити",
+      "delete_confirm_text": "Ви впевнені, що хочете видалити змінну конфігурації <strong>{{name}}</strong>?",
+      "delete_confirm_title": "Видалити змінну конфігурації?",
+      "description": "Опис",
+      "error_delete_title": "Помилка видалення змінної конфігурації <strong>${user.{{name}}}</strong>",
+      "error_in_use": "Неможливо видалити цю змінну конфігурації, оскільки вона досі використовується. Видаліть змінну з таких конфігурацій і повторіть спробу.",
+      "name": "Назва"
+    },
+    "edit_configuration_variable_modal": {
+      "create_action": "Створити",
+      "create_variable": "Створити змінну",
+      "content": "Вміст",
+      "content_help": "Напишіть вміст змінної",
+      "description": "Опис",
+      "description_help": "Введіть опис цієї змінної",
+      "edit": "Редагувати",
+      "edit_action": "Редагувати",
+      "name": "Назва",
+      "name_help": "Введіть назву цієї змінної",
+      "optional": "(Необов’язково)",
+      "title": "{{action}} змінну ${user.{{name}}}"
+    },
+    "templates_helper": {
+      "description": "Опис",
+      "name": "Назва",
+      "node_id": "UUID Sidecar.",
+      "node_name": "Назва Sidecar; якщо не задано, за замовчуванням використовується ім’я хоста.",
+      "operating_system": "Назва операційної системи, у якій працює Sidecar, напр. <code>\"Linux\", \"Windows\"</code>",
+      "sidecar_version": "Рядок версії запущеного Sidecar.",
+      "spool_dir": "Каталог, унікальний для кожної конфігурації, який можна використовувати для зберігання даних Collector.",
+      "tags": "Відображення тегів, заданих для Sidecar. Його можна використовувати для формування умовних фрагментів конфігурації, напр.:"
+    }
+  },
+  "configurations": {
+    "collector_list": {
+      "actions": "Дії",
+      "create_collector": "Створити Collector журналів",
+      "description": "Керуйте Collectors журналів, які можна налаштовувати та контролювати через Sidecars і вебінтерфейс.",
+      "name": "Назва",
+      "no_data": "Немає Collectors журналів для відображення. Чому б не створити один?",
+      "operating_system": "Операційна система",
+      "placeholder": "Знайти Collectors",
+      "title": "Collectors журналів",
+      "total": "Усього: {{total}}"
+    },
+    "collector_row": {
+      "delete_confirm": "Ви збираєтеся видалити Collector «{{name}}». Ви впевнені?",
+      "edit": "Редагувати"
+    },
+    "configuration_list": {
+      "actions": "Дії",
+      "collector": "Collector",
+      "color": "Колір",
+      "configuration": "Конфігурація",
+      "create_configuration": "Створити конфігурацію",
+      "description": "Це конфігурації для ваших Collectors. Не забудьте застосувати нові конфігурації до Collectors на сторінці адміністрування.",
+      "no_data": "Немає конфігурацій для відображення. Спробуйте створити одну або змінити запит.",
+      "placeholder": "Знайти конфігурації",
+      "title": "Конфігурації",
+      "total": "Усього: {{total}}"
+    },
+    "configuration_row": {
+      "clone": "Клонувати",
+      "delete_confirm": "Ви збираєтеся видалити конфігурацію «{{name}}». Ви впевнені?",
+      "edit": "Редагувати",
+      "unknown_collector": "Невідомий Collector"
+    }
+  },
+  "failure_tracking": {
+    "list": {
+      "columns": {
+        "collector": "Collector",
+        "error_message": "Повідомлення про помилку",
+        "last_seen": "Востаннє бачили",
+        "sidecar": "Sidecar",
+        "status": "Стан",
+        "verbose_message": "Докладне повідомлення"
+      },
+      "hide_inactive_sidecars": "Приховати неактивні Sidecars",
+      "include_inactive_hint": " та/або натисніть «Включити неактивні Sidecars»",
+      "include_inactive_sidecars": "Включити неактивні Sidecars",
+      "no_failures": "Немає Sidecars зі збоями.",
+      "no_matching_sidecars": "Немає Sidecars зі збоями, що відповідають критеріям пошуку. Спробуйте змінити фільтр пошуку: {{query}} {{inactiveHint}}"
+    },
+    "rows": {
+      "inactive_annotation": " (неактивний)",
+      "show_more": "Показати більше",
+      "sidecar_version": "v{{version}}"
+    }
+  },
+  "basic_sidecar_user": {
+    "load_failed": "Не вдалося завантажити користувача Sidecar, стан: {{error}}",
+    "load_failed_title": "Не вдалося завантажити користувача Sidecar"
+  },
+  "sidecar_status_file_list": {
+    "filter_files": "Фільтрувати файли"
+  },
+  "sidecars": {
+    "sidecar_list": {
+      "hide_inactive_sidecars": "Приховати неактивні Sidecars",
+      "include_inactive_hint": " та/або натисніть «Включити неактивні Sidecars»",
+      "include_inactive_sidecars": "Включити неактивні Sidecars",
+      "last_seen": "Востаннє бачили",
+      "name": "Назва",
+      "no_matching_sidecars": "Немає Sidecars, що відповідають критеріям пошуку. Спробуйте змінити фільтр пошуку{{inactiveHint}}.",
+      "no_sidecars": "Не налаштовано жодного Sidecar.",
+      "node_id": "Ідентифікатор вузла",
+      "operating_system": "Операційна система",
+      "sidecar_version": "Версія Sidecar",
+      "status": "Стан"
+    },
+    "sidecar_row": {
+      "inactive_annotation": " (неактивний)",
+      "manage_sidecar": "Керувати Sidecar",
+      "show_messages": "Показати повідомлення"
+    },
+    "sidecar_status": {
+      "collector_running": "Collector працює.",
+      "collector_unknown": "Стан Collector наразі невідомий.",
+      "collectors_status_title": "Стан Collectors",
+      "collectors_status_unavailable": "Стан Collectors наразі недоступний. Зачекайте трохи та переконайтеся, що Sidecar правильно підключено до сервера.",
+      "cpu_idle": "Простій ЦП",
+      "ip_address": "IP-адреса",
+      "load": "Навантаження",
+      "log_files_title": "Файли журналів",
+      "node_details_title": "Подробиці вузла",
+      "node_details_unavailable": "Подробиці вузла наразі недоступні. Зачекайте трохи та переконайтеся, що Sidecar правильно підключено до сервера.",
+      "no_collectors": "У цьому Sidecar не налаштовано жодного Collector.",
+      "no_status_received": "Стан Collectors не отримано. Щоб побачити цю інформацію, встановіть параметр <code>send_status: true</code> у конфігурації Sidecar.",
+      "none": "Немає",
+      "not_available": "Недоступно",
+      "operating_system": "Операційна система",
+      "recently_modified": "Нещодавно змінені файли буде виділено синім.",
+      "show_details": "Показати подробиці",
+      "volumes_75": "Томи, заповнені понад 75%"
+    },
+    "verbose_message_modal": {
+      "close": "Закрити",
+      "no_messages": "<немає повідомлень>",
+      "title": "Подробиці помилки для <em>{{collectorName}}</em>"
+    }
+  },
+  "pages": {
+    "administration": {
+      "description": "Collectors можуть надійно пересилати вміст файлів журналів або Windows EventLog з ваших серверів.",
+      "title": "Адміністрування Collectors"
+    },
+    "configuration": {
+      "description": "Collector Sidecar працює поруч із вашим улюбленим Collector журналів і налаштовує його за вас. Тут можна керувати конфігураціями Sidecar.",
+      "title": "Конфігурація Collectors"
+    },
+    "documentation_title": "Документація Sidecar",
+    "edit_collector": {
+      "description": "Кілька слів про Collectors журналів.",
+      "title": "Collector журналів"
+    },
+    "edit_configuration": {
+      "description": "Кілька слів про конфігурації Collector.",
+      "title": "Конфігурація Collector"
+    },
+    "failure_tracking": {
+      "description": "Sidecar Failure Tracking надає додаткову корисну інформацію про причини збоїв, що допоможе скоротити час усунення несправностей і швидше повернути ваші Collectors у мережу.",
+      "document_title": "Sidecars",
+      "title": "Відстеження збоїв"
+    },
+    "new_collector": {
+      "description": "Кілька слів про Collectors журналів.",
+      "title": "Новий Collector журналів"
+    },
+    "new_configuration": {
+      "description": "Кілька слів про конфігурації Collector.",
+      "title": "Нова конфігурація Collector"
+    },
+    "overview": {
+      "description": "Sidecars можуть надійно пересилати вміст файлів журналів або Windows EventLog з ваших серверів.",
+      "document_title": "Sidecars",
+      "title": "Огляд Sidecars",
+      "token_hint": "Потрібен токен API для Sidecar? <tokenLink>Створіть або повторно використайте токен для користувача <em>{{username}}</em></tokenLink>"
+    },
+    "status": {
+      "description": "Огляд стану Sidecar.",
+      "document_title": "Стан Sidecar",
+      "document_title_named": "Стан Sidecar {{name}}",
+      "documentation_title": "Документація Sidecars",
+      "title": "Стан Sidecar <em>{{name}}</em>"
+    }
+  },
+  "notifications": {
+    "fetch_failed": "Не вдалося отримати змінні конфігурації, стан: {{error}}",
+    "fetch_failed_title": "Не вдалося отримати змінні конфігурації",
+    "save_success_created": "Змінну конфігурації «{{name}}» успішно створено",
+    "save_success_updated": "Змінну конфігурації «{{name}}» успішно оновлено",
+    "save_failed": "Не вдалося зберегти змінну «{{name}}», стан: {{error}}",
+    "save_failed_title": "Не вдалося зберегти змінну",
+    "delete_success": "Змінну конфігурації «{{name}}» успішно видалено",
+    "delete_failed": "Не вдалося видалити змінну «{{name}}», стан: {{error}}",
+    "delete_failed_title": "Не вдалося видалити змінну",
+    "validate_failed": "Не вдалося перевірити змінну «{{name}}», стан: {{error}}",
+    "validate_failed_title": "Не вдалося перевірити змінну",
+    "configurations_fetch_failed": "Не вдалося отримати конфігурації для цієї змінної, стан: {{error}}"
+  },
+  "use_sidecars_notifications": {
+    "fetch_failed": "Не вдалося отримати Sidecar, стан: {{error}}",
+    "fetch_failed_title": "Не вдалося отримати Sidecar",
+    "not_found": "Не вдалося знайти Sidecar з ідентифікатором <{{sidecarId}}>, можливо, він надто довго був неактивним.",
+    "fetch_actions_failed": "Не вдалося отримати дії Sidecar, стан: {{error}}",
+    "fetch_actions_failed_title": "Не вдалося отримати дії Sidecar",
+    "restart_failed": "Не вдалося перезапустити Sidecar, стан: {{error}}",
+    "restart_failed_title": "Не вдалося перезапустити Sidecar",
+    "configuration_change_requested": "Запитано зміну конфігурації для Collectors: {{amount}}",
+    "fetch_sidecars_failed": "Не вдалося отримати Sidecars, стан: {{error}}",
+    "fetch_sidecars_failed_title": "Не вдалося отримати Sidecars"
+  },
+  "use_sidecars_administration_notifications": {
+    "fetch_sidecars_failed": "Не вдалося отримати Sidecars, стан: {{error}}",
+    "fetch_sidecars_failed_title": "Не вдалося отримати Sidecars",
+    "requested": {
+      "start": "Запитано запуск для Collectors: {{amount}}",
+      "restart": "Запитано перезапуск для Collectors: {{amount}}",
+      "stop": "Запитано зупинку для Collectors: {{amount}}"
+    },
+    "request_failed": {
+      "start": "Не вдалося запитати запуск, стан: {{error}}",
+      "restart": "Не вдалося запитати перезапуск, стан: {{error}}",
+      "stop": "Не вдалося запитати зупинку, стан: {{error}}"
+    },
+    "request_failed_title": {
+      "start": "Не вдалося запустити Collectors",
+      "restart": "Не вдалося перезапустити Collectors",
+      "stop": "Не вдалося зупинити Collectors"
+    }
+  }
+}
