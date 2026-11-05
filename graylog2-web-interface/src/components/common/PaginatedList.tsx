@@ -21,6 +21,7 @@ import IfInteractive from 'views/components/dashboard/IfInteractive';
 import usePaginationQueryParameter, { DEFAULT_PAGE_SIZES } from 'hooks/usePaginationQueryParameter';
 
 import Pagination from './Pagination';
+import CompactPagination from './CompactPagination';
 import PageSizeSelect from './PageSizeSelect';
 
 export const INITIAL_PAGE = 1;
@@ -28,6 +29,7 @@ export const INITIAL_PAGE = 1;
 type Props = {
   children: React.ReactNode;
   className?: string;
+  compactPagination?: boolean;
   hideFirstAndLastPageLinks?: boolean;
   hidePreviousAndNextPageLinks?: boolean;
   onChange?: (currentPage: number, pageSize: number) => void;
@@ -40,6 +42,7 @@ type Props = {
 const ListBase = ({
   children,
   className,
+  compactPagination,
   currentPage,
   currentPageSize,
   hideFirstAndLastPageLinks,
@@ -98,14 +101,18 @@ const ListBase = ({
 
       <IfInteractive>
         <div className={`text-center pagination-wrapper ${className ?? ''}`}>
-          <Pagination
-            warnIfPageOutOfBounds={false}
-            totalPages={numberPages}
-            currentPage={currentPage}
-            hidePreviousAndNextPageLinks={hidePreviousAndNextPageLinks}
-            hideFirstAndLastPageLinks={hideFirstAndLastPageLinks}
-            onChange={_onChangePage}
-          />
+          {compactPagination ? (
+            <CompactPagination totalPages={numberPages} currentPage={currentPage} onChange={_onChangePage} />
+          ) : (
+            <Pagination
+              warnIfPageOutOfBounds={false}
+              totalPages={numberPages}
+              currentPage={currentPage}
+              hidePreviousAndNextPageLinks={hidePreviousAndNextPageLinks}
+              hideFirstAndLastPageLinks={hideFirstAndLastPageLinks}
+              onChange={_onChangePage}
+            />
+          )}
         </div>
       </IfInteractive>
     </>
@@ -137,16 +144,21 @@ const ListWithOwnState = ({
 }: Required<Props> & { activePage: number; pageSize: number }) => {
   const [currentPage, setCurrentPage] = useState<number>(Math.max(activePage, INITIAL_PAGE));
   const [currentPageSize, setCurrentPageSize] = useState<number>(propPageSize);
+  const [prevActivePage, setPrevActivePage] = useState<number>(activePage);
+  const [prevPropPageSize, setPrevPropPageSize] = useState<number>(propPageSize);
 
-  useEffect(() => {
+  if (activePage !== prevActivePage) {
+    setPrevActivePage(activePage);
+
     if (activePage > 0) {
       setCurrentPage(activePage);
     }
-  }, [activePage]);
+  }
 
-  useEffect(() => {
+  if (propPageSize !== prevPropPageSize) {
+    setPrevPropPageSize(propPageSize);
     setCurrentPageSize(propPageSize);
-  }, [propPageSize]);
+  }
 
   const setPagination = useCallback(({ page, pageSize }) => {
     setCurrentPageSize(pageSize);
@@ -168,6 +180,7 @@ const PaginatedList = ({
   activePage = 1,
   children,
   className = undefined,
+  compactPagination = false,
   hideFirstAndLastPageLinks = false,
   hidePreviousAndNextPageLinks = false,
   onChange = undefined,
@@ -185,6 +198,7 @@ const PaginatedList = ({
   const baseProps = {
     enforcePageBounds: enforcePageBounds,
     className: className,
+    compactPagination: compactPagination,
     hideFirstAndLastPageLinks: hideFirstAndLastPageLinks,
     hidePreviousAndNextPageLinks: hidePreviousAndNextPageLinks,
     onChange: onChange,

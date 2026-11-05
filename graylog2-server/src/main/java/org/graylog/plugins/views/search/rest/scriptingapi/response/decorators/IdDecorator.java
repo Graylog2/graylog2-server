@@ -30,6 +30,8 @@ import java.util.Set;
  */
 public class IdDecorator implements FieldDecorator {
 
+    public static final String DECORATOR = "id";
+
     private final Set<String> ID_FIELDS = Sets.newHashSet(
             Message.FIELD_STREAMS,
             Message.FIELD_GL2_SOURCE_NODE,
@@ -38,7 +40,7 @@ public class IdDecorator implements FieldDecorator {
 
     @Override
     public boolean accept(RequestedField field) {
-        return ID_FIELDS.contains(field.name()) && field.hasDecorator("id");
+        return ID_FIELDS.contains(field.name()) && field.hasDecorator(DECORATOR);
     }
 
     @Override

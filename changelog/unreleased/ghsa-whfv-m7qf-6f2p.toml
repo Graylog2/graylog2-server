@@ -1,0 +1,2 @@
+type = "s"
+message = "Harden password change handling. [GHSA-whfv-m7qf-6f2p](https://github.com/Graylog2/graylog2-server/security/advisories/GHSA-whfv-m7qf-6f2p)"

@@ -33,6 +33,9 @@ export const loadView = (history: HistoryFunction, viewId: string) => history.pu
 export const loadDashboard = (history: HistoryFunction, dashboardId: string, initialPage?: string) =>
   history.push(`${Routes.DASHBOARD.SHOW(dashboardId)}${initialPage ? `?${stringify({ page: initialPage })}` : ''}`);
 
+export const loadDashboardWithSearch = (history: HistoryFunction, dashboardId: string, search: string = '') =>
+  history.push(`${Routes.DASHBOARD.SHOW(dashboardId)}${search}`);
+
 export const loadAsDashboard = (history: HistoryFunction, view: View) =>
   history.pushWithState<NewDashboardPageState>(Routes.DASHBOARD.NEW, {
     view,

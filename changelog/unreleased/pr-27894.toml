@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix ignored `streams` parameter in Scripting API messages GET endpoint."
+
+pulls = ["27894"]

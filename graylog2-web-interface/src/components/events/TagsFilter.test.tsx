@@ -21,6 +21,7 @@ import userEvent from '@testing-library/user-event';
 import { Events } from '@graylog/server-api';
 
 import TagsFilter from 'components/events/TagsFilter';
+import { asMock } from 'helpers/mocking';
 
 jest.mock('@graylog/server-api', () => ({
   Events: { filterOptions: jest.fn() },
@@ -31,7 +32,7 @@ jest.mock('routing/useQuery', () => ({
   default: () => ({}),
 }));
 
-const mockedFilterOptions = Events.filterOptions as jest.MockedFunction<typeof Events.filterOptions>;
+const mockedFilterOptions = asMock(Events.filterOptions);
 
 const filterOptionsResponse = (tags: Array<string>) =>
   ({ tags }) as unknown as Awaited<ReturnType<typeof Events.filterOptions>>;

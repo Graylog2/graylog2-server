@@ -1,0 +1,4 @@
+type = "a"
+message = "Add `include_unresolved_ids` to Scripting API message searches to also return the ids of fields resolved to titles, like stream ids next to stream titles."
+
+pulls = ["27813"]

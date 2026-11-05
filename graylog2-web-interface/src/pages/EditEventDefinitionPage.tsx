@@ -60,7 +60,7 @@ const EditEventDefinitionPage = () => {
 
           // Inject an internal "_is_scheduled" field to indicate if the event definition should be scheduled in the
           // backend. This field will be removed again before sending an event definition back to the server.
-          eventDefinitionResponse.config._is_scheduled = response.context.scheduler.is_scheduled;
+          eventDefinitionResponse.config._is_scheduled = eventDefinitionResponse.state === 'ENABLED';
           setEventDefinition(eventDefinitionResponse);
         },
         (error) => {

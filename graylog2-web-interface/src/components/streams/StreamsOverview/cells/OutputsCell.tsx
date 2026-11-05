@@ -16,20 +16,15 @@
  */
 
 import * as React from 'react';
-import { useRef } from 'react';
 
 import type { Stream } from 'logic/streams/types';
-import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
-import { CountBadge } from 'components/common';
+import ExpandedSectionCount from 'components/common/EntityDataTable/ExpandedSectionCount';
 
 type Props = {
   stream: Stream;
 };
 
 const OutputsCell = ({ stream }: Props) => {
-  const buttonRef = useRef();
-  const { toggleSection, expandedSections } = useExpandedSections();
-
   if (!stream.is_editable) {
     return null;
   }
@@ -39,18 +34,7 @@ const OutputsCell = ({ stream }: Props) => {
     return null;
   }
 
-  const outputsSectionIsOpen = expandedSections?.[stream.id]?.includes('outputs');
-  const outputsSectionTitle = `${outputsSectionIsOpen ? 'Hide' : 'Show'} stream outputs`;
-
-  return (
-    <CountBadge
-      count={outputCount}
-      iconName={outputsSectionIsOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
-      onClick={() => toggleSection(stream.id, 'outputs')}
-      ref={buttonRef}
-      title={outputsSectionTitle}
-    />
-  );
+  return <ExpandedSectionCount entityId={stream.id} section="outputs" count={outputCount} label="stream outputs" />;
 };
 
 export default OutputsCell;

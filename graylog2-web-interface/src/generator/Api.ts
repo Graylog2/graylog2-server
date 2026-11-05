@@ -17,17 +17,20 @@
 interface ArrayType {
   type: 'array';
   items: Type;
+  optional?: boolean;
 }
 export interface EnumType {
   type: 'enum';
   name: 'string' | 'number' | 'boolean' | 'unknown';
   options: Array<unknown>;
   defaultValue?: unknown;
+  optional?: boolean;
 }
 export interface TypeLiteral {
   type: 'type_literal';
   properties: Record<string, Type>;
   additionalProperties?: Type;
+  optional?: boolean;
 }
 interface TypeReference {
   type: 'type_reference';

@@ -16,15 +16,28 @@
  */
 import type { Optional } from 'utility-types';
 
-import { prepareEntityShare, updateEntityShare, loadUserSharesPaginated } from 'api/entity-share';
+import {
+  prepareEntityShare,
+  prepareEntityCreateShare,
+  updateEntityShare,
+  loadUserSharesPaginated,
+} from 'api/entity-share';
 import type { GRN } from 'logic/permissions/types';
-import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import type { EntityCreateSharePayload, EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 import notifyingAction from '../notifyingAction';
 
 const prepare = notifyingAction({
-  action: (_entityType: string, _entityTitle: string, entityGRN: GRN | null, payload?: Optional<EntitySharePayload>) =>
+  action: (_entityType: string, _entityTitle: string, entityGRN: GRN, payload?: Optional<EntitySharePayload>) =>
     prepareEntityShare(entityGRN, payload),
+  error: (error, entityType, entityName) => ({
+    message: `Preparing shares for ${entityType} "${entityName}" failed with status: ${error}`,
+  }),
+});
+
+const prepareCreate = notifyingAction({
+  action: (_entityType: string, _entityTitle: string, payload?: EntityCreateSharePayload) =>
+    prepareEntityCreateShare(payload),
   error: (error, entityType, entityName) => ({
     message: `Preparing shares for ${entityType} "${entityName}" failed with status: ${error}`,
   }),
@@ -50,6 +63,7 @@ const loadUserSharesPaginatedAction = notifyingAction({
 
 export default {
   prepare,
+  prepareCreate,
   update,
   loadUserSharesPaginated: loadUserSharesPaginatedAction,
 };

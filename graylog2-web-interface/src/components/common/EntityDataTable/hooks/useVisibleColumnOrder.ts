@@ -17,7 +17,12 @@
 
 import { useMemo } from 'react';
 
-import { BULK_SELECT_COL_ID, ACTIONS_COL_ID, ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
+import {
+  BULK_SELECT_COL_ID,
+  ACTIONS_COL_ID,
+  ATTRIBUTE_STATUS,
+  ROW_EXPAND_COL_ID,
+} from 'components/common/EntityDataTable/Constants';
 import type { ColumnPreferences } from 'components/common/EntityDataTable/types';
 
 const getVisibleAttributeColumns = (
@@ -41,6 +46,7 @@ const useVisibleColumnOrder = (
   attributeColumnOrder: Array<string>,
   defaultDisplayedColumns: Array<string>,
   displayBulkSelectCol: boolean,
+  displayRowExpandCol: boolean,
 ) =>
   useMemo(() => {
     const visibleAttributeColumns = getVisibleAttributeColumns(defaultDisplayedColumns, columnPreferences);
@@ -51,7 +57,13 @@ const useVisibleColumnOrder = (
 
     // Keep actions as the trailing column even when there are no row actions.
     // It doubles as the "tail" column to consume leftover width for fully-static layouts.
-    return [...(displayBulkSelectCol ? [BULK_SELECT_COL_ID] : []), ...coreOrder, ...additionalVisible, ACTIONS_COL_ID];
-  }, [columnPreferences, defaultDisplayedColumns, attributeColumnOrder, displayBulkSelectCol]);
+    return [
+      ...(displayRowExpandCol ? [ROW_EXPAND_COL_ID] : []),
+      ...(displayBulkSelectCol ? [BULK_SELECT_COL_ID] : []),
+      ...coreOrder,
+      ...additionalVisible,
+      ACTIONS_COL_ID,
+    ];
+  }, [columnPreferences, defaultDisplayedColumns, attributeColumnOrder, displayBulkSelectCol, displayRowExpandCol]);
 
 export default useVisibleColumnOrder;

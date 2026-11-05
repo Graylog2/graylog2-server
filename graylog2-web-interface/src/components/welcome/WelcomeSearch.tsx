@@ -53,7 +53,13 @@ const WelcomeSearch = ({ view, loadingPlaceholder }: Props) => (
   <InteractiveContext.Provider value="read-only">
     <WidgetActionsContext.Provider value={WIDGET_ACTIONS}>
       <SearchPageLayoutProvider value={SEARCH_PAGE_LAYOUT_CONTEXT_VALUE}>
-        <SearchPage view={view} isNew={false} skipNoStreamsCheck loadingPlaceholder={loadingPlaceholder} />
+        <SearchPage
+          view={view}
+          isNew={false}
+          skipNoStreamsCheck
+          skipDocumentTitle
+          loadingPlaceholder={loadingPlaceholder}
+        />
       </SearchPageLayoutProvider>
     </WidgetActionsContext.Provider>
   </InteractiveContext.Provider>

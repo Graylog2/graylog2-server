@@ -1,0 +1,14 @@
+type = "c"
+message = "Revamp the index sets overview on System > Indices as a paginated entity table."
+
+details.user = """
+The index sets overview is now a paginated, sortable and filterable table instead of a card list. It shows a card per
+index set category with counts, the number of streams routed to each index set, and cached cluster metrics such as
+size, document count and deflector health. You can apply field type profiles to several index sets at once and expand
+a row to see its associated streams.
+
+The previous list endpoint is deprecated.
+"""
+
+issues = ["Graylog2/graylog-plugin-enterprise#15851"]
+pulls = ["27597", "27622", "27640", "27674", "27691", "27704", "27707", "27620"]

@@ -43,7 +43,9 @@ const usePageNavigationItems = (page: string, items: Array<PageNavItem>) => {
       return sortNavigationItems(items);
     }
 
-    return mergeAndSortNavigationItems(allPageNavigationItems).find((item) => item.description === page)?.children ?? [];
+    return (
+      mergeAndSortNavigationItems(allPageNavigationItems).find((item) => item.description === page)?.children ?? []
+    );
   }, [items, allPageNavigationItems, page]);
 };
 

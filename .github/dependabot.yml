@@ -22,6 +22,10 @@ updates:
       # Remove when upgrading to Jersey 5.
       - dependency-name: "org.glassfish.grizzly:*"
         update-types: ["version-update:semver-major"]
+      # ClassGraph 6.x requires JDK 25; 5.x is the same API for JDK 17-24.
+      # Remove when upgrading to JDK 25.
+      - dependency-name: "io.github.classgraph:classgraph"
+        versions: [">= 6"]
     groups:
       # The Google API and Cloud client libraries are released in lockstep,
       # so bumping them individually almost always trips the

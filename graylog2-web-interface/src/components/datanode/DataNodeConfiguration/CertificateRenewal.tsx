@@ -15,69 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import styled from 'styled-components';
 import { useState } from 'react';
-import moment from 'moment';
 
-import ProductName from 'brand-customization/ProductName';
-import { qualifyUrl } from 'util/URLUtils';
-import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
+import { CertificateRenewal } from '@graylog/server-api';
+
 import type { DataNode } from 'components/datanode/Types';
 import UserNotification from 'util/UserNotification';
-import { Spinner } from 'components/common';
-import { Alert, ListGroup, ListGroupItem, Button } from 'components/bootstrap';
-import { defaultCompare } from 'logic/DefaultCompare';
+import { Button } from 'components/bootstrap';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import { Badge } from 'preflight/components/common';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { defaultOnError } from 'util/conditional/onError';
-
-import DataNodeBadge from '../DataNodeList/DataNodeBadge';
-
-const StyledList = styled(ListGroup)`
-  max-width: fit-content;
-
-  li > div,
-  li > a {
-    display: flex;
-    justify-content: space-between;
-  }
-`;
-
-const DataNodeInfos = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  margin-right: 10px;
-`;
-
-const NodeIdColumn = styled.div`
-  width: 100px;
-`;
-
-export const fetchDataNodes = () => fetchPeriodically<Array<DataNode>>('GET', qualifyUrl('/certrenewal'));
-
-const useDataNodes = () => {
-  const { data, isInitialLoading } = useQuery({
-    queryKey: ['data-nodes', 'overview'],
-    queryFn: () =>
-      defaultOnError(fetchDataNodes(), 'Loading Data Nodes failed with status', 'Could not load data nodes'),
-    placeholderData: keepPreviousData,
-    refetchInterval: 3000,
-  });
-
-  return {
-    data,
-    isInitialLoading,
-  };
-};
-
-const RightCol = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 6px;
-`;
 
 const renewalWording = {
   buttonTitle: 'Renew certificate',
@@ -110,7 +56,7 @@ export const CertRenewalButton = ({ nodeId, status }: { nodeId: string; status: 
       app_action_value: telemetryAppSection,
     });
 
-    fetch('POST', qualifyUrl(`/certrenewal/${nodeId}`))
+    CertificateRenewal.initiateCertRenewalForNode(nodeId)
       .then(() => {
         UserNotification.success(`Certificate ${successActionTitle} successfully`);
       })
@@ -128,59 +74,3 @@ export const CertRenewalButton = ({ nodeId, status }: { nodeId: string; status: 
     </Button>
   );
 };
-
-const ErrorBadge = styled(Badge)`
-  margin-left: 5px;
-`;
-const Error = ({ message }: { message: string }) => (
-  <ErrorBadge title={message} color="red">
-    {message}
-  </ErrorBadge>
-);
-
-const CertificateRenewal = () => {
-  const { data: dataNodes, isInitialLoading: isInitialLoadingDataNodes } = useDataNodes();
-  const sortedDataNodes = dataNodes?.sort((d1, d2) => defaultCompare(d1.cert_valid_until, d2.cert_valid_until));
-
-  return (
-    <div>
-      <h2>Certificate Renewal & Provisioning</h2>
-      <p>
-        Here you can manually trigger the certificate renewal or provisioning for <ProductName /> Data Nodes. It is only
-        necessary to manually provision certificates when the renewal policy mode &quot;Manual&quot; is configured and
-        Data Nodes have been started after the initial certificate provisioning.
-      </p>
-
-      {!!sortedDataNodes?.length && (
-        <StyledList>
-          {sortedDataNodes.map(
-            ({ node_id, hostname, transport_address, short_node_id, cert_valid_until, status, error_msg }) => (
-              <ListGroupItem key={short_node_id}>
-                <NodeIdColumn>
-                  <DataNodeBadge status={status} nodeId={short_node_id} transportAddress={transport_address} />
-                </NodeIdColumn>
-                <DataNodeInfos>
-                  <span title="Transport address">{transport_address}</span>
-                  {' – '}
-                  <span title="Hostname">{hostname}</span>
-                  {error_msg && <Error message={error_msg} />}
-                </DataNodeInfos>
-                <RightCol>
-                  {cert_valid_until && (
-                    <span title={cert_valid_until}>valid until {moment(cert_valid_until).from(moment())} </span>
-                  )}
-                  <CertRenewalButton nodeId={node_id} status={status} />
-                </RightCol>
-              </ListGroupItem>
-            ),
-          )}
-        </StyledList>
-      )}
-
-      {isInitialLoadingDataNodes && <Spinner />}
-      {!sortedDataNodes?.length && !isInitialLoadingDataNodes && <Alert>No Data Nodes have been found.</Alert>}
-    </div>
-  );
-};
-
-export default CertificateRenewal;

@@ -48,13 +48,14 @@ public class GenerateApiDefinition {
         System.exit(-1);
     }
 
-    private static Set<Class<?>> findResources(String[] controllerPackages) {
+    private static Set<Class<?>> findResources(String[] controllerPackages) throws ClassNotFoundException {
         final ImmutableSet.Builder<Class<?>> resources = ImmutableSet.builder();
-        final ClassGraph classGraph = new ClassGraph().enableAnnotationInfo().acceptPackages(controllerPackages);
+        final ClassGraph classGraph = new ClassGraph().enableClasspath().enableNonSystemModules()
+                .enableClassInfo().enableAnnotationInfo().acceptPackages(controllerPackages);
 
         try (final ScanResult scanResult = classGraph.scan()) {
             for (final ClassInfo classInfo : scanResult.getClassesWithAnnotation("jakarta.ws.rs.Path")) {
-                resources.add(classInfo.loadClass());
+                resources.add(Class.forName(classInfo.getName(), false, GenerateApiDefinition.class.getClassLoader()));
             }
         }
 
@@ -71,7 +72,7 @@ public class GenerateApiDefinition {
         return directoryToBeDeleted.delete();
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
         if (args.length < 2) {
             bail("Syntax: " + GenerateApiDefinition.class.getSimpleName() + " <outdir> <package1> ... <packageN>");
         }

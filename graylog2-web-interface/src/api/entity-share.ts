@@ -22,7 +22,11 @@ import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import type { EntityShareStateJson } from 'logic/permissions/EntityShareState';
 import EntityShareState from 'logic/permissions/EntityShareState';
-import type { EntitySharePayload, PaginatedEntityShares } from 'actions/permissions/EntityShareActions';
+import type {
+  EntityCreateSharePayload,
+  EntitySharePayload,
+  PaginatedEntityShares,
+} from 'actions/permissions/EntityShareActions';
 import { qualifyUrl } from 'util/URLUtils';
 import type { GRN } from 'logic/permissions/types';
 import PaginationURL from 'util/PaginationURL';
@@ -55,14 +59,22 @@ const formatPaginatedSharesResponse = ({
 });
 
 export const prepareEntityShare = (
-  entityGRN: GRN | null,
+  entityGRN: GRN,
   payload: Optional<EntitySharePayload> = DEFAULT_PREPARE_PAYLOAD,
 ): Promise<EntityShareState> => {
-  const url = entityGRN
-    ? ApiRoutes.EntityShareController.prepare(entityGRN).url
-    : ApiRoutes.EntityShareController.prepareEntityCreate().url;
+  const url = qualifyUrl(ApiRoutes.EntityShareController.prepare(entityGRN).url);
 
-  return fetch('POST', qualifyUrl(url), JSON.stringify(payload)).then((response: EntityShareStateJson) =>
+  return fetch('POST', url, JSON.stringify(payload)).then((response: EntityShareStateJson) =>
+    EntityShareState.fromJSON(response),
+  );
+};
+
+export const prepareEntityCreateShare = (
+  payload: EntityCreateSharePayload = DEFAULT_PREPARE_PAYLOAD,
+): Promise<EntityShareState> => {
+  const url = qualifyUrl(ApiRoutes.EntityShareController.prepareEntityCreate().url);
+
+  return fetch('POST', url, JSON.stringify(payload)).then((response: EntityShareStateJson) =>
     EntityShareState.fromJSON(response),
   );
 };

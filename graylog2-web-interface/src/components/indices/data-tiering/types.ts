@@ -29,6 +29,8 @@ export type DataTieringConfig = {
   index_hot_lifetime_min?: string;
   warm_tier_enabled?: boolean;
   archive_before_deletion?: boolean;
+  archive_retention_override_enabled?: boolean;
+  archive_retention_time?: number | null;
   warm_tier_repository_name?: string | null;
 };
 
@@ -39,6 +41,8 @@ export type DataTieringFormValues = {
   index_hot_lifetime_min?: number;
   warm_tier_enabled: boolean;
   archive_before_deletion: boolean;
+  archive_retention_override_enabled: boolean;
+  archive_retention_time?: number | '' | null;
   warm_tier_repository_name?: string | null;
 };
 

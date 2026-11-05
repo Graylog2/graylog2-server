@@ -30,11 +30,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -89,21 +88,21 @@ public class MongodbClusterCommand {
                     .collect(Collectors.toMap(host -> host, host -> executor.submit(() -> runCommand(host, call))));
 
             Map<String, T> results = new HashMap<>();
-            Set<String> failedHosts = new HashSet<>();
 
             for (Map.Entry<String, Future<T>> entry : futures.entrySet()) {
                 try {
                     results.put(entry.getKey(), entry.getValue().get(executionTimeoutSec, TimeUnit.SECONDS));
                 } catch (TimeoutException e) {
-                    failedHosts.add(entry.getKey());
+                    LOG.warn("Timed out after {}s executing action on mongodb host {}", executionTimeoutSec, entry.getKey());
                     entry.getValue().cancel(true);
+                } catch (ExecutionException e) {
+                    // runCommand already logged MongoDB command and security errors
+                    if (!(e.getCause() instanceof MongoCommandException || e.getCause() instanceof MongodbPermissionException)) {
+                        LOG.warn("Failed to execute action on mongodb host {}", entry.getKey(), e.getCause());
+                    }
                 } catch (Exception e) {
-                    failedHosts.add(entry.getKey());
+                    LOG.warn("Failed to execute action on mongodb host {}", entry.getKey(), e);
                 }
-            }
-
-            if (!failedHosts.isEmpty()) {
-                LOG.warn("Failed to execute action in following mongodb host: {}", failedHosts);
             }
 
             return results;

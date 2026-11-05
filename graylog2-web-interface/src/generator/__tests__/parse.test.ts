@@ -136,4 +136,33 @@ describe('parse', () => {
 }
 `);
   });
+
+  it('marks properties that are not required as optional', () => {
+    const api = {
+      apis: [],
+      models: {
+        OptionalProperties: {
+          type: 'object',
+          id: 'OptionalProperties',
+          properties: {
+            required_value: { type: 'string' },
+            optional_value: { type: 'string', required: false },
+            optional_entity: { $ref: 'SampleEntity', required: false },
+            optional_list: { type: 'array', items: { type: 'string' }, required: false },
+          },
+        },
+      },
+    };
+
+    const result = parseApi('sample', api);
+
+    expect(result.models.OptionalProperties).toMatchObject({
+      properties: {
+        required_value: { type: 'type_reference', name: 'string', optional: false },
+        optional_value: { type: 'type_reference', name: 'string', optional: true },
+        optional_entity: { type: 'type_reference', name: 'SampleEntity', optional: true },
+        optional_list: { type: 'array', optional: true },
+      },
+    });
+  });
 });
