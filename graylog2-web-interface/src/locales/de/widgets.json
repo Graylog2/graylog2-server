@@ -47,11 +47,11 @@
     "executed_at_label": "Ausgeführt am",
     "executed_in": "Ausgeführt in:",
     "duration": "{{duration}} ms",
-    "effective_time_range": "Effektiver Zeitraum:",
+    "effective_time_range": "Effektiver Zeitbereich:",
     "from": "Von",
     "to": "Bis",
-    "from_label": "Effektiver Zeitraum von",
-    "to_label": "Effektiver Zeitraum bis",
+    "from_label": "Effektiver Zeitbereich von",
+    "to_label": "Effektiver Zeitbereich bis",
     "total_results": "Ergebnisse gesamt:",
     "title": "Ausführungsinformationen",
     "no_query_executed": "Es wurde noch keine Abfrage ausgeführt."
@@ -69,9 +69,9 @@
   },
   "timerange_info": {
     "global_override": "Globale Überschreibung: {{timerange}}",
-    "effective_unavailable": "Der effektive Zeitraum des Widgets ist derzeit nicht verfügbar.",
+    "effective_unavailable": "Der effektive Zeitbereich des Widgets ist derzeit nicht verfügbar.",
     "independent": "Das Ergebnis dieses Widgets ist unabhängig von der aktuellen Suche.",
-    "all_time": "Gesamter Zeitraum"
+    "all_time": "Gesamter Zeitbereich"
   },
   "unknown_widget": {
     "title": "Unbekanntes Widget: {{type}}",
@@ -147,9 +147,9 @@
   },
   "date_filter": {
     "single_date": "Einzelnes Datum",
-    "range": "Zeitraum",
+    "range": "Zeitbereich",
     "select_single_date": "Typ einzelnes Datum auswählen",
-    "select_range": "Typ Zeitraum auswählen",
+    "select_range": "Typ Zeitbereich auswählen",
     "date_range": "{{from}} bis {{to}}"
   },
   "message_table": {

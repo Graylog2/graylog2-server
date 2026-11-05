@@ -38,7 +38,7 @@ Terms used in the German translations (`de/*.json`), so the whole interface uses
 | Slice                              | Gruppe                        |
 | Slicing / Slice by                 | Gruppierung / Gruppieren nach |
 | Submit                             | Absenden                      |
-| Time range                         | Zeitraum                      |
+| Time range                         | Zeitbereich (period: Zeitraum) |
 | Update (save changes)              | Aktualisieren                 |
 
 ## Enterprise

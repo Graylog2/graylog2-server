@@ -117,7 +117,7 @@
     "all_time": "Gesamte Zeit",
     "ago": "zurück",
     "range_ago": "vor {{time}}",
-    "range_length_placeholder": "Zeitraum auswählen",
+    "range_length_placeholder": "Zeitbereich auswählen",
     "load_preset": "Vorlage laden",
     "no_available_presets": "Keine Vorlagen verfügbar",
     "loading": "Laden...",
@@ -137,15 +137,15 @@
     "to_seconds": "Sekunden der Endzeit",
     "toggle_day_boundary": "Zwischen Tagesbeginn und Tagesende wechseln",
     "set_current_time": "Auf aktuelle Ortszeit setzen",
-    "set_range_value": "Wert für den Zeitraum festlegen",
+    "set_range_value": "Wert für den Zeitbereich festlegen",
     "set_from_value": "Startwert festlegen",
     "set_to_value": "Endwert festlegen",
     "save_as_preset": "Als Vorlage speichern",
-    "save_current_as_preset": "Aktuellen Zeitraum als Vorlage speichern",
+    "save_current_as_preset": "Aktuellen Zeitbereich als Vorlage speichern",
     "preset_description_placeholder": "Beschreibung hinzufügen...",
-    "preset_description_label": "Beschreibung des Zeitraums",
+    "preset_description_label": "Beschreibung des Zeitbereichs",
     "preset_description_required": "Eine Beschreibung ist erforderlich",
-    "preset_similar": "Ein ähnlicher Zeitraum existiert bereits in der <configurationsLink>Zeitraum-Konfiguration</configurationsLink>",
+    "preset_similar": "Ein ähnlicher Zeitbereich existiert bereits in der <configurationsLink>Zeitbereich-Konfiguration</configurationsLink>",
     "save_preset": "Vorlage speichern",
     "calendar": "Kalender",
     "timestamp": "Zeitstempel",
@@ -153,24 +153,24 @@
     "from_timestamp": "Startzeitpunkt",
     "to_timestamp": "Endzeitpunkt",
     "no_override_title": "Keine Überschreibung von Datum/Uhrzeit gewählt.",
-    "no_override_hint": "Wählen Sie über die Tabs oben einen Zeitraum für die Suche.",
+    "no_override_hint": "Wählen Sie über die Tabs oben einen Zeitbereich für die Suche.",
     "keyword_from": "Von",
     "keyword_to": "Bis",
-    "keyword_headline": "Zeitraum:",
+    "keyword_headline": "Zeitbereich:",
     "keyword_input": "Schlüsselwort-Eingabe",
-    "keyword_help": "Geben Sie den Zeitraum für die Suche in natürlicher Sprache an (auf Englisch).",
+    "keyword_help": "Geben Sie den Zeitbereich für die Suche in natürlicher Sprache an (auf Englisch).",
     "keyword_preview": "Vorschau",
     "keyword_example_last_month": "<code>{{keyword}}</code> sucht zwischen vor einem Monat und jetzt",
     "keyword_example_hours_ago": "<code>{{keyword}}</code> sucht zwischen vor vier Stunden und jetzt",
     "keyword_example_range": "<code>{{keyword}}</code> sucht zwischen dem 1. April und vor 2 Tagen",
     "keyword_example_timezone": "<code>{{keyword}}</code> sucht zwischen gestern Mitternacht und heute Mitternacht in der Zeitzone +0200 – entspricht 22:00 Uhr UTC",
     "keyword_docs": "Weitere Details finden Sie in der <docsLink>Dokumentation</docsLink>.",
-    "keyword_docs_title": "Dokumentation zu Schlüsselwort-Zeiträumen",
-    "display_label": "Suchzeitraum, öffnet beim Klicken die Zeitraumauswahl",
-    "picker_title": "Suchzeitraum",
+    "keyword_docs_title": "Dokumentation zu Schlüsselwort-Zeitbereichen",
+    "display_label": "Suchzeitbereich, öffnet beim Klicken die Zeitbereichsauswahl",
+    "picker_title": "Suchzeitbereich",
     "admin_limit": "Die Suche ist vom Administrator auf {{duration}} begrenzt",
-    "update": "Zeitraum aktualisieren",
-    "open_selector": "Zeitraumauswahl öffnen",
+    "update": "Zeitbereich aktualisieren",
+    "open_selector": "Zeitbereichsauswahl öffnen",
     "timezones_using": "Alle Zeitzonen in: <bold>{{timezone}}</bold>",
     "unit_seconds": "Sekunden",
     "unit_minutes": "Minuten",
@@ -238,7 +238,7 @@
     "add_to_query": "Zur Abfrage hinzufügen",
     "time_range_validation": {
       "invalid_date_format": "Das Format muss {{format}} sein.",
-      "range_limit": "Der Zeitraum liegt außerhalb der erlaubten Dauer.",
+      "range_limit": "Der Zeitbereich liegt außerhalb der erlaubten Dauer.",
       "date_limit": "Das Datum liegt außerhalb der erlaubten Dauer.",
       "until_before_from": "Das \"Bis\"-Datum muss nach dem \"Von\"-Datum liegen.",
       "empty": "Darf nicht leer sein.",
@@ -319,13 +319,13 @@
     "reset_global_override": "Globale Überschreibung zurücksetzen"
   },
   "time_range_presets": {
-    "select_time_range": "Zeitraum auswählen",
-    "open_preset_select": "Auswahl der Zeitraum-Vorlagen öffnen"
+    "select_time_range": "Zeitbereich auswählen",
+    "open_preset_select": "Auswahl der Zeitbereichsvorlagen öffnen"
   },
   "move_range": {
-    "show_previous": "Vorherigen Zeitraum anzeigen",
+    "show_previous": "Vorherigen Zeitbereich anzeigen",
     "show_previous_duration": "Vorherige {{duration}} anzeigen",
-    "show_next": "Nächsten Zeitraum anzeigen",
+    "show_next": "Nächsten Zeitbereich anzeigen",
     "show_next_duration": "Nächste {{duration}} anzeigen"
   },
   "query_validation": {
@@ -339,7 +339,7 @@
     "status_error": "Fehler",
     "validation_failed": "Validierung der Suchabfrage fehlgeschlagen mit Status: {{error}}",
     "warm_tier_title": "Suche im Warm Tier",
-    "warm_tier_message": "Der gewählte Zeitraum enthält Daten aus dem Warm Tier, deren Abruf langsam sein kann. Daten, die älter als der angegebene Zeitstempel sind, liegen für den jeweiligen Stream im Warm Tier:"
+    "warm_tier_message": "Der gewählte Zeitbereich enthält Daten aus dem Warm Tier, deren Abruf langsam sein kann. Daten, die älter als der angegebene Zeitstempel sind, liegen für den jeweiligen Stream im Warm Tier:"
   },
   "saved_searches": {
     "title": "Gespeicherte Suchen",
@@ -376,8 +376,8 @@
   },
   "search_result_overview": {
     "duration_at": "{{duration}} ms am <timestamp/>",
-    "effective_from": "Tatsächlicher Zeitraum von",
-    "effective_to": "Tatsächlicher Zeitraum bis"
+    "effective_from": "Tatsächlicher Zeitbereich von",
+    "effective_to": "Tatsächlicher Zeitbereich bis"
   },
   "fields_overview": {
     "filter_placeholder": "Felder filtern",

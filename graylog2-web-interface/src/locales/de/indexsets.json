@@ -334,7 +334,7 @@
     "contains_up_to": "Enthält Nachrichten bis <relativeTime />",
     "contains_from": "Enthält Nachrichten von <begin /> bis <end />",
     "empty": "Der Index enthält keine Nachrichten.",
-    "range_unknown": "Der Zeitraum des Index ist unbekannt, weil kein Indexbereich verfügbar ist. Bitte berechnen Sie die Indexbereiche manuell neu.",
+    "range_unknown": "Der Zeitbereich des Index ist unbekannt, weil kein Indexbereich verfügbar ist. Bitte berechnen Sie die Indexbereiche manuell neu.",
     "hide_details": "Details / Aktionen ausblenden",
     "show_details": "Details / Aktionen einblenden",
     "size_one": "({{size}} / {{formattedCount}} Nachricht)",

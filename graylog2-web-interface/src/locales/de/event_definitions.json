@@ -204,7 +204,7 @@
     "use_cron": "Cron-Planung verwenden",
     "use_cron_help": "Planen Sie dieses Event mit einem Quartz-Cron-Ausdruck",
     "warm_tier_title": "Warm-Tier-Warnung",
-    "warm_tier_warning": "Der ausgewählte Zeitraum enthält Daten, die im Warm Tier gespeichert sind. Events, die häufig Daten aus dem Warm Tier abrufen müssen, können Performance-Probleme verursachen. Ein Wert für <strong>Suchen innerhalb der letzten</strong>, der die folgende Dauer überschreitet, fällt in den Warm Tier: <timestamp></timestamp>."
+    "warm_tier_warning": "Der ausgewählte Zeitbereich enthält Daten, die im Warm Tier gespeichert sind. Events, die häufig Daten aus dem Warm Tier abrufen müssen, können Performance-Probleme verursachen. Ein Wert für <strong>Suchen innerhalb der letzten</strong>, der die folgende Dauer überschreitet, fällt in den Warm Tier: <timestamp></timestamp>."
   },
   "filter_preview": {
     "help_aggregation": "Ein Event jedes Mal, wenn das Aggregationsergebnis die Bedingung erfüllt",
@@ -377,7 +377,7 @@
     "every": "alle {{duration}}",
     "last_execution": "Letzte Ausführung:",
     "next_execution": "Nächste Ausführung:",
-    "next_time_range": "Nächster Zeitraum:",
+    "next_time_range": "Nächster Zeitbereich:",
     "not_scheduled": "Nicht geplant.",
     "queued_notifications": "Benachrichtigungen in der Warteschlange:",
     "runs": "Läuft {{schedule}}.",

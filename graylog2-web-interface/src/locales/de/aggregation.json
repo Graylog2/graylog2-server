@@ -229,7 +229,7 @@
     "trend": "Trend",
     "trend_description": "Trendinformationen für diese Zahl anzeigen.",
     "trend_help_enabled": "Wenn der Trend aktiviert ist, wird unterhalb des aktuellen Werts ein separates Feld angezeigt, das die Richtung der Änderung mit einem Symbol sowie die absolute und relative Differenz zwischen aktuellem und vorherigem Wert anzeigt.",
-    "trend_help_previous": "Der vorherige Wert wird durch zwei Suchen im Hintergrund berechnet, die bis auf den Zeitraum identisch sind. Der Zeitraum der ersten Suche entspricht dem für diese Abfrage bzw. dieses Widget konfigurierten, die zweite Suche verwendet denselben Zeitraum, um dessen Länge in die Vergangenheit verschoben.",
+    "trend_help_previous": "Der vorherige Wert wird durch zwei Suchen im Hintergrund berechnet, die bis auf den Zeitbereich identisch sind. Der Zeitbereich der ersten Suche entspricht dem für diese Abfrage bzw. dieses Widget konfigurierten, die zweite Suche verwendet denselben Zeitbereich, um dessen Länge in die Vergangenheit verschoben.",
     "trend_preference": "Trendpräferenz",
     "trend_preferences": {
       "LOWER": "Niedriger",

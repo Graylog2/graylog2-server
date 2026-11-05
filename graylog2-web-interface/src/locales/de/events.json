@@ -28,7 +28,7 @@
     "no_further_details": "Keine weiteren Details",
     "no_group_by_fields": "Dieses Event hat keine Gruppierungsfelder.",
     "no_key": "Für dieses Event ist kein Schlüssel gesetzt.",
-    "no_time_range": "Kein Zeitraum",
+    "no_time_range": "Kein Zeitbereich",
     "refresh_human_name": "Events",
     "replay_search": "Suche wiederholen",
     "histogram_series_events": "Events",
@@ -44,7 +44,7 @@
     "open_section": "Abschnitt {{title}} öffnen",
     "replay_details": "Details der Wiederholung",
     "replayed_search": "Wiederholte Suche",
-    "system_event": "Das Event ist ein Systemevent, diesen sind keine Abfrage, kein Stream und kein Zeitraum zugeordnet."
+    "system_event": "Das Event ist ein Systemevent, diesen sind keine Abfrage, kein Stream und kein Zeitbereich zugeordnet."
   },
   "alerts_types": {
     "alert": "Alarm",
