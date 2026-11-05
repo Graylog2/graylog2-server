@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
+import styled, { css } from 'styled-components';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import parse, { domToReact, Element } from 'html-react-parser';
@@ -38,7 +39,56 @@ const ALLOWED_URI_REGEXP = /^(?:https?:|graylog:|[^a-z])/i;
 type Transformer = Parameters<typeof parse>[1]['replace'];
 type Renderer = ({ html, transformer }: { html: string; transformer?: Transformer }) => ReturnType<typeof parse>;
 
-const HTML: Renderer = ({ html, transformer }) => parse(html, { replace: transformer });
+const mergeTransformer =
+  (transformers: Array<Transformer>): Transformer =>
+  (domNode, idx) => {
+    for (const transformer of transformers) {
+      const result = transformer(domNode, idx);
+      if (result) {
+        return result;
+      }
+    }
+
+    return undefined;
+  };
+
+// A table wider than its container scrolls instead of squeezing its columns.
+const Table = styled.table(
+  ({ theme }) => css`
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    margin: ${theme.spacings.xs} 0;
+    border-collapse: collapse;
+
+    th,
+    td {
+      padding: ${theme.spacings.xxs} ${theme.spacings.sm};
+      border-bottom: 1px solid ${theme.colors.table.row.divider};
+      overflow-wrap: normal;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      font-weight: 600;
+    }
+  `,
+);
+
+// The table's content is transformed like everything else, e.g. its links and augmented values.
+const parseWithTables = (html: string, transformer: Transformer) => {
+  const options: HTMLReactParserOptions = {};
+  const tableTransformer: Transformer = (domNode) =>
+    domNode instanceof Element && domNode.name === 'table' ? (
+      <Table>{domToReact(domNode.children as DOMNode[], options)}</Table>
+    ) : undefined;
+  options.replace = transformer ? mergeTransformer([transformer, tableTransformer]) : tableTransformer;
+
+  return parse(html, options);
+};
+
+const HTML: Renderer = ({ html, transformer }) => parseWithTables(html, transformer);
 
 const useMarkdownTransformer = (): HTMLReactParserOptions['replace'] => {
   const components = usePluginEntities('markdown.augment.components');
@@ -77,19 +127,6 @@ const useMarkdownTransformer = (): HTMLReactParserOptions['replace'] => {
   }, [components]);
 };
 
-const mergeTransformer =
-  (transformers: Array<Transformer>): Transformer =>
-  (domNode, idx) => {
-    for (const transformer of transformers) {
-      const result = transformer(domNode, idx);
-      if (result) {
-        return result;
-      }
-    }
-
-    return undefined;
-  };
-
 const Augment: Renderer = ({ html, transformer }) => {
   const markdownTransformer = useMarkdownTransformer();
   const replace = useMemo(
@@ -97,7 +134,7 @@ const Augment: Renderer = ({ html, transformer }) => {
     [markdownTransformer, transformer],
   );
 
-  return parse(html, { replace });
+  return parseWithTables(html, replace);
 };
 
 const UnsupportedImageWarning = () => (
