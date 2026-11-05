@@ -26,7 +26,9 @@ import useTableElements from 'components/streams/StreamsOverview/hooks/useTableC
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 import useLayoutVariant from 'components/common/PaginatedEntityTable/hooks/useLayoutVariant';
-import { ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
+import { getVisibleAttributeColumns } from 'components/common/EntityDataTable/hooks/useVisibleColumnOrder';
+import useSharedWithOthersSection from 'components/permissions/SharedWithOthers/useSharedWithOthersSection';
+import { SHARED_WITH_OTHERS_ID } from 'components/permissions/SharedWithOthers/Constants';
 import CurrentUser from 'logic/users/CurrentUser';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
@@ -88,12 +90,16 @@ const StreamsOverview = ({ indexSets }: Props) => {
     activeLayout.entityTableId,
     activeLayoutVariant || undefined,
   );
-  const userPrefs = layoutPreferences?.attributes ?? {};
-  const userSelection = Object.entries(userPrefs)
-    .filter(([, pref]) => pref.status === ATTRIBUTE_STATUS.show)
-    .map(([attributeId]) => attributeId);
-  const visibleColumns = userSelection.length > 0 ? userSelection : activeLayout.defaultDisplayedAttributes;
+  const visibleColumns = getVisibleAttributeColumns(
+    activeLayout.defaultDisplayedAttributes,
+    layoutPreferences?.attributes,
+  );
   const requestedFields = backendFieldsForVisibleColumns(visibleColumns, extensionMetricFields);
+  const sharedWithOthersSection = useSharedWithOthersSection<Stream>(
+    'stream',
+    'stream',
+    visibleColumns.has(SHARED_WITH_OTHERS_ID),
+  );
 
   return (
     <StreamMetricsProvider streamIds={visibleStreamIds} fields={requestedFields}>
@@ -106,7 +112,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
         fetchEntities={fetchEntities}
         onDataLoaded={onDataLoaded}
         keyFn={keyFn}
-        expandedSectionRenderers={expandedSections}
+        expandedSectionRenderers={{ ...expandedSections, ...sharedWithOthersSection }}
         bulkSelection={{ actions: bulkActions }}
         entityAttributesAreCamelCase={false}
         filterValueRenderers={FilterValueRenderers}

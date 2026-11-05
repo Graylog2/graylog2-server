@@ -25,6 +25,9 @@ import TitleCell from 'components/streams/StreamsOverview/cells/TitleCell';
 import ThroughputCell from 'components/streams/StreamsOverview/cells/ThroughputCell';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
+import SharedWithOthersCell from 'components/permissions/SharedWithOthers/SharedWithOthersCell';
+import { SHARED_WITH_OTHERS_ID } from 'components/permissions/SharedWithOthers/Constants';
+import { createGRN } from 'logic/permissions/GRN';
 
 import StatusCell from './cells/StatusCell';
 import StreamRulesCell from './cells/StreamRulesCell';
@@ -105,6 +108,12 @@ const customColumnRenderers = (
     [METRIC_COLUMN_IDS.routingPipelines]: {
       renderCell: (_value: unknown, stream) => <RoutingPipelinesCell stream={stream} />,
       staticWidth: COLUMN_WIDTH.reference,
+    },
+    [SHARED_WITH_OTHERS_ID]: {
+      renderCell: (_value: unknown, stream) => (
+        <SharedWithOthersCell entityId={stream.id} grn={createGRN('stream', stream.id)} />
+      ),
+      staticWidth: COLUMN_WIDTH.tags,
     },
     ...(extensionColumnRenderers || {}),
   },

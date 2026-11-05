@@ -27,6 +27,8 @@ import { createGRN } from 'logic/permissions/GRN';
 import { useTableFilterContext } from 'components/common/PaginatedEntityTable';
 import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
 import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
+import SharedWithOthersCell from 'components/permissions/SharedWithOthers/SharedWithOthersCell';
+import { SHARED_WITH_OTHERS_ID } from 'components/permissions/SharedWithOthers/Constants';
 
 const DashboardFavoriteItem = ({ favorite, dashboardId }: { favorite: boolean; dashboardId: string }) => {
   const queryClient = useQueryClient();
@@ -82,6 +84,12 @@ export const useColumnRenderers = (pluggableColumnRenderers?: ColumnRenderersByA
           renderCell: (favorite: boolean, dashboard: View) => (
             <DashboardFavoriteItem dashboardId={dashboard.id} favorite={favorite} />
           ),
+        },
+        [SHARED_WITH_OTHERS_ID]: {
+          renderCell: (_value: unknown, dashboard: View) => (
+            <SharedWithOthersCell entityId={dashboard.id} grn={createGRN('dashboard', dashboard.id)} />
+          ),
+          staticWidth: COLUMN_WIDTH.tags,
         },
         ...(pluggableColumnRenderers || {}),
       },
