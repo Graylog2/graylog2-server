@@ -14,29 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useEffect, useMemo } from 'react';
-
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
-import {
-  ConfigurationsActions,
-  ConfigurationsStore,
-  type PasswordComplexityConfigType,
-} from 'stores/configurations/ConfigurationsStore';
-import { getConfig } from 'components/configurations/helpers';
-import { useStore } from 'stores/connect';
+import type { PasswordComplexityConfigType } from 'stores/configurations/ConfigurationsStore';
+import useClusterConfig from 'hooks/useClusterConfig';
 import { DEFAULT_PASSWORD_COMPLEXITY_CONFIG } from 'logic/users/passwordComplexity';
 
 const usePasswordComplexityConfig = (): PasswordComplexityConfigType => {
-  const configuration = useStore(ConfigurationsStore, (state) => state?.configuration);
+  const { data } = useClusterConfig<PasswordComplexityConfigType>(ConfigurationType.PASSWORD_COMPLEXITY_CONFIG);
 
-  useEffect(() => {
-    ConfigurationsActions.listPasswordComplexityConfig(ConfigurationType.PASSWORD_COMPLEXITY_CONFIG);
-  }, []);
-
-  return useMemo(
-    () => getConfig(ConfigurationType.PASSWORD_COMPLEXITY_CONFIG, configuration) ?? DEFAULT_PASSWORD_COMPLEXITY_CONFIG,
-    [configuration],
-  );
+  return data ?? DEFAULT_PASSWORD_COMPLEXITY_CONFIG;
 };
 
 export default usePasswordComplexityConfig;
