@@ -390,7 +390,8 @@
       "delete_input": "입력 삭제",
       "delete_title": "입력 삭제 중",
       "delete_confirm": "입력 {{title}}을(를) 삭제하시겠습니까?"
-    }
+    },
+    "human_name": "입력"
   },
   "dot_badge": {
     "problematic_inputs": "일부 입력이 실패 상태이거나 설정 모드입니다."

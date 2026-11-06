@@ -109,6 +109,12 @@
       "last_seen_example": "Znajdź Sidecary, które nie komunikowały się od określonej daty:",
       "placeholder": "Znajdź Sidecary",
       "status_example": "Znajdź Sidecary o statusie <code>failing</code> lub <code>unknown</code>:"
+    },
+    "status_indicator": {
+      "running": "Działa",
+      "unknown": "Nieznany",
+      "failing": "Występują błędy",
+      "stopped": "Zatrzymany"
     }
   },
   "configuration_forms": {

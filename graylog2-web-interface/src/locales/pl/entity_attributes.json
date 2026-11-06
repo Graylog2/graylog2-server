@@ -113,5 +113,14 @@
   "Page": "Strona",
   "Reporter": "Zgłaszający",
   "Resolution": "Rozstrzygnięcie",
-  "Updated": "Zaktualizowano"
+  "Updated": "Zaktualizowano",
+  "Hit Rate": "Współczynnik trafień",
+  "Entries": "Wpisy",
+  "Data Adapter": "Adapter danych",
+  "Cache": "Pamięć podręczna",
+  "Throughput": "Przepustowość",
+  "Event Definition": "Definicja zdarzenia",
+  "Scheduling": "Harmonogram",
+  "Last Matched": "Ostatnie dopasowanie",
+  "Notifications": "Powiadomienia"
 }

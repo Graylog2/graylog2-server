@@ -63,7 +63,9 @@
       "info_indexer": "Messages which meet the criteria of the following filter rule(s) will not be routed to the index set.",
       "no_filters": "No filter have been found.",
       "title": "Filter Rules"
-    }
+    },
+    "status_enabled": "Enabled",
+    "status_disabled": "Disabled"
   },
   "outputs": {
     "assign_existing": "Assign existing Output",
@@ -372,7 +374,11 @@
       "max_processing_time": "Max processing time: {{ms}} ms (last 15 minutes)",
       "message_count_one": "{{count}} message in the last 24 hours",
       "message_count_other": "{{count}} messages in the last 24 hours",
-      "throughput": "{{throughput}} msg/s"
+      "throughput": "{{throughput}} msg/s",
+      "stream_rules_label": "stream rules",
+      "outputs_label": "stream outputs",
+      "filter_rules_label": "filter rules",
+      "associated_inputs_label": "associated inputs for {{title}}"
     },
     "columns": {
       "archiving": "Archiving",

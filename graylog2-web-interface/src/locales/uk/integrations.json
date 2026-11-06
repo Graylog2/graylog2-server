@@ -517,5 +517,11 @@
   },
   "whois_adapter_summary": {
     "unit_ms": "мс"
+  },
+  "aws_cloudwatch_wizard": {
+    "step_authorize_title": "Авторизація AWS Kinesis",
+    "step_kinesis_title": "Налаштування AWS Kinesis",
+    "step_health_check_title": "Перевірка працездатності AWS CloudWatch",
+    "step_review_title": "Перевірка AWS Kinesis"
   }
 }

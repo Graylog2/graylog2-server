@@ -296,7 +296,26 @@
     "event_procedure": "event procedure",
     "event_procedure_step": "event procedure step",
     "collection": "collection",
-    "collection_entities": "collection entities"
+    "collection_entities": "collection entities",
+    "event": "event",
+    "input": "input",
+    "data_adapter": "data adapter",
+    "cache": "cache",
+    "lookup_table": "lookup table",
+    "shared_entity": "shared entity",
+    "token": "token",
+    "sidecar": "sidecar",
+    "backend": "backend",
+    "pipeline_rule": "pipeline rule",
+    "input_profile": "input profile",
+    "forwarder": "forwarder",
+    "forwarder_input": "forwarder input",
+    "archives": "archives",
+    "repository": "repository",
+    "audit_event": "audit event",
+    "filter": "filter",
+    "title": "title",
+    "entity": "entity"
   },
   "marketplace_link": "the {{productName}} Marketplace",
   "chips_cell": {
@@ -514,7 +533,19 @@
     "intro": "Please enter a search query to search for a page, stream, dashboard, input or other entities.",
     "intro_hint": "To give you a head start, you will find a list of your <bold>last opened</bold> and <bold>favorite</bold> items below:",
     "no_results": "No search results found. Please try different search terms.",
-    "recent": "Recent"
+    "recent": "Recent",
+    "configuration_page": "Configurations / {{name}}",
+    "actions": {
+      "logout": "Logout current user",
+      "toggle_theme": "Toggle Theme",
+      "hide_scratchpad": "Hide Scratchpad",
+      "show_scratchpad": "Show Scratchpad"
+    },
+    "links": {
+      "show_profile": "Show profile for current user",
+      "edit_profile": "Edit profile for current user",
+      "welcome": "Welcome"
+    }
   },
   "scratchpad": {
     "title": "Scratchpad",

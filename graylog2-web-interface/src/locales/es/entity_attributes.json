@@ -113,5 +113,14 @@
   "Page": "Página",
   "Reporter": "Informante",
   "Resolution": "Resolución",
-  "Updated": "Actualizado"
+  "Updated": "Actualizado",
+  "Hit Rate": "Tasa de aciertos",
+  "Entries": "Entradas",
+  "Data Adapter": "Adaptador de datos",
+  "Cache": "Caché",
+  "Throughput": "Rendimiento",
+  "Event Definition": "Definición de evento",
+  "Scheduling": "Programación",
+  "Last Matched": "Última coincidencia",
+  "Notifications": "Notificaciones"
 }

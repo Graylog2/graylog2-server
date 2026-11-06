@@ -319,7 +319,9 @@
   },
   "system_notifications_table": {
     "title": "Powiadomienia",
-    "human_name": "powiadomień"
+    "human_name": "powiadomień",
+    "severity_urgent": "Pilne",
+    "severity_normal": "Informacja"
   },
   "actions_cell": {
     "dismiss": "Odrzuć"

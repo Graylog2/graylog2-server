@@ -282,7 +282,26 @@
     "event_procedure": "事件程序",
     "event_procedure_step": "事件程序步驟",
     "collection": "集合",
-    "collection_entities": "集合項目"
+    "collection_entities": "集合項目",
+    "event": "事件",
+    "input": "Input",
+    "data_adapter": "資料配接器",
+    "cache": "快取",
+    "lookup_table": "Lookup Table",
+    "shared_entity": "共用項目",
+    "token": "權杖",
+    "sidecar": "Sidecar",
+    "backend": "後端",
+    "pipeline_rule": "Pipeline 規則",
+    "input_profile": "輸入設定檔",
+    "forwarder": "Forwarder",
+    "forwarder_input": "Forwarder 輸入",
+    "archives": "封存檔",
+    "repository": "儲存庫",
+    "audit_event": "稽核事件",
+    "filter": "篩選器",
+    "title": "標題",
+    "entity": "實體"
   },
   "marketplace_link": "{{productName}} 市集",
   "chips_cell": {
@@ -499,7 +518,19 @@
     "intro": "請輸入搜尋查詢，以搜尋頁面、Stream、Dashboard、Input 或其他項目。",
     "intro_hint": "為了方便您快速開始，以下列出您<bold>最近開啟</bold>與<bold>常用</bold>的項目：",
     "no_results": "找不到搜尋結果，請嘗試其他搜尋字詞。",
-    "recent": "最近"
+    "recent": "最近",
+    "configuration_page": "設定 / {{name}}",
+    "actions": {
+      "logout": "登出目前使用者",
+      "toggle_theme": "切換佈景主題",
+      "hide_scratchpad": "隱藏便條區",
+      "show_scratchpad": "顯示便條區"
+    },
+    "links": {
+      "show_profile": "檢視目前使用者的個人資料",
+      "edit_profile": "編輯目前使用者的個人資料",
+      "welcome": "歡迎"
+    }
   },
   "scratchpad": {
     "title": "便條區",

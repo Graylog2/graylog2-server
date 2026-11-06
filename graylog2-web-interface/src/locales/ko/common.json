@@ -282,7 +282,26 @@
     "event_procedure": "이벤트 절차",
     "event_procedure_step": "이벤트 절차 단계",
     "collection": "컬렉션",
-    "collection_entities": "컬렉션 항목"
+    "collection_entities": "컬렉션 항목",
+    "event": "이벤트",
+    "input": "입력",
+    "data_adapter": "데이터 어댑터",
+    "cache": "캐시",
+    "lookup_table": "조회 테이블",
+    "shared_entity": "공유 항목",
+    "token": "토큰",
+    "sidecar": "Sidecar",
+    "backend": "백엔드",
+    "pipeline_rule": "파이프라인 규칙",
+    "input_profile": "입력 프로필",
+    "forwarder": "Forwarder",
+    "forwarder_input": "Forwarder 입력",
+    "archives": "아카이브",
+    "repository": "리포지토리",
+    "audit_event": "감사 이벤트",
+    "filter": "필터",
+    "title": "제목",
+    "entity": "엔티티"
   },
   "marketplace_link": "{{productName}} Marketplace",
   "chips_cell": {
@@ -499,7 +518,19 @@
     "intro": "페이지, 스트림, 대시보드, 입력 또는 기타 항목을 검색하려면 검색 쿼리를 입력하십시오.",
     "intro_hint": "빠르게 시작할 수 있도록 <bold>최근에 연</bold> 항목과 <bold>즐겨찾기</bold> 항목 목록이 아래에 표시됩니다:",
     "no_results": "검색 결과가 없습니다. 다른 검색어를 사용해 보십시오.",
-    "recent": "최근"
+    "recent": "최근",
+    "configuration_page": "구성 / {{name}}",
+    "actions": {
+      "logout": "현재 사용자 로그아웃",
+      "toggle_theme": "테마 전환",
+      "hide_scratchpad": "스크래치패드 숨기기",
+      "show_scratchpad": "스크래치패드 표시"
+    },
+    "links": {
+      "show_profile": "현재 사용자 프로필 보기",
+      "edit_profile": "현재 사용자 프로필 편집",
+      "welcome": "시작하기"
+    }
   },
   "scratchpad": {
     "title": "스크래치패드",

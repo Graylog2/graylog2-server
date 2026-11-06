@@ -63,7 +63,9 @@
       "info_indexer": "다음 필터 규칙의 조건을 충족하는 메시지는 인덱스 세트로 라우팅되지 않습니다.",
       "no_filters": "필터가 없습니다.",
       "title": "필터 규칙"
-    }
+    },
+    "status_enabled": "사용",
+    "status_disabled": "사용 안 함"
   },
   "outputs": {
     "assign_existing": "기존 출력 할당",
@@ -360,7 +362,11 @@
       "index_set_not_found": "찾을 수 없음",
       "max_processing_time": "최대 처리 시간: {{ms}}ms(최근 15분)",
       "message_count_other": "최근 24시간 동안 메시지 {{count}}개",
-      "throughput": "{{throughput}} msg/s"
+      "throughput": "{{throughput}} msg/s",
+      "stream_rules_label": "스트림 규칙",
+      "outputs_label": "스트림 출력",
+      "filter_rules_label": "필터 규칙",
+      "associated_inputs_label": "{{title}}의 연결된 입력"
     },
     "columns": {
       "archiving": "아카이브",

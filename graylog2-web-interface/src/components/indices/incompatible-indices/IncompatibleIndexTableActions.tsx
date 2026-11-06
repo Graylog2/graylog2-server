@@ -18,6 +18,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
+import useServerText from 'util/serverText';
 import { Button, ButtonToolbar, Label } from 'components/bootstrap';
 import { ConfirmDialog, ProgressBar } from 'components/common';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
@@ -60,6 +61,7 @@ type Props = {
 
 const IncompatibleIndexTableActions = ({ index }: Props) => {
   const { t } = useTranslation('indexsets');
+  const serverText = useServerText();
   const {
     archiveActionsAvailable,
     reindexActionsAvailable,
@@ -166,7 +168,7 @@ const IncompatibleIndexTableActions = ({ index }: Props) => {
   return (
     <ActionsToolbar>
       {pendingStatus?.state === 'failed' && (
-        <Label bsStyle="danger" title={pendingStatus.message}>
+        <Label bsStyle="danger" title={serverText(pendingStatus.message)}>
           {pendingStatus.label}
         </Label>
       )}

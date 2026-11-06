@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { Stream } from 'logic/streams/types';
 import useStreamDestinationFilterRuleCount from 'components/streams/hooks/useStreamDestinationFilterRuleCount';
@@ -25,6 +26,7 @@ type Props = {
 };
 
 const DestinationFilterRulesCell = ({ stream }: Props) => {
+  const { t } = useTranslation('streams');
   const hasFilterRules = !stream.is_default && stream.is_editable;
   const { data: destinationFilterRuleCount } = useStreamDestinationFilterRuleCount(stream.id, hasFilterRules);
 
@@ -42,7 +44,7 @@ const DestinationFilterRulesCell = ({ stream }: Props) => {
       entityId={stream.id}
       section="destination_filters"
       count={filterRuleCount}
-      label="filter rules"
+      label={t('streams_overview.cells.filter_rules_label')}
     />
   );
 };

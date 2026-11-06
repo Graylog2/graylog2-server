@@ -113,5 +113,14 @@
   "Page": "ページ",
   "Reporter": "報告者",
   "Resolution": "対応結果",
-  "Updated": "更新日時"
+  "Updated": "更新日時",
+  "Hit Rate": "ヒット率",
+  "Entries": "エントリー",
+  "Data Adapter": "データアダプター",
+  "Cache": "キャッシュ",
+  "Throughput": "スループット",
+  "Event Definition": "Event Definition",
+  "Scheduling": "スケジュール",
+  "Last Matched": "最終一致",
+  "Notifications": "通知"
 }

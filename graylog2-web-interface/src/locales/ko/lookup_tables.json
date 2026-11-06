@@ -262,7 +262,8 @@
     "delete": "삭제",
     "delete_title": "캐시 삭제",
     "delete_confirm": "캐시 \"{{title}}\"을(를) 삭제하시겠습니까?",
-    "more_actions": "{{name}}의 추가 작업"
+    "more_actions": "{{name}}의 추가 작업",
+    "not_available": "해당 없음"
   },
   "caffeine_doc": {
     "cache_size_label": "캐시 크기",
@@ -301,7 +302,13 @@
     "title_required": "제목은 필수입니다",
     "name_required": "이름은 필수입니다",
     "cache_required": "캐시는 필수입니다",
-    "data_adapter_required": "데이터 어댑터는 필수입니다"
+    "data_adapter_required": "데이터 어댑터는 필수입니다",
+    "steps": {
+      "lookup_table": "조회 테이블",
+      "cache": "캐시(필수)",
+      "data_adapter": "데이터 어댑터(필수)",
+      "summary": "요약"
+    }
   },
   "lut_fields": {
     "title_label": "제목 *",

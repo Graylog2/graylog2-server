@@ -716,7 +716,8 @@
     "failures_count_load_failed": "Caricamento del numero di errori dell'indexer non riuscito con stato",
     "failures_count_load_failed_title": "Impossibile caricare il numero di errori dell'indexer",
     "indices_multiple_load_failed": "Caricamento di più indici dell'indexer non riuscito con stato",
-    "indices_multiple_load_failed_title": "Impossibile caricare più indici dell'indexer"
+    "indices_multiple_load_failed_title": "Impossibile caricare più indici dell'indexer",
+    "profiles_custom_field_mappings_label": "mappature dei campi personalizzati"
   },
   "notifications": {
     "create_success": "Index Set '{{title}}' creato correttamente",

@@ -741,7 +741,8 @@
     "failures_count_load_failed": "Ładowanie liczby błędów indeksera nie powiodło się, status",
     "failures_count_load_failed_title": "Nie udało się załadować liczby błędów indeksera",
     "indices_multiple_load_failed": "Ładowanie wielu indeksów indeksera nie powiodło się, status",
-    "indices_multiple_load_failed_title": "Nie udało się załadować wielu indeksów indeksera"
+    "indices_multiple_load_failed_title": "Nie udało się załadować wielu indeksów indeksera",
+    "profiles_custom_field_mappings_label": "niestandardowe mapowania pól"
   },
   "notifications": {
     "create_success": "Pomyślnie utworzono zestaw indeksów '{{title}}'",

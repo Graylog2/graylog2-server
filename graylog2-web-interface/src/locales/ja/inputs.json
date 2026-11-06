@@ -390,7 +390,8 @@
       "delete_input": "Input を削除",
       "delete_title": "Input の削除",
       "delete_confirm": "Input {{title}} を本当に削除しますか？"
-    }
+    },
+    "human_name": "Input"
   },
   "dot_badge": {
     "problematic_inputs": "失敗状態またはセットアップモードの Input があります。"

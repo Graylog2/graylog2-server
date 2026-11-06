@@ -32,7 +32,8 @@
     "refresh_human_name": "이벤트",
     "replay_search": "검색 다시 실행",
     "histogram_series_events": "이벤트",
-    "histogram_series_alerts": "경고"
+    "histogram_series_alerts": "경고",
+    "human_name": "이벤트"
   },
   "alerts_replay": {
     "cannot_replay": "이 이벤트를 다시 실행할 수 없습니다: {{reason}} 다른 이벤트를 선택하십시오.",

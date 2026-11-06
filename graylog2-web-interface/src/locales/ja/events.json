@@ -32,7 +32,8 @@
     "refresh_human_name": "イベント",
     "replay_search": "検索を再実行",
     "histogram_series_events": "イベント",
-    "histogram_series_alerts": "アラート"
+    "histogram_series_alerts": "アラート",
+    "human_name": "イベント"
   },
   "alerts_replay": {
     "cannot_replay": "このイベントを再実行できません: {{reason}} 別のイベントを選択してください。",

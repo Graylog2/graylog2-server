@@ -17,6 +17,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
+import i18n from 'i18n';
 import { Label } from 'components/bootstrap';
 import type { ColumnRenderers, ColumnSchema } from 'components/common/EntityDataTable';
 import { Icon, Link } from 'components/common';
@@ -150,9 +151,9 @@ export const createColumnRenderers = (productName: string): ColumnRenderers<Clus
     },
     datanode_version: {
       renderCell: (_value, entity) => {
-        const versionLabel = entity.datanode_version ?? 'N/A';
+        const versionLabel = entity.datanode_version ?? i18n.t('details_page.not_available', { ns: 'datanode' });
         const showWarning = entity.version_compatible === false;
-        const warningMessage = `This data node version is incompatible with your current ${productName} version, so metrics are disabled.`;
+        const warningMessage = i18n.t('details_page.version_incompatible', { ns: 'datanode', productName });
 
         return (
           <SecondaryText title={showWarning ? warningMessage : undefined}>

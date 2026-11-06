@@ -91,6 +91,12 @@
       "last_seen_example": "查找自特定日期以来未通信的 Sidecar：",
       "placeholder": "查找 Sidecar",
       "status_example": "查找状态为 <code>failing</code> 或 <code>unknown</code> 的 Sidecar："
+    },
+    "status_indicator": {
+      "running": "运行中",
+      "unknown": "未知",
+      "failing": "故障",
+      "stopped": "已停止"
     }
   },
   "configuration_forms": {

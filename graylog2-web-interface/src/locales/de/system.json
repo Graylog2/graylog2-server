@@ -309,7 +309,9 @@
   },
   "system_notifications_table": {
     "title": "Benachrichtigungen",
-    "human_name": "Benachrichtigungen"
+    "human_name": "Benachrichtigungen",
+    "severity_urgent": "Dringend",
+    "severity_normal": "Info"
   },
   "actions_cell": {
     "dismiss": "Verwerfen"

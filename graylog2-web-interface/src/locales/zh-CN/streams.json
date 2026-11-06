@@ -63,7 +63,9 @@
       "info_indexer": "符合以下过滤规则条件的消息将不会被路由到索引集。",
       "no_filters": "未找到过滤器。",
       "title": "过滤规则"
-    }
+    },
+    "status_enabled": "已启用",
+    "status_disabled": "已禁用"
   },
   "outputs": {
     "assign_existing": "分配现有 Output",
@@ -360,7 +362,11 @@
       "index_set_not_found": "未找到",
       "max_processing_time": "最长处理时间：{{ms}} ms（最近 15 分钟）",
       "message_count_other": "过去 24 小时内有 {{count}} 条消息",
-      "throughput": "{{throughput}} msg/s"
+      "throughput": "{{throughput}} msg/s",
+      "stream_rules_label": "Stream 规则",
+      "outputs_label": "Stream 输出",
+      "filter_rules_label": "过滤规则",
+      "associated_inputs_label": "{{title}} 的关联 Input"
     },
     "columns": {
       "archiving": "归档",

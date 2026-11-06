@@ -392,7 +392,8 @@
       "delete_input": "Elimina input",
       "delete_title": "Eliminazione dell'Input",
       "delete_confirm": "Vuoi davvero eliminare l'input {{title}}?"
-    }
+    },
+    "human_name": "input"
   },
   "dot_badge": {
     "problematic_inputs": "Alcuni input sono in stato non riuscito o in modalità di configurazione."

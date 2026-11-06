@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import upperFirst from 'lodash/upperFirst';
+import { useTranslation } from 'react-i18next';
 
 import { OverlayTrigger, Icon } from 'components/common';
 import SidecarStatusEnum from 'logic/sidecar/SidecarStatusEnum';
@@ -32,9 +32,10 @@ type Props = {
 };
 
 const StatusIndicator = ({ message: messageProp = '', status = -1, lastSeen = undefined, id = '' }: Props) => {
+  const { t } = useTranslation('sidecars');
   const { toUserTimezone } = useUserDateTime();
   let message = messageProp;
-  const text = upperFirst(SidecarStatusEnum.toString(status));
+  const text = t(`common.status_indicator.${SidecarStatusEnum.toString(status)}`);
   const lastSeenDateTime = toUserTimezone(lastSeen);
 
   let icon;

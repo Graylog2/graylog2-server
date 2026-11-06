@@ -22,6 +22,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import i18n from 'i18n';
 import { QueryHelper, RelativeTime, PaginatedEntityTable, Link } from 'components/common';
 import Routes from 'routing/Routes';
+import ServerText from 'components/common/ServerText';
 import FilterValueRenderers from 'components/event-definitions/FilterValueRenderers';
 import { keyFn, fetchEventDefinitions } from 'components/event-definitions/hooks/useEventDefinitions';
 import BulkActions from 'components/event-definitions/event-definitions/BulkActions';
@@ -47,14 +48,19 @@ const getCustomColumnRenderers = (
   tacticsTechniquesPlugin?: TacticsTechniquesColumnPlugin,
 ) => ({
   attributes: {
+    description: {
+      renderCell: (description: string) => <ServerText text={description} />,
+    },
     title: {
       renderCell: (title: string, eventDefinition: EventDefinition) => (
-        <Link to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>{title}</Link>
+        <Link to={Routes.ALERTS.DEFINITIONS.show(eventDefinition.id)}>
+          <ServerText text={title} />
+        </Link>
       ),
     },
     matched_at: {
       renderCell: (_matched_at: string, eventDefinition: EventDefinition) =>
-        eventDefinition.matched_at ? <RelativeTime dateTime={eventDefinition.matched_at} /> : 'Never',
+        eventDefinition.matched_at ? <RelativeTime dateTime={eventDefinition.matched_at} /> : i18n.t('time.never', { ns: 'common' }),
       staticWidth: COLUMN_WIDTH.relativeTime,
     },
     scheduling: {

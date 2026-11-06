@@ -17,7 +17,8 @@
     "not_available": "brak danych",
     "certificate_valid_until": "Certyfikat ważny do:",
     "datanode_version": "Wersja węzła danych:",
-    "configuration_warnings": "Ostrzeżenia konfiguracyjne"
+    "configuration_warnings": "Ostrzeżenia konfiguracyjne",
+    "version_incompatible": "Ta wersja data node jest niezgodna z bieżącą wersją {{productName}}, dlatego metryki są wyłączone."
   },
   "upgrade_status": {
     "title": "Status aktualizacji",

@@ -265,7 +265,8 @@
     "delete": "Видалити",
     "delete_title": "Видалити кеш",
     "delete_confirm": "Ви впевнені, що хочете видалити кеш «{{title}}»?",
-    "more_actions": "Більше дій для {{name}}"
+    "more_actions": "Більше дій для {{name}}",
+    "not_available": "н/д"
   },
   "caffeine_doc": {
     "cache_size_label": "Розмір кешу",
@@ -304,7 +305,13 @@
     "title_required": "Потрібен заголовок",
     "name_required": "Потрібна назва",
     "cache_required": "Потрібен кеш",
-    "data_adapter_required": "Потрібен адаптер даних"
+    "data_adapter_required": "Потрібен адаптер даних",
+    "steps": {
+      "lookup_table": "Таблиця підстановки",
+      "cache": "Кеш (обов’язково)",
+      "data_adapter": "Адаптер даних (обов’язково)",
+      "summary": "Підсумок"
+    }
   },
   "lut_fields": {
     "title_label": "Заголовок *",

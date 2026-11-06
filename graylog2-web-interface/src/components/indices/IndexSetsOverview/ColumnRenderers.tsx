@@ -24,6 +24,7 @@ import { Timestamp } from 'components/common';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
 import NumberUtils from 'util/NumberUtils';
 import { formatReadableNumber } from 'util/NumberFormatting';
+import useServerText from 'util/serverText';
 
 import { getIndexSetCategoryTitle } from './Constants';
 import type { IndexSetCategory, IndexSetEntity } from './types';
@@ -34,6 +35,13 @@ import DeflectorHealthCell from './cells/DeflectorHealthCell';
 import StreamCountCell from './cells/StreamCountCell';
 import { METRIC_COLUMN_IDS } from './metricColumns';
 
+// The built-in index sets are created with English descriptions.
+const TranslatedDescription = ({ description }: { description: string }) => {
+  const serverText = useServerText();
+
+  return <TextOverflowEllipsis>{serverText(description)}</TextOverflowEllipsis>;
+};
+
 const customColumnRenderers = (
   extensionColumnRenderers: ColumnRenderersByAttribute<IndexSetEntity>,
 ): ColumnRenderers<IndexSetEntity> => ({
@@ -43,7 +51,7 @@ const customColumnRenderers = (
       staticWidth: COLUMN_WIDTH.title,
     },
     description: {
-      renderCell: (description: string) => <TextOverflowEllipsis>{description}</TextOverflowEllipsis>,
+      renderCell: (description: string) => <TranslatedDescription description={description} />,
     },
     index_prefix: {
       renderCell: (indexPrefix: string) => indexPrefix,

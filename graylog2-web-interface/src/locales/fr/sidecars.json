@@ -103,6 +103,12 @@
       "last_seen_example": "Trouver les sidecars qui n'ont pas communiqué depuis une date précise :",
       "placeholder": "Rechercher des sidecars",
       "status_example": "Trouver les sidecars avec un statut <code>failing</code> ou <code>unknown</code> :"
+    },
+    "status_indicator": {
+      "running": "En cours d'exécution",
+      "unknown": "Inconnu",
+      "failing": "En échec",
+      "stopped": "Arrêté"
     }
   },
   "configuration_forms": {

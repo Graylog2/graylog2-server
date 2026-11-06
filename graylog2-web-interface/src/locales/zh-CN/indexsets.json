@@ -666,7 +666,8 @@
     "failures_count_load_failed": "加载索引器失败数量失败，状态",
     "failures_count_load_failed_title": "无法加载索引器失败数量",
     "indices_multiple_load_failed": "加载 Indexer 多个索引失败，状态",
-    "indices_multiple_load_failed_title": "无法加载 Indexer 多个索引"
+    "indices_multiple_load_failed_title": "无法加载 Indexer 多个索引",
+    "profiles_custom_field_mappings_label": "自定义字段映射"
   },
   "notifications": {
     "create_success": "已成功创建索引集 '{{title}}'",

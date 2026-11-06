@@ -17,7 +17,8 @@
     "not_available": "N/A",
     "certificate_valid_until": "Certificate valid until:",
     "datanode_version": "Datanode version:",
-    "configuration_warnings": "Configuration warnings"
+    "configuration_warnings": "Configuration warnings",
+    "version_incompatible": "This data node version is incompatible with your current {{productName}} version, so metrics are disabled."
   },
   "upgrade_status": {
     "title": "Upgrade status",

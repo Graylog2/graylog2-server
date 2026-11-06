@@ -113,5 +113,14 @@
   "Page": "Page",
   "Reporter": "Reporter",
   "Resolution": "Resolution",
-  "Updated": "Updated"
+  "Updated": "Updated",
+  "Hit Rate": "Hit Rate",
+  "Entries": "Entries",
+  "Data Adapter": "Data Adapter",
+  "Cache": "Cache",
+  "Throughput": "Throughput",
+  "Event Definition": "Event Definition",
+  "Scheduling": "Scheduling",
+  "Last Matched": "Last Matched",
+  "Notifications": "Notifications"
 }

@@ -20,6 +20,7 @@ import styled from 'styled-components';
 
 import Routes from 'routing/Routes';
 import { Link } from 'components/common';
+import ServerText from 'components/common/ServerText';
 import { Label } from 'components/bootstrap';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
@@ -37,7 +38,8 @@ const TitleCell = ({ indexSet }: Props) => {
 
   return (
     <span>
-      <Link to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id)}>{indexSet.title}</Link>
+      <Link to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id)}><ServerText text={indexSet.title} />
+      </Link>
       {indexSet.default && (
         <StatusLabel bsStyle="primary" bsSize="xsmall">
           {t('overview_table.default')}

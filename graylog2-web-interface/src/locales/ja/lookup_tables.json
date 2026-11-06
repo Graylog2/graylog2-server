@@ -262,7 +262,8 @@
     "delete": "削除",
     "delete_title": "キャッシュを削除",
     "delete_confirm": "キャッシュ \"{{title}}\" を削除してもよろしいですか？",
-    "more_actions": "{{name}} のその他の操作"
+    "more_actions": "{{name}} のその他の操作",
+    "not_available": "該当なし"
   },
   "caffeine_doc": {
     "cache_size_label": "キャッシュサイズ",
@@ -301,7 +302,13 @@
     "title_required": "タイトルは必須です",
     "name_required": "名前は必須です",
     "cache_required": "キャッシュは必須です",
-    "data_adapter_required": "データアダプターは必須です"
+    "data_adapter_required": "データアダプターは必須です",
+    "steps": {
+      "lookup_table": "ルックアップテーブル",
+      "cache": "キャッシュ（必須）",
+      "data_adapter": "データアダプター（必須）",
+      "summary": "概要"
+    }
   },
   "lut_fields": {
     "title_label": "タイトル *",

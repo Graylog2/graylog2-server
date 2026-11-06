@@ -113,5 +113,14 @@
   "Page": "페이지",
   "Reporter": "보고자",
   "Resolution": "해결",
-  "Updated": "업데이트일"
+  "Updated": "업데이트일",
+  "Hit Rate": "적중률",
+  "Entries": "항목",
+  "Data Adapter": "데이터 어댑터",
+  "Cache": "캐시",
+  "Throughput": "처리량",
+  "Event Definition": "이벤트 정의",
+  "Scheduling": "스케줄링",
+  "Last Matched": "마지막 일치",
+  "Notifications": "알림"
 }

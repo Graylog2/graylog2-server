@@ -282,7 +282,26 @@
     "event_procedure": "イベントプロシージャ",
     "event_procedure_step": "イベントプロシージャのステップ",
     "collection": "コレクション",
-    "collection_entities": "コレクションの項目"
+    "collection_entities": "コレクションの項目",
+    "event": "イベント",
+    "input": "Input",
+    "data_adapter": "データアダプター",
+    "cache": "キャッシュ",
+    "lookup_table": "ルックアップテーブル",
+    "shared_entity": "共有項目",
+    "token": "トークン",
+    "sidecar": "サイドカー",
+    "backend": "バックエンド",
+    "pipeline_rule": "パイプラインルール",
+    "input_profile": "Inputプロファイル",
+    "forwarder": "Forwarder",
+    "forwarder_input": "Forwarder Input",
+    "archives": "アーカイブ",
+    "repository": "リポジトリ",
+    "audit_event": "監査イベント",
+    "filter": "フィルター",
+    "title": "タイトル",
+    "entity": "エンティティ"
   },
   "marketplace_link": "{{productName}} Marketplace",
   "chips_cell": {
@@ -499,7 +518,19 @@
     "intro": "ページ、ストリーム、ダッシュボード、入力、その他の項目を検索するには、検索クエリを入力してください。",
     "intro_hint": "手早く始められるように、<bold>最近開いた</bold>項目と<bold>お気に入り</bold>の項目の一覧を以下に表示します:",
     "no_results": "検索結果が見つかりませんでした。別の検索語句を試してください。",
-    "recent": "最近"
+    "recent": "最近",
+    "configuration_page": "設定 / {{name}}",
+    "actions": {
+      "logout": "現在のユーザーをログアウト",
+      "toggle_theme": "テーマを切り替え",
+      "hide_scratchpad": "スクラッチパッドを非表示",
+      "show_scratchpad": "スクラッチパッドを表示"
+    },
+    "links": {
+      "show_profile": "現在のユーザーのプロフィールを表示",
+      "edit_profile": "現在のユーザーのプロフィールを編集",
+      "welcome": "ようこそ"
+    }
   },
   "scratchpad": {
     "title": "スクラッチパッド",

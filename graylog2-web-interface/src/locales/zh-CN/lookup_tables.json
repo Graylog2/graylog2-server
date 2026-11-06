@@ -262,7 +262,8 @@
     "delete": "删除",
     "delete_title": "删除缓存",
     "delete_confirm": "您确定要删除缓存 \"{{title}}\" 吗？",
-    "more_actions": "{{name}} 的更多操作"
+    "more_actions": "{{name}} 的更多操作",
+    "not_available": "不适用"
   },
   "caffeine_doc": {
     "cache_size_label": "缓存大小",
@@ -301,7 +302,13 @@
     "title_required": "必须填写标题",
     "name_required": "必须填写名称",
     "cache_required": "必须选择缓存",
-    "data_adapter_required": "必须选择数据适配器"
+    "data_adapter_required": "必须选择数据适配器",
+    "steps": {
+      "lookup_table": "Lookup Table",
+      "cache": "缓存（必填）",
+      "data_adapter": "数据适配器（必填）",
+      "summary": "摘要"
+    }
   },
   "lut_fields": {
     "title_label": "标题 *",

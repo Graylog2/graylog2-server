@@ -716,7 +716,8 @@
     "failures_count_load_failed": "Error al cargar el recuento de fallos del indexador. Estado",
     "failures_count_load_failed_title": "No se pudo cargar el recuento de fallos del indexador",
     "indices_multiple_load_failed": "Error al cargar varios índices del indexador. Estado",
-    "indices_multiple_load_failed_title": "No se pudieron cargar varios índices del indexador"
+    "indices_multiple_load_failed_title": "No se pudieron cargar varios índices del indexador",
+    "profiles_custom_field_mappings_label": "asignaciones de campos personalizadas"
   },
   "notifications": {
     "create_success": "El conjunto de índices '{{title}}' se ha creado correctamente",

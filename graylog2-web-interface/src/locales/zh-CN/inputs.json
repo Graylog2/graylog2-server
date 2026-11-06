@@ -390,7 +390,8 @@
       "delete_input": "删除 Input",
       "delete_title": "删除 Input",
       "delete_confirm": "您确定要删除 Input {{title}} 吗？"
-    }
+    },
+    "human_name": "Input"
   },
   "dot_badge": {
     "problematic_inputs": "部分 Input 处于失败状态或设置模式。"

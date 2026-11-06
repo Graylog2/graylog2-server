@@ -113,5 +113,14 @@
   "Page": "页面",
   "Reporter": "报告人",
   "Resolution": "处理结果",
-  "Updated": "更新时间"
+  "Updated": "更新时间",
+  "Hit Rate": "命中率",
+  "Entries": "条目",
+  "Data Adapter": "数据适配器",
+  "Cache": "缓存",
+  "Throughput": "吞吐量",
+  "Event Definition": "Event Definition",
+  "Scheduling": "调度",
+  "Last Matched": "上次匹配",
+  "Notifications": "通知"
 }

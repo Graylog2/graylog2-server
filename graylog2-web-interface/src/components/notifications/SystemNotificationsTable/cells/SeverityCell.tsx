@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Badge } from 'components/bootstrap';
 import type { NotificationType } from 'components/notifications/types';
@@ -24,19 +25,24 @@ const COLOR_BY_SEVERITY: Record<string, 'danger' | 'info' | 'default'> = {
   normal: 'info',
 };
 
-const LABEL_BY_SEVERITY: Record<string, string> = {
-  urgent: 'Urgent',
-  normal: 'Info',
+const LABEL_KEY_BY_SEVERITY: Record<string, string> = {
+  urgent: 'system_notifications_table.severity_urgent',
+  normal: 'system_notifications_table.severity_normal',
 };
 
 type Props = { row: NotificationType };
 
 const capitalize = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
 
-const SeverityCell = ({ row }: Props) => (
-  <Badge bsStyle={COLOR_BY_SEVERITY[row.severity] ?? 'default'}>
-    {LABEL_BY_SEVERITY[row.severity] ?? capitalize(row.severity)}
-  </Badge>
-);
+const SeverityCell = ({ row }: Props) => {
+  const { t } = useTranslation('system');
+  const labelKey = LABEL_KEY_BY_SEVERITY[row.severity];
+
+  return (
+    <Badge bsStyle={COLOR_BY_SEVERITY[row.severity] ?? 'default'}>
+      {labelKey ? t(labelKey) : capitalize(row.severity)}
+    </Badge>
+  );
+};
 
 export default SeverityCell;

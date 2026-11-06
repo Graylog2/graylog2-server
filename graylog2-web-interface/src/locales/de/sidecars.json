@@ -97,6 +97,12 @@
       "last_seen_example": "Sidecars finden, die seit einem bestimmten Datum nicht mehr kommuniziert haben:",
       "placeholder": "Sidecars durchsuchen",
       "status_example": "Sidecars mit dem Status <code>failing</code> oder <code>unknown</code> finden:"
+    },
+    "status_indicator": {
+      "running": "Läuft",
+      "unknown": "Unbekannt",
+      "failing": "Fehlerhaft",
+      "stopped": "Gestoppt"
     }
   },
   "configuration_forms": {

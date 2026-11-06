@@ -262,7 +262,8 @@
     "delete": "刪除",
     "delete_title": "刪除快取",
     "delete_confirm": "確定要刪除快取「{{title}}」嗎？",
-    "more_actions": "{{name}} 的更多操作"
+    "more_actions": "{{name}} 的更多操作",
+    "not_available": "不適用"
   },
   "caffeine_doc": {
     "cache_size_label": "快取大小",
@@ -301,7 +302,13 @@
     "title_required": "必須填寫標題",
     "name_required": "必須填寫名稱",
     "cache_required": "必須選擇快取",
-    "data_adapter_required": "必須選擇資料配接器"
+    "data_adapter_required": "必須選擇資料配接器",
+    "steps": {
+      "lookup_table": "Lookup Table",
+      "cache": "快取（必填）",
+      "data_adapter": "資料配接器（必填）",
+      "summary": "摘要"
+    }
   },
   "lut_fields": {
     "title_label": "標題 *",

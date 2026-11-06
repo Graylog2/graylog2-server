@@ -741,7 +741,8 @@
     "failures_count_load_failed": "Не вдалося завантажити кількість збоїв індексатора, стан",
     "failures_count_load_failed_title": "Не вдалося завантажити кількість збоїв індексатора",
     "indices_multiple_load_failed": "Не вдалося завантажити кілька індексів індексатора, стан",
-    "indices_multiple_load_failed_title": "Не вдалося завантажити кілька індексів індексатора"
+    "indices_multiple_load_failed_title": "Не вдалося завантажити кілька індексів індексатора",
+    "profiles_custom_field_mappings_label": "користувацькі відображення полів"
   },
   "notifications": {
     "create_success": "Набір індексів '{{title}}' успішно створено",

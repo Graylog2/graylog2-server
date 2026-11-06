@@ -113,5 +113,14 @@
   "Page": "頁面",
   "Reporter": "回報者",
   "Resolution": "處理結果",
-  "Updated": "更新時間"
+  "Updated": "更新時間",
+  "Hit Rate": "命中率",
+  "Entries": "項目",
+  "Data Adapter": "資料配接器",
+  "Cache": "快取",
+  "Throughput": "輸送量",
+  "Event Definition": "Event Definition",
+  "Scheduling": "排程",
+  "Last Matched": "上次符合",
+  "Notifications": "通知"
 }

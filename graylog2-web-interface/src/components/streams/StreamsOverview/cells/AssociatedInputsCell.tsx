@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { Stream } from 'logic/streams/types';
 import { Spinner } from 'components/common';
@@ -29,6 +30,7 @@ type Props = {
 const SECTION_NAME = METRIC_COLUMN_IDS.associatedInputs;
 
 const AssociatedInputsCell = ({ stream }: Props) => {
+  const { t } = useTranslation('streams');
   const { metrics, isInitialLoading, isError } = useStreamMetricsFor(stream.id);
 
   if (isInitialLoading && !metrics) {
@@ -44,7 +46,7 @@ const AssociatedInputsCell = ({ stream }: Props) => {
       entityId={stream.id}
       section={SECTION_NAME}
       count={metrics.associated_inputs.length}
-      label={`associated inputs for ${stream.title}`}
+      label={t('streams_overview.cells.associated_inputs_label', { title: stream.title })}
     />
   );
 };

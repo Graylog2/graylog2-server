@@ -17,7 +17,8 @@
     "not_available": "해당 없음",
     "certificate_valid_until": "인증서 유효 기간:",
     "datanode_version": "Datanode 버전:",
-    "configuration_warnings": "구성 경고"
+    "configuration_warnings": "구성 경고",
+    "version_incompatible": "이 Data Node 버전은 현재 {{productName}} 버전과 호환되지 않으므로 메트릭이 비활성화되었습니다."
   },
   "upgrade_status": {
     "title": "업그레이드 상태",

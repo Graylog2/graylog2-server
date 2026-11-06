@@ -299,7 +299,26 @@
     "event_procedure": "Eventprozedur",
     "event_procedure_step": "Schritt einer Eventprozedur",
     "collection": "Collection",
-    "collection_entities": "Collection-Einträge"
+    "collection_entities": "Collection-Einträge",
+    "event": "Event",
+    "input": "Input",
+    "data_adapter": "Data-Adapter",
+    "cache": "Cache",
+    "lookup_table": "Lookup-Tabelle",
+    "shared_entity": "geteilter Eintrag",
+    "token": "Token",
+    "sidecar": "Sidecar",
+    "backend": "Backend",
+    "pipeline_rule": "Pipeline-Regel",
+    "input_profile": "Input-Profil",
+    "forwarder": "Forwarder",
+    "forwarder_input": "Forwarder-Input",
+    "archives": "Archive",
+    "repository": "Repository",
+    "audit_event": "Audit-Ereignis",
+    "filter": "Filter",
+    "title": "Titel",
+    "entity": "Entität"
   },
   "marketplace_link": "{{productName}} Marketplace",
   "chips_cell": {
@@ -517,7 +536,19 @@
     "intro": "Geben Sie eine Suchanfrage ein, um nach einer Seite, einem Stream, einem Dashboard, einem Input oder anderen Einträgen zu suchen.",
     "intro_hint": "Damit Sie schnell loslegen können, finden Sie unten eine Liste Ihrer <bold>zuletzt geöffneten</bold> und <bold>favorisierten</bold> Einträge:",
     "no_results": "Keine Suchergebnisse gefunden. Bitte versuchen Sie andere Suchbegriffe.",
-    "recent": "Zuletzt"
+    "recent": "Zuletzt",
+    "configuration_page": "Konfigurationen / {{name}}",
+    "actions": {
+      "logout": "Aktuellen Benutzer abmelden",
+      "toggle_theme": "Design umschalten",
+      "hide_scratchpad": "Scratchpad ausblenden",
+      "show_scratchpad": "Scratchpad anzeigen"
+    },
+    "links": {
+      "show_profile": "Profil des aktuellen Benutzers anzeigen",
+      "edit_profile": "Profil des aktuellen Benutzers bearbeiten",
+      "welcome": "Willkommen"
+    }
   },
   "scratchpad": {
     "title": "Scratchpad",

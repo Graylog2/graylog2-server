@@ -304,7 +304,9 @@
   },
   "system_notifications_table": {
     "title": "通知",
-    "human_name": "通知"
+    "human_name": "通知",
+    "severity_urgent": "紧急",
+    "severity_normal": "信息"
   },
   "actions_cell": {
     "dismiss": "忽略"

@@ -69,7 +69,8 @@
     "not_available": "k. A.",
     "status": "Status:",
     "title": "Data Nodes: {{hostname}}",
-    "transport_address": "Transport-Adresse:"
+    "transport_address": "Transport-Adresse:",
+    "version_incompatible": "Diese Data-Node-Version ist nicht mit Ihrer aktuellen {{productName}}-Version kompatibel, daher sind die Metriken deaktiviert."
   },
   "pages": {
     "certificate_management_title": "Zertifikatsverwaltung",

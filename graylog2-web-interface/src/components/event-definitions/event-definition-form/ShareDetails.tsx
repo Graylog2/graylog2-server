@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import useEntityShareState from 'hooks/useEntityShareState';
 import { createGRN } from 'logic/permissions/GRN';
+import capabilityLabel from 'logic/permissions/capabilityLabel';
 import type { SelectedGrantees } from 'logic/permissions/EntityShareState';
 import { DEFAULT_PAGE_SIZES } from 'hooks/usePaginationQueryParameter';
 import {
@@ -33,6 +34,8 @@ import {
 } from 'components/permissions/CommonStyledComponents';
 import { PageSizeSelect, Pagination } from 'components/common';
 import { Alert } from 'components/bootstrap';
+
+const CAPABILITY_TITLES: { [capabilityId: string]: string } = { view: 'Viewer', manage: 'Manager', own: 'Owner' };
 
 type Props = {
   shareState?: EntitySharePayload;
@@ -125,7 +128,7 @@ const ShareDetails = ({ shareState = null, entityId = undefined }: Props) => {
                     <StyledGranteeIcon type={grantee.type} />
                     <GranteeListItemTitle>{grantee.title}</GranteeListItemTitle>
                   </GranteeInfo>
-                  <StyledDiv>{capitalize(grantee.capabilityId)}</StyledDiv>
+                  <StyledDiv>{capabilityLabel(CAPABILITY_TITLES[grantee.capabilityId] ?? capitalize(grantee.capabilityId))}</StyledDiv>
                 </GranteeListItemContainer>
               );
             })

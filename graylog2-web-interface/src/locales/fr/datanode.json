@@ -17,7 +17,8 @@
     "not_available": "N/A",
     "certificate_valid_until": "Certificat valable jusqu'au :",
     "datanode_version": "Version du Data Node :",
-    "configuration_warnings": "Avertissements de configuration"
+    "configuration_warnings": "Avertissements de configuration",
+    "version_incompatible": "Cette version du data node est incompatible avec votre version actuelle de {{productName}}, les métriques sont donc désactivées."
   },
   "upgrade_status": {
     "title": "Statut de la mise à niveau",

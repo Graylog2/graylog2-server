@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Badge } from 'components/bootstrap';
 
@@ -25,8 +26,9 @@ type Props = {
 };
 
 const FilterStatusCell = ({ filterOutputRule }: Props) => {
+  const { t } = useTranslation('streams');
   const isEnabled = filterOutputRule.status === 'enabled';
-  const title = isEnabled ? 'Enabled' : 'Disabled';
+  const title = isEnabled ? t('output_filter.status_enabled') : t('output_filter.status_disabled');
 
   return (
     <Badge color={isEnabled ? 'success' : 'warning'} variant="light" title={title} aria-label={title}>

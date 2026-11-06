@@ -20,6 +20,7 @@ import styled from 'styled-components';
 
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
+import i18n from 'i18n';
 import NumberUtils from 'util/NumberUtils';
 import { MetricsMapper, MetricContainer, CounterRate } from 'components/metrics';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
@@ -70,7 +71,7 @@ const EntriesCol = ({ cache }: { cache: CacheEntity }) => {
       0,
     );
 
-    if (total < 1) return 'N/A';
+    if (total < 1) return i18n.t('cache_list.not_available', { ns: 'lookup_tables' });
 
     return NumberUtils.formatNumber(total);
   };
@@ -99,7 +100,7 @@ const HitRateCol = ({ cache }: { cache: CacheEntity }) => {
     }, 0);
 
     const total = totalHits + totalMisses;
-    if (total < 1) return 'N/A';
+    if (total < 1) return i18n.t('cache_list.not_available', { ns: 'lookup_tables' });
 
     const hitRate = (totalHits * 100.0) / total;
 

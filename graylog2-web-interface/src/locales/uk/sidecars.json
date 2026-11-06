@@ -109,6 +109,12 @@
       "last_seen_example": "Знайти Sidecars, які не взаємодіяли після певної дати:",
       "placeholder": "Знайти Sidecars",
       "status_example": "Знайти Sidecars зі станом <code>failing</code> або <code>unknown</code>:"
+    },
+    "status_indicator": {
+      "running": "Працює",
+      "unknown": "Невідомо",
+      "failing": "Збій",
+      "stopped": "Зупинено"
     }
   },
   "configuration_forms": {

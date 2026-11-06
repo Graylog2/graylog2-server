@@ -63,7 +63,9 @@
       "info_indexer": "次のフィルタールールの条件に一致するメッセージは、インデックスセットにルーティングされません。",
       "no_filters": "フィルターが見つかりません。",
       "title": "フィルタールール"
-    }
+    },
+    "status_enabled": "有効",
+    "status_disabled": "無効"
   },
   "outputs": {
     "assign_existing": "既存の Output を割り当て",
@@ -360,7 +362,11 @@
       "index_set_not_found": "見つかりません",
       "max_processing_time": "最大処理時間: {{ms}} ms（過去 15 分）",
       "message_count_other": "過去 24 時間で {{count}} 件のメッセージ",
-      "throughput": "{{throughput}} msg/s"
+      "throughput": "{{throughput}} msg/s",
+      "stream_rules_label": "ストリームルール",
+      "outputs_label": "ストリームの出力",
+      "filter_rules_label": "フィルタールール",
+      "associated_inputs_label": "{{title}} に関連付けられた入力"
     },
     "columns": {
       "archiving": "アーカイブ",

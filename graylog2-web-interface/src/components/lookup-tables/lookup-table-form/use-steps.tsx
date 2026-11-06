@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import styled from 'styled-components';
+import { useTranslation } from 'react-i18next';
 
 import LookupTableFormFields from './lookup-table-form-fields';
 import DataAdapterFormStep from './adapter-step';
@@ -31,12 +32,13 @@ const CenteredDiv = styled.div`
 function useSteps(
   activeStepKey: string = 'lookup-table',
 ): [Array<any>, { activeStep: string; setActiveStep: (newStep: string) => void }] {
+  const { t } = useTranslation('lookup_tables');
   const [activeStep, setActiveStep] = useState(activeStepKey);
 
   const steps = [
     {
       key: 'lookup-table',
-      title: 'Lookup Table',
+      title: t('lookup_table_form.steps.lookup_table'),
       component: (
         <CenteredDiv>
           <LookupTableFormFields />
@@ -45,17 +47,17 @@ function useSteps(
     },
     {
       key: 'cache',
-      title: 'Cache (required)',
+      title: t('lookup_table_form.steps.cache'),
       component: <CacheFormStep />,
     },
     {
       key: 'data-adapter',
-      title: 'Data Adapter (required)',
+      title: t('lookup_table_form.steps.data_adapter'),
       component: <DataAdapterFormStep />,
     },
     {
       key: 'summary',
-      title: 'Summary',
+      title: t('lookup_table_form.steps.summary'),
       component: <SummaryStep />,
     },
   ];

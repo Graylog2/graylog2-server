@@ -324,7 +324,26 @@
     "event_procedure": "процедура події",
     "event_procedure_step": "крок процедури події",
     "collection": "колекція",
-    "collection_entities": "елементи колекції"
+    "collection_entities": "елементи колекції",
+    "event": "подія",
+    "input": "вхід",
+    "data_adapter": "адаптер даних",
+    "cache": "кеш",
+    "lookup_table": "таблиця підстановки",
+    "shared_entity": "спільний елемент",
+    "token": "токен",
+    "sidecar": "Sidecar",
+    "backend": "бекенд",
+    "pipeline_rule": "правило Pipeline",
+    "input_profile": "профіль входу",
+    "forwarder": "forwarder",
+    "forwarder_input": "вхід forwarder",
+    "archives": "архіви",
+    "repository": "репозиторій",
+    "audit_event": "подія аудиту",
+    "filter": "фільтр",
+    "title": "заголовок",
+    "entity": "сутність"
   },
   "marketplace_link": "{{productName}} Marketplace",
   "chips_cell": {
@@ -544,7 +563,19 @@
     "intro": "Введіть пошуковий запит, щоб знайти сторінку, потік, панель моніторингу, вхід або інші елементи.",
     "intro_hint": "Щоб полегшити початок, нижче наведено список ваших <bold>останніх відкритих</bold> та <bold>обраних</bold> елементів:",
     "no_results": "Результатів пошуку не знайдено. Спробуйте інші пошукові терміни.",
-    "recent": "Нещодавні"
+    "recent": "Нещодавні",
+    "configuration_page": "Конфігурації / {{name}}",
+    "actions": {
+      "logout": "Вийти з облікового запису поточного користувача",
+      "toggle_theme": "Перемкнути тему",
+      "hide_scratchpad": "Приховати чернетку",
+      "show_scratchpad": "Показати чернетку"
+    },
+    "links": {
+      "show_profile": "Показати профіль поточного користувача",
+      "edit_profile": "Редагувати профіль поточного користувача",
+      "welcome": "Ласкаво просимо"
+    }
   },
   "scratchpad": {
     "title": "Чернетка",

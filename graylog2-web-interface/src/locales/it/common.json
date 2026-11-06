@@ -310,7 +310,26 @@
     "event_procedure": "procedura di evento",
     "event_procedure_step": "passaggio della procedura di evento",
     "collection": "raccolta",
-    "collection_entities": "elementi della raccolta"
+    "collection_entities": "elementi della raccolta",
+    "event": "evento",
+    "input": "input",
+    "data_adapter": "data adapter",
+    "cache": "cache",
+    "lookup_table": "lookup table",
+    "shared_entity": "elemento condiviso",
+    "token": "token",
+    "sidecar": "sidecar",
+    "backend": "servizio",
+    "pipeline_rule": "regola della pipeline",
+    "input_profile": "profilo di input",
+    "forwarder": "forwarder",
+    "forwarder_input": "input del forwarder",
+    "archives": "archivi",
+    "repository": "repository",
+    "audit_event": "evento di audit",
+    "filter": "filtro",
+    "title": "titolo",
+    "entity": "entità"
   },
   "marketplace_link": "il Marketplace di {{productName}}",
   "chips_cell": {
@@ -529,7 +548,19 @@
     "intro": "Inserisci una query di ricerca per trovare una pagina, uno stream, un dashboard, un input o altri elementi.",
     "intro_hint": "Per iniziare, qui sotto trovi l'elenco degli elementi <bold>aperti di recente</bold> e dei <bold>preferiti</bold>:",
     "no_results": "Nessun risultato trovato. Prova con termini di ricerca diversi.",
-    "recent": "Recenti"
+    "recent": "Recenti",
+    "configuration_page": "Configurazioni / {{name}}",
+    "actions": {
+      "logout": "Disconnetti l'utente corrente",
+      "toggle_theme": "Cambia tema",
+      "hide_scratchpad": "Nascondi blocco note",
+      "show_scratchpad": "Mostra blocco note"
+    },
+    "links": {
+      "show_profile": "Mostra il profilo dell'utente corrente",
+      "edit_profile": "Modifica il profilo dell'utente corrente",
+      "welcome": "Benvenuto"
+    }
   },
   "scratchpad": {
     "title": "Blocco note",

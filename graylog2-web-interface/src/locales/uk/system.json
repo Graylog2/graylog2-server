@@ -319,7 +319,9 @@
   },
   "system_notifications_table": {
     "title": "Сповіщення",
-    "human_name": "сповіщення"
+    "human_name": "сповіщення",
+    "severity_urgent": "Терміново",
+    "severity_normal": "Інформація"
   },
   "actions_cell": {
     "dismiss": "Закрити"

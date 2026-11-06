@@ -304,7 +304,9 @@
   },
   "system_notifications_table": {
     "title": "알림",
-    "human_name": "알림"
+    "human_name": "알림",
+    "severity_urgent": "긴급",
+    "severity_normal": "정보"
   },
   "actions_cell": {
     "dismiss": "해제"

@@ -282,7 +282,26 @@
     "event_procedure": "事件流程",
     "event_procedure_step": "事件流程步骤",
     "collection": "Collection",
-    "collection_entities": "Collection 条目"
+    "collection_entities": "Collection 条目",
+    "event": "事件",
+    "input": "Input",
+    "data_adapter": "数据适配器",
+    "cache": "缓存",
+    "lookup_table": "Lookup Table",
+    "shared_entity": "共享条目",
+    "token": "令牌",
+    "sidecar": "Sidecar",
+    "backend": "认证服务",
+    "pipeline_rule": "Pipeline 规则",
+    "input_profile": "输入配置文件",
+    "forwarder": "Forwarder",
+    "forwarder_input": "Forwarder 输入",
+    "archives": "归档",
+    "repository": "存储库",
+    "audit_event": "审计事件",
+    "filter": "过滤器",
+    "title": "标题",
+    "entity": "实体"
   },
   "marketplace_link": "{{productName}} 市场",
   "chips_cell": {
@@ -499,7 +518,19 @@
     "intro": "请输入搜索查询，以搜索页面、Stream、Dashboard、输入或其他条目。",
     "intro_hint": "为方便您快速开始，下方列出了您<bold>最近打开</bold>和<bold>收藏</bold>的条目：",
     "no_results": "未找到搜索结果，请尝试其他搜索词。",
-    "recent": "最近"
+    "recent": "最近",
+    "configuration_page": "配置 / {{name}}",
+    "actions": {
+      "logout": "退出当前用户",
+      "toggle_theme": "切换主题",
+      "hide_scratchpad": "隐藏草稿板",
+      "show_scratchpad": "显示草稿板"
+    },
+    "links": {
+      "show_profile": "查看当前用户的个人资料",
+      "edit_profile": "编辑当前用户的个人资料",
+      "welcome": "欢迎"
+    }
   },
   "scratchpad": {
     "title": "草稿板",

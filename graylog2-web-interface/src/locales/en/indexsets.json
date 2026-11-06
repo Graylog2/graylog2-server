@@ -647,7 +647,8 @@
     "failures_count_load_failed": "Loading indexer failures count failed with status",
     "failures_count_load_failed_title": "Could not load indexer failures count",
     "indices_multiple_load_failed": "Loading Indexer multiple indices failed with status",
-    "indices_multiple_load_failed_title": "Could not load Indexer multiple indices"
+    "indices_multiple_load_failed_title": "Could not load Indexer multiple indices",
+    "profiles_custom_field_mappings_label": "custom field mappings"
   },
   "notifications": {
     "create_success": "Successfully created index set '{{title}}'",

@@ -113,5 +113,14 @@
   "Page": "Seite",
   "Reporter": "Meldende Person",
   "Resolution": "Ergebnis",
-  "Updated": "Aktualisiert"
+  "Updated": "Aktualisiert",
+  "Hit Rate": "Trefferquote",
+  "Entries": "Einträge",
+  "Data Adapter": "Data-Adapter",
+  "Cache": "Cache",
+  "Throughput": "Durchsatz",
+  "Event Definition": "Event Definition",
+  "Scheduling": "Zeitplanung",
+  "Last Matched": "Zuletzt zugetroffen",
+  "Notifications": "Benachrichtigungen"
 }

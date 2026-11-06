@@ -716,7 +716,8 @@
     "failures_count_load_failed": "Falha ao carregar a contagem de falhas do indexador, com o status",
     "failures_count_load_failed_title": "Não foi possível carregar a contagem de falhas do indexador",
     "indices_multiple_load_failed": "Falha ao carregar múltiplos índices do indexador, com o status",
-    "indices_multiple_load_failed_title": "Não foi possível carregar múltiplos índices do indexador"
+    "indices_multiple_load_failed_title": "Não foi possível carregar múltiplos índices do indexador",
+    "profiles_custom_field_mappings_label": "mapeamentos de campos personalizados"
   },
   "notifications": {
     "create_success": "Index set '{{title}}' criado com sucesso",

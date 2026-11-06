@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import * as Immutable from 'immutable';
+import { useTranslation } from 'react-i18next';
 
 import type { NodeInfo } from 'stores/nodes/NodesStore';
 import { KEY_PREFIX, fetchInputs } from 'hooks/usePaginatedInputs';
@@ -66,6 +67,7 @@ const InputsOverview = ({
   entityTableId = undefined,
   withoutURLParams = false,
 }: Props) => {
+  const { t } = useTranslation('inputs');
   const { data: inputStates } = useInputsStates();
   const { tableLayout, additionalAttributes } = getInputsTableElements();
   const resolvedTableLayout = entityTableId ? { ...tableLayout, entityTableId } : tableLayout;
@@ -121,7 +123,7 @@ const InputsOverview = ({
       )}
       <InputMetricsProvider inputIds={visibleInputIds} fields={requestedFields}>
         <PaginatedEntityTable<Input>
-          humanName="inputs"
+          humanName={t('overview.human_name')}
           additionalAttributes={additionalAttributes}
           queryHelpComponent={<QueryHelper entityName={entityName} />}
           entityActions={entityActions}

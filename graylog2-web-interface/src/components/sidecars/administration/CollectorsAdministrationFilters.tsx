@@ -187,7 +187,7 @@ const CollectorsAdministrationFilters = (props: Props) => {
       onFilterChange('status', statusCode, callback);
 
     const statusFilter = filters.status;
-    const statusFormatter = (statusCode: string) => upperFirst(SidecarStatusEnum.toString(statusCode));
+    const statusFormatter = (statusCode: string) => t(`common.status_indicator.${SidecarStatusEnum.toString(statusCode)}`);
 
     return (
       <SelectPopover

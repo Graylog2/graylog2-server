@@ -666,7 +666,8 @@
     "failures_count_load_failed": "인덱서 실패 수를 불러오지 못했습니다. 상태:",
     "failures_count_load_failed_title": "인덱서 실패 수를 불러올 수 없습니다",
     "indices_multiple_load_failed": "인덱서의 여러 인덱스를 불러오지 못했습니다. 상태:",
-    "indices_multiple_load_failed_title": "인덱서의 여러 인덱스를 불러올 수 없습니다"
+    "indices_multiple_load_failed_title": "인덱서의 여러 인덱스를 불러올 수 없습니다",
+    "profiles_custom_field_mappings_label": "사용자 지정 필드 매핑"
   },
   "notifications": {
     "create_success": "인덱스 세트 '{{title}}'을(를) 만들었습니다",

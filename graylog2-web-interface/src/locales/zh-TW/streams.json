@@ -63,7 +63,9 @@
       "info_indexer": "符合以下篩選規則條件的訊息將不會路由至 Index Set。",
       "no_filters": "找不到任何篩選器。",
       "title": "篩選規則"
-    }
+    },
+    "status_enabled": "已啟用",
+    "status_disabled": "已停用"
   },
   "outputs": {
     "assign_existing": "指派現有 Output",
@@ -360,7 +362,11 @@
       "index_set_not_found": "找不到",
       "max_processing_time": "最長處理時間：{{ms}} ms（過去 15 分鐘）",
       "message_count_other": "過去 24 小時內有 {{count}} 則訊息",
-      "throughput": "{{throughput}} msg/s"
+      "throughput": "{{throughput}} msg/s",
+      "stream_rules_label": "Stream 規則",
+      "outputs_label": "Stream 輸出",
+      "filter_rules_label": "篩選規則",
+      "associated_inputs_label": "{{title}} 的關聯 Input"
     },
     "columns": {
       "archiving": "封存",

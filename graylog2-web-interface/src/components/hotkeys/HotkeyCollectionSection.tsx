@@ -22,6 +22,7 @@ import styled from 'styled-components';
 
 import { KeyboardKey } from 'components/bootstrap';
 import { isMacOS as _isMacOS } from 'util/OSUtils';
+import useServerText from 'util/serverText';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 const ShortcutList = styled.div`
@@ -131,14 +132,16 @@ type Props = {
 
 const HotkeyCollectionSection = ({ title, description, sectionActions }: Props) => {
   const isMacOS = _isMacOS();
+  // The texts of the shortcuts are English, they are translated with the catalog of English texts.
+  const serverText = useServerText();
 
   return (
-    <SectionComponent title={title}>
-      <p className="description">{description}</p>
+    <SectionComponent title={serverText(title)}>
+      <p className="description">{serverText(description)}</p>
       <ShortcutList>
         {sectionActions.map(({ keyDescription, keys, combinationKey, splitKey, reactKey }) => (
           <Key
-            description={keyDescription}
+            description={serverText(keyDescription)}
             keys={keys}
             combinationKey={combinationKey}
             splitKey={splitKey}

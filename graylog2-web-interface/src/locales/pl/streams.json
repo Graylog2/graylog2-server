@@ -63,7 +63,9 @@
       "info_indexer": "Wiadomości spełniające kryteria poniższych reguł filtrowania nie będą kierowane do zestawu indeksów.",
       "no_filters": "Nie znaleziono żadnych filtrów.",
       "title": "Reguły filtrowania"
-    }
+    },
+    "status_enabled": "Włączony",
+    "status_disabled": "Wyłączony"
   },
   "outputs": {
     "assign_existing": "Przypisz istniejące wyjście",
@@ -396,7 +398,11 @@
       "message_count_other": "{{count}} wiadomości w ciągu ostatnich 24 godzin",
       "throughput": "{{throughput}} msg/s",
       "message_count_few": "{{count}} wiadomości w ciągu ostatnich 24 godzin",
-      "message_count_many": "{{count}} wiadomości w ciągu ostatnich 24 godzin"
+      "message_count_many": "{{count}} wiadomości w ciągu ostatnich 24 godzin",
+      "stream_rules_label": "reguły strumienia",
+      "outputs_label": "wyjścia strumienia",
+      "filter_rules_label": "reguły filtrów",
+      "associated_inputs_label": "powiązane wejścia dla {{title}}"
     },
     "columns": {
       "archiving": "Archiwizacja",

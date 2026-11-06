@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { OrderedMap } from 'immutable';
+import { useTranslation } from 'react-i18next';
 
 import { Events } from '@graylog/server-api';
 
@@ -42,6 +43,7 @@ const additionalSearchFields = {
 const defaultFilters = OrderedMap({ priority: nonInfoPriorities });
 
 const EventsEntityTable = () => {
+  const { t } = useTranslation('events');
   const { stream_id: streamId } = useQuery();
   const _fetchEvents = (searchParams: SearchParams) => fetchEvents(searchParams, streamId as string);
   const { entityActions, expandedSections, bulkSelection } = useTableElements({
@@ -63,7 +65,7 @@ const EventsEntityTable = () => {
   return (
     <EventsRefreshProvider>
       <PaginatedEntityTable<Event, EventsAdditionalData>
-        humanName="events"
+        humanName={t('alerts_list.human_name')}
         queryHelpComponent={
           <QueryHelper entityName="event" commonFields={['id', 'description']} fieldMap={additionalSearchFields} />
         }

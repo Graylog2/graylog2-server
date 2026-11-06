@@ -32,7 +32,8 @@
     "refresh_human_name": "Events",
     "replay_search": "Suche wiederholen",
     "histogram_series_events": "Events",
-    "histogram_series_alerts": "Alarme"
+    "histogram_series_alerts": "Alarme",
+    "human_name": "Events"
   },
   "alerts_replay": {
     "cannot_replay": "Dieses Event kann nicht wiederholt werden: {{reason}} Bitte wählen Sie ein anderes aus.",

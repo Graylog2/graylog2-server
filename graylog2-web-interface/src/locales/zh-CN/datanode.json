@@ -17,7 +17,8 @@
     "not_available": "不适用",
     "certificate_valid_until": "证书有效期至：",
     "datanode_version": "数据节点版本：",
-    "configuration_warnings": "配置警告"
+    "configuration_warnings": "配置警告",
+    "version_incompatible": "此 Data Node 版本与您当前的 {{productName}} 版本不兼容，因此指标已禁用。"
   },
   "upgrade_status": {
     "title": "升级状态",

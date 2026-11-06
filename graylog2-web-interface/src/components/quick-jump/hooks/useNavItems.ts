@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useContext, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Permission } from 'graylog-web-plugin/plugin';
 
 import useNavigationTitle from 'components/navigation/useNavigationTitle';
@@ -46,6 +47,7 @@ const useEntityCreatorItems = () => {
 };
 
 const useConfigurationPages = () => {
+  const { t } = useTranslation('common');
   const { isPermitted } = usePermissions();
   const coreSystemConfigurations = usePluginEntities('coreSystemConfigurations');
   const pluginSystemConfigurations = usePluginEntities('systemConfigurations');
@@ -55,7 +57,7 @@ const useConfigurationPages = () => {
     .map((page) => ({
       type: PAGE_TYPE,
       link: prefixUrl(`${Routes.SYSTEM.CONFIGURATIONS}/${page.name}`),
-      title: `Configurations / ${page.displayName ?? page.name}`,
+      title: t('quick_jump.configuration_page', { name: page.displayName ?? page.name }),
     }));
 
   const pluginNavItems = pluginSystemConfigurations
@@ -64,33 +66,34 @@ const useConfigurationPages = () => {
     .map((page) => ({
       type: PAGE_TYPE,
       link: prefixUrl(`${Routes.SYSTEM.configurationsSection('Plugins', page.configType)}`),
-      title: `Configurations / ${page.displayName}`,
+      title: t('quick_jump.configuration_page', { name: page.displayName }),
     }));
 
   return [...coreNavItems, ...pluginNavItems];
 };
 
 const useQuickJumpActions = (): SearchResultItem[] => {
+  const { t } = useTranslation('common');
   const { isScratchpadVisible } = useContext(ScratchpadContext);
 
   return [
     {
       type: ACTION_TYPE,
-      title: 'Logout current user',
+      title: t('quick_jump.actions.logout'),
       action: ({ logout }) => {
         logout();
       },
     },
     {
       type: ACTION_TYPE,
-      title: 'Toggle Theme',
+      title: t('quick_jump.actions.toggle_theme'),
       action: ({ toggleThemeMode }) => {
         toggleThemeMode();
       },
     },
     {
       type: ACTION_TYPE,
-      title: `${isScratchpadVisible ? 'Hide' : 'Show'} Scratchpad`,
+      title: isScratchpadVisible ? t('quick_jump.actions.hide_scratchpad') : t('quick_jump.actions.show_scratchpad'),
       action: ({ toggleScratchpad }) => {
         toggleScratchpad();
       },
@@ -112,17 +115,18 @@ const useQuickJumpActions = (): SearchResultItem[] => {
 };
 
 const useQuickJumpLinks = () => {
+  const { t } = useTranslation('common');
   const { readOnly, id: userId } = useCurrentUser();
 
   return [
     {
       type: PAGE_TYPE,
-      title: `${readOnly ? 'Show' : 'Edit'} profile for current user`,
+      title: readOnly ? t('quick_jump.links.show_profile') : t('quick_jump.links.edit_profile'),
       link: readOnly ? Routes.SYSTEM.USERS.show(userId) : Routes.SYSTEM.USERS.edit(userId),
     },
     {
       type: PAGE_TYPE,
-      title: 'Welcome',
+      title: t('quick_jump.links.welcome'),
       link: Routes.WELCOME,
     },
   ];

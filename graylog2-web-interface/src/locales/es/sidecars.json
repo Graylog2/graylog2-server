@@ -103,6 +103,12 @@
       "last_seen_example": "Buscar sidecars que no se han comunicado desde una fecha concreta:",
       "placeholder": "Buscar sidecars",
       "status_example": "Buscar sidecars con estado <code>failing</code> o <code>unknown</code>:"
+    },
+    "status_indicator": {
+      "running": "En ejecución",
+      "unknown": "Desconocido",
+      "failing": "Con errores",
+      "stopped": "Detenido"
     }
   },
   "configuration_forms": {

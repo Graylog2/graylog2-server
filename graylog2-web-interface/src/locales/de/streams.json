@@ -63,7 +63,9 @@
       "info_indexer": "Nachrichten, die die Kriterien der folgenden Filterregel(n) erfüllen, werden nicht an das Index-Set weitergeleitet.",
       "no_filters": "Es wurden keine Filter gefunden.",
       "title": "Filterregeln"
-    }
+    },
+    "status_enabled": "Aktiviert",
+    "status_disabled": "Deaktiviert"
   },
   "outputs": {
     "assign_existing": "Bestehenden Output zuweisen",
@@ -372,7 +374,11 @@
       "max_processing_time": "Maximale Verarbeitungszeit: {{ms}} ms (letzte 15 Minuten)",
       "message_count_one": "{{count}} Nachricht in den letzten 24 Stunden",
       "message_count_other": "{{count}} Nachrichten in den letzten 24 Stunden",
-      "throughput": "{{throughput}} Nachr./s"
+      "throughput": "{{throughput}} Nachr./s",
+      "stream_rules_label": "Stream-Regeln",
+      "outputs_label": "Stream-Outputs",
+      "filter_rules_label": "Filterregeln",
+      "associated_inputs_label": "zugeordnete Inputs für {{title}}"
     },
     "columns": {
       "archiving": "Archivierung",

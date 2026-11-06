@@ -97,6 +97,12 @@
       "last_seen_example": "Find sidecars that have not communicated since a specific date:",
       "placeholder": "Find sidecars",
       "status_example": "Find sidecars with <code>failing</code> or <code>unknown</code> status:"
+    },
+    "status_indicator": {
+      "running": "Running",
+      "unknown": "Unknown",
+      "failing": "Failing",
+      "stopped": "Stopped"
     }
   },
   "configuration_forms": {

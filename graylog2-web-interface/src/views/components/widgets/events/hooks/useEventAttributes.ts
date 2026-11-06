@@ -15,14 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import usePluginEntities from 'hooks/usePluginEntities';
+import useServerText from 'util/serverText';
 
 const useEventAttributes = () => {
   const eventAttributes = usePluginEntities('views.components.widgets.events.attributes');
 
-  return eventAttributes.filter(({ useCondition }) =>
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    typeof useCondition === 'function' ? useCondition() : true,
-  );
+  const serverText = useServerText();
+
+  return eventAttributes
+    .filter(({ useCondition }) =>
+      // eslint-disable-next-line react-hooks/rules-of-hooks
+      typeof useCondition === 'function' ? useCondition() : true,
+    )
+    .map((attribute) => ({ ...attribute, title: serverText(attribute.title) }));
 };
 
 export default useEventAttributes;

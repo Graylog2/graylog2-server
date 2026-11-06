@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { CustomFieldMapping, IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldTypeProfiles/types';
 import ExpandedSectionCount from 'components/common/EntityDataTable/ExpandedSectionCount';
@@ -25,13 +26,17 @@ const CustomFieldMappingsCell = ({
 }: {
   customFieldTypes: Array<CustomFieldMapping>;
   profile: IndexSetFieldTypeProfile;
-}) => (
-  <ExpandedSectionCount
-    entityId={profile.id}
-    section="customFieldMapping"
-    count={customFieldTypes.length}
-    label="custom field mappings"
-  />
-);
+}) => {
+  const { t } = useTranslation('indexsets');
+
+  return (
+    <ExpandedSectionCount
+      entityId={profile.id}
+      section="customFieldMapping"
+      count={customFieldTypes.length}
+      label={t('hooks.profiles_custom_field_mappings_label')}
+    />
+  );
+};
 
 export default CustomFieldMappingsCell;

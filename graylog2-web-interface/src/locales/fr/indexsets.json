@@ -716,7 +716,8 @@
     "failures_count_load_failed": "Le chargement du nombre d'échecs de l'indexeur a échoué avec le statut",
     "failures_count_load_failed_title": "Impossible de charger le nombre d'échecs de l'indexeur",
     "indices_multiple_load_failed": "Le chargement de plusieurs index de l'indexeur a échoué avec le statut",
-    "indices_multiple_load_failed_title": "Impossible de charger plusieurs index de l'indexeur"
+    "indices_multiple_load_failed_title": "Impossible de charger plusieurs index de l'indexeur",
+    "profiles_custom_field_mappings_label": "mappages de champs personnalisés"
   },
   "notifications": {
     "create_success": "L'Index Set « {{title}} » a bien été créé",

@@ -80,7 +80,7 @@ const SortConfiguration = ({
               clearable={false}
               size="small"
               onChange={(newColumn) => onChange({ target: { value: newColumn, name } })}
-              value={isUnknownColumn ? 'Unknown' : value}
+              value={isUnknownColumn ? t('events_widget.unknown_attribute') : value}
             />
           </Input>
         )}

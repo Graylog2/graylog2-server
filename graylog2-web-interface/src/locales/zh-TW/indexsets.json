@@ -666,7 +666,8 @@
     "failures_count_load_failed": "載入索引器失敗數量失敗，狀態",
     "failures_count_load_failed_title": "無法載入索引器失敗數量",
     "indices_multiple_load_failed": "載入多個索引器索引失敗，狀態",
-    "indices_multiple_load_failed_title": "無法載入多個索引器索引"
+    "indices_multiple_load_failed_title": "無法載入多個索引器索引",
+    "profiles_custom_field_mappings_label": "自訂欄位對應"
   },
   "notifications": {
     "create_success": "已成功建立 Index Set「{{title}}」",

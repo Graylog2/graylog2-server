@@ -17,7 +17,8 @@
     "not_available": "不適用",
     "certificate_valid_until": "憑證有效期限至：",
     "datanode_version": "Data Node 版本：",
-    "configuration_warnings": "設定警告"
+    "configuration_warnings": "設定警告",
+    "version_incompatible": "此 Data Node 版本與您目前的 {{productName}} 版本不相容，因此指標已停用。"
   },
   "upgrade_status": {
     "title": "升級狀態",

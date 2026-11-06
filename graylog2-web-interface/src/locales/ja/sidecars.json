@@ -91,6 +91,12 @@
       "last_seen_example": "特定の日付以降に通信していないサイドカーを検索:",
       "placeholder": "サイドカーを検索",
       "status_example": "ステータスが <code>failing</code> または <code>unknown</code> のサイドカーを検索:"
+    },
+    "status_indicator": {
+      "running": "実行中",
+      "unknown": "不明",
+      "failing": "失敗",
+      "stopped": "停止"
     }
   },
   "configuration_forms": {

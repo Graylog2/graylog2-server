@@ -517,5 +517,11 @@
   },
   "whois_adapter_summary": {
     "unit_ms": "ms"
+  },
+  "aws_cloudwatch_wizard": {
+    "step_authorize_title": "AWS Kinesis の認証",
+    "step_kinesis_title": "AWS Kinesis の設定",
+    "step_health_check_title": "AWS CloudWatch のヘルスチェック",
+    "step_review_title": "AWS Kinesis の確認"
   }
 }

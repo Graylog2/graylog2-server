@@ -16,6 +16,7 @@
  */
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { Stream } from 'logic/streams/types';
 import ExpandedSectionCount from 'components/common/EntityDataTable/ExpandedSectionCount';
@@ -25,6 +26,8 @@ type Props = {
 };
 
 const StreamRulesCell = ({ stream }: Props) => {
+  const { t } = useTranslation('streams');
+
   if (stream.is_default || !stream.is_editable) {
     return null;
   }
@@ -34,7 +37,14 @@ const StreamRulesCell = ({ stream }: Props) => {
     return null;
   }
 
-  return <ExpandedSectionCount entityId={stream.id} section="rules" count={streamRulesCount} label="stream rules" />;
+  return (
+    <ExpandedSectionCount
+      entityId={stream.id}
+      section="rules"
+      count={streamRulesCount}
+      label={t('streams_overview.cells.stream_rules_label')}
+    />
+  );
 };
 
 export default StreamRulesCell;

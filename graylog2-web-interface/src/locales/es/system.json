@@ -314,7 +314,9 @@
   },
   "system_notifications_table": {
     "title": "Notificaciones",
-    "human_name": "notificaciones"
+    "human_name": "notificaciones",
+    "severity_urgent": "Urgente",
+    "severity_normal": "Info"
   },
   "actions_cell": {
     "dismiss": "Descartar"

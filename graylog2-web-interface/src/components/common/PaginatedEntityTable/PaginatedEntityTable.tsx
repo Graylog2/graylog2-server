@@ -252,8 +252,15 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   );
 
   const columnSchemas = useMemo(
-    () => [...serverAttributes, ...additionalAttributes.map((attribute) => ({ isDerived: true, ...attribute }))],
-    [additionalAttributes, serverAttributes],
+    () => [
+      ...serverAttributes,
+      ...additionalAttributes.map((attribute) => ({
+        isDerived: true,
+        ...attribute,
+        title: serverText(attribute.title),
+      })),
+    ],
+    [additionalAttributes, serverAttributes, serverText],
   );
 
   const onSlicingPreferencesChange = useCallback(

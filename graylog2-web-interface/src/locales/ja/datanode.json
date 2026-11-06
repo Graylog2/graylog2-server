@@ -17,7 +17,8 @@
     "not_available": "該当なし",
     "certificate_valid_until": "証明書の有効期限:",
     "datanode_version": "Datanode バージョン:",
-    "configuration_warnings": "設定の警告"
+    "configuration_warnings": "設定の警告",
+    "version_incompatible": "この Data Node のバージョンは現在の {{productName}} のバージョンと互換性がないため、メトリクスは無効になっています。"
   },
   "upgrade_status": {
     "title": "アップグレードステータス",

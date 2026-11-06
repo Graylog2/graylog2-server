@@ -263,7 +263,8 @@
     "delete": "Löschen",
     "delete_title": "Cache löschen",
     "delete_confirm": "Möchten Sie den Cache „{{title}}“ wirklich löschen?",
-    "more_actions": "Weitere Aktionen für {{name}}"
+    "more_actions": "Weitere Aktionen für {{name}}",
+    "not_available": "k. A."
   },
   "caffeine_doc": {
     "cache_size_label": "Cache-Größe",
@@ -302,7 +303,13 @@
     "title_required": "Titel ist erforderlich",
     "name_required": "Name ist erforderlich",
     "cache_required": "Cache ist erforderlich",
-    "data_adapter_required": "Data-Adapter ist erforderlich"
+    "data_adapter_required": "Data-Adapter ist erforderlich",
+    "steps": {
+      "lookup_table": "Lookup-Tabelle",
+      "cache": "Cache (erforderlich)",
+      "data_adapter": "Data-Adapter (erforderlich)",
+      "summary": "Zusammenfassung"
+    }
   },
   "lut_fields": {
     "title_label": "Titel *",

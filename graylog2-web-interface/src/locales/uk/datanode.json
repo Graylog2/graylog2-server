@@ -17,7 +17,8 @@
     "not_available": "Н/д",
     "certificate_valid_until": "Сертифікат дійсний до:",
     "datanode_version": "Версія Datanode:",
-    "configuration_warnings": "Попередження конфігурації"
+    "configuration_warnings": "Попередження конфігурації",
+    "version_incompatible": "Ця версія Data Node несумісна з вашою поточною версією {{productName}}, тому метрики вимкнено."
   },
   "upgrade_status": {
     "title": "Стан оновлення",

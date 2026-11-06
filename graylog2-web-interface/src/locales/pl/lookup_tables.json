@@ -265,7 +265,8 @@
     "delete": "Usuń",
     "delete_title": "Usuń pamięć podręczną",
     "delete_confirm": "Czy na pewno usunąć pamięć podręczną \"{{title}}\"?",
-    "more_actions": "Więcej działań dla: {{name}}"
+    "more_actions": "Więcej działań dla: {{name}}",
+    "not_available": "brak danych"
   },
   "caffeine_doc": {
     "cache_size_label": "Rozmiar pamięci podręcznej",
@@ -304,7 +305,13 @@
     "title_required": "Tytuł jest wymagany",
     "name_required": "Nazwa jest wymagana",
     "cache_required": "Pamięć podręczna jest wymagana",
-    "data_adapter_required": "Adapter danych jest wymagany"
+    "data_adapter_required": "Adapter danych jest wymagany",
+    "steps": {
+      "lookup_table": "Tabela wyszukiwania",
+      "cache": "Pamięć podręczna (wymagana)",
+      "data_adapter": "Adapter danych (wymagany)",
+      "summary": "Podsumowanie"
+    }
   },
   "lut_fields": {
     "title_label": "Tytuł *",

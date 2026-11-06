@@ -63,7 +63,9 @@
       "info_indexer": "Les messages qui satisfont aux critères de la ou des règles de filtre suivantes ne seront pas routés vers l'Index Set.",
       "no_filters": "Aucun filtre trouvé.",
       "title": "Règles de filtre"
-    }
+    },
+    "status_enabled": "Activé",
+    "status_disabled": "Désactivé"
   },
   "outputs": {
     "assign_existing": "Affecter un Output existant",
@@ -384,7 +386,11 @@
       "message_count_one": "{{count}} message au cours des dernières 24 heures",
       "message_count_other": "{{count}} messages au cours des dernières 24 heures",
       "throughput": "{{throughput}} msg/s",
-      "message_count_many": "{{count}} messages au cours des dernières 24 heures"
+      "message_count_many": "{{count}} messages au cours des dernières 24 heures",
+      "stream_rules_label": "règles du stream",
+      "outputs_label": "outputs du stream",
+      "filter_rules_label": "règles de filtre",
+      "associated_inputs_label": "inputs associés à {{title}}"
     },
     "columns": {
       "archiving": "Archivage",

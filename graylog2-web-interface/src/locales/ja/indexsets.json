@@ -666,7 +666,8 @@
     "failures_count_load_failed": "インデクサーの失敗件数の読み込みに失敗しました。ステータス",
     "failures_count_load_failed_title": "インデクサーの失敗件数を読み込めませんでした",
     "indices_multiple_load_failed": "複数のインデックスの読み込みに失敗しました。ステータス",
-    "indices_multiple_load_failed_title": "複数のインデックスを読み込めませんでした"
+    "indices_multiple_load_failed_title": "複数のインデックスを読み込めませんでした",
+    "profiles_custom_field_mappings_label": "カスタムフィールドマッピング"
   },
   "notifications": {
     "create_success": "インデックスセット「{{title}}」を作成しました",

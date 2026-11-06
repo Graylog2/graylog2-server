@@ -63,7 +63,9 @@
       "info_indexer": "Повідомлення, що відповідають критеріям наведених нижче правил фільтра, не буде маршрутизовано до набору індексів.",
       "no_filters": "Фільтрів не знайдено.",
       "title": "Правила фільтра"
-    }
+    },
+    "status_enabled": "Увімкнено",
+    "status_disabled": "Вимкнено"
   },
   "outputs": {
     "assign_existing": "Призначити наявний вихід",
@@ -396,7 +398,11 @@
       "message_count_other": "{{count}} повідомлення за останні 24 години",
       "throughput": "{{throughput}} повідомл./с",
       "message_count_few": "{{count}} повідомлення за останні 24 години",
-      "message_count_many": "{{count}} повідомлень за останні 24 години"
+      "message_count_many": "{{count}} повідомлень за останні 24 години",
+      "stream_rules_label": "правила потоку",
+      "outputs_label": "виходи потоку",
+      "filter_rules_label": "правила фільтрів",
+      "associated_inputs_label": "пов’язані входи для {{title}}"
     },
     "columns": {
       "archiving": "Архівування",

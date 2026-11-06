@@ -324,7 +324,26 @@
     "event_procedure": "procedura zdarzeń",
     "event_procedure_step": "krok procedury zdarzeń",
     "collection": "kolekcja",
-    "collection_entities": "elementy kolekcji"
+    "collection_entities": "elementy kolekcji",
+    "event": "zdarzenie",
+    "input": "wejście",
+    "data_adapter": "adapter danych",
+    "cache": "pamięć podręczna",
+    "lookup_table": "tabela wyszukiwania",
+    "shared_entity": "udostępniony element",
+    "token": "token",
+    "sidecar": "sidecar",
+    "backend": "backend",
+    "pipeline_rule": "reguła pipeline'u",
+    "input_profile": "profil wejścia",
+    "forwarder": "forwarder",
+    "forwarder_input": "wejście forwardera",
+    "archives": "archiwa",
+    "repository": "repozytorium",
+    "audit_event": "zdarzenie audytu",
+    "filter": "filtr",
+    "title": "tytuł",
+    "entity": "encja"
   },
   "marketplace_link": "Marketplace {{productName}}",
   "chips_cell": {
@@ -544,7 +563,19 @@
     "intro": "Wpisz zapytanie wyszukiwania, aby znaleźć stronę, strumień, panel, wejście lub inny element.",
     "intro_hint": "Aby ułatwić start, poniżej znajdziesz listę elementów <bold>ostatnio otwieranych</bold> i <bold>ulubionych</bold>:",
     "no_results": "Nie znaleziono wyników wyszukiwania. Spróbuj użyć innych wyrażeń.",
-    "recent": "Ostatnie"
+    "recent": "Ostatnie",
+    "configuration_page": "Konfiguracje / {{name}}",
+    "actions": {
+      "logout": "Wyloguj bieżącego użytkownika",
+      "toggle_theme": "Przełącz motyw",
+      "hide_scratchpad": "Ukryj notatnik",
+      "show_scratchpad": "Pokaż notatnik"
+    },
+    "links": {
+      "show_profile": "Pokaż profil bieżącego użytkownika",
+      "edit_profile": "Edytuj profil bieżącego użytkownika",
+      "welcome": "Witamy"
+    }
   },
   "scratchpad": {
     "title": "Notatnik",

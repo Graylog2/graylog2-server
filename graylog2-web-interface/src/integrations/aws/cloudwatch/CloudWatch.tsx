@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useContext, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import useHistory from 'routing/useHistory';
 import Wizard from 'components/common/Wizard';
@@ -42,6 +43,7 @@ const CloudWatch = ({ externalInputSubmit = false, onSubmit = undefined }: Cloud
   const { setFormData } = useContext(FormDataContext);
   const { availableStreams } = useContext(ApiContext);
   const { sidebar, clearSidebar } = useContext(SidebarContext);
+  const { t } = useTranslation('integrations');
   // const history = useHistory();
   const { push } = useHistory();
 
@@ -86,7 +88,7 @@ const CloudWatch = ({ externalInputSubmit = false, onSubmit = undefined }: Cloud
     return [
       {
         key: 'authorize',
-        title: 'AWS Kinesis Authorize',
+        title: t('aws_cloudwatch_wizard.step_authorize_title'),
         component: (
           <StepAuthorize
             onSubmit={handleSubmit}
@@ -98,7 +100,7 @@ const CloudWatch = ({ externalInputSubmit = false, onSubmit = undefined }: Cloud
       },
       {
         key: 'kinesis-setup',
-        title: 'AWS Kinesis Setup',
+        title: t('aws_cloudwatch_wizard.step_kinesis_title'),
         component: (
           <StepKinesis onSubmit={handleSubmit} onChange={handleFieldUpdate} hasStreams={availableStreams.length > 0} />
         ),
@@ -106,13 +108,13 @@ const CloudWatch = ({ externalInputSubmit = false, onSubmit = undefined }: Cloud
       },
       {
         key: 'health-check',
-        title: 'AWS CloudWatch Health Check',
+        title: t('aws_cloudwatch_wizard.step_health_check_title'),
         component: <StepHealthCheck onSubmit={handleSubmit} onChange={handleFieldUpdate} />,
         disabled: isDisabledStep('health-check'),
       },
       {
         key: 'review',
-        title: 'AWS Kinesis Review',
+        title: t('aws_cloudwatch_wizard.step_review_title'),
         component: (
           <StepReview onSubmit={handleSubmit} onEditClick={handleEditClick} externalInputSubmit={externalInputSubmit} />
         ),
@@ -120,6 +122,7 @@ const CloudWatch = ({ externalInputSubmit = false, onSubmit = undefined }: Cloud
       },
     ];
   }, [
+    t,
     isDisabledStep,
     availableStreams.length,
     externalInputSubmit,

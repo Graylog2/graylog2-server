@@ -393,7 +393,8 @@
       "delete_input": "Usuń wejście",
       "delete_title": "Usuwanie wejścia",
       "delete_confirm": "Czy na pewno chcesz usunąć wejście {{title}}?"
-    }
+    },
+    "human_name": "wejścia"
   },
   "dot_badge": {
     "problematic_inputs": "Niektóre wejścia są w stanie błędu lub w trybie konfiguracji."

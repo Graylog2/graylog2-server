@@ -113,5 +113,14 @@
   "Page": "Сторінка",
   "Reporter": "Автор звіту",
   "Resolution": "Рішення",
-  "Updated": "Оновлено"
+  "Updated": "Оновлено",
+  "Hit Rate": "Частота влучань",
+  "Entries": "Записи",
+  "Data Adapter": "Адаптер даних",
+  "Cache": "Кеш",
+  "Throughput": "Пропускна здатність",
+  "Event Definition": "Визначення події",
+  "Scheduling": "Планування",
+  "Last Matched": "Останній збіг",
+  "Notifications": "Сповіщення"
 }

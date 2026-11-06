@@ -32,7 +32,8 @@
     "refresh_human_name": "Події",
     "replay_search": "Відтворити пошук",
     "histogram_series_events": "Події",
-    "histogram_series_alerts": "Оповіщення"
+    "histogram_series_alerts": "Оповіщення",
+    "human_name": "події"
   },
   "alerts_replay": {
     "cannot_replay": "Неможливо відтворити цю подію: {{reason}} Виберіть іншу.",
