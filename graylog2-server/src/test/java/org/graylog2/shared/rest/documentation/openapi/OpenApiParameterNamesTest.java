@@ -47,8 +47,6 @@ class OpenApiParameterNamesTest {
         final List<String> mismatches = new ArrayList<>();
 
         try (final ScanResult scanResult = new ClassGraph()
-                .enableClasspath()
-                .enableNonSystemModules()
                 .enableClassInfo()
                 .enableAnnotationInfo()
                 .acceptPackages("org.graylog", "org.graylog2")
