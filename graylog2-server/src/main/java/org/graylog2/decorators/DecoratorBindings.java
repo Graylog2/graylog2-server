@@ -16,13 +16,19 @@
  */
 package org.graylog2.decorators;
 
+import com.floreysoft.jmte.Engine;
 import com.google.inject.multibindings.MapBinder;
+import com.google.inject.name.Names;
 import org.graylog2.plugin.decorators.SearchResponseDecorator;
 import org.graylog2.plugin.inject.Graylog2Module;
 
 public class DecoratorBindings extends Graylog2Module {
     @Override
     protected void configure() {
+        bind(Engine.class).annotatedWith(Names.named(DecoratorTemplateEngineProvider.NAME))
+                .toProvider(DecoratorTemplateEngineProvider.class)
+                .asEagerSingleton();
+
         final MapBinder<String, SearchResponseDecorator.Factory> searchResponseDecoratorBinder = searchResponseDecoratorBinder();
         installSearchResponseDecorator(searchResponseDecoratorBinder,
                                        SyslogSeverityMapperDecorator.class,
