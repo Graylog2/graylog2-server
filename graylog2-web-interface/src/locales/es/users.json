@@ -271,7 +271,7 @@
         "compliance_reporting": "Informes de cumplimiento",
         "correlation_aggregation": "Eventos de correlación y agregación",
         "threat_intel": "Integraciones de inteligencia de amenazas",
-        "incident_workspaces": "Espacios de trabajo de Incident Investigation",
+        "incident_workspaces": "Espacios de trabajo de investigación de incidentes",
         "prebuilt_parser_dashboards": "Parser y Dashboards de seguridad preconfigurados",
         "sigma_rules": "Sigma Rules",
         "parameterized_dashboards": "Dashboards parametrizados",
