@@ -139,13 +139,21 @@ describe('Markdown', () => {
       expect(svg).not.toContainHTML('<script>');
     });
 
-    it('shows the source with the error when a diagram is invalid', async () => {
-      asMock(mermaid.render).mockRejectedValue(new Error('Parse error on line 2'));
+    it('shows the source with the error when a diagram is invalid, and removes what mermaid left behind', async () => {
+      asMock(mermaid.render).mockImplementation((id: string) => {
+        const leftover = document.createElement('div');
+        leftover.id = `d${id}`;
+        leftover.textContent = 'Syntax error in text';
+        document.body.appendChild(leftover);
+
+        return Promise.reject(new Error('Parse error on line 2'));
+      });
 
       render(<Markdown text={diagram} />);
 
       await screen.findByText(/could not be rendered: parse error on line 2/i);
       expect(screen.getByText(/graph LR/)).toBeInTheDocument();
+      expect(screen.queryByText('Syntax error in text')).not.toBeInTheDocument();
     });
 
     it('keeps other code blocks', async () => {
