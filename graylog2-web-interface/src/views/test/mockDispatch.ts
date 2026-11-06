@@ -25,7 +25,7 @@ import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
 import SearchMetadata from 'views/logic/search/SearchMetadata';
 
 const defaultState = { view: { view: createSearch(), activeQuery: 'query-id-1' } } as RootState;
-const mockSearchExecutors: SearchExecutors = {
+export const mockSearchExecutors: SearchExecutors = {
   resultMapper: (r) => r,
   parse: async () => SearchMetadata.empty(),
   executeJobResult: async () => ({}) as SearchExecutionResult,
