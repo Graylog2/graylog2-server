@@ -33,7 +33,8 @@ type Arguments = {
 };
 
 // Matches any of the given values of a single field, e.g. `source:(a OR b)`.
-// The missing bucket is matched with `NOT _exists_:field`, e.g. `(source:(a OR b) OR NOT _exists_:source)`.
+// The missing bucket is matched with `NOT _exists_:field`, e.g. `((source:(a OR b)) OR (NOT _exists_:source))`.
+// Each alternative is bracketed, because Lucene would otherwise treat `NOT` as prohibiting the field for the whole group.
 export const anyValueClause = (field: string, values: Array<QueryValue>, type: FieldType) => {
   const presentValues = values.filter((value) => value !== MISSING_BUCKET_NAME);
   const includesMissingBucket = presentValues.length !== values.length;
@@ -45,7 +46,7 @@ export const anyValueClause = (field: string, values: Array<QueryValue>, type: F
     ...(presentValues.length > 0 ? [presentValuesClause] : []),
     ...(includesMissingBucket ? [predicate(field, MISSING_BUCKET_NAME)] : []),
   ];
-  const clause = concatQueryStrings(clauses, { operator: 'OR', withBrackets: false });
+  const clause = concatQueryStrings(clauses, { operator: 'OR', withBrackets: true });
 
   return clauses.length > 1 ? `(${clause})` : clause;
 };

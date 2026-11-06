@@ -77,7 +77,7 @@ const SelectedRowsActions = ({ selectedRowsCount, fieldValues, onClearSelection 
 
   return (
     <Container>
-      <DropdownButton bsSize="xsmall" title="Bulk actions" id={`selected-rows-actions-${dropdownId}`}>
+      <DropdownButton bsSize="xsmall" title="Bulk actions" withinPortal id={`selected-rows-actions-${dropdownId}`}>
         <FieldsSubmenu title="Add to query" fieldValues={fieldValues} onSelect={onAddToQuery} />
         <FieldsSubmenu title="Exclude from results" fieldValues={fieldValues} onSelect={onExclude} />
         <MenuItem divider />

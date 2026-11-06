@@ -20,8 +20,13 @@ import { concatQueryStrings, escape, formatTimestamp, predicate } from 'views/lo
 export type QueryValue = string | number;
 export type QueryValueForClause = { value: QueryValue; type?: FieldType };
 
-export const formatQueryValue = (value: QueryValue, type?: FieldType) =>
-  type?.type === 'date' ? formatTimestamp(value) : escape(value);
+export const formatQueryValue = (value: QueryValue, type?: FieldType) => {
+  if (value === '') {
+    return '""';
+  }
+
+  return type?.type === 'date' ? formatTimestamp(value) : escape(value);
+};
 
 export const orValuesClause = (values: Array<QueryValueForClause>) =>
   `(${concatQueryStrings(

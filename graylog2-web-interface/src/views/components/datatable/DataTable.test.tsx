@@ -652,6 +652,66 @@ describe('DataTable', () => {
       expect(updateQueryString).toHaveBeenCalledWith('query-id-1', 'controller:UsersController');
     });
 
+    it('does not allow selecting rows when grouping only by time', async () => {
+      const config = sourceConfig
+        .toBuilder()
+        .rowPivots([Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1.0 } })])
+        .build();
+      const timeData = {
+        chart: [
+          {
+            key: ['2019-01-17T11:00:00.000Z'],
+            source: 'leaf',
+            values: [{ key: ['count()'], rollup: true, source: 'row-leaf', value: 42 }],
+          },
+        ],
+      };
+      render(
+        <SimplifiedDataTable
+          config={config}
+          // @ts-expect-error
+          data={timeData}
+        />,
+      );
+
+      await screen.findByText('42');
+
+      expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+    });
+
+    it('offers only value pivot fields when grouping by time and values', async () => {
+      const config = sourceConfig
+        .toBuilder()
+        .rowPivots([
+          Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1.0 } }),
+          Pivot.createValues(['source']),
+        ])
+        .build();
+      const mixedData = {
+        chart: [
+          {
+            key: ['2019-01-17T11:00:00.000Z', 'host1'],
+            source: 'leaf',
+            values: [{ key: ['count()'], rollup: true, source: 'row-leaf', value: 42 }],
+          },
+        ],
+      };
+      render(
+        <SimplifiedDataTable
+          config={config}
+          // @ts-expect-error
+          data={mixedData}
+        />,
+      );
+
+      await userEvent.click(await screen.findByRole('checkbox', { name: /select timestamp .*, source host1/i }));
+      await userEvent.click(screen.getByRole('button', { name: /bulk actions/i }));
+      await userEvent.click(await screen.findByRole('menuitem', { name: 'Add to query' }));
+      await screen.findByRole('menuitem', { name: 'source' });
+
+      expect(screen.queryByRole('menuitem', { name: 'timestamp' })).not.toBeInTheDocument();
+    });
+
     it('does not allow selecting rows in non-interactive mode', async () => {
       render(
         <InteractiveContext.Provider value="read-only">

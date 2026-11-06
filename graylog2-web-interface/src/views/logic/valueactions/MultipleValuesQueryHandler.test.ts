@@ -59,8 +59,13 @@ describe('MultipleValuesQueryHandler', () => {
     it('matches missing bucket with non-existing field', () => {
       expect(anyValueClause('source', [MISSING_BUCKET_NAME], keywordType)).toBe('NOT _exists_:source');
       expect(anyValueClause('source', ['host1', MISSING_BUCKET_NAME, 'host2'], keywordType)).toBe(
-        '(source:(host1 OR host2) OR NOT _exists_:source)',
+        '((source:(host1 OR host2)) OR (NOT _exists_:source))',
       );
+    });
+
+    it('matches empty string values', () => {
+      expect(anyValueClause('source', [''], keywordType)).toBe('source:""');
+      expect(anyValueClause('source', ['host1', ''], keywordType)).toBe('source:(host1 OR "")');
     });
   });
 

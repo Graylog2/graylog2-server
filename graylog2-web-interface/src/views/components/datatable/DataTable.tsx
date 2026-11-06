@@ -34,6 +34,7 @@ import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visuali
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { updateWidgetConfig } from 'views/logic/slices/widgetActions';
 import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits';
+import { ValuesType } from 'views/logic/aggregationbuilder/Pivot';
 
 import TableHead from './TableHead';
 import DataTableEntry from './DataTableEntry';
@@ -238,7 +239,9 @@ const DataTable = ({
     rows.filter((r): r is Leaf => r.source === 'leaf'),
   );
 
-  const rowSelection = useRowSelection(expandedRows, rowFieldNames, fields);
+  // Only value pivots can be filtered by exact values; time pivot keys are bucket starts, not field values.
+  const valuePivotFieldNames = rowPivots.filter((pivot) => pivot.type === ValuesType).flatMap((pivot) => pivot.fields);
+  const rowSelection = useRowSelection(expandedRows, rowFieldNames, valuePivotFieldNames, fields);
   const selectionColumnOffset = rowSelection.selectAll ? 1 : 0;
 
   const actualColumnPivotFields = _extractColumnPivotValues(rows);

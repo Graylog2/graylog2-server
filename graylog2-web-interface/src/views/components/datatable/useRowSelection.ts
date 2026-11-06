@@ -22,10 +22,15 @@ import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import type { Row } from './rowSelection';
 import { rowSelectionKey, rowSelectionLabel, selectableFieldsFor, selectedValuesByField } from './rowSelection';
 
-const useRowSelection = (rows: Array<Row>, rowFieldNames: Array<string>, types: FieldTypeMappingsList) => {
+const useRowSelection = (
+  rows: Array<Row>,
+  rowFieldNames: Array<string>,
+  selectableFieldNames: Array<string>,
+  types: FieldTypeMappingsList,
+) => {
   const interactive = useIsInteractiveMode();
   const [selection, setSelection] = useState<Array<string>>([]);
-  const selectableFields = selectableFieldsFor(rowFieldNames, types, interactive);
+  const selectableFields = selectableFieldsFor(selectableFieldNames, types, interactive);
   const isSelectable = selectableFields.length > 0;
   const rowKeys = isSelectable ? rows.map((row) => rowSelectionKey(row, rowFieldNames)) : [];
   // Ignores selected rows which are no longer part of the result.
