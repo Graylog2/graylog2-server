@@ -149,7 +149,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
                                         @Parameter(name = "streams", description = "Comma separated list of streams to search in (can be empty)", required = true) @QueryParam("streams") Set<String> streams,
                                         @Parameter(name = "stream_categories", description = "Comma separated list of streams categories to search in (can be empty)", required = true) @QueryParam("stream_categories") Set<String> streamCategories,
                                         @Parameter(name = "timerange", description = "Timeframe to search in. See method description.", required = true) @QueryParam("timerange") String timerangeKeyword,
-                                        @Parameter(name = "group_by", description = "Group aggregation by fields/limits.", required = true) @QueryParam("groups") List<String> groups,
+                                        @Parameter(name = "groups", description = "Group aggregation by fields/limits.", required = true) @QueryParam("groups") List<String> groups,
                                         @Parameter(name = "metrics", description = "Metrics to be used.", required = true) @QueryParam("metrics") List<String> metrics,
                                         @Parameter(name = "size", description = "Number of items to return for all groupings/buckets (default: 15)") @QueryParam("size") Integer allGroupingsSize,
                                         @Context SearchUser searchUser) {
