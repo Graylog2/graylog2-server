@@ -328,12 +328,12 @@ public class UsersResource extends RestResource {
                                                       @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                       @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
                                                       @Parameter(name = "sort",
-                                                              description = "The field to sort the result on",
-                                                              required = true,
-                                                              schema = @Schema(allowableValues = {"username", "full_name", "email"}))
+                                                                 description = "The field to sort the result on",
+                                                                 required = true,
+                                                                 schema = @Schema(allowableValues = {"username", "full_name", "email"}))
                                                       @DefaultValue(UserOverviewDTO.FIELD_FULL_NAME) @QueryParam("sort") String sort,
                                                       @Parameter(name = "order", description = "The sort direction",
-                                                              schema = @Schema(allowableValues = {"asc", "desc"}))
+                                                                 schema = @Schema(allowableValues = {"asc", "desc"}))
                                                       @DefaultValue("asc") @QueryParam("order") SortOrder order) {
 
         SearchQuery searchQuery;
@@ -391,7 +391,8 @@ public class UsersResource extends RestResource {
             @ApiResponse(responseCode = "400", description = "Missing or invalid user details.")
     })
     @AuditEvent(type = AuditEventTypes.USER_CREATE)
-    public Response create(@RequestBody(description = "Must contain username, full_name, email, password and a list of permissions.", required = true)
+    @SuppressWarnings("removal")
+    public Response create(@RequestBody(description = "The user account to create", required = true)
                            @Valid @NotNull CreateUserRequest cr,
                            @Context UserContext userContext) throws ValidationException {
         if (isUserNameInUse(cr.username())) {
@@ -404,6 +405,11 @@ public class UsersResource extends RestResource {
         }
         privilegeEscalationGuard.validatePermissionsAndRoles(cr, userContext);
         validatePasswordComplexity(cr.password());
+
+        if (!cr.permissions().isEmpty()) {
+            LOG.warn("Request 'POST /users' creates user <{}> with direct permissions. Direct user permissions are " +
+                    "deprecated and will be removed in version 8.0. Assign roles instead.", cr.username());
+        }
 
         // Create user.
         User user = userManagementService.create();
@@ -438,7 +444,6 @@ public class UsersResource extends RestResource {
 
         return Response.created(userUri).build();
     }
-
 
 
     @GET
@@ -544,6 +549,7 @@ public class UsersResource extends RestResource {
             @ApiResponse(responseCode = "400", description = "Missing or invalid user details.")
     })
     @AuditEvent(type = AuditEventTypes.USER_UPDATE)
+    @SuppressWarnings("removal")
     public void changeUser(@Parameter(name = "userId", description = "The ID of the user to modify.", required = true)
                            @PathParam("userId") String userId,
                            @RequestBody(description = "Updated user information.", required = true)
@@ -569,6 +575,12 @@ public class UsersResource extends RestResource {
         final boolean permitted = isPermitted(USERS_PERMISSIONSEDIT, user.getName());
         if (permitted && cr.permissions() != null) {
             privilegeEscalationGuard.validatePermissions(cr.permissions(), userContext);
+
+            if (!cr.permissions().isEmpty()) {
+                LOG.warn("Request 'PUT /users/{}' sets direct permissions on user <{}>. Direct user permissions " +
+                        "are deprecated and will be removed in version 8.0. Assign roles instead.", userId, username);
+            }
+
             user.setPermissions(getEffectiveUserPermissions(user, cr.permissions()));
         }
 
@@ -678,15 +690,22 @@ public class UsersResource extends RestResource {
         }
     }
 
+    /**
+     * @deprecated This endpoint will be removed in version 8.0. Assign roles instead of direct user permissions.
+     */
+    @Deprecated(since = "7.3.0", forRemoval = true)
     @PUT
     @Path("{username}/permissions")
     @RequiresPermissions(RestPermissions.USERS_PERMISSIONSEDIT)
-    @Operation(summary = "Update a user's permission set.")
+    @Operation(summary = "Update a user's permission set.", deprecated = true,
+               description = "Deprecated: this endpoint will be removed in version 8.0. Assign roles instead of " +
+                       "direct user permissions.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Success"),
             @ApiResponse(responseCode = "400", description = "Missing or invalid permission data.")
     })
     @AuditEvent(type = AuditEventTypes.USER_PERMISSIONS_UPDATE)
+    @SuppressWarnings("removal")
     public void editPermissions(@Parameter(name = "username", description = "The name of the user to modify.", required = true)
                                 @PathParam("username") String username,
                                 @RequestBody(description = "The list of permissions to assign to the user.", required = true)
@@ -698,6 +717,11 @@ public class UsersResource extends RestResource {
         }
 
         privilegeEscalationGuard.validatePermissions(permissionRequest.permissions(), userContext);
+
+        LOG.warn("Request 'PUT /users/{}/permissions' sets direct permissions on user <{}>. This endpoint will be " +
+                        "removed in version 8.0. Assign roles instead of direct user permissions.",
+                username, username);
+
         user.setPermissions(getEffectiveUserPermissions(user, permissionRequest.permissions()));
         userManagementService.save(user);
     }
@@ -725,10 +749,16 @@ public class UsersResource extends RestResource {
         userManagementService.save(user);
     }
 
+    /**
+     * @deprecated This endpoint will be removed in version 8.0. Assign roles instead of direct user permissions.
+     */
+    @Deprecated(since = "7.3.0", forRemoval = true)
     @DELETE
     @Path("{username}/permissions")
     @RequiresPermissions(RestPermissions.USERS_PERMISSIONSEDIT)
-    @Operation(summary = "Revoke all permissions for a user without deleting the account.")
+    @Operation(summary = "Revoke all permissions for a user without deleting the account.", deprecated = true,
+               description = "Deprecated: this endpoint will be removed in version 8.0. Assign roles instead of " +
+                       "direct user permissions.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Success"),
             @ApiResponse(responseCode = "500", description = "When saving the user failed.")
@@ -740,6 +770,11 @@ public class UsersResource extends RestResource {
         if (user == null) {
             throw new NotFoundException("Couldn't find user " + username);
         }
+
+        LOG.warn("Request 'DELETE /users/{}/permissions' cleared direct permissions of user <{}>. This endpoint will " +
+                        "be removed in version 8.0. Assign roles instead of direct user permissions.",
+                username, username);
+
         user.setPermissions(Collections.emptyList());
         userManagementService.save(user);
     }
@@ -816,7 +851,7 @@ public class UsersResource extends RestResource {
             @Parameter(name = "userId", description = "The id of the user whose status to change.", required = true)
             @PathParam("userId") @NotBlank String userId,
             @Parameter(name = "newStatus", description = "The account status to be set", required = true,
-                      schema = @Schema(allowableValues = {"enabled", "disabled", "deleted"}))
+                       schema = @Schema(allowableValues = {"enabled", "disabled", "deleted"}))
             @PathParam("newStatus") @NotBlank String newStatusString,
             @Context UserContext userContext) throws ValidationException {
 
@@ -1031,7 +1066,7 @@ public class UsersResource extends RestResource {
             String[] parts = permission.toString().split(":");
             boolean hasUsername = parts.length == USERNAME_PERMISSION_PARTS_LENGTH && USER_PERMISSION_DOMAIN.equals(parts[0]);
             if (hasUsername) {
-                String username = parts[parts.length-1];
+                String username = parts[parts.length - 1];
                 String userId = userIdCache.computeIfAbsent(username, name -> {
                     final User loadedUser = userManagementService.load(name);
                     return loadedUser != null ? loadedUser.getId() : null;

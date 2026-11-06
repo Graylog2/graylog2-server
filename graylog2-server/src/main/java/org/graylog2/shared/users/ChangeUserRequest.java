@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
@@ -47,6 +48,8 @@ public abstract class ChangeUserRequest {
 
     @JsonProperty("permissions")
     @Nullable
+    @Deprecated(since = "7.3.0", forRemoval = true)
+    @Schema(deprecated = true, description = "Deprecated: direct user permissions will be removed in version 8.0. Assign roles instead.")
     public abstract List<String> permissions();
 
     @JsonProperty("timezone")
