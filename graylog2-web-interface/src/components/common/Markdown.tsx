@@ -78,19 +78,29 @@ const Table = styled.table(
   `,
 );
 
-// The table's content is transformed like everything else, e.g. its links and augmented values.
-const parseWithTables = (html: string, transformer: Transformer) => {
+// The content of tables and links is transformed like everything else, e.g. its links and augmented values.
+const parseHtml = (html: string, transformer: Transformer) => {
   const options: HTMLReactParserOptions = {};
-  const tableTransformer: Transformer = (domNode) =>
-    domNode instanceof Element && domNode.name === 'table' ? (
-      <Table>{domToReact(domNode.children as DOMNode[], options)}</Table>
-    ) : undefined;
-  options.replace = transformer ? mergeTransformer([transformer, tableTransformer]) : tableTransformer;
+  const contentOf = (domNode: Element) => domToReact(domNode.children as DOMNode[], options);
+  const containerTransformer: Transformer = (domNode) => {
+    if (!(domNode instanceof Element)) {
+      return undefined;
+    }
+
+    if (domNode.name === 'table') {
+      return <Table>{contentOf(domNode)}</Table>;
+    }
+
+    const href = domNode.name === 'a' ? domNode.attribs?.href : undefined;
+
+    return href ? <MarkdownLink href={href}>{contentOf(domNode)}</MarkdownLink> : undefined;
+  };
+  options.replace = transformer ? mergeTransformer([transformer, containerTransformer]) : containerTransformer;
 
   return parse(html, options);
 };
 
-const HTML: Renderer = ({ html, transformer }) => parseWithTables(html, transformer);
+const HTML: Renderer = ({ html, transformer }) => parseHtml(html, transformer);
 
 const useMarkdownTransformer = (): HTMLReactParserOptions['replace'] => {
   const components = usePluginEntities('markdown.augment.components');
@@ -136,7 +146,7 @@ const Augment: Renderer = ({ html, transformer }) => {
     [markdownTransformer, transformer],
   );
 
-  return parseWithTables(html, replace);
+  return parseHtml(html, replace);
 };
 
 const UnsupportedImageWarning = () => (
@@ -152,20 +162,6 @@ const imageWarningTransformer: Transformer = (domNode) => {
   }
 
   return undefined;
-};
-
-const anchorTransformer: Transformer = (domNode) => {
-  if (!(domNode instanceof Element) || domNode.name !== 'a') {
-    return undefined;
-  }
-
-  const href = domNode.attribs?.href;
-
-  if (!href) {
-    return undefined;
-  }
-
-  return <MarkdownLink href={href}>{domToReact(domNode.children as DOMNode[])}</MarkdownLink>;
 };
 
 const textOf = (nodes: Array<DOMNode>): string =>
@@ -217,7 +213,7 @@ const Markdown = ({ augment = false, text }: Props) => {
       : imageWarningTransformer;
 
   const transformer = useMemo(
-    () => mergeTransformer([anchorTransformer, mermaidTransformer, ...(imageTransformer ? [imageTransformer] : [])]),
+    () => mergeTransformer([mermaidTransformer, ...(imageTransformer ? [imageTransformer] : [])]),
     [imageTransformer],
   );
 
