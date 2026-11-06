@@ -36,6 +36,8 @@ import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
 import type UnitsConfig from 'views/logic/aggregationbuilder/UnitsConfig';
 
 import TableDataCell from './TableDataCell';
+import { SelectRowCell } from './SelectionCells';
+import type { SelectRowProps } from './SelectionCells';
 
 import CustomHighlighting from '../highlighting/CustomHighlighting';
 import DecoratedValue from '../messagelist/decoration/DecoratedValue';
@@ -57,6 +59,7 @@ type Props = {
   units: UnitsConfig;
   pinnedColumnIndexes: Set<number>;
   striped?: boolean;
+  selection?: SelectRowProps;
 };
 
 const _c = (field: string, value: any, path: ValuePath, source: string) => ({ field, value, path, source });
@@ -134,6 +137,7 @@ const DataTableEntry = ({
   units,
   pinnedColumnIndexes,
   striped = false,
+  selection = undefined,
 }: Props) => {
   const classes = 'message-group';
   const activeQuery = useActiveQueryId();
@@ -165,13 +169,14 @@ const DataTableEntry = ({
 
   return (
     <tr className={`fields-row ${classes}`}>
+      {selection && <SelectRowCell {...selection} />}
       {showRowNumbers && <LineNumber>{index}</LineNumber>}
       {columns.map(({ field, value, path, source }, idx) => {
         const key = `${activeQuery}-${field}=${value}-${idx}`;
         const nameForField = columnNameToField(field, series);
         const fieldNameForUnit = parseSeries(nameForField)?.field ?? nameForField;
         const unit = units.getFieldUnit(fieldNameForUnit);
-        const columnIndex = idx + (showRowNumbers ? 1 : 0);
+        const columnIndex = idx + (showRowNumbers ? 1 : 0) + (selection ? 1 : 0);
         const className = getPinnedCellClassName(pinnedColumnIndexes.has(columnIndex), isStripedRow);
 
         return (
