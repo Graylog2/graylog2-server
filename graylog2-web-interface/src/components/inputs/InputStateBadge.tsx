@@ -50,8 +50,9 @@ const getBadgeColorForState = (
     case 'RUNNING':
       return 'success';
     case 'FAILED':
-    case 'STOPPED':
       return 'danger';
+    case 'STOPPED':
+      return 'warning';
     case 'STARTING':
       return 'primary';
     default:
