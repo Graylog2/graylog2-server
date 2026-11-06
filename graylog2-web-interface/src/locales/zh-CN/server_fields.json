@@ -278,5 +278,9 @@
   "Whether to use Nagle's algorithm for TCP connections": "是否对 TCP 连接使用 Nagle 算法",
   "Whether to verify peers when using TLS": "使用 TLS 时是否验证对端",
   "Which pipeline to use for message decoration": "用于消息装饰的 Pipeline",
-  "ZooKeeper address (legacy mode only)": "ZooKeeper 地址（仅限旧版模式）"
+  "ZooKeeper address (legacy mode only)": "ZooKeeper 地址（仅限旧版模式）",
+  "Contains messages that are not explicitly routed to other streams": "包含未明确路由到其他 Stream 的消息",
+  "Stream containing all events created": "包含所有已创建事件的 Stream",
+  "Stream containing all system events created": "包含所有已创建系统事件的 Stream",
+  "Stream containing system logs from managed collectors": "包含受管 Collector 系统日志的 Stream"
 }

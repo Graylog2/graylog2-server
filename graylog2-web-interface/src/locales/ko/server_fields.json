@@ -278,5 +278,9 @@
   "Whether to use Nagle's algorithm for TCP connections": "TCP 연결에 Nagle 알고리즘을 사용할지 여부",
   "Whether to verify peers when using TLS": "TLS 사용 시 피어를 검증할지 여부",
   "Which pipeline to use for message decoration": "메시지 데코레이션에 사용할 파이프라인",
-  "ZooKeeper address (legacy mode only)": "ZooKeeper 주소 (레거시 모드 전용)"
+  "ZooKeeper address (legacy mode only)": "ZooKeeper 주소 (레거시 모드 전용)",
+  "Contains messages that are not explicitly routed to other streams": "다른 스트림으로 명시적으로 라우팅되지 않은 메시지를 포함합니다",
+  "Stream containing all events created": "생성된 모든 이벤트를 포함하는 스트림",
+  "Stream containing all system events created": "생성된 모든 시스템 이벤트를 포함하는 스트림",
+  "Stream containing system logs from managed collectors": "관리되는 수집기의 시스템 로그를 포함하는 스트림"
 }

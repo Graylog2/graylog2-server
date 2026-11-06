@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type { BackendWidgetPosition } from 'views/types';
 import { AdditionalContext } from 'views/logic/ActionContext';
@@ -25,6 +26,7 @@ import ExportSettingsContextProvider from 'views/components/ExportSettingsContex
 import View from 'views/logic/views/View';
 import defaultTitle from 'views/components/defaultTitle';
 import TitleTypes from 'views/stores/TitleTypes';
+import translateGeneratedText from 'views/logic/translateGeneratedText';
 import useViewType from 'views/hooks/useViewType';
 import type WidgetType from 'views/logic/widgets/Widget';
 import useWidget from 'views/hooks/useWidget';
@@ -43,8 +45,13 @@ type Props = {
 
 const useTitle = (widget: WidgetType) => {
   const activeViewState = useActiveViewState();
+  // Renders again when the language changes.
+  useTranslation('widgets');
 
-  return activeViewState?.titles?.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget)) as string;
+  // Titles of new searches are stored in English, e.g. "Message Count".
+  return translateGeneratedText(
+    activeViewState?.titles?.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget)) as string,
+  );
 };
 
 const WidgetComponent = ({ editing, onPositionsChange = () => undefined, position, widgetId }: Props) => {

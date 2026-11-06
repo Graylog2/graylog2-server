@@ -554,5 +554,8 @@
   "views_logic": {
     "result_window_limit": "Elasticsearch는 검색 결과를 메시지 {{limit}}개로 제한합니다. 페이지 크기가 메시지 {{pageSize}}개이면 처음 {{validPages}}페이지를 사용할 수 있습니다.",
     "confirm_delete_dashboard_page": "이 대시보드 페이지를 삭제하시겠습니까?"
+  },
+  "saved_searches_overview": {
+    "human_name": "저장된 검색"
   }
 }

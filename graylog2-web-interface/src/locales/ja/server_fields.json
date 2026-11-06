@@ -278,5 +278,9 @@
   "Whether to use Nagle's algorithm for TCP connections": "TCP接続でNagleのアルゴリズムを使用するかどうか",
   "Whether to verify peers when using TLS": "TLSを使用する際に通信相手を検証するかどうか",
   "Which pipeline to use for message decoration": "メッセージの装飾に使用するパイプライン",
-  "ZooKeeper address (legacy mode only)": "ZooKeeperのアドレス（レガシーモードのみ）"
+  "ZooKeeper address (legacy mode only)": "ZooKeeperのアドレス（レガシーモードのみ）",
+  "Contains messages that are not explicitly routed to other streams": "他のストリームに明示的にルーティングされないメッセージを含みます",
+  "Stream containing all events created": "作成されたすべてのイベントを含むストリーム",
+  "Stream containing all system events created": "作成されたすべてのシステムイベントを含むストリーム",
+  "Stream containing system logs from managed collectors": "管理対象コレクターのシステムログを含むストリーム"
 }

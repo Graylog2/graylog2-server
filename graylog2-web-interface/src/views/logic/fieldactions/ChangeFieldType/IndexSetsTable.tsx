@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 import { PaginatedEntityTable } from 'components/common';
@@ -48,6 +49,7 @@ const mapper = (indexSets: Array<IndexSet>): Record<string, IndexSet> => {
 };
 
 const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelection }: Props) => {
+  const { t } = useTranslation('indexsets');
   const { data } = useIndexSetsList();
   const currentStreams = useCurrentStream();
 
@@ -76,7 +78,7 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
   return (
     <Container>
       <PaginatedEntityTable<FieldTypeUsage>
-        humanName="Index Sets"
+        humanName={t('overview_table.human_name')}
         tableLayout={DEFAULT_LAYOUT}
         withoutURLParams
         fetchEntities={fetchEntities}

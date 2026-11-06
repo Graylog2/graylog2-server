@@ -16,6 +16,7 @@
  */
 import type { DefaultTheme } from 'styled-components';
 
+import translateGeneratedText from 'views/logic/translateGeneratedText';
 import getDefaultPlotFontSettings from 'views/components/visualizations/utils/getDefaultPlotFontSettings';
 import { AXIS_LABEL_MARGIN } from 'views/components/visualizations/Constants';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
@@ -46,7 +47,7 @@ const getDefaultPlotYLayoutSettings = (
     tickfont: { ...fontSettings, color },
     title: {
       font: { ...fontSettings, color },
-      text: visualizationAxisTitle,
+      text: translateGeneratedText(visualizationAxisTitle),
       automargin: true,
       standoff: AXIS_LABEL_MARGIN,
     },

@@ -26,10 +26,14 @@ describe('serverText', () => {
     i18n.addResourceBundle('en', 'server_fields', {
       'Bind address': 'Bind address',
       'Port: e.g. 514.': 'Port: e.g. 514.',
+      'Archived documents in indices: {{indices}}': 'Archived documents in indices: {{indices}}',
+      'Restored {{documents}} documents from index: {{index}}': 'Restored {{documents}} documents from index: {{index}}',
     });
     i18n.addResourceBundle('de', 'server_fields', {
       'Bind address': 'Bind-Adresse',
       'Port: e.g. 514.': 'Port: z. B. 514.',
+      'Archived documents in indices: {{indices}}': 'Dokumente in Indizes archiviert: {{indices}}',
+      'Restored {{documents}} documents from index: {{index}}': '{{documents}} Dokumente aus Index {{index}} wiederhergestellt',
     });
   });
 
@@ -54,6 +58,18 @@ describe('serverText', () => {
 
     expect(translateServerText('Some new text of the server')).toBe('Some new text of the server');
     expect(translateServerText(undefined)).toBeUndefined();
+  });
+
+  it('translates texts which contain values', async () => {
+    await i18n.changeLanguage('de');
+
+    expect(translateServerText('Archived documents in indices: graylog_1, graylog_2')).toBe(
+      'Dokumente in Indizes archiviert: graylog_1, graylog_2',
+    );
+    expect(translateServerText('Restored 42 documents from index: graylog_3')).toBe(
+      '42 Dokumente aus Index graylog_3 wiederhergestellt',
+    );
+    expect(translateServerText('Archived documents in indices:')).toBe('Archived documents in indices:');
   });
 
   it('follows language changes in components', async () => {

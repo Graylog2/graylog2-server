@@ -562,5 +562,8 @@
   "views_logic": {
     "result_window_limit": "Elasticsearch limita il risultato della ricerca a {{limit}} messaggi. Con una dimensione di pagina di {{pageSize}} messaggi, puoi usare le prime {{validPages}} pagine.",
     "confirm_delete_dashboard_page": "Vuoi davvero eliminare questa pagina della dashboard?"
+  },
+  "saved_searches_overview": {
+    "human_name": "ricerca salvata"
   }
 }

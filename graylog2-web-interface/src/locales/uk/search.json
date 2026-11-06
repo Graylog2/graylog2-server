@@ -566,5 +566,8 @@
   "views_logic": {
     "result_window_limit": "Elasticsearch обмежує результат пошуку {{limit}} повідомленнями. За розміру сторінки {{pageSize}} повідомлень ви можете використовувати перші {{validPages}} сторінок.",
     "confirm_delete_dashboard_page": "Ви справді хочете видалити цю сторінку панелі моніторингу?"
+  },
+  "saved_searches_overview": {
+    "human_name": "збережені пошуки"
   }
 }

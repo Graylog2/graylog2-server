@@ -224,5 +224,15 @@
   "notifications": {
     "delete_decorator_confirm": "Ви справді хочете видалити цей декоратор?",
     "unsaved_changes_confirm": "У формі конфігурації є незбережені зміни. Ця дія скасує їх"
+  },
+  "generated_texts": {
+    "message_count": "Кількість повідомлень",
+    "all_messages": "Усі повідомлення",
+    "untitled_aggregation": "Агрегація без назви",
+    "untitled_message_table": "Таблиця повідомлень без назви",
+    "untitled_events_overview": "Огляд подій без назви",
+    "untitled_text_widget": "Текстовий віджет без назви",
+    "count": "Кількість",
+    "time_range": "Часовий діапазон"
   }
 }

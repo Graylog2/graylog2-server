@@ -278,5 +278,9 @@
   "Whether to use Nagle's algorithm for TCP connections": "Si se debe usar el algoritmo de Nagle en las conexiones TCP",
   "Whether to verify peers when using TLS": "Si se debe verificar a los pares al usar TLS",
   "Which pipeline to use for message decoration": "Qué pipeline usar para enriquecer los mensajes",
-  "ZooKeeper address (legacy mode only)": "Dirección de ZooKeeper (solo modo heredado)"
+  "ZooKeeper address (legacy mode only)": "Dirección de ZooKeeper (solo modo heredado)",
+  "Contains messages that are not explicitly routed to other streams": "Contiene los mensajes que no se enrutan explícitamente a otros Streams",
+  "Stream containing all events created": "Stream que contiene todos los eventos creados",
+  "Stream containing all system events created": "Stream que contiene todos los eventos del sistema creados",
+  "Stream containing system logs from managed collectors": "Stream que contiene los registros del sistema de los Collectors administrados"
 }

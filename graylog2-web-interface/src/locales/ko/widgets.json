@@ -218,5 +218,15 @@
   "notifications": {
     "delete_decorator_confirm": "이 데코레이터를 삭제하시겠습니까?",
     "unsaved_changes_confirm": "구성 양식에 저장되지 않은 변경 사항이 있습니다. 이 작업을 수행하면 변경 사항이 되돌려집니다"
+  },
+  "generated_texts": {
+    "message_count": "메시지 수",
+    "all_messages": "모든 메시지",
+    "untitled_aggregation": "제목 없는 집계",
+    "untitled_message_table": "제목 없는 메시지 테이블",
+    "untitled_events_overview": "제목 없는 이벤트 개요",
+    "untitled_text_widget": "제목 없는 텍스트 위젯",
+    "count": "개수",
+    "time_range": "시간 범위"
   }
 }

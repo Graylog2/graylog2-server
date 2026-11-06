@@ -29,6 +29,8 @@ import i18n from 'i18n';
  */
 const LOOKUP_OPTIONS = { keySeparator: false, nsSeparator: false } as const;
 
+const DEFAULT_LANGUAGE = 'en';
+
 /** Namespaces searched for server texts, in this order. Plugins (e.g. enterprise) register their own. */
 const SERVER_TEXT_NAMESPACES = [
   'server_fields',
@@ -36,6 +38,41 @@ const SERVER_TEXT_NAMESPACES = [
   'entity_attributes',
   'enterprise_entity_attributes',
 ];
+
+type Template = { key: string; pattern: RegExp; names: Array<string> };
+
+const templatesByBundle = new WeakMap<object, Array<Template>>();
+
+const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/**
+ * Keys with placeholders, e.g. `Archived documents in indices: {{indices}}`, match server texts which contain
+ * values, e.g. `Archived documents in indices: graylog_1, graylog_2`.
+ */
+const templatesOf = (namespace: string): Array<Template> => {
+  const bundle = i18n.getResourceBundle(DEFAULT_LANGUAGE, namespace) as { [key: string]: string } | undefined;
+
+  if (!bundle) {
+    return [];
+  }
+
+  if (!templatesByBundle.has(bundle)) {
+    const templates = Object.keys(bundle)
+      .filter((key) => key.includes('{{'))
+      .map((key) => {
+        const names = [...key.matchAll(/\{\{(\w+)\}\}/g)].map(([, name]) => name);
+        const source = key
+          .split(/\{\{\w+\}\}/)
+          .map(escapeRegExp)
+          .join('(.+?)');
+
+        return { key, pattern: new RegExp(`^${source}$`, 's'), names };
+      });
+    templatesByBundle.set(bundle, templates);
+  }
+
+  return templatesByBundle.get(bundle);
+};
 
 const lookup =
   (translate: (key: string, options: TOptions) => string, exists: (key: string, options: TOptions) => boolean) =>
@@ -46,7 +83,23 @@ const lookup =
 
     const namespace = namespaces.find((ns) => exists(text, { ns, ...LOOKUP_OPTIONS }));
 
-    return namespace ? translate(text, { ns: namespace, ...LOOKUP_OPTIONS }) : text;
+    if (namespace) {
+      return translate(text, { ns: namespace, ...LOOKUP_OPTIONS });
+    }
+
+    for (const ns of namespaces) {
+      for (const { key, pattern, names } of templatesOf(ns)) {
+        const match = pattern.exec(text);
+
+        if (match) {
+          const values = Object.fromEntries(names.map((name, index) => [name, match[index + 1]]));
+
+          return translate(key, { ns, ...LOOKUP_OPTIONS, ...values });
+        }
+      }
+    }
+
+    return text;
   };
 
 /** Translated text of a server text, or the text itself. Use `useServerText` in components, so they follow language changes. */

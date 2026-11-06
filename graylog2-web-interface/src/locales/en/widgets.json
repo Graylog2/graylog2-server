@@ -220,5 +220,15 @@
   "notifications": {
     "delete_decorator_confirm": "Do you really want to delete this decorator?",
     "unsaved_changes_confirm": "You have unsaved changes in configuration form. This action will rollback them"
+  },
+  "generated_texts": {
+    "message_count": "Message Count",
+    "all_messages": "All Messages",
+    "untitled_aggregation": "Untitled Aggregation",
+    "untitled_message_table": "Untitled Message Table",
+    "untitled_events_overview": "Untitled Events Overview",
+    "untitled_text_widget": "Untitled Text Widget",
+    "count": "Count",
+    "time_range": "Time Range"
   }
 }

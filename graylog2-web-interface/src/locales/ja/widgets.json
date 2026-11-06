@@ -218,5 +218,15 @@
   "notifications": {
     "delete_decorator_confirm": "このデコレーターを本当に削除しますか？",
     "unsaved_changes_confirm": "設定フォームに未保存の変更があります。この操作を行うと、変更は破棄されます"
+  },
+  "generated_texts": {
+    "message_count": "メッセージ数",
+    "all_messages": "すべてのメッセージ",
+    "untitled_aggregation": "無題の集計",
+    "untitled_message_table": "無題のメッセージテーブル",
+    "untitled_events_overview": "無題のイベント概要",
+    "untitled_text_widget": "無題のテキストウィジェット",
+    "count": "件数",
+    "time_range": "期間"
   }
 }

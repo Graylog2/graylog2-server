@@ -554,5 +554,8 @@
   "views_logic": {
     "result_window_limit": "Elasticsearch 將搜尋結果限制為 {{limit}} 則訊息。以每頁 {{pageSize}} 則訊息計算，您可以使用前 {{validPages}} 頁。",
     "confirm_delete_dashboard_page": "您確定要刪除此 Dashboard 頁面嗎？"
+  },
+  "saved_searches_overview": {
+    "human_name": "已儲存的搜尋"
   }
 }

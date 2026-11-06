@@ -278,5 +278,9 @@
   "Whether to use Nagle's algorithm for TCP connections": "Чи використовувати алгоритм Нейгла для TCP-з’єднань",
   "Whether to verify peers when using TLS": "Чи перевіряти вузли під час використання TLS",
   "Which pipeline to use for message decoration": "Який Pipeline використовувати для декорування повідомлень",
-  "ZooKeeper address (legacy mode only)": "Адреса ZooKeeper (лише застарілий режим)"
+  "ZooKeeper address (legacy mode only)": "Адреса ZooKeeper (лише застарілий режим)",
+  "Contains messages that are not explicitly routed to other streams": "Містить повідомлення, які не спрямовано явно до інших потоків",
+  "Stream containing all events created": "Потік з усіма створеними подіями",
+  "Stream containing all system events created": "Потік з усіма створеними системними подіями",
+  "Stream containing system logs from managed collectors": "Потік із системними журналами керованих Collector"
 }

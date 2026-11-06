@@ -218,5 +218,15 @@
   "notifications": {
     "delete_decorator_confirm": "您確定要刪除此裝飾器嗎？",
     "unsaved_changes_confirm": "設定表單中有未儲存的變更。此操作將會捨棄這些變更。"
+  },
+  "generated_texts": {
+    "message_count": "訊息數量",
+    "all_messages": "所有訊息",
+    "untitled_aggregation": "未命名彙總",
+    "untitled_message_table": "未命名訊息表",
+    "untitled_events_overview": "未命名事件概觀",
+    "untitled_text_widget": "未命名文字 Widget",
+    "count": "計數",
+    "time_range": "時間範圍"
   }
 }

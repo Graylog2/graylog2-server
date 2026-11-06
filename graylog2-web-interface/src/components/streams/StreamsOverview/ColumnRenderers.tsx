@@ -27,6 +27,7 @@ import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 import StatusCell from './cells/StatusCell';
+import DescriptionCell from './cells/DescriptionCell';
 import StreamRulesCell from './cells/StreamRulesCell';
 import PipelinesCell from './cells/PipelinesCell';
 import OutputsCell from './cells/OutputsCell';
@@ -53,6 +54,9 @@ const customColumnRenderers = (
   attributes: {
     title: {
       renderCell: (_title: string, stream) => <TitleCell stream={stream} />,
+    },
+    description: {
+      renderCell: (description: string) => <DescriptionCell description={description} />,
     },
     index_set_title: {
       renderCell: (_index_set_title: string, stream) => <IndexSetCell indexSets={indexSets} stream={stream} />,

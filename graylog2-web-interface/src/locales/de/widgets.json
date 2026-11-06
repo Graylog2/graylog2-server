@@ -220,5 +220,15 @@
   "notifications": {
     "delete_decorator_confirm": "Möchten Sie diesen Decorator wirklich löschen?",
     "unsaved_changes_confirm": "Sie haben nicht gespeicherte Änderungen im Konfigurationsformular. Diese Aktion verwirft sie."
+  },
+  "generated_texts": {
+    "message_count": "Anzahl der Nachrichten",
+    "all_messages": "Alle Nachrichten",
+    "untitled_aggregation": "Unbenannte Aggregation",
+    "untitled_message_table": "Unbenannte Nachrichtentabelle",
+    "untitled_events_overview": "Unbenannte Event-Übersicht",
+    "untitled_text_widget": "Unbenanntes Text-Widget",
+    "count": "Anzahl",
+    "time_range": "Zeitbereich"
   }
 }

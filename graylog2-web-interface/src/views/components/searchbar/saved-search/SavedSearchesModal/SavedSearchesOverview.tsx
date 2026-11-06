@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCallback } from 'react';
 
 import { PaginatedEntityTable } from 'components/common';
@@ -36,6 +37,7 @@ type Props = {
 };
 
 const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadSavedSearch }: Props) => {
+  const { t } = useTranslation('search');
   const { pluggableAttributes, pluggableExpandedSections } = usePluggableEntityTableElements<View>(null, 'search');
 
   const renderSavedSearchActions = useCallback(
@@ -61,7 +63,7 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
       expandedSectionRenderers={pluggableExpandedSections}
       fetchEntities={fetchSavedSearches}
       focusSearchAfterMount
-      humanName="Saved Searches"
+      humanName={t('saved_searches_overview.human_name')}
       keyFn={queryKey}
       queryHelpComponent={<QueryHelper entityName="search" commonFields={['id', 'title']} />}
       tableLayout={DEFAULT_LAYOUT}

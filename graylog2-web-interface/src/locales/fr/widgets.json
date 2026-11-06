@@ -222,5 +222,15 @@
   "notifications": {
     "delete_decorator_confirm": "Voulez-vous vraiment supprimer ce décorateur ?",
     "unsaved_changes_confirm": "Vous avez des modifications non enregistrées dans le formulaire de configuration. Cette action les annulera."
+  },
+  "generated_texts": {
+    "message_count": "Nombre de messages",
+    "all_messages": "Tous les messages",
+    "untitled_aggregation": "Agrégation sans titre",
+    "untitled_message_table": "Tableau de messages sans titre",
+    "untitled_events_overview": "Aperçu des événements sans titre",
+    "untitled_text_widget": "Widget de texte sans titre",
+    "count": "Nombre",
+    "time_range": "Plage de temps"
   }
 }

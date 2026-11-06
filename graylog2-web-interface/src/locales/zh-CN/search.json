@@ -554,5 +554,8 @@
   "views_logic": {
     "result_window_limit": "Elasticsearch 将搜索结果限制为 {{limit}} 条消息。每页 {{pageSize}} 条消息时，可使用前 {{validPages}} 页。",
     "confirm_delete_dashboard_page": "确定要删除此 Dashboard 页面吗？"
+  },
+  "saved_searches_overview": {
+    "human_name": "已保存的搜索"
   }
 }

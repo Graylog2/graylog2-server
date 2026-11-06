@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import translateGeneratedText from 'views/logic/translateGeneratedText';
 import { AXIS_LABEL_MARGIN } from 'views/components/visualizations/Constants';
 import getDefaultPlotFontSettings from 'views/components/visualizations/utils/getDefaultPlotFontSettings';
 import type { ChartAxisConfig } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
@@ -33,7 +34,7 @@ const getPlotXTitleSettings = (theme, config: AggregationWidgetConfig) => {
   const color = visualizationAxisColor ?? fontSettings.color;
 
   return {
-    text: visualizationAxisTitle,
+    text: translateGeneratedText(visualizationAxisTitle),
     standoff: AXIS_LABEL_MARGIN,
     font: { ...fontSettings, color },
   };

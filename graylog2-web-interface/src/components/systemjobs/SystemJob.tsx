@@ -27,6 +27,7 @@ import type { BadgeColor } from 'components/bootstrap/Badge';
 import UserNotification from 'util/UserNotification';
 import { SYSTEM_JOBS_QUERY_KEY } from 'components/systemjobs/useSystemJobs';
 import translateApiError from 'util/translateApiError';
+import useServerText from 'util/serverText';
 
 enum JobStatus {
   Cancelled = 'cancelled',
@@ -83,6 +84,8 @@ type SystemJobProps = {
 
 const SystemJob = ({ job }: SystemJobProps) => {
   const { t } = useTranslation('system');
+  // The server describes the jobs in English, e.g. "Archived documents in indices: graylog_1".
+  const serverText = useServerText();
   const queryClient = useQueryClient();
   const jobIsOver =
     job.job_status === JobStatus.Complete ||
@@ -107,7 +110,7 @@ const SystemJob = ({ job }: SystemJobProps) => {
     e.preventDefault();
 
     // eslint-disable-next-line no-alert
-    if (window.confirm(t('system_job.cancel_confirm', { info: job.info }))) {
+    if (window.confirm(t('system_job.cancel_confirm', { info: serverText(job.info) }))) {
       ClusterJobs.cancelJob(job.id)
         .then(() => {
           queryClient.invalidateQueries({ queryKey: SYSTEM_JOBS_QUERY_KEY });
@@ -123,7 +126,7 @@ const SystemJob = ({ job }: SystemJobProps) => {
       <JobWrap>
         <Icon name="settings" />{' '}
         <span data-toggle="tooltip" title={job.name}>
-          {job.info}
+          {serverText(job.info)}
         </span>{' '}
         {t('system_job.on_node')} <LinkToNode nodeId={job.node_id} /> <RelativeTime dateTime={job.started_at} />{' '}
         <span data-toggle="tooltip" title={t('system_job.runtime', { duration: job.execution_duration })}>

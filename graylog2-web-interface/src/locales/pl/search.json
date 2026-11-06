@@ -566,5 +566,8 @@
   "views_logic": {
     "result_window_limit": "Elasticsearch ogranicza wynik wyszukiwania do {{limit}} wiadomości. Przy rozmiarze strony wynoszącym {{pageSize}} wiadomości możesz użyć pierwszych {{validPages}} stron.",
     "confirm_delete_dashboard_page": "Czy na pewno chcesz usunąć tę stronę panelu?"
+  },
+  "saved_searches_overview": {
+    "human_name": "zapisane wyszukiwania"
   }
 }

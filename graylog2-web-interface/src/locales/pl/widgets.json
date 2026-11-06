@@ -224,5 +224,15 @@
   "notifications": {
     "delete_decorator_confirm": "Czy na pewno chcesz usunąć ten dekorator?",
     "unsaved_changes_confirm": "Formularz konfiguracji zawiera niezapisane zmiany. Ta akcja je cofnie."
+  },
+  "generated_texts": {
+    "message_count": "Liczba wiadomości",
+    "all_messages": "Wszystkie wiadomości",
+    "untitled_aggregation": "Agregacja bez tytułu",
+    "untitled_message_table": "Tabela wiadomości bez tytułu",
+    "untitled_events_overview": "Przegląd zdarzeń bez tytułu",
+    "untitled_text_widget": "Widget tekstowy bez tytułu",
+    "count": "Liczba",
+    "time_range": "Zakres czasu"
   }
 }

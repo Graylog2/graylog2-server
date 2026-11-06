@@ -218,5 +218,15 @@
   "notifications": {
     "delete_decorator_confirm": "确定要删除此装饰器吗？",
     "unsaved_changes_confirm": "配置表单中有未保存的更改，此操作将撤销这些更改"
+  },
+  "generated_texts": {
+    "message_count": "消息数量",
+    "all_messages": "所有消息",
+    "untitled_aggregation": "未命名聚合",
+    "untitled_message_table": "未命名消息表",
+    "untitled_events_overview": "未命名事件概览",
+    "untitled_text_widget": "未命名文本 Widget",
+    "count": "计数",
+    "time_range": "时间范围"
   }
 }
