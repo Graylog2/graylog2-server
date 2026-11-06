@@ -26,7 +26,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 export const DEFAULT_SPLIT_KEY = ',';
 export const DEFAULT_COMBINATION_KEY = '+';
-const defaultOptions: ReactHotKeysHookOptions & Options = {
+const defaultOptions: Omit<ReactHotKeysHookOptions, 'splitKey'> & Options = {
   preventDefault: true,
   enabled: true,
   enableOnContentEditable: false,
@@ -116,10 +116,12 @@ const useHotkey = <T extends HTMLElement>({
     mergedOptions.splitKey,
   ]);
 
+  const { combinationKey, splitKey, displayInOverview: _displayInOverview, ...hotkeysOptions } = mergedOptions;
+
   return originalUseHotkeys<T>(
     hotKeysCollections?.[scope]?.actions?.[actionKey]?.keys,
     callbackWithTelemetry,
-    mergedOptions,
+    { ...hotkeysOptions, splitKey: combinationKey, delimiter: splitKey },
     dependencies,
   );
 };
