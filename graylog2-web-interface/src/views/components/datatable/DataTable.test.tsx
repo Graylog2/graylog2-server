@@ -616,6 +616,32 @@ describe('DataTable', () => {
       expect(updateQueryString).toHaveBeenCalledWith('query-id-1', 'source:host1');
     });
 
+    it('drops selection when grouping changes to a different field with the same values', async () => {
+      const { rerender } = render(
+        <SimplifiedDataTable
+          config={sourceConfig}
+          // @ts-expect-error
+          data={sourceData}
+        />,
+      );
+
+      await userEvent.click(await screen.findByRole('checkbox', { name: 'Select source host1' }));
+      await screen.findByText('1 row selected');
+
+      rerender(
+        <SimplifiedDataTable
+          config={sourceConfig.toBuilder().rowPivots([Pivot.createValues(['destination'])]).build()}
+          // @ts-expect-error
+          data={sourceData}
+        />,
+      );
+
+      await screen.findByRole('checkbox', { name: 'Select destination host1' });
+
+      expect(screen.getByRole('checkbox', { name: 'Select destination host1' })).not.toBeChecked();
+      expect(screen.queryByText(/selected/)).not.toBeInTheDocument();
+    });
+
     it('adds distinct values of chosen field when grouping by multiple fields', async () => {
       const config = sourceConfig.toBuilder().rowPivots([Pivot.createValues(['source', 'controller'])]).build();
       const multiFieldData = {

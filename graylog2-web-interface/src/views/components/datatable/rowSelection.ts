@@ -37,9 +37,10 @@ const queryValueFor = (row: Row, field: string): QueryValue | undefined => {
   return typeof value === 'string' || typeof value === 'number' ? value : undefined;
 };
 
-// Identifies a row by the values of all row grouping fields.
+// Identifies a row by the fields and values of all row grouping fields,
+// so a selection does not carry over to a different grouping with the same values.
 export const rowSelectionKey = (row: Row, rowFieldNames: Array<string>) =>
-  JSON.stringify(rowFieldNames.map((field) => row[field]));
+  JSON.stringify(rowFieldNames.map((field) => [field, row[field]]));
 
 export const rowSelectionLabel = (row: Row, rowFieldNames: Array<string>) =>
   `Select ${rowFieldNames.map((field) => `${field} ${row[field]}`).join(', ')}`;
