@@ -111,20 +111,22 @@ if (TARGET === 'start') {
       },
       proxy: [
         {
-          context: ['/api', '/config.js', '/sso', '/.well-known', '/v1/opamp'],
+          context: ['/api', '/config.js', '/sso', '/.well-known', '/oauth/', '/authorize', '/register', '/token', '/v1/opamp'],
           target: apiUrl,
           ws: true,
           // Skip proxying for /api-browser - it's a frontend route, not an API endpoint
           bypass: (req) => (req.path.startsWith('/api-browser') ? req.path : null),
-          onProxyReq: (proxyReq, req) => {
-            if (!proxyReq.getHeader(urlHeader)?.trim()) {
-              proxyReq.setHeader(urlHeader, `${req.protocol}://${req.get('host')}`);
-            }
-          },
-          onProxyReqWs: (proxyReq, req) => {
-            if (!proxyReq.getHeader(urlHeader)?.trim()) {
-              proxyReq.setHeader(urlHeader, req.headers.origin || `http://${req.headers.host}`);
-            }
+          on: {
+            proxyReq: (proxyReq, req) => {
+              if (!proxyReq.getHeader(urlHeader)?.toString().trim()) {
+                proxyReq.setHeader(urlHeader, `${req.protocol}://${req.get('host')}`);
+              }
+            },
+            proxyReqWs: (proxyReq, req) => {
+              if (!proxyReq.getHeader(urlHeader)?.toString().trim()) {
+                proxyReq.setHeader(urlHeader, req.headers.origin || `http://${req.headers.host}`);
+              }
+            },
           },
         },
       ],

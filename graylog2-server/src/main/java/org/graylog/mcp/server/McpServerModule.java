@@ -16,6 +16,11 @@
  */
 package org.graylog.mcp.server;
 
+import org.graylog.mcp.oauth.rest.McpOAuthResource;
+import org.graylog.mcp.oauth.rest.McpOAuthResponseFilter;
+import org.graylog.mcp.oauth.rest.OAuthFallbackResource;
+import org.graylog.mcp.oauth.rest.OAuthMetadataResource;
+import org.graylog.mcp.oauth.rest.OAuthResource;
 import org.graylog.mcp.resources.DashboardResourceProvider;
 import org.graylog.mcp.resources.EventDefinitionResourceProvider;
 import org.graylog.mcp.resources.StreamResourceProvider;
@@ -64,5 +69,11 @@ public class McpServerModule extends PluginModule {
         addMcpResource(StreamResourceProvider.GRN_TYPE, StreamResourceProvider.class);
         addMcpResource(DashboardResourceProvider.GRN_TYPE, DashboardResourceProvider.class);
         addMcpResource(EventDefinitionResourceProvider.GRN_TYPE, EventDefinitionResourceProvider.class);
+
+        addSystemRestResource(OAuthMetadataResource.class);
+        addSystemRestResource(OAuthResource.class);
+        addSystemRestResource(OAuthFallbackResource.class);
+        addSystemRestResource(McpOAuthResource.class);
+        jerseyContainerResponseFilterBinder().addBinding().toInstance(McpOAuthResponseFilter.class);
     }
 }

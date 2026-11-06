@@ -55,6 +55,7 @@ type SearchQueryParams = {
 const Routes = {
   STARTPAGE: '/',
   NOTFOUND: '/notfound',
+  MCP_OAUTH_CONSENT: '/oauth-consent',
   SEARCH: '/search',
   SEARCH_SHOW: (id: string) => `/search/${id}`,
   STREAMS: '/streams',
