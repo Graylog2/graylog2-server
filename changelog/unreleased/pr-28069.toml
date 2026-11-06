@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Make the maximum Beats event size configurable per Beats input, with a cluster-wide default under System > Configurations. This replaces the fixed frame size limits that rejected events larger than 16 MiB."
+
+pulls = ["28069"]
