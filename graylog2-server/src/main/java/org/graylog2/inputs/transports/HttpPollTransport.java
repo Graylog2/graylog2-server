@@ -237,7 +237,11 @@ public class HttpPollTransport extends ThrottleableTransport2 {
 
     @Override
     public void doStop() {
-        serverEventBus.unregister(this);
+        try {
+            serverEventBus.unregister(this);
+        } catch (IllegalArgumentException iae) {
+            LOG.warn("Failed to unregister input from eventbus. This hints that stopping the input happens multiple times instead of once.", iae);
+        }
         if (scheduledFuture != null) {
             scheduledFuture.cancel(true);
         }
