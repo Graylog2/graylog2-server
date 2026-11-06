@@ -21,6 +21,15 @@ import FormattedValue from 'views/components/FormattedValue';
 
 import type { ValueRendererProps } from './messagelist/decoration/ValueRenderer';
 
+type DecoratedLink = {
+  type: string;
+  href: string;
+  text?: string;
+};
+
+const isDecoratedLink = (value: unknown): value is DecoratedLink =>
+  typeof value === 'object' && value !== null && 'href' in value && 'type' in value && !!value.href && !!value.type;
+
 type Props = {
   field: string;
   value: any;
@@ -30,9 +39,9 @@ type Props = {
 };
 
 const DecoratorValue = ({ field, value, truncate, render, type }: Props) =>
-  value && value.href && value.type ? (
-    <a href={value.href} target="_blank" rel="noreferrer">
-      <FormattedValue field={field} value={value.href} truncate={truncate} render={render} type={type} />
+  isDecoratedLink(value) ? (
+    <a href={value.href} target="_blank" rel="noreferrer" title={value.text ? value.href : undefined}>
+      <FormattedValue field={field} value={value.text ?? value.href} truncate={truncate} render={render} type={type} />
     </a>
   ) : (
     <FormattedValue field={field} value={value} truncate={truncate} render={render} type={type} />
