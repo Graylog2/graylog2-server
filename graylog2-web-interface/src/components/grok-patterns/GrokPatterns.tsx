@@ -23,6 +23,7 @@ import EditPatternModal from 'components/grok-patterns/EditPatternModal';
 import BulkLoadPatternModal from 'components/grok-patterns/BulkLoadPatternModal';
 import withPaginationQueryParameter from 'components/common/withPaginationQueryParameter';
 import {
+  loadGrokPatterns,
   searchGrokPatternsPaginated,
   testGrokPattern,
   saveGrokPattern,
@@ -84,6 +85,7 @@ class GrokPatterns extends React.Component<
 
     this.state = {
       patterns: [],
+      allPatterns: [],
       pagination: {
         count: 0,
         total: 0,
@@ -94,6 +96,7 @@ class GrokPatterns extends React.Component<
 
   componentDidMount() {
     this.loadData();
+    this.loadAllPatterns();
   }
 
   componentWillUnmount() {
@@ -122,17 +125,31 @@ class GrokPatterns extends React.Component<
     });
   };
 
+  // The modals need all patterns, independent of the current page and search query of the list.
+  loadAllPatterns = () => {
+    loadGrokPatterns((allPatterns) => {
+      if (!this._unmounted) {
+        this.setState({ allPatterns });
+      }
+    });
+  };
+
+  reloadAll = () => {
+    this.loadData();
+    this.loadAllPatterns();
+  };
+
   validPatternName = (name) => {
     // Check if patterns already contain a pattern with the given name.
-    const { patterns } = this.state;
+    const { allPatterns } = this.state;
 
-    return !patterns.some((pattern) => pattern.name === name);
+    return !allPatterns.some((pattern) => pattern.name === name);
   };
 
   savePattern = (pattern, callback) => {
     saveGrokPattern(pattern, () => {
       callback();
-      this.loadData();
+      this.reloadAll();
     });
   };
 
@@ -166,14 +183,14 @@ class GrokPatterns extends React.Component<
           app_pathname: 'grokpatterns',
         });
 
-        this.loadData();
+        this.reloadAll();
       });
     }
   };
 
   _patternFormatter = (pattern) => {
-    const { patterns: unfilteredPatterns } = this.state;
-    const patterns = unfilteredPatterns.filter((p) => p.name !== pattern.name);
+    const { allPatterns } = this.state;
+    const patterns = allPatterns.filter((p) => p.name !== pattern.name);
 
     return (
       <tr key={pattern.id}>
@@ -209,7 +226,7 @@ class GrokPatterns extends React.Component<
 
   render() {
     const headers = ['Name', 'Pattern', 'Actions'];
-    const { pagination, patterns } = this.state;
+    const { pagination, patterns, allPatterns } = this.state;
 
     const queryHelperComponent = <GrokPatternQueryHelper />;
 
@@ -220,12 +237,12 @@ class GrokPatterns extends React.Component<
           actions={
             <IfPermitted permissions="inputs:edit">
               <ButtonToolbar>
-                <BulkLoadPatternModal onSuccess={this.loadData} />
+                <BulkLoadPatternModal onSuccess={this.reloadAll} />
                 <EditPatternModal
                   id=""
                   name=""
                   pattern=""
-                  patterns={patterns}
+                  patterns={allPatterns}
                   create
                   testPattern={_testPattern}
                   reload={this.loadData}
