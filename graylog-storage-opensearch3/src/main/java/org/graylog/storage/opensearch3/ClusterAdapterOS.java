@@ -44,6 +44,7 @@ import org.graylog2.system.stats.elasticsearch.NodeUtilization;
 import org.graylog2.system.stats.elasticsearch.NodesStats;
 import org.graylog2.system.stats.elasticsearch.ShardStats;
 import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch._types.ExpandWildcard;
 import org.opensearch.client.opensearch._types.Time;
 import org.opensearch.client.opensearch.cat.NodesRequest;
 import org.opensearch.client.opensearch.cat.aliases.AliasesRecord;
@@ -60,6 +61,9 @@ import org.opensearch.client.opensearch.cluster.PutClusterSettingsResponse;
 import org.opensearch.client.opensearch.cluster.pending_tasks.PendingTask;
 import org.opensearch.client.opensearch.generic.Request;
 import org.opensearch.client.opensearch.generic.Requests;
+import org.opensearch.client.opensearch.indices.IndexSettings;
+import org.opensearch.client.opensearch.indices.IndexSettingsStore;
+import org.opensearch.client.opensearch.indices.IndexState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -154,13 +158,54 @@ public class ClusterAdapterOS implements ClusterAdapter {
         } catch (Exception e) {
             LOG.warn("Could not retrieve max_shards_per_node setting from cluster settings. Threshold warnings disabled.", e);
         }
+        final int maxShardsPerCluster = clusterShardLimit(getSetting("cluster.routing.allocation.total_shards_limit", settings));
+        // Since OpenSearch 3.4, searchable snapshot shards count toward cluster.max_remote_capable_shards_per_node
+        // instead of cluster.max_shards_per_node.
+        final boolean excludeRemoteSnapshots = !getSetting("cluster.max_remote_capable_shards_per_node", settings).isEmpty();
 
         List<NodeShardAllocation> nodeShardAllocations = opensearchClient.sync(c ->
                         c.cat().allocation().valueBody().stream().map(this::toNodeShardAllocation).toList(),
                 "Unable to retrieve node shard allocation"
         );
-        return new ClusterShardAllocation(maxShardsPerNode, nodeShardAllocations);
+        return ClusterShardAllocation.fromCatAllocation(maxShardsPerNode, maxShardsPerCluster, nodeShardAllocations,
+                openShards(excludeRemoteSnapshots));
+    }
 
+    private static int clusterShardLimit(String setting) {
+        try {
+            return Integer.parseInt(setting);
+        } catch (NumberFormatException e) {
+            return ClusterShardAllocation.NO_CLUSTER_LIMIT;
+        }
+    }
+
+    // Shards of closed indices don't count toward cluster.max_shards_per_node, and _cat/allocation still reports them.
+    private long openShards(boolean excludeRemoteSnapshots) {
+        return opensearchClient.sync(c -> c.indices().getSettings(r -> r
+                                .index("*")
+                                .expandWildcards(ExpandWildcard.Open, ExpandWildcard.Hidden)
+                                .allowNoIndices(true)
+                                .ignoreUnavailable(true)
+                                .name("index.number_of_shards", "index.number_of_replicas", "index.store.type"))
+                        .result().values().stream()
+                        .map(IndexState::settings)
+                        .filter(Objects::nonNull)
+                        // Without flat settings, the response nests them under "index".
+                        .map(settings -> Objects.requireNonNullElse(settings.index(), settings))
+                        .filter(indexSettings -> !(excludeRemoteSnapshots && isRemoteSnapshot(indexSettings)))
+                        .mapToLong(ClusterAdapterOS::shardCopies)
+                        .sum(),
+                "Unable to retrieve index shard counts"
+        );
+    }
+
+    private static boolean isRemoteSnapshot(IndexSettings indexSettings) {
+        final IndexSettingsStore store = indexSettings.store();
+        return store != null && store.type() != null && store.type().isCustom() && "remote_snapshot".equals(store.type().custom());
+    }
+
+    private static long shardCopies(IndexSettings indexSettings) {
+        return (long) Objects.requireNonNullElse(indexSettings.numberOfShards(), 0) * (1 + Objects.requireNonNullElse(indexSettings.numberOfReplicas(), 0));
     }
 
     private NodeShardAllocation toNodeShardAllocation(AllocationRecord allocationRecord) {
