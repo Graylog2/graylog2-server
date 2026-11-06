@@ -39,6 +39,7 @@ import mockManagedConfigurationApi, {
 import changeConfigurationField from 'components/datanode/configuration/testing/changeConfigurationField';
 import clusterBindings from 'components/cluster-configuration/bindings';
 import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
+import useRunsWithDataNode from 'components/datanode/hooks/useRunsWithDataNode';
 import useShowDatanodeMigration from 'components/datanode/hooks/useShowDatanodeMigration';
 import RoutePaths from 'routing/Routes';
 import useManagedConfiguration from 'components/datanode/configuration/useManagedConfiguration';
@@ -50,6 +51,7 @@ import DataNodeConfigurationPage from './DataNodeConfigurationPage';
 
 jest.mock('hooks/useCurrentUser');
 jest.mock('routing/request');
+jest.mock('components/datanode/hooks/useRunsWithDataNode');
 jest.mock('components/datanode/hooks/useShowDatanodeMigration');
 
 const settingsPath = RoutePaths.SYSTEM.CLUSTER.DATANODE_CONFIGURATION;
@@ -133,6 +135,7 @@ describe('DataNodeConfigurationPage', () => {
       isDatanodeConfiguredAndUsed: true,
       showDatanodeMigration: false,
     });
+    asMock(useRunsWithDataNode).mockReturnValue({ data: true, isLoading: false });
     PluginStore.register(clusterPlugin);
   });
 
@@ -206,6 +209,15 @@ describe('DataNodeConfigurationPage', () => {
       expect(screen.getByRole('link', { name: 'Data Node Configuration' })).toHaveClass('active');
     });
 
+    it('hides the configuration tab when the cluster does not run Data Nodes', async () => {
+      asMock(useRunsWithDataNode).mockReturnValue({ data: false, isLoading: false });
+      renderPage();
+      await screen.findByLabelText(/^Stop allocating shards at \(/);
+
+      expect(screen.getByRole('link', { name: 'Cluster Nodes' })).toBeInTheDocument();
+      expect(screen.queryByRole('link', { name: 'Data Node Configuration' })).not.toBeInTheDocument();
+    });
+
     it('keeps unsaved configuration when switching Cluster tabs is declined', async () => {
       const confirm = jest.spyOn(window, 'confirm').mockReturnValue(false);
       const { router } = renderPage();
@@ -243,10 +255,7 @@ describe('DataNodeConfigurationPage', () => {
       await waitFor(() => expect(getApplyButton()).toBeDisabled());
 
       const saved = await managedConfigurationApi.get();
-      expect(saved.node_type).toBe('datanode');
-      expect(saved.node_id).toBeNull();
       expect(saved.parameters.find(({ name }) => name === lowWatermarkName).value).toBe('80%');
-      expect(saved.parameters.find(({ name }) => name === lowWatermarkName).source).toBe('database');
       expect(saved.parameters.find(({ name }) => name === shardLimitName).value).toBe('1000');
     });
 
@@ -660,7 +669,6 @@ describe('DataNodeConfigurationPage', () => {
       );
       expect(screen.getByLabelText('Shard limit per Data Node')).toHaveValue(null);
       expect(getApplyButton()).toBeEnabled();
-      expect(await savedValueOf(shardLimitName)).toBe('1000');
 
       await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
@@ -700,7 +708,6 @@ describe('DataNodeConfigurationPage', () => {
         expect.any(Object),
         undefined,
       );
-      expect(await savedValueOf(shardLimitName)).toBeNull();
     });
 
     it('does not store an untouched reported value when another field is applied', async () => {

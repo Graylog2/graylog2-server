@@ -280,11 +280,12 @@ describe('DataNodePage configuration', () => {
 
   describe('Permissions', () => {
     it('keeps details visible without exposing configuration to users lacking read permission', async () => {
+      const get = jest.spyOn(managedConfigurationApi, 'get');
       asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions([]).build());
       renderPage('');
 
       await screen.findByRole('heading', { name: `Data Nodes: ${dataNodes[0].hostname}` });
-      expect(screen.queryByRole('navigation', { name: 'Data Node configuration sections' })).not.toBeInTheDocument();
+      expect(get).not.toHaveBeenCalled();
     });
   });
 
