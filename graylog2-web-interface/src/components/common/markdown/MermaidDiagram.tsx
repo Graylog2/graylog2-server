@@ -33,6 +33,7 @@ const Diagram = styled.div(
 );
 
 const ID_PREFIX = 'mermaid-';
+const GANTT_WIDTH = 800;
 
 // Mermaid's labels use the class "label", which Bootstrap styles as badges. Global, as mermaid also measures the labels
 // in an element of its own.
@@ -85,12 +86,24 @@ const MermaidDiagram = ({ source }: Props) => {
 
     loadMermaid()
       .then(async (mermaid) => {
-        mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme: darkMode ? 'dark' : 'default' });
+        mermaid.initialize({
+          startOnLoad: false,
+          securityLevel: 'strict',
+          theme: darkMode ? 'dark' : 'default',
+          // Gantt charts take the width of the hidden element they are rendered in, and their text shrinks when they
+          // are scaled down to the diagram's width.
+          gantt: { useWidth: GANTT_WIDTH },
+        });
         const { svg } = await mermaid.render(id, source);
 
         return { svg: sanitizeSvg(svg) };
       })
-      .catch((error: unknown) => ({ error: error instanceof Error ? error.message : String(error) }))
+      .catch((error: unknown) => {
+        // Mermaid leaves the error diagram it renders into a failed diagram's container in the page's body.
+        document.getElementById(`d${id}`)?.remove();
+
+        return { error: error instanceof Error ? error.message : String(error) };
+      })
       .then((next) => {
         if (!cancelled) {
           setResult(next);
