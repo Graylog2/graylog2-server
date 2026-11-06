@@ -59,27 +59,17 @@ jobs:
         env:
           PR_EVENT: "${{ toJSON(github.event.pull_request) }}"
 
-      - name: Detect repository
-        run: |
-          repo="${{ github.repository }}"
-          repo_fork=""
-
-          # Our workflows require caller_repo to be our own repo. For forks
-          # github.repository is the PR author's repo.
-          if ! [[ "${repo,,}" =~ ^graylog2/ ]]; then
-            repo_fork="$repo"
-            repo="Graylog2/${repo#*/}"
-          fi
-
-          echo "repo=$repo" | tee -a "$GITHUB_ENV"
-          echo "repo_fork=$repo_fork" | tee -a "$GITHUB_ENV"
+      # Repository secrets are not available to pull_request runs from forks
+      # or to runs inside a fork, so there is no token to dispatch the build with.
+      - name: Skip dispatch for forks
+        if: ${{ github.repository_owner != 'Graylog2' || github.event.pull_request.head.repo.full_name != github.repository }}
+        run: echo "::warning::PR is from a fork. Skipping dispatch to graylog-project-internal."
 
       - name: Dispatch job to graylog-project-internal
-        if: ${{ (github.event.action != 'edited' && (github.event.action != 'labeled' || github.event.label.name == 'e2e-tests')) || steps.pr-string-changed.outcome == 'success' }}
+        if: ${{ github.repository_owner == 'Graylog2' && github.event.pull_request.head.repo.full_name == github.repository && ((github.event.action != 'edited' && (github.event.action != 'labeled' || github.event.label.name == 'e2e-tests')) || steps.pr-string-changed.outcome == 'success') }}
         run: >
           gh workflow run -R Graylog2/graylog-project-internal pr-build.yml --ref master
-          -f caller_repo="${{ env.repo }}"
-          -f caller_repo_fork="${{ env.repo_fork }}"
+          -f caller_repo="${{ github.repository }}"
           -f caller_pr_nr=${{ github.event.number }}
           -f caller_base_branch="$BASE_BRANCH"
           -f caller_head_branch="$HEAD_BRANCH"
