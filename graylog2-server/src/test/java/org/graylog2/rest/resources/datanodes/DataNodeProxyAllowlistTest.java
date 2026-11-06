@@ -32,7 +32,7 @@ class DataNodeProxyAllowlistTest {
     // Mirrors the real "metrics" rule from DataNodeRestApiProxyResource: it's meant to permit read-only
     // access to cluster configuration metrics, nothing else.
     private static final DataNodeProxyAllowlist ALLOWLIST = new DataNodeProxyAllowlist(List.of(
-            request -> request.path().startsWith("metrics")
+            request -> DataNodeProxyAllowlist.hasPathPrefix(request, "metrics")
     ));
 
     private static ProxyRequestAdapter.ProxyRequest requestFor(String path) {
@@ -42,6 +42,32 @@ class DataNodeProxyAllowlistTest {
     @Test
     void permitsExactAllowedPrefix() throws RequestNotAllowedException {
         assertThat(ALLOWLIST.authorize(requestFor("metrics"))).isNotNull();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"metrics/multiple", "metrics/"})
+    void permitsPathsBelowAllowedPrefix(String path) throws RequestNotAllowedException {
+        assertThat(ALLOWLIST.authorize(requestFor(path))).isNotNull();
+    }
+
+    /**
+     * Prefixes match on whole path segments only. A raw {@code startsWith("metrics")} would also permit
+     * unrelated endpoints or index names that merely share the same leading characters.
+     */
+    @ParameterizedTest
+    @ValueSource(strings = {"metricsfoo", "metrics_secret/_search", "metrics-index/_doc/1", "metrics.bak"})
+    void rejectsPathsSharingOnlyCharactersWithAllowedPrefix(String path) {
+        assertThatThrownBy(() -> ALLOWLIST.authorize(requestFor(path)))
+                .isInstanceOf(RequestNotAllowedException.class);
+    }
+
+    @Test
+    void hasPathPrefixMatchesWholeSegmentsOnly() {
+        assertThat(DataNodeProxyAllowlist.hasPathPrefix(requestFor("_cat"), "_cat")).isTrue();
+        assertThat(DataNodeProxyAllowlist.hasPathPrefix(requestFor("_cat/indices"), "_cat")).isTrue();
+        assertThat(DataNodeProxyAllowlist.hasPathPrefix(requestFor("_catalog/_search"), "_cat")).isFalse();
+        assertThat(DataNodeProxyAllowlist.hasPathPrefix(requestFor("x/_cat"), "_cat")).isFalse();
+        assertThat(DataNodeProxyAllowlist.hasPathPrefix(requestFor(null), "_cat")).isFalse();
     }
 
     @Test

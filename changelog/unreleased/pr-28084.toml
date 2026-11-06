@@ -1,0 +1,4 @@
+type = "s"
+message = "Tighten the Data Node proxy allowlists so that allowed path prefixes only match whole path segments."
+
+pulls = ["28084"]
