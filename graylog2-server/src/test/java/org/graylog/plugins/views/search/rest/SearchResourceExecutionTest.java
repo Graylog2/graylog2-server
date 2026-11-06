@@ -222,6 +222,33 @@ public class SearchResourceExecutionTest {
     }
 
     @Test
+    public void executeSyncJobWithExecutionStateAppliesExecutionState() {
+        mockCurrentUserName("peterchen");
+
+        final SearchDTO search = SearchDTO.fromSearch(makeNewSearch("search1"));
+        final ExecutionState executionState = ExecutionState.builder()
+                .setGlobalOverride(ExecutionStateGlobalOverride.builder().keepQueries(ImmutableSet.of("query1")).build())
+                .build();
+
+        when(queryEngine.execute(any(), any(), any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        this.searchResource.executeSyncJobWithExecutionState(new SyncSearchExecutionRequest(search, executionState), searchUser);
+
+        final ArgumentCaptor<SearchJob> searchJobCaptor = ArgumentCaptor.forClass(SearchJob.class);
+        verify(queryEngine).execute(searchJobCaptor.capture(), any(), any());
+        assertThat(searchJobCaptor.getValue().getSearch().queries())
+                .extracting(Query::id)
+                .containsExactly("query1");
+    }
+
+    @Test
+    public void syncSearchExecutionRequestDefaultsToEmptyExecutionState() {
+        final SyncSearchExecutionRequest request = new SyncSearchExecutionRequest(makeSearchDTO(), null);
+
+        assertThat(request.executionState()).isEqualTo(ExecutionState.empty());
+    }
+
+    @Test
     public void guardExceptionInAsyncExecutionLeadsTo403() {
         final Search search = makeExistingSearch("basti");
 
