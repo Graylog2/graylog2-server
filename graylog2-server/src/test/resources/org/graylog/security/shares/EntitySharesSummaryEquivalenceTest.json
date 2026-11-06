@@ -1,0 +1,207 @@
+{
+  "users": [
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0001"
+      },
+      "username": "viewer",
+      "email": "viewer@example.com",
+      "full_name": "The Viewer",
+      "password": "NO LOGIN",
+      "session_timeout_ms": -1,
+      "timezone": "UTC",
+      "permissions": []
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0002"
+      },
+      "username": "alice",
+      "email": "alice@example.com",
+      "full_name": "Alice",
+      "password": "NO LOGIN",
+      "session_timeout_ms": -1,
+      "timezone": "UTC",
+      "permissions": []
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0003"
+      },
+      "username": "bob",
+      "email": "bob@example.com",
+      "full_name": "Bob",
+      "password": "NO LOGIN",
+      "session_timeout_ms": -1,
+      "timezone": "UTC",
+      "permissions": []
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0004"
+      },
+      "username": "carol",
+      "email": "carol@example.com",
+      "full_name": "Carol",
+      "password": "NO LOGIN",
+      "session_timeout_ms": -1,
+      "timezone": "UTC",
+      "permissions": []
+    }
+  ],
+  "grants": [
+    {
+      "_id": {
+        "$oid": "64e3deadbeefdeadbeef0000"
+      },
+      "grantee": "grn::::user:54e3deadbeefdeadbeef0001",
+      "capability": "own",
+      "target": "grn::::stream:54e3deadbeefdeadbeef0a01",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "updated_by": "admin",
+      "updated_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "64e3deadbeefdeadbeef0001"
+      },
+      "grantee": "grn::::user:54e3deadbeefdeadbeef0002",
+      "capability": "own",
+      "target": "grn::::stream:54e3deadbeefdeadbeef0a01",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "updated_by": "admin",
+      "updated_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "64e3deadbeefdeadbeef0002"
+      },
+      "grantee": "grn::::user:54e3deadbeefdeadbeef0003",
+      "capability": "view",
+      "target": "grn::::stream:54e3deadbeefdeadbeef0a01",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "updated_by": "admin",
+      "updated_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "64e3deadbeefdeadbeef0003"
+      },
+      "grantee": "grn::::user:54e3deadbeefdeadbeef0004",
+      "capability": "manage",
+      "target": "grn::::stream:54e3deadbeefdeadbeef0a01",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "updated_by": "admin",
+      "updated_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "64e3deadbeefdeadbeef0004"
+      },
+      "grantee": "grn::::builtin-team:everyone",
+      "capability": "view",
+      "target": "grn::::stream:54e3deadbeefdeadbeef0a01",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "updated_by": "admin",
+      "updated_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "64e3deadbeefdeadbeef0005"
+      },
+      "grantee": "grn::::user:54e3deadbeefdeadbeef0009",
+      "capability": "view",
+      "target": "grn::::stream:54e3deadbeefdeadbeef0a01",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "updated_by": "admin",
+      "updated_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "64e3deadbeefdeadbeef0006"
+      },
+      "grantee": "grn::::user:54e3deadbeefdeadbeef0001",
+      "capability": "own",
+      "target": "grn::::dashboard:54e3deadbeefdeadbeef0a02",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "updated_by": "admin",
+      "updated_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "64e3deadbeefdeadbeef0007"
+      },
+      "grantee": "grn::::user:54e3deadbeefdeadbeef0003",
+      "capability": "manage",
+      "target": "grn::::stream:54e3deadbeefdeadbeef0a03",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "updated_by": "admin",
+      "updated_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "64e3deadbeefdeadbeef0008"
+      },
+      "grantee": "grn::::user:54e3deadbeefdeadbeef0004",
+      "capability": "view",
+      "target": "grn::::stream:54e3deadbeefdeadbeef0a03",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "updated_by": "admin",
+      "updated_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "expires_at": null
+    }
+  ]
+}

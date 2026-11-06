@@ -33,6 +33,8 @@ import useStreamOutputFilters from 'components/streams/hooks/useStreamOutputFilt
 import useStreamRulesInputs from 'hooks/useStreamRulesInputs';
 import useStreamOutputs from 'hooks/useStreamOutputs';
 import useStreamMetrics from 'hooks/useStreamMetrics';
+import useShareSummary from 'components/permissions/SharedWithOthers/useShareSummary';
+import useEntityGrantees from 'components/permissions/SharedWithOthers/useEntityGrantees';
 
 import StreamsOverview from './StreamsOverview';
 
@@ -44,6 +46,8 @@ jest.mock('components/streams/hooks/useStreamDestinationFilterRuleCount');
 jest.mock('components/streams/hooks/useStreamOutputFilters');
 jest.mock('hooks/useStreamRulesInputs');
 jest.mock('hooks/useStreamOutputs');
+jest.mock('components/permissions/SharedWithOthers/useShareSummary');
+jest.mock('components/permissions/SharedWithOthers/useEntityGrantees');
 
 const attributes = [
   {
@@ -369,5 +373,57 @@ describe('StreamsOverview', () => {
     } finally {
       PluginStore.unregister(plugin);
     }
+  });
+
+  describe('Shared With Others', () => {
+    const showSharingColumn = () =>
+      asMock(useUserLayoutPreferences).mockReturnValue({
+        data: {
+          ...layoutPreferences,
+          attributes: {
+            title: { status: 'show' },
+            shared_with_others: { status: 'show' },
+          },
+        },
+        isInitialLoading: false,
+        refetch: () => {},
+      });
+
+    beforeEach(() => {
+      asMock(useShareSummary).mockReturnValue({
+        data: { own: 1, manage: 0, view: 3 },
+        isInitialLoading: false,
+        isError: false,
+      });
+      asMock(useEntityGrantees).mockReturnValue({
+        data: [{ grantee: { id: 'grn::::user:jane', type: 'user', title: 'Jane Doe' }, capability: 'view' }],
+        isInitialLoading: false,
+        isError: false,
+      });
+    });
+
+    it('hides the column and its section by default', async () => {
+      asMock(useFetchEntities).mockReturnValue(paginatedStreams());
+
+      renderSut();
+
+      await screen.findByText(stream.title);
+
+      expect(screen.queryByText('Shared With Others')).not.toBeInTheDocument();
+      expect(useShareSummary).not.toHaveBeenCalled();
+    });
+
+    it('shows the counts and opens the grantees section from the cell', async () => {
+      showSharingColumn();
+      asMock(useFetchEntities).mockReturnValue(paginatedStreams());
+
+      renderSut();
+
+      const tableRow = await screen.findByTestId(`table-row-${stream.id}`);
+      await userEvent.click(within(tableRow).getByTitle('Show grantees'));
+
+      expect(useShareSummary).toHaveBeenCalledWith(`grn::::stream:${stream.id}`);
+      await screen.findByText('Jane Doe');
+    });
   });
 });

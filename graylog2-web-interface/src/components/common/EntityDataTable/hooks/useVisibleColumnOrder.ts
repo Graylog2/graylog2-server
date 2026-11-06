@@ -25,7 +25,7 @@ import {
 } from 'components/common/EntityDataTable/Constants';
 import type { ColumnPreferences } from 'components/common/EntityDataTable/types';
 
-const getVisibleAttributeColumns = (
+export const getVisibleAttributeColumns = (
   defaultDisplayedColumns: Array<string>,
   userColumnPreferences: ColumnPreferences | undefined = {},
 ) => {

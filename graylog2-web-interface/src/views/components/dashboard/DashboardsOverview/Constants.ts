@@ -16,6 +16,7 @@
  */
 
 import type { Attribute, Sort } from 'stores/PaginationTypes';
+import { SHARED_WITH_OTHERS_ATTRIBUTE } from 'components/permissions/SharedWithOthers/Constants';
 
 const getDashboardTableElements = (pluggableAttributes?: {
   attributeNames?: Array<string>;
@@ -33,6 +34,7 @@ const getDashboardTableElements = (pluggableAttributes?: {
       'summary',
       'description',
       'owner',
+      SHARED_WITH_OTHERS_ATTRIBUTE.id,
       '_entity_source.source',
       'created_at',
       'last_updated_at',
@@ -41,7 +43,7 @@ const getDashboardTableElements = (pluggableAttributes?: {
     ],
   });
 
-  const additionalAttributes = [...(pluggableAttributes?.attributes || [])];
+  const additionalAttributes = [...(pluggableAttributes?.attributes || []), SHARED_WITH_OTHERS_ATTRIBUTE];
 
   return {
     getDefaultLayout,
