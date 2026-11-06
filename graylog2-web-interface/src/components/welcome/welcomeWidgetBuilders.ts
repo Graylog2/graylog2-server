@@ -14,18 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMemo } from 'react';
 import URI from 'urijs';
 
 import generateId from 'logic/generateId';
-import useCreateSearch from 'views/hooks/useCreateSearch';
 import Routes from 'routing/Routes';
 import { nonInfoPriorities } from 'components/events/Constants';
-import View from 'views/logic/views/View';
-import ViewState from 'views/logic/views/ViewState';
-import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
-import Search from 'views/logic/search/Search';
-import QueryGenerator from 'views/logic/queries/QueryGenerator';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import type { RelativeTimeRangeWithEnd } from 'views/logic/queries/Query';
 import { timeRangeToQueryParameter } from 'views/logic/TimeRange';
@@ -39,7 +32,7 @@ import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 
 export const DEFAULT_TIME_RANGE_SECONDS = 86400;
 
-export type WelcomeSearchWidgetEntry = {
+export type WelcomeWidgetEntry = {
   title: string;
   widget: Widget;
   position: WidgetPosition;
@@ -88,42 +81,3 @@ export const numberWidget = ({
     )
     .build(),
 });
-
-const buildViewState = (entries: Array<WelcomeSearchWidgetEntry>) =>
-  ViewState.create()
-    .toBuilder()
-    .titles({ widget: Object.fromEntries(entries.map(({ widget, title }) => [widget.id, title])) })
-    .widgets(entries.map(({ widget }) => widget))
-    .widgetPositions(Object.fromEntries(entries.map(({ widget, position }) => [widget.id, position])))
-    .build();
-
-const buildView = (entries: Array<WelcomeSearchWidgetEntry>, timeRange: RelativeTimeRangeWithEnd) => {
-  const query = QueryGenerator(undefined, undefined, undefined, timeRange);
-  const search = Search.create().toBuilder().queries([query]).build();
-  const view = View.create()
-    .toBuilder()
-    .newId()
-    .type(View.Type.Dashboard)
-    .state({ [query.id]: buildViewState(entries) })
-    .search(search)
-    .build();
-
-  return Promise.resolve(UpdateSearchForWidgets(view));
-};
-
-/**
- * Turns an arbitrary list of welcome-page widgets into a created search, ready to hand to `WelcomeSearch`.
- * Shared by the general tab (`useWelcomeMetricsSearch`) and any other welcome-page widget area (e.g. the
- * Security tab's search-backed widgets) that needs its own view/search built from a small widget set.
- */
-const useWelcomeSearch = (entries: Array<WelcomeSearchWidgetEntry>, timeRange: RelativeTimeRangeWithEnd) => {
-  const view = useCreateSearch(
-    // `useCreateSearch` creates a new search on the server for every new promise it receives, so the promise
-    // must only be recreated when the widgets or the time range actually change.
-    useMemo(() => buildView(entries, timeRange), [entries, timeRange]),
-  );
-
-  return { view, entries };
-};
-
-export default useWelcomeSearch;

@@ -28,13 +28,13 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { TIMESTAMP_FIELD } from 'views/Constants';
-
-import useWelcomeSearch, {
+import {
   numberWidget,
   messagesTodayLink,
   alertsOrEventsLink,
-  type WelcomeSearchWidgetEntry,
-} from './useWelcomeSearch';
+  type WelcomeWidgetEntry,
+} from 'components/welcome/welcomeWidgetBuilders';
+
 import useMetricsTimeRange from './useMetricsTimeRange';
 import usePermittedAlertsEventsStreams from './usePermittedAlertsEventsStreams';
 
@@ -61,7 +61,7 @@ const buildEntries = (
   permittedAlertsEventsStreams: Array<string>,
   timeRange: RelativeTimeRangeWithEnd,
   topSourcesOnly: boolean,
-): Array<WelcomeSearchWidgetEntry> => {
+): Array<WelcomeWidgetEntry> => {
   const sources = topSourcesWidget(timeRange);
 
   if (topSourcesOnly) {
@@ -105,19 +105,17 @@ const buildEntries = (
   ];
 };
 
-const useGeneralMetricsSearch = (topSourcesOnly: boolean = false) => {
+const useGeneralMetricsWidgets = (topSourcesOnly: boolean = false) => {
   const rangeSeconds = useMetricsTimeRange();
   const permittedAlertsEventsStreams = usePermittedAlertsEventsStreams();
   const timeRange = useMemo<RelativeTimeRangeWithEnd>(() => ({ type: 'relative', from: rangeSeconds }), [rangeSeconds]);
 
-  // Building the entries assigns new widget ids, so the result has to be stable to avoid recreating the view
-  // (and the search on the server) on every render.
-  const entries = useMemo(
+  // Building the entries assigns new widget ids, so the result has to be stable to avoid running the search
+  // again on every render.
+  return useMemo(
     () => buildEntries(permittedAlertsEventsStreams, timeRange, topSourcesOnly),
     [permittedAlertsEventsStreams, timeRange, topSourcesOnly],
   );
-
-  return useWelcomeSearch(entries, timeRange);
 };
 
-export default useGeneralMetricsSearch;
+export default useGeneralMetricsWidgets;

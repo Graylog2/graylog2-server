@@ -21,22 +21,22 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import WidgetCard from 'views/components/widgets/WidgetCard';
 import WidgetContentSkeleton from 'views/components/widgets/WidgetContentSkeleton';
 
-import type { WelcomeSearchWidgetEntry } from './hooks/useWelcomeSearch';
+import type { WelcomeWidgetEntry } from './welcomeWidgetBuilders';
 
-const COLUMNS = { xxl: 12, xl: 12, lg: 12, md: 12, sm: 12, xs: 12 };
+export const WIDGET_GRID_COLUMNS = { xxl: 12, xl: 12, lg: 12, md: 12, sm: 12, xs: 12 };
 
 const NOOP = () => {};
 
 type Props = {
-  entries: Array<WelcomeSearchWidgetEntry>;
+  entries: Array<WelcomeWidgetEntry>;
 };
 
 /**
- * Mirrors the widget grid of a `WelcomeSearch` with titled skeleton cards while its search is being prepared.
+ * Mirrors the widget grid of `WelcomeWidgets` with titled skeleton cards while its search is being prepared.
  */
-const WelcomeSearchSkeleton = ({ entries }: Props) => (
+const WelcomeWidgetsSkeleton = ({ entries }: Props) => (
   <ReactGridContainer
-    columns={COLUMNS}
+    columns={WIDGET_GRID_COLUMNS}
     positions={Object.fromEntries(entries.map(({ widget, position }) => [widget.id, position]))}
     onPositionsChange={NOOP}
     isResizable={false}
@@ -53,4 +53,4 @@ const WelcomeSearchSkeleton = ({ entries }: Props) => (
   </ReactGridContainer>
 );
 
-export default WelcomeSearchSkeleton;
+export default WelcomeWidgetsSkeleton;
