@@ -19,9 +19,10 @@ import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import CurrentUser from 'logic/users/CurrentUser';
+import type User from 'logic/users/User';
 
-export const setStartpage = (userId: string, type: string, id: string): Promise<void> => {
-  const url = qualifyUrl(ApiRoutes.UsersApiController.update(userId).url);
+export const setStartpage = (user: Pick<User, 'id' | 'timezone'>, type: string, id: string): Promise<void> => {
+  const url = qualifyUrl(ApiRoutes.UsersApiController.update(encodeURIComponent(user.id)).url);
   const payload: { type?: string; id?: string } = {};
 
   if (type && id) {
@@ -29,7 +30,8 @@ export const setStartpage = (userId: string, type: string, id: string): Promise<
     payload.id = id;
   }
 
-  return fetch('PUT', url, { startpage: payload }).then(
+  // The backend treats a missing timezone as null and clears it, so we always send the current value.
+  return fetch('PUT', url, { timezone: user.timezone, startpage: payload }).then(
     () => {
       CurrentUser.reload();
       UserNotification.success('Your start page was changed successfully');

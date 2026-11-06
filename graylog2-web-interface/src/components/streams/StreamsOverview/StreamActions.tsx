@@ -54,10 +54,7 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
   const [showCloneModal, setShowCloneModal] = useState(false);
   const [changingStatus, setChangingStatus] = useState(false);
   const sendTelemetry = useSendTelemetry();
-  const handleSetStartpage = useCallback(
-    () => setStartpage(currentUser.id, 'stream', stream.id),
-    [currentUser.id, stream.id],
-  );
+  const handleSetStartpage = () => setStartpage(currentUser, 'stream', stream.id);
   const { actions: pluggableActions, actionModals: pluggableActionModals } = usePluggableEntitySharedActions<Stream>(
     stream,
     'stream',

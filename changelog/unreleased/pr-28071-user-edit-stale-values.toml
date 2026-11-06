@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix user edit page showing outdated values after saving and switching sections, and reverting values saved in another section."
+
+pulls = ["28071"]

@@ -18,7 +18,9 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
+import selectEvent from 'helpers/selectEvent';
 import { rolesList as mockRoles } from 'fixtures/roles';
 
 import RolesSelector from './RolesSelector';
@@ -68,5 +70,20 @@ describe('RolesSelector', () => {
     await waitFor(() => {
       expect(submitButton).not.toBeInTheDocument();
     });
+  });
+
+  it('enables the button again and keeps the selection when assigning fails', async () => {
+    const onSubmit = jest.fn(() => Promise.reject(new Error('Assignment failed')));
+    const roleName = mockRoles.first().name;
+
+    render(<RolesSelector assignedRolesIds={Immutable.Set([''])} identifier={(role) => role.name} onSubmit={onSubmit} />);
+
+    await selectEvent.chooseOption('Search for roles', roleName);
+    await userEvent.click(await screen.findByRole('button', { name: /assign role/i }));
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(screen.getByRole('button', { name: /assign role/i })).toBeEnabled());
+
+    expect(screen.getByText(roleName)).toBeInTheDocument();
   });
 });

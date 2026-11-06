@@ -1,5 +1,5 @@
 type = "fixed"
-message = "Fix permission handling when updating users."
+message = "Fix saving a user on the user edit page storing effective permissions (e.g. derived from shares) as direct user permissions."
 
 issues = ["Graylog2/graylog-plugin-enterprise#16219"]
 pulls = ["28071"]

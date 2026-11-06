@@ -47,13 +47,17 @@ export type UserCreate = {
   session_timeout_ms: UserJSON['session_timeout_ms'];
   timezone: UserJSON['timezone'];
   username: UserJSON['username'];
+  service_account?: UserJSON['service_account'];
+  startpage?: UserJSON['startpage'];
 };
 
 // Permissions must never be sent on update. The user response contains effective permissions, incl. permissions that
 // are derived e.g. from shares. Sending them back would store them as direct user permissions.
 export type UserUpdate = Partial<
-  Omit<UserCreate, 'permissions'> & {
+  Omit<UserCreate, 'permissions' | 'startpage'> & {
     old_password: string;
+    // null resets the startpage
+    startpage: UserJSON['startpage'] | null;
   }
 > & {
   permissions?: never;
