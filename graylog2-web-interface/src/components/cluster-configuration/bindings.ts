@@ -17,18 +17,30 @@
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
 import Routes from 'routing/Routes';
+import useRunsWithDataNode from 'components/datanode/hooks/useRunsWithDataNode';
 import useShowDatanodeMigration from 'components/datanode/hooks/useShowDatanodeMigration';
 import AppConfig from 'util/AppConfig';
 
 const enableDataNodeMigration = AppConfig.isFeatureEnabled('data_node_migration');
-export const PAGE_NAV_TITLE = 'Cluster Configuration';
+export const PAGE_NAV_TITLE = 'Cluster';
 
 const bindings: PluginExports = {
   pageNavigation: [
     {
       description: PAGE_NAV_TITLE,
       children: [
-        { description: 'Cluster Configuration', path: Routes.SYSTEM.CLUSTER.NODES, exactPathMatch: true },
+        { description: 'Cluster Nodes', path: Routes.SYSTEM.CLUSTER.NODES, exactPathMatch: true },
+        {
+          description: 'Data Node Configuration',
+          path: Routes.SYSTEM.CLUSTER.DATANODE_CONFIGURATION,
+          permissions: ['clusterconfigentry:read'],
+          position: { after: 'Cluster Nodes' },
+          useCondition: () => {
+            const { data: runsWithDataNode } = useRunsWithDataNode();
+
+            return runsWithDataNode === true;
+          },
+        },
         {
           description: 'Certificate Management',
           path: Routes.SYSTEM.CLUSTER.CERTIFICATE_MANAGEMENT,
