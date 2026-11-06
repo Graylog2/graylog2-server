@@ -23,6 +23,7 @@ import ViewsStoreProvider from 'views/stores/ViewsStoreProvider';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import AutoRefreshContext from 'views/components/contexts/AutoRefreshContext';
 import WidgetContext from 'views/components/contexts/WidgetContext';
+import { AdditionalContext } from 'views/logic/ActionContext';
 import WidgetFieldTypesContextProvider from 'views/components/contexts/WidgetFieldTypesContextProvider';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import useWidget from 'views/hooks/useWidget';
@@ -62,7 +63,10 @@ const WidgetFromStore = ({ widgetId, children = undefined }: React.PropsWithChil
 
   return (
     <WidgetContext.Provider value={widget}>
-      <WidgetFieldTypesContextProvider>{children}</WidgetFieldTypesContextProvider>
+      {/* Like on the search page, field and value actions get the widget, e.g. for values of several groupings. */}
+      <AdditionalContext.Provider value={{ widget }}>
+        <WidgetFieldTypesContextProvider>{children}</WidgetFieldTypesContextProvider>
+      </AdditionalContext.Provider>
     </WidgetContext.Provider>
   );
 };
