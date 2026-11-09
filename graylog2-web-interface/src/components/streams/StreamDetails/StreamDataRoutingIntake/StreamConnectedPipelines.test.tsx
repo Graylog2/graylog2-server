@@ -174,15 +174,10 @@ describe('<StreamConnectedPipelines />', () => {
 
     const row = await screen.findByTestId('table-row-test-id-1');
 
-    const rule = await within(row).findByText(/Rule 1/i);
-    const pipeline = await within(row).findByText(/Pipeline 1/i);
-    const connectedStream1 = await within(row).findByText(/Stream Title 1/i);
+    await within(row).findByText(/Rule 1/i);
+    await within(row).findByText(/Pipeline 1/i);
     await userEvent.click(await within(row).findByRole('button', { name: /show 1 more/i }));
-    const connectedStream2 = await within(row).findByText(/Stream Title 2/i);
-
-    expect(rule).toBeInTheDocument();
-    expect(pipeline).toBeInTheDocument();
-    expect(connectedStream1).toBeInTheDocument();
-    expect(connectedStream2).toBeInTheDocument();
+    await within(row).findByText(/Stream Title 1/i);
+    await within(row).findByText(/Stream Title 2/i);
   });
 });
