@@ -37,11 +37,15 @@ following locations where they are displayed:
 
 ## Java API Changes
 
-- tbd
+This release includes the following Java API changes.
+
+| File/method                                              | Description                                                       |
+|----------------------------------------------------------|-------------------------------------------------------------------|
+| `org.graylog2.plugin.database.users.User#setPermissions` | Deprecated. Will be removed in Graylog 8.0. Assign roles instead. |
 
 ## REST API Endpoint Changes
 
-The following REST API changes have been made.
+This release includes the following REST API changes.
 
 | Endpoint                               | Description                                                                   |
 |----------------------------------------|-------------------------------------------------------------------------------|
