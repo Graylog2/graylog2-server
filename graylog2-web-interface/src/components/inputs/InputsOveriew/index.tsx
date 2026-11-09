@@ -33,6 +33,5 @@ export { default as ExpandedConfigurationSection } from './expanded-sections/Exp
 export { default as MessagesPerStreamSection } from './expanded-sections/MessagesPerStreamSection';
 export { default as ExtractorsSection } from './expanded-sections/ExtractorsSection';
 export { default as ExtractorsSectionActions } from './expanded-sections/ExtractorsSectionActions';
-export { default as AssociatedStreamsSection } from './expanded-sections/AssociatedStreamsSection';
 export { InputMetricsProvider, useInputMetricsContext, useInputMetricsFor } from './InputMetricsContext';
 export { METRIC_COLUMN_IDS, METRIC_COLUMN_TITLES, backendFieldsForVisibleColumns } from './metricColumns';

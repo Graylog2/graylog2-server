@@ -18,15 +18,13 @@ import * as React from 'react';
 
 import type { InputSummary } from 'hooks/usePaginatedInputs';
 import { Spinner } from 'components/common';
-import ExpandedSectionCount from 'components/common/EntityDataTable/ExpandedSectionCount';
+import EntityTitlesCellList from 'components/common/EntityTitlesCellList';
+import Routes from 'routing/Routes';
 import { useInputMetricsFor } from 'components/inputs/InputsOveriew/InputMetricsContext';
-import { METRIC_COLUMN_IDS } from 'components/inputs/InputsOveriew/metricColumns';
 
 type Props = {
   input: InputSummary;
 };
-
-const SECTION_NAME = METRIC_COLUMN_IDS.associatedStreams;
 
 const AssociatedStreamsCell = ({ input }: Props) => {
   const { metrics, isInitialLoading, isError } = useInputMetricsFor(input.id);
@@ -39,14 +37,11 @@ const AssociatedStreamsCell = ({ input }: Props) => {
     return <span aria-label={`No associated streams available for input ${input.title}`}>—</span>;
   }
 
-  const streamCount = Object.keys(metrics.messages_per_stream).length;
-
   return (
-    <ExpandedSectionCount
-      entityId={input.id}
-      section={SECTION_NAME}
-      count={streamCount}
-      label={`associated streams for ${input.title}`}
+    <EntityTitlesCellList
+      entityIds={Object.keys(metrics.messages_per_stream)}
+      entityType="streams"
+      entityRoute={Routes.stream_view}
     />
   );
 };
