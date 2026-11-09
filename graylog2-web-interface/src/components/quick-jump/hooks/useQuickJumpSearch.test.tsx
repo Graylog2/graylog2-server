@@ -22,6 +22,7 @@ import { usePluginExports } from 'views/test/testPlugins';
 import asMock from 'helpers/mocking/AsMock';
 import useNavItems from 'components/quick-jump/hooks/useNavItems';
 import { ACTION_TYPE, PAGE_TYPE } from 'components/quick-jump/Constants';
+import type { QualifiedUrl } from 'routing/Routes';
 
 import useQuickJumpSearch from './useQuickJumpSearch';
 
@@ -35,15 +36,15 @@ describe('useQuickJumpSearch', () => {
     'quickJump.queryActions': [
       {
         key: 'ask',
-        item: (query: string) => ({ type: ACTION_TYPE, title: `Ask about "${query}"`, link: `/ask?q=${query}` }),
+        item: (query: string) => ({ type: ACTION_TYPE, title: `Ask about "${query}"`, link: `/ask?q=${query}` as QualifiedUrl<string> }),
       },
-      { key: 'hidden', item: () => ({ type: ACTION_TYPE, title: 'Hidden', link: '/hidden' }), useCondition: () => false },
+      { key: 'hidden', item: () => ({ type: ACTION_TYPE, title: 'Hidden', link: '/hidden' as QualifiedUrl<string> }), useCondition: () => false },
     ],
   });
 
   beforeEach(() => {
     asMock(QuickJump.search).mockResolvedValue({ results: [] } as Awaited<ReturnType<typeof QuickJump.search>>);
-    asMock(useNavItems).mockReturnValue([{ type: PAGE_TYPE, title: 'Streams', link: '/streams' }]);
+    asMock(useNavItems).mockReturnValue([{ type: PAGE_TYPE, title: 'Streams', link: '/streams' as QualifiedUrl<string> }]);
   });
 
   it('offers actions for the typed text after everything that matches it', async () => {
