@@ -27,6 +27,7 @@ import AppConfig from 'util/AppConfig';
 import { ConfirmDialog, FormikInput, FormSubmit, Section, Spinner, TimeUnitInput } from 'components/common';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { Alert, Col, Row } from 'components/bootstrap';
+import type { Input } from 'components/bootstrap';
 import 'components/indices/rotation';
 import 'components/indices/retention';
 import { prepareDataTieringConfig, prepareDataTieringInitialValues } from 'components/indices/data-tiering';
@@ -60,6 +61,7 @@ type Props = {
   rotationStrategies: Strategies;
   submitButtonText: string;
   submitLoadingText?: string;
+  titleInputRef?: React.Ref<Input>;
 };
 
 type Unit = 'seconds' | 'minutes';
@@ -101,6 +103,7 @@ const IndexSetConfigurationForm = ({
   cancelLink,
   submitButtonText,
   submitLoadingText = undefined,
+  titleInputRef = undefined,
 }: Props) => {
   const history = useHistory();
   const productName = useProductName();
@@ -304,6 +307,7 @@ const IndexSetConfigurationForm = ({
                       id="title"
                       name="title"
                       autoFocus
+                      inputRef={titleInputRef}
                       help="Descriptive name of the index set."
                       onChange={(event) => handleTitleChange(event, setFieldValue)}
                       required
