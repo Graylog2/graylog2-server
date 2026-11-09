@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix query time range limit blocking short searches further back in the past than the limit."
+
+issues = ["27488"]
+pulls = []

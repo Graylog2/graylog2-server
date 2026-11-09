@@ -125,4 +125,40 @@ describe('TimeRangePresetDropdown', () => {
 
     expect(screen.queryByText('Keyword ten min')).not.toBeInTheDocument();
   });
+
+  it('keeps options older than limit when their range is within limit', async () => {
+    asMock(useSearchConfiguration).mockReturnValue({
+      config: {
+        ...mockSearchClusterConfig,
+        quick_access_timerange_presets: [
+          {
+            id: '639843f5-049a-4532-8a54-102da850b7f1',
+            timerange: { from: 7 * 86400, to: 6 * 86400, type: 'relative' },
+            description: 'Day a week ago',
+          },
+          {
+            id: '8dda08e9-cd23-44ff-b4eb-edeb7a704cf4',
+            timerange: { from: '2018-11-14 01:00:00.000', to: '2018-11-14 13:00:00.000', type: 'absolute' },
+            description: 'Half a day in 2018',
+          },
+          {
+            id: '0b9cbd77-3e55-4b6b-8a4e-6f7c2b1fd0a2',
+            timerange: { from: '2018-11-12 13:00:00.000', to: '2018-11-14 13:00:00.000', type: 'absolute' },
+            description: 'Two days in 2018',
+          },
+        ],
+      },
+      refresh: jest.fn(),
+      isInitialLoading: false,
+    });
+
+    render(<TimeRangePresetDropdown onChange={jest.fn()} limitDuration={86400} />);
+
+    await openTimeRangePresetSelect();
+
+    await screen.findByRole('menuitem', { name: /day a week ago/i });
+    await screen.findByRole('menuitem', { name: /half a day in 2018/i });
+
+    expect(screen.queryByText('Two days in 2018')).not.toBeInTheDocument();
+  });
 });
