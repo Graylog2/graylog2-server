@@ -130,6 +130,8 @@
         <commons-io.version>2.22.0</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.51.0</error-prone.version>
+        <!-- Jakarta EL 6 implementation. See the jakarta.el-api dependency in graylog2-server/pom.xml for details. -->
+        <expressly.version>6.0.0</expressly.version>
         <freemarker.version>2.3.35</freemarker.version>
         <gcs.version>2.76.0</gcs.version>
         <azure-blob-storage.version>12.36.0</azure-blob-storage.version>
@@ -168,6 +170,7 @@
         <javassist.version>3.33.0-GA</javassist.version>
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
         <jakarta.annotation-api.version>3.0.0</jakarta.annotation-api.version>
+        <jakarta.el-api.version>6.0.1</jakarta.el-api.version> <!-- Must match the EL version implemented by expressly -->
         <jakarta.inject.version>2.0.1</jakarta.inject.version>
         <jakarta.ws.rs-api.version>4.0.0</jakarta.ws.rs-api.version>
         <jakarta.servlet-api.version>6.1.0</jakarta.servlet-api.version>
