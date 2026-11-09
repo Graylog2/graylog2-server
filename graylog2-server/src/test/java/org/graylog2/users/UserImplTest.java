@@ -122,10 +122,10 @@ class UserImplTest {
     void testFirstNameLengthValidation() {
         user = createUserImpl(null, null, null);
         ValidationResult result = user.getValidations().get(UserImpl.FIRST_NAME)
-                                            .validate(StringUtils.repeat("*", 10));
+                .validate(StringUtils.repeat("*", 10));
         assertTrue(result.passed());
         result = user.getValidations().get(UserImpl.FIRST_NAME)
-                     .validate(StringUtils.repeat("*", 210));
+                .validate(StringUtils.repeat("*", 210));
         assertFalse(result.passed());
     }
 
@@ -133,10 +133,10 @@ class UserImplTest {
     void testLastNameLengthValidation() {
         user = createUserImpl(null, null, null);
         ValidationResult result = user.getValidations().get(UserImpl.LAST_NAME)
-                                      .validate(StringUtils.repeat("*", 10));
+                .validate(StringUtils.repeat("*", 10));
         assertTrue(result.passed());
         result = user.getValidations().get(UserImpl.LAST_NAME)
-                     .validate(StringUtils.repeat("*", 210));
+                .validate(StringUtils.repeat("*", 210));
         assertFalse(result.passed());
     }
 
@@ -182,16 +182,17 @@ class UserImplTest {
         final Permissions permissions = new Permissions(Collections.emptySet());
         final List<String> customPermissions = Collections.singletonList("subject:action");
         final Map<String, Object> fields = ImmutableMap.of(
-            UserImpl.USERNAME, "foobar",
-            UserImpl.PERMISSIONS, customPermissions);
+                UserImpl.USERNAME, "foobar",
+                UserImpl.PERMISSIONS, customPermissions);
         user = createUserImpl(passwordAlgorithmFactory, permissions, fields);
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(CONFIG_ALL_ALLOWED);
 
         assertThat(user.getPermissions())
                 .containsAll(permissions.userSelfEditPermissions("foobar", true))
-            .contains("subject:action");
+                .contains("subject:action");
     }
 
+    @SuppressWarnings("removal")
     @Test
     void permissionsArentModified() {
         final Permissions permissions = new Permissions(Collections.emptySet());
@@ -230,7 +231,7 @@ class UserImplTest {
         user = createUserImpl(null, null, null);
         user.setStartpage(new DashboardStartPage("id"));
         assertEquals("dashboard", user.getStartpage().type());
-        assertEquals("id", ((DashboardStartPage)user.getStartpage()).id());
+        assertEquals("id", ((DashboardStartPage) user.getStartpage()).id());
     }
 
     @Test

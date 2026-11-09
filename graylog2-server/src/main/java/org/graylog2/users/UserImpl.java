@@ -171,7 +171,7 @@ public class UserImpl extends PersistedImpl implements User {
                 .put(FIRST_NAME, new LimitedOptionalStringValidator(MAX_FIRST_LAST_NAME_LENGTH))
                 .put(LAST_NAME, new LimitedOptionalStringValidator(MAX_FIRST_LAST_NAME_LENGTH))
                 .put(FULL_NAME, new LimitedOptionalStringValidator(MAX_FULL_NAME_LENGTH))
-                .put(PERMISSIONS, new ListValidator())
+                .put(PERMISSIONS, new ListValidator(true))
                 .put(ROLES, new ListValidator(true))
                 .build();
     }
@@ -207,8 +207,9 @@ public class UserImpl extends PersistedImpl implements User {
     /**
      * Set the first, last, and full user's name. The user's full name is composed by concatenating the first and
      * last names together with a space between. For example "First Last".
+     *
      * @param firstName Required. The user's first name.
-     * @param lastName Required. The user's last name.
+     * @param lastName  Required. The user's last name.
      */
     @Override
     public void setFirstLastFullNames(final String firstName, final String lastName) {
@@ -275,6 +276,11 @@ public class UserImpl extends PersistedImpl implements User {
         }).collect(Collectors.toSet());
     }
 
+    /**
+     * @deprecated Direct user permissions will be removed in version 8.0. Assign roles instead.
+     */
+    @Deprecated(since = "7.3.0", forRemoval = true)
+    @SuppressWarnings("removal")
     @Override
     public void setPermissions(final List<String> permissions) {
         final List<String> perms = Lists.newArrayList(permissions);

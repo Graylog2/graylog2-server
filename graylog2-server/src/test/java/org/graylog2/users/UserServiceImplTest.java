@@ -168,7 +168,7 @@ public class UserServiceImplTest {
     @MongoDBFixtures("UserServiceImplTest.json")
     public void testLoadDuplicateUser() {
         assertThrows(RuntimeException.class, () ->
-            userService.load("user-duplicate"));
+                userService.load("user-duplicate"));
     }
 
     @Test
@@ -254,7 +254,6 @@ public class UserServiceImplTest {
         user.setEmail("test@example.com");
         user.setTimeZone(DateTimeZone.UTC);
         user.setPassword("TEST");
-        user.setPermissions(Collections.<String>emptyList());
 
         final String id = userService.save(user);
         final DBObject query = BasicDBObjectBuilder.start("_id", new ObjectId(id)).get();
@@ -275,7 +274,6 @@ public class UserServiceImplTest {
         user.setEmail("test@example.com");
         user.setTimeZone(DateTimeZone.UTC);
         user.setPassword("TEST");
-        user.setPermissions(Collections.<String>emptyList());
         user.setFullName(null);
         userService.save(user);
     }
@@ -355,6 +353,7 @@ public class UserServiceImplTest {
         assertThat(userService.getRoleNames(user)).isEmpty();
     }
 
+    @SuppressWarnings("removal")
     @Test
     public void testGetPermissionsForUser() {
         final InMemoryRolePermissionResolver permissionResolver = mock(InMemoryRolePermissionResolver.class);
@@ -403,7 +402,6 @@ public class UserServiceImplTest {
         user.setEmail(username + "@graylog.local");
         user.setName(username);
         user.setPassword("password");
-        user.setPermissions(List.of());
         user.setAuthServiceUid(authServiceUid);
         return user;
     }

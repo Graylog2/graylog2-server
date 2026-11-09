@@ -752,6 +752,7 @@ public class UsersResource extends RestResource {
     /**
      * @deprecated This endpoint will be removed in version 8.0. Assign roles instead of direct user permissions.
      */
+    @SuppressWarnings("removal")
     @Deprecated(since = "7.3.0", forRemoval = true)
     @DELETE
     @Path("{username}/permissions")
