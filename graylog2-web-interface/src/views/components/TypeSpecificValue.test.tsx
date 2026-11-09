@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, within } from 'wrappedTestingLibrary';
 
 import asMock from 'helpers/mocking/AsMock';
 import TypeSpecificValue from 'views/components/TypeSpecificValue';
@@ -25,6 +25,8 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import FieldTypeValueRenderer from 'views/components/fieldtypes/FieldTypeValueRenderer';
 import { useInputs } from 'hooks/useInputs';
 import FieldType from 'views/logic/fieldtypes/FieldType';
+import { AdditionalContext } from 'views/logic/ActionContext';
+import DecoratedValue from 'views/components/messagelist/decoration/DecoratedValue';
 
 jest.mock('hooks/useFeature');
 jest.mock('hooks/usePluginEntities');
@@ -78,6 +80,55 @@ describe('TypeSpecificValue', () => {
 
     expect(link).toHaveTextContent('Open in IPAM');
     expect(link).toHaveAttribute('href', 'https://ipam.example.com/search?ip=10.0.0.1');
+  });
+
+  describe('highlighting of decorated links', () => {
+    const originalValue = '10.0.0.1';
+    const message = (after: unknown) => ({
+      id: 'message-id',
+      index: 'graylog_0',
+      fields: { field1: after },
+      highlight_ranges: { field1: [{ start: 0, length: 4 }] },
+      decoration_stats: {
+        added_fields: {},
+        changed_fields: { field1: { before: originalValue, after } },
+        removed_fields: {},
+      },
+    });
+
+    const renderInMessage = (value: unknown) =>
+      render(
+        <AdditionalContext.Provider value={{ message: message(value) }}>
+          <TypeSpecificValue field="field1" value={value} type={FieldType.Decorated} render={DecoratedValue} />
+        </AdditionalContext.Provider>,
+      );
+
+    it('highlights link label when it is the original field value', async () => {
+      renderInMessage({ type: 'a', href: originalValue });
+
+      const link = await screen.findByRole('link');
+
+      expect(within(link).getByText('10.0')).toHaveStyle({ padding: '0 1px' });
+    });
+
+    it('does not apply highlight ranges of original value to custom link text', async () => {
+      renderInMessage({ type: 'a', href: 'https://ipam.example.com/search?ip=10.0.0.1', text: 'Open in IPAM' });
+
+      const link = await screen.findByRole('link');
+
+      expect(link).toHaveTextContent('Open in IPAM');
+      expect(within(link).queryByText('Open')).not.toBeInTheDocument();
+    });
+
+    it('does not apply highlight ranges of original value to templated URL', async () => {
+      const href = 'https://ipam.example.com/search?ip=10.0.0.1';
+      renderInMessage({ type: 'a', href });
+
+      const link = await screen.findByRole('link');
+
+      expect(link).toHaveTextContent(href);
+      expect(within(link).queryByText('http')).not.toBeInTheDocument();
+    });
   });
 
   it('should render original value if unit not defined', async () => {

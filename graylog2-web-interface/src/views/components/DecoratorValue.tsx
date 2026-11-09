@@ -15,9 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+ import { useContext } from 'react';
 
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import FormattedValue from 'views/components/FormattedValue';
+import { ActionContext } from 'views/logic/ActionContext';
+import type { Message } from 'views/components/messagelist/Types';
+import stringify from 'util/stringify';
 
 import type { ValueRendererProps } from './messagelist/decoration/ValueRenderer';
 
@@ -30,6 +34,16 @@ type DecoratedLink = {
 const isDecoratedLink = (value: unknown): value is DecoratedLink =>
   typeof value === 'object' && value !== null && 'href' in value && 'type' in value && !!value.href && !!value.type;
 
+const plainRenderer = ({ value }: ValueRendererProps) => value;
+
+// Highlight ranges of a message refer to the original field value. They only apply to a link label which is
+// identical to it, not to a custom link text or a templated URL.
+const isOriginalFieldValue = (label: string, field: string, message: Message | undefined) => {
+  const originalValue = message?.decoration_stats?.changed_fields?.[field]?.before;
+
+  return originalValue !== undefined && stringify(originalValue) === label;
+};
+
 type Props = {
   field: string;
   value: any;
@@ -38,13 +52,21 @@ type Props = {
   type: FieldType;
 };
 
-const DecoratorValue = ({ field, value, truncate, render, type }: Props) =>
-  isDecoratedLink(value) ? (
+const DecoratorValue = ({ field, value, truncate, render, type }: Props) => {
+  const { message } = useContext(ActionContext);
+
+  if (!isDecoratedLink(value)) {
+    return <FormattedValue field={field} value={value} truncate={truncate} render={render} type={type} />;
+  }
+
+  const label = value.text ?? value.href;
+  const labelRenderer = isOriginalFieldValue(label, field, message) ? render : plainRenderer;
+
+  return (
     <a href={value.href} target="_blank" rel="noreferrer" title={value.text ? value.href : undefined}>
-      <FormattedValue field={field} value={value.text ?? value.href} truncate={truncate} render={render} type={type} />
+      <FormattedValue field={field} value={label} truncate={truncate} render={labelRenderer} type={type} />
     </a>
-  ) : (
-    <FormattedValue field={field} value={value} truncate={truncate} render={render} type={type} />
   );
+};
 
 export default DecoratorValue;
