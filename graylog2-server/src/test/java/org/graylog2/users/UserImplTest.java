@@ -239,4 +239,29 @@ class UserImplTest {
         user.setStartpage(null);
         assertNull(user.getStartpage());
     }
+
+    @Test
+    void usernameValidationRejectsNamesThatWouldActAsPermissionWildcards() {
+        user = createUserImpl(null, null, null);
+        final var usernameValidator = user.getValidations().get(UserImpl.USERNAME);
+
+        for (final String username : List.of("*", "admin,attacker", "admin:attacker", " admin", "admin ")) {
+            assertThat(usernameValidator.validate(username))
+                    .as("username <%s> must be rejected", username)
+                    .isInstanceOf(ValidationResult.ValidationFailed.class);
+        }
+    }
+
+    @Test
+    void usernameValidationAcceptsOrdinaryNames() {
+        user = createUserImpl(null, null, null);
+        final var usernameValidator = user.getValidations().get(UserImpl.USERNAME);
+
+        for (final String username : List.of("alice", "alice.smith", "alice-smith_1", "alice@example.com",
+                "DOMAIN\\alice")) {
+            assertThat(usernameValidator.validate(username))
+                    .as("username <%s> must be accepted", username)
+                    .isInstanceOf(ValidationResult.ValidationPassed.class);
+        }
+    }
 }
