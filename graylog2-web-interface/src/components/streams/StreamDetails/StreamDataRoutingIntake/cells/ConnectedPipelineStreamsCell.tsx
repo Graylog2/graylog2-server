@@ -17,6 +17,7 @@
 import React from 'react';
 
 import { Link } from 'components/common';
+import ExpandableCellList from 'components/common/ExpandableCellList';
 import Routes from 'routing/Routes';
 import type { StreamConnectedPipeline } from 'components/streams/StreamDetails/StreamDataRoutingIntake/types';
 
@@ -24,18 +25,13 @@ type Props = {
   streams: StreamConnectedPipeline['connected_streams'];
 };
 
-const ConnectedPipelineStreamsCell = ({ streams }: Props) => {
-  if (!streams || streams.length < 1) return null;
+const ConnectedPipelineStreamsCell = ({ streams }: Props) => (
+  <ExpandableCellList
+    items={streams}
+    renderItem={(stream) => <Link to={Routes.stream_view(stream.id)}>{stream.title}</Link>}
+    itemKey={({ id }) => id}
+    itemTitle={({ title }) => title}
+  />
+);
 
-  return (
-    <>
-      {streams.map((stream, index) => (
-        <span key={stream.id}>
-          <Link to={Routes.stream_view(stream.id)}>{stream.title}</Link>
-          {index !== streams.length - 1 && ', '}
-        </span>
-      ))}
-    </>
-  );
-};
 export default ConnectedPipelineStreamsCell;
