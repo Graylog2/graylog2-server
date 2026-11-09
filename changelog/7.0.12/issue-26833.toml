@@ -1,0 +1,5 @@
+type = "f"
+message = "Skip CEF fields that carry an empty numeric value instead of logging a stack trace for each message."
+
+issues = ["26833"]
+pulls = ["26835"]

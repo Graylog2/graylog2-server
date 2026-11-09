@@ -107,7 +107,7 @@ export function useUpdateLookupTable() {
       });
       queryClient.invalidateQueries({
         queryKey: ['lookup-table-details'],
-        refetchType: 'active',
+        refetchType: 'none',
       });
     },
     onError: (error: Error) => UserNotification.error(error.message),
@@ -298,7 +298,7 @@ export function useUpdateCache() {
       });
       queryClient.invalidateQueries({
         queryKey: ['cache-details'],
-        refetchType: 'active',
+        refetchType: 'none',
       });
     },
     onError: (error: Error) => UserNotification.error(error.message),
@@ -424,7 +424,7 @@ export function useUpdateAdapter() {
       });
       queryClient.invalidateQueries({
         queryKey: ['data-adapter-details'],
-        refetchType: 'active',
+        refetchType: 'none',
       });
     },
     onError: (error: Error) => UserNotification.error(error.message),

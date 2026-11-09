@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-project-parent</artifactId>
-        <version>7.0.7-SNAPSHOT</version>
+        <version>7.0.17-SNAPSHOT</version>
         <relativePath>../graylog-project-parent</relativePath>
     </parent>
 
@@ -646,6 +646,11 @@
             <groupId>com.github.luben</groupId>
             <artifactId>zstd-jni</artifactId>
         </dependency>
+        <!-- Explicitly declare lz4 since kafka-clients depends on it and we exclude it from the declaration. -->
+        <dependency>
+            <groupId>at.yawk.lz4</groupId>
+            <artifactId>lz4-java</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>com.github.zafarkhaja</groupId>
@@ -674,10 +679,6 @@
         <dependency>
             <groupId>com.maxmind.geoip2</groupId>
             <artifactId>geoip2</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.graylog.cef</groupId>
-            <artifactId>cef-parser</artifactId>
         </dependency>
         <dependency>
             <groupId>org.antlr</groupId>

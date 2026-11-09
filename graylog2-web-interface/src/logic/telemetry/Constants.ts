@@ -46,6 +46,7 @@ export const TELEMETRY_EVENT_TYPE = {
     WIDGET_EDIT_CANCEL_CLICKED: 'Search Widget Edit Cancel Clicked',
     WIDGET_CONFIG_UPDATED: 'Search Widget Config Updated',
     EXPORT: 'Search Widget Exported',
+    VISUALIZATION_TYPE_SELECTED: 'Search Widget Visualization Type Selected',
   },
   SEARCH_WIDGET_CREATE: {
     AGGREGATION: 'Search Widget Aggregation Created',

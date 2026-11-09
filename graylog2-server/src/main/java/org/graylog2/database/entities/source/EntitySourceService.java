@@ -37,10 +37,6 @@ public class EntitySourceService {
         dbEntitySourceService.deleteByEntityId(entityId);
     }
 
-    public void handleEntityIdChange(String oldEntityId, String newEntityId) {
-        dbEntitySourceService.updateParentId(oldEntityId, newEntityId);
-    }
-
     public void bulkDeleteByEntityId(Set<String> entityIds) {
         dbEntitySourceService.bulkDeleteByEntityId(entityIds);
     }

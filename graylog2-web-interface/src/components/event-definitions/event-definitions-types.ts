@@ -17,6 +17,7 @@
 import type { SyntheticEvent } from 'react';
 
 import type { StepsType } from 'components/common/Wizard';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import type { LookupTableParameterJson } from 'views/logic/parameters/LookupTableParameter';
 import { SYSTEM_EVENT_DEFINITION_TYPE } from 'components/event-definitions/constants';
 
@@ -110,6 +111,7 @@ export type EventDefinition = {
   updated_at: string | null;
   matched_at: string;
   scheduler: Scheduler;
+  share_request?: EntitySharePayload;
 };
 
 export type EventDefinitionFormControlsProps = {

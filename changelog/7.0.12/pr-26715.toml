@@ -1,0 +1,4 @@
+type = "s"
+message = "Fix bug in updating a view where the check for permissions could test on a wrong view ID."
+
+pulls = ["26715"]

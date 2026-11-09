@@ -1,0 +1,5 @@
+type = "f"
+message = "Show the priority name instead of its numeric value in the event definitions overview."
+
+issues = ["22917"]
+pulls = ["27525"]

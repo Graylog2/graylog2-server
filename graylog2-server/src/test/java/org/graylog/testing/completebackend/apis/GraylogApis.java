@@ -70,6 +70,8 @@ public class GraylogApis implements GraylogRestApi {
     private final EventDefinitions eventDefinitions;
     private final Dashboards dashboards;
     private final Pipelines pipelines;
+    private final Rules rules;
+    private final Simulator simulator;
     private final Inputs inputs;
     private final Roles roles;
 
@@ -95,6 +97,8 @@ public class GraylogApis implements GraylogRestApi {
         this.eventDefinitions = new EventDefinitions(this);
         this.dashboards = new Dashboards(this);
         this.pipelines = new Pipelines(this);
+        this.rules = new Rules(this);
+        this.simulator = new Simulator(this);
         this.inputs = new Inputs(this);
         this.roles = new Roles(this);
     }
@@ -176,6 +180,14 @@ public class GraylogApis implements GraylogRestApi {
 
     public Pipelines pipelines() {
         return pipelines;
+    }
+
+    public Rules rules() {
+        return rules;
+    }
+
+    public Simulator simulator() {
+        return simulator;
     }
 
     public Inputs inputs() {

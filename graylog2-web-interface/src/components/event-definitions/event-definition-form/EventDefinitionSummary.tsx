@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import upperFirst from 'lodash/upperFirst';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import moment from 'moment';
@@ -28,7 +27,7 @@ import { Alert, Col, Row } from 'components/bootstrap';
 import { isPermitted } from 'util/PermissionsMixin';
 import usePluginEntities from 'hooks/usePluginEntities';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
-import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
+import { getPriorityName } from 'logic/alerts/EventDefinitionPriorityEnum';
 import type User from 'logic/users/User';
 import type { EventNotification } from 'stores/event-notifications/EventNotificationsStore';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
@@ -85,7 +84,7 @@ const EventDefinitionSummary = ({
         <dt>Description</dt>
         <dd>{eventDefinition.description || 'No description given'}</dd>
         <dt>Priority</dt>
-        <dd>{upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name)}</dd>
+        <dd>{getPriorityName(eventDefinition.priority)}</dd>
         {validSecurityLicense ? (
           <>
             {eventDefinition?.event_procedure ? (

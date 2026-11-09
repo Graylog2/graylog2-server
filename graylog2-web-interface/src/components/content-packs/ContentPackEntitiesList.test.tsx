@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { act, render, screen, waitFor, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import ContentPack from 'logic/content-packs/ContentPack';
@@ -102,5 +102,23 @@ describe('<ContentPackEntitiesList />', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Reset search' }));
 
     await screen.findByText('test');
+  });
+
+  it('should only open the edit modal of the clicked entity and apply the parameter to it', async () => {
+    const onParameterApply = jest.fn();
+    render(<ContentPackEntitiesList contentPack={contentPack} onParameterApply={onParameterApply} />);
+
+    await userEvent.click((await screen.findAllByRole('button', { name: 'Edit' }))[0]);
+
+    const dialog = await screen.findByRole('dialog');
+
+    expect(screen.getAllByRole('dialog')).toHaveLength(1);
+
+    const [configKeySelect, parameterSelect] = within(dialog).getAllByRole('combobox');
+    await userEvent.selectOptions(configKeySelect, within(configKeySelect).getAllByRole('option')[1]);
+    await userEvent.selectOptions(parameterSelect, 'TITLE');
+    await userEvent.click(within(dialog).getByRole('button', { name: 'Apply' }));
+
+    expect(onParameterApply).toHaveBeenCalledWith(entity1.id, expect.any(String), 'TITLE');
   });
 });

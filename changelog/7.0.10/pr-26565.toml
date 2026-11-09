@@ -1,0 +1,3 @@
+type = "s"
+message = "Fix security issue in `MessageResource` that allowed fetching a message from an index the user has no read permission for. Prevent this kind of users to check index existence."
+pulls = ["26565"]

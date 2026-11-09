@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix crash on event definition details page when streams are not loaded yet."
+
+pulls = ["27734"]

@@ -1,0 +1,3 @@
+type = "s"
+message = "Protect regex tester REST endpoints against ReDoS by enforcing input length limits and a per-match timeout."
+pulls = ["26483"]

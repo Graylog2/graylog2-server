@@ -1,0 +1,4 @@
+type = "s"
+message = "Check read permission for the requested lookup table in the lookup table tester endpoints."
+
+pulls = ["26915"]

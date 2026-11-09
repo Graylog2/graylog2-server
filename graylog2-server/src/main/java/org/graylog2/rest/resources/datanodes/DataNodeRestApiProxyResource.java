@@ -42,7 +42,6 @@ import org.graylog2.shared.security.RestPermissions;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.function.Predicate;
 
 import static org.graylog2.audit.AuditEventTypes.DATANODE_API_REQUEST;
 
@@ -53,20 +52,25 @@ import static org.graylog2.audit.AuditEventTypes.DATANODE_API_REQUEST;
 @Timed
 @RequiresPermissions(RestPermissions.DATANODE_REST_PROXY)
 public class DataNodeRestApiProxyResource extends RestResource {
-    private static final List<Predicate<ProxyRequestAdapter.ProxyRequest>> allowList = List.of(
-            request -> request.path().startsWith("indices-directory") && "GET".equals(request.method()),
-            request -> request.path().startsWith("logs") && "GET".equals(request.method()),
-            request -> request.path().startsWith("connection-check") && "POST".equals(request.method())
-    );
+    private static final DataNodeProxyAllowlist RESTRICTED_ALLOWLIST = new DataNodeProxyAllowlist(List.of(
+            request -> isAllowed(request, "indices-directory", "GET", RestPermissions.DATANODE_MIGRATION),
+            request -> isAllowed(request, "logs", "GET", RestPermissions.CLUSTER_CONFIGURATION_READ),
+            request -> isAllowed(request, "metrics", "GET", RestPermissions.CLUSTER_CONFIGURATION_READ),
+            request -> isAllowed(request, "metrics", "POST", RestPermissions.CLUSTER_CONFIGURATION_READ)
+    ));
+
+    private static boolean isAllowed(ProxyRequestAdapter.ProxyRequest request, String path, String method, String permission) {
+        return request.path().startsWith(path) && method.equals(request.method()) && (request.subject() != null && request.subject().isPermitted(permission));
+    }
 
     private final DatanodeRestApiProxy proxyRequestAdapter;
-    private final boolean enableAllowlist;
+    private final DataNodeProxyAllowlist allowlist;
 
     @Inject
     public DataNodeRestApiProxyResource(DatanodeRestApiProxy proxyRequestAdapter,
                                         @Named("datanode_proxy_api_allowlist") boolean enableAllowlist) {
         this.proxyRequestAdapter = proxyRequestAdapter;
-        this.enableAllowlist = enableAllowlist;
+        this.allowlist = enableAllowlist ? RESTRICTED_ALLOWLIST : DataNodeProxyAllowlist.allowAll();
     }
 
 
@@ -115,15 +119,16 @@ public class DataNodeRestApiProxyResource extends RestResource {
     }
 
     private Response request(ContainerRequestContext context, String path, String hostname) throws IOException {
-        final var request = new ProxyRequestAdapter.ProxyRequest(context.getMethod(), path, context.getEntityStream(), hostname, context.getUriInfo().getQueryParameters());
-        if (enableAllowlist && allowList.stream().noneMatch(condition -> condition.test(request))) {
+        final var request = new ProxyRequestAdapter.ProxyRequest(context.getMethod(), path, context.getEntityStream(), hostname, context.getUriInfo().getQueryParameters(), getSubject());
+
+        try {
+            final var response = proxyRequestAdapter.request(allowlist.authorize(request));
+            return Response.status(response.status()).entity(response.response()).type(response.contentType()).build();
+        } catch (RequestNotAllowedException e) {
             return Response.status(Response.Status.BAD_REQUEST)
                     .entity("This request is not allowed.")
                     .type(MediaType.TEXT_PLAIN_TYPE)
                     .build();
         }
-
-        final var response = proxyRequestAdapter.request(request);
-        return Response.status(response.status()).entity(response.response()).type(response.contentType()).build();
     }
 }

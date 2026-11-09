@@ -60,7 +60,8 @@ const useGetPermissionsByScope = (entity: Partial<GenericEntityType> = undefined
   });
 
   const scope = entity?._scope?.toUpperCase() || 'DEFAULT';
-  const permissions: ScopeParams = isLoading ? { is_mutable: false, is_deletable: false } : data.entity_scopes[scope];
+  // Unknown scopes and missing responses are treated as locked, like the loading state.
+  const permissions: ScopeParams = data?.entity_scopes?.[scope] ?? { is_mutable: false, is_deletable: false };
 
   return {
     loadingScopePermissions: isLoading,
@@ -68,7 +69,7 @@ const useGetPermissionsByScope = (entity: Partial<GenericEntityType> = undefined
     checkPermissions: (inEntity: Partial<GenericEntityType>) => {
       const entityScope = inEntity?._scope?.toUpperCase() || 'DEFAULT';
 
-      return data.entity_scopes[entityScope].is_mutable;
+      return data?.entity_scopes?.[entityScope]?.is_mutable ?? false;
     },
   };
 };

@@ -158,10 +158,20 @@ public class EventDefinitionHandler {
      * @return the updated event definition
      */
     public EventDefinitionDto update(EventDefinitionDto updatedEventDefinition, boolean schedule) {
+        return update(updatedEventDefinition, schedule, true);
+    }
+
+    /**
+     * Like {@link #update(EventDefinitionDto, boolean)}, but allows bypassing the scope mutability check.
+     * Only system-driven writes such as the Illuminate content-pack upgrade path should pass
+     * {@code checkMutability = false}: that path must rewrite the content of immutable Illuminate-scoped
+     * definitions in place to preserve their IDs.
+     */
+    public EventDefinitionDto update(EventDefinitionDto updatedEventDefinition, boolean schedule, boolean checkMutability) {
         // Grab the old record so we can revert to it if something goes wrong
         final Optional<EventDefinitionDto> oldEventDefinition = eventDefinitionService.get(updatedEventDefinition.id());
 
-        final EventDefinitionDto eventDefinition = updateEventDefinition(updatedEventDefinition);
+        final EventDefinitionDto eventDefinition = updateEventDefinition(updatedEventDefinition, checkMutability);
 
         try {
             if (schedule) {
@@ -177,7 +187,7 @@ public class EventDefinitionHandler {
             // Cleanup if anything goes wrong
             LOG.error("Reverting to old event definition <{}/{}> because of an error updating the job definition",
                     eventDefinition.id(), eventDefinition.title(), e);
-            oldEventDefinition.ifPresent(eventDefinitionService::save);
+            oldEventDefinition.ifPresent(dto -> eventDefinitionService.save(dto, checkMutability));
             throw e;
         }
 
@@ -309,8 +319,8 @@ public class EventDefinitionHandler {
                 .orElseThrow(() -> new IllegalArgumentException("Event definition <" + eventDefinitionId + "> doesn't exist"));
     }
 
-    private EventDefinitionDto updateEventDefinition(EventDefinitionDto updatedEventDefinition) {
-        final EventDefinitionDto eventDefinition = eventDefinitionService.save(updatedEventDefinition);
+    private EventDefinitionDto updateEventDefinition(EventDefinitionDto updatedEventDefinition, boolean checkMutability) {
+        final EventDefinitionDto eventDefinition = eventDefinitionService.save(updatedEventDefinition, checkMutability);
         LOG.debug("Updated event definition <{}/{}>", eventDefinition.id(), eventDefinition.title());
         return eventDefinition;
     }

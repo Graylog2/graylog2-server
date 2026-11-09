@@ -59,7 +59,7 @@ public class HttpConfiguration {
     private boolean httpEnableGzip = true;
 
     @Parameter(value = "http_max_header_size", required = true, validator = PositiveIntegerValidator.class)
-    private int httpMaxHeaderSize = 8192;
+    private int httpMaxHeaderSize = 16384;
 
     @Parameter(value = "http_thread_pool_size", required = true, validator = PositiveIntegerValidator.class)
     private int httpThreadPoolSize = 64;

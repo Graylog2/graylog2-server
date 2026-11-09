@@ -57,6 +57,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.PaginatedUserService;
+import org.graylog2.users.PrivilegeEscalationGuard;
 import org.graylog2.users.UserOverviewDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,14 +99,17 @@ public class AuthzRolesResource extends RestResource {
     private final SearchQueryParser searchQueryParser;
     private final SearchQueryParser userSearchQueryParser;
     private final AuditEventSender auditEventSender;
+    private final PrivilegeEscalationGuard privilegeEscalationGuard;
 
     @Inject
     public AuthzRolesResource(
             PaginatedAuthzRolesService authzRolesService,
             PaginatedUserService paginatedUserService,
             UserService userService,
-            AuditEventSender auditEventSender) {
+            AuditEventSender auditEventSender,
+            PrivilegeEscalationGuard privilegeEscalationGuard) {
         this.auditEventSender = auditEventSender;
+        this.privilegeEscalationGuard = privilegeEscalationGuard;
         this.authzRolesService = authzRolesService;
         this.paginatedUserService = paginatedUserService;
         this.userService = userService;
@@ -240,7 +244,7 @@ public class AuthzRolesResource extends RestResource {
             @ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId,
             @ApiParam(name = "usernames") Set<String> usernames,
             @Context UserContext userContext) {
-        updateUserRole(userContext, AuditEventTypes.ROLE_AUTHZ_UPDATE, roleId, usernames, Set::add);
+        updateUserRole(userContext, AuditEventTypes.ROLE_AUTHZ_UPDATE, roleId, usernames, Set::add, true);
     }
 
     @DELETE
@@ -251,14 +255,22 @@ public class AuthzRolesResource extends RestResource {
             @ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId,
             @ApiParam(name = "username") @PathParam("username") @NotBlank String username,
             @Context UserContext userContext) {
-        updateUserRole(userContext, AuditEventTypes.ROLE_AUTHZ_DELETE, roleId, ImmutableSet.of(username), Set::remove);
+        updateUserRole(userContext, AuditEventTypes.ROLE_AUTHZ_DELETE, roleId, ImmutableSet.of(username), Set::remove, false);
     }
 
     interface UpdateRoles {
         boolean update(Set<String> roles, String roleId);
     }
 
-    private void updateUserRole(UserContext userContext, String auditEventType, String roleId, Set<String> usernames, UpdateRoles rolesUpdater) {
+    /**
+     * @param guardPrivilegeEscalation whether the caller must hold every permission the role grants. Required
+     *                                 when assigning a role, since {@code roles:assign} on a role would
+     *                                 otherwise be enough to hand out permissions the caller does not have.
+     *                                 Un-assigning reduces privileges, so it stays unguarded - otherwise an
+     *                                 over-privileged user could never be demoted by a less privileged admin.
+     */
+    private void updateUserRole(UserContext userContext, String auditEventType, String roleId, Set<String> usernames,
+                                UpdateRoles rolesUpdater, boolean guardPrivilegeEscalation) {
         usernames.forEach(username -> {
             checkPermission(USERS_ROLESEDIT, username);
 
@@ -273,6 +285,9 @@ public class AuthzRolesResource extends RestResource {
             } else {
                 roleName = authzRoleDTO.get().name();
                 checkPermission(RestPermissions.ROLES_ASSIGN, roleName);
+                if (guardPrivilegeEscalation) {
+                    privilegeEscalationGuard.validatePermissions(authzRoleDTO.get().permissions(), userContext);
+                }
             }
             Set<String> roles = user.getRoleIds();
             rolesUpdater.update(roles, roleId);
