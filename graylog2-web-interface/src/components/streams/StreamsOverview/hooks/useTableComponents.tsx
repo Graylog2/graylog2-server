@@ -24,8 +24,6 @@ import ExpandedRulesSection from 'components/streams/StreamsOverview/ExpandedRul
 import ExpandedRulesActions from 'components/streams/StreamsOverview/ExpandedRulesActions';
 import ExpandedDestinationFilterRulesSection from 'components/streams/StreamsOverview/ExpandedDestinationFilterRulesSection';
 import ExpandedDestinationFilterRulesActions from 'components/streams/StreamsOverview/ExpandedDestinationFilterRulesActions';
-import ExpandedAssociatedInputsSection from 'components/streams/StreamsOverview/ExpandedAssociatedInputsSection';
-import { METRIC_COLUMN_IDS, METRIC_COLUMN_TITLES } from 'components/streams/StreamsOverview/metricColumns';
 import ExpandedOutputsSection from 'components/streams/StreamsOverview/ExpandedOutputsSection';
 import ExpandedOutputsActions from 'components/streams/StreamsOverview/ExpandedOutputsActions';
 import type { ExpandedSectionRenderer } from 'components/common/EntityDataTable/types';
@@ -59,10 +57,6 @@ const useTableElements = ({
       content: (stream: Stream) => <ExpandedOutputsSection stream={stream} />,
       actions: (stream: Stream) => <ExpandedOutputsActions stream={stream} />,
       isAvailable: (stream: Stream) => stream.is_editable,
-    },
-    [METRIC_COLUMN_IDS.associatedInputs]: {
-      title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.associatedInputs],
-      content: (stream: Stream) => <ExpandedAssociatedInputsSection stream={stream} />,
     },
     ...pluggableExpandedSections,
   };
