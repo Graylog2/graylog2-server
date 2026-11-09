@@ -38,38 +38,6 @@ const ALLOWED_URI_REGEXP = /^(?:https?:|graylog:|[^a-z])/i;
 type Transformer = Parameters<typeof parse>[1]['replace'];
 type Renderer = ({ html, transformer }: { html: string; transformer?: Transformer }) => ReturnType<typeof parse>;
 
-const mergeTransformer =
-  (transformers: Array<Transformer>): Transformer =>
-  (domNode, idx) => {
-    for (const transformer of transformers) {
-      const result = transformer(domNode, idx);
-      if (result) {
-        return result;
-      }
-    }
-
-    return undefined;
-  };
-
-// The content of links is transformed like everything else, e.g. its augmented values.
-const parseHtml = (html: string, transformer: Transformer) => {
-  const options: HTMLReactParserOptions = {};
-  const linkTransformer: Transformer = (domNode) => {
-    if (!(domNode instanceof Element) || domNode.name !== 'a' || !domNode.attribs?.href) {
-      return undefined;
-    }
-
-    return (
-      <MarkdownLink href={domNode.attribs.href}>{domToReact(domNode.children as DOMNode[], options)}</MarkdownLink>
-    );
-  };
-  options.replace = transformer ? mergeTransformer([transformer, linkTransformer]) : linkTransformer;
-
-  return parse(html, options);
-};
-
-const HTML: Renderer = ({ html, transformer }) => parseHtml(html, transformer);
-
 const useMarkdownTransformer = (): HTMLReactParserOptions['replace'] => {
   const components = usePluginEntities('markdown.augment.components');
 
@@ -106,6 +74,38 @@ const useMarkdownTransformer = (): HTMLReactParserOptions['replace'] => {
     };
   }, [components]);
 };
+
+const mergeTransformer =
+  (transformers: Array<Transformer>): Transformer =>
+  (domNode, idx) => {
+    for (const transformer of transformers) {
+      const result = transformer(domNode, idx);
+      if (result) {
+        return result;
+      }
+    }
+
+    return undefined;
+  };
+
+// The content of links is transformed like everything else, e.g. its augmented values.
+const parseHtml = (html: string, transformer: Transformer) => {
+  const options: HTMLReactParserOptions = {};
+  const linkTransformer: Transformer = (domNode) => {
+    if (!(domNode instanceof Element) || domNode.name !== 'a' || !domNode.attribs?.href) {
+      return undefined;
+    }
+
+    return (
+      <MarkdownLink href={domNode.attribs.href}>{domToReact(domNode.children as DOMNode[], options)}</MarkdownLink>
+    );
+  };
+  options.replace = transformer ? mergeTransformer([transformer, linkTransformer]) : linkTransformer;
+
+  return parse(html, options);
+};
+
+const HTML: Renderer = ({ html, transformer }) => parseHtml(html, transformer);
 
 const Augment: Renderer = ({ html, transformer }) => {
   const markdownTransformer = useMarkdownTransformer();
