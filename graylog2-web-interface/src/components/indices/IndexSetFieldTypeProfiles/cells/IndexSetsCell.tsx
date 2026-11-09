@@ -15,45 +15,37 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { styled } from 'styled-components';
 
 import { Link } from 'components/common';
+import ExpandableCellList from 'components/common/ExpandableCellList';
 import Routes from 'routing/Routes';
 import usePermissions from 'hooks/usePermissions';
 
-const List = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-`;
-
-const IndexSetsCell = ({
-  indexSetIds,
-  normalizedIndexSetsTitles,
-}: {
+type Props = {
   indexSetIds: Array<string>;
   normalizedIndexSetsTitles: Record<string, string>;
-}) => {
+};
+
+const IndexSetsCell = ({ indexSetIds, normalizedIndexSetsTitles }: Props) => {
   const { isPermitted } = usePermissions();
 
   if (!isPermitted(['indexsets:read'])) {
     return null;
   }
 
-  return (
-    <List>
-      {indexSetIds.map((indexSetId, index) => {
-        const isLast = index === indexSetIds.length - 1;
+  const title = (indexSetId: string) => normalizedIndexSetsTitles[indexSetId] ?? indexSetId;
 
-        return (
-          <>
-            <Link key={indexSetId} to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSetId)} target="_blank">
-              {normalizedIndexSetsTitles[indexSetId]}
-            </Link>
-            {!isLast && ', '}
-          </>
-        );
-      })}
-    </List>
+  return (
+    <ExpandableCellList
+      items={[...indexSetIds].sort((a, b) => title(a).localeCompare(title(b)))}
+      renderItem={(indexSetId) => (
+        <Link to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSetId)} target="_blank">
+          {title(indexSetId)}
+        </Link>
+      )}
+      itemKey={(indexSetId) => indexSetId}
+      itemTitle={title}
+    />
   );
 };
 
