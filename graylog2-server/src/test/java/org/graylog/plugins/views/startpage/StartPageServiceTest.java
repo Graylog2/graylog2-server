@@ -144,7 +144,7 @@ public class StartPageServiceTest {
     @Test
     public void addsLastOpenedEntitiesOfAnyTypeAlongsideViews() {
         final var eventDefinition = grnRegistry.newGRN(GRNTypes.EVENT_DEFINITION, "id2");
-        startPageService.addLastOpenedFor(ViewDTO.builder().title("test").state(Map.of()).searchId("1").id("id1").build(), searchUser);
+        startPageService.addLastOpenedFor(ViewDTO.builder().type(ViewDTO.Type.SEARCH).title("test").state(Map.of()).searchId("1").id("id1").build(), searchUser);
         startPageService.addLastOpenedFor(eventDefinition, searchUser.getUser());
 
         final var list = (List<LastOpened>) startPageService.findLastOpenedFor(searchUser, 1, 10).jsonValue().get("lastOpened");
