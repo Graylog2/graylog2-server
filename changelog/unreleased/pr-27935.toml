@@ -1,0 +1,4 @@
+type = "c"
+message = "Improve responsive layout of the search bar on smaller screens when a sidebar is open."
+
+pulls = ["27935"]

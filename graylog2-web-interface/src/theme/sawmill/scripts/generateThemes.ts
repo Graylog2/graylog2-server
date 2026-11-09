@@ -14,18 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import path from 'path';
 
-import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
-import OriginExpandedSection from 'components/indices/IndexSetFieldTypes/originExpandedSections/OriginExpandedSection';
+import buildMantineTheme from './mantine/buildMantineTheme';
+import buildStyledComponentsTheme from './styled-components/buildStyledComponentsTheme';
+import writeThemeFile from './writeThemeFile';
 
-const expandedSections = {
-  overriddenProfile: {
-    title: 'Origin explanation',
-    content: ({ type, origin, fieldName }: IndexSetFieldType) => (
-      <OriginExpandedSection origin={origin} type={type} fieldName={fieldName} />
-    ),
-  },
-};
-
-export default expandedSections;
+const mantineTheme = buildMantineTheme();
+writeThemeFile(path.resolve(__dirname, '../mantine/generated/theme.json'), mantineTheme);
+const styledComponentsTheme = buildStyledComponentsTheme();
+writeThemeFile(path.resolve(__dirname, '../styled-components/generated/theme.json'), styledComponentsTheme);

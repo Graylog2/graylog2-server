@@ -14,6 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { ColorScheme, CustomColors } from '@graylog/sawmill';
+import type { ColorScheme, CustomColors } from 'theme/sawmill';
 
 export type CustomThemesColors = Record<ColorScheme, CustomColors>;

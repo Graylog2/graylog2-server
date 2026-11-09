@@ -313,7 +313,13 @@ export default [
       ],
       'testing-library/render-result-naming-convention': 'off',
       'graylog/no-literal-product-name': 'off',
-      'no-restricted-syntax': 'off',
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "TSAsExpression > TSTypeReference > TSQualifiedName[left.name='jest'][right.name=/^Mock(edFunction)?$/]",
+          message: 'Use `asMock(fn)` from `helpers/mocking` instead of casting to `jest.Mock`.',
+        },
+      ],
     },
   },
 ];
