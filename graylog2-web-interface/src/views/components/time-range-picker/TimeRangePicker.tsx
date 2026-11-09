@@ -141,7 +141,7 @@ const TimeRangePicker = ({
       {limitDuration > 0 && (
         <LimitLabel>
           <Icon name="warning" />
-          <span>Admin has limited searching to {moment.duration(-limitDuration, 'seconds').humanize(true)}</span>
+          <span>Admin has limited the search time range to {moment.duration(limitDuration, 'seconds').humanize()}</span>
         </LimitLabel>
       )}
     </PopoverTitle>
