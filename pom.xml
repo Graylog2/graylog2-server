@@ -116,7 +116,7 @@
         <aws-msk-iam-auth.version>2.3.9</aws-msk-iam-auth.version>
         <bouncycastle-prov.version>1.86</bouncycastle-prov.version>
         <bouncycastle-pkix.version>1.86</bouncycastle-pkix.version>
-        <byte-buddy.version>1.18.16</byte-buddy.version>
+        <byte-buddy.version>1.18.17</byte-buddy.version>
         <caffeine.version>3.3.1</caffeine.version>
         <classgraph.version>5.0.1</classgraph.version>
         <commons-codec.version>1.22.1</commons-codec.version>
@@ -134,7 +134,7 @@
         <gcs.version>2.76.0</gcs.version>
         <azure-blob-storage.version>12.36.0</azure-blob-storage.version>
         <azure-core.version>1.61.0</azure-core.version>
-        <azure-identity.version>1.18.7</azure-identity.version>
+        <azure-identity.version>1.19.0</azure-identity.version>
         <azure-json.version>1.5.1</azure-json.version>
         <azure-messaging-eventhubs.version>5.21.7</azure-messaging-eventhubs.version>
         <gelfclient.version>1.5.1</gelfclient.version>
@@ -176,7 +176,7 @@
         <jersey.version>4.0.3</jersey.version>
         <jmte.version>7.0.3</jmte.version>
         <joda-time.version>2.15.1</joda-time.version>
-        <jool.version>0.9.15</jool.version>
+        <jool.version>0.9.16</jool.version>
         <json-org.version>20260814</json-org.version>
         <json-path.version>3.0.0</json-path.version>
         <jsoup.version>1.23.2</jsoup.version>
@@ -186,7 +186,7 @@
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <jetbrains-annotations.version>26.1.0</jetbrains-annotations.version>
         <log4j.version>2.26.1</log4j.version>
-        <lucene.version>10.5.2</lucene.version>
+        <lucene.version>10.6.0</lucene.version>
         <lz4.version>1.12.1</lz4.version>
         <metrics.version>4.2.40</metrics.version>
         <mongodb-driver.version>5.14.0</mongodb-driver.version>
@@ -211,7 +211,7 @@
         <shiro.version>3.0.1</shiro.version>
         <snakeyaml.version>2.7</snakeyaml.version>
         <snappy-java.version>1.1.10.12</snappy-java.version>
-        <oshi.version>7.7.2</oshi.version>
+        <oshi.version>7.7.3</oshi.version>
         <siv-mode.version>1.6.1</siv-mode.version>
         <slf4j.version>2.0.20</slf4j.version>
         <streamex.version>0.9.0</streamex.version>
