@@ -80,6 +80,7 @@ const customColumnRenderers = (
     destination_filters: {
       renderCell: (_destinationFilters: string, stream) => <DestinationFilterRulesCell stream={stream} />,
       staticWidth: 'matchHeader' as const,
+      textAlign: 'right',
     },
     archiving: {
       renderCell: (_archiving: boolean, stream) => <ArchivingsCell stream={stream} indexSets={indexSets} />,
