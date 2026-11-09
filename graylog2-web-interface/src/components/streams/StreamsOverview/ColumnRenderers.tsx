@@ -99,8 +99,7 @@ const customColumnRenderers = (
     },
     [METRIC_COLUMN_IDS.associatedInputs]: {
       renderCell: (_value: unknown, stream) => <AssociatedInputsCell stream={stream} />,
-      staticWidth: 'matchHeader' as const,
-      textAlign: 'right',
+      staticWidth: COLUMN_WIDTH.reference,
     },
     [METRIC_COLUMN_IDS.routingPipelines]: {
       renderCell: (_value: unknown, stream) => <RoutingPipelinesCell stream={stream} />,
