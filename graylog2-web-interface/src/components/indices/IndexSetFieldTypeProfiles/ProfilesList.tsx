@@ -25,7 +25,6 @@ import { fetchIndexSetFieldTypeProfiles, keyFn } from 'components/indices/IndexS
 import useCustomColumnRenderers from 'components/indices/IndexSetFieldTypeProfiles/helpers/useCustomColumnRenderers';
 import profileActions from 'components/indices/IndexSetFieldTypeProfiles/helpers/profileActions';
 import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
-import ExpandedCustomFieldTypes from 'components/indices/IndexSetFieldTypeProfiles/ExpandedCustomFieldTypes';
 
 export const DEFAULT_LAYOUT = {
   entityTableId: 'index-set-field-type-profiles',
@@ -33,15 +32,6 @@ export const DEFAULT_LAYOUT = {
   defaultSort: { attributeId: 'name', direction: 'asc' } as Sort,
   defaultDisplayedAttributes: ['name', 'description', 'custom_field_mappings', 'index_set_ids'],
   defaultColumnOrder: ['name', 'description', 'custom_field_mappings', 'index_set_ids'],
-};
-
-const expandedSections = {
-  customFieldMapping: {
-    title: 'Custom Field Mappings',
-    content: ({ customFieldMappings }: IndexSetFieldTypeProfile) => (
-      <ExpandedCustomFieldTypes customFieldMappings={customFieldMappings} />
-    ),
-  },
 };
 
 const ProfilesList = () => {
@@ -59,7 +49,6 @@ const ProfilesList = () => {
       fetchEntities={fetchIndexSetFieldTypeProfiles}
       keyFn={keyFn}
       entityAttributesAreCamelCase
-      expandedSectionRenderers={expandedSections}
       columnRenderers={customColumnRenderers}
       searchPlaceholder="Search for profile name"
     />

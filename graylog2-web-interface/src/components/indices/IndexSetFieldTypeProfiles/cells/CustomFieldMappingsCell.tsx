@@ -16,22 +16,32 @@
  */
 import React from 'react';
 
-import type { CustomFieldMapping, IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldTypeProfiles/types';
-import ExpandedSectionCount from 'components/common/EntityDataTable/ExpandedSectionCount';
+import ExpandableCellList from 'components/common/ExpandableCellList';
+import type { CustomFieldMapping } from 'components/indices/IndexSetFieldTypeProfiles/types';
+import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 
-const CustomFieldMappingsCell = ({
-  customFieldTypes,
-  profile,
-}: {
+type Props = {
   customFieldTypes: Array<CustomFieldMapping>;
-  profile: IndexSetFieldTypeProfile;
-}) => (
-  <ExpandedSectionCount
-    entityId={profile.id}
-    section="customFieldMapping"
-    count={customFieldTypes.length}
-    label="custom field mappings"
-  />
-);
+};
+
+const CustomFieldMappingsCell = ({ customFieldTypes }: Props) => {
+  const {
+    data: { fieldTypes },
+  } = useFieldTypesForMappings();
+  const typeTitle = (type: string) => fieldTypes[type] ?? type;
+
+  return (
+    <ExpandableCellList
+      items={[...customFieldTypes].sort((a, b) => a.field.localeCompare(b.field))}
+      renderItem={({ field, type }) => (
+        <>
+          <b>{field}:</b> <i>{typeTitle(type)}</i>
+        </>
+      )}
+      itemKey={({ field }) => field}
+      itemTitle={({ field, type }) => `${field}: ${typeTitle(type)}`}
+    />
+  );
+};
 
 export default CustomFieldMappingsCell;

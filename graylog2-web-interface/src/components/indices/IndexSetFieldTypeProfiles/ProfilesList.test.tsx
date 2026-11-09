@@ -93,14 +93,14 @@ describe('IndexSetFieldTypesList', () => {
 
     await within(tableRow1).findByText('Profile 1');
     await within(tableRow1).findByText('Description 1');
-    await within(tableRow1).findByText('2');
+    await within(tableRow1).findByText('http_method:');
     await within(tableRow1).findByText('Edit');
 
     const tableRow2 = await screen.findByTestId('table-row-222');
 
     await within(tableRow2).findByText('Profile 2');
     await within(tableRow2).findByText('Description 2');
-    await within(tableRow2).findByText('3');
+    await within(tableRow2).findByText('logged_in:');
     await within(tableRow2).findByText('Edit');
   });
 
@@ -115,13 +115,10 @@ describe('IndexSetFieldTypesList', () => {
 
     const tableRow2 = await screen.findByTestId('table-row-222');
 
-    const customFieldTypeMappingAmount = await within(tableRow2).findByText('3');
+    await userEvent.click(await within(tableRow2).findByRole('button', { name: /show 2 more/i }));
 
-    await userEvent.click(customFieldTypeMappingAmount);
-
-    expect(tableRow2.textContent).toContain('Custom Field Mappings');
-    expect(tableRow2.textContent).toContain('user_name:String type');
-    expect(tableRow2.textContent).toContain('logged_in:Boolean');
-    expect(tableRow2.textContent).toContain('sum:Number(int)');
+    await within(tableRow2).findByTitle('user_name: String type');
+    await within(tableRow2).findByTitle('logged_in: Boolean');
+    await within(tableRow2).findByTitle('sum: Number(int)');
   });
 });
