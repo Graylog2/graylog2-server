@@ -93,14 +93,14 @@ describe('IndexSetFieldTypesList', () => {
 
     await within(tableRow1).findByText('Profile 1');
     await within(tableRow1).findByText('Description 1');
-    await within(tableRow1).findByText('http_method:');
+    await within(tableRow1).findByText('http_method');
     await within(tableRow1).findByText('Edit');
 
     const tableRow2 = await screen.findByTestId('table-row-222');
 
     await within(tableRow2).findByText('Profile 2');
     await within(tableRow2).findByText('Description 2');
-    await within(tableRow2).findByText('logged_in:');
+    await within(tableRow2).findByText('logged_in');
     await within(tableRow2).findByText('Edit');
   });
 
@@ -117,8 +117,9 @@ describe('IndexSetFieldTypesList', () => {
 
     await userEvent.click(await within(tableRow2).findByRole('button', { name: /show 2 more/i }));
 
-    await within(tableRow2).findByTitle('user_name: String type');
-    await within(tableRow2).findByTitle('logged_in: Boolean');
-    await within(tableRow2).findByTitle('sum: Number(int)');
+    await within(tableRow2).findByText('user_name');
+    await within(tableRow2).findByText('String type');
+    await within(tableRow2).findByText('sum');
+    await within(tableRow2).findByText('Number(int)');
   });
 });

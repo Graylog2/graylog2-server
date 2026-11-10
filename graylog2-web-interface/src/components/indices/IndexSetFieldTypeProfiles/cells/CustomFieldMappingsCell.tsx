@@ -16,6 +16,7 @@
  */
 import React from 'react';
 
+import { DefinitionList } from 'components/common';
 import ExpandableCellList from 'components/common/ExpandableCellList';
 import type { CustomFieldMapping } from 'components/indices/IndexSetFieldTypeProfiles/types';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
@@ -33,13 +34,16 @@ const CustomFieldMappingsCell = ({ customFieldTypes }: Props) => {
   return (
     <ExpandableCellList
       items={[...customFieldTypes].sort((a, b) => a.field.localeCompare(b.field))}
-      renderItem={({ field, type }) => (
-        <>
-          <b>{field}:</b> <i>{typeTitle(type)}</i>
-        </>
+      renderList={(mappings) => (
+        <DefinitionList striped={false}>
+          {mappings.map(({ field, type }) => (
+            <React.Fragment key={field}>
+              <dt>{field}</dt>
+              <dd>{typeTitle(type)}</dd>
+            </React.Fragment>
+          ))}
+        </DefinitionList>
       )}
-      itemKey={({ field }) => field}
-      itemTitle={({ field, type }) => `${field}: ${typeTitle(type)}`}
     />
   );
 };
