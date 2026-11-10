@@ -2,4 +2,4 @@ type = "f"
 message = "Fix editing a pipeline's title or description reverting stage changes made since the page was opened."
 
 issues = ["28128"]
-pulls = []
+pulls = ["28129"]
