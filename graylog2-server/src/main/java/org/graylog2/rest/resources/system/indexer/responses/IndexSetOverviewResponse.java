@@ -16,25 +16,33 @@
  */
 package org.graylog2.rest.resources.system.indexer.responses;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import org.graylog2.indexer.indexset.IndexSetCategory;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 
+import java.util.Map;
+
 /**
  * One row of the index sets entity table. It carries the {@link IndexSetResponse} fields plus the derived
  * values only the table needs.
+ *
+ * @param pluginValues the values of the attributes plugins add to the table, keyed by attribute id.
  */
 public record IndexSetOverviewResponse(@JsonUnwrapped IndexSetResponse indexSet,
                                        @JsonProperty("category") String category,
                                        @JsonProperty("can_have_profile") boolean canHaveProfile,
-                                       @JsonProperty("stream_count") long streamCount) {
+                                       @JsonProperty("stream_count") long streamCount,
+                                       @JsonAnyGetter Map<String, Object> pluginValues) {
 
-    public static IndexSetOverviewResponse create(IndexSetConfig config, boolean isDefault, long streamCount) {
+    public static IndexSetOverviewResponse create(IndexSetConfig config, boolean isDefault, long streamCount,
+                                                  Map<String, Object> pluginValues) {
         return new IndexSetOverviewResponse(
                 IndexSetResponse.fromIndexSetConfig(config, isDefault, null),
                 IndexSetCategory.of(config).value(),
                 config.canHaveProfile(),
-                streamCount);
+                streamCount,
+                pluginValues);
     }
 }

@@ -111,14 +111,16 @@
         <auto-service.version>1.1.1</auto-service.version>
         <auto-value.version>1.11.1</auto-value.version>
         <aws-java-sdk-1.version>1.12.797</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.55.8</aws-java-sdk-2.version>
+        <aws-java-sdk-2.version>2.57.3</aws-java-sdk-2.version>
         <aws-kinesis-client.version>3.5.3</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.3.9</aws-msk-iam-auth.version>
         <bouncycastle-prov.version>1.86</bouncycastle-prov.version>
         <bouncycastle-pkix.version>1.86</bouncycastle-pkix.version>
+        <byte-buddy.version>1.18.17</byte-buddy.version>
         <caffeine.version>3.3.1</caffeine.version>
-        <classgraph.version>5.0.0</classgraph.version>
+        <classgraph.version>5.0.1</classgraph.version>
         <commons-codec.version>1.22.1</commons-codec.version>
+        <commons-collections4.version>4.6.0</commons-collections4.version>
         <commons-csv.version>1.14.1</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
         <commons-exec.version>1.6.0</commons-exec.version>
@@ -127,32 +129,32 @@
         <commons-validator.version>1.11.0</commons-validator.version>
         <commons-io.version>2.22.0</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
-        <error-prone.version>2.50.0</error-prone.version>
+        <error-prone.version>2.51.0</error-prone.version>
         <freemarker.version>2.3.35</freemarker.version>
-        <gcs.version>2.75.0</gcs.version>
+        <gcs.version>2.76.0</gcs.version>
         <azure-blob-storage.version>12.36.0</azure-blob-storage.version>
-        <azure-core.version>1.60.0</azure-core.version>
-        <azure-identity.version>1.18.7</azure-identity.version>
+        <azure-core.version>1.61.0</azure-core.version>
+        <azure-identity.version>1.19.0</azure-identity.version>
         <azure-json.version>1.5.1</azure-json.version>
         <azure-messaging-eventhubs.version>5.21.7</azure-messaging-eventhubs.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>5.2.0</geoip2.version>
-        <google-api-client.version>2.9.1</google-api-client.version>
-        <google-api-common.version>2.70.0</google-api-common.version>
+        <google-api-client.version>2.9.2</google-api-client.version>
+        <google-api-common.version>2.71.0</google-api-common.version>
         <google-api-services-admin-reports.version>reports_v1-rev20251202-2.0.0</google-api-services-admin-reports.version>
         <google-api-services-compute.version>v1-rev20251110-2.0.0</google-api-services-compute.version>
-        <google-auth-library.version>1.54.0</google-auth-library.version>
+        <google-auth-library.version>1.55.0</google-auth-library.version>
         <google-oauth-client.version>1.39.0</google-oauth-client.version>
-        <google-cloud-bigquery.version>2.73.0</google-cloud-bigquery.version>
-        <google-cloud-core.version>2.77.0</google-cloud-core.version>
-        <google-cloud-logging.version>3.40.0</google-cloud-logging.version>
+        <google-cloud-bigquery.version>2.74.0</google-cloud-bigquery.version>
+        <google-cloud-core.version>2.78.0</google-cloud-core.version>
+        <google-cloud-logging.version>3.41.0</google-cloud-logging.version>
         <google-conscrypt.version>2.8.0</google-conscrypt.version>
-        <google-gax.version>2.87.0</google-gax.version>
+        <google-gax.version>2.88.0</google-gax.version>
         <google-http-client.version>2.2.0</google-http-client.version>
         <grizzly.version>4.1.0</grizzly.version> <!-- Should match the version used by Jersey -->
         <grok.version>0.1.9-graylog-3</grok.version>
         <grpc.version>1.85.1</grpc.version>
-        <gson.version>2.14.0</gson.version>
+        <gson.version>2.15.0</gson.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>33.7.2-jre</guava.version>
         <guice.version>7.0.0</guice.version>
@@ -173,8 +175,8 @@
         <jbcrypt.version>0.4</jbcrypt.version>
         <jersey.version>4.0.3</jersey.version>
         <jmte.version>7.0.3</jmte.version>
-        <joda-time.version>2.15.0</joda-time.version>
-        <jool.version>0.9.15</jool.version>
+        <joda-time.version>2.15.1</joda-time.version>
+        <jool.version>0.9.16</jool.version>
         <json-org.version>20260814</json-org.version>
         <json-path.version>3.0.0</json-path.version>
         <jsoup.version>1.23.2</jsoup.version>
@@ -184,32 +186,32 @@
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <jetbrains-annotations.version>26.1.0</jetbrains-annotations.version>
         <log4j.version>2.26.1</log4j.version>
-        <lucene.version>10.5.2</lucene.version>
-        <lz4.version>1.12.0</lz4.version>
+        <lucene.version>10.6.0</lucene.version>
+        <lz4.version>1.12.1</lz4.version>
         <metrics.version>4.2.40</metrics.version>
-        <mongodb-driver.version>5.13.0</mongodb-driver.version>
+        <mongodb-driver.version>5.14.0</mongodb-driver.version>
         <mongojack.version>5.1.0</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.2.19.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.84.Final</netty-tcnative-boringssl-static.version>
-        <okhttp.version>5.5.0</okhttp.version>
+        <okhttp.version>5.5.1</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
         <opentelemetry.version>1.67.0</opentelemetry.version>
-        <opentelemetry-instrumentation.version>2.32.0</opentelemetry-instrumentation.version>
+        <opentelemetry-instrumentation.version>2.33.1</opentelemetry-instrumentation.version>
         <opentelemetry-semconv.version>1.44.0</opentelemetry-semconv.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.18</pkts.version>
         <prometheus-client.version>0.16.0</prometheus-client.version>
         <protobuf.version>4.36.2</protobuf.version>
-        <proto-google-common-protos.version>2.78.0</proto-google-common-protos.version>
-        <proto-google-iam-v1.version>1.73.0</proto-google-iam-v1.version>
+        <proto-google-common-protos.version>2.79.0</proto-google-common-protos.version>
+        <proto-google-iam-v1.version>1.74.0</proto-google-iam-v1.version>
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>3.0.0</retrofit.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
         <shiro.version>3.0.1</shiro.version>
         <snakeyaml.version>2.7</snakeyaml.version>
         <snappy-java.version>1.1.10.12</snappy-java.version>
-        <oshi.version>7.7.2</oshi.version>
+        <oshi.version>7.7.3</oshi.version>
         <siv-mode.version>1.6.1</siv-mode.version>
         <slf4j.version>2.0.20</slf4j.version>
         <streamex.version>0.9.0</streamex.version>
@@ -221,13 +223,14 @@
         <unboundid-ldap.version>7.0.5</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>3.1.1</validation-api.version>
-        <zstd.version>1.5.7-24</zstd.version>
+        <zstd.version>1.5.7-25</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
         <jjwt.version>0.13.0</jjwt.version>
         <stateless4j.version>2.6.0</stateless4j.version>
         <poi.version>5.5.1</poi.version>
         <mcp-bom.version>2.1.0</mcp-bom.version>
+        <json-schema-validator.version>2.0.4</json-schema-validator.version>
         <json-schema-generator.version>4.38.0</json-schema-generator.version>
 
         <!-- Test dependencies -->
@@ -239,7 +242,7 @@
         <guice-extension.version>1.2.1</guice-extension.version>
         <junit-jupiter.version>6.1.3</junit-jupiter.version>
         <mockito.version>5.24.0</mockito.version>
-        <restassured.version>6.1.0</restassured.version>
+        <restassured.version>6.3.0</restassured.version>
         <testcontainers.version>2.0.5</testcontainers.version>
         <testcontainers.opensearch.version>4.1.0</testcontainers.opensearch.version>
         <graalvm.version>25.4.4.1.1</graalvm.version>
@@ -877,6 +880,27 @@
                 <artifactId>javassist</artifactId>
                 <version>${javassist.version}</version>
             </dependency>
+            <!-- Test dependencies (mockito, assertj, equalsverifier) pull in older byte-buddy versions
+                 than selenium requires -->
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${byte-buddy.version}</version>
+            </dependency>
+            <!-- airline, poi and amazon-kinesis-client pull in older commons-collections4 versions
+                 than the Apache Directory API requires -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>${commons-collections4.version}</version>
+            </dependency>
+            <!-- wiremock pulls in json-schema-validator 1.x, but the MCP SDK (mcp-json-jackson2)
+                 requires 2.x. Keep in sync with the version required by the MCP SDK. -->
+            <dependency>
+                <groupId>com.networknt</groupId>
+                <artifactId>json-schema-validator</artifactId>
+                <version>${json-schema-validator.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -958,12 +982,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.5.6</version>
+                    <version>3.6.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.5.6</version>
+                    <version>3.6.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -1003,7 +1027,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.6.3</version>
+                    <version>3.7.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.cyclonedx</groupId>

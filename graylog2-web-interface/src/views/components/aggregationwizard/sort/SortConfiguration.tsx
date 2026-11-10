@@ -20,6 +20,7 @@ import { Field, useFormikContext } from 'formik';
 import Select from 'components/common/Select';
 import { Input } from 'components/bootstrap';
 
+import { seriesFunctionForMetric } from '../metric/MetricElement';
 import type { GroupByFormValues, MetricFormValues, WidgetConfigFormValues } from '../WidgetConfigForm';
 
 type Props = {
@@ -32,11 +33,12 @@ const directionOptions = [
 ];
 
 const formatSeries = (metric: MetricFormValues) => {
-  const readableField = `${metric.function}(${metric.field ?? ''})`;
+  // The sort field needs to match the function of the series, including its parameter (e.g. percentile).
+  const seriesFunction = seriesFunctionForMetric(metric);
 
   return {
-    label: metric.name || readableField,
-    field: readableField,
+    label: metric.name || seriesFunction,
+    field: seriesFunction,
   };
 };
 
