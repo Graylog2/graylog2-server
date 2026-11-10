@@ -36,7 +36,7 @@ export type WelcomeWidgetEntry = {
   widget: Widget;
   /** How many of the 12 grid columns the widget spans. */
   columns: number;
-  /** CSS height, e.g. `312px`. */
+  /** CSS height, e.g. `300px`. */
   height: string;
 };
 

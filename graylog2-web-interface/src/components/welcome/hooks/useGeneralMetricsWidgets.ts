@@ -37,8 +37,8 @@ import {
 import useMetricsTimeRange from './useMetricsTimeRange';
 import usePermittedAlertsEventsStreams from './usePermittedAlertsEventsStreams';
 
-const CHART_HEIGHT = '312px';
-const NUMBER_HEIGHT = '164px';
+const CHART_HEIGHT = '300px';
+const NUMBER_HEIGHT = '150px';
 
 const topSourcesWidget = (timeRange: RelativeTimeRangeWithEnd) => ({
   title: 'Top 5 Sources',
