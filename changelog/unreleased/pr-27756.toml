@@ -1,0 +1,11 @@
+type = "c"
+message = "Derive the Data Node keystore encryption key from `password_secret` instead of using the secret directly."
+
+details.user = """
+Data Node keystores are now encrypted with a key derived from `password_secret` using HKDF, instead of reusing the secret itself.
+Existing keystores are migrated automatically the first time they are used.
+The deprecated Data Node keystore storage in MongoDB has also been removed, and a migration deletes the unused `data_node_certificates` collection.
+"""
+
+pulls = ["27756"]
+issues = ["Graylog2/graylog-plugin-enterprise#14737"]

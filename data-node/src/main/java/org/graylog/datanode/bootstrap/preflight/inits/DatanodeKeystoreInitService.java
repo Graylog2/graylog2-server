@@ -24,7 +24,6 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import jakarta.inject.Inject;
 import org.graylog.datanode.bootstrap.preflight.DatanodeCertReceiver;
-import org.graylog.datanode.bootstrap.preflight.LegacyDatanodeKeystoreProvider;
 import org.graylog.datanode.configuration.DatanodeKeystore;
 import org.graylog.datanode.configuration.DatanodeKeystoreException;
 import org.graylog.datanode.opensearch.CsrRequester;
@@ -33,7 +32,6 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.security.KeyStore;
 import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -43,16 +41,12 @@ import java.util.concurrent.TimeUnit;
  * This init verifies that each datanode has a private key configured. It may be needed right now, but at the moment
  * we'll start provisioning and create certificate signing requests, we may be sure that there is one private key
  * available.
- * ·<br>
- * Additionally, this check is able to restore existing keystore persisted in mongodb. It may hold valid certificate
- * that we want to reuse. Otherwise, the node would undergo signing again.
  */
 public class DatanodeKeystoreInitService implements DatanodeBlockingInit {
 
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeKeystoreInitService.class);
 
     private final DatanodeKeystore datanodeKeystore;
-    private final LegacyDatanodeKeystoreProvider legacyDatanodeKeystoreProvider;
     private final CsrRequester csrRequester;
     private final DatanodeCertReceiver datanodeCertReceiver;
 
@@ -61,13 +55,11 @@ public class DatanodeKeystoreInitService implements DatanodeBlockingInit {
     @Inject
     public DatanodeKeystoreInitService(
             DatanodeKeystore datanodeKeystore,
-            LegacyDatanodeKeystoreProvider legacyDatanodeKeystoreProvider,
             CsrRequester csrRequester,
             DatanodeCertReceiver datanodeCertReceiver, ClusterConfigService clusterConfigService
 
     ) {
         this.datanodeKeystore = datanodeKeystore;
-        this.legacyDatanodeKeystoreProvider = legacyDatanodeKeystoreProvider;
         this.csrRequester = csrRequester;
         this.datanodeCertReceiver = datanodeCertReceiver;
         this.clusterConfigService = clusterConfigService;
@@ -78,15 +70,8 @@ public class DatanodeKeystoreInitService implements DatanodeBlockingInit {
         if (!datanodeKeystore.exists()) {
             LOG.info("Creating keystore for this data node");
             try {
-                final Optional<KeyStore> legacyKeystore = legacyDatanodeKeystoreProvider.get();
-                if (legacyKeystore.isPresent()) { // remove this branch latest with 7.0 release
-                    LOG.info("Legacy keystore discovered, converting to local file");
-                    datanodeKeystore.create(legacyKeystore.get());
-                    legacyDatanodeKeystoreProvider.deleteLocalPrivateKey();
-                } else {
-                    datanodeKeystore.initWithSelfSignedCertificate();
-                }
-            } catch (Exception e) {
+                datanodeKeystore.initWithSelfSignedCertificate();
+            } catch (DatanodeKeystoreException e) {
                 throw new RuntimeException(e);
             }
         } else {
