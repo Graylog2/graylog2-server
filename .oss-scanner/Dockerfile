@@ -66,9 +66,10 @@ WORKDIR /src
 # tarball. -DskipTests still compiles the test classes, so test code is available to the audit agent. Failsafe in
 # graylog2-server still runs the *IT classes under -DskipTests; they need Docker (Testcontainers), which is not
 # available during docker build, so -DskipITs skips them explicitly.
-# The web interface's "check-production-build" step (bound to verify) opens the bundle in Puppeteer's Chrome, which
-# has no linux-arm64 build and whose shared libraries this image lacks. It is a smoke test only, so the yarn script is
-# stubbed for the build and package.json is restored afterwards, leaving /src as upstream has it.
+# The web interface's "check-production-build" step (bound to verify) loads the built bundle in a headless Chrome to
+# check that it starts. That is a release check for CI and adds nothing to a security audit, so it is left out on
+# purpose: no browser is installed (PUPPETEER_SKIP_DOWNLOAD), the yarn script is stubbed for the build, and
+# package.json is restored afterwards, leaving /src as upstream has it.
 RUN pkg=graylog2-web-interface/package.json \
     && cp "$pkg" /tmp/package.json.orig \
     && sed -i 's/"check-production-build": "[^"]*"/"check-production-build": "true"/' "$pkg" \
