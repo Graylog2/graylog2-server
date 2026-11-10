@@ -129,6 +129,20 @@
                 <artifactId>hibernate-validator</artifactId>
                 <version>${hibernate-validator.version}</version>
             </dependency>
+            <!--
+                Overrides the Jakarta EL 5 versions from jersey-bean-validation.
+                See the jakarta.el-api dependency in graylog2-server/pom.xml for details.
+            -->
+            <dependency>
+                <groupId>jakarta.el</groupId>
+                <artifactId>jakarta.el-api</artifactId>
+                <version>${jakarta.el-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.expressly</groupId>
+                <artifactId>expressly</artifactId>
+                <version>${expressly.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>commons-codec</groupId>
