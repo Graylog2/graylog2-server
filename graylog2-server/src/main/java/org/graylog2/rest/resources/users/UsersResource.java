@@ -772,7 +772,7 @@ public class UsersResource extends RestResource {
             throw new NotFoundException("Couldn't find user " + username);
         }
 
-        LOG.warn("Request 'DELETE /users/{}/permissions' cleared direct permissions of user <{}>. This endpoint will " +
+        LOG.warn("Request 'DELETE /users/{}/permissions' clears direct permissions of user <{}>. This endpoint will " +
                         "be removed in version 8.0. Assign roles instead of direct user permissions.",
                 username, username);
 
