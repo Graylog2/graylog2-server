@@ -32,7 +32,6 @@ import ErrorWidget from 'views/components/widgets/ErrorWidget';
 import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
 
 import createStandaloneView, { STANDALONE_QUERY_ID } from './createStandaloneView';
-import RenderWhenVisible from './RenderWhenVisible';
 
 // Stable across renders: the views store is created again whenever its initial execution state changes, which
 // runs the search again.
@@ -101,11 +100,6 @@ const Group = ({ widgets, titles, loadingPlaceholder, children = undefined }: Gr
 type Props = React.PropsWithChildren<{
   widgets: Array<Widget>;
   titles?: { [widgetId: string]: string };
-  /**
-   * Creates the views store and runs the search only once the group comes close to the viewport.
-   * Its container needs a height until then.
-   */
-  lazy?: boolean;
   /** Runs the search instead of the search page's executors, e.g. to show stored results. Must be stable across renders. */
   searchExecutors?: SearchExecutors;
   /** Shown while the group prepares its search, e.g. skeletons of its widgets. */
@@ -125,7 +119,6 @@ type Props = React.PropsWithChildren<{
 const StandaloneWidgetGroup = ({
   widgets,
   titles = {},
-  lazy = false,
   searchExecutors = undefined,
   loadingPlaceholder = <Spinner text="Loading widgets..." />,
   interactionMode = 'read-only',
@@ -136,15 +129,14 @@ const StandaloneWidgetGroup = ({
       {children}
     </Group>
   );
-  const groupWithExecutors = searchExecutors ? (
-    <SearchExecutorsContext.Provider value={searchExecutors}>{group}</SearchExecutorsContext.Provider>
-  ) : (
-    group
-  );
 
   return (
     <InteractiveContext.Provider value={interactionMode}>
-      {lazy ? <RenderWhenVisible>{groupWithExecutors}</RenderWhenVisible> : groupWithExecutors}
+      {searchExecutors ? (
+        <SearchExecutorsContext.Provider value={searchExecutors}>{group}</SearchExecutorsContext.Provider>
+      ) : (
+        group
+      )}
     </InteractiveContext.Provider>
   );
 };

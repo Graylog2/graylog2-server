@@ -25,11 +25,6 @@ import StandaloneWidgetContent from './StandaloneWidgetContent';
 type Props = {
   widget: Widget;
   title: string;
-  /**
-   * Renders the widget and runs its search only once it comes close to the viewport, e.g. for long lists of widgets.
-   * Its container needs a height until then.
-   */
-  lazy?: boolean;
   /** Runs the widget's search, e.g. to show stored results instead. Must be stable across renders. */
   searchExecutors?: SearchExecutors;
 };
@@ -38,12 +33,8 @@ type Props = {
  * Shows a widget with its results outside of a search or dashboard. To run one search for several widgets,
  * use `StandaloneWidgetGroup` with `StandaloneWidgetCard` or `StandaloneWidgetContent` instead.
  */
-const StandaloneWidget = ({ widget, title, lazy = false, searchExecutors = undefined }: Props) => (
-  <StandaloneWidgetGroup
-    widgets={[widget]}
-    titles={{ [widget.id]: title }}
-    lazy={lazy}
-    searchExecutors={searchExecutors}>
+const StandaloneWidget = ({ widget, title, searchExecutors = undefined }: Props) => (
+  <StandaloneWidgetGroup widgets={[widget]} titles={{ [widget.id]: title }} searchExecutors={searchExecutors}>
     <StandaloneWidgetContent widgetId={widget.id} />
   </StandaloneWidgetGroup>
 );
