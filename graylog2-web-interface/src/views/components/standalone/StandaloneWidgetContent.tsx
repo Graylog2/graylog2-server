@@ -37,7 +37,7 @@ type VisualizationProps = {
   editing: boolean;
 };
 
-export const StandaloneWidgetVisualization = ({ title, editing }: VisualizationProps) => {
+export const WidgetVisualizationFromContext = ({ title, editing }: VisualizationProps) => {
   const widget = useContext(WidgetContext);
   const fieldTypes = useContext(FieldTypesContext);
   const queryId = useActiveQueryId();
@@ -62,11 +62,11 @@ export const StandaloneWidgetVisualization = ({ title, editing }: VisualizationP
   );
 };
 
-const GroupedWidgetVisualization = () => {
+const VisualizationWithTitle = () => {
   const widget = useContext(WidgetContext);
   const title = useWidgetTitle(widget);
 
-  return <StandaloneWidgetVisualization title={title} editing={false} />;
+  return <WidgetVisualizationFromContext title={title} editing={false} />;
 };
 
 type Props = {
@@ -74,14 +74,15 @@ type Props = {
 };
 
 /**
- * Shows a widget of the enclosing `StandaloneWidgetGroup` with its results.
+ * Shows the results of a widget of the enclosing `StandaloneWidgetGroup`, without a frame.
+ * `StandaloneWidgetCard` adds its title and time range.
  */
-const GroupedWidget = ({ widgetId }: Props) => (
+const StandaloneWidgetContent = ({ widgetId }: Props) => (
   <WidgetFromGroup widgetId={widgetId}>
     <WidgetColorContext id={widgetId}>
-      <GroupedWidgetVisualization />
+      <VisualizationWithTitle />
     </WidgetColorContext>
   </WidgetFromGroup>
 );
 
-export default GroupedWidget;
+export default StandaloneWidgetContent;

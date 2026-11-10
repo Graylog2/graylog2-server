@@ -22,7 +22,7 @@ import TimerangeInfo from 'views/components/widgets/TimerangeInfo';
 import useWidget from 'views/hooks/useWidget';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 
-import GroupedWidget from './GroupedWidget';
+import StandaloneWidgetContent from './StandaloneWidgetContent';
 import useWidgetTitle from './useWidgetTitle';
 
 const Content = styled.div`
@@ -46,7 +46,7 @@ type Props = {
  * Shows a widget of the enclosing `StandaloneWidgetGroup` in a card with its title and time range,
  * like the widgets of a dashboard, without their controls.
  */
-const GroupedWidgetCard = ({ widgetId, actions = undefined, className = undefined }: Props) => {
+const StandaloneWidgetCard = ({ widgetId, actions = undefined, className = undefined }: Props) => {
   const widget = useWidget(widgetId);
   const title = useWidgetTitle(widget);
   const activeQuery = useActiveQueryId();
@@ -54,7 +54,7 @@ const GroupedWidgetCard = ({ widgetId, actions = undefined, className = undefine
   return (
     <WidgetCard headline={title} actions={actions} className={className}>
       <Content>
-        <GroupedWidget widgetId={widgetId} />
+        <StandaloneWidgetContent widgetId={widgetId} />
       </Content>
       <Footer>
         <TimerangeInfo widget={widget} activeQuery={activeQuery} widgetId={widgetId} />
@@ -63,4 +63,4 @@ const GroupedWidgetCard = ({ widgetId, actions = undefined, className = undefine
   );
 };
 
-export default GroupedWidgetCard;
+export default StandaloneWidgetCard;

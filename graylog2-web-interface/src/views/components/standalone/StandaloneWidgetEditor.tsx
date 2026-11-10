@@ -29,7 +29,7 @@ import WidgetHeader from 'views/components/widgets/WidgetHeader';
 import WidgetEditWrapper from 'views/components/widgets/WidgetEditWrapper';
 
 import StandaloneWidgetGroup, { WidgetFromGroup } from './StandaloneWidgetGroup';
-import { StandaloneWidgetVisualization } from './GroupedWidget';
+import { WidgetVisualizationFromContext } from './StandaloneWidgetContent';
 
 const Container = styled.div`
   display: flex;
@@ -73,7 +73,7 @@ const Editor = ({ initialTitle, onSave, onCancel }: EditorProps) => {
         onCancelEdit={onCancel}
         onWidgetConfigChange={onWidgetConfigChange}
         onSubmit={(newWidget) => onSave(newWidget, title)}>
-        <StandaloneWidgetVisualization title={title} editing />
+        <WidgetVisualizationFromContext title={title} editing />
       </WidgetEditWrapper>
     </Container>
   );

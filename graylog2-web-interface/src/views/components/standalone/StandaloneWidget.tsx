@@ -20,7 +20,7 @@ import type Widget from 'views/logic/widgets/Widget';
 import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
 
 import StandaloneWidgetGroup from './StandaloneWidgetGroup';
-import GroupedWidget from './GroupedWidget';
+import StandaloneWidgetContent from './StandaloneWidgetContent';
 
 type Props = {
   widget: Widget;
@@ -36,7 +36,7 @@ type Props = {
 
 /**
  * Shows a widget with its results outside of a search or dashboard. To run one search for several widgets,
- * use `StandaloneWidgetGroup` with `GroupedWidget` instead.
+ * use `StandaloneWidgetGroup` with `StandaloneWidgetCard` or `StandaloneWidgetContent` instead.
  */
 const StandaloneWidget = ({ widget, title, lazy = false, searchExecutors = undefined }: Props) => (
   <StandaloneWidgetGroup
@@ -44,7 +44,7 @@ const StandaloneWidget = ({ widget, title, lazy = false, searchExecutors = undef
     titles={{ [widget.id]: title }}
     lazy={lazy}
     searchExecutors={searchExecutors}>
-    <GroupedWidget widgetId={widget.id} />
+    <StandaloneWidgetContent widgetId={widget.id} />
   </StandaloneWidgetGroup>
 );
 

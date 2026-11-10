@@ -140,7 +140,7 @@ type Props = React.PropsWithChildren<{
 /**
  * Runs one search for several widgets outside of a search or dashboard, in its own in-memory views store.
  * The store holds a temporary view that is never saved. Like on the search page, its search is stored to run it.
- * Render the widgets anywhere inside the group with `GroupedWidget`.
+ * Render the widgets anywhere inside the group with `StandaloneWidgetCard` or `StandaloneWidgetContent`.
  */
 const StandaloneWidgetGroup = ({
   widgets,
