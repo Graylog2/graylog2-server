@@ -16,7 +16,6 @@
  */
 import React from 'react';
 
-import { DefinitionList } from 'components/common';
 import ExpandableCellList from 'components/common/ExpandableCellList';
 import { defaultCompare } from 'logic/DefaultCompare';
 
@@ -31,10 +30,9 @@ const EventFieldsCellList = ({ fields }: Props) => (
   <ExpandableCellList
     items={Object.keys(fields).sort(defaultCompare)}
     renderItem={(fieldName) => (
-      <DefinitionList striped={false}>
-        <dt>{fieldName}</dt>
-        <dd>{fields[fieldName]}</dd>
-      </DefinitionList>
+      <>
+        <b>{fieldName}:</b> {fields[fieldName]}
+      </>
     )}
     itemKey={(fieldName) => fieldName}
     itemTitle={(fieldName) => `${fieldName}: ${fields[fieldName]}`}

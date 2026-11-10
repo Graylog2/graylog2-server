@@ -25,7 +25,7 @@ const Container = styled(ElementDimensions)`
   width: 100%;
 `;
 
-const StyledDl = styled.dl<{ $horizontalLayout: boolean; $striped: boolean }>`
+const StyledDl = styled.dl<{ $horizontalLayout: boolean }>`
   width: 100%;
   margin: 0;
 
@@ -56,14 +56,10 @@ const StyledDl = styled.dl<{ $horizontalLayout: boolean; $striped: boolean }>`
     margin: ${({ theme }) => theme.spacings.xxs} 0;
   }
 
-  ${({ $striped, theme }) =>
-    $striped &&
-    css`
-      dt:nth-of-type(odd),
-      dd:nth-of-type(odd) {
-        background-color: ${theme.colors.table.row.backgroundStriped};
-      }
-    `}
+  dt:nth-of-type(odd),
+  dd:nth-of-type(odd) {
+    background-color: ${({ theme }) => theme.colors.table.row.backgroundStriped};
+  }
 
   ${({ $horizontalLayout, theme }) =>
     $horizontalLayout &&
@@ -95,18 +91,9 @@ const StyledDl = styled.dl<{ $horizontalLayout: boolean; $striped: boolean }>`
     `}
 `;
 
-type Props = {
-  // Stripes alternate rows. Turn it off for lists with a single entry, e.g. one per item of a cell list.
-  striped?: boolean;
-};
-
-const DefinitionList = ({ children = undefined, striped = true }: React.PropsWithChildren<Props>) => (
+const DefinitionList = ({ children }: React.PropsWithChildren) => (
   <Container>
-    {({ width }) => (
-      <StyledDl $horizontalLayout={width > HORIZONTAL_LAYOUT_BREAKPOINT} $striped={striped}>
-        {children}
-      </StyledDl>
-    )}
+    {({ width }) => <StyledDl $horizontalLayout={width > HORIZONTAL_LAYOUT_BREAKPOINT}>{children}</StyledDl>}
   </Container>
 );
 
