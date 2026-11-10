@@ -93,14 +93,14 @@ describe('IndexSetFieldTypesList', () => {
 
     await within(tableRow1).findByText('Profile 1');
     await within(tableRow1).findByText('Description 1');
-    await within(tableRow1).findByText('http_method:');
+    await within(tableRow1).findByText('http_method');
     await within(tableRow1).findByText('Edit');
 
     const tableRow2 = await screen.findByTestId('table-row-222');
 
     await within(tableRow2).findByText('Profile 2');
     await within(tableRow2).findByText('Description 2');
-    await within(tableRow2).findByText('logged_in:');
+    await within(tableRow2).findByText('logged_in');
     await within(tableRow2).findByText('Edit');
   });
 
