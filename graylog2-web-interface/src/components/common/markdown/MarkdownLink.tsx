@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import URI from 'urijs';
 
 import { Link } from 'components/common';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -35,6 +36,8 @@ type Props = {
 
 type OnClickHandler = Extract<EntityLinkResolution, { onClick: unknown }>['onClick'];
 type ResolvedLink = { to: string } | { onClick: OnClickHandler };
+
+const isRelativeUrl = (href: string) => new URI(href).is('relative');
 
 const useResolvedGraylogLink = (href: string): ResolvedLink | null => {
   const resolvers = usePluginEntities('markdown.entityLinkResolvers');
@@ -92,6 +95,10 @@ const MarkdownLink = ({ href, children = null }: Props) => {
 
   if (resolved && 'onClick' in resolved) {
     return <OnClickLink handler={resolved.onClick}>{children}</OnClickLink>;
+  }
+
+  if (isRelativeUrl(href)) {
+    return <Link to={href}>{children}</Link>;
   }
 
   return <ExternalLink href={href}>{children}</ExternalLink>;
