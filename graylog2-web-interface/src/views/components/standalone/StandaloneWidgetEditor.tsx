@@ -91,7 +91,7 @@ type Props = {
  * `onSave` receives the edited widget, including its query, time range and streams.
  */
 const StandaloneWidgetEditor = ({ widget, title, onSave, onCancel }: Props) => (
-  <StandaloneWidgetGroup widgets={[widget]} titles={{ [widget.id]: title }}>
+  <StandaloneWidgetGroup widgets={[widget]} titles={{ [widget.id]: title }} interactionMode="interactive">
     <WidgetFromGroup widgetId={widget.id}>
       <WidgetColorContext id={widget.id}>
         <Editor initialTitle={title} onSave={onSave} onCancel={onCancel} />

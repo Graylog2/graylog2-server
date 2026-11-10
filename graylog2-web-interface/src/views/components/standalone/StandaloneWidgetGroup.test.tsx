@@ -24,6 +24,8 @@ import { executeActiveQuery } from 'views/logic/slices/viewSlice';
 import { asMock } from 'helpers/mocking';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import WidgetContext from 'views/components/contexts/WidgetContext';
+import InteractiveContext from 'views/components/contexts/InteractiveContext';
+import createSearch from 'views/logic/slices/createSearch';
 
 import StandaloneWidgetGroup, { WidgetFromGroup } from './StandaloneWidgetGroup';
 
@@ -85,5 +87,30 @@ describe('StandaloneWidgetGroup', () => {
     await screen.findByText(/widget widget-2/i);
 
     expect(asMock(executeActiveQuery)).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows an error when preparing the search fails', async () => {
+    asMock(createSearch).mockRejectedValueOnce(new Error('Search could not be stored'));
+
+    render(
+      <StandaloneWidgetGroup widgets={[widget()]}>
+        <span>Widget content</span>
+      </StandaloneWidgetGroup>,
+    );
+
+    await screen.findByText(/search could not be stored/i);
+    expect(screen.queryByText(/widget content/i)).not.toBeInTheDocument();
+  });
+
+  it('shows the widgets read-only by default', async () => {
+    const InteractionMode = () => <span>Mode: {useContext(InteractiveContext)}</span>;
+
+    render(
+      <StandaloneWidgetGroup widgets={[widget()]}>
+        <InteractionMode />
+      </StandaloneWidgetGroup>,
+    );
+
+    await screen.findByText(/mode: read-only/i);
   });
 });

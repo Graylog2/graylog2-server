@@ -30,6 +30,9 @@ import useWidget from 'views/hooks/useWidget';
 import { executeActiveQuery } from 'views/logic/slices/viewSlice';
 import type Widget from 'views/logic/widgets/Widget';
 import SearchExecutorsContext from 'views/components/contexts/SearchExecutorsContext';
+import InteractiveContext from 'views/components/contexts/InteractiveContext';
+import type { InteractionMode } from 'views/components/contexts/InteractiveContext';
+import ErrorWidget from 'views/components/widgets/ErrorWidget';
 import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
 
 import createStandaloneView, { STANDALONE_QUERY_ID } from './createStandaloneView';
@@ -81,12 +84,21 @@ type GroupProps = React.PropsWithChildren<{
 }>;
 
 const Group = ({ widgets, titles, loadingPlaceholder, children = undefined }: GroupProps) => {
-  const { data: view } = useQuery({
+  const { data: view, error } = useQuery({
     queryKey: ['views', 'standalone-widgets', widgets, titles],
     queryFn: () => createStandaloneView(widgets, titles),
     staleTime: Infinity,
     gcTime: 0,
   });
+
+  if (error) {
+    return (
+      <ErrorWidget
+        title="While preparing the search for these widgets, the following error occurred:"
+        errors={[{ description: error.message }]}
+      />
+    );
+  }
 
   if (!view) {
     return loadingPlaceholder;
@@ -118,6 +130,11 @@ type Props = React.PropsWithChildren<{
   searchExecutors?: SearchExecutors;
   /** Shown while the group prepares its search, e.g. skeletons of its widgets. */
   loadingPlaceholder?: React.ReactNode;
+  /**
+   * Most field and value actions change the search or add widgets, which the page does not show,
+   * so the widgets are read-only by default.
+   */
+  interactionMode?: InteractionMode;
 }>;
 
 /**
@@ -131,6 +148,7 @@ const StandaloneWidgetGroup = ({
   lazy = false,
   searchExecutors = undefined,
   loadingPlaceholder = <Spinner text="Loading widgets..." />,
+  interactionMode = 'read-only',
   children = undefined,
 }: Props) => {
   const group = (
@@ -144,7 +162,11 @@ const StandaloneWidgetGroup = ({
     group
   );
 
-  return lazy ? <RenderWhenVisible>{groupWithExecutors}</RenderWhenVisible> : groupWithExecutors;
+  return (
+    <InteractiveContext.Provider value={interactionMode}>
+      {lazy ? <RenderWhenVisible>{groupWithExecutors}</RenderWhenVisible> : groupWithExecutors}
+    </InteractiveContext.Provider>
+  );
 };
 
 export default StandaloneWidgetGroup;
