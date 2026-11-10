@@ -112,18 +112,23 @@ public class TruststoreCreator {
      * @param keystoreInformation access to the keystore, to obtain certificate chains and certificates
      */
     public TruststoreCreator addCertificates(KeystoreInformation keystoreInformation) throws IOException, GeneralSecurityException {
-        final KeyStore keystore = keystoreInformation.loadKeystore();
+        return addCertificates(keystoreInformation.loadKeystore());
+    }
+
+    /**
+     * Adds certificate chains of all key entries and all trusted certificate entries of the given keystore.
+     * Private keys are never copied to the truststore.
+     */
+    public TruststoreCreator addCertificates(KeyStore keystore) throws KeyStoreException {
         final Enumeration<String> aliases = keystore.aliases();
         while (aliases.hasMoreElements()) {
             final String alias = aliases.nextElement();
             if (keystore.isKeyEntry(alias)) {
                 LOG.info("Adding key certificate chain of alias {} to the truststore", alias);
-                final Certificate[] chain = keystore.getCertificateChain(alias);
-                final List<X509Certificate> x509Certs = toX509Certs(chain);
-                return addCertificates(x509Certs);
+                addCertificates(toX509Certs(keystore.getCertificateChain(alias)));
             } else if (keystore.isCertificateEntry(alias)) {
                 LOG.info("Adding certificate of alias {} to the truststore", alias);
-                return addCertificates(toX509Certs(new Certificate[]{keystore.getCertificate(alias)}));
+                addCertificates(toX509Certs(new Certificate[]{keystore.getCertificate(alias)}));
             } else {
                 LOG.warn("Unsupported keystore alias {}", alias);
             }
@@ -139,10 +144,14 @@ public class TruststoreCreator {
                 .toList();
     }
 
+    /**
+     * Adds the given certificates to the truststore. Certificates that are already present or not valid are skipped.
+     */
     public TruststoreCreator addCertificates(List<X509Certificate> trustedCertificates) {
         trustedCertificates
                 .stream()
                 .filter(this::filterOutInvalidWithLogging)
+                .filter(cert -> !isPresent(cert))
                 .forEach(cert -> {
                     try {
                         this.truststore.setCertificateEntry(generateAlias(this.truststore, cert), cert);
@@ -151,6 +160,14 @@ public class TruststoreCreator {
                     }
                 });
         return this;
+    }
+
+    private boolean isPresent(X509Certificate cert) {
+        try {
+            return this.truststore.getCertificateAlias(cert) != null;
+        } catch (KeyStoreException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private boolean filterOutInvalidWithLogging(X509Certificate cert) {

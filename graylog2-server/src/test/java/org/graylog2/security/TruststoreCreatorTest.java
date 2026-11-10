@@ -166,6 +166,40 @@ public class TruststoreCreatorTest {
                 .contains("cn=my-ca_2");
     }
 
+    @Test
+    void testSameCertificateAddedOnlyOnce() throws Exception {
+        final KeyPair ca = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("my-ca").isCA(true).validity(Duration.ofDays(90)));
+
+        final KeyStore truststore = TruststoreCreator.newEmpty()
+                .addCertificates(List.of(ca.certificate()))
+                .addCertificates(List.of(ca.certificate()))
+                .getTruststore();
+
+        Assertions.assertThat(Collections.list(truststore.aliases()))
+                .containsExactly("cn=my-ca");
+    }
+
+    @Test
+    void testAllKeystoreEntriesAdded() throws Exception {
+        final KeyPair ca = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("my-ca").isCA(true).validity(Duration.ofDays(90)));
+        final KeyPair otherCa = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("other-ca").isCA(true).validity(Duration.ofDays(90)));
+        final KeyPair node = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.signed("my-node", ca).isCA(false).validity(Duration.ofDays(90)));
+
+        final KeyStore source = KeyStore.getInstance(CertConstants.PKCS12);
+        source.load(null, null);
+        source.setCertificateEntry("other-ca", otherCa.certificate());
+        source.setKeyEntry("node", node.privateKey(), "password".toCharArray(), new Certificate[]{node.certificate(), ca.certificate()});
+
+        final KeyStore truststore = TruststoreCreator.newEmpty()
+                .addCertificates(source)
+                .getTruststore();
+
+        // both the key entry chain and the trusted certificate entry are added, regardless of alias order
+        Assertions.assertThat(Collections.list(truststore.aliases()))
+                .containsExactlyInAnyOrder("cn=my-node", "cn=my-ca", "cn=other-ca");
+        Assertions.assertThat(truststore.isKeyEntry("cn=my-node")).isFalse();
+    }
+
     private static X509TrustManager createTrustManager(KeyStore caTruststore) throws NoSuchAlgorithmException, KeyStoreException {
         final TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         tmf.init(caTruststore);
