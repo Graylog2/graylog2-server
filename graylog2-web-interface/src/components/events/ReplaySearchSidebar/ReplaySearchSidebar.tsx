@@ -14,11 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo } from 'react';
+import * as React from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import GeneralEventSideBar from 'components/events/ReplaySearchSidebar/GeneralEventSideBar';
-import type { EventDefinitionSideBarDetailsProps, EventReplaySideBarDetailsProps } from 'views/types';
 
 type Props = {
   alertId: string;
@@ -28,30 +27,19 @@ type Props = {
 const ReplaySearchSidebar = ({ alertId, definitionId = undefined }: Props) => {
   const sideBarDetailsPlugin = usePluginEntities('views.components.eventReplay.sideBarDetails');
   const isEventDefinition = !alertId && !!definitionId;
+  const sideBarDetails = sideBarDetailsPlugin[0];
+  const hasPlugin = typeof sideBarDetails?.useCondition === 'function' ? sideBarDetails.useCondition() : true;
 
-  const EventDefSideBar = useMemo<React.ComponentType<EventDefinitionSideBarDetailsProps> | null>(() => {
-    const sideBarDetails = sideBarDetailsPlugin[0];
-    const hasPlugin = typeof sideBarDetails?.useCondition === 'function' ? sideBarDetails.useCondition() : true;
+  const EventDefSideBar =
+    hasPlugin && sideBarDetails?.eventDefinitionComponent ? sideBarDetails.eventDefinitionComponent : null;
 
-    if (hasPlugin && sideBarDetails?.eventDefinitionComponent) return sideBarDetails.eventDefinitionComponent;
+  const EventSideBarDetails = hasPlugin && !!sideBarDetails?.component ? sideBarDetails.component : GeneralEventSideBar;
 
-    return null;
-  }, [sideBarDetailsPlugin]);
-
-  const EventSideBarDetails = useMemo<React.ComponentType<EventReplaySideBarDetailsProps>>(() => {
-    const sideBarDetails = sideBarDetailsPlugin[0];
-    const hasPlugin = typeof sideBarDetails?.useCondition === 'function' ? sideBarDetails.useCondition() : true;
-
-    if (hasPlugin && !!sideBarDetails?.component) return sideBarDetails.component;
-
-    return GeneralEventSideBar;
-  }, [sideBarDetailsPlugin]);
-
-  if (isEventDefinition && EventDefSideBar) {
-    return <EventDefSideBar definitionId={definitionId} />;
-  }
-
-  return <EventSideBarDetails alertId={alertId} definitionId={definitionId} />;
+  return isEventDefinition && EventDefSideBar ? (
+    <EventDefSideBar definitionId={definitionId} />
+  ) : (
+    <EventSideBarDetails alertId={alertId} definitionId={definitionId} />
+  );
 };
 
 export default ReplaySearchSidebar;
