@@ -233,6 +233,10 @@ public class DBGrantService {
         }
     }
 
+    public List<GrantDTO> getForTargets(Collection<GRN> targets) {
+        return collection.find(in(GrantDTO.FIELD_TARGET, targets)).into(new ArrayList<>());
+    }
+
     public boolean hasGrantFor(GRN grantee, Capability capability, GRN target) {
         return collection.find(and(
                 eq(GrantDTO.FIELD_GRANTEE, grantee),

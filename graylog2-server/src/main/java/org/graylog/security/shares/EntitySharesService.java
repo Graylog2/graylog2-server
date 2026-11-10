@@ -390,6 +390,60 @@ public class EntitySharesService {
         return updateEntityShares(grnClone, shareRequest, sharingUser);
     }
 
+    /**
+     * Counts the grantees per capability for each of the given entities. Uses the same rules as the active shares
+     * of the share dialog: the viewer's own grant is left out, and so are grantees the viewer cannot see.
+     * The caller must make sure that the viewer owns the given entities.
+     *
+     * @param ownedEntities the entities to summarize
+     * @param viewer        the user who looks at the summaries
+     * @return the summary for each entity that has at least one counted grantee
+     */
+    public Map<GRN, ShareSummary> summarize(Set<GRN> ownedEntities, User viewer) {
+        requireNonNull(ownedEntities, "ownedEntities cannot be null");
+        requireNonNull(viewer, "viewer cannot be null");
+
+        return visibleGrants(ownedEntities, viewer).entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> ShareSummary.of(entry.getValue())));
+    }
+
+    /**
+     * Returns the grantees of one entity with their capabilities. Uses the same rules as the active shares
+     * of the share dialog: the viewer's own grant is left out, and so are grantees the viewer cannot see.
+     * The caller must make sure that the viewer owns the given entity.
+     *
+     * @param ownedEntity the entity
+     * @param viewer      the user who looks at the grantees
+     * @return the grantees with their capabilities
+     */
+    public List<GranteeShare> getGrantees(GRN ownedEntity, User viewer) {
+        requireNonNull(ownedEntity, "ownedEntity cannot be null");
+        requireNonNull(viewer, "viewer cannot be null");
+
+        return visibleGrants(Set.of(ownedEntity), viewer).getOrDefault(ownedEntity, List.of());
+    }
+
+    private Map<GRN, List<GranteeShare>> visibleGrants(Set<GRN> targets, User viewer) {
+        if (targets.isEmpty()) {
+            return Map.of();
+        }
+        final GRN viewerGRN = grnRegistry.ofUser(viewer);
+        final List<GrantDTO> grants = grantService.getForTargets(targets).stream()
+                .filter(grant -> !grant.grantee().equals(viewerGRN))
+                .toList();
+        final Set<GRN> candidates = grants.stream().map(GrantDTO::grantee).collect(Collectors.toSet());
+        final Map<GRN, Grantee> visibleGrantees = granteeService.getVisibleGrantees(viewer, candidates).stream()
+                .collect(Collectors.toMap(Grantee::grn, grantee -> grantee));
+
+        return grants.stream()
+                .filter(grant -> visibleGrantees.containsKey(grant.grantee()))
+                .collect(Collectors.groupingBy(
+                        GrantDTO::target,
+                        Collectors.mapping(grant -> new GranteeShare(visibleGrantees.get(grant.grantee()), grant.capability()),
+                                Collectors.toList())
+                ));
+    }
+
     private void postUpdateEvent(EntitySharesUpdateEvent updateEvent) {
         this.serverEventBus.post(updateEvent);
     }

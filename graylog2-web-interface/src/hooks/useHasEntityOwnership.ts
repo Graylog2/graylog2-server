@@ -16,11 +16,11 @@
  */
 import { createGRN } from 'logic/permissions/GRN';
 import useCurrentUser from 'hooks/useCurrentUser';
+// eslint-disable-next-line no-restricted-imports
 import { hasAdminPermission } from 'util/PermissionsMixin';
+import type User from 'logic/users/User';
 
-const useHasEntityOwnership = (id: string | undefined, type: string) => {
-  const currentUser = useCurrentUser();
-
+export const hasEntityOwnership = (currentUser: User | undefined, type: string, id: string | undefined) => {
   if (!currentUser) {
     return false;
   }
@@ -28,6 +28,12 @@ const useHasEntityOwnership = (id: string | undefined, type: string) => {
   const { grnPermissions = [], permissions } = currentUser;
 
   return hasAdminPermission(permissions) || grnPermissions.includes(`entity:own:${createGRN(type, id)}`);
+};
+
+const useHasEntityOwnership = (id: string | undefined, type: string) => {
+  const currentUser = useCurrentUser();
+
+  return hasEntityOwnership(currentUser, type, id);
 };
 
 export default useHasEntityOwnership;

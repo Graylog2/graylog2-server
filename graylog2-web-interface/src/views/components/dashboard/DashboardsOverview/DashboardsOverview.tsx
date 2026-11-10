@@ -27,6 +27,10 @@ import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElemen
 import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
 import CurrentUser from 'logic/users/CurrentUser';
 import type { SearchParamsForDashboards } from 'views/components/dashboard/SearchParamsForDashboards';
+import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
+import { getVisibleAttributeColumns } from 'components/common/EntityDataTable/hooks/useVisibleColumnOrder';
+import useSharedWithOthersSection from 'components/permissions/SharedWithOthers/useSharedWithOthersSection';
+import { SHARED_WITH_OTHERS_ID } from 'components/permissions/SharedWithOthers/Constants';
 
 import BulkActions from './BulkActions';
 
@@ -41,6 +45,17 @@ const DashboardsOverview = ({ hideAdditionalColumns = false, hideShare = false, 
     usePluggableEntityTableElements<View>(null, 'dashboard');
   const { getDefaultLayout, additionalAttributes } = getDashboardTableElements(pluggableAttributes);
   const customColumnRenderers = useColumnRenderers(pluggableColumnRenderers);
+  const tableLayout = getDefaultLayout(hideAdditionalColumns);
+  const { data: layoutPreferences } = useUserLayoutPreferences(tableLayout.entityTableId);
+  const visibleColumns = getVisibleAttributeColumns(
+    tableLayout.defaultDisplayedAttributes,
+    layoutPreferences?.attributes,
+  );
+  const sharedWithOthersSection = useSharedWithOthersSection<View>(
+    'dashboard',
+    'dashboard',
+    visibleColumns.has(SHARED_WITH_OTHERS_ID),
+  );
 
   const renderDashboardActions = useCallback(
     (dashboard: View) => <DashboardActions dashboard={dashboard} hideDelete={hideDelete} hideShare={hideShare} />,
@@ -49,8 +64,9 @@ const DashboardsOverview = ({ hideAdditionalColumns = false, hideShare = false, 
   const expandedSections = useMemo(
     () => ({
       ...pluggableExpandedSections,
+      ...sharedWithOthersSection,
     }),
-    [pluggableExpandedSections],
+    [pluggableExpandedSections, sharedWithOthersSection],
   );
 
   const fetchEntities = (searchParams: SearchParamsForDashboards): Promise<PaginatedResponse<View>> => {
@@ -66,7 +82,7 @@ const DashboardsOverview = ({ hideAdditionalColumns = false, hideShare = false, 
         <QueryHelper entityName="dashboard" commonFields={['id', 'title', 'description', 'summary']} />
       }
       entityActions={renderDashboardActions}
-      tableLayout={getDefaultLayout(hideAdditionalColumns)}
+      tableLayout={tableLayout}
       fetchEntities={fetchEntities}
       additionalAttributes={additionalAttributes}
       expandedSectionRenderers={expandedSections}

@@ -1,0 +1,191 @@
+{
+  "grants": [
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0001"
+      },
+      "grantee": "grn::::user:hans",
+      "capability": "own",
+      "target": "grn::::stream:54e3deadbeefdeadbeef0a01",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "updated_by": "admin",
+      "updated_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0002"
+      },
+      "grantee": "grn::::user:alice",
+      "capability": "own",
+      "target": "grn::::stream:54e3deadbeefdeadbeef0a01",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "updated_by": "admin",
+      "updated_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0003"
+      },
+      "grantee": "grn::::builtin-team:everyone",
+      "capability": "view",
+      "target": "grn::::stream:54e3deadbeefdeadbeef0a01",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "updated_by": "admin",
+      "updated_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0004"
+      },
+      "grantee": "grn::::user:bob",
+      "capability": "view",
+      "target": "grn::::stream:54e3deadbeefdeadbeef0a01",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "updated_by": "admin",
+      "updated_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0005"
+      },
+      "grantee": "grn::::user:carol",
+      "capability": "view",
+      "target": "grn::::stream:54e3deadbeefdeadbeef0a01",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "updated_by": "admin",
+      "updated_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0006"
+      },
+      "grantee": "grn::::user:invisible",
+      "capability": "manage",
+      "target": "grn::::stream:54e3deadbeefdeadbeef0a01",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "updated_by": "admin",
+      "updated_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0007"
+      },
+      "grantee": "grn::::user:hans",
+      "capability": "own",
+      "target": "grn::::stream:54e3deadbeefdeadbeef0a02",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "updated_by": "admin",
+      "updated_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0008"
+      },
+      "grantee": "grn::::user:invisible",
+      "capability": "manage",
+      "target": "grn::::dashboard:54e3deadbeefdeadbeef0a03",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "updated_by": "admin",
+      "updated_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0009"
+      },
+      "grantee": "grn::::user:bob",
+      "capability": "manage",
+      "target": "grn::::dashboard:54e3deadbeefdeadbeef0a04",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "updated_by": "admin",
+      "updated_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef000a"
+      },
+      "grantee": "grn::::user:carol",
+      "capability": "view",
+      "target": "grn::::collection_entities:54e3deadbeefdeadbeef0a05",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "updated_by": "admin",
+      "updated_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "expires_at": null
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef000b"
+      },
+      "grantee": "grn::::user:alice",
+      "capability": "view",
+      "target": "grn::::stream:54e3deadbeefdeadbeef0a06",
+      "created_by": "admin",
+      "created_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "updated_by": "admin",
+      "updated_at": {
+        "$date": "2020-05-12T12:25:00Z"
+      },
+      "expires_at": null
+    }
+  ]
+}

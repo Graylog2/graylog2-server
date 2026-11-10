@@ -25,18 +25,21 @@ import { formatReadableNumber } from 'util/NumberFormatting';
 type Props = {
   entityId: string;
   section: string;
-  count: number;
   // Names the section's content in the button title, e.g. "stream rules" for "Show stream rules".
   label: string;
-  abbreviate?: boolean;
-};
+} & (
+  | { count: number; abbreviate?: boolean; children?: never }
+  // Custom content replaces the count, e.g. a count per category.
+  | { children: React.ReactNode; count?: never; abbreviate?: never }
+);
 
 /**
  * Count of the items in an expanded section. Clicking it opens the row on that section.
+ * Instead of a single count, it can render custom content passed as children.
  */
 // Forwards the ref, since cells wrap the count in a tooltip.
 const ExpandedSectionCount = (
-  { entityId, section, count, label, abbreviate = false }: Props,
+  { entityId, section, count = undefined, label, abbreviate = false, children = undefined }: Props,
   ref: React.ForwardedRef<HTMLElement>,
 ) => {
   const { expandedSections, toggleSection } = useExpandedSections();
@@ -49,7 +52,7 @@ const ExpandedSectionCount = (
       variant={isActive ? 'filled' : undefined}
       onClick={() => toggleSection(entityId, section)}
       title={`${isActive ? 'Hide' : 'Show'} ${label}`}>
-      {abbreviate ? formatReadableNumber(count) : count}
+      {children ?? (abbreviate ? formatReadableNumber(count) : count)}
       <Icon name="dock_to_bottom" size="xs" type="regular" />
     </Badge>
   );
