@@ -15,11 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { Form, Formik } from 'formik';
 
 import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
+import QueryValidationErrors from 'views/components/searchbar/queryvalidation/QueryValidationErrors';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import type { QueryValidationState, ValidationExplanations } from 'views/components/searchbar/queryvalidation/types';
 import { validationError, validationErrorExplanation } from 'fixtures/queryValidationState';
@@ -80,6 +81,15 @@ describe('QueryValidation', () => {
     await screen.findByText('Error');
     await screen.findByText('Parse Exception');
     await screen.findByText(/Cannot parse 'source: '/);
+  });
+
+  it('should display validation error explanation when requested', async () => {
+    render(<SUT error={validationError} />);
+
+    await screen.findByTitle(validationErrorIconTitle);
+    act(() => QueryValidationErrors.display());
+
+    await screen.findByText('Parse Exception');
   });
 
   it('should display validation error specific documentation links', async () => {
