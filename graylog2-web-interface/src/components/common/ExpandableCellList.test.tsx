@@ -28,13 +28,19 @@ const items: Array<Item> = [
   { id: 'item-3', name: 'Charlie' },
 ];
 
-const SUT = (props: Partial<React.ComponentProps<typeof ExpandableCellList<Item>>>) => (
+const SUT = ({
+  items: sutItems = items,
+  collapsedCount = undefined,
+}: {
+  items?: Array<Item>;
+  collapsedCount?: number;
+}) => (
   <ExpandableCellList<Item>
-    items={items}
+    items={sutItems}
+    collapsedCount={collapsedCount}
     renderItem={({ name }) => name}
     itemKey={({ id }) => id}
     itemTitle={({ name }) => `Title of ${name}`}
-    {...props}
   />
 );
 

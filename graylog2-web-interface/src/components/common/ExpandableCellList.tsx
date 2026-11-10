@@ -45,6 +45,10 @@ const CollapsedItem = styled.div`
   white-space: nowrap;
 `;
 
+const CollapsedList = styled.div`
+  min-width: 0;
+`;
+
 const Expanded = styled.div(
   ({ theme }) => css`
     display: flex;
@@ -52,6 +56,15 @@ const Expanded = styled.div(
     gap: ${theme.spacings.xs};
   `,
 );
+
+const scrollableStyles = css`
+  max-height: ${EXPANDED_MAX_HEIGHT}px;
+  overflow: hidden auto;
+
+  /* Extends into the cell padding, so the scrollbar sits at the cell border. */
+  margin-right: -${CELL_PADDING_HORIZONTAL}px;
+  padding-right: ${CELL_PADDING_HORIZONTAL}px;
+`;
 
 const Items = styled.div<{ $layout: Layout; $scrollable: boolean }>(
   ({ theme, $layout, $scrollable }) => css`
@@ -67,15 +80,14 @@ const Items = styled.div<{ $layout: Layout; $scrollable: boolean }>(
           flex-wrap: wrap;
           gap: ${theme.spacings.xs};
         `}
-    ${$scrollable &&
-    css`
-      max-height: ${EXPANDED_MAX_HEIGHT}px;
-      overflow: hidden auto;
+    ${$scrollable && scrollableStyles}
+  `,
+);
 
-      /* Extends into the cell padding, so the scrollbar sits at the cell border. */
-      margin-right: -${CELL_PADDING_HORIZONTAL}px;
-      padding-right: ${CELL_PADDING_HORIZONTAL}px;
-    `}
+const ListItems = styled.div<{ $scrollable: boolean }>(
+  ({ $scrollable }) => css`
+    min-width: 0;
+    ${$scrollable && scrollableStyles}
   `,
 );
 
@@ -105,12 +117,25 @@ const ShowLessBadge = styled(ToggleBadge)`
   align-self: flex-start;
 `;
 
-type Props<ItemType> = {
-  items: ReadonlyArray<ItemType> | undefined | null;
+type ItemRenderProps<ItemType> = {
   renderItem: (item: ItemType) => React.ReactNode;
   itemKey: (item: ItemType) => string;
   // Shown on hover, since long items are cut off.
   itemTitle?: (item: ItemType) => string;
+  renderList?: never;
+};
+
+type ListRenderProps<ItemType> = {
+  // Renders the visible items together instead of one by one, for items which need a shared container,
+  // e.g. the entries of a definition list.
+  renderList: (items: ReadonlyArray<ItemType>) => React.ReactNode;
+  renderItem?: never;
+  itemKey?: never;
+  itemTitle?: never;
+};
+
+type Props<ItemType> = (ItemRenderProps<ItemType> | ListRenderProps<ItemType>) & {
+  items: ReadonlyArray<ItemType> | undefined | null;
   collapsedCount?: number;
   // `stacked` lists one item per line (e.g. entity links), `inline` wraps items next to each other (e.g. chips).
   layout?: Layout;
@@ -122,11 +147,9 @@ type Props<ItemType> = {
  */
 const ExpandableCellList = <ItemType,>({
   items,
-  renderItem,
-  itemKey,
-  itemTitle = undefined,
   collapsedCount = DEFAULT_COLLAPSED_COUNT,
   layout = 'stacked',
+  ...renderProps
 }: Props<ItemType>) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -135,15 +158,39 @@ const ExpandableCellList = <ItemType,>({
   }
 
   const hiddenCount = items.length - collapsedCount;
-  const renderAllItems = (scrollable: boolean) => (
-    <Items $layout={layout} $scrollable={scrollable}>
-      {items.map((item) => (
-        <Item key={itemKey(item)} $layout={layout} title={itemTitle?.(item)}>
-          {renderItem(item)}
-        </Item>
-      ))}
-    </Items>
-  );
+  const renderAllItems = (scrollable: boolean) => {
+    if (renderProps.renderList) {
+      return <ListItems $scrollable={scrollable}>{renderProps.renderList(items)}</ListItems>;
+    }
+
+    const { renderItem, itemKey, itemTitle } = renderProps;
+
+    return (
+      <Items $layout={layout} $scrollable={scrollable}>
+        {items.map((item) => (
+          <Item key={itemKey(item)} $layout={layout} title={itemTitle?.(item)}>
+            {renderItem(item)}
+          </Item>
+        ))}
+      </Items>
+    );
+  };
+
+  const renderCollapsedItems = () => {
+    const collapsedItems = items.slice(0, collapsedCount);
+
+    if (renderProps.renderList) {
+      return <CollapsedList>{renderProps.renderList(collapsedItems)}</CollapsedList>;
+    }
+
+    const { renderItem, itemKey, itemTitle } = renderProps;
+
+    return collapsedItems.map((item) => (
+      <CollapsedItem key={itemKey(item)} title={itemTitle?.(item)}>
+        {renderItem(item)}
+      </CollapsedItem>
+    ));
+  };
 
   if (hiddenCount <= 0) {
     return renderAllItems(false);
@@ -159,11 +206,7 @@ const ExpandableCellList = <ItemType,>({
 
     return (
       <CollapsedRow>
-        {items.slice(0, collapsedCount).map((item) => (
-          <CollapsedItem key={itemKey(item)} title={itemTitle?.(item)}>
-            {renderItem(item)}
-          </CollapsedItem>
-        ))}
+        {renderCollapsedItems()}
         <ToggleBadge color="gray" size="sm" onClick={toggle} title={title} aria-label={title}>
           +{hiddenCount}
           <Icon name="keyboard_arrow_down" size="sm" />
