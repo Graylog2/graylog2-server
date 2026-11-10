@@ -98,6 +98,10 @@ const Item = styled.div<{ $layout: Layout }>(
 
 const ToggleBadge = styled(Badge)`
   flex-shrink: 0;
+`;
+
+// Below the expanded items, so it stays at the start instead of stretching across the cell.
+const ShowLessBadge = styled(ToggleBadge)`
   align-self: flex-start;
 `;
 
@@ -171,10 +175,10 @@ const ExpandableCellList = <ItemType,>({
   return (
     <Expanded>
       {renderAllItems(true)}
-      <ToggleBadge color="gray" size="sm" onClick={toggle}>
+      <ShowLessBadge color="gray" size="sm" onClick={toggle}>
         Show less
         <Icon name="keyboard_arrow_up" size="sm" />
-      </ToggleBadge>
+      </ShowLessBadge>
     </Expanded>
   );
 };
