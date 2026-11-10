@@ -14,9 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import hashQueryKey from 'util/hashQueryKey';
+
 const defaultQueryOptions = {
   refetchOnWindowFocus: false,
   networkMode: 'always' as const,
+  queryKeyHashFn: hashQueryKey,
 };
 
 export default defaultQueryOptions;
