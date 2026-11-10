@@ -45,6 +45,11 @@ const StyledDl = styled.dl<{ $horizontalLayout: boolean; $striped: boolean }>`
     word-break: break-word;
   }
 
+  /* The divider separates entries, so the last one doesn't need it. */
+  dd:last-of-type {
+    border-bottom: none;
+  }
+
   dd > ${Container} {
     border-left: 3px solid ${({ theme }) => theme.colors.misc.divider};
     padding-left: ${({ theme }) => theme.spacings.xs};
@@ -69,6 +74,10 @@ const StyledDl = styled.dl<{ $horizontalLayout: boolean; $striped: boolean }>`
       dt {
         padding: ${theme.spacings.xxs};
         border-bottom: 1px solid ${theme.colors.table.row.divider};
+      }
+
+      dt:last-of-type {
+        border-bottom: none;
       }
 
       dd {
