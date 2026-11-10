@@ -35,7 +35,7 @@ const CustomFieldMappingsCell = ({ customFieldTypes }: Props) => {
     <ExpandableCellList
       items={[...customFieldTypes].sort((a, b) => a.field.localeCompare(b.field))}
       renderItem={({ field, type }) => (
-        <DefinitionList>
+        <DefinitionList striped={false}>
           <dt>{field}</dt>
           <dd>{typeTitle(type)}</dd>
         </DefinitionList>

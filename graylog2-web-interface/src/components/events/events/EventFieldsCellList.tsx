@@ -31,7 +31,7 @@ const EventFieldsCellList = ({ fields }: Props) => (
   <ExpandableCellList
     items={Object.keys(fields).sort(defaultCompare)}
     renderItem={(fieldName) => (
-      <DefinitionList>
+      <DefinitionList striped={false}>
         <dt>{fieldName}</dt>
         <dd>{fields[fieldName]}</dd>
       </DefinitionList>
