@@ -24,42 +24,29 @@ import type { TimeRange } from 'views/logic/queries/Query';
 import type Query from 'views/logic/queries/Query';
 import type GlobalOverride from 'views/logic/search/GlobalOverride';
 import { filtersToStreamSet, filtersToStreamCategorySet } from 'views/logic/queries/Query';
-import { isTypeRelativeWithStartOnly, isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
+import {
+  isTypeAbsolute,
+  isTypeKeyword,
+  isTypeRelativeWithStartOnly,
+  isTypeRelativeWithEnd,
+} from 'views/typeGuards/timeRange';
+import { timeRangeToQueryParameter } from 'views/logic/TimeRange';
 import useViewType from 'views/hooks/useViewType';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
 import useHistory from 'routing/useHistory';
 
-const TIMERANGE_PARAMS = ['from', 'to', 'keyword', 'relative', 'rangetype'] as const;
+const TIMERANGE_PARAMS = ['from', 'to', 'keyword', 'timezone', 'relative', 'rangetype'] as const;
 
-const extractTimerangeParams = (timerange: TimeRange): [string, string | number][] => {
+const extractTimerangeParams = (timerange: TimeRange): [string, string][] => {
   const { type } = timerange;
-  const result = { rangetype: type };
 
-  const formatResult = (paramsObject): [string, string | number][] => Object.entries(paramsObject);
-
-  switch (timerange.type) {
-    case 'relative':
-      if (isTypeRelativeWithStartOnly(timerange)) {
-        return formatResult({ ...result, relative: timerange.range });
-      }
-
-      if (isTypeRelativeWithEnd(timerange)) {
-        if ('to' in timerange) {
-          return formatResult({ ...result, from: timerange.from, to: timerange.to });
-        }
-
-        return formatResult({ ...result, from: timerange.from });
-      }
-
-      return formatResult(result);
-    case 'keyword':
-      return formatResult({ ...result, keyword: timerange.keyword });
-    case 'absolute':
-      return formatResult({ ...result, from: timerange.from, to: timerange.to });
-    default:
-      return Object.entries(result);
-  }
+  return isTypeKeyword(timerange) ||
+    isTypeAbsolute(timerange) ||
+    isTypeRelativeWithStartOnly(timerange) ||
+    isTypeRelativeWithEnd(timerange)
+    ? Object.entries(timeRangeToQueryParameter(timerange))
+    : [['rangetype', type]];
 };
 
 const uriForSearchView = (query: string, searchQuery: Query) => {
@@ -73,6 +60,7 @@ const uriForSearchView = (query: string, searchQuery: Query) => {
     .removeQuery('from')
     .removeQuery('to')
     .removeQuery('keyword')
+    .removeQuery('timezone')
     .removeQuery('relative');
   const uriWithTimerange = extractTimerangeParams(timerange).reduce(
     (prev, [key, value]) => prev.setSearch(key, String(value)),

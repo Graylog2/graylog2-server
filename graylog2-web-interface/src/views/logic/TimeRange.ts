@@ -65,7 +65,9 @@ export const timeRangeToQueryParameter = (timeRange: TimeRange): TimeRangeQueryP
 
       return assertUnreachable(timeRange, 'Unexpected time range: ');
     case 'keyword':
-      return { rangetype: 'keyword', keyword: timeRange.keyword };
+      return timeRange.timezone
+        ? { rangetype: 'keyword', keyword: timeRange.keyword, timezone: timeRange.timezone }
+        : { rangetype: 'keyword', keyword: timeRange.keyword };
     case 'absolute':
       return { rangetype: 'absolute', from: timeRange.from, to: timeRange.to };
     default:
@@ -93,7 +95,7 @@ const parseRelativeTimeRange = (range: RelativeRangeQueryParameter): RelativeTim
   return assertUnreachable(range, 'Invalid relative range specified: ');
 };
 
-export const timeRangeFromQueryParameter = (range: TimeRangeQueryParameter): TimeRange => {
+export const timeRangeFromQueryParameter = (range: TimeRangeQueryParameter, defaultTimezone?: string): TimeRange => {
   switch (range?.rangetype) {
     case 'relative':
       return parseRelativeTimeRange(range);
@@ -110,7 +112,7 @@ export const timeRangeFromQueryParameter = (range: TimeRangeQueryParameter): Tim
         ? {
             type: range.rangetype,
             keyword: range.keyword,
-            timezone: range.timezone,
+            timezone: range.timezone ?? defaultTimezone,
           }
         : assertUnreachable(range, 'Invalid keyword range specified: ');
     default:
