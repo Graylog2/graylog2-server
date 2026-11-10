@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fixed stream rules editor crashing when testing a message containing very large numbers."
+
+pulls = ["28130"]
