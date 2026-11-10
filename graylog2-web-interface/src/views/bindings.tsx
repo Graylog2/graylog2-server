@@ -139,7 +139,12 @@ import AreaVisualizationConfig from './logic/aggregationbuilder/visualizations/A
 import Parameter from './logic/parameters/Parameter';
 import ValueParameter from './logic/parameters/ValueParameter';
 import MessageConfigGenerator from './logic/searchtypes/messages/MessageConfigGenerator';
+import SwimlaneConfigGenerator from './logic/searchtypes/messages/SwimlaneConfigGenerator';
 import UnknownWidget from './components/widgets/UnknownWidget';
+import SwimlaneWidget from './logic/widgets/SwimlaneWidget';
+import AddSwimlaneWidget, { CreateSwimlaneWidget } from './logic/widgets/CreateSwimlaneWidget';
+import SwimlaneVisualization from './components/widgets/swimlane/SwimlaneVisualization';
+import SwimlaneEdit from './components/widgets/swimlane/SwimlaneEdit';
 import NewSearchRedirectPage from './pages/NewSearchRedirectPage';
 import EventsVisualization from './components/widgets/events/EventsVisualization';
 import eventsFilterComponents from './components/widgets/events/filters/filterComponents';
@@ -147,6 +152,7 @@ import eventsFilterComponents from './components/widgets/events/filters/filterCo
 Widget.registerSubtype(AggregationWidget.type, AggregationWidget);
 Widget.registerSubtype(MessagesWidget.type, MessagesWidget);
 Widget.registerSubtype(EventsWidget.type, EventsWidget);
+Widget.registerSubtype(SwimlaneWidget.type, SwimlaneWidget);
 VisualizationConfig.registerSubtype(WorldMapVisualization.type, WorldMapVisualizationConfig);
 VisualizationConfig.registerSubtype(BarVisualization.type, BarVisualizationConfig);
 VisualizationConfig.registerSubtype(NumberVisualization.type, NumberVisualizationConfig);
@@ -263,6 +269,19 @@ const exports: PluginExports = {
       titleGenerator: () => TextWidget.defaultTitle,
       needsControlledHeight: () => false,
       searchResultTransformer: () => ({}),
+    },
+    {
+      type: 'SWIMLANE',
+      displayName: 'Swimlane',
+      defaultHeight: 5,
+      defaultWidth: 6,
+      hasEditSubmitButton: true,
+      visualizationComponent: SwimlaneVisualization as unknown as React.ComponentType<WidgetComponentProps>,
+      editComponent: SwimlaneEdit,
+      needsControlledHeight: () => false,
+      searchResultTransformer: (data: Array<unknown>) => data[0],
+      searchTypes: SwimlaneConfigGenerator,
+      titleGenerator: () => SwimlaneWidget.defaultTitle,
     },
     {
       type: 'default',
@@ -440,6 +459,11 @@ const exports: PluginExports = {
       func: CreateTextWidget,
       icon: () => <Icon name="description" />,
     },
+    {
+      title: 'Swimlane',
+      func: CreateSwimlaneWidget,
+      icon: () => <Icon name="view_timeline" />,
+    },
   ],
   creators: [
     {
@@ -466,6 +490,11 @@ const exports: PluginExports = {
       type: 'generic',
       title: 'Text/Markdown',
       func: AddTextWidget,
+    },
+    {
+      type: 'generic',
+      title: 'Swimlane',
+      func: AddSwimlaneWidget,
     },
   ],
   'views.completers': [new FieldNameCompletion(), new FieldValueCompletion(), new OperatorCompletion()],
