@@ -22,11 +22,7 @@ import { Spinner } from 'components/common';
 import ViewsStoreProvider from 'views/stores/ViewsStoreProvider';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import AutoRefreshContext from 'views/components/contexts/AutoRefreshContext';
-import WidgetContext from 'views/components/contexts/WidgetContext';
-import { AdditionalContext } from 'views/logic/ActionContext';
-import WidgetFieldTypesContextProvider from 'views/components/contexts/WidgetFieldTypesContextProvider';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
-import useWidget from 'views/hooks/useWidget';
 import { executeActiveQuery } from 'views/logic/slices/viewSlice';
 import type Widget from 'views/logic/widgets/Widget';
 import SearchExecutorsContext from 'views/components/contexts/SearchExecutorsContext';
@@ -59,22 +55,6 @@ const ExecuteOnMount = () => {
   }, [dispatch]);
 
   return null;
-};
-
-/**
- * Provides a widget of the enclosing `StandaloneWidgetGroup` to its children, like the search page does for its widgets.
- */
-export const WidgetFromGroup = ({ widgetId, children = undefined }: React.PropsWithChildren<{ widgetId: string }>) => {
-  const widget = useWidget(widgetId);
-
-  return (
-    <WidgetContext.Provider value={widget}>
-      {/* Like on the search page, field and value actions get the widget, e.g. for values of several groupings. */}
-      <AdditionalContext.Provider value={{ widget }}>
-        <WidgetFieldTypesContextProvider>{children}</WidgetFieldTypesContextProvider>
-      </AdditionalContext.Provider>
-    </WidgetContext.Provider>
-  );
 };
 
 type GroupProps = React.PropsWithChildren<{

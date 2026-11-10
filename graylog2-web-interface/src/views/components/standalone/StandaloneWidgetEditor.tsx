@@ -28,7 +28,8 @@ import WidgetColorContext from 'views/components/widgets/WidgetColorContext';
 import WidgetHeader from 'views/components/widgets/WidgetHeader';
 import WidgetEditWrapper from 'views/components/widgets/WidgetEditWrapper';
 
-import StandaloneWidgetGroup, { WidgetFromGroup } from './StandaloneWidgetGroup';
+import StandaloneWidgetGroup from './StandaloneWidgetGroup';
+import StandaloneWidgetContextProvider from './StandaloneWidgetContextProvider';
 import { WidgetVisualizationFromContext } from './StandaloneWidgetContent';
 
 const Container = styled.div`
@@ -92,11 +93,11 @@ type Props = {
  */
 const StandaloneWidgetEditor = ({ widget, title, onSave, onCancel }: Props) => (
   <StandaloneWidgetGroup widgets={[widget]} titles={{ [widget.id]: title }} interactionMode="interactive">
-    <WidgetFromGroup widgetId={widget.id}>
+    <StandaloneWidgetContextProvider widgetId={widget.id}>
       <WidgetColorContext id={widget.id}>
         <Editor initialTitle={title} onSave={onSave} onCancel={onCancel} />
       </WidgetColorContext>
-    </WidgetFromGroup>
+    </StandaloneWidgetContextProvider>
   </StandaloneWidgetGroup>
 );
 

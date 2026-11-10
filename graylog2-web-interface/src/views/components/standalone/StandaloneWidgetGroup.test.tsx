@@ -27,7 +27,8 @@ import WidgetContext from 'views/components/contexts/WidgetContext';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import createSearch from 'views/logic/slices/createSearch';
 
-import StandaloneWidgetGroup, { WidgetFromGroup } from './StandaloneWidgetGroup';
+import StandaloneWidgetGroup from './StandaloneWidgetGroup';
+import StandaloneWidgetContextProvider from './StandaloneWidgetContextProvider';
 
 jest.mock('views/logic/slices/viewSlice', () => ({
   ...jest.requireActual('views/logic/slices/viewSlice'),
@@ -75,12 +76,12 @@ describe('StandaloneWidgetGroup', () => {
 
     render(
       <StandaloneWidgetGroup widgets={[widget('widget-1'), widget('widget-2')]}>
-        <WidgetFromGroup widgetId="widget-1">
+        <StandaloneWidgetContextProvider widgetId="widget-1">
           <WidgetId />
-        </WidgetFromGroup>
-        <WidgetFromGroup widgetId="widget-2">
+        </StandaloneWidgetContextProvider>
+        <StandaloneWidgetContextProvider widgetId="widget-2">
           <WidgetId />
-        </WidgetFromGroup>
+        </StandaloneWidgetContextProvider>
       </StandaloneWidgetGroup>,
     );
     await screen.findByText(/widget widget-1/i);

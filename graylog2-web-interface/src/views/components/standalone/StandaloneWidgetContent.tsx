@@ -27,7 +27,7 @@ import WidgetColorContext from 'views/components/widgets/WidgetColorContext';
 import WidgetErrorBoundary from 'views/components/widgets/WidgetErrorBoundary';
 import WidgetVisualization from 'views/components/widgets/WidgetVisualization';
 
-import { WidgetFromGroup } from './StandaloneWidgetGroup';
+import StandaloneWidgetContextProvider from './StandaloneWidgetContextProvider';
 import useWidgetTitle from './useWidgetTitle';
 
 const noop = () => {};
@@ -78,11 +78,11 @@ type Props = {
  * `StandaloneWidgetCard` adds its title and time range.
  */
 const StandaloneWidgetContent = ({ widgetId }: Props) => (
-  <WidgetFromGroup widgetId={widgetId}>
+  <StandaloneWidgetContextProvider widgetId={widgetId}>
     <WidgetColorContext id={widgetId}>
       <VisualizationWithTitle />
     </WidgetColorContext>
-  </WidgetFromGroup>
+  </StandaloneWidgetContextProvider>
 );
 
 export default StandaloneWidgetContent;
