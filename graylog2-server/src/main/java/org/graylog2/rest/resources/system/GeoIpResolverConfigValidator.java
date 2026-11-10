@@ -73,6 +73,11 @@ public class GeoIpResolverConfigValidator implements ClusterConfigValidator {
     public void validate(Object configObject) throws ConfigValidationException {
 
         if (configObject instanceof GeoIpResolverConfig config) {
+            if (!VALID_UNITS.contains(config.refreshIntervalUnit())) {
+                final String valid = VALID_UNITS.stream().map(TimeUnit::name).collect(Collectors.joining(","));
+                throw new ConfigValidationException(String.format(Locale.ENGLISH, "Invalid '%s'. Valid units are '%s'",
+                        GeoIpResolverConfig.FIELD_REFRESH_INTERVAL_UNIT, valid));
+            }
 
             if (config.enabled()) {
                 validateConfig(config);
@@ -88,12 +93,6 @@ public class GeoIpResolverConfigValidator implements ClusterConfigValidator {
         Timer timer = new Timer(new UniformReservoir());
         final GeoIpFileService geoIpFileService = geoIpFileServiceFactory.create(config);
         try {
-
-            if (!VALID_UNITS.contains(config.refreshIntervalUnit())) {
-                String valid = VALID_UNITS.stream().map(TimeUnit::name).collect(Collectors.joining(","));
-                String error = String.format(Locale.ENGLISH, "Invalid '%s'. Valid units are '%s'", GeoIpResolverConfig.FIELD_REFRESH_INTERVAL_UNIT, valid);
-                throw new IllegalArgumentException(error);
-            }
 
             GeoIpResolverConfig curConfig = clusterConfigService.getOrDefault(GeoIpResolverConfig.class,
                     GeoIpResolverConfig.defaultConfig());

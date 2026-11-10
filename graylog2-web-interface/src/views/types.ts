@@ -247,14 +247,12 @@ export interface SystemConfiguration {
 
 export interface CoreSystemConfiguration {
   name: string;
+  feature?: string;
   SectionComponent: React.ComponentType;
   permissions?: Array<Permission>;
   showCaret?: boolean;
   catchAll?: boolean;
-  props?: {
-    ConfigurationComponent: React.ComponentType;
-    title: string;
-  };
+  props?: Record<string, unknown>;
 }
 
 export type GenericResult = {

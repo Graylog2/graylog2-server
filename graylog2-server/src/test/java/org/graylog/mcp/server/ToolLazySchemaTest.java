@@ -45,7 +45,7 @@ class ToolLazySchemaTest {
 
     @Test
     void doesNotConsultTheSchemaGeneratorUntilFirstAccess() {
-        final SchemaGeneratorProvider provider = spy(new SchemaGeneratorProvider(Set.of()));
+        final SchemaGeneratorProvider provider = spy(new SchemaGeneratorProvider(new ObjectMapperProvider().get(), Set.of()));
 
         final Tool<TestParameters, String> tool = new TestTool(objectMapper, provider);
 

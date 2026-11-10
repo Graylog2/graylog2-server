@@ -32,7 +32,6 @@ type ConfigurationsActionsType = {
   listEventsClusterConfig: () => Promise<unknown>;
   listIndexSetsDefaultsClusterConfig: () => Promise<unknown>;
   listAllowListConfig: (configType: any) => Promise<unknown>;
-  listPermissionsConfig: (configType: string) => Promise<unknown>;
   listUserConfig: (configType: string) => Promise<unknown>;
   listPasswordComplexityConfig: (configType: string) => Promise<unknown>;
   update: (configType: any, config: any) => Promise<void>;
@@ -48,7 +47,6 @@ export const ConfigurationsActions = singletonActions('core.Configuration', () =
     listEventsClusterConfig: { asyncResult: true },
     listIndexSetsDefaultsClusterConfig: { asyncResult: true },
     listAllowListConfig: { asyncResult: true },
-    listPermissionsConfig: { asyncResult: true },
     listUserConfig: { asyncResult: true },
     listPasswordComplexityConfig: { asyncResult: true },
     update: { asyncResult: true },
@@ -69,10 +67,6 @@ export type Url = {
 export type AllowListConfig = {
   entries: Array<Url>;
   disabled: boolean;
-};
-export type PermissionsConfigType = {
-  allow_sharing_with_everyone: boolean;
-  allow_sharing_with_users: boolean;
 };
 export type PasswordComplexityConfigType = {
   min_length: number;
@@ -170,25 +164,6 @@ export const ConfigurationsStore = singletonStore('core.Configuration', () =>
       });
 
       ConfigurationsActions.listAllowListConfig.promise(promise);
-    },
-
-    listPermissionsConfig(configType) {
-      const promise = SystemClusterConfig.read(configType).then((response: PermissionsConfigType) => {
-        this.configuration = {
-          ...this.configuration,
-          // default values bellow should be the same in backend.
-          [configType]: response || {
-            allow_sharing_with_everyone: true,
-            allow_sharing_with_users: true,
-          },
-        };
-
-        this.propagateChanges();
-
-        return response;
-      });
-
-      ConfigurationsActions.listPermissionsConfig.promise(promise);
     },
 
     listUserConfig(configType) {

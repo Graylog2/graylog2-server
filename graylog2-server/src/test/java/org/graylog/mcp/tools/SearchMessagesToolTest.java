@@ -49,7 +49,7 @@ class SearchMessagesToolTest {
     private final PermissionHelper permissionHelper = mock(PermissionHelper.class);
     private final SearchUser searchUser = mock(SearchUser.class);
     private final SearchMessagesTool tool = new SearchMessagesTool(scriptingApiService, CustomizationConfig.empty(),
-            new ObjectMapperProvider().get(), null, new SchemaGeneratorProvider(Set.of()));
+            new ObjectMapperProvider().get(), null, new SchemaGeneratorProvider(new ObjectMapperProvider().get(), Set.of()));
     private final ArgumentCaptor<MessagesRequestSpec> spec = ArgumentCaptor.forClass(MessagesRequestSpec.class);
 
     @BeforeEach

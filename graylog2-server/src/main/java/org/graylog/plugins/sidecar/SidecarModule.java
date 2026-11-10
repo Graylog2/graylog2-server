@@ -45,6 +45,8 @@ import org.graylog.plugins.sidecar.services.ConfigurationService;
 import org.graylog.plugins.sidecar.services.ConfigurationVariableService;
 import org.graylog.plugins.sidecar.services.EtagService;
 import org.graylog.plugins.sidecar.services.SidecarService;
+import org.graylog.plugins.sidecar.system.SidecarConfiguration;
+import org.graylog.plugins.sidecar.system.SidecarConfigurationValidator;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.PluginModule;
@@ -84,6 +86,9 @@ public class SidecarModule extends PluginModule {
         addPeriodical(PurgeExpiredSidecarsThread.class);
 
         addAuditEventTypes(SidecarAuditEventTypes.class);
+
+        addRuntimeTunable(SidecarConfiguration.class);
+        addClusterConfigValidator(SidecarConfiguration.class, SidecarConfigurationValidator.class);
 
         final Multibinder<Migration> binder = Multibinder.newSetBinder(binder(), Migration.class);
         binder.addBinding().to(V20180212165000_AddDefaultCollectors.class);

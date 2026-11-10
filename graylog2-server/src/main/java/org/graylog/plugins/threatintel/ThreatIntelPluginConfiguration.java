@@ -21,30 +21,41 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog2.configuration.tunables.RuntimeTunable;
+import org.graylog2.configuration.tunables.TunableField;
 
 import javax.annotation.Nullable;
 
 @JsonAutoDetect
 @JsonIgnoreProperties(ignoreUnknown = true)
 @AutoValue
+@RuntimeTunable(id = "threat_intelligence.configuration", feature = "threat_intelligence",
+        title = "Threat Intelligence Lookup Configuration", description = "Configuration for threat intelligence lookup plugin.")
 public abstract class ThreatIntelPluginConfiguration {
 
     @JsonProperty("otx_enabled")
+    @TunableField(label = "OTX lookups", hidden = true)
     @Deprecated // Not used anymore
     public abstract boolean otxEnabled();
 
     @JsonProperty("otx_api_key")
+    @TunableField(label = "OTX API key", hidden = true)
     @Deprecated // Only used to migrate API key from pre-2.4 setups
     @Nullable
     public abstract String otxApiKey();
 
     @JsonProperty("tor_enabled")
+    @TunableField(label = "Allow Tor exit node lookups",
+            help = "Enable to include Tor exit node lookup in global pipeline function, disabling also stops refreshing the data.")
     public abstract boolean torEnabled();
 
     @JsonProperty("spamhaus_enabled")
+    @TunableField(label = "Allow Spamhaus DROP/EDROP lookups",
+            help = "Enable to include Spamhaus lookup in global pipeline function, disabling also stops refreshing the data.")
     public abstract boolean spamhausEnabled();
 
     @JsonProperty("abusech_ransom_enabled")
+    @TunableField(label = "Abuse.ch ransomware lookups", hidden = true)
     public abstract boolean abusechRansomEnabled();
 
     @JsonCreator

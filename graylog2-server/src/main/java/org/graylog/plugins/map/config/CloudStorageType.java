@@ -17,13 +17,17 @@
 package org.graylog.plugins.map.config;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import org.graylog2.configuration.tunables.TunableEnumLabel;
 
 /**
  * Tells in which cloud-storage the files for the GeoIP database are stored.
  */
 public enum CloudStorageType {
+    @TunableEnumLabel("S3")
     S3("s3"),
+    @TunableEnumLabel("Google Cloud Storage")
     GCS("gcs"),
+    @TunableEnumLabel("Azure Blob Storage")
     ABS("abs");
 
     private final String name;

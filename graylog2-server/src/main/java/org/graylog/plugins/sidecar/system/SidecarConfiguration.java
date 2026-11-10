@@ -20,6 +20,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog2.configuration.tunables.RuntimeTunable;
+import org.graylog2.configuration.tunables.TunableField;
 import org.graylog2.plugin.PluginConfigBean;
 import org.joda.time.Period;
 
@@ -29,6 +31,7 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 
 @JsonAutoDetect
 @AutoValue
+@RuntimeTunable(id = "sidecars.configuration", feature = "sidecars", title = "Sidecars Configuration")
 public abstract class SidecarConfiguration implements PluginConfigBean {
 
     private static final Period DEFAULT_EXPIRATION_PERIOD = Period.days(14);
@@ -38,18 +41,23 @@ public abstract class SidecarConfiguration implements PluginConfigBean {
     private static final boolean DEFAULT_CONFIG_OVERRIDE = false;
 
     @JsonProperty("sidecar_expiration_threshold")
+    @TunableField(label = "Expiration threshold", help = "Amount of time after which inactive Sidecars are purged from the database.")
     public abstract Period sidecarExpirationThreshold();
 
     @JsonProperty("sidecar_inactive_threshold")
+    @TunableField(label = "Inactive threshold", help = "Amount of time of inactivity after which Sidecars are flagged as inactive.")
     public abstract Period sidecarInactiveThreshold();
 
     @JsonProperty("sidecar_update_interval")
+    @TunableField(label = "Update interval", help = "Time between Sidecar update requests. Must be less than the inactive threshold.")
     public abstract Period sidecarUpdateInterval();
 
     @JsonProperty("sidecar_send_status")
+    @TunableField(label = "Send status updates", help = "Send Sidecar status and host metrics from each client.")
     public abstract boolean sidecarSendStatus();
 
     @JsonProperty("sidecar_configuration_override")
+    @TunableField(label = "Override Sidecar configuration", help = "Override configuration file settings for all Sidecars.")
     public abstract boolean sidecarConfigurationOverride();
 
     @JsonCreator
@@ -75,6 +83,10 @@ public abstract class SidecarConfiguration implements PluginConfigBean {
                 .sidecarSendStatus(DEFAULT_SEND_STATUS)
                 .sidecarConfigurationOverride(DEFAULT_CONFIG_OVERRIDE)
                 .build();
+    }
+
+    public static SidecarConfiguration defaults() {
+        return defaultConfiguration();
     }
 
     public static Builder builder() {
