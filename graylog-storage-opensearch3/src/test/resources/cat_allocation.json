@@ -20,5 +20,16 @@
     "host": "node2",
     "ip": "182.88.0.2",
     "node": "node2"
+  },
+  {
+    "shards": "8",
+    "disk.indices": null,
+    "disk.used": null,
+    "disk.avail": null,
+    "disk.total": null,
+    "disk.percent": null,
+    "host": null,
+    "ip": null,
+    "node": "UNASSIGNED"
   }
 ]

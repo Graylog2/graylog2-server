@@ -133,6 +133,27 @@ public abstract class ClusterIT extends ElasticsearchBaseTest {
     }
 
     @Test
+    public void clusterShardAllocationCountsUnassignedShardsButNotClosedIndices() {
+        final ClusterShardAllocation before = cluster.clusterShardAllocation();
+
+        // The test cluster has a single data node, so the replicas of this index stay unassigned.
+        client().createIndex("cluster_it_unassigned", 2, 1);
+        client().createIndex("cluster_it_closed", 3, 0);
+        client().closeIndex("cluster_it_closed");
+        // Closing re-initializes the shards of the index, they are briefly unassigned.
+        client().waitForGreenStatus("cluster_it_closed");
+
+        final ClusterShardAllocation after = cluster.clusterShardAllocation();
+
+        assertThat(after.nodeShardAllocations()).extracting(NodeShardAllocation::node).doesNotContain("UNASSIGNED");
+        assertThat(after.unassignedShards() - before.unassignedShards()).isEqualTo(2);
+        // Elasticsearch doesn't read the open index shards and counts all _cat/allocation rows instead.
+        if (after.maxShardsPerNode() != Integer.MAX_VALUE) {
+            assertThat(after.openShards() - before.openShards()).isEqualTo(4);
+        }
+    }
+
+    @Test
     public void health() {
         final String index = client().createRandomIndex("cluster_it_");
         when(indexSetRegistry.getIndexWildcards()).thenReturn(new String[]{index});
