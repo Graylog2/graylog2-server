@@ -1,5 +1,5 @@
 type = "f"
-message = "Fix editing a pipeline's title or description reverting stage changes made since the page was opened."
+message = "Fix pipeline details page dialogs saving outdated or cancelled values, which could revert stage changes when editing a pipeline's title or description."
 
 issues = ["28128"]
 pulls = ["28129"]
