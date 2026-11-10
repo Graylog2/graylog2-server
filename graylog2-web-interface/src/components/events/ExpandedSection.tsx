@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import useMetaDataContext from 'components/common/EntityDataTable/hooks/useMetaDataContext';
@@ -24,21 +23,13 @@ import useNonDisplayedAttributes from 'components/events/events/hooks/useNonDisp
 import type { DefaultLayout } from 'components/common/EntityDataTable/types';
 import usePermissions from 'hooks/usePermissions';
 import TagsDetailRow from 'components/events/TagsDetailRow';
+import TacticsTechniquesDetailRow from 'components/events/TacticsTechniquesDetailRow';
 
 const noDetails = <em>No further details</em>;
 
 type Props = {
   defaultLayout: DefaultLayout;
   event: Event;
-};
-
-const TacticsTechniquesPluginRow = ({ event }: { event: Event }) => {
-  const plugin = PluginStore.exports('events.components.tacticsTechniquesDetailRow')[0];
-  const enabled = plugin?.useCondition?.() ?? !!plugin;
-  if (!plugin || !enabled) return null;
-  const Row = plugin.component;
-
-  return <Row entity={event} />;
 };
 
 const GeneralEventDetails = ({ defaultLayout, event }: Props) => {
@@ -54,7 +45,7 @@ const GeneralEventDetails = ({ defaultLayout, event }: Props) => {
         <GeneralEventDetailsTable attributesList={nonDisplayedAttributes} event={event} meta={meta} />
       ) : null}
       <TagsDetailRow tags={event.tags} />
-      <TacticsTechniquesPluginRow event={event} />
+      <TacticsTechniquesDetailRow entity={event} />
     </>
   );
 };
