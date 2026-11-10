@@ -30,6 +30,8 @@ import useDashboards from 'views/components/dashboard/hooks/useDashboards';
 import useStreams from 'components/streams/hooks/useStreams';
 import useSavedSearches from 'views/hooks/useSavedSearches';
 import type { SettingsFormValues } from 'components/users/UserEdit/SettingsSection';
+// Checks the edited user's permissions, not the current user's.
+// eslint-disable-next-line no-restricted-imports
 import { hasAdminPermission, isAnyPermitted, isPermitted } from 'util/PermissionsMixin';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 
