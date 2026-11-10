@@ -60,6 +60,5 @@ Besides roles and shares, users can hold permissions directly. Starting with Gra
 deprecated. Support for them will be removed in Graylog 8.0.
 
 The web interface doesn't manage direct user permissions, so this mainly affects REST API clients. Graylog logs a
-warning when a request sets direct permissions or uses one of the deprecated endpoints listed above.
-
-Graylog users are encouraged to assign roles instead of direct permissions.
+warning when a request sets direct permissions or uses one of the deprecated endpoints listed above. To avoid the
+warnings, omit the `permissions` field in `POST /users` and `PUT /users/{userId}`, and assign roles instead.
