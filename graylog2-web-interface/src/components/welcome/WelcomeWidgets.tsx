@@ -16,22 +16,20 @@
  */
 import * as React from 'react';
 
-import ReactGridContainer from 'components/common/ReactGridContainer';
 import { ReplaySearchButtonComponent } from 'views/components/widgets/ReplaySearchButton';
 import StandaloneWidgetGroup from 'views/components/standalone/StandaloneWidgetGroup';
 import StandaloneWidgetCard from 'views/components/standalone/StandaloneWidgetCard';
 
-import WelcomeWidgetsSkeleton, { WIDGET_GRID_COLUMNS } from './WelcomeWidgetsSkeleton';
+import WelcomeWidgetsGrid from './WelcomeWidgetsGrid';
+import WelcomeWidgetsSkeleton from './WelcomeWidgetsSkeleton';
 import type { WelcomeWidgetEntry } from './welcomeWidgetBuilders';
-
-const NOOP = () => {};
 
 type Props = {
   entries: Array<WelcomeWidgetEntry>;
 };
 
 /**
- * Shows welcome-page widgets read-only in a fixed grid, running one search for all of them.
+ * Shows welcome-page widgets read-only in a grid, running one search for all of them.
  * The entries need stable widget ids, otherwise the search runs again on every render.
  */
 const WelcomeWidgets = ({ entries }: Props) => (
@@ -39,21 +37,15 @@ const WelcomeWidgets = ({ entries }: Props) => (
     widgets={entries.map(({ widget }) => widget)}
     titles={Object.fromEntries(entries.map(({ widget, title }) => [widget.id, title]))}
     loadingPlaceholder={<WelcomeWidgetsSkeleton entries={entries} />}>
-    <ReactGridContainer
-      columns={WIDGET_GRID_COLUMNS}
-      positions={Object.fromEntries(entries.map(({ widget, position }) => [widget.id, position]))}
-      onPositionsChange={NOOP}
-      isResizable={false}
-      locked>
-      {entries.map(({ widget }) => (
-        <div key={widget.id}>
-          <StandaloneWidgetCard
-            widgetId={widget.id}
-            actions={widget.context && <ReplaySearchButtonComponent searchLink={widget.context} />}
-          />
-        </div>
-      ))}
-    </ReactGridContainer>
+    <WelcomeWidgetsGrid
+      entries={entries}
+      renderWidget={({ widget }) => (
+        <StandaloneWidgetCard
+          widgetId={widget.id}
+          actions={widget.context && <ReplaySearchButtonComponent searchLink={widget.context} />}
+        />
+      )}
+    />
   </StandaloneWidgetGroup>
 );
 

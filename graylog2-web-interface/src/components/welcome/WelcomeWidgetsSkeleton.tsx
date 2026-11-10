@@ -16,16 +16,12 @@
  */
 import * as React from 'react';
 
-import ReactGridContainer from 'components/common/ReactGridContainer';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import WidgetCard from 'views/components/widgets/WidgetCard';
 import WidgetContentSkeleton from 'views/components/widgets/WidgetContentSkeleton';
 
+import WelcomeWidgetsGrid from './WelcomeWidgetsGrid';
 import type { WelcomeWidgetEntry } from './welcomeWidgetBuilders';
-
-export const WIDGET_GRID_COLUMNS = { xxl: 12, xl: 12, lg: 12, md: 12, sm: 12, xs: 12 };
-
-const NOOP = () => {};
 
 type Props = {
   entries: Array<WelcomeWidgetEntry>;
@@ -35,22 +31,16 @@ type Props = {
  * Mirrors the widget grid of `WelcomeWidgets` with titled skeleton cards while its search is being prepared.
  */
 const WelcomeWidgetsSkeleton = ({ entries }: Props) => (
-  <ReactGridContainer
-    columns={WIDGET_GRID_COLUMNS}
-    positions={Object.fromEntries(entries.map(({ widget, position }) => [widget.id, position]))}
-    onPositionsChange={NOOP}
-    isResizable={false}
-    locked>
-    {entries.map(({ widget, title }) => (
-      <div key={widget.id}>
-        <WidgetCard headline={title}>
-          <WidgetContentSkeleton
-            visualization={widget.config instanceof AggregationWidgetConfig ? widget.config.visualization : undefined}
-          />
-        </WidgetCard>
-      </div>
-    ))}
-  </ReactGridContainer>
+  <WelcomeWidgetsGrid
+    entries={entries}
+    renderWidget={({ widget, title }) => (
+      <WidgetCard headline={title}>
+        <WidgetContentSkeleton
+          visualization={widget.config instanceof AggregationWidgetConfig ? widget.config.visualization : undefined}
+        />
+      </WidgetCard>
+    )}
+  />
 );
 
 export default WelcomeWidgetsSkeleton;

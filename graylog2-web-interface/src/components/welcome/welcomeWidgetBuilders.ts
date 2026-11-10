@@ -28,14 +28,16 @@ import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationW
 import Series from 'views/logic/aggregationbuilder/Series';
 import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 import type Widget from 'views/logic/widgets/Widget';
-import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 
 export const DEFAULT_TIME_RANGE_SECONDS = 86400;
 
 export type WelcomeWidgetEntry = {
   title: string;
   widget: Widget;
-  position: WidgetPosition;
+  /** How many of the 12 grid columns the widget spans. */
+  columns: number;
+  /** CSS height, e.g. `312px`. */
+  height: string;
 };
 
 export const messagesTodayLink = (timeRange: RelativeTimeRangeWithEnd) =>
