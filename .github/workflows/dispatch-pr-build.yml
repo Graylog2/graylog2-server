@@ -16,6 +16,8 @@ on:
 jobs:
   dispatchedPR:
     name: Dispatch wait and check
+    permissions:
+      pull-requests: write
     runs-on: ubuntu-slim
 
     steps:
@@ -45,10 +47,28 @@ jobs:
           NEW_PR_BODY: "${{ github.event.pull_request.body }}"
           BASE_CHANGED: "${{ github.event.changes.base && 'true' || 'false' }}"
 
+      - name: Add e2e-tests label to PRs against stable branches
+        id: stable-branch
+        if: ${{ github.event.action == 'opened' }}
+        run: |
+          if [[ "$BASE_BRANCH" =~ ^[0-9]+\.[0-9]+$ ]]; then
+            echo "PR targets stable branch $BASE_BRANCH, adding e2e-tests label"
+            gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/labels" -f "labels[]=e2e-tests" \
+              || echo "::warning::Unable to add e2e-tests label"
+            echo "e2e=true" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BASE_BRANCH: "${{ github.base_ref }}"
+          PR_NUMBER: "${{ github.event.number }}"
+
       - name: Check e2e-tests label
         id: e2e-tests
         run: |
           has_label="$(jq -r '.labels[].name | select(. == "e2e-tests")' <<< "$PR_EVENT")"
+          if [ "$STABLE_BRANCH_E2E" = "true" ]; then
+            has_label="true"
+          fi
           {
             if [ -n "$has_label" ]; then
               echo "run=true"
@@ -58,6 +78,7 @@ jobs:
           } | tee -a "$GITHUB_OUTPUT"
         env:
           PR_EVENT: "${{ toJSON(github.event.pull_request) }}"
+          STABLE_BRANCH_E2E: "${{ steps.stable-branch.outputs.e2e }}"
 
       - name: Detect repository
         run: |
