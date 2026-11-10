@@ -18,7 +18,7 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import ExpandableCellList from 'components/common/ExpandableCellList';
+import ExpandableCellList from 'components/common/cell-list/ExpandableCellList';
 
 type Item = { id: string; name: string };
 
@@ -28,19 +28,13 @@ const items: Array<Item> = [
   { id: 'item-3', name: 'Charlie' },
 ];
 
-const SUT = ({
-  items: sutItems = items,
-  collapsedCount = undefined,
-}: {
-  items?: Array<Item>;
-  collapsedCount?: number;
-}) => (
+const SUT = (props: Partial<React.ComponentProps<typeof ExpandableCellList<Item>>>) => (
   <ExpandableCellList<Item>
-    items={sutItems}
-    collapsedCount={collapsedCount}
+    items={items}
     renderItem={({ name }) => name}
     itemKey={({ id }) => id}
     itemTitle={({ name }) => `Title of ${name}`}
+    {...props}
   />
 );
 

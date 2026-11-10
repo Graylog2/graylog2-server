@@ -18,7 +18,7 @@ import * as React from 'react';
 
 import useEntityTitles from 'hooks/useEntityTitles';
 import { Link, Spinner } from 'components/common';
-import ExpandableCellList from 'components/common/ExpandableCellList';
+import ExpandableCellList from 'components/common/cell-list/ExpandableCellList';
 
 type EntityItem = {
   id: string;

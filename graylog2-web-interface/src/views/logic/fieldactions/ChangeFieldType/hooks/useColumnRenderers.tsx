@@ -20,7 +20,7 @@ import take from 'lodash/take';
 import last from 'lodash/last';
 
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
-import ExpandableCellList from 'components/common/ExpandableCellList';
+import ExpandableCellList from 'components/common/cell-list/ExpandableCellList';
 import type { FieldTypes, FieldTypeUsage, TypeHistoryItem } from 'views/logic/fieldactions/ChangeFieldType/types';
 
 const RestTypesContainer = styled.i(

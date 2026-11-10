@@ -25,7 +25,7 @@ import EventTypeLabel from 'components/events/events/EventTypeLabel';
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import PriorityName from 'components/events/events/PriorityName';
 import usePluginEntities from 'hooks/usePluginEntities';
-import EventFieldsCellList from 'components/events/events/EventFieldsCellList';
+import ExpandableFieldsCellList from 'components/common/cell-list/ExpandableFieldsCellList';
 import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
 import { Timestamp } from 'components/common';
 import type { ColumnRenderersByAttribute, EntityBase } from 'components/common/EntityDataTable/types';
@@ -61,10 +61,14 @@ export const EventDefinitionTypeRenderer = ({ type }: { type: string }) => {
 };
 
 const FieldsRenderer = ({ fields }: { fields: { [fieldName: string]: string } }) =>
-  isEmpty(fields) ? <em>No additional Fields added to this Event.</em> : <EventFieldsCellList fields={fields} />;
+  isEmpty(fields) ? <em>No additional Fields added to this Event.</em> : <ExpandableFieldsCellList fields={fields} />;
 
 const GroupByFieldsRenderer = ({ groupByFields }: { groupByFields: Record<string, string> }) =>
-  isEmpty(groupByFields) ? <em>No group-by fields on this Event.</em> : <EventFieldsCellList fields={groupByFields} />;
+  isEmpty(groupByFields) ? (
+    <em>No group-by fields on this Event.</em>
+  ) : (
+    <ExpandableFieldsCellList fields={groupByFields} />
+  );
 
 const StyledDiv = styled.div`
   cursor: pointer;

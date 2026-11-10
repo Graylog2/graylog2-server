@@ -20,7 +20,7 @@ import type { Stream } from 'logic/streams/types';
 import useInputDetails from 'hooks/useInputDetails';
 import type { ResolvedInput } from 'hooks/useInputDetails';
 import { Link, Spinner } from 'components/common';
-import ExpandableCellList from 'components/common/ExpandableCellList';
+import ExpandableCellList from 'components/common/cell-list/ExpandableCellList';
 import { useStreamMetricsFor } from 'components/streams/StreamsOverview/StreamMetricsContext';
 import { useInputTitleLinkBuilder } from 'components/streams/StreamsOverview/inputTitleLinks';
 

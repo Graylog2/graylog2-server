@@ -17,7 +17,7 @@
 import React from 'react';
 
 import { Link } from 'components/common';
-import ExpandableCellList from 'components/common/ExpandableCellList';
+import ExpandableCellList from 'components/common/cell-list/ExpandableCellList';
 import Routes from 'routing/Routes';
 import usePermissions from 'hooks/usePermissions';
 
