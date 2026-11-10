@@ -1,0 +1,89 @@
+{
+  "index" : "alloc-test-r12",
+  "shard" : 0,
+  "primary" : false,
+  "current_state" : "unassigned",
+  "unassigned_info" : {
+    "reason" : "REPLICA_ADDED",
+    "at" : "2026-10-06T21:49:07.334Z",
+    "last_allocation_status" : "no_attempt"
+  },
+  "can_allocate" : "no",
+  "allocate_explanation" : "cannot allocate because allocation is not permitted to any of the nodes",
+  "node_allocation_decisions" : [
+    {
+      "node_id" : "6Rv--47TSK61F9h03QIgEQ",
+      "node_name" : "os3-node-2",
+      "transport_address" : "10.40.68.10:9300",
+      "node_attributes" : {
+        "shard_indexing_pressure_enabled" : "true"
+      },
+      "node_decision" : "no",
+      "deciders" : [
+        {
+          "decider" : "replica_after_primary_active",
+          "decision" : "NO",
+          "explanation" : "primary shard for this replica is not yet active"
+        },
+        {
+          "decider" : "throttling",
+          "decision" : "NO",
+          "explanation" : "primary shard for this replica is not yet active"
+        }
+      ]
+    },
+    {
+      "node_id" : "KvBPYWMFRkedKhzv-9qoHA",
+      "node_name" : "os3-node-0",
+      "transport_address" : "10.40.68.5:9300",
+      "node_attributes" : {
+        "shard_indexing_pressure_enabled" : "true"
+      },
+      "node_decision" : "no",
+      "deciders" : [
+        {
+          "decider" : "replica_after_primary_active",
+          "decision" : "NO",
+          "explanation" : "primary shard for this replica is not yet active"
+        },
+        {
+          "decider" : "filter",
+          "decision" : "NO",
+          "explanation" : "node does not match index setting [index.routing.allocation.require] filters [_name:\"os3-node-2\"]"
+        },
+        {
+          "decider" : "throttling",
+          "decision" : "NO",
+          "explanation" : "primary shard for this replica is not yet active"
+        }
+      ]
+    },
+    {
+      "node_id" : "R-zGvRGdRlGomtFe_WC9yw",
+      "node_name" : "os3-node-1",
+      "transport_address" : "10.40.68.7:9300",
+      "node_attributes" : {
+        "shard_indexing_pressure_enabled" : "true"
+      },
+      "node_decision" : "no",
+      "deciders" : [
+        {
+          "decider" : "replica_after_primary_active",
+          "decision" : "NO",
+          "explanation" : "primary shard for this replica is not yet active"
+        },
+        {
+          "decider" : "filter",
+          "decision" : "NO",
+          "explanation" : "node does not match index setting [index.routing.allocation.require] filters [_name:\"os3-node-2\"]"
+        },
+        {
+          "decider" : "throttling",
+          "decision" : "NO",
+          "explanation" : "primary shard for this replica is not yet active"
+        }
+      ]
+    }
+  ]
+}
+

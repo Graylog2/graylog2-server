@@ -1,0 +1,64 @@
+{
+  "index" : "alloc-test-r8",
+  "shard" : 0,
+  "primary" : false,
+  "current_state" : "unassigned",
+  "unassigned_info" : {
+    "reason" : "NODE_LEFT",
+    "at" : "2026-10-06T15:46:13.096Z",
+    "details" : "node_left [2svFqa49RO2JWKoEAwoX_g]",
+    "last_allocation_status" : "no_attempt"
+  },
+  "can_allocate" : "no",
+  "allocate_explanation" : "cannot allocate because allocation is not permitted to any of the nodes",
+  "node_allocation_decisions" : [
+    {
+      "node_id" : "2svFqa49RO2JWKoEAwoX_g",
+      "node_name" : "os-dev-node-1",
+      "transport_address" : "10.40.2.174:9300",
+      "node_attributes" : {
+        "shard_indexing_pressure_enabled" : "true"
+      },
+      "node_decision" : "no",
+      "deciders" : [
+        {
+          "decider" : "replica_after_primary_active",
+          "decision" : "NO",
+          "explanation" : "primary shard for this replica is not yet active"
+        },
+        {
+          "decider" : "throttling",
+          "decision" : "NO",
+          "explanation" : "primary shard for this replica is not yet active"
+        }
+      ]
+    },
+    {
+      "node_id" : "rtBtz0HaSxu-1B50379-zA",
+      "node_name" : "os-dev-node-0",
+      "transport_address" : "10.40.2.172:9300",
+      "node_attributes" : {
+        "shard_indexing_pressure_enabled" : "true"
+      },
+      "node_decision" : "no",
+      "deciders" : [
+        {
+          "decider" : "replica_after_primary_active",
+          "decision" : "NO",
+          "explanation" : "primary shard for this replica is not yet active"
+        },
+        {
+          "decider" : "filter",
+          "decision" : "NO",
+          "explanation" : "node does not match index setting [index.routing.allocation.include] filters [_name:\"os-dev-node-1 OR os-dev-node-2\"]"
+        },
+        {
+          "decider" : "throttling",
+          "decision" : "NO",
+          "explanation" : "primary shard for this replica is not yet active"
+        }
+      ]
+    }
+  ]
+}
+

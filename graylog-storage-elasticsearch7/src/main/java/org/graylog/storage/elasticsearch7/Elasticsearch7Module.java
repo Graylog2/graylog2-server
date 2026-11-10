@@ -40,6 +40,7 @@ import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
 import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.IndicesAdapter;
+import org.graylog2.indexer.management.IndexManagementAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
 import org.graylog2.indexer.searches.SearchesAdapter;
@@ -86,6 +87,7 @@ public class Elasticsearch7Module extends VersionAwareModule {
 
         bindForSupportedVersion(QuerySuggestionsService.class).to(QuerySuggestionsES7.class);
         bindForSupportedVersion(ProxyRequestAdapter.class).to(ProxyRequestAdapterES7.class);
+        bindForSupportedVersion(IndexManagementAdapter.class).to(IndexManagementAdapterES7.class);
 
         install(new FactoryModuleBuilder().build(ScrollResultES7.Factory.class));
 

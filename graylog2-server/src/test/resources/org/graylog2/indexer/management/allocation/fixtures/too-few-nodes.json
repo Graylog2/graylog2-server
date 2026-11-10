@@ -1,0 +1,67 @@
+{
+  "index" : "alloc-test-r1",
+  "shard" : 0,
+  "primary" : false,
+  "current_state" : "unassigned",
+  "unassigned_info" : {
+    "reason" : "INDEX_CREATED",
+    "at" : "2026-10-06T15:41:30.353Z",
+    "last_allocation_status" : "no_attempt"
+  },
+  "can_allocate" : "no",
+  "allocate_explanation" : "cannot allocate because allocation is not permitted to any of the nodes",
+  "node_allocation_decisions" : [
+    {
+      "node_id" : "2svFqa49RO2JWKoEAwoX_g",
+      "node_name" : "os-dev-node-1",
+      "transport_address" : "10.40.2.171:9300",
+      "node_attributes" : {
+        "shard_indexing_pressure_enabled" : "true"
+      },
+      "node_decision" : "no",
+      "weight_ranking" : 1,
+      "deciders" : [
+        {
+          "decider" : "same_shard",
+          "decision" : "NO",
+          "explanation" : "a copy of this shard is already allocated to this node [[alloc-test-r1][0], node[2svFqa49RO2JWKoEAwoX_g], [P], s[STARTED], a[id=xkShi73LS4O9aEvxnGBN8Q]]"
+        }
+      ]
+    },
+    {
+      "node_id" : "Ubm6UZfJTACzIT7Ihle31Q",
+      "node_name" : "os-dev-node-2",
+      "transport_address" : "10.40.2.170:9300",
+      "node_attributes" : {
+        "shard_indexing_pressure_enabled" : "true"
+      },
+      "node_decision" : "no",
+      "weight_ranking" : 2,
+      "deciders" : [
+        {
+          "decider" : "same_shard",
+          "decision" : "NO",
+          "explanation" : "a copy of this shard is already allocated to this node [[alloc-test-r1][0], node[Ubm6UZfJTACzIT7Ihle31Q], [R], s[STARTED], a[id=Mk6ZwDQzROK2qyCFifIGWQ]]"
+        }
+      ]
+    },
+    {
+      "node_id" : "rtBtz0HaSxu-1B50379-zA",
+      "node_name" : "os-dev-node-0",
+      "transport_address" : "10.40.2.172:9300",
+      "node_attributes" : {
+        "shard_indexing_pressure_enabled" : "true"
+      },
+      "node_decision" : "no",
+      "weight_ranking" : 3,
+      "deciders" : [
+        {
+          "decider" : "same_shard",
+          "decision" : "NO",
+          "explanation" : "a copy of this shard is already allocated to this node [[alloc-test-r1][0], node[rtBtz0HaSxu-1B50379-zA], [R], s[STARTED], a[id=5nBZKtYoRTC3viUczD-N0A]]"
+        }
+      ]
+    }
+  ]
+}
+

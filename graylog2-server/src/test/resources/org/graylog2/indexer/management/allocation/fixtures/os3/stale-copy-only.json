@@ -1,0 +1,42 @@
+{
+  "index" : "alloc-test-r8",
+  "shard" : 0,
+  "primary" : true,
+  "current_state" : "unassigned",
+  "unassigned_info" : {
+    "reason" : "NODE_LEFT",
+    "at" : "2026-10-06T21:44:08.313Z",
+    "details" : "node_left [6Rv--47TSK61F9h03QIgEQ]",
+    "last_allocation_status" : "no_valid_shard_copy"
+  },
+  "can_allocate" : "no_valid_shard_copy",
+  "allocate_explanation" : "cannot allocate because all found copies of the shard are either stale or corrupt",
+  "node_allocation_decisions" : [
+    {
+      "node_id" : "KvBPYWMFRkedKhzv-9qoHA",
+      "node_name" : "os3-node-0",
+      "transport_address" : "10.40.68.5:9300",
+      "node_attributes" : {
+        "shard_indexing_pressure_enabled" : "true"
+      },
+      "node_decision" : "no",
+      "store" : {
+        "found" : false
+      }
+    },
+    {
+      "node_id" : "R-zGvRGdRlGomtFe_WC9yw",
+      "node_name" : "os3-node-1",
+      "transport_address" : "10.40.68.7:9300",
+      "node_attributes" : {
+        "shard_indexing_pressure_enabled" : "true"
+      },
+      "node_decision" : "no",
+      "store" : {
+        "in_sync" : false,
+        "allocation_id" : "4KzK0976T-yr8b-P5QsUrA"
+      }
+    }
+  ]
+}
+
