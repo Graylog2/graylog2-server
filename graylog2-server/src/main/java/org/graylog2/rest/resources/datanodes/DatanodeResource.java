@@ -112,6 +112,6 @@ public class DatanodeResource extends RestResource {
 
 
         return PageListResponse.create(query, result.pagination(),
-                result.grandTotal().orElse(0L), sort, order, result.stream().toList(), attributes, settings);
+                result.pagination().total(), sort, order, result.stream().toList(), attributes, settings);
     }
 }
