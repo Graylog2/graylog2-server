@@ -119,7 +119,12 @@ The image contains the full build of `/src`; there is no network.
   `/opt/graylog-tests-needing-docker.txt`, so reproduce those cases against `graylog-services` instead. Results of
   the run made at build time: `/var/log/graylog-unit-tests.log` and `graylog2-server/target/surefire-reports/`.
 - **Frontend tests**: `cd graylog2-web-interface && export PATH="$PWD/node:$PWD/node/yarn/dist/bin:$PATH" && yarn
-  test <path>` (use `yarn test`, not `yarn jest`).
+  test <path>` (use `yarn test`, not `yarn jest`). The tests run in Jest with jsdom.
+- **No browser.** The image has no Chrome or other browser: the only build step that would use one is a
+  release check for CI, and installing a browser for it would not help the audit. To confirm XSS, write a Jest
+  test that renders the affected component with the hostile data (for example a message field value) and checks
+  whether the markup or script ends up in the DOM unescaped, and show with `graylog-services` and the API how
+  that data gets stored.
 
 ## How we rate severity
 
