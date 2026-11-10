@@ -20,7 +20,6 @@ import styled from 'styled-components';
 import { DropdownButton, FormControl, InputGroup, MenuItem } from 'components/bootstrap';
 
 import type { ConfigurationUnits } from './types';
-import { formatQuantityValue, parseQuantityValue } from './configurationQuantities';
 
 const QuantityInputGroup = styled(InputGroup)`
   display: flex;
@@ -46,12 +45,14 @@ type Props = {
   id: string;
   label: string;
   units: ConfigurationUnits;
-  value: string | undefined;
+  amount: string;
+  unit: string;
   placeholder: string;
   disabled: boolean;
   invalid?: boolean;
   describedBy?: string;
-  onChange: (value: string) => void;
+  onAmountChange: (amount: string) => void;
+  onUnitChange: (unit: string) => void;
   onBlur: () => void;
   buttonAfter?: React.ReactNode;
 };
@@ -60,56 +61,50 @@ const ConfigurationQuantityInput = ({
   id,
   label,
   units,
-  value,
+  amount,
+  unit,
   placeholder,
   disabled,
   invalid = false,
   describedBy = undefined,
-  onChange,
+  onAmountChange,
+  onUnitChange,
   onBlur,
   buttonAfter = undefined,
-}: Props) => {
-  const { amount, unit } = parseQuantityValue(value, units);
-  const unitOptions = Object.entries(units);
-
-  return (
-    <QuantityInputGroup>
-      <QuantityControl
-        id={id}
-        name={id}
-        type="number"
-        value={amount}
-        placeholder={placeholder}
-        min={0}
-        max={maxByUnit[unit]}
-        step="any"
-        aria-invalid={invalid}
-        aria-describedby={describedBy}
+}: Props) => (
+  <QuantityInputGroup>
+    <QuantityControl
+      id={id}
+      name={id}
+      type="number"
+      value={amount}
+      placeholder={placeholder}
+      min={0}
+      max={maxByUnit[unit]}
+      step="any"
+      aria-invalid={invalid}
+      aria-describedby={describedBy}
+      disabled={disabled}
+      onChange={(event) => onAmountChange((event.target as HTMLInputElement).value)}
+      onBlur={onBlur}
+    />
+    <QuantityActions>
+      <UnitDropdown
+        id={`${id}-unit`}
+        bsStyle="transparent"
+        buttonTitle={`${label} unit: ${units[unit]}`}
+        title={units[unit]}
         disabled={disabled}
-        onChange={(event) => onChange(formatQuantityValue((event.target as HTMLInputElement).value, unit))}
-        onBlur={onBlur}
-      />
-      <QuantityActions>
-        <UnitDropdown
-          id={`${id}-unit`}
-          bsStyle="transparent"
-          buttonTitle={`${label} unit`}
-          title={units[unit]}
-          disabled={disabled}
-          onBlur={onBlur}>
-          {unitOptions.map(([suffix, unitLabel]) => (
-            <MenuItem
-              key={suffix}
-              active={unit === suffix}
-              onSelect={() => onChange(formatQuantityValue(amount, suffix))}>
-              {unitLabel}
-            </MenuItem>
-          ))}
-        </UnitDropdown>
-        {buttonAfter}
-      </QuantityActions>
-    </QuantityInputGroup>
-  );
-};
+        onBlur={onBlur}>
+        {Object.entries(units).map(([suffix, unitLabel]) => (
+          <MenuItem key={suffix} active={unit === suffix} onSelect={() => onUnitChange(suffix)}>
+            {unitLabel}
+          </MenuItem>
+        ))}
+      </UnitDropdown>
+      {buttonAfter}
+    </QuantityActions>
+  </QuantityInputGroup>
+);
 
 export default ConfigurationQuantityInput;

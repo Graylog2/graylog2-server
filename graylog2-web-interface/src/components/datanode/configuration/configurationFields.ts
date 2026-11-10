@@ -139,27 +139,33 @@ const parseWatermark = (value: string) => {
   return { kind: 'usage', amount: Number(value) };
 };
 
-const validateWatermarks = (values: Record<string, string>) => {
-  if (watermarkNames.some((name) => values[name] === undefined)) return undefined;
+const validateWatermarks = (watermarks: Array<ConfigurationParameter>, values: ConfigurationValues) => {
+  const known = watermarks.flatMap((parameter) => {
+    const value = getDisplayedConfigurationValue(parameter, values[parameter.name]);
 
-  const [low, high, flood] = watermarkNames.map((name) => parseWatermark(values[name].trim()));
+    return value === undefined ? [] : [parseWatermark(value.trim())];
+  });
+  const [low, high, flood] = watermarks.map(({ label }) => `"${label}"`);
 
-  if (low.kind !== high.kind || high.kind !== flood.kind) {
-    return 'Use disk usage units for all three watermarks, or use free-space units for all three.';
+  if (known.some(({ kind }) => kind !== known[0].kind)) {
+    return `Use disk usage units for ${low}, ${high} and ${flood}, or use free-space units for all three.`;
   }
 
-  if (low.kind === 'usage') {
-    return low.amount <= high.amount && high.amount <= flood.amount
-      ? undefined
-      : 'Set watermarks in ascending order: low, high, then flood stage.';
-  }
+  const isUsage = known[0]?.kind === 'usage';
+  const isOrdered = known.every(
+    ({ amount }, index) =>
+      index === 0 || (isUsage ? known[index - 1].amount <= amount : known[index - 1].amount >= amount),
+  );
 
-  return low.amount >= high.amount && high.amount >= flood.amount
-    ? undefined
-    : 'Set free-space watermarks in descending order: low, high, then flood stage.';
+  if (isOrdered) return undefined;
+
+  return isUsage
+    ? `Set watermarks in ascending order: ${low}, ${high}, then ${flood}.`
+    : `Set free-space watermarks in descending order: ${low}, ${high}, then ${flood}.`;
 };
 
 export const validateConfigurationValues = (
+  initialValues: ConfigurationValues,
   values: ConfigurationValues,
   parameters: Array<ConfigurationParameter>,
 ): Record<string, string> => {
@@ -167,22 +173,19 @@ export const validateConfigurationValues = (
 
   parameters.forEach((parameter) => {
     const value = values[parameter.name];
-    if (value == null) return;
+    if (value == null || value === initialValues[parameter.name]) return;
 
     const error = validateParameter(parameter, value);
 
     if (error) errors.push([parameter.name, error]);
   });
 
-  const hasWatermarks = watermarkNames.every((name) => parameters.some(({ name: it }) => it === name));
-  const displayedValues: Record<string, string> = Object.fromEntries(
-    parameters.flatMap((parameter) => {
-      const value = getDisplayedConfigurationValue(parameter, values[parameter.name]);
-
-      return value === undefined ? [] : [[parameter.name, value]];
-    }),
-  );
-  const watermarkError = hasWatermarks && errors.length === 0 ? validateWatermarks(displayedValues) : undefined;
+  const watermarks = watermarkNames.flatMap((name) => parameters.filter((parameter) => parameter.name === name));
+  const changesWatermarks = watermarkNames.some((name) => values[name] !== initialValues[name]);
+  const watermarkError =
+    watermarks.length === watermarkNames.length && changesWatermarks && errors.length === 0
+      ? validateWatermarks(watermarks, values)
+      : undefined;
 
   if (watermarkError) errors.push([watermarkNames[0], watermarkError]);
 

@@ -23,14 +23,23 @@ type Props = {
   category: ConfigurationCategory;
   canEdit: boolean;
   canDelete: boolean;
+  selectedUnits: Record<string, string>;
+  onSelectUnit: (name: string, unit: string) => void;
 };
 
-const DataNodeConfigurationSection = ({ category, canEdit, canDelete }: Props) => (
+const DataNodeConfigurationSection = ({ category, canEdit, canDelete, selectedUnits, onSelectUnit }: Props) => (
   <section aria-labelledby={`data-node-configuration-${category.id}`}>
     <h3 id={`data-node-configuration-${category.id}`}>{category.label}</h3>
     <hr />
     {category.parameters.map((parameter) => (
-      <ConfigurationFieldInput key={parameter.name} parameter={parameter} canEdit={canEdit} canDelete={canDelete} />
+      <ConfigurationFieldInput
+        key={parameter.name}
+        parameter={parameter}
+        canEdit={canEdit}
+        canDelete={canDelete}
+        selectedUnit={selectedUnits[parameter.name]}
+        onSelectUnit={(unit) => onSelectUnit(parameter.name, unit)}
+      />
     ))}
   </section>
 );

@@ -43,7 +43,9 @@ import RoutePaths from 'routing/Routes';
 import DataNodePage from './DataNodePage';
 
 jest.mock('hooks/useCurrentUser');
-jest.mock('routing/request');
+jest.mock('@graylog/server-api', () => ({
+  SystemManagedConfiguration: { get: jest.fn(), update: jest.fn() },
+}));
 jest.mock('components/datanode/hooks/useDataNode');
 jest.mock('components/cluster-configuration/ClusterConfigurationPageNavigation', () => () => null);
 jest.mock('components/datanode/DataNodeList/DataNodeActions', () => () => null);
@@ -131,24 +133,24 @@ describe('DataNodePage configuration', () => {
   });
 
   describe('Rendering and navigation', () => {
-    it('preserves node details and opens the reusable editor with the saved heap size', async () => {
+    it('preserves node details and opens the first section the API returns', async () => {
       const router = renderPage('');
-      const heap = await screen.findByRole('spinbutton', { name: 'OpenSearch JVM heap (GB)' });
 
-      expect(router.state.location.pathname).toBe(`${nodePath}/${nodeSettingsSection}`);
+      expect(await screen.findByRole('spinbutton', { name: 'Indexing buffer size (% of heap)' })).toHaveValue(10);
+      expect(router.state.location.pathname).toBe(`${nodePath}/indexing-and-recovery`);
       expect(screen.getByRole('heading', { name: `Data Nodes: ${dataNodes[0].hostname}` })).toBeInTheDocument();
-      expect(heap).toHaveValue(2);
-      expect(heap).toHaveAccessibleDescription(/opensearch_heap · Current source: This field/);
-      expect(screen.getByRole('combobox', { name: 'Node roles' })).toBeInTheDocument();
-      expect(screen.getByRole('link', { name: 'Node Settings' })).toHaveAttribute('aria-current', 'page');
+      expect(screen.getByRole('link', { name: 'Indexing and Recovery' })).toHaveAttribute('aria-current', 'page');
       expect(screen.getByRole('link', { name: 'Search' })).toHaveAttribute('href', `${nodePath}/search`);
-      expect(screen.getByRole('link', { name: 'Indexing and Recovery' })).toHaveAttribute(
-        'href',
-        `${nodePath}/indexing-and-recovery`,
-      );
       expect(screen.queryByRole('alert')).not.toBeInTheDocument();
       expect(getApplyButton()).toBeDisabled();
       expect(getApplyButton()).toHaveAccessibleName('Apply changes');
+
+      await userEvent.click(screen.getByRole('link', { name: 'Node Settings' }));
+
+      const heap = await screen.findByRole('spinbutton', { name: 'OpenSearch JVM heap (GB)' });
+      expect(heap).toHaveValue(2);
+      expect(heap).toHaveAccessibleDescription(/opensearch_heap · Current source: This field/);
+      expect(screen.getByRole('combobox', { name: 'Node roles' })).toBeInTheDocument();
     });
 
     it('shows only the selected section and keeps the section in the URL', async () => {
@@ -250,6 +252,34 @@ describe('DataNodePage configuration', () => {
       expect(update).toHaveBeenCalledWith({ node_roles: 'data,search,ingest' }, nodeId);
     });
 
+    it('keeps keyboard focus on node roles when their error appears', async () => {
+      renderPage();
+      await changeConfigurationField('OpenSearch JVM heap', '0', 'GB');
+      await userEvent.click(getApplyButton());
+      await screen.findByText('Enter a value in a supported format.');
+
+      await userEvent.click(screen.getByRole('combobox', { name: 'Node roles' }));
+      await userEvent.keyboard('{Backspace}{Backspace}{Backspace}{Backspace}');
+
+      await screen.findByText('Enter a value.');
+      const roles = screen.getByRole('combobox', { name: 'Node roles' });
+      expect(roles).toHaveFocus();
+      expect(roles).toHaveAccessibleErrorMessage('Enter a value.');
+    });
+
+    it('saves the heap size while the node reports a role the editor does not offer', async () => {
+      mockManagedConfigurationApi([
+        managedConfigurationResponse({ opensearch_heap: '2g', node_roles: 'cluster_manager,data,warm' }, nodeId),
+      ]);
+      const update = jest.spyOn(managedConfigurationApi, 'update');
+      renderPage();
+
+      await changeConfigurationField('OpenSearch JVM heap', '4', 'GB');
+      await save();
+
+      expect(update).toHaveBeenCalledWith({ opensearch_heap: '4g' }, nodeId);
+    });
+
     it('shows a heap size with surrounding whitespace in its unit', async () => {
       mockManagedConfigurationApi([managedConfigurationResponse({ opensearch_heap: ' 512m ' }, nodeId)]);
       renderPage();
@@ -335,7 +365,7 @@ describe('DataNodePage configuration', () => {
 
         await userEvent.click(resetButton);
         if (fallback !== null) {
-          await userEvent.click(screen.getByRole('button', { name: 'OpenSearch JVM heap unit' }));
+          await userEvent.click(screen.getByRole('button', { name: 'OpenSearch JVM heap unit: GB' }));
           await userEvent.click(screen.getByRole('menuitem', { name: 'GB' }));
         }
         await save();
@@ -368,6 +398,21 @@ describe('DataNodePage configuration', () => {
       expect(await screen.findByRole('spinbutton', { name: 'Query cache size (% of heap)' })).toHaveValue(15);
       expect(getApplyButton()).toBeDisabled();
       expect(confirm).not.toHaveBeenCalled();
+    });
+
+    it('keeps the unit chosen for an emptied field across categories', async () => {
+      const update = jest.spyOn(managedConfigurationApi, 'update');
+      renderPage();
+      await userEvent.click(await screen.findByRole('button', { name: 'OpenSearch JVM heap unit: GB' }));
+      await userEvent.click(await screen.findByRole('menuitem', { name: 'MB' }));
+      await userEvent.clear(screen.getByRole('spinbutton', { name: 'OpenSearch JVM heap (MB)' }));
+      await userEvent.click(screen.getByRole('link', { name: 'Search' }));
+      await userEvent.click(await screen.findByRole('link', { name: 'Node Settings' }));
+
+      await userEvent.type(await screen.findByRole('spinbutton', { name: 'OpenSearch JVM heap (MB)' }), '512');
+      await save();
+
+      expect(update).toHaveBeenCalledWith({ opensearch_heap: '512m' }, nodeId);
     });
 
     it('cancels edits in every category without saving or warning on subsequent navigation', async () => {

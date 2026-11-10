@@ -50,9 +50,8 @@ const useDataNodeConfigurationForm = ({ categories, nodeId, basePath }: Options)
   const formik = useFormik<ConfigurationValues>({
     initialValues: serverValues,
     validateOnChange: false,
-    validate: (values) => validateConfigurationValues(values, parameters),
-    onSubmit: async (draftValues, { resetForm, setStatus }) => {
-      setStatus(undefined);
+    validate: (values) => validateConfigurationValues(formik.initialValues, values, parameters),
+    onSubmit: async (draftValues, { resetForm }) => {
       const saveOnly = saveOnlyRequested.current;
       const changes = buildConfigurationValuesPatch(formik.initialValues, draftValues, parameters);
       const changedRestartNames = parameters
@@ -67,10 +66,9 @@ const useDataNodeConfigurationForm = ({ categories, nodeId, basePath }: Options)
       } catch (error) {
         const details =
           error instanceof Error || typeof error === 'string' ? extractErrorMessage(error).trim() : undefined;
-        setStatus(
-          ['Could not save Data Node configuration.', details, 'Your changes have been kept. Please try again.']
-            .filter(Boolean)
-            .join(' '),
+        UserNotification.error(
+          [details, 'Please try again.'].filter(Boolean).join(' '),
+          'Could not save Data Node configuration',
         );
       }
     },

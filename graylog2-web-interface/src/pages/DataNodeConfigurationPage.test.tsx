@@ -50,7 +50,9 @@ import FetchError from 'logic/errors/FetchError';
 import DataNodeConfigurationPage from './DataNodeConfigurationPage';
 
 jest.mock('hooks/useCurrentUser');
-jest.mock('routing/request');
+jest.mock('@graylog/server-api', () => ({
+  SystemManagedConfiguration: { get: jest.fn(), update: jest.fn() },
+}));
 jest.mock('components/datanode/hooks/useRunsWithDataNode');
 jest.mock('components/datanode/hooks/useShowDatanodeMigration');
 
@@ -403,10 +405,10 @@ describe('DataNodeConfigurationPage', () => {
     });
 
     it('keeps the draft when a background refresh fails and retries without remounting the editor', async () => {
-      const transport = mockManagedConfigurationApi([sampleClusterConfiguration]);
+      const client = mockManagedConfigurationApi([sampleClusterConfiguration]);
       const { queryClient } = renderPage();
       await changeConfigurationField('Stop allocating shards at', '80', '% disk used');
-      transport.mockRejectedValueOnce(new Error('Unavailable'));
+      client.get.mockRejectedValueOnce(new Error('Unavailable'));
 
       await act(async () => {
         await queryClient.invalidateQueries();
@@ -446,10 +448,12 @@ describe('DataNodeConfigurationPage', () => {
         renderPage();
         const input = await screen.findByRole('spinbutton', { name: 'Stop allocating shards at (% disk used)' });
         expect(input).toHaveValue(85);
-        await userEvent.click(screen.getByRole('button', { name: 'Stop allocating shards at unit' }));
+        await userEvent.click(screen.getByRole('button', { name: 'Stop allocating shards at unit: % disk used' }));
         await userEvent.click(await screen.findByRole('menuitem', { name: unitLabel }));
         await userEvent.clear(input);
-        expect(screen.getByRole('button', { name: 'Stop allocating shards at unit' })).toHaveTextContent(unitLabel);
+        expect(screen.getByRole('button', { name: `Stop allocating shards at unit: ${unitLabel}` })).toHaveTextContent(
+          unitLabel,
+        );
         expect(screen.getByRole('spinbutton', { name: `Stop allocating shards at (${unitLabel})` })).toHaveValue(null);
         await userEvent.type(input, amount);
         expect(screen.getByRole('spinbutton', { name: `Stop allocating shards at (${unitLabel})` })).toHaveValue(
@@ -468,7 +472,7 @@ describe('DataNodeConfigurationPage', () => {
       const update = jest.spyOn(managedConfigurationApi, 'update');
       renderPage();
       await screen.findByRole('spinbutton', { name: 'Stop allocating shards at (% disk used)' });
-      await userEvent.click(screen.getByRole('button', { name: 'Stop allocating shards at unit' }));
+      await userEvent.click(screen.getByRole('button', { name: 'Stop allocating shards at unit: % disk used' }));
       await userEvent.click(await screen.findByRole('menuitem', { name: 'Ratio (0–1)' }));
       const input = screen.getByRole('spinbutton', { name: 'Stop allocating shards at (Ratio (0–1))' });
       expect(input).toHaveValue(null);
@@ -495,7 +499,9 @@ describe('DataNodeConfigurationPage', () => {
       );
       const input = screen.getByRole('spinbutton', { name: 'Stop allocating shards at (Ratio (0–1))' });
       await userEvent.clear(input);
-      expect(screen.getByRole('button', { name: 'Stop allocating shards at unit' })).toHaveTextContent('Ratio (0–1)');
+      expect(screen.getByRole('button', { name: 'Stop allocating shards at unit: Ratio (0–1)' })).toHaveTextContent(
+        'Ratio (0–1)',
+      );
       await userEvent.type(input, '0.85');
       expect(getApplyButton()).toBeDisabled();
 
@@ -559,9 +565,25 @@ describe('DataNodeConfigurationPage', () => {
       await waitFor(() => expect(update).toHaveBeenCalledWith({ [shardLimitName]: '1200' }, null));
     });
 
-    it('rejects a quantity without an amount against the pattern the API provides', async () => {
+    it('keeps a field that loaded without a value unchanged when it is emptied again', async () => {
+      mockManagedConfigurationApi();
+      renderPage();
+
+      const shardLimit = await screen.findByLabelText('Shard limit per Data Node');
+      await userEvent.type(shardLimit, '5');
+      await userEvent.clear(shardLimit);
+      await userEvent.click(screen.getByRole('button', { name: 'Stop allocating shards at unit: % disk used' }));
+      await userEvent.click(await screen.findByRole('menuitem', { name: 'GB free' }));
+      await userEvent.tab();
+
+      expect(screen.getByRole('spinbutton', { name: 'Stop allocating shards at (GB free)' })).toHaveValue(null);
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+      expect(getApplyButton()).toBeDisabled();
+    });
+
+    it('rejects a cleared quantity that had a value', async () => {
       const update = jest.spyOn(managedConfigurationApi, 'update');
-      const error = 'Enter a value in a supported format.';
+      const error = 'Enter a value.';
       renderPage();
 
       const input = await screen.findByRole('spinbutton', { name: 'Stop allocating shards at (% disk used)' });
@@ -587,7 +609,8 @@ describe('DataNodeConfigurationPage', () => {
         flood: '95',
         correctedLow: '80',
         expectedPatch: { [lowWatermarkName]: '80%' },
-        error: 'Set watermarks in ascending order: low, high, then flood stage.',
+        error:
+          'Set watermarks in ascending order: "Stop allocating shards at", "Move shards away at", then "Protect indexes at".',
       },
       {
         scenario: 'free-space watermarks',
@@ -601,7 +624,8 @@ describe('DataNodeConfigurationPage', () => {
           'cluster.routing.allocation.disk.watermark.high': '10gb',
           'cluster.routing.allocation.disk.watermark.flood_stage': '3gb',
         },
-        error: 'Set free-space watermarks in descending order: low, high, then flood stage.',
+        error:
+          'Set free-space watermarks in descending order: "Stop allocating shards at", "Move shards away at", then "Protect indexes at".',
       },
     ])(
       'validates the order of $scenario and applies corrected values',
@@ -632,7 +656,8 @@ describe('DataNodeConfigurationPage', () => {
       await changeConfigurationField('Stop allocating shards at', '20', 'GB free');
       await userEvent.click(getApplyButton());
 
-      const error = 'Use disk usage units for all three watermarks, or use free-space units for all three.';
+      const error =
+        'Use disk usage units for "Stop allocating shards at", "Move shards away at" and "Protect indexes at", or use free-space units for all three.';
       await screen.findByText(error);
       expect(update).not.toHaveBeenCalled();
 
@@ -652,20 +677,66 @@ describe('DataNodeConfigurationPage', () => {
         ),
       );
     });
+
+    it('checks the order of the watermarks that have values', async () => {
+      mockManagedConfigurationApi();
+      const update = jest.spyOn(managedConfigurationApi, 'update');
+      const error =
+        'Set watermarks in ascending order: "Stop allocating shards at", "Move shards away at", then "Protect indexes at".';
+      renderPage();
+
+      await changeConfigurationField('Stop allocating shards at', '95', '% disk used');
+      await changeConfigurationField('Move shards away at', '90', '% disk used');
+      await userEvent.click(getApplyButton());
+
+      await screen.findByText(error);
+      expect(update).not.toHaveBeenCalled();
+
+      await changeConfigurationField('Move shards away at', '97', '% disk used');
+      await waitFor(() => expect(screen.queryByText(error)).not.toBeInTheDocument());
+      await userEvent.click(getApplyButton());
+
+      await waitFor(() =>
+        expect(update).toHaveBeenCalledWith(
+          { [lowWatermarkName]: '95%', 'cluster.routing.allocation.disk.watermark.high': '97%' },
+          null,
+        ),
+      );
+    });
+
+    it('saves another setting without checking unchanged watermarks', async () => {
+      mockManagedConfigurationApi([
+        managedConfigurationResponse({
+          [lowWatermarkName]: '95%',
+          'cluster.routing.allocation.disk.watermark.high': '90%',
+          'cluster.routing.allocation.disk.watermark.flood_stage': '97%',
+        }),
+      ]);
+      const update = jest.spyOn(managedConfigurationApi, 'update');
+      renderPage();
+
+      await changeConfigurationField('Shard limit per Data Node', '1200');
+      await userEvent.click(getApplyButton());
+
+      await waitFor(() => expect(update).toHaveBeenCalledWith({ [shardLimitName]: '1200' }, null));
+    });
   });
 
   describe('Reset values and sources', () => {
     it('keeps a failed reset and supports cancel after a backend rejection', async () => {
       const error = new FetchError('Bad Request', 400, { message: 'This setting is locked.' });
       const update = jest.spyOn(managedConfigurationApi, 'update').mockRejectedValueOnce(error);
+      const notifyError = jest.spyOn(UserNotification, 'error');
       renderPage();
 
       await userEvent.click(await screen.findByRole('button', { name: 'Reset value for Shard limit per Data Node' }));
       await userEvent.click(getApplyButton());
 
-      await screen.findByText(/Your changes have been kept/);
-      expect(screen.getByRole('alert')).toHaveTextContent(
-        'Could not save Data Node configuration. This setting is locked. Your changes have been kept. Please try again.',
+      await waitFor(() =>
+        expect(notifyError).toHaveBeenCalledWith(
+          'This setting is locked. Please try again.',
+          'Could not save Data Node configuration',
+        ),
       );
       expect(screen.getByLabelText('Shard limit per Data Node')).toHaveValue(null);
       expect(getApplyButton()).toBeEnabled();
@@ -678,7 +749,7 @@ describe('DataNodeConfigurationPage', () => {
     });
 
     it('resets a stored value without a known fallback by sending null on apply', async () => {
-      const transport = mockManagedConfigurationApi([managedConfigurationResponse({ [shardLimitName]: '1200' })]);
+      const client = mockManagedConfigurationApi([managedConfigurationResponse({ [shardLimitName]: '1200' })]);
       const update = jest.spyOn(managedConfigurationApi, 'update');
       renderPage();
 
@@ -700,14 +771,11 @@ describe('DataNodeConfigurationPage', () => {
       await userEvent.click(getApplyButton());
 
       await waitFor(() => expect(getApplyButton()).toBeDisabled());
-      expect(transport).toHaveBeenLastCalledWith(
-        'PUT',
-        '/system/managed_configuration',
-        { node_type: 'datanode', node_id: null, values: { [shardLimitName]: null } },
-        expect.any(Object),
-        expect.any(Object),
-        undefined,
-      );
+      expect(client.update).toHaveBeenLastCalledWith({
+        node_type: 'datanode',
+        node_id: null,
+        values: { [shardLimitName]: null },
+      });
     });
 
     it('does not store an untouched reported value when another field is applied', async () => {
@@ -756,7 +824,9 @@ describe('DataNodeConfigurationPage', () => {
       expect(screen.getByRole('spinbutton', { name: 'Stop allocating shards at (% disk used)' })).toHaveValue(92);
       await userEvent.click(getApplyButton());
 
-      await screen.findByText('Set watermarks in ascending order: low, high, then flood stage.');
+      await screen.findByText(
+        'Set watermarks in ascending order: "Stop allocating shards at", "Move shards away at", then "Protect indexes at".',
+      );
       expect(update).not.toHaveBeenCalled();
 
       await changeConfigurationField('Move shards away at', '94', '% disk used');
@@ -778,9 +848,25 @@ describe('DataNodeConfigurationPage', () => {
       const input = await screen.findByLabelText(/^Stop allocating shards at \(/);
       expect(input).toBeDisabled();
       expect(input).toHaveValue(85);
-      expect(screen.getByRole('button', { name: 'Stop allocating shards at unit' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'Stop allocating shards at unit: % disk used' })).toBeDisabled();
+      expect(screen.queryByRole('button', { name: /^Reset value/ })).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: /apply changes/i })).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument();
+    });
+
+    it('hides the tab and the page from users without read permission', async () => {
+      const get = jest.spyOn(managedConfigurationApi, 'get');
+      asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions([]).build());
+      const { router } = renderPage();
+
+      await screen.findByRole('heading', { name: 'Page not found' });
+      await act(async () => {
+        await router.navigate(RoutePaths.SYSTEM.CLUSTER.NODES);
+      });
+
+      await screen.findByRole('heading', { name: 'Cluster Nodes' });
+      expect(screen.queryByRole('link', { name: 'Data Node Configuration' })).not.toBeInTheDocument();
+      expect(get).not.toHaveBeenCalled();
     });
 
     it('requires deletion permission to remove a stored value', async () => {
@@ -800,13 +886,14 @@ describe('DataNodeConfigurationPage', () => {
 
   describe('Loading', () => {
     it('loads an empty scope without sample defaults and saves only an edited parameter', async () => {
-      const transport = mockManagedConfigurationApi();
+      const client = mockManagedConfigurationApi();
       const configuration = managedConfigurationResponse();
-      const omitUnknownValues = (response: typeof configuration) => ({
-        ...omitBy(response, (value) => value == null),
-        parameters: response.parameters.map((parameter) => omitBy(parameter, (value) => value == null)),
-      });
-      transport.mockResolvedValueOnce(omitUnknownValues(configuration));
+      const omitUnknownValues = (response: typeof configuration) =>
+        ({
+          ...omitBy(response, (value) => value == null),
+          parameters: response.parameters.map((parameter) => omitBy(parameter, (value) => value == null)),
+        }) as typeof configuration;
+      client.get.mockResolvedValueOnce(omitUnknownValues(configuration));
       const notify = jest.spyOn(UserNotification, 'success');
       renderPage();
 
@@ -827,24 +914,21 @@ describe('DataNodeConfigurationPage', () => {
 
       await changeConfigurationField('Shard limit per Data Node', '1200');
       const saved = managedConfigurationResponse({ [shardLimitName]: '1200' });
-      transport.mockResolvedValueOnce(omitUnknownValues(saved));
+      client.update.mockResolvedValueOnce(omitUnknownValues(saved));
       await userEvent.click(getApplyButton());
 
       await waitFor(() => expect(getApplyButton()).toBeDisabled());
-      expect(transport).toHaveBeenCalledWith(
-        'PUT',
-        '/system/managed_configuration',
-        { node_type: 'datanode', node_id: null, values: { [shardLimitName]: '1200' } },
-        expect.any(Object),
-        expect.any(Object),
-        undefined,
-      );
+      expect(client.update).toHaveBeenCalledWith({
+        node_type: 'datanode',
+        node_id: null,
+        values: { [shardLimitName]: '1200' },
+      });
       expect(notify).toHaveBeenCalledWith('Configuration saved.');
     });
 
     it('retries a failed initial load using the keyboard without falling back to samples', async () => {
-      const transport = mockManagedConfigurationApi();
-      transport.mockRejectedValueOnce(new Error('Unavailable'));
+      const client = mockManagedConfigurationApi();
+      client.get.mockRejectedValueOnce(new Error('Unavailable'));
       renderPage();
 
       await screen.findByText('Could not load Data Node configuration. Please try again.');
@@ -856,8 +940,8 @@ describe('DataNodeConfigurationPage', () => {
     });
 
     it('keeps an empty catalog distinct from a failed load', async () => {
-      const transport = mockManagedConfigurationApi();
-      transport.mockResolvedValueOnce({ ...managedConfigurationResponse(), parameters: [] });
+      const client = mockManagedConfigurationApi();
+      client.get.mockResolvedValueOnce({ ...managedConfigurationResponse(), parameters: [] });
       renderPage();
 
       await screen.findByText('No Data Node configuration parameters are available here.');

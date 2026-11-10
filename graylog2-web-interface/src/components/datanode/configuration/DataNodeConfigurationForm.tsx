@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useState } from 'react';
 import { Form, FormikProvider } from 'formik';
 import { Navigate, Route, Routes, useMatch } from 'react-router-dom';
 import styled from 'styled-components';
@@ -67,7 +67,9 @@ const DataNodeConfigurationForm = ({ categories, nodeId, basePath, children = un
   const { isPermitted } = usePermissions();
   const { formik, hasUnsavedChanges, restartParameters, hasUnsavedRestartChanges, saveChangesWithoutRestart } =
     useDataNodeConfigurationForm({ categories, nodeId, basePath });
-  const { isSubmitting, resetForm, status } = formik;
+  const { isSubmitting, resetForm } = formik;
+  const [selectedUnits, setSelectedUnits] = useState<Record<string, string>>({});
+  const selectUnit = (name: string, unit: string) => setSelectedUnits((units) => ({ ...units, [name]: unit }));
   const canDelete = isPermitted('clusterconfigentry:delete');
   const canEdit = isPermitted(['clusterconfigentry:create', 'clusterconfigentry:edit']);
   const showNavigation = categories.length > 1;
@@ -103,7 +105,6 @@ const DataNodeConfigurationForm = ({ categories, nodeId, basePath, children = un
           <Col md={showNavigation ? 10 : 12}>
             <Row>
               <Col md={8}>
-                {status && <Alert bsStyle="danger">{status}</Alert>}
                 <Routes>
                   <Route index element={<Navigate to={categories[0].id} replace />} />
                   {categories.map((category) => (
@@ -111,7 +112,13 @@ const DataNodeConfigurationForm = ({ categories, nodeId, basePath, children = un
                       key={category.id}
                       path={category.id}
                       element={
-                        <DataNodeConfigurationSection category={category} canEdit={canEdit} canDelete={canDelete} />
+                        <DataNodeConfigurationSection
+                          category={category}
+                          canEdit={canEdit}
+                          canDelete={canDelete}
+                          selectedUnits={selectedUnits}
+                          onSelectUnit={selectUnit}
+                        />
                       }
                     />
                   ))}

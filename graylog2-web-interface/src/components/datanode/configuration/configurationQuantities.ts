@@ -32,13 +32,9 @@ export const parseQuantityValue = (rawValue: string | undefined, units: Configur
   return { amount: value, unit: suffixes.includes('') ? '' : (suffixes[0] ?? '') };
 };
 
-export const getQuantityUnitLabel = (value: string | undefined, units: ConfigurationUnits) => {
-  const { unit } = parseQuantityValue(value, units);
-
-  return units[unit];
-};
-
 export const formatQuantityValue = (amount: string, unit: string) => {
+  if (amount === '') return '';
+
   let normalizedAmount = amount.startsWith('.') ? `0${amount}` : amount;
 
   if (/[eE]/.test(amount) && Number.isFinite(Number(amount))) normalizedAmount = String(Number(amount));

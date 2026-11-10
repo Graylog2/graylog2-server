@@ -23,7 +23,7 @@ const changeConfigurationField = async (label: string, amount: string, unit?: st
   await screen.findByRole('spinbutton', { name: inputName });
 
   if (unit) {
-    const unitButton = screen.getByRole('button', { name: `${label} unit` });
+    const unitButton = screen.getByRole('button', { name: new RegExp(`^${escapeRegExp(label)} unit: `) });
 
     if (!within(unitButton).queryByText(unit)) {
       await userEvent.click(unitButton);

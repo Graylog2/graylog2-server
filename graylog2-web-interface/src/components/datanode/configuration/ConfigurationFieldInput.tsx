@@ -17,13 +17,14 @@
 import React from 'react';
 import { useFormikContext } from 'formik';
 import styled from 'styled-components';
+import omit from 'lodash/omit';
 
 import { Button, Input } from 'components/bootstrap';
 import { Icon, Select, Tooltip } from 'components/common';
 
 import type { ConfigurationValues, ConfigurationParameter, ConfigurationSource } from './types';
 import ConfigurationQuantityInput from './ConfigurationQuantityInput';
-import { getQuantityUnitLabel } from './configurationQuantities';
+import { formatQuantityValue, parseQuantityValue } from './configurationQuantities';
 import { getConfigurationValueSource, getDisplayedConfigurationValue, trimListEntries } from './configurationFields';
 
 const FieldDetail = styled.span`
@@ -58,9 +59,11 @@ type Props = {
   parameter: ConfigurationParameter;
   canEdit: boolean;
   canDelete: boolean;
+  selectedUnit: string | undefined;
+  onSelectUnit: (unit: string) => void;
 };
 
-const ConfigurationFieldInput = ({ parameter, canEdit, canDelete }: Props) => {
+const ConfigurationFieldInput = ({ parameter, canEdit, canDelete, selectedUnit, onSelectUnit }: Props) => {
   const { values, initialValues, errors, touched, isSubmitting, submitCount, setValues, setTouched } =
     useFormikContext<ConfigurationValues>();
   const { name, label, description, type, units, constraints } = parameter;
@@ -76,19 +79,24 @@ const ConfigurationFieldInput = ({ parameter, canEdit, canDelete }: Props) => {
   const disabled = !canEdit || isSubmitting;
   const hasUnits = Object.keys(units ?? {}).length > 0;
   const isQuantity = hasUnits && (type === 'size' || type === 'duration');
-  const unitLabel = isQuantity ? getQuantityUnitLabel(displayedValue, units) : undefined;
+  const parsedQuantity = isQuantity ? parseQuantityValue(displayedValue, units) : undefined;
+  const quantity = parsedQuantity && {
+    amount: parsedQuantity.amount,
+    unit: parsedQuantity.amount === '' ? (selectedUnit ?? parsedQuantity.unit) : parsedQuantity.unit,
+  };
+  const unitLabel = quantity ? units[quantity.unit] : undefined;
   const helpId = `${name}-help`;
   const errorId = `${name}-error`;
   const describedBy = [helpId, error && errorId].filter(Boolean).join(' ');
   const onBlur = () => setTouched({ ...touched, [name]: true });
   const setValue = (nextValue: string) =>
-    setValues(
-      (currentValues) =>
-        nextValue === getDisplayedConfigurationValue(parameter, currentValues[name])
-          ? currentValues
-          : { ...currentValues, [name]: nextValue },
-      submitCount > 0,
-    );
+    setValues((currentValues) => {
+      if (nextValue === '' && !Object.hasOwn(initialValues, name)) return omit(currentValues, name);
+
+      return nextValue === getDisplayedConfigurationValue(parameter, currentValues[name])
+        ? currentValues
+        : { ...currentValues, [name]: nextValue };
+    }, submitCount > 0);
 
   const resetValue = async () => {
     await setValues((currentValues) => ({ ...currentValues, [name]: null }), true);
@@ -96,7 +104,7 @@ const ConfigurationFieldInput = ({ parameter, canEdit, canDelete }: Props) => {
   };
 
   const resetButton =
-    parameter.set_value != null ? (
+    parameter.set_value != null && canEdit ? (
       <Button
         type="button"
         aria-label={`Reset value for ${label}`}
@@ -115,18 +123,26 @@ const ConfigurationFieldInput = ({ parameter, canEdit, canDelete }: Props) => {
   };
 
   const renderControl = () => {
-    if (isQuantity) {
+    if (quantity) {
       return (
         <ConfigurationQuantityInput
           id={name}
           label={label}
           units={units}
-          value={displayedValue}
+          amount={quantity.amount}
+          unit={quantity.unit}
           placeholder={placeholder}
           disabled={disabled}
           describedBy={describedBy}
           invalid={!!error}
-          onChange={setValue}
+          onAmountChange={(amount) => {
+            if (amount === '') onSelectUnit(quantity.unit);
+            setValue(formatQuantityValue(amount, quantity.unit));
+          }}
+          onUnitChange={(unit) => {
+            if (quantity.amount === '') onSelectUnit(unit);
+            else setValue(formatQuantityValue(quantity.amount, unit));
+          }}
           onBlur={onBlur}
           buttonAfter={resetButton}
         />
@@ -139,7 +155,9 @@ const ConfigurationFieldInput = ({ parameter, canEdit, canDelete }: Props) => {
           inputId={name}
           name={name}
           aria-label={label}
-          inputProps={{ 'aria-describedby': describedBy, 'aria-invalid': !!error }}
+          aria-invalid={!!error}
+          aria-errormessage={error ? errorId : undefined}
+          inputProps={{ 'aria-describedby': helpId }}
           multi={type === 'list'}
           options={selectableValues.map(([optionValue, optionLabel]) => ({ value: optionValue, label: optionLabel }))}
           placeholder={placeholder}

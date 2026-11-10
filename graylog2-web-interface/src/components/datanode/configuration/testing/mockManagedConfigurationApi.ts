@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { SystemManagedConfiguration } from '@graylog/server-api';
+
 import asMock from 'helpers/mocking/AsMock';
-import request from 'routing/request';
 
 import type { ConfigurationParameter, ManagedConfiguration, ConfigurationUnits } from '../types';
 
@@ -122,6 +123,27 @@ const clusterParameters = (): Array<ConfigurationParameter> => [
 
 const nodeParameters = (): Array<ConfigurationParameter> => [
   configurationParameter({
+    name: 'indices.memory.index_buffer_size',
+    label: 'Indexing buffer size',
+    category: 'Indexing and Recovery',
+    order: 10,
+    type: 'size',
+    units: memoryUnits,
+    constraints: { min: undefined, max: undefined, pattern: `${PERCENTAGE}|${BYTE_SIZE}`, values: {} },
+    requires_restart: true,
+    backing: 'runtime',
+  }),
+  configurationParameter({
+    name: 'indices.recovery.max_bytes_per_sec',
+    label: 'Recovery bandwidth limit',
+    category: 'Indexing and Recovery',
+    order: 20,
+    type: 'size',
+    units: byteUnits('/s'),
+    constraints: { min: undefined, max: undefined, pattern: BYTE_SIZE, values: {} },
+    backing: 'runtime',
+  }),
+  configurationParameter({
     name: 'opensearch_heap',
     label: 'OpenSearch JVM heap',
     category: 'Node Settings',
@@ -171,27 +193,6 @@ const nodeParameters = (): Array<ConfigurationParameter> => [
     requires_restart: true,
     backing: 'runtime',
   }),
-  configurationParameter({
-    name: 'indices.memory.index_buffer_size',
-    label: 'Indexing buffer size',
-    category: 'Indexing and Recovery',
-    order: 10,
-    type: 'size',
-    units: memoryUnits,
-    constraints: { min: undefined, max: undefined, pattern: `${PERCENTAGE}|${BYTE_SIZE}`, values: {} },
-    requires_restart: true,
-    backing: 'runtime',
-  }),
-  configurationParameter({
-    name: 'indices.recovery.max_bytes_per_sec',
-    label: 'Recovery bandwidth limit',
-    category: 'Indexing and Recovery',
-    order: 20,
-    type: 'size',
-    units: byteUnits('/s'),
-    constraints: { min: undefined, max: undefined, pattern: BYTE_SIZE, values: {} },
-    backing: 'runtime',
-  }),
 ];
 
 export const managedConfigurationResponse = (
@@ -236,22 +237,10 @@ const mockManagedConfigurationApi = (initialConfigurations: Array<ManagedConfigu
       ),
     ]),
   );
-  const transport = asMock(request).mockReset();
-
-  transport.mockImplementation(async (method, _path, body, query) => {
-    const nodeId: string | null = (method === 'GET' ? query.node_id : body.node_id) ?? null;
-    const values = { ...(storedValues.get(nodeId) ?? {}) };
-
-    if (method !== 'GET') {
-      Object.entries(body.values as Record<string, string | null>).forEach(([name, value]) => {
-        if (value === null) delete values[name];
-        else values[name] = value;
-      });
-      storedValues.set(nodeId, values);
-    }
-
+  const respond = (nodeId: string | null): ManagedConfiguration => {
     const configuration =
       initialConfigurations.find(({ node_id: id }) => id === nodeId) ?? managedConfigurationResponse({}, nodeId);
+    const values = storedValues.get(nodeId) ?? {};
 
     return {
       ...configuration,
@@ -259,9 +248,26 @@ const mockManagedConfigurationApi = (initialConfigurations: Array<ManagedConfigu
         withStoredValue(parameter, values[parameter.name] ?? null),
       ),
     };
-  });
+  };
 
-  return transport;
+  const get = asMock(SystemManagedConfiguration.get)
+    .mockReset()
+    .mockImplementation(async (_nodeType, nodeId) => respond(nodeId ?? null));
+  const update = asMock(SystemManagedConfiguration.update)
+    .mockReset()
+    .mockImplementation(async ({ node_id: nodeId, values: changes }) => {
+      const values = { ...(storedValues.get(nodeId) ?? {}) };
+
+      Object.entries(changes as Record<string, string | null>).forEach(([name, value]) => {
+        if (value === null) delete values[name];
+        else values[name] = value;
+      });
+      storedValues.set(nodeId, values);
+
+      return respond(nodeId);
+    });
+
+  return { get, update };
 };
 
 export default mockManagedConfigurationApi;
