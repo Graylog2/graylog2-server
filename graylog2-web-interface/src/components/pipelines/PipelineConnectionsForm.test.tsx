@@ -40,7 +40,7 @@ const submit = async () => userEvent.click(await screen.findByRole('button', { n
 
 describe('PipelineConnectionsForm', () => {
   beforeEach(() => {
-    asMock(usePermissions).mockReturnValue({ isPermitted: () => true, isAnyPermitted: () => true, isAdmin: false });
+    asMock(usePermissions).mockReturnValue({ isPermitted: () => true });
   });
 
   it('discards cancelled edits', async () => {

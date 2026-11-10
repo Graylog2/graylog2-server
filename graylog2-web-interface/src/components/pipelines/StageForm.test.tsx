@@ -22,15 +22,12 @@ import type { PipelineType, StageType } from 'components/pipelines/types';
 import { DEFAULT_PIPELINE } from 'components/pipelines/types';
 import asMock from 'helpers/mocking/AsMock';
 import usePermissions from 'hooks/usePermissions';
-import { useRules } from 'components/rules/hooks/useRules';
+import { useStore } from 'stores/connect';
 
 import StageForm from './StageForm';
 
 jest.mock('hooks/usePermissions');
-jest.mock('components/rules/hooks/useRules', () => ({
-  ...jest.requireActual('components/rules/hooks/useRules'),
-  useRules: jest.fn(),
-}));
+jest.mock('stores/connect', () => ({ useStore: jest.fn() }));
 
 const stage: StageType = { stage: 0, match: 'EITHER', rules: ['rule-a'] };
 const pipeline: PipelineType = { ...DEFAULT_PIPELINE, id: 'pipeline-id', title: 'Pipeline', stages: [stage] };
@@ -39,8 +36,8 @@ const openForm = async () => userEvent.click(await screen.findByRole('button', {
 
 describe('StageForm', () => {
   beforeEach(() => {
-    asMock(usePermissions).mockReturnValue({ isPermitted: () => true, isAnyPermitted: () => true, isAdmin: false });
-    asMock(useRules).mockReturnValue({ data: [], isLoading: false } as unknown as ReturnType<typeof useRules>);
+    asMock(usePermissions).mockReturnValue({ isPermitted: () => true });
+    asMock(useStore).mockReturnValue({ rules: [] });
   });
 
   it('discards cancelled edits', async () => {
