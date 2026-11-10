@@ -23,8 +23,8 @@ import { OrderedSet } from 'immutable';
 import UserNotification from 'util/UserNotification';
 import type { QueryId } from 'views/logic/queries/Query';
 import type QueryTitleEditModal from 'views/components/queries/QueryTitleEditModal';
-import { Nav, NavItem, MenuItem } from 'components/bootstrap';
-import { Icon, IconButton } from 'components/common';
+import { Nav, MenuItem, Button } from 'components/bootstrap';
+import { Icon } from 'components/common';
 import QueryTitle from 'views/components/queries/QueryTitle';
 import AdaptableQueryTabsConfiguration from 'views/components/AdaptableQueryTabsConfiguration';
 import CopyToDashboardForm from 'views/components/widgets/CopyToDashboardForm';
@@ -75,23 +75,40 @@ const TAB_MENU_ITEM_CLASS = 'tab-menu-item';
 const MORE_TABS_BUTTON_CLASS = 'query-tabs-more';
 const MORE_TABS_LI_CLASS = 'query-tabs-more-li';
 const NEW_TAB_BUTTON_CLASS = 'query-tab-create';
+const TAB_LI_CLASS = 'query-tab-li';
+
+const tabButtonStyles = css`
+  height: 100%;
+  width: auto;
+  padding: 10px 15px;
+  // same color as IconButton
+  color: ${({ theme }) => theme.colors.gray[60]};
+`;
 
 const Container = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  .query-config-btn {
+    ${tabButtonStyles}
+  }
 `;
 
 const StyledQueryNav = styled(Nav)(
   ({ theme }) => css`
-    &.nav.nav-tabs {
+    & {
       border-bottom: 0;
       display: flex;
       white-space: nowrap;
       position: relative;
       padding-left: ${NAV_PADDING}px;
 
-      > li {
+      gap: ${theme.spacings.sm};
+
+      align-items: flex-end;
+
+      > li.${TAB_LI_CLASS} {
         > a {
           color: ${theme.colors.text.primary};
           border: none;
@@ -106,14 +123,19 @@ const StyledQueryNav = styled(Nav)(
         }
       }
 
-      > li.active {
+      > li.${MORE_TABS_LI_CLASS} > button,
+      > li.${NEW_TAB_BUTTON_CLASS} > button {
+        ${tabButtonStyles}
+      }
+
+      > li.${TAB_LI_CLASS}.active {
         display: flex;
         flex-direction: column;
         align-items: center;
         margin-bottom: -3px;
 
         > a {
-          padding: 9px 15px;
+          padding: 6px 15px 9px;
           border: 1px solid ${theme.colors.variant.lighter.default};
           border-bottom: none;
           background-color: ${theme.colors.global.contentBackground};
@@ -128,19 +150,61 @@ const StyledQueryNav = styled(Nav)(
           }
         }
       }
-
-      > li.${MORE_TABS_BUTTON_CLASS}, > li.${MORE_TABS_BUTTON_CLASS} a {
-        cursor: pointer;
-      }
     }
   `,
 );
 
-const QueryTab = styled(NavItem)`
-  &&&&.active > a {
-    padding: 6px 15px 9px;
+const QueryTabLink = styled.a`
+  cursor: pointer;
+  display: inline-block;
+  padding: 10px 15px;
+
+  &,
+  &:hover,
+  &:focus {
+    text-decoration: none;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
   }
 `;
+
+type QueryTabProps = {
+  active: boolean;
+  className?: string;
+  'data-tab-id': string;
+  'aria-label': string;
+  onClick: () => void;
+  children: React.ReactNode;
+};
+
+const QueryTab = ({ active, className = undefined, onClick, children, ...rest }: QueryTabProps) => (
+  <li className={[TAB_LI_CLASS, active ? CLASS_ACTIVE : '', className].filter(Boolean).join(' ')}>
+    <QueryTabLink
+      role="button"
+      tabIndex={0}
+      aria-current={active ? 'page' : undefined}
+      onClick={onClick}
+      onKeyDown={(event: React.KeyboardEvent) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onClick();
+        }
+      }}
+      {...rest}>
+      {children}
+    </QueryTabLink>
+  </li>
+);
+
+const NewTabLi = ({ onClick }: { onClick: () => void }) => (
+  <li className={NEW_TAB_BUTTON_CLASS}>
+    <Button bsStyle="transparent" title="Create New Page" onClick={onClick}>
+      <Icon name="add" />
+    </Button>
+  </li>
+);
 
 const MoreTabsLi = ({ menuItems }: { menuItems: OrderedSet<React.ReactNode> }) => (
   <li className={MORE_TABS_LI_CLASS}>
@@ -148,7 +212,6 @@ const MoreTabsLi = ({ menuItems }: { menuItems: OrderedSet<React.ReactNode> }) =
       className={MORE_TABS_BUTTON_CLASS}
       id="query-tabs-more"
       aria-label="More Dashboard Pages"
-      bsStyle="link"
       keepMounted
       pullRight>
       {menuItems.toArray()}
@@ -292,7 +355,7 @@ const AdaptableQueryTabs = ({
   const [showCopyToDashboardModal, setShowCopyToDashboardModal] = useState<boolean>(false);
   const dispatch = useViewsDispatch();
   const history = useHistory();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('dashboard');
   const queriesConfigBtn = useRef(null);
 
   const toggleCopyToDashboardModal = useCallback(() => {
@@ -343,9 +406,10 @@ const AdaptableQueryTabs = ({
       navItems = navItems.add(
         lockedTab === id ? null : (
           <QueryTab
-            eventKey={id}
             key={id}
+            active={activeQueryId === id}
             data-tab-id={id}
+            aria-label={title}
             onClick={() => {
               setLockedTab(undefined);
               onSelect(id);
@@ -374,7 +438,13 @@ const AdaptableQueryTabs = ({
 
       lockedItems = lockedItems.add(
         lockedTab !== id ? null : (
-          <QueryTab eventKey={id} key={id} data-tab-id={id} onClick={() => onSelect(id)} className={CLASS_LOCKED}>
+          <QueryTab
+            key={id}
+            active={activeQueryId === id}
+            data-tab-id={id}
+            aria-label={title}
+            onClick={() => onSelect(id)}
+            className={CLASS_LOCKED}>
             {tabTitle}
           </QueryTab>
         ),
@@ -392,45 +462,39 @@ const AdaptableQueryTabs = ({
 
   return (
     <Container>
-      <StyledQueryNav bsStyle="tabs" activeKey={activeQueryId} id="dashboard-tabs">
+      <StyledQueryNav id="dashboard-tabs">
         {currentTabs.navItems.toArray()}
 
         <MoreTabsLi menuItems={currentTabs.menuItems} />
 
         {currentTabs.lockedItems.toArray()}
 
-        <QueryTab
-          key="new"
-          eventKey="new"
-          title="Create New Page"
+        <NewTabLi
           onClick={() => {
             sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_CREATE_PAGE, {
               app_pathname: 'dashboard',
-              app_section: 'dashboard',
               app_action_value: 'dashboard-create-page-button',
             });
 
             onSelect('new');
           }}
-          className={NEW_TAB_BUTTON_CLASS}>
-          <Icon name="add" />
-        </QueryTab>
+        />
       </StyledQueryNav>
-      <IconButton
+      <Button
+        bsStyle="transparent"
         title="Open pages configuration"
-        name="settings"
         ref={queriesConfigBtn}
         className="query-config-btn"
         onClick={() => {
           sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_PAGE_CONFIGURATION, {
             app_pathname: 'dashboard',
-            app_section: 'dashboard',
             app_action_value: 'dashboard-page-configuration-button',
           });
 
           setShowConfigurationModal(true);
-        }}
-      />
+        }}>
+        <Icon name="settings" />
+      </Button>
       {showConfigurationModal && (
         <AdaptableQueryTabsConfiguration
           show={showConfigurationModal}

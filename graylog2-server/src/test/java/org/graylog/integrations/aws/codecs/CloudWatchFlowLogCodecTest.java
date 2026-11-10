@@ -29,6 +29,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class CloudWatchFlowLogCodecTest {
 
@@ -73,5 +74,23 @@ public class CloudWatchFlowLogCodecTest {
         Assertions.assertEquals(2264, message.getField(KinesisCloudWatchFlowLogCodec.FIELD_DST_PORT));
         Assertions.assertEquals("ACCEPT", message.getField(KinesisCloudWatchFlowLogCodec.FIELD_ACTION));
         Assertions.assertEquals(timestamp, message.getTimestamp());
+        Assertions.assertNull(message.getField(Message.FIELD_FULL_MESSAGE));
+    }
+
+    @Test
+    public void testFlowLogCodecStoresFullMessage() {
+
+        final HashMap<String, Object> configMap = new HashMap<>();
+        configMap.put(AWSCodec.CK_STORE_FULL_MESSAGE, true);
+        final KinesisCloudWatchFlowLogCodec codecWithFullMessage = new KinesisCloudWatchFlowLogCodec(
+                new Configuration(configMap), new ObjectMapperProvider().get(), messageFactory);
+
+        final String flowLogMessage = "2 423432432432 eni-3244234 172.1.1.2 172.1.1.2 80 2264 6 1 52 1559738144 1559738204 ACCEPT OK";
+        final DateTime timestamp = DateTime.now(DateTimeZone.UTC);
+        final KinesisLogEntry logEvent = KinesisLogEntry.create("a-stream", "log-group", "log-stream",
+                timestamp, flowLogMessage, "123456789", "TEST_STREAM_ARN", new ArrayList<>());
+
+        final Message message = codecWithFullMessage.decodeLogData(logEvent).get();
+        Assertions.assertEquals(flowLogMessage, message.getField(Message.FIELD_FULL_MESSAGE));
     }
 }

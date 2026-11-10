@@ -1,0 +1,345 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import * as React from 'react';
+import * as Immutable from 'immutable';
+import userEvent from '@testing-library/user-event';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import type { Permission } from 'graylog-web-plugin/plugin';
+
+import { asMock, MockStore } from 'helpers/mocking';
+import AppConfig from 'util/AppConfig';
+import useInputsStates from 'hooks/useInputsStates';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { adminUser } from 'fixtures/users';
+import useSendCollectorsTelemetry from 'components/collectors/hooks/useSendCollectorsTelemetry';
+
+import CollectorsSettings from './CollectorsSettings';
+
+import {
+  useCollectorsConfig,
+  useCollectorInputIds,
+  useCollectorsMutations,
+  useCollectorInputDetails,
+  useCollectorInputMutations,
+  useCollectorPermissions,
+} from '../hooks';
+import { mockCollectorsMutations } from '../testing/mockMutations';
+import { configuredCollectorsConfig, mockCollectorInput } from '../testing/fixtures';
+
+jest.mock('../hooks');
+jest.mock('hooks/useInputsStates');
+jest.mock('hooks/useCurrentUser');
+jest.mock('components/collectors/hooks/useSendCollectorsTelemetry');
+
+jest.mock('hooks/useInputMutations', () => () => ({
+  createInput: jest.fn(),
+  updateInput: jest.fn(),
+  deleteInput: jest.fn(),
+}));
+jest.mock('stores/nodes/NodesStore', () => ({
+  NodesStore: MockStore([
+    'getInitialState',
+    () => ({ nodes: { 'node-1': { short_node_id: 'node-1', hostname: 'node-1.example.org' } } }),
+  ]),
+}));
+
+const updateConfig = jest.fn();
+
+describe('CollectorsSettings', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    asMock(useCollectorsConfig).mockReturnValue({
+      data: configuredCollectorsConfig,
+      isLoading: false,
+    });
+    asMock(useCollectorsMutations).mockReturnValue(
+      mockCollectorsMutations({
+        updateConfig,
+        isUpdatingConfig: false,
+      }),
+    );
+    asMock(useCollectorInputIds).mockReturnValue({
+      data: [],
+      isLoading: false,
+    });
+    asMock(useInputsStates).mockReturnValue({
+      data: {},
+      refetch: jest.fn(),
+      isLoading: false,
+    });
+    asMock(useCollectorInputDetails).mockReturnValue({
+      collectorInputIds: [],
+      readableInputIds: [],
+      loadedInputs: [],
+      unreadableCount: 0,
+      isLoading: false,
+    });
+    asMock(useCollectorInputMutations).mockReturnValue({
+      createCollectorInput: jest.fn(),
+      isCreatingCollectorInput: false,
+      updateCollectorInputPort: jest.fn(),
+      isUpdatingCollectorInputPort: false,
+    });
+    asMock(useCollectorPermissions).mockReturnValue({ canEditConfig: true } as ReturnType<
+      typeof useCollectorPermissions
+    >);
+    asMock(useCurrentUser).mockReturnValue(adminUser);
+    updateConfig.mockResolvedValue(undefined);
+  });
+
+  it('renders the ingest endpoint section', async () => {
+    render(<CollectorsSettings />);
+
+    await screen.findByRole('heading', { name: 'Ingest Endpoint' });
+
+    expect(screen.queryByRole('heading', { name: 'gRPC' })).not.toBeInTheDocument();
+  });
+
+  it('shows the lifecycle thresholds', async () => {
+    render(<CollectorsSettings />);
+
+    await screen.findByRole('heading', { name: 'Collector Lifecycle' });
+
+    expect(screen.getByLabelText('Offline threshold')).toBeVisible();
+    expect(screen.getByLabelText('Default visibility')).toBeVisible();
+    expect(screen.getByLabelText('Expiration threshold')).toBeVisible();
+  });
+
+  it('saves config with create_input false when already configured', async () => {
+    const user = userEvent.setup();
+
+    render(<CollectorsSettings />);
+
+    const hostnameInput = await screen.findByLabelText('External hostname');
+    const portInput = screen.getByLabelText('External port');
+
+    await user.clear(hostnameInput);
+    await user.type(hostnameInput, 'ingest.example.com');
+    await user.clear(portInput);
+    await user.type(portInput, '14411');
+    await user.click(screen.getByRole('button', { name: /Confirm settings/i }));
+
+    await waitFor(() =>
+      expect(updateConfig).toHaveBeenCalledWith({
+        http: {
+          hostname: 'ingest.example.com',
+          port: 14411,
+        },
+        create_input: false,
+        collector_offline_threshold: 'PT5M',
+        collector_default_visibility_threshold: 'P1D',
+        collector_expiration_threshold: 'P7D',
+      }),
+    );
+  });
+
+  it('does not show enabled checkbox', async () => {
+    render(<CollectorsSettings />);
+
+    await screen.findByLabelText('External hostname');
+
+    expect(screen.queryByLabelText('Enabled')).not.toBeInTheDocument();
+  });
+
+  it('shows port mismatch info when input port differs from config port', async () => {
+    asMock(useCollectorInputDetails).mockReturnValue({
+      collectorInputIds: ['input-1'],
+      readableInputIds: ['input-1'],
+      loadedInputs: [mockCollectorInput(14402)],
+      unreadableCount: 0,
+      isLoading: false,
+    });
+
+    render(<CollectorsSettings />);
+
+    await screen.findByText(/different port/i);
+    expect(screen.getAllByText(/14402/).length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('does not show port mismatch info when ports match', async () => {
+    asMock(useCollectorInputDetails).mockReturnValue({
+      collectorInputIds: ['input-1'],
+      readableInputIds: ['input-1'],
+      loadedInputs: [mockCollectorInput(14401)],
+      unreadableCount: 0,
+      isLoading: false,
+    });
+
+    render(<CollectorsSettings />);
+
+    await screen.findByLabelText('External hostname');
+    expect(screen.queryByText(/different port/i)).not.toBeInTheDocument();
+  });
+
+  it('does not show port mismatch info while loading', async () => {
+    asMock(useCollectorInputDetails).mockReturnValue({
+      collectorInputIds: [],
+      readableInputIds: [],
+      loadedInputs: [],
+      unreadableCount: 0,
+      isLoading: true,
+    });
+
+    render(<CollectorsSettings />);
+
+    await screen.findByLabelText('External hostname');
+    expect(screen.queryByText(/different port/i)).not.toBeInTheDocument();
+  });
+
+  describe('in cloud', () => {
+    beforeEach(() => {
+      jest.spyOn(AppConfig, 'isCloud').mockReturnValue(true);
+    });
+
+    afterEach(() => {
+      asMock(AppConfig.isCloud).mockRestore();
+    });
+
+    it('shows the ingest endpoint read-only and hides editing/creation controls', async () => {
+      render(<CollectorsSettings />);
+
+      // Endpoint fields are present but read-only (disabled), showing the server-provisioned values.
+      const hostname = await screen.findByLabelText('External hostname');
+      const port = screen.getByLabelText('External port');
+      expect(hostname).toBeDisabled();
+      expect(hostname).toHaveValue('graylog.example.com');
+      expect(port).toBeDisabled();
+      expect(port).toHaveValue(14401);
+
+      // No input-management UI in cloud.
+      expect(screen.queryByLabelText('Create ingest input')).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Create input' })).not.toBeInTheDocument();
+
+      // Thresholds remain editable.
+      expect(screen.getByLabelText('Offline threshold')).toBeEnabled();
+    });
+
+    it('shows cloud-appropriate getting-started copy before configuration', async () => {
+      asMock(useCollectorsConfig).mockReturnValue({
+        data: { ...configuredCollectorsConfig, signing_cert_id: null },
+        isLoading: false,
+      });
+
+      render(<CollectorsSettings />);
+
+      await screen.findByText('Getting started with Collectors');
+      // The on-prem instruction to configure the endpoint must not appear — it's managed in cloud.
+      expect(screen.queryByText(/Configure the HTTP endpoint below/i)).not.toBeInTheDocument();
+      expect(screen.getByText(/managed ingest endpoint/i)).toBeInTheDocument();
+    });
+  });
+
+  it('hides the settings submit without collectors_config:edit', () => {
+    asMock(useCurrentUser).mockReturnValue(
+      adminUser
+        .toBuilder()
+        .permissions(Immutable.List(['collectors_config:read'] as Array<Permission>))
+        .build(),
+    );
+    asMock(useCollectorPermissions).mockReturnValue({ canEditConfig: false } as ReturnType<
+      typeof useCollectorPermissions
+    >);
+
+    render(<CollectorsSettings />);
+
+    expect(screen.queryByRole('button', { name: /confirm settings/i })).not.toBeInTheDocument();
+  });
+});
+
+describe('CollectorsSettings telemetry', () => {
+  const sendTelemetry = jest.fn();
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    asMock(useSendCollectorsTelemetry).mockReturnValue(sendTelemetry);
+    asMock(useCollectorsConfig).mockReturnValue({
+      data: configuredCollectorsConfig,
+      isLoading: false,
+    });
+    asMock(useCollectorsMutations).mockReturnValue(
+      mockCollectorsMutations({
+        updateConfig: jest.fn().mockResolvedValue(undefined),
+        isUpdatingConfig: false,
+      }),
+    );
+    asMock(useCollectorInputIds).mockReturnValue({
+      data: ['input-1'],
+      isLoading: false,
+    });
+    asMock(useInputsStates).mockReturnValue({
+      data: {
+        'input-1': {
+          'node-1': {
+            state: 'RUNNING',
+            id: 'input-1',
+            detailed_message: null,
+            message_input: {} as never,
+          },
+        },
+      },
+      refetch: jest.fn(),
+      isLoading: false,
+    } as never);
+    asMock(useCollectorInputDetails).mockReturnValue({
+      collectorInputIds: ['input-1'],
+      readableInputIds: ['input-1'],
+      loadedInputs: [mockCollectorInput(14401)],
+      unreadableCount: 0,
+      isLoading: false,
+    });
+    asMock(useCollectorPermissions).mockReturnValue({ canEditConfig: true } as ReturnType<
+      typeof useCollectorPermissions
+    >);
+    asMock(useCurrentUser).mockReturnValue(adminUser);
+  });
+
+  it('emits SETTINGS.UPDATED on submit with resulting state and diff flags', async () => {
+    const user = userEvent.setup();
+    const mockUpdateConfig = jest.fn().mockResolvedValue(undefined);
+    asMock(useCollectorsMutations).mockReturnValue(
+      mockCollectorsMutations({
+        updateConfig: mockUpdateConfig,
+        isUpdatingConfig: false,
+      }),
+    );
+
+    render(<CollectorsSettings />);
+    const hostnameInput = await screen.findByLabelText('External hostname');
+
+    await user.clear(hostnameInput);
+    await user.type(hostnameInput, 'newhost.example.com');
+
+    await user.click(screen.getByRole('button', { name: /Confirm settings/i }));
+
+    await waitFor(() => {
+      expect(sendTelemetry).toHaveBeenCalledWith(
+        'Collector Settings Updated',
+        expect.objectContaining({
+          http_hostname_kind: 'hostname',
+          http_port: 14401,
+          http_hostname_changed: true,
+          http_port_changed: false,
+          port_matches_any_input: true,
+          input_bind_types: 'all_wildcard',
+          has_running_input: true,
+          input_count: 1,
+        }),
+      );
+    });
+  });
+});

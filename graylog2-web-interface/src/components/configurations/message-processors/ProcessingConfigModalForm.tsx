@@ -135,7 +135,7 @@ const ProcessingConfigModalForm = ({ closeModal, formConfig }: Props) => {
                 />
                 <h3>Status</h3>
                 <p>Change the checkboxes to change the status of a message processor.</p>
-                <Table striped bordered condensed className="top-margin">
+                <Table bordered condensed className="top-margin">
                   <thead>
                     <tr>
                       <th>Processor</th>

@@ -1,0 +1,4 @@
+type = "changed"
+message = "Sort event definition custom fields alphabetically in the user interface and in notifications."
+
+issues = ["25998"]

@@ -25,11 +25,13 @@ import jakarta.inject.Inject;
 public class TrafficAccounting {
     private final Counter outputByteCounter;
     private final Counter systemTrafficCounter;
+    private final Counter indexedInputByteCounter;
 
     @Inject
     public TrafficAccounting(MetricRegistry metricRegistry) {
         outputByteCounter = metricRegistry.counter(GlobalMetricNames.OUTPUT_TRAFFIC);
         systemTrafficCounter = metricRegistry.counter(GlobalMetricNames.SYSTEM_OUTPUT_TRAFFIC);
+        indexedInputByteCounter = metricRegistry.counter(GlobalMetricNames.INDEXED_INPUT_TRAFFIC);
     }
 
     public void addOutputTraffic(long size) {
@@ -38,5 +40,9 @@ public class TrafficAccounting {
 
     public void addSystemTraffic(long size) {
         this.systemTrafficCounter.inc(size);
+    }
+
+    public void addIndexedInputTraffic(long size) {
+        this.indexedInputByteCounter.inc(size);
     }
 }

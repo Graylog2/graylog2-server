@@ -65,19 +65,31 @@ public class StaticFieldFilter implements MessageFilter {
 
     @Override
     public boolean filter(Message msg) {
-        if (msg.getSourceInputId() == null) {
-            return false;
+        applyStaticFields(msg, msg.getSourceInputId());
+
+        // Forwarded messages arrive on the local Forwarder input but carry the remote input's ID in
+        // sourceInputId/gl2_source_input. Static fields configured on the local Forwarder input are keyed by
+        // its own ID, which is available in gl2_forwarder_input, so apply those as well.
+        final Object forwarderInputId = msg.getField(Message.FIELD_GL2_FORWARDER_INPUT);
+        if (forwarderInputId != null) {
+            applyStaticFields(msg, forwarderInputId.toString());
         }
 
-        for (final Map.Entry<String, String> field : staticFields.getOrDefault(msg.getSourceInputId(), Collections.emptyList())) {
+        return false;
+    }
+
+    private void applyStaticFields(Message msg, String inputId) {
+        if (inputId == null) {
+            return;
+        }
+
+        for (final Map.Entry<String, String> field : staticFields.getOrDefault(inputId, Collections.emptyList())) {
             if (!msg.hasField(field.getKey())) {
                 msg.addField(field.getKey(), field.getValue());
             } else {
                 LOG.debug("Message already contains field [{}]. Not overwriting.", field.getKey());
             }
         }
-
-        return false;
     }
 
     @Subscribe

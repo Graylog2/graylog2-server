@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix timerange validation not running when loading a saved search."
+
+issues = ["15957"]
+pulls = ["25585"]

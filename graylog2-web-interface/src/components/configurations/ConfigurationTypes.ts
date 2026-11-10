@@ -28,6 +28,7 @@ enum ConfigurationType {
   GLOBAL_PROCESSING_RULE_CONFIG = 'org.graylog2.shared.buffers.processors.TimeStampConfig',
   MCP_CONFIG = 'org.graylog.mcp.config.McpConfiguration',
   MARKDOWN_CONFIG = 'org.graylog2.configuration.MarkdownConfiguration',
+  WELCOME_PAGE_CONFIG = 'org.graylog2.configuration.WelcomePageConfiguration',
 }
 export default ConfigurationType;
 export { ConfigurationType };

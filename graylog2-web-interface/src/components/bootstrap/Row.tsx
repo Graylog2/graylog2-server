@@ -14,10 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// eslint-disable-next-line no-restricted-imports
-import { Row as BootstrapRow } from 'react-bootstrap';
+import * as React from 'react';
+import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
+// Direct port of Bootstrap 3's `.row`, which is the variant in use per
+// `public/stylesheets/bootstrap-config.json`. The row extends 15px outside its
+// container via horizontal negative margins so a `<Col>`'s 15px horizontal
+// padding aligns the column content with the container's edges, and contains
+// its floated column children with a clearfix.
 export const RowContentStyles = css(
   ({ theme }) => css`
     background-color: ${theme.colors.global.contentBackground};
@@ -27,12 +32,39 @@ export const RowContentStyles = css(
   `,
 );
 
-type RowProps = React.ComponentProps<typeof BootstrapRow>;
-const Row: React.ComponentType<RowProps> = styled(BootstrapRow)`
+type Props = React.HTMLAttributes<HTMLDivElement> & {
+  as?: React.ElementType;
+  'data-testid'?: string;
+  className?: string;
+};
+
+const StyledRow = styled.div`
+  margin-left: -15px;
+  margin-right: -15px;
+
+  &::before,
+  &::after {
+    display: table;
+    content: ' ';
+  }
+
+  &::after {
+    clear: both;
+  }
+
   &.content {
     ${RowContentStyles}
   }
 `;
 
+const Row = (
+  { children = undefined, as = undefined, className = undefined, ...rest }: Props,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) => (
+  <StyledRow ref={ref} as={as} className={`${className ?? ''} row`} {...rest}>
+    {children}
+  </StyledRow>
+);
+
 /** @component */
-export default Row;
+export default forwardRef(Row);

@@ -28,35 +28,23 @@ type Props = {
   dangerThreshold?: number;
 };
 
-const formatNumberValue = (value: number | undefined | null, suffix = '') =>
-  value == null ? '' : `${NumberUtils.formatNumber(value)}${suffix}`;
-
-const toRatio = (percent: number | undefined | null) => {
-  if (percent == null) {
-    return null;
-  }
-
-  return percent > 1 ? percent / 100 : percent;
-};
-
 const CpuMetricsCell = ({
   loadAverage = null,
   cpuPercent = null,
   warningThreshold = Number.NaN,
   dangerThreshold = Number.NaN,
 }: Props) => {
-  const loadLabel = formatNumberValue(loadAverage);
-  const percentLabel = formatNumberValue(cpuPercent, '%');
-  const percentIndicator =
-    cpuPercent == null ? null : buildRatioIndicator(toRatio(cpuPercent), warningThreshold, dangerThreshold);
-
-  if (!loadLabel && !percentLabel && !percentIndicator) {
+  if (cpuPercent == null && loadAverage == null) {
     return <MetricPlaceholder />;
   }
 
+  const loadLabel = loadAverage == null ? null : NumberUtils.formatNumber(loadAverage);
+
   return (
     <MetricsColumn>
-      {(percentIndicator || percentLabel) && <MetricsRow>{percentIndicator ?? <span>{percentLabel}</span>}</MetricsRow>}
+      {cpuPercent != null && (
+        <MetricsRow>{buildRatioIndicator(cpuPercent / 100, warningThreshold, dangerThreshold)}</MetricsRow>
+      )}
       {loadLabel && (
         <MetricsRow>
           <span>Load (1m)</span>

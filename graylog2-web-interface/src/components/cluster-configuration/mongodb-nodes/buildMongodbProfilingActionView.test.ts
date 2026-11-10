@@ -22,6 +22,7 @@ describe('buildMongodbProfilingActionView', () => {
       action: null,
       state: 'unknown',
       profilingStatusByLevel: undefined,
+      slowMs: undefined,
       isStatusReady: false,
       isTogglingProfiling: false,
     });
@@ -38,6 +39,7 @@ describe('buildMongodbProfilingActionView', () => {
       action: 'enable',
       state: 'off',
       profilingStatusByLevel: { OFF: 3 },
+      slowMs: 100,
       isStatusReady: true,
       isTogglingProfiling: false,
     });
@@ -48,6 +50,20 @@ describe('buildMongodbProfilingActionView', () => {
     expect(view.statusSummary).toMatch(/profiling is off for all mongodb nodes/i);
     expect(view.statusSummary).toMatch(/0\/3 nodes profiled/i);
     expect(view.enablingProfiling).toBe(true);
+    expect(view.enableThresholdLabel).toBe('level 1, 100ms threshold');
+  });
+
+  it('falls back to a plain level label when slowMs is unknown', () => {
+    const view = buildMongodbProfilingActionView({
+      action: 'enable',
+      state: 'off',
+      profilingStatusByLevel: { OFF: 3 },
+      slowMs: undefined,
+      isStatusReady: true,
+      isTogglingProfiling: false,
+    });
+
+    expect(view.enableThresholdLabel).toBe('level 1');
   });
 
   it('returns disable loading view when all nodes are enabled and mutation is running', () => {
@@ -55,6 +71,7 @@ describe('buildMongodbProfilingActionView', () => {
       action: 'disable',
       state: 'enabled',
       profilingStatusByLevel: { SLOW_OPS: 2, ALL: 1 },
+      slowMs: 100,
       isStatusReady: true,
       isTogglingProfiling: true,
     });

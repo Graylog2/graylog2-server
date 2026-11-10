@@ -23,6 +23,7 @@ import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.DistinctIterable;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.ListIndexesIterable;
+import com.mongodb.client.model.CountOptions;
 import com.mongodb.client.model.FindOneAndReplaceOptions;
 import com.mongodb.client.model.FindOneAndUpdateOptions;
 import com.mongodb.client.model.IndexModel;
@@ -39,6 +40,7 @@ import jakarta.annotation.Nullable;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
+import java.time.Duration;
 import java.util.List;
 
 /**
@@ -93,6 +95,18 @@ public interface MongoCollection<TDocument extends MongoEntity> {
     MongoCollection<TDocument> withWriteConcern(@Nonnull WriteConcern writeConcern);
 
     /**
+     * Create a new MongoCollection instance with a client-side operation timeout (CSOT) applied to every operation
+     * on the returned view. The timeout bounds the whole operation -- including the socket read -- so a stuck or
+     * black-holed connection fails fast instead of blocking indefinitely (the driver's default socket timeout is
+     * infinite). Useful where a caller must not block longer than a known budget, e.g. a health check.
+     *
+     * @param timeout the per-operation timeout
+     * @return a new MongoCollection instance bounded by the given timeout
+     */
+    @Nonnull
+    MongoCollection<TDocument> withTimeout(@Nonnull Duration timeout);
+
+    /**
      * Counts the number of documents in the collection.
      *
      * <p>
@@ -141,6 +155,16 @@ public interface MongoCollection<TDocument extends MongoEntity> {
      * @since 3.8
      */
     long countDocuments(@Nonnull Bson filter);
+
+    /**
+     * Counts the number of documents in the collection according to the given filter and options.
+     *
+     * @param filter  the query filter
+     * @param options the options describing the count
+     * @return the number of documents in the collection
+     * @since 3.8
+     */
+    long countDocuments(@Nonnull Bson filter, @Nonnull CountOptions options);
 
     /**
      * Gets the distinct values of the specified field name.

@@ -16,31 +16,33 @@
  */
 package org.graylog.datanode.rest;
 
+import com.google.common.eventbus.EventBus;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import org.graylog.datanode.configuration.OpensearchUpdateEvent;
 import org.graylog.datanode.rest.config.OnlyInSecuredNode;
 import org.graylog2.datanode.DataNodeLifecycleEvent;
 import org.graylog2.datanode.DataNodeLifecycleTrigger;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.NodeId;
 
-import jakarta.inject.Inject;
-
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-
 @Path("/management")
 @Produces(MediaType.APPLICATION_JSON)
 public class ManagementController {
 
     private final ClusterEventBus clusterEventBus;
+    private final EventBus eventBus;
     private final NodeId nodeId;
 
 
     @Inject
-    public ManagementController(ClusterEventBus clusterEventBus, NodeId nodeId) {
+    public ManagementController(ClusterEventBus clusterEventBus, EventBus eventBus, NodeId nodeId) {
         this.clusterEventBus = clusterEventBus;
+        this.eventBus = eventBus;
         this.nodeId = nodeId;
     }
 
@@ -50,11 +52,19 @@ public class ManagementController {
         postEvent(DataNodeLifecycleTrigger.REMOVE);
     }
 
+    @Deprecated
     @POST
     @Path("/start")
     @OnlyInSecuredNode
     public void start() {
         postEvent(DataNodeLifecycleTrigger.START);
+    }
+
+    @POST
+    @Path("/upgrade")
+    @OnlyInSecuredNode
+    public void upgrade() {
+        eventBus.post(new OpensearchUpdateEvent());
     }
 
     @POST

@@ -37,6 +37,15 @@ public @interface DbEntity {
 
     String readPermission() default NOBODY_ALLOWED;
 
+    /**
+     * List of document field names that are permitted to be read through general-purpose services
+     * (e.g. {@code MongoEntitySuggestionService}) when the caller has the appropriate {@link #readPermission()}.
+     * <p>
+     * Only fields that are safe to expose should be listed here — sensitive data such as passwords,
+     * tokens, or internal configuration objects must be excluded.
+     */
+    String[] readableFields() default {};
+
     //use for DBEntities that do not have string representations/ titles at all
     String NO_TITLE = "";
 

@@ -14,19 +14,38 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { EntityShareActions } from 'stores/permissions/EntityShareStore';
+import type { Optional } from 'utility-types';
+
+import {
+  prepareEntityShare,
+  prepareEntityCreateShare,
+  updateEntityShare,
+  loadUserSharesPaginated,
+} from 'api/entity-share';
+import type { GRN } from 'logic/permissions/types';
+import type { EntityCreateSharePayload, EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 import notifyingAction from '../notifyingAction';
 
 const prepare = notifyingAction({
-  action: EntityShareActions.prepare,
+  action: (_entityType: string, _entityTitle: string, entityGRN: GRN, payload?: Optional<EntitySharePayload>) =>
+    prepareEntityShare(entityGRN, payload),
+  error: (error, entityType, entityName) => ({
+    message: `Preparing shares for ${entityType} "${entityName}" failed with status: ${error}`,
+  }),
+});
+
+const prepareCreate = notifyingAction({
+  action: (_entityType: string, _entityTitle: string, payload?: EntityCreateSharePayload) =>
+    prepareEntityCreateShare(payload),
   error: (error, entityType, entityName) => ({
     message: `Preparing shares for ${entityType} "${entityName}" failed with status: ${error}`,
   }),
 });
 
 const update = notifyingAction({
-  action: EntityShareActions.update,
+  action: (_entityType: string, _entityTitle: string, entityGRN: GRN, payload: EntitySharePayload) =>
+    updateEntityShare(entityGRN, payload),
   error: (error, entityType, entityName) => ({
     message: `Updating shares for ${entityType} "${entityName}" failed with status: ${error}`,
   }),
@@ -35,8 +54,8 @@ const update = notifyingAction({
   }),
 });
 
-const loadUserSharesPaginated = notifyingAction({
-  action: EntityShareActions.loadUserSharesPaginated,
+const loadUserSharesPaginatedAction = notifyingAction({
+  action: (userId: string, pagination) => loadUserSharesPaginated(userId, pagination),
   error: (error, userId) => ({
     message: `Loading entities which got shared for user with id "${userId}" failed with status: ${error}`,
   }),
@@ -44,6 +63,7 @@ const loadUserSharesPaginated = notifyingAction({
 
 export default {
   prepare,
+  prepareCreate,
   update,
-  loadUserSharesPaginated,
+  loadUserSharesPaginated: loadUserSharesPaginatedAction,
 };

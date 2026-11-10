@@ -1,0 +1,5 @@
+type = "c"
+message = "Support bundle improvements and fixes - parallelism, memory consumption, resource and error handling"
+
+issues = ["graylog-plugin-enterprise#13625"]
+pulls = ["25555"]

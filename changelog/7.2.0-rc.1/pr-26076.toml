@@ -1,0 +1,4 @@
+type = "f"
+message = "Provide certificate authentication for internal OpenSearch maintenance calls."
+issues = ["Graylog2/graylog-plugin-enterprise#14009"]
+pulls = ["26076"]

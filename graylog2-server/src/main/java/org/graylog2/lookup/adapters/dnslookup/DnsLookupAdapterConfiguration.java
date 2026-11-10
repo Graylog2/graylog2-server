@@ -33,11 +33,11 @@ public class DnsLookupAdapterConfiguration implements PluginConfigBean {
     protected static final int DEFAULT_POOL_SIZE = 10;
     protected static final int DEFAULT_REFRESH_INTERVAL_SECONDS = 300;
 
-    @Documentation("tbd")
+    @Documentation("Number of DNS resolvers in the pool shared by all DNS lookup adapters.")
     @Parameter(value = RESOLVER_POOL_SIZE, validators = PositiveIntegerValidator.class)
     private int poolSize = DEFAULT_POOL_SIZE;
 
-    @Documentation("tbd")
+    @Documentation("Interval in which the resolvers in the DNS lookup adapter pool are recreated to cycle in new source ports.")
     @Parameter(value = RESOLVER_POOL_REFRESH_INTERVAL, validators = PositiveDurationValidator.class)
     private Duration poolRefreshInterval = Duration.seconds(DEFAULT_REFRESH_INTERVAL_SECONDS);
 

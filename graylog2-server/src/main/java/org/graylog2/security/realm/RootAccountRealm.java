@@ -16,6 +16,8 @@
  */
 package org.graylog2.security.realm;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -25,14 +27,11 @@ import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.AllPermission;
 import org.apache.shiro.authz.permission.WildcardPermissionResolver;
 import org.apache.shiro.realm.SimpleAccountRealm;
-import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.apache.shiro.subject.ImmutablePrincipalCollection;
 import org.apache.shiro.util.CollectionUtils;
 import org.graylog2.users.UserImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 public class RootAccountRealm extends SimpleAccountRealm {
     private static final Logger LOG = LoggerFactory.getLogger(RootAccountRealm.class);
@@ -65,9 +64,8 @@ public class RootAccountRealm extends SimpleAccountRealm {
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
         final AuthenticationInfo authenticationInfo = super.doGetAuthenticationInfo(token);
         // After successful authentication, exchange the principals to unique admin userId
-        if (authenticationInfo instanceof SimpleAccount) {
-            SimpleAccount account = (SimpleAccount) authenticationInfo;
-            account.setPrincipals(new SimplePrincipalCollection(UserImpl.LocalAdminUser.LOCAL_ADMIN_ID, NAME));
+        if (authenticationInfo instanceof final SimpleAccount account) {
+            account.setPrincipals(ImmutablePrincipalCollection.ofSinglePrincipal(UserImpl.LocalAdminUser.LOCAL_ADMIN_ID, NAME));
             return account;
         }
         return null;

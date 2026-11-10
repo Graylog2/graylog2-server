@@ -92,15 +92,5 @@ public abstract class OSPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
                 : new SortOrders(ordering, List.copyOf(sortingAggregations));
     }
 
-    private boolean isSortOnNumericPivotField(Pivot pivot, PivotSort pivotSort, IndexerGeneratedQueryContext<?> queryContext, Query query) {
-        return queryContext.fieldType(query.effectiveStreams(pivot), pivotSort.field())
-                .filter(this::isNumericFieldType)
-                .isPresent();
-    }
-
-    private boolean isNumericFieldType(String fieldType) {
-        return fieldType.equals("long") || fieldType.equals("double") || fieldType.equals("float");
-    }
-
     public abstract Stream<PivotBucket> extractBuckets(Pivot pivot, BucketSpec bucketSpecs, PivotBucket previousBucket);
 }

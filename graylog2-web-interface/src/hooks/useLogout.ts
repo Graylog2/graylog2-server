@@ -15,13 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useCallback, useMemo } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
-import { SessionActions } from 'stores/sessions/SessionStore';
+import { logout } from 'logic/session/SessionApi';
 import Routes from 'routing/Routes';
 import useHistory from 'routing/useHistory';
 import usePluginEntities from 'hooks/usePluginEntities';
-
-const logout = () => SessionActions.logout().then(() => SessionActions.validate);
 
 const wrapHooks = (hooks: Array<() => void | Promise<unknown>>) => () =>
   Promise.allSettled(
@@ -37,6 +36,7 @@ const wrapHooks = (hooks: Array<() => void | Promise<unknown>>) => () =>
 
 const useLogout = () => {
   const history = useHistory();
+  const queryClient = useQueryClient();
   const logoutHooks = usePluginEntities('hooks.logout');
   const logoutHook = useMemo(() => wrapHooks(logoutHooks), [logoutHooks]);
 
@@ -44,8 +44,11 @@ const useLogout = () => {
     () =>
       logoutHook()
         .then(logout)
+        .then(() => {
+          queryClient.removeQueries({ queryKey: ['streams'] });
+        })
         .then(() => history.push(Routes.STARTPAGE)),
-    [history, logoutHook],
+    [history, logoutHook, queryClient],
   );
 };
 

@@ -67,6 +67,7 @@ export type DataNode = {
   rest_api_address: string;
   action_queue: string;
   opensearch_roles?: string[];
+  configuration_warnings?: string[];
 };
 
 export type DataNodes = Array<DataNode>;

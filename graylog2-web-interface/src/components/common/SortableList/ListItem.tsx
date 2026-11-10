@@ -80,7 +80,7 @@ const ListItem = <ItemType extends ListItemType>(
   }
 
   return (
-    <StyledListGroupItem $alignItemContent={alignItemContent} ref={ref} className={className}>
+    <StyledListGroupItem ref={ref} className={className} $alignItemContent={alignItemContent}>
       {dragHandle}
       {itemContent}
     </StyledListGroupItem>

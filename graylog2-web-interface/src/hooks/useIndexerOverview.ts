@@ -16,14 +16,60 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
-import ApiRoutes from 'routing/ApiRoutes';
-import type { IndexerOverview } from 'stores/indexers/IndexerOverviewStore';
+import { IndexerOverview as IndexerOverviewAPI } from '@graylog/server-api';
+
 import { defaultOnError } from 'util/conditional/onError';
 
+export type IndexRange = {
+  index_name?: string;
+  begin: string;
+  end: string;
+  calculated_at: string;
+  took_ms: number;
+};
+
+export type IndexTier = 'WARM' | 'HOT';
+
+export type IndexSummary = {
+  index_name?: string;
+  size: {
+    events: number;
+    deleted: number;
+    bytes: number;
+  };
+  range: IndexRange;
+  is_deflector: boolean;
+  is_closed: boolean;
+  is_reopened: boolean;
+  shard_count: number;
+  tier: IndexTier;
+};
+
+export type IndexerOverview = {
+  deflector: {
+    current_target: string;
+    is_up: boolean;
+  };
+  indexer_cluster: {
+    health: {
+      status: string;
+      name?: string;
+      shards: {
+        active: number;
+        initializing: number;
+        relocating: number;
+        unassigned: number;
+      };
+    };
+  };
+  counts: {
+    events: number;
+  };
+  indices: Array<IndexSummary>;
+};
+
 const fetchIndexerOverview = (indexSetId: string): Promise<IndexerOverview> =>
-  fetch('GET', qualifyUrl(ApiRoutes.IndexerOverviewApiResource.list(indexSetId).url));
+  IndexerOverviewAPI.indexByindexSetId(indexSetId);
 
 const useIndexerOverview = (indexSetId: string) => {
   const { data, refetch, isLoading, error, isSuccess } = useQuery({

@@ -1,0 +1,5 @@
+type = "s"
+message = "Fix path traversal in datanode proxy resources."
+
+pulls = ["26825"]
+issues = ["Graylog2/graylog-plugin-enterprise#15029"]

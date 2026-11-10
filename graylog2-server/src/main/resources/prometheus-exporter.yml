@@ -1210,6 +1210,9 @@ metric_mappings:
   - metric_name: "traffic_system_output_traffic"
     match_pattern: "org.graylog2.traffic.system-output-traffic"
 
+  - metric_name: "traffic_input_indexed"
+    match_pattern: "org.graylog2.traffic.input-indexed"
+
   - metric_name: "forwarder_grpc_method_invocations"
     match_pattern: "org.graylog.plugins.forwarder.grpc.ServerMetricsInterceptor.method.org.graylog.cloud.forwarder.*.invocations"
     wildcard_extract_labels:

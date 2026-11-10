@@ -1,0 +1,4 @@
+type = "f"
+message = "Show event priority values by their name (e.g. \"Critical\") instead of the raw number in chart labels and Data Table widget cells."
+
+pulls = ["27473"]

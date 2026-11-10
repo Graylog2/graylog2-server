@@ -17,23 +17,24 @@
 
 import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 
+import { SystemIndexSetsFieldTypeProfiles } from '@graylog/server-api';
+
 import asMock from 'helpers/mocking/AsMock';
 import UserNotification from 'util/UserNotification';
 import suppressConsole from 'helpers/suppressConsole';
 import useProfile from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfile';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
 import { profile1JSON, profile1 } from 'fixtures/indexSetFieldTypeProfiles';
 
 const mockData = profile1JSON;
 
 const expectedState = profile1;
 jest.mock('util/UserNotification', () => ({ error: jest.fn() }));
-jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
-
 jest.mock('@graylog/server-api', () => ({
   SystemFieldTypes: {
     getAllFieldTypes: jest.fn(() => Promise.resolve()),
+  },
+  SystemIndexSetsFieldTypeProfiles: {
+    retrieveById: jest.fn(() => Promise.resolve()),
   },
 }));
 
@@ -45,19 +46,19 @@ describe('useProfiles custom hook', () => {
   });
 
   it('Test return initial data and take from fetch', async () => {
-    asMock(fetch).mockImplementation(() => Promise.resolve(mockData));
+    asMock(SystemIndexSetsFieldTypeProfiles.retrieveById).mockImplementation(() => Promise.resolve(mockData));
     const { result } = renderUseProfilesHook();
 
     await waitFor(() => !result.current.isFetched);
     await waitFor(() => result.current.isFetched);
 
-    expect(fetch).toHaveBeenCalledWith('GET', qualifyUrl('/system/indices/index_sets/profiles/111'));
+    expect(SystemIndexSetsFieldTypeProfiles.retrieveById).toHaveBeenCalledWith('111');
 
     expect(result.current.data).toEqual(expectedState);
   });
 
   it('Test trigger notification on fail', async () => {
-    asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
+    asMock(SystemIndexSetsFieldTypeProfiles.retrieveById).mockImplementation(() => Promise.reject(new Error('Error')));
 
     const { result } = renderUseProfilesHook();
 

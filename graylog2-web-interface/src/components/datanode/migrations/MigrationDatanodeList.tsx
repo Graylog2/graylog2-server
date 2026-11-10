@@ -65,7 +65,7 @@ const MigrationDatanodeList = ({ showProvisioningState = true }: Props) => {
             </Alert>
           )}
           <br />
-          <Table bordered condensed striped hover>
+          <Table bordered condensed>
             <thead>
               <tr>
                 <th>Hostname</th>

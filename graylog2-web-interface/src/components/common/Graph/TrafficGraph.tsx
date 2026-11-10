@@ -142,8 +142,10 @@ const TrafficGraph = ({ width, traffic, trafficLimit = undefined }: Props) => {
       },
       xaxis: {
         type: 'date',
+        tickformat: '%b %d',
+        hoverformat: '%b %d, %Y',
         title: {
-          text: 'Time shown in UTC',
+          text: 'Date (UTC)',
         },
       },
       hovermode: 'x',

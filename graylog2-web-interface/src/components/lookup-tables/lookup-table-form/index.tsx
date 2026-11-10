@@ -18,8 +18,9 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import { Formik } from 'formik';
 import type { FormikErrors } from 'formik';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
+import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import { Wizard, Spinner } from 'components/common';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -34,29 +35,22 @@ import type { LookupTable } from 'logic/lookup-tables/types';
 
 import WizardButtons from './wizard-buttons';
 
-export type LookupTableType = LookupTable & {
-  enable_single_value: boolean;
-  enable_multi_value: boolean;
-};
-
-export const INIT_TABLE_VALUES: LookupTableType = {
+export const INIT_TABLE_VALUES: LookupTable = {
   id: undefined,
   title: '',
   description: '',
   name: '',
   cache_id: undefined,
   data_adapter_id: undefined,
-  enable_single_value: false,
   default_single_value: '',
   default_single_value_type: 'NULL',
-  enable_multi_value: false,
   default_multi_value: '',
   default_multi_value_type: 'NULL',
   content_pack: null,
 };
 
-const validations = (values: LookupTableType) => {
-  const errors: FormikErrors<LookupTableType> = {};
+const validations = (values: LookupTable) => {
+  const errors: FormikErrors<LookupTable> = {};
 
   if (!values.title) errors.title = 'Title is required';
   if (!values.name) errors.name = 'Name is required';
@@ -71,8 +65,8 @@ function LookupTableWizard() {
   const { lookupTable, loadingLookupTable } = useFetchLookupTable(lutIdOrName);
   const initialValues = useMemo(() => lookupTable || INIT_TABLE_VALUES, [lookupTable]);
   const [steps, { activeStep, setActiveStep }] = useSteps();
-  const navigate = useNavigate();
-  const sendTelemetry = useSendTelemetry();
+  const { push } = useHistory();
+  const sendTelemetry = useSendTelemetry('lookup_table');
   const { createLookupTable, creatingLookupTable } = useCreateLookupTable();
   const { updateLookupTable, updatingLookupTable } = useUpdateLookupTable();
 
@@ -82,24 +76,24 @@ function LookupTableWizard() {
     setActiveStep(newStepKey);
   };
 
-  const handleSubmit = async (values: LookupTableType) => {
-    const payload = { ...values };
-
-    delete payload.enable_multi_value;
-    delete payload.enable_single_value;
+  const handleSubmit = async (values: LookupTable) => {
+    const payload = {
+      ...values,
+      default_single_value: values.default_single_value?.trim(),
+      default_multi_value: values.default_multi_value?.trim(),
+    };
 
     const promise = isCreate ? createLookupTable(payload) : updateLookupTable(payload);
 
     return promise.then(() => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.LUT[isCreate ? 'CREATED' : 'UPDATED'], {
         app_pathname: 'lut',
-        app_section: 'lookup_table',
         event_details: {
           lookup_table_name: values.name,
         },
       });
 
-      navigate(Routes.SYSTEM.LOOKUPTABLES.OVERVIEW);
+      push(Routes.SYSTEM.LOOKUPTABLES.OVERVIEW);
     });
   };
 

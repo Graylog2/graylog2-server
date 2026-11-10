@@ -31,6 +31,7 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
 import org.graylog2.rest.models.system.inputs.responses.InputSetup;
+import org.graylog2.rest.models.system.inputs.responses.InputStopped;
 import org.graylog2.rest.models.system.inputs.responses.InputUpdated;
 import org.graylog2.shared.inputs.InputLauncher;
 import org.graylog2.shared.inputs.InputRegistry;
@@ -111,7 +112,11 @@ public class InputEventListener {
         final boolean startInput;
         final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
         if (inputState != null) {
-            startInput = inputState.getState() == IOState.Type.RUNNING || inputState.getState() == IOState.Type.SETUP;
+            // Relaunch what was (meant to be) running. A FAILED input was never stopped on purpose, and an update is
+            // typically the fix for whatever made it fail (e.g. a port that was already in use), so retry it.
+            // Deliberately stopped inputs stay stopped.
+            final IOState.Type state = inputState.getState();
+            startInput = state == IOState.Type.RUNNING || state == IOState.Type.SETUP || state == IOState.Type.FAILED;
             inputRegistry.remove(inputState);
         } else {
             startInput = false;
@@ -146,10 +151,20 @@ public class InputEventListener {
     }
 
     @Subscribe
+    public void inputStopped(InputStopped inputStoppedEvent) {
+        LOG.debug("Input stopped: {}", inputStoppedEvent.id());
+        removeFromRegistry(inputStoppedEvent.id());
+    }
+
+    @Subscribe
     public void inputDeleted(InputDeleted inputDeletedEvent) {
         LOG.debug("Input deleted: {}", inputDeletedEvent.id());
         metricRegistry.remove(name(Input.class, FAILED_STARTS_METRIC, inputDeletedEvent.id()));
-        final IOState<MessageInput> inputState = inputRegistry.getInputState(inputDeletedEvent.id());
+        removeFromRegistry(inputDeletedEvent.id());
+    }
+
+    private void removeFromRegistry(String inputId) {
+        final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
         if (inputState != null) {
             inputRegistry.remove(inputState);
         }
@@ -199,7 +214,7 @@ public class InputEventListener {
                     .filter(input -> input.isGlobal() && input.onlyOnePerCluster())
                     .forEach(input -> {
                         LOG.info("Lost leader role. Stopping input {}", input.toIdentifier());
-                        inputDeleted(InputDeleted.create(input.getId()));
+                        inputStopped(InputStopped.create(input.getId()));
                     });
         }
     }

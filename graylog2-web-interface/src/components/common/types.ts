@@ -21,3 +21,7 @@ export type MarkdownConfigType = {
   allow_all_image_sources: boolean;
   allowed_image_sources: string;
 };
+
+export type WelcomePageConfigType = {
+  disable_metrics: boolean;
+};

@@ -17,12 +17,16 @@
 package org.graylog.events.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.Test;
 
 import java.net.URL;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -51,5 +55,54 @@ public class EventDtoTest {
         assertThat(eventDto.processingTimestamp()).isEqualTo(DateTime.parse("2019-09-25T10:35:57.116Z"));
         assertThat(eventDto.timerangeStart()).get().isEqualTo(DateTime.parse("2019-08-21T07:47:41.213Z"));
         assertThat(eventDto.timerangeEnd()).get().isEqualTo(DateTime.parse("2019-08-21T07:48:41.212Z"));
+    }
+
+    @Test
+    public void sortsFieldsAlphabeticallyWhenBuilt() {
+        final Map<String, String> unsorted = new LinkedHashMap<>();
+        unsorted.put("charlie", "3");
+        unsorted.put("zulu", "26");
+        unsorted.put("alpha", "1");
+
+        final EventDto eventDto = testDto().fields(unsorted).build();
+
+        assertThat(eventDto.fields().keySet()).containsExactly("alpha", "charlie", "zulu");
+    }
+
+    @Test
+    public void sortsGroupByFieldsAlphabeticallyWhenBuilt() {
+        final Map<String, String> unsorted = new LinkedHashMap<>();
+        unsorted.put("beta", "2");
+        unsorted.put("alpha", "1");
+
+        final EventDto eventDto = testDto().groupByFields(unsorted).build();
+
+        assertThat(eventDto.groupByFields().keySet()).containsExactly("alpha", "beta");
+    }
+
+    @Test
+    public void sortsFieldsWhenDeserializedFromElasticsearch() throws Exception {
+        final URL eventString = Resources.getResource(getClass(), "unsorted-fields-event-from-elasticsearch.json");
+        final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+
+        final EventDto eventDto = objectMapper.readValue(eventString, EventDto.class);
+
+        assertThat(eventDto.fields().keySet()).containsExactly("alpha", "charlie", "zulu");
+    }
+
+    private EventDto.Builder testDto() {
+        return EventDto.builder()
+                .id("01DNM0DVJDV52NA5VEBTYJ6PJY")
+                .eventDefinitionType("aggregation-v1")
+                .eventDefinitionId("event-definition-id")
+                .eventTimestamp(DateTime.parse("2019-08-21T07:48:01.326Z"))
+                .processingTimestamp(DateTime.parse("2019-09-25T10:35:57.116Z"))
+                .message("message")
+                .source("source")
+                .keyTuple(ImmutableList.of())
+                .priority(1)
+                .alert(false)
+                .fields(ImmutableMap.of())
+                .groupByFields(ImmutableMap.of());
     }
 }

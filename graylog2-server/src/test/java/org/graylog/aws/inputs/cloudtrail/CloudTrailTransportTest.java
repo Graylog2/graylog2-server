@@ -41,6 +41,7 @@ import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_ASSUME_ROLE_A
 import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_AWS_ACCESS_KEY;
 import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_AWS_S3_REGION;
 import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_AWS_SQS_REGION;
+import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_EXTERNAL_ID;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -87,6 +88,7 @@ public class CloudTrailTransportTest {
     private static final String TEST_USER_NAME = "username";
     private static final String TEST_REGION = "us-east-1";
     private static final String TEST_ARN = "test:arn:aws:iam::123456789012:role/test-role";
+    private static final String TEST_EXTERNAL_ID = "12345";
 
     // Test Cases
     @Test
@@ -122,6 +124,7 @@ public class CloudTrailTransportTest {
         given(mockConfiguration.getString(eq(CK_ASSUME_ROLE_ARN))).willReturn(TEST_ARN);
         given(mockConfiguration.getString(eq(CK_AWS_SQS_REGION), any())).willReturn(TEST_REGION);
         given(mockConfiguration.getString(eq(CK_AWS_S3_REGION), any())).willReturn(TEST_REGION);
+        given(mockConfiguration.getString(eq(CK_EXTERNAL_ID))).willReturn(TEST_EXTERNAL_ID);
 
         given(mockCloudTrailInput.getConfiguration()).willReturn(mockConfiguration);
 

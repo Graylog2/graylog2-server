@@ -17,11 +17,15 @@
 import React from 'react';
 import moment from 'moment';
 import styled, { css } from 'styled-components';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { describeExpression } from 'util/CronUtils';
 import { OverlayTrigger, Icon, Timestamp } from 'components/common';
 import Button from 'components/bootstrap/Button';
-import { EventDefinitionsActions } from 'stores/event-definitions/EventDefinitionsStore';
+import {
+  clearNotificationQueue,
+  EVENT_DEFINITIONS_QUERY_KEY,
+} from 'components/event-definitions/hooks/useEventDefinitions';
 
 import type { Scheduler, EventDefinition } from '../event-definitions-types';
 
@@ -47,8 +51,8 @@ const DetailValue = styled.dd(
   `,
 );
 
-const DetailsButton = styled(Button)`
-  padding: 6px 8px;
+const DetailsOverlayTrigger = styled(OverlayTrigger)`
+  vertical-align: bottom;
 `;
 
 const getTimeRange = (scheduler: Scheduler) => {
@@ -140,22 +144,22 @@ const SchedulingInfo = ({
   return (
     <>
       {`Runs ${executeEveryFormatted}${searchWithinMessage} `}
-      <OverlayTrigger
+      <DetailsOverlayTrigger
         trigger="click"
         rootClose
         placement="left"
         title={`${title} details.`}
         overlay={detailsPopover(scheduler, clearNotifications)}
         width={500}>
-        <DetailsButton bsStyle="link">
-          <Icon name="info" />
-        </DetailsButton>
-      </OverlayTrigger>
+        <Icon name="info" title={`${title} details.`} bsStyle={'info'} />
+      </DetailsOverlayTrigger>
     </>
   );
 };
 
 const SchedulingCell = ({ definition }: Props) => {
+  const queryClient = useQueryClient();
+
   if (!definition?.config?.search_within_ms && !definition?.config?.execute_every_ms) {
     return <>Not Scheduled.</>;
   }
@@ -163,7 +167,12 @@ const SchedulingCell = ({ definition }: Props) => {
   const clearNotifications = (eventDefinition: EventDefinition) => () => {
     // eslint-disable-next-line no-alert
     if (window.confirm(`Are you sure you want to clear queued notifications for "${eventDefinition.title}"?`)) {
-      EventDefinitionsActions.clearNotificationQueue(eventDefinition);
+      clearNotificationQueue(eventDefinition).then(
+        () => queryClient.invalidateQueries({ queryKey: EVENT_DEFINITIONS_QUERY_KEY }),
+        () => {
+          // Error feedback is handled by `clearNotificationQueue` itself.
+        },
+      );
     }
   };
 

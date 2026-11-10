@@ -27,6 +27,7 @@ import type { Generator } from 'views/components/visualizations/ChartData';
 import useChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartDataSettingsWithCustomUnits';
 import useChartLayoutSettingsWithCustomUnits from 'views/components/visualizations/hooks/useChartLayoutSettingsWithCustomUnits';
 import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
+import scatterOnClickPopover from 'views/components/visualizations/scatter/scatterOnClickPopover';
 
 import XYPlot from '../XYPlot';
 
@@ -71,7 +72,10 @@ const ScatterVisualization = makeVisualization(
 
       return _layouts;
     }, [shapes, getChartLayoutSettingsWithCustomUnits]);
-    const { popover, initializeGraphDivRef, onChartClick } = usePlotOnClickPopover('scatter', config);
+    const { popover, initializeGraphDivRef, onChartClick } = usePlotOnClickPopover({
+      ...scatterOnClickPopover,
+      config,
+    });
 
     return (
       <>

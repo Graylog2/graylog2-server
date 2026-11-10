@@ -1,0 +1,5 @@
+type = "f"
+message = "Enforce attribute permissions on entity table filters and expanded details."
+
+pulls = ["25697"]
+issues = ["Graylog2/graylog-plugin-enterprise#13925"]

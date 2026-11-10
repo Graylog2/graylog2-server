@@ -25,7 +25,6 @@ import useLastOpened from 'components/welcome/hooks/useLastOpened';
 import useFavoriteItems from 'components/welcome/hooks/useFavoriteItems';
 import useRecentActivity from 'components/welcome/hooks/useRecentActivity';
 import useCurrentUser from 'hooks/useCurrentUser';
-import { carol, sam } from 'fixtures/users';
 
 jest.mock('components/content-stream/ContentStreamSection', () => 'content-stream-section');
 
@@ -100,31 +99,6 @@ jest.mock('hooks/useCurrentUser');
 describe('Welcome', () => {
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
-  });
-
-  describe('Page header', () => {
-    it('Shows link to edit profile in case user is not readOnly and has no defined starting page', async () => {
-      render(<Welcome />);
-
-      await screen.findByText(
-        'This is your personal start page, allowing easy access to the content most relevant for you.',
-      );
-      const linkToEditProfile = await screen.findByText('edit profile');
-
-      expect(linkToEditProfile).toHaveAttribute('href', '/system/users/edit/admin-id');
-    });
-
-    it('Shows appropriate message without link for readOnly users', async () => {
-      asMock(useCurrentUser).mockReturnValue(sam);
-      render(<Welcome />);
-      await screen.findByText('This is your personal page, allowing easy access to the content most relevant for you.');
-    });
-
-    it('Shows appropriate message without link for users with defined starting page', async () => {
-      asMock(useCurrentUser).mockReturnValue(carol);
-      render(<Welcome />);
-      await screen.findByText('This is your personal page, allowing easy access to the content most relevant for you.');
-    });
   });
 
   describe('Last opened list', () => {

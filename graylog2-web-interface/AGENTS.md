@@ -1,0 +1,94 @@
+# Agent Instructions
+
+This file contains instructions for AI coding agents working on the Graylog web interface.
+
+**You must also read [CONVENTIONS.md](./CONVENTIONS.md)** before changing code — it contains the coding conventions, component guidelines, testing standards, and UI styling rules that apply to all changes.
+
+## Project Overview
+
+- **Project**: Graylog Web Interface (`graylog-web-interface`)
+- **Language**: TypeScript, React
+- **Package manager**: Yarn (v1)
+- **Bundler**: Webpack
+- **Test framework**: Jest + Testing Library
+- **Linter**: ESLint (extends `eslint-config-graylog`, based on Airbnb)
+- **Style linter**: Stylelint (`stylelint-config-graylog`)
+
+## Commands
+
+```bash
+# Install dependencies
+yarn install
+
+# Start dev server
+yarn start
+
+# Start dev server without plugins
+disable_plugins=true yarn start
+
+# Build (without plugins)
+yarn build
+
+# Run all tests (DO NOT use `yarn jest`)
+yarn test
+
+# Run specific tests (file or folder path)
+yarn test <path>
+
+# Type check (~10s)
+yarn tsgo
+
+# Quick check while working: type check plus the tests of the feature you changed.
+# Prefer a folder path over `--findRelatedTests`, which pulls in hundreds of suites for shared components.
+yarn tsgo && yarn test <feature-folder>
+
+# Lint changed files (requires committed changes, diffs against origin/master, so fetch first)
+yarn lint:changes
+
+# Lint a specific file
+yarn lint:path <file>
+
+# Lint styles
+yarn lint:styles
+
+# Lint styles for a specific file
+yarn lint:styles:path <file>
+
+# Format code (always formats all of src, test and docs, even with file arguments)
+yarn format
+
+# Format specific files
+yarn oxfmt <file>
+
+# Regenerate the API types in target/api (@graylog/server-api) from the backend's swagger output.
+# `tsgo` errors about `@graylog/server-api` can mean target/api is stale: compile the backend
+# (see the root AGENTS.md, it writes the swagger output), then run this.
+yarn generate:apidefs
+
+# Regenerate the default themes after changing the theme in src/theme/sawmill
+yarn generate:themes
+
+# Pre-PR verification (run before considering work complete)
+yarn tsgo && yarn lint:changes && yarn test
+```
+
+## Project Structure
+
+- `src/` — Application source code (components, views, stores, actions, logic)
+- `src/theme/sawmill/` — Mantine and styled-components theme, see "Theme" in [CONVENTIONS.md](./CONVENTIONS.md)
+- `packages/graylog-web-plugin/` — Shared packages for core and plugins, webpack config for plugins, plugin registration interfaces
+- `packages/eslint-config-graylog/` — Custom ESLint rules
+- `packages/stylelint-config-graylog/` — Custom Stylelint rules
+- `docs/graylog-luma/stories/` — Sources of the graylog-luma design system
+- `target/` — Build output
+
+## Design System
+
+When a change touches UI, consult the graylog-luma design system in `docs/graylog-luma/stories/`. Read every file relevant to the change, not just `.mdx` docs.
+
+## Finishing work
+
+Before finishing current work, please make sure that:
+- Type-checking passes
+- Tests are passing (use `yarn test`, never `yarn jest`)
+- Generated code adheres to [CONVENTIONS.md](./CONVENTIONS.md)

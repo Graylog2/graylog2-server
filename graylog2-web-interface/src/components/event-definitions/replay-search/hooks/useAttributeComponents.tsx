@@ -17,20 +17,19 @@
 import React, { useMemo } from 'react';
 import moment from 'moment/moment';
 import styled, { css } from 'styled-components';
-import upperFirst from 'lodash/upperFirst';
 
 import { TIME_UNITS } from 'components/event-definitions/event-definition-types/FilterForm';
-import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
+import { getPriorityName } from 'logic/alerts/EventDefinitionPriorityEnum';
 import { extractDurationAndUnit } from 'components/common/TimeUnitInput';
 import { Timestamp, HoverForHelp } from 'components/common';
 import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
-import useFeature from 'hooks/useFeature';
 import SidebarNavigationLink from 'components/layout/RightSidebar/SidebarNavigationLink';
 import SidebarEventDefinitionDetails from 'components/event-definitions/SidebarEventDefinitionDetails';
+import Routes from 'routing/Routes';
+import Link from 'components/common/Link';
 
 import useAlertAndEventDefinitionData from './useAlertAndEventDefinitionData';
 
-import AggregationConditions from '../AggregationConditions';
 import Notifications from '../Notifications';
 
 const AlertTimestamp = styled(Timestamp)(
@@ -39,10 +38,22 @@ const AlertTimestamp = styled(Timestamp)(
   `,
 );
 
+const EventDefinitionTitle = () => {
+  const { alertId, definitionId } = useReplaySearchContext();
+  const { eventDefinition } = useAlertAndEventDefinitionData(alertId, definitionId);
+
+  return alertId ? (
+    <SidebarNavigationLink content={SidebarEventDefinitionDetails(definitionId)}>
+      {eventDefinition.title}
+    </SidebarNavigationLink>
+  ) : (
+    <Link to={Routes.ALERTS.DEFINITIONS.show(definitionId)}>{eventDefinition.title}</Link>
+  );
+};
+
 const useAttributeComponents = () => {
   const { alertId, definitionId, type } = useReplaySearchContext();
   const { eventData, eventDefinition } = useAlertAndEventDefinitionData(alertId, definitionId);
-  const isRightSidebarEnabled = useFeature('replay_search_right_sidebar');
 
   return useMemo(() => {
     const isEventDefinition = type === 'event_definition';
@@ -60,7 +71,6 @@ const useAttributeComponents = () => {
       title: string;
       content: React.ReactNode;
       show?: boolean;
-      inRows?: boolean;
     }> = [
       {
         title: 'Event definition updated at',
@@ -77,16 +87,12 @@ const useAttributeComponents = () => {
       },
       {
         title: 'Event definition',
-        content: (
-          <SidebarNavigationLink content={SidebarEventDefinitionDetails(eventDefinition.id)}>
-            {eventDefinition.title}
-          </SidebarNavigationLink>
-        ),
+        content: <EventDefinitionTitle />,
         show: !isEventDefinition,
       },
       {
         title: 'Priority',
-        content: upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name),
+        content: getPriorityName(eventDefinition.priority),
       },
       {
         title: 'Execute search every',
@@ -102,18 +108,11 @@ const useAttributeComponents = () => {
         title: 'Notifications',
         content: <Notifications />,
       },
-      { title: 'Description', content: eventDefinition.description, inRows: true },
+      { title: 'Description', content: eventDefinition.description },
     ];
-    if (!isRightSidebarEnabled) {
-      components.push({
-        title: 'Aggregation conditions',
-        content: <AggregationConditions />,
-        inRows: true,
-      });
-    }
 
     return components;
-  }, [eventData?.timestamp, eventDefinition, isRightSidebarEnabled, type]);
+  }, [eventData?.timestamp, eventDefinition, type]);
 };
 
 export default useAttributeComponents;

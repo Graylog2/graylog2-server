@@ -35,6 +35,7 @@ import org.graylog2.web.customization.CustomizationConfig;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Comparator;
+import java.util.Set;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -67,6 +68,11 @@ public class ListIndexSetsTool extends Tool<ListIndexSetsTool.Parameters, String
         );
         this.indexSetService = indexSetService;
         this.customizationConfig = customizationConfig;
+    }
+
+    @Override
+    public Set<String> checkedPermissions() {
+        return Set.of(RestPermissions.INDEXSETS_READ);
     }
 
     @Override

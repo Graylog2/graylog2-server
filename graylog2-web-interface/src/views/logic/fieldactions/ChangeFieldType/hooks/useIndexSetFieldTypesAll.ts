@@ -16,8 +16,8 @@
  */
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
+import { SystemIndexSetsTypes } from '@graylog/server-api';
+
 import type { IndexSetFieldTypeJson } from 'components/indices/IndexSetFieldTypes/types';
 import { defaultOnError } from 'util/conditional/onError';
 
@@ -28,10 +28,11 @@ const INITIAL_DATA = {
   currentTypes: {},
 };
 
-const fetchIndexSetFieldTypesAll = async (indexSetId: string) => {
-  const indexSetFieldTypeAllUrl = qualifyUrl(`/system/indices/index_sets/types/${indexSetId}/all`);
-
-  return fetch('GET', indexSetFieldTypeAllUrl).then((elements) => ({
+const fetchIndexSetFieldTypesAll = async (indexSetId: string) =>
+  SystemIndexSetsTypes.indexSetFieldTypesListByindex_set_idAndfieldNameQueryAndfiltersAndsortAndorder(
+    undefined,
+    indexSetId,
+  ).then((elements) => ({
     currentTypes: Object.fromEntries(
       elements.map((fieldType: IndexSetFieldTypeJson) => [fieldType.field_name, fieldType.type]),
     ),
@@ -41,7 +42,6 @@ const fetchIndexSetFieldTypesAll = async (indexSetId: string) => {
       disabled: fieldType.is_reserved === true,
     })),
   }));
-};
 
 const useIndexSetFieldTypesAll = (
   indexSetId: string,

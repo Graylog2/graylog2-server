@@ -1,0 +1,4 @@
+type = "a"
+message = "Implement sampling for pipeline rule debug metrics."
+
+pulls = ["25953", "graylog-plugin-enterprise#14196"]

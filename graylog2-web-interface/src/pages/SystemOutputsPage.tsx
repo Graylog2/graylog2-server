@@ -18,12 +18,10 @@ import React from 'react';
 
 import { DocumentTitle, PageHeader } from 'components/common';
 import OutputsComponent from 'components/outputs/OutputsComponent';
-import useCurrentUser from 'hooks/useCurrentUser';
 import useProductName from 'brand-customization/useProductName';
 import MarketplaceLink from 'components/support/MarketplaceLink';
 
 const SystemOutputsPage = () => {
-  const currentUser = useCurrentUser();
   const productName = useProductName();
 
   return (
@@ -38,7 +36,7 @@ const SystemOutputsPage = () => {
           </span>
         </PageHeader>
 
-        <OutputsComponent permissions={currentUser.permissions} />
+        <OutputsComponent />
       </span>
     </DocumentTitle>
   );

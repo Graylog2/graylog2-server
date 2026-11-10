@@ -1,0 +1,3 @@
+type = "f"
+message = "Surface partial shard failures from searches instead of silently returning incomplete results."
+pulls = ["25797"]

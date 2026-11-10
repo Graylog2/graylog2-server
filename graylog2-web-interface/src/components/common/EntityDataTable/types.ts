@@ -18,6 +18,7 @@ import type * as React from 'react';
 
 import type { Attribute, Sort } from 'stores/PaginationTypes';
 import type { ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
+import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 
 export type EntityBase = {
   id: string;
@@ -29,17 +30,23 @@ export type ColumnSchema = {
   isDerived?: boolean;
 } & Pick<
   Attribute,
-  'id' | 'title' | 'type' | 'sortable' | 'hidden' | 'permissions' | 'sliceable' | 'slice_sort_options'
+  | 'id'
+  | 'title'
+  | 'type'
+  | 'sortable'
+  | 'hidden'
+  | 'permissions'
+  | 'sliceable'
+  | 'slice_sort_options'
+  | 'slice_sort_default'
 >;
 
-// A column render should have either a `width` and optionally a `minWidth` or only a `staticWidth`.
 export type ColumnRenderer<Entity extends EntityBase, Meta = unknown> = {
   renderCell?: (value: unknown, entity: Entity, meta: Meta, additionalInfo?: unknown) => React.ReactNode;
   renderHeader?: (title: string) => React.ReactNode;
   textAlign?: string;
-  minWidth?: number; // px
-  width?: number; // fraction of unassigned table width, similar to CSS unit fr.
-  // Uses the rendered title width as the fixed width; or provide a px value, if the title width is too small.
+  // Width in px, or `matchHeader` to use the rendered header width. A px value smaller than the header width
+  // will be increased to the header width.
   staticWidth?: number | 'matchHeader';
 };
 
@@ -59,13 +66,31 @@ export type ColumnPreferences = {
   };
 };
 
+export type SlicingPreferences = {
+  sliceColumn: string;
+  sortBy: string;
+  order: 'asc' | 'desc';
+  readOnly?: boolean;
+};
+
+export type SlicingPreferencesJSON = {
+  slice_column: string;
+  sort_by: string;
+  order: 'asc' | 'desc';
+  read_only?: boolean;
+};
+
 export type TableLayoutPreferences<T = { [key: string]: unknown }> = {
   attributes?: ColumnPreferences;
   sort?: Sort;
   perPage?: number;
   order?: Array<string>;
+  slicing?: SlicingPreferences | null;
   customPreferences?: T;
+  defaultFilters?: UrlQueryFilters;
 };
+
+export type TableLayoutDefaultFiltersJSON = Array<string>;
 
 export type TableLayoutPreferencesJSON<T = { [key: string]: unknown }> = {
   attributes?: ColumnPreferences;
@@ -74,8 +99,10 @@ export type TableLayoutPreferencesJSON<T = { [key: string]: unknown }> = {
     order: 'asc' | 'desc';
   };
   per_page?: number;
+  slicing?: SlicingPreferencesJSON | null;
   custom_preferences?: T;
   order?: Array<string>;
+  filters?: TableLayoutDefaultFiltersJSON;
 };
 
 export type ExpandedSectionRenderer<Entity> = {
@@ -83,15 +110,21 @@ export type ExpandedSectionRenderer<Entity> = {
   content: (entity: Entity) => React.ReactNode;
   actions?: (entity: Entity) => React.ReactNode;
   disableHeader?: boolean;
+  // Hides the section for entities it doesn't apply to, e.g. stream rules for the default stream.
+  isAvailable?: (entity: Entity) => boolean;
 };
 
 export type ExpandedSectionRenderers<Entity> = {
   [sectionName: string]: ExpandedSectionRenderer<Entity>;
 };
 
+export type RowOverride<Entity extends EntityBase> = (entity: Entity) => React.ReactNode;
+
 export type DefaultLayout = {
   entityTableId: string;
+  layoutVariant?: string;
   defaultSort: Sort;
+  defaultSlicing?: SlicingPreferences;
   defaultDisplayedAttributes: Array<string>;
   defaultPageSize: number;
   defaultColumnOrder: Array<string>;

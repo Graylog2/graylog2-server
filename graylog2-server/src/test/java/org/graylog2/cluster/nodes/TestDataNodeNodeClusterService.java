@@ -34,8 +34,8 @@ public class TestDataNodeNodeClusterService implements NodeService<DataNodeDto> 
 
 
     @Override
-    public boolean registerServer(NodeDto dto) {
-        return nodes.add((DataNodeDto) dto);
+    public boolean registerServer(DataNodeDto dto) {
+        return nodes.add(dto);
     }
 
     @Override
@@ -69,12 +69,12 @@ public class TestDataNodeNodeClusterService implements NodeService<DataNodeDto> 
     }
 
     @Override
-    public void ping(NodeDto dto) {
+    public void ping(DataNodeDto dto) {
         throw new UnsupportedOperationException("Unsupported operation");
     }
 
     @Override
-    public void update(NodeDto dto) {
+    public void update(DataNodeDto dto) {
         nodes = nodes.stream().map(node -> Objects.equals(node.getNodeId(), dto.getNodeId()) ? (DataNodeDto) dto : node).collect(Collectors.toList());
     }
 
@@ -83,8 +83,4 @@ public class TestDataNodeNodeClusterService implements NodeService<DataNodeDto> 
         throw new UnsupportedOperationException("Unsupported operation");
     }
 
-    @Override
-    public void markAsAlive(NodeDto dto) throws NodeNotFoundException {
-        throw new UnsupportedOperationException("Unsupported operation");
-    }
 }

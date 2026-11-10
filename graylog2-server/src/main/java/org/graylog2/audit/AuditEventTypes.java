@@ -60,10 +60,14 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String DATANODE_START = PREFIX + "data_node:start";
     public static final String DATANODE_START_REPLICATION = PREFIX + "data_node:start_replication";
     public static final String DATANODE_STOP_REPLICATION = PREFIX + "data_node:stop_replication";
+    public static final String DATANODE_TRIGGER_RESTART = PREFIX + "data_node:trigger_restart";
+    public static final String DATANODE_ABORT_RESTART = PREFIX + "data_node:abort_restart";
+    public static final String DATANODE_RESUME_RESTART = PREFIX + "data_node:resume_restart";
     public static final String ES_INDEX_CLOSE = PREFIX + "es_index:close";
     public static final String ES_INDEX_CREATE = PREFIX + "es_index:create";
     public static final String ES_INDEX_DELETE = PREFIX + "es_index:delete";
     public static final String ES_INDEX_OPEN = PREFIX + "es_index:open";
+    public static final String ES_INDEX_REINDEX = PREFIX + "es_index:reindex";
     public static final String ES_INDEX_RANGE_CREATE = PREFIX + "es_index_range:create";
     public static final String ES_INDEX_RANGE_DELETE = PREFIX + "es_index_range:delete";
     public static final String ES_INDEX_RANGE_UPDATE_JOB = PREFIX + "es_index_range_update_job:start";
@@ -152,6 +156,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String STREAM_DESTINATION_FILTER_CREATE = PREFIX + "stream_destination_filter:create";
     public static final String STREAM_DESTINATION_FILTER_DELETE = PREFIX + "stream_destination_filter:delete";
     public static final String STREAM_DESTINATION_FILTER_UPDATE = PREFIX + "stream_destination_filter:update";
+    public static final String STREAM_ASSIGN_INDEX_SET = PREFIX + "stream:assign_index_set";
     public static final String STREAM_CREATE = PREFIX + "stream:create";
     public static final String STREAM_DELETE = PREFIX + "stream:delete";
     public static final String STREAM_OUTPUT_ASSIGNMENT_CREATE = PREFIX + "stream_output_assignment:create";
@@ -197,6 +202,18 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String MCP_TOOL_LIST = MCP_PREFIX + "tool:list";
     public static final String MCP_TOOL_CALL = MCP_PREFIX + "tool:call";
 
+    public static final String OPAMP_ENROLLMENT_TOKEN_CREATE = PREFIX + "collector_enrollment_token:create";
+    public static final String OPAMP_ENROLLMENT_TOKEN_DELETE = PREFIX + "collector_enrollment_token:delete";
+    public static final String COLLECTOR_FLEET_CREATE = PREFIX + "collector_fleet:create";
+    public static final String COLLECTOR_FLEET_DELETE = PREFIX + "collector_fleet:delete";
+    public static final String COLLECTOR_FLEET_UPDATE = PREFIX + "collector_fleet:update";
+    public static final String COLLECTOR_INSTANCE_DELETE = PREFIX + "collector_instance:delete";
+    public static final String COLLECTOR_INSTANCE_REASSIGN = PREFIX + "collector_instance:reassign";
+    public static final String COLLECTOR_SOURCE_CREATE = PREFIX + "collector_source:create";
+    public static final String COLLECTOR_SOURCE_DELETE = PREFIX + "collector_source:delete";
+    public static final String COLLECTOR_SOURCE_UPDATE = PREFIX + "collector_source:update";
+    public static final String COLLECTORS_CONFIG_UPDATE = PREFIX + "collectors_config:update";
+
     private static final ImmutableSet<String> EVENT_TYPES = ImmutableSet.<String>builder()
             .add(ALARM_CALLBACK_CREATE)
             .add(ALARM_CALLBACK_DELETE)
@@ -233,11 +250,15 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(DATANODE_START)
             .add(DATANODE_START_REPLICATION)
             .add(DATANODE_STOP_REPLICATION)
+            .add(DATANODE_TRIGGER_RESTART)
+            .add(DATANODE_ABORT_RESTART)
+            .add(DATANODE_RESUME_RESTART)
             .add(DATANODE_API_REQUEST)
             .add(ES_INDEX_CLOSE)
             .add(ES_INDEX_CREATE)
             .add(ES_INDEX_DELETE)
             .add(ES_INDEX_OPEN)
+            .add(ES_INDEX_REINDEX)
             .add(ES_INDEX_RANGE_CREATE)
             .add(ES_INDEX_RANGE_DELETE)
             .add(ES_INDEX_RANGE_UPDATE_JOB)
@@ -322,6 +343,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(SESSION_DELETE)
             .add(STATIC_FIELD_CREATE)
             .add(STATIC_FIELD_DELETE)
+            .add(STREAM_ASSIGN_INDEX_SET)
             .add(STREAM_CREATE)
             .add(STREAM_DELETE)
             .add(STREAM_OUTPUT_ASSIGNMENT_CREATE)
@@ -366,6 +388,17 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(MCP_PROMPT_LIST)
             .add(MCP_PROMPT_GET)
             .add(MONGODB_CHANGE_PROFILING)
+            .add(OPAMP_ENROLLMENT_TOKEN_CREATE)
+            .add(OPAMP_ENROLLMENT_TOKEN_DELETE)
+            .add(COLLECTOR_FLEET_CREATE)
+            .add(COLLECTOR_FLEET_DELETE)
+            .add(COLLECTOR_FLEET_UPDATE)
+            .add(COLLECTOR_INSTANCE_DELETE)
+            .add(COLLECTOR_INSTANCE_REASSIGN)
+            .add(COLLECTOR_SOURCE_CREATE)
+            .add(COLLECTOR_SOURCE_DELETE)
+            .add(COLLECTOR_SOURCE_UPDATE)
+            .add(COLLECTORS_CONFIG_UPDATE)
             .build();
 
     @Override

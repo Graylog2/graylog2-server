@@ -17,19 +17,23 @@
 
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 import { defaultUser } from 'defaultMockValues';
 import type { Permission } from 'graylog-web-plugin/plugin';
 
 import Routes from 'routing/Routes';
 import usePluginEntities from 'hooks/usePluginEntities';
-import mockAction from 'helpers/mocking/MockAction';
-import MockStore from 'helpers/mocking/StoreMock';
 import mockComponent from 'helpers/mocking/MockComponent';
 import { simpleEventDefinition as mockEventDefinition } from 'fixtures/eventDefinition';
 import { adminUser } from 'fixtures/users';
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
+import { useEventDefinitionWithContext } from 'components/event-definitions/hooks/useEventDefinitions';
+import EventDefinitionSummary from 'components/event-definitions/event-definition-form/EventDefinitionSummary';
+import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import ViewEventDefinitionPage from './ViewEventDefinitionPage';
 
@@ -42,35 +46,44 @@ jest.mock('react-router-dom', () => ({
 
 jest.mock('hooks/useCurrentUser');
 
-jest.mock('stores/event-definitions/EventDefinitionsStore', () => ({
-  EventDefinitionsActions: {
-    get: mockAction(
-      jest.fn(() =>
-        Promise.resolve({
-          event_definition: mockEventDefinition,
-          context: { scheduler: { is_scheduled: true } },
-          is_mutable: true,
-        }),
-      ),
-    ),
-  },
+jest.mock('components/event-definitions/hooks/useEventDefinitions', () => ({
+  ...jest.requireActual('components/event-definitions/hooks/useEventDefinitions'),
+  useEventDefinitionWithContext: jest.fn(),
+  copyEventDefinition: jest.fn(() => Promise.resolve({ id: 'new-id', title: 'New copy' })),
 }));
 
-jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
-  EventNotificationsActions: {
-    listAll: mockAction(),
-  },
-  EventNotificationsStore: MockStore(['getInitialState', () => ({ all: [] })]),
+jest.mock('components/event-notifications/hooks/useEventNotifications', () => ({
+  ...jest.requireActual('components/event-notifications/hooks/useEventNotifications'),
+  useEventNotifications: jest.fn(() => ({ data: { notifications: [] as Array<EventNotification> }, isFetched: true })),
 }));
 
 jest.mock('components/event-definitions/event-definition-form/EventDefinitionSummary', () =>
-  mockComponent('EventDefinitionSummary'),
+  jest.fn(mockComponent('EventDefinitionSummary')),
 );
 jest.mock('hooks/usePluginEntities');
+jest.mock('logic/telemetry/useSendTelemetry');
 
 describe('<ViewEventDefinitionPage />', () => {
+  const sendTelemetry = jest.fn();
+
+  const duplicateEventDefinition = async () => {
+    await userEvent.click(await screen.findByRole('button', { name: /duplicate event definition/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /confirm/i }));
+  };
+
   beforeEach(() => {
+    sendTelemetry.mockClear();
+    asMock(EventDefinitionSummary).mockClear();
+    asMock(useSendTelemetry).mockReturnValue(sendTelemetry);
     asMock(useCurrentUser).mockReturnValue(defaultUser);
+    asMock(useEventDefinitionWithContext).mockReturnValue({
+      data: {
+        eventDefinition: mockEventDefinition,
+        context: { scheduler: { is_scheduled: true } },
+        is_mutable: true,
+      },
+      isFetching: false,
+    });
     asMock(usePluginEntities).mockImplementation(
       (entityKey) =>
         ({
@@ -90,7 +103,45 @@ describe('<ViewEventDefinitionPage />', () => {
   it('should display the event definition page', async () => {
     render(<ViewEventDefinitionPage />);
 
-    await screen.findByText(/View Event Definition/);
+    await screen.findByText(/View "Event Definition 1" Event Definition/);
+  });
+
+  it('shows an enabled event definition as scheduled when it has no scheduler job', async () => {
+    asMock(useEventDefinitionWithContext).mockReturnValue({
+      data: {
+        eventDefinition: { ...mockEventDefinition, state: 'ENABLED' },
+        context: { scheduler: { is_scheduled: false } },
+        is_mutable: true,
+      },
+      isFetching: false,
+    });
+
+    render(<ViewEventDefinitionPage />);
+
+    await waitFor(() => expect(EventDefinitionSummary).toHaveBeenCalled());
+
+    const [{ eventDefinition }] = asMock(EventDefinitionSummary).mock.lastCall;
+
+    expect(eventDefinition.config._is_scheduled).toBe(true);
+  });
+
+  it('shows a disabled event definition as unscheduled', async () => {
+    asMock(useEventDefinitionWithContext).mockReturnValue({
+      data: {
+        eventDefinition: { ...mockEventDefinition, state: 'DISABLED' },
+        context: { scheduler: { is_scheduled: true } },
+        is_mutable: true,
+      },
+      isFetching: false,
+    });
+
+    render(<ViewEventDefinitionPage />);
+
+    await waitFor(() => expect(EventDefinitionSummary).toHaveBeenCalled());
+
+    const [{ eventDefinition }] = asMock(EventDefinitionSummary).mock.lastCall;
+
+    expect(eventDefinition.config._is_scheduled).toBe(false);
   });
 
   it('should display event details when permitted', async () => {
@@ -124,5 +175,43 @@ describe('<ViewEventDefinitionPage />', () => {
     await screen.findAllByRole('button', {
       name: /edit event definition/i,
     });
+  });
+
+  it('does not send Illuminate clone telemetry when duplicating a non-Illuminate event definition', async () => {
+    render(<ViewEventDefinitionPage />);
+
+    await duplicateEventDefinition();
+
+    await waitFor(() =>
+      expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_DUPLICATED, expect.anything()),
+    );
+    expect(sendTelemetry).not.toHaveBeenCalledWith(
+      TELEMETRY_EVENT_TYPE.ILLUMINATE_EVENTDEFINITION_CLONED,
+      expect.anything(),
+    );
+  });
+
+  it('sends only Illuminate clone telemetry with the original title when duplicating an Illuminate event definition', async () => {
+    asMock(useEventDefinitionWithContext).mockReturnValue({
+      data: {
+        eventDefinition: { ...mockEventDefinition, _scope: 'ILLUMINATE' },
+        context: { scheduler: { is_scheduled: true } },
+        is_mutable: false,
+      },
+      isFetching: false,
+    });
+
+    render(<ViewEventDefinitionPage />);
+
+    await duplicateEventDefinition();
+
+    await waitFor(() =>
+      expect(sendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.ILLUMINATE_EVENTDEFINITION_CLONED, {
+        app_pathname: 'event-definition',
+        app_action_value: 'illuminate-event-definition-clone',
+        event_details: { event_definition_title: 'Event Definition 1' },
+      }),
+    );
+    expect(sendTelemetry).not.toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_DUPLICATED, expect.anything());
   });
 });

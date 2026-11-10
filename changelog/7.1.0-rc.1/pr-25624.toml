@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix data node metrics permissions for cluster configuration reader role."
+
+issues = ["Graylog2/graylog-plugin-enterprise#13538"]
+pulls = ["25624"]

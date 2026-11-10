@@ -54,4 +54,14 @@ public interface ImmutableMessage extends Indexable, Acknowledgeable {
     String getSource();
 
     ImmutableSet<String> getStreamIds();
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Re-declared as abstract — overriding {@link Indexable}'s {@code 0} default — so that every
+     * {@link ImmutableMessage} implementation must supply a real input size. This prevents a wrapper
+     * from silently inheriting the {@code 0} default and under-counting input-based traffic.
+     */
+    @Override
+    long getInputMessageSize();
 }

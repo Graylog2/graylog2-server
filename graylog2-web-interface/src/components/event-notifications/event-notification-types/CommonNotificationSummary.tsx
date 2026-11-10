@@ -54,7 +54,7 @@ const CommonNotificationSummary = ({
             {displayDetails ? 'Less details' : 'More details'}
           </Button>
           {displayDetails && (
-            <Table condensed hover className={styles.fixedTable}>
+            <Table condensed className={styles.fixedTable}>
               <tbody>
                 <tr>
                   <td>Description</td>

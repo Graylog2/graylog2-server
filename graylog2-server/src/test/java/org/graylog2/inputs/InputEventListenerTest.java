@@ -27,6 +27,7 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
+import org.graylog2.rest.models.system.inputs.responses.InputStopped;
 import org.graylog2.rest.models.system.inputs.responses.InputUpdated;
 import org.graylog2.shared.inputs.InputLauncher;
 import org.graylog2.shared.inputs.InputRegistry;
@@ -244,6 +245,24 @@ public class InputEventListenerTest {
         verify(inputLauncher, times(1)).launch(messageInput);
     }
 
+    // A failed input (e.g. port already in use) was never stopped on purpose; an update is the user's fix and
+    // should be retried. Only deliberately stopped inputs stay down (see #3824).
+    @Test
+    public void inputUpdatedRestartsFailedInput() throws Exception {
+        when(inputState.getState()).thenReturn(IOState.Type.FAILED);
+        when(inputService.find(INPUT_ID)).thenReturn(input);
+        when(inputRegistry.getInputState(INPUT_ID)).thenReturn(inputState);
+        when(input.getNodeId()).thenReturn(THIS_NODE_ID);
+        when(input.isGlobal()).thenReturn(false);
+
+        final MessageInput messageInput = mock(MessageInput.class);
+        when(inputService.getMessageInput(input)).thenReturn(messageInput);
+
+        listener.inputUpdated(InputUpdated.create(INPUT_ID));
+
+        verify(inputLauncher, times(1)).launch(messageInput);
+    }
+
     @Test
     public void inputUpdatedDoesNotStartLocalInputOnLocalNodeIfItWasNotRunning() throws Exception {
         when(inputState.getState()).thenReturn(IOState.Type.STOPPED);
@@ -278,5 +297,23 @@ public class InputEventListenerTest {
         listener.inputDeleted(InputDeleted.create(INPUT_ID));
 
         verify(inputRegistry, never()).remove(any(MessageInput.class));
+    }
+
+    @Test
+    public void inputStoppedRemovesInputFromRegistry() {
+        when(inputRegistry.getInputState(INPUT_ID)).thenReturn(inputState);
+
+        listener.inputStopped(InputStopped.create(INPUT_ID));
+
+        verify(inputRegistry, times(1)).remove(inputState);
+    }
+
+    @Test
+    public void inputStoppedDoesNothingIfInputIsNotInRegistry() {
+        when(inputRegistry.getInputState(INPUT_ID)).thenReturn(null);
+
+        listener.inputStopped(InputStopped.create(INPUT_ID));
+
+        verify(inputRegistry, never()).remove(Mockito.<IOState<MessageInput>>any());
     }
 }

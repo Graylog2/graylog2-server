@@ -1,0 +1,4 @@
+type = "added"
+message = "Combining the stream and category selection into one dropdown."
+
+pulls = ["25893", "Graylog2/graylog-plugin-enterprise#14154"]

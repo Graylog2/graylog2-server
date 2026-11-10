@@ -59,6 +59,15 @@ public record SystemJobResult(JobTriggerStatus status, Duration delay, int maxRe
     }
 
     /**
+     * Creates a job result indicating that the job stopped early because it has been cancelled.
+     *
+     * @return a SystemJobResult representing a cancelled job
+     */
+    public static SystemJobResult cancelled() {
+        return new SystemJobResult(JobTriggerStatus.CANCELLED, Duration.ZERO, 0);
+    }
+
+    /**
      * Creates a job result indicating that the job has failed with an error.
      *
      * @return a SystemJobResult representing an error state
@@ -77,7 +86,8 @@ public record SystemJobResult(JobTriggerStatus status, Duration delay, int maxRe
             return switch (result.status()) {
                 case ERROR -> JobTriggerUpdate.withError(trigger);
                 case RUNNABLE -> JobTriggerUpdate.withNextTime(getNextTime(result.delay()));
-                case COMPLETE, CANCELLED -> JobTriggerUpdate.withoutNextTime();
+                case CANCELLED -> JobTriggerUpdate.withStatusAndNoNextTime(JobTriggerStatus.CANCELLED);
+                case COMPLETE -> JobTriggerUpdate.withoutNextTime();
                 default -> throw new IllegalStateException("Unhandled result status: " + result.status());
             };
         }

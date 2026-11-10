@@ -14,37 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import moment from 'moment';
-import trim from 'lodash/trim';
-
-import { extractRangeFromString } from 'components/common/EntityFilters/helpers/timeRange';
-import { adjustFormat } from 'util/DateTime';
+import { parseStringTimerangeFilterValue } from 'components/common/EntityFilters/helpers/timeRange';
 import type { TimeRange } from 'views/logic/queries/Query';
-
-const isNullOrBlank = (s: string | undefined) => {
-  if (!s) {
-    return true;
-  }
-
-  return trim(s) === '';
-};
 
 const parseTimerangeFilter = (timestamp: string | undefined, defaultTimerange?: TimeRange): TimeRange => {
   if (!timestamp) {
     return defaultTimerange;
   }
 
-  const [from, to] = extractRangeFromString(timestamp);
-
-  if (!from && !to) {
-    return defaultTimerange;
-  }
-
-  return {
-    type: 'absolute',
-    from: isNullOrBlank(from) ? adjustFormat(moment(0).utc(), 'internal') : from,
-    to: isNullOrBlank(to) ? adjustFormat(moment().utc(), 'internal') : to,
-  };
+  return parseStringTimerangeFilterValue(timestamp);
 };
 
 export default parseTimerangeFilter;

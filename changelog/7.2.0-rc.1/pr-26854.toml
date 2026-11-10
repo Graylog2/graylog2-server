@@ -1,0 +1,4 @@
+type = "f"
+message = "Fixed Enterprise MongoDB Data Adapter CIDR entries being cached up to one hour after their TTL had expired."
+
+pulls = ["26854"]

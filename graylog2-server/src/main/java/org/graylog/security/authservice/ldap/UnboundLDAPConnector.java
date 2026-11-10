@@ -31,6 +31,7 @@ import com.unboundid.ldap.sdk.LDAPBindException;
 import com.unboundid.ldap.sdk.LDAPConnection;
 import com.unboundid.ldap.sdk.LDAPConnectionOptions;
 import com.unboundid.ldap.sdk.LDAPException;
+import com.unboundid.ldap.sdk.LDAPSearchException;
 import com.unboundid.ldap.sdk.ResultCode;
 import com.unboundid.ldap.sdk.SearchRequest;
 import com.unboundid.ldap.sdk.SearchResult;
@@ -177,6 +178,37 @@ public class UnboundLDAPConnector {
         return searchResult.getSearchEntries().stream()
                 .map(entry -> createLDAPEntry(entry, uniqueIdAttribute))
                 .collect(ImmutableList.toImmutableList());
+    }
+
+    /**
+     * Reads a single entry by its DN, with {@link SearchScope#BASE} at that DN rather than a subtree search
+     * from a configured base. Callers that follow DN references out of their own search base need this - AD
+     * {@code memberOf} nesting, for example, can point at a group outside the configured group search base,
+     * and a subtree search from that base cannot see it.
+     *
+     * @return empty if nothing is readable at the DN: it does not exist, or it lives in a partition this
+     * connection cannot follow. Both are dead ends for the caller rather than failures.
+     */
+    public Optional<LDAPEntry> readEntryByDn(LDAPConnection connection,
+                                             String dn,
+                                             String uniqueIdAttribute,
+                                             Set<String> attributes) throws LDAPException {
+        final Filter filter = Filter.createPresenceFilter(OBJECT_CLASS_ATTRIBUTE);
+        final SearchRequest searchRequest =
+                new SearchRequest(dn, SearchScope.BASE, filter, buildLdapSearchBase(dn, filter, attributes));
+        searchRequest.setTimeLimitSeconds(requestTimeoutSeconds);
+
+        try {
+            return connection.search(searchRequest).getSearchEntries().stream()
+                    .findFirst()
+                    .map(entry -> createLDAPEntry(entry, uniqueIdAttribute));
+        } catch (LDAPSearchException e) {
+            if (ResultCode.NO_SUCH_OBJECT.equals(e.getResultCode()) || ResultCode.REFERRAL.equals(e.getResultCode())) {
+                LOG.debug("No entry readable at DN <{}>: {}", dn, e.getResultCode());
+                return Optional.empty();
+            }
+            throw e;
+        }
     }
 
     public List<LDAPEntry> searchPaginated(LDAPConnection connection,

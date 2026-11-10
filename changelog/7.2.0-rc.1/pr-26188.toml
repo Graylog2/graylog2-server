@@ -1,0 +1,4 @@
+type = "f"
+message = "fix potential null messages in events after event summary template transformation."
+issues = []
+pulls = ["26188"]

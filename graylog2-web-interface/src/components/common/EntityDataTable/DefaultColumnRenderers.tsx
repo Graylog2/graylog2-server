@@ -19,23 +19,39 @@ import React from 'react';
 
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
 import { Timestamp } from 'components/common';
+import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 const DefaultColumnRenderers = {
   types: {
     DATE: {
       renderCell: (dateTime: string) => <Timestamp dateTime={dateTime} />,
-      staticWidth: 160,
+      staticWidth: COLUMN_WIDTH.date,
     },
     STRING: {
       renderCell: (text: string) => <TextOverflowEllipsis>{text}</TextOverflowEllipsis>,
     },
+    DOUBLE: {
+      textAlign: 'right',
+    },
+    INT: {
+      textAlign: 'right',
+    },
+    LONG: {
+      textAlign: 'right',
+    },
   },
   attributes: {
+    title: {
+      staticWidth: COLUMN_WIDTH.title,
+    },
+    name: {
+      staticWidth: COLUMN_WIDTH.title,
+    },
     description: {
-      width: 2,
+      staticWidth: COLUMN_WIDTH.description,
     },
     summary: {
-      width: 1.5,
+      staticWidth: COLUMN_WIDTH.description,
     },
     favorite: {
       renderHeader: () => '',

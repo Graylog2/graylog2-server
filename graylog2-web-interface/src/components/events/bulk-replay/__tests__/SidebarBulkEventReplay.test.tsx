@@ -26,7 +26,6 @@ import SidebarBulkEventReplay from 'components/events/bulk-replay/SidebarBulkEve
 import EventReplaySelectedProvider from 'contexts/EventReplaySelectedProvider';
 import asMock from 'helpers/mocking/AsMock';
 import useSessionInitialEventIds from 'components/events/bulk-replay/hooks/useSessionInitialEventIds';
-import StringUtils from 'util/StringUtils';
 
 import events from './events.fixtures';
 
@@ -34,9 +33,6 @@ const initialEventIds = ['01JH007XPDF710TPJZT8K2CN3W', '01JH006340WP7HQ5E7P71Q9H
 
 jest.mock('components/events/bulk-replay/hooks/useEventsById');
 jest.mock('components/events/bulk-replay/hooks/useSessionInitialEventIds');
-jest.mock('components/events/ReplaySearch', () => ({ alertId }: { alertId: string }) => (
-  <span>Replaying search for event {alertId}</span>
-));
 
 const markEventAsReviewedFromList = async (eventId: string) => {
   const list = await screen.findByRole('list');
@@ -46,22 +42,6 @@ const markEventAsReviewedFromList = async (eventId: string) => {
   });
 
   return userEvent.click(markAsReviewedButton);
-};
-
-const findDropdownButton = () => screen.findByTitle(/show selected events/i);
-
-const openDropdown = async () => {
-  const openButton = await findDropdownButton();
-
-  return userEvent.click(openButton);
-};
-
-const expectReplayingEvent = async (eventId: string) => {
-  const DropdownButton = await findDropdownButton();
-
-  const message = StringUtils.escapeRegExp(events?.[eventId]?.event?.message);
-
-  return within(DropdownButton).findByText(new RegExp(message, 'i'));
 };
 
 const removeEvent = async (eventId: string) => {
@@ -75,21 +55,9 @@ const removeEvent = async (eventId: string) => {
 const eventByIndex = (index: number) => events[initialEventIds[index]].event;
 const eventMessage = (index: number) => eventByIndex(index).message;
 
-const onClose = jest.fn();
-
-const markEventAsReviewedFromHeader = async (eventId: string) => {
-  const dropdownButton = await findDropdownButton();
-
-  const markAsReviewedButton = await within(dropdownButton).findByRole('button', {
-    name: new RegExp(`mark event "${eventId}" as reviewed`, 'i'),
-  });
-
-  return userEvent.click(markAsReviewedButton);
-};
-
 const SUT = () => (
   <EventReplaySelectedProvider initialEventIds={initialEventIds} eventsData={events}>
-    <SidebarBulkEventReplay onClose={onClose} />
+    <SidebarBulkEventReplay />
   </EventReplaySelectedProvider>
 );
 
@@ -117,77 +85,57 @@ describe('SidebarBulkEventReplay', () => {
 
   it('renders list of selected events', async () => {
     render(<SUT />);
-    await openDropdown();
     const list = await screen.findByRole('list');
     await within(list).findByText(eventMessage(0));
     await within(list).findByText(eventMessage(1));
     await within(list).findByText(eventMessage(2));
-
-    await expectReplayingEvent(initialEventIds[0]);
   });
 
   it('clicking delete button removes event from list', async () => {
     render(<SUT />);
-    await openDropdown();
     const list = await screen.findByRole('list');
     await within(list).findByText(eventMessage(0));
     await removeEvent(initialEventIds[0]);
-    await within(list).findByText(eventMessage(1));
-    await expectReplayingEvent(initialEventIds[1]);
 
     expect(within(list).queryByText(eventMessage(0))).not.toBeInTheDocument();
+    await within(list).findByText(eventMessage(1));
+    await within(list).findByText(eventMessage(2));
   });
 
-  it('marking events as reviewed jumps to next one', async () => {
+  it('marking events as reviewed shows completion message when all done', async () => {
     render(<SUT />);
-    await openDropdown();
     await markEventAsReviewedFromList(initialEventIds[0]);
-
-    await expectReplayingEvent(initialEventIds[1]);
-
     await markEventAsReviewedFromList(initialEventIds[1]);
-    await expectReplayingEvent(initialEventIds[2]);
-
     await markEventAsReviewedFromList(initialEventIds[2]);
+
     await screen.findByText(
-      'You are done reviewing all events. You can now select a bulk action to apply to all remaining events.',
+      'You have reviewed all events. You can now select a bulk action to apply to all events listed below.',
     );
   });
 
-  it('allows jumping to specific events', async () => {
+  it('allows clicking on specific events', async () => {
     render(<SUT />);
-    await expectReplayingEvent(initialEventIds[0]);
+    const list = await screen.findByRole('list');
+    const secondEvent = await within(list).findByText(eventMessage(1));
+    await userEvent.click(secondEvent);
 
-    await openDropdown();
-    await userEvent.click(await screen.findByText(eventMessage(1)));
-
-    await expectReplayingEvent(initialEventIds[1]);
-
-    await openDropdown();
-    await userEvent.click(await screen.findByText(eventMessage(0)));
-
-    await expectReplayingEvent(initialEventIds[0]);
+    const firstEvent = await within(list).findByText(eventMessage(0));
+    await userEvent.click(firstEvent);
   });
 
-  it('skips removed event when jumping to next one', async () => {
+  it('skips removed event when marking as reviewed', async () => {
     render(<SUT />);
-    await openDropdown();
     await removeEvent(initialEventIds[1]);
-    await markEventAsReviewedFromList(initialEventIds[0]);
-    await expectReplayingEvent(initialEventIds[2]);
-  });
 
-  it('skips event marked as reviewed when jumping to next one', async () => {
-    render(<SUT />);
-    await openDropdown();
-    await markEventAsReviewedFromList(initialEventIds[1]);
-    await markEventAsReviewedFromList(initialEventIds[0]);
-    await expectReplayingEvent(initialEventIds[2]);
+    const list = await screen.findByRole('list');
+
+    expect(within(list).queryByText(eventMessage(1))).not.toBeInTheDocument();
+    await within(list).findByText(eventMessage(0));
+    await within(list).findByText(eventMessage(2));
   });
 
   it('bulk actions get current list of events', async () => {
     render(<SUT />);
-    await openDropdown();
     await removeEvent(initialEventIds[1]);
 
     await userEvent.click(await screen.findByRole('button', { name: /bulk actions/i }));
@@ -198,33 +146,14 @@ describe('SidebarBulkEventReplay', () => {
     });
   });
 
-  it('navigation buttons switch events', async () => {
+  it('shows review progress counter', async () => {
     render(<SUT />);
-    await expectReplayingEvent(initialEventIds[0]);
+    await screen.findByText(/0\/3/);
 
-    const prev = await screen.findByTitle(/previous event/i);
-    const next = await screen.findByTitle(/next event/i);
+    await markEventAsReviewedFromList(initialEventIds[0]);
+    await screen.findByText(/1\/3/);
 
-    await userEvent.click(next);
-    await expectReplayingEvent(initialEventIds[1]);
-
-    await userEvent.click(prev);
-    await expectReplayingEvent(initialEventIds[0]);
-  });
-
-  it('marking events as reviewed from the header and jumps to next one', async () => {
-    render(<SUT />);
-    await openDropdown();
-    await markEventAsReviewedFromHeader(initialEventIds[0]);
-
-    await expectReplayingEvent(initialEventIds[1]);
-
-    await markEventAsReviewedFromHeader(initialEventIds[1]);
-    await expectReplayingEvent(initialEventIds[2]);
-
-    await markEventAsReviewedFromHeader(initialEventIds[2]);
-    await screen.findByText(
-      'You are done reviewing all events. You can now select a bulk action to apply to all remaining events.',
-    );
+    await markEventAsReviewedFromList(initialEventIds[1]);
+    await screen.findByText(/2\/3/);
   });
 });

@@ -25,9 +25,10 @@ import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
+import static org.graylog.events.search.SourceStreamFilter.allAllowed;
 
 /**
  * Performs system-level event searches with the expectation that callers must independently verify
@@ -56,7 +57,7 @@ public class SystemEventsSearchService extends AbstractEventsSearchService {
             throw e;
         }
         final var filter = new EventsFilterBuilder(parameters).build();
-        final MoreSearch.Result result = moreSearch.eventSearch(parameters, filter, eventStreams, Collections.emptySet());
+        final MoreSearch.Result result = moreSearch.eventSearch(parameters, filter, eventStreams, allAllowed());
 
         return buildResultForSystem(parameters, result);
     }

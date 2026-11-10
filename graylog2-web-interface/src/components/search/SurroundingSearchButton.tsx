@@ -24,8 +24,6 @@ import DrilldownContext from 'views/components/contexts/DrilldownContext';
 import SearchLink from 'views/logic/search/SearchLink';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 
 import type { SearchesConfig } from './SearchConfig';
@@ -96,13 +94,10 @@ const SurroundingSearchButton = ({ timestamp, id, messageFields }: Props) => {
   const { streams, streamCategories } = useContext(DrilldownContext);
   const { config: searchConfig, isInitialLoading: isLoadingSearchConfig } = useSearchConfiguration();
   const timeRangeOptions = buildTimeRangeOptions(searchConfig);
-  const location = useLocation();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('search-message-table');
 
   const sendEvent = (range: string) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_MESSAGE_TABLE_SHOW_SURROUNDING_MESSAGE, {
-      app_pathname: getPathnameWithoutId(location.pathname),
-      app_section: 'search-message-table',
       app_action_value: 'seach-message-table-show-surrounding',
       event_details: {
         range,

@@ -1,0 +1,5 @@
+type = "s"
+message = "Fix missing permission checks in stream routing rules endpoint"
+
+issues = ["Graylog2/graylog-plugin-enterprise#13861"]
+pulls = ["25633"]

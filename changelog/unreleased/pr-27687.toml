@@ -1,0 +1,4 @@
+type = "c"
+message = "The `_id` field of a message is now considered to be an internal field everywhere. In the GeoIP processor, the `_id` field is no longer a candidate for possibly containing an IP address."
+
+pulls = ["27687"]

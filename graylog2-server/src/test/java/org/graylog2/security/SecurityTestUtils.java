@@ -77,6 +77,11 @@ public class SecurityTestUtils {
      * @param permissions wildcard permissions
      */
     public static void setupSecurityContext(String username, String rolename, Set<String> permissions) {
+        // Defensively clean up any stale Shiro state that might have leaked from previous tests.
+        // If a previous test left a Subject in ThreadContext, SecurityUtils.getSubject() would return
+        // that stale subject (bound to the wrong SecurityManager), causing login to fail.
+        clearSecurityContext();
+
         String password = "test_password";
 
         TestRealm realm = new TestRealm();

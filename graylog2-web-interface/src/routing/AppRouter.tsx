@@ -31,6 +31,7 @@ import {
   ContentPacksPage,
   CreateContentPackPage,
   CreateEventDefinitionPage,
+  SigmaEventDefinitionPage,
   CreateEventNotificationPage,
   CreateExtractorsPage,
   DataNodePage,
@@ -100,12 +101,20 @@ import {
   SidecarNewConfigurationPage,
   SidecarsPage,
   SidecarStatusPage,
+  CollectorsOverviewPage,
+  CollectorsFleetsPage,
+  CollectorsFleetDetailPage,
+  CollectorsInstancesPage,
+  CollectorsOnboardingInstancePage,
+  CollectorsDeploymentPage,
+  CollectorsSettingsPage,
   SimulatorPage,
   StartPage,
   StreamEditPage,
   StreamOutputsPage,
   StreamsPage,
   StreamDetailsPage,
+  SystemNotificationsPage,
   SystemOutputsPage,
   SystemOverviewPage,
   ThreadDumpPage,
@@ -127,21 +136,27 @@ import App from 'routing/App';
 import PageContentLayout from 'components/layout/PageContentLayout';
 import RoutePaths from 'routing/Routes';
 import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
+import RoutePermissionGuard from 'routing/RoutePermissionGuard';
 import usePluginEntities from 'hooks/usePluginEntities';
 import GlobalContextProviders from 'contexts/GlobalContextProviders';
 import TokenManagementPage from 'pages/TokenManagementPage';
 import { withLUTModalProvider } from 'components/lookup-tables/contexts/ModalContext';
 
-const renderPluginRoute = ({ path, component: Component, parentComponent, requiredFeatureFlag }: PluginRoute) => {
+const renderPluginRoute = (
+  { path, component: Component, parentComponent, permissions, requiredFeatureFlag }: PluginRoute,
+  { insidePageLayout = false }: { insidePageLayout?: boolean } = {},
+) => {
   if (requiredFeatureFlag && !AppConfig.isFeatureEnabled(requiredFeatureFlag)) {
     return null;
   }
 
   const ParentComponent = parentComponent ?? React.Fragment;
   const WrappedComponent = () => (
-    <ParentComponent>
-      <Component />
-    </ParentComponent>
+    <RoutePermissionGuard permissions={permissions} displayPageLayout={!insidePageLayout}>
+      <ParentComponent>
+        <Component />
+      </ParentComponent>
+    </RoutePermissionGuard>
   );
 
   return {
@@ -162,10 +177,10 @@ const AppRouter = () => {
     .map((route) => renderPluginRoute({ ...route, parentComponent: null }));
   const pluginRoutesWithParent = pluginRoutes
     .filter((route) => route.parentComponent && !routeHasAppParent(route))
-    .map(renderPluginRoute);
+    .map((route) => renderPluginRoute(route));
   const standardPluginRoutes = pluginRoutes
     .filter((route) => route.parentComponent === undefined)
-    .map(renderPluginRoute);
+    .map((route) => renderPluginRoute(route, { insidePageLayout: true }));
 
   const isCloud = AppConfig.isCloud();
 
@@ -176,6 +191,7 @@ const AppRouter = () => {
   }
 
   const enableDataNodeMigration = AppConfig.isFeatureEnabled('data_node_migration');
+  const enableCollectors = AppConfig.isFeatureEnabled('collectors');
 
   const router = createBrowserRouter([
     ...pluginRoutesWithNullParent,
@@ -208,6 +224,8 @@ const AppRouter = () => {
             { path: RoutePaths.ALERTS.LIST, element: <EventsPage /> },
             { path: RoutePaths.ALERTS.DEFINITIONS.LIST, element: <EventDefinitionsPage /> },
             { path: RoutePaths.ALERTS.DEFINITIONS.CREATE, element: <CreateEventDefinitionPage /> },
+            { path: RoutePaths.ALERTS.DEFINITIONS.SIGMA.GIT_IMPORT, element: <SigmaEventDefinitionPage /> },
+            { path: RoutePaths.ALERTS.DEFINITIONS.SIGMA.FILE_IMPORT, element: <SigmaEventDefinitionPage /> },
             {
               path: RoutePaths.ALERTS.DEFINITIONS.edit(':definitionId'),
               element: <EditEventDefinitionPage />,
@@ -359,6 +377,7 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.AUTHZROLES.edit(':roleId'), element: <RoleEditPage /> },
 
             { path: RoutePaths.SYSTEM.OVERVIEW, element: <SystemOverviewPage /> },
+            { path: RoutePaths.SYSTEM.NOTIFICATIONS, element: <SystemNotificationsPage /> },
             { path: RoutePaths.SYSTEM.PROCESSBUFFERDUMP(':nodeId'), element: <ProcessBufferDumpPage /> },
             { path: RoutePaths.SYSTEM.THREADDUMP(':nodeId'), element: <ThreadDumpPage /> },
             { path: RoutePaths.SYSTEM.SYSTEMLOGS(':nodeId'), element: <SystemLogsPage /> },
@@ -376,6 +395,23 @@ const AppRouter = () => {
             },
             { path: RoutePaths.SYSTEM.SIDECARS.NEW_COLLECTOR, element: <SidecarNewCollectorPage /> },
             { path: RoutePaths.SYSTEM.SIDECARS.EDIT_COLLECTOR(':collectorId'), element: <SidecarEditCollectorPage /> },
+
+            ...(enableCollectors
+              ? [
+                  { path: RoutePaths.SYSTEM.COLLECTORS.OVERVIEW, element: <CollectorsOverviewPage /> },
+                  { path: RoutePaths.SYSTEM.COLLECTORS.FLEETS, element: <CollectorsFleetsPage /> },
+                  { path: `${RoutePaths.SYSTEM.COLLECTORS.FLEETS}/new`, element: <CollectorsFleetsPage /> },
+                  { path: `${RoutePaths.SYSTEM.COLLECTORS.FLEETS}/:fleetId`, element: <CollectorsFleetDetailPage /> },
+                  { path: RoutePaths.SYSTEM.COLLECTORS.INSTANCES, element: <CollectorsInstancesPage /> },
+                  {
+                    path: RoutePaths.SYSTEM.COLLECTORS.ONBOARDING_INSTANCE(':instanceUid'),
+                    element: <CollectorsOnboardingInstancePage />,
+                  },
+                  { path: RoutePaths.SYSTEM.COLLECTORS.DEPLOYMENT, element: <CollectorsDeploymentPage /> },
+                  { path: RoutePaths.SYSTEM.COLLECTORS.SETTINGS, element: <CollectorsSettingsPage /> },
+                ]
+              : []),
+
             { path: RoutePaths.KEYBOARD_SHORTCUTS, element: <KeyboardShortcutsPage /> },
             {
               path: RoutePaths.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW,
@@ -410,7 +446,7 @@ const AppRouter = () => {
 
   return (
     <RouterErrorBoundary>
-      <RouterProvider router={router} />
+      <RouterProvider router={router} future={{ v7_startTransition: true }} />
     </RouterErrorBoundary>
   );
 };

@@ -14,12 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { AuthenticationActions } from 'stores/authentication/AuthenticationStore';
+import {
+  createAuthBackend,
+  loadAuthBackend,
+  loadActiveAuthBackend,
+  updateAuthBackend,
+  deleteAuthBackend,
+  testAuthConnection,
+  testAuthLogin,
+  setActiveAuthBackend,
+  loadAuthBackendsPaginated,
+  loadAuthBackendUsersPaginated,
+  loadActiveAuthBackendType,
+} from 'hooks/useAuthentication';
 
 import notifyingAction from '../notifyingAction';
 
 const create = notifyingAction({
-  action: AuthenticationActions.create,
+  action: createAuthBackend,
   success: (authBackend) => ({
     message: `Authentication service "${authBackend.title} was created successfully`,
   }),
@@ -29,7 +41,7 @@ const create = notifyingAction({
 });
 
 const load = notifyingAction({
-  action: AuthenticationActions.load,
+  action: loadAuthBackend,
   error: (error, authBackendId) => ({
     message: `Loading authentication service with id "${authBackendId}" failed with status: ${error}`,
   }),
@@ -37,14 +49,14 @@ const load = notifyingAction({
 });
 
 const loadActive = notifyingAction({
-  action: AuthenticationActions.loadActive,
+  action: loadActiveAuthBackend,
   error: (error) => ({
     message: `Loading active authentication service failed with status: ${error}`,
   }),
 });
 
 const update = notifyingAction({
-  action: AuthenticationActions.update,
+  action: updateAuthBackend,
   success: (_authBackendId, authBackend) => ({
     message: `Authentication service "${authBackend.title}" was updated successfully`,
   }),
@@ -54,7 +66,7 @@ const update = notifyingAction({
 });
 
 const deleteBackend = notifyingAction({
-  action: AuthenticationActions.delete,
+  action: (backendId: string, _authBackendTitle: string) => deleteAuthBackend(backendId),
   success: (_authBackendId, authBackendTitle) => ({
     message: `Authentication service "${authBackendTitle} was deleted successfully`,
   }),
@@ -64,21 +76,21 @@ const deleteBackend = notifyingAction({
 });
 
 const testConnection = notifyingAction({
-  action: AuthenticationActions.testConnection,
+  action: testAuthConnection,
   error: (error) => ({
     message: `Connection test failed with status: ${error}`,
   }),
 });
 
 const testLogin = notifyingAction({
-  action: AuthenticationActions.testLogin,
+  action: testAuthLogin,
   error: (error) => ({
     message: `Login test failed with status: ${error}`,
   }),
 });
 
 const setActiveBackend = notifyingAction({
-  action: AuthenticationActions.setActiveBackend,
+  action: (backendId: string, _authBackendTitle: string) => setActiveAuthBackend(backendId),
   success: (authBackendId, authBackendTitle) => ({
     message: `Authentication service "${authBackendTitle} was ${authBackendId ? 'activated' : 'deactivated'} successfully`,
   }),
@@ -88,21 +100,21 @@ const setActiveBackend = notifyingAction({
 });
 
 const loadBackendsPaginated = notifyingAction({
-  action: AuthenticationActions.loadBackendsPaginated,
+  action: loadAuthBackendsPaginated,
   error: (error) => ({
     message: `Loading authentication services failed with status: ${error}`,
   }),
 });
 
 const loadUsersPaginated = notifyingAction({
-  action: AuthenticationActions.loadUsersPaginated,
+  action: loadAuthBackendUsersPaginated,
   error: (authBackendId, error) => ({
     message: `Loading synchronized users for authentication service with id "${authBackendId}" failed with status: ${error}`,
   }),
 });
 
 const loadActiveBackendType = notifyingAction({
-  action: AuthenticationActions.loadActiveBackendType,
+  action: loadActiveAuthBackendType,
   error: (error) => ({
     message: `Loading active authentication service type failed with status: ${error}`,
   }),

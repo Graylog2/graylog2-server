@@ -62,7 +62,7 @@ public abstract class IndexerGeneratedQueryContext<S> implements GeneratedQueryC
 
     @Override
     public Optional<String> getSearchTypeQueryString(final String id) {
-        return Optional.ofNullable(searchTypeQueries.get(id)).map(S::toString);
+        return Optional.ofNullable(searchTypeQueries.get(id)).map(Object::toString);
     }
 
     @Override

@@ -82,7 +82,7 @@ public class RegexReplaceExtractor extends Extractor {
         return result == null ? null : new Result[]{result};
     }
 
-    public Result runExtractor(String value) {
+    public Result runExtractor(CharSequence value) {
         final Matcher matcher = pattern.matcher(value);
 
         final boolean found = matcher.find();

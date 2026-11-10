@@ -28,11 +28,15 @@ import org.graylog.shaded.elasticsearch7.org.apache.http.ContentTooLongException
 import org.graylog.shaded.elasticsearch7.org.apache.http.client.config.RequestConfig;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchStatusException;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.ActionListener;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.support.PlainActionFuture;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Cancellable;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Request;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RequestOptions;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Response;
@@ -122,6 +126,11 @@ public class ElasticsearchClient {
         client.msearchAsync(multiSearchRequest, requestOptions(), future);
 
         return future;
+    }
+
+    public Cancellable clusterHealthAsync(ClusterHealthRequest request,
+                                          ActionListener<ClusterHealthResponse> listener) {
+        return client.cluster().healthAsync(request, requestOptions(), listener);
     }
 
     public <R> R execute(ThrowingBiFunction<RestHighLevelClient, RequestOptions, R, IOException> fn) {

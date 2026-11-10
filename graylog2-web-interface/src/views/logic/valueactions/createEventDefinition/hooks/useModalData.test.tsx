@@ -17,23 +17,17 @@
 import React from 'react';
 import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 
-import MockStore from 'helpers/mocking/StoreMock';
 import { ltParamJSON, modalDataResult } from 'fixtures/createEventDefinitionFromValue';
 import useModalData from 'views/logic/valueactions/createEventDefinition/hooks/useModalData';
+import StreamsContext from 'contexts/StreamsContext';
+import type { Stream } from 'logic/streams/types';
 
-jest.mock('views/stores/StreamsStore', () => ({
-  StreamsStore: MockStore([
-    'getInitialState',
-    () => ({
-      streams: [
-        { title: 'streamId-1-title', id: 'streamId-1' },
-        { title: 'streamId-2-title', id: 'streamId-2' },
-      ],
-    }),
-  ]),
-}));
+const streams = [
+  { title: 'streamId-1-title', id: 'streamId-1' },
+  { title: 'streamId-2-title', id: 'streamId-2' },
+] as Array<Stream>;
 
-const wrapper = ({ children }) => <div>{children}</div>;
+const wrapper = ({ children }) => <StreamsContext.Provider value={streams}>{children}</StreamsContext.Provider>;
 
 describe('useModalData', () => {
   it('return correct data', async () => {

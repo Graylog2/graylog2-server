@@ -58,6 +58,6 @@ public class DashboardServiceTest {
 
         assertThat(counts)
                 .containsEntry("illuminate_dashboards", 1L)
-                .containsEntry("user_dashboards", 1L);
+                .containsEntry("user_dashboards", 2L);
     }
 }

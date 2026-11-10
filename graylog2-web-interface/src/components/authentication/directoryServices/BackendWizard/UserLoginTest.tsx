@@ -22,7 +22,7 @@ import type { WizardSubmitPayload } from 'logic/authentication/directoryServices
 import AuthenticationDomain from 'domainActions/authentication/AuthenticationDomain';
 import { FormikInput, Spinner } from 'components/common';
 import { Button, Row, Col } from 'components/bootstrap';
-import type { LoginTestResult } from 'stores/authentication/AuthenticationStore';
+import type { LoginTestResult } from 'hooks/useAuthentication';
 
 import ConnectionErrors, { NotificationContainer } from './ConnectionErrors';
 import type { WizardFormValues } from './BackendWizardContext';

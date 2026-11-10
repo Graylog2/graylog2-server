@@ -112,7 +112,8 @@
               "000000000000000000000001"
             ],
             "source_streams": [
-              "source_stream_a"
+              "source_stream_a",
+              "source_stream_c"
             ]
           }
         }
@@ -138,7 +139,7 @@
               "000000000000000000000001"
             ],
             "source_streams": [
-              "forbidden_stream"
+              "source_stream_b"
             ]
           }
         }

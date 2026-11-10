@@ -26,9 +26,7 @@ import { DEFAULT_PAGINATION } from 'components/common/PaginatedItemOverview';
 import SectionComponent from 'components/common/Section/SectionComponent';
 import type Role from 'logic/roles/Role';
 import type { PaginatedList } from 'stores/PaginationTypes';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import UsersSelector from './UsersSelector';
@@ -46,8 +44,8 @@ const UsersSection = ({ role: { id, name }, role }: Props) => {
   const [loading, setLoading] = useState(false);
   const [paginatedUsers, setPaginatedUsers] = useState<PaginatedList<UserOverview>>();
   const [errors, setErrors] = useState<string | undefined>();
-  const { pathname } = useLocation();
-  const sendTelemetry = useSendTelemetry();
+  const [refreshVersion, setRefreshVersion] = useState(0);
+  const sendTelemetry = useSendTelemetry('role-edit');
 
   const _onLoad = useCallback(
     (pagination) => {
@@ -64,24 +62,22 @@ const UsersSection = ({ role: { id, name }, role }: Props) => {
 
   const _onAssignUser = (newUsers: Immutable.Set<UserOverview>) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.ROLES.USER_ASSIGNED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'role-edit',
       app_action_value: 'assign-user',
     });
 
-    return AuthzRolesDomain.addMembers(id, newUsers.map((u) => u.username).toSet()).then(() =>
-      _onLoad(DEFAULT_PAGINATION).then((result) => {
+    return AuthzRolesDomain.addMembers(id, newUsers.map((u) => u.username).toSet()).then(() => {
+      setRefreshVersion((v) => v + 1);
+
+      return _onLoad(DEFAULT_PAGINATION).then((result) => {
         setPaginatedUsers(result);
 
         return result;
-      }),
-    );
+      });
+    });
   };
 
   const _onUnassignUser = (user) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.ROLES.USER_UNASSIGNED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'role-edit',
       app_action_value: 'unassign-user',
     });
 
@@ -98,6 +94,7 @@ const UsersSection = ({ role: { id, name }, role }: Props) => {
     setErrors(undefined);
 
     AuthzRolesDomain.removeMember(id, user.name).then(() => {
+      setRefreshVersion((v) => v + 1);
       _onLoad(DEFAULT_PAGINATION).then(setPaginatedUsers);
     });
   };
@@ -106,7 +103,7 @@ const UsersSection = ({ role: { id, name }, role }: Props) => {
     <SectionComponent title="Users" showLoading={loading}>
       <h3>Assign Users</h3>
       <Container>
-        <UsersSelector onSubmit={_onAssignUser} role={role} />
+        <UsersSelector onSubmit={_onAssignUser} role={role} refreshVersion={refreshVersion} />
       </Container>
       <ErrorAlert onClose={setErrors}>{errors}</ErrorAlert>
       <h3>Selected Users</h3>

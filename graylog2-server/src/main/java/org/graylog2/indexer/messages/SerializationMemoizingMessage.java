@@ -168,6 +168,11 @@ public class SerializationMemoizingMessage implements ImmutableMessage {
     }
 
     @Override
+    public long getInputMessageSize() {
+        return delegate.getInputMessageSize();
+    }
+
+    @Override
     public DateTime getReceiveTime() {
         return delegate.getReceiveTime();
     }
@@ -220,5 +225,10 @@ public class SerializationMemoizingMessage implements ImmutableMessage {
     @Override
     public Object getMessageQueueId() {
         return delegate.getMessageQueueId();
+    }
+
+    @Override
+    public boolean isAccounted() {
+        return delegate.isAccounted();
     }
 }

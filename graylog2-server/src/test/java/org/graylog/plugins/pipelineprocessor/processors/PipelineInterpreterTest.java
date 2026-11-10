@@ -71,6 +71,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -518,14 +519,15 @@ public class PipelineInterpreterTest {
         final PipelineInterpreterStateUpdater stateUpdater = new PipelineInterpreterStateUpdater(
                 stateBuilder,
                 metricRegistry,
-                Executors.newScheduledThreadPool(1),
+                mock(ScheduledExecutorService.class),
                 eventBus
         );
 
         final PipelineInterpreter interpreter = new PipelineInterpreter(
                 messageQueueAcknowledger,
                 metricRegistry,
-                stateUpdater);
+                stateUpdater,
+                1);
 
         // Create message on default stream only
         final Message msg = messageFactory.createMessage("test message", "test", Tools.nowUTC());
@@ -576,13 +578,14 @@ public class PipelineInterpreterTest {
         final PipelineInterpreterStateUpdater stateUpdater = new PipelineInterpreterStateUpdater(
                 stateBuilder,
                 metricRegistry,
-                Executors.newScheduledThreadPool(1),
+                mock(ScheduledExecutorService.class),
                 mock(EventBus.class)
         );
         return new PipelineInterpreter(
                 messageQueueAcknowledger,
                 metricRegistry,
-                stateUpdater);
+                stateUpdater,
+                1);
     }
 
     @Test
@@ -636,13 +639,14 @@ public class PipelineInterpreterTest {
         final PipelineInterpreterStateUpdater stateUpdater = new PipelineInterpreterStateUpdater(
                 stateBuilder,
                 metricRegistry,
-                Executors.newScheduledThreadPool(1),
+                mock(ScheduledExecutorService.class),
                 mock(EventBus.class)
         );
         final PipelineInterpreter interpreter = new PipelineInterpreter(
                 mock(MessageQueueAcknowledger.class),
                 metricRegistry,
-                stateUpdater);
+                stateUpdater,
+                1);
 
         interpreter.process(messageInDefaultStream("", ""));
 

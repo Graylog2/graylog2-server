@@ -21,6 +21,8 @@ import { act } from '@testing-library/react';
 import useRightSidebar from 'hooks/useRightSidebar';
 import RightSidebarProvider from 'contexts/RightSidebarProvider';
 
+jest.mock('logic/telemetry/useSendTelemetry', () => () => jest.fn());
+
 const TestComponent = () => <div>Test</div>;
 
 describe('useRightSidebar', () => {

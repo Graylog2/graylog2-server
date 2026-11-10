@@ -19,6 +19,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import * as API from '@graylog/server-api';
 
+import * as JSON from 'util/json';
 import { ClipboardButton, Spinner } from 'components/common';
 import { Row, Col, Input } from 'components/bootstrap';
 import Version from 'util/Version';

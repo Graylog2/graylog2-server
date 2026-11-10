@@ -17,9 +17,11 @@
 package org.graylog.testing.completebackend;
 
 import com.google.common.base.Stopwatch;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.bson.Document;
 import org.graylog.testing.completebackend.ContainerizedGraylogBackendServicesProvider.Services;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog.testing.graylognode.MavenPackager;
@@ -175,6 +177,11 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
     @Override
     public long countDocumentsInMongoDBCollection(final String collection) {
         return services.getMongoDBInstance().mongoCollection(collection).countDocuments();
+    }
+
+    @Override
+    public MongoCollection<Document> mongoCollection(final String collection) {
+        return services.getMongoDBInstance().mongoCollection(collection);
     }
 
     @Override

@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import { Clearfix } from 'components/bootstrap';
+import { ClearFloat } from 'components/common';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 
 import AggregationConditionExpression from '../AggregationConditionExpression';
@@ -43,7 +43,7 @@ const BooleanExpression = ({ expression, level, onChildChange, validation = {}, 
       onChange={onChildChange('left')}
       level={level + 1}
     />
-    <Clearfix />
+    <ClearFloat />
     <AggregationConditionExpression
       {...props}
       expression={expression.right}

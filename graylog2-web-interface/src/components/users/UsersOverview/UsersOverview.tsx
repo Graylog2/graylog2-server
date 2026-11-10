@@ -15,12 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import type { PaginatedUsers } from 'stores/users/UsersStore';
 import UsersDomain from 'domainActions/users/UsersDomain';
-import { UsersActions } from 'stores/users/UsersStore';
+import { USERS_QUERY_KEY } from 'hooks/useUsers';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { DataTable, Spinner, PaginatedList, NoSearchResult } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
@@ -58,7 +58,7 @@ const StyledPaginatedList = styled(PaginatedList)`
   }
 `;
 
-const _headerCellFormatter = (header) => {
+const _headerCellFormatter = (header: string) => {
   switch (header.toLowerCase()) {
     case 'client address':
       return <ClientAddressHead title={header} />;
@@ -69,46 +69,43 @@ const _headerCellFormatter = (header) => {
   }
 };
 
-const _loadUsers = (pagination, setLoading, setPaginatedUsers) => {
-  setLoading(true);
+const buildUsersOverviewItem =
+  (currentUser: any, onDeleted: () => void, onStatusChange: () => void) => (user: UserOverview) => {
+    const { id: userId } = user;
 
-  UsersDomain.loadUsersPaginated(pagination).then((paginatedUsers) => {
-    setPaginatedUsers(paginatedUsers);
-    setLoading(false);
-  });
-};
-
-const _updateListOnUserDelete = (pagination, setLoading, setPaginatedUsers, callback: () => void) =>
-  UsersActions.delete.completed.listen(() => {
-    _loadUsers(pagination, setLoading, setPaginatedUsers);
-    callback();
-  });
-const _updateListOnUserSetStatus = (pagination, setLoading, setPaginatedUsers) =>
-  UsersActions.setStatus.completed.listen(() => _loadUsers(pagination, setLoading, setPaginatedUsers));
-
-const buildUsersOverviewItem = (currentUser: any) => (user: UserOverview) => {
-  const { id: userId } = user;
-
-  return <UserOverviewItem user={user} isActive={currentUser?.id === userId} />;
-};
+    return (
+      <UserOverviewItem
+        user={user}
+        isActive={currentUser?.id === userId}
+        onDeleted={onDeleted}
+        onStatusChange={onStatusChange}
+      />
+    );
+  };
 
 const UsersOverview = () => {
   const { page, pageSize: perPage, resetPage } = usePaginationQueryParameter();
   const currentUser = useCurrentUser();
-  const [paginatedUsers, setPaginatedUsers] = useState<PaginatedUsers | undefined>();
-  const [loading, setLoading] = useState(false);
+  const queryClient = useQueryClient();
   const [query, setQuery] = useState('');
+
+  const { data: paginatedUsers, isFetching } = useQuery({
+    queryKey: [...USERS_QUERY_KEY, 'overview-paginated', { page, perPage, query }],
+    queryFn: () => UsersDomain.loadUsersPaginated({ page, perPage, query }),
+    placeholderData: keepPreviousData,
+    retry: false,
+  });
+
   const { list: users, adminUser, pagination: { total = 0 } = {} } = paginatedUsers || {};
 
-  useEffect(() => _loadUsers({ page, perPage, query }, setLoading, setPaginatedUsers), [page, perPage, query]);
-  useEffect(
-    () => _updateListOnUserDelete({ page, perPage, query }, setLoading, setPaginatedUsers, resetPage),
-    [page, perPage, query, resetPage],
-  );
-  useEffect(
-    () => _updateListOnUserSetStatus({ page, perPage, query }, setLoading, setPaginatedUsers),
-    [page, perPage, query],
-  );
+  const onUserDeleted = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEY });
+    resetPage();
+  }, [queryClient, resetPage]);
+
+  const onUserStatusChange = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEY });
+  }, [queryClient]);
 
   if (!users) {
     return <Spinner />;
@@ -126,7 +123,7 @@ const UsersOverview = () => {
       {adminUser && (
         <SystemAdministrator
           adminUser={adminUser}
-          dataRowFormatter={buildUsersOverviewItem(currentUser)}
+          dataRowFormatter={buildUsersOverviewItem(currentUser, onUserDeleted, onUserStatusChange)}
           headerCellFormatter={_headerCellFormatter}
           headers={TABLE_HEADERS}
         />
@@ -135,13 +132,12 @@ const UsersOverview = () => {
         <Col xs={12}>
           <Header>
             <h2>Users</h2>
-            {loading && <LoadingSpinner text="" delay={0} />}
+            {isFetching && <LoadingSpinner text="" delay={0} />}
           </Header>
           <p className="description">Found {total} registered users on the system.</p>
           <StyledPaginatedList totalItems={total}>
             <DataTable
               id="users-overview"
-              className="table-hover"
               rowClassName="no-bm"
               headers={TABLE_HEADERS}
               headerCellFormatter={_headerCellFormatter}
@@ -149,7 +145,7 @@ const UsersOverview = () => {
               noDataText={<NoSearchResult>No users have been found.</NoSearchResult>}
               rows={users.toJS()}
               customFilter={searchFilter}
-              dataRowFormatter={buildUsersOverviewItem(currentUser)}
+              dataRowFormatter={buildUsersOverviewItem(currentUser, onUserDeleted, onUserStatusChange)}
               filterKeys={[]}
               filterLabel="Filter Users"
             />

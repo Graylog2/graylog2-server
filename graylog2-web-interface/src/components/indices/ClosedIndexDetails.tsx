@@ -15,55 +15,47 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { Alert, Button } from 'components/bootstrap';
 import IndexRangeSummary from 'components/indices/IndexRangeSummary';
-import { IndicesActions } from 'stores/indices/IndicesStore';
+import { INDICES_QUERY_KEY, reopenIndex, deleteIndex } from 'hooks/useIndices';
 
 type ClosedIndexDetailsProps = {
   indexName: string;
   indexRange?: any;
 };
 
-class ClosedIndexDetails extends React.Component<
-  ClosedIndexDetailsProps,
-  {
-    [key: string]: any;
-  }
-> {
-  static defaultProps = {
-    indexRange: undefined,
+const ClosedIndexDetails = ({ indexName, indexRange = undefined }: ClosedIndexDetailsProps) => {
+  const queryClient = useQueryClient();
+
+  const _invalidate = () => queryClient.invalidateQueries({ queryKey: INDICES_QUERY_KEY });
+
+  const _onReopen = () => {
+    reopenIndex(indexName).then(_invalidate);
   };
 
-  _onReopen = () => {
-    IndicesActions.reopen(this.props.indexName);
-  };
-
-  _onDeleteIndex = () => {
-    if (window.confirm(`Really delete index ${this.props.indexName}?`)) {
-      IndicesActions.delete(this.props.indexName);
+  const _onDeleteIndex = () => {
+    if (window.confirm(`Really delete index ${indexName}?`)) {
+      deleteIndex(indexName).then(_invalidate);
     }
   };
 
-  render() {
-    const { indexRange } = this.props;
-
-    return (
-      <div className="index-info">
-        <IndexRangeSummary indexRange={indexRange} />
-        <Alert bsStyle="info">
-          This index is closed. Index information is not available at the moment, please reopen the index and try again.
-        </Alert>
-        <hr style={{ marginBottom: '5', marginTop: '10' }} />
-        <Button bsStyle="warning" bsSize="xs" onClick={this._onReopen}>
-          Reopen index
-        </Button>{' '}
-        <Button bsStyle="danger" bsSize="xs" onClick={this._onDeleteIndex}>
-          Delete index
-        </Button>
-      </div>
-    );
-  }
-}
+  return (
+    <div className="index-info">
+      <IndexRangeSummary indexRange={indexRange} />
+      <Alert bsStyle="info">
+        This index is closed. Index information is not available at the moment, please reopen the index and try again.
+      </Alert>
+      <hr style={{ marginBottom: '5', marginTop: '10' }} />
+      <Button bsStyle="warning" bsSize="xs" onClick={_onReopen}>
+        Reopen index
+      </Button>{' '}
+      <Button bsStyle="danger" bsSize="xs" onClick={_onDeleteIndex}>
+        Delete index
+      </Button>
+    </div>
+  );
+};
 
 export default ClosedIndexDetails;

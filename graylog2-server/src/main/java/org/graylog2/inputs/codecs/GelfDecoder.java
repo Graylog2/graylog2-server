@@ -159,7 +159,7 @@ public class GelfDecoder {
             }
 
             // Skip standard or already set fields.
-            if (message.getField(key) != null || Message.RESERVED_FIELDS.contains(key) && !Message.RESERVED_SETTABLE_FIELDS.contains(key)) {
+            if (message.getField(key) != null || Message.isReservedNonSettableField(key)) {
                 continue;
             }
 

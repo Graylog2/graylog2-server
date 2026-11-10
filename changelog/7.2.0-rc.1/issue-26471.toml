@@ -1,0 +1,4 @@
+type = "f"
+message = "Fixed a startup failure on hosts where the Graylog data directory is on a `noexec` filesystem, caused by the node CPU-load metric eagerly loading the OSHI/JNA native library during boot. The metric now initializes lazily and degrades gracefully instead of preventing the server from starting."
+
+issues = ["26471"]

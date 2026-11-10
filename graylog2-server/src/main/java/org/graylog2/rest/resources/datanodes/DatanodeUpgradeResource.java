@@ -29,12 +29,20 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.datanode.dto.FlushResponse;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.cluster.nodes.DataNodeClusterService;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.DataNodeMetadataService;
+import org.graylog2.cluster.nodes.OpensearchVersionsOverview;
+import org.graylog2.datanode.DataNodeInformation;
 import org.graylog2.datanode.DatanodeUpgradeService;
 import org.graylog2.datanode.DatanodeUpgradeStatus;
-import org.graylog2.rest.bulk.model.BulkOperationRequest;
 import org.graylog2.shared.security.RestPermissions;
 
-import static org.graylog2.audit.AuditEventTypes.DATANODE_START;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import static org.graylog2.audit.AuditEventTypes.DATANODE_START_REPLICATION;
 import static org.graylog2.audit.AuditEventTypes.DATANODE_STOP_REPLICATION;
 
@@ -45,10 +53,16 @@ import static org.graylog2.audit.AuditEventTypes.DATANODE_STOP_REPLICATION;
 public class DatanodeUpgradeResource {
 
     private final DatanodeUpgradeService upgradeService;
+    private final DataNodeMetadataService dataNodeMetadataService;
+    private final DataNodeClusterService dataNodeClusterService;
 
     @Inject
-    public DatanodeUpgradeResource(DatanodeUpgradeService upgradeService) {
+    public DatanodeUpgradeResource(DatanodeUpgradeService upgradeService,
+                                   DataNodeMetadataService dataNodeMetadataService,
+                                   DataNodeClusterService dataNodeClusterService) {
         this.upgradeService = upgradeService;
+        this.dataNodeMetadataService = dataNodeMetadataService;
+        this.dataNodeClusterService = dataNodeClusterService;
     }
 
 
@@ -58,6 +72,31 @@ public class DatanodeUpgradeResource {
     @RequiresPermissions(RestPermissions.DATANODE_READ)
     public DatanodeUpgradeStatus status() {
         return upgradeService.status();
+    }
+
+    @GET
+    @Path("/indexer/overview")
+    @Operation(summary = "Returns which opensearch versions are available and used in the data node cluster")
+    @RequiresPermissions(RestPermissions.DATANODE_READ)
+    public OpensearchVersionsOverview opensearchVersions() {
+        final OpensearchVersionsOverview overview = dataNodeMetadataService.getVersionsOverview();
+        final Set<String> nodeIds = overview.nodes().stream()
+                .map(OpensearchVersionsOverview.NodeVersionStatus::nodeId)
+                .collect(Collectors.toSet());
+        return overview.withDatanodeDetails(datanodeInformationByNodeId(nodeIds));
+    }
+
+    private Map<String, DataNodeInformation> datanodeInformationByNodeId(Set<String> nodeIds) {
+        final Map<String, DataNodeDto> datanodeDtos = dataNodeClusterService.byNodeIds(nodeIds);
+        final var upgradeStatus = upgradeService.status();
+        final Map<String, DataNodeInformation> informationByHostname = Stream
+                .concat(upgradeStatus.upToDateNodes().stream(), upgradeStatus.outdatedNodes().stream())
+                .filter(i -> i.hostname() != null)
+                .collect(Collectors.toMap(DataNodeInformation::hostname, i -> i, (a, b) -> a));
+        return datanodeDtos.entrySet().stream()
+                .filter(e -> e.getValue().getHostname() != null)
+                .filter(e -> informationByHostname.containsKey(e.getValue().getHostname()))
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> informationByHostname.get(e.getValue().getHostname())));
     }
 
     @POST

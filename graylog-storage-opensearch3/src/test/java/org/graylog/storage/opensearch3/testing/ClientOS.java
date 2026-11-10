@@ -59,6 +59,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.graylog2.indexer.Constants.COMPOSABLE_INDEX_TEMPLATES_FEATURE;
+import static org.graylog2.shared.utilities.StringUtils.f;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class ClientOS implements Client {
     private static final Logger LOG = LoggerFactory.getLogger(ClientOS.class);
@@ -192,6 +194,24 @@ public class ClientOS implements Client {
         deleteIndices(existingIndices());
         deleteAllTemplates();
         refreshNode();
+        try {
+            opensearchClient.syncWithoutErrorMapping().cluster().health(req -> req.waitForStatus(HealthStatus.Green));
+        } catch (IOException e) {
+            try {
+                final var catShards = opensearchClient.syncWithoutErrorMapping().cat().shards();
+                final String table = catShards.valueBody().stream()
+                        .filter(r -> "UNASSIGNED".equalsIgnoreCase(r.state()))
+                        .map(r -> f("%-40s %-8s %-12s %-12s %-20s %s",
+                                r.index(), r.shard(), r.prirep(), r.state(), r.unassignedReason(), r.unassignedDetails()))
+                        .collect(Collectors.joining("\n",
+                                f("%-40s %-8s %-12s %-12s %-20s %s\n",
+                                        "index", "shard", "prirep", "state", "reason", "details"),
+                                ""));
+                fail("Unassigned shards after clean up of OpenSearch:\n" + table);
+            } catch (Exception catException) {
+                LOG.error("OpenSearch test server clean up failed and could not retrieve _cat/shards", catException);
+            }
+        }
     }
 
     private String[] existingIndices() {

@@ -185,47 +185,23 @@ public class OshiFsProbe implements FsProbe {
     }
 
     private OSFileStore generateDummyFileStore() {
-        return new AbstractOSFileStore() {
-            @Override
-            public String getLogicalVolume() {
-                return "missing";
-            }
-
-            @Override
-            public String getDescription() {
-                return "missing";
-            }
-
-            @Override
-            public String getType() {
-                return "dummy";
-            }
-
-            @Override
-            public long getFreeSpace() {
-                return 0;
-            }
-
-            @Override
-            public long getUsableSpace() {
-                return 0;
-            }
-
-            @Override
-            public long getTotalSpace() {
-                return 1;
-            }
-
-            @Override
-            public long getFreeInodes() {
-                return 0;
-            }
-
-            @Override
-            public long getTotalInodes() {
-                return 1;
-            }
-
+        return new AbstractOSFileStore(
+                "missing",
+                "missing",
+                "missing",
+                "missing",
+                "missing",
+                "missing",
+                true,
+                "missing",
+                "missing",
+                "missing",
+                0,
+                1,
+                1,
+                0,
+                1
+        ) {
             @Override
             public boolean updateAttributes() {
                 return false;

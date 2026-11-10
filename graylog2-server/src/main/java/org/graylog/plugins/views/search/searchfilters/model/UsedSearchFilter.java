@@ -49,9 +49,9 @@ public interface UsedSearchFilter extends NativeEntityConverter<UsedSearchFilter
     String INLINE_QUERY_STRING_SEARCH_FILTER = "inlineQueryString";
     String REFERENCED_SEARCH_FILTER = "referenced";
 
-    boolean negation();
+    Boolean negation();
 
-    boolean disabled();
+    Boolean disabled();
 
     // This method should only be overridden for referenced filters as those will be exported as separate entities in content packs.
     // Inline filters will not be updated during import/export.

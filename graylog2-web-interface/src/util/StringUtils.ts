@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as JSON from 'util/json';
+
 const StringUtils = {
   tempDocument: document.createElement('textarea'),
   capitalizeFirstLetter(text: string) {
@@ -35,7 +37,7 @@ const StringUtils = {
   pluralize(number: string | number, singular: string, plural: string) {
     return number === 1 || number === '1' ? singular : plural;
   },
-  stringify(text) {
+  stringify(text: unknown) {
     return (typeof text === 'object' ? JSON.stringify(text) : String(text)) || '';
   },
   replaceSpaces(text: string, newCharacter = '-') {
@@ -55,7 +57,7 @@ const StringUtils = {
 
     return text;
   },
-  getRecursiveChildText(reactNode: string | React.ReactNode) {
+  getRecursiveChildText(reactNode: string | React.ReactNode): string {
     if (typeof reactNode === 'string') {
       return reactNode;
     }
@@ -63,7 +65,7 @@ const StringUtils = {
     const { children } = (reactNode as any)?.props || {};
 
     if (Array.isArray(reactNode)) {
-      const joinedNodes = [];
+      const joinedNodes: string[] = [];
 
       reactNode.forEach((node) => {
         if (typeof node === 'object') joinedNodes.push(StringUtils.getRecursiveChildText(node));

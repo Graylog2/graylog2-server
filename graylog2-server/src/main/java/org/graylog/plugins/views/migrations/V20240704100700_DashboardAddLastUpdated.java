@@ -36,7 +36,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class V20240704100700_DashboardAddLastUpdated extends Migration {
-    private static final Logger LOG = LoggerFactory.getLogger(V20190127111728_MigrateWidgetFormatSettings.class);
+    private static final Logger LOG = LoggerFactory.getLogger(V20240704100700_DashboardAddLastUpdated.class);
     private final ClusterConfigService clusterConfigService;
     private final MongoCollection<ViewDTO> viewsCollection;
     private final MongoCollection<Search> searchesCollection;

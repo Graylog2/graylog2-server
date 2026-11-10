@@ -37,7 +37,8 @@ import org.apache.http.HttpStatus;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeDto;
 import org.graylog2.cluster.nodes.NodeService;
-import org.graylog2.indexer.datanode.ProxyRequestAdapter;
+import org.graylog2.indexer.datanode.ProxyRequestAdapter.ProxyRequest;
+import org.graylog2.indexer.datanode.ProxyRequestAdapter.ProxyResponse;
 import org.graylog2.security.jwt.IndexerJwtAuthToken;
 import org.graylog2.security.jwt.IndexerJwtAuthTokenProvider;
 import retrofit2.Call;
@@ -51,14 +52,17 @@ import java.io.InputStream;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 @Singleton
-public class DatanodeRestApiProxy implements ProxyRequestAdapter {
+public class DatanodeRestApiProxy {
 
     private final Provider<IndexerJwtAuthToken> authToken;
     private final NodeService<DataNodeDto> nodeService;
@@ -116,7 +120,6 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
         return baos;
     }
 
-    @Override
     public ProxyResponse request(ProxyRequest request) throws IOException {
 
         if (Objects.equals(DatanodeResolver.ALL_NODES_KEYWORD, request.hostname())) {
@@ -128,14 +131,8 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
                 .map(url -> StringUtils.removeEnd(url, "/"))
                 .orElseThrow(() -> new IllegalStateException("No datanode found matching name " + request.hostname()));
 
-        final HttpUrl.Builder urlBuilder = HttpUrl.parse(host)
-                .newBuilder()
-                .addPathSegments(StringUtils.removeStart(request.path(), "/"));
-
-        request.queryParameters().forEach((key, values) -> values.forEach(value -> urlBuilder.addQueryParameter(key, value)));
-
         final Request.Builder builder = new Request.Builder()
-                .url(urlBuilder.build());
+                .url(buildTargetUrl(host, request));
 
         authToken.get().headerValue().ifPresent(headerValue -> builder.addHeader(HttpHeaders.AUTHORIZATION, headerValue));
 
@@ -151,12 +148,50 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
         return new ProxyResponse(response.code(), response.body().byteStream(), getContentType(response));
     }
 
+    /**
+     * Builds the URL of the proxied request. The base URL comes from the registered data node, the path and query
+     * parameters from the (untrusted) proxy request. The path is normalized and the resulting URL is verified to
+     * still point to the data node's base URL, so a request can never be redirected to a different host, port or
+     * outside the data node's API root, even if a caller didn't go through {@link DataNodeProxyAllowlist}.
+     */
+    static HttpUrl buildTargetUrl(String baseUrl, ProxyRequest request) {
+        final HttpUrl base = HttpUrl.parse(baseUrl);
+        if (base == null) {
+            throw new IllegalStateException(f("Invalid REST API address of datanode %s: %s", request.hostname(), baseUrl));
+        }
+
+        final String path = DataNodeProxyAllowlist.normalize(StringUtils.removeStart(request.path(), "/"))
+                .orElseThrow(() -> new RequestNotAllowedException(f("Path traverses above its root: %s", request.path())));
+
+        final HttpUrl.Builder urlBuilder = base.newBuilder().addPathSegments(path);
+        request.queryParameters().forEach((key, values) -> values.forEach(value -> urlBuilder.addQueryParameter(key, value)));
+        final HttpUrl target = urlBuilder.build();
+
+        if (!isWithinBase(base, target)) {
+            throw new RequestNotAllowedException(f("Refusing to proxy request outside of datanode %s: %s", request.hostname(), request.path()));
+        }
+        return target;
+    }
+
+    private static boolean isWithinBase(HttpUrl base, HttpUrl target) {
+        final String basePath = base.encodedPath();
+        final String basePathPrefix = basePath.endsWith("/") ? basePath : basePath + "/";
+        return target.scheme().equals(base.scheme())
+                && target.host().equals(base.host())
+                && target.port() == base.port()
+                && (target.encodedPath().equals(basePath) || target.encodedPath().startsWith(basePathPrefix));
+    }
+
     public <RemoteInterfaceType, RemoteResponseType> Map<String, RemoteResponseType> remoteInterface(String nodeSelector, Class<RemoteInterfaceType> interfaceClass, Function<RemoteInterfaceType, Call<RemoteResponseType>> function) {
         final Collection<DataNodeDto> hosts = resolveHosts(nodeSelector);
-        return hosts.stream()
+        // synchronizedMap on HashMap so we can safely insert null values from parallel threads.
+        // null is the expected body for void-typed Retrofit calls (Call<Void>) and 204 No Content responses;
+        // we still want the entry in the result map to signal that the host responded successfully.
+        final Map<String, RemoteResponseType> result = Collections.synchronizedMap(new HashMap<>());
+        hosts.stream()
                 .filter(n -> Objects.nonNull(n.getRestApiAddress()))
                 .parallel()
-                .collect(Collectors.toMap(NodeDto::getHostname, n -> {
+                .forEach(n -> {
                     final Retrofit retrofit = new Retrofit.Builder()
                             .baseUrl(StringUtils.removeEnd(n.getRestApiAddress(), "/"))
                             .addConverterFactory(JacksonConverterFactory.create(objectMapper))
@@ -168,15 +203,16 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
                             .build();
                     try {
                         final retrofit2.Response<RemoteResponseType> response = function.apply(retrofit.create(interfaceClass)).execute();
-                        if (response.isSuccessful() && response.body() != null) { // TODO: this causes exceptions when the remote if returns no body but ok state!
-                            return response.body();
+                        if (response.isSuccessful()) {
+                            result.put(n.getHostname(), response.body());
                         } else {
                             throw new IllegalStateException("Failed to trigger datanode request. Code: " + response.code() + ", message: " + response.message());
                         }
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
-                }));
+                });
+        return Collections.unmodifiableMap(new HashMap<>(result));
     }
 
     private Collection<DataNodeDto> resolveHosts(String nodeSelector) {
@@ -185,7 +221,7 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
         } else {
             return datanodeResolver.findByHostname(nodeSelector)
                     .map(Collections::singleton)
-                    .orElseThrow(() -> new IllegalStateException("No datanode found matching name " + nodeSelector));
+                    .orElseThrow(() -> new DatanodeNotFoundException("No datanode found matching name " + nodeSelector));
         }
     }
 

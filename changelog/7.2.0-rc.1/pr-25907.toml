@@ -1,0 +1,3 @@
+type = "f"
+message = "Fix broken `Manage extractors` link for local inputs on the Inputs overview page."
+pulls = ["25907"]

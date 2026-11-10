@@ -324,7 +324,9 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
                 .collect(Collectors.toCollection(LinkedHashSet::new));
         final SearchEntity.Builder searchEntityBuilder = SearchEntity.builder()
                 .queries(ImmutableSet.copyOf(queries))
-                .parameters(this.parameters())
+                .parameters(this.parameters().stream()
+                        .map(parameter -> parameter.toContentPackEntity(entityDescriptorIds))
+                        .collect(ImmutableSet.toImmutableSet()))
                 .requires(this.requires())
                 .createdAt(this.createdAt());
         if (this.owner().isPresent()) {

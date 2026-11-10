@@ -101,4 +101,20 @@ public class GrokTesterResourceTest {
         assertThat(response.string()).isEqualTo("");
         assertThat(response.errorMessage()).isNullOrEmpty();
     }
+
+    @Test
+    public void testGrokWithNestedQuantifierReturnsErrorInsteadOfCrashing() {
+        final String longInput = "a]".repeat(5000);
+        final GrokTesterResponse response = resource.grokTest("(?<msg>(.|\r|\n)*)", longInput, false);
+        assertThat(response.matched()).isFalse();
+        assertThat(response.errorMessage()).contains("stack overflow");
+    }
+
+    @Test
+    public void testGrokWithCharacterClassDoesNotOverflow() {
+        final String longInput = "a]".repeat(5000);
+        final GrokTesterResponse response = resource.grokTest("(?<msg>[\\s\\S]*)", longInput, false);
+        assertThat(response.matched()).isTrue();
+        assertThat(response.errorMessage()).isNullOrEmpty();
+    }
 }

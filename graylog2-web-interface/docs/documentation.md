@@ -12,8 +12,9 @@ Here is a summary of what to do if you just want to document a component:
    intents to do, followed by any warnings, notes, or deprecations if needed.
    Please **do not** include code examples in here unless you cannot create an
    example for some reason.
-3. Each `propType` definition **must** be preceded by its documentation. Pay
-   special attention to:
+3. Type props with a `Props` type, not PropTypes (see
+   [CONVENTIONS.md](../CONVENTIONS.md#types)). Add a comment above any prop
+   whose purpose isn't clear from its name. Pay special attention to:
    - Document data structures the component expect in array and object props
    - Document when a callback function will be called. This is specially
      helpful if the prop name is not as clear as it should be
@@ -23,7 +24,7 @@ Here is a summary of what to do if you just want to document a component:
    [Markdown](https://en.wikipedia.org/wiki/Markdown) file in the same directory
    as the component, with the same name as the component but the `md` extension.
    E.g. `ReactGridContainer.md` will contain the examples for
-   `ReactGridContainer.jsx`.
+   `ReactGridContainer.tsx`.
 5. Only write examples to show important use cases of the component, but you
    do not need to write an example for each prop and value that the component
    can accept.

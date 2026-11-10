@@ -22,6 +22,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
+import org.graylog.plugins.netflow.flows.CorruptFlowPacketException;
 import org.graylog.plugins.netflow.flows.EmptyTemplateException;
 import org.graylog.plugins.netflow.flows.InvalidFlowVersionException;
 import org.slf4j.Logger;
@@ -40,6 +41,10 @@ import java.util.Set;
 public class NetFlowV9Parser {
     private static final Logger LOG = LoggerFactory.getLogger(NetFlowV9Parser.class);
 
+    // A FlowSet's length includes its own 4-byte header (RFC 3954 Sec 5.1), so anything smaller
+    // cannot advance the reader index.
+    private static final int MIN_FLOWSET_LENGTH = 4;
+
     public static NetFlowV9Packet parsePacket(ByteBuf bb, NetFlowV9FieldTypeRegistry typeRegistry) {
         return parsePacket(bb, typeRegistry, Maps.newHashMap(), null);
     }
@@ -51,7 +56,16 @@ public class NetFlowV9Parser {
         final List<NetFlowV9Template> allTemplates = new ArrayList<>();
         NetFlowV9OptionTemplate optTemplate = optionTemplate;
         List<NetFlowV9BaseRecord> records = new ArrayList<>();
+        int previousStart = -1;
         while (bb.isReadable()) {
+            // Backstop in case a FlowSet parser ever returns without consuming input. A silent spin
+            // here is unrecoverable, so don't rely on every branch staying correct.
+            final int flowSetStart = bb.readerIndex();
+            if (flowSetStart == previousStart) {
+                LOG.error("Parser made no progress reading NetFlow V9 packet, discarding remaining bytes");
+                break;
+            }
+            previousStart = flowSetStart;
             bb.markReaderIndex();
             int flowSetId = bb.readUnsignedShort();
             if (flowSetId == 0) {
@@ -211,6 +225,7 @@ public class NetFlowV9Parser {
      */
     public static NetFlowV9OptionTemplate parseOptionTemplate(ByteBuf bb, NetFlowV9FieldTypeRegistry typeRegistry) {
         int length = bb.readUnsignedShort();
+        checkFlowSetLength(1, length);
         final int templateId = bb.readUnsignedShort();
 
         int optionScopeLength = bb.readUnsignedShort();
@@ -251,6 +266,7 @@ public class NetFlowV9Parser {
     public static Map.Entry<Integer, byte[]> parseOptionTemplateShallow(ByteBuf bb) {
         final int start = bb.readerIndex();
         int length = bb.readUnsignedShort();
+        checkFlowSetLength(1, length);
         final int templateId = bb.readUnsignedShort();
 
         int optionScopeLength = bb.readUnsignedShort();
@@ -297,6 +313,7 @@ public class NetFlowV9Parser {
         List<NetFlowV9BaseRecord> records = new ArrayList<>();
         int flowSetId = bb.readUnsignedShort();
         int length = bb.readUnsignedShort();
+        checkFlowSetLength(flowSetId, length);
         int end = bb.readerIndex() - 4 + length;
 
         List<NetFlowV9FieldDef> defs;
@@ -316,6 +333,13 @@ public class NetFlowV9Parser {
         int unitSize = 0;
         for (NetFlowV9FieldDef def : defs) {
             unitSize += def.length();
+        }
+
+        // A wire-supplied template whose fields sum to zero bytes makes the loop below append a
+        // record per pass without consuming anything, filling the heap rather than terminating.
+        if (unitSize <= 0) {
+            throw new CorruptFlowPacketException("Template " + flowSetId + " declares a zero-length record."
+                    + " Discarding packet.");
         }
 
         while (bb.readerIndex() < end && bb.readableBytes() >= unitSize) {
@@ -360,6 +384,7 @@ public class NetFlowV9Parser {
         final int start = bb.readerIndex();
         int usedTemplateId = bb.readUnsignedShort();
         int length = bb.readUnsignedShort();
+        checkFlowSetLength(usedTemplateId, length);
         int end = bb.readerIndex() - 4 + length;
         bb.readerIndex(end);
         return usedTemplateId;
@@ -375,7 +400,15 @@ public class NetFlowV9Parser {
         Map.Entry<Integer, byte[]> optTemplate = null;
         final Set<Integer> usedTemplates = Sets.newHashSet();
 
+        int previousStart = -1;
         while (buf.isReadable()) {
+            // See the equivalent guard in parsePacket.
+            final int flowSetStart = buf.readerIndex();
+            if (flowSetStart == previousStart) {
+                LOG.error("Parser made no progress reading NetFlow V9 packet, discarding remaining bytes");
+                break;
+            }
+            previousStart = flowSetStart;
             buf.markReaderIndex();
             int flowSetId = buf.readUnsignedShort();
             if (flowSetId == 0) {
@@ -392,5 +425,12 @@ public class NetFlowV9Parser {
         }
 
         return RawNetFlowV9Packet.create(header, dataLength, allTemplates, optTemplate, usedTemplates);
+    }
+
+    private static void checkFlowSetLength(int flowSetId, int length) {
+        if (length < MIN_FLOWSET_LENGTH) {
+            throw new CorruptFlowPacketException("FlowSet " + flowSetId + " declares length " + length
+                    + ", which is below the " + MIN_FLOWSET_LENGTH + " byte minimum. Discarding packet.");
+        }
     }
 }

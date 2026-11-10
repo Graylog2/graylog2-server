@@ -1,0 +1,4 @@
+type = "changed"
+message = "Data Lake restores that don't incur license traffic now report `gl2_accounted_message_size` as `0`."
+
+pulls = ["26190"]

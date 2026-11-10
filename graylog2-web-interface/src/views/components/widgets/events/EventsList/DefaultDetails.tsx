@@ -15,12 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useMemo } from 'react';
+import styled from 'styled-components';
 
 import type { Event, EventDefinitionContext } from 'components/events/events/types';
 import GeneralEventDetailsTable from 'components/events/events/GeneralEventDetailsTable';
 import { detailsAttributes } from 'components/events/Constants';
 import DropdownButton from 'components/bootstrap/DropdownButton';
 import useEventAction from 'components/events/events/hooks/useEventAction';
+import TagsDetailRow from 'components/events/TagsDetailRow';
 
 type Props = {
   event: Event;
@@ -29,10 +31,16 @@ type Props = {
 
 const attributesList = detailsAttributes.map(({ id, title }) => ({ id, title }));
 
+const ActionsWrapperContainer = styled.div`
+  margin-top: ${({ theme }) => theme.spacings.md};
+`;
+
 const ActionsWrapper = ({ children }) => (
-  <DropdownButton title="Actions" buttonTitle="Actions">
-    {children}
-  </DropdownButton>
+  <ActionsWrapperContainer>
+    <DropdownButton title="Actions" buttonTitle="Actions">
+      {children}
+    </DropdownButton>
+  </ActionsWrapperContainer>
 );
 
 const DefaultDetails = ({ event, eventDefinitionContext }: Props) => {
@@ -45,6 +53,9 @@ const DefaultDetails = ({ event, eventDefinitionContext }: Props) => {
   return (
     <>
       <GeneralEventDetailsTable attributesList={attributesList} event={event} meta={meta} />
+      {/* No filter component is in scope for the events overview widget, so tag chips
+          here would just append an unused `filters` query param when clicked. */}
+      <TagsDetailRow tags={event.tags} interactive={false} />
       <ActionsWrapper>{moreActions}</ActionsWrapper>
       {pluggableActionModals}
     </>

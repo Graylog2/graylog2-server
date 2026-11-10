@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Add endpoint to identify problematic indices for OpenSearch upgrades."
+
+pulls = ["25685"]

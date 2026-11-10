@@ -33,6 +33,7 @@ public interface AWSRequest {
     String AWS_ACCESS_KEY_ID = "aws_access_key_id";
     String AWS_SECRET_ACCESS_KEY = "aws_secret_access_key";
     String ASSUME_ROLE_ARN = "assume_role_arn";
+    String EXTERNAL_ID = "aws_external_id";
 
     String CLOUDWATCH_ENDPOINT = "cloudwatch_endpoint";
     String DYNAMODB_ENDPOINT = "dynamodb_endpoint";
@@ -53,6 +54,10 @@ public interface AWSRequest {
     @Nullable
     @JsonProperty(ASSUME_ROLE_ARN)
     String assumeRoleArn();
+
+    @Nullable
+    @JsonProperty(EXTERNAL_ID)
+    String externalId();
 
     @Nullable
     @JsonProperty(CLOUDWATCH_ENDPOINT)
@@ -82,6 +87,9 @@ public interface AWSRequest {
 
         @JsonProperty(ASSUME_ROLE_ARN)
         SELF assumeRoleArn(String assumeRoleArn);
+
+        @JsonProperty(EXTERNAL_ID)
+        SELF externalId(String externalId);
 
         @JsonProperty(CLOUDWATCH_ENDPOINT)
         SELF cloudwatchEndpoint(String cloudwatchEndpoint);

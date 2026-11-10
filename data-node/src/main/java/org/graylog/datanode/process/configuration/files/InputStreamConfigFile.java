@@ -21,9 +21,25 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
 
-public record InputStreamConfigFile(Path relativePath, ByteArrayInputStream inputStream) implements DatanodeConfigFile {
+public class InputStreamConfigFile implements DatanodeConfigFile {
+
+    private final Path relativePath;
+    private final byte[] content;
+
+    public InputStreamConfigFile(Path relativePath, byte[] content) {
+        this.relativePath = relativePath;
+        this.content = content;
+    }
+
+    @Override
+    public Path relativePath() {
+        return relativePath;
+    }
+
     @Override
     public void write(OutputStream output) throws IOException {
-        inputStream.transferTo(output);
+        try (final ByteArrayInputStream input = new ByteArrayInputStream(content)) {
+            input.transferTo(output);
+        }
     }
 }

@@ -30,10 +30,12 @@ import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import generateId from 'logic/generateId';
 import type Parameter from 'views/logic/parameters/Parameter';
 import type { ParameterBindings } from 'views/logic/search/SearchExecutionState';
+import type { FiltersType } from 'views/types';
 
 const NeutralLink = styled.a`
   display: inline-flex;
   align-items: center;
+  vertical-align: middle;
   color: inherit;
   text-decoration: none;
 
@@ -57,6 +59,7 @@ const buildSearchLink = (
   streams: Array<string>,
   streamCategories: Array<string>,
   parameters?: Immutable.Set<Parameter>,
+  filters?: FiltersType,
 ) => {
   let searchLink = SearchLink.builder()
     .query(createElasticsearchQueryString(queryString))
@@ -66,7 +69,7 @@ const buildSearchLink = (
     .build()
     .toURL();
 
-  if (parameters?.size) {
+  if (parameters?.size || filters?.size) {
     searchLink = new URI(searchLink).setSearch('session-id', sessionId).toString();
   }
 
@@ -88,27 +91,28 @@ export const ReplaySearchButtonComponent = ({
   children = undefined,
   onClick = undefined,
   component: Component = NeutralLink,
+  newTab = false,
 }: {
   children?: React.ReactNode;
   searchLink: string;
   onClick?: () => void;
   component?: React.ComponentType<CustomComponentProps>;
+  newTab?: boolean;
 }) => {
   const title = 'Replay search';
+  const newTabProps = newTab
+    ? { href: searchLink, target: '_blank' as const, rel: 'noopener noreferrer' as const }
+    : {};
 
-  return (
-    <LinkContainer to={searchLink}>
-      <Component title={title} onClick={onClick}>
-        {children ? (
-          <>
-            {children} <StyledIcon name={iconName} />
-          </>
-        ) : (
-          <IconButton name={iconName} focusable={false} title={title} />
-        )}
-      </Component>
-    </LinkContainer>
+  const button = children ? (
+    <Component title={title} onClick={onClick} {...newTabProps}>
+      {children} <StyledIcon name={iconName} />
+    </Component>
+  ) : (
+    <IconButton name={iconName} title={title} onClick={onClick} {...newTabProps} />
   );
+
+  return newTab ? button : <LinkContainer to={searchLink}>{button}</LinkContainer>;
 };
 
 type Props = {
@@ -117,8 +121,9 @@ type Props = {
   streams?: string[] | undefined;
   streamCategories?: string[] | undefined;
   parameters?: Immutable.Set<Parameter>;
-  children?: React.ReactNode;
+  filters?: FiltersType;
   parameterBindings?: ParameterBindings;
+  newTab?: boolean;
 };
 
 const ReplaySearchButton = ({
@@ -127,23 +132,27 @@ const ReplaySearchButton = ({
   streams = undefined,
   streamCategories = undefined,
   parameters = undefined,
-  children = undefined,
+  filters = undefined,
   parameterBindings = undefined,
+  newTab = false,
 }: Props) => {
   const sessionId = useMemo(() => `replay-search-${generateId()}`, []);
-  const searchLink = buildSearchLink(sessionId, timerange, queryString, streams, streamCategories, parameters);
+  const searchLink = buildSearchLink(sessionId, timerange, queryString, streams, streamCategories, parameters, filters);
 
   const onReplaySearch = useCallback(() => {
-    if (parameters?.size) {
-      Store.set(sessionId, JSON.stringify({ parameters, parameterBindings }));
+    if (parameters?.size || filters?.size) {
+      Store.set(
+        sessionId,
+        JSON.stringify({
+          parameters,
+          parameterBindings,
+          filters: filters?.toArray() ?? [],
+        }),
+      );
     }
-  }, [sessionId, parameters, parameterBindings]);
+  }, [sessionId, parameters, parameterBindings, filters]);
 
-  return (
-    <ReplaySearchButtonComponent searchLink={searchLink} onClick={onReplaySearch}>
-      {children}
-    </ReplaySearchButtonComponent>
-  );
+  return <ReplaySearchButtonComponent searchLink={searchLink} onClick={onReplaySearch} newTab={newTab} />;
 };
 
 export default ReplaySearchButton;

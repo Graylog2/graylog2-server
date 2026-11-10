@@ -1,0 +1,5 @@
+type = "f"
+message = "Encrypt `MessageOutput` configuration fields marked with `isEncrypted=true` before persisting them, instead of storing the secret in plain text."
+
+issues = ["26626"]
+pulls = ["27104"]

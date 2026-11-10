@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix issue when inline search bound in Query Input."
+
+issues = ["25570"]
+pulls = ["25686"]

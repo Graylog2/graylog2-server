@@ -197,6 +197,7 @@ const Metric = ({ index }: Props) => {
                   <FieldSelect
                     id="metric-field-select"
                     selectRef={metricFieldSelectRef}
+                    allowCreate
                     onChange={(fieldName) => {
                       onChange({ target: { name, value: fieldName } });
                     }}

@@ -25,7 +25,12 @@ declare global {
 }
 
 export type BrandingResource = { enabled?: boolean; url?: string | undefined };
-export type BrandingResourceKey = 'stream_rule_matcher_code' | 'contact_support' | 'contact_us' | 'marketplace';
+export type BrandingResourceKey =
+  | 'stream_rule_matcher_code'
+  | 'contact_support'
+  | 'contact_us'
+  | 'marketplace'
+  | 'forwarder_download_url';
 
 export type BrandingResources = Record<BrandingResourceKey, BrandingResource>;
 type FeatureToggle = { enabled?: boolean };
@@ -44,6 +49,9 @@ export type Branding = {
   welcome?: {
     news?: { enabled: boolean; feed?: string };
     releases?: { enabled: boolean };
+  };
+  onboarding?: {
+    resources?: { enabled: boolean };
   };
   navigation?: {
     home?: { icon: string };

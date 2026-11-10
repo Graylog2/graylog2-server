@@ -43,14 +43,6 @@ const mockContentStreamSettings = {
 
 jest.mock('components/content-stream/hook/useContentStreamSettings', () => jest.fn(() => mockContentStreamSettings));
 
-jest.mock('util/AppConfig', () => ({
-  gl2DevMode: jest.fn(() => false),
-  gl2AppPathPrefix: jest.fn(() => ''),
-  isCloud: jest.fn(() => true),
-  gl2ServerUrl: jest.fn(() => 'https://example.org/api/'),
-  contentStream: jest.fn(() => ({ refresh_interval: 'PT168H', rss_url: 'https://example.org/rss' })),
-}));
-
 jest.mock('components/content-stream/ContentStreamNews', () => () => <div>ContentStreamNews</div>);
 
 jest.mock('components/content-stream/ContentStreamReleasesSection', () => () => (
@@ -58,11 +50,6 @@ jest.mock('components/content-stream/ContentStreamReleasesSection', () => () => 
 ));
 
 jest.mock('hooks/useCurrentUser');
-jest.mock('util/AppConfig', () => ({
-  gl2AppPathPrefix: jest.fn(() => ''),
-  gl2ServerUrl: jest.fn(() => undefined),
-  branding: jest.fn(() => undefined),
-}));
 
 describe('<ContentStreamSection>', () => {
   beforeEach(() => {

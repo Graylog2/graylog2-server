@@ -17,8 +17,14 @@
 import type { Sort, Attribute } from 'stores/PaginationTypes';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import type { MiddleSectionProps } from 'components/common/PaginatedEntityTable/PaginatedEntityTable';
+import { ALPHABETICAL_SORT } from 'components/common/PaginatedEntityTable/slicing/slicingConstants';
+import TagsFilter from 'components/events/TagsFilter';
 
 export const EVENTS_ENTITY_TABLE_ID = 'events';
+
+export const nonInfoPriorities = Object.keys(EventDefinitionPriorityEnum.properties)
+  .reverse()
+  .filter((key) => key !== String(EventDefinitionPriorityEnum.INFO));
 
 export const commonEventAttributes: Array<Attribute> = [
   {
@@ -34,6 +40,7 @@ export const commonEventAttributes: Array<Attribute> = [
     sortable: true,
     title: 'Priority',
     type: 'STRING',
+    slice_sort_default: { mode: ALPHABETICAL_SORT, direction: 'desc' },
   },
   {
     id: 'timestamp',
@@ -120,6 +127,14 @@ export const eventsTableSpecificAttributes: Array<Attribute> = [
       { value: 'true', title: 'Alert' },
     ],
   },
+  {
+    id: 'tags',
+    title: 'Tags',
+    type: 'STRING',
+    sortable: false,
+    filterable: true,
+    filter_component: TagsFilter,
+  },
 ];
 export const additionalAttributes: Array<Attribute> = [...eventsTableSpecificAttributes, ...detailsAttributes];
 
@@ -129,26 +144,27 @@ export const eventsTableElements = {
     defaultPageSize: 20,
     defaultSort: { attributeId: 'timestamp', direction: 'desc' } as Sort,
     defaultDisplayedAttributes: [
+      'timestamp',
+      'alert',
       'priority',
       'message',
-      'key',
-      'alert',
       'event_definition_id',
+      'key',
       'event_definition_type',
-      'timestamp',
     ],
     defaultColumnOrder: [
-      'message',
-      'id',
-      'priority',
-      'key',
-      'alert',
-      'event_definition_id',
-      'event_definition_type',
       'timestamp',
-      'fields',
+      'alert',
+      'priority',
+      'message',
+      'event_definition_id',
+      'key',
+      'event_definition_type',
       'group_by_fields',
       'remediation_steps',
+      'id',
+      'tags',
+      'fields',
       'timerange_start',
     ],
   },

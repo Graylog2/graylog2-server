@@ -21,6 +21,7 @@ import type { TimeRange } from 'views/logic/queries/Query';
 import ViewGenerator from 'views/logic/views/ViewGenerator';
 import type Parameter from 'views/logic/parameters/Parameter';
 import type { QueryString } from 'views/logic/queries/types';
+import type { SearchFilter } from 'views/types';
 
 type Props = {
   streamId?: string | string[];
@@ -28,15 +29,25 @@ type Props = {
   timeRange?: TimeRange;
   queryString?: QueryString;
   parameters?: Array<Parameter>;
+  searchFilters?: Array<SearchFilter>;
 };
 
 type Deps = Array<Props[keyof Props]> | [];
 const useCreateSavedSearch = (
-  { streamId, streamCategory, timeRange, queryString, parameters }: Props,
+  { streamId, streamCategory, timeRange, queryString, parameters, searchFilters }: Props,
   deps: Deps = [],
 ) =>
   useMemo(
-    () => ViewGenerator({ type: View.Type.Search, streamId, streamCategory, timeRange, queryString, parameters }),
+    () =>
+      ViewGenerator({
+        type: View.Type.Search,
+        streamId,
+        streamCategory,
+        timeRange,
+        queryString,
+        parameters,
+        searchFilters,
+      }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     deps,
   );

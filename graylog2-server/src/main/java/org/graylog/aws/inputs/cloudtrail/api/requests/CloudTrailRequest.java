@@ -33,6 +33,7 @@ public interface CloudTrailRequest {
     String AWS_SQS_REGION = "aws_sqs_region";
     String AWS_S3_REGION = "aws_s3_region";
     String ASSUME_ROLE_ARN = "assume_role_arn";
+    String AWS_EXTERNAL_ID = "aws_external_id";
 
     @Nullable
     @JsonProperty(AWS_ACCESS_ID)
@@ -58,6 +59,10 @@ public interface CloudTrailRequest {
     @JsonProperty(ASSUME_ROLE_ARN)
     String assumeRoleArn();
 
+    @Nullable
+    @JsonProperty(AWS_EXTERNAL_ID)
+    String externalId();
+
     interface Builder<SELF> {
 
         @JsonProperty(AWS_ACCESS_ID)
@@ -77,5 +82,8 @@ public interface CloudTrailRequest {
 
         @JsonProperty(ASSUME_ROLE_ARN)
         SELF assumeRoleArn(String assumeRoleArn);
+
+        @JsonProperty(AWS_EXTERNAL_ID)
+        SELF externalId(String externalId);
     }
 }

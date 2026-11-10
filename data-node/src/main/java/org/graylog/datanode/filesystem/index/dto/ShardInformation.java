@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.annotation.Nullable;
-import org.apache.lucene.util.Version;
 import org.graylog.datanode.filesystem.index.statefile.StateFile;
 
 import java.util.Optional;
@@ -28,7 +27,7 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record ShardInformation(@JsonIgnore java.nio.file.Path path, int documentsCount,
                                @Nullable @JsonIgnore StateFile stateFile,
-                               @JsonIgnore Version minSegmentLuceneVersion) {
+                               @Nullable @JsonIgnore String minSegmentLuceneVersion) {
 
     private static final String PRIMARY_DOC_KEY = "primary";
 
@@ -39,7 +38,7 @@ public record ShardInformation(@JsonIgnore java.nio.file.Path path, int document
 
     @JsonProperty
     public String minLuceneVersion() {
-        return Optional.ofNullable(minSegmentLuceneVersion).map(Version::toString).orElse(null);
+        return minSegmentLuceneVersion;
     }
 
     @JsonProperty

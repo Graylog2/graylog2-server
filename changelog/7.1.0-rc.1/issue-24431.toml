@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Execution Info popover can now be dismissed by clicking outside."
+
+issues = ["24431"]

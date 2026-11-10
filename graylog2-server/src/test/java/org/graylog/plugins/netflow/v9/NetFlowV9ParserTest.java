@@ -19,17 +19,24 @@ package org.graylog.plugins.netflow.v9;
 import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
 import io.netty.buffer.Unpooled;
+import org.graylog.plugins.netflow.flows.CorruptFlowPacketException;
 import org.graylog.plugins.netflow.flows.EmptyTemplateException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -114,6 +121,116 @@ public class NetFlowV9ParserTest {
         final byte[] b = Resources.toByteArray(Resources.getResource("netflow-data/netflow-v9-3_incomplete.dat"));
         assertThatExceptionOfType(EmptyTemplateException.class)
                 .isThrownBy(() -> NetFlowV9Parser.parsePacket(Unpooled.wrappedBuffer(b), typeRegistry));
+    }
+
+    // Each case below used to rewind the reader index to the start of the FlowSet and spin forever.
+    // The timeouts fail the test rather than hanging the suite if that regresses.
+
+    // Only the version is validated, so sysUptime / unixSecs / sequence / sourceId are left zero.
+    private static final String HEADER_ONE_FLOWSET = "0009" + "0001" + "00000000" + "00000000" + "00000000" + "00000000";
+    private static final String HEADER_TWO_FLOWSETS = "0009" + "0002" + "00000000" + "00000000" + "00000000" + "00000000";
+
+    @Test
+    @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+    public void parsePacketShallow_dataFlowSetWithZeroLength_isRejected() {
+        // FlowSet id 256 (any id above 1 is a data FlowSet), length 0
+        final byte[] b = hexToBytes(HEADER_ONE_FLOWSET + "0100" + "0000");
+
+        assertThatExceptionOfType(CorruptFlowPacketException.class)
+                .isThrownBy(() -> NetFlowV9Parser.parsePacketShallow(Unpooled.wrappedBuffer(b)));
+    }
+
+    @Test
+    @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+    public void parsePacketShallow_optionTemplateWithZeroLength_isRejected() {
+        // FlowSet id 1 (options template), length 0, then template id and zero scope/option lengths
+        final byte[] b = hexToBytes(HEADER_ONE_FLOWSET + "0001" + "0000" + "0100" + "0000" + "0000");
+
+        assertThatExceptionOfType(CorruptFlowPacketException.class)
+                .isThrownBy(() -> NetFlowV9Parser.parsePacketShallow(Unpooled.wrappedBuffer(b)));
+    }
+
+    @Test
+    @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+    public void parsePacketShallow_dataFlowSetWithHeaderOnlyLength_parsesCleanly() {
+        // Same packet except length 4: a FlowSet header and no records, which must still parse.
+        final byte[] b = hexToBytes(HEADER_ONE_FLOWSET + "0100" + "0004");
+
+        final RawNetFlowV9Packet packet = NetFlowV9Parser.parsePacketShallow(Unpooled.wrappedBuffer(b));
+
+        assertEquals(9, packet.header().version());
+        assertEquals(Collections.singleton(256), packet.usedTemplates());
+    }
+
+    @Test
+    @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+    public void parsePacket_dataFlowSetWithZeroLength_isRejected() {
+        // The template for id 256 is needed so the record parser gets past its cache lookup.
+        final byte[] b = hexToBytes(HEADER_TWO_FLOWSETS
+                + "0000" + "0010" + "0100" + "0002" + "0008" + "0004" + "000c" + "0004"
+                + "0100" + "0000");
+
+        assertThatExceptionOfType(CorruptFlowPacketException.class)
+                .isThrownBy(() -> NetFlowV9Parser.parsePacket(Unpooled.wrappedBuffer(b), typeRegistry));
+    }
+
+    @Test
+    @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+    public void parsePacket_optionTemplateWithZeroLength_isRejected() {
+        final byte[] b = hexToBytes(HEADER_ONE_FLOWSET + "0001" + "0000" + "0100" + "0000" + "0000");
+
+        assertThatExceptionOfType(CorruptFlowPacketException.class)
+                .isThrownBy(() -> NetFlowV9Parser.parsePacket(Unpooled.wrappedBuffer(b), typeRegistry));
+    }
+
+    @Test
+    @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+    public void parsePacket_templateWithNoFields_isRejected() {
+        // Distinct from the length cases: the FlowSet length here is legitimate, but a template
+        // declaring zero fields makes each record occupy zero bytes, exhausting the heap.
+        final byte[] b = hexToBytes(HEADER_TWO_FLOWSETS
+                + "0000" + "0008" + "0100" + "0000"
+                + "0100" + "0008" + "00000000");
+
+        assertThatExceptionOfType(CorruptFlowPacketException.class)
+                .isThrownBy(() -> NetFlowV9Parser.parsePacket(Unpooled.wrappedBuffer(b), typeRegistry));
+    }
+
+    @Test
+    public void parsePacket_skipFieldIsNotIncludedInRecord() throws Exception {
+        // Build a registry where field 235 (0x00EB) is marked :skip
+        final String yaml = "---\n235:\n- :skip\n1:\n- 4\n- :in_bytes\n";
+        final NetFlowV9FieldTypeRegistry skipRegistry = NetFlowV9FieldTypeRegistry.create(
+                new ByteArrayInputStream(yaml.getBytes(StandardCharsets.UTF_8)));
+
+        // Template FlowSet: two fields — field 235 (skip, 4 bytes) and field 1 (in_bytes, 4 bytes)
+        // Data FlowSet: one record — 4 bytes for the skip field and 4 bytes for in_bytes
+        final byte[] packet = hexToBytes(HEADER_TWO_FLOWSETS
+                // Template FlowSet: flowSetId=0, length=16 (4 header + 4 tmpl header + 2*4 fields)
+                + "0000" + "0010"
+                + "0100" + "0002"   // templateId=256, fieldCount=2
+                + "00EB" + "0004"   // field 235 (skip), length 4
+                + "0001" + "0004"   // field 1 (in_bytes), length 4
+                // Data FlowSet: flowSetId=256, length=12 (4 header + 8 data)
+                + "0100" + "000C"
+                + "DEADBEEF"        // 4 bytes consumed by skip field
+                + "000000FF");      // in_bytes = 255
+
+        final NetFlowV9Packet result = NetFlowV9Parser.parsePacket(Unpooled.wrappedBuffer(packet), skipRegistry);
+
+        assertThat(result.records()).hasSize(1);
+        final Map<String, Object> fields = result.records().getFirst().fields();
+        assertThat(fields).doesNotContainKey("skip_235");
+        assertThat(fields).doesNotContainKey("field_235");
+        assertThat(fields).containsEntry("in_bytes", 255L);
+    }
+
+    private static byte[] hexToBytes(String hex) {
+        final byte[] out = new byte[hex.length() / 2];
+        for (int i = 0; i < out.length; i++) {
+            out[i] = (byte) Integer.parseInt(hex.substring(i * 2, i * 2 + 2), 16);
+        }
+        return out;
     }
 
     private String name(NetFlowV9FieldDef def) {

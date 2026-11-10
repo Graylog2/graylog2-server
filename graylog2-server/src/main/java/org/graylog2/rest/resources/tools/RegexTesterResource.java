@@ -17,17 +17,12 @@
 package org.graylog2.rest.resources.tools;
 
 import com.codahale.metrics.annotation.Timed;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.rest.models.tools.requests.RegexTestRequest;
-import org.graylog2.rest.models.tools.responses.RegexTesterResponse;
-import org.graylog2.rest.models.tools.responses.RegexValidationResponse;
-import org.graylog2.shared.rest.resources.RestResource;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -36,15 +31,30 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.rest.models.tools.requests.RegexTestRequest;
+import org.graylog2.rest.models.tools.responses.RegexTesterResponse;
+import org.graylog2.rest.models.tools.responses.RegexValidationResponse;
+import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 @RequiresAuthentication
+@Tag(name = "Tools/RegexTester", description = "Test regular expressions")
 @Path("/tools/regex_tester")
 public class RegexTesterResource extends RestResource {
+
+    private final SafePattern safePattern;
+
+    @Inject
+    public RegexTesterResource(final SafePattern safePattern) {
+        this.safePattern = safePattern;
+    }
+
     @GET
+    @Operation(summary = "Test a regular expression against a string")
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public RegexTesterResponse regexTester(@QueryParam("regex") @NotEmpty String regex,
@@ -53,6 +63,7 @@ public class RegexTesterResource extends RestResource {
     }
 
     @POST
+    @Operation(summary = "Test a regular expression against a string")
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -62,42 +73,38 @@ public class RegexTesterResource extends RestResource {
     }
 
     @GET
+    @Operation(summary = "Validate a regular expression")
     @Path("/validate")
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public RegexValidationResponse validateRegex(@QueryParam("regex") @NotEmpty String regex) {
-        final RegexValidationResponse.Builder response = RegexValidationResponse.builder()
-                .regex(regex);
-
+        final RegexValidationResponse.Builder response = RegexValidationResponse.builder().regex(regex);
         try {
-            Pattern.compile(regex, Pattern.DOTALL);
+            safePattern.compile(regex);
             response.isValid(true);
-        } catch (PatternSyntaxException e) {
+        } catch (IllegalArgumentException e) {
             response.isValid(false).validationMessage(e.getMessage());
         }
-
         return response.build();
     }
 
-    private RegexTesterResponse doTestRegex(String example, String regex) {
-        final Pattern pattern;
+    private RegexTesterResponse doTestRegex(final String example, final String regex) {
         try {
-            pattern = Pattern.compile(regex, Pattern.DOTALL);
+            final Matcher matcher = safePattern.compile(regex).matcher(example);
+            final boolean matched = matcher.find();
+            final RegexTesterResponse.Match match;
+            if (matched && matcher.groupCount() > 0) {
+                match = RegexTesterResponse.Match.create(matcher.group(1), matcher.start(1), matcher.end(1));
+            } else {
+                match = null;
+            }
+            return RegexTesterResponse.create(matched, match, regex, example);
         } catch (PatternSyntaxException e) {
             throw new BadRequestException("Invalid regular expression: " + e.getMessage(), e);
+        } catch (TimeLimitedCharSequence.TimeoutException e) {
+            throw new BadRequestException("Regular expression matching timed out — the pattern may be susceptible to catastrophic backtracking");
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e.getMessage(), e);
         }
-
-        final Matcher matcher = pattern.matcher(example);
-        boolean matched = matcher.find();
-
-        // Get the first matched group.
-        final RegexTesterResponse.Match match;
-        if (matched && matcher.groupCount() > 0) {
-            match = RegexTesterResponse.Match.create(matcher.group(1), matcher.start(1), matcher.end(1));
-        } else {
-            match = null;
-        }
-
-        return RegexTesterResponse.create(matched, match, regex, example);
     }
 }

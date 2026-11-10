@@ -27,6 +27,7 @@ import PopoverTitle from 'views/components/visualizations/OnClickPopover/Popover
 const StyledListGroup = styled(ListGroup)`
   max-height: 300px;
   overflow-y: auto;
+  max-width: 450px;
 `;
 
 type Props = {
@@ -36,7 +37,7 @@ type Props = {
 };
 
 const ClickPointSelector = ({ clickPointsInRadius, onSelect, metricMapper }: Props) => (
-  <Popover.Dropdown title={<PopoverTitle>Metrics</PopoverTitle>}>
+  <Popover.Dropdown title={<PopoverTitle>Data Points</PopoverTitle>}>
     <StyledListGroup>
       {clickPointsInRadius.map((clickPoint: ClickPoint) => {
         const { value, metric } = metricMapper(clickPoint);

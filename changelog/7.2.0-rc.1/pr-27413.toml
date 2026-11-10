@@ -1,0 +1,5 @@
+type = "f"
+message = "Add missing orElse(null) to unpack the Optional in the Percentiles handler which caused issues with event definitions."
+
+issues = ["Graylog2/graylog-plugin-enterprise#15678"]
+pulls = ["27413"]

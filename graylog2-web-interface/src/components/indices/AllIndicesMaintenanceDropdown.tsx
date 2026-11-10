@@ -15,10 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
 
 import { SystemIndexRanges } from '@graylog/server-api';
 
 import { ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
+import IncompatibleIndicesModal from 'components/indices/IncompatibleIndicesModal';
 
 const _onRecalculateAllIndexRange = () => {
   // eslint-disable-next-line no-alert
@@ -27,14 +29,22 @@ const _onRecalculateAllIndexRange = () => {
   }
 };
 
-const AllIndicesMaintenanceDropdown = () => (
-  <ButtonGroup>
-    <DropdownButton bsStyle="info" title="Maintenance" id="indices-maintenance-actions" pullRight>
-      <MenuItem eventKey="1" onClick={_onRecalculateAllIndexRange}>
-        Cleanup & recalculate all index ranges
-      </MenuItem>
-    </DropdownButton>
-  </ButtonGroup>
-);
+const AllIndicesMaintenanceDropdown = () => {
+  const [showIncompatibleModal, setShowIncompatibleModal] = useState(false);
+
+  return (
+    <ButtonGroup>
+      <DropdownButton bsStyle="info" title="Maintenance" id="indices-maintenance-actions" pullRight>
+        <MenuItem eventKey="1" onClick={_onRecalculateAllIndexRange}>
+          Cleanup & recalculate all index ranges
+        </MenuItem>
+        <MenuItem eventKey="4" onClick={() => setShowIncompatibleModal(true)}>
+          Check index versions
+        </MenuItem>
+      </DropdownButton>
+      {showIncompatibleModal && <IncompatibleIndicesModal show onClose={() => setShowIncompatibleModal(false)} />}
+    </ButtonGroup>
+  );
+};
 
 export default AllIndicesMaintenanceDropdown;

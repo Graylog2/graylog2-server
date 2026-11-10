@@ -1,0 +1,137 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import * as React from 'react';
+import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
+
+import ChipsCell from 'components/common/ChipsCell';
+
+describe('ChipsCell', () => {
+  it('renders nothing when items are empty', () => {
+    render(<ChipsCell items={[]} />);
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    expect(screen.queryByText(/\+/)).not.toBeInTheDocument();
+  });
+
+  it('renders all items when count is at or below collapsedCount', async () => {
+    render(<ChipsCell items={['phishing', 'lateral-movement']} collapsedCount={2} />);
+
+    await screen.findByText('phishing');
+    await screen.findByText('lateral-movement');
+
+    expect(screen.queryByRole('button', { name: /show \d+ more/i })).not.toBeInTheDocument();
+  });
+
+  it('truncates items above collapsedCount and shows a clickable "+N" toggle', async () => {
+    const items = ['t1', 't2', 't3', 't4', 't5', 't6', 't7'];
+    render(<ChipsCell items={items} />);
+
+    await screen.findByText('t1');
+
+    expect(screen.queryByText('t2')).not.toBeInTheDocument();
+    expect(screen.queryByText('t7')).not.toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: /show 6 more/i })).toHaveTextContent('+6');
+  });
+
+  it('expands and collapses when the toggle is clicked', async () => {
+    const items = ['t1', 't2', 't3', 't4', 't5', 't6', 't7'];
+    render(<ChipsCell items={items} />);
+
+    await userEvent.click(await screen.findByRole('button', { name: /show 6 more/i }));
+
+    await screen.findByText('t2');
+    await screen.findByText('t7');
+
+    await userEvent.click(await screen.findByRole('button', { name: /show less/i }));
+
+    expect(await screen.findByRole('button', { name: /show 6 more/i })).toHaveTextContent('+6');
+    expect(screen.queryByText('t2')).not.toBeInTheDocument();
+  });
+
+  it('renders items as plain spans without onItemClick', () => {
+    render(<ChipsCell items={['phishing']} />);
+    expect(screen.queryByRole('button', { name: /Filter by/i })).not.toBeInTheDocument();
+  });
+
+  it('invokes onItemClick when a chip button is clicked', async () => {
+    const onItemClick = jest.fn();
+    render(<ChipsCell items={['phishing', 'exfil']} onItemClick={onItemClick} itemLabel="tag" />);
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Filter by tag "exfil"' }));
+
+    expect(onItemClick).toHaveBeenCalledWith('exfil');
+  });
+
+  it('uses custom chip content when renderItemContent is supplied', () => {
+    render(
+      <ChipsCell
+        items={['T1059', 'T1003']}
+        truncate={false}
+        renderItemContent={(t) => <span data-testid="custom-chip">CUSTOM-{t}</span>}
+      />,
+    );
+
+    expect(screen.getByText('CUSTOM-T1003')).toBeInTheDocument();
+    expect(screen.getByText('CUSTOM-T1059')).toBeInTheDocument();
+    expect(screen.getAllByTestId('custom-chip')).toHaveLength(2);
+    expect(screen.queryByRole('button', { name: /Filter by/i })).not.toBeInTheDocument();
+  });
+
+  it('keeps chips clickable when renderItemContent is supplied', async () => {
+    const onItemClick = jest.fn();
+    render(
+      <ChipsCell
+        items={['T1059']}
+        renderItemContent={(t) => <span>CUSTOM-{t}</span>}
+        onItemClick={onItemClick}
+        itemLabel="technique"
+      />,
+    );
+
+    const chip = screen.getByRole('button', { name: 'Filter by technique "T1059"' });
+    expect(chip).toHaveTextContent('CUSTOM-T1059');
+
+    await userEvent.click(chip);
+
+    expect(onItemClick).toHaveBeenCalledWith('T1059');
+  });
+
+  it('names clickable chips with itemTitle when supplied', () => {
+    render(
+      <ChipsCell
+        items={['T1059']}
+        onItemClick={jest.fn()}
+        itemLabel="technique"
+        itemTitle={(t) => `${t}: Command and Scripting Interpreter`}
+      />,
+    );
+
+    expect(
+      screen.getByRole('button', { name: 'Filter by technique "T1059: Command and Scripting Interpreter"' }),
+    ).toHaveAttribute('title', 'Filter by technique "T1059: Command and Scripting Interpreter"');
+  });
+
+  it('respects a custom collapsedCount', async () => {
+    render(<ChipsCell items={['a', 'b', 'c', 'd']} collapsedCount={2} />);
+
+    await screen.findByText('a');
+    await screen.findByText('b');
+
+    expect(screen.queryByText('c')).not.toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: /show 2 more/i })).toHaveTextContent('+2');
+  });
+});

@@ -29,16 +29,17 @@ import ValueReferenceData from 'util/ValueReferenceData';
 import ContentPackEdit from 'components/content-packs/ContentPackEdit';
 import Entity from 'logic/content-packs/Entity';
 import EntityIndex from 'logic/content-packs/EntityIndex';
-import { ContentPacksActions, ContentPacksStore } from 'stores/content-packs/ContentPacksStore';
+import { createContentPack } from 'hooks/useContentPackMutations';
 import useParams from 'routing/useParams';
 import useHistory from 'routing/useHistory';
-import { useStore } from 'stores/connect';
 import useProductName from 'brand-customization/useProductName';
+import useContentPackRevisions from 'components/content-packs/hooks/useContentPackRevisions';
 import MarketplaceLink from 'components/support/MarketplaceLink';
 import useEntityIndex from 'components/content-packs/hooks/useEntityIndex';
+import useContentPackInstallations from 'components/content-packs/hooks/useContentPackInstallations';
+import { pairEntities } from 'logic/content-packs/pairEntities';
 
 const EditContentPackPage = () => {
-  useStore(ContentPacksStore);
   const productName = useProductName();
   const { entityIndex } = useEntityIndex();
   const { contentPackId, contentPackRev } = useParams<{ contentPackId: string; contentPackRev: string }>();
@@ -48,38 +49,54 @@ const EditContentPackPage = () => {
   const [contentPack, setContentPack] = useState(undefined);
   const [contentPackEntities, setContentPackEntities] = useState(undefined);
   const [fetchedEntities, setFetchedEntities] = useState(undefined);
+  const { data: revisionData } = useContentPackRevisions(contentPackId);
+  const { data: installationsData } = useContentPackInstallations(contentPackId);
+  const entityPairs =
+    contentPackEntities && entityIndex
+      ? pairEntities(
+          contentPackEntities,
+          entityIndex,
+          installationsData?.installations ?? [],
+          parseInt(contentPackRev, 10),
+        )
+      : [];
 
   useEffect(() => {
-    ContentPacksActions.get(contentPackId).then((result) => {
-      const { contentPackRevisions } = result;
-      const newContentPack = contentPackRevisions.createNewVersionFromRev(contentPackRev);
+    if (!revisionData) return;
 
-      setContentPack(newContentPack);
-      setContentPackEntities(cloneDeep(newContentPack.entities));
-    });
-  }, [contentPackId, contentPackRev]);
+    const { contentPackRevisions } = revisionData;
+    const newContentPack = contentPackRevisions.createNewVersionFromRev(contentPackRev);
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setContentPack(newContentPack);
+    setContentPackEntities(cloneDeep(newContentPack.entities));
+  }, [revisionData, contentPackRev]);
 
   const entityCatalog = useMemo(() => {
-    if (!contentPack || !entityIndex) {
+    if (!contentPackEntities || !entityIndex) {
       return {};
     }
 
     const groupedContentPackEntities = groupBy(contentPackEntities, 'type.name');
 
-    return Object.keys(entityIndex).reduce((result, entityType) => {
-      /* eslint-disable-next-line no-param-reassign */
-      result[entityType] = entityIndex[entityType].concat(groupedContentPackEntities[entityType] || []);
+    return Object.fromEntries(
+      Object.keys(entityIndex).map((entityType) => [
+        entityType,
+        entityIndex[entityType].concat(groupedContentPackEntities[entityType] || []),
+      ]),
+    );
+  }, [entityIndex, contentPackEntities]);
 
-      return result;
-    }, {});
-  }, [contentPack, entityIndex, contentPackEntities]);
-
+  /*
+   * Keyed on the revision's entities rather than `contentPack`, which changes on every field edit and would
+   * otherwise reset the user's selection.
+   */
   useEffect(() => {
-    if (!contentPack || !entityIndex) {
+    if (!contentPackEntities || !entityIndex) {
       return;
     }
 
-    const newSelectedEntities = contentPack.entities.reduce((result, entity) => {
+    const newSelectedEntities = contentPackEntities.reduce((result, entity) => {
       if (
         entityCatalog[entity.type.name] &&
         entityCatalog[entity.type.name].findIndex((fetchedEntity) => fetchedEntity.id === entity.id) >= 0
@@ -97,14 +114,14 @@ const EditContentPackPage = () => {
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedEntities(newSelectedEntities);
-  }, [contentPack, entityCatalog, entityIndex]);
+  }, [contentPackEntities, entityCatalog, entityIndex]);
 
   useEffect(() => {
-    if (!contentPack) {
+    if (!contentPackEntities) {
       return;
     }
 
-    const newAppliedParameter = contentPack.entities.reduce((result, entity) => {
+    const newAppliedParameter = contentPackEntities.reduce((result, entity) => {
       const entityData = new ValueReferenceData(entity.data);
       const configPaths = entityData.getPaths();
 
@@ -122,7 +139,7 @@ const EditContentPackPage = () => {
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setAppliedParameter(newAppliedParameter);
-  }, [contentPack]);
+  }, [contentPackEntities]);
 
   const _onStateChanged = (newState) => {
     setContentPack(newState.contentPack || contentPack);
@@ -131,7 +148,7 @@ const EditContentPackPage = () => {
   };
 
   const _onSave = () => {
-    ContentPacksActions.create(contentPack.toJSON()).then(
+    createContentPack(contentPack.toJSON()).then(
       () => {
         UserNotification.success('Content pack imported successfully', 'Success!');
         history.push(Routes.SYSTEM.CONTENTPACKS.LIST);
@@ -195,6 +212,7 @@ const EditContentPackPage = () => {
           fetchedEntities={fetchedEntities}
           selectedEntities={selectedEntities}
           entityIndex={entityCatalog}
+          entityPairs={entityPairs}
           appliedParameter={appliedParameter}
           edit
           onSave={_onSave}

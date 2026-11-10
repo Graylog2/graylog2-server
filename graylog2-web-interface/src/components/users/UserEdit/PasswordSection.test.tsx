@@ -24,7 +24,7 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import { alice } from 'fixtures/users';
 import usePasswordComplexityConfig from 'components/users/usePasswordComplexityConfig';
 import { PASSWORD_SPECIAL_CHARACTERS } from 'logic/users/passwordComplexity';
-import { UsersActions } from 'stores/users/UsersStore';
+import { changeUserPassword } from 'hooks/useUsers';
 
 import PasswordSection from './PasswordSection';
 
@@ -40,10 +40,9 @@ const passwordComplexityConfig = {
 jest.mock('hooks/useCurrentUser');
 jest.mock('components/users/usePasswordComplexityConfig');
 
-jest.mock('stores/users/UsersStore', () => ({
-  UsersActions: {
-    changePassword: jest.fn(() => Promise.resolve()),
-  },
+jest.mock('hooks/useUsers', () => ({
+  USERS_QUERY_KEY: ['users'],
+  changeUserPassword: jest.fn(() => Promise.resolve()),
 }));
 
 describe('<PasswordSection />', () => {
@@ -67,9 +66,9 @@ describe('<PasswordSection />', () => {
     await userEvent.type(newPasswordRepeatInput, 'Abcdef1!');
     await userEvent.click(submitButton);
 
-    await waitFor(() => expect(UsersActions.changePassword).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(changeUserPassword).toHaveBeenCalledTimes(1));
 
-    expect(UsersActions.changePassword).toHaveBeenCalledWith(exampleUser.id, {
+    expect(changeUserPassword).toHaveBeenCalledWith(exampleUser.id, {
       password: 'Abcdef1!',
     });
   });
@@ -88,9 +87,9 @@ describe('<PasswordSection />', () => {
     await userEvent.type(newPasswordRepeatInput, 'Abcdef1!');
     await userEvent.click(submitButton);
 
-    await waitFor(() => expect(UsersActions.changePassword).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(changeUserPassword).toHaveBeenCalledTimes(1));
 
-    expect(UsersActions.changePassword).toHaveBeenCalledWith(exampleUser.id, {
+    expect(changeUserPassword).toHaveBeenCalledWith(exampleUser.id, {
       old_password: 'oldpassword',
       password: 'Abcdef1!',
     });

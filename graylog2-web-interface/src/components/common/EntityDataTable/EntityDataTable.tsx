@@ -38,17 +38,27 @@ import {
   columnWidthVar,
   displayScrollRightIndicatorVar,
   scrollContainerWidthVar,
+  tableMinWidthVar,
 } from 'components/common/EntityDataTable/CSSVariables';
 import useHeaderMinWidths from 'components/common/EntityDataTable/hooks/useHeaderMinWidths';
 import useColumnDefinitions from 'components/common/EntityDataTable/hooks/useColumnDefinitions';
 import useColumnRenderers from 'components/common/EntityDataTable/hooks/useColumnRenderers';
 import useAuthorizedColumnSchemas from 'components/common/EntityDataTable/hooks/useAuthorizedColumnSchemas';
 import useIntersectionObserver from 'hooks/useIntersectionObserver';
-import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
+import { ACTIONS_COL_ID, CELL_PADDING_HORIZONTAL } from 'components/common/EntityDataTable/Constants';
 import ActiveSliceColContext from 'components/common/EntityDataTable/contexts/ActiveSliceColContext';
+import useInternalLayoutPreferences from 'components/common/EntityDataTable/hooks/useInternalLayoutPreferences';
 
-import type { ColumnRenderers, ColumnSchema, EntityBase, ColumnPreferences, ExpandedSectionRenderers } from './types';
+import type {
+  ColumnRenderers,
+  ColumnSchema,
+  EntityBase,
+  ColumnPreferences,
+  ExpandedSectionRenderers,
+  RowOverride,
+} from './types';
 import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
+import getAvailableSectionNames from './getAvailableSectionNames';
 import BulkActionsRow from './BulkActionsRow';
 
 const cssVariable = (variable: string, value: string | number) => css`
@@ -62,6 +72,7 @@ const ScrollContainer = styled.div<{
   $actionsHeaderWidth: number;
   $canScrollRight: boolean;
   $scrollContainerWidth: number;
+  $tableMinWidth: number;
 }>(
   ({
     $columnWidths,
@@ -70,11 +81,16 @@ const ScrollContainer = styled.div<{
     $actionsHeaderWidth,
     $canScrollRight,
     $scrollContainerWidth,
+    $tableMinWidth,
   }) => css`
     width: 100%;
     overflow-x: auto;
 
-    ${Object.entries($columnWidths).map(([id, width]) => cssVariable(columnWidthVar(id), `${width}px`))}
+    /* The actions column has no width, so it fills the remaining space. */
+    ${Object.entries($columnWidths)
+      .filter(([id]) => id !== ACTIONS_COL_ID)
+      .map(([id, width]) => cssVariable(columnWidthVar(id), `${width}px`))}
+    ${$tableMinWidth ? cssVariable(tableMinWidthVar, `${$tableMinWidth}px`) : ''}
     ${Object.entries($columnTransform).map(([id, transform]) => cssVariable(columnTransformVar(id), transform))}
     ${$actionsHeaderWidth ? cssVariable(actionsHeaderWidthVar, `${$actionsHeaderWidth}px`) : ''}
     ${$canScrollRight ? cssVariable(displayScrollRightIndicatorVar, 'block') : ''}
@@ -91,7 +107,7 @@ const ScrollContainer = styled.div<{
 const InnerContainer = styled.div`
   position: relative;
   height: 100%;
-  width: fit-content;
+  width: max(100%, var(${tableMinWidthVar}, 0px));
 `;
 
 const ScrollRightIndicator = styled.div`
@@ -99,7 +115,7 @@ const ScrollRightIndicator = styled.div`
   top: 0;
   bottom: 0;
   right: 0;
-  width: ${CELL_PADDING}px;
+  width: ${CELL_PADDING_HORIZONTAL}px;
   pointer-events: none;
   z-index: 2;
 `;
@@ -150,6 +166,7 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   enableSlicing?: boolean;
   /** Allows you to extend a row with additional information * */
   expandedSectionRenderers?: ExpandedSectionRenderers<Entity>;
+  rowOverride?: RowOverride<Entity>;
   /** User layout preferences */
   layoutPreferences: {
     attributes?: ColumnPreferences;
@@ -172,13 +189,15 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   onResetLayoutPreferences: () => Promise<void>;
   /** Active page size */
   pageSize?: number;
-  /** Required when parent container does not use contentBackground for the background */
-  parentBgColor?: string;
   appSection?: string;
   /** Actions for each row. */
   entityActions?: (entity: Entity) => React.ReactNode;
   /** Meta data. */
   meta?: Meta;
+  /** Disable column reordering */
+  noColumnReordering?: boolean;
+  /** Disable page size select */
+  noPageSizeSelect?: boolean;
 };
 
 /**
@@ -197,6 +216,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   entityAttributesAreCamelCase,
   enableSlicing = false,
   expandedSectionRenderers = undefined,
+  rowOverride = undefined,
   layoutPreferences,
   meta = undefined,
   onChangeSlicing,
@@ -205,13 +225,20 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   onResetLayoutPreferences,
   onSortChange,
   pageSize = undefined,
-  parentBgColor = undefined,
   appSection = undefined,
+  noColumnReordering = false,
+  noPageSizeSelect = false,
 }: Props<Entity, Meta>) => {
   const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection ?? []);
   const hasRowActions = typeof entityActions === 'function';
   const displayBulkAction = !!actions;
   const displayBulkSelectCol = typeof onChangeSelection === 'function' || displayBulkAction;
+  const displayRowExpandCol = Object.keys(expandedSectionRenderers ?? {}).length > 0;
+  const getDefaultExpandedSection = (entityId: string) => {
+    const entity = entities.find(({ id }) => id === entityId);
+
+    return entity ? getAvailableSectionNames(expandedSectionRenderers, entity)[0] : undefined;
+  };
   const displayPageSizeSelect = typeof onPageSizeChange === 'function';
   const authorizedColumnSchemas = useAuthorizedColumnSchemas(columnSchemas);
   const columnRenderersByAttribute = useColumnRenderers<Entity, Meta>(authorizedColumnSchemas, customColumnRenderers);
@@ -220,38 +247,40 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   const scrolledToRightIndicator = useRef<HTMLDivElement>();
   const scrolledToRight = useIntersectionObserver(scrollContainerRef, scrolledToRightIndicator);
 
-  const [internalAttributeColumnOrder, setInternalAttributeColumnOrder] = useState<Array<string>>(
-    layoutPreferences?.order ?? defaultColumnOrder,
-  );
-  const [internalColumnWidthPreferences, setInternalColumnWidthPreferences] = useState<{
-    [attributeId: string]: number;
-  }>(() =>
-    Object.fromEntries(
-      Object.entries(layoutPreferences?.attributes ?? {}).flatMap(([key, { width }]) =>
-        typeof width === 'number' ? [[key, width]] : [],
-      ),
-    ),
-  );
+  const {
+    setInternalAttributeColumnOrder,
+    setInternalColumnWidthPreferences,
+    internalColumnWidthPreferences,
+    internalAttributeColumnOrder,
+  } = useInternalLayoutPreferences({ layoutPreferences, defaultColumnOrder });
 
   const columnOrder = useVisibleColumnOrder(
     layoutPreferences?.attributes,
     internalAttributeColumnOrder,
     defaultDisplayedColumns,
     displayBulkSelectCol,
+    displayRowExpandCol,
   );
 
-  const { columnWidths, handleActionsWidthChange, tableIsCompressed, actionsColMinWidth, scrollContainerWidth } =
-    useElementWidths<Entity, Meta>({
-      columnRenderersByAttribute,
-      columnSchemas: authorizedColumnSchemas,
-      columnWidthPreferences: internalColumnWidthPreferences,
-      displayBulkSelectCol,
-      entities,
-      hasRowActions,
-      headerMinWidths,
-      scrollContainerRef,
-      visibleColumns: columnOrder,
-    });
+  const {
+    columnWidths,
+    handleActionsWidthChange,
+    tableIsCompressed,
+    actionsColMinWidth,
+    scrollContainerWidth,
+    tableMinWidth,
+  } = useElementWidths<Entity, Meta>({
+    columnRenderersByAttribute,
+    columnSchemas: authorizedColumnSchemas,
+    columnWidthPreferences: internalColumnWidthPreferences,
+    displayBulkSelectCol,
+    displayRowExpandCol,
+    entities,
+    hasRowActions,
+    headerMinWidths,
+    scrollContainerRef,
+    visibleColumns: columnOrder,
+  });
 
   const columnDefinitions = useColumnDefinitions<Entity, Meta>({
     actionsColMinWidth,
@@ -261,13 +290,13 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     displayBulkSelectCol,
     enableSlicing,
     entityActions,
+    expandedSectionRenderers,
     entityAttributesAreCamelCase,
     hasRowActions,
     meta,
     onActionsWidthChange: handleActionsWidthChange,
     onChangeSlicing,
     onHeaderSectionResize: handleHeaderSectionResize,
-    parentBgColor,
     appSection,
   });
 
@@ -295,12 +324,20 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const headerGroups = useMemo(() => table.getHeaderGroups(), [columnOrder]);
 
+  const hasColumnLayoutPreferences =
+    Object.keys(layoutPreferences?.attributes ?? {}).length > 0 || (layoutPreferences?.order?.length ?? 0) > 0;
+
   const resetLayoutPreferences = useCallback(() => {
     onResetLayoutPreferences().then(() => {
       setInternalAttributeColumnOrder(defaultColumnOrder);
       setInternalColumnWidthPreferences({});
     });
-  }, [defaultColumnOrder, onResetLayoutPreferences]);
+  }, [
+    defaultColumnOrder,
+    onResetLayoutPreferences,
+    setInternalAttributeColumnOrder,
+    setInternalColumnWidthPreferences,
+  ]);
 
   return (
     <MetaDataProvider<Meta> meta={meta}>
@@ -310,18 +347,26 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
         isSomeRowsSelected={table.getIsSomeRowsSelected()}
         isAllRowsSelected={table.getIsAllRowsSelected()}>
         <ActiveSliceColContext.Provider value={activeSliceCol}>
-          <ExpandedSectionsProvider>
+          <ExpandedSectionsProvider getDefaultSection={getDefaultExpandedSection}>
             <ActionsRow>
               <div>{displayBulkAction && <BulkActionsRow bulkActions={actions} />}</div>
-              <LayoutConfigRow>
-                Show
-                <ButtonGroup>
-                  {displayPageSizeSelect && (
-                    <PageSizeSelect pageSize={pageSize} showLabel={false} onChange={onPageSizeChange} />
-                  )}
-                  <ColumnsVisibilitySelect<Entity> table={table} onResetLayoutPreferences={resetLayoutPreferences} />
-                </ButtonGroup>
-              </LayoutConfigRow>
+              {noColumnReordering && noPageSizeSelect ? null : (
+                <LayoutConfigRow>
+                  Show
+                  <ButtonGroup>
+                    {displayPageSizeSelect && !noPageSizeSelect && (
+                      <PageSizeSelect pageSize={pageSize} showLabel={false} onChange={onPageSizeChange} />
+                    )}
+                    {!noColumnReordering && (
+                      <ColumnsVisibilitySelect<Entity>
+                        table={table}
+                        onResetLayoutPreferences={resetLayoutPreferences}
+                        hasColumnLayoutPreferences={hasColumnLayoutPreferences}
+                      />
+                    )}
+                  </ButtonGroup>
+                </LayoutConfigRow>
+              )}
             </ActionsRow>
             <TableDndProvider table={table}>
               <DndStylesContext.Consumer>
@@ -334,11 +379,14 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                     $columnTransform={columnTransform}
                     $columnWidths={columnWidths}
                     $canScrollRight={scrolledToRight && tableIsCompressed}
-                    $scrollContainerWidth={scrollContainerWidth}>
+                    $scrollContainerWidth={scrollContainerWidth}
+                    $tableMinWidth={tableMinWidth}>
                     <InnerContainer>
                       <Table<Entity>
+                        columnWidths={columnWidths}
                         expandedSectionRenderers={expandedSectionRenderers}
                         headerGroups={headerGroups}
+                        rowOverride={rowOverride}
                         rows={table.getRowModel().rows}
                       />
                       <ScrollRightIndicator ref={scrolledToRightIndicator} />

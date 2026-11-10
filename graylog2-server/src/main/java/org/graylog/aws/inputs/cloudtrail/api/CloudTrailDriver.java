@@ -27,6 +27,7 @@ import org.graylog.aws.inputs.cloudtrail.external.CloudTrailClientFactory;
 import org.graylog.integrations.aws.AWSClientBuilderUtil;
 import org.graylog.integrations.aws.resources.requests.AWSRequest;
 import org.graylog.integrations.aws.resources.requests.AWSRequestImpl;
+import org.graylog.integrations.common.CheckCredentialsResponse;
 import org.graylog2.Configuration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.inputs.Input;
@@ -87,7 +88,7 @@ public class CloudTrailDriver {
 
     private static final Logger LOG = LoggerFactory.getLogger(CloudTrailDriver.class);
 
-    public String checkCredentials(CloudTrailRequest request) throws Exception {
+    public CheckCredentialsResponse checkCredentials(CloudTrailRequest request) throws Exception {
         // Get AWS Plugin configuration for fallback
         final AWSPluginConfiguration pluginConfig = clusterConfigService.getOrDefault(
                 AWSPluginConfiguration.class,
@@ -115,7 +116,8 @@ public class CloudTrailDriver {
                 .region(request.sqsRegion())
                 .awsAccessKeyId(awsAccessKey)
                 .awsSecretAccessKey(secretAccessKey)
-                .assumeRoleArn(request.assumeRoleArn()).build();
+                .assumeRoleArn(request.assumeRoleArn())
+                .externalId(request.externalId()).build();
         final AwsCredentialsProvider credentialsProvider = awsUtils.createCredentialsProvider(awsRequest);
         return cloudTrailClientFactory.checkCredentials(request.sqsQueueName(), credentialsProvider,
                 request.sqsRegion());
@@ -142,6 +144,7 @@ public class CloudTrailDriver {
         configuration.put(CloudTrailInput.CK_AWS_SQS_REGION, request.sqsRegion());
         configuration.put(CloudTrailInput.CK_AWS_S3_REGION, request.s3Region());
         configuration.put(CloudTrailInput.CK_ASSUME_ROLE_ARN, request.assumeRoleArn());
+        configuration.put(CloudTrailInput.CK_EXTERNAL_ID, request.externalId());
         configuration.put(CloudTrailInput.CK_AWS_SQS_QUEUE_NAME, request.sqsQueueName());
         configuration.put(CloudTrailInput.CK_POLLING_INTERVAL, request.pollingInterval());
         configuration.put(CloudTrailInput.CK_OVERRIDE_SOURCE, request.overrideSource());
@@ -159,7 +162,6 @@ public class CloudTrailDriver {
             messageInput.checkConfiguration();
             final Input input = this.inputService.create(messageInput.asMap());
             final String newInputId = inputService.save(input);
-            LOG.info("New CloudTrail input created. id [{}] request [{}]", newInputId, request);
 
             return inputService.find(newInputId);
         } catch (NoSuchInputTypeException e) {

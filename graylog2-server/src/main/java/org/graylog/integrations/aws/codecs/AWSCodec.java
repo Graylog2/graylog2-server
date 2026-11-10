@@ -31,8 +31,6 @@ import org.graylog2.plugin.inputs.codecs.AbstractCodec;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.journal.RawMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.regions.Region;
 
 import javax.annotation.Nonnull;
@@ -46,7 +44,6 @@ import static org.graylog.integrations.aws.inputs.AWSInput.getOverrideSourceFiel
 public class AWSCodec extends AbstractCodec {
 
     public static final String NAME = "AWSCodec";
-    private static final Logger LOG = LoggerFactory.getLogger(AWSCodec.class);
 
     /**
      * Specifies one of the {@code AWSInputType} choices, which indicates which codec and transport
@@ -54,6 +51,7 @@ public class AWSCodec extends AbstractCodec {
      */
     public static final String CK_AWS_MESSAGE_TYPE = "aws_message_type";
     public static final String CK_FLOW_LOG_PREFIX = "aws_flow_log_prefix";
+    public static final String CK_STORE_FULL_MESSAGE = "store_full_message";
 
     static final boolean FLOW_LOG_PREFIX_DEFAULT = true;
 
@@ -117,6 +115,13 @@ public class AWSCodec extends AbstractCodec {
                     "Add Flow Log field name prefix",
                     FLOW_LOG_PREFIX_DEFAULT,
                     "Add field with the Flow Log prefix e. g. \"src_addr\" -> \"flow_log_src_addr\"."
+            ));
+
+            request.addField(new BooleanField(
+                    CK_STORE_FULL_MESSAGE,
+                    "Store full message?",
+                    false,
+                    "Store the original Kinesis/CloudWatch log event payload in the full_message field."
             ));
 
             request.addField(getKinesisStreamARNDefinition());

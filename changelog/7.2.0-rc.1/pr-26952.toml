@@ -1,0 +1,5 @@
+type = "a"
+message = "Added datanode configuration opensearch_heap_size_warning_enabled to control heap size check and warnings"
+
+issues = ["Graylog2/graylog-plugin-enterprise#12164"]
+pulls = ["26952"]

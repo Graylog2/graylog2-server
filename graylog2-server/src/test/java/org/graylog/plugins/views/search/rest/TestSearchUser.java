@@ -58,6 +58,11 @@ public class TestSearchUser {
         return this;
     }
 
+    public TestSearchUser allowUserRead(String userId) {
+        this.permissions.put(RestPermissions.USERS_READ + ":" + userId, true);
+        return this;
+    }
+
     public TestSearchUser allowDashboard(String id) {
         this.permissions.put(DASHBOARDS_READ + ":" + id, true);
         return this;

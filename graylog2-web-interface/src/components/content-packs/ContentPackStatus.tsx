@@ -15,27 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled, { css } from 'styled-components';
 
-import Badge from 'components/bootstrap/Badge';
+import { Badge } from 'components/bootstrap';
+import type { BadgeColor } from 'components/bootstrap/Badge';
 import { Link } from 'components/common';
 import Routes from 'routing/Routes';
 
-const StatusBadge = styled(Badge)<{ status: string }>(({ status, theme }) => {
-  const { success, info, warning, danger } = theme.colors.variant.dark;
-  const statuses = {
-    installed: success,
-    updatable: info,
-    edited: warning,
-    error: danger,
-  };
-
-  return css`
-    margin-left: 4px;
-    background-color: ${statuses[status]};
-    color: ${theme.utils.readableColor(statuses[status])};
-  `;
-});
+const BADGE_COLOR_BY_STATUS: Record<string, BadgeColor> = {
+  installed: 'success',
+  updatable: 'primary',
+  edited: 'warning',
+  error: 'danger',
+};
 
 type ContentPackStatusProps = {
   states?: string[];
@@ -45,7 +36,9 @@ type ContentPackStatusProps = {
 const ContentPackStatus = ({ contentPackId = undefined, states = [] }: ContentPackStatusProps) => {
   const badges = states.map((state) => (
     <Link key={state} to={Routes.SYSTEM.CONTENTPACKS.show(contentPackId)}>
-      <StatusBadge status={state}>{state}</StatusBadge>
+      <Badge color={BADGE_COLOR_BY_STATUS[state] ?? 'gray'} variant="light" style={{ marginLeft: 4 }}>
+        {state}
+      </Badge>
     </Link>
   ));
 

@@ -32,6 +32,7 @@ public record Config(
         @JsonProperty("help_pages") Optional<Map<String, String>> helpPages,
         Optional<Login> login,
         Optional<Welcome> welcome,
+        Optional<Onboarding> onboarding,
         Optional<Navigation> navigation,
         Optional<Footer> footer,
         Optional<Resources> resources,
@@ -50,10 +51,16 @@ public record Config(
     }
 
     @JsonInclude(JsonInclude.Include.NON_ABSENT)
+    public record Onboarding(Optional<OnboardingItem> resources) {
+        public record OnboardingItem(Optional<Boolean> enabled) {}
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_ABSENT)
     public record Resources(@JsonProperty("stream_rule_matcher_code") Optional<ResourceItem> streamRuleMatcherCode,
                             @JsonProperty("contact_support") Optional<ResourceItem> contactSupport,
                             @JsonProperty("contact_us") Optional<ResourceItem> contactUs,
-                            Optional<ResourceItem> marketplace
+                            Optional<ResourceItem> marketplace,
+                            @JsonProperty("forwarder_download_url") Optional<ResourceItem> forwarderDownloadUrl
                             ) {
         public record ResourceItem(Optional<Boolean> enabled, Optional<String> url) {}
     }
@@ -78,15 +85,17 @@ public record Config(
 
     public static Config empty() {
         return new Config(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
-                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+                Optional.empty());
     }
 
     public static Config forProductName(String productName) {
         return new Config(Optional.of(productName), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
-                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+                Optional.empty());
     }
 
     public Config withWelcome(Welcome welcome) {
-        return new Config(productName, favicon, logo, helpUrl, helpPages, login, Optional.of(welcome), navigation, footer, resources, features);
+        return new Config(productName, favicon, logo, helpUrl, helpPages, login, Optional.of(welcome), onboarding, navigation, footer, resources, features);
     }
 }

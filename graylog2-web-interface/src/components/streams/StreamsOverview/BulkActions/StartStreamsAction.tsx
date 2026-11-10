@@ -17,9 +17,8 @@
 import { useCallback } from 'react';
 import * as React from 'react';
 
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
-import ApiRoutes from 'routing/ApiRoutes';
+import { Streams } from '@graylog/server-api';
+
 import { MenuItem } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
@@ -38,7 +37,7 @@ const StartStreamsActions = ({ handleFailures, refetchStreams, descriptor, onSel
       onSelect();
     }
 
-    fetch('POST', qualifyUrl(ApiRoutes.StreamsApiController.bulk_resume().url), { entity_ids: selectedEntities })
+    Streams.bulkResume({ entity_ids: selectedEntities })
       .then(({ failures }) => handleFailures(failures, 'started'))
       .catch((error) => {
         UserNotification.error(`An error occurred while starting streams. ${error}`);

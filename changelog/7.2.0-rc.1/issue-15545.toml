@@ -1,0 +1,14 @@
+type = "f"
+message = "Fixed several CEF input parsing issues."
+
+issues = ["Graylog2/graylog-plugin-enterprise#15545"]
+pulls = ["27336"]
+
+details.user = """
+Fixes the following:
+
+- Escaped backslashes in extension values are now unescaped correctly, so Windows file paths keep the backslash and the character following it.
+- Messages are no longer dropped when the syslog priority is preceded by octet counting framing, or when the message body contains a carriage return.
+- The hostname is now read from the correct token, so RFC 5424 messages are no longer indexed with `source: "-"`.
+- Timestamps with sub-millisecond precision are now accurate, instead of being off by up to fifteen minutes.
+"""

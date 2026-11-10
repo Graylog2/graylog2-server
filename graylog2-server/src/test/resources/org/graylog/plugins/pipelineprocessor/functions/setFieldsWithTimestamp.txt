@@ -1,0 +1,6 @@
+rule "set_fields_with_timestamp"
+when true
+then
+  let kv = key_value(value: to_string($message.message), trim_value_chars: "\"");
+  set_fields(fields: kv);
+end

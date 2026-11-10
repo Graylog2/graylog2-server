@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useEffect, useMemo } from 'react';
-import { Formik } from 'formik';
+import { Formik, useFormikContext } from 'formik';
 import { OrderedMap } from 'immutable';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -27,9 +27,29 @@ type Props = {
   filters: SearchFilter[];
   onChange: (filters: OrderedMap<string, SearchFilter>) => void;
   hideFiltersPreview?: (val: boolean) => void;
+  queryString?: string;
+  isParentMutable?: boolean;
 };
 
-function SearchFiltersFormControls({ filters, onChange, hideFiltersPreview = () => {} }: Props) {
+// Keeps the isolated Formik's `queryString` field in sync with the manually-entered query
+// living outside this form, without resetting `searchFilters` on every keystroke.
+const SyncQueryString = ({ queryString }: { queryString: string }) => {
+  const { setFieldValue } = useFormikContext();
+
+  useEffect(() => {
+    setFieldValue('queryString', queryString);
+  }, [queryString, setFieldValue]);
+
+  return null;
+};
+
+function SearchFiltersFormControls({
+  filters,
+  onChange,
+  hideFiltersPreview = () => {},
+  queryString = '',
+  isParentMutable = true,
+}: Props) {
   const searchFiltersPlugin = usePluginEntities('eventDefinitions.components.searchForm') ?? [];
   const pluggableControls = searchFiltersPlugin.map((controlFn) => controlFn()).filter((control) => !!control);
 
@@ -38,11 +58,18 @@ function SearchFiltersFormControls({ filters, onChange, hideFiltersPreview = () 
 
   const initialFilters = useMemo(() => {
     const searchFilters = OrderedMap(
-      filters.map((filter) => [filter.id || uuidv4(), { frontendId: filter.id || uuidv4(), ...filter }]),
+      filters.map((filter) => {
+        // The map key and the `frontendId` must be identical, since all filter actions (edit, negate, remove)
+        // look up the filter by its `frontendId`. Filters without an `id` (e.g. inline filters which are not
+        // saved in "My Filters") would otherwise end up with two different generated ids.
+        const frontendId = filter.id || uuidv4();
+
+        return [frontendId, { ...filter, frontendId }];
+      }),
     );
 
-    return { searchFilters };
-  }, [filters]);
+    return { searchFilters, queryString };
+  }, [filters, queryString]);
 
   if (!pluggableControls.length)
     return <SearchFilterBanner onHide={() => hideFiltersPreview(true)} pluggableControls={pluggableControls} />;
@@ -58,7 +85,10 @@ function SearchFiltersFormControls({ filters, onChange, hideFiltersPreview = () 
 
   return (
     <Formik onSubmit={handleSearchFiltersChange} initialValues={initialFilters}>
-      <SearchFiltersComponent />
+      <>
+        <SyncQueryString queryString={queryString} />
+        <SearchFiltersComponent isParentMutable={isParentMutable} />
+      </>
     </Formik>
   );
 }

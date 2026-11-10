@@ -18,6 +18,8 @@ package org.graylog.plugins.views.search.searchtypes.pivot;
 
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
+import org.graylog.plugins.views.search.engine.IndexerGeneratedQueryContext;
+import org.graylog2.indexer.fieldtypes.FieldTypeMapper;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
@@ -49,6 +51,17 @@ public interface BucketSpecHandler<SPEC_TYPE extends BucketSpec, AGGREGATION_BUI
 
     @Nonnull
     CreatedAggregations<AGGREGATION_BUILDER> doCreateAggregation(Direction direction, String name, Pivot pivot, SPEC_TYPE bucketSpec, QUERY_CONTEXT queryContext, Query query);
+
+    /**
+     * A pivot field is sorted numerically only when its field type is a numeric one. Backend handlers use this to
+     * decide whether to add a metric sub-aggregation as a sort helper instead of falling back to (lexicographic) key
+     * order.
+     */
+    default boolean isSortOnNumericPivotField(Pivot pivot, PivotSort pivotSort, IndexerGeneratedQueryContext<?> queryContext, Query query) {
+        return queryContext.fieldType(query.effectiveStreams(pivot), pivotSort.field())
+                .filter(FieldTypeMapper::isNumericType)
+                .isPresent();
+    }
 
     record CreatedAggregations<T>(T root, T leaf, List<T> metrics) {
         public static <T> CreatedAggregations<T> create(T singleAggregation) {

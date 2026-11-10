@@ -17,11 +17,11 @@
 
 import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 
+import { SystemIndexSetsFieldTypeProfiles } from '@graylog/server-api';
+
 import asMock from 'helpers/mocking/AsMock';
 import UserNotification from 'util/UserNotification';
 import suppressConsole from 'helpers/suppressConsole';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
 import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions';
 
 const mockData = [
@@ -34,7 +34,9 @@ const expectedState = [
   { label: 'Profile 2', value: '222' },
 ];
 jest.mock('util/UserNotification', () => ({ error: jest.fn() }));
-jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
+jest.mock('@graylog/server-api', () => ({
+  SystemIndexSetsFieldTypeProfiles: { getAll: jest.fn(() => Promise.resolve()) },
+}));
 
 const renderUseProfileOptions = () => renderHook(() => useProfileOptions());
 
@@ -44,19 +46,19 @@ describe('useProfileOptions custom hook', () => {
   });
 
   it('Test return initial data and take from fetch', async () => {
-    asMock(fetch).mockImplementation(() => Promise.resolve(mockData));
+    asMock(SystemIndexSetsFieldTypeProfiles.getAll).mockImplementation(() => Promise.resolve(mockData));
     const { result } = renderUseProfileOptions();
 
     await waitFor(() => result.current.isLoading);
     await waitFor(() => !result.current.isLoading);
 
-    expect(fetch).toHaveBeenCalledWith('GET', qualifyUrl('/system/indices/index_sets/profiles/all'));
+    expect(SystemIndexSetsFieldTypeProfiles.getAll).toHaveBeenCalled();
 
     expect(result.current.options).toEqual(expectedState);
   });
 
   it('Test trigger notification on fail', async () => {
-    asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
+    asMock(SystemIndexSetsFieldTypeProfiles.getAll).mockImplementation(() => Promise.reject(new Error('Error')));
 
     const { result } = renderUseProfileOptions();
 

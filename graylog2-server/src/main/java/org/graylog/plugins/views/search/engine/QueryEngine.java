@@ -27,6 +27,9 @@ import org.graylog.plugins.views.search.QueryMetadataDecorator;
 import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchJob;
+import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.searchfilters.EffectiveQueryComposer;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.errors.QueryError;
 import org.graylog.plugins.views.search.errors.SearchError;
@@ -38,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -62,17 +66,20 @@ public class QueryEngine {
     private final Executor dataLakeJobsQueryPool;
     private final ElasticsearchBackendProvider elasticsearchBackendProvider;
     private final Map<String, QueryBackend<? extends GeneratedQueryContext>> unversionedBackends;
+    private final EffectiveQueryComposer effectiveQueryComposer;
 
     @Inject
     public QueryEngine(Configuration configuration,
                        ElasticsearchBackendProvider elasticsearchBackendProvider,
                        Map<String, QueryBackend<? extends GeneratedQueryContext>> unversionedBackends,
                        Set<QueryMetadataDecorator> queryMetadataDecorators,
-                       QueryParser queryParser) {
+                       QueryParser queryParser,
+                       EffectiveQueryComposer effectiveQueryComposer) {
         this.elasticsearchBackendProvider = elasticsearchBackendProvider;
         this.unversionedBackends = unversionedBackends;
         this.queryMetadataDecorators = queryMetadataDecorators;
         this.queryParser = queryParser;
+        this.effectiveQueryComposer = effectiveQueryComposer;
 
         this.indexerJobsQueryPool = createThreadPool(
                 configuration.searchQueryEngineIndexerJobsPoolSize(),
@@ -111,10 +118,29 @@ public class QueryEngine {
                     var backend = getBackendForQuery(q);
                     final GeneratedQueryContext generatedQueryContext = backend.generate(q, Set.of(), timezone);
 
-                    return backend.explain(searchJob, q, generatedQueryContext);
+                    return withEffectiveQueries(q, backend.explain(searchJob, q, generatedQueryContext));
                 }));
 
         return new ExplainResults(searchJob.getSearchId(), new ExplainResults.SearchResult(queries), validationErrors);
+    }
+
+    private ExplainResults.QueryExplainResult withEffectiveQueries(final Query query, final ExplainResults.QueryExplainResult queryExplainResult) {
+        final Map<String, SearchType> searchTypesById = query.searchTypes().stream()
+                .collect(Collectors.toMap(SearchType::id, s -> s, (a, b) -> a));
+        final String baseQuery = query.query().queryString();
+
+        final Map<String, ExplainResults.ExplainResult> enriched = queryExplainResult.searchTypes().entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
+                    final List<UsedSearchFilter> filters = new java.util.ArrayList<>(
+                            query.filters() != null ? query.filters() : List.of());
+                    final SearchType searchType = searchTypesById.get(entry.getKey());
+                    if (searchType != null && searchType.filters() != null) {
+                        filters.addAll(searchType.filters());
+                    }
+                    return entry.getValue().withEffectiveQuery(effectiveQueryComposer.compose(baseQuery, filters));
+                }));
+
+        return new ExplainResults.QueryExplainResult(enriched);
     }
 
     @WithSpan

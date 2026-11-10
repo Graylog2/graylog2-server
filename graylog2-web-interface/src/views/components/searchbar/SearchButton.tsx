@@ -31,10 +31,6 @@ const StyledButton = styled(Button)<{ $dirty: boolean }>(
     position: relative;
     min-width: ${SEARCH_BUTTON_WIDTH}px;
 
-    &&&.disabled {
-      color: ${theme.utils.contrastingColor(theme.colors.variant.success)};
-    }
-
     ${$dirty
       ? css`
           &::after {
@@ -83,13 +79,11 @@ const SearchButton = ({
   displaySpinner = false,
   onClick = undefined,
 }: Props) => {
-  const sendTelemetry = useSendTelemetry();
-  const className = disabled ? 'disabled' : '';
+  const sendTelemetry = useSendTelemetry('search-bar');
   const title = dirty ? 'Perform search (changes were made after last search execution)' : 'Perform Search';
 
   const triggerTelemetry = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_BUTTON_CLICKED, {
-      app_section: 'search-bar',
       app_action_value: 'search-button',
       event_details: {
         disabled,
@@ -101,9 +95,11 @@ const SearchButton = ({
     <StyledButton
       onClick={(e) => onButtonClick(e, disabled, triggerTelemetry, onClick)}
       title={title}
-      className={className}
+      disabled={disabled}
+      allowClickWhenDisabled
       type="submit"
       bsStyle="primary"
+      showOverflow
       $dirty={dirty && !displaySpinner}>
       {displaySpinner ? <Spinner delay={0} text="" /> : <Icon name={glyph} size="lg" />}
     </StyledButton>

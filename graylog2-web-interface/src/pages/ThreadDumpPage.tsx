@@ -19,19 +19,19 @@ import { useParams } from 'react-router-dom';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Timestamp } from 'components/common';
-import { ClusterOverviewStore } from 'stores/cluster/ClusterOverviewStore';
+import { fetchThreadDump } from 'hooks/useClusterOverview';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import { useStore } from 'stores/connect';
 
 const ThreadDumpPage = () => {
   const { nodeId } = useParams();
   const { nodes } = useStore(NodesStore);
-  const [threadDump, setThreadDump] = useState();
+  const [threadDump, setThreadDump] = useState<string>();
   const node = nodes?.[nodeId];
 
   useEffect(() => {
     if (nodeId) {
-      ClusterOverviewStore.threadDump(nodeId).then((result) => setThreadDump(result));
+      fetchThreadDump(nodeId).then((result) => setThreadDump(result));
     }
   }, [nodeId]);
 

@@ -16,28 +16,25 @@
  */
 
 import * as React from 'react';
-import { useRef } from 'react';
 
-import type { Stream } from 'stores/streams/StreamsStore';
-import { CountBadge } from 'components/common';
+import type { Stream } from 'logic/streams/types';
+import ExpandedSectionCount from 'components/common/EntityDataTable/ExpandedSectionCount';
 
 type Props = {
   stream: Stream;
 };
 
 const OutputsCell = ({ stream }: Props) => {
-  const buttonRef = useRef();
-
-  if (stream.is_default || !stream.is_editable) {
+  if (!stream.is_editable) {
     return null;
   }
 
-  const outputCount = stream.outputs?.length || 0;
+  const outputCount = stream.outputs?.length ?? 0;
   if (outputCount === 0) {
     return null;
   }
 
-  return <CountBadge count={outputCount} ref={buttonRef} title="Stream Outputs" />;
+  return <ExpandedSectionCount entityId={stream.id} section="outputs" count={outputCount} label="stream outputs" />;
 };
 
 export default OutputsCell;

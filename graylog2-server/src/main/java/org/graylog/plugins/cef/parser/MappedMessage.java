@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.cef.parser;
 
-import com.github.jcustenborder.cef.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,14 +23,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MappedMessage implements Message {
+public class MappedMessage {
     private static final Logger LOG = LoggerFactory.getLogger(MappedMessage.class);
-    private final Message message;
+    private final CEFMessage message;
     private static final String LABEL_SUFFIX = "Label";
     private final boolean useFullNames;
     private final Map<String, Object> extensions;
 
-    public MappedMessage(Message message, boolean useFullNames) {
+    public MappedMessage(CEFMessage message, boolean useFullNames) {
         this.message = message;
         this.useFullNames = useFullNames;
         this.extensions = mapExtensions(message.extensions());
@@ -47,14 +46,21 @@ public class MappedMessage implements Message {
             }
 
             final CEFMapping fieldMapping = CEFMapping.forKeyName(keyName);
+            final String value = extension.getValue();
             if (fieldMapping != null) {
                 try {
-                    mappedExtensions.put(getLabel(keyName, fieldMapping.getFullName(), extensions), fieldMapping.convert(extension.getValue()));
+                    final Object converted = fieldMapping.convert(value);
+                    if (converted == null) {
+                        LOG.trace("CEF field [{}] has an empty value. Skipping.", keyName);
+                    } else {
+                        mappedExtensions.put(getLabel(keyName, fieldMapping.getFullName(), extensions), converted);
+                    }
                 } catch (Exception e) {
-                    LOG.warn("Could not transform CEF field [{}] according to standard. Skipping.", keyName, e);
+                    LOG.warn("Could not transform CEF field [{}] with value [{}] according to standard. Skipping.",
+                            keyName, value);
                 }
             } else {
-                mappedExtensions.put(getLabel(keyName, keyName, extensions), extension.getValue());
+                mappedExtensions.put(getLabel(keyName, keyName, extensions), value);
             }
 
         }
@@ -66,52 +72,42 @@ public class MappedMessage implements Message {
         return extensions.getOrDefault(labelName, useFullNames ? fullName : keyName);
     }
 
-    @Override
     public Date timestamp() {
         return message.timestamp();
     }
 
-    @Override
     public String host() {
         return message.host();
     }
 
-    @Override
     public int cefVersion() {
         return message.cefVersion();
     }
 
-    @Override
     public String deviceVendor() {
         return message.deviceVendor();
     }
 
-    @Override
     public String deviceProduct() {
         return message.deviceProduct();
     }
 
-    @Override
     public String deviceVersion() {
         return message.deviceVersion();
     }
 
-    @Override
     public String deviceEventClassId() {
         return message.deviceEventClassId();
     }
 
-    @Override
     public String name() {
         return message.name();
     }
 
-    @Override
     public String severity() {
         return message.severity();
     }
 
-    @Override
     public Map<String, String> extensions() {
         return message.extensions();
     }

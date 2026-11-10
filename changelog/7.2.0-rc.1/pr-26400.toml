@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix deprecated @Valid on List container in AggregationRequestSpec"
+
+pulls = ["26400"]
+issues = ["Graylog2/graylog-plugin-enterprise#14515"]

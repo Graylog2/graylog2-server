@@ -95,7 +95,18 @@ export default [
       'no-plusplus': 'error',
       'no-promise-executor-return': 'error',
       'no-restricted-globals': 'error',
-      'no-restricted-syntax': 'error',
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'JSXAttribute[name.name=/^(href|to)$/] > Literal[value=/^\\x2F/]',
+          message: 'Use `Routes` or `prefixUrl()` for internal links so the app path prefix is applied.',
+        },
+        {
+          selector:
+            'JSXAttribute[name.name=/^(href|to)$/] > JSXExpressionContainer > TemplateLiteral > TemplateElement:first-child[value.raw=/^\\x2F/]',
+          message: 'Use `Routes` or `prefixUrl()` for internal links so the app path prefix is applied.',
+        },
+      ],
       'no-script-url': 'error',
       'no-template-curly-in-string': 'error',
       'no-throw-literal': 'error',
@@ -178,6 +189,11 @@ export default [
               message: 'Please use `routing/useLocation` instead.',
             },
             {
+              name: 'react-router-dom',
+              importNames: ['useNavigate'],
+              message: 'Please use `routing/useHistory` instead.',
+            },
+            {
               name: 'create-react-class',
               message: 'Please use an ES6 or functional component instead.',
             },
@@ -200,6 +216,15 @@ export default [
             {
               name: 'lodash/max',
               message: 'Please use `Math.max` instead.',
+            },
+            {
+              name: '@mantine/hooks',
+              message:
+                'We wrap Mantine hooks with our own abstractions. Check `util/hooks/` for an existing wrapper before importing from `@mantine/hooks` directly.',
+            },
+            {
+              name: 'util/PermissionsMixin',
+              message: 'Please use the `usePermissions` hook from `hooks/usePermissions` instead.',
             },
           ],
         },
@@ -287,6 +312,14 @@ export default [
         },
       ],
       'testing-library/render-result-naming-convention': 'off',
+      'graylog/no-literal-product-name': 'off',
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "TSAsExpression > TSTypeReference > TSQualifiedName[left.name='jest'][right.name=/^Mock(edFunction)?$/]",
+          message: 'Use `asMock(fn)` from `helpers/mocking` instead of casting to `jest.Mock`.',
+        },
+      ],
     },
   },
 ];

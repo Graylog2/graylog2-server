@@ -19,7 +19,7 @@ package org.graylog.storage.elasticsearch7;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.binder.LinkedBindingBuilder;
 import org.graylog.events.search.MoreSearchAdapter;
-import org.graylog.plugins.datanode.DatanodeUpgradeServiceAdapter;
+import org.graylog.plugins.datanode.DatanodeClusterAdminAdapter;
 import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
 import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
 import org.graylog.shaded.elasticsearch7.org.apache.http.client.CredentialsProvider;
@@ -43,6 +43,7 @@ import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
 import org.graylog2.indexer.searches.SearchesAdapter;
+import org.graylog2.indexer.security.IndexerAdminCert;
 import org.graylog2.indexer.security.SecurityAdapter;
 import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 import org.graylog2.plugin.VersionAwareModule;
@@ -63,6 +64,7 @@ public class Elasticsearch7Module extends VersionAwareModule {
         bindForSupportedVersion(CountsAdapter.class).to(CountsAdapterES7.class);
         bindForSupportedVersion(ClusterAdapter.class).to(ClusterAdapterES7.class);
         bindForSupportedVersion(IndicesAdapter.class).to(IndicesAdapterES7.class);
+        bindForSupportedVersion(IndicesAdapter.class, IndexerAdminCert.class).to(IndicesAdapterES7.class);
         bindForSupportedVersion(DataStreamAdapter.class).to(DataStreamAdapterES7.class);
         if (useComposableIndexTemplates) {
             bindForSupportedVersion(IndexTemplateAdapter.class).to(ComposableIndexTemplateAdapter.class);
@@ -90,7 +92,7 @@ public class Elasticsearch7Module extends VersionAwareModule {
         bind(RestHighLevelClient.class).toProvider(RestHighLevelClientProvider.class);
         bind(CredentialsProvider.class).toProvider(ESCredentialsProvider.class);
 
-        bindForSupportedVersion(DatanodeUpgradeServiceAdapter.class).to(DatanodeUpgradeServiceAdapterES7.class);
+        bindForSupportedVersion(DatanodeClusterAdminAdapter.class).to(DatanodeClusterAdminAdapterES7.class);
 
         bindForSupportedVersion(IndexerHostsAdapter.class).to(IndexerHostsAdapterES7.class);
         bindForSupportedVersion(SecurityAdapter.class).to(SecurityAdapterES7.class);
@@ -98,5 +100,10 @@ public class Elasticsearch7Module extends VersionAwareModule {
 
     private <T> LinkedBindingBuilder<T> bindForSupportedVersion(Class<T> interfaceClass) {
         return bindForVersion(supportedVersion, interfaceClass);
+    }
+
+    private <T> LinkedBindingBuilder<T> bindForSupportedVersion(Class<T> interfaceClass,
+                                                                Class<? extends java.lang.annotation.Annotation> qualifier) {
+        return bindForVersion(supportedVersion, interfaceClass, qualifier);
     }
 }

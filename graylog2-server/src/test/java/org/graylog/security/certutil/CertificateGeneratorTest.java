@@ -46,4 +46,20 @@ class CertificateGeneratorTest {
         final CertRequest req = CertRequest.selfSigned(cname).validity(Duration.ofDays(1));
         return CERTIFICATE_GENERATOR.generateKeyPair(req);
     }
+
+    @Test
+    void testCnAtMaxLengthIsNotTruncated() throws Exception {
+        final String cname = "a".repeat(CertConstants.CN_MAX_LENGTH);
+        final KeyPair pair = selfSigned(cname);
+        final String cn = pair.certificate().getSubjectX500Principal().getName();
+        Assertions.assertThat(cn).isEqualTo("CN=" + cname);
+    }
+
+    @Test
+    void testCnExceedingMaxLengthIsTruncated() throws Exception {
+        final String cname = "a".repeat(CertConstants.CN_MAX_LENGTH + 1);
+        final KeyPair pair = selfSigned(cname);
+        final String cn = pair.certificate().getSubjectX500Principal().getName();
+        Assertions.assertThat(cn).isEqualTo("CN=" + "a".repeat(CertConstants.CN_MAX_LENGTH));
+    }
 }

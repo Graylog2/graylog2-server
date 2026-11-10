@@ -44,7 +44,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 public class ESPercentageHandler extends ESPivotSeriesSpecHandler<Percentage, ValueCount> {
-    private static final Logger LOG = LoggerFactory.getLogger(ESCountHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ESPercentageHandler.class);
     private final ESCountHandler esCountHandler;
     private final ESSumHandler esSumHandler;
 

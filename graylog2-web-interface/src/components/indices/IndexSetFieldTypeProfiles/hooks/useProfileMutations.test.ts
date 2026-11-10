@@ -17,6 +17,8 @@
 import { renderHook, act, waitFor } from 'wrappedTestingLibrary/hooks';
 import omit from 'lodash/omit';
 
+import { SystemIndexSetsFieldTypeProfiles } from '@graylog/server-api';
+
 import asMock from 'helpers/mocking/AsMock';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
@@ -27,6 +29,9 @@ import { formValuesProfile1, requestBodyProfile1JSON } from 'fixtures/indexSetFi
 const urlPrefix = '/system/indices/index_sets/profiles';
 
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
+jest.mock('@graylog/server-api', () => ({
+  SystemIndexSetsFieldTypeProfiles: { remove: jest.fn() },
+}));
 
 jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
@@ -121,10 +126,8 @@ describe('useProfileMutations', () => {
   });
 
   describe('deleteProfile', () => {
-    const deleteUrl = qualifyUrl(`${urlPrefix}/111`);
-
     it('should run fetch and display UserNotification', async () => {
-      asMock(fetch).mockImplementation(() => Promise.resolve({}));
+      asMock(SystemIndexSetsFieldTypeProfiles.remove).mockResolvedValue(undefined);
 
       const { result } = renderHook(() => useProfileMutations());
 
@@ -132,7 +135,7 @@ describe('useProfileMutations', () => {
         result.current.deleteProfile('111');
       });
 
-      await waitFor(() => expect(fetch).toHaveBeenCalledWith('DELETE', deleteUrl));
+      await waitFor(() => expect(SystemIndexSetsFieldTypeProfiles.remove).toHaveBeenCalledWith('111'));
 
       await waitFor(() =>
         expect(UserNotification.success).toHaveBeenCalledWith(
@@ -143,7 +146,7 @@ describe('useProfileMutations', () => {
     });
 
     it('should display notification on fail', async () => {
-      asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
+      asMock(SystemIndexSetsFieldTypeProfiles.remove).mockRejectedValue(new Error('Error'));
 
       const { result } = renderHook(() => useProfileMutations());
 

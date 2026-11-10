@@ -64,6 +64,7 @@ import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.inputs.transports.util.KeyUtil;
 import org.graylog2.plugin.inputs.util.ConnectionCounter;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
+import org.graylog2.security.encryption.EncryptedValueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,15 +100,15 @@ public abstract class AbstractTcpTransport extends NettyTransport {
 
     private static final String CK_TLS_CERT_FILE = "tls_cert_file";
     private static final String CK_TLS_KEY_FILE = "tls_key_file";
-    private static final String CK_TLS_ENABLE = "tls_enable";
+    public static final String CK_TLS_ENABLE = "tls_enable";
     private static final String CK_TLS_KEY_PASSWORD = "tls_key_password";
-    private static final String CK_TLS_CLIENT_AUTH = "tls_client_auth";
+    public static final String CK_TLS_CLIENT_AUTH = "tls_client_auth";
     private static final String CK_TLS_CLIENT_AUTH_TRUSTED_CERT_FILE = "tls_client_auth_cert_file";
-    private static final String CK_TCP_KEEPALIVE = "tcp_keepalive";
+    public static final String CK_TCP_KEEPALIVE = "tcp_keepalive";
 
     private static final String TLS_CLIENT_AUTH_DISABLED = "disabled";
     private static final String TLS_CLIENT_AUTH_OPTIONAL = "optional";
-    private static final String TLS_CLIENT_AUTH_REQUIRED = "required";
+    public static final String TLS_CLIENT_AUTH_REQUIRED = "required";
     private static final ImmutableMap<String, String> TLS_CLIENT_AUTH_OPTIONS = ImmutableMap.of(
             TLS_CLIENT_AUTH_DISABLED, TLS_CLIENT_AUTH_DISABLED,
             TLS_CLIENT_AUTH_OPTIONAL, TLS_CLIENT_AUTH_OPTIONAL,
@@ -145,9 +146,11 @@ public abstract class AbstractTcpTransport extends NettyTransport {
             EventLoopGroup parentEventLoopGroup,
             EventLoopGroupFactory eventLoopGroupFactory,
             NettyTransportConfiguration nettyTransportConfiguration,
+            EncryptedValueService encryptedValueService,
             org.graylog2.Configuration graylogConfiguration) {
-            this(configuration, throughputCounter, localRegistry, parentEventLoopGroup, eventLoopGroupFactory,
-                    nettyTransportConfiguration, new TLSProtocolsConfiguration(graylogConfiguration.getEnabledTlsProtocols()));
+        this(configuration, throughputCounter, localRegistry, parentEventLoopGroup, eventLoopGroupFactory,
+                nettyTransportConfiguration, new TLSProtocolsConfiguration(graylogConfiguration.getEnabledTlsProtocols()),
+                encryptedValueService);
     }
 
     public AbstractTcpTransport(
@@ -157,7 +160,8 @@ public abstract class AbstractTcpTransport extends NettyTransport {
             EventLoopGroup parentEventLoopGroup,
             EventLoopGroupFactory eventLoopGroupFactory,
             NettyTransportConfiguration nettyTransportConfiguration,
-            TLSProtocolsConfiguration tlsConfiguration) {
+            TLSProtocolsConfiguration tlsConfiguration,
+            EncryptedValueService encryptedValueService) {
         super(configuration, eventLoopGroupFactory, throughputCounter, localRegistry);
         this.configuration = configuration;
         this.parentEventLoopGroup = parentEventLoopGroup;
@@ -169,7 +173,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
         this.tlsEnable = configuration.getBoolean(CK_TLS_ENABLE);
         this.tlsCertFile = getTlsFile(configuration, CK_TLS_CERT_FILE);
         this.tlsKeyFile = getTlsFile(configuration, CK_TLS_KEY_FILE);
-        this.tlsKeyPassword = configuration.getString(CK_TLS_KEY_PASSWORD);
+        this.tlsKeyPassword = encryptedValueService.decrypt(configuration.getEncryptedValue(CK_TLS_KEY_PASSWORD));
         this.tlsClientAuth = configuration.getString(CK_TLS_CLIENT_AUTH, TLS_CLIENT_AUTH_DISABLED);
         this.tlsClientAuthCertFile = getTlsFile(configuration, CK_TLS_CLIENT_AUTH_TRUSTED_CERT_FILE);
 
@@ -263,7 +267,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
         handlers.put("connection-counter", () -> connectionCounter);
         if (tlsEnable) {
             LOG.info("Enabled TLS for input {}. key-file=\"{}\" cert-file=\"{}\"", input.toIdentifier(), tlsKeyFile, tlsCertFile);
-            handlers.put("tls", getSslHandlerCallable(input));
+            handlers.put("tls", createSslHandler(input));
         }
         handlers.putAll(getCustomChildChannelHandlers(input));
         if (aggregator != null) {
@@ -271,9 +275,13 @@ public abstract class AbstractTcpTransport extends NettyTransport {
             handlers.put("codec-aggregator", () -> new ByteBufMessageAggregationHandler(aggregator, localRegistry));
         }
         handlers.put("rawmessage-handler", () -> new RawMessageHandler(input));
-        handlers.put("exception-logger", () -> new ExceptionLoggingChannelHandler(input, LOG, this.tcpKeepalive));
+        handlers.put("exception-logger", () -> new ExceptionLoggingChannelHandler(input, LOG));
 
         return handlers;
+    }
+
+    protected Callable<? extends ChannelHandler> createSslHandler(MessageInput input) {
+        return getSslHandlerCallable(input);
     }
 
     private Callable<ChannelHandler> getSslHandlerCallable(MessageInput input) {
@@ -299,8 +307,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                 if (!Strings.isNullOrEmpty(tlsKeyPassword)) {
                     keyFile = KeyUtil.generatePKCS8FromPrivateKey(tmpPath, tlsKeyPassword.toCharArray(), ssc.key());
                     ssc.privateKey().delete();
-                }
-                else {
+                } else {
                     keyFile = ssc.privateKey();
                 }
             } catch (GeneralSecurityException e) {
@@ -424,6 +431,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                             "",
                             "The password for the encrypted key file.",
                             ConfigurationField.Optional.OPTIONAL,
+                            true,
                             TextField.Attribute.IS_PASSWORD
                     )
             );

@@ -21,9 +21,11 @@ import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.Multibinder;
 import org.apache.hc.client5.http.auth.CredentialsProvider;
 import org.graylog.events.search.MoreSearchAdapter;
-import org.graylog.plugins.datanode.DatanodeUpgradeServiceAdapter;
+import org.graylog.plugins.datanode.DatanodeClusterAdminAdapter;
 import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdFieldAliasForEvents;
 import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
+import org.graylog.security.certutil.ClientCertSslContextFactory;
+import org.graylog.security.certutil.ClientCertSslContextFactoryImpl;
 import org.graylog.storage.opensearch3.client.IndexerHostsAdapterOS;
 import org.graylog.storage.opensearch3.client.OpensearchCredentialsProvider;
 import org.graylog.storage.opensearch3.fieldtypes.streams.StreamsForFieldRetrieverOS;
@@ -53,6 +55,7 @@ import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
 import org.graylog2.indexer.searches.SearchesAdapter;
+import org.graylog2.indexer.security.IndexerAdminCert;
 import org.graylog2.indexer.security.SecurityAdapter;
 import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 import org.graylog2.plugin.VersionAwareModule;
@@ -104,7 +107,11 @@ public class OpenSearch3Module extends VersionAwareModule {
         bind(OfficialOpensearchClientProvider.class).asEagerSingleton();
         bind(OfficialOpensearchClient.class).toProvider(OfficialOpensearchClientProvider.class);
         bind(CredentialsProvider.class).toProvider(OpensearchCredentialsProvider.class);
-        bindForSupportedVersion(DatanodeUpgradeServiceAdapter.class).to(DatanodeUpgradeServiceAdapterOS.class);
+        bind(ClientCertSslContextFactory.class).to(ClientCertSslContextFactoryImpl.class);
+        bind(AdminOpensearchClientProvider.class);
+        bindForSupportedVersion(IndicesAdapter.class, IndexerAdminCert.class)
+                .toProvider(AdminIndicesAdapterProvider.class);
+        bindForSupportedVersion(DatanodeClusterAdminAdapter.class).to(DatanodeClusterAdminAdapterOS.class);
 
         Multibinder<NodesSniffer> nodeSniffers = Multibinder.newSetBinder(binder(), NodesSniffer.class);
         nodeSniffers.addBinding().to(OpensearchClusterSniffer.class);
@@ -124,5 +131,10 @@ public class OpenSearch3Module extends VersionAwareModule {
 
     private <T> LinkedBindingBuilder<T> bindForSupportedVersion(Class<T> interfaceClass) {
         return bindForVersion(supportedVersion, interfaceClass);
+    }
+
+    private <T> LinkedBindingBuilder<T> bindForSupportedVersion(Class<T> interfaceClass,
+                                                                Class<? extends java.lang.annotation.Annotation> qualifier) {
+        return bindForVersion(supportedVersion, interfaceClass, qualifier);
     }
 }

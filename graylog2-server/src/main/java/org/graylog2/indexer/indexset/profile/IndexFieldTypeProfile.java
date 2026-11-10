@@ -17,6 +17,7 @@
 package org.graylog2.indexer.indexset.profile;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog2.database.DbEntity;
 import org.graylog2.database.MongoEntity;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.mongojack.Id;
@@ -25,9 +26,17 @@ import org.mongojack.ObjectId;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService.INDEX_FIELD_TYPE_PROFILE_MONGO_COLLECTION_NAME;
+import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
+import static org.graylog2.shared.security.RestPermissions.MAPPING_PROFILES_READ;
+
 /**
  * Represents profile as it is stored in Mongo.
  */
+@DbEntity(collection = INDEX_FIELD_TYPE_PROFILE_MONGO_COLLECTION_NAME,
+          titleField = IndexFieldTypeProfile.NAME_FIELD_NAME,
+          readPermission = MAPPING_PROFILES_READ,
+          readableFields = {ID_FIELD, IndexFieldTypeProfile.ID_FIELD_NAME, IndexFieldTypeProfile.NAME_FIELD_NAME})
 public record IndexFieldTypeProfile(@JsonProperty(ID_FIELD_NAME) @Nullable @Id @ObjectId String id,
                                     @JsonProperty(NAME_FIELD_NAME) String name,
                                     @JsonProperty(DESCRIPTION_FIELD_NAME) String description,

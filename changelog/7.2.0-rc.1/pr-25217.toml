@@ -1,0 +1,5 @@
+type = "fixed" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Fix tool failure related to NPE when retrieving stream descriptions"
+
+issues = ["25214"]
+pulls = ["25217"]

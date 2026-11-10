@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Exclude collector system logs from traffic accounting."
+
+issues = ["26036"]
+pulls = ["26190"]

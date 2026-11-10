@@ -16,6 +16,8 @@
  */
 import Reflux from 'reflux';
 
+import { SystemClusterConfig, SystemMessageProcessors, SystemUrlAllowlist } from '@graylog/server-api';
+
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -123,7 +125,7 @@ export const ConfigurationsStore = singletonStore('core.Configuration', () =>
     },
 
     list(configType) {
-      const promise = fetch('GET', this._url(`/${configType}`));
+      const promise = SystemClusterConfig.read(configType);
 
       promise.then((response) => {
         this.configuration = { ...this.configuration, [configType]: response };
@@ -136,7 +138,7 @@ export const ConfigurationsStore = singletonStore('core.Configuration', () =>
     },
 
     listSearchesClusterConfig() {
-      const promise = fetch('GET', this._url('/org.graylog2.indexer.searches.SearchesClusterConfig')).then(
+      const promise = SystemClusterConfig.read('org.graylog2.indexer.searches.SearchesClusterConfig').then(
         (response) => {
           this.searchesClusterConfig = response;
           this.propagateChanges();
@@ -149,7 +151,7 @@ export const ConfigurationsStore = singletonStore('core.Configuration', () =>
     },
 
     listMessageProcessorsConfig(configType) {
-      const promise = fetch('GET', qualifyUrl('/system/messageprocessors/config')).then((response) => {
+      const promise = SystemMessageProcessors.config().then((response) => {
         this.configuration = { ...this.configuration, [configType]: response };
         this.propagateChanges();
 
@@ -160,7 +162,7 @@ export const ConfigurationsStore = singletonStore('core.Configuration', () =>
     },
 
     listAllowListConfig(configType) {
-      const promise = fetch('GET', qualifyUrl('/system/urlallowlist')).then((response) => {
+      const promise = SystemUrlAllowlist.get().then((response) => {
         this.configuration = { ...this.configuration, [configType]: response };
         this.propagateChanges();
 
@@ -171,7 +173,7 @@ export const ConfigurationsStore = singletonStore('core.Configuration', () =>
     },
 
     listPermissionsConfig(configType) {
-      const promise = fetch('GET', this._url(`/${configType}`)).then((response: PermissionsConfigType) => {
+      const promise = SystemClusterConfig.read(configType).then((response: PermissionsConfigType) => {
         this.configuration = {
           ...this.configuration,
           // default values bellow should be the same in backend.
@@ -190,7 +192,7 @@ export const ConfigurationsStore = singletonStore('core.Configuration', () =>
     },
 
     listUserConfig(configType) {
-      const promise = fetch('GET', this._url(`/${configType}`)).then((response: UserConfigType) => {
+      const promise = SystemClusterConfig.read(configType).then((response: UserConfigType) => {
         this.configuration = {
           ...this.configuration,
           // default values bellow should be the same in backend.
@@ -209,7 +211,7 @@ export const ConfigurationsStore = singletonStore('core.Configuration', () =>
     },
 
     listPasswordComplexityConfig(configType) {
-      const promise = fetch('GET', this._url(`/${configType}`)).then((response: PasswordComplexityConfigType) => {
+      const promise = SystemClusterConfig.read(configType).then((response: PasswordComplexityConfigType) => {
         this.configuration = {
           ...this.configuration,
           [configType]: response || {
@@ -230,7 +232,7 @@ export const ConfigurationsStore = singletonStore('core.Configuration', () =>
     },
 
     listEventsClusterConfig() {
-      const promise = fetch('GET', this._url('/org.graylog.events.configuration.EventsConfiguration')).then(
+      const promise = SystemClusterConfig.read('org.graylog.events.configuration.EventsConfiguration').then(
         (response) => {
           this.eventsClusterConfig = response;
           this.propagateChanges();
@@ -243,7 +245,7 @@ export const ConfigurationsStore = singletonStore('core.Configuration', () =>
     },
 
     listIndexSetsDefaultsClusterConfig() {
-      const promise = fetch('GET', this._url('/org.graylog2.configuration.IndexSetsDefaultConfiguration')).then(
+      const promise = SystemClusterConfig.read('org.graylog2.configuration.IndexSetsDefaultConfiguration').then(
         (response) => {
           this.indexSetsDefaultConfig = response;
           this.propagateChanges();

@@ -38,7 +38,7 @@ const defaultConfig = {
 const ThreatIntelPluginConfig = ({ config: initialConfig = defaultConfig, updateConfig }: Props) => {
   const [showModal, setShowModal] = useState(false);
   const [config, setConfig] = useState<Config>(ObjectUtils.clone(initialConfig));
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('threat-intel');
 
   const _updateConfigField = (field: string, value: boolean) => {
     const newConfig = {
@@ -69,7 +69,6 @@ const ThreatIntelPluginConfig = ({ config: initialConfig = defaultConfig, update
   const _saveConfig = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.THREATINTEL_CONFIGURATION_UPDATED, {
       app_pathname: 'configurations',
-      app_section: 'threat-intel',
     });
 
     updateConfig(config).then(() => {

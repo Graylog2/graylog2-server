@@ -16,6 +16,7 @@
  */
 package org.graylog.mcp.resources;
 
+import com.google.common.base.Strings;
 import io.modelcontextprotocol.spec.McpSchema;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.MediaType;
@@ -79,10 +80,10 @@ public class EventDefinitionResourceProvider extends ResourceProvider {
             return Optional.empty();
         }
         final var eventDefinition = definitionDto.get();
-        return Optional.of(McpSchema.Resource.builder()
-                .name(eventDefinition.title())
+        // MCP SDK 2.0.0 rejects a null/empty Resource name; fall back to the id.
+        final String name = Strings.isNullOrEmpty(eventDefinition.title()) ? eventDefinition.id() : eventDefinition.title();
+        return Optional.of(McpSchema.Resource.builder(grn.toString(), name)
                 .description(eventDefinition.description())
-                .uri(grn.toString())
                 .build());
     }
 
@@ -92,15 +93,13 @@ public class EventDefinitionResourceProvider extends ResourceProvider {
             return dtos
                     .filter(eventDefinition -> permissionHelper.isPermitted(RestPermissions.EVENT_DEFINITIONS_READ,
                             eventDefinition.id()))
-                    .map(eventDefinition -> new McpSchema.Resource(
-                            GRN_TYPE.toGRN(eventDefinition.id()).toString(),
-                            eventDefinition.title(),
-                            eventDefinition.title(),
-                            eventDefinition.description(),
-                            null,
-                            null,
-                            null,
-                            null))
+                    .map(eventDefinition -> McpSchema.Resource.builder(
+                                    GRN_TYPE.toGRN(eventDefinition.id()).toString(),
+                                    // MCP SDK 2.0.0 rejects a null/empty Resource name; fall back to the id.
+                                    Strings.isNullOrEmpty(eventDefinition.title()) ? eventDefinition.id() : eventDefinition.title())
+                            .title(eventDefinition.title())
+                            .description(eventDefinition.description())
+                            .build())
                     .toList();
         }
     }

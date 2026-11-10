@@ -16,12 +16,12 @@
  */
 import React, { useEffect, useContext, useState } from 'react';
 
-import FormDataContext from 'integrations/contexts/FormDataContext';
-import { qualifyUrl } from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
-import formValidation from 'integrations/aws/utils/formValidation';
+import { AWSCloudTrail } from '@graylog/server-api';
 
-import { ApiRoutes } from './common/Routes';
+import FormDataContext from 'integrations/contexts/FormDataContext';
+import formValidation from 'integrations/aws/utils/formValidation';
+import { validateExternalIdRequiresArn } from 'integrations/aws/utils/awsValidation';
+
 import type { ErrorMessageType, HandleFieldUpdateType, HandleSubmitType } from './types';
 
 import { renderOptions } from '../common/Options';
@@ -38,7 +38,7 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
   const [regions, setRegions] = useState([]);
 
   useEffect(() => {
-    fetch('GET', qualifyUrl(ApiRoutes.INTEGRATIONS.AWSCloudTrail.GET_AWS_REGIONS)).then((response) => {
+    AWSCloudTrail.getAWSRegions().then((response) => {
       const region = Object.keys(response).map((key) => ({ label: response[key], value: key }));
       setRegions(region);
     });
@@ -51,17 +51,33 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = () => {
+    // Validate that External ID is only used with Assume Role ARN
+    const externalIdError = validateExternalIdRequiresArn(
+      formData?.awsAssumeRoleARN?.value,
+      formData?.awsExternalId?.value,
+    );
+
+    if (externalIdError) {
+      setFormError({
+        full_message: externalIdError,
+        nice_message: externalIdError,
+      });
+
+      return;
+    }
+
     setLoading(true);
 
-    fetch('POST', qualifyUrl(ApiRoutes.INTEGRATIONS.AWSCloudTrail.CHECK_CREDENTIALS), {
+    AWSCloudTrail.checkCredentials({
       aws_access_key: formData?.awsAccessKey?.value || '',
       aws_secret_key: formData?.awsSecretKey?.value || '',
       aws_sqs_queue_name: formData?.awsCloudTrailSqsQueueName?.value || '',
       aws_sqs_region: formData?.awsCloudTrailSqsRegion?.value || '',
       aws_s3_region: formData?.awsCloudTrailS3Region?.value || '',
       assume_role_arn: formData?.awsAssumeRoleARN?.value || '',
+      aws_external_id: formData?.awsExternalId?.value || '',
     })
-      .then((result: any) => {
+      .then((result) => {
         if (result.result === 'valid') {
           setFormError(null);
           onSubmit();

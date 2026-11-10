@@ -27,7 +27,7 @@ import {
   RelativeTime,
 } from 'components/common';
 import { Button, Panel, Table } from 'components/bootstrap';
-import type { Token, TokenSummary } from 'stores/users/UsersStore';
+import type { Token, TokenSummary } from 'hooks/useUsers';
 import { sortByDate } from 'util/SortUtils';
 import { Headline } from 'components/common/Section/SectionComponent';
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -77,7 +77,7 @@ const TokenList = ({ creatingToken = false, onCreate, user, onDelete = () => {},
       .sort((token1, token2) => sortByDate(token1.last_access, token2.last_access, 'desc'));
   }, [query, tokens]);
 
-  const handleTokenCreation = async ({ tokenName, tokenTtl }) => {
+  const handleTokenCreation = async ({ tokenName, tokenTtl }: { tokenName: string; tokenTtl: string }) => {
     const token = await onCreate({ tokenName, tokenTtl });
     setCreatedToken(token);
   };
@@ -119,7 +119,7 @@ const TokenList = ({ creatingToken = false, onCreate, user, onDelete = () => {},
       {effectiveTokens.length === 0 ? (
         <NoEntitiesExist>{query === '' ? 'No tokens to display.' : 'No tokens match the filter.'}</NoEntitiesExist>
       ) : (
-        <Table striped bordered condensed>
+        <Table bordered condensed>
           <thead>
             <tr>
               <th>Token Name</th>

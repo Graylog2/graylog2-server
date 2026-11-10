@@ -22,7 +22,7 @@ import Routes from 'routing/Routes';
 import { Link, IfPermitted, ReadOnlyFormGroup } from 'components/common';
 import type User from 'logic/users/User';
 import SectionComponent from 'components/common/Section/SectionComponent';
-import { StreamsActions } from 'stores/streams/StreamsStore';
+import useStream from 'components/streams/hooks/useStream';
 import useIsGlobalTimeoutEnabled from 'hooks/useIsGlobalTimeoutEnabled';
 import { getView } from 'views/api/views';
 
@@ -49,25 +49,24 @@ const _sessionTimeout = (sessionTimeout: { value: number; unitString: string }, 
 };
 
 const StartpageValue = ({ type, id }: { type: string | null | undefined; id: string | null | undefined }) => {
-  const [title, setTitle] = useState<string | undefined>();
+  const [viewTitle, setViewTitle] = useState<string | undefined>();
+  const isStream = type === 'stream';
+  const { data: stream } = useStream(id ?? '', { enabled: isStream && !!id });
 
   useEffect(() => {
-    if (!type || !id) {
+    if (!type || !id || isStream) {
       return;
     }
 
-    if (type === 'stream') {
-      StreamsActions.get(id).then(({ title: streamTitle }) => setTitle(streamTitle));
-    } else {
-      getView(id).then(({ title: viewTitle }) => setTitle(viewTitle));
-    }
-  }, [id, type]);
+    getView(id).then(({ title }) => setViewTitle(title));
+  }, [id, type, isStream]);
 
   if (!type || !id) {
     return <span>No start page set</span>;
   }
 
-  const route = type === 'stream' ? Routes.stream_search(id) : Routes.dashboard_show(id);
+  const title = isStream ? stream?.title : viewTitle;
+  const route = isStream ? Routes.stream_search(id) : Routes.dashboard_show(id);
 
   return (
     <Link to={route}>

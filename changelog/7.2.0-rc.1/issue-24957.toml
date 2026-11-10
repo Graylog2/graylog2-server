@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fixed pipeline stages in the Processing Timeline being sorted alphabetically instead of numerically, so stages such as 100 no longer display before 2."
+
+issues = ["24957"]
+pulls = ["27346"]

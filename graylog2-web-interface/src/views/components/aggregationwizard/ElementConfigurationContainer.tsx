@@ -54,8 +54,7 @@ const ElementActions = styled.div`
 `;
 
 const StyledIconButton = styled(IconButton)`
-  width: fit-content;
-  height: fit-content;
+  line-height: normal;
 `;
 
 const ElementConfiguration = styled.div`
@@ -79,7 +78,7 @@ const ElementConfigurationContainer = (
   <Container className={className} ref={ref}>
     <ElementActions>
       {dragHandle}
-      {onRemove && <StyledIconButton size="sm" onClick={onRemove} name="delete" title={`Remove ${elementTitle}`} />}
+      {onRemove && <StyledIconButton size="xs" onClick={onRemove} name="delete" title={`Remove ${elementTitle}`} />}
     </ElementActions>
     <ElementConfiguration>{children}</ElementConfiguration>
   </Container>

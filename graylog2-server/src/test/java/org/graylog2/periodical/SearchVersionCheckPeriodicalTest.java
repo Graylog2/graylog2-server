@@ -124,7 +124,8 @@ class SearchVersionCheckPeriodicalTest {
                 versionProbe,
                 IndexerJwtAuthToken.disabled(),
                 notificationService,
-                ()  -> new SearchIndexerHosts(Collections.emptyList(), Collections.emptyList(), Collections.emptyList())
+                () -> new SearchIndexerHosts(Collections.emptyList(), Collections.emptyList(), Collections.emptyList()),
+                false
         );
     }
 

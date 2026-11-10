@@ -1,0 +1,74 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import * as React from 'react';
+import { useMemo, useCallback } from 'react';
+
+import useLocation from 'routing/useLocation';
+import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
+import type { SearchParams } from 'stores/PaginationTypes';
+import Routes from 'routing/Routes';
+import useHistory from 'routing/useHistory';
+
+import { FleetFormModal } from './index';
+import FleetActions from './FleetActions';
+import customColumnRenderers from './ColumnRenderers';
+import { DEFAULT_LAYOUT } from './Constants';
+
+import { fetchPaginatedFleets, fleetsKeyFn, useCollectorsMutations, useCollectorPermissions } from '../hooks';
+import type { Fleet } from '../types';
+
+const CollectorsFleets = () => {
+  const { createFleet } = useCollectorsMutations();
+  const { canCreateFleet } = useCollectorPermissions();
+  const { pathname } = useLocation();
+  const history = useHistory();
+
+  // The modal is fully URL-driven: /fleets/new shows it, closing navigates back to /fleets.
+  const showFleetModal = pathname === Routes.SYSTEM.COLLECTORS.FLEETS_NEW;
+
+  const columnRenderers = useMemo(() => customColumnRenderers(), []);
+
+  const fetchEntities = useCallback((searchParams: SearchParams) => fetchPaginatedFleets(searchParams), []);
+
+  const fleetActions = useCallback((fleet: Fleet) => <FleetActions fleet={fleet} />, []);
+
+  const closeCreateModal = useCallback(() => {
+    history.goBack();
+  }, [history]);
+
+  const handleSaveFleet = async (fleet: Omit<Fleet, 'id' | 'created_at' | 'updated_at'>) => {
+    await createFleet(fleet);
+  };
+
+  return (
+    <>
+      <PaginatedEntityTable<Fleet>
+        humanName="fleets"
+        tableLayout={DEFAULT_LAYOUT}
+        fetchEntities={fetchEntities}
+        keyFn={fleetsKeyFn}
+        entityAttributesAreCamelCase={false}
+        columnRenderers={columnRenderers}
+        entityActions={fleetActions}
+      />
+
+      {showFleetModal && canCreateFleet && <FleetFormModal onClose={closeCreateModal} onSave={handleSaveFleet} />}
+    </>
+  );
+};
+
+export default CollectorsFleets;

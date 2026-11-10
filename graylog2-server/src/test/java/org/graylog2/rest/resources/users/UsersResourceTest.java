@@ -23,6 +23,7 @@ import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.bson.types.ObjectId;
 import org.graylog.security.UserContext;
@@ -34,6 +35,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.rest.models.users.requests.ChangePasswordRequest;
 import org.graylog2.rest.models.users.requests.CreateUserRequest;
 import org.graylog2.rest.models.users.requests.DashboardStartPage;
 import org.graylog2.rest.models.users.requests.UpdateUserPreferences;
@@ -48,11 +50,13 @@ import org.graylog2.security.sessions.SessionService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.shared.users.ChangeUserRequest;
 import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.UserManagementService;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.PaginatedUserService;
 import org.graylog2.users.PasswordComplexityConfig;
+import org.graylog2.users.PrivilegeEscalationGuard;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.UserConfiguration;
 import org.graylog2.users.UserImpl;
@@ -78,7 +82,10 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.shared.security.RestPermissions.ROLES_READ;
+import static org.graylog2.shared.security.RestPermissions.USERS_PASSWORDCHANGE;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENCREATE;
+import static org.graylog2.shared.security.RestPermissions.USERS_TOKENREMOVE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -86,7 +93,9 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -148,6 +157,7 @@ public class UsersResourceTest {
         lenient().when(userContext.getUser()).thenReturn(user);
         lenient().when(user.getName()).thenReturn("username");
         lenient().when(user.getId()).thenReturn("userId");
+        lenient().when(userContext.isPermitted(ROLES_READ, TestUsersResource.ALLOWED_ROLE)).thenReturn(true);
     }
 
     /**
@@ -183,9 +193,11 @@ public class UsersResourceTest {
         Role adminRole = mock(Role.class);
         when(adminRole.getId()).thenReturn(new ObjectId().toHexString());
         when(adminRole.getName()).thenReturn("admin");
+        when(userContext.isPermitted(ROLES_READ, TestUsersResource.ALLOWED_ROLE)).thenReturn(true);
+        when(userContext.isPermitted(ROLES_READ, forbiddenRole)).thenReturn(true);
 
         when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of(ALLOWED_ROLE_LOWER_CASE, readerRole, "admin", adminRole));
-        when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
+        when(userManagementService.create()).thenReturn(userImplFactory.create(Map.of()));
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
 
         ForbiddenException exception = assertThrows(ForbiddenException.class, () -> usersResource.create(buildCreateUserRequest(List.of(TestUsersResource.ALLOWED_ROLE, forbiddenRole), PASSWORD), userContext));
@@ -220,9 +232,136 @@ public class UsersResourceTest {
     @Test
     void createFailureOnWrongRoleAssignPermission() {
         String testRole = "forbiddenRole";
+        lenient().when(userContext.isPermitted(ROLES_READ, testRole)).thenReturn(true);
         when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
         assertThrows(BadRequestException.class, () -> usersResource.create(buildCreateUserRequest(List.of(testRole), PASSWORD), userContext));
+    }
+
+    @Test
+    void createFailsWhenAssigningPermissionTheCreatingUserDoesNotHave() throws NotFoundException {
+        // The creating user is allowed to create users, but does not hold `inputs:create` itself.
+        lenient().when(subject.isPermitted(RestPermissions.USERS_CREATE)).thenReturn(true);
+        lenient().when(subject.isPermitted(RestPermissions.INPUTS_CREATE)).thenReturn(false);
+
+        lenient().when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of());
+        lenient().when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
+        lenient().when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
+
+        final var creator = userImplFactory.create(Map.of(UserImpl.USERNAME, "creator"));
+        lenient().when(userService.loadById("creator")).thenReturn(creator);
+        lenient().when(subject.getPrincipal()).thenReturn(creator.getName());
+
+        final CreateUserRequest request = buildCreateUserRequest(List.of(), PASSWORD, List.of(RestPermissions.INPUTS_CREATE));
+        assertThrows(BadRequestException.class, () -> usersResource.create(request, userContext));
+    }
+
+    @Test
+    void createFailsWhenAssigningRoleContainingPermissionTheCreatingUserDoesNotHave() throws NotFoundException {
+        // The role itself is assignable by the creating user, but it grants `inputs:create`, which the creating user
+        // does not hold itself.
+        final Role roleWithInputsCreate = mock(Role.class);
+        lenient().when(roleWithInputsCreate.getId()).thenReturn(new ObjectId().toHexString());
+        lenient().when(roleWithInputsCreate.getName()).thenReturn(TestUsersResource.ALLOWED_ROLE);
+        lenient().when(roleWithInputsCreate.getPermissions()).thenReturn(Set.of(RestPermissions.INPUTS_CREATE));
+
+        lenient().when(subject.isPermitted(RestPermissions.USERS_CREATE)).thenReturn(true);
+        lenient().when(subject.isPermitted(RestPermissions.INPUTS_CREATE)).thenReturn(false);
+
+        lenient().when(roleService.loadByNames(List.of(TestUsersResource.ALLOWED_ROLE))).thenReturn(Set.of(roleWithInputsCreate));
+        lenient().when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of(TestUsersResource.ALLOWED_ROLE, roleWithInputsCreate));
+        lenient().when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
+        lenient().when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
+
+        final var creator = userImplFactory.create(Map.of(UserImpl.USERNAME, "creator"));
+        lenient().when(userService.loadById("creator")).thenReturn(creator);
+        lenient().when(subject.getPrincipal()).thenReturn(creator.getName());
+
+        final CreateUserRequest request = buildCreateUserRequest(List.of(TestUsersResource.ALLOWED_ROLE), PASSWORD, List.of());
+        final var exception = assertThrows(BadRequestException.class, () -> usersResource.create(request, userContext));
+        assertThat(exception).hasMessage("Cannot assign permissions/roles to new user that current user does not have: inputs:create");
+    }
+
+    @Test
+    void createSucceedsWithoutRoles() throws ValidationException, NotFoundException {
+        lenient().when(subject.isPermitted(RestPermissions.USERS_CREATE)).thenReturn(true);
+        lenient().when(roleService.loadAllIdMap()).thenReturn(Map.of());
+        when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
+
+        final var creator = userImplFactory.create(Map.of(UserImpl.USERNAME, "creator"));
+        lenient().when(userService.loadById("creator")).thenReturn(creator);
+        lenient().when(subject.getPrincipal()).thenReturn(creator.getName());
+
+        // `roles` is @Nullable in CreateUserRequest, so the validation must cope with a missing list.
+        final Response response = usersResource.create(buildCreateUserRequest(null, PASSWORD, List.of()), userContext);
+
+        assertEquals(201, response.getStatus());
+        verify(userManagementService).create(isA(UserImpl.class), eq(creator));
+    }
+
+    @Test
+    void changeUserSucceedsWithoutPermissionsAndRoles() throws ValidationException, NotFoundException {
+        final String userId = "targetId";
+        final var targetUser = userImplFactory.create(Map.of(UserImpl.USERNAME, "target"));
+        when(userManagementService.loadById(userId)).thenReturn(targetUser);
+        when(subject.isPermitted(RestPermissions.USERS_EDIT + ":target")).thenReturn(true);
+        lenient().when(roleService.loadAllIdMap()).thenReturn(Map.of());
+
+        // Both `permissions` and `roles` are @Nullable in ChangeUserRequest, so a request that touches neither must not
+        // fail the validation.
+        final var request = ChangeUserRequest.create(EMAIL, FIRST_NAME, LAST_NAME, null, TIMEZONE, null, null, null, null);
+        usersResource.changeUser(userId, request, userContext);
+
+        verify(userManagementService).update(targetUser, request);
+    }
+
+    @Test
+    void changeUserFailsWhenAssigningPermissionTheEditingUserDoesNotHave() throws ValidationException {
+        final String userId = "targetId";
+        final var targetUser = userImplFactory.create(Map.of(UserImpl.USERNAME, "target"));
+        when(userManagementService.loadById(userId)).thenReturn(targetUser);
+        when(subject.isPermitted(RestPermissions.USERS_EDIT + ":target")).thenReturn(true);
+        // The editing user is allowed to edit permissions, so the submitted list would be applied.
+        lenient().when(subject.isPermitted(RestPermissions.USERS_PERMISSIONSEDIT + ":target")).thenReturn(true);
+
+        // The editing user holds `streams:read`, but not `inputs:create`.
+        lenient().when(userContext.isPermitted(RestPermissions.STREAMS_READ)).thenReturn(true);
+        lenient().when(userContext.isPermitted(RestPermissions.INPUTS_CREATE)).thenReturn(false);
+
+        final var request = buildChangeUserRequest(null, List.of(RestPermissions.STREAMS_READ, RestPermissions.INPUTS_CREATE));
+        final var exception = assertThrows(BadRequestException.class, () -> usersResource.changeUser(userId, request, userContext));
+
+        assertThat(exception)
+                .hasMessageContaining(RestPermissions.INPUTS_CREATE)
+                .hasMessageNotContaining(RestPermissions.STREAMS_READ);
+        verify(userManagementService, never()).update(isA(UserImpl.class), isA(ChangeUserRequest.class));
+    }
+
+    @Test
+    void changeUserFailsWhenAssigningRoleContainingPermissionTheEditingUserDoesNotHave() throws NotFoundException, ValidationException {
+        final String userId = "targetId";
+        final var targetUser = userImplFactory.create(Map.of(UserImpl.USERNAME, "target"));
+        when(userManagementService.loadById(userId)).thenReturn(targetUser);
+        when(subject.isPermitted(RestPermissions.USERS_EDIT + ":target")).thenReturn(true);
+
+        // The editing user is allowed to edit roles, and the role itself is assignable by them.
+        lenient().when(subject.isPermitted(RestPermissions.USERS_ROLESEDIT + ":target")).thenReturn(true);
+
+        final Role roleWithInputsCreate = mock(Role.class);
+        lenient().when(roleWithInputsCreate.getId()).thenReturn(new ObjectId().toHexString());
+        lenient().when(roleWithInputsCreate.getName()).thenReturn(TestUsersResource.ALLOWED_ROLE);
+        lenient().when(roleWithInputsCreate.getPermissions()).thenReturn(Set.of(RestPermissions.INPUTS_CREATE));
+        // The role is looked up by its lowercased name, no matter how the request spells it.
+        lenient().when(roleService.loadByNames(List.of(TestUsersResource.ALLOWED_ROLE))).thenReturn(Set.of(roleWithInputsCreate));
+        lenient().when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of(TestUsersResource.ALLOWED_ROLE, roleWithInputsCreate));
+
+        lenient().when(userContext.isPermitted(RestPermissions.INPUTS_CREATE)).thenReturn(false);
+
+        final var request = buildChangeUserRequest(List.of(TestUsersResource.ALLOWED_ROLE), null);
+        final var exception = assertThrows(BadRequestException.class, () -> usersResource.changeUser(userId, request, userContext));
+
+        assertThat(exception).hasMessageContaining(RestPermissions.INPUTS_CREATE);
+        verify(userManagementService, never()).update(isA(UserImpl.class), isA(ChangeUserRequest.class));
     }
 
     @Test
@@ -349,6 +488,124 @@ public class UsersResourceTest {
     }
 
     @Test
+    void usersCanRevokeTheirOwnToken() {
+        final AccessToken accessToken = prepareRevokeMocks(USERNAME, true, true);
+        try {
+            usersResource.revokeToken(USERNAME, TOKEN_NAME);
+        } finally {
+            verify(accessTokenService).loadById(TOKEN_NAME);
+            verify(accessTokenService).destroy(accessToken);
+            verifyNoMoreInteractions(clusterConfigService, accessTokenService);
+        }
+    }
+
+    @Test
+    void revokingWithoutPermissionThrowsForbidden() {
+        prepareRevokeMocks(USERNAME, false, true);
+        try {
+            assertThrows(ForbiddenException.class, () -> usersResource.revokeToken(USERNAME, TOKEN_NAME));
+        } finally {
+            verify(accessTokenService).loadById(TOKEN_NAME);
+            verifyNoMoreInteractions(clusterConfigService, accessTokenService);
+        }
+    }
+
+    @Test
+    void usersCanNotRevokeOtherUsersToken() {
+        final String accessingUser = "Dee-Dee";
+        prepareRevokeMocks(accessingUser, true, true);
+        try {
+            assertThrows(ForbiddenException.class, () -> usersResource.revokeToken(accessingUser, TOKEN_NAME));
+        } finally {
+            verify(accessTokenService).loadById(TOKEN_NAME);
+            verifyNoMoreInteractions(clusterConfigService, accessTokenService);
+        }
+    }
+
+    @Test
+    void revokingNonExistingTokenThrowsNotFound() {
+        prepareRevokeMocks(USERNAME, true, false);
+        try {
+            assertThrows(jakarta.ws.rs.NotFoundException.class, () -> usersResource.revokeToken(USERNAME, TOKEN_NAME));
+        } finally {
+            verify(accessTokenService).loadById(TOKEN_NAME);
+            verify(accessTokenService).load(TOKEN_NAME);
+            verifyNoMoreInteractions(clusterConfigService, accessTokenService);
+        }
+    }
+
+    private AccessToken prepareRevokeMocks(String urlUser, boolean hasPermission, boolean tokenExists) {
+        // Assuming that the token-owner is always USERNAME.
+        final AccessToken accessToken = tokenExists ? mock(AccessToken.class) : null;
+        if (tokenExists) {
+            when(accessToken.getUserName()).thenReturn(USERNAME);
+        }
+        when(userManagementService.loadById(urlUser)).thenReturn(userImplFactory.create(Map.of(UserImpl.USERNAME, urlUser)));
+        when(subject.isPermitted(USERS_TOKENREMOVE + ":" + urlUser)).thenReturn(hasPermission);
+        when(accessTokenService.loadById(TOKEN_NAME)).thenReturn(accessToken);
+        return accessToken;
+    }
+
+    @Test
+    void changingOwnPasswordTerminatesAllSessions() throws ValidationException {
+        final Session currentSession = sessionWithId("current");
+        final Session otherSession = sessionWithId("other");
+        preparePasswordChange();
+        when(userManagementService.isUserPassword(user, "oldPassword")).thenReturn(true);
+        when(subject.getPrincipal()).thenReturn("userId");
+        when(userService.loadById("userId")).thenReturn(user);
+        when(subject.getSession(false)).thenReturn(currentSession);
+        when(sessionTerminationService.getActiveSessionsForUser(user)).thenReturn(List.of(currentSession, otherSession));
+
+        usersResource.changePassword("userId", ChangePasswordRequest.create("oldPassword", PASSWORD));
+
+        verify(otherSession).stop();
+        verify(securityManager).logout(subject);
+    }
+
+    @Test
+    void passwordResetByAdminTerminatesAllSessionsOfTheUser() throws ValidationException {
+        final User admin = mock(User.class);
+        when(admin.getId()).thenReturn("adminId");
+        final Session firstSession = mock(Session.class);
+        final Session secondSession = mock(Session.class);
+        preparePasswordChange();
+        when(subject.isPermitted(USERS_PASSWORDCHANGE + ":*")).thenReturn(true);
+        when(subject.getPrincipal()).thenReturn("adminId");
+        when(userService.loadById("adminId")).thenReturn(admin);
+        when(subject.getSession(false)).thenReturn(mock(Session.class));
+        when(sessionTerminationService.getActiveSessionsForUser(user)).thenReturn(List.of(firstSession, secondSession));
+
+        usersResource.changePassword("userId", ChangePasswordRequest.create(null, PASSWORD));
+
+        verify(firstSession).stop();
+        verify(secondSession).stop();
+        verify(securityManager, never()).logout(subject);
+    }
+
+    @Test
+    void changingOwnPasswordRequiresOldPasswordEvenWithWildcardPermission() {
+        preparePasswordChange();
+        when(subject.isPermitted(USERS_PASSWORDCHANGE + ":*")).thenReturn(true);
+        when(subject.getPrincipal()).thenReturn("userId");
+
+        assertThrows(BadRequestException.class,
+                () -> usersResource.changePassword("userId", ChangePasswordRequest.create("wrongPassword", PASSWORD)));
+        verifyNoInteractions(sessionTerminationService);
+    }
+
+    private void preparePasswordChange() {
+        when(userManagementService.loadById("userId")).thenReturn(user);
+        when(subject.isPermitted(USERS_PASSWORDCHANGE + ":" + USERNAME)).thenReturn(true);
+    }
+
+    private static Session sessionWithId(String id) {
+        final Session session = mock(Session.class);
+        when(session.getId()).thenReturn(id);
+        return session;
+    }
+
+    @Test
     void getByIdUserWithAdditionalUserIdPermissions() {
         String alice = "alice";
         String bob = "bob";
@@ -387,9 +644,17 @@ public class UsersResourceTest {
         return user;
     }
 
+    private ChangeUserRequest buildChangeUserRequest(List<String> roles, List<String> permissions) {
+        return ChangeUserRequest.create(EMAIL, FIRST_NAME, LAST_NAME, permissions, TIMEZONE, null, null, roles, null);
+    }
+
     private CreateUserRequest buildCreateUserRequest(List<String> roles, String password) {
+        return buildCreateUserRequest(roles, password, Collections.emptyList());
+    }
+
+    private CreateUserRequest buildCreateUserRequest(List<String> roles, String password, List<String> permissions) {
         return CreateUserRequest.create(USERNAME, password, EMAIL,
-                FIRST_NAME, LAST_NAME, Collections.singletonList(""),
+                FIRST_NAME, LAST_NAME, permissions,
                 TIMEZONE, SESSION_TIMEOUT,
                 new DashboardStartPage("dashboard-id"), roles, false);
     }
@@ -460,7 +725,7 @@ public class UsersResourceTest {
                                  DefaultSecurityManager securityManager, GlobalAuthServiceConfig globalAuthServiceConfig,
                                  ClusterConfigService clusterConfigService, UserService userService) {
             super(userManagementService, paginatedUserService, accessTokenService, roleService, sessionService,
-                    sessionTerminationService, securityManager, globalAuthServiceConfig, clusterConfigService, mock(AuditEventSender.class));
+                    sessionTerminationService, securityManager, globalAuthServiceConfig, clusterConfigService, mock(AuditEventSender.class), new PrivilegeEscalationGuard(roleService));
             this.subject = subject;
             super.configuration = configuration;
             super.userService = userService;

@@ -18,7 +18,8 @@ import * as React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import fetch from 'logic/rest/FetchProvider';
+import { Views } from '@graylog/server-api';
+
 import UserNotification from 'util/UserNotification';
 import { asMock } from 'helpers/mocking';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
@@ -26,7 +27,7 @@ import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
 
 import BulkActions from './BulkActions';
 
-jest.mock('logic/rest/FetchProvider', () => jest.fn());
+jest.mock('@graylog/server-api', () => ({ Views: { bulkDelete: jest.fn() } }));
 jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');
 
 jest.mock('util/UserNotification', () => ({
@@ -67,7 +68,7 @@ describe('DashboardsOverview BulkActionsRow', () => {
   });
 
   it('should delete selected dashboards', async () => {
-    asMock(fetch).mockReturnValue(Promise.resolve({ failures: [] }));
+    asMock(Views.bulkDelete).mockReturnValue(Promise.resolve({ failures: [], successfully_performed: 2, errors: [] }));
     const setSelectedEntities = jest.fn();
 
     asMock(useSelectedEntities).mockReturnValue({
@@ -85,7 +86,7 @@ describe('DashboardsOverview BulkActionsRow', () => {
     expect(window.confirm).toHaveBeenCalledWith('Do you really want to remove 2 dashboards?');
 
     await waitFor(() =>
-      expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/views/bulk_delete'), {
+      expect(Views.bulkDelete).toHaveBeenCalledWith({
         entity_ids: ['dashboard-id-1', 'dashboard-id-2'],
       }),
     );
@@ -95,9 +96,11 @@ describe('DashboardsOverview BulkActionsRow', () => {
   });
 
   it('should display warning and not reset dashboards which could not be deleted', async () => {
-    asMock(fetch).mockReturnValue(
+    asMock(Views.bulkDelete).mockReturnValue(
       Promise.resolve({
         failures: [{ entity_id: 'dashboard-id-1', failure_explanation: 'The dashboard cannot be deleted.' }],
+        successfully_performed: 1,
+        errors: [],
       }),
     );
 
@@ -118,7 +121,7 @@ describe('DashboardsOverview BulkActionsRow', () => {
     expect(window.confirm).toHaveBeenCalledWith('Do you really want to remove 2 dashboards?');
 
     await waitFor(() =>
-      expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/views/bulk_delete'), {
+      expect(Views.bulkDelete).toHaveBeenCalledWith({
         entity_ids: ['dashboard-id-1', 'dashboard-id-2'],
       }),
     );

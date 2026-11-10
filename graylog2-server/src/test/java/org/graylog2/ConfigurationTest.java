@@ -21,6 +21,7 @@ import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import org.graylog2.configuration.ConfigurationHelper;
 import org.graylog2.plugin.Tools;
+import org.graylog2.utilities.ProxyConfig;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
@@ -293,6 +294,25 @@ public class ConfigurationTest {
         final Configuration configuration = ConfigurationHelper.initConfig(new Configuration(), validProperties, temporaryFolder);
         assertThat(configuration.getStaleMasterTimeout()).isEqualTo(3000);
         assertThat(configuration.getStaleLeaderTimeout()).isEqualTo(3000);
+    }
+
+    @Test
+    public void httpProxyUriBindsAsProxyConfig() throws Exception {
+        final Configuration configuration = ConfigurationHelper.initConfig(new Configuration(),
+                Map.of("http_proxy_uri", "http://user:pass@proxy.example.com:8123"), temporaryFolder);
+
+        final ProxyConfig proxyConfig = configuration.getHttpProxyConfig().orElseThrow();
+        assertThat(proxyConfig.host()).isEqualTo("proxy.example.com");
+        assertThat(proxyConfig.port()).isEqualTo(8123);
+        assertThat(proxyConfig.credentials()).contains(new ProxyConfig.Credentials("user", "pass"));
+    }
+
+    @Test
+    public void blankHttpProxyUriIsTreatedAsUnset() throws Exception {
+        final Configuration configuration = ConfigurationHelper.initConfig(new Configuration(),
+                Map.of("http_proxy_uri", ""), temporaryFolder);
+
+        assertThat(configuration.getHttpProxyConfig()).isEmpty();
     }
 
     @Test

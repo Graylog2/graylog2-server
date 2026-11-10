@@ -1,0 +1,4 @@
+type = "f"
+message = "Pipeline interpreter no longer silently replaces a valid pipeline state with an empty one when a transient MongoDB error occurs during reload."
+
+issues = ["25750"]

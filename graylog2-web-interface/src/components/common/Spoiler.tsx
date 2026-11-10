@@ -16,6 +16,15 @@
  */
 import * as React from 'react';
 import { Spoiler as MantineSpoiler } from '@mantine/core';
+import styled, { css } from 'styled-components';
+
+const StyledSpoiler = styled(MantineSpoiler)(
+  ({ theme }) => css`
+    .mantine-Spoiler-control {
+      color: ${theme.colors.link.default};
+    }
+  `,
+);
 
 type Props = React.PropsWithChildren<{
   maxHeight: number;
@@ -31,9 +40,9 @@ const Spoiler = ({
   showLabel = 'Show more',
   hideLabel = 'Hide',
 }: Props) => (
-  <MantineSpoiler maxHeight={maxHeight} showLabel={showLabel} hideLabel={hideLabel} className={className}>
+  <StyledSpoiler maxHeight={maxHeight} showLabel={showLabel} hideLabel={hideLabel} className={className}>
     {children}
-  </MantineSpoiler>
+  </StyledSpoiler>
 );
 
 export default Spoiler;

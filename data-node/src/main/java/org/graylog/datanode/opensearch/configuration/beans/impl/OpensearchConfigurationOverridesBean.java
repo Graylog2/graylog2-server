@@ -17,6 +17,7 @@
 package org.graylog.datanode.opensearch.configuration.beans.impl;
 
 import com.google.common.collect.Maps;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
@@ -31,6 +32,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +49,6 @@ public class OpensearchConfigurationOverridesBean implements DatanodeConfigurati
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchConfigurationOverridesBean.class);
     private final Supplier<Map<String, String>> systemEnvSupplier;
-    private final DatanodeDirectories datanodeDirectories;
     private final Path overridesFile;
     private static final Set<Pattern> ALLOWED_OVERRIDES = Set.of(
             "^cluster\\.routing\\.allocation\\.disk\\.watermark\\..*$",
@@ -57,12 +59,11 @@ public class OpensearchConfigurationOverridesBean implements DatanodeConfigurati
     ).stream().map(Pattern::compile).collect(Collectors.toSet());
 
     @Inject
-    public OpensearchConfigurationOverridesBean(DatanodeConfiguration datanodeConfiguration, Configuration configuration) {
-        this(datanodeConfiguration.datanodeDirectories(), configuration.getOpensearchConfigurationOverridesFile(), System::getenv);
+    public OpensearchConfigurationOverridesBean(Configuration configuration) {
+        this(configuration.getOpensearchConfigurationOverridesFile(), System::getenv);
     }
 
-    public OpensearchConfigurationOverridesBean(DatanodeDirectories datanodeDirectories, Path overridesFile, Supplier<Map<String, String>> systemEnvSupplier) {
-        this.datanodeDirectories = datanodeDirectories;
+    public OpensearchConfigurationOverridesBean(Path overridesFile, Supplier<Map<String, String>> systemEnvSupplier) {
         this.overridesFile = overridesFile;
         this.systemEnvSupplier = systemEnvSupplier;
     }
@@ -82,7 +83,7 @@ public class OpensearchConfigurationOverridesBean implements DatanodeConfigurati
                 .forEach(entry -> properties.put(entry.getKey().substring("opensearch.".length()), entry.getValue()));
 
         if (overridesFile != null) {
-            datanodeDirectories.resolveConfigurationSourceFile(overridesFile)
+            configurationParams.datanodeConfiguration().datanodeDirectories().resolveConfigurationSourceFile(overridesFile)
                     .map(this::readPropertiesFile)
                     .ifPresentOrElse(properties::putAll, () -> LOG.error("Could not read opensearch overrides file {}", overridesFile));
         }
@@ -97,7 +98,22 @@ public class OpensearchConfigurationOverridesBean implements DatanodeConfigurati
         return properties.entrySet().stream()
                 .filter(this::shouldPrintWarning)
                 .map(this::formatWarning)
-                .collect(Collectors.toList());
+                .collect(Collectors.collectingAndThen(Collectors.toList(), list -> {
+                    if(list.isEmpty()) {
+                        return Collections.emptyList();
+                    } else {
+                        return prependOverridesWarning(list);
+                    }
+                }));
+    }
+
+    @Nonnull
+    private static List<String> prependOverridesWarning(List<String> list) {
+        final List<String> warnings = new ArrayList<>(list.size() + 1);
+        warnings.add("Your system is overriding forbidden opensearch configuration properties. " +
+                "This may cause unexpected results and may break in any future release!");
+        warnings.addAll(list);
+        return warnings;
     }
 
     protected String formatWarning(Map.Entry<String, String> entry) {

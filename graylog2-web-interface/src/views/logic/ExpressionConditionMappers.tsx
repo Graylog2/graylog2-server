@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type { ValueExpr } from 'hooks/useEventDefinition';
 import type { Condition } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 
 export const exprToConditionMapper: { [name: string]: Condition } = {
@@ -24,12 +23,4 @@ export const exprToConditionMapper: { [name: string]: Condition } = {
   '>=': 'greater_equal',
   '>': 'greater',
   '==': 'equal',
-};
-
-export const conditionToExprMapper: { [name: string]: ValueExpr } = {
-  less: '<',
-  less_equal: '<=',
-  greater_equal: '>=',
-  greater: '>',
-  equal: '==',
 };

@@ -22,9 +22,10 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import org.apache.commons.io.FileUtils;
 import org.graylog.datanode.Configuration;
-import org.graylog.datanode.configuration.DatanodeDirectories;
+import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.configuration.snapshots.RepositoryConfiguration;
+import org.graylog.datanode.configuration.snapshots.RepositoryConfigurationProvider;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
 import org.graylog.datanode.opensearch.configuration.OpensearchUsableSpace;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
@@ -38,12 +39,16 @@ import org.slf4j.LoggerFactory;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * This opensearch configuration bean manages searchable snapshots and their S3 or local filesystem configuration.
@@ -59,62 +64,61 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
     private static final Logger LOG = LoggerFactory.getLogger(SearchableSnapshotsConfigurationBean.class);
 
     private final Configuration localConfiguration;
-    private final DatanodeDirectories datanodeDirectories;
 
-    private final Set<RepositoryConfiguration> repositoryConfigurations;
-
+    private final Set<RepositoryConfigurationProvider> repositoryProviders;
 
     private final Provider<OpensearchUsableSpace> usableSpaceProvider;
 
     @Inject
     public SearchableSnapshotsConfigurationBean(
             Configuration localConfiguration,
-            DatanodeDirectories datanodeDirectories,
-            Set<RepositoryConfiguration> repositoryConfigurations,
+            DatanodeConfiguration datanodeConfiguration,
+            Set<RepositoryConfigurationProvider> repositoryProviders,
             Provider<OpensearchUsableSpace> usableSpaceProvider) {
         this.localConfiguration = localConfiguration;
-        this.datanodeDirectories = datanodeDirectories;
-        this.repositoryConfigurations = repositoryConfigurations;
+        this.repositoryProviders = repositoryProviders;
         this.usableSpaceProvider = usableSpaceProvider;
     }
 
     @Override
-    public DatanodeConfigurationPart buildConfigurationPart(OpensearchConfigurationParams trustedCertificates) {
+    public DatanodeConfigurationPart buildConfigurationPart(OpensearchConfigurationParams configurationParams) {
+        final String searchableSnapshotsRole = configurationParams.datanodeConfiguration().opensearchDistribution().distributionProperties().searchableSnapshotsRole();
 
-        final Set<RepositoryConfiguration> enabledRepositories = repositoryConfigurations.stream()
+        final List<RepositoryConfiguration> enabledRepositories = repositoryProviders.stream()
+                .flatMap(provider -> provider.get().stream())
                 .filter(RepositoryConfiguration::isRepositoryEnabled)
-                .collect(Collectors.toSet());
+                .toList();
 
         if (!enabledRepositories.isEmpty()) {
             LOG.info("Searchable snapshots are configured, adding opensearch configuration");
             final DatanodeConfigurationPart.Builder builder = DatanodeConfigurationPart.builder();
 
-            final boolean warmRoleEnabled = warmRoleEnabled();
-            if (warmRoleEnabled) {
-                LOG.info("Warm role enabled, validating usable space and adding warm role to opensearch configuration");
+            final boolean searchRoleEnabled = searchRoleEnabled(searchableSnapshotsRole);
+            if (searchRoleEnabled) {
+                LOG.info("Search role enabled, validating usable space and adding search role to opensearch configuration");
                 validateUsableSpace();
-                builder.addNodeRole(OpensearchNodeRole.WARM);
+                builder.addNodeRole(searchableSnapshotsRole);
             }
             return builder
-                    .properties(properties(warmRoleEnabled, enabledRepositories))
-                    .keystoreItems(keystoreItems(enabledRepositories))
+                    .properties(properties(searchRoleEnabled, enabledRepositories))
+                    .keystoreItems(keystoreItems(enabledRepositories, configurationParams))
                     .build();
-        } else if (warmRoleExplicitlyConfigured()) {
-            throw new OpensearchConfigurationException("Your configuration contains the warm node role in node_roles but there is no" +
+        } else if (searchRoleExplicitlyConfigured(searchableSnapshotsRole)) {
+            throw new OpensearchConfigurationException("Your configuration contains the search node role in node_roles but there is no" +
                     "snapshots repository configured. Please remove the role or provide path_repo or S3 repository credentials.");
         } else {
-            LOG.info("Opensearch snapshots not configured, skipping warm role and cache configuration.");
+            LOG.info("Opensearch snapshots not configured, skipping search role and cache configuration.");
             return DatanodeConfigurationPart.builder().build();
         }
     }
 
-    private boolean warmRoleExplicitlyConfigured() {
-        return localConfiguration.getNodeRoles() != null && localConfiguration.getNodeRoles().contains(OpensearchNodeRole.WARM);
+    private boolean searchRoleExplicitlyConfigured(String searchableSnapshotsRole) {
+        return localConfiguration.getNodeRoles() != null && localConfiguration.getNodeRoles().contains(searchableSnapshotsRole);
     }
 
-    private boolean warmRoleEnabled() {
+    private boolean searchRoleEnabled(String searchableSnapshotsRole) {
         final boolean rolesNotConfigured = localConfiguration.getNodeRoles() == null || localConfiguration.getNodeRoles().isEmpty();
-        return rolesNotConfigured || localConfiguration.getNodeRoles().contains(OpensearchNodeRole.WARM);
+        return rolesNotConfigured || localConfiguration.getNodeRoles().contains(searchableSnapshotsRole);
     }
 
     private void validateUsableSpace() throws OpensearchConfigurationException {
@@ -167,23 +171,30 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
         return returnValue;
     }
 
-    private Map<String, String> properties(boolean searchRoleEnabled, Set<RepositoryConfiguration> enabledRepositories) {
-        final ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+    private Map<String, String> properties(boolean searchRoleEnabled, List<RepositoryConfiguration> enabledRepositories) {
+        final Map<String, String> properties = new LinkedHashMap<>();
 
         if (searchRoleEnabled) { // configure cache only if we also have the search role
-            builder.put("node.search.cache.size", localConfiguration.getNodeSearchCacheSize());
+            properties.put("node.search.cache.size", localConfiguration.getNodeSearchCacheSize());
         }
 
-        enabledRepositories.stream()
-                .map(RepositoryConfiguration::opensearchProperties)
-                .forEach(builder::putAll);
+        enabledRepositories.forEach(repo -> repo.opensearchProperties().forEach((key, value) ->
+                properties.merge(key, value, (existing, conflicting) -> Objects.equals(existing, conflicting)
+                        ? existing
+                        : repo.mergeProperty(key, existing, conflicting))));
 
-        return builder.build();
+        return ImmutableMap.copyOf(properties);
     }
 
-    private Collection<OpensearchKeystoreItem> keystoreItems(Set<RepositoryConfiguration> enabledRepositories) {
-        return enabledRepositories.stream()
-                .flatMap(repo -> repo.keystoreItems(datanodeDirectories).stream())
-                .collect(Collectors.toSet());
+    private Collection<OpensearchKeystoreItem> keystoreItems(List<RepositoryConfiguration> enabledRepositories, OpensearchConfigurationParams configurationParams) {
+        final Map<String, OpensearchKeystoreItem> items = new LinkedHashMap<>();
+        enabledRepositories.stream()
+                .flatMap(repo -> repo.keystoreItems(configurationParams.datanodeConfiguration().datanodeDirectories()).stream())
+                .forEach(item -> {
+                    if (items.putIfAbsent(item.key(), item) != null) {
+                        throw new OpensearchConfigurationException(f("Conflicting snapshot repository configuration, keystore item %s is provided by more repositories. Please use distinct client names.", item.key()));
+                    }
+                });
+        return List.copyOf(items.values());
     }
 }

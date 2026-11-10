@@ -18,7 +18,7 @@ package org.graylog2.datanode;
 
 import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
-import org.graylog.plugins.datanode.DatanodeUpgradeServiceAdapter;
+import org.graylog.plugins.datanode.DatanodeClusterAdminAdapter;
 import org.graylog.plugins.datanode.dto.ClusterState;
 import org.graylog.plugins.datanode.dto.FlushResponse;
 import org.graylog.plugins.datanode.dto.ManagerNode;
@@ -48,7 +48,7 @@ class DatanodeUpgradeServiceTest {
         nodeService.registerServer(buildTestNode("3", DataNodeStatus.AVAILABLE, Version.from(6, 2, 1), false));
 
         final DatanodeUpgradeService upgradeService = new DatanodeUpgradeService(
-                mockUpgradeAdapter(nodeService, HealthStatus.Green, ShardReplication.ALL),
+                mockClusterAdmin(nodeService, HealthStatus.Green, ShardReplication.ALL),
                 nodeService,
                 Version.from(6, 2, 1));
 
@@ -84,7 +84,7 @@ class DatanodeUpgradeServiceTest {
         nodeService.registerServer(buildTestNode("1", DataNodeStatus.AVAILABLE, datanodeVersion, true));
 
         final DatanodeUpgradeService upgradeService = new DatanodeUpgradeService(
-                mockUpgradeAdapter(nodeService, HealthStatus.Green, ShardReplication.ALL),
+                mockClusterAdmin(nodeService, HealthStatus.Green, ShardReplication.ALL),
                 nodeService,
                 serverVersion);
 
@@ -113,7 +113,7 @@ class DatanodeUpgradeServiceTest {
         nodeService.registerServer(buildTestNode("3", DataNodeStatus.AVAILABLE, Version.from(6, 1, 0), true));
 
         final DatanodeUpgradeService upgradeService = new DatanodeUpgradeService(
-                mockUpgradeAdapter(nodeService, HealthStatus.Green, ShardReplication.ALL),
+                mockClusterAdmin(nodeService, HealthStatus.Green, ShardReplication.ALL),
                 nodeService,
                 Version.from(6, 2, 1));
 
@@ -151,10 +151,10 @@ class DatanodeUpgradeServiceTest {
     }
 
     @Nonnull
-    private static DatanodeUpgradeServiceAdapter mockUpgradeAdapter(NodeService<DataNodeDto> nodeService, final HealthStatus clusterStatus, final ShardReplication shardReplication) {
+    private static DatanodeClusterAdminAdapter mockClusterAdmin(NodeService<DataNodeDto> nodeService, final HealthStatus clusterStatus, final ShardReplication shardReplication) {
         final List<Node> nodes = nodeService.allActive().values().stream().map(DatanodeUpgradeServiceTest::toOpensearchNode).collect(Collectors.toList());
         final ManagerNode managerNode = nodeService.allActive().values().stream().filter(NodeDto::isLeader).findFirst().map(n -> new ManagerNode(n.getNodeId(), n.getHostname())).orElseThrow(() -> new IllegalStateException("No manager node found"));
-        return new DatanodeUpgradeServiceAdapter() {
+        return new DatanodeClusterAdminAdapter() {
             @Override
             public ClusterState getClusterState() {
                 return new ClusterState(

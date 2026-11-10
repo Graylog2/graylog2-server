@@ -283,6 +283,52 @@ describe('AggregationWizard/Core Visualizations', () => {
             visualizationConfig: expect.objectContaining({
               trend: true,
               trendPreference: 'HIGHER',
+              colorPreference: 'TREND_ONLY',
+            }),
+          }),
+        ),
+      );
+    },
+    testTimeout,
+  );
+
+  it(
+    'only shows Highlight once a non-neutral Trend Preference is selected, and allows overriding its default',
+    async () => {
+      const onChange = jest.fn();
+
+      render(<SimpleAggregationWizard onChange={onChange} />);
+
+      await selectEvent.chooseOption('Select visualization type', 'Single Number');
+
+      await userEvent.click(await screen.findByRole('checkbox', { name: 'Trend' }));
+
+      await screen.findByText('Trend Preference');
+
+      expect(screen.queryByText('Highlight')).not.toBeInTheDocument();
+
+      await selectEvent.chooseOption('Select Trend Preference', 'Neutral');
+
+      expect(screen.queryByText('Highlight')).not.toBeInTheDocument();
+
+      await selectEvent.chooseOption('Select Trend Preference', 'Higher');
+
+      await screen.findByText('Highlight');
+
+      await selectEvent.chooseOption('Select Highlight', 'Entire widget');
+
+      await expectSubmitButtonNotToBeDisabled();
+
+      await userEvent.click(await submitButton());
+
+      await waitFor(() =>
+        expect(onChange).toHaveBeenCalledWith(
+          expect.objectContaining({
+            visualization: 'numeric',
+            visualizationConfig: expect.objectContaining({
+              trend: true,
+              trendPreference: 'HIGHER',
+              colorPreference: 'FULL_WIDGET',
             }),
           }),
         ),

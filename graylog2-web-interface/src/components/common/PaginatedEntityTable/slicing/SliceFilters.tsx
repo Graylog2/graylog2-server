@@ -25,16 +25,15 @@ import SearchForm from 'components/common/SearchForm';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
-export const ALPHABETICAL_SORT = 'alphabetical';
+export type { SortMode, SortDirection } from './slicingConstants';
+export { ALPHABETICAL_SORT, defaultSortDirectionForMode } from './slicingConstants';
 
-export type SortMode = string;
-export type SortDirection = 'asc' | 'desc';
+import { ALPHABETICAL_SORT } from './slicingConstants';
+import type { SortMode, SortDirection } from './slicingConstants';
+
 export type SortOption = { value: SortMode; label: string };
 
 export const DEFAULT_SORT_OPTIONS: Array<SortOption> = [{ value: ALPHABETICAL_SORT, label: 'Alphabetical' }];
-
-export const defaultSortDirectionForMode = (mode: SortMode): SortDirection =>
-  mode === ALPHABETICAL_SORT ? 'asc' : 'desc';
 
 const Controls = styled.div(
   ({ theme }) => css`
@@ -93,13 +92,12 @@ const SliceFilters = ({
   sortDirection,
   onSortDirectionChange,
 }: Props) => {
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry(appSection);
   const selectedSortOption = sortOptions.find((option) => option.value === sortMode) ?? DEFAULT_SORT_OPTIONS[0];
 
   const handleSearchChange = (value: string) => {
     onSearchQueryChange(value);
     sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SLICE_SEARCH_CHANGED, {
-      app_section: appSection,
       event_details: {
         attribute_id: sliceCol,
         has_query: value.length > 0,
@@ -109,25 +107,22 @@ const SliceFilters = ({
   const handleSearchReset = () => {
     onSearchReset();
     sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SLICE_SEARCH_CHANGED, {
-      app_section: appSection,
       event_details: {
         attribute_id: sliceCol,
         reset: true,
       },
     });
   };
-  const handleSortChange = (mode: SortMode) => {
+  const handleSortModeChange = (mode: SortMode) => {
     if (mode === sortMode) {
       return;
     }
 
     onSortModeChange(mode);
     sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SLICE_SORT_CHANGED, {
-      app_section: appSection,
       event_details: {
         attribute_id: sliceCol,
         sort_mode: mode,
-        sort_direction: defaultSortDirectionForMode(mode),
       },
     });
   };
@@ -136,7 +131,6 @@ const SliceFilters = ({
 
     onSortDirectionChange(nextDirection);
     sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SLICE_SORT_CHANGED, {
-      app_section: appSection,
       event_details: {
         attribute_id: sliceCol,
         sort_mode: sortMode,
@@ -152,7 +146,10 @@ const SliceFilters = ({
       title={selectedSortOption.label}
       buttonTitle={`Sort by ${selectedSortOption.label}`}>
       {sortOptions.map((option) => (
-        <MenuItem key={option.value} onClick={() => handleSortChange(option.value)} active={sortMode === option.value}>
+        <MenuItem
+          key={option.value}
+          onClick={() => handleSortModeChange(option.value)}
+          active={sortMode === option.value}>
           {option.label}
         </MenuItem>
       ))}
@@ -173,7 +170,7 @@ const SliceFilters = ({
         {sortControl}
         <IconButton
           name={sortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward'}
-          title={`Sort ${sortDirection === 'asc' ? 'ascending' : 'descending'}`}
+          title={`Sort ${sortDirection === 'asc' ? 'descending' : 'ascending'}`}
           onClick={handleSortDirectionChange}
         />
       </ControlsRow>

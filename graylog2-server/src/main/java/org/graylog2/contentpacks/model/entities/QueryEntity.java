@@ -38,6 +38,8 @@ import org.graylog2.contentpacks.exceptions.ContentPackException;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -54,12 +56,15 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.collect.ImmutableSortedSet.of;
 import static java.util.stream.Collectors.toSet;
 import static org.graylog2.contentpacks.facades.StreamReferenceFacade.resolveStreamEntityObject;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @AutoValue
 @JsonAutoDetect
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonDeserialize(builder = QueryEntity.Builder.class)
 public abstract class QueryEntity implements NativeEntityConverter<Query> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(QueryEntity.class);
 
     @JsonProperty
     public abstract String id();
@@ -150,15 +155,29 @@ public abstract class QueryEntity implements NativeEntityConverter<Query> {
                           .map(filter -> {
                               if (filter.type().matches(StreamFilter.NAME)) {
                                   final StreamFilter streamFilter = (StreamFilter) filter;
-                                  final Stream stream = (Stream) resolveStreamEntityObject(streamFilter.streamId(), nativeEntities);
-                                  if (Objects.isNull(stream)) {
-                                      throw new ContentPackException("Could not find matching stream id: " +
-                                              streamFilter.streamId());
+                                  final Object object = resolveStreamEntityObject(streamFilter.streamId(), nativeEntities);
+                                  if (object == null) {
+                                      // Skip a dangling stream reference instead of aborting the whole content pack
+                                      // installation. Note this import side is deliberately more tolerant than the
+                                      // export side (Query.shallowMappedFilter), which still throws on an unresolvable
+                                      // reference.
+                                      LOG.warn("Skipping unresolvable stream reference <{}> in query filter for query <{}> during content pack installation",
+                                              streamFilter.streamId(), id());
+                                      return null;
+                                  } else if (object instanceof final Stream stream) {
+                                      return streamFilter.toBuilder().streamId(stream.getId()).build();
+                                  } else {
+                                      // A non-null, non-Stream value indicates a corrupt entity map rather than a
+                                      // missing reference, so abort the installation like the other view resolvers.
+                                      throw new ContentPackException(
+                                              f("Invalid type for stream <%s> in query <%s>: %s",
+                                                      streamFilter.streamId(), id(), object.getClass()));
                                   }
-                                  return streamFilter.toBuilder().streamId(stream.getId()).build();
                               }
                               return filter;
-                          }).collect(Collectors.toSet());
+                          })
+                          .filter(Objects::nonNull)
+                          .collect(Collectors.toSet());
                   return optFilter.toGenericBuilder().filters(newFilters).build();
                })
                .orElse(null);

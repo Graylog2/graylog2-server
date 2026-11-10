@@ -1,0 +1,5 @@
+type = "a"
+message = "Implement pipelines processing-load endpoint."
+
+issues = ["Graylog2/graylog-plugin-enterprise#14144"]
+pulls = ["26024"]

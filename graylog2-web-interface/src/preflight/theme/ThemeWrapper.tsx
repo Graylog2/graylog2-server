@@ -17,10 +17,12 @@
 import React, { useMemo } from 'react';
 import { createGlobalStyle, useTheme } from 'styled-components';
 import { MantineProvider } from '@mantine/core';
-import SawmillMantine from '@graylog/sawmill/mantine';
+
+import SawmillMantine from 'theme/sawmill/mantine/Sawmill';
 
 type Props = {
   children: React.ReactElement;
+  env?: 'default' | 'test';
 };
 
 const GlobalStyles = createGlobalStyle`
@@ -30,12 +32,12 @@ const GlobalStyles = createGlobalStyle`
   },
 `;
 
-const ThemeWrapper = ({ children }: Props) => {
+const ThemeWrapper = ({ children, env = undefined }: Props) => {
   const theme = useTheme();
   const mantineTheme = useMemo(() => SawmillMantine({ colorScheme: theme.mode }), [theme.mode]);
 
   return (
-    <MantineProvider theme={mantineTheme}>
+    <MantineProvider theme={mantineTheme} env={env}>
       <GlobalStyles />
       {children}
     </MantineProvider>

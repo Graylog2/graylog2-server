@@ -16,13 +16,20 @@
  */
 import * as React from 'react';
 
-import { DocumentTitle } from 'components/common';
+import { DocumentTitle, Spinner } from 'components/common';
 import Welcome from 'components/welcome/Welcome';
+import useShowOnboardingWizard from 'components/welcome/useShowOnboardingWizard';
+import FirstUseWelcome from 'components/welcome/FirstUseWelcome';
 
-const WelcomePage = () => (
-  <DocumentTitle title="Welcome">
-    <Welcome />
-  </DocumentTitle>
-);
+const WelcomePage = () => {
+  const showOnboardingWizard = useShowOnboardingWizard();
+  if (showOnboardingWizard === 'LOADING') {
+    return <Spinner />;
+  }
+
+  return (
+    <DocumentTitle title="Welcome">{showOnboardingWizard === 'SHOW' ? <FirstUseWelcome /> : <Welcome />}</DocumentTitle>
+  );
+};
 
 export default WelcomePage;

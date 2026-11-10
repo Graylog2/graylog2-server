@@ -1,0 +1,5 @@
+type = "f"
+message = "Removing title from help-component for Alerts/Events because events have no title."
+
+issues = ["14049"]
+pulls = ["26401", "Graylog2/graylog-plugin-enterprise#14516"]

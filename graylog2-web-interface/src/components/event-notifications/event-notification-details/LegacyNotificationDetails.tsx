@@ -15,12 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState } from 'react';
 
 import { ReadOnlyFormGroup, Spinner } from 'components/common';
 import { Alert, Well } from 'components/bootstrap';
-import type { LegacyEventNotification } from 'stores/event-notifications/EventNotificationsStore';
-import { EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
+import { useLegacyEventNotificationTypes } from 'components/event-notifications/hooks/useEventNotifications';
 
 import emailStyles from '../event-notification-types/EmailNotificationSummary.css';
 import notificationStyles from '../event-notification-types/LegacyNotificationCommonStyles.css';
@@ -29,17 +27,12 @@ type LegacyNotificationDetailsProps = {
   notification: any;
 };
 
-type LegacyTypes = { [key: string]: LegacyEventNotification };
-
 const LegacyNotificationDetails = ({ notification }: LegacyNotificationDetailsProps) => {
-  const [legacyTypes, setLegacyTypes] = useState<LegacyTypes>();
+  const { data } = useLegacyEventNotificationTypes();
+  const legacyTypes = data?.types;
   const configurationValues = notification.config.configuration;
   const callbackType = notification.config.callback_type;
   const typeData = legacyTypes?.[callbackType];
-
-  useEffect(() => {
-    EventNotificationsActions.listAllLegacyTypes().then((result) => setLegacyTypes(result.types));
-  }, []);
 
   if (!legacyTypes) {
     return (

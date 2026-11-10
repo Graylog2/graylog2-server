@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix stream rule update request payload"
+
+pulls = ["25618"]
+issues = ["25609"]

@@ -29,7 +29,7 @@ describe('StreamsFilter', () => {
       { key: 'Yet another Stream', value: 'streamId3' },
       { key: '101 Stream', value: 'streamId4' },
     ];
-    render(<StreamsFilter streams={streams} onChange={() => {}} />);
+    render(<StreamsFilter streams={streams} streamCategories={[]} onChange={() => {}} />);
 
     await selectEvent.assertOptionExists('select streams', [
       '101 Stream',

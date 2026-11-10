@@ -1,0 +1,5 @@
+type = "a"
+message = "Add optional store_full_message field to AWS Kinesis/CloudWatch input."
+
+issues = ["Graylog2/graylog-plugin-enterprise#14362"]
+pulls = ["26820"]

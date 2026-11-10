@@ -41,7 +41,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public class OSPercentageHandler extends OSPivotSeriesSpecHandler<Percentage> {
-    private static final Logger LOG = LoggerFactory.getLogger(OSCountHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OSPercentageHandler.class);
     private final OSCountHandler osCountHandler;
     private final OSSumHandler osSumHandler;
 

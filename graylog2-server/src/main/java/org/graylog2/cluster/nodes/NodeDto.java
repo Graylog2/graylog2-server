@@ -17,11 +17,20 @@
 package org.graylog2.cluster.nodes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.bson.BsonTimestamp;
 import org.graylog2.cluster.Node;
 import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nullable;
+import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -32,7 +41,7 @@ public abstract class NodeDto implements Node, MongoEntity {
 
     @Override
     public String id() {
-        return getId();
+        return getObjectId();
     }
 
     @JsonProperty("object_id")
@@ -92,6 +101,7 @@ public abstract class NodeDto implements Node, MongoEntity {
         public abstract B setTransportAddress(@Nullable String transportAddress);
 
         @JsonProperty("last_seen")
+        @JsonDeserialize(using = LastSeenDeserializer.class)
         public abstract B setLastSeen(DateTime lastSeen);
 
         @JsonProperty("hostname")
@@ -102,4 +112,27 @@ public abstract class NodeDto implements Node, MongoEntity {
 
     }
 
+    /**
+     * Reads {@code last_seen} as either a Mongo Date (current) or a numeric epoch-seconds value (legacy).
+     */
+    static class LastSeenDeserializer extends JsonDeserializer<DateTime> {
+        @Override
+        public DateTime deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+            final JsonToken t = p.currentToken();
+            if (t == JsonToken.VALUE_EMBEDDED_OBJECT) {
+                final Object embedded = p.getEmbeddedObject();
+                if (embedded instanceof Date date) {
+                    return new DateTime(date, DateTimeZone.UTC);
+                }
+                if (embedded instanceof BsonTimestamp ts) {
+                    return new DateTime(ts.getTime() * 1000L, DateTimeZone.UTC);
+                }
+                return (DateTime) ctxt.handleUnexpectedToken(DateTime.class, p);
+            }
+            if (t.isNumeric()) {
+                return new DateTime(p.getLongValue() * 1000L, DateTimeZone.UTC);
+            }
+            return DateTime.parse(p.getValueAsString()).withZone(DateTimeZone.UTC);
+        }
+    }
 }

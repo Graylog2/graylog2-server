@@ -28,6 +28,7 @@ import type { VisualizationComponent } from 'views/components/aggregationbuilder
 import type { WidgetActionType } from 'views/components/widgets/Types';
 import type { Creator } from 'views/components/sidebar/create/AddWidgetButton';
 import type { ViewHook } from 'views/logic/hooks/ViewHook';
+import type { IsPermitted } from 'hooks/usePermissions';
 import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import type { Completer } from 'views/components/searchbar/SearchBarAutocompletions';
@@ -68,6 +69,7 @@ import type { EntityPermissionsMapper } from 'logic/permissions/EntityPermission
 import type { WidgetsState } from 'views/logic/slices/widgetsSlice';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import type { DEFAULT_AXIS_KEY } from 'views/components/visualizations/Constants';
+import type { Key } from 'views/logic/searchtypes/pivot/PivotHandler';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
   ? ElementType
@@ -276,9 +278,14 @@ export interface ActionContexts {
   view: View;
   analysisDisabledFields: Array<string>;
   currentUser: User;
+  isPermitted: IsPermitted;
   widget: Widget;
   message: Message;
   valuePath: ValuePath;
+  // How to combine the entries of `valuePath` when generating a query clause. Defaults to 'AND'
+  // (combined groupings); 'OR' is used e.g. for a network-graph node queried across all groupings;
+  // 'EDGE' builds the symmetric two-field clause for a network-graph edge.
+  valuePathOperator?: 'AND' | 'OR' | 'EDGE';
   isLocalNode: boolean;
   parameters?: Immutable.Set<Parameter>;
   parameterBindings?: ParameterBindings;
@@ -464,8 +471,10 @@ interface MessageRowOverrideProps {
 
 export interface CombinedSearchBarFormValues {
   timerange?: TimeRange | NoTimeRangeOverride;
-  streams?: Array<string>;
-  streamCategories?: Array<string>;
+  streamsAndCategories?: {
+    streams: Array<string>;
+    categories?: Array<string>;
+  };
   queryString?: string;
 }
 
@@ -509,8 +518,8 @@ export type FiltersType = Immutable.List<SearchFilter>;
 export type SaveViewControls = {
   component: React.ComponentType<{ disabledViewCreation?: boolean }>;
   id: string;
-  onSearchDuplication?: (view: View, userPermissions: Immutable.List<string>) => Promise<View>;
-  onDashboardDuplication?: (view: View, userPermissions: Immutable.List<string>) => Promise<View>;
+  onSearchDuplication?: (view: View, isPermitted: IsPermitted) => Promise<View>;
+  onDashboardDuplication?: (view: View, isPermitted: IsPermitted) => Promise<View>;
 };
 
 export type CustomCommandArgument<T> = {
@@ -631,8 +640,13 @@ export type EventReplaySideBarDetailsProps = {
   definitionId?: string;
 };
 
+export type EventDefinitionSideBarDetailsProps = {
+  definitionId: string;
+};
+
 export type EventReplaySideBarPlugin = {
   component: React.ComponentType<EventReplaySideBarDetailsProps>;
+  eventDefinitionComponent?: React.ComponentType<EventDefinitionSideBarDetailsProps>;
   key: string;
   useCondition?: () => boolean;
 };
@@ -652,6 +666,10 @@ declare module 'graylog-web-plugin/plugin' {
     fieldTypeValueRenderer?: Array<{
       type: string;
       render: (value: unknown, field: string, render: React.ComponentType<ValueRendererProps>) => React.ReactNode;
+    }>;
+    visualizationKeyMappers?: Array<{
+      type: string;
+      useKeyMapper: (keys: Array<string>) => (key: Key) => Key;
     }>;
     messageAugmentations?: Array<MessageAugmentation>;
     searchTypes?: Array<SearchType<any, any>>;

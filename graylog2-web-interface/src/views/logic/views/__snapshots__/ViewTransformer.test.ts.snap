@@ -12,6 +12,7 @@ exports[`ViewTransformer transform with all attributes should transform a view w
     "owner": "admin",
     "properties": Immutable.List [],
     "requires": undefined,
+    "scope": undefined,
     "search": {
       "id": "5da42aa9c6eb193adff63b1b",
       "parameters": [],

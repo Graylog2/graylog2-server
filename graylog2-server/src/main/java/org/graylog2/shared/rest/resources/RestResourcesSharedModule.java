@@ -18,6 +18,7 @@ package org.graylog2.shared.rest.resources;
 
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.shared.rest.documentation.openapi.OpenApiResource;
+import org.graylog2.shared.rest.resources.documentation.ApiBrowserRedirectResource;
 import org.graylog2.shared.rest.resources.documentation.DocumentationResource;
 import org.graylog2.shared.rest.resources.system.LoadBalancerStatusResource;
 import org.graylog2.shared.rest.resources.system.MetricsResource;
@@ -32,6 +33,7 @@ public class RestResourcesSharedModule extends Graylog2Module {
     protected void configure() {
         addSystemRestResource(OpenApiResource.class);
         addSystemRestResource(DocumentationResource.class);
+        addSystemRestResource(ApiBrowserRedirectResource.class);
         addSystemRestResource(CodecTypesResource.class);
         addSystemRestResource(InputTypesResource.class);
         addSystemRestResource(LoadBalancerStatusResource.class);

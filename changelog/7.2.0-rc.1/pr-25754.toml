@@ -1,0 +1,4 @@
+type = "f"
+message = "Enforce clusterconfiguration:read permission on Cluster Configuration API endpoints"
+
+pulls = ["25754"]

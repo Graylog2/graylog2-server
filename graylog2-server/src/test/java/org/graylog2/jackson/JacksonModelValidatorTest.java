@@ -48,12 +48,12 @@ class JacksonModelValidatorTest {
             String type();
         }
 
-        record Employee(@JsonProperty("type") String type,
-                        @JsonProperty("employee_number") String employeeNumber) implements Person {
+        private record Employee(@JsonProperty("type") String type,
+                                @JsonProperty("employee_number") String employeeNumber) implements Person {
         }
 
-        record Customer(@JsonProperty("type") String type,
-                        @JsonProperty("customer_number") String customerNumber) implements Person {
+        private record Customer(@JsonProperty("type") String type,
+                                @JsonProperty("customer_number") String customerNumber) implements Person {
         }
 
         @Test
@@ -86,10 +86,10 @@ class JacksonModelValidatorTest {
         private interface Person {
         }
 
-        record Employee(@JsonProperty("employee_number") String employeeNumber) implements Person {
+        private record Employee(@JsonProperty("employee_number") String employeeNumber) implements Person {
         }
 
-        record Customer(@JsonProperty("customer_number") String customerNumber) implements Person {
+        private record Customer(@JsonProperty("customer_number") String customerNumber) implements Person {
         }
 
         @Test
@@ -128,12 +128,12 @@ class JacksonModelValidatorTest {
             String type();
         }
 
-        record Employee(@JsonProperty("type") String type,
-                        @JsonProperty("employee_number") String employeeNumber) implements Person {
+        private record Employee(@JsonProperty("type") String type,
+                                @JsonProperty("employee_number") String employeeNumber) implements Person {
         }
 
-        record Customer(@JsonProperty("type") String type,
-                        @JsonProperty("customer_number") String customerNumber) implements Person {
+        private record Customer(@JsonProperty("type") String type,
+                                @JsonProperty("customer_number") String customerNumber) implements Person {
         }
 
         @Test
@@ -167,7 +167,7 @@ class JacksonModelValidatorTest {
                 @JsonSubTypes.Type(name = "employee", value = Employee.class),
                 @JsonSubTypes.Type(name = "customer", value = Customer.class),
         })
-        private interface Person {
+        interface Person {
         }
 
         @AutoValue

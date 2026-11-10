@@ -1,0 +1,5 @@
+type = "a"
+message = "Expose Collector health in the user interface."
+
+issues = ["26800"]
+pulls = ["26840"]

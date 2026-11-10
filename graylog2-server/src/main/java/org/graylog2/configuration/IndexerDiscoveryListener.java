@@ -16,7 +16,11 @@
  */
 package org.graylog2.configuration;
 
+import java.net.URI;
+import java.util.List;
+
 public interface IndexerDiscoveryListener {
+    void onExplicitlyConfiguredNodes(List<URI> hosts);
     /**
      * Triggered before we start with indexer discovery. Won't be triggered if there are any indexers
      * explicitly defined in the configuration.

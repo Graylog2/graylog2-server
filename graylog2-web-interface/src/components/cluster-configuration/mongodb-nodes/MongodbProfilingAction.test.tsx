@@ -29,6 +29,7 @@ jest.mock('./useMongodbProfilingToggle', () => ({
     action: 'enable',
     state: 'off',
     profilingStatusByLevel: { OFF: 3 },
+    slowMs: 100,
     isStatusReady: true,
     isTogglingProfiling: false,
     runToggleAction: jest.fn(),
@@ -59,6 +60,7 @@ describe('<MongodbProfilingAction />', () => {
       action: 'enable',
       state: 'off',
       profilingStatusByLevel: { OFF: 3 },
+      slowMs: 100,
       isStatusReady: true,
       isTogglingProfiling: false,
       runToggleAction,
@@ -72,6 +74,27 @@ describe('<MongodbProfilingAction />', () => {
     expect(screen.getByText(/level 1, 100ms threshold/i)).toBeInTheDocument();
   });
 
+  it('falls back to a plain level label in the confirmation dialog when slowMs is unknown', async () => {
+    const runToggleAction = jest.fn().mockResolvedValue(true);
+    const mockUseMongodbProfilingToggle = asMock(useMongodbProfilingToggle);
+    mockUseMongodbProfilingToggle.mockReturnValue({
+      action: 'enable',
+      state: 'off',
+      profilingStatusByLevel: { OFF: 3 },
+      slowMs: undefined,
+      isStatusReady: true,
+      isTogglingProfiling: false,
+      runToggleAction,
+    });
+
+    render(<MongodbProfilingAction />);
+
+    await userEvent.click(screen.getByText('Enable Profiling'));
+
+    expect(screen.getByText(/profiling \(level 1\) on all mongodb nodes/i)).toBeInTheDocument();
+    expect(screen.queryByText(/100ms threshold/i)).not.toBeInTheDocument();
+  });
+
   it('runs toggle action directly when profiling is in disable mode', async () => {
     const runToggleAction = jest.fn().mockResolvedValue(true);
     const mockUseMongodbProfilingToggle = asMock(useMongodbProfilingToggle);
@@ -79,6 +102,7 @@ describe('<MongodbProfilingAction />', () => {
       action: 'disable',
       state: 'enabled',
       profilingStatusByLevel: { SLOW_OPS: 2, ALL: 1 },
+      slowMs: 100,
       isStatusReady: true,
       isTogglingProfiling: false,
       runToggleAction,
@@ -100,6 +124,7 @@ describe('<MongodbProfilingAction />', () => {
       action: 'enable',
       state: 'mixed',
       profilingStatusByLevel: { OFF: 2, SLOW_OPS: 1, ALL: 0 },
+      slowMs: 100,
       isStatusReady: true,
       isTogglingProfiling: false,
       runToggleAction: jest.fn(),
@@ -118,6 +143,7 @@ describe('<MongodbProfilingAction />', () => {
       action: null,
       state: 'unknown',
       profilingStatusByLevel: undefined,
+      slowMs: undefined,
       isStatusReady: false,
       isTogglingProfiling: false,
       runToggleAction,

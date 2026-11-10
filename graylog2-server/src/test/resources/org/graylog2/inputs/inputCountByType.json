@@ -1,0 +1,33 @@
+{
+  "inputs": [
+    {
+      "_id": { "$oid": "54e3deadbeefdeadbeef1001" },
+      "creator_user_id": "admin",
+      "name": "GELF TCP",
+      "title": "GELF TCP 1",
+      "created_at": { "$date": "2018-03-28T13:03:00.000Z" },
+      "global": true,
+      "type": "org.graylog2.inputs.gelf.tcp.GELFTCPInput"
+    },
+    {
+      "_id": { "$oid": "54e3deadbeefdeadbeef1002" },
+      "creator_user_id": "admin",
+      "name": "GELF TCP",
+      "title": "GELF TCP 2",
+      "created_at": { "$date": "2018-03-28T13:04:00.000Z" },
+      "global": false,
+      "node_id": "cd03ee44-b2a7-cafe-babe-0000deadbeef",
+      "type": "org.graylog2.inputs.gelf.tcp.GELFTCPInput"
+    },
+    {
+      "_id": { "$oid": "54e3deadbeefdeadbeef1003" },
+      "creator_user_id": "admin",
+      "name": "Raw/Plaintext TCP",
+      "title": "Raw TCP",
+      "created_at": { "$date": "2018-03-26T11:01:00.000Z" },
+      "global": false,
+      "node_id": "cd03ee44-b2a7-cafe-babe-0000deadbeef",
+      "type": "org.graylog2.inputs.raw.tcp.RawTCPInput"
+    }
+  ]
+}

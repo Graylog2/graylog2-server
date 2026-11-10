@@ -26,9 +26,6 @@ import type { SelectedEventsData } from 'contexts/EventReplaySelectedContext';
 import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
 import sidebarSections, { type SidebarSection } from 'views/components/sidebar/sidebarSections';
 import SidebarBulkEventReplay from 'components/events/bulk-replay/SidebarBulkEventReplay';
-import ReplaySearchSidebar from 'components/events/ReplaySearchSidebar/ReplaySearchSidebar';
-import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
-import useFeature from 'hooks/useFeature';
 
 const Container = styled.div`
   display: flex;
@@ -53,36 +50,21 @@ const AlertWrapper = styled(Alert)(
 `,
 );
 
-const ReplaySearchSidebarSection = () => {
-  const { alertId, definitionId } = useReplaySearchContext();
-
-  return <ReplaySearchSidebar alertId={alertId} definitionId={definitionId} />;
-};
-
 const replaySection: SidebarSection = {
   key: 'eventDescription',
   title: null,
   hoverTitle: 'Replayed Search',
   icon: 'play_arrow',
-  content: ReplaySearchSidebarSection,
+  content: SidebarBulkEventReplay,
 };
 
 const searchPageLayout: Partial<LayoutState> = {
   sidebar: {
     isShown: true,
-    title: SidebarBulkEventReplay,
-    sections: [...sidebarSections],
-    contentColumnWidth: 350,
-  },
-};
-
-const legacySearchPageLayout: Partial<LayoutState> = {
-  sidebar: {
-    isShown: true,
-    title: SidebarBulkEventReplay,
+    title: 'Replay Search',
     sections: [replaySection, ...sidebarSections],
-    contentColumnWidth: 350,
   },
+  synchronizeUrl: false,
 };
 
 const ReplayedSearch = ({
@@ -93,7 +75,6 @@ const ReplayedSearch = ({
   const { eventIds, selectedId, eventsData } = useSelectedEvents();
   const selectedEvent = eventsData?.[selectedId];
   const { data: eventDefinitionMappedData } = useEventDefinition(selectedEvent?.event?.event_definition_id);
-  const isRightSidebarEnabled = useFeature('replay_search_right_sidebar');
   const total = eventIds.length;
 
   if (total === 0) {
@@ -111,7 +92,7 @@ const ReplayedSearch = ({
     <EventReplaySearch
       eventData={selectedEvent.event}
       eventDefinitionMappedData={eventDefinitionMappedData}
-      searchPageLayout={isRightSidebarEnabled ? searchPageLayout : legacySearchPageLayout}
+      searchPageLayout={searchPageLayout}
     />
   );
 };

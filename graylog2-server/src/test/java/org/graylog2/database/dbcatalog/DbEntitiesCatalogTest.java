@@ -27,6 +27,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class DbEntitiesCatalogTest {
 
+    private static DbEntityCatalogEntry streamEntry() {
+        return new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read", List.of());
+    }
+
     @Test
     void returnsEmptyOptionalsOnEmptyCatalog() {
         DbEntitiesCatalog catalog = new DbEntitiesCatalog(List.of());
@@ -36,20 +40,18 @@ class DbEntitiesCatalogTest {
 
     @Test
     void returnsEmptyOptionalsOnEntryAbsentInCatalog() {
-        DbEntitiesCatalog catalog = new DbEntitiesCatalog(List.of(new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read")));
+        DbEntitiesCatalog catalog = new DbEntitiesCatalog(List.of(streamEntry()));
 
         assertThat(catalog.getByCollectionName("Guadalajara")).isEmpty();
     }
 
     @Test
     void returnsProperDataFromCatalog() {
-        DbEntitiesCatalog catalog = new DbEntitiesCatalog(List.of(new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read")));
+        final var entry = streamEntry();
+        DbEntitiesCatalog catalog = new DbEntitiesCatalog(List.of(entry));
 
         assertThat(catalog.getByCollectionName("streams"))
-                .isEqualTo(Optional.of(
-                        new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read")
-                        )
-                );
+                .isEqualTo(Optional.of(entry));
     }
 
     @Test
@@ -57,8 +59,8 @@ class DbEntitiesCatalogTest {
         assertThrows(IllegalStateException.class,
                 () -> new DbEntitiesCatalog(
                         List.of(
-                                new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read"),
-                                new DbEntityCatalogEntry("streams", "title", String.class, "")
+                                new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read", List.of()),
+                                new DbEntityCatalogEntry("streams", "title", String.class, "", List.of())
                         )
                 )
         );

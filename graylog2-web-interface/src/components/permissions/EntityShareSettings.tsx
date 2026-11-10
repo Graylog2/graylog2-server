@@ -23,6 +23,7 @@ import type { GRN } from 'logic/permissions/types';
 import type EntityShareState from 'logic/permissions/EntityShareState';
 import type SharedEntity from 'logic/permissions/SharedEntity';
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
+import { useSetEntityShareState } from 'hooks/useEntityShareState';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import type {
   SelectionRequest,
@@ -87,6 +88,7 @@ const EntityShareSettings = ({
   const filteredGrantees = _filterAvailableGrantees(availableGrantees, selectedGranteeCapabilities);
 
   const CollectionGranteeList = usePluggableEntityCollectionGranteeList();
+  const setEntityShareState = useSetEntityShareState();
 
   useEffect(() => {
     setDisableSubmit(validationResults?.failed);
@@ -101,7 +103,11 @@ const EntityShareSettings = ({
       selected_grantee_capabilities: newSelectedCapabilities,
     };
 
-    return EntityShareDomain.prepare(entityType, entityTitle, entityGRN, payload);
+    return EntityShareDomain.prepare(entityType, entityTitle, entityGRN, payload).then((state) => {
+      setEntityShareState(entityGRN, state);
+
+      return state;
+    });
   };
 
   const _handleDeletion = (granteeId: GRN) => {
@@ -113,7 +119,11 @@ const EntityShareSettings = ({
       selected_grantee_capabilities: newSelectedGranteeCapabilities,
     };
 
-    return EntityShareDomain.prepare(entityType, entityTitle, entityGRN, payload);
+    return EntityShareDomain.prepare(entityType, entityTitle, entityGRN, payload).then((state) => {
+      setEntityShareState(entityGRN, state);
+
+      return state;
+    });
   };
 
   return (

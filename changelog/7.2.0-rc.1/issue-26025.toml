@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix false `Message failed to process` errors when a pipeline rule or extractor assigns a string `timestamp` field in ISO-8601 format. Such timestamps are now parsed leniently instead of being recorded as a processing failure."
+
+issues = ["26025"]
+pulls = ["26269"]

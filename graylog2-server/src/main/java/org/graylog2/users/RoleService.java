@@ -22,6 +22,7 @@ import org.graylog2.shared.users.Role;
 
 import jakarta.validation.ConstraintViolation;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,6 +30,7 @@ public interface RoleService {
     Role loadById(String roleId) throws NotFoundException;
 
     Role load(String roleName) throws NotFoundException;
+    Set<Role> loadByNames(Collection<String> roleNames) throws NotFoundException;
 
     boolean exists(String roleName);
 

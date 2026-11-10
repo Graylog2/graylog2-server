@@ -1,0 +1,15 @@
+{
+  "outputs": [
+    {
+      "_id" : { "$oid" : "5b927d32a7c8644ed44576ee" },
+      "title" : "Encrypted",
+      "type" : "custom.EncryptedOutput",
+      "creator_user_id" : "admin",
+      "configuration" : {
+        "host" : "example.com",
+        "password" : { "encrypted_value" : "cipher", "salt" : "salty" }
+      },
+      "created_at" : { "$date" : "2018-09-07T13:29:22.589Z" }
+    }
+  ]
+}

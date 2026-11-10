@@ -1,0 +1,13 @@
+type = "a"
+message = "Add opensearch_network_publish_host config option to Data Node."
+
+details.user = """
+Data Node previously always advertised its own hostname to other cluster nodes via OpenSearch's `network.publish_host`. This broke clustering across hosts in setups like Docker bridge networks, where the hostname resolves to a non-routable internal address from inside the container. The new `opensearch_network_publish_host` setting lets you configure a different, externally routable address for Data Node to advertise, independent of its hostname/bind address. It maps to OpenSearch's `network.publish_host`, so it applies to both the transport and the HTTP interface: it is also the HTTP address reported by the `_nodes` API, which Graylog uses when `elasticsearch_discovery_enabled` is set.
+
+The automatically computed `cluster.initial_cluster_manager_nodes` now uses the OpenSearch node names of the manager nodes instead of their hostnames, so cluster bootstrap also works when `node_name` differs from `hostname`.
+
+**Behaviour change for clusters that set `node_name`:** the transport address each Data Node registers for discovery by its peers (`discovery.seed_hosts`) was previously built from `node_name` (`<node_name>:9300`). It is now built from `opensearch_network_publish_host`, which defaults to `hostname` (`<hostname>:9300`). This applies on upgrade even if you don't use the new option. If your nodes are only reachable under their `node_name`, set `opensearch_network_publish_host` to that address. IPv6 publish hosts are now correctly bracketed (`[2001:db8::1]:9300`).
+"""
+
+issues = ["20970"]
+pulls = ["27363"]

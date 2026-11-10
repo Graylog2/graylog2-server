@@ -50,6 +50,8 @@ import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
+import org.graylog2.inputs.extractors.LookupTableExtractor;
+import org.graylog2.lookup.LookupTableService;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.Converter;
@@ -87,6 +89,7 @@ public class ExtractorsResource extends RestResource {
     private final ExtractorFactory extractorFactory;
     private final ConverterFactory converterFactory;
     private final PersistedInputs persistedInputs;
+    private final LookupTableService lookupTableService;
 
     @Inject
     public ExtractorsResource(final InputService inputService,
@@ -94,13 +97,15 @@ public class ExtractorsResource extends RestResource {
                               final MetricRegistry metricRegistry,
                               final ExtractorFactory extractorFactory,
                               final ConverterFactory converterFactory,
-                              final PersistedInputs persistedInputs) {
+                              final PersistedInputs persistedInputs,
+                              final LookupTableService lookupTableService) {
         this.inputService = inputService;
         this.activityWriter = activityWriter;
         this.metricRegistry = metricRegistry;
         this.extractorFactory = extractorFactory;
         this.converterFactory = converterFactory;
         this.persistedInputs = persistedInputs;
+        this.lookupTableService = lookupTableService;
     }
 
     @POST
@@ -358,6 +363,8 @@ public class ExtractorsResource extends RestResource {
     }
 
     private Extractor buildExtractorFromRequest(CreateExtractorRequest cer, String id) {
+        validateLookupTableReference(cer);
+
         Extractor extractor;
         try {
             extractor = extractorFactory.factory(
@@ -385,5 +392,29 @@ public class ExtractorsResource extends RestResource {
             throw new BadRequestException(e);
         }
         return extractor;
+    }
+
+    // The LookupTableExtractor tolerates a missing lookup table at runtime so existing extractors stay editable and
+    // deletable when their table is deleted (issue #26122). We still reject creating or updating an extractor that
+    // references a non-existent table here, so typos are caught with a clean 400 instead of silently misconfiguring.
+    private void validateLookupTableReference(CreateExtractorRequest cer) {
+        if (!Extractor.Type.LOOKUP_TABLE.toString().equalsIgnoreCase(cer.extractorType())) {
+            return;
+        }
+        final Map<String, Object> config = cer.extractorConfig();
+        final Object lookupTableName = config == null ? null : config.get(LookupTableExtractor.CONFIG_LUT_NAME);
+        // Validate the reference fully here so every bad value yields a deterministic 400. We deliberately do not lean
+        // on the LookupTableExtractor constructor to reject bad input: issue #26122 loosened that constructor, and a
+        // non-string value would slip past it into an uncaught ClassCastException (HTTP 500) anyway.
+        if (lookupTableName != null && !(lookupTableName instanceof String)) {
+            throw new BadRequestException("Configured lookup table name must be a string");
+        }
+        final String name = (String) lookupTableName;
+        if (name == null || name.isEmpty()) {
+            throw new BadRequestException("Missing lookup table extractor configuration field: " + LookupTableExtractor.CONFIG_LUT_NAME);
+        }
+        if (!lookupTableService.hasTable(name)) {
+            throw new BadRequestException("Configured lookup table <" + name + "> doesn't exist");
+        }
     }
 }

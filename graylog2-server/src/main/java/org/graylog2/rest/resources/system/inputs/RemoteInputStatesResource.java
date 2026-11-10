@@ -17,7 +17,7 @@
 package org.graylog2.rest.resources.system.inputs;
 
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
-import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
+import org.graylog2.rest.models.system.inputs.responses.InputStopped;
 import org.graylog2.rest.models.system.inputs.responses.InputSetup;
 import org.graylog2.rest.models.system.inputs.responses.InputStatesList;
 import retrofit2.Call;
@@ -37,5 +37,5 @@ public interface RemoteInputStatesResource {
     Call<InputSetup> setup(@Path("inputId") String inputId);
 
     @DELETE("system/inputstates/{inputId}")
-    Call<InputDeleted> stop(@Path("inputId") String inputId);
+    Call<InputStopped> stop(@Path("inputId") String inputId);
 }

@@ -23,7 +23,7 @@ import selectEvent from 'helpers/selectEvent';
 import { asMock } from 'helpers/mocking';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import { createEntityShareState, everyone, viewer } from 'fixtures/entityShareState';
-import { EntityShareStore } from 'stores/permissions/EntityShareStore';
+import useEntityShareState from 'hooks/useEntityShareState';
 
 import OriginalSavedSearchForm from './SavedSearchForm';
 
@@ -32,17 +32,8 @@ jest.mock('formik', () => ({
   useFormikContext: jest.fn(),
 }));
 jest.mock('views/hooks/useSaveViewFormControls');
-jest.mock('stores/permissions/EntityShareStore', () => ({
-  __esModule: true,
-  EntityShareActions: {
-    prepare: jest.fn(() => Promise.resolve()),
-    update: jest.fn(() => Promise.resolve()),
-  },
-  EntityShareStore: {
-    listen: jest.fn(),
-    getInitialState: jest.fn(),
-  },
-}));
+jest.mock('api/entity-share');
+jest.mock('hooks/useEntityShareState');
 
 const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
 
@@ -73,7 +64,7 @@ const mockFormDirtyState = (dirty: boolean) =>
 
 describe('SavedSearchForm', () => {
   beforeEach(() => {
-    asMock(EntityShareStore.getInitialState).mockReturnValue({ state: createEntityShareState });
+    asMock(useEntityShareState).mockReturnValue({ data: createEntityShareState });
   });
 
   beforeAll(() => {

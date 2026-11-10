@@ -64,7 +64,7 @@ class SidecarList extends React.Component<
     };
 
     return (
-      <Table striped responsive className={style.sidecarList}>
+      <Table responsive className={style.sidecarList}>
         <thead>
           <tr>
             {Object.keys(sidecarCollection).map((sidecar) => (

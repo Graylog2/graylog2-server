@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix Collector onboarding source status section for the macOS Unified Logging source on unsupported platforms."
+
+pulls = ["27635"]

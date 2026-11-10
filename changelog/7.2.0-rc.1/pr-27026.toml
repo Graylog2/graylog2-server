@@ -1,0 +1,4 @@
+type = "f"
+message = "Prevent a crash on the event definition Notifications step when a notification is assigned without selecting one."
+
+pulls = ["27026"]

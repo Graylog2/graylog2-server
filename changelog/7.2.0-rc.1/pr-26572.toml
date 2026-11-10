@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Accept collector ingest mTLS connections only from certificates that are bound to an active collector instance."
+
+pulls = ["26572"]

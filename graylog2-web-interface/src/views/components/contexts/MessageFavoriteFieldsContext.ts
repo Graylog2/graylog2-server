@@ -31,6 +31,7 @@ export type MessageFavoriteFieldsContextState = {
   message: Message;
   editableStreams: Array<Stream>;
   setFieldsIsPending: boolean;
+  initialFavoriteFieldsByStream: Record<string, Array<string>>;
 };
 
 const MessageFavoriteFieldsContext = React.createContext<MessageFavoriteFieldsContextState>({
@@ -41,6 +42,7 @@ const MessageFavoriteFieldsContext = React.createContext<MessageFavoriteFieldsCo
   message: undefined,
   editableStreams: [],
   setFieldsIsPending: false,
+  initialFavoriteFieldsByStream: {},
 });
 
 export default singleton('contexts.MessageFavoriteFieldsContext', () => MessageFavoriteFieldsContext);

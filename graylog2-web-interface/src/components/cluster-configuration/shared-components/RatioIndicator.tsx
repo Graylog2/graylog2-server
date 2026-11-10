@@ -18,17 +18,17 @@ import React from 'react';
 import styled from 'styled-components';
 
 import NumberUtils from 'util/NumberUtils';
-
-import { StyledLabel } from './NodeMetricsLayout';
+import { Label } from 'components/bootstrap';
+import { GrowContainer } from 'components/cluster-configuration/shared-components/NodeMetricsLayout';
 
 const SecondaryText = styled.div`
   font-size: small;
+  flex-grow: 1;
 
   span {
     font-size: inherit;
   }
 `;
-
 export const computeRatio = (used: number | undefined | null, max: number | undefined | null) => {
   if (used == null || max == null || max === 0) {
     return undefined;
@@ -55,16 +55,16 @@ const RatioIndicator = ({ ratio, warningThreshold = Number.NaN, dangerThreshold 
   if (!exceedsDanger && !exceedsWarning) {
     return (
       <SecondaryText>
-        <span>{formattedRatio}</span>
+        <GrowContainer>{formattedRatio}</GrowContainer>
       </SecondaryText>
     );
   }
 
   return (
     <SecondaryText>
-      <StyledLabel bsStyle={exceedsDanger ? 'danger' : 'warning'} bsSize="xs">
+      <Label bsStyle={exceedsDanger ? 'danger' : 'warning'} bsSize="xs">
         {formattedRatio}
-      </StyledLabel>
+      </Label>
     </SecondaryText>
   );
 };

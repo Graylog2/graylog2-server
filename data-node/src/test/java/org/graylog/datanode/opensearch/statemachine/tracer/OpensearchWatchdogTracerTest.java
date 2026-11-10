@@ -16,55 +16,49 @@
  */
 package org.graylog.datanode.opensearch.statemachine.tracer;
 
+import com.google.common.eventbus.EventBus;
 import org.assertj.core.api.Assertions;
-import org.graylog.datanode.opensearch.OpensearchProcess;
+import org.graylog.datanode.opensearch.OpensearchStartRequestedEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
-import org.graylog.datanode.opensearch.statemachine.OpensearchStateMachine;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Set;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class OpensearchWatchdogTracerTest {
 
     @Mock
-    OpensearchProcess opensearchProcess;
+    EventBus eventBus;
 
     @Test
     void testLifecycle() {
-        final OpensearchWatchdog watchdog = new OpensearchWatchdog(3);
-        OpensearchStateMachine stateMachine = OpensearchStateMachine.createNew(opensearchProcess, Set.of(watchdog));
-        stateMachine.fire(OpensearchEvent.PROCESS_STARTED);
+        final OpensearchWatchdog watchdog = new OpensearchWatchdog(eventBus, 3);
+        watchdog.transition(OpensearchEvent.PROCESS_STARTED, OpensearchState.WAITING_FOR_CONFIGURATION, OpensearchState.STARTING);
 
-        // both process and watchdog are running now. Let's stop the process and see if the watchdog will restart it
-        terminateProcess(stateMachine);
-
-        // see if the process is starting again
-        Assertions.assertThat(isInStartingState(stateMachine)).isTrue();
+        // the process is running now. Let's terminate it and see if the watchdog requests a restart
+        terminateProcess(watchdog);
+        verify(eventBus, times(1)).post(new OpensearchStartRequestedEvent());
 
         // repeat
-        terminateProcess(stateMachine);
-        Assertions.assertThat(isInStartingState(stateMachine)).isTrue();
+        terminateProcess(watchdog);
+        verify(eventBus, times(2)).post(new OpensearchStartRequestedEvent());
 
-        terminateProcess(stateMachine);
-        Assertions.assertThat(isInStartingState(stateMachine)).isTrue();
+        terminateProcess(watchdog);
+        verify(eventBus, times(3)).post(new OpensearchStartRequestedEvent());
 
-        // this is the 4th termination, we give up trying
-        terminateProcess(stateMachine);
+        // this is the 4th termination, we give up trying, no additional restart is requested
+        terminateProcess(watchdog);
+        verify(eventBus, times(3)).post(new OpensearchStartRequestedEvent());
 
         Assertions.assertThat(watchdog.isActive()).isFalse();
-        Assertions.assertThat(stateMachine.getState()).isEqualTo(OpensearchState.TERMINATED);
     }
 
-    private void terminateProcess(OpensearchStateMachine stateMachine) {
-        stateMachine.fire(OpensearchEvent.PROCESS_TERMINATED);
-    }
-
-    private boolean isInStartingState(OpensearchStateMachine stateMachine) {
-        return stateMachine.getState() == OpensearchState.STARTING;
+    private void terminateProcess(OpensearchWatchdog watchdog) {
+        watchdog.transition(OpensearchEvent.PROCESS_TERMINATED, OpensearchState.STARTING, OpensearchState.TERMINATED);
     }
 }

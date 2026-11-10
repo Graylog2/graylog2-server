@@ -1,0 +1,5 @@
+type = "a"
+message = "Add number of indices incompatible with the next major OpenSearch version to telemetry data."
+
+issues = ["Graylog2/graylog-plugin-enterprise#14607"]
+pulls = ["26764"]

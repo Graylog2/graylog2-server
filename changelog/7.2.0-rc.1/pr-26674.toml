@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix Kafka inputs being unable to process LZ4-compressed record batches."
+
+pulls = ["26674"]

@@ -15,21 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
+import useHistory from 'routing/useHistory';
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import EventDefinitionFormContainer from 'components/event-definitions/event-definition-form/EventDefinitionFormContainer';
+import { normalizeStepKey } from 'components/event-definitions/event-definition-form/EventDefinitionForm';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import { isPermitted } from 'util/PermissionsMixin';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 import useQuery from 'routing/useQuery';
 
 const CreateEventDefinitionPage = () => {
-  const currentUser = useCurrentUser();
-  const navigate = useNavigate();
+  const { isPermitted } = usePermissions();
+  const { push } = useHistory();
 
   const [eventDefinitionTitle, setEventDefinitionTitle] = useState();
   const { step } = useQuery();
@@ -49,14 +49,14 @@ const CreateEventDefinitionPage = () => {
   );
 
   const goToOverview = useCallback(() => {
-    navigate(Routes.ALERTS.DEFINITIONS.LIST);
-  }, [navigate]);
+    push(Routes.ALERTS.DEFINITIONS.LIST);
+  }, [push]);
 
   useEffect(() => {
-    if (!isPermitted(currentUser.permissions, 'eventdefinitions:create')) {
-      navigate(Routes.NOTFOUND);
+    if (!isPermitted('eventdefinitions:create')) {
+      push(Routes.NOTFOUND);
     }
-  }, [currentUser.permissions, navigate]);
+  }, [isPermitted, push]);
 
   return (
     <DocumentTitle title={pageTitle}>
@@ -76,7 +76,7 @@ const CreateEventDefinitionPage = () => {
           <EventDefinitionFormContainer
             action="create"
             onEventDefinitionChange={handleEventDefinitionChange}
-            initialStep={step as string}
+            initialStep={normalizeStepKey(step as string)}
             onSubmit={goToOverview}
             onCancel={goToOverview}
           />

@@ -55,7 +55,7 @@ public class MongoDbConfiguration {
 
     @Documentation("""
             Maximum number of attempts to connect to MongoDB on boot for the version probe.
-            Default 0 means retry indefinitely until a connection can be established
+            A value of 0 means retry indefinitely until a connection can be established
             """)
     @Parameter(value = "mongodb_version_probe_attempts", validators = {PositiveIntegerValidator.class})
     int mongodbVersionProbeAttempts = 0;

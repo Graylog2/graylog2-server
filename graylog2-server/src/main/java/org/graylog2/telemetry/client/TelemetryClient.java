@@ -29,6 +29,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 @Singleton
@@ -57,7 +58,13 @@ public class TelemetryClient {
         if (isEnabled) {
             final var batch = events.entrySet()
                     .stream()
-                    .map(entry -> PosthogAPI.Event.create(clusterId, entry.getKey(), entry.getValue().metrics()))
+                    .map(entry -> {
+                        final HashMap<String, Object> properties = new HashMap<>(entry.getValue().metrics());
+                        // setting this prevents posthog from creating a person profile for the ID
+                        // this event is not tied to a person so it's useless to create that (and pay for it)
+                        properties.put("$process_person_profile", false);
+                        return PosthogAPI.Event.create(clusterId, entry.getKey(), properties);
+                    })
                     .toList();
             final var request = new PosthogAPI.BatchRequest(apiKey, batch);
             final var response = posthog.batchSend(request).execute();

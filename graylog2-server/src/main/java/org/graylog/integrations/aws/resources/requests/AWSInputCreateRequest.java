@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
+
 /**
  * This request is used to save a new Kinesis AWS input. Each type of AWS input will use it's own request
  * object due to typically very unique required fields for each.
@@ -36,6 +37,7 @@ public abstract class AWSInputCreateRequest implements AWSRequest {
     private static final String BATCH_SIZE = "batch_size";
     private static final String THROTTLING_ALLOWED = "enable_throttling";
     private static final String ADD_FLOW_LOG_PREFIX = "add_flow_log_prefix";
+    private static final String STORE_FULL_MESSAGE = "store_full_message";
     private static final String OVERRIDE_SOURCE = "override_source";
 
     @JsonProperty(NAME)
@@ -62,6 +64,9 @@ public abstract class AWSInputCreateRequest implements AWSRequest {
     @JsonProperty(ADD_FLOW_LOG_PREFIX)
     public abstract boolean addFlowLogPrefix();
 
+    @JsonProperty(STORE_FULL_MESSAGE)
+    public abstract boolean storeFullMessage();
+
     public static Builder builder() {
         return Builder.create();
     }
@@ -70,7 +75,8 @@ public abstract class AWSInputCreateRequest implements AWSRequest {
     public static abstract class Builder implements AWSRequest.Builder<Builder> {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_AWSInputCreateRequest.Builder();
+            return new AutoValue_AWSInputCreateRequest.Builder()
+                    .storeFullMessage(false);
         }
 
         @JsonProperty(NAME)
@@ -96,6 +102,9 @@ public abstract class AWSInputCreateRequest implements AWSRequest {
 
         @JsonProperty(ADD_FLOW_LOG_PREFIX)
         public abstract Builder addFlowLogPrefix(boolean addFlowLogPrefix);
+
+        @JsonProperty(STORE_FULL_MESSAGE)
+        public abstract Builder storeFullMessage(boolean storeFullMessage);
 
         public abstract AWSInputCreateRequest build();
     }

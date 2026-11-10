@@ -164,4 +164,19 @@ describe('<DataTable />', () => {
 
     expect(await numberOfRows()).toHaveLength(nextFilteredRows.length);
   });
+  it('should sort rows which are missing the sort key', async () => {
+    const rowsWithMissingKey = [{ title: 'Row 1' }, { title: undefined }, { title: 'Foo 3' }];
+
+    render(
+      <DataTable
+        id="myDataTable"
+        headers={['One']}
+        rows={rowsWithMissingKey}
+        sortByKey="title"
+        dataRowFormatter={rowFormatter}
+      />,
+    );
+
+    expect(await numberOfRows()).toHaveLength(rowsWithMissingKey.length);
+  });
 });

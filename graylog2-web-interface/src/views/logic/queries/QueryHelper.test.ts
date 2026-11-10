@@ -15,12 +15,27 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { MISSING_BUCKET_NAME } from 'views/Constants';
+import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 
-import { concatQueryStrings, escape, predicate } from './QueryHelper';
+import { concatQueryStrings, edgeClause, escape, formatValueForQuery, predicate } from './QueryHelper';
 
 describe('QueryHelper', () => {
   it('quotes $ in values', () => {
     expect(escape('foo$bar$')).toEqual('foo\\$bar\\$');
+  });
+
+  describe('edgeClause', () => {
+    it('builds a symmetric compound clause over both fields, bracketed as one group', () => {
+      expect(edgeClause({ field: 'source', value: 'a1' }, { field: 'target', value: 'b1' })).toBe(
+        '((source:a1 AND target:b1) OR (source:b1 AND target:a1))',
+      );
+    });
+
+    it('escapes values', () => {
+      expect(edgeClause({ field: 'source', value: 'a b' }, { field: 'target', value: 'c:d' })).toBe(
+        '((source:"a b" AND target:c\\:d) OR (source:c\\:d AND target:"a b"))',
+      );
+    });
   });
 
   describe('concatQueryStrings', () => {
@@ -55,6 +70,22 @@ describe('QueryHelper', () => {
       const result = concatQueryStrings([undefined, 'field1:value1 OR field2:value2', null, '']);
 
       expect(result).toEqual('field1:value1 OR field2:value2');
+    });
+  });
+
+  describe('formatValueForQuery', () => {
+    it('escapes string values', () => {
+      expect(formatValueForQuery('foo:bar', FieldTypes.STRING())).toEqual('foo\\:bar');
+    });
+
+    it('quotes string values containing whitespace', () => {
+      expect(formatValueForQuery('foo bar', FieldTypes.STRING())).toEqual('"foo bar"');
+    });
+
+    it('formats date values as quoted UTC timestamp', () => {
+      expect(formatValueForQuery('2026-10-08T09:05:06.000+02:00', FieldTypes.DATE())).toEqual(
+        '"2026-10-08T07:05:06.000Z"',
+      );
     });
   });
 

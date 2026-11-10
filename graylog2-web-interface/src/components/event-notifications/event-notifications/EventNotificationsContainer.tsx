@@ -20,15 +20,13 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import { QueryHelper, PaginatedEntityTable } from 'components/common';
-import type { EventNotification, TestResults } from 'stores/event-notifications/EventNotificationsStore';
+import type { EventNotification, TestResults } from 'components/event-notifications/hooks/useEventNotifications';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
 import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
 import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
 import type { SearchParams } from 'stores/PaginationTypes';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import CurrentUser from 'logic/users/CurrentUser';
 import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
 
 import NotificationConfigTypeCell from './NotificationConfigTypeCell';
@@ -52,16 +50,15 @@ const customColumnRenderers = (
     },
     type: {
       renderCell: (_type: string, notification) => <NotificationConfigTypeCell notification={notification} />,
+      staticWidth: 230,
     },
     ...(pluggableColumnRenderers || {}),
   },
 });
 
 const EventNotificationsContainer = () => {
-  const currentUser = CurrentUserStore.getInitialState();
   const { isLoadingTest, testResults, getNotificationTest } = useNotificationTest();
-  const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
+  const sendTelemetry = useSendTelemetry('event-notification');
   const { pluggableColumnRenderers, pluggableAttributes, pluggableExpandedSections } =
     usePluggableEntityTableElements<EventNotification>(null, 'notification');
 
@@ -75,15 +72,13 @@ const EventNotificationsContainer = () => {
   const handleTest = useCallback(
     (notification: EventNotification) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.NOTIFICATIONS.ROW_ACTION_TEST_CLICKED, {
-        app_pathname: getPathnameWithoutId(pathname),
-        app_section: 'event-notification',
         app_action_value: 'notification-test',
       });
 
       getNotificationTest(notification);
       queryClient.invalidateQueries({ queryKey: keyFn() });
     },
-    [getNotificationTest, pathname, queryClient, sendTelemetry],
+    [getNotificationTest, queryClient, sendTelemetry],
   );
   const expandedSections = useMemo(
     () => ({
@@ -100,7 +95,7 @@ const EventNotificationsContainer = () => {
   );
 
   const fetchEntities = async (searchParams: SearchParams): Promise<PaginatedResponse<EventNotification>> => {
-    CurrentUserStore.update(currentUser.currentUser.username);
+    CurrentUser.reload();
 
     return fetchEventNotifications(searchParams);
   };

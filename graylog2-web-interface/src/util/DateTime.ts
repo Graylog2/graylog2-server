@@ -104,10 +104,10 @@ export const formatAsBrowserTime = (time: DateTime, format: DateTimeFormats = 'd
  * Returns the time in a human-readable format, relative to the provided date time.
  * If you just want to display the output, you can use the `RelativeTime` component.
  */
-export const relativeDifference = (dateTime: DateTime) => {
+export const relativeDifference = (dateTime: DateTime, withoutSuffix: boolean = false) => {
   const dateObject = toDateObject(dateTime);
 
-  return validateDateTime(dateObject, dateTime).fromNow();
+  return validateDateTime(dateObject, dateTime).fromNow(withoutSuffix);
 };
 
 /**
@@ -125,6 +125,11 @@ export const readableDifference = (from: DateTime, to: DateTime) => {
 
   return moment.preciseDiff(fromObject, toObject);
 };
+
+/**
+ * Takes a duration in seconds and returns it in a human-readable format, e.g. "7 days".
+ */
+export const readableDuration = (seconds: number) => moment.duration(seconds, 'seconds').humanize();
 
 /**
  * Returns the time difference, relative to the provided date time, in days.

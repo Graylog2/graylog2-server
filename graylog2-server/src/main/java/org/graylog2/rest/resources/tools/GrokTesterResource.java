@@ -22,6 +22,19 @@ import io.krakens.grok.api.Grok;
 import io.krakens.grok.api.GrokCompiler;
 import io.krakens.grok.api.Match;
 import io.krakens.grok.api.exception.GrokException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.grok.GrokPattern;
@@ -30,26 +43,13 @@ import org.graylog2.rest.models.tools.requests.GrokTestRequest;
 import org.graylog2.rest.resources.tools.responses.GrokTesterResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import jakarta.inject.Inject;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.MediaType;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 @RequiresAuthentication
+@Tag(name = "Tools/GrokTester", description = "Test Grok patterns")
 @Path("/tools/grok_tester")
 @Produces(MediaType.APPLICATION_JSON)
 public class GrokTesterResource extends RestResource {
@@ -62,6 +62,7 @@ public class GrokTesterResource extends RestResource {
     }
 
     @GET
+    @Operation(summary = "Test a Grok pattern against a string")
     @Timed
     public GrokTesterResponse grokTest(@QueryParam("pattern") @NotEmpty String pattern,
                                        @QueryParam("string") @NotNull String string,
@@ -71,6 +72,7 @@ public class GrokTesterResource extends RestResource {
     }
 
     @POST
+    @Operation(summary = "Test a Grok pattern against a string")
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -94,7 +96,13 @@ public class GrokTesterResource extends RestResource {
             return GrokTesterResponse.createError(pattern, string, e.getMessage());
         }
 
-        final Match match = grok.match(string);
+        final Match match;
+        try {
+            match = grok.match(string);
+        } catch (StackOverflowError e) {
+            return GrokTesterResponse.createError(pattern, string,
+                    "Pattern caused a stack overflow during matching. Simplify the pattern to avoid deeply nested or repeated groups.");
+        }
         final Map<String, Object> matches = match.captureFlattened();
 
         final GrokTesterResponse response;

@@ -15,10 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 
-import { useStore } from 'stores/connect';
-import { EventNotificationsStore, EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
+import { useEventNotifications } from 'components/event-notifications/hooks/useEventNotifications';
 import NoAttributeProvided from 'components/event-definitions/replay-search/NoAttributeProvided';
 import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
 import EventNotificationLink from 'components/event-notifications/event-notifications/EventNotificationLink';
@@ -28,13 +27,14 @@ import useAlertAndEventDefinitionData from './hooks/useAlertAndEventDefinitionDa
 const Notifications = () => {
   const { alertId, definitionId } = useReplaySearchContext();
   const { eventDefinition } = useAlertAndEventDefinitionData(alertId, definitionId);
+  const { data: notificationsData } = useEventNotifications();
 
-  useEffect(() => {
-    EventNotificationsActions.listAll();
-  }, []);
-
-  const allNotifications = useStore(EventNotificationsStore, ({ all }) =>
-    Object.fromEntries((all ?? []).map((notification) => [notification.id, notification])),
+  const allNotifications = useMemo(
+    () =>
+      Object.fromEntries(
+        (notificationsData?.notifications ?? []).map((notification) => [notification.id, notification]),
+      ),
+    [notificationsData],
   );
 
   const notificationList = useMemo(

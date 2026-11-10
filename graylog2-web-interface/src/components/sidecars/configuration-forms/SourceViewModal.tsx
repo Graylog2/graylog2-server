@@ -18,7 +18,7 @@ import React from 'react';
 import isEqual from 'lodash/isEqual';
 
 import { Modal, Button, BootstrapModalWrapper } from 'components/bootstrap';
-import { CollectorConfigurationsActions } from 'stores/sidecars/CollectorConfigurationsStore';
+import { renderConfigurationPreview, fetchConfiguration } from 'hooks/useCollectorConfigurations';
 
 type SourceViewModalProps = {
   configurationId?: string;
@@ -69,7 +69,7 @@ class SourceViewModal extends React.Component<
     }
 
     if (this.props.templateString) {
-      CollectorConfigurationsActions.renderPreview(this.props.templateString).then(
+      renderConfigurationPreview(this.props.templateString).then(
         (response) => {
           this.setState({ source: response.preview, name: 'preview' });
         },
@@ -80,7 +80,7 @@ class SourceViewModal extends React.Component<
         },
       );
     } else {
-      CollectorConfigurationsActions.getConfiguration(this.props.configurationId).then(
+      fetchConfiguration(this.props.configurationId).then(
         (configuration) => {
           this.setState({ source: configuration.template, name: configuration.name });
         },

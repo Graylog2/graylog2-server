@@ -20,8 +20,6 @@ import com.google.common.eventbus.EventBus;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog2.database.MongoCollections;
-import org.graylog2.database.NotFoundException;
-import org.graylog2.inputs.InputService;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,7 +35,6 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -50,12 +47,10 @@ public class MongoInputStatusServiceTest {
 
     @Mock
     EventBus mockEventBus;
-    @Mock
-    private InputService inputService;
 
     @BeforeEach
     public void setUp(MongoCollections mongoCollections) {
-        cut = new MongoInputStatusService(mongoCollections, inputService, mockEventBus);
+        cut = new MongoInputStatusService(mongoCollections, mockEventBus);
     }
 
     @Test
@@ -173,24 +168,10 @@ public class MongoInputStatusServiceTest {
 
     @Test
     @MongoDBFixtures("input-status.json")
-    public void handleDeleteEvent_WhenStoppingInputDoesNothing() throws Exception {
+    public void handleDeleteEvent_RemovesState() {
         final String deletedInput = "54e3deadbeefdeadbeef0001";
-        final InputDeleted inputDeletedEvent = new InputDeleted() {
-            @Override
-            public String id() {
-                return deletedInput;
-            }
-        };
-
-        cut.handleInputDeleted(inputDeletedEvent);
-        // The record should not be removed from the DB
         assertThat(cut.get(deletedInput).isPresent(), is(true));
-    }
 
-    @Test
-    @MongoDBFixtures("input-status.json")
-    public void handleDeleteEvent_WhenDeletingInputRemovesState() throws Exception {
-        final String deletedInput = "54e3deadbeefdeadbeef0001";
         final InputDeleted inputDeletedEvent = new InputDeleted() {
             @Override
             public String id() {
@@ -198,12 +179,7 @@ public class MongoInputStatusServiceTest {
             }
         };
 
-        // Simulate that the input has actually been deleted
-        // TODO: This will change once we fix https://github.com/Graylog2/graylog2-server/issues/7812
-        when(inputService.find(deletedInput)).thenThrow(new NotFoundException());
-
         cut.handleInputDeleted(inputDeletedEvent);
-        // The record should be removed from the DB
         assertThat(cut.get(deletedInput).isPresent(), is(false));
     }
 }

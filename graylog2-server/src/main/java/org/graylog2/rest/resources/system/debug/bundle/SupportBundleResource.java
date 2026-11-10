@@ -101,6 +101,7 @@ public class SupportBundleResource extends RestResource {
 
     @POST
     @Path("/bundle/build")
+    @Operation(summary = "Start building a support bundle")
     @Timed
     @RestrictToLeader
     @RequiresPermissions(SUPPORTBUNDLE_CREATE)
@@ -132,10 +133,9 @@ public class SupportBundleResource extends RestResource {
     @RestrictToLeader
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @AuditEvent(type = AuditEventTypes.SUPPORT_BUNDLE_DOWNLOAD)
-    public Response download(@PathParam("filename") @Parameter(name = "filename") String filename) {
-        var mediaType = MediaType.valueOf(MediaType.APPLICATION_OCTET_STREAM);
-        StreamingOutput streamingOutput = outputStream -> supportBundleService.downloadBundle(filename, outputStream);
-        return respondWithFile(filename, streamingOutput, mediaType)
+    public Response download(@PathParam("filename") @Parameter(name = "filename") String filename) throws IOException {
+        final var bundleStream = supportBundleService.openBundleStream(filename);
+        return respondWithFile(filename, bundleStream, MediaType.valueOf(MediaType.APPLICATION_OCTET_STREAM))
                 .build();
     }
 

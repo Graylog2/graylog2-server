@@ -20,9 +20,9 @@ import styled, { css } from 'styled-components';
 import { Input } from 'components/bootstrap';
 import ConfirmDialog from 'components/common/ConfirmDialog';
 import UserNotification from 'util/UserNotification';
-import useCurrentUser from 'hooks/useCurrentUser';
-import StreamsStore, { type Stream } from 'stores/streams/StreamsStore';
-import { isPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
+import type { Stream } from 'logic/streams/types';
+import useStreamMutations from 'hooks/useStreamMutations';
 
 const StreamRuleConnector = styled.div(
   ({ theme }) => css`
@@ -56,23 +56,24 @@ type Props = {
 
 const MatchingTypeSwitcher = ({ stream, onChange }: Props) => {
   const [matchingType, setMatchingType] = useState<'AND' | 'OR' | undefined>(undefined);
-  const currentUser = useCurrentUser();
-  const disabled =
-    stream.is_default || !stream.is_editable || !isPermitted(currentUser.permissions, `streams:edit:${stream.id}`);
+  const { isPermitted } = usePermissions();
+  const { updateStream } = useStreamMutations();
+  const disabled = stream.is_default || !stream.is_editable || !isPermitted(`streams:edit:${stream.id}`);
 
   const handleTypeChange = (newValue: 'AND' | 'OR') => {
-    StreamsStore.update(stream.id, { matching_type: newValue }, (response) => {
-      onChange();
+    // The api fn handles the error toast on rejection, so we only run the success path on resolve.
+    updateStream({ streamId: stream.id, data: { matching_type: newValue } })
+      .then(() => {
+        onChange();
 
-      UserNotification.success(
-        `Messages will now be routed into the stream when ${newValue === 'AND' ? 'all' : 'any'} rules are matched`,
-        'Success',
-      );
+        UserNotification.success(
+          `Messages will now be routed into the stream when ${newValue === 'AND' ? 'all' : 'any'} rules are matched`,
+          'Success',
+        );
 
-      setMatchingType(undefined);
-
-      return response;
-    });
+        setMatchingType(undefined);
+      })
+      .catch(() => {});
   };
 
   return (

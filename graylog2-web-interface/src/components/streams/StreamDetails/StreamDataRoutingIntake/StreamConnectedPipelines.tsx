@@ -15,11 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
 
 import { Col, Row } from 'components/bootstrap';
 import type { Sort } from 'stores/PaginationTypes';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 import { Section, PaginatedEntityTable } from 'components/common';
 import {
   fetchStreamConnectedPipelines,
@@ -33,6 +32,8 @@ type Props = {
   stream: Stream;
 };
 
+const EXTERNAL_SEARCH = { query: '' };
+
 export const DEFAULT_LAYOUT = {
   entityTableId: 'pipelines',
   defaultPageSize: 20,
@@ -41,26 +42,20 @@ export const DEFAULT_LAYOUT = {
   defaultColumnOrder: ['rule', 'pipeline', 'connected_streams'],
 };
 
-const ListCol = styled(Col)(
-  ({ theme }) => css`
-    padding-top: ${theme.spacings.lg};
-  `,
-);
-
 const StreamConnectedPipelines = ({ stream }: Props) => (
-  <Section title="Pipelines" collapsible>
+  <Section title="Routing from other Streams" collapsible>
     <Row>
-      <ListCol md={12}>
+      <Col md={12}>
         <PaginatedEntityTable<StreamConnectedPipeline>
           humanName="pipelines"
           tableLayout={DEFAULT_LAYOUT}
           fetchEntities={(searchParams) => fetchStreamConnectedPipelines(stream.id, searchParams)}
           keyFn={(searchParams) => keyFn(stream.id, searchParams)}
           entityAttributesAreCamelCase={false}
-          searchPlaceholder="Search for pipeline"
+          externalSearch={EXTERNAL_SEARCH}
           columnRenderers={customColumnRenderers}
         />
-      </ListCol>
+      </Col>
     </Row>
   </Section>
 );

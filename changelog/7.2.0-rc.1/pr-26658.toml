@@ -1,0 +1,5 @@
+type = "a"
+message = "Periodically truncate fleet transaction log."
+
+issues = ["26267"]
+pulls = ["26658"]

@@ -20,6 +20,7 @@ import jakarta.inject.Inject;
 import org.graylog2.cluster.nodes.ServerNodeDto;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.shared.ServerVersion;
 
 import java.net.URI;
 import java.util.Collection;
@@ -49,6 +50,7 @@ public class NodeServiceImpl implements NodeService {
                 .setHostname(hostname)
                 .setProcessing(isProcessing)
                 .setLifecycle(lifecycle)
+                .setVersion(ServerVersion.VERSION.toString())
                 .build();
         return delegate.registerServer(dto);
     }

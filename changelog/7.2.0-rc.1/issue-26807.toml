@@ -1,0 +1,5 @@
+type = "a"
+message = "Add endpoint for rotating multiple index sets"
+
+pulls = ["26802"]
+issues = ["26807"]

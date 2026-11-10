@@ -24,14 +24,12 @@ import useParams from 'routing/useParams';
 import { PaginatedEntityTable, StatusIcon } from 'components/common';
 import type { Sort } from 'stores/PaginationTypes';
 import FieldTypeActions from 'components/indices/IndexSetFieldTypes/FieldTypeActions';
-import expandedSections from 'components/indices/IndexSetFieldTypes/originExpandedSections/expandedSections';
 import type { FieldTypeOrigin, IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
 import OriginFilterValueRenderer from 'components/indices/IndexSetFieldTypes/OriginFilterValueRenderer';
 import useCustomColumnRenderers from 'components/indices/IndexSetFieldTypes/hooks/useCustomColumnRenderers';
 import IndexSetProfile from 'components/indices/IndexSetFieldTypes/IndexSetProfile';
 import type { FieldTypePutResponse } from 'views/logic/fieldactions/ChangeFieldType/types';
-import { useStore } from 'stores/connect';
-import { IndexSetsStore } from 'stores/indices/IndexSetsStore';
+import useSingleIndexSet from 'components/indices/hooks/useSingleIndexSet';
 import isIndexFieldTypeChangeAllowed from 'components/indices/helpers/isIndexFieldTypeChangeAllowed';
 
 import BulkActions from './BulkActions';
@@ -60,7 +58,7 @@ const FilterValueRenderers = {
 
 const IndexSetFieldTypesList = () => {
   const { indexSetId } = useParams();
-  const { indexSet } = useStore(IndexSetsStore);
+  const { data: indexSet } = useSingleIndexSet(indexSetId);
   const [selectedEntitiesData, setSelectedEntitiesData] = useState<Record<string, IndexSetFieldType>>({});
   const customColumnRenderers = useCustomColumnRenderers();
 
@@ -107,11 +105,10 @@ const IndexSetFieldTypesList = () => {
       humanName="index set field types"
       entityActions={indexFieldTypeChangeAllowed && renderActions}
       tableLayout={DEFAULT_LAYOUT}
-      topRightCol={indexFieldTypeChangeAllowed && <IndexSetProfile />}
+      topRightCol={indexFieldTypeChangeAllowed && <IndexSetProfile indexSet={indexSet} />}
       fetchEntities={(searchParams) => fetchIndexSetFieldTypes(indexSetId, searchParams)}
       keyFn={keyFn}
       bulkSelection={bulkSelection}
-      expandedSectionRenderers={expandedSections}
       entityAttributesAreCamelCase
       filterValueRenderers={FilterValueRenderers}
       columnRenderers={customColumnRenderers}

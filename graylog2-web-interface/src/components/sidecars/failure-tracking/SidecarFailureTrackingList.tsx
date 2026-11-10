@@ -90,7 +90,7 @@ const SidecarTable = ({
   const sortableColumns = ['node_name', 'last_seen'];
 
   return (
-    <Table striped responsive>
+    <Table responsive>
       <colgroup>
         <StandardWidthCol />
         <StandardWidthCol />

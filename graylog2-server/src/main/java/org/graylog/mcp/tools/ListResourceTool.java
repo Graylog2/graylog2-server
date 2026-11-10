@@ -31,6 +31,7 @@ import org.graylog2.web.customization.CustomizationConfig;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -55,6 +56,11 @@ public class ListResourceTool extends Tool<ListResourceTool.Parameters, ListReso
                         Returns: A list of tuples with both the GRN and name of each resource.
                         """.formatted(customizationConfig.productName()));
         this.resourceProviders = resourceProviders;
+    }
+
+    @Override
+    public Set<String> checkedPermissions() {
+        return Set.of();
     }
 
     @Override

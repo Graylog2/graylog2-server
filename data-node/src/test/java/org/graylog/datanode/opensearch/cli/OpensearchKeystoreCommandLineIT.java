@@ -16,17 +16,21 @@
  */
 package org.graylog.datanode.opensearch.cli;
 
+import com.github.zafarkhaja.semver.Version;
 import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.OpensearchArchitecture;
 import org.graylog.datanode.configuration.OpensearchDistributionProvider;
+import org.graylog.datanode.configuration.OpensearchVersionSelector;
 import org.graylog.datanode.process.Environment;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -41,12 +45,14 @@ class OpensearchKeystoreCommandLineIT {
 
         cli.keystore().add("s3.client.default.access_key", "foo");
         cli.keystore().add("s3.client.default.secret_key", "bar");
+        cli.keystore().addFile("gcs.client.default.credentials_file", "{\"type\": \"service_account\"}".getBytes(StandardCharsets.UTF_8));
 
         final List<String> response = cli.keystore().list();
         Assertions.assertThat(response)
-                .hasSize(3) // two keys and one internal seed
+                .hasSize(4) // three keys and one internal seed
                 .contains("s3.client.default.access_key")
-                .contains("s3.client.default.secret_key");
+                .contains("s3.client.default.secret_key")
+                .contains("gcs.client.default.credentials_file");
     }
 
     private OpensearchCli createCli(Path tempDir) throws URISyntaxException {
@@ -60,8 +66,14 @@ class OpensearchKeystoreCommandLineIT {
     @Nonnull
     private Path detectOpensearchBinDir() throws URISyntaxException {
         final Path opensearchDistRoot = Path.of(getClass().getResource("/").toURI()).getParent().resolve("opensearch");
-        final OpensearchDistributionProvider distributionProvider = new OpensearchDistributionProvider(opensearchDistRoot, OpensearchArchitecture.fromOperatingSystem());
+        final OpensearchDistributionProvider distributionProvider = new OpensearchDistributionProvider(opensearchDistRoot, OpensearchArchitecture.fromOperatingSystem(), oldestVersionSelector());
         final OpensearchDistribution opensearchDistribution = distributionProvider.get();
         return opensearchDistribution.getOpensearchBinDirPath();
+    }
+
+    private static OpensearchVersionSelector oldestVersionSelector() {
+        return candidates -> candidates.stream()
+                .min(Comparator.comparing(OpensearchDistribution::version, Comparator.comparing(Version::parse)))
+                .orElseThrow(() -> new IllegalArgumentException("No suitable OpenSearch distribution found"));
     }
 }

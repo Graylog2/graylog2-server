@@ -59,7 +59,7 @@ describe('PaginatedList', () => {
 
   it('should not display Pagination, when context is not interactive', () => {
     const { queryByText } = render(
-      <InteractiveContext.Provider value={false}>
+      <InteractiveContext.Provider value="disabled">
         <PaginatedList totalItems={100} onChange={() => {}}>
           <div>The list</div>
         </PaginatedList>

@@ -63,6 +63,13 @@ const CustomFilterInput = ({ filter, onSubmit }: FilterComponentProps) => (
   </div>
 );
 
+// Asks to keep the dropdown open after submitting, like a component that allows adding several values.
+const KeepOpenFilterInput = ({ onSubmit }: FilterComponentProps) => (
+  <button type="button" onClick={() => onSubmit({ title: 'first', value: 'first' }, false)}>
+    Add value
+  </button>
+);
+
 describe('<EntityFilters />', () => {
   const onChangeFiltersWithTitle = jest.fn();
   const setUrlQueryFilters = jest.fn();
@@ -121,6 +128,14 @@ describe('<EntityFilters />', () => {
       title: 'Custom Component Attribute',
       type: 'STRING',
       filter_component: CustomFilterInput,
+    },
+    {
+      id: 'singleFilter',
+      filterable: true,
+      title: 'Single Filter Attribute',
+      type: 'STRING',
+      filter_component: KeepOpenFilterInput,
+      single_filter: true,
     },
   ];
 
@@ -241,6 +256,46 @@ describe('<EntityFilters />', () => {
     });
   });
 
+  describe('single filter attribute', () => {
+    it('should prevent creating a second filter', async () => {
+      asMock(useFiltersWithTitle).mockReturnValue({
+        data: OrderedMap({ singleFilter: [{ title: 'first', value: 'first' }] }),
+        onChange: onChangeFiltersWithTitle,
+        isInitialLoading: false,
+      });
+
+      render(<EntityFilters urlQueryFilters={OrderedMap({ singleFilter: ['first'] })} />);
+
+      await screen.findByTestId('singleFilter-filter-first');
+
+      await setupUser().click(
+        await screen.findByRole('button', {
+          name: /create filter/i,
+        }),
+      );
+
+      const singleFilterElement = await screen.findByRole('menuitem', { name: /single filter attribute/i });
+
+      await waitFor(() => expect(singleFilterElement).toBeDisabled());
+    });
+
+    it('should close the dropdown after creating the filter', async () => {
+      render(<EntityFilters urlQueryFilters={OrderedMap()} />);
+
+      await setupUser().click(await screen.findByRole('button', { name: /create filter/i }));
+
+      const singleFilterElement = await screen.findByRole('menuitem', { name: /single filter attribute/i });
+
+      expect(singleFilterElement).toBeEnabled();
+
+      await setupUser().click(singleFilterElement);
+      await setupUser().click(await screen.findByRole('button', { name: /add value/i }));
+
+      await waitFor(() => expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ singleFilter: ['first'] })));
+      await waitFor(() => dropdownIsHidden('create single filter attribute filter'));
+    });
+  });
+
   describe('attribute with filter suggestions', () => {
     beforeEach(() => {
       asMock(useFilterValueSuggestions).mockReturnValue({
@@ -347,19 +402,10 @@ describe('<EntityFilters />', () => {
       );
 
       const timeRangeForm = await screen.findByTestId('time-range-form');
-
-      const fromPicker = await screen.findByTestId('date-picker-from');
-      await setupUser().click(await within(fromPicker).findByRole('button', { name: /Monday, January 13th, 2020/i }));
-      await setupUser().clear(await screen.findByRole('spinbutton', { name: /from hour/i }));
-      await setupUser().type(await screen.findByRole('spinbutton', { name: /from hour/i }), '13');
-      await setupUser().clear(await screen.findByRole('spinbutton', { name: /from minutes/i }));
-      await setupUser().type(await screen.findByRole('spinbutton', { name: /from minutes/i }), '42');
-      await setupUser().clear(await screen.findByRole('spinbutton', { name: /from seconds/i }));
-      await setupUser().type(await screen.findByRole('spinbutton', { name: /from seconds/i }), '23');
-
-      const submitButton = within(timeRangeForm).getByRole('button', {
+      const submitButton = await within(timeRangeForm).findByRole('button', {
         name: /create filter/i,
       });
+
       await setupUser().click(submitButton);
 
       await waitFor(() =>
@@ -367,19 +413,17 @@ describe('<EntityFilters />', () => {
           OrderedMap({
             created_at: [
               {
-                title: '2020-01-13 13:42:23 - Now',
-                value: '2020-01-13T12:42:23.000+00:00><',
+                title: 'from 5 minutes ago until now',
+                value: 'relative@300',
               },
             ],
           }),
-          OrderedMap({ created_at: ['2020-01-13T12:42:23.000+00:00><'] }),
+          OrderedMap({ created_at: ['relative@300'] }),
         ),
       );
 
       await waitFor(() =>
-        expect(setUrlQueryFilters).toHaveBeenCalledWith(
-          OrderedMap({ created_at: ['2020-01-13T12:42:23.000+00:00><'] }),
-        ),
+        expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ created_at: ['relative@300'] })),
       );
       await waitFor(() => dropdownIsHidden('create created filter'));
     });
@@ -389,8 +433,8 @@ describe('<EntityFilters />', () => {
         data: OrderedMap({
           created_at: [
             {
-              title: '2020-01-01 00:55:00 - Now',
-              value: '2019-12-31T23:55:00.001+00:00',
+              title: 'from 10 minutes ago until now',
+              value: 'relative@600',
             },
           ],
         }),
@@ -398,28 +442,22 @@ describe('<EntityFilters />', () => {
         isInitialLoading: false,
       });
 
-      render(<EntityFilters urlQueryFilters={OrderedMap({ created_at: ['2019-12-31T23:55:00.000+00:00><'] })} />);
+      render(<EntityFilters urlQueryFilters={OrderedMap({ created_at: ['relative@600'] })} />);
 
-      const activeFilter = await screen.findByTestId('created_at-filter-2019-12-31T23:55:00.001+00:00');
+      const activeFilter = await screen.findByTestId('created_at-filter-relative@600');
 
       const toggleFilterButton = within(activeFilter).getByRole('button', {
         name: /change filter value/i,
       });
       await setupUser().click(toggleFilterButton);
 
-      const fromPicker = await screen.findByTestId('date-picker-from');
-      await setupUser().click(await within(fromPicker).findByRole('button', { name: /Monday, January 13th, 2020/i }));
-      await setupUser().clear(await screen.findByRole('spinbutton', { name: /from hour/i }));
-      await setupUser().type(await screen.findByRole('spinbutton', { name: /from hour/i }), '13');
-      await setupUser().clear(await screen.findByRole('spinbutton', { name: /from minutes/i }));
-      await setupUser().type(await screen.findByRole('spinbutton', { name: /from minutes/i }), '42');
-      await setupUser().clear(await screen.findByRole('spinbutton', { name: /from seconds/i }));
-      await setupUser().type(await screen.findByRole('spinbutton', { name: /from seconds/i }), '23');
-
       const timeRangeForm = await screen.findByTestId('time-range-form');
-      const submitButton = within(timeRangeForm).getByRole('button', {
+      await setupUser().click(await within(timeRangeForm).findByRole('tab', { name: /keyword/i }));
+
+      const submitButton = await within(timeRangeForm).findByRole('button', {
         name: /update filter/i,
       });
+
       await setupUser().click(submitButton);
 
       await waitFor(() =>
@@ -427,19 +465,17 @@ describe('<EntityFilters />', () => {
           OrderedMap({
             created_at: [
               {
-                title: '2020-01-13 13:42:23 - Now',
-                value: '2020-01-13T12:42:23.000+00:00><',
+                title: 'Last five minutes',
+                value: 'keyword@Last five minutes',
               },
             ],
           }),
-          OrderedMap({ created_at: ['2020-01-13T12:42:23.000+00:00><'] }),
+          OrderedMap({ created_at: ['keyword@Last five minutes'] }),
         ),
       );
 
       await waitFor(() =>
-        expect(setUrlQueryFilters).toHaveBeenCalledWith(
-          OrderedMap({ created_at: ['2020-01-13T12:42:23.000+00:00><'] }),
-        ),
+        expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap({ created_at: ['keyword@Last five minutes'] })),
       );
       await waitFor(() => dropdownIsHidden('edit created filter'));
     });
@@ -470,6 +506,36 @@ describe('<EntityFilters />', () => {
       );
 
       expect(screen.getByRole('menuitem', { name: /string/i })).toBeDisabled();
+    });
+
+    it('should strike through and disable conflicting active filter while keeping delete available', async () => {
+      asMock(useFiltersWithTitle).mockReturnValue({
+        data: OrderedMap({ type: [{ title: 'String', value: 'string' }] }),
+        onChange: onChangeFiltersWithTitle,
+        isInitialLoading: false,
+      });
+
+      render(
+        <EntityFilters urlQueryFilters={OrderedMap({ type: ['string'] })} activeSliceCol="type" activeSlice="string" />,
+      );
+
+      const activeFilter = await screen.findByTestId('type-filter-string');
+      const changeFilterButton = within(activeFilter).getByRole('button', { name: /change filter value/i });
+      const deleteFilterButton = within(activeFilter).getByRole('button', { name: /delete filter/i });
+
+      expect(changeFilterButton).toBeDisabled();
+      expect(changeFilterButton).toHaveStyle('text-decoration: line-through');
+      expect(deleteFilterButton).not.toBeDisabled();
+
+      await setupUser().click(changeFilterButton);
+
+      expect(screen.queryByRole('menuitem', { name: /number/i })).not.toBeInTheDocument();
+
+      await setupUser().click(deleteFilterButton);
+
+      await waitFor(() => {
+        expect(setUrlQueryFilters).toHaveBeenCalledWith(OrderedMap());
+      });
     });
   });
 

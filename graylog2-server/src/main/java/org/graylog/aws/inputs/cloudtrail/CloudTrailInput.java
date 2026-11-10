@@ -51,6 +51,7 @@ public class CloudTrailInput extends MessageInput {
     public static final String CK_OVERRIDE_SOURCE = "override_source";
     public static final String CK_POLLING_INTERVAL = "polling_interval";
     public static final String CK_SQS_MESSAGE_BATCH_SIZE = "sqs_message_batch_size";
+    public static final String CK_EXTERNAL_ID = "aws_external_id";
 
     @Inject
     public CloudTrailInput(@Assisted Configuration configuration,
@@ -123,7 +124,8 @@ public class CloudTrailInput extends MessageInput {
                     "",
                     "Secret key of an AWS user with sufficient permissions. (See documentation)",
                     ConfigurationField.Optional.OPTIONAL,
-                    true
+                    true,
+                    TextField.Attribute.IS_PASSWORD
             ));
             r.addField(new DropdownField(
                     CK_AWS_SQS_REGION,
@@ -152,13 +154,20 @@ public class CloudTrailInput extends MessageInput {
                     CK_POLLING_INTERVAL,
                     "Polling interval",
                     1,
-                    "Determines how often Graylog will check for SQS notifications. The smallest allowable interval is 1 minute.",
+                    "Determines how often to check for SQS notifications. The smallest allowable interval is 1 minute.",
                     ConfigurationField.Optional.OPTIONAL));
             r.addField(new TextField(
                     CK_ASSUME_ROLE_ARN,
                     "AWS assume role ARN",
                     "",
                     "The role ARN with required permissions (cross account access)",
+                    ConfigurationField.Optional.OPTIONAL
+            ));
+            r.addField(new TextField(
+                    CK_EXTERNAL_ID,
+                    "AWS External ID (optional)",
+                    "",
+                    "An external ID that is required to assume the role. This prevents the confused deputy problem in cross-account scenarios.",
                     ConfigurationField.Optional.OPTIONAL
             ));
             r.addField(new NumberField(

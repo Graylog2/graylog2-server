@@ -23,6 +23,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import jakarta.validation.constraints.NotBlank;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.database.entities.SourcedMongoEntity;
 import org.graylog2.database.entities.source.EntitySource;
 import org.joda.time.DateTime;
@@ -47,6 +49,9 @@ public abstract class ViewSummaryDTO implements ViewLike, SourcedMongoEntity<Vie
     @Nullable
     @JsonProperty(ViewDTO.FIELD_ID)
     public abstract String id();
+
+    @JsonProperty(ScopedEntity.FIELD_SCOPE)
+    public abstract String scope();
 
     @JsonProperty(ViewDTO.FIELD_TYPE)
     public abstract ViewDTO.Type type();
@@ -106,6 +111,9 @@ public abstract class ViewSummaryDTO implements ViewLike, SourcedMongoEntity<Vie
         @JsonProperty(FIELD_ENTITY_SOURCE)
         public abstract Builder entitySource(Optional<EntitySource> source);
 
+        @JsonProperty(ScopedEntity.FIELD_SCOPE)
+        public abstract Builder scope(String scope);
+
         @JsonProperty(ViewDTO.FIELD_TYPE)
         public abstract Builder type(ViewDTO.Type type);
 
@@ -148,6 +156,7 @@ public abstract class ViewSummaryDTO implements ViewLike, SourcedMongoEntity<Vie
         @JsonCreator
         public static Builder create() {
             return new AutoValue_ViewSummaryDTO.Builder()
+                    .scope(DefaultEntityScope.NAME)
                     .type(ViewDTO.Type.DASHBOARD)
                     .summary("")
                     .description("")

@@ -15,15 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useContext } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { defaultOnError } from 'util/conditional/onError';
-import TableFetchContext from 'components/common/PaginatedEntityTable/TableFetchContext';
+import useTableFilterContext from 'components/common/PaginatedEntityTable/useTableFilterContext';
 import type { Slice, SliceRenderers } from 'components/common/PaginatedEntityTable/slicing/Slicing';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import { slicesQueryKey } from 'components/common/PaginatedEntityTable/slicing/queryKeys';
 import useOnRefresh from 'components/common/PaginatedEntityTable/useOnRefresh';
+import useTableFetchContext from 'components/common/PaginatedEntityTable/useTableFetchContext';
 
 export type FetchSlices = (
   column: string,
@@ -34,10 +34,12 @@ export type FetchSlices = (
 const useFetchSlices = (fetchSlices: FetchSlices, sliceRenderers?: SliceRenderers) => {
   const {
     searchParams: { sliceCol, query, filters },
-  } = useContext(TableFetchContext);
+  } = useTableFilterContext();
+  // Tables can share slice columns, and layout variants can fetch different slices for the same filters.
+  const { entityTableId, layoutVariant } = useTableFetchContext();
 
   const { data, isLoading, refetch } = useQuery({
-    queryKey: slicesQueryKey(sliceCol, query, filters),
+    queryKey: slicesQueryKey(sliceCol, query, filters, entityTableId, layoutVariant),
     queryFn: () =>
       defaultOnError(
         fetchSlices(sliceCol, query, filters).then(

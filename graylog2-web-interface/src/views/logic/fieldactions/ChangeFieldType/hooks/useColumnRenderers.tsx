@@ -52,6 +52,7 @@ export const useColumnRenderers = (fieldTypes: FieldTypes) => {
               </div>
             );
           },
+          staticWidth: 220,
         },
       },
     }),

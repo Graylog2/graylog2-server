@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useMemo } from 'react';
+// eslint-disable-next-line no-restricted-imports
 import { useNavigate } from 'react-router-dom';
 
 const useHistory = () => {

@@ -45,7 +45,7 @@ public class LegacyDecoratorProcessor {
         }
         final List<SearchResponseDecorator> searchResponseDecorators = decorators
                 .stream()
-                .sorted(Comparator.comparing(Decorator::order))
+                .sorted(Comparator.comparingInt(Decorator::order))
                 .map(decorator -> this.searchResponseDecorators.get(decorator.type()).create(decorator))
                 .collect(Collectors.toList());
         return decoratorProcessor.decorate(searchResponse, searchResponseDecorators);

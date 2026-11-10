@@ -36,20 +36,32 @@ import java.nio.file.PathMatcher;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 class MockedTransport implements OpenSearchTransport {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private final JacksonJsonpMapper jacksonJsonpMapper;
     private final Set<MockedResponse> responses;
+    private final Consumer<TransportOptions> optionsConsumer;
+    private final TransportOptions baseOptions;
 
-    MockedTransport(Set<MockedResponse> responses) {
+    MockedTransport(Set<MockedResponse> responses, Consumer<TransportOptions> optionsConsumer) {
+        this(responses, optionsConsumer, TransportOptions.builder().build());
+    }
+
+    MockedTransport(Set<MockedResponse> responses, Consumer<TransportOptions> optionsConsumer, TransportOptions baseOptions) {
         jacksonJsonpMapper = new JacksonJsonpMapper(OBJECT_MAPPER);
         this.responses = responses;
+        this.optionsConsumer = optionsConsumer;
+        this.baseOptions = baseOptions;
     }
 
     @Override
     public <RequestT, ResponseT, ErrorT> ResponseT performRequest(RequestT request, Endpoint<RequestT, ResponseT, ErrorT> endpoint, @Nullable TransportOptions options) throws IOException {
+        if (optionsConsumer != null) {
+            optionsConsumer.accept(options);
+        }
         final String url = endpoint.requestUrl(request);
         final String method = endpoint.method(request);
 
@@ -102,7 +114,7 @@ class MockedTransport implements OpenSearchTransport {
 
     @Override
     public TransportOptions options() {
-        return TransportOptions.builder().build();
+        return baseOptions;
     }
 
     @Override

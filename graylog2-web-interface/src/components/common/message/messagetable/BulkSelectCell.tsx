@@ -17,11 +17,9 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
-
 const StyledCell = styled.td`
   &&& {
-    width: ${BULK_SELECT_COLUMN_WIDTH}px;
+    width: 24px;
     min-width: auto;
   }
 `;

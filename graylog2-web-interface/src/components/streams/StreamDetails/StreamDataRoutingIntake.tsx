@@ -18,7 +18,7 @@ import * as React from 'react';
 
 import StreamRules from 'components/streams/StreamDetails/StreamDataRoutingIntake/StreamRules';
 import StreamConnectedPipelines from 'components/streams/StreamDetails/StreamDataRoutingIntake/StreamConnectedPipelines';
-import type { Stream } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 
 type Props = {
   stream: Stream;

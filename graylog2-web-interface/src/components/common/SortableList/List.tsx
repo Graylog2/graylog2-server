@@ -16,6 +16,8 @@
  */
 import * as React from 'react';
 
+import { ListGroup } from 'components/bootstrap';
+
 import type { CustomContentRender, CustomListItemRender, ListItemType } from './types';
 import SortableListItem from './SortableListItem';
 
@@ -34,7 +36,7 @@ const List = <ItemType extends ListItemType>({
   disableDragging = false,
   items,
 }: Props<ItemType>) => (
-  <>
+  <ListGroup>
     {items?.map((item, index) => (
       <SortableListItem
         alignItemContent={alignItemContent}
@@ -46,7 +48,7 @@ const List = <ItemType extends ListItemType>({
         key={item.id}
       />
     ))}
-  </>
+  </ListGroup>
 );
 
 export default React.memo(List);

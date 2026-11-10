@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
 
+import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
 import { Col, Row, DataWell } from 'components/lookup-tables/layout-componets';
@@ -37,11 +37,11 @@ type Props = {
 };
 
 function LookupTableDetails({ table, canEdit = false }: Props) {
-  const navigate = useNavigate();
+  const { push } = useHistory();
 
   const handleEdit = useCallback(() => {
-    navigate(Routes.SYSTEM.LOOKUPTABLES.edit(table.name));
-  }, [table, navigate]);
+    push(Routes.SYSTEM.LOOKUPTABLES.edit(table.name));
+  }, [table, push]);
 
   return (
     <>

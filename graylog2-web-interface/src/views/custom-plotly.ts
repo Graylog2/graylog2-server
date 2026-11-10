@@ -18,10 +18,19 @@ import Plotly from 'plotly.js/lib/core';
 import Bar from 'plotly.js/lib/bar';
 import Pie from 'plotly.js/lib/pie';
 import Heatmap from 'plotly.js/lib/heatmap';
+import Sankey from 'plotly.js/lib/sankey';
 import Scatter from 'plotly.js/lib/scatter';
 import Scatterpolar from 'plotly.js/lib/scatterpolar';
 
+// Disable plotly sankey's hard-coded 500ms transition that fades links in on
+// initial render and re-fades them on node selection. The constants module is
+// required by sankey/render.js; mutating the cached CommonJS exports propagates
+// to every `transition().duration(c.duration)` call.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const sankeyConstants: { duration: number } = require('plotly.js/src/traces/sankey/constants');
+sankeyConstants.duration = 0;
+
 // @ts-ignore
-Plotly.register([Bar, Pie, Scatter, Heatmap, Scatterpolar]);
+Plotly.register([Bar, Pie, Scatter, Heatmap, Sankey, Scatterpolar]);
 
 export default Plotly;

@@ -265,6 +265,7 @@ const QueryInput = (
       }),
     [onExecuteProp, value, error, disableExecution, isValidating, validate],
   );
+
   const _commands = useMemo(
     () => [
       ...commands,
@@ -296,7 +297,7 @@ const QueryInput = (
       // The following will disable the mentioned hotkeys.
       {
         name: 'Do nothing',
-        bindKey: { win: 'Ctrl-Shift-Space', mac: 'Ctrl-Space|Ctrl-Shift-Space' },
+        bindKey: { win: 'Ctrl-Shift-Space|Ctrl+H', mac: 'Ctrl-Space|Ctrl-Shift-Space|Command+Option+F' },
         exec: () => {},
       },
     ],

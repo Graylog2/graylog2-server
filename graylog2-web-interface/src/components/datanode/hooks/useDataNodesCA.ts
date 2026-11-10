@@ -18,14 +18,14 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 
+import { CA } from '@graylog/server-api';
+
 import type FetchError from 'logic/errors/FetchError';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
 import type { DataNodesCA } from 'components/datanode/Types';
 import { onSettled } from 'util/conditional/onError';
 
 export const QUERY_KEY = ['data-nodes', 'ca-status'];
-const fetchDataNodesCA = (): Promise<DataNodesCA> => fetch('GET', qualifyUrl('ca'), undefined, false);
+const fetchDataNodesCA = (): Promise<DataNodesCA> => CA.get();
 
 const useDataNodesCA = (
   refetchInterval: number | false = 3000,

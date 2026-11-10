@@ -18,14 +18,18 @@ package org.graylog.integrations.ipfix;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.Resources;
+import com.google.common.primitives.Bytes;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.concurrent.TimeUnit;
 
 import static com.google.common.collect.Maps.immutableEntry;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,6 +43,100 @@ public class IpfixParserTest {
 
     @TempDir
     public File temporaryFolder;
+
+    @Test
+    @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+    public void parseMessage_undefinedInformationElement_doesNotLoop() {
+        final byte[] packetBytes = hexToBytes("000a00240000000000000001000000000002000c0100000103e800040100000841414141");
+        final ByteBuf packet = Unpooled.wrappedBuffer(packetBytes);
+        final IpfixMessage message = new IpfixParser(definitions).parseMessage(packet);
+        assertThat(message).isNotNull();
+        assertThat(message.flows()).hasSize(1);
+        assertThat(message.flows().getFirst().fields()).isEmpty();
+    }
+
+    @Test
+    @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+    public void parseMessage_undefinedInformationElement_fixedLength_doesNotCorruptSubsequentField() {
+        // Template: IE 1000 (len=4, undefined) + IE 8 (sourceIPv4Address, len=4, defined)
+        // Data record: 4 junk bytes for IE 1000, then 192.168.1.1 for IE 8
+        final byte[] packetBytes = hexToBytes("000a002c000000000000000100000000000200100100000203e8000400080004" +
+                "0100000c41414141c0a80101");
+        final ByteBuf packet = Unpooled.wrappedBuffer(packetBytes);
+        final IpfixMessage message = new IpfixParser(definitions).parseMessage(packet);
+        assertThat(message).isNotNull();
+        assertThat(message.flows()).hasSize(1);
+        assertThat(message.flows().getFirst().fields()).containsEntry("sourceIPv4Address", "192.168.1.1");
+    }
+
+    @Test
+    @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+    public void parseMessage_undefinedInformationElement_variableLength_doesNotCorruptSubsequentField() {
+        // Template: IE 1000 (len=65535 var-length, undefined) + IE 8 (sourceIPv4Address, len=4, defined)
+        // Data record: 0x04 (var-length prefix=4) + 4 junk bytes, then 192.168.1.1 for IE 8
+        final byte[] packetBytes = hexToBytes("000a002d000000000000000100000000000200100100000203e8ffff00080004" +
+                "0100000d0441414141c0a80101");
+        final ByteBuf packet = Unpooled.wrappedBuffer(packetBytes);
+        final IpfixMessage message = new IpfixParser(definitions).parseMessage(packet);
+        assertThat(message).isNotNull();
+        assertThat(message.flows()).hasSize(1);
+        assertThat(message.flows().getFirst().fields()).containsEntry("sourceIPv4Address", "192.168.1.1");
+    }
+
+    @Test
+    @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+    public void parseMessage_basicListZeroLengthElement_doesNotLoop() {
+        final byte[] packetBytes = hexToBytes("000a00270000000000000001000000000002000c01000001012300080100000b06000001000041");
+        final ByteBuf packet = Unpooled.wrappedBuffer(packetBytes);
+        final IpfixMessage message = new IpfixParser(definitions).parseMessage(packet);
+        assertThat(message).isNotNull();
+        assertThat(message.flows()).hasSize(1);
+        assertThat(message.flows().getFirst().fields()).isEmpty();
+    }
+
+    @Test
+    @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+    public void parseMessage_deeplyNestedSubTemplateList_doesNotOverflowStack() {
+        // A subTemplateList template that references itself recurses once per nesting level. Without a depth bound a
+        // crafted packet exhausts the stack (StackOverflowError); the parser must bail cleanly at MAX_SUBTEMPLATE_DEPTH.
+        final ByteBuf packet = Unpooled.wrappedBuffer(nestedSubTemplateListPacket(5000));
+        final IpfixMessage message = new IpfixParser(definitions).parseMessage(packet);
+        assertThat(message).isNotNull();
+    }
+
+    private static byte[] hexToBytes(final String hex) {
+        final int len = hex.length();
+        final byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(hex.charAt(i), 16) << 4) + Character.digit(hex.charAt(i + 1), 16));
+        }
+        return data;
+    }
+
+    private static byte[] u16(int v) {
+        return new byte[]{(byte) (v >> 8), (byte) v};
+    }
+
+    private static byte[] varLen(int n) {
+        return n < 255 ? new byte[]{(byte) n} : Bytes.concat(new byte[]{(byte) 0xff}, u16(n));
+    }
+
+    // An IPFIX message whose template 256 is a single subTemplateList (IE 292) referencing template 256, nested `depth`
+    // levels deep — the self-recursive parse path guarded by MAX_SUBTEMPLATE_DEPTH.
+    private static byte[] nestedSubTemplateListPacket(int depth) {
+        byte[] level = new byte[0];
+        for (int i = 0; i < depth; i++) {
+            final byte[] content = Bytes.concat(new byte[]{0x00}, u16(256), level); // semantic + templateId + nested list
+            level = Bytes.concat(varLen(content.length), content);
+        }
+        final byte[] dataSet = Bytes.concat(u16(256), u16(4 + level.length), level);
+        final byte[] template = Bytes.concat(u16(256), u16(1), u16(292), u16(0xffff));
+        final byte[] templateSet = Bytes.concat(u16(2), u16(4 + template.length), template);
+        final byte[] body = Bytes.concat(templateSet, dataSet);
+        final byte[] header = Bytes.concat(u16(10), u16(16 + body.length),
+                new byte[]{0, 0, 0, 1}, new byte[]{0, 0, 0, 1}, new byte[]{0, 0, 0, 1});
+        return Bytes.concat(header, body);
+    }
 
     @Test
     public void shallowParsePacket() throws IOException {

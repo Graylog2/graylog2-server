@@ -14,12 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as Immutable from 'immutable';
+
 import type {
   WidgetConfigFormValues,
   GroupingValidationErrors,
 } from 'views/components/aggregationwizard/WidgetConfigForm';
+import FieldType, { FieldTypes } from 'views/logic/fieldtypes/FieldType';
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import { ValuesType, DateType } from 'views/logic/aggregationbuilder/Pivot';
+import { DEFAULT_PIVOT_LIMIT } from 'views/Constants';
 
-import GroupingElement from './GroupingElement';
+import GroupingElement, { onGroupingFieldsChange } from './GroupingElement';
 
 describe('GroupByElement', () => {
   describe('Validation', () => {
@@ -213,6 +219,76 @@ describe('GroupByElement', () => {
       const result = onRemove(4, { groupBy: { ...groupBy, groupings: [grouping1, grouping2] } });
 
       expect(result.groupBy.groupings).toStrictEqual([grouping1, grouping2]);
+    });
+  });
+
+  describe('onGroupingFieldsChange', () => {
+    const knownFields = Immutable.List([
+      new FieldTypeMapping('http_method', new FieldType('string', [], [])),
+      new FieldTypeMapping('timestamp', FieldTypes.DATE()),
+    ]);
+    const fieldTypes = { all: knownFields, currentQuery: knownFields, queryFields: Immutable.Map() };
+
+    const timeGrouping = {
+      id: 'grouping-id',
+      direction: 'row' as const,
+      type: 'time' as const,
+      fields: [] as Array<string>,
+      interval: { type: 'auto', scaling: 1 } as const,
+    };
+
+    it('treats an unknown field as a values grouping', () => {
+      const setFieldValue = jest.fn();
+
+      onGroupingFieldsChange({
+        fieldTypes,
+        activeQueryId: 'queryId',
+        groupingIndex: 0,
+        grouping: timeGrouping,
+        newFields: ['arbitrary_field'],
+        setFieldValue,
+      });
+
+      expect(setFieldValue).toHaveBeenCalledWith(
+        'groupBy.groupings.0',
+        expect.objectContaining({ type: ValuesType, fields: ['arbitrary_field'], limit: DEFAULT_PIVOT_LIMIT }),
+      );
+    });
+
+    it('treats a known non-date field as a values grouping', () => {
+      const setFieldValue = jest.fn();
+
+      onGroupingFieldsChange({
+        fieldTypes,
+        activeQueryId: 'queryId',
+        groupingIndex: 0,
+        grouping: timeGrouping,
+        newFields: ['http_method'],
+        setFieldValue,
+      });
+
+      expect(setFieldValue).toHaveBeenCalledWith(
+        'groupBy.groupings.0',
+        expect.objectContaining({ type: ValuesType, fields: ['http_method'] }),
+      );
+    });
+
+    it('keeps a known date field as a date grouping', () => {
+      const setFieldValue = jest.fn();
+
+      onGroupingFieldsChange({
+        fieldTypes,
+        activeQueryId: 'queryId',
+        groupingIndex: 0,
+        grouping: timeGrouping,
+        newFields: ['timestamp'],
+        setFieldValue,
+      });
+
+      expect(setFieldValue).toHaveBeenCalledWith(
+        'groupBy.groupings.0',
+        expect.objectContaining({ type: DateType, fields: ['timestamp'] }),
+      );
     });
   });
 });

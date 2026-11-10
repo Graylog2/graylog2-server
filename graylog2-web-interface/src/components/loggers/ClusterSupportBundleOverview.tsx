@@ -84,7 +84,7 @@ const ClusterSupportBundleOverview = () => {
           </Header>
           <ClusterSupportBundleInfo />
           {list.length > 0 ? (
-            <Table className="table-striped table-condensed table-hover">
+            <Table condensed>
               <colgroup>
                 <FilenameCol />
               </colgroup>

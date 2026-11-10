@@ -1,5 +1,5 @@
 ```js
-const styles = ['Primary', 'Danger', 'Warning', 'Success', 'Info', 'Gray'];
+const styles = ['Primary', 'Danger', 'Warning', 'Success', 'Info', 'Default'];
 
 styles.map((style, i) => {
   return (

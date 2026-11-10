@@ -372,7 +372,7 @@ public class StreamRouterEngine {
             this.matchingType = stream.getMatchingType();
         }
 
-        public void addRule(Rule rule) {
+        private void addRule(Rule rule) {
             rules.add(rule);
         }
 

@@ -32,11 +32,9 @@ const mockLoadUsersPromise = Promise.resolve({
   },
 });
 
-jest.mock('stores/roles/AuthzRolesStore', () => ({
-  AuthzRolesStore: {},
-  AuthzRolesActions: {
-    loadUsersForRole: jest.fn(() => mockLoadUsersPromise),
-  },
+jest.mock('hooks/useAuthzRoles', () => ({
+  AUTHZ_ROLES_QUERY_KEY: ['authz', 'roles'],
+  loadUsersForRole: jest.fn(() => mockLoadUsersPromise),
 }));
 
 jest.useFakeTimers();
@@ -66,7 +64,7 @@ describe('RoleDetails', () => {
   it('should display assigned users', async () => {
     render(<RoleDetails role={exampleRole} />);
 
-    await screen.findByRole('heading', { level: 2, name: 'Users' });
+    await screen.findByRole('heading', { name: 'Users' });
     await screen.findByText(assignedUser.fullName);
   });
 });

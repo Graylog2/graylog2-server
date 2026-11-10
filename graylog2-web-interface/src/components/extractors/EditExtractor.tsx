@@ -19,8 +19,8 @@ import React from 'react';
 import { Col, ControlLabel, FormControl, FormGroup, Row, Button, Input } from 'components/bootstrap';
 import ExtractorUtils from 'util/ExtractorUtils';
 import { getValueFromInput } from 'util/FormsUtils';
-import ToolsStore from 'stores/tools/ToolsStore';
-import { ExtractorsActions } from 'stores/extractors/ExtractorsStore';
+import { testContainsString, testRegex } from 'api/tools';
+import { saveExtractor } from 'hooks/useExtractors';
 
 import EditExtractorConverters from './EditExtractorConverters';
 import EditExtractorConfiguration from './EditExtractorConfiguration';
@@ -134,7 +134,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
 
   _testCondition = () => {
     const { exampleMessage, updatedExtractor } = this.state;
-    const tester = updatedExtractor.condition_type === 'string' ? ToolsStore.testContainsString : ToolsStore.testRegex;
+    const tester = updatedExtractor.condition_type === 'string' ? testContainsString : testRegex;
     const promise = tester(updatedExtractor.condition_value, exampleMessage);
 
     promise.then((result) => this.setState({ conditionTestResult: result.matched }));
@@ -212,7 +212,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
 
     event.preventDefault();
 
-    ExtractorsActions.save.triggerPromise(inputId, updatedExtractor).then(() => onSave());
+    saveExtractor(inputId, updatedExtractor).then(() => onSave());
   };
 
   render() {

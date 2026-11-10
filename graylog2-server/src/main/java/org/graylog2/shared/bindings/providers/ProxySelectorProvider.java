@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Provider;
+import org.graylog2.utilities.ProxyConfig;
 import org.graylog2.utilities.ProxyHostsPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,33 +28,30 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.ProxySelector;
 import java.net.SocketAddress;
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.Optional;
 
 public class ProxySelectorProvider implements Provider<ProxySelector> {
     private static final Logger LOG = LoggerFactory.getLogger(ProxySelectorProvider.class);
 
-    protected final URI httpProxyUri;
+    protected final Optional<ProxyConfig> proxyConfig;
     protected final ProxyHostsPattern nonProxyHostsPattern;
 
     @Inject
-    public ProxySelectorProvider(@Named("http_proxy_uri") @Nullable URI httpProxyUri,
+    public ProxySelectorProvider(@Named("http_proxy_uri") @Nullable ProxyConfig httpProxyConfig,
                                  @Named("http_non_proxy_hosts") @Nullable ProxyHostsPattern nonProxyHostsPattern) {
-        this.httpProxyUri = httpProxyUri;
+        this.proxyConfig = Optional.ofNullable(httpProxyConfig);
         this.nonProxyHostsPattern = nonProxyHostsPattern;
     }
 
     @Override
     public ProxySelector get() {
-        if (httpProxyUri == null) {
-            return ProxySelector.getDefault();
-        }
-        return new ProxySelector() {
+        return proxyConfig.<ProxySelector>map(config -> new ProxySelector() {
             @Override
             public List<Proxy> select(URI uri) {
                 final String host = uri.getHost();
@@ -73,7 +71,7 @@ public class ProxySelectorProvider implements Provider<ProxySelector> {
                     LOG.debug("Unable to resolve host name for proxy selection: ", e);
                 }
 
-                final Proxy proxy = new Proxy(Proxy.Type.HTTP, getProxyAddress());
+                final Proxy proxy = new Proxy(Proxy.Type.HTTP, config.getProxyAddress());
                 return ImmutableList.of(proxy);
             }
 
@@ -81,10 +79,6 @@ public class ProxySelectorProvider implements Provider<ProxySelector> {
             public void connectFailed(URI uri, SocketAddress sa, IOException ioe) {
                 LOG.warn("Unable to connect to proxy: ", ioe);
             }
-        };
-    }
-
-    public InetSocketAddress getProxyAddress() {
-        return new InetSocketAddress(httpProxyUri.getHost(), httpProxyUri.getPort());
+        }).orElseGet(ProxySelector::getDefault);
     }
 }

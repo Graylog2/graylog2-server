@@ -25,13 +25,18 @@ import org.bson.BsonDocument;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.searchfilters.db.SearchFiltersReFetcher;
+import org.graylog.plugins.views.search.searchfilters.model.ReferencedSearchFilter;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.security.entities.EntityRegistrar;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.database.pagination.MongoPaginationHelper;
 import org.graylog2.database.utils.MongoUtils;
+import org.graylog2.database.utils.ScopedEntityMongoUtils;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.SortOrder;
@@ -39,10 +44,13 @@ import org.graylog2.search.SearchQuery;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -62,6 +70,8 @@ public class ViewService implements ViewUtils<ViewDTO> {
     private final MongoCollection<ViewDTO> collection;
     private final MongoPaginationHelper<ViewDTO> pagination;
     private final MongoUtils<ViewDTO> mongoUtils;
+    private final ScopedEntityMongoUtils<ViewDTO> scopedEntityMongoUtils;
+    private final SearchFiltersReFetcher searchFiltersRefetcher;
 
     @Inject
     protected ViewService(ClusterConfigService clusterConfigService,
@@ -69,7 +79,9 @@ public class ViewService implements ViewUtils<ViewDTO> {
                           EntityRegistrar entityRegistrar,
                           ViewSummaryService viewSummaryService,
                           EntitySourceService entitySourceService,
-                          MongoCollections mongoCollections) {
+                          MongoCollections mongoCollections,
+                          EntityScopeService entityScopeService,
+                          SearchFiltersReFetcher searchFiltersRefetcher) {
         this.clusterConfigService = clusterConfigService;
         this.viewRequirementsFactory = viewRequirementsFactory;
         this.entityRegistrar = entityRegistrar;
@@ -78,6 +90,8 @@ public class ViewService implements ViewUtils<ViewDTO> {
         this.collection = mongoCollections.collection(COLLECTION_NAME, ViewDTO.class);
         this.pagination = mongoCollections.paginationHelper(this.collection);
         this.mongoUtils = mongoCollections.utils(collection);
+        this.scopedEntityMongoUtils = mongoCollections.scopedEntityUtils(collection, entityScopeService);
+        this.searchFiltersRefetcher = searchFiltersRefetcher;
 
         mongoCollections.indexUtils(collection).prepareIndices(ViewDTO.FIELD_ID, ViewDTO.SORT_FIELDS, ViewDTO.STRING_SORT_FIELDS);
     }
@@ -100,7 +114,8 @@ public class ViewService implements ViewUtils<ViewDTO> {
 
     public Optional<ViewDTO> get(final SearchUser searchUser, final String id) {
         return findViews(searchUser, Filters.eq("_id", new ObjectId(id)), Sorts.ascending("_id"))
-                .findFirst();
+                .findFirst()
+                .map(this::getViewWithRefetchedFilters);//TODO: why requirementsForView is missing?
     }
 
     protected PaginatedList<ViewDTO> findPaginatedWithQueryFilterAndSortWithGrandTotal(SearchUser searchUser,
@@ -202,12 +217,15 @@ public class ViewService implements ViewUtils<ViewDTO> {
         try (final var stream = MongoUtils.stream(this.collection.find(Filters.eq(ViewDTO.FIELD_SEARCH_ID, searchId)))) {
             return stream
                     .map(this::requirementsForView)
-                    .collect(Collectors.toSet());
+                    .map(this::getViewWithRefetchedFilters)
+                .collect(Collectors.toSet());
         }
     }
 
     public Optional<ViewDTO> get(String id) {
-        return mongoUtils.getById(id).map(this::requirementsForView);
+        return mongoUtils.getById(id)
+                .map(this::requirementsForView)
+                .map(this::getViewWithRefetchedFilters);
     }
 
     @MustBeClosed
@@ -232,8 +250,8 @@ public class ViewService implements ViewUtils<ViewDTO> {
 
     public ViewDTO save(ViewDTO viewDTO) {
         try {
-            final var save = collection.insertOne(requirementsForView(viewDTO));
-            return mongoUtils.getById(MongoUtils.insertedId(save)).orElseThrow(() -> new IllegalStateException("Unable to retrieve saved View!"));
+            final String id = scopedEntityMongoUtils.create(requirementsForView(viewDTO));
+            return mongoUtils.getById(id).orElseThrow(() -> new IllegalStateException("Unable to retrieve saved View!"));
         } catch (MongoException e) {
             if (MongoUtils.isDuplicateKeyError(e)) {
                 throw new IllegalStateException("Unable to save view, it already exists.");
@@ -243,27 +261,105 @@ public class ViewService implements ViewUtils<ViewDTO> {
     }
 
     public void delete(String id) {
+        delete(id, true);
+    }
+
+    /**
+     * Deletes a view without scope deletability or mutability checks. Only for system-driven deletes such as
+     * content pack uninstalls, never for user API requests.
+     */
+    public void forceDelete(String id) {
+        delete(id, false);
+    }
+
+    private void delete(String id, boolean checkScope) {
         get(id).ifPresent(view -> {
+            if (checkScope) {
+                scopedEntityMongoUtils.ensureDeletability(view);
+                scopedEntityMongoUtils.ensureMutability(view);
+            }
             if (view.type().equals(ViewDTO.Type.DASHBOARD)) {
                 entityRegistrar.unregisterDashboard(id);
             } else {
                 entityRegistrar.unregisterSearch(id);
             }
         });
-        mongoUtils.deleteById(id);
+        scopedEntityMongoUtils.forceDelete(id);
         entitySourceService.deleteByEntityId(id);
     }
 
     public ViewDTO update(ViewDTO viewDTO) {
+        return scopedEntityMongoUtils.update(prepareForUpdate(viewDTO));
+    }
+
+    /**
+     * Updates a view without the scope mutability check. Only for system-driven updates such as content pack
+     * upgrades or cleanup of deleted references, never for user API requests.
+     */
+    public ViewDTO forceUpdate(ViewDTO viewDTO) {
+        return scopedEntityMongoUtils.forceUpdate(prepareForUpdate(viewDTO));
+    }
+
+    private ViewDTO prepareForUpdate(ViewDTO viewDTO) {
         checkArgument(viewDTO.id() != null, "Id of view must not be null.");
-        final ViewDTO viewWithRequirements = requirementsForView(viewDTO).toBuilder().lastUpdatedAt(DateTime.now(DateTimeZone.UTC)).build();
-        collection.replaceOne(MongoUtils.idEq(viewWithRequirements.id()), viewWithRequirements);
-        return viewWithRequirements;
+        return requirementsForView(viewDTO).toBuilder().lastUpdatedAt(DateTime.now(DateTimeZone.UTC)).build();
     }
 
     public ViewDTO requirementsForView(ViewDTO view) {
         return viewRequirementsFactory.create(view)
                 .rebuildRequirements(ViewDTO::requires, (v, newRequirements) -> v.toBuilder().requires(newRequirements).build());
+    }
+
+    public static ViewDTO fixReferencedSearchFilters(ViewDTO dto, Function<List<UsedSearchFilter>, List<UsedSearchFilter>> converter) {
+        return dto.toBuilder()
+                .state(dto.state().entrySet().stream()
+                        .map(
+                                entry -> new AbstractMap.SimpleEntry<>(
+                                        entry.getKey(),
+                                        fixStateForReferencedFilters(entry.getValue(), converter)
+                                )
+                        )
+                        .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                Map.Entry::getValue
+                        )))
+                .build();
+    }
+
+    private static ViewStateDTO fixStateForReferencedFilters(final ViewStateDTO stateDTO, Function<List<UsedSearchFilter>, List<UsedSearchFilter>> converter) {
+        return stateDTO.toBuilder()
+                .widgets(stateDTO.widgets().stream()
+                        .map(widgetDTO ->
+                                widgetDTO.toBuilder()
+                                        .filters(converter.apply(widgetDTO.filters()))
+                                        .build()
+                        )
+                        .collect(Collectors.toSet()))
+                .build();
+    }
+
+    private List<UsedSearchFilter> refetch(List<UsedSearchFilter> filters) {
+        return searchFiltersRefetcher.reFetch(filters);
+    }
+
+    private ViewDTO getViewWithRefetchedFilters(final ViewDTO viewDTO) {
+        if (searchFiltersRefetchNeeded(viewDTO)) {
+            return fixReferencedSearchFilters(viewDTO, this::refetch);
+        } else {
+            return viewDTO;
+        }
+    }
+
+    private boolean searchFiltersRefetchNeeded(final ViewDTO viewDTO) {
+        return searchFiltersRefetcher.turnedOn() &&
+                viewDTO.state().values()
+                        .stream()
+                        .anyMatch(state -> state.widgets()
+                                .stream()
+                                .anyMatch(
+                                        widgetDTO -> widgetDTO.filters() != null && widgetDTO.filters().stream().anyMatch(f -> f instanceof ReferencedSearchFilter)
+                                )
+                        );
     }
 
     @Override

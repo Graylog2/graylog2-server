@@ -26,7 +26,7 @@ import ContentPackEdit from 'components/content-packs/ContentPackEdit';
 import ContentPack from 'logic/content-packs/ContentPack';
 import Entity from 'logic/content-packs/Entity';
 import EntityIndex from 'logic/content-packs/EntityIndex';
-import { ContentPacksActions } from 'stores/content-packs/ContentPacksStore';
+import { createContentPack } from 'hooks/useContentPackMutations';
 import useHistory from 'routing/useHistory';
 import useProductName from 'brand-customization/useProductName';
 import MarketplaceLink from 'components/support/MarketplaceLink';
@@ -59,7 +59,7 @@ const CreateContentPackPage = () => {
   const _onSave = () => {
     const { contentPack } = contentPackState;
 
-    ContentPacksActions.create(contentPack.toJSON()).then(
+    createContentPack(contentPack.toJSON()).then(
       () => {
         UserNotification.success('Content pack imported successfully', 'Success!');
         history.push(Routes.SYSTEM.CONTENTPACKS.LIST);

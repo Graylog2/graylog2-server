@@ -19,9 +19,18 @@ import React from 'react';
 type InputWrapperProps = {
   className?: string;
   children: React.ReactNode;
+  wrapperAttributes?: React.HTMLAttributes<HTMLElement> & {
+    'data-input-value'?: string | undefined;
+  };
 };
 
-const InputWrapper = ({ children, className = undefined }: InputWrapperProps) =>
-  className ? <div className={className}>{children}</div> : <span>{children}</span>;
+const InputWrapper = ({ children, className = undefined, wrapperAttributes = undefined }: InputWrapperProps) =>
+  className ? (
+    <div {...wrapperAttributes} className={className}>
+      {children}
+    </div>
+  ) : (
+    <span {...wrapperAttributes}>{children}</span>
+  );
 
 export default InputWrapper;

@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix Inputs: Show green badges for pull inputs when running on all expected nodes."
+
+issues = ["Graylog2/graylog-plugin-enterprise#13977"]
+pulls = ["26314"]

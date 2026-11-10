@@ -18,17 +18,15 @@ import React from 'react';
 import { useQueries } from '@tanstack/react-query';
 import styled from 'styled-components';
 
-import { isPermitted } from 'util/PermissionsMixin';
+import { IndexerCluster } from '@graylog/server-api';
+
 import { Spinner } from 'components/common';
 import { Row, Col } from 'components/bootstrap';
 import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 import { IndexerClusterHealthSummary } from 'components/indexers';
 import type FetchError from 'logic/errors/FetchError';
-import ApiRoutes from 'routing/ApiRoutes';
-import { fetchPeriodically } from 'logic/rest/FetchProvider';
-import * as URLUtils from 'util/URLUtils';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 
 import IndexerClusterHealthError from './IndexerClusterHealthError';
 
@@ -45,17 +43,11 @@ type ClusterHealth = {
   shards: { active: number; initializing: number; relocating: number; unassigned: number };
 };
 
-const getIndexerClusterHealth = (): Promise<ClusterHealth> => {
-  const url = URLUtils.qualifyUrl(ApiRoutes.IndexerClusterApiController.health().url);
+const getIndexerClusterHealth = (): Promise<ClusterHealth> =>
+  IndexerCluster.clusterHealth({ requestShouldExtendSession: false });
 
-  return fetchPeriodically<ClusterHealth>('GET', url);
-};
-
-const getIndexerClusterName = (): Promise<{ name: string; distribution: string }> => {
-  const url = URLUtils.qualifyUrl(ApiRoutes.IndexerClusterApiController.info().url);
-
-  return fetchPeriodically('GET', url);
-};
+const getIndexerClusterName = (): Promise<{ name: string; distribution: string }> =>
+  IndexerCluster.clusterInfo({ requestShouldExtendSession: false });
 
 const useLoadHealthAndName = (enabled: boolean) => {
   const options = { refetchInterval: 5000, retry: 0, enabled };
@@ -95,8 +87,8 @@ type Props = {
 };
 
 const IndexerClusterHealth = ({ minimal = false }: Props) => {
-  const currentUser = useCurrentUser();
-  const userHasRequiredPermissions = isPermitted(currentUser.permissions, 'indexercluster:read');
+  const { isPermitted } = usePermissions();
+  const userHasRequiredPermissions = isPermitted('indexercluster:read');
   const { health, name, loading, error, isSuccess } = useLoadHealthAndName(userHasRequiredPermissions);
 
   if (!userHasRequiredPermissions) {

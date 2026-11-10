@@ -33,4 +33,10 @@ public @interface AuditEvent {
     boolean captureRequestEntity() default true;
 
     boolean captureResponseEntity() default true;
+
+    /**
+     * The response is streamed and starts successfully before its outcome is known. Only failed responses are
+     * audited; the resource must audit the outcome of successful ones itself.
+     */
+    boolean streaming() default false;
 }

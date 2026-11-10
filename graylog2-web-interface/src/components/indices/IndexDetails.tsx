@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { SystemIndexRanges } from '@graylog/server-api';
 
@@ -23,10 +24,12 @@ import { defaultOnError } from 'util/conditional/onError';
 import NumberUtils from 'util/NumberUtils';
 import { Col, Row, Button } from 'components/bootstrap';
 import { Spinner } from 'components/common';
-import { IndexRangeSummary, ShardMeter, ShardRoutingOverview } from 'components/indices';
-import type { IndexInfo } from 'stores/indices/IndicesStore';
-import type { IndexRange } from 'stores/indexers/IndexerOverviewStore';
-import { IndicesActions } from 'stores/indices/IndicesStore';
+import IndexRangeSummary from 'components/indices/IndexRangeSummary';
+import ShardMeter from 'components/indices/ShardMeter';
+import ShardRoutingOverview from 'components/indices/ShardRoutingOverview';
+import type { IndexInfo } from 'hooks/useIndices';
+import type { IndexRange } from 'hooks/useIndexerOverview';
+import { INDICES_QUERY_KEY, deleteIndex } from 'hooks/useIndices';
 
 type Props = {
   index: IndexInfo;
@@ -37,13 +40,9 @@ type Props = {
 };
 
 const IndexDetails = ({ index, indexName, indexRange = undefined, indexSetId = undefined, isDeflector }: Props) => {
-  useEffect(() => {
-    IndicesActions.subscribe(indexName);
+  const queryClient = useQueryClient();
 
-    return () => {
-      IndicesActions.unsubscribe(indexName);
-    };
-  }, [indexName]);
+  const _invalidate = useCallback(() => queryClient.invalidateQueries({ queryKey: INDICES_QUERY_KEY }), [queryClient]);
 
   const _onRecalculateIndex = useCallback(() => {
     // eslint-disable-next-line no-alert
@@ -54,22 +53,22 @@ const IndexDetails = ({ index, indexName, indexRange = undefined, indexSetId = u
         `Error starting index ranges recalculation for ${indexName}`,
       ).then(() => {
         if (indexSetId) {
-          IndicesActions.list(indexSetId);
+          _invalidate();
         }
       });
     }
-  }, [indexName, indexSetId]);
+  }, [indexName, indexSetId, _invalidate]);
 
   const _onDeleteIndex = useCallback(() => {
     // eslint-disable-next-line no-alert
     if (window.confirm(`Really delete index ${indexName}?`)) {
-      IndicesActions.delete(indexName).then(() => {
+      deleteIndex(indexName).then(() => {
         if (indexSetId) {
-          IndicesActions.list(indexSetId);
+          _invalidate();
         }
       });
     }
-  }, [indexName, indexSetId]);
+  }, [indexName, indexSetId, _invalidate]);
 
   const actionButtons = useMemo(() => {
     if (isDeflector) {

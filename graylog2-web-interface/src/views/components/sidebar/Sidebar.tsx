@@ -39,6 +39,7 @@ type Props = {
   children?: React.ReactElement;
   enableSidebarPinning?: boolean;
   forceSideBarPinned?: boolean;
+  initialSectionCollapsed?: boolean;
   results?: QueryResult;
   searchPreferencesLayout?: SearchPreferencesLayout;
   sections?: Array<SidebarSection>;
@@ -93,6 +94,7 @@ const Sidebar = ({
   sections = sidebarSections,
   actions = sidebarActions,
   forceSideBarPinned = false,
+  initialSectionCollapsed = false,
   enableSidebarPinning = true,
   contentColumnWidth = 275,
 }: Props) => {
@@ -100,7 +102,7 @@ const Sidebar = ({
   const sidebarIsPinned = searchPreferencesLayout?.config.sidebar.isPinned || forceSideBarPinned;
   const initialSectionKey = sections[0].key;
   const [activeSectionKey, setActiveSectionKey] = useState<string | undefined>(
-    sidebarIsPinned ? initialSectionKey : null,
+    sidebarIsPinned && !initialSectionCollapsed ? initialSectionKey : null,
   );
   const activeSection = sections.find((section) => section.key === activeSectionKey);
 

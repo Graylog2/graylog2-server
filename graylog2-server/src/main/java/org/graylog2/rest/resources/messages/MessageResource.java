@@ -40,6 +40,7 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
@@ -59,6 +60,8 @@ import org.graylog2.rest.models.messages.responses.MessageTokens;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -75,6 +78,8 @@ import static java.util.Objects.requireNonNull;
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/messages")
 public class MessageResource extends RestResource {
+    private static final Logger LOG = LoggerFactory.getLogger(MessageResource.class);
+
     private final Messages messages;
     private final CodecFactory codecFactory;
     private final IndexSetRegistry indexSetRegistry;
@@ -95,8 +100,7 @@ public class MessageResource extends RestResource {
     @Operation(summary = "Get a single message.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Returns the message", useReturnTypeSchema = true),
-            @ApiResponse(responseCode = "404", description = "Specified index does not exist."),
-            @ApiResponse(responseCode = "404", description = "Message does not exist.")
+            @ApiResponse(responseCode = "404", description = "Specified message does not exist or the user does not have the required permissions.")
     })
     public ResultMessage search(@Parameter(name = "index", description = "The index this message is stored in.", required = true)
                                 @PathParam("index") String index,
@@ -109,10 +113,8 @@ public class MessageResource extends RestResource {
             checkMessageReadPermission(message);
 
             return resultMessage;
-        } catch (DocumentNotFoundException e) {
-            throw new NotFoundException("Message " + messageId + " does not exist in index " + index, e);
-        } catch (IndexNotFoundException e) {
-            throw new NotFoundException("Index " + index + " does not exist.", e);
+        } catch (DocumentNotFoundException | IndexNotFoundException | ForbiddenException e) {
+            throw new NotFoundException("Specified message does not exist or the user does not have the required permissions");
         }
     }
 
@@ -146,12 +148,22 @@ public class MessageResource extends RestResource {
     })
     @NoAuditEvent("only used to parse a test message")
     public ResultMessage parse(@RequestBody(required = true) MessageParseRequest request) {
-        Codec codec;
+        if (!isAnyPermitted(RestPermissions.INPUTS_CREATE, PipelineRestPermissions.PIPELINE_RULE_CREATE)) {
+            throw new ForbiddenException("Not authorized");
+        }
+        if (!codecFactory.getFactory().containsKey(request.codec())) {
+            throw new NotFoundException("Codec type " + request.codec() + " does not exist.");
+        }
+        if (codecFactory.isMultiMessageCodec(request.codec())) {
+            throw new BadRequestException("Codec type " + request.codec() + " does not support parsing a single message.");
+        }
+
+        final Codec codec;
         try {
-            final Configuration configuration = new Configuration(request.configuration());
-            codec = codecFactory.create(request.codec(), configuration);
-        } catch (IllegalArgumentException e) {
-            throw new NotFoundException(e);
+            codec = codecFactory.create(request.codec(), new Configuration(request.configuration()));
+        } catch (Exception e) {
+            LOG.debug("Could not create codec <{}>", request.codec(), e);
+            throw new BadRequestException("Could not decode message");
         }
 
         final ResolvableInetSocketAddress remoteAddress = ResolvableInetSocketAddress.wrap(new InetSocketAddress(request.remoteAddress(), 1234));
@@ -191,7 +203,7 @@ public class MessageResource extends RestResource {
     @Path("/{index}/analyze")
     @Timed
     @Operation(summary = "Analyze a message string",
-                  description = "Returns what tokens/terms a message string (message or full_message) is split to.")
+               description = "Returns what tokens/terms a message string (message or full_message) is split to.")
     @RequiresPermissions(RestPermissions.MESSAGES_ANALYZE)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Returns tokens", useReturnTypeSchema = true),

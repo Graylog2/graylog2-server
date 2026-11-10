@@ -96,7 +96,7 @@ const MigrationStepTriggerButtonToolbar = ({
   hidden = false,
   children = undefined,
 }: Props) => {
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('migration');
   const { currentStep } = useMigrationState();
 
   if (hidden) {
@@ -109,7 +109,6 @@ const MigrationStepTriggerButtonToolbar = ({
     if (eventType) {
       sendTelemetry(eventType, {
         app_pathname: 'datanode',
-        app_section: 'migration',
       });
     }
 

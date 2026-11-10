@@ -46,6 +46,7 @@ export type LayoutSidebarTitle = string | LayoutSidebarTitleComponent;
 export type LayoutState = {
   sidebar: {
     isShown: boolean;
+    initialSectionCollapsed?: boolean;
     sections?: Array<SidebarSection>;
     title?: LayoutSidebarTitle;
     contentColumnWidth?: number;

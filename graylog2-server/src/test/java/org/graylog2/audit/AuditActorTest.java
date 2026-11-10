@@ -40,7 +40,7 @@ public class AuditActorTest {
     @Test
     public void testNullUser() {
         assertThrows(IllegalArgumentException.class, () ->
-            AuditActor.user(null));
+            AuditActor.user((String) null));
     }
 
     @Test

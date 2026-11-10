@@ -16,6 +16,7 @@
  */
 package org.graylog.security.certutil.csr;
 
+import com.google.common.net.InetAddresses;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.x509.Extension;
@@ -69,7 +70,9 @@ public class CsrGenerator {
                     new DEROctetString(
                             new GeneralNames(
                                     names.stream()
-                                            .map(alternativeName -> new GeneralName(GeneralName.dNSName, alternativeName))
+                                            .map(alternativeName -> InetAddresses.isInetAddress(alternativeName)
+                                                    ? new GeneralName(GeneralName.iPAddress, alternativeName)
+                                                    : new GeneralName(GeneralName.dNSName, alternativeName))
                                             .toArray(GeneralName[]::new)
                             )
                     )

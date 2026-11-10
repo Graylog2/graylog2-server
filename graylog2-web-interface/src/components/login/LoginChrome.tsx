@@ -20,6 +20,7 @@ import styled, { css } from 'styled-components';
 import DOMPurify from 'dompurify';
 
 import LoginBox from 'components/login/LoginBox';
+import { Sanitize } from 'components/common';
 import PublicNotifications from 'components/common/PublicNotifications';
 import backgroundImage from 'images/auth/login-bg.svg';
 import { Logo } from 'components/navigation/NavigationBrand';
@@ -107,7 +108,9 @@ const CustomizableLogo = () => {
   const customLogo = useCustomLogo(colorScheme);
 
   return customLogo ? (
-    <CustomLogo dangerouslySetInnerHTML={{ __html: customLogo }} />
+    <CustomLogo>
+      <Sanitize html={customLogo} />
+    </CustomLogo>
   ) : (
     <LogoContainer>
       <Logo color="#03C3FF" />

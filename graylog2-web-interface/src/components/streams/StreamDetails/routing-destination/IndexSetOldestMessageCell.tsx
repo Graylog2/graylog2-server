@@ -17,7 +17,7 @@
 import * as React from 'react';
 
 import { Timestamp } from 'components/common';
-import type { IndexSummary } from 'stores/indexers/IndexerOverviewStore';
+import type { IndexSummary } from 'hooks/useIndexerOverview';
 
 type Props = {
   index?: IndexSummary;

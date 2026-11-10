@@ -17,13 +17,13 @@
 import React from 'react';
 
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
+import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 import { Link } from 'components/common';
 import Routes from 'routing/Routes';
 import ConnectedPipelineLinkedCell from 'components/streams/StreamDetails/StreamDataRoutingIntake/cells/ConnectedPipelineLinkedCell';
 import ConnectedPipelineStreamsCell from 'components/streams/StreamDetails/StreamDataRoutingIntake/cells/ConnectedPipelineStreamsCell';
 import HumanReadableStreamRule from 'components/streamrules/HumanReadableStreamRule';
-import { useStore } from 'stores/connect';
-import { StreamRulesInputsStore } from 'stores/inputs/StreamRulesInputsStore';
+import useStreamRulesInputs from 'hooks/useStreamRulesInputs';
 import type { InputPipelineRule, InputStreamRule } from 'components/inputs/InputDiagnosis/types';
 
 export const pipelineRulesColumnRenderers: ColumnRenderers<InputPipelineRule> = {
@@ -47,7 +47,7 @@ export const pipelineRulesColumnRenderers: ColumnRenderers<InputPipelineRule> = 
 };
 
 const StreamRuleCell = ({ streamRule }: { streamRule: InputStreamRule }) => {
-  const { inputs } = useStore(StreamRulesInputsStore);
+  const { data: inputs } = useStreamRulesInputs();
 
   return (
     <HumanReadableStreamRule
@@ -71,6 +71,7 @@ export const streamRulesColumnRenderers: ColumnRenderers<InputStreamRule> = {
     },
     rule: {
       renderCell: (_rule: string, streamRule: InputStreamRule) => <StreamRuleCell streamRule={streamRule} />,
+      staticWidth: COLUMN_WIDTH.description,
     },
   },
 };

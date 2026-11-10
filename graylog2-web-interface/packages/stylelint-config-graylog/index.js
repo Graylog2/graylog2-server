@@ -21,8 +21,16 @@ module.exports = {
   ],
   rules: {
     'declaration-empty-line-before': null,
+    'declaration-property-value-disallowed-list': [
+      { 'z-index': [/^-?\d{2,}$/] },
+      { message: 'Use a value from `theme/z-indices` instead of a numeric z-index.' },
+    ],
     'function-name-case': null,
     'media-query-no-invalid': null,
+    // `postcss-styled-syntax` does not treat a styled-component template root as a
+    // scoping root, so idiomatic root-level `&` selectors (e.g. `&::before`,
+    // `&.content`) are flagged as false positives. Disable for styled-components.
+    'nesting-selector-no-missing-scoping-root': null,
     'no-descending-specificity': null,
     'no-empty-source': null,
     'property-no-vendor-prefix': [true, {

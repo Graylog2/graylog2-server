@@ -33,7 +33,6 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationRequestSpec.DEFAULT_TIMERANGE;
-import static org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec.DEFAULT_FIELDS;
 import static org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec.DEFAULT_SORT;
 import static org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec.DEFAULT_SORT_ORDER;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -124,7 +123,7 @@ class QueryParamsToFullRequestSpecificationMapperTest {
                 )
         );
 
-        final MessagesRequestSpec messagesRequestSpec = toTest.simpleQueryParamsToFullRequestSpecification(null, null, null, null, null, null, null, 0, 10);
+        final MessagesRequestSpec messagesRequestSpec = toTest.simpleQueryParamsToFullRequestSpecification(null, null, null, null, null, null, null, 0, 10, false);
         assertThat(messagesRequestSpec).isEqualTo(new MessagesRequestSpec(
                         "*",
                         Set.of(),
@@ -134,9 +133,8 @@ class QueryParamsToFullRequestSpecificationMapperTest {
                         DEFAULT_SORT_ORDER,
                         0,
                         10,
-                        DEFAULT_FIELDS
-
-
+                        List.of(),
+                        false
                 )
         );
     }

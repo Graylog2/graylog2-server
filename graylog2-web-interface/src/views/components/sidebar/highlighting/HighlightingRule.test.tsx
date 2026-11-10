@@ -83,7 +83,7 @@ describe('HighlightingRule', () => {
   describe('rule edit', () => {
     it('should show a edit modal', async () => {
       render(<SUT />);
-      const editIcon = await screen.findByTitle('Edit this Highlighting Rule');
+      const editIcon = await screen.findByRole('button', { name: 'Edit this Highlighting Rule' });
 
       expect(screen.queryByText('Edit Highlighting Rule')).not.toBeInTheDocument();
 
@@ -94,7 +94,7 @@ describe('HighlightingRule', () => {
   });
 
   describe('rule removal:', () => {
-    const findDeleteIcon = () => screen.findByTitle('Remove this Highlighting Rule');
+    const findDeleteIcon = () => screen.findByRole('button', { name: 'Remove this Highlighting Rule' });
 
     useWindowConfirmMock();
 

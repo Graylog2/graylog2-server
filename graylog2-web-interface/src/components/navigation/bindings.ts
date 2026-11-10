@@ -26,6 +26,7 @@ import DocsHelper from 'util/DocsHelper';
 export const SYSTEM_DROPDOWN_TITLE = 'System';
 export const SEARCH_LINK_TITLE = 'Search';
 export const DASHBOARDS_LINK_TITLE = 'Dashboards';
+export const AUTHENTICATION_LINK_TITLE = 'Authentication';
 
 const navigationBindings: PluginExports = {
   navigation: [
@@ -76,7 +77,7 @@ const navigationBindings: PluginExports = {
             { path: Routes.SYSTEM.AUTHZROLES.OVERVIEW, description: 'Roles', permissions: ['roles:read'] },
             {
               path: Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE,
-              description: 'Authentication',
+              description: AUTHENTICATION_LINK_TITLE,
               permissions: ['authentication:edit'],
             },
             { path: Routes.SYSTEM.CONTENTPACKS.LIST, description: 'Content Packs', permissions: ['contentpack:read'] },
@@ -92,6 +93,12 @@ const navigationBindings: PluginExports = {
               permissions: ['pipeline:read', 'pipeline_connection:read'],
             },
             { path: Routes.SYSTEM.SIDECARS.OVERVIEW, description: 'Sidecars', permissions: ['sidecars:read'] },
+            {
+              path: Routes.SYSTEM.COLLECTORS.OVERVIEW,
+              description: 'Collectors',
+              permissions: ['collector_fleets:read', 'collectors_config:read'],
+              requiredFeatureFlag: 'collectors',
+            },
           ],
           AppConfig.isCloud() && !AppConfig.isFeatureEnabled('cloud_inputs') ? [Routes.SYSTEM.INPUTS] : [],
         ),
@@ -106,6 +113,9 @@ const navigationBindings: PluginExports = {
   ],
   helpMenu: [
     { description: 'Documentation', externalLink: DocsHelper.versionedDocsHomePage() },
+    ...(AppConfig.gl2DevMode()
+      ? [{ description: 'Design System', externalLink: 'https://graylog2.github.io/design-system' }]
+      : []),
     { description: 'Keyboard Shortcuts', action: ({ showHotkeysModal }) => showHotkeysModal() },
     {
       description: 'API browser',

@@ -19,9 +19,9 @@ import { useQuery } from '@tanstack/react-query';
 
 import { NodeMaintenanceDropdown, NodeOverview } from 'components/nodes';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import { ClusterOverviewStore } from 'stores/cluster/ClusterOverviewStore';
-import { InputStatesStore } from 'stores/inputs/InputStatesStore';
-import { InputTypesStore } from 'stores/inputs/InputTypesStore';
+import { fetchInputStates } from 'hooks/useInputsStates';
+import useInputTypesDescriptions from 'hooks/useInputTypesDescriptions';
+import useClusterOverview, { fetchNodeJvm } from 'hooks/useClusterOverview';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import useParams from 'routing/useParams';
 import { useStore } from 'stores/connect';
@@ -31,25 +31,22 @@ import useProductName from 'brand-customization/useProductName';
 const ShowNodePage = () => {
   const productName = useProductName();
   const { nodeId } = useParams<{ nodeId: string }>();
-  const { inputDescriptions } = useStore(InputTypesStore);
+  const { data: inputDescriptions } = useInputTypesDescriptions();
   const { nodes } = useStore(NodesStore);
-  const { clusterOverview } = useStore(ClusterOverviewStore);
+  const { data: clusterOverview } = useClusterOverview();
   const { pluginList, isLoading: isLoadingPlugins } = usePluginList(nodeId);
   const { data: jvmInformation } = useQuery({
     queryKey: ['jvm', nodeId],
-    queryFn: () => ClusterOverviewStore.jvm(nodeId),
+    queryFn: () => fetchNodeJvm(nodeId),
   });
   const { data: inputStates } = useQuery({
     queryKey: ['inputs', 'states', nodeId],
-
     queryFn: () =>
-      InputStatesStore.list().then((newInputStates) => {
-        // We only want the input states for the current node
-        const inputIds = Object.keys(newInputStates);
+      fetchInputStates().then((allInputStates) => {
         const filteredInputStates = [];
 
-        inputIds.forEach((inputId) => {
-          const inputObject = newInputStates[inputId][nodeId];
+        Object.keys(allInputStates).forEach((inputId) => {
+          const inputObject = allInputStates[inputId][nodeId];
 
           if (inputObject) {
             filteredInputStates.push(inputObject);
@@ -96,7 +93,7 @@ const ShowNodePage = () => {
           jvmInformation={jvmInformation}
           plugins={pluginList.plugins}
           inputStates={inputStates}
-          inputDescriptions={inputDescriptions}
+          inputDescriptions={inputDescriptions as any}
         />
       </div>
     </DocumentTitle>

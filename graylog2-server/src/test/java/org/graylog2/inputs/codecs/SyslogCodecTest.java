@@ -465,6 +465,45 @@ public class SyslogCodecTest {
     }
 
     @Test
+    public void testFortiGateTopLevelFieldsAreNotOverriddenByMatchingKeysInsideQuotedValues() {
+        final String msg = "<99>date=2026-06-12 time=13:17:12 devname=\"FW1\" tz=+00:00 "
+                + "srcip=10.0.0.1 dstip=10.0.0.2 "
+                + "url=\"/?srcip=127.0.0.1&dstip=127.0.0.1\"";
+
+        final Message message = codec.decodeSafe(buildRawMessage(msg)).get();
+
+        assertThat(message).isNotNull();
+        assertThat(message.getField("srcip")).isEqualTo("10.0.0.1");
+        assertThat(message.getField("dstip")).isEqualTo("10.0.0.2");
+        assertThat(message.getField("url")).isEqualTo("/?srcip=127.0.0.1&dstip=127.0.0.1");
+    }
+
+    @Test
+    public void testFortiGateBackslashEscapedQuoteInsideQuotedValueDoesNotTerminateTheValue() {
+        final String msg = "<99>date=2026-06-12 time=13:17:12 devname=\"FW1\" tz=+00:00 "
+                + "srcip=10.0.0.1 "
+                + "url=\"/test?\\\"srcip=127.0.0.1\"";
+
+        final Message message = codec.decodeSafe(buildRawMessage(msg)).get();
+
+        assertThat(message).isNotNull();
+        assertThat(message.getField("srcip")).isEqualTo("10.0.0.1");
+        assertThat(message.getField("url")).isEqualTo("/test?\\\"srcip=127.0.0.1");
+    }
+
+    @Test
+    public void testFortiGateUsesTopLevelDateAndTimeWhenMatchingKeysAppearInsideQuotedValues() {
+        final String msg = "<99>date=2026-06-12 time=13:17:12 devname=\"FW1\" tz=+00:00 "
+                + "url=\"/?date=invalid&time=1&tz=Z\"";
+
+        final Message message = codec.decodeSafe(buildRawMessage(msg)).get();
+
+        assertThat(message).isNotNull();
+        assertThat(message.getTimestamp()).isEqualTo(new DateTime(2026, 6, 12, 13, 17, 12, DateTimeZone.UTC));
+        assertThat(message.getField("url")).isEqualTo("/?date=invalid&time=1&tz=Z");
+    }
+
+    @Test
     public void testDefaultTimezoneConfig() {
         when(configuration.getString("timezone")).thenReturn("MST");
 

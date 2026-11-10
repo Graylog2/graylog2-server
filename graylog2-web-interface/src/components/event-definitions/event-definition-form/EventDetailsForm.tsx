@@ -21,18 +21,19 @@ import upperFirst from 'lodash/upperFirst';
 import toNumber from 'lodash/toNumber';
 import toString from 'lodash/toString';
 import { useMantineTheme } from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
 
+import useMediaQuery from 'util/hooks/useMediaQuery';
 import { Select } from 'components/common';
+import { MarkdownEditor, MarkdownPreview } from 'components/common/MarkdownEditor';
 import { Button, Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import usePluginEntities from 'hooks/usePluginEntities';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 import * as FormsUtils from 'util/FormsUtils';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+
+import EventSummaryTemplateHelp from './EventSummaryTemplateHelp';
 
 import type { EventDefinition } from '../event-definitions-types';
 import { isSystemEventDefinition } from '../event-definitions-types';
@@ -46,6 +47,22 @@ const StyledRow = styled.div`
   & .form-group {
     width: 100%;
   }
+`;
+
+const InputContainer = styled.div`
+  display: inline-block;
+  position: relative;
+  width: 100%;
+`;
+
+const InputFeedback = styled.div`
+  position: absolute;
+  right: 0;
+  top: 24px;
+  display: flex;
+  align-items: center;
+  min-height: 34px;
+  padding-right: 3px;
 `;
 
 const priorityOptions = Object.entries(EventDefinitionPriorityEnum.properties)
@@ -70,17 +87,13 @@ type Props = {
 const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, validation, onChange, canEdit }: Props) => {
   const theme = useMantineTheme();
   const ltXl = useMediaQuery(`(min-width: ${theme.breakpoints.xl}`);
-  const { pathname } = useLocation();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('event-definition-details');
   const [showAddEventProcedureForm, setShowAddEventProcedureForm] = useState<boolean>(false);
   const {
     data: { valid: validSecurityLicense },
   } = usePluggableLicenseCheck('/license/security');
 
-  const readOnly = useMemo(
-    () => !canEdit || isSystemEventDefinition(eventDefinition) || eventDefinition.config.type === 'sigma-v1',
-    [canEdit, eventDefinition],
-  );
+  const readOnly = useMemo(() => !canEdit || isSystemEventDefinition(eventDefinition), [canEdit, eventDefinition]);
   const showEventProcedureSummary = useMemo(
     () => !!eventDefinitionEventProcedure && !showAddEventProcedureForm && validSecurityLicense,
     [eventDefinitionEventProcedure, showAddEventProcedureForm, validSecurityLicense],
@@ -98,8 +111,6 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
 
   const handlePriorityChange = (nextPriority: string) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_DETAILS.PRIORITY_CHANGED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'event-definition-details',
       app_action_value: 'priority-select',
       priority: priorityOptions.find((opt) => opt.value === nextPriority)?.label,
     });
@@ -143,16 +154,21 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
             </FormGroup>
           </StyledRow>
 
-          <Input
-            id="event-definition-event-summary-template"
-            name="event_summary_template"
-            label="Event Summary Template"
-            type="text"
-            help="Template used to generate the Event and Alert summaries."
-            value={eventDefinition.event_summary_template}
-            onChange={handleChange}
-            readOnly={readOnly}
-          />
+          <InputContainer className="input-container">
+            <Input
+              id="event-definition-event-summary-template"
+              name="event_summary_template"
+              label="Event Summary Template"
+              type="text"
+              help="Template used to generate the Event and Alert summaries."
+              value={eventDefinition.event_summary_template}
+              onChange={handleChange}
+              readOnly={readOnly}
+            />
+            <InputFeedback>
+              <EventSummaryTemplateHelp />
+            </InputFeedback>
+          </InputContainer>
 
           <Input
             id="event-definition-description"
@@ -169,7 +185,30 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
             readOnly={readOnly}
             rows={2}
           />
-          {showAddEventProcedureForm && (
+          {!validSecurityLicense && (
+            <FormGroup>
+              <ControlLabel>
+                Remediation Steps <small className="text-muted">(Optional)</small>
+              </ControlLabel>
+              {readOnly ? (
+                <MarkdownPreview
+                  show
+                  withFullView
+                  height={150}
+                  value={eventDefinition.remediation_steps || 'No remediation steps given'}
+                />
+              ) : (
+                <MarkdownEditor
+                  id="event-definition-remediation-steps"
+                  height={150}
+                  value={eventDefinition.remediation_steps ?? ''}
+                  onChange={(newValue) => onChange('remediation_steps', newValue)}
+                />
+              )}
+              <HelpBlock>Steps to remediate this Event. Markdown formatting is supported.</HelpBlock>
+            </FormGroup>
+          )}
+          {validSecurityLicense && showAddEventProcedureForm && (
             <PluggableEventProcedureForm
               eventProcedureId={eventDefinitionEventProcedure}
               remediationSteps={eventDefinition?.remediation_steps}

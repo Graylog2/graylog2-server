@@ -14,22 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import memoize from 'lodash/memoize';
-import { JSONParse, JSONStringify } from 'json-with-bigint';
-
+import * as JSON from 'util/json';
 import FetchError from 'logic/errors/FetchError';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import CancellablePromise from 'logic/rest/CancellablePromise';
-import { ServerAvailabilityActions } from 'stores/sessions/ServerAvailabilityStore';
+import { reportError as reportServerError, reportSuccess as reportServerSuccess } from 'api/server-availability';
 import type { Method } from 'routing/types';
-
-// eslint-disable-next-line global-require,@typescript-eslint/no-require-imports
-const importSessionStore = memoize(() => require('stores/sessions/SessionStore'));
-
-const reportServerSuccess = () => {
-  ServerAvailabilityActions.reportSuccess();
-};
+import Session from 'logic/session/Session';
 
 const defaultOnUnauthorizedError = (error: FetchError) => ErrorsActions.report(createFromFetchError(error));
 
@@ -40,26 +32,25 @@ const onServerError = async (error: Response | undefined, onUnauthorized = defau
   const response = await (contentType?.startsWith('application/json')
     ? error.json().then((body) => body)
     : error?.text?.());
-  const { SessionStore, SessionActions } = importSessionStore();
   const fetchError = new FetchError(error.statusText, error.status, emptyToUndefined(response));
 
-  if (SessionStore.isLoggedIn() && error.status === 401) {
-    SessionActions.logout();
+  if (Session.isLoggedIn() && error.status === 401) {
+    Session.logout().catch(() => {});
   }
 
   // Redirect to the start page if a user is logged in but not allowed to access a certain HTTP API.
-  if (SessionStore.isLoggedIn() && error.status === 403) {
+  if (Session.isLoggedIn() && error.status === 403) {
     onUnauthorized(fetchError);
   }
 
   if (error && !error.status) {
-    ServerAvailabilityActions.reportError(fetchError);
+    reportServerError(fetchError);
   }
 
   throw fetchError;
 };
 
-const maybeStringify = (body: any) => (body && typeof body !== 'string' ? JSONStringify(body) : body);
+const maybeStringify = (body: any) => (body && typeof body !== 'string' ? JSON.stringify(body) : body);
 
 type RequestHeaders = {
   Accept?: string;
@@ -74,7 +65,7 @@ const defaultResponseHandler = (resp: Response) => {
 
     reportServerSuccess();
 
-    return noContent ? null : resp.text().then(JSONParse);
+    return noContent ? null : resp.text().then(JSON.parse);
   }
 
   throw resp;
@@ -105,6 +96,8 @@ export class Builder {
 
   private errorHandler: (error: unknown) => unknown;
 
+  private signal: AbortSignal;
+
   constructor(method: Method, url: string) {
     this.method = method;
     this.url = url.replace(/([^:])\/\//, '$1/');
@@ -118,7 +111,7 @@ export class Builder {
     this.errorHandler = undefined;
   }
 
-  setHeader(header, value) {
+  setHeader(header: string, value: string | number | boolean | string[]) {
     this.options = {
       ...this.options,
       [header]: value,
@@ -147,7 +140,7 @@ export class Builder {
     return this;
   }
 
-  formData(body, acceptedMimeType = 'application/json') {
+  formData(body: any, acceptedMimeType = 'application/json') {
     this.body = { body };
 
     this.accept = acceptedMimeType;
@@ -158,7 +151,7 @@ export class Builder {
     return this;
   }
 
-  file(body, mimeType) {
+  file(body: any, mimeType: string) {
     this.body = { body: maybeStringify(body), mimeType: 'application/json' };
     this.accept = mimeType;
 
@@ -177,7 +170,7 @@ export class Builder {
     return this;
   }
 
-  blobFile(body, mimeType) {
+  blobFile(body: any, mimeType: string) {
     this.body = { body: maybeStringify(body), mimeType: 'application/json' };
     this.accept = mimeType;
 
@@ -196,7 +189,28 @@ export class Builder {
     return this;
   }
 
-  plaintext(body) {
+  // Resolves with the body as it arrives. Aborting rejects with the abort's error, not as a server error.
+  ndjsonStream(body: any, signal?: AbortSignal) {
+    this.body = { body: maybeStringify(body), mimeType: 'application/json' };
+    this.accept = 'application/x-ndjson';
+    this.signal = signal;
+
+    this.responseHandler = (resp: Response) => {
+      if (resp.ok) {
+        reportServerSuccess();
+
+        return resp.body;
+      }
+
+      throw resp;
+    };
+
+    this.errorHandler = (error: Response) => (signal?.aborted ? Promise.reject(error) : onServerError(error));
+
+    return this;
+  }
+
+  plaintext(body: any) {
     this.body = { body, mimeType: 'text/plain' };
     this.accept = 'application/json';
 
@@ -207,7 +221,7 @@ export class Builder {
     return this;
   }
 
-  streamingplaintext(body) {
+  streamingplaintext(body: any) {
     this.body = { body, mimeType: 'text/plain' };
     this.accept = 'text/plain';
 
@@ -226,6 +240,7 @@ export class Builder {
   noSessionExtension() {
     this.options = {
       ...this.options,
+      // eslint-disable-next-line graylog/no-literal-product-name -- HTTP header name expected by the backend
       'X-Graylog-No-Session-Extension': 'true',
     };
 
@@ -245,6 +260,7 @@ export class Builder {
         method: this.method,
         headers,
         body: this.body ? this.body.body : undefined,
+        signal: this.signal,
       }),
     )
       .then(this.responseHandler, this.errorHandler)
@@ -253,17 +269,8 @@ export class Builder {
 }
 
 function queuePromiseIfNotLoggedin<T>(promise: () => Promise<T>): () => Promise<T> {
-  const { SessionStore, SessionActions } = importSessionStore();
-
-  if (!SessionStore.isLoggedIn()) {
-    return () =>
-      CancellablePromise.of(
-        new Promise((resolve, reject) => {
-          SessionActions.login.completed.listen(() => {
-            promise().then(resolve, reject);
-          });
-        }),
-      );
+  if (!Session.isLoggedIn()) {
+    return () => CancellablePromise.of(Session.waitForLogin().then(promise));
   }
 
   return promise;
@@ -312,13 +319,24 @@ export function fetchPeriodically<T = unknown>(method: Method, url: string, body
   return queuePromiseIfNotLoggedin(promise)();
 }
 
-export function fetchFile(method, url, body, mimeType = 'text/csv') {
+export function fetchStream(
+  method: Method,
+  url: string,
+  body: any,
+  signal?: AbortSignal,
+): Promise<ReadableStream<Uint8Array>> {
+  const promise = () => new Builder(method, url).ndjsonStream(body, signal).build();
+
+  return queuePromiseIfNotLoggedin(promise)();
+}
+
+export function fetchFile(method: Method, url: string, body?: any, mimeType = 'text/csv') {
   const promise = () => new Builder(method, url).file(body, mimeType).build();
 
   return queuePromiseIfNotLoggedin(promise)();
 }
 
-export function fetchBlobFile(method, url, body, mimeType = 'text/csv') {
+export function fetchBlobFile(method: Method, url: string, body?: any, mimeType = 'text/csv') {
   const promise = () => new Builder(method, url).blobFile(body, mimeType).build();
 
   return queuePromiseIfNotLoggedin(promise)();

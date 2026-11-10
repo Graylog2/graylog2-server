@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { MemoryRouter } from 'react-router-dom';
 
 import PreflightThemeProvider from 'preflight/theme/PreflightThemeProvider';
 import ThemeWrapper from 'preflight/theme/ThemeWrapper';
@@ -29,9 +28,7 @@ type Props = {
 const PreflightWrappingContainer = ({ children }: Props) => (
   <PreflightThemeProvider>
     <DefaultQueryClientProvider>
-      <MemoryRouter>
-        <ThemeWrapper>{children}</ThemeWrapper>
-      </MemoryRouter>
+      <ThemeWrapper env="test">{children}</ThemeWrapper>
     </DefaultQueryClientProvider>
   </PreflightThemeProvider>
 );

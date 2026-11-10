@@ -16,11 +16,9 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import isEmpty from 'lodash/isEmpty';
 
 import type SharedEntity from 'logic/permissions/SharedEntity';
-import { useStore } from 'stores/connect';
-import { EntityShareStore } from 'stores/permissions/EntityShareStore';
+import useEntityShareState, { useSetEntityShareState } from 'hooks/useEntityShareState';
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import type { GRN } from 'logic/permissions/types';
 import type { GranteesList as GranteesListType, SelectedGranteeCapabilities } from 'logic/permissions/EntityShareState';
@@ -66,6 +64,32 @@ const _granteesOptions = (grantees: GranteesListType) =>
 const getAvailableGrantee = (grantees: GranteesListType, selected: SelectedGranteeCapabilities) =>
   grantees?.filter((g) => !selected.has(g.id))?.toList();
 
+const prepareShare = ({
+  entityType,
+  entityTitle,
+  entityGRN,
+  dependenciesGRN,
+  selectedGranteeCapabilities,
+}: {
+  entityType: string;
+  entityTitle: string;
+  entityGRN: GRN | null;
+  dependenciesGRN: Array<GRN> | null;
+  selectedGranteeCapabilities: SelectedGranteeCapabilities | undefined;
+}) => {
+  // The server resolves the dependencies of existing entities, new entities have to provide them.
+  if (entityGRN) {
+    return EntityShareDomain.prepare(entityType, entityTitle, entityGRN, {
+      selected_grantee_capabilities: selectedGranteeCapabilities,
+    });
+  }
+
+  return EntityShareDomain.prepareCreate(entityType, entityTitle, {
+    selected_grantee_capabilities: selectedGranteeCapabilities,
+    prepare_request: (selectedGranteeCapabilities?.size ?? 0) > 0 ? dependenciesGRN : null,
+  });
+};
+
 const EntityCreateShareFormGroup = ({
   description,
   entityType,
@@ -76,21 +100,28 @@ const EntityCreateShareFormGroup = ({
   dependenciesGRN = null,
   defaultSharePayload = undefined,
 }: Props) => {
-  const { state: entityShareState } = useStore(EntityShareStore);
   const entityGRN = entityId && createGRN(entityType, entityId);
+  const { data: entityShareState } = useEntityShareState(entityGRN);
+  const setEntityShareState = useSetEntityShareState();
   const defaultShareSelection = { granteeId: null, capabilityId: 'view' };
   const [disableSubmit, setDisableSubmit] = useState(entityShareState?.validationResults?.failed);
   const [shareSelection, setShareSelection] = useState<SelectionRequest>(defaultShareSelection);
-  const [entityShare, setEntityShare] = useState<Omit<EntitySharePayload, 'prepare_request'>>(
-    defaultSharePayload ?? null,
-  );
+  const [entityShare, setEntityShare] = useState<EntitySharePayload>(defaultSharePayload ?? null);
   const PluggableEntityShareFormGroup = usePluggableEntityShareFormGroup();
 
   useEffect(() => {
-    const { selected_collections: _, ...rest } = defaultSharePayload ?? {};
-
-    EntityShareDomain.prepare(entityType, entityTitle, entityGRN, rest);
-  }, [entityType, entityTitle, entityGRN, defaultSharePayload]);
+    // Restoring a selection has to re-run the dependency check, or the missing dependency
+    // warnings shown before would silently disappear.
+    prepareShare({
+      entityType,
+      entityTitle,
+      entityGRN,
+      dependenciesGRN,
+      selectedGranteeCapabilities: defaultSharePayload?.selected_grantee_capabilities,
+    }).then((state) => {
+      setEntityShareState(entityGRN, state);
+    });
+  }, [entityType, entityTitle, entityGRN, defaultSharePayload, dependenciesGRN, setEntityShareState]);
 
   const resetSelection = () => {
     setDisableSubmit(false);
@@ -101,15 +132,16 @@ const EntityCreateShareFormGroup = ({
     const newSelectedCapabilities = entityShareState?.selectedGranteeCapabilities.merge({ [granteeId]: capabilityId });
 
     setDisableSubmit(true);
-
-    const payload: EntitySharePayload = {
-      selected_grantee_capabilities: newSelectedCapabilities,
-      prepare_request: dependenciesGRN,
-    };
-
     setEntityShare({ ...entityShare, selected_grantee_capabilities: newSelectedCapabilities });
 
-    return EntityShareDomain.prepare(entityType, entityTitle, entityGRN, payload).then((response) => {
+    return prepareShare({
+      entityType,
+      entityTitle,
+      entityGRN,
+      dependenciesGRN,
+      selectedGranteeCapabilities: newSelectedCapabilities,
+    }).then((response) => {
+      setEntityShareState(entityGRN, response);
       onSetEntityShare({ ...entityShare, selected_grantee_capabilities: newSelectedCapabilities });
       resetSelection();
 
@@ -121,15 +153,16 @@ const EntityCreateShareFormGroup = ({
     const newSelectedCapabilities = entityShareState?.selectedGranteeCapabilities.remove(granteeId);
 
     setDisableSubmit(true);
-
-    const prepare_request = isEmpty(newSelectedCapabilities) ? null : dependenciesGRN;
-    const payload: EntitySharePayload = {
-      selected_grantee_capabilities: newSelectedCapabilities,
-      prepare_request,
-    };
     setEntityShare({ ...entityShare, selected_grantee_capabilities: newSelectedCapabilities });
 
-    return EntityShareDomain.prepare(entityType, entityTitle, null, payload).then((response) => {
+    return prepareShare({
+      entityType,
+      entityTitle,
+      entityGRN,
+      dependenciesGRN,
+      selectedGranteeCapabilities: newSelectedCapabilities,
+    }).then((response) => {
+      setEntityShareState(entityGRN, response);
       onSetEntityShare({ ...entityShare, selected_grantee_capabilities: newSelectedCapabilities });
       setDisableSubmit(false);
 
@@ -198,6 +231,8 @@ const EntityCreateShareFormGroup = ({
             availableGrantees={entityShareState.availableGrantees}
           />
           {PluggableEntityShareFormGroup && (
+            /* Resolved from the plugin store at render time and cannot be hoisted. */
+            /* eslint-disable-next-line react-hooks/static-components */
             <PluggableEntityShareFormGroup
               entityType={entityType}
               onChange={handleAdditionalFormChange}

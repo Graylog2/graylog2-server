@@ -56,6 +56,56 @@ describe('useUserSearchFilterQuery hook', () => {
     expect(result.current.data).toEqual(layoutPreferences);
   });
 
+  it('should return slicing preferences', async () => {
+    asMock(fetch).mockImplementation(() =>
+      Promise.resolve({
+        ...layoutPreferencesJSON,
+        slicing: { slice_column: 'status', sort_by: 'risk_score', order: 'desc' as const },
+      }),
+    );
+    const { result } = renderHook(() => useUserLayoutPreferences('streams'), { wrapper });
+
+    await waitFor(() => result.current.isInitialLoading);
+    await waitFor(() => !result.current.isInitialLoading);
+
+    expect(result.current.data).toEqual({
+      ...layoutPreferences,
+      slicing: { sliceColumn: 'status', sortBy: 'risk_score', order: 'desc' },
+    });
+  });
+
+  it('should return null slicing preferences', async () => {
+    asMock(fetch).mockImplementation(() =>
+      Promise.resolve({
+        ...layoutPreferencesJSON,
+        slicing: null,
+      }),
+    );
+    const { result } = renderHook(() => useUserLayoutPreferences('streams'), { wrapper });
+
+    await waitFor(() => result.current.isInitialLoading);
+    await waitFor(() => !result.current.isInitialLoading);
+
+    expect(result.current.data).toEqual({
+      ...layoutPreferences,
+      slicing: null,
+    });
+  });
+
+  it('should fetch layout preferences for a layout variant', async () => {
+    asMock(fetch).mockImplementation(() => Promise.resolve(layoutPreferencesJSON));
+    const { result } = renderHook(() => useUserLayoutPreferences('streams', 'security-events'), { wrapper });
+
+    await waitFor(() => result.current.isInitialLoading);
+    await waitFor(() => !result.current.isInitialLoading);
+
+    expect(fetch).toHaveBeenCalledWith(
+      'GET',
+      expect.stringContaining('/entitylists/preferences/streams?layout_variant=security-events'),
+    );
+    expect(result.current.data).toEqual(layoutPreferences);
+  });
+
   it('should trigger notification on error', async () => {
     asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error!')));
 

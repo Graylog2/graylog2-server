@@ -27,6 +27,7 @@ import {
   fetchLookupTable,
   createLookupTable,
   updateLookupTable,
+  validateLookupTable,
   purgeLookupTableKey,
   purgeAllLookupTableKey,
   testLookupTableKey,
@@ -48,10 +49,8 @@ import {
   validateDataAdapter,
 } from './api/lookupTablesAPI';
 
+export { fetchPaginatedLookupTables };
 export const lookupTablesKeyFn = (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams];
-export function useFetchLookupTables() {
-  return { fetchPaginatedLookupTables, lookupTablesKeyFn };
-}
 
 export function useFetchLookupTable(idOrName: string) {
   const { data, isLoading } = useQuery({
@@ -107,7 +106,7 @@ export function useUpdateLookupTable() {
       });
       queryClient.invalidateQueries({
         queryKey: ['lookup-table-details'],
-        refetchType: 'active',
+        refetchType: 'none',
       });
     },
     onError: (error: Error) => UserNotification.error(error.message),
@@ -117,6 +116,15 @@ export function useUpdateLookupTable() {
     updateLookupTable: mutateAsync,
     updatingLookupTable: isLoading,
   };
+}
+
+export function useValidateLookupTable() {
+  const { mutateAsync } = useMutation({
+    mutationFn: validateLookupTable,
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return { validateLookupTable: mutateAsync };
 }
 
 export function usePurgeLookupTableKey() {
@@ -298,7 +306,7 @@ export function useUpdateCache() {
       });
       queryClient.invalidateQueries({
         queryKey: ['cache-details'],
-        refetchType: 'active',
+        refetchType: 'none',
       });
     },
     onError: (error: Error) => UserNotification.error(error.message),
@@ -424,7 +432,7 @@ export function useUpdateAdapter() {
       });
       queryClient.invalidateQueries({
         queryKey: ['data-adapter-details'],
-        refetchType: 'active',
+        refetchType: 'none',
       });
     },
     onError: (error: Error) => UserNotification.error(error.message),

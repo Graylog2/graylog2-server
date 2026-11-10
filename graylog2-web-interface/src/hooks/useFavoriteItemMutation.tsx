@@ -17,23 +17,13 @@
 
 import { useMutation } from '@tanstack/react-query';
 
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
+import { Favorites } from '@graylog/server-api';
+
 import UserNotification from 'util/UserNotification';
 
-export const urlPrefix = '/favorites';
+const putFavoriteItem = async (grn: string) => Favorites.addItemToFavorites(grn);
 
-const putFavoriteItem = async (grn: string) => {
-  const url = `${urlPrefix}/${grn}`;
-
-  return fetch('PUT', qualifyUrl(url));
-};
-
-const deleteFavoriteItem = (grn: string) => {
-  const url = `${urlPrefix}/${grn}`;
-
-  return fetch('DELETE', qualifyUrl(url));
-};
+const deleteFavoriteItem = (grn: string) => Favorites.removeItemFromFavorites(grn);
 
 const useFavoriteItemMutation = () => {
   const putMutation = useMutation({

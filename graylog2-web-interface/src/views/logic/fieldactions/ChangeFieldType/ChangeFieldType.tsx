@@ -20,10 +20,8 @@ import type { ActionComponentProps, ActionHandlerArguments } from 'views/compone
 import type { AdditionalViewsActionHandlerArguments } from 'views/types';
 import ChangeFieldTypeModal from 'views/logic/fieldactions/ChangeFieldType/ChangeFieldTypeModal';
 import { isFunction } from 'views/logic/aggregationbuilder/Series';
-import type User from 'logic/users/User';
 import isReservedField from 'views/logic/IsReservedField';
 import useInitialSelection from 'views/logic/fieldactions/ChangeFieldType/hooks/useInitialSelection';
-import { isPermitted } from 'util/PermissionsMixin';
 
 const ChangeFieldType = ({ field, onClose }: ActionComponentProps<AdditionalViewsActionHandlerArguments>) => {
   const [show, setShow] = useState(true);
@@ -45,19 +43,14 @@ const ChangeFieldType = ({ field, onClose }: ActionComponentProps<AdditionalView
   );
 };
 
-const hasMappingPermission = (currentUser: User) => isPermitted(currentUser?.permissions, 'typemappings:edit');
+const hasMappingPermission = ({ isPermitted }: ActionHandlerArguments['contexts']) =>
+  !!isPermitted?.('typemappings:edit');
 
-export const isChangeFieldTypeEnabled = ({ field, type, contexts }: ActionHandlerArguments) => {
-  const { currentUser } = contexts;
-
-  return !isFunction(field) && !type.isDecorated() && !isReservedField(field) && hasMappingPermission(currentUser);
-};
+export const isChangeFieldTypeEnabled = ({ field, type, contexts }: ActionHandlerArguments) =>
+  !isFunction(field) && !type.isDecorated() && !isReservedField(field) && hasMappingPermission(contexts);
 
 export const ChangeFieldTypeHelp = ({ contexts }: ActionHandlerArguments) => {
-  const { currentUser } = contexts;
-  hasMappingPermission(currentUser);
-
-  if (hasMappingPermission(currentUser)) return null;
+  if (hasMappingPermission(contexts)) return null;
 
   return { title: 'No permission', description: "You don't have permission to do that action" };
 };

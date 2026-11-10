@@ -17,15 +17,14 @@
 package org.graylog2.streams;
 
 import com.google.common.base.Strings;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.MustBeClosed;
+import com.mongodb.client.model.Accumulators;
+import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Indexes;
 import com.mongodb.client.result.UpdateResult;
-import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -42,9 +41,9 @@ import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.database.utils.ScopedEntityMongoUtils;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.IndexSet;
-import org.graylog2.indexer.indexset.MongoIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.indexset.MongoIndexSet;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
@@ -64,13 +63,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -85,8 +84,6 @@ import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.idsIn;
 import static org.graylog2.database.utils.MongoUtils.stream;
 import static org.graylog2.database.utils.MongoUtils.stringIdsIn;
-import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
-import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.graylog2.streams.StreamImpl.FIELD_CATEGORIES;
 import static org.graylog2.streams.StreamImpl.FIELD_DISABLED;
 import static org.graylog2.streams.StreamImpl.FIELD_INDEX_SET_ID;
@@ -96,6 +93,7 @@ import static org.graylog2.streams.StreamImpl.FIELD_TITLE;
 public class StreamServiceImpl implements StreamService {
     private static final Logger LOG = LoggerFactory.getLogger(StreamServiceImpl.class);
     public static final String COLLECTION_NAME = "streams";
+    private static final String COUNT = "count";
     private final MongoCollection<StreamDTO> collection;
     private final MongoUtils<StreamDTO> mongoUtils;
     private final ScopedEntityMongoUtils<StreamDTO> scopedMongoUtils;
@@ -107,8 +105,7 @@ public class StreamServiceImpl implements StreamService {
     private final ClusterEventBus clusterEventBus;
     private final Set<StreamDeletionGuard> streamDeletionGuards;
     private final EntityScopeService scopeService;
-    private final LoadingCache<String, String> streamTitleCache;
-    private Set<String> systemStreamIds;
+    private final StreamCache streamCache;
 
     @Inject
     public StreamServiceImpl(MongoCollections mongoCollections,
@@ -119,8 +116,11 @@ public class StreamServiceImpl implements StreamService {
                              EntityRegistrar entityRegistrar,
                              ClusterEventBus clusterEventBus,
                              Set<StreamDeletionGuard> streamDeletionGuards,
-                             EntityScopeService scopeService) {
+                             EntityScopeService scopeService,
+                             StreamCache streamCache) {
         this.collection = mongoCollections.collection(COLLECTION_NAME, StreamDTO.class);
+        // The index sets table counts streams per index set on every page.
+        this.collection.createIndex(Indexes.ascending(FIELD_INDEX_SET_ID));
         this.mongoUtils = mongoCollections.utils(collection);
         this.scopedMongoUtils = mongoCollections.scopedEntityUtils(collection, scopeService);
         this.streamRuleService = streamRuleService;
@@ -131,24 +131,7 @@ public class StreamServiceImpl implements StreamService {
         this.clusterEventBus = clusterEventBus;
         this.streamDeletionGuards = streamDeletionGuards;
         this.scopeService = scopeService;
-
-        final CacheLoader<String, String> streamTitleLoader = new CacheLoader<>() {
-            @Nonnull
-            @Override
-            public String load(@Nonnull String streamId) throws NotFoundException {
-                String title = loadStreamTitles(List.of(streamId)).get(streamId);
-                if (title != null) {
-                    return title;
-                } else {
-                    throw new NotFoundException(f("Couldn't find stream %s", streamId));
-                }
-            }
-        };
-
-        this.streamTitleCache = CacheBuilder.newBuilder()
-                .expireAfterAccess(10, TimeUnit.SECONDS)
-                .build(streamTitleLoader);
-
+        this.streamCache = streamCache;
     }
 
     @Nullable
@@ -193,16 +176,7 @@ public class StreamServiceImpl implements StreamService {
 
     @Override
     public Set<String> getSystemStreamIds(boolean includeDefaultStream) {
-        if (systemStreamIds == null) {
-            try (var stream = streamAllDTOs()) {
-                systemStreamIds = stream
-                        .filter(s -> ImmutableSystemScope.NAME.equals(s.getScope()))
-                        .map(Stream::getId)
-                        .collect(Collectors.toSet());
-            }
-        }
-        return includeDefaultStream ? java.util.stream.Stream.concat(systemStreamIds.stream(),
-                java.util.stream.Stream.of(DEFAULT_STREAM_ID)).collect(Collectors.toSet()) : systemStreamIds;
+        return streamCache.getSystemStreamIds(includeDefaultStream);
     }
 
     @Override
@@ -242,11 +216,7 @@ public class StreamServiceImpl implements StreamService {
     @Override
     @Nullable
     public String streamTitleFromCache(String streamId) {
-        try {
-            return streamTitleCache.get(streamId);
-        } catch (Exception e) {
-            return null;
-        }
+        return streamCache.streamTitleFromCache(streamId);
     }
 
     @Override
@@ -489,7 +459,8 @@ public class StreamServiceImpl implements StreamService {
     public void addToIndexSet(String indexSetId, Collection<String> streamIds) {
         final UpdateResult update = collection.updateMany(stringIdsIn(streamIds), set(FIELD_INDEX_SET_ID, indexSetId));
 
-        if (update.getModifiedCount() < streamIds.stream().distinct().count()) {
+        // Matched rather than modified, so streams that are already in the index set don't count as failures
+        if (update.getMatchedCount() < streamIds.stream().distinct().count()) {
             throw new IllegalStateException("Assigning streams " + streamIds + " to index set <" + indexSetId + "> failed!");
         }
     }
@@ -550,6 +521,7 @@ public class StreamServiceImpl implements StreamService {
 
         final Stream updatedStream = streamBuilder.build();
         save(updatedStream);
+        streamCache.invalidateTitle(streamId);
         if (streamRenamedEvent != null) {
             clusterEventBus.post(streamRenamedEvent);
         }
@@ -575,6 +547,19 @@ public class StreamServiceImpl implements StreamService {
         try (var stream = stream(collection.find(eq(FIELD_INDEX_SET_ID, indexSetId)))) {
             return stream.map(StreamDTO::title).toList();
         }
+    }
+
+    @Override
+    public Map<String, Long> countByIndexSet(Collection<String> indexSetIds) {
+        if (indexSetIds.isEmpty()) {
+            return Map.of();
+        }
+        final Map<String, Long> counts = new HashMap<>();
+        collection.aggregate(List.of(
+                Aggregates.match(Filters.in(FIELD_INDEX_SET_ID, indexSetIds)),
+                Aggregates.group("$" + FIELD_INDEX_SET_ID, Accumulators.sum(COUNT, 1))
+        ), Document.class).forEach(group -> counts.put(group.getString("_id"), group.get(COUNT, Number.class).longValue()));
+        return Map.copyOf(counts);
     }
 
     @Override

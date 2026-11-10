@@ -18,13 +18,10 @@ import React, { act } from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import { StoreMock as MockStore } from 'helpers/mocking';
 import ContentPackInstall from 'components/content-packs/ContentPackInstall';
 
-jest.mock('stores/permissions/EntityShareStore', () => ({
-  EntityShareActions: { prepare: async () => {} },
-  EntityShareStore: MockStore(['getInitialState', () => ({})]),
-}));
+jest.mock('api/entity-share');
+jest.mock('hooks/useEntityShareState');
 
 describe('<ContentPackInstall />', () => {
   const parameter = {

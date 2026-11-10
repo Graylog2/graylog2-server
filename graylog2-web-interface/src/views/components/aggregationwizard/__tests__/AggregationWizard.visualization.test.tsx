@@ -20,14 +20,18 @@ import { useContext } from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import selectEvent from 'helpers/selectEvent';
+import { asMock } from 'helpers/mocking';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import AggregationWizard from 'views/components/aggregationwizard/AggregationWizard';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { makeVisualization } from 'views/components/aggregationbuilder/AggregationBuilder';
 import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import OnVisualizationConfigChangeContext from 'views/components/aggregationwizard/OnVisualizationConfigChangeContext';
+import { usePlugin } from 'views/test/testPlugins';
+
+jest.mock('logic/telemetry/useSendTelemetry');
 
 const widgetConfig = AggregationWidgetConfig.builder().visualization('table').build();
 
@@ -135,9 +139,34 @@ const expectSubmitButtonToBeDisabled = async () => {
 };
 
 describe('AggregationWizard/Visualizations', () => {
-  beforeAll(() => PluginStore.register(visualizationPlugin));
+  usePlugin(visualizationPlugin);
 
-  afterAll(() => PluginStore.unregister(visualizationPlugin));
+  const sendTelemetry = jest.fn();
+
+  beforeEach(() => {
+    asMock(useSendTelemetry).mockReturnValue(sendTelemetry);
+    sendTelemetry.mockClear();
+  });
+
+  it('sends a telemetry event when selecting a new visualization type', async () => {
+    render(<SimpleAggregationWizard />);
+
+    await selectEvent.chooseOption('Select visualization type', 'Without Config');
+
+    expect(sendTelemetry).toHaveBeenCalledWith('Search Widget Visualization Type Selected', {
+      app_section: 'search-widget',
+      app_action_value: 'visualization-type-select',
+      event_details: { visualizationType: 'withoutConfig' },
+    });
+  });
+
+  it('does not send a telemetry event when re-selecting the current visualization type', async () => {
+    render(<SimpleAggregationWizard />);
+
+    await selectEvent.chooseOption('Select visualization type', 'Data Table');
+
+    expect(sendTelemetry).not.toHaveBeenCalled();
+  });
 
   it('shows visualization section if it is present', async () => {
     render(<SimpleAggregationWizard />);

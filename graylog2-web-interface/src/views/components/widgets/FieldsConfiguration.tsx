@@ -49,6 +49,7 @@ type Props = {
   showListCollapseButton?: boolean;
   showUnit?: boolean;
   fieldSelect?: React.ComponentType<React.ComponentProps<typeof FieldSelect>>;
+  allowCreate?: boolean;
 };
 
 const FieldsConfiguration = ({
@@ -63,6 +64,7 @@ const FieldsConfiguration = ({
   showListCollapseButton = false,
   showUnit = false,
   fieldSelect: FieldSelectComponent = FieldSelect,
+  allowCreate = false,
 }: Props) => {
   const [showSelectedList, setShowSelectedList] = useState(true);
   const onAddField = useCallback(
@@ -109,6 +111,7 @@ const FieldsConfiguration = ({
           onChange={onChange}
           fieldSelect={FieldSelectComponent}
           showUnit={showUnit}
+          allowCreate={allowCreate}
         />
       )}
       <FieldSelectComponent
@@ -127,6 +130,7 @@ const FieldsConfiguration = ({
         showSelectAllRest={showSelectAllRest}
         onDeSelectAll={onDeselectAll}
         showDeSelectAll={showDeSelectAll && !!selectedFields.length}
+        allowCreate={allowCreate}
       />
     </>
   );

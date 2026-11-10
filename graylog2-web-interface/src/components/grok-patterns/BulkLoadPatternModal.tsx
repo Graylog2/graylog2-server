@@ -19,7 +19,7 @@ import React from 'react';
 import { Button, Input } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
-import { GrokPatternsStore } from 'stores/grok-patterns/GrokPatternsStore';
+import { bulkImportGrokPatterns } from 'hooks/useGrokPatterns';
 import withTelemetry from 'logic/telemetry/withTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
@@ -67,13 +67,12 @@ class BulkLoadPatternModal extends React.Component<
     reader.onload = (loaded) => {
       const request = loaded.target.result;
 
-      GrokPatternsStore.bulkImport(request, importStrategy).then(() => {
+      bulkImportGrokPatterns(request as string, importStrategy).then(() => {
         UserNotification.success('Grok Patterns imported successfully', 'Success!');
         this._closeModal();
 
         this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.GROK_PATTERN.IMPORTED, {
           app_pathname: 'grokpatterns',
-          app_section: 'grokpatterns',
         });
 
         onSuccess();
@@ -140,4 +139,4 @@ class BulkLoadPatternModal extends React.Component<
   }
 }
 
-export default withTelemetry(BulkLoadPatternModal);
+export default withTelemetry(BulkLoadPatternModal, 'grokpatterns');

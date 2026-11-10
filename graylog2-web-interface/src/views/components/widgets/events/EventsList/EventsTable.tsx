@@ -18,6 +18,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { useCallback } from 'react';
 
+import { Table } from 'components/bootstrap';
 import { TableHead, TableHeaderCell } from 'views/components/datatable';
 import IfInteractive from 'views/components/dashboard/IfInteractive';
 import type EventsWidgetConfig from 'views/logic/widgets/events/EventsWidgetConfig';
@@ -57,7 +58,7 @@ const EventsTable = ({ events, config, onSortChange, setLoadingState }: Props) =
 
   return (
     <TableWrapper>
-      <table className="table table-condensed">
+      <Table condensed>
         <TableHead>
           <tr>
             {config.fields.toArray().map((field) => {
@@ -89,7 +90,7 @@ const EventsTable = ({ events, config, onSortChange, setLoadingState }: Props) =
             <EventsTableRow key={event.id} event={event} fields={config.fields} />
           ))}
         </tbody>
-      </table>
+      </Table>
     </TableWrapper>
   );
 };

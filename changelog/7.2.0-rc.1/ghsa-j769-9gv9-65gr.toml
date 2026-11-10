@@ -1,0 +1,2 @@
+type = "s"
+message = "Fix IDOR in access-token revocation endpoint. See [GHSA-j769-9gv9-65gr](https://github.com/Graylog2/graylog2-server/security/advisories/GHSA-j769-9gv9-65gr) for details."

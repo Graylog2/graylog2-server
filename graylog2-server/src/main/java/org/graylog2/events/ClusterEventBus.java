@@ -54,7 +54,7 @@ public class ClusterEventBus extends AsyncEventBus {
      * event updates replicated from across the cluster, subscribe to the regular {@code EventBus}
      * instead.
      *
-     * <p>{@link ClusterEventPeriodical} is also a subscriber on this bus. It listens for locally
+     * <p>{@link ClusterEventService} is also a subscriber on this bus. It listens for locally
      * posted cluster events and persists and replicates them via the regular {@code EventBus}.
      *
      * @param object the subscriber to register

@@ -29,6 +29,7 @@ const baseFormData = {
   awsCloudTrailSqsRegion: { value: 'us-east-1' },
   awsCloudTrailS3Region: { value: 'us-east-2' },
   awsAssumeRoleARN: { value: 'arn:aws:iam::123456789012:role/test-role' },
+  awsExternalId: { value: 'test-external-id' },
   overrideSource: { value: '' },
   sqsMessageBatchSize: { value: 10 },
   includeFullMessageJson: { value: false },
@@ -62,6 +63,19 @@ describe('CloudTrail formDataAdapter', () => {
       const request = toGenericInputCreateRequest(formData);
 
       expect(request.configuration.assume_role_arn).toBeUndefined();
+    });
+
+    it('includes external_id in configuration', () => {
+      const request = toGenericInputCreateRequest(baseFormData);
+
+      expect(request.configuration.aws_external_id).toBe('test-external-id');
+    });
+
+    it('sets external_id to undefined when not provided', () => {
+      const formData = { ...baseFormData, awsExternalId: { value: undefined } };
+      const request = toGenericInputCreateRequest(formData);
+
+      expect(request.configuration.aws_external_id).toBeUndefined();
     });
   });
 });

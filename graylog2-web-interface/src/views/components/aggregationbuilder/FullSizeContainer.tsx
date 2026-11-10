@@ -36,7 +36,7 @@ type Props = {
 
 const FullSizeContainer = ({ children }: Props) => {
   const element = useRef<HTMLDivElement>(null);
-  const { width, height } = useElementDimensions(element);
+  const { width, height } = useElementDimensions(element, 50);
 
   return <Wrapper ref={element}>{children({ height, width })}</Wrapper>;
 };

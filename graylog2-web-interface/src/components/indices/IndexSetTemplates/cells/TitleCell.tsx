@@ -18,8 +18,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import Routes from 'routing/Routes';
-import { Link } from 'components/common';
-import { Badge } from 'components/bootstrap';
+import { DefaultLabel, Link } from 'components/common';
 
 type Props = {
   title: string;
@@ -34,18 +33,12 @@ const DisabledTitle = styled.span(
   `,
 );
 
-const StyledBadge = styled(Badge)(
-  ({ theme }) => css`
-    margin-left: ${theme.spacings.xs};
-  `,
-);
-
 const TitleCell = ({ title, id, isDefault, isEnabled }: Props) => {
   if (!isEnabled) {
     return (
       <>
         <DisabledTitle>{title} (disabled)</DisabledTitle>
-        {isDefault && <StyledBadge>Default</StyledBadge>}
+        {isDefault && <DefaultLabel />}
       </>
     );
   }
@@ -53,7 +46,7 @@ const TitleCell = ({ title, id, isDefault, isEnabled }: Props) => {
   return (
     <Link to={Routes.SYSTEM.INDICES.TEMPLATES.view(id)}>
       <span>{title}</span>
-      {isDefault && <StyledBadge>Default</StyledBadge>}
+      {isDefault && <DefaultLabel />}
     </Link>
   );
 };

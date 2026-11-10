@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState } from 'react';
+import React from 'react';
 import styled, { css, useTheme } from 'styled-components';
 
-import { Tooltip } from 'components/bootstrap';
+import Tooltip from 'components/common/Tooltip';
 
 type Props = {
   minDays?: number;
@@ -107,26 +107,6 @@ const Label = styled.div<LabelProps>(
   `,
 );
 
-const StyledTooltip = styled(Tooltip)<{ value: number }>(
-  ({ value }) => css`
-    position: absolute;
-    top: 0;
-
-    ${value > PERCENTAGE_SPACING_THRESHOLD
-      ? `
-  right: ${100 - value}%;
-
-    &.bottom > .tooltip-arrow {
-      margin-left: -20px;
-    }
-  `
-      : `
-  left: 0;
-  margin-left: 3px;
-  `}
-  `,
-);
-
 const DataTieringVisualisation = ({
   archiveData = false,
   minDays = 0,
@@ -134,8 +114,6 @@ const DataTieringVisualisation = ({
   minDaysInHot = 0,
   warmTierEnabled = false,
 }: Props) => {
-  const [showMinDaysTooltip, setShowMinDaysTooltip] = useState<boolean>(false);
-  const [showMinDaysInHotTooltip, setShowMinDaysInHotTooltip] = useState<boolean>(false);
   const theme = useTheme();
 
   const percentageFor = (days: number) => {
@@ -160,51 +138,25 @@ const DataTieringVisualisation = ({
         </AnnotationBar>
 
         <LifeCycleBar>
-          <Bar
-            value={minDaysPercentage}
-            color={theme.colors.variant.info}
-            onMouseEnter={() => setShowMinDaysTooltip(true)}
-            onMouseLeave={() => setShowMinDaysTooltip(false)}
-          />
+          <Tooltip
+            label="Min. # of days in storage"
+            position={minDaysPercentage <= PERCENTAGE_SPACING_THRESHOLD ? 'bottom-start' : 'bottom-end'}
+            withArrow>
+            <Bar value={minDaysPercentage} color={theme.colors.variant.info} />
+          </Tooltip>
           {showHotTier && (
-            <Bar
-              value={minDaysInHotPercentage}
-              color={theme.colors.variant.darkest.info}
-              onMouseEnter={() => setShowMinDaysInHotTooltip(true)}
-              onMouseLeave={() => setShowMinDaysInHotTooltip(false)}
-            />
+            <Tooltip
+              label={
+                minDaysInHotPercentage === minDaysPercentage
+                  ? 'Min. # of days in Hot Tier and storage'
+                  : 'Min. # of days in Hot Tier'
+              }
+              position={minDaysInHotPercentage <= PERCENTAGE_SPACING_THRESHOLD ? 'bottom-start' : 'bottom-end'}
+              withArrow>
+              <Bar value={minDaysInHotPercentage} color={theme.colors.variant.darkest.info} />
+            </Tooltip>
           )}
         </LifeCycleBar>
-        <AnnotationBar>
-          {showHotTier &&
-            showMinDaysInHotTooltip &&
-            (minDaysInHotPercentage === minDaysPercentage ? (
-              <StyledTooltip
-                placement="bottom"
-                id="min-days-in-hot-and-storage"
-                arrowOffsetLeft={minDaysInHotPercentage <= PERCENTAGE_SPACING_THRESHOLD ? '10px' : '100%'}
-                value={minDaysInHotPercentage}>
-                Min. # of days in Hot Tier and storage
-              </StyledTooltip>
-            ) : (
-              <StyledTooltip
-                placement="bottom"
-                id="min-days-in-hot"
-                arrowOffsetLeft={minDaysInHotPercentage <= PERCENTAGE_SPACING_THRESHOLD ? '10px' : '100%'}
-                value={minDaysInHotPercentage}>
-                Min. # of days in Hot Tier
-              </StyledTooltip>
-            ))}
-          {minDaysPercentage > 0 && showMinDaysTooltip && (
-            <StyledTooltip
-              placement="bottom"
-              id="min-days-in-storage"
-              arrowOffsetLeft={minDaysPercentage <= PERCENTAGE_SPACING_THRESHOLD ? '10px' : '100%'}
-              value={minDaysPercentage}>
-              Min. # of days in storage
-            </StyledTooltip>
-          )}
-        </AnnotationBar>
       </BarWrapper>
       <MaxDaysLabel>
         {archiveData ? 'Archived and deleted' : 'Deleted'} after <strong>{maxDays} days</strong>

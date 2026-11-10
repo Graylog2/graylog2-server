@@ -49,7 +49,7 @@ const ButtonContainer = styled.div`
   height: 25px;
 `;
 
-export const StyledButton = styled(Button)(
+const StyledButton = styled(Button)(
   ({ theme }) => css`
     background-color: ${theme.colors.gray[60]};
     padding: 1px 2px;

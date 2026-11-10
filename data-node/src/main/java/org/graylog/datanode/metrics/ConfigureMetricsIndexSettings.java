@@ -88,7 +88,14 @@ public class ConfigureMetricsIndexSettings implements StateMachineTracer<Opensea
                 LOGGER.debug("Opensearch client available, tracer instance: {}, client: {}", this, client);
                 if (datastreamCreated.compareAndSet(false, true)) {
                     LOGGER.info("Initial creation of metric templates and datastreams, tracer instance: {}, client: {}", this, client);
-                    createDatastream(client);
+                    try {
+                        createDatastream(client);
+                    } catch (Exception e) {
+                        // Reset so the next AVAILABLE health-check reentry (every 10s) retries. Don't rethrow -
+                        // a metrics datastream failure shouldn't be treated as an opensearch process health failure.
+                        datastreamCreated.set(false);
+                        LOGGER.error("Failed to create metrics datastream, will retry, tracer instance: {}", this, e);
+                    }
                 }
             });
         }

@@ -41,9 +41,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import static org.graylog2.plugin.Message.FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS;
 
 public class FieldTypeMappingsService {
 
@@ -51,23 +51,26 @@ public class FieldTypeMappingsService {
 
     private final IndexSetService indexSetService;
     private final MongoIndexSet.Factory mongoIndexSetFactory;
+    private final CustomMappingValidation customMappingValidation;
 
     private final IndexFieldTypeProfileService profileService;
 
     @Inject
     public FieldTypeMappingsService(final IndexSetService indexSetService,
                                     final MongoIndexSet.Factory mongoIndexSetFactory,
-                                    final IndexFieldTypeProfileService profileService) {
+                                    final IndexFieldTypeProfileService profileService,
+                                    final CustomMappingValidation customMappingValidation) {
         this.indexSetService = indexSetService;
         this.mongoIndexSetFactory = mongoIndexSetFactory;
         this.profileService = profileService;
+        this.customMappingValidation = customMappingValidation;
     }
 
     public void changeFieldType(final CustomFieldMapping customMapping,
                                 final Set<String> indexSetsIds,
                                 final boolean rotateImmediately) {
-        checkFieldTypeCanBeChanged(customMapping.fieldName());
-        checkType(customMapping);
+        customMappingValidation.checkFieldTypeCanBeChanged(customMapping.fieldName());
+        customMappingValidation.checkType(customMapping);
         checkAllIndicesSupportFieldTypeChange(customMapping.fieldName(), indexSetsIds);
 
         final Set<String> indexSetIdsWithError = new HashSet<>();
@@ -137,6 +140,64 @@ public class FieldTypeMappingsService {
                 throw ex;
             }
         }
+    }
+
+    public Map<String, BulkOperationResponse> bulkSetProfile(final Set<String> indexSetsIds,
+                                                             final String profileId,
+                                                             final boolean rotateImmediately) {
+        checkProfile(profileId);
+        return changeProfileOfEach(indexSetsIds, rotateImmediately, IndexSetConfig::canHaveProfile,
+                indexSetConfig -> setProfileForIndexSet(profileId, indexSetConfig));
+    }
+
+    public Map<String, BulkOperationResponse> bulkRemoveProfile(final Set<String> indexSetsIds,
+                                                                final boolean rotateImmediately) {
+        return changeProfileOfEach(indexSetsIds, rotateImmediately, indexSetConfig -> true, this::removeProfileFromIndexSet);
+    }
+
+    /**
+     * Changes each index set independently. A change that was stored but whose rotation failed is reported
+     * as a success with an error and is never rolled back.
+     */
+    private Map<String, BulkOperationResponse> changeProfileOfEach(final Set<String> indexSetsIds,
+                                                                   final boolean rotateImmediately,
+                                                                   final Predicate<IndexSetConfig> eligible,
+                                                                   final Function<IndexSetConfig, Optional<IndexSetConfig>> change) {
+        return indexSetsIds.stream().collect(Collectors.toMap(Function.identity(),
+                indexSetId -> changeProfile(indexSetId, rotateImmediately, eligible, change)));
+    }
+
+    private BulkOperationResponse changeProfile(final String indexSetId,
+                                                final boolean rotateImmediately,
+                                                final Predicate<IndexSetConfig> eligible,
+                                                final Function<IndexSetConfig, Optional<IndexSetConfig>> change) {
+        final Optional<IndexSetConfig> updatedIndexSetConfig;
+        try {
+            final Optional<IndexSetConfig> indexSetConfig = indexSetService.get(indexSetId);
+            if (indexSetConfig.isEmpty()) {
+                return failure(indexSetId, "Index set not found");
+            }
+            if (!eligible.test(indexSetConfig.get())) {
+                return failure(indexSetId, "Index set " + indexSetConfig.get().title() + " cannot have a field type profile");
+            }
+            updatedIndexSetConfig = change.apply(indexSetConfig.get());
+        } catch (Exception ex) {
+            LOG.error("Failed to change field type profile of index set: " + indexSetId, ex);
+            return failure(indexSetId, ex.getMessage());
+        }
+        if (rotateImmediately) {
+            try {
+                updatedIndexSetConfig.ifPresent(this::cycleIndexSet);
+            } catch (Exception ex) {
+                LOG.error("Failed to rotate index set after changing its field type profile: " + indexSetId, ex);
+                return new BulkOperationResponse(1, List.of(), List.of("Profile change applied, but rotation failed: " + ex.getMessage()));
+            }
+        }
+        return new BulkOperationResponse(1, List.of());
+    }
+
+    private static BulkOperationResponse failure(final String indexSetId, final String explanation) {
+        return new BulkOperationResponse(0, List.of(new BulkOperationFailure(indexSetId, explanation)));
     }
 
     public Map<String, BulkOperationResponse> removeCustomMappingForFields(final List<String> fieldNames,
@@ -233,27 +294,13 @@ public class FieldTypeMappingsService {
         mongoIndexSet.cycle();
     }
 
-    private void checkType(final CustomFieldMapping customMapping) {
-        var type = CustomFieldMappings.AVAILABLE_TYPES.get(customMapping.type());
-        if (type == null) {
-            throw new BadRequestException("Invalid type provided: " + customMapping.type() + " - available types: " + CustomFieldMappings.AVAILABLE_TYPES.keySet());
-        }
-    }
-
     private void checkProfile(final String profileId) {
         final Optional<IndexFieldTypeProfile> fieldTypeProfile = profileService.get(profileId);
         if (fieldTypeProfile.isPresent()) {
-            fieldTypeProfile.get().customFieldMappings().forEach(mapping -> checkFieldTypeCanBeChanged(mapping.fieldName()));
+            customMappingValidation.checkProfile(fieldTypeProfile.get());
         } else {
             throw new NotFoundException("No profile with id : " + profileId);
         }
-    }
-
-    private void checkFieldTypeCanBeChanged(final String fieldName) {
-        if (FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS.contains(fieldName)) {
-            throw new BadRequestException("Unable to change field type of " + fieldName + ", not allowed to change type of these fields: " + FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS);
-        }
-
     }
 
     private void checkAllIndicesSupportFieldTypeChange(final String fieldName, final Set<String> indexSetsIds) {

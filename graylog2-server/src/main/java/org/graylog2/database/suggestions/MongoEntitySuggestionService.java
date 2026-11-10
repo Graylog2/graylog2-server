@@ -33,7 +33,6 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.utils.CompositeDisplayFormatter;
 import org.graylog2.database.utils.MongoUtils;
-import org.graylog2.search.SearchQueryField;
 import org.graylog2.shared.security.EntityPermissionsUtils;
 
 import javax.annotation.Nullable;
@@ -43,9 +42,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
+import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.graylog2.users.UserImpl.COLLECTION_NAME;
 import static org.graylog2.users.UserImpl.LocalAdminUser.LOCAL_ADMIN_ID;
 import static org.graylog2.users.UserImpl.USERNAME;
@@ -68,7 +69,7 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
 
     @Override
     public EntitySuggestionResponse suggest(final String collection,
-                                            final String targetColumn,
+                                            final String identifier,
                                             final String valueColumn,
                                             @Nullable final List<String> displayFields,
                                             @Nullable final String displayTemplate,
@@ -76,20 +77,16 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                                             final int page,
                                             final int perPage,
                                             final Subject subject) {
-        return suggest(collection, targetColumn, valueColumn, displayFields, displayTemplate, null, query, page, perPage, subject);
-    }
+        final Set<String> requestedFields = new HashSet<>();
+        requestedFields.add(identifier);
+        requestedFields.add(valueColumn);
+        if (displayFields != null) {
+            requestedFields.addAll(displayFields);
+        }
+        if (!permissionsUtils.areAllFieldsReadable(collection, requestedFields)) {
+            throw new IllegalArgumentException(f("Improper list of fields for collection %s : %s", collection, requestedFields));
+        }
 
-    @Override
-    public EntitySuggestionResponse suggest(final String collection,
-                                            final String targetColumn,
-                                            final String valueColumn,
-                                            @Nullable final List<String> displayFields,
-                                            @Nullable final String displayTemplate,
-                                            final SearchQueryField.Type identifierType,
-                                            final String query,
-                                            final int page,
-                                            final int perPage,
-                                            final Subject subject) {
         final MongoCollection<Document> mongoCollection = mongoConnection.getMongoDatabase().getCollection(collection);
         final boolean filterIsEmpty = Strings.isNullOrEmpty(query);
         final boolean isSpecialCollection = addAdminToSuggestions(collection, valueColumn, filterIsEmpty, query);
@@ -98,7 +95,7 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
 
         // Determine which fields to project
         final Set<String> fieldsToProject = new HashSet<>();
-        fieldsToProject.add(targetColumn);
+        fieldsToProject.add(identifier);
 
         if (displayFields != null && !displayFields.isEmpty()) {
             fieldsToProject.addAll(displayFields);
@@ -113,10 +110,10 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
             final Set<String> searchFields = new LinkedHashSet<>(displayFields);
             searchFields.add(valueColumn);
             bsonFilter = Filters.or(searchFields.stream()
-                    .map(field -> Filters.regex(field, query, "i"))
+                    .map(field -> Filters.regex(field, Pattern.quote(query), "i"))
                     .toList());
         } else {
-            bsonFilter = Filters.regex(valueColumn, query, "i");
+            bsonFilter = Filters.regex(valueColumn, Pattern.quote(query), "i");
         }
 
         final String sortColumn = (displayFields != null && !displayFields.isEmpty())
@@ -149,9 +146,9 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                             displayValue = doc.getString(valueColumn);
                         }
 
-                        // Extract targetColumn value as String
+                        // Extract identifier value as String
                         final String targetValue;
-                        final Object rawValue = doc.get(targetColumn);
+                        final Object rawValue = doc.get(identifier);
                         if (rawValue instanceof ObjectId oid) {
                             targetValue = oid.toHexString();
                         } else {
@@ -196,16 +193,4 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
     private Stream<Document> mongoPaginate(FindIterable<Document> result, int limit, int skip) {
         return MongoUtils.stream(result.limit(limit).skip(skip));
     }
-
-    @Override
-    public EntitySuggestionResponse suggest(final String collection,
-                                            final String targetColumn,
-                                            final String valueColumn,
-                                            final String query,
-                                            final int page,
-                                            final int perPage,
-                                            final Subject subject) {
-        return suggest(collection, targetColumn, valueColumn, null, null, null, query, page, perPage, subject);
-    }
-
 }

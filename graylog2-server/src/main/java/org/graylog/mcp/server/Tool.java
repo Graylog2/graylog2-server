@@ -19,16 +19,15 @@ package org.graylog.mcp.server;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.victools.jsonschema.generator.SchemaGenerator;
-import io.modelcontextprotocol.spec.McpSchema;
-import jakarta.inject.Inject;
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import org.graylog.mcp.config.McpConfiguration;
 import org.graylog.mcp.tools.PermissionHelper;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.web.customization.CustomizationConfig;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * The base class for MCP tools.
@@ -44,8 +43,8 @@ public abstract class Tool<P, O> {
     private final String name;
     private final String title;
     private final String description;
-    private final McpSchema.JsonSchema inputSchema;
-    private final Map<String, Object> outputSchema;
+    private final Supplier<Map<String, Object>> inputSchema;
+    private final Supplier<Map<String, Object>> outputSchema;
 
     @Deprecated
     protected Tool(
@@ -87,22 +86,19 @@ public abstract class Tool<P, O> {
         this.objectMapper = objectMapper;
         this.clusterConfigService = clusterConfigService;
 
-        // Get the schema generator with all contributed modules
-        SchemaGenerator generator = schemaGeneratorProvider.get();
-
-        // we can precompute the schema for our parameters, it's statically known
-        final var inputSchemaNode = generator.generateSchema(parameterType.getType());
-        if (inputSchemaNode.isEmpty()) {
-            this.inputSchema = null;
-        } else {
-            this.inputSchema = objectMapper.convertValue(inputSchemaNode, McpSchema.JsonSchema.class);
-        }
-        // if our tool produces anything other than a String, we want to create a JSON schema for it
-        if (String.class.equals(outputType.getType())) {
-            this.outputSchema = null;
-        } else {
-            this.outputSchema = objectMapper.convertValue(generator.generateSchema(outputType.getType()), new TypeReference<Map<String, Object>>() {});
-        }
+        // Lazily compute the schema on first use to avoid a GL-startup race with migrations that seed its data.
+        this.inputSchema = Suppliers.memoize(() -> {
+            final var inputSchemaNode = schemaGeneratorProvider.get().generateSchema(parameterType.getType());
+            final Map<String, Object> emptySchema = Map.of("type", "object");
+            return inputSchemaNode.isEmpty()
+                    ? emptySchema
+                    : objectMapper.convertValue(inputSchemaNode, new TypeReference<Map<String, Object>>() {});
+        });
+        // String-output tools have no output schema; memoize caches that null correctly too.
+        this.outputSchema = Suppliers.memoize(() -> String.class.equals(outputType.getType())
+                ? null
+                : objectMapper.convertValue(schemaGeneratorProvider.get().generateSchema(outputType.getType()),
+                        new TypeReference<Map<String, Object>>() {}));
     }
 
     protected boolean isOutputSchemaEnabled() {
@@ -113,6 +109,8 @@ public abstract class Tool<P, O> {
     protected ObjectMapper getObjectMapper() {
         return objectMapper;
     }
+
+    public abstract Set<String> checkedPermissions();
 
     @JsonProperty
     public String name() {
@@ -130,19 +128,20 @@ public abstract class Tool<P, O> {
     }
 
     @JsonProperty
-    public Optional<McpSchema.JsonSchema> inputSchema() {
-        return Optional.ofNullable(inputSchema);
+    public Map<String, Object> inputSchema() {
+        return inputSchema.get();
     }
 
     @JsonProperty
     public Optional<Map<String, Object>> outputSchema() {
-        return Optional.ofNullable(outputSchema);
+        return Optional.ofNullable(outputSchema.get());
     }
 
     /**
      * Calls the tool implementation with the raw parameter map.
      * Internally this will get converted into the actual parameter type for type safety.
      *
+     * @param permissionHelper provides permission checks and user identity for the calling user
      * @param parameterMap raw parameter map
      * @return the return value of the tool call
      */
@@ -151,5 +150,12 @@ public abstract class Tool<P, O> {
         return apply(permissionHelper, p);
     }
 
-    protected abstract O apply(PermissionHelper permissionHelper, P parameters);
+    /**
+     * Executes the tool logic with typed parameters and the caller's permission context.
+     *
+     * @param permissionHelper provides permission checks and user identity for the calling user
+     * @param parameters the deserialized, tool-specific parameter object
+     * @return the tool's result, typically a JSON string or structured response object
+     */
+    public abstract O apply(PermissionHelper permissionHelper, P parameters);
 }

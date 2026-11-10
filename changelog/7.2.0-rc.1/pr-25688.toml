@@ -1,0 +1,4 @@
+type = "c"
+message = "Reduced the frequency of the OpenSearch data directory compatibility preflight check to trigger only on major version upgrades, skipping it for minor and patch releases. "
+
+pulls = ["25688"]

@@ -27,9 +27,7 @@ import { Select, InputDescription } from 'components/common';
 import { Button } from 'components/bootstrap';
 import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const ElementsContainer = styled.div`
@@ -62,20 +60,17 @@ const BackendCreateSelect = () => {
     value: service.name,
   }));
   const history = useHistory();
-  const { pathname } = useLocation();
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('services');
 
   const onSubmit = useCallback(
     (formState: FormState) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.AUTHENTICATION.SERVICE_CREATED, {
-        app_pathname: getPathnameWithoutId(pathname),
-        app_section: 'services',
         app_action_value: 'create-service-form',
       });
 
       _onSubmit(history, formState);
     },
-    [history, pathname, sendTelemetry],
+    [history, sendTelemetry],
   );
 
   return (
@@ -91,8 +86,6 @@ const BackendCreateSelect = () => {
                       clearable={false}
                       onChange={(authService) => {
                         sendTelemetry(TELEMETRY_EVENT_TYPE.AUTHENTICATION.SERVICE_SELECTED, {
-                          app_pathname: getPathnameWithoutId(pathname),
-                          app_section: 'services',
                           app_action_value: 'selectservice',
                         });
 

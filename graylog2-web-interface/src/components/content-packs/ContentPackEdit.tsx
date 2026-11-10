@@ -22,6 +22,7 @@ import ContentPackSelection from 'components/content-packs/ContentPackSelection'
 import ContentPackDetails from 'components/content-packs/ContentPackDetails';
 import ContentPackPreview from 'components/content-packs/ContentPackPreview';
 import ContentPackParameters from 'components/content-packs/ContentPackParameters';
+import type { EntityPair } from 'logic/content-packs/pairEntities';
 
 type ContentPackEditProps = {
   contentPack?: any;
@@ -33,6 +34,7 @@ type ContentPackEditProps = {
   selectedEntities?: any;
   appliedParameter?: any;
   edit?: boolean;
+  entityPairs?: Array<EntityPair>;
 };
 
 class ContentPackEdit extends React.Component<
@@ -51,6 +53,7 @@ class ContentPackEdit extends React.Component<
     entityIndex: {},
     selectedEntities: {},
     appliedParameter: {},
+    entityPairs: [],
   };
 
   constructor(props) {
@@ -139,6 +142,7 @@ class ContentPackEdit extends React.Component<
         edit={this.props.edit}
         onStateChange={this.props.onStateChange}
         entities={this.props.entityIndex}
+        entityPairs={this.props.entityPairs}
       />
     );
     const parameterComponent = (

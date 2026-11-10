@@ -17,9 +17,9 @@
 package org.graylog.plugins.cef.parser;
 
 import com.google.common.collect.ImmutableMap;
+import jakarta.annotation.Nullable;
 import org.joda.time.DateTime;
 
-import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.util.function.Function;
 
@@ -228,24 +228,29 @@ public enum CEFMapping {
         return s;
     }
 
+    @Nullable
     private static Float convertFloat(String s) {
-        return Float.parseFloat(s);
+        return s.isBlank() ? null : Float.parseFloat(s);
     }
 
+    @Nullable
     private static Double convertDouble(String s) {
-        return Double.parseDouble(s);
+        return s.isBlank() ? null : Double.parseDouble(s);
     }
 
+    @Nullable
     private static Long convertLong(String s) {
-        return Long.parseLong(s);
+        return s.isBlank() ? null : Long.parseLong(s);
     }
 
+    @Nullable
     private static BigInteger convertBigInteger(String s) {
-        return new BigInteger(s);
+        return s.isBlank() ? null : new BigInteger(s);
     }
 
+    @Nullable
     private static Integer convertInteger(String s) {
-        return Integer.parseInt(s);
+        return s.isBlank() ? null : Integer.parseInt(s);
     }
 
     private static Object convertTimestamp(String s) {
@@ -309,6 +314,7 @@ public enum CEFMapping {
         return converter;
     }
 
+    @Nullable
     public Object convert(String s) {
         return converter.apply(s);
     }

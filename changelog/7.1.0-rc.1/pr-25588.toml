@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix NPE when updating output configuration."
+
+pulls = ["25588"]
+issues = ["Graylog2/graylog-plugin-enterprise#13688"]

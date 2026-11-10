@@ -16,27 +16,30 @@
  */
 
 import * as React from 'react';
-import { useMemo, useContext } from 'react';
+import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
 import type { ColumnSchema } from 'components/common/EntityDataTable';
-import TableFetchContext from 'components/common/PaginatedEntityTable/TableFetchContext';
+import type { SlicingPreferences } from 'components/common/EntityDataTable/types';
+import useTableFilterContext from 'components/common/PaginatedEntityTable/useTableFilterContext';
 
 import SliceHeaderControls from './SliceHeaderControls';
 import { DEFAULT_SORT_OPTIONS } from './SliceFilters';
 import SlicesOverview from './SlicesOverview';
 import type { FetchSlices } from './useFetchSlices';
 
-export type Slice = {
+export type Slice<T extends { [attribute: string]: unknown } = {}> = {
   value: string | number | null;
   count: number;
   title?: string;
   type?: unknown;
-  meta?: unknown;
+  meta?: T;
 };
 export type SliceRenderer = {
   extendSlices?: (slices: Array<Slice>) => Array<Slice>;
   render?: (slice: Slice) => React.ReactNode;
+  // render additional slice information on right side of list item
+  renderAdditional?: (slice: Slice) => React.ReactNode;
 };
 export type SliceRenderers = { [col: string]: SliceRenderer };
 export type Slices = Array<Slice>;
@@ -53,14 +56,24 @@ type Props = {
   appSection: string;
   columnSchemas: Array<ColumnSchema>;
   onChangeSlicing: (sliceCol: string | undefined, slice?: string | undefined) => void;
+  onSlicingPreferencesChange?: (slicing: SlicingPreferences) => void;
+  slicingPreferences?: SlicingPreferences;
   sliceRenderers?: SliceRenderers;
   fetchSlices: FetchSlices;
 };
 
-const Slicing = ({ appSection, columnSchemas, onChangeSlicing, sliceRenderers = undefined, fetchSlices }: Props) => {
+const Slicing = ({
+  appSection,
+  columnSchemas,
+  onChangeSlicing,
+  onSlicingPreferencesChange = () => {},
+  slicingPreferences = undefined,
+  sliceRenderers = undefined,
+  fetchSlices,
+}: Props) => {
   const {
     searchParams: { sliceCol, slice: activeSlice },
-  } = useContext(TableFetchContext);
+  } = useTableFilterContext();
   const activeColumn = columnSchemas.find(({ id }) => id === sliceCol);
   const sortOptions = useMemo(
     () => [
@@ -79,6 +92,7 @@ const Slicing = ({ appSection, columnSchemas, onChangeSlicing, sliceRenderers = 
         sliceCol={sliceCol}
         columnSchemas={columnSchemas}
         onChangeSlicing={onChangeSlicing}
+        isSlicingReadOnly={slicingPreferences?.readOnly}
       />
       <SlicesOverview
         key={sliceCol ?? 'no-slice'}
@@ -90,6 +104,9 @@ const Slicing = ({ appSection, columnSchemas, onChangeSlicing, sliceRenderers = 
         sliceRenderers={sliceRenderers}
         fetchSlices={fetchSlices}
         sortOptions={sortOptions}
+        defaultSliceSort={activeColumn?.slice_sort_default}
+        onSlicingPreferencesChange={onSlicingPreferencesChange}
+        slicingPreferences={slicingPreferences}
       />
     </Container>
   );

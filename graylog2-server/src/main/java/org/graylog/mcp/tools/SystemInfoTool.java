@@ -31,6 +31,7 @@ import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.web.customization.CustomizationConfig;
 
 import java.util.Locale;
+import java.util.Set;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -64,6 +65,11 @@ public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, SystemOvervi
         this.serverStatus = serverStatus;
         this.leaderElectionService = leaderElectionService;
         this.customizationConfig = customizationConfig;
+    }
+
+    @Override
+    public Set<String> checkedPermissions() {
+        return Set.of(RestPermissions.SYSTEM_READ);
     }
 
     @Override

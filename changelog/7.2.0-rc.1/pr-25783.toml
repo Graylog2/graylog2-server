@@ -1,0 +1,5 @@
+type = "c"
+message = "Allow collectors to re-enroll with their existing keypair."
+
+issues = ["25717"]
+pulls = ["25783"]

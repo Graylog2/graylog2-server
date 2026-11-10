@@ -19,7 +19,6 @@ import * as Immutable from 'immutable';
 import { render, screen, waitFor, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 
 import selectEvent from 'helpers/selectEvent';
@@ -34,6 +33,7 @@ import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visuali
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import useSortableItemRectsMock from 'components/common/SortableList/tests/useSortableItemRectsMock';
+import { usePlugin } from 'views/test/testPlugins';
 
 import AggregationWizard from '../AggregationWizard';
 
@@ -98,9 +98,7 @@ describe('AggregationWizard', () => {
       </FieldTypesContext.Provider>,
     );
 
-  beforeAll(() => PluginStore.register(plugin));
-
-  afterAll(() => PluginStore.unregister(plugin));
+  usePlugin(plugin);
 
   beforeEach(() => {
     asMock(useActiveQueryId).mockReturnValue('queryId');
@@ -131,6 +129,31 @@ describe('AggregationWizard', () => {
       await submitWidgetConfigForm();
 
       const pivot = Pivot.createValues(['took_ms'], expectedPivotConfig);
+      const updatedConfig = widgetConfig.toBuilder().rowPivots([pivot]).build();
+
+      await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
+
+      expect(onChange).toHaveBeenCalledWith(updatedConfig);
+    },
+    extendedTimeout,
+  );
+
+  it(
+    'should allow entering an arbitrary field that is not in the field list',
+    async () => {
+      const onChange = jest.fn();
+      renderSUT({ onChange });
+
+      await addGrouping();
+
+      const groupingContainer = await screen.findByTestId('grouping-0');
+      const fieldInput = await selectEvent.findSelectInput('Add a field', { container: groupingContainer });
+      await selectEvent.create(fieldInput, 'my_custom_field');
+
+      await within(groupingContainer).findByText('my_custom_field');
+      await submitWidgetConfigForm();
+
+      const pivot = Pivot.createValues(['my_custom_field'], expectedPivotConfig);
       const updatedConfig = widgetConfig.toBuilder().rowPivots([pivot]).build();
 
       await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));

@@ -15,41 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import useRightSidebar from 'hooks/useRightSidebar';
 import type { RightSidebarContent } from 'contexts/RightSidebarContext';
+import { Button } from 'components/bootstrap';
 
 type Props = {
   content: RightSidebarContent;
   children: React.ReactNode;
 };
-
-const StyledButton = styled.button(
-  ({ theme }) => css`
-    background: none;
-    border: none;
-    padding: 0;
-    color: ${theme.colors.variant.primary};
-    cursor: pointer;
-    font-size: inherit;
-    font-family: inherit;
-
-    :hover {
-      color: ${theme.colors.variant.dark.primary};
-    }
-
-    :focus-visible {
-      outline: 2px solid ${theme.colors.variant.primary};
-      outline-offset: 2px;
-      border-radius: 2px;
-    }
-
-    :active {
-      color: ${theme.colors.variant.darker.primary};
-    }
-  `,
-);
 
 const SidebarNavigationLink = ({ content, children }: Props) => {
   const { openSidebar } = useRightSidebar();
@@ -59,9 +33,9 @@ const SidebarNavigationLink = ({ content, children }: Props) => {
   };
 
   return (
-    <StyledButton type="button" onClick={handleClick}>
+    <Button bsStyle="link" onClick={handleClick}>
       {children}
-    </StyledButton>
+    </Button>
   );
 };
 

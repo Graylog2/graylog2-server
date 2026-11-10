@@ -18,8 +18,19 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { SystemInputsTypes } from '@graylog/server-api';
 
-import type { InputDescription } from 'stores/inputs/InputTypesStore';
 import { defaultOnError } from 'util/conditional/onError';
+import type { ConfigurationField } from 'components/configurationforms';
+
+export type InputDescription = {
+  type: string;
+  name: string;
+  description: string;
+  is_exclusive: boolean;
+  requested_configuration: {
+    [key: string]: ConfigurationField;
+  };
+  link_to_docs: string;
+};
 
 type Options = {
   enabled: boolean;

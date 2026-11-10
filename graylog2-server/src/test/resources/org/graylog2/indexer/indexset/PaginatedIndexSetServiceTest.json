@@ -1,0 +1,321 @@
+{
+  "index_sets": [
+    {
+      "_id": {
+        "$oid": "66a0000000000000000000a1"
+      },
+      "title": "alpha",
+      "description": "Index set alpha",
+      "index_prefix": "idx_alpha",
+      "shards": 1,
+      "replicas": 0,
+      "rotation_strategy_class": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy",
+      "rotation_strategy": {
+        "type": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig",
+        "max_docs_per_index": 1000
+      },
+      "retention_strategy_class": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategy",
+      "retention_strategy": {
+        "type": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig",
+        "max_number_of_indices": 10
+      },
+      "creation_date": {
+        "$date": "2024-01-01T10:00:00Z"
+      },
+      "index_analyzer": "standard",
+      "index_template_name": "idx_alpha",
+      "index_optimization_max_num_segments": 1,
+      "index_optimization_disabled": false,
+      "field_type_profile": "77b000000000000000000001"
+    },
+    {
+      "_id": {
+        "$oid": "66a0000000000000000000a2"
+      },
+      "title": "Bravo",
+      "description": "Index set Bravo",
+      "index_prefix": "idx_bravo",
+      "shards": 1,
+      "replicas": 0,
+      "rotation_strategy_class": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy",
+      "rotation_strategy": {
+        "type": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig",
+        "max_docs_per_index": 1000
+      },
+      "retention_strategy_class": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategy",
+      "retention_strategy": {
+        "type": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig",
+        "max_number_of_indices": 10
+      },
+      "creation_date": {
+        "$date": "2024-01-02T10:00:00Z"
+      },
+      "index_analyzer": "standard",
+      "index_template_name": "idx_bravo",
+      "index_optimization_max_num_segments": 1,
+      "index_optimization_disabled": false,
+      "regular": true,
+      "index_template_type": "events"
+    },
+    {
+      "_id": {
+        "$oid": "66a0000000000000000000a3"
+      },
+      "title": "charlie",
+      "description": "Index set charlie",
+      "index_prefix": "idx_charlie",
+      "shards": 1,
+      "replicas": 0,
+      "rotation_strategy_class": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy",
+      "rotation_strategy": {
+        "type": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig",
+        "max_docs_per_index": 1000
+      },
+      "retention_strategy_class": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategy",
+      "retention_strategy": {
+        "type": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig",
+        "max_number_of_indices": 10
+      },
+      "creation_date": {
+        "$date": "2024-01-03T10:00:00Z"
+      },
+      "index_analyzer": "standard",
+      "index_template_name": "idx_charlie",
+      "index_optimization_max_num_segments": 1,
+      "index_optimization_disabled": false,
+      "index_template_type": "events",
+      "field_type_profile": "77b000000000000000000002"
+    },
+    {
+      "_id": {
+        "$oid": "66a0000000000000000000a4"
+      },
+      "title": "Delta",
+      "description": "Index set Delta",
+      "index_prefix": "idx_delta",
+      "shards": 1,
+      "replicas": 0,
+      "rotation_strategy_class": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy",
+      "rotation_strategy": {
+        "type": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig",
+        "max_docs_per_index": 1000
+      },
+      "retention_strategy_class": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategy",
+      "retention_strategy": {
+        "type": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig",
+        "max_number_of_indices": 10
+      },
+      "creation_date": {
+        "$date": "2024-01-04T10:00:00Z"
+      },
+      "index_analyzer": "standard",
+      "index_template_name": "idx_delta",
+      "index_optimization_max_num_segments": 1,
+      "index_optimization_disabled": false,
+      "regular": false
+    },
+    {
+      "_id": {
+        "$oid": "66a0000000000000000000a5"
+      },
+      "title": "echo",
+      "description": "Index set echo",
+      "index_prefix": "idx_echo",
+      "shards": 1,
+      "replicas": 0,
+      "rotation_strategy_class": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy",
+      "rotation_strategy": {
+        "type": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig",
+        "max_docs_per_index": 1000
+      },
+      "retention_strategy_class": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategy",
+      "retention_strategy": {
+        "type": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig",
+        "max_number_of_indices": 10
+      },
+      "creation_date": {
+        "$date": "2024-01-05T10:00:00Z"
+      },
+      "index_analyzer": "standard",
+      "index_template_name": "idx_echo",
+      "index_optimization_max_num_segments": 1,
+      "index_optimization_disabled": false,
+      "regular": true,
+      "writable": false
+    },
+    {
+      "_id": {
+        "$oid": "66a0000000000000000000a6"
+      },
+      "title": "foxtrot",
+      "description": "Index set foxtrot",
+      "index_prefix": "idx_foxtrot",
+      "shards": 1,
+      "replicas": 0,
+      "rotation_strategy_class": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy",
+      "rotation_strategy": {
+        "type": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig",
+        "max_docs_per_index": 1000
+      },
+      "retention_strategy_class": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategy",
+      "retention_strategy": {
+        "type": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig",
+        "max_number_of_indices": 10
+      },
+      "creation_date": {
+        "$date": "2024-01-06T10:00:00Z"
+      },
+      "index_analyzer": "standard",
+      "index_template_name": "idx_foxtrot",
+      "index_optimization_max_num_segments": 1,
+      "index_optimization_disabled": false,
+      "regular": true,
+      "index_template_type": "illuminate_content"
+    },
+    {
+      "_id": {
+        "$oid": "66a0000000000000000000a7"
+      },
+      "title": "Golf",
+      "description": "Index set Golf",
+      "index_prefix": "idx_golf",
+      "shards": 1,
+      "replicas": 0,
+      "rotation_strategy_class": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy",
+      "rotation_strategy": {
+        "type": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig",
+        "max_docs_per_index": 1000
+      },
+      "retention_strategy_class": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategy",
+      "retention_strategy": {
+        "type": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig",
+        "max_number_of_indices": 10
+      },
+      "creation_date": {
+        "$date": "2024-01-07T10:00:00Z"
+      },
+      "index_analyzer": "standard",
+      "index_template_name": "idx_golf",
+      "index_optimization_max_num_segments": 1,
+      "index_optimization_disabled": false,
+      "writable": false,
+      "index_template_type": "illuminate_content"
+    },
+    {
+      "_id": {
+        "$oid": "66a0000000000000000000a8"
+      },
+      "title": "hotel",
+      "description": "Index set hotel",
+      "index_prefix": "idx_hotel",
+      "shards": 1,
+      "replicas": 0,
+      "rotation_strategy_class": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy",
+      "rotation_strategy": {
+        "type": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig",
+        "max_docs_per_index": 1000
+      },
+      "retention_strategy_class": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategy",
+      "retention_strategy": {
+        "type": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig",
+        "max_number_of_indices": 10
+      },
+      "creation_date": {
+        "$date": "2024-01-08T10:00:00Z"
+      },
+      "index_analyzer": "standard",
+      "index_template_name": "idx_hotel",
+      "index_optimization_max_num_segments": 1,
+      "index_optimization_disabled": false,
+      "index_template_type": "messages"
+    }
+  ],
+  "streams": [
+    {
+      "_id": {
+        "$oid": "88c0000000000000000000b1"
+      },
+      "title": "Bravo stream one",
+      "description": "Stream Bravo stream one",
+      "creator_user_id": "local:admin",
+      "index_set_id": "66a0000000000000000000a2",
+      "created_at": {
+        "$date": "2024-02-01T10:00:00Z"
+      },
+      "disabled": false,
+      "matching_type": "AND",
+      "outputs": [],
+      "remove_matches_from_default_stream": false,
+      "is_default_stream": false
+    },
+    {
+      "_id": {
+        "$oid": "88c0000000000000000000b2"
+      },
+      "title": "Bravo stream two",
+      "description": "Stream Bravo stream two",
+      "creator_user_id": "local:admin",
+      "index_set_id": "66a0000000000000000000a2",
+      "created_at": {
+        "$date": "2024-02-02T10:00:00Z"
+      },
+      "disabled": false,
+      "matching_type": "AND",
+      "outputs": [],
+      "remove_matches_from_default_stream": false,
+      "is_default_stream": false
+    },
+    {
+      "_id": {
+        "$oid": "88c0000000000000000000b3"
+      },
+      "title": "Bravo stream three",
+      "description": "Stream Bravo stream three",
+      "creator_user_id": "local:admin",
+      "index_set_id": "66a0000000000000000000a2",
+      "created_at": {
+        "$date": "2024-02-03T10:00:00Z"
+      },
+      "disabled": false,
+      "matching_type": "AND",
+      "outputs": [],
+      "remove_matches_from_default_stream": false,
+      "is_default_stream": false
+    },
+    {
+      "_id": {
+        "$oid": "88c0000000000000000000b4"
+      },
+      "title": "Delta stream",
+      "description": "Stream Delta stream",
+      "creator_user_id": "local:admin",
+      "index_set_id": "66a0000000000000000000a4",
+      "created_at": {
+        "$date": "2024-02-04T10:00:00Z"
+      },
+      "disabled": false,
+      "matching_type": "AND",
+      "outputs": [],
+      "remove_matches_from_default_stream": false,
+      "is_default_stream": false
+    }
+  ],
+  "index_field_type_profiles": [
+    {
+      "_id": {
+        "$oid": "77b000000000000000000001"
+      },
+      "name": "Zulu profile",
+      "description": "Profile sorted last by name",
+      "custom_field_mappings": []
+    },
+    {
+      "_id": {
+        "$oid": "77b000000000000000000002"
+      },
+      "name": "Alpha profile",
+      "description": "Profile sorted first by name",
+      "custom_field_mappings": []
+    }
+  ]
+}

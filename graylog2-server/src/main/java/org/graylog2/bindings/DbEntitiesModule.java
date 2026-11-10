@@ -16,15 +16,17 @@
  */
 package org.graylog2.bindings;
 
+import org.graylog.events.notifications.NotificationDto;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.plugins.views.search.views.ViewDTO;
-import org.graylog2.cluster.nodes.DataNodeEntity;
-import org.graylog2.cluster.nodes.ServerNodeEntity;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.ServerNodeDto;
 import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
 import org.graylog2.database.dbcatalog.DbEntitiesCatalogProvider;
 import org.graylog2.decorators.DecoratorImpl;
 import org.graylog2.indexer.IndexFailureImpl;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
 import org.graylog2.inputs.InputImpl;
 import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.plugin.PluginModule;
@@ -43,15 +45,17 @@ public class DbEntitiesModule extends PluginModule {
 
         addDbEntities(
                 AccessTokenImpl.class,
-                DataNodeEntity.class,
+                DataNodeDto.class,
                 DecoratorImpl.class,
                 EventDefinition.class,
                 IndexFailureImpl.class,
+                IndexFieldTypeProfile.class,
                 IndexSetConfig.class,
                 InputImpl.class,
+                NotificationDto.class,
                 NotificationImpl.class,
                 OutputImpl.class,
-                ServerNodeEntity.class,
+                ServerNodeDto.class,
                 StreamDestinationFilterRuleDTO.class,
                 StreamImpl.class,
                 StreamRuleImpl.class,

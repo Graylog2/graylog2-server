@@ -17,6 +17,7 @@
 package org.graylog2.audit.jersey;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Collections;
@@ -24,6 +25,9 @@ import java.util.List;
 import java.util.Map;
 
 public class ResponseEntityConverter {
+    private static final TypeReference<Map<String, Object>> MAP_REF = new TypeReference<>() {};
+    private static final TypeReference<List<Object>> LIST_REF = new TypeReference<>() {};
+
     private final ObjectMapper objectMapper;
 
     public ResponseEntityConverter(final ObjectMapper objectMapper) {
@@ -31,22 +35,19 @@ public class ResponseEntityConverter {
     }
 
     public Map<String, Object> convertValue(final Object entity, final Class<?> entityClass) {
+        if (entityClass.equals(Void.class) || entityClass.equals(void.class)) {
+            return null;
+        }
         if (entityClass.equals(String.class)) {
             return Collections.singletonMap("data", objectMapper.convertValue(entity, String.class));
-        } else if (!entityClass.equals(Void.class) && !entityClass.equals(void.class)) {
-            final TypeReference<Map<String, Object>> typeRef = new TypeReference<>() {
-            };
-            try {
-                return objectMapper.convertValue(entity, typeRef);
-            } catch (IllegalArgumentException e) {
-                // Try to convert the response to a list if converting to a map failed.
-                final TypeReference<List<Object>> arrayTypeRef = new TypeReference<>() {
-                };
-                return Collections.singletonMap("data", objectMapper.convertValue(entity, arrayTypeRef));
-            }
         }
-        return null;
+        final JsonNode node = objectMapper.valueToTree(entity);
+        if (node.isObject()) {
+            return objectMapper.convertValue(node, MAP_REF);
+        }
+        if (node.isArray()) {
+            return Collections.singletonMap("data", objectMapper.convertValue(node, LIST_REF));
+        }
+        return Collections.singletonMap("data", entity);
     }
-
-
 }

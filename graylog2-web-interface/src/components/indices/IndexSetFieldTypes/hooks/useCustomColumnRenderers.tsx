@@ -16,11 +16,11 @@
  */
 import React, { useMemo } from 'react';
 
-import type { FieldTypeOrigin } from 'components/indices/IndexSetFieldTypes/types';
-import ExpandedRowToggleWrapper from 'components/indices/IndexSetFieldTypes/originBadges/ExpandedRowToggleWrapper';
+import type { FieldTypeOrigin, IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
 import { Icon } from 'components/common';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import OriginCell from 'components/indices/IndexSetFieldTypes/originBadges/OriginCell';
+import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 const useCustomColumnRenderers = () => {
   const {
@@ -30,16 +30,15 @@ const useCustomColumnRenderers = () => {
   return useMemo(
     () => ({
       attributes: {
+        field_name: {
+          staticWidth: COLUMN_WIDTH.title,
+        },
         type: {
           renderCell: (item: string) => <span>{fieldTypes[item]}</span>,
         },
         origin: {
-          renderCell: (origin: FieldTypeOrigin, { id }) => (
-            <ExpandedRowToggleWrapper id={id}>
-              <OriginCell origin={origin} />
-            </ExpandedRowToggleWrapper>
-          ),
-          staticWidth: 200,
+          renderCell: (_origin: FieldTypeOrigin, fieldType: IndexSetFieldType) => <OriginCell fieldType={fieldType} />,
+          staticWidth: 180,
         },
         is_reserved: {
           renderCell: (isReserved: boolean) =>

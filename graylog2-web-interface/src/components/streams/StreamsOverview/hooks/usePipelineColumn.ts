@@ -14,12 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
 
 const usePipelineColumn = () => {
-  const currentUser = useCurrentUser();
-  const isPipelineColumnPermitted = isPermitted(currentUser.permissions, ['pipeline:edit']);
+  const { isPermitted } = usePermissions();
+  const isPipelineColumnPermitted = isPermitted(['pipeline:edit']);
 
   return {
     isPipelineColumnPermitted,

@@ -14,9 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useStore } from 'stores/connect';
-import { ServerAvailabilityStore } from 'stores/sessions/ServerAvailabilityStore';
+import { useContext } from 'react';
 
-const useServerVersion = () => useStore(ServerAvailabilityStore, (state) => state.version);
+import ServerAvailabilityContext from 'contexts/ServerAvailabilityContext';
+
+const useServerVersion = () => useContext(ServerAvailabilityContext)?.version;
 
 export default useServerVersion;

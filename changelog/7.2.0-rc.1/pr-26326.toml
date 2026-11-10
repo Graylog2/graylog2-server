@@ -1,0 +1,3 @@
+type = "f"
+message = "Fix lexicographic sorting of pivots on numeric grouping fields with non-`long`/`double`/`float` or mixed-but-numeric types."
+pulls = ["26326"]

@@ -17,18 +17,17 @@
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 import { waitFor } from 'wrappedTestingLibrary';
 
+import { Streams } from '@graylog/server-api';
+
 import asMock from 'helpers/mocking/AsMock';
-import fetch from 'logic/rest/FetchProvider';
-import ApiRoutes from 'routing/ApiRoutes';
-import { qualifyUrl } from 'util/URLUtils';
 
 import useStreamDestinationFilterRuleCount from './useStreamDestinationFilterRuleCount';
 
-jest.mock('logic/rest/FetchProvider', () => jest.fn());
+jest.mock('@graylog/server-api', () => ({ Streams: { getDestinationFilterRuleCountsForStreams: jest.fn() } }));
 
 describe('useStreamDestinationFilterRuleCount', () => {
   it('batches subsequent requests', async () => {
-    asMock(fetch).mockResolvedValue({
+    asMock(Streams.getDestinationFilterRuleCountsForStreams).mockResolvedValue({
       foo: 1,
       bar: 2,
       baz: 3,
@@ -41,11 +40,9 @@ describe('useStreamDestinationFilterRuleCount', () => {
     });
 
     await waitFor(() => {
-      expect(fetch).toHaveBeenCalledWith(
-        'POST',
-        qualifyUrl(ApiRoutes.StreamOutputFilterRuleApiController.countByStreams().url),
-        { stream_ids: ['foo', 'bar', 'baz'] },
-      );
+      expect(Streams.getDestinationFilterRuleCountsForStreams).toHaveBeenCalledWith({
+        stream_ids: ['foo', 'bar', 'baz'],
+      });
     });
   });
 });

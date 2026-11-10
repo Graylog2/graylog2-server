@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.rest.exceptionmappers;
 
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import org.graylog.plugins.views.search.errors.IllegalTimeRangeException;
@@ -25,6 +26,9 @@ public class IllegalTimeRangeExceptionMapper implements ExceptionMapper<IllegalT
     @Override
     public Response toResponse(IllegalTimeRangeException exception) {
         final ApiError apiError = ApiError.create(exception.getMessage());
-        return Response.status(Response.Status.BAD_REQUEST).entity(apiError).build();
+        return Response.status(Response.Status.BAD_REQUEST)
+                .type(MediaType.APPLICATION_JSON_TYPE)
+                .entity(apiError)
+                .build();
     }
 }

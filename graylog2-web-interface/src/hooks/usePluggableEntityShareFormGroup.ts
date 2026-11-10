@@ -18,8 +18,12 @@ import usePluginEntities from 'hooks/usePluginEntities';
 
 const usePluggableEntityShareFormGroup = () => {
   const pluggableCollection = usePluginEntities('components.collection');
+  const collection = pluggableCollection?.[0];
+  const conditionMet = collection?.useCondition ? collection.useCondition() : true;
 
-  return pluggableCollection?.[0]?.AddCollectionFormGroup ?? null;
+  if (!conditionMet) return null;
+
+  return collection?.AddCollectionFormGroup ?? null;
 };
 
 export default usePluggableEntityShareFormGroup;

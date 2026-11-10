@@ -107,9 +107,13 @@ public class OpensearchStateMachine extends ProcessStateMachine<OpensearchState,
 
         // failed and we see the process as not recoverable.
         // TODO: what to do if the process fails? Reboot?
+        //  OpensearchWatchdog only restarts on PROCESS_TERMINATED, so a process that's alive but stuck here
+        //  (e.g. answering nothing but TLS errors) is invisible to it - nothing forces a restart on its own.
+        //  See the TODO on org.graylog.datanode.opensearch.CertificateReloadVerifier for a concrete case that
+        //  would want exactly this: persistent certificate drift that keeps failing to self-heal.
         config.configure(OpensearchState.FAILED)
                 .ignore(OpensearchEvent.HEALTH_CHECK_FAILED)
-                .ignore(OpensearchEvent.CERTIFICATES_RELOAD)
+                .permitReentry(OpensearchEvent.CERTIFICATES_RELOAD, process::reloadCertificates)
                 .permit(OpensearchEvent.HEALTH_CHECK_OK, OpensearchState.AVAILABLE)
                 .permit(OpensearchEvent.PROCESS_STOPPED, OpensearchState.TERMINATED)
                 .permit(OpensearchEvent.PROCESS_PREPARED, OpensearchState.PREPARED) //restart if reconfigured
@@ -139,7 +143,10 @@ public class OpensearchStateMachine extends ProcessStateMachine<OpensearchState,
                 .onEntry(process::stop)
                 .ignore(OpensearchEvent.CERTIFICATES_RELOAD)
                 .permit(OpensearchEvent.PROCESS_CONFIGURATION_REMOVED, OpensearchState.WAITING_FOR_CONFIGURATION, process::removeConfiguration)
-                .permit(OpensearchEvent.RESET, OpensearchState.WAITING_FOR_CONFIGURATION, process::reset)
+                // the process is already stopped by REMOVED's onEntry action above; the actual restart is
+                // driven by PROCESS_STARTED, fired once OpensearchProcessService rebuilds the configuration
+                // in response to the RESET trigger (see OpensearchProcessService#triggerOpensearchStartup())
+                .permit(OpensearchEvent.RESET, OpensearchState.WAITING_FOR_CONFIGURATION)
                 .ignore(OpensearchEvent.PROCESS_STOPPED);
 
         return new OpensearchStateMachine(OpensearchState.WAITING_FOR_CONFIGURATION, config, tracer);

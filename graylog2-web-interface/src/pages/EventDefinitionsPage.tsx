@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import React from 'react';
 
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
@@ -22,13 +22,28 @@ import EventDefinitionsContainer from 'components/event-definitions/event-defini
 import DocsHelper from 'util/DocsHelper';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import CreateButton from 'components/common/CreateButton';
+import usePluginEntities from 'hooks/usePluginEntities';
+
+const CreateButtonWithSigma = () => {
+  const importOptionsPlugin = usePluginEntities('eventDefinitions.components.sigmaOptions');
+  const SigmaOptionsComponent = importOptionsPlugin.find(
+    ({ key }) => key === 'eventDefinitionsSigmaOptions',
+  )?.component;
+
+  return (
+    <>
+      <CreateButton entityKey="Event Definition" />
+      {SigmaOptionsComponent ? <SigmaOptionsComponent /> : null}
+    </>
+  );
+};
 
 const EventDefinitionsPage = () => (
   <DocumentTitle title="Event Definitions">
     <EventsPageNavigation />
     <PageHeader
       title="Event Definitions"
-      actions={<CreateButton entityKey="Event Definition" />}
+      actions={<CreateButtonWithSigma />}
       documentationLink={{
         title: 'Alerts documentation',
         path: DocsHelper.PAGES.ALERTS,

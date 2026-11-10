@@ -18,6 +18,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { Well } from 'components/bootstrap';
+import FieldValue from 'components/common/message/details/fields/FieldValue';
 
 import MessageLoader from './MessageLoader';
 
@@ -73,7 +74,9 @@ class ExtractorExampleMessage extends React.Component<
     if (example) {
       messagePreview = (
         <NewExampleWell bsSize="small">
-          <span id="xtrc-example">{example}</span>
+          <span id="xtrc-example">
+            <FieldValue value={example} />
+          </span>
         </NewExampleWell>
       );
     } else {

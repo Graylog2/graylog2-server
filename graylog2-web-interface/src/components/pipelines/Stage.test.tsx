@@ -25,13 +25,17 @@ import type { PipelineType, StageType } from 'components/pipelines/types';
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { PIPELINE_QUERY_KEY } from 'hooks/usePipeline';
-import { useStore } from 'stores/connect';
-import { RulesActions } from 'stores/rules/RulesStore';
+import { useRules, deleteRule } from 'components/rules/hooks/useRules';
+import type { RuleType } from 'components/rules/hooks/useRules';
 
 import Stage from './Stage';
 
 jest.mock('hooks/useCurrentUser');
-jest.mock('stores/connect', () => ({ useStore: jest.fn() }));
+jest.mock('components/rules/hooks/useRules', () => ({
+  ...jest.requireActual('components/rules/hooks/useRules'),
+  useRules: jest.fn(),
+  deleteRule: jest.fn(),
+}));
 jest.mock('@tanstack/react-query', () => {
   const actual = jest.requireActual('@tanstack/react-query');
 
@@ -96,7 +100,7 @@ jest.mock('components/common', () => ({
 jest.mock('./StageRules', () => {
   const INPUT_SETUP_WIZARD_ROUTING_RULE_DESCRIPTION = 'Input setup wizard routing rule';
 
-  const wizardRule = {
+  const wizardRule: RuleType = {
     id: 'wizard-rule-id',
     title: 'Wizard Rule',
     description: INPUT_SETUP_WIZARD_ROUTING_RULE_DESCRIPTION,
@@ -106,7 +110,7 @@ jest.mock('./StageRules', () => {
     rule_builder: undefined,
   };
 
-  const manualRule = {
+  const manualRule: RuleType = {
     id: 'manual-rule-id',
     title: 'Manual Rule',
     description: 'Manual rule',
@@ -138,13 +142,6 @@ jest.mock('./StageRules', () => {
     ),
   };
 });
-
-jest.mock('stores/rules/RulesStore', () => ({
-  RulesActions: {
-    delete: jest.fn(),
-  },
-  RulesStore: {},
-}));
 
 const stage: StageType = {
   stage: 1,
@@ -197,11 +194,11 @@ describe('Stage', () => {
     invalidateQueriesSpy = jest.spyOn(queryClient, 'invalidateQueries').mockResolvedValue(undefined);
 
     asMock(useCurrentUser).mockReturnValue(buildCurrentUser(['pipeline:edit', 'pipeline_rule:delete']));
-    asMock(useStore).mockReturnValue({
-      rules: [{ title: 'Wizard Rule' }, { title: 'Manual Rule' }],
-    });
+    asMock(useRules).mockReturnValue({
+      data: [{ title: 'Wizard Rule' }, { title: 'Manual Rule' }],
+    } as ReturnType<typeof useRules>);
     asMock(useQueryClient).mockReturnValue(queryClient);
-    asMock(RulesActions.delete).mockResolvedValue(undefined);
+    asMock(deleteRule).mockResolvedValue(undefined);
   });
 
   afterEach(() => {
@@ -251,20 +248,20 @@ describe('Stage', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
     expect(screen.queryByText('Remove Routing Rule')).not.toBeInTheDocument();
-    expect(RulesActions.delete).not.toHaveBeenCalled();
+    expect(deleteRule).not.toHaveBeenCalled();
   });
 
   it('deletes, invalidates the pipeline query, and allows new removals after completion', async () => {
     const pendingDelete = deferred();
 
-    asMock(RulesActions.delete).mockReturnValue(pendingDelete.promise);
+    asMock(deleteRule).mockReturnValue(pendingDelete.promise);
 
     renderStage();
 
     await userEvent.click(screen.getByRole('button', { name: 'Request wizard remove' }));
     await userEvent.click(screen.getByRole('button', { name: 'Remove' }));
 
-    expect(RulesActions.delete).toHaveBeenCalledWith(expect.objectContaining({ id: 'wizard-rule-id' }));
+    expect(deleteRule).toHaveBeenCalledWith(expect.objectContaining({ id: 'wizard-rule-id' }));
     expect(screen.queryByText('Remove Routing Rule')).not.toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: 'Request wizard remove' }));

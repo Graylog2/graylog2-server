@@ -16,30 +16,33 @@
  */
 
 import * as React from 'react';
-import { useRef } from 'react';
 
-import type { Stream } from 'stores/streams/StreamsStore';
-import usePipelinesConnectedStream from 'hooks/usePipelinesConnectedStream';
-import { CountBadge } from 'components/common';
+import type { Stream } from 'logic/streams/types';
+import { Spinner } from 'components/common';
+import { useStreamMetricsFor } from 'components/streams/StreamsOverview/StreamMetricsContext';
+
+import PipelinesList from './PipelinesList';
 
 type Props = {
   stream: Stream;
 };
 
 const PipelinesCell = ({ stream }: Props) => {
-  const buttonRef = useRef();
-  const { data } = usePipelinesConnectedStream(stream.id);
+  const { metrics, isInitialLoading, isError } = useStreamMetricsFor(stream.id);
 
-  if (stream.is_default || !stream.is_editable) {
+  if (!stream.is_editable) {
     return null;
   }
 
-  const pipelinesCount = data?.length || 0;
-  if (pipelinesCount === 0) {
+  if (isInitialLoading && !metrics) {
+    return <Spinner size="xs" />;
+  }
+
+  if (isError || !metrics?.pipelines?.length) {
     return null;
   }
 
-  return <CountBadge count={pipelinesCount} ref={buttonRef} title="Connected pipelines" />;
+  return <PipelinesList pipelineIds={metrics.pipelines} />;
 };
 
 export default PipelinesCell;

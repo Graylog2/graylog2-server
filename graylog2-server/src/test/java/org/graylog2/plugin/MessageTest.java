@@ -60,6 +60,10 @@ import java.util.regex.Pattern;
 import static com.google.common.collect.Sets.symmetricDifference;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_AGENT_FLEET_ID;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_AGENT_ID;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_AGENT_RECEIVER_TYPE;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_AGENT_SOURCE_ID;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_CATEGORY;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -277,6 +281,49 @@ public class MessageTest {
     }
 
     @Test
+    public void removeStreamMatchesStreamInstanceWithSameId() {
+        final IndexSet indexSet = mock(IndexSet.class);
+        final IndexSet otherIndexSet = mock(IndexSet.class);
+        final Stream routedStream = mockStream("stream-1", indexSet);
+        final Stream cachedStream = mock(Stream.class);
+        when(cachedStream.getId()).thenReturn("stream-1");
+        final Stream otherStream = mockStream("stream-2", otherIndexSet);
+
+        message.addStreams(List.of(routedStream, otherStream));
+        final long sizeWithStreams = message.getSize();
+
+        assertThat(message.removeStream(cachedStream)).isTrue();
+        assertThat(message.getStreams()).containsOnly(otherStream);
+        assertThat(message.getIndexSets()).containsOnly(otherIndexSet);
+        assertThat(message.getSize()).isEqualTo(sizeWithStreams - 8);
+        assertThat(message.removeStream(cachedStream)).isFalse();
+    }
+
+    @Test
+    public void addStreamReplacesStreamInstanceWithSameId() {
+        final IndexSet staleIndexSet = mock(IndexSet.class);
+        final IndexSet freshIndexSet = mock(IndexSet.class);
+        final Stream routedStream = mockStream("stream-1", staleIndexSet);
+        final Stream cachedStream = mockStream("stream-1", freshIndexSet);
+
+        message.addStream(routedStream);
+        final long sizeWithStream = message.getSize();
+
+        message.addStream(cachedStream);
+
+        assertThat(message.getStreams()).containsExactly(cachedStream);
+        assertThat(message.getIndexSets()).containsExactly(freshIndexSet);
+        assertThat(message.getSize()).isEqualTo(sizeWithStream);
+    }
+
+    private static Stream mockStream(String id, IndexSet indexSet) {
+        final Stream stream = mock(Stream.class);
+        when(stream.getId()).thenReturn(id);
+        when(stream.getIndexSet()).thenReturn(indexSet);
+        return stream;
+    }
+
+    @Test
     public void testGetStreamIds() throws Exception {
         message.addField("streams", Lists.newArrayList("stream-id"));
 
@@ -468,6 +515,24 @@ public class MessageTest {
     }
 
     @Test
+    public void toElasticsearchObjectAddsInputMessageSize() {
+        final long inputMessageSize = 12345L;
+        message.addField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, inputMessageSize);
+        final Map<String, Object> esObject = message.toElasticSearchObject(objectMapper, invalidTimestampMeter);
+        assertThat(esObject.get(Message.FIELD_GL2_INPUT_MESSAGE_SIZE)).isEqualTo(inputMessageSize);
+    }
+
+    @Test
+    public void inputMessageSizeDoesNotAffectAccountedMessageSize() {
+        final Message message = new Message("message", "source", Tools.nowUTC());
+        final long sizeBeforeInputField = message.getSize();
+
+        message.addField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, 12345L);
+
+        assertThat(message.getSize()).isEqualTo(sizeBeforeInputField);
+    }
+
+    @Test
     public void messageSizes() {
         final Message message = new Message("1234567890", "12345", Tools.nowUTC());
         assertThat(message.getSize()).isEqualTo(45);
@@ -477,6 +542,41 @@ public class MessageTest {
         message.addStream(defaultStream);
 
         assertThat(message.getSize()).isEqualTo(53);
+    }
+
+    @Test
+    public void messagesAreAccountedByDefaultButCanBeCreatedExcluded() {
+        final Message accounted = new Message("1234567890", "12345", Tools.nowUTC());
+        assertThat(accounted.isAccounted()).isTrue();
+
+        final Message excluded = new Message("1234567890", "12345", Tools.nowUTC(), false);
+        assertThat(excluded.isAccounted()).isFalse();
+    }
+
+    @Test
+    public void unaccountedMessageReportsZeroSize() {
+        // getSize() (also stored as gl2_accounted_message_size) is 0 for an unaccounted message,
+        // while an accounted message reports its real field size.
+        final Message accounted = new Message("1234567890", "12345", Tools.nowUTC());
+        final Message unaccounted = new Message("1234567890", "12345", Tools.nowUTC(), false);
+
+        assertThat(accounted.getSize()).isGreaterThan(0L);
+        assertThat(unaccounted.getSize()).isZero();
+    }
+
+    @Test
+    public void getInputMessageSizeReturnsRecordedFieldValue() {
+        final Message message = new Message("1234567890", "12345", Tools.nowUTC());
+        message.addField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE, 500L);
+
+        assertThat(message.getInputMessageSize()).isEqualTo(500L);
+    }
+
+    @Test
+    public void getInputMessageSizeFallsBackToGetSizeWhenNotRecorded() {
+        final Message message = new Message("1234567890", "12345", Tools.nowUTC());
+
+        assertThat(message.getInputMessageSize()).isEqualTo(message.getSize());
     }
 
     @Test
@@ -490,6 +590,23 @@ public class MessageTest {
         assertThat(message.getSize()).isEqualTo(45);
 
         // this field should increase message size
+        message.addField("http_url", "https//www.wikipedia.org");
+        assertThat(message.getSize()).isEqualTo(77);
+    }
+
+    @Test
+    public void testMessageSizeIgnoresCollectorFields() {
+        final Message message = new Message("1234567890", "12345", Tools.nowUTC());
+        assertThat(message.getSize()).isEqualTo(45);
+
+        // None of the collector metadata fields should contribute to the overall message size.
+        message.addField(FIELD_AGENT_RECEIVER_TYPE, "filelog");
+        message.addField(FIELD_AGENT_ID, "uid-42");
+        message.addField(FIELD_AGENT_SOURCE_ID, "source-abc");
+        message.addField(FIELD_AGENT_FLEET_ID, "fleet-xyz");
+        assertThat(message.getSize()).isEqualTo(45);
+
+        // A non-excluded field should still increase the size.
         message.addField("http_url", "https//www.wikipedia.org");
         assertThat(message.getSize()).isEqualTo(77);
     }
@@ -763,7 +880,7 @@ public class MessageTest {
             assertThat(e).hasSize(1);
             assertThat(e.get(0).getCause()).isEqualTo(ProcessingFailureCause.InvalidTimestampException);
             assertThat(e.get(0).getMessage()).startsWith("Replaced invalid timestamp value in message <");
-            assertThat(e.get(0).getDetails()).startsWith("Value <1234> caused exception: Invalid format: \"1234\" is too short");
+            assertThat(e.get(0).getDetails()).startsWith("Value <1234> caused exception: Unsupported timestamp string format: <1234>");
         });
     }
 
@@ -806,6 +923,55 @@ public class MessageTest {
         assertThat(message.processingErrors()).isEmpty();
     }
 
+    @Test
+    public void assignIsoStringWithOffsetAsTimestamp() {
+        // Reproduces https://github.com/Graylog2/graylog2-server/issues/26025: a pipeline rule (set_fields with
+        // key_value) assigns a string timestamp in ISO-8601 format with a numeric offset. This must be parsed
+        // leniently and must not record a processing error.
+        final Message message = new Message("message", "source", Tools.nowUTC());
+        message.addField(Message.FIELD_TIMESTAMP, "2026-05-18T08:57:55+0200");
+
+        // +0200 means the instant is 06:57:55 UTC
+        assertThat(message.getTimestamp()).isEqualTo(new DateTime(2026, 5, 18, 6, 57, 55, DateTimeZone.UTC));
+        assertThat(message.processingErrors()).isEmpty();
+    }
+
+    @Test
+    public void assignIsoStringInUtcAsTimestamp() {
+        final Message message = new Message("message", "source", Tools.nowUTC());
+        message.addField(Message.FIELD_TIMESTAMP, "2026-05-18T08:57:55.123Z");
+
+        assertThat(message.getTimestamp()).isEqualTo(new DateTime(2026, 5, 18, 8, 57, 55, 123, DateTimeZone.UTC));
+        assertThat(message.processingErrors()).isEmpty();
+    }
+
+    @Test
+    public void assignEsFormatStringWithoutMillisAsTimestamp() {
+        final Message message = new Message("message", "source", Tools.nowUTC());
+        message.addField(Message.FIELD_TIMESTAMP, "2026-05-18 08:57:55");
+
+        assertThat(message.getTimestamp()).isEqualTo(new DateTime(2026, 5, 18, 8, 57, 55, DateTimeZone.UTC));
+        assertThat(message.processingErrors()).isEmpty();
+    }
+
+    @Test
+    public void assignUnparseableStringStillRecordsProcessingError() {
+        // Do not use fixed time from setUp() in this test
+        DateTimeUtils.setCurrentMillisSystem();
+
+        final Message message = new Message("message", "source", Tools.nowUTC().minusMinutes(2));
+        final DateTime previousTimestamp = message.getTimestamp();
+
+        message.addField(Message.FIELD_TIMESTAMP, "not-a-timestamp");
+
+        // genuinely invalid value still falls back to the current time and records an error
+        assertThat(message.getTimestamp()).isNotEqualTo(previousTimestamp);
+        assertThat(message.processingErrors()).satisfies(e -> {
+            assertThat(e).hasSize(1);
+            assertThat(e.get(0).getCause()).isEqualTo(ProcessingFailureCause.InvalidTimestampException);
+        });
+    }
+
     // Arguably, a message should not allow null values for basic fields, but it is what it is. Here we are checking
     // that at least basic operations can deal with null values in the 'message' field without failing with e.g. an
     // NPE.
@@ -815,5 +981,31 @@ public class MessageTest {
         assertThat(msg).isNotEmpty();
         assertThat(msg.getMessage()).isNull();
         assertThat(msg.toString()).isNotEmpty();
+    }
+
+    @Test
+    public void isInternalField() {
+        assertThat(Message.isInternalField(Message.FIELD_ID)).isTrue();
+        assertThat(Message.isInternalField(Message.FIELD_GL2_SOURCE_INPUT)).isTrue();
+        assertThat(Message.isInternalField(Message.FIELD_GL2_MESSAGE_ID)).isTrue();
+        assertThat(Message.isInternalField("gl2_custom_plugin_field")).isTrue();
+
+        assertThat(Message.isInternalField(Message.FIELD_MESSAGE)).isFalse();
+        assertThat(Message.isInternalField(Message.FIELD_SOURCE)).isFalse();
+        assertThat(Message.isInternalField(Message.FIELD_TIMESTAMP)).isFalse();
+        assertThat(Message.isInternalField(Message.FIELD_INDEX)).isFalse();
+        assertThat(Message.isInternalField("my_gl2_field")).isFalse();
+    }
+
+    @Test
+    public void isReservedNonSettableField() {
+        assertThat(Message.isReservedNonSettableField(Message.FIELD_ID)).isTrue();
+        assertThat(Message.isReservedNonSettableField(Message.FIELD_INDEX)).isTrue();
+        assertThat(Message.isReservedNonSettableField("_source")).isTrue();
+
+        assertThat(Message.isReservedNonSettableField(Message.FIELD_MESSAGE)).isFalse();
+        assertThat(Message.isReservedNonSettableField(Message.FIELD_TIMESTAMP)).isFalse();
+        assertThat(Message.isReservedNonSettableField(Message.FIELD_GL2_SOURCE_INPUT)).isFalse();
+        assertThat(Message.isReservedNonSettableField("custom_field")).isFalse();
     }
 }

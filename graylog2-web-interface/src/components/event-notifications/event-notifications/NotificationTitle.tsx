@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import type { EventNotification, TestResults } from 'stores/event-notifications/EventNotificationsStore';
+import type { EventNotification, TestResults } from 'components/event-notifications/hooks/useEventNotifications';
 import { Spinner } from 'components/common';
 import EventNotificationLink from 'components/event-notifications/event-notifications/EventNotificationLink';
 

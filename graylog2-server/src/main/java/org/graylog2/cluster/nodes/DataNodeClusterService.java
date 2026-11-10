@@ -16,16 +16,15 @@
  */
 package org.graylog2.cluster.nodes;
 
-import org.graylog2.Configuration;
-import org.graylog2.database.MongoConnection;
-
 import jakarta.inject.Inject;
+import org.graylog2.Configuration;
+import org.graylog2.database.MongoCollections;
 
-public class DataNodeClusterService extends AbstractNodeService<DataNodeEntity, DataNodeDto> {
+public class DataNodeClusterService extends AbstractNodeService<DataNodeDto> {
 
     @Inject
-    public DataNodeClusterService(MongoConnection mongoConnection, Configuration configuration) {
-        super(mongoConnection, configuration, DataNodeEntity.class);
+    public DataNodeClusterService(MongoCollections mongoCollections, Configuration configuration) {
+        super(mongoCollections, configuration, DataNodeDto.COLLECTION_NAME, DataNodeDto.class);
     }
 
 }

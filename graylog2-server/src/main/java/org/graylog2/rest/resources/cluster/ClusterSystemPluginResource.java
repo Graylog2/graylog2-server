@@ -54,7 +54,7 @@ import static jakarta.ws.rs.core.Response.Status.BAD_GATEWAY;
 @Path("/cluster/{nodeId}/plugins")
 @Produces(MediaType.APPLICATION_JSON)
 public class ClusterSystemPluginResource extends ProxiedResource {
-    private static final Logger LOG = LoggerFactory.getLogger(ClusterSystemResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ClusterSystemPluginResource.class);
 
     @Inject
     public ClusterSystemPluginResource(NodeService nodeService,

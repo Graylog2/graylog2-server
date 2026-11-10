@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Always sort time columns of heatmaps chronologically."
+
+pulls = ["27861"]

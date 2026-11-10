@@ -16,8 +16,11 @@
  */
 package org.graylog.datanode.process;
 
+import org.graylog.datanode.Configuration;
+
 public interface ManagableProcess<T, EVENT, STATE> {
 
+    @Deprecated
     void configure(T configuration);
 
     void start();

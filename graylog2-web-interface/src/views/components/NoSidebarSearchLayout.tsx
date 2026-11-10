@@ -25,12 +25,15 @@ import { Row } from 'components/bootstrap';
 
 const Container = styled(Row)`
   position: relative;
+  flex: 1;
 `;
 
 const PageContentLayout = styled.div`
   padding: 0 15px;
   width: 100%;
   height: 100%;
+  display: flex;
+  flex-direction: column;
 `;
 
 const SearchAreaContainer = React.forwardRef<HTMLDivElement, React.PropsWithChildren>(({ children }, ref) => (

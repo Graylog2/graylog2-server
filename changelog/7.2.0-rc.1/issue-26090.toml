@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix timeout settings for async optimize index jobs"
+
+issues = ["26090"]
+pulls = ["26183"]

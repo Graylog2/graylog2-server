@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from '@graylog/sawmill';
-import type { ColorScheme } from '@graylog/sawmill';
+import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from 'theme/sawmill';
+import type { ColorScheme } from 'theme/sawmill';
 
 const prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
 
@@ -34,12 +34,15 @@ const LEGACY_DEFAULT_THEME_MODE: LegacyColorScheme = prefersDarkMode
 const COLOR_SCHEMES: Array<ColorScheme> = [COLOR_SCHEME_LIGHT, COLOR_SCHEME_DARK];
 const INPUT_BORDER_RADIUS = 0;
 const NAV_ITEM_HEIGHT = '50px';
+const NAV_ITEM_LINE_HEIGHT = '20px';
 
 const NAV_LOGO_HEIGHT = '30px';
 
 const MAX_NAV_LOGO_WIDTH = '120px';
 
 const MAX_NAV_ICON_WIDTH = '30px';
+
+const NAVBAR_GAP = 15;
 
 export {
   DEFAULT_THEME_MODE,
@@ -53,7 +56,9 @@ export {
   COLOR_SCHEMES,
   INPUT_BORDER_RADIUS,
   NAV_ITEM_HEIGHT,
+  NAV_ITEM_LINE_HEIGHT,
   NAV_LOGO_HEIGHT,
   MAX_NAV_LOGO_WIDTH,
   MAX_NAV_ICON_WIDTH,
+  NAVBAR_GAP,
 };

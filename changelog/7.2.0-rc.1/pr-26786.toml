@@ -1,0 +1,4 @@
+type = "f"
+message = "Truncate certificate CN to RFC 5280's 64-character limit to prevent certificate generation from failing on hosts with long hostnames."
+
+pulls = ["26786"]

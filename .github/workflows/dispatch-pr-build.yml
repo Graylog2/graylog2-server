@@ -24,8 +24,8 @@ jobs:
         id: pr-string-changed
         continue-on-error: true
         run: |
-          if [ -n "$BASE_CHANGE" ]; then
-            echo "PR base branch change detected: $BASE_CHANGE"
+          if [ "$BASE_CHANGED" = "true" ]; then
+            echo "PR base branch change detected"
             echo "Re-triggering PR build..."
             exit 0
           fi
@@ -43,7 +43,7 @@ jobs:
         env:
           OLD_PR_BODY: "${{ github.event.changes.body.from }}"
           NEW_PR_BODY: "${{ github.event.pull_request.body }}"
-          BASE_CHANGE: "${{ github.event.changes.base || '' }}"
+          BASE_CHANGED: "${{ github.event.changes.base && 'true' || 'false' }}"
 
       - name: Check e2e-tests label
         id: e2e-tests

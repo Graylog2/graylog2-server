@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen, within } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import Pagination from './Pagination';
@@ -27,12 +27,10 @@ describe('<Pagination />', () => {
 
     render(<Pagination currentPage={currentPage} totalPages={totalPages} />);
 
-    const activePage = await screen.findByTitle('Active page');
-
     await screen.findByTestId('graylog-pagination');
     await screen.findByRole('button', { name: /open page 5/i });
 
-    expect(within(activePage).getByText(1)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /open page 1/i, current: 'page' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /open page 6/i })).not.toBeInTheDocument();
   });
 
@@ -42,7 +40,7 @@ describe('<Pagination />', () => {
 
     render(<Pagination currentPage={currentPage} totalPages={totalPages} />);
 
-    expect(screen.queryByTitle('Active page')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('graylog-pagination')).not.toBeInTheDocument();
   });
 
   it('should return proper page to `onChange`', async () => {

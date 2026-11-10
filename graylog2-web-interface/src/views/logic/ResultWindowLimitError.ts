@@ -32,7 +32,7 @@ export const isResultWindowLimitErrorResponse = (error: SearchErrorResponse): er
   error?.type === 'result_window_limit';
 
 export default class ResultWindowLimitError extends SearchError {
-  protected readonly _state: ResultWindowLimitErrorState;
+  declare protected readonly _state: ResultWindowLimitErrorState;
 
   private readonly _resultWindowLimit: number;
 

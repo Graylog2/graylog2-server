@@ -22,7 +22,7 @@ import org.graylog.events.processor.EventDefinition;
 import org.graylog.plugins.views.search.rest.ViewsRestPermissions;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog2.cluster.nodes.NodeDto;
-import org.graylog2.cluster.nodes.ServerNodeEntity;
+import org.graylog2.cluster.nodes.ServerNodeDto;
 import org.graylog2.contentpacks.ContentPackPersistenceService;
 import org.graylog2.contentpacks.model.ContentPackV1;
 import org.graylog2.featureflag.FeatureFlags;
@@ -59,7 +59,7 @@ public class QuickJumpModule extends PluginModule {
             addQuickJumpProvider(QuickJumpProvider.create("event_definition", EventDefinition.class));
             addQuickJumpProvider(QuickJumpProvider.create("event_notification", DBNotificationService.NOTIFICATION_COLLECTION_NAME,
                     (id, user) -> user.isPermitted(RestPermissions.EVENT_NOTIFICATIONS_READ, id)));
-            addQuickJumpProvider(QuickJumpProvider.create("node", ServerNodeEntity.class,
+            addQuickJumpProvider(QuickJumpProvider.create("node", ServerNodeDto.class,
                     List.of(NodeDto.FIELD_HOSTNAME, NodeDto.FIELD_NODE_ID), Optional.of(NodeDto.FIELD_NODE_ID)));
             addQuickJumpProvider(QuickJumpProvider.create("content_pack", ContentPackPersistenceService.COLLECTION_NAME,
                     (id, user) -> user.isPermitted(RestPermissions.CONTENT_PACK_READ, id),

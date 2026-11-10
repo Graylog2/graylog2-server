@@ -25,8 +25,6 @@ import { formatTrafficData } from 'util/TrafficUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { TrafficGraph, useGraphWidth } from 'components/common/Graph';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
 import type { Traffic } from 'components/common/Graph/types';
 import { DAYS } from 'components/common/Graph/types';
 import useGraphDays from 'components/common/Graph/contexts/useGraphDays';
@@ -62,14 +60,19 @@ type Props = {
   traffic: Traffic;
   trafficLimit?: number;
   title?: string;
+  trafficType?: 'input-indexed' | 'output';
 };
 
-const TrafficGraphWithDaySelect = ({ traffic, trafficLimit = undefined, title = undefined }: Props) => {
+const TrafficGraphWithDaySelect = ({
+  traffic,
+  trafficLimit = undefined,
+  title = undefined,
+  trafficType = 'output',
+}: Props) => {
   const { graphDays, setGraphDays } = useGraphDays();
   const { graphWidth, graphContainerRef } = useGraphWidth();
-  const { pathname } = useLocation();
 
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry(trafficType === 'input-indexed' ? 'incoming-traffic' : 'outgoing-traffic');
 
   const onGraphDaysChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     event.preventDefault();
@@ -78,8 +81,6 @@ const TrafficGraphWithDaySelect = ({ traffic, trafficLimit = undefined, title = 
     setGraphDays(newDays);
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.TRAFFIC_GRAPH_DAYS_CHANGED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'outgoing-traffic',
       app_action_value: 'trafficgraph-days-button',
       event_details: { value: newDays },
     });
@@ -114,7 +115,7 @@ const TrafficGraphWithDaySelect = ({ traffic, trafficLimit = undefined, title = 
       </Wrapper>
 
       <StyledH3 ref={graphContainerRef}>
-        {title ?? 'Outgoing traffic'}{' '}
+        {title ?? (trafficType === 'input-indexed' ? 'Incoming traffic' : 'Outgoing traffic')}{' '}
         {bytesOut && (
           <small>
             Last {graphDays} days: {formattedTotalTraffic}

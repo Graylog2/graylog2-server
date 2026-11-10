@@ -37,15 +37,15 @@ public class NettyTransportConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(NettyTransportConfiguration.class);
     private static final String PREFIX = "transport_netty_";
 
-    @Documentation(value = "tbd")
+    @Documentation(value = "Netty transport type used by inputs: \"epoll\", \"kqueue\", \"nio\" or \"auto\" (detect best available).")
     @Parameter(value = PREFIX + "type", required = true, validators = StringNotBlankValidator.class)
     private String type = "auto";
 
-    @Documentation(value = "tbd")
+    @Documentation(value = "TLS provider used by Netty-based inputs: \"openssl\", \"jdk\" or \"auto\" (OpenSSL if available, else JDK).")
     @Parameter(value = PREFIX + "tls_provider", required = true, validators = StringNotBlankValidator.class)
     private String tlsProvider = "auto";
 
-    @Documentation(value = "tbd")
+    @Documentation(value = "Number of threads in the shared Netty event loop group used by inputs.")
     @Parameter(value = PREFIX + "num_threads", required = true, validators = PositiveIntegerValidator.class)
     private int numThreads = Runtime.getRuntime().availableProcessors() * 2;
 

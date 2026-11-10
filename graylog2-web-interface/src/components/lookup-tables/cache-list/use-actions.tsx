@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { useCallback, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
+import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import { MenuItem, DeleteMenuItem, BootstrapModalConfirm } from 'components/bootstrap';
 import { Spinner } from 'components/common';
@@ -34,19 +34,18 @@ type ActionsProps = {
 
 function Actions({ cache }: ActionsProps) {
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('lut_cache');
   const { deleteCache, deletingCache } = useDeleteCache();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(cache);
-  const navigate = useNavigate();
+  const { push } = useHistory();
 
   const handleEdit = useCallback(() => {
-    navigate(Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(cache.name));
-  }, [navigate, cache.name]);
+    push(Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(cache.name));
+  }, [push, cache.name]);
 
   const handleDelete = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.LUT.CACHE_DELETED, {
       app_pathname: 'lut',
-      app_section: 'lut_cache',
     });
 
     deleteCache(cache.id).then(() => setShowDeleteModal(false));

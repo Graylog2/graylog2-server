@@ -153,7 +153,7 @@ describe('Value', () => {
     'verifying that value $value is rendered correctly when interactive=$interactive',
     async ({ interactive, value, result, type }) => {
       const Component = (props) => (
-        <InteractiveContext.Provider value={interactive}>
+        <InteractiveContext.Provider value={interactive ? 'interactive' : 'disabled'}>
           <Value {...props} />
         </InteractiveContext.Provider>
       );
@@ -168,7 +168,7 @@ describe('Value', () => {
     const component =
       (interactive: boolean) =>
       ({ ...props }: React.ComponentProps<typeof Value>) => (
-        <InteractiveContext.Provider value={interactive}>
+        <InteractiveContext.Provider value={interactive ? 'interactive' : 'disabled'}>
           <Value {...props} />
         </InteractiveContext.Provider>
       );

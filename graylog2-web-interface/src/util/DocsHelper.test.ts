@@ -17,8 +17,6 @@
 import asMock from 'helpers/mocking/AsMock';
 import AppConfig from 'util/AppConfig';
 
-jest.mock('util/AppConfig');
-
 describe('DocsHelper', () => {
   const loadDocsHelper = async () => {
     let docsHelper;

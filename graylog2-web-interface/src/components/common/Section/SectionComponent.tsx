@@ -26,6 +26,7 @@ import useDisclosure from 'util/hooks/useDisclosure';
 type Props = {
   children: React.ReactNode;
   title: string;
+  titleAs?: 'h2' | 'h3';
   showLoading?: boolean;
   headerActions?: React.ReactElement;
   className?: string;
@@ -72,6 +73,7 @@ export const SectionCol = styled(Col)``;
 const SectionComponent = ({
   children,
   title,
+  titleAs = undefined,
   showLoading = false,
   headerActions = undefined,
   className = '',
@@ -85,7 +87,7 @@ const SectionComponent = ({
     <Row className={`content ${className}`}>
       <SectionCol xs={12}>
         <Header>
-          <Headline>
+          <Headline as={titleAs}>
             {title}
             {showLoading && <LoadingSpinner text="" delay={0} />}
           </Headline>

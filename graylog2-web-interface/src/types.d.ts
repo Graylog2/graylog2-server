@@ -22,6 +22,14 @@ declare module '*.css' {
   export default classes;
 }
 
+declare module '*.less' {
+  interface CSSClasses {
+    [key: string]: any;
+  }
+  const classes: CSSClasses;
+  export default classes;
+}
+
 declare module '*.jpg' {
   export default string;
 }
@@ -34,4 +42,13 @@ declare module '*.svg' {
 
 declare module '*.png' {
   export default string;
+}
+
+declare module '*.woff2' {
+  export default string;
+}
+
+declare module 'jest-preset-graylog/lib/timeouts' {
+  export const timeoutMultiplier: () => number;
+  export const applyTimeoutMultiplier: (x: number) => number;
 }

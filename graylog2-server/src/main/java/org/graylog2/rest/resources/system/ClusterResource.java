@@ -35,6 +35,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
@@ -59,6 +60,7 @@ import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -99,6 +101,7 @@ public class ClusterResource extends RestResource {
             EntityAttribute.builder().id("hostname").title("Node").searchable(true).sortable(true).build(),
             EntityAttribute.builder().id("node_id").title("Node ID").searchable(true).sortable(true).type(SearchQueryField.Type.STRING).build(),
             EntityAttribute.builder().id("short_node_id").title("Short node ID").sortable(true).build(),
+            EntityAttribute.builder().id(ServerNodeDto.FIELD_VERSION).title("Version").sortable(true).type(SearchQueryField.Type.STRING).build(),
             EntityAttribute.builder().id(ServerNodeDto.FIELD_LOAD_BALANCER_STATUS).title("Load balancer").sortable(true).filterable(true).filterOptions(loadBalancerOptions()).build(),
             EntityAttribute.builder().id(ServerNodeDto.FIELD_LIFECYCLE).title("Status").sortable(true).filterable(true).filterOptions(lifecycleOptions()).build(),
             EntityAttribute.builder().id(ServerNodeDto.FIELD_IS_PROCESSING).title("Processing").sortable(true).filterable(true).build()
@@ -148,6 +151,7 @@ public class ClusterResource extends RestResource {
     @GET
     @Path("/nodes/paginated")
     @Timed
+    @RequiresPermissions(RestPermissions.CLUSTER_CONFIGURATION_READ)
     @Operation(summary = "Get a paginated list of all server nodes in this cluster")
     public PageListResponse<ServerNodeDto> nodes(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                  @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
@@ -155,7 +159,7 @@ public class ClusterResource extends RestResource {
                                                  @Parameter(name = "sort",
                                                            description = "The field to sort the result on",
                                                            required = true,
-                                                           schema = @Schema(allowableValues = {"hostname", "node_id", "short_node_id", "transport_address"}))
+                                                           schema = @Schema(allowableValues = {"hostname", "node_id", "short_node_id", "transport_address", "version"}))
                                                  @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
                                                  @Parameter(name = "order", description = "The sort direction",
                                                            schema = @Schema(allowableValues = {"asc", "desc"}))
@@ -171,6 +175,7 @@ public class ClusterResource extends RestResource {
     @GET
     @Timed
     @Path("/node")
+    @RequiresPermissions(RestPermissions.CLUSTER_CONFIGURATION_READ)
     @Operation(summary = "Information about this node.",
                   description = "This is returning information of this node in context to its state in the cluster. " +
                           "Use the system API of the node itself to get system information.")
@@ -181,6 +186,7 @@ public class ClusterResource extends RestResource {
     @GET
     @Timed
     @Path("/nodes/{nodeId}")
+    @RequiresPermissions(RestPermissions.CLUSTER_CONFIGURATION_READ)
     @Operation(summary = "Information about a node.",
                   description = "This is returning information of a node in context to its state in the cluster. " +
                           "Use the system API of the node itself to get system information.")

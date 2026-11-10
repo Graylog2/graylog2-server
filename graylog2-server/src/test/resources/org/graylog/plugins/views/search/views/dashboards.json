@@ -38,7 +38,50 @@
       },
       "last_updated_at": {
         "$date": "2025-09-24T10:02:14.176Z"
-      }
+      },
+      "_scope": "ILLUMINATE"
+    },
+    {
+      "_id": {
+        "$oid": "68ef5a140f5ba3bef59ca64c"
+      },
+      "type": "DASHBOARD",
+      "title": "Illuminate:Copied Dashboard",
+      "summary": "Test Dashboard",
+      "description": "Test Dashboard",
+      "search_id": "68ef5a140f5ba3bef59ca64d",
+      "properties": [],
+      "requires": {},
+      "state": {},
+      "owner": "admin",
+      "created_at": {
+        "$date": "2023-06-01T08:43:23.743Z"
+      },
+      "last_updated_at": {
+        "$date": "2025-09-24T10:02:14.176Z"
+      },
+      "_scope": "DEFAULT"
+    },
+    {
+      "_id": {
+        "$oid": "68ef5a140f5ba3bef59ca64e"
+      },
+      "type": "SEARCH",
+      "title": "Illuminate Search",
+      "summary": "Test Dashboard",
+      "description": "Test Dashboard",
+      "search_id": "68ef5a140f5ba3bef59ca64f",
+      "properties": [],
+      "requires": {},
+      "state": {},
+      "owner": "admin",
+      "created_at": {
+        "$date": "2023-06-01T08:43:23.743Z"
+      },
+      "last_updated_at": {
+        "$date": "2025-09-24T10:02:14.176Z"
+      },
+      "_scope": "ILLUMINATE"
     }
   ]
 }

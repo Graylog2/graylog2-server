@@ -65,7 +65,7 @@ describe('useLocationSearchPagination custom hook', () => {
 
     act(() => setPagination(nextPage));
 
-    expect(mockNavigate).toHaveBeenCalledWith({ pathname: '/', search: stringify(nextPage) });
+    expect(mockNavigate).toHaveBeenCalledWith(`/?${stringify(nextPage)}`);
   });
 
   it.each`

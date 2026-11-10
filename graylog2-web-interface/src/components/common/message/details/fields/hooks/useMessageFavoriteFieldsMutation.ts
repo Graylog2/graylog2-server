@@ -15,15 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useCallback } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import mapValues from 'lodash/mapValues';
 
 import { FavoriteFields } from '@graylog/server-api';
 
-import { StreamsActions } from 'views/stores/StreamsStore';
+import { STREAMS_QUERY_KEY } from 'components/streams/hooks/useAllStreams';
 import UserNotification from 'util/UserNotification';
-import type { Stream } from 'logic/streams/types';
-
-import useSendFavoriteFieldTelemetry from './useSendFavoriteFieldTelemetry';
+import useSendFavoriteFieldTelemetry from 'components/common/message/details/fields/hooks/useSendFavoriteFieldTelemetry';
 
 interface FavoriteFieldRequest {
   readonly field: string;
@@ -36,8 +35,12 @@ interface SetFavoriteFieldsRequest {
   };
 }
 
-const useMessageFavoriteFieldsMutation = (streams: Array<Stream>, initialFavoriteFields: Array<string>) => {
+const useMessageFavoriteFieldsMutation = (
+  initialFavoriteFieldsByStream: Record<string, Array<string>>,
+  initialFavoriteFields: Array<string>,
+) => {
   const sendFavoriteFieldTelemetry = useSendFavoriteFieldTelemetry();
+  const queryClient = useQueryClient();
   const { isPending: setFieldsIsPending, mutate: setFavoriteFields } = useMutation({
     mutationFn: (props: SetFavoriteFieldsRequest) => FavoriteFields.set(props),
     onSuccess: (_, newFavoriteFieldsByStream) => {
@@ -45,7 +48,7 @@ const useMessageFavoriteFieldsMutation = (streams: Array<Stream>, initialFavorit
         fields_lengths: Object.values(newFavoriteFieldsByStream.fields).map((fields) => fields.length),
       });
 
-      return StreamsActions.refresh();
+      return queryClient.invalidateQueries({ queryKey: STREAMS_QUERY_KEY });
     },
     onError: (errorThrown) =>
       UserNotification.error(
@@ -61,7 +64,7 @@ const useMessageFavoriteFieldsMutation = (streams: Array<Stream>, initialFavorit
         app_action_value: 'add',
       });
 
-      return StreamsActions.refresh();
+      return queryClient.invalidateQueries({ queryKey: STREAMS_QUERY_KEY });
     },
     onError: (errorThrown) =>
       UserNotification.error(
@@ -77,7 +80,7 @@ const useMessageFavoriteFieldsMutation = (streams: Array<Stream>, initialFavorit
         app_action_value: 'remove',
       });
 
-      return StreamsActions.refresh();
+      return queryClient.invalidateQueries({ queryKey: STREAMS_QUERY_KEY });
     },
     onError: (errorThrown) =>
       UserNotification.error(
@@ -90,26 +93,19 @@ const useMessageFavoriteFieldsMutation = (streams: Array<Stream>, initialFavorit
     (favoritesToSave: Array<string>) => {
       const newAddedFields = favoritesToSave.filter((f) => !initialFavoriteFields.includes(f));
 
-      const newFavoriteFieldsByStream = Object.fromEntries(
-        streams.map((stream) => [
-          stream.id,
-          favoritesToSave.filter((f) => {
-            const streamFavoriteFields = stream?.favorite_fields ?? [];
-
-            return streamFavoriteFields.includes(f) || newAddedFields.includes(f);
-          }),
-        ]),
+      const newFavoriteFieldsByStream = mapValues(initialFavoriteFieldsByStream, (streamFavoriteFields) =>
+        favoritesToSave.filter((f) => streamFavoriteFields.includes(f) || newAddedFields.includes(f)),
       );
 
       setFavoriteFields({ fields: newFavoriteFieldsByStream });
     },
-    [initialFavoriteFields, setFavoriteFields, streams],
+    [initialFavoriteFields, initialFavoriteFieldsByStream, setFavoriteFields],
   );
 
   const toggleField = useCallback(
     (field: string) => {
       const isFavorite = initialFavoriteFields?.includes(field);
-      const streamIds = streams.map((stream) => stream.id);
+      const streamIds = Object.keys(initialFavoriteFieldsByStream);
 
       if (isFavorite) {
         removeFavoriteField({ field, stream_ids: streamIds });
@@ -117,7 +113,7 @@ const useMessageFavoriteFieldsMutation = (streams: Array<Stream>, initialFavorit
         addFavoriteField({ field, stream_ids: streamIds });
       }
     },
-    [addFavoriteField, initialFavoriteFields, removeFavoriteField, streams],
+    [addFavoriteField, initialFavoriteFields, initialFavoriteFieldsByStream, removeFavoriteField],
   );
 
   return {

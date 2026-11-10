@@ -78,11 +78,12 @@ type RefType = ExistingRefType | LiteralRefType;
 type ObjectType = {
   id: string;
   type: 'object';
-  properties: Record<string, RawType>;
+  properties: Record<string, RawProperty>;
   additional_properties?: string | RawType;
 };
 
 type RawType = PrimitiveType | EnumType | ArrayType | RefType | ObjectType;
+type RawProperty = RawType & { required?: boolean };
 
 const isMappedType = (type: string): type is keyof typeof typeMappings => Object.keys(typeMappings).includes(type);
 const mapType = (type: keyof typeof typeMappings) => typeMappings[type];
@@ -176,7 +177,8 @@ function createType(rawTypeDefinition: RawType): Type {
 
     const properties = typeDefinition.properties
       ? Object.fromEntries(
-          Object.entries(typeDefinition.properties).map(([propName, propType]) => [propName, createType(propType)]),
+          // eslint-disable-next-line @typescript-eslint/no-use-before-define
+          Object.entries(typeDefinition.properties).map(([propName, propType]) => [propName, createProperty(propType)]),
         )
       : {};
 
@@ -194,6 +196,12 @@ function createType(rawTypeDefinition: RawType): Type {
   return createTypeReference(type, isOptional);
 }
 
+function createProperty(rawProperty: RawProperty): Type {
+  const type = createType(rawProperty);
+
+  return rawProperty.required === false ? { ...type, optional: true } : type;
+}
+
 const bannedModels = [
   ...Object.keys(typeMappings),
   'DateTime',
@@ -208,7 +216,7 @@ const isNotBannedModel = ([name]) => !bannedModels.includes(name);
 type RawModel = {
   id: string;
   type: string;
-  properties: Record<string, RawType>;
+  properties: Record<string, RawProperty>;
   additional_properties?: string | RawType;
 };
 
@@ -272,17 +280,29 @@ type RawOperation = {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE';
   nickname: string;
   type: string | RawType;
+  items?: RawType;
   parameters: Array<RawParameter>;
   path?: string;
   produces: Array<RawContentType>;
 };
 
-function createOperation({ summary, method, type, parameters, nickname, path, produces }: RawOperation): Operation {
+function createOperation({
+  summary,
+  method,
+  type,
+  items,
+  parameters,
+  nickname,
+  path,
+  produces,
+}: RawOperation): Operation {
+  const rawType: string | RawType = type === 'array' && items ? { type: 'array', items } : type;
+
   return {
     method,
     summary,
     nickname,
-    type: typeof type === 'string' ? createType({ type }) : createType(type),
+    type: typeof rawType === 'string' ? createType({ type: rawType }) : createType(rawType),
     parameters: parameters?.map(createParameter) ?? [],
     path,
     produces,

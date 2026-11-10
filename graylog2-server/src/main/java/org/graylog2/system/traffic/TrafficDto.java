@@ -50,10 +50,16 @@ public abstract class TrafficDto implements MongoEntity {
     @JsonProperty
     public abstract Map<String, Long> decoded();
 
+    @JsonProperty("input_indexed")
+    @Nullable
+    public abstract Map<String, Long> inputIndexed();
+
     public abstract Builder toBuilder();
 
     public static Builder builder() {
-        return new AutoValue_TrafficDto.Builder().decoded(Collections.emptyMap());
+        return new AutoValue_TrafficDto.Builder()
+                .decoded(Collections.emptyMap())
+                .inputIndexed(Collections.emptyMap());
     }
 
     @AutoValue.Builder
@@ -75,6 +81,9 @@ public abstract class TrafficDto implements MongoEntity {
 
         @JsonProperty
         public abstract Builder decoded(Map<String, Long> decodedTraffic);
+
+        @JsonProperty("input_indexed")
+        public abstract Builder inputIndexed(Map<String, Long> inputIndexedTraffic);
 
         public abstract TrafficDto build();
     }

@@ -36,6 +36,16 @@ import OriginalTimerangeInfo from './TimerangeInfo';
 
 jest.mock('views/hooks/useView');
 jest.mock('views/hooks/useGlobalOverride');
+jest.mock(
+  'components/common/Tooltip',
+  () =>
+    ({ children, label }: { children: React.ReactNode; label: React.ReactNode }) => (
+      <>
+        {children}
+        <div data-testid="tooltip-label">{label}</div>
+      </>
+    ),
+);
 
 const defaultSearchResult = {
   execution: {
@@ -104,7 +114,9 @@ describe('TimerangeInfo', () => {
     const relativeWidget = widget.toBuilder().timerange({ type: 'relative', range: 3000 }).build();
     render(<TimerangeInfo widget={relativeWidget} activeQuery="active-query-id" widgetId="widget-id" />);
 
-    expect(screen.getByTitle('2021-04-26T14:32:48.000+02:00 - 2021-04-26T16:32:48.000+02:00')).toBeInTheDocument();
+    expect(screen.getByTestId('tooltip-label')).toHaveTextContent(
+      '2021-04-26T14:32:48.000+02:00 - 2021-04-26T16:32:48.000+02:00',
+    );
   });
 
   it('should display a relative timerange', () => {

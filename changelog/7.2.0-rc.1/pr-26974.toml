@@ -1,0 +1,5 @@
+type = "f"
+message = "Fixed the Streams page showing \"Archiving is enabled\" for streams that are excluded from archiving under Archive > Configuration > Streams to archive."
+
+issues = ["Graylog2/graylog-plugin-enterprise#14996"]
+pulls = ["26974"]

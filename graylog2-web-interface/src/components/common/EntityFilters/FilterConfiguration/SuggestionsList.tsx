@@ -18,7 +18,7 @@ import React, { useCallback } from 'react';
 import debounce from 'lodash/debounce';
 import styled, { css } from 'styled-components';
 
-import { Input, ListGroupItem } from 'components/bootstrap';
+import { Input, ListGroup, ListGroupItem } from 'components/bootstrap';
 import type { Attribute } from 'stores/PaginationTypes';
 import type { Filters } from 'components/common/EntityFilters/types';
 import NoSearchResult from 'components/common/NoSearchResult';
@@ -47,7 +47,7 @@ const ScrollableArea = styled.div`
   max-height: 50vh;
   overflow: auto;
 `;
-const StyledListGroup = styled.div`
+const StyledListGroup = styled(ListGroup)`
   margin-bottom: 0;
 `;
 

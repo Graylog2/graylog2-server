@@ -306,6 +306,9 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @NoAuditEvent("only used to test event notifications")
     public Response test(@Parameter(name = "JSON Body") NotificationDto dto) {
         checkPermission(RestPermissions.EVENT_NOTIFICATIONS_CREATE);
+        if (!isNullOrEmpty(dto.id())) {
+            checkPermission(RestPermissions.EVENT_NOTIFICATIONS_EDIT, dto.id());
+        }
         final ValidationResult validationResult = dto.validate();
         if (validationResult.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(validationResult).build();

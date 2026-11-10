@@ -52,6 +52,7 @@ type Props = {
   sliceCol: string | undefined;
   columnSchemas: Array<ColumnSchema>;
   onChangeSlicing: (sliceCol: string | undefined, slice?: string | undefined) => void;
+  isSlicingReadOnly: boolean;
 };
 
 const SliceHeaderControls = ({
@@ -61,15 +62,15 @@ const SliceHeaderControls = ({
   sliceCol,
   columnSchemas,
   onChangeSlicing,
+  isSlicingReadOnly,
 }: Props) => {
   const { isPermitted } = usePermissions();
   const sliceableColumns = columnSchemas
     .filter((schema) => schema.sliceable && isPermitted(schema.permissions))
     .sort(({ title: title1 }, { title: title2 }) => defaultCompare(title1, title2));
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry(appSection);
   const onSliceColumn = (columnId: string) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SLICE_COLUMN_SELECTED_SECTION, {
-      app_section: appSection,
       app_action_value: 'slice-column-select',
       event_details: { attribute_id: columnId },
     });
@@ -77,16 +78,15 @@ const SliceHeaderControls = ({
   };
   const onRemoveSlicing = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SLICE_REMOVED, {
-      app_section: appSection,
       app_action_value: 'slice-remove',
       event_details: { attribute_id: sliceCol },
     });
-    onChangeSlicing(undefined, undefined);
+    onChangeSlicing(null, null);
   };
 
   return (
     <SliceHeader>
-      <DropdownButton bsSize="small" title={activeColumnTitle ?? 'Slice by'}>
+      <DropdownButton bsSize="small" title={activeColumnTitle ?? 'Slice by'} disabled={isSlicingReadOnly}>
         <MenuItem header>Slice by</MenuItem>
         {sliceableColumns.map((schema) => (
           <MenuItem key={schema.id} onClick={() => onSliceColumn(schema.id)}>
@@ -100,7 +100,7 @@ const SliceHeaderControls = ({
             Unselect slice
           </Button>
         )}
-        <IconButton name="close" title="No slicing" onClick={onRemoveSlicing} />
+        <IconButton disabled={isSlicingReadOnly} name="close" title="No slicing" onClick={onRemoveSlicing} />
       </HeaderActions>
     </SliceHeader>
   );

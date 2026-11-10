@@ -26,6 +26,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import org.graylog.collectors.indexer.CollectorLogsIndexTemplateProvider;
 import org.graylog2.database.DbEntity;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.NonDeletableSystemScope;
@@ -57,12 +58,25 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.graylog2.database.MongoEntity.FIELD_ID;
+import static org.graylog2.indexer.indexset.IndexSetConfig.FIELD_REGULAR;
+import static org.graylog2.indexer.indexset.fields.ExtendedIndexSetFields.FIELD_CREATION_DATE;
+import static org.graylog2.indexer.indexset.fields.IndexPrefixField.FIELD_INDEX_PREFIX;
+import static org.graylog2.indexer.indexset.fields.IndexTemplateTypeField.FIELD_INDEX_TEMPLATE_TYPE;
+import static org.graylog2.indexer.indexset.fields.ShardsAndReplicasField.FIELD_REPLICAS;
+import static org.graylog2.indexer.indexset.fields.ShardsAndReplicasField.FIELD_SHARDS;
+import static org.graylog2.indexer.indexset.fields.WritableField.FIELD_WRITABLE;
 import static org.graylog2.indexer.template.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
+import static org.graylog2.shared.fields.TitleAndDescriptionFields.FIELD_DESCRIPTION;
+import static org.graylog2.shared.fields.TitleField.FIELD_TITLE;
+import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
 import static org.graylog2.shared.security.RestPermissions.INDEXSETS_READ;
 
 @AutoValue
 @JsonAutoDetect
-@DbEntity(collection = MongoIndexSetService.COLLECTION_NAME, readPermission = INDEXSETS_READ)
+@DbEntity(collection = MongoIndexSetService.COLLECTION_NAME, readPermission = INDEXSETS_READ,
+          readableFields = {ID_FIELD, FIELD_ID, FIELD_TITLE, FIELD_DESCRIPTION, FIELD_INDEX_PREFIX, FIELD_WRITABLE,
+                  FIELD_REGULAR, FIELD_CREATION_DATE, FIELD_INDEX_TEMPLATE_TYPE, FIELD_SHARDS, FIELD_REPLICAS})
 public abstract class IndexSetConfig implements
         Comparable<IndexSetConfig>,
         ExtendedIndexSetFields,
@@ -85,7 +99,8 @@ public abstract class IndexSetConfig implements
     private static final Set<String> TEMPLATE_TYPES_FOR_INDEX_SETS_WITH_IMMUTABLE_FIELD_TYPES = Set.of(
             EVENT_TEMPLATE_TYPE,
             IndexTemplateProvider.FAILURE_TEMPLATE_TYPE,
-            IndexTemplateProvider.ILLUMINATE_INDEX_TEMPLATE_TYPE
+            IndexTemplateProvider.ILLUMINATE_INDEX_TEMPLATE_TYPE,
+            CollectorLogsIndexTemplateProvider.COLLECTOR_LOGS_TEMPLATE_TYPE
     );
 
     @JsonCreator

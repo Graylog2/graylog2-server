@@ -4,16 +4,16 @@
 - [Node.js](https://nodejs.org/)
 - [Yarn](https://yarnpkg.com/)
 
-**Note:** NPM v5 changed completely the way it builds local modules, breaking the Graylog web interface build. Please use Yarn instead of NPM v5.
+**Note:** Use Yarn (v1), not npm.
 
 ## Development Setup
 
 * Install the requirements listed above
 * Run `yarn install`
-* Run `yarn start` to build the project for development and start the development server. You can exclude any Graylog frontend plugins from the build by running `disable_plugins=true npm start` instead
+* Run `yarn start` to build the project for development and start the development server. You can exclude any Graylog frontend plugins from the build by running `disable_plugins=true yarn start` instead
 * Open http://localhost:8080 in your browser to access the Graylog web interface
 
-The `yarn start` (or `disable_plugins=true yarn start`) command will run an [Express](http://expressjs.com) web server which is configured to do a full page reload in your browser every time that you save a file. This ensures that you will always use the latest version of your code.
+The `yarn start` (or `disable_plugins=true yarn start`) command runs the webpack dev server (`webpack serve`), which rebuilds when you save a file.
 
 ### Run development server in a different host and port
 
@@ -26,7 +26,7 @@ E.g. `yarn start --host=0.0.0.0 --port=8000` will start the development server i
 
 ## Contributing
 
-Please have a look at the [CONTRIBUTING.md](CONTRIBUTING.md) for an overview of our conventions, best practices and tips.
+Please have a look at the [CONTRIBUTING.md](CONTRIBUTING.md) for how to contribute, and at [CONVENTIONS.md](CONVENTIONS.md) for our coding conventions and best practices.
 
 ## Frontend documentation and component gallery
 There's an online version of the frontend documentation and component gallery at:
@@ -34,6 +34,8 @@ There's an online version of the frontend documentation and component gallery at
 [https://graylog2.github.io/frontend-documentation/](https://graylog2.github.io/frontend-documentation/)
 
 The online version is automatically deployed and reflects the current state of the `master` branch in this repository.
+
+Note: We are migrating to a new design system. Please refer to the new design system at [https://graylog2.github.io/design-system](https://graylog2.github.io/design-system) for up-to-date component documentation and guidelines.
 
 ### Run documentation locally
 You may also run the documentation locally to contribute to it or see a different version than the current master:

@@ -16,11 +16,9 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import { qualifyUrl } from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
-import ApiRoutes from 'routing/ApiRoutes';
+import { IndexerCluster } from '@graylog/server-api';
 
-const fetchClusterName = async () => fetch('GET', qualifyUrl(ApiRoutes.IndexerClusterApiController.info().url));
+const fetchClusterName = async () => IndexerCluster.clusterInfo();
 
 const useIsElasticsearch = (): boolean => {
   const { data } = useQuery({

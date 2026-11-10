@@ -19,11 +19,10 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, waitFor, screen } from 'wrappedTestingLibrary';
 
+import { addMembersToRole, loadUsersForRole, removeMemberFromRole } from 'hooks/useAuthzRoles';
 import selectEvent from 'helpers/selectEvent';
 import { alertsManager as exampleRole } from 'fixtures/roles';
 import { alice, bob, charlie } from 'fixtures/userOverviews';
-import mockAction from 'helpers/mocking/MockAction';
-import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 
 import UsersSection from './UsersSection';
 
@@ -36,13 +35,11 @@ const mockLoadUsersForRolePromise = Promise.resolve({
   },
 });
 
-jest.mock('stores/roles/AuthzRolesStore', () => ({
-  AuthzRolesStore: {},
-  AuthzRolesActions: {
-    removeMember: mockAction(),
-    addMembers: mockAction(),
-    loadUsersForRole: jest.fn(() => mockLoadUsersForRolePromise),
-  },
+jest.mock('hooks/useAuthzRoles', () => ({
+  AUTHZ_ROLES_QUERY_KEY: ['authz', 'roles'],
+  removeMemberFromRole: jest.fn(() => Promise.resolve()),
+  addMembersToRole: jest.fn(() => Promise.resolve()),
+  loadUsersForRole: jest.fn(() => mockLoadUsersForRolePromise),
 }));
 
 // mock loadUsersPaginated
@@ -55,10 +52,9 @@ const mockLoadUsersPromise = Promise.resolve({
   },
 });
 
-jest.mock('stores/users/UsersStore', () => ({
-  UsersActions: {
-    loadUsersPaginated: jest.fn(() => mockLoadUsersPromise),
-  },
+jest.mock('hooks/useUsers', () => ({
+  USERS_QUERY_KEY: ['users'],
+  loadUsersPaginated: jest.fn(() => mockLoadUsersPromise),
 }));
 
 describe('UsersSection', () => {
@@ -74,9 +70,9 @@ describe('UsersSection', () => {
 
     await userEvent.click(assignUserButton);
 
-    await waitFor(() => expect(AuthzRolesActions.addMembers).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(addMembersToRole).toHaveBeenCalledTimes(1));
 
-    expect(AuthzRolesActions.addMembers).toHaveBeenCalledWith(exampleRole.id, Immutable.Set.of(bob.username));
+    expect(addMembersToRole).toHaveBeenCalledWith(exampleRole.id, Immutable.Set.of(bob.username));
   });
 
   it('should filter assigned users', async () => {
@@ -85,9 +81,9 @@ describe('UsersSection', () => {
     const filterInput = await screen.findByPlaceholderText('Enter query to filter');
     await userEvent.type(filterInput, 'name of an assigned user');
 
-    await waitFor(() => expect(AuthzRolesActions.loadUsersForRole).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(loadUsersForRole).toHaveBeenCalledTimes(2));
 
-    expect(AuthzRolesActions.loadUsersForRole).toHaveBeenCalledWith(exampleRole.id, exampleRole.name, {
+    expect(loadUsersForRole).toHaveBeenCalledWith(exampleRole.id, {
       page: 1,
       perPage: 5,
       query: 'name of an assigned user',
@@ -100,6 +96,6 @@ describe('UsersSection', () => {
     const assignUserButton = await screen.findByRole('button', { name: `Remove ${alice.username}` });
     await userEvent.click(assignUserButton);
 
-    await waitFor(() => expect(AuthzRolesActions.removeMember).toHaveBeenCalledWith(exampleRole.id, alice.username));
+    await waitFor(() => expect(removeMemberFromRole).toHaveBeenCalledWith(exampleRole.id, alice.username));
   });
 });

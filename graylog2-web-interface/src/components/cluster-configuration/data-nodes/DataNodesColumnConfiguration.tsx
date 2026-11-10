@@ -17,17 +17,19 @@
 import React from 'react';
 import styled from 'styled-components';
 
+import { Label } from 'components/bootstrap';
 import type { ColumnRenderers, ColumnSchema } from 'components/common/EntityDataTable';
 import { Icon, Link } from 'components/common';
 import DataNodeStatusCell from 'components/datanode/DataNodeList/DataNodeStatusCell';
 import type { DataNode } from 'components/datanode/Types';
 import Routes from 'routing/Routes';
+import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 import type { ClusterDataNode } from './fetchClusterDataNodes';
 import IndexingMetricsCell from './cells/IndexingMetricsCell';
 
 import CpuMetricsCell from '../shared-components/CpuMetricsCell';
-import { RoleLabel, SecondaryText } from '../shared-components/NodeMetricsLayout';
+import { SecondaryText } from '../shared-components/NodeMetricsLayout';
 import SizeAndRatioMetric from '../shared-components/SizeAndRatioMetric';
 
 export const DEFAULT_VISIBLE_COLUMNS = [
@@ -65,7 +67,7 @@ export const createColumnDefinitions = (): Array<ColumnSchema> => [
 const getRoleLabels = (roles: Array<string>) =>
   roles.map((role) => (
     <span key={role}>
-      <RoleLabel bsSize="xs">{role}</RoleLabel>&nbsp;
+      <Label bsSize="xs">{role}</Label>&nbsp;
     </span>
   ));
 
@@ -88,7 +90,7 @@ export const createColumnRenderers = (productName: string): ColumnRenderers<Clus
 
         return <Link to={Routes.SYSTEM.CLUSTER.DATANODE_SHOW(datanodeRouteId)}>{nodeName}</Link>;
       },
-      minWidth: 300,
+      staticWidth: COLUMN_WIDTH.title,
     },
     datanode_status: {
       renderCell: (_value, entity) => <DataNodeStatusCell dataNode={entity} />,
@@ -159,11 +161,11 @@ export const createColumnRenderers = (productName: string): ColumnRenderers<Clus
           </SecondaryText>
         );
       },
-      minWidth: 200,
+      staticWidth: 150,
     },
     opensearch_roles: {
       renderCell: (_value, entity) => getRoleLabels(getDataNodeRoles(entity)),
-      minWidth: 220,
+      staticWidth: 220,
     },
   },
 });

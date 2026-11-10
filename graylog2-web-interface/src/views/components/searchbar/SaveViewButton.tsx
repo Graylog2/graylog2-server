@@ -18,7 +18,7 @@ import * as React from 'react';
 import { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
 
-import { Icon } from 'components/common';
+import { Icon, Tooltip } from 'components/common';
 import useIsDirty from 'views/hooks/useIsDirty';
 import { Button } from 'components/bootstrap';
 const StyledIcon = styled(Icon)<{ $isDirty: boolean }>(
@@ -31,10 +31,26 @@ type Props = {
   title: string;
   onClick: () => void;
   disabled?: boolean;
+  /** Explains why the button is disabled. Keeps the disabled button hoverable to show it as a tooltip. */
+  disabledInfo?: string;
 };
 
-const SaveViewButton = ({ title, onClick, disabled = false }: Props, ref: React.ForwardedRef<HTMLButtonElement>) => {
+const SaveViewButton = (
+  { title, onClick, disabled = false, disabledInfo = undefined }: Props,
+  ref: React.ForwardedRef<HTMLButtonElement>,
+) => {
   const isDirty = useIsDirty();
+  const showDisabledInfo = disabled && !!disabledInfo;
+
+  if (showDisabledInfo) {
+    return (
+      <Tooltip label={disabledInfo} position="bottom" withArrow>
+        <Button aria-label={title} aria-disabled ref={ref} disabled allowClickWhenDisabled>
+          <StyledIcon name="save" type="regular" $isDirty={false} /> Save
+        </Button>
+      </Tooltip>
+    );
+  }
 
   return (
     <Button title={title} ref={ref} onClick={onClick} disabled={disabled}>

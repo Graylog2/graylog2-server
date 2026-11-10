@@ -30,6 +30,7 @@ import org.graylog2.web.customization.CustomizationConfig;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
+import java.util.Set;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -54,6 +55,11 @@ public class ReadResourceTool extends Tool<ReadResourceTool.Parameters, String> 
                 f("A brief description of the %s resource.", customizationConfig.productName()));
         this.grnRegistry = grnRegistry;
         this.resourceProviders = resourceProviders;
+    }
+
+    @Override
+    public Set<String> checkedPermissions() {
+        return Set.of();
     }
 
     @Override

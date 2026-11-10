@@ -22,7 +22,6 @@ import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
-import org.graylog.security.entities.EntityRegistrar;
 import org.graylog2.contentpacks.model.EntityPermissions;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -40,9 +39,8 @@ public class DashboardFacade extends ViewFacade implements DashboardEntityCreato
                            SearchDbService searchDbService,
                            ViewService viewService,
                            ViewSummaryService viewSummaryService,
-                           UserService userService,
-                           EntityRegistrar entityRegistrar) {
-        super(objectMapper, searchDbService, viewService, viewSummaryService, userService, entityRegistrar);
+                           UserService userService) {
+        super(objectMapper, searchDbService, viewService, viewSummaryService, userService);
     }
 
     @Override

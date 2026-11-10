@@ -26,6 +26,8 @@ import { selectSearchExecutionState } from 'views/logic/slices/searchExecutionSe
 import useLocation from 'routing/useLocation';
 import useQuery from 'routing/useQuery';
 import { updateView, executeActiveQuery } from 'views/logic/slices/viewSlice';
+import { updateGlobalOverride } from 'views/logic/slices/searchExecutionSlice';
+import GlobalOverride from 'views/logic/search/GlobalOverride';
 
 const bindSearchParamsFromQueryThunk =
   (query: { [key: string]: unknown }) => async (dispatch: ViewsDispatch, getState: () => RootState) => {
@@ -38,14 +40,25 @@ const bindSearchParamsFromQueryThunk =
       return Promise.resolve();
     }
 
-    const [newView] = result;
+    const [newView, newExecutionState] = result;
 
-    if (newView !== view) {
+    const viewChanged = newView !== view;
+    const executionStateChanged = newExecutionState !== executionState;
+
+    if (!viewChanged && !executionStateChanged) {
+      return Promise.resolve();
+    }
+
+    if (executionStateChanged) {
+      await dispatch(updateGlobalOverride(newExecutionState.globalOverride ?? GlobalOverride.empty()));
+    }
+
+    if (viewChanged) {
       // Update view, but don't create new search because this already happened in bindSearchParamsFromQuery
       await dispatch(updateView(newView));
-
-      return dispatch(executeActiveQuery());
     }
+
+    return dispatch(executeActiveQuery());
   };
 
 const useBindSearchParamsFromQuery = (query: { [key: string]: unknown }) => {

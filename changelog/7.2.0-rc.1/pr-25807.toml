@@ -1,0 +1,4 @@
+type = "f"
+message = "Remove 'query' part duplication in indexer query for events."
+
+pulls = ["25807"]

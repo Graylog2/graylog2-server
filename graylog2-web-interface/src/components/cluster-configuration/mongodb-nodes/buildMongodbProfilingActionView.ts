@@ -24,6 +24,7 @@ type Props = {
   action: MongodbProfilingToggleAction | null;
   state: MongodbProfilingState;
   profilingStatusByLevel: MongodbProfilingStatusByLevel | undefined;
+  slowMs: number | undefined;
   isStatusReady: boolean;
   isTogglingProfiling: boolean;
 };
@@ -34,7 +35,14 @@ export type MongodbProfilingActionView = {
   buttonLabel: string;
   enablingProfiling: boolean;
   statusSummary: string;
+  enableThresholdLabel: string;
 };
+
+// slowMs reflects whatever the MongoDB nodes are already configured with -- Graylog no longer sets it when
+// enabling profiling (doing so requires elevated privileges as of MongoDB 8.0.29 / SERVER-130198), so it's
+// only known once the status call actually reports it.
+const getEnableThresholdLabel = (slowMs: number | undefined): string =>
+  slowMs === undefined ? 'level 1' : `level 1, ${slowMs}ms threshold`;
 
 const getActionLabel = (action: MongodbProfilingToggleAction | null): string =>
   action === 'disable' ? 'Disable Profiling' : 'Enable Profiling';
@@ -89,6 +97,7 @@ const buildMongodbProfilingActionView = ({
   action,
   state,
   profilingStatusByLevel,
+  slowMs,
   isStatusReady,
   isTogglingProfiling,
 }: Props): MongodbProfilingActionView => {
@@ -117,6 +126,7 @@ const buildMongodbProfilingActionView = ({
   }
 
   const actionTitle = getActionTitle(isStatusReady, enablingProfiling);
+  const enableThresholdLabel = getEnableThresholdLabel(slowMs);
 
   return {
     actionLabel,
@@ -124,6 +134,7 @@ const buildMongodbProfilingActionView = ({
     buttonLabel,
     enablingProfiling,
     statusSummary,
+    enableThresholdLabel,
   };
 };
 

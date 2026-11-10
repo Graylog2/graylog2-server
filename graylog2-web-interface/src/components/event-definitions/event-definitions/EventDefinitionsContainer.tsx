@@ -15,25 +15,35 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
 import startCase from 'lodash/startCase';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { QueryHelper, RelativeTime, PaginatedEntityTable, Link } from 'components/common';
 import Routes from 'routing/Routes';
-import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
+import FilterValueRenderers from 'components/event-definitions/FilterValueRenderers';
 import { keyFn, fetchEventDefinitions } from 'components/event-definitions/hooks/useEventDefinitions';
 import BulkActions from 'components/event-definitions/event-definitions/BulkActions';
 import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
 import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
+import type { SearchParams } from 'stores/PaginationTypes';
+import { TagsRenderer, EventDefinitionTypeRenderer } from 'components/events/events/ColumnRenderers';
+import PriorityName from 'components/events/events/PriorityName';
+import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 import EventDefinitionActions from './EventDefinitionActions';
+import EventDefinitionNotificationsCell from './EventDefinitionNotificationsCell';
 import SchedulingCell from './SchedulingCell';
 import StatusCell from './StatusCell';
+import useEventDefinitionOverviewSections from './useEventDefinitionOverviewSections';
 
 import type { EventDefinition } from '../event-definitions-types';
+import type { TacticsTechniquesColumnPlugin } from '../types';
 import getEventDefinitionTableElements from '../constants';
 
-const getCustomColumnRenderers = (pluggableColumnRenderers?: ColumnRenderersByAttribute<EventDefinition>) => ({
+const getCustomColumnRenderers = (
+  pluggableColumnRenderers?: ColumnRenderersByAttribute<EventDefinition>,
+  tacticsTechniquesPlugin?: TacticsTechniquesColumnPlugin,
+) => ({
   attributes: {
     title: {
       renderCell: (title: string, eventDefinition: EventDefinition) => (
@@ -43,8 +53,10 @@ const getCustomColumnRenderers = (pluggableColumnRenderers?: ColumnRenderersByAt
     matched_at: {
       renderCell: (_matched_at: string, eventDefinition: EventDefinition) =>
         eventDefinition.matched_at ? <RelativeTime dateTime={eventDefinition.matched_at} /> : 'Never',
+      staticWidth: COLUMN_WIDTH.relativeTime,
     },
     scheduling: {
+      staticWidth: 300,
       renderCell: (_scheduling: string, eventDefinition: EventDefinition) => (
         <SchedulingCell definition={eventDefinition} />
       ),
@@ -53,10 +65,23 @@ const getCustomColumnRenderers = (pluggableColumnRenderers?: ColumnRenderersByAt
       renderCell: (_status: string, eventDefinition: EventDefinition) => (
         <StatusCell eventDefinition={eventDefinition} />
       ),
-      staticWidth: 110,
+      staticWidth: 120,
+    },
+    type: {
+      renderCell: (_type: string, eventDefinition: EventDefinition) => (
+        <EventDefinitionTypeRenderer type={eventDefinition.config?.type} />
+      ),
+      staticWidth: 'matchHeader' as const,
     },
     priority: {
+      renderCell: (priority: number) => <PriorityName priority={priority} />,
       staticWidth: 'matchHeader' as const,
+    },
+    notifications: {
+      renderCell: (_notifications: EventDefinition['notifications'], eventDefinition: EventDefinition) => (
+        <EventDefinitionNotificationsCell eventDefinition={eventDefinition} />
+      ),
+      staticWidth: COLUMN_WIDTH.reference,
     },
     '_entity_source.source': {
       renderCell: (_title: string, eventDefinition: EventDefinition) => (
@@ -66,7 +91,24 @@ const getCustomColumnRenderers = (pluggableColumnRenderers?: ColumnRenderersByAt
             : 'User Defined'}
         </span>
       ),
+      staticWidth: 110,
     },
+    tags: {
+      renderCell: (_tags: string[], eventDefinition: EventDefinition) => <TagsRenderer tags={eventDefinition.tags} />,
+      staticWidth: COLUMN_WIDTH.tags,
+    },
+    ...(tacticsTechniquesPlugin
+      ? {
+          [tacticsTechniquesPlugin.attribute.id]: {
+            renderCell: (_: unknown, eventDefinition: EventDefinition) => {
+              const Cell = tacticsTechniquesPlugin.component;
+
+              return <Cell entity={eventDefinition} />;
+            },
+            staticWidth: COLUMN_WIDTH.tags,
+          },
+        }
+      : {}),
     ...(pluggableColumnRenderers || {}),
   },
 });
@@ -81,29 +123,50 @@ const renderEventDefinitionActions = (listItem: EventDefinition) => (
 const EventDefinitionsContainer = () => {
   const { pluggableColumnRenderers, pluggableAttributes, pluggableExpandedSections } =
     usePluggableEntityTableElements<EventDefinition>(null, 'event_definition');
-  const { defaultLayout, additionalAttributes } = getEventDefinitionTableElements(pluggableAttributes);
-  const expandedSections = useMemo(
-    () => ({
-      ...pluggableExpandedSections,
-    }),
-    [pluggableExpandedSections],
+
+  const tacticsTechniquesPlugin = PluginStore.exports('eventDefinitions.components.tacticsTechniquesColumn')[0];
+  const tacticsTechniquesEnabled = tacticsTechniquesPlugin?.useCondition?.() ?? !!tacticsTechniquesPlugin;
+  const activeTacticsTechniquesPlugin = tacticsTechniquesEnabled ? tacticsTechniquesPlugin : undefined;
+
+  const tacticsTechniquesAttribute = activeTacticsTechniquesPlugin?.attribute;
+
+  const { defaultLayout, additionalAttributes } = getEventDefinitionTableElements(
+    pluggableAttributes,
+    tacticsTechniquesAttribute,
   );
+  // The filter dropdown only lists attributes from the fetch response, so the plugin attribute is spliced in there.
+  const fetchEntities = (searchParams: SearchParams) =>
+    tacticsTechniquesAttribute
+      ? fetchEventDefinitions(searchParams).then((result) => ({
+          ...result,
+          attributes: [...result.attributes, tacticsTechniquesAttribute],
+        }))
+      : fetchEventDefinitions(searchParams);
+  const filterValueRenderers = activeTacticsTechniquesPlugin?.filterValueRenderer
+    ? { ...FilterValueRenderers, [tacticsTechniquesAttribute.id]: activeTacticsTechniquesPlugin.filterValueRenderer }
+    : FilterValueRenderers;
+  const overviewSections = useEventDefinitionOverviewSections();
 
   return (
-    <PaginatedEntityTable<EventDefinition>
-      humanName="event definitions"
-      additionalAttributes={additionalAttributes}
-      queryHelpComponent={<QueryHelper entityName="event definition" />}
-      tableLayout={defaultLayout}
-      fetchEntities={fetchEventDefinitions}
-      entityActions={renderEventDefinitionActions}
-      keyFn={keyFn}
-      entityAttributesAreCamelCase={false}
-      expandedSectionRenderers={expandedSections}
-      filterValueRenderers={FilterValueRenderers}
-      columnRenderers={getCustomColumnRenderers(pluggableColumnRenderers)}
-      bulkSelection={bulkSelection}
-    />
+    <>
+      {overviewSections.map(({ key, component: Component }) => (
+        <Component key={key} />
+      ))}
+      <PaginatedEntityTable<EventDefinition>
+        humanName="event definitions"
+        additionalAttributes={additionalAttributes}
+        queryHelpComponent={<QueryHelper entityName="event definition" />}
+        tableLayout={defaultLayout}
+        fetchEntities={fetchEntities}
+        entityActions={renderEventDefinitionActions}
+        keyFn={keyFn}
+        entityAttributesAreCamelCase={false}
+        expandedSectionRenderers={pluggableExpandedSections}
+        filterValueRenderers={filterValueRenderers}
+        columnRenderers={getCustomColumnRenderers(pluggableColumnRenderers, activeTacticsTechniquesPlugin)}
+        bulkSelection={bulkSelection}
+      />
+    </>
   );
 };
 

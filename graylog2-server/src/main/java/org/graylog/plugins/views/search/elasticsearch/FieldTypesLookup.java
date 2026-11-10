@@ -18,6 +18,7 @@ package org.graylog.plugins.views.search.elasticsearch;
 
 import com.google.common.collect.Sets;
 import org.graylog2.indexer.fieldtypes.FieldTypeDTO;
+import org.graylog2.indexer.fieldtypes.FieldTypeMapper;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesDTO;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 
@@ -35,6 +36,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class FieldTypesLookup {
+    private static final Set<String> INTEGER_FIELD_TYPES = Set.of("long", "integer", "short", "byte");
+
     private final IndexFieldTypesService indexFieldTypesService;
     private final StreamService streamService;
 
@@ -93,6 +96,23 @@ public class FieldTypesLookup {
     }
 
     private Optional<String> typeFromFieldType(Set<String> fieldTypes) {
-        return fieldTypes == null || fieldTypes.size() > 1 ? Optional.empty() : fieldTypes.stream().findFirst();
+        if (fieldTypes == null || fieldTypes.isEmpty()) {
+            return Optional.empty();
+        }
+        if (fieldTypes.size() == 1) {
+            return fieldTypes.stream().findFirst();
+        }
+        if (fieldTypes.stream().allMatch(FieldTypeMapper::isNumericType)) {
+            return Optional.of(widestNumericType(fieldTypes));
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * If a field has different numeric types across index sets, we collapse them to the widest type so that consumers
+     * can still treat the field as numeric instead of having no type information at all.
+     */
+    private String widestNumericType(Set<String> fieldTypes) {
+        return fieldTypes.stream().allMatch(INTEGER_FIELD_TYPES::contains) ? "long" : "double";
     }
 }

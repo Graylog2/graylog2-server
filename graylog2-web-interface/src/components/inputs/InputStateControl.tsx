@@ -18,13 +18,11 @@ import * as React from 'react';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { isInputRunning, isInputInSetupMode } from 'components/inputs/helpers/inputState';
+import useInputStateMutations from 'hooks/useInputsStateMutations';
 import useFeature from 'hooks/useFeature';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 import type { Input } from 'components/messageloaders/Types';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { Button } from 'components/bootstrap';
 import { INPUT_SETUP_MODE_FEATURE_FLAG } from 'components/inputs/InputSetupWizard';
@@ -44,19 +42,18 @@ const StateActionButton = styled(Button)(
 
 const InputStateControl = ({ input, openWizard, inputStates }: Props) => {
   const sendTelemetry = useSendTelemetry();
-  const { pathname } = useLocation();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
+  const { startInput: startInputMutation, stopInput: stopInputMutation } = useInputStateMutations(input as any);
 
   const startInput = () => {
     setIsLoading(true);
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_START_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'start-input',
     });
 
-    InputStatesStore.start(input).finally(() => {
+    startInputMutation({ inputId: input.id }).finally(() => {
       setIsLoading(false);
     });
   };
@@ -65,18 +62,16 @@ const InputStateControl = ({ input, openWizard, inputStates }: Props) => {
     setIsLoading(true);
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_STOP_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'stop-input',
     });
 
-    InputStatesStore.stop(input).finally(() => {
+    stopInputMutation({ inputId: input.id }).finally(() => {
       setIsLoading(false);
     });
   };
 
   const setupInput = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_SETUP_CLICKED, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'setup-input',
     });
 

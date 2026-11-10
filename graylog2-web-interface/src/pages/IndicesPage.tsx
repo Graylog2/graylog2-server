@@ -20,7 +20,8 @@ import { Col, Row, ButtonToolbar } from 'components/bootstrap';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import DocsHelper from 'util/DocsHelper';
 import { DocumentTitle, PageHeader, IfPermitted } from 'components/common';
-import { IndexSetsComponent, IndicesPageNavigation } from 'components/indices';
+import { IndicesPageNavigation } from 'components/indices';
+import IndexSetsOverview from 'components/indices/IndexSetsOverview';
 import { IndexerClusterHealth } from 'components/indexers';
 import AllIndicesMaintenanceDropdown from 'components/indices/AllIndicesMaintenanceDropdown';
 import CreateButton from 'components/common/CreateButton';
@@ -55,7 +56,7 @@ const IndicesPage = () => (
 
     <Row className="content">
       <Col md={12}>
-        <IndexSetsComponent />
+        <IndexSetsOverview />
       </Col>
     </Row>
   </DocumentTitle>

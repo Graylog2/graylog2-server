@@ -51,7 +51,7 @@ const InputTypesDataTable = ({ inputDescriptions = undefined }: Props) => {
     <DataTable
       id="input-types-list"
       rowClassName="row-sm"
-      className="table-hover table-condensed table-striped"
+      condensed
       headers={headers}
       headerCellFormatter={headerCellFormatter}
       sortByKey="name"

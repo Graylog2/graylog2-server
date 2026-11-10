@@ -19,7 +19,6 @@ import * as Immutable from 'immutable';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import { paginatedShares } from 'fixtures/sharedEntities';
 import { reader as assignedRole } from 'fixtures/roles';
 import User from 'logic/users/User';
 
@@ -29,20 +28,15 @@ const mockAuthzRolesPromise = Promise.resolve({
   list: Immutable.List([assignedRole]),
   pagination: { page: 1, perPage: 10, total: 1 },
 });
-const mockPaginatedUserShares = paginatedShares({ page: 1, perPage: 10, query: '' });
 
-jest.mock('stores/roles/AuthzRolesStore', () => ({
-  AuthzRolesActions: {
-    loadRolesForUser: jest.fn(() => mockAuthzRolesPromise),
-    loadRolesPaginated: jest.fn(() => mockAuthzRolesPromise),
-  },
+jest.mock('hooks/useAuthzRoles', () => ({
+  AUTHZ_ROLES_QUERY_KEY: ['authz', 'roles'],
+  loadRolesForUser: jest.fn(() => mockAuthzRolesPromise),
+  loadRolesPaginated: jest.fn(() => mockAuthzRolesPromise),
 }));
 
-jest.mock('stores/permissions/EntityShareStore', () => ({
-  EntityShareActions: {
-    loadUserSharesPaginated: jest.fn(() => Promise.resolve(mockPaginatedUserShares)),
-  },
-}));
+jest.mock('api/entity-share');
+jest.mock('hooks/useEntityShareState');
 
 const user = User.builder()
   .fullName('The full name')

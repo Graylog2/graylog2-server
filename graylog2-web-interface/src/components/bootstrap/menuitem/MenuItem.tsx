@@ -112,6 +112,19 @@ const CustomMenuItem = <T,>({
     closeMenuOnClick,
   } satisfies Partial<React.ComponentProps<typeof MantineMenu.Item>>;
 
+  if (href && component === 'a') {
+    return (
+      <StyledMenuItem
+        component="a"
+        href={href}
+        rel={rel ?? (target === '_blank' ? 'noopener noreferrer' : undefined)}
+        target={target}
+        {...sharedProps}>
+        {children}
+      </StyledMenuItem>
+    );
+  }
+
   if (href) {
     return (
       <StyledMenuItem component={Link} to={href} rel={rel} target={target} {...sharedProps}>

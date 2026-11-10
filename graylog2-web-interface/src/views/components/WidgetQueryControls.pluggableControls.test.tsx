@@ -108,16 +108,6 @@ describe('WidgetQueryControls pluggable controls', () => {
     jest.clearAllMocks();
   });
 
-  const config = {
-    relative_timerange_options: { P1D: 'Search in last day', PT0S: 'Search in all messages' },
-    query_time_range_limit: 'PT0S',
-  };
-
-  const defaultProps = {
-    availableStreams: [],
-    config,
-  };
-
   const widget = Widget.builder().id('deadbeef').type('dummy').config({}).build();
 
   useViewsPlugin();
@@ -132,7 +122,7 @@ describe('WidgetQueryControls pluggable controls', () => {
   const renderSUT = (props = {}) =>
     render(
       <Wrapper>
-        <WidgetQueryControls {...defaultProps} {...props} />
+        <WidgetQueryControls {...props} />
       </Wrapper>,
     );
 
@@ -163,7 +153,10 @@ describe('WidgetQueryControls pluggable controls', () => {
           {
             pluggableControl: 'Initial Value2',
             queryString: '',
-            streams: undefined,
+            'streamsAndCategories': {
+              'categories': undefined,
+              'streams': undefined,
+            },
             timerange: { from: 300, type: 'relative' },
           },
           expect.any(Function),
@@ -182,7 +175,10 @@ describe('WidgetQueryControls pluggable controls', () => {
         {
           pluggableControl: 'Initial Value',
           queryString: '',
-          streams: undefined,
+          'streamsAndCategories': {
+            'categories': undefined,
+            'streams': undefined,
+          },
           timerange: { from: 300, type: 'relative' },
         },
         {

@@ -17,10 +17,9 @@
 import * as React from 'react';
 
 import Select from 'components/common/Select';
-import type { Locales } from 'stores/system/SystemStore';
-import { SystemStore } from 'stores/system/SystemStore';
+import type { Locales } from 'hooks/useSystemStore';
+import { useSystemLocales } from 'hooks/useSystemStore';
 import Spinner from 'components/common/Spinner';
-import { useStore } from 'stores/connect';
 
 const _formatLocales = (locales: Array<Locales>) => {
   const sortedLocales = Object.values(locales)
@@ -61,13 +60,13 @@ const _renderOption = (option: Option) => (
 const LocaleSelect = (
   props: Omit<React.ComponentProps<typeof Select>, 'placeholder' | 'options' | 'optionRenderer'>,
 ) => {
-  const { locales } = useStore(SystemStore);
+  const locales = useSystemLocales();
 
-  if (!locales) {
+  if (!locales.data) {
     return <Spinner />;
   }
 
-  const _locales = _formatLocales(locales);
+  const _locales = _formatLocales(locales.data);
 
   return <Select {...props} placeholder="Pick a locale" options={_locales} optionRenderer={_renderOption} />;
 };

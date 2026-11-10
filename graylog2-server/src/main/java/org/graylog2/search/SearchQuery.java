@@ -83,7 +83,15 @@ public class SearchQuery {
 
     private List<Bson> toBson(String field, List<SearchQueryParser.FieldValue> values) {
         return values.stream()
-                .map(value -> value.getOperator().buildBson(field, value.getValue()))
+                .map(value -> {
+                    if (value.getField() != null) {
+                        var creator = value.getField().getBsonFilterCreator();
+                        if (creator.isPresent()) {
+                            return creator.get().createFilter(field, value);
+                        }
+                    }
+                    return value.getOperator().buildBson(field, value.getValue());
+                })
                 .toList();
     }
 

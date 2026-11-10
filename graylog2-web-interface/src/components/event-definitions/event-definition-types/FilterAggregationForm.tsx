@@ -19,11 +19,11 @@ import { useCallback, useState } from 'react';
 import isEmpty from 'lodash/isEmpty';
 import cloneDeep from 'lodash/cloneDeep';
 
-import { Col, ControlLabel, FormGroup, Input, Radio, Row } from 'components/bootstrap';
+import { Col, ControlLabel, FormGroup, Input, Row } from 'components/bootstrap';
+import { Radio } from 'components/common';
 import * as FormsUtils from 'util/FormsUtils';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
-import type { Stream } from 'views/stores/StreamsStore';
-import type User from 'logic/users/User';
+import type { Stream } from 'logic/streams/types';
 import type { EventDefinitionValidation } from 'components/event-definitions/types';
 
 import FilterForm from './FilterForm';
@@ -61,11 +61,10 @@ type Props = {
     aggregation_functions: Array<{}>;
   };
   streams: Array<Stream>;
-  currentUser: User;
   validation: EventDefinitionValidation;
 };
 
-const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validation, currentUser, onChange }: Props) => {
+const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validation, onChange }: Props) => {
   const { group_by, series, conditions } = eventDefinition.config;
   const expression = conditions?.expression ?? {};
   const [conditionType, setConditionType] = useState(
@@ -90,30 +89,27 @@ const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validati
   );
 
   const handleTypeChange = useCallback(
-    (event: React.FormEvent<Radio>) => {
-      const nextConditionType = Number(FormsUtils.getValueFromInput(event.target as HTMLInputElement));
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const nextConditionType = Number(FormsUtils.getValueFromInput(event.target));
 
       setConditionType(nextConditionType);
-      let newExistingAggregationConfig;
-
       if (nextConditionType === conditionTypes.FILTER) {
         // Store existing data temporarily in state, to restore it in case the type change was accidental
-        Object.keys(initialAggregationConfig).forEach((key) => {
-          newExistingAggregationConfig[key] = eventDefinition.config[key];
-        });
+        const savedAggregationConfig = Object.fromEntries(
+          Object.keys(initialAggregationConfig).map((key) => [key, eventDefinition.config[key]]),
+        ) as EventDefinition['config'];
 
         const nextConfig = { ...eventDefinition.config, ...initialAggregationConfig };
 
         propagateConfigChange(nextConfig as EventDefinition['config']);
+        setExistingAggregationConfig(savedAggregationConfig);
       } else if (existingAggregationConfig) {
         // Reset aggregation data from state if it exists
         const nextConfig = { ...eventDefinition.config, ...existingAggregationConfig };
 
         propagateConfigChange(nextConfig);
-        newExistingAggregationConfig = undefined;
+        setExistingAggregationConfig(undefined);
       }
-
-      setExistingAggregationConfig(newExistingAggregationConfig);
     },
     [eventDefinition.config, existingAggregationConfig, propagateConfigChange],
   );
@@ -128,7 +124,6 @@ const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validati
             eventDefinition={eventDefinition}
             validation={validation}
             streams={streams.filter((s) => s.is_editable)}
-            currentUser={currentUser}
             onChange={onChange}
           />
 

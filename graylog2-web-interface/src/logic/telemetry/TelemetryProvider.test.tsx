@@ -18,17 +18,13 @@ import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
 
 import mockComponent from 'helpers/mocking/MockComponent';
-import { asMock, MockStore } from 'helpers/mocking';
-import { TelemetrySettingsStore } from 'stores/telemetry/TelemetrySettingsStore';
+import { asMock } from 'helpers/mocking';
 import useTelemetryData from 'logic/telemetry/useTelemetryData';
 import TelemetryContext from 'logic/telemetry/TelemetryContext';
 import TelemetryProvider from 'logic/telemetry/TelemetryProvider';
+import { telemetryDebugStore, setTelemetryDebugEnabled } from 'logic/telemetry/debug/TelemetryDebugStore';
+import { useUpdateTelemetrySettings } from 'logic/telemetry/useTelemetrySettings';
 
-const mockedTelemetryConfig = {
-  api_key: 'key',
-  host: 'http://localhost',
-  enabled: true,
-};
 const mockTelemetryData = {
   current_user: {
     user: '1',
@@ -47,19 +43,10 @@ const mockTelemetryData = {
 jest.mock('logic/telemetry/TelemetryInfoModal', () => mockComponent('MockTelemetryInfoModal'));
 jest.mock('./useTelemetryData');
 
-jest.mock('util/AppConfig', () => ({
-  gl2ServerUrl: jest.fn(() => {
-    'http://localhost';
-  }),
-  gl2AppPathPrefix: jest.fn,
-  telemetry: jest.fn(() => mockedTelemetryConfig),
-}));
-
-jest.mock('stores/telemetry/TelemetrySettingsStore', () => ({
-  TelemetrySettingsActions: {
-    get: jest.fn(),
-  },
-  TelemetrySettingsStore: MockStore(),
+jest.mock('logic/telemetry/useTelemetrySettings', () => ({
+  useUpdateTelemetrySettings: jest.fn(() => ({
+    mutateAsync: jest.fn(() => Promise.resolve()),
+  })),
 }));
 
 jest.useFakeTimers();
@@ -85,20 +72,55 @@ const renderSUT = () => {
 describe('<TelemetryProvider>', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+
+    asMock(useUpdateTelemetrySettings).mockReturnValue({
+      mutateAsync: jest.fn(() => Promise.resolve()),
+    } as any);
   });
 
   it('should render TelemetryProvider', () => {
     asMock(useTelemetryData).mockReturnValue({ data: mockTelemetryData, isSuccess: true } as any);
 
-    asMock(TelemetrySettingsStore.getInitialState).mockReturnValue({
-      telemetrySetting: {
-        telemetry_permission_asked: false,
-        telemetry_enabled: true,
-      },
-    });
-
     const consume = renderSUT();
 
     expect(consume).toHaveBeenCalledWith(expect.objectContaining({ sendTelemetry: expect.anything() }));
+  });
+
+  // In this suite telemetry is disabled (AppConfig.telemetry() is undefined), exercising the
+  // debug-only provider branch.
+  describe('debug store tap with disabled telemetry', () => {
+    afterEach(() => {
+      setTelemetryDebugEnabled(false);
+      telemetryDebugStore.clear();
+    });
+
+    it('records events as disabled while debugging is on', () => {
+      setTelemetryDebugEnabled(true);
+      asMock(useTelemetryData).mockReturnValue({ data: mockTelemetryData, isSuccess: true } as any);
+
+      const consume = renderSUT();
+      const { sendTelemetry } = consume.mock.calls[consume.mock.calls.length - 1][0];
+
+      sendTelemetry('Fleet Created', { fleet_id: 'f1' });
+
+      expect(telemetryDebugStore.getEntries()).toEqual([
+        expect.objectContaining({
+          eventType: 'Fleet Created',
+          payload: { fleet_id: 'f1' },
+          status: 'disabled',
+        }),
+      ]);
+    });
+
+    it('records nothing while debugging is off', () => {
+      asMock(useTelemetryData).mockReturnValue({ data: mockTelemetryData, isSuccess: true } as any);
+
+      const consume = renderSUT();
+      const { sendTelemetry } = consume.mock.calls[consume.mock.calls.length - 1][0];
+
+      sendTelemetry('Fleet Created', { fleet_id: 'f1' });
+
+      expect(telemetryDebugStore.getEntries()).toHaveLength(0);
+    });
   });
 });

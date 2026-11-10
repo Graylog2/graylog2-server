@@ -25,6 +25,7 @@ import com.github.joschi.jadconfig.converters.IntegerConverter;
 import com.github.joschi.jadconfig.converters.StringListConverter;
 import com.github.joschi.jadconfig.converters.StringSetConverter;
 import com.github.joschi.jadconfig.util.Duration;
+import com.github.joschi.jadconfig.util.Size;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
@@ -98,7 +99,7 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     @Parameter(value = "opensearch_data_location", required = true)
     private Path opensearchDataLocation = Path.of("datanode/data");
 
-    @Documentation("Logs directory of the embedded opensearch")
+    @Documentation("Logs directory of the embedded opensearch.")
     @Parameter(value = "opensearch_logs_location", required = true, validators = DirectoryWritableValidator.class)
     private Path opensearchLogsLocation = Path.of("datanode/logs");
 
@@ -155,11 +156,18 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     @Parameter(value = "opensearch_heap", validators = {JavaHeapSizeValidator.class})
     private String opensearchHeap = "1g";
 
-    @Documentation("HTTP port on which the embedded opensearch listens")
+    @Documentation("""
+            Warn if the configured opensearch heap size appears too small compared to the memory available
+            to this data node. Set to false to suppress the warning.
+            """)
+    @Parameter(value = "opensearch_heap_size_warning_enabled")
+    private boolean opensearchHeapSizeWarningEnabled = true;
+
+    @Documentation("HTTP port on which the embedded opensearch listens.")
     @Parameter(value = "opensearch_http_port", converter = IntegerConverter.class)
     private int opensearchHttpPort = 9200;
 
-    @Documentation("Transport port on which the embedded opensearch listens")
+    @Documentation("Transport port on which the embedded opensearch listens.")
     @Parameter(value = "opensearch_transport_port", converter = IntegerConverter.class)
     private int opensearchTransportPort = 9300;
 
@@ -182,7 +190,7 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     @Parameter(value = TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY)
     private String datanodeTransportCertificatePassword;
 
-    @Documentation("Transport keystore alias name. Optional. Default is the first alias.")
+    @Documentation("Transport keystore alias name. Optional.")
     @Parameter(value = "transport_certificate_alias")
     private String datanodeTransportCertificateAlias;
 
@@ -195,7 +203,7 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     @Parameter(value = HTTP_CERTIFICATE_PASSWORD_PROPERTY)
     private String datanodeHttpCertificatePassword;
 
-    @Documentation("Http keystore alias name. Optional. Default is the first alias.")
+    @Documentation("Http keystore alias name. Optional.")
     @Parameter(value = "http_certificate_alias")
     private String datanodeHttpCertificateAlias;
 
@@ -221,7 +229,7 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
             communication between Graylog and OpenSearch is secured by JWT. These are the defaults used for the token usage
             adjust them, if you have special needs.
             """)
-    @Documentation("This configuration defines validity interval of JWT tokens")
+    @Documentation("This configuration defines validity interval of JWT tokens.")
     @Parameter(value = "indexer_jwt_auth_token_expiration_duration")
     Duration indexerJwtAuthTokenExpirationDuration = Duration.seconds(180);
 
@@ -231,7 +239,8 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
             """)
     @Documentation(value = """
             Sets a window of time, in seconds, to compensate for any disparity between the graylog server and OpenSearch node clock times,
-             thereby preventing authentication failures due to the misalignment.""")
+             thereby preventing authentication failures due to the misalignment.
+            """)
     @Parameter(value = "indexer_jwt_auth_token_clock_skew_tolerance")
     Duration indexerJwtAuthTokeClockSkewTolerance = Duration.seconds(30);
 
@@ -247,13 +256,26 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     private String bindAddress = DEFAULT_BIND_ADDRESS;
 
 
-    @Documentation("HTTP port. The port where the DataNode REST api is listening")
+    @Documentation("HTTP port. The port where the DataNode REST api is listening.")
     @Parameter(value = "datanode_http_port", required = true)
     private int datanodeHttpPort = DATANODE_DEFAULT_PORT;
 
     @Documentation(visible = false)
     @Parameter(value = "hostname")
     private String hostname = null;
+
+    @Documentation("""
+            The address that OpenSearch advertises to other nodes and clients, set as OpenSearch's network.publish_host.
+            It applies to both the transport (node-to-node) and the HTTP interface, so it is also the address reported
+            by the nodes info API and used by Graylog when elasticsearch_discovery_enabled is set.
+            Set this explicitly when $hostname/$bind_address is not routable from other cluster members, e.g. when
+            this Datanode runs in a Docker bridge network and the container's hostname only resolves to a
+            non-routable internal address from inside the container. Falls back to $hostname if not set.
+            Must be a single hostname or IP address. Write IPv6 addresses without brackets and without a zone ID;
+            wildcard addresses (0.0.0.0, ::) are rejected.
+            """)
+    @Parameter(value = "opensearch_network_publish_host", validators = PublishHostValidator.class)
+    private String opensearchNetworkPublishHost = null;
 
     @Documentation("Name of the cluster that the embedded opensearch will form. Should be the same for all Datanodes in one cluster.")
     @Parameter(value = "clustername")
@@ -275,9 +297,9 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     @Parameter(value = "http_enable_gzip")
     private boolean httpEnableGzip = true;
 
-    @Documentation("The maximum size of the HTTP request headers in bytes")
+    @Documentation("The maximum size of the HTTP request headers in bytes.")
     @Parameter(value = "http_max_header_size", required = true, validator = PositiveIntegerValidator.class)
-    private int httpMaxHeaderSize = 8192;
+    private int httpMaxHeaderSize = 16384;
 
     @Documentation("The size of the thread pool used exclusively for serving the HTTP interface.")
     @Parameter(value = "http_thread_pool_size", required = true, validator = PositiveIntegerValidator.class)
@@ -289,7 +311,7 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     @Parameter(value = "http_selector_runners_count", required = true, validator = PositiveIntegerValidator.class)
     private int httpSelectorRunnersCount = 1;
 
-    @Documentation(visible = false, value = "TODO: do we need this configuration? We control the decision based on preflight and CA configurations")
+    @Documentation(visible = false, value = "TODO: do we need this configuration? We control the decision based on preflight and CA configurations.")
     @Parameter(value = "http_enable_tls")
     private boolean httpEnableTls = false;
 
@@ -351,7 +373,7 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
 
     @Documentation("""
             Configures verbosity of embedded opensearch logs.
-            Possible values OFF, FATAL, ERROR, WARN, INFO, DEBUG, and TRACE, default is INFO
+            Possible values OFF, FATAL, ERROR, WARN, INFO, DEBUG, and TRACE
             """)
     @Parameter(value = "opensearch_logger_org_opensearch")
     private String opensearchDebug;
@@ -364,11 +386,38 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     @Parameter(value = "opensearch_plugins_security_audit_type")
     private String opensearchAuditLog;
 
+    @Documentation("Opensearch memory lock ensures the process locks its memory into RAM so it cannot be swapped to disk.")
+    @Parameter(value = "opensearch_bootstrap_memory_lock")
+    private boolean opensearchBootstrapMemoryLock = false;
+
+    /**
+     * Testing aid, deliberately undocumented and unsupported. Normally a datanode keeps running the opensearch version
+     * it has already recorded, and moving to a newer one is an explicit administrator action on the upgrade page.
+     * With this enabled the node instead takes the newest distribution its data allows on every start, which makes it
+     * possible to exercise a generation change without driving the upgrade UI. It never relaxes the compatibility
+     * bound — data that only the compatibility distribution can read still gets the compatibility distribution.
+     */
+    @Documentation(visible = false)
+    @Parameter(value = "auto_update_opensearch")
+    private boolean autoUpdateOpensearch = false;
+
     public String getOpensearchAuditLog() {
         return opensearchAuditLog;
     }
 
-     /**
+    public boolean isAutoUpdateOpensearch() {
+        return autoUpdateOpensearch;
+    }
+
+    @Documentation("""
+            This parameter defines the maximum size in bytes of cluster events. When it is exceeded, oldest events will
+            be overwritten. This should be as small as possible (for performance), but large enough to hold events long
+            enough for all nodes to process them.
+            """)
+    @Parameter(value = "max_events_collection_size")
+    private Size maxEventsCollectionSize = Size.megabytes(100);
+
+    /**
      * The insecure flag causes problems on many places. We should replace it with autosecurity option, that would
      * configure all the CA and certs automatically.
      */
@@ -704,6 +753,11 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
         return bindAddress;
     }
 
+    public String getOpensearchNetworkPublishHost() {
+        return opensearchNetworkPublishHost != null && !opensearchNetworkPublishHost.isBlank()
+                ? opensearchNetworkPublishHost : getHostname();
+    }
+
     public String getNodeSearchCacheSize() {
         return searchCacheSize;
     }
@@ -714,6 +768,10 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
 
     public String getOpensearchHeap() {
         return opensearchHeap;
+    }
+
+    public boolean isOpensearchHeapSizeWarningEnabled() {
+        return opensearchHeapSizeWarningEnabled;
     }
 
     @Override
@@ -752,5 +810,9 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
 
     public Duration getIndexerJwtAuthTokenClockSkewTolerance() {
         return indexerJwtAuthTokeClockSkewTolerance;
+    }
+
+    public boolean getOpensearchBootstrapMemoryLock() {
+        return opensearchBootstrapMemoryLock;
     }
 }

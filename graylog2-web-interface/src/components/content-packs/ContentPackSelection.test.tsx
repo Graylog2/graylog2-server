@@ -248,4 +248,56 @@ describe('<ContentPackSelection />', () => {
       }
     });
   });
+
+  describe('latest / older version buttons', () => {
+    const type = { name: 'stream', version: '1' };
+    const packStream = { title: 'Stream', type, id: 'pack-stream-uuid' } as any;
+    const serverStream = { title: 'Stream', type, id: '5f0000000000000000000001' } as any;
+    const unpairedPackStream = { title: 'Other', type, id: 'unpaired-pack-uuid' } as any;
+    const entities = { stream: [serverStream, packStream, unpairedPackStream] };
+    const entityPairs = [{ packEntity: packStream, installedEntity: serverStream }];
+
+    const renderSelection = (selectedEntities, onStateChange = jest.fn(), pairs = entityPairs) =>
+      render(
+        <ContentPackSelection
+          contentPack={{}}
+          edit
+          entities={entities}
+          entityPairs={pairs}
+          selectedEntities={selectedEntities}
+          onStateChange={onStateChange}
+        />,
+      );
+
+    it('is disabled when no entity has an installed copy', async () => {
+      const changeFn = jest.fn();
+      renderSelection({ stream: [packStream] }, changeFn, []);
+
+      const button = screen.getByRole('button', { name: /select latest installed versions/i });
+
+      expect(button).toHaveAttribute('data-disabled', 'true');
+
+      await setupUser().click(button);
+
+      expect(changeFn).not.toHaveBeenCalled();
+    });
+
+    it('swaps only checked, paired entities to their latest installed versions', async () => {
+      const changeFn = jest.fn();
+      renderSelection({ stream: [packStream, unpairedPackStream] }, changeFn);
+
+      await setupUser().click(screen.getByRole('button', { name: /select latest installed versions/i }));
+
+      expect(changeFn).toHaveBeenCalledWith({ selectedEntities: { stream: [unpairedPackStream, serverStream] } });
+    });
+
+    it('swaps them back to their older content pack versions', async () => {
+      const changeFn = jest.fn();
+      renderSelection({ stream: [unpairedPackStream, serverStream] }, changeFn);
+
+      await setupUser().click(screen.getByRole('button', { name: /select older content pack versions/i }));
+
+      expect(changeFn).toHaveBeenCalledWith({ selectedEntities: { stream: [unpairedPackStream, packStream] } });
+    });
+  });
 });

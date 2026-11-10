@@ -23,9 +23,7 @@ import io.swagger.v3.oas.integration.api.OpenApiContext;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
-import jakarta.ws.rs.core.HttpHeaders;
-import jakarta.ws.rs.core.MultivaluedHashMap;
-import org.graylog2.configuration.HttpConfiguration;
+import org.graylog2.rest.URIHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +31,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.net.URI;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.lenient;
@@ -48,12 +45,6 @@ class OpenApiResourceTest {
     @Mock
     private OpenApiContext openApiContext;
 
-    @Mock
-    private HttpConfiguration httpConfiguration;
-
-    @Mock
-    private HttpHeaders httpHeaders;
-
     private OpenApiResource resource;
     private OpenAPI cachedOpenAPI;
 
@@ -67,18 +58,17 @@ class OpenApiResourceTest {
         when(openApiContext.read()).thenReturn(cachedOpenAPI);
         lenient().when(openApiContext.getOutputJsonMapper()).thenReturn(Json31.mapper());
         lenient().when(openApiContext.getOutputYamlMapper()).thenReturn(Yaml31.mapper());
-        lenient().when(httpConfiguration.getHttpExternalUri()).thenReturn(URI.create("http://localhost:9000/"));
 
-        resource = new OpenApiResource(contextFactory, httpConfiguration);
+        resource = new OpenApiResource(contextFactory);
+    }
+
+    private static URIHelper uriHelper(String baseUri) {
+        return new URIHelper(URI.create(baseUri));
     }
 
     @Test
     void setsAbsoluteServerUrlFromOverrideHeader() throws Exception {
-        final var headers = new MultivaluedHashMap<String, String>();
-        headers.put(HttpConfiguration.OVERRIDE_HEADER, List.of("https://example.com/graylog/"));
-        when(httpHeaders.getRequestHeaders()).thenReturn(headers);
-
-        final var response = resource.getOpenApi(httpHeaders, null);
+        final var response = resource.getOpenApi(uriHelper("https://example.com/graylog/"), null);
         final var json = response.getEntity().toString();
         final var tree = new ObjectMapper().readTree(json);
 
@@ -86,12 +76,8 @@ class OpenApiResourceTest {
     }
 
     @Test
-    void fallsBackToExternalUriWhenNoHeader() throws Exception {
-        final var headers = new MultivaluedHashMap<String, String>();
-        when(httpHeaders.getRequestHeaders()).thenReturn(headers);
-        when(httpConfiguration.getHttpExternalUri()).thenReturn(URI.create("https://external.example.com/"));
-
-        final var response = resource.getOpenApi(httpHeaders, null);
+    void usesProvidedBaseUri() throws Exception {
+        final var response = resource.getOpenApi(uriHelper("https://external.example.com/"), null);
         final var json = response.getEntity().toString();
         final var tree = new ObjectMapper().readTree(json);
 
@@ -99,25 +85,8 @@ class OpenApiResourceTest {
     }
 
     @Test
-    void fallsBackToPublishUriWhenNoHeaderOrExternalUri() throws Exception {
-        final var headers = new MultivaluedHashMap<String, String>();
-        when(httpHeaders.getRequestHeaders()).thenReturn(headers);
-        when(httpConfiguration.getHttpExternalUri()).thenReturn(URI.create("http://10.0.0.1:9000/"));
-
-        final var response = resource.getOpenApi(httpHeaders, null);
-        final var json = response.getEntity().toString();
-        final var tree = new ObjectMapper().readTree(json);
-
-        assertThat(tree.at("/servers/0/url").asText()).isEqualTo("http://10.0.0.1:9000/api/");
-    }
-
-    @Test
     void doesNotMutateCachedOpenAPIModel() throws Exception {
-        final var headers = new MultivaluedHashMap<String, String>();
-        headers.put(HttpConfiguration.OVERRIDE_HEADER, List.of("https://example.com/graylog/"));
-        when(httpHeaders.getRequestHeaders()).thenReturn(headers);
-
-        resource.getOpenApi(httpHeaders, null);
+        resource.getOpenApi(uriHelper("https://example.com/graylog/"), null);
 
         // The cached model should still have the original /api/ server URL
         assertThat(cachedOpenAPI.getServers()).hasSize(1);
@@ -126,11 +95,7 @@ class OpenApiResourceTest {
 
     @Test
     void returnsYamlWhenExtIsYaml() throws Exception {
-        final var headers = new MultivaluedHashMap<String, String>();
-        when(httpHeaders.getRequestHeaders()).thenReturn(headers);
-        when(httpConfiguration.getHttpExternalUri()).thenReturn(URI.create("http://localhost:9000/"));
-
-        final var response = resource.getOpenApi(httpHeaders, ".yaml");
+        final var response = resource.getOpenApi(uriHelper("http://localhost:9000/"), ".yaml");
         final var yaml = response.getEntity().toString();
 
         // YAML should not start with '{' (that would be JSON)
@@ -143,11 +108,7 @@ class OpenApiResourceTest {
 
     @Test
     void returnsJsonWhenExtIsNull() throws Exception {
-        final var headers = new MultivaluedHashMap<String, String>();
-        when(httpHeaders.getRequestHeaders()).thenReturn(headers);
-        when(httpConfiguration.getHttpExternalUri()).thenReturn(URI.create("http://localhost:9000/"));
-
-        final var response = resource.getOpenApi(httpHeaders, null);
+        final var response = resource.getOpenApi(uriHelper("http://localhost:9000/"), null);
         final var json = response.getEntity().toString();
 
         // Verify it's valid JSON by parsing it
@@ -159,18 +120,14 @@ class OpenApiResourceTest {
     void returns404WhenOpenAPIModelIsNull() throws Exception {
         when(openApiContext.read()).thenReturn(null);
 
-        final var response = resource.getOpenApi(httpHeaders, null);
+        final var response = resource.getOpenApi(uriHelper("http://localhost:9000/"), null);
 
         assertThat(response.getStatus()).isEqualTo(404);
     }
 
     @Test
     void prettyPrintsJsonOutput() throws Exception {
-        final var headers = new MultivaluedHashMap<String, String>();
-        when(httpHeaders.getRequestHeaders()).thenReturn(headers);
-        when(httpConfiguration.getHttpExternalUri()).thenReturn(URI.create("http://localhost:9000/"));
-
-        final var response = resource.getOpenApi(httpHeaders, null);
+        final var response = resource.getOpenApi(uriHelper("http://localhost:9000/"), null);
         final var json = response.getEntity().toString();
 
         // Pretty-printed JSON contains newlines and indentation

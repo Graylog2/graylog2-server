@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix uneven bar widths on stacked time-bucket charts where some series only contain data for a single timestamp."
+issues = ["11676"]
+pulls = ["26030"]

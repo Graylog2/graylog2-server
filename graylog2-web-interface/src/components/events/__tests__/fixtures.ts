@@ -78,6 +78,7 @@ export const eventDefinition: EventDefinition = {
   },
   field_spec: {},
   key_spec: ['mightyalert', 'secondkey'],
+  tags: [],
   notification_settings: {
     grace_period_ms: 300000,
     backlog_size: 0,
@@ -91,6 +92,7 @@ export const eventDefinition: EventDefinition = {
   ],
   scheduler: null,
   state: 'ENABLED',
+  tactics_techniques: [],
   remediation_steps: '',
   event_procedure: '',
   event_summary_template: null,

@@ -1,0 +1,132 @@
+import { Canvas, Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { Alert } from 'components/bootstrap';
+import * as CreatingAnEntityStories from './CreatingAnEntity.stories';
+import Mermaid from './Mermaid';
+
+export const DIAGRAM = `flowchart TD
+  A(["User's current view"])
+  A --> B{{"\`Should users remain
+in their current workflow?\`"}}
+B -->|Yes| MODAL
+B -->|No| PAGE
+
+subgraph Surface["Surface"]
+MODAL(["\`**Modal**
+Current context preserved\`"])
+PAGE(["\`**Page**
+Dedicated creation experience\`"])
+end
+
+subgraph Method["Method"]
+MW(["\`**Form or Wizard**
+Never take users into a secondary context\`"])
+FW(["\`**Form or Wizard**\`"])
+end
+
+MODAL --> MW
+PAGE --> FW
+
+MW --> RC(["\`**Return to current workflow**
+Modal closes, toast shown\`"])
+FW --> NC(["\`**Navigate to entity**
+Details page, toast shown\`"])
+`;
+
+<Meta of={CreatingAnEntityStories} />
+
+# Creating an Entity
+
+Entity creation is a foundational interaction in Graylog. This guide helps you decide how to implement a creation flow consistently.
+
+<Unstyled>
+  <Alert bsStyle="info">
+    {
+      <>
+        <strong>Design principle:</strong> Entity creation is organized around two decisions: choose the appropriate
+        surface, then choose the appropriate method.
+      </>
+    }
+  </Alert>
+</Unstyled>
+
+<Mermaid chart={DIAGRAM} />
+
+## Choosing the Surface
+
+Choose the surface based on whether creation should happen within the user's current workflow or in a dedicated creation experience.
+
+### Current Context: Modal
+
+Use a Modal when creation is part of the task the user is already performing and they should be able to continue where they left off when creation is complete.
+
+**Characteristics**
+
+- Users remain in their current workflow.
+- The parent view remains visible.
+- Creation is completed without changing pages.
+- Completion returns users to their previous location.
+- Successful creation closes the modal and shows a toast notification.
+
+<Unstyled>
+  <Canvas of={CreatingAnEntityStories.CurrentContextModal} />
+</Unstyled>
+
+### New Context: Page
+
+Use a Page when creation benefits from a dedicated experience with its own focus, navigation state, and destination.
+
+**Characteristics**
+
+- Users move into a focused creation experience.
+- The flow has its own URL and browser history entry.
+- Additional guidance, content, or validation can be accommodated.
+- Successful creation navigates users to the newly created entity.
+- A toast notification communicates successful creation.
+
+<Unstyled>
+  <Canvas of={CreatingAnEntityStories.NewContextPage} />
+</Unstyled>
+
+<Unstyled>
+  <Alert bsStyle="info">
+    {
+      <>
+        If it is unclear whether creation belongs in the current context or a dedicated one, involve Product and Design
+        before implementation. Context decisions affect navigation, workflow continuity, and long-term consistency
+        across the product.
+      </>
+    }
+  </Alert>
+</Unstyled>
+
+## Choosing the Method
+
+After selecting the surface, choose the creation method. A Form and a Wizard can both be used in either a Modal or a Page.
+
+### Form
+
+Use a Form when users can reasonably complete creation in a single step.
+
+**Characteristics**
+
+- Fields can be displayed together.
+- There are no significant dependencies between steps.
+- The workflow is primarily data entry.
+
+### Wizard
+
+Use a Wizard when users benefit from progressive guidance and decision making.
+
+**Characteristics**
+
+- The flow contains multiple dependent decisions.
+- Information is naturally grouped into stages.
+- Showing everything at once would be overwhelming.
+- Users benefit from being guided through the process.
+
+### Avoid Wizards When
+
+- The only purpose is reducing scroll length.
+- Steps do not depend on one another.
+- Users would frequently need to jump between sections.
+- The workflow can be understood in a single view.

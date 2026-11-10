@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { memo } from 'react';
+import React, { createContext, memo } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { FormGroup as BootstrapFormGroup } from 'react-bootstrap';
 import styled, { css } from 'styled-components';
@@ -80,10 +80,14 @@ type Props = React.ComponentProps<typeof StyledFormGroup> & {
   validationState?: 'error' | 'success' | 'warning';
 };
 
-const FormGroup = ({ children = undefined, validationState = null, ...props }: Props) => (
-  <StyledFormGroup validationState={validationState} {...props}>
-    {children}
-  </StyledFormGroup>
+export const FormGroupControlIdContext = createContext<string | undefined>(undefined);
+
+const FormGroup = ({ children = undefined, validationState = null, controlId, ...props }: Props) => (
+  <FormGroupControlIdContext.Provider value={controlId}>
+    <StyledFormGroup validationState={validationState} controlId={controlId} {...props}>
+      {children}
+    </StyledFormGroup>
+  </FormGroupControlIdContext.Provider>
 );
 
 export default memo(FormGroup);

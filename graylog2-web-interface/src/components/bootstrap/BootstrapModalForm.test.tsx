@@ -61,6 +61,42 @@ describe('BootstrapModalForm', () => {
     expect(onCancel).not.toHaveBeenCalled();
   });
 
+  describe('when nested inside another form', () => {
+    let originalConsoleError;
+
+    beforeAll(() => {
+      // eslint-disable-next-line no-console
+      originalConsoleError = console.error;
+
+      // eslint-disable-next-line no-console
+      console.error = (message: string) => {
+        if (!JSON.stringify(message || '').includes('Warning: validateDOMNesting')) {
+          originalConsoleError(message);
+        }
+      };
+    });
+
+    afterAll(() => {
+      // eslint-disable-next-line no-console
+      console.error = originalConsoleError;
+    });
+
+    it('does not submit surrounding form when modal form is submitted', async () => {
+      const onSubmitOuterForm = jest.fn((e: React.FormEvent) => e.preventDefault());
+      const onSubmit = jest.fn();
+
+      render(<form onSubmit={onSubmitOuterForm}>{renderModalForm(true, onSubmit)}</form>);
+
+      (await screen.findByRole('button', { name: 'Submit' })).click();
+
+      await waitFor(() => {
+        expect(onSubmit).toHaveBeenCalled();
+      });
+
+      expect(onSubmitOuterForm).not.toHaveBeenCalled();
+    });
+  });
+
   it('calls onCancel when form is cancelled', async () => {
     const onCancel = jest.fn();
     const onSubmit = jest.fn();

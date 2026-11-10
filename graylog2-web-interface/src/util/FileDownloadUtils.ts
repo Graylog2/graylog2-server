@@ -17,6 +17,7 @@
 
 import UserNotification from 'util/UserNotification';
 import { fetchBlobFile, fetchFile } from 'logic/rest/FetchProvider';
+import type { Method } from 'routing/types';
 
 export const createLinkAndDownload = (href: string, fileName: string) => {
   const a = document.createElement('a');
@@ -45,7 +46,7 @@ const errorHandler = (errorThrown: Error) => {
 };
 
 export const fetchTextFile = async <Body>(
-  method: string,
+  method: Method,
   url: string,
   body: Body | undefined,
   mimeType: string,
@@ -56,7 +57,7 @@ export const fetchTextFile = async <Body>(
     .catch(errorHandler);
 
 export const fetchBinaryFile = async <Body>(
-  method: string,
+  method: Method,
   url: string,
   body: Body | undefined,
   mimeType: string,

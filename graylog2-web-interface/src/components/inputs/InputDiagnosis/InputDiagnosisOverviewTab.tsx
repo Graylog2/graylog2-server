@@ -29,13 +29,17 @@ import type {
 import ShowReceivedMessagesButton from 'components/inputs/InputDiagnosis/ShowReceivedMessagesButton';
 import NetworkStats from 'components/inputs/InputDiagnosis/NetworkStats';
 import Routes from 'routing/Routes';
-import type { InputState } from 'stores/inputs/InputStatesStore';
+import type { InputState } from 'hooks/useInputsStates';
 import type { Input } from 'components/messageloaders/Types';
 import SectionGrid from 'components/common/Section/SectionGrid';
 import StatusColorIndicator from 'components/common/StatusColorIndicator';
 import DiagnosisMessageErrors from 'components/inputs/InputDiagnosis/DiagnosisMessageErrors';
 import { DIAGNOSIS_HELP } from 'components/inputs/InputDiagnosis/Constants';
 import HelpPopoverButton from 'components/common/HelpPopoverButton';
+
+const StyledListGroupItem = styled(ListGroupItem)`
+  display: flex;
+`;
 
 const StyledP = styled.p(
   ({ theme }) => css`
@@ -72,11 +76,6 @@ const StyledListGroup = styled(ListGroup)(
     border-radius: ${theme.spacings.xs};
   `,
 );
-
-const StyledListGroupItem = styled(ListGroupItem)`
-  background-color: transparent;
-  display: flex;
-`;
 
 const StyledTitle = styled.p(
   ({ theme }) => css`

@@ -17,6 +17,7 @@
 package org.graylog.testing.mongodb;
 
 import com.google.common.io.Resources;
+import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
@@ -46,6 +47,7 @@ public class MongoDBTestService implements AutoCloseable {
     private final MongoDBContainer container;
     private final MongoDBVersion version;
     private MongoConnectionImpl mongoConnection;
+    private MongoClient mongoClient;
 
     /**
      * Create service instance with the default version and network and start it immediately.
@@ -89,7 +91,7 @@ public class MongoDBTestService implements AutoCloseable {
         mongoConfiguration.setUri(uri());
 
         this.mongoConnection = new MongoConnectionImpl(mongoConfiguration);
-        this.mongoConnection.connect();
+        this.mongoClient = this.mongoConnection.connect();
         this.mongoConnection.getMongoDatabase().drop();
     }
 
@@ -98,6 +100,11 @@ public class MongoDBTestService implements AutoCloseable {
      */
     @Override
     public void close() {
+        // Explicitly close the client so we don't have a running client when we shut down the container.
+        if (mongoClient != null) {
+            mongoClient.close();
+            mongoClient = null;
+        }
         container.close();
     }
 

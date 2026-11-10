@@ -19,8 +19,10 @@ import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import { StoreMock as MockStore, asMock } from 'helpers/mocking';
+import { asMock } from 'helpers/mocking';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
+import StreamsContext from 'contexts/StreamsContext';
+import type { Stream } from 'logic/streams/types';
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import TestStoreProvider from 'views/test/TestStoreProvider';
@@ -39,10 +41,7 @@ const resetFavoriteFields = jest.fn();
 const saveFavoriteFields = jest.fn();
 const mockedToggleEditMode = jest.fn();
 
-jest.mock('views/stores/StreamsStore', () => ({
-  StreamsActions: { refresh: jest.fn() },
-  StreamsStore: MockStore(['getInitialState', () => ({ streams: [{ id: 'streamId', title: 'Stream' }] })]),
-}));
+const streams = [{ id: 'streamId', title: 'Stream' }] as Array<Stream>;
 
 jest.mock('./hooks/useFormattedFields');
 jest.mock('./hooks/useMessageFavoriteFieldsForEditing');
@@ -81,16 +80,18 @@ const renderComponent = () =>
     render(
       <TestStoreProvider view={view}>
         <GraylogThemeProvider userIsLoggedIn>
-          <MessageFavoriteFieldsContext.Provider
-            value={
-              {
-                saveFavoriteField: saveFavoriteFields,
-                editableStreams: [],
-                message,
-              } as any
-            }>
-            <MessageFieldsEditModal toggleEditMode={mockedToggleEditMode} />
-          </MessageFavoriteFieldsContext.Provider>
+          <StreamsContext.Provider value={streams}>
+            <MessageFavoriteFieldsContext.Provider
+              value={
+                {
+                  saveFavoriteField: saveFavoriteFields,
+                  editableStreams: [],
+                  message,
+                } as any
+              }>
+              <MessageFieldsEditModal toggleEditMode={mockedToggleEditMode} />
+            </MessageFavoriteFieldsContext.Provider>
+          </StreamsContext.Provider>
         </GraylogThemeProvider>
       </TestStoreProvider>,
     ),

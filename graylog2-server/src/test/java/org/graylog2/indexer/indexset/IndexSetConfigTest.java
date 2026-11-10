@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.indexset;
 
+import org.graylog.collectors.indexer.CollectorLogsIndexTemplateProvider;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
@@ -333,6 +334,20 @@ public class IndexSetConfigTest {
     @Test
     public void testFailureIndexWithChangedFieldMappingsIsIllegal() {
         assertFalse(testIndexSetConfig(IndexTemplateProvider.FAILURE_TEMPLATE_TYPE,
+                new CustomFieldMappings(List.of(new CustomFieldMapping("john", "long"))),
+                null).canHaveCustomFieldMappings());
+    }
+
+    @Test
+    public void testCollectorLogsIndexWithProfileSetIsIllegal() {
+        assertFalse(testIndexSetConfig(CollectorLogsIndexTemplateProvider.COLLECTOR_LOGS_TEMPLATE_TYPE,
+                null,
+                "profile").canHaveProfile());
+    }
+
+    @Test
+    public void testCollectorLogsIndexWithChangedFieldMappingsIsIllegal() {
+        assertFalse(testIndexSetConfig(CollectorLogsIndexTemplateProvider.COLLECTOR_LOGS_TEMPLATE_TYPE,
                 new CustomFieldMappings(List.of(new CustomFieldMapping("john", "long"))),
                 null).canHaveCustomFieldMappings());
     }

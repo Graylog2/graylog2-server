@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fixed keyboard shortcut save (Ctrl+S / Cmd+S) overwriting the saved search title instead of preserving it."
+
+issues = ["Graylog2/graylog-plugin-enterprise#13589"]
+pulls = ["25683"]

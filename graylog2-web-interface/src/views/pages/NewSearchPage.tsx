@@ -27,10 +27,11 @@ import Parameter from 'views/logic/parameters/Parameter';
 import type { ParameterBindingJsonRepresentation } from 'views/logic/parameters/ParameterBinding';
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
 import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import type { SearchFilter } from 'views/types';
 
 import SearchPage from './SearchPage';
 
-const useParametersFromStore = () => {
+const useReplayStateFromStore = () => {
   const { 'session-id': sessionId } = useQuery();
 
   return useMemo(() => {
@@ -40,24 +41,27 @@ const useParametersFromStore = () => {
 
       const searchData = searchDataFromStore ? JSON.parse(searchDataFromStore) : undefined;
 
-      if (searchData?.parameters) {
+      if (searchData) {
         return {
-          parameters: searchData.parameters.map((param) => Parameter.fromJSON(param)),
-          parameterBindings: Immutable.Map<string, ParameterBinding>(
-            Object.entries<ParameterBindingJsonRepresentation>(searchData.parameterBindings ?? {}).map(
-              ([paramName, paramBinding]) => [paramName, ParameterBinding.fromJSON(paramBinding)],
-            ),
-          ),
+          parameters: searchData.parameters?.map((param) => Parameter.fromJSON(param)),
+          parameterBindings: searchData.parameterBindings
+            ? Immutable.Map<string, ParameterBinding>(
+                Object.entries<ParameterBindingJsonRepresentation>(searchData.parameterBindings).map(
+                  ([paramName, paramBinding]) => [paramName, ParameterBinding.fromJSON(paramBinding)],
+                ),
+              )
+            : undefined,
+          searchFilters: searchData.filters as SearchFilter[] | undefined,
         };
       }
     }
 
-    return { parameters: undefined, parameterBindings: undefined };
+    return { parameters: undefined, parameterBindings: undefined, searchFilters: undefined };
   }, [sessionId]);
 };
 
 const NewSearchPage = () => {
-  const { parameters, parameterBindings } = useParametersFromStore();
+  const { parameters, parameterBindings, searchFilters } = useReplayStateFromStore();
   const { timeRange, queryString, streams, streamCategories } = useSearchURLQueryParams();
   const viewPromise = useCreateSavedSearch({
     streamId: streams,
@@ -65,6 +69,7 @@ const NewSearchPage = () => {
     timeRange,
     queryString,
     parameters,
+    searchFilters,
   });
   const view = useCreateSearch(viewPromise);
 

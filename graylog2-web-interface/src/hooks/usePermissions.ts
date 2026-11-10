@@ -18,7 +18,10 @@ import { useCallback, useMemo } from 'react';
 import type { Permission } from 'graylog-web-plugin/plugin';
 
 import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
+// eslint-disable-next-line no-restricted-imports
+import { isPermitted, isAnyPermitted, hasAdminPermission } from 'util/PermissionsMixin';
+
+export type IsPermitted = (permissions: Array<Permission> | Permission) => boolean;
 
 const usePermissions = () => {
   const currentUser = useCurrentUser();
@@ -27,7 +30,17 @@ const usePermissions = () => {
     [currentUser?.permissions],
   );
 
-  return useMemo(() => ({ isPermitted: _isPermitted }), [_isPermitted]);
+  const _isAnyPermitted = useCallback(
+    (permissions: Array<Permission>) => isAnyPermitted(currentUser?.permissions, permissions),
+    [currentUser?.permissions],
+  );
+
+  const isAdmin = hasAdminPermission(currentUser?.permissions ?? []);
+
+  return useMemo(
+    () => ({ isPermitted: _isPermitted, isAnyPermitted: _isAnyPermitted, isAdmin }),
+    [_isPermitted, _isAnyPermitted, isAdmin],
+  );
 };
 
 export default usePermissions;

@@ -18,14 +18,15 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import Menu from 'components/bootstrap/Menu';
-import { NAV_ITEM_HEIGHT } from 'theme/constants';
+import { NAV_ITEM_HEIGHT, NAV_ITEM_LINE_HEIGHT } from 'theme/constants';
 import NavItemStateIndicator, {
   hoverIndicatorStyles,
   activeIndicatorStyles,
 } from 'components/common/NavItemStateIndicator';
+import zIndices from 'theme/z-indices';
 
 const StyledMenuDropdown = styled(Menu.Dropdown)`
-  z-index: 1032 !important;
+  z-index: ${zIndices.navigationDropdown} !important;
 `;
 
 const DropdownTrigger = styled.button<{ $active: boolean }>(
@@ -35,6 +36,7 @@ const DropdownTrigger = styled.button<{ $active: boolean }>(
     padding: 0 15px;
     min-height: ${NAV_ITEM_HEIGHT};
     display: inline-flex;
+    line-height: ${NAV_ITEM_LINE_HEIGHT};
     align-items: center;
     gap: ${theme.spacings.xs};
 
@@ -54,10 +56,6 @@ const NavItem = styled.li`
   align-items: center;
   min-height: ${NAV_ITEM_HEIGHT};
   padding: 0;
-
-  @media (width <= 991px) {
-    width: 100%;
-  }
 `;
 
 type Props = {

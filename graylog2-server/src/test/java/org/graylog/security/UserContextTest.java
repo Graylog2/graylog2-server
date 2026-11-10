@@ -27,6 +27,7 @@ import org.graylog2.security.SecurityTestUtils;
 import org.graylog2.shared.rest.RequestIdFilter;
 import org.graylog2.shared.security.ShiroRequestHeadersBinder;
 import org.graylog2.shared.users.UserService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -45,6 +46,13 @@ class UserContextTest {
     @BeforeEach
     void setUp() {
         userService = mock(UserService.class);
+    }
+
+    @AfterEach
+    void tearDown() {
+        ThreadContext.unbindSubject();
+        ThreadContext.unbindSecurityManager();
+        SecurityUtils.setSecurityManager(null);
     }
 
     @Test

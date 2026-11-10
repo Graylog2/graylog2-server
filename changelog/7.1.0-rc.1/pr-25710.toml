@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix CpuMetricsCell percent handling"
+
+issues = ["Graylog2/graylog-plugin-enterprise#13934"]
+pulls = ["25710"]

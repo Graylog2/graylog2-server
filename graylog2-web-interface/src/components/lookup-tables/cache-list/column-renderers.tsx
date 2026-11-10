@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
 
+import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import NumberUtils from 'util/NumberUtils';
 import { MetricsMapper, MetricContainer, CounterRate } from 'components/metrics';
@@ -45,11 +45,11 @@ const Title = styled.div`
 `;
 
 const TitleCol = ({ cache, children }: { cache: CacheEntity; children: string }) => {
-  const navigate = useNavigate();
+  const { push } = useHistory();
 
   const onClick = useCallback(() => {
-    navigate(Routes.SYSTEM.LOOKUPTABLES.CACHES.show(cache.name));
-  }, [navigate, cache.name]);
+    push(Routes.SYSTEM.LOOKUPTABLES.CACHES.show(cache.name));
+  }, [push, cache.name]);
 
   return (
     <TitleRow>
@@ -118,28 +118,29 @@ const ThroughputCol = ({ cache }: { cache: CacheEntity }) => (
 const columnRenderers: ColumnRenderers<CacheEntity> = {
   attributes: {
     title: {
-      width: 0.2,
       renderCell: (title: string, cache: CacheEntity) => <TitleCol cache={cache}>{title}</TitleCol>,
     },
     description: {
-      width: 0.2,
       renderCell: (description: string) => <span>{description}</span>,
     },
     name: {
-      width: 0.2,
+      staticWidth: 200,
       renderCell: (name: string) => <span>{name}</span>,
     },
     entries: {
       staticWidth: 'matchHeader',
       renderCell: (_arg: unknown, cache: CacheEntity) => <EntriesCol cache={cache} />,
+      textAlign: 'right',
     },
     hit_rate: {
       staticWidth: 'matchHeader',
       renderCell: (_arg: unknown, cache: CacheEntity) => <HitRateCol cache={cache} />,
+      textAlign: 'right',
     },
     throughput: {
-      staticWidth: 150,
+      staticWidth: 130,
       renderCell: (_arg: unknown, cache: CacheEntity) => <ThroughputCol cache={cache} />,
+      textAlign: 'right',
     },
   },
 };

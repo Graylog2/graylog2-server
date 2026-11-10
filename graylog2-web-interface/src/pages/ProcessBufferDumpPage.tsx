@@ -19,7 +19,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner, Timestamp } from 'components/common';
-import { ClusterOverviewStore } from 'stores/cluster/ClusterOverviewStore';
+import { fetchProcessBufferDump } from 'hooks/useClusterOverview';
 import { NodesStore } from 'stores/nodes/NodesStore';
 import useParams from 'routing/useParams';
 import { useStore } from 'stores/connect';
@@ -30,7 +30,7 @@ const ProcessBufferDumpPage = () => {
   const { data: processbufferDump } = useQuery({
     queryKey: ['processBufferDump', nodeId],
 
-    queryFn: () => ClusterOverviewStore.processbufferDump(nodeId),
+    queryFn: () => fetchProcessBufferDump(nodeId),
   });
 
   const node = nodes?.[nodeId];

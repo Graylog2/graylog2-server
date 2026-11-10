@@ -30,6 +30,7 @@ import { keySeparator, humanSeparator } from 'views/Constants';
 import type { PieChartDataSettingsWithCustomUnits } from 'views/components/visualizations/hooks/usePieChartDataSettingsWithCustomUnits';
 import usePieChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/usePieChartDataSettingsWithCustomUnits';
 import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
+import pieOnClickPopover from 'views/components/visualizations/pie/pieOnClickPopover';
 import OverflowingComponentsContextProvider from 'views/components/contexts/OverflowingComponentsContextProvider';
 
 import GenericPlot from '../GenericPlot';
@@ -107,7 +108,7 @@ const PieVisualization = makeVisualization(({ config, data, height, width }: Vis
     generator: _generateSeries(mapKeys, getPieChartDataSettingsWithCustomUnits),
   });
 
-  const { popover, initializeGraphDivRef, onChartClick } = usePlotOnClickPopover('pie', config);
+  const { popover, initializeGraphDivRef, onChartClick } = usePlotOnClickPopover({ ...pieOnClickPopover, config });
 
   return (
     <>

@@ -53,11 +53,13 @@ public class KinesisPayloadDecoderTest {
     @Test
     public void testCloudWatchFlowLogDecoding() throws IOException {
 
-        final List<KinesisLogEntry> logEntries =
+        final var result =
                 flowLogDecoder.processMessages(AWSTestingUtils.cloudWatchFlowLogPayload(),
                         Instant.ofEpochMilli(AWSTestingUtils.CLOUD_WATCH_TIMESTAMP.getMillis()));
+        final List<KinesisLogEntry> logEntries = result.entries();
 
         Assertions.assertEquals(2, logEntries.size());
+        Assertions.assertTrue(result.decompressedSize() > 0);
 
         // Verify that there are two flowlogs present in the parsed result.
         Assertions.assertEquals(2, logEntries.stream().filter(logEntry -> {
@@ -74,10 +76,11 @@ public class KinesisPayloadDecoderTest {
     @Test
     public void testCloudWatchRawDecoding() throws IOException {
 
-        final List<KinesisLogEntry> logEntries =
-                flowLogDecoder.processMessages(AWSTestingUtils.cloudWatchRawPayload(), Instant.now());
+        final var result = flowLogDecoder.processMessages(AWSTestingUtils.cloudWatchRawPayload(), Instant.now());
+        final List<KinesisLogEntry> logEntries = result.entries();
 
         Assertions.assertEquals(2, logEntries.size());
+        Assertions.assertTrue(result.decompressedSize() > 0);
         // Verify that there are two flow logs present in the parsed result.
         Assertions.assertEquals(2, logEntries.stream().filter(logEntry -> {
             final AWSLogMessage logMessage = new AWSLogMessage(logEntry.message());
@@ -95,10 +98,11 @@ public class KinesisPayloadDecoderTest {
 
         final String textLogMessage = "a text log message";
         final Instant now = Instant.now();
-        final List<KinesisLogEntry> logEntries =
-                rawDecoder.processMessages(textLogMessage.getBytes(StandardCharsets.UTF_8), now);
+        final var result = rawDecoder.processMessages(textLogMessage.getBytes(StandardCharsets.UTF_8), now);
+        final List<KinesisLogEntry> logEntries = result.entries();
 
         Assertions.assertEquals(1, logEntries.size());
+        Assertions.assertEquals(textLogMessage.getBytes(StandardCharsets.UTF_8).length, result.decompressedSize());
         // Verify that there are two flow logs present in the parsed result.
         Assertions.assertEquals(1, logEntries.stream().filter(logEntry -> logEntry.message().equals(textLogMessage)).count());
 

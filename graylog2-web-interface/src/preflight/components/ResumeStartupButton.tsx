@@ -18,6 +18,7 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 
+import useProductName from 'brand-customization/useProductName';
 import fetch from 'logic/rest/FetchProvider';
 import useDataNodes from 'preflight/hooks/useDataNodes';
 import { qualifyUrl } from 'util/URLUtils';
@@ -31,6 +32,7 @@ type Props = {
 };
 
 const ResumeStartupButton = ({ setIsWaitingForStartup, children = 'Resume startup', compact = false }: Props) => {
+  const productName = useProductName();
   const { data: dataNodes } = useDataNodes();
 
   const onResumeStartup = useCallback(() => {
@@ -38,7 +40,7 @@ const ResumeStartupButton = ({ setIsWaitingForStartup, children = 'Resume startu
       dataNodes?.length ||
       // eslint-disable-next-line no-alert
       window.confirm(
-        'Are you sure you want to resume startup without a running Graylog data node? This will cause the configuration to fall back to using an Opensearch instance on localhost:9200.',
+        `Are you sure you want to resume startup without a running ${productName} data node? This will cause the configuration to fall back to using an Opensearch instance on localhost:9200.`,
       )
     ) {
       const status = dataNodes?.length ? 'finish' : 'skip';
@@ -53,7 +55,7 @@ const ResumeStartupButton = ({ setIsWaitingForStartup, children = 'Resume startu
           UserNotification.error(`Resuming startup failed with error: ${error}`, 'Could not resume startup');
         });
     }
-  }, [dataNodes?.length, setIsWaitingForStartup]);
+  }, [dataNodes?.length, productName, setIsWaitingForStartup]);
 
   return (
     <Button bsStyle="info" bsSize={compact ? 'xs' : 'small'} onClick={onResumeStartup}>

@@ -16,7 +16,7 @@
  */
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { SystemInputStates } from '@graylog/server-api';
+import { ClusterInputState } from '@graylog/server-api';
 
 import UserNotification from 'util/UserNotification';
 import type { InputSummary } from 'hooks/usePaginatedInputs';
@@ -26,9 +26,9 @@ type PROPS = {
   inputId: string;
 };
 
-const startInput = async ({ inputId }: PROPS): Promise<{ id: string }> => SystemInputStates.start(inputId);
-const stopInput = async ({ inputId }: PROPS): Promise<{ id: string }> => SystemInputStates.stop(inputId);
-const setupInput = async ({ inputId }: PROPS): Promise<{ id: string }> => SystemInputStates.setup(inputId);
+const startInput = async ({ inputId }: PROPS) => ClusterInputState.start(inputId);
+const stopInput = async ({ inputId }: PROPS) => ClusterInputState.stop(inputId);
+const setupInput = async ({ inputId }: PROPS) => ClusterInputState.setup(inputId);
 
 const useInputStateMutations = (input: InputSummary) => {
   const queryClient = useQueryClient();

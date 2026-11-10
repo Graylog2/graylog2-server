@@ -16,7 +16,11 @@
  */
 package org.graylog2.shared.journal;
 
-import com.codahale.metrics.*;
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricFilter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.RatioGauge;
 import com.codahale.metrics.Timer;
 import com.github.joschi.jadconfig.util.Size;
 import com.google.common.annotations.VisibleForTesting;
@@ -488,28 +492,28 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
      */
     private void teardownLogMetrics() {
         removeAllMetrics(
-            name(metricPrefix, METER_WRITTEN_MESSAGES),
-            name(metricPrefix, METER_READ_MESSAGES),
-            name(metricPrefix, METER_WRITE_DISCARDED_MESSAGES),
-            name(metricPrefix, GAUGE_UNCOMMITTED_MESSAGES),
-            name(metricPrefix, TIMER_WRITE_TIME),
-            name(metricPrefix, TIMER_READ_TIME),
-            name(metricPrefix, METRIC_NAME_SIZE),
-            name(metricPrefix, METRIC_NAME_LOG_END_OFFSET),
-            name(metricPrefix, METRIC_NAME_NUMBER_OF_SEGMENTS),
-            name(metricPrefix, METRIC_NAME_UNFLUSHED_MESSAGES),
-            name(metricPrefix, METRIC_NAME_RECOVERY_POINT),
-            name(metricPrefix, METRIC_NAME_LAST_FLUSH_TIME)
+                name(metricPrefix, METER_WRITTEN_MESSAGES),
+                name(metricPrefix, METER_READ_MESSAGES),
+                name(metricPrefix, METER_WRITE_DISCARDED_MESSAGES),
+                name(metricPrefix, GAUGE_UNCOMMITTED_MESSAGES),
+                name(metricPrefix, TIMER_WRITE_TIME),
+                name(metricPrefix, TIMER_READ_TIME),
+                name(metricPrefix, METRIC_NAME_SIZE),
+                name(metricPrefix, METRIC_NAME_LOG_END_OFFSET),
+                name(metricPrefix, METRIC_NAME_NUMBER_OF_SEGMENTS),
+                name(metricPrefix, METRIC_NAME_UNFLUSHED_MESSAGES),
+                name(metricPrefix, METRIC_NAME_RECOVERY_POINT),
+                name(metricPrefix, METRIC_NAME_LAST_FLUSH_TIME)
         );
         this.metricRegistry.remove(getOldestSegmentMetricName());
 
         // Remove additional metrics
         removeAllMetrics(
-            name(metricPrefix, GlobalMetricNames.JOURNAL_SEGMENTS_SUFFIX),
-            name(metricPrefix, GlobalMetricNames.JOURNAL_UNCOMMITTED_ENTRIES_SUFFIX),
-            name(metricPrefix, GlobalMetricNames.JOURNAL_SIZE_SUFFIX),
-            name(metricPrefix, GlobalMetricNames.JOURNAL_SIZE_LIMIT_SUFFIX),
-            name(metricPrefix, GlobalMetricNames.JOURNAL_UTILIZATION_RATIO_SUFFIX)
+                name(metricPrefix, GlobalMetricNames.JOURNAL_SEGMENTS_SUFFIX),
+                name(metricPrefix, GlobalMetricNames.JOURNAL_UNCOMMITTED_ENTRIES_SUFFIX),
+                name(metricPrefix, GlobalMetricNames.JOURNAL_SIZE_SUFFIX),
+                name(metricPrefix, GlobalMetricNames.JOURNAL_SIZE_LIMIT_SUFFIX),
+                name(metricPrefix, GlobalMetricNames.JOURNAL_UTILIZATION_RATIO_SUFFIX)
         );
 
         if (LocalKafkaJournal.class.getName().equals(metricPrefix)) {
@@ -517,11 +521,11 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
 
             //Remove additional metrics from global namespace:
             removeAllMetrics(
-                GlobalMetricNames.JOURNAL_SEGMENTS,
-                GlobalMetricNames.JOURNAL_UNCOMMITTED_ENTRIES,
-                GlobalMetricNames.JOURNAL_SIZE,
-                GlobalMetricNames.JOURNAL_SIZE_LIMIT,
-                GlobalMetricNames.JOURNAL_UTILIZATION_RATIO
+                    GlobalMetricNames.JOURNAL_SEGMENTS,
+                    GlobalMetricNames.JOURNAL_UNCOMMITTED_ENTRIES,
+                    GlobalMetricNames.JOURNAL_SIZE,
+                    GlobalMetricNames.JOURNAL_SIZE_LIMIT,
+                    GlobalMetricNames.JOURNAL_UTILIZATION_RATIO
             );
         }
     }

@@ -1,0 +1,5 @@
+type = "f"
+message = "Refetch all referenced search filters when loading a view, remove all unwanted attributes on a reference prior to saving to fix inconsistencies in the FE."
+
+issues = ["19480"]
+pulls = ["21393"]

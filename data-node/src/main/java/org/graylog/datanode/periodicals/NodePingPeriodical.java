@@ -148,6 +148,7 @@ public class NodePingPeriodical extends Periodical {
                 .setCertValidUntil(certValidUntil.get())
                 .setDatanodeVersion(version.getVersion().toString())
                 .setOpensearchRoles(getOpensearchRoles())
+                .setOpensearchNodeName(configuration.getDatanodeNodeName())
                 .setConfigurationWarnings(configurationWarnings.get())
                 .build();
 
@@ -173,6 +174,7 @@ public class NodePingPeriodical extends Periodical {
                 .setCertValidUntil(certValidUntil.get())
                 .setDatanodeVersion(version.getVersion().toString())
                 .setOpensearchRoles(getOpensearchRoles())
+                .setOpensearchNodeName(configuration.getDatanodeNodeName())
                 .setConfigurationWarnings(configurationWarnings.get())
                 .build());
 

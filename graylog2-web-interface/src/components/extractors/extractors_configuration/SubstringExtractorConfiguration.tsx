@@ -22,7 +22,7 @@ import { Icon } from 'components/common';
 import UserNotification from 'util/UserNotification';
 import ExtractorUtils from 'util/ExtractorUtils';
 import { getValueFromInput } from 'util/FormsUtils';
-import ToolsStore from 'stores/tools/ToolsStore';
+import { testSubstring } from 'api/tools';
 
 type Config = {
   begin_index: number;
@@ -93,7 +93,7 @@ const SubstringExtractorConfiguration = ({
       onExtractorPreviewLoad('');
       setTrying(false);
     } else {
-      const promise = ToolsStore.testSubstring(configuration.begin_index, configuration.end_index, exampleMessage);
+      const promise = testSubstring(configuration.begin_index, configuration.end_index, exampleMessage);
 
       promise.then((result) => {
         if (!result.successful) {

@@ -14,22 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect } from 'react';
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import ExportExtractors from 'components/extractors/ExportExtractors';
-import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
+import { fetchInput } from 'hooks/useInputs';
 import useParams from 'routing/useParams';
-import { useStore } from 'stores/connect';
 import MarketplaceLink from 'components/support/MarketplaceLink';
 
 const ExportExtractorsPage = () => {
   const { inputId } = useParams();
-  const { input } = useStore(InputsStore);
-
-  useEffect(() => {
-    InputsActions.get.triggerPromise(inputId);
-  }, [inputId]);
+  const { data: input } = useQuery({
+    queryKey: ['inputs', inputId],
+    queryFn: () => fetchInput(inputId),
+  });
 
   if (!input) {
     return <Spinner />;

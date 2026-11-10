@@ -17,11 +17,16 @@
 import type { Attribute, Sort } from 'stores/PaginationTypes';
 
 export const SYSTEM_EVENT_DEFINITION_TYPE = 'system-notifications-v1';
+// Matches the backend's tactics_techniques filter on the event definitions list.
+export const TACTICS_TECHNIQUES_ATTRIBUTE_ID = 'tactics_techniques';
 
-const getEventDefinitionTableElements = (pluggableAttributes?: {
-  attributeNames?: Array<string>;
-  attributes?: Array<Attribute>;
-}) => {
+const getEventDefinitionTableElements = (
+  pluggableAttributes?: {
+    attributeNames?: Array<string>;
+    attributes?: Array<Attribute>;
+  },
+  tacticsTechniquesAttribute?: Attribute,
+) => {
   const defaultLayout = {
     entityTableId: 'event_definitions',
     defaultPageSize: 20,
@@ -30,26 +35,36 @@ const getEventDefinitionTableElements = (pluggableAttributes?: {
       'title',
       'description',
       'priority',
+      'notifications',
       'scheduling',
       'status',
       'matched_at',
-      ...(pluggableAttributes?.attributeNames || []),
+      'tags',
+      ...(tacticsTechniquesAttribute ? [tacticsTechniquesAttribute.id] : []),
     ],
     defaultColumnOrder: [
       'title',
       'description',
       'priority',
+      'notifications',
       '_entity_source.source',
       'matched_at',
       'status',
+      'type',
       'scheduling',
+      'tags',
+      ...(tacticsTechniquesAttribute ? [tacticsTechniquesAttribute.id] : []),
       ...(pluggableAttributes?.attributeNames || []),
     ],
   };
 
-  const additionalAttributes = [
+  // `tags` and the plugin's tactics/techniques attribute are supplied via the fetch response (so
+  // they show up in the filter dropdown with their custom filter_component) and are NOT added
+  // here, otherwise PaginatedEntityTable would render duplicate columns.
+  const additionalAttributes: Array<Attribute> = [
     { id: 'scheduling', title: 'Scheduling', sortable: false },
     { id: 'matched_at', title: 'Last Matched', sortable: true },
+    { id: 'notifications', title: 'Notifications', sortable: false },
     ...(pluggableAttributes?.attributes || []),
   ];
 

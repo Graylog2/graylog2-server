@@ -24,7 +24,6 @@ import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
-import AppConfig from 'util/AppConfig';
 import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
 import asMock from 'helpers/mocking/AsMock';
 import GenericPlot from 'views/components/visualizations/GenericPlot';
@@ -34,14 +33,6 @@ import { effectiveTimerange, simpleChartData } from './AreaVisualization.fixture
 import OriginalAreaVisualization from '../AreaVisualization';
 
 jest.mock('../../GenericPlot', () => jest.fn(mockComponent('GenericPlot')));
-
-jest.mock('util/AppConfig', () => ({
-  gl2AppPathPrefix: jest.fn(() => ''),
-  rootTimeZone: jest.fn(() => 'America/Chicago'),
-  gl2ServerUrl: jest.fn(() => undefined),
-  isCloud: jest.fn(() => false),
-  isFeatureEnabled: () => true,
-}));
 
 const AreaVisualization = ({ ...props }: React.ComponentProps<typeof OriginalAreaVisualization>) => (
   <TestStoreProvider>
@@ -56,7 +47,6 @@ describe('AreaVisualization', () => {
 
   beforeEach(() => {
     asMock(GenericPlot).mockClear();
-    AppConfig.isFeatureEnabled = jest.fn(() => false);
   });
 
   it('generates correct props for plot component', () => {
@@ -88,6 +78,7 @@ describe('AreaVisualization', () => {
             range: ['2019-11-28T16:21:00.486+01:00', '2019-11-28T16:25:57.000+01:00'],
             type: 'date',
             fixedrange: false,
+            title: expect.objectContaining({ text: undefined, standoff: 10 }),
           },
           legend: { y: -0.14 },
         }),
@@ -104,8 +95,10 @@ describe('AreaVisualization', () => {
             ],
             y: [24558.239393939395, 3660.5666666666666, 49989.69, 2475.225, 10034.822222222223],
             fill: 'tozeroy',
-            line: { shape: 'linear' },
+            line: { shape: 'linear', smoothing: 0.5, width: 1 },
             originalName: 'avg(nf_bytes)',
+            fullPath: 'avg(nf_bytes)',
+            yaxis: 'y',
           },
           {
             type: 'scatter',
@@ -119,8 +112,10 @@ describe('AreaVisualization', () => {
             ],
             y: [14967, 1239, 20776, 1285, 4377],
             fill: 'tozeroy',
-            line: { shape: 'linear' },
+            line: { shape: 'linear', smoothing: 0.5, width: 1 },
             originalName: 'sum(nf_pkts)',
+            fullPath: 'sum(nf_pkts)',
+            yaxis: 'y',
           },
         ],
       }),

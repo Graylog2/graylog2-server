@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useCallback, useState, useEffect } from 'react';
+import React, { useMemo, useCallback, useState } from 'react';
 import styled from 'styled-components';
 import mapValues from 'lodash/mapValues';
 import { Formik, Form, Field } from 'formik';
@@ -29,14 +29,14 @@ import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 import { defaultCompare } from 'logic/DefaultCompare';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import useSendTelemetryOnMount from 'logic/telemetry/useSendTelemetryOnMount';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import FieldSelect from 'views/logic/fieldactions/ChangeFieldType/FieldSelect';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import type { FieldTypePutResponse, FieldTypePutResponseJson } from 'views/logic/fieldactions/ChangeFieldType/types';
 import Routes from 'routing/Routes';
 import type { Stream } from 'logic/streams/types';
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
 import ModalSubmit from 'components/common/ModalSubmit';
 
 const StyledSelect = styled(Select)`
@@ -103,8 +103,8 @@ const ChangeFieldTypeModal = ({
     isLoading: isLoadingFieldTypes,
   } = useFieldTypesForMappings();
   const sendTelemetry = useSendTelemetry();
-  const currentUser = useCurrentUser();
-  const hasFailureStreamAccess = isPermitted(currentUser.permissions, `streams:read:${failureStreamId}`);
+  const { isPermitted } = usePermissions();
+  const hasFailureStreamAccess = isPermitted(`streams:read:${failureStreamId}`);
   const fieldTypeOptions = useMemo(
     () =>
       Object.entries(fieldTypes)
@@ -161,11 +161,9 @@ const ChangeFieldTypeModal = ({
     ],
   );
 
-  useEffect(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.CHANGE_FIELD_TYPE_OPENED, {
-      app_action_value: 'change-field-type-opened',
-    });
-  }, [sendTelemetry]);
+  useSendTelemetryOnMount(sendTelemetry, TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.CHANGE_FIELD_TYPE_OPENED, {
+    app_action_value: 'change-field-type-opened',
+  });
 
   const onCancel = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.CHANGE_FIELD_TYPE_CLOSED, {

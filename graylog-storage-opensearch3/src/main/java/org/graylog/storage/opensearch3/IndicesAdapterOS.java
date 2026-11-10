@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.joschi.jadconfig.util.Duration;
+import com.google.common.base.Throwables;
 import jakarta.inject.Inject;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.EnumUtils;
@@ -39,6 +40,7 @@ import org.graylog2.indexer.indices.IndexStatus;
 import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.IndicesAdapter;
+import org.graylog2.indexer.indices.OutdatedIndex;
 import org.graylog2.indexer.indices.ShardsInfo;
 import org.graylog2.indexer.indices.Template;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
@@ -84,6 +86,7 @@ import org.opensearch.client.opensearch.indices.OpenSearchIndicesClient;
 import org.opensearch.client.opensearch.indices.PutIndicesSettingsRequest;
 import org.opensearch.client.opensearch.indices.RefreshRequest;
 import org.opensearch.client.opensearch.indices.get_mapping.IndexMappingRecord;
+import org.opensearch.client.opensearch.indices.resolve_index.ResolveIndexItem;
 import org.opensearch.client.opensearch.indices.stats.IndicesStats;
 import org.opensearch.client.opensearch.indices.update_aliases.AddAction;
 import org.opensearch.client.opensearch.indices.update_aliases.RemoveAction;
@@ -152,13 +155,13 @@ public class IndicesAdapterOS implements IndicesAdapter {
     }
 
     @Override
-    public void move(String source, String target, Consumer<IndexMoveResult> resultCallback) {
+    public void reindex(String source, String target, Consumer<IndexMoveResult> resultCallback) {
         ReindexResponse result = c.execute(() -> openSearchClient.reindex(
                         org.opensearch.client.opensearch.core.ReindexRequest.builder()
                                 .source(Source.builder().index(source).build())
                                 .dest(Destination.builder().index(target).build())
                                 .build()),
-                "Error moving index " + source + " to " + target);
+                "Error reindexing index " + source + " to " + target);
 
         final IndexMoveResult indexMoveResult = IndexMoveResult.create(
                 Math.toIntExact(getIfNull(result.total(), 0L)),
@@ -448,16 +451,42 @@ public class IndicesAdapterOS implements IndicesAdapter {
 
     @Override
     public Set<String> closedIndices(Collection<String> indices) {
+        if (indices.isEmpty()) {
+            return Set.of();
+        }
         return c.execute(() -> {
-            List<IndicesRecord> indicesRecords = catClient.indices(r -> r.index(indices.stream().toList())
-                            .expandWildcards(ExpandWildcard.Closed))
-                    .valueBody();
-            return indicesRecords.stream()
-                    .filter(i -> Objects.nonNull(i.status()))
-                    .filter(i -> i.status().equals("close"))
-                    .map(IndicesRecord::index)
-                    .collect(Collectors.toSet());
+            try {
+                return resolveClosedIndices(indices);
+            } catch (IOException e) {
+                if (!isForbidden(e)) {
+                    throw e;
+                }
+                LOG.debug("Resolve index API is forbidden, falling back to the cat API", e);
+                return closedIndicesFromCat(indices);
+            }
         }, "Unable to retrieve list of closed indices for " + indices);
+    }
+
+    // A 403 arrives as an IOException wrapping a ResponseException.
+    private static boolean isForbidden(IOException e) {
+        return Throwables.getCausalChain(e).stream()
+                .anyMatch(cause -> cause instanceof ResponseException response && response.status() == 403);
+    }
+
+    private Set<String> resolveClosedIndices(Collection<String> indices) throws IOException {
+        return indicesClient.resolveIndex(r -> r.name(indices.stream().toList()).expandWildcards(ExpandWildcard.Closed))
+                .indices().stream()
+                .filter(index -> index.attributes().contains("closed"))
+                .map(ResolveIndexItem::name)
+                .collect(Collectors.toSet());
+    }
+
+    private Set<String> closedIndicesFromCat(Collection<String> indices) throws IOException {
+        return catClient.indices(r -> r.index(indices.stream().toList()).expandWildcards(ExpandWildcard.Closed))
+                .valueBody().stream()
+                .filter(i -> "close".equals(i.status()))
+                .map(IndicesRecord::index)
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -627,15 +656,17 @@ public class IndicesAdapterOS implements IndicesAdapter {
 
     @Override
     public void optimizeIndex(String index, int maxNumSegments, Duration timeout) {
-        ForcemergeRequest request = ForcemergeRequest.of(b -> b
+        final ForcemergeRequest request = ForcemergeRequest.of(b -> b
                 .index(index)
                 .maxNumSegments(Integer.toUnsignedLong(maxNumSegments))
                 .flush(true)
         );
 
-        String errorMessage = "Force merge of index " + index + " did not complete in " + timeout.toString() + ", not waiting for completion any longer.";
-        c.executeWithClientTimeout((asyncClient) -> asyncClient.indices().forcemerge(request), errorMessage, timeout);
-
+        final String errorMessage = "Force merge of index " + index + " did not complete in " + timeout + ", not waiting for completion any longer.";
+        c.executeWithClientTimeout(
+                (asyncClient) -> asyncClient.indices().forcemerge(request),
+                errorMessage,
+                timeout);
     }
 
     @Override
@@ -778,4 +809,40 @@ public class IndicesAdapterOS implements IndicesAdapter {
 
         return new WarmIndexInfo(index, initialIndexName, repository, snapshotName);
     }
+
+    @Override
+    public Set<OutdatedIndex> getOutdatedIndices(int currentMajorVersion) {
+        return c.execute(() -> {
+            GetIndicesSettingsResponse result = indicesClient.getSettings(b -> b
+                    .ignoreUnavailable(true)
+                    .allowNoIndices(true)
+                    .expandWildcards(ExpandWildcard.All)
+                    .flatSettings(true)
+                    .human(true)
+            );
+            return result.result().keySet().stream()
+                    .map(index -> new TempIndexSettings(index, Optional.ofNullable(toIndexSettings(result, index))))
+                    .filter(indexSettings ->
+                            indexSettings.settings()
+                                    .map(settings -> settings.get("index.version.created_string"))
+                                    .map(Object::toString)
+                                    // checking for version mismatch is enough as a higher version index won't work anyway
+                                    // or would be expected if created with e.g. Elastic 7.x
+                                    .map(version -> !version.startsWith(currentMajorVersion + "."))
+                                    .orElseGet(() -> {
+                                        LOG.error("Could not resolve version from settings for index " + indexSettings.index());
+                                        return true;
+                                    })
+                    ).map(
+                            indexSettings -> new OutdatedIndex(
+                                    indexSettings.index(),
+                                    indexSettings.settings().map(settings -> settings.get("index.version.created_string")).map(Object::toString).orElse(""),
+                                    indexSettings.settings().map(settings -> settings.get("index.store.type")).map(type -> "remote_snapshot".equals(type)).orElse(false)
+                            )
+                    ).collect(Collectors.toSet());
+        }, "Couldn't read settings for indices");
+    }
+
+    record TempIndexSettings(String index, Optional<Map<String, Object>> settings) {}
+
 }

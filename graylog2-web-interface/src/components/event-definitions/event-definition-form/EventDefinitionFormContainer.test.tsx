@@ -16,10 +16,16 @@
  */
 
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { defaultUser as mockDefaultUser } from 'defaultMockValues';
 
+import { EventsEntityTypes } from '@graylog/server-api';
+
+import selectEvent from 'helpers/selectEvent';
+import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
+import { createEntityShareState, everyone, viewer } from 'fixtures/entityShareState';
 import useLocation from 'routing/useLocation';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { asMock } from 'helpers/mocking';
@@ -31,7 +37,7 @@ import useEventDefinitionConfigFromLocalStorage from 'components/event-definitio
 import { SYSTEM_EVENT_DEFINITION_TYPE as mockSYSTEM_EVENT_DEFINITION_TYPE } from 'components/event-definitions/constants';
 import type { PermissionsByScopeReturnType } from 'hooks/useScopePermissions';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
-import fetch from 'logic/rest/FetchProvider';
+import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 
 import EventDefinitionFormContainer from './EventDefinitionFormContainer';
 
@@ -101,6 +107,11 @@ jest.mock('logic/rest/FetchProvider', () => {
   return { __esModule: true, default: mockFetch, Builder: MockBuilder };
 });
 
+jest.mock('@graylog/server-api', () => ({
+  ...jest.requireActual('@graylog/server-api'),
+  EventsEntityTypes: { all: jest.fn() },
+}));
+
 const mockEntityTypes = {
   aggregation_functions: [
     'avg',
@@ -121,7 +132,7 @@ const mockEntityTypes = {
   storage_handler_types: ['persist-to-streams-v1'],
 };
 
-const mockEventNotifications = [
+const mockEventNotifications: Array<EventNotification> = [
   {
     id: 'mock-notification-id',
     title: 'mock-notification-title',
@@ -149,24 +160,16 @@ const mockEventNotifications = [
   },
 ];
 
-jest.mock('stores/event-notifications/EventNotificationsStore', () => ({
-  EventNotificationsActions: { listAll: jest.fn() },
-  EventNotificationsStore: {
-    listen: () => jest.fn(),
-    getInitialState: () => ({
-      all: mockEventNotifications,
-      allLegacyTypes: [],
-      notifications: mockEventNotifications,
-      query: '',
-      pagination: {
-        count: 1,
-        page: 1,
-        pageSize: 10,
-        total: 1,
-        grandTotal: 1,
-      },
-    }),
-  },
+jest.mock('components/event-notifications/hooks/useEventNotifications', () => ({
+  ...jest.requireActual('components/event-notifications/hooks/useEventNotifications'),
+  fetchAllEventNotifications: jest.fn(() => Promise.resolve({ notifications: mockEventNotifications })),
+  // The container reads notifications through useEventNotifications(). The hook's queryFn closes
+  // over the module-local fetchAllEventNotifications, so overriding the export above is not enough
+  // to feed it mock data; mock the hook directly with the react-query result shape it returns.
+  useEventNotifications: jest.fn(() => ({
+    data: { notifications: mockEventNotifications },
+    isLoading: false,
+  })),
 }));
 
 jest.mock('stores/configurations/ConfigurationsStore', () => ({
@@ -183,12 +186,11 @@ jest.mock('stores/configurations/ConfigurationsStore', () => ({
   },
 }));
 
-jest.mock('stores/users/CurrentUserStore', () => ({
+jest.mock('logic/users/CurrentUser', () => ({
   __esModule: true,
-  CurrentUserStore: {
-    listen: () => jest.fn(),
-    getInitialState: () => ({ currentUser: mockDefaultUser.toJSON() }),
-  },
+  default: jest
+    .requireActual('helpers/mocking')
+    .ExternalStoreMock(() => ({ currentUser: mockDefaultUser.toJSON() }), { reload: jest.fn(() => Promise.resolve()) }),
 }));
 
 jest.mock('logic/telemetry/withTelemetry', () => ({
@@ -205,6 +207,11 @@ jest.mock('logic/telemetry/withTelemetry', () => ({
   ),
 }));
 
+jest.mock('domainActions/permissions/EntityShareDomain');
+
+// Rendered once the form is dirty and relies on `useBlocker`, which needs a data router.
+jest.mock('components/common/ConfirmLeaveDialog', () => () => null);
+
 jest.mock('components/event-definitions/hooks/useEventDefinitionConfigFromLocalStorage');
 jest.mock('routing/useLocation');
 jest.mock('logic/telemetry/useSendTelemetry');
@@ -214,7 +221,7 @@ jest.mock('hooks/usePluginEntities');
 
 describe('EventDefinitionFormContainer', () => {
   beforeEach(() => {
-    asMock(fetch).mockResolvedValue(mockEntityTypes);
+    asMock(EventsEntityTypes.all).mockResolvedValue(mockEntityTypes);
 
     asMock(useLocation).mockImplementation(() => ({
       pathname: '/event-definitions',
@@ -279,23 +286,30 @@ describe('EventDefinitionFormContainer', () => {
     expect(screen.getByText(/cannot be edited/i)).toBeVisible();
   });
 
-  it('should render Fields form enabled', async () => {
+  it('should render Additional Details form enabled', async () => {
     render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
 
-    const tab = await screen.findByRole('button', { name: /fields/i });
+    const tab = await screen.findByRole('button', { name: /additional details/i });
     await userEvent.click(tab);
 
     expect(screen.getByRole('button', { name: /add custom field/i })).toBeEnabled();
   });
 
-  it('Fields should not be accessible for immutable entities', async () => {
+  it('Additional Details should not be accessible for immutable entities', async () => {
     asMock(useScopePermissions).mockImplementation(() => exampleEntityScopeImmutable);
     render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
 
-    const tab = await screen.findByRole('button', { name: /fields/i });
+    const tab = await screen.findByRole('button', { name: /additional details/i });
     await userEvent.click(tab);
 
     expect(screen.getByText(/cannot be edited/i)).toBeVisible();
+  });
+
+  it('labels the step "Additional Details" rather than the legacy "Fields"', async () => {
+    render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
+
+    expect(await screen.findByRole('button', { name: /additional details/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^fields$/i })).not.toBeInTheDocument();
   });
 
   it('should render Notifications form enabled', async () => {
@@ -353,9 +367,36 @@ describe('EventDefinitionFormContainer', () => {
   it('should show summary with update action on edit', async () => {
     render(<EventDefinitionFormContainer action="edit" eventDefinition={mockAggregationEventDefinition} />);
 
-    const tab = await screen.findByRole('button', { name: /summary/i });
+    const tab = await screen.findByRole('button', { name: /^summary$/i });
     await userEvent.click(tab);
 
     expect(screen.getByRole('button', { name: /update event definition/i })).toBeVisible();
+  });
+
+  it('keeps the selected collaborators when navigating away from and back to the Share step', async () => {
+    // Mirrors the server: the prepared state reflects exactly the capabilities that were sent.
+    asMock(EntityShareDomain.prepareCreate).mockImplementation((_type, _title, payload?: any) =>
+      Promise.resolve(
+        createEntityShareState
+          .toBuilder()
+          .selectedGranteeCapabilities(payload?.selected_grantee_capabilities ?? Immutable.Map())
+          .build(),
+      ),
+    );
+
+    render(<EventDefinitionFormContainer action="create" eventDefinition={mockAggregationEventDefinition} />);
+
+    await userEvent.click(await screen.findByRole('button', { name: /^share$/i }));
+
+    await selectEvent.chooseOption('Search for users and teams', everyone.title);
+    await selectEvent.chooseOption('Select a capability', viewer.title);
+    await userEvent.click(await screen.findByRole('button', { name: /add collaborator/i }));
+
+    expect(await screen.findByText(everyone.title)).toBeVisible();
+
+    await userEvent.click(await screen.findByRole('button', { name: /^summary$/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /^share$/i }));
+
+    expect(await screen.findByText(everyone.title)).toBeVisible();
   });
 });

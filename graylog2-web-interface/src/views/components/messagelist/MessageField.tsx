@@ -79,7 +79,7 @@ const ValueContext = ({
 }: React.PropsWithChildren<{ isDecoratedField: boolean }>) => {
   if (isDecoratedField)
     return (
-      <InteractiveContext.Provider value={false}>
+      <InteractiveContext.Provider value="disabled">
         {children} <DecoratedField>(decorated)</DecoratedField>
       </InteractiveContext.Provider>
     );

@@ -141,7 +141,7 @@ public class RestClientProvider implements Provider<RestHighLevelClient> {
                     }
                     return httpClientConfig;
                 })
-                .setChunkedEnabled(configuration.compressionEnabled());
+                .setCompressionEnabled(configuration.compressionEnabled());
 
         return new RestHighLevelClient(restClientBuilder);
     }

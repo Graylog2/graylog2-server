@@ -66,7 +66,7 @@ public class GrokMatch extends AbstractFunction<GrokMatch.GrokResult> {
             final Match match = grok.match(value);
             return new GrokResult(match.captureFlattened());
         } catch (StackOverflowError e) {
-            throw new IllegalStateException("Stack overflow during grok pattern matching");
+            throw new IllegalStateException("Pattern caused a stack overflow during matching. Simplify the pattern to avoid deeply nested or repeated groups.");
         }
     }
 

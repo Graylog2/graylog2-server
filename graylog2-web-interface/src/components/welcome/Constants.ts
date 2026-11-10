@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 export const entityTypeMap = {
   dashboard: { link: 'DASHBOARDS_VIEWID', typeTitle: 'dashboard' },
@@ -28,3 +29,5 @@ export const DEFAULT_PAGINATION = {
   count: 0,
   total: 0,
 };
+
+export const REQUIRED_PERMISSIONS: Array<Permission> = ['inputs:create', 'collectors:create'];

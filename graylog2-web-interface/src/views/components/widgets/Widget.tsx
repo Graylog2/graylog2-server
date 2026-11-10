@@ -27,6 +27,7 @@ import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import TimerangeInfo from 'views/components/widgets/TimerangeInfo';
 import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import useWidgetResults from 'views/components/useWidgetResults';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
@@ -59,7 +60,7 @@ import WidgetErrorBoundary from './WidgetErrorBoundary';
 import WidgetActionsMenu from './WidgetActionsMenu';
 import WidgetWarmTierAlert from './WidgetWarmTierAlert';
 
-import InteractiveContext from '../contexts/InteractiveContext';
+import { useIsInteractiveMode } from '../contexts/InteractiveContext';
 
 export type Props = {
   id: string;
@@ -146,7 +147,11 @@ const Visualization = ({
     );
   }
 
-  return <LoadingWidget />;
+  return (
+    <LoadingWidget
+      visualization={widget.config instanceof AggregationWidgetConfig ? widget.config.visualization : undefined}
+    />
+  );
 };
 
 type EditWrapperProps = {
@@ -287,7 +292,7 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
   const { focusedWidget } = useContext(WidgetFocusContext);
   const dispatch = useViewsDispatch();
   const sendWidgetConfigUpdateTelemetry = useSendWidgetConfigUpdateTelemetry();
-  const interactive = useContext(InteractiveContext);
+  const interactive = useIsInteractiveMode();
 
   const isDashboard = viewType === View.Type.Dashboard;
 
@@ -300,7 +305,14 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
 
   const onWidgetConfigChange = useCallback(
     async (newWidgetConfig: WidgetConfig) => {
-      sendWidgetConfigUpdateTelemetry();
+      sendWidgetConfigUpdateTelemetry(
+        newWidgetConfig instanceof AggregationWidgetConfig
+          ? {
+              visualizationType: newWidgetConfig.visualization,
+              visualizationConfig: newWidgetConfig.visualizationConfig,
+            }
+          : {},
+      );
 
       return dispatch(updateWidgetConfig(id, newWidgetConfig)).then(() => {});
     },

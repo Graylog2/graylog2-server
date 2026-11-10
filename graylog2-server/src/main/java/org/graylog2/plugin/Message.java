@@ -75,6 +75,10 @@ import static com.google.common.base.CharMatcher.anyOf;
 import static com.google.common.base.CharMatcher.inRange;
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.base.Predicates.not;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_AGENT_FLEET_ID;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_AGENT_ID;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_AGENT_RECEIVER_TYPE;
+import static org.graylog.collectors.input.CollectorIngestCodec.FIELD_AGENT_SOURCE_ID;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_CATEGORY;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_SUBCATEGORY;
 import static org.graylog.schema.GraylogSchemaFields.FIELD_ILLUMINATE_EVENT_TYPE;
@@ -122,6 +126,11 @@ public class Message implements Messages, Indexable, Acknowledgeable {
      * Will be set to the accounted message size in bytes.
      */
     public static final String FIELD_GL2_ACCOUNTED_MESSAGE_SIZE = "gl2_accounted_message_size";
+
+    /**
+     * Will be set to the raw input message size in bytes (payload size at the transport layer).
+     */
+    public static final String FIELD_GL2_INPUT_MESSAGE_SIZE = "gl2_input_message_size";
 
     /**
      * This is the message ID. It will be set to a {@link de.huxhorn.sulky.ulid.ULID} during processing.
@@ -234,6 +243,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
 
     private static final ImmutableSet<String> GRAYLOG_FIELDS = ImmutableSet.of(
             FIELD_GL2_ACCOUNTED_MESSAGE_SIZE,
+            FIELD_GL2_INPUT_MESSAGE_SIZE,
             FIELD_GL2_PROCESSING_ERROR,
             FIELD_GL2_PROCESSING_DURATION_MS,
             FIELD_GL2_PROCESSING_TIMESTAMP,
@@ -246,7 +256,8 @@ public class Message implements Messages, Indexable, Acknowledgeable {
             FIELD_GL2_SOURCE_INPUT,
             FIELD_GL2_SOURCE_NODE,
             FIELD_GL2_SOURCE_RADIO,
-            FIELD_GL2_SOURCE_RADIO_INPUT
+            FIELD_GL2_SOURCE_RADIO_INPUT,
+            FIELD_GL2_FORWARDER_INPUT
     );
 
     // Graylog Illuminate Fields
@@ -263,6 +274,13 @@ public class Message implements Messages, Indexable, Acknowledgeable {
             FIELD_ILLUMINATE_GIM_TAGS,
             FIELD_ILLUMINATE_GIM_VERSION,
             FIELD_ASSOCIATED_ASSETS
+    );
+
+    private static final Set<String> COLLECTOR_FIELDS = ImmutableSet.of(
+            FIELD_AGENT_RECEIVER_TYPE,
+            FIELD_AGENT_SOURCE_ID,
+            FIELD_AGENT_FLEET_ID,
+            FIELD_AGENT_ID
     );
 
     private static final ImmutableSet<String> CORE_MESSAGE_FIELDS = ImmutableSet.of(
@@ -345,6 +363,10 @@ public class Message implements Messages, Indexable, Acknowledgeable {
 
     private List<ProcessingError> processingErrors;
 
+    // Indicates if a message is supposed to be accounted for license usage. Except for some special cases, this will
+    // usually be true.
+    private final boolean accounted;
+
     private static final IdentityHashMap<Class<?>, Integer> classSizes = Maps.newIdentityHashMap();
 
     static {
@@ -378,7 +400,8 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     }
 
     // Intentionally package-private to enforce MessageFactory usage.
-    Message(final String message, final String source, final DateTime timestamp) {
+    Message(final String message, final String source, final DateTime timestamp, boolean accounted) {
+        this.accounted = accounted;
         fields.put(FIELD_ID, new UUID().toString());
         addRequiredField(FIELD_MESSAGE, message);
         addRequiredField(FIELD_SOURCE, source);
@@ -386,15 +409,30 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     }
 
     // Intentionally package-private to enforce MessageFactory usage.
+    Message(final String message, final String source, final DateTime timestamp) {
+        this(message, source, timestamp, true);
+    }
+
+    Message(final Map<String, Object> fields, boolean accounted) {
+        this((String) fields.get(FIELD_ID), Maps.filterKeys(fields, not(equalTo(FIELD_ID))), accounted);
+    }
+
+    // Intentionally package-private to enforce MessageFactory usage.
     Message(final Map<String, Object> fields) {
-        this((String) fields.get(FIELD_ID), Maps.filterKeys(fields, not(equalTo(FIELD_ID))));
+        this(fields, true);
+    }
+
+    // Intentionally package-private to enforce MessageFactory usage.
+    Message(String id, Map<String, Object> newFields, boolean accounted) {
+        this.accounted = accounted;
+        Preconditions.checkArgument(id != null, "message id cannot be null");
+        fields.put(FIELD_ID, id);
+        addFields(newFields);
     }
 
     // Intentionally package-private to enforce MessageFactory usage.
     Message(String id, Map<String, Object> newFields) {
-        Preconditions.checkArgument(id != null, "message id cannot be null");
-        fields.put(FIELD_ID, id);
-        addFields(newFields);
+        this(id, newFields, true);
     }
 
     public boolean isComplete() {
@@ -618,7 +656,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         final String trimmedKey = key.trim();
 
         // Don't accept protected keys. (some are allowed though lol)
-        if ((RESERVED_FIELDS.contains(trimmedKey) && !RESERVED_SETTABLE_FIELDS.contains(trimmedKey)) || !validKey(trimmedKey)) {
+        if (isReservedNonSettableField(trimmedKey) || !validKey(trimmedKey)) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Ignoring invalid or reserved key {} for message {}", trimmedKey, getId());
             } else {
@@ -650,7 +688,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
 
     private void updateSize(String fieldName, Object newValue, Object previousValue) {
         // don't count internal fields
-        if (GRAYLOG_FIELDS.contains(fieldName) || ILLUMINATE_FIELDS.contains(fieldName)) {
+        if (GRAYLOG_FIELDS.contains(fieldName) || ILLUMINATE_FIELDS.contains(fieldName) || COLLECTOR_FIELDS.contains(fieldName)) {
             return;
         }
         long newValueSize = 0;
@@ -689,9 +727,67 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         return valueSize;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Returns the accumulated size of all message fields when the message is accounted, and {@code 0}
+     * when it is not (see {@link #isAccounted()}). Since this value is also stored as
+     * {@link #FIELD_GL2_ACCOUNTED_MESSAGE_SIZE}, an unaccounted message records an accounted size of
+     * {@code 0}.
+     */
     @Override
     public long getSize() {
-        return sizeCounter.getCount();
+        return isAccounted() ? sizeCounter.getCount() : 0L;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Returns the raw input size recorded in {@link #FIELD_GL2_INPUT_MESSAGE_SIZE} (set by the decoding
+     * layer from the original transport payload), falling back to {@link #getSize()} when no input size
+     * was recorded — e.g. for messages created in-process rather than decoded from an input.
+     */
+    @Override
+    @JsonIgnore
+    public long getInputMessageSize() {
+        final Object value = getField(Message.FIELD_GL2_INPUT_MESSAGE_SIZE);
+        return value instanceof Number n ? n.longValue() : getSize();
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The flag is fixed at construction (a message is created as excluded via the
+     * {@code MessageFactory.createUnaccountedMessage(...)} factory method) and is never toggled
+     * between accounted and unaccounted afterward.
+     */
+    @Override
+    @JsonIgnore
+    public boolean isAccounted() {
+        return accounted;
+    }
+
+    /**
+     * Checks whether the given field name denotes an internal field, i.e. Graylog metadata (fields starting with
+     * {@link #INTERNAL_FIELD_PREFIX}) or the message ID ({@link #FIELD_ID}). Internal fields are not meant to be
+     * presented to or processed as user data.
+     * <p>
+     * Note: this differs from the fields excluded from the message size accounting, which use an explicit list.
+     *
+     * @param name the field name
+     * @return {@code true} if the field is internal
+     */
+    public static boolean isInternalField(final String name) {
+        return (name != null && name.startsWith(INTERNAL_FIELD_PREFIX)) || FIELD_ID.equals(name);
+    }
+
+    /**
+     * @param name the field name
+     * @return {@code true} if the field is reserved and must not be set from outside (e.g. by inputs, extractors or
+     * static fields)
+     */
+    public static boolean isReservedNonSettableField(final String name) {
+        return RESERVED_FIELDS.contains(name) && !RESERVED_SETTABLE_FIELDS.contains(name);
     }
 
     public static boolean validKey(final String key) {
@@ -783,13 +879,17 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     }
 
     /**
-     * Assign the given stream to this message.
+     * Assign the given stream to this message. An already assigned instance of the same stream is replaced.
      *
      * @param stream the stream to route this message into
      */
     public void addStream(Stream stream) {
+        final boolean replaced = streams.removeIf(s -> s != stream && isSameStream(s, stream));
+        if (replaced) {
+            rebuildIndexSets();
+        }
         indexSets.add(stream.getIndexSet());
-        if (streams.add(stream)) {
+        if (streams.add(stream) && !replaced) {
             sizeCounter.inc(8);
             if (LOG.isTraceEnabled()) {
                 LOG.trace("[Message size update][{}] stream added: {}", getId(), sizeCounter.getCount());
@@ -815,13 +915,10 @@ public class Message implements Messages, Indexable, Acknowledgeable {
      * @return <tt>true</tt> if this message was assigned to the stream
      */
     public boolean removeStream(Stream stream) {
-        final boolean removed = streams.remove(stream);
+        final boolean removed = streams.removeIf(s -> isSameStream(s, stream));
 
         if (removed) {
-            indexSets.clear();
-            for (Stream s : streams) {
-                indexSets.add(s.getIndexSet());
-            }
+            rebuildIndexSets();
             sizeCounter.dec(8);
             if (LOG.isTraceEnabled()) {
                 LOG.trace("[Message size update][{}] stream removed: {}", getId(), sizeCounter.getCount());
@@ -829,6 +926,19 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         }
 
         return removed;
+    }
+
+    // Stream instances from different caches can differ in value (e.g. index set config) while representing the same stream.
+    private static boolean isSameStream(Stream a, Stream b) {
+        final String id = a.getId();
+        return id != null ? id.equals(b.getId()) : a.equals(b);
+    }
+
+    private void rebuildIndexSets() {
+        indexSets.clear();
+        for (Stream s : streams) {
+            indexSets.add(s.getIndexSet());
+        }
     }
 
     /**
@@ -1044,11 +1154,11 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     }
 
     public abstract static class Recording {
-        static Timing timing(String name, long elapsedNanos) {
+        private static Timing timing(String name, long elapsedNanos) {
             return new Timing(name, elapsedNanos);
         }
 
-        public static Message.Counter counter(String name, int counter) {
+        private static Message.Counter counter(String name, int counter) {
             return new Counter(name, counter);
         }
 

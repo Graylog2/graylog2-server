@@ -77,40 +77,48 @@ import EntityDataTable from './EntityDataTable';
 />;
 ```
 
-Change the width of a column, with the related column renderer. Column renderers can have
+Change the width of a column, with the related column renderer. All columns have a static width in px.
+The actions column fills the remaining space. When the columns need more space than available, the table can be scrolled horizontally.
+When a user resizes a column, only this column changes its width.
 
-- either a `width` defined as a fraction like `2`. If no width is defined we are using a default of `1`.
-  The width defines which fraction of the assignable space the column should claim. It works similar to the css attribute `flex`.
-  Optionally you can also define a `minWidth` to override the default min width for flexible columns. This can be helpful to ensure a column has enough space, no matter how large the table width is.
-- or a `staticWidth` in px. Useful when the cells contain e.g. just an icon and its width never changes.
+Column renderers can define a `staticWidth`:
 
-Please have a look at the default column renderers defined in the `EntityDataTable` since they contain predefined widths for common attributes like `description`.
+- in px. Please use the `COLUMN_WIDTH` constants for common column content like a title, description or username,
+  also when the attribute has a custom name, e.g. a `hostname` column which is the title of the entity.
+- or `'matchHeader'`, to use the rendered header width. Useful when the cells contain e.g. just an icon or a short status.
+
+If no `staticWidth` is defined, the column has a width of `DEFAULT_COL_WIDTH`. A width smaller than the header width will be increased to the header width.
+
+Please have a look at the default column renderers defined in the `EntityDataTable`, they already contain widths for common attributes
+like `title`, `name` and `description` and for date columns.
 
 ```js
 import EntityDataTable from './EntityDataTable';
+import { COLUMN_WIDTH } from './Constants';
 
 <EntityDataTable
-  columnPreferences={{ title: { status: 'show' }, description: { status: 'show' }, status: { status: 'show' } }}
+  columnPreferences={{ hostname: { status: 'show' }, summary: { status: 'show' }, status: { status: 'show' } }}
   data={[
     {
       id: 'row-id',
-      title: 'Entity title',
+      hostname: 'graylog-node-1',
       summary: 'Entity summary',
       status: 'status',
     },
   ]}
   columnDefinitions={[
-    { id: 'title', title: 'Title' },
+    { id: 'hostname', title: 'Hostname' },
     { id: 'summary', title: 'Summary' },
     { id: 'status', title: 'Status' },
   ]}
   columnRenderers={{
-    summary: {
-      width: 2,
-      minWidth: 200,
-    },
-    status: {
-      staticWidth: 100,
+    attributes: {
+      hostname: {
+        staticWidth: COLUMN_WIDTH.title,
+      },
+      status: {
+        staticWidth: 'matchHeader',
+      },
     },
   }}
 />;

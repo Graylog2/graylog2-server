@@ -42,6 +42,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.BooleanSupplier;
 
 class CommandLineProcessTest {
 
@@ -112,6 +113,64 @@ class CommandLineProcessTest {
                 .hasSize(1)
                 .contains("This message goes to stderr");
 
+    }
+
+    @Test
+    void testDestroyForcibly() throws Exception {
+        final URL bin = getClass().getResource("test-script-ignore-sigterm.sh");
+        assert bin != null;
+        final Path ignoreSigTermScript = Path.of(bin.toURI());
+        Files.setPosixFilePermissions(ignoreSigTermScript, PosixFilePermissions.fromString("rwxr-xr-x"));
+
+        final ProcessListener listener = new ProcessListener() {
+            @Override
+            public void onStart() {
+            }
+
+            @Override
+            public void onStdOut(String line) {
+            }
+
+            @Override
+            public void onStdErr(String line) {
+            }
+
+            @Override
+            public void onProcessComplete(int exitValue) {
+            }
+
+            @Override
+            public void onProcessFailed(ExecuteException e) {
+            }
+        };
+        final CommandLineProcess process = new CommandLineProcess(
+                ignoreSigTermScript,
+                Collections.emptyList(),
+                listener,
+                new Environment(Map.of())
+        );
+        process.start();
+
+        waitUntil(() -> process.processInfo().alive());
+
+        // the script ignores SIGTERM, so a regular stop() must not be able to kill it
+        process.stop();
+        Thread.sleep(500);
+        Assertions.assertThat(process.processInfo().alive()).isTrue();
+
+        // SIGKILL cannot be ignored, so destroyForcibly() must terminate the process
+        process.destroyForcibly();
+        waitUntil(() -> !process.processInfo().alive());
+        Assertions.assertThat(process.processInfo().alive()).isFalse();
+    }
+
+    private void waitUntil(BooleanSupplier condition) throws ExecutionException, RetryException {
+        RetryerBuilder.<Boolean>newBuilder()
+                .withWaitStrategy(WaitStrategies.fixedWait(100, TimeUnit.MILLISECONDS))
+                .withStopStrategy(StopStrategies.stopAfterAttempt(50))
+                .retryIfResult(Boolean.FALSE::equals)
+                .build()
+                .call(condition::getAsBoolean);
     }
 
     private void waitTillLogsAreAvailable(List<String> logs, int expectedLinesCount) throws ExecutionException, RetryException {

@@ -20,8 +20,7 @@ import styled, { css } from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { useStore } from 'stores/connect';
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
+import usePermissions from 'hooks/usePermissions';
 import { Col, Row } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import { NodesStore } from 'stores/nodes/NodesStore';
@@ -58,6 +57,22 @@ const ClusterInfo = () => {
   );
 };
 
+const LicenseGraphComponent = () => {
+  const licensePlugin = PluginStore.exports('license');
+  const { isPermitted } = usePermissions();
+
+  return React.createElement(
+    (isPermitted(['licenses:read']) && licensePlugin[0]?.TrafficGraphWithLicenseMetrics) || ClusterTrafficGraph,
+  );
+};
+
+const EnterpriseGraphComponent = () => {
+  const licensePlugin = PluginStore.exports('license');
+  const { isPermitted } = usePermissions();
+
+  return React.createElement((isPermitted(['licenses:read']) && licensePlugin[0]?.TrafficGraph) || ClusterTrafficGraph);
+};
+
 type Props = {
   layout?: 'default' | 'compact';
   children?: React.ReactNode;
@@ -65,16 +80,6 @@ type Props = {
 };
 
 const GraylogClusterOverview = ({ layout = 'default', children = null, showLicenseGraph = false }: Props) => {
-  const licensePlugin = PluginStore.exports('license');
-  const currentUser = useCurrentUser();
-
-  const LicenseGraphComponent =
-    (isPermitted(currentUser.permissions, ['licenses:read']) && licensePlugin[0]?.LicenseGraphWithMetrics) ||
-    ClusterTrafficGraph;
-  const EnterpriseGraphComponent =
-    (isPermitted(currentUser.permissions, ['licenses:read']) && licensePlugin[0]?.EnterpriseTrafficGraph) ||
-    ClusterTrafficGraph;
-
   if (layout === 'compact') {
     return (
       <GraphDaysContextProvider>

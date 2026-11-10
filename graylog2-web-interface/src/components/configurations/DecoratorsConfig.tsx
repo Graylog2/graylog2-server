@@ -23,8 +23,8 @@ import { SearchDecorators } from '@graylog/server-api';
 import { Button } from 'components/bootstrap';
 import { IfPermitted } from 'components/common';
 import Spinner from 'components/common/Spinner';
-import type { Stream } from 'stores/streams/StreamsStore';
-import { StreamsActions } from 'stores/streams/StreamsStore';
+import type { Stream } from 'logic/streams/types';
+import { fetchStreams } from 'api/streams';
 import UserNotification from 'util/UserNotification';
 import DecoratorList from 'views/components/messagelist/decorators/DecoratorList';
 import type { Decorator, DecoratorType } from 'views/components/messagelist/decorators/Types';
@@ -38,7 +38,7 @@ import formatDecorator from './decorators/FormatDecorator';
 const DecoratorsConfig = () => {
   const { data: streams, isLoading: streamsLoading } = useQuery<Array<Stream>>({
     queryKey: ['streamsMap'],
-    queryFn: () => StreamsActions.listStreams(),
+    queryFn: () => fetchStreams(),
   });
   const { data: types, isLoading: typesLoading } = useQuery<{ [key: string]: DecoratorType }>({
     queryKey: ['decorators', 'types'],

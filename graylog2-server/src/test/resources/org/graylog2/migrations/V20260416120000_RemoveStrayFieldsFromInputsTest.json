@@ -1,0 +1,65 @@
+{
+  "inputs": [
+    {
+      "_id": {
+        "$oid": "aaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "title": "Syslog UDP",
+      "type": "org.graylog2.inputs.syslog.udp.SyslogUDPInput",
+      "creator_user_id": "admin",
+      "global": true,
+      "configuration": {
+        "bind_address": "0.0.0.0",
+        "port": 5140
+      },
+      "created_at": {
+        "$date": "2026-01-01T00:00:00Z"
+      },
+      "fields": {
+        "_id": "aaaaaaaaaaaaaaaaaaaaaaaa",
+        "title": "Syslog UDP",
+        "type": "org.graylog2.inputs.syslog.udp.SyslogUDPInput",
+        "fields": {
+          "title": "Syslog UDP"
+        }
+      }
+    },
+    {
+      "_id": {
+        "$oid": "bbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "title": "GELF TCP",
+      "type": "org.graylog2.inputs.gelf.tcp.GELFTCPInput",
+      "creator_user_id": "admin",
+      "global": false,
+      "node_id": "node-1",
+      "configuration": {
+        "bind_address": "0.0.0.0",
+        "port": 12201
+      },
+      "created_at": {
+        "$date": "2026-01-02T00:00:00Z"
+      },
+      "fields": {
+        "_id": "bbbbbbbbbbbbbbbbbbbbbbbb",
+        "title": "GELF TCP"
+      }
+    },
+    {
+      "_id": {
+        "$oid": "cccccccccccccccccccccccc"
+      },
+      "title": "Beats",
+      "type": "org.graylog.plugins.beats.BeatsInput",
+      "creator_user_id": "admin",
+      "global": true,
+      "configuration": {
+        "bind_address": "0.0.0.0",
+        "port": 5044
+      },
+      "created_at": {
+        "$date": "2026-01-03T00:00:00Z"
+      }
+    }
+  ]
+}

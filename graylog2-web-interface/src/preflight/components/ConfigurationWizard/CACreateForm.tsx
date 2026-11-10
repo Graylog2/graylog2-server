@@ -19,6 +19,7 @@ import * as React from 'react';
 import { Formik, Form } from 'formik';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import useProductName from 'brand-customization/useProductName';
 import { FormikInput, Space } from 'preflight/components/common';
 import Button from 'components/bootstrap/Button';
 import fetch from 'logic/rest/FetchProvider';
@@ -31,6 +32,7 @@ type FormValues = {};
 const createCA = (caData: FormValues) => fetch('POST', qualifyUrl('/api/ca/create'), caData, false);
 
 const CACreateForm = () => {
+  const productName = useProductName();
   const queryClient = useQueryClient();
 
   const { mutateAsync: onCreateCA } = useMutation({
@@ -52,11 +54,11 @@ const CACreateForm = () => {
     <div>
       <p>
         Here you can quickly create a new certificate authority. All you need to do is to click on the &ldquo;Create
-        CA&rdquo; button. The CA should only be used to secure your Graylog data nodes.
+        CA&rdquo; button. The CA should only be used to secure your {productName} data nodes.
       </p>
       <Space h="xs" />
       <Formik
-        initialValues={{ organization: 'Graylog CA' }}
+        initialValues={{ organization: `${productName} CA` }}
         onSubmit={(formValues: FormValues) => onSubmit(formValues)}>
         {({ isSubmitting, isValid }) => (
           <Form>

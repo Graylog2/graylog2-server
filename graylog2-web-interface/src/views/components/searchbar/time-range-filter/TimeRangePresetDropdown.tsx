@@ -25,11 +25,12 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useUserDateTime from 'hooks/useUserDateTime';
 import { onInitializingTimerange } from 'views/components/TimerangeForForm';
 import type { TimeRange } from 'views/logic/queries/Query';
-import ToolsStore from 'stores/tools/ToolsStore';
+import { testNaturalDate } from 'api/tools';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 import { isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import type { BsSize } from 'components/bootstrap/types';
+import Routes from 'routing/Routes';
 
 type PresetOption = {
   eventKey?: TimeRange;
@@ -59,9 +60,7 @@ const relativeStartTimeForTimeRange = (timeRange: TimeRange) => {
     case 'absolute':
       return moment().diff(timeRange.from, 'seconds');
     case 'keyword':
-      return ToolsStore.testNaturalDate(timeRange.keyword, timeRange.timezone).then(({ from }) =>
-        moment().diff(from, 'seconds'),
-      );
+      return testNaturalDate(timeRange.keyword, timeRange.timezone).then(({ from }) => moment().diff(from, 'seconds'));
     default:
       throw Error("Time range type doesn't not exist");
   }
@@ -139,7 +138,7 @@ const TimeRangePresetDropdown = ({
   bsSize = 'small',
   header = undefined,
 }: Props) => {
-  const sendTelemetry = useSendTelemetry();
+  const sendTelemetry = useSendTelemetry('search-bar');
   const { formatTime } = useUserDateTime();
   const { options, setOptions: setDropdownOptions } = usePresetOptions(disabled, limitDuration);
 
@@ -150,7 +149,6 @@ const TimeRangePresetDropdown = ({
       }
 
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_TIMERANGE_PRESET_SELECTED, {
-        app_section: 'search-bar',
         app_action_value: 'timerange-preset-selector',
         event_details: { timerange },
       });
@@ -194,7 +192,7 @@ const TimeRangePresetDropdown = ({
       )}
       <IfPermitted permissions="clusterconfigentry:edit">
         <MenuItem divider />
-        <AdminMenuItem href="/system/configurations" target="_blank">
+        <AdminMenuItem href={Routes.SYSTEM.CONFIGURATIONS} target="_blank">
           Configure presets <ExternalIcon name="open_in_new" />
         </AdminMenuItem>
       </IfPermitted>

@@ -20,18 +20,17 @@ import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
-import { isPermitted } from 'util/PermissionsMixin';
 import EventNotificationFormContainer from 'components/event-notifications/event-notification-form/EventNotificationFormContainer';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
 import useHistory from 'routing/useHistory';
 import PageDescription from 'components/event-notifications/PageDescription';
 
 const CreateEventDefinitionPage = () => {
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const history = useHistory();
 
-  if (!isPermitted(currentUser.permissions, 'eventnotifications:create')) {
+  if (!isPermitted('eventnotifications:create')) {
     history.push(Routes.NOTFOUND);
   }
 

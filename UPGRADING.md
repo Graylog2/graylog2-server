@@ -1,97 +1,38 @@
-Upgrading to Graylog 7.1.x
+Upgrading to Graylog 7.3.x
 ==========================
-
-## User Session Termination
-
-All user sessions will be terminated when upgrading because the internal storage format for sessions has been changed.
-Users will have to log in again.
-
-## Teams Notification V2: Timezone Handling Change
-
-Previously, timestamps in Teams Notification V2 were always displayed in UTC regardless of the configured time zone.
-The **Time Zone** configuration field has been removed and the timestamp is now displayed in the viewer's local timezone
-using Microsoft Teams' native Adaptive Card `DATE()` and `TIME()` functions.
-For example, a timestamp will render as: **Thu, Mar 19, 2026 at 10:33 AM** (adjusted to the viewer's local timezone automatically).
-
-A migration automatically updates notifications that use the default adaptive card template. If you use a custom
-template, you will need to manually update it to use the `DATE()`/`TIME()` functions for timestamp fields.
-For example: `{{DATE(${event.timestamp_processing},SHORT)}} at {{TIME(${event.timestamp_processing})}}`.
-See the [Adaptive Card documentation](https://adaptivecards.io/explorer/TextBlock.html) for details on date/time formatting.
 
 ## Breaking Changes
 
-### Plugins: Removal of Perspective Plugin API
+### `stream_aware_field_types` Is Now Enabled by Default
 
-This release includes frontend plugin API changes related to perspectives.
+The `stream_aware_field_types` option now defaults to `true`. Graylog then tracks which fields are used in which streams,
+so field lists and field types match the streams you are searching in. We enabled it because more and more features rely on accurate, stream-specific field types.
 
-- The `perspectives` plugin export has been removed from core.
-- Plugin-provided `navigation` and `pageNavigation` entities no longer support the `perspective` key.
+If your `graylog.conf` still contains `stream_aware_field_types=false` from a previous version, the option stays disabled.
+If you don't configure it (e.g. Docker setups using only environment variables), it will be enabled after the upgrade.
 
-### Security Events UI Routes Consolidated into Alerts
+Enabling this option can decrease performance on systems with many streams and fields. To disable it, set
+`stream_aware_field_types = false` (or `GRAYLOG_STREAM_AWARE_FIELD_TYPES=false`).
 
-The dedicated Security Events UI routes under `/security/security-events/*` have been removed in favor of the
-existing Alerts routes.
+### Microsoft Defender Vulnerabilities Now Counted per Affected Application
 
-If you have bookmarks, links, or runbooks pointing to old routes, update them as follows:
+Assets imported from Microsoft Defender now store one vulnerability per CVE and affected application, instead of
+one per CVE. A CVE that affects several applications on the same machine (for example, Application A and Application B) is now
+counted once for each application, so the count more accurately reflects the number of vulnerable applications that
+need to be patched. This is consistent with how vulnerabilities from other scanner sources, such as CrowdStrike, are
+counted.
 
-| Old route                                               | New route                             |
-| ------------------------------------------------------- | ------------------------------------- |
-| `/security/security-events/alerts`                      | `/alerts`                             |
-| `/security/security-events/definitions`                 | `/alerts/definitions`                 |
-| `/security/security-events/notifications`               | `/alerts/notifications`               |
-| `/security/security-events/event-procedures/procedures` | `/alerts/event-procedures/procedures` |
-| `/security/security-events/event-procedures/steps`      | `/alerts/event-procedures/steps`      |
-| `/security/security-events/event-procedure-action`      | `/alerts/event-procedure-action`      |
+After the first Defender scanner sync following the upgrade, vulnerability counts may be higher than before in the
+following locations where they are displayed:
 
-### External Authentication Services: Changed Default User Time Zone
-
-The authentication backends for Active Directory, LDAP, OIDC, Okta, and SAML previously set the time zone for
-newly synchronized users to the value of the `root_timezone` config file setting. ("UTC" by default)
-
-Graylog 7.1 introduces a configurable "default user time zone" setting for all authentication backends.
-The default value is unset, meaning that the browser's time zone will be used by default.
-
-### Formatting Change of `aggregation_conditions` Field in Aggregation Events
-
-The `aggregation_conditions` map previously used keys with parentheses on the aggregation type. These needed to be
-escaped if they were used directly in Notification templates, e.g. `${aggregation_conditions.count\\(\\)}`,
-`${aggregation_conditions.sum\\(fieldname\\)}`. To avoid the need for escaping, their format has been modified to use
-underscores instead, e.g. `${aggregation_conditions.count}`, `${aggregation_conditions.sum_fieldname}`. Any
-existing notifications using the escaping of parentheses in explicit `aggregation_conditions` key names will need to
-be modified to instead use the underscore format.
-
-### Data Node in-place migration only available for OpenSearch versions above 2.0.0
-
-Due to bundling OpenSearch 3.5.0 with Data Node, in-place migrations are now only supported for OpenSearch versions
-higher than 2.0.0. If you are running a lower version, please upgrade your OpenSearch to the highest available 2.x or
-3.x version first.
-
-### Data Node role name change from `search` to `warm`
-
-Data Node now bundles OpenSearch 3.5.0. In OpenSearch 3.x the `search` role was explicitly renamed to `warm`. While Data
-Node will usually take care of this for you, please be aware that you need to adjust your roles accordingly if you
-override the default values using `node_role` in the Data Node configuration.
-
-### OpenSearch-Based Anomaly Detection Removed
-
-Anomaly detection now runs natively within Graylog, removing the dependency on OpenSearch's Anomaly Detection plugin. 
-This provides a more integrated experience with Alerts and Events, and does not require OpenSearch-specific
-configuration.
-
-As part of this change, existing OpenSearch-based anomaly detectors are no longer supported and will be
-automatically disabled during the upgrade to Graylog 7.1. A software migration will stop and remove all
-OpenSearch anomaly detectors and delete their associated event definitions.
-
-After the upgrade, previously configured detectors will remain visible in the Anomaly Detection Configuration page 
-for reference, showing their name and whether they were previously enabled. However, the full detector
-configuration (indices, feature fields, intervals, etc.) will not be displayed and detectors can no longer be
-edited or re-enabled. **Note: If you have custom anomaly detectors, you should note down their configuration 
-before upgrading.**
+- The Vulnerabilities column on the Assets page
+- The Vulnerabilities tab in the asset details
+- The `vulnerability_count_*` fields of messages in the Asset History stream
 
 ## Configuration File Changes
 
 | Option | Action    | Description |
-| ------ | --------- | ----------- |
+|--------|-----------|-------------|
 | `tbd`  | **added** |             |
 
 ## Java API Changes
@@ -102,6 +43,6 @@ before upgrading.**
 
 The following REST API changes have been made.
 
-| Endpoint          | Description                        |
-| ----------------- | ---------------------------------- |
-| `GET /<endpoint>` | Description of the endpoint change |
+| Endpoint             | Description                        |
+|----------------------|------------------------------------|
+| `GET /<endpoint>`    | Description of the endpoint change |

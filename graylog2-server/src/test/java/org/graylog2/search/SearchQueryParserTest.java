@@ -19,19 +19,25 @@ package org.graylog2.search;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
+import com.mongodb.MongoClientSettings;
 import org.apache.commons.lang3.tuple.Pair;
+import org.bson.BsonDocument;
 import org.bson.BsonValue;
+import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.Test;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 
@@ -40,6 +46,12 @@ import static org.graylog2.search.SearchQueryParser.DEFAULT_OPERATOR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SearchQueryParserTest {
+
+    private static final CodecRegistry CODEC_REGISTRY = MongoClientSettings.getDefaultCodecRegistry();
+
+    private String toJson(Bson bson) {
+        return bson.toBsonDocument(BsonDocument.class, CODEC_REGISTRY).toJson();
+    }
 
     @Test
     void explicitAllowedField() {
@@ -226,27 +238,29 @@ public class SearchQueryParserTest {
                 "date", SearchQueryField.create("created_at", SearchQueryField.Type.DATE));
         final SearchQueryParser parser = new SearchQueryParser("defaultfield", fields);
 
-        final SearchQueryParser.FieldValue v1 = parser.createFieldValue(fields.get("id").getFieldType(), "abc", false);
+        final SearchQueryField id = Objects.requireNonNull(fields.get("id"));
+        final SearchQueryParser.FieldValue v1 = parser.createFieldValue(id, "abc", false);
         assertThat(v1.getOperator()).isEqualTo(SearchQueryParser.DEFAULT_STRING_OPERATOR);
         assertThat(v1.getValue()).isEqualTo("abc");
         assertThat(v1.isNegate()).isFalse();
 
-        final SearchQueryParser.FieldValue v2 = parser.createFieldValue(fields.get("id").getFieldType(), "=abc", true);
+        final SearchQueryParser.FieldValue v2 = parser.createFieldValue(id, "=abc", true);
         assertThat(v2.getOperator()).isEqualTo(SearchQueryOperators.EQUALS);
         assertThat(v2.getValue()).isEqualTo("abc");
         assertThat(v2.isNegate()).isTrue();
 
-        final SearchQueryParser.FieldValue v3 = parser.createFieldValue(fields.get("date").getFieldType(), ">=2017-03-01", false);
+        final SearchQueryField date = Objects.requireNonNull(fields.get("date"));
+        final SearchQueryParser.FieldValue v3 = parser.createFieldValue(date, ">=2017-03-01", false);
         assertThat(v3.getOperator()).isEqualTo(SearchQueryOperators.GREATER_EQUALS);
         assertThat(v3.getValue()).isEqualTo(new DateTime(2017, 3, 1, 0, 0, DateTimeZone.UTC));
         assertThat(v3.isNegate()).isFalse();
 
-        final SearchQueryParser.FieldValue v4 = parser.createFieldValue(fields.get("date").getFieldType(), ">=2017-03-01 12:12:12", false);
+        final SearchQueryParser.FieldValue v4 = parser.createFieldValue(date, ">=2017-03-01 12:12:12", false);
         assertThat(v4.getOperator()).isEqualTo(SearchQueryOperators.GREATER_EQUALS);
         assertThat(v4.getValue()).isEqualTo(new DateTime(2017, 3, 1, 12, 12, 12, DateTimeZone.UTC));
         assertThat(v4.isNegate()).isFalse();
 
-        final SearchQueryParser.FieldValue v5 = parser.createFieldValue(fields.get("date").getFieldType(), "\">=2017-03-01 12:12:12\"", false);
+        final SearchQueryParser.FieldValue v5 = parser.createFieldValue(date, "\">=2017-03-01 12:12:12\"", false);
         assertThat(v5.getOperator()).isEqualTo(SearchQueryOperators.GREATER_EQUALS);
         assertThat(v5.getValue()).isEqualTo(new DateTime(2017, 3, 1, 12, 12, 12, DateTimeZone.UTC));
         assertThat(v5.isNegate()).isFalse();
@@ -367,5 +381,49 @@ public class SearchQueryParserTest {
                         false)
                 );
 
+    }
+
+    @Test
+    void unqualifiedSearchUsesDefaultFieldBsonFilterCreator() {
+        final List<EntityAttribute> attributes = List.of(
+                EntityAttribute.builder().id("hostname").title("Hostname")
+                        .dbField("non_identifying_attributes")
+                        .bsonFilterCreator(AttributeFieldFilters.attributeArray("host.name"))
+                        .sortable(true).searchable(true).build(),
+                EntityAttribute.builder().id("instance_uid").title("Instance UID")
+                        .sortable(true).searchable(true).build()
+        );
+
+        final SearchQueryParser parser = new SearchQueryParser("hostname", attributes);
+
+        // Unqualified search: bare term without field prefix
+        final SearchQuery searchQuery = parser.parse("server01");
+        final List<Bson> filters = searchQuery.toBsonFilterList();
+
+        assertThat(filters).hasSize(1);
+        final String json = toJson(filters.getFirst());
+
+        // Must use $elemMatch on the attribute array, not a plain regex on "hostname"
+        assertThat(json).contains("$elemMatch");
+        assertThat(json).contains("non_identifying_attributes");
+        assertThat(json).contains("\"key\": \"host.name\"");
+        assertThat(json).contains("$regularExpression");
+    }
+
+    @Test
+    void qualifiedAndUnqualifiedSearchProduceSameFilterForDefaultField() {
+        final List<EntityAttribute> attributes = List.of(
+                EntityAttribute.builder().id("hostname").title("Hostname")
+                        .dbField("non_identifying_attributes")
+                        .bsonFilterCreator(AttributeFieldFilters.attributeArray("host.name"))
+                        .sortable(true).searchable(true).build()
+        );
+
+        final SearchQueryParser parser = new SearchQueryParser("hostname", attributes);
+
+        final String unqualifiedJson = toJson(parser.parse("server01").toBsonFilterList().getFirst());
+        final String qualifiedJson = toJson(parser.parse("hostname:server01").toBsonFilterList().getFirst());
+
+        assertThat(unqualifiedJson).isEqualTo(qualifiedJson);
     }
 }

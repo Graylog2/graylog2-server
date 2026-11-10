@@ -16,75 +16,45 @@
  */
 package org.graylog.aws;
 
-import com.google.common.base.Splitter;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
+import org.graylog2.utilities.ProxyConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.http.apache.ApacheHttpClient;
 import software.amazon.awssdk.http.apache.ProxyConfiguration;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.List;
-
 @Singleton
 public class AWSProxyConfigurationProvider implements Provider<ApacheHttpClient.Builder> {
     private static final Logger LOG = LoggerFactory.getLogger(AWSProxyConfigurationProvider.class);
-    private final URI httpProxyUri;
+    private final ProxyConfig proxyConfig;
 
     @Inject
-    public AWSProxyConfigurationProvider(@Named("http_proxy_uri") @Nullable URI httpProxyUri) {
-        this.httpProxyUri = httpProxyUri;
+    public AWSProxyConfigurationProvider(@Named("http_proxy_uri") @Nullable ProxyConfig proxyConfig) {
+        this.proxyConfig = proxyConfig;
     }
 
     @Override
     public ApacheHttpClient.Builder get() {
         ApacheHttpClient.Builder httpClientBuilder = ApacheHttpClient.builder();
-        if (httpProxyUri == null) {
+        if (proxyConfig == null) {
             LOG.debug("AWS proxy disabled: http_proxy_uri not set");
             return httpClientBuilder;
         }
 
-        httpClientBuilder.proxyConfiguration(buildProxyConfiguration(httpProxyUri));
-        LOG.debug("AWS proxy enabled: {}:{}", httpProxyUri.getHost(), httpProxyUri.getPort());
+        httpClientBuilder.proxyConfiguration(buildProxyConfiguration(proxyConfig));
+        LOG.debug("AWS proxy enabled: {}:{}", proxyConfig.host(), proxyConfig.port());
         return httpClientBuilder;
     }
 
-    static ProxyConfiguration buildProxyConfiguration(URI proxyUri) {
-        ProxyConfiguration.Builder proxyConfigBuilder = ProxyConfiguration.builder();
-
-        if (proxyUri.getUserInfo() != null && !proxyUri.getUserInfo().isEmpty()) {
-            final List<String> credentials = Splitter.on(":")
-                    .limit(2)
-                    .splitToList(proxyUri.getUserInfo());
-
-            if (credentials.size() == 2) {
-                proxyConfigBuilder.username(credentials.get(0));
-                proxyConfigBuilder.password(credentials.get(1));
-            }
-
-            try {
-                URI cleanProxyUri = new URI(
-                        proxyUri.getScheme(),
-                        null,
-                        proxyUri.getHost(),
-                        proxyUri.getPort(),
-                        proxyUri.getPath(),
-                        proxyUri.getQuery(),
-                        proxyUri.getFragment()
-                );
-                proxyConfigBuilder.endpoint(cleanProxyUri);
-            } catch (URISyntaxException e) {
-                proxyConfigBuilder.endpoint(proxyUri);
-            }
-        } else {
-            proxyConfigBuilder.endpoint(proxyUri);
-        }
-
+    static ProxyConfiguration buildProxyConfiguration(ProxyConfig proxyConfig) {
+        final ProxyConfiguration.Builder proxyConfigBuilder = ProxyConfiguration.builder()
+                .endpoint(proxyConfig.endpoint());
+        proxyConfig.credentials().ifPresent(credentials ->
+                proxyConfigBuilder.username(credentials.username()).password(credentials.password()));
         return proxyConfigBuilder.build();
     }
 }

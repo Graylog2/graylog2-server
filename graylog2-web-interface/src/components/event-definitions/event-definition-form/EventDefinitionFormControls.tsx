@@ -16,10 +16,18 @@
  */
 
 import React from 'react';
+import styled from 'styled-components';
 
-import { ModalSubmit } from 'components/common';
+import { ModalSubmit, Spinner } from 'components/common';
 import { Button } from 'components/bootstrap';
 import type { EventDefinitionFormControlsProps } from 'components/event-definitions/event-definitions-types';
+
+const SubmitTextRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: ${({ theme }) => theme.spacings.xs};
+`;
 
 const EventDefinitionFormControls = ({
   action,
@@ -29,13 +37,32 @@ const EventDefinitionFormControls = ({
   onOpenPrevPage,
   onSubmit,
   steps,
+  isSubmitting = false,
+  disabledSubmit = false,
 }: EventDefinitionFormControlsProps) => {
+  const isEditing = action === 'edit';
+
+  // eslint-disable-next-line no-nested-ternary
+  const submitText = isSubmitting
+    ? isEditing
+      ? 'Updating...'
+      : 'Creating...'
+    : isEditing
+      ? 'Update Event Definition'
+      : 'Create Event Definition';
+
   if (activeStepIndex === steps.length - 1) {
     return (
       <ModalSubmit
         onCancel={onCancel}
         onSubmit={onSubmit}
-        submitButtonText={`${action === 'edit' ? 'Update' : 'Create'} event definition`}
+        disabledSubmit={disabledSubmit || isSubmitting}
+        submitButtonText={
+          <SubmitTextRow>
+            {isSubmitting && <Spinner text="" />}
+            {submitText}
+          </SubmitTextRow>
+        }
       />
     );
   }

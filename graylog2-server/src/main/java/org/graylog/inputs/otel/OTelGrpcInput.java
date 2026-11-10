@@ -24,6 +24,7 @@ import org.graylog.inputs.otel.transport.OTelGrpcTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
@@ -41,6 +42,12 @@ public class OTelGrpcInput extends MessageInput {
                          Descriptor descriptor,
                          ServerStatus serverStatus) {
         super(metricRegistry, configuration, transport, localRegistry, codec, config, descriptor, serverStatus);
+    }
+
+    @Override
+    public void checkConfiguration() throws ConfigurationException {
+        super.checkConfiguration();
+        OTelGrpcTransport.checkTlsConfiguration(getConfiguration());
     }
 
     @FactoryClass

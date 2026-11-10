@@ -60,6 +60,8 @@ public class DataNodeHousekeepingPeriodical extends Periodical {
                     .addType(Notification.Type.DATA_NODE_VERSION_MISMATCH)
                     .addSeverity(Notification.Severity.NORMAL);
             notificationService.publishIfFirst(notification);
+        } else {
+            notificationService.fixed(Notification.Type.DATA_NODE_VERSION_MISMATCH);
         }
 
     }
