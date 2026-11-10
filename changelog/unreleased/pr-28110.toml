@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix index rotation for the collector system logs index set when the `collectors` feature flag is disabled."
+
+pulls = ["28110"]
