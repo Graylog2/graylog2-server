@@ -28,6 +28,7 @@ const MANIFESTS_PATH = path.resolve(ROOT_PATH, 'manifests');
 
 const vendorModules = require('./vendor.modules');
 const supportedBrowsers = require('./supportedBrowsers');
+const { createDevServerProxy } = require('./webpack/devServerProxy');
 
 const TARGET = process.env.npm_lifecycle_event || 'build';
 process.env.BABEL_ENV = TARGET;
@@ -98,8 +99,6 @@ const webpackConfig = {
 // eslint-disable-next-line import/no-mutable-exports
 let defaultExport = webpackConfig;
 
-const urlHeader = 'X-Graylog-Server-URL';
-
 if (TARGET === 'start') {
   defaultExport = merge(webpackConfig, {
     devServer: {
@@ -109,25 +108,7 @@ if (TARGET === 'start') {
       historyApiFallback: {
         disableDotRule: true,
       },
-      proxy: [
-        {
-          context: ['/api', '/config.js', '/sso', '/.well-known', '/v1/opamp'],
-          target: apiUrl,
-          ws: true,
-          // Skip proxying for /api-browser - it's a frontend route, not an API endpoint
-          bypass: (req) => (req.path.startsWith('/api-browser') ? req.path : null),
-          onProxyReq: (proxyReq, req) => {
-            if (!proxyReq.getHeader(urlHeader)?.trim()) {
-              proxyReq.setHeader(urlHeader, `${req.protocol}://${req.get('host')}`);
-            }
-          },
-          onProxyReqWs: (proxyReq, req) => {
-            if (!proxyReq.getHeader(urlHeader)?.trim()) {
-              proxyReq.setHeader(urlHeader, req.headers.origin || `http://${req.headers.host}`);
-            }
-          },
-        },
-      ],
+      proxy: createDevServerProxy(apiUrl),
     },
   });
 }
