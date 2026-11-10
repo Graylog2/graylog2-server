@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix start page picker in user settings ignoring dashboards, streams and searches the user can read through roles."
+
+issues = ["27874"]
+pulls = []

@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import type * as Immutable from 'immutable';
-import { useState, useEffect } from 'react';
 import { Field, useFormikContext } from 'formik';
+import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
 
 import { getValuesFromGRN } from 'logic/permissions/GRN';
@@ -30,7 +30,7 @@ import useDashboards from 'views/components/dashboard/hooks/useDashboards';
 import useStreams from 'components/streams/hooks/useStreams';
 import useSavedSearches from 'views/hooks/useSavedSearches';
 import type { SettingsFormValues } from 'components/users/UserEdit/SettingsSection';
-import { hasAdminPermission } from 'util/PermissionsMixin';
+import { hasAdminPermission, isAnyPermitted, isPermitted } from 'util/PermissionsMixin';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 
 const Container = styled.div`
@@ -68,6 +68,15 @@ const UNLIMITED_ENTITY_SHARE_REQ = { page: 1, perPage: 10000, query: '' };
 
 const grnId = (grn) => getValuesFromGRN(grn).id;
 const _grnOptionFormatter = ({ id, title }: SharedEntity): Option => ({ value: grnId(id), label: title });
+const shareEntityTypes = ['dashboard', 'stream', 'search'];
+const loadUserShares = (userId: string, entityType: string) =>
+  EntityShareDomain.loadUserSharesPaginated(userId, {
+    ...UNLIMITED_ENTITY_SHARE_REQ,
+    additionalQueries: { entity_type: entityType },
+  }).then(({ list }) => list.map(_grnOptionFormatter).toArray());
+const mergeOptions = (...lists: Array<Option[]>) => [
+  ...new Map(lists.flat().map((option) => [option.value, option])).values(),
+];
 const typeOptions = [
   { value: 'dashboard', label: 'Dashboard' },
   { value: 'stream', label: 'Stream' },
@@ -79,66 +88,52 @@ const useStartPageOptions = (userId, permissions) => {
     values: { startpage },
   } = useFormikContext<SettingsFormValues>();
   const selectedUserIsAdmin = hasAdminPermission(permissions);
-  const [userDashboards, setUserDashboards] = useState<Option[]>([]);
-  const [userStreams, setUserStreams] = useState<Option[]>([]);
-  const [userSearches, setUserSearches] = useState<Option[]>([]);
-  const [isLoadingUserEntities, setIsLoadingUserEntities] = useState(false);
+  const { data: userShares, isLoading: isLoadingUserShares } = useQuery({
+    queryKey: ['users', userId, 'startpage', 'shares'],
+    queryFn: () => Promise.all(shareEntityTypes.map((entityType) => loadUserShares(userId, entityType))),
+    enabled: !selectedUserIsAdmin,
+  });
+  const [userDashboards, userStreams, userSearches] = userShares ?? [[], [], []];
 
-  const { data: allDashboards, isInitialLoading: isLoadingAllDashboards } = useDashboards(
-    { query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' }, scope: 'read' },
-    { enabled: selectedUserIsAdmin },
-  );
-  const { data: allStreams, isInitialLoading: isLoadingAllStreams } = useStreams(
-    { query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } },
-    { enabled: selectedUserIsAdmin },
-  );
-  const { data: allSearches, isInitialLoading: isLoadingAllSearches } = useSavedSearches(
-    { query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } },
-    { enabled: selectedUserIsAdmin },
-  );
-  const allDashboardsOptions = (allDashboards?.list ?? []).map(({ id, title }) => ({ value: id, label: title }));
-  const allStreamsOptions = (allStreams?.list ?? []).map(({ id, title }) => ({ value: id, label: title }));
-  const allSearchesOptions = (allSearches?.list ?? []).map(({ id, title }) => ({ value: id, label: title }));
-
-  useEffect(() => {
-    if (!selectedUserIsAdmin) {
-      setIsLoadingUserEntities(true);
-
-      EntityShareDomain.loadUserSharesPaginated(userId, {
-        ...UNLIMITED_ENTITY_SHARE_REQ,
-        additionalQueries: { entity_type: 'dashboard' },
-      })
-        .then(({ list }) => setUserDashboards(list.map(_grnOptionFormatter).toArray()))
-        .then(() =>
-          EntityShareDomain.loadUserSharesPaginated(userId, {
-            ...UNLIMITED_ENTITY_SHARE_REQ,
-            additionalQueries: { entity_type: 'stream' },
-          }).then(({ list }) => {
-            setUserStreams(list.map(_grnOptionFormatter).toArray());
-          }),
-        )
-        .then(() =>
-          EntityShareDomain.loadUserSharesPaginated(userId, {
-            ...UNLIMITED_ENTITY_SHARE_REQ,
-            additionalQueries: { entity_type: 'search' },
-          }).then(({ list }) => {
-            setIsLoadingUserEntities(false);
-            setUserSearches(list.map(_grnOptionFormatter).toArray());
-          }),
-        );
-    }
-  }, [selectedUserIsAdmin, userId]);
+  const { data: allDashboards, isInitialLoading: isLoadingAllDashboards } = useDashboards({
+    query: '',
+    page: 1,
+    pageSize: 0,
+    sort: { direction: 'asc', attributeId: 'title' },
+    scope: 'read',
+  });
+  const { data: allStreams, isInitialLoading: isLoadingAllStreams } = useStreams({
+    query: '',
+    page: 1,
+    pageSize: 0,
+    sort: { direction: 'asc', attributeId: 'title' },
+  });
+  const { data: allSearches, isInitialLoading: isLoadingAllSearches } = useSavedSearches({
+    query: '',
+    page: 1,
+    pageSize: 0,
+    sort: { direction: 'asc', attributeId: 'title' },
+  });
+  const permittedDashboardsOptions = (allDashboards?.list ?? [])
+    .filter(({ id }) => isAnyPermitted(permissions, [`view:read:${id}`, `dashboards:read:${id}`]))
+    .map(({ id, title }) => ({ value: id, label: title }));
+  const permittedStreamsOptions = (allStreams?.list ?? [])
+    .filter(({ id }) => isPermitted(permissions, `streams:read:${id}`))
+    .map(({ id, title }) => ({ value: id, label: title }));
+  const permittedSearchesOptions = (allSearches?.list ?? [])
+    .filter(({ id }) => isPermitted(permissions, `view:read:${id}`))
+    .map(({ id, title }) => ({ value: id, label: title }));
 
   const prepareOptions = () => {
     if (!startpage) return [];
 
     switch (startpage?.type) {
       case 'dashboard':
-        return [...userDashboards, ...allDashboardsOptions];
+        return mergeOptions(userDashboards, permittedDashboardsOptions);
       case 'search':
-        return [{ value: 'default', label: 'New Search' }, ...userSearches, ...allSearchesOptions];
+        return mergeOptions([{ value: 'default', label: 'New Search' }], userSearches, permittedSearchesOptions);
       case 'stream':
-        return [...userStreams, ...allStreamsOptions];
+        return mergeOptions(userStreams, permittedStreamsOptions);
       default:
         return [];
     }
@@ -146,7 +141,7 @@ const useStartPageOptions = (userId, permissions) => {
 
   return {
     options: prepareOptions(),
-    isLoading: isLoadingUserEntities || isLoadingAllDashboards || isLoadingAllSearches || isLoadingAllStreams,
+    isLoading: isLoadingUserShares || isLoadingAllDashboards || isLoadingAllSearches || isLoadingAllStreams,
   };
 };
 
