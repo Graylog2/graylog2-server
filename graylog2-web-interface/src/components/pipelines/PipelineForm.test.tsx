@@ -51,7 +51,7 @@ const replaceValue = async (label: RegExp, value: string) => {
 
 describe('PipelineForm', () => {
   beforeEach(() => {
-    asMock(usePermissions).mockReturnValue({ isPermitted: () => true, isAnyPermitted: () => true, isAdmin: false });
+    asMock(usePermissions).mockReturnValue({ isPermitted: () => true, isAnyPermitted: () => true });
   });
 
   it('keeps stages added after the form was first rendered', async () => {

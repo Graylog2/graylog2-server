@@ -39,7 +39,7 @@ const openForm = async () => userEvent.click(await screen.findByRole('button', {
 
 describe('StageForm', () => {
   beforeEach(() => {
-    asMock(usePermissions).mockReturnValue({ isPermitted: () => true, isAnyPermitted: () => true, isAdmin: false });
+    asMock(usePermissions).mockReturnValue({ isPermitted: () => true, isAnyPermitted: () => true });
     asMock(useRules).mockReturnValue({ data: [], isLoading: false } as unknown as ReturnType<typeof useRules>);
   });
 
