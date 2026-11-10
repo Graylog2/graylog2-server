@@ -38,10 +38,11 @@ export const useColumnRenderers = (fieldTypes: FieldTypes) => {
         stream_titles: {
           renderCell: (streams: Array<string>) => (
             <ExpandableCellList
-              items={streams}
-              renderItem={(title) => title}
-              itemKey={(title) => title}
-              itemTitle={(title) => title}
+              items={streams.map((title, index) => ({ title, index }))}
+              renderItem={({ title }) => title}
+              // Stream titles aren't unique.
+              itemKey={({ title, index }) => `${title}-${index}`}
+              itemTitle={({ title }) => title}
             />
           ),
         },

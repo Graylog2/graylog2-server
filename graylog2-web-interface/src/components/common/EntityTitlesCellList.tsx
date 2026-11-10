@@ -41,7 +41,7 @@ type Props = {
  * Lists entities by their titles in an entity data table cell, linked to their pages.
  */
 const EntityTitlesCellList = ({ entityIds, entityType, entityRoute }: Props) => {
-  const { titlesById, notPermittedIds, isInitialLoading } = useEntityTitles(
+  const { titlesById, notPermittedIds, isInitialLoading, isFetching, isError } = useEntityTitles(
     entityIds.map((id) => ({ id, type: entityType })),
   );
 
@@ -58,7 +58,12 @@ const EntityTitlesCellList = ({ entityIds, entityType, entityRoute }: Props) => 
       return <i title="Missing permissions">{id}</i>;
     }
 
-    return title ? <Link to={entityRoute(id)}>{title}</Link> : `${id} (deleted)`;
+    if (title) {
+      return <Link to={entityRoute(id)}>{title}</Link>;
+    }
+
+    // A missing title only means the entity is deleted once the titles request settled.
+    return isFetching || isError ? id : `${id} (deleted)`;
   };
 
   return (
