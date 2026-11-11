@@ -53,7 +53,6 @@ import type { ParameterMap } from 'views/logic/parameters/Parameter';
 import type Parameter from 'views/logic/parameters/Parameter';
 import type { JobIds, StartJobOptions } from 'views/stores/SearchJobs';
 import type Search from 'views/logic/search/Search';
-import type View from 'views/logic/views/View';
 import { setParameters, setView } from 'views/logic/slices/viewSlice';
 import createSearch from 'views/logic/slices/createSearch';
 import type { WidgetMapping } from 'views/logic/views/types';
@@ -238,19 +237,20 @@ const isMissingStreamPermission = (error: FetchError) => error.additional?.body?
 
 const SUPERSEDED = 'superseded';
 
-const searchReplacedMeanwhile = (getState: () => RootState, search: Search, view: View) => {
+const searchReplacedMeanwhile = (getState: () => RootState, search: Search, widgetMapping: WidgetMapping) => {
   const currentView = selectView(getState());
 
   if (currentView.search.id === search.id) {
     return undefined;
   }
 
-  return Immutable.is(currentView.widgetMapping, view.widgetMapping) ? currentView.search : SUPERSEDED;
+  return Immutable.is(currentView.widgetMapping, widgetMapping) ? currentView.search : SUPERSEDED;
 };
 
 const replaceInaccessibleSearch = async (
   error: FetchError,
   search: Search,
+  executedWidgetMapping: WidgetMapping,
   dispatch: ViewsDispatch,
   getState: () => RootState,
 ): Promise<Search | typeof SUPERSEDED | undefined> => {
@@ -270,19 +270,25 @@ const replaceInaccessibleSearch = async (
     return undefined;
   }
 
-  const replacedBeforeCopy = searchReplacedMeanwhile(getState, search, view);
+  const replacedBeforeCopy = searchReplacedMeanwhile(getState, search, executedWidgetMapping);
 
   if (replacedBeforeCopy) {
     return replacedBeforeCopy;
   }
 
-  const newSearch = await createSearch(search.toBuilder().newId().build()).catch(() => undefined);
+  const newSearch = await createSearch(search.toBuilder().newId().build()).catch((copyError) => {
+    if (copyError instanceof FetchError && isMissingStreamPermission(copyError)) {
+      throw copyError;
+    }
+
+    return undefined;
+  });
 
   if (!newSearch) {
     return undefined;
   }
 
-  const replacedWhileCopying = searchReplacedMeanwhile(getState, search, view);
+  const replacedWhileCopying = searchReplacedMeanwhile(getState, search, executedWidgetMapping);
 
   if (replacedWhileCopying) {
     return replacedWhileCopying;
@@ -332,6 +338,7 @@ export const executeWithExecutionState =
   }) =>
   async (dispatch: ViewsDispatch, getState: () => RootState) => {
     dispatch(loading());
+    const executedWidgetMapping = selectRootView(getState())?.view?.widgetMapping;
 
     return dispatch(parseSearch(search, searchExecutors.parse))
       .then(() => {
@@ -344,7 +351,16 @@ export const executeWithExecutionState =
               throw error;
             }
 
-            const newSearch = await replaceInaccessibleSearch(error, search, dispatch, getState);
+            const newSearch = await replaceInaccessibleSearch(
+              error,
+              search,
+              executedWidgetMapping,
+              dispatch,
+              getState,
+            ).catch((copyError) => {
+              reportSearchNotAccessible(copyError);
+              throw copyError;
+            });
 
             if (!newSearch) {
               reportSearchNotAccessible(error);

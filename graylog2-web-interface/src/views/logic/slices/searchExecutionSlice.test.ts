@@ -237,6 +237,37 @@ describe('executeWithExecutionState', () => {
     expect(UserNotification.warning).not.toHaveBeenCalled();
   });
 
+  it('leaves executing to a local edit made before the search turned out to be inaccessible', async () => {
+    savedViewWithSearch('newer-search-id');
+    const executeJobResult = jest.fn();
+    const editedView = view
+      .toBuilder()
+      .search(createSearch({ searchId: 'edited-search-id' }).search)
+      .state(
+        view.state.update('query-id-1', (viewState) =>
+          viewState
+            .toBuilder()
+            .widgetMapping(Immutable.Map({ 'widget-id': Immutable.Set(['new-search-type-id']) }))
+            .build(),
+        ),
+      )
+      .build();
+    const sharedState = createState();
+    const startJob = jest.fn(async () => {
+      sharedState.view = { ...sharedState.view, view: editedView };
+
+      throw forbidden();
+    });
+
+    await execute({ startJob, executeJobResult, sharedState }).result;
+
+    expect(sharedState.view.view).toBe(editedView);
+    expect(createBackendSearch).not.toHaveBeenCalled();
+    expect(startJob).toHaveBeenCalledTimes(1);
+    expect(executeJobResult).not.toHaveBeenCalled();
+    expect(ErrorsActions.report).not.toHaveBeenCalled();
+  });
+
   it('continues with the search another execution put into the view without copying it again', async () => {
     const copiedView = view
       .toBuilder()
@@ -265,6 +296,17 @@ describe('executeWithExecutionState', () => {
     await expect(execute({ startJob: jest.fn(() => Promise.reject(error)) }).result).rejects.toBe(error);
 
     expect(ErrorsActions.report).toHaveBeenCalledWith(createFromFetchError(error));
+  });
+
+  it('reports missing stream permissions of the copy instead of the original error', async () => {
+    savedViewWithSearch('newer-search-id');
+    const copyError = new FetchError('Forbidden', 403, { type: 'MissingStreamPermission', streams: ['stream-id'] });
+    asMock(createBackendSearch).mockRejectedValue(copyError);
+
+    await expect(execute({ startJob: jest.fn(() => Promise.reject(forbidden())) }).result).rejects.toBe(copyError);
+
+    expect(ErrorsActions.report).toHaveBeenCalledTimes(1);
+    expect(ErrorsActions.report).toHaveBeenCalledWith(createFromFetchError(copyError));
   });
 
   it('reports permission error when the view is no longer accessible', async () => {
