@@ -21,23 +21,22 @@ import View from 'views/logic/views/View';
 import ViewState from 'views/logic/views/ViewState';
 import UpdateSearchForWidgets from 'views/logic/views/UpdateSearchForWidgets';
 import type Widget from 'views/logic/widgets/Widget';
-import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
 import createSearch from 'views/logic/slices/createSearch';
 
 export const STANDALONE_QUERY_ID = 'standalone-query';
 
-// A dashboard view, so the widget's own query, time range and streams are used instead of the query's.
-const createStandaloneView = async (widget: Widget, title: string, searchExecutors: SearchExecutors) => {
+// A dashboard view, so each widget's own query, time range and streams are used instead of the query's.
+const createStandaloneView = async (
+  widgets: Array<Widget>,
+  titles: { [widgetId: string]: string },
+  storeSearch: (search: Search) => Promise<Search> = createSearch,
+) => {
   const query = Query.builder()
     .id(STANDALONE_QUERY_ID)
     .query(createElasticsearchQueryString())
-    .timerange(widget.timerange ?? DEFAULT_TIMERANGE)
+    .timerange(DEFAULT_TIMERANGE)
     .build();
-  const state = ViewState.create()
-    .toBuilder()
-    .widgets([widget])
-    .titles({ widget: { [widget.id]: title } })
-    .build();
+  const state = ViewState.create().toBuilder().widgets(widgets).titles({ widget: titles }).build();
   const view = UpdateSearchForWidgets(
     View.create()
       .toBuilder()
@@ -47,7 +46,7 @@ const createStandaloneView = async (widget: Widget, title: string, searchExecuto
       .search(Search.create().toBuilder().queries([query]).build())
       .build(),
   );
-  const search = await (searchExecutors.createSearch ?? createSearch)(view.search);
+  const search = await storeSearch(view.search);
 
   return view.toBuilder().search(search).build();
 };

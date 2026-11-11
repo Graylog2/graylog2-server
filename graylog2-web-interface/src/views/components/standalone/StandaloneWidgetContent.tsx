@@ -23,14 +23,12 @@ import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { updateWidgetConfig } from 'views/logic/slices/widgetActions';
 import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
-import type Widget from 'views/logic/widgets/Widget';
-import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
 import WidgetColorContext from 'views/components/widgets/WidgetColorContext';
 import WidgetErrorBoundary from 'views/components/widgets/WidgetErrorBoundary';
 import WidgetVisualization from 'views/components/widgets/WidgetVisualization';
 
-import StandaloneWidgetProvider from './StandaloneWidgetProvider';
-import RenderWhenVisible from './RenderWhenVisible';
+import StandaloneWidgetContextProvider from './StandaloneWidgetContextProvider';
+import useWidgetTitle from './useWidgetTitle';
 
 const noop = () => {};
 
@@ -39,7 +37,7 @@ type VisualizationProps = {
   editing: boolean;
 };
 
-export const StandaloneWidgetVisualization = ({ title, editing }: VisualizationProps) => {
+export const WidgetVisualizationFromContext = ({ title, editing }: VisualizationProps) => {
   const widget = useContext(WidgetContext);
   const fieldTypes = useContext(FieldTypesContext);
   const queryId = useActiveQueryId();
@@ -64,31 +62,27 @@ export const StandaloneWidgetVisualization = ({ title, editing }: VisualizationP
   );
 };
 
+const VisualizationWithTitle = () => {
+  const widget = useContext(WidgetContext);
+  const title = useWidgetTitle(widget);
+
+  return <WidgetVisualizationFromContext title={title} editing={false} />;
+};
+
 type Props = {
-  widget: Widget;
-  title: string;
-  /**
-   * Renders the widget and runs its search only once it comes close to the viewport, e.g. for long lists of widgets.
-   * Its container needs a height until then.
-   */
-  lazy?: boolean;
-  /** Runs the widget's search, e.g. to show stored results instead. Must be stable across renders. */
-  searchExecutors?: SearchExecutors;
+  widgetId: string;
 };
 
 /**
- * Shows a widget with its results outside of a search or dashboard.
+ * Shows the results of a widget of the enclosing `StandaloneWidgetGroup`, without a frame.
+ * `StandaloneWidgetCard` adds its title and time range.
  */
-const StandaloneWidget = ({ widget, title, lazy = false, searchExecutors = undefined }: Props) => {
-  const content = (
-    <StandaloneWidgetProvider widget={widget} title={title} searchExecutors={searchExecutors}>
-      <WidgetColorContext id={widget.id}>
-        <StandaloneWidgetVisualization title={title} editing={false} />
-      </WidgetColorContext>
-    </StandaloneWidgetProvider>
-  );
+const StandaloneWidgetContent = ({ widgetId }: Props) => (
+  <StandaloneWidgetContextProvider widgetId={widgetId}>
+    <WidgetColorContext id={widgetId}>
+      <VisualizationWithTitle />
+    </WidgetColorContext>
+  </StandaloneWidgetContextProvider>
+);
 
-  return lazy ? <RenderWhenVisible>{content}</RenderWhenVisible> : content;
-};
-
-export default StandaloneWidget;
+export default StandaloneWidgetContent;

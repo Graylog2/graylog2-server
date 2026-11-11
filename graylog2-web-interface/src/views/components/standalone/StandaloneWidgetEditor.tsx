@@ -28,8 +28,9 @@ import WidgetColorContext from 'views/components/widgets/WidgetColorContext';
 import WidgetHeader from 'views/components/widgets/WidgetHeader';
 import WidgetEditWrapper from 'views/components/widgets/WidgetEditWrapper';
 
-import StandaloneWidgetProvider from './StandaloneWidgetProvider';
-import { StandaloneWidgetVisualization } from './StandaloneWidget';
+import StandaloneWidgetGroup from './StandaloneWidgetGroup';
+import StandaloneWidgetContextProvider from './StandaloneWidgetContextProvider';
+import { WidgetVisualizationFromContext } from './StandaloneWidgetContent';
 
 const Container = styled.div`
   display: flex;
@@ -73,7 +74,7 @@ const Editor = ({ initialTitle, onSave, onCancel }: EditorProps) => {
         onCancelEdit={onCancel}
         onWidgetConfigChange={onWidgetConfigChange}
         onSubmit={(newWidget) => onSave(newWidget, title)}>
-        <StandaloneWidgetVisualization title={title} editing />
+        <WidgetVisualizationFromContext title={title} editing />
       </WidgetEditWrapper>
     </Container>
   );
@@ -91,11 +92,13 @@ type Props = {
  * `onSave` receives the edited widget, including its query, time range and streams.
  */
 const StandaloneWidgetEditor = ({ widget, title, onSave, onCancel }: Props) => (
-  <StandaloneWidgetProvider widget={widget} title={title}>
-    <WidgetColorContext id={widget.id}>
-      <Editor initialTitle={title} onSave={onSave} onCancel={onCancel} />
-    </WidgetColorContext>
-  </StandaloneWidgetProvider>
+  <StandaloneWidgetGroup widgets={[widget]} titles={{ [widget.id]: title }} interactionMode="interactive">
+    <StandaloneWidgetContextProvider widgetId={widget.id}>
+      <WidgetColorContext id={widget.id}>
+        <Editor initialTitle={title} onSave={onSave} onCancel={onCancel} />
+      </WidgetColorContext>
+    </StandaloneWidgetContextProvider>
+  </StandaloneWidgetGroup>
 );
 
 export default StandaloneWidgetEditor;
