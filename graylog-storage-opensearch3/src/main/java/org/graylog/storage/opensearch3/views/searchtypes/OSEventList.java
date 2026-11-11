@@ -52,22 +52,22 @@ public class OSEventList implements EventListStrategy {
     @Override
     public void doGenerateQueryPart(Query query, EventList eventList,
                                     OSGeneratedQueryContext queryContext) {
-        final Set<String> effectiveStreams = eventList.streams().isEmpty()
-                ? query.usedStreamIds()
-                : eventList.streams();
+        final var streamSelection = eventList.streamSelection(query);
+        final var sourceStreamFilter = eventList.sourceStreamFilter(query);
 
         final var searchSourceBuilder = queryContext.searchSourceBuilder(eventList);
         final FieldSort.Builder sortConfig = sortConfig(eventList);
         searchSourceBuilder.sort(sortConfig.build()._toSortOptions());
         final var originalQuery = searchSourceBuilder.query();
-        if (!effectiveStreams.isEmpty() && originalQuery.isBool()) {
-            searchSourceBuilder.query(
-                    originalQuery.bool().toBuilder().must(TermsQuery.of(t -> t
-                                            .field(EventDto.FIELD_SOURCE_STREAMS)
-                                            .terms(ts -> ts.value(effectiveStreams.stream().map(FieldValue::of).toList()))
-                                    )
-                                    .toQuery()
-                    ).build().toQuery());
+        if (originalQuery.isBool()) {
+            final var boolQuery = originalQuery.bool().toBuilder();
+            if (streamSelection.isEventStreamsOnly()) {
+                boolQuery.must(termsQuery(EventDto.FIELD_STREAMS, streamSelection.eventStreams()).toQuery());
+            }
+            if (!sourceStreamFilter.isAllAllowed()) {
+                boolQuery.must(termsQuery(EventDto.FIELD_SOURCE_STREAMS, sourceStreamFilter.streamIds()).toQuery());
+            }
+            searchSourceBuilder.query(boolQuery.build().toQuery());
         }
         if (!eventList.attributes().isEmpty() && originalQuery.isBool()) {
             final var filterQueries = eventList.attributes().stream()
@@ -88,6 +88,13 @@ public class OSEventList implements EventListStrategy {
             searchSourceBuilder.size(pageSize);
             searchSourceBuilder.from((page - 1) * pageSize);
         }, () -> searchSourceBuilder.size(10000));
+    }
+
+    private static TermsQuery termsQuery(String field, Set<String> values) {
+        return TermsQuery.of(t -> t
+                .field(field)
+                .terms(ts -> ts.value(values.stream().map(FieldValue::of).toList()))
+        );
     }
 
     private SortOrder toSortOrder(EventList.Direction direction) {

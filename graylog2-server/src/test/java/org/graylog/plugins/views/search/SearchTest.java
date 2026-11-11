@@ -21,6 +21,7 @@ import org.graylog.plugins.views.search.filter.StreamFilter;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
+import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog2.contentpacks.model.entities.QueryEntity;
 import org.graylog2.shared.rest.exceptions.MissingStreamPermissionException;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,7 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.graylog.plugins.views.search.TestData.validQueryBuilder;
+import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENTS_STREAM_ID;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -66,6 +68,31 @@ public class SearchTest {
         Search after = before.addStreamsToQueriesWithoutStreams(() -> ImmutableSet.of("one", "two", "three"));
 
         assertThat(before).isEqualTo(after);
+    }
+
+    @Test
+    void addsPermittedSourceStreamsOnlyToEventListsWithEventStreamsOnlySelection() {
+        final Query eventStreamsOnly = validQueryBuilder()
+                .filter(StreamFilter.anyIdOf(DEFAULT_EVENTS_STREAM_ID))
+                .searchTypes(Set.of(EventList.builder().id("events-only").build(), messageList("messages")))
+                .build();
+        final Query withSourceStream = validQueryBuilder()
+                .filter(StreamFilter.anyIdOf(DEFAULT_EVENTS_STREAM_ID, "source-stream"))
+                .searchTypes(Set.of(EventList.builder().id("with-source").build()))
+                .build();
+        final Search before = Search.builder().queries(ImmutableSet.of(eventStreamsOnly, withSourceStream)).build();
+
+        final Search after = before.addPermittedSourceStreamsToEventLists(() -> Set.of("readable"));
+
+        assertThat(after.queries())
+                .flatMap(Query::searchTypes)
+                .allSatisfy(searchType -> {
+                    switch (searchType.id()) {
+                        case "events-only" -> assertThat(((EventList) searchType).permittedSourceStreams()).contains(Set.of("readable"));
+                        case "with-source" -> assertThat(((EventList) searchType).permittedSourceStreams()).isEmpty();
+                        default -> assertThat(searchType).isEqualTo(messageList("messages"));
+                    }
+                });
     }
 
     @Test

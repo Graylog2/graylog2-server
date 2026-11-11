@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
@@ -31,6 +32,7 @@ import com.google.common.graph.MutableGraph;
 import org.graylog.plugins.views.search.engine.validation.DataLakeSearchValidator;
 import org.graylog.plugins.views.search.permissions.StreamPermissions;
 import org.graylog.plugins.views.search.rest.ExecutionState;
+import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.plugins.views.search.views.PluginMetadataSummary;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -210,6 +212,21 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
         }
 
         final ImmutableSet<Query> newQueries = Sets.union(withMappedStreamCategories, withoutStreamCategories).immutableCopy();
+
+        return toBuilder().queries(newQueries).build();
+    }
+
+    public Search addPermittedSourceStreamsToEventLists(Supplier<Set<String>> permittedSourceStreamsSupplier) {
+        final Supplier<Set<String>> permittedSourceStreams = Suppliers.memoize(permittedSourceStreamsSupplier::get);
+        final ImmutableSet<Query> newQueries = queries().stream()
+                .map(query -> query.toBuilder()
+                        .searchTypes(query.searchTypes().stream()
+                                .map(searchType -> searchType instanceof EventList eventList && eventList.streamSelection(query).isEventStreamsOnly()
+                                        ? eventList.toBuilder().permittedSourceStreams(permittedSourceStreams.get()).build()
+                                        : searchType)
+                                .collect(toImmutableSet()))
+                        .build())
+                .collect(toImmutableSet());
 
         return toBuilder().queries(newQueries).build();
     }

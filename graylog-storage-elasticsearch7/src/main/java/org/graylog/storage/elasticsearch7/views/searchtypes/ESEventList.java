@@ -50,16 +50,20 @@ public class ESEventList implements ESSearchTypeHandler<EventList> {
     @Override
     public void doGenerateQueryPart(Query query, EventList eventList,
                                     ESGeneratedQueryContext queryContext) {
-        final Set<String> effectiveStreams = eventList.streams().isEmpty()
-                ? query.usedStreamIds()
-                : eventList.streams();
+        final var streamSelection = eventList.streamSelection(query);
+        final var sourceStreamFilter = eventList.sourceStreamFilter(query);
 
         final var searchSourceBuilder = queryContext.searchSourceBuilder(eventList);
         final FieldSortBuilder sortConfig = sortConfig(eventList);
         searchSourceBuilder.sort(sortConfig);
         final var queryBuilder = searchSourceBuilder.query();
-        if (!effectiveStreams.isEmpty() && queryBuilder instanceof BoolQueryBuilder boolQueryBuilder) {
-            boolQueryBuilder.must(QueryBuilders.termsQuery(EventDto.FIELD_SOURCE_STREAMS, effectiveStreams));
+        if (queryBuilder instanceof BoolQueryBuilder boolQueryBuilder) {
+            if (streamSelection.isEventStreamsOnly()) {
+                boolQueryBuilder.must(QueryBuilders.termsQuery(EventDto.FIELD_STREAMS, streamSelection.eventStreams()));
+            }
+            if (!sourceStreamFilter.isAllAllowed()) {
+                boolQueryBuilder.must(QueryBuilders.termsQuery(EventDto.FIELD_SOURCE_STREAMS, sourceStreamFilter.streamIds()));
+            }
         }
         if (!eventList.attributes().isEmpty() && queryBuilder instanceof BoolQueryBuilder boolQueryBuilder) {
             final var filterQueries = eventList.attributes().stream()
