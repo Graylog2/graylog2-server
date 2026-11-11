@@ -536,7 +536,7 @@ describe('DataTable', () => {
       await screen.findByText('2 rows selected');
       await selectBulkAction('Add to query', 'source');
 
-      expect(updateQueryString).toHaveBeenCalledWith('query-id-1', 'source:(host1 OR host3)');
+      expect(updateQueryString).toHaveBeenCalledWith('query-id-1', '(source:(host1 OR host3))');
       expect(screen.queryByText('2 rows selected')).not.toBeInTheDocument();
     });
 
@@ -553,7 +553,7 @@ describe('DataTable', () => {
       await screen.findByText('3 rows selected');
       await selectBulkAction('Exclude from results', 'source');
 
-      expect(updateQueryString).toHaveBeenCalledWith('query-id-1', 'NOT source:(host1 OR host2 OR host3)');
+      expect(updateQueryString).toHaveBeenCalledWith('query-id-1', 'NOT (source:(host1 OR host2 OR host3))');
     });
 
     it('cancels selection', async () => {

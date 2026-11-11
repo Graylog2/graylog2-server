@@ -22,7 +22,8 @@ import { DropdownButton, Menu, MenuItem } from 'components/bootstrap';
 import StringUtils from 'util/StringUtils';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
-import { addValuesToQuery, excludeValuesFromQuery } from 'views/logic/valueactions/MultipleValuesQueryHandler';
+import AddToQueryHandler from 'views/logic/valueactions/AddToQueryHandler';
+import ExcludeFromQueryHandler from 'views/logic/valueactions/ExcludeFromQueryHandler';
 
 import type { FieldValues } from './rowSelection';
 
@@ -71,9 +72,9 @@ const SelectedRowsActions = ({ selectedRowsCount, fieldValues, onClearSelection 
   const queryId = useActiveQueryId();
 
   const onAddToQuery = ({ field, values, type }: FieldValues) =>
-    dispatch(addValuesToQuery({ queryId, field, values, type })).then(onClearSelection);
+    dispatch(AddToQueryHandler({ queryId, field, value: values, type })).then(onClearSelection);
   const onExclude = ({ field, values, type }: FieldValues) =>
-    dispatch(excludeValuesFromQuery({ queryId, field, values, type })).then(onClearSelection);
+    dispatch(ExcludeFromQueryHandler({ queryId, field, value: values, type })).then(onClearSelection);
 
   return (
     <Container>
