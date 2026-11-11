@@ -57,6 +57,7 @@ const StageForm = ({
   const { data: rules } = useRules();
 
   const openModal = () => {
+    setNextStage({ ...stage, stage: _initialStageNumber });
     setShowModal(true);
   };
 

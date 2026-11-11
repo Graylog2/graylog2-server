@@ -78,6 +78,71 @@ export function bulkUpdatePatternsFromTextFile(importStrategy?: 'ABORT_ON_CONFLI
 `);
   });
 
+  it('sends header parameters as request headers', () => {
+    const api = {
+      name: 'cells',
+      routes: [
+        {
+          path: '/cells/{cellId}',
+          operations: [
+            {
+              method: 'PUT' as const,
+              summary: 'Update a cell',
+              nickname: 'updateCell',
+              type: {
+                type: 'type_reference' as const,
+                name: 'unknown',
+                optional: false,
+              },
+              parameters: [
+                {
+                  name: 'cellId',
+                  description: '',
+                  paramType: 'path' as const,
+                  required: true,
+                  type: { type: 'type_reference' as const, name: 'string', optional: false },
+                },
+                {
+                  name: 'If-Match',
+                  description: "The cell's etag",
+                  paramType: 'header' as const,
+                  required: false,
+                  type: { type: 'type_reference' as const, name: 'string', optional: false },
+                },
+              ],
+              produces: ['application/json' as const],
+            },
+          ],
+        },
+      ],
+      models: {},
+    };
+
+    const result = emit([api]);
+
+    expect(result).toMatchInlineSnapshot(`
+[
+  {
+    "cells": "import __request__ from 'routing/request';
+import type { RequestOptions } from 'routing/request';
+/**
+ * Update a cell
+ * @param If-Match The cell's etag
+ */
+export function updateCell(cellId: string, IfMatch?: string, requestOptions?: RequestOptions): Promise<unknown> {
+    return __request__('PUT', \`/cells/\${cellId}\`, null, {}, {
+        'Accept': ['application/json'],
+        'If-Match': IfMatch
+    }, requestOptions);
+}
+",
+  },
+  "export * as cells from './cells';
+",
+]
+`);
+  });
+
   it('emits proper indexer signatures for collection-types', () => {
     const api = {
       name: 'sample',
