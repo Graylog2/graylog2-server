@@ -27,37 +27,34 @@ export type FieldValues = { field: string; type: FieldType; values: Array<QueryV
 
 // Fields of the row grouping, which can be used to filter the query by the values of the selected rows.
 export const selectableFieldsFor = (rowFieldNames: Array<string>, types: FieldTypeMappingsList, interactive: boolean) =>
-  interactive
-    ? rowFieldNames.filter((field) => !isFunction(field) && !fieldTypeFor(field, types).isDecorated())
-    : [];
+  interactive ? rowFieldNames.filter((field) => !isFunction(field) && !fieldTypeFor(field, types).isDecorated()) : [];
 
-const queryValueFor = (row: Row, field: string): QueryValue | undefined => {
-  const value = row[field];
-
-  return typeof value === 'string' || typeof value === 'number' ? value : undefined;
-};
+const queryValueFor = (value: unknown): QueryValue | undefined =>
+  typeof value === 'string' || typeof value === 'number' ? value : undefined;
 
 // Identifies a row by the fields and values of all row grouping fields,
 // so a selection does not carry over to a different grouping with the same values.
 export const rowSelectionKey = (row: Row, rowFieldNames: Array<string>) =>
   JSON.stringify(rowFieldNames.map((field) => [field, row[field]]));
 
-export const rowSelectionLabel = (row: Row, rowFieldNames: Array<string>) =>
-  `Select ${rowFieldNames.map((field) => `${field} ${row[field]}`).join(', ')}`;
+const parseRowSelectionKey = (key: string): Array<[string, unknown]> => JSON.parse(key);
 
-// Returns the distinct values of each selectable field for the selected rows, in the order of the table.
+export const rowSelectionLabel = (key: string) =>
+  `Select ${parseRowSelectionKey(key)
+    .map(([field, value]) => `${field} ${value}`)
+    .join(', ')}`;
+
+// Returns the distinct values of each selectable field for the selected rows.
 export const selectedValuesByField = (
-  rows: Array<Row>,
-  rowFieldNames: Array<string>,
-  selectableFields: Array<string>,
   selectedKeys: Array<string>,
+  selectableFields: Array<string>,
   types: FieldTypeMappingsList,
 ): Array<FieldValues> => {
-  const selectedRows = rows.filter((row) => selectedKeys.includes(rowSelectionKey(row, rowFieldNames)));
+  const selectedRows = selectedKeys.map((key) => Object.fromEntries(parseRowSelectionKey(key)));
 
   return selectableFields.map((field) => ({
     field,
     type: fieldTypeFor(field, types),
-    values: uniq(selectedRows.map((row) => queryValueFor(row, field)).filter((value) => value !== undefined)),
+    values: uniq(selectedRows.map((row) => queryValueFor(row[field])).filter((value) => value !== undefined)),
   }));
 };

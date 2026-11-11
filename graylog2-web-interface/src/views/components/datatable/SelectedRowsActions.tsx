@@ -19,12 +19,15 @@ import { useId } from 'react';
 import styled, { css } from 'styled-components';
 
 import { DropdownButton, Menu, MenuItem } from 'components/bootstrap';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import StringUtils from 'util/StringUtils';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import AddToQueryHandler from 'views/logic/valueactions/AddToQueryHandler';
 import ExcludeFromQueryHandler from 'views/logic/valueactions/ExcludeFromQueryHandler';
+import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 
+import { selectedValuesByField } from './rowSelection';
 import type { FieldValues } from './rowSelection';
 
 const Container = styled.div(
@@ -61,15 +64,22 @@ const FieldsSubmenu = ({ title, fieldValues, onSelect }: FieldsSubmenuProps) => 
 );
 
 type Props = {
-  selectedRowsCount: number;
-  fieldValues: Array<FieldValues>;
-  onClearSelection: () => void;
+  selectableFields: Array<string>;
+  types: FieldTypeMappingsList;
 };
 
-const SelectedRowsActions = ({ selectedRowsCount, fieldValues, onClearSelection }: Props) => {
+const SelectedRowsActions = ({ selectableFields, types }: Props) => {
   const dropdownId = useId();
   const dispatch = useViewsDispatch();
   const queryId = useActiveQueryId();
+  const { selectedEntities, setSelectedEntities } = useSelectedEntities();
+  const selectedRowsCount = selectedEntities.length;
+  const fieldValues = selectedValuesByField(selectedEntities, selectableFields, types);
+  const onClearSelection = () => setSelectedEntities([]);
+
+  if (selectedRowsCount === 0) {
+    return null;
+  }
 
   const onAddToQuery = ({ field, values, type }: FieldValues) =>
     dispatch(AddToQueryHandler({ queryId, field, value: values, type })).then(onClearSelection);

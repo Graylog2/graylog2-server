@@ -18,8 +18,10 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 import TableHeaderCell from './TableHeaderCell';
+import { rowSelectionLabel } from './rowSelection';
 
 const SelectionHeader = styled(TableHeaderCell)`
   && {
@@ -33,30 +35,43 @@ const SelectionData = styled.td`
   }
 `;
 
-export type SelectAllProps = {
-  checked: boolean;
-  indeterminate: boolean;
-  onChange: () => void;
+type SelectAllHeaderCellProps = {
+  rowIds: Array<string>;
 };
 
-export const SelectAllHeaderCell = ({ checked, indeterminate, onChange }: SelectAllProps) => {
-  const label = checked ? 'Deselect all rows' : 'Select all rows';
+export const SelectAllHeaderCell = ({ rowIds }: SelectAllHeaderCellProps) => {
+  const { isAllRowsSelected, isSomeRowsSelected, setSelectedEntities } = useSelectedEntities();
+  const label = isAllRowsSelected ? 'Deselect all rows' : 'Select all rows';
 
   return (
     <SelectionHeader>
-      <RowCheckbox checked={checked} indeterminate={indeterminate} onChange={onChange} title={label} aria-label={label} />
+      <RowCheckbox
+        checked={isAllRowsSelected}
+        indeterminate={isSomeRowsSelected}
+        onChange={() => setSelectedEntities(isAllRowsSelected ? [] : rowIds)}
+        title={label}
+        aria-label={label}
+      />
     </SelectionHeader>
   );
 };
 
-export type SelectRowProps = {
-  checked: boolean;
-  onChange: () => void;
-  label: string;
+type SelectRowCellProps = {
+  rowId: string;
 };
 
-export const SelectRowCell = ({ checked, onChange, label }: SelectRowProps) => (
-  <SelectionData>
-    <RowCheckbox checked={checked} onChange={onChange} title={label} aria-label={label} />
-  </SelectionData>
-);
+export const SelectRowCell = ({ rowId }: SelectRowCellProps) => {
+  const { selectedEntities, toggleEntitySelect } = useSelectedEntities();
+  const label = rowSelectionLabel(rowId);
+
+  return (
+    <SelectionData>
+      <RowCheckbox
+        checked={selectedEntities.includes(rowId)}
+        onChange={() => toggleEntitySelect(rowId)}
+        title={label}
+        aria-label={label}
+      />
+    </SelectionData>
+  );
+};
