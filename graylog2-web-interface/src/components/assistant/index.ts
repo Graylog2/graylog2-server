@@ -20,6 +20,7 @@ export {
   useAssistantPanelContext,
   useAssistantPageTools,
   useAssistantPageSnapshot,
+  useAssistantPageSelector,
 } from './AssistantPageContext';
 export type {
   Page,

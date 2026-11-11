@@ -16,12 +16,13 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, act } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import {
   AssistantPageContextProvider,
   useAssistantPageContext,
+  useAssistantPageSelector,
   useAssistantPageSnapshot,
   useAssistantPageTools,
   useAssistantPanelContext,
@@ -103,5 +104,36 @@ describe('AssistantPageContext', () => {
     );
 
     expect(await readSnapshot()).toEqual(expect.objectContaining({ page: { type: 'generic' }, panels: [], tools: [] }));
+  });
+
+  it('follows pages and titles published after the current render', async () => {
+    const CurrentPage = () => {
+      const description = useAssistantPageSelector(({ page, title }) => `${page.type}: ${title}`);
+
+      return <span>{description}</span>;
+    };
+    document.title = 'Dashboards';
+    const { rerender } = render(
+      <AssistantPageContextProvider>
+        <CurrentPage />
+      </AssistantPageContextProvider>,
+    );
+
+    expect(screen.getByText('generic: Dashboards')).toBeInTheDocument();
+
+    rerender(
+      <AssistantPageContextProvider>
+        <CurrentPage />
+        <SearchPage />
+      </AssistantPageContextProvider>,
+    );
+
+    expect(await screen.findByText('search: Dashboards')).toBeInTheDocument();
+
+    act(() => {
+      document.title = 'Streams';
+    });
+
+    expect(await screen.findByText('search: Streams')).toBeInTheDocument();
   });
 });
