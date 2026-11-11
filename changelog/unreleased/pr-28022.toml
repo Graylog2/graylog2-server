@@ -1,0 +1,4 @@
+type = "a"
+message = "Add OAuth 2.1 sign-in for MCP clients, so they only need the server URL to connect."
+
+pulls = ["28022"]
