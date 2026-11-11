@@ -47,7 +47,7 @@ export interface Parameter {
   name: string;
   description: string;
   required: boolean;
-  paramType: 'path' | 'query' | 'body' | 'formdata';
+  paramType: 'path' | 'query' | 'body' | 'formdata' | 'header';
   type: Type;
   defaultValue?: string;
 }

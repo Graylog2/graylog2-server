@@ -23,6 +23,7 @@ import { detailsAttributes } from 'components/events/Constants';
 import DropdownButton from 'components/bootstrap/DropdownButton';
 import useEventAction from 'components/events/events/hooks/useEventAction';
 import TagsDetailRow from 'components/events/TagsDetailRow';
+import { useIsInteractiveMode } from 'views/components/contexts/InteractiveContext';
 
 type Props = {
   event: Event;
@@ -45,6 +46,7 @@ const ActionsWrapper = ({ children }) => (
 
 const DefaultDetails = ({ event, eventDefinitionContext }: Props) => {
   const { moreActions, pluggableActionModals } = useEventAction(event);
+  const interactive = useIsInteractiveMode();
   const meta = useMemo(
     () => ({ context: { event_definitions: { [event.event_definition_id]: eventDefinitionContext } } }),
     [event.event_definition_id, eventDefinitionContext],
@@ -56,7 +58,7 @@ const DefaultDetails = ({ event, eventDefinitionContext }: Props) => {
       {/* No filter component is in scope for the events overview widget, so tag chips
           here would just append an unused `filters` query param when clicked. */}
       <TagsDetailRow tags={event.tags} interactive={false} />
-      <ActionsWrapper>{moreActions}</ActionsWrapper>
+      {interactive && <ActionsWrapper>{moreActions}</ActionsWrapper>}
       {pluggableActionModals}
     </>
   );

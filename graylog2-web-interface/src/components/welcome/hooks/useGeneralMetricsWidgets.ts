@@ -26,17 +26,19 @@ import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import pivotForField from 'views/logic/searchtypes/aggregation/PivotGenerator';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import AreaVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/AreaVisualizationConfig';
-import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { TIMESTAMP_FIELD } from 'views/Constants';
-
-import useWelcomeSearch, {
+import {
   numberWidget,
   messagesTodayLink,
   alertsOrEventsLink,
-  type WelcomeSearchWidgetEntry,
-} from './useWelcomeSearch';
+  type WelcomeWidgetEntry,
+} from 'components/welcome/welcomeWidgetBuilders';
+
 import useMetricsTimeRange from './useMetricsTimeRange';
 import usePermittedAlertsEventsStreams from './usePermittedAlertsEventsStreams';
+
+const CHART_HEIGHT = '300px';
+const NUMBER_HEIGHT = '150px';
 
 const topSourcesWidget = (timeRange: RelativeTimeRangeWithEnd) => ({
   title: 'Top 5 Sources',
@@ -61,19 +63,19 @@ const buildEntries = (
   permittedAlertsEventsStreams: Array<string>,
   timeRange: RelativeTimeRangeWithEnd,
   topSourcesOnly: boolean,
-): Array<WelcomeSearchWidgetEntry> => {
+): Array<WelcomeWidgetEntry> => {
   const sources = topSourcesWidget(timeRange);
 
   if (topSourcesOnly) {
-    return [{ ...sources, position: new WidgetPosition(1, 1, 3, 12) }];
+    return [{ ...sources, columns: 12, height: CHART_HEIGHT }];
   }
 
   const messages = numberWidget({ title: 'Messages Today', timeRange, link: messagesTodayLink(timeRange) });
 
   if (permittedAlertsEventsStreams.length === 0) {
     return [
-      { ...messages, position: new WidgetPosition(1, 1, 3, 4) },
-      { ...sources, position: new WidgetPosition(5, 1, 3, 8) },
+      { ...messages, columns: 4, height: CHART_HEIGHT },
+      { ...sources, columns: 8, height: CHART_HEIGHT },
     ];
   }
 
@@ -96,28 +98,22 @@ const buildEntries = (
   ];
 
   return [
-    ...numberWidgets.map(({ title, widget }, index) => ({
-      title,
-      widget,
-      position: new WidgetPosition(1 + index * 4, 1, 1.6, 4),
-    })),
-    { ...sources, position: new WidgetPosition(1, 2.75, 3, 12) },
+    ...numberWidgets.map((numberWidgetEntry) => ({ ...numberWidgetEntry, columns: 4, height: NUMBER_HEIGHT })),
+    { ...sources, columns: 12, height: CHART_HEIGHT },
   ];
 };
 
-const useGeneralMetricsSearch = (topSourcesOnly: boolean = false) => {
+const useGeneralMetricsWidgets = (topSourcesOnly: boolean = false) => {
   const rangeSeconds = useMetricsTimeRange();
   const permittedAlertsEventsStreams = usePermittedAlertsEventsStreams();
   const timeRange = useMemo<RelativeTimeRangeWithEnd>(() => ({ type: 'relative', from: rangeSeconds }), [rangeSeconds]);
 
-  // Building the entries assigns new widget ids, so the result has to be stable to avoid recreating the view
-  // (and the search on the server) on every render.
-  const entries = useMemo(
+  // Building the entries assigns new widget ids, so the result has to be stable to avoid running the search
+  // again on every render.
+  return useMemo(
     () => buildEntries(permittedAlertsEventsStreams, timeRange, topSourcesOnly),
     [permittedAlertsEventsStreams, timeRange, topSourcesOnly],
   );
-
-  return useWelcomeSearch(entries, timeRange);
 };
 
-export default useGeneralMetricsSearch;
+export default useGeneralMetricsWidgets;
