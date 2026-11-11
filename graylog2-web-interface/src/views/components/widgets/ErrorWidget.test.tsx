@@ -18,6 +18,7 @@ import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import SearchError from 'views/logic/SearchError';
+import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
 
 import ErrorWidget from './ErrorWidget';
 
@@ -44,5 +45,19 @@ describe('<ErrorWidget />', () => {
 
     await screen.findByText(errors[0].description);
     await screen.findByText(errors[1].description);
+  });
+
+  it('reports that it rendered, so exports do not wait for it', async () => {
+    const onRenderComplete = jest.fn();
+
+    render(
+      <RenderCompletionCallback.Provider value={onRenderComplete}>
+        <ErrorWidget errors={[{ description: 'Query failed' }]} />
+      </RenderCompletionCallback.Provider>,
+    );
+
+    await screen.findByText('Query failed');
+
+    expect(onRenderComplete).toHaveBeenCalled();
   });
 });
