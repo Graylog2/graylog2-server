@@ -95,36 +95,35 @@ These are vulnerabilities even when the attacker has Admin:
 - Out of scope: vulnerabilities in third-party dependencies, unless you show a path through Graylog code that
   reaches them with attacker-controlled input. Version bumps alone are not findings.
 - Out of scope for now: the URL allowlist for outgoing HTTP requests. Do not report ways around it.
-- Out of scope: MongoDB, the standalone OpenSearch in `/opt/opensearch`, and their configuration in this image.
-  They are here only so `graylog-services` can run a server to test against. What Graylog does with them stays in
-  scope: the queries it builds from user input and the stream filters it adds.
-- In scope: the OpenSearch the Data Node wraps, as the Data Node configures and runs it (see "The Data Node"
-  above). Bugs in OpenSearch's own code are third-party issues, unless the Data Node's configuration exposes them.
+- Out of scope: bugs in MongoDB's and OpenSearch's own code, unless the Data Node's configuration of its
+  OpenSearch exposes them. What Graylog does with them stays in scope: the queries it builds from user input, the
+  stream filters it adds, and how the Data Node configures and runs its OpenSearch (see "The Data Node" above).
 
 ## How to exercise it
 
-The image contains the full build of `/src`; there is no network.
+The image contains the full build of `/src`; there is no network, and no MongoDB, OpenSearch or running Graylog
+server. Reproduce findings with unit tests.
 
-- **A real server.** Run `graylog-services`. It starts MongoDB, OpenSearch and the Graylog server built from this
-  checkout and prints when it is ready (up to five minutes on first start): `http://127.0.0.1:9000`, API under
-  `/api`, user `admin`, password `admin`, log in `/var/log/graylog/server.log`. Non-GET API requests need the
-  header `X-Requested-By: <anything>`. Create low-privilege users, roles, streams and inputs through the API to
-  reproduce authorisation bugs; inputs you start listen on localhost (for example a GELF HTTP input on 12201:
-  `curl -XPOST 127.0.0.1:12201/gelf -d '{"short_message":"x","host":"h"}'`).
 - **Java unit tests**, offline. Run `graylog-test-hosts` once first (it adds `/etc/hosts` entries some tests need).
   Then: `setpriv --bounding-set=-dac_override,-dac_read_search -- ./mvnw -o test -pl graylog2-server
   -Dskip.web.build=true -Dspotbugs.skip -Dsurefire.excludesFile=/opt/graylog-tests-needing-docker.txt
   -Dtest=<TestClass>` (or `-pl data-node`). The `setpriv` prefix makes root obey file permissions, which some tests
   check. Tests that start containers need Docker, which is not available here; they are listed in
-  `/opt/graylog-tests-needing-docker.txt`, so reproduce those cases against `graylog-services` instead. Results of
-  the run made at build time: `/var/log/graylog-unit-tests.log` and `graylog2-server/target/surefire-reports/`.
+  `/opt/graylog-tests-needing-docker.txt`. For code that needs a database, mock the service or database layer
+  instead. Results of the run made at build time: `/var/log/graylog-unit-tests.log` and
+  `graylog2-server/target/surefire-reports/`.
+- **Authorization bugs**: use `@WithAuthorization` (`WithAuthorizationExtension`), as `AuthzRolesResourceTest`
+  does. It logs in a real Shiro user that holds only the permissions you list and enforces `@RequiresPermissions`
+  on calls to the resource. Give that user the permissions of the low-privilege attacker and show that the call
+  succeeds or returns data it should not. A resource called directly, without it, skips `@RequiresPermissions`
+  (the server checks it in a request filter), so a missing check found that way may not be real.
 - **Frontend tests**: `cd graylog2-web-interface && export PATH="$PWD/node:$PWD/node/yarn/dist/bin:$PATH" && yarn
   test <path>` (use `yarn test`, not `yarn jest`). The tests run in Jest with jsdom.
 - **No browser.** The image has no Chrome or other browser: the only build step that would use one is a
   release check for CI, and installing a browser for it would not help the audit. To confirm XSS, write a Jest
   test that renders the affected component with the hostile data (for example a message field value) and checks
-  whether the markup or script ends up in the DOM unescaped, and show with `graylog-services` and the API how
-  that data gets stored.
+  whether the markup or script ends up in the DOM unescaped, and show from the code how that data reaches the
+  component.
 
 ## How we rate severity
 

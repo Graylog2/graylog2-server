@@ -22,10 +22,9 @@ this order:
    with which role and which permissions.
 6. **Root cause**: file paths with line numbers, and the code path from the entry point (REST resource, input,
    pipeline function) to the faulty code.
-7. **Reproduction**: commands that work in the scanner image. Prefer `curl` against `graylog-services`
-   (`http://127.0.0.1:9000`, user `admin`/`admin`), including the API calls that create any low-privilege users,
-   roles, streams or inputs it needs. Otherwise a unit test. Show the observed output and say what output would
-   be correct.
+7. **Reproduction**: a unit test that works in the scanner image (JUnit for the server and Data Node, Jest with
+   `yarn test` for the web interface), with the command that runs it. Show the observed output and say what
+   output would be correct.
 8. **Suggested fix**: one paragraph; the patch itself goes in the patch.
 
 ## What every report should state

@@ -10,7 +10,7 @@ Follow `AGENTS.md` at the repository root, and `graylog2-web-interface/AGENTS.md
 - If the same mistake is repeated in sibling code (for example the same missing permission check on several
   methods of one REST resource), fix all of them in the same patch and say so.
 - Prefer existing mechanisms over new ones: `@RequiresPermissions` and `RestPermissions` constants for REST
-  authorisation, `EntityPermissionsUtils` and the grants/shares services for entity access, the URL allowlist
+  authorization, `EntityPermissionsUtils` and the grants/shares services for entity access, the URL allowlist
   service for outbound URLs, `AllowedAuxiliaryPathChecker` for file paths.
 - Do not change public REST API paths or response formats unless the fix needs it; if it does, say why.
 - Do not upgrade dependencies as part of a fix.
@@ -31,7 +31,8 @@ Follow `AGENTS.md` at the repository root, and `graylog2-web-interface/AGENTS.md
 - Add a regression test that fails without the fix and passes with it, in the existing test class for the
   changed class when there is one. Java: JUnit 5, Mockito and AssertJ. Frontend: Jest and Testing Library, run
   with `yarn test <path>`.
-- Prefer plain unit tests over tests that need MongoDB, OpenSearch or Testcontainers.
+- Prefer plain unit tests over tests that need MongoDB, OpenSearch or Testcontainers; those cannot run in the
+  scanner image.
 - Make sure the module still compiles and its existing tests for the changed classes pass.
 
 ## Branch, commit message and changelog
