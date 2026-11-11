@@ -33,13 +33,11 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.graylog.mcp.config.McpConfiguration;
 import org.graylog.mcp.oauth.McpOAuthService;
 import org.graylog.mcp.oauth.McpOAuthUrls;
 import org.graylog.mcp.oauth.OAuthClient;
 import org.graylog.mcp.oauth.OAuthException;
 import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.rest.NonApiResource;
 import org.graylog2.shared.rest.SkipCSRFProtection;
 import org.slf4j.Logger;
@@ -63,13 +61,11 @@ public class OAuthResource {
 
     private final McpOAuthService oauthService;
     private final McpOAuthUrls urls;
-    private final ClusterConfigService clusterConfigService;
 
     @Inject
-    public OAuthResource(McpOAuthService oauthService, McpOAuthUrls urls, ClusterConfigService clusterConfigService) {
+    public OAuthResource(McpOAuthService oauthService, McpOAuthUrls urls) {
         this.oauthService = oauthService;
         this.urls = urls;
-        this.clusterConfigService = clusterConfigService;
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -108,7 +104,7 @@ public class OAuthResource {
                               @QueryParam("state") String state,
                               @QueryParam("resource") String resource,
                               @Context HttpHeaders headers) {
-        if (!oauthAvailable()) {
+        if (!oauthService.oauthAvailable()) {
             return plainError(Response.Status.NOT_FOUND, "MCP OAuth is not enabled.");
         }
         final McpOAuthUrls.Urls requestUrls = urls.forRequest(headers.getRequestHeaders());
@@ -116,7 +112,7 @@ public class OAuthResource {
         try {
             request = oauthService.validateAuthorizationRequest(clientId, redirectUri, responseType, codeChallenge, codeChallengeMethod, state, resource);
         } catch (OAuthException e) {
-            final Optional<String> errorRedirect = oauthService.errorRedirect(e, clientId, redirectUri, state, requestUrls.issuer());
+            final Optional<String> errorRedirect = McpOAuthService.errorRedirect(e, state, requestUrls.issuer());
             if (errorRedirect.isPresent()) {
                 return Response.seeOther(URI.create(errorRedirect.get())).build();
             }
@@ -149,7 +145,7 @@ public class OAuthResource {
     @SkipCSRFProtection("OAuth dynamic client registration is used by non-browser clients")
     @NoAuditEvent("Has custom audit events")
     public Response register(@Nullable RegistrationRequest request) {
-        if (!oauthAvailable()) {
+        if (!oauthService.oauthAvailable()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         if (request == null) {
@@ -162,7 +158,7 @@ public class OAuthResource {
                     request.clientUri(),
                     request.grantTypes(),
                     request.responseTypes()
-            ), config());
+            ));
             return Response.status(Response.Status.CREATED)
                     .cacheControl(noStore())
                     .entity(new RegistrationResponse(
@@ -194,14 +190,14 @@ public class OAuthResource {
                           @FormParam("code_verifier") String codeVerifier,
                           @FormParam("refresh_token") String refreshToken,
                           @FormParam("resource") String resource) {
-        if (!oauthAvailable()) {
+        if (!oauthService.oauthAvailable()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         try {
             final McpOAuthService.TokenResponse tokens = switch (grantType == null ? "" : grantType) {
                 case McpOAuthService.GRANT_TYPE_AUTHORIZATION_CODE ->
-                        oauthService.exchangeAuthorizationCode(clientId, code, redirectUri, codeVerifier, resource, config());
-                case McpOAuthService.GRANT_TYPE_REFRESH_TOKEN -> oauthService.refresh(clientId, refreshToken, resource, config());
+                        oauthService.exchangeAuthorizationCode(clientId, code, redirectUri, codeVerifier, resource);
+                case McpOAuthService.GRANT_TYPE_REFRESH_TOKEN -> oauthService.refresh(clientId, refreshToken, resource);
                 default -> throw OAuthException.of(OAuthException.UNSUPPORTED_GRANT_TYPE, "Unsupported grant_type");
             };
             return Response.ok(new TokenResponse(tokens.accessToken(), "Bearer", tokens.expiresIn(), tokens.refreshToken()))
@@ -221,7 +217,7 @@ public class OAuthResource {
     @SkipCSRFProtection("OAuth token revocation requests are made by non-browser clients")
     @NoAuditEvent("Has custom audit events")
     public Response revoke(@FormParam("client_id") String clientId, @FormParam("token") String token) {
-        if (!oauthAvailable()) {
+        if (!oauthService.oauthAvailable()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         try {
@@ -230,14 +226,6 @@ public class OAuthResource {
         } catch (OAuthException e) {
             return error(e);
         }
-    }
-
-    private boolean oauthAvailable() {
-        return config().oauthAvailable();
-    }
-
-    private McpConfiguration config() {
-        return clusterConfigService.getOrDefault(McpConfiguration.class, McpConfiguration.DEFAULT_VALUES);
     }
 
     static Response error(OAuthException e) {

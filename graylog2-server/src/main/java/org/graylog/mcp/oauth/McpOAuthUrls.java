@@ -19,6 +19,7 @@ package org.graylog.mcp.oauth;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.core.MultivaluedMap;
+import org.apache.commons.lang3.StringUtils;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.rest.RestTools;
 
@@ -32,8 +33,8 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  */
 @Singleton
 public class McpOAuthUrls {
-    public static final String MCP_PATH = "api/mcp";
-    public static final String CONSENT_PAGE_PATH = "oauth-consent";
+    private static final String MCP_PATH = "api/mcp";
+    private static final String CONSENT_PAGE_PATH = "oauth-consent";
 
     private final URI httpExternalUri;
 
@@ -58,14 +59,10 @@ public class McpOAuthUrls {
                 return false;
             }
             final String scheme = uri.getScheme().toLowerCase(Locale.ROOT);
-            return (scheme.equals("http") || scheme.equals("https")) && stripTrailingSlash(uri.getPath()).endsWith("/" + MCP_PATH);
+            return (scheme.equals("http") || scheme.equals("https")) && StringUtils.removeEnd(uri.getPath(), "/").endsWith("/" + MCP_PATH);
         } catch (IllegalArgumentException e) {
             return false;
         }
-    }
-
-    private static String stripTrailingSlash(String value) {
-        return value.endsWith("/") ? value.substring(0, value.length() - 1) : value;
     }
 
     public record Urls(URI base) {
@@ -76,7 +73,7 @@ public class McpOAuthUrls {
         }
 
         public String issuer() {
-            return stripTrailingSlash(base.toString());
+            return StringUtils.removeEnd(base.toString(), "/");
         }
 
         public String resource() {
@@ -118,7 +115,7 @@ public class McpOAuthUrls {
         }
 
         private String wellKnown(String name, String path) {
-            final String suffix = path == null ? "" : stripTrailingSlash(path);
+            final String suffix = path == null ? "" : StringUtils.removeEnd(path, "/");
             return f("%s://%s/.well-known/%s%s", base.getScheme(), base.getRawAuthority(), name, suffix);
         }
     }

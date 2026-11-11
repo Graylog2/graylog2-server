@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import qs from 'qs';
+import type { ParsedQs } from 'qs';
 
 export type McpAuthorizationParams = {
   client_id: string;
@@ -26,8 +26,7 @@ export type McpAuthorizationParams = {
   resource: string;
 };
 
-const parseAuthorizationParams = (search: string): McpAuthorizationParams => {
-  const params = qs.parse(search, { ignoreQueryPrefix: true });
+const parseAuthorizationParams = (params: ParsedQs): McpAuthorizationParams => {
   const get = (name: keyof McpAuthorizationParams) => {
     const value = params[name];
 

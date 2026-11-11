@@ -16,7 +16,10 @@
  */
 package org.graylog.mcp.oauth;
 
+import jakarta.annotation.Nullable;
 import jakarta.ws.rs.core.Response;
+
+import java.util.Optional;
 
 /**
  * An OAuth error as defined in RFC 6749 section 5.2. The description is meant to be returned to clients.
@@ -36,33 +39,34 @@ public class OAuthException extends RuntimeException {
     private final String error;
     private final String description;
     private final Response.Status status;
-    private final boolean redirectable;
+    @Nullable
+    private final String redirectUri;
 
-    private OAuthException(String error, String description, Response.Status status, boolean redirectable) {
+    private OAuthException(String error, String description, Response.Status status, @Nullable String redirectUri) {
         super(description);
         this.error = error;
         this.description = description;
         this.status = status;
-        this.redirectable = redirectable;
+        this.redirectUri = redirectUri;
     }
 
     public static OAuthException of(String error, String description) {
-        return new OAuthException(error, description, Response.Status.BAD_REQUEST, false);
+        return new OAuthException(error, description, Response.Status.BAD_REQUEST, null);
     }
 
     public static OAuthException of(String error, String description, Response.Status status) {
-        return new OAuthException(error, description, status, false);
-    }
-
-    /**
-     * An authorization request error that can safely be reported to the client's redirect URI.
-     */
-    public static OAuthException redirectable(String error, String description) {
-        return new OAuthException(error, description, Response.Status.BAD_REQUEST, true);
+        return new OAuthException(error, description, status, null);
     }
 
     public static OAuthException invalidClient(String description) {
-        return new OAuthException(INVALID_CLIENT, description, Response.Status.UNAUTHORIZED, false);
+        return new OAuthException(INVALID_CLIENT, description, Response.Status.UNAUTHORIZED, null);
+    }
+
+    /**
+     * Marks this authorization request error as safe to report to the client's validated redirect URI.
+     */
+    public OAuthException redirectTo(String redirectUri) {
+        return new OAuthException(error, description, status, redirectUri);
     }
 
     public String error() {
@@ -77,7 +81,7 @@ public class OAuthException extends RuntimeException {
         return status;
     }
 
-    public boolean redirectable() {
-        return redirectable;
+    public Optional<String> redirectUri() {
+        return Optional.ofNullable(redirectUri);
     }
 }

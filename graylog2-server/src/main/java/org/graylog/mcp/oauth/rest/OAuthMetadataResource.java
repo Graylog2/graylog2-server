@@ -25,10 +25,8 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
-import org.graylog.mcp.config.McpConfiguration;
 import org.graylog.mcp.oauth.McpOAuthService;
 import org.graylog.mcp.oauth.McpOAuthUrls;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.rest.NonApiResource;
 
 import java.util.List;
@@ -36,7 +34,7 @@ import java.util.List;
 /**
  * OAuth discovery endpoints used by MCP clients.
  * <p>
- * The variants with a path suffix are required when Graylog is served below a path prefix, see RFC 9728 section 3.1
+ * The path suffixes are required when Graylog is served below a path prefix, see RFC 9728 section 3.1
  * and RFC 8414 section 3.1.
  *
  * @see <a href="https://datatracker.ietf.org/doc/html/rfc9728">RFC 9728 - OAuth 2.0 Protected Resource Metadata</a>
@@ -45,12 +43,12 @@ import java.util.List;
 @NonApiResource
 @Path("/.well-known")
 public class OAuthMetadataResource {
-    private final ClusterConfigService clusterConfigService;
+    private final McpOAuthService oauthService;
     private final McpOAuthUrls urls;
 
     @Inject
-    public OAuthMetadataResource(ClusterConfigService clusterConfigService, McpOAuthUrls urls) {
-        this.clusterConfigService = clusterConfigService;
+    public OAuthMetadataResource(McpOAuthService oauthService, McpOAuthUrls urls) {
+        this.oauthService = oauthService;
         this.urls = urls;
     }
 
@@ -72,7 +70,7 @@ public class OAuthMetadataResource {
                                               @JsonProperty("authorization_response_iss_parameter_supported") boolean authorizationResponseIssParameterSupported) {}
 
     @GET
-    @Path("oauth-protected-resource")
+    @Path("oauth-protected-resource{suffix: (/.+)?}")
     @Produces(MediaType.APPLICATION_JSON)
     public ProtectedResourceMetadata protectedResource(@Context HttpHeaders headers) {
         ensureAvailable();
@@ -86,14 +84,7 @@ public class OAuthMetadataResource {
     }
 
     @GET
-    @Path("oauth-protected-resource/{suffix: .+}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public ProtectedResourceMetadata protectedResourceWithSuffix(@Context HttpHeaders headers) {
-        return protectedResource(headers);
-    }
-
-    @GET
-    @Path("oauth-authorization-server")
+    @Path("oauth-authorization-server{suffix: (/.+)?}")
     @Produces(MediaType.APPLICATION_JSON)
     public AuthorizationServerMetadata authorizationServer(@Context HttpHeaders headers) {
         ensureAvailable();
@@ -113,15 +104,8 @@ public class OAuthMetadataResource {
         );
     }
 
-    @GET
-    @Path("oauth-authorization-server/{suffix: .+}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public AuthorizationServerMetadata authorizationServerWithSuffix(@Context HttpHeaders headers) {
-        return authorizationServer(headers);
-    }
-
     private void ensureAvailable() {
-        if (!clusterConfigService.getOrDefault(McpConfiguration.class, McpConfiguration.DEFAULT_VALUES).oauthAvailable()) {
+        if (!oauthService.oauthAvailable()) {
             throw new NotFoundException();
         }
     }

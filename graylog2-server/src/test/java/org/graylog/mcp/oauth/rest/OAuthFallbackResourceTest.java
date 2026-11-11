@@ -20,23 +20,20 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.Response;
-import org.graylog.mcp.config.McpConfiguration;
+import org.graylog.mcp.oauth.McpOAuthService;
 import org.graylog.mcp.oauth.McpOAuthUrls;
 import org.graylog2.configuration.HttpConfiguration;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class OAuthFallbackResourceTest {
-    private final ClusterConfigService clusterConfigService = mock(ClusterConfigService.class);
+    private final McpOAuthService oauthService = mock(McpOAuthService.class);
     private final HttpHeaders headers = mock(HttpHeaders.class);
     private OAuthFallbackResource resource;
 
@@ -45,7 +42,7 @@ class OAuthFallbackResourceTest {
         final HttpConfiguration httpConfiguration = mock(HttpConfiguration.class);
         when(httpConfiguration.getHttpExternalUri()).thenReturn(URI.create("https://graylog.example.com/"));
         when(headers.getRequestHeaders()).thenReturn(new MultivaluedHashMap<>());
-        resource = new OAuthFallbackResource(clusterConfigService, new McpOAuthUrls(httpConfiguration));
+        resource = new OAuthFallbackResource(oauthService, new McpOAuthUrls(httpConfiguration));
     }
 
     @Test
@@ -74,8 +71,6 @@ class OAuthFallbackResourceTest {
     }
 
     private void mockConfig(boolean oauthAvailable) {
-        final McpConfiguration config = mock(McpConfiguration.class);
-        when(config.oauthAvailable()).thenReturn(oauthAvailable);
-        when(clusterConfigService.getOrDefault(eq(McpConfiguration.class), any())).thenReturn(config);
+        when(oauthService.oauthAvailable()).thenReturn(oauthAvailable);
     }
 }

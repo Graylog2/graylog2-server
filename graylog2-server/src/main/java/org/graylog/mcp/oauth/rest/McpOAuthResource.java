@@ -38,12 +38,11 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog.mcp.config.McpConfiguration;
 import org.graylog.mcp.oauth.McpOAuthService;
 import org.graylog.mcp.oauth.McpOAuthUrls;
 import org.graylog.mcp.oauth.OAuthException;
 import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -61,13 +60,11 @@ import java.util.List;
 public class McpOAuthResource extends RestResource {
     private final McpOAuthService oauthService;
     private final McpOAuthUrls urls;
-    private final ClusterConfigService clusterConfigService;
 
     @Inject
-    public McpOAuthResource(McpOAuthService oauthService, McpOAuthUrls urls, ClusterConfigService clusterConfigService) {
+    public McpOAuthResource(McpOAuthService oauthService, McpOAuthUrls urls) {
         this.oauthService = oauthService;
         this.urls = urls;
-        this.clusterConfigService = clusterConfigService;
     }
 
     public record AuthorizationRequestDetails(@JsonProperty("client_id") String clientId,
@@ -105,7 +102,7 @@ public class McpOAuthResource extends RestResource {
                                                             @QueryParam("code_challenge_method") String codeChallengeMethod,
                                                             @QueryParam("state") String state,
                                                             @QueryParam("resource") String resource) {
-        ensureAllowed();
+        ensureAllowed(getCurrentUser());
         final McpOAuthService.AuthorizationRequest request = validate(clientId, redirectUri, responseType,
                 codeChallenge, codeChallengeMethod, state, resource);
         return new AuthorizationRequestDetails(
@@ -124,14 +121,15 @@ public class McpOAuthResource extends RestResource {
     @Operation(summary = "Approves or denies an MCP OAuth authorization request")
     @NoAuditEvent("Has custom audit events")
     public AuthorizationDecisionResponse decide(@NotNull AuthorizationDecision decision, @Context HttpHeaders headers) {
-        ensureAllowed();
+        final User user = getCurrentUser();
+        ensureAllowed(user);
         final McpOAuthService.AuthorizationRequest request = validate(decision.clientId(), decision.redirectUri(),
                 decision.responseType(), decision.codeChallenge(), decision.codeChallengeMethod(), decision.state(),
                 decision.resource());
         final String issuer = urls.forRequest(headers.getRequestHeaders()).issuer();
         final String redirect = decision.approved()
-                ? oauthService.approve(request, getCurrentUser(), issuer)
-                : oauthService.deny(request, getCurrentUser(), issuer);
+                ? oauthService.approve(request, user, issuer)
+                : oauthService.deny(request, user, issuer);
         return new AuthorizationDecisionResponse(redirect);
     }
 
@@ -154,15 +152,14 @@ public class McpOAuthResource extends RestResource {
         }
     }
 
-    private void ensureAllowed() {
-        final McpConfiguration config = clusterConfigService.getOrDefault(McpConfiguration.class, McpConfiguration.DEFAULT_VALUES);
-        if (!config.oauthAvailable()) {
+    private void ensureAllowed(User user) {
+        if (!oauthService.oauthAvailable()) {
             throw new NotFoundException("MCP OAuth is not enabled");
         }
         if (!isPermitted(RestPermissions.MCP_SERVER_ACCESS)) {
             throw new ForbiddenException("You are not allowed to access the MCP server");
         }
-        if (!isPermitted(RestPermissions.USERS_TOKENCREATE, getCurrentUser().getName())) {
+        if (!isPermitted(RestPermissions.USERS_TOKENCREATE, user.getName())) {
             throw new ForbiddenException("You are not allowed to create access tokens");
         }
     }

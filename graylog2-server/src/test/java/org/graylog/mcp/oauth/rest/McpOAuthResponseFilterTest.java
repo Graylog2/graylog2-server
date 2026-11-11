@@ -24,11 +24,9 @@ import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.glassfish.jersey.test.TestProperties;
-import org.graylog.mcp.config.McpConfiguration;
 import org.graylog.mcp.oauth.McpOAuthService;
 import org.graylog.mcp.oauth.McpOAuthUrls;
 import org.graylog2.configuration.HttpConfiguration;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -38,8 +36,6 @@ import java.net.URI;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -62,20 +58,18 @@ class McpOAuthResponseFilterTest extends JerseyTest {
         forceSet(TestProperties.CONTAINER_PORT, "0");
         final HttpConfiguration httpConfiguration = mock(HttpConfiguration.class);
         when(httpConfiguration.getHttpExternalUri()).thenReturn(URI.create("https://graylog.example.com/"));
-        final McpConfiguration config = mock(McpConfiguration.class);
-        when(config.oauthAvailable()).thenReturn(true);
-        final ClusterConfigService clusterConfigService = mock(ClusterConfigService.class);
-        when(clusterConfigService.getOrDefault(eq(McpConfiguration.class), any())).thenReturn(config);
+        final McpOAuthService oauthService = mock(McpOAuthService.class);
+        when(oauthService.oauthAvailable()).thenReturn(true);
         final McpOAuthUrls urls = new McpOAuthUrls(httpConfiguration);
 
         return new ResourceConfig(OtherResource.class, McpOAuthResponseFilter.class)
-                .register(new OAuthResource(mock(McpOAuthService.class), urls, clusterConfigService))
-                .register(new OAuthMetadataResource(clusterConfigService, urls))
-                .register(new OAuthFallbackResource(clusterConfigService, urls))
+                .register(new OAuthResource(oauthService, urls))
+                .register(new OAuthMetadataResource(oauthService, urls))
+                .register(new OAuthFallbackResource(oauthService, urls))
                 .register(new AbstractBinder() {
                     @Override
                     protected void configure() {
-                        bind(clusterConfigService).to(ClusterConfigService.class);
+                        bind(oauthService).to(McpOAuthService.class);
                         bind(urls).to(McpOAuthUrls.class);
                     }
                 });

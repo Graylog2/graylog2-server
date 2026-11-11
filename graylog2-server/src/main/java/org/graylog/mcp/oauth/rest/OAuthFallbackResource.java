@@ -25,11 +25,10 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.graylog.mcp.config.McpConfiguration;
+import org.graylog.mcp.oauth.McpOAuthService;
 import org.graylog.mcp.oauth.McpOAuthUrls;
 import org.graylog.mcp.oauth.OAuthException;
 import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.rest.NonApiResource;
 import org.graylog2.shared.rest.SkipCSRFProtection;
 
@@ -45,12 +44,12 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 // A non-empty class path keeps Jersey from merging this with other root resources, which would break their prefixes
 @Path("{endpoint: authorize|register|token}")
 public class OAuthFallbackResource {
-    private final ClusterConfigService clusterConfigService;
+    private final McpOAuthService oauthService;
     private final McpOAuthUrls urls;
 
     @Inject
-    public OAuthFallbackResource(ClusterConfigService clusterConfigService, McpOAuthUrls urls) {
-        this.clusterConfigService = clusterConfigService;
+    public OAuthFallbackResource(McpOAuthService oauthService, McpOAuthUrls urls) {
+        this.oauthService = oauthService;
         this.urls = urls;
     }
 
@@ -69,7 +68,7 @@ public class OAuthFallbackResource {
     }
 
     private Response error(HttpHeaders headers) {
-        final String description = clusterConfigService.getOrDefault(McpConfiguration.class, McpConfiguration.DEFAULT_VALUES).oauthAvailable()
+        final String description = oauthService.oauthAvailable()
                 ? f("OAuth endpoints are advertised at %s", urls.forRequest(headers.getRequestHeaders()).authorizationServerMetadata())
                 : "MCP OAuth is not enabled. Enable remote access and OAuth in the MCP configuration.";
         return OAuthResource.error(OAuthException.of(OAuthException.INVALID_REQUEST, description, Response.Status.NOT_FOUND));

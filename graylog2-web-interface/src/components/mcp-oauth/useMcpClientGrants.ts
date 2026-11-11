@@ -40,9 +40,7 @@ const fetchGrants = (): Promise<Array<McpClientGrant>> =>
     })),
   );
 
-const useMcpClientGrants = (
-  { enabled } = { enabled: true },
-): {
+const useMcpClientGrants = (): {
   grants: Array<McpClientGrant>;
   isLoading: boolean;
   revokeGrant: (clientId: string) => Promise<void>;
@@ -52,7 +50,6 @@ const useMcpClientGrants = (
   const { data, isLoading } = useQuery({
     queryKey: GRANTS_QUERY_KEY,
     queryFn: () => defaultOnError(fetchGrants(), 'Loading connected MCP clients failed with status'),
-    enabled,
   });
   const { mutateAsync, isPending } = useMutation({
     mutationFn: (clientId: string) => MCPOAuth.revokeGrant(clientId),

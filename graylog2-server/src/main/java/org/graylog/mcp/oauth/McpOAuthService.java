@@ -20,10 +20,12 @@ import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.core.Response;
+import org.apache.commons.lang3.StringUtils;
 import org.graylog.mcp.config.McpConfiguration;
 import org.graylog.security.GranteeAuthorizer;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.AccessToken;
 import org.graylog2.security.AccessTokenService;
@@ -48,6 +50,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.graylog.mcp.oauth.OAuthException.ACCESS_DENIED;
 import static org.graylog.mcp.oauth.OAuthException.INVALID_CLIENT_METADATA;
 import static org.graylog.mcp.oauth.OAuthException.INVALID_GRANT;
@@ -70,7 +73,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  * OAuth 2.1 authorization server for MCP clients, following the MCP authorization specification.
  * <p>
  * Only public clients using the authorization code grant with PKCE ({@code S256}) are supported. Issued access tokens
- * are regular Graylog access tokens restricted to the MCP endpoint.
+ * are regular Graylog access tokens linked to the OAuth client.
  */
 @Singleton
 public class McpOAuthService {
@@ -96,6 +99,7 @@ public class McpOAuthService {
     private final UserService userService;
     private final GranteeAuthorizer.Factory granteeAuthorizerFactory;
     private final AuditEventSender auditEventSender;
+    private final ClusterConfigService clusterConfigService;
     private final Clock clock;
 
     @Inject
@@ -106,6 +110,7 @@ public class McpOAuthService {
                            UserService userService,
                            GranteeAuthorizer.Factory granteeAuthorizerFactory,
                            AuditEventSender auditEventSender,
+                           ClusterConfigService clusterConfigService,
                            Clock clock) {
         this.clientService = clientService;
         this.codeService = codeService;
@@ -114,7 +119,16 @@ public class McpOAuthService {
         this.userService = userService;
         this.granteeAuthorizerFactory = granteeAuthorizerFactory;
         this.auditEventSender = auditEventSender;
+        this.clusterConfigService = clusterConfigService;
         this.clock = clock;
+    }
+
+    public McpConfiguration config() {
+        return clusterConfigService.getOrDefault(McpConfiguration.class, McpConfiguration.DEFAULT_VALUES);
+    }
+
+    public boolean oauthAvailable() {
+        return config().oauthAvailable();
     }
 
     public record ClientRegistrationRequest(List<String> redirectUris,
@@ -136,13 +150,14 @@ public class McpOAuthService {
     /**
      * Dynamic client registration (RFC 7591). All clients are registered as public clients.
      */
-    public OAuthClient registerClient(ClientRegistrationRequest request, McpConfiguration config) {
+    public OAuthClient registerClient(ClientRegistrationRequest request) {
         final List<String> redirectUris = Optional.ofNullable(request.redirectUris()).orElse(List.of());
         if (redirectUris.isEmpty() || redirectUris.size() > MAX_REDIRECT_URIS) {
             throw OAuthException.of(INVALID_REDIRECT_URI, f("Between 1 and %d redirect URIs are required", MAX_REDIRECT_URIS));
         }
+        final List<String> allowedRedirectUris = config().oauthAllowedRedirectUris();
         for (final String redirectUri : redirectUris) {
-            if (!RedirectUriPolicy.isAllowed(redirectUri, config.oauthAllowedRedirectUris())) {
+            if (!RedirectUriPolicy.isAllowed(redirectUri, allowedRedirectUris)) {
                 throw OAuthException.of(INVALID_REDIRECT_URI, f("Redirect URI <%s> is not allowed", redirectUri));
             }
         }
@@ -189,42 +204,37 @@ public class McpOAuthService {
         final OAuthClient client = clientService.findByClientId(clientId)
                 .orElseThrow(() -> OAuthException.invalidClient("Unknown client"));
         final String effectiveRedirectUri = resolveRedirectUri(client, redirectUri);
-
-        if (!RESPONSE_TYPE_CODE.equals(responseType)) {
-            throw OAuthException.redirectable(UNSUPPORTED_RESPONSE_TYPE, "Only the code response type is supported");
-        }
-        if (isBlank(codeChallenge) || !OAuthTokens.isValidCodeChallenge(codeChallenge)) {
-            throw OAuthException.redirectable(INVALID_REQUEST, "A valid PKCE code_challenge is required");
-        }
-        if (!CODE_CHALLENGE_METHOD_S256.equals(codeChallengeMethod)) {
-            throw OAuthException.redirectable(INVALID_REQUEST, "Only the S256 code_challenge_method is supported");
-        }
-        if (!isBlank(resource) && !McpOAuthUrls.isMcpResource(resource)) {
-            throw OAuthException.redirectable(INVALID_TARGET, "The requested resource is not the MCP endpoint");
+        try {
+            validateAuthorizationParameters(responseType, codeChallenge, codeChallengeMethod, resource);
+        } catch (OAuthException e) {
+            throw e.redirectTo(effectiveRedirectUri);
         }
         return new AuthorizationRequest(client, effectiveRedirectUri, codeChallenge, state, isBlank(resource) ? null : resource);
     }
 
-    /**
-     * Builds the redirect for an error in an authorization request, if the client and redirect URI are known to be valid.
-     */
-    public Optional<String> errorRedirect(OAuthException e,
-                                          @Nullable String clientId,
-                                          @Nullable String redirectUri,
-                                          @Nullable String state,
-                                          String issuer) {
-        if (!e.redirectable() || isBlank(clientId)) {
-            return Optional.empty();
+    private static void validateAuthorizationParameters(@Nullable String responseType,
+                                                        @Nullable String codeChallenge,
+                                                        @Nullable String codeChallengeMethod,
+                                                        @Nullable String resource) {
+        if (!RESPONSE_TYPE_CODE.equals(responseType)) {
+            throw OAuthException.of(UNSUPPORTED_RESPONSE_TYPE, "Only the code response type is supported");
         }
-        return clientService.findByClientId(clientId)
-                .map(client -> {
-                    try {
-                        return resolveRedirectUri(client, redirectUri);
-                    } catch (OAuthException ignored) {
-                        return null;
-                    }
-                })
-                .map(uri -> errorRedirectUri(uri, e.error(), e.description(), state, issuer));
+        if (codeChallenge == null || !OAuthTokens.isValidCodeChallenge(codeChallenge)) {
+            throw OAuthException.of(INVALID_REQUEST, "A valid PKCE code_challenge is required");
+        }
+        if (!CODE_CHALLENGE_METHOD_S256.equals(codeChallengeMethod)) {
+            throw OAuthException.of(INVALID_REQUEST, "Only the S256 code_challenge_method is supported");
+        }
+        if (!isBlank(resource) && !McpOAuthUrls.isMcpResource(resource)) {
+            throw OAuthException.of(INVALID_TARGET, "The requested resource is not the MCP endpoint");
+        }
+    }
+
+    /**
+     * Builds the redirect for an authorization request error that can be reported to the client.
+     */
+    public static Optional<String> errorRedirect(OAuthException e, @Nullable String state, String issuer) {
+        return e.redirectUri().map(uri -> errorRedirectUri(uri, e.error(), e.description(), state, issuer));
     }
 
     /**
@@ -246,11 +256,7 @@ public class McpOAuthService {
 
         final Map<String, String> params = new LinkedHashMap<>();
         params.put("code", code);
-        params.put("iss", issuer);
-        if (request.state() != null) {
-            params.put("state", request.state());
-        }
-        return appendQueryParameters(request.redirectUri(), params);
+        return clientRedirect(request.redirectUri(), params, request.state(), issuer);
     }
 
     public String deny(AuthorizationRequest request, User user, String issuer) {
@@ -262,8 +268,7 @@ public class McpOAuthService {
                                                    @Nullable String code,
                                                    @Nullable String redirectUri,
                                                    @Nullable String codeVerifier,
-                                                   @Nullable String resource,
-                                                   McpConfiguration config) {
+                                                   @Nullable String resource) {
         final OAuthClient client = loadClient(clientId);
         if (isBlank(code) || isBlank(codeVerifier)) {
             throw OAuthException.of(INVALID_REQUEST, "Missing code or code_verifier");
@@ -287,15 +292,14 @@ public class McpOAuthService {
         final String effectiveResource = validateResource(resource, authorizationCode.resource());
         final User user = loadAuthorizedUser(authorizationCode.userId());
 
-        final TokenResponse response = issueTokens(client, user, effectiveResource, UUID.randomUUID().toString(), config);
+        final TokenResponse response = issueTokens(client, user, effectiveResource);
         auditEventSender.success(AuditActor.user(user), MCP_OAUTH_TOKEN_ISSUE, clientContext(client));
         return response;
     }
 
     public TokenResponse refresh(@Nullable String clientId,
                                  @Nullable String refreshToken,
-                                 @Nullable String resource,
-                                 McpConfiguration config) {
+                                 @Nullable String resource) {
         final OAuthClient client = loadClient(clientId);
         if (isBlank(refreshToken)) {
             throw OAuthException.of(INVALID_REQUEST, "Missing refresh_token");
@@ -324,7 +328,7 @@ public class McpOAuthService {
         final String effectiveResource = validateResource(resource, token.resource());
         final User user = loadAuthorizedUser(token.userId());
 
-        final TokenResponse response = issueTokens(client, user, effectiveResource, token.familyId(), config);
+        final TokenResponse response = issueTokens(client, user, effectiveResource);
         auditEventSender.success(AuditActor.user(user), MCP_OAUTH_TOKEN_REFRESH, clientContext(client));
         return response;
     }
@@ -370,14 +374,15 @@ public class McpOAuthService {
         return revoked;
     }
 
-    private TokenResponse issueTokens(OAuthClient client, User user, @Nullable String resource, String familyId, McpConfiguration config) {
+    private TokenResponse issueTokens(OAuthClient client, User user, @Nullable String resource) {
+        final McpConfiguration config = config();
         final Instant now = Instant.now(clock);
         final Duration accessTokenTtl = config.oauthAccessTokenTtl();
         final Instant refreshTokenExpiresAt = now.plus(config.oauthRefreshTokenTtl());
 
         final AccessToken accessToken = accessTokenService.create(
                 user.getName(),
-                truncate(f("MCP: %s", client.clientName()), MAX_CLIENT_NAME_LENGTH + 5),
+                f("MCP: %s", client.clientName()),
                 PeriodDuration.of(accessTokenTtl),
                 client.clientId()
         );
@@ -385,7 +390,6 @@ public class McpOAuthService {
         refreshTokenService.create(new OAuthRefreshToken(
                 null,
                 OAuthTokens.hash(refreshToken),
-                familyId,
                 client.clientId(),
                 user.getId(),
                 user.getName(),
@@ -460,10 +464,14 @@ public class McpOAuthService {
     private static String errorRedirectUri(String redirectUri, String error, @Nullable String description, @Nullable String state, String issuer) {
         final Map<String, String> params = new LinkedHashMap<>();
         params.put("error", error);
-        params.put("iss", issuer);
         if (description != null) {
             params.put("error_description", description);
         }
+        return clientRedirect(redirectUri, params, state, issuer);
+    }
+
+    private static String clientRedirect(String redirectUri, Map<String, String> params, @Nullable String state, String issuer) {
+        params.put("iss", issuer);
         if (state != null) {
             params.put("state", state);
         }
@@ -483,15 +491,7 @@ public class McpOAuthService {
             return DEFAULT_CLIENT_NAME;
         }
         final String printable = clientName.replaceAll("\\p{Cntrl}", "").strip();
-        return printable.isEmpty() ? DEFAULT_CLIENT_NAME : truncate(printable, MAX_CLIENT_NAME_LENGTH);
-    }
-
-    private static String truncate(String value, int maxLength) {
-        return value.length() <= maxLength ? value : value.substring(0, maxLength);
-    }
-
-    private static boolean isBlank(@Nullable String value) {
-        return value == null || value.isBlank();
+        return printable.isEmpty() ? DEFAULT_CLIENT_NAME : StringUtils.truncate(printable, MAX_CLIENT_NAME_LENGTH);
     }
 
     private static Map<String, Object> clientContext(OAuthClient client) {

@@ -15,14 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Alert, Button, ButtonToolbar } from 'components/bootstrap';
 import { RelativeTime, Spinner } from 'components/common';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useProductName from 'brand-customization/useProductName';
-import useLocation from 'routing/useLocation';
+import useQueryParameters from 'routing/useQuery';
 
 import parseAuthorizationParams from './parseAuthorizationParams';
 import redirectToClient from './redirectToClient';
@@ -59,8 +59,8 @@ const Details = styled.dl(
 );
 
 const McpOAuthConsent = () => {
-  const { search } = useLocation();
-  const params = parseAuthorizationParams(search);
+  const query = useQueryParameters();
+  const params = useMemo(() => parseAuthorizationParams(query), [query]);
   const currentUser = useCurrentUser();
   const productName = useProductName();
   const { data: request, isLoading, error } = useMcpAuthorizationRequest(params);

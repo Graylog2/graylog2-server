@@ -27,10 +27,9 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.server.ExtendedUriInfo;
 import org.glassfish.jersey.server.model.Resource;
-import org.graylog.mcp.config.McpConfiguration;
+import org.graylog.mcp.oauth.McpOAuthService;
 import org.graylog.mcp.oauth.McpOAuthUrls;
 import org.graylog.mcp.server.McpRestResource;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 
 import java.util.Collections;
 import java.util.Set;
@@ -45,13 +44,13 @@ public class McpOAuthResponseFilter implements ContainerResponseFilter {
     private static final Set<Class<?>> CORS_RESOURCES = Set.of(OAuthResource.class, OAuthMetadataResource.class, OAuthFallbackResource.class);
 
     private final ResourceInfo resourceInfo;
-    private final ClusterConfigService clusterConfigService;
+    private final McpOAuthService oauthService;
     private final McpOAuthUrls urls;
 
     @Inject
-    public McpOAuthResponseFilter(@Context ResourceInfo resourceInfo, ClusterConfigService clusterConfigService, McpOAuthUrls urls) {
+    public McpOAuthResponseFilter(@Context ResourceInfo resourceInfo, McpOAuthService oauthService, McpOAuthUrls urls) {
         this.resourceInfo = resourceInfo;
-        this.clusterConfigService = clusterConfigService;
+        this.oauthService = oauthService;
         this.urls = urls;
     }
 
@@ -69,7 +68,7 @@ public class McpOAuthResponseFilter implements ContainerResponseFilter {
         final Class<?> resourceClass = resourceInfo.getResourceClass();
         if (resourceClass != null && McpRestResource.class.isAssignableFrom(resourceClass)
                 && responseContext.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()
-                && clusterConfigService.getOrDefault(McpConfiguration.class, McpConfiguration.DEFAULT_VALUES).oauthAvailable()) {
+                && oauthService.oauthAvailable()) {
             final String resourceMetadata = urls.forRequest(requestContext.getHeaders()).protectedResourceMetadata();
             final String authorization = requestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
             final String error = authorization != null && authorization.startsWith("Bearer ") ? "error=\"invalid_token\", " : "";

@@ -44,7 +44,6 @@ public class OAuthRefreshTokenService {
         this.collection = mongoCollections.collection(COLLECTION_NAME, OAuthRefreshToken.class);
         collection.createIndexes(List.of(
                 new IndexModel(Indexes.ascending(OAuthRefreshToken.FIELD_TOKEN_HASH), new IndexOptions().unique(true)),
-                new IndexModel(Indexes.ascending(OAuthRefreshToken.FIELD_FAMILY_ID)),
                 new IndexModel(Indexes.ascending(OAuthRefreshToken.FIELD_USERNAME, OAuthRefreshToken.FIELD_CLIENT_ID)),
                 new IndexModel(Indexes.ascending(OAuthRefreshToken.FIELD_EXPIRES_AT), new IndexOptions().expireAfter(0L, TimeUnit.SECONDS))
         ));
@@ -73,10 +72,6 @@ public class OAuthRefreshTokenService {
     public List<OAuthRefreshToken> findActiveByUsername(String username) {
         return collection.find(and(eq(OAuthRefreshToken.FIELD_USERNAME, username), eq(OAuthRefreshToken.FIELD_USED, false)))
                 .into(new ArrayList<>());
-    }
-
-    public void deleteFamily(String familyId) {
-        collection.deleteMany(eq(OAuthRefreshToken.FIELD_FAMILY_ID, familyId));
     }
 
     public long deleteByUsernameAndClientId(String username, String clientId) {

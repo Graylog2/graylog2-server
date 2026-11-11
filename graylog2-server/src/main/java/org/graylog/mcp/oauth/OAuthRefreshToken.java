@@ -29,17 +29,16 @@ import org.mongojack.ObjectId;
 import java.time.Instant;
 
 /**
- * A refresh token. Refresh tokens are rotated on every use, all tokens descending from the same authorization share
- * a {@code familyId}.
+ * A refresh token. Refresh tokens are rotated on every use.
  *
  * @param accessTokenId        the access token issued together with this refresh token
  * @param accessTokenExpiresAt used to tell an expired access token from a revoked one
- * @param used                 whether this token was already exchanged. Presenting a used token revokes its family.
+ * @param used                 whether this token was already exchanged. Presenting a used token revokes all
+ *                             tokens of the client for the user.
  */
 public record OAuthRefreshToken(
         @ObjectId @Id @Nullable @JsonProperty(MongoEntity.FIELD_ID) String id,
         @JsonProperty(FIELD_TOKEN_HASH) String tokenHash,
-        @JsonProperty(FIELD_FAMILY_ID) String familyId,
         @JsonProperty(FIELD_CLIENT_ID) String clientId,
         @JsonProperty(FIELD_USER_ID) String userId,
         @JsonProperty(FIELD_USERNAME) String username,
@@ -57,7 +56,6 @@ public record OAuthRefreshToken(
         @JsonProperty(FIELD_EXPIRES_AT) Instant expiresAt
 ) implements MongoEntity {
     public static final String FIELD_TOKEN_HASH = "token_hash";
-    public static final String FIELD_FAMILY_ID = "family_id";
     public static final String FIELD_CLIENT_ID = "client_id";
     public static final String FIELD_USER_ID = "user_id";
     public static final String FIELD_USERNAME = "username";

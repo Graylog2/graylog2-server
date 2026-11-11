@@ -110,6 +110,7 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
         collection(AccessTokenImpl.class).createIndex(new BasicDBObject(AccessTokenImpl.TOKEN, 1), new BasicDBObject("unique", true));
         // Add an index on the expires_at field to speed up the search for expired tokens:
         collection(AccessTokenImpl.class).createIndex(new BasicDBObject(AccessTokenImpl.EXPIRES_AT, 1));
+        collection(AccessTokenImpl.class).createIndex(new BasicDBObject(AccessTokenImpl.USERNAME, 1).append(AccessTokenImpl.OAUTH_CLIENT_ID, 1));
     }
 
     @Override
