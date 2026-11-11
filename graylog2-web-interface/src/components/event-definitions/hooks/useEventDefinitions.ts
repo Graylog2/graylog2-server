@@ -56,9 +56,10 @@ type EventDefinitionResult = {
   attributes: Array<{ id: string; title: string; sortable: boolean }>;
 };
 
-export const useGetEventDefinition = (eventDefinitionId: string) => {
+export const useGetEventDefinition = (eventDefinitionId: string, enabled = true) => {
   const { data, isFetching } = useQuery({
     queryKey: ['get-event-definition', eventDefinitionId],
+    enabled,
 
     queryFn: () =>
       defaultOnError(
