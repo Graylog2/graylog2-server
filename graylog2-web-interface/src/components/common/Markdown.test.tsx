@@ -70,6 +70,15 @@ describe('Markdown', () => {
       expect(testComponent).toHaveTextContent('Hello world!');
     });
 
+    it('replaces custom syntax in link texts', async () => {
+      render(<Markdown text="[Seen #test#yesterday#test# on fw-1](https://example.org/fw-1)" augment />);
+
+      const link = await screen.findByRole('link', { name: /Seen yesterday on fw-1/ });
+
+      expect(link).toHaveAttribute('href', 'https://example.org/fw-1');
+      expect(screen.getByTestId('test-component')).toHaveTextContent('yesterday');
+    });
+
     it('replaces custom syntax and renders links inside tables', async () => {
       render(
         <Markdown
