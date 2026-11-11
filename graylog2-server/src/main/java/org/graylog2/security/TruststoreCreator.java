@@ -123,14 +123,14 @@ public class TruststoreCreator {
         final Enumeration<String> aliases = keystore.aliases();
         while (aliases.hasMoreElements()) {
             final String alias = aliases.nextElement();
-            if (keystore.isKeyEntry(alias)) {
+            if (keystore.entryInstanceOf(alias, KeyStore.PrivateKeyEntry.class)) {
                 LOG.info("Adding key certificate chain of alias {} to the truststore", alias);
                 addCertificates(toX509Certs(keystore.getCertificateChain(alias)));
-            } else if (keystore.isCertificateEntry(alias)) {
+            } else if (keystore.entryInstanceOf(alias, KeyStore.TrustedCertificateEntry.class)) {
                 LOG.info("Adding certificate of alias {} to the truststore", alias);
                 addCertificates(toX509Certs(new Certificate[]{keystore.getCertificate(alias)}));
             } else {
-                LOG.warn("Unsupported keystore alias {}", alias);
+                LOG.warn("Unsupported keystore alias {}, skipping", alias);
             }
         }
         return this;

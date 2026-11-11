@@ -40,6 +40,8 @@ import org.graylog.security.certutil.keystore.storage.KeystoreFileStorage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
@@ -198,6 +200,25 @@ public class TruststoreCreatorTest {
         Assertions.assertThat(Collections.list(truststore.aliases()))
                 .containsExactlyInAnyOrder("cn=my-node", "cn=my-ca", "cn=other-ca");
         Assertions.assertThat(truststore.isKeyEntry("cn=my-node")).isFalse();
+    }
+
+    @Test
+    void testSecretKeyEntriesSkipped() throws Exception {
+        final KeyPair node = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("my-node").isCA(false).validity(Duration.ofDays(90)));
+        final char[] password = "password".toCharArray();
+
+        final KeyStore source = KeyStore.getInstance(CertConstants.PKCS12);
+        source.load(null, null);
+        source.setKeyEntry("node", node.privateKey(), password, new Certificate[]{node.certificate()});
+        final SecretKey secretKey = KeyGenerator.getInstance("AES").generateKey();
+        source.setEntry("secret", new KeyStore.SecretKeyEntry(secretKey), new KeyStore.PasswordProtection(password));
+
+        final KeyStore truststore = TruststoreCreator.newEmpty()
+                .addCertificates(source)
+                .getTruststore();
+
+        Assertions.assertThat(Collections.list(truststore.aliases()))
+                .containsExactly("cn=my-node");
     }
 
     private static X509TrustManager createTrustManager(KeyStore caTruststore) throws NoSuchAlgorithmException, KeyStoreException {
