@@ -14,16 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.rest;
+import TitleTypes from 'views/stores/TitleTypes';
+import defaultTitle from 'views/components/defaultTitle';
+import useActiveViewState from 'views/hooks/useActiveViewState';
+import type Widget from 'views/logic/widgets/Widget';
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.NotNull;
+const useWidgetTitle = (widget: Widget) => {
+  const viewState = useActiveViewState();
 
-public record SyncSearchExecutionRequest(@JsonProperty("search") @NotNull SearchDTO search,
-                                         @JsonProperty("execution_state") ExecutionState executionState) {
-    @JsonCreator
-    public SyncSearchExecutionRequest {
-        executionState = executionState == null ? ExecutionState.empty() : executionState;
-    }
-}
+  return viewState?.titles?.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget)) as string;
+};
+
+export default useWidgetTitle;
