@@ -2,4 +2,4 @@ type = "f"
 message = "Fix Events Overview widget showing no results when the dashboard stream filter contains only the All events or All system events stream."
 
 issues = ["26083"]
-pulls = []
+pulls = ["28177"]
