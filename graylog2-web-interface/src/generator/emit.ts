@@ -208,6 +208,7 @@ const emitBlock = (
   queryParameter: Parameter[],
   rawProduces: string[],
   formDataParameters: Parameter[],
+  headerParameters: Parameter[],
 ) => {
   const produces = rawProduces || [];
   const queryParameters = ts.factory.createObjectLiteralExpression(
@@ -247,6 +248,9 @@ const emitBlock = (
           produces.map((contentType) => emitString(contentType)),
           produces.length > 1,
         ),
+      ),
+      ...headerParameters.map((h) =>
+        ts.factory.createPropertyAssignment(emitString(h.name), ts.factory.createIdentifier(cleanVariableName(h.name))),
       ),
     ],
     true,
@@ -394,6 +398,7 @@ const emitRoute = (
   const queryParameters = parameters.filter((parameter) => parameter.paramType === 'query');
   const bodyParameter = parameters.filter((parameter) => parameter.paramType === 'body');
   const formDataParameters = parameters.filter((parameter) => parameter.paramType === 'formdata');
+  const headerParameters = parameters.filter((parameter) => parameter.paramType === 'header');
   const routePath = firstNonEmpty(operationPath, path) || '/';
   const parameterNames = parameters.map(({ name }) => cleanVariableName(name));
   const undeclaredPathVariables = (routePath.match(/{.+?}/g) ?? [])
@@ -439,7 +444,7 @@ const emitRoute = (
         undefined,
         [...parameters.sort(sortByOptionality).map(emitFunctionParameter), requestOptionsParameter],
         emitPromiseResultType(emitType(type)),
-        emitBlock(method, routePath, bodyParameter[0], queryParameters, produces, formDataParameters),
+        emitBlock(method, routePath, bodyParameter[0], queryParameters, produces, formDataParameters, headerParameters),
       ),
     ],
   };
