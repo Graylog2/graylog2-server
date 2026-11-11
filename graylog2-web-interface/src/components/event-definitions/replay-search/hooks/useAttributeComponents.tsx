@@ -27,6 +27,7 @@ import SidebarNavigationLink from 'components/layout/RightSidebar/SidebarNavigat
 import SidebarEventDefinitionDetails from 'components/event-definitions/SidebarEventDefinitionDetails';
 import Routes from 'routing/Routes';
 import Link from 'components/common/Link';
+import { describeExpression } from 'util/CronUtils';
 
 import useAlertAndEventDefinitionData from './useAlertAndEventDefinitionData';
 
@@ -62,8 +63,9 @@ const useAttributeComponents = () => {
       return [{ title: 'Timestamp', content: <Timestamp dateTime={eventData?.timestamp} />, show: !isEventDefinition }];
     }
 
-    const searchWithin = extractDurationAndUnit(eventDefinition.config.search_within_ms, TIME_UNITS);
-    const executeEvery = extractDurationAndUnit(eventDefinition.config.execute_every_ms, TIME_UNITS);
+    const { config } = eventDefinition;
+    const searchWithin = extractDurationAndUnit(config.search_within_ms, TIME_UNITS);
+    const executeEvery = extractDurationAndUnit(config.execute_every_ms, TIME_UNITS);
     const isEDUpdatedAfterEvent =
       !isEventDefinition && moment(eventDefinition.updated_at).diff(eventData?.timestamp) > 0;
 
@@ -94,11 +96,23 @@ const useAttributeComponents = () => {
         title: 'Priority',
         content: getPriorityName(eventDefinition.priority),
       },
-      {
-        title: 'Execute search every',
-        content:
-          executeEvery?.duration && executeEvery?.unit && `${executeEvery.duration} ${executeEvery.unit.toLowerCase()}`,
-      },
+      config.use_cron_scheduling
+        ? {
+            title: 'Execute search',
+            content: config.cron_expression && (
+              <span title={config.cron_expression}>
+                {describeExpression(config.cron_expression)}
+                {config.cron_timezone && ` (${config.cron_timezone})`}
+              </span>
+            ),
+          }
+        : {
+            title: 'Execute search every',
+            content:
+              executeEvery?.duration &&
+              executeEvery?.unit &&
+              `${executeEvery.duration} ${executeEvery.unit.toLowerCase()}`,
+          },
       {
         title: 'Search within',
         content:
