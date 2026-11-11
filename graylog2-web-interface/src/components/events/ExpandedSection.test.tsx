@@ -55,10 +55,10 @@ describe('ExpandedSection', () => {
 
   const baseEvent = { ...eventsFixtures[0], fields: { field: 'The Additional Field' } } as unknown as Event;
 
-  const renderSUT = () =>
+  const renderSUT = (event: Event = baseEvent) =>
     render(
       <MetaDataContext.Provider value={{ meta: {} }}>
-        <ExpandedSection defaultLayout={eventsTableElements.defaultLayout} event={baseEvent} />
+        <ExpandedSection defaultLayout={eventsTableElements.defaultLayout} event={event} />
       </MetaDataContext.Provider>,
     );
 
@@ -67,5 +67,14 @@ describe('ExpandedSection', () => {
 
     await screen.findByText(baseEvent.id);
     await screen.findByText('The Additional Field');
+  });
+
+  it('lists all additional fields instead of collapsing them like the table cell', async () => {
+    renderSUT({ ...baseEvent, fields: { first: 'First value', second: 'Second value' } } as Event);
+
+    await screen.findByText('First value');
+    await screen.findByText('Second value');
+
+    expect(screen.queryByRole('button', { name: /show 1 more/i })).not.toBeInTheDocument();
   });
 });
