@@ -368,16 +368,16 @@ export const executeWithExecutionState =
             }
 
             if (newSearch === SUPERSEDED || selectActiveQuery(getState()) !== activeQuery) {
-              return undefined;
+              return SUPERSEDED;
             }
 
             return searchExecutors.startJob(newSearch, searchTypesToSearch, executionState, [activeQuery]);
           });
       })
-      .then((jobIds: JobIds | undefined) =>
-        jobIds
-          ? dispatch(executeSearchJob({ searchExecutors, jobIds, widgetMapping, page, perPage, stopPolling }))
-          : undefined,
+      .then((jobIds: JobIds | typeof SUPERSEDED) =>
+        jobIds === SUPERSEDED
+          ? undefined
+          : dispatch(executeSearchJob({ searchExecutors, jobIds, widgetMapping, page, perPage, stopPolling })),
       )
       .catch((error) => {
         dispatch(cancelExecutedJob());
