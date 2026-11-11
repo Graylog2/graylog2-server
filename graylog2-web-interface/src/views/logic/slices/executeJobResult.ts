@@ -16,7 +16,7 @@
  */
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
-import type { SearchJobType, JobIds } from 'views/stores/SearchJobs';
+import type { SearchJobType, JobIds, StartJobOptions } from 'views/stores/SearchJobs';
 import { runStartJob, runPollJob, runCancelJob } from 'views/stores/SearchJobs';
 import type { SearchExecutionResult } from 'views/types';
 import SearchResult from 'views/logic/SearchResult';
@@ -54,12 +54,22 @@ export type StartJobType = (
   searchTypesToSearch: string[],
   executionStateParam: SearchExecutionState,
   keepQueries: string[],
+  options?: StartJobOptions,
 ) => Promise<JobIds>;
 
-export const startJob: StartJobType = async (search, searchTypesToSearch, executionStateParam, keepQueries = []) => {
+export const startJob: StartJobType = async (
+  search,
+  searchTypesToSearch,
+  executionStateParam,
+  keepQueries = [],
+  options = {},
+) => {
   const executionState = buildSearchExecutionState(searchTypesToSearch, executionStateParam, keepQueries);
 
-  return runStartJob(search, executionState).then((res) => ({ asyncSearchId: res.id, nodeId: res.executing_node }));
+  return runStartJob(search, executionState, options).then((res) => ({
+    asyncSearchId: res.id,
+    nodeId: res.executing_node,
+  }));
 };
 
 const getDelayTime = (depth: number = 1): number => {

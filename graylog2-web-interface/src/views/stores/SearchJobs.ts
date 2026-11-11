@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import fetch, { Builder } from 'logic/rest/FetchProvider';
+import fetch, { fetchIgnoringUnauthorized } from 'logic/rest/FetchProvider';
 import * as URLUtils from 'util/URLUtils';
 import type Search from 'views/logic/search/Search';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
@@ -60,8 +60,19 @@ export type JobIds = {
   nodeId: string;
 };
 
-export function runStartJob(search: Search, executionState: SearchExecutionState): Promise<JobIdsJson> {
-  return new Builder('POST', startJobUrl(search.id)).json(executionState).ignoreUnauthorized().build();
+/** `ignoreUnauthorized`: the caller handles 403/404 itself, so no global error page and no error notification. */
+export type StartJobOptions = { ignoreUnauthorized?: boolean };
+
+export function runStartJob(
+  search: Search,
+  executionState: SearchExecutionState,
+  { ignoreUnauthorized = false }: StartJobOptions = {},
+): Promise<JobIdsJson> {
+  const body = JSON.stringify(executionState);
+
+  return ignoreUnauthorized
+    ? fetchIgnoringUnauthorized('POST', startJobUrl(search.id), body)
+    : fetch('POST', startJobUrl(search.id), body);
 }
 
 export function runPollJob({

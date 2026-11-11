@@ -37,14 +37,22 @@ describe('executeWithExecutionState', () => {
   });
 
   const view = createSearch();
-  const state = { view: { view, activeQuery: 'query-id-1' }, searchExecution: { jobIds: null } } as RootState;
+  const createState = (isDirty = false) =>
+    ({ view: { view, activeQuery: 'query-id-1', isDirty }, searchExecution: { jobIds: null } }) as RootState;
 
-  const execute = (error: Error) => {
+  const execute = (
+    error: Error,
+    {
+      state = createState(),
+      startJob = jest.fn(() => Promise.reject(error)),
+      executeJobResult = jest.fn(),
+    }: Partial<Pick<SearchExecutors, 'startJob' | 'executeJobResult'>> & { state?: RootState } = {},
+  ) => {
     const searchExecutors: SearchExecutors = {
       resultMapper: (r) => r,
       parse: async () => SearchMetadata.empty(),
-      startJob: () => Promise.reject(error),
-      executeJobResult: jest.fn(),
+      startJob,
+      executeJobResult,
       cancelJob: async () => null,
     };
     const dispatch = jest.fn((action) => (typeof action === 'function' ? action(dispatch, () => state, { searchExecutors }) : action));
@@ -89,6 +97,50 @@ describe('executeWithExecutionState', () => {
 
     expect(ErrorsActions.report).toHaveBeenCalled();
     expect(UserNotification.warning).not.toHaveBeenCalled();
+  });
+
+  it('starts job without triggering the global permission error page', async () => {
+    const startJob = jest.fn(() => Promise.reject(new FetchError('Server Error', 500, undefined)));
+
+    await expect(execute(new FetchError('Server Error', 500, undefined), { startJob })).rejects.toBeInstanceOf(
+      FetchError,
+    );
+
+    expect(startJob).toHaveBeenCalledWith(view.search, undefined, expect.anything(), ['query-id-1'], {
+      ignoreUnauthorized: true,
+    });
+  });
+
+  it('reports permission error for a view with unsaved changes', async () => {
+    savedViewWithSearch('newer-search-id');
+
+    const error = new FetchError('Forbidden', 403, undefined);
+
+    await expect(execute(error, { state: createState(true) })).rejects.toBe(error);
+
+    expect(getView).not.toHaveBeenCalled();
+    expect(ErrorsActions.report).toHaveBeenCalled();
+  });
+
+  it('reports missing stream permissions', async () => {
+    savedViewWithSearch('newer-search-id');
+    const error = new FetchError('Forbidden', 403, { type: 'MissingStreamPermission', streams: ['stream-id'] });
+
+    await expect(execute(error)).rejects.toBe(error);
+
+    expect(getView).not.toHaveBeenCalled();
+    expect(ErrorsActions.report).toHaveBeenCalled();
+  });
+
+  it('does not check view when polling the job fails', async () => {
+    const error = new FetchError('Not Found', 404, undefined);
+    const startJob = jest.fn(() => Promise.resolve({ asyncSearchId: 'job-id', nodeId: 'node-id' }));
+    const executeJobResult = jest.fn(() => Promise.reject(error));
+
+    await expect(execute(error, { startJob, executeJobResult })).rejects.toBe(error);
+
+    expect(getView).not.toHaveBeenCalled();
+    expect(UserNotification.error).not.toHaveBeenCalled();
   });
 
   it('does not check view for other errors', async () => {

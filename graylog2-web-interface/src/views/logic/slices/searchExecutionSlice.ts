@@ -32,7 +32,7 @@ import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type { SearchParser } from 'views/logic/slices/searchMetadataSlice';
 import { parseSearch } from 'views/logic/slices/searchMetadataSlice';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
-import { selectParameters, selectView } from 'views/logic/slices/viewSelectors';
+import { selectIsDirty, selectParameters, selectView } from 'views/logic/slices/viewSelectors';
 import {
   selectGlobalOverride,
   selectSearchTypesToSearch,
@@ -45,7 +45,7 @@ import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
 import type { ParameterMap } from 'views/logic/parameters/Parameter';
 import type Parameter from 'views/logic/parameters/Parameter';
-import type { JobIds } from 'views/stores/SearchJobs';
+import type { JobIds, StartJobOptions } from 'views/stores/SearchJobs';
 import type Search from 'views/logic/search/Search';
 import { setParameters } from 'views/logic/slices/viewSlice';
 import type { WidgetMapping } from 'views/logic/views/types';
@@ -151,6 +151,7 @@ export type SearchExecutors = {
     searchTypesToSearch: string[],
     executionStateParam: SearchExecutionState,
     keepQueries?: string[],
+    options?: StartJobOptions,
   ) => Promise<JobIds>;
   executeJobResult: (params: {
     jobIds: JobIds;
@@ -209,6 +210,9 @@ export const executeSearchJob =
       });
   };
 
+export const notifyStartJobFailed = (error: unknown) =>
+  UserNotification.error(`Starting search job failed: ${error}`, 'Error!');
+
 export const isSearchNotAccessibleError = (error: unknown): error is FetchError =>
   error instanceof FetchError && (error.status === 403 || error.status === 404);
 
@@ -226,10 +230,14 @@ const isSearchOutdated = async (viewId: string | undefined, searchId: string) =>
   }
 };
 
-const handleSearchNotAccessible = async (error: FetchError, search: Search, getState: () => RootState) => {
-  const view = selectView(getState());
+const isMissingStreamPermission = (error: FetchError) => error.additional?.body?.type === 'MissingStreamPermission';
 
-  if (await isSearchOutdated(view?.id, search.id)) {
+const handleSearchNotAccessible = async (error: FetchError, search: Search, getState: () => RootState) => {
+  const state = getState();
+  const view = selectView(state);
+  const mayBeOutdated = !selectIsDirty(state) && !isMissingStreamPermission(error);
+
+  if (mayBeOutdated && (await isSearchOutdated(view?.id, search.id))) {
     UserNotification.warning(
       `This ${ViewTypeLabel({ type: view.type })} was changed by another user. Reload the page to see the latest version.`,
       'Outdated version',
@@ -241,7 +249,7 @@ const handleSearchNotAccessible = async (error: FetchError, search: Search, getS
   if (error.status === 403) {
     ErrorsActions.report(createFromFetchError(error));
   } else {
-    UserNotification.error(`Starting search job failed: ${error}`, 'Error!');
+    notifyStartJobFailed(error);
   }
 };
 
@@ -274,7 +282,15 @@ export const executeWithExecutionState =
       .then(() => {
         dispatch(cancelExecutedJob());
 
-        return searchExecutors.startJob(search, searchTypesToSearch, executionState, [activeQuery]);
+        return searchExecutors
+          .startJob(search, searchTypesToSearch, executionState, [activeQuery], { ignoreUnauthorized: true })
+          .catch(async (error) => {
+            if (isSearchNotAccessibleError(error)) {
+              await handleSearchNotAccessible(error, search, getState);
+            }
+
+            throw error;
+          });
       })
       .then((jobIds: JobIds) =>
         dispatch(executeSearchJob({ searchExecutors, jobIds, widgetMapping, page, perPage, stopPolling })),
@@ -282,12 +298,6 @@ export const executeWithExecutionState =
       .catch((error) => {
         dispatch(cancelExecutedJob());
         dispatch(stopLoading());
-
-        if (isSearchNotAccessibleError(error)) {
-          return handleSearchNotAccessible(error, search, getState).then(() => {
-            throw error;
-          });
-        }
 
         throw error;
       });

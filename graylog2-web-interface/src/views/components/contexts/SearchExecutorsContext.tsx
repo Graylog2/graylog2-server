@@ -20,13 +20,12 @@ import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
 import { cancelJob, executeJobResult, startJob } from 'views/logic/slices/executeJobResult';
 import parseSearch from 'views/logic/slices/parseSearch';
 import { onError, wrapWithOnError } from 'util/conditional/onError';
-import UserNotification from 'util/UserNotification';
-import { isSearchNotAccessibleError } from 'views/logic/slices/searchExecutionSlice';
+import { isSearchNotAccessibleError, notifyStartJobFailed } from 'views/logic/slices/searchExecutionSlice';
 
-const defaultStartJob: typeof startJob = (...args) =>
-  onError(startJob(...args), (error) => {
-    if (!isSearchNotAccessibleError(error)) {
-      UserNotification.error(`Starting search job failed: ${error}`, 'Error!');
+const defaultStartJob: typeof startJob = (search, searchTypesToSearch, executionState, keepQueries, options) =>
+  onError(startJob(search, searchTypesToSearch, executionState, keepQueries, options), (error) => {
+    if (!(options?.ignoreUnauthorized && isSearchNotAccessibleError(error))) {
+      notifyStartJobFailed(error);
     }
   });
 
