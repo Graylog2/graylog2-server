@@ -42,7 +42,7 @@ class OSEventListTest {
     void filtersBySourceStreamsWhenSelectionContainsSourceStreams() throws Exception {
         final DocumentContext doc = generateQuery(EventList.builder().build(), DEFAULT_EVENTS_STREAM_ID, "source-stream");
 
-        assertThat(doc.read("$.query.bool.must[*].terms.source_streams", List.class)).containsExactly(List.of("source-stream"));
+        assertThat(doc.read("$.query.bool.must[*].terms.source_streams[*]", List.class)).containsExactlyInAnyOrder(DEFAULT_EVENTS_STREAM_ID, "source-stream");
         assertThat(doc.read("$.query.bool.must[*].terms.streams", List.class)).isEmpty();
     }
 

@@ -151,9 +151,9 @@ public abstract class EventList implements SearchEngineSearchType, HasAttributeF
     }
 
     public SourceStreamFilter sourceStreamFilter(Query query) {
-        final Set<String> selected = streamSelection(query).sourceStreams();
-        if (!selected.isEmpty()) {
-            return SourceStreamFilter.allowList(selected);
+        final StreamSelection selection = streamSelection(query);
+        if (!selection.sourceStreams().isEmpty()) {
+            return SourceStreamFilter.allowList(Sets.union(selection.eventStreams(), selection.sourceStreams()));
         }
         return permittedSourceStreams().map(SourceStreamFilter::allowList).orElseGet(SourceStreamFilter::allAllowed);
     }

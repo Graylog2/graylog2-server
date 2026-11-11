@@ -48,12 +48,12 @@ public class EventListTest {
     }
 
     @Test
-    void sourceStreamsInSelectionFilterSourceStreamsAndIgnoreEventStreams() {
+    void sourceStreamsInSelectionFilterSourceStreamsOnWholeSelection() {
         final EventList eventList = EventList.builder().build();
         final Query query = queryWithStreams(DEFAULT_SYSTEM_EVENTS_STREAM_ID, "source-stream");
 
         assertThat(eventList.streamSelection(query).isEventStreamsOnly()).isFalse();
-        assertThat(eventList.sourceStreamFilter(query)).isEqualTo(SourceStreamFilter.allowList(Set.of("source-stream")));
+        assertThat(eventList.sourceStreamFilter(query)).isEqualTo(SourceStreamFilter.allowList(Set.of(DEFAULT_SYSTEM_EVENTS_STREAM_ID, "source-stream")));
     }
 
     @Test
