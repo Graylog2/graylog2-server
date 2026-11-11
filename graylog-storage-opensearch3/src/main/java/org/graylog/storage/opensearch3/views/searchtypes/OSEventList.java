@@ -29,17 +29,16 @@ import org.graylog.storage.opensearch3.OSSerializationUtils;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch._types.FieldSort;
-import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.SortOrder;
 import org.opensearch.client.opensearch._types.query_dsl.QueryStringQuery;
-import org.opensearch.client.opensearch._types.query_dsl.TermsQuery;
 import org.opensearch.client.opensearch.core.msearch.MultiSearchItem;
 import org.opensearch.client.opensearch.core.search.Hit;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
+
+import static org.graylog.storage.opensearch3.SearchRequestFactoryOS.termsQuery;
 
 public class OSEventList implements EventListStrategy {
     private final ObjectMapper objectMapper;
@@ -62,10 +61,10 @@ public class OSEventList implements EventListStrategy {
         if (originalQuery.isBool()) {
             final var boolQuery = originalQuery.bool().toBuilder();
             if (streamSelection.isEventStreamsOnly()) {
-                boolQuery.must(termsQuery(EventDto.FIELD_STREAMS, streamSelection.eventStreams()).toQuery());
+                boolQuery.must(termsQuery(EventDto.FIELD_STREAMS, streamSelection.eventStreams()));
             }
             if (!sourceStreamFilter.isAllAllowed()) {
-                boolQuery.must(termsQuery(EventDto.FIELD_SOURCE_STREAMS, sourceStreamFilter.streamIds()).toQuery());
+                boolQuery.must(termsQuery(EventDto.FIELD_SOURCE_STREAMS, sourceStreamFilter.streamIds()));
             }
             searchSourceBuilder.query(boolQuery.build().toQuery());
         }
@@ -88,13 +87,6 @@ public class OSEventList implements EventListStrategy {
             searchSourceBuilder.size(pageSize);
             searchSourceBuilder.from((page - 1) * pageSize);
         }, () -> searchSourceBuilder.size(10000));
-    }
-
-    private static TermsQuery termsQuery(String field, Set<String> values) {
-        return TermsQuery.of(t -> t
-                .field(field)
-                .terms(ts -> ts.value(values.stream().map(FieldValue::of).toList()))
-        );
     }
 
     private SortOrder toSortOrder(EventList.Direction direction) {

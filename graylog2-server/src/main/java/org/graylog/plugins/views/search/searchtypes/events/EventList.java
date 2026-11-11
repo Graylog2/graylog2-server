@@ -51,9 +51,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENTS_STREAM_ID;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENT_STREAM_IDS;
-import static org.graylog2.plugin.streams.Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID;
 
 @AutoValue
 @JsonTypeName(EventList.NAME)
@@ -154,9 +152,10 @@ public abstract class EventList implements SearchEngineSearchType, HasAttributeF
 
     public SourceStreamFilter sourceStreamFilter(Query query) {
         final Set<String> selected = streamSelection(query).sourceStreams();
-        return permittedSourceStreams()
-                .map(permitted -> SourceStreamFilter.allowList(selected.isEmpty() ? permitted : Sets.intersection(selected, permitted)))
-                .orElseGet(() -> selected.isEmpty() ? SourceStreamFilter.allAllowed() : SourceStreamFilter.allowList(selected));
+        if (!selected.isEmpty()) {
+            return SourceStreamFilter.allowList(selected);
+        }
+        return permittedSourceStreams().map(SourceStreamFilter::allowList).orElseGet(SourceStreamFilter::allAllowed);
     }
 
     public record StreamSelection(Set<String> eventStreams, Set<String> sourceStreams) {
@@ -167,7 +166,7 @@ public abstract class EventList implements SearchEngineSearchType, HasAttributeF
 
     @Override
     public Set<String> effectiveStreams() {
-        return ImmutableSet.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID);
+        return DEFAULT_EVENT_STREAM_IDS;
     }
 
     @AutoValue.Builder
