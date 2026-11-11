@@ -52,12 +52,12 @@ const listResponse = {
       stage: 1,
       connected_streams: [
         {
-          id: 'stream-id-1',
-          title: 'Stream Title 1',
-        },
-        {
           id: 'stream-id-2',
           title: 'Stream Title 2',
+        },
+        {
+          id: 'stream-id-1',
+          title: 'Stream Title 1',
         },
       ],
     },
@@ -176,6 +176,11 @@ describe('<StreamConnectedPipelines />', () => {
 
     await within(row).findByText(/Rule 1/i);
     await within(row).findByText(/Pipeline 1/i);
+    // Sorted by title, so the first stream is shown although it is connected second.
+    await within(row).findByText(/Stream Title 1/i);
+
+    expect(within(row).queryByText(/Stream Title 2/i)).not.toBeInTheDocument();
+
     await userEvent.click(await within(row).findByRole('button', { name: /show 1 more/i }));
     await within(row).findByText(/Stream Title 1/i);
     await within(row).findByText(/Stream Title 2/i);

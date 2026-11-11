@@ -19,6 +19,7 @@ import React from 'react';
 import { Link } from 'components/common';
 import ExpandableCellList from 'components/common/cell-list/ExpandableCellList';
 import Routes from 'routing/Routes';
+import { defaultCompare } from 'logic/DefaultCompare';
 import type { StreamConnectedPipeline } from 'components/streams/StreamDetails/StreamDataRoutingIntake/types';
 
 type Props = {
@@ -27,7 +28,7 @@ type Props = {
 
 const ConnectedPipelineStreamsCell = ({ streams }: Props) => (
   <ExpandableCellList
-    items={streams}
+    items={[...(streams ?? [])].sort((a, b) => defaultCompare(a.title, b.title))}
     renderItem={(stream) => <Link to={Routes.stream_view(stream.id)}>{stream.title}</Link>}
     itemKey={({ id }) => id}
     itemTitle={({ title }) => title}
