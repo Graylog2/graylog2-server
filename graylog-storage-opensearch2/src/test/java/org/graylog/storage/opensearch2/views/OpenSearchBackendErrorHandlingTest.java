@@ -136,4 +136,16 @@ public class OpenSearchBackendErrorHandlingTest extends OpensearchMockedClientTe
                 .containsExactly("Unable to perform search query: " +
                         "\n\nOpenSearch exception [type=illegal_argument_exception, reason=Expected numeric type on field [facility], but got [keyword]].");
     }
+
+    @Test
+    public void mapsTooManyClausesShardErrorsToMaxClauseCountMessage() throws Exception {
+        final MultiSearchResponse multiSearchResult = TestMultisearchResponse.fromFixture("errorhandling/tooManyClausesOnSearchTypeLevel.json");
+        mockCancellableMSearch(multiSearchResult);
+
+        final QueryResult queryResult = this.backend.doRun(searchJob, query, queryContext);
+
+        assertThat(queryResult.errors().stream().map(SearchError::description).collect(Collectors.toList()))
+                .containsExactly("Unable to perform search query: " +
+                        "\n\nYour query exceeded the maxClauseCount setting of OpenSearch. This is probably due to a custom parameter filled from a lookup table. Please check you query and settings.");
+    }
 }
