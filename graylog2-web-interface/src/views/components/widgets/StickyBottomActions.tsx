@@ -74,7 +74,11 @@ type Props = {
 const StickyBottomActions = ({ actions, children, className = undefined, alignActionsAtBottom = false }: Props) => {
   const scrollContainerRef = useRef<HTMLDivElement>();
   const scrolledToBottomIndicatorRef = useRef<HTMLDivElement>();
-  const scrolledToBottom = useIntersectionObserver(scrollContainerRef, scrolledToBottomIndicatorRef);
+  const scrolledToBottom = !useIntersectionObserver(scrolledToBottomIndicatorRef, {
+    root: scrollContainerRef,
+    threshold: 0.9,
+    initialIsIntersecting: true,
+  });
 
   return (
     <Container className={className}>

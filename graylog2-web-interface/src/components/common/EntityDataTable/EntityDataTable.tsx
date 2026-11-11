@@ -245,7 +245,11 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   const { headerMinWidths, handleHeaderSectionResize } = useHeaderMinWidths();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const scrolledToRightIndicator = useRef<HTMLDivElement>();
-  const scrolledToRight = useIntersectionObserver(scrollContainerRef, scrolledToRightIndicator);
+  const scrolledToRight = !useIntersectionObserver(scrolledToRightIndicator, {
+    root: scrollContainerRef,
+    threshold: 0.9,
+    initialIsIntersecting: true,
+  });
 
   const {
     setInternalAttributeColumnOrder,
