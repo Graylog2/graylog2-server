@@ -22,7 +22,7 @@ import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 import Value from 'views/components/Value';
 import DecoratedValue from 'views/components/messagelist/decoration/DecoratedValue';
 import CustomHighlighting from 'views/components/highlighting/CustomHighlighting';
-import useNotifyRenderComplete from 'views/components/widgets/useNotifyRenderComplete';
+import useReportRenderComplete from 'views/components/widgets/useReportRenderComplete';
 import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 import type { NumberAlignment } from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -114,7 +114,7 @@ const NumberVisualization = ({ config, fields, data, height: heightProp }: Visua
   const targetRef = useRef();
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const widgetUnits = useWidgetUnits(config);
-  useNotifyRenderComplete();
+  useReportRenderComplete();
   const visualizationConfig =
     (config.visualizationConfig as NumberVisualizationConfig) ?? NumberVisualizationConfig.create();
 

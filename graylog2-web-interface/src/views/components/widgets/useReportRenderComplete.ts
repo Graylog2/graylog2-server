@@ -18,7 +18,7 @@ import { useEffect } from 'react';
 
 import useRenderCompletionCallback from 'views/components/widgets/useRenderCompletionCallback';
 
-const useNotifyRenderComplete = () => {
+const useReportRenderComplete = () => {
   const onRenderComplete = useRenderCompletionCallback();
 
   useEffect(() => {
@@ -26,4 +26,4 @@ const useNotifyRenderComplete = () => {
   }, [onRenderComplete]);
 };
 
-export default useNotifyRenderComplete;
+export default useReportRenderComplete;

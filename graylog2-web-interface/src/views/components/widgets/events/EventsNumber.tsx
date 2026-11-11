@@ -21,7 +21,7 @@ import type { WidgetComponentProps } from 'views/types';
 import AutoFontSizer from 'views/components/visualizations/number/AutoFontSizer';
 import { ElementDimensions } from 'components/common';
 import type EventsWidgetConfig from 'views/logic/widgets/events/EventsWidgetConfig';
-import useNotifyRenderComplete from 'views/components/widgets/useNotifyRenderComplete';
+import useReportRenderComplete from 'views/components/widgets/useReportRenderComplete';
 
 import type { EventsListResult } from './types';
 
@@ -32,7 +32,7 @@ const NumberBox = styled(ElementDimensions)`
 `;
 
 const EventsNumber = ({ data }: WidgetComponentProps<EventsWidgetConfig, EventsListResult>) => {
-  useNotifyRenderComplete();
+  useReportRenderComplete();
 
   return (
     <NumberBox resizeDelay={20}>

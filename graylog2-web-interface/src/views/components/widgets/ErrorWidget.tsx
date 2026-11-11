@@ -18,7 +18,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { Icon, Center } from 'components/common';
-import useNotifyRenderComplete from 'views/components/widgets/useNotifyRenderComplete';
+import useReportRenderComplete from 'views/components/widgets/useReportRenderComplete';
 
 import styles from './MessageWidgets.css';
 
@@ -52,7 +52,7 @@ const ErrorWidget = ({
   title = 'While retrieving data for this widget, the following error(s) occurred:',
 }: Props) => {
   // Exports wait for every widget to render, including those that failed.
-  useNotifyRenderComplete();
+  useReportRenderComplete();
 
   return (
     <Center>

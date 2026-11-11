@@ -42,7 +42,7 @@ import deduplicateValues from './DeduplicateValues';
 import Headers from './Headers';
 import styles from './DataTable.css';
 
-import useNotifyRenderComplete from '../widgets/useNotifyRenderComplete';
+import useReportRenderComplete from '../widgets/useReportRenderComplete';
 import type { VisualizationComponentProps } from '../aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from '../aggregationbuilder/AggregationBuilder';
 
@@ -144,7 +144,7 @@ const DataTable = ({
   striped = true,
 }: Props) => {
   const formContext = useContext(FormikContext);
-  useNotifyRenderComplete();
+  useReportRenderComplete();
   const widget = useContext(WidgetContext);
   const [rowPivotColumnsWidth, setRowPivotColumnsWidth] = useState<{ [key: string]: number }>({});
   const dispatch = useViewsDispatch();

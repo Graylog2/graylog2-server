@@ -18,7 +18,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { Button } from 'components/bootstrap';
-import useNotifyRenderComplete from 'views/components/widgets/useNotifyRenderComplete';
+import useReportRenderComplete from 'views/components/widgets/useReportRenderComplete';
 import { UPDATE_WIDGET_BTN_TEXT } from 'views/components/widgets/SaveOrCancelButtons';
 import { UPDATE_WIDGET_PREVIEW_BTN_TEXT } from 'views/components/aggregationwizard/ElementsConfigurationActions';
 
@@ -44,7 +44,7 @@ const SpacedHeading = styled.h2(
 );
 
 const EmptyAggregationContent = ({ toggleEdit, editing = false }: Props) => {
-  useNotifyRenderComplete();
+  useReportRenderComplete();
 
   const interactive = useIsInteractiveMode();
   const text = editing ? (

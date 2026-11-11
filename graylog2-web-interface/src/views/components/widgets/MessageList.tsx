@@ -118,7 +118,7 @@ const useResetScrollPositionOnPageChange = (currentPage: number) => {
   return scrollContainerRef;
 };
 
-const useNotifyRenderCompleteAfterFetchingInputs = () => {
+const useReportRenderCompleteAfterFetchingInputs = () => {
   const onRenderComplete = useRenderCompletionCallback();
 
   useEffect(() => {
@@ -152,7 +152,7 @@ const MessageList = ({
   const scrollContainerRef = useResetScrollPositionOnPageChange(currentPage);
   const dispatch = useViewsDispatch();
   useResetPaginationOnSearchExecution(setCurrentPage, currentPage);
-  useNotifyRenderCompleteAfterFetchingInputs();
+  useReportRenderCompleteAfterFetchingInputs();
   const displayBulkSelectCol = !!pluggableBulkActions && !editing && interactive;
 
   const bulkSelection = useMemo(

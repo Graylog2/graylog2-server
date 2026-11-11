@@ -17,14 +17,14 @@
 import React from 'react';
 
 import { Alert } from 'components/bootstrap';
-import useNotifyRenderComplete from 'views/components/widgets/useNotifyRenderComplete';
+import useReportRenderComplete from 'views/components/widgets/useReportRenderComplete';
 
 type Props = {
   widgetClassName: string;
 };
 
 const WidgetVisualizationNotFound = ({ widgetClassName }: Props) => {
-  useNotifyRenderComplete();
+  useReportRenderComplete();
 
   return (
     <Alert bsStyle="danger">

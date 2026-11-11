@@ -29,7 +29,7 @@ import type EventsWidgetSortConfig from 'views/logic/widgets/events/EventsWidget
 import useOnSearchExecution from 'views/hooks/useOnSearchExecution';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import ErrorWidget from 'views/components/widgets/ErrorWidget';
-import useNotifyRenderComplete from 'views/components/widgets/useNotifyRenderComplete';
+import useReportRenderComplete from 'views/components/widgets/useReportRenderComplete';
 
 import EventsTable from './EventsTable';
 
@@ -118,7 +118,7 @@ const EventsList = ({
     },
     [config, onConfigChange],
   );
-  useNotifyRenderComplete();
+  useReportRenderComplete();
 
   return (
     <Container>
