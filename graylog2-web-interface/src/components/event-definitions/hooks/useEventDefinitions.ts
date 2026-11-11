@@ -351,9 +351,10 @@ export const keyFn = (searchParams: SearchParams) => [
   searchParams,
 ];
 
-export const useEventDefinitionWithContext = (eventDefinitionId: string) => {
+export const useEventDefinitionWithContext = (eventDefinitionId: string, enabled = true) => {
   const { data, isFetching } = useQuery({
     queryKey: [...EVENT_DEFINITIONS_QUERY_KEY, eventDefinitionId],
+    enabled,
 
     queryFn: () =>
       defaultOnError(
