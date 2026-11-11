@@ -15,13 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import asMock from 'helpers/mocking/AsMock';
+import selectEvent from 'helpers/selectEvent';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useGraphDays from 'components/common/Graph/contexts/useGraphDays';
-import useLocation from 'routing/useLocation';
 import useGraphWidth from 'components/common/Graph/useGraphWidth';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
@@ -29,7 +28,6 @@ import TrafficGraphWithDaySelect from './TrafficGraphWithDaySelect';
 
 jest.mock('logic/telemetry/useSendTelemetry');
 jest.mock('components/common/Graph/contexts/useGraphDays');
-jest.mock('routing/useLocation');
 jest.mock('components/common/Graph/useGraphWidth');
 
 describe('TrafficGraphWithDaySelect', () => {
@@ -50,13 +48,6 @@ describe('TrafficGraphWithDaySelect', () => {
       graphDays: 30,
       setGraphDays: mockSetGraphDays,
     });
-    asMock(useLocation).mockReturnValue({
-      pathname: '/system/overview',
-      search: '',
-      hash: '',
-      state: undefined,
-      key: 'default',
-    });
     asMock(useGraphWidth).mockReturnValue({
       graphWidth: 1000,
       graphContainerRef: React.createRef(),
@@ -64,50 +55,154 @@ describe('TrafficGraphWithDaySelect', () => {
   });
 
   it('displays traffic graph with total and allows changing days', async () => {
-    const { getByLabelText } = render(<TrafficGraphWithDaySelect traffic={mockTrafficData} />);
+    render(<TrafficGraphWithDaySelect traffic={mockTrafficData} />);
 
     await screen.findByText('Outgoing traffic');
     expect(screen.getByText(/Last 30 days:/)).toBeInTheDocument();
 
-    const daysSelect = getByLabelText('Days') as HTMLSelectElement;
-    expect(daysSelect.value).toBe('30');
-
-    await userEvent.selectOptions(daysSelect, '365');
+    await selectEvent.select(await screen.findByLabelText('Days'), '365');
 
     await waitFor(() => {
       expect(mockSetGraphDays).toHaveBeenCalledWith(365);
     });
 
     expect(useSendTelemetry).toHaveBeenCalledWith('outgoing-traffic');
-    expect(mockSendTelemetry).toHaveBeenCalledWith(
-      TELEMETRY_EVENT_TYPE.TRAFFIC_GRAPH_DAYS_CHANGED,
-      expect.objectContaining({
-        event_details: { value: 365 },
-      }),
-    );
+    expect(mockSendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.TRAFFIC_GRAPH_DAYS_CHANGED, {
+      app_action_value: 'trafficgraph-days-button',
+      event_details: { value: 365 },
+    });
   });
 
   it('supports both input and output traffic with correct titles and telemetry', async () => {
-    const { getByLabelText, rerender } = render(
-      <TrafficGraphWithDaySelect traffic={mockTrafficData} trafficType="input-indexed" />,
-    ) as any;
+    const { rerender } = render(<TrafficGraphWithDaySelect traffic={mockTrafficData} trafficType="input-indexed" />);
 
     await screen.findByText('Incoming traffic');
 
-    const daysSelect = getByLabelText('Days');
-    await userEvent.selectOptions(daysSelect, '90');
+    await selectEvent.select(await screen.findByLabelText('Days'), '90');
 
     expect(useSendTelemetry).toHaveBeenCalledWith('incoming-traffic');
-    expect(mockSendTelemetry).toHaveBeenCalledWith(
-      TELEMETRY_EVENT_TYPE.TRAFFIC_GRAPH_DAYS_CHANGED,
-      expect.objectContaining({ event_details: { value: 90 } }),
-    );
+    expect(mockSendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.TRAFFIC_GRAPH_DAYS_CHANGED, {
+      app_action_value: 'trafficgraph-days-button',
+      event_details: { value: 90 },
+    });
 
     jest.clearAllMocks();
     rerender(<TrafficGraphWithDaySelect traffic={mockTrafficData} trafficType="output" />);
 
     await screen.findByText('Outgoing traffic');
 
+    expect(mockSendTelemetry).not.toHaveBeenCalled();
+  });
+
+  it('renders a traffic type selector when onTrafficTypeChange is provided', async () => {
+    const onTrafficTypeChange = jest.fn();
+
+    render(
+      <TrafficGraphWithDaySelect
+        traffic={mockTrafficData}
+        trafficType="input-indexed"
+        onTrafficTypeChange={onTrafficTypeChange}
+      />,
+    );
+
+    await selectEvent.select(await screen.findByLabelText('Show traffic type'), 'Outgoing traffic');
+
+    await waitFor(() => {
+      expect(onTrafficTypeChange).toHaveBeenCalledWith('output');
+    });
+
+    expect(useSendTelemetry).toHaveBeenCalledWith('incoming-traffic');
+    expect(mockSendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.TRAFFIC_GRAPH_TYPE_CHANGED, {
+      app_section: 'outgoing-traffic',
+      app_action_value: 'trafficgraph-type-select',
+      event_details: { value: 'output' },
+    });
+  });
+
+  it('reports incoming telemetry when switching back to the incoming view', async () => {
+    const onTrafficTypeChange = jest.fn();
+
+    render(
+      <TrafficGraphWithDaySelect
+        traffic={mockTrafficData}
+        trafficType="output"
+        onTrafficTypeChange={onTrafficTypeChange}
+      />,
+    );
+
+    await selectEvent.select(await screen.findByLabelText('Show traffic type'), 'Incoming traffic');
+
+    await waitFor(() => {
+      expect(onTrafficTypeChange).toHaveBeenCalledWith('input-indexed');
+    });
+
+    expect(useSendTelemetry).toHaveBeenCalledWith('outgoing-traffic');
+    expect(mockSendTelemetry).toHaveBeenCalledWith(TELEMETRY_EVENT_TYPE.TRAFFIC_GRAPH_TYPE_CHANGED, {
+      app_section: 'incoming-traffic',
+      app_action_value: 'trafficgraph-type-select',
+      event_details: { value: 'input-indexed' },
+    });
+  });
+
+  it('does not render a traffic type selector by default', async () => {
+    render(<TrafficGraphWithDaySelect traffic={mockTrafficData} trafficType="input-indexed" />);
+
+    await screen.findByText('Incoming traffic');
+    expect(screen.queryByLabelText('Show traffic type')).not.toBeInTheDocument();
+  });
+
+  it('always renders a Zoom/Reset button in the controls row', async () => {
+    render(<TrafficGraphWithDaySelect traffic={mockTrafficData} />);
+
+    await screen.findByRole('button', { name: 'Zoom/Reset' });
+  });
+
+  it('disables Zoom/Reset on a pristine graph without a traffic limit', async () => {
+    render(<TrafficGraphWithDaySelect traffic={mockTrafficData} />);
+
+    expect(await screen.findByRole('button', { name: 'Zoom/Reset' })).toBeDisabled();
+  });
+
+  it('enables Zoom/Reset when a traffic limit dwarfs the data', async () => {
+    render(<TrafficGraphWithDaySelect traffic={mockTrafficData} trafficLimit={1024 * 1024 * 1024} />);
+
+    expect(await screen.findByRole('button', { name: 'Zoom/Reset' })).toBeEnabled();
+  });
+
+  it('keeps Zoom/Reset disabled when the daily total exceeds the limit even though every raw bucket is below it', async () => {
+    const hourlyTraffic = {
+      '2022-09-21T08:00:00.000Z': 600,
+      '2022-09-21T09:00:00.000Z': 600,
+    };
+
+    render(<TrafficGraphWithDaySelect traffic={hourlyTraffic} trafficLimit={1000} />);
+
+    expect(await screen.findByRole('button', { name: 'Zoom/Reset' })).toBeDisabled();
+  });
+
+  it('ignores re-selecting the currently selected days value', async () => {
+    render(<TrafficGraphWithDaySelect traffic={mockTrafficData} />);
+
+    await selectEvent.select(await screen.findByLabelText('Days'), '30');
+
+    expect(mockSetGraphDays).not.toHaveBeenCalled();
+    expect(mockSendTelemetry).not.toHaveBeenCalled();
+  });
+
+  it('ignores re-selecting the current traffic type', async () => {
+    const onTrafficTypeChange = jest.fn();
+
+    render(
+      <TrafficGraphWithDaySelect
+        traffic={mockTrafficData}
+        trafficType="output"
+        onTrafficTypeChange={onTrafficTypeChange}
+      />,
+    );
+
+    await selectEvent.select(await screen.findByLabelText('Show traffic type'), 'Outgoing traffic');
+
+    expect(onTrafficTypeChange).not.toHaveBeenCalled();
     expect(mockSendTelemetry).not.toHaveBeenCalled();
   });
 
@@ -124,6 +219,26 @@ describe('TrafficGraphWithDaySelect', () => {
     render(<TrafficGraphWithDaySelect traffic={{}} />);
 
     await screen.findByText('Outgoing traffic');
+  });
+
+  it('shows a spinner without a total while traffic is not available yet', async () => {
+    render(<TrafficGraphWithDaySelect />);
+
+    await screen.findByText('Outgoing traffic');
+    await screen.findByText(/Loading/);
+    expect(screen.queryByText(/Last 30 days:/)).not.toBeInTheDocument();
+  });
+
+  it('shows a zero total when the traffic sums to zero', async () => {
+    const zeroTraffic = {
+      '2022-09-21T08:00:00.000Z': 0,
+      '2022-09-21T09:00:00.000Z': 0,
+    };
+
+    render(<TrafficGraphWithDaySelect traffic={zeroTraffic} />);
+
+    await screen.findByRole('heading', { name: /Outgoing traffic/ });
+    expect(screen.getByText(/Last 30 days: 0(\.0)?\s?B/)).toBeInTheDocument();
   });
 
   it('passes trafficLimit to graph component', async () => {
