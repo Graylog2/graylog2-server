@@ -55,6 +55,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(MessagesExtension.class)
@@ -100,8 +102,7 @@ class PipelineRuleOutputFilterTest {
         assertThat(filteredMessage.destinations().get("other")).containsExactlyInAnyOrder(defaultStream);
     }
 
-    @Test
-    void applyWithFilter(MessageFactory messageFactory) {
+    private Map<String, Pipeline> createPipelines() {
         final var filterRules = List.of(
                 RuleDao.builder()
                         .id("668cff8ed9f9636b4b629c29")
@@ -129,9 +130,12 @@ class PipelineRuleOutputFilterTest {
                 .build();
 
         final var resolver = createResolver(filterRules);
-        final var pipelines = resolver.resolveFunctions(Set.of(pipeline), PipelineMetricRegistry.create(new MetricRegistry(), "P", "R"));
+        return resolver.resolveFunctions(Set.of(pipeline), PipelineMetricRegistry.create(new MetricRegistry(), "P", "R"));
+    }
 
-        final var filter = createFilter(pipelines, Set.of("indexer", "other"));
+    @Test
+    void applyWithFilter(MessageFactory messageFactory) {
+        final var filter = createFilter(createPipelines(), Set.of("indexer", "other"));
         final var message = messageFactory.createMessage("msg", "src", Tools.nowUTC());
         message.addStream(defaultStream);
 
@@ -141,6 +145,21 @@ class PipelineRuleOutputFilterTest {
         // The filter rules removes the default stream from the indexer destination, so it shouldn't be in the
         // destinations after running the filter.
         assertThat(filteredMessage.destinations().keySet()).containsExactlyInAnyOrder("other");
+        assertThat(filteredMessage.destinations().get("indexer")).isEmpty();
+        assertThat(filteredMessage.destinations().get("other")).containsExactlyInAnyOrder(defaultStream);
+    }
+
+    @Test
+    void applyWithFilterWhenCacheHoldsAnotherStreamCopy(MessageFactory messageFactory) {
+        // The stream router and the stream cache keep separate copies of each stream.
+        when(streamCacheService.getById("000000000000000000000001")).thenReturn(mock(Stream.class));
+
+        final var filter = createFilter(createPipelines(), Set.of("indexer", "other"));
+        final var message = messageFactory.createMessage("msg", "src", Tools.nowUTC());
+        message.addStream(defaultStream);
+
+        final var filteredMessage = filter.apply(message);
+
         assertThat(filteredMessage.destinations().get("indexer")).isEmpty();
         assertThat(filteredMessage.destinations().get("other")).containsExactlyInAnyOrder(defaultStream);
     }

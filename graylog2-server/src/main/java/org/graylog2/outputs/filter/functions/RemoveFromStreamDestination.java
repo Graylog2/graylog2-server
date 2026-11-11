@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+import java.util.Objects;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
@@ -76,7 +77,8 @@ public class RemoveFromStreamDestination extends AbstractFunction<Void> {
                 if (LOG.isTraceEnabled()) {
                     LOG.trace("Removing stream <{}/{}> from destination <{}> for message: {}", stream.getId(), stream.getTitle(), destinationType, message);
                 }
-                metadata.destinations().remove(destinationType, stream);
+                // Match by ID because the message's copy of the stream can differ from the cached one.
+                metadata.destinations().get(destinationType).removeIf(s -> Objects.equals(streamId, s.getId()));
             } else {
                 RATE_LIMITED_LOG.warn("Couldn't find stream for stream ID <{}> in cache", streamId);
             }
