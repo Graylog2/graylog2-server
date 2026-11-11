@@ -103,6 +103,24 @@ public class FormatStringDecoratorTest {
     }
 
     @Test
+    public void normalizesNonUtcTimeRangeToUtc() {
+        final DateTimeZone plusTwo = DateTimeZone.forOffsetHours(2);
+        final DecoratorImpl decorator = getDecoratorConfig(
+                "${search.from} | ${search.from;date} | ${search.from;date(HH:mm)} to ${search.to;date(HH:mm)}",
+                "message", false);
+        final SearchResponse searchResponse = getSearchResponse().toBuilder()
+                .from(FROM.withZone(plusTwo))
+                .to(TO.withZone(plusTwo))
+                .build();
+
+        final FormatStringDecorator formatStringDecorator = new FormatStringDecorator(decorator, templateEngine, messageFactory);
+        final SearchResponse response = formatStringDecorator.apply(searchResponse);
+
+        assertThat(response.messages().get(0).message().get("message"))
+                .isEqualTo("2026-11-04T10:00:00.000Z | 2026-11-04T10:00:00.000Z | 10:00 to 11:30");
+    }
+
+    @Test
     public void requireAllFieldsIgnoresTimeRangeVariables() {
         final DecoratorImpl decorator = getDecoratorConfig("${field_a} ${search.from_ms}", "message", true);
 

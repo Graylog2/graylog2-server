@@ -21,6 +21,8 @@ import com.floreysoft.jmte.TemplateContext;
 import com.floreysoft.jmte.token.Token;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,11 +56,13 @@ public final class TimeRangeTemplateContext {
     }
 
     public static TimeRangeTemplateContext of(SearchResponse searchResponse) {
+        final DateTime from = searchResponse.from().withZone(DateTimeZone.UTC);
+        final DateTime to = searchResponse.to().withZone(DateTimeZone.UTC);
         return new TimeRangeTemplateContext(ImmutableMap.of(
-                FROM, searchResponse.from(),
-                TO, searchResponse.to(),
-                FROM_MS, searchResponse.from().getMillis(),
-                TO_MS, searchResponse.to().getMillis()
+                FROM, from,
+                TO, to,
+                FROM_MS, from.getMillis(),
+                TO_MS, to.getMillis()
         ));
     }
 
