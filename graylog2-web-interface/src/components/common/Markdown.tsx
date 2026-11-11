@@ -28,6 +28,7 @@ import Spinner from 'components/common/Spinner';
 import { Link } from 'components/common';
 import Routes from 'routing/Routes';
 import MarkdownLink from 'components/common/markdown/MarkdownLink';
+import Table from 'components/bootstrap/Table';
 
 type Props = {
   text: string;
@@ -53,26 +54,10 @@ const mergeTransformer =
   };
 
 // A table wider than its container scrolls instead of squeezing its columns.
-const Table = styled.table(
+const SpacedTable = styled(Table)(
   ({ theme }) => css`
-    display: block;
-    max-width: 100%;
-    overflow-x: auto;
     margin: ${theme.spacings.xs} 0;
-    border-collapse: collapse;
-
-    th,
-    td {
-      padding: ${theme.spacings.xxs} ${theme.spacings.sm};
-      border-bottom: 1px solid ${theme.colors.table.row.divider};
-      overflow-wrap: normal;
-      text-align: left;
-      vertical-align: top;
-    }
-
-    th {
-      font-weight: 600;
-    }
+    width: auto;
   `,
 );
 
@@ -81,7 +66,9 @@ const parseWithTables = (html: string, transformer: Transformer) => {
   const options: HTMLReactParserOptions = {};
   const tableTransformer: Transformer = (domNode) =>
     domNode instanceof Element && domNode.name === 'table' ? (
-      <Table>{domToReact(domNode.children as DOMNode[], options)}</Table>
+      <SpacedTable responsive condensed striped={false} hover={false}>
+        {domToReact(domNode.children as DOMNode[], options)}
+      </SpacedTable>
     ) : undefined;
   options.replace = transformer ? mergeTransformer([transformer, tableTransformer]) : tableTransformer;
 

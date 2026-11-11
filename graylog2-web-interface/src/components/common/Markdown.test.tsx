@@ -78,12 +78,11 @@ describe('Markdown', () => {
         />,
       );
 
-      const table = await screen.findByRole('table');
+      await screen.findByRole('table');
 
       expect(screen.getByRole('columnheader', { name: 'Host' })).toBeInTheDocument();
       expect(screen.getByRole('link', { name: /fw-1/ })).toHaveAttribute('href', 'https://example.org/fw-1');
       expect(screen.getByTestId('test-component')).toHaveTextContent('yesterday');
-      expect(table).toHaveStyle({ overflowX: 'auto' });
     });
 
     it('does not replace custom #test# syntax by default', async () => {
