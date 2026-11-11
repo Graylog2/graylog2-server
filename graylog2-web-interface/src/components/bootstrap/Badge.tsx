@@ -195,6 +195,8 @@ const Badge = (
         {...sharedProps}
         style={{ cursor: 'pointer', ...style }}
         component="button"
+        // Badges can sit inside forms, e.g. in a table of a modal, and must not submit them.
+        type="button"
         ref={ref as React.Ref<HTMLButtonElement>}
         onClick={onClick}>
         {children}
