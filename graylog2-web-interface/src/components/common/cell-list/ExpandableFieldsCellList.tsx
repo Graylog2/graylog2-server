@@ -33,7 +33,7 @@ type Fields = Record<string, React.ReactNode>;
 
 const renderFields = (fields: Fields, fieldNames: ReadonlyArray<string>) => (
   // Table rows are striped already.
-  <DefinitionList striped={false}>
+  <DefinitionList striped={false} lastDivider={false}>
     {fieldNames.map((fieldName) => (
       <React.Fragment key={fieldName}>
         <dt>{fieldName}</dt>
