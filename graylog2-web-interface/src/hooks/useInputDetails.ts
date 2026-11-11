@@ -16,6 +16,8 @@
  */
 import { useMemo } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { create, windowScheduler } from '@yornaath/batshit';
+import uniq from 'lodash/uniq';
 
 import useEntityTitles from 'hooks/useEntityTitles';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -49,6 +51,30 @@ export type InputDetailsFetcher = {
 };
 
 export type TypedInput = { id: string; type: string };
+
+// Batches the requests of components rendered together, e.g. the cells of a table page, per fetcher.
+// Handles errors per batch, so a failed request shows one notification instead of one per component.
+const createBatcher = (fetcher: InputDetailsFetcher) =>
+  create({
+    fetcher: (ids: Array<string>) =>
+      defaultOnError(
+        fetcher.fetchDetails(uniq(ids)),
+        'Loading input details failed with status',
+        'Could not load input details',
+      ),
+    resolver: (resolved: Array<ResolvedInput>, id: string) => resolved.find((input) => input.id === id) ?? null,
+    scheduler: windowScheduler(10),
+  });
+
+const batchers = new WeakMap<InputDetailsFetcher, ReturnType<typeof createBatcher>>();
+
+const fetchInputDetails = (fetcher: InputDetailsFetcher, id: string) => {
+  if (!batchers.has(fetcher)) {
+    batchers.set(fetcher, createBatcher(fetcher));
+  }
+
+  return batchers.get(fetcher).fetch(id);
+};
 
 const useInputDetails = (
   typedInputs: ReadonlyArray<TypedInput>,
@@ -108,17 +134,11 @@ const useInputDetails = (
   } = useQuery({
     queryKey,
     queryFn: () =>
-      defaultOnError(
-        Promise.all(
-          fetchers.map((fetcher) => {
-            const ids = nonDefaultIdsByType.get(fetcher.type) ?? [];
-
-            return ids.length > 0 ? fetcher.fetchDetails(ids) : Promise.resolve([]);
-          }),
-        ).then((chunks) => chunks.flat()),
-        'Loading input details failed with status',
-        'Could not load input details',
-      ),
+      Promise.all(
+        fetchers.flatMap((fetcher) =>
+          (nonDefaultIdsByType.get(fetcher.type) ?? []).map((id) => fetchInputDetails(fetcher, id)),
+        ),
+      ).then((resolved) => resolved.filter((input): input is ResolvedInput => input !== null)),
     enabled,
     placeholderData: keepPreviousData,
   });
