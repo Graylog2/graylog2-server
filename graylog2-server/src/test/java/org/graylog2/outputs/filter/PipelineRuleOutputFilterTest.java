@@ -25,7 +25,6 @@ import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
-import org.graylog.plugins.pipelineprocessor.functions.messages.StreamCacheService;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineMetricRegistry;
@@ -66,13 +65,10 @@ class PipelineRuleOutputFilterTest {
     private PipelineRuleOutputFilterStateUpdater stateUpdater;
     @Mock
     private Stream defaultStream;
-    @Mock
-    private StreamCacheService streamCacheService;
 
     @BeforeEach
     void setUp() {
         lenient().when(defaultStream.getId()).thenReturn("000000000000000000000001");
-        lenient().when(streamCacheService.getById("000000000000000000000001")).thenReturn(defaultStream);
     }
 
     @Test
@@ -150,18 +146,19 @@ class PipelineRuleOutputFilterTest {
     }
 
     @Test
-    void applyWithFilterWhenCacheHoldsAnotherStreamCopy(MessageFactory messageFactory) {
-        // The stream router and the stream cache keep separate copies of each stream.
-        when(streamCacheService.getById("000000000000000000000001")).thenReturn(mock(Stream.class));
+    void applyWithFilterKeepsOtherStreams(MessageFactory messageFactory) {
+        final var otherStream = mock(Stream.class);
+        when(otherStream.getId()).thenReturn("000000000000000000000002");
 
         final var filter = createFilter(createPipelines(), Set.of("indexer", "other"));
         final var message = messageFactory.createMessage("msg", "src", Tools.nowUTC());
         message.addStream(defaultStream);
+        message.addStream(otherStream);
 
         final var filteredMessage = filter.apply(message);
 
-        assertThat(filteredMessage.destinations().get("indexer")).isEmpty();
-        assertThat(filteredMessage.destinations().get("other")).containsExactlyInAnyOrder(defaultStream);
+        assertThat(filteredMessage.destinations().get("indexer")).containsExactlyInAnyOrder(otherStream);
+        assertThat(filteredMessage.destinations().get("other")).containsExactlyInAnyOrder(defaultStream, otherStream);
     }
 
     @SuppressForbidden("Executors.newSingleThreadScheduledExecutor is okay in tests")
@@ -190,7 +187,7 @@ class PipelineRuleOutputFilterTest {
     private PipelineResolver createResolver(List<RuleDao> rules) {
         final var ruleParser = new PipelineRuleParser(new FunctionRegistry(
                 Map.of(HasField.NAME, new HasField()),
-                Map.of(RemoveFromStreamDestination.NAME, new RemoveFromStreamDestination(streamCacheService))
+                Map.of(RemoveFromStreamDestination.NAME, new RemoveFromStreamDestination())
         ));
 
         return new PipelineResolver(ruleParser, PipelineResolverConfig.of(rules::stream, java.util.stream.Stream::of));
