@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// The page context the Assistant gets with each question. Mirrors the backend's `PageContext` records.
+// The page context the Assistant gets with each question. Mirrors the enterprise plugin's `PageContext` records.
 export type TimeRangeJson = { type: string; [key: string]: unknown };
 
 export type SearchPage = {
