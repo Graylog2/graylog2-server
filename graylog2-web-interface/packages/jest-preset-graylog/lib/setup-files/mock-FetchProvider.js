@@ -31,6 +31,7 @@ class MockBuilder {
 
   noSessionExtension = () => this;
 
+  // eslint-disable-next-line class-methods-use-this
   build = () => Promise.resolve({});
 }
 
