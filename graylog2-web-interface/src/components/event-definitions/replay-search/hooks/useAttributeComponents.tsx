@@ -78,7 +78,9 @@ const useAttributeComponents = () => {
       : {
           title: 'Execute search every',
           content:
-            executeEvery?.duration && executeEvery?.unit && `${executeEvery.duration} ${executeEvery.unit.toLowerCase()}`,
+            executeEvery?.duration &&
+            executeEvery?.unit &&
+            `${executeEvery.duration} ${executeEvery.unit.toLowerCase()}`,
         };
     const isEDUpdatedAfterEvent =
       !isEventDefinition && moment(eventDefinition.updated_at).diff(eventData?.timestamp) > 0;
