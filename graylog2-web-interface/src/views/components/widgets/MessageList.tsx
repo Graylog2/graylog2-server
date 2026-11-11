@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useContext, useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
 import type { WidgetComponentProps, MessageResult } from 'views/types';
 import { Messages } from 'views/Constants';
@@ -40,7 +40,7 @@ import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDr
 import useMessageListPluggableBulkActions from 'views/components/widgets/useMessageListPluggableBulkActions';
 import { useIsInteractiveMode } from 'views/components/contexts/InteractiveContext';
 
-import RenderCompletionCallback from './RenderCompletionCallback';
+import useRenderCompletionCallback from './useRenderCompletionCallback';
 import MessageTableSelectedEntitiesProvider from './MessageTableSelectedEntitiesProvider';
 import SelectableMessageTableMessagesProvider from './SelectableMessageTableMessagesProvider';
 
@@ -118,12 +118,12 @@ const useResetScrollPositionOnPageChange = (currentPage: number) => {
   return scrollContainerRef;
 };
 
-const useRenderCompletionCallback = () => {
-  const renderCompletionCallback = useContext(RenderCompletionCallback);
+const useNotifyRenderCompleteAfterFetchingInputs = () => {
+  const onRenderComplete = useRenderCompletionCallback();
 
   useEffect(() => {
-    fetchInputs().then(() => renderCompletionCallback && renderCompletionCallback());
-  }, [renderCompletionCallback]);
+    fetchInputs().then(() => onRenderComplete());
+  }, [onRenderComplete]);
 };
 
 const usePageErrors = (searchTypeId: string) => {
@@ -152,7 +152,7 @@ const MessageList = ({
   const scrollContainerRef = useResetScrollPositionOnPageChange(currentPage);
   const dispatch = useViewsDispatch();
   useResetPaginationOnSearchExecution(setCurrentPage, currentPage);
-  useRenderCompletionCallback();
+  useNotifyRenderCompleteAfterFetchingInputs();
   const displayBulkSelectCol = !!pluggableBulkActions && !editing && interactive;
 
   const bulkSelection = useMemo(

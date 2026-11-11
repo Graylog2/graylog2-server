@@ -14,12 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useContext, useEffect } from 'react';
+import { useEffect } from 'react';
 
-import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
+import useRenderCompletionCallback from 'views/components/widgets/useRenderCompletionCallback';
 
 const useNotifyRenderComplete = () => {
-  const onRenderComplete = useContext(RenderCompletionCallback);
+  const onRenderComplete = useRenderCompletionCallback();
 
   useEffect(() => {
     onRenderComplete();
