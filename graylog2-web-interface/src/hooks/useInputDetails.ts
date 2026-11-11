@@ -54,6 +54,8 @@ const useInputDetails = (
   typedInputs: ReadonlyArray<TypedInput>,
 ): {
   resolvedById: Record<string, ResolvedInput>;
+  // Regular inputs the user may not read. Plugin fetchers leave out such inputs, so they can't be told apart from deleted ones.
+  notPermittedIds: Set<string>;
   isInitialLoading: boolean;
   /**
    * True while any underlying request is in flight, including background refetches. Use this to
@@ -67,6 +69,7 @@ const useInputDetails = (
   const titleEntities = useMemo(() => regularIds.map((id) => ({ id, type: 'inputs' })), [regularIds]);
   const {
     titlesById,
+    notPermittedIds,
     isInitialLoading: isCatalogLoading,
     isFetching: isCatalogFetching,
     isError: isCatalogError,
@@ -137,6 +140,7 @@ const useInputDetails = (
 
   return {
     resolvedById,
+    notPermittedIds,
     isInitialLoading: isCatalogLoading || isPluginLoading,
     isFetching: isCatalogFetching || isPluginFetching,
     isError: isCatalogError || isPluginError,

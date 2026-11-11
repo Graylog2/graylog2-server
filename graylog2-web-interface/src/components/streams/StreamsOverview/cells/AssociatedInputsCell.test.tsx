@@ -57,6 +57,7 @@ describe('AssociatedInputsCell (Streams)', () => {
         },
       },
       isInitialLoading: false,
+      notPermittedIds: new Set(),
       isFetching: false,
       isError: false,
     });
@@ -112,6 +113,7 @@ describe('AssociatedInputsCell (Streams)', () => {
         },
       },
       isInitialLoading: false,
+      notPermittedIds: new Set(),
       isFetching: false,
       isError: false,
     });
@@ -134,6 +136,7 @@ describe('AssociatedInputsCell (Streams)', () => {
     asMock(useInputDetails).mockReturnValue({
       resolvedById: {},
       isInitialLoading: false,
+      notPermittedIds: new Set(),
       isFetching: true,
       isError: false,
     });
@@ -154,6 +157,7 @@ describe('AssociatedInputsCell (Streams)', () => {
     asMock(useInputDetails).mockReturnValue({
       resolvedById: {},
       isInitialLoading: false,
+      notPermittedIds: new Set(),
       isFetching: false,
       isError: true,
     });
@@ -176,6 +180,7 @@ describe('AssociatedInputsCell (Streams)', () => {
     asMock(useInputDetails).mockReturnValue({
       resolvedById: {},
       isInitialLoading: false,
+      notPermittedIds: new Set(),
       isFetching: false,
       isError: false,
     });
@@ -188,6 +193,26 @@ describe('AssociatedInputsCell (Streams)', () => {
     render(<AssociatedInputsCell stream={stream} />);
 
     await screen.findByText('input-deleted (deleted)');
+  });
+
+  it('shows the ID with a missing permissions hint for inputs the user may not read', async () => {
+    asMock(useInputDetails).mockReturnValue({
+      resolvedById: {},
+      notPermittedIds: new Set(['input-secret']),
+      isInitialLoading: false,
+      isFetching: false,
+      isError: false,
+    });
+    asMock(useStreamMetricsFor).mockReturnValue({
+      metrics: { associated_inputs: [{ id: 'input-secret', type: 'input' }] },
+      isInitialLoading: false,
+      isError: false,
+    });
+
+    render(<AssociatedInputsCell stream={stream} />);
+
+    expect(await screen.findByTitle('Missing permissions')).toHaveTextContent('input-secret');
+    expect(screen.queryByText(/deleted/i)).not.toBeInTheDocument();
   });
 
   it('renders the first input and the number of the others, which can be expanded', async () => {

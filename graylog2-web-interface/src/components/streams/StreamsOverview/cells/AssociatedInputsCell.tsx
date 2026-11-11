@@ -27,6 +27,7 @@ import { useInputTitleLinkBuilder } from 'components/streams/StreamsOverview/inp
 type InputItem = {
   id: string;
   resolved: ResolvedInput | undefined;
+  isPermitted: boolean;
 };
 
 type Props = {
@@ -38,6 +39,7 @@ const AssociatedInputsCell = ({ stream }: Props) => {
   const typedInputs = metrics?.associated_inputs;
   const {
     resolvedById,
+    notPermittedIds,
     isInitialLoading: areDetailsLoading,
     isFetching: areDetailsFetching,
     isError: isDetailsError,
@@ -57,14 +59,19 @@ const AssociatedInputsCell = ({ stream }: Props) => {
   const label = ({ id, resolved }: InputItem) => resolved?.title ?? fallbackLabel(id);
 
   const renderInput = (item: InputItem) => {
+    if (!item.isPermitted) {
+      return <i title="Missing permissions">{item.id}</i>;
+    }
+
     const path = item.resolved ? buildLink(item.resolved) : null;
 
     return path ? <Link to={path}>{label(item)}</Link> : label(item);
   };
 
+  // Inputs the user can't read have no title, so they go last as plain IDs.
   const items = typedInputs
-    .map(({ id }) => ({ id, resolved: resolvedById[id] }))
-    .sort((a, b) => label(a).localeCompare(label(b)));
+    .map(({ id }) => ({ id, resolved: resolvedById[id], isPermitted: !notPermittedIds.has(id) }))
+    .sort((a, b) => Number(!a.isPermitted) - Number(!b.isPermitted) || label(a).localeCompare(label(b)));
 
   return <ExpandableCellList items={items} renderItem={renderInput} itemKey={({ id }) => id} itemTitle={label} />;
 };
