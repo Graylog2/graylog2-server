@@ -14,22 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import TitleTypes from 'views/stores/TitleTypes';
+import defaultTitle from 'views/components/defaultTitle';
+import useActiveViewState from 'views/hooks/useActiveViewState';
+import type Widget from 'views/logic/widgets/Widget';
 
-import { ExpandedSectionToggleWrapper } from 'components/common/EntityDataTable';
+const useWidgetTitle = (widget: Widget) => {
+  const viewState = useActiveViewState();
 
-import { DETAILS_SECTION } from '../Constants';
-import type { IndexSetEntity } from '../types';
+  return viewState?.titles?.getIn([TitleTypes.Widget, widget.id], defaultTitle(widget)) as string;
+};
 
-type Props = React.PropsWithChildren<{
-  indexSet: IndexSetEntity;
-  align?: 'right';
-}>;
-
-const DetailsToggle = ({ indexSet, align = undefined, children = undefined }: Props) => (
-  <ExpandedSectionToggleWrapper id={indexSet.id} section={DETAILS_SECTION} align={align}>
-    {children}
-  </ExpandedSectionToggleWrapper>
-);
-
-export default DetailsToggle;
+export default useWidgetTitle;

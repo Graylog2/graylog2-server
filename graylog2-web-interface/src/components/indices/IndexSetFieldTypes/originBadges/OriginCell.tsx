@@ -17,16 +17,18 @@
 import React, { useMemo } from 'react';
 import keyBy from 'lodash/keyBy';
 
-import type { FieldTypeOrigin } from 'components/indices/IndexSetFieldTypes/types';
+import type { IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import { OverlayTrigger } from 'components/common';
+import OriginExpandedSection from 'components/indices/IndexSetFieldTypes/originExpandedSections/OriginExpandedSection';
 
 import OriginBadge from './OriginBadge';
 
 type Props = {
-  origin: FieldTypeOrigin;
+  fieldType: IndexSetFieldType;
 };
 
-const OriginCell = ({ origin }: Props) => {
+const OriginCell = ({ fieldType: { origin, type, fieldName } }: Props) => {
   const { attributes } = useTableFetchContext();
 
   const normalizedOrigin = useMemo(() => {
@@ -35,7 +37,14 @@ const OriginCell = ({ origin }: Props) => {
     return keyBy(originOptions, 'value');
   }, [attributes]);
 
-  return <OriginBadge origin={origin} title={normalizedOrigin?.[origin]?.title} />;
+  return (
+    <OverlayTrigger
+      trigger="hover"
+      placement="bottom"
+      overlay={<OriginExpandedSection origin={origin} type={type} fieldName={fieldName} />}>
+      <OriginBadge origin={origin} title={normalizedOrigin?.[origin]?.title} withInfoIcon />
+    </OverlayTrigger>
+  );
 };
 
 export default OriginCell;
