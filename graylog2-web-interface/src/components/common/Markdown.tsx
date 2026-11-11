@@ -30,6 +30,7 @@ import Routes from 'routing/Routes';
 import MarkdownLink from 'components/common/markdown/MarkdownLink';
 import MermaidDiagram from 'components/common/markdown/MermaidDiagram';
 import { useTrackMarkdownRender } from 'components/common/markdown/MarkdownRenderTracker';
+import Table from 'components/bootstrap/Table';
 
 type Props = {
   text: string;
@@ -55,26 +56,10 @@ const mergeTransformer =
   };
 
 // A table wider than its container scrolls instead of squeezing its columns.
-const Table = styled.table(
+const SpacedTable = styled(Table)(
   ({ theme }) => css`
-    display: block;
-    max-width: 100%;
-    overflow-x: auto;
     margin: ${theme.spacings.xs} 0;
-    border-collapse: collapse;
-
-    th,
-    td {
-      padding: ${theme.spacings.xxs} ${theme.spacings.sm};
-      border-bottom: 1px solid ${theme.colors.table.row.divider};
-      overflow-wrap: normal;
-      text-align: left;
-      vertical-align: top;
-    }
-
-    th {
-      font-weight: 600;
-    }
+    width: auto;
   `,
 );
 
@@ -88,7 +73,11 @@ const parseHtml = (html: string, transformer: Transformer) => {
     }
 
     if (domNode.name === 'table') {
-      return <Table>{contentOf(domNode)}</Table>;
+      return (
+        <SpacedTable responsive condensed striped={false} hover={false}>
+          {contentOf(domNode)}
+        </SpacedTable>
+      );
     }
 
     const href = domNode.name === 'a' ? domNode.attribs?.href : undefined;
