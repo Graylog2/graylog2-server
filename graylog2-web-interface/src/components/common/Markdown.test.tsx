@@ -139,6 +139,45 @@ describe('Markdown', () => {
       expect(svg).not.toContainHTML('<script>');
     });
 
+    it('removes images from diagrams', async () => {
+      asMock(mermaid.render).mockResolvedValue({
+        svg: '<svg><image href="https://example.org/a.png"></image><foreignObject><div><img src="https://example.org/b.png"><span>Start</span></div></foreignObject></svg>',
+        diagramType: 'flowchart',
+      });
+
+      render(<Markdown text={diagram} />);
+
+      const svg = await screen.findByRole('img', { name: 'Diagram' });
+
+      expect(screen.getByText('Start')).toBeInTheDocument();
+      expect(svg.innerHTML).not.toMatch(/<(image|img)\b/);
+    });
+
+    it('keeps diagrams from loading external resources', async () => {
+      asMock(mermaid.render).mockResolvedValue({
+        svg: [
+          '<svg>',
+          '<style>@import "https://example.org/a.css"; .evil > * { background-image: url(https://example.org/b.png) !important; } .escaped { background: \\75rl(https://example.org/c.png); } .set { background: image-set("https://example.org/d.png" 1x); } path { marker-end: url(#arrowhead); }</style>',
+          '<filter id="f"><feImage href="https://example.org/e.png"></feImage></filter>',
+          '<linearGradient id="a" href="https://example.org/f.svg#shape"></linearGradient><linearGradient href="#a"></linearGradient>',
+          '<rect fill="url(https://example.org/g.png)" style="fill: url(https://example.org/h.png); stroke: #333"></rect>',
+          '<text>Start</text>',
+          '</svg>',
+        ].join(''),
+        diagramType: 'flowchart',
+      });
+
+      render(<Markdown text={diagram} />);
+
+      const svg = await screen.findByRole('img', { name: 'Diagram' });
+
+      expect(screen.getByText('Start')).toBeInTheDocument();
+      expect(svg.innerHTML).not.toMatch(/(?:url|image-set|href=)["(]*https|@import|feImage/i);
+      expect(svg.innerHTML).toMatch(/marker-end: url\(#arrowhead\)/);
+      expect(svg.innerHTML).toMatch(/href="#a"/);
+      expect(svg.innerHTML).toMatch(/stroke: #333/);
+    });
+
     it('shows the source with the error when a diagram is invalid, and removes what mermaid left behind', async () => {
       asMock(mermaid.render).mockImplementation((id: string) => {
         const leftover = document.createElement('div');
