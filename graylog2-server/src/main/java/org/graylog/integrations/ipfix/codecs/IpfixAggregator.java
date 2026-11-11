@@ -39,6 +39,7 @@ import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -201,7 +202,7 @@ public class IpfixAggregator implements RemoteAddressCodecAggregator {
     public void collectAllTemplateIds(@Nullable SocketAddress remoteAddress, long observationDomainId, Set<Integer> knownTemplateIdsList) {
         LOG.debug("Collecting all templateIds from templateKeys stored in templateCache.");
         for (TemplateKey templateKey : templateCache.asMap().keySet()) {
-            if (templateKey.getRemoteAddress() == remoteAddress && templateKey.getObservationDomainId() == observationDomainId) {
+            if (Objects.equals(templateKey.getRemoteAddress(), remoteAddress) && templateKey.getObservationDomainId() == observationDomainId) {
                 final Integer templateId = templateKey.getTemplateId();
                 knownTemplateIdsList.add(templateId);
             }
