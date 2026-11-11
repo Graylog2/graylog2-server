@@ -1,0 +1,4 @@
+type = "a"
+message = "Add telemetry events for opening and closing the scratchpad."
+
+pulls = ["28169"]

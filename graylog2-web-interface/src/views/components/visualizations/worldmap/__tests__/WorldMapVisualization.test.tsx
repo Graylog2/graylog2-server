@@ -19,16 +19,19 @@ import * as Immutable from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
+import asMock from 'helpers/mocking/AsMock';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import MockViewport from 'views/logic/aggregationbuilder/visualizations/Viewport';
 import Series from 'views/logic/aggregationbuilder/Series';
-import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
+import useRenderCompletionCallback from 'views/components/widgets/useRenderCompletionCallback';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import MapVisualization from 'views/components/visualizations/worldmap/MapVisualization';
 
 import WorldMapVisualization from '../WorldMapVisualization';
+
+jest.mock('views/components/widgets/useRenderCompletionCallback');
 
 jest.mock('../MapVisualization', () =>
   jest.fn(({ onChange, onRenderComplete }: MapVisualizationProps) => {
@@ -90,11 +93,9 @@ describe('WorldMapVisualization', () => {
 
   it('calls render completion callback after first render', () => {
     const renderCompletionCallback = jest.fn();
-    render(
-      <RenderCompletionCallback.Provider value={renderCompletionCallback}>
-        <WorldMapVisualization {...defaultProps} editing />
-      </RenderCompletionCallback.Provider>,
-    );
+    asMock(useRenderCompletionCallback).mockReturnValue(renderCompletionCallback);
+
+    render(<WorldMapVisualization {...defaultProps} editing />);
 
     expect(renderCompletionCallback).toHaveBeenCalled();
   });

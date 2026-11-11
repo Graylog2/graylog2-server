@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-/* eslint-disable graylog/no-literal-product-name -- HTTP header name expected by the backend */
 import { Builder } from 'logic/rest/FetchProvider';
 
 import request from './request';

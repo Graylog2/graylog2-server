@@ -42,55 +42,6 @@ const ALLOWED_URI_REGEXP = /^(?:https?:|graylog:|[^a-z])/i;
 type Transformer = Parameters<typeof parse>[1]['replace'];
 type Renderer = ({ html, transformer }: { html: string; transformer?: Transformer }) => ReturnType<typeof parse>;
 
-const mergeTransformer =
-  (transformers: Array<Transformer>): Transformer =>
-  (domNode, idx) => {
-    for (const transformer of transformers) {
-      const result = transformer(domNode, idx);
-      if (result) {
-        return result;
-      }
-    }
-
-    return undefined;
-  };
-
-// A table wider than its container scrolls instead of squeezing its columns.
-const SpacedTable = styled(Table)(
-  ({ theme }) => css`
-    margin: ${theme.spacings.xs} 0;
-    width: auto;
-  `,
-);
-
-// The content of tables and links is transformed like everything else, e.g. its links and augmented values.
-const parseHtml = (html: string, transformer: Transformer) => {
-  const options: HTMLReactParserOptions = {};
-  const contentOf = (domNode: Element) => domToReact(domNode.children as DOMNode[], options);
-  const containerTransformer: Transformer = (domNode) => {
-    if (!(domNode instanceof Element)) {
-      return undefined;
-    }
-
-    if (domNode.name === 'table') {
-      return (
-        <SpacedTable responsive condensed striped={false} hover={false}>
-          {contentOf(domNode)}
-        </SpacedTable>
-      );
-    }
-
-    const href = domNode.name === 'a' ? domNode.attribs?.href : undefined;
-
-    return href ? <MarkdownLink href={href}>{contentOf(domNode)}</MarkdownLink> : undefined;
-  };
-  options.replace = transformer ? mergeTransformer([transformer, containerTransformer]) : containerTransformer;
-
-  return parse(html, options);
-};
-
-const HTML: Renderer = ({ html, transformer }) => parseHtml(html, transformer);
-
 const useMarkdownTransformer = (): HTMLReactParserOptions['replace'] => {
   const components = usePluginEntities('markdown.augment.components');
 
@@ -127,6 +78,57 @@ const useMarkdownTransformer = (): HTMLReactParserOptions['replace'] => {
     };
   }, [components]);
 };
+
+const mergeTransformer =
+  (transformers: Array<Transformer>): Transformer =>
+  (domNode, idx) => {
+    for (const transformer of transformers) {
+      const result = transformer(domNode, idx);
+      if (result) {
+        return result;
+      }
+    }
+
+    return undefined;
+  };
+
+// A table wider than its container scrolls instead of squeezing its columns.
+const SpacedTable = styled(Table)(
+  ({ theme }) => css`
+    margin: ${theme.spacings.xs} 0;
+    width: auto;
+  `,
+);
+
+// The content of tables and links is transformed like everything else, e.g. its links and augmented values.
+const parseHtml = (html: string, transformer: Transformer) => {
+  const options: HTMLReactParserOptions = {};
+  const tableTransformer: Transformer = (domNode) => {
+    if (!(domNode instanceof Element) || domNode.name !== 'table') {
+      return undefined;
+    }
+
+    return (
+      <SpacedTable responsive condensed striped={false} hover={false}>
+        {domToReact(domNode.children as DOMNode[], options)}
+      </SpacedTable>
+    );
+  };
+  const linkTransformer: Transformer = (domNode) => {
+    if (!(domNode instanceof Element) || domNode.name !== 'a' || !domNode.attribs?.href) {
+      return undefined;
+    }
+
+    return (
+      <MarkdownLink href={domNode.attribs.href}>{domToReact(domNode.children as DOMNode[], options)}</MarkdownLink>
+    );
+  };
+  options.replace = mergeTransformer([...(transformer ? [transformer] : []), tableTransformer, linkTransformer]);
+
+  return parse(html, options);
+};
+
+const HTML: Renderer = ({ html, transformer }) => parseHtml(html, transformer);
 
 const Augment: Renderer = ({ html, transformer }) => {
   const markdownTransformer = useMarkdownTransformer();
