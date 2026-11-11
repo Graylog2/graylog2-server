@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import styled from 'styled-components';
 
 import { Spinner } from 'components/common';
 import ViewsStoreProvider from 'views/stores/ViewsStoreProvider';
@@ -30,9 +31,9 @@ import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import type { InteractionMode } from 'views/components/contexts/InteractiveContext';
 import ErrorWidget from 'views/components/widgets/ErrorWidget';
 import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
+import useIntersectionObserver from 'hooks/useIntersectionObserver';
 
 import createStandaloneView, { STANDALONE_QUERY_ID } from './createStandaloneView';
-import RenderWhenVisible from './RenderWhenVisible';
 
 // Stable across renders: the views store is created again whenever its initial execution state changes, which
 // runs the search again.
@@ -55,6 +56,28 @@ const ExecuteOnMount = () => {
   }, [dispatch]);
 
   return null;
+};
+
+// Takes the space the widgets will take, so the layout does not jump when they render.
+const LazyPlaceholder = styled.div`
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+`;
+
+const RenderWhenNearViewport = ({ children }: React.PropsWithChildren) => {
+  const placeholderRef = useRef<HTMLDivElement>(null);
+  // Renders a bit before the widgets scroll into view, so they are usually ready by then.
+  const isNearViewport = useIntersectionObserver(placeholderRef, { rootMargin: '200px' });
+  // Keeps the widgets once rendered, so scrolling past them does not run their search again.
+  const [wasNearViewport, setWasNearViewport] = useState(false);
+
+  if (isNearViewport && !wasNearViewport) {
+    setWasNearViewport(true);
+  }
+
+  return wasNearViewport ? children : <LazyPlaceholder ref={placeholderRef} />;
 };
 
 type GroupProps = React.PropsWithChildren<{
@@ -137,7 +160,7 @@ const StandaloneWidgetGroup = ({
       {children}
     </Group>
   );
-  const group = lazy ? <RenderWhenVisible>{content}</RenderWhenVisible> : content;
+  const group = lazy ? <RenderWhenNearViewport>{content}</RenderWhenNearViewport> : content;
 
   return (
     <InteractiveContext.Provider value={interactionMode}>
