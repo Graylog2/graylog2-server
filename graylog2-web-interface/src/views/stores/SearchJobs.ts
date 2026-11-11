@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import fetch from 'logic/rest/FetchProvider';
+import fetch, { Builder } from 'logic/rest/FetchProvider';
 import * as URLUtils from 'util/URLUtils';
 import type Search from 'views/logic/search/Search';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
@@ -61,7 +61,7 @@ export type JobIds = {
 };
 
 export function runStartJob(search: Search, executionState: SearchExecutionState): Promise<JobIdsJson> {
-  return fetch('POST', startJobUrl(search.id), JSON.stringify(executionState));
+  return new Builder('POST', startJobUrl(search.id)).json(executionState).ignoreUnauthorized().build();
 }
 
 export function runPollJob({

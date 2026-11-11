@@ -32,7 +32,7 @@ import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type { SearchParser } from 'views/logic/slices/searchMetadataSlice';
 import { parseSearch } from 'views/logic/slices/searchMetadataSlice';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
-import { selectParameters } from 'views/logic/slices/viewSelectors';
+import { selectParameters, selectView } from 'views/logic/slices/viewSelectors';
 import {
   selectGlobalOverride,
   selectSearchTypesToSearch,
@@ -49,6 +49,12 @@ import type { JobIds } from 'views/stores/SearchJobs';
 import type Search from 'views/logic/search/Search';
 import { setParameters } from 'views/logic/slices/viewSlice';
 import type { WidgetMapping } from 'views/logic/views/types';
+import FetchError from 'logic/errors/FetchError';
+import ErrorsActions from 'actions/errors/ErrorsActions';
+import { createFromFetchError } from 'logic/errors/ReportedErrors';
+import UserNotification from 'util/UserNotification';
+import { getView } from 'views/api/views';
+import ViewTypeLabel from 'views/components/ViewTypeLabel';
 
 const initialState = {
   searchTypesToSearch: undefined,
@@ -203,6 +209,42 @@ export const executeSearchJob =
       });
   };
 
+export const isSearchNotAccessibleError = (error: unknown): error is FetchError =>
+  error instanceof FetchError && (error.status === 403 || error.status === 404);
+
+const isSearchOutdated = async (viewId: string | undefined, searchId: string) => {
+  if (!viewId) {
+    return false;
+  }
+
+  try {
+    const { search_id: savedSearchId } = await getView(viewId);
+
+    return savedSearchId !== searchId;
+  } catch {
+    return false;
+  }
+};
+
+const handleSearchNotAccessible = async (error: FetchError, search: Search, getState: () => RootState) => {
+  const view = selectView(getState());
+
+  if (await isSearchOutdated(view?.id, search.id)) {
+    UserNotification.warning(
+      `This ${ViewTypeLabel({ type: view.type })} was changed by another user. Reload the page to see the latest version.`,
+      'Outdated version',
+    );
+
+    return;
+  }
+
+  if (error.status === 403) {
+    ErrorsActions.report(createFromFetchError(error));
+  } else {
+    UserNotification.error(`Starting search job failed: ${error}`, 'Error!');
+  }
+};
+
 export const executeWithExecutionState =
   ({
     search,
@@ -225,7 +267,7 @@ export const executeWithExecutionState =
     perPage?: number;
     stopPolling?: (progress: number) => boolean;
   }) =>
-  async (dispatch: ViewsDispatch) => {
+  async (dispatch: ViewsDispatch, getState: () => RootState) => {
     dispatch(loading());
 
     return dispatch(parseSearch(search, searchExecutors.parse))
@@ -240,6 +282,12 @@ export const executeWithExecutionState =
       .catch((error) => {
         dispatch(cancelExecutedJob());
         dispatch(stopLoading());
+
+        if (isSearchNotAccessibleError(error)) {
+          return handleSearchNotAccessible(error, search, getState).then(() => {
+            throw error;
+          });
+        }
 
         throw error;
       });

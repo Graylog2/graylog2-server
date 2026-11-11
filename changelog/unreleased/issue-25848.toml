@@ -1,0 +1,5 @@
+type = "f"
+message = "Show a notice instead of a permission error page when a dashboard or saved search was changed by another user while it was open."
+
+issues = ["25848"]
+pulls = []
