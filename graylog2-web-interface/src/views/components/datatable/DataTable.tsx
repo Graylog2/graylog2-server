@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useCallback, useContext, useMemo, useState } from 'react';
 import * as Immutable from 'immutable';
 import flatten from 'lodash/flatten';
 import isEqual from 'lodash/isEqual';
@@ -42,7 +42,7 @@ import deduplicateValues from './DeduplicateValues';
 import Headers from './Headers';
 import styles from './DataTable.css';
 
-import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
+import useNotifyRenderComplete from '../widgets/useNotifyRenderComplete';
 import type { VisualizationComponentProps } from '../aggregationbuilder/AggregationBuilder';
 import { makeVisualization, retrieveChartData } from '../aggregationbuilder/AggregationBuilder';
 
@@ -144,9 +144,8 @@ const DataTable = ({
   striped = true,
 }: Props) => {
   const formContext = useContext(FormikContext);
-  const onRenderComplete = useContext(RenderCompletionCallback);
+  useNotifyRenderComplete();
   const widget = useContext(WidgetContext);
-  useEffect(onRenderComplete, [onRenderComplete]);
   const [rowPivotColumnsWidth, setRowPivotColumnsWidth] = useState<{ [key: string]: number }>({});
   const dispatch = useViewsDispatch();
 

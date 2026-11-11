@@ -14,14 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext, useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
 import type { WidgetComponentProps } from 'views/types';
 import AutoFontSizer from 'views/components/visualizations/number/AutoFontSizer';
 import { ElementDimensions } from 'components/common';
 import type EventsWidgetConfig from 'views/logic/widgets/events/EventsWidgetConfig';
-import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
+import useNotifyRenderComplete from 'views/components/widgets/useNotifyRenderComplete';
 
 import type { EventsListResult } from './types';
 
@@ -32,11 +32,7 @@ const NumberBox = styled(ElementDimensions)`
 `;
 
 const EventsNumber = ({ data }: WidgetComponentProps<EventsWidgetConfig, EventsListResult>) => {
-  const onRenderComplete = useContext(RenderCompletionCallback);
-
-  useEffect(() => {
-    onRenderComplete();
-  }, [onRenderComplete]);
+  useNotifyRenderComplete();
 
   return (
     <NumberBox resizeDelay={20}>

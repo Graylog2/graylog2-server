@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext, useEffect, useRef, useMemo } from 'react';
+import React, { useRef, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
@@ -22,7 +22,7 @@ import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 import Value from 'views/components/Value';
 import DecoratedValue from 'views/components/messagelist/decoration/DecoratedValue';
 import CustomHighlighting from 'views/components/highlighting/CustomHighlighting';
-import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
+import useNotifyRenderComplete from 'views/components/widgets/useNotifyRenderComplete';
 import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 import type { NumberAlignment } from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
 import type { VisualizationComponentProps } from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -114,14 +114,12 @@ const NumberVisualization = ({ config, fields, data, height: heightProp }: Visua
   const targetRef = useRef();
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const widgetUnits = useWidgetUnits(config);
-  const onRenderComplete = useContext(RenderCompletionCallback);
+  useNotifyRenderComplete();
   const visualizationConfig =
     (config.visualizationConfig as NumberVisualizationConfig) ?? NumberVisualizationConfig.create();
 
   const field = _extractFirstSeriesName(config);
   const alignment = visualizationConfig.alignment ?? DEFAULT_ALIGNMENT;
-
-  useEffect(onRenderComplete, [onRenderComplete]);
   const chartRows = retrieveChartData(data);
   const trendRows = data.trend;
   const { value } = _extractValueAndField(chartRows);
