@@ -30,7 +30,7 @@ import getDefaultPlotYLayoutSettings from 'views/components/visualizations/utils
 import ChartColorContext from './ChartColorContext';
 
 import { useIsInteractiveMode, useIsReadOnlyMode } from '../contexts/InteractiveContext';
-import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
+import useRenderCompletionCallback from '../widgets/useRenderCompletionCallback';
 
 export type PlotLayout = Layout;
 
@@ -271,7 +271,7 @@ const GenericPlot = ({
   );
 
   const plotConfig = useMemo(() => ({ ...defaultPlotConfig, ...config }), [config]);
-  const onRenderComplete = useContext(RenderCompletionCallback);
+  const onRenderComplete = useRenderCompletionCallback();
 
   const _onRelayout = useCallback(
     (axis: Axis) => {

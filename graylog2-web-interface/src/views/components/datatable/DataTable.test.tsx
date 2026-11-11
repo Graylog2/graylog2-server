@@ -20,6 +20,7 @@ import * as Immutable from 'immutable';
 import { Form, Formik } from 'formik';
 import userEvent from '@testing-library/user-event';
 
+import asMock from 'helpers/mocking/AsMock';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
@@ -38,10 +39,12 @@ import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget'
 import { createViewWithWidgets } from 'fixtures/searches';
 import { updateWidgetConfig } from 'views/logic/slices/widgetActions';
 
-import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
+import useRenderCompletionCallback from '../widgets/useRenderCompletionCallback';
 
 const createWidget = (config: AggregationWidgetConfig = AggregationWidgetConfig.builder().build()) =>
   AggregationWidget.builder().id('deadbeef').config(config).build();
+
+jest.mock('../widgets/useRenderCompletionCallback');
 
 jest.mock('views/logic/slices/widgetActions', () => ({
   ...jest.requireActual('views/logic/slices/widgetActions'),
@@ -314,11 +317,9 @@ describe('DataTable', () => {
       .build();
     const onRenderComplete = jest.fn();
 
-    render(
-      <RenderCompletionCallback.Provider value={onRenderComplete}>
-        <SimplifiedDataTable config={config} />
-      </RenderCompletionCallback.Provider>,
-    );
+    asMock(useRenderCompletionCallback).mockReturnValue(onRenderComplete);
+
+    render(<SimplifiedDataTable config={config} />);
 
     expect(onRenderComplete).toHaveBeenCalled();
   });
