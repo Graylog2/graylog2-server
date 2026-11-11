@@ -19,7 +19,8 @@ by a security or operations team. Untrusted input enters through:
   collector endpoint and others), often reachable by every logging host and sometimes by the Internet, plus inputs
   that poll or consume external systems.
 - **The Data Node API** (port 8999), secured with certificates and JWTs the server issues.
-- **Files and packages users upload**: content packs, lookup data, GeoIP databases, certificates.
+- **Files users supply**: content packs and certificates they upload, and lookup data and GeoIP databases that
+  Graylog reads from a path or from cloud storage.
 
 ## Who the attackers are
 
@@ -30,7 +31,7 @@ In order of how much we care:
    parsers, pipeline rules and lookups into storage and analysts' screens. Treat every field as hostile.
 3. An authenticated user with few permissions (for example the Reader role, or access to only some streams).
 4. A user with powerful but non-admin permissions (inputs, pipeline rules, lookup tables, notifications).
-5. Whoever supplies a content pack or other uploaded file.
+5. Whoever supplies a content pack or another file Graylog reads.
 
 Users with the Admin role are trusted to configure the system, except for the boundaries listed below.
 
@@ -105,12 +106,14 @@ The image contains the full build of `/src`; there is no network, and no MongoDB
 server. Reproduce findings with unit tests.
 
 - **Java unit tests**, offline. Run `graylog-test-hosts` once first (it adds `/etc/hosts` entries some tests need).
-  Then: `setpriv --bounding-set=-dac_override,-dac_read_search -- ./mvnw -o test -pl graylog2-server
-  -Dskip.web.build=true -Dspotbugs.skip -Dsurefire.excludesFile=/opt/graylog-tests-needing-docker.txt
-  -Dtest=<TestClass>` (or `-pl data-node`). The `setpriv` prefix makes root obey file permissions, which some tests
-  check. Tests that start containers need Docker, which is not available here; they are listed in
-  `/opt/graylog-tests-needing-docker.txt`. For code that needs a database, mock the service or database layer
-  instead. Results of the run made at build time: `/var/log/graylog-unit-tests.log` and
+  Then, for the server: `setpriv --bounding-set=-dac_override,-dac_read_search -- ./mvnw -o test -pl
+  graylog2-server -Dskip.web.build=true -Dsurefire.excludesFile=/opt/graylog-tests-needing-docker.txt
+  -Dtest=<TestClass>`. The `setpriv` prefix makes root obey file permissions, which some tests check. For the Data
+  Node: `./mvnw -o test -pl data-node -Dopensearch.unpack.compat.skip=true -Dopensearch.unpack.latest.skip=true
+  -Dtest=<TestClass>` (the image does not contain the OpenSearch builds the Data Node bundles, and without these
+  flags Maven tries to download them). Tests that start containers need Docker, which is not available here; the
+  server's are listed in `/opt/graylog-tests-needing-docker.txt`. For code that needs a database, mock the service
+  or database layer instead. Results of the server run made at build time: `/var/log/graylog-unit-tests.log` and
   `graylog2-server/target/surefire-reports/`.
 - **Authorization bugs**: use `@WithAuthorization` (`WithAuthorizationExtension`), as `AuthzRolesResourceTest`
   does. It logs in a real Shiro user that holds only the permissions you list and enforces `@RequiresPermissions`
@@ -118,12 +121,9 @@ server. Reproduce findings with unit tests.
   succeeds or returns data it should not. A resource called directly, without it, skips `@RequiresPermissions`
   (the server checks it in a request filter), so a missing check found that way may not be real.
 - **Frontend tests**: `cd graylog2-web-interface && export PATH="$PWD/node:$PWD/node/yarn/dist/bin:$PATH" && yarn
-  test <path>` (use `yarn test`, not `yarn jest`). The tests run in Jest with jsdom.
-- **No browser.** The image has no Chrome or other browser: the only build step that would use one is a
-  release check for CI, and installing a browser for it would not help the audit. To confirm XSS, write a Jest
-  test that renders the affected component with the hostile data (for example a message field value) and checks
-  whether the markup or script ends up in the DOM unescaped, and show from the code how that data reaches the
-  component.
+  test <path>`. The tests run in Jest with jsdom; there is no browser. To confirm XSS, write a Jest test that
+  renders the affected component with the hostile data (for example a message field value) and checks whether the
+  markup or script ends up in the DOM unescaped, and show from the code how that data reaches the component.
 
 ## How we rate severity
 
