@@ -30,6 +30,7 @@ type BaseProps = {
   formGroupClassName?: string;
   help?: React.ReactElement | string;
   id: string;
+  inputRef?: React.Ref<Input>;
   label?: React.ReactElement | string;
   labelClassName?: string;
   maxLength?: number;
@@ -62,6 +63,7 @@ const FormikInput = ({
   disabled = false,
   required = false,
   autoFocus = false,
+  inputRef = undefined,
   name,
   type = 'text',
   help,
@@ -89,6 +91,7 @@ const FormikInput = ({
 
         return (
           <Input
+            ref={inputRef}
             {...rest}
             disabled={disabled}
             required={required}
