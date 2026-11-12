@@ -21,6 +21,7 @@ import type { Event, EventsAdditionalData } from 'components/events/events/types
 import useMetaDataContext from 'components/common/EntityDataTable/hooks/useMetaDataContext';
 import GeneralEventDetailsTable from 'components/events/events/GeneralEventDetailsTable';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import sortEventDetailsAttributes from 'components/events/events/sortEventDetailsAttributes';
 import usePermissions from 'hooks/usePermissions';
 import TagsDetailRow from 'components/events/TagsDetailRow';
 
@@ -43,7 +44,7 @@ const GeneralEventDetails = ({ event }: Props) => {
   const { meta } = useMetaDataContext<EventsAdditionalData>();
   const { attributes } = useTableFetchContext();
   // The details show all attributes, also the ones shown as table columns. The tags follow in their own row.
-  const detailsAttributes = attributes.filter(({ id }) => id !== 'tags');
+  const detailsAttributes = sortEventDetailsAttributes(attributes.filter(({ id }) => id !== 'tags'));
   const hasTags = !!event.tags?.length;
 
   if (!detailsAttributes.length && !hasTags) return noDetails;
