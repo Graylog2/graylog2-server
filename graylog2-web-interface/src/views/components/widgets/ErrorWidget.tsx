@@ -18,6 +18,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { Icon, Center } from 'components/common';
+import useReportRenderComplete from 'views/components/widgets/useReportRenderComplete';
 
 import styles from './MessageWidgets.css';
 
@@ -49,22 +50,27 @@ const Row = styled.div`
 const ErrorWidget = ({
   errors,
   title = 'While retrieving data for this widget, the following error(s) occurred:',
-}: Props) => (
-  <Center>
-    <Icon name="warning" size="3x" className={styles.iconMargin} />
-    <Description>
-      <Row>
-        <strong>{title}</strong>
-      </Row>
-      <ErrorList>
-        {errors.map((e) => (
-          <Row as="li" key={e.description}>
-            {e.description}
-          </Row>
-        ))}
-      </ErrorList>
-    </Description>
-  </Center>
-);
+}: Props) => {
+  // Exports wait for every widget to render, including those that failed.
+  useReportRenderComplete();
+
+  return (
+    <Center>
+      <Icon name="warning" size="3x" className={styles.iconMargin} />
+      <Description>
+        <Row>
+          <strong>{title}</strong>
+        </Row>
+        <ErrorList>
+          {errors.map((e) => (
+            <Row as="li" key={e.description}>
+              {e.description}
+            </Row>
+          ))}
+        </ErrorList>
+      </Description>
+    </Center>
+  );
+};
 
 export default ErrorWidget;

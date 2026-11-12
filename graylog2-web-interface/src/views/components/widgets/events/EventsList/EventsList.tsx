@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import styled from 'styled-components';
 
 import type { WidgetComponentProps } from 'views/types';
@@ -29,7 +29,7 @@ import type EventsWidgetSortConfig from 'views/logic/widgets/events/EventsWidget
 import useOnSearchExecution from 'views/hooks/useOnSearchExecution';
 import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import ErrorWidget from 'views/components/widgets/ErrorWidget';
-import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
+import useReportRenderComplete from 'views/components/widgets/useReportRenderComplete';
 
 import EventsTable from './EventsTable';
 
@@ -118,11 +118,7 @@ const EventsList = ({
     },
     [config, onConfigChange],
   );
-  const onRenderComplete = useContext(RenderCompletionCallback);
-
-  useEffect(() => {
-    onRenderComplete();
-  }, [onRenderComplete]);
+  useReportRenderComplete();
 
   return (
     <Container>
