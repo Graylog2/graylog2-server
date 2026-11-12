@@ -17,8 +17,9 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
-import { marked } from 'marked';
+import { Marked } from 'marked';
 import DOMPurify from 'dompurify';
+import escape from 'lodash/escape';
 import parse, { domToReact, Element } from 'html-react-parser';
 import type { DOMNode, HTMLReactParserOptions } from 'html-react-parser';
 
@@ -38,6 +39,13 @@ type Props = {
 };
 
 const ALLOWED_URI_REGEXP = /^(?:https?:|graylog:|[^a-z])/i;
+
+const markdownParser = new Marked({
+  async: false,
+  renderer: {
+    html: ({ text }) => escape(text),
+  },
+});
 
 type Transformer = Parameters<typeof parse>[1]['replace'];
 type Renderer = ({ html, transformer }: { html: string; transformer?: Transformer }) => ReturnType<typeof parse>;
@@ -151,20 +159,16 @@ const imageWarningTransformer: Transformer = (domNode) => {
   return undefined;
 };
 
-const textOf = (nodes: Array<DOMNode>): string =>
+const textOf = (nodes: Element['children']): string =>
   nodes
     .map((node) => {
       if ('data' in node) {
         return node.data;
       }
 
-      return 'children' in node ? textOf(node.children as Array<DOMNode>) : '';
+      return 'children' in node ? textOf(node.children) : '';
     })
     .join('');
-
-// Sanitizing the Markdown escapes these characters before the code block escapes them again.
-const ENTITIES: { [entity: string]: string } = { '&lt;': '<', '&gt;': '>', '&amp;': '&', '&nbsp;': '\u00a0' };
-const unescapeSanitized = (text: string) => text.replace(/&(?:lt|gt|amp|nbsp);/g, (entity) => ENTITIES[entity]);
 
 // Code blocks in the language "mermaid" are shown as diagrams.
 const mermaidTransformer: Transformer = (domNode) => {
@@ -178,20 +182,17 @@ const mermaidTransformer: Transformer = (domNode) => {
     return undefined;
   }
 
-  return <MermaidDiagram source={unescapeSanitized(textOf(code.children as Array<DOMNode>))} />;
+  return <MermaidDiagram source={textOf(code.children)} />;
 };
 
 const Markdown = ({ augment = false, text }: Props) => {
   const { isInitialLoading, data: markdownConfig } = useMarkdownConfig();
   useTrackMarkdownRender(isInitialLoading);
 
-  // Remove dangerous HTML
-  const sanitizedText = DOMPurify.sanitize(text ?? '', { USE_PROFILES: { html: false } });
-
-  // Remove dangerous markdown
+  // Raw HTML is escaped by the parser, sanitizing the output is a safety net
   const html = useMemo(
-    () => DOMPurify.sanitize(marked.parse(sanitizedText, { async: false }), { ALLOWED_URI_REGEXP }),
-    [sanitizedText],
+    () => DOMPurify.sanitize(markdownParser.parse(text ?? '', { async: false }), { ALLOWED_URI_REGEXP }),
+    [text],
   );
 
   const imageTransformer: Transformer =

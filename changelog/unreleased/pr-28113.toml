@@ -1,0 +1,5 @@
+type = "f"
+message = "Show HTML in Markdown content (e.g. AI answers quoting log data) as text instead of removing it."
+
+issues = ["Graylog2/graylog-plugin-enterprise#16297"]
+pulls = ["28113"]
