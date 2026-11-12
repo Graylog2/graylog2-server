@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix stream destination filters not applying correctly after Illuminate upgrades."
+
+issues = ["Graylog2/graylog-plugin-enterprise#16300"]
+pulls = ["28176"]
