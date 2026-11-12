@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
+import styled, { css } from 'styled-components';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import parse, { domToReact, Element } from 'html-react-parser';
@@ -27,6 +28,7 @@ import Spinner from 'components/common/Spinner';
 import { Link } from 'components/common';
 import Routes from 'routing/Routes';
 import MarkdownLink from 'components/common/markdown/MarkdownLink';
+import Table from 'components/bootstrap/Table';
 
 type Props = {
   text: string;
@@ -88,9 +90,23 @@ const mergeTransformer =
     return undefined;
   };
 
-// The content of links is transformed like everything else, e.g. its augmented values.
+// A table wider than its container scrolls instead of squeezing its columns.
+const SpacedTable = styled(Table)(
+  ({ theme }) => css`
+    margin: ${theme.spacings.xs} 0;
+    width: auto;
+  `,
+);
+
+// The content of links and tables is transformed like everything else, e.g. its augmented values.
 const parseHtml = (html: string, transformer: Transformer) => {
   const options: HTMLReactParserOptions = {};
+  const tableTransformer: Transformer = (domNode) =>
+    domNode instanceof Element && domNode.name === 'table' ? (
+      <SpacedTable responsive condensed striped={false} hover={false}>
+        {domToReact(domNode.children as DOMNode[], options)}
+      </SpacedTable>
+    ) : undefined;
   const linkTransformer: Transformer = (domNode) => {
     if (!(domNode instanceof Element) || domNode.name !== 'a' || !domNode.attribs?.href) {
       return undefined;
@@ -100,7 +116,8 @@ const parseHtml = (html: string, transformer: Transformer) => {
       <MarkdownLink href={domNode.attribs.href}>{domToReact(domNode.children as DOMNode[], options)}</MarkdownLink>
     );
   };
-  options.replace = transformer ? mergeTransformer([transformer, linkTransformer]) : linkTransformer;
+  const builtInTransformers = [linkTransformer, tableTransformer];
+  options.replace = mergeTransformer(transformer ? [transformer, ...builtInTransformers] : builtInTransformers);
 
   return parse(html, options);
 };
