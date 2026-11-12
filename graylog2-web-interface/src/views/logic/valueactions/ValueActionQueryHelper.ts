@@ -31,3 +31,13 @@ export const orValuesClause = (values: Array<QueryValueForClause>) =>
 
 export const fieldValueOrClause = (field: string, values: Array<QueryValueForClause>) =>
   `(${predicate(field, orValuesClause(values))})`;
+
+// Builds `field:(a AND b AND c)` for values that must all be present.
+export const fieldValueAndClause = (field: string, values: Array<QueryValueForClause>) =>
+  predicate(
+    field,
+    `(${concatQueryStrings(
+      values.map(({ value, type }) => formatQueryValue(value, type)),
+      { operator: 'AND', withBrackets: false },
+    )})`,
+  );

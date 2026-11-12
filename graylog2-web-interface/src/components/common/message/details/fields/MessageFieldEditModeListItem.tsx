@@ -63,7 +63,7 @@ const MessageFieldEditModeListItem = ({ fieldName, fieldType, value, isFavorite,
       <CommonFavoriteIcon isFavorite={isFavorite} title={favTitle} onClick={_onFavoriteToggle} />
       <FieldValueContainer>
         <b>
-          <MessageFieldName message={message} fieldName={fieldName} fieldType={fieldType} />
+          <MessageFieldName message={message} fieldName={fieldName} fieldType={fieldType} value={value} />
         </b>
         <span>
           <DefinitionDescription data-testid={`message-field-value-${fieldName}`}>

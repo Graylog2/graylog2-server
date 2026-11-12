@@ -25,6 +25,7 @@ import { MessageList } from 'views/components/widgets';
 import AddToTableActionHandler from 'views/logic/fieldactions/AddToTableActionHandler';
 import AddToAllTablesActionHandler from 'views/logic/fieldactions/AddToAllTablesActionHandler';
 import AddToQueryHandler from 'views/logic/valueactions/AddToQueryHandler';
+import AddAllValuesToQueryHandler from 'views/logic/valueactions/AddAllValuesToQueryHandler';
 import AggregateActionHandler from 'views/logic/fieldactions/AggregateActionHandler';
 import ChartActionHandler from 'views/logic/fieldactions/ChartActionHandler';
 import AggregationBuilder from 'views/components/aggregationbuilder/AggregationBuilder';
@@ -347,6 +348,14 @@ const exports: PluginExports = {
       title: 'Remove from all tables',
       thunk: RemoveFromAllTablesActionHandler,
       isEnabled: ({ field, type }) => !isFunction(field) && !type.isDecorated(),
+      resetFocus: false,
+    },
+    {
+      type: 'add-all-values-to-query',
+      title: 'Add all values to query',
+      thunk: AddAllValuesToQueryHandler,
+      isEnabled: ({ field, type }) => !isFunction(field) && !type.isDecorated(),
+      isHidden: ({ value }) => !Array.isArray(value),
       resetFocus: false,
     },
     CopyToClipboardFieldActionPlugin,
