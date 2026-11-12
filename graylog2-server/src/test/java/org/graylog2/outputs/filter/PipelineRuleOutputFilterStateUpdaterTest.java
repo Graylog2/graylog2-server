@@ -19,7 +19,6 @@ package org.graylog2.outputs.filter;
 import com.codahale.metrics.MetricRegistry;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
-import org.graylog.plugins.pipelineprocessor.functions.messages.StreamCacheService;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineResolver;
@@ -69,8 +68,6 @@ class PipelineRuleOutputFilterStateUpdaterTest {
     private PipelineResolver.Factory resolverFactory;
     @Mock
     private PipelineRuleParser ruleParser;
-    @Mock
-    private StreamCacheService streamCacheService;
     @Mock
     private Stream defaultStream;
     @Mock
@@ -227,7 +224,7 @@ class PipelineRuleOutputFilterStateUpdaterTest {
     private PipelineResolver createResolver(List<RuleDao> rules) {
         final var ruleParser = new PipelineRuleParser(new FunctionRegistry(
                 Map.of(HasField.NAME, new HasField()),
-                Map.of(RemoveFromStreamDestination.NAME, new RemoveFromStreamDestination(streamCacheService))
+                Map.of(RemoveFromStreamDestination.NAME, new RemoveFromStreamDestination())
         ));
 
         return new PipelineResolver(ruleParser, PipelineResolverConfig.of(rules::stream, java.util.stream.Stream::of));
