@@ -6,4 +6,4 @@ The `aggregate_messages` tool of the MCP server accepts `from` and `to` for an a
 """
 
 issues = ["26421"]
-pulls = []
+pulls = ["28184"]
