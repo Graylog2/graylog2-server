@@ -121,6 +121,16 @@ const rules = (target, supportedBrowsers) => [
   },
 ];
 
+// Dependencies resolve their own dependencies like Node does, from nested node_modules first. E.g. plotly.js and mermaid
+// need different major versions of the same d3 packages. Plugins also bundle dependencies of the web interface.
+const nestedDependencies = (rootPath, webInterfaceRoot) => ({
+  test: /\.m?js$/,
+  include: /[\\/]node_modules[\\/]/,
+  resolve: {
+    modules: ['node_modules', path.resolve(rootPath, 'node_modules'), path.resolve(webInterfaceRoot, 'node_modules')],
+  },
+});
+
 const config = (target, appPath, rootPath, webInterfaceRoot, supportedBrowsers) => {
   const MANIFESTS_PATH = path.resolve(webInterfaceRoot, 'manifests');
   const VENDOR_MANIFEST_PATH = path.resolve(MANIFESTS_PATH, 'vendor-manifest.json');
@@ -140,7 +150,7 @@ const config = (target, appPath, rootPath, webInterfaceRoot, supportedBrowsers) 
       },
     },
     module: {
-      rules: rules(target, supportedBrowsers),
+      rules: [...rules(target, supportedBrowsers), nestedDependencies(rootPath, webInterfaceRoot)],
     },
     resolveLoader: { modules: [path.join(webInterfaceRoot, 'node_modules')] },
     devtool: 'source-map',

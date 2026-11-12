@@ -29,6 +29,8 @@ import { Link } from 'components/common';
 import Routes from 'routing/Routes';
 import MarkdownLink from 'components/common/markdown/MarkdownLink';
 import Table from 'components/bootstrap/Table';
+import MermaidDiagram from 'components/common/markdown/MermaidDiagram';
+import { useTrackMarkdownRender } from 'components/common/markdown/MarkdownRenderTracker';
 
 type Props = {
   text: string;
@@ -149,8 +151,39 @@ const imageWarningTransformer: Transformer = (domNode) => {
   return undefined;
 };
 
+const textOf = (nodes: Array<DOMNode>): string =>
+  nodes
+    .map((node) => {
+      if ('data' in node) {
+        return node.data;
+      }
+
+      return 'children' in node ? textOf(node.children as Array<DOMNode>) : '';
+    })
+    .join('');
+
+// Sanitizing the Markdown escapes these characters before the code block escapes them again.
+const ENTITIES: { [entity: string]: string } = { '&lt;': '<', '&gt;': '>', '&amp;': '&', '&nbsp;': '\u00a0' };
+const unescapeSanitized = (text: string) => text.replace(/&(?:lt|gt|amp|nbsp);/g, (entity) => ENTITIES[entity]);
+
+// Code blocks in the language "mermaid" are shown as diagrams.
+const mermaidTransformer: Transformer = (domNode) => {
+  if (!(domNode instanceof Element) || domNode.name !== 'pre') {
+    return undefined;
+  }
+
+  const code = domNode.children.find((child): child is Element => child instanceof Element && child.name === 'code');
+
+  if (!code?.attribs?.class?.split(' ').includes('language-mermaid')) {
+    return undefined;
+  }
+
+  return <MermaidDiagram source={unescapeSanitized(textOf(code.children as Array<DOMNode>))} />;
+};
+
 const Markdown = ({ augment = false, text }: Props) => {
   const { isInitialLoading, data: markdownConfig } = useMarkdownConfig();
+  useTrackMarkdownRender(isInitialLoading);
 
   // Remove dangerous HTML
   const sanitizedText = DOMPurify.sanitize(text ?? '', { USE_PROFILES: { html: false } });
@@ -166,13 +199,18 @@ const Markdown = ({ augment = false, text }: Props) => {
       ? undefined
       : imageWarningTransformer;
 
+  const transformer = useMemo(
+    () => mergeTransformer([mermaidTransformer, ...(imageTransformer ? [imageTransformer] : [])]),
+    [imageTransformer],
+  );
+
   const RendererComponent = augment ? Augment : HTML;
 
   if (isInitialLoading) {
     return <Spinner />;
   }
 
-  return <RendererComponent html={html} transformer={imageTransformer} />;
+  return <RendererComponent html={html} transformer={transformer} />;
 };
 
 export default Markdown;
