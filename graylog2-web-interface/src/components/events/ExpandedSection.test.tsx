@@ -17,12 +17,14 @@
 
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import MetaDataContext from 'components/common/EntityDataTable/contexts/MetaDataContext';
 import { eventsTableElements } from 'components/events/Constants';
 import { events as eventsFixtures } from 'fixtures/events';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
+import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
 import { asMock } from 'helpers/mocking';
 import type { Attribute } from 'stores/PaginationTypes';
 import type { Event } from 'components/events/events/types';
@@ -32,6 +34,7 @@ import ExpandedSection from './ExpandedSection';
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences', () =>
   jest.fn(() => ({ data: {}, isInitialLoading: false })),
 );
+jest.mock('components/common/EntityDataTable/hooks/useExpandedSections');
 jest.mock('components/common/PaginatedEntityTable', () => ({
   useTableFetchContext: jest.fn(),
 }));
@@ -80,5 +83,25 @@ describe('ExpandedSection', () => {
     renderSUT();
 
     await screen.findByText('The Additional Field');
+  });
+
+  it('does not toggle the details when clicking the description in them', async () => {
+    const toggleSection = jest.fn();
+    asMock(useExpandedSections).mockReturnValue({ toggleSection, expandedSections: {} });
+    asMock(useTableFetchContext).mockReturnValue({
+      refetch: jest.fn(),
+      attributes: [{ id: 'message', title: 'Description' }],
+      entityTableId: eventsTableElements.defaultLayout.entityTableId,
+    });
+
+    render(
+      <MetaDataContext.Provider value={{ meta: {} }}>
+        <ExpandedSection event={{ ...baseEvent, message: 'The event message' }} />
+      </MetaDataContext.Provider>,
+    );
+
+    await userEvent.click(await screen.findByText('The event message'));
+
+    expect(toggleSection).not.toHaveBeenCalled();
   });
 });
