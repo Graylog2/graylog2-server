@@ -17,21 +17,18 @@
 package org.graylog2.outputs.filter.functions;
 
 import com.google.common.collect.ImmutableList;
-import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
-import org.graylog.plugins.pipelineprocessor.functions.messages.StreamCacheService;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGroup;
 import org.graylog2.outputs.filter.PipelineRuleOutputFilter;
 import org.graylog2.plugin.Message;
-import org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Duration;
+import java.util.Objects;
 
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
@@ -44,7 +41,6 @@ import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescr
  */
 public class RemoveFromStreamDestination extends AbstractFunction<Void> {
     private static final Logger LOG = LoggerFactory.getLogger(RemoveFromStreamDestination.class);
-    private static final Logger RATE_LIMITED_LOG = RateLimitedLogFactory.createRateLimitedLog(LOG, 1, Duration.ofSeconds(15));
 
     public static final String NAME = "__remove_from_stream_destination__";
     public static final String STREAM_ID_PARAM = "stream_id";
@@ -54,11 +50,7 @@ public class RemoveFromStreamDestination extends AbstractFunction<Void> {
     private final ParameterDescriptor<String, String> streamIdParam;
     private final ParameterDescriptor<String, String> destinationTypeParam;
 
-    private final StreamCacheService streamCacheService;
-
-    @Inject
-    public RemoveFromStreamDestination(StreamCacheService streamCacheService) {
-        this.streamCacheService = streamCacheService;
+    public RemoveFromStreamDestination() {
         this.messageParam = type("message", Message.class).optional().description("The message to use, defaults to '$message'.").build();
         this.streamIdParam = string(STREAM_ID_PARAM).optional().description("The stream to remove the message from.").build();
         this.destinationTypeParam = string(DESTINATION_TYPE_PARAM).optional().description("The destination type to remove the message from.").build();
@@ -71,15 +63,11 @@ public class RemoveFromStreamDestination extends AbstractFunction<Void> {
         final var message = messageParam.optional(args, context).orElse(context.currentMessage());
 
         if (message.getMetadataValue(PipelineRuleOutputFilter.METADATA_KEY) instanceof PipelineRuleOutputFilter.Metadata metadata) {
-            final var stream = streamCacheService.getById(streamId);
-            if (stream != null) {
-                if (LOG.isTraceEnabled()) {
-                    LOG.trace("Removing stream <{}/{}> from destination <{}> for message: {}", stream.getId(), stream.getTitle(), destinationType, message);
-                }
-                metadata.destinations().remove(destinationType, stream);
-            } else {
-                RATE_LIMITED_LOG.warn("Couldn't find stream for stream ID <{}> in cache", streamId);
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("Removing stream <{}> from destination <{}> for message: {}", streamId, destinationType, message);
             }
+            // Match by ID because the router and the stream cache can hold different copies of a stream.
+            metadata.destinations().get(destinationType).removeIf(s -> Objects.equals(streamId, s.getId()));
         }
 
         return null;
