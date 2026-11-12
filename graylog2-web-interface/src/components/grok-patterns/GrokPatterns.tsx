@@ -125,7 +125,6 @@ class GrokPatterns extends React.Component<
     });
   };
 
-  // The modals need all patterns, independent of the current page and search query of the list.
   loadAllPatterns = () => {
     loadGrokPatterns((allPatterns) => {
       if (!this._unmounted) {
