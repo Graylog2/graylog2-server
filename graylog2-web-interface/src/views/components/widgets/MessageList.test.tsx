@@ -42,14 +42,15 @@ import useSelectedMessageEntities from 'views/hooks/useSelectedMessageEntities';
 
 import type { MessageListResult } from './MessageList';
 import MessageList from './MessageList';
-import type { TRenderCompletionCallback } from './RenderCompletionCallback';
-import RenderCompletionCallback from './RenderCompletionCallback';
+import useRenderCompletionCallback from './useRenderCompletionCallback';
 
 const mockEffectiveTimeRange: AbsoluteTimeRange = {
   from: '2019-11-15T14:40:48.666Z',
   to: '2019-11-29T14:40:48.666Z',
   type: 'absolute',
 };
+
+jest.mock('./useRenderCompletionCallback');
 
 jest.mock('hooks/useInputs', () => ({
   __esModule: true,
@@ -276,13 +277,11 @@ describe('MessageList', () => {
   });
 
   it('calls render completion callback after first render', async () => {
-    const onRenderComplete: TRenderCompletionCallback = jest.fn();
+    const onRenderComplete = jest.fn();
 
-    render(
-      <RenderCompletionCallback.Provider value={onRenderComplete}>
-        <SimpleMessageList />
-      </RenderCompletionCallback.Provider>,
-    );
+    asMock(useRenderCompletionCallback).mockReturnValue(onRenderComplete);
+
+    render(<SimpleMessageList />);
 
     await waitFor(() => expect(onRenderComplete).toHaveBeenCalled());
   });
