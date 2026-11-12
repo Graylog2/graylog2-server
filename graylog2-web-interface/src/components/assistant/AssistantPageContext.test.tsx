@@ -19,6 +19,9 @@ import { useState } from 'react';
 import { render, screen, act } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
+import AppConfig from 'util/AppConfig';
+import { asMock } from 'helpers/mocking';
+
 import {
   AssistantPageContextProvider,
   useAssistantPageContext,
@@ -29,7 +32,8 @@ import {
 } from './AssistantPageContext';
 import type { Page, PageTools, Panel } from './types';
 
-jest.mock('routing/useLocation', () => () => ({ pathname: '/search/66b2' }));
+let mockPathname = '/search/66b2';
+jest.mock('routing/useLocation', () => () => ({ pathname: mockPathname }));
 
 const searchPage: Page = { type: 'search', view: { id: '66b2' }, dirty: false };
 const eventPanel: Panel = { type: 'event', event_id: '01J' };
@@ -69,6 +73,24 @@ const readSnapshot = async () => {
 };
 
 describe('AssistantPageContext', () => {
+  afterEach(() => {
+    mockPathname = '/search/66b2';
+    asMock(AppConfig.gl2AppPathPrefix).mockReturnValue('/');
+  });
+
+  it('publishes the route without the path prefix', async () => {
+    asMock(AppConfig.gl2AppPathPrefix).mockReturnValue('/graylog');
+    mockPathname = '/graylog/search/66b2';
+
+    render(
+      <AssistantPageContextProvider>
+        <Snapshot />
+      </AssistantPageContextProvider>,
+    );
+
+    expect(await readSnapshot()).toEqual(expect.objectContaining({ route: '/search/66b2' }));
+  });
+
   it('combines the published page, panels and tools', async () => {
     render(
       <AssistantPageContextProvider>

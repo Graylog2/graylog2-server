@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useCallback, useContext, useEffect, useId, useState, useSyncExternalStore } from 'react';
 
 import useLocation from 'routing/useLocation';
+import { currentPathnameWithoutPrefix, stripPrefixFromPathname } from 'util/URLUtils';
 
 import type { Page, PageContext, PageTools, Panel } from './types';
 
@@ -91,11 +92,13 @@ const createStore = (initialRoute: string): Store => {
 // that show something about the current page follow it with `useAssistantPageSelector`.
 export const AssistantPageContextProvider = ({ children }: React.PropsWithChildren) => {
   const { pathname } = useLocation();
-  const [store] = useState(() => createStore(pathname));
+  // The route without the path prefix, which navigating within Graylog adds.
+  const route = stripPrefixFromPathname(pathname);
+  const [store] = useState(() => createStore(route));
 
   useEffect(() => {
-    store.setRoute(pathname);
-  }, [pathname, store]);
+    store.setRoute(route);
+  }, [route, store]);
 
   // Pages set their title in effects, often only once their data is loaded.
   useEffect(() => {
@@ -137,7 +140,7 @@ export const useAssistantPageSnapshot = () => {
     (): PageContext =>
       context?.getSnapshot() ?? {
         version: 1,
-        route: window.location.pathname,
+        route: currentPathnameWithoutPrefix(),
         title: document.title,
         page: { type: 'generic' },
         panels: [],
