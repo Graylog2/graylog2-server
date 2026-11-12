@@ -31,10 +31,10 @@ WORKDIR /src
 # Node. `install` puts the module jars into ~/.m2, so one module can be tested on its own (`-pl data-node` needs the
 # graylog2-server jars). -DskipTests still compiles the test classes. Failsafe still runs the *IT classes under
 # -DskipTests, and they need Docker, so -DskipITs skips them explicitly.
-# Release packaging is left out because the audit does not use it: the four OpenSearch builds the Data Node bundles,
-# the server and Data Node tarballs, and the SBOMs. So is the web interface's "check-production-build" step, which
-# loads the bundle in a headless Chrome: its yarn script is stubbed for the build (no browser is downloaded) and
-# package.json is restored afterwards, leaving /src as upstream has it.
+# Release packaging is left out because the audit does not use it: the server and Data Node tarballs, and the two
+# OpenSearch versions the Data Node bundles (downloaded for both x64 and aarch64). So is the web interface's
+# "check-production-build" step, which loads the bundle in a headless Chrome: its yarn script is stubbed for the
+# build (no browser is downloaded) and package.json is restored afterwards, leaving /src as upstream has it.
 RUN pkg=graylog2-web-interface/package.json \
     && cp "$pkg" /tmp/package.json.orig \
     && sed -i 's/"check-production-build": "[^"]*"/"check-production-build": "true"/' "$pkg" \
@@ -42,7 +42,7 @@ RUN pkg=graylog2-web-interface/package.json \
     && PUPPETEER_SKIP_DOWNLOAD=true MAVEN_OPTS="-Xmx6g" NODE_OPTIONS="--max-old-space-size=8192" \
        ./mvnw -DskipTests -DskipITs \
          -Dopensearch.unpack.compat.skip=true -Dopensearch.unpack.latest.skip=true \
-         -Dassembly.skipAssembly=true -Dcyclonedx.skip install \
+         -Dassembly.skipAssembly=true install \
     && mv /tmp/package.json.orig "$pkg"
 
 # graylog-test-hosts: some unit tests resolve example.com (HttpConfigurationTest) or the container's own hostname
