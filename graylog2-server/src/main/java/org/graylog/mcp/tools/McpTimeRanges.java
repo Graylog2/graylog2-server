@@ -39,7 +39,12 @@ final class McpTimeRanges {
         if (from == null || to == null) {
             throw new IllegalArgumentException("Pass both from and to for an absolute time range, or neither");
         }
-        return AbsoluteRange.create(parseTimestamp("from", from), parseTimestamp("to", to));
+        final DateTime fromTimestamp = parseTimestamp("from", from);
+        final DateTime toTimestamp = parseTimestamp("to", to);
+        if (fromTimestamp.isAfter(toTimestamp)) {
+            throw new IllegalArgumentException(f("from must not be after to, got <%s> and <%s>", from, to));
+        }
+        return AbsoluteRange.create(fromTimestamp, toTimestamp);
     }
 
     // Accepts ISO 8601 with or without fractional seconds, which callers often omit.

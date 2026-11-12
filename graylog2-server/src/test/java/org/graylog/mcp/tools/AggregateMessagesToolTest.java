@@ -95,6 +95,16 @@ class AggregateMessagesToolTest {
     }
 
     @Test
+    void rejectsAnInvertedAbsoluteTimeRange() {
+        assertThatThrownBy(() -> tool.apply(permissionHelper, countBySource(Map.of(
+                "from", "2026-10-05T16:00:00Z",
+                "to", "2026-10-05T14:00:00Z"))))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("from must not be after to");
+        verifyNoInteractions(scriptingApiService);
+    }
+
+    @Test
     void describesTheTimeRangeParameters() {
         assertThat(tool.inputSchema()).extractingByKey("properties")
                 .asInstanceOf(InstanceOfAssertFactories.MAP)
