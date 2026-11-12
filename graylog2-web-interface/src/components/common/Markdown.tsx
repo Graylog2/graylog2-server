@@ -28,9 +28,9 @@ import Spinner from 'components/common/Spinner';
 import { Link } from 'components/common';
 import Routes from 'routing/Routes';
 import MarkdownLink from 'components/common/markdown/MarkdownLink';
+import Table from 'components/bootstrap/Table';
 import MermaidDiagram from 'components/common/markdown/MermaidDiagram';
 import { useTrackMarkdownRender } from 'components/common/markdown/MarkdownRenderTracker';
-import Table from 'components/bootstrap/Table';
 
 type Props = {
   text: string;
@@ -100,20 +100,15 @@ const SpacedTable = styled(Table)(
   `,
 );
 
-// The content of tables and links is transformed like everything else, e.g. its links and augmented values.
+// The content of links and tables is transformed like everything else, e.g. its augmented values.
 const parseHtml = (html: string, transformer: Transformer) => {
   const options: HTMLReactParserOptions = {};
-  const tableTransformer: Transformer = (domNode) => {
-    if (!(domNode instanceof Element) || domNode.name !== 'table') {
-      return undefined;
-    }
-
-    return (
+  const tableTransformer: Transformer = (domNode) =>
+    domNode instanceof Element && domNode.name === 'table' ? (
       <SpacedTable responsive condensed striped={false} hover={false}>
         {domToReact(domNode.children as DOMNode[], options)}
       </SpacedTable>
-    );
-  };
+    ) : undefined;
   const linkTransformer: Transformer = (domNode) => {
     if (!(domNode instanceof Element) || domNode.name !== 'a' || !domNode.attribs?.href) {
       return undefined;
@@ -123,7 +118,8 @@ const parseHtml = (html: string, transformer: Transformer) => {
       <MarkdownLink href={domNode.attribs.href}>{domToReact(domNode.children as DOMNode[], options)}</MarkdownLink>
     );
   };
-  options.replace = mergeTransformer([...(transformer ? [transformer] : []), tableTransformer, linkTransformer]);
+  const builtInTransformers = [linkTransformer, tableTransformer];
+  options.replace = mergeTransformer(transformer ? [transformer, ...builtInTransformers] : builtInTransformers);
 
   return parse(html, options);
 };

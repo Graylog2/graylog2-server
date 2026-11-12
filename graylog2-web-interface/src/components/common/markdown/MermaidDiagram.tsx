@@ -60,11 +60,44 @@ const ErrorMessage = styled.p(
 // Unnamed, as plugins bundle it too and named chunks of different builds would overwrite each other.
 const loadMermaid = () => import('mermaid').then((module) => module.default);
 
+// Matches CSS that loads external resources. Fragments like `url(#arrowhead)` refer to the diagram itself.
+const EXTERNAL_CSS_FUNCTION = /\b(?:url|src)\(\s*(?!['"]?#)|\b(?:image-set|image|cross-fade)\(/gi;
+const EXTERNAL_CSS_AT_RULE = /@(?:import|font-face)/gi;
+
+// Removing backslashes first prevents CSS escapes like `\75rl(`. The browser drops the invalidated declarations.
+const invalidateExternalCss = (styles: string) =>
+  styles.replace(/\\/g, '').replace(EXTERNAL_CSS_FUNCTION, 'invalid(').replace(EXTERNAL_CSS_AT_RULE, '@invalid');
+
+const svgPurifier = DOMPurify();
+
+// Mermaid passes styles of diagrams on unchecked, which could load images from sources the Markdown configuration
+// does not allow.
+svgPurifier.addHook('afterSanitizeAttributes', (node) => {
+  if (node.nodeName.toLowerCase() === 'style') {
+    node.replaceChildren(invalidateExternalCss(node.textContent ?? ''));
+  }
+
+  Array.from(node.attributes).forEach(({ name, value }) => {
+    if (['href', 'xlink:href'].includes(name) && node.nodeName.toLowerCase() !== 'a' && !value.startsWith('#')) {
+      node.removeAttribute(name);
+
+      return;
+    }
+
+    const invalidated = invalidateExternalCss(value);
+
+    if (invalidated !== value) {
+      node.setAttribute(name, invalidated);
+    }
+  });
+});
+
 // Mermaid sanitizes labels already; this keeps what it adds to the page to SVG and the HTML of its labels.
 const sanitizeSvg = (svg: string) =>
-  DOMPurify.sanitize(svg, {
+  svgPurifier.sanitize(svg, {
     USE_PROFILES: { svg: true, svgFilters: true, html: true },
     ADD_TAGS: ['foreignObject', 'style'],
+    FORBID_TAGS: ['image', 'img', 'feImage'],
     HTML_INTEGRATION_POINTS: { foreignobject: true },
   });
 
