@@ -17,10 +17,13 @@
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
+import asMock from 'helpers/mocking/AsMock';
 import SearchError from 'views/logic/SearchError';
-import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
+import useRenderCompletionCallback from 'views/components/widgets/useRenderCompletionCallback';
 
 import ErrorWidget from './ErrorWidget';
+
+jest.mock('views/components/widgets/useRenderCompletionCallback');
 
 describe('<ErrorWidget />', () => {
   it('should display a list item for every provided error', async () => {
@@ -50,11 +53,9 @@ describe('<ErrorWidget />', () => {
   it('reports that it rendered, so exports do not wait for it', async () => {
     const onRenderComplete = jest.fn();
 
-    render(
-      <RenderCompletionCallback.Provider value={onRenderComplete}>
-        <ErrorWidget errors={[{ description: 'Query failed' }]} />
-      </RenderCompletionCallback.Provider>,
-    );
+    asMock(useRenderCompletionCallback).mockReturnValue(onRenderComplete);
+
+    render(<ErrorWidget errors={[{ description: 'Query failed' }]} />);
 
     await screen.findByText('Query failed');
 
