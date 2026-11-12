@@ -19,6 +19,7 @@ import type * as Immutable from 'immutable';
 import { Field, useFormikContext } from 'formik';
 import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import { getValuesFromGRN } from 'logic/permissions/GRN';
 import { Button, Alert, Input } from 'components/bootstrap';
@@ -79,6 +80,8 @@ const loadUserShares = (userId: string, entityType: string) =>
 const mergeOptions = (...lists: Array<Option[]>) => [
   ...new Map(lists.flat().map((option) => [option.value, option])).values(),
 ];
+const SECURITY_START_PAGE = 'graylog_security_welcome';
+const SECURITY_READ_PERMISSION = 'graylog_security:read' as Permission;
 const typeOptions = [
   { value: 'dashboard', label: 'Dashboard' },
   { value: 'stream', label: 'Stream' },
@@ -143,6 +146,7 @@ const useStartPageOptions = (userId, permissions) => {
 
   return {
     options: prepareOptions(),
+    canReadSecurity: isPermitted(permissions, SECURITY_READ_PERMISSION),
     isLoading: isLoadingUserShares || isLoadingAllDashboards || isLoadingAllSearches || isLoadingAllStreams,
   };
 };
@@ -151,8 +155,8 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
   const {
     data: { valid: validSecurityLicense },
   } = usePluggableLicenseCheck('/license/security');
-  const { options, isLoading } = useStartPageOptions(userId, permissions);
-  const securityOverviewOption = { value: 'graylog_security_welcome', label: 'Threat Coverage' };
+  const { options, canReadSecurity, isLoading } = useStartPageOptions(userId, permissions);
+  const securityOverviewOption = { value: SECURITY_START_PAGE, label: 'Threat Coverage' };
 
   if (isLoading) {
     return <Spinner />;
@@ -162,11 +166,15 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
     <Field name="startpage">
       {({ field: { name, value, onChange }, meta }) => {
         const type = value?.type;
+        const isSecurityStartPage = type === SECURITY_START_PAGE;
+        const showSecurityOption = validSecurityLicense && (canReadSecurity || isSecurityStartPage);
+        const isMissingPermission = isSecurityStartPage
+          ? !canReadSecurity
+          : value?.id && options.findIndex(({ value: v }) => v === value.id) < 0;
 
-        const error =
-          value?.id && options.findIndex(({ value: v }) => v === value.id) < 0 ? (
-            <Alert bsStyle="warning">User is missing permission for the configured page</Alert>
-          ) : null;
+        const error = isMissingPermission ? (
+          <Alert bsStyle="warning">User is missing permission for the configured page</Alert>
+        ) : null;
 
         const resetBtn = value?.type ? (
           <ResetBtn onClick={() => onChange({ target: { name, value: null } })}>Reset</ResetBtn>
@@ -183,7 +191,7 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
             <>
               <Container>
                 <TypeSelect
-                  options={validSecurityLicense ? [...typeOptions, securityOverviewOption] : typeOptions}
+                  options={showSecurityOption ? [...typeOptions, securityOverviewOption] : typeOptions}
                   placeholder="Select type"
                   onChange={(newType) => {
                     if (!newType) {
@@ -194,7 +202,7 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
                   }}
                   value={value?.type}
                 />
-                {value?.type !== 'graylog_security_welcome' && (
+                {!isSecurityStartPage && (
                   <ValueSelect
                     options={options}
                     placeholder={`Select ${value?.type ?? 'entity'}`}

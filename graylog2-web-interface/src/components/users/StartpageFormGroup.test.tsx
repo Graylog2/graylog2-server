@@ -142,4 +142,34 @@ describe('StartpageFormGroup', () => {
 
     expect(await screen.findByText(/user is missing permission/i)).toBeInTheDocument();
   });
+
+  describe('Threat Coverage', () => {
+    beforeEach(() => {
+      asMock(usePluggableLicenseCheck).mockReturnValue({ data: { valid: true } } as any);
+    });
+
+    it('is offered only when the user can read the security app', async () => {
+      const { unmount } = renderPicker(['graylog_security:read'], undefined);
+
+      expect(await openOptions('type')).toContain('Threat Coverage');
+
+      unmount();
+      renderPicker(['streams:read'], undefined);
+
+      expect(await openOptions('type')).not.toContain('Threat Coverage');
+    });
+
+    it('warns when the user cannot read the security app', async () => {
+      const { unmount } = renderPicker(['graylog_security:read'], { type: 'graylog_security_welcome' });
+
+      await screen.findByText('Threat Coverage');
+
+      expect(screen.queryByText(/user is missing permission/i)).not.toBeInTheDocument();
+
+      unmount();
+      renderPicker(['streams:read'], { type: 'graylog_security_welcome' });
+
+      expect(await screen.findByText(/user is missing permission/i)).toBeInTheDocument();
+    });
+  });
 });
