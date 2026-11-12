@@ -533,11 +533,11 @@ describe('DataTable', () => {
 
       await userEvent.click(await screen.findByRole('checkbox', { name: 'Select source host1' }));
       await userEvent.click(screen.getByRole('checkbox', { name: 'Select source host3' }));
-      await screen.findByText('2 rows selected');
+      await screen.findByText('2 items selected');
       await selectBulkAction('Add to query', 'source');
 
       expect(updateQueryString).toHaveBeenCalledWith('query-id-1', '(source:(host1 OR host3))');
-      expect(screen.queryByText('2 rows selected')).not.toBeInTheDocument();
+      expect(screen.queryByText('2 items selected')).not.toBeInTheDocument();
     });
 
     it('excludes values of all rows', async () => {
@@ -550,7 +550,7 @@ describe('DataTable', () => {
       );
 
       await userEvent.click(await screen.findByRole('checkbox', { name: 'Select all rows' }));
-      await screen.findByText('3 rows selected');
+      await screen.findByText('3 items selected');
       await selectBulkAction('Exclude from results', 'source');
 
       expect(updateQueryString).toHaveBeenCalledWith('query-id-1', 'NOT (source:(host1 OR host2 OR host3))');
@@ -566,11 +566,11 @@ describe('DataTable', () => {
       );
 
       await userEvent.click(await screen.findByRole('checkbox', { name: 'Select source host1' }));
-      await screen.findByText('1 row selected');
+      await screen.findByText('1 item selected');
       await userEvent.click(screen.getByRole('button', { name: /bulk actions/i }));
       await userEvent.click(await screen.findByRole('menuitem', { name: 'Cancel selection' }));
 
-      expect(screen.queryByText('1 row selected')).not.toBeInTheDocument();
+      expect(screen.queryByText('1 item selected')).not.toBeInTheDocument();
       expect(screen.getByRole('checkbox', { name: 'Select source host1' })).not.toBeChecked();
     });
 
@@ -584,7 +584,7 @@ describe('DataTable', () => {
       );
 
       await userEvent.click(await screen.findByRole('checkbox', { name: 'Select all rows' }));
-      await screen.findByText('3 rows selected');
+      await screen.findByText('3 items selected');
       await userEvent.click(screen.getByRole('checkbox', { name: 'Deselect all rows' }));
 
       expect(screen.queryByText(/selected/)).not.toBeInTheDocument();
@@ -601,7 +601,7 @@ describe('DataTable', () => {
 
       await userEvent.click(await screen.findByRole('checkbox', { name: 'Select source host1' }));
       await userEvent.click(screen.getByRole('checkbox', { name: 'Select source host3' }));
-      await screen.findByText('2 rows selected');
+      await screen.findByText('2 items selected');
 
       rerender(
         <SimplifiedDataTable
@@ -611,7 +611,7 @@ describe('DataTable', () => {
         />,
       );
 
-      await screen.findByText('1 row selected');
+      await screen.findByText('1 item selected');
       await selectBulkAction('Add to query', 'source');
 
       expect(updateQueryString).toHaveBeenCalledWith('query-id-1', 'source:host1');
@@ -627,7 +627,7 @@ describe('DataTable', () => {
       );
 
       await userEvent.click(await screen.findByRole('checkbox', { name: 'Select source host1' }));
-      await screen.findByText('1 row selected');
+      await screen.findByText('1 item selected');
 
       rerender(
         <SimplifiedDataTable

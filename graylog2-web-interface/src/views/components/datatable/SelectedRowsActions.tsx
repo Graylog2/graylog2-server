@@ -15,12 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useId } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
-import { DropdownButton, Menu, MenuItem } from 'components/bootstrap';
+import { Menu, MenuItem } from 'components/bootstrap';
+import BulkActionsRow from 'components/common/EntityDataTable/BulkActionsRow';
+import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
-import StringUtils from 'util/StringUtils';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import AddToQueryHandler from 'views/logic/valueactions/AddToQueryHandler';
@@ -30,17 +30,11 @@ import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import { selectedValuesByField } from './rowSelection';
 import type { FieldValues } from './rowSelection';
 
-const Container = styled.div(
-  ({ theme }) => css`
-    grid-row: 1;
-    grid-column: 1;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: ${theme.spacings.sm};
-    padding: ${theme.spacings.xs} 0;
-  `,
-);
+const StyledBulkActionsRow = styled(BulkActionsRow)`
+  grid-row: 1;
+  grid-column: 1;
+  padding-bottom: 10px;
+`;
 
 type FieldsSubmenuProps = {
   title: string;
@@ -69,17 +63,11 @@ type Props = {
 };
 
 const SelectedRowsActions = ({ selectableFields, types }: Props) => {
-  const dropdownId = useId();
   const dispatch = useViewsDispatch();
   const queryId = useActiveQueryId();
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
-  const selectedRowsCount = selectedEntities.length;
   const fieldValues = selectedValuesByField(selectedEntities, selectableFields, types);
   const onClearSelection = () => setSelectedEntities([]);
-
-  if (selectedRowsCount === 0) {
-    return null;
-  }
 
   const onAddToQuery = ({ field, values, type }: FieldValues) =>
     dispatch(AddToQueryHandler({ queryId, field, value: values, type })).then(onClearSelection);
@@ -87,17 +75,14 @@ const SelectedRowsActions = ({ selectableFields, types }: Props) => {
     dispatch(ExcludeFromQueryHandler({ queryId, field, value: values, type })).then(onClearSelection);
 
   return (
-    <Container>
-      <DropdownButton bsSize="xsmall" title="Bulk actions" withinPortal id={`selected-rows-actions-${dropdownId}`}>
-        <FieldsSubmenu title="Add to query" fieldValues={fieldValues} onSelect={onAddToQuery} />
-        <FieldsSubmenu title="Exclude from results" fieldValues={fieldValues} onSelect={onExclude} />
-        <MenuItem divider />
-        <MenuItem onClick={onClearSelection}>Cancel selection</MenuItem>
-      </DropdownButton>
-      <span>
-        {selectedRowsCount} {StringUtils.pluralize(selectedRowsCount, 'row', 'rows')} selected
-      </span>
-    </Container>
+    <StyledBulkActionsRow
+      bulkActions={
+        <BulkActionsDropdown bsSize="xs">
+          <FieldsSubmenu title="Add to query" fieldValues={fieldValues} onSelect={onAddToQuery} />
+          <FieldsSubmenu title="Exclude from results" fieldValues={fieldValues} onSelect={onExclude} />
+        </BulkActionsDropdown>
+      }
+    />
   );
 };
 
