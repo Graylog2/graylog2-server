@@ -46,11 +46,15 @@ type Options = {
 
 /**
  * Renderers of the attributes which the event details show differently than a table cell:
- * They list all fields and tags, while a cell shows them in a compact way.
+ * They list all fields and tags, while a cell shows them in a compact way. And they render the message
+ * as plain text, since clicking it in the table toggles the details.
  */
 export const getEventDetailsRenderers = <T extends EntityBase, M = unknown>({
   interactiveTags = true,
 }: Options = {}): ColumnRenderersByAttribute<T, M> => ({
+  message: {
+    renderCell: (message: string) => message,
+  },
   fields: {
     renderCell: (fields: Record<string, string>) =>
       isEmpty(fields) ? <em>No additional Fields added to this Event.</em> : <EventFields fields={fields} />,
