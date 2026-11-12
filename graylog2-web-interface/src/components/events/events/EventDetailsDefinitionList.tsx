@@ -15,22 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import isEmpty from 'lodash/isEmpty';
 
 import { DefinitionList } from 'components/common';
-import EventFields from 'components/events/events/EventFields';
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import type { ColumnRenderersByAttribute, EntityBase } from 'components/common/EntityDataTable/types';
 import DefaultColumnRenderers from 'components/common/EntityDataTable/DefaultColumnRenderers';
 import type { Attribute } from 'stores/PaginationTypes';
-
-// The details have room for all fields, so they list them instead of using the collapsed list of the table cells.
-const detailsRenderers: { [attributeId: string]: (value: unknown) => React.ReactNode } = {
-  fields: (fields: Record<string, string>) =>
-    isEmpty(fields) ? <em>No additional Fields added to this Event.</em> : <EventFields fields={fields} />,
-  group_by_fields: (groupByFields: Record<string, string>) =>
-    isEmpty(groupByFields) ? <em>No group-by fields on this Event.</em> : <EventFields fields={groupByFields} />,
-};
 
 type Props<T extends EntityBase, M = EventsAdditionalData> = {
   attributesList: Array<{ id: string; title: string }>;
@@ -53,12 +43,11 @@ const EventDetailsDefinitionList = <E extends EntityBase = Event>({
       const typeRenderer = attributesRenderers?.types?.[attribute?.type]?.renderCell;
       const renderCell = attributesRenderers[attribute.id]?.renderCell ?? typeRenderer ?? defaultTypeRenderer;
       const value = event[attribute.id];
-      const detailsRenderer = detailsRenderers[attribute.id];
 
       return (
         <React.Fragment key={attribute.id}>
           <dt>{attribute.title}</dt>
-          <dd>{detailsRenderer?.(value) ?? (renderCell ? renderCell(value, event, meta, eventProcedureId) : value)}</dd>
+          <dd>{renderCell ? renderCell(value, event, meta, eventProcedureId) : value}</dd>
         </React.Fragment>
       );
     })}
