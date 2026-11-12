@@ -16,7 +16,6 @@
  */
 import uniq from 'lodash/uniq';
 
-import { isFunction } from 'views/logic/aggregationbuilder/Series';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
@@ -24,10 +23,6 @@ import type { QueryValue } from 'views/logic/valueactions/ValueActionQueryHelper
 
 export type Row = { [key: string]: unknown };
 export type FieldValues = { field: string; type: FieldType; values: Array<QueryValue> };
-
-// Fields of the row grouping, which can be used to filter the query by the values of the selected rows.
-export const selectableFieldsFor = (rowFieldNames: Array<string>, types: FieldTypeMappingsList, interactive: boolean) =>
-  interactive ? rowFieldNames.filter((field) => !isFunction(field) && !fieldTypeFor(field, types).isDecorated()) : [];
 
 const queryValueFor = (value: unknown): QueryValue | undefined =>
   typeof value === 'string' || typeof value === 'number' ? value : undefined;

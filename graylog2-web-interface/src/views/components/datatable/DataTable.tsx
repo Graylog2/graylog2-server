@@ -45,7 +45,7 @@ import Headers from './Headers';
 import styles from './DataTable.css';
 import SelectedRowsActions from './SelectedRowsActions';
 import DataTableSelectedEntitiesProvider from './DataTableSelectedEntitiesProvider';
-import { rowSelectionKey, selectableFieldsFor } from './rowSelection';
+import { rowSelectionKey } from './rowSelection';
 
 import useReportRenderComplete from '../widgets/useReportRenderComplete';
 import type { VisualizationComponentProps } from '../aggregationbuilder/AggregationBuilder';
@@ -240,10 +240,11 @@ const DataTable = ({
     rows.filter((r): r is Leaf => r.source === 'leaf'),
   );
 
-  // Only value pivots can be filtered by exact values; time pivot keys are bucket starts, not field values.
-  const valuePivotFieldNames = rowPivots.filter((pivot) => pivot.type === ValuesType).flatMap((pivot) => pivot.fields);
   const interactive = useIsInteractiveMode();
-  const selectableFields = selectableFieldsFor(valuePivotFieldNames, fields, interactive);
+  // Only value pivots can be filtered by exact values; time pivot keys are bucket starts, not field values.
+  const selectableFields = interactive
+    ? rowPivots.filter((pivot) => pivot.type === ValuesType).flatMap((pivot) => pivot.fields)
+    : [];
   const selectableRowIds =
     selectableFields.length > 0 ? expandedRows.map((row) => rowSelectionKey(row, rowFieldNames)) : undefined;
   const selectionColumnOffset = selectableRowIds ? 1 : 0;
