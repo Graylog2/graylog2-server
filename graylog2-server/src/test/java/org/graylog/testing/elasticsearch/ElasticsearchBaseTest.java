@@ -58,7 +58,7 @@ public abstract class ElasticsearchBaseTest {
 
     private Map<String, Template> getGraylogDefaultMessageTemplates(SearchVersion version) {
         var template = new MessageIndexTemplateProvider().create(version, null)
-                .messageTemplate(messageTemplateIndexPattern(), "standard", 100L, null);
+                .messageTemplate(messageTemplateIndexPattern(), "standard", 100L, null, null);
         return Collections.singletonMap("graylog-test-internal", template);
     }
 

@@ -23,6 +23,7 @@ import org.graylog2.indexer.indexset.IndexSetMappingTemplate;
 import org.graylog2.indexer.indices.Template;
 import org.graylog2.plugin.Message;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +45,8 @@ public abstract class IndexMapping extends AbstractMapping {
         return messageTemplate(indexSetConfig.indexWildcard(),
                 indexSetConfig.indexAnalyzer(),
                 order,
-                indexSetConfig.customFieldMappings());
+                indexSetConfig.customFieldMappings(),
+                indexSetConfig.fieldLimit());
     }
 
     protected Map<String, Object> analyzerKeyword() {
@@ -56,12 +58,13 @@ public abstract class IndexMapping extends AbstractMapping {
     public Template messageTemplate(final String indexPattern,
                                     final String analyzer,
                                     final Long order,
-                                    final CustomFieldMappings customFieldMappings) {
-        var settings = new Template.Settings(Map.of(
-                "index", Map.of(
-                        "analysis", analysisSettings()
-                )
-        ));
+                                    final CustomFieldMappings customFieldMappings,
+                                    @Nullable final Integer fieldLimit) {
+        final var indexSettings = ImmutableMap.<String, Object>builder().put("analysis", analysisSettings());
+        if (fieldLimit != null) {
+            indexSettings.put("mapping", Map.of("total_fields", Map.of("limit", fieldLimit)));
+        }
+        var settings = new Template.Settings(Map.of("index", indexSettings.build()));
         var mappings = mapping(analyzer, customFieldMappings);
 
         return createTemplate(indexPattern, order, settings, mappings);

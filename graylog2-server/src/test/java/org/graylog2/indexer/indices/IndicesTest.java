@@ -195,7 +195,7 @@ class IndicesTest {
                                 new CustomFieldMapping("f1", "string"), //from individual custom mapping
                                 new CustomFieldMapping("f2", "long"), //from individual custom mapping
                                 new CustomFieldMapping("f3", "ip") //from profile
-                        )))
+                        )), null)
         );
     }
 
@@ -222,7 +222,7 @@ class IndicesTest {
 
         verify(indexMappingTemplateMock).toTemplate(
                 new IndexSetMappingTemplate("standard", "test_*",
-                        individualCustomFieldMappings)
+                        individualCustomFieldMappings, null)
         );
     }
 
@@ -243,7 +243,7 @@ class IndicesTest {
 
         verify(indexMappingTemplateMock).toTemplate(
                 new IndexSetMappingTemplate("standard", "test_*",
-                        individualCustomFieldMappings)
+                        individualCustomFieldMappings, null)
         );
     }
 
@@ -276,7 +276,7 @@ class IndicesTest {
                                 new CustomFieldMapping("f1", "string"), //from individual custom mapping
                                 new CustomFieldMapping("f2", "long"), //from individual custom mapping
                                 new CustomFieldMapping("f3", "ip") //from profile
-                        ))),
+                        )), null),
                 0L
         );
     }

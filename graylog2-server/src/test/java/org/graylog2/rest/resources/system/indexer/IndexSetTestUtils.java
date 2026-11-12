@@ -45,6 +45,7 @@ public class IndexSetTestUtils {
                 .indexOptimizationDisabled(indexSetConfig.indexOptimizationDisabled())
                 .fieldTypeRefreshInterval(indexSetConfig.fieldTypeRefreshInterval())
                 .fieldTypeProfile(indexSetConfig.fieldTypeProfile())
+                .fieldLimit(indexSetConfig.fieldLimit())
                 .dataTieringConfig(indexSetConfig.dataTieringConfig())
                 .useLegacyRotation(indexSetConfig.dataTieringConfig() == null)
                 .fieldRestrictions(indexSetConfig.fieldRestrictions())
@@ -70,6 +71,7 @@ public class IndexSetTestUtils {
                 .fieldTypeRefreshInterval(indexSet.fieldTypeRefreshInterval())
                 .indexTemplateType(indexSet.indexTemplateType().orElse(null))
                 .fieldTypeProfile(indexSet.fieldTypeProfile())
+                .fieldLimit(indexSet.fieldLimit())
                 .dataTieringConfig(indexSet.dataTieringConfig())
                 .useLegacyRotation(indexSet.dataTieringConfig() == null)
                 .build();

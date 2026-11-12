@@ -58,6 +58,7 @@ class IndexMappingTest {
         indexSetMappingTemplate = mock(IndexSetMappingTemplate.class);
         when(indexSetMappingTemplate.indexAnalyzer()).thenReturn("standard");
         when(indexSetMappingTemplate.indexWildcard()).thenReturn("sampleIndexTemplate");
+        when(indexSetMappingTemplate.fieldLimit()).thenReturn(null);
     }
 
     @Test
@@ -92,6 +93,18 @@ class IndexMappingTest {
         final String fixture = resourceFile(expectedTemplateFileName);
 
         JSONAssert.assertEquals(json(template), fixture, true);
+    }
+
+    @Test
+    void setsFieldLimitOnlyWhenConfigured() {
+        final IndexMapping indexMapping = new IndexMapping7();
+
+        assertTrue(objectMapper.valueToTree(indexMapping.toTemplate(indexSetMappingTemplate))
+                .at("/settings/index/mapping").isMissingNode());
+
+        when(indexSetMappingTemplate.fieldLimit()).thenReturn(1500);
+        assertEquals(1500, objectMapper.valueToTree(indexMapping.toTemplate(indexSetMappingTemplate))
+                .at("/settings/index/mapping/total_fields/limit").asInt());
     }
 
     private String json(Object value) throws JsonProcessingException {

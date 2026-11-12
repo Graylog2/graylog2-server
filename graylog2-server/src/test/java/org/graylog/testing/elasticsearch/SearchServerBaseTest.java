@@ -49,7 +49,7 @@ public abstract class SearchServerBaseTest {
     private static Map<String, Template> getGraylogDefaultMessageTemplates(SearchVersion version) {
         var template =
                 new MessageIndexTemplateProvider().create(version, null)
-                        .messageTemplate("*", "standard", 100L, null);
+                        .messageTemplate("*", "standard", 100L, null, null);
         return Collections.singletonMap("graylog-test-internal", template);
     }
 

@@ -140,6 +140,7 @@ class IndexSetValidatorTest {
         when(indexSetRegistry.getAllIndexSets()).thenReturn(Collections.singleton(indexSet));
         when(indexSet.getIndexPrefix()).thenReturn("foo");
         when(newConfig.indexPrefix()).thenReturn("graylog_index");
+        when(newConfig.fieldLimit()).thenReturn(null);
 
         when(newConfig.fieldTypeRefreshInterval()).thenReturn(fieldTypeRefreshInterval);
 
@@ -184,6 +185,7 @@ class IndexSetValidatorTest {
         when(indexSet.getIndexPrefix()).thenReturn("foo");
         when(indexSetRegistry.getAllIndexSets()).thenReturn(Collections.singleton(indexSet));
         when(newConfig.indexPrefix()).thenReturn(prefix);
+        when(newConfig.fieldLimit()).thenReturn(null);
         when(newConfig.fieldTypeRefreshInterval()).thenReturn(fieldTypeRefreshInterval);
         when(newConfig.retentionStrategyConfig()).thenReturn(retentionStrategyConfig);
 
@@ -298,6 +300,24 @@ class IndexSetValidatorTest {
         config = testIndexSetConfig().toBuilder().indexTemplateType(DEFAULT_INDEX_TEMPLATE_TYPE)
                 .customFieldMappings(new CustomFieldMappings(List.of(new CustomFieldMapping("john", "long"))))
                 .build();
+        assertThat(validator.validate(config)).isEmpty();
+    }
+
+    @Test
+    void testValidationOfFieldLimitInIndexSetConfig() {
+        final IndexSet indexSet = mock(IndexSet.class);
+        when(indexSetRegistry.getAllIndexSets()).thenReturn(Collections.singleton(indexSet));
+        when(indexSet.getIndexPrefix()).thenReturn("foo");
+
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker, Set.of());
+        IndexSetConfig config = testIndexSetConfig().toBuilder().indexTemplateType(EVENT_TEMPLATE_TYPE).fieldLimit(1500).build();
+        assertThat(validator.validate(config)).hasValueSatisfying(v ->
+                assertThat(v.message()).contains("A field limit cannot be set for events and failures index sets"));
+
+        config = testIndexSetConfig().toBuilder().indexTemplateType(EVENT_TEMPLATE_TYPE).fieldLimit(null).build();
+        assertThat(validator.validate(config)).isEmpty();
+
+        config = testIndexSetConfig().toBuilder().indexTemplateType(DEFAULT_INDEX_TEMPLATE_TYPE).fieldLimit(1500).build();
         assertThat(validator.validate(config)).isEmpty();
     }
 

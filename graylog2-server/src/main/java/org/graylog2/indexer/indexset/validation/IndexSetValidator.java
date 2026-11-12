@@ -153,6 +153,9 @@ public class IndexSetValidator {
         if (!config.canHaveCustomFieldMappings() && config.customFieldMappings() != null && !config.customFieldMappings().isEmpty()) {
             return Violation.create("Custom field mappings cannot be set for events and failures index sets");
         }
+        if (!config.canHaveCustomFieldMappings() && config.fieldLimit() != null) {
+            return Violation.create("A field limit cannot be set for events and failures index sets");
+        }
         return null;
     }
 

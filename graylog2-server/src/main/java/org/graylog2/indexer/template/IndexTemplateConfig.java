@@ -18,6 +18,7 @@ package org.graylog2.indexer.template;
 
 import com.google.auto.value.AutoValue;
 import org.graylog2.indexer.indexset.fields.CustomFieldMappingsField;
+import org.graylog2.indexer.indexset.fields.FieldLimitField;
 import org.graylog2.indexer.indexset.fields.FieldTypeProfileField;
 import org.graylog2.indexer.indexset.fields.IndexAnalyzerField;
 import org.graylog2.indexer.indexset.fields.IndexPrefixField;
@@ -31,6 +32,7 @@ public abstract class IndexTemplateConfig implements
         IndexTemplateNameField,
         FieldTypeProfileField,
         CustomFieldMappingsField,
+        FieldLimitField,
         IndexAnalyzerField {
 
     public abstract String indexWildcard();
@@ -48,6 +50,7 @@ public abstract class IndexTemplateConfig implements
             IndexTemplateTypeFieldBuilder<Builder>,
             IndexTemplateNameFieldBuilder<Builder>,
             CustomFieldMappingsField.CustomFieldMappingsFieldBuilder<Builder>,
+            FieldLimitField.FieldLimitFieldBuilder<Builder>,
             IndexAnalyzerField.IndexAnalyzerFieldBuilder<Builder>,
             IndexPrefixFieldBuilder<Builder> {
 

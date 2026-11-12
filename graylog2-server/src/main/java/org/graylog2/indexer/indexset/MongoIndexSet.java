@@ -392,6 +392,7 @@ public class MongoIndexSet implements IndexSet {
                 .indexTemplateType(config.indexTemplateType().orElse(null))
                 .indexTemplateName(config.indexTemplateName())
                 .customFieldMappings(config.customFieldMappings())
+                .fieldLimit(config.fieldLimit())
                 .indexAnalyzer(config.indexAnalyzer())
                 .indexPrefix(config.indexPrefix())
                 .indexWildcard(getIndexWildcard())

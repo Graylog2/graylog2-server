@@ -29,6 +29,7 @@ public interface ExtendedIndexSetFields extends
         WritableField,
         IndexAnalyzerField,
         FieldTypeProfileField,
+        FieldLimitField,
         IndexTemplateTypeField,
         IndexPrefixField {
 
@@ -46,6 +47,7 @@ public interface ExtendedIndexSetFields extends
             WritableFieldBuilder<T>,
             IndexAnalyzerFieldBuilder<T>,
             FieldTypeProfileFieldBuilder<T>,
+            FieldLimitFieldBuilder<T>,
             IndexTemplateTypeFieldBuilder<T>,
             IndexPrefixFieldBuilder<T> {
 

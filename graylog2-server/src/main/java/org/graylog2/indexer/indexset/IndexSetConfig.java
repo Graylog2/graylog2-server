@@ -129,7 +129,8 @@ public abstract class IndexSetConfig implements
                                         @JsonProperty(FIELD_CUSTOM_FIELD_MAPPINGS) @Nullable CustomFieldMappings customFieldMappings,
                                         @JsonProperty(FIELD_PROFILE_ID) @ValidObjectId @Nullable String fieldTypeProfile,
                                         @JsonProperty(FIELD_DATA_TIERING) @Nullable DataTieringConfig dataTiering,
-                                        @JsonProperty(FIELD_RESTRICTIONS) @Nullable Map<String, Set<IndexSetFieldRestriction>> fieldRestrictions
+                                        @JsonProperty(FIELD_RESTRICTIONS) @Nullable Map<String, Set<IndexSetFieldRestriction>> fieldRestrictions,
+                                        @JsonProperty(FIELD_FIELD_LIMIT) @Nullable Integer fieldLimit
     ) {
 
         final boolean writableValue = isWritable == null || isWritable;
@@ -171,6 +172,7 @@ public abstract class IndexSetConfig implements
                 .dataTieringConfig(dataTiering)
                 .scope(scope)
                 .fieldRestrictions(fieldRestrictions)
+                .fieldLimit(fieldLimit)
                 .build();
     }
 
@@ -196,7 +198,7 @@ public abstract class IndexSetConfig implements
         return create(id, null, title, description, isWritable, isRegular, indexPrefix, null, null, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
                 indexAnalyzer, indexTemplateName, indexTemplateType, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
-                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings(), null, null, null);
+                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings(), null, null, null, null);
     }
 
     // Compatibility creator after field type refresh interval has been introduced
@@ -220,7 +222,7 @@ public abstract class IndexSetConfig implements
         return create(null, DefaultEntityScope.NAME, title, description, isWritable, isRegular, indexPrefix, null, null, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
                 indexAnalyzer, indexTemplateName, indexTemplateType, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
-                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings(), null, null, null);
+                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings(), null, null, null, null);
     }
 
     /**
