@@ -22,6 +22,7 @@ import MetaDataContext from 'components/common/EntityDataTable/contexts/MetaData
 import { eventsTableElements } from 'components/events/Constants';
 import { events as eventsFixtures } from 'fixtures/events';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 import { asMock } from 'helpers/mocking';
 import type { Attribute } from 'stores/PaginationTypes';
 import type { Event } from 'components/events/events/types';
@@ -58,7 +59,7 @@ describe('ExpandedSection', () => {
   const renderSUT = () =>
     render(
       <MetaDataContext.Provider value={{ meta: {} }}>
-        <ExpandedSection defaultLayout={eventsTableElements.defaultLayout} event={baseEvent} />
+        <ExpandedSection event={baseEvent} />
       </MetaDataContext.Provider>,
     );
 
@@ -66,6 +67,18 @@ describe('ExpandedSection', () => {
     renderSUT();
 
     await screen.findByText(baseEvent.id);
+    await screen.findByText('The Additional Field');
+  });
+
+  it('also renders attributes which are displayed as table columns', async () => {
+    asMock(useUserLayoutPreferences).mockReturnValue({
+      data: { attributes: { fields: { status: 'show' } } },
+      isInitialLoading: false,
+      refetch: jest.fn(),
+    });
+
+    renderSUT();
+
     await screen.findByText('The Additional Field');
   });
 });
