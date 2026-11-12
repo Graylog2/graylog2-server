@@ -60,10 +60,10 @@ export const EventDefinitionTypeRenderer = ({ type }: { type: string }) => {
   return <>{(plugin && plugin.displayName) || type}</>;
 };
 
-export const FieldsRenderer = ({ fields }: { fields: { [fieldName: string]: string } }) =>
+const FieldsRenderer = ({ fields }: { fields: { [fieldName: string]: string } }) =>
   isEmpty(fields) ? <em>No additional Fields added to this Event.</em> : <EventFields fields={fields} />;
 
-export const GroupByFieldsRenderer = ({ groupByFields }: { groupByFields: Record<string, string> }) =>
+const GroupByFieldsRenderer = ({ groupByFields }: { groupByFields: Record<string, string> }) =>
   isEmpty(groupByFields) ? <em>No group-by fields on this Event.</em> : <EventFields fields={groupByFields} />;
 
 const StyledDiv = styled.div`

@@ -17,7 +17,7 @@
 import React from 'react';
 
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
-import EventDetailsAttributeRenderers from 'components/events/events/EventDetailsAttributeRenderers';
+import ColumnRenderers from 'components/events/events/ColumnRenderers';
 import EventDetailsDefinitionList from 'components/events/events/EventDetailsDefinitionList';
 import { useEventDefinitionWithContext } from 'components/event-definitions/hooks/useEventDefinitions';
 import { Spinner } from 'components/common';
@@ -47,7 +47,7 @@ const GeneralEventDetailsTable = ({ event, attributesList, meta }: Props) => {
       event={event}
       meta={meta}
       eventProcedureId={eventDefinitionEventProcedureId}
-      attributesRenderers={EventDetailsAttributeRenderers}
+      attributesRenderers={ColumnRenderers.attributes}
       attributesList={attributesList}
     />
   );
