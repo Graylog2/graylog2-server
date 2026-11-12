@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useCallback, useContext, useEffect, useId, useState, useSyncExternalStore } from 'react';
 
 import useLocation from 'routing/useLocation';
+import { singleton } from 'logic/singleton';
 import { currentPathnameWithoutPrefix, stripPrefixFromPathname } from 'util/URLUtils';
 
 import type { Page, PageContext, PageTools, Panel } from './types';
@@ -32,7 +33,9 @@ type ContextType = {
   subscribe: (listener: () => void) => () => void;
 };
 
-const AssistantPageContext = React.createContext<ContextType | undefined>(undefined);
+const AssistantPageContext = singleton('components.assistant.AssistantPageContext', () =>
+  React.createContext<ContextType | undefined>(undefined),
+);
 
 type Store = ContextType & { setRoute: (route: string) => void; notify: () => void };
 
