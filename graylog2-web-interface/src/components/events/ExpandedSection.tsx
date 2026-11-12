@@ -21,6 +21,7 @@ import type { Event, EventsAdditionalData } from 'components/events/events/types
 import useMetaDataContext from 'components/common/EntityDataTable/hooks/useMetaDataContext';
 import GeneralEventDetailsTable from 'components/events/events/GeneralEventDetailsTable';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import sortEventDetailsAttributes from 'components/events/events/sortEventDetailsAttributes';
 import usePermissions from 'hooks/usePermissions';
 
 const noDetails = <em>No further details</em>;
@@ -42,12 +43,13 @@ const GeneralEventDetails = ({ event }: Props) => {
   const { meta } = useMetaDataContext<EventsAdditionalData>();
   // The details show all attributes, also the ones shown as table columns.
   const { attributes } = useTableFetchContext();
+  const detailsAttributes = sortEventDetailsAttributes(attributes);
 
-  if (!attributes.length) return noDetails;
+  if (!detailsAttributes.length) return noDetails;
 
   return (
     <>
-      <GeneralEventDetailsTable attributesList={attributes} event={event} meta={meta} />
+      <GeneralEventDetailsTable attributesList={detailsAttributes} event={event} meta={meta} />
       <TacticsTechniquesPluginRow event={event} />
     </>
   );
