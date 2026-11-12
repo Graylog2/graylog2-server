@@ -40,7 +40,6 @@ describe('<GrokPatterns />', () => {
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(adminUser);
 
-    // The list only shows the patterns matching the search query, e.g. "IP".
     asMock(searchGrokPatternsPaginated).mockResolvedValue({
       patterns: [ipPattern],
       pagination: { count: 1, total: 1, page: 1, perPage: 10, query: 'IP' },
