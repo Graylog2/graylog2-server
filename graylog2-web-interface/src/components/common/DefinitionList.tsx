@@ -25,7 +25,7 @@ const Container = styled(ElementDimensions)`
   width: 100%;
 `;
 
-const StyledDl = styled.dl<{ $horizontalLayout: boolean; $striped: boolean; $lastDivider: boolean }>`
+const StyledDl = styled.dl<{ $horizontalLayout: boolean; $striped: boolean }>`
   width: 100%;
   margin: 0;
 
@@ -45,13 +45,10 @@ const StyledDl = styled.dl<{ $horizontalLayout: boolean; $striped: boolean; $las
     word-break: break-word;
   }
 
-  ${({ $lastDivider }) =>
-    !$lastDivider &&
-    css`
-      dd:last-of-type {
-        border-bottom: none;
-      }
-    `}
+  /* The divider separates entries, so the last one doesn't need it. */
+  dd:last-of-type {
+    border-bottom: none;
+  }
 
   dd > ${Container} {
     border-left: 3px solid ${({ theme }) => theme.colors.misc.divider};
@@ -68,7 +65,7 @@ const StyledDl = styled.dl<{ $horizontalLayout: boolean; $striped: boolean; $las
       }
     `}
 
-  ${({ $horizontalLayout, $lastDivider, theme }) =>
+  ${({ $horizontalLayout, theme }) =>
     $horizontalLayout &&
     css`
       display: grid;
@@ -79,12 +76,9 @@ const StyledDl = styled.dl<{ $horizontalLayout: boolean; $striped: boolean; $las
         border-bottom: 1px solid ${theme.colors.table.row.divider};
       }
 
-      ${!$lastDivider &&
-      css`
-        dt:last-of-type {
-          border-bottom: none;
-        }
-      `}
+      dt:last-of-type {
+        border-bottom: none;
+      }
 
       dd {
         padding: ${theme.spacings.xxs};
@@ -104,18 +98,12 @@ const StyledDl = styled.dl<{ $horizontalLayout: boolean; $striped: boolean; $las
 type Props = {
   // Stripes alternate entries. Turn it off where the list sits in an already striped context, like a table cell.
   striped?: boolean;
-  // The divider below the last entry separates the list from content after it. Turn it off where nothing follows.
-  lastDivider?: boolean;
 };
 
-const DefinitionList = ({
-  children = undefined,
-  striped = true,
-  lastDivider = true,
-}: React.PropsWithChildren<Props>) => (
+const DefinitionList = ({ children = undefined, striped = true }: React.PropsWithChildren<Props>) => (
   <Container>
     {({ width }) => (
-      <StyledDl $horizontalLayout={width > HORIZONTAL_LAYOUT_BREAKPOINT} $striped={striped} $lastDivider={lastDivider}>
+      <StyledDl $horizontalLayout={width > HORIZONTAL_LAYOUT_BREAKPOINT} $striped={striped}>
         {children}
       </StyledDl>
     )}
