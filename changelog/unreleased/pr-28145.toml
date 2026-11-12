@@ -4,7 +4,7 @@ message = "Fix Data Node rejecting Graylog's admin requests with 401 when using 
 details.user = """
 When Data Node was configured with your own certificates (`http_certificate` and `transport_certificate`), the Graylog CA was not added to its OpenSearch truststore. Graylog authenticates some requests to Data Node with a client certificate signed by the Graylog CA, for example the outdated indices check. Data Node rejected those requests with `401 Unauthorized`. Data Node now always trusts the Graylog CA when it exists.
 
-Data Node now also adds every certificate from a user-provided keystore to its truststore. Previously it added only the first entry, so a CA stored as a separate entry could be skipped.
+Data Node now also adds all trusted certificate entries from a user-provided keystore to its truststore, together with the certificate chain of the configured key alias (or the first private key if no alias is configured). Previously, trusted certificate entries stored after the private key were skipped.
 """
 
 pulls = ["28145"]

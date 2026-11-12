@@ -127,6 +127,28 @@ class OpensearchSecurityConfigurationBeanTest {
     }
 
     @Test
+    void addsOnlyChainOfConfiguredAlias() throws Exception {
+        final KeyPair customCa = generateCa("Custom CA");
+        final KeyPair nodeCert = generateSigned("datanode", customCa);
+        final KeyPair unrelatedCa = generateCa("Unrelated CA");
+        final KeyPair unrelatedCert = generateSigned("unrelated", unrelatedCa);
+
+        final char[] password = "password".toCharArray();
+        final KeyStore keystore = KeyStore.getInstance(PKCS12);
+        keystore.load(null, null);
+        keystore.setKeyEntry("unrelated", unrelatedCert.privateKey(), password, new Certificate[]{unrelatedCert.certificate(), unrelatedCa.certificate()});
+        keystore.setKeyEntry("datanode", nodeCert.privateKey(), password, new Certificate[]{nodeCert.certificate(), customCa.certificate()});
+        final Optional<OpensearchCertificates> certificates = Optional.of(new OpensearchCertificates(password, () -> keystore, "datanode", () -> keystore, "datanode"));
+
+        final DatanodeConfigurationPart part = buildConfigurationPart(certificates, caTruststore(graylogCa));
+
+        assertThat(trusts(part.trustStore(), customCa.certificate())).isTrue();
+        assertThat(trusts(part.trustStore(), graylogCa.certificate())).isTrue();
+        assertThat(trusts(part.trustStore(), unrelatedCa.certificate())).isFalse();
+        assertThat(trusts(part.trustStore(), unrelatedCert.certificate())).isFalse();
+    }
+
+    @Test
     void doesNotAddGraylogCaWithoutCertificates() throws Exception {
         final DatanodeConfigurationPart part = buildConfigurationPart(Optional.empty(), caTruststore(graylogCa));
 

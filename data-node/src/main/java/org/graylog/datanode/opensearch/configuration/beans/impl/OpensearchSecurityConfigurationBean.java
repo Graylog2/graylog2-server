@@ -41,10 +41,9 @@ import org.graylog2.security.TruststoreCreator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.nio.file.Path;
-import java.security.GeneralSecurityException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
@@ -114,8 +113,9 @@ public class OpensearchSecurityConfigurationBean implements DatanodeConfiguratio
 
         opensearchCertificates.filter(OpensearchCertificates::hasCertificates).ifPresent(c -> {
             try {
-                truststoreCreator.addCertificates(new InMemoryKeystoreInformation(c.getHttpKeystore().get(), c.getPassword()));
-                truststoreCreator.addCertificates(new InMemoryKeystoreInformation(c.getTransportKeystore().get(), c.getPassword()));
+                // only the chain of the key opensearch actually uses (configured alias or the first private key)
+                truststoreCreator.addCertificates(c.getHttpKeystore().get(), c.getHttpKeyAlias());
+                truststoreCreator.addCertificates(c.getTransportKeystore().get(), c.getTransportKeyAlias());
                 // Graylog server authenticates some requests (e.g. outdated indices check) with a short-lived client
                 // certificate signed by the Graylog CA. User-provided certificates don't have the Graylog CA
                 // in their chain, without it opensearch would reject the client certificate with 401.
@@ -123,7 +123,7 @@ public class OpensearchSecurityConfigurationBean implements DatanodeConfiguratio
                 if (graylogCa.isPresent()) {
                     truststoreCreator.addCertificates(graylogCa.get());
                 }
-            } catch (IOException | GeneralSecurityException e) {
+            } catch (KeyStoreException e) {
                 throw new RuntimeException(e);
             }
         });

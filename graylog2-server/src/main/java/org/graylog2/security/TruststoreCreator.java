@@ -17,6 +17,7 @@
 package org.graylog2.security;
 
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
 import org.graylog.security.certutil.csr.KeystoreInformation;
@@ -36,11 +37,15 @@ import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class TruststoreCreator {
 
@@ -112,28 +117,56 @@ public class TruststoreCreator {
      * @param keystoreInformation access to the keystore, to obtain certificate chains and certificates
      */
     public TruststoreCreator addCertificates(KeystoreInformation keystoreInformation) throws IOException, GeneralSecurityException {
-        return addCertificates(keystoreInformation.loadKeystore());
+        return addCertificates(keystoreInformation.loadKeystore(), null);
     }
 
     /**
-     * Adds certificate chains of all key entries and all trusted certificate entries of the given keystore.
-     * Private keys are never copied to the truststore.
+     * Same as {@link #addCertificates(KeyStore, String)}, using the first private key entry of the keystore.
      */
     public TruststoreCreator addCertificates(KeyStore keystore) throws KeyStoreException {
-        final Enumeration<String> aliases = keystore.aliases();
-        while (aliases.hasMoreElements()) {
-            final String alias = aliases.nextElement();
-            if (keystore.entryInstanceOf(alias, KeyStore.PrivateKeyEntry.class)) {
-                LOG.info("Adding key certificate chain of alias {} to the truststore", alias);
-                addCertificates(toX509Certs(keystore.getCertificateChain(alias)));
-            } else if (keystore.entryInstanceOf(alias, KeyStore.TrustedCertificateEntry.class)) {
+        return addCertificates(keystore, null);
+    }
+
+    /**
+     * Adds the certificate chain of one private key entry and all trusted certificate entries of the given keystore.
+     * The private key entry is selected by the given alias or, if no alias is given, the first private key entry is used.
+     * Chains of other private key entries are not added, the keystore may hold keys that are not used for TLS.
+     * Private and secret keys are never copied to the truststore.
+     *
+     * @param keyAlias alias of the private key entry used for TLS, or null to use the first private key entry
+     * @throws IllegalArgumentException if the keyAlias is given but doesn't point to a private key entry
+     */
+    public TruststoreCreator addCertificates(KeyStore keystore, @Nullable String keyAlias) throws KeyStoreException {
+        final List<String> aliases = Collections.list(keystore.aliases());
+
+        final Optional<String> privateKeyAlias = selectPrivateKeyAlias(keystore, aliases, keyAlias);
+        if (privateKeyAlias.isPresent()) {
+            LOG.info("Adding key certificate chain of alias {} to the truststore", privateKeyAlias.get());
+            addCertificates(toX509Certs(keystore.getCertificateChain(privateKeyAlias.get())));
+        }
+
+        for (String alias : aliases) {
+            if (keystore.entryInstanceOf(alias, KeyStore.TrustedCertificateEntry.class)) {
                 LOG.info("Adding certificate of alias {} to the truststore", alias);
                 addCertificates(toX509Certs(new Certificate[]{keystore.getCertificate(alias)}));
-            } else {
-                LOG.warn("Unsupported keystore alias {}, skipping", alias);
             }
         }
         return this;
+    }
+
+    private static Optional<String> selectPrivateKeyAlias(KeyStore keystore, List<String> aliases, @Nullable String keyAlias) throws KeyStoreException {
+        if (keyAlias != null) {
+            if (!keystore.entryInstanceOf(keyAlias, KeyStore.PrivateKeyEntry.class)) {
+                throw new IllegalArgumentException(f("Keystore alias %s doesn't exist or is not a private key entry", keyAlias));
+            }
+            return Optional.of(keyAlias);
+        }
+        for (String alias : aliases) {
+            if (keystore.entryInstanceOf(alias, KeyStore.PrivateKeyEntry.class)) {
+                return Optional.of(alias);
+            }
+        }
+        return Optional.empty();
     }
 
     @Nonnull
