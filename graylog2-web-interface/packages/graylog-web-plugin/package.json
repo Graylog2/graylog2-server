@@ -27,7 +27,7 @@
   "main": "index.js",
   "dependencies": {
     "@reduxjs/toolkit": "^2.5.1",
-    "@tanstack/react-query": "5.105.1",
+    "@tanstack/react-query": "5.106.0",
     "@types/react": "18.3.12",
     "eslint-config-graylog": "file:../eslint-config-graylog",
     "formik": "2.4.9",
