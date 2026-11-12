@@ -84,13 +84,14 @@ describe('AssociatedStreamsCell', () => {
     expect(await screen.findByRole('link', { name: 'Beta Stream' })).toHaveAttribute('href', '/streams/stream-b/view');
   });
 
-  it('renders an empty cell when no streams have received messages', () => {
+  it('renders a dash when no streams have received messages', async () => {
     mockMessagesPerStream({});
 
     render(<AssociatedStreamsCell input={input} />);
 
+    await screen.findByText('—');
+
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
-    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
   it('renders a spinner while metrics are loading and no cached data is present', async () => {

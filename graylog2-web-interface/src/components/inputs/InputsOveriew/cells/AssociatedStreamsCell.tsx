@@ -33,17 +33,13 @@ const AssociatedStreamsCell = ({ input }: Props) => {
     return <Spinner size="xs" />;
   }
 
-  if (isError || !metrics?.messages_per_stream) {
+  const streamIds = Object.keys(metrics?.messages_per_stream ?? {});
+
+  if (isError || !streamIds.length) {
     return <span aria-label={`No associated streams available for input ${input.title}`}>—</span>;
   }
 
-  return (
-    <EntityTitlesCellList
-      entityIds={Object.keys(metrics.messages_per_stream)}
-      entityType="streams"
-      entityRoute={Routes.stream_view}
-    />
-  );
+  return <EntityTitlesCellList entityIds={streamIds} entityType="streams" entityRoute={Routes.stream_view} />;
 };
 
 export default AssociatedStreamsCell;
