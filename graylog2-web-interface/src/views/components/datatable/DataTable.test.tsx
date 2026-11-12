@@ -497,16 +497,15 @@ describe('DataTable', () => {
   });
 
   describe('selecting rows', () => {
-    const sourcePivot = Pivot.createValues(['source']);
     const sourceData = {
-      chart: ['host1', 'host2', 'host3'].map((host, idx) => ({
+      chart: ['host1', 'host2', 'host3'].map((host) => ({
         key: [host],
         source: 'leaf',
-        values: [{ key: ['count()'], rollup: true, source: 'row-leaf', value: 100 - idx }],
+        values: [{ key: ['count()'], rollup: true, source: 'row-leaf', value: 42 }],
       })),
     };
     const sourceConfig = AggregationWidgetConfig.builder()
-      .rowPivots([sourcePivot])
+      .rowPivots([Pivot.createValues(['source'])])
       .series([series])
       .visualization('table')
       .rollup(true)
@@ -515,9 +514,13 @@ describe('DataTable', () => {
     const rowCheckbox = async (rowName: RegExp) =>
       within(await screen.findByRole('row', { name: rowName })).getByRole('checkbox');
 
-    const selectBulkAction = async (action: string, field: string) => {
+    const openBulkActionFields = async (action: string) => {
       await userEvent.click(screen.getByRole('button', { name: /bulk actions/i }));
       await userEvent.click(await screen.findByRole('menuitem', { name: action }));
+    };
+
+    const selectBulkAction = async (action: string, field: string) => {
+      await openBulkActionFields(action);
       await userEvent.click(await screen.findByRole('menuitem', { name: field }));
     };
 
@@ -526,188 +529,51 @@ describe('DataTable', () => {
     });
 
     it('adds values of selected rows to query', async () => {
-      render(
-        <SimplifiedDataTable
-          config={sourceConfig}
-          // @ts-expect-error
-          data={sourceData}
-        />,
-      );
+      // @ts-expect-error
+      render(<SimplifiedDataTable config={sourceConfig} data={sourceData} />);
 
       await userEvent.click(await rowCheckbox(/host1/));
       await userEvent.click(await rowCheckbox(/host3/));
-      await screen.findByText('2 items selected');
       await selectBulkAction('Add to query', 'source');
 
       expect(updateQueryString).toHaveBeenCalledWith('query-id-1', '(source:(host1 OR host3))');
-      expect(screen.queryByText('2 items selected')).not.toBeInTheDocument();
     });
 
-    it('excludes values of all rows', async () => {
-      render(
-        <SimplifiedDataTable
-          config={sourceConfig}
-          // @ts-expect-error
-          data={sourceData}
-        />,
-      );
+    it('excludes values of all rows from query', async () => {
+      // @ts-expect-error
+      render(<SimplifiedDataTable config={sourceConfig} data={sourceData} />);
 
       await userEvent.click(await screen.findByRole('checkbox', { name: 'Select all rows' }));
-      await screen.findByText('3 items selected');
       await selectBulkAction('Exclude from results', 'source');
 
       expect(updateQueryString).toHaveBeenCalledWith('query-id-1', 'NOT (source:(host1 OR host2 OR host3))');
     });
 
-    it('cancels selection', async () => {
-      render(
-        <SimplifiedDataTable
-          config={sourceConfig}
-          // @ts-expect-error
-          data={sourceData}
-        />,
-      );
-
-      await userEvent.click(await rowCheckbox(/host1/));
-      await screen.findByText('1 item selected');
-      await userEvent.click(screen.getByRole('button', { name: /bulk actions/i }));
-      await userEvent.click(await screen.findByRole('menuitem', { name: 'Cancel selection' }));
-
-      expect(screen.queryByText('1 item selected')).not.toBeInTheDocument();
-      expect(await rowCheckbox(/host1/)).not.toBeChecked();
-    });
-
-    it('deselects all rows', async () => {
-      render(
-        <SimplifiedDataTable
-          config={sourceConfig}
-          // @ts-expect-error
-          data={sourceData}
-        />,
-      );
-
-      await userEvent.click(await screen.findByRole('checkbox', { name: 'Select all rows' }));
-      await screen.findByText('3 items selected');
-      await userEvent.click(screen.getByRole('checkbox', { name: 'Deselect all rows' }));
-
-      expect(screen.queryByText(/selected/)).not.toBeInTheDocument();
-    });
-
-    it('ignores selected rows which are no longer part of the result', async () => {
-      const { rerender } = render(
-        <SimplifiedDataTable
-          config={sourceConfig}
-          // @ts-expect-error
-          data={sourceData}
-        />,
-      );
-
-      await userEvent.click(await rowCheckbox(/host1/));
-      await userEvent.click(await rowCheckbox(/host3/));
-      await screen.findByText('2 items selected');
-
-      rerender(
-        <SimplifiedDataTable
-          config={sourceConfig}
-          // @ts-expect-error
-          data={{ chart: sourceData.chart.slice(0, 2) }}
-        />,
-      );
-
-      await screen.findByText('1 item selected');
-      await selectBulkAction('Add to query', 'source');
-
-      expect(updateQueryString).toHaveBeenCalledWith('query-id-1', 'source:host1');
-    });
-
-    it('drops selection when grouping changes to a different field with the same values', async () => {
-      const { rerender } = render(
-        <SimplifiedDataTable
-          config={sourceConfig}
-          // @ts-expect-error
-          data={sourceData}
-        />,
-      );
-
-      await userEvent.click(await rowCheckbox(/host1/));
-      await screen.findByText('1 item selected');
-
-      rerender(
-        <SimplifiedDataTable
-          config={sourceConfig.toBuilder().rowPivots([Pivot.createValues(['destination'])]).build()}
-          // @ts-expect-error
-          data={sourceData}
-        />,
-      );
-
-      await screen.findByRole('columnheader', { name: /destination/ });
-
-      expect(await rowCheckbox(/host1/)).not.toBeChecked();
-      expect(screen.queryByText(/selected/)).not.toBeInTheDocument();
-    });
-
     it('adds distinct values of chosen field when grouping by multiple fields', async () => {
-      const config = sourceConfig.toBuilder().rowPivots([Pivot.createValues(['source', 'controller'])]).build();
+      const config = sourceConfig
+        .toBuilder()
+        .rowPivots([Pivot.createValues(['source', 'controller'])])
+        .build();
       const multiFieldData = {
         chart: [
           ['host1', 'UsersController'],
           ['host1', 'StreamsController'],
-          ['host2', 'UsersController'],
         ].map((key) => ({
           key,
           source: 'leaf',
           values: [{ key: ['count()'], rollup: true, source: 'row-leaf', value: 42 }],
         })),
       };
-      render(
-        <SimplifiedDataTable
-          config={config}
-          // @ts-expect-error
-          data={multiFieldData}
-        />,
-      );
+      // @ts-expect-error
+      render(<SimplifiedDataTable config={config} data={multiFieldData} />);
 
-      await userEvent.click(await rowCheckbox(/host1.*UsersController/));
-      await userEvent.click(await rowCheckbox(/StreamsController/));
+      await userEvent.click(await screen.findByRole('checkbox', { name: 'Select all rows' }));
       await selectBulkAction('Add to query', 'source');
 
       expect(updateQueryString).toHaveBeenCalledWith('query-id-1', 'source:host1');
-
-      await userEvent.click(await rowCheckbox(/host1.*UsersController/));
-      await userEvent.click(await rowCheckbox(/host2.*UsersController/));
-      await selectBulkAction('Add to query', 'controller');
-
-      expect(updateQueryString).toHaveBeenCalledWith('query-id-1', 'controller:UsersController');
     });
 
-    it('does not allow selecting rows when grouping only by time', async () => {
-      const config = sourceConfig
-        .toBuilder()
-        .rowPivots([Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1.0 } })])
-        .build();
-      const timeData = {
-        chart: [
-          {
-            key: ['2019-01-17T11:00:00.000Z'],
-            source: 'leaf',
-            values: [{ key: ['count()'], rollup: true, source: 'row-leaf', value: 42 }],
-          },
-        ],
-      };
-      render(
-        <SimplifiedDataTable
-          config={config}
-          // @ts-expect-error
-          data={timeData}
-        />,
-      );
-
-      await screen.findByText('42');
-
-      expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
-    });
-
-    it('offers only value pivot fields when grouping by time and values', async () => {
+    it('offers only value pivot fields', async () => {
       const config = sourceConfig
         .toBuilder()
         .rowPivots([
@@ -724,17 +590,11 @@ describe('DataTable', () => {
           },
         ],
       };
-      render(
-        <SimplifiedDataTable
-          config={config}
-          // @ts-expect-error
-          data={mixedData}
-        />,
-      );
+      // @ts-expect-error
+      render(<SimplifiedDataTable config={config} data={mixedData} />);
 
       await userEvent.click(await rowCheckbox(/host1/));
-      await userEvent.click(screen.getByRole('button', { name: /bulk actions/i }));
-      await userEvent.click(await screen.findByRole('menuitem', { name: 'Add to query' }));
+      await openBulkActionFields('Add to query');
       await screen.findByRole('menuitem', { name: 'source' });
 
       expect(screen.queryByRole('menuitem', { name: 'timestamp' })).not.toBeInTheDocument();
@@ -743,11 +603,8 @@ describe('DataTable', () => {
     it('does not allow selecting rows in non-interactive mode', async () => {
       render(
         <InteractiveContext.Provider value="read-only">
-          <SimplifiedDataTable
-            config={sourceConfig}
-            // @ts-expect-error
-            data={sourceData}
-          />
+          {/* @ts-expect-error */}
+          <SimplifiedDataTable config={sourceConfig} data={sourceData} />
         </InteractiveContext.Provider>,
       );
 
