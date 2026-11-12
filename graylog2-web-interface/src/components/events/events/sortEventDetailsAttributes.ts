@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import sortBy from 'lodash/sortBy';
+
 // Order of the attributes in the event details: the event itself, where it comes from, related information,
 // and the additional fields last, since they can be long. Plugins insert their attributes into this order.
 export const EVENT_DETAILS_ATTRIBUTES_ORDER = [
@@ -32,29 +34,10 @@ export const EVENT_DETAILS_ATTRIBUTES_ORDER = [
   'fields',
 ];
 
-const LAST_ATTRIBUTE_ID = 'fields';
-
-/**
- * Sorts the attributes of the event details by the given order.
- * Attributes which aren't part of the order keep their relative order and go before the additional fields.
- */
+// Attributes which aren't part of the order go last.
 const sortEventDetailsAttributes = <A extends { id: string }>(
   attributes: ReadonlyArray<A>,
   order: ReadonlyArray<string> = EVENT_DETAILS_ATTRIBUTES_ORDER,
-) => {
-  const position = (id: string) => {
-    const index = order.indexOf(id);
-
-    if (index !== -1) {
-      return index;
-    }
-
-    const lastIndex = order.indexOf(LAST_ATTRIBUTE_ID);
-
-    return lastIndex === -1 ? order.length : lastIndex - 0.5;
-  };
-
-  return [...attributes].sort((a, b) => position(a.id) - position(b.id));
-};
+) => sortBy(attributes, ({ id }) => (order.includes(id) ? order.indexOf(id) : order.length));
 
 export default sortEventDetailsAttributes;

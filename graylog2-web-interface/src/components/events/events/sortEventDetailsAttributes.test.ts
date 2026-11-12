@@ -30,10 +30,10 @@ describe('sortEventDetailsAttributes', () => {
     ).toEqual(['message', 'event_definition_id', 'event_definition_type', 'id', 'fields']);
   });
 
-  it('puts unknown attributes before the additional fields, keeping their order', () => {
+  it('puts unknown attributes last, keeping their order', () => {
     expect(
-      ids(sortEventDetailsAttributes(attributes(['fields', 'second_unknown', 'message', 'first_unknown']))),
-    ).toEqual(['message', 'second_unknown', 'first_unknown', 'fields']);
+      ids(sortEventDetailsAttributes(attributes(['second_unknown', 'fields', 'first_unknown', 'message']))),
+    ).toEqual(['message', 'fields', 'second_unknown', 'first_unknown']);
   });
 
   it('sorts by a custom order', () => {
