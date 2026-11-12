@@ -26,13 +26,17 @@ import useViewsDispatch from 'views/stores/useViewsDispatch';
 import AddToQueryHandler from 'views/logic/valueactions/AddToQueryHandler';
 import ExcludeFromQueryHandler from 'views/logic/valueactions/ExcludeFromQueryHandler';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
+import type FieldType from 'views/logic/fieldtypes/FieldType';
+import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
+import type { QueryValue } from 'views/logic/valueactions/ValueActionQueryHelper';
 
-import { selectedValuesByField } from './rowSelection';
-import type { FieldValues } from './rowSelection';
+import { selectedFieldValues } from './rowSelection';
 
 const StyledBulkActionsRow = styled(BulkActionsRow)`
   padding-bottom: 10px;
 `;
+
+type FieldValues = { field: string; type: FieldType; values: Array<QueryValue> };
 
 type FieldsSubmenuProps = {
   title: string;
@@ -64,7 +68,11 @@ const SelectedRowsActions = ({ selectableFields, types }: Props) => {
   const dispatch = useViewsDispatch();
   const queryId = useActiveQueryId();
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
-  const fieldValues = selectedValuesByField(selectedEntities, selectableFields, types);
+  const fieldValues = selectableFields.map((field) => ({
+    field,
+    type: fieldTypeFor(field, types),
+    values: selectedFieldValues(selectedEntities, field),
+  }));
   const onClearSelection = () => setSelectedEntities([]);
 
   const onAddToQuery = ({ field, values, type }: FieldValues) =>

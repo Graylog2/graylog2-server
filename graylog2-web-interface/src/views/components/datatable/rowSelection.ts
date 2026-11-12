@@ -16,35 +16,14 @@
  */
 import uniq from 'lodash/uniq';
 
-import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
-import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
-import type FieldType from 'views/logic/fieldtypes/FieldType';
 import type { QueryValue } from 'views/logic/valueactions/ValueActionQueryHelper';
 
-export type Row = { [key: string]: unknown };
-export type FieldValues = { field: string; type: FieldType; values: Array<QueryValue> };
+type Row = { [key: string]: unknown };
 
-const queryValueFor = (value: unknown): QueryValue | undefined =>
-  typeof value === 'string' || typeof value === 'number' ? value : undefined;
-
-// Identifies a row by the fields and values of all row grouping fields,
-// so a selection does not carry over to a different grouping with the same values.
+// Identifies a row by the values of its row grouping fields, so the bulk actions can read the values from the selected keys.
+// Including the field names prevents a selection from carrying over to a different grouping with the same values.
 export const rowSelectionKey = (row: Row, rowFieldNames: Array<string>) =>
   JSON.stringify(rowFieldNames.map((field) => [field, row[field]]));
 
-const parseRowSelectionKey = (key: string): Array<[string, unknown]> => JSON.parse(key);
-
-// Returns the distinct values of each selectable field for the selected rows.
-export const selectedValuesByField = (
-  selectedKeys: Array<string>,
-  selectableFields: Array<string>,
-  types: FieldTypeMappingsList,
-): Array<FieldValues> => {
-  const selectedRows = selectedKeys.map((key) => Object.fromEntries(parseRowSelectionKey(key)));
-
-  return selectableFields.map((field) => ({
-    field,
-    type: fieldTypeFor(field, types),
-    values: uniq(selectedRows.map((row) => queryValueFor(row[field])).filter((value) => value !== undefined)),
-  }));
-};
+export const selectedFieldValues = (selectedKeys: Array<string>, field: string): Array<QueryValue> =>
+  uniq(selectedKeys.map((key) => Object.fromEntries(JSON.parse(key))[field]));
