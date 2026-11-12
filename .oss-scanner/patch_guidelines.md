@@ -37,6 +37,9 @@ Follow `AGENTS.md` at the repository root, and `graylog2-web-interface/AGENTS.md
 
 ## Branch, commit message and changelog
 
+The patch reaches us with the report, and we commit it ourselves when we are ready. That commit is public before
+the advisory is, so it must not reveal the vulnerability.
+
 - Against the `master` branch.
 - Commit subject: an imperative sentence describing the change, without a component prefix and without saying it
   is a security fix (for example `Check stream permission when updating stream rules`).

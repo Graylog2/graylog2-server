@@ -37,8 +37,8 @@ Users with the Admin role are trusted to configure the system, except for the bo
 
 ## What must hold
 
-- **Permissions hold between users.** Every API endpoint, MCP tool and search path enforces the caller's
-  permissions on the entity it acts on. A user who may read only some streams must not read messages from others
+- **Permissions hold between users.** Every API endpoint and MCP tool enforces the caller's permissions on the
+  entity it acts on. A user who may read only some streams must not read messages from others
   by any route (search, aggregation, export, dashboards, event definitions, the API directly). Responses must not
   contain entities or fields the caller may not see.
 - **No one gains more than they were given.** Creating users, changing roles and permissions, sharing entities
@@ -56,6 +56,10 @@ Users with the Admin role are trusted to configure the system, except for the bo
   endpoint or perform an action their own permissions do not allow. The server's own requests to OpenSearch and
   other backends are not covered by this; what users can see through them is governed by the permission rules
   above.
+- **Outgoing requests stay within the URL allowlist.** The allowlist (enabled by default, edited only with the
+  `urlallowlist:write` permission) limits the URLs that features such as HTTP notifications and HTTP lookup data
+  adapters may request. A user who may configure such a feature but not the allowlist must not make the server
+  request a URL it does not permit.
 - **TLS and keys are handled properly.** Outbound TLS verifies certificates and hostnames when configured to;
   passwords and tokens are hashed properly; secrets (`password_secret`, encryption keys, the internal CA's private
   keys, encrypted input and adapter credentials) are never exposed or reused unsafely.
@@ -95,7 +99,6 @@ These are vulnerabilities even when the attacker has Admin:
   and test code, except test helpers shipped in a release.
 - Out of scope: vulnerabilities in third-party dependencies, unless you show a path through Graylog code that
   reaches them with attacker-controlled input. Version bumps alone are not findings.
-- Out of scope for now: the URL allowlist for outgoing HTTP requests. Do not report ways around it.
 - Out of scope: bugs in MongoDB's and OpenSearch's own code, unless the Data Node's configuration of its
   OpenSearch exposes them. What Graylog does with them stays in scope: the queries it builds from user input, the
   stream filters it adds, and how the Data Node configures and runs its OpenSearch (see "The Data Node" above).
@@ -103,7 +106,13 @@ These are vulnerabilities even when the attacker has Admin:
 ## How to exercise it
 
 The image contains the full build of `/src`; there is no network, and no MongoDB, OpenSearch or running Graylog
-server. Reproduce findings with unit tests.
+server. Reproduce findings with a unit test where you can. Where a unit test is impractical, a script is fine too.
+It can run offline in this image, for example a Python script that builds a crafted input, or a `jshell` session
+that calls the built classes (get the classpath with `./mvnw -o -q dependency:build-classpath -pl graylog2-server
+-Dmdep.outputFile=/tmp/cp.txt`, then add `graylog2-server/target/classes`). Or it can run against a Graylog server,
+which we will do ourselves: take the server's URL and credentials as arguments, and state the version and
+configuration it needs. You cannot run such a script here, so say in the report that it is untested. If you
+cannot reproduce a finding, say so and explain it from the code.
 
 - **Java unit tests**, offline. Run `graylog-test-hosts` once first (it adds `/etc/hosts` entries some tests need).
   Then, for the server: `setpriv --bounding-set=-dac_override,-dac_read_search -- ./mvnw -o test -pl
