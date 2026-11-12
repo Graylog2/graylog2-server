@@ -26,6 +26,7 @@ import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import CreateProfile from 'components/indices/IndexSetFieldTypeProfiles/CreateProfile';
 import useProfileMutations from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileMutations';
 import { simpleFields } from 'fixtures/fields';
+import useLocation from 'routing/useLocation';
 
 const renderCreateNewProfile = () => render(<CreateProfile />);
 
@@ -33,6 +34,11 @@ jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfileMutation
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
 
 jest.mock('views/logic/fieldtypes/useFieldTypes', () => jest.fn());
+
+jest.mock('routing/useLocation', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}));
 
 describe('CreateProfile', () => {
   const createMock = jest.fn(() => Promise.resolve());
@@ -42,6 +48,8 @@ describe('CreateProfile', () => {
   useViewsPlugin();
 
   beforeEach(() => {
+    asMock(useLocation).mockReturnValue({ pathname: '/', search: '', hash: '', key: 'default', state: undefined });
+
     asMock(useFieldTypesForMappings).mockReturnValue({
       data: {
         fieldTypes: {
@@ -103,5 +111,41 @@ describe('CreateProfile', () => {
         ],
       });
     });
+  });
+
+  it('Pre-fills name, description and mappings passed from a duplicated profile', async () => {
+    asMock(useLocation).mockReturnValue({
+      pathname: '',
+      search: '',
+      hash: '',
+      key: 'duplicate',
+      state: {
+        name: 'Profile 1 (COPY)',
+        description: 'Description 1',
+        customFieldMappings: [{ field: 'http_method', type: 'string' }],
+      },
+    } as any);
+
+    renderCreateNewProfile();
+
+    expect(await screen.findByRole('textbox', { name: /name/i })).toHaveValue('Profile 1 (COPY)');
+    expect(await screen.findByRole('textbox', { name: /description/i })).toHaveValue('Description 1');
+  });
+
+  it('Tells how many fields an import left out', async () => {
+    asMock(useLocation).mockReturnValue({
+      pathname: '',
+      search: '',
+      hash: '',
+      key: 'import',
+      state: {
+        customFieldMappings: [{ field: 'http_method', type: 'string' }],
+        skippedFieldsCount: 3,
+      },
+    } as any);
+
+    renderCreateNewProfile();
+
+    await screen.findByText(/3 fields were left out/i);
   });
 });

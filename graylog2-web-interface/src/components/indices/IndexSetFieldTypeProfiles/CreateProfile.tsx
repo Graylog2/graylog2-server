@@ -16,6 +16,7 @@
  */
 import React, { useMemo, useCallback } from 'react';
 
+import { Alert } from 'components/bootstrap';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useSendTelemetryOnMount from 'logic/telemetry/useSendTelemetryOnMount';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -29,7 +30,12 @@ import useHistory from 'routing/useHistory';
 const CreateProfile = () => {
   const sendTelemetry = useSendTelemetry();
   const { createProfile } = useProfileMutations();
-  const location = useLocation<{ customFieldMappings: any }>();
+  const location = useLocation<{
+    customFieldMappings: any;
+    name?: string;
+    description?: string;
+    skippedFieldsCount?: number;
+  }>();
   const history = useHistory();
   const initialValues = useMemo<IndexSetFieldTypeProfileForm>(() => {
     const defaultCustomFieldMappings = location?.state?.customFieldMappings;
@@ -37,13 +43,13 @@ const CreateProfile = () => {
     if (defaultCustomFieldMappings) {
       return {
         customFieldMappings: defaultCustomFieldMappings,
-        name: null,
-        description: null,
+        name: location.state.name ?? null,
+        description: location.state.description ?? null,
       };
     }
 
     return undefined;
-  }, [location?.state?.customFieldMappings]);
+  }, [location?.state?.customFieldMappings, location?.state?.name, location?.state?.description]);
 
   const onSubmit = useCallback(
     (profile: IndexSetFieldTypeProfileForm) => {
@@ -69,14 +75,24 @@ const CreateProfile = () => {
     history.goBack();
   }, [history, sendTelemetry]);
 
+  const skippedFieldsCount = location?.state?.skippedFieldsCount ?? 0;
+
   return (
-    <ProfileForm
-      initialValues={initialValues}
-      onCancel={onCancel}
-      submitButtonText="Create profile"
-      submitLoadingText="Creating profile..."
-      onSubmit={onSubmit}
-    />
+    <>
+      {skippedFieldsCount > 0 && (
+        <Alert bsStyle="info">
+          {skippedFieldsCount} {skippedFieldsCount === 1 ? 'field was' : 'fields were'} left out because a profile
+          cannot map reserved fields or fields of this type.
+        </Alert>
+      )}
+      <ProfileForm
+        initialValues={initialValues}
+        onCancel={onCancel}
+        submitButtonText="Create profile"
+        submitLoadingText="Creating profile..."
+        onSubmit={onSubmit}
+      />
+    </>
   );
 };
 
