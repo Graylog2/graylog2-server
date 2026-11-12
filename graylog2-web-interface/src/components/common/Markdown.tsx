@@ -159,14 +159,14 @@ const imageWarningTransformer: Transformer = (domNode) => {
   return undefined;
 };
 
-const textOf = (nodes: Array<DOMNode>): string =>
+const textOf = (nodes: Element['children']): string =>
   nodes
     .map((node) => {
       if ('data' in node) {
         return node.data;
       }
 
-      return 'children' in node ? textOf(node.children as Array<DOMNode>) : '';
+      return 'children' in node ? textOf(node.children) : '';
     })
     .join('');
 
@@ -182,7 +182,7 @@ const mermaidTransformer: Transformer = (domNode) => {
     return undefined;
   }
 
-  return <MermaidDiagram source={textOf(code.children as Array<DOMNode>)} />;
+  return <MermaidDiagram source={textOf(code.children)} />;
 };
 
 const Markdown = ({ augment = false, text }: Props) => {
