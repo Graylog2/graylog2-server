@@ -52,7 +52,7 @@ public class EventListTest {
         final EventList eventList = EventList.builder().build();
         final Query query = queryWithStreams(DEFAULT_SYSTEM_EVENTS_STREAM_ID, "source-stream");
 
-        assertThat(eventList.streamSelection(query).isEventStreamsOnly()).isFalse();
+        assertThat(eventList.eventStreamFilter(query)).isEmpty();
         assertThat(eventList.sourceStreamFilter(query)).isEqualTo(SourceStreamFilter.allowList(Set.of(DEFAULT_SYSTEM_EVENTS_STREAM_ID, "source-stream")));
     }
 
@@ -61,8 +61,7 @@ public class EventListTest {
         final EventList eventList = EventList.builder().build();
         final Query query = queryWithStreams(DEFAULT_EVENTS_STREAM_ID);
 
-        assertThat(eventList.streamSelection(query).isEventStreamsOnly()).isTrue();
-        assertThat(eventList.streamSelection(query).eventStreams()).containsExactly(DEFAULT_EVENTS_STREAM_ID);
+        assertThat(eventList.eventStreamFilter(query)).containsExactly(DEFAULT_EVENTS_STREAM_ID);
         assertThat(eventList.sourceStreamFilter(query)).isEqualTo(SourceStreamFilter.allAllowed());
     }
 
@@ -81,7 +80,7 @@ public class EventListTest {
         final EventList eventList = EventList.builder().streams(Set.of(DEFAULT_EVENTS_STREAM_ID)).build();
         final Query query = queryWithStreams("source-stream");
 
-        assertThat(eventList.streamSelection(query).isEventStreamsOnly()).isTrue();
+        assertThat(eventList.eventStreamFilter(query)).containsExactly(DEFAULT_EVENTS_STREAM_ID);
         assertThat(eventList.sourceStreamFilter(query)).isEqualTo(SourceStreamFilter.allAllowed());
     }
 

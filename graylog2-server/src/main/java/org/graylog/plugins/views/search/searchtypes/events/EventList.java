@@ -158,6 +158,12 @@ public abstract class EventList implements SearchEngineSearchType, HasAttributeF
         return permittedSourceStreams().map(SourceStreamFilter::allowList).orElseGet(SourceStreamFilter::allAllowed);
     }
 
+    // Empty means no filter on the events stream an event is stored in
+    public Set<String> eventStreamFilter(Query query) {
+        final StreamSelection selection = streamSelection(query);
+        return selection.isEventStreamsOnly() ? selection.eventStreams() : Set.of();
+    }
+
     public record StreamSelection(Set<String> eventStreams, Set<String> sourceStreams) {
         public boolean isEventStreamsOnly() {
             return sourceStreams.isEmpty() && !eventStreams.isEmpty();
