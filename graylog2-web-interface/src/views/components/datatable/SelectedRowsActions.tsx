@@ -61,17 +61,18 @@ const FieldsSubmenu = ({ title, fieldValues, onSelect }: FieldsSubmenuProps) => 
 
 type Props = {
   selectableFields: Array<string>;
+  rowFieldNames: Array<string>;
   types: FieldTypeMappingsList;
 };
 
-const SelectedRowsActions = ({ selectableFields, types }: Props) => {
+const SelectedRowsActions = ({ selectableFields, rowFieldNames, types }: Props) => {
   const dispatch = useViewsDispatch();
   const queryId = useActiveQueryId();
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const fieldValues = selectableFields.map((field) => ({
     field,
     type: fieldTypeFor(field, types),
-    values: selectedFieldValues(selectedEntities, field),
+    values: selectedFieldValues(selectedEntities, rowFieldNames, field),
   }));
   const onClearSelection = () => setSelectedEntities([]);
 

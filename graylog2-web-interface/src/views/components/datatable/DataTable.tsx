@@ -325,7 +325,9 @@ const DataTable = ({
   return (
     <DataTableSelectedEntitiesProvider rowIds={selectableRowIds ?? []}>
       <div className={styles.container}>
-        {selectableRowIds && <SelectedRowsActions selectableFields={selectableFields} types={fields} />}
+        {selectableRowIds && (
+          <SelectedRowsActions selectableFields={selectableFields} rowFieldNames={rowFieldNames} types={fields} />
+        )}
         <div className={styles.scrollContainer}>
           <MessagesTable striped={striped} bordered={bordered} stickyHeader={stickyHeader} condensed={condensed}>
             <THead $stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>

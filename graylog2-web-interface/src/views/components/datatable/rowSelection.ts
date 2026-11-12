@@ -16,14 +16,16 @@
  */
 import uniq from 'lodash/uniq';
 
-import type { QueryValue } from 'views/logic/valueactions/ValueActionQueryHelper';
+import { createCompositeKey, splitCompositeKey } from 'views/logic/compositeKey';
 
 type Row = { [key: string]: unknown };
 
 // Identifies a row by the values of its row grouping fields, so the bulk actions can read the values from the selected keys.
-// Including the field names prevents a selection from carrying over to a different grouping with the same values.
 export const rowSelectionKey = (row: Row, rowFieldNames: Array<string>) =>
-  JSON.stringify(rowFieldNames.map((field) => [field, row[field]]));
+  createCompositeKey(rowFieldNames.map((field) => row[field]));
 
-export const selectedFieldValues = (selectedKeys: Array<string>, field: string): Array<QueryValue> =>
-  uniq(selectedKeys.map((key) => Object.fromEntries(JSON.parse(key))[field]));
+export const selectedFieldValues = (selectedKeys: Array<string>, rowFieldNames: Array<string>, field: string) => {
+  const fieldIndex = rowFieldNames.indexOf(field);
+
+  return uniq(selectedKeys.map((key) => splitCompositeKey(key)[fieldIndex]));
+};
