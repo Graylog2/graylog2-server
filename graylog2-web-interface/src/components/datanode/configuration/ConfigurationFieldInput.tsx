@@ -17,15 +17,20 @@
 import React from 'react';
 import { useFormikContext } from 'formik';
 import styled from 'styled-components';
-import omit from 'lodash/omit';
 
 import { Button, Input } from 'components/bootstrap';
 import { Icon, Select, Tooltip } from 'components/common';
 
 import type { ConfigurationValues, ConfigurationParameter, ConfigurationSource } from './types';
 import ConfigurationQuantityInput from './ConfigurationQuantityInput';
-import { formatQuantityValue, parseQuantityValue } from './configurationQuantities';
-import { getConfigurationValueSource, getDisplayedConfigurationValue, trimListEntries } from './configurationFields';
+import { changeQuantityAmount, changeQuantityUnit, getQuantity } from './configurationQuantities';
+import type { QuantityChange } from './configurationQuantities';
+import {
+  applyConfigurationValue,
+  getConfigurationValueSource,
+  getDisplayedConfigurationValue,
+  trimListEntries,
+} from './configurationFields';
 
 const FieldDetail = styled.span`
   display: block;
@@ -77,26 +82,21 @@ const ConfigurationFieldInput = ({ parameter, canEdit, canDelete, selectedUnit, 
   const source = value !== '' ? getConfigurationValueSource(parameter, draftValue, initialValues[name]) : undefined;
   const sourceDescription = source ? sourceDescriptions[source] : undefined;
   const disabled = !canEdit || isSubmitting;
-  const hasUnits = Object.keys(units ?? {}).length > 0;
-  const isQuantity = hasUnits && (type === 'size' || type === 'duration');
-  const parsedQuantity = isQuantity ? parseQuantityValue(displayedValue, units) : undefined;
-  const quantity = parsedQuantity && {
-    amount: parsedQuantity.amount,
-    unit: parsedQuantity.amount === '' ? (selectedUnit ?? parsedQuantity.unit) : parsedQuantity.unit,
-  };
+  const quantity = getQuantity(parameter, displayedValue, selectedUnit);
   const unitLabel = quantity ? units[quantity.unit] : undefined;
   const helpId = `${name}-help`;
   const errorId = `${name}-error`;
   const describedBy = [helpId, error && errorId].filter(Boolean).join(' ');
   const onBlur = () => setTouched({ ...touched, [name]: true });
   const setValue = (nextValue: string) =>
-    setValues((currentValues) => {
-      if (nextValue === '' && !Object.hasOwn(initialValues, name)) return omit(currentValues, name);
-
-      return nextValue === getDisplayedConfigurationValue(parameter, currentValues[name])
-        ? currentValues
-        : { ...currentValues, [name]: nextValue };
-    }, submitCount > 0);
+    setValues(
+      (currentValues) => applyConfigurationValue(currentValues, initialValues, parameter, nextValue),
+      submitCount > 0,
+    );
+  const applyQuantityChange = ({ value: nextValue, selectedUnit: nextUnit }: QuantityChange) => {
+    if (nextUnit !== undefined) onSelectUnit(nextUnit);
+    if (nextValue !== undefined) setValue(nextValue);
+  };
 
   const resetValue = async () => {
     await setValues((currentValues) => ({ ...currentValues, [name]: null }), true);
@@ -114,89 +114,90 @@ const ConfigurationFieldInput = ({ parameter, canEdit, canDelete, selectedUnit, 
       </Button>
     ) : undefined;
 
-  const getControlProps = () => {
-    if (isQuantity || selectableValues.length > 0) return { type: undefined, value: undefined };
-    if (type === 'integer') return { type: 'number', value };
-    if (type === 'boolean') return { type: 'select', value };
-
-    return { type: 'text', value };
+  const nativeControlProps = {
+    value,
+    placeholder,
+    disabled,
+    'aria-describedby': describedBy,
+    'aria-invalid': !!error,
+    onChange: (event: React.ChangeEvent<HTMLInputElement>) => setValue(event.target.value),
+    onBlur,
   };
 
-  const renderControl = () => {
+  const getControl = () => {
     if (quantity) {
-      return (
-        <ConfigurationQuantityInput
-          id={name}
-          label={label}
-          units={units}
-          amount={quantity.amount}
-          unit={quantity.unit}
-          placeholder={placeholder}
-          disabled={disabled}
-          describedBy={describedBy}
-          invalid={!!error}
-          onAmountChange={(amount) => {
-            if (amount === '') onSelectUnit(quantity.unit);
-            setValue(formatQuantityValue(amount, quantity.unit));
-          }}
-          onUnitChange={(unit) => {
-            if (quantity.amount === '') onSelectUnit(unit);
-            else setValue(formatQuantityValue(quantity.amount, unit));
-          }}
-          onBlur={onBlur}
-          buttonAfter={resetButton}
-        />
-      );
+      return {
+        control: (
+          <ConfigurationQuantityInput
+            id={name}
+            label={label}
+            units={units}
+            amount={quantity.amount}
+            unit={quantity.unit}
+            placeholder={placeholder}
+            disabled={disabled}
+            describedBy={describedBy}
+            invalid={!!error}
+            onAmountChange={(amount) => applyQuantityChange(changeQuantityAmount(quantity, amount))}
+            onUnitChange={(unit) => applyQuantityChange(changeQuantityUnit(quantity, unit))}
+            onBlur={onBlur}
+            buttonAfter={resetButton}
+          />
+        ),
+      };
     }
 
     if (selectableValues.length > 0) {
-      return (
-        <Select
-          inputId={name}
-          name={name}
-          aria-label={label}
-          aria-invalid={!!error}
-          aria-errormessage={error ? errorId : undefined}
-          inputProps={{ 'aria-describedby': helpId }}
-          multi={type === 'list'}
-          options={selectableValues.map(([optionValue, optionLabel]) => ({ value: optionValue, label: optionLabel }))}
-          placeholder={placeholder}
-          value={type === 'list' ? trimListEntries(value) : value}
-          onChange={setValue}
-          onBlur={onBlur}
-          disabled={disabled}
-        />
-      );
+      return {
+        buttonAfter: resetButton,
+        control: (
+          <Select
+            inputId={name}
+            name={name}
+            aria-label={label}
+            aria-invalid={!!error}
+            aria-errormessage={error ? errorId : undefined}
+            inputProps={{ 'aria-describedby': helpId }}
+            multi={type === 'list'}
+            options={selectableValues.map(([optionValue, optionLabel]) => ({ value: optionValue, label: optionLabel }))}
+            placeholder={placeholder}
+            value={type === 'list' ? trimListEntries(value) : value}
+            onChange={setValue}
+            onBlur={onBlur}
+            disabled={disabled}
+          />
+        ),
+      };
     }
 
     if (type === 'boolean') {
-      return (
-        <>
-          <option value="" disabled>
-            {placeholder}
-          </option>
-          <option value="true">Enabled</option>
-          <option value="false">Disabled</option>
-        </>
-      );
+      return {
+        ...nativeControlProps,
+        type: 'select',
+        buttonAfter: resetButton,
+        control: (
+          <>
+            <option value="" disabled>
+              {placeholder}
+            </option>
+            <option value="true">Enabled</option>
+            <option value="false">Disabled</option>
+          </>
+        ),
+      };
     }
 
-    return undefined;
+    return { ...nativeControlProps, type: type === 'integer' ? 'number' : 'text', buttonAfter: resetButton };
   };
+
+  const { control, ...controlProps } = getControl();
 
   return (
     <Input
       id={name}
       name={name}
       label={unitLabel ? `${label} (${unitLabel})` : label}
-      aria-describedby={describedBy}
-      aria-invalid={!!error}
-      {...getControlProps()}
-      disabled={disabled}
-      buttonAfter={isQuantity ? undefined : resetButton}
-      placeholder={placeholder}
-      onChange={(event: React.ChangeEvent<HTMLInputElement>) => setValue(event.target.value)}
-      onBlur={onBlur}
+      {...controlProps}
       error={
         error ? (
           <span id={errorId} role="alert">
@@ -227,7 +228,7 @@ const ConfigurationFieldInput = ({ parameter, canEdit, canDelete, selectedUnit, 
           </FieldDetail>
         </span>
       }>
-      {renderControl()}
+      {control}
     </Input>
   );
 };

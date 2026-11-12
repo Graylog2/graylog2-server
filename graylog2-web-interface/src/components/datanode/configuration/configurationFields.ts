@@ -15,8 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import groupBy from 'lodash/groupBy';
+import omit from 'lodash/omit';
 
 import type { ConfigurationCategory, ConfigurationParameter, ConfigurationValues } from './types';
+import { getWatermarkError } from './configurationWatermarks';
 
 export const categoryId = (category: string) =>
   category
@@ -38,6 +40,21 @@ export const getDisplayedConfigurationValue = (
   parameter: ConfigurationParameter,
   draftValue: string | null | undefined,
 ) => (draftValue === null ? (parameter.node_value ?? undefined) : draftValue);
+
+export const applyConfigurationValue = (
+  currentValues: ConfigurationValues,
+  initialValues: ConfigurationValues,
+  parameter: ConfigurationParameter,
+  nextValue: string,
+) => {
+  const { name } = parameter;
+
+  if (nextValue === '' && !Object.hasOwn(initialValues, name)) return omit(currentValues, name);
+
+  return nextValue === getDisplayedConfigurationValue(parameter, currentValues[name])
+    ? currentValues
+    : { ...currentValues, [name]: nextValue };
+};
 
 export const trimListEntries = (value: string) =>
   value
@@ -118,52 +135,6 @@ const validateParameter = (parameter: ConfigurationParameter, value: string): st
   return validateElement(parameter, value.trim());
 };
 
-const watermarkNames = [
-  'cluster.routing.allocation.disk.watermark.low',
-  'cluster.routing.allocation.disk.watermark.high',
-  'cluster.routing.allocation.disk.watermark.flood_stage',
-] as const;
-
-const isByteSize = (value: string) => /^\d+(?:\.\d+)?(?:b|kb|mb|gb|tb|pb)$/i.test(value);
-
-const parseWatermark = (value: string) => {
-  if (value.endsWith('%')) return { kind: 'usage', amount: Number(value.slice(0, -1)) / 100 };
-
-  if (isByteSize(value)) {
-    const unit = value.replace(/^[\d.]+/, '').toLowerCase();
-    const exponent = ['b', 'kb', 'mb', 'gb', 'tb', 'pb'].indexOf(unit);
-
-    return { kind: 'free_bytes', amount: Number.parseFloat(value) * 1024 ** exponent };
-  }
-
-  return { kind: 'usage', amount: Number(value) };
-};
-
-const validateWatermarks = (watermarks: Array<ConfigurationParameter>, values: ConfigurationValues) => {
-  const known = watermarks.flatMap((parameter) => {
-    const value = getDisplayedConfigurationValue(parameter, values[parameter.name]);
-
-    return value === undefined ? [] : [parseWatermark(value.trim())];
-  });
-  const [low, high, flood] = watermarks.map(({ label }) => `"${label}"`);
-
-  if (known.some(({ kind }) => kind !== known[0].kind)) {
-    return `Use disk usage units for ${low}, ${high} and ${flood}, or use free-space units for all three.`;
-  }
-
-  const isUsage = known[0]?.kind === 'usage';
-  const isOrdered = known.every(
-    ({ amount }, index) =>
-      index === 0 || (isUsage ? known[index - 1].amount <= amount : known[index - 1].amount >= amount),
-  );
-
-  if (isOrdered) return undefined;
-
-  return isUsage
-    ? `Set watermarks in ascending order: ${low}, ${high}, then ${flood}.`
-    : `Set free-space watermarks in descending order: ${low}, ${high}, then ${flood}.`;
-};
-
 export const validateConfigurationValues = (
   initialValues: ConfigurationValues,
   values: ConfigurationValues,
@@ -180,14 +151,14 @@ export const validateConfigurationValues = (
     if (error) errors.push([parameter.name, error]);
   });
 
-  const watermarks = watermarkNames.flatMap((name) => parameters.filter((parameter) => parameter.name === name));
-  const changesWatermarks = watermarkNames.some((name) => values[name] !== initialValues[name]);
   const watermarkError =
-    watermarks.length === watermarkNames.length && changesWatermarks && errors.length === 0
-      ? validateWatermarks(watermarks, values)
+    errors.length === 0
+      ? getWatermarkError(parameters, initialValues, values, (parameter) =>
+          getDisplayedConfigurationValue(parameter, values[parameter.name]),
+        )
       : undefined;
 
-  if (watermarkError) errors.push([watermarkNames[0], watermarkError]);
+  if (watermarkError) errors.push(watermarkError);
 
   return Object.fromEntries(errors);
 };
