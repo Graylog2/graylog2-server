@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, within } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import { Form, Formik } from 'formik';
 import userEvent from '@testing-library/user-event';
@@ -512,6 +512,9 @@ describe('DataTable', () => {
       .rollup(true)
       .build();
 
+    const rowCheckbox = async (rowName: RegExp) =>
+      within(await screen.findByRole('row', { name: rowName })).getByRole('checkbox');
+
     const selectBulkAction = async (action: string, field: string) => {
       await userEvent.click(screen.getByRole('button', { name: /bulk actions/i }));
       await userEvent.click(await screen.findByRole('menuitem', { name: action }));
@@ -531,8 +534,8 @@ describe('DataTable', () => {
         />,
       );
 
-      await userEvent.click(await screen.findByRole('checkbox', { name: 'Select source host1' }));
-      await userEvent.click(screen.getByRole('checkbox', { name: 'Select source host3' }));
+      await userEvent.click(await rowCheckbox(/host1/));
+      await userEvent.click(await rowCheckbox(/host3/));
       await screen.findByText('2 items selected');
       await selectBulkAction('Add to query', 'source');
 
@@ -565,13 +568,13 @@ describe('DataTable', () => {
         />,
       );
 
-      await userEvent.click(await screen.findByRole('checkbox', { name: 'Select source host1' }));
+      await userEvent.click(await rowCheckbox(/host1/));
       await screen.findByText('1 item selected');
       await userEvent.click(screen.getByRole('button', { name: /bulk actions/i }));
       await userEvent.click(await screen.findByRole('menuitem', { name: 'Cancel selection' }));
 
       expect(screen.queryByText('1 item selected')).not.toBeInTheDocument();
-      expect(screen.getByRole('checkbox', { name: 'Select source host1' })).not.toBeChecked();
+      expect(await rowCheckbox(/host1/)).not.toBeChecked();
     });
 
     it('deselects all rows', async () => {
@@ -599,8 +602,8 @@ describe('DataTable', () => {
         />,
       );
 
-      await userEvent.click(await screen.findByRole('checkbox', { name: 'Select source host1' }));
-      await userEvent.click(screen.getByRole('checkbox', { name: 'Select source host3' }));
+      await userEvent.click(await rowCheckbox(/host1/));
+      await userEvent.click(await rowCheckbox(/host3/));
       await screen.findByText('2 items selected');
 
       rerender(
@@ -626,7 +629,7 @@ describe('DataTable', () => {
         />,
       );
 
-      await userEvent.click(await screen.findByRole('checkbox', { name: 'Select source host1' }));
+      await userEvent.click(await rowCheckbox(/host1/));
       await screen.findByText('1 item selected');
 
       rerender(
@@ -637,9 +640,9 @@ describe('DataTable', () => {
         />,
       );
 
-      await screen.findByRole('checkbox', { name: 'Select destination host1' });
+      await screen.findByRole('columnheader', { name: /destination/ });
 
-      expect(screen.getByRole('checkbox', { name: 'Select destination host1' })).not.toBeChecked();
+      expect(await rowCheckbox(/host1/)).not.toBeChecked();
       expect(screen.queryByText(/selected/)).not.toBeInTheDocument();
     });
 
@@ -664,16 +667,14 @@ describe('DataTable', () => {
         />,
       );
 
-      await userEvent.click(
-        await screen.findByRole('checkbox', { name: 'Select source host1, controller UsersController' }),
-      );
-      await userEvent.click(screen.getByRole('checkbox', { name: 'Select source host1, controller StreamsController' }));
+      await userEvent.click(await rowCheckbox(/host1.*UsersController/));
+      await userEvent.click(await rowCheckbox(/StreamsController/));
       await selectBulkAction('Add to query', 'source');
 
       expect(updateQueryString).toHaveBeenCalledWith('query-id-1', 'source:host1');
 
-      await userEvent.click(screen.getByRole('checkbox', { name: 'Select source host1, controller UsersController' }));
-      await userEvent.click(screen.getByRole('checkbox', { name: 'Select source host2, controller UsersController' }));
+      await userEvent.click(await rowCheckbox(/host1.*UsersController/));
+      await userEvent.click(await rowCheckbox(/host2.*UsersController/));
       await selectBulkAction('Add to query', 'controller');
 
       expect(updateQueryString).toHaveBeenCalledWith('query-id-1', 'controller:UsersController');
@@ -731,7 +732,7 @@ describe('DataTable', () => {
         />,
       );
 
-      await userEvent.click(await screen.findByRole('checkbox', { name: /select timestamp .*, source host1/i }));
+      await userEvent.click(await rowCheckbox(/host1/));
       await userEvent.click(screen.getByRole('button', { name: /bulk actions/i }));
       await userEvent.click(await screen.findByRole('menuitem', { name: 'Add to query' }));
       await screen.findByRole('menuitem', { name: 'source' });

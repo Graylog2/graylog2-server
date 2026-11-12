@@ -39,11 +39,6 @@ export const rowSelectionKey = (row: Row, rowFieldNames: Array<string>) =>
 
 const parseRowSelectionKey = (key: string): Array<[string, unknown]> => JSON.parse(key);
 
-export const rowSelectionLabel = (key: string) =>
-  `Select ${parseRowSelectionKey(key)
-    .map(([field, value]) => `${field} ${value}`)
-    .join(', ')}`;
-
 // Returns the distinct values of each selectable field for the selected rows.
 export const selectedValuesByField = (
   selectedKeys: Array<string>,

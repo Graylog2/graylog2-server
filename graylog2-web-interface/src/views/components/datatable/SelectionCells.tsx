@@ -15,25 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 
 import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import BulkSelectCell from 'components/common/message/messagetable/BulkSelectCell';
 
 import TableHeaderCell from './TableHeaderCell';
-import { rowSelectionLabel } from './rowSelection';
-
-const SelectionHeader = styled(TableHeaderCell)`
-  && {
-    width: 1px;
-  }
-`;
-
-const SelectionData = styled.td`
-  && {
-    width: 1px;
-  }
-`;
 
 type SelectAllHeaderCellProps = {
   rowIds: Array<string>;
@@ -41,18 +28,18 @@ type SelectAllHeaderCellProps = {
 
 export const SelectAllHeaderCell = ({ rowIds }: SelectAllHeaderCellProps) => {
   const { isAllRowsSelected, isSomeRowsSelected, setSelectedEntities } = useSelectedEntities();
-  const label = isAllRowsSelected ? 'Deselect all rows' : 'Select all rows';
+  const title = `${isAllRowsSelected ? 'Deselect' : 'Select'} all rows`;
 
   return (
-    <SelectionHeader>
+    <TableHeaderCell $noMinWidth>
       <RowCheckbox
         checked={isAllRowsSelected}
         indeterminate={isSomeRowsSelected}
         onChange={() => setSelectedEntities(isAllRowsSelected ? [] : rowIds)}
-        title={label}
-        aria-label={label}
+        title={title}
+        aria-label={title}
       />
-    </SelectionHeader>
+    </TableHeaderCell>
   );
 };
 
@@ -62,16 +49,12 @@ type SelectRowCellProps = {
 
 export const SelectRowCell = ({ rowId }: SelectRowCellProps) => {
   const { selectedEntities, toggleEntitySelect } = useSelectedEntities();
-  const label = rowSelectionLabel(rowId);
+  const isSelected = selectedEntities.includes(rowId);
+  const title = `${isSelected ? 'Deselect' : 'Select'} row`;
 
   return (
-    <SelectionData>
-      <RowCheckbox
-        checked={selectedEntities.includes(rowId)}
-        onChange={() => toggleEntitySelect(rowId)}
-        title={label}
-        aria-label={label}
-      />
-    </SelectionData>
+    <BulkSelectCell>
+      <RowCheckbox checked={isSelected} onChange={() => toggleEntitySelect(rowId)} title={title} aria-label={title} />
+    </BulkSelectCell>
   );
 };
