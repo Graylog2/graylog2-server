@@ -22,7 +22,6 @@ import useMetaDataContext from 'components/common/EntityDataTable/hooks/useMetaD
 import GeneralEventDetailsTable from 'components/events/events/GeneralEventDetailsTable';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 import usePermissions from 'hooks/usePermissions';
-import TagsDetailRow from 'components/events/TagsDetailRow';
 
 const noDetails = <em>No further details</em>;
 
@@ -41,19 +40,14 @@ const TacticsTechniquesPluginRow = ({ event }: { event: Event }) => {
 
 const GeneralEventDetails = ({ event }: Props) => {
   const { meta } = useMetaDataContext<EventsAdditionalData>();
+  // The details show all attributes, also the ones shown as table columns.
   const { attributes } = useTableFetchContext();
-  // The details show all attributes, also the ones shown as table columns. The tags follow in their own row.
-  const detailsAttributes = attributes.filter(({ id }) => id !== 'tags');
-  const hasTags = !!event.tags?.length;
 
-  if (!detailsAttributes.length && !hasTags) return noDetails;
+  if (!attributes.length) return noDetails;
 
   return (
     <>
-      {detailsAttributes.length ? (
-        <GeneralEventDetailsTable attributesList={detailsAttributes} event={event} meta={meta} />
-      ) : null}
-      <TagsDetailRow tags={event.tags} />
+      <GeneralEventDetailsTable attributesList={attributes} event={event} meta={meta} />
       <TacticsTechniquesPluginRow event={event} />
     </>
   );

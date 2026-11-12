@@ -22,7 +22,6 @@ import GeneralEventDetailsTable from 'components/events/events/GeneralEventDetai
 import { detailsAttributes } from 'components/events/Constants';
 import DropdownButton from 'components/bootstrap/DropdownButton';
 import useEventAction from 'components/events/events/hooks/useEventAction';
-import TagsDetailRow from 'components/events/TagsDetailRow';
 import { useIsInteractiveMode } from 'views/components/contexts/InteractiveContext';
 
 type Props = {
@@ -30,7 +29,7 @@ type Props = {
   eventDefinitionContext: EventDefinitionContext;
 };
 
-const attributesList = detailsAttributes.map(({ id, title }) => ({ id, title }));
+const attributesList = [...detailsAttributes.map(({ id, title }) => ({ id, title })), { id: 'tags', title: 'Tags' }];
 
 const ActionsWrapperContainer = styled.div`
   margin-top: ${({ theme }) => theme.spacings.md};
@@ -54,10 +53,9 @@ const DefaultDetails = ({ event, eventDefinitionContext }: Props) => {
 
   return (
     <>
-      <GeneralEventDetailsTable attributesList={attributesList} event={event} meta={meta} />
       {/* No filter component is in scope for the events overview widget, so tag chips
           here would just append an unused `filters` query param when clicked. */}
-      <TagsDetailRow tags={event.tags} interactive={false} />
+      <GeneralEventDetailsTable attributesList={attributesList} event={event} meta={meta} interactiveTags={false} />
       {interactive && <ActionsWrapper>{moreActions}</ActionsWrapper>}
       {pluggableActionModals}
     </>

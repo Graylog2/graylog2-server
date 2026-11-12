@@ -126,11 +126,11 @@ describe('EventDetails', () => {
     expect(screen.getByText('phishing')).toBeInTheDocument();
   });
 
-  it('should not render a tags section when the event has no tags', async () => {
+  it('shows a hint in the tags row when the event has no tags', async () => {
     renderEventDetails();
 
-    await screen.findByText('Additional Fields');
-    expect(screen.queryByText('Tags')).not.toBeInTheDocument();
+    await screen.findByText('Tags');
+    await screen.findByText('No tags');
   });
 
   it('offers event actions only when interactive', async () => {
