@@ -31,8 +31,6 @@ import { selectedValuesByField } from './rowSelection';
 import type { FieldValues } from './rowSelection';
 
 const StyledBulkActionsRow = styled(BulkActionsRow)`
-  grid-row: 1;
-  grid-column: 1;
   padding-bottom: 10px;
 `;
 
