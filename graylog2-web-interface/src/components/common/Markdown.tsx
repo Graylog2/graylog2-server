@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
+import styled, { css } from 'styled-components';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import parse, { domToReact, Element } from 'html-react-parser';
@@ -27,6 +28,7 @@ import Spinner from 'components/common/Spinner';
 import { Link } from 'components/common';
 import Routes from 'routing/Routes';
 import MarkdownLink from 'components/common/markdown/MarkdownLink';
+import Table from 'components/bootstrap/Table';
 
 type Props = {
   text: string;
@@ -37,8 +39,6 @@ const ALLOWED_URI_REGEXP = /^(?:https?:|graylog:|[^a-z])/i;
 
 type Transformer = Parameters<typeof parse>[1]['replace'];
 type Renderer = ({ html, transformer }: { html: string; transformer?: Transformer }) => ReturnType<typeof parse>;
-
-const HTML: Renderer = ({ html, transformer }) => parse(html, { replace: transformer });
 
 const useMarkdownTransformer = (): HTMLReactParserOptions['replace'] => {
   const components = usePluginEntities('markdown.augment.components');
@@ -90,6 +90,40 @@ const mergeTransformer =
     return undefined;
   };
 
+// A table wider than its container scrolls instead of squeezing its columns.
+const SpacedTable = styled(Table)(
+  ({ theme }) => css`
+    margin: ${theme.spacings.xs} 0;
+    width: auto;
+  `,
+);
+
+// The content of links and tables is transformed like everything else, e.g. its augmented values.
+const parseHtml = (html: string, transformer: Transformer) => {
+  const options: HTMLReactParserOptions = {};
+  const tableTransformer: Transformer = (domNode) =>
+    domNode instanceof Element && domNode.name === 'table' ? (
+      <SpacedTable responsive condensed striped={false} hover={false}>
+        {domToReact(domNode.children as DOMNode[], options)}
+      </SpacedTable>
+    ) : undefined;
+  const linkTransformer: Transformer = (domNode) => {
+    if (!(domNode instanceof Element) || domNode.name !== 'a' || !domNode.attribs?.href) {
+      return undefined;
+    }
+
+    return (
+      <MarkdownLink href={domNode.attribs.href}>{domToReact(domNode.children as DOMNode[], options)}</MarkdownLink>
+    );
+  };
+  const builtInTransformers = [linkTransformer, tableTransformer];
+  options.replace = mergeTransformer(transformer ? [transformer, ...builtInTransformers] : builtInTransformers);
+
+  return parse(html, options);
+};
+
+const HTML: Renderer = ({ html, transformer }) => parseHtml(html, transformer);
+
 const Augment: Renderer = ({ html, transformer }) => {
   const markdownTransformer = useMarkdownTransformer();
   const replace = useMemo(
@@ -97,7 +131,7 @@ const Augment: Renderer = ({ html, transformer }) => {
     [markdownTransformer, transformer],
   );
 
-  return parse(html, { replace });
+  return parseHtml(html, replace);
 };
 
 const UnsupportedImageWarning = () => (
@@ -113,20 +147,6 @@ const imageWarningTransformer: Transformer = (domNode) => {
   }
 
   return undefined;
-};
-
-const anchorTransformer: Transformer = (domNode) => {
-  if (!(domNode instanceof Element) || domNode.name !== 'a') {
-    return undefined;
-  }
-
-  const href = domNode.attribs?.href;
-
-  if (!href) {
-    return undefined;
-  }
-
-  return <MarkdownLink href={href}>{domToReact(domNode.children as DOMNode[])}</MarkdownLink>;
 };
 
 const Markdown = ({ augment = false, text }: Props) => {
@@ -146,18 +166,13 @@ const Markdown = ({ augment = false, text }: Props) => {
       ? undefined
       : imageWarningTransformer;
 
-  const transformer = useMemo(
-    () => (imageTransformer ? mergeTransformer([anchorTransformer, imageTransformer]) : anchorTransformer),
-    [imageTransformer],
-  );
-
   const RendererComponent = augment ? Augment : HTML;
 
   if (isInitialLoading) {
     return <Spinner />;
   }
 
-  return <RendererComponent html={html} transformer={transformer} />;
+  return <RendererComponent html={html} transformer={imageTransformer} />;
 };
 
 export default Markdown;
