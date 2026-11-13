@@ -1,0 +1,5 @@
+type = "f"
+message = "When a query time range limit is set, the time range picker now allows searching a short time range far in the past, as long as the range itself is within the limit. Previously it rejected any range starting earlier than the limit."
+
+issues = ["27488"]
+pulls = ["28107"]

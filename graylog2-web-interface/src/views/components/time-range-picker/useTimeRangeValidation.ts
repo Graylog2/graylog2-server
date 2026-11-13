@@ -17,7 +17,6 @@
 import { useCallback } from 'react';
 
 import useUserDateTime from 'hooks/useUserDateTime';
-import type { DateTime } from 'util/DateTime';
 import validateTimeRange from 'views/components/TimeRangeValidation';
 
 import { normalizeIfClassifiedRelativeTimeRange } from './RelativeTimeRangeClassifiedHelper';
@@ -26,7 +25,6 @@ import type { TimeRangePickerFormValues, TimeRangePickerTimeRange } from './type
 const dateTimeValidate = async (
   activeTabTimeRange: TimeRangePickerTimeRange,
   limitDuration: number,
-  formatTime: (dateTime: DateTime, format: string) => string,
   userTimezone: string,
 ) => {
   if (!activeTabTimeRange) {
@@ -34,7 +32,7 @@ const dateTimeValidate = async (
   }
 
   const normalizedTimeRange = normalizeIfClassifiedRelativeTimeRange(activeTabTimeRange);
-  const timeRangeErrors = await validateTimeRange(normalizedTimeRange, limitDuration, formatTime, userTimezone);
+  const timeRangeErrors = await validateTimeRange(normalizedTimeRange, limitDuration, userTimezone);
 
   return Object.keys(timeRangeErrors).length !== 0
     ? { timeRangeTabs: { [activeTabTimeRange.type]: timeRangeErrors } }
@@ -42,12 +40,12 @@ const dateTimeValidate = async (
 };
 
 const useTimeRangeValidation = (limitDuration: number = 0) => {
-  const { formatTime, userTimezone } = useUserDateTime();
+  const { userTimezone } = useUserDateTime();
 
   return useCallback(
     ({ timeRangeTabs, activeTab }: TimeRangePickerFormValues) =>
-      dateTimeValidate(activeTab ? timeRangeTabs[activeTab] : undefined, limitDuration, formatTime, userTimezone),
-    [formatTime, limitDuration, userTimezone],
+      dateTimeValidate(activeTab ? timeRangeTabs[activeTab] : undefined, limitDuration, userTimezone),
+    [limitDuration, userTimezone],
   );
 };
 

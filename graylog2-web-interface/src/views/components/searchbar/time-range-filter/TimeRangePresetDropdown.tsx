@@ -49,18 +49,20 @@ const AdminMenuItem: React.ComponentType<React.ComponentProps<typeof MenuItem>> 
   `,
 );
 
-const relativeStartTimeForTimeRange = (timeRange: TimeRange) => {
+const durationForTimeRange = (timeRange: TimeRange) => {
   switch (timeRange.type) {
     case 'relative':
       if (isTypeRelativeWithEnd(timeRange)) {
-        return timeRange.from;
+        return timeRange.from - (timeRange.to ?? 0);
       }
 
       return timeRange.range;
     case 'absolute':
-      return moment().diff(timeRange.from, 'seconds');
+      return moment(timeRange.to).diff(timeRange.from, 'seconds');
     case 'keyword':
-      return testNaturalDate(timeRange.keyword, timeRange.timezone).then(({ from }) => moment().diff(from, 'seconds'));
+      return testNaturalDate(timeRange.keyword, timeRange.timezone).then(({ from, to }) =>
+        moment(to).diff(from, 'seconds'),
+      );
     default:
       throw Error("Time range type doesn't not exist");
   }
@@ -72,9 +74,9 @@ const filterOptionsByLimit = async (
 ) => {
   const filteredOptions = await Promise.all(
     presets?.map(async (preset) => {
-      const relativeStartTime = await relativeStartTimeForTimeRange(preset.timerange);
+      const duration = await durationForTimeRange(preset.timerange);
 
-      return relativeStartTime && relativeStartTime <= timeRangeLimit ? preset : null;
+      return duration && duration <= timeRangeLimit ? preset : null;
     }),
   );
 
