@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import styled, { css } from 'styled-components';
 import { Form, Formik } from 'formik';
 
@@ -24,10 +24,9 @@ import FormikInput from 'components/common/FormikInput';
 import Spinner from 'components/common/Spinner';
 import { ModalSubmit, IfPermitted } from 'components/common';
 import type { PasswordComplexityConfigType } from 'stores/configurations/ConfigurationsStore';
-import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
-import { getConfig } from 'components/configurations/helpers';
-import { useStore } from 'stores/connect';
+import useClusterConfig, { useUpdateClusterConfig } from 'hooks/useClusterConfig';
+import UserNotification from 'util/UserNotification';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { DEFAULT_PASSWORD_COMPLEXITY_CONFIG, PASSWORD_SPECIAL_CHARACTERS } from 'logic/users/passwordComplexity';
@@ -54,20 +53,11 @@ const configType = ConfigurationType.PASSWORD_COMPLEXITY_CONFIG;
 
 const PasswordComplexityConfig = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [viewConfig, setViewConfig] = useState<PasswordComplexityConfigType | undefined>(undefined);
-  const [formConfig, setFormConfig] = useState<PasswordComplexityConfigType | undefined>(undefined);
-  const configuration = useStore(ConfigurationsStore, (state) => state?.configuration);
+  const { data, isLoading } = useClusterConfig<PasswordComplexityConfigType>(configType);
+  const { mutateAsync: updateConfig } = useUpdateClusterConfig<PasswordComplexityConfigType>(configType);
+  const viewConfig = isLoading ? undefined : (data ?? DEFAULT_PASSWORD_COMPLEXITY_CONFIG);
 
   const sendTelemetry = useSendTelemetry('password-complexity');
-
-  useEffect(() => {
-    ConfigurationsActions.listPasswordComplexityConfig(configType).then(() => {
-      const config = getConfig(configType, configuration) ?? DEFAULT_PASSWORD_COMPLEXITY_CONFIG;
-
-      setViewConfig(config);
-      setFormConfig(config);
-    });
-  }, [configuration]);
 
   const saveConfig = (values: PasswordComplexityConfigType) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.CONFIGURATIONS.PASSWORD_COMPLEXITY_UPDATED, {
@@ -76,14 +66,22 @@ const PasswordComplexityConfig = () => {
 
     const payload = { ...values, min_length: Number(values.min_length) };
 
-    ConfigurationsActions.update(configType, payload).then(() => {
-      setShowModal(false);
-    });
+    return updateConfig(payload).then(
+      () => {
+        UserNotification.success('Configuration updated successfully');
+        setShowModal(false);
+      },
+      (error) => {
+        UserNotification.error(
+          `Password complexity config update failed: ${error}`,
+          `Could not update password complexity config: ${configType}`,
+        );
+      },
+    );
   };
 
   const resetConfig = () => {
     setShowModal(false);
-    setFormConfig(viewConfig);
   };
 
   const validate = (
@@ -136,8 +134,8 @@ const PasswordComplexityConfig = () => {
             </Button>
           </IfPermitted>
 
-          <Modal show={showModal && !!formConfig} onHide={resetConfig}>
-            <Formik onSubmit={saveConfig} initialValues={formConfig} validate={validate}>
+          <Modal show={showModal} onHide={resetConfig}>
+            <Formik onSubmit={saveConfig} initialValues={viewConfig} validate={validate}>
               {({ isSubmitting }) => (
                 <Form>
                   <Modal.Header>
