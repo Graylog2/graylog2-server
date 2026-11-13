@@ -18,6 +18,9 @@ package org.graylog2.rest.documentation.generator;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -25,6 +28,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.jayway.jsonpath.ReadContext;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.BeanParam;
@@ -72,6 +77,30 @@ public class GeneratorTest {
                                      @JsonProperty("optional_entity") Optional<SampleEntity> optionalEntity) {}
 
     public record NestedOptionalProperties(@JsonProperty("nested") OptionalProperties nested) {}
+
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
+    @JsonSubTypes({@JsonSubTypes.Type(Circle.class), @JsonSubTypes.Type(Square.class)})
+    @Schema(discriminatorProperty = "type", oneOf = {Circle.class, Square.class},
+            discriminatorMapping = @DiscriminatorMapping(value = "circle", schema = Circle.class))
+    public sealed interface Shape permits Circle, Square {}
+
+    @JsonTypeName("circle")
+    public record Circle(@JsonProperty("type") String type, @JsonProperty("radius") int radius) implements Shape {}
+
+    @JsonTypeName("square")
+    public record Square(@JsonProperty("type") String type, @JsonProperty("side") int side) implements Shape {}
+
+    public record Drawing(@JsonProperty("main") Shape main, @JsonProperty("shapes") List<Shape> shapes) {}
+
+    @Tag(name = "Drawings", description = "Returns polymorphic objects")
+    @Path("/drawings")
+    public class DrawingResource {
+        @GET
+        @Operation(summary = "A drawing")
+        public Drawing drawing() {
+            return null;
+        }
+    }
 
     @Tag(name = "Nested", description = "Returns nested objects")
     @Path("/nested")
@@ -209,6 +238,29 @@ public class GeneratorTest {
                         tuple("sort", "query", null),
                         tuple("order", "query", "asc")
                 );
+    }
+
+    @Test
+    public void describesSubtypesOfPolymorphicTypesThatOptIn() throws Exception {
+        final var result = jsonPath(createGenerator(DrawingResource.class).generateForRoute("/drawings", "http://localhost:12900/"));
+
+        assertThat(result.read("$.models.GeneratorTest__Drawing.properties.main[\"$ref\"]", String.class)).isEqualTo("GeneratorTest__Shape");
+        assertThat(result.read("$.models.GeneratorTest__Shape.one_of[*][\"$ref\"]", List.class))
+                .containsExactly("GeneratorTest__Circle", "GeneratorTest__Square");
+        assertThat(result.read("$.models.GeneratorTest__Shape.discriminator.property_name", String.class)).isEqualTo("type");
+        assertThat(result.read("$.models.GeneratorTest__Shape.discriminator.mapping", Map.class))
+                .containsEntry("circle", "GeneratorTest__Circle")
+                .containsEntry("square", "GeneratorTest__Square");
+        assertThat(result.read("$.models.GeneratorTest__Circle.properties.radius.type", String.class)).isEqualTo("integer");
+        assertThat(result.read("$.models.GeneratorTest__Square.properties.side.type", String.class)).isEqualTo("integer");
+    }
+
+    @Test
+    public void leavesTypesWithoutSubtypeOptInUnchanged() throws Exception {
+        final var result = jsonPath(createGenerator(SampleResource.class).generateForRoute("/sample", "http://localhost:12900/"));
+        final Map<String, Object> entity = result.read("$.models.GeneratorTest__SampleEntity");
+
+        assertThat(entity).doesNotContainKeys("one_of", "discriminator");
     }
 
     private Generator createGenerator(Class<?> resource) {

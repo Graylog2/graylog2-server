@@ -26,7 +26,11 @@ import createSearch from 'views/logic/slices/createSearch';
 export const STANDALONE_QUERY_ID = 'standalone-query';
 
 // A dashboard view, so each widget's own query, time range and streams are used instead of the query's.
-const createStandaloneView = async (widgets: Array<Widget>, titles: { [widgetId: string]: string }) => {
+const createStandaloneView = async (
+  widgets: Array<Widget>,
+  titles: { [widgetId: string]: string },
+  storeSearch: (search: Search) => Promise<Search> = createSearch,
+) => {
   const query = Query.builder()
     .id(STANDALONE_QUERY_ID)
     .query(createElasticsearchQueryString())
@@ -42,7 +46,7 @@ const createStandaloneView = async (widgets: Array<Widget>, titles: { [widgetId:
       .search(Search.create().toBuilder().queries([query]).build())
       .build(),
   );
-  const search = await createSearch(view.search);
+  const search = await storeSearch(view.search);
 
   return view.toBuilder().search(search).build();
 };

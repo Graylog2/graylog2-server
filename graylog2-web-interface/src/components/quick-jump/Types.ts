@@ -45,3 +45,13 @@ type SearchResultItemAction = {
 
 export type SearchResultItem = SearchResultItemBase &
   (SearchResultItemLink | SearchResultItemExternalLink | SearchResultItemAction);
+
+/**
+ * Offers to do something with the text the user typed, e.g. to ask about it. Its item is shown last, whatever else
+ * matches the text.
+ */
+export type QuickJumpQueryAction = {
+  key: string;
+  item: (query: string) => SearchResultItem;
+  useCondition?: () => boolean;
+};
