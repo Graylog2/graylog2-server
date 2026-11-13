@@ -27,6 +27,7 @@ import org.graylog.datanode.configuration.OpensearchConfigurationDir;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.configuration.variants.OpensearchCertificates;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
+import org.graylog.datanode.opensearch.configuration.UnicastHostsFile;
 import org.graylog.datanode.opensearch.configuration.beans.impl.OpensearchSecurityConfigurationBean;
 import org.graylog.datanode.process.CommandLineProcess;
 import org.graylog.datanode.process.CommandLineProcessListener;
@@ -44,8 +45,11 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class OpensearchCommandLineProcess implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchCommandLineProcess.class);
@@ -158,5 +162,16 @@ public class OpensearchCommandLineProcess implements Closeable {
     public void hotReload() {
         LOG.info("Triggered hot reload of opensearch certificates");
         persistCertificates(config);
+    }
+
+    public void updateSeedHosts(Set<String> seedHosts) {
+        final Path configurationRoot = config.getOpensearchConfigTargetDir().configurationRoot();
+        try {
+            if (UnicastHostsFile.update(configurationRoot, seedHosts)) {
+                LOG.info("Updated opensearch discovery seed hosts: {}", seedHosts);
+            }
+        } catch (IOException e) {
+            throw new OpensearchConfigurationException(f("Failed to update opensearch seed hosts file %s", UnicastHostsFile.FILENAME), e);
+        }
     }
 }

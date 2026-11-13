@@ -23,6 +23,7 @@ import org.graylog.datanode.bootstrap.preflight.DataNodeConfigurationPeriodical;
 import org.graylog.datanode.periodicals.MetricsCollector;
 import org.graylog.datanode.periodicals.NodePingPeriodical;
 import org.graylog.datanode.periodicals.OpensearchNodeHeartbeat;
+import org.graylog.datanode.periodicals.OpensearchSeedHostsPeriodical;
 import org.graylog2.events.Offset;
 import org.graylog2.events.OffsetFromCurrentMongoDBTimeProvider;
 import org.graylog2.plugin.periodical.Periodical;
@@ -37,5 +38,6 @@ public class PeriodicalBindings extends AbstractModule {
         periodicalBinder.addBinding().to(DataNodeConfigurationPeriodical.class);
         periodicalBinder.addBinding().to(DataNodeCertRenewalPeriodical.class);
         periodicalBinder.addBinding().to(MetricsCollector.class);
+        periodicalBinder.addBinding().to(OpensearchSeedHostsPeriodical.class);
     }
 }
