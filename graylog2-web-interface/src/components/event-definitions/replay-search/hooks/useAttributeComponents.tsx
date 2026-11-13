@@ -27,6 +27,7 @@ import SidebarNavigationLink from 'components/layout/RightSidebar/SidebarNavigat
 import SidebarEventDefinitionDetails from 'components/event-definitions/SidebarEventDefinitionDetails';
 import Routes from 'routing/Routes';
 import Link from 'components/common/Link';
+import { describeExpression } from 'util/CronUtils';
 
 import useAlertAndEventDefinitionData from './useAlertAndEventDefinitionData';
 
@@ -64,6 +65,23 @@ const useAttributeComponents = () => {
 
     const searchWithin = extractDurationAndUnit(eventDefinition.config.search_within_ms, TIME_UNITS);
     const executeEvery = extractDurationAndUnit(eventDefinition.config.execute_every_ms, TIME_UNITS);
+    const {
+      use_cron_scheduling: useCronScheduling,
+      cron_expression: cronExpression,
+      cron_timezone: cronTimezone,
+    } = eventDefinition.config;
+    const executeSearch = useCronScheduling
+      ? {
+          title: 'Execute search',
+          content: `${describeExpression(cronExpression)} (${cronTimezone ?? 'UTC'})`,
+        }
+      : {
+          title: 'Execute search every',
+          content:
+            executeEvery?.duration &&
+            executeEvery?.unit &&
+            `${executeEvery.duration} ${executeEvery.unit.toLowerCase()}`,
+        };
     const isEDUpdatedAfterEvent =
       !isEventDefinition && moment(eventDefinition.updated_at).diff(eventData?.timestamp) > 0;
 
@@ -94,11 +112,7 @@ const useAttributeComponents = () => {
         title: 'Priority',
         content: getPriorityName(eventDefinition.priority),
       },
-      {
-        title: 'Execute search every',
-        content:
-          executeEvery?.duration && executeEvery?.unit && `${executeEvery.duration} ${executeEvery.unit.toLowerCase()}`,
-      },
+      executeSearch,
       {
         title: 'Search within',
         content:
