@@ -95,7 +95,7 @@ const ExpandableCellList = <ItemType,>({
     return null;
   }
 
-  const allItems = (
+  const renderAllItems = () => (
     <Items $layout={layout}>
       {items.map((item) => (
         <Item key={itemKey(item)} $layout={layout} title={itemTitle?.(item)}>
@@ -106,7 +106,7 @@ const ExpandableCellList = <ItemType,>({
   );
 
   if (hiddenCount <= 0) {
-    return allItems;
+    return renderAllItems();
   }
 
   if (!isExpanded) {
@@ -124,7 +124,7 @@ const ExpandableCellList = <ItemType,>({
 
   return (
     <CellListExpanded>
-      <CellListScrollArea>{allItems}</CellListScrollArea>
+      <CellListScrollArea>{renderAllItems()}</CellListScrollArea>
       <CellListToggle isExpanded hiddenCount={hiddenCount} onToggle={toggle} />
     </CellListExpanded>
   );
