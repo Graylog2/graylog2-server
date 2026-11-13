@@ -472,6 +472,8 @@ declare module 'graylog-web-plugin/plugin' {
     dataTiering?: Array<DataTiering>;
     defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
+    // Shown next to every page, after the right sidebar, e.g. the Assistant's chat.
+    globalSidebars?: Array<{ key: string; component: React.ComponentType }>;
     'navigation.badges'?: Array<NavigationBadge>;
     globalNotifications?: Array<GlobalNotification>;
     helpMenu?: Array<HelpMenuItem>;
