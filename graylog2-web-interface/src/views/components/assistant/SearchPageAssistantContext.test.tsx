@@ -36,6 +36,8 @@ import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
+import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
+import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import { addWidget } from 'views/logic/slices/widgetActions';
 import { createSearch } from 'fixtures/searches';
@@ -107,10 +109,10 @@ const barChart = AggregationWidget.builder()
   .build();
 
 // Runs thunks against a page whose shown tab has the bar chart.
-const mockPageWithBarChart = () => {
+const mockPageWithBarChart = (widget: Widget = barChart) => {
   const viewState = ViewState.create()
     .toBuilder()
-    .widgets(Immutable.List([barChart]))
+    .widgets(Immutable.List([widget]))
     .titles({ widget: { w1: 'Logins per host' } })
     .build();
   const state = {
@@ -140,6 +142,10 @@ describe('SearchPageAssistantContext', () => {
 
       return undefined;
     });
+
+  beforeAll(() => {
+    VisualizationConfig.registerSubtype('bar', BarVisualizationConfig);
+  });
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -228,6 +234,42 @@ describe('SearchPageAssistantContext', () => {
     expect(widget.config.sort.map(({ field }) => field)).toEqual(['source']);
     expect(updatedViewState().titles.getIn(['widget', 'w1'])).toBe('Logins over time');
     expect(result).toEqual(expect.objectContaining({ summary: 'Changed "Logins over time"' }));
+  });
+
+  it("keeps the user's group-by limits, metric names and axis settings when changing a chart", async () => {
+    mockPageWithBarChart(
+      barChart
+        .toBuilder()
+        .config(
+          barChart.config
+            .toBuilder()
+            .rowPivots([Pivot.createValues(['source'], { limit: 5, skip_empty_values: true })])
+            .series([Series.fromJSON({ function: 'count()', config: { name: 'Logins', thresholds: [] } })])
+            .visualizationConfig(BarVisualizationConfig.create('group', 'logarithmic'))
+            .build(),
+        )
+        .build(),
+    );
+    const tools = renderTools();
+
+    await tools().update_widget({
+      widget_id: 'w1',
+      config: {
+        row_pivots: [{ fields: ['source'], type: 'values', config: { limit: 15 } }],
+        column_pivots: [],
+        series: [{ function: 'count()', config: {} }, { function: 'avg(took_ms)', config: {} }],
+        sort: [],
+        visualization: 'bar',
+        visualization_config: { barmode: 'stack' },
+        rollup: true,
+      },
+    });
+
+    const { config } = updatedViewState().widgets.first() as AggregationWidget;
+
+    expect(config.rowPivots[0].config).toEqual({ limit: 5, skip_empty_values: true });
+    expect(config.series.map(({ effectiveName }) => effectiveName)).toEqual(['Logins', 'avg(took_ms)']);
+    expect(config.visualizationConfig).toEqual(BarVisualizationConfig.create('stack', 'logarithmic'));
   });
 
   it('changes only the search of a widget when no aggregation is given', async () => {

@@ -16,6 +16,7 @@
  */
 import { useContext, useMemo } from 'react';
 import { OrderedSet } from 'immutable';
+import isEqual from 'lodash/isEqual';
 
 import { useAssistantPageContext, useAssistantPageTools } from 'components/assistant';
 import type { PageTools, SearchPage } from 'components/assistant';
@@ -31,7 +32,10 @@ import type Widget from 'views/logic/widgets/Widget';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { AggregationWidgetConfigJson } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import type { VisualizationConfigJson } from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
+import type Pivot from 'views/logic/aggregationbuilder/Pivot';
+import type Series from 'views/logic/aggregationbuilder/Series';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import type { DirectionJson } from 'views/logic/aggregationbuilder/Direction';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
@@ -117,21 +121,48 @@ const withSearch = (builder: WidgetBuilder, { query, streams, timerange }: Parti
   return result;
 };
 
-// The changed aggregation, with the settings the user chose for the widget where they still apply.
-const mergeAggregation = (current: AggregationWidgetConfig, changed: AggregationWidgetConfig) => {
+const visualizationConfigJson = (config: AggregationWidgetConfig) =>
+  (config.visualizationConfig as { toJSON?: () => Record<string, unknown> } | undefined)?.toJSON?.() ?? {};
+
+// The assistant sends only the visualization settings it changes, e.g. the bar mode; the others stay as they are.
+const withCurrentVisualizationConfig = (
+  current: AggregationWidgetConfig,
+  changed: AggregationWidgetConfigJson,
+): AggregationWidgetConfigJson =>
+  changed.visualization === current.visualization && current.visualizationConfig
+    ? {
+        ...changed,
+        visualization_config: {
+          ...visualizationConfigJson(current),
+          ...(changed.visualization_config ?? {}),
+        } as VisualizationConfigJson,
+      }
+    : changed;
+
+// The changed aggregation, with the settings the user chose for the widget where they still apply: the limits and
+// intervals of its group-bys, the names of its metrics, its sort, and its visualization's settings.
+const mergeAggregation = (current: AggregationWidgetConfig, changedJson: AggregationWidgetConfigJson) => {
+  const changed = AggregationWidgetConfig.fromJSON(withCurrentVisualizationConfig(current, changedJson));
+  const currentPivots = [...current.rowPivots, ...current.columnPivots];
+  const keepPivot = (pivot: Pivot) =>
+    currentPivots.find(({ type, fields }) => type === pivot.type && isEqual(fields, pivot.fields)) ?? pivot;
+  const keepSeries = (series: Series) =>
+    current.series.find(({ function: fn }) => fn === series.function) ?? series;
   const fields = new Set([...changed.rowPivots, ...changed.columnPivots].flatMap((pivot) => pivot.fields));
   const functions = new Set(changed.series.map((series) => series.function));
   const sort = current.sort.filter(({ type, field }) =>
     type === SortConfig.PIVOT_TYPE ? fields.has(field) : functions.has(field),
   );
-  const visualizationConfig =
-    changed.visualizationConfig ??
-    (changed.visualization === current.visualization ? current.visualizationConfig : undefined);
+  const sameVisualization = changed.visualization === current.visualization;
 
   return changed
     .toBuilder()
+    .rowPivots(changed.rowPivots.map(keepPivot))
+    .columnPivots(changed.columnPivots.map(keepPivot))
+    .series(changed.series.map(keepSeries))
     .sort(sort)
-    .visualizationConfig(visualizationConfig)
+    .rollup(sameVisualization ? current.rollup : changed.rollup)
+    .visualizationConfig(changed.visualizationConfig ?? (sameVisualization ? current.visualizationConfig : undefined))
     .formattingSettings(current.formattingSettings)
     .units(current.units)
     .eventAnnotation(current.eventAnnotation)
@@ -188,7 +219,7 @@ const useSearchPageTools = (): PageTools => {
             throw new Error('Only aggregation widgets have a visualization, group-bys and metrics.');
           }
 
-          builder = builder.config(mergeAggregation(widget.config, AggregationWidgetConfig.fromJSON(config)));
+          builder = builder.config(mergeAggregation(widget.config, config));
         }
 
         // One change, so a single undo reverts the widget and its title.
