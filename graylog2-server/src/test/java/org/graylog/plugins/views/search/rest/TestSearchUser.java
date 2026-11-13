@@ -53,6 +53,11 @@ public class TestSearchUser {
         return this;
     }
 
+    public TestSearchUser allowAllStreams() {
+        this.permissions.put(STREAMS_READ, true);
+        return this;
+    }
+
     public TestSearchUser allowNodeRead(String nodeId) {
         this.permissions.put("nodes:read:" + nodeId, true);
         return this;

@@ -24,6 +24,7 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
 import org.graylog2.plugin.Tools;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 
@@ -79,8 +80,11 @@ public class PluggableSearchNormalization implements SearchNormalization {
                 .addStreamsToQueriesWithCategories(streamCategoryMapper, searchUser)
                 .addStreamsToSearchTypesWithCategories(streamCategoryMapper, searchUser)
                 .addStreamsToQueriesWithoutStreams(() -> searchUser.streams().loadMessageStreamsWithFallback());
+        final Search searchWithPermittedSourceStreams = searchUser.isPermitted(RestPermissions.STREAMS_READ)
+                ? searchWithStreams
+                : searchWithStreams.addPermittedSourceStreamsToEventLists(() -> searchUser.streams().loadAllStreams());
         final var now = referenceDateFromOverrideOrNow(executionState);
-        final var normalizedSearch = searchWithStreams.applyExecutionState(firstNonNull(executionState, ExecutionState.empty()))
+        final var normalizedSearch = searchWithPermittedSourceStreams.applyExecutionState(firstNonNull(executionState, ExecutionState.empty()))
                 .withReferenceDate(now);
 
         return normalize(normalizedSearch, pluggableNormalizers);

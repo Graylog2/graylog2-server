@@ -133,7 +133,7 @@ public class SearchRequestFactoryOS {
     /**
      * Creates a terms query for the given field and values.
      */
-    public Query termsQuery(final String field, final Set<String> values) {
+    public static Query termsQuery(final String field, final Set<String> values) {
         final List<FieldValue> fieldValues = values.stream()
                 .map(FieldValue::of)
                 .toList();

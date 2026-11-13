@@ -17,13 +17,17 @@
 package org.graylog.plugins.views.search.searchtypes.events;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.google.common.graph.MutableGraph;
+import org.graylog.events.search.SourceStreamFilter;
 import org.graylog.plugins.views.search.Filter;
+import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.SearchTypeBuilder;
 import org.graylog.plugins.views.search.engine.BackendQuery;
@@ -47,8 +51,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENTS_STREAM_ID;
-import static org.graylog2.plugin.streams.Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID;
+import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENT_STREAM_IDS;
 
 @AutoValue
 @JsonTypeName(EventList.NAME)
@@ -95,6 +98,10 @@ public abstract class EventList implements SearchEngineSearchType, HasAttributeF
     @JsonProperty
     public abstract Optional<SortConfig> sort();
 
+    // Set during normalization for users without blanket stream read permission
+    @JsonIgnore
+    public abstract Optional<Set<String>> permittedSourceStreams();
+
     public SortConfig sortWithDefault() {
         return sort().orElse(DEFAULT_SORT);
     }
@@ -135,9 +142,37 @@ public abstract class EventList implements SearchEngineSearchType, HasAttributeF
         return this;
     }
 
+    public StreamSelection streamSelection(Query query) {
+        final Set<String> selected = streams().isEmpty() ? query.usedStreamIds() : streams();
+        return new StreamSelection(
+                ImmutableSet.copyOf(Sets.intersection(selected, DEFAULT_EVENT_STREAM_IDS)),
+                ImmutableSet.copyOf(Sets.difference(selected, DEFAULT_EVENT_STREAM_IDS))
+        );
+    }
+
+    public SourceStreamFilter sourceStreamFilter(Query query) {
+        final StreamSelection selection = streamSelection(query);
+        if (!selection.sourceStreams().isEmpty()) {
+            return SourceStreamFilter.allowList(Sets.union(selection.eventStreams(), selection.sourceStreams()));
+        }
+        return permittedSourceStreams().map(SourceStreamFilter::allowList).orElseGet(SourceStreamFilter::allAllowed);
+    }
+
+    // Empty means no filter on the events stream an event is stored in
+    public Set<String> eventStreamFilter(Query query) {
+        final StreamSelection selection = streamSelection(query);
+        return selection.isEventStreamsOnly() ? selection.eventStreams() : Set.of();
+    }
+
+    public record StreamSelection(Set<String> eventStreams, Set<String> sourceStreams) {
+        public boolean isEventStreamsOnly() {
+            return sourceStreams.isEmpty() && !eventStreams.isEmpty();
+        }
+    }
+
     @Override
     public Set<String> effectiveStreams() {
-        return ImmutableSet.of(DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID);
+        return DEFAULT_EVENT_STREAM_IDS;
     }
 
     @AutoValue.Builder
@@ -196,6 +231,8 @@ public abstract class EventList implements SearchEngineSearchType, HasAttributeF
 
         @JsonProperty
         public abstract Builder sort(@Nullable SortConfig sort);
+
+        public abstract Builder permittedSourceStreams(Set<String> permittedSourceStreams);
 
         abstract EventList autoBuild();
 
