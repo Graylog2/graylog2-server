@@ -20,6 +20,7 @@ import take from 'lodash/take';
 import last from 'lodash/last';
 
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
+import ExpandableCellList from 'components/common/cell-list/ExpandableCellList';
 import type { FieldTypes, FieldTypeUsage, TypeHistoryItem } from 'views/logic/fieldactions/ChangeFieldType/types';
 
 const RestTypesContainer = styled.i(
@@ -35,7 +36,15 @@ export const useColumnRenderers = (fieldTypes: FieldTypes) => {
     () => ({
       attributes: {
         stream_titles: {
-          renderCell: (streams: Array<string>) => streams.join(', '),
+          renderCell: (streams: Array<string>) => (
+            <ExpandableCellList
+              items={streams.map((title, index) => ({ title, index }))}
+              renderItem={({ title }) => title}
+              // Stream titles aren't unique.
+              itemKey={({ title, index }) => `${title}-${index}`}
+              itemTitle={({ title }) => title}
+            />
+          ),
         },
         types: {
           renderCell: (items: Array<TypeHistoryItem>) => {

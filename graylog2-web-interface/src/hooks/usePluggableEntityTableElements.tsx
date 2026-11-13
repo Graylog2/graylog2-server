@@ -30,7 +30,7 @@ const usePluggableEntityTableElements = <T extends EntityBase>(_entity: T, entit
   const pluggableAttributes = tableElements.reduce((acc, curr) => [...acc, ...curr.attributes], []);
   const pluggableAttributeNames = tableElements.reduce((acc, curr) => [...acc, curr.attributeName], []);
   const pluggableExpandedSections = tableElements.reduce(
-    (acc, curr) => ({ ...acc, ...curr.expandedSection(entityType) }),
+    (acc, curr) => ({ ...acc, ...curr.expandedSection?.(entityType) }),
     {},
   );
 

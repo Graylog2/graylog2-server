@@ -15,28 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import { Badge } from 'components/bootstrap';
-import Icon from 'components/common/Icon';
-import { CELL_PADDING_HORIZONTAL } from 'components/common/EntityDataTable/Constants';
-
-const DEFAULT_COLLAPSED_COUNT = 1;
-// About ten one-line items. Longer lists scroll, so the row doesn't grow with the list.
-const EXPANDED_MAX_HEIGHT = 240; // px
+import CellListCollapsedRow from 'components/common/cell-list/CellListCollapsedRow';
+import CellListExpanded from 'components/common/cell-list/CellListExpanded';
+import CellListScrollArea from 'components/common/cell-list/CellListScrollArea';
+import CellListToggle from 'components/common/cell-list/CellListToggle';
+import useCellListToggle, { DEFAULT_COLLAPSED_COUNT } from 'components/common/cell-list/useCellListToggle';
 
 type Layout = 'stacked' | 'inline';
-
-// Collapsed, the list stays on one line, so the row keeps its height.
-const CollapsedRow = styled.div(
-  ({ theme }) => css`
-    display: flex;
-    align-items: center;
-    gap: ${theme.spacings.xs};
-    min-width: 0;
-  `,
-);
 
 const CollapsedItem = styled.div`
   min-width: 0;
@@ -45,16 +32,8 @@ const CollapsedItem = styled.div`
   white-space: nowrap;
 `;
 
-const Expanded = styled.div(
-  ({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacings.xs};
-  `,
-);
-
-const Items = styled.div<{ $layout: Layout; $scrollable: boolean }>(
-  ({ theme, $layout, $scrollable }) => css`
+const Items = styled.div<{ $layout: Layout }>(
+  ({ theme, $layout }) => css`
     display: flex;
     min-width: 0;
     ${$layout === 'stacked'
@@ -67,15 +46,6 @@ const Items = styled.div<{ $layout: Layout; $scrollable: boolean }>(
           flex-wrap: wrap;
           gap: ${theme.spacings.xs};
         `}
-    ${$scrollable &&
-    css`
-      max-height: ${EXPANDED_MAX_HEIGHT}px;
-      overflow: hidden auto;
-
-      /* Extends into the cell padding, so the scrollbar sits at the cell border. */
-      margin-right: -${CELL_PADDING_HORIZONTAL}px;
-      padding-right: ${CELL_PADDING_HORIZONTAL}px;
-    `}
   `,
 );
 
@@ -95,11 +65,6 @@ const Item = styled.div<{ $layout: Layout }>(
     `}
   `,
 );
-
-const ToggleBadge = styled(Badge)`
-  flex-shrink: 0;
-  align-self: flex-start;
-`;
 
 type Props<ItemType> = {
   items: ReadonlyArray<ItemType> | undefined | null;
@@ -124,15 +89,14 @@ const ExpandableCellList = <ItemType,>({
   collapsedCount = DEFAULT_COLLAPSED_COUNT,
   layout = 'stacked',
 }: Props<ItemType>) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const { isExpanded, hiddenCount, toggle } = useCellListToggle(items?.length ?? 0, collapsedCount);
 
   if (!items?.length) {
     return null;
   }
 
-  const hiddenCount = items.length - collapsedCount;
-  const renderAllItems = (scrollable: boolean) => (
-    <Items $layout={layout} $scrollable={scrollable}>
+  const renderAllItems = () => (
+    <Items $layout={layout}>
       {items.map((item) => (
         <Item key={itemKey(item)} $layout={layout} title={itemTitle?.(item)}>
           {renderItem(item)}
@@ -142,40 +106,27 @@ const ExpandableCellList = <ItemType,>({
   );
 
   if (hiddenCount <= 0) {
-    return renderAllItems(false);
+    return renderAllItems();
   }
 
-  const toggle = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsExpanded((cur) => !cur);
-  };
-
   if (!isExpanded) {
-    const title = `Show ${hiddenCount} more`;
-
     return (
-      <CollapsedRow>
+      <CellListCollapsedRow>
         {items.slice(0, collapsedCount).map((item) => (
           <CollapsedItem key={itemKey(item)} title={itemTitle?.(item)}>
             {renderItem(item)}
           </CollapsedItem>
         ))}
-        <ToggleBadge color="gray" size="sm" onClick={toggle} title={title} aria-label={title}>
-          +{hiddenCount}
-          <Icon name="keyboard_arrow_down" size="sm" />
-        </ToggleBadge>
-      </CollapsedRow>
+        <CellListToggle isExpanded={false} hiddenCount={hiddenCount} onToggle={toggle} />
+      </CellListCollapsedRow>
     );
   }
 
   return (
-    <Expanded>
-      {renderAllItems(true)}
-      <ToggleBadge color="gray" size="sm" onClick={toggle}>
-        Show less
-        <Icon name="keyboard_arrow_up" size="sm" />
-      </ToggleBadge>
-    </Expanded>
+    <CellListExpanded>
+      <CellListScrollArea>{renderAllItems()}</CellListScrollArea>
+      <CellListToggle isExpanded hiddenCount={hiddenCount} onToggle={toggle} />
+    </CellListExpanded>
   );
 };
 

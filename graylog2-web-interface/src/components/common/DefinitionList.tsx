@@ -25,7 +25,7 @@ const Container = styled(ElementDimensions)`
   width: 100%;
 `;
 
-const StyledDl = styled.dl<{ $horizontalLayout: boolean }>`
+const StyledDl = styled.dl<{ $horizontalLayout: boolean; $striped: boolean }>`
   width: 100%;
   margin: 0;
 
@@ -45,16 +45,25 @@ const StyledDl = styled.dl<{ $horizontalLayout: boolean }>`
     word-break: break-word;
   }
 
+  /* The divider separates entries, so the last one doesn't need it. */
+  dd:last-of-type {
+    border-bottom: none;
+  }
+
   dd > ${Container} {
     border-left: 3px solid ${({ theme }) => theme.colors.misc.divider};
     padding-left: ${({ theme }) => theme.spacings.xs};
     margin: ${({ theme }) => theme.spacings.xxs} 0;
   }
 
-  dt:nth-of-type(odd),
-  dd:nth-of-type(odd) {
-    background-color: ${({ theme }) => theme.colors.table.row.backgroundStriped};
-  }
+  ${({ $striped, theme }) =>
+    $striped &&
+    css`
+      dt:nth-of-type(odd),
+      dd:nth-of-type(odd) {
+        background-color: ${theme.colors.table.row.backgroundStriped};
+      }
+    `}
 
   ${({ $horizontalLayout, theme }) =>
     $horizontalLayout &&
@@ -65,6 +74,10 @@ const StyledDl = styled.dl<{ $horizontalLayout: boolean }>`
       dt {
         padding: ${theme.spacings.xxs};
         border-bottom: 1px solid ${theme.colors.table.row.divider};
+      }
+
+      dt:last-of-type {
+        border-bottom: none;
       }
 
       dd {
@@ -82,9 +95,18 @@ const StyledDl = styled.dl<{ $horizontalLayout: boolean }>`
     `}
 `;
 
-const DefinitionList = ({ children }: React.PropsWithChildren) => (
+type Props = {
+  // Stripes alternate entries. Turn it off where the list sits in an already striped context, like a table cell.
+  striped?: boolean;
+};
+
+const DefinitionList = ({ children = undefined, striped = true }: React.PropsWithChildren<Props>) => (
   <Container>
-    {({ width }) => <StyledDl $horizontalLayout={width > HORIZONTAL_LAYOUT_BREAKPOINT}>{children}</StyledDl>}
+    {({ width }) => (
+      <StyledDl $horizontalLayout={width > HORIZONTAL_LAYOUT_BREAKPOINT} $striped={striped}>
+        {children}
+      </StyledDl>
+    )}
   </Container>
 );
 
