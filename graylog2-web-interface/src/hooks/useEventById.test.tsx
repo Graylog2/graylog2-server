@@ -24,6 +24,7 @@ import { mockEventData } from 'helpers/mocking/EventAndEventDefinitions_mock';
 import suppressConsole from 'helpers/suppressConsole';
 import asMock from 'helpers/mocking/AsMock';
 import UserNotification from 'util/UserNotification';
+import FetchError from 'logic/errors/FetchError';
 import useEventById from 'hooks/useEventById';
 
 jest.mock('@graylog/server-api', () => ({ Events: { getById: jest.fn(() => Promise.resolve(mockEventData)) } }));
@@ -69,13 +70,14 @@ describe('useEventById', () => {
     expect(result.current.data).toEqual(mockEventData.event);
   });
 
-  it('should report a not found error when the event does not exist', async () => {
-    asMock(Events.getById).mockResolvedValueOnce(null);
+  it('should pass a not found error to the error handler', async () => {
+    const error = new FetchError('Not Found', 404, { message: "Event <missing-event-id> doesn't exist" });
+    asMock(Events.getById).mockRejectedValueOnce(error);
     const onErrorHandler = jest.fn();
 
     renderHook(() => useEventById('missing-event-id', { onErrorHandler }), { wrapper });
 
-    await waitFor(() => expect(onErrorHandler).toHaveBeenCalledWith(expect.objectContaining({ status: 404 })));
+    await waitFor(() => expect(onErrorHandler).toHaveBeenCalledWith(error));
   });
 
   it('should display notification on fail', async () => {

@@ -145,7 +145,7 @@ describe('EventReplaySearchPage', () => {
     });
 
     it('reports a not found error when the event does not exist', () => {
-      onErrorHandler(new FetchError('Not Found', 404, { message: 'Event not found.' }));
+      onErrorHandler(new FetchError('Not Found', 404, { message: "Event <missing-event-id> doesn't exist" }));
 
       expect(ErrorsActions.report).toHaveBeenCalledWith(expect.objectContaining({ type: 'NotFoundError' }));
     });
