@@ -26,6 +26,8 @@ import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 
 import { darkTheme, lightTheme } from './storybook-theme';
 
+import { dividerBorder } from '../stories/Foundation/lumaTokens';
+
 const DocsOverride = createGlobalStyle(
   ({ theme }) => css`
     p:not(.sb-anchor):not(.sb-unstyled),
@@ -33,8 +35,25 @@ const DocsOverride = createGlobalStyle(
       font-size: 1rem;
     }
 
-    h2 {
-      border-bottom: none;
+    /* Section headers: H2 with a divider line under it */
+    .sbdocs.sbdocs-content h2 {
+      padding-bottom: ${theme.spacings.xs};
+      border-bottom: ${dividerBorder(theme)};
+    }
+
+    /* Page titles */
+    .sbdocs.sbdocs-content h1 {
+      font-size: ${theme.fonts.size.huge};
+      font-weight: 400;
+    }
+
+    /* Space between sections on docs pages */
+    .sbdocs.sbdocs-content h2 {
+      margin-top: ${theme.spacings.xl};
+    }
+
+    .sbdocs.sbdocs-content > h2:first-child {
+      margin-top: 0;
     }
 
     .docs-story {
