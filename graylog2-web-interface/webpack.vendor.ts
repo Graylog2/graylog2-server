@@ -14,20 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const path = require('path');
+import path from 'path';
 
-const webpack = require('webpack');
-const AssetsPlugin = require('assets-webpack-plugin');
-const { merge } = require('webpack-merge');
-const { EsbuildPlugin } = require('esbuild-loader');
-const { CycloneDxWebpackPlugin } = require('@cyclonedx/webpack-plugin');
+import webpack from 'webpack';
+import AssetsPlugin from 'assets-webpack-plugin';
+import { merge } from 'webpack-merge';
+import { EsbuildPlugin } from 'esbuild-loader';
+import { CycloneDxWebpackPlugin } from '@cyclonedx/webpack-plugin';
+
+import vendorModules from './vendor.modules';
+import supportedBrowsers from './supportedBrowsers';
 
 const ROOT_PATH = path.resolve(__dirname);
 const BUILD_PATH = path.resolve(ROOT_PATH, 'target/web/build');
 const MANIFESTS_PATH = path.resolve(ROOT_PATH, 'manifests');
-
-const vendorModules = require('./vendor.modules');
-const supportedBrowsers = require('./supportedBrowsers');
 
 const TARGET = process.env.npm_lifecycle_event || 'build';
 process.env.BABEL_ENV = TARGET;
@@ -95,9 +95,9 @@ const webpackConfig = {
   recordsPath: path.resolve(ROOT_PATH, 'webpack/vendor-module-ids.json'),
 };
 
-// eslint-disable-next-line import/no-mutable-exports
 let defaultExport = webpackConfig;
 
+// eslint-disable-next-line graylog/no-literal-product-name -- HTTP header name expected by the backend
 const urlHeader = 'X-Graylog-Server-URL';
 
 if (TARGET === 'start') {
@@ -111,20 +111,32 @@ if (TARGET === 'start') {
       },
       proxy: [
         {
-          context: ['/api', '/config.js', '/sso', '/.well-known', '/v1/opamp'],
+          context: [
+            '/api',
+            '/config.js',
+            '/sso',
+            '/.well-known',
+            '/oauth/',
+            '/authorize',
+            '/register',
+            '/token',
+            '/v1/opamp',
+          ],
           target: apiUrl,
           ws: true,
           // Skip proxying for /api-browser - it's a frontend route, not an API endpoint
           bypass: (req) => (req.path.startsWith('/api-browser') ? req.path : null),
-          onProxyReq: (proxyReq, req) => {
-            if (!proxyReq.getHeader(urlHeader)?.trim()) {
-              proxyReq.setHeader(urlHeader, `${req.protocol}://${req.get('host')}`);
-            }
-          },
-          onProxyReqWs: (proxyReq, req) => {
-            if (!proxyReq.getHeader(urlHeader)?.trim()) {
-              proxyReq.setHeader(urlHeader, req.headers.origin || `http://${req.headers.host}`);
-            }
+          on: {
+            proxyReq: (proxyReq, req) => {
+              if (!proxyReq.getHeader(urlHeader)?.toString().trim()) {
+                proxyReq.setHeader(urlHeader, `${req.protocol}://${req.get('host')}`);
+              }
+            },
+            proxyReqWs: (proxyReq, req) => {
+              if (!proxyReq.getHeader(urlHeader)?.toString().trim()) {
+                proxyReq.setHeader(urlHeader, req.headers.origin || `http://${req.headers.host}`);
+              }
+            },
           },
         },
       ],

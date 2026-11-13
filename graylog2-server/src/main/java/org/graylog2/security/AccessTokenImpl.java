@@ -59,6 +59,7 @@ public class AccessTokenImpl extends PersistedImpl implements AccessToken {
     public static final String CREATED_AT = "created_at";
     public static final String LAST_ACCESS = "last_access";
     public static final String EXPIRES_AT = "expires_at";
+    public static final String OAUTH_CLIENT_ID = "oauth_client_id";
 
     public AccessTokenImpl(Map<String, Object> fields) {
         super(fields);

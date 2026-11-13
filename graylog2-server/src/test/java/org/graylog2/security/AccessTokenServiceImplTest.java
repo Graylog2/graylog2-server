@@ -163,6 +163,22 @@ public class AccessTokenServiceImplTest {
     }
 
     @Test
+    public void deleteForOAuthClientOnlyDeletesTokensOfThatClient() {
+        final PeriodDuration ttl = PeriodDuration.of(Duration.ofHours(1));
+        final AccessToken clientToken = accessTokenService.create("admin", "client", ttl, "client-a");
+        final AccessToken otherClientToken = accessTokenService.create("admin", "other client", ttl, "client-b");
+        final AccessToken personalToken = accessTokenService.create("admin", "personal", ttl);
+
+        assertThat(accessTokenService.deleteForOAuthClient(otherClientToken.getToken(), "client-a")).isEmpty();
+        assertThat(accessTokenService.deleteForOAuthClient(personalToken.getToken(), "client-a")).isEmpty();
+        assertThat(accessTokenService.deleteForOAuthClient(clientToken.getToken(), "client-a"))
+                .hasValueSatisfying(deleted -> assertThat(deleted.getUserName()).isEqualTo("admin"));
+
+        assertThat(accessTokenService.load(clientToken.getToken())).isNull();
+        assertThat(accessTokenService.loadAll("admin")).extracting(AccessToken::getName).containsExactlyInAnyOrder("other client", "personal");
+    }
+
+    @Test
     public void testCreateWithOddTTL() {
         final String username = "admin";
         final String tokenname = "web";
