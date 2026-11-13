@@ -27,6 +27,7 @@ import {
   StoryContainer,
   Token,
 } from './shared';
+import { dividerColor } from './lumaTokens';
 
 // ─── Font Families ─────────────────────────────────────────────────────────
 type FamilyEntry = {
@@ -282,7 +283,7 @@ const Swatch = styled.div<{ $color: string; $labelColor: string }>`
   height: 64px;
   border-radius: 6px;
   background-color: ${({ $color }) => $color};
-  border: 1px solid rgba(128, 128, 128, 0.25);
+  border: 1px solid ${({ theme }) => dividerColor(theme)};
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;
