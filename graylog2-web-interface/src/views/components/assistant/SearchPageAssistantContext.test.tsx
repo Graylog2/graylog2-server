@@ -47,10 +47,13 @@ import TextWidget from 'views/logic/widgets/TextWidget';
 import EventsWidget from 'views/logic/widgets/events/EventsWidget';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import type { FocusContextState } from 'views/components/contexts/WidgetFocusContext';
+import Store from 'logic/local-storage/Store';
 
 import SearchPageAssistantContext from './SearchPageAssistantContext';
 
 jest.mock('routing/useLocation', () => () => ({ pathname: '/search' }));
+const mockHistory = { push: jest.fn() };
+jest.mock('routing/useHistory', () => () => mockHistory);
 jest.mock('views/stores/useViewsSelector');
 jest.mock('views/stores/useViewsDispatch');
 jest.mock('views/logic/slices/widgetActions', () => ({ addWidget: jest.fn(() => 'addWidget') }));
@@ -283,6 +286,46 @@ describe('SearchPageAssistantContext', () => {
     expect(widget.query).toEqual({ type: 'elasticsearch', query_string: 'action:login_failed' });
     expect(widget.config.visualization).toBe('bar');
     expect(updatedViewState().titles.getIn(['widget', 'w1'])).toBe('Logins per host');
+  });
+
+  describe('create_event_definition', () => {
+    afterEach(() => {
+      window.localStorage.clear();
+    });
+
+    it('opens the event definition form in the app, filled in with the definition and its condition', () => {
+      const result = renderTools()().create_event_definition({
+        title: 'Many failed logins',
+        description: 'Brute force attempts',
+        priority: 3,
+        query: 'action:login_failed',
+        streams: ['s1'],
+        search_within_ms: 600000,
+        execute_every_ms: 60000,
+        condition: { function: 'count', field: '', operator: '>=', threshold: 10, group_by: ['source'] },
+      });
+
+      const [url] = mockHistory.push.mock.calls[0] as [string];
+      const [, path, step, sessionId] = url.match(/^(.*)\?step=([^&]+)&session-id=(.+)$/);
+
+      expect(path).toBe('/alerts/definitions/new');
+      expect(step).toBe('event-details');
+      expect(Store.get(sessionId)).toEqual({
+        type: 'aggregation-v1',
+        title: 'Many failed logins',
+        description: 'Brute force attempts',
+        priority: 3,
+        query: 'action:login_failed',
+        streams: ['s1'],
+        search_within_ms: 600000,
+        execute_every_ms: 60000,
+        agg_function: 'count',
+        agg_operator: '>=',
+        agg_value: 10,
+        group_by: ['source'],
+      });
+      expect(result).toEqual({ summary: 'Opened the form for event definition "Many failed logins"' });
+    });
   });
 
   it('refuses to change a widget that is not on the shown tab', async () => {
