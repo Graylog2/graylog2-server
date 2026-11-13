@@ -1,4 +1,4 @@
 type = "f"
-message = "Fix replay search page loading forever when the event does not exist."
+message = "Return 404 instead of 204 from `GET /api/events/{event_id}` for a missing event, so the replay search page shows the not found page instead of loading forever."
 
 pulls = ["28218"]
