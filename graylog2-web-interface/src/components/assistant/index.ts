@@ -27,6 +27,7 @@ export type {
   PageContext,
   Panel,
   PageToolHandler,
+  PageToolLink,
   PageToolResult,
   PageTools,
   SearchPage,
