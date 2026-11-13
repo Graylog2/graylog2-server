@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.modelcontextprotocol.spec.McpSchema;
 import jakarta.inject.Inject;
 import org.graylog.grn.GRNType;
-import org.graylog.grn.GRNTypes;
 import org.graylog.mcp.server.ResourceProvider;
 import org.graylog.mcp.server.SchemaGeneratorProvider;
 import org.graylog.mcp.server.Tool;
@@ -32,6 +31,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -52,9 +52,12 @@ public class ListResourceTool extends Tool<ListResourceTool.Parameters, ListReso
                 NAME,
                 f("List %s Resources", customizationConfig.productName()),
                 """
-                        List all Resources available in %1$s for one resource type out of the following: {stream,dashboard,event_definition}.
+                        List all Resources available in %1$s for one resource type out of the following: {%2$s}.
                         Returns: A list of tuples with both the GRN and name of each resource.
-                        """.formatted(customizationConfig.productName()));
+                        """.formatted(customizationConfig.productName(), resourceProviders.keySet().stream()
+                        .map(GRNType::type)
+                        .sorted()
+                        .collect(Collectors.joining(","))));
         this.resourceProviders = resourceProviders;
     }
 
@@ -65,16 +68,21 @@ public class ListResourceTool extends Tool<ListResourceTool.Parameters, ListReso
 
     @Override
     public ListResourceTool.Result apply(PermissionHelper permissionHelper, ListResourceTool.Parameters parameters) {
-        GRNType grnType = switch (parameters.type.toLowerCase(Locale.US).replace(' ', '_')) {
-            case "streams", "stream" -> GRNTypes.STREAM;
-            case "dashboards", "dashboard" -> GRNTypes.DASHBOARD;
-            case "event_definitions", "event_definition", "eventdefinitions", "eventdefinition" ->
-                    GRNTypes.EVENT_DEFINITION;
-            default -> throw new IllegalArgumentException("Unsupported type " + parameters.type);
-        };
+        final String requested = parameters.type.toLowerCase(Locale.US).replace(' ', '_');
+        final GRNType grnType = resourceProviders.keySet().stream()
+                .filter(type -> names(type).contains(requested))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(f("Unsupported type %s", parameters.type)));
 
         List<McpSchema.Resource> resources = this.resourceProviders.get(grnType).list(permissionHelper);
         return new Result(resources);
+    }
+
+    // Accepts plurals and names without underscores, e.g. "event_definitions" or "eventdefinition".
+    private static Set<String> names(GRNType type) {
+        final String name = type.type();
+        final String joined = name.replace("_", "");
+        return Set.copyOf(List.of(name, name + "s", joined, joined + "s"));
     }
 
     public record Result(@JsonProperty("resources") List<McpSchema.Resource> resources) {}
