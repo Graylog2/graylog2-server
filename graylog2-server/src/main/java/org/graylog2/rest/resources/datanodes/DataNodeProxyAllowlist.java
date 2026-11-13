@@ -75,6 +75,15 @@ public class DataNodeProxyAllowlist {
     }
 
     /**
+     * Checks whether the request's path is the given prefix itself or lies below it. Matching is done on whole
+     * path segments, so the prefix "_cat" matches "_cat" and "_cat/indices", but not "_catalog/_search".
+     */
+    public static boolean hasPathPrefix(ProxyRequestAdapter.ProxyRequest request, String prefix) {
+        final String path = request.path();
+        return path != null && (path.equals(prefix) || path.startsWith(prefix + "/"));
+    }
+
+    /**
      * Resolves "." and ".." segments in the given path. {@code unixSeparator} is forced to {@code true} so
      * behavior doesn't depend on the platform the server runs on.
      *

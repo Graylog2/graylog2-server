@@ -78,7 +78,7 @@ class DataNodeApiProxyResourceTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"_cat/indices", "_cat/nodes"})
+    @ValueSource(strings = {"_cat", "_cat/indices", "_cat/nodes"})
     void allowlistPermitsCatPaths(String path) throws IOException {
         final var adapter = new RecordingAdapter(OK_RESPONSE);
         assertThat(resource(adapter, true).requestGet(path, "myhost", requestContext).getStatus()).isEqualTo(200);
@@ -98,6 +98,15 @@ class DataNodeApiProxyResourceTest {
     void allowlistBlocksArbitraryPath() throws IOException {
         final var adapter = new RecordingAdapter(null);
         final Response response = resource(adapter, true).requestGet("_nodes/stats", "myhost", requestContext);
+        assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
+        assertThat(adapter.lastRequest).isNull();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"_clusterfoo", "_catalog/_search", "_cat-index/_doc/1", "_cluster_secrets/_search", "_mappingx/myindex"})
+    void allowlistBlocksPathsSharingOnlyCharactersWithAllowedPrefix(String path) throws IOException {
+        final var adapter = new RecordingAdapter(null);
+        final Response response = resource(adapter, true).requestGet(path, "myhost", requestContext);
         assertThat(response.getStatus()).isEqualTo(Response.Status.BAD_REQUEST.getStatusCode());
         assertThat(adapter.lastRequest).isNull();
     }
