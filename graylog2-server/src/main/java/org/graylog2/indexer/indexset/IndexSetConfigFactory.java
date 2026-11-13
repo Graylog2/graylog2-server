@@ -56,8 +56,6 @@ public class IndexSetConfigFactory {
                 .indexOptimizationDisabled(defaultConfig.indexOptimizationDisabled())
                 .indexOptimizationMaxNumSegments(defaultConfig.indexOptimizationMaxNumSegments())
                 .fieldTypeRefreshInterval(defaultConfig.fieldTypeRefreshInterval())
-                .fieldLimit(defaultConfig.fieldLimit())
-                .dynamicMappingDisabled(defaultConfig.dynamicMappingDisabled())
                 .rotationStrategyClass(defaultConfig.rotationStrategyClass())
                 .rotationStrategyConfig(defaultConfig.rotationStrategyConfig())
                 .retentionStrategyClass(defaultConfig.retentionStrategyClass())
