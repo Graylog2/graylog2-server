@@ -16,17 +16,12 @@
  */
 package org.graylog2.decorators;
 
-import com.floreysoft.jmte.DefaultModelAdaptor;
-import com.floreysoft.jmte.TemplateContext;
-import com.floreysoft.jmte.token.Token;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,12 +32,12 @@ import java.util.Map;
  * so the {@code date} named renderer can format them, and additionally as epoch milliseconds.
  * <p>
  * To avoid collisions with message fields, the time range is stored in the template model under {@value #MODEL_KEY},
- * which is not a valid message field name, and {@link ModelAdaptor} redirects dotted {@code search.*} lookups to it.
+ * which is not a valid message field name, and {@link TimeRangeModelAdaptor} redirects dotted {@code search.*} lookups to it.
  * A bare {@code ${search}} still resolves to a message field with that name.
  */
 public final class TimeRangeTemplateContext {
-    private static final String TEMPLATE_KEY = "search";
-    private static final String MODEL_KEY = "#search";
+    static final String TEMPLATE_KEY = "search";
+    static final String MODEL_KEY = "#search";
 
     private static final String FROM = "from";
     private static final String TO = "to";
@@ -67,7 +62,7 @@ public final class TimeRangeTemplateContext {
     }
 
     /**
-     * Builds the template model for a single message. Requires an engine using {@link ModelAdaptor}.
+     * Builds the template model for a single message. Requires an engine using {@link TimeRangeModelAdaptor}.
      */
     public Map<String, Object> model(Map<String, Object> messageFields) {
         final Map<String, Object> model = new HashMap<>(messageFields);
@@ -81,21 +76,5 @@ public final class TimeRangeTemplateContext {
      */
     public static boolean isContextVariable(String variableName) {
         return variableName.startsWith(TEMPLATE_KEY + ".");
-    }
-
-    /**
-     * Resolves {@code search.*} variables from the time range stored under {@value #MODEL_KEY} instead of
-     * from a message field named {@value #TEMPLATE_KEY}.
-     */
-    static class ModelAdaptor extends DefaultModelAdaptor {
-        @Override
-        public Object getValue(TemplateContext context, Token token, List<String> segments, String expression) {
-            if (segments.size() > 1 && TEMPLATE_KEY.equals(segments.getFirst())) {
-                final List<String> redirected = new ArrayList<>(segments);
-                redirected.set(0, MODEL_KEY);
-                return super.getValue(context, token, redirected, expression);
-            }
-            return super.getValue(context, token, segments, expression);
-        }
     }
 }

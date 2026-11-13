@@ -37,7 +37,7 @@ public class DecoratorTemplateEngineProvider implements Provider<Engine> {
     public DecoratorTemplateEngineProvider() {
         engine = Engine.createEngine();
         engine.registerNamedRenderer(new NamedDateRenderer());
-        engine.setModelAdaptor(new TimeRangeTemplateContext.ModelAdaptor());
+        engine.setModelAdaptor(new TimeRangeModelAdaptor());
     }
 
     @Override
