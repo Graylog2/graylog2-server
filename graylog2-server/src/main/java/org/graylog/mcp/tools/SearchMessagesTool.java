@@ -34,7 +34,6 @@ import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryFailedExc
 import org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.web.customization.CustomizationConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,7 +88,7 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
                     parameters.query(),
                     parameters.streams(),
                     parameters.streamCategories(),
-                    RelativeRange.create(parameters.rangeSeconds()),
+                    McpTimeRanges.timerange(parameters.rangeSeconds(), parameters.from(), parameters.to()),
                     null,
                     null,
                     parameters.offset(),
