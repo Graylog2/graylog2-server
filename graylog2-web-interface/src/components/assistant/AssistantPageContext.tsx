@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useContext, useEffect, useId, useState, useSyncExternalStore } from 'react';
+import { useContext, useEffect, useId, useState, useSyncExternalStore } from 'react';
 
 import useLocation from 'routing/useLocation';
 import { singleton } from 'logic/singleton';
-import { currentPathnameWithoutPrefix, stripPrefixFromPathname } from 'util/URLUtils';
+import { stripPrefixFromPathname } from 'util/URLUtils';
 
 import type { Page, PageContext, PageTools, Panel } from './types';
 
@@ -136,26 +136,22 @@ export const useAssistantPanelContext = (panel: Panel | undefined) =>
 export const useAssistantPageTools = (pageTools: PageTools | undefined) =>
   usePublish(useContext(AssistantPageContext)?.setTools, pageTools);
 
+const useStore = () => {
+  const context = useContext(AssistantPageContext);
+
+  if (!context) {
+    throw new Error('Assistant page hooks must be used within an AssistantPageContextProvider');
+  }
+
+  return context;
+};
+
 // For the Assistant's chat: what the page shows, and its tools, at the time of the call.
 export const useAssistantPageSnapshot = () => {
-  const context = useContext(AssistantPageContext);
-  const getSnapshot = useCallback(
-    (): PageContext =>
-      context?.getSnapshot() ?? {
-        version: 1,
-        route: currentPathnameWithoutPrefix(),
-        title: document.title,
-        page: { type: 'generic' },
-        panels: [],
-      },
-    [context],
-  );
-  const getTools = useCallback((): PageTools => context?.getTools() ?? {}, [context]);
+  const { getSnapshot, getTools } = useStore();
 
   return { getSnapshot, getTools };
 };
-
-const emptySubscription = () => () => {};
 
 /**
  * Follows the current page: re-renders when what `select` returns changes, e.g. after moving to another page, once it
@@ -164,8 +160,7 @@ const emptySubscription = () => () => {};
 export const useAssistantPageSelector = <T extends string | number | boolean | undefined>(
   select: (page: PageContext) => T,
 ) => {
-  const context = useContext(AssistantPageContext);
-  const { getSnapshot } = useAssistantPageSnapshot();
+  const { subscribe, getSnapshot } = useStore();
 
-  return useSyncExternalStore(context?.subscribe ?? emptySubscription, () => select(getSnapshot()));
+  return useSyncExternalStore(subscribe, () => select(getSnapshot()));
 };
