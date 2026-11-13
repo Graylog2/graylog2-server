@@ -19,7 +19,9 @@ import { create } from 'storybook/theming';
 import SawmillMantine from 'theme/sawmill/mantine/Sawmill';
 import SawmillSC from 'theme/sawmill/styled-components/Sawmill';
 
-import graylogLogo from '../graylog-logo.png';
+import { UI_ICON_COLORS } from './storybookUi';
+
+import graylogLogoSvg from '../graylog-logo.svg?raw';
 
 // Mirrors the pure function calls inside useThemes, without the React hook wrappers.
 
@@ -27,17 +29,25 @@ const baseConfiguration = {
   brandTitle: 'Graylog Design System',
   brandUrl: 'https://graylog.org/',
   brandTarget: '_block',
-  brandImage: graylogLogo,
 
   appBorderRadius: 4,
   inputBorderRadius: 2,
+};
+
+// The logo is recolored with the Luma icon color for each mode (every filled shape in the SVG).
+const logoFor = (colorScheme: 'light' | 'dark') => {
+  const svg = graylogLogoSvg.replace(/fill="(?!none)[^"]*"/g, `fill="${UI_ICON_COLORS[colorScheme]}"`);
+
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 };
 
 const colorsConfiguration = (colorScheme: 'light' | 'dark') => {
   const { colors, fonts } = SawmillSC(SawmillMantine({ colorScheme }));
 
   return {
-    appBg: colors.global.contentBackground,
+    brandImage: logoFor(colorScheme),
+    // Sidebar and toolbar use the page background; content areas stay on the content background.
+    appBg: colors.global.background,
     appContentBg: colors.global.contentBackground,
     appPreviewBg: colors.global.contentBackground,
     appBorderColor: colors.misc.divider,
@@ -48,7 +58,7 @@ const colorsConfiguration = (colorScheme: 'light' | 'dark') => {
     fontBase: fonts.family.body,
     fontCode: fonts.family.monospace,
 
-    barBg: colors.global.contentBackground,
+    barBg: colors.global.background,
     barTextColor: colors.text.primary,
 
     inputBg: colors.input.background,
