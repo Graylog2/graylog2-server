@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix unnecessary function descriptor lookups during pipeline rule evaluation."
+
+pulls = ["27764"]

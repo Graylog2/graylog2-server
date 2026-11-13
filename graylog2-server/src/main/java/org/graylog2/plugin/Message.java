@@ -656,7 +656,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         final String trimmedKey = key.trim();
 
         // Don't accept protected keys. (some are allowed though lol)
-        if ((RESERVED_FIELDS.contains(trimmedKey) && !RESERVED_SETTABLE_FIELDS.contains(trimmedKey)) || !validKey(trimmedKey)) {
+        if (isReservedNonSettableField(trimmedKey) || !validKey(trimmedKey)) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Ignoring invalid or reserved key {} for message {}", trimmedKey, getId());
             } else {
@@ -767,6 +767,29 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         return accounted;
     }
 
+    /**
+     * Checks whether the given field name denotes an internal field, i.e. Graylog metadata (fields starting with
+     * {@link #INTERNAL_FIELD_PREFIX}) or the message ID ({@link #FIELD_ID}). Internal fields are not meant to be
+     * presented to or processed as user data.
+     * <p>
+     * Note: this differs from the fields excluded from the message size accounting, which use an explicit list.
+     *
+     * @param name the field name
+     * @return {@code true} if the field is internal
+     */
+    public static boolean isInternalField(final String name) {
+        return (name != null && name.startsWith(INTERNAL_FIELD_PREFIX)) || FIELD_ID.equals(name);
+    }
+
+    /**
+     * @param name the field name
+     * @return {@code true} if the field is reserved and must not be set from outside (e.g. by inputs, extractors or
+     * static fields)
+     */
+    public static boolean isReservedNonSettableField(final String name) {
+        return RESERVED_FIELDS.contains(name) && !RESERVED_SETTABLE_FIELDS.contains(name);
+    }
+
     public static boolean validKey(final String key) {
         return VALID_KEY_CHAR_MATCHER.matchesAllOf(key);
     }
@@ -856,13 +879,17 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     }
 
     /**
-     * Assign the given stream to this message.
+     * Assign the given stream to this message. An already assigned instance of the same stream is replaced.
      *
      * @param stream the stream to route this message into
      */
     public void addStream(Stream stream) {
+        final boolean replaced = streams.removeIf(s -> s != stream && isSameStream(s, stream));
+        if (replaced) {
+            rebuildIndexSets();
+        }
         indexSets.add(stream.getIndexSet());
-        if (streams.add(stream)) {
+        if (streams.add(stream) && !replaced) {
             sizeCounter.inc(8);
             if (LOG.isTraceEnabled()) {
                 LOG.trace("[Message size update][{}] stream added: {}", getId(), sizeCounter.getCount());
@@ -888,13 +915,10 @@ public class Message implements Messages, Indexable, Acknowledgeable {
      * @return <tt>true</tt> if this message was assigned to the stream
      */
     public boolean removeStream(Stream stream) {
-        final boolean removed = streams.remove(stream);
+        final boolean removed = streams.removeIf(s -> isSameStream(s, stream));
 
         if (removed) {
-            indexSets.clear();
-            for (Stream s : streams) {
-                indexSets.add(s.getIndexSet());
-            }
+            rebuildIndexSets();
             sizeCounter.dec(8);
             if (LOG.isTraceEnabled()) {
                 LOG.trace("[Message size update][{}] stream removed: {}", getId(), sizeCounter.getCount());
@@ -902,6 +926,19 @@ public class Message implements Messages, Indexable, Acknowledgeable {
         }
 
         return removed;
+    }
+
+    // Stream instances from different caches can differ in value (e.g. index set config) while representing the same stream.
+    private static boolean isSameStream(Stream a, Stream b) {
+        final String id = a.getId();
+        return id != null ? id.equals(b.getId()) : a.equals(b);
+    }
+
+    private void rebuildIndexSets() {
+        indexSets.clear();
+        for (Stream s : streams) {
+            indexSets.add(s.getIndexSet());
+        }
     }
 
     /**

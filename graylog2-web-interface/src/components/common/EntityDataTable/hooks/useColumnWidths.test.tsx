@@ -16,6 +16,8 @@
  */
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 
+import { DEFAULT_COL_WIDTH } from 'components/common/EntityDataTable/Constants';
+
 import useColumnWidths from './useColumnWidths';
 
 describe('useColumnWidths hook test', () => {
@@ -25,63 +27,75 @@ describe('useColumnWidths hook test', () => {
     columnWidthPreferences: undefined,
     scrollContainerWidth: 600,
     headerMinWidths: { title: 100, description: 110 },
-    columnSchemas: [
-      { id: 'title', title: 'Title' },
-      { id: 'description', title: 'Description' },
-    ],
+    columnIds: ['title', 'description'],
   };
 
-  it('should calculate width for columns with flexible width', async () => {
+  it('should use static widths and fill the remaining width with the actions column', async () => {
     const columnRenderersByAttribute = {
-      title: { width: 1 },
-      description: { width: 2 },
+      title: { staticWidth: 300 },
+      description: { staticWidth: 200 },
     };
-    const columnIds = ['title', 'description'];
 
     const { result } = renderHook(() =>
       useColumnWidths({
         ...defaultProps,
         columnRenderersByAttribute,
-        columnIds,
       }),
     );
 
     expect(result.current).toEqual({
-      actions: 0,
-      description: 399,
-      title: 199,
+      actions: 99,
+      description: 200,
+      title: 300,
     });
   });
 
-  it('should use default width for columns without column renderers', async () => {
+  it('should use default width for columns without static width', async () => {
     const columnRenderersByAttribute = {
-      title: {
-        width: 1,
-      },
+      title: { staticWidth: 300 },
     };
-    const columnIds = ['title', 'description'];
+
+    const { result } = renderHook(() =>
+      useColumnWidths({
+        ...defaultProps,
+        scrollContainerWidth: 1000,
+        columnRenderersByAttribute,
+      }),
+    );
+
+    expect(result.current).toEqual({
+      actions: 499,
+      description: DEFAULT_COL_WIDTH,
+      title: 300,
+    });
+  });
+
+  it('should prefer column width preferences over static widths', async () => {
+    const columnRenderersByAttribute = {
+      title: { staticWidth: 300 },
+      description: { staticWidth: 200 },
+    };
 
     const { result } = renderHook(() =>
       useColumnWidths({
         ...defaultProps,
         columnRenderersByAttribute,
-        columnIds,
+        columnWidthPreferences: { title: 250 },
       }),
     );
 
     expect(result.current).toEqual({
-      actions: 0,
-      description: 299,
-      title: 299,
+      actions: 149,
+      description: 200,
+      title: 250,
     });
   });
 
-  it('should consider width of bulk select and actions col', async () => {
+  it('should keep column widths and use actions column min width when there is no remaining width', async () => {
     const columnRenderersByAttribute = {
-      title: { width: 1 },
-      description: { width: 2 },
+      title: { staticWidth: 300 },
+      description: { staticWidth: 300 },
     };
-    const columnIds = ['title', 'description'];
 
     const { result } = renderHook(() =>
       useColumnWidths({
@@ -89,65 +103,56 @@ describe('useColumnWidths hook test', () => {
         actionsColMinWidth: 110,
         bulkSelectColWidth: 20,
         columnRenderersByAttribute,
-        columnIds,
       }),
     );
 
     expect(result.current).toEqual({
       actions: 110,
       'bulk-select': 20,
-      description: 312,
-      title: 156,
-    });
-  });
-
-  it('should use actions column to fill remaining width when all columns are static', async () => {
-    const columnRenderersByAttribute = {
-      title: { staticWidth: 200 },
-      description: { staticWidth: 200 },
-    };
-    const columnIds = ['title', 'description'];
-
-    const { result } = renderHook(() =>
-      useColumnWidths({
-        ...defaultProps,
-        columnRenderersByAttribute,
-        columnIds,
-      }),
-    );
-
-    expect(result.current).toEqual({
-      actions: 199,
-      description: 200,
-      title: 200,
+      description: 300,
+      title: 300,
     });
   });
 
   it('should consider header min widths', async () => {
     const columnRenderersByAttribute = {
-      title: { width: 1 },
+      title: { staticWidth: 'matchHeader' as const },
       description: { staticWidth: 100 },
     };
-    const headerMinWidths = { description: 150 };
-    const columnIds = ['title', 'description'];
 
     const { result } = renderHook(() =>
       useColumnWidths({
         ...defaultProps,
-        scrollContainerWidth: 1500,
-        actionsColMinWidth: 110,
-        bulkSelectColWidth: 20,
         columnRenderersByAttribute,
-        columnIds,
-        headerMinWidths,
+        headerMinWidths: { title: 120, description: 150 },
       }),
     );
 
     expect(result.current).toEqual({
-      actions: 110,
-      'bulk-select': 20,
+      actions: 329,
       description: 150,
-      title: 1219,
+      title: 120,
+    });
+  });
+
+  it('should use default width for columns matching the header width until the header has been measured', async () => {
+    const columnRenderersByAttribute = {
+      title: { staticWidth: 'matchHeader' as const },
+      description: { staticWidth: 100 },
+    };
+
+    const { result } = renderHook(() =>
+      useColumnWidths({
+        ...defaultProps,
+        columnRenderersByAttribute,
+        headerMinWidths: {},
+      }),
+    );
+
+    expect(result.current).toEqual({
+      actions: 299,
+      description: 100,
+      title: DEFAULT_COL_WIDTH,
     });
   });
 });

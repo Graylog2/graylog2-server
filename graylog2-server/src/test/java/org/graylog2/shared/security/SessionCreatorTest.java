@@ -240,6 +240,43 @@ public class SessionCreatorTest {
         assertThat(session.get().getAttribute(AUTH_CONTEXT_SESSION_KEY)).isEqualTo(expectedAuthContext);
     }
 
+    /**
+     * When a realm emits a {@link SessionAuthContext}, the session is created during login. It must still carry the
+     * client host passed to {@link SessionCreator#login}, even if the token itself has no host (e.g. SSO bearer tokens).
+     */
+    @Test
+    public void loginWithSessionAuthContextKeepsClientHost() {
+        setUpUserMock();
+
+        securityManager.setRealms(ImmutableList.of(new AuthContextEmittingRealm(validToken, new TestSessionAuthContext("v"))));
+
+        final Optional<Session> session = sessionCreator.login("192.0.2.1", validToken);
+
+        assertThat(session).isPresent();
+        assertThat(session.get().getHost()).isEqualTo("192.0.2.1");
+        verify(auditEventSender).success(eq(AuditActor.user("username")), anyString(),
+                argThat(map -> "192.0.2.1".equals(map.get("remote_address"))));
+    }
+
+    /**
+     * The existing subject's host is only a fallback. A host carried by the token must take precedence.
+     */
+    @Test
+    public void loginWithSessionAuthContextPrefersTokenHost() {
+        setUpUserMock();
+
+        final var tokenWithHost = new ActorAwareUsernamePasswordToken("username", "password");
+        tokenWithHost.setHost("198.51.100.7");
+        securityManager.setRealms(ImmutableList.of(new AuthContextEmittingRealm(tokenWithHost, new TestSessionAuthContext("v"))));
+
+        final Optional<Session> session = sessionCreator.login("192.0.2.1", tokenWithHost);
+
+        assertThat(session).isPresent();
+        assertThat(session.get().getHost()).isEqualTo("198.51.100.7");
+        verify(auditEventSender).success(eq(AuditActor.user("username")), anyString(),
+                argThat(map -> "198.51.100.7".equals(map.get("remote_address"))));
+    }
+
     private record TestSessionAuthContext(String value) implements SessionAuthContext {
         @Override
         public String type() {

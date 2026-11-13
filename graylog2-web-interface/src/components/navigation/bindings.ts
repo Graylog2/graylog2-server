@@ -26,6 +26,7 @@ import DocsHelper from 'util/DocsHelper';
 export const SYSTEM_DROPDOWN_TITLE = 'System';
 export const SEARCH_LINK_TITLE = 'Search';
 export const DASHBOARDS_LINK_TITLE = 'Dashboards';
+export const AUTHENTICATION_LINK_TITLE = 'Authentication';
 
 const navigationBindings: PluginExports = {
   navigation: [
@@ -76,7 +77,7 @@ const navigationBindings: PluginExports = {
             { path: Routes.SYSTEM.AUTHZROLES.OVERVIEW, description: 'Roles', permissions: ['roles:read'] },
             {
               path: Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE,
-              description: 'Authentication',
+              description: AUTHENTICATION_LINK_TITLE,
               permissions: ['authentication:edit'],
             },
             { path: Routes.SYSTEM.CONTENTPACKS.LIST, description: 'Content Packs', permissions: ['contentpack:read'] },

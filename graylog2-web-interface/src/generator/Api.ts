@@ -17,24 +17,33 @@
 interface ArrayType {
   type: 'array';
   items: Type;
+  optional?: boolean;
 }
 export interface EnumType {
   type: 'enum';
   name: 'string' | 'number' | 'boolean' | 'unknown';
   options: Array<unknown>;
   defaultValue?: unknown;
+  optional?: boolean;
 }
 export interface TypeLiteral {
   type: 'type_literal';
   properties: Record<string, Type>;
   additionalProperties?: Type;
+  optional?: boolean;
 }
 interface TypeReference {
   type: 'type_reference';
   name: string;
   optional: boolean;
 }
-export type Type = ArrayType | TypeLiteral | TypeReference | EnumType;
+// A polymorphic type: one of its subtypes, told apart by a discriminator property.
+export interface UnionType {
+  type: 'union';
+  options: Array<Type>;
+  optional?: boolean;
+}
+export type Type = ArrayType | TypeLiteral | TypeReference | EnumType | UnionType;
 
 export type Model = Type & {
   id: string;
@@ -44,7 +53,7 @@ export interface Parameter {
   name: string;
   description: string;
   required: boolean;
-  paramType: 'path' | 'query' | 'body' | 'formdata';
+  paramType: 'path' | 'query' | 'body' | 'formdata' | 'header';
   type: Type;
   defaultValue?: string;
 }

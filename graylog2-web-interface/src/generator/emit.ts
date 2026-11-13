@@ -208,6 +208,7 @@ const emitBlock = (
   queryParameter: Parameter[],
   rawProduces: string[],
   formDataParameters: Parameter[],
+  headerParameters: Parameter[],
 ) => {
   const produces = rawProduces || [];
   const queryParameters = ts.factory.createObjectLiteralExpression(
@@ -247,6 +248,9 @@ const emitBlock = (
           produces.map((contentType) => emitString(contentType)),
           produces.length > 1,
         ),
+      ),
+      ...headerParameters.map((h) =>
+        ts.factory.createPropertyAssignment(emitString(h.name), ts.factory.createIdentifier(cleanVariableName(h.name))),
       ),
     ],
     true,
@@ -331,6 +335,7 @@ type TypeResult =
   | ReturnType<typeof emitEnumType>
   | ReturnType<typeof emitTypeLiteral>
   | ReturnType<typeof ts.factory.createTypeReferenceNode>
+  | ReturnType<typeof ts.factory.createUnionTypeNode>
   | undefined;
 
 function emitType(type: Type): TypeResult {
@@ -343,6 +348,8 @@ function emitType(type: Type): TypeResult {
       return emitTypeLiteral(type);
     case 'type_reference':
       return ts.factory.createTypeReferenceNode(type.name);
+    case 'union':
+      return ts.factory.createUnionTypeNode(type.options.map(emitType));
     default:
       assertUnreachable(type, 'Unexpected type');
   }
@@ -394,6 +401,16 @@ const emitRoute = (
   const queryParameters = parameters.filter((parameter) => parameter.paramType === 'query');
   const bodyParameter = parameters.filter((parameter) => parameter.paramType === 'body');
   const formDataParameters = parameters.filter((parameter) => parameter.paramType === 'formdata');
+  const headerParameters = parameters.filter((parameter) => parameter.paramType === 'header');
+  const routePath = firstNonEmpty(operationPath, path) || '/';
+  const parameterNames = parameters.map(({ name }) => cleanVariableName(name));
+  const undeclaredPathVariables = (routePath.match(/{.+?}/g) ?? [])
+    .map(extractVariable)
+    .filter((variable) => !parameterNames.includes(variable));
+
+  if (undeclaredPathVariables.length > 0) {
+    throw new Error(`${method} ${routePath} (${nickname}) has no parameter for: ${undeclaredPathVariables.join(', ')}`);
+  }
 
   const jsDoc = ts.factory.createJSDocComment(
     summary,
@@ -430,14 +447,7 @@ const emitRoute = (
         undefined,
         [...parameters.sort(sortByOptionality).map(emitFunctionParameter), requestOptionsParameter],
         emitPromiseResultType(emitType(type)),
-        emitBlock(
-          method,
-          firstNonEmpty(operationPath, path) || '/',
-          bodyParameter[0],
-          queryParameters,
-          produces,
-          formDataParameters,
-        ),
+        emitBlock(method, routePath, bodyParameter[0], queryParameters, produces, formDataParameters, headerParameters),
       ),
     ],
   };
@@ -526,6 +536,8 @@ const referencedTypes = (type: Type): Array<string> => {
       return [];
     case 'array':
       return referencedTypes(type.items);
+    case 'union':
+      return type.options.flatMap(referencedTypes);
     default:
       assertUnreachable(type, 'Missing type.');
   }

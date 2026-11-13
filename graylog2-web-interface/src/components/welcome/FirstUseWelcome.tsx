@@ -87,10 +87,10 @@ type Resource = {
   iconName: IconName;
 };
 
-const resources: Resource[] = [
+const buildResources = (productName: string): Resource[] => [
   {
     title: 'Collector Documentation',
-    description: 'Information on how to install and use Graylog Collectors.',
+    description: `Information on how to install and use ${productName} Collectors.`,
     link: DocsHelper.PAGES.COLLECTORS,
     iconName: 'menu_book',
   },
@@ -258,7 +258,7 @@ const FirstUseWelcome = () => {
           <SecondaryHeadline>Resources</SecondaryHeadline>
 
           <Container>
-            {resources.map((resource) => (
+            {buildResources(productName).map((resource) => (
               <ResourceTile className="content" key={resource.title}>
                 <StyledResourceCol>
                   <ResourceTileContent>

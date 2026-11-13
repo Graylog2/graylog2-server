@@ -111,6 +111,24 @@ public class StreamServiceImplTest {
 
     @Test
     @MongoDBFixtures("someStreamsWithAlertConditions.json")
+    public void addToIndexSetAcceptsStreamsAlreadyInTheIndexSet() {
+        streamService.addToIndexSet("586bb9288e82bf5e2c9ab68d", List.of("565f02223b0c25a537197af2", "559d14663b0cf26a15ee0f01"));
+        assertThat(streamService.countByIndexSet(List.of("586bb9288e82bf5e2c9ab68d"))).containsOnly(Map.entry("586bb9288e82bf5e2c9ab68d", 2L));
+
+        streamService.addToIndexSet("686bb9288e82bf5e2c9ab68d", List.of("565f02223b0c25a537197af2"));
+        streamService.addToIndexSet("686bb9288e82bf5e2c9ab68d", List.of("565f02223b0c25a537197af2", "559d14663b0cf26a15ee0f01"));
+        assertThat(streamService.countByIndexSet(List.of("686bb9288e82bf5e2c9ab68d"))).containsOnly(Map.entry("686bb9288e82bf5e2c9ab68d", 2L));
+    }
+
+    @Test
+    @MongoDBFixtures("someStreamsWithAlertConditions.json")
+    public void addToIndexSetFailsForUnknownStreams() {
+        assertThatThrownBy(() -> streamService.addToIndexSet("686bb9288e82bf5e2c9ab68d", List.of("565f02223b0c25a537197af2", "565f02223b0c25a5deadbeef")))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    @MongoDBFixtures("someStreamsWithAlertConditions.json")
     public void loadStreamTitles() {
         final var result = streamService.loadStreamTitles(Set.of("565f02223b0c25a537197af2", "559d14663b0cf26a15ee0f01"));
 

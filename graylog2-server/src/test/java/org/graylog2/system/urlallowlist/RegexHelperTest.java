@@ -37,6 +37,24 @@ public class RegexHelperTest {
     }
 
     @Test
+    public void createRegexForTemplateUrlWithLeadingAndTrailingPlaceholder() {
+        String url = "message_key/api/lookup/message_key";
+        String template = "${key}/api/lookup/${key}";
+        String expected = "^.*?\\Q/api/lookup/\\E.*?$";
+        String got = regexHelper.createRegexForUrlTemplate(template, "${key}");
+        assertThat(got).isEqualTo(expected);
+        Pattern compiled = Pattern.compile(got, Pattern.DOTALL);
+        assertThat(compiled.matcher(url).find()).isTrue();
+    }
+
+    @Test
+    public void createRegexForTemplateUrlWithEmptyPlaceholder() {
+        String template = "https://example.com/api/lookup";
+        String expected = "^\\Qhttps://example.com/api/lookup\\E$";
+        assertThat(regexHelper.createRegexForUrlTemplate(template, "")).isEqualTo(expected);
+    }
+
+    @Test
     public void create() {
         String url = "https://example.com/api/lookup";
         String expected = "^\\Qhttps://example.com/api/lookup\\E$";

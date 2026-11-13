@@ -58,9 +58,70 @@ describe('MarkdownLink', () => {
     expect(onClick).toHaveBeenCalledWith({ openSidebar });
   });
 
+  it('renders the title a resolver provides for a routed entity', () => {
+    asMock(usePluginEntities).mockImplementation((key) =>
+      key === 'markdown.entityLinkResolvers'
+        ? [
+            {
+              uriSegment: 'streams',
+              resolve: ([id]) => ({
+                grnType: 'stream',
+                id,
+                Title: ({ id: streamId }) => <>Title of {streamId}</>,
+              }),
+            },
+          ]
+        : [],
+    );
+
+    render(<MarkdownLink href="graylog:///streams/5f4dcc3b5aa765d61d8327de">5f4dcc3b5aa765d61d8327de</MarkdownLink>);
+
+    expect(screen.getByRole('link', { name: 'Title of 5f4dcc3b5aa765d61d8327de' })).toHaveAttribute(
+      'href',
+      expect.stringContaining('/streams/5f4dcc3b5aa765d61d8327de/search'),
+    );
+  });
+
+  it('lets a resolver render the link itself', () => {
+    asMock(usePluginEntities).mockImplementation((key) =>
+      key === 'markdown.entityLinkResolvers'
+        ? [
+            {
+              uriSegment: 'notebook-cells',
+              resolve: ([id]) => ({
+                id,
+                Link: ({ id: cellId, children }) => (
+                  <button type="button" title={`Go to ${cellId}`}>
+                    {children}
+                  </button>
+                ),
+              }),
+            },
+          ]
+        : [],
+    );
+
+    render(<MarkdownLink href="graylog:///notebook-cells/cell-1">cell 3</MarkdownLink>);
+
+    expect(screen.getByRole('button', { name: 'Go to cell-1' })).toHaveTextContent('cell 3');
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+  });
+
   it('keeps the href for a link no resolver claims', () => {
     render(<MarkdownLink href="https://graylog.org">Docs</MarkdownLink>);
 
     expect(screen.getByRole('link', { name: /Docs/ })).toHaveAttribute('href', 'https://graylog.org');
+  });
+
+  it('renders a relative URL as internal link', () => {
+    render(<MarkdownLink href="/streams?foo=bar#baz">Streams</MarkdownLink>);
+
+    expect(screen.getByRole('link', { name: 'Streams' })).toHaveAttribute('href', '/streams?foo=bar#baz');
+  });
+
+  it('keeps links to other origins external', () => {
+    render(<MarkdownLink href="https://example.org/streams">Other</MarkdownLink>);
+
+    expect(screen.getByRole('link', { name: /Other/ })).toHaveAttribute('target', '_blank');
   });
 });

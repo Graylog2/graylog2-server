@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
@@ -44,12 +45,14 @@ class OpensearchKeystoreCommandLineIT {
 
         cli.keystore().add("s3.client.default.access_key", "foo");
         cli.keystore().add("s3.client.default.secret_key", "bar");
+        cli.keystore().addFile("gcs.client.default.credentials_file", "{\"type\": \"service_account\"}".getBytes(StandardCharsets.UTF_8));
 
         final List<String> response = cli.keystore().list();
         Assertions.assertThat(response)
-                .hasSize(3) // two keys and one internal seed
+                .hasSize(4) // three keys and one internal seed
                 .contains("s3.client.default.access_key")
-                .contains("s3.client.default.secret_key");
+                .contains("s3.client.default.secret_key")
+                .contains("gcs.client.default.credentials_file");
     }
 
     private OpensearchCli createCli(Path tempDir) throws URISyntaxException {

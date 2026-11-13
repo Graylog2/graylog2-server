@@ -23,6 +23,7 @@ import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.bson.types.ObjectId;
 import org.graylog.security.UserContext;
@@ -34,6 +35,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.rest.models.users.requests.ChangePasswordRequest;
 import org.graylog2.rest.models.users.requests.CreateUserRequest;
 import org.graylog2.rest.models.users.requests.DashboardStartPage;
 import org.graylog2.rest.models.users.requests.UpdateUserPreferences;
@@ -81,6 +83,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.shared.security.RestPermissions.ROLES_READ;
+import static org.graylog2.shared.security.RestPermissions.USERS_PASSWORDCHANGE;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENCREATE;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENREMOVE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -92,6 +95,7 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -540,6 +544,65 @@ public class UsersResourceTest {
         when(subject.isPermitted(USERS_TOKENREMOVE + ":" + urlUser)).thenReturn(hasPermission);
         when(accessTokenService.loadById(TOKEN_NAME)).thenReturn(accessToken);
         return accessToken;
+    }
+
+    @Test
+    void changingOwnPasswordTerminatesAllSessions() throws ValidationException {
+        final Session currentSession = sessionWithId("current");
+        final Session otherSession = sessionWithId("other");
+        preparePasswordChange();
+        when(userManagementService.isUserPassword(user, "oldPassword")).thenReturn(true);
+        when(subject.getPrincipal()).thenReturn("userId");
+        when(userService.loadById("userId")).thenReturn(user);
+        when(subject.getSession(false)).thenReturn(currentSession);
+        when(sessionTerminationService.getActiveSessionsForUser(user)).thenReturn(List.of(currentSession, otherSession));
+
+        usersResource.changePassword("userId", ChangePasswordRequest.create("oldPassword", PASSWORD));
+
+        verify(otherSession).stop();
+        verify(securityManager).logout(subject);
+    }
+
+    @Test
+    void passwordResetByAdminTerminatesAllSessionsOfTheUser() throws ValidationException {
+        final User admin = mock(User.class);
+        when(admin.getId()).thenReturn("adminId");
+        final Session firstSession = mock(Session.class);
+        final Session secondSession = mock(Session.class);
+        preparePasswordChange();
+        when(subject.isPermitted(USERS_PASSWORDCHANGE + ":*")).thenReturn(true);
+        when(subject.getPrincipal()).thenReturn("adminId");
+        when(userService.loadById("adminId")).thenReturn(admin);
+        when(subject.getSession(false)).thenReturn(mock(Session.class));
+        when(sessionTerminationService.getActiveSessionsForUser(user)).thenReturn(List.of(firstSession, secondSession));
+
+        usersResource.changePassword("userId", ChangePasswordRequest.create(null, PASSWORD));
+
+        verify(firstSession).stop();
+        verify(secondSession).stop();
+        verify(securityManager, never()).logout(subject);
+    }
+
+    @Test
+    void changingOwnPasswordRequiresOldPasswordEvenWithWildcardPermission() {
+        preparePasswordChange();
+        when(subject.isPermitted(USERS_PASSWORDCHANGE + ":*")).thenReturn(true);
+        when(subject.getPrincipal()).thenReturn("userId");
+
+        assertThrows(BadRequestException.class,
+                () -> usersResource.changePassword("userId", ChangePasswordRequest.create("wrongPassword", PASSWORD)));
+        verifyNoInteractions(sessionTerminationService);
+    }
+
+    private void preparePasswordChange() {
+        when(userManagementService.loadById("userId")).thenReturn(user);
+        when(subject.isPermitted(USERS_PASSWORDCHANGE + ":" + USERNAME)).thenReturn(true);
+    }
+
+    private static Session sessionWithId(String id) {
+        final Session session = mock(Session.class);
+        when(session.getId()).thenReturn(id);
+        return session;
     }
 
     @Test

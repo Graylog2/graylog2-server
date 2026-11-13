@@ -15,15 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useCallback, useMemo, useState } from 'react';
+import { useContext } from 'react';
 import styled, { css } from 'styled-components';
-import chunk from 'lodash/chunk';
 
-import ColorPicker from 'components/common/ColorPicker';
+import ChartLegend from 'components/common/ChartLegend';
+import type { ChartLegendItem } from 'components/common/ChartLegend';
 import Value from 'views/components/Value';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import ChartColorContext from 'views/components/visualizations/ChartColorContext';
-import Popover from 'components/common/Popover';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { colors as defaultColors } from 'views/components/visualizations/Colors';
 import { EVENT_COLOR, eventsDisplayName } from 'views/logic/searchtypes/events/EventHandler';
@@ -35,16 +34,6 @@ import { keySeparator, humanSeparator } from 'views/Constants';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import { useIsInteractiveMode } from 'views/components/contexts/InteractiveContext';
 import WidgetRenderingContext from 'views/components/widgets/WidgetRenderingContext';
-
-const ColorHint = styled.div(
-  ({ color }) => css`
-    cursor: pointer;
-    background-color: ${color} !important; /* Needed for report generation */
-    -webkit-print-color-adjust: exact !important; /* Needed for report generation */
-    width: 12px;
-    height: 12px;
-  `,
-);
 
 const FixedContainer = styled.div<{ $height: number; $width: number }>`
   display: grid;
@@ -63,44 +52,6 @@ const VariableContainer = styled.div<{ $height: number; $width: number }>(
     justify-content: center;
   `,
 );
-
-const LegendContainerBase = styled.div(
-  ({ theme }) => css`
-    padding: ${theme.spacings.xxs};
-  `,
-);
-
-const LegendContainer = styled(LegendContainerBase)`
-  max-height: 100px;
-  overflow: auto;
-`;
-
-const Legend = styled.div(
-  ({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-    gap: ${theme.spacings.xxs};
-    width: 100%;
-  `,
-);
-
-const LegendRow = styled.div(
-  ({ theme }) => css`
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: ${theme.spacings.xs};
-  `,
-);
-
-const LegendEntryContainer = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const ValueContainer = styled.div`
-  margin-left: 5px;
-  line-height: 1;
-`;
 
 type Props = {
   children: React.ReactNode;
@@ -130,118 +81,13 @@ const stringLenSort = (s1: string, s2: string) => {
 
 const columnPivotsToFields = (config: Props['config']) => config?.columnPivots?.flatMap((pivot) => pivot.fields) ?? [];
 
-type TableCellProps = {
-  value: string;
-  fieldTypes: FieldTypes;
-  labelFields: string[];
-};
-
-type LegendEntryProps = Pick<TableCellProps, 'value'> & {
-  labelsWithField: Array<{ label: string; field: string; type: FieldType }>;
-};
-
-const LegendEntry = ({ value, labelsWithField }: LegendEntryProps) => {
-  const { colors, setColor } = useContext(ChartColorContext);
-  const interactive = useIsInteractiveMode();
-  const mapKeys = useMapKeys();
-  const [showPopover, setShowPopover] = useState(false);
-  const defaultColor = value === eventsDisplayName ? EVENT_COLOR : undefined;
-  const val = labelsWithField.map(({ label, field, type }) =>
-    field ? <Value key={`${field}:${label}`} type={type} value={label} field={field} /> : label,
-  );
-  const humanLabel = Object.values(labelsWithField)
-    .map(({ label, field }) => mapKeys(label, field))
-    .join(humanSeparator);
-
-  const _onColorSelect = useCallback(
-    (color: string) => {
-      setColor(value, color);
-      setShowPopover(false);
-    },
-    [setColor, value],
-  );
-
-  const togglePopover = useMemo(() => (interactive ? () => setShowPopover((show) => !show) : () => {}), [interactive]);
-
-  return (
-    <LegendEntryContainer>
-      <Popover position="top" withArrow opened={showPopover}>
-        <Popover.Target>
-          <ColorHint aria-label="Color Hint" onClick={togglePopover} color={colors.get(value, defaultColor)} />
-        </Popover.Target>
-        <Popover.Dropdown title={`Configuration for ${humanLabel}`}>
-          <ColorPicker color={colors.get(value, defaultColor)} colors={defaultColors} onChange={_onColorSelect} />
-        </Popover.Dropdown>
-      </Popover>
-      <ValueContainer>{val}</ValueContainer>
-    </LegendEntryContainer>
-  );
-};
-
-const TableCell = ({ value, fieldTypes, labelFields }: TableCellProps) => {
-  const labelsWithField = value.split(keySeparator).map((label, idx) => {
+const labelsWithFields = (value: string, labelFields: Array<string>, fieldTypes: FieldTypes) =>
+  value.split(keySeparator).map((label, idx) => {
     const field = labelFields[idx];
-    const fieldType = fieldTypes?.currentQuery?.find((type) => type.name === field)?.type ?? FieldType.Unknown;
+    const type = fieldTypes?.currentQuery?.find((fieldType) => fieldType.name === field)?.type ?? FieldType.Unknown;
 
-    return { label, field, type: fieldType };
+    return { label, field, type };
   });
-
-  return (
-    <div key={value}>
-      <LegendEntry labelsWithField={labelsWithField} value={value} />
-    </div>
-  );
-};
-
-type LegendComponentProps = Pick<Props, 'config' | 'labelFields'> & {
-  fieldTypes: FieldTypes;
-  labels: Array<string>;
-};
-
-const InteractiveLegend = ({ config, fieldTypes, labelFields, labels }: LegendComponentProps) => {
-  const _labelFields = useMemo(() => labelFields(config), [config, labelFields]);
-  const tableCells = labels
-    .sort(stringLenSort)
-    .map((value) => <TableCell key={value} value={value} labelFields={_labelFields} fieldTypes={fieldTypes} />);
-
-  const result = chunk(tableCells, 5).map((cells, index) => (
-    // eslint-disable-next-line react/no-array-index-key
-    <LegendRow key={index}>{cells}</LegendRow>
-  ));
-
-  return (
-    <LegendContainer>
-      <Legend>{result}</Legend>
-    </LegendContainer>
-  );
-};
-
-const FlexLegendContainer = styled(LegendContainerBase)(
-  ({ theme }) => css`
-    display: flex;
-    gap: ${theme.spacings.xxs} ${theme.spacings.xs};
-    flex-wrap: wrap;
-  `,
-);
-
-const NoninteractiveLegend = ({ config, fieldTypes, labels, labelFields }: LegendComponentProps) => {
-  const _labelFields = useMemo(() => labelFields(config), [config, labelFields]);
-
-  return (
-    <FlexLegendContainer>
-      {labels.map((value) => {
-        const labelsWithField = value.split(keySeparator).map((label, idx) => {
-          const field = _labelFields[idx];
-          const fieldType = fieldTypes?.currentQuery?.find((type) => type.name === field)?.type ?? FieldType.Unknown;
-
-          return { label, field, type: fieldType };
-        });
-
-        return <LegendEntry key={value} labelsWithField={labelsWithField} value={value} />;
-      })}
-    </FlexLegendContainer>
-  );
-};
 
 const PlotLegend = ({
   children,
@@ -258,6 +104,8 @@ const PlotLegend = ({
   const interactive = useIsInteractiveMode();
   const fieldTypes = useContext(FieldTypesContext);
   const { limitHeight } = useContext(WidgetRenderingContext);
+  const { colors, setColor } = useContext(ChartColorContext);
+  const mapKeys = useMapKeys();
 
   const labels = labelMapper(chartData);
   const Container = limitHeight ? FixedContainer : VariableContainer;
@@ -270,12 +118,28 @@ const PlotLegend = ({
     );
   }
 
-  const LegendComponent = interactive ? InteractiveLegend : NoninteractiveLegend;
+  const fields = labelFields(config);
+  const items: Array<ChartLegendItem> = (interactive ? labels.sort(stringLenSort) : labels).map((value) => {
+    const labelsWithField = labelsWithFields(value, fields, fieldTypes);
+
+    return {
+      key: value,
+      color: colors.get(value, value === eventsDisplayName ? EVENT_COLOR : undefined),
+      title: labelsWithField.map(({ label, field }) => mapKeys(label, field)).join(humanSeparator),
+      label: labelsWithField.map(({ label, field, type }) =>
+        field ? <Value key={`${field}:${label}`} type={type} value={label} field={field} /> : label,
+      ),
+    };
+  });
 
   return (
     <Container $height={height} $width={width}>
       {children}
-      <LegendComponent config={config} fieldTypes={fieldTypes} labelFields={labelFields} labels={labels} />
+      <ChartLegend
+        items={items}
+        layout={interactive ? 'grid' : 'wrap'}
+        colorPicker={interactive ? { colors: defaultColors, onChange: setColor } : undefined}
+      />
     </Container>
   );
 };

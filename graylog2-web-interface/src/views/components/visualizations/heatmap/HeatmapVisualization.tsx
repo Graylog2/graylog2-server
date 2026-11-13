@@ -15,11 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import _values from 'lodash/values';
 import merge from 'lodash/merge';
 import fill from 'lodash/fill';
 import find from 'lodash/find';
 import isEmpty from 'lodash/isEmpty';
+import sortBy from 'lodash/sortBy';
 import type { DefaultTheme } from 'styled-components';
 import styled, { useTheme, css } from 'styled-components';
 
@@ -31,6 +31,10 @@ import type { KeyMapper } from 'views/components/visualizations/TransformKeys';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
 import heatmapOnClickPopover from 'views/components/visualizations/heatmap/heatmapOnClickPopover';
+import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import { DateType } from 'views/logic/aggregationbuilder/Pivot';
+import { keySeparator } from 'views/Constants';
+import { toDateObject } from 'util/DateTime';
 
 import GenericPlot from '../GenericPlot';
 import type { ChartDefinition, ExtractedSeries, ValuesBySeries, Generator } from '../ChartData';
@@ -109,10 +113,23 @@ const _findSmallestValue = (valuesFound: Array<Array<number>>) =>
     (valuesFound[0] || [])[0],
   );
 
+// The columns are collected from all rows in the order in which they first appear. Rows can cover different time ranges,
+// and a configured sort also reorders the time buckets within each row, so time columns are not chronological without sorting.
+const _sortColumnKeys = (keys: Array<string>, config: AggregationWidgetConfig) => {
+  const [firstColumnPivot] = config.columnPivots;
+
+  if (firstColumnPivot?.type !== DateType) {
+    return keys;
+  }
+
+  return sortBy(keys, (key) => toDateObject(key.split(keySeparator)[0]).valueOf());
+};
+
 const _formatSeries =
-  (visualizationConfig: HeatmapVisualizationConfig) =>
+  (visualizationConfig: HeatmapVisualizationConfig, config: AggregationWidgetConfig) =>
   ({ valuesBySeries, xLabels }: { valuesBySeries: ValuesBySeries; xLabels: Array<any> }): ExtractedSeries => {
-    const valuesFoundBySeries = _values(valuesBySeries);
+    const yLabels = _sortColumnKeys(Object.keys(valuesBySeries), config);
+    const valuesFoundBySeries = yLabels.map((key) => valuesBySeries[key]);
     // When using the hovertemplate, we need to provide a value for empty z values.
     // Otherwise, plotly would throw errors when hovering over a field.
     // We need to transpose the z matrix, because we are changing the x and y label in the generator function
@@ -120,12 +137,15 @@ const _formatSeries =
       ? _findSmallestValue(valuesFoundBySeries)
       : (visualizationConfig.defaultValue ?? 'None');
     const z = _transposeMatrix(_fillUpMatrix(valuesFoundBySeries, xLabels, defaultValue));
-    const yLabels = Object.keys(valuesBySeries);
 
     return [['Heatmap Chart', xLabels, yLabels, z]];
   };
 
-const _axisConfig = (chartHasContent: ChartDefinition) => {
+// Keys combine several values, e.g. a timestamp and the series name, when there are more pivot fields or series.
+const _isTimeAxis = (pivots: AggregationWidgetConfig['rowPivots'], seriesCount = 1) =>
+  pivots.length === 1 && pivots[0].type === DateType && pivots[0].fields.length === 1 && seriesCount === 1;
+
+const _axisConfig = (chartHasContent: ChartDefinition, isTimeAxis: boolean) => {
   const axisConfig = {
     type: undefined,
     fixedrange: true,
@@ -133,19 +153,18 @@ const _axisConfig = (chartHasContent: ChartDefinition) => {
 
   // Adding the axis type, without provided z data, would hide the empty grid
   if (chartHasContent) {
-    axisConfig.type = 'category';
+    axisConfig.type = isTimeAxis ? 'date' : 'category';
   }
 
   return axisConfig;
 };
 
-const _chartLayout = (heatmapData: ChartDefinition[]) => {
+const _chartLayout = (heatmapData: ChartDefinition[], config: AggregationWidgetConfig) => {
   const hasContent = find(heatmapData, (series) => !isEmpty(series.z));
-  const axisConfig = _axisConfig(hasContent);
 
   return {
-    yaxis: axisConfig,
-    xaxis: axisConfig,
+    yaxis: _axisConfig(hasContent, _isTimeAxis(config.rowPivots)),
+    xaxis: _axisConfig(hasContent, _isTimeAxis(config.columnPivots, config.series.length)),
     margin: {
       b: 40,
     },
@@ -164,10 +183,10 @@ const HeatmapVisualization = makeVisualization(({ config, data, height, width }:
     widgetConfig: config,
     chartType: 'heatmap',
     generator: _generateSeries(visualizationConfig, mapKeys, theme),
-    seriesFormatter: _formatSeries(visualizationConfig),
+    seriesFormatter: _formatSeries(visualizationConfig, config),
     leafValueMatcher: _leafSourceMatcher,
   });
-  const layout = _chartLayout(heatmapData);
+  const layout = _chartLayout(heatmapData, config);
   const { popover, initializeGraphDivRef, onChartClick } = usePlotOnClickPopover({ ...heatmapOnClickPopover, config });
 
   return (

@@ -183,13 +183,21 @@ class Input extends React.Component<
         <InputWrapper className={wrapperClassName} wrapperAttributes={wrapperAttributes}>
           {buttonAfter ? (
             <InputGroup>
-              <Checkbox ref={this.input} {...controlProps}>
+              <Checkbox
+                ref={(ref) => {
+                  this.input = ref;
+                }}
+                {...controlProps}>
                 {label}
               </Checkbox>
               {buttonAfter && <InputGroup.Button>{buttonAfter}</InputGroup.Button>}
             </InputGroup>
           ) : (
-            <Checkbox ref={this.input} {...controlProps}>
+            <Checkbox
+              ref={(ref) => {
+                this.input = ref;
+              }}
+              {...controlProps}>
               {label}
             </Checkbox>
           )}

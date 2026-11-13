@@ -18,6 +18,7 @@ package org.graylog2.telemetry;
 
 import com.google.inject.multibindings.Multibinder;
 import org.graylog2.plugin.PluginModule;
+import org.graylog2.telemetry.pipelines.PipelineActivityPeriodical;
 import org.graylog2.telemetry.scheduler.TelemetrySubmissionPeriodical;
 import org.graylog2.telemetry.suppliers.DashboardsMetricsSupplier;
 import org.graylog2.telemetry.suppliers.EventDefinitionsMetricsSupplier;
@@ -28,6 +29,7 @@ import org.graylog2.telemetry.suppliers.MongoDBMetricsSupplier;
 import org.graylog2.telemetry.suppliers.NodesSystemMetricsSupplier;
 import org.graylog2.telemetry.suppliers.OutdatedIndicesMetricsSupplier;
 import org.graylog2.telemetry.suppliers.OutputsMetricsSupplier;
+import org.graylog2.telemetry.suppliers.PipelinesMetricsSupplier;
 import org.graylog2.telemetry.suppliers.ShardsMetricsSupplier;
 import org.graylog2.telemetry.suppliers.SidecarsVersionSupplier;
 import org.graylog2.telemetry.suppliers.StreamsMetricsSupplier;
@@ -40,6 +42,7 @@ public class TelemetryModule extends PluginModule {
         telemetryMetricSupplierBinder();
 
         addPeriodical(TelemetrySubmissionPeriodical.class);
+        addPeriodical(PipelineActivityPeriodical.class);
         Multibinder.newSetBinder(binder(), TelemetryDataProvider.class);
 
         addTelemetryMetricProvider("Users Metrics", UsersMetricsSupplier.class);
@@ -52,6 +55,7 @@ public class TelemetryModule extends PluginModule {
         addTelemetryMetricProvider("Event Notifications Metrics", EventNotificationsMetricsSupplier.class);
         addTelemetryMetricProvider("Dashboards Metrics", DashboardsMetricsSupplier.class);
         addTelemetryMetricProvider("Streams Metrics", StreamsMetricsSupplier.class);
+        addTelemetryMetricProvider("Pipelines Metrics", PipelinesMetricsSupplier.class);
         addTelemetryMetricProvider("Sidecars Version", SidecarsVersionSupplier.class);
         addTelemetryMetricProvider("Nodes System Metrics", NodesSystemMetricsSupplier.class);
         addTelemetryMetricProvider("Outdated Indices Metrics", OutdatedIndicesMetricsSupplier.class);

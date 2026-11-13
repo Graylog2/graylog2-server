@@ -23,9 +23,10 @@ import NavItemStateIndicator, {
   hoverIndicatorStyles,
   activeIndicatorStyles,
 } from 'components/common/NavItemStateIndicator';
+import zIndices from 'theme/z-indices';
 
 const StyledMenuDropdown = styled(Menu.Dropdown)`
-  z-index: 1032 !important;
+  z-index: ${zIndices.navigationDropdown} !important;
 `;
 
 const DropdownTrigger = styled.button<{ $active: boolean }>(
@@ -55,10 +56,6 @@ const NavItem = styled.li`
   align-items: center;
   min-height: ${NAV_ITEM_HEIGHT};
   padding: 0;
-
-  @media (width <= 991px) {
-    width: 100%;
-  }
 `;
 
 type Props = {

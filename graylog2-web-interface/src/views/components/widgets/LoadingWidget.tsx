@@ -16,13 +16,12 @@
  */
 import * as React from 'react';
 
-import { Center } from 'components/common';
-import Spinner from 'components/common/Spinner';
+import WidgetContentSkeleton from 'views/components/widgets/WidgetContentSkeleton';
 
-const LoadingWidget = () => (
-  <Center>
-    <Spinner data-testid="loading-widget" />
-  </Center>
-);
+type Props = {
+  visualization?: string;
+};
+
+const LoadingWidget = ({ visualization = undefined }: Props) => <WidgetContentSkeleton visualization={visualization} />;
 
 export default LoadingWidget;

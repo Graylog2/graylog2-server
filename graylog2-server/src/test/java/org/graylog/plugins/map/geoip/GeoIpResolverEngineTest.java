@@ -230,8 +230,10 @@ public class GeoIpResolverEngineTest {
         Message message = messageFactory.createMessage(fields);
         List<String> ipFields = engine.getIpAddressFields(message);
 
-        //without enforcing the Graylog Schema, all but the gl2_* fields should be returned.
-        Assertions.assertEquals(5, ipFields.size());
+        //without enforcing the Graylog Schema, all but the internal (_id and gl2_*) fields should be returned.
+        Assertions.assertEquals(4, ipFields.size());
+        Assertions.assertFalse(ipFields.contains("_id"));
+        Assertions.assertFalse(ipFields.contains("gl2_test"));
 
     }
 

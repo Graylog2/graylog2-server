@@ -47,6 +47,7 @@ import TableHead from './TableHead';
 const StyledTable = styled(BaseTable)(
   ({ theme }) => css`
     table-layout: fixed;
+    width: 100%;
     margin-bottom: 0;
     height: 100%; // required to be able to use height: 100% in td
 
@@ -177,6 +178,7 @@ const Table = <Entity extends EntityBase>({
                   key={`expanded-sections-${row.id}`}
                   expandedSectionRenderers={expandedSectionRenderers}
                   entity={row.original}
+                  visibleCellCount={visibleCellCount}
                 />
               </>
             )}

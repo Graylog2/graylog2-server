@@ -14,9 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import URI from 'urijs';
-
-import { SystemUrlAllowlist } from '@graylog/server-api';
+import {
+  SystemUrlAllowlist,
+  ToolsContainsStringTester,
+  ToolsNaturalDateTester,
+  ToolsRegexReplaceTester,
+  ToolsRegexTester,
+} from '@graylog/server-api';
 
 import fetch from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -30,11 +34,7 @@ export type NaturalDateResponse = {
 };
 
 export const testNaturalDate = (keyword: string, userTimezone: string): Promise<NaturalDateResponse> => {
-  const { url } = ApiRoutes.ToolsApiController.naturalDateTest(
-    encodeURIComponent(keyword),
-    encodeURIComponent(userTimezone),
-  );
-  const promise = fetch('GET', qualifyUrl(url));
+  const promise = ToolsNaturalDateTester.naturalDateTester(keyword, userTimezone);
 
   promise.catch((errorThrown) => {
     if (errorThrown.additional.status !== 422) {
@@ -122,9 +122,7 @@ export const testJSON = (
 };
 
 export const testRegexValidity = (regex: string): Promise<{ is_valid: boolean }> => {
-  const encodedRegex = URI.encode(regex);
-  const { url } = ApiRoutes.ToolsApiController.regexValidate(encodedRegex);
-  const promise = fetch('GET', qualifyUrl(url));
+  const promise = ToolsRegexTester.validateRegex(regex);
 
   promise.catch((errorThrown) => {
     UserNotification.error(
@@ -184,8 +182,7 @@ export const testRegex = (
     match: string;
   };
 }> => {
-  const { url } = ApiRoutes.ToolsApiController.regexTest();
-  const promise = fetch('POST', qualifyUrl(url), {
+  const promise = ToolsRegexTester.testRegex({
     regex: regex,
     string: string,
   });
@@ -212,14 +209,13 @@ export const testRegexReplace = (
     match: string;
   };
 }> => {
-  const { url } = ApiRoutes.ToolsApiController.regexReplaceTest();
   const payload = {
     regex: regex,
     replacement: replacement,
     replace_all: replaceAll,
     string: string,
   };
-  const promise = fetch('POST', qualifyUrl(url), payload);
+  const promise = ToolsRegexReplaceTester.testRegex(payload);
 
   promise.catch((errorThrown) => {
     UserNotification.error(`Details: ${errorThrown}`, 'Could not try regular expression. Make sure that it is valid.');
@@ -295,8 +291,7 @@ export const testContainsString = (
   search_string: string;
   string: string;
 }> => {
-  const { url } = ApiRoutes.ToolsApiController.containsStringTest();
-  const promise = fetch('POST', qualifyUrl(url), {
+  const promise = ToolsContainsStringTester.testContainsString({
     search_string: searchString,
     string: string,
   });

@@ -18,7 +18,6 @@ package org.graylog.datanode.configuration.snapshots;
 
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.documentation.Documentation;
-import jakarta.annotation.Nonnull;
 import org.graylog.datanode.DirectoriesWritableValidator;
 import org.graylog.datanode.PathListConverter;
 import org.graylog.datanode.configuration.DatanodeDirectories;
@@ -29,9 +28,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class FsRepositoryConfiguration implements RepositoryConfiguration {
+
+    private static final String PATH_REPO = "path.repo";
+
+    private static final PathListConverter PATH_LIST_CONVERTER = new PathListConverter();
+
     /**
      * By default, this property is called path_repo. But the name is almost the same as opensearch property path.repo,
      * so people tend to use the dot instead of underscore here. Let's add the doc version as fallback, catching
@@ -43,6 +47,13 @@ public class FsRepositoryConfiguration implements RepositoryConfiguration {
     @Parameter(value = "path_repo", fallbackPropertyName = "path.repo", converter = PathListConverter.class, validators = DirectoriesWritableValidator.class)
     private List<Path> pathRepo;
 
+    public FsRepositoryConfiguration() {
+    }
+
+    public FsRepositoryConfiguration(List<Path> pathRepo) {
+        this.pathRepo = List.copyOf(pathRepo);
+    }
+
     @Override
     public boolean isRepositoryEnabled() throws IllegalStateException {
         return pathRepo != null && !pathRepo.isEmpty();
@@ -51,16 +62,26 @@ public class FsRepositoryConfiguration implements RepositoryConfiguration {
     @Override
     public Map<String, String> opensearchProperties() {
         // https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/snapshot-restore/#shared-file-system
-        return Map.of("path.repo", serialize(pathRepo));
+        return Map.of(PATH_REPO, PATH_LIST_CONVERTER.convertTo(pathRepo));
+    }
+
+    /**
+     * path.repo is a node-level setting shared by all filesystem repositories, merge all their paths into one list.
+     */
+    @Override
+    public String mergeProperty(String key, String existingValue, String newValue) {
+        if (PATH_REPO.equals(key)) {
+            final List<Path> paths = Stream.of(existingValue, newValue)
+                    .flatMap(value -> PATH_LIST_CONVERTER.convertFrom(value).stream())
+                    .distinct()
+                    .toList();
+            return PATH_LIST_CONVERTER.convertTo(paths);
+        }
+        return RepositoryConfiguration.super.mergeProperty(key, existingValue, newValue);
     }
 
     @Override
     public Collection<OpensearchKeystoreItem> keystoreItems(DatanodeDirectories datanodeDirectories) {
         return Collections.emptyList();
-    }
-
-    @Nonnull
-    private String serialize(List<Path> pathRepo) {
-        return pathRepo.stream().map(Path::toString).collect(Collectors.joining(","));
     }
 }

@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Show the container's memory and CPU usage of Data Nodes on the cluster configuration page also for cgroup v2 and containers without limits."
+
+issues = ["27264"]
+pulls = ["27633"]

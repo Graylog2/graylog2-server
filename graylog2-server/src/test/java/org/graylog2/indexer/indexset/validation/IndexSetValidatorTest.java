@@ -71,7 +71,7 @@ class IndexSetValidatorTest {
 
     @BeforeEach
     void setUp() {
-        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker);
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker, Set.of());
     }
 
     @Test
@@ -219,7 +219,7 @@ class IndexSetValidatorTest {
         when(indexSet.getIndexPrefix()).thenReturn("foo");
         when(indexSetRegistry.getAllIndexSets()).thenReturn(Collections.singleton(indexSet));
 
-        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker);
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker, Set.of());
 
         IndexSetConfig config = testIndexSetConfig().toBuilder().dataTieringConfig(mock(DataTieringConfig.class)).build();
         assertThat(validator.validate(config)).hasValueSatisfying(v ->
@@ -233,7 +233,7 @@ class IndexSetValidatorTest {
     void testWarmTierKeywordReserved() {
         IndexSetConfig config = testIndexSetConfig().toBuilder().indexPrefix("warm_").build();
 
-        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker);
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker, Set.of());
 
         assertThat(validator.validate(config)).hasValueSatisfying(v ->
                 assertThat(v.message()).contains("contains reserved keyword 'warm_'!"));
@@ -245,7 +245,7 @@ class IndexSetValidatorTest {
         when(indexSetRegistry.getAllIndexSets()).thenReturn(Collections.singleton(indexSet));
         when(indexSet.getIndexPrefix()).thenReturn("foo");
 
-        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker);
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker, Set.of());
         IndexSetConfig config = testIndexSetConfig().toBuilder().indexTemplateType(EVENT_TEMPLATE_TYPE).fieldTypeProfile("smth").build();
         assertThat(validator.validate(config)).hasValueSatisfying(v ->
                 assertThat(v.message()).contains("Profiles cannot be set for events and failures index sets"));
@@ -273,7 +273,7 @@ class IndexSetValidatorTest {
         when(indexSetRegistry.getAllIndexSets()).thenReturn(Collections.singleton(indexSet));
         when(indexSet.getIndexPrefix()).thenReturn("foo");
 
-        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker);
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker, Set.of());
         IndexSetConfig config = testIndexSetConfig().toBuilder().indexTemplateType(EVENT_TEMPLATE_TYPE)
                 .customFieldMappings(new CustomFieldMappings(List.of(new CustomFieldMapping("john", "long"))))
                 .build();

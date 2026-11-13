@@ -34,6 +34,8 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.subject.SubjectContext;
+import org.apache.shiro.subject.support.DelegatingSubject;
 import org.graylog2.rest.models.system.sessions.SessionUtils;
 import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.security.OrderedAuthenticatingRealms;
@@ -71,6 +73,22 @@ public class DefaultSecurityManagerProvider implements Provider<DefaultSecurityM
                 )) {
                     subject.getSession().setAttribute(SessionUtils.AUTH_CONTEXT_SESSION_KEY, sessionAuthContext);
                 }
+            }
+
+            @Override
+            public Subject createSubject(SubjectContext context) {
+                // Shiro's resolveHost() ignores the existing subject's host. The host can be carried by the token or
+                // by the session. Not all our tokens carry the host at the moment, and since Shiro 2.2 discards any
+                // session created early in the login process, nothing carries the host to the logged-in subject. The
+                // proper fix will be to make sure all our tokens carry the host, but as a non-invasive fix we simply
+                // copy the host from the existing subject as a fallback.
+                if (context.getSubject() instanceof DelegatingSubject existing && existing.getHost() != null
+                        && context.resolveHost() == null) {
+                    final var copy = copy(context);
+                    copy.setHost(existing.getHost());
+                    return super.createSubject(copy);
+                }
+                return super.createSubject(context);
             }
         };
 

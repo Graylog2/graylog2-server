@@ -16,4 +16,3 @@
  */
 export const PLUGIN_PACKAGE = 'org.graylog.aws' as const;
 export const PLUGIN_CONFIG_CLASS_NAME = `${PLUGIN_PACKAGE}.config.AWSPluginConfiguration` as const;
-export const PLUGIN_API_ENDPOINT = `/plugins/${PLUGIN_PACKAGE}/config` as const;

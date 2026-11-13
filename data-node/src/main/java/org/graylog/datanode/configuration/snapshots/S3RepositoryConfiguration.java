@@ -29,9 +29,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 public class S3RepositoryConfiguration implements RepositoryConfiguration {
 
     private static final Logger LOG = LoggerFactory.getLogger(S3RepositoryConfiguration.class);
+
+    private final String clientName;
 
     @Documentation("S3 repository access key for searchable snapshots")
     @Parameter(value = "s3_client_default_access_key")
@@ -57,6 +61,23 @@ public class S3RepositoryConfiguration implements RepositoryConfiguration {
     @Parameter(value = "s3_client_default_path_style_access", converter = BooleanConverter.class)
     private boolean s3ClientDefaultPathStyleAccess = true;
 
+    /**
+     * Configuration of the default S3 client, populated from the datanode configuration file.
+     */
+    public S3RepositoryConfiguration() {
+        this.clientName = DEFAULT_CLIENT_NAME;
+    }
+
+    public S3RepositoryConfiguration(String clientName, String accessKey, String secretKey, String protocol,
+                                     String endpoint, String region, boolean pathStyleAccess) {
+        this.clientName = clientName;
+        this.s3ClientDefaultAccessKey = accessKey;
+        this.s3ClientDefaultSecretKey = secretKey;
+        this.s3ClientDefaultProtocol = protocol;
+        this.s3ClientDefaultEndpoint = endpoint;
+        this.s3ClientDefaultRegion = region;
+        this.s3ClientDefaultPathStyleAccess = pathStyleAccess;
+    }
 
     /**
      * Verify that either both access and secret keys and the endpoint are configured or none of them. Partial configuration
@@ -84,19 +105,23 @@ public class S3RepositoryConfiguration implements RepositoryConfiguration {
     @Override
     public Map<String, String> opensearchProperties() {
         return Map.of(
-                "s3.client.default.protocol", s3ClientDefaultProtocol,
-                "s3.client.default.endpoint", s3ClientDefaultEndpoint,
-                "s3.client.default.region", s3ClientDefaultRegion,
-                "s3.client.default.path_style_access", String.valueOf(s3ClientDefaultPathStyleAccess)
+                clientProperty("protocol"), s3ClientDefaultProtocol,
+                clientProperty("endpoint"), s3ClientDefaultEndpoint,
+                clientProperty("region"), s3ClientDefaultRegion,
+                clientProperty("path_style_access"), String.valueOf(s3ClientDefaultPathStyleAccess)
         );
     }
 
     @Override
     public Collection<OpensearchKeystoreItem> keystoreItems(DatanodeDirectories datanodeDirectories) {
-        LOG.info("S3 repository configured, adding access and secret key to opensearch keystore");
+        LOG.info("S3 repository configured, adding access and secret key of client {} to opensearch keystore", clientName);
         return List.of(
-                new OpensearchKeystoreStringItem("s3.client.default.access_key", s3ClientDefaultAccessKey),
-                new OpensearchKeystoreStringItem("s3.client.default.secret_key", s3ClientDefaultSecretKey)
+                new OpensearchKeystoreStringItem(clientProperty("access_key"), s3ClientDefaultAccessKey),
+                new OpensearchKeystoreStringItem(clientProperty("secret_key"), s3ClientDefaultSecretKey)
         );
+    }
+
+    private String clientProperty(String property) {
+        return f("s3.client.%s.%s", clientName, property);
     }
 }

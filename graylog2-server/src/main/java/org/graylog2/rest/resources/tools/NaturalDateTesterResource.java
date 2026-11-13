@@ -18,6 +18,8 @@ package org.graylog2.rest.resources.tools;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -33,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RequiresAuthentication
+@Tag(name = "Tools/NaturalDateTester", description = "Test natural date parsing")
 @Path("/tools/natural_date_tester")
 public class NaturalDateTesterResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(NaturalDateTesterResource.class);
@@ -44,6 +47,7 @@ public class NaturalDateTesterResource extends RestResource {
     ) {}
 
     @GET
+    @Operation(summary = "Parse a natural language date")
     @Timed
     @Produces(MediaType.APPLICATION_JSON)
     public NaturalDateResponse naturalDateTester(@QueryParam("string") @NotEmpty final String string, @QueryParam("timezone") @NotEmpty final String timezone) {

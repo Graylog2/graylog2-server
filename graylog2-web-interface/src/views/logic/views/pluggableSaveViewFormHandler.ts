@@ -14,22 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type * as Immutable from 'immutable';
-
+import type { IsPermitted } from 'hooks/usePermissions';
 import type View from 'views/logic/views/View';
 import UserNotification from 'util/UserNotification';
 import type { SaveViewControls } from 'views/types';
 
 const executeDuplicationHandler = async (
   view: View,
-  userPermissions: Immutable.List<string>,
-  duplicationHandlers: Array<(view: View, userPermissions: Immutable.List<string>) => Promise<View>>,
+  isPermitted: IsPermitted,
+  duplicationHandlers: Array<(view: View, isPermitted: IsPermitted) => Promise<View>>,
 ): Promise<View> => {
   let updatedView = view.toBuilder().build();
 
   for (const duplicationHandler of duplicationHandlers) {
     // eslint-disable-next-line no-await-in-loop,no-loop-func
-    const viewWithPluginData = await duplicationHandler(updatedView, userPermissions).catch((e) => {
+    const viewWithPluginData = await duplicationHandler(updatedView, isPermitted).catch((e) => {
       const errorMessage = `An error occurred when executing a submit handler from a plugin: ${e}`;
       // eslint-disable-next-line no-console
       console.error(errorMessage);
@@ -48,24 +47,24 @@ const executeDuplicationHandler = async (
 
 export const executePluggableSearchDuplicationHandler = (
   view: View,
-  userPermissions: Immutable.List<string>,
+  isPermitted: IsPermitted,
   pluggableSaveViewControls: Array<SaveViewControls>,
 ) => {
   const pluginDuplicationHandlers = pluggableSaveViewControls
     ?.map(({ onSearchDuplication }) => onSearchDuplication)
     .filter((pluginData) => !!pluginData);
 
-  return executeDuplicationHandler(view, userPermissions, pluginDuplicationHandlers);
+  return executeDuplicationHandler(view, isPermitted, pluginDuplicationHandlers);
 };
 
 export const executePluggableDashboardDuplicationHandler = (
   view: View,
-  userPermissions: Immutable.List<string>,
+  isPermitted: IsPermitted,
   pluggableSaveViewControls: Array<SaveViewControls>,
 ) => {
   const pluginDuplicationHandlers = pluggableSaveViewControls
     ?.map(({ onDashboardDuplication }) => onDashboardDuplication)
     .filter((pluginData) => !!pluginData);
 
-  return executeDuplicationHandler(view, userPermissions, pluginDuplicationHandlers);
+  return executeDuplicationHandler(view, isPermitted, pluginDuplicationHandlers);
 };

@@ -38,13 +38,14 @@ import {
   columnWidthVar,
   displayScrollRightIndicatorVar,
   scrollContainerWidthVar,
+  tableMinWidthVar,
 } from 'components/common/EntityDataTable/CSSVariables';
 import useHeaderMinWidths from 'components/common/EntityDataTable/hooks/useHeaderMinWidths';
 import useColumnDefinitions from 'components/common/EntityDataTable/hooks/useColumnDefinitions';
 import useColumnRenderers from 'components/common/EntityDataTable/hooks/useColumnRenderers';
 import useAuthorizedColumnSchemas from 'components/common/EntityDataTable/hooks/useAuthorizedColumnSchemas';
 import useIntersectionObserver from 'hooks/useIntersectionObserver';
-import { CELL_PADDING_HORIZONTAL } from 'components/common/EntityDataTable/Constants';
+import { ACTIONS_COL_ID, CELL_PADDING_HORIZONTAL } from 'components/common/EntityDataTable/Constants';
 import ActiveSliceColContext from 'components/common/EntityDataTable/contexts/ActiveSliceColContext';
 import useInternalLayoutPreferences from 'components/common/EntityDataTable/hooks/useInternalLayoutPreferences';
 
@@ -57,6 +58,7 @@ import type {
   RowOverride,
 } from './types';
 import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
+import getAvailableSectionNames from './getAvailableSectionNames';
 import BulkActionsRow from './BulkActionsRow';
 
 const cssVariable = (variable: string, value: string | number) => css`
@@ -70,6 +72,7 @@ const ScrollContainer = styled.div<{
   $actionsHeaderWidth: number;
   $canScrollRight: boolean;
   $scrollContainerWidth: number;
+  $tableMinWidth: number;
 }>(
   ({
     $columnWidths,
@@ -78,11 +81,16 @@ const ScrollContainer = styled.div<{
     $actionsHeaderWidth,
     $canScrollRight,
     $scrollContainerWidth,
+    $tableMinWidth,
   }) => css`
     width: 100%;
     overflow-x: auto;
 
-    ${Object.entries($columnWidths).map(([id, width]) => cssVariable(columnWidthVar(id), `${width}px`))}
+    /* The actions column has no width, so it fills the remaining space. */
+    ${Object.entries($columnWidths)
+      .filter(([id]) => id !== ACTIONS_COL_ID)
+      .map(([id, width]) => cssVariable(columnWidthVar(id), `${width}px`))}
+    ${$tableMinWidth ? cssVariable(tableMinWidthVar, `${$tableMinWidth}px`) : ''}
     ${Object.entries($columnTransform).map(([id, transform]) => cssVariable(columnTransformVar(id), transform))}
     ${$actionsHeaderWidth ? cssVariable(actionsHeaderWidthVar, `${$actionsHeaderWidth}px`) : ''}
     ${$canScrollRight ? cssVariable(displayScrollRightIndicatorVar, 'block') : ''}
@@ -99,7 +107,7 @@ const ScrollContainer = styled.div<{
 const InnerContainer = styled.div`
   position: relative;
   height: 100%;
-  width: fit-content;
+  width: max(100%, var(${tableMinWidthVar}, 0px));
 `;
 
 const ScrollRightIndicator = styled.div`
@@ -225,13 +233,23 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   const hasRowActions = typeof entityActions === 'function';
   const displayBulkAction = !!actions;
   const displayBulkSelectCol = typeof onChangeSelection === 'function' || displayBulkAction;
+  const displayRowExpandCol = Object.keys(expandedSectionRenderers ?? {}).length > 0;
+  const getDefaultExpandedSection = (entityId: string) => {
+    const entity = entities.find(({ id }) => id === entityId);
+
+    return entity ? getAvailableSectionNames(expandedSectionRenderers, entity)[0] : undefined;
+  };
   const displayPageSizeSelect = typeof onPageSizeChange === 'function';
   const authorizedColumnSchemas = useAuthorizedColumnSchemas(columnSchemas);
   const columnRenderersByAttribute = useColumnRenderers<Entity, Meta>(authorizedColumnSchemas, customColumnRenderers);
   const { headerMinWidths, handleHeaderSectionResize } = useHeaderMinWidths();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const scrolledToRightIndicator = useRef<HTMLDivElement>();
-  const scrolledToRight = useIntersectionObserver(scrollContainerRef, scrolledToRightIndicator);
+  const scrolledToRight = useIntersectionObserver(scrolledToRightIndicator, {
+    root: scrollContainerRef,
+    threshold: 0.9,
+    initialIsIntersecting: true,
+  });
 
   const {
     setInternalAttributeColumnOrder,
@@ -245,20 +263,28 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     internalAttributeColumnOrder,
     defaultDisplayedColumns,
     displayBulkSelectCol,
+    displayRowExpandCol,
   );
 
-  const { columnWidths, handleActionsWidthChange, tableIsCompressed, actionsColMinWidth, scrollContainerWidth } =
-    useElementWidths<Entity, Meta>({
-      columnRenderersByAttribute,
-      columnSchemas: authorizedColumnSchemas,
-      columnWidthPreferences: internalColumnWidthPreferences,
-      displayBulkSelectCol,
-      entities,
-      hasRowActions,
-      headerMinWidths,
-      scrollContainerRef,
-      visibleColumns: columnOrder,
-    });
+  const {
+    columnWidths,
+    handleActionsWidthChange,
+    tableIsCompressed,
+    actionsColMinWidth,
+    scrollContainerWidth,
+    tableMinWidth,
+  } = useElementWidths<Entity, Meta>({
+    columnRenderersByAttribute,
+    columnSchemas: authorizedColumnSchemas,
+    columnWidthPreferences: internalColumnWidthPreferences,
+    displayBulkSelectCol,
+    displayRowExpandCol,
+    entities,
+    hasRowActions,
+    headerMinWidths,
+    scrollContainerRef,
+    visibleColumns: columnOrder,
+  });
 
   const columnDefinitions = useColumnDefinitions<Entity, Meta>({
     actionsColMinWidth,
@@ -268,6 +294,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     displayBulkSelectCol,
     enableSlicing,
     entityActions,
+    expandedSectionRenderers,
     entityAttributesAreCamelCase,
     hasRowActions,
     meta,
@@ -324,7 +351,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
         isSomeRowsSelected={table.getIsSomeRowsSelected()}
         isAllRowsSelected={table.getIsAllRowsSelected()}>
         <ActiveSliceColContext.Provider value={activeSliceCol}>
-          <ExpandedSectionsProvider>
+          <ExpandedSectionsProvider getDefaultSection={getDefaultExpandedSection}>
             <ActionsRow>
               <div>{displayBulkAction && <BulkActionsRow bulkActions={actions} />}</div>
               {noColumnReordering && noPageSizeSelect ? null : (
@@ -355,8 +382,9 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                     $activeColId={activeColId}
                     $columnTransform={columnTransform}
                     $columnWidths={columnWidths}
-                    $canScrollRight={scrolledToRight && tableIsCompressed}
-                    $scrollContainerWidth={scrollContainerWidth}>
+                    $canScrollRight={!scrolledToRight && tableIsCompressed}
+                    $scrollContainerWidth={scrollContainerWidth}
+                    $tableMinWidth={tableMinWidth}>
                     <InnerContainer>
                       <Table<Entity>
                         columnWidths={columnWidths}

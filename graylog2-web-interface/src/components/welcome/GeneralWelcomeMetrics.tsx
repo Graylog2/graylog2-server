@@ -16,17 +16,17 @@
  */
 import * as React from 'react';
 
-import useGeneralMetricsSearch from './hooks/useGeneralMetricsSearch';
-import WelcomeSearch from './WelcomeSearch';
+import useGeneralMetricsWidgets from './hooks/useGeneralMetricsWidgets';
+import WelcomeWidgets from './WelcomeWidgets';
 
 type Props = {
   topSourcesOnly?: boolean;
 };
 
 const GeneralWelcomeMetrics = ({ topSourcesOnly = false }: Props) => {
-  const view = useGeneralMetricsSearch(topSourcesOnly);
+  const entries = useGeneralMetricsWidgets(topSourcesOnly);
 
-  return <WelcomeSearch view={view} />;
+  return <WelcomeWidgets entries={entries} />;
 };
 
 export default GeneralWelcomeMetrics;

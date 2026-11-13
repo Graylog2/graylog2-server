@@ -15,10 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import * as mockImmutable from 'immutable';
+import * as Immutable from 'immutable';
 import { render, screen, within, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
-import Immutable from 'immutable';
 
 import { asMock } from 'helpers/mocking';
 import { adminUser } from 'fixtures/users';
@@ -51,26 +50,8 @@ jest.mock('views/api/views', () => ({
   createView: jest.fn((v) => Promise.resolve(v)).mockName('create'),
 }));
 
-jest.mock('api/entity-share', () => ({
-  prepareEntityShare: jest.fn(() => Promise.resolve()),
-  updateEntityShare: jest.fn(() => Promise.resolve()),
-  loadUserSharesPaginated: jest.fn(() =>
-    Promise.resolve({
-      list: Immutable.List(),
-      pagination: { page: 1, perPage: 10, query: '', total: 0, count: 0 },
-    }),
-  ),
-}));
-jest.mock('hooks/useEntityShareState', () => {
-  const mockSetEntityShareState = jest.fn();
-
-  return {
-    __esModule: true,
-    default: jest.fn(() => ({ data: undefined })),
-    useSetEntityShareState: jest.fn(() => mockSetEntityShareState),
-    entityShareQueryKey: jest.fn((grn) => ['entity-share', grn ?? 'new']),
-  };
-});
+jest.mock('api/entity-share');
+jest.mock('hooks/useEntityShareState');
 
 describe('DashboardActionsMenu', () => {
   const mockView = View.create()
@@ -124,8 +105,8 @@ describe('DashboardActionsMenu', () => {
     asMock(useCurrentUser).mockReturnValue(
       adminUser
         .toBuilder()
-        .grnPermissions(mockImmutable.List(['entity:own:grn::::dashboard:view-id']))
-        .permissions(mockImmutable.List(['dashboards:edit:view-id', 'view:edit:view-id']))
+        .grnPermissions(Immutable.List(['entity:own:grn::::dashboard:view-id']))
+        .permissions(Immutable.List(['dashboards:edit:view-id', 'view:edit:view-id']))
         .build(),
     );
 

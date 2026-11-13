@@ -19,6 +19,7 @@ package org.graylog2.rest;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.rest.resources.search.responses.SearchError;
 
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
@@ -29,6 +30,9 @@ public class ElasticsearchExceptionMapper implements ExceptionMapper<Elasticsear
     public Response toResponse(ElasticsearchException exception) {
         final SearchError searchError = SearchError.create(exception.getMessage(), exception.getErrorDetails());
 
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(searchError).build();
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .type(MediaType.APPLICATION_JSON_TYPE)
+                .entity(searchError)
+                .build();
     }
 }

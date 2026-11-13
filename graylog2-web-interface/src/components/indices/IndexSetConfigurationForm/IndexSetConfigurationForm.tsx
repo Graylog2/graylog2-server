@@ -17,13 +17,14 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import moment from 'moment';
 import { Formik, Form, Field } from 'formik';
+import type { FormikHelpers } from 'formik';
 import styled, { css } from 'styled-components';
 import deburr from 'lodash/deburr';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import useIndexSetTemplateDefaults from 'components/indices/IndexSetTemplates/hooks/useIndexSetTemplateDefaults';
 import AppConfig from 'util/AppConfig';
-import { FormikInput, FormSubmit, Section, Spinner, TimeUnitInput } from 'components/common';
+import { ConfirmDialog, FormikInput, FormSubmit, Section, Spinner, TimeUnitInput } from 'components/common';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { Alert, Col, Row } from 'components/bootstrap';
 import 'components/indices/rotation';
@@ -53,7 +54,7 @@ type Props = {
   cancelLink: string;
   create?: boolean;
   indexSet?: IndexSet;
-  onUpdate: (indexSet: IndexSet) => void;
+  onUpdate: (indexSet: IndexSet) => Promise<void> | void;
   retentionStrategies: Strategies;
   retentionStrategiesContext: RetentionStrategyContext;
   rotationStrategies: Strategies;
@@ -135,7 +136,7 @@ const IndexSetConfigurationForm = ({
 
   const prepareRetentionConfigBeforeSubmit = useCallback(
     (values: IndexSetFormValues): IndexSet => {
-      const indexSetValues = values;
+      const indexSetValues = { ...values };
 
       if (!create) {
         delete indexSetValues.index_prefix;
@@ -187,7 +188,12 @@ const IndexSetConfigurationForm = ({
     ],
   );
 
-  const saveConfiguration = (values: IndexSetFormValues) => onUpdate(prepareRetentionConfigBeforeSubmit(values));
+  const [confirmation, setConfirmation] = useState<{ title: string; message: string; values: IndexSet } | null>(null);
+  const [savingConfirmed, setSavingConfirmed] = useState(false);
+
+  const dataTieringPlugin = PluginStore.exports('dataTiering').find((plugin) => plugin.type === 'hot_warm');
+  const useSubmitConfirmation = dataTieringPlugin?.useIndexSetSubmitConfirmation ?? (() => () => null);
+  const submitConfirmation = useSubmitConfirmation({ enabled: !create });
 
   const onFieldTypeRefreshIntervalChange = (
     intervalValue: number,
@@ -246,9 +252,46 @@ const IndexSetConfigurationForm = ({
     return indexSet as unknown as IndexSetFormValues;
   };
 
+  const saveConfiguration = (values: IndexSetFormValues, { setSubmitting }: FormikHelpers<IndexSetFormValues>) => {
+    const preparedValues = prepareRetentionConfigBeforeSubmit(values);
+
+    const required = submitConfirmation(prepareInitialValues(), preparedValues);
+
+    if (required) {
+      setConfirmation({ ...required, values: preparedValues });
+      setSubmitting(false);
+
+      return undefined;
+    }
+
+    return onUpdate(preparedValues);
+  };
+
+  const cancelConfirmation = () => setConfirmation(null);
+
+  const acceptConfirmation = () => {
+    const { values } = confirmation;
+    cancelConfirmation();
+    setSavingConfirmed(true);
+
+    return Promise.resolve()
+      .then(() => onUpdate(values))
+      .finally(() => setSavingConfirmed(false));
+  };
+
   return (
     <Row>
       <Col md={12}>
+        {confirmation && (
+          <ConfirmDialog
+            show
+            title={confirmation.title}
+            btnConfirmText="Save"
+            onCancel={cancelConfirmation}
+            onConfirm={acceptConfirmation}>
+            {confirmation.message}
+          </ConfirmDialog>
+        )}
         <Formik validateOnMount onSubmit={saveConfiguration} enableReinitialize initialValues={prepareInitialValues()}>
           {({ isValid, setFieldValue, isSubmitting, values }) => (
             <IndexRetentionProvider>
@@ -411,7 +454,7 @@ const IndexSetConfigurationForm = ({
                       disabledSubmit={!isValid}
                       submitButtonText={submitButtonText}
                       submitLoadingText={submitLoadingText}
-                      isSubmitting={isSubmitting}
+                      isSubmitting={isSubmitting || savingConfirmed}
                       isAsyncSubmit
                       displayCancel
                       onCancel={onCancel}

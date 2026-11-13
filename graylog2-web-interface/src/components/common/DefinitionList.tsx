@@ -45,6 +45,12 @@ const StyledDl = styled.dl<{ $horizontalLayout: boolean }>`
     word-break: break-word;
   }
 
+  dd > ${Container} {
+    border-left: 3px solid ${({ theme }) => theme.colors.misc.divider};
+    padding-left: ${({ theme }) => theme.spacings.xs};
+    margin: ${({ theme }) => theme.spacings.xxs} 0;
+  }
+
   dt:nth-of-type(odd),
   dd:nth-of-type(odd) {
     background-color: ${({ theme }) => theme.colors.table.row.backgroundStriped};
@@ -63,6 +69,15 @@ const StyledDl = styled.dl<{ $horizontalLayout: boolean }>`
 
       dd {
         padding: ${theme.spacings.xxs};
+      }
+
+      dt:has(+ dd > ${Container}),
+      dd:has(> ${Container}) {
+        grid-column: 1 / -1;
+      }
+
+      dt:has(+ dd > ${Container}) {
+        border-bottom: none;
       }
     `}
 `;

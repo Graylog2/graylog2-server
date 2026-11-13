@@ -19,8 +19,7 @@ import { useCallback, useContext, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import isEqual from 'lodash/isEqual';
 
-import type { BackendWidgetPosition, WidgetResults } from 'views/types';
-import { widgetDefinition } from 'views/logic/Widgets';
+import type { BackendWidgetPosition } from 'views/types';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type { Rows } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
@@ -28,8 +27,6 @@ import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import TimerangeInfo from 'views/components/widgets/TimerangeInfo';
 import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
-import useWidgetResults from 'views/components/useWidgetResults';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { updateWidget, updateWidgetConfig, setWidgetTitle, updateDescription } from 'views/logic/slices/widgetActions';
@@ -37,7 +34,6 @@ import useAutoRefresh from 'views/hooks/useAutoRefresh';
 import useViewType from 'views/hooks/useViewType';
 import View from 'views/logic/views/View';
 import IfDashboard from 'views/components/dashboard/IfDashboard';
-import FullSizeContainer from 'views/components/aggregationbuilder/FullSizeContainer';
 import type WidgetType from 'views/logic/widgets/Widget';
 import {
   useSendWidgetEditTelemetry,
@@ -52,9 +48,8 @@ import useQueryFieldTypes from 'views/hooks/useQueryFieldTypes';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
-import EditWidgetFrame from './EditWidgetFrame';
-import LoadingWidget from './LoadingWidget';
-import ErrorWidget from './ErrorWidget';
+import WidgetEditWrapper from './WidgetEditWrapper';
+import WidgetVisualization from './WidgetVisualization';
 import WidgetColorContext from './WidgetColorContext';
 import WidgetErrorBoundary from './WidgetErrorBoundary';
 import WidgetActionsMenu from './WidgetActionsMenu';
@@ -77,12 +72,6 @@ export type Result = {
   effective_timerange: AbsoluteTimeRange;
 };
 
-const _visualizationForType = (type: string) => widgetDefinition(type).visualizationComponent;
-
-const _editComponentForType = (type: string) => widgetDefinition(type).editComponent;
-
-const _hasOwnEditSubmitButton = (type: string) => widgetDefinition(type).hasEditSubmitButton;
-
 const WidgetFooter = styled.div(
   ({ theme }) => css`
     font-size: ${theme.fonts.size.tiny};
@@ -93,125 +82,6 @@ const WidgetFooter = styled.div(
     gap: 10px;
   `,
 );
-
-type VisualizationProps = Pick<Props, 'title' | 'id' | 'widget' | 'editing'> & {
-  queryId: string;
-  setLoadingState: (loading: boolean) => void;
-  onToggleEdit: () => void;
-  onWidgetConfigChange: (newWidgetConfig: WidgetConfig) => Promise<void>;
-  fields: FieldTypeMappingsList;
-};
-
-const Visualization = ({
-  title,
-  id,
-  widget,
-  fields,
-  queryId,
-  editing,
-  setLoadingState,
-  onToggleEdit,
-  onWidgetConfigChange,
-}: VisualizationProps) => {
-  const VisComponent = useMemo(() => _visualizationForType(widget.type), [widget.type]);
-  const { error: errors, widgetData: data } = useWidgetResults(id);
-
-  if (errors && errors.length > 0) {
-    return <ErrorWidget errors={errors} />;
-  }
-
-  if (data) {
-    const { config, filter } = widget;
-
-    return (
-      <FullSizeContainer>
-        {({ height, width }) => (
-          <VisComponent
-            config={config}
-            data={data as WidgetResults}
-            editing={editing}
-            fields={fields}
-            filter={filter}
-            queryId={queryId}
-            onConfigChange={onWidgetConfigChange}
-            setLoadingState={setLoadingState}
-            title={title}
-            toggleEdit={onToggleEdit}
-            type={widget.type}
-            id={id}
-            height={height}
-            width={width}
-          />
-        )}
-      </FullSizeContainer>
-    );
-  }
-
-  return <LoadingWidget />;
-};
-
-type EditWrapperProps = {
-  children: React.ReactElement;
-  config: WidgetConfig;
-  editing: boolean;
-  fields: FieldTypeMappingsList;
-  id: string;
-  onCancelEdit: () => void;
-  onToggleEdit: () => void;
-  onWidgetConfigChange: (newWidgetConfig: WidgetConfig) => void;
-  showQueryControls?: boolean;
-  type: string;
-};
-
-export const EditWrapper = ({
-  children,
-  config,
-  editing,
-  fields,
-  id,
-  onToggleEdit,
-  onCancelEdit,
-  onWidgetConfigChange,
-  type,
-  showQueryControls = undefined,
-}: EditWrapperProps) => {
-  const EditComponent = useMemo(() => _editComponentForType(type), [type]);
-  const hasOwnSubmitButton = _hasOwnEditSubmitButton(type);
-  const dispatch = useViewsDispatch();
-  const onSubmitEdit = useCallback(
-    (newWidget: WidgetType, hasChanges: boolean) => {
-      if (hasChanges) {
-        return dispatch(updateWidget(newWidget.id, newWidget)).then(() => onToggleEdit());
-      }
-
-      onToggleEdit();
-
-      return Promise.resolve();
-    },
-    [dispatch, onToggleEdit],
-  );
-
-  return editing ? (
-    <EditWidgetFrame
-      onSubmit={onSubmitEdit}
-      onCancel={onCancelEdit}
-      displaySubmitActions={!hasOwnSubmitButton}
-      showQueryControls={showQueryControls}>
-      <EditComponent
-        config={config}
-        fields={fields}
-        editing={editing}
-        id={id}
-        type={type}
-        onCancel={onCancelEdit}
-        onChange={onWidgetConfigChange}>
-        {children}
-      </EditComponent>
-    </EditWidgetFrame>
-  ) : (
-    children
-  );
-};
 
 const WidgetDescription = ({ text }: { text: string }) => <TextOverflowEllipsis>{text}</TextOverflowEllipsis>;
 
@@ -299,6 +169,19 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
     [dispatch, widget],
   );
 
+  const onSubmitEdit = useCallback(
+    (newWidget: WidgetType, hasChanges: boolean) => {
+      if (hasChanges) {
+        return dispatch(updateWidget(newWidget.id, newWidget)).then(() => onToggleEdit());
+      }
+
+      onToggleEdit();
+
+      return Promise.resolve();
+    },
+    [dispatch, onToggleEdit],
+  );
+
   const onWidgetConfigChange = useCallback(
     async (newWidgetConfig: WidgetConfig) => {
       sendWidgetConfigUpdateTelemetry(
@@ -344,8 +227,8 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
             />
           ) : null}
         </WidgetHeader>
-        <EditWrapper
-          onToggleEdit={onToggleEdit}
+        <WidgetEditWrapper
+          onSubmit={onSubmitEdit}
           onCancelEdit={onCancelEdit}
           showQueryControls={isDashboard}
           onWidgetConfigChange={onWidgetConfigChange}
@@ -355,7 +238,7 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
           id={id}
           type={widget.type}>
           <WidgetErrorBoundary>
-            <Visualization
+            <WidgetVisualization
               id={id}
               editing={editing}
               queryId={activeQuery}
@@ -367,7 +250,7 @@ const Widget = ({ id, editing = false, widget, title, position, onPositionsChang
               onWidgetConfigChange={onWidgetConfigChange}
             />
           </WidgetErrorBoundary>
-        </EditWrapper>
+        </WidgetEditWrapper>
         <WidgetFooter>
           {interactive ? <span /> : <WidgetDescription text={widget.description} />}
           {(widget.returnsAllRecords || isDashboard) && !editing && (

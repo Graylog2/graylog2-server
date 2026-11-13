@@ -14,15 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useState } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import without from 'lodash/without';
 
 import { LinkContainer, Icon } from 'components/common';
 import { Alert, Col, Row, Button } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import { isPermitted } from 'util/PermissionsMixin';
-import withTelemetry from 'logic/telemetry/withTelemetry';
+import usePermissions from 'hooks/usePermissions';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import AddNotificationForm from './AddNotificationForm';
@@ -32,41 +32,27 @@ import styles from './NotificationsForm.css';
 
 import commonStyles from '../common/commonStyles.css';
 
-type NotificationsFormProps = {
+type Props = {
   eventDefinition: any;
   notifications: any[];
   defaults: any;
-  currentUser: any;
   onChange: (...args: any[]) => void;
-  sendTelemetry: (...args: any[]) => void;
 };
 
-class NotificationsForm extends React.Component<
-  NotificationsFormProps,
-  {
-    [key: string]: any;
-  }
-> {
-  constructor(props) {
-    super(props);
+const NotificationsForm = ({ eventDefinition, notifications, defaults, onChange }: Props) => {
+  const sendTelemetry = useSendTelemetry('event-definition-notifications');
+  const { isPermitted } = usePermissions();
+  const [showAddNotificationForm, setShowAddNotificationForm] = useState(false);
 
-    this.state = {
-      showAddNotificationForm: false,
-    };
-  }
-
-  toggleAddNotificationForm = () => {
-    this.props.sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS.ADD_CLICKED, {
+  const toggleAddNotificationForm = () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_NOTIFICATIONS.ADD_CLICKED, {
       app_action_value: 'add-notification-button',
     });
 
-    const { showAddNotificationForm } = this.state;
-
-    this.setState({ showAddNotificationForm: !showAddNotificationForm });
+    setShowAddNotificationForm(!showAddNotificationForm);
   };
 
-  handleAssignNotification = (nextNotification) => {
-    const { onChange, eventDefinition } = this.props;
+  const handleAssignNotification = (nextNotification: string) => {
     const nextNotifications = cloneDeep(eventDefinition.notifications);
 
     nextNotifications.push({
@@ -74,77 +60,69 @@ class NotificationsForm extends React.Component<
     });
 
     onChange('notifications', nextNotifications);
-    this.toggleAddNotificationForm();
+    toggleAddNotificationForm();
   };
 
-  handleRemoveNotification = (notificationId) => {
-    const { onChange, eventDefinition } = this.props;
+  const handleRemoveNotification = (notificationId: string) => {
     const notification = eventDefinition.notifications.find((n) => n.notification_id === notificationId);
     const nextNotifications = without(eventDefinition.notifications, notification);
 
     onChange('notifications', nextNotifications);
   };
 
-  render() {
-    const { eventDefinition, notifications, defaults, currentUser, onChange } = this.props;
-    const { showAddNotificationForm } = this.state;
+  const notificationIds = eventDefinition.notifications.map((n) => n.notification_id);
+  const missingPermissions = notificationIds.filter((id) => !isPermitted(`eventnotifications:read:${id}`));
 
-    const notificationIds = eventDefinition.notifications.map((n) => n.notification_id);
-    const missingPermissions = notificationIds.filter(
-      (id) => !isPermitted(currentUser.permissions, `eventnotifications:read:${id}`),
-    );
-
-    if (missingPermissions.length > 0) {
-      return (
-        <Row>
-          <Col md={6} lg={5}>
-            <Alert bsStyle="warning">
-              Missing Notifications Permissions for: <br /> {missingPermissions.join(', ')}
-            </Alert>
-          </Col>
-        </Row>
-      );
-    }
-
-    if (showAddNotificationForm) {
-      return (
-        <AddNotificationForm
-          notifications={notifications}
-          onChange={this.handleAssignNotification}
-          onCancel={this.toggleAddNotificationForm}
-          hasCreationPermissions={isPermitted(currentUser.permissions, 'eventnotifications:create')}
-        />
-      );
-    }
-
+  if (missingPermissions.length > 0) {
     return (
       <Row>
         <Col md={6} lg={5}>
-          <span className={styles.manageNotifications}>
-            <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST} target="_blank">
-              <Button bsStyle="link" bsSize="small">
-                Manage Notifications <Icon name="open_in_new" />
-              </Button>
-            </LinkContainer>
-          </span>
-          <h2 className={commonStyles.title}>
-            Notifications <small>(optional)</small>
-          </h2>
-          <p>
-            Is this Event important enough that requires your attention? Make it an Alert by adding Notifications to it.
-          </p>
-
-          <NotificationList
-            eventDefinition={eventDefinition}
-            notifications={notifications}
-            onAddNotificationClick={this.toggleAddNotificationForm}
-            onRemoveNotificationClick={this.handleRemoveNotification}
-          />
-          <NotificationSettingsForm eventDefinition={eventDefinition} defaults={defaults} onSettingsChange={onChange} />
+          <Alert bsStyle="warning">
+            Missing Notifications Permissions for: <br /> {missingPermissions.join(', ')}
+          </Alert>
         </Col>
       </Row>
     );
   }
-}
 
-export default withTelemetry(NotificationsForm, 'event-definition-notifications');
+  if (showAddNotificationForm) {
+    return (
+      <AddNotificationForm
+        notifications={notifications}
+        onChange={handleAssignNotification}
+        onCancel={toggleAddNotificationForm}
+        hasCreationPermissions={isPermitted('eventnotifications:create')}
+      />
+    );
+  }
+
+  return (
+    <Row>
+      <Col md={6} lg={5}>
+        <span className={styles.manageNotifications}>
+          <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.LIST} target="_blank">
+            <Button bsStyle="link" bsSize="small">
+              Manage Notifications <Icon name="open_in_new" />
+            </Button>
+          </LinkContainer>
+        </span>
+        <h2 className={commonStyles.title}>
+          Notifications <small>(optional)</small>
+        </h2>
+        <p>
+          Is this Event important enough that requires your attention? Make it an Alert by adding Notifications to it.
+        </p>
+
+        <NotificationList
+          eventDefinition={eventDefinition}
+          notifications={notifications}
+          onAddNotificationClick={toggleAddNotificationForm}
+          onRemoveNotificationClick={handleRemoveNotification}
+        />
+        <NotificationSettingsForm eventDefinition={eventDefinition} defaults={defaults} onSettingsChange={onChange} />
+      </Col>
+    </Row>
+  );
+};
+
+export default NotificationsForm;

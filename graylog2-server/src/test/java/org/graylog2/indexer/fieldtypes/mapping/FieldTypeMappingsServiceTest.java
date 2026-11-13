@@ -43,6 +43,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.indexer.template.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
 import static org.graylog2.plugin.Message.FIELD_TIMESTAMP;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -205,14 +206,7 @@ class FieldTypeMappingsServiceTest {
     @Test
     void testSetsProfileIfItIsCorrect() {
         doReturn(Optional.of(existingIndexSet)).when(indexSetService).get("existing_index_set");
-        final String profileId = "000000000000000000000007";
-        IndexFieldTypeProfile profile = new IndexFieldTypeProfile(
-                profileId,
-                "Nice profile!",
-                "Nice profile!",
-                new CustomFieldMappings(List.of(new CustomFieldMapping("bubamara", "ip")))
-        );
-        doReturn(Optional.of(profile)).when(profileService).get(profileId);
+        final String profileId = givenValidProfile();
         toTest.setProfile(Set.of(existingIndexSet.id()), profileId, false);
 
         verify(indexSetService).save(
@@ -228,14 +222,7 @@ class FieldTypeMappingsServiceTest {
                 .fieldTypeProfile("000000000000000000000007")
                 .build();
         doReturn(Optional.of(existingIndexSet)).when(indexSetService).get("existing_index_set");
-        final String profileId = "000000000000000000000007";
-        IndexFieldTypeProfile profile = new IndexFieldTypeProfile(
-                profileId,
-                "Nice profile!",
-                "Nice profile!",
-                new CustomFieldMappings(List.of(new CustomFieldMapping("bubamara", "ip")))
-        );
-        doReturn(Optional.of(profile)).when(profileService).get(profileId);
+        final String profileId = givenValidProfile();
         toTest.setProfile(Set.of(existingIndexSet.id()), profileId, false);
 
         verify(indexSetService, never()).save(any());
@@ -315,14 +302,7 @@ class FieldTypeMappingsServiceTest {
                 .fieldTypeProfile("000000000000000000000042")
                 .build();
         doReturn(Optional.of(existingIndexSet)).when(indexSetService).get("existing_index_set");
-        final String profileId = "000000000000000000000007";
-        IndexFieldTypeProfile profile = new IndexFieldTypeProfile(
-                profileId,
-                "Nice profile!",
-                "Nice profile!",
-                new CustomFieldMappings(List.of(new CustomFieldMapping("bubamara", "ip")))
-        );
-        doReturn(Optional.of(profile)).when(profileService).get(profileId);
+        final String profileId = givenValidProfile();
         toTest.setProfile(Set.of(existingIndexSet.id()), profileId, false);
 
         verify(indexSetService).save(
@@ -330,6 +310,169 @@ class FieldTypeMappingsServiceTest {
                         .fieldTypeProfile(profileId)
                         .build());
         verifyNoInteractions(existingMongoIndexSet);
+    }
+
+    @Test
+    void testBulkSetProfileSetsAndRotatesSingleIndexSet() {
+        final String profileId = givenValidProfile();
+        doReturn(Optional.of(existingIndexSet)).when(indexSetService).get("existing_index_set");
+        doReturn(existingMongoIndexSet).when(mongoIndexSetFactory).create(any());
+
+        final Map<String, BulkOperationResponse> response = toTest.bulkSetProfile(Set.of("existing_index_set"), profileId, true);
+
+        verify(indexSetService).save(existingIndexSet.toBuilder().fieldTypeProfile(profileId).build());
+        verify(existingMongoIndexSet).cycle();
+        assertThat(response).containsOnlyKeys("existing_index_set");
+        assertSuccess(response.get("existing_index_set"));
+    }
+
+    @Test
+    void testBulkSetProfileReportsUnchangedIndexSetAsSuccess() {
+        final String profileId = givenValidProfile();
+        existingIndexSet = existingIndexSet.toBuilder().fieldTypeProfile(profileId).build();
+        doReturn(Optional.of(existingIndexSet)).when(indexSetService).get("existing_index_set");
+
+        final Map<String, BulkOperationResponse> response = toTest.bulkSetProfile(Set.of("existing_index_set"), profileId, true);
+
+        verify(indexSetService, never()).save(any());
+        verifyNoInteractions(existingMongoIndexSet);
+        assertSuccess(response.get("existing_index_set"));
+    }
+
+    @Test
+    void testBulkSetProfileSetsEligibleIndexSetsAndReportsIneligibleOnesAsFailures() {
+        final String profileId = givenValidProfile();
+        final IndexSetConfig eventsIndexSet = buildSampleIndexSetConfig("events_index_set").toBuilder()
+                .indexTemplateType(EVENT_TEMPLATE_TYPE)
+                .build();
+        doReturn(Optional.of(existingIndexSet)).when(indexSetService).get("existing_index_set");
+        doReturn(Optional.of(eventsIndexSet)).when(indexSetService).get("events_index_set");
+
+        final Map<String, BulkOperationResponse> response = toTest.bulkSetProfile(
+                new LinkedHashSet<>(List.of("events_index_set", "existing_index_set")), profileId, false);
+
+        verify(indexSetService).save(existingIndexSet.toBuilder().fieldTypeProfile(profileId).build());
+        verify(indexSetService, never()).save(argThat(config -> Objects.equals(config.id(), "events_index_set")));
+        assertSuccess(response.get("existing_index_set"));
+        assertFailure(response.get("events_index_set"), "cannot have a field type profile");
+    }
+
+    @Test
+    void testBulkSetProfileContinuesWithRemainingIndexSetsWhenSavingOneFails() {
+        final String profileId = givenValidProfile();
+        final IndexSetConfig brokenIndexSet = buildSampleIndexSetConfig("broken_index_set");
+        doReturn(Optional.of(brokenIndexSet)).when(indexSetService).get("broken_index_set");
+        doReturn(Optional.of(existingIndexSet)).when(indexSetService).get("existing_index_set");
+        doThrow(new RuntimeException("MongoDB failure")).when(indexSetService).save(argThat(config -> Objects.equals(config.id(), "broken_index_set")));
+
+        final Map<String, BulkOperationResponse> response = toTest.bulkSetProfile(
+                new LinkedHashSet<>(List.of("broken_index_set", "existing_index_set")), profileId, false);
+
+        verify(indexSetService).save(existingIndexSet.toBuilder().fieldTypeProfile(profileId).build());
+        assertFailure(response.get("broken_index_set"), "MongoDB failure");
+        assertSuccess(response.get("existing_index_set"));
+    }
+
+    @Test
+    void testBulkSetProfileReportsMissingIndexSetAsFailure() {
+        final String profileId = givenValidProfile();
+        doReturn(Optional.of(existingIndexSet)).when(indexSetService).get("existing_index_set");
+        doReturn(Optional.empty()).when(indexSetService).get("missing_index_set");
+
+        final Map<String, BulkOperationResponse> response = toTest.bulkSetProfile(
+                Set.of("existing_index_set", "missing_index_set"), profileId, false);
+
+        assertThat(response).containsOnlyKeys("existing_index_set", "missing_index_set");
+        assertSuccess(response.get("existing_index_set"));
+        assertFailure(response.get("missing_index_set"), "Index set not found");
+    }
+
+    @Test
+    void testBulkSetProfileReportsRotationFailureAsErrorAndKeepsProfile() {
+        final String profileId = givenValidProfile();
+        doReturn(Optional.of(existingIndexSet)).when(indexSetService).get("existing_index_set");
+        doReturn(existingMongoIndexSet).when(mongoIndexSetFactory).create(any());
+        doThrow(new RuntimeException("OpenSearch failure")).when(existingMongoIndexSet).cycle();
+
+        final Map<String, BulkOperationResponse> response = toTest.bulkSetProfile(Set.of("existing_index_set"), profileId, true);
+
+        verify(indexSetService).save(existingIndexSet.toBuilder().fieldTypeProfile(profileId).build());
+        verify(indexSetService, never()).save(existingIndexSet); // no rollback
+        final BulkOperationResponse result = response.get("existing_index_set");
+        assertThat(result.successfullyPerformed()).isEqualTo(1);
+        assertThat(result.failures()).isEmpty();
+        assertThat(result.errors()).singleElement().asString().contains("rotation failed", "OpenSearch failure");
+    }
+
+    @Test
+    void testBulkSetProfileReportsUnreadableIndexSetAsFailureAndContinues() {
+        final String profileId = givenValidProfile();
+        doThrow(new IllegalArgumentException("invalid hexadecimal representation of an ObjectId: [foo]")).when(indexSetService).get("foo");
+        doReturn(Optional.of(existingIndexSet)).when(indexSetService).get("existing_index_set");
+
+        final Map<String, BulkOperationResponse> response = toTest.bulkSetProfile(
+                new LinkedHashSet<>(List.of("foo", "existing_index_set")), profileId, false);
+
+        assertFailure(response.get("foo"), "invalid hexadecimal representation");
+        assertSuccess(response.get("existing_index_set"));
+    }
+
+    @Test
+    void testBulkSetProfileRejectsUnknownProfileBeforeAnyChange() {
+        assertThrows(NotFoundException.class, () -> toTest.bulkSetProfile(Set.of("existing_index_set"), "000000000000000000000042", false));
+        verifyNoInteractions(indexSetService);
+    }
+
+    @Test
+    void testBulkRemoveProfileRotatesWhenAsked() {
+        existingIndexSet = existingIndexSet.toBuilder().fieldTypeProfile("000000000000000000000042").build();
+        doReturn(Optional.of(existingIndexSet)).when(indexSetService).get("existing_index_set");
+        doReturn(existingMongoIndexSet).when(mongoIndexSetFactory).create(any());
+
+        final Map<String, BulkOperationResponse> response = toTest.bulkRemoveProfile(Set.of("existing_index_set"), true);
+
+        verify(indexSetService).save(existingIndexSet.toBuilder().fieldTypeProfile(null).build());
+        verify(existingMongoIndexSet).cycle();
+        assertSuccess(response.get("existing_index_set"));
+    }
+
+    @Test
+    void testBulkRemoveProfileFromIndexSetThatCannotHaveOneIsANoOpSuccess() {
+        final IndexSetConfig eventsIndexSet = buildSampleIndexSetConfig("events_index_set").toBuilder()
+                .indexTemplateType(EVENT_TEMPLATE_TYPE)
+                .build();
+        doReturn(Optional.of(eventsIndexSet)).when(indexSetService).get("events_index_set");
+
+        final Map<String, BulkOperationResponse> response = toTest.bulkRemoveProfile(Set.of("events_index_set"), true);
+
+        verify(indexSetService, never()).save(any());
+        verifyNoInteractions(mongoIndexSetFactory);
+        assertSuccess(response.get("events_index_set"));
+    }
+
+    private String givenValidProfile() {
+        final String profileId = "000000000000000000000007";
+        final IndexFieldTypeProfile profile = new IndexFieldTypeProfile(
+                profileId,
+                "Nice profile!",
+                "Nice profile!",
+                new CustomFieldMappings(List.of(new CustomFieldMapping("bubamara", "ip")))
+        );
+        doReturn(Optional.of(profile)).when(profileService).get(profileId);
+        return profileId;
+    }
+
+    private static void assertSuccess(final BulkOperationResponse result) {
+        assertThat(result.successfullyPerformed()).isEqualTo(1);
+        assertThat(result.failures()).isEmpty();
+        assertThat(result.errors()).isEmpty();
+    }
+
+    private static void assertFailure(final BulkOperationResponse result, final String explanationPart) {
+        assertThat(result.successfullyPerformed()).isZero();
+        assertThat(result.errors()).isEmpty();
+        assertThat(result.failures()).singleElement()
+                .satisfies(failure -> assertThat(failure.failureExplanation()).contains(explanationPart));
     }
 
     private IndexSetConfig buildSampleIndexSetConfig(final String id) {

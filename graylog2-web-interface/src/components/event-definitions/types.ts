@@ -77,6 +77,8 @@ export type TacticsTechniquesEditorPlugin = {
 export type TacticsTechniquesColumnPlugin = {
   attribute: Attribute;
   component: React.ComponentType<{ entity: EventDefinition }>;
+  // Renders an active filter chip for this attribute (e.g. the MITRE name instead of the raw ID).
+  filterValueRenderer?: (value: string) => React.ReactNode;
   // Hook evaluated inside EventDefinitionsContainer to decide whether to render the column.
   // Lets the plugin gate on license/feature state without OSS knowing about it.
   useCondition?: () => boolean;
@@ -93,6 +95,13 @@ export type TacticsTechniquesDetailRowPlugin = {
 export type TacticsTechniquesSummaryPlugin = {
   // Renders a Tactics/Techniques row on the event definition summary view.
   component: React.ComponentType<{ eventDefinition: EventDefinition }>;
+  useCondition?: () => boolean;
+};
+
+export type SigmaImportPlugin = {
+  component: React.FC;
+  key: string;
+  // The import page renders as not found when this returns false.
   useCondition?: () => boolean;
 };
 
@@ -117,8 +126,8 @@ declare module 'graylog-web-plugin/plugin' {
     'eventDefinitions.components.tacticsTechniquesColumn'?: Array<TacticsTechniquesColumnPlugin>;
     'eventDefinitions.components.tacticsTechniquesSummary'?: Array<TacticsTechniquesSummaryPlugin>;
     'events.components.tacticsTechniquesDetailRow'?: Array<TacticsTechniquesDetailRowPlugin>;
-    'eventDefinitions.components.sigmaGitImport'?: Array<{ component: React.FC; key: string }>;
-    'eventDefinitions.components.sigmaFileUpload'?: Array<{ component: React.FC; key: string }>;
+    'eventDefinitions.components.sigmaGitImport'?: Array<SigmaImportPlugin>;
+    'eventDefinitions.components.sigmaFileUpload'?: Array<SigmaImportPlugin>;
     'eventDefinitions.components.sigmaOptions'?: Array<{ component: React.FC; key: string }>;
     'eventDefinitions.components.searchQueryPreview'?: Array<{
       component: React.ComponentType<{ queryString: string; filters: SearchFilter[] }>;

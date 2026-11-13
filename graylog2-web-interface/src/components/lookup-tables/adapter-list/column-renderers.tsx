@@ -71,19 +71,17 @@ const ThroughputCol = ({ adapter }: { adapter: DataAdapterEntity }) => (
 const columnRenderers: ColumnRenderers<DataAdapterEntity> = {
   attributes: {
     title: {
-      width: 0.2,
       renderCell: (title: string, adapter: DataAdapterEntity) => <TitleCol adapter={adapter}>{title}</TitleCol>,
     },
     description: {
-      width: 0.2,
       renderCell: (description: string) => <span>{description}</span>,
     },
     name: {
-      width: 0.2,
+      staticWidth: 200,
       renderCell: (name: string) => <span>{name}</span>,
     },
     throughput: {
-      staticWidth: 150,
+      staticWidth: 130,
       renderCell: (_arg: unknown, adapter: DataAdapterEntity) => <ThroughputCol adapter={adapter} />,
       textAlign: 'right',
     },

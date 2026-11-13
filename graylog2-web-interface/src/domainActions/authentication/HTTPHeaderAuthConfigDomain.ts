@@ -16,9 +16,6 @@
  */
 import { SystemAuthenticationHTTPHeaderAuthConfig } from '@graylog/server-api';
 
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
-import ApiRoutes from 'routing/ApiRoutes';
 import type { HTTPHeaderAuthConfigJSON } from 'logic/authentication/HTTPHeaderAuthConfig';
 import HTTPHeaderAuthConfig from 'logic/authentication/HTTPHeaderAuthConfig';
 import UserNotification from 'util/UserNotification';
@@ -31,8 +28,7 @@ const load = (): Promise<HTTPHeaderAuthConfig> =>
   );
 
 const update = (payload: HTTPHeaderAuthConfigJSON): Promise<HTTPHeaderAuthConfig> => {
-  const url = qualifyUrl(ApiRoutes.HTTPHeaderAuthConfigController.update().url);
-  const promise = fetch('PUT', url, payload).then(HTTPHeaderAuthConfig.fromJSON);
+  const promise = SystemAuthenticationHTTPHeaderAuthConfig.updateConfig(payload).then(HTTPHeaderAuthConfig.fromJSON);
 
   return promise
     .then((result) => {

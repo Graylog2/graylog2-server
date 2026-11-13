@@ -21,6 +21,7 @@ import { Col, Row } from 'components/bootstrap';
 import { TagList } from 'components/common';
 import { getPriorityName } from 'logic/alerts/EventDefinitionPriorityEnum';
 import type User from 'logic/users/User';
+import usePermissions from 'hooks/usePermissions';
 import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 
 import EventDefinitionValidationSummary from './EventDefinitionValidationSummary';
@@ -55,6 +56,7 @@ const EventDefinitionSummary = ({
   validation = { errors: {} },
   currentUser,
 }: Props) => {
+  const { isPermitted } = usePermissions();
   const [showValidation, setShowValidation] = useState<boolean>(false);
   const { label: eventProcedureSummaryLabel, Component: EventProcedureSummaryComponent } =
     useEventProcedureSummaryComponents({
@@ -130,7 +132,7 @@ const EventDefinitionSummary = ({
               eventDefinition.notifications,
               eventDefinition.notification_settings,
               notifications,
-              currentUser,
+              isPermitted,
             )}
           </Col>
         </Row>

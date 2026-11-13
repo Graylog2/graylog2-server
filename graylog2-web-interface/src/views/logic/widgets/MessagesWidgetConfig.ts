@@ -29,7 +29,7 @@ export type Decorator = {
   id: string;
   type: string;
   config?: any;
-  stream: string | undefined | null;
+  stream?: string | null;
   category?: string | null;
   order: number;
 };

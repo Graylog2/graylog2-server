@@ -28,6 +28,7 @@ import type { VisualizationComponent } from 'views/components/aggregationbuilder
 import type { WidgetActionType } from 'views/components/widgets/Types';
 import type { Creator } from 'views/components/sidebar/create/AddWidgetButton';
 import type { ViewHook } from 'views/logic/hooks/ViewHook';
+import type { IsPermitted } from 'hooks/usePermissions';
 import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
 import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import type { Completer } from 'views/components/searchbar/SearchBarAutocompletions';
@@ -277,6 +278,7 @@ export interface ActionContexts {
   view: View;
   analysisDisabledFields: Array<string>;
   currentUser: User;
+  isPermitted: IsPermitted;
   widget: Widget;
   message: Message;
   valuePath: ValuePath;
@@ -516,8 +518,8 @@ export type FiltersType = Immutable.List<SearchFilter>;
 export type SaveViewControls = {
   component: React.ComponentType<{ disabledViewCreation?: boolean }>;
   id: string;
-  onSearchDuplication?: (view: View, userPermissions: Immutable.List<string>) => Promise<View>;
-  onDashboardDuplication?: (view: View, userPermissions: Immutable.List<string>) => Promise<View>;
+  onSearchDuplication?: (view: View, isPermitted: IsPermitted) => Promise<View>;
+  onDashboardDuplication?: (view: View, isPermitted: IsPermitted) => Promise<View>;
 };
 
 export type CustomCommandArgument<T> = {

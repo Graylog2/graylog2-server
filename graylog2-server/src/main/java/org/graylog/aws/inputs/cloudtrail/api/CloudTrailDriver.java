@@ -27,6 +27,7 @@ import org.graylog.aws.inputs.cloudtrail.external.CloudTrailClientFactory;
 import org.graylog.integrations.aws.AWSClientBuilderUtil;
 import org.graylog.integrations.aws.resources.requests.AWSRequest;
 import org.graylog.integrations.aws.resources.requests.AWSRequestImpl;
+import org.graylog.integrations.common.CheckCredentialsResponse;
 import org.graylog2.Configuration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.inputs.Input;
@@ -87,7 +88,7 @@ public class CloudTrailDriver {
 
     private static final Logger LOG = LoggerFactory.getLogger(CloudTrailDriver.class);
 
-    public String checkCredentials(CloudTrailRequest request) throws Exception {
+    public CheckCredentialsResponse checkCredentials(CloudTrailRequest request) throws Exception {
         // Get AWS Plugin configuration for fallback
         final AWSPluginConfiguration pluginConfig = clusterConfigService.getOrDefault(
                 AWSPluginConfiguration.class,

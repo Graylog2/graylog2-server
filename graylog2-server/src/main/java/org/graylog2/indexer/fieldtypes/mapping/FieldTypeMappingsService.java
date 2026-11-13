@@ -41,6 +41,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class FieldTypeMappingsService {
@@ -138,6 +140,64 @@ public class FieldTypeMappingsService {
                 throw ex;
             }
         }
+    }
+
+    public Map<String, BulkOperationResponse> bulkSetProfile(final Set<String> indexSetsIds,
+                                                             final String profileId,
+                                                             final boolean rotateImmediately) {
+        checkProfile(profileId);
+        return changeProfileOfEach(indexSetsIds, rotateImmediately, IndexSetConfig::canHaveProfile,
+                indexSetConfig -> setProfileForIndexSet(profileId, indexSetConfig));
+    }
+
+    public Map<String, BulkOperationResponse> bulkRemoveProfile(final Set<String> indexSetsIds,
+                                                                final boolean rotateImmediately) {
+        return changeProfileOfEach(indexSetsIds, rotateImmediately, indexSetConfig -> true, this::removeProfileFromIndexSet);
+    }
+
+    /**
+     * Changes each index set independently. A change that was stored but whose rotation failed is reported
+     * as a success with an error and is never rolled back.
+     */
+    private Map<String, BulkOperationResponse> changeProfileOfEach(final Set<String> indexSetsIds,
+                                                                   final boolean rotateImmediately,
+                                                                   final Predicate<IndexSetConfig> eligible,
+                                                                   final Function<IndexSetConfig, Optional<IndexSetConfig>> change) {
+        return indexSetsIds.stream().collect(Collectors.toMap(Function.identity(),
+                indexSetId -> changeProfile(indexSetId, rotateImmediately, eligible, change)));
+    }
+
+    private BulkOperationResponse changeProfile(final String indexSetId,
+                                                final boolean rotateImmediately,
+                                                final Predicate<IndexSetConfig> eligible,
+                                                final Function<IndexSetConfig, Optional<IndexSetConfig>> change) {
+        final Optional<IndexSetConfig> updatedIndexSetConfig;
+        try {
+            final Optional<IndexSetConfig> indexSetConfig = indexSetService.get(indexSetId);
+            if (indexSetConfig.isEmpty()) {
+                return failure(indexSetId, "Index set not found");
+            }
+            if (!eligible.test(indexSetConfig.get())) {
+                return failure(indexSetId, "Index set " + indexSetConfig.get().title() + " cannot have a field type profile");
+            }
+            updatedIndexSetConfig = change.apply(indexSetConfig.get());
+        } catch (Exception ex) {
+            LOG.error("Failed to change field type profile of index set: " + indexSetId, ex);
+            return failure(indexSetId, ex.getMessage());
+        }
+        if (rotateImmediately) {
+            try {
+                updatedIndexSetConfig.ifPresent(this::cycleIndexSet);
+            } catch (Exception ex) {
+                LOG.error("Failed to rotate index set after changing its field type profile: " + indexSetId, ex);
+                return new BulkOperationResponse(1, List.of(), List.of("Profile change applied, but rotation failed: " + ex.getMessage()));
+            }
+        }
+        return new BulkOperationResponse(1, List.of());
+    }
+
+    private static BulkOperationResponse failure(final String indexSetId, final String explanation) {
+        return new BulkOperationResponse(0, List.of(new BulkOperationFailure(indexSetId, explanation)));
     }
 
     public Map<String, BulkOperationResponse> removeCustomMappingForFields(final List<String> fieldNames,

@@ -15,16 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type * as React from 'react';
-import type Immutable from 'immutable';
 
 import type FetchError from 'logic/errors/FetchError';
 import type { DataTieringConfig } from 'components/indices/data-tiering';
 import type { IndexArchiveBinding } from 'components/indices/archive/types';
 import type { Attribute } from 'stores/PaginationTypes';
 import type { QualifiedUrl } from 'routing/Routes';
+import type { QuickJumpQueryAction } from 'components/quick-jump/Types';
 import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { Stream } from 'logic/streams/types';
+import type { IndexSetEntity } from 'components/indices/IndexSetsOverview/types';
 import type { ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
 import type { StepType } from 'components/common/Wizard';
 import type { InputSetupWizardStep } from 'components/inputs/InputSetupWizard';
@@ -37,7 +38,7 @@ type PluginNavigationLink = {
 
 interface PluginNavigationItems {
   key: string;
-  component: React.ComponentType<{ smallScreen?: boolean }>;
+  component: React.ComponentType;
 }
 interface GlobalNotification {
   key: string;
@@ -76,6 +77,7 @@ interface PluginForwarder {
   }>;
   fetchForwarderInput: (inputId: string) => Promise<ForwarderInput>;
   fetchForwarderNode: (nodeId: string) => Promise<Forwarder>;
+  fetchForwarderNodes?: (nodeIds: Array<string>) => Promise<Array<Forwarder>>;
   isLocalNode: (nodeId: string) => Promise<boolean>;
   messageLoaders: {
     ForwarderInputDropdown: React.ComponentType<{
@@ -141,6 +143,16 @@ type DataTiering = {
     eventKey: string;
     indexSetId: string;
   }>;
+  ArchiveRetentionFields?: React.ComponentType<{
+    valuesPrefix?: string;
+    archivingEnabled: boolean;
+    hiddenFields?: string[];
+    immutableFields?: string[];
+    ignoreFieldRestrictions?: boolean;
+  }>;
+  useIndexSetSubmitConfirmation?: (options?: {
+    enabled?: boolean;
+  }) => (initialValues: unknown, values: unknown) => { title: string; message: string } | null;
 };
 
 type InputSetupWizard = {
@@ -200,6 +212,8 @@ type RouteGenerator = (id: string, type: string) => QualifiedUrl<string>;
 
 type EntityTypeRouteGenerator = { type: string; route: (id: string) => QualifiedUrl<string> };
 
+type EntityTypeTitle = { type: string; title: string };
+
 type IndexRetentionConfig = {
   type: string;
   displayName: string;
@@ -217,6 +231,14 @@ type StreamsOverviewTableElement = {
   // `failure_count`). When the column is visible, the listed fields are added to the
   // metrics request automatically.
   metricFields?: Record<string, Array<string>>;
+};
+
+type IndexSetsOverviewTableElement = {
+  attributeName: string;
+  group?: 'configuration';
+  attributes?: Array<Attribute>;
+  backendAttributeIds?: Array<string>;
+  columnRenderers: ColumnRenderersByAttribute<IndexSetEntity>;
 };
 
 declare module 'graylog-web-plugin/plugin' {
@@ -258,6 +280,7 @@ declare module 'graylog-web-plugin/plugin' {
     dashboards: 'create' | 'edit' | 'read';
     datanode: 'read' | 'start';
     decorators: 'create' | 'edit' | 'read';
+    deflector: 'cycle';
     eventdefinitions: 'create' | 'delete' | 'edit' | 'read';
     eventnotifications: 'create' | 'delete' | 'edit' | 'read';
     fieldnames: 'read';
@@ -318,9 +341,7 @@ declare module 'graylog-web-plugin/plugin' {
   }
 
   interface PluginDataLake {
-    StreamDataLake: React.ComponentType<{
-      permissions: Immutable.List<Permission>;
-    }>;
+    StreamDataLake: React.ComponentType;
     DataLakeStatus: React.ComponentType<{
       dataLakeEnabled: boolean;
     }>;
@@ -328,7 +349,6 @@ declare module 'graylog-web-plugin/plugin' {
       nodeId: string;
     }>;
     DataLakeJobs: React.ComponentType<{
-      permissions: Immutable.List<Permission>;
       streamId: string;
     }>;
     StreamIlluminateProcessingSection: React.ComponentType<{
@@ -395,6 +415,7 @@ declare module 'graylog-web-plugin/plugin' {
   interface PluginNavigationDropdownItem {
     description: string;
     path: QualifiedUrl<string>;
+    position?: PluginNavigation['position'];
     permissions?: Permission | Array<Permission>;
     requiredFeatureFlag?: string;
     useCondition?: () => boolean;
@@ -417,11 +438,21 @@ declare module 'graylog-web-plugin/plugin' {
     openSidebar: RightSidebarContextType['openSidebar'];
   };
 
+  type EntityLinkTitleProps = {
+    id: string;
+    children: React.ReactNode;
+  };
+
   type EntityLinkResolver = {
     uriSegment: string;
     resolve: (
       trailingSegments: ReadonlyArray<string>,
-    ) => { grnType: string; id: string } | { onClick: (context: EntityLinkOnClickContext) => void } | null;
+    ) =>
+      | { grnType: string; id: string; Title?: React.ComponentType<EntityLinkTitleProps> }
+      | { onClick: (context: EntityLinkOnClickContext) => void }
+      // Renders the link itself, for targets only known where the link is shown, e.g. through a React context.
+      | { id: string; Link: React.ComponentType<EntityLinkTitleProps> }
+      | null;
   };
 
   interface PluginExports {
@@ -437,12 +468,14 @@ declare module 'graylog-web-plugin/plugin' {
     // Use this for stream-overview-only columns. Use `components.shared.entityTableElements`
     // when the extension should participate in the generic entity-table mechanism.
     'components.streams.overview.tableElements'?: Array<StreamsOverviewTableElement>;
+    'components.indexSets.overview.tableElements'?: Array<IndexSetsOverviewTableElement>;
     dataTiering?: Array<DataTiering>;
     defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
     'navigation.badges'?: Array<NavigationBadge>;
     globalNotifications?: Array<GlobalNotification>;
     helpMenu?: Array<HelpMenuItem>;
+    'quickJump.queryActions'?: Array<QuickJumpQueryAction>;
     fieldValueProviders?: Array<FieldValueProvider>;
     license?: Array<License>;
     inputSetupWizard?: Array<InputSetupWizard>;
@@ -462,6 +495,7 @@ declare module 'graylog-web-plugin/plugin' {
     'hooks.logout'?: Array<LogoutHook>;
     entityRoutes?: Array<RouteGenerator>;
     entityTypeRoute?: Array<EntityTypeRouteGenerator>;
+    entityTypeTitles?: Array<EntityTypeTitle>;
     entityCreators?: Array<EntityCreator>;
     'users.details.segments'?: Array<{
       value: string;

@@ -39,6 +39,8 @@ import java.util.stream.Collectors;
 
 public class TitleDecorator implements FieldDecorator {
 
+    public static final String DECORATOR = "title";
+
     private final EntityTitleService entityTitleService;
 
 
@@ -58,7 +60,7 @@ public class TitleDecorator implements FieldDecorator {
     }
 
     private boolean acceptsDecorator(@Nullable String decorator) {
-        return decorator == null || decorator.equals("title");
+        return decorator == null || decorator.equals(DECORATOR);
     }
 
     @Override

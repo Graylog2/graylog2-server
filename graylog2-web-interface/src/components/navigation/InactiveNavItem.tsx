@@ -21,12 +21,6 @@ import { NavItem } from 'components/bootstrap';
 import { itemStateIndicatorSelector } from 'components/common/NavItemStateIndicator';
 
 const StyledInactiveNav = styled(NavItem)`
-  .navbar-default .navbar-nav > & > a {
-    &:hover,
-    &:focus {
-      background: transparent;
-    }
-  }
   ${itemStateIndicatorSelector} {
     display: none;
   }

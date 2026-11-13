@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import type { ColorVariant } from '@graylog/sawmill';
 
+import type { ColorVariant } from 'theme/sawmill';
 import { Alert, Button, Col, Row } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
 

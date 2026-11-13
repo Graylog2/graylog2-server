@@ -22,33 +22,12 @@ import FormData from 'form-data';
 import * as JSON from 'util/json';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import { asMock } from 'helpers/mocking';
-import { SessionStore } from 'stores/sessions/SessionStore';
+import Session from 'logic/session/Session';
+import { reportError as reportServerError } from 'api/server-availability';
 
-import fetch, { Builder, fetchFile } from './FetchProvider';
+import fetch, { Builder, fetchFile, fetchStream } from './FetchProvider';
 
 jest.unmock('./FetchProvider');
-const mockLogout = jest.fn();
-const mockLoginListeners = new Set<() => void>();
-const mockCompleteLogin = () => [...mockLoginListeners].forEach((listener) => listener());
-
-jest.mock('stores/sessions/SessionStore', () => ({
-  SessionStore: {
-    isLoggedIn: jest.fn(() => true),
-  },
-  SessionActions: {
-    logout: (...args: Array<unknown>) => mockLogout(...args),
-    login: {
-      completed: {
-        listen: (listener: () => void) => {
-          mockLoginListeners.add(listener);
-
-          return () => mockLoginListeners.delete(listener);
-        },
-      },
-    },
-  },
-}));
-
 jest.mock('api/server-availability', () => ({
   reportSuccess: jest.fn(),
   reportError: jest.fn(),
@@ -103,6 +82,18 @@ const setUpServer = () => {
     res.status(401).end();
   });
 
+  app.post('/simulatesSessionExpiration', (_req, res) => {
+    res.status(401).end();
+  });
+
+  app.post('/stream', (req, res) => {
+    if (req.accepts().includes('application/x-ndjson')) {
+      res.send('{"type":"answer"}\n');
+    } else {
+      res.status(406).end();
+    }
+  });
+
   app.get('/simulatesUnauthorized', (_req, res) => {
     res.status(403).end();
   });
@@ -140,6 +131,12 @@ describe('FetchProvider', () => {
 
   beforeEach(() => {
     asMock(ErrorsActions.report).mockClear();
+    asMock(reportServerError).mockClear();
+    Session.setUsername('alice');
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   afterAll(() => {
@@ -159,25 +156,6 @@ describe('FetchProvider', () => {
     }),
   );
 
-  it('sends a request queued until login only once', async () => {
-    asMock(SessionStore.isLoggedIn).mockReturnValueOnce(false);
-    const fetchSpy = jest.spyOn(window, 'fetch');
-
-    const response = fetch('GET', `${baseUrl}/test1`);
-
-    expect(fetchSpy).not.toHaveBeenCalled();
-
-    mockCompleteLogin();
-
-    await expect(response).resolves.toEqual({ text: 'test' });
-
-    mockCompleteLogin();
-
-    expect(fetchSpy).toHaveBeenCalledTimes(1);
-
-    fetchSpy.mockRestore();
-  });
-
   it('sets correct accept header', async () => {
     const result = await fetchFile('POST', `${baseUrl}/failIfWrongAcceptHeader`, {}, 'text/csv');
 
@@ -185,6 +163,8 @@ describe('FetchProvider', () => {
   });
 
   it('removes local session if 401 is returned', async () => {
+    const onLogout = jest.fn();
+    const unsubscribe = Session.on('logout', onLogout);
     const error = await fetch('GET', `${baseUrl}/simulatesSessionExpiration`).catch((e) => e);
 
     expect(error.name).toEqual('FetchError');
@@ -192,7 +172,28 @@ describe('FetchProvider', () => {
       'There was an error fetching a resource: Unauthorized. Additional information: Not available',
     );
 
-    expect(mockLogout).toHaveBeenCalled();
+    expect(Session.isLoggedIn()).toBe(false);
+    expect(onLogout).toHaveBeenCalledTimes(1);
+
+    unsubscribe();
+  });
+
+  it('sends a request queued until login only once', async () => {
+    Session.setUsername(undefined);
+    const fetchSpy = jest.spyOn(window, 'fetch');
+
+    const response = fetch('GET', `${baseUrl}/test1`);
+
+    expect(fetchSpy).not.toHaveBeenCalled();
+
+    Session.setUsername('alice');
+
+    await expect(response).resolves.toEqual({ text: 'test' });
+
+    Session.setUsername(undefined);
+    Session.setUsername('alice');
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
   });
 
   it('supports uploading form data without content type', async () => {
@@ -244,5 +245,33 @@ describe('FetchProvider', () => {
     );
 
     expect(ErrorsActions.report).not.toHaveBeenCalled();
+  });
+
+  it('streams the body of a response it accepts', async () => {
+    const body = await fetchStream('POST', `${baseUrl}/stream`, {});
+
+    expect(body).toBeTruthy();
+  });
+
+  it('removes local session if a stream returns 401', async () => {
+    const onLogout = jest.fn();
+    const unsubscribe = Session.on('logout', onLogout);
+    const error = await fetchStream('POST', `${baseUrl}/simulatesSessionExpiration`, {}).catch((e) => e);
+
+    expect(error.status).toEqual(401);
+    expect(Session.isLoggedIn()).toBe(false);
+    expect(onLogout).toHaveBeenCalledTimes(1);
+
+    unsubscribe();
+  });
+
+  it('rejects an aborted stream with its abort error, not as a server error', async () => {
+    const controller = new AbortController();
+    controller.abort();
+
+    const error = await fetchStream('POST', `${baseUrl}/stream`, {}, controller.signal).catch((e) => e);
+
+    expect(error.name).toEqual('AbortError');
+    expect(reportServerError).not.toHaveBeenCalled();
   });
 });

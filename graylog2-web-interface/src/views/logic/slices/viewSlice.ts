@@ -19,7 +19,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import * as Immutable from 'immutable';
 
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
-import type { ViewState, RootState, GetState } from 'views/types';
+import type { ViewState, RootState, GetState, ExtraArguments } from 'views/types';
 import type { QueryId, TimeRange } from 'views/logic/queries/Query';
 import type ViewStateType from 'views/logic/views/ViewState';
 import NewQueryActionHandler from 'views/logic/NewQueryActionHandler';
@@ -95,9 +95,11 @@ export const isViewWidgetsEqualForSearch = (view: View, newView: View) => {
   return isEqualForSearch(oldWidgets, newWidgets);
 };
 
-const _recreateSearch = async (newView: View) => {
+const _createSearch = (extra?: ExtraArguments) => extra?.searchExecutors?.createSearch ?? createSearch;
+
+const _recreateSearch = async (newView: View, extra: ExtraArguments) => {
   const updatedView = UpdateSearchForWidgets(newView);
-  const updatedSearch = await createSearch(updatedView.search);
+  const updatedSearch = await _createSearch(extra)(updatedView.search);
 
   return updatedView.toBuilder().search(updatedSearch).build();
 };
@@ -121,11 +123,11 @@ export const selectQuery = (activeQuery: string) => async (dispatch: ViewsDispat
 
 export const loadView =
   (newView: View, recreateSearch: boolean = false) =>
-  async (dispatch: ViewsDispatch, getState: () => RootState) => {
+  async (dispatch: ViewsDispatch, getState: () => RootState, extra: ExtraArguments) => {
     const view = selectView(getState());
 
     if (recreateSearch || !isViewWidgetsEqualForSearch(view, newView)) {
-      const updatedViewWithSearch = await _recreateSearch(newView);
+      const updatedViewWithSearch = await _recreateSearch(newView, extra);
 
       await dispatch(setView(updatedViewWithSearch));
 
@@ -140,7 +142,7 @@ const defaultUpdateViewOptions = { hasToPushRevision: true };
 
 export const updateView =
   (newView: View, recreateSearch: boolean = false, options: UpdateViewOptions = defaultUpdateViewOptions) =>
-  async (dispatch: ViewsDispatch, getState: () => RootState) => {
+  async (dispatch: ViewsDispatch, getState: () => RootState, extra: ExtraArguments) => {
     const state = getState();
     const view = selectView(state);
 
@@ -156,7 +158,7 @@ export const updateView =
     }
 
     if (recreateSearch || !isViewWidgetsEqualForSearch(view, newView)) {
-      const updatedViewWithSearch = await _recreateSearch(newView);
+      const updatedViewWithSearch = await _recreateSearch(newView, extra);
       await dispatch(setView(updatedViewWithSearch, true));
 
       return dispatch(executeActiveQuery());
@@ -166,12 +168,13 @@ export const updateView =
   };
 
 export const updateQueries =
-  (newQueries: Immutable.OrderedSet<Query>) => async (dispatch: ViewsDispatch, getState: () => RootState) => {
+  (newQueries: Immutable.OrderedSet<Query>) =>
+  async (dispatch: ViewsDispatch, getState: () => RootState, extra: ExtraArguments) => {
     const view = selectView(getState());
     const { search } = view;
     const newSearch = search.toBuilder().newId().queries(newQueries).build();
 
-    const searchAfterSave = await createSearch(newSearch);
+    const searchAfterSave = await _createSearch(extra)(newSearch);
     const newViewState = view.state
       .filter((_state, queryId) => !!newQueries.find((query) => query.id === queryId))
       .toMap();

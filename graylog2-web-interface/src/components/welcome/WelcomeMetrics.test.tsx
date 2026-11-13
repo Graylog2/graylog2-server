@@ -25,9 +25,8 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 import StreamsContext from 'contexts/StreamsContext';
-import useCreateSearch from 'views/hooks/useCreateSearch';
-import type View from 'views/logic/views/View';
 import useViewsPlugin from 'views/test/testViewsPlugin';
+import createSearch from 'views/logic/slices/createSearch';
 import type { Stream } from 'logic/streams/types';
 import Store from 'logic/local-storage/Store';
 import type { WelcomePageMetricsPlugin, WelcomeGeneralPageMetricsPlugin } from 'components/welcome/types';
@@ -37,7 +36,8 @@ import WelcomeMetricsSection from './WelcomeMetricsSection';
 jest.mock('hooks/useCurrentUser');
 jest.mock('hooks/useSearchConfiguration');
 jest.mock('hooks/usePluggableLicenseCheck');
-jest.mock('views/hooks/useCreateSearch');
+// The widgets' search is never created, so they keep showing their loading state.
+jest.mock('views/logic/slices/createSearch', () => jest.fn(() => new Promise(() => {})));
 jest.mock('logic/local-storage/Store', () => ({
   get: jest.fn(),
   set: jest.fn(),
@@ -64,7 +64,6 @@ describe('WelcomeMetrics', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     asMock(useCurrentUser).mockReturnValue(defaultUser);
-    asMock(useCreateSearch).mockImplementation((viewPromise: Promise<View>) => viewPromise);
     asMock(useSearchConfiguration).mockReturnValue({ config: undefined, refresh: () => {}, isInitialLoading: false });
     asMock(Store.get).mockReturnValue(undefined);
     asMock(usePluggableLicenseCheck).mockReturnValue(licenseCheck(false));
@@ -75,7 +74,7 @@ describe('WelcomeMetrics', () => {
 
     await screen.findByText('Once you have access to a stream, your message metrics will show up here.');
     expect(screen.queryByText('Messages Today')).not.toBeInTheDocument();
-    expect(useCreateSearch).not.toHaveBeenCalled();
+    expect(createSearch).not.toHaveBeenCalled();
   });
 
   it('allows dismissing the message shown when the user has no access to any stream, persisting the choice', async () => {
@@ -103,6 +102,16 @@ describe('WelcomeMetrics', () => {
 
     await screen.findByText('Messages Today');
     expect(screen.queryAllByRole('radio')).toHaveLength(0);
+  });
+
+  it('shows titled content skeletons for all widgets while their search is being created', async () => {
+    renderWithStreams([accessibleStream]);
+
+    await screen.findByText('Messages Today');
+    expect(screen.getByText('Alerts Today')).toBeInTheDocument();
+    expect(screen.getByText('Events Today')).toBeInTheDocument();
+    expect(screen.getByText('Top 5 Sources')).toBeInTheDocument();
+    expect(screen.getAllByRole('status', { name: 'Loading widget content' })).toHaveLength(4);
   });
 
   describe('welcome page metrics plugins', () => {

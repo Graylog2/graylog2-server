@@ -21,14 +21,12 @@ import { Link, ContentHeadRow, DocumentTitle, Spinner } from 'components/common'
 import { Col } from 'components/bootstrap';
 import OutputsComponent from 'components/outputs/OutputsComponent';
 import Routes from 'routing/Routes';
-import useCurrentUser from 'hooks/useCurrentUser';
 import useStream from 'components/streams/hooks/useStream';
 import useProductName from 'brand-customization/useProductName';
 import MarketplaceLink from 'components/support/MarketplaceLink';
 
 const StreamOutputsPage = () => {
   const productName = useProductName();
-  const currentUser = useCurrentUser();
   const { streamId } = useParams();
   const { data: stream } = useStream(streamId);
 
@@ -56,7 +54,7 @@ const StreamOutputsPage = () => {
             </p>
           </Col>
         </ContentHeadRow>
-        <OutputsComponent streamId={stream.id} permissions={currentUser.permissions} />
+        <OutputsComponent streamId={stream.id} />
       </div>
     </DocumentTitle>
   );

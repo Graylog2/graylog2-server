@@ -19,6 +19,7 @@ import moment from 'moment-timezone';
 
 import { DATE_TIME_FORMATS } from 'util/DateTime';
 import { MISSING_BUCKET_NAME } from 'views/Constants';
+import type FieldType from 'views/logic/fieldtypes/FieldType';
 
 export const isPhrase = (searchTerm: string | undefined | null) => String(searchTerm).indexOf(' ') !== -1;
 
@@ -68,6 +69,9 @@ export const formatTimestamp = (value: string | number) => {
 
   return `"${utc.format(DATE_TIME_FORMATS.internalIndexer)}"`;
 };
+
+export const formatValueForQuery = (value: string | number, type: FieldType) =>
+  type.type === 'date' ? formatTimestamp(value) : escape(value);
 
 export const predicate = (field: string, value: string | number) =>
   value === MISSING_BUCKET_NAME || value === escape(MISSING_BUCKET_NAME)

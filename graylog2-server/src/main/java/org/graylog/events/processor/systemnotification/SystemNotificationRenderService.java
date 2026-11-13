@@ -23,8 +23,10 @@ import freemarker.core.TemplateConfiguration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
+import org.graylog2.rest.URIHelper;
 
 import jakarta.inject.Inject;
 
@@ -47,17 +49,28 @@ public class SystemNotificationRenderService {
     private static final String KEY_TITLE = "_title";
     private static final String KEY_DESCRIPTION = "_description";
     private static final String KEY_CLOUD = "_cloud";
+
+    /**
+     * Template key for the {@link URIHelper} used to resolve links in the rendered template against the
+     * externally visible base URI. Links the browser will follow should stay relative and only take the
+     * external path prefix into account, e.g. {@code ${uri_helper.relativePath('some/path')}}. Use
+     * {@code ${uri_helper.resolve('some/path')}} only where an absolute URI is required.
+     */
+    private static final String KEY_URI_HELPER = "uri_helper";
     public static final String TEMPLATE_BASE_PATH = "/org/graylog2/freemarker/templates/";
     private NotificationService notificationService;
     private org.graylog2.Configuration graylogConfig;
+    private HttpConfiguration httpConfiguration;
     private static final freemarker.template.Configuration cfg =
             new freemarker.template.Configuration(freemarker.template.Configuration.VERSION_2_3_28);
 
     @Inject
     public SystemNotificationRenderService(NotificationService notificationService,
-                                           org.graylog2.Configuration graylogConfig) {
+                                           org.graylog2.Configuration graylogConfig,
+                                           HttpConfiguration httpConfiguration) {
         this.notificationService = notificationService;
         this.graylogConfig = graylogConfig;
+        this.httpConfiguration = httpConfiguration;
 
         cfg.setDefaultEncoding(UTF_8);
         cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
@@ -78,8 +91,45 @@ public class SystemNotificationRenderService {
         return render(notification, format, values);
     }
 
+    /**
+     * @param uriHelper resolves links in the rendered template against the externally visible base URI,
+     *                  e.g. taking the {@code X-Graylog-Server-URL} request header into account when available.
+     *                  Overrides the configured default for this render call only.
+     */
+    public RenderResponse render(Notification.Type type, String key, Format format, Map<String, Object> values,
+                                 URIHelper uriHelper) {
+        Notification notification = notificationService.getByTypeAndKey(type, key)
+                .orElseThrow(() -> new NotFoundException(f("Event type <%s/%s> is not currently active", type, key)));
+        return render(notification, format, values, uriHelper);
+    }
+
     public RenderResponse render(Notification notification) {
-        return render(notification, Format.PLAINTEXT, null);
+        return render(notification, Format.PLAINTEXT, (Map<String, Object>) null);
+    }
+
+    public RenderResponse render(Notification notification, Format format) {
+        return render(notification, format, (Map<String, Object>) null);
+    }
+
+    /**
+     * @param uriHelper resolves links in the rendered template against the externally visible base URI,
+     *                  e.g. taking the {@code X-Graylog-Server-URL} request header into account when available.
+     *                  Overrides the configured default for this render call only.
+     */
+    public RenderResponse render(Notification notification, Format format, URIHelper uriHelper) {
+        return render(notification, format, null, uriHelper);
+    }
+
+    /**
+     * @param uriHelper resolves links in the rendered template against the externally visible base URI,
+     *                  e.g. taking the {@code X-Graylog-Server-URL} request header into account when available.
+     *                  Overrides the configured default for this render call only.
+     */
+    public RenderResponse render(Notification notification, Format format, Map<String, Object> values,
+                                 URIHelper uriHelper) {
+        final Map<String, Object> resolvedValues = (values != null) ? values : new HashMap<>();
+        resolvedValues.put(KEY_URI_HELPER, uriHelper);
+        return render(notification, format, resolvedValues);
     }
 
     public RenderResponse render(Notification notification, Format format, Map<String, Object> values) {
@@ -94,6 +144,7 @@ public class SystemNotificationRenderService {
             values.put(KEY_NODE_ID, notification.getNodeId());
         }
         values.put(KEY_CLOUD, graylogConfig.isCloud());
+        values.putIfAbsent(KEY_URI_HELPER, new URIHelper(httpConfiguration.getHttpExternalUri()));
 
         final String templateRelPath = format.toString() + "/" + notification.getType().toString().toLowerCase(Locale.ENGLISH) + ".ftl";
         try (StringWriter writer = new StringWriter()) {

@@ -21,7 +21,7 @@ import type { PluginNavigation } from 'graylog-web-plugin';
 import usePermissions from 'hooks/usePermissions';
 import sortNavigationItems from 'components/navigation/util/sortNavigationItems';
 import usePluginEntities from 'hooks/usePluginEntities';
-import mergeNavigationItems from 'components/navigation/util/mergeNavigationItems';
+import mergeAndSortNavigationItems from 'components/navigation/util/mergeAndSortNavigationItems';
 import AppConfig from 'util/AppConfig';
 import NavTabs from 'components/common/NavTabs';
 
@@ -40,10 +40,12 @@ const usePageNavigationItems = (page: string, items: Array<PageNavItem>) => {
 
   return useMemo(() => {
     if (items) {
-      return items;
+      return sortNavigationItems(items);
     }
 
-    return mergeNavigationItems(allPageNavigationItems).find((item) => item.description === page)?.children ?? [];
+    return (
+      mergeAndSortNavigationItems(allPageNavigationItems).find((item) => item.description === page)?.children ?? []
+    );
   }, [items, allPageNavigationItems, page]);
 };
 
@@ -65,13 +67,11 @@ const PageNavigation = ({ page = undefined, items: itemsProp = undefined }: Prop
       !!item.path,
   );
 
-  const formatedItems = sortNavigationItems<PageNavItem>(availableItems);
-
-  if (formatedItems.length === 0) {
+  if (availableItems.length === 0) {
     return null;
   }
 
-  return <NavTabs items={formatedItems} />;
+  return <NavTabs items={availableItems} />;
 };
 
 export default PageNavigation;

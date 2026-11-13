@@ -20,7 +20,8 @@ import userEvent from '@testing-library/user-event';
 
 import { adminUser, bob } from 'fixtures/users';
 import UsersDomain from 'domainActions/users/UsersDomain';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import CurrentUser from 'logic/users/CurrentUser';
+import { asMock } from 'helpers/mocking';
 
 import UserEdit from './UserEdit';
 
@@ -41,7 +42,7 @@ jest.mock('./RolesSection', () => ({ onSubmit }) => (
 ));
 jest.mock('./TeamsSection', () => () => <div>TeamsSection</div>);
 jest.mock('domainActions/users/UsersDomain');
-jest.mock('stores/users/CurrentUserStore');
+jest.mock('logic/users/CurrentUser');
 
 jest.useFakeTimers();
 const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
@@ -49,7 +50,7 @@ const setupUser = () => userEvent.setup({ advanceTimers: jest.advanceTimersByTim
 describe('<UserEdit />', () => {
   afterEach(() => {
     jest.clearAllMocks();
-    CurrentUserStore.reload = jest.fn();
+    CurrentUser.reload = jest.fn();
   });
 
   const user = adminUser.toBuilder().readOnly(false).external(false).build();
@@ -110,7 +111,7 @@ describe('<UserEdit />', () => {
 
   it('should send complete UserUpdate object when updating user profile', async () => {
     const updateSpy = jest.fn(() => Promise.resolve());
-    (UsersDomain.update as jest.Mock) = updateSpy;
+    asMock(UsersDomain.update).mockImplementation(updateSpy);
 
     render(<UserEdit user={user} />);
 
@@ -131,7 +132,7 @@ describe('<UserEdit />', () => {
 
   it('should send complete UserUpdate object when updating user roles', async () => {
     const updateSpy = jest.fn(() => Promise.resolve());
-    (UsersDomain.update as jest.Mock) = updateSpy;
+    asMock(UsersDomain.update).mockImplementation(updateSpy);
 
     render(<UserEdit user={user} />);
 
@@ -153,11 +154,11 @@ describe('<UserEdit />', () => {
     );
   });
 
-  it('should reload CurrentUserStore when updating current user', async () => {
+  it('should reload current user when updating current user', async () => {
     const updateSpy = jest.fn(() => Promise.resolve());
-    (UsersDomain.update as jest.Mock) = updateSpy;
+    asMock(UsersDomain.update).mockImplementation(updateSpy);
     const reloadSpy = jest.fn();
-    CurrentUserStore.reload = reloadSpy;
+    CurrentUser.reload = reloadSpy;
 
     render(<UserEdit user={user} />);
 
@@ -168,12 +169,12 @@ describe('<UserEdit />', () => {
     await waitFor(() => expect(reloadSpy).toHaveBeenCalledTimes(1));
   });
 
-  it('should not reload CurrentUserStore when updating different user', async () => {
+  it('should not reload current user when updating different user', async () => {
     const differentUser = bob.toBuilder().readOnly(false).external(false).build();
     const updateSpy = jest.fn(() => Promise.resolve());
-    (UsersDomain.update as jest.Mock) = updateSpy;
+    asMock(UsersDomain.update).mockImplementation(updateSpy);
     const reloadSpy = jest.fn();
-    CurrentUserStore.reload = reloadSpy;
+    CurrentUser.reload = reloadSpy;
 
     render(<UserEdit user={differentUser} />);
 

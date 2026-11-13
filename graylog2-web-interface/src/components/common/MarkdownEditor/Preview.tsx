@@ -20,6 +20,7 @@ import styled, { css } from 'styled-components';
 
 import NumberUtils from 'util/NumberUtils';
 import { Markdown, IconButton } from 'components/common';
+import zIndices from 'theme/z-indices';
 
 import PreviewModal from './PreviewModal';
 
@@ -58,7 +59,7 @@ const ExpandIconButton = styled(IconButton)`
   right: 0;
   padding: 8px 16px;
   cursor: pointer;
-  z-index: 10;
+  z-index: ${zIndices.expandButton};
 `;
 
 const MarkdownStyles = styled.div<{ $noPadding?: boolean }>`
@@ -101,18 +102,6 @@ const MarkdownStyles = styled.div<{ $noPadding?: boolean }>`
   & p {
     white-space: pre-line;
     margin: 8px 0;
-  }
-
-  & table {
-    border-collapse: collapse;
-    border-spacing: 0;
-    margin: 8px 0;
-
-    & th,
-    & td {
-      border: 1px solid ${({ theme }) => theme.colors.input.border};
-      padding: 4px 8px;
-    }
   }
 `;
 

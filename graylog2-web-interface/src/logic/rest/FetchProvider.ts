@@ -14,8 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import memoize from 'lodash/memoize';
-
 import * as JSON from 'util/json';
 import FetchError from 'logic/errors/FetchError';
 import ErrorsActions from 'actions/errors/ErrorsActions';
@@ -23,9 +21,7 @@ import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import CancellablePromise from 'logic/rest/CancellablePromise';
 import { reportError as reportServerError, reportSuccess as reportServerSuccess } from 'api/server-availability';
 import type { Method } from 'routing/types';
-
-// eslint-disable-next-line global-require,@typescript-eslint/no-require-imports
-const importSessionStore = memoize(() => require('stores/sessions/SessionStore'));
+import Session from 'logic/session/Session';
 
 const defaultOnUnauthorizedError = (error: FetchError) => ErrorsActions.report(createFromFetchError(error));
 
@@ -36,15 +32,14 @@ const onServerError = async (error: Response | undefined, onUnauthorized = defau
   const response = await (contentType?.startsWith('application/json')
     ? error.json().then((body) => body)
     : error?.text?.());
-  const { SessionStore, SessionActions } = importSessionStore();
   const fetchError = new FetchError(error.statusText, error.status, emptyToUndefined(response));
 
-  if (SessionStore.isLoggedIn() && error.status === 401) {
-    SessionActions.logout();
+  if (Session.isLoggedIn() && error.status === 401) {
+    Session.logout().catch(() => {});
   }
 
   // Redirect to the start page if a user is logged in but not allowed to access a certain HTTP API.
-  if (SessionStore.isLoggedIn() && error.status === 403) {
+  if (Session.isLoggedIn() && error.status === 403) {
     onUnauthorized(fetchError);
   }
 
@@ -100,6 +95,8 @@ export class Builder {
   private responseHandler: (response: unknown) => unknown;
 
   private errorHandler: (error: unknown) => unknown;
+
+  private signal: AbortSignal;
 
   constructor(method: Method, url: string) {
     this.method = method;
@@ -192,6 +189,27 @@ export class Builder {
     return this;
   }
 
+  // Resolves with the body as it arrives. Aborting rejects with the abort's error, not as a server error.
+  ndjsonStream(body: any, signal?: AbortSignal) {
+    this.body = { body: maybeStringify(body), mimeType: 'application/json' };
+    this.accept = 'application/x-ndjson';
+    this.signal = signal;
+
+    this.responseHandler = (resp: Response) => {
+      if (resp.ok) {
+        reportServerSuccess();
+
+        return resp.body;
+      }
+
+      throw resp;
+    };
+
+    this.errorHandler = (error: Response) => (signal?.aborted ? Promise.reject(error) : onServerError(error));
+
+    return this;
+  }
+
   plaintext(body: any) {
     this.body = { body, mimeType: 'text/plain' };
     this.accept = 'application/json';
@@ -222,6 +240,7 @@ export class Builder {
   noSessionExtension() {
     this.options = {
       ...this.options,
+      // eslint-disable-next-line graylog/no-literal-product-name -- HTTP header name expected by the backend
       'X-Graylog-No-Session-Extension': 'true',
     };
 
@@ -241,6 +260,7 @@ export class Builder {
         method: this.method,
         headers,
         body: this.body ? this.body.body : undefined,
+        signal: this.signal,
       }),
     )
       .then(this.responseHandler, this.errorHandler)
@@ -249,18 +269,8 @@ export class Builder {
 }
 
 function queuePromiseIfNotLoggedin<T>(promise: () => Promise<T>): () => Promise<T> {
-  const { SessionStore, SessionActions } = importSessionStore();
-
-  if (!SessionStore.isLoggedIn()) {
-    return () =>
-      CancellablePromise.of(
-        new Promise((resolve, reject) => {
-          const unsubscribe = SessionActions.login.completed.listen(() => {
-            unsubscribe();
-            promise().then(resolve, reject);
-          });
-        }),
-      );
+  if (!Session.isLoggedIn()) {
+    return () => CancellablePromise.of(Session.waitForLogin().then(promise));
   }
 
   return promise;
@@ -305,6 +315,17 @@ export function fetchStreamingPlainText(method: Method, url: string, body?: any)
 
 export function fetchPeriodically<T = unknown>(method: Method, url: string, body?: any): Promise<T> {
   const promise = () => new Builder(method, url).noSessionExtension().json(body).build();
+
+  return queuePromiseIfNotLoggedin(promise)();
+}
+
+export function fetchStream(
+  method: Method,
+  url: string,
+  body: any,
+  signal?: AbortSignal,
+): Promise<ReadableStream<Uint8Array>> {
+  const promise = () => new Builder(method, url).ndjsonStream(body, signal).build();
 
   return queuePromiseIfNotLoggedin(promise)();
 }

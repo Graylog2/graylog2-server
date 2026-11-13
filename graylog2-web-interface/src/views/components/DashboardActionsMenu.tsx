@@ -17,7 +17,7 @@
 import React, { useState, useCallback, useMemo, useRef } from 'react';
 
 import useHistory from 'routing/useHistory';
-import { isPermitted } from 'util/PermissionsMixin';
+import useLocation from 'routing/useLocation';
 import AppConfig from 'util/AppConfig';
 import { MenuItem, ButtonGroup } from 'components/bootstrap';
 import { ShareButton } from 'components/common';
@@ -27,8 +27,8 @@ import onSaveNewDashboard from 'views/logic/views/OnSaveNewDashboard';
 import * as ViewPermissions from 'views/Permissions';
 import useSearchPageLayout from 'hooks/useSearchPageLayout';
 import View from 'views/logic/views/View';
-import type User from 'logic/users/User';
-import useCurrentUser from 'hooks/useCurrentUser';
+import usePermissions from 'hooks/usePermissions';
+import type { IsPermitted } from 'hooks/usePermissions';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
 import useProductName from 'brand-customization/useProductName';
 import EntityShareModal from 'components/permissions/EntityShareModal';
@@ -49,9 +49,9 @@ import { MoreActionsMenu } from 'components/common/MoreActions';
 import DashboardPropertiesModal from './dashboard/DashboardPropertiesModal';
 import BigDisplayModeConfiguration from './dashboard/BigDisplayModeConfiguration';
 
-const _isAllowedToEdit = (view: View, currentUser: User | undefined | null) =>
-  isPermitted(currentUser?.permissions, [ViewPermissions.View.Edit(view.id)]) ||
-  (view.type === View.Type.Dashboard && isPermitted(currentUser?.permissions, [`dashboards:edit:${view.id}`]));
+const _isAllowedToEdit = (view: View, isPermitted: IsPermitted) =>
+  isPermitted([ViewPermissions.View.Edit(view.id)]) ||
+  (view.type === View.Type.Dashboard && isPermitted([`dashboards:edit:${view.id}`]));
 
 const immutableDashboardInfo = (productName: string) =>
   `This dashboard is read-only because it is managed by ${productName}. Use "Save as" to create an editable copy.`;
@@ -59,7 +59,7 @@ const immutableDashboardInfo = (productName: string) =>
 const DashboardActionsMenu = () => {
   const view = useView();
   const isNewView = useIsNew();
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
 
   const {
     viewActions: {
@@ -77,7 +77,7 @@ const DashboardActionsMenu = () => {
   const [exportOpen, setExportOpen] = useState(false);
   const sendTelemetry = useSendTelemetry('dashboard');
   const { loadingScopePermissions, scopePermissions } = useGetPermissionsByScope({ _scope: view.scope });
-  const allowedToEdit = _isAllowedToEdit(view, currentUser) && !!scopePermissions?.is_mutable;
+  const allowedToEdit = _isAllowedToEdit(view, isPermitted) && !!scopePermissions?.is_mutable;
   const isImmutable = !isNewView && !loadingScopePermissions && !scopePermissions?.is_mutable;
   const productName = useProductName();
   const debugOverlay = AppConfig.gl2DevMode() && (
@@ -91,6 +91,7 @@ const DashboardActionsMenu = () => {
 
   const dispatch = useViewsDispatch();
   const history = useHistory();
+  const { search } = useLocation();
   const pluggableDashboardActions = usePluginEntities('views.components.dashboardActions');
   const modalRefs = useRef({});
   const dashboardActions = useMemo(
@@ -138,19 +139,20 @@ const DashboardActionsMenu = () => {
       if (!isNewView) {
         const dashboardWithPluginData = await executePluggableDuplicationHandler(
           newDashboard,
-          currentUser.permissions,
+          isPermitted,
           pluggableSaveViewControls,
         );
 
-        return dispatch(onSaveNewDashboard(dashboardWithPluginData, history, entityShare, view.id));
+        return dispatch(onSaveNewDashboard(dashboardWithPluginData, history, entityShare, view.id, search));
       }
 
-      return dispatch(onSaveNewDashboard(newDashboard, history, entityShare));
+      return dispatch(onSaveNewDashboard(newDashboard, history, entityShare, undefined, search));
     },
     [
-      currentUser.permissions,
+      isPermitted,
       dispatch,
       history,
+      search,
       pluggableSaveViewControls,
       sendTelemetry,
       view.id,

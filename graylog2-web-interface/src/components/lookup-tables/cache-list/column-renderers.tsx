@@ -118,15 +118,13 @@ const ThroughputCol = ({ cache }: { cache: CacheEntity }) => (
 const columnRenderers: ColumnRenderers<CacheEntity> = {
   attributes: {
     title: {
-      width: 0.2,
       renderCell: (title: string, cache: CacheEntity) => <TitleCol cache={cache}>{title}</TitleCol>,
     },
     description: {
-      width: 0.2,
       renderCell: (description: string) => <span>{description}</span>,
     },
     name: {
-      width: 0.2,
+      staticWidth: 200,
       renderCell: (name: string) => <span>{name}</span>,
     },
     entries: {
@@ -140,7 +138,7 @@ const columnRenderers: ColumnRenderers<CacheEntity> = {
       textAlign: 'right',
     },
     throughput: {
-      staticWidth: 150,
+      staticWidth: 130,
       renderCell: (_arg: unknown, cache: CacheEntity) => <ThroughputCol cache={cache} />,
       textAlign: 'right',
     },

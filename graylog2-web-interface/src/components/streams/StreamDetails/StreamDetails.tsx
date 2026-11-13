@@ -32,7 +32,6 @@ import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useQuery from 'routing/useQuery';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import useCurrentUser from 'hooks/useCurrentUser';
 import { MoreActionsMenu } from 'components/common/MoreActions';
 
 import StreamDataRoutingIntake from './StreamDataRoutingIntake';
@@ -164,7 +163,6 @@ const StreamDetails = ({ stream }: Props) => {
   } = useIndexSetsList(false);
   const { updateStream } = useStreamMutations();
   const history = useHistory();
-  const currentUser = useCurrentUser();
   const sendTelemetry = useSendTelemetry();
 
   const updateURLStepQueryParam = (nextSegment: DetailsSegment) => {
@@ -198,7 +196,7 @@ const StreamDetails = ({ stream }: Props) => {
 
   return (
     <>
-      {DataLakeJobComponent && <DataLakeJobComponent permissions={currentUser.permissions} streamId={stream.id} />}
+      {DataLakeJobComponent && <DataLakeJobComponent streamId={stream.id} />}
       <Container>
         <Header>
           <LeftCol>

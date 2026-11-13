@@ -1,0 +1,7 @@
+type = "f"
+message = "Fix failing cross-region downloads of Geo IP database files from S3."
+
+contributors = ["@Utkarsh-rwt"]
+
+issues = ["27753"]
+pulls = ["27798"]

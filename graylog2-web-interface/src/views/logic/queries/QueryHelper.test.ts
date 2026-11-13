@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { MISSING_BUCKET_NAME } from 'views/Constants';
+import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 
-import { concatQueryStrings, edgeClause, escape, predicate } from './QueryHelper';
+import { concatQueryStrings, edgeClause, escape, formatValueForQuery, predicate } from './QueryHelper';
 
 describe('QueryHelper', () => {
   it('quotes $ in values', () => {
@@ -69,6 +70,22 @@ describe('QueryHelper', () => {
       const result = concatQueryStrings([undefined, 'field1:value1 OR field2:value2', null, '']);
 
       expect(result).toEqual('field1:value1 OR field2:value2');
+    });
+  });
+
+  describe('formatValueForQuery', () => {
+    it('escapes string values', () => {
+      expect(formatValueForQuery('foo:bar', FieldTypes.STRING())).toEqual('foo\\:bar');
+    });
+
+    it('quotes string values containing whitespace', () => {
+      expect(formatValueForQuery('foo bar', FieldTypes.STRING())).toEqual('"foo bar"');
+    });
+
+    it('formats date values as quoted UTC timestamp', () => {
+      expect(formatValueForQuery('2026-10-08T09:05:06.000+02:00', FieldTypes.DATE())).toEqual(
+        '"2026-10-08T07:05:06.000Z"',
+      );
     });
   });
 

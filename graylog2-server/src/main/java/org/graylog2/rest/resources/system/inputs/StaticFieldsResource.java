@@ -103,7 +103,7 @@ public class StaticFieldsResource extends RestResource {
             throw new BadRequestException(msg);
         }
 
-        if (Message.RESERVED_FIELDS.contains(csfr.key()) && !Message.RESERVED_SETTABLE_FIELDS.contains(csfr.key())) {
+        if (Message.isReservedNonSettableField(csfr.key())) {
             final String message = "Cannot add static field. Field [" + csfr.key() + "] is reserved.";
             LOG.error(message);
             throw new BadRequestException(message);
@@ -137,7 +137,7 @@ public class StaticFieldsResource extends RestResource {
     })
     @Path("/{key}")
     @AuditEvent(type = AuditEventTypes.STATIC_FIELD_DELETE)
-    public void delete(@Parameter(name = "Key", required = true)
+    public void delete(@Parameter(name = "key", required = true)
                        @PathParam("key") String key,
                        @Parameter(name = "inputId", required = true)
                        @PathParam("inputId") String inputId) throws NotFoundException {

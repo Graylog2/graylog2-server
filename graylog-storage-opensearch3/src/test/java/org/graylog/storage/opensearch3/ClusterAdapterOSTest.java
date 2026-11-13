@@ -51,8 +51,8 @@ class ClusterAdapterOSTest {
                 .stubResponse("GET", "/_cat/nodes", Resources.getResource("cat_nodes.json"))
                 .stubResponse("GET", "/_cluster/settings", Resources.getResource("cluster_settings.json"))
                 .stubResponse("GET", "/_cat/allocation", Resources.getResource("cat_allocation.json"))
-                .stubResponse("GET", "/_cat/aliases", Resources.getResource("cat_aliases.json"))
-                .stubResponse("GET", "/_cat/indices", Resources.getResource("cat_indices.json"))
+                .stubResponse("GET", "/_cat/aliases/*", Resources.getResource("cat_aliases.json"))
+                .stubResponse("GET", "/_cat/indices/*", Resources.getResource("cat_indices.json"))
                 .stubError("GET", "/_cluster/health", 500, "Server not responding")
                 .build();
         this.clusterAdapter = new ClusterAdapterOS(client, Duration.seconds(1));
@@ -135,7 +135,7 @@ class ClusterAdapterOSTest {
 
     @Test
     void testDeflectorHealth() {
-        assertThat(clusterAdapter.deflectorHealth(Set.of("graylog_0", "gl-system-events_deflector", "gl-events_deflector"))).contains(HealthStatus.Red);
+        assertThat(clusterAdapter.deflectorHealth(Set.of("gl-system-events_deflector", "gl-events_deflector"))).contains(HealthStatus.Red);
     }
 
     @Test

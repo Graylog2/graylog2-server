@@ -28,7 +28,6 @@ import org.graylog2.indexer.indices.Indices;
 import org.graylog2.metrics.entity.EntityMetric;
 
 import java.time.Duration;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -70,8 +69,7 @@ public class IndexSetFieldCountDescriptor extends IndexSetMetricDescriptor<Integ
     }
 
     @Override
-    public List<EntityMetric<Integer>> compute(Collection<String> entityIds) {
-        final Set<IndexSet> indexSets = indexSets(entityIds);
+    List<EntityMetric<Integer>> computeFor(Set<IndexSet> indexSets) {
         final Map<String, String> writeIndexByAlias = resolveWriteIndices(indexSets);
         final Map<String, Integer> fieldCounts = indexFieldTypesService.findByIndexNames(writeIndexByAlias.values()).stream()
                 .collect(Collectors.toMap(IndexFieldTypesDTO::indexName, dto -> dto.fields().size()));
