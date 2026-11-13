@@ -52,7 +52,10 @@ const GROUPS: TokenGroup[] = [
       { path: 'text.primary', usage: 'Default body and heading text.' },
       { path: 'text.secondary', usage: 'Supporting text: descriptions, help text, metadata, table headers.' },
       { path: 'text.disabled', usage: 'Text in disabled controls.' },
-      { path: 'global.textAlt', usage: 'Text on dark or colored surfaces where the primary text color would not contrast.' },
+      {
+        path: 'global.textAlt',
+        usage: 'Text on dark or colored surfaces where the primary text color would not contrast.',
+      },
       { path: 'input.placeholder', usage: 'Placeholder text inside form inputs.' },
       { path: 'global.link', usage: 'Inline links.' },
       { path: 'global.linkHover', usage: 'Inline links on hover.' },
@@ -196,7 +199,11 @@ export const TokensDoc = () => {
             {group.intro && <Muted>{group.intro}</Muted>}
             <FoundationTable
               columns={[
-                { header: 'Token', width: '300px', render: (r: Row) => <Token>{r.path ? `theme.colors.${r.path}` : r.name}</Token> },
+                {
+                  header: 'Token',
+                  width: '300px',
+                  render: (r: Row) => <Token>{r.path ? `theme.colors.${r.path}` : r.name}</Token>,
+                },
                 { header: 'Light', width: '190px', render: (r: Row) => <ColorValue value={r.light} /> },
                 { header: 'Dark', width: '190px', render: (r: Row) => <ColorValue value={r.dark} /> },
                 { header: 'Usage', render: (r: Row) => r.usage },

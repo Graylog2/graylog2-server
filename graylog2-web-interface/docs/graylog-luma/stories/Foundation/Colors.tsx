@@ -43,7 +43,9 @@ const bestContrast = (hex: string) => {
   const withBlack = (l + 0.05) / 0.05;
   const withWhite = 1.05 / (l + 0.05);
 
-  return withBlack >= withWhite ? { ratio: withBlack, text: 'black' as const } : { ratio: withWhite, text: 'white' as const };
+  return withBlack >= withWhite
+    ? { ratio: withBlack, text: 'black' as const }
+    : { ratio: withWhite, text: 'white' as const };
 };
 
 const formatRatio = (ratio: number) => (ratio >= 10 ? ratio.toFixed(1) : ratio.toFixed(2)).replace(/\.?0+$/, '') || '0';
