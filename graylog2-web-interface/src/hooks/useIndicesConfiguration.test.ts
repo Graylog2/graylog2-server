@@ -38,7 +38,9 @@ jest.mock('util/UserNotification', () => ({
   success: jest.fn(),
 }));
 
+// eslint-disable-next-line no-restricted-syntax -- fixtures are partial API responses without json_schema
 const listRotation = SystemIndicesRotation.list as jest.Mock;
+// eslint-disable-next-line no-restricted-syntax -- fixtures are partial API responses without json_schema
 const listRetention = SystemIndicesRetention.list as jest.Mock;
 
 const mockRotationData = {

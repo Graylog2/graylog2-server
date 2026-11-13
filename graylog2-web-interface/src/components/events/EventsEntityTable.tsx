@@ -44,9 +44,7 @@ const defaultFilters = OrderedMap({ priority: nonInfoPriorities });
 const EventsEntityTable = () => {
   const { stream_id: streamId } = useQuery();
   const _fetchEvents = (searchParams: SearchParams) => fetchEvents(searchParams, streamId as string);
-  const { entityActions, expandedSections, bulkSelection } = useTableElements({
-    defaultLayout: eventsTableElements.defaultLayout,
-  });
+  const { entityActions, expandedSections, bulkSelection } = useTableElements();
 
   const _fetchSlices = (column: string, query: string, filters: UrlQueryFilters) => {
     const { filter, timerange } = parseFilters(filters);

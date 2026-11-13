@@ -48,6 +48,7 @@ const PipelineForm = ({
   const [showModal, setShowModal] = useState<boolean>(false);
 
   const _openModal = () => {
+    setNextPipeline(cloneDeep(pipeline));
     setShowModal(true);
   };
 
@@ -72,7 +73,10 @@ const PipelineForm = ({
       event.preventDefault();
     }
 
-    save(nextPipeline, _onSaved);
+    save(
+      create ? nextPipeline : { ...pipeline, title: nextPipeline.title, description: nextPipeline.description },
+      _onSaved,
+    );
   };
 
   const content = (

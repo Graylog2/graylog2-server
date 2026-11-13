@@ -1,0 +1,5 @@
+type = "c"
+message = "Expand rows in entity tables with a dedicated toggle and switch between expanded sections with tabs."
+
+issues = ["Graylog2/graylog-plugin-enterprise#16066"]
+pulls = ["27975"]

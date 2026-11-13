@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useEffect } from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import { defaultUser } from 'defaultMockValues';
 import Immutable from 'immutable';
@@ -24,6 +24,7 @@ import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
 import type { ColumnSchema } from 'components/common/EntityDataTable/types';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
 import { ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
 
 import EntityDataTable from './EntityDataTable';
@@ -175,6 +176,38 @@ describe('<EntityDataTable />', () => {
 
     await screen.findByText('Override for Entity title');
     await screen.findByText('Custom actions for Entity title');
+  });
+
+  it('keeps a section opened by a cell effect open when the table re-renders', async () => {
+    const OpenDetailsOnMount = ({ entityId }: { entityId: string }) => {
+      const { toggleSection } = useExpandedSections();
+
+      useEffect(() => {
+        toggleSection(entityId, 'details');
+      }, [entityId, toggleSection]);
+
+      return <span>Entity title</span>;
+    };
+
+    const renderTable = () => (
+      <EntityDataTable<{ id: string; title: string }>
+        {...defaultProps}
+        columnRenderers={{
+          attributes: {
+            title: { renderCell: (_title, entity) => <OpenDetailsOnMount entityId={entity.id} /> },
+          },
+        }}
+        expandedSectionRenderers={{ details: { title: 'Details', content: () => 'Details content' } }}
+      />
+    );
+
+    const { rerender } = render(renderTable());
+
+    await screen.findByText('Details content');
+
+    rerender(renderTable());
+
+    await screen.findByText('Details content');
   });
 
   it('keeps the trailing actions column even without row actions', async () => {

@@ -21,6 +21,7 @@ import type { DataTieringConfig } from 'components/indices/data-tiering';
 import type { IndexArchiveBinding } from 'components/indices/archive/types';
 import type { Attribute } from 'stores/PaginationTypes';
 import type { QualifiedUrl } from 'routing/Routes';
+import type { QuickJumpQueryAction } from 'components/quick-jump/Types';
 import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { Stream } from 'logic/streams/types';
@@ -76,6 +77,7 @@ interface PluginForwarder {
   }>;
   fetchForwarderInput: (inputId: string) => Promise<ForwarderInput>;
   fetchForwarderNode: (nodeId: string) => Promise<Forwarder>;
+  fetchForwarderNodes?: (nodeIds: Array<string>) => Promise<Array<Forwarder>>;
   isLocalNode: (nodeId: string) => Promise<boolean>;
   messageLoaders: {
     ForwarderInputDropdown: React.ComponentType<{
@@ -210,6 +212,8 @@ type RouteGenerator = (id: string, type: string) => QualifiedUrl<string>;
 
 type EntityTypeRouteGenerator = { type: string; route: (id: string) => QualifiedUrl<string> };
 
+type EntityTypeTitle = { type: string; title: string };
+
 type IndexRetentionConfig = {
   type: string;
   displayName: string;
@@ -232,7 +236,8 @@ type StreamsOverviewTableElement = {
 type IndexSetsOverviewTableElement = {
   attributeName: string;
   group?: 'configuration';
-  attributes: Array<Attribute>;
+  attributes?: Array<Attribute>;
+  backendAttributeIds?: Array<string>;
   columnRenderers: ColumnRenderersByAttribute<IndexSetEntity>;
 };
 
@@ -445,6 +450,8 @@ declare module 'graylog-web-plugin/plugin' {
     ) =>
       | { grnType: string; id: string; Title?: React.ComponentType<EntityLinkTitleProps> }
       | { onClick: (context: EntityLinkOnClickContext) => void }
+      // Renders the link itself, for targets only known where the link is shown, e.g. through a React context.
+      | { id: string; Link: React.ComponentType<EntityLinkTitleProps> }
       | null;
   };
 
@@ -468,6 +475,7 @@ declare module 'graylog-web-plugin/plugin' {
     'navigation.badges'?: Array<NavigationBadge>;
     globalNotifications?: Array<GlobalNotification>;
     helpMenu?: Array<HelpMenuItem>;
+    'quickJump.queryActions'?: Array<QuickJumpQueryAction>;
     fieldValueProviders?: Array<FieldValueProvider>;
     license?: Array<License>;
     inputSetupWizard?: Array<InputSetupWizard>;
@@ -487,6 +495,7 @@ declare module 'graylog-web-plugin/plugin' {
     'hooks.logout'?: Array<LogoutHook>;
     entityRoutes?: Array<RouteGenerator>;
     entityTypeRoute?: Array<EntityTypeRouteGenerator>;
+    entityTypeTitles?: Array<EntityTypeTitle>;
     entityCreators?: Array<EntityCreator>;
     'users.details.segments'?: Array<{
       value: string;

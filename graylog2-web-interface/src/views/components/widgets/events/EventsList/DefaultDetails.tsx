@@ -20,16 +20,18 @@ import styled from 'styled-components';
 import type { Event, EventDefinitionContext } from 'components/events/events/types';
 import GeneralEventDetailsTable from 'components/events/events/GeneralEventDetailsTable';
 import { detailsAttributes } from 'components/events/Constants';
+import sortEventDetailsAttributes from 'components/events/events/sortEventDetailsAttributes';
 import DropdownButton from 'components/bootstrap/DropdownButton';
 import useEventAction from 'components/events/events/hooks/useEventAction';
 import TagsDetailRow from 'components/events/TagsDetailRow';
+import { useIsInteractiveMode } from 'views/components/contexts/InteractiveContext';
 
 type Props = {
   event: Event;
   eventDefinitionContext: EventDefinitionContext;
 };
 
-const attributesList = detailsAttributes.map(({ id, title }) => ({ id, title }));
+const attributesList = sortEventDetailsAttributes(detailsAttributes.map(({ id, title }) => ({ id, title })));
 
 const ActionsWrapperContainer = styled.div`
   margin-top: ${({ theme }) => theme.spacings.md};
@@ -45,6 +47,7 @@ const ActionsWrapper = ({ children }) => (
 
 const DefaultDetails = ({ event, eventDefinitionContext }: Props) => {
   const { moreActions, pluggableActionModals } = useEventAction(event);
+  const interactive = useIsInteractiveMode();
   const meta = useMemo(
     () => ({ context: { event_definitions: { [event.event_definition_id]: eventDefinitionContext } } }),
     [event.event_definition_id, eventDefinitionContext],
@@ -56,7 +59,7 @@ const DefaultDetails = ({ event, eventDefinitionContext }: Props) => {
       {/* No filter component is in scope for the events overview widget, so tag chips
           here would just append an unused `filters` query param when clicked. */}
       <TagsDetailRow tags={event.tags} interactive={false} />
-      <ActionsWrapper>{moreActions}</ActionsWrapper>
+      {interactive && <ActionsWrapper>{moreActions}</ActionsWrapper>}
       {pluggableActionModals}
     </>
   );

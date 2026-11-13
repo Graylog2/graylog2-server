@@ -25,6 +25,8 @@ import useEventById from 'hooks/useEventById';
 import { mockEventData, mockEventDefinitionTwoAggregations } from 'helpers/mocking/EventAndEventDefinitions_mock';
 import useEventDefinition from 'components/events/events/hooks/useEventDefinition';
 import RightSidebarProvider from 'contexts/RightSidebarProvider';
+import InteractiveContext from 'views/components/contexts/InteractiveContext';
+import type { InteractionMode } from 'views/components/contexts/InteractiveContext';
 
 import EventDetails from './EventDetails';
 
@@ -33,11 +35,13 @@ jest.mock('hooks/useEventById');
 jest.mock('hooks/useCurrentUser');
 jest.mock('components/events/events/hooks/useEventDefinition');
 
-const renderEventDetails = () =>
+const renderEventDetails = (mode: InteractionMode = 'interactive') =>
   render(
-    <RightSidebarProvider>
-      <EventDetails eventId="event-id" />
-    </RightSidebarProvider>,
+    <InteractiveContext.Provider value={mode}>
+      <RightSidebarProvider>
+        <EventDetails eventId="event-id" />
+      </RightSidebarProvider>
+    </InteractiveContext.Provider>,
   );
 describe('EventDetails', () => {
   beforeEach(() => {
@@ -127,5 +131,17 @@ describe('EventDetails', () => {
 
     await screen.findByText('Additional Fields');
     expect(screen.queryByText('Tags')).not.toBeInTheDocument();
+  });
+
+  it('offers event actions only when interactive', async () => {
+    const { unmount } = renderEventDetails();
+
+    await screen.findByRole('button', { name: /actions/i });
+    unmount();
+
+    renderEventDetails('disabled');
+
+    await screen.findByText('Additional Fields');
+    expect(screen.queryByRole('button', { name: /actions/i })).not.toBeInTheDocument();
   });
 });

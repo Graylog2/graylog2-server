@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix incorrect parameter names in the API browser, e.g. `groups` for `GET /api/search/aggregate`, `decoratorId` for decorator endpoints and `key` for deleting input static fields."
+
+issues = ["28047"]
+pulls = ["28048"]
