@@ -56,6 +56,7 @@ import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import Store from 'logic/local-storage/Store';
 import generateId from 'logic/generateId';
 import Routes from 'routing/Routes';
+import useHistory from 'routing/useHistory';
 import type { EventDefinitionLocalStorageConfig } from 'components/event-definitions/hooks/useEventDefinitionConfigFromLocalStorage';
 import type { TimeRange } from 'views/logic/queries/Query';
 
@@ -121,9 +122,8 @@ type CreateEventDefinitionArgs = {
   };
 };
 
-// Hands the event definition to its form, as creating one from a widget's value does. Runs synchronously, so the
-// browser lets the click on the proposal open the new tab.
-const openEventDefinitionForm = (args: Record<string, unknown>) => {
+// Hands the event definition to its form, as creating one from a widget's value does.
+const eventDefinitionFormUrl = (args: Record<string, unknown>) => {
   const { condition, ...definition } = args as CreateEventDefinitionArgs;
   const sessionId = `assistant-${generateId()}`;
   const config: EventDefinitionLocalStorageConfig = {
@@ -141,12 +141,7 @@ const openEventDefinitionForm = (args: Record<string, unknown>) => {
   };
   Store.set(sessionId, config);
 
-  if (!window.open(`${Routes.ALERTS.DEFINITIONS.CREATE}?step=event-details&session-id=${sessionId}`, '_blank')) {
-    Store.delete(sessionId);
-    throw new Error('The browser blocked the new tab for the event definition.');
-  }
-
-  return { summary: `Opened the form for event definition "${definition.title}" in a new tab` };
+  return `${Routes.ALERTS.DEFINITIONS.CREATE}?step=event-details&session-id=${sessionId}`;
 };
 
 type WidgetBuilder = ReturnType<typeof Widget.builder>;
@@ -220,6 +215,7 @@ const mergeAggregation = (current: AggregationWidgetConfig, changedJson: Aggrega
 
 const useSearchPageTools = (): PageTools => {
   const dispatch = useViewsDispatch();
+  const history = useHistory();
   const view = useViewsSelector(selectView);
   const activeQueryId = useViewsSelector(selectActiveQuery);
   const globalOverride = useViewsSelector(selectGlobalOverride);
@@ -331,9 +327,13 @@ const useSearchPageTools = (): PageTools => {
 
         return { summary: 'Changed the time range', undo: isDashboard ? undefined : () => dispatch(undo()) };
       },
-      create_event_definition: openEventDefinitionForm,
+      create_event_definition: (args) => {
+        history.push(eventDefinitionFormUrl(args));
+
+        return { summary: `Opened the form for event definition "${String(args.title)}"` };
+      },
     };
-  }, [activeQueryId, dispatch, globalOverride, isDashboard]);
+  }, [activeQueryId, dispatch, globalOverride, history, isDashboard]);
 };
 
 // Tells the Assistant what the search or dashboard shows, and lets it change the page.

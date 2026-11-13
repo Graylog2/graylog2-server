@@ -52,6 +52,8 @@ import Store from 'logic/local-storage/Store';
 import SearchPageAssistantContext from './SearchPageAssistantContext';
 
 jest.mock('routing/useLocation', () => () => ({ pathname: '/search' }));
+const mockHistory = { push: jest.fn() };
+jest.mock('routing/useHistory', () => () => mockHistory);
 jest.mock('views/stores/useViewsSelector');
 jest.mock('views/stores/useViewsDispatch');
 jest.mock('views/logic/slices/widgetActions', () => ({ addWidget: jest.fn(() => 'addWidget') }));
@@ -287,22 +289,11 @@ describe('SearchPageAssistantContext', () => {
   });
 
   describe('create_event_definition', () => {
-    const openedSession = () => {
-      const [, step, sessionId] = (asMock(window.open).mock.calls[0][0] as string).match(/step=([^&]+)&session-id=(.+)$/);
-
-      return { step, config: Store.get(sessionId) };
-    };
-
-    beforeEach(() => {
-      jest.spyOn(window, 'open').mockReturnValue({} as Window);
-    });
-
     afterEach(() => {
-      asMock(window.open).mockRestore();
       window.localStorage.clear();
     });
 
-    it('opens the event definition form in a new tab, filled in with the definition and its condition', () => {
+    it('opens the event definition form in the app, filled in with the definition and its condition', () => {
       const result = renderTools()().create_event_definition({
         title: 'Many failed logins',
         description: 'Brute force attempts',
@@ -314,40 +305,26 @@ describe('SearchPageAssistantContext', () => {
         condition: { function: 'count', field: '', operator: '>=', threshold: 10, group_by: ['source'] },
       });
 
-      expect(window.open).toHaveBeenCalledWith(expect.stringContaining('/alerts/definitions/new?'), '_blank');
-      expect(openedSession()).toEqual({
-        step: 'event-details',
-        config: {
-          type: 'aggregation-v1',
-          title: 'Many failed logins',
-          description: 'Brute force attempts',
-          priority: 3,
-          query: 'action:login_failed',
-          streams: ['s1'],
-          search_within_ms: 600000,
-          execute_every_ms: 60000,
-          agg_function: 'count',
-          agg_operator: '>=',
-          agg_value: 10,
-          group_by: ['source'],
-        },
+      const [url] = mockHistory.push.mock.calls[0] as [string];
+      const [, path, step, sessionId] = url.match(/^(.*)\?step=([^&]+)&session-id=(.+)$/);
+
+      expect(path).toBe('/alerts/definitions/new');
+      expect(step).toBe('event-details');
+      expect(Store.get(sessionId)).toEqual({
+        type: 'aggregation-v1',
+        title: 'Many failed logins',
+        description: 'Brute force attempts',
+        priority: 3,
+        query: 'action:login_failed',
+        streams: ['s1'],
+        search_within_ms: 600000,
+        execute_every_ms: 60000,
+        agg_function: 'count',
+        agg_operator: '>=',
+        agg_value: 10,
+        group_by: ['source'],
       });
-      expect(result).toEqual({ summary: 'Opened the form for event definition "Many failed logins" in a new tab' });
-    });
-
-    it('fails and forgets the definition when the browser blocks the new tab', () => {
-      asMock(window.open).mockReturnValue(null);
-
-      expect(() =>
-        renderTools()().create_event_definition({
-          title: 'Admin logins',
-          query: 'user:admin',
-          streams: [],
-          search_within_ms: 300000,
-          execute_every_ms: 300000,
-        }),
-      ).toThrow('blocked');
-      expect(window.localStorage.length).toBe(0);
+      expect(result).toEqual({ summary: 'Opened the form for event definition "Many failed logins"' });
     });
   });
 
