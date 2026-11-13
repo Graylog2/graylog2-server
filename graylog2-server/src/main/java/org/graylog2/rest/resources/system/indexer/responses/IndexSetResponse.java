@@ -78,6 +78,8 @@ public abstract class IndexSetResponse implements
                 .fieldTypeRefreshInterval(indexSetConfig.fieldTypeRefreshInterval())
                 .indexTemplateType(indexSetConfig.indexTemplateType().orElse(null))
                 .fieldTypeProfile(indexSetConfig.fieldTypeProfile())
+                .fieldLimit(indexSetConfig.fieldLimit())
+                .dynamicMappingDisabled(indexSetConfig.dynamicMappingDisabled())
                 .dataTieringConfig(indexSetConfig.dataTieringConfig())
                 .useLegacyRotation(indexSetConfig.dataTieringConfig() == null)
                 .dataTieringStatus(dataTieringStatus)

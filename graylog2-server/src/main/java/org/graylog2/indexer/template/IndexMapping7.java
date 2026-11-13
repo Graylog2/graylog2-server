@@ -26,8 +26,9 @@ import java.util.Map;
 public class IndexMapping7 extends IndexMapping {
     @Override
     protected Template.Mappings mapping(String analyzer,
-                                          final CustomFieldMappings customFieldMappings) {
-        return new Template.Mappings(messageMapping(analyzer, customFieldMappings));
+                                          final CustomFieldMappings customFieldMappings,
+                                          final boolean dynamicMappingDisabled) {
+        return new Template.Mappings(messageMapping(analyzer, customFieldMappings, dynamicMappingDisabled));
     }
 
     @Override

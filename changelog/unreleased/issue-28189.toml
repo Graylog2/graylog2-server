@@ -1,0 +1,5 @@
+type = "a"
+message = "Added two settings to index sets and index set templates: a maximum field count of up to 2000 per index, and an option to stop indexing fields that the Field Type Profile does not map."
+
+issues = ["28189"]
+pulls = ["28212", "Graylog2/graylog-plugin-enterprise#16362"]

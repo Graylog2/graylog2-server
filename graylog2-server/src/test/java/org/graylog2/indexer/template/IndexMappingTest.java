@@ -17,6 +17,7 @@
 package org.graylog2.indexer.template;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
@@ -43,6 +44,7 @@ import java.util.Map;
 
 import static org.graylog2.plugin.Message.FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -58,6 +60,8 @@ class IndexMappingTest {
         indexSetMappingTemplate = mock(IndexSetMappingTemplate.class);
         when(indexSetMappingTemplate.indexAnalyzer()).thenReturn("standard");
         when(indexSetMappingTemplate.indexWildcard()).thenReturn("sampleIndexTemplate");
+        when(indexSetMappingTemplate.fieldLimit()).thenReturn(null);
+        when(indexSetMappingTemplate.dynamicMappingDisabled()).thenReturn(null);
     }
 
     @Test
@@ -92,6 +96,35 @@ class IndexMappingTest {
         final String fixture = resourceFile(expectedTemplateFileName);
 
         JSONAssert.assertEquals(json(template), fixture, true);
+    }
+
+    @Test
+    void setsFieldLimitOnlyWhenConfigured() {
+        final IndexMapping indexMapping = new IndexMapping7();
+
+        assertTrue(objectMapper.valueToTree(indexMapping.toTemplate(indexSetMappingTemplate))
+                .at("/settings/index/mapping").isMissingNode());
+
+        when(indexSetMappingTemplate.fieldLimit()).thenReturn(1500);
+        assertEquals(1500, objectMapper.valueToTree(indexMapping.toTemplate(indexSetMappingTemplate))
+                .at("/settings/index/mapping/total_fields/limit").asInt());
+    }
+
+    @Test
+    void disablesDynamicMappingOnlyWhenConfigured() {
+        final IndexMapping indexMapping = new IndexMapping7();
+
+        final JsonNode defaultMappings = objectMapper.valueToTree(indexMapping.toTemplate(indexSetMappingTemplate)).at("/mappings");
+        assertTrue(defaultMappings.at("/dynamic").isMissingNode());
+        assertFalse(defaultMappings.at("/dynamic_templates").isMissingNode());
+
+        when(indexSetMappingTemplate.dynamicMappingDisabled()).thenReturn(true);
+        final JsonNode mappings = objectMapper.valueToTree(indexMapping.toTemplate(indexSetMappingTemplate)).at("/mappings");
+        assertFalse(mappings.at("/dynamic").asBoolean(true));
+        assertEquals("keyword", mappings.at("/properties/gl2_source_input/type").asText());
+        assertEquals("keyword", mappings.at("/properties/gl2_source_node/type").asText());
+        assertEquals("long", mappings.at("/properties/gl2_remote_port/type").asText());
+        assertEquals("keyword", mappings.at("/properties/gl2_message_id/type").asText());
     }
 
     private String json(Object value) throws JsonProcessingException {

@@ -153,6 +153,17 @@ public class IndexSetValidator {
         if (!config.canHaveCustomFieldMappings() && config.customFieldMappings() != null && !config.customFieldMappings().isEmpty()) {
             return Violation.create("Custom field mappings cannot be set for events and failures index sets");
         }
+        if (!config.canHaveFieldLimitAndDynamicMapping() && config.fieldLimit() != null) {
+            return Violation.create("A field limit cannot be set for events, failures and collector logs index sets");
+        }
+        if (Boolean.TRUE.equals(config.dynamicMappingDisabled())) {
+            if (!config.canHaveFieldLimitAndDynamicMapping()) {
+                return Violation.create("Dynamic mapping cannot be disabled for events, failures and collector logs index sets");
+            }
+            if (Strings.isNullOrEmpty(config.fieldTypeProfile())) {
+                return Violation.create("Dynamic mapping can only be disabled for index sets with a field type profile");
+            }
+        }
         return null;
     }
 

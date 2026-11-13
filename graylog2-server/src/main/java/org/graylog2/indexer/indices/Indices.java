@@ -306,11 +306,13 @@ public class Indices {
             if (fieldTypeProfile.isPresent() && !fieldTypeProfile.get().customFieldMappings().isEmpty()) {
                 return new IndexSetMappingTemplate(config.indexAnalyzer(),
                         config.indexWildcard(),
-                        fieldTypeProfile.get().customFieldMappings().mergeWith(customFieldMappings));
+                        fieldTypeProfile.get().customFieldMappings().mergeWith(customFieldMappings),
+                        config.fieldLimit(),
+                        config.dynamicMappingDisabled());
             }
         }
 
-        return new IndexSetMappingTemplate(config.indexAnalyzer(), config.indexWildcard(), customFieldMappings);
+        return new IndexSetMappingTemplate(config.indexAnalyzer(), config.indexWildcard(), customFieldMappings, config.fieldLimit(), config.dynamicMappingDisabled());
     }
 
     public Map<String, Set<String>> getAllMessageFieldsForIndices(final String[] writeIndexWildcards) {

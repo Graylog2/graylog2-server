@@ -234,7 +234,7 @@ class FieldTypeMappingsServiceTest {
         existingIndexSet = existingIndexSet.toBuilder()
                 .fieldTypeProfile("000000000000000000000042")
                 .build();
-        doReturn(Optional.of(existingIndexSet)).when(indexSetService).get("existing_index_set");
+        doReturn(List.of(existingIndexSet)).when(indexSetService).findByIds(Set.of("existing_index_set"));
         toTest.removeProfileFromIndexSets(Set.of(existingIndexSet.id()), false);
 
         verify(indexSetService).save(
@@ -245,8 +245,43 @@ class FieldTypeMappingsServiceTest {
     }
 
     @Test
-    void testDoesNothingWhenAskedToRemoveProfileFromIndexSetWithout() {
+    void testRejectsProfileRemovalWhileDynamicMappingIsDisabled() {
+        final IndexSetConfig otherIndexSet = buildSampleIndexSetConfig("other_index_set").toBuilder()
+                .fieldTypeProfile("000000000000000000000042")
+                .build();
+        existingIndexSet = existingIndexSet.toBuilder()
+                .title("Needs profile")
+                .fieldTypeProfile("000000000000000000000042")
+                .dynamicMappingDisabled(true)
+                .build();
+        doReturn(List.of(otherIndexSet, existingIndexSet)).when(indexSetService).findByIds(Set.of("other_index_set", "existing_index_set"));
+
+        final BadRequestException exception = assertThrows(BadRequestException.class, () ->
+                toTest.removeProfileFromIndexSets(new LinkedHashSet<>(List.of("other_index_set", "existing_index_set")), false));
+
+        assertThat(exception.getMessage()).contains("Needs profile");
+        verify(indexSetService, never()).save(any());
+    }
+
+    @Test
+    void testBulkRemoveProfileReportsIndexSetWithDisabledDynamicMappingAsFailure() {
+        existingIndexSet = existingIndexSet.toBuilder()
+                .title("Needs profile")
+                .fieldTypeProfile("000000000000000000000042")
+                .dynamicMappingDisabled(true)
+                .build();
         doReturn(Optional.of(existingIndexSet)).when(indexSetService).get("existing_index_set");
+
+        final Map<String, BulkOperationResponse> response = toTest.bulkRemoveProfile(Set.of("existing_index_set"), true);
+
+        verify(indexSetService, never()).save(any());
+        verifyNoInteractions(mongoIndexSetFactory);
+        assertFailure(response.get("existing_index_set"), "Needs profile");
+    }
+
+    @Test
+    void testDoesNothingWhenAskedToRemoveProfileFromIndexSetWithout() {
+        doReturn(List.of(existingIndexSet)).when(indexSetService).findByIds(Set.of("existing_index_set"));
         toTest.removeProfileFromIndexSets(Set.of(existingIndexSet.id()), false);
 
         verify(indexSetService, never()).save(any());
