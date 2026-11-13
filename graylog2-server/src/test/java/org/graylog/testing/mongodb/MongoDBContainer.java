@@ -19,6 +19,7 @@ package org.graylog.testing.mongodb;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.google.common.primitives.Ints;
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
@@ -52,19 +53,37 @@ public class MongoDBContainer extends GenericContainer<MongoDBContainer> {
 
     private boolean replicaSetEnabled;
 
+    /**
+     * Creates a container on the default Docker bridge network. Use this when only the test JVM connects to
+     * MongoDB via the mapped port. Avoids creating a dedicated Docker network for every container.
+     */
+    public static MongoDBContainer create(MongoDBVersion version) {
+        return new MongoDBContainer(DEFAULT_IMAGE + ":" + version.version(), null);
+    }
+
+    /**
+     * Creates a container attached to the given network with the {@link #NETWORK_ALIAS} alias. Use this when other
+     * containers must connect to MongoDB.
+     */
     public static MongoDBContainer create(Network network) {
         return create(MongoDBVersion.DEFAULT, network);
     }
 
+    /**
+     * Creates a container attached to the given network with the {@link #NETWORK_ALIAS} alias. Use this when other
+     * containers must connect to MongoDB.
+     */
     public static MongoDBContainer create(MongoDBVersion version, Network network) {
-        return new MongoDBContainer(DEFAULT_IMAGE + ":" + version.version(), network);
+        return new MongoDBContainer(DEFAULT_IMAGE + ":" + version.version(), requireNonNull(network, "network cannot be null"));
     }
 
-    private MongoDBContainer(String dockerImageName, Network network) {
+    private MongoDBContainer(String dockerImageName, @Nullable Network network) {
         super(requireNonNull(dockerImageName, "dockerImageName cannot be null"));
         withExposedPorts(MONGODB_PORT);
-        withNetwork(requireNonNull(network, "network cannot be null"));
-        withNetworkAliases(NETWORK_ALIAS);
+        if (network != null) {
+            withNetwork(network);
+            withNetworkAliases(NETWORK_ALIAS);
+        }
         waitingFor(Wait.forListeningPort());
         withStartupAttempts(3);
         withStartupTimeout(Duration.ofSeconds(30));

@@ -104,9 +104,11 @@ public class S3MinioContainer extends GenericContainer<S3MinioContainer> {
                 .build();
     }
 
+    // The Testcontainers JUnit extension (@Container) calls stop(), not close(). Since close() delegates to stop(),
+    // removing the network here covers both. The network can only be removed after the container has been stopped.
     @Override
-    public void close() {
-        super.close();
+    public void stop() {
+        super.stop();
         if (closeNetwork) {
             network.ifPresent(Network::close);
         }

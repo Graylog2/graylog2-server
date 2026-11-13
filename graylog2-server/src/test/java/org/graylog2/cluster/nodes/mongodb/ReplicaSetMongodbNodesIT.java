@@ -27,23 +27,23 @@ import org.graylog2.database.MongoConnection;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.Network;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
 
+@Testcontainers
 class ReplicaSetMongodbNodesIT {
 
-    private Network network;
-    private MongoDBContainer mongoDBContainer;
+    @Container
+    private static final MongoDBContainer mongoDBContainer = MongoDBContainer.create(MongoDBVersion.DEFAULT).withReplicaSet();
+
     private ReplicaSetMongodbNodes replicaSetNodes;
 
     private DockerMongodbConnectionResolver dockerMongodbConnectionResolver;
 
     @BeforeEach
     void setUp() {
-        network = Network.newNetwork();
-        mongoDBContainer = MongoDBContainer.create(MongoDBVersion.DEFAULT, network).withReplicaSet();
-        mongoDBContainer.start();
         final MongoConnection mongoConnection = createMongoConnection();
         this.dockerMongodbConnectionResolver = new DockerMongodbConnectionResolver(mongoDBContainer);
         replicaSetNodes = new ReplicaSetMongodbNodes(mongoConnection, new MongodbClusterCommand(mongoConnection, this.dockerMongodbConnectionResolver));
@@ -52,8 +52,6 @@ class ReplicaSetMongodbNodesIT {
     @AfterEach
     void tearDown() {
         dockerMongodbConnectionResolver.close();
-        mongoDBContainer.stop();
-        network.close();
     }
 
 

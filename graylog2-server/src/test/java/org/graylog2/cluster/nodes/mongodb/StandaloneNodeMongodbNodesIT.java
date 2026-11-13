@@ -24,31 +24,24 @@ import org.assertj.core.api.Assertions;
 import org.graylog.testing.mongodb.MongoDBContainer;
 import org.graylog.testing.mongodb.MongoDBVersion;
 import org.graylog2.database.MongoConnection;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.Network;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
 
+@Testcontainers
 class StandaloneNodeMongodbNodesIT {
 
-    private Network network;
-    private MongoDBContainer mongoDBContainer;
+    @Container
+    private static final MongoDBContainer mongoDBContainer = MongoDBContainer.create(MongoDBVersion.DEFAULT);
+
     private StandaloneNodeMongodbNodes standaloneNodes;
 
     @BeforeEach
     void setUp() {
-        network = Network.newNetwork();
-        mongoDBContainer = MongoDBContainer.create(MongoDBVersion.DEFAULT, network);
-        mongoDBContainer.start();
         standaloneNodes = new StandaloneNodeMongodbNodes(createMongoConnection());
-    }
-
-    @AfterEach
-    void tearDown() {
-        mongoDBContainer.stop();
-        network.close();
     }
 
 
