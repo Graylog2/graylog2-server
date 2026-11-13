@@ -1,0 +1,111 @@
+import { Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { Alert } from 'components/bootstrap';
+
+import {
+  Accessibility,
+  ButtonOrLink,
+  Hierarchy,
+  Icons,
+  Intent,
+  LabelsTable,
+  LinkExamples,
+  Placement,
+  SizesDemo,
+  SizesTable,
+  StateRules,
+  StatesTable,
+} from './Buttons';
+
+<Meta title="Components/Buttons/Overview" />
+
+# Buttons
+
+Buttons let users take actions and make choices with a single click or tap. Use them to submit forms, open modals, confirm decisions, or start a process. A button's label should say exactly what will happen when it's pressed.
+
+If an action takes the user somewhere else, such as another page or the documentation, use a link instead.
+
+## Hierarchy
+
+Choose emphasis based on how important the action is compared with everything else on the surface. Most screens need one primary button and a few secondary or tertiary ones.
+
+<Unstyled>
+  <Hierarchy />
+</Unstyled>
+
+## Intent
+
+Intent is separate from hierarchy. Destructive intent can be applied at primary or secondary emphasis, depending on how prominent the action should be.
+
+<Unstyled>
+  <Intent />
+</Unstyled>
+
+## Button or Link?
+
+Buttons do things. Links go places. Screen reader users hear "button" or "link" and expect different behavior, so the element must match what happens.
+
+<Unstyled>
+  <ButtonOrLink />
+</Unstyled>
+
+### Examples
+
+<Unstyled>
+  <LinkExamples />
+</Unstyled>
+
+## Sizes
+
+Buttons come in three sizes. Small (sm) is the default for most interfaces. Extra small (xs) is for compact contexts where space is limited, such as tables, cards, and infographics. Medium (md) is for larger layouts or standalone actions that need extra emphasis.
+
+<Unstyled>
+  <SizesDemo />
+  <SizesTable />
+  <br />
+  <Alert bsStyle="info">
+    <strong>Target Size</strong>
+    <br />
+    Every size meets the WCAG 2.2 minimum target of 24×24px. Keep at least 12px between adjacent xs buttons.
+  </Alert>
+</Unstyled>
+
+## States
+
+Every variant supports the same six states. Hover and pressed shift the fill one step darker; focus, disabled, and loading follow the rules below.
+
+<Unstyled>
+  <StatesTable />
+  <StateRules />
+</Unstyled>
+
+## Icons
+
+Icons support the label; they rarely replace it. Use icons from the Graylog icon set at the size paired with the button size.
+
+<Unstyled>
+  <Icons />
+</Unstyled>
+
+## Writing Button Labels
+
+Labels should tell users exactly what will happen. Start with a verb, keep it to one to three words, and use sentence case: capitalize only the first word and proper nouns or acronyms, such as "Export CSV".
+
+<Unstyled>
+  <LabelsTable />
+</Unstyled>
+
+## Accessibility
+
+These requirements apply to every variant, size, and state.
+
+<Unstyled>
+  <Accessibility />
+</Unstyled>
+
+## Placement and Usage
+
+Consistent placement helps users find actions quickly, build familiarity, and avoid mistakes. Which side matters less than doing it the same way everywhere: place actions where the task ends, and keep the order within each context identical across the product.
+
+<Unstyled>
+  <Placement />
+</Unstyled>
