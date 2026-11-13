@@ -1,0 +1,59 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+
+import * as EntityDataTableStories from './EntityDataTable.stories';
+
+<Meta of={EntityDataTableStories} />
+
+# EntityDataTable
+
+The entity table lists entities, such as streams, users or index sets, and lets users sort, choose columns, and act on one or many rows.
+
+<Canvas of={EntityDataTableStories.Default} />
+
+## Usage
+
+### When to Use
+
+- Overview pages that list entities of one type, such as Streams or Users
+- When users need to sort, compare, or act on items from the list
+
+### When Not to Use
+
+- **Small, fixed sets of data** without sorting or row actions: use the basic `Table`.
+- **Key/value details** of a single entity: use `KeyValueTable`.
+
+### Paginated Data
+
+Most pages use `PaginatedEntityTable`, which wraps this table and adds search, filters, pagination and data fetching from the server. Use `EntityDataTable` directly only when the data is already loaded.
+
+### Row Actions
+
+Put the most common action on each row, such as Edit, as a small tertiary button. Move destructive and rarely used actions into the **More actions** menu so they aren't clicked by accident.
+
+### Bulk Actions
+
+Turn on bulk selection when users regularly act on several entities at once. The bulk actions appear once at least one row is selected.
+
+<Canvas of={EntityDataTableStories.WithBulkSelection} />
+
+### Columns
+
+Every table defines its available columns, which are shown by default, and their default order. Users can show or hide columns, drag to reorder, and resize them. Their choices are saved as layout preferences.
+
+## Accessibility
+
+- Column headers are buttons: sorting and reordering work with the keyboard.
+- Row checkboxes need to identify the row they select.
+- Icon-only row actions need an `aria-label`.
+
+## Props
+
+Key props of `EntityDataTable`:
+
+- `entities`: the rows to show.
+- `columnSchemas`: all available columns, with their id, title, type and whether they're sortable.
+- `defaultDisplayedColumns` and `defaultColumnOrder`: which columns are shown, and in what order, by default.
+- `activeSort` and `onSortChange`: the current sort and its change handler.
+- `layoutPreferences`, `onLayoutPreferencesChange` and `onResetLayoutPreferences`: the user's saved column settings.
+- `entityActions`: renders the actions for each row.
+- `bulkSelection`: enables row checkboxes and bulk actions.

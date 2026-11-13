@@ -1,0 +1,58 @@
+import { ArgTypes, Canvas, Controls, Meta } from '@storybook/addon-docs/blocks';
+
+import * as SegmentedControlStories from './SegmentedControl.stories';
+
+<Meta of={SegmentedControlStories} />
+
+# SegmentedControl
+
+A segmented control lets users pick one option from a small set of related, mutually exclusive choices. Selecting a segment takes effect immediately, such as switching a view or changing a time range, without a separate submit step.
+
+<Canvas of={SegmentedControlStories.Default} />
+
+<Controls of={SegmentedControlStories.Default} />
+
+## Usage
+
+### When to Use
+
+- Switching between views of the same content, such as Table and Chart
+- Choosing a mode or filter that applies right away, such as Day, Week, or Month
+- Two to five options with short labels that all fit on one line
+
+### When Not to Use
+
+- **More than five options, or long labels:** use a select.
+- **Choices inside a form that are only applied on submit:** use radio buttons.
+- **Switching between separate sections of content:** use tabs.
+- **A single on/off setting:** use a switch or checkbox.
+- **Triggering an action:** use buttons.
+
+### Writing Labels
+
+- Keep labels to one or two words
+- Use sentence case, matching button labels
+- Keep labels similar in length so segments stay balanced
+- Always have one segment selected, and choose a sensible default
+
+### Color
+
+Use the default `info` color in most cases. Use `neutral` when the control sits next to a primary button or in a dense toolbar, so it doesn't compete for attention.
+
+<Canvas of={SegmentedControlStories.Neutral} />
+
+### States
+
+Disable the whole control when its choices don't apply in the current context, and explain why nearby.
+
+<Canvas of={SegmentedControlStories.Disabled} />
+
+## Accessibility
+
+- Each segment is a radio input, so screen readers announce the options as a group and the selected one
+- Arrow keys move between segments; Tab moves focus into and out of the control
+- Don't rely on color alone to show the selected segment; the default style also changes the segment's background
+
+## Props
+
+<ArgTypes of={SegmentedControlStories} />

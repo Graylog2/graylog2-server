@@ -54,7 +54,7 @@ const CurrentContextModalStory = () => {
 
   return (
     <>
-      <Button onClick={() => setShow(true)}>Create Stream</Button>
+      <Button onClick={() => setShow(true)}>Create stream</Button>
       <CreateModal<StoryValues>
         entityName="Stream"
         show={show}
