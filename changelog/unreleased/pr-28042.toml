@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fixed the pattern list in the Grok pattern create/edit dialog being limited by the search on the Grok patterns page."
+
+pulls = ["28042"]
