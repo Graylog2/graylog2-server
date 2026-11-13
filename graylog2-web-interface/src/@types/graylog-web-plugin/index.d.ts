@@ -445,9 +445,7 @@ declare module 'graylog-web-plugin/plugin' {
 
   type EntityLinkResolver = {
     uriSegment: string;
-    resolve: (
-      trailingSegments: ReadonlyArray<string>,
-    ) =>
+    resolve: (trailingSegments: ReadonlyArray<string>) =>
       | { grnType: string; id: string; Title?: React.ComponentType<EntityLinkTitleProps> }
       | { onClick: (context: EntityLinkOnClickContext) => void }
       // Renders the link itself, for targets only known where the link is shown, e.g. through a React context.
