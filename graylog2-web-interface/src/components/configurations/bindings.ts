@@ -29,6 +29,7 @@ import MarkdownConfig from 'components/configurations/MarkdownConfig';
 import WelcomePageConfig from 'components/configurations/WelcomePageConfig';
 import McpConfig from 'components/configurations/McpConfig';
 import PasswordComplexityConfig from 'components/configurations/PasswordComplexityConfig';
+import BeatsInputsConfig from 'components/configurations/BeatsInputsConfig';
 
 const bindings: PluginExports = {
   coreSystemConfigurations: [
@@ -62,6 +63,14 @@ const bindings: PluginExports = {
       props: {
         ConfigurationComponent: EventsConfig,
         title: 'Events',
+      },
+    },
+    {
+      name: 'Beats Inputs',
+      SectionComponent: ConfigurationSection,
+      props: {
+        ConfigurationComponent: BeatsInputsConfig,
+        title: 'Beats Inputs',
       },
     },
     {
