@@ -18,10 +18,9 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import getTitleForEntityType from 'util/getTitleForEntityType';
 
 const useEntityTypeTitle = (type: string): string | undefined => {
-  const pluginEntityTypeTitles = usePluginEntities('entityTypeTitles');
-  const pluginTitles = Object.fromEntries(pluginEntityTypeTitles.map(({ type: key, title }) => [key, title]));
+  const pluginTitle = usePluginEntities('entityTypeTitles').find((entry) => entry.type === type)?.title;
 
-  return getTitleForEntityType(type, false, pluginTitles);
+  return getTitleForEntityType(type, false) ?? pluginTitle;
 };
 
 export default useEntityTypeTitle;
