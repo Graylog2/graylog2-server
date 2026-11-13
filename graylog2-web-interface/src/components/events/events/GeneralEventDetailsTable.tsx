@@ -29,6 +29,12 @@ type Props = {
   meta: EventsAdditionalData;
 };
 
+// In the table, clicking the message toggles these details, so the details render it as plain text.
+const detailsAttributesRenderers = {
+  ...ColumnRenderers.attributes,
+  message: { renderCell: (message: string) => message },
+};
+
 const GeneralEventDetailsTable = ({ event, attributesList, meta }: Props) => {
   const { event_definition_id } = event;
   const { isPermitted } = usePermissions();
@@ -47,7 +53,7 @@ const GeneralEventDetailsTable = ({ event, attributesList, meta }: Props) => {
       event={event}
       meta={meta}
       eventProcedureId={eventDefinitionEventProcedureId}
-      attributesRenderers={ColumnRenderers.attributes}
+      attributesRenderers={detailsAttributesRenderers}
       attributesList={attributesList}
     />
   );
