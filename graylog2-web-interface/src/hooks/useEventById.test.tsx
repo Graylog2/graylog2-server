@@ -69,6 +69,15 @@ describe('useEventById', () => {
     expect(result.current.data).toEqual(mockEventData.event);
   });
 
+  it('should report a not found error when the event does not exist', async () => {
+    asMock(Events.getById).mockResolvedValueOnce(null);
+    const onErrorHandler = jest.fn();
+
+    renderHook(() => useEventById('missing-event-id', { onErrorHandler }), { wrapper });
+
+    await waitFor(() => expect(onErrorHandler).toHaveBeenCalledWith(expect.objectContaining({ status: 404 })));
+  });
+
   it('should display notification on fail', async () => {
     asMock(Events.getById).mockRejectedValueOnce(new Error('Error'));
 
