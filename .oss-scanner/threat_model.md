@@ -124,15 +124,17 @@ cannot reproduce a finding, say so and explain it from the code.
   server's are listed in `/opt/graylog-tests-needing-docker.txt`. For code that needs a database, mock the service
   or database layer instead. Results of the server run made at build time: `/var/log/graylog-unit-tests.log` and
   `graylog2-server/target/surefire-reports/`.
-- **Authorization bugs**: use `@WithAuthorization` (`WithAuthorizationExtension`), as `AuthzRolesResourceTest`
-  does. It logs in a real Shiro user that holds only the permissions you list and enforces `@RequiresPermissions`
-  on calls to the resource. Give that user the permissions of the low-privilege attacker and show that the call
-  succeeds or returns data it should not. A resource called directly, without it, skips `@RequiresPermissions`
-  (the server checks it in a request filter), so a missing check found that way may not be real.
+- **Authorization bugs**: the server enforces `@RequiresPermissions` in a request filter, so a test that calls a
+  resource method directly skips it, and a missing check found that way may not be real. Use `@WithAuthorization`
+  (`WithAuthorizationExtension`; its Javadoc explains how to use it, and `AuthzRolesResourceTest` is an example).
+  It logs in a user with only the permissions you list and enforces the checks. Give that user the low-privilege
+  attacker's permissions and show that the call succeeds or returns data it should not.
 - **Frontend tests**: `cd graylog2-web-interface && export PATH="$PWD/node:$PWD/node/yarn/dist/bin:$PATH" && yarn
-  test <path>`. The tests run in Jest with jsdom; there is no browser. To confirm XSS, write a Jest test that
-  renders the affected component with the hostile data (for example a message field value) and checks whether the
-  markup or script ends up in the DOM unescaped, and show from the code how that data reaches the component.
+  test <path>`. The tests run in Jest with jsdom; there is no browser. Start from the component's existing test,
+  if it has one. Permission checks in the web interface only hide controls; an authorization bug must be shown
+  on the server. To confirm XSS, write a Jest test that renders the affected component with the hostile data (for
+  example a message field value) and checks whether the markup or script ends up in the DOM unescaped, and show
+  from the code how that data reaches the component.
 
 ## How we rate severity
 
