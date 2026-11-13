@@ -76,7 +76,7 @@ describe('useEventDefinitionConfigFromLocalStorage', () => {
           series: [
             {
               field: 'action',
-              function: 'count',
+              type: 'count',
               id: 'count-action',
             },
           ],
@@ -100,7 +100,7 @@ describe('useEventDefinitionConfigFromLocalStorage', () => {
             expression: {
               left: {
                 expr: 'number-ref',
-                ref: 'count-undefined',
+                ref: 'count-',
               },
               right: {
                 expr: 'number',
@@ -126,8 +126,9 @@ describe('useEventDefinitionConfigFromLocalStorage', () => {
           search_within_ms: 300000,
           series: [
             {
-              function: 'count',
-              id: 'count-undefined',
+              field: null,
+              type: 'count',
+              id: 'count-',
             },
           ],
           streams: ['streamId-1', 'streamId-2'],
@@ -198,10 +199,11 @@ describe('useEventDefinitionConfigFromLocalStorage', () => {
         conditions: {
           expression: {
             expr: '>',
-            left: { expr: 'number-ref', ref: 'count-undefined' },
+            left: { expr: 'number-ref', ref: 'count-' },
             right: { expr: 'number', value: 0 },
           },
         },
+        series: [{ id: 'count-', type: 'count', field: null }],
       }),
     );
   });
