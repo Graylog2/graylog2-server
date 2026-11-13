@@ -22,7 +22,7 @@ import { Badge } from 'components/bootstrap';
 import { BADGE_COLORS, BADGE_VARIANTS, BADGE_SIZES } from 'components/bootstrap/Badge';
 
 const meta = {
-  title: 'Components/Badges/Badge',
+  title: 'Components/Badge',
   component: Badge,
   parameters: {
     layout: 'centered',
@@ -48,7 +48,6 @@ const meta = {
       },
     },
   },
-  tags: ['autodocs'],
   argTypes: {
     'aria-label': { table: { disable: true } },
     bsSize: { table: { disable: true } },
