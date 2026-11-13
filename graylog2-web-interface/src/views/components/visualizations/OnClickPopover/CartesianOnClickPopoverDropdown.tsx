@@ -18,7 +18,7 @@ import React, { useMemo, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
 import Popover from 'components/common/Popover';
-import { keySeparator } from 'views/Constants';
+import { splitCompositeKey } from 'views/logic/compositeKey';
 import OnClickPopoverValueGroups from 'views/components/visualizations/OnClickPopover/OnClickPopoverValueGroups';
 import type { ValueGroups, OnClickPopoverDropdownProps } from 'views/components/visualizations/OnClickPopover/Types';
 import getHoverSwatchColor from 'views/components/visualizations/utils/getHoverSwatchColor';
@@ -55,8 +55,8 @@ const CartesianOnClickPopoverDropdown = ({
 
   const { rowPivotValues, columnPivotValues, metricValue } = useMemo<ValueGroups>(() => {
     if (!clickPoint || !config) return {};
-    const splitNames: Array<string | number> = (clickPoint.data.originalName ?? clickPoint.data.name).split(
-      keySeparator,
+    const splitNames: Array<string | number> = splitCompositeKey(
+      clickPoint.data.originalName ?? clickPoint.data.name,
     );
     const metric: string = config.series.length === 1 ? config.series[0].function : (splitNames.pop() as string);
     const columnValues = splitNames.filter((value) => value !== metric);
@@ -65,7 +65,7 @@ const CartesianOnClickPopoverDropdown = ({
 
     const rowPivotsToFields = config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [];
     const splitXValues: Array<string | number> = rowPivotsToFields?.length
-      ? `${String(clickPoint.x)}`.split(keySeparator)
+      ? splitCompositeKey(String(clickPoint.x))
       : [];
 
     return {

@@ -33,7 +33,7 @@ import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlot
 import heatmapOnClickPopover from 'views/components/visualizations/heatmap/heatmapOnClickPopover';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { DateType } from 'views/logic/aggregationbuilder/Pivot';
-import { keySeparator } from 'views/Constants';
+import { splitCompositeKey } from 'views/logic/compositeKey';
 import { toDateObject } from 'util/DateTime';
 
 import GenericPlot from '../GenericPlot';
@@ -122,7 +122,7 @@ const _sortColumnKeys = (keys: Array<string>, config: AggregationWidgetConfig) =
     return keys;
   }
 
-  return sortBy(keys, (key) => toDateObject(key.split(keySeparator)[0]).valueOf());
+  return sortBy(keys, (key) => toDateObject(splitCompositeKey(key)[0]).valueOf());
 };
 
 const _formatSeries =
@@ -141,7 +141,11 @@ const _formatSeries =
     return [['Heatmap Chart', xLabels, yLabels, z]];
   };
 
-const _axisConfig = (chartHasContent: ChartDefinition) => {
+// Keys combine several values, e.g. a timestamp and the series name, when there are more pivot fields or series.
+const _isTimeAxis = (pivots: AggregationWidgetConfig['rowPivots'], seriesCount = 1) =>
+  pivots.length === 1 && pivots[0].type === DateType && pivots[0].fields.length === 1 && seriesCount === 1;
+
+const _axisConfig = (chartHasContent: ChartDefinition, isTimeAxis: boolean) => {
   const axisConfig = {
     type: undefined,
     fixedrange: true,
@@ -149,19 +153,18 @@ const _axisConfig = (chartHasContent: ChartDefinition) => {
 
   // Adding the axis type, without provided z data, would hide the empty grid
   if (chartHasContent) {
-    axisConfig.type = 'category';
+    axisConfig.type = isTimeAxis ? 'date' : 'category';
   }
 
   return axisConfig;
 };
 
-const _chartLayout = (heatmapData: ChartDefinition[]) => {
+const _chartLayout = (heatmapData: ChartDefinition[], config: AggregationWidgetConfig) => {
   const hasContent = find(heatmapData, (series) => !isEmpty(series.z));
-  const axisConfig = _axisConfig(hasContent);
 
   return {
-    yaxis: axisConfig,
-    xaxis: axisConfig,
+    yaxis: _axisConfig(hasContent, _isTimeAxis(config.rowPivots)),
+    xaxis: _axisConfig(hasContent, _isTimeAxis(config.columnPivots, config.series.length)),
     margin: {
       b: 40,
     },
@@ -183,7 +186,7 @@ const HeatmapVisualization = makeVisualization(({ config, data, height, width }:
     seriesFormatter: _formatSeries(visualizationConfig, config),
     leafValueMatcher: _leafSourceMatcher,
   });
-  const layout = _chartLayout(heatmapData);
+  const layout = _chartLayout(heatmapData, config);
   const { popover, initializeGraphDivRef, onChartClick } = usePlotOnClickPopover({ ...heatmapOnClickPopover, config });
 
   return (

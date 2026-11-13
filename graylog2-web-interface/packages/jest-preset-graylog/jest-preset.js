@@ -71,7 +71,8 @@ module.exports = {
       module: { type: 'commonjs' },
     }],
   },
+  // Only checks the innermost package, as dependencies can have their own versions of the packages below, e.g. d3.
   transformIgnorePatterns: [
-    'node_modules/(?!(@react-hook|uuid|@?react-leaflet|jest-preset-graylog|graylog-web-plugin|styled-components|p-debounce|marked|d3-(interpolate|color))/)',
+    'node_modules/(?!.*node_modules/)(?!(@react-hook|uuid|@?react-leaflet|jest-preset-graylog|graylog-web-plugin|styled-components|p-debounce|marked|d3-(interpolate|color))/)',
   ],
 };
