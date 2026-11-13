@@ -14,13 +14,33 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import lowerCase from 'lodash/lowerCase';
+
 import usePluginEntities from 'hooks/usePluginEntities';
-import getTitleForEntityType from 'util/getTitleForEntityType';
+
+const coreEntityTypes = new Set([
+  'user',
+  'team',
+  'dashboard',
+  'event_definition',
+  'notification',
+  'search',
+  'stream',
+  'search_filter',
+  'report',
+  'role',
+  'output',
+  'sigma_rule',
+  'event_procedure',
+  'event_procedure_step',
+  'collection',
+  'collection_entities',
+]);
 
 const useEntityTypeTitle = (type: string): string | undefined => {
   const pluginTitle = usePluginEntities('entityTypeTitles').find((entry) => entry.type === type)?.title;
 
-  return getTitleForEntityType(type, false) ?? pluginTitle;
+  return coreEntityTypes.has(type) ? lowerCase(type) : pluginTitle;
 };
 
 export default useEntityTypeTitle;
