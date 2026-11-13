@@ -28,7 +28,6 @@ import org.graylog2.database.MongoConnection;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -51,10 +50,8 @@ class MongodbClusterCommandIT {
     private static final String RESTRICTED_PASSWORD = "restrictedpass";
     private static final String TEST_DATABASE = "graylog";
 
-    private static final Network NETWORK = Network.newNetwork();
-
     @Container
-    static MongoDBContainer mongoContainer = MongoDBContainer.create(MongoDBVersion.DEFAULT, NETWORK)
+    static MongoDBContainer mongoContainer = MongoDBContainer.create(MongoDBVersion.DEFAULT)
             .withEnv("MONGO_INITDB_ROOT_USERNAME", ADMIN_USER)
             .withEnv("MONGO_INITDB_ROOT_PASSWORD", ADMIN_PASSWORD)
             .withEnv("MONGO_INITDB_DATABASE", TEST_DATABASE)

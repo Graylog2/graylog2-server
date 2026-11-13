@@ -18,7 +18,6 @@ package org.graylog2.system.stats.mongo;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.testcontainers.containers.Network;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.testing.mongodb.MongoDBTestService.createStarted;
@@ -34,7 +33,7 @@ class MongoProbeIT {
     @ParameterizedTest
     @ValueSource(strings = {"7.0", "8.0", "8.2", "8.3", "latest"})
     void testVersion(String version) {
-        try (var db = createStarted(of(version), Network.newNetwork())) {
+        try (var db = createStarted(of(version))) {
             final var probe = new MongoProbe(db.mongoConnection());
 
             assertThat(probe.mongoStats().buildInfo().version()).matches("^\\d+\\.\\d+.*");
