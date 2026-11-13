@@ -23,3 +23,9 @@ declare module 'graylog-web-plugin/plugin' {
     [key: string]: any;
   }
 }
+
+// Raw file contents, e.g. `import svg from './logo.svg?raw'` (supported by Storybook's webpack config).
+declare module '*?raw' {
+  const content: string;
+  export default content;
+}
