@@ -304,6 +304,13 @@ public class Message implements Messages, Indexable, Acknowledgeable {
 
     public static final Set<String> SEARCHABLE_ES_FIELDS = Set.of(FIELD_INDEX, FIELD_ID);
 
+    /**
+     * Fields that have dedicated accessors on a message ({@link #getId()}, {@link #getMessage()},
+     * {@link #getSource()} and {@link #getTimestamp()}) and are therefore usually serialized separately from the
+     * remaining fields.
+     */
+    public static final Set<String> STANDARD_FIELDS = Set.of(FIELD_ID, FIELD_MESSAGE, FIELD_SOURCE, FIELD_TIMESTAMP);
+
     public static final ImmutableSet<String> RESERVED_SETTABLE_FIELDS = new ImmutableSet.Builder<String>()
             .addAll(GRAYLOG_FIELDS)
             .addAll(CORE_MESSAGE_FIELDS)
@@ -835,6 +842,14 @@ public class Message implements Messages, Indexable, Acknowledgeable {
 
     public Map<String, Object> getFields() {
         return ImmutableMap.copyOf(fields);
+    }
+
+    /**
+     * @param keyFilter predicate on the field name, fields for which it returns {@code true} are included
+     * @return an immutable copy of the fields whose names match the given filter
+     */
+    public Map<String, Object> getFields(final Predicate<String> keyFilter) {
+        return ImmutableMap.copyOf(Maps.filterKeys(fields, keyFilter::test));
     }
 
     public Iterable<Map.Entry<String, Object>> getFieldsEntries() {
