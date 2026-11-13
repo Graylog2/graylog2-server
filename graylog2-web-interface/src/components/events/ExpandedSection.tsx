@@ -23,7 +23,6 @@ import GeneralEventDetailsTable from 'components/events/events/GeneralEventDetai
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 import sortEventDetailsAttributes from 'components/events/events/sortEventDetailsAttributes';
 import usePermissions from 'hooks/usePermissions';
-import TagsDetailRow from 'components/events/TagsDetailRow';
 
 const noDetails = <em>No further details</em>;
 
@@ -42,19 +41,15 @@ const TacticsTechniquesPluginRow = ({ event }: { event: Event }) => {
 
 const GeneralEventDetails = ({ event }: Props) => {
   const { meta } = useMetaDataContext<EventsAdditionalData>();
+  // The details show all attributes, also the ones shown as table columns.
   const { attributes } = useTableFetchContext();
-  // The details show all attributes, also the ones shown as table columns. The tags follow in their own row.
-  const detailsAttributes = sortEventDetailsAttributes(attributes.filter(({ id }) => id !== 'tags'));
-  const hasTags = !!event.tags?.length;
+  const detailsAttributes = sortEventDetailsAttributes(attributes);
 
-  if (!detailsAttributes.length && !hasTags) return noDetails;
+  if (!detailsAttributes.length) return noDetails;
 
   return (
     <>
-      {detailsAttributes.length ? (
-        <GeneralEventDetailsTable attributesList={detailsAttributes} event={event} meta={meta} />
-      ) : null}
-      <TagsDetailRow tags={event.tags} />
+      <GeneralEventDetailsTable attributesList={detailsAttributes} event={event} meta={meta} />
       <TacticsTechniquesPluginRow event={event} />
     </>
   );
