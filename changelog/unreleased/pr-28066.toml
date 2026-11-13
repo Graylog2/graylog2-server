@@ -1,0 +1,8 @@
+type = "a"
+message = "Add search time range variables to the Format String decorator."
+
+details.user = """
+The Format String decorator can now use the time range of the current search in its format string: `${search.from}` and `${search.to}` (ISO-8601 timestamps), `${search.from_ms}` and `${search.to_ms}` (epoch milliseconds). Dates can be formatted with the date renderer, e.g. `${search.from;date(yyyy-MM-dd HH:mm)}`. A message field named `search` remains accessible as `${search}`.
+"""
+
+pulls = ["28066"]
