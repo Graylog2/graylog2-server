@@ -16,9 +16,10 @@
  */
 import * as React from 'react';
 import type * as Immutable from 'immutable';
-import { useState, useEffect } from 'react';
 import { Field, useFormikContext } from 'formik';
+import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import { getValuesFromGRN } from 'logic/permissions/GRN';
 import { Button, Alert, Input } from 'components/bootstrap';
@@ -30,7 +31,9 @@ import useDashboards from 'views/components/dashboard/hooks/useDashboards';
 import useStreams from 'components/streams/hooks/useStreams';
 import useSavedSearches from 'views/hooks/useSavedSearches';
 import type { SettingsFormValues } from 'components/users/UserEdit/SettingsSection';
-import { hasAdminPermission } from 'util/PermissionsMixin';
+// Checks the edited user's permissions, not the current user's.
+// eslint-disable-next-line no-restricted-imports
+import { hasAdminPermission, isAnyPermitted, isPermitted } from 'util/PermissionsMixin';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 
 const Container = styled.div`
@@ -68,6 +71,17 @@ const UNLIMITED_ENTITY_SHARE_REQ = { page: 1, perPage: 10000, query: '' };
 
 const grnId = (grn) => getValuesFromGRN(grn).id;
 const _grnOptionFormatter = ({ id, title }: SharedEntity): Option => ({ value: grnId(id), label: title });
+const shareEntityTypes = ['dashboard', 'stream', 'search'];
+const loadUserShares = (userId: string, entityType: string) =>
+  EntityShareDomain.loadUserSharesPaginated(userId, {
+    ...UNLIMITED_ENTITY_SHARE_REQ,
+    additionalQueries: { entity_type: entityType },
+  }).then(({ list }) => list.map(_grnOptionFormatter).toArray());
+const mergeOptions = (...lists: Array<Option[]>) => [
+  ...new Map(lists.flat().map((option) => [option.value, option])).values(),
+];
+const SECURITY_START_PAGE = 'graylog_security_welcome';
+const SECURITY_READ_PERMISSION = 'graylog_security:read' as Permission;
 const typeOptions = [
   { value: 'dashboard', label: 'Dashboard' },
   { value: 'stream', label: 'Stream' },
@@ -79,66 +93,52 @@ const useStartPageOptions = (userId, permissions) => {
     values: { startpage },
   } = useFormikContext<SettingsFormValues>();
   const selectedUserIsAdmin = hasAdminPermission(permissions);
-  const [userDashboards, setUserDashboards] = useState<Option[]>([]);
-  const [userStreams, setUserStreams] = useState<Option[]>([]);
-  const [userSearches, setUserSearches] = useState<Option[]>([]);
-  const [isLoadingUserEntities, setIsLoadingUserEntities] = useState(false);
+  const { data: userShares, isLoading: isLoadingUserShares } = useQuery({
+    queryKey: ['users', userId, 'startpage', 'shares'],
+    queryFn: () => Promise.all(shareEntityTypes.map((entityType) => loadUserShares(userId, entityType))),
+    enabled: !selectedUserIsAdmin,
+  });
+  const [userDashboards, userStreams, userSearches] = userShares ?? [[], [], []];
 
-  const { data: allDashboards, isInitialLoading: isLoadingAllDashboards } = useDashboards(
-    { query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' }, scope: 'read' },
-    { enabled: selectedUserIsAdmin },
-  );
-  const { data: allStreams, isInitialLoading: isLoadingAllStreams } = useStreams(
-    { query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } },
-    { enabled: selectedUserIsAdmin },
-  );
-  const { data: allSearches, isInitialLoading: isLoadingAllSearches } = useSavedSearches(
-    { query: '', page: 1, pageSize: 0, sort: { direction: 'asc', attributeId: 'title' } },
-    { enabled: selectedUserIsAdmin },
-  );
-  const allDashboardsOptions = (allDashboards?.list ?? []).map(({ id, title }) => ({ value: id, label: title }));
-  const allStreamsOptions = (allStreams?.list ?? []).map(({ id, title }) => ({ value: id, label: title }));
-  const allSearchesOptions = (allSearches?.list ?? []).map(({ id, title }) => ({ value: id, label: title }));
-
-  useEffect(() => {
-    if (!selectedUserIsAdmin) {
-      setIsLoadingUserEntities(true);
-
-      EntityShareDomain.loadUserSharesPaginated(userId, {
-        ...UNLIMITED_ENTITY_SHARE_REQ,
-        additionalQueries: { entity_type: 'dashboard' },
-      })
-        .then(({ list }) => setUserDashboards(list.map(_grnOptionFormatter).toArray()))
-        .then(() =>
-          EntityShareDomain.loadUserSharesPaginated(userId, {
-            ...UNLIMITED_ENTITY_SHARE_REQ,
-            additionalQueries: { entity_type: 'stream' },
-          }).then(({ list }) => {
-            setUserStreams(list.map(_grnOptionFormatter).toArray());
-          }),
-        )
-        .then(() =>
-          EntityShareDomain.loadUserSharesPaginated(userId, {
-            ...UNLIMITED_ENTITY_SHARE_REQ,
-            additionalQueries: { entity_type: 'search' },
-          }).then(({ list }) => {
-            setIsLoadingUserEntities(false);
-            setUserSearches(list.map(_grnOptionFormatter).toArray());
-          }),
-        );
-    }
-  }, [selectedUserIsAdmin, userId]);
+  const { data: allDashboards, isInitialLoading: isLoadingAllDashboards } = useDashboards({
+    query: '',
+    page: 1,
+    pageSize: 0,
+    sort: { direction: 'asc', attributeId: 'title' },
+    scope: 'read',
+  });
+  const { data: allStreams, isInitialLoading: isLoadingAllStreams } = useStreams({
+    query: '',
+    page: 1,
+    pageSize: 0,
+    sort: { direction: 'asc', attributeId: 'title' },
+  });
+  const { data: allSearches, isInitialLoading: isLoadingAllSearches } = useSavedSearches({
+    query: '',
+    page: 1,
+    pageSize: 0,
+    sort: { direction: 'asc', attributeId: 'title' },
+  });
+  const permittedDashboardsOptions = (allDashboards?.list ?? [])
+    .filter(({ id }) => isAnyPermitted(permissions, [`view:read:${id}`, `dashboards:read:${id}`]))
+    .map(({ id, title }) => ({ value: id, label: title }));
+  const permittedStreamsOptions = (allStreams?.list ?? [])
+    .filter(({ id }) => isPermitted(permissions, `streams:read:${id}`))
+    .map(({ id, title }) => ({ value: id, label: title }));
+  const permittedSearchesOptions = (allSearches?.list ?? [])
+    .filter(({ id }) => isPermitted(permissions, `view:read:${id}`))
+    .map(({ id, title }) => ({ value: id, label: title }));
 
   const prepareOptions = () => {
     if (!startpage) return [];
 
     switch (startpage?.type) {
       case 'dashboard':
-        return [...userDashboards, ...allDashboardsOptions];
+        return mergeOptions(userDashboards, permittedDashboardsOptions);
       case 'search':
-        return [{ value: 'default', label: 'New Search' }, ...userSearches, ...allSearchesOptions];
+        return mergeOptions([{ value: 'default', label: 'New Search' }], userSearches, permittedSearchesOptions);
       case 'stream':
-        return [...userStreams, ...allStreamsOptions];
+        return mergeOptions(userStreams, permittedStreamsOptions);
       default:
         return [];
     }
@@ -146,7 +146,8 @@ const useStartPageOptions = (userId, permissions) => {
 
   return {
     options: prepareOptions(),
-    isLoading: isLoadingUserEntities || isLoadingAllDashboards || isLoadingAllSearches || isLoadingAllStreams,
+    canReadSecurity: isPermitted(permissions, SECURITY_READ_PERMISSION),
+    isLoading: isLoadingUserShares || isLoadingAllDashboards || isLoadingAllSearches || isLoadingAllStreams,
   };
 };
 
@@ -154,8 +155,8 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
   const {
     data: { valid: validSecurityLicense },
   } = usePluggableLicenseCheck('/license/security');
-  const { options, isLoading } = useStartPageOptions(userId, permissions);
-  const securityOverviewOption = { value: 'graylog_security_welcome', label: 'Threat Coverage' };
+  const { options, canReadSecurity, isLoading } = useStartPageOptions(userId, permissions);
+  const securityOverviewOption = { value: SECURITY_START_PAGE, label: 'Threat Coverage' };
 
   if (isLoading) {
     return <Spinner />;
@@ -165,11 +166,15 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
     <Field name="startpage">
       {({ field: { name, value, onChange }, meta }) => {
         const type = value?.type;
+        const isSecurityStartPage = type === SECURITY_START_PAGE;
+        const showSecurityOption = validSecurityLicense && (canReadSecurity || isSecurityStartPage);
+        const isMissingPermission = isSecurityStartPage
+          ? !canReadSecurity
+          : value?.id && options.findIndex(({ value: v }) => v === value.id) < 0;
 
-        const error =
-          value?.id && options.findIndex(({ value: v }) => v === value.id) < 0 ? (
-            <Alert bsStyle="warning">User is missing permission for the configured page</Alert>
-          ) : null;
+        const error = isMissingPermission ? (
+          <Alert bsStyle="warning">User is missing permission for the configured page</Alert>
+        ) : null;
 
         const resetBtn = value?.type ? (
           <ResetBtn onClick={() => onChange({ target: { name, value: null } })}>Reset</ResetBtn>
@@ -186,7 +191,7 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
             <>
               <Container>
                 <TypeSelect
-                  options={validSecurityLicense ? [...typeOptions, securityOverviewOption] : typeOptions}
+                  options={showSecurityOption ? [...typeOptions, securityOverviewOption] : typeOptions}
                   placeholder="Select type"
                   onChange={(newType) => {
                     if (!newType) {
@@ -197,7 +202,7 @@ const StartpageFormGroup = ({ userId, permissions }: Props) => {
                   }}
                   value={value?.type}
                 />
-                {value?.type !== 'graylog_security_welcome' && (
+                {!isSecurityStartPage && (
                   <ValueSelect
                     options={options}
                     placeholder={`Select ${value?.type ?? 'entity'}`}

@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { MISSING_BUCKET_NAME } from 'views/Constants';
+
 import { fieldValueOrClause, orValuesClause } from './ValueActionQueryHelper';
 
 describe('ValueActionQueryHelper', () => {
@@ -25,6 +27,16 @@ describe('ValueActionQueryHelper', () => {
 
   it('joins field values in a field scoped OR clause', () => {
     expect(fieldValueOrClause('associated_assets', values)).toEqual('(associated_assets:(id1 OR id2 OR id3))');
+  });
+
+  it('matches the empty value bucket with a missing field', () => {
+    expect(fieldValueOrClause('source', [{ value: 'a' }, { value: 'b' }, { value: MISSING_BUCKET_NAME }])).toEqual(
+      '((source:(a OR b)) OR (NOT _exists_:source))',
+    );
+  });
+
+  it('matches only a missing field when the empty value bucket is the only value', () => {
+    expect(fieldValueOrClause('source', [{ value: MISSING_BUCKET_NAME }])).toEqual('(NOT _exists_:source)');
   });
 
   it('escapes values', () => {

@@ -20,6 +20,7 @@ import styled from 'styled-components';
 import type { Event, EventDefinitionContext } from 'components/events/events/types';
 import GeneralEventDetailsTable from 'components/events/events/GeneralEventDetailsTable';
 import { detailsAttributes } from 'components/events/Constants';
+import sortEventDetailsAttributes from 'components/events/events/sortEventDetailsAttributes';
 import DropdownButton from 'components/bootstrap/DropdownButton';
 import useEventAction from 'components/events/events/hooks/useEventAction';
 import TagsDetailRow from 'components/events/TagsDetailRow';
@@ -30,7 +31,7 @@ type Props = {
   eventDefinitionContext: EventDefinitionContext;
 };
 
-const attributesList = detailsAttributes.map(({ id, title }) => ({ id, title }));
+const attributesList = sortEventDetailsAttributes(detailsAttributes.map(({ id, title }) => ({ id, title })));
 
 const ActionsWrapperContainer = styled.div`
   margin-top: ${({ theme }) => theme.spacings.md};
