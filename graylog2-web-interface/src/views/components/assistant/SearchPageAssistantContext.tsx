@@ -44,7 +44,7 @@ import { addWidget } from 'views/logic/slices/widgetActions';
 import { setTitle } from 'views/logic/slices/titlesActions';
 import TitleTypes from 'views/stores/TitleTypes';
 import { executeActiveQuery, setTimerange, updateQueryString } from 'views/logic/slices/viewSlice';
-import { setGlobalOverrideTimerange } from 'views/logic/slices/searchExecutionSlice';
+import { setGlobalOverrideQuery, setGlobalOverrideTimerange } from 'views/logic/slices/searchExecutionSlice';
 import { undo } from 'views/logic/slices/undoRedoActions';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import type { TimeRange } from 'views/logic/queries/Query';
@@ -70,8 +70,9 @@ const useSearchPage = (): SearchPage => {
         parameter_values: parameterBindings?.toJS?.() ?? undefined,
       },
       focused_widget_id: focusedWidget?.id,
+      focused_widget_editing: !!focusedWidget?.editing,
     }),
-    [activeQueryId, dirty, focusedWidget?.id, globalOverride, parameterBindings, view],
+    [activeQueryId, dirty, focusedWidget?.editing, focusedWidget?.id, globalOverride, parameterBindings, view],
   );
 };
 
@@ -116,6 +117,7 @@ const useSearchPageTools = (): PageTools => {
   const dispatch = useViewsDispatch();
   const view = useViewsSelector(selectView);
   const activeQueryId = useViewsSelector(selectActiveQuery);
+  const globalOverride = useViewsSelector(selectGlobalOverride);
   const isDashboard = view?.type === View.Type.Dashboard;
 
   return useMemo(() => {
@@ -159,13 +161,24 @@ const useSearchPageTools = (): PageTools => {
       },
       set_query: async (args) => {
         const { query } = args as { query: string };
-        await dispatch(updateQueryString(activeQueryId, query));
+        const summary = `Changed the query to "${query}"`;
 
-        if (!isDashboard) {
-          await dispatch(executeActiveQuery());
+        // A dashboard's search bar sets the query of all its widgets, like its time range.
+        if (isDashboard) {
+          const previousQuery = globalOverride?.query?.query_string ?? '';
+          const setQuery = async (queryString: string) => {
+            await dispatch(setGlobalOverrideQuery(queryString));
+            await dispatch(executeActiveQuery());
+          };
+          await setQuery(query);
+
+          return { summary, undo: () => setQuery(previousQuery) };
         }
 
-        return { summary: `Changed the query to "${query}"`, undo: () => dispatch(undo()) };
+        await dispatch(updateQueryString(activeQueryId, query));
+        await dispatch(executeActiveQuery());
+
+        return { summary, undo: () => dispatch(undo()) };
       },
       set_timerange: async (args) => {
         const { timerange } = args as { timerange: TimeRange };
@@ -180,7 +193,7 @@ const useSearchPageTools = (): PageTools => {
         return { summary: 'Changed the time range', undo: isDashboard ? undefined : () => dispatch(undo()) };
       },
     };
-  }, [activeQueryId, dispatch, isDashboard]);
+  }, [activeQueryId, dispatch, globalOverride, isDashboard]);
 };
 
 // Tells the Assistant what the search or dashboard shows, and lets it change the page.
