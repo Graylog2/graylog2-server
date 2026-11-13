@@ -26,7 +26,6 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
 import java.util.Map;
 
 public class ProvisionerService {
@@ -136,7 +135,6 @@ public class ProvisionerService {
 
         // Set fields there that should not be overridden by the authentication service provisioning
         user.setRoleIds(userDetails.defaultRoles());
-        user.setPermissions(Collections.emptyList());
         // Default to null for the user's time zone so the UI will use the browser's time zone by default.
         user.setTimeZone(userDetails.timezone()
                 .map(zoneId -> DateTimeZone.forID(zoneId.getId()))

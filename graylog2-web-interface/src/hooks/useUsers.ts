@@ -42,7 +42,6 @@ export type UserCreate = {
   first_name: UserJSON['first_name'];
   last_name: UserJSON['last_name'];
   password: string;
-  permissions: UserJSON['permissions'];
   roles: UserJSON['roles'];
   session_timeout_ms: UserJSON['session_timeout_ms'];
   timezone: UserJSON['timezone'];

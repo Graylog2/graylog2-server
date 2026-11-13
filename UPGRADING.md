@@ -37,12 +37,28 @@ following locations where they are displayed:
 
 ## Java API Changes
 
-- tbd
+This release includes the following Java API changes.
+
+| File/method                                              | Description                                                       |
+|----------------------------------------------------------|-------------------------------------------------------------------|
+| `org.graylog2.plugin.database.users.User#setPermissions` | Deprecated. Will be removed in Graylog 8.0. Assign roles instead. |
 
 ## REST API Endpoint Changes
 
-The following REST API changes have been made.
+This release includes the following REST API changes.
 
-| Endpoint             | Description                        |
-|----------------------|------------------------------------|
-| `GET /<endpoint>`    | Description of the endpoint change |
+| Endpoint                               | Description                                                                   |
+|----------------------------------------|-------------------------------------------------------------------------------|
+| `POST /users`                          | The `permissions` field is deprecated and now optional. Assign roles instead. |
+| `PUT /users/{userId}`                  | The `permissions` field is deprecated. Assign roles instead.                  |
+| `PUT /users/{username}/permissions`    | Deprecated. Will be removed in Graylog 8.0.                                   |
+| `DELETE /users/{username}/permissions` | Deprecated. Will be removed in Graylog 8.0.                                   |
+
+## Deprecation of Direct User Permissions
+
+Besides roles and shares, users can hold permissions directly. Starting with Graylog 7.3, direct user permissions are
+deprecated. Support for them will be removed in Graylog 8.0.
+
+The web interface doesn't manage direct user permissions, so this mainly affects REST API clients. Graylog logs a
+warning when a request sets direct permissions or uses one of the deprecated endpoints listed above. To avoid the
+warnings, omit the `permissions` field in `POST /users` and `PUT /users/{userId}`, and assign roles instead.

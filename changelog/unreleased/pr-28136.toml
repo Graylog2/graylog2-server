@@ -1,0 +1,4 @@
+type = "c"
+message = "Deprecates direct user permissions and logs a warning when the REST API sets them."
+
+pulls = ["28136"]
