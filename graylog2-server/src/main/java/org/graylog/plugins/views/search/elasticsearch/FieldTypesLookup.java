@@ -21,6 +21,7 @@ import org.graylog2.indexer.fieldtypes.FieldTypeDTO;
 import org.graylog2.indexer.fieldtypes.FieldTypeMapper;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesDTO;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
+import org.graylog2.plugin.streams.Stream;
 
 import jakarta.inject.Inject;
 import org.graylog2.streams.StreamService;
@@ -68,7 +69,9 @@ public class FieldTypesLookup {
         return streamService.loadByIds(streamIds)
                 .stream()
                 .filter(Objects::nonNull)
-                .map(stream -> stream.getIndexSet().getConfig().id())
+                // Read the ID directly: plugin-provided index sets have no Mongo config behind getIndexSet().
+                .map(Stream::getIndexSetId)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
     }
 
