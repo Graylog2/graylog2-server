@@ -37,6 +37,8 @@ import {
 import useParams from 'routing/useParams';
 import type { Stream } from 'logic/streams/types';
 import RightSidebarProvider from 'contexts/RightSidebarProvider';
+import ErrorsActions from 'actions/errors/ErrorsActions';
+import FetchError from 'logic/errors/FetchError';
 import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 
 jest.mock('logic/telemetry/useSendTelemetry', () => {
@@ -57,6 +59,10 @@ jest.mock('views/hooks/useCreateSearch');
 jest.mock('hooks/useEventById');
 jest.mock('hooks/useEventDefinition');
 jest.mock('components/event-definitions/replay-search/hooks/useAlertAndEventDefinitionData');
+
+jest.mock('actions/errors/ErrorsActions', () => ({
+  report: jest.fn(),
+}));
 
 jest.mock('components/event-notifications/hooks/useEventNotifications', () => ({
   ...jest.requireActual('components/event-notifications/hooks/useEventNotifications'),
@@ -130,6 +136,24 @@ describe('EventReplaySearchPage', () => {
       eventData: mockEventData.event,
       eventDefinition: mockEventDefinitionTwoAggregations,
       aggregations: mockedMappedAggregation,
+    });
+  });
+
+  describe('onErrorHandler', () => {
+    afterEach(() => {
+      asMock(ErrorsActions.report).mockClear();
+    });
+
+    it('reports a not found error when the event does not exist', () => {
+      onErrorHandler(new FetchError('Not Found', 404, { message: "Event <missing-event-id> doesn't exist" }));
+
+      expect(ErrorsActions.report).toHaveBeenCalledWith(expect.objectContaining({ type: 'NotFoundError' }));
+    });
+
+    it('does not report other errors', () => {
+      onErrorHandler(new FetchError('Internal Server Error', 500, undefined));
+
+      expect(ErrorsActions.report).not.toHaveBeenCalled();
     });
   });
 });
