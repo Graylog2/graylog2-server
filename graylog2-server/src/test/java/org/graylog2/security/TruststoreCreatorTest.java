@@ -40,6 +40,8 @@ import org.graylog.security.certutil.keystore.storage.KeystoreFileStorage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
@@ -164,6 +166,112 @@ public class TruststoreCreatorTest {
                 .contains("cn=my-ca")
                 .contains("cn=my-ca_1")
                 .contains("cn=my-ca_2");
+    }
+
+    @Test
+    void testSameCertificateAddedOnlyOnce() throws Exception {
+        final KeyPair ca = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("my-ca").isCA(true).validity(Duration.ofDays(90)));
+
+        final KeyStore truststore = TruststoreCreator.newEmpty()
+                .addCertificates(List.of(ca.certificate()))
+                .addCertificates(List.of(ca.certificate()))
+                .getTruststore();
+
+        Assertions.assertThat(Collections.list(truststore.aliases()))
+                .containsExactly("cn=my-ca");
+    }
+
+    @Test
+    void testFirstPrivateKeyChainAndAllTrustedCertificatesAdded() throws Exception {
+        final KeyStore source = keystoreWithTwoKeysAndTrustedCertificates();
+
+        final KeyStore truststore = TruststoreCreator.newEmpty()
+                .addCertificates(source)
+                .getTruststore();
+
+        // chain of the first private key and all trusted certificates, regardless of their position.
+        // The chain of the second private key is not added.
+        Assertions.assertThat(Collections.list(truststore.aliases()))
+                .containsExactlyInAnyOrder("cn=my-node", "cn=my-ca", "cn=trusted-before", "cn=trusted-after");
+        Assertions.assertThat(truststore.isKeyEntry("cn=my-node")).isFalse();
+    }
+
+    @Test
+    void testAliasSelectsPrivateKeyChain() throws Exception {
+        final KeyStore source = keystoreWithTwoKeysAndTrustedCertificates();
+
+        final KeyStore truststore = TruststoreCreator.newEmpty()
+                .addCertificates(source, "unrelated")
+                .getTruststore();
+
+        Assertions.assertThat(Collections.list(truststore.aliases()))
+                .containsExactlyInAnyOrder("cn=unrelated-node", "cn=unrelated-ca", "cn=trusted-before", "cn=trusted-after");
+    }
+
+    @Test
+    void testAliasNotPointingToPrivateKeyFails() throws Exception {
+        final KeyStore source = keystoreWithTwoKeysAndTrustedCertificates();
+        final TruststoreCreator creator = TruststoreCreator.newEmpty();
+
+        Assertions.assertThatThrownBy(() -> creator.addCertificates(source, "trusted-before"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("trusted-before");
+        Assertions.assertThatThrownBy(() -> creator.addCertificates(source, "does-not-exist"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("does-not-exist");
+    }
+
+    @Test
+    void testKeystoreWithoutPrivateKeyAddsTrustedCertificates() throws Exception {
+        final KeyPair ca = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("my-ca").isCA(true).validity(Duration.ofDays(90)));
+        final KeyStore source = KeyStore.getInstance(CertConstants.PKCS12);
+        source.load(null, null);
+        source.setCertificateEntry("ca", ca.certificate());
+
+        final KeyStore truststore = TruststoreCreator.newEmpty()
+                .addCertificates(source)
+                .getTruststore();
+
+        Assertions.assertThat(Collections.list(truststore.aliases()))
+                .containsExactly("cn=my-ca");
+    }
+
+    private static KeyStore keystoreWithTwoKeysAndTrustedCertificates() throws Exception {
+        final Duration validity = Duration.ofDays(90);
+        final KeyPair ca = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("my-ca").isCA(true).validity(validity));
+        final KeyPair node = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.signed("my-node", ca).isCA(false).validity(validity));
+        final KeyPair unrelatedCa = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("unrelated-ca").isCA(true).validity(validity));
+        final KeyPair unrelatedNode = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.signed("unrelated-node", unrelatedCa).isCA(false).validity(validity));
+        final KeyPair trustedBefore = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("trusted-before").isCA(true).validity(validity));
+        final KeyPair trustedAfter = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("trusted-after").isCA(true).validity(validity));
+
+        final char[] password = "password".toCharArray();
+        final KeyStore source = KeyStore.getInstance(CertConstants.PKCS12);
+        source.load(null, null);
+        source.setCertificateEntry("trusted-before", trustedBefore.certificate());
+        source.setKeyEntry("node", node.privateKey(), password, new Certificate[]{node.certificate(), ca.certificate()});
+        source.setKeyEntry("unrelated", unrelatedNode.privateKey(), password, new Certificate[]{unrelatedNode.certificate(), unrelatedCa.certificate()});
+        source.setCertificateEntry("trusted-after", trustedAfter.certificate());
+        return source;
+    }
+
+    @Test
+    void testSecretKeyEntriesSkipped() throws Exception {
+        final KeyPair node = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("my-node").isCA(false).validity(Duration.ofDays(90)));
+        final char[] password = "password".toCharArray();
+
+        final KeyStore source = KeyStore.getInstance(CertConstants.PKCS12);
+        source.load(null, null);
+        source.setKeyEntry("node", node.privateKey(), password, new Certificate[]{node.certificate()});
+        final SecretKey secretKey = KeyGenerator.getInstance("AES").generateKey();
+        source.setEntry("secret", new KeyStore.SecretKeyEntry(secretKey), new KeyStore.PasswordProtection(password));
+
+        final KeyStore truststore = TruststoreCreator.newEmpty()
+                .addCertificates(source)
+                .getTruststore();
+
+        Assertions.assertThat(Collections.list(truststore.aliases()))
+                .containsExactly("cn=my-node");
     }
 
     private static X509TrustManager createTrustManager(KeyStore caTruststore) throws NoSuchAlgorithmException, KeyStoreException {
