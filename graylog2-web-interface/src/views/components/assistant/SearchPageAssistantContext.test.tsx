@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import * as Immutable from 'immutable';
 import { render } from 'wrappedTestingLibrary';
 
 import { asMock } from 'helpers/mocking';
@@ -25,12 +26,18 @@ import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { selectActiveQuery, selectView } from 'views/logic/slices/viewSelectors';
 import { selectGlobalOverride } from 'views/logic/slices/searchExecutionSelectors';
 import { setGlobalOverrideQuery } from 'views/logic/slices/searchExecutionSlice';
-import { executeActiveQuery, updateQueryString } from 'views/logic/slices/viewSlice';
+import { executeActiveQuery, updateQueryString, updateViewState } from 'views/logic/slices/viewSlice';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import View from 'views/logic/views/View';
+import ViewState from 'views/logic/views/ViewState';
+import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
+import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import Pivot from 'views/logic/aggregationbuilder/Pivot';
+import Series from 'views/logic/aggregationbuilder/Series';
+import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
+import Direction from 'views/logic/aggregationbuilder/Direction';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import { addWidget } from 'views/logic/slices/widgetActions';
-import { setTitle } from 'views/logic/slices/titlesActions';
 import { createSearch } from 'fixtures/searches';
 import type Widget from 'views/logic/widgets/Widget';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
@@ -45,7 +52,6 @@ jest.mock('routing/useLocation', () => () => ({ pathname: '/search' }));
 jest.mock('views/stores/useViewsSelector');
 jest.mock('views/stores/useViewsDispatch');
 jest.mock('views/logic/slices/widgetActions', () => ({ addWidget: jest.fn(() => 'addWidget') }));
-jest.mock('views/logic/slices/titlesActions', () => ({ setTitle: jest.fn(() => 'setTitle') }));
 jest.mock('views/logic/slices/searchExecutionSlice', () => ({
   ...jest.requireActual('views/logic/slices/searchExecutionSlice'),
   setGlobalOverrideQuery: jest.fn(() => 'setGlobalOverrideQuery'),
@@ -53,6 +59,7 @@ jest.mock('views/logic/slices/searchExecutionSlice', () => ({
 jest.mock('views/logic/slices/viewSlice', () => ({
   ...jest.requireActual('views/logic/slices/viewSlice'),
   updateQueryString: jest.fn(() => 'updateQueryString'),
+  updateViewState: jest.fn(() => 'updateViewState'),
   executeActiveQuery: jest.fn(() => 'executeActiveQuery'),
 }));
 
@@ -87,6 +94,43 @@ const renderTools = () => renderPage().getTools;
 
 const addedWidget = () => asMock(addWidget).mock.calls[0][0] as Widget;
 
+const barChart = AggregationWidget.builder()
+  .id('w1')
+  .config(
+    AggregationWidgetConfig.builder()
+      .rowPivots([Pivot.createValues(['source'])])
+      .series([Series.forFunction('count()')])
+      .sort([new SortConfig(SortConfig.PIVOT_TYPE, 'source', Direction.Descending)])
+      .visualization('bar')
+      .build(),
+  )
+  .build();
+
+// Runs thunks against a page whose shown tab has the bar chart.
+const mockPageWithBarChart = () => {
+  const viewState = ViewState.create()
+    .toBuilder()
+    .widgets(Immutable.List([barChart]))
+    .titles({ widget: { w1: 'Logins per host' } })
+    .build();
+  const state = {
+    view: {
+      activeQuery: 'query-id',
+      view: createSearch()
+        .toBuilder()
+        .state(Immutable.Map({ 'query-id': viewState }))
+        .build(),
+    },
+  };
+  asMock(useViewsDispatch).mockReturnValue(
+    jest.fn((action: unknown) =>
+      typeof action === 'function' ? action(jest.fn(), () => state) : Promise.resolve(),
+    ) as unknown as ReturnType<typeof useViewsDispatch>,
+  );
+};
+
+const updatedViewState = () => asMock(updateViewState).mock.calls[0][1] as ViewState;
+
 describe('SearchPageAssistantContext', () => {
   const mockState = (view: View, globalOverride?: GlobalOverride) =>
     asMock(useViewsSelector).mockImplementation((selector) => {
@@ -120,7 +164,8 @@ describe('SearchPageAssistantContext', () => {
     expect(widget.config.sort[0].field).toBe('user_name');
     expect(widget.config.sort[0].direction.direction).toBe('Ascending');
     expect(widget.query).toEqual({ type: 'elasticsearch', query_string: 'action:login_failed' });
-    expect(setTitle).toHaveBeenCalledWith('query-id', 'widget', widget.id, 'Failed logins');
+    // Added with its title in one change, so a single undo removes both.
+    expect(addWidget).toHaveBeenCalledWith(widget, undefined, 'Failed logins');
   });
 
   it('adds a message table with the default columns', async () => {
@@ -155,6 +200,55 @@ describe('SearchPageAssistantContext', () => {
     expect(widget).toBeInstanceOf(EventsWidget);
     expect(widget.config.mode).toBe('Number');
     expect(widget.config.filters.toArray()).toEqual([{ field: 'priority', value: ['4'] }]);
+  });
+
+  it('turns a bar chart into a line chart, keeping its sort, in one change', async () => {
+    mockPageWithBarChart();
+    const tools = renderTools();
+
+    const result = await tools().update_widget({
+      widget_id: 'w1',
+      title: 'Logins over time',
+      config: {
+        row_pivots: [{ fields: ['timestamp'], type: 'time', config: { interval: { type: 'auto', scaling: 1.0 } } }],
+        column_pivots: [{ fields: ['source'], type: 'values', config: { limit: 15 } }],
+        series: [{ function: 'count()', config: {} }],
+        sort: [],
+        visualization: 'line',
+        rollup: true,
+      },
+    });
+
+    expect(updateViewState).toHaveBeenCalledTimes(1);
+    const widget = updatedViewState().widgets.first() as AggregationWidget;
+
+    expect(widget.id).toBe('w1');
+    expect(widget.config.visualization).toBe('line');
+    expect(widget.config.rowPivots.map(({ fields }) => fields)).toEqual([['timestamp']]);
+    expect(widget.config.sort.map(({ field }) => field)).toEqual(['source']);
+    expect(updatedViewState().titles.getIn(['widget', 'w1'])).toBe('Logins over time');
+    expect(result).toEqual(expect.objectContaining({ summary: 'Changed "Logins over time"' }));
+  });
+
+  it('changes only the search of a widget when no aggregation is given', async () => {
+    mockPageWithBarChart();
+    const tools = renderTools();
+
+    await tools().update_widget({ widget_id: 'w1', query: 'action:login_failed' });
+
+    const widget = updatedViewState().widgets.first() as AggregationWidget;
+
+    expect(widget.query).toEqual({ type: 'elasticsearch', query_string: 'action:login_failed' });
+    expect(widget.config.visualization).toBe('bar');
+    expect(updatedViewState().titles.getIn(['widget', 'w1'])).toBe('Logins per host');
+  });
+
+  it('refuses to change a widget that is not on the shown tab', async () => {
+    mockPageWithBarChart();
+    const tools = renderTools();
+
+    await expect(tools().update_widget({ widget_id: 'gone', title: 'x' })).rejects.toThrow('not on the shown tab');
+    expect(updateViewState).not.toHaveBeenCalled();
   });
 
   it('sets the query of the shown tab of a search', async () => {

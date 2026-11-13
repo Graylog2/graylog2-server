@@ -21,7 +21,9 @@ import { useAssistantPageContext, useAssistantPageTools } from 'components/assis
 import type { PageTools, SearchPage } from 'components/assistant';
 import useViewsSelector from 'views/stores/useViewsSelector';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
-import { selectActiveQuery, selectIsDirty, selectView } from 'views/logic/slices/viewSelectors';
+import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
+import type { GetState } from 'views/types';
+import { selectActiveQuery, selectActiveViewState, selectIsDirty, selectView } from 'views/logic/slices/viewSelectors';
 import { selectGlobalOverride, selectParameterBindings } from 'views/logic/slices/searchExecutionSelectors';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import View from 'views/logic/views/View';
@@ -41,9 +43,9 @@ import EventsWidgetConfig from 'views/logic/widgets/events/EventsWidgetConfig';
 import type { Filter, VisualizationType } from 'views/logic/widgets/events/EventsWidgetConfig';
 import { DEFAULT_MESSAGE_FIELDS } from 'views/Constants';
 import { addWidget } from 'views/logic/slices/widgetActions';
-import { setTitle } from 'views/logic/slices/titlesActions';
 import TitleTypes from 'views/stores/TitleTypes';
-import { executeActiveQuery, setTimerange, updateQueryString } from 'views/logic/slices/viewSlice';
+import { executeActiveQuery, setTimerange, updateQueryString, updateViewState } from 'views/logic/slices/viewSlice';
+import normalizeViewState from 'views/logic/views/normalizeViewState';
 import { setGlobalOverrideQuery, setGlobalOverrideTimerange } from 'views/logic/slices/searchExecutionSlice';
 import { undo } from 'views/logic/slices/undoRedoActions';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
@@ -85,6 +87,8 @@ type WidgetSearchArgs = {
 
 type AddWidgetArgs = WidgetSearchArgs & { config: AggregationWidgetConfigJson };
 
+type UpdateWidgetArgs = Partial<WidgetSearchArgs> & { widget_id: string; config?: AggregationWidgetConfigJson };
+
 type AddMessageTableArgs = WidgetSearchArgs & {
   fields?: Array<string>;
   sort?: { field: string; direction: DirectionJson };
@@ -95,7 +99,7 @@ type AddEventsWidgetArgs = WidgetSearchArgs & { mode: VisualizationType; filters
 type WidgetBuilder = ReturnType<typeof Widget.builder>;
 
 // Without them, the widget uses the query, streams and time range of the page.
-const withSearch = (builder: WidgetBuilder, { query, streams, timerange }: WidgetSearchArgs) => {
+const withSearch = (builder: WidgetBuilder, { query, streams, timerange }: Partial<WidgetSearchArgs>) => {
   let result = builder;
 
   if (query !== undefined) {
@@ -113,6 +117,27 @@ const withSearch = (builder: WidgetBuilder, { query, streams, timerange }: Widge
   return result;
 };
 
+// The changed aggregation, with the settings the user chose for the widget where they still apply.
+const mergeAggregation = (current: AggregationWidgetConfig, changed: AggregationWidgetConfig) => {
+  const fields = new Set([...changed.rowPivots, ...changed.columnPivots].flatMap((pivot) => pivot.fields));
+  const functions = new Set(changed.series.map((series) => series.function));
+  const sort = current.sort.filter(({ type, field }) =>
+    type === SortConfig.PIVOT_TYPE ? fields.has(field) : functions.has(field),
+  );
+  const visualizationConfig =
+    changed.visualizationConfig ??
+    (changed.visualization === current.visualization ? current.visualizationConfig : undefined);
+
+  return changed
+    .toBuilder()
+    .sort(sort)
+    .visualizationConfig(visualizationConfig)
+    .formattingSettings(current.formattingSettings)
+    .units(current.units)
+    .eventAnnotation(current.eventAnnotation)
+    .build();
+};
+
 const useSearchPageTools = (): PageTools => {
   const dispatch = useViewsDispatch();
   const view = useViewsSelector(selectView);
@@ -122,8 +147,7 @@ const useSearchPageTools = (): PageTools => {
 
   return useMemo(() => {
     const add = async (widget: Widget, title: string) => {
-      await dispatch(addWidget(widget));
-      await dispatch(setTitle(activeQueryId, TitleTypes.Widget, widget.id, title));
+      await dispatch(addWidget(widget, undefined, title));
 
       return { summary: `Added "${title}"`, undo: () => dispatch(undo()) };
     };
@@ -147,6 +171,41 @@ const useSearchPageTools = (): PageTools => {
         }
 
         return add(withSearch(MessagesWidget.builder().newId().config(config.build()), search).build(), search.title);
+      },
+      update_widget: async (args) => {
+        const { widget_id: widgetId, title, config, ...search } = args as UpdateWidgetArgs;
+        const viewState = dispatch((_dispatch: ViewsDispatch, getState: GetState) => selectActiveViewState(getState()));
+        const widget = viewState?.widgets.find(({ id }) => id === widgetId);
+
+        if (!widget) {
+          throw new Error('The widget is not on the shown tab anymore.');
+        }
+
+        let builder = withSearch(widget.toBuilder(), search);
+
+        if (config) {
+          if (!(widget instanceof AggregationWidget)) {
+            throw new Error('Only aggregation widgets have a visualization, group-bys and metrics.');
+          }
+
+          builder = builder.config(mergeAggregation(widget.config, AggregationWidgetConfig.fromJSON(config)));
+        }
+
+        // One change, so a single undo reverts the widget and its title.
+        const updated = builder.build();
+        const titles = title ? viewState.titles.setIn([TitleTypes.Widget, widgetId], title) : viewState.titles;
+        const newViewState = viewState
+          .toBuilder()
+          .widgets(viewState.widgets.map((current) => (current.id === widgetId ? updated : current)).toList())
+          .titles(titles)
+          .build();
+        await dispatch(updateViewState(activeQueryId, normalizeViewState(newViewState)));
+        const shownTitle = title ?? viewState.titles.getIn([TitleTypes.Widget, widgetId]);
+
+        return {
+          summary: shownTitle ? `Changed "${shownTitle}"` : 'Changed the widget',
+          undo: () => dispatch(undo()),
+        };
       },
       add_text_widget: async (args) => {
         const { title, text } = args as { title: string; text: string };
