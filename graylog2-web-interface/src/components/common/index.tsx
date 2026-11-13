@@ -135,6 +135,7 @@ export { default as SelectPopover } from './SelectPopover';
 export { default as SelectableList } from './SelectableList';
 export { default as ShareButton } from './ShareButton';
 export { default as ShareMenuItem } from './ShareMenuItem';
+export { default as SidebarResizeHandle } from './SidebarResizeHandle';
 export { default as SimpleGrid } from './SimpleGrid';
 export { default as SortableList } from './SortableList';
 export { default as Stack } from './Stack';

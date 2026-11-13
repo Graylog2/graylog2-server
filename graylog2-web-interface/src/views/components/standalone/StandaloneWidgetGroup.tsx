@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useId, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import styled from 'styled-components';
 
@@ -88,8 +88,12 @@ type GroupProps = React.PropsWithChildren<{
 
 const Group = ({ widgets, titles, loadingPlaceholder, children = undefined }: GroupProps) => {
   const { createSearch } = useContext(SearchExecutorsContext);
+  // A query key can't hold the search executors, as react-query drops functions when hashing it, so the key names
+  // the group instead.
+  const groupId = useId();
   const { data: view, error } = useQuery({
-    queryKey: ['views', 'standalone-widgets', widgets, titles, createSearch],
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: ['views', 'standalone-widgets', groupId, widgets, titles],
     queryFn: () => createStandaloneView(widgets, titles, createSearch),
     staleTime: Infinity,
     gcTime: 0,
