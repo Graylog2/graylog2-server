@@ -53,6 +53,10 @@ import normalizeViewState from 'views/logic/views/normalizeViewState';
 import { setGlobalOverrideQuery, setGlobalOverrideTimerange } from 'views/logic/slices/searchExecutionSlice';
 import { undo } from 'views/logic/slices/undoRedoActions';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
+import Store from 'logic/local-storage/Store';
+import generateId from 'logic/generateId';
+import Routes from 'routing/Routes';
+import type { EventDefinitionLocalStorageConfig } from 'components/event-definitions/hooks/useEventDefinitionConfigFromLocalStorage';
 import type { TimeRange } from 'views/logic/queries/Query';
 
 const useSearchPage = (): SearchPage => {
@@ -99,6 +103,51 @@ type AddMessageTableArgs = WidgetSearchArgs & {
 };
 
 type AddEventsWidgetArgs = WidgetSearchArgs & { mode: VisualizationType; filters: Array<Filter> };
+
+type CreateEventDefinitionArgs = {
+  title: string;
+  description: string;
+  priority: number;
+  query: string;
+  streams: Array<string>;
+  search_within_ms: number;
+  execute_every_ms: number;
+  condition?: {
+    function: string;
+    field: string;
+    operator: EventDefinitionLocalStorageConfig['agg_operator'];
+    threshold: number;
+    group_by: Array<string>;
+  };
+};
+
+// Hands the event definition to its form, as creating one from a widget's value does. Runs synchronously, so the
+// browser lets the click on the proposal open the new tab.
+const openEventDefinitionForm = (args: Record<string, unknown>) => {
+  const { condition, ...definition } = args as CreateEventDefinitionArgs;
+  const sessionId = `assistant-${generateId()}`;
+  const config: EventDefinitionLocalStorageConfig = {
+    type: 'aggregation-v1',
+    ...definition,
+    ...(condition
+      ? {
+          agg_function: condition.function,
+          agg_field: condition.field || undefined,
+          agg_operator: condition.operator,
+          agg_value: condition.threshold,
+          group_by: condition.group_by,
+        }
+      : {}),
+  };
+  Store.set(sessionId, config);
+
+  if (!window.open(`${Routes.ALERTS.DEFINITIONS.CREATE}?step=event-details&session-id=${sessionId}`, '_blank')) {
+    Store.delete(sessionId);
+    throw new Error('The browser blocked the new tab for the event definition.');
+  }
+
+  return { summary: `Opened the form for event definition "${definition.title}" in a new tab` };
+};
 
 type WidgetBuilder = ReturnType<typeof Widget.builder>;
 
@@ -282,6 +331,7 @@ const useSearchPageTools = (): PageTools => {
 
         return { summary: 'Changed the time range', undo: isDashboard ? undefined : () => dispatch(undo()) };
       },
+      create_event_definition: openEventDefinitionForm,
     };
   }, [activeQueryId, dispatch, globalOverride, isDashboard]);
 };
