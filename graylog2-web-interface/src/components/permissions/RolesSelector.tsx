@@ -78,10 +78,11 @@ const _assignRole = (selectedRoleNames, roles, onSubmit, setselectedRoleNames, s
   setError();
   setIsSubmitting(true);
 
-  onSubmit(selectedRoles).then(() => {
-    setselectedRoleNames();
-    setIsSubmitting(false);
-  });
+  onSubmit(selectedRoles)
+    .then(() => setselectedRoleNames())
+    // The caller shows the error. We keep the selection so the assignment can be retried.
+    .catch(() => {})
+    .finally(() => setIsSubmitting(false));
 };
 
 const _loadRoles = (setPaginatedRoles) => {
