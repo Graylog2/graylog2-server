@@ -1,0 +1,8 @@
+type = "a"
+message = "Add bulk actions for selected rows in data table widgets."
+
+details.user = """
+You can now select multiple rows in a data table widget, such as the result of "Show top values". The new "Bulk actions" menu lets you add the selected values of a field to the search query, joined with OR (for example `source:(a OR b)`), or exclude them from the results.
+"""
+
+pulls = ["28058"]

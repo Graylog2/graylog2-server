@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix \"Unsaved Dashboard\" being appended to the window title of the welcome page."
+
+issues = ["27789"]
+pulls = ["27958"]

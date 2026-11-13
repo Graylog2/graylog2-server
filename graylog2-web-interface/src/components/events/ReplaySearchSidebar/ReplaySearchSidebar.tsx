@@ -17,6 +17,7 @@
 import React, { useMemo } from 'react';
 
 import usePluginEntities from 'hooks/usePluginEntities';
+import { useAssistantPanelContext } from 'components/assistant';
 import GeneralEventSideBar from 'components/events/ReplaySearchSidebar/GeneralEventSideBar';
 import type { EventDefinitionSideBarDetailsProps, EventReplaySideBarDetailsProps } from 'views/types';
 
@@ -28,6 +29,7 @@ type Props = {
 const ReplaySearchSidebar = ({ alertId, definitionId = undefined }: Props) => {
   const sideBarDetailsPlugin = usePluginEntities('views.components.eventReplay.sideBarDetails');
   const isEventDefinition = !alertId && !!definitionId;
+  useAssistantPanelContext(useMemo(() => (alertId ? { type: 'event' as const, event_id: alertId } : undefined), [alertId]));
 
   const EventDefSideBar = useMemo<React.ComponentType<EventDefinitionSideBarDetailsProps> | null>(() => {
     const sideBarDetails = sideBarDetailsPlugin[0];

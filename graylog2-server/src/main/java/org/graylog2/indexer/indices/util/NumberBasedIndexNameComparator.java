@@ -52,7 +52,7 @@ public class NumberBasedIndexNameComparator implements Comparator<String> {
 
         final int prefixComparisonResult = indexPrefix1.compareTo(indexPrefix2);
         if (prefixComparisonResult == 0) {
-            return -Integer.compare(index1Number, index2Number);
+            return Integer.compare(index2Number, index1Number);
         } else {
             return prefixComparisonResult;
         }

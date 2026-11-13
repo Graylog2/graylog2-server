@@ -32,6 +32,7 @@ import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreItem;
 import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreStringItem;
 import org.graylog.datanode.process.configuration.files.KeystoreConfigFile;
 import org.graylog.datanode.process.configuration.files.OpensearchSecurityConfigurationFile;
+import org.graylog.security.certutil.CaTruststore;
 import org.graylog.security.certutil.csr.InMemoryKeystoreInformation;
 import org.graylog.security.certutil.csr.KeystoreInformation;
 import org.graylog2.indexer.security.IndexerAdminCertConstants;
@@ -40,10 +41,9 @@ import org.graylog2.security.TruststoreCreator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.nio.file.Path;
-import java.security.GeneralSecurityException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
@@ -81,14 +81,17 @@ public class OpensearchSecurityConfigurationBean implements DatanodeConfiguratio
     private final Set<OpensearchCertificatesProvider> opensearchCertificatesProviders;
     private final Configuration localConfiguration;
     private final JwtSecret jwtSecret;
+    private final CaTruststore caTruststore;
 
     @Inject
     public OpensearchSecurityConfigurationBean(Set<OpensearchCertificatesProvider> opensearchCertificatesProviders,
                                                final Configuration localConfiguration,
-                                               final JwtSecret jwtSecret) {
+                                               final JwtSecret jwtSecret,
+                                               final CaTruststore caTruststore) {
         this.opensearchCertificatesProviders = opensearchCertificatesProviders;
         this.localConfiguration = localConfiguration;
         this.jwtSecret = jwtSecret;
+        this.caTruststore = caTruststore;
     }
 
     @Override
@@ -110,9 +113,17 @@ public class OpensearchSecurityConfigurationBean implements DatanodeConfiguratio
 
         opensearchCertificates.filter(OpensearchCertificates::hasCertificates).ifPresent(c -> {
             try {
-                truststoreCreator.addCertificates(new InMemoryKeystoreInformation(c.getHttpKeystore().get(), c.getPassword()));
-                truststoreCreator.addCertificates(new InMemoryKeystoreInformation(c.getTransportKeystore().get(), c.getPassword()));
-            } catch (IOException | GeneralSecurityException e) {
+                // only the chain of the key opensearch actually uses (configured alias or the first private key)
+                truststoreCreator.addCertificates(c.getHttpKeystore().get(), c.getHttpKeyAlias());
+                truststoreCreator.addCertificates(c.getTransportKeystore().get(), c.getTransportKeyAlias());
+                // Graylog server authenticates some requests (e.g. outdated indices check) with a short-lived client
+                // certificate signed by the Graylog CA. User-provided certificates don't have the Graylog CA
+                // in their chain, without it opensearch would reject the client certificate with 401.
+                final Optional<KeyStore> graylogCa = graylogCaTruststore();
+                if (graylogCa.isPresent()) {
+                    truststoreCreator.addCertificates(graylogCa.get());
+                }
+            } catch (KeyStoreException e) {
                 throw new RuntimeException(e);
             }
         });
@@ -125,6 +136,20 @@ public class OpensearchSecurityConfigurationBean implements DatanodeConfiguratio
                 .withConfigFile(truststoreFile(truststoreCreator, truststorePassword))
                 .withConfigFile(new OpensearchSecurityConfigurationFile(jwtSecret, localConfiguration.getIndexerJwtAuthTokenClockSkewTolerance()))
                 .build();
+    }
+
+    /**
+     * The Graylog CA is optional, there is no CA if all certificates are provided by the user. In such case
+     * the result is empty. A CA that exists but can't be loaded (file not readable, wrong password_secret, corrupted data)
+     * should not prevent opensearch from starting, so we only log a warning.
+     */
+    private Optional<KeyStore> graylogCaTruststore() {
+        try {
+            return caTruststore.getTrustStore();
+        } catch (RuntimeException e) {
+            LOG.warn("Failed to load Graylog CA, it won't be added to the opensearch truststore", e);
+            return Optional.empty();
+        }
     }
 
     @Nonnull
@@ -197,7 +222,7 @@ public class OpensearchSecurityConfigurationBean implements DatanodeConfiguratio
 
         config.put("plugins.security.enable_snapshot_restore_privilege", "true");
         config.put("plugins.security.check_snapshot_restore_write_privileges", "true");
-        config.put("plugins.security.restapi.roles_enabled", "all_access,security_rest_api_access,readall");
+        config.put("plugins.security.restapi.roles_enabled", "all_access,security_rest_api_access");
         config.put("plugins.security.system_indices.enabled", "false");
 //        config.put("plugins.security.system_indices.indices", ".plugins-ml-model,.plugins-ml-task,.opendistro-alerting-config,.opendistro-alerting-alert*,.opendistro-anomaly-results*,.opendistro-anomaly-detector*,.opendistro-anomaly-checkpoints,.opendistro-anomaly-detection-state,.opendistro-reports-*,.opensearch-notifications-*,.opensearch-notebooks,.opensearch-observability,.opendistro-asynchronous-search-response*,.replication-metadata-store,.opendistro-ism-config,.opendistro-job-scheduler-lock");
 

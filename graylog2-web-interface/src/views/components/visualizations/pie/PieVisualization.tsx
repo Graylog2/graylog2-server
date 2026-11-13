@@ -26,7 +26,8 @@ import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import type { KeyMapper } from 'views/components/visualizations/TransformKeys';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import { keySeparator, humanSeparator } from 'views/Constants';
+import { humanSeparator } from 'views/Constants';
+import { splitCompositeKey } from 'views/logic/compositeKey';
 import type { PieChartDataSettingsWithCustomUnits } from 'views/components/visualizations/hooks/usePieChartDataSettingsWithCustomUnits';
 import usePieChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/usePieChartDataSettingsWithCustomUnits';
 import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
@@ -68,8 +69,7 @@ const _generateSeries =
       name,
       hole: 0.4,
       labels: labels.map((label) =>
-        label
-          .split(keySeparator)
+        splitCompositeKey(label)
           .map((l, i) => mapKeys(l, rowPivots[i]))
           .join(humanSeparator),
       ),

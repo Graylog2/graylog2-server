@@ -21,6 +21,7 @@ import type { DataTieringConfig } from 'components/indices/data-tiering';
 import type { IndexArchiveBinding } from 'components/indices/archive/types';
 import type { Attribute } from 'stores/PaginationTypes';
 import type { QualifiedUrl } from 'routing/Routes';
+import type { QuickJumpQueryAction } from 'components/quick-jump/Types';
 import type User from 'logic/users/User';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import type { Stream } from 'logic/streams/types';
@@ -30,6 +31,7 @@ import type { StepType } from 'components/common/Wizard';
 import type { InputSetupWizardStep } from 'components/inputs/InputSetupWizard';
 import type { TelemetryEventType } from 'logic/telemetry/TelemetryContext';
 import type { RightSidebarContextType } from 'contexts/RightSidebarContext';
+import type { HotkeyCollection, ScopeName } from 'contexts/HotkeysContext';
 
 type PluginNavigationLink = {
   path: QualifiedUrl<string>;
@@ -76,6 +78,7 @@ interface PluginForwarder {
   }>;
   fetchForwarderInput: (inputId: string) => Promise<ForwarderInput>;
   fetchForwarderNode: (nodeId: string) => Promise<Forwarder>;
+  fetchForwarderNodes?: (nodeIds: Array<string>) => Promise<Array<Forwarder>>;
   isLocalNode: (nodeId: string) => Promise<boolean>;
   messageLoaders: {
     ForwarderInputDropdown: React.ComponentType<{
@@ -210,6 +213,8 @@ type RouteGenerator = (id: string, type: string) => QualifiedUrl<string>;
 
 type EntityTypeRouteGenerator = { type: string; route: (id: string) => QualifiedUrl<string> };
 
+type EntityTypeTitle = { type: string; title: string };
+
 type IndexRetentionConfig = {
   type: string;
   displayName: string;
@@ -232,7 +237,8 @@ type StreamsOverviewTableElement = {
 type IndexSetsOverviewTableElement = {
   attributeName: string;
   group?: 'configuration';
-  attributes: Array<Attribute>;
+  attributes?: Array<Attribute>;
+  backendAttributeIds?: Array<string>;
   columnRenderers: ColumnRenderersByAttribute<IndexSetEntity>;
 };
 
@@ -440,11 +446,11 @@ declare module 'graylog-web-plugin/plugin' {
 
   type EntityLinkResolver = {
     uriSegment: string;
-    resolve: (
-      trailingSegments: ReadonlyArray<string>,
-    ) =>
+    resolve: (trailingSegments: ReadonlyArray<string>) =>
       | { grnType: string; id: string; Title?: React.ComponentType<EntityLinkTitleProps> }
       | { onClick: (context: EntityLinkOnClickContext) => void }
+      // Renders the link itself, for targets only known where the link is shown, e.g. through a React context.
+      | { id: string; Link: React.ComponentType<EntityLinkTitleProps> }
       | null;
   };
 
@@ -465,9 +471,14 @@ declare module 'graylog-web-plugin/plugin' {
     dataTiering?: Array<DataTiering>;
     defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
+    // Shown next to every page, after the right sidebar, e.g. the Assistant's chat.
+    globalSidebars?: Array<{ key: string; component: React.ComponentType }>;
     'navigation.badges'?: Array<NavigationBadge>;
     globalNotifications?: Array<GlobalNotification>;
     helpMenu?: Array<HelpMenuItem>;
+    // Adds keyboard shortcuts to an existing scope, so `useHotkey` and the shortcut overview know them.
+    hotkeys?: Array<{ scope: ScopeName; actions: HotkeyCollection['actions'] }>;
+    'quickJump.queryActions'?: Array<QuickJumpQueryAction>;
     fieldValueProviders?: Array<FieldValueProvider>;
     license?: Array<License>;
     inputSetupWizard?: Array<InputSetupWizard>;
@@ -487,6 +498,7 @@ declare module 'graylog-web-plugin/plugin' {
     'hooks.logout'?: Array<LogoutHook>;
     entityRoutes?: Array<RouteGenerator>;
     entityTypeRoute?: Array<EntityTypeRouteGenerator>;
+    entityTypeTitles?: Array<EntityTypeTitle>;
     entityCreators?: Array<EntityCreator>;
     'users.details.segments'?: Array<{
       value: string;

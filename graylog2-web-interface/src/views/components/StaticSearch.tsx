@@ -68,7 +68,7 @@ const StaticSearch = ({ searchJson, viewJson, searchJobResult }: Props) => {
 
   return (
     <SearchExecutorsContext.Provider value={searchExecutors}>
-      <SearchPage view={Promise.resolve(view)} isNew={false} searchResult={searchResult} />
+      <SearchPage view={Promise.resolve(view)} isNew={false} searchResult={searchResult} skipDocumentTitle={true} />
     </SearchExecutorsContext.Provider>
   );
 };
