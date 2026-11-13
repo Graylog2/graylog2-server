@@ -38,6 +38,7 @@ import org.graylog2.audit.AuditEventType;
 import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.formatter.AuditEventFormatter;
 import org.graylog2.bootstrap.preflight.PreflightCheck;
+import org.graylog2.configuration.managed.ConfigurationParameter;
 import org.graylog2.contentpacks.constraints.ConstraintChecker;
 import org.graylog2.contentpacks.facades.EntityWithExcerptFacade;
 import org.graylog2.contentpacks.model.ModelType;
@@ -510,6 +511,18 @@ public abstract class Graylog2Module extends AbstractModule {
      */
     protected void addSystemRestResource(Class<?> restResourceClass) {
         systemRestResourceBinder().addBinding().toInstance(restResourceClass);
+    }
+
+    /**
+     * Exposes a configuration parameter through the managed configuration API. Parameters without a descriptor can
+     * neither be read nor changed there.
+     */
+    protected void addConfigurationParameter(ConfigurationParameter configurationParameter) {
+        configurationParameterBinder().addBinding().toInstance(configurationParameter);
+    }
+
+    private Multibinder<ConfigurationParameter> configurationParameterBinder() {
+        return Multibinder.newSetBinder(binder(), ConfigurationParameter.class);
     }
 
     private Multibinder<Class<?>> systemRestResourceBinder() {

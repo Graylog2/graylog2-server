@@ -36,10 +36,10 @@ const ClusterConfigurationPage = () => {
   }, [isPermitted, push]);
 
   return (
-    <DocumentTitle title="Cluster Configuration">
+    <DocumentTitle title="Cluster Nodes">
       <ClusterConfigurationPageNavigation />
       <div>
-        <PageHeader title="Cluster Configuration">
+        <PageHeader title="Cluster Nodes">
           <span>
             This page provides a real-time overview of the nodes in your cluster. You can pause message processing at
             any time. The process buffers will not accept any new messages until you resume it. If the message journal

@@ -33,6 +33,7 @@ const SigmaEventDefinitionPage = loadAsync(() => import('./SigmaEventDefinitionP
 const CreateEventNotificationPage = loadAsync(() => import('./CreateEventNotificationPage'));
 const CreateContentPackPage = loadAsync(() => import('pages/CreateContentPackPage'));
 const CreateExtractorsPage = loadAsync(() => import('./CreateExtractorsPage'));
+const DataNodeConfigurationPage = loadAsync(() => import('./DataNodeConfigurationPage'));
 const DataNodePage = loadAsync(() => import('./DataNodePage'));
 const DataNodeUpgradePage = loadAsync(() => import('./DataNodeUpgradePage'));
 const DataNodesClusterManagementPage = loadAsync(() => import('./DataNodesClusterManagementPage'));
@@ -147,6 +148,7 @@ export {
   CreateEventNotificationPage,
   CreateContentPackPage,
   CreateExtractorsPage,
+  DataNodeConfigurationPage,
   DataNodePage,
   DataNodeUpgradePage,
   DataNodesClusterManagementPage,

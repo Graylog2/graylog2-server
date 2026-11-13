@@ -86,6 +86,8 @@ import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.configuration.TelemetryConfiguration;
 import org.graylog2.configuration.VersionCheckConfiguration;
+import org.graylog2.configuration.managed.ManagedConfigurationModule;
+import org.graylog2.configuration.managed.NodeType;
 import org.graylog2.contentpacks.ContentPacksModule;
 import org.graylog2.database.MongoSequenceModule;
 import org.graylog2.database.entities.ScopedEntitiesModule;
@@ -192,6 +194,7 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
                 new VersionProbeModule(),
                 new ConfigurationModule(configuration),
                 new DbEntitiesModule(),
+                new ManagedConfigurationModule(NodeType.SERVER),
                 new ServerBindings(configuration, isMigrationCommand()),
                 new ElasticsearchModule(),
                 new PersistenceServicesBindings(),
