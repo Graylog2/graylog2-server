@@ -112,22 +112,24 @@ public class OpensearchVersionSelectorImpl implements OpensearchVersionSelector 
     }
 
     /**
-     * No version recorded for this node. An empty directory has nothing to preserve, so we take the newest
-     * distribution available. A directory that already holds indices is left on the oldest one that can read it —
-     * it may have been adopted from an existing cluster during an in-place migration, and moving it up a generation
-     * rewrites index formats irreversibly. The upgrade page offers the newer version afterwards.
+     * No version recorded for this node. A directory opensearch has never initialized has nothing to preserve, so we
+     * take the newest distribution available. A directory an existing opensearch node already ran on is left on the
+     * oldest distribution that can read it — it may belong to a running cluster or have been adopted from one during
+     * an in-place migration, and moving it up a generation rewrites formats irreversibly and, for a cluster manager,
+     * locks the not yet upgraded nodes out of the cluster. This deliberately doesn't depend on the directory holding
+     * any indices: dedicated cluster managers never do. The upgrade page offers the newer version afterwards.
      */
     private OpensearchDistribution fallbackVersion(List<OpensearchDistribution> candidates, Path dataDir) {
         final Optional<IndicesDirectoryParseResult> parseResult = parse(dataDir);
         final List<OpensearchDistribution> bound = withinBound(candidates, parseResult);
 
-        final boolean holdsIndices = parseResult
+        final boolean initialized = parseResult
                 .map(result -> !result.info().nodes().isEmpty())
                 // Unreadable or unparseable: assume there is data and stay conservative. The preflight check reports
                 // the actual problem with a usable message.
                 .orElse(true);
 
-        return holdsIndices ? lowestOf(bound) : highestOf(bound);
+        return initialized ? lowestOf(bound) : highestOf(bound);
     }
 
     private List<OpensearchDistribution> withinBound(List<OpensearchDistribution> candidates, Path dataDir) {

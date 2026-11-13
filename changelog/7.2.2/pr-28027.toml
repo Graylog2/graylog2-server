@@ -1,0 +1,4 @@
+type = "s"
+message = "Update lz4-java library to 1.12.1 to fix [GHSA-48mj-8f7c-7qfm](https://github.com/yawkat/lz4-java/security/advisories/GHSA-48mj-8f7c-7qfm)."
+
+pulls = ["28027"]

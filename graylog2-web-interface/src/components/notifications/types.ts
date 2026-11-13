@@ -58,7 +58,8 @@ export type NotificationKind =
   | 'data_node_version_mismatch'
   | 'data_tiering_rollover_error'
   | 'data_node_heap_warning'
-  | 'data_node_cert_renewal_warning';
+  | 'data_node_cert_renewal_warning'
+  | 'kinesis_single_table_migration';
 
 export type NotificationType = {
   id: string;

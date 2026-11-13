@@ -250,4 +250,71 @@ public class LenientDelimiterBasedFrameDecoderTest {
         buf.release();
         buf2.release();
     }
+
+    @Test
+    public void testMultiByteDelimiterFoundAcrossResumedScanBoundary() {
+        EmbeddedChannel ch = new EmbeddedChannel(new LenientDelimiterBasedFrameDecoder(8192,
+                Unpooled.copiedBuffer("XYZ", CharsetUtil.US_ASCII)));
+
+        // Drip-feed one byte at a time so every decode() call resumes from the previous scan offset
+        for (byte b : "aaXYaXYZbbbXYZ".getBytes(CharsetUtil.US_ASCII)) {
+            ch.writeInbound(Unpooled.wrappedBuffer(new byte[]{b}));
+        }
+
+        ByteBuf buf = ch.readInbound();
+        assertEquals("aaXYa", buf.toString(CharsetUtil.US_ASCII));
+
+        ByteBuf buf2 = ch.readInbound();
+        assertEquals("bbb", buf2.toString(CharsetUtil.US_ASCII));
+        assertNull(ch.readInbound());
+        ch.finish();
+
+        buf.release();
+        buf2.release();
+    }
+
+    @Test
+    public void testDripFeedAfterTooLongFrame() {
+        EmbeddedChannel ch = new EmbeddedChannel(new LenientDelimiterBasedFrameDecoder(4,
+                Delimiters.nulDelimiter()));
+
+        int failures = 0;
+        for (byte b : "abcdefgh\0ok\0".getBytes(CharsetUtil.US_ASCII)) {
+            try {
+                ch.writeInbound(Unpooled.wrappedBuffer(new byte[]{b}));
+            } catch (TooLongFrameException e) {
+                failures++;
+            }
+        }
+        assertEquals(1, failures);
+
+        ByteBuf buf = ch.readInbound();
+        assertEquals("ok", buf.toString(CharsetUtil.US_ASCII));
+        assertNull(ch.readInbound());
+        ch.finish();
+
+        buf.release();
+    }
+
+    @Test
+    public void testLineDelimiterDecodesLinesAfterTooLongLineInSameRead() {
+        // Line delimiters must be handled by the line based decoder, which continues decoding after a
+        // too long line. The generic delimiter code path stops decoding the current read instead.
+        EmbeddedChannel ch = new EmbeddedChannel(new LenientDelimiterBasedFrameDecoder(4,
+                Delimiters.lineDelimiter()));
+
+        try {
+            ch.writeInbound(Unpooled.copiedBuffer("abcdefgh\nok\n", CharsetUtil.US_ASCII));
+            fail();
+        } catch (TooLongFrameException e) {
+            // expected
+        }
+
+        ByteBuf buf = ch.readInbound();
+        assertEquals("ok", buf.toString(CharsetUtil.US_ASCII));
+        assertNull(ch.readInbound());
+        ch.finish();
+
+        buf.release();
+    }
 }

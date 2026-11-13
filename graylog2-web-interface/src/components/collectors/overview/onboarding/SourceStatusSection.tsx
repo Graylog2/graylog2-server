@@ -112,6 +112,7 @@ const Footer = styled.div(
 const SOURCE_PLATFORM: Partial<Record<SourceType, string>> = {
   journald: 'linux',
   windows_event_log: 'windows',
+  macos_unified_logging: 'darwin',
 };
 
 /**

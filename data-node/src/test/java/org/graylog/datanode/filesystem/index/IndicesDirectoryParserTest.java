@@ -153,6 +153,30 @@ class IndicesDirectoryParserTest {
     }
 
     @Test
+    void testNodeWithoutIndicesDirectoryIsReportedFromItsStateFile(@TempDir Path tempDir) throws Exception {
+        // Layout of a dedicated cluster manager: node state, but no indices directory at all
+        final Path stateDir = Files.createDirectories(tempDir.resolve("nodes/0/_state"));
+        final Path fixtureState = Path.of(getClass().getResource("/indices/opensearch2/nodes/0/_state/node-1.st").toURI());
+        Files.copy(fixtureState, stateDir.resolve("node-1.st"));
+
+        final IndicesDirectoryParseResult parseResult = parser.parse(tempDir);
+        Assertions.assertThat(parseResult.info().nodes())
+                .singleElement()
+                .satisfies(node -> {
+                    Assertions.assertThat(node.nodeVersion()).isEqualTo("2.10.0");
+                    Assertions.assertThat(node.indices()).isEmpty();
+                    Assertions.assertThat(node.isEmpty()).isTrue();
+                    Assertions.assertThat(node.isInitialized()).isTrue();
+                });
+    }
+
+    @Test
+    void testNodeDirectoryWithoutStateIsIgnored(@TempDir Path tempDir) throws IOException {
+        Files.createDirectories(tempDir.resolve("nodes/0"));
+        Assertions.assertThat(parser.parse(tempDir).info().nodes()).isEmpty();
+    }
+
+    @Test
     void testOpensearch2IndicesAreSortedAlphabetically() throws URISyntaxException {
         final URI uri = getClass().getResource("/indices/opensearch2").toURI();
         final List<String> indexNames = parser.parse(Path.of(uri)).info().nodes().getFirst().indices().stream()
