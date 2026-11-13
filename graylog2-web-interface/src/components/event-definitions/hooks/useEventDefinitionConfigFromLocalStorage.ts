@@ -47,7 +47,7 @@ type EventDefinitionConfigFromUrl = {
   query_parameters: ParameterJson[];
   streams: string[];
   group_by?: string[];
-  series?: Array<{ id: string; function: string; field: string }>;
+  series?: Array<{ id: string; type: string; field: string | null }>;
   search_within_ms: number;
   execute_every_ms?: number;
   conditions?: {
@@ -85,17 +85,19 @@ const useEventDefinitionConfigFromLocalStorage = (): {
     } = parsedLocalStorageConfig;
 
     const details = Object.entries({ title, description, priority }).filter(([, value]) => value !== undefined);
+    // Series as the condition form and the backend name them: by their function's type, and an id made of it and the field.
+    const seriesId = `${agg_function}-${agg_field ?? ''}`;
     const aggData =
       agg_function && agg_value !== undefined && agg_value !== null && agg_value !== ''
         ? {
             conditions: {
               expression: {
                 expr: agg_operator,
-                left: { expr: 'number-ref', ref: `${agg_function}-${agg_field}` },
+                left: { expr: 'number-ref', ref: seriesId },
                 right: { expr: 'number', value: agg_value },
               },
             },
-            series: [{ id: `${agg_function}-${agg_field}`, function: agg_function, field: agg_field }],
+            series: [{ id: seriesId, type: agg_function, field: agg_field ?? null }],
             group_by: group_by || [],
           }
         : {};
