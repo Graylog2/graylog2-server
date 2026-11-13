@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { Permission } from 'graylog-web-plugin/plugin';
+
 import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
 import type { ErrorType } from 'integrations/event-notifications/types';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
@@ -67,6 +69,8 @@ export interface EventNotificationTypes {
     notification: EventNotification;
   }>;
   defaultConfig: Omit<EventNotification['config'], 'type'>;
+  // Hides the type from the create dropdown for users missing any of these permissions.
+  requiredPermissions?: Array<Permission>;
 }
 
 declare module 'graylog-web-plugin/plugin' {

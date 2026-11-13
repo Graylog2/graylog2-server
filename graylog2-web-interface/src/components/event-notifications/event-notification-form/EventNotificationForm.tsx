@@ -26,6 +26,9 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import EntityCreateShareFormGroup from 'components/permissions/EntityCreateShareFormGroup';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
+import usePermissions from 'hooks/usePermissions';
+
+import notificationTypeOptions from './notificationTypeOptions';
 
 const getNotificationPlugin = (type: string) => {
   if (type === undefined) {
@@ -34,9 +37,6 @@ const getNotificationPlugin = (type: string) => {
 
   return PluginStore.exports('eventNotificationTypes').find((n) => n.type === type);
 };
-
-const formattedEventNotificationTypes = () =>
-  PluginStore.exports('eventNotificationTypes').map((type) => ({ label: type.displayName, value: type.type }));
 
 type EventNotificationFormProps = {
   action?: 'create' | 'edit';
@@ -69,6 +69,7 @@ const EventNotificationForm = ({
 }: EventNotificationFormProps) => {
   const sendTelemetry = useSendTelemetry();
   const [isSubmitEnabled, setIsSubmitEnabled] = useState(true);
+  const { isPermitted } = usePermissions();
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     sendTelemetry(
@@ -78,6 +79,7 @@ const EventNotificationForm = ({
       {
         app_section: 'event-notification',
         app_action_value: `${action}-button`,
+        notification_type: notification.config.type,
       },
     );
 
@@ -171,7 +173,11 @@ const EventNotificationForm = ({
             <ControlLabel>Notification Type</ControlLabel>
             <Select
               id="notification-type"
-              options={formattedEventNotificationTypes()}
+              options={notificationTypeOptions(
+                PluginStore.exports('eventNotificationTypes'),
+                isPermitted,
+                action === 'edit' ? notification.config.type : undefined,
+              )}
               value={notification.config.type}
               onChange={handleTypeChange}
               clearable={false}
