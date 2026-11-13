@@ -31,6 +31,7 @@ import type { StepType } from 'components/common/Wizard';
 import type { InputSetupWizardStep } from 'components/inputs/InputSetupWizard';
 import type { TelemetryEventType } from 'logic/telemetry/TelemetryContext';
 import type { RightSidebarContextType } from 'contexts/RightSidebarContext';
+import type { HotkeyCollection, ScopeName } from 'contexts/HotkeysContext';
 
 type PluginNavigationLink = {
   path: QualifiedUrl<string>;
@@ -445,9 +446,7 @@ declare module 'graylog-web-plugin/plugin' {
 
   type EntityLinkResolver = {
     uriSegment: string;
-    resolve: (
-      trailingSegments: ReadonlyArray<string>,
-    ) =>
+    resolve: (trailingSegments: ReadonlyArray<string>) =>
       | { grnType: string; id: string; Title?: React.ComponentType<EntityLinkTitleProps> }
       | { onClick: (context: EntityLinkOnClickContext) => void }
       // Renders the link itself, for targets only known where the link is shown, e.g. through a React context.
@@ -477,6 +476,8 @@ declare module 'graylog-web-plugin/plugin' {
     'navigation.badges'?: Array<NavigationBadge>;
     globalNotifications?: Array<GlobalNotification>;
     helpMenu?: Array<HelpMenuItem>;
+    // Adds keyboard shortcuts to an existing scope, so `useHotkey` and the shortcut overview know them.
+    hotkeys?: Array<{ scope: ScopeName; actions: HotkeyCollection['actions'] }>;
     'quickJump.queryActions'?: Array<QuickJumpQueryAction>;
     fieldValueProviders?: Array<FieldValueProvider>;
     license?: Array<License>;

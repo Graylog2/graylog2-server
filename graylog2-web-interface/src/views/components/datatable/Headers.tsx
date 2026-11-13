@@ -37,6 +37,7 @@ import { useIsInteractiveMode } from 'views/components/contexts/InteractiveConte
 
 import FieldSortIcon from './FieldSortIcon';
 import TableHeaderCell from './TableHeaderCell';
+import { SelectAllHeaderCell } from './SelectionCells';
 
 const CenteredTh = styled(TableHeaderCell)`
   text-align: center;
@@ -250,6 +251,7 @@ type Props = {
   togglePin: (field: string) => void;
   setLoadingState: (loading: boolean) => void;
   showRowNumbers?: boolean;
+  selectableRowIds?: Array<string>;
 };
 
 const Headers = ({
@@ -268,6 +270,7 @@ const Headers = ({
   togglePin,
   setLoadingState,
   showRowNumbers = true,
+  selectableRowIds = undefined,
 }: Props) => {
   const rowFieldNames = rowPivots.flatMap((pivot) => pivot.fields);
   const columnFieldNames = columnPivots.flatMap((pivot) => pivot.fields);
@@ -304,7 +307,7 @@ const Headers = ({
     />
   );
 
-  const lineNumberOffset = showRowNumbers ? 1 : 0;
+  const lineNumberOffset = (showRowNumbers ? 1 : 0) + (selectableRowIds ? 1 : 0);
   const rowPivotFields = rowFieldNames.map((fieldName, index) =>
     headerField({
       field: fieldName,
@@ -343,7 +346,7 @@ const Headers = ({
       ),
     ),
   );
-  const offset = (rollup ? rowFieldNames.length + series.length : rowFieldNames.length) + (showRowNumbers ? 1 : 0);
+  const offset = (rollup ? rowFieldNames.length + series.length : rowFieldNames.length) + lineNumberOffset;
 
   return (
     <>
@@ -356,6 +359,7 @@ const Headers = ({
         offset={offset}
       />
       <tr className="pivot-header-row">
+        {selectableRowIds && <SelectAllHeaderCell rowIds={selectableRowIds} />}
         {showRowNumbers && <RowNumberHeader $isNumeric>#</RowNumberHeader>}
         {rowPivotFields}
         {rollup && seriesFields}
