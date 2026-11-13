@@ -23,12 +23,12 @@ import type { PlotData } from 'plotly.js';
 import type { Key, Leaf, Row, Rows, Value } from 'views/logic/searchtypes/pivot/PivotHandler';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { DateTime, DateTimeFormats } from 'util/DateTime';
+import { humanSeparator } from 'views/Constants';
+import { createCompositeKey, splitCompositeKey } from 'views/logic/compositeKey';
 
 import type { KeyMapper } from './TransformKeys';
 import transformKeys from './TransformKeys';
 
-const keySeparator = '\u2E31';
-const humanSeparator = '-';
 
 export type ChartDefinition = Partial<Omit<PlotData, 'type' | 'colorbar'>> & {
   type: string;
@@ -89,7 +89,7 @@ type ChartInput = {
 };
 export type Generator = (chartInput: ChartInput) => ChartDefinition;
 
-const _defaultKeyJoiner = (keys: Array<any>) => keys.join(keySeparator);
+const _defaultKeyJoiner = (keys: Array<any>) => createCompositeKey(keys);
 
 const _defaultChartGenerator = ({ type, name, labels, values, originalName }: ChartInput): ChartDefinition => ({
   type,
@@ -160,11 +160,10 @@ export const generateChart = (
   return (results: ExtractedSeries) => {
     const allCharts = results.map(([value, x, values, z, fullPath]) => ({
       type: chartType,
-      name: value
-        .split(keySeparator)
+      name: splitCompositeKey(value)
         .map((key, idx) => (columnFields[idx] ? mapKeys(key, columnFields[idx]) : key))
         .join(humanSeparator),
-      labels: x.map((key) => key.join(keySeparator)),
+      labels: x.map((key) => createCompositeKey(key)),
       values,
       data: z,
       originalName: value,
@@ -188,7 +187,7 @@ export const removeNulls = (): ((series: ExtractedSeries) => ExtractedSeries) =>
   });
 
 const doNotSuffixTraceForSingleSeries = (keys: Array<Key>) =>
-  keys.length > 1 ? keys.slice(0, -1).join(keySeparator) : keys[0];
+  keys.length > 1 ? createCompositeKey(keys.slice(0, -1)) : keys[0];
 
 export type ChartDataConfig = {
   widgetConfig: AggregationWidgetConfig;

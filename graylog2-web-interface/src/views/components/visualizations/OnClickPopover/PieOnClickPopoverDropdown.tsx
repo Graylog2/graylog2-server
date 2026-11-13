@@ -17,7 +17,7 @@
 import React, { useMemo } from 'react';
 
 import Popover from 'components/common/Popover';
-import { keySeparator } from 'views/Constants';
+import { splitCompositeKey } from 'views/logic/compositeKey';
 import OnClickPopoverValueGroups from 'views/components/visualizations/OnClickPopover/OnClickPopoverValueGroups';
 import formatValueWithUnitLabel from 'views/components/visualizations/utils/formatValueWithUnitLabel';
 import { getPrettifiedValue } from 'views/components/visualizations/utils/unitConverters';
@@ -29,8 +29,8 @@ const PieOnClickPopoverDropdown = ({ clickPoint, config, setFieldData }: OnClick
     if (!clickPoint || !config) return {};
 
     const traceColor = getHoverSwatchColor(clickPoint);
-    const splitNames: Array<string | number> = (clickPoint.data.originalName ?? clickPoint.data.name).split(
-      keySeparator,
+    const splitNames: Array<string | number> = splitCompositeKey(
+      clickPoint.data.originalName ?? clickPoint.data.name,
     );
     const metric: string = config.series.length === 1 ? config.series[0].function : (splitNames.pop() as string);
     const columnValues = splitNames.filter((value) => value !== metric);
@@ -39,7 +39,7 @@ const PieOnClickPopoverDropdown = ({ clickPoint, config, setFieldData }: OnClick
 
     const rowPivotsToFields = config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [];
     const splitXValues: Array<string | number> = rowPivotsToFields?.length
-      ? clickPoint.data.originalLabels?.[clickPoint.pointNumber].split(keySeparator)
+      ? splitCompositeKey(clickPoint.data.originalLabels?.[clickPoint.pointNumber])
       : [];
 
     return {
