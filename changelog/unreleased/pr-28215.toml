@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix replay search sidebar not switching to the general sidebar when the plugin condition changes."
+
+pulls = ["28215"]
