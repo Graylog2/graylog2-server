@@ -29,7 +29,6 @@ import { createCompositeKey, splitCompositeKey } from 'views/logic/compositeKey'
 import type { KeyMapper } from './TransformKeys';
 import transformKeys from './TransformKeys';
 
-
 export type ChartDefinition = Partial<Omit<PlotData, 'type' | 'colorbar'>> & {
   type: string;
   name: string;
