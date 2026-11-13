@@ -18,48 +18,45 @@ import type { PluginExports } from 'graylog-web-plugin/plugin';
 
 import Routes from 'routing/Routes';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import AppConfig from 'util/AppConfig';
 import { COLLECTOR_PERMISSIONS } from 'components/collectors/Permissions';
 import useCanAccessDeployment from 'components/collectors/hooks/useCanAccessDeployment';
 
 export const PAGE_NAV_TITLE = 'Collectors';
 
-const bindings: PluginExports = AppConfig.isFeatureEnabled('collectors')
-  ? {
-      pageNavigation: [
+const bindings: PluginExports = {
+  pageNavigation: [
+    {
+      description: PAGE_NAV_TITLE,
+      children: [
+        { description: 'Overview', path: Routes.SYSTEM.COLLECTORS.OVERVIEW, exactPathMatch: true },
+        { description: 'Fleets', path: Routes.SYSTEM.COLLECTORS.FLEETS },
+        { description: 'Instances', path: Routes.SYSTEM.COLLECTORS.INSTANCES },
         {
-          description: PAGE_NAV_TITLE,
-          children: [
-            { description: 'Overview', path: Routes.SYSTEM.COLLECTORS.OVERVIEW, exactPathMatch: true },
-            { description: 'Fleets', path: Routes.SYSTEM.COLLECTORS.FLEETS },
-            { description: 'Instances', path: Routes.SYSTEM.COLLECTORS.INSTANCES },
-            {
-              description: 'Deployment',
-              path: Routes.SYSTEM.COLLECTORS.DEPLOYMENT,
-              useCondition: useCanAccessDeployment,
-            },
-            {
-              description: 'Settings',
-              path: Routes.SYSTEM.COLLECTORS.SETTINGS,
-              permissions: [COLLECTOR_PERMISSIONS.CONFIGURATION_READ],
-            },
-          ],
+          description: 'Deployment',
+          path: Routes.SYSTEM.COLLECTORS.DEPLOYMENT,
+          useCondition: useCanAccessDeployment,
+        },
+        {
+          description: 'Settings',
+          path: Routes.SYSTEM.COLLECTORS.SETTINGS,
+          permissions: [COLLECTOR_PERMISSIONS.CONFIGURATION_READ],
         },
       ],
-      entityCreators: [
-        {
-          id: 'Fleet',
-          title: 'Create fleet',
-          path: Routes.SYSTEM.COLLECTORS.FLEETS_NEW,
-          telemetryEvent: {
-            type: TELEMETRY_EVENT_TYPE.COLLECTORS.FLEET.CREATE_OPENED,
-            section: 'collectors',
-            actionValue: 'create-fleet-button',
-          },
-          permissions: COLLECTOR_PERMISSIONS.FLEET_CREATE,
-        },
-      ],
-    }
-  : {};
+    },
+  ],
+  entityCreators: [
+    {
+      id: 'Fleet',
+      title: 'Create fleet',
+      path: Routes.SYSTEM.COLLECTORS.FLEETS_NEW,
+      telemetryEvent: {
+        type: TELEMETRY_EVENT_TYPE.COLLECTORS.FLEET.CREATE_OPENED,
+        section: 'collectors',
+        actionValue: 'create-fleet-button',
+      },
+      permissions: COLLECTOR_PERMISSIONS.FLEET_CREATE,
+    },
+  ],
+};
 
 export default bindings;
