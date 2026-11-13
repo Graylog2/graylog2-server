@@ -18,7 +18,6 @@ package org.graylog.datanode.opensearch.configuration.beans.impl;
 
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.DatanodeTestUtils;
-import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.variants.OpensearchCertificates;
 import org.graylog.datanode.configuration.variants.OpensearchCertificatesProvider;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
@@ -60,13 +59,11 @@ class OpensearchSecurityConfigurationBeanTest {
     private Path tempDir;
 
     private Configuration localConfiguration;
-    private DatanodeConfiguration datanodeConfiguration;
     private KeyPair graylogCa;
 
     @BeforeEach
     void setUp() throws Exception {
         localConfiguration = DatanodeTestUtils.datanodeConfiguration(Map.of(), tempDir);
-        datanodeConfiguration = DatanodeTestUtils.mockDatanodeConfiguration(tempDir);
         graylogCa = generateCa("Graylog CA");
     }
 
@@ -168,7 +165,7 @@ class OpensearchSecurityConfigurationBeanTest {
             }
         };
         final OpensearchSecurityConfigurationBean bean = new OpensearchSecurityConfigurationBean(Set.of(provider), localConfiguration, JWT_SECRET, caTruststore);
-        return bean.buildConfigurationPart(new OpensearchConfigurationParams(datanodeConfiguration, tempDir));
+        return bean.buildConfigurationPart(new OpensearchConfigurationParams(tempDir));
     }
 
     private static Optional<OpensearchCertificates> certificates(KeyPair nodeCert, KeyPair issuer) throws Exception {
