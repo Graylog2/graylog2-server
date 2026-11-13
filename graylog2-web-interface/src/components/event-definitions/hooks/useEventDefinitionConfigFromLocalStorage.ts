@@ -30,8 +30,16 @@ export type EventDefinitionLocalStorageConfig = {
   agg_function?: string;
   agg_field?: string;
   agg_value?: string | number;
+  // How the aggregation compares to agg_value; the form asks for it when it is missing.
+  agg_operator?: '>' | '>=' | '<' | '<=' | '==';
   loc_query_parameters?: Array<ParameterJson>;
+  execute_every_ms?: number;
+  title?: string;
+  description?: string;
+  priority?: number;
 };
+
+export type EventDefinitionDetailsFromLocalStorage = Partial<{ title: string; description: string; priority: number }>;
 
 type EventDefinitionConfigFromUrl = {
   type: string;
@@ -41,6 +49,7 @@ type EventDefinitionConfigFromUrl = {
   group_by?: string[];
   series?: Array<{ id: string; function: string; field: string }>;
   search_within_ms: number;
+  execute_every_ms?: number;
   conditions?: {
     expression: { left: any; right: any; expr: any };
   };
@@ -49,6 +58,7 @@ type EventDefinitionConfigFromUrl = {
 const useEventDefinitionConfigFromLocalStorage = (): {
   hasLocalStorageConfig: boolean;
   configFromLocalStorage: EventDefinitionConfigFromUrl;
+  detailsFromLocalStorage?: EventDefinitionDetailsFromLocalStorage;
 } => {
   const { 'session-id': sessionId } = useQuery();
 
@@ -66,15 +76,21 @@ const useEventDefinitionConfigFromLocalStorage = (): {
       agg_function,
       agg_field,
       agg_value,
+      agg_operator,
       loc_query_parameters,
+      execute_every_ms,
+      title,
+      description,
+      priority,
     } = parsedLocalStorageConfig;
 
+    const details = Object.entries({ title, description, priority }).filter(([, value]) => value !== undefined);
     const aggData =
-      agg_function && agg_value
+      agg_function && agg_value !== undefined && agg_value !== null && agg_value !== ''
         ? {
             conditions: {
               expression: {
-                expr: undefined,
+                expr: agg_operator,
                 left: { expr: 'number-ref', ref: `${agg_function}-${agg_field}` },
                 right: { expr: 'number', value: agg_value },
               },
@@ -93,8 +109,10 @@ const useEventDefinitionConfigFromLocalStorage = (): {
         search_within_ms,
         group_by: group_by ?? [],
         query_parameters: loc_query_parameters ?? [],
+        ...(execute_every_ms ? { execute_every_ms } : {}),
         ...aggData,
       },
+      detailsFromLocalStorage: details.length ? Object.fromEntries(details) : undefined,
     };
   }, [sessionId]);
 };
