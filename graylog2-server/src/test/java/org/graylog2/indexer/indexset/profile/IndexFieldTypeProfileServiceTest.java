@@ -270,6 +270,28 @@ public class IndexFieldTypeProfileServiceTest {
 
     }
 
+    @Test
+    public void testRejectsRemovalOfProfileNeededByIndexSetWithDisabledDynamicMapping() {
+        toTest.save(new IndexFieldTypeProfile("123400000000000000000001", "profile1", "profile1", new CustomFieldMappings()));
+        mongoIndexSetService.save(createIndexSetConfigForTest("000000000000000000000001",
+                "Index set using profile 1",
+                "123400000000000000000001"));
+        mongoIndexSetService.save(createIndexSetConfigForTest("000000000000000000000011",
+                "Index set relying on profile 1",
+                "123400000000000000000001").toBuilder()
+                .title("Relies on profile")
+                .dynamicMappingDisabled(true)
+                .build());
+
+        final BadRequestException exception = assertThrows(BadRequestException.class,
+                () -> toTest.delete("123400000000000000000001"));
+
+        assertTrue(exception.getMessage().contains("Relies on profile"));
+        assertTrue(toTest.get("123400000000000000000001").isPresent());
+        verifyHasProfile("000000000000000000000001", "123400000000000000000001");
+        verifyHasProfile("000000000000000000000011", "123400000000000000000001");
+    }
+
     private void verifyHasNoProfile(final String indexSetId) {
         Optional<IndexSetConfig> indexSetConfig = mongoIndexSetService.get(indexSetId);
         assertTrue(indexSetConfig.isPresent());
@@ -301,6 +323,8 @@ public class IndexFieldTypeProfileServiceTest {
                 Duration.standardSeconds(5),
                 new CustomFieldMappings(),
                 profileId,
+                null,
+                null,
                 null,
                 null);
     }

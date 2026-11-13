@@ -30,6 +30,7 @@ public interface ExtendedIndexSetFields extends
         IndexAnalyzerField,
         FieldTypeProfileField,
         FieldLimitField,
+        DynamicMappingDisabledField,
         IndexTemplateTypeField,
         IndexPrefixField {
 
@@ -48,6 +49,7 @@ public interface ExtendedIndexSetFields extends
             IndexAnalyzerFieldBuilder<T>,
             FieldTypeProfileFieldBuilder<T>,
             FieldLimitFieldBuilder<T>,
+            DynamicMappingDisabledFieldBuilder<T>,
             IndexTemplateTypeFieldBuilder<T>,
             IndexPrefixFieldBuilder<T> {
 

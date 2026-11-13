@@ -195,7 +195,7 @@ class IndicesTest {
                                 new CustomFieldMapping("f1", "string"), //from individual custom mapping
                                 new CustomFieldMapping("f2", "long"), //from individual custom mapping
                                 new CustomFieldMapping("f3", "ip") //from profile
-                        )), null)
+                        )), null, null)
         );
     }
 
@@ -222,7 +222,7 @@ class IndicesTest {
 
         verify(indexMappingTemplateMock).toTemplate(
                 new IndexSetMappingTemplate("standard", "test_*",
-                        individualCustomFieldMappings, null)
+                        individualCustomFieldMappings, null, null)
         );
     }
 
@@ -243,7 +243,23 @@ class IndicesTest {
 
         verify(indexMappingTemplateMock).toTemplate(
                 new IndexSetMappingTemplate("standard", "test_*",
-                        individualCustomFieldMappings, null)
+                        individualCustomFieldMappings, null, null)
+        );
+    }
+
+    @Test
+    void testPassesFieldLimitAndDynamicMappingWhileGettingTemplate() {
+        final TestIndexSet testIndexSet = new TestIndexSet(indexSetConfig("test", "test-template-limits", "custom")
+                .getConfig().toBuilder()
+                .fieldLimit(1500)
+                .dynamicMappingDisabled(true)
+                .build());
+        IndexMappingTemplate indexMappingTemplateMock = mock(IndexMappingTemplate.class);
+        doReturn(indexMappingTemplateMock).when(indexMappingFactory).createIndexMapping(testIndexSet.indexTemplateConfig());
+        underTest.getIndexTemplate(testIndexSet.indexTemplateConfig());
+
+        verify(indexMappingTemplateMock).toTemplate(
+                new IndexSetMappingTemplate("standard", "test_*", new CustomFieldMappings(List.of()), 1500, true)
         );
     }
 
@@ -276,7 +292,7 @@ class IndicesTest {
                                 new CustomFieldMapping("f1", "string"), //from individual custom mapping
                                 new CustomFieldMapping("f2", "long"), //from individual custom mapping
                                 new CustomFieldMapping("f3", "ip") //from profile
-                        )), null),
+                        )), null, null),
                 0L
         );
     }

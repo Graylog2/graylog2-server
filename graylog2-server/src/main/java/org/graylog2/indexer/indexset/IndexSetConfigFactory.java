@@ -42,7 +42,7 @@ public class IndexSetConfigFactory {
     }
 
     private static DataTieringConfig getDataTieringConfig(IndexSetTemplateConfig defaultConfig) {
-        return defaultConfig.useLegacyRotation() ? null : defaultConfig.dataTieringConfig();
+        return Boolean.TRUE.equals(defaultConfig.useLegacyRotation()) ? null : defaultConfig.dataTieringConfig();
     }
 
     public IndexSetConfig.Builder createDefault() {
@@ -57,6 +57,7 @@ public class IndexSetConfigFactory {
                 .indexOptimizationMaxNumSegments(defaultConfig.indexOptimizationMaxNumSegments())
                 .fieldTypeRefreshInterval(defaultConfig.fieldTypeRefreshInterval())
                 .fieldLimit(defaultConfig.fieldLimit())
+                .dynamicMappingDisabled(defaultConfig.dynamicMappingDisabled())
                 .rotationStrategyClass(defaultConfig.rotationStrategyClass())
                 .rotationStrategyConfig(defaultConfig.rotationStrategyConfig())
                 .retentionStrategyClass(defaultConfig.retentionStrategyClass())

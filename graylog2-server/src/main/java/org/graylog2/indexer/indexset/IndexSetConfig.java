@@ -103,6 +103,12 @@ public abstract class IndexSetConfig implements
             CollectorLogsIndexTemplateProvider.COLLECTOR_LOGS_TEMPLATE_TYPE
     );
 
+    private static final Set<String> TEMPLATE_TYPES_IGNORING_FIELD_LIMIT_AND_DYNAMIC_MAPPING = Set.of(
+            EVENT_TEMPLATE_TYPE,
+            IndexTemplateProvider.FAILURE_TEMPLATE_TYPE,
+            CollectorLogsIndexTemplateProvider.COLLECTOR_LOGS_TEMPLATE_TYPE
+    );
+
     @JsonCreator
     public static IndexSetConfig create(@JsonProperty(FIELD_ID) @Id @ObjectId @Nullable String id,
                                         @JsonProperty(FIELD_SCOPE) @Nullable String scope,
@@ -130,7 +136,8 @@ public abstract class IndexSetConfig implements
                                         @JsonProperty(FIELD_PROFILE_ID) @ValidObjectId @Nullable String fieldTypeProfile,
                                         @JsonProperty(FIELD_DATA_TIERING) @Nullable DataTieringConfig dataTiering,
                                         @JsonProperty(FIELD_RESTRICTIONS) @Nullable Map<String, Set<IndexSetFieldRestriction>> fieldRestrictions,
-                                        @JsonProperty(FIELD_FIELD_LIMIT) @Nullable Integer fieldLimit
+                                        @JsonProperty(FIELD_FIELD_LIMIT) @Nullable Integer fieldLimit,
+                                        @JsonProperty(FIELD_DYNAMIC_MAPPING_DISABLED) @Nullable Boolean dynamicMappingDisabled
     ) {
 
         final boolean writableValue = isWritable == null || isWritable;
@@ -173,6 +180,7 @@ public abstract class IndexSetConfig implements
                 .scope(scope)
                 .fieldRestrictions(fieldRestrictions)
                 .fieldLimit(fieldLimit)
+                .dynamicMappingDisabled(dynamicMappingDisabled)
                 .build();
     }
 
@@ -198,7 +206,7 @@ public abstract class IndexSetConfig implements
         return create(id, null, title, description, isWritable, isRegular, indexPrefix, null, null, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
                 indexAnalyzer, indexTemplateName, indexTemplateType, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
-                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings(), null, null, null, null);
+                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings(), null, null, null, null, null);
     }
 
     // Compatibility creator after field type refresh interval has been introduced
@@ -222,7 +230,7 @@ public abstract class IndexSetConfig implements
         return create(null, DefaultEntityScope.NAME, title, description, isWritable, isRegular, indexPrefix, null, null, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
                 indexAnalyzer, indexTemplateName, indexTemplateType, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
-                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings(), null, null, null, null);
+                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings(), null, null, null, null, null);
     }
 
     /**
@@ -287,6 +295,11 @@ public abstract class IndexSetConfig implements
     @JsonIgnore
     public boolean canHaveProfile() {
         return !this.indexTemplateType().map(TEMPLATE_TYPES_FOR_INDEX_SETS_WITH_IMMUTABLE_FIELD_TYPES::contains).orElse(false);
+    }
+
+    @JsonIgnore
+    public boolean canHaveFieldLimitAndDynamicMapping() {
+        return !this.indexTemplateType().map(TEMPLATE_TYPES_IGNORING_FIELD_LIMIT_AND_DYNAMIC_MAPPING::contains).orElse(false);
     }
 
     @Override

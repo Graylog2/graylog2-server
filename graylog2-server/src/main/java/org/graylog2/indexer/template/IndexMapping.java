@@ -38,6 +38,7 @@ public abstract class IndexMapping extends AbstractMapping {
     public static final String PROPERTIES = "properties";
     public static final String DYNAMIC_TEMPLATES = "dynamic_templates";
     public static final String SOURCE = "_source";
+    public static final String DYNAMIC = "dynamic";
 
     @Override
     public Template toTemplate(final IndexSetMappingTemplate indexSetConfig,
@@ -46,7 +47,8 @@ public abstract class IndexMapping extends AbstractMapping {
                 indexSetConfig.indexAnalyzer(),
                 order,
                 indexSetConfig.customFieldMappings(),
-                indexSetConfig.fieldLimit());
+                indexSetConfig.fieldLimit(),
+                Boolean.TRUE.equals(indexSetConfig.dynamicMappingDisabled()));
     }
 
     protected Map<String, Object> analyzerKeyword() {
@@ -59,13 +61,14 @@ public abstract class IndexMapping extends AbstractMapping {
                                     final String analyzer,
                                     final Long order,
                                     final CustomFieldMappings customFieldMappings,
-                                    @Nullable final Integer fieldLimit) {
+                                    @Nullable final Integer fieldLimit,
+                                    final boolean dynamicMappingDisabled) {
         final var indexSettings = ImmutableMap.<String, Object>builder().put("analysis", analysisSettings());
         if (fieldLimit != null) {
             indexSettings.put("mapping", Map.of("total_fields", Map.of("limit", fieldLimit)));
         }
         var settings = new Template.Settings(Map.of("index", indexSettings.build()));
-        var mappings = mapping(analyzer, customFieldMappings);
+        var mappings = mapping(analyzer, customFieldMappings, dynamicMappingDisabled);
 
         return createTemplate(indexPattern, order, settings, mappings);
     }
@@ -79,16 +82,47 @@ public abstract class IndexMapping extends AbstractMapping {
     }
 
     protected Template.Mappings mapping(final String analyzer,
-                                        final CustomFieldMappings customFieldMappings) {
-        return new Template.Mappings(ImmutableMap.of(TYPE_MESSAGE, messageMapping(analyzer, customFieldMappings)));
+                                        final CustomFieldMappings customFieldMappings,
+                                        final boolean dynamicMappingDisabled) {
+        return new Template.Mappings(ImmutableMap.of(TYPE_MESSAGE, messageMapping(analyzer, customFieldMappings, dynamicMappingDisabled)));
     }
 
     protected Map<String, Object> messageMapping(final String analyzer,
                                                  final CustomFieldMappings customFieldMappings) {
+        return messageMapping(analyzer, customFieldMappings, false);
+    }
+
+    protected Map<String, Object> messageMapping(final String analyzer,
+                                                 final CustomFieldMappings customFieldMappings,
+                                                 final boolean dynamicMappingDisabled) {
+        if (!dynamicMappingDisabled) {
+            return ImmutableMap.of(
+                    PROPERTIES, fieldProperties(analyzer, customFieldMappings),
+                    DYNAMIC_TEMPLATES, dynamicTemplate(),
+                    SOURCE, enabled());
+        }
+        // The search backend ignores dynamic templates when dynamic mapping is off, so the internal fields
+        // they would map need explicit mappings to stay searchable.
         return ImmutableMap.of(
-                PROPERTIES, fieldProperties(analyzer, customFieldMappings),
-                DYNAMIC_TEMPLATES, dynamicTemplate(),
+                PROPERTIES, ImmutableMap.<String, Map<String, Object>>builder()
+                        .putAll(fieldProperties(analyzer, customFieldMappings))
+                        .putAll(internalFieldProperties())
+                        .build(),
+                DYNAMIC, false,
                 SOURCE, enabled());
+    }
+
+    private Map<String, Map<String, Object>> internalFieldProperties() {
+        return ImmutableMap.<String, Map<String, Object>>builder()
+                .put(Message.FIELD_GL2_PROCESSING_ERROR, notAnalyzedString())
+                .put(Message.FIELD_GL2_REMOTE_HOSTNAME, notAnalyzedString())
+                .put(Message.FIELD_GL2_REMOTE_IP, notAnalyzedString())
+                .put(Message.FIELD_GL2_REMOTE_PORT, typeLong())
+                .put(Message.FIELD_GL2_SOURCE_COLLECTOR, notAnalyzedString())
+                .put(Message.FIELD_GL2_SOURCE_INPUT, notAnalyzedString())
+                .put(Message.FIELD_GL2_SOURCE_NODE, notAnalyzedString())
+                .put(Message.FIELD_GL2_FORWARDER_INPUT, notAnalyzedString())
+                .build();
     }
 
     private Map<String, Map<String, Object>> internalFieldsMapping() {

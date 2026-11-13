@@ -17,13 +17,12 @@
 package org.graylog2.indexer.indexset.fields;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 
-import javax.annotation.Nullable;
-
 /**
- * The maximum number of fields of the indices of an index set. Without a value, the search backend default applies.
+ * The maximum number of fields per index of an index set. Null means the search backend default applies.
  */
 public interface FieldLimitField {
 

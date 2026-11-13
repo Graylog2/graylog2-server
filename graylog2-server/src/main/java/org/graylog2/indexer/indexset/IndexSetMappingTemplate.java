@@ -24,6 +24,7 @@ import javax.annotation.Nullable;
 public record IndexSetMappingTemplate(String indexAnalyzer,
                                       String indexWildcard,
                                       CustomFieldMappings customFieldMappings,
-                                      @Nullable Integer fieldLimit) {
+                                      @Nullable Integer fieldLimit,
+                                      @Nullable Boolean dynamicMappingDisabled) {
 
 }

@@ -406,6 +406,7 @@ public class IndexSetConfigTest {
                 fieldTypeProfile,
                 null,
                 null,
+                null,
                 null);
 
     }

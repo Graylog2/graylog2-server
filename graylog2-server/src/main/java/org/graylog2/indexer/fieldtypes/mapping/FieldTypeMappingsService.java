@@ -127,16 +127,16 @@ public class FieldTypeMappingsService {
 
     public void removeProfileFromIndexSets(final Set<String> indexSetsIds,
                                            final boolean rotateImmediately) {
-        for (String indexSetId : indexSetsIds) {
+        final List<IndexSetConfig> indexSetConfigs = indexSetService.findByIds(indexSetsIds);
+        checkNoIndexSetNeedsProfileForDisabledDynamicMapping(indexSetConfigs);
+        for (IndexSetConfig indexSetConfig : indexSetConfigs) {
             try {
-                indexSetService.get(indexSetId).ifPresent(indexSetConfig -> {
-                    var updatedIndexSetConfig = removeProfileFromIndexSet(indexSetConfig);
-                    if (rotateImmediately) {
-                        updatedIndexSetConfig.ifPresent(this::cycleIndexSet);
-                    }
-                });
+                var updatedIndexSetConfig = removeProfileFromIndexSet(indexSetConfig);
+                if (rotateImmediately) {
+                    updatedIndexSetConfig.ifPresent(this::cycleIndexSet);
+                }
             } catch (Exception ex) {
-                LOG.error("Failed to update field type in index set : " + indexSetId, ex);
+                LOG.error("Failed to update field type in index set : " + indexSetConfig.id(), ex);
                 throw ex;
             }
         }
@@ -282,6 +282,9 @@ public class FieldTypeMappingsService {
         if (indexSetConfig.fieldTypeProfile() == null) {
             return Optional.empty();
         }
+        if (needsProfileForDisabledDynamicMapping(indexSetConfig)) {
+            throw new BadRequestException(profileNeededMessage(List.of(indexSetConfig)));
+        }
         return Optional.of(indexSetService.save(
                 indexSetConfig.toBuilder()
                         .fieldTypeProfile(null)
@@ -315,6 +318,23 @@ public class FieldTypeMappingsService {
         if (!indexSetConfigs.isEmpty()) {
             throw new BadRequestException("Unable to change profile in indices : " + indexSetConfigs.stream().map(IndexSetConfig::title).toList());
         }
+    }
+
+    private void checkNoIndexSetNeedsProfileForDisabledDynamicMapping(final List<IndexSetConfig> indexSetConfigs) {
+        final List<IndexSetConfig> needingProfile = indexSetConfigs.stream()
+                .filter(FieldTypeMappingsService::needsProfileForDisabledDynamicMapping)
+                .toList();
+        if (!needingProfile.isEmpty()) {
+            throw new BadRequestException(profileNeededMessage(needingProfile));
+        }
+    }
+
+    private static boolean needsProfileForDisabledDynamicMapping(final IndexSetConfig indexSetConfig) {
+        return Boolean.TRUE.equals(indexSetConfig.dynamicMappingDisabled());
+    }
+
+    private static String profileNeededMessage(final List<IndexSetConfig> indexSetConfigs) {
+        return "Unable to remove the profile, dynamic mapping is disabled in index sets: " + indexSetConfigs.stream().map(IndexSetConfig::title).toList();
     }
 
     private List<IndexSetConfig> filterOutIndicesThatCannotHaveFieldTypeChanged(final Set<String> indexSetsIds) {

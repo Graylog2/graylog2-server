@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.fields.DynamicMappingDisabledField;
 import org.graylog2.indexer.indexset.fields.FieldLimitField;
 import org.graylog2.indexer.indexset.fields.FieldRestrictionsField;
 import org.graylog2.indexer.indexset.fields.FieldTypeProfileField;
@@ -44,6 +45,7 @@ public abstract class IndexSetUpdateRequest implements
         WritableField,
         FieldTypeProfileField,
         FieldLimitField,
+        DynamicMappingDisabledField,
         FieldRestrictionsField {
 
     public IndexSetConfig toIndexSetConfig(final IndexSetConfig oldConfig) {
@@ -64,6 +66,7 @@ public abstract class IndexSetUpdateRequest implements
                 .fieldTypeRefreshInterval(fieldTypeRefreshInterval())
                 .fieldTypeProfile(fieldTypeProfile())
                 .fieldLimit(fieldLimit())
+                .dynamicMappingDisabled(dynamicMappingDisabled())
                 .dataTieringConfig(Boolean.FALSE.equals(useLegacyRotation()) ? dataTieringConfig() : null)
                 .fieldRestrictions(fieldRestrictions())
                 .build();
@@ -87,6 +90,7 @@ public abstract class IndexSetUpdateRequest implements
             WritableFieldBuilder<Builder>,
             FieldTypeProfileFieldBuilder<Builder>,
             FieldLimitFieldBuilder<Builder>,
+            DynamicMappingDisabledFieldBuilder<Builder>,
             FieldRestrictionsFieldBuilder<Builder> {
 
         @JsonCreator

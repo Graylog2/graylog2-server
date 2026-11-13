@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog2.indexer.indexset.fields.DynamicMappingDisabledField;
 import org.graylog2.indexer.indexset.fields.FieldLimitField;
 import org.graylog2.indexer.indexset.fields.FieldRestrictionsField;
 import org.graylog2.indexer.indexset.fields.IndexAnalyzerField;
@@ -36,6 +37,7 @@ public abstract class IndexSetTemplateConfig implements
         IndexAnalyzerField,
         UseLegacyRotationField,
         FieldLimitField,
+        DynamicMappingDisabledField,
         FieldRestrictionsField {
 
     public static Builder builder() {
@@ -51,6 +53,7 @@ public abstract class IndexSetTemplateConfig implements
             IndexAnalyzerFieldBuilder<Builder>,
             UseLegacyRotationFieldBuilder<Builder>,
             FieldLimitFieldBuilder<Builder>,
+            DynamicMappingDisabledFieldBuilder<Builder>,
             FieldRestrictionsFieldBuilder<Builder> {
 
         @JsonCreator

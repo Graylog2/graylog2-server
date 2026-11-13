@@ -16,6 +16,8 @@
  */
 package org.graylog2.indexer.indices;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -26,13 +28,17 @@ import org.assertj.core.api.Assertions;
 import org.graylog.testing.completebackend.FullBackendTest;
 import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog.testing.completebackend.Lifecycle;
+import org.graylog.testing.elasticsearch.BulkIndexRequest;
 import org.graylog.testing.elasticsearch.SearchServerBaseTest;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.counts.CountsAdapter;
+import org.graylog2.indexer.indexset.CustomFieldMapping;
+import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.IndexSetMappingTemplate;
 import org.graylog2.indexer.indexset.IndexSetStatsCreator;
 import org.graylog2.indexer.indexset.TestIndexSet;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
@@ -302,6 +308,45 @@ public class IndicesIT extends SearchServerBaseTest {
         indices.create(indexName, indexSet.basicIndexSetConfig());
 
         assertThat(client().fieldType(indexName, "message")).isEqualTo("text");
+    }
+
+    @FullBackendTest
+    public void messageTemplateAppliesFieldLimitAndDisabledDynamicMapping() {
+        final String templateName = "template-field-limit";
+        final String indexName = "field_limit_test_0";
+        indicesToCleanUp.add(indexName);
+        // Priority above the catch-all test template, because composable index templates do not merge.
+        final Template template = new MessageIndexTemplateProvider().create(searchServer().version(), null)
+                .toTemplate(new IndexSetMappingTemplate("standard", "field_limit_test_*",
+                        new CustomFieldMappings(List.of(new CustomFieldMapping("known_field", "string"))),
+                        1500, true), 200L);
+
+        try {
+            indexTemplateAdapter.ensureIndexTemplate(templateName, template);
+            client().createIndex(indexName);
+
+            final JsonNode settings = new ObjectMapper().valueToTree(
+                    searchServer().adapters().indicesAdapter().getStructuredIndexSettings(indexName));
+            assertThat(settings.at("/index/mapping/total_fields/limit").asText()).isEqualTo("1500");
+
+            final BulkIndexRequest bulkIndexRequest = new BulkIndexRequest();
+            bulkIndexRequest.addRequest(indexName, Map.of(
+                    "message", "hello",
+                    "timestamp", "2026-11-12 10:00:00.000",
+                    "gl2_source_input", "input-1",
+                    "gl2_remote_port", 5140,
+                    "known_field", "known",
+                    "unknown_field", "unknown"));
+            client().bulkIndex(bulkIndexRequest);
+            client().refreshNode();
+
+            assertThat(client().fieldType(indexName, "unknown_field")).isNull();
+            assertThat(client().fieldType(indexName, "known_field")).isEqualTo("keyword");
+            assertThat(client().fieldType(indexName, "gl2_source_input")).isEqualTo("keyword");
+            assertThat(client().fieldType(indexName, "gl2_remote_port")).isEqualTo("long");
+        } finally {
+            indexTemplateAdapter.deleteIndexTemplate(templateName);
+        }
     }
 
     @FullBackendTest
