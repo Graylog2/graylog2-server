@@ -36,7 +36,11 @@ type Props = {
 
 type OnClickHandler = Extract<EntityLinkResolution, { onClick: unknown }>['onClick'];
 type TitleComponent = Extract<EntityLinkResolution, { grnType: string }>['Title'];
-type ResolvedLink = { to: string; id: string; Title?: TitleComponent } | { onClick: OnClickHandler };
+type LinkComponent = Extract<EntityLinkResolution, { Link: unknown }>['Link'];
+type ResolvedLink =
+  | { to: string; id: string; Title?: TitleComponent }
+  | { onClick: OnClickHandler }
+  | { id: string; Link: LinkComponent };
 
 const isRelativeUrl = (href: string) => new URI(href).is('relative');
 
@@ -56,6 +60,10 @@ const useResolvedGraylogLink = (href: string): ResolvedLink | null => {
 
   if ('onClick' in resolved) {
     return { onClick: resolved.onClick };
+  }
+
+  if ('Link' in resolved) {
+    return resolved;
   }
 
   return { to: getEntityRoute(resolved.id, resolved.grnType), id: resolved.id, Title: resolved.Title };
@@ -98,6 +106,12 @@ const MarkdownLink = ({ href, children = null }: Props) => {
 
   if (resolved && 'onClick' in resolved) {
     return <OnClickLink handler={resolved.onClick}>{children}</OnClickLink>;
+  }
+
+  if (resolved && 'Link' in resolved) {
+    const { id, Link: ResolvedLinkComponent } = resolved;
+
+    return <ResolvedLinkComponent id={id}>{children}</ResolvedLinkComponent>;
   }
 
   if (isRelativeUrl(href)) {

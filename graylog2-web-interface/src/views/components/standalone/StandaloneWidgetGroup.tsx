@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import styled from 'styled-components';
 
 import { Spinner } from 'components/common';
 import ViewsStoreProvider from 'views/stores/ViewsStoreProvider';
@@ -30,6 +31,7 @@ import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import type { InteractionMode } from 'views/components/contexts/InteractiveContext';
 import ErrorWidget from 'views/components/widgets/ErrorWidget';
 import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
+import useIntersectionObserver from 'hooks/useIntersectionObserver';
 
 import createStandaloneView, { STANDALONE_QUERY_ID } from './createStandaloneView';
 
@@ -56,6 +58,28 @@ const ExecuteOnMount = () => {
   return null;
 };
 
+// Takes the space the widgets will take, so the layout does not jump when they render.
+const LazyPlaceholder = styled.div`
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+`;
+
+const RenderWhenNearViewport = ({ children }: React.PropsWithChildren) => {
+  const placeholderRef = useRef<HTMLDivElement>(null);
+  // Renders a bit before the widgets scroll into view, so they are usually ready by then.
+  const isNearViewport = useIntersectionObserver(placeholderRef, { rootMargin: '200px' });
+  // Keeps the widgets once rendered, so scrolling past them does not run their search again.
+  const [wasNearViewport, setWasNearViewport] = useState(false);
+
+  if (isNearViewport && !wasNearViewport) {
+    setWasNearViewport(true);
+  }
+
+  return wasNearViewport ? children : <LazyPlaceholder ref={placeholderRef} />;
+};
+
 type GroupProps = React.PropsWithChildren<{
   widgets: Array<Widget>;
   titles: { [widgetId: string]: string };
@@ -63,9 +87,10 @@ type GroupProps = React.PropsWithChildren<{
 }>;
 
 const Group = ({ widgets, titles, loadingPlaceholder, children = undefined }: GroupProps) => {
+  const { createSearch } = useContext(SearchExecutorsContext);
   const { data: view, error } = useQuery({
-    queryKey: ['views', 'standalone-widgets', widgets, titles],
-    queryFn: () => createStandaloneView(widgets, titles),
+    queryKey: ['views', 'standalone-widgets', widgets, titles, createSearch],
+    queryFn: () => createStandaloneView(widgets, titles, createSearch),
     staleTime: Infinity,
     gcTime: 0,
   });
@@ -109,6 +134,11 @@ type Props = React.PropsWithChildren<{
    * so the widgets are read-only by default.
    */
   interactionMode?: InteractionMode;
+  /**
+   * Renders the widgets and runs their search only once the group comes close to the viewport, e.g. for long lists
+   * of widgets. Its container needs a height until then.
+   */
+  lazy?: boolean;
 }>;
 
 /**
@@ -122,13 +152,15 @@ const StandaloneWidgetGroup = ({
   searchExecutors = undefined,
   loadingPlaceholder = <Spinner text="Loading widgets..." />,
   interactionMode = 'read-only',
+  lazy = false,
   children = undefined,
 }: Props) => {
-  const group = (
+  const content = (
     <Group widgets={widgets} titles={titles} loadingPlaceholder={loadingPlaceholder}>
       {children}
     </Group>
   );
+  const group = lazy ? <RenderWhenNearViewport>{content}</RenderWhenNearViewport> : content;
 
   return (
     <InteractiveContext.Provider value={interactionMode}>

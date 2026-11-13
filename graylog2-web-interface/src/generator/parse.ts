@@ -75,11 +75,18 @@ type LiteralRefType = {
 
 type RefType = ExistingRefType | LiteralRefType;
 
+type Discriminator = {
+  property_name: string;
+  mapping: Record<string, string>;
+};
+
 type ObjectType = {
   id: string;
   type: 'object';
   properties: Record<string, RawProperty>;
   additional_properties?: string | RawType;
+  one_of?: Array<RawType>;
+  discriminator?: Discriminator;
 };
 
 type RawType = PrimitiveType | EnumType | ArrayType | RefType | ObjectType;
@@ -123,6 +130,13 @@ function createArray(items: Type) {
   return {
     type: 'array',
     items,
+  } as const;
+}
+
+function createUnion(options: Array<Type>) {
+  return {
+    type: 'union',
+    options,
   } as const;
 }
 
@@ -175,6 +189,10 @@ function createType(rawTypeDefinition: RawType): Type {
       return createType({ type: id });
     }
 
+    if (typeDefinition.one_of?.length > 0) {
+      return createUnion(typeDefinition.one_of.map(createType));
+    }
+
     const properties = typeDefinition.properties
       ? Object.fromEntries(
           // eslint-disable-next-line @typescript-eslint/no-use-before-define
@@ -218,6 +236,8 @@ type RawModel = {
   type: string;
   properties: Record<string, RawProperty>;
   additional_properties?: string | RawType;
+  one_of?: Array<RawType>;
+  discriminator?: Discriminator;
 };
 
 function createModel(model: RawModel): Model {
@@ -227,7 +247,7 @@ function createModel(model: RawModel): Model {
 type RawParameter = {
   name: string;
   description: string;
-  paramType: 'path' | 'query' | 'body' | 'formdata';
+  paramType: 'path' | 'query' | 'body' | 'formdata' | 'header';
   type: string | RawType;
   defaultValue?: string;
   required: boolean;
@@ -335,14 +355,36 @@ type RawApi = {
   apis: Array<RawRoute>;
 };
 
-export function parseApi(name: string, api: RawApi) {
-  const models = Object.fromEntries(
-    Object.entries(api.models)
-      .filter(([n]) => isNotBannedModel([n]))
-      .map(([n, model]) => [n, createModel(model)]),
-  );
+// Each subtype of a polymorphic type gets its type name as the discriminator's only possible value.
+const withDiscriminatorValues = (models: Record<string, Model>, rawModels: Record<string, RawModel>) => {
+  const result = { ...models };
 
-  return createApiObject(name, api, models);
+  Object.values(rawModels)
+    .filter(({ discriminator }) => discriminator)
+    .forEach(({ discriminator: { property_name: propertyName, mapping } }) =>
+      Object.entries(mapping).forEach(([typeName, modelName]) => {
+        const subtype = result[modelName];
+
+        if (subtype?.type === 'type_literal') {
+          result[modelName] = {
+            ...subtype,
+            properties: {
+              ...subtype.properties,
+              [propertyName]: { type: 'enum', name: 'string', options: [typeName] },
+            },
+          };
+        }
+      }),
+    );
+
+  return result;
+};
+
+export function parseApi(name: string, api: RawApi) {
+  const rawModels = Object.fromEntries(Object.entries(api.models).filter(([n]) => isNotBannedModel([n])));
+  const models = Object.fromEntries(Object.entries(rawModels).map(([n, model]) => [n, createModel(model)]));
+
+  return createApiObject(name, api, withDiscriminatorValues(models, rawModels));
 }
 
 export default function parse(srcDir: string): Array<Api> {
