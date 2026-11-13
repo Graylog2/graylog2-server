@@ -52,7 +52,7 @@ public class LastOpenedService {
         return findForUser(searchUser.getUser().getId());
     }
 
-    Optional<LastOpenedForUserDTO> findForUser(final String userId) {
+    public Optional<LastOpenedForUserDTO> findForUser(final String userId) {
         return Optional.ofNullable(this.db.find(Filters.eq(LastOpenedForUserDTO.FIELD_USER_ID, userId)).first());
     }
 

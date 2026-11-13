@@ -39,8 +39,13 @@ const supportedTypes = new Set([
   'collection_entities',
 ]);
 
-const getTitleForEntityType = (type: string, throwErrorOnUnknown = true) => {
+const getTitleForEntityType = (
+  type: string,
+  throwErrorOnUnknown = true,
+  pluginTitles: { [type: string]: string } = {},
+) => {
   if (supportedTypes.has(type)) return lowerCase(type);
+  if (pluginTitles[type]) return pluginTitles[type];
 
   return throwErrorOnUnknown ? assertUnreachable(type) : undefined;
 };
