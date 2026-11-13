@@ -17,6 +17,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
+import { dividerColor } from './lumaTokens';
+
 export const COL_WIDTH_STYLE = '200px';
 export const COL_WIDTH_VARIABLE = '220px';
 export const COL_WIDTH_SIZE = '140px';
@@ -49,7 +51,7 @@ const CopiedHint = styled.span<{ $visible: boolean }>`
   background: rgba(0, 0, 0, 0.75);
   color: #fff;
   font-size: 11px;
-  padding: 2px 6px;
+  padding: 2px ${({ theme }) => theme.spacings.xs};
   border-radius: 3px;
   white-space: nowrap;
   pointer-events: none;
@@ -102,14 +104,14 @@ const Th = styled.th<{ $width?: string }>`
   text-transform: uppercase;
   letter-spacing: 0.07em;
   color: ${({ theme }) => theme.colors.text.secondary};
-  border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+  border-bottom: 1px solid ${({ theme }) => dividerColor(theme)};
   ${({ $width }) => $width && `width: ${$width};`}
 `;
 
 const Td = styled.td`
   padding: ${({ theme }) => theme.spacings.sm};
   vertical-align: top;
-  border-bottom: 1px solid rgba(128, 128, 128, 0.12);
+  border-bottom: 1px solid ${({ theme }) => dividerColor(theme)};
   line-height: 1.5;
 `;
 
