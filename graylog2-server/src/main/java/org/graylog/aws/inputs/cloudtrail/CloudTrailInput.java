@@ -16,7 +16,6 @@
  */
 package org.graylog.aws.inputs.cloudtrail;
 
-import com.amazonaws.regions.Regions;
 import com.codahale.metrics.MetricRegistry;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
@@ -33,6 +32,7 @@ import org.graylog2.plugin.inputs.CloudCompatible;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
+import software.amazon.awssdk.regions.Region;
 
 import java.util.Map;
 
@@ -47,7 +47,7 @@ public class CloudTrailInput extends MessageInput {
     public static final String CK_AWS_SQS_REGION = "aws_sqs_region";
     public static final String CK_AWS_S3_REGION = "aws_s3_region";
     public static final String CK_ASSUME_ROLE_ARN = "aws_assume_role_arn";
-    private static final Regions DEFAULT_REGION = Regions.US_EAST_1;
+    private static final Region DEFAULT_REGION = Region.US_EAST_1;
     public static final String CK_OVERRIDE_SOURCE = "override_source";
     public static final String CK_POLLING_INTERVAL = "polling_interval";
     public static final String CK_SQS_MESSAGE_BATCH_SIZE = "sqs_message_batch_size";
@@ -128,7 +128,7 @@ public class CloudTrailInput extends MessageInput {
             r.addField(new DropdownField(
                     CK_AWS_SQS_REGION,
                     "AWS SQS Region",
-                    DEFAULT_REGION.getName(),
+                    DEFAULT_REGION.id(),
                     regionChoices,
                     "The AWS region the SQS queue is in.",
                     ConfigurationField.Optional.NOT_OPTIONAL
@@ -136,7 +136,7 @@ public class CloudTrailInput extends MessageInput {
             r.addField(new DropdownField(
                     CK_AWS_S3_REGION,
                     "AWS S3 Region",
-                    DEFAULT_REGION.getName(),
+                    DEFAULT_REGION.id(),
                     regionChoices,
                     "The AWS region the S3 bucket is in.",
                     ConfigurationField.Optional.NOT_OPTIONAL
