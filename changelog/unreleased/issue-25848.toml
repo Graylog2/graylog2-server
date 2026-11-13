@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix the permission error page shown when a dashboard or saved search was saved by another user while it was open."
+
+issues = ["25848"]
+pulls = ["28166"]

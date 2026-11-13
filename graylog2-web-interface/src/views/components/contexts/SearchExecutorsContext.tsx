@@ -19,9 +19,15 @@ import * as React from 'react';
 import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
 import { cancelJob, executeJobResult, startJob } from 'views/logic/slices/executeJobResult';
 import parseSearch from 'views/logic/slices/parseSearch';
-import { wrapWithOnError } from 'util/conditional/onError';
+import { onError, wrapWithOnError } from 'util/conditional/onError';
+import { isSearchNotAccessibleError, notifyStartJobFailed } from 'views/logic/slices/searchExecutionSlice';
 
-const defaultStartJob = wrapWithOnError(startJob, 'Starting search job failed', 'Error!');
+const defaultStartJob: typeof startJob = (search, searchTypesToSearch, executionState, keepQueries, options) =>
+  onError(startJob(search, searchTypesToSearch, executionState, keepQueries, options), (error) => {
+    if (!(options?.ignoreUnauthorized && isSearchNotAccessibleError(error))) {
+      notifyStartJobFailed(error);
+    }
+  });
 
 const defaultExecuteJobResult = wrapWithOnError(executeJobResult, 'Executing search failed', 'Error!');
 

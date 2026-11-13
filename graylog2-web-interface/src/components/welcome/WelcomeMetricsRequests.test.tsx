@@ -22,7 +22,7 @@ import asMock from 'helpers/mocking/AsMock';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useViewsPlugin from 'views/test/testViewsPlugin';
-import fetch from 'logic/rest/FetchProvider';
+import fetch, { fetchIgnoringUnauthorized } from 'logic/rest/FetchProvider';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 
 import GeneralWelcomeMetrics from './GeneralWelcomeMetrics';
@@ -33,14 +33,22 @@ jest.mock('logic/rest/FetchProvider', () => {
   (window as unknown as { fetch: () => Promise<unknown> }).fetch = () =>
     Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve({}), text: () => Promise.resolve('') });
 
-  return { ...jest.requireActual('logic/rest/FetchProvider'), __esModule: true, default: jest.fn() };
+  return {
+    ...jest.requireActual('logic/rest/FetchProvider'),
+    __esModule: true,
+    default: jest.fn(),
+    fetchIgnoringUnauthorized: jest.fn(),
+  };
 });
 
 const SEARCH_ID = 'welcome-search-id';
 
 type FetchCall = [string, string, unknown?];
 
-const callsFor = (path: RegExp) => (asMock(fetch).mock.calls as Array<FetchCall>).filter(([, url]) => path.test(url));
+const callsFor = (path: RegExp) =>
+  ([...asMock(fetch).mock.calls, ...asMock(fetchIgnoringUnauthorized).mock.calls] as Array<FetchCall>).filter(([, url]) =>
+    path.test(url),
+  );
 
 const searchesCreated = () => callsFor(/\/views\/search$/);
 const searchesExecuted = () => callsFor(/\/views\/search\/[^/]+\/execute$/);
@@ -53,7 +61,7 @@ describe('Welcome page metrics requests', () => {
     jest.clearAllMocks();
     asMock(useCurrentUser).mockReturnValue(defaultUser);
     asMock(useSearchConfiguration).mockReturnValue({ config: undefined, refresh: () => {}, isInitialLoading: false });
-    asMock(fetch).mockImplementation((_method: string, url: string, body?: unknown) => {
+    const fetchMock = (_method: string, url: string, body?: unknown) => {
       if (url.includes('/views/fields')) return Promise.resolve([]);
 
       if (url.endsWith('/views/search')) {
@@ -63,7 +71,9 @@ describe('Welcome page metrics requests', () => {
       }
 
       return Promise.resolve({});
-    });
+    };
+    asMock(fetch).mockImplementation(fetchMock);
+    asMock(fetchIgnoringUnauthorized).mockImplementation(fetchMock);
   });
 
   const renderAndSettle = async () => {

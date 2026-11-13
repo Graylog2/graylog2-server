@@ -32,7 +32,13 @@ import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import type { SearchParser } from 'views/logic/slices/searchMetadataSlice';
 import { parseSearch } from 'views/logic/slices/searchMetadataSlice';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
-import { selectParameters } from 'views/logic/slices/viewSelectors';
+import {
+  selectActiveQuery,
+  selectIsDirty,
+  selectParameters,
+  selectRootView,
+  selectView,
+} from 'views/logic/slices/viewSelectors';
 import {
   selectGlobalOverride,
   selectSearchTypesToSearch,
@@ -45,10 +51,17 @@ import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import ParameterBinding from 'views/logic/parameters/ParameterBinding';
 import type { ParameterMap } from 'views/logic/parameters/Parameter';
 import type Parameter from 'views/logic/parameters/Parameter';
-import type { JobIds } from 'views/stores/SearchJobs';
+import type { JobIds, StartJobOptions } from 'views/stores/SearchJobs';
 import type Search from 'views/logic/search/Search';
-import { setParameters } from 'views/logic/slices/viewSlice';
+import { setParameters, setView } from 'views/logic/slices/viewSlice';
+import createSearch from 'views/logic/slices/createSearch';
 import type { WidgetMapping } from 'views/logic/views/types';
+import FetchError from 'logic/errors/FetchError';
+import ErrorsActions from 'actions/errors/ErrorsActions';
+import { createFromFetchError } from 'logic/errors/ReportedErrors';
+import UserNotification from 'util/UserNotification';
+import { getView } from 'views/api/views';
+import ViewTypeLabel from 'views/components/ViewTypeLabel';
 
 const initialState = {
   searchTypesToSearch: undefined,
@@ -145,6 +158,7 @@ export type SearchExecutors = {
     searchTypesToSearch: string[],
     executionStateParam: SearchExecutionState,
     keepQueries?: string[],
+    options?: StartJobOptions,
   ) => Promise<JobIds>;
   executeJobResult: (params: {
     jobIds: JobIds;
@@ -203,6 +217,103 @@ export const executeSearchJob =
       });
   };
 
+export const notifyStartJobFailed = (error: unknown) =>
+  UserNotification.error(`Starting search job failed: ${error}`, 'Error!');
+
+export const isSearchNotAccessibleError = (error: unknown): error is FetchError =>
+  error instanceof FetchError && (error.status === 403 || error.status === 404);
+
+const fetchSavedSearchId = async (viewId: string) => {
+  try {
+    const { search_id: savedSearchId } = await getView(viewId);
+
+    return savedSearchId;
+  } catch {
+    return undefined;
+  }
+};
+
+const isMissingStreamPermission = (error: FetchError) => error.additional?.body?.type === 'MissingStreamPermission';
+
+const SUPERSEDED = 'superseded';
+
+const searchReplacedMeanwhile = (getState: () => RootState, search: Search, widgetMapping: WidgetMapping) => {
+  const currentView = selectView(getState());
+
+  if (currentView.search.id === search.id) {
+    return undefined;
+  }
+
+  return Immutable.is(currentView.widgetMapping, widgetMapping) ? currentView.search : SUPERSEDED;
+};
+
+const replaceInaccessibleSearch = async (
+  error: FetchError,
+  search: Search,
+  executedWidgetMapping: WidgetMapping,
+  dispatch: ViewsDispatch,
+  getState: () => RootState,
+): Promise<Search | typeof SUPERSEDED | undefined> => {
+  if (isMissingStreamPermission(error)) {
+    return undefined;
+  }
+
+  const view = selectRootView(getState())?.view;
+
+  if (!view) {
+    return undefined;
+  }
+
+  const savedSearchId = await fetchSavedSearchId(view.id);
+
+  if (!savedSearchId) {
+    return undefined;
+  }
+
+  const replacedBeforeCopy = searchReplacedMeanwhile(getState, search, executedWidgetMapping);
+
+  if (replacedBeforeCopy) {
+    return replacedBeforeCopy;
+  }
+
+  const newSearch = await createSearch(search.toBuilder().newId().build()).catch((copyError) => {
+    if (copyError instanceof FetchError && isMissingStreamPermission(copyError)) {
+      throw copyError;
+    }
+
+    return undefined;
+  });
+
+  if (!newSearch) {
+    return undefined;
+  }
+
+  const replacedWhileCopying = searchReplacedMeanwhile(getState, search, executedWidgetMapping);
+
+  if (replacedWhileCopying) {
+    return replacedWhileCopying;
+  }
+
+  await dispatch(setView(selectView(getState()).toBuilder().search(newSearch).build()));
+
+  if (savedSearchId !== search.id && (error.status === 403 || !selectIsDirty(getState()))) {
+    UserNotification.warning(
+      `A newer version of this ${ViewTypeLabel({ type: view.type })} was saved. Reload the page to see it.`,
+      'Outdated version',
+    );
+  }
+
+  return newSearch;
+};
+
+const reportSearchNotAccessible = (error: FetchError) => {
+  if (error.status === 403) {
+    ErrorsActions.report(createFromFetchError(error));
+  } else {
+    notifyStartJobFailed(error);
+  }
+};
+
 export const executeWithExecutionState =
   ({
     search,
@@ -225,17 +336,48 @@ export const executeWithExecutionState =
     perPage?: number;
     stopPolling?: (progress: number) => boolean;
   }) =>
-  async (dispatch: ViewsDispatch) => {
+  async (dispatch: ViewsDispatch, getState: () => RootState) => {
     dispatch(loading());
+    const executedWidgetMapping = selectRootView(getState())?.view?.widgetMapping;
 
     return dispatch(parseSearch(search, searchExecutors.parse))
       .then(() => {
         dispatch(cancelExecutedJob());
 
-        return searchExecutors.startJob(search, searchTypesToSearch, executionState, [activeQuery]);
+        return searchExecutors
+          .startJob(search, searchTypesToSearch, executionState, [activeQuery], { ignoreUnauthorized: true })
+          .catch(async (error) => {
+            if (!isSearchNotAccessibleError(error)) {
+              throw error;
+            }
+
+            const newSearch = await replaceInaccessibleSearch(
+              error,
+              search,
+              executedWidgetMapping,
+              dispatch,
+              getState,
+            ).catch((copyError) => {
+              reportSearchNotAccessible(copyError);
+              throw copyError;
+            });
+
+            if (!newSearch) {
+              reportSearchNotAccessible(error);
+              throw error;
+            }
+
+            if (newSearch === SUPERSEDED || selectActiveQuery(getState()) !== activeQuery) {
+              return SUPERSEDED;
+            }
+
+            return searchExecutors.startJob(newSearch, searchTypesToSearch, executionState, [activeQuery]);
+          });
       })
-      .then((jobIds: JobIds) =>
-        dispatch(executeSearchJob({ searchExecutors, jobIds, widgetMapping, page, perPage, stopPolling })),
+      .then((jobIds: JobIds | typeof SUPERSEDED) =>
+        jobIds === SUPERSEDED
+          ? undefined
+          : dispatch(executeSearchJob({ searchExecutors, jobIds, widgetMapping, page, perPage, stopPolling })),
       )
       .catch((error) => {
         dispatch(cancelExecutedJob());
