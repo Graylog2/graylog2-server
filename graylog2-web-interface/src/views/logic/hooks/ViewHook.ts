@@ -22,6 +22,7 @@ export type ViewHookArguments = {
   executionState: SearchExecutionState;
   retry: (args: { view: View; executionState: SearchExecutionState }) => Promise<unknown>;
   query: { [key: string]: any };
+  userTimezone?: string;
 };
 
 export type ViewHook = (args: ViewHookArguments) => Promise<readonly [View, SearchExecutionState]>;

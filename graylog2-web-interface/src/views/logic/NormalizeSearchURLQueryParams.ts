@@ -29,6 +29,7 @@ import type { TimeRangeQueryParameter } from 'views/logic/TimeRange';
 import { timeRangeFromQueryParameter } from 'views/logic/TimeRange';
 import { DEFAULT_RANGE_TYPE } from 'views/Constants';
 import useQuery from 'routing/useQuery';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 type StreamsQuery = {
   streams?: string;
@@ -47,12 +48,12 @@ export type RawQuery = (TimeRangeQueryParameter | { relative?: string }) &
   StreamsQuery &
   StreamCategoryQuery & { q?: string };
 
-const normalizeTimeRange = (query: {} | TimeRangeQueryParameter): TimeRange | undefined =>
+const normalizeTimeRange = (query: {} | TimeRangeQueryParameter, userTimezone?: string): TimeRange | undefined =>
   // eslint-disable-next-line no-nested-ternary
   query && 'rangetype' in query
-    ? timeRangeFromQueryParameter(query)
+    ? timeRangeFromQueryParameter(query, userTimezone)
     : 'relative' in query
-      ? timeRangeFromQueryParameter({ ...query, rangetype: DEFAULT_RANGE_TYPE })
+      ? timeRangeFromQueryParameter({ ...query, rangetype: DEFAULT_RANGE_TYPE }, userTimezone)
       : undefined;
 
 const normalizeStreams = (query: StreamsQuery = {}): Array<string> => {
@@ -89,9 +90,9 @@ type NormalizedSearchURLQueryParams = {
   queryString: QueryString | undefined;
 };
 
-const normalizeSearchURLQueryParams = (query: RawQuery): NormalizedSearchURLQueryParams => {
+const normalizeSearchURLQueryParams = (query: RawQuery, userTimezone?: string): NormalizedSearchURLQueryParams => {
   const { q: queryString } = query ?? {};
-  const timeRange = normalizeTimeRange(query);
+  const timeRange = normalizeTimeRange(query, userTimezone);
   const streamsFilter = filtersForQuery(normalizeStreams(query));
   const streamCategoriesFilter = categoryFiltersForQuery(normalizeStreamCategories(query));
 
@@ -108,10 +109,11 @@ const normalizeSearchURLQueryParams = (query: RawQuery): NormalizedSearchURLQuer
 
 export const useSearchURLQueryParams = () => {
   const query = useQuery();
+  const { userTimezone } = useUserDateTime();
 
   return useMemo(() => {
     const { timeRange, autoRefresh, queryString, streamsFilter, streamCategoriesFilter } =
-      normalizeSearchURLQueryParams(query);
+      normalizeSearchURLQueryParams(query, userTimezone);
 
     return {
       timeRange,
@@ -121,7 +123,7 @@ export const useSearchURLQueryParams = () => {
       streamCategories: filtersToStreamCategorySet(streamCategoriesFilter).toArray(),
     };
     // eslint-disable-next-line @tanstack/query/no-unstable-deps
-  }, [query]);
+  }, [query, userTimezone]);
 };
 
 export default normalizeSearchURLQueryParams;

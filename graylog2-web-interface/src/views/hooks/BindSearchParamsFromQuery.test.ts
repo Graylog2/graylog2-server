@@ -150,6 +150,40 @@ describe('BindSearchParamsFromQuery should', () => {
     expect(findMockQuery(newView).timerange).toEqual(expectedTimerange);
   });
 
+  it('use user timezone for keyword range param without timezone', async () => {
+    const input = {
+      ...defaultInput,
+      query: { rangetype: 'keyword', keyword: 'Last five days' },
+      userTimezone: 'America/New_York',
+    };
+
+    const [newView] = await bindSearchParamsFromQuery(input);
+
+    expect(findMockQuery(newView).timerange).toEqual({
+      type: 'keyword',
+      keyword: 'Last five days',
+      timezone: 'America/New_York',
+    });
+  });
+
+  it('not replace search when keyword range param matches current keyword range', async () => {
+    const keywordQuery = query
+      .toBuilder()
+      .timerange({ type: 'keyword', keyword: '7am -0400 till now', timezone: 'America/New_York' })
+      .build();
+    const keywordView = view.toBuilder().search(search.toBuilder().queries([keywordQuery]).build()).build();
+    const input = {
+      ...defaultInput,
+      view: keywordView,
+      query: { rangetype: 'keyword', keyword: '7am -0400 till now' },
+      userTimezone: 'America/New_York',
+    };
+
+    const [newView] = await bindSearchParamsFromQuery(input);
+
+    expect(newView).toBe(keywordView);
+  });
+
   it('update streams of new search when comma-separated streams parameter was supplied', async () => {
     const input = {
       ...defaultInput,

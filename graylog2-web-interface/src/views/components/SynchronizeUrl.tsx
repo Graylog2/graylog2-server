@@ -25,16 +25,24 @@ import { selectView } from 'views/logic/slices/viewSelectors';
 import { selectSearchExecutionState } from 'views/logic/slices/searchExecutionSelectors';
 import useLocation from 'routing/useLocation';
 import useQuery from 'routing/useQuery';
+import useUserDateTime from 'hooks/useUserDateTime';
 import { updateView, executeActiveQuery } from 'views/logic/slices/viewSlice';
 import { updateGlobalOverride } from 'views/logic/slices/searchExecutionSlice';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 
 const bindSearchParamsFromQueryThunk =
-  (query: { [key: string]: unknown }) => async (dispatch: ViewsDispatch, getState: () => RootState) => {
+  (query: { [key: string]: unknown }, userTimezone: string) =>
+  async (dispatch: ViewsDispatch, getState: () => RootState) => {
     const view = selectView(getState());
     const executionState = selectSearchExecutionState(getState());
 
-    const result = await bindSearchParamsFromQuery({ view, query, retry: () => Promise.resolve(), executionState });
+    const result = await bindSearchParamsFromQuery({
+      view,
+      query,
+      retry: () => Promise.resolve(),
+      executionState,
+      userTimezone,
+    });
 
     if (!result) {
       return Promise.resolve();
@@ -63,9 +71,10 @@ const bindSearchParamsFromQueryThunk =
 
 const useBindSearchParamsFromQuery = (query: { [key: string]: unknown }) => {
   const dispatch = useViewsDispatch();
+  const { userTimezone } = useUserDateTime();
 
   useEffect(() => {
-    dispatch(bindSearchParamsFromQueryThunk(query));
+    dispatch(bindSearchParamsFromQueryThunk(query, userTimezone));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 };
