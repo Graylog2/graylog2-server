@@ -20,18 +20,10 @@ import { Events } from '@graylog/server-api';
 
 import UserNotification from 'util/UserNotification';
 import type { Event } from 'components/events/events/types';
-import FetchError from 'logic/errors/FetchError';
+import type FetchError from 'logic/errors/FetchError';
 import { onError } from 'util/conditional/onError';
 
-// The endpoint responds with an empty body instead of a 404 when the event does not exist.
-const fetchEvent = (eventId: string) =>
-  Events.getById(eventId).then((data) => {
-    if (!data?.event) {
-      throw new FetchError('Not Found', 404, { message: `Event <${eventId}> not found.` });
-    }
-
-    return data.event;
-  });
+const fetchEvent = (eventId: string) => Events.getById(eventId).then((data) => data.event);
 
 const useEventById = (
   eventId: string,
