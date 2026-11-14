@@ -218,24 +218,7 @@ public class PipelineFacade implements EntityFacade<PipelineDao> {
 
     @Override
     public void delete(PipelineDao nativeEntity) {
-        final Set<PipelineConnections> pipelineConnections = connectionsService.loadByPipelineId(nativeEntity.id());
-        for (PipelineConnections connections : pipelineConnections) {
-            final Set<String> pipelineIds = connections.pipelineIds().stream()
-                    .filter(pipelineId -> !pipelineId.equals(nativeEntity.id()))
-                    .collect(Collectors.toSet());
-
-            if (pipelineIds.isEmpty()) {
-                LOG.trace("Removing pipeline connections for stream {}", connections.streamId());
-                connectionsService.delete(connections.streamId());
-            } else {
-                final PipelineConnections newConnections = connections.toBuilder()
-                        .pipelineIds(pipelineIds)
-                        .build();
-                LOG.trace("Saving updated pipeline connections: {}", newConnections);
-                connectionsService.save(newConnections);
-            }
-        }
-
+        // Stream connection cleanup runs inside PipelineService.delete (see #21008).
         pipelineService.delete(nativeEntity.id());
     }
 
