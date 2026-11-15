@@ -16,6 +16,7 @@
  */
 package org.graylog.mcp.tools;
 
+import com.eaio.uuid.UUID;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
@@ -25,6 +26,8 @@ import org.graylog.mcp.server.Tool;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
 import org.graylog2.shared.ServerVersion;
 import org.graylog2.shared.security.RestPermissions;
@@ -42,26 +45,30 @@ public class SystemInfoFormattedTool extends Tool<SystemInfoFormattedTool.Parame
     private final CustomizationConfig customizationConfig;
     private final ServerStatus serverStatus;
     private final LeaderElectionService leaderElectionService;
+    private final ClusterConfigService clusterConfigService;
 
     @Inject
     public SystemInfoFormattedTool(ObjectMapper objectMapper,
                                    SchemaGeneratorProvider schemaGeneratorProvider,
                                    CustomizationConfig customizationConfig,
                                    ServerStatus serverStatus,
-                                   LeaderElectionService leaderElectionService) {
-        super(objectMapper,
-                schemaGeneratorProvider,
-                new TypeReference<>() {},
+                                   LeaderElectionService leaderElectionService,
+                                   ClusterConfigService clusterConfigService) {
+        super(new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
                 f("Get %s System Information", customizationConfig.productName()),
                 """
                         Returns Markdown containing system information about the %s installation, including
                         cluster ID, installed version, hostname, timezone, and operating system.
-                        """.formatted(customizationConfig.productName()));
+                        """.formatted(customizationConfig.productName()),
+                objectMapper,
+                clusterConfigService,
+                schemaGeneratorProvider);
         this.customizationConfig = customizationConfig;
         this.serverStatus = serverStatus;
         this.leaderElectionService = leaderElectionService;
+        this.clusterConfigService = clusterConfigService;
     }
 
     @Override
@@ -81,7 +88,7 @@ public class SystemInfoFormattedTool extends Tool<SystemInfoFormattedTool.Parame
             return output.unorderedListKVItem(SystemOverviewResponse.create(f("%s Server", customizationConfig.productName()),
                     ServerVersion.CODENAME,
                     serverStatus.getNodeId().toString(),
-                    serverStatus.getClusterId(),
+                    clusterConfigService.getOrDefault(ClusterId.class, ClusterId.create(UUID.nilUUID().toString())).clusterId(),
                     ServerVersion.VERSION.toString(),
                     Tools.getISO8601String(serverStatus.getStartedAt()),
                     serverStatus.isProcessing(),

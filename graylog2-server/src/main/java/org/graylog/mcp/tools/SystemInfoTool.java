@@ -16,6 +16,7 @@
  */
 package org.graylog.mcp.tools;
 
+import com.eaio.uuid.UUID;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
@@ -25,6 +26,7 @@ import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
 import org.graylog2.shared.ServerVersion;
 import org.graylog2.shared.security.RestPermissions;
@@ -41,6 +43,7 @@ public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, SystemOvervi
     private final ServerStatus serverStatus;
     private final LeaderElectionService leaderElectionService;
     private final CustomizationConfig customizationConfig;
+    private final ClusterConfigService clusterConfigService;
 
     @Inject
     public SystemInfoTool(ServerStatus serverStatus,
@@ -65,6 +68,7 @@ public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, SystemOvervi
         this.serverStatus = serverStatus;
         this.leaderElectionService = leaderElectionService;
         this.customizationConfig = customizationConfig;
+        this.clusterConfigService = clusterConfigService;
     }
 
     @Override
@@ -82,7 +86,7 @@ public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, SystemOvervi
             return SystemOverviewResponse.create(f("%s Server", customizationConfig.productName()),
                     ServerVersion.CODENAME,
                     serverStatus.getNodeId().toString(),
-                    serverStatus.getClusterId(),
+                    clusterConfigService.getOrDefault(ClusterId.class, ClusterId.create(UUID.nilUUID().toString())).clusterId(),
                     ServerVersion.VERSION.toString(),
                     Tools.getISO8601String(serverStatus.getStartedAt()),
                     serverStatus.isProcessing(),
