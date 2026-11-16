@@ -26,6 +26,8 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import createSearch from 'views/logic/slices/createSearch';
+import type Search from 'views/logic/search/Search';
+import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
 
 import StandaloneWidgetGroup from './StandaloneWidgetGroup';
 import StandaloneWidgetContextProvider from './StandaloneWidgetContextProvider';
@@ -88,6 +90,34 @@ describe('StandaloneWidgetGroup', () => {
     await screen.findByText(/widget widget-2/i);
 
     expect(asMock(executeActiveQuery)).toHaveBeenCalledTimes(1);
+  });
+
+  it('prepares the search with the executors of each group, also for equal widgets', async () => {
+    const createStoredSearch = jest.fn(async (search: Search) => search);
+    const storedResultsExecutors: SearchExecutors = {
+      parse: jest.fn(),
+      resultMapper: (result) => result,
+      startJob: jest.fn(),
+      executeJobResult: jest.fn(),
+      cancelJob: jest.fn(),
+      createSearch: createStoredSearch,
+    };
+
+    render(
+      <>
+        <StandaloneWidgetGroup widgets={[widget()]}>
+          <span>Live widget</span>
+        </StandaloneWidgetGroup>
+        <StandaloneWidgetGroup widgets={[widget()]} searchExecutors={storedResultsExecutors}>
+          <span>Stored widget</span>
+        </StandaloneWidgetGroup>
+      </>,
+    );
+    await screen.findByText('Live widget');
+    await screen.findByText('Stored widget');
+
+    expect(createSearch).toHaveBeenCalledTimes(1);
+    expect(createStoredSearch).toHaveBeenCalledTimes(1);
   });
 
   it('shows an error when preparing the search fails', async () => {
