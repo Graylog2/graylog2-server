@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useCallback, useState } from 'react';
-import type { ColorScheme } from '@graylog/sawmill';
 
+import type { ColorScheme } from 'theme/sawmill';
 import Store from 'logic/local-storage/Store';
 import type { UserPreferences } from 'contexts/UserPreferencesContext';
 import usePersistedSetting from 'hooks/usePersistedSetting';

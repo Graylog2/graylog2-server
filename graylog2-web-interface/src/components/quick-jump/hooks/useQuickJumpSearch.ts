@@ -21,6 +21,7 @@ import { QuickJump } from '@graylog/server-api';
 
 import { defaultOnError } from 'util/conditional/onError';
 import { useGetEntityRoute } from 'routing/hooks/useShowRouteForEntity';
+import usePluginEntities from 'hooks/usePluginEntities';
 import useNavItems from 'components/quick-jump/hooks/useNavItems';
 import { PAGE_WEIGHT, BASE_SCORE } from 'components/quick-jump/Constants';
 import type { SearchResultItem } from 'components/quick-jump/Types';
@@ -78,9 +79,20 @@ const useEntityResultMapper = () => {
   );
 };
 
+// Offers to do something with the typed text, after everything that matches it.
+const useQueryActionItems = (searchQuery: string): Array<SearchResultItem> => {
+  const queryActions = usePluginEntities('quickJump.queryActions')
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    .filter(({ useCondition }) => useCondition?.() ?? true);
+  const query = searchQuery.trim();
+
+  return query === '' ? [] : queryActions.map(({ key, item }) => ({ key, ...item(query) }));
+};
+
 const useQuickJumpSearch = (searchQuery: string) => {
   const mapEntityResult = useEntityResultMapper();
   const navItems = useNavItems();
+  const queryActionItems = useQueryActionItems(searchQuery);
 
   const { data: searchResultItems, isLoading } = useQuery({
     queryKey: ['quick-jump', searchQuery],
@@ -103,7 +115,7 @@ const useQuickJumpSearch = (searchQuery: string) => {
   });
 
   return {
-    searchResults: searchResultItems ?? [],
+    searchResults: [...(searchResultItems ?? []), ...queryActionItems],
     isLoading,
   };
 };

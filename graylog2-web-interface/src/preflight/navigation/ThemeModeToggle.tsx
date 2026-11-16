@@ -18,9 +18,9 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import styled, { css, useTheme } from 'styled-components';
 import defer from 'lodash/defer';
-import { COLOR_SCHEME_LIGHT, COLOR_SCHEME_DARK } from '@graylog/sawmill';
 import { Switch } from '@mantine/core';
 
+import { COLOR_SCHEME_LIGHT, COLOR_SCHEME_DARK } from 'theme/sawmill';
 import Icon from 'components/common/Icon';
 
 const ThemeModeToggleWrap = styled.div`

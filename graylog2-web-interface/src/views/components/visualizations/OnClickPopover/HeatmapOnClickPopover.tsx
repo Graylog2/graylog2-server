@@ -18,13 +18,13 @@ import React, { useMemo } from 'react';
 
 import Popover from 'components/common/Popover';
 import type { ValueGroups, OnClickPopoverDropdownProps } from 'views/components/visualizations/OnClickPopover/Types';
-import { keySeparator } from 'views/Constants';
+import { splitCompositeKey } from 'views/logic/compositeKey';
 import OnClickPopoverValueGroups from 'views/components/visualizations/OnClickPopover/OnClickPopoverValueGroups';
 
 const HeatmapOnClickPopover = ({ clickPoint, config, setFieldData }: OnClickPopoverDropdownProps) => {
   const { rowPivotValues, columnPivotValues, metricValue } = useMemo<ValueGroups>(() => {
     if (!clickPoint || !config) return {};
-    const splitXValues: Array<string | number> = (clickPoint.x as string).split(keySeparator);
+    const splitXValues: Array<string | number> = splitCompositeKey(clickPoint.x as string);
     const traceColor = null;
     const metric: string = config.series.length === 1 ? config.series[0].function : (splitXValues.pop() as string);
     const columnValues = splitXValues.filter((value) => value !== metric);
@@ -32,7 +32,7 @@ const HeatmapOnClickPopover = ({ clickPoint, config, setFieldData }: OnClickPopo
     const columnPivotsToFields = config?.columnPivots?.flatMap((pivot) => pivot.fields) ?? [];
 
     const rowPivotsToFields = config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [];
-    const splitYValues: Array<string | number> = `${String(clickPoint.y)}`.split(keySeparator);
+    const splitYValues: Array<string | number> = splitCompositeKey(String(clickPoint.y));
 
     return {
       rowPivotValues: splitYValues.map((value, i) => ({

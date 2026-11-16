@@ -76,10 +76,7 @@ const AppFacade = () => {
 
     if (loadError) {
       return (
-        <ErrorPage
-          title="Loading your user failed"
-          description={loadError.message}
-          displayPageLayout={false}>
+        <ErrorPage title="Loading your user failed" description={loadError.message} displayPageLayout={false}>
           <Button bsStyle="primary" onClick={() => window.location.reload()}>
             Reload page
           </Button>

@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import styled from 'styled-components';
-import type { ThemeBase } from '@graylog/sawmill';
+
+import type { ThemeBase } from 'theme/sawmill';
 
 export type FlexBaseType = {
   $gap?: (typeof ThemeBase)['spacings'][0] | number;

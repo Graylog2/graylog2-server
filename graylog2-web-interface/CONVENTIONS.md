@@ -22,8 +22,11 @@ Coding conventions for the Graylog web interface. They apply to all changes, whe
 
 ### Reusing Components
 
-- Reuse shared components before creating new ones or using native HTML elements. See the [frontend documentation](https://graylog2.github.io/frontend-documentation).
-- `src/components/common`: shared components. `src/components/bootstrap`: our Mantine and react-bootstrap wrappers.
+- Reuse shared components before creating new ones or using native HTML elements. Look at the [graylog-luma design system](https://graylog2.github.io/design-system) first (sources in `docs/graylog-luma/stories/`), then `src/components/common` and `src/components/bootstrap`.
+- `src/components/common`: shared components, including thin wrappers around Mantine components (`Stack`, `Text`, `Tooltip`, …). New shared components go here.
+- `src/components/bootstrap`: replacements for former react-bootstrap components that keep their API (e.g. `Button` with `bsStyle`), today mostly built on Mantine. Only add a component here when it replaces a react-bootstrap one.
+- The goal is a consistent UI the designer has approved, so avoid one-off UI in feature code. If a shared component is missing, create it in `src/components/common`, even while the design is still open, and document it with a story in `docs/graylog-luma/stories/`. Without an approved design, say so in the story and the PR, and open a follow-up issue to align it with the designer.
+- Patterns, recurring combinations of components such as entity list pages (`PageHeader` with a `CreateButton`, then a `PaginatedEntityTable`), follow `docs/graylog-luma/stories/Patterns/` or, where a pattern isn't documented yet, the composition of existing pages of the same kind. Document a missing pattern in a separate PR. Check the Figma file or ask the designer first; if there is no design yet, start from what the code does and get the PR reviewed by frontend and design.
 
 ## Types
 
@@ -47,7 +50,8 @@ Coding conventions for the Graylog web interface. They apply to all changes, whe
 - State, in order of preference: `useState` (local) → `useContext` (shared in a hierarchy) → Redux (complex).
 - No Reflux in new code. Replace existing stores with `react-query` or `useState`/`useContext` where possible; otherwise access them via `useStore`.
 - Server state: `@tanstack/react-query`, wrapped in dedicated hooks instead of calling `useQuery`/`useMutation` in many components.
-- API calls: typed stubs from `@graylog/server-api` and `@graylog/enterprise-api`.
+- API calls: typed stubs from `@graylog/server-api` and `@graylog/enterprise-api`. They are generated into `target/api` from the Swagger definition of the Maven build (`yarn generate:apidefs`) and not committed. Don't edit them. If a stub is still missing after regenerating, the backend API has to change first.
+- Feature flags: read them with `useFeature('flag_name')`. Flags are defined and enabled by the backend, the frontend can't add one alone.
 - Forms: `formik`, reusing existing Formik-based helpers and components.
 - Session: every `fetch` from `FetchProvider` extends the user's session. Periodic requests must not — use `fetchPeriodically`, or pass `{ requestShouldExtendSession: false }` as the last argument of generated stubs.
 
@@ -61,8 +65,10 @@ Coding conventions for the Graylog web interface. They apply to all changes, whe
 - Choose queries by Testing Library's [priority guide](https://testing-library.com/docs/queries/about#priority).
 - Use `findBy` for UI that may update asynchronously, and `await screen.findBy…` on its own — it already fails if the element is missing, no `expect(…).toBeInTheDocument()` needed.
 - Don't mock `@tanstack/react-query`; mock the hook on top of it. If that hook lives inside a component, move it to its own file.
-- Use `asMock(foo)`, never `foo as jest.Mock`.
-- Reuse existing fixtures instead of large inline mocks. If none fits, create a fixture file following the local pattern, otherwise in a nearby `__tests__/` directory.
+- Use `asMock(foo)`, never `foo as jest.Mock`. Mock Reflux stores with `MockStore` (both from `helpers/mocking`).
+- For `react-select` inputs, use `helpers/selectEvent`.
+- `console.warn` and `console.error` fail tests. Fix the cause; wrap only expected errors in `helpers/suppressConsole`.
+- Reuse existing fixtures (shared ones in `test/fixtures/`, imported as `fixtures/...`) instead of large inline mocks. If none fits, create a fixture file following the local pattern, otherwise in a nearby `__tests__/` directory.
 - Placement: `ComponentA.test.tsx` next to `ComponentA.tsx`. With fixtures: `__tests__/ComponentA.test.tsx` and `__tests__/ComponentA.test.case1.json`.
 
 ## JavaScript
@@ -102,6 +108,16 @@ The [graylog-luma design system](https://graylog2.github.io/design-system) (sour
 | `success` | Green  | Creative actions (creating data) |
 
 - No `link` style buttons — use anchors for navigation.
+
+## Theme
+
+The theme lives in `src/theme/sawmill`. `THEME_BASE.ts` defines the color shade matrix, which the Mantine theme is built on. `styled-components/utils/colors.ts` maps these shades to the tokens of the styled-components theme (`theme.colors.*`), which match the tokens in Figma.
+
+- Only our designer changes the color shade matrix in `THEME_BASE.ts`. To change the color of an element or token, point the token to a different shade instead.
+- Reuse existing tokens where they fit. Tokens named after their purpose, like `theme.colors.input.borderFocus`, are only used for that purpose.
+- Prefer descriptive tokens like `theme.colors.section.filled.background` over generic helpers like `theme.colors.variant.lighter.danger` or `theme.colors.gray[60]`. Descriptive tokens can use different shades in light and dark mode.
+- New tokens need a name that describes their usage. Inform the designer when you add one. Add them to `styled-components/utils/colors.ts` and their type to `styled-components/types.ts`. Applying an opacity with `opacify` is fine.
+- The default themes are read from the generated `mantine/generated/theme.json` and `styled-components/generated/theme.json`. After changing `THEME_BASE.ts` or the color utils, run `yarn generate:themes` and commit the generated files. Custom themes from the customization page are generated at runtime.
 
 ## Refactoring
 

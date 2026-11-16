@@ -16,20 +16,25 @@
  */
 import React from 'react';
 
-import type { CustomFieldMapping, IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldTypeProfiles/types';
-import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
-import { CountBadge } from 'components/common';
+import ExpandableFieldsCellList from 'components/common/cell-list/ExpandableFieldsCellList';
+import type { CustomFieldMapping } from 'components/indices/IndexSetFieldTypeProfiles/types';
+import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 
-const CustomFieldMappingsCell = ({
-  customFieldTypes,
-  profile,
-}: {
+type Props = {
   customFieldTypes: Array<CustomFieldMapping>;
-  profile: IndexSetFieldTypeProfile;
-}) => {
-  const { toggleSection } = useExpandedSections();
+};
 
-  return <CountBadge onClick={() => toggleSection(profile.id, 'customFieldMapping')} count={customFieldTypes.length} />;
+const CustomFieldMappingsCell = ({ customFieldTypes }: Props) => {
+  const {
+    data: { fieldTypes },
+  } = useFieldTypesForMappings();
+  const typeTitle = (type: string) => fieldTypes[type] ?? type;
+
+  return (
+    <ExpandableFieldsCellList
+      fields={Object.fromEntries(customFieldTypes.map(({ field, type }) => [field, typeTitle(type)]))}
+    />
+  );
 };
 
 export default CustomFieldMappingsCell;

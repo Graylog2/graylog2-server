@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { ColorVariant } from '@graylog/sawmill';
+import type { ColorVariant } from 'theme/sawmill';
 
 import type { CollectorInstanceView } from '../types';
 

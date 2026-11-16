@@ -21,7 +21,11 @@ import { TABLE_BORDER_WIDTH } from 'components/bootstrap/Table';
 import type { EntityBase, ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
 import useElementDimensions from 'hooks/useElementDimensions';
-import { BULK_SELECT_COLUMN_WIDTH, ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
+import {
+  BULK_SELECT_COLUMN_WIDTH,
+  ACTIONS_COL_ID,
+  ROW_EXPAND_COLUMN_WIDTH,
+} from 'components/common/EntityDataTable/Constants';
 import useColumnWidths from 'components/common/EntityDataTable/hooks/useColumnWidths';
 import useActionsColumnWidth from 'components/common/EntityDataTable/hooks/useActionsColumnWidth';
 
@@ -30,6 +34,7 @@ type Props<Entity extends EntityBase, Meta> = {
   columnSchemas: Array<ColumnSchema>;
   columnWidthPreferences: { [colId: string]: number };
   displayBulkSelectCol: boolean;
+  displayRowExpandCol: boolean;
   hasRowActions: boolean;
   headerMinWidths: { [colId: string]: number };
   visibleColumns: Array<string>;
@@ -42,6 +47,7 @@ const useElementWidths = <Entity extends EntityBase, Meta>({
   columnSchemas,
   columnWidthPreferences,
   displayBulkSelectCol,
+  displayRowExpandCol,
   entities,
   hasRowActions,
   headerMinWidths,
@@ -58,6 +64,7 @@ const useElementWidths = <Entity extends EntityBase, Meta>({
   const columnWidths = useColumnWidths<Entity>({
     actionsColMinWidth,
     bulkSelectColWidth: displayBulkSelectCol ? BULK_SELECT_COLUMN_WIDTH : 0,
+    rowExpandColWidth: displayRowExpandCol ? ROW_EXPAND_COLUMN_WIDTH : 0,
     columnIds,
     columnRenderersByAttribute,
     columnWidthPreferences,

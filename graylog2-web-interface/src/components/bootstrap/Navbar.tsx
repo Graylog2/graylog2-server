@@ -17,6 +17,7 @@
 import styled, { css } from 'styled-components';
 
 import { NAV_ITEM_HEIGHT } from 'theme/constants';
+import zIndices from 'theme/z-indices';
 
 const Navbar = styled.header(
   ({ theme }) => css`
@@ -34,6 +35,7 @@ const Navbar = styled.header(
     margin-bottom: 0;
     font-family: ${theme.fonts.family.navigation};
     font-size: ${theme.fonts.size.navigation};
+    z-index: ${zIndices.navigation};
   `,
 );
 

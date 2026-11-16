@@ -17,11 +17,13 @@
 import React from 'react';
 
 import { Badge } from 'components/bootstrap';
+import Icon from 'components/common/Icon';
 import type { FieldTypeOrigin } from 'components/indices/IndexSetFieldTypes/types';
 
 type Props = {
   origin: FieldTypeOrigin;
   title: string;
+  withInfoIcon?: boolean;
 };
 
 type BadgeBsStyle = 'default' | 'danger' | 'info' | 'primary' | 'success' | 'warning' | 'gray';
@@ -31,6 +33,11 @@ const originBsStyles: Record<FieldTypeOrigin, BadgeBsStyle> = {
   OVERRIDDEN_PROFILE: 'warning',
   PROFILE: 'default',
 };
-const OriginBadge = ({ title, origin }: Props) => <Badge bsStyle={originBsStyles[origin]}>{title}</Badge>;
+const OriginBadge = ({ title, origin, withInfoIcon = false }: Props) => (
+  <Badge bsStyle={originBsStyles[origin]}>
+    {title}
+    {withInfoIcon && <Icon name="info" size="xs" type="regular" />}
+  </Badge>
+);
 
 export default OriginBadge;

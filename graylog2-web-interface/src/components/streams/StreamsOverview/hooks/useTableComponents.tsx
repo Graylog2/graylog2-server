@@ -24,11 +24,6 @@ import ExpandedRulesSection from 'components/streams/StreamsOverview/ExpandedRul
 import ExpandedRulesActions from 'components/streams/StreamsOverview/ExpandedRulesActions';
 import ExpandedDestinationFilterRulesSection from 'components/streams/StreamsOverview/ExpandedDestinationFilterRulesSection';
 import ExpandedDestinationFilterRulesActions from 'components/streams/StreamsOverview/ExpandedDestinationFilterRulesActions';
-import ExpandedAssociatedInputsSection from 'components/streams/StreamsOverview/ExpandedAssociatedInputsSection';
-import ExpandedPipelinesSection from 'components/streams/StreamsOverview/ExpandedPipelinesSection';
-import ExpandedPipelinesActions from 'components/streams/StreamsOverview/ExpandedPipelinesActions';
-import ExpandedRoutingPipelinesSection from 'components/streams/StreamsOverview/ExpandedRoutingPipelinesSection';
-import { METRIC_COLUMN_IDS, METRIC_COLUMN_TITLES } from 'components/streams/StreamsOverview/metricColumns';
 import ExpandedOutputsSection from 'components/streams/StreamsOverview/ExpandedOutputsSection';
 import ExpandedOutputsActions from 'components/streams/StreamsOverview/ExpandedOutputsActions';
 import type { ExpandedSectionRenderer } from 'components/common/EntityDataTable/types';
@@ -49,29 +44,19 @@ const useTableElements = ({
       title: 'Rules',
       content: renderExpandedRules,
       actions: renderExpandedRulesActions,
+      isAvailable: (stream: Stream) => !stream.is_default && stream.is_editable,
     },
     destination_filters: {
       title: 'Filter Rules',
       content: (stream: Stream) => <ExpandedDestinationFilterRulesSection stream={stream} />,
       actions: (stream: Stream) => <ExpandedDestinationFilterRulesActions stream={stream} />,
+      isAvailable: (stream: Stream) => !stream.is_default && stream.is_editable,
     },
     outputs: {
       title: 'Outputs',
       content: (stream: Stream) => <ExpandedOutputsSection stream={stream} />,
       actions: (stream: Stream) => <ExpandedOutputsActions stream={stream} />,
-    },
-    [METRIC_COLUMN_IDS.associatedInputs]: {
-      title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.associatedInputs],
-      content: (stream: Stream) => <ExpandedAssociatedInputsSection stream={stream} />,
-    },
-    [METRIC_COLUMN_IDS.pipelines]: {
-      title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.pipelines],
-      content: (stream: Stream) => <ExpandedPipelinesSection stream={stream} />,
-      actions: () => <ExpandedPipelinesActions />,
-    },
-    [METRIC_COLUMN_IDS.routingPipelines]: {
-      title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.routingPipelines],
-      content: (stream: Stream) => <ExpandedRoutingPipelinesSection stream={stream} />,
+      isAvailable: (stream: Stream) => stream.is_editable,
     },
     ...pluggableExpandedSections,
   };

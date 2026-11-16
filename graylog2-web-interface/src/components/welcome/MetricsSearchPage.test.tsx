@@ -21,8 +21,6 @@ import { defaultUser } from 'defaultMockValues';
 import asMock from 'helpers/mocking/AsMock';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
-import useCreateSearch from 'views/hooks/useCreateSearch';
-import type View from 'views/logic/views/View';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 
@@ -30,7 +28,7 @@ import GeneralWelcomeMetrics from './GeneralWelcomeMetrics';
 
 jest.mock('hooks/useCurrentUser');
 jest.mock('hooks/useSearchConfiguration');
-jest.mock('views/hooks/useCreateSearch');
+jest.mock('views/logic/slices/createSearch', () => jest.fn(async (search) => search));
 
 describe('MetricsSearchPage', () => {
   useViewsPlugin();
@@ -38,7 +36,6 @@ describe('MetricsSearchPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     asMock(useCurrentUser).mockReturnValue(defaultUser);
-    asMock(useCreateSearch).mockImplementation((viewPromise: Promise<View>) => viewPromise);
     asMock(useSearchConfiguration).mockReturnValue({ config: undefined, refresh: () => {}, isInitialLoading: false });
   });
 
