@@ -21,7 +21,6 @@ import org.graylog.security.authservice.ldap.LDAPTransportSecurity;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 
 import java.time.Duration;
@@ -39,7 +38,6 @@ public class OpenLDAPContainer extends GenericContainer<OpenLDAPContainer> {
 
     private static final String BIND_DN = "cn=admin,dc=example,dc=com";
     private static final String BIND_PASSWORD = "admin";
-    private final Network network;
 
     public static OpenLDAPContainer create(String customLdifPath) {
         return new OpenLDAPContainer(customLdifPath);
@@ -62,7 +60,6 @@ public class OpenLDAPContainer extends GenericContainer<OpenLDAPContainer> {
 
     public OpenLDAPContainer(String customLdifPath) {
         super(IMAGE_NAME);
-        this.network = Network.newNetwork();
 
         waitingFor(Wait.forLogMessage(".*slapd starting.*", 1));
         withCommand("--copy-service");
@@ -74,8 +71,6 @@ public class OpenLDAPContainer extends GenericContainer<OpenLDAPContainer> {
                 "/container/service/slapd/assets/config/bootstrap/ldif/custom/custom.ldif",
                 BindMode.READ_ONLY
         );
-        withNetwork(this.network);
-        withNetworkAliases("openldap");
         withStartupTimeout(Duration.ofSeconds(10));
         withExposedPorts(PORT);
     }
@@ -127,11 +122,5 @@ public class OpenLDAPContainer extends GenericContainer<OpenLDAPContainer> {
      */
     public String ldapsURL() {
         return String.format(Locale.US, "ldaps://127.0.0.1:%s/", ldapsPort());
-    }
-
-    @Override
-    public void close() {
-        super.close();
-        this.network.close();
     }
 }

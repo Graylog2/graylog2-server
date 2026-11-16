@@ -33,7 +33,6 @@ import org.graylog2.database.MongoConnectionImpl;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -104,10 +103,8 @@ class MongodbClusterResourceIT {
         }
     };
 
-    private static final Network NETWORK = Network.newNetwork();
-
     @Container
-    static MongoDBContainer mongoContainer = MongoDBContainer.create(PROFILING_TEST_MONGODB_VERSION, NETWORK)
+    static MongoDBContainer mongoContainer = MongoDBContainer.create(PROFILING_TEST_MONGODB_VERSION)
             .withEnv("MONGO_INITDB_ROOT_USERNAME", ADMIN.username())
             .withEnv("MONGO_INITDB_ROOT_PASSWORD", ADMIN.password())
             .withEnv("MONGO_INITDB_DATABASE", TEST_DATABASE)
