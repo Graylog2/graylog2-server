@@ -37,7 +37,13 @@ interface TypeReference {
   name: string;
   optional: boolean;
 }
-export type Type = ArrayType | TypeLiteral | TypeReference | EnumType;
+// A polymorphic type: one of its subtypes, told apart by a discriminator property.
+export interface UnionType {
+  type: 'union';
+  options: Array<Type>;
+  optional?: boolean;
+}
+export type Type = ArrayType | TypeLiteral | TypeReference | EnumType | UnionType;
 
 export type Model = Type & {
   id: string;

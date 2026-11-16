@@ -24,4 +24,12 @@ describe('getTitleForEntityType', () => {
   it('returns a readable title for collection entities, which is what sharing a collection records', () => {
     expect(getTitleForEntityType('collection_entities')).toBe('collection entities');
   });
+
+  it('returns titles registered by plugins', () => {
+    expect(getTitleForEntityType('notebook', true, { notebook: 'notebook' })).toBe('notebook');
+  });
+
+  it('returns undefined for unknown types when not throwing', () => {
+    expect(getTitleForEntityType('unknown_type', false)).toBeUndefined();
+  });
 });

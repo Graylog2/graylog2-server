@@ -154,6 +154,8 @@ export { default as TimezoneSelect } from './TimezoneSelect';
 export { default as Text } from './Text';
 export { default as Title } from './Title';
 export { default as Tooltip } from './Tooltip';
+export { default as ViewerBadges } from './ViewerBadges/ViewerBadges';
+export type { Viewer } from './ViewerBadges/types';
 export { default as Tree } from './Tree';
 export { default as TypeAheadDataFilter } from './TypeAheadDataFilter';
 export { default as TypeAheadFieldInput } from './TypeAheadFieldInput';

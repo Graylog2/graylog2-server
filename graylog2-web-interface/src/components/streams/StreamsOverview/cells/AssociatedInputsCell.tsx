@@ -17,36 +17,63 @@
 import * as React from 'react';
 
 import type { Stream } from 'logic/streams/types';
-import { Spinner } from 'components/common';
-import ExpandedSectionCount from 'components/common/EntityDataTable/ExpandedSectionCount';
+import useInputDetails from 'hooks/useInputDetails';
+import type { ResolvedInput } from 'hooks/useInputDetails';
+import { Link, Spinner } from 'components/common';
+import ExpandableCellList from 'components/common/cell-list/ExpandableCellList';
 import { useStreamMetricsFor } from 'components/streams/StreamsOverview/StreamMetricsContext';
-import { METRIC_COLUMN_IDS } from 'components/streams/StreamsOverview/metricColumns';
+import { useInputTitleLinkBuilder } from 'components/streams/StreamsOverview/inputTitleLinks';
+
+type InputItem = {
+  id: string;
+  resolved: ResolvedInput | undefined;
+  isPermitted: boolean;
+};
 
 type Props = {
   stream: Stream;
 };
 
-const SECTION_NAME = METRIC_COLUMN_IDS.associatedInputs;
-
 const AssociatedInputsCell = ({ stream }: Props) => {
   const { metrics, isInitialLoading, isError } = useStreamMetricsFor(stream.id);
+  const typedInputs = metrics?.associated_inputs;
+  const {
+    resolvedById,
+    notPermittedIds,
+    isInitialLoading: areDetailsLoading,
+    isFetching: areDetailsFetching,
+    isError: isDetailsError,
+  } = useInputDetails(typedInputs ?? []);
+  const buildLink = useInputTitleLinkBuilder();
 
-  if (isInitialLoading && !metrics) {
+  if ((isInitialLoading && !typedInputs) || areDetailsLoading) {
     return <Spinner size="xs" />;
   }
 
-  if (isError || !metrics?.associated_inputs?.length) {
+  if (isError || !typedInputs?.length) {
     return null;
   }
 
-  return (
-    <ExpandedSectionCount
-      entityId={stream.id}
-      section={SECTION_NAME}
-      count={metrics.associated_inputs.length}
-      label={`associated inputs for ${stream.title}`}
-    />
-  );
+  // A missing entry only means the input is deleted once the details request settled.
+  const fallbackLabel = (id: string) => (areDetailsFetching || isDetailsError ? id : `${id} (deleted)`);
+  const label = ({ id, resolved }: InputItem) => resolved?.title ?? fallbackLabel(id);
+
+  const renderInput = (item: InputItem) => {
+    if (!item.isPermitted) {
+      return <i title="Missing permissions">{item.id}</i>;
+    }
+
+    const path = item.resolved ? buildLink(item.resolved) : null;
+
+    return path ? <Link to={path}>{label(item)}</Link> : label(item);
+  };
+
+  // Inputs the user can't read have no title, so they go last as plain IDs.
+  const items = typedInputs
+    .map(({ id }) => ({ id, resolved: resolvedById[id], isPermitted: !notPermittedIds.has(id) }))
+    .sort((a, b) => Number(!a.isPermitted) - Number(!b.isPermitted) || label(a).localeCompare(label(b)));
+
+  return <ExpandableCellList items={items} renderItem={renderInput} itemKey={({ id }) => id} itemTitle={label} />;
 };
 
 export default AssociatedInputsCell;
