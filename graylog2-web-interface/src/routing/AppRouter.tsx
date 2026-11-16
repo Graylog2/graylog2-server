@@ -34,6 +34,7 @@ import {
   SigmaEventDefinitionPage,
   CreateEventNotificationPage,
   CreateExtractorsPage,
+  DataNodeConfigurationPage,
   DataNodePage,
   DataNodeUpgradePage,
   DataNodesClusterManagementPage,
@@ -315,6 +316,10 @@ const AppRouter = () => {
 
             !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.NODES, element: <ClusterConfigurationPage /> },
             !isCloud && {
+              path: `${RoutePaths.SYSTEM.CLUSTER.DATANODE_CONFIGURATION}/*`,
+              element: <DataNodeConfigurationPage />,
+            },
+            !isCloud && {
               path: RoutePaths.SYSTEM.CLUSTER.DATANODE_DASHBOARD,
               element: <DataNodesClusterManagementPage />,
             },
@@ -330,7 +335,10 @@ const AppRouter = () => {
               },
 
             !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.NODE_SHOW(':nodeId'), element: <ShowNodePage /> },
-            !isCloud && { path: RoutePaths.SYSTEM.CLUSTER.DATANODE_SHOW(':dataNodeId'), element: <DataNodePage /> },
+            !isCloud && {
+              path: `${RoutePaths.SYSTEM.CLUSTER.DATANODE_SHOW(':dataNodeId')}/*`,
+              element: <DataNodePage />,
+            },
 
             !isCloud && { path: RoutePaths.SYSTEM.LOGGING, element: <LoggersPage /> },
             { path: RoutePaths.SYSTEM.METRICS(':nodeId'), element: <ShowMetricsPage /> },

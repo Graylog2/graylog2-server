@@ -19,6 +19,7 @@ import styled, { css } from 'styled-components';
 
 import { Alert, Button, ButtonToolbar, Col, Row } from 'components/bootstrap';
 import { Title } from 'components/common';
+import HelpText, { HelpTextHeading, HelpTextList } from 'components/datanode/HelpText';
 import useIncompatibleIndices from 'components/indices/hooks/useIncompatibleIndices';
 import IncompatibleIndicesTable from 'components/indices/incompatible-indices/IncompatibleIndicesTable';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -62,41 +63,9 @@ const Heading = styled.h4(
   `,
 );
 
-const HelpText = styled.div(
-  ({ theme }) => css`
-    margin-top: ${theme.spacings.md};
-    color: ${theme.colors.gray[60]};
-    font-size: ${theme.fonts.size.small};
-  `,
-);
-
 const TableContainer = styled.div(
   ({ theme }) => css`
     margin-top: ${theme.spacings.lg};
-  `,
-);
-
-const HelpTextHeading = styled.h4`
-  margin: 0;
-  color: inherit;
-  font-size: inherit;
-`;
-
-const HelpTextList = styled.ul(
-  ({ theme }) => css`
-    margin: ${theme.spacings.xs} 0 0;
-    padding-left: ${theme.spacings.lg};
-    list-style-position: outside;
-    list-style-type: disc;
-
-    > li {
-      display: list-item;
-      margin-bottom: ${theme.spacings.xxs};
-    }
-
-    > li:last-child {
-      margin-bottom: 0;
-    }
   `,
 );
 
