@@ -44,11 +44,11 @@ import java.util.stream.Collectors;
 @Singleton
 public class ManagedConfigurationApplier {
     /**
-     * Name of the binding with the names of the parameters whose stored value is ignored, as the way out when a
-     * stored value keeps a node from working. It has to come from the node's own configuration, never from the
-     * database.
+     * Name of the configuration parameter with the names of the parameters whose stored value is ignored, as the way
+     * out when a stored value keeps a node from working. A node which picks up stored values has to declare it in
+     * its own configuration bean: it must never come from the database.
      */
-    public static final String IGNORED_PARAMETERS = "managed_configuration_ignored_parameters";
+    public static final String IGNORED_PARAMETERS = "ignore_stored_configuration";
     /**
      * Ignores the stored values of all parameters.
      */
