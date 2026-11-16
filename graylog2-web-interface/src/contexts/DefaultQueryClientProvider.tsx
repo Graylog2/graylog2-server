@@ -20,6 +20,8 @@ import type { QueryClientConfig } from '@tanstack/react-query';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import merge from 'lodash/merge';
 
+import defaultQueryOptions from 'contexts/defaultQueryOptions';
+
 type Props = {
   children: React.ReactNode;
   options?: QueryClientConfig;
@@ -28,8 +30,7 @@ type Props = {
 const defaultOptions = {
   defaultOptions: {
     queries: {
-      refetchOnWindowFocus: false,
-      networkMode: 'always' as const,
+      ...defaultQueryOptions,
       retry: (failureCount, error) => {
         if (error.status >= 400 && error.status < 500) return false;
 

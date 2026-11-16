@@ -20,6 +20,7 @@ import { DocumentTitle, PageHeader } from 'components/common';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useLocation from 'routing/useLocation';
+import NotFoundPage from 'pages/NotFoundPage';
 
 const PAGE_TITLE_BY_ACTION: Record<string, string> = {
   'git-import': 'Create Event Definitions - Git Import',
@@ -39,10 +40,12 @@ function SigmaEventDefinitionPage() {
   const pathAction = pathname.split('/').pop() ?? '';
   const pluginKey = PLUGIN_KEY_BY_ACTION[pathAction];
   const pluginComponents = usePluginEntities(pluginKey);
-  const PluginComponent = pluginComponents?.[0]?.component;
+  const plugin = pluginComponents?.[0];
+  const isAvailable = plugin?.useCondition?.() ?? true;
+  const PluginComponent = plugin?.component;
 
-  if (!PluginComponent) {
-    return null;
+  if (!PluginComponent || !isAvailable) {
+    return <NotFoundPage displayPageLayout={false} />;
   }
 
   const pageTitle = PAGE_TITLE_BY_ACTION[pathAction] ?? 'Create Event Definitions';

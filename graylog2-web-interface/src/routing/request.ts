@@ -28,6 +28,7 @@ export type RequestOptions = {
 
 const headersFromOptions = (options: RequestOptions): Headers => {
   if (options && 'requestShouldExtendSession' in options) {
+    // eslint-disable-next-line graylog/no-literal-product-name -- HTTP header name expected by the backend
     return { 'X-Graylog-No-Session-Extension': !(options?.requestShouldExtendSession ?? true) };
   }
 
@@ -45,10 +46,10 @@ const request = (
     Object.entries(query).length > 0 ? `${path}?${Qs.stringify(query, { indices: false })}` : path;
 
   const optionHeaders = headersFromOptions(options);
-  const _headers: Headers = {
-    ...headers,
-    ...optionHeaders,
-  };
+  // Optional header parameters of generated stubs are undefined when not passed; fetch would send them as "undefined".
+  const _headers: Headers = Object.fromEntries(
+    Object.entries({ ...headers, ...optionHeaders }).filter(([, value]) => value !== undefined && value !== null),
+  );
 
   return new Builder(method, URLUtils.qualifyUrl(pathWithQueryParameters)).json(body).setHeaders(_headers).build();
 };
