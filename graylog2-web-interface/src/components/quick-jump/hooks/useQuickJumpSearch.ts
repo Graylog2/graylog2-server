@@ -25,6 +25,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import useNavItems from 'components/quick-jump/hooks/useNavItems';
 import { PAGE_WEIGHT, BASE_SCORE } from 'components/quick-jump/Constants';
 import type { SearchResultItem } from 'components/quick-jump/Types';
+import type { StubResponse } from 'util/UtilityTypes';
 
 const compareSearchItems = (result1: SearchResultItem, result2: SearchResultItem) => {
   const scoreDifference = result2.score - result1.score;
@@ -63,7 +64,7 @@ const scoreResults = (items: Array<SearchResultItem>, query: string, weight = 1.
     return [{ ...item, score: score * weight }];
   });
 
-type ItemResultType = Awaited<ReturnType<typeof QuickJump.search>>['results'][number];
+type ItemResultType = StubResponse<typeof QuickJump.search>['results'][number];
 
 const useEntityResultMapper = () => {
   const getEntityRoute = useGetEntityRoute();
