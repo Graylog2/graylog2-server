@@ -16,8 +16,9 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
-import { marked } from 'marked';
+import { Marked } from 'marked';
 import DOMPurify from 'dompurify';
+import escape from 'lodash/escape';
 import parse, { domToReact, Element } from 'html-react-parser';
 import type { DOMNode, HTMLReactParserOptions } from 'html-react-parser';
 
@@ -34,6 +35,13 @@ type Props = {
 };
 
 const ALLOWED_URI_REGEXP = /^(?:https?:|graylog:|[^a-z])/i;
+
+const markdownParser = new Marked({
+  async: false,
+  renderer: {
+    html: ({ text }) => escape(text),
+  },
+});
 
 type Transformer = Parameters<typeof parse>[1]['replace'];
 type Renderer = ({ html, transformer }: { html: string; transformer?: Transformer }) => ReturnType<typeof parse>;
@@ -132,13 +140,10 @@ const anchorTransformer: Transformer = (domNode) => {
 const Markdown = ({ augment = false, text }: Props) => {
   const { isInitialLoading, data: markdownConfig } = useMarkdownConfig();
 
-  // Remove dangerous HTML
-  const sanitizedText = DOMPurify.sanitize(text ?? '', { USE_PROFILES: { html: false } });
-
-  // Remove dangerous markdown
+  // Raw HTML is escaped by the parser, sanitizing the output is a safety net
   const html = useMemo(
-    () => DOMPurify.sanitize(marked.parse(sanitizedText, { async: false }), { ALLOWED_URI_REGEXP }),
-    [sanitizedText],
+    () => DOMPurify.sanitize(markdownParser.parse(text ?? '', { async: false }), { ALLOWED_URI_REGEXP }),
+    [text],
   );
 
   const imageTransformer: Transformer =
