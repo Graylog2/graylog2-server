@@ -18,11 +18,8 @@ package org.graylog.datanode.bindings;
 
 import com.google.common.util.concurrent.Service;
 import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
-import jakarta.inject.Named;
-import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.ConfigurationWarningsLogger;
 import org.graylog.datanode.configuration.DatanodeTrustManagerProvider;
 import org.graylog.datanode.configuration.OpensearchConfigurationService;
@@ -56,8 +53,6 @@ import org.graylog.datanode.opensearch.statemachine.tracer.OpensearchWatchdog;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
 import org.graylog.datanode.process.statemachine.tracer.StateMachineTracer;
 import org.graylog2.configuration.managed.ManagedConfigurationApplier;
-
-import java.util.Set;
 
 public class OpensearchProcessBindings extends AbstractModule {
 
@@ -111,12 +106,6 @@ public class OpensearchProcessBindings extends AbstractModule {
         tracerBinder.addBinding().to(ManagedConfigurationAppliedTracer.class).asEagerSingleton();
 
         bind(ManagedConfigurationApplier.class).asEagerSingleton();
-    }
-
-    @Provides
-    @Named(ManagedConfigurationApplier.IGNORED_PARAMETERS)
-    Set<String> ignoredStoredConfiguration(Configuration configuration) {
-        return configuration.getIgnoreStoredConfiguration();
     }
 
 }

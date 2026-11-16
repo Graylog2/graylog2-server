@@ -39,6 +39,7 @@ import org.graylog2.Configuration.SafeClassesValidator;
 import com.github.joschi.jadconfig.documentation.Documentation;
 import com.github.joschi.jadconfig.documentation.DocumentationSection;
 import org.graylog2.configuration.NativeLibPathConfiguration;
+import org.graylog2.configuration.managed.ManagedConfigurationApplier;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.SuppressForbidden;
 import org.slf4j.Logger;
@@ -169,7 +170,7 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
             Stored values otherwise take precedence over this file, environment variables and system properties.
             Use this to start a data node which doesn't work with a stored value.
             """)
-    @Parameter(value = "ignore_stored_configuration", converter = StringSetConverter.class)
+    @Parameter(value = ManagedConfigurationApplier.IGNORED_PARAMETERS, converter = StringSetConverter.class)
     private Set<String> ignoreStoredConfiguration = Set.of();
 
     @Documentation("HTTP port on which the embedded opensearch listens.")
