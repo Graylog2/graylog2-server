@@ -14,11 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { Permission } from 'graylog-web-plugin/plugin';
+
 import type { EventNotificationTypes } from 'components/event-notifications/types';
 
 import notificationTypeOptions from './notificationTypeOptions';
 
-const pluginType = (type: string, requiredPermissions?: Array<string>): EventNotificationTypes => ({
+declare module 'graylog-web-plugin/plugin' {
+  interface EntityActions {
+    watchlist: 'edit' | 'delete';
+  }
+}
+
+const pluginType = (type: string, requiredPermissions?: Array<Permission>): EventNotificationTypes => ({
   type,
   displayName: `${type} display`,
   formComponent: () => null,
