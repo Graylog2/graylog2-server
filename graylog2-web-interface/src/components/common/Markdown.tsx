@@ -16,8 +16,9 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
-import { marked } from 'marked';
+import { Marked } from 'marked';
 import DOMPurify from 'dompurify';
+import escape from 'lodash/escape';
 import parse from 'html-react-parser';
 import type { HTMLReactParserOptions } from 'html-react-parser';
 
@@ -37,6 +38,13 @@ DOMPurify.addHook('afterSanitizeAttributes', (node) => {
     node.setAttribute('target', '_blank');
     node.setAttribute('rel', 'noopener noreferrer');
   }
+});
+
+const markdownParser = new Marked({
+  async: false,
+  renderer: {
+    html: ({ text }) => escape(text),
+  },
 });
 
 type Transformer = Parameters<typeof parse>[1]['replace'];
@@ -121,11 +129,8 @@ const imageWarningTransformer: Transformer = (domNode) => {
 
 const Markdown = ({ augment = false, text }: Props) => {
   const { isInitialLoading, data: markdownConfig } = useMarkdownConfig();
-  // Remove dangerous HTML
-  const sanitizedText = DOMPurify.sanitize(text ?? '', { USE_PROFILES: { html: false } });
-
-  // Remove dangerous markdown
-  const html = useMemo(() => DOMPurify.sanitize(marked(sanitizedText, { async: false })), [sanitizedText]);
+  // Raw HTML is escaped by the parser, sanitizing the output is a safety net
+  const html = useMemo(() => DOMPurify.sanitize(markdownParser.parse(text ?? '', { async: false })), [text]);
   const transformer =
     markdownConfig?.allow_all_image_sources == true || markdownConfig?.allowed_image_sources
       ? undefined
