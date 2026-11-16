@@ -22,7 +22,7 @@ import type {
   IndexSetFieldTypeProfileForm,
 } from 'components/indices/IndexSetFieldTypeProfiles/types';
 
-export const MAPPINGS_PAGE_SIZE = 50;
+export const MAPPINGS_PAGE_SIZE = 20;
 
 export const getLastPage = (rowsCount: number) => Math.max(1, Math.ceil(rowsCount / MAPPINGS_PAGE_SIZE));
 

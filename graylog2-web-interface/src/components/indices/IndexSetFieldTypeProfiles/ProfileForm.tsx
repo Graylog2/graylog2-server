@@ -59,6 +59,17 @@ const Item = styled.div`
   gap: 5px;
 `;
 
+const MappingsToolbar = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 10px;
+`;
+
+const SearchContainer = styled.div`
+  flex-grow: 1;
+`;
+
 const StyledFormSubmit = styled(FormSubmit)`
   margin-top: 30px;
 `;
@@ -221,26 +232,41 @@ const ProfileForm = ({
               />
               <FieldArray
                 name="customFieldMappings"
-                render={({ remove, push }) => (
+                render={({ remove, unshift }) => (
                   <>
                     <StyledLabel>Set up mappings</StyledLabel>
                     <HelpBlock>Here you can set up type mapping to any field.</HelpBlock>
-                    {isPaginated && (
-                      <Input
-                        id="index-set-field-type-profile-mappings-search"
-                        type="text"
-                        placeholder="Search mappings by field name"
-                        aria-label="Search mappings"
-                        value={mappingsSearch}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                          setMappingsSearch(e.target.value);
+                    <MappingsToolbar>
+                      {isPaginated && (
+                        <SearchContainer>
+                          <Input
+                            id="index-set-field-type-profile-mappings-search"
+                            type="text"
+                            placeholder="Search mappings by field name"
+                            aria-label="Search mappings"
+                            value={mappingsSearch}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                              setMappingsSearch(e.target.value);
+                              setMappingsPage(1);
+                            }}
+                            onKeyDown={(e: React.KeyboardEvent) => {
+                              if (e.key === 'Enter') e.preventDefault();
+                            }}
+                          />
+                        </SearchContainer>
+                      )}
+                      <Button
+                        bsStyle="success"
+                        onClick={() => {
+                          unshift({});
+                          setMappingsSearch('');
                           setMappingsPage(1);
                         }}
-                        onKeyDown={(e: React.KeyboardEvent) => {
-                          if (e.key === 'Enter') e.preventDefault();
-                        }}
-                      />
-                    )}
+                        name="plus"
+                        title="Add mapping">
+                        Add mapping
+                      </Button>
+                    </MappingsToolbar>
                     {isPaginated && (
                       <HelpBlock>
                         {pageRows.length === 0
@@ -305,17 +331,6 @@ const ProfileForm = ({
                     {totalPages > 1 && (
                       <Pagination currentPage={currentPage} totalPages={totalPages} onChange={setMappingsPage} />
                     )}
-                    <Button
-                      bsSize="xs"
-                      onClick={() => {
-                        push({});
-                        setMappingsSearch('');
-                        setMappingsPage(getLastPage(customFieldMappings.length + 1));
-                      }}
-                      name="plus"
-                      title="Add mapping">
-                      Add mapping
-                    </Button>
                   </>
                 )}
               />

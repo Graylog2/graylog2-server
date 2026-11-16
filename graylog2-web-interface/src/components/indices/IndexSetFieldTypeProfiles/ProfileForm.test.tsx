@@ -67,17 +67,17 @@ describe('IndexSetFieldTypesList', () => {
     asMock(useFieldTypes).mockImplementation(() => ({ data: simpleFields().toArray(), refetch: jest.fn() }));
   });
 
-  it('shows 50 mappings per page and pages through the rest', async () => {
+  it('shows 20 mappings per page and pages through the rest', async () => {
     renderProfileForm({ initialValues: { ...profile1, customFieldMappings: buildMappings(120) } });
 
-    expect(await screen.findByText('Showing 1-50 of 120 mappings')).toBeInTheDocument();
-    expect(screen.getByTestId('custom-mapping-row-for-field_049')).toBeInTheDocument();
-    expect(screen.queryByTestId('custom-mapping-row-for-field_050')).not.toBeInTheDocument();
+    expect(await screen.findByText('Showing 1-20 of 120 mappings')).toBeInTheDocument();
+    expect(screen.getByTestId('custom-mapping-row-for-field_019')).toBeInTheDocument();
+    expect(screen.queryByTestId('custom-mapping-row-for-field_020')).not.toBeInTheDocument();
 
     await userEvent.click(await screen.findByRole('button', { name: /next page/i }));
 
-    expect(await screen.findByText('Showing 51-100 of 120 mappings')).toBeInTheDocument();
-    expect(screen.getByTestId('custom-mapping-row-for-field_050')).toBeInTheDocument();
+    expect(await screen.findByText('Showing 21-40 of 120 mappings')).toBeInTheDocument();
+    expect(screen.getByTestId('custom-mapping-row-for-field_020')).toBeInTheDocument();
   });
 
   it('sorts the mappings alphabetically by field name', async () => {
@@ -128,28 +128,30 @@ describe('IndexSetFieldTypesList', () => {
   });
 
   it('does not show a search field for a short list', async () => {
-    renderProfileForm({ initialValues: { ...profile1, customFieldMappings: buildMappings(50) } });
+    renderProfileForm({ initialValues: { ...profile1, customFieldMappings: buildMappings(20) } });
 
-    await screen.findByTestId('custom-mapping-row-for-field_049');
+    await screen.findByTestId('custom-mapping-row-for-field_019');
 
     expect(screen.queryByLabelText('Search mappings')).not.toBeInTheDocument();
   });
 
   it('does not show a pager for a short list', async () => {
-    renderProfileForm({ initialValues: { ...profile1, customFieldMappings: buildMappings(50) } });
+    renderProfileForm({ initialValues: { ...profile1, customFieldMappings: buildMappings(20) } });
 
-    await screen.findByTestId('custom-mapping-row-for-field_049');
+    await screen.findByTestId('custom-mapping-row-for-field_019');
 
     expect(screen.queryByRole('button', { name: /next page/i })).not.toBeInTheDocument();
     expect(screen.queryByText(/Showing/)).not.toBeInTheDocument();
   });
 
-  it('jumps to the last page after adding a mapping', async () => {
-    renderProfileForm({ initialValues: { ...profile1, customFieldMappings: buildMappings(50) } });
+  it('adds a new mapping at the top of the first page', async () => {
+    renderProfileForm({ initialValues: { ...profile1, customFieldMappings: buildMappings(30) } });
 
+    await userEvent.click(await screen.findByRole('button', { name: /next page/i }));
     await userEvent.click(await screen.findByRole('button', { name: /add mapping/i }));
 
-    expect(await screen.findByText('Showing 51-51 of 51 mappings')).toBeInTheDocument();
+    expect(await screen.findByText('Showing 1-20 of 31 mappings')).toBeInTheDocument();
+    expect(await screen.findByLabelText(/select customFieldMappings\.0\.field/i)).toBeInTheDocument();
   });
 
   it('points to a mapping with an error on another page', async () => {
@@ -172,7 +174,7 @@ describe('IndexSetFieldTypesList', () => {
     renderProfileForm({ initialValues: { ...profile1, customFieldMappings: buildMappings(60) } });
 
     await userEvent.click(await screen.findByRole('button', { name: /next page/i }));
-    await selectEvent.chooseOption('select customFieldMappings.55.type', 'Number(int)');
+    await selectEvent.chooseOption('select customFieldMappings.25.type', 'Number(int)');
     await userEvent.click(await screen.findByLabelText('Submit'));
 
     await waitFor(() => expect(mockSubmit).toHaveBeenCalledTimes(1));
@@ -180,7 +182,7 @@ describe('IndexSetFieldTypesList', () => {
     const submittedMappings = mockSubmit.mock.calls[0][0].customFieldMappings;
 
     expect(submittedMappings).toHaveLength(60);
-    expect(submittedMappings[55]).toEqual({ field: 'field_055', type: 'int' });
+    expect(submittedMappings[25]).toEqual({ field: 'field_025', type: 'int' });
   });
 
   it('Do not run onSubmit when has empty name', async () => {
@@ -211,7 +213,7 @@ describe('IndexSetFieldTypesList', () => {
 
     const submitButton = await screen.findByLabelText('Submit');
 
-    await selectEvent.chooseOption('select customFieldMappings.1.type', 'String type');
+    await selectEvent.chooseOption('select customFieldMappings.0.type', 'String type');
 
     await waitFor(async () => {
       expect(screen.queryAllByText('String type')).toHaveLength(2);
@@ -236,8 +238,8 @@ describe('IndexSetFieldTypesList', () => {
 
     const submitButton = await screen.findByLabelText('Submit');
 
-    await selectEvent.chooseOption('select customFieldMappings.1.type', 'String type');
-    await selectEvent.chooseOption('select customFieldMappings.1.field', 'http_method');
+    await selectEvent.chooseOption('select customFieldMappings.0.type', 'String type');
+    await selectEvent.chooseOption('select customFieldMappings.0.field', 'http_method');
 
     await waitFor(async () => {
       expect(screen.queryAllByText('http_method')).toHaveLength(2);
