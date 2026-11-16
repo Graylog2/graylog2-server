@@ -17,7 +17,7 @@
 import * as React from 'react';
 
 import { Spinner } from 'components/common';
-import ExpandableCellList from 'components/common/ExpandableCellList';
+import ExpandableCellList from 'components/common/cell-list/ExpandableCellList';
 import EventNotificationLink from 'components/event-notifications/event-notifications/EventNotificationLink';
 import useResolvedNotifications from 'components/event-definitions/hooks/useResolvedNotifications';
 

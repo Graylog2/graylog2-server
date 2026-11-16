@@ -35,6 +35,8 @@ import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 import RightSidebarProvider from 'contexts/RightSidebarProvider';
 import RightSidebar from 'components/layout/RightSidebar';
 import RightSidebarContext from 'contexts/RightSidebarContext';
+import { AssistantPageContextProvider } from 'components/assistant';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 const AppLayout = styled.div`
   display: flex;
@@ -62,6 +64,19 @@ const PageContent = styled.div`
   min-height: 0;
 `;
 
+// Sidebars shown next to every page, e.g. the Assistant's chat, which stays open across pages.
+const GlobalSidebars = () => {
+  const sidebars = usePluginEntities('globalSidebars');
+
+  return (
+    <>
+      {sidebars.map(({ key, component: Sidebar }) => (
+        <Sidebar key={key} />
+      ))}
+    </>
+  );
+};
+
 const App = () => (
   <DefaultQueryParamProvider>
     <CurrentUserContext.Consumer>
@@ -71,37 +86,40 @@ const App = () => (
         }
 
         return (
-          <RightSidebarProvider>
-            <HotkeysProvider>
-              <ScratchpadProvider loginName={currentUser.username}>
-                <NavigationTelemetry />
-                <>
-                  <AppLayout>
-                    <Navigation />
-                    <ReportedErrorBoundary>
-                      <ContentRow>
-                        <MainContentColumn>
-                          <Scratchpad />
-                          <RuntimeErrorBoundary>
-                            <PageContextProviders>
-                              <PageContent>
-                                <Outlet />
-                              </PageContent>
-                            </PageContextProviders>
-                          </RuntimeErrorBoundary>
-                        </MainContentColumn>
-                        <RightSidebarContext.Consumer>
-                          {({ isOpen }) => isOpen && <RightSidebar />}
-                        </RightSidebarContext.Consumer>
-                      </ContentRow>
-                    </ReportedErrorBoundary>
-                  </AppLayout>
-                  <HotkeysModalContainer />
-                  <TelemetryDebugOverlay />
-                </>
-              </ScratchpadProvider>
-            </HotkeysProvider>
-          </RightSidebarProvider>
+          <AssistantPageContextProvider>
+            <RightSidebarProvider>
+              <HotkeysProvider>
+                <ScratchpadProvider loginName={currentUser.username}>
+                  <NavigationTelemetry />
+                  <>
+                    <AppLayout>
+                      <Navigation />
+                      <ReportedErrorBoundary>
+                        <ContentRow>
+                          <MainContentColumn>
+                            <Scratchpad />
+                            <RuntimeErrorBoundary>
+                              <PageContextProviders>
+                                <PageContent>
+                                  <Outlet />
+                                </PageContent>
+                              </PageContextProviders>
+                            </RuntimeErrorBoundary>
+                          </MainContentColumn>
+                          <RightSidebarContext.Consumer>
+                            {({ isOpen }) => isOpen && <RightSidebar />}
+                          </RightSidebarContext.Consumer>
+                          <GlobalSidebars />
+                        </ContentRow>
+                      </ReportedErrorBoundary>
+                    </AppLayout>
+                    <HotkeysModalContainer />
+                    <TelemetryDebugOverlay />
+                  </>
+                </ScratchpadProvider>
+              </HotkeysProvider>
+            </RightSidebarProvider>
+          </AssistantPageContextProvider>
         );
       }}
     </CurrentUserContext.Consumer>

@@ -34,6 +34,8 @@ import DataTableVisualizationConfig from 'views/logic/aggregationbuilder/visuali
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { updateWidgetConfig } from 'views/logic/slices/widgetActions';
 import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits';
+import { ValuesType } from 'views/logic/aggregationbuilder/Pivot';
+import { useIsInteractiveMode } from 'views/components/contexts/InteractiveContext';
 
 import TableHead from './TableHead';
 import DataTableEntry from './DataTableEntry';
@@ -41,6 +43,9 @@ import MessagesTable from './MessagesTable';
 import deduplicateValues from './DeduplicateValues';
 import Headers from './Headers';
 import styles from './DataTable.css';
+import SelectedRowsActions from './SelectedRowsActions';
+import DataTableSelectedEntitiesProvider from './DataTableSelectedEntitiesProvider';
+import { rowSelectionKey } from './rowSelection';
 
 import useReportRenderComplete from '../widgets/useReportRenderComplete';
 import type { VisualizationComponentProps } from '../aggregationbuilder/AggregationBuilder';
@@ -235,6 +240,15 @@ const DataTable = ({
     rows.filter((r): r is Leaf => r.source === 'leaf'),
   );
 
+  const interactive = useIsInteractiveMode();
+  // Only value pivots can be filtered by exact values; time pivot keys are bucket starts, not field values.
+  const selectableFields = interactive
+    ? rowPivots.filter((pivot) => pivot.type === ValuesType).flatMap((pivot) => pivot.fields)
+    : [];
+  const selectableRowIds =
+    selectableFields.length > 0 ? expandedRows.map((row) => rowSelectionKey(row, rowFieldNames)) : undefined;
+  const selectionColumnOffset = selectableRowIds ? 1 : 0;
+
   const actualColumnPivotFields = _extractColumnPivotValues(rows);
   const pinnedColumns: Immutable.Set<string> = useMemo(
     () => widget?.config?.visualizationConfig?.pinnedColumns ?? Immutable.Set(),
@@ -244,7 +258,8 @@ const DataTable = ({
   const stickyLeftMarginsByColumnIndex = useMemo(() => {
     let prev = 0;
     const res = [];
-    const lineNumberOffset = widget?.config?.visualizationConfig?.showRowNumbers === false ? 0 : 1;
+    const lineNumberOffset =
+      (widget?.config?.visualizationConfig?.showRowNumbers === false ? 0 : 1) + selectionColumnOffset;
 
     const rowPivotsFields = rowPivots.flatMap((rowPivot) => rowPivot.fields ?? []);
 
@@ -265,7 +280,14 @@ const DataTable = ({
     });
 
     return res;
-  }, [widget?.config?.visualizationConfig?.showRowNumbers, rowPivots, series, pinnedColumns, rowPivotColumnsWidth]);
+  }, [
+    widget?.config?.visualizationConfig?.showRowNumbers,
+    selectionColumnOffset,
+    rowPivots,
+    series,
+    pinnedColumns,
+    rowPivotColumnsWidth,
+  ]);
   const pinnedColumnIndexes = useMemo(
     () => new Set(stickyLeftMarginsByColumnIndex.map(({ index }) => index)),
     [stickyLeftMarginsByColumnIndex],
@@ -290,6 +312,7 @@ const DataTable = ({
         units={widgetUnits}
         pinnedColumnIndexes={pinnedColumnIndexes}
         striped={striped}
+        selectionRowId={selectableRowIds?.[idx]}
       />
     );
   });
@@ -300,32 +323,38 @@ const DataTable = ({
   );
 
   return (
-    <div className={styles.container}>
-      <div className={styles.scrollContainer}>
-        <MessagesTable striped={striped} bordered={bordered} stickyHeader={stickyHeader} condensed={condensed}>
-          <THead $stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>
-            <Headers
-              actualColumnPivotFields={actualColumnPivotFields}
-              borderedHeader={borderedHeader}
-              columnPivots={columnPivots}
-              fields={fields}
-              rollup={rollup}
-              rowPivots={rowPivots}
-              series={series}
-              onSortChange={_onSortChange}
-              sortConfigMap={sortConfigMap}
-              onSetColumnsWidth={onSetColumnsWidth}
-              setLoadingState={setLoadingState}
-              pinnedColumns={pinnedColumns}
-              pinnedColumnIndexes={pinnedColumnIndexes}
-              togglePin={togglePin}
-              showRowNumbers={showRowNumbers}
-            />
-          </THead>
-          <TBody $stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>{formattedRows}</TBody>
-        </MessagesTable>
+    <DataTableSelectedEntitiesProvider rowIds={selectableRowIds ?? []}>
+      <div className={styles.container}>
+        {selectableRowIds && (
+          <SelectedRowsActions selectableFields={selectableFields} rowFieldNames={rowFieldNames} types={fields} />
+        )}
+        <div className={styles.scrollContainer}>
+          <MessagesTable striped={striped} bordered={bordered} stickyHeader={stickyHeader} condensed={condensed}>
+            <THead $stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>
+              <Headers
+                actualColumnPivotFields={actualColumnPivotFields}
+                borderedHeader={borderedHeader}
+                columnPivots={columnPivots}
+                fields={fields}
+                rollup={rollup}
+                rowPivots={rowPivots}
+                series={series}
+                onSortChange={_onSortChange}
+                sortConfigMap={sortConfigMap}
+                onSetColumnsWidth={onSetColumnsWidth}
+                setLoadingState={setLoadingState}
+                pinnedColumns={pinnedColumns}
+                pinnedColumnIndexes={pinnedColumnIndexes}
+                togglePin={togglePin}
+                showRowNumbers={showRowNumbers}
+                selectableRowIds={selectableRowIds}
+              />
+            </THead>
+            <TBody $stickyLeftMarginsByColumnIndex={stickyLeftMarginsByColumnIndex}>{formattedRows}</TBody>
+          </MessagesTable>
+        </div>
       </div>
-    </div>
+    </DataTableSelectedEntitiesProvider>
   );
 };
 

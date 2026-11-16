@@ -40,6 +40,21 @@ describe('Badge', () => {
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
+  it('does not submit a surrounding form when clicked', async () => {
+    const onSubmit = jest.fn((e: React.FormEvent) => e.preventDefault());
+    render(
+      <form onSubmit={onSubmit}>
+        <Badge color="gray" onClick={() => {}}>
+          +2
+        </Badge>
+      </form>,
+    );
+
+    await userEvent.click(await screen.findByRole('button', { name: '+2' }));
+
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
   it('renders color/variant content', () => {
     render(
       <Badge color="success" variant="light">

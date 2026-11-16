@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix crash on user create/edit pages and password complexity configuration when outdated plugins are installed."
+
+pulls = ["27842"]
