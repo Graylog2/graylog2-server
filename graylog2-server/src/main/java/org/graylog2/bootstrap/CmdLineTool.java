@@ -60,6 +60,7 @@ import org.graylog2.GraylogNodeConfiguration;
 import org.graylog2.bindings.NamedConfigParametersOverrideModule;
 import org.graylog2.bootstrap.commands.MigrateCmd;
 import org.graylog2.configuration.ConfigurationInfoService;
+import org.graylog2.configuration.managed.ConfigurationReprocessor;
 import org.graylog2.configuration.NativeLibPathConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
@@ -590,8 +591,11 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
         builder.addAll(Arrays.asList(modules));
         builder.add(binder -> {
             binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader);
-            binder.bind(ConfigurationInfoService.class)
-                    .toInstance(new ConfigurationInfoService(parameterInfoCollector.getParameterInfos()));
+            final ConfigurationInfoService configurationInfoService =
+                    new ConfigurationInfoService(parameterInfoCollector.getParameterInfos());
+            binder.bind(ConfigurationInfoService.class).toInstance(configurationInfoService);
+            binder.bind(ConfigurationReprocessor.class).toInstance(
+                    new ConfigurationReprocessor(jadConfig, parameterInfoCollector, configurationInfoService));
             featureFlagsBinding(binder);
             binder.bind(String.class).annotatedWith(Names.named("BootstrapCommand")).toInstance(commandName);
         });

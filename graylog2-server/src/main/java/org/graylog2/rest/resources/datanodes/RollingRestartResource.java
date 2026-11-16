@@ -66,7 +66,9 @@ public class RollingRestartResource extends RestResource {
     public Response start(@RequestBody(required = false) StartRequest request) {
         try {
             final String triggeredBy = getCurrentUser().getName();
-            final JobTriggerDto trigger = handler.start(triggeredBy, request != null && request.force());
+            final JobTriggerDto trigger = handler.start(triggeredBy,
+                    request != null && request.force(),
+                    request != null && request.restartOnly());
             return Response.status(Response.Status.CREATED).entity(trigger).build();
         } catch (RollingRestartPreconditionsException e) {
             return Response.status(Response.Status.BAD_REQUEST)
@@ -121,6 +123,10 @@ public class RollingRestartResource extends RestResource {
         }
     }
 
-    public record StartRequest(@JsonProperty("force") boolean force) {
+    /**
+     * @param restartOnly restart the nodes to pick up their stored configuration, without upgrading OpenSearch
+     */
+    public record StartRequest(@JsonProperty("force") boolean force,
+                               @JsonProperty("restart_only") boolean restartOnly) {
     }
 }

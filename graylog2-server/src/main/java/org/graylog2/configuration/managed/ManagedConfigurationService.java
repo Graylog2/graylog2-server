@@ -37,11 +37,13 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
+import static org.graylog2.configuration.managed.ManagedConfigurationEntry.FIELD_CHANGED_AT;
 import static org.graylog2.configuration.managed.ManagedConfigurationEntry.FIELD_NAME;
 import static org.graylog2.configuration.managed.ManagedConfigurationEntry.FIELD_NODE_ID;
 import static org.graylog2.configuration.managed.ManagedConfigurationEntry.FIELD_NODE_SOURCE;
@@ -64,6 +66,7 @@ public abstract class ManagedConfigurationService {
     private static final Logger LOG = LoggerFactory.getLogger(ManagedConfigurationService.class);
 
     private final MongoCollection<ManagedConfigurationEntry> collection;
+    private final MongoCollection<NodeConfigurationState> stateCollection;
     private final NodeType nodeType;
     private final ClusterEventBus clusterEventBus;
     private final Clock clock;
@@ -79,6 +82,9 @@ public abstract class ManagedConfigurationService {
         this.clock = clock;
 
         collection.createIndex(Indexes.ascending(FIELD_NODE_ID, FIELD_NAME), new IndexOptions().unique(true));
+
+        this.stateCollection = mongoCollections.collection(collectionName + "_state", NodeConfigurationState.class);
+        stateCollection.createIndex(Indexes.ascending(NodeConfigurationState.FIELD_NODE_ID), new IndexOptions().unique(true));
     }
 
     public NodeType nodeType() {
@@ -117,11 +123,13 @@ public abstract class ManagedConfigurationService {
                     ? Updates.combine(
                             Updates.unset(FIELD_VALUE),
                             Updates.unset(FIELD_UPDATED_AT),
-                            Updates.unset(FIELD_UPDATED_BY))
+                            Updates.unset(FIELD_UPDATED_BY),
+                            Updates.currentDate(FIELD_CHANGED_AT))
                     : Updates.combine(
                             Updates.set(FIELD_VALUE, value),
                             Updates.set(FIELD_UPDATED_AT, now),
-                            Updates.set(FIELD_UPDATED_BY, updatedBy));
+                            Updates.set(FIELD_UPDATED_BY, updatedBy),
+                            Updates.currentDate(FIELD_CHANGED_AT));
             writes.add(new UpdateOneModel<>(entryFilter(nodeId, name), update, new UpdateOptions().upsert(true)));
         });
         collection.bulkWrite(writes);
@@ -177,6 +185,60 @@ public abstract class ManagedConfigurationService {
             LOG.debug("Value of cluster parameter <{}> has been adopted by another node.", name, e);
             return false;
         }
+    }
+
+    /**
+     * The values stored through the API which apply to the given node: the ones stored for all nodes of the type,
+     * replaced by the ones stored for the node itself.
+     *
+     * @return the stored values keyed by parameter name
+     */
+    public Map<String, String> storedValues(String nodeId) {
+        final Map<String, String> values = new TreeMap<>();
+        for (final String scope : new String[]{null, nodeId}) {
+            get(scope).values().stream()
+                    .filter(entry -> entry.value() != null)
+                    .forEach(entry -> values.put(entry.name(), entry.value()));
+        }
+        return Collections.unmodifiableMap(values);
+    }
+
+    /**
+     * Records that a node loaded its stored values to start its process with them. The time only becomes the
+     * {@link NodeConfigurationState#appliedAt()} of the node once the process runs, see
+     * {@link #markConfigurationApplied(String)}.
+     */
+    public void markConfigurationLoaded(String nodeId) {
+        stateCollection.updateOne(
+                eq(NodeConfigurationState.FIELD_NODE_ID, nodeId),
+                Updates.currentDate(NodeConfigurationState.FIELD_LOADED_AT),
+                new UpdateOptions().upsert(true));
+    }
+
+    /**
+     * Records that the process of a node runs with the values it loaded last. Stored values which have been changed
+     * between loading them and the process becoming available stay marked as not applied, because the time they were
+     * loaded at counts, not the time of this call.
+     */
+    public void markConfigurationApplied(String nodeId) {
+        configurationState(nodeId)
+                .map(NodeConfigurationState::loadedAt)
+                .ifPresent(loadedAt -> stateCollection.updateOne(
+                        eq(NodeConfigurationState.FIELD_NODE_ID, nodeId),
+                        Updates.set(NodeConfigurationState.FIELD_APPLIED_AT, Date.from(loadedAt))));
+    }
+
+    public Optional<NodeConfigurationState> configurationState(String nodeId) {
+        return Optional.ofNullable(stateCollection.find(eq(NodeConfigurationState.FIELD_NODE_ID, nodeId)).first());
+    }
+
+    /**
+     * The state of every node which reported one, keyed by node ID.
+     */
+    public Map<String, NodeConfigurationState> configurationStates() {
+        final Map<String, NodeConfigurationState> states = new TreeMap<>();
+        stateCollection.find().forEach(state -> states.put(state.nodeId(), state));
+        return Collections.unmodifiableMap(states);
     }
 
     private Bson entryFilter(@Nullable String nodeId, String name) {

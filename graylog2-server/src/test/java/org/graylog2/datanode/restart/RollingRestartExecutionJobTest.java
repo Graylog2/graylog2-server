@@ -194,6 +194,50 @@ class RollingRestartExecutionJobTest {
         assertThat(newData.nodes().get(0).status()).isEqualTo(RollingRestartNodeStatus.STARTED);
     }
 
+    private RollingRestartExecutionJob.Data restartOnlyData(RollingRestartState smState) {
+        return baseData(smState).toBuilder().targetOpensearchVersion(null).currentNodeIndex(0).build();
+    }
+
+    @Test
+    void upgradingNode_restartOnly_restartsWithoutUpgrade_andRemembersWhenTheNodeAppliedItsConfiguration() throws Exception {
+        final var appliedAt = Instant.parse("2026-11-16T10:00:00Z");
+        when(actions.configurationAppliedAt("id-a")).thenReturn(Optional.of(appliedAt));
+
+        final var update = job.execute(ctxWith(restartOnlyData(RollingRestartState.UPGRADING_NODE)));
+
+        verify(actions).restartNode("node-a");
+        verify(actions, never()).upgradeNode(any());
+        final var newData = dataOf(update);
+        assertThat(newData.smState()).isEqualTo(RollingRestartState.WAITING_NODE_JOINED);
+        assertThat(newData.previousAppliedAt()).isEqualTo(appliedAt);
+    }
+
+    @Test
+    void waitingNodeJoined_restartOnly_waitsUntilTheNodeAppliedItsConfigurationAgain() throws Exception {
+        final var before = Instant.parse("2026-11-16T10:00:00Z");
+        final var data = restartOnlyData(RollingRestartState.WAITING_NODE_JOINED).toBuilder()
+                .previousAppliedAt(before)
+                .build();
+        // The node is listed in the cluster before, during and after a restart without a version change
+        when(actions.isNodeInCluster("node-a", null)).thenReturn(true);
+        when(actions.configurationAppliedAt("id-a")).thenReturn(Optional.of(before));
+
+        assertThat(dataOf(job.execute(ctxWith(data))).smState()).isEqualTo(RollingRestartState.WAITING_NODE_JOINED);
+
+        when(actions.configurationAppliedAt("id-a")).thenReturn(Optional.of(before.plusSeconds(30)));
+
+        assertThat(dataOf(job.execute(ctxWith(data))).smState()).isEqualTo(RollingRestartState.REENABLING_ALLOCATION);
+    }
+
+    @Test
+    void waitingNodeJoined_restartOnly_acceptsANodeWhichNeverAppliedBefore() throws Exception {
+        final var data = restartOnlyData(RollingRestartState.WAITING_NODE_JOINED);
+        when(actions.isNodeInCluster("node-a", null)).thenReturn(true);
+        when(actions.configurationAppliedAt("id-a")).thenReturn(Optional.of(Instant.parse("2026-11-16T10:00:30Z")));
+
+        assertThat(dataOf(job.execute(ctxWith(data))).smState()).isEqualTo(RollingRestartState.REENABLING_ALLOCATION);
+    }
+
     @Test
     void reenablingAllocation_callsEnable_andResetsWaitingGreenSince() throws Exception {
         final var oldTimestamp = Instant.now().minus(Duration.ofHours(1));

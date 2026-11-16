@@ -24,6 +24,7 @@ import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.datanode.DataNodeCommandService;
+import org.graylog2.datanode.restart.RollingRestartActions;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,7 +37,9 @@ import org.mockito.quality.Strictness;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @MockitoSettings(strictness = Strictness.WARN)
 @ExtendWith(MockitoExtension.class)
@@ -53,12 +56,15 @@ public class DataNodeManagementResourceTest {
     private UserContext userContext;
     @Mock
     AuditEventSender auditEventSender;
+    @Mock
+    private RollingRestartActions rollingRestartActions;
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
 
     @BeforeEach
     public void setUp() {
-        classUnderTest = new DataNodeManagementResource(dataNodeCommandService, nodeService, true, auditEventSender, objectMapper);
+        classUnderTest = new DataNodeManagementResource(dataNodeCommandService, nodeService, true, auditEventSender,
+                objectMapper, rollingRestartActions);
     }
 
     @Test
@@ -87,5 +93,21 @@ public class DataNodeManagementResourceTest {
         verify(dataNodeCommandService).resetNode(NODEID);
     }
 
+    @Test
+    public void restartNode_restartsTheOpensearchProcessOfThatNode() throws NodeNotFoundException {
+        final DataNodeDto node = mock(DataNodeDto.class);
+        when(node.getHostname()).thenReturn("datanode-1");
+        when(nodeService.byNodeId(NODEID)).thenReturn(node);
 
+        classUnderTest.restartNode(NODEID);
+
+        verify(rollingRestartActions).restartNode("datanode-1");
+    }
+
+    @Test
+    public void restartUnavailableNode_throwsNotFoundException() throws NodeNotFoundException {
+        doThrow(NodeNotFoundException.class).when(nodeService).byNodeId(NODEID);
+        Exception e = assertThrows(NotFoundException.class, () -> classUnderTest.restartNode(NODEID));
+        assertEquals("Node " + NODEID + " not found", e.getMessage());
+    }
 }

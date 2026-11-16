@@ -80,7 +80,9 @@ public enum ConfigurationSource {
         if (repository instanceof PropertiesRepository) {
             return CONFIG_FILE;
         }
-        // The repository reading values set through the API is mapped here once stored values are applied on startup
+        if (repository instanceof ManagedConfigurationRepository) {
+            return DATABASE;
+        }
         return UNKNOWN;
     }
 }

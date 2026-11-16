@@ -48,6 +48,7 @@ import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.configuration.RunsWithDataNode;
 import org.graylog2.datanode.DataNodeCommandService;
+import org.graylog2.datanode.restart.RollingRestartActions;
 import org.graylog2.rest.bulk.AuditParams;
 import org.graylog2.rest.bulk.BulkExecutor;
 import org.graylog2.rest.bulk.SequentialBulkExecutor;
@@ -61,6 +62,7 @@ import static org.graylog2.audit.AuditEventTypes.DATANODE_REMOVE;
 import static org.graylog2.audit.AuditEventTypes.DATANODE_RESET;
 import static org.graylog2.audit.AuditEventTypes.DATANODE_START;
 import static org.graylog2.audit.AuditEventTypes.DATANODE_STOP;
+import static org.graylog2.audit.AuditEventTypes.DATANODE_TRIGGER_RESTART;
 
 @RequiresAuthentication
 @PublicCloudAPI
@@ -72,6 +74,7 @@ public class DataNodeManagementResource extends RestResource {
     private final DataNodeCommandService dataNodeCommandService;
     private final NodeService<DataNodeDto> nodeService;
     private final Boolean runsWithDataNode;
+    private final RollingRestartActions rollingRestartActions;
     private final BulkExecutor<DataNodeDto, UserContext> bulkRemovalExecutor;
     private final BulkExecutor<DataNodeDto, UserContext> bulkStopExecutor;
     private final BulkExecutor<DataNodeDto, UserContext> bulkStartExecutor;
@@ -80,10 +83,12 @@ public class DataNodeManagementResource extends RestResource {
     protected DataNodeManagementResource(DataNodeCommandService dataNodeCommandService,
                                          NodeService<DataNodeDto> nodeService,
                                          @RunsWithDataNode Boolean runsWithDataNode,
-                                         AuditEventSender auditEventSender, ObjectMapper objectMapper) {
+                                         AuditEventSender auditEventSender, ObjectMapper objectMapper,
+                                         RollingRestartActions rollingRestartActions) {
         this.dataNodeCommandService = dataNodeCommandService;
         this.nodeService = nodeService;
         this.runsWithDataNode = runsWithDataNode;
+        this.rollingRestartActions = rollingRestartActions;
         bulkRemovalExecutor = new SequentialBulkExecutor<>(this::removeNode, auditEventSender, objectMapper);
         bulkStopExecutor = new SequentialBulkExecutor<>(this::stopNode, auditEventSender, objectMapper);
         bulkStartExecutor = new SequentialBulkExecutor<>(this::startNode, auditEventSender, objectMapper);
@@ -154,6 +159,21 @@ public class DataNodeManagementResource extends RestResource {
     public DataNodeDto resetNode(@Parameter(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) {
         try {
             return dataNodeCommandService.resetNode(nodeId);
+        } catch (NodeNotFoundException e) {
+            throw new NotFoundException("Node " + nodeId + " not found");
+        }
+    }
+
+    @POST
+    @Path("{nodeId}/restart")
+    @Operation(summary = "Restart the OpenSearch process of a data node, so that it picks up its stored configuration")
+    @AuditEvent(type = DATANODE_TRIGGER_RESTART)
+    @RequiresPermissions(RestPermissions.DATANODE_RESTART)
+    public DataNodeDto restartNode(@Parameter(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) {
+        try {
+            final DataNodeDto node = nodeService.byNodeId(nodeId);
+            rollingRestartActions.restartNode(node.getHostname());
+            return node;
         } catch (NodeNotFoundException e) {
             throw new NotFoundException("Node " + nodeId + " not found");
         }
