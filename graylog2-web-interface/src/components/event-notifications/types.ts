@@ -71,6 +71,8 @@ export interface EventNotificationTypes {
   defaultConfig: Omit<EventNotification['config'], 'type'>;
   // Hides the type from the create dropdown for users missing any of these permissions.
   requiredPermissions?: Array<Permission>;
+  // Hides the type from the create dropdown when it returns false, e.g. without the required license.
+  useCondition?: () => boolean;
 }
 
 declare module 'graylog-web-plugin/plugin' {

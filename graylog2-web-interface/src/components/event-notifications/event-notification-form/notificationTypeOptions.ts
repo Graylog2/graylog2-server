@@ -22,9 +22,14 @@ const notificationTypeOptions = (
   types: Array<EventNotificationTypes>,
   isPermitted: IsPermitted,
   currentType: string | undefined,
+  conditionMet: (type: EventNotificationTypes) => boolean = () => true,
 ) =>
   types
-    .filter((type) => type.type === currentType || !type.requiredPermissions || isPermitted(type.requiredPermissions))
+    .filter(
+      (type) =>
+        type.type === currentType ||
+        (conditionMet(type) && (!type.requiredPermissions || isPermitted(type.requiredPermissions))),
+    )
     .map((type) => ({ label: type.displayName, value: type.type }));
 
 export default notificationTypeOptions;

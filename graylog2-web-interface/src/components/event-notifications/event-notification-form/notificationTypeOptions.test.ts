@@ -57,6 +57,18 @@ describe('notificationTypeOptions', () => {
     ]);
   });
 
+  it('hides a type whose condition is not met', () => {
+    expect(notificationTypeOptions(types, () => true, undefined, (type) => type.type !== 'watchlist')).toEqual([
+      { label: 'email display', value: 'email' },
+    ]);
+  });
+
+  it('keeps the type of the notification being edited even when its condition is not met', () => {
+    expect(notificationTypeOptions(types, () => true, 'watchlist', () => false)).toEqual([
+      { label: 'watchlist display', value: 'watchlist' },
+    ]);
+  });
+
   it('checks the declared permissions', () => {
     const isPermitted = jest.fn(() => true);
 

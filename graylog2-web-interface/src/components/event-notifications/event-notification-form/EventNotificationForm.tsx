@@ -70,6 +70,9 @@ const EventNotificationForm = ({
   const sendTelemetry = useSendTelemetry();
   const [isSubmitEnabled, setIsSubmitEnabled] = useState(true);
   const { isPermitted } = usePermissions();
+  const notificationTypes = PluginStore.exports('eventNotificationTypes');
+  // Every condition hook runs on each render so the hook order never changes.
+  const metConditions = Object.fromEntries(notificationTypes.map((type) => [type.type, type.useCondition?.() ?? true]));
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     sendTelemetry(
@@ -174,9 +177,10 @@ const EventNotificationForm = ({
             <Select
               id="notification-type"
               options={notificationTypeOptions(
-                PluginStore.exports('eventNotificationTypes'),
+                notificationTypes,
                 isPermitted,
                 action === 'edit' ? notification.config.type : undefined,
+                (type) => metConditions[type.type],
               )}
               value={notification.config.type}
               onChange={handleTypeChange}
