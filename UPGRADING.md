@@ -46,3 +46,13 @@ The following REST API changes have been made.
 | Endpoint             | Description                        |
 |----------------------|------------------------------------|
 | `GET /<endpoint>`    | Description of the endpoint change |
+
+## Reporting: Leftover Chrome Profile Directories Can Be Deleted
+
+Earlier versions created a Chrome profile directory named `reporting-<uuid>` in `<data_dir>/reports/headless` for
+each report render. These directories were not removed when Chrome failed to start, so they could accumulate over
+time. Report rendering no longer creates them, and directories left behind by earlier versions are not removed
+automatically.
+
+To reclaim the disk space, delete the `<data_dir>/reports/headless` directory on each Graylog node after the upgrade.
+You can do this while the node is stopped, or while it is running as long as no report is being rendered.
