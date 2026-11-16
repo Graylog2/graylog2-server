@@ -47,10 +47,10 @@ class OptionalResponseFilterTest {
 
 
     @Test
-    void changesStatusToNoContentForEmptyOptional() {
+    void changesStatusToNotFoundForEmptyOptional() {
         doReturn(Optional.empty()).when(response).getEntity();
         toTest.filter(requestContext, response);
-        verify(response).setStatus(204);
+        verify(response).setStatus(404);
         verify(response).setEntity(null);
     }
 

@@ -16,7 +16,6 @@
  */
 package org.graylog.events.rest;
 
-import jakarta.ws.rs.NotFoundException;
 import org.apache.shiro.subject.Subject;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.search.EventsSearchParameters;
@@ -34,7 +33,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -61,16 +59,14 @@ class EventsResourceTest {
         final var event = EventsSearchResult.Event.create(mock(EventDto.class), "gl-events_0", "message");
         when(searchService.searchByIds(List.of(EVENT_ID), subject)).thenReturn(searchResult(List.of(event)));
 
-        assertThat(resource.getById(EVENT_ID)).isEqualTo(event);
+        assertThat(resource.getById(EVENT_ID)).contains(event);
     }
 
     @Test
-    void getByIdThrowsNotFoundExceptionForMissingEvent() {
+    void getByIdReturnsEmptyOptionalForMissingEvent() {
         when(searchService.searchByIds(List.of(EVENT_ID), subject)).thenReturn(searchResult(List.of()));
 
-        assertThatThrownBy(() -> resource.getById(EVENT_ID))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessage("Event <" + EVENT_ID + "> doesn't exist");
+        assertThat(resource.getById(EVENT_ID)).isEmpty();
     }
 
     private static EventsSearchResult searchResult(List<EventsSearchResult.Event> events) {

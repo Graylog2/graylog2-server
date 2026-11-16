@@ -30,7 +30,7 @@ public class OptionalResponseFilter implements ContainerResponseFilter {
                        ContainerResponseContext response) {
         final Object entity = response.getEntity();
         if (isEmptyOptional(entity)) {
-            response.setStatus(Response.Status.NO_CONTENT.getStatusCode());
+            response.setStatus(Response.Status.NOT_FOUND.getStatusCode());
             response.setEntity(null);
         }
     }

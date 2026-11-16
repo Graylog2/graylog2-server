@@ -22,7 +22,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -55,7 +54,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
-import static org.graylog2.shared.utilities.StringUtils.f;
 
 @PublicCloudAPI
 @Tag(name = "Events", description = "Events overview and search")
@@ -116,9 +114,8 @@ public class EventsResource extends RestResource implements PluginRestResource {
     @GET
     @Path("{event_id}")
     @Operation(summary = "Get event by ID")
-    public EventsSearchResult.Event getById(@Parameter(name = "event_id") @PathParam("event_id") final String eventId) {
-        return searchService.searchByIds(List.of(eventId), getSubject()).events().stream().findFirst()
-                .orElseThrow(() -> new NotFoundException(f("Event <%s> doesn't exist", eventId)));
+    public Optional<EventsSearchResult.Event> getById(@Parameter(name = "event_id") @PathParam("event_id") final String eventId) {
+        return searchService.searchByIds(List.of(eventId), getSubject()).events().stream().findFirst();
     }
 
     public record BulkEventsByIds(Collection<String> eventIds) {}
