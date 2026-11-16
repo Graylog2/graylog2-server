@@ -1,7 +1,8 @@
 # How we would like patches made
 
-Follow `AGENTS.md` at the repository root, and `graylog2-web-interface/AGENTS.md` plus
-`graylog2-web-interface/CONVENTIONS.md` for frontend changes. The points below matter most.
+For code style and tests, follow `AGENTS.md` at the repository root, and for frontend changes also
+`graylog2-web-interface/AGENTS.md` and `graylog2-web-interface/CONVENTIONS.md`. The rest of this file covers what
+is specific to the patches you send us.
 
 ## Size and scope of a fix
 
@@ -13,34 +14,25 @@ Follow `AGENTS.md` at the repository root, and `graylog2-web-interface/AGENTS.md
   authorization, `EntityPermissionsUtils` and the grants/shares services for entity access, the URL allowlist
   service for outbound URLs, `AllowedAuxiliaryPathChecker` for file paths.
 - Do not change public REST API paths or response formats unless the fix needs it; if it does, say why.
-- Do not upgrade dependencies as part of a fix.
-
-## Code style
-
-- Java 21. Follow the Java code style in `AGENTS.md`: no wildcard imports, `final` for local variables, the
-  documented import order, `f()` from `org.graylog2.shared.utilities.StringUtils` for formatted strings and
-  SLF4J `{}` placeholders for logging.
-- New Java files need the SSPL license header used by the other files in `src/main/java` and `src/test/java`.
-- The build enforces forbidden APIs (see the `forbiddenapis` configuration in `pom.xml`); for example, always pass
-  a charset.
-- Comments only where the code is not obvious. Do not reference the report or the scanner in code comments.
-- Frontend: TypeScript and React, following `CONVENTIONS.md`; never render message data as HTML.
 
 ## Tests
 
 - Add a regression test that fails without the fix and passes with it, in the existing test class for the
-  changed class when there is one. Java: JUnit 5, Mockito and AssertJ. Frontend: Jest and Testing Library, run
-  with `yarn test <path>`.
+  changed class when there is one.
 - Prefer plain unit tests over tests that need MongoDB, OpenSearch or Testcontainers; those cannot run in the
   scanner image.
 - Make sure the module still compiles and its existing tests for the changed classes pass.
 
-## Branch, commit message and changelog
+## Branch, commit message, comments and changelog
 
 The patch reaches us with the report, and we commit it ourselves when we are ready. That commit is public before
-the advisory is, so it must not reveal the vulnerability.
+the advisory is. Its diff shows what was fixed, which cannot be avoided: still make the complete fix, with its
+regression test. What must not point to the vulnerability is how the change is described, in the commit message,
+code comments and test names. Describe what the code now does, not the attack it prevents, and name tests after
+the behavior they check (for example `rejectsRuleUpdateWithoutStreamEditPermission`).
 
 - Against the `master` branch.
 - Commit subject: an imperative sentence describing the change, without a component prefix and without saying it
   is a security fix (for example `Check stream permission when updating stream rules`).
+- Code comments only where the code is not obvious, and without referring to the report or the scanner.
 - Do not add a file under `changelog/`; we add the entry when we publish the advisory.

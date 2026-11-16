@@ -16,8 +16,10 @@ these sections, in this order:
    - CWE: the most specific CWE that matches the root cause (for example CWE-639 rather than CWE-284,
      CWE-770 rather than CWE-400).
    - CVSS v3.1 vector and base score. Optionally a CVSS v4.0 vector on the next line.
-4. **Affected versions and configuration**: the first affected version if you can tell from the git history,
-   otherwise "at least since <commit or version>". State every non-default setting the issue needs.
+4. **Affected versions and configuration**: the affected version ranges, for example `>= 6.3.0, < 7.2.0` when
+   7.2.0 changed the code and is not affected, or `>= 7.0.10, < 7.1.0` and `>= 7.1.3` when the bug came with patch
+   releases. If you cannot tell, write "at least since <commit or version>". State every non-default setting the
+   issue needs.
 5. **Attacker's starting position**: unauthenticated network access to which port or input, or an account
    with which role and which permissions.
 6. **Root cause**: file paths with line numbers, and the code path from the entry point (REST resource, input,

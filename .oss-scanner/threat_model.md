@@ -57,9 +57,15 @@ Users with the Admin role are trusted to configure the system, except for the bo
   other backends are not covered by this; what users can see through them is governed by the permission rules
   above.
 - **Outgoing requests stay within the URL allowlist.** The allowlist (enabled by default, edited only with the
-  `urlallowlist:write` permission) limits the URLs that features such as HTTP notifications and HTTP lookup data
-  adapters may request. A user who may configure such a feature but not the allowlist must not make the server
-  request a URL it does not permit.
+  `urlallowlist:write` permission) limits the URLs that the HTTP notifications ("HTTP Notification" and "Custom
+  HTTP Notification") and the "DSV File from HTTP" and "HTTP JSONPath" lookup data adapters may request. A user
+  who may configure one of these but not the allowlist must not make the server request a URL it does not permit.
+  The allowlist applies to the URL as configured, or as built from a lookup key; following a redirect that an
+  allowlisted server returns is by design. Other features connect to a target that whoever configures them
+  chooses, without the allowlist: pull-based inputs (such as "JSON path value from HTTP API", Kafka and AMQP), the
+  Slack and Microsoft Teams notifications, and the "Alienvault OTX API" lookup data adapter. The permission to
+  configure them includes choosing that target, so a request to an internal address through them is not a finding
+  by itself.
 - **TLS and keys are handled properly.** Outbound TLS verifies certificates and hostnames when configured to;
   passwords and tokens are hashed properly; secrets (`password_secret`, encryption keys, the internal CA's private
   keys, encrypted input and adapter credentials) are never exposed or reused unsafely.
@@ -151,8 +157,10 @@ needs a non-default setting is scored for the configuration that has it, and say
   dashboards). Crashing a server node or Data Node, or stopping message processing for all inputs, with a small
   amount of unauthenticated traffic. Bypassing `allowed_auxiliary_paths`. Reading stored secrets.
 - **Medium**: IDOR that reads or changes another user's non-message entities (dashboards, saved searches, event
-  definitions, user metadata). Resource exhaustion from attacker-controlled log content that degrades but does not
-  stop processing. Stored XSS that needs elevated permissions to plant.
+  definitions, user metadata) that the caller was not given access to. Sharing gives access on purpose, up to the
+  level shared (view, manage or own), and so do roles and permissions. Resource exhaustion from
+  attacker-controlled log content that degrades but does not stop processing. Stored XSS that needs elevated
+  permissions to plant.
 - **Low**: disclosure of non-secret data (internal hostnames, versions, stack traces), CSRF on low-impact actions,
   open redirects, missing hardening.
 
