@@ -87,38 +87,38 @@ const App = () => (
 
         return (
           <AssistantPageContextProvider>
-          <RightSidebarProvider>
-            <HotkeysProvider>
-              <ScratchpadProvider loginName={currentUser.username}>
-                <NavigationTelemetry />
-                <>
-                  <AppLayout>
-                    <Navigation />
-                    <ReportedErrorBoundary>
-                      <ContentRow>
-                        <MainContentColumn>
-                          <Scratchpad />
-                          <RuntimeErrorBoundary>
-                            <PageContextProviders>
-                              <PageContent>
-                                <Outlet />
-                              </PageContent>
-                            </PageContextProviders>
-                          </RuntimeErrorBoundary>
-                        </MainContentColumn>
-                        <RightSidebarContext.Consumer>
-                          {({ isOpen }) => isOpen && <RightSidebar />}
-                        </RightSidebarContext.Consumer>
-                        <GlobalSidebars />
-                      </ContentRow>
-                    </ReportedErrorBoundary>
-                  </AppLayout>
-                  <HotkeysModalContainer />
-                  <TelemetryDebugOverlay />
-                </>
-              </ScratchpadProvider>
-            </HotkeysProvider>
-          </RightSidebarProvider>
+            <RightSidebarProvider>
+              <HotkeysProvider>
+                <ScratchpadProvider loginName={currentUser.username}>
+                  <NavigationTelemetry />
+                  <>
+                    <AppLayout>
+                      <Navigation />
+                      <ReportedErrorBoundary>
+                        <ContentRow>
+                          <MainContentColumn>
+                            <Scratchpad />
+                            <RuntimeErrorBoundary>
+                              <PageContextProviders>
+                                <PageContent>
+                                  <Outlet />
+                                </PageContent>
+                              </PageContextProviders>
+                            </RuntimeErrorBoundary>
+                          </MainContentColumn>
+                          <RightSidebarContext.Consumer>
+                            {({ isOpen }) => isOpen && <RightSidebar />}
+                          </RightSidebarContext.Consumer>
+                          <GlobalSidebars />
+                        </ContentRow>
+                      </ReportedErrorBoundary>
+                    </AppLayout>
+                    <HotkeysModalContainer />
+                    <TelemetryDebugOverlay />
+                  </>
+                </ScratchpadProvider>
+              </HotkeysProvider>
+            </RightSidebarProvider>
           </AssistantPageContextProvider>
         );
       }}
