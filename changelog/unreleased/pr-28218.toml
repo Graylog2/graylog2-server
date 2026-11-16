@@ -1,0 +1,8 @@
+type = "f"
+message = "Show the not found page on the replay search of a missing event."
+
+details.user = """
+REST resources that return an empty `Optional` respond with `404 Not Found` instead of `204 No Content`. For example, `GET /api/events/{event_id}` returns a 404 for a missing event, so the replay search page shows the not found page instead of loading forever.
+"""
+
+pulls = ["28218"]

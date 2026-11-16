@@ -17,20 +17,27 @@
 import React from 'react';
 
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
-import ColumnRenderers from 'components/events/events/ColumnRenderers';
+import getEventDetailsAttributeRenderers from 'components/events/events/EventDetailsAttributeRenderers';
 import EventDetailsDefinitionList from 'components/events/events/EventDetailsDefinitionList';
 import { useEventDefinitionWithContext } from 'components/event-definitions/hooks/useEventDefinitions';
 import { Spinner } from 'components/common';
+import usePermissions from 'hooks/usePermissions';
 
 type Props = {
   attributesList: Array<{ id: string; title: string }>;
   event: Event;
   meta: EventsAdditionalData;
+  interactiveTags?: boolean;
 };
 
-const GeneralEventDetailsTable = ({ event, attributesList, meta }: Props) => {
+const GeneralEventDetailsTable = ({ event, attributesList, meta, interactiveTags = true }: Props) => {
   const { event_definition_id } = event;
-  const { data, isFetching } = useEventDefinitionWithContext(event_definition_id);
+  const { isPermitted } = usePermissions();
+  // Users may see an event without being allowed to read its definition.
+  const { data, isFetching } = useEventDefinitionWithContext(
+    event_definition_id,
+    isPermitted(`eventdefinitions:read:${event_definition_id}`),
+  );
 
   if (isFetching) return <Spinner />;
 
@@ -41,7 +48,7 @@ const GeneralEventDetailsTable = ({ event, attributesList, meta }: Props) => {
       event={event}
       meta={meta}
       eventProcedureId={eventDefinitionEventProcedureId}
-      attributesRenderers={ColumnRenderers.attributes}
+      attributesRenderers={getEventDetailsAttributeRenderers({ interactiveTags })}
       attributesList={attributesList}
     />
   );

@@ -17,19 +17,21 @@
 import * as React from 'react';
 import { render } from 'wrappedTestingLibrary';
 
+import asMock from 'helpers/mocking/AsMock';
+
 import EmptyAggregationContent from './EmptyAggregationContent';
 
-import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
+import useRenderCompletionCallback from '../widgets/useRenderCompletionCallback';
+
+jest.mock('../widgets/useRenderCompletionCallback');
 
 describe('EmptyAggregationContext', () => {
   it('calls render completion callback after first render', () => {
     const onRenderComplete = jest.fn();
 
-    render(
-      <RenderCompletionCallback.Provider value={onRenderComplete}>
-        <EmptyAggregationContent toggleEdit={() => {}} editing={false} />
-      </RenderCompletionCallback.Provider>,
-    );
+    asMock(useRenderCompletionCallback).mockReturnValue(onRenderComplete);
+
+    render(<EmptyAggregationContent toggleEdit={() => {}} editing={false} />);
 
     expect(onRenderComplete).toHaveBeenCalled();
   });
