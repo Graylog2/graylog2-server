@@ -162,4 +162,58 @@ class ManagedConfigurationServiceTest {
         assertThat(service.adoptClusterValue("a", "second", "node-2")).isFalse();
         assertThat(service.get(null).get("a").value()).isNull();
     }
+
+    @Test
+    void recordsWhenAValueHasBeenSetOrRemoved() {
+        assertThat(service.update(NODE_ID, Map.of("a", "1"), "admin").get("a").changedAt()).isNotNull();
+
+        final var changes = new HashMap<String, String>();
+        changes.put("a", null);
+        final var removed = service.update(NODE_ID, changes, "admin").get("a");
+
+        // Falling back to the value of the node needs a restart as well, so the removal has to stay visible
+        assertThat(removed.value()).isNull();
+        assertThat(removed.updatedAt()).isNull();
+        assertThat(removed.changedAt()).isNotNull();
+    }
+
+    @Test
+    void reportingAndAdoptingDoNotCountAsAChange() {
+        service.reportNodeValues(NODE_ID, Map.of("a", new ReportedValue("1g", ConfigurationSource.CONFIG_FILE)));
+        service.adoptClusterValue("b", "adopted", "node-1");
+
+        assertThat(service.get(NODE_ID).get("a").changedAt()).isNull();
+        assertThat(service.get(null).get("b").changedAt()).isNull();
+    }
+
+    @Test
+    void storedValuesOfANodeReplaceTheOnesOfTheCluster() {
+        service.update(null, Map.of("a", "for the cluster", "b", "for the cluster"), "admin");
+        service.update(NODE_ID, Map.of("a", "for the node"), "admin");
+        service.reportNodeValues(NODE_ID, Map.of("c", new ReportedValue("reported", ConfigurationSource.DEFAULT)));
+
+        assertThat(service.storedValues(NODE_ID))
+                .containsOnly(Map.entry("a", "for the node"), Map.entry("b", "for the cluster"));
+        assertThat(service.storedValues("another-node"))
+                .containsOnly(Map.entry("a", "for the cluster"), Map.entry("b", "for the cluster"));
+    }
+
+    @Test
+    void configurationOnlyCountsAsAppliedOnceTheProcessIsAvailable() {
+        assertThat(service.configurationState(NODE_ID)).isEmpty();
+
+        // Nothing has been loaded yet, so there is nothing to apply
+        service.markConfigurationApplied(NODE_ID);
+        assertThat(service.configurationState(NODE_ID)).isEmpty();
+
+        service.markConfigurationLoaded(NODE_ID);
+        final var loaded = service.configurationState(NODE_ID).orElseThrow();
+        assertThat(loaded.loadedAt()).isNotNull();
+        assertThat(loaded.appliedAt()).isNull();
+
+        service.markConfigurationApplied(NODE_ID);
+        final var applied = service.configurationState(NODE_ID).orElseThrow();
+        assertThat(applied.appliedAt()).isEqualTo(loaded.loadedAt());
+        assertThat(service.configurationStates()).containsOnlyKeys(NODE_ID);
+    }
 }

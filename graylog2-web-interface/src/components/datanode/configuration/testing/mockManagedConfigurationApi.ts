@@ -50,6 +50,7 @@ export const configurationParameter = (parameter: ParameterOverrides): Configura
   set_by: null,
   node_value: null,
   node_source: null,
+  pending_restart: false,
   ...parameter,
 });
 
@@ -204,6 +205,8 @@ export const managedConfigurationResponse = (
   parameters: (nodeId === null ? clusterParameters() : nodeParameters()).map((parameter) =>
     withStoredValue(parameter, storedValues[parameter.name] ?? null),
   ),
+  restart_required: false,
+  pending_nodes: [],
 });
 
 export const sampleClusterConfiguration = managedConfigurationResponse({

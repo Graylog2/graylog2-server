@@ -40,6 +40,9 @@ import java.time.Instant;
  * @param nodeValue  The value this node resolved without taking the database into account
  * @param nodeSource Where {@link #nodeValue} came from
  * @param value      The value set through the API, {@code null} if nobody set one
+ * @param changedAt  When the value set through the API has last been set or removed, by the clock of the database.
+ *                   In contrast to {@link #updatedAt} it survives the removal, since falling back to the value of
+ *                   the node needs a restart just like a new value does.
  */
 public record ManagedConfigurationEntry(
         @ObjectId @Id @Nullable @JsonProperty(FIELD_ID) String id,
@@ -54,7 +57,10 @@ public record ManagedConfigurationEntry(
         @JsonSerialize(using = MongoInstantSerializer.class)
         @JsonDeserialize(using = MongoInstantDeserializer.class)
         @JsonProperty(FIELD_UPDATED_AT) @Nullable Instant updatedAt,
-        @JsonProperty(FIELD_UPDATED_BY) @Nullable String updatedBy
+        @JsonProperty(FIELD_UPDATED_BY) @Nullable String updatedBy,
+        @JsonSerialize(using = MongoInstantSerializer.class)
+        @JsonDeserialize(using = MongoInstantDeserializer.class)
+        @JsonProperty(FIELD_CHANGED_AT) @Nullable Instant changedAt
 ) implements MongoEntity {
     public static final String FIELD_NODE_ID = "node_id";
     public static final String FIELD_NAME = "name";
@@ -64,6 +70,7 @@ public record ManagedConfigurationEntry(
     public static final String FIELD_VALUE = "value";
     public static final String FIELD_UPDATED_AT = "updated_at";
     public static final String FIELD_UPDATED_BY = "updated_by";
+    public static final String FIELD_CHANGED_AT = "changed_at";
 
     /**
      * The value which applies, which is the one set through the API if there is one.
