@@ -313,6 +313,12 @@ export function fetchStreamingPlainText(method: Method, url: string, body?: any)
   return queuePromiseIfNotLoggedin(promise)();
 }
 
+export function fetchIgnoringUnauthorized<T = any>(method: Method, url: string, body?: any): Promise<T> {
+  const promise = () => new Builder(method, url).json(body).ignoreUnauthorized().build();
+
+  return queuePromiseIfNotLoggedin(promise)();
+}
+
 export function fetchPeriodically<T = unknown>(method: Method, url: string, body?: any): Promise<T> {
   const promise = () => new Builder(method, url).noSessionExtension().json(body).build();
 
