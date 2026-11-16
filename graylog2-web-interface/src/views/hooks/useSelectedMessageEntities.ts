@@ -19,12 +19,12 @@ import uniq from 'lodash/uniq';
 
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import type { EntityBase } from 'components/common/EntityDataTable/types';
-import { keySeparator } from 'views/Constants';
+import { createCompositeKey, splitCompositeKey } from 'views/logic/compositeKey';
 import type { SelectableMessageTableMessage } from 'views/components/widgets/MessageList';
 
-export const createSelectedEntityId = (index: string, id: string) => `${index}${keySeparator}${id}`;
+export const createSelectedEntityId = (index: string, id: string) => createCompositeKey([index, id]);
 const splitSelectedEntityId = (selectedEntityId: string) => {
-  const [index, id] = selectedEntityId.split(keySeparator);
+  const [index, id] = splitCompositeKey(selectedEntityId);
 
   return { index, id };
 };
