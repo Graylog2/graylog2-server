@@ -17,6 +17,7 @@
 package org.graylog2.datanode.restart;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -168,6 +169,13 @@ public class RollingRestartExecutionJob implements Job {
             }
             case UPGRADING_NODE -> {
                 final RollingRestartNodeEntry current = requireCurrent(data);
+                if (data.restartOnly()) {
+                    // Remember when the node last picked up its configuration, to tell the restart apart later
+                    final Instant appliedAt = actions.configurationAppliedAt(current.datanodeId()).orElse(null);
+                    actions.restartNode(current.hostname());
+                    sm.fire(RollingRestartTrigger.PROCEED);
+                    return data.toBuilder().smState(sm.getState()).previousAppliedAt(appliedAt).build();
+                }
                 actions.upgradeNode(current.hostname());
                 sm.fire(RollingRestartTrigger.PROCEED);
                 return data.toBuilder().smState(sm.getState()).build();
@@ -176,7 +184,7 @@ public class RollingRestartExecutionJob implements Job {
                 final RollingRestartNodeEntry current = requireCurrent(data);
                 String expectedVersion = data.targetOpensearchVersion();
 
-                if (actions.isNodeInCluster(current.hostname(), expectedVersion)) {
+                if (actions.isNodeInCluster(current.hostname(), expectedVersion) && hasRestarted(data, current)) {
                     // Small clusters skip the per-node replication/green gate — message processing stays paused
                     // for the whole run, so we go straight back to selecting the next node.
                     final boolean noReplication = data.pauseProcessing();
@@ -242,6 +250,20 @@ public class RollingRestartExecutionJob implements Job {
                 return data;
             }
         }
+    }
+
+    /**
+     * A node which is restarted without a version change is listed in the cluster with the same version before and
+     * after, so it only counts as restarted once it picked up its configuration again. An upgraded node is told
+     * apart by its version already.
+     */
+    private boolean hasRestarted(Data data, RollingRestartNodeEntry current) {
+        if (!data.restartOnly()) {
+            return true;
+        }
+        return actions.configurationAppliedAt(current.datanodeId())
+                .filter(appliedAt -> !appliedAt.equals(data.previousAppliedAt()))
+                .isPresent();
     }
 
     private RollingRestartNodeEntry requireCurrent(Data data) {
@@ -316,6 +338,7 @@ public class RollingRestartExecutionJob implements Job {
         public static final String FIELD_WAITING_GREEN_SINCE = "waiting_green_since";
         public static final String TARGET_OPENSEARCH_VERSION = "target_opensearch_version";
         public static final String FIELD_PAUSE_PROCESSING = "pause_processing";
+        public static final String FIELD_PREVIOUS_APPLIED_AT = "previous_applied_at";
 
         @JsonProperty(FIELD_SM_STATE)
         public abstract RollingRestartState smState();
@@ -343,8 +366,26 @@ public class RollingRestartExecutionJob implements Job {
         @JsonProperty(FIELD_WAITING_GREEN_SINCE)
         public abstract Instant waitingGreenSince();
 
+        /**
+         * The version every node is upgraded to, {@code null} when the nodes are only restarted to pick up their
+         * stored configuration.
+         */
+        @Nullable
         @JsonProperty(TARGET_OPENSEARCH_VERSION)
         public abstract String targetOpensearchVersion();
+
+        /**
+         * When the node which is being restarted had last picked up its configuration before the restart was
+         * triggered. Only used for restarts without a version change.
+         */
+        @Nullable
+        @JsonProperty(FIELD_PREVIOUS_APPLIED_AT)
+        public abstract Instant previousAppliedAt();
+
+        @JsonIgnore
+        public boolean restartOnly() {
+            return targetOpensearchVersion() == null;
+        }
 
         /**
          * When {@code true}, this run pauses cluster-wide message processing for its whole duration instead of
@@ -397,7 +438,10 @@ public class RollingRestartExecutionJob implements Job {
             public abstract Builder waitingGreenSince(Instant waitingGreenSince);
 
             @JsonProperty(TARGET_OPENSEARCH_VERSION)
-            public abstract Builder targetOpensearchVersion(String targetOpensearchVersion);
+            public abstract Builder targetOpensearchVersion(@Nullable String targetOpensearchVersion);
+
+            @JsonProperty(FIELD_PREVIOUS_APPLIED_AT)
+            public abstract Builder previousAppliedAt(@Nullable Instant previousAppliedAt);
 
             @JsonProperty(FIELD_PAUSE_PROCESSING)
             public abstract Builder pauseProcessing(boolean pauseProcessing);

@@ -163,6 +163,15 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     @Parameter(value = "opensearch_heap_size_warning_enabled")
     private boolean opensearchHeapSizeWarningEnabled = true;
 
+    @Documentation("""
+            Comma separated names of configuration parameters for which the value stored through the web interface is
+            ignored, so that the configuration of this data node is used for them. Use * to ignore all stored values.
+            Stored values otherwise take precedence over this file, environment variables and system properties.
+            Use this to start a data node which doesn't work with a stored value.
+            """)
+    @Parameter(value = "ignore_stored_configuration", converter = StringSetConverter.class)
+    private Set<String> ignoreStoredConfiguration = Set.of();
+
     @Documentation("HTTP port on which the embedded opensearch listens.")
     @Parameter(value = "opensearch_http_port", converter = IntegerConverter.class)
     private int opensearchHttpPort = 9200;
@@ -772,6 +781,10 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
 
     public boolean isOpensearchHeapSizeWarningEnabled() {
         return opensearchHeapSizeWarningEnabled;
+    }
+
+    public Set<String> getIgnoreStoredConfiguration() {
+        return ignoreStoredConfiguration;
     }
 
     @Override

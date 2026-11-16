@@ -19,6 +19,7 @@ package org.graylog2.datanode.restart;
 import org.graylog.plugins.datanode.DatanodeClusterAdminAdapter;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
+import org.graylog2.configuration.managed.ManagedConfigurationServices;
 import org.graylog2.rest.resources.datanodes.DatanodeRestApiProxy;
 import org.graylog2.security.AccessToken;
 import org.graylog2.security.AccessTokenService;
@@ -56,6 +57,8 @@ class RollingRestartActionsTest {
     @Mock
     AccessTokenService accessTokenService;
     @Mock
+    ManagedConfigurationServices configurationServices;
+    @Mock
     ClusterProcessingControl control;
     @Mock
     AccessToken accessToken;
@@ -65,7 +68,7 @@ class RollingRestartActionsTest {
     @BeforeEach
     void setUp() {
         actions = new RollingRestartActions(clusterAdmin, datanodeProxy, nodeService,
-                clusterProcessingControlFactory, accessTokenService);
+                clusterProcessingControlFactory, accessTokenService, configurationServices);
     }
 
     private String expectedBasicHeader(String token) {
