@@ -22,12 +22,14 @@ import {
   useHotkeysContext as useOriginalHotkeysContext,
 } from 'react-hotkeys-hook';
 import Immutable from 'immutable';
+import type { PluginExports } from 'graylog-web-plugin/plugin';
 
 import type { ScopeName, ActiveHotkeys, HotkeyCollections, Options } from 'contexts/HotkeysContext';
 import HotkeysContext from 'contexts/HotkeysContext';
 import { isMacOS } from 'util/OSUtils';
 import AppConfig from 'util/AppConfig';
 import { FEATURE_FLAG } from 'components/quick-jump/Constants';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 const viewActions = {
   undo: { keys: 'mod+shift+z', description: 'Undo last action' },
@@ -93,7 +95,18 @@ export const hotKeysCollections: HotkeyCollections = {
   },
 };
 
+const addPluginHotkeys = (collections: HotkeyCollections, pluginHotkeys: PluginExports['hotkeys'] = []) => {
+  const merged = { ...collections };
+
+  pluginHotkeys.forEach(({ scope, actions }) => {
+    merged[scope] = { ...merged[scope], actions: { ...merged[scope].actions, ...actions } };
+  });
+
+  return merged;
+};
+
 const CustomHotkeysProvider = ({ children }: PropsWithChildren) => {
+  const pluginHotkeys = usePluginEntities('hotkeys');
   const [activeHotkeys, setActiveHotkeys] = useState<ActiveHotkeys>(Immutable.Map());
   const { enabledScopes } = useOriginalHotkeysContext();
   const [showHotkeysModal, setShowHotkeysModal] = useState(false);
@@ -120,14 +133,14 @@ const CustomHotkeysProvider = ({ children }: PropsWithChildren) => {
   const value = useMemo(
     () => ({
       enabledScopes: enabledScopes as Array<ScopeName>,
-      hotKeysCollections,
+      hotKeysCollections: addPluginHotkeys(hotKeysCollections, pluginHotkeys),
       activeHotkeys,
       addActiveHotkey,
       removeActiveHotkey,
       showHotkeysModal,
       setShowHotkeysModal,
     }),
-    [activeHotkeys, addActiveHotkey, enabledScopes, removeActiveHotkey, showHotkeysModal],
+    [activeHotkeys, addActiveHotkey, enabledScopes, pluginHotkeys, removeActiveHotkey, showHotkeysModal],
   );
 
   return <HotkeysContext.Provider value={value}>{children}</HotkeysContext.Provider>;

@@ -1,0 +1,3 @@
+type = "a"
+message = "Render code blocks in the language `mermaid` as diagrams in Markdown."
+pulls = ["28167"]

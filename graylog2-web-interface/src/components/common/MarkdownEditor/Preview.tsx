@@ -103,18 +103,6 @@ const MarkdownStyles = styled.div<{ $noPadding?: boolean }>`
     white-space: pre-line;
     margin: 8px 0;
   }
-
-  & table {
-    border-collapse: collapse;
-    border-spacing: 0;
-    margin: 8px 0;
-
-    & th,
-    & td {
-      border: 1px solid ${({ theme }) => theme.colors.input.border};
-      padding: 4px 8px;
-    }
-  }
 `;
 
 type Props = {

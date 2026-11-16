@@ -4,16 +4,16 @@
 - [Node.js](https://nodejs.org/)
 - [Yarn](https://yarnpkg.com/)
 
-**Note:** NPM v5 changed completely the way it builds local modules, breaking the Graylog web interface build. Please use Yarn instead of NPM v5.
+**Note:** Use Yarn (v1), not npm.
 
 ## Development Setup
 
 * Install the requirements listed above
 * Run `yarn install`
-* Run `yarn start` to build the project for development and start the development server. You can exclude any Graylog frontend plugins from the build by running `disable_plugins=true npm start` instead
+* Run `yarn start` to build the project for development and start the development server. You can exclude any Graylog frontend plugins from the build by running `disable_plugins=true yarn start` instead
 * Open http://localhost:8080 in your browser to access the Graylog web interface
 
-The `yarn start` (or `disable_plugins=true yarn start`) command will run an [Express](http://expressjs.com) web server which is configured to do a full page reload in your browser every time that you save a file. This ensures that you will always use the latest version of your code.
+The `yarn start` (or `disable_plugins=true yarn start`) command runs the webpack dev server (`webpack serve`), which rebuilds when you save a file.
 
 ### Run development server in a different host and port
 

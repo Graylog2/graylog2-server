@@ -1,0 +1,3 @@
+type = "f"
+message = "Show time axes of heatmaps as date axes instead of raw timestamps."
+pulls = ["28085"]

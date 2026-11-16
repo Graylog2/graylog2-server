@@ -28,9 +28,9 @@ import InputsContext from 'contexts/InputsContext';
 const SOURCE_URL = '/system/inputs';
 const INPUTS_QUERY_KEY = ['inputs', 'list'] as const;
 
-export const fetchInputs = (): Promise<{ inputs: Array<Input>; total: number }> => fetch('GET', qualifyUrl(SOURCE_URL));
+export const fetchInputs = (): Promise<{ inputs: Array<Input>; total: number }> => SystemInputs.list();
 
-export const fetchInput = (inputId: string): Promise<Input> => fetch('GET', qualifyUrl(`${SOURCE_URL}/${inputId}`));
+export const fetchInput = (inputId: string): Promise<Input> => SystemInputs.get(inputId);
 
 export const createInput = (input: ConfiguredInput): Promise<{ id: string }> => {
   const promise = fetch('POST', qualifyUrl(`${SOURCE_URL}?setup_wizard=true`), input);

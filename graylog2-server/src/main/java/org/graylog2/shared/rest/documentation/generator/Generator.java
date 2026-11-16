@@ -87,6 +87,9 @@ import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.base.Strings.nullToEmpty;
+import static org.graylog2.shared.rest.documentation.generator.ObjectSchemaWithOptionalSupport.DISCRIMINATOR;
+import static org.graylog2.shared.rest.documentation.generator.ObjectSchemaWithOptionalSupport.DISCRIMINATOR_MAPPING;
+import static org.graylog2.shared.rest.documentation.generator.ObjectSchemaWithOptionalSupport.ONE_OF;
 
 /**
  * This is generating API information in legacy <a href="http://swagger.io/">Swagger 1.2</a> format.
@@ -585,6 +588,31 @@ public class Generator {
                         newGenericTypeSchema.put(ADDITIONAL_PROPERTIES, itemsSchema.type());
                     }
                 }
+            }
+
+            if (genericTypeSchema.get(ONE_OF) instanceof List<?> subtypes) {
+                final List<Map<String, Object>> subtypeRefs = subtypes.stream()
+                        .map(subtype -> {
+                            final TypeSchema subtypeSchema = extractInlineModels((Map<String, Object>) subtype);
+                            models.putAll(subtypeSchema.models());
+                            if (subtypeSchema.name() == null) {
+                                return reuseTypeRef(subtypeSchema.type());
+                            }
+                            if (subtypeSchema.type() != null) {
+                                models.put(subtypeSchema.name(), subtypeSchema.type());
+                            }
+                            return Collections.<String, Object>singletonMap(REF, subtypeSchema.name());
+                        })
+                        .toList();
+                newGenericTypeSchema.put(ONE_OF, subtypeRefs);
+            }
+            if (genericTypeSchema.get(DISCRIMINATOR) instanceof Map<?, ?> discriminator
+                    && discriminator.get(DISCRIMINATOR_MAPPING) instanceof Map<?, ?> mapping) {
+                final Map<String, Object> newDiscriminator = new HashMap<>((Map<String, Object>) discriminator);
+                newDiscriminator.put(DISCRIMINATOR_MAPPING, mapping.entrySet().stream()
+                        .collect(Collectors.toMap(entry -> (String) entry.getKey(),
+                                entry -> shortenJsonSchemaURNs((String) entry.getValue()))));
+                newGenericTypeSchema.put(DISCRIMINATOR, newDiscriminator);
             }
 
             if (!genericTypeSchema.containsKey(PROPERTIES)) {

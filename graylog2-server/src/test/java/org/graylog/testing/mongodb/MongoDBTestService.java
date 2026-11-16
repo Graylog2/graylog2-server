@@ -50,6 +50,18 @@ public class MongoDBTestService implements AutoCloseable {
     private MongoClient mongoClient;
 
     /**
+     * Create service instance with the given version on the default Docker bridge network and start it immediately.
+     * Use this when only the test JVM connects to MongoDB. {@link #internalUri()} is not available for such instances.
+     *
+     * @return the service instance
+     */
+    public static MongoDBTestService createStarted(MongoDBVersion version) {
+        final var mongoDBTestService = new MongoDBTestService(MongoDBContainer.create(version), version);
+        mongoDBTestService.start();
+        return mongoDBTestService;
+    }
+
+    /**
      * Create service instance with the default version and network and start it immediately.
      *
      * @return the service instance
@@ -173,7 +185,16 @@ public class MongoDBTestService implements AutoCloseable {
         return container.getContainerId();
     }
 
+    /**
+     * Returns the URI that other containers in the same Docker network can use to connect to MongoDB.
+     *
+     * @return the internal URI
+     * @throws IllegalStateException when the service was created without a network
+     */
     public String internalUri() {
+        if (container.getNetwork() == null) {
+            throw new IllegalStateException("MongoDB service was created without a network, internal URI not available. Use createStarted(MongoDBVersion, Network) instead.");
+        }
         return uriWithHostAndPort(MongoDBContainer.NETWORK_ALIAS, MongoDBContainer.MONGODB_PORT);
     }
 

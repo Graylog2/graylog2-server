@@ -63,47 +63,57 @@ const excludeEdgeClause = (oldQuery: string, valuePath: ValuePath) => {
   return addToQuery(oldQuery, not(edgeClause({ field: f0, value: v0 }, { field: f1, value: v1 })));
 };
 
-type Args = {
-  queryId: string;
+type QueryArgs = {
   field: string;
   value?: ValueArgument;
   type?: FieldType;
   contexts?: { valuePath?: ValuePath; valuePathOperator?: 'AND' | 'OR' | 'EDGE'; widget?: Widget } | null;
 };
 
+type Args = QueryArgs & {
+  queryId: string;
+};
+
+// Also used outside of views, e.g. for widgets which keep their own query.
+export const excludeValueFromQuery = (oldQuery: string, { field, value, type, contexts }: QueryArgs) => {
+  const multipleValues = hasMultipleValueForActions(contexts);
+  const fieldValueIsArray = Array.isArray(value);
+  const arrayValuesToExclude = fieldValueIsArray ? valuesFromArray(field, value, type) : [];
+
+  const getValues = (): Array<ValueToExclude> => {
+    if (multipleValues) return contexts.valuePath.map(() => ({ field, value, type }));
+    if (fieldValueIsArray) return arrayValuesToExclude;
+
+    return [{ field, value, type }];
+  };
+
+  const valuesToAdd = uniq(getValues());
+
+  let newQuery: string;
+
+  const shouldExcludeArrayFieldValuesWithOr = !multipleValues && arrayValuesToExclude.length > 1;
+
+  if (multipleValues && contexts?.valuePathOperator === 'EDGE') {
+    newQuery = excludeEdgeClause(oldQuery, contexts.valuePath);
+  } else if (multipleValues && contexts?.valuePathOperator === 'OR') {
+    newQuery = excludeOrClause(oldQuery, contexts.valuePath);
+  } else if (shouldExcludeArrayFieldValuesWithOr) {
+    newQuery = addToQuery(oldQuery, not(fieldValueOrClause(field, arrayValuesToExclude)));
+  } else {
+    newQuery = valuesToAdd.reduce(
+      (prev, valueToAdd) => formatNewQuery(prev, valueToAdd.field, valueToAdd.value),
+      oldQuery,
+    );
+  }
+
+  return newQuery;
+};
+
 const ExcludeFromQueryHandler =
-  ({ queryId, field, value, type, contexts }: Args) =>
+  ({ queryId, ...args }: Args) =>
   async (dispatch: ViewsDispatch, getState: () => RootState) => {
     const oldQuery = selectQueryString(queryId)(getState());
-    const multipleValues = hasMultipleValueForActions(contexts);
-    const fieldValueIsArray = Array.isArray(value);
-    const arrayValuesToExclude = fieldValueIsArray ? valuesFromArray(field, value, type) : [];
-
-    const getValues = (): Array<ValueToExclude> => {
-      if (multipleValues) return contexts.valuePath.map(() => ({ field, value, type }));
-      if (fieldValueIsArray) return arrayValuesToExclude;
-
-      return [{ field, value, type }];
-    };
-
-    const valuesToAdd = uniq(getValues());
-
-    let newQuery: string;
-
-    const shouldExcludeArrayFieldValuesWithOr = !multipleValues && arrayValuesToExclude.length > 1;
-
-    if (multipleValues && contexts?.valuePathOperator === 'EDGE') {
-      newQuery = excludeEdgeClause(oldQuery, contexts.valuePath);
-    } else if (multipleValues && contexts?.valuePathOperator === 'OR') {
-      newQuery = excludeOrClause(oldQuery, contexts.valuePath);
-    } else if (shouldExcludeArrayFieldValuesWithOr) {
-      newQuery = addToQuery(oldQuery, not(fieldValueOrClause(field, arrayValuesToExclude)));
-    } else {
-      newQuery = valuesToAdd.reduce(
-        (prev, valueToAdd) => formatNewQuery(prev, valueToAdd.field, valueToAdd.value),
-        oldQuery,
-      );
-    }
+    const newQuery = excludeValueFromQuery(oldQuery, args);
 
     await recordQueryStringUsage(newQuery, oldQuery);
 

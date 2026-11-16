@@ -22,6 +22,7 @@ import userEvent from '@testing-library/user-event';
 import { EventsDefinitions } from '@graylog/server-api';
 
 import TagsEditor from 'components/event-definitions/event-definition-form/TagsEditor';
+import { asMock } from 'helpers/mocking';
 
 jest.mock('@graylog/server-api', () => ({
   EventsDefinitions: {
@@ -29,7 +30,7 @@ jest.mock('@graylog/server-api', () => ({
   },
 }));
 
-const mockedSuggestTags = EventsDefinitions.suggestTags as jest.MockedFunction<typeof EventsDefinitions.suggestTags>;
+const mockedSuggestTags = asMock(EventsDefinitions.suggestTags);
 
 const Harness = ({ initial = [] as string[], onChange = (_: string[]) => {} }) => {
   const [tags, setTags] = useState<string[]>(initial);
