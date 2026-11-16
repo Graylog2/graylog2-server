@@ -1,4 +1,4 @@
 type = "f"
-message = "Return 404 instead of 204 from `GET /api/events/{event_id}` for a missing event, so the replay search page shows the not found page instead of loading forever."
+message = "Return 404 instead of 204 for REST resources that return an empty `Optional`, such as `GET /api/events/{event_id}` for a missing event. The replay search page of a missing event now shows the not found page instead of loading forever."
 
 pulls = ["28218"]
