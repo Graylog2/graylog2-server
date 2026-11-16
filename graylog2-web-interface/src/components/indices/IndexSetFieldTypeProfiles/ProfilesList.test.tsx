@@ -147,7 +147,7 @@ describe('IndexSetFieldTypesList', () => {
     renderIndexSetFieldTypeProfilesList();
 
     const tableRow1 = await screen.findByTestId('table-row-111');
-    await userEvent.click(await within(tableRow1).findByRole('button', { name: /more/i }));
+    await userEvent.click(await within(tableRow1).findByRole('button', { name: /^more( actions)?$/i }));
     await userEvent.click(await screen.findByText('Duplicate'));
 
     expect(mockPushWithState).toHaveBeenCalledWith(Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.CREATE, {
