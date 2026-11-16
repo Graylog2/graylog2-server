@@ -137,7 +137,7 @@ public class StaticFieldsResource extends RestResource {
     })
     @Path("/{key}")
     @AuditEvent(type = AuditEventTypes.STATIC_FIELD_DELETE)
-    public void delete(@Parameter(name = "Key", required = true)
+    public void delete(@Parameter(name = "key", required = true)
                        @PathParam("key") String key,
                        @Parameter(name = "inputId", required = true)
                        @PathParam("inputId") String inputId) throws NotFoundException {

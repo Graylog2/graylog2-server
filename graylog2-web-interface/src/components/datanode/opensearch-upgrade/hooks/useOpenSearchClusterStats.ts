@@ -19,10 +19,11 @@ import { useQuery } from '@tanstack/react-query';
 import { DatanodeUpgrade } from '@graylog/server-api';
 
 import { defaultOnError } from 'util/conditional/onError';
+import type { StubResponse } from 'util/UtilityTypes';
 
 const CLUSTER_STATS_REFETCH_INTERVAL_MS = 5000;
 
-type OpenSearchVersionsOverview = Awaited<ReturnType<typeof DatanodeUpgrade.opensearchVersions>>;
+type OpenSearchVersionsOverview = StubResponse<typeof DatanodeUpgrade.opensearchVersions>;
 
 export type OpenSearchVersionNode = Omit<OpenSearchVersionsOverview['nodes'][number], 'datanode'> & {
   datanode?: OpenSearchVersionsOverview['nodes'][number]['datanode'] | null;

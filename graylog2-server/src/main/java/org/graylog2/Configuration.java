@@ -783,7 +783,7 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
         if (leaderElectionLockPollingInterval.compareTo(java.time.Duration.ofSeconds(1)) < 0) {
             throw new ValidationException("The minimum valid \"leader_election_lock_polling_interval\" is 1 second");
         }
-        if (lockServiceLockTTL.compareTo(leaderElectionLockPollingInterval) < 1) {
+        if (lockServiceLockTTL.compareTo(leaderElectionLockPollingInterval) <= 0) {
             throw new ValidationException("The \"leader_election_lock_polling_interval\" needs to be greater than the \"lock_service_lock_ttl\"!");
         }
     }

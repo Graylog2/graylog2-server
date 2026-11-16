@@ -24,7 +24,6 @@ import { ExpandedConfigurationSection, InputsActions } from 'components/inputs/I
 import MessagesPerStreamSection from 'components/inputs/InputsOveriew/expanded-sections/MessagesPerStreamSection';
 import ExtractorsSection from 'components/inputs/InputsOveriew/expanded-sections/ExtractorsSection';
 import ExtractorsSectionActions from 'components/inputs/InputsOveriew/expanded-sections/ExtractorsSectionActions';
-import AssociatedStreamsSection from 'components/inputs/InputsOveriew/expanded-sections/AssociatedStreamsSection';
 import { METRIC_COLUMN_IDS, METRIC_COLUMN_TITLES } from 'components/inputs/InputsOveriew/metricColumns';
 
 const useTableElements = ({
@@ -62,10 +61,6 @@ const useTableElements = ({
         title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.extractorCount],
         content: (input: InputSummary) => <ExtractorsSection input={input} />,
         actions: (input: InputSummary) => <ExtractorsSectionActions input={input} />,
-      },
-      [METRIC_COLUMN_IDS.associatedStreams]: {
-        title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.associatedStreams],
-        content: (input: InputSummary) => <AssociatedStreamsSection input={input} />,
       },
     }),
     [renderExpandedConfigurationDetails],
