@@ -16,6 +16,7 @@
  */
 import type { FieldTypeOrigin, IndexSetFieldTypeJson } from 'components/indices/IndexSetFieldTypes/types';
 import type { CustomFieldMapping } from 'components/indices/IndexSetFieldTypeProfiles/types';
+import isReservedField from 'views/logic/IsReservedField';
 
 export type ImportOriginKey = 'profile' | 'indexFieldConfiguration' | 'index';
 
@@ -41,7 +42,7 @@ const buildImportedMappings = (
   const origins = selectedOrigins.flatMap((key) => FIELD_ORIGINS[key]);
   const fieldsInOrigins = fields.filter(({ origin }) => origins.includes(origin));
   const importableFields = fieldsInOrigins.filter(
-    ({ is_reserved, type }) => !is_reserved && allowedTypes.includes(type),
+    ({ is_reserved, field_name, type }) => !is_reserved && !isReservedField(field_name) && allowedTypes.includes(type),
   );
 
   return {

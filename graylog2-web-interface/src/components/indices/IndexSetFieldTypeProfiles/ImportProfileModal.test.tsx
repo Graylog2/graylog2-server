@@ -123,6 +123,18 @@ describe('ImportProfileModal', () => {
     });
   });
 
+  it('leaves out fields with a reserved name even when the index set does not flag them', async () => {
+    mockFetch([fields[0], { field_name: 'message', type: 'string', origin: 'INDEX', is_reserved: false }]);
+    renderModal();
+
+    await importFrom();
+
+    expect(mockPushWithState).toHaveBeenCalledWith(Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.CREATE, {
+      customFieldMappings: [{ field: 'from_profile', type: 'string' }],
+      skippedFieldsCount: 1,
+    });
+  });
+
   it('imports only fields with a custom mapping when only Index Field Configuration is ticked', async () => {
     mockFetch(fields);
     renderModal();
