@@ -57,25 +57,27 @@ type Props = {
  * Place it inside the sidebar's positioned container.
  */
 const SidebarResizeHandle = ({ side, width, bounds, label, onResize }: Props) => {
-  const drag = useRef<{ startX: number; startWidth: number } | undefined>(undefined);
+  const drag = useRef<{ pointerId: number; startX: number; startWidth: number } | undefined>(undefined);
   const [dragging, setDragging] = useState(false);
   const direction = side === 'left' ? 1 : -1;
 
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (drag.current || event.button !== 0) return;
+
     event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
-    drag.current = { startX: event.clientX, startWidth: width };
+    drag.current = { pointerId: event.pointerId, startX: event.clientX, startWidth: width };
     setDragging(true);
   };
 
   const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (drag.current) {
+    if (drag.current && drag.current.pointerId === event.pointerId) {
       onResize(drag.current.startWidth + direction * (event.clientX - drag.current.startX));
     }
   };
 
   const endDrag = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (drag.current) {
+    if (drag.current && drag.current.pointerId === event.pointerId) {
       event.currentTarget.releasePointerCapture(event.pointerId);
       drag.current = undefined;
       setDragging(false);
