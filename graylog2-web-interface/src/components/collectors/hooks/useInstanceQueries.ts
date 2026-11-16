@@ -23,6 +23,7 @@ import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQue
 import { defaultOnError } from 'util/conditional/onError';
 import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
 import type { RequestOptions } from 'routing/request';
+import type { StubResponse } from 'util/UtilityTypes';
 
 import useCollectorRefetchInterval from './useCollectorRefetchInterval';
 
@@ -33,7 +34,7 @@ export const INSTANCES_KEY_PREFIX = ['collectors', 'instances'];
 export const instancesKeyFn = (searchParams: SearchParams) => [...INSTANCES_KEY_PREFIX, 'paginated', searchParams];
 export const instanceKeyFn = (instanceUid: string | undefined) => [...INSTANCES_KEY_PREFIX, 'single', instanceUid];
 
-type ApiInstanceResponse = Awaited<ReturnType<typeof Collectors.findInstances>>['elements'][number];
+type ApiInstanceResponse = StubResponse<typeof Collectors.findInstances>['elements'][number];
 
 const toView = (dto: ApiInstanceResponse): CollectorInstanceView => {
   const allAttributes = { ...dto.identifying_attributes, ...dto.non_identifying_attributes };

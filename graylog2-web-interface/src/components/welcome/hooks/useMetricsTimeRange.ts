@@ -16,8 +16,7 @@
  */
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import { durationInSeconds } from 'util/DateTime';
-
-import { DEFAULT_TIME_RANGE_SECONDS } from './useWelcomeSearch';
+import { DEFAULT_TIME_RANGE_SECONDS } from 'components/welcome/welcomeWidgetBuilders';
 
 /**
  * Caps the welcome page's default 24-hour widget time range to the deployment's configured query

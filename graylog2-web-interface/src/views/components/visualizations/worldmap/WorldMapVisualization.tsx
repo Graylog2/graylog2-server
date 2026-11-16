@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext } from 'react';
+import React from 'react';
 import flow from 'lodash/flow';
 import fromPairs from 'lodash/fromPairs';
 import zip from 'lodash/zip';
@@ -33,7 +33,7 @@ import MapVisualization from './MapVisualization';
 import type { ExtractedSeries, ChartData } from '../ChartData';
 import { extractSeries, formatSeries, getLeafsFromRows, getXLabelsFromLeafs } from '../ChartData';
 import transformKeys from '../TransformKeys';
-import RenderCompletionCallback from '../../widgets/RenderCompletionCallback';
+import useRenderCompletionCallback from '../../widgets/useRenderCompletionCallback';
 
 const _arrayToMap = ([name, x, y]: ChartData) => ({ name, x, y });
 const _lastKey = <T,>(keys: Array<T>) => keys[keys.length - 1];
@@ -66,7 +66,7 @@ const _formatSeriesForMap = (rowPivots: Array<Pivot>) => {
 const WorldMapVisualization = makeVisualization(
   ({ config, data, editing, onChange, width, ...rest }: VisualizationComponentProps) => {
     const { rowPivots } = config;
-    const onRenderComplete = useContext(RenderCompletionCallback);
+    const onRenderComplete = useRenderCompletionCallback();
     const hasMetric = !isEmpty(config.series);
     const markerRadiusSize = !hasMetric ? 1 : undefined;
     const seriesExtractor = hasMetric ? extractSeries() : _createSeriesWithoutMetric;

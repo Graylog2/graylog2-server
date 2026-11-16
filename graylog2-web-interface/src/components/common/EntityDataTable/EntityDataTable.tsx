@@ -186,7 +186,7 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   /** Function to handle page size changes */
   onPageSizeChange?: (newPageSize: number) => void;
   /** Function to handle layout preferences reset */
-  onResetLayoutPreferences: () => Promise<void>;
+  onResetLayoutPreferences: () => Promise<unknown>;
   /** Active page size */
   pageSize?: number;
   appSection?: string;
@@ -245,7 +245,11 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   const { headerMinWidths, handleHeaderSectionResize } = useHeaderMinWidths();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const scrolledToRightIndicator = useRef<HTMLDivElement>();
-  const scrolledToRight = useIntersectionObserver(scrollContainerRef, scrolledToRightIndicator);
+  const scrolledToRight = useIntersectionObserver(scrolledToRightIndicator, {
+    root: scrollContainerRef,
+    threshold: 0.9,
+    initialIsIntersecting: true,
+  });
 
   const {
     setInternalAttributeColumnOrder,
@@ -378,7 +382,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                     $activeColId={activeColId}
                     $columnTransform={columnTransform}
                     $columnWidths={columnWidths}
-                    $canScrollRight={scrolledToRight && tableIsCompressed}
+                    $canScrollRight={!scrolledToRight && tableIsCompressed}
                     $scrollContainerWidth={scrollContainerWidth}
                     $tableMinWidth={tableMinWidth}>
                     <InnerContainer>

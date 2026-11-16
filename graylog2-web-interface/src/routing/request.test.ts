@@ -84,6 +84,12 @@ describe('request', () => {
     });
   });
 
+  it('drops headers without a value', () => {
+    request('PUT', '/foo', null, {}, { Accept: ['application/json'], 'If-Match': undefined, 'X-Empty': null });
+
+    expect(mockSetHeaders).toHaveBeenCalledWith({ Accept: ['application/json'] });
+  });
+
   it('passes method and qualified URL to the Builder', () => {
     request('POST', '/bar', { hello: 'world' }, { q: 'value' }, {});
 
