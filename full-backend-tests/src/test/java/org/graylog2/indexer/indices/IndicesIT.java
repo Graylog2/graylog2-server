@@ -319,7 +319,7 @@ public class IndicesIT extends SearchServerBaseTest {
         final Template template = new MessageIndexTemplateProvider().create(searchServer().version(), null)
                 .toTemplate(new IndexSetMappingTemplate("standard", "field_limit_test_*",
                         new CustomFieldMappings(List.of(new CustomFieldMapping("known_field", "string"))),
-                        1500, true), 200L);
+                        1500, true, null), 200L);
 
         try {
             indexTemplateAdapter.ensureIndexTemplate(templateName, template);

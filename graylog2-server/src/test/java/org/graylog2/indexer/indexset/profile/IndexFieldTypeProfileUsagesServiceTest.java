@@ -118,6 +118,7 @@ public class IndexFieldTypeProfileUsagesServiceTest {
                 null,
                 null,
                 null,
+                null,
                 null);
     }
 

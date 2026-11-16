@@ -155,6 +155,7 @@ public class TestIndexSet implements IndexSet {
                 .customFieldMappings(config.customFieldMappings())
                 .fieldLimit(config.fieldLimit())
                 .dynamicMappingDisabled(config.dynamicMappingDisabled())
+                .keptFields(config.keptFields())
                 .indexAnalyzer(config.indexAnalyzer())
                 .indexPrefix(config.indexPrefix())
                 .indexWildcard(getIndexWildcard())

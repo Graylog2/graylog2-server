@@ -50,6 +50,7 @@ import static org.graylog2.indexer.indexset.fields.RotationAndRetentionFields.FI
 import static org.graylog2.indexer.indexset.fields.RotationAndRetentionFields.FIELD_ROTATION_STRATEGY;
 import static org.graylog2.indexer.indexset.fields.RotationAndRetentionFields.FIELD_ROTATION_STRATEGY_CLASS;
 import static org.graylog2.indexer.indexset.index.IndexPattern.WARM_INDEX_INFIX;
+import static org.graylog2.indexer.template.IndexTemplateProvider.ILLUMINATE_INDEX_TEMPLATE_TYPE;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class IndexSetValidator {
@@ -160,7 +161,9 @@ public class IndexSetValidator {
             if (!config.canHaveFieldLimitAndDynamicMapping()) {
                 return Violation.create("Dynamic mapping cannot be disabled for events, failures and collector logs index sets");
             }
-            if (Strings.isNullOrEmpty(config.fieldTypeProfile())) {
+            // Illuminate index sets can't have a profile; their fixed field types count as one.
+            final boolean isIlluminate = config.indexTemplateType().map(ILLUMINATE_INDEX_TEMPLATE_TYPE::equals).orElse(false);
+            if (Strings.isNullOrEmpty(config.fieldTypeProfile()) && !isIlluminate) {
                 return Violation.create("Dynamic mapping can only be disabled for index sets with a field type profile");
             }
         }

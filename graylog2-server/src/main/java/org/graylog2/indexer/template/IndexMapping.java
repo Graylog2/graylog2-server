@@ -112,6 +112,16 @@ public abstract class IndexMapping extends AbstractMapping {
                 SOURCE, enabled());
     }
 
+    /**
+     * Mappings for all of Graylog's own {@code gl2_*} fields, for other templates that turn off dynamic mapping.
+     */
+    public Map<String, Map<String, Object>> gl2FieldProperties() {
+        return ImmutableMap.<String, Map<String, Object>>builder()
+                .putAll(gl2ProcessingFields())
+                .putAll(internalFieldProperties())
+                .build();
+    }
+
     private Map<String, Map<String, Object>> internalFieldProperties() {
         return ImmutableMap.<String, Map<String, Object>>builder()
                 .put(Message.FIELD_GL2_PROCESSING_ERROR, notAnalyzedString())

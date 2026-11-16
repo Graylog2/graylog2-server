@@ -21,8 +21,10 @@ import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
 import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.indexset.KeptFieldsCollector;
 import org.graylog2.indexer.indexset.MongoIndexSet;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
+import org.graylog2.indexer.indexset.NoKeptFieldsCollector;
 import org.graylog2.indexer.indexset.basic.ExtendedBasicIndexSets;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indexset.registry.MongoIndexSetRegistry;
@@ -50,5 +52,6 @@ public class IndexerBindings extends Graylog2Module {
         Multibinder.newSetBinder(binder(), IndexSetConfigValidator.class);
 
         OptionalBinder.newOptionalBinder(binder(), IndexSetConfigTransformer.class).setDefault().to(DefaultIndexSetConfigTransformer.class);
+        OptionalBinder.newOptionalBinder(binder(), KeptFieldsCollector.class).setDefault().to(NoKeptFieldsCollector.class);
     }
 }

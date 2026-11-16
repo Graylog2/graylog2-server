@@ -308,11 +308,12 @@ public class Indices {
                         config.indexWildcard(),
                         fieldTypeProfile.get().customFieldMappings().mergeWith(customFieldMappings),
                         config.fieldLimit(),
-                        config.dynamicMappingDisabled());
+                        config.dynamicMappingDisabled(),
+                        config.keptFields());
             }
         }
 
-        return new IndexSetMappingTemplate(config.indexAnalyzer(), config.indexWildcard(), customFieldMappings, config.fieldLimit(), config.dynamicMappingDisabled());
+        return new IndexSetMappingTemplate(config.indexAnalyzer(), config.indexWildcard(), customFieldMappings, config.fieldLimit(), config.dynamicMappingDisabled(), config.keptFields());
     }
 
     public Map<String, Set<String>> getAllMessageFieldsForIndices(final String[] writeIndexWildcards) {

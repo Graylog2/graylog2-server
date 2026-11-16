@@ -407,6 +407,7 @@ public class IndexSetConfigTest {
                 null,
                 null,
                 null,
+                null,
                 null);
 
     }

@@ -358,10 +358,9 @@ class IndexSetValidatorTest {
         assertThat(validator.validate(config)).hasValueSatisfying(v ->
                 assertThat(v.message()).contains("Dynamic mapping can only be disabled for index sets with a field type profile"));
 
-        // Illuminate index sets can't have a profile, so dynamic mapping stays on there.
+        // Illuminate index sets can't have a profile; their fixed field types count as one.
         config = testIndexSetConfig().toBuilder().indexTemplateType(ILLUMINATE_INDEX_TEMPLATE_TYPE).dynamicMappingDisabled(true).build();
-        assertThat(validator.validate(config)).hasValueSatisfying(v ->
-                assertThat(v.message()).contains("Dynamic mapping can only be disabled for index sets with a field type profile"));
+        assertThat(validator.validate(config)).isEmpty();
 
         config = testIndexSetConfig().toBuilder().indexTemplateType(DEFAULT_INDEX_TEMPLATE_TYPE).dynamicMappingDisabled(false).fieldTypeProfile(null).build();
         assertThat(validator.validate(config)).isEmpty();

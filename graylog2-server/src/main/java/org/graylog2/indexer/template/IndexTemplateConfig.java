@@ -25,6 +25,7 @@ import org.graylog2.indexer.indexset.fields.IndexAnalyzerField;
 import org.graylog2.indexer.indexset.fields.IndexPrefixField;
 import org.graylog2.indexer.indexset.fields.IndexTemplateNameField;
 import org.graylog2.indexer.indexset.fields.IndexTemplateTypeField;
+import org.graylog2.indexer.indexset.fields.KeptFieldsField;
 
 @AutoValue
 public abstract class IndexTemplateConfig implements
@@ -35,6 +36,7 @@ public abstract class IndexTemplateConfig implements
         CustomFieldMappingsField,
         FieldLimitField,
         DynamicMappingDisabledField,
+        KeptFieldsField,
         IndexAnalyzerField {
 
     public abstract String indexWildcard();
@@ -54,6 +56,7 @@ public abstract class IndexTemplateConfig implements
             CustomFieldMappingsField.CustomFieldMappingsFieldBuilder<Builder>,
             FieldLimitField.FieldLimitFieldBuilder<Builder>,
             DynamicMappingDisabledField.DynamicMappingDisabledFieldBuilder<Builder>,
+            KeptFieldsField.KeptFieldsFieldBuilder<Builder>,
             IndexAnalyzerField.IndexAnalyzerFieldBuilder<Builder>,
             IndexPrefixFieldBuilder<Builder> {
 
