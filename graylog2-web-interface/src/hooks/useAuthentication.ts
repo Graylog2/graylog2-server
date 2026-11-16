@@ -17,7 +17,7 @@
 import * as Immutable from 'immutable';
 import { useQuery } from '@tanstack/react-query';
 
-import { SystemAuthenticationServicesBackends } from '@graylog/server-api';
+import { SystemAuthenticationServicesBackends, SystemAuthenticationServicesConfiguration } from '@graylog/server-api';
 
 import AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 import type { AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
@@ -177,11 +177,8 @@ export const testAuthLogin = (payload: LoginTestPayload): Promise<LoginTestResul
   return fetch('POST', url, payload);
 };
 
-export const setActiveAuthBackend = (backendId: null | undefined | AuthenticationBackend['id']): Promise<void> => {
-  const url = qualifyUrl(ApiRoutes.AuthenticationController.updateConfiguration().url);
-
-  return fetch('POST', url, { active_backend: backendId });
-};
+export const setActiveAuthBackend = (backendId: null | undefined | AuthenticationBackend['id']): Promise<unknown> =>
+  SystemAuthenticationServicesConfiguration.update({ active_backend: backendId });
 
 export const loadAuthBackendsPaginated = ({ page, perPage, query }: Pagination): Promise<PaginatedBackends> =>
   SystemAuthenticationServicesBackends.list(query || undefined, page, perPage).then(
