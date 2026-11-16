@@ -38,7 +38,7 @@ const coreEntityTypes = new Set([
 ]);
 
 const useEntityTypeTitle = (type: string): string | undefined => {
-  const pluginTitle = usePluginEntities('entityTypeTitles').find((entry) => entry.type === type)?.title;
+  const pluginTitle = usePluginEntities('entityTypeTitles').findLast((entry) => entry.type === type)?.title;
 
   return coreEntityTypes.has(type) ? lowerCase(type) : pluginTitle;
 };
