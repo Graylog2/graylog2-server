@@ -30,6 +30,7 @@ import { testMatch } from 'api/streams';
 import type { Message } from 'views/components/messagelist/Types';
 import useCreateStreamRule from 'components/streamrules/hooks/useCreateStreamRule';
 import StartStreamAfterRuleCreateDialog from 'components/streamrules/StartStreamAfterRuleCreateDialog';
+import * as JSON from 'util/json';
 
 import useStream from '../streams/hooks/useStream';
 
@@ -63,7 +64,7 @@ const StreamRulesEditor = ({ streamId, messageId = '', index = '' }: Props) => {
   const [message, setMessage] = useState<Message | undefined>();
   const { data: stream, refetch } = useStream(streamId);
   const { data: matchData } = useQuery({
-    queryKey: ['stream', streamId, 'testMatch', message?.fields],
+    queryKey: ['stream', streamId, 'testMatch', JSON.stringify(message?.fields)],
     queryFn: () => testMatch(streamId, { message: message?.fields ?? {} }),
     enabled: !!message,
     retry: false,
