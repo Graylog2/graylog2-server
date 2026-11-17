@@ -14,14 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { SystemCluster } from '@graylog/server-api';
+
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 import ApiRoutes from 'routing/ApiRoutes';
 import { qualifyUrl } from 'util/URLUtils';
-import PaginationURL from 'util/PaginationURL';
 import fetch from 'logic/rest/FetchProvider';
 import { defaultOnError } from 'util/conditional/onError';
-import type { Attribute, PaginatedResponseType, SearchParams } from 'stores/PaginationTypes';
+import type { Attribute, SearchParams } from 'stores/PaginationTypes';
 import type { Metric, NodeMetric } from 'types/metrics';
+import type { StubResponse } from 'util/UtilityTypes';
+import { DEFAULT_PRODUCT_NAME } from 'brand-customization/useProductName';
 
 export const GRAYLOG_NODE_METRIC_NAMES = {
   journalSize: 'org.graylog2.journal.size',
@@ -76,7 +79,7 @@ export type ClusterGraylogNode = GraylogNode & { metrics: GraylogNodeMetrics };
 
 export type GraylogNodesResponse = {
   list: GraylogNodes;
-  pagination: PaginatedResponseType;
+  pagination: StubResponse<typeof SystemCluster.nodesBypageAndper_pageAndqueryAndsortAndorder>['pagination'];
   attributes: Array<Attribute>;
 };
 
@@ -89,28 +92,18 @@ export const DEFAULT_GRAYLOG_NODES_SEARCH_PARAMS: SearchParams = {
 
 export const fetchGraylogNodes = async (
   params: SearchParams = DEFAULT_GRAYLOG_NODES_SEARCH_PARAMS,
-): Promise<GraylogNodesResponse> => {
-  const url = PaginationURL('/system/cluster/nodes/paginated', params.page, params.pageSize, params.query, {
-    sort: params.sort?.attributeId,
-    order: params.sort?.direction,
-  });
-
-  return fetch('GET', qualifyUrl(url)).then(
-    ({
-      attributes,
-      pagination,
-      elements,
-    }: {
-      attributes: Array<Attribute>;
-      pagination: PaginatedResponseType;
-      elements: GraylogNodes;
-    }) => ({
-      attributes,
-      list: elements,
-      pagination,
-    }),
-  );
-};
+): Promise<GraylogNodesResponse> =>
+  SystemCluster.nodesBypageAndper_pageAndqueryAndsortAndorder(
+    params.sort?.attributeId as Parameters<typeof SystemCluster.nodesBypageAndper_pageAndqueryAndsortAndorder>[0],
+    params.page,
+    params.pageSize,
+    params.query || undefined,
+    params.sort?.direction,
+  ).then(({ attributes, pagination, elements }) => ({
+    attributes,
+    list: elements,
+    pagination,
+  }));
 
 export const clusterGraylogNodesKeyFn = (searchParams: SearchParams = DEFAULT_GRAYLOG_NODES_SEARCH_PARAMS) => [
   'graylogNodes',
@@ -138,7 +131,7 @@ const toNodeMetric = (response?: MetricsSummaryResponse): NodeMetric | undefined
   return Object.fromEntries(response.metrics.map((metric) => [metric.full_name, metric])) as NodeMetric;
 };
 
-const fetchGraylogNodeMetrics = async (nodeIds: Array<string>) => {
+const fetchGraylogNodeMetrics = async (nodeIds: Array<string>, productName: string) => {
   if (!nodeIds.length) {
     return {};
   }
@@ -150,8 +143,8 @@ const fetchGraylogNodeMetrics = async (nodeIds: Array<string>) => {
       try {
         const response = await defaultOnError(
           fetch('POST', url, { metrics: METRIC_NAMES_LIST }),
-          'Loading Graylog node metrics failed with status',
-          'Could not load Graylog node metrics.',
+          `Loading ${productName} node metrics failed with status`,
+          `Could not load ${productName} node metrics.`,
         );
 
         return { nodeId, response };
@@ -180,10 +173,11 @@ const fetchGraylogNodeMetrics = async (nodeIds: Array<string>) => {
 
 export const fetchClusterGraylogNodesWithMetrics = async (
   searchParams: SearchParams = DEFAULT_GRAYLOG_NODES_SEARCH_PARAMS,
+  productName: string = DEFAULT_PRODUCT_NAME,
 ): Promise<GraylogNodesResponse & { list: Array<ClusterGraylogNode> }> => {
   const base = await fetchGraylogNodes(searchParams);
   const nodeIds = Array.from(new Set(base.list.map(({ node_id }) => node_id).filter(Boolean)));
-  const metricsByNodeId = nodeIds.length ? await fetchGraylogNodeMetrics(nodeIds) : {};
+  const metricsByNodeId = nodeIds.length ? await fetchGraylogNodeMetrics(nodeIds, productName) : {};
 
   return {
     ...base,

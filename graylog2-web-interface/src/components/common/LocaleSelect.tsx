@@ -21,7 +21,7 @@ import type { Locales } from 'hooks/useSystemStore';
 import { useSystemLocales } from 'hooks/useSystemStore';
 import Spinner from 'components/common/Spinner';
 
-const _formatLocales = (locales: Array<Locales>) => {
+const _formatLocales = (locales: Locales) => {
   const sortedLocales = Object.values(locales)
     .filter((locale) => locale.language_tag !== 'und')
     .map((locale) => ({ value: locale.language_tag, label: locale.display_name }))

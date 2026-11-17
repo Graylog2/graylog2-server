@@ -1,0 +1,4 @@
+type = "c"
+message = "Show lists in more entity table columns directly in the cell, with the first item and an option to expand the rest."
+
+pulls = ["28108", "Graylog2/graylog-plugin-enterprise#16291"]

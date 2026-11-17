@@ -16,8 +16,10 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
-import { marked } from 'marked';
+import styled, { css } from 'styled-components';
+import { Marked } from 'marked';
 import DOMPurify from 'dompurify';
+import escape from 'lodash/escape';
 import parse, { domToReact, Element } from 'html-react-parser';
 import type { DOMNode, HTMLReactParserOptions } from 'html-react-parser';
 
@@ -27,6 +29,9 @@ import Spinner from 'components/common/Spinner';
 import { Link } from 'components/common';
 import Routes from 'routing/Routes';
 import MarkdownLink from 'components/common/markdown/MarkdownLink';
+import Table from 'components/bootstrap/Table';
+import MermaidDiagram from 'components/common/markdown/MermaidDiagram';
+import { useTrackMarkdownRender } from 'components/common/markdown/MarkdownRenderTracker';
 
 type Props = {
   text: string;
@@ -34,6 +39,13 @@ type Props = {
 };
 
 const ALLOWED_URI_REGEXP = /^(?:https?:|graylog:|[^a-z])/i;
+
+const markdownParser = new Marked({
+  async: false,
+  renderer: {
+    html: ({ text }) => escape(text),
+  },
+});
 
 type Transformer = Parameters<typeof parse>[1]['replace'];
 type Renderer = ({ html, transformer }: { html: string; transformer?: Transformer }) => ReturnType<typeof parse>;
@@ -88,9 +100,23 @@ const mergeTransformer =
     return undefined;
   };
 
-// The content of links is transformed like everything else, e.g. its augmented values.
+// A table wider than its container scrolls instead of squeezing its columns.
+const SpacedTable = styled(Table)(
+  ({ theme }) => css`
+    margin: ${theme.spacings.xs} 0;
+    width: auto;
+  `,
+);
+
+// The content of links and tables is transformed like everything else, e.g. its augmented values.
 const parseHtml = (html: string, transformer: Transformer) => {
   const options: HTMLReactParserOptions = {};
+  const tableTransformer: Transformer = (domNode) =>
+    domNode instanceof Element && domNode.name === 'table' ? (
+      <SpacedTable responsive condensed striped={false} hover={false}>
+        {domToReact(domNode.children as DOMNode[], options)}
+      </SpacedTable>
+    ) : undefined;
   const linkTransformer: Transformer = (domNode) => {
     if (!(domNode instanceof Element) || domNode.name !== 'a' || !domNode.attribs?.href) {
       return undefined;
@@ -100,7 +126,8 @@ const parseHtml = (html: string, transformer: Transformer) => {
       <MarkdownLink href={domNode.attribs.href}>{domToReact(domNode.children as DOMNode[], options)}</MarkdownLink>
     );
   };
-  options.replace = transformer ? mergeTransformer([transformer, linkTransformer]) : linkTransformer;
+  const builtInTransformers = [linkTransformer, tableTransformer];
+  options.replace = mergeTransformer(transformer ? [transformer, ...builtInTransformers] : builtInTransformers);
 
   return parse(html, options);
 };
@@ -132,16 +159,40 @@ const imageWarningTransformer: Transformer = (domNode) => {
   return undefined;
 };
 
+const textOf = (nodes: Element['children']): string =>
+  nodes
+    .map((node) => {
+      if ('data' in node) {
+        return node.data;
+      }
+
+      return 'children' in node ? textOf(node.children) : '';
+    })
+    .join('');
+
+// Code blocks in the language "mermaid" are shown as diagrams.
+const mermaidTransformer: Transformer = (domNode) => {
+  if (!(domNode instanceof Element) || domNode.name !== 'pre') {
+    return undefined;
+  }
+
+  const code = domNode.children.find((child): child is Element => child instanceof Element && child.name === 'code');
+
+  if (!code?.attribs?.class?.split(' ').includes('language-mermaid')) {
+    return undefined;
+  }
+
+  return <MermaidDiagram source={textOf(code.children)} />;
+};
+
 const Markdown = ({ augment = false, text }: Props) => {
   const { isInitialLoading, data: markdownConfig } = useMarkdownConfig();
+  useTrackMarkdownRender(isInitialLoading);
 
-  // Remove dangerous HTML
-  const sanitizedText = DOMPurify.sanitize(text ?? '', { USE_PROFILES: { html: false } });
-
-  // Remove dangerous markdown
+  // Raw HTML is escaped by the parser, sanitizing the output is a safety net
   const html = useMemo(
-    () => DOMPurify.sanitize(marked.parse(sanitizedText, { async: false }), { ALLOWED_URI_REGEXP }),
-    [sanitizedText],
+    () => DOMPurify.sanitize(markdownParser.parse(text ?? '', { async: false }), { ALLOWED_URI_REGEXP }),
+    [text],
   );
 
   const imageTransformer: Transformer =
@@ -149,13 +200,18 @@ const Markdown = ({ augment = false, text }: Props) => {
       ? undefined
       : imageWarningTransformer;
 
+  const transformer = useMemo(
+    () => mergeTransformer([mermaidTransformer, ...(imageTransformer ? [imageTransformer] : [])]),
+    [imageTransformer],
+  );
+
   const RendererComponent = augment ? Augment : HTML;
 
   if (isInitialLoading) {
     return <Spinner />;
   }
 
-  return <RendererComponent html={html} transformer={imageTransformer} />;
+  return <RendererComponent html={html} transformer={transformer} />;
 };
 
 export default Markdown;

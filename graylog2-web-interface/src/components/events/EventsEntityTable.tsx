@@ -24,7 +24,12 @@ import { eventsTableElements, nonInfoPriorities } from 'components/events/Consta
 import eventsSliceRenderers from 'components/events/SliceRenderers';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import FilterValueRenderers from 'components/events/FilterValueRenderers';
-import fetchEvents, { keyFn, parseFilters, getConcatenatedQuery } from 'components/events/fetchEvents';
+import fetchEvents, {
+  keyFn,
+  parseFilters,
+  getConcatenatedQuery,
+  defaultTimeRange,
+} from 'components/events/fetchEvents';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import useQuery from 'routing/useQuery';
@@ -34,19 +39,18 @@ import QueryHelper from 'components/common/QueryHelper';
 import EventsWidgets from 'components/events/EventsWidgets';
 import EventsRefreshProvider from 'components/events/EventsRefreshProvider';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
+import { serializeTimeRange } from 'components/common/EntityFilters/helpers/timeRange';
 
 const additionalSearchFields = {
   key: 'The key of the event',
 };
 
-const defaultFilters = OrderedMap({ priority: nonInfoPriorities });
+const defaultFilters = OrderedMap({ priority: nonInfoPriorities, timestamp: [serializeTimeRange(defaultTimeRange)] });
 
 const EventsEntityTable = () => {
   const { stream_id: streamId } = useQuery();
   const _fetchEvents = (searchParams: SearchParams) => fetchEvents(searchParams, streamId as string);
-  const { entityActions, expandedSections, bulkSelection } = useTableElements({
-    defaultLayout: eventsTableElements.defaultLayout,
-  });
+  const { entityActions, expandedSections, bulkSelection } = useTableElements();
 
   const _fetchSlices = (column: string, query: string, filters: UrlQueryFilters) => {
     const { filter, timerange } = parseFilters(filters);
