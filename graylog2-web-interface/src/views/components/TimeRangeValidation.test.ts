@@ -17,7 +17,6 @@
 import asMock from 'helpers/mocking/AsMock';
 import TimeRangeValidation from 'views/components/TimeRangeValidation';
 import * as ToolsApi from 'api/tools';
-import { adjustFormat } from 'util/DateTime';
 
 jest.mock('api/tools', () => ({
   testNaturalDate: jest.fn(),
@@ -40,7 +39,6 @@ describe('TimeRangeValidation', () => {
       const errors = await TimeRangeValidation(
         { type: 'keyword', keyword: '   ' },
         0,
-        (value) => String(value),
         'Europe/Berlin',
       );
 
@@ -53,7 +51,6 @@ describe('TimeRangeValidation', () => {
       const errors = await TimeRangeValidation(
         { type: 'keyword', keyword: 'Last five minutes' },
         0,
-        (value) => String(value),
         'Europe/Berlin',
       );
 
@@ -64,7 +61,7 @@ describe('TimeRangeValidation', () => {
       asMock(ToolsApi.testNaturalDate).mockImplementation(() =>
         Promise.resolve({
           type: 'absolute',
-          from: '2018-11-14 13:52:38',
+          from: '2018-11-04 13:57:38',
           to: '2018-11-14 13:57:38',
           timezone: 'Europe/Berlin',
         }),
@@ -73,11 +70,62 @@ describe('TimeRangeValidation', () => {
       const errors = await TimeRangeValidation(
         { type: 'keyword', keyword: 'Last ten days' },
         86400,
-        (value) => adjustFormat(value),
         'Europe/Berlin',
       );
 
       expect(errors).toEqual({ keyword: 'Range is outside limit duration.' });
+    });
+
+    it('should accept keyword older than limit when range is within limit', async () => {
+      const errors = await TimeRangeValidation(
+        { type: 'keyword', keyword: 'Five minutes in 2018' },
+        86400,
+        'Europe/Berlin',
+      );
+
+      expect(errors).toEqual({});
+    });
+  });
+
+  describe('absolute', () => {
+    it('should accept range older than limit when range is within limit', async () => {
+      const errors = await TimeRangeValidation(
+        { type: 'absolute', from: '2018-11-14 01:00:00.000', to: '2018-11-14 13:00:00.000' },
+        86400,
+        'Europe/Berlin',
+      );
+
+      expect(errors).toEqual({});
+    });
+
+    it('should error when range exceeds limit', async () => {
+      const errors = await TimeRangeValidation(
+        { type: 'absolute', from: '2018-11-12 13:00:00.000', to: '2018-11-14 13:00:00.000' },
+        86400,
+        'Europe/Berlin',
+      );
+
+      expect(errors).toEqual({ from: 'Range is outside limit duration.' });
+    });
+  });
+
+  describe('relative with end', () => {
+    it('should accept range older than limit when range is within limit', async () => {
+      const errors = await TimeRangeValidation({ type: 'relative', from: 7 * 86400, to: 6 * 86400 }, 86400, 'Europe/Berlin');
+
+      expect(errors).toEqual({});
+    });
+
+    it('should error when range exceeds limit', async () => {
+      const errors = await TimeRangeValidation({ type: 'relative', from: 7 * 86400, to: 5 * 86400 }, 86400, 'Europe/Berlin');
+
+      expect(errors).toEqual({ from: 'Range is outside limit duration.' });
+    });
+
+    it('should error when range ending now exceeds limit', async () => {
+      const errors = await TimeRangeValidation({ type: 'relative', from: 2 * 86400 }, 86400, 'Europe/Berlin');
+
+      expect(errors).toEqual({ from: 'Range is outside limit duration.' });
     });
   });
 });

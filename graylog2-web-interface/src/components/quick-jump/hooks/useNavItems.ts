@@ -39,6 +39,8 @@ const useEntityCreatorItems = () => {
   const entityCreators = usePluginEntities('entityCreators');
 
   return entityCreators
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    .filter(({ useCondition }) => useCondition?.() ?? true)
     .filter((creator) => (creator.permissions ? isPermitted(creator.permissions) : true))
     .filter((creator) => isFeatureEnabled(creator.requiredFeatureFlag))
     .map((creator) => ({ type: PAGE_TYPE, link: creator.path, title: creator.title }));
