@@ -1,0 +1,4 @@
+type = "f"
+message = "Catch exceptions due to invalid queries on the Alerts/Events page and handle it more graceful."
+
+pulls = ["26406"]
