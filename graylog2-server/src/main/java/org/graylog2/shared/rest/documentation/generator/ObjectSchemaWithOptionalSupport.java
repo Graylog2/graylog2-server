@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.module.jsonSchema.jakarta.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.jakarta.types.ObjectSchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Nullable;
 
 import java.util.List;
@@ -48,12 +49,12 @@ public class ObjectSchemaWithOptionalSupport extends ObjectSchema {
         this.discriminator = discriminator;
     }
 
+    // A property marked as required, e.g. an id that is only missing before an entity is created, stays required.
     @Override
     public void putOptionalProperty(BeanProperty property, JsonSchema jsonSchema) {
-        if (property.getType().isTypeOrSubTypeOf(Optional.class)) {
-            jsonSchema.setRequired(false);
-        }
-        if (property.getType().getRawClass().isAnnotationPresent(Nullable.class)) {
+        final Schema schema = property.getAnnotation(Schema.class);
+        final boolean required = schema != null && schema.requiredMode() == Schema.RequiredMode.REQUIRED;
+        if (!required && (property.getType().isTypeOrSubTypeOf(Optional.class) || property.getAnnotation(Nullable.class) != null)) {
             jsonSchema.setRequired(false);
         }
         super.putOptionalProperty(property, jsonSchema);
