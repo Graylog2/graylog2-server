@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useContext } from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, act } from 'wrappedTestingLibrary';
 
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
@@ -26,6 +26,8 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import WidgetContext from 'views/components/contexts/WidgetContext';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
 import createSearch from 'views/logic/slices/createSearch';
+import type Search from 'views/logic/search/Search';
+import type { SearchExecutors } from 'views/logic/slices/searchExecutionSlice';
 
 import StandaloneWidgetGroup from './StandaloneWidgetGroup';
 import StandaloneWidgetContextProvider from './StandaloneWidgetContextProvider';
@@ -90,6 +92,34 @@ describe('StandaloneWidgetGroup', () => {
     expect(asMock(executeActiveQuery)).toHaveBeenCalledTimes(1);
   });
 
+  it('prepares the search with the executors of each group, also for equal widgets', async () => {
+    const createStoredSearch = jest.fn(async (search: Search) => search);
+    const storedResultsExecutors: SearchExecutors = {
+      parse: jest.fn(),
+      resultMapper: (result) => result,
+      startJob: jest.fn(),
+      executeJobResult: jest.fn(),
+      cancelJob: jest.fn(),
+      createSearch: createStoredSearch,
+    };
+
+    render(
+      <>
+        <StandaloneWidgetGroup widgets={[widget()]}>
+          <span>Live widget</span>
+        </StandaloneWidgetGroup>
+        <StandaloneWidgetGroup widgets={[widget()]} searchExecutors={storedResultsExecutors}>
+          <span>Stored widget</span>
+        </StandaloneWidgetGroup>
+      </>,
+    );
+    await screen.findByText('Live widget');
+    await screen.findByText('Stored widget');
+
+    expect(createSearch).toHaveBeenCalledTimes(1);
+    expect(createStoredSearch).toHaveBeenCalledTimes(1);
+  });
+
   it('shows an error when preparing the search fails', async () => {
     asMock(createSearch).mockRejectedValueOnce(new Error('Search could not be stored'));
 
@@ -113,5 +143,22 @@ describe('StandaloneWidgetGroup', () => {
     );
 
     await screen.findByText(/mode: read-only/i);
+  });
+
+  it('runs the search of a lazy group only once it comes close to the viewport', async () => {
+    render(
+      <StandaloneWidgetGroup widgets={[widget()]} lazy>
+        <span>Widget content</span>
+      </StandaloneWidgetGroup>,
+    );
+
+    expect(screen.queryByText(/widget content/i)).not.toBeInTheDocument();
+    expect(asMock(executeActiveQuery)).not.toHaveBeenCalled();
+
+    const [reportIntersection] = jest.mocked(window.IntersectionObserver).mock.calls.at(-1);
+    act(() => reportIntersection([{ isIntersecting: true } as IntersectionObserverEntry], undefined));
+
+    await screen.findByText(/widget content/i);
+    expect(asMock(executeActiveQuery)).toHaveBeenCalledTimes(1);
   });
 });

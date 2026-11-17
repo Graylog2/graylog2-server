@@ -14,11 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext, useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
 import { Icon, Center } from 'components/common';
-import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
+import useReportRenderComplete from 'views/components/widgets/useReportRenderComplete';
 
 import styles from './MessageWidgets.css';
 
@@ -51,12 +51,8 @@ const ErrorWidget = ({
   errors,
   title = 'While retrieving data for this widget, the following error(s) occurred:',
 }: Props) => {
-  const onRenderComplete = useContext(RenderCompletionCallback);
-
   // Exports wait for every widget to render, including those that failed.
-  useEffect(() => {
-    onRenderComplete();
-  }, [onRenderComplete]);
+  useReportRenderComplete();
 
   return (
     <Center>

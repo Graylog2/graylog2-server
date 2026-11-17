@@ -24,6 +24,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.core.MediaType;
+import org.graylog2.plugin.rest.ApiError;
 
 import java.util.Optional;
 
@@ -47,11 +49,11 @@ class OptionalResponseFilterTest {
 
 
     @Test
-    void changesStatusToNoContentForEmptyOptional() {
+    void changesStatusToNotFoundForEmptyOptional() {
         doReturn(Optional.empty()).when(response).getEntity();
         toTest.filter(requestContext, response);
-        verify(response).setStatus(204);
-        verify(response).setEntity(null);
+        verify(response).setStatus(404);
+        verify(response).setEntity(ApiError.create("The requested resource doesn't exist."), null, MediaType.APPLICATION_JSON_TYPE);
     }
 
     @Test

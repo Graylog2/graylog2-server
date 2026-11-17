@@ -199,7 +199,11 @@ describe('HeatmapVisualization', () => {
       />,
     );
 
-    const { x, z } = asMock(GenericPlot).mock.calls.at(-1)[0].chartData[0];
+    const { chartData, layout } = asMock(GenericPlot).mock.calls.at(-1)[0];
+    const { x, z } = chartData[0];
+
+    expect(layout.xaxis.type).toBe('date');
+    expect(layout.yaxis.type).toBe('category');
 
     expect(x.map((time: string) => new Date(time).toISOString())).toEqual([
       '2026-08-31T19:02:00.000Z',
