@@ -1,0 +1,8 @@
+type = "f"
+message = "Data Node no longer fails to start when the searchable snapshots cache doesn't fit on the disk and only optional repositories are configured."
+
+details.user = """
+If there is not enough usable disk space for the searchable snapshots node cache, Data Node now starts OpenSearch without the optional snapshot repositories and without the search role, and logs an error instead of failing to start. Repositories configured in the Data Node configuration file, or an explicitly configured search role, still require enough space and fail the startup as before.
+"""
+
+pulls = ["28250"]
