@@ -20,6 +20,7 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import { Extractors } from '@graylog/server-api';
 
 import { asMock } from 'helpers/mocking';
+import type { StubResponse } from 'util/UtilityTypes';
 
 import ExtractorsSection from './ExtractorsSection';
 
@@ -29,7 +30,7 @@ jest.mock('@graylog/server-api', () => ({
   },
 }));
 
-type ExtractorsListResponse = Awaited<ReturnType<typeof Extractors.list>>;
+type ExtractorsListResponse = StubResponse<typeof Extractors.list>;
 
 const input = {
   id: 'input-1',
