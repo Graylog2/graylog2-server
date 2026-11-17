@@ -31,8 +31,8 @@ const DEFAULT_DATA = {
 
 type ResponseData = {
   input_id: string;
-  stream_refs: Array<{ id: string; name: string }>;
-  pipeline_refs: Array<{ id: string; name: string }>;
+  stream_refs: Array<{ id: string; name?: string }>;
+  pipeline_refs: Array<{ id: string; name?: string }>;
 };
 
 const fetchInputReferences = async (inputId: string): Promise<ResponseData> => SystemInputs.getReferences(inputId);
@@ -41,8 +41,8 @@ const useInputReferences = (
   inputId?: string,
 ): {
   data: {
-    stream_refs: Array<{ id: string; name: string }>;
-    pipeline_refs: Array<{ id: string; name: string }>;
+    stream_refs: Array<{ id: string; name?: string }>;
+    pipeline_refs: Array<{ id: string; name?: string }>;
     isInputAlreadyInUse: boolean;
   };
   isLoading: boolean;

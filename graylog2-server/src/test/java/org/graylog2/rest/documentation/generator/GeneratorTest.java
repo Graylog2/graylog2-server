@@ -77,6 +77,8 @@ public class GeneratorTest {
                                      @JsonProperty("optional_list") Optional<List<String>> optionalList,
                                      @JsonProperty("optional_entity") Optional<SampleEntity> optionalEntity,
                                      @JsonProperty("nullable_value") @Nullable String nullableValue,
+                                     @JsonProperty("javax_nullable_value")
+                                     @javax.annotation.Nullable String javaxNullableValue,
                                      @JsonProperty("required_nullable_value") @Nullable @Schema(requiredMode = Schema.RequiredMode.REQUIRED) String requiredNullableValue) {}
 
     public record NestedOptionalProperties(@JsonProperty("nested") OptionalProperties nested) {}
@@ -203,7 +205,8 @@ public class GeneratorTest {
 
         assertThat(properties.get("required_value")).doesNotContainKey("required");
         assertThat(properties.get("required_nullable_value")).doesNotContainKey("required");
-        assertThat(properties).extractingByKeys("optional_map", "optional_list", "optional_entity", "nullable_value")
+        assertThat(properties).extractingByKeys("optional_map", "optional_list", "optional_entity", "nullable_value",
+                        "javax_nullable_value")
                 .allSatisfy(property -> assertThat(property).containsEntry("required", false));
     }
 

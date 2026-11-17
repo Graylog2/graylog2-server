@@ -54,9 +54,14 @@ public class ObjectSchemaWithOptionalSupport extends ObjectSchema {
     public void putOptionalProperty(BeanProperty property, JsonSchema jsonSchema) {
         final Schema schema = property.getAnnotation(Schema.class);
         final boolean required = schema != null && schema.requiredMode() == Schema.RequiredMode.REQUIRED;
-        if (!required && (property.getType().isTypeOrSubTypeOf(Optional.class) || property.getAnnotation(Nullable.class) != null)) {
+        if (!required && (property.getType().isTypeOrSubTypeOf(Optional.class) || isNullable(property))) {
             jsonSchema.setRequired(false);
         }
         super.putOptionalProperty(property, jsonSchema);
+    }
+
+    private static boolean isNullable(BeanProperty property) {
+        return property.getAnnotation(Nullable.class) != null
+                || property.getAnnotation(javax.annotation.Nullable.class) != null;
     }
 }

@@ -360,7 +360,7 @@ declare module 'graylog-web-plugin/plugin' {
       id: string;
       enabled: boolean;
       stream_id: string;
-      retention_time: string;
+      retention_time?: string;
     }>;
     fetchStreamDataLake: (streamId: string) => Promise<{
       id: string;
