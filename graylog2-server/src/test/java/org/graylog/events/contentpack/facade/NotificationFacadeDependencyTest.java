@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.graph.Graph;
 import com.google.common.graph.MutableGraph;
 import org.graylog.events.contentpack.entities.EventNotificationConfigEntity;
@@ -112,6 +113,26 @@ class NotificationFacadeDependencyTest {
         final Graph<Entity> graph = facade.resolveForInstallation(entity, Map.of(), Map.of(REFERENCED, referenced));
 
         assertThat(graph.successors(entity)).containsExactly(referenced);
+    }
+
+    @Test
+    void resolveForInstallationReturnsLoneNodeForUnregisteredConfigType() {
+        final NotificationEntity notificationEntity = NotificationEntity.builder()
+                .title(ValueReference.of("t"))
+                .description(ValueReference.of("d"))
+                .config(new ReferencingConfigEntity(ReferencingConfigEntity.TYPE, "ref-1"))
+                .build();
+        final JsonNode data = objectMapper.convertValue(notificationEntity, JsonNode.class);
+        ((ObjectNode) data.get("config")).put(EventNotificationConfigEntity.TYPE_FIELD, "unregistered-type");
+        final EntityV1 entity = EntityV1.builder()
+                .id(ModelId.of("n-1"))
+                .type(ModelTypes.NOTIFICATION_V1)
+                .data(data)
+                .build();
+
+        final Graph<Entity> graph = facade.resolveForInstallation(entity, Map.of(), Map.of());
+
+        assertThat(graph.nodes()).containsExactly(entity);
     }
 
     @JsonTypeName(ReferencingConfigEntity.TYPE)
