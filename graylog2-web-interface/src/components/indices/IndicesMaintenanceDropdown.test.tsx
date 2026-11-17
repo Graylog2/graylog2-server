@@ -20,6 +20,7 @@ import userEvent from '@testing-library/user-event';
 
 import asMock from 'helpers/mocking/AsMock';
 import usePermissions from 'hooks/usePermissions';
+import AppConfig from 'util/AppConfig';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { cycleActiveWriteIndex, saveIndexSetFieldLimit } from 'components/indices/helpers/indexSetMaintenanceActions';
 
@@ -76,6 +77,17 @@ describe('IndicesMaintenanceDropdown raise max field count', () => {
     await userEvent.click(await screen.findByRole('button', { name: /maintenance/i }));
 
     expect(screen.queryByRole('menuitem', { name: /raise max field count and rotate/i })).not.toBeInTheDocument();
+  });
+
+  it('hides the item on Cloud', async () => {
+    const isCloud = jest.spyOn(AppConfig, 'isCloud').mockReturnValue(true);
+    render(<IndicesMaintenanceDropdown indexSet={indexSet} indexSetId={indexSet.id} />);
+
+    await userEvent.click(await screen.findByRole('button', { name: /maintenance/i }));
+
+    expect(screen.queryByRole('menuitem', { name: /raise max field count and rotate/i })).not.toBeInTheDocument();
+
+    isCloud.mockRestore();
   });
 
   it('saves the limit, then rotates', async () => {

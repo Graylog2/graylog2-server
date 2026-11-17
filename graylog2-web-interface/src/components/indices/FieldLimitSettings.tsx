@@ -20,6 +20,7 @@ import { Field, getIn, useFormikContext } from 'formik';
 import { Alert, Input } from 'components/bootstrap';
 import { ExternalLink, FormikInput, Switch } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
+import AppConfig from 'util/AppConfig';
 import useProfile from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfile';
 import { DEFAULT_FIELD_LIMIT, MAX_FIELD_LIMIT, type FieldLimitErrors } from 'components/indices/helpers/fieldLimit';
 
@@ -84,20 +85,25 @@ const FieldLimitSettings = ({ namePrefix = '', errors = {}, profile = undefined 
   const limitName = `${namePrefix}field_limit`;
   const dynamicMappingName = `${namePrefix}dynamic_mapping_disabled`;
   const fieldLimit = getIn(values, limitName);
+  const isCloud = AppConfig.isCloud();
   const dynamicMappingSavedOff = !!getIn(initialValues, dynamicMappingName);
 
   return (
     <>
-      <FormikInput
-        type="number"
-        id={limitName}
-        name={limitName}
-        label="Max field count"
-        placeholder={`${DEFAULT_FIELD_LIMIT} (default)`}
-        help={`Values from ${DEFAULT_FIELD_LIMIT} to ${MAX_FIELD_LIMIT} are allowed. Leave empty to use the default of ${DEFAULT_FIELD_LIMIT}.`}
-        error={errors.field_limit}
-      />
-      <FieldLimitWarning />
+      {!isCloud && (
+        <>
+          <FormikInput
+            type="number"
+            id={limitName}
+            name={limitName}
+            label="Max field count"
+            placeholder={`${DEFAULT_FIELD_LIMIT} (default)`}
+            help={`Values from ${DEFAULT_FIELD_LIMIT} to ${MAX_FIELD_LIMIT} are allowed. Leave empty to use the default of ${DEFAULT_FIELD_LIMIT}.`}
+            error={errors.field_limit}
+          />
+          <FieldLimitWarning />
+        </>
+      )}
       {profile?.id && <ProfileSizeWarning profileId={profile.id} fieldLimit={fieldLimit || DEFAULT_FIELD_LIMIT} />}
       <Field name={dynamicMappingName}>
         {({ field: { name, value }, form: { setFieldValue } }) => (
