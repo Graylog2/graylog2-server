@@ -427,11 +427,44 @@ describe('IndexSetConfigurationForm', () => {
       expect(screen.queryByLabelText(/disable dynamic index mapping/i)).not.toBeInTheDocument();
     });
 
-    it('Should show the max field count for Illuminate index sets and keep the toggle off', async () => {
+    it('Should show the max field count and an enabled toggle for Illuminate index sets', async () => {
       render(<SUT indexSet={{ ...indexSet, index_template_type: 'illuminate_content' }} />);
 
       expect(await screen.findByRole('spinbutton', { name: /max field count/i })).toBeInTheDocument();
-      expect(await screen.findByLabelText(/disable dynamic index mapping/i)).toBeDisabled();
+      expect(await screen.findByLabelText(/disable dynamic index mapping/i)).toBeEnabled();
+      expect(screen.getByText(/fields first seen later are not searchable/i)).toBeInTheDocument();
+    });
+
+    it('Should show how many fields were kept on Illuminate index sets with dynamic mapping off', async () => {
+      render(
+        <SUT
+          indexSet={{
+            ...indexSet,
+            index_template_type: 'illuminate_content',
+            dynamic_mapping_disabled: true,
+            kept_fields_count: 42,
+          }}
+        />,
+      );
+
+      expect(await screen.findByText(/42 fields were kept from the write index/i)).toBeInTheDocument();
+    });
+
+    it('Should warn when no fields were kept on Illuminate index sets with dynamic mapping off', async () => {
+      render(
+        <SUT
+          indexSet={{
+            ...indexSet,
+            index_template_type: 'illuminate_content',
+            dynamic_mapping_disabled: true,
+            kept_fields_count: null,
+          }}
+        />,
+      );
+
+      expect(
+        await screen.findByText(/only the fields the illuminate package lists stay searchable/i),
+      ).toBeInTheDocument();
     });
 
     it('Should show the backend error on the field', async () => {

@@ -28,6 +28,7 @@ export type FieldLimitErrors = {
 type FieldLimitValues = {
   field_limit?: number | null;
   dynamic_mapping_disabled?: boolean | null;
+  kept_fields_count?: number | null;
 };
 
 export const isFieldLimitAllowed = (templateType?: string) =>
@@ -36,7 +37,7 @@ export const isFieldLimitAllowed = (templateType?: string) =>
 export const isIlluminateTemplateType = (templateType?: string) => templateType === 'illuminate_content';
 
 export const prepareFieldLimitValues = <T extends FieldLimitValues>(values: T, allowed: boolean = true): T => {
-  const { field_limit, dynamic_mapping_disabled, ...rest } = values;
+  const { field_limit, dynamic_mapping_disabled, kept_fields_count: _keptFieldsCount, ...rest } = values;
 
   if (!allowed) {
     return rest as T;

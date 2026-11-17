@@ -37,6 +37,6 @@ export const cycleActiveWriteIndex = (indexSetId: string) =>
 
 export const saveIndexSetFieldLimit = (indexSet: IndexSet, fieldLimit: number) =>
   updateIndexSet({
-    ...omit(indexSet, ['index_prefix', 'index_analyzer', 'creation_date', 'can_be_default', 'default']),
+    ...omit(indexSet, ['index_prefix', 'index_analyzer', 'creation_date', 'can_be_default', 'default', 'kept_fields_count']),
     field_limit: fieldLimit,
   } as IndexSet);

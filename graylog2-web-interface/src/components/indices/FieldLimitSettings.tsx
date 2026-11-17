@@ -26,7 +26,7 @@ import { DEFAULT_FIELD_LIMIT, MAX_FIELD_LIMIT, type FieldLimitErrors } from 'com
 type Props = {
   namePrefix?: string;
   errors?: FieldLimitErrors;
-  profile?: { id: string | null | undefined; isIlluminate: boolean };
+  profile?: { id: string | null | undefined; isIlluminate: boolean; keptFieldsCount?: number | null };
 };
 
 export const FieldLimitWarning = ({ showRotateHint = true }: { showRotateHint?: boolean }) => (
@@ -55,21 +55,36 @@ const ProfileSizeWarning = ({ profileId, fieldLimit }: { profileId: string; fiel
   );
 };
 
+const KeptFieldsInfo = ({ keptFieldsCount = undefined }: { keptFieldsCount?: number | null }) =>
+  (keptFieldsCount ?? 0) > 0 ? (
+    <Alert bsStyle="info">
+      {keptFieldsCount} fields were kept from the write index and stay searchable. Fields first seen later are not
+      searchable.
+    </Alert>
+  ) : (
+    <Alert bsStyle="warning">
+      No fields were kept from the write index. Only the fields the Illuminate package lists stay searchable.
+    </Alert>
+  );
+
 const dynamicMappingHelp = (profile: Props['profile'], checked: boolean) => {
+  if (profile?.isIlluminate) {
+    return 'The fields the write index has when you save stay searchable. Fields first seen later are not searchable. If a source floods this index set with new fields, fix the source and rotate the index set before you turn dynamic mapping off. A change applies when the index set rotates next. Use the Rotate action to apply it right away.';
+  }
+
   if (profile && !profile.id && !checked) {
-    return profile.isIlluminate
-      ? 'Illuminate index sets cannot have a field type profile, so dynamic index mapping stays on.'
-      : 'Assign a field type profile to this index set first.';
+    return 'Assign a field type profile to this index set first.';
   }
 
   return 'Fields that are not in the field type profile are kept in the stored message and show in message details, but they are not searchable and do not count toward the limit. A change applies when the index set rotates next. Use the Rotate action to apply it right away.';
 };
 
 const FieldLimitSettings = ({ namePrefix = '', errors = {}, profile = undefined }: Props) => {
-  const { values } = useFormikContext();
+  const { values, initialValues } = useFormikContext();
   const limitName = `${namePrefix}field_limit`;
   const dynamicMappingName = `${namePrefix}dynamic_mapping_disabled`;
   const fieldLimit = getIn(values, limitName);
+  const dynamicMappingSavedOff = !!getIn(initialValues, dynamicMappingName);
 
   return (
     <>
@@ -96,12 +111,13 @@ const FieldLimitSettings = ({ namePrefix = '', errors = {}, profile = undefined 
               name={name}
               aria-label="Disable dynamic index mapping"
               checked={!!value}
-              disabled={!!profile && !profile.id && !value}
+              disabled={!!profile && !profile.isIlluminate && !profile.id && !value}
               onChange={(event) => setFieldValue(name, event.target.checked)}
             />
           </Input>
         )}
       </Field>
+      {profile?.isIlluminate && dynamicMappingSavedOff && <KeptFieldsInfo keptFieldsCount={profile.keptFieldsCount} />}
     </>
   );
 };

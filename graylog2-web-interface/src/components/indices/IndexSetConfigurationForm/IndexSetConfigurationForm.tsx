@@ -477,6 +477,7 @@ const IndexSetConfigurationForm = ({
                         profile={{
                           id: values.field_type_profile,
                           isIlluminate: isIlluminateTemplateType(indexSet.index_template_type),
+                          keptFieldsCount: indexSet.kept_fields_count,
                         }}
                       />
                     </Section>

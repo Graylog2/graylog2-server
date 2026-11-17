@@ -49,6 +49,7 @@ export type IndexSetConfig = {
   field_type_profile?: string | null;
   field_limit?: number | null;
   dynamic_mapping_disabled?: boolean | null;
+  kept_fields_count?: number | null;
   index_template_type?: string;
   index_set_template_id?: string | null;
   writable: boolean;
