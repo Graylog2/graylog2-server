@@ -22,6 +22,9 @@ import { DATA_TIERING_TYPE } from 'components/indices/data-tiering';
 import { ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import IndexSetMaintenanceDialog from 'components/indices/IndexSetMaintenanceDialog';
+import IncreaseFieldLimitDialog from 'components/indices/IncreaseFieldLimitDialog';
+import { isFieldLimitAllowed } from 'components/indices/helpers/fieldLimit';
+import usePermissions from 'hooks/usePermissions';
 import type { IndexSetMaintenanceAction } from 'components/indices/IndexSetMaintenanceDialog';
 
 type Props = {
@@ -34,7 +37,14 @@ const IndicesMaintenanceDropdown = ({ indexSet, indexSetId }: Props) => {
     (plugin) => plugin.type === DATA_TIERING_TYPE.HOT_WARM,
   );
 
+  const { isPermitted } = usePermissions();
   const [pendingAction, setPendingAction] = useState<IndexSetMaintenanceAction | null>(null);
+  const [showFieldLimitDialog, setShowFieldLimitDialog] = useState(false);
+  const canRaiseFieldLimit =
+    !!indexSet?.writable &&
+    isFieldLimitAllowed(indexSet.index_template_type) &&
+    isPermitted(`indexsets:edit:${indexSetId}`) &&
+    isPermitted('deflector:cycle');
 
   return (
     <>
@@ -48,11 +58,19 @@ const IndicesMaintenanceDropdown = ({ indexSet, indexSetId }: Props) => {
               Rotate active write index
             </MenuItem>
           )}
+          {canRaiseFieldLimit && (
+            <MenuItem eventKey="4" onClick={() => setShowFieldLimitDialog(true)}>
+              Raise max field count and rotate
+            </MenuItem>
+          )}
           {indexSet?.data_tiering_status?.has_failed_snapshot && dataTieringPlugin && (
             <dataTieringPlugin.DeleteFailedSnapshotMenuItem eventKey="3" indexSetId={indexSetId} />
           )}
         </DropdownButton>
       </ButtonGroup>
+      {showFieldLimitDialog && (
+        <IncreaseFieldLimitDialog indexSet={indexSet} onClose={() => setShowFieldLimitDialog(false)} />
+      )}
       {pendingAction && (
         <IndexSetMaintenanceDialog
           action={pendingAction}

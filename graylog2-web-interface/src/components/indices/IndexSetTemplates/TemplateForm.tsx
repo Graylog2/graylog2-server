@@ -21,6 +21,7 @@ import React, { useState } from 'react';
 import { Formik, Form, Field } from 'formik';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import cloneDeep from 'lodash/cloneDeep';
+import isEmpty from 'lodash/isEmpty';
 
 import type {
   RotationStrategyConfig,
@@ -40,13 +41,16 @@ import {
 } from 'components/indices/data-tiering';
 import useProductName from 'brand-customization/useProductName';
 import useIndicesConfiguration from 'hooks/useIndicesConfiguration';
+import FieldLimitSettings from 'components/indices/FieldLimitSettings';
+import { extractFieldLimitErrors, prepareFieldLimitValues } from 'components/indices/helpers/fieldLimit';
+import type { FieldLimitErrors } from 'components/indices/helpers/fieldLimit';
 
 type Props = {
   initialValues?: IndexSetTemplate;
   submitButtonText: string;
   submitLoadingText: string;
   onCancel: () => void;
-  onSubmit: (template: IndexSetTemplate) => void;
+  onSubmit: (template: IndexSetTemplate) => Promise<unknown> | void;
 };
 
 type RetentionConfigSegment = 'data_tiering' | 'legacy';
@@ -219,6 +223,7 @@ const TemplateForm = ({
   const [selectedRetentionSegment, setSelectedRetentionSegment] =
     useState<RetentionConfigSegment>(initialSelectedSegment);
   const [fieldTypeRefreshIntervalUnit, setFieldTypeRefreshIntervalUnit] = useState<Unit>('seconds');
+  const [fieldLimitErrors, setFieldLimitErrors] = useState<FieldLimitErrors>({});
 
   const { rotationStrategies, retentionStrategies, retentionStrategiesContext } = useIndicesConfiguration({
     enabled: selectedRetentionSegment === 'legacy',
@@ -229,7 +234,7 @@ const TemplateForm = ({
     const { retention_strategy, retention_strategy_class, rotation_strategy, rotation_strategy_class, ...other } =
       values;
 
-    const index_set_config = { ...values.index_set_config };
+    const index_set_config = prepareFieldLimitValues({ ...values.index_set_config });
 
     template = { ...other };
 
@@ -249,7 +254,17 @@ const TemplateForm = ({
       },
     };
 
-    onSubmit(template as unknown as IndexSetTemplate);
+    setFieldLimitErrors({});
+
+    return Promise.resolve(onSubmit(template as unknown as IndexSetTemplate)).catch((error) => {
+      const errors = extractFieldLimitErrors(error);
+
+      if (isEmpty(errors)) {
+        throw error;
+      }
+
+      setFieldLimitErrors(errors);
+    });
   };
 
   const prepareInitialValues = () => {
@@ -399,6 +414,7 @@ const TemplateForm = ({
                         />
                       )}
                     </Field>
+                    <FieldLimitSettings namePrefix="index_set_config." errors={fieldLimitErrors} />
                   </Section>
 
                   <Section title="Rotation & Retention">

@@ -28,6 +28,8 @@ type IndexSetDefaultFields = Pick<
   | 'index_optimization_disabled'
   | 'field_type_refresh_interval'
   | 'field_restrictions'
+  | 'field_limit'
+  | 'dynamic_mapping_disabled'
 >;
 
 export type IndexSetsDefaultConfiguration = IndexSetDefaultFields & {

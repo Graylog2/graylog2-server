@@ -47,6 +47,8 @@ export type IndexSetConfig = {
   index_optimization_disabled: boolean;
   field_type_refresh_interval: number;
   field_type_profile?: string | null;
+  field_limit?: number | null;
+  dynamic_mapping_disabled?: boolean | null;
   index_template_type?: string;
   index_set_template_id?: string | null;
   writable: boolean;
