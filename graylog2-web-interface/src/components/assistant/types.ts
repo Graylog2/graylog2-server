@@ -24,6 +24,8 @@ export type SearchPage = {
   active_query_id?: string;
   overrides?: { query?: string; timerange?: TimeRangeJson; parameter_values?: Record<string, unknown> };
   focused_widget_id?: string;
+  // Whether the focused widget is open in its editor, whose changes are not in `view` until they are applied.
+  focused_widget_editing?: boolean;
 };
 
 export type NotebookPage = {
