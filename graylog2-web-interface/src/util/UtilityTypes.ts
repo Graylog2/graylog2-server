@@ -18,3 +18,5 @@
 export type ExtractObjectValues<T extends object> = {
   [K in keyof T]: T[K] extends object ? ExtractObjectValues<T[K]> : T[K];
 }[keyof T];
+
+export type StubResponse<F extends (...args: never[]) => Promise<unknown>> = Awaited<ReturnType<F>>;

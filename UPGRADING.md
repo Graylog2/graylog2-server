@@ -37,12 +37,13 @@ following locations where they are displayed:
 
 ## Java API Changes
 
-- tbd
+- REST resources that return an empty `Optional` now respond with `404 Not Found` instead of `204 No Content`.
+  To keep the previous behavior, return a `204 No Content` response explicitly.
 
 ## REST API Endpoint Changes
 
 The following REST API changes have been made.
 
-| Endpoint             | Description                        |
-|----------------------|------------------------------------|
-| `GET /<endpoint>`    | Description of the endpoint change |
+| Endpoint                     | Description                                                                    |
+|------------------------------|--------------------------------------------------------------------------------|
+| `GET /events/{event_id}`     | Responds with `404 Not Found` instead of `204 No Content` for a missing event. |

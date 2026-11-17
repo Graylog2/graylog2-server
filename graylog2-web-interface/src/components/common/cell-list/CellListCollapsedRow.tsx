@@ -14,13 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import generateId from 'logic/generateId';
+import styled, { css } from 'styled-components';
 
-const clientId = generateId();
+// Collapsed, the list stays on one line, so the row keeps its height.
+const CellListCollapsedRow = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacings.xs};
+    min-width: 0;
+  `,
+);
 
-/**
- * Identifies this browser tab for the lifetime of the page, e.g. to tell several tabs of the same user apart.
- */
-const useClientId = () => clientId;
-
-export default useClientId;
+export default CellListCollapsedRow;

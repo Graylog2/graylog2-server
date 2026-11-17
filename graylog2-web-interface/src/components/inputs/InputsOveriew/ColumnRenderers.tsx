@@ -86,8 +86,7 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
     },
     [METRIC_COLUMN_IDS.associatedStreams]: {
       renderCell: (_value: unknown, input: InputSummary) => <AssociatedStreamsCell input={input} />,
-      staticWidth: 'matchHeader',
-      textAlign: 'right',
+      staticWidth: COLUMN_WIDTH.reference,
     },
   },
 });
