@@ -262,6 +262,7 @@ declare module 'graylog-web-plugin/plugin' {
     permissions?: Permissions;
     telemetryEvent?: CreatorTelemetryEvent;
     requiredFeatureFlag?: string;
+    useCondition?: () => boolean;
   }
 
   interface EntityActions {
