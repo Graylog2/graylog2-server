@@ -55,7 +55,7 @@ public class LookupTableTesterResource extends RestResource {
     @GET
     @Operation(summary = "Look up a string in a lookup table")
     @Timed
-    public LookupTableTesterResponse testLookupTable(@QueryParam("lookup_table_name") @NotEmpty String lookupTableName,
+    public LookupTableTesterResponse lookupTableTest(@QueryParam("lookup_table_name") @NotEmpty String lookupTableName,
                                                      @QueryParam("string") @NotEmpty String string) {
         return doTestLookupTable(string, lookupTableName);
     }
