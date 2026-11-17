@@ -37,6 +37,7 @@ import Series from 'views/logic/aggregationbuilder/Series';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
+import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import { addWidget } from 'views/logic/slices/widgetActions';
@@ -146,6 +147,7 @@ describe('SearchPageAssistantContext', () => {
 
   beforeAll(() => {
     VisualizationConfig.registerSubtype('bar', BarVisualizationConfig);
+    VisualizationConfig.registerSubtype('line', LineVisualizationConfig);
   });
 
   beforeEach(() => {
@@ -354,6 +356,41 @@ describe('SearchPageAssistantContext', () => {
     const { config } = updatedViewState().widgets.first() as AggregationWidget;
 
     expect(config.visualizationConfig).toEqual(BarVisualizationConfig.create('group', 'logarithmic', {}));
+  });
+
+  it('refuses to change the settings of another visualization than the widget shows', async () => {
+    mockPageWithBarChart(barChartWithAxes);
+    const tools = renderTools();
+
+    await expect(
+      tools().update_widget({ widget_id: 'w1', visualization: 'line', visualization_config: { interpolation: 'spline' } }),
+    ).rejects.toThrow('The widget shows a bar visualization now, not line.');
+  });
+
+  it('applies the settings of another visualization to its defaults', async () => {
+    mockPageWithBarChart(barChartWithAxes);
+    const tools = renderTools();
+
+    await tools().update_widget({
+      widget_id: 'w1',
+      config: {
+        row_pivots: [{ fields: ['timestamp'], type: 'time', config: { interval: { type: 'auto', scaling: 1.0 } } }],
+        column_pivots: [],
+        series: [{ function: 'count()', config: {} }],
+        sort: [],
+        visualization: 'line',
+        visualization_config: { interpolation: 'spline' },
+        rollup: true,
+      },
+      visualization_defaults: { interpolation: 'linear', axis_type: 'linear', axis_config: null },
+    });
+
+    const { config } = updatedViewState().widgets.first() as AggregationWidget;
+
+    expect(config.visualization).toBe('line');
+    expect(config.visualizationConfig.toJSON()).toEqual(
+      expect.objectContaining({ interpolation: 'spline', axis_type: 'linear' }),
+    );
   });
 
   it('refuses to change the visualization settings of widgets without a visualization', async () => {

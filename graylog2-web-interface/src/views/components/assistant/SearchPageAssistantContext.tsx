@@ -98,7 +98,10 @@ type Settings = Record<string, unknown>;
 type UpdateWidgetArgs = Partial<WidgetSearchArgs> & {
   widget_id: string;
   config?: AggregationWidgetConfigJson;
-  // Changed settings of the widget's visualization, without changing its aggregation.
+  // The settings of the visualization the config switches to, for those its changes do not give.
+  visualization_defaults?: Settings;
+  // Changed settings of the widget's visualization, which must still be the given one, without changing its aggregation.
+  visualization?: string;
   visualization_config?: Settings;
 };
 
@@ -150,34 +153,48 @@ const mergeSettings = (current: Settings, changes: Settings): Settings =>
     };
   }, current);
 
-// The assistant sends only the visualization settings it changes; the others stay as they are. For another
-// visualization, it sends all of them.
+// The assistant sends only the visualization settings it changes; the others stay as they are, or, for another
+// visualization, become its defaults.
 const withCurrentVisualizationConfig = (
   current: AggregationWidgetConfig,
   changed: AggregationWidgetConfigJson,
-): AggregationWidgetConfigJson =>
-  changed.visualization === current.visualization && current.visualizationConfig
-    ? {
-        ...changed,
-        visualization_config: mergeSettings(
-          visualizationConfigJson(current),
-          (changed.visualization_config ?? {}) as Settings,
-        ) as VisualizationConfigJson,
-      }
-    : changed;
+  defaults: Settings | undefined,
+): AggregationWidgetConfigJson => {
+  const changes = changed.visualization_config as Settings | undefined;
 
-const withChangedSettings = (current: AggregationWidgetConfig, changes: Settings) =>
-  current
+  if (changed.visualization === current.visualization && current.visualizationConfig) {
+    return {
+      ...changed,
+      visualization_config: mergeSettings(visualizationConfigJson(current), changes ?? {}) as VisualizationConfigJson,
+    };
+  }
+
+  return changes
+    ? { ...changed, visualization_config: mergeSettings(defaults ?? {}, changes) as VisualizationConfigJson }
+    : changed;
+};
+
+const withChangedSettings = (current: AggregationWidgetConfig, visualization: string, changes: Settings) => {
+  if (visualization && current.visualization !== visualization) {
+    throw new Error(`The widget shows a ${current.visualization} visualization now, not ${visualization}.`);
+  }
+
+  return current
     .toBuilder()
     .visualizationConfig(
       VisualizationConfig.fromJSON(current.visualization, mergeSettings(visualizationConfigJson(current), changes)),
     )
     .build();
+};
 
 // The changed aggregation, with the settings the user chose for the widget where they still apply: the limits and
 // intervals of its group-bys, the names of its metrics, its sort, and its visualization's settings.
-const mergeAggregation = (current: AggregationWidgetConfig, changedJson: AggregationWidgetConfigJson) => {
-  const changed = AggregationWidgetConfig.fromJSON(withCurrentVisualizationConfig(current, changedJson));
+const mergeAggregation = (
+  current: AggregationWidgetConfig,
+  changedJson: AggregationWidgetConfigJson,
+  defaults: Settings | undefined,
+) => {
+  const changed = AggregationWidgetConfig.fromJSON(withCurrentVisualizationConfig(current, changedJson, defaults));
   const currentPivots = [...current.rowPivots, ...current.columnPivots];
   const keepPivot = (pivot: Pivot) =>
     currentPivots.find(({ type, fields }) => type === pivot.type && isEqual(fields, pivot.fields)) ?? pivot;
@@ -239,7 +256,15 @@ const useSearchPageTools = (): PageTools => {
         return add(withSearch(MessagesWidget.builder().newId().config(config.build()), search).build(), search.title);
       },
       update_widget: async (args) => {
-        const { widget_id: widgetId, title, config, visualization_config: settings, ...search } = args as UpdateWidgetArgs;
+        const {
+          widget_id: widgetId,
+          title,
+          config,
+          visualization_defaults: defaults,
+          visualization,
+          visualization_config: settings,
+          ...search
+        } = args as UpdateWidgetArgs;
         const viewState = dispatch((_dispatch: ViewsDispatch, getState: GetState) => selectActiveViewState(getState()));
         const widget = viewState?.widgets.find(({ id }) => id === widgetId);
 
@@ -255,7 +280,9 @@ const useSearchPageTools = (): PageTools => {
           }
 
           builder = builder.config(
-            config ? mergeAggregation(widget.config, config) : withChangedSettings(widget.config, settings),
+            config
+              ? mergeAggregation(widget.config, config, defaults)
+              : withChangedSettings(widget.config, visualization, settings),
           );
         }
 
