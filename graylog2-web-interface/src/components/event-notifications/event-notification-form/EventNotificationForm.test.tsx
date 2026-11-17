@@ -48,7 +48,7 @@ const plugin = new PluginManifest(
     eventNotificationTypes: [
       notificationType('open-type', 'Open type'),
       notificationType('gated-type', 'Gated type', { useCondition: () => false }),
-      notificationType('restricted-type', 'Restricted type', { requiredPermissions: ['restricted:edit'] }),
+      notificationType('restricted-type', 'Restricted type', { requiredPermissions: ['streams:edit'] }),
     ],
   },
 );
@@ -82,7 +82,7 @@ describe('EventNotificationForm', () => {
 
   beforeEach(() => {
     asMock(usePermissions).mockReturnValue({
-      isPermitted: (permissions) => !permissions.includes('restricted:edit'),
+      isPermitted: (permissions) => !permissions.includes('streams:edit'),
       isAnyPermitted: () => true,
       isAdmin: false,
     });
