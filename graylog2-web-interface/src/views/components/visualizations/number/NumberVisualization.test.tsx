@@ -18,9 +18,10 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import { List } from 'immutable';
 
+import asMock from 'helpers/mocking/AsMock';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
-import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
+import useRenderCompletionCallback from 'views/components/widgets/useRenderCompletionCallback';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series from 'views/logic/aggregationbuilder/Series';
 import NumberVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -33,6 +34,8 @@ import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 
 import NumberVisualization from './NumberVisualization';
+
+jest.mock('views/components/widgets/useRenderCompletionCallback');
 
 jest.mock(
   './AutoFontSizer',
@@ -135,11 +138,9 @@ describe('NumberVisualization', () => {
   it('calls render completion callback after first render', () => {
     const onRenderComplete = jest.fn();
 
-    render(
-      <RenderCompletionCallback.Provider value={onRenderComplete}>
-        <SimplifiedNumberVisualization />
-      </RenderCompletionCallback.Provider>,
-    );
+    asMock(useRenderCompletionCallback).mockReturnValue(onRenderComplete);
+
+    render(<SimplifiedNumberVisualization />);
 
     expect(onRenderComplete).toHaveBeenCalledTimes(1);
   });

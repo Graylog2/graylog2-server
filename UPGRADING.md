@@ -43,16 +43,20 @@ This release includes the following Java API changes.
 |----------------------------------------------------------|-------------------------------------------------------------------|
 | `org.graylog2.plugin.database.users.User#setPermissions` | Deprecated. Will be removed in Graylog 8.0. Assign roles instead. |
 
+- REST resources that return an empty `Optional` now respond with `404 Not Found` instead of `204 No Content`.
+  To keep the previous behavior, return a `204 No Content` response explicitly.
+
 ## REST API Endpoint Changes
 
 This release includes the following REST API changes.
 
-| Endpoint                               | Description                                                                   |
-|----------------------------------------|-------------------------------------------------------------------------------|
-| `POST /users`                          | The `permissions` field is deprecated and now optional. Assign roles instead. |
-| `PUT /users/{userId}`                  | The `permissions` field is deprecated. Assign roles instead.                  |
-| `PUT /users/{username}/permissions`    | Deprecated. Will be removed in Graylog 8.0.                                   |
-| `DELETE /users/{username}/permissions` | Deprecated. Will be removed in Graylog 8.0.                                   |
+| Endpoint                               | Description                                                                    |
+|----------------------------------------|--------------------------------------------------------------------------------|
+| `GET /events/{event_id}`               | Responds with `404 Not Found` instead of `204 No Content` for a missing event. |
+| `POST /users`                          | The `permissions` field is deprecated and now optional. Assign roles instead.  |
+| `PUT /users/{userId}`                  | The `permissions` field is deprecated. Assign roles instead.                   |
+| `PUT /users/{username}/permissions`    | Deprecated. Will be removed in Graylog 8.0.                                    |
+| `DELETE /users/{username}/permissions` | Deprecated. Will be removed in Graylog 8.0.                                    |
 
 ## Deprecation of Direct User Permissions
 

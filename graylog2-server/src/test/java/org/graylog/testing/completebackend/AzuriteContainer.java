@@ -21,13 +21,11 @@ import com.azure.storage.blob.BlobServiceAsyncClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.Network;
 
 public class AzuriteContainer extends GenericContainer<AzuriteContainer> {
 
     private static final String IMAGE_NAME = "mcr.microsoft.com/azure-storage/azurite:3.35.0";
     public static final int PORT = 10000;
-    private final Network network;
 
     public static final String ACCOUNT_NAME = "devstoreaccount1";
     public static final String ACCOUNT_KEY = "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==";
@@ -35,10 +33,6 @@ public class AzuriteContainer extends GenericContainer<AzuriteContainer> {
 
     public AzuriteContainer() {
         super(IMAGE_NAME);
-        this.network = Network.newNetwork();
-
-        withNetwork(network);
-        withNetworkAliases("azurite");
         withExposedPorts(PORT);
         withCommand("azurite-blob", "--blobHost", "0.0.0.0", "--skipApiVersionCheck");
     }
@@ -70,13 +64,5 @@ public class AzuriteContainer extends GenericContainer<AzuriteContainer> {
         BlobServiceClient client = createBlobServiceClient();
         client.createBlobContainer(containerName);
         return client.getBlobContainerClient(containerName);
-    }
-
-    @Override
-    public void close() {
-        super.close();
-        if (network != null) {
-            network.close();
-        }
     }
 }

@@ -50,12 +50,15 @@ const orClause = (values: Array<ValueToAdd>) =>
     { operator: 'OR', withBrackets: false },
   )})`;
 
-type Arguments = {
-  queryId: string;
+type QueryArguments = {
   field: string;
   value?: ValueArgument;
   type: FieldType;
   contexts?: Partial<ActionContexts>;
+};
+
+type Arguments = QueryArguments & {
+  queryId: string;
 };
 
 const valuesFromPath = (contexts: Partial<ActionContexts>) =>
@@ -68,45 +71,52 @@ const valuesFromPath = (contexts: Partial<ActionContexts>) =>
 const valuesFromArray = (field: string, value: Array<QueryValue>, type: FieldType): Array<ValueToAdd> =>
   value.map((arrayValue) => ({ field, value: arrayValue, type }));
 
+// Also used outside of views, e.g. for widgets which keep their own query.
+export const addValueToQuery = (oldQuery: string, { field, value = '', type, contexts }: QueryArguments) => {
+  const hasMultipleValuesInPath = hasMultipleValueForActions(contexts);
+  const fieldValueIsArray = Array.isArray(value);
+
+  const getValues = () => {
+    if (hasMultipleValuesInPath) return valuesFromPath(contexts);
+    if (fieldValueIsArray) return valuesFromArray(field, value, type);
+
+    return [{ field, value, type }];
+  };
+
+  const valuesToAdd: Array<ValueToAdd> = uniq(getValues());
+
+  let newQuery: string;
+
+  const shouldAddValuePathWithOr = hasMultipleValuesInPath && contexts?.valuePathOperator === 'OR';
+  const shouldAddArrayFieldValuesWithOr = !hasMultipleValuesInPath && fieldValueIsArray && valuesToAdd.length > 1;
+
+  if (hasMultipleValuesInPath && contexts?.valuePathOperator === 'EDGE') {
+    newQuery = addToQuery(
+      oldQuery,
+      edgeClause(
+        { field: valuesToAdd[0].field, value: valuesToAdd[0].value },
+        { field: valuesToAdd[1].field, value: valuesToAdd[1].value },
+      ),
+    );
+  } else if (shouldAddValuePathWithOr) {
+    newQuery = addToQuery(oldQuery, orClause(valuesToAdd));
+  } else if (shouldAddArrayFieldValuesWithOr) {
+    newQuery = addToQuery(oldQuery, fieldValueOrClause(field, valuesToAdd));
+  } else {
+    newQuery = valuesToAdd.reduce(
+      (prev, valueToAdd) => formatNewQuery(prev, valueToAdd.field, valueToAdd.value, valueToAdd.type),
+      oldQuery,
+    );
+  }
+
+  return newQuery;
+};
+
 const AddToQueryHandler =
-  ({ queryId, field, value = '', type, contexts }: Arguments) =>
+  ({ queryId, ...args }: Arguments) =>
   async (dispatch: ViewsDispatch, getState: () => RootState) => {
     const oldQuery = selectQueryString(queryId)(getState());
-    const hasMultipleValuesInPath = hasMultipleValueForActions(contexts);
-    const fieldValueIsArray = Array.isArray(value);
-
-    const getValues = () => {
-      if (hasMultipleValuesInPath) return valuesFromPath(contexts);
-      if (fieldValueIsArray) return valuesFromArray(field, value, type);
-
-      return [{ field, value, type }];
-    };
-
-    const valuesToAdd: Array<ValueToAdd> = uniq(getValues());
-
-    let newQuery: string;
-
-    const shouldAddValuePathWithOr = hasMultipleValuesInPath && contexts?.valuePathOperator === 'OR';
-    const shouldAddArrayFieldValuesWithOr = !hasMultipleValuesInPath && fieldValueIsArray && valuesToAdd.length > 1;
-
-    if (hasMultipleValuesInPath && contexts?.valuePathOperator === 'EDGE') {
-      newQuery = addToQuery(
-        oldQuery,
-        edgeClause(
-          { field: valuesToAdd[0].field, value: valuesToAdd[0].value },
-          { field: valuesToAdd[1].field, value: valuesToAdd[1].value },
-        ),
-      );
-    } else if (shouldAddValuePathWithOr) {
-      newQuery = addToQuery(oldQuery, orClause(valuesToAdd));
-    } else if (shouldAddArrayFieldValuesWithOr) {
-      newQuery = addToQuery(oldQuery, fieldValueOrClause(field, valuesToAdd));
-    } else {
-      newQuery = valuesToAdd.reduce(
-        (prev, valueToAdd) => formatNewQuery(prev, valueToAdd.field, valueToAdd.value, valueToAdd.type),
-        oldQuery,
-      );
-    }
+    const newQuery = addValueToQuery(oldQuery, args);
 
     await recordQueryStringUsage(newQuery, oldQuery);
 

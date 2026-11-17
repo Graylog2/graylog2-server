@@ -1,0 +1,3 @@
+type = "f"
+message = "Fix timestamps and other augmented values not being formatted in Markdown link texts."
+pulls = ["28106"]
