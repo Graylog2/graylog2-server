@@ -19,9 +19,11 @@ import * as React from 'react';
 
 import type { Stream } from 'logic/streams/types';
 import { Spinner } from 'components/common';
+import EntityTitlesCellList from 'components/common/EntityTitlesCellList';
+import Routes from 'routing/Routes';
 import { useStreamMetricsFor } from 'components/streams/StreamsOverview/StreamMetricsContext';
 
-import PipelinesList from './PipelinesList';
+const PIPELINE_ENTITY_TYPE = 'pipeline_processor_pipelines';
 
 type Props = {
   stream: Stream;
@@ -42,7 +44,13 @@ const PipelinesCell = ({ stream }: Props) => {
     return null;
   }
 
-  return <PipelinesList pipelineIds={metrics.pipelines} />;
+  return (
+    <EntityTitlesCellList
+      entityIds={metrics.pipelines}
+      entityType={PIPELINE_ENTITY_TYPE}
+      entityRoute={Routes.SYSTEM.PIPELINES.PIPELINE}
+    />
+  );
 };
 
 export default PipelinesCell;
