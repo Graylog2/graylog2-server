@@ -44,6 +44,7 @@ import { createSearch } from 'fixtures/searches';
 import type Widget from 'views/logic/widgets/Widget';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import TextWidget from 'views/logic/widgets/TextWidget';
+import TextWidgetConfig from 'views/logic/widgets/TextWidgetConfig';
 import EventsWidget from 'views/logic/widgets/events/EventsWidget';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import type { FocusContextState } from 'views/components/contexts/WidgetFocusContext';
@@ -283,6 +284,85 @@ describe('SearchPageAssistantContext', () => {
     expect(widget.query).toEqual({ type: 'elasticsearch', query_string: 'action:login_failed' });
     expect(widget.config.visualization).toBe('bar');
     expect(updatedViewState().titles.getIn(['widget', 'w1'])).toBe('Logins per host');
+  });
+
+  const barChartWithAxes = barChart
+    .toBuilder()
+    .config(
+      barChart.config
+        .toBuilder()
+        .visualizationConfig(
+          BarVisualizationConfig.create('group', 'logarithmic', { number: { title: 'Logins', color: '#e6194b' } }),
+        )
+        .build(),
+    )
+    .build();
+
+  it('changes only the visualization settings it is given, merging nested ones', async () => {
+    mockPageWithBarChart(barChartWithAxes);
+    const tools = renderTools();
+
+    await tools().update_widget({
+      widget_id: 'w1',
+      visualization_config: { barmode: 'stack', axis_config: { number: { title: 'Failed logins' }, xaxis: { title: 'Host' } } },
+    });
+
+    const { config } = updatedViewState().widgets.first() as AggregationWidget;
+
+    expect(config.rowPivots.map(({ fields }) => fields)).toEqual([['source']]);
+    expect(config.visualizationConfig).toEqual(
+      BarVisualizationConfig.create('stack', 'logarithmic', {
+        number: { title: 'Failed logins', color: '#e6194b' },
+        xaxis: { title: 'Host' },
+      }),
+    );
+  });
+
+  it('merges nested visualization settings when changing the aggregation', async () => {
+    mockPageWithBarChart(barChartWithAxes);
+    const tools = renderTools();
+
+    await tools().update_widget({
+      widget_id: 'w1',
+      config: {
+        row_pivots: [{ fields: ['source'], type: 'values', config: { limit: 15 } }],
+        column_pivots: [],
+        series: [{ function: 'count()', config: {} }],
+        sort: [],
+        visualization: 'bar',
+        visualization_config: { axis_config: { xaxis: { title: 'Host' } } },
+        rollup: true,
+      },
+    });
+
+    const { config } = updatedViewState().widgets.first() as AggregationWidget;
+
+    expect(config.visualizationConfig).toEqual(
+      BarVisualizationConfig.create('group', 'logarithmic', {
+        number: { title: 'Logins', color: '#e6194b' },
+        xaxis: { title: 'Host' },
+      }),
+    );
+  });
+
+  it('resets visualization settings changed to null', async () => {
+    mockPageWithBarChart(barChartWithAxes);
+    const tools = renderTools();
+
+    await tools().update_widget({ widget_id: 'w1', visualization_config: { axis_config: { number: null } } });
+
+    const { config } = updatedViewState().widgets.first() as AggregationWidget;
+
+    expect(config.visualizationConfig).toEqual(BarVisualizationConfig.create('group', 'logarithmic', {}));
+  });
+
+  it('refuses to change the visualization settings of widgets without a visualization', async () => {
+    mockPageWithBarChart(TextWidget.builder().id('w1').config(new TextWidgetConfig('Notes')).build());
+    const tools = renderTools();
+
+    await expect(tools().update_widget({ widget_id: 'w1', visualization_config: { barmode: 'stack' } })).rejects.toThrow(
+      'Only aggregation widgets',
+    );
   });
 
   it('refuses to change a widget that is not on the shown tab', async () => {
