@@ -78,7 +78,7 @@ class LookupTableTesterResourceTest {
     void rejectTestingLookupTableUserHasNoAccessTo() {
         setUserIsPermittedForLookupTable(false);
 
-        assertThrows(ForbiddenException.class, () -> resource.testLookupTable(tableName, someKey));
+        assertThrows(ForbiddenException.class, () -> resource.lookupTableTest(tableName, someKey));
         assertThrows(ForbiddenException.class, () -> resource.testLookupTable(LookupTableTestRequest.create(someKey, tableName)));
     }
 
@@ -86,7 +86,7 @@ class LookupTableTesterResourceTest {
     void performTestingLookupIfUserHasAccessToTable() {
         setUserIsPermittedForLookupTable(true);
 
-        assertThat(resource.testLookupTable(tableName, someKey))
+        assertThat(resource.lookupTableTest(tableName, someKey))
                 .satisfies(this::assertSuccessfulResponse);
         assertThat(resource.testLookupTable(LookupTableTestRequest.create(someKey, tableName)))
                 .satisfies(this::assertSuccessfulResponse);
@@ -97,7 +97,7 @@ class LookupTableTesterResourceTest {
         setUserIsPermittedForLookupTable(true);
         when(lookupTableService.hasTable(tableName)).thenReturn(false);
 
-        assertThat(resource.testLookupTable(tableName, someKey))
+        assertThat(resource.lookupTableTest(tableName, someKey))
                 .satisfies(this::assertErrorResponse);
         assertThat(resource.testLookupTable(LookupTableTestRequest.create(someKey, tableName)))
                 .satisfies(this::assertErrorResponse);
