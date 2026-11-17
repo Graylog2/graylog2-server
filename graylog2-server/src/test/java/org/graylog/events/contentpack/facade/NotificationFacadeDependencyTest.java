@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -133,6 +134,24 @@ class NotificationFacadeDependencyTest {
         final Graph<Entity> graph = facade.resolveForInstallation(entity, Map.of(), Map.of());
 
         assertThat(graph.nodes()).containsExactly(entity);
+    }
+
+    @Test
+    void resolveForInstallationRejectsMalformedConfig() {
+        final NotificationEntity notificationEntity = NotificationEntity.builder()
+                .title(ValueReference.of("t"))
+                .description(ValueReference.of("d"))
+                .config(new ReferencingConfigEntity(ReferencingConfigEntity.TYPE, "ref-1"))
+                .build();
+        final JsonNode data = objectMapper.convertValue(notificationEntity, JsonNode.class);
+        ((ObjectNode) data.get("config")).putArray("ref_id");
+        final EntityV1 entity = EntityV1.builder()
+                .id(ModelId.of("n-1"))
+                .type(ModelTypes.NOTIFICATION_V1)
+                .data(data)
+                .build();
+
+        assertThrows(IllegalArgumentException.class, () -> facade.resolveForInstallation(entity, Map.of(), Map.of()));
     }
 
     @JsonTypeName(ReferencingConfigEntity.TYPE)
