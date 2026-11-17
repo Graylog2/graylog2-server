@@ -26,6 +26,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
@@ -43,6 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+@Testcontainers
 @ExtendWith(MockitoExtension.class)
 class S3GeoIpFileServiceIT {
     private static final String BUCKET = "geoip-bucket";
@@ -60,7 +62,6 @@ class S3GeoIpFileServiceIT {
 
     @BeforeEach
     void setUp(@TempDir Path junitTempDir) {
-        minio.start();
         s3Client = minio.getClient();
 
         //And now to the service itself:

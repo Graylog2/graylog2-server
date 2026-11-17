@@ -21,7 +21,6 @@ import com.google.cloud.storage.BucketInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.Network;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -31,15 +30,10 @@ import java.net.http.HttpResponse;
 public class FakeGCSContainer extends GenericContainer<FakeGCSContainer> {
     private static final String IMAGE_NAME = "fsouza/fake-gcs-server";
     private static final int PORT = 4443;
-    private final Network network;
     private final String projectId  = "graylog-project";
 
     public FakeGCSContainer() {
         super(IMAGE_NAME);
-        this.network = Network.newNetwork();
-
-        withNetwork(network);
-        withNetworkAliases("gcp");
         withExposedPorts(PORT);
 
         withCreateContainerCmdModifier(cmd -> cmd.withEntrypoint(
@@ -88,13 +82,5 @@ public class FakeGCSContainer extends GenericContainer<FakeGCSContainer> {
 
     public String getProjectId() {
         return projectId;
-    }
-
-    @Override
-    public void close() {
-        super.close();
-        if (network != null) {
-            network.close();
-        }
     }
 }
