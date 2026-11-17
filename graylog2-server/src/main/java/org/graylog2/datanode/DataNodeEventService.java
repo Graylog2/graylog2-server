@@ -38,8 +38,9 @@ public class DataNodeEventService {
     @SuppressWarnings("unused")
     public void onNotificationEvent(DataNodeNotficationEvent event) {
         Notification notification = notificationService.buildNow();
-        notification.addSeverity(Notification.Severity.NORMAL);
+        notification.addSeverity(event.severity());
         notification.addType(event.notificationType());
+        notification.addNode(event.nodeId());
         event.details().forEach(notification::addDetail);
         notificationService.publishIfFirst(notification);
     }
