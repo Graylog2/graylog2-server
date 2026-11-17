@@ -16,11 +16,11 @@
  */
 import generateId from 'logic/generateId';
 
-const clientId = generateId();
-
 /**
  * Identifies this browser tab for the lifetime of the page, e.g. to tell several tabs of the same user apart.
+ * It is generated once when the module loads, so every import in the tab gets the same id, while calling
+ * `generateId` directly returns a new one each time.
  */
-const useClientId = () => clientId;
+const clientId = generateId();
 
-export default useClientId;
+export default clientId;

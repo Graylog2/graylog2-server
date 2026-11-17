@@ -16,9 +16,8 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
-import ApiRoutes from 'routing/ApiRoutes';
+import { EntityScope } from '@graylog/server-api';
+
 import UserNotification from 'util/UserNotification';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
 import { onError } from 'util/conditional/onError';
@@ -28,28 +27,16 @@ export type ScopeParams = {
   is_deletable?: boolean;
 };
 
-type ScopeName = 'DEFAULT' | 'ILLUMINATE';
-
-type EntityScopeRecord = Record<ScopeName, ScopeParams>;
-
-type EntityScopeType = {
-  entity_scopes: EntityScopeRecord;
-};
-
 export type PermissionsByScopeReturnType = {
   loadingScopePermissions: boolean;
   scopePermissions: ScopeParams;
   checkPermissions: (inEntity: Partial<GenericEntityType>) => boolean;
 };
 
-function fetchScopePermissions(): Promise<EntityScopeType> {
-  return fetch('GET', qualifyUrl(ApiRoutes.EntityScopeController.getScope().url));
-}
-
 const useGetPermissionsByScope = (entity: Partial<GenericEntityType> = undefined) => {
   const { data, isLoading } = useQuery({
     queryKey: ['scope-permissions'],
-    queryFn: () => onError(fetchScopePermissions(), (e) => UserNotification.error(e.message)),
+    queryFn: () => onError(EntityScope.getAllEntityScopes(), (e) => UserNotification.error(e.message)),
     retry: 1,
 
     // cache for 3 hours
