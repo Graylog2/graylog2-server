@@ -185,6 +185,14 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
 
     public abstract Builder toBuilder();
 
+    public EventDefinitionDto prepareForSave() {
+        final EventProcessorConfig preparedConfig = config().prepareForSave();
+        if (preparedConfig == config()) {
+            return this;
+        }
+        return toBuilder().config(preparedConfig).build();
+    }
+
     public ValidationResult validate(@Nullable EventDefinitionDto oldEventDefinitionDto,
                                      EventDefinitionConfiguration eventDefinitionConfiguration,
                                      UserContext userContext) {

@@ -38,10 +38,12 @@ import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorEngine;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
+import org.graylog.security.shares.CreateEntityRequest;
 import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.shared.security.RestPermissions;
 import org.junit.jupiter.api.BeforeEach;
@@ -106,6 +108,37 @@ public class EventDefinitionsResourceTest {
         resource = new TestEventDefinitionsResource(subject);
         when(config1.type()).thenReturn(CONFIG_TYPE_1);
         when(config2.type()).thenReturn(CONFIG_TYPE_2);
+    }
+
+    @Test
+    public void validateEventDefinitionValidatesThePreparedConfig() {
+        when(config1.prepareForSave()).thenReturn(config2);
+        when(config2.validate(any())).thenReturn(new ValidationResult());
+        when(config2.validate(any(), any(), any())).thenReturn(new ValidationResult());
+
+        resource.validateEventDefinition(eventDefinitionDto(config1), mock(UserContext.class));
+
+        verify(config2).validate(any());
+        verify(config1, never()).validate(any());
+    }
+
+    @Test
+    public void createValidatesAndStoresThePreparedConfig() {
+        when(config1.prepareForSave()).thenReturn(config2);
+        when(config2.validate(any())).thenReturn(new ValidationResult());
+        when(config2.validate(any(), any(), any())).thenReturn(new ValidationResult());
+        when(eventDefinitionHandler.create(any(), any())).thenAnswer(invocation ->
+                invocation.<EventDefinitionDto>getArgument(0).toBuilder().id("54e3deadbeefdeadbeefaffe").build());
+        final UserContext userContext = mock(UserContext.class);
+        when(userContext.getUser()).thenReturn(mock(User.class));
+
+        resource.create(true, CreateEntityRequest.create(eventDefinitionDto(config1), null), userContext);
+
+        final ArgumentCaptor<EventDefinitionDto> captor = ArgumentCaptor.forClass(EventDefinitionDto.class);
+        verify(eventDefinitionHandler).create(captor.capture(), any());
+        Assertions.assertThat(captor.getValue().config()).isSameAs(config2);
+        verify(config2).validate(any());
+        verify(config1, never()).validate(any());
     }
 
     @Test

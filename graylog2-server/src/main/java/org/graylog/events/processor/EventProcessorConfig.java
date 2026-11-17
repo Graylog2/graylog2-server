@@ -128,6 +128,10 @@ public interface EventProcessorConfig extends ContentPackable<EventProcessorConf
         return null;
     }
 
+    default EventProcessorConfig prepareForSave() {
+        return this;
+    }
+
     interface Builder<SELF> {
         @JsonProperty(TYPE_FIELD)
         SELF type(String type);

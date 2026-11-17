@@ -303,12 +303,13 @@ public class EventDefinitionHandler {
     }
 
     private EventDefinitionDto createEventDefinition(EventDefinitionDto unsavedEventDefinition, Optional<User> user) {
+        final EventDefinitionDto preparedEventDefinition = unsavedEventDefinition.prepareForSave();
         EventDefinitionDto eventDefinition;
         if (user.isPresent()) {
-            eventDefinition = eventDefinitionService.saveWithOwnership(unsavedEventDefinition, user.get());
+            eventDefinition = eventDefinitionService.saveWithOwnership(preparedEventDefinition, user.get());
             LOG.debug("Created event definition <{}/{}> with user <{}>", eventDefinition.id(), eventDefinition.title(), user.get());
         } else {
-            eventDefinition = eventDefinitionService.save(unsavedEventDefinition);
+            eventDefinition = eventDefinitionService.save(preparedEventDefinition);
             LOG.debug("Created event definition <{}/{}> without user", eventDefinition.id(), eventDefinition.title());
         }
         return eventDefinition;
@@ -320,7 +321,7 @@ public class EventDefinitionHandler {
     }
 
     private EventDefinitionDto updateEventDefinition(EventDefinitionDto updatedEventDefinition, boolean checkMutability) {
-        final EventDefinitionDto eventDefinition = eventDefinitionService.save(updatedEventDefinition, checkMutability);
+        final EventDefinitionDto eventDefinition = eventDefinitionService.save(updatedEventDefinition.prepareForSave(), checkMutability);
         LOG.debug("Updated event definition <{}/{}>", eventDefinition.id(), eventDefinition.title());
         return eventDefinition;
     }

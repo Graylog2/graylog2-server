@@ -390,7 +390,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
     public Response create(@Parameter(name = "schedule") @QueryParam("schedule") @DefaultValue("true") boolean schedule,
                            @Parameter(name = "JSON Body") CreateEntityRequest<EventDefinitionDto> createEntityRequest, @Context UserContext userContext) {
-        final EventDefinitionDto dto = createEntityRequest.entity();
+        final EventDefinitionDto dto = createEntityRequest.entity().prepareForSave();
         checkEventDefinitionPermissions(dto, "create");
 
         final ValidationResult result = dto.validate(null, eventDefinitionConfiguration, userContext);
@@ -427,6 +427,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                 .orElseThrow(() -> new NotFoundException("Event definition <" + definitionId + "> doesn't exist"));
         checkProcessorConfig(oldDto, dto);
 
+        dto = dto.prepareForSave();
         final ValidationResult result = dto.validate(oldDto, eventDefinitionConfiguration, userContext);
         tacticsTechniquesValidator.validate(dto, result);
         if (!definitionId.equals(dto.id())) {
@@ -608,10 +609,11 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     public ValidationResult validateEventDefinition(@RequestBody(required = true)
                                          @Valid @NotNull EventDefinitionDto toValidate,
                                      @Context UserContext userContext) {
-        EventProcessorConfig oldConfig = dbService.get(toValidate.id()).map(EventDefinition::config).orElse(null);
-        ValidationResult validationResult = toValidate.config().validate(userContext);
-        validationResult.addAll(toValidate.config().validate(userContext, oldConfig, eventDefinitionConfiguration));
-        tacticsTechniquesValidator.validate(toValidate, validationResult);
+        final EventDefinitionDto prepared = toValidate.prepareForSave();
+        EventProcessorConfig oldConfig = dbService.get(prepared.id()).map(EventDefinition::config).orElse(null);
+        ValidationResult validationResult = prepared.config().validate(userContext);
+        validationResult.addAll(prepared.config().validate(userContext, oldConfig, eventDefinitionConfiguration));
+        tacticsTechniquesValidator.validate(prepared, validationResult);
         return validationResult;
     }
 

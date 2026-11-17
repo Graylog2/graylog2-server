@@ -72,6 +72,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -177,6 +178,54 @@ public class EventDefinitionHandlerTest {
             assertThat(schedule.interval()).isEqualTo(60001);
             assertThat(schedule.unit()).isEqualTo(TimeUnit.MILLISECONDS);
         });
+    }
+
+    @Test
+    public void createStoresConfigReturnedByPrepareForSave() {
+        final TestEventProcessorConfig config = spy(testConfig("original"));
+        final TestEventProcessorConfig prepared = testConfig("prepared");
+        doReturn(prepared).when(config).prepareForSave();
+
+        final EventDefinitionDto dto = handler.create(testDefinition(config), Optional.empty());
+
+        assertThat(dto.config()).isEqualTo(prepared);
+        assertThat(eventDefinitionService.get(dto.id())).get().satisfies(saved ->
+                assertThat(saved.config()).isEqualTo(prepared));
+    }
+
+    @Test
+    public void updateStoresConfigReturnedByPrepareForSave() {
+        final EventDefinitionDto existing = handler.create(testDefinition(testConfig("original")), Optional.empty());
+        final TestEventProcessorConfig config = spy(testConfig("updated"));
+        final TestEventProcessorConfig prepared = testConfig("prepared");
+        doReturn(prepared).when(config).prepareForSave();
+
+        final EventDefinitionDto dto = handler.update(existing.toBuilder().config(config).build(), true);
+
+        assertThat(dto.config()).isEqualTo(prepared);
+        assertThat(eventDefinitionService.get(existing.id())).get().satisfies(saved ->
+                assertThat(saved.config()).isEqualTo(prepared));
+    }
+
+    private static TestEventProcessorConfig testConfig(String message) {
+        return TestEventProcessorConfig.builder()
+                .message(message)
+                .searchWithinMs(300000)
+                .executeEveryMs(60001)
+                .build();
+    }
+
+    private static EventDefinitionDto testDefinition(TestEventProcessorConfig config) {
+        return EventDefinitionDto.builder()
+                .title("Test")
+                .description("A test event definition")
+                .config(config)
+                .priority(3)
+                .alert(false)
+                .notificationSettings(EventNotificationSettings.withGracePeriod(60000))
+                .keySpec(ImmutableList.of("a", "b"))
+                .notifications(ImmutableList.of())
+                .build();
     }
 
     @Test
