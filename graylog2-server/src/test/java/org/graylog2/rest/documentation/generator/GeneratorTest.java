@@ -31,6 +31,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.GET;
@@ -74,7 +75,9 @@ public class GeneratorTest {
     public record OptionalProperties(@JsonProperty("required_value") String requiredValue,
                                      @JsonProperty("optional_map") Optional<Map<String, String>> optionalMap,
                                      @JsonProperty("optional_list") Optional<List<String>> optionalList,
-                                     @JsonProperty("optional_entity") Optional<SampleEntity> optionalEntity) {}
+                                     @JsonProperty("optional_entity") Optional<SampleEntity> optionalEntity,
+                                     @JsonProperty("nullable_value") @Nullable String nullableValue,
+                                     @JsonProperty("required_nullable_value") @Nullable @Schema(requiredMode = Schema.RequiredMode.REQUIRED) String requiredNullableValue) {}
 
     public record NestedOptionalProperties(@JsonProperty("nested") OptionalProperties nested) {}
 
@@ -199,7 +202,8 @@ public class GeneratorTest {
         final Map<String, Map<String, Object>> properties = result.read("$.models.GeneratorTest__OptionalProperties.properties");
 
         assertThat(properties.get("required_value")).doesNotContainKey("required");
-        assertThat(properties).extractingByKeys("optional_map", "optional_list", "optional_entity")
+        assertThat(properties.get("required_nullable_value")).doesNotContainKey("required");
+        assertThat(properties).extractingByKeys("optional_map", "optional_list", "optional_entity", "nullable_value")
                 .allSatisfy(property -> assertThat(property).containsEntry("required", false));
     }
 
