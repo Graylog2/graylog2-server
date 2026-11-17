@@ -31,6 +31,7 @@ import type Widget from 'views/logic/widgets/Widget';
 import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
 import generateId from 'logic/generateId';
 import { setTitle } from 'views/logic/slices/titlesActions';
+import TitleTypes from 'views/stores/TitleTypes';
 import WidgetFormattingSettings from 'views/logic/aggregationbuilder/WidgetFormattingSettings';
 import GenerateNextPosition from 'views/logic/views/GenerateNextPosition';
 import normalizeViewState from 'views/logic/views/normalizeViewState';
@@ -63,8 +64,10 @@ export const updateWidgets = (newWidgets: Immutable.List<Widget>) => (dispatch: 
   return dispatch(updateViewState(activeQuery, newViewStateNormalized));
 };
 
+// With a title, the widget is added with it in one change, which a single undo reverts.
 export const addWidget =
-  (widget: Widget, position?: WidgetPosition) => async (dispatch: ViewsDispatch, getState: GetState) => {
+  (widget: Widget, position?: WidgetPosition, title?: string) =>
+  async (dispatch: ViewsDispatch, getState: GetState) => {
     if (widget.id === undefined) {
       throw new Error('Unable to add widget without id to query.');
     }
@@ -78,7 +81,13 @@ export const addWidget =
 
     const activeQuery = selectActiveQuery(getState());
     const activeViewState = selectActiveViewState(getState());
-    const newViewState = activeViewState.toBuilder().widgetPositions(newWidgetPositions).widgets(newWidgets).build();
+    const titles = title ? activeViewState.titles.setIn([TitleTypes.Widget, widget.id], title) : activeViewState.titles;
+    const newViewState = activeViewState
+      .toBuilder()
+      .widgetPositions(newWidgetPositions)
+      .widgets(newWidgets)
+      .titles(titles)
+      .build();
 
     const result = dispatch(updateViewState(activeQuery, newViewState)).then(() => widget.id);
     dispatch(setNewWidget(widget.id));
