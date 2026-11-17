@@ -63,6 +63,7 @@ const PipelineConnectionsForm = ({ pipeline, connections, streams, save, disable
   );
 
   const _openModal = () => {
+    setConnectedStreams(formatStreams(initialStreamConnections));
     setShowModal(true);
   };
 

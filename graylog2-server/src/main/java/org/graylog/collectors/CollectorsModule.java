@@ -65,6 +65,12 @@ public class CollectorsModule extends PluginModule {
 
     @Override
     protected void configure() {
+        // Always bind the index template provider. The collector system logs index set might exist from a time when
+        // the feature flag was enabled. Index rotation fails without the provider if the flag is disabled now.
+        MapBinder.newMapBinder(binder(), String.class, IndexTemplateProvider.class)
+                .addBinding(CollectorLogsIndexTemplateProvider.COLLECTOR_LOGS_TEMPLATE_TYPE)
+                .to(CollectorLogsIndexTemplateProvider.class);
+
         if (!collectorsEnabled) {
             return;
         }
@@ -135,11 +141,6 @@ public class CollectorsModule extends PluginModule {
         registerJacksonSubtype(FileSourceConfig.class);
         registerJacksonSubtype(JournaldSourceConfig.class);
         registerJacksonSubtype(WindowsEventLogSourceConfig.class);
-
-        final var indexTemplateProviderBinder = MapBinder.newMapBinder(binder(), String.class,
-                IndexTemplateProvider.class);
-        indexTemplateProviderBinder.addBinding(CollectorLogsIndexTemplateProvider.COLLECTOR_LOGS_TEMPLATE_TYPE)
-                .to(CollectorLogsIndexTemplateProvider.class);
 
         addTelemetryMetricProvider("Collector Metrics", CollectorMetricsSupplier.class);
     }

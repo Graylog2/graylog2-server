@@ -16,40 +16,38 @@
  */
 package org.graylog2.cluster.nodes.mongodb;
 
-import com.google.common.base.Splitter;
 import com.google.common.net.HostAndPort;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoClientURI;
+import com.mongodb.ServerAddress;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
-import org.apache.http.client.utils.URIBuilder;
 import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.system.shutdown.GracefulShutdownHook;
 import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class DefaultMongodbConnectionResolver implements MongodbConnectionResolver, GracefulShutdownHook {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultMongodbConnectionResolver.class);
 
-    private final MongoClientURI mongoClientURI;
+    // The per-node clients only run occasional cluster overview commands, so they don't need the configured pool size,
+    // which is sized for the main connection.
+    private static final int PER_NODE_MAX_POOL_SIZE = 5;
+
+    private final MongoDbConfiguration configuration;
     private final Map<String, MongoClient> mongoClients = new ConcurrentHashMap<>();
 
 
     @Inject
     public DefaultMongodbConnectionResolver(MongoDbConfiguration configuration, GracefulShutdownService shutdownService) {
-        this.mongoClientURI = configuration.getMongoClientURI();
+        // Don't parse the connection string here: for mongodb+srv:// that means DNS lookups
+        this.configuration = configuration;
         shutdownService.register(DefaultMongodbConnectionResolver.this);
     }
 
@@ -58,50 +56,22 @@ public class DefaultMongodbConnectionResolver implements MongodbConnectionResolv
         return mongoClients.computeIfAbsent(nodeName, k -> createClient(nodeName));
     }
 
+    /**
+     * Creates a client with a direct connection to a single node, reusing the credentials and options of the
+     * configured connection string. They are taken from the connection string parsed by the MongoDB driver, which
+     * already decoded them and, for mongodb+srv://, applied the implied TLS and the options of the DNS TXT record.
+     */
     @Nonnull
     private MongoClient createClient(String nodeName) {
         LOG.info("Creating mongo client for {}", nodeName);
-        return new MongoClient(new MongoClientURI(buildConnectionString(nodeName)));
-    }
-
-    private String buildConnectionString(String nodeName) {
-        // Extract credentials from the original connection URI
-        final String username = mongoClientURI.getUsername();
-        final char[] password = mongoClientURI.getPassword();
-        final String database = mongoClientURI.getDatabase();
-
-        // Parse host and port from the nodeName (supports both IPv4 and IPv6)
+        final MongoClientURI uri = configuration.getMongoClientURI();
         final HostAndPort hostAndPort = HostAndPort.fromString(nodeName);
-
-        try {
-            URIBuilder builder = new URIBuilder();
-            builder.setScheme("mongodb");
-            builder.setHost(hostAndPort.getHost());
-            builder.setPort(hostAndPort.getPort());
-            if (username != null && password != null) {
-                builder.setUserInfo(f("%s:%s", username, new String(password)));
-            }
-            builder.setPath(database);
-            final Map<String, String> configParams = new LinkedHashMap<>(configParamsFromQuery());
-            configParams.put("directConnection", "true");
-            configParams.forEach(builder::addParameter);
-            configParams.remove("replicaSet");
-            configParams.put("maxPoolSize", "5");
-
-            return builder.build().toString();
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Nonnull
-    private Map<String, String> configParamsFromQuery() {
-        final URI uri = URI.create(mongoClientURI.getURI());
-        return Optional.ofNullable(uri.getQuery())
-                .map(query -> Splitter.on('&')
-                        .withKeyValueSeparator('=')
-                        .split(query))
-                .orElseGet(Collections::emptyMap);
+        final ServerAddress address = new ServerAddress(hostAndPort.getHost(), hostAndPort.getPortOrDefault(ServerAddress.defaultPort()));
+        final MongoClientOptions options = MongoClientOptions.builder(uri.getOptions())
+                .connectionsPerHost(PER_NODE_MAX_POOL_SIZE)
+                .build();
+        // This constructor connects directly to the given node, without discovering the other replica set members
+        return new MongoClient(address, uri.getCredentials(), options);
     }
 
     @Override

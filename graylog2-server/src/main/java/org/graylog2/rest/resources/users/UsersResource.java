@@ -776,7 +776,7 @@ public class UsersResource extends RestResource {
         // users with the wildcard permission for password change do not have to supply the old password, unless they try to change their own password.
         // the rationale is to prevent accidental or malicious change of admin passwords (e.g. to prevent locking out legitimate admins)
         if (getSubject().isPermitted(RestPermissions.USERS_PASSWORDCHANGE + ":*")) {
-            if (username.equals(getSubject().getPrincipal())) {
+            if (user.getId().equals(getSubject().getPrincipal())) {
                 LOG.debug("User {} is allowed to change the password of any user, but attempts to change own password. Must supply the old password.", getSubject().getPrincipal());
                 checkOldPassword = true;
             } else {
@@ -801,6 +801,7 @@ public class UsersResource extends RestResource {
             } else {
                 userManagementService.changePassword(user, cr.password());
             }
+            terminateSessions(user);
         } else {
             throw new BadRequestException("Old password is missing or incorrect.");
         }

@@ -479,4 +479,8 @@ export const TELEMETRY_EVENT_TYPE = {
     NAVIGATED_BACK: 'Right Sidebar Navigated Back',
     NAVIGATED_FORWARD: 'Right Sidebar Navigated Forward',
   },
+  SCRATCHPAD: {
+    OPENED: 'Scratchpad Opened',
+    CLOSED: 'Scratchpad Closed',
+  },
 } as const;

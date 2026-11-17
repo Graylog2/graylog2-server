@@ -1,0 +1,9 @@
+type = "f"
+message = "Fix fields of types like geo_point showing as unknown type with OpenSearch 3."
+
+details.user = """
+This affects field types with multi-word names, such as geo_point, half_float and scaled_float.
+"""
+
+pulls = ["27959"]
+issues = ["27937"]

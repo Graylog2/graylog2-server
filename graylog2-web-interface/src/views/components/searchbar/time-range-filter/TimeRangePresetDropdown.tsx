@@ -30,6 +30,7 @@ import type { SearchesConfig } from 'components/search/SearchConfig';
 import { isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import type { BsSize } from 'components/bootstrap/types';
+import Routes from 'routing/Routes';
 
 type PresetOption = {
   eventKey?: TimeRange;
@@ -194,7 +195,7 @@ const TimeRangePresetDropdown = ({
       )}
       <IfPermitted permissions="clusterconfigentry:edit">
         <MenuItem divider />
-        <AdminMenuItem href="/system/configurations" target="_blank">
+        <AdminMenuItem href={Routes.SYSTEM.CONFIGURATIONS} target="_blank">
           Configure presets <ExternalIcon name="open_in_new" />
         </AdminMenuItem>
       </IfPermitted>

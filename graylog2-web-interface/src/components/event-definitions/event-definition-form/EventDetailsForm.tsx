@@ -24,6 +24,7 @@ import { useMantineTheme } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 
 import { Select } from 'components/common';
+import { MarkdownEditor, MarkdownPreview } from 'components/common/MarkdownEditor';
 import { Button, Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
 import EventDefinitionPriorityEnum from 'logic/alerts/EventDefinitionPriorityEnum';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -192,7 +193,30 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
             readOnly={readOnly}
             rows={2}
           />
-          {showAddEventProcedureForm && (
+          {!validSecurityLicense && (
+            <FormGroup>
+              <ControlLabel>
+                Remediation Steps <small className="text-muted">(Optional)</small>
+              </ControlLabel>
+              {readOnly ? (
+                <MarkdownPreview
+                  show
+                  withFullView
+                  height={150}
+                  value={eventDefinition.remediation_steps || 'No remediation steps given'}
+                />
+              ) : (
+                <MarkdownEditor
+                  id="event-definition-remediation-steps"
+                  height={150}
+                  value={eventDefinition.remediation_steps ?? ''}
+                  onChange={(newValue) => onChange('remediation_steps', newValue)}
+                />
+              )}
+              <HelpBlock>Steps to remediate this Event. Markdown formatting is supported.</HelpBlock>
+            </FormGroup>
+          )}
+          {validSecurityLicense && showAddEventProcedureForm && (
             <PluggableEventProcedureForm
               eventProcedureId={eventDefinitionEventProcedure}
               remediationSteps={eventDefinition?.remediation_steps}

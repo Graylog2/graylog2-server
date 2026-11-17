@@ -25,6 +25,10 @@ import asMock from 'helpers/mocking/AsMock';
 import TimeRangePresetDropdown from './TimeRangePresetDropdown';
 
 jest.mock('hooks/useSearchConfiguration', () => jest.fn());
+jest.mock('util/AppConfig', () => ({
+  ...jest.requireActual('util/AppConfig').default,
+  gl2AppPathPrefix: () => '/graylog',
+}));
 
 describe('TimeRangePresetDropdown', () => {
   const openTimeRangePresetSelect = async () => {
@@ -36,6 +40,23 @@ describe('TimeRangePresetDropdown', () => {
 
     await screen.findByRole('menu');
   };
+
+  it('should prefix "Configure presets" link with app path prefix', async () => {
+    asMock(useSearchConfiguration).mockReturnValue({
+      config: mockSearchClusterConfig,
+      refresh: jest.fn(),
+      isInitialLoading: false,
+    });
+
+    render(<TimeRangePresetDropdown onChange={jest.fn()} limitDuration={0} />);
+
+    await openTimeRangePresetSelect();
+
+    expect(await screen.findByRole('menuitem', { name: /configure presets/i })).toHaveAttribute(
+      'href',
+      '/graylog/system/configurations',
+    );
+  });
 
   it('should not call onChange prop when selecting "Configure Ranges" option.', async () => {
     asMock(useSearchConfiguration).mockReturnValue({

@@ -19,9 +19,12 @@ package org.graylog.storage.opensearch3.mapping;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog.storage.opensearch3.testing.client.mock.ServerlessOpenSearchClient;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Map;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FieldMappingApiTest {
@@ -118,5 +121,34 @@ class FieldMappingApiTest {
         assertEquals(expectedResult, result);
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"geo_point", "half_float", "scaled_float", "date_nanos", "flat_object"})
+    void testMultiWordTypesUseJsonNames(String type) {
+        final String mappingResponse = f("""
+                {
+                  "graylog_42": {
+                    "mappings": {
+                      "properties": {
+                        "field": {
+                          "type": "%s"%s
+                        },
+                        "field_alias": {
+                          "type": "alias",
+                          "path": "field"
+                        }
+                      }
+                    }
+                  }
+                }
+                """, type, type.equals("scaled_float") ? ", \"scaling_factor\": 100" : "");
+        final OfficialOpensearchClient opensearchClient = ServerlessOpenSearchClient.builder()
+                .stubResponse("GET", "/graylog_42/_mapping", mappingResponse)
+                .build();
 
+        final FieldMappingApi api = new FieldMappingApi(opensearchClient);
+
+        final Map<String, FieldMappingApi.FieldMapping> expectedResult = Map.of("field", new FieldMappingApi.FieldMapping(type, false), "field_alias", new FieldMappingApi.FieldMapping(type, false));
+        final Map<String, FieldMappingApi.FieldMapping> result = api.fieldTypes("graylog_42");
+        assertEquals(expectedResult, result);
+    }
 }

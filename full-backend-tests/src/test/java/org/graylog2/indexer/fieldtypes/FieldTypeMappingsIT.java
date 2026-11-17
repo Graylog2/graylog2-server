@@ -36,7 +36,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @GraylogBackendConfiguration()
 public class FieldTypeMappingsIT {
-    private static final String INDEX_PREFIX = "custom-mappings";
     private static GraylogApis api;
 
     @BeforeAll
@@ -57,15 +56,25 @@ public class FieldTypeMappingsIT {
 
     @FullBackendTest
     void changeFieldTypeFromStringToIp() throws ExecutionException, RetryException {
-        var indexSet = api.indices().createIndexSet("Field Type Mappings Test", "Testing custom field type mapping", INDEX_PREFIX);
-        var stream = api.streams().createStream("Field Type Mappings Stream", indexSet, Streams.StreamRule.exact("field-type-mappings-test", "test-id", false));
+        changeFieldType("custom-mappings", "field-type-mappings-test", "source_ip", "192.168.1.1", "ip");
+    }
+
+    @FullBackendTest
+    void changeFieldTypeFromStringToGeoPoint() throws ExecutionException, RetryException {
+        // geo_point is a multi-word physical type, which has to be reported as "geo_point", not "geopoint"
+        changeFieldType("geo-mappings","field-type-mappings-geo-test", "location", "52.52,13.40", "geo-point");
+    }
+
+    private void changeFieldType(String indexPrefix, String testId, String fieldName, String fieldValue, String newType) throws ExecutionException, RetryException {
+        var indexSet = api.indices().createIndexSet("Field Type Mappings Test " + testId, "Testing custom field type mapping", indexPrefix);
+        var stream = api.streams().createStream("Field Type Mappings Stream " + testId, indexSet, Streams.StreamRule.exact(testId, "test_id", false));
         var gelfInput = api.gelf().createGelfHttpInput();
-        waitForNewIndex(indexSet, INDEX_PREFIX + "_0");
+        waitForNewIndex(indexSet, indexPrefix + "_0");
 
-        gelfInput.postMessage(messageWithTimestamp("2019-07-23 09:53:08.175"));
+        gelfInput.postMessage(message(testId, fieldName, fieldValue, "2019-07-23 09:53:08.175"));
 
-        api.search().waitForMessage("field-type-mappings-test");
-        var previousType = new ArrayList<>(api.fieldTypes().waitForFieldTypeDefinitions("source_ip"));
+        api.search().waitForMessage(testId);
+        var previousType = new ArrayList<>(api.fieldTypes().waitForFieldTypeDefinitions(fieldName));
         assertThat(previousType.get(0)).isNotNull()
                 .satisfies(fieldType -> assertThat(fieldType.type()).isEqualTo(FieldTypeMapper.STRING_TYPE));
 
@@ -73,21 +82,21 @@ public class FieldTypeMappingsIT {
                 .config(api.withGraylogBackendFailureConfig())
                 .spec(api.requestSpecification())
                 .when()
-                .body(new FieldTypeChangeRequest(Set.of(indexSet), "source_ip", "ip", true))
+                .body(new FieldTypeChangeRequest(Set.of(indexSet), fieldName, newType, true))
                 .put("/system/indices/mappings")
                 .then()
                 .statusCode(200);
 
-        waitForNewIndex(indexSet, INDEX_PREFIX + "_1");
+        waitForNewIndex(indexSet, indexPrefix + "_1");
 
-        gelfInput.postMessage(messageWithTimestamp("2023-07-23 09:53:08.175"));
+        gelfInput.postMessage(message(testId, fieldName, fieldValue, "2023-07-23 09:53:08.175"));
 
         api.waitFor(() -> {
             var fieldTypes = api.fieldTypes().getFieldTypes(AbsoluteRange.create("2023-01-01T00:00:00.000Z", "2024-01-01T00:00:00.000Z"), Set.of(stream));
-            var sourceIpField = fieldTypes.stream().filter(type -> type.name().equals("source_ip")).findFirst();
+            var field = fieldTypes.stream().filter(type -> type.name().equals(fieldName)).findFirst();
 
-            return sourceIpField.map(type -> type.type().type().equals("ip")).orElse(false);
-        }, "Waiting for field type to change to `ip` timed out.", Duration.ofSeconds(60));
+            return field.map(type -> type.type().type().equals(newType)).orElse(false);
+        }, "Waiting for field type to change to `" + newType + "` timed out.", Duration.ofSeconds(60));
     }
 
     private void waitForNewIndex(String indexSetId, String indexName) {
@@ -98,15 +107,15 @@ public class FieldTypeMappingsIT {
                 .contains(indexName), "Waiting for new index after rotation timed out.", Duration.ofMinutes(3));
     }
 
-    public String messageWithTimestamp(String timestamp) {
+    private String message(String testId, String fieldName, String fieldValue, String timestamp) {
         return String.format(Locale.ROOT, """
                 {
-                "short_message":"field-type-mappings-test",
-                "test_id": "field-type-mappings-test",
+                "short_message":"%1$s",
+                "test_id": "%1$s",
                 "source":"example.org",
-                "source_ip": "192.168.1.1",
-                "timestamp": "%s",
+                "%2$s": "%3$s",
+                "timestamp": "%4$s",
                 "level":3
-                }""", timestamp);
+                }""", testId, fieldName, fieldValue, timestamp);
     }
 }

@@ -27,6 +27,7 @@ import {
   fetchLookupTable,
   createLookupTable,
   updateLookupTable,
+  validateLookupTable,
   purgeLookupTableKey,
   purgeAllLookupTableKey,
   testLookupTableKey,
@@ -115,6 +116,15 @@ export function useUpdateLookupTable() {
     updateLookupTable: mutateAsync,
     updatingLookupTable: isLoading,
   };
+}
+
+export function useValidateLookupTable() {
+  const { mutateAsync } = useMutation({
+    mutationFn: validateLookupTable,
+    onError: (error: Error) => UserNotification.error(error.message),
+  });
+
+  return { validateLookupTable: mutateAsync };
 }
 
 export function usePurgeLookupTableKey() {

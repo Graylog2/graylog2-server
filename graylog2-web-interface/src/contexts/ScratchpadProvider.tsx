@@ -19,6 +19,8 @@ import { createContext, useState, useMemo } from 'react';
 
 import Store from 'logic/local-storage/Store';
 import useHotkey from 'hooks/useHotkey';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 type ScratchPadContextType = {
   isScratchpadVisible: boolean;
@@ -38,21 +40,23 @@ export const ScratchpadProvider = ({ children, loginName }: Props) => {
   type ScratchpadStoreData = Record<string, unknown> & { opened?: boolean };
   const scratchpadStore = Store.get<ScratchpadStoreData>(localStorageItem) || {};
   const [isScratchpadVisible, setVisibility] = useState(scratchpadStore.opened || false);
+  const sendTelemetry = useSendTelemetry();
 
   const scratchpadContextValue = useMemo(() => {
-    const toggleScratchpadVisibility = () => {
-      const currentStorage = Store.get<ScratchpadStoreData>(localStorageItem);
-
-      Store.set(localStorageItem, { ...currentStorage, opened: !isScratchpadVisible });
-      setVisibility(!isScratchpadVisible);
-    };
-
     const setScratchpadVisibility = (opened: boolean) => {
       const currentStorage = Store.get<ScratchpadStoreData>(localStorageItem);
 
       Store.set(localStorageItem, { ...currentStorage, opened });
       setVisibility(opened);
+
+      if (opened !== isScratchpadVisible) {
+        sendTelemetry(opened ? TELEMETRY_EVENT_TYPE.SCRATCHPAD.OPENED : TELEMETRY_EVENT_TYPE.SCRATCHPAD.CLOSED, {
+          app_section: 'scratchpad',
+        });
+      }
     };
+
+    const toggleScratchpadVisibility = () => setScratchpadVisibility(!isScratchpadVisible);
 
     return {
       isScratchpadVisible,
@@ -60,14 +64,13 @@ export const ScratchpadProvider = ({ children, loginName }: Props) => {
       setScratchpadVisibility,
       toggleScratchpadVisibility,
     };
-  }, [isScratchpadVisible, localStorageItem]);
+  }, [isScratchpadVisible, localStorageItem, sendTelemetry]);
 
   useHotkey({
     actionKey: 'show-scratchpad-modal',
-    callback: () => {
-      setVisibility(true);
-    },
+    callback: () => scratchpadContextValue.setScratchpadVisibility(true),
     scope: 'general',
+    dependencies: [scratchpadContextValue],
   });
 
   return <ScratchpadContext.Provider value={scratchpadContextValue}>{children}</ScratchpadContext.Provider>;
