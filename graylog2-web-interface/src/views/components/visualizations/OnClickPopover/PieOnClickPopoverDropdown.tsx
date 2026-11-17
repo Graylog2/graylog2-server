@@ -29,9 +29,7 @@ const PieOnClickPopoverDropdown = ({ clickPoint, config, setFieldData }: OnClick
     if (!clickPoint || !config) return {};
 
     const traceColor = getHoverSwatchColor(clickPoint);
-    const splitNames: Array<string | number> = splitCompositeKey(
-      clickPoint.data.originalName ?? clickPoint.data.name,
-    );
+    const splitNames: Array<string | number> = splitCompositeKey(clickPoint.data.originalName ?? clickPoint.data.name);
     const metric: string = config.series.length === 1 ? config.series[0].function : (splitNames.pop() as string);
     const columnValues = splitNames.filter((value) => value !== metric);
 
