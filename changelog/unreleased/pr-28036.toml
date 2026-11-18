@@ -3,3 +3,5 @@ message = "Fix IPFIX input dropping flow records from packets that also contain 
 
 issues = ["28033"]
 pulls = ["28036"]
+
+contributors = ["@kkrysiak-dev"]

@@ -3,3 +3,5 @@ message = "Fix IPFIX input decoding data records with another exporter's templat
 
 issues = ["28032"]
 pulls = ["28035"]
+
+contributors = ["@kkrysiak-dev"]

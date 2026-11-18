@@ -3,3 +3,5 @@ message = "Fix IPFIX and NetFlow v9 inputs not releasing buffered flows that als
 
 issues = ["28034"]
 pulls = ["28037"]
+
+contributors = ["@kkrysiak-dev"]
