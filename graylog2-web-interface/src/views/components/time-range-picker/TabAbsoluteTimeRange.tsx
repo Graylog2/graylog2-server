@@ -21,7 +21,6 @@ import moment from 'moment';
 import { useFormikContext } from 'formik';
 
 import { Icon, Accordion, AccordionItem } from 'components/common';
-import useUserDateTime from 'hooks/useUserDateTime';
 
 import AbsoluteCalendar from './AbsoluteCalendar';
 import AbsoluteTimestamp from './AbsoluteTimestamp';
@@ -29,7 +28,6 @@ import type { TimeRangePickerFormValues } from './types';
 
 type Props = {
   disabled?: boolean;
-  limitDuration?: number;
 };
 
 const AbsoluteWrapper = styled.div`
@@ -73,16 +71,14 @@ const FlexWrap = styled.div`
   display: flex;
 `;
 
-const TabAbsoluteTimeRange = ({ disabled = false, limitDuration = 0 }: Props) => {
+const TabAbsoluteTimeRange = ({ disabled = false }: Props) => {
   const {
     values: { timeRangeTabs },
   } = useFormikContext<TimeRangePickerFormValues>();
   const activeTabTimeRange = timeRangeTabs.absolute;
 
-  const { toUserTimezone } = useUserDateTime();
   const [activeAccordion, setActiveAccordion] = useState<'Timestamp' | 'Calendar' | undefined>();
   const toStartDate = moment(activeTabTimeRange.from).toDate();
-  const fromStartDate = limitDuration ? toUserTimezone(new Date()).seconds(-limitDuration).toDate() : undefined;
 
   const handleSelect = (nextKey: 'Timestamp' | 'Calendar' | undefined) => {
     setActiveAccordion(nextKey ?? activeAccordion);
@@ -98,7 +94,7 @@ const TabAbsoluteTimeRange = ({ disabled = false, limitDuration = 0 }: Props) =>
         activeKey={activeAccordion}>
         <AccordionItem name="Calendar">
           <RangeWrapper>
-            <AbsoluteCalendar startDate={fromStartDate} timeRange={activeTabTimeRange} range="from" />
+            <AbsoluteCalendar timeRange={activeTabTimeRange} range="from" />
           </RangeWrapper>
 
           <IconWrap>
