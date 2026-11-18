@@ -15,8 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 // ─── Luma color palette ────────────────────────────────────────────────────
-// Scales come from the theme's color variants (src/theme/sawmill/THEME_BASE.ts). The syntax colors
-// are Luma spec colors that aren't in the theme yet.
+// Scales come from the theme's color variants (src/theme/sawmill/THEME_BASE.ts).
 import { colorVariants } from 'theme/sawmill/THEME_BASE';
 
 export type Swatch = {
@@ -94,23 +93,6 @@ export const SECTIONS: Section[] = [
         swatches: [
           { label: 'White', hex: '#FFFFFF' },
           { label: 'Black', hex: colorVariants.default[8] },
-        ],
-      },
-    ],
-  },
-  {
-    title: 'Syntax Colors',
-    intro: 'This is used for highlighting the syntax in code.',
-    palettes: [
-      {
-        swatches: [
-          { label: 'Purple', hex: '#9747FF' },
-          { label: 'Blue', hex: '#437AED' },
-          { label: 'Maroon', hex: '#CD6069' },
-          { label: 'Orange', hex: '#FF6D12' },
-          { label: 'Green', hex: '#53A053' },
-          { label: 'Violet', hex: '#C838C6' },
-          { label: 'Teal', hex: '#1098AD' },
         ],
       },
     ],
