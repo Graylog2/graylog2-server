@@ -78,14 +78,7 @@ const SearchBarForm = ({
         handlerContext,
         userTimezone,
       ),
-    [
-      limitDuration,
-      setFieldWarning,
-      validateQueryString,
-      pluggableSearchBarControls,
-      handlerContext,
-      userTimezone,
-    ],
+    [limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, handlerContext, userTimezone],
   );
 
   return (
