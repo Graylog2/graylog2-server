@@ -19,7 +19,9 @@ package org.graylog2.configuration.managed;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Clock;
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,6 +35,7 @@ class PendingRestartsTest {
     private static final Instant CHANGED_AT = Instant.parse("2026-11-16T10:00:00Z");
     private static final Instant BEFORE_CHANGE = CHANGED_AT.minusSeconds(60);
     private static final Instant AFTER_CHANGE = CHANGED_AT.plusSeconds(60);
+    private static final Instant NOW = CHANGED_AT.plusSeconds(120);
 
     private final ManagedConfigurationService configurationService = mock(ManagedConfigurationService.class);
     private PendingRestarts pendingRestarts;
@@ -47,7 +50,7 @@ class PendingRestartsTest {
                         .requiresRestart(false).build()));
         final var configurationServices = mock(ManagedConfigurationServices.class);
         when(configurationServices.get(NodeType.DATANODE)).thenReturn(configurationService);
-        pendingRestarts = new PendingRestarts(catalog, configurationServices);
+        pendingRestarts = new PendingRestarts(catalog, configurationServices, Clock.fixed(NOW, ZoneOffset.UTC));
     }
 
     private static ManagedConfigurationEntry entry(String nodeId, String name, Instant changedAt) {
@@ -131,5 +134,26 @@ class PendingRestartsTest {
         when(configurationService.configurationStates()).thenReturn(Map.of());
 
         assertThat(pendingRestarts.pendingParameters(NodeType.DATANODE, List.of("node-1")).get("node-1")).isEmpty();
+    }
+
+    @Test
+    void nodeIsRestartingBetweenLoadingItsConfigurationAndItsProcessBecomingAvailable() {
+        when(configurationService.configurationStates()).thenReturn(Map.of(
+                "restarting", new NodeConfigurationState(null, "restarting", AFTER_CHANGE, BEFORE_CHANGE),
+                "first-start", new NodeConfigurationState(null, "first-start", AFTER_CHANGE, null),
+                "done", new NodeConfigurationState(null, "done", AFTER_CHANGE, AFTER_CHANGE)));
+
+        assertThat(pendingRestarts.restartingNodes(NodeType.DATANODE, List.of("restarting", "first-start", "done", "unknown")))
+                .containsExactly("first-start", "restarting");
+        assertThat(pendingRestarts.isRestarting(NodeType.DATANODE, "done")).isFalse();
+    }
+
+    @Test
+    void nodeWhichTakesTooLongToStartNoLongerCountsAsRestarting() {
+        final Instant longAgo = NOW.minus(PendingRestarts.RESTART_TIMEOUT).minusSeconds(1);
+        when(configurationService.configurationStates()).thenReturn(Map.of(
+                "stuck", new NodeConfigurationState(null, "stuck", longAgo, longAgo.minusSeconds(60))));
+
+        assertThat(pendingRestarts.isRestarting(NodeType.DATANODE, "stuck")).isFalse();
     }
 }

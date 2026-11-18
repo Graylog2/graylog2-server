@@ -17,7 +17,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { Label } from 'components/bootstrap';
+import { Badge, Label } from 'components/bootstrap';
 import type { ColumnRenderers, ColumnSchema } from 'components/common/EntityDataTable';
 import { Icon, Link } from 'components/common';
 import DataNodeStatusCell from 'components/datanode/DataNodeList/DataNodeStatusCell';
@@ -51,6 +51,15 @@ const STORAGE_DANGER_THRESHOLD = 0.8;
 const CPU_WARNING_THRESHOLD = 0.7;
 const CPU_DANGER_THRESHOLD = 0.9;
 
+const StatusCell = styled.span`
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+`;
+
+const RESTART_REQUIRED_DESCRIPTION = 'Saved configuration changes take effect once this Data Node is restarted.';
+
 const VersionWarningIcon = styled(Icon)`
   line-height: 1;
   transform: translateY(-1px);
@@ -77,7 +86,13 @@ const getDataNodeRoles = (dataNode: DataNode) =>
 const calculateUsedFsBytes = (total: number | undefined | null, available: number | undefined | null) =>
   total != null && available != null ? total - available : undefined;
 
-export const createColumnRenderers = (productName: string): ColumnRenderers<ClusterDataNode> => ({
+/**
+ * @param pendingRestartNodeIds IDs of the Data Nodes which don't run with their saved configuration yet
+ */
+export const createColumnRenderers = (
+  productName: string,
+  pendingRestartNodeIds: ReadonlySet<string> = new Set(),
+): ColumnRenderers<ClusterDataNode> => ({
   attributes: {
     hostname: {
       renderCell: (_value, entity) => {
@@ -93,8 +108,17 @@ export const createColumnRenderers = (productName: string): ColumnRenderers<Clus
       staticWidth: COLUMN_WIDTH.title,
     },
     datanode_status: {
-      renderCell: (_value, entity) => <DataNodeStatusCell dataNode={entity} />,
-      staticWidth: 130,
+      renderCell: (_value, entity) => (
+        <StatusCell>
+          <DataNodeStatusCell dataNode={entity} />
+          {pendingRestartNodeIds.has(entity.node_id) && (
+            <Badge color="warning" variant="light" size="sm" title={RESTART_REQUIRED_DESCRIPTION}>
+              Restart required
+            </Badge>
+          )}
+        </StatusCell>
+      ),
+      staticWidth: 230,
     },
     memory: {
       renderCell: (_value, entity) => (

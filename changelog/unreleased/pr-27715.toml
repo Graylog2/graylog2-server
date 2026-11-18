@@ -1,0 +1,12 @@
+type = "a"
+message = "Add Data Node configuration management to the UI, for all Data Nodes or a single Data Node."
+
+details.user = """
+The new **Data Node Configuration** tab on the **Cluster** page lists settings shared by all Data Nodes, such as the disk watermarks and the shard limit. A new **Configuration** section on each Data Node's page lists settings of that node, such as the OpenSearch heap size and the node roles.
+
+For every setting the UI shows the value in use and where it comes from: the built-in default, the configuration file, an environment variable, a system property, or a value saved in the UI. Settings that need a restart to take effect are marked. A value saved in the UI can be removed again, so the setting falls back to the node's own configuration.
+
+The **Cluster Configuration** page has been renamed to **Cluster**, and its nodes overview is now the **Cluster Nodes** tab.
+"""
+
+pulls = ["27715"]

@@ -185,6 +185,13 @@ public class RollingRestartJobHandler {
                 .orElseGet(() -> jobDefinitionService.save(RollingRestartExecutionJob.DEFINITION_INSTANCE));
     }
 
+    /**
+     * Whether a rolling restart is running or waiting to continue.
+     */
+    public boolean isActive() {
+        return findActive().isPresent();
+    }
+
     private Optional<JobTriggerDto> findActive() {
         try (final var stream = jobTriggerService.streamByQuery(
                 Filters.and(
