@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -37,6 +38,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 
 class VisualizationConfigsTest {
     private static final Path FRONTEND_COLOR_SCALES = Path.of(
@@ -158,6 +160,20 @@ class VisualizationConfigsTest {
         assertThat(applied).containsEntry("color_scale", "Plasma")
                 .containsEntry("reverse_scale", true)
                 .doesNotContainKey("legacy_option");
+    }
+
+    @Test
+    void namesTypesInErrorsByTheirSimpleNames() {
+        assertThat(VisualizationConfigs.withSimpleTypeNames("Cannot deserialize value of type "
+                + "`org.graylog.Dto$TrendPreference` from String \"UP\": not one of `java.lang.String`"))
+                .isEqualTo("Cannot deserialize value of type TrendPreference from String \"UP\": not one of String");
+    }
+
+    @Test
+    void namesTypesWithoutBacktrackingOnUnclosedQuotes() {
+        final String unclosed = "`" + "a$".repeat(50_000) + "!";
+
+        assertTimeoutPreemptively(Duration.ofSeconds(1), () -> VisualizationConfigs.withSimpleTypeNames(unclosed));
     }
 
     @Test

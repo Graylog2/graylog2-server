@@ -54,6 +54,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -68,6 +69,8 @@ public class VisualizationConfigs {
     /** The path under which errors name settings, as tools take them. */
     public static final String SETTINGS = "visualization_config";
     private static final TypeReference<Map<String, Object>> MAP = new TypeReference<>() {};
+    // Possessive and without overlapping classes, so it cannot backtrack.
+    private static final Pattern QUALIFIED_TYPE = Pattern.compile("`(?:\\w++[.$])*+(\\w++)`");
 
     private final Map<String, VisualizationDescriptor> visualizations;
     private final ObjectMapper objectMapper;
@@ -268,10 +271,13 @@ public class VisualizationConfigs {
                         ? "." + reference.getFieldName()
                         : "[" + reference.getIndex() + "]")
                 .collect(Collectors.joining("", SETTINGS, ""));
-        final String message = e.getOriginalMessage()
-                .replaceAll("`(?:[\\w$]+[.$])*([\\w]+)`", "$1")
-                .lines().findFirst().orElse("invalid value");
+        final String message = withSimpleTypeNames(e.getOriginalMessage()).lines().findFirst().orElse("invalid value");
         return f("%s: %s", path, message);
+    }
+
+    // Jackson quotes types by their qualified names, e.g. `org.graylog.Dto$Mode`, which mean nothing to tools.
+    static String withSimpleTypeNames(String message) {
+        return QUALIFIED_TYPE.matcher(message).replaceAll("$1");
     }
 
     @SuppressWarnings("unchecked")
