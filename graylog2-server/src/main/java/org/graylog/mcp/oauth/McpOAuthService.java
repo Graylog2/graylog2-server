@@ -203,7 +203,7 @@ public class McpOAuthService {
         }
         final OAuthClient client = clientService.findByClientId(clientId)
                 .orElseThrow(() -> OAuthException.invalidClient("Unknown client"));
-        final String effectiveRedirectUri = resolveRedirectUri(client, redirectUri);
+        final String effectiveRedirectUri = resolveRedirectUri(client, redirectUri, config().oauthAllowedRedirectUris());
         try {
             validateAuthorizationParameters(responseType, codeChallenge, codeChallengeMethod, resource);
         } catch (OAuthException e) {
@@ -421,7 +421,12 @@ public class McpOAuthService {
         if (isBlank(clientId)) {
             throw OAuthException.invalidClient("Missing client_id");
         }
-        return clientService.findByClientId(clientId).orElseThrow(() -> OAuthException.invalidClient("Unknown client"));
+        final OAuthClient client = clientService.findByClientId(clientId).orElseThrow(() -> OAuthException.invalidClient("Unknown client"));
+        final List<String> allowedRedirectUris = config().oauthAllowedRedirectUris();
+        if (client.redirectUris().stream().noneMatch(uri -> RedirectUriPolicy.isAllowed(uri, allowedRedirectUris))) {
+            throw OAuthException.invalidClient("None of the client's redirect URIs is allowed anymore");
+        }
+        return client;
     }
 
     private User loadAuthorizedUser(String userId) {
@@ -448,17 +453,20 @@ public class McpOAuthService {
         return requested;
     }
 
-    private static String resolveRedirectUri(OAuthClient client, @Nullable String redirectUri) {
+    private static String resolveRedirectUri(OAuthClient client, @Nullable String redirectUri, List<String> allowedRedirectUris) {
+        final List<String> registeredUris = client.redirectUris().stream()
+                .filter(uri -> RedirectUriPolicy.isAllowed(uri, allowedRedirectUris))
+                .toList();
         if (isBlank(redirectUri)) {
-            if (client.redirectUris().size() == 1) {
-                return client.redirectUris().getFirst();
+            if (registeredUris.size() == 1 && client.redirectUris().size() == 1) {
+                return registeredUris.getFirst();
             }
             throw OAuthException.of(INVALID_REQUEST, "Missing redirect_uri");
         }
-        return client.redirectUris().stream()
+        return registeredUris.stream()
                 .flatMap(registered -> RedirectUriPolicy.resolve(registered, redirectUri).stream())
                 .findFirst()
-                .orElseThrow(() -> OAuthException.of(INVALID_REQUEST, "redirect_uri is not registered for this client"));
+                .orElseThrow(() -> OAuthException.of(INVALID_REQUEST, "redirect_uri is not registered for this client or no longer allowed"));
     }
 
     private static String errorRedirectUri(String redirectUri, String error, @Nullable String description, @Nullable String state, String issuer) {

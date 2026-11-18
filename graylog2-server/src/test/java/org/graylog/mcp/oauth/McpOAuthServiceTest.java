@@ -58,7 +58,12 @@ class McpOAuthServiceTest {
     private static final McpConfiguration CONFIG = McpConfiguration.create(true, false, false);
     private static final OAuthClient CLIENT = new OAuthClient("id", "mcp-client", "Claude Code", null,
             List.of(REDIRECT_URI), NOW.minusSeconds(60), NOW.plus(Duration.ofDays(1)));
+    private static final String WEB_REDIRECT_URI = "https://claude.ai/api/mcp/auth_callback";
+    private static final OAuthClient WEB_CLIENT = new OAuthClient("web-id", "mcp-web-client", "Claude", null,
+            List.of(WEB_REDIRECT_URI), NOW.minusSeconds(60), NOW.plus(Duration.ofDays(1)));
+    private static final McpConfiguration CONFIG_WITHOUT_WEB_CLIENTS = McpConfiguration.create(true, false, false, null, null, null, List.of());
 
+    private ClusterConfigService clusterConfigService;
     private OAuthClientService clientService;
     private OAuthAuthorizationCodeService codeService;
     private OAuthRefreshTokenService refreshTokenService;
@@ -77,7 +82,7 @@ class McpOAuthServiceTest {
         userService = mock(UserService.class);
         authorizer = mock(GranteeAuthorizer.class);
         final GranteeAuthorizer.Factory authorizerFactory = mock(GranteeAuthorizer.Factory.class);
-        final ClusterConfigService clusterConfigService = mock(ClusterConfigService.class);
+        clusterConfigService = mock(ClusterConfigService.class);
         when(clusterConfigService.getOrDefault(eq(McpConfiguration.class), any())).thenReturn(CONFIG);
         service = new McpOAuthService(clientService, codeService, refreshTokenService, accessTokenService, userService,
                 authorizerFactory, mock(AuditEventSender.class), clusterConfigService, Clock.fixed(NOW, ZoneOffset.UTC));
@@ -91,6 +96,7 @@ class McpOAuthServiceTest {
         when(authorizer.isPermitted(RestPermissions.MCP_SERVER_ACCESS)).thenReturn(true);
         when(authorizer.isPermitted(RestPermissions.USERS_TOKENCREATE, "jane")).thenReturn(true);
         when(clientService.findByClientId(CLIENT.clientId())).thenReturn(Optional.of(CLIENT));
+        when(clientService.findByClientId(WEB_CLIENT.clientId())).thenReturn(Optional.of(WEB_CLIENT));
     }
 
     @Test
@@ -272,6 +278,26 @@ class McpOAuthServiceTest {
         stubAccessTokenCreation();
 
         assertThat(service.refresh(CLIENT.clientId(), "refresh", null).accessToken()).isEqualTo("access-token");
+    }
+
+    @Test
+    void rejectsAuthorizationForRedirectUriNoLongerAllowed() {
+        assertThat(validate(WEB_CLIENT.clientId(), WEB_REDIRECT_URI, CHALLENGE, "S256").redirectUri()).isEqualTo(WEB_REDIRECT_URI);
+
+        when(clusterConfigService.getOrDefault(eq(McpConfiguration.class), any())).thenReturn(CONFIG_WITHOUT_WEB_CLIENTS);
+        assertThatThrownBy(() -> validate(WEB_CLIENT.clientId(), WEB_REDIRECT_URI, CHALLENGE, "S256"))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.redirectUri()).isEmpty());
+        assertThatThrownBy(() -> validate(WEB_CLIENT.clientId(), null, CHALLENGE, "S256"))
+                .isInstanceOf(OAuthException.class);
+    }
+
+    @Test
+    void rejectsRefreshForClientWithoutAllowedRedirectUri() {
+        when(clusterConfigService.getOrDefault(eq(McpConfiguration.class), any())).thenReturn(CONFIG_WITHOUT_WEB_CLIENTS);
+
+        assertThatThrownBy(() -> service.refresh(WEB_CLIENT.clientId(), "refresh", null))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_CLIENT));
+        verify(refreshTokenService, never()).markUsed(anyString());
     }
 
     @Test
