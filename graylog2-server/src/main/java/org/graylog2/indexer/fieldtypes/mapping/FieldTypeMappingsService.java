@@ -330,7 +330,7 @@ public class FieldTypeMappingsService {
     }
 
     private static boolean needsProfileForDisabledDynamicMapping(final IndexSetConfig indexSetConfig) {
-        return Boolean.TRUE.equals(indexSetConfig.dynamicMappingDisabled());
+        return indexSetConfig.fieldTypeProfile() != null && Boolean.TRUE.equals(indexSetConfig.dynamicMappingDisabled());
     }
 
     private static String profileNeededMessage(final List<IndexSetConfig> indexSetConfigs) {

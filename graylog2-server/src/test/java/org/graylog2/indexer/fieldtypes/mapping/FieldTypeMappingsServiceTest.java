@@ -264,6 +264,22 @@ class FieldTypeMappingsServiceTest {
     }
 
     @Test
+    void testRemovesProfileNextToIndexSetWithDisabledDynamicMappingAndNoProfile() {
+        final IndexSetConfig illuminateIndexSet = buildSampleIndexSetConfig("illuminate_index_set").toBuilder()
+                .dynamicMappingDisabled(true)
+                .build();
+        existingIndexSet = existingIndexSet.toBuilder()
+                .fieldTypeProfile("000000000000000000000042")
+                .build();
+        doReturn(List.of(illuminateIndexSet, existingIndexSet)).when(indexSetService).findByIds(Set.of("illuminate_index_set", "existing_index_set"));
+
+        toTest.removeProfileFromIndexSets(Set.of("illuminate_index_set", "existing_index_set"), false);
+
+        verify(indexSetService).save(existingIndexSet.toBuilder().fieldTypeProfile(null).build());
+        verify(indexSetService, never()).save(illuminateIndexSet);
+    }
+
+    @Test
     void testBulkRemoveProfileReportsIndexSetWithDisabledDynamicMappingAsFailure() {
         existingIndexSet = existingIndexSet.toBuilder()
                 .title("Needs profile")
