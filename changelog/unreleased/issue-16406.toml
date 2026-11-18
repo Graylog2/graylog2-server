@@ -1,0 +1,5 @@
+type = "a"
+message = "Add optional HTTP Strict Transport Security (HSTS) header to the HTTP interface when TLS is enabled."
+
+issues = ["Graylog2/graylog-plugin-enterprise#16406"]
+pulls = ["28258"]
