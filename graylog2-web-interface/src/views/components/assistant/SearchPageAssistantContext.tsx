@@ -146,8 +146,7 @@ const mergeAggregation = (current: AggregationWidgetConfig, changedJson: Aggrega
   const currentPivots = [...current.rowPivots, ...current.columnPivots];
   const keepPivot = (pivot: Pivot) =>
     currentPivots.find(({ type, fields }) => type === pivot.type && isEqual(fields, pivot.fields)) ?? pivot;
-  const keepSeries = (series: Series) =>
-    current.series.find(({ function: fn }) => fn === series.function) ?? series;
+  const keepSeries = (series: Series) => current.series.find(({ function: fn }) => fn === series.function) ?? series;
   const fields = new Set([...changed.rowPivots, ...changed.columnPivots].flatMap((pivot) => pivot.fields));
   const functions = new Set(changed.series.map((series) => series.function));
   const sort = current.sort.filter(({ type, field }) =>
