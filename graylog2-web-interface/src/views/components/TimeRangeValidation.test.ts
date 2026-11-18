@@ -36,11 +36,7 @@ describe('TimeRangeValidation', () => {
     });
 
     it('should error on empty keyword', async () => {
-      const errors = await TimeRangeValidation(
-        { type: 'keyword', keyword: '   ' },
-        0,
-        'Europe/Berlin',
-      );
+      const errors = await TimeRangeValidation({ type: 'keyword', keyword: '   ' }, 0, 'Europe/Berlin');
 
       expect(errors).toEqual({ keyword: 'Keyword must not be empty!' });
     });
@@ -48,11 +44,7 @@ describe('TimeRangeValidation', () => {
     it('should error when keyword is not valid', async () => {
       asMock(ToolsApi.testNaturalDate).mockImplementation(() => Promise.reject());
 
-      const errors = await TimeRangeValidation(
-        { type: 'keyword', keyword: 'Last five minutes' },
-        0,
-        'Europe/Berlin',
-      );
+      const errors = await TimeRangeValidation({ type: 'keyword', keyword: 'Last five minutes' }, 0, 'Europe/Berlin');
 
       expect(errors).toEqual({ keyword: 'Unable to parse keyword' });
     });
@@ -67,11 +59,7 @@ describe('TimeRangeValidation', () => {
         }),
       );
 
-      const errors = await TimeRangeValidation(
-        { type: 'keyword', keyword: 'Last ten days' },
-        86400,
-        'Europe/Berlin',
-      );
+      const errors = await TimeRangeValidation({ type: 'keyword', keyword: 'Last ten days' }, 86400, 'Europe/Berlin');
 
       expect(errors).toEqual({ keyword: 'Range is outside limit duration.' });
     });
@@ -111,13 +99,21 @@ describe('TimeRangeValidation', () => {
 
   describe('relative with end', () => {
     it('should accept range older than limit when range is within limit', async () => {
-      const errors = await TimeRangeValidation({ type: 'relative', from: 7 * 86400, to: 6 * 86400 }, 86400, 'Europe/Berlin');
+      const errors = await TimeRangeValidation(
+        { type: 'relative', from: 7 * 86400, to: 6 * 86400 },
+        86400,
+        'Europe/Berlin',
+      );
 
       expect(errors).toEqual({});
     });
 
     it('should error when range exceeds limit', async () => {
-      const errors = await TimeRangeValidation({ type: 'relative', from: 7 * 86400, to: 5 * 86400 }, 86400, 'Europe/Berlin');
+      const errors = await TimeRangeValidation(
+        { type: 'relative', from: 7 * 86400, to: 5 * 86400 },
+        86400,
+        'Europe/Berlin',
+      );
 
       expect(errors).toEqual({ from: 'Range is outside limit duration.' });
     });

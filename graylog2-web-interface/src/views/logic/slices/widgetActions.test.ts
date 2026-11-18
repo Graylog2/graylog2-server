@@ -42,7 +42,9 @@ describe('widgetActions', () => {
         .build(),
     },
   } as unknown as RootState;
-  const dispatch = jest.fn((action: unknown) => (typeof action === 'function' ? action(dispatch, () => state) : action));
+  const dispatch = jest.fn((action: unknown) =>
+    typeof action === 'function' ? action(dispatch, () => state) : action,
+  );
   const widget = TextWidget.builder().id('w1').config(new TextWidgetConfig('Hi')).build();
   const position = new WidgetPosition(1, 1, 2, 6);
 

@@ -302,9 +302,9 @@ const SearchesConfig = () => {
         <dt>Query time range limit</dt>
         <dd>{limit(viewConfig)}</dd>
         <dd>
-          The maximum length of a search&apos;s time range. Searches can start at any point in the past, but
-          can&apos;t cover more than this duration. This prevents users from accidentally creating queries which span
-          a lot of data and would need a long time and many resources to complete.
+          The maximum length of a search&apos;s time range. Searches can start at any point in the past, but can&apos;t
+          cover more than this duration. This prevents users from accidentally creating queries which span a lot of data
+          and would need a long time and many resources to complete.
         </dd>
       </dl>
 

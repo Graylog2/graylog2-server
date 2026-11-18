@@ -76,14 +76,7 @@ const DashboardSearchForm = ({ initialValues, limitDuration, onSubmit, validateQ
         handlerContext,
         userTimezone,
       ),
-    [
-      limitDuration,
-      setFieldWarning,
-      validateQueryString,
-      pluggableSearchBarControls,
-      handlerContext,
-      userTimezone,
-    ],
+    [limitDuration, setFieldWarning, validateQueryString, pluggableSearchBarControls, handlerContext, userTimezone],
   );
 
   return (
