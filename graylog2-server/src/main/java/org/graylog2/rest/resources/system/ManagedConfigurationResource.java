@@ -164,7 +164,16 @@ public class ManagedConfigurationResource extends RestResource {
                 .map(parameter -> ManagedConfigurationParameter.of(parameter, entries.get(parameter.name()),
                         pendingParameters.contains(parameter.name())))
                 .toList();
-        return new ManagedConfiguration(nodeType, nodeId, parameters, !pendingNodes.isEmpty(), pendingNodes);
+        return new ManagedConfiguration(nodeType, nodeId, parameters, !pendingNodes.isEmpty(), pendingNodes,
+                List.copyOf(restartingNodes(nodeType, nodeId)));
+    }
+
+    private Set<String> restartingNodes(NodeType nodeType, @Nullable String nodeId) {
+        if (nodeType != NodeType.DATANODE) {
+            return Set.of();
+        }
+        final Collection<String> nodeIds = nodeId == null ? dataNodeService.allActive().keySet() : List.of(nodeId);
+        return pendingRestarts.restartingNodes(nodeType, nodeIds);
     }
 
     /**
@@ -190,12 +199,14 @@ public class ManagedConfigurationResource extends RestResource {
      *                        also covers the values shared by all nodes of the type, which aren't part of
      *                        {@code parameters} then.
      * @param pendingNodes    The IDs of the nodes which have to be restarted
+     * @param restartingNodes The IDs of the nodes which are restarting right now
      */
     public record ManagedConfiguration(@JsonProperty("node_type") NodeType nodeType,
                                        @JsonProperty("node_id") @Nullable String nodeId,
                                        @JsonProperty("parameters") List<ManagedConfigurationParameter> parameters,
                                        @JsonProperty("restart_required") boolean restartRequired,
-                                       @JsonProperty("pending_nodes") List<String> pendingNodes) {}
+                                       @JsonProperty("pending_nodes") List<String> pendingNodes,
+                                       @JsonProperty("restarting_nodes") List<String> restartingNodes) {}
 
     /**
      * A parameter with everything needed to show and edit it.

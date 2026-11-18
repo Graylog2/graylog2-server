@@ -17,14 +17,18 @@
 package org.graylog2.rest.resources.datanodes;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.NotFoundException;
 import org.graylog.security.UserContext;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
+import org.graylog2.configuration.managed.NodeType;
+import org.graylog2.configuration.managed.PendingRestarts;
 import org.graylog2.datanode.DataNodeCommandService;
 import org.graylog2.datanode.restart.RollingRestartActions;
+import org.graylog2.datanode.restart.RollingRestartJobHandler;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,6 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @MockitoSettings(strictness = Strictness.WARN)
@@ -58,13 +63,17 @@ public class DataNodeManagementResourceTest {
     AuditEventSender auditEventSender;
     @Mock
     private RollingRestartActions rollingRestartActions;
+    @Mock
+    private RollingRestartJobHandler rollingRestartJobHandler;
+    @Mock
+    private PendingRestarts pendingRestarts;
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
 
     @BeforeEach
     public void setUp() {
         classUnderTest = new DataNodeManagementResource(dataNodeCommandService, nodeService, true, auditEventSender,
-                objectMapper, rollingRestartActions);
+                objectMapper, rollingRestartActions, rollingRestartJobHandler, pendingRestarts);
     }
 
     @Test
@@ -109,5 +118,25 @@ public class DataNodeManagementResourceTest {
         doThrow(NodeNotFoundException.class).when(nodeService).byNodeId(NODEID);
         Exception e = assertThrows(NotFoundException.class, () -> classUnderTest.restartNode(NODEID));
         assertEquals("Node " + NODEID + " not found", e.getMessage());
+    }
+
+    @Test
+    public void refusesToRestartANodeWhichIsRestartingAlready() {
+        when(pendingRestarts.isRestarting(NodeType.DATANODE, NODEID)).thenReturn(true);
+
+        final ClientErrorException e = assertThrows(ClientErrorException.class, () -> classUnderTest.restartNode(NODEID));
+
+        assertEquals(409, e.getResponse().getStatus());
+        verifyNoInteractions(rollingRestartActions);
+    }
+
+    @Test
+    public void refusesToRestartANodeDuringARollingRestart() {
+        when(rollingRestartJobHandler.isActive()).thenReturn(true);
+
+        final ClientErrorException e = assertThrows(ClientErrorException.class, () -> classUnderTest.restartNode(NODEID));
+
+        assertEquals(409, e.getResponse().getStatus());
+        verifyNoInteractions(rollingRestartActions);
     }
 }

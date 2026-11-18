@@ -20,8 +20,12 @@ import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -37,13 +41,52 @@ import java.util.TreeSet;
  */
 @Singleton
 public class PendingRestarts {
+    /**
+     * How long a node may take from loading its configuration until its process is available with it. A node which
+     * takes longer most likely failed to start and shouldn't keep a restart from being requested again.
+     */
+    static final Duration RESTART_TIMEOUT = Duration.ofMinutes(10);
+
     private final ConfigurationCatalog catalog;
     private final ManagedConfigurationServices configurationServices;
+    private final Clock clock;
 
     @Inject
-    public PendingRestarts(ConfigurationCatalog catalog, ManagedConfigurationServices configurationServices) {
+    public PendingRestarts(ConfigurationCatalog catalog, ManagedConfigurationServices configurationServices, Clock clock) {
         this.catalog = catalog;
         this.configurationServices = configurationServices;
+        this.clock = clock;
+    }
+
+    /**
+     * The nodes which are restarting right now: they loaded their configuration to start their process with it, but
+     * the process isn't available yet.
+     *
+     * @return the IDs of the restarting nodes among the given ones
+     */
+    public Set<String> restartingNodes(NodeType nodeType, Collection<String> nodeIds) {
+        final Map<String, NodeConfigurationState> states = configurationServices.get(nodeType).configurationStates();
+        final Instant timeout = clock.instant().minus(RESTART_TIMEOUT);
+        final Set<String> restarting = new TreeSet<>();
+        for (final String nodeId : nodeIds) {
+            final NodeConfigurationState state = states.get(nodeId);
+            if (state != null && isRestarting(state, timeout)) {
+                restarting.add(nodeId);
+            }
+        }
+        return restarting;
+    }
+
+    public boolean isRestarting(NodeType nodeType, String nodeId) {
+        return !restartingNodes(nodeType, List.of(nodeId)).isEmpty();
+    }
+
+    private static boolean isRestarting(NodeConfigurationState state, Instant timeout) {
+        final Instant loadedAt = state.loadedAt();
+        if (loadedAt == null || loadedAt.isBefore(timeout)) {
+            return false;
+        }
+        return state.appliedAt() == null || loadedAt.isAfter(state.appliedAt());
     }
 
     /**

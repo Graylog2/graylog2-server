@@ -68,9 +68,10 @@ export const rollingRestartStartError = (error: unknown) => {
   };
 };
 
-export const useCurrentRollingRestart = () => {
+export const useCurrentRollingRestart = (enabled = true) => {
   const { data, isInitialLoading, refetch } = useQuery<RollingRestartJob | null>({
     queryKey: ROLLING_RESTART_QUERY_KEY,
+    enabled,
     queryFn: () =>
       defaultOnError(
         fetchCurrentRollingRestart(),

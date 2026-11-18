@@ -51,4 +51,29 @@ describe('DataNodesColumnConfiguration', () => {
     expect(screen.getByText('8.0.0')).toBeInTheDocument();
     expect(screen.queryByTitle(warningMessage)).not.toBeInTheDocument();
   });
+
+  describe('restart flag', () => {
+    const renderStatusCell = (pendingRestartNodeIds: Set<string>) => {
+      const { attributes } = createColumnRenderers(productName, pendingRestartNodeIds);
+      const cell = attributes.datanode_status.renderCell(
+        undefined,
+        { node_id: 'node-1', datanode_status: 'AVAILABLE' } as ClusterDataNode,
+        undefined,
+      );
+
+      render(<>{cell}</>);
+    };
+
+    it('flags a Data Node which still has to be restarted', () => {
+      renderStatusCell(new Set(['node-1']));
+
+      expect(screen.getByText('Restart required')).toBeInTheDocument();
+    });
+
+    it('does not flag a Data Node which runs with its saved configuration', () => {
+      renderStatusCell(new Set(['another-node']));
+
+      expect(screen.queryByText('Restart required')).not.toBeInTheDocument();
+    });
+  });
 });

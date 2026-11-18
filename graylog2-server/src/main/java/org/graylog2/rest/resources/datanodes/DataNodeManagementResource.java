@@ -26,6 +26,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -47,8 +48,11 @@ import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.configuration.RunsWithDataNode;
+import org.graylog2.configuration.managed.NodeType;
+import org.graylog2.configuration.managed.PendingRestarts;
 import org.graylog2.datanode.DataNodeCommandService;
 import org.graylog2.datanode.restart.RollingRestartActions;
+import org.graylog2.datanode.restart.RollingRestartJobHandler;
 import org.graylog2.rest.bulk.AuditParams;
 import org.graylog2.rest.bulk.BulkExecutor;
 import org.graylog2.rest.bulk.SequentialBulkExecutor;
@@ -75,6 +79,8 @@ public class DataNodeManagementResource extends RestResource {
     private final NodeService<DataNodeDto> nodeService;
     private final Boolean runsWithDataNode;
     private final RollingRestartActions rollingRestartActions;
+    private final RollingRestartJobHandler rollingRestartJobHandler;
+    private final PendingRestarts pendingRestarts;
     private final BulkExecutor<DataNodeDto, UserContext> bulkRemovalExecutor;
     private final BulkExecutor<DataNodeDto, UserContext> bulkStopExecutor;
     private final BulkExecutor<DataNodeDto, UserContext> bulkStartExecutor;
@@ -84,11 +90,15 @@ public class DataNodeManagementResource extends RestResource {
                                          NodeService<DataNodeDto> nodeService,
                                          @RunsWithDataNode Boolean runsWithDataNode,
                                          AuditEventSender auditEventSender, ObjectMapper objectMapper,
-                                         RollingRestartActions rollingRestartActions) {
+                                         RollingRestartActions rollingRestartActions,
+                                         RollingRestartJobHandler rollingRestartJobHandler,
+                                         PendingRestarts pendingRestarts) {
         this.dataNodeCommandService = dataNodeCommandService;
         this.nodeService = nodeService;
         this.runsWithDataNode = runsWithDataNode;
         this.rollingRestartActions = rollingRestartActions;
+        this.rollingRestartJobHandler = rollingRestartJobHandler;
+        this.pendingRestarts = pendingRestarts;
         bulkRemovalExecutor = new SequentialBulkExecutor<>(this::removeNode, auditEventSender, objectMapper);
         bulkStopExecutor = new SequentialBulkExecutor<>(this::stopNode, auditEventSender, objectMapper);
         bulkStartExecutor = new SequentialBulkExecutor<>(this::startNode, auditEventSender, objectMapper);
@@ -170,6 +180,12 @@ public class DataNodeManagementResource extends RestResource {
     @AuditEvent(type = DATANODE_TRIGGER_RESTART)
     @RequiresPermissions(RestPermissions.DATANODE_RESTART)
     public DataNodeDto restartNode(@Parameter(name = "nodeId", required = true) @PathParam("nodeId") String nodeId) {
+        if (rollingRestartJobHandler.isActive()) {
+            throw new ClientErrorException("A rolling restart of the Data Nodes is running already.", Response.Status.CONFLICT);
+        }
+        if (pendingRestarts.isRestarting(NodeType.DATANODE, nodeId)) {
+            throw new ClientErrorException("Data Node " + nodeId + " is restarting already.", Response.Status.CONFLICT);
+        }
         try {
             final DataNodeDto node = nodeService.byNodeId(nodeId);
             rollingRestartActions.restartNode(node.getHostname());

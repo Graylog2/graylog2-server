@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { SystemManagedConfiguration } from '@graylog/server-api';
+import { Datanode, DataNodeRollingRestart, SystemManagedConfiguration } from '@graylog/server-api';
 
 import type { ManagedConfiguration, ConfigurationValues } from './types';
 
@@ -25,6 +25,12 @@ const managedConfigurationApi = {
     SystemManagedConfiguration.get(NODE_TYPE, nodeId ?? undefined),
   update: (values: ConfigurationValues, nodeId: string | null = null): Promise<ManagedConfiguration> =>
     SystemManagedConfiguration.update({ node_type: NODE_TYPE, node_id: nodeId, values }),
+  // A single Data Node restarts its OpenSearch process right away. All Data Nodes are restarted one after another, so
+  // the cluster stays available, without upgrading OpenSearch.
+  restart: (nodeId: string | null = null): Promise<unknown> =>
+    nodeId === null
+      ? DataNodeRollingRestart.start({ force: false, restart_only: true })
+      : Datanode.restartNode(nodeId),
 };
 
 export default managedConfigurationApi;
