@@ -57,7 +57,6 @@ import org.opensearch.client.opensearch._types.aggregations.RangeAggregation;
 import org.opensearch.client.opensearch._types.mapping.FieldType;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
-import org.opensearch.client.opensearch._types.query_dsl.TermsQueryField;
 import org.opensearch.client.opensearch.core.SearchResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,6 +80,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.graylog.storage.opensearch3.SearchRequestFactoryOS.termsQuery;
 
 public class MoreSearchAdapterOS implements MoreSearchAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(MoreSearchAdapterOS.class);
@@ -216,11 +216,6 @@ public class MoreSearchAdapterOS implements MoreSearchAdapter {
 
     private Query timerangeQuery(TimeRange timerange) {
         return Query.builder().range(TimeRangeQueryFactory.createTimeRangeQuery(timerange)).build();
-    }
-
-    private Query termsQuery(String field, Set<String> eventStreams) {
-        final List<FieldValue> values = eventStreams.stream().map(FieldValue::of).collect(Collectors.toList());
-        return Query.builder().terms(terms -> terms.field(field).terms(TermsQueryField.builder().value(values).build())).build();
     }
 
     private Query queryStringQuery(String queryString, Boolean allowLeadingWildcard) {

@@ -89,7 +89,10 @@ const renderPage = (focusedWidget?: FocusContextState) => {
     </WidgetFocusContext.Provider>,
   );
 
-  return { getTools: (): PageTools => snapshot.getTools(), getPage: (): PageContext['page'] => snapshot.getSnapshot().page };
+  return {
+    getTools: (): PageTools => snapshot.getTools(),
+    getPage: (): PageContext['page'] => snapshot.getSnapshot().page,
+  };
 };
 
 const renderTools = () => renderPage().getTools;
@@ -257,7 +260,10 @@ describe('SearchPageAssistantContext', () => {
       config: {
         row_pivots: [{ fields: ['source'], type: 'values', config: { limit: 15 } }],
         column_pivots: [],
-        series: [{ function: 'count()', config: {} }, { function: 'avg(took_ms)', config: {} }],
+        series: [
+          { function: 'count()', config: {} },
+          { function: 'avg(took_ms)', config: {} },
+        ],
         sort: [],
         visualization: 'bar',
         visualization_config: { barmode: 'stack' },
