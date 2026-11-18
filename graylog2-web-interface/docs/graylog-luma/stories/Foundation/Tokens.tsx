@@ -21,9 +21,9 @@ import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from 'theme/sawmill';
 import SawmillMantine from 'theme/sawmill/mantine/Sawmill';
 import SawmillSC from 'theme/sawmill/styled-components/Sawmill';
 
-import { FoundationTable, StoryContainer, Token } from './shared';
+import { ColorSwatch, FoundationTable, StoryContainer, Token } from './shared';
 import { PALETTE_NAMES } from './colorPalette';
-import { BORDER_TOKENS, dividerColor } from './lumaTokens';
+import { BORDER_TOKENS } from './lumaTokens';
 
 // ─── Token groups ──────────────────────────────────────────────────────────
 // Edit this list to add, remove or regroup tokens. `path` is the path below `theme.colors`.
@@ -137,18 +137,6 @@ const ValueCell = styled.div`
   gap: ${({ theme }) => theme.spacings.xs};
 `;
 
-// Checkerboard behind the swatch so semi-transparent colors are visible.
-const SwatchChip = styled.div<{ $color: string }>`
-  flex-shrink: 0;
-  width: 32px;
-  height: 24px;
-  border-radius: 4px;
-  border: 1px solid ${({ theme }) => dividerColor(theme)};
-  background:
-    linear-gradient(${({ $color }) => $color}, ${({ $color }) => $color}),
-    repeating-conic-gradient(#ccc 0% 25%, #fff 0% 50%) 0 0 / 8px 8px;
-`;
-
 const Hex = styled.span`
   font-family: ${({ theme }) => theme.fonts.family.monospace};
   font-size: 12px;
@@ -167,7 +155,7 @@ const ColorValue = ({ value }: { value: string | undefined }) => {
 
   return (
     <ValueCell>
-      <SwatchChip $color={value} />
+      <ColorSwatch color={value} />
       <div>
         <Hex>{value}</Hex>
         <PaletteLabel $missing={!name}>{name ?? 'Not in Luma palette'}</PaletteLabel>

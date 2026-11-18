@@ -22,6 +22,7 @@ import {
   COL_WIDTH_SIZE,
   COL_WIDTH_STYLE,
   COL_WIDTH_VARIABLE,
+  ColorSwatch,
   FoundationTable,
   PxLabel,
   StoryContainer,
@@ -277,19 +278,10 @@ export const TypeScaleGroupDoc = ({ label }: { label: string }) => {
 
 // ─── Text Colors ───────────────────────────────────────────────────────────
 
-const Swatch = styled.div<{ $color: string; $labelColor: string }>`
-  width: 120px;
-  height: 64px;
-  border-radius: 6px;
-  background-color: ${({ $color }) => $color};
-  border: 1px solid rgba(128, 128, 128, 0.25);
+const ColorCell = styled.div`
   display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
-  padding: ${({ theme }) => theme.spacings.xs};
-  font-size: ${({ theme }) => theme.fonts.size.small};
-  font-weight: 600;
-  color: ${({ $labelColor }) => $labelColor};
+  align-items: center;
+  gap: ${({ theme }) => theme.spacings.xs};
 `;
 
 type ColorEntry = {
@@ -331,9 +323,10 @@ export const TextColorsDoc = () => {
         const color = row.getColor(theme);
 
         return (
-          <Swatch $color={color} $labelColor={theme.utils.readableColor(color)}>
+          <ColorCell>
+            <ColorSwatch color={color} />
             {row.name}
-          </Swatch>
+          </ColorCell>
         );
       },
     },

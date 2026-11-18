@@ -84,6 +84,28 @@ export const PxLabel = styled.span`
   color: ${({ theme }) => theme.colors.text.secondary};
 `;
 
+// Checkerboard behind the color so semi-transparent colors are visible.
+const StyledColorSwatch = styled.div<{ $color: string; $width: string; $height: string }>`
+  flex-shrink: 0;
+  width: ${({ $width }) => $width};
+  height: ${({ $height }) => $height};
+  border-radius: 4px;
+  border: 1px solid ${({ theme }) => dividerColor(theme)};
+  background:
+    linear-gradient(${({ $color }) => $color}, ${({ $color }) => $color}),
+    repeating-conic-gradient(#ccc 0% 25%, #fff 0% 50%) 0 0 / 8px 8px;
+`;
+
+type ColorSwatchProps = {
+  color: string;
+  width?: string;
+  height?: string;
+};
+
+export const ColorSwatch = ({ color, width = '32px', height = '24px' }: ColorSwatchProps) => (
+  <StyledColorSwatch $color={color} $width={width} $height={height} />
+);
+
 export const StoryContainer = styled.div`
   padding-bottom: ${({ theme }) => theme.spacings.xs};
 `;

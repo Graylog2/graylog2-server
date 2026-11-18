@@ -17,7 +17,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { StoryContainer } from './shared';
+import { ColorSwatch, StoryContainer } from './shared';
 import { SECTIONS } from './colorPalette';
 import type { Swatch } from './colorPalette';
 import { dividerColor } from './lumaTokens';
@@ -67,13 +67,6 @@ const SwatchGrid = styled.div`
   margin-top: ${({ theme }) => theme.spacings.sm};
 `;
 
-const SwatchTile = styled.div<{ $hex: string }>`
-  height: 44px;
-  border-radius: 4px;
-  border: 1px solid ${({ theme }) => dividerColor(theme)};
-  background-color: ${({ $hex }) => $hex};
-`;
-
 const SwatchLabel = styled.div`
   margin-top: ${({ theme }) => theme.spacings.xs};
   font-size: 12px;
@@ -86,9 +79,9 @@ const SwatchHex = styled.div`
   color: ${({ theme }) => theme.colors.text.secondary};
 `;
 
-const ColorSwatch = ({ swatch }: { swatch: Swatch }) => (
+const PaletteSwatch = ({ swatch }: { swatch: Swatch }) => (
   <div>
-    <SwatchTile $hex={swatch.hex} />
+    <ColorSwatch color={swatch.hex} width="100%" height="44px" />
     <SwatchLabel>{swatch.label}</SwatchLabel>
     <SwatchHex>{swatch.hex}</SwatchHex>
   </div>
@@ -116,7 +109,7 @@ export const ColorsDoc = () => (
               {palette.description && <Muted>{palette.description}</Muted>}
               <SwatchGrid>
                 {palette.swatches.map((swatch) => (
-                  <ColorSwatch key={`${swatch.label}-${swatch.hex}`} swatch={swatch} />
+                  <PaletteSwatch key={`${swatch.label}-${swatch.hex}`} swatch={swatch} />
                 ))}
               </SwatchGrid>
             </PaletteBlock>
