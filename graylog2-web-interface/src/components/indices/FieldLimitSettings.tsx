@@ -14,11 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import React, { useState } from 'react';
 import { Field, getIn, useFormikContext } from 'formik';
 
 import { Alert, Input } from 'components/bootstrap';
-import { ExternalLink, FormikInput, Switch } from 'components/common';
+import { ConfirmDialog, ExternalLink, FormikInput, Switch } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import AppConfig from 'util/AppConfig';
 import useProfile from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfile';
@@ -81,7 +81,8 @@ const dynamicMappingHelp = (profile: Props['profile'], checked: boolean) => {
 };
 
 const FieldLimitSettings = ({ namePrefix = '', errors = {}, profile = undefined }: Props) => {
-  const { values, initialValues } = useFormikContext();
+  const { values, initialValues, setFieldValue } = useFormikContext();
+  const [showDisableConfirm, setShowDisableConfirm] = useState(false);
   const limitName = `${namePrefix}field_limit`;
   const dynamicMappingName = `${namePrefix}dynamic_mapping_disabled`;
   const fieldLimit = getIn(values, limitName);
@@ -106,7 +107,7 @@ const FieldLimitSettings = ({ namePrefix = '', errors = {}, profile = undefined 
       )}
       {profile?.id && <ProfileSizeWarning profileId={profile.id} fieldLimit={fieldLimit || DEFAULT_FIELD_LIMIT} />}
       <Field name={dynamicMappingName}>
-        {({ field: { name, value }, form: { setFieldValue } }) => (
+        {({ field: { name, value } }) => (
           <Input
             id={name}
             label="Disable dynamic index mapping"
@@ -118,11 +119,22 @@ const FieldLimitSettings = ({ namePrefix = '', errors = {}, profile = undefined 
               aria-label="Disable dynamic index mapping"
               checked={!!value}
               disabled={!!profile && !profile.isIlluminate && !profile.id && !value}
-              onChange={(event) => setFieldValue(name, event.target.checked)}
+              onChange={(event) => (event.target.checked ? setShowDisableConfirm(true) : setFieldValue(name, false))}
             />
           </Input>
         )}
       </Field>
+      <ConfirmDialog
+        show={showDisableConfirm}
+        title="Disable dynamic index mapping?"
+        btnConfirmText="Disable dynamic mapping"
+        onCancel={() => setShowDisableConfirm(false)}
+        onConfirm={() => {
+          setFieldValue(dynamicMappingName, true);
+          setShowDisableConfirm(false);
+        }}>
+        {dynamicMappingHelp(profile, true)}
+      </ConfirmDialog>
       {profile?.isIlluminate && dynamicMappingSavedOff && <KeptFieldsInfo keptFieldsCount={profile.keptFieldsCount} />}
     </>
   );

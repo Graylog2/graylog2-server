@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, within } from 'wrappedTestingLibrary';
 import { waitFor } from 'wrappedTestingLibrary/hooks';
 import userEvent from '@testing-library/user-event';
 
@@ -477,6 +477,57 @@ describe('IndexSetConfigurationForm', () => {
       expect(screen.queryByRole('spinbutton', { name: /max field count/i })).not.toBeInTheDocument();
 
       isCloud.mockRestore();
+    });
+
+    it('Should keep dynamic mapping on when the confirmation is cancelled', async () => {
+      render(<SUT indexSet={{ ...indexSet, field_type_profile: 'profile-id' }} />);
+
+      const toggle = await screen.findByLabelText(/disable dynamic index mapping/i);
+      await userEvent.click(toggle);
+
+      const dialog = await screen.findByRole('dialog');
+      await userEvent.click(within(dialog).getByRole('button', { name: /cancel/i }));
+
+      await waitFor(() => {
+        expect(screen.queryByText('Disable dynamic index mapping?')).not.toBeInTheDocument();
+      });
+
+      expect(toggle).not.toBeChecked();
+    });
+
+    it('Should disable dynamic mapping only after the confirmation', async () => {
+      render(<SUT indexSet={{ ...indexSet, field_type_profile: 'profile-id' }} />);
+
+      const toggle = await screen.findByLabelText(/disable dynamic index mapping/i);
+      await userEvent.click(toggle);
+
+      expect(toggle).not.toBeChecked();
+
+      const dialog = await screen.findByRole('dialog');
+      await userEvent.click(within(dialog).getByRole('button', { name: /disable dynamic mapping/i }));
+
+      await waitFor(() => {
+        expect(toggle).toBeChecked();
+      });
+
+      await userEvent.click(await screen.findByRole('button', { name: /save/i }));
+
+      await waitFor(() => {
+        expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ dynamic_mapping_disabled: true }));
+      });
+    });
+
+    it('Should turn dynamic mapping back on without a confirmation', async () => {
+      render(<SUT indexSet={{ ...indexSet, field_type_profile: 'profile-id', dynamic_mapping_disabled: true }} />);
+
+      const toggle = await screen.findByLabelText(/disable dynamic index mapping/i);
+      await userEvent.click(toggle);
+
+      await waitFor(() => {
+        expect(toggle).not.toBeChecked();
+      });
+
+      expect(screen.queryByText('Disable dynamic index mapping?')).not.toBeInTheDocument();
     });
 
     it('Should show the backend error on the field', async () => {
