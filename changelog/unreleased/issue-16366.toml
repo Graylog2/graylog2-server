@@ -2,4 +2,4 @@ type = "a"
 message = "Allow plugins to run event definitions on their own scheduler job type and to normalize event definitions before they are saved."
 
 issues = ["Graylog2/graylog-plugin-enterprise#16366"]
-pulls = []
+pulls = ["28259"]
