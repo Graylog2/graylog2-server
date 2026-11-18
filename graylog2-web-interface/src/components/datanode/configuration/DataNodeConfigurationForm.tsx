@@ -20,7 +20,7 @@ import { Navigate, Route, Routes, useMatch } from 'react-router-dom';
 import styled from 'styled-components';
 
 import { Alert, Button, Col, NavItem, Row } from 'components/bootstrap';
-import { ConfirmLeaveDialog, FormSubmit, Link, LinkContainer, Spinner } from 'components/common';
+import { ConfirmLeaveDialog, FormSubmit, Link, LinkContainer } from 'components/common';
 import { SectionNav, SectionNavItem } from 'components/configurations/SectionNav';
 import usePermissions from 'hooks/usePermissions';
 import RoutePaths from 'routing/Routes';
@@ -30,12 +30,7 @@ import { categoryId } from './configurationFields';
 import useDataNodeConfigurationForm from './useDataNodeConfigurationForm';
 import DataNodeConfigurationSection from './DataNodeConfigurationSection';
 import ConfigurationPrecedenceHelp from './ConfigurationPrecedenceHelp';
-
-const RestartProgress = styled.span`
-  display: inline-flex;
-  align-items: center;
-  gap: ${({ theme }) => theme.spacings.sm};
-`;
+import DataNodeRestartProgress from './DataNodeRestartProgress';
 
 const RestartSettingsList = styled.ul`
   display: flex;
@@ -139,10 +134,7 @@ const DataNodeConfigurationForm = ({ categories, nodeId, basePath, children = un
                 </Routes>
                 {isRestarting && (
                   <Alert bsStyle="info" title={nodeId === null ? 'Restarting Data Nodes' : 'Restarting Data Node'}>
-                    <RestartProgress>
-                      <Spinner text="" delay={0} />
-                      <span role="status">{restartProgress}</span>
-                    </RestartProgress>
+                    <DataNodeRestartProgress progress={restartProgress} />
                   </Alert>
                 )}
                 {canEdit && !isRestarting && restartParameters.length > 0 && (

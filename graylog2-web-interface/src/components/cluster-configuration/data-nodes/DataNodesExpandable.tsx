@@ -31,6 +31,7 @@ import {
 } from './DataNodesColumnConfiguration';
 import { clusterDataNodesKeyFn, fetchClusterDataNodesWithMetrics } from './fetchClusterDataNodes';
 import type { ClusterDataNode } from './fetchClusterDataNodes';
+import DataNodeRestartBanner from './DataNodeRestartBanner';
 
 import ClusterNodesSectionWrapper from '../shared-components/ClusterNodesSectionWrapper';
 
@@ -83,6 +84,7 @@ const DataNodesExpandable = ({
       titleCount={totalDataNodes}
       onTitleCountClick={onSelectNodeType ?? null}
       collapsible={collapsible}>
+      <DataNodeRestartBanner />
       <PaginatedEntityTable<ClusterDataNode>
         tableLayout={tableLayout}
         fetchEntities={fetchClusterDataNodesWithMetrics}

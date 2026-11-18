@@ -33,7 +33,7 @@ const REQUEST_GRACE_PERIOD = 30000;
  */
 const useDataNodeRestartProgress = (nodeId: string | null) => {
   const { isPermitted } = usePermissions();
-  const { data: configuration } = useManagedConfiguration(nodeId);
+  const { data: configuration } = useManagedConfiguration(nodeId, isPermitted('clusterconfigentry:read'));
   const { data: rollingRestart } = useCurrentRollingRestart(isPermitted('datanode:read'));
   const [restartRequested, setRestartRequested] = useState(false);
 
