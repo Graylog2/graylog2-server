@@ -233,11 +233,11 @@ public class IpfixAggregatorTest {
         // Two exporters use the same observation domain id and the same template id, but different field layouts.
         final Exporter exporterA = new Exporter(InetSocketAddress.createUnresolved("192.168.1.1", 4739),
                 templateRecord(COLLIDING_TEMPLATE_ID, IE_SOURCE_IPV4_ADDRESS, 4, IE_PROTOCOL_IDENTIFIER, 1),
-                new byte[]{10, 0, 0, 1, 6},
+                ByteString.copyFrom(new byte[]{10, 0, 0, 1, 6}),
                 "10.0.0.1", 6L);
         final Exporter exporterB = new Exporter(InetSocketAddress.createUnresolved("192.168.1.2", 4739),
                 templateRecord(COLLIDING_TEMPLATE_ID, IE_SOURCE_IPV4_ADDRESS, 4, IE_DESTINATION_TRANSPORT_PORT, 2, IE_PROTOCOL_IDENTIFIER, 1),
-                new byte[]{10, 0, 0, 2, 0x01, (byte) 0xbb, 17},
+                ByteString.copyFrom(new byte[]{10, 0, 0, 2, 0x01, (byte) 0xbb, 17}),
                 "10.0.0.2", 17L);
 
         // the arrival order of the exporters must not matter
@@ -269,7 +269,7 @@ public class IpfixAggregatorTest {
         assertThat(rawIpfix.getTemplatesMap())
                 .as("templates sent along with the data of exporter %s", exporter.address())
                 .containsOnlyKeys(COLLIDING_TEMPLATE_ID)
-                .containsEntry(COLLIDING_TEMPLATE_ID, ByteString.copyFrom(exporter.templateRecord()));
+                .containsEntry(COLLIDING_TEMPLATE_ID, exporter.templateRecord());
 
         final Collection<Message> messages = codec.decodeMessages(new RawMessage(bytes));
         assertThat(messages).singleElement().satisfies(message -> {
@@ -278,26 +278,26 @@ public class IpfixAggregatorTest {
         });
     }
 
-    private static byte[] templateRecord(int templateId, int... fieldIdsAndLengths) {
+    private static ByteString templateRecord(int templateId, int... fieldIdsAndLengths) {
         final ByteBuf buf = Unpooled.buffer();
         buf.writeShort(templateId);
         buf.writeShort(fieldIdsAndLengths.length / 2);
         for (int value : fieldIdsAndLengths) {
             buf.writeShort(value);
         }
-        return ByteBufUtil.getBytes(buf);
+        return ByteString.copyFrom(ByteBufUtil.getBytes(buf));
     }
 
-    private static ByteBuf ipfixPacket(@Nullable byte[] templateRecord, byte[] dataRecord) {
+    private static ByteBuf ipfixPacket(@Nullable ByteString templateRecord, ByteString dataRecord) {
         final ByteBuf sets = Unpooled.buffer();
         if (templateRecord != null) {
             sets.writeShort(2); // template set id
-            sets.writeShort(4 + templateRecord.length);
-            sets.writeBytes(templateRecord);
+            sets.writeShort(4 + templateRecord.size());
+            sets.writeBytes(templateRecord.toByteArray());
         }
         sets.writeShort(COLLIDING_TEMPLATE_ID); // data set id
-        sets.writeShort(4 + dataRecord.length);
-        sets.writeBytes(dataRecord);
+        sets.writeShort(4 + dataRecord.size());
+        sets.writeBytes(dataRecord.toByteArray());
 
         final ByteBuf packet = Unpooled.buffer();
         packet.writeShort(10); // IPFIX version
@@ -309,7 +309,7 @@ public class IpfixAggregatorTest {
         return packet;
     }
 
-    private record Exporter(InetSocketAddress address, byte[] templateRecord, byte[] dataRecord,
+    private record Exporter(InetSocketAddress address, ByteString templateRecord, ByteString dataRecord,
                             String expectedSourceAddress, long expectedProtocol) {
     }
 
