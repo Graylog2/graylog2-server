@@ -54,6 +54,22 @@ class BucketAggregationTest {
     }
 
     @Test
+    void aggregatesAllDocumentsWithoutAFilter() {
+        final var request = BucketAggregation.of(null, Grouping.terms("owner"));
+
+        assertThat(request.documentFilter().toBsonDocument()).isEmpty();
+    }
+
+    @Test
+    void ordersByCountDescendingWithoutAnOrder() {
+        final var request = BucketAggregation.of(null, Grouping.terms("owner"))
+                .withOrder(BucketOrder.byKey(SortOrder.ASCENDING))
+                .withOrder(null);
+
+        assertThat(request.order()).isEqualTo(BucketOrder.byCount(SortOrder.DESCENDING));
+    }
+
+    @Test
     void validatesOrderAndLimit() {
         final var request = BucketAggregation.of(new Document(), Grouping.terms("owner"));
 

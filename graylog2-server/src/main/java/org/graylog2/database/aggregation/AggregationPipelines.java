@@ -63,7 +63,7 @@ final class AggregationPipelines {
 
     static List<Bson> buckets(final BucketAggregation request) {
         final var stages = new ArrayList<Bson>();
-        stages.add(Aggregates.match(request.filter()));
+        stages.add(Aggregates.match(request.documentFilter()));
         stages.addAll(valueStages(request.grouping().source()));
         stages.add(Aggregates.unwind("$" + VALUE, new UnwindOptions().preserveNullAndEmptyArrays(true)));
         stages.add(Aggregates.group(bucketKey(request.grouping()), Accumulators.sum(COUNT, 1L)));
