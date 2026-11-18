@@ -87,6 +87,8 @@ public class McpOAuthService {
 
     static final Duration AUTHORIZATION_CODE_TTL = Duration.ofMinutes(1);
     static final Duration UNUSED_CLIENT_TTL = Duration.ofDays(1);
+    // Lets clients refresh concurrently without being taken for a replay
+    static final Duration REFRESH_TOKEN_REUSE_GRACE_PERIOD = Duration.ofSeconds(30);
     static final long MAX_CLIENTS = 10_000;
     private static final int MAX_REDIRECT_URIS = 10;
     private static final int MAX_CLIENT_NAME_LENGTH = 100;
@@ -305,13 +307,8 @@ public class McpOAuthService {
             throw OAuthException.of(INVALID_REQUEST, "Missing refresh_token");
         }
         final String tokenHash = OAuthTokens.hash(refreshToken);
-        final Optional<OAuthRefreshToken> unused = refreshTokenService.markUsed(tokenHash);
-        if (unused.isEmpty()) {
-            refreshTokenService.findByHash(tokenHash).ifPresent(this::handleRefreshTokenReuse);
-            throw OAuthException.of(INVALID_GRANT, "Invalid refresh token");
-        }
-        final OAuthRefreshToken token = unused.get();
         final Instant now = Instant.now(clock);
+        final OAuthRefreshToken token = consumeRefreshToken(tokenHash, now);
 
         if (!token.clientId().equals(client.clientId())) {
             throw OAuthException.of(INVALID_GRANT, "Refresh token was issued to another client");
@@ -323,6 +320,11 @@ public class McpOAuthService {
         final User user = loadAuthorizedUser(token.userId());
 
         final TokenResponse response = issueTokens(client, user, effectiveResource);
+        // Revocations delete the used token too, so its absence means a revocation might have missed the new tokens
+        if (refreshTokenService.findByHash(tokenHash).isEmpty()) {
+            revokeTokens(token.username(), token.clientId());
+            throw OAuthException.of(INVALID_GRANT, "Authorization was revoked");
+        }
         auditEventSender.success(AuditActor.user(user), MCP_OAUTH_TOKEN_REFRESH, clientContext(client));
         return response;
     }
@@ -397,13 +399,27 @@ public class McpOAuthService {
                 user.getId(),
                 user.getName(),
                 resource,
-                false,
+                null,
                 now,
                 refreshTokenExpiresAt
         ));
         clientService.extendExpiry(client.clientId(), refreshTokenExpiresAt);
 
         return new TokenResponse(accessToken.getToken(), accessTokenTtl.toSeconds(), refreshToken);
+    }
+
+    private OAuthRefreshToken consumeRefreshToken(String tokenHash, Instant now) {
+        final Optional<OAuthRefreshToken> unused = refreshTokenService.markUsed(tokenHash, now);
+        if (unused.isPresent()) {
+            return unused.get();
+        }
+        final OAuthRefreshToken used = refreshTokenService.findByHash(tokenHash)
+                .orElseThrow(() -> OAuthException.of(INVALID_GRANT, "Invalid refresh token"));
+        if (used.usedAt() == null || used.usedAt().plus(REFRESH_TOKEN_REUSE_GRACE_PERIOD).isBefore(now)) {
+            handleRefreshTokenReuse(used);
+            throw OAuthException.of(INVALID_GRANT, "Invalid refresh token");
+        }
+        return used;
     }
 
     private void handleRefreshTokenReuse(OAuthRefreshToken token) {

@@ -25,7 +25,9 @@ import jakarta.inject.Singleton;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -62,15 +64,15 @@ public class OAuthRefreshTokenService {
      *
      * @return the token if it was unused before, empty if it doesn't exist or was already used
      */
-    public Optional<OAuthRefreshToken> markUsed(String tokenHash) {
+    public Optional<OAuthRefreshToken> markUsed(String tokenHash, Instant usedAt) {
         return Optional.ofNullable(collection.findOneAndUpdate(
-                and(eq(OAuthRefreshToken.FIELD_TOKEN_HASH, tokenHash), eq(OAuthRefreshToken.FIELD_USED, false)),
-                Updates.set(OAuthRefreshToken.FIELD_USED, true)
+                and(eq(OAuthRefreshToken.FIELD_TOKEN_HASH, tokenHash), eq(OAuthRefreshToken.FIELD_USED_AT, null)),
+                Updates.set(OAuthRefreshToken.FIELD_USED_AT, Date.from(usedAt))
         ));
     }
 
     public List<OAuthRefreshToken> findActiveByUsername(String username) {
-        return collection.find(and(eq(OAuthRefreshToken.FIELD_USERNAME, username), eq(OAuthRefreshToken.FIELD_USED, false)))
+        return collection.find(and(eq(OAuthRefreshToken.FIELD_USERNAME, username), eq(OAuthRefreshToken.FIELD_USED_AT, null)))
                 .into(new ArrayList<>());
     }
 
