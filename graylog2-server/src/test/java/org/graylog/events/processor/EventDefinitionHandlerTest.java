@@ -16,6 +16,9 @@
  */
 package org.graylog.events.processor;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.github.joschi.jadconfig.util.Duration;
@@ -24,6 +27,7 @@ import jakarta.inject.Provider;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog.events.TestEventProcessorConfig;
 import org.graylog.events.TestEventProcessorParameters;
+import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
 import org.graylog.events.notifications.EventNotificationExecutionJob;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.storage.PersistToStreamsStorageHandler;
@@ -33,14 +37,17 @@ import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.capabilities.SchedulerCapabilitiesService;
+import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
+import org.graylog.security.UserContext;
 import org.graylog.security.entities.EntityRegistrar;
 import org.graylog.security.shares.EntitySharesService;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScope;
@@ -49,7 +56,9 @@ import org.graylog2.database.entities.source.EntitySource;
 import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -117,6 +126,8 @@ public class EventDefinitionHandlerTest {
         objectMapper.registerSubtypes(new NamedType(IntervalJobSchedule.class, IntervalJobSchedule.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(OnceJobSchedule.class, OnceJobSchedule.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(PersistToStreamsStorageHandler.Config.class, PersistToStreamsStorageHandler.Config.TYPE_NAME));
+        objectMapper.registerSubtypes(new NamedType(TestLongRunningProcessorConfig.class, TestLongRunningProcessorConfig.TYPE_NAME));
+        objectMapper.registerSubtypes(new NamedType(TestLongRunningJobConfig.class, TestLongRunningJobConfig.TYPE_NAME));
 
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
         final var mongoCollections = new MongoCollections(mapperProvider, dbTestService.mongoConnection());
@@ -586,6 +597,99 @@ public class EventDefinitionHandlerTest {
 
         assertThat(jobTriggerService.get("61fbcca5b2507945cc120001")).isNotPresent();
         assertThat(jobTriggerService.get("61fbcca5b2507945cc120002")).isPresent();
+    }
+
+    @Test
+    public void createUsesJobTypeFromSchedulerConfig() {
+        final EventDefinitionDto dto = handler.create(longRunningDefinition(), Optional.empty());
+
+        final JobDefinitionDto jobDefinition = jobDefinitionService.getByConfigField("event_definition_id", dto.id())
+                .orElseThrow(AssertionError::new);
+        assertThat(jobDefinition.config()).isInstanceOf(TestLongRunningJobConfig.class);
+        assertThat(jobTriggerService.getOneForJob(jobDefinition.id())).get()
+                .satisfies(trigger -> assertThat(trigger.jobDefinitionType()).isEqualTo(TestLongRunningJobConfig.TYPE_NAME));
+    }
+
+    @Test
+    @MongoDBFixtures("event-processors.json")
+    public void updateToAnotherJobTypeIsRejectedAndReverted() {
+        final EventDefinitionDto existingDto = eventDefinitionService.get("54e3deadbeefdeadbeef0000").orElseThrow(AssertionError::new);
+        final JobTriggerDto existingTrigger = jobTriggerService.get("54e3deadbeefdeadbeef0002").orElseThrow(AssertionError::new);
+
+        assertThatThrownBy(() -> handler.update(existingDto.toBuilder().config(new TestLongRunningProcessorConfig(
+                TestLongRunningProcessorConfig.TYPE_NAME, 300000, 60000)).build(), true))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("can't change its job type");
+
+        assertThat(eventDefinitionService.get(existingDto.id())).get()
+                .satisfies(dto -> assertThat(dto.config()).isEqualTo(existingDto.config()));
+        assertThat(jobDefinitionService.get("54e3deadbeefdeadbeef0001")).get()
+                .satisfies(definition -> assertThat(definition.config()).isInstanceOf(EventProcessorExecutionJob.Config.class));
+        assertThat(jobTriggerService.get("54e3deadbeefdeadbeef0002")).get().satisfies(trigger -> {
+            assertThat(trigger.jobDefinitionType()).isEqualTo(EventProcessorExecutionJob.TYPE_NAME);
+            assertThat(trigger.data()).isEqualTo(existingTrigger.data());
+        });
+    }
+
+    private EventDefinitionDto longRunningDefinition() {
+        return EventDefinitionDto.builder()
+                .title("Long running")
+                .description("Runs on its own job type")
+                .config(new TestLongRunningProcessorConfig(TestLongRunningProcessorConfig.TYPE_NAME, 300000, 60000))
+                .priority(3)
+                .alert(false)
+                .notificationSettings(EventNotificationSettings.withGracePeriod(60000))
+                .keySpec(ImmutableList.of())
+                .notifications(ImmutableList.of())
+                .build();
+    }
+
+    /**
+     * Event processor config that runs on {@link TestLongRunningJobConfig} and requires a scheduler capability.
+     */
+    @JsonAutoDetect(getterVisibility = Visibility.NONE, isGetterVisibility = Visibility.NONE)
+    record TestLongRunningProcessorConfig(@JsonProperty("type") String type,
+                                          @JsonProperty("search_within_ms") long searchWithinMs,
+                                          @JsonProperty("execute_every_ms") long executeEveryMs) implements EventProcessorConfig {
+        static final String TYPE_NAME = "__test_long_running_processor__";
+
+        @Override
+        public Optional<EventProcessorSchedulerConfig> toJobSchedulerConfig(EventDefinition eventDefinition, JobSchedulerClock clock) {
+            final DateTime now = clock.nowUTC();
+            final TestLongRunningJobConfig jobConfig = new TestLongRunningJobConfig(TestLongRunningJobConfig.TYPE_NAME,
+                    eventDefinition.id(),
+                    TestEventProcessorParameters.builder().timerange(AbsoluteRange.create(now.minus(searchWithinMs), now)).build(),
+                    searchWithinMs, executeEveryMs, false, false);
+            final IntervalJobSchedule schedule = IntervalJobSchedule.builder()
+                    .interval(executeEveryMs)
+                    .unit(TimeUnit.MILLISECONDS)
+                    .build();
+            return Optional.of(EventProcessorSchedulerConfig.builder()
+                    .jobDefinitionConfig(jobConfig)
+                    .schedule(schedule)
+                    .build());
+        }
+
+        @Override
+        public ValidationResult validate(UserContext userContext) {
+            return new ValidationResult();
+        }
+
+        @Override
+        public EventProcessorConfigEntity toContentPackEntity(EntityDescriptorIds entityDescriptorIds) {
+            return null;
+        }
+    }
+
+    @JsonAutoDetect(getterVisibility = Visibility.NONE, isGetterVisibility = Visibility.NONE)
+    record TestLongRunningJobConfig(@JsonProperty("type") String type,
+                                    @JsonProperty("event_definition_id") String eventDefinitionId,
+                                    @JsonProperty("parameters") EventProcessorParametersWithTimerange parameters,
+                                    @JsonProperty("processing_window_size") long processingWindowSize,
+                                    @JsonProperty("processing_hop_size") long processingHopSize,
+                                    @JsonProperty("is_cron") boolean isCron,
+                                    @JsonProperty("disable_catchup") boolean disableCatchup) implements EventProcessorJobConfig {
+        static final String TYPE_NAME = "__test_long_running_job__";
     }
 
     @ExtendWith(MongoDBExtension.class)

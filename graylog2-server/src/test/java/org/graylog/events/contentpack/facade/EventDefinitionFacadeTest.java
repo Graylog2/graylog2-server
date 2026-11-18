@@ -41,6 +41,7 @@ import org.graylog.events.processor.DBEventProcessorStateService;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
+import org.graylog.events.processor.EventDefinitionNormalizers;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.events.processor.aggregation.AggregationConditions;
@@ -182,7 +183,8 @@ public class EventDefinitionFacadeTest {
                 pluginMetaData,
                 jobDefinitionService,
                 eventDefinitionService,
-                userService);
+                userService,
+                EventDefinitionNormalizers.none());
     }
 
     @Test
@@ -357,7 +359,7 @@ public class EventDefinitionFacadeTest {
     @Test
     public void listExcerptsExcludesNonContentPackExportableEventDefinitions() {
         EventDefinitionFacade testFacade = new EventDefinitionFacade(
-                objectMapper, eventDefinitionHandler, new HashSet<>(), jobDefinitionService, mockEventDefinitionService, userService);
+                objectMapper, eventDefinitionHandler, new HashSet<>(), jobDefinitionService, mockEventDefinitionService, userService, EventDefinitionNormalizers.none());
         EventDefinitionDto dto = validEventDefinitionDto(mockEventProcessorConfig);
 
         when(mockEventProcessorConfig.isContentPackExportable()).thenReturn(false);

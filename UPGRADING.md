@@ -37,7 +37,9 @@ following locations where they are displayed:
 
 ## Java API Changes
 
-- tbd
+- `EventProcessorSchedulerConfig#jobDefinitionConfig()` and its `create` and builder methods now use the new
+  `EventProcessorJobConfig` interface instead of `JobDefinitionConfig`. `EventProcessorExecutionJob.Config` implements
+  it. Plugins that build an `EventProcessorSchedulerConfig` must be recompiled.
 
 ## REST API Endpoint Changes
 

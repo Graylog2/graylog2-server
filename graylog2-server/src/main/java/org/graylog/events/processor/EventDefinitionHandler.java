@@ -47,6 +47,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * Handles event definitions and creates scheduler job definitions and job triggers.
@@ -442,7 +443,7 @@ public class EventDefinitionHandler {
 
     private JobTriggerDto newJobTrigger(JobDefinitionDto jobDefinition, EventProcessorSchedulerConfig schedulerConfig) {
         return JobTriggerDto.builderWithClock(clock)
-                .jobDefinitionType(EventProcessorExecutionJob.TYPE_NAME)
+                .jobDefinitionType(schedulerConfig.jobDefinitionConfig().type())
                 .jobDefinitionId(requireNonNull(jobDefinition.id(), "Job definition ID cannot be null"))
                 .nextTime(clock.nowUTC())
                 .schedule(schedulerConfig.schedule())
@@ -475,14 +476,24 @@ public class EventDefinitionHandler {
 
         final JobTriggerDto oldJobTrigger = optionalOldJobTrigger.get();
 
+        final EventProcessorJobConfig config = schedulerConfig.jobDefinitionConfig();
+
+        // A definition can't move to another job type on update: the trigger keeps its type, and its data belongs
+        // to the old job. Event processors must reject such changes in validation; a move between releases needs a
+        // migration. Failing here makes the caller revert the update.
+        if (!oldJobTrigger.jobDefinitionType().equals(config.type())) {
+            throw new IllegalStateException(f("Event definition <%s> can't change its job type from <%s> to <%s>",
+                    eventDefinition.id(), oldJobTrigger.jobDefinitionType(), config.type()));
+        }
+
         // Update the existing object to make sure we keep the ID
         final JobTriggerDto.Builder unsavedJobTriggerBuilder = oldJobTrigger.toBuilder()
                 .jobDefinitionId(requireNonNull(jobDefinition.id(), "Job definition ID cannot be null"))
                 .schedule(schedulerConfig.schedule())
                 .nextTime(clock.nowUTC());
 
-        final EventProcessorExecutionJob.Config oldConfig = (EventProcessorExecutionJob.Config) oldJobDefinition.config();
-        final EventProcessorExecutionJob.Config config = (EventProcessorExecutionJob.Config) jobDefinition.config();
+        final EventProcessorJobConfig oldConfig = (EventProcessorJobConfig) oldJobDefinition.config();
+
         // If necessary, reset the scheduling times
         if (!config.hasEqualSchedule(oldConfig)) {
             // jobDefinition has a newly created scheduling timerange.
