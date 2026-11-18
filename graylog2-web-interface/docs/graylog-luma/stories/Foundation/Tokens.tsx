@@ -21,7 +21,7 @@ import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from 'theme/sawmill';
 import SawmillMantine from 'theme/sawmill/mantine/Sawmill';
 import SawmillSC from 'theme/sawmill/styled-components/Sawmill';
 
-import { ColorSwatch, FoundationTable, StoryContainer, Token } from './shared';
+import { ColorSwatch, FoundationTable, HexValue, StoryContainer, Token } from './shared';
 import { PALETTE_NAMES } from './colorPalette';
 import { BORDER_TOKENS } from './lumaTokens';
 
@@ -137,11 +137,6 @@ const ValueCell = styled.div`
   gap: ${({ theme }) => theme.spacings.xs};
 `;
 
-const Hex = styled.span`
-  font-family: ${({ theme }) => theme.fonts.family.monospace};
-  font-size: 12px;
-`;
-
 const PaletteLabel = styled.span<{ $missing?: boolean }>`
   display: block;
   font-size: 11px;
@@ -149,7 +144,7 @@ const PaletteLabel = styled.span<{ $missing?: boolean }>`
 `;
 
 const ColorValue = ({ value }: { value: string | undefined }) => {
-  if (!value) return <Hex>—</Hex>;
+  if (!value) return <HexValue>—</HexValue>;
 
   const name = paletteName(value);
 
@@ -157,7 +152,7 @@ const ColorValue = ({ value }: { value: string | undefined }) => {
     <ValueCell>
       <ColorSwatch color={value} />
       <div>
-        <Hex>{value}</Hex>
+        <HexValue>{value}</HexValue>
         <PaletteLabel $missing={!name}>{name ?? 'Not in Luma palette'}</PaletteLabel>
       </div>
     </ValueCell>

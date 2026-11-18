@@ -17,7 +17,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { ColorSwatch, StoryContainer } from './shared';
+import { ColorSwatch, HexValue, StoryContainer } from './shared';
 import { SECTIONS } from './colorPalette';
 import type { Swatch } from './colorPalette';
 import { dividerColor } from './lumaTokens';
@@ -73,17 +73,11 @@ const SwatchLabel = styled.div`
   font-weight: 700;
 `;
 
-const SwatchHex = styled.div`
-  font-family: ${({ theme }) => theme.fonts.family.monospace};
-  font-size: 11px;
-  color: ${({ theme }) => theme.colors.text.secondary};
-`;
-
 const PaletteSwatch = ({ swatch }: { swatch: Swatch }) => (
   <div>
     <ColorSwatch color={swatch.hex} width="100%" height="44px" />
     <SwatchLabel>{swatch.label}</SwatchLabel>
-    <SwatchHex>{swatch.hex}</SwatchHex>
+    <HexValue>{swatch.hex}</HexValue>
   </div>
 );
 

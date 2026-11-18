@@ -84,6 +84,13 @@ export const PxLabel = styled.span`
   color: ${({ theme }) => theme.colors.text.secondary};
 `;
 
+export const HexValue = styled.span`
+  display: block;
+  font-family: ${({ theme }) => theme.fonts.family.monospace};
+  font-size: ${({ theme }) => theme.fonts.size.small};
+  color: ${({ theme }) => theme.colors.text.secondary};
+`;
+
 // Checkerboard behind the color so semi-transparent colors are visible.
 const StyledColorSwatch = styled.div<{ $color: string; $width: string; $height: string }>`
   flex-shrink: 0;
