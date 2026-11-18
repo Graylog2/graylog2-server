@@ -22,6 +22,8 @@ import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.documentation.Documentation;
 import com.github.joschi.jadconfig.documentation.DocumentationSection;
+import com.github.joschi.jadconfig.util.Duration;
+import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.URIAbsoluteValidator;
 import com.google.common.annotations.VisibleForTesting;
@@ -150,6 +152,24 @@ public class HttpConfiguration {
     @Documentation("Allow embedding the Graylog web interface in frames from the same origin (X-Frame-Options: SAMEORIGIN instead of DENY).")
     @Parameter(value = "http_allow_embedding")
     private boolean httpAllowEmbedding = false;
+
+    @Documentation("""
+            ## HTTP Strict Transport Security (HSTS)
+
+            Send the "Strict-Transport-Security" header on all HTTPS responses of the HTTP interface.
+            This only has an effect if $http_enable_tls is enabled. If TLS is terminated by a reverse proxy
+            or load-balancer, configure HSTS there instead.
+            """)
+    @Parameter(value = "http_hsts_enabled")
+    private boolean httpHstsEnabled = false;
+
+    @Documentation("The time browsers should remember to only access Graylog via HTTPS (\"max-age\" directive of the HSTS header).")
+    @Parameter(value = "http_hsts_max_age", validators = PositiveDurationValidator.class)
+    private Duration httpHstsMaxAge = Duration.days(365);
+
+    @Documentation("Apply the HSTS policy to all subdomains as well (\"includeSubDomains\" directive of the HSTS header).")
+    @Parameter(value = "http_hsts_include_subdomains")
+    private boolean httpHstsIncludeSubdomains = false;
 
     @Documentation("Always set the \"Secure\" flag on the authentication cookie, even if the request was not made via HTTPS (e. g. behind a TLS-terminating proxy).")
     @Parameter(value = "http_cookie_secure_override")
@@ -295,6 +315,18 @@ public class HttpConfiguration {
         return httpCookieSecureOverride;
     }
 
+    public boolean isHttpHstsEnabled() {
+        return httpHstsEnabled;
+    }
+
+    public Duration getHttpHstsMaxAge() {
+        return httpHstsMaxAge;
+    }
+
+    public boolean isHttpHstsIncludeSubdomains() {
+        return httpHstsIncludeSubdomains;
+    }
+
     public URI getHttpExternalUri() {
         return httpExternalUri == null ? getHttpPublishUri() : httpExternalUri;
     }
@@ -339,6 +371,14 @@ public class HttpConfiguration {
             if (!isRegularFileAndReadable(getHttpTlsCertFile())) {
                 throw new ValidationException("Unreadable or missing HTTP X.509 certificate: " + getHttpTlsCertFile());
             }
+        }
+    }
+
+    @ValidatorMethod
+    @SuppressWarnings("unused")
+    public void validateHstsConfig() {
+        if (isHttpHstsEnabled() && !isHttpEnableTls()) {
+            LOG.warn("\"http_hsts_enabled\" is set, but \"http_enable_tls\" is disabled. The Strict-Transport-Security header will not be sent.");
         }
     }
 
