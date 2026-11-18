@@ -25,6 +25,7 @@ import org.graylog.plugins.views.search.rest.SearchJobDTO;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.RequestedField;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.Metadata;
+import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseEntryDataType;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.ResponseSchemaEntry;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.decorators.CachingDecorator;
@@ -38,6 +39,7 @@ import org.slf4j.LoggerFactory;
 
 import jakarta.inject.Inject;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -82,9 +84,16 @@ public class MessagesTabularResponseCreator implements TabularResponseCreator {
         final Set<String> streams = searchUser.streams().readableOrAllIfEmpty(searchRequestSpec.streams());
         final Set<MappedFieldTypeDTO> knownFields = mappedFieldTypesService.fieldTypesByStreamIds(streams, searchRequestSpec.timerange());
         final List<RequestedField> fields = getRequestedFields(searchRequestSpec, knownFields);
+        final List<String> documentIds = searchRequestSpec.includeDocumentIds()
+                ? Stream.of(MessagesRequestSpec.DOCUMENT_ID, MessagesRequestSpec.DOCUMENT_INDEX)
+                .filter(column -> fields.stream().noneMatch(field -> field.name().equals(column)))
+                .toList()
+                : List.of();
+        final List<ResponseSchemaEntry> schema = new ArrayList<>(getSchema(fields, knownFields));
+        documentIds.forEach(column -> schema.add(ResponseSchemaEntry.field(column, ResponseEntryDataType.STRING)));
         return new TabularResponse(
-                getSchema(fields, knownFields),
-                getDatarows(fields, messageListResult, searchUser),
+                schema,
+                getDatarows(fields, documentIds, messageListResult, searchUser),
                 new Metadata(messageListResult.effectiveTimerange())
         );
     }
@@ -124,17 +133,28 @@ public class MessagesTabularResponseCreator implements TabularResponseCreator {
         return decorators.stream().anyMatch(decorator -> decorator.accept(field));
     }
 
-    private List<List<Object>> getDatarows(final List<RequestedField> fields,
+    private List<List<Object>> getDatarows(final List<RequestedField> fields, final List<String> documentIds,
                                            final MessageList.Result messageListResult, SearchUser searchUser) {
 
         final Set<FieldDecorator> cachedDecorators = this.decorators.stream().map(CachingDecorator::new).collect(Collectors.toSet());
 
         return messageListResult.messages()
                 .stream()
-                .map(message -> fields
-                        .stream()
-                        .map(field -> extractValue(message, field, cachedDecorators, searchUser))
-                        .collect(Collectors.toList())).collect(Collectors.toList());
+                .map(message -> {
+                    final List<Object> row = fields
+                            .stream()
+                            .map(field -> extractValue(message, field, cachedDecorators, searchUser))
+                            .collect(Collectors.toList());
+                    documentIds.forEach(column -> row.add(documentId(message, column)));
+                    return row;
+                }).collect(Collectors.toList());
+    }
+
+    private static Object documentId(ResultMessageSummary message, String column) {
+        final Object value = MessagesRequestSpec.DOCUMENT_INDEX.equals(column)
+                ? message.index()
+                : message.message().get(column);
+        return value == null ? "-" : value;
     }
 
     private Object extractValue(ResultMessageSummary message, RequestedField field, Set<FieldDecorator> decorators, SearchUser searchUser) {
