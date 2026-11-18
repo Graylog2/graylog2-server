@@ -15,9 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 // ─── Luma color palette ────────────────────────────────────────────────────
-// Values match the current Graylog theme (@graylog/sawmill THEME_BASE): Gray = gray, Cyan = info,
-// Yellow = warning, Green = success, Red = danger, Blue = primary. Violet and the syntax colors are
-// Luma spec colors that aren't in the theme yet. Edit the data below to update the page.
+// Scales come from the theme's color variants (src/theme/sawmill/THEME_BASE.ts). The syntax colors
+// are Luma spec colors that aren't in the theme yet.
+import { colorVariants } from 'theme/sawmill/THEME_BASE';
 
 export type Swatch = {
   label: string;
@@ -45,33 +45,11 @@ export const SECTIONS: Section[] = [
     palettes: [
       {
         name: 'Gray',
-        swatches: scale([
-          '#F6F7FC',
-          '#E1E4ED',
-          '#C1C7DC',
-          '#6F768F',
-          '#394261',
-          '#252D47',
-          '#232B43',
-          '#1C2235',
-          '#12182B',
-          '#060C1F',
-        ]),
+        swatches: scale(colorVariants.gray),
       },
       {
         name: 'Blue',
-        swatches: scale([
-          '#D9EBFF',
-          '#ADD0FF',
-          '#7FB8FF',
-          '#65A9FF',
-          '#4396FF',
-          '#1877EF',
-          '#1064CD',
-          '#0C50A5',
-          '#083772',
-          '#032551',
-        ]),
+        swatches: scale(colorVariants.primary),
       },
     ],
   },
@@ -81,50 +59,17 @@ export const SECTIONS: Section[] = [
       {
         name: 'Yellow',
         description: 'Warning: used to indicate moderate urgency.',
-        swatches: scale([
-          '#FFFBEB',
-          '#FFF2C2',
-          '#FFEDAD',
-          '#FFE485',
-          '#FFDC5C',
-          '#FFCA0A',
-          '#FFCA0A',
-          '#CCA000',
-          '#7A6000',
-          '#292000',
-        ]),
+        swatches: scale(colorVariants.warning),
       },
       {
         name: 'Green',
         description: 'Success: used to indicate a positive state.',
-        swatches: scale([
-          '#E1FFF4',
-          '#ACFFE0',
-          '#69F9C3',
-          '#62F3BC',
-          '#45E5A8',
-          '#2ECA8F',
-          '#22B07A',
-          '#1A9869',
-          '#128057',
-          '#094F35',
-        ]),
+        swatches: scale(colorVariants.success),
       },
       {
         name: 'Red',
         description: 'Danger: used to indicate immediate attention or a destructive action.',
-        swatches: scale([
-          '#FFEDED',
-          '#FFC7C7',
-          '#FFACAB',
-          '#FE8685',
-          '#FE6E6D',
-          '#FE4A49',
-          '#E74342',
-          '#B43534',
-          '#8C2928',
-          '#6B1F1F',
-        ]),
+        swatches: scale(colorVariants.danger),
       },
     ],
   },
@@ -134,33 +79,11 @@ export const SECTIONS: Section[] = [
     palettes: [
       {
         name: 'Violet',
-        swatches: scale([
-          '#F5F0FF',
-          '#E8DDFF',
-          '#D9C7FF',
-          '#CEB7FF',
-          '#BA9AFF',
-          '#9A6BFE',
-          '#8C61E7',
-          '#6D4CB4',
-          '#553B8C',
-          '#412D6B',
-        ]),
+        swatches: scale(colorVariants.violet),
       },
       {
         name: 'Cyan',
-        swatches: scale([
-          '#EBFAFF',
-          '#C2F0FF',
-          '#85E0FF',
-          '#47D1FF',
-          '#1FC7FF',
-          '#03C2FF',
-          '#00A8E0',
-          '#008AB8',
-          '#006B8F',
-          '#003D52',
-        ]),
+        swatches: scale(colorVariants.info),
       },
     ],
   },
@@ -170,7 +93,7 @@ export const SECTIONS: Section[] = [
       {
         swatches: [
           { label: 'White', hex: '#FFFFFF' },
-          { label: 'Black', hex: '#0D0A1F' },
+          { label: 'Black', hex: colorVariants.default[8] },
         ],
       },
     ],
