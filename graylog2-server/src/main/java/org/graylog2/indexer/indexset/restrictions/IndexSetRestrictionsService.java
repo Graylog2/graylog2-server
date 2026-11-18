@@ -16,7 +16,10 @@
  */
 package org.graylog2.indexer.indexset.restrictions;
 
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.ws.rs.ForbiddenException;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplateService;
 import org.graylog2.indexer.indexset.template.IndexSetTemplate;
@@ -25,6 +28,7 @@ import org.graylog2.indexer.indexset.template.IndexSetTemplateService;
 import org.graylog2.rest.resources.system.indexer.requests.IndexSetCreationRequest;
 import org.graylog2.rest.resources.system.indexer.requests.IndexSetUpdateRequest;
 
+import java.util.Objects;
 import java.util.Optional;
 
 public class IndexSetRestrictionsService {
@@ -33,21 +37,24 @@ public class IndexSetRestrictionsService {
     private final IndexSetDefaultTemplateService indexSetDefaultTemplateService;
     private final IndexSetConfigTransformer indexSetConfigTransformer;
     private final FieldRestrictionService fieldRestrictionService;
+    private final boolean isCloud;
 
 
     @Inject
     public IndexSetRestrictionsService(IndexSetTemplateService templateService,
                                        IndexSetDefaultTemplateService indexSetDefaultTemplateService,
                                        IndexSetConfigTransformer indexSetConfigTransformer,
-                                       FieldRestrictionService fieldRestrictionService) {
+                                       FieldRestrictionService fieldRestrictionService,
+                                       @Named("is_cloud") boolean isCloud) {
         this.templateService = templateService;
         this.indexSetDefaultTemplateService = indexSetDefaultTemplateService;
         this.indexSetConfigTransformer = indexSetConfigTransformer;
         this.fieldRestrictionService = fieldRestrictionService;
+        this.isCloud = isCloud;
     }
 
 
-    public IndexSetConfig createIndexSetConfig(IndexSetCreationRequest creationRequest, boolean skipRestrictionCheck) {
+    public IndexSetConfig createIndexSetConfig(IndexSetCreationRequest creationRequest, boolean skipRestrictionCheck, boolean isAdmin) {
         IndexSetTemplateConfig indexSetTemplateConfig = indexSetConfigTransformer.transform(
                 Optional.ofNullable(creationRequest.indexSetTemplateId())
                         .flatMap(templateService::get)
@@ -55,6 +62,7 @@ public class IndexSetRestrictionsService {
                         .orElse(indexSetDefaultTemplateService.getOrCreateDefaultConfig()));
 
         final IndexSetConfig newConfig = creationRequest.toIndexSetConfig(true, indexSetTemplateConfig.fieldRestrictions());
+        checkFieldLimitChange(indexSetTemplateConfig.fieldLimit(), newConfig.fieldLimit(), isAdmin);
         if (!skipRestrictionCheck) {
             fieldRestrictionService.checkRestrictions(indexSetTemplateConfig.fieldRestrictions(), newConfig, indexSetTemplateConfig);
         }
@@ -63,12 +71,22 @@ public class IndexSetRestrictionsService {
 
     public IndexSetConfig updateIndexSetConfig(IndexSetUpdateRequest updateRequest,
                                                IndexSetConfig oldConfig,
-                                               boolean skipRestrictionCheck) {
+                                               boolean skipRestrictionCheck,
+                                               boolean isAdmin) {
         final IndexSetConfig newConfig = updateRequest.toIndexSetConfig(oldConfig);
+        checkFieldLimitChange(oldConfig.fieldLimit(), newConfig.fieldLimit(), isAdmin);
         if (!skipRestrictionCheck) {
             fieldRestrictionService.checkRestrictions(oldConfig.fieldRestrictions(), newConfig, indexSetConfigTransformer.transform(oldConfig));
         }
         return newConfig;
     }
 
+    /**
+     * On Graylog Cloud, only admins may change the field limit. Keeping the current or the template's limit is allowed.
+     */
+    public void checkFieldLimitChange(@Nullable Integer before, @Nullable Integer after, boolean isAdmin) {
+        if (isCloud && !isAdmin && !Objects.equals(before, after)) {
+            throw new ForbiddenException("Only admins can change the field limit on Graylog Cloud.");
+        }
+    }
 }

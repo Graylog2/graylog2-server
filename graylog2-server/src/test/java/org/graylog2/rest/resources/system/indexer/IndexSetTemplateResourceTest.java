@@ -18,10 +18,14 @@ package org.graylog2.rest.resources.system.indexer;
 
 import jakarta.validation.Validator;
 import jakarta.ws.rs.ClientErrorException;
+import jakarta.ws.rs.ForbiddenException;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.cluster.lock.AlreadyLockedException;
 import org.graylog2.cluster.lock.RefreshingLockService;
 import org.graylog2.datatiering.DataTieringConfig;
+import org.graylog2.indexer.indexset.restrictions.DefaultIndexSetConfigTransformer;
+import org.graylog2.indexer.indexset.restrictions.FieldRestrictionService;
+import org.graylog2.indexer.indexset.restrictions.IndexSetRestrictionsService;
 import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplateService;
 import org.graylog2.indexer.indexset.template.IndexSetTemplate;
 import org.graylog2.indexer.indexset.template.IndexSetTemplateConfig;
@@ -31,6 +35,7 @@ import org.graylog2.indexer.indexset.template.requirement.IndexSetTemplateRequir
 import org.graylog2.indexer.indexset.template.requirement.IndexSetTemplateRequirementsChecker;
 import org.graylog2.indexer.indexset.validation.IndexSetValidator;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -74,7 +79,7 @@ public class IndexSetTemplateResourceTest {
     @Mock
     private IndexSetTemplateConfig indexSetConfig;
 
-    private IndexSetTemplateResource resource;
+    private TestResource resource;
 
     public IndexSetTemplateResourceTest() {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
@@ -82,8 +87,11 @@ public class IndexSetTemplateResourceTest {
 
     @BeforeEach
     public void setUp() {
+        final IndexSetRestrictionsService cloudRestrictionsService = new IndexSetRestrictionsService(templateService,
+                indexSetDefaultTemplateService, new DefaultIndexSetConfigTransformer(),
+                new FieldRestrictionService(new ObjectMapperProvider().get()), true);
         resource = new TestResource(indexSetValidator, validator, templateService, indexSetDefaultTemplateService,
-                indexSetTemplateRequirementsChecker, lockServiceFactory);
+                indexSetTemplateRequirementsChecker, lockServiceFactory, cloudRestrictionsService);
     }
 
     @Test
@@ -131,6 +139,30 @@ public class IndexSetTemplateResourceTest {
         verify(templateService, never()).update(any(), any());
     }
 
+    @Test
+    public void onCloudNonAdminCannotCreateTemplateWithFieldLimit() {
+        when(indexSetConfig.fieldLimit()).thenReturn(1500);
+        resource.admin = false;
+
+        assertThrows(ForbiddenException.class,
+                () -> resource.create(new IndexSetTemplateRequest("title", "description", indexSetConfig)));
+        verify(templateService, never()).save(any());
+    }
+
+    @Test
+    public void onCloudNonAdminCannotChangeTemplateFieldLimit() {
+        final IndexSetTemplateConfig changedConfig = mock(IndexSetTemplateConfig.class);
+        when(changedConfig.fieldLimit()).thenReturn(2000);
+        when(indexSetConfig.fieldLimit()).thenReturn(1500);
+        when(templateService.get("template-id")).thenReturn(Optional.of(template()));
+        when(indexSetTemplateRequirementsChecker.check(any())).thenReturn(new IndexSetTemplateRequirement.Result(true, ""));
+        resource.admin = false;
+
+        assertThrows(ForbiddenException.class,
+                () -> resource.update("template-id", new IndexSetTemplateRequest("title", "description", changedConfig)));
+        verify(templateService, never()).update(any(), any());
+    }
+
     private static DataTieringConfig dataTieringWithLockId() {
         final DataTieringConfig dataTieringConfig = mock(DataTieringConfig.class);
         when(dataTieringConfig.repositoryLockId()).thenReturn(Optional.of("warm-tier-repository/repo1"));
@@ -142,19 +174,22 @@ public class IndexSetTemplateResourceTest {
     }
 
     private static class TestResource extends IndexSetTemplateResource {
+        boolean admin = true;
 
         TestResource(IndexSetValidator indexSetValidator, Validator validator, IndexSetTemplateService templateService,
                      IndexSetDefaultTemplateService indexSetDefaultTemplateService,
                      IndexSetTemplateRequirementsChecker indexSetTemplateRequirementsChecker,
-                     RefreshingLockService.Factory lockServiceFactory) {
+                     RefreshingLockService.Factory lockServiceFactory,
+                     IndexSetRestrictionsService indexSetRestrictionsService) {
             super(indexSetValidator, validator, templateService, indexSetDefaultTemplateService,
-                    indexSetTemplateRequirementsChecker, lockServiceFactory);
+                    indexSetTemplateRequirementsChecker, lockServiceFactory, indexSetRestrictionsService);
         }
 
         @Override
         protected Subject getSubject() {
             final Subject mockSubject = mock(Subject.class);
             lenient().when(mockSubject.isPermitted(anyString())).thenReturn(true);
+            lenient().when(mockSubject.isPermitted("*")).thenReturn(admin);
             lenient().when(mockSubject.getPrincipal()).thenReturn("test-user");
             return mockSubject;
         }

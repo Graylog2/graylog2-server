@@ -162,11 +162,11 @@ public class IndexSetsResourceTest {
     public void setUp() throws Exception {
         this.permissionCheck = permission -> true;
         this.indexSetsResource = createIndexSetsResource(Set.of(), Set.of());
-        when(indexSetRestrictionsService.createIndexSetConfig(any(), anyBoolean())).then(invocationOnMock -> {
+        when(indexSetRestrictionsService.createIndexSetConfig(any(), anyBoolean(), anyBoolean())).then(invocationOnMock -> {
             IndexSetCreationRequest request = invocationOnMock.getArgument(0);
             return request.toIndexSetConfig(true, null);
         });
-        when(indexSetRestrictionsService.updateIndexSetConfig(any(), any(), anyBoolean())).then(invocationOnMock -> {
+        when(indexSetRestrictionsService.updateIndexSetConfig(any(), any(), anyBoolean(), anyBoolean())).then(invocationOnMock -> {
             IndexSetUpdateRequest request = invocationOnMock.getArgument(0);
             IndexSetConfig config = invocationOnMock.getArgument(1);
             return request.toIndexSetConfig(config);

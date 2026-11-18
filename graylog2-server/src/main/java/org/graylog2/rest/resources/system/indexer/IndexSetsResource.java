@@ -445,7 +445,7 @@ public class IndexSetsResource extends RestResource {
                                  @Valid @NotNull IndexSetCreationRequest indexSet) {
         try {
             checkDataTieringNotNull(indexSet.useLegacyRotation(), indexSet.dataTieringConfig());
-            final IndexSetConfig indexSetConfig = indexSetRestrictionsService.createIndexSetConfig(indexSet, isPermitted(RestPermissions.INDEXSETS_FIELD_RESTRICTIONS_EDIT));
+            final IndexSetConfig indexSetConfig = indexSetRestrictionsService.createIndexSetConfig(indexSet, isPermitted(RestPermissions.INDEXSETS_FIELD_RESTRICTIONS_EDIT), isPermitted("*"));
 
             final IndexSetConfig savedObject = validateAndSaveWithRepositoryLock(indexSetConfig);
             final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
@@ -487,7 +487,7 @@ public class IndexSetsResource extends RestResource {
         checkDataTieringNotNull(updateRequest.useLegacyRotation(), updateRequest.dataTieringConfig());
 
         final IndexSetConfig indexSetConfig = indexSetRestrictionsService.updateIndexSetConfig(updateRequest, oldConfig,
-                isPermitted(RestPermissions.INDEXSETS_FIELD_RESTRICTIONS_EDIT));
+                isPermitted(RestPermissions.INDEXSETS_FIELD_RESTRICTIONS_EDIT), isPermitted("*"));
 
         final IndexSetConfig savedObject = validateAndSaveWithRepositoryLock(indexSetConfig, config -> withKeptFields(oldConfig, config));
 
