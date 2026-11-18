@@ -24,6 +24,7 @@ import useSelectedIndexSetTemplate from 'components/indices/IndexSetTemplates/ho
 import asMock from 'helpers/mocking/AsMock';
 import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions';
 import useProfile from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfile';
+import AppConfig from 'util/AppConfig';
 import { DATA_TIERING_TYPE } from 'components/indices/data-tiering';
 
 import IndexSetConfigurationForm from './IndexSetConfigurationForm';
@@ -465,6 +466,17 @@ describe('IndexSetConfigurationForm', () => {
       expect(
         await screen.findByText(/only the fields the illuminate package lists stay searchable/i),
       ).toBeInTheDocument();
+    });
+
+    it('Should hide the max field count but keep the toggle on Cloud', async () => {
+      const isCloud = jest.spyOn(AppConfig, 'isCloud').mockReturnValue(true);
+
+      render(<SUT indexSet={{ ...indexSet, field_type_profile: 'profile-id' }} />);
+
+      expect(await screen.findByLabelText(/disable dynamic index mapping/i)).toBeInTheDocument();
+      expect(screen.queryByRole('spinbutton', { name: /max field count/i })).not.toBeInTheDocument();
+
+      isCloud.mockRestore();
     });
 
     it('Should show the backend error on the field', async () => {

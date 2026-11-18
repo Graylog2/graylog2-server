@@ -25,6 +25,7 @@ import IndexSetMaintenanceDialog from 'components/indices/IndexSetMaintenanceDia
 import IncreaseFieldLimitDialog from 'components/indices/IncreaseFieldLimitDialog';
 import { isFieldLimitAllowed } from 'components/indices/helpers/fieldLimit';
 import usePermissions from 'hooks/usePermissions';
+import AppConfig from 'util/AppConfig';
 import type { IndexSetMaintenanceAction } from 'components/indices/IndexSetMaintenanceDialog';
 
 type Props = {
@@ -41,6 +42,7 @@ const IndicesMaintenanceDropdown = ({ indexSet, indexSetId }: Props) => {
   const [pendingAction, setPendingAction] = useState<IndexSetMaintenanceAction | null>(null);
   const [showFieldLimitDialog, setShowFieldLimitDialog] = useState(false);
   const canRaiseFieldLimit =
+    !AppConfig.isCloud() &&
     !!indexSet?.writable &&
     isFieldLimitAllowed(indexSet.index_template_type) &&
     isPermitted(`indexsets:edit:${indexSetId}`) &&
