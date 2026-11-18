@@ -31,10 +31,8 @@ import java.time.Instant;
 /**
  * A refresh token. Refresh tokens are rotated on every use.
  *
- * @param accessTokenId        the access token issued together with this refresh token
- * @param accessTokenExpiresAt used to tell an expired access token from a revoked one
- * @param used                 whether this token was already exchanged. Presenting a used token revokes all
- *                             tokens of the client for the user.
+ * @param used whether this token was already exchanged. Presenting a used token revokes all tokens of the client
+ *             for the user.
  */
 public record OAuthRefreshToken(
         @ObjectId @Id @Nullable @JsonProperty(MongoEntity.FIELD_ID) String id,
@@ -42,10 +40,6 @@ public record OAuthRefreshToken(
         @JsonProperty(FIELD_CLIENT_ID) String clientId,
         @JsonProperty(FIELD_USER_ID) String userId,
         @JsonProperty(FIELD_USERNAME) String username,
-        @JsonProperty(FIELD_ACCESS_TOKEN_ID) String accessTokenId,
-        @JsonSerialize(using = MongoInstantSerializer.class)
-        @JsonDeserialize(using = MongoInstantDeserializer.class)
-        @JsonProperty(FIELD_ACCESS_TOKEN_EXPIRES_AT) Instant accessTokenExpiresAt,
         @Nullable @JsonProperty(FIELD_RESOURCE) String resource,
         @JsonProperty(FIELD_USED) boolean used,
         @JsonSerialize(using = MongoInstantSerializer.class)
@@ -59,8 +53,6 @@ public record OAuthRefreshToken(
     public static final String FIELD_CLIENT_ID = "client_id";
     public static final String FIELD_USER_ID = "user_id";
     public static final String FIELD_USERNAME = "username";
-    public static final String FIELD_ACCESS_TOKEN_ID = "access_token_id";
-    public static final String FIELD_ACCESS_TOKEN_EXPIRES_AT = "access_token_expires_at";
     public static final String FIELD_RESOURCE = "resource";
     public static final String FIELD_USED = "used";
     public static final String FIELD_CREATED_AT = "created_at";

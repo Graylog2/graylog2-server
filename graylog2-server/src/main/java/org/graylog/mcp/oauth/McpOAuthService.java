@@ -319,12 +319,6 @@ public class McpOAuthService {
         if (token.expiresAt().isBefore(now)) {
             throw OAuthException.of(INVALID_GRANT, "Refresh token expired");
         }
-        // The access token is gone before its expiry, so a user revoked it in the token management
-        if (accessTokenService.loadById(token.accessTokenId()) == null && token.accessTokenExpiresAt().isAfter(now)) {
-            LOG.info("Access token of OAuth client <{}> for user <{}> was revoked, revoking its refresh tokens.", token.clientId(), token.username());
-            revokeTokens(token.username(), token.clientId());
-            throw OAuthException.of(INVALID_GRANT, "Authorization was revoked");
-        }
         final String effectiveResource = validateResource(resource, token.resource());
         final User user = loadAuthorizedUser(token.userId());
 
@@ -374,6 +368,15 @@ public class McpOAuthService {
         return revoked;
     }
 
+    /**
+     * Revokes the grant of a client whose access token a user deleted in the token management.
+     */
+    public void revokeGrantOfDeletedAccessToken(String username, String clientId) {
+        if (revokeTokens(username, clientId) > 0) {
+            LOG.info("Access token of OAuth client <{}> for user <{}> was deleted, revoked its authorization.", clientId, username);
+        }
+    }
+
     private TokenResponse issueTokens(OAuthClient client, User user, @Nullable String resource) {
         final McpConfiguration config = config();
         final Instant now = Instant.now(clock);
@@ -393,8 +396,6 @@ public class McpOAuthService {
                 client.clientId(),
                 user.getId(),
                 user.getName(),
-                accessToken.getId(),
-                now.plus(accessTokenTtl),
                 resource,
                 false,
                 now,

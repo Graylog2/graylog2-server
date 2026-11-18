@@ -16,6 +16,7 @@
  */
 package org.graylog.mcp.server;
 
+import org.graylog.mcp.oauth.OAuthAccessTokenDeletionListener;
 import org.graylog.mcp.oauth.rest.McpOAuthResource;
 import org.graylog.mcp.oauth.rest.McpOAuthResponseFilter;
 import org.graylog.mcp.oauth.rest.OAuthFallbackResource;
@@ -70,6 +71,7 @@ public class McpServerModule extends PluginModule {
         addMcpResource(DashboardResourceProvider.GRN_TYPE, DashboardResourceProvider.class);
         addMcpResource(EventDefinitionResourceProvider.GRN_TYPE, EventDefinitionResourceProvider.class);
 
+        bind(OAuthAccessTokenDeletionListener.class).asEagerSingleton();
         addSystemRestResource(OAuthMetadataResource.class);
         addSystemRestResource(OAuthResource.class);
         addSystemRestResource(OAuthFallbackResource.class);

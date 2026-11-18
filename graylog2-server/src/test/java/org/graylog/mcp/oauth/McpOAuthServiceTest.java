@@ -185,7 +185,6 @@ class McpOAuthServiceTest {
         final ArgumentCaptor<OAuthRefreshToken> refreshToken = ArgumentCaptor.forClass(OAuthRefreshToken.class);
         verify(refreshTokenService).create(refreshToken.capture());
         assertThat(refreshToken.getValue().tokenHash()).isEqualTo(OAuthTokens.hash(response.refreshToken()));
-        assertThat(refreshToken.getValue().accessTokenId()).isEqualTo("access-token-id");
         assertThat(refreshToken.getValue().expiresAt()).isEqualTo(NOW.plus(CONFIG.oauthRefreshTokenTtl()));
         verify(clientService).extendExpiry(CLIENT.clientId(), NOW.plus(CONFIG.oauthRefreshTokenTtl()));
     }
@@ -230,9 +229,8 @@ class McpOAuthServiceTest {
 
     @Test
     void rotatesRefreshToken() {
-        final OAuthRefreshToken existing = refreshToken(NOW.plusSeconds(60));
+        final OAuthRefreshToken existing = refreshToken();
         when(refreshTokenService.markUsed(OAuthTokens.hash("refresh"))).thenReturn(Optional.of(existing));
-        when(accessTokenService.loadById("old-access-token")).thenReturn(mock(AccessToken.class));
         stubAccessTokenCreation();
 
         final McpOAuthService.TokenResponse response = service.refresh(CLIENT.clientId(), "refresh", null);
@@ -246,7 +244,7 @@ class McpOAuthServiceTest {
     @Test
     void revokesAllTokensOnRefreshTokenReuse() {
         when(refreshTokenService.markUsed(OAuthTokens.hash("refresh"))).thenReturn(Optional.empty());
-        when(refreshTokenService.findByHash(OAuthTokens.hash("refresh"))).thenReturn(Optional.of(refreshToken(NOW.plusSeconds(60))));
+        when(refreshTokenService.findByHash(OAuthTokens.hash("refresh"))).thenReturn(Optional.of(refreshToken()));
 
         assertThatThrownBy(() -> service.refresh(CLIENT.clientId(), "refresh", null))
                 .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_GRANT));
@@ -262,22 +260,11 @@ class McpOAuthServiceTest {
     }
 
     @Test
-    void refusesRefreshAfterAccessTokenWasRevoked() {
-        when(refreshTokenService.markUsed(OAuthTokens.hash("refresh"))).thenReturn(Optional.of(refreshToken(NOW.plusSeconds(60))));
-        when(accessTokenService.loadById("old-access-token")).thenReturn(null);
+    void revokesGrantOfDeletedAccessToken() {
+        service.revokeGrantOfDeletedAccessToken("jane", CLIENT.clientId());
 
-        assertThatThrownBy(() -> service.refresh(CLIENT.clientId(), "refresh", null))
-                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_GRANT));
         verify(refreshTokenService).deleteByUsernameAndClientId("jane", CLIENT.clientId());
-    }
-
-    @Test
-    void allowsRefreshAfterAccessTokenExpired() {
-        when(refreshTokenService.markUsed(OAuthTokens.hash("refresh"))).thenReturn(Optional.of(refreshToken(NOW.minusSeconds(60))));
-        when(accessTokenService.loadById("old-access-token")).thenReturn(null);
-        stubAccessTokenCreation();
-
-        assertThat(service.refresh(CLIENT.clientId(), "refresh", null).accessToken()).isEqualTo("access-token");
+        verify(accessTokenService).deleteAllForOAuthClient("jane", CLIENT.clientId());
     }
 
     @Test
@@ -302,7 +289,7 @@ class McpOAuthServiceTest {
 
     @Test
     void rejectsRefreshWhenUserLostMcpAccess() {
-        when(refreshTokenService.markUsed(OAuthTokens.hash("refresh"))).thenReturn(Optional.of(refreshToken(NOW.minusSeconds(60))));
+        when(refreshTokenService.markUsed(OAuthTokens.hash("refresh"))).thenReturn(Optional.of(refreshToken()));
         when(authorizer.isPermitted(RestPermissions.MCP_SERVER_ACCESS)).thenReturn(false);
 
         assertThatThrownBy(() -> service.refresh(CLIENT.clientId(), "refresh", null))
@@ -312,7 +299,7 @@ class McpOAuthServiceTest {
 
     @Test
     void rejectsRefreshWhenUserMayNotCreateTokens() {
-        when(refreshTokenService.markUsed(OAuthTokens.hash("refresh"))).thenReturn(Optional.of(refreshToken(NOW.minusSeconds(60))));
+        when(refreshTokenService.markUsed(OAuthTokens.hash("refresh"))).thenReturn(Optional.of(refreshToken()));
         when(authorizer.isPermitted(RestPermissions.USERS_TOKENCREATE, "jane")).thenReturn(false);
 
         assertThatThrownBy(() -> service.refresh(CLIENT.clientId(), "refresh", null))
@@ -322,7 +309,7 @@ class McpOAuthServiceTest {
 
     @Test
     void rejectsRefreshForDisabledUser() {
-        when(refreshTokenService.markUsed(OAuthTokens.hash("refresh"))).thenReturn(Optional.of(refreshToken(NOW.minusSeconds(60))));
+        when(refreshTokenService.markUsed(OAuthTokens.hash("refresh"))).thenReturn(Optional.of(refreshToken()));
         when(user.getAccountStatus()).thenReturn(User.AccountStatus.DISABLED);
 
         assertThatThrownBy(() -> service.refresh(CLIENT.clientId(), "refresh", null))
@@ -359,8 +346,8 @@ class McpOAuthServiceTest {
         return accessToken;
     }
 
-    private OAuthRefreshToken refreshToken(Instant accessTokenExpiresAt) {
+    private OAuthRefreshToken refreshToken() {
         return new OAuthRefreshToken("rt-id", OAuthTokens.hash("refresh"), CLIENT.clientId(), "user-id", "jane",
-                "old-access-token", accessTokenExpiresAt, null, false, NOW.minusSeconds(3600), NOW.plus(Duration.ofDays(10)));
+                null, false, NOW.minusSeconds(3600), NOW.plus(Duration.ofDays(10)));
     }
 }

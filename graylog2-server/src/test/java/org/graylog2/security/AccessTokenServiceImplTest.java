@@ -16,6 +16,7 @@
  */
 package org.graylog2.security;
 
+import com.google.common.eventbus.EventBus;
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -71,6 +72,9 @@ public class AccessTokenServiceImplTest {
     @Mock
     private Configuration configuration;
 
+    @Mock
+    private EventBus eventBus;
+
     private AccessTokenService accessTokenService;
     private MongoCollections mongoCollections;
 
@@ -82,7 +86,7 @@ public class AccessTokenServiceImplTest {
         when(accessTokenCipher.encrypt(anyString())).then(inv -> StringUtils.reverse(inv.getArgument(0)));
         when(accessTokenCipher.decrypt(anyString())).then(inv -> StringUtils.reverse(inv.getArgument(0)));
 
-        this.accessTokenService = new AccessTokenServiceImpl(mongoCollections.mongoConnection(), paginatedAccessTokenEntityService, accessTokenCipher, configService, configuration);
+        this.accessTokenService = new AccessTokenServiceImpl(mongoCollections.mongoConnection(), paginatedAccessTokenEntityService, accessTokenCipher, configService, configuration, eventBus);
     }
 
     @AfterEach
@@ -176,6 +180,19 @@ public class AccessTokenServiceImplTest {
 
         assertThat(accessTokenService.load(clientToken.getToken())).isNull();
         assertThat(accessTokenService.loadAll("admin")).extracting(AccessToken::getName).containsExactlyInAnyOrder("other client", "personal");
+    }
+
+    @Test
+    public void destroyPostsDeletionEventWithOAuthClient() {
+        final PeriodDuration ttl = PeriodDuration.of(Duration.ofHours(1));
+        final AccessToken clientToken = accessTokenService.create("admin", "client", ttl, "client-a");
+        final AccessToken personalToken = accessTokenService.create("admin", "personal", ttl);
+
+        accessTokenService.destroy(accessTokenService.loadById(clientToken.getId()));
+        accessTokenService.destroy(accessTokenService.loadById(personalToken.getId()));
+
+        verify(eventBus).post(new AccessTokenDeletedEvent("admin", "client-a"));
+        verify(eventBus).post(new AccessTokenDeletedEvent("admin", null));
     }
 
     @Test

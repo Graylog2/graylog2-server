@@ -21,6 +21,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Maps;
+import com.google.common.eventbus.EventBus;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
@@ -41,6 +42,7 @@ import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
@@ -93,16 +95,19 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
     private final AccessTokenCipher cipher;
     private final ClusterConfigService configService;
     private final Configuration configuration;
+    private final EventBus eventBus;
     private LoadingCache<String, DateTime> lastAccessCache;
 
     @Inject
     public AccessTokenServiceImpl(MongoConnection mongoConnection, PaginatedAccessTokenEntityService paginatedAccessTokenEntityService,
-                                  AccessTokenCipher accessTokenCipher, ClusterConfigService configService, Configuration configuration) {
+                                  AccessTokenCipher accessTokenCipher, ClusterConfigService configService, Configuration configuration,
+                                  EventBus eventBus) {
         super(mongoConnection);
         this.paginatedAccessTokenEntityService = paginatedAccessTokenEntityService;
         this.cipher = accessTokenCipher;
         this.configService = configService;
         this.configuration = configuration;
+        this.eventBus = eventBus;
         setLastAccessCache(30, TimeUnit.SECONDS);
 
         collection(AccessTokenImpl.class).createIndex(new BasicDBObject(AccessTokenImpl.TOKEN_TYPE, 1));
@@ -233,6 +238,16 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
         final int result = destroy(query, AccessTokenImpl.COLLECTION_NAME);
         LOG.debug("Deleted {} access tokens of user \"{}\"", result, username);
         return result;
+    }
+
+    @Override
+    public <T extends Persisted> int destroy(T model) {
+        final int deleted = super.destroy(model);
+        if (deleted > 0 && model instanceof AccessToken accessToken) {
+            eventBus.post(new AccessTokenDeletedEvent(accessToken.getUserName(),
+                    (String) accessToken.getFields().get(AccessTokenImpl.OAUTH_CLIENT_ID)));
+        }
+        return deleted;
     }
 
     @Override
