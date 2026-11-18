@@ -66,7 +66,12 @@ export type PageToolLink = { label: string; path: string };
 
 // What a page tool did, shown in the chat; `undo` reverts it. `result` tells the Assistant what it needs to refer to
 // it later, e.g. the id of a created entity.
-export type PageToolResult = { summary?: string; links?: Array<PageToolLink>; result?: string; undo?: () => unknown } | void;
+export type PageToolResult = {
+  summary?: string;
+  links?: Array<PageToolLink>;
+  result?: string;
+  undo?: () => unknown;
+} | void;
 
 // Runs a page tool the Assistant asked for, with arguments the backend checked.
 export type PageToolHandler = (args: Record<string, unknown>) => PageToolResult | Promise<PageToolResult>;
