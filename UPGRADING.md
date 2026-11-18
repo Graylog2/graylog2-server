@@ -37,14 +37,10 @@ following locations where they are displayed:
 
 ## Java API Changes
 
-This release includes the following Java API changes.
-
-| File/method                                              | Description                                                       |
-|----------------------------------------------------------|-------------------------------------------------------------------|
-| `org.graylog2.plugin.database.users.User#setPermissions` | Deprecated. Will be removed in Graylog 8.0. Assign roles instead. |
-
 - REST resources that return an empty `Optional` now respond with `404 Not Found` instead of `204 No Content`.
   To keep the previous behavior, return a `204 No Content` response explicitly.
+- `org.graylog2.plugin.database.users.User#setPermissions` is deprecated and will be removed in Graylog 8.0.
+  See [Deprecation of Direct User Permissions](#deprecation-of-direct-user-permissions) for details.
 
 ## REST API Endpoint Changes
 
@@ -66,3 +62,5 @@ deprecated. Support for them will be removed in Graylog 8.0.
 The web interface doesn't manage direct user permissions, so this mainly affects REST API clients. Graylog logs a
 warning when a request sets direct permissions or uses one of the deprecated endpoints listed above. To avoid the
 warnings, omit the `permissions` field in `POST /users` and `PUT /users/{userId}`, and assign roles instead.
+
+Plugins that call `User#setPermissions` should assign roles instead.
