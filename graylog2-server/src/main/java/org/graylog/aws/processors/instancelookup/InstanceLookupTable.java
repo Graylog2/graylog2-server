@@ -16,24 +16,23 @@
  */
 package org.graylog.aws.processors.instancelookup;
 
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.ec2.AmazonEC2;
-import com.amazonaws.services.ec2.AmazonEC2Client;
-import com.amazonaws.services.ec2.model.DescribeInstancesResult;
-import com.amazonaws.services.ec2.model.DescribeNetworkInterfacesResult;
-import com.amazonaws.services.ec2.model.Instance;
-import com.amazonaws.services.ec2.model.InstanceNetworkInterface;
-import com.amazonaws.services.ec2.model.InstancePrivateIpAddress;
-import com.amazonaws.services.ec2.model.NetworkInterface;
-import com.amazonaws.services.ec2.model.NetworkInterfacePrivateIpAddress;
-import com.amazonaws.services.ec2.model.Reservation;
-import com.amazonaws.services.ec2.model.Tag;
 import com.google.common.collect.ImmutableMap;
 import okhttp3.HttpUrl;
 import org.graylog.aws.auth.AWSAuthProvider;
 import org.graylog.aws.config.Proxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.ec2.Ec2Client;
+import software.amazon.awssdk.services.ec2.model.DescribeInstancesResponse;
+import software.amazon.awssdk.services.ec2.model.DescribeNetworkInterfacesResponse;
+import software.amazon.awssdk.services.ec2.model.Instance;
+import software.amazon.awssdk.services.ec2.model.InstanceNetworkInterface;
+import software.amazon.awssdk.services.ec2.model.InstancePrivateIpAddress;
+import software.amazon.awssdk.services.ec2.model.NetworkInterface;
+import software.amazon.awssdk.services.ec2.model.NetworkInterfacePrivateIpAddress;
+import software.amazon.awssdk.services.ec2.model.Reservation;
+import software.amazon.awssdk.services.ec2.model.Tag;
 
 import jakarta.inject.Singleton;
 
@@ -57,75 +56,75 @@ public class InstanceLookupTable {
 
     // TODO METRICS
 
-    public void reload(List<Regions> regions, AWSAuthProvider awsAuthProvider, HttpUrl proxyUrl) {
+    public void reload(List<Region> regions, AWSAuthProvider awsAuthProvider, HttpUrl proxyUrl) {
         LOG.debug("Reloading AWS instance lookup table.");
 
         ImmutableMap.Builder<String, Instance> ec2InstancesBuilder = ImmutableMap.<String, Instance>builder();
         ImmutableMap.Builder<String, NetworkInterface> networkInterfacesBuilder = ImmutableMap.<String, NetworkInterface>builder();
 
-        for (Regions region : regions) {
+        for (Region region : regions) {
             try {
-                AmazonEC2 ec2Client;
+                Ec2Client ec2Client;
 
                 if (proxyUrl != null) {
-                    ec2Client = AmazonEC2Client.builder()
-                            .withCredentials(awsAuthProvider)
-                            .withRegion(region)
-                            .withClientConfiguration(Proxy.forAWS(proxyUrl))
+                    ec2Client = Ec2Client.builder()
+                            .credentialsProvider(awsAuthProvider)
+                            .region(region)
+                            .httpClientBuilder(Proxy.forAWS(proxyUrl))
                             .build();
                 } else {
-                    ec2Client = AmazonEC2Client.builder()
-                            .withCredentials(awsAuthProvider)
-                            .withRegion(region)
+                    ec2Client = Ec2Client.builder()
+                            .credentialsProvider(awsAuthProvider)
+                            .region(region)
                             .build();
                 }
 
                 // Load network interfaces
-                LOG.debug("Requesting AWS network interface descriptions in [{}].", region.getName());
-                DescribeNetworkInterfacesResult interfaces = ec2Client.describeNetworkInterfaces();
-                for (NetworkInterface iface : interfaces.getNetworkInterfaces()) {
-                    LOG.debug("Discovered network interface [{}].", iface.getNetworkInterfaceId());
+                LOG.debug("Requesting AWS network interface descriptions in [{}].", region.id());
+                DescribeNetworkInterfacesResponse interfaces = ec2Client.describeNetworkInterfaces();
+                for (NetworkInterface iface : interfaces.networkInterfaces()) {
+                    LOG.debug("Discovered network interface [{}].", iface.networkInterfaceId());
 
                     // Add all private IP addresses.
-                    for (final NetworkInterfacePrivateIpAddress privateIp : iface.getPrivateIpAddresses()) {
-                        LOG.debug("Network interface [{}] has private IP: {}", iface.getNetworkInterfaceId(), privateIp);
-                        networkInterfacesBuilder.put(privateIp.getPrivateIpAddress(), iface);
+                    for (final NetworkInterfacePrivateIpAddress privateIp : iface.privateIpAddresses()) {
+                        LOG.debug("Network interface [{}] has private IP: {}", iface.networkInterfaceId(), privateIp);
+                        networkInterfacesBuilder.put(privateIp.privateIpAddress(), iface);
                     }
 
                     // Add public IP address.
-                    if (iface.getAssociation() != null) {
-                        String publicIp = iface.getAssociation().getPublicIp();
-                        LOG.debug("Network interface [{}] has public IP: {}", iface.getNetworkInterfaceId(), publicIp);
+                    if (iface.association() != null) {
+                        String publicIp = iface.association().publicIp();
+                        LOG.debug("Network interface [{}] has public IP: {}", iface.networkInterfaceId(), publicIp);
                         networkInterfacesBuilder.put(publicIp, iface);
                     }
                 }
 
                 // Load EC2 instances
-                LOG.debug("Requesting EC2 instance descriptions in [{}].", region.getName());
-                DescribeInstancesResult ec2Result = ec2Client.describeInstances();
-                for (Reservation reservation : ec2Result.getReservations()) {
-                    LOG.debug("Fetching instances for reservation [{}].", reservation.getReservationId());
-                    for (final Instance instance : reservation.getInstances()) {
-                        LOG.debug("Discovered EC2 instance [{}].", instance.getInstanceId());
+                LOG.debug("Requesting EC2 instance descriptions in [{}].", region.id());
+                DescribeInstancesResponse ec2Result = ec2Client.describeInstances();
+                for (Reservation reservation : ec2Result.reservations()) {
+                    LOG.debug("Fetching instances for reservation [{}].", reservation.reservationId());
+                    for (final Instance instance : reservation.instances()) {
+                        LOG.debug("Discovered EC2 instance [{}].", instance.instanceId());
 
                         // Add all private IP addresses.
-                        for (InstanceNetworkInterface iface : instance.getNetworkInterfaces()) {
-                            for (InstancePrivateIpAddress privateIp : iface.getPrivateIpAddresses()) {
-                                LOG.debug("EC2 instance [{}] has private IP: {}", instance.getInstanceId(), privateIp.getPrivateIpAddress());
-                                ec2InstancesBuilder.put(privateIp.getPrivateIpAddress(), instance);
+                        for (InstanceNetworkInterface iface : instance.networkInterfaces()) {
+                            for (InstancePrivateIpAddress privateIp : iface.privateIpAddresses()) {
+                                LOG.debug("EC2 instance [{}] has private IP: {}", instance.instanceId(), privateIp.privateIpAddress());
+                                ec2InstancesBuilder.put(privateIp.privateIpAddress(), instance);
                             }
                         }
 
                         // Add public IP address.
-                        String publicIp = instance.getPublicIpAddress();
+                        String publicIp = instance.publicIpAddress();
                         if (publicIp != null) {
-                            LOG.debug("EC2 instance [{}] has public IP: {}", instance.getInstanceId(), publicIp);
+                            LOG.debug("EC2 instance [{}] has public IP: {}", instance.instanceId(), publicIp);
                             ec2InstancesBuilder.put(publicIp, instance);
                         }
                     }
                 }
             } catch (Exception e) {
-                LOG.error("Error when trying to refresh AWS instance lookup table in [{}]", region.getName(), e);
+                LOG.error("Error when trying to refresh AWS instance lookup table in [{}]", region.id(), e);
             }
         }
 
@@ -141,7 +140,7 @@ public class InstanceLookupTable {
             if (ec2Instances.containsKey(ip)) {
                 Instance instance = ec2Instances.get(ip);
                 LOG.debug("Found IP [{}] in EC2 instance lookup table.", ip);
-                return new DiscoveredEC2Instance(instance.getInstanceId(), getNameOfInstance(instance));
+                return new DiscoveredEC2Instance(instance.instanceId(), getNameOfInstance(instance));
             }
 
             // If it's not an EC2 instance, we might still find it in our list of network interfaces.
@@ -172,15 +171,15 @@ public class InstanceLookupTable {
     // Format is "ELB [name]" where "name" can only be a-z, A-Z and hyphens.
     private String getELBNameFromInterface(NetworkInterface iface) {
         try {
-            String[] parts = iface.getDescription().split(" ");
+            String[] parts = iface.description().split(" ");
             if (parts.length == 2) {
                 return parts[1];
             } else {
-                LOG.warn("Unexpected ELB name in network interface description: [{}]", iface.getDescription());
+                LOG.warn("Unexpected ELB name in network interface description: [{}]", iface.description());
                 return "unknown-name";
             }
         } catch (Exception e) {
-            LOG.warn("Could not get ELB name from network interface description. Description was [{}]", iface.getDescription(), e);
+            LOG.warn("Could not get ELB name from network interface description. Description was [{}]", iface.description(), e);
             return "unknown-name";
         }
     }
@@ -196,12 +195,12 @@ public class InstanceLookupTable {
      */
     private InstanceType determineType(NetworkInterface iface) {
         String ownerId;
-        if (iface.getAssociation() != null) {
-            ownerId = iface.getAssociation().getIpOwnerId();
-        } else if (iface.getRequesterId().equals("amazon-rds")) {
+        if (iface.association() != null) {
+            ownerId = iface.association().ipOwnerId();
+        } else if (iface.requesterId().equals("amazon-rds")) {
             ownerId = "amazon-rds";
         } else {
-            LOG.debug("AWS network interface with no association: [{}]", iface.getDescription());
+            LOG.debug("AWS network interface with no association: [{}]", iface.description());
             return InstanceType.UNKNOWN;
         }
 
@@ -218,9 +217,9 @@ public class InstanceLookupTable {
     }
 
     private String getNameOfInstance(Instance x) {
-        for (Tag tag : x.getTags()) {
-            if ("Name".equals(tag.getKey())) {
-                return tag.getValue();
+        for (Tag tag : x.tags()) {
+            if ("Name".equals(tag.key())) {
+                return tag.value();
             }
         }
 
