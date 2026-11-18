@@ -37,6 +37,8 @@ following locations where they are displayed:
 
 ## Java API Changes
 
+- REST resources that return an empty `Optional` now respond with `404 Not Found` instead of `204 No Content`.
+  To keep the previous behavior, return a `204 No Content` response explicitly.
 - `EventProcessorSchedulerConfig#jobDefinitionConfig()` and its `create` and builder methods now use the new
   `EventProcessorJobConfig` interface instead of `JobDefinitionConfig`. `EventProcessorExecutionJob.Config` implements
   it. Plugins that build an `EventProcessorSchedulerConfig` must be recompiled.
@@ -45,6 +47,6 @@ following locations where they are displayed:
 
 The following REST API changes have been made.
 
-| Endpoint             | Description                        |
-|----------------------|------------------------------------|
-| `GET /<endpoint>`    | Description of the endpoint change |
+| Endpoint                     | Description                                                                    |
+|------------------------------|--------------------------------------------------------------------------------|
+| `GET /events/{event_id}`     | Responds with `404 Not Found` instead of `204 No Content` for a missing event. |

@@ -17,9 +17,13 @@
 import {
   SystemUrlAllowlist,
   ToolsContainsStringTester,
+  ToolsGrokTester,
+  ToolsLookupTableTester,
   ToolsNaturalDateTester,
   ToolsRegexReplaceTester,
   ToolsRegexTester,
+  ToolsSplitAndIndexTester,
+  ToolsSubstringTester,
 } from '@graylog/server-api';
 
 import fetch from 'logic/rest/FetchProvider';
@@ -48,20 +52,8 @@ export const testNaturalDate = (keyword: string, userTimezone: string): Promise<
   return promise;
 };
 
-export const testGrok = (
-  pattern: string,
-  namedCapturesOnly: boolean,
-  string: string,
-): Promise<{
-  pattern: string;
-  string: string;
-  named_captures_only: string;
-  error_message: string;
-  matched: boolean;
-  matches: Array<{ name: string; match: string }>;
-}> => {
-  const { url } = ApiRoutes.ToolsApiController.grokTest();
-  const promise = fetch('POST', qualifyUrl(url), {
+export const testGrok = (pattern: string, namedCapturesOnly: boolean, string: string) => {
+  const promise = ToolsGrokTester.testGrok({
     pattern: pattern,
     string: string,
     named_captures_only: namedCapturesOnly,
@@ -151,15 +143,8 @@ export const urlAllowListCheck = (
   return promise;
 };
 
-export const urlAllowListGenerateRegex = (
-  urlTemplate: string,
-  placeholder: string,
-): Promise<{
-  url_template: string;
-  placeholder: string;
-}> => {
-  const { url } = ApiRoutes.ToolsApiController.urlAllowlistGenerateRegex();
-  const promise = fetch('POST', qualifyUrl(url), {
+export const urlAllowListGenerateRegex = (urlTemplate: string, placeholder: string) => {
+  const promise = SystemUrlAllowlist.generateRegex({
     url_template: urlTemplate,
     placeholder,
   });
@@ -224,25 +209,14 @@ export const testRegexReplace = (
   return promise;
 };
 
-export const testSplitAndIndex = (
-  splitBy: string,
-  index: number,
-  string: string,
-): Promise<{
-  split_by: string;
-  index: number;
-  string: string;
-  successful: boolean;
-  cut?: string;
-}> => {
-  const { url } = ApiRoutes.ToolsApiController.splitAndIndexTest();
+export const testSplitAndIndex = (splitBy: string, index: number, string: string) => {
   const payload = {
     split_by: splitBy,
     index: index,
     string: string,
   };
 
-  const promise = fetch('POST', qualifyUrl(url), payload);
+  const promise = ToolsSplitAndIndexTester.splitAndIndexTest(payload);
 
   promise.catch((errorThrown) => {
     UserNotification.error(
@@ -254,25 +228,14 @@ export const testSplitAndIndex = (
   return promise;
 };
 
-export const testSubstring = (
-  beginIndex: number,
-  endIndex: number,
-  string: string,
-): Promise<{
-  start: number;
-  end: number;
-  string: string;
-  successful: boolean;
-  cut: string;
-}> => {
-  const { url } = ApiRoutes.ToolsApiController.substringTest();
+export const testSubstring = (beginIndex: number, endIndex: number, string: string) => {
   const payload = {
     start: beginIndex,
     end: endIndex,
     string: string,
   };
 
-  const promise = fetch('POST', qualifyUrl(url), payload);
+  const promise = ToolsSubstringTester.testSubstring(payload);
 
   promise.catch((errorThrown) => {
     UserNotification.error(
@@ -303,20 +266,8 @@ export const testContainsString = (
   return promise;
 };
 
-export const testLookupTable = (
-  lookupTableName: string,
-  string: string,
-): Promise<{
-  lookup_table_name: string;
-  string: string;
-  error: string;
-  empty: boolean;
-  error_message: string;
-  key: string;
-  value: string;
-}> => {
-  const { url } = ApiRoutes.ToolsApiController.lookupTableTest();
-  const promise = fetch('POST', qualifyUrl(url), {
+export const testLookupTable = (lookupTableName: string, string: string) => {
+  const promise = ToolsLookupTableTester.testLookupTable({
     lookup_table_name: lookupTableName,
     string: string,
   });
