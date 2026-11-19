@@ -52,20 +52,20 @@ class RepositoryClientServiceTest {
     }
 
     @Test
-    void createGeneratesTheClientNameAndPassesItToTheSettings() {
-        final RepositoryClientDto client = service.create("repo", name -> s3(Map.of("role_session_name", name)));
+    void createGeneratesTheClientName() {
+        final RepositoryClientDto client = service.create("repo", s3(Map.of("region", "eu-west-1")));
 
         assertThat(RepositoryClientNames.isManaged(client.clientName())).isTrue();
         assertThat(client.clientName()).startsWith("repository_repo_");
-        assertThat(client.opensearch().settings()).containsEntry("role_session_name", client.clientName());
+        assertThat(client.opensearch().settings()).containsEntry("region", "eu-west-1");
         assertThat(service.get("repo")).contains(client);
     }
 
     @Test
     void createReplacesThePreviousClientOfTheRepository() {
-        final String previous = service.create("repo", name -> s3(Map.of())).clientName();
+        final String previous = service.create("repo", s3(Map.of())).clientName();
 
-        final String created = service.create("repo", name -> s3(Map.of())).clientName();
+        final String created = service.create("repo", s3(Map.of())).clientName();
 
         assertThat(created).isNotEqualTo(previous);
         assertThat(service.get("repo")).hasValueSatisfying(client -> assertThat(client.clientName()).isEqualTo(created));
@@ -77,7 +77,7 @@ class RepositoryClientServiceTest {
         final Iterator<String> names = List.of(CLIENT, "repository_repo_0001").iterator();
         service = new RepositoryClientService(mongoCollections, repositoryName -> names.next());
 
-        assertThat(service.create("repo", name -> s3(Map.of())).clientName()).isEqualTo("repository_repo_0001");
+        assertThat(service.create("repo", s3(Map.of())).clientName()).isEqualTo("repository_repo_0001");
     }
 
     @Test
@@ -85,7 +85,7 @@ class RepositoryClientServiceTest {
         service.save("other", CLIENT, s3(Map.of()));
         service = new RepositoryClientService(mongoCollections, repositoryName -> CLIENT);
 
-        assertThatThrownBy(() -> service.create("repo", name -> s3(Map.of()))).isInstanceOf(MongoException.class);
+        assertThatThrownBy(() -> service.create("repo", s3(Map.of()))).isInstanceOf(MongoException.class);
         assertThat(service.get("repo")).isEmpty();
     }
 

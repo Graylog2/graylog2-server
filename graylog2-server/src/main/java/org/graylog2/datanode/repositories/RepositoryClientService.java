@@ -31,7 +31,6 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
 
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -66,14 +65,12 @@ public class RepositoryClientService {
      * Creates a client with a new name for the given repository, replacing its previous client. The repository is
      * registered with that client afterwards.
      *
-     * @param settings the settings of the client, by its name, e.g. for settings that identify the client
      * @return the stored client
      */
-    public RepositoryClientDto create(String repositoryName, Function<String, RepositoryClientSettings> settings) {
+    public RepositoryClientDto create(String repositoryName, RepositoryClientSettings settings) {
         for (int attempt = 1; ; attempt++) {
-            final String clientName = clientNames.apply(repositoryName);
             try {
-                return replace(repositoryName, clientName, settings.apply(clientName));
+                return replace(repositoryName, clientNames.apply(repositoryName), settings);
             } catch (MongoException e) {
                 if (!MongoUtils.isDuplicateKeyError(e) || attempt >= CLIENT_NAME_ATTEMPTS) {
                     throw e;

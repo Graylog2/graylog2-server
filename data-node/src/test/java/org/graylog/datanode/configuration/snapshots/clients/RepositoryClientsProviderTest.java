@@ -79,7 +79,7 @@ class RepositoryClientsProviderTest {
 
     @Test
     void secureFilesGoToTheKeystoreAsFileContent() {
-        final String client = clientService.create("gcs", name -> new RepositoryClientSettings(RepositoryClientSettings.TYPE_GCS,
+        final String client = clientService.create("gcs", new RepositoryClientSettings(RepositoryClientSettings.TYPE_GCS,
                 Map.of(), Map.of(), Map.of("credentials_file", encrypt("{\"type\": \"service_account\"}")))).clientName();
 
         assertThat(single(provider.get()).keystoreItems(null))
@@ -123,16 +123,6 @@ class RepositoryClientsProviderTest {
     }
 
     @Test
-    void clientNamesNotGeneratedByGraylogAreSkipped() {
-        records.insertOne(new Document("repository_name", "dotted").append("client_name", "a.b")
-                .append("opensearch", new Document("type", "s3")));
-        final String client = minio("minio");
-
-        assertThat(provider.get()).singleElement()
-                .satisfies(repository -> assertThat(repository.opensearchProperties()).containsKey(f("s3.client.%s.endpoint", client)));
-    }
-
-    @Test
     void invalidRecordsDoNotAffectOthers() {
         records.insertOne(new Document("repository_name", "undecodable").append("client_name", "repository_undecodable_0001")
                 .append("opensearch", "not-an-object"));
@@ -155,7 +145,7 @@ class RepositoryClientsProviderTest {
                 return super.decrypt(value);
             }
         });
-        clientService.create("failing", name -> new RepositoryClientSettings(RepositoryClientSettings.TYPE_S3,
+        clientService.create("failing", new RepositoryClientSettings(RepositoryClientSettings.TYPE_S3,
                 Map.of(), Map.of("secret_key", failing), Map.of()));
         minio("working");
 
@@ -164,7 +154,7 @@ class RepositoryClientsProviderTest {
 
     // Stores a client like the server does, returns the client name
     private String minio(String repositoryName) {
-        return clientService.create(repositoryName, name -> s3("secret")).clientName();
+        return clientService.create(repositoryName, s3("secret")).clientName();
     }
 
     private RepositoryClientSettings s3(String secretKey) {

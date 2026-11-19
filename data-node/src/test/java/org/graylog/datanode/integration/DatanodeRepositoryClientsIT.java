@@ -115,7 +115,7 @@ public class DatanodeRepositoryClientsIT {
                 Map.of("access_key", encryptedValueService.encrypt(s3Container.getAccessKey()),
                         "secret_key", encryptedValueService.encrypt(secretKey)),
                 Map.of());
-        return new RepositoryClientService(mongoCollections).create(repositoryName, client -> settings).clientName();
+        return new RepositoryClientService(mongoCollections).create(repositoryName, settings).clientName();
     }
 
     private String startDatanode() throws ExecutionException, RetryException {

@@ -69,7 +69,11 @@ public final class RepositoryClientNames {
         return client != null && MANAGED.matcher(client).matches();
     }
 
-    static String slug(String repositoryName) {
+    /**
+     * A readable form of the repository name that only contains lowercase letters, digits and {@code -}, at most 32
+     * characters long. Also usable where AWS restricts names, e.g. role session names.
+     */
+    public static String slug(String repositoryName) {
         final String slug = NOT_IN_SLUG.matcher(repositoryName.toLowerCase(Locale.ROOT)).replaceAll("-");
         final String trimmed = StringUtils.strip(StringUtils.left(StringUtils.strip(slug, "-"), MAX_SLUG_LENGTH), "-");
         return trimmed.isEmpty() ? EMPTY_SLUG : trimmed;
