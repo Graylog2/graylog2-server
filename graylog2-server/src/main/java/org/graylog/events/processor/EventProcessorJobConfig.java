@@ -27,7 +27,7 @@ import org.graylog.scheduler.JobDefinitionConfig;
  * job definitions are looked up by it. The job's trigger data must keep the {@code timerange_from} and
  * {@code timerange_to} fields of {@link EventProcessorExecutionJob.Data}, because the UI reads them.
  * <p>
- * A definition can't change its job type on update.
+ * An update that changes the job type replaces the trigger; the new job starts at the current time with empty data.
  */
 public interface EventProcessorJobConfig extends JobDefinitionConfig {
     String eventDefinitionId();

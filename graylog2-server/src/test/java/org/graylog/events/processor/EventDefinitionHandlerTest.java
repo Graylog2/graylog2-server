@@ -612,22 +612,20 @@ public class EventDefinitionHandlerTest {
 
     @Test
     @MongoDBFixtures("event-processors.json")
-    public void updateToAnotherJobTypeIsRejectedAndReverted() {
+    public void updateToAnotherJobTypeReplacesTrigger() {
         final EventDefinitionDto existingDto = eventDefinitionService.get("54e3deadbeefdeadbeef0000").orElseThrow(AssertionError::new);
-        final JobTriggerDto existingTrigger = jobTriggerService.get("54e3deadbeefdeadbeef0002").orElseThrow(AssertionError::new);
+        assertThat(jobTriggerService.get("54e3deadbeefdeadbeef0002")).get()
+                .satisfies(trigger -> assertThat(trigger.data()).isPresent());
 
-        assertThatThrownBy(() -> handler.update(existingDto.toBuilder().config(new TestLongRunningProcessorConfig(
-                TestLongRunningProcessorConfig.TYPE_NAME, 300000, 60000)).build(), true))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("can't change its job type");
+        handler.update(existingDto.toBuilder().config(new TestLongRunningProcessorConfig(
+                TestLongRunningProcessorConfig.TYPE_NAME, 300000, 60000)).build(), true);
 
-        assertThat(eventDefinitionService.get(existingDto.id())).get()
-                .satisfies(dto -> assertThat(dto.config()).isEqualTo(existingDto.config()));
         assertThat(jobDefinitionService.get("54e3deadbeefdeadbeef0001")).get()
-                .satisfies(definition -> assertThat(definition.config()).isInstanceOf(EventProcessorExecutionJob.Config.class));
-        assertThat(jobTriggerService.get("54e3deadbeefdeadbeef0002")).get().satisfies(trigger -> {
-            assertThat(trigger.jobDefinitionType()).isEqualTo(EventProcessorExecutionJob.TYPE_NAME);
-            assertThat(trigger.data()).isEqualTo(existingTrigger.data());
+                .satisfies(definition -> assertThat(definition.config()).isInstanceOf(TestLongRunningJobConfig.class));
+        assertThat(jobTriggerService.get("54e3deadbeefdeadbeef0002")).isEmpty();
+        assertThat(jobTriggerService.getOneForJob("54e3deadbeefdeadbeef0001")).get().satisfies(trigger -> {
+            assertThat(trigger.jobDefinitionType()).isEqualTo(TestLongRunningJobConfig.TYPE_NAME);
+            assertThat(trigger.data()).isEmpty();
         });
     }
 

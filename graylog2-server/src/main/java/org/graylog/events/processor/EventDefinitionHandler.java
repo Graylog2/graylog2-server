@@ -47,7 +47,6 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
-import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * Handles event definitions and creates scheduler job definitions and job triggers.
@@ -478,12 +477,12 @@ public class EventDefinitionHandler {
 
         final EventProcessorJobConfig config = schedulerConfig.jobDefinitionConfig();
 
-        // A definition can't move to another job type on update: the trigger keeps its type, and its data belongs
-        // to the old job. Event processors must reject such changes in validation; a move between releases needs a
-        // migration. Failing here makes the caller revert the update.
+        // A trigger can't change its job type in place, and its data belongs to the old job. Replace it instead,
+        // like disable and enable do, so the new job starts at the current time with empty data.
         if (!oldJobTrigger.jobDefinitionType().equals(config.type())) {
-            throw new IllegalStateException(f("Event definition <%s> can't change its job type from <%s> to <%s>",
-                    eventDefinition.id(), oldJobTrigger.jobDefinitionType(), config.type()));
+            deleteJobTrigger(jobDefinition, eventDefinition);
+            createJobTrigger(eventDefinition, jobDefinition, schedulerConfig);
+            return;
         }
 
         // Update the existing object to make sure we keep the ID
