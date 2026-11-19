@@ -71,6 +71,7 @@ public class AmqpTransport extends ThrottleableTransport2 {
     public static final String CK_ROUTING_KEY = "routing_key";
     public static final String CK_PARALLEL_QUEUES = "parallel_queues";
     public static final String CK_TLS = "tls";
+    public static final String CK_TLS_VERIFY = "tls_verify";
     public static final String CK_REQUEUE_INVALID_MESSAGES = "requeue_invalid_messages";
     public static final String CK_HEARTBEAT_TIMEOUT = "heartbeat";
     public static final String CK_CONNECTION_RECOVERY_INTERVAL = "connection_recovery_interval";
@@ -417,6 +418,15 @@ public class AmqpTransport extends ThrottleableTransport2 {
                             "Enable TLS?",
                             false,
                             "Enable transport encryption via TLS. (requires valid TLS port setting)"
+                    )
+            );
+
+            cr.addField(
+                    new BooleanField(
+                            CK_TLS_VERIFY,
+                            "Verify TLS certificate?",
+                            false,
+                            "Validate the broker certificate against the JVM trust store and check that it matches the broker hostname. Only applies when TLS is enabled."
                     )
             );
 

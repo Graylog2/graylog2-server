@@ -1,0 +1,4 @@
+type = "s"
+message = "Update the RabbitMQ client used by the AMQP input to 5.37.0 and add a \"Verify TLS certificate?\" option to the input. Existing inputs with TLS enabled keep connecting without certificate verification."
+
+pulls = ["28115"]
