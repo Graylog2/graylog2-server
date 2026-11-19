@@ -140,14 +140,11 @@ public class MessagesTabularResponseCreator implements TabularResponseCreator {
 
         return messageListResult.messages()
                 .stream()
-                .map(message -> {
-                    final List<Object> row = fields
-                            .stream()
-                            .map(field -> extractValue(message, field, cachedDecorators, searchUser))
-                            .collect(Collectors.toList());
-                    documentIds.forEach(column -> row.add(documentId(message, column)));
-                    return row;
-                }).collect(Collectors.toList());
+                .map(message -> Stream.concat(
+                        fields.stream().map(field -> extractValue(message, field, cachedDecorators, searchUser)),
+                        documentIds.stream().map(column -> documentId(message, column))
+                ).toList())
+                .toList();
     }
 
     private static Object documentId(ResultMessageSummary message, String column) {
