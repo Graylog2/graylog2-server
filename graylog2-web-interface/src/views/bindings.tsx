@@ -20,6 +20,7 @@ import type { PluginExports } from 'graylog-web-plugin/plugin';
 import type { WidgetComponentProps, AdditionalViewsActionHandlerArguments } from 'views/types';
 import Routes from 'routing/Routes';
 import App from 'routing/App';
+import { isPermitted } from 'util/PermissionsMixin';
 import { MessageListHandler } from 'views/logic/searchtypes/messages';
 import { MessageList } from 'views/components/widgets';
 import AddToTableActionHandler from 'views/logic/fieldactions/AddToTableActionHandler';
@@ -400,7 +401,7 @@ const exports: PluginExports = {
       {
         type: 'create-event-definition-from-value',
         title: 'Create event definition',
-        isEnabled: ({ contexts }) => !!contexts?.isPermitted?.('eventdefinitions:create'),
+        isEnabled: ({ contexts }) => isPermitted(contexts?.currentUser?.permissions, 'eventdefinitions:create'),
         resetFocus: false,
         component: CreateEventDefinition,
       },
