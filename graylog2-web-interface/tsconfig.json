@@ -13,6 +13,9 @@
     "allowSyntheticDefaultImports": true,
 
     "strict": false,
+    "alwaysStrict": true,
+    "strictBuiltinIteratorReturn": true,
+    "useUnknownInCatchVariables": true,
     "strictBindCallApply": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,

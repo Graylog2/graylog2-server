@@ -90,7 +90,7 @@ const CreateModal = <TValues extends object>({
       await onSubmit(values);
       onClose();
     } catch (error) {
-      setSubmitError(error?.message ?? 'An error occurred. Please try again.');
+      setSubmitError(error instanceof Error ? error.message : 'An error occurred. Please try again.');
     }
   };
 
