@@ -27,20 +27,27 @@ import org.bson.codecs.Codec;
 import org.bson.codecs.DecoderContext;
 import org.graylog.datanode.configuration.snapshots.RepositoryConfiguration;
 import org.graylog.datanode.configuration.snapshots.RepositoryConfigurationProvider;
+import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreFileContentItem;
+import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreItem;
+import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreStringItem;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.datanode.repositories.RepositoryClientDto;
 import org.graylog2.datanode.repositories.RepositoryClientNames;
+import org.graylog2.datanode.repositories.RepositoryClientSettings;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * Provides the opensearch repository clients stored by the Graylog server, see {@link RepositoryClientDto}. The
@@ -94,29 +101,43 @@ public class RepositoryClientsProvider implements RepositoryConfigurationProvide
     }
 
     private Optional<RepositoryConfiguration> configuration(RepositoryClientDto client) {
-        final Map<String, String> secureSettings = decrypt(client.opensearch().secureSettings());
-        final Map<String, String> secureFiles = decrypt(client.opensearch().secureFiles());
-        if (secureSettings == null || secureFiles == null) {
-            LOG.warn("Secrets of client <{}> of repository <{}> can't be decrypted, make sure password_secret matches the Graylog server. Skipping it.",
-                    client.clientName(), client.repositoryName());
-            return Optional.empty();
+        final RepositoryClientSettings opensearch = client.opensearch();
+        final Map<String, String> properties = new LinkedHashMap<>();
+        opensearch.settings().forEach((setting, value) -> properties.put(key(client, setting), value));
+
+        final List<OpensearchKeystoreItem> keystoreItems = new ArrayList<>();
+        for (Map.Entry<String, EncryptedValue> setting : opensearch.secureSettings().entrySet()) {
+            final String value = decrypt(setting.getValue());
+            if (value == null) {
+                return skipUndecryptable(client);
+            }
+            keystoreItems.add(new OpensearchKeystoreStringItem(key(client, setting.getKey()), value));
         }
-        return Optional.of(new RepositoryClientConfiguration(client.opensearch().type(), client.clientName(),
-                client.opensearch().settings(), secureSettings, secureFiles));
+        for (Map.Entry<String, EncryptedValue> file : opensearch.secureFiles().entrySet()) {
+            final String content = decrypt(file.getValue());
+            if (content == null) {
+                return skipUndecryptable(client);
+            }
+            keystoreItems.add(new OpensearchKeystoreFileContentItem(key(client, file.getKey()), content.getBytes(StandardCharsets.UTF_8)));
+        }
+        return Optional.of(new RepositoryClientConfiguration(properties, List.copyOf(keystoreItems)));
     }
 
-    // Null when a value can't be decrypted
+    private static Optional<RepositoryConfiguration> skipUndecryptable(RepositoryClientDto client) {
+        LOG.warn("Secrets of client <{}> of repository <{}> can't be decrypted, make sure password_secret matches the Graylog server. Skipping it.",
+                client.clientName(), client.repositoryName());
+        return Optional.empty();
+    }
+
+    // Null when the value can't be decrypted
     @Nullable
-    private Map<String, String> decrypt(Map<String, EncryptedValue> values) {
-        final Map<String, String> decrypted = new LinkedHashMap<>();
-        for (Map.Entry<String, EncryptedValue> value : values.entrySet()) {
-            final String plain = encryptedValueService.decrypt(value.getValue());
-            if (StringUtils.isBlank(plain)) {
-                return null;
-            }
-            decrypted.put(value.getKey(), plain);
-        }
-        return decrypted;
+    private String decrypt(EncryptedValue value) {
+        final String plain = encryptedValueService.decrypt(value);
+        return StringUtils.isBlank(plain) ? null : plain;
+    }
+
+    private static String key(RepositoryClientDto client, String setting) {
+        return f("%s.client.%s.%s", client.opensearch().type(), client.clientName(), setting);
     }
 
     @Nullable
