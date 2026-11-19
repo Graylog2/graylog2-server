@@ -168,7 +168,7 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
         public abstract boolean includeUnresolvedIds();
 
         @JsonProperty("include_document_ids")
-        @JsonPropertyDescription("Additionally return the id of each message's document as `_id` and its index as `_index`, e.g. to attach messages to an investigation as evidence.")
+        @JsonPropertyDescription("Additionally return the id of each message's document as `_id` and its index as `_index`, which together identify the message.")
         @DefaultValue("false")
         public abstract boolean includeDocumentIds();
 
