@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix event processor `execution_time` metric dropping whole seconds of the run duration."
+
+issues = ["28049"]
+pulls = []

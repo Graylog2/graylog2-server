@@ -63,7 +63,7 @@ public class EventProcessorExecutionMetrics {
 
     void recordExecutionTime(EventProcessor eventProcessor, String definitionId, Duration duration) {
         final String name = getNameForField(eventProcessor, definitionId, Fields.EXECUTION_TIME);
-        MetricUtils.getOrRegister(metricRegistry, name, new Timer()).update(duration.getNano(), TimeUnit.NANOSECONDS);
+        MetricUtils.getOrRegister(metricRegistry, name, new Timer()).update(duration.toNanos(), TimeUnit.NANOSECONDS);
     }
 
     void recordExecutions(EventProcessor eventProcessor, String definitionId) {
