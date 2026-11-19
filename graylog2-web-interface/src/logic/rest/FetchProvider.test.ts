@@ -216,7 +216,7 @@ describe('FetchProvider', () => {
 
     expect(error.status).toEqual(undefined);
     expect(error.message).toEqual(
-      'There was an error fetching a resource: undefined. Additional information: Not available',
+      'There was an error fetching a resource: The server could not be reached. Additional information: Not available',
     );
   });
 
