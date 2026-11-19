@@ -140,6 +140,29 @@ describe('SyncWithQueryParameters', () => {
       expect(history.replace).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=keyword&keyword=Last+five+minutes');
     });
 
+    it('if time range is keyword time range with timezone', () => {
+      asMock(useCurrentQuery).mockReturnValue(
+        createQuery({
+          type: 'keyword',
+          keyword: 'Last five minutes',
+          timezone: 'America/New_York',
+        }),
+      );
+      renderHook(() => useSyncWithQueryParameters('/search'));
+
+      expect(history.replace).toHaveBeenCalledWith(
+        '/search?q=foo%3A42&rangetype=keyword&keyword=Last+five+minutes&timezone=America%2FNew_York',
+      );
+    });
+
+    it('removes stale timezone when time range is no longer keyword', () => {
+      renderHook(() =>
+        useSyncWithQueryParameters('/search?q=foo%3A42&rangetype=keyword&keyword=today&timezone=America%2FNew_York'),
+      );
+
+      expect(history.replace).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&from=300');
+    });
+
     it('adds list of streams to query', () => {
       asMock(useCurrentQuery).mockReturnValue(createQuery(lastFiveMinutes, ['stream1', 'stream2']));
       renderHook(() => useSyncWithQueryParameters('/search'));
@@ -243,6 +266,26 @@ describe('SyncWithQueryParameters', () => {
       renderHook(() => useSyncWithQueryParameters('/dashboards/abc'));
 
       expect(history.replace).toHaveBeenCalledWith('/dashboards/abc?rangetype=keyword&keyword=Last+five+days');
+    });
+
+    it('writes keyword timerange with timezone from globalOverride.timerange to URL', () => {
+      asMock(useGlobalOverride).mockReturnValue(
+        GlobalOverride.create({ type: 'keyword', keyword: 'Last five days', timezone: 'America/New_York' }),
+      );
+      renderHook(() => useSyncWithQueryParameters('/dashboards/abc'));
+
+      expect(history.replace).toHaveBeenCalledWith(
+        '/dashboards/abc?rangetype=keyword&keyword=Last+five+days&timezone=America%2FNew_York',
+      );
+    });
+
+    it('removes stale timezone when globalOverride.timerange is no longer keyword', () => {
+      asMock(useGlobalOverride).mockReturnValue(GlobalOverride.create({ type: 'relative', range: 3600 }));
+      renderHook(() =>
+        useSyncWithQueryParameters('/dashboards/abc?rangetype=keyword&keyword=today&timezone=America%2FNew_York'),
+      );
+
+      expect(history.replace).toHaveBeenCalledWith('/dashboards/abc?rangetype=relative&relative=3600');
     });
 
     it('writes both q and timerange when globalOverride has both', () => {

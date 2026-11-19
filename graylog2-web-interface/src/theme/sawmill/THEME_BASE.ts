@@ -29,7 +29,7 @@ export const VARIANT_NAMES: Array<ColorVariant> = [
   'gray',
 ];
 
-const colorVariants: Record<string, [string, string, string, string, string, string, string, string, string, string]> =
+export const colorVariants: Record<string, [string, string, string, string, string, string, string, string, string, string]> =
   {
     danger: [
       '#FFEDED',
@@ -114,6 +114,18 @@ const colorVariants: Record<string, [string, string, string, string, string, str
       '#1C2235',
       '#12182B',
       '#060C1F',
+    ],
+    violet: [
+      '#F5F0FF',
+      '#E8DDFF',
+      '#D9C7FF',
+      '#CEB7FF',
+      '#BA9AFF',
+      '#9A6BFE',
+      '#8C61E7',
+      '#6D4CB4',
+      '#553B8C',
+      '#412D6B',
     ],
   };
 

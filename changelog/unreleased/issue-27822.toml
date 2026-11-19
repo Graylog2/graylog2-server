@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix keyword time ranges being evaluated in UTC instead of the user's timezone after executing a search."
+
+issues = ["27822"]
+pulls = ["28146"]

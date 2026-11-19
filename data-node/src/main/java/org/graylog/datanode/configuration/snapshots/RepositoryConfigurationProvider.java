@@ -25,4 +25,14 @@ import java.util.Collection;
  */
 public interface RepositoryConfigurationProvider {
     Collection<RepositoryConfiguration> get();
+
+    /**
+     * Repositories of an optional provider must not prevent opensearch from starting. If the searchable snapshots
+     * role can't be enabled, e.g. because the node search cache doesn't fit on the disk, and all repositories come
+     * from optional providers, opensearch starts without them and without the role. Repositories from the datanode
+     * configuration file are required, plugins can make repositories from other sources (e.g. MongoDB) optional.
+     */
+    default boolean isOptional() {
+        return false;
+    }
 }
