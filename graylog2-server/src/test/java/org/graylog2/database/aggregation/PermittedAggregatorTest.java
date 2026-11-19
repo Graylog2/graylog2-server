@@ -55,8 +55,9 @@ class PermittedAggregatorTest {
     private static final String DB_01 = "65f0000000000000000000a2";
     private static final String LAPTOP_07 = "65f0000000000000000000a3";
     private static final PermissionFilter STREAM_S1 = PermissionFilter.of(Filters.in("event.source_streams", "s1"));
-    private static final ValueSource.Related ASSET_CATEGORY =
-            ValueSource.related("event.associated_assets", "assets", "_id", "category").withLocalFieldAsObjectId();
+    private static final GroupedValueSource.Related ASSET_CATEGORY =
+            GroupedValueSource.related("event.associated_assets", "assets", "_id", "category")
+                    .withLocalFieldAsObjectId();
 
     private final Set<String> permissions = new HashSet<>();
     private final Subject subject = mock(Subject.class);
@@ -135,7 +136,7 @@ class PermittedAggregatorTest {
 
     @Test
     void rejectsCollectionsMissingFromTheCatalog() {
-        final var ownerStatus = ValueSource.related("owner", "users", "_id", "account_status")
+        final var ownerStatus = GroupedValueSource.related("owner", "users", "_id", "account_status")
                 .withLocalFieldAsObjectId();
 
         assertThatThrownBy(() -> aggregator.buckets("security_events", subject,

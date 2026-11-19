@@ -25,12 +25,12 @@ import org.bson.conversions.Bson;
  * A source can yield several values for one document, when its path leads through arrays. The document then belongs
  * to one bucket per distinct value, and to the missing bucket if there is none.
  */
-public sealed interface ValueSource {
+public sealed interface GroupedValueSource {
 
     /**
      * A field of the document itself.
      */
-    static ValueSource.Field field(final String path) {
+    static GroupedValueSource.Field field(final String path) {
         return new Field(path);
     }
 
@@ -39,7 +39,7 @@ public sealed interface ValueSource {
      *
      * @see Related
      */
-    static ValueSource.Related related(final String localField,
+    static GroupedValueSource.Related related(final String localField,
                                        final String collection,
                                        final String foreignField,
                                        final String path) {
@@ -49,7 +49,7 @@ public sealed interface ValueSource {
     /**
      * @param path the field path, which may lead through arrays of embedded documents, e.g. {@code assets.id}
      */
-    record Field(String path) implements ValueSource {
+    record Field(String path) implements GroupedValueSource {
         public Field {
             FieldPaths.requireFieldPath(path);
         }
@@ -78,7 +78,7 @@ public sealed interface ValueSource {
                    String foreignField,
                    String path,
                    @Nullable Bson filter,
-                   boolean localFieldAsObjectId) implements ValueSource {
+                   boolean localFieldAsObjectId) implements GroupedValueSource {
         public Related {
             FieldPaths.requireFieldPath(localField);
             FieldPaths.requireCollectionName(collection);

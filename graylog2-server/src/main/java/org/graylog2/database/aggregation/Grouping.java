@@ -28,46 +28,46 @@ import java.util.Objects;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
- * How documents are assigned to buckets, based on the values of a {@link ValueSource}.
+ * How documents are assigned to buckets, based on the values of a {@link GroupedValueSource}.
  * <p>
  * Documents without a value, or whose values the grouping can't place (e.g. a string in a date histogram), belong
  * to the missing bucket.
  */
 public sealed interface Grouping {
 
-    ValueSource source();
+    GroupedValueSource source();
 
     /**
      * The same grouping of another source's values.
      */
-    Grouping withSource(ValueSource source);
+    Grouping withSource(GroupedValueSource source);
 
     static Terms terms(final String field) {
-        return new Terms(ValueSource.field(field));
+        return new Terms(GroupedValueSource.field(field));
     }
 
-    static Terms terms(final ValueSource source) {
+    static Terms terms(final GroupedValueSource source) {
         return new Terms(source);
     }
 
-    static Ranges ranges(final ValueSource source, final List<Range> ranges) {
+    static Ranges ranges(final GroupedValueSource source, final List<Range> ranges) {
         return new Ranges(source, ranges);
     }
 
-    static DateHistogram dateHistogram(final ValueSource source, final DateUnit unit, final ZoneId timezone) {
+    static DateHistogram dateHistogram(final GroupedValueSource source, final DateUnit unit, final ZoneId timezone) {
         return new DateHistogram(source, unit, 1, timezone);
     }
 
     /**
      * One bucket per distinct value.
      */
-    record Terms(ValueSource source) implements Grouping {
+    record Terms(GroupedValueSource source) implements Grouping {
         public Terms {
             Objects.requireNonNull(source, "source");
         }
 
         @Override
-        public Terms withSource(final ValueSource source) {
+        public Terms withSource(final GroupedValueSource source) {
             return new Terms(source);
         }
     }
@@ -75,7 +75,7 @@ public sealed interface Grouping {
     /**
      * One bucket per range, keyed by the range's key. A value belongs to the first range containing it.
      */
-    record Ranges(ValueSource source, List<Range> ranges) implements Grouping {
+    record Ranges(GroupedValueSource source, List<Range> ranges) implements Grouping {
         public Ranges {
             Objects.requireNonNull(source, "source");
             ranges = List.copyOf(ranges);
@@ -94,7 +94,7 @@ public sealed interface Grouping {
         }
 
         @Override
-        public Ranges withSource(final ValueSource source) {
+        public Ranges withSource(final GroupedValueSource source) {
             return new Ranges(source, ranges);
         }
 
@@ -154,7 +154,7 @@ public sealed interface Grouping {
      * One bucket per period that has values, keyed by the period's start. Periods are aligned to the calendar in
      * {@code timezone}; weeks start on Monday.
      */
-    record DateHistogram(ValueSource source, DateUnit unit, int binSize, ZoneId timezone) implements Grouping {
+    record DateHistogram(GroupedValueSource source, DateUnit unit, int binSize, ZoneId timezone) implements Grouping {
         public DateHistogram {
             Objects.requireNonNull(source, "source");
             Objects.requireNonNull(unit, "unit");
@@ -165,7 +165,7 @@ public sealed interface Grouping {
         }
 
         @Override
-        public DateHistogram withSource(final ValueSource source) {
+        public DateHistogram withSource(final GroupedValueSource source) {
             return new DateHistogram(source, unit, binSize, timezone);
         }
 

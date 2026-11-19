@@ -187,7 +187,7 @@ class MongoAggregatorScenariosTest {
     class Ranges {
         @Test
         void countsEventsPerRiskLevel() {
-            final var grouping = Grouping.ranges(ValueSource.field("risk_score"), List.of(
+            final var grouping = Grouping.ranges(GroupedValueSource.field("risk_score"), List.of(
                     Range.of("low", null, 30),
                     Range.of("medium", 30, 70),
                     Range.of("high", 70, null)));
@@ -202,7 +202,7 @@ class MongoAggregatorScenariosTest {
 
     @Nested
     class DateHistogram {
-        private static final ValueSource TIMESTAMP = ValueSource.field("event.timestamp");
+        private static final GroupedValueSource TIMESTAMP = GroupedValueSource.field("event.timestamp");
 
         @Test
         void countsEventsPerDay() {
@@ -237,10 +237,11 @@ class MongoAggregatorScenariosTest {
 
     @Nested
     class Relations {
-        private static final ValueSource.Related OWNER_ACCOUNT_STATUS =
-                ValueSource.related("owner", "users", "_id", "account_status").withLocalFieldAsObjectId();
-        private static final ValueSource.Related ASSET_CATEGORY =
-                ValueSource.related("event.associated_assets", "assets", "_id", "category").withLocalFieldAsObjectId();
+        private static final GroupedValueSource.Related OWNER_ACCOUNT_STATUS =
+                GroupedValueSource.related("owner", "users", "_id", "account_status").withLocalFieldAsObjectId();
+        private static final GroupedValueSource.Related ASSET_CATEGORY =
+                GroupedValueSource.related("event.associated_assets", "assets", "_id", "category")
+                        .withLocalFieldAsObjectId();
 
         @Test
         void countsEventsPerAccountStatusOfTheirOwner() {

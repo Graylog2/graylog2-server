@@ -79,15 +79,15 @@ final class AggregationPipelines {
         return stages;
     }
 
-    private static List<Bson> valueStages(final ValueSource source) {
+    private static List<Bson> valueStages(final GroupedValueSource source) {
         return switch (source) {
-            case ValueSource.Field field ->
+            case GroupedValueSource.Field field ->
                     List.of(Aggregates.set(new Field<>(VALUE, distinctValues("$" + field.path()))));
-            case ValueSource.Related related -> relatedValueStages(related);
+            case GroupedValueSource.Related related -> relatedValueStages(related);
         };
     }
 
-    private static List<Bson> relatedValueStages(final ValueSource.Related related) {
+    private static List<Bson> relatedValueStages(final GroupedValueSource.Related related) {
         final var stages = new ArrayList<Bson>();
         final var temporaryFields = new ArrayList<>(List.of(RELATED));
         var localField = related.localField();

@@ -74,7 +74,7 @@ public class PermittedAggregator {
                                            final Subject subject,
                                            final BucketAggregation request) {
         final Bson documentFilter = Filters.and(permissionFilter.filter(), request.documentFilter());
-        final Grouping grouping = request.grouping().source() instanceof ValueSource.Related related
+        final Grouping grouping = request.grouping().source() instanceof GroupedValueSource.Related related
                 ? request.grouping().withSource(permitted(related, subject))
                 : request.grouping();
         return mongoCollections.aggregator(collection)
@@ -82,7 +82,7 @@ public class PermittedAggregator {
     }
 
     // A document whose related documents the user may not read counts as missing, like one without any.
-    private ValueSource.Related permitted(final ValueSource.Related related, final Subject subject) {
+    private GroupedValueSource.Related permitted(final GroupedValueSource.Related related, final Subject subject) {
         final Bson permissionFilter = permissionFilters.permissionFilter(related.collection(), subject).filter();
         return related.withFilter(related.filter() == null
                 ? permissionFilter

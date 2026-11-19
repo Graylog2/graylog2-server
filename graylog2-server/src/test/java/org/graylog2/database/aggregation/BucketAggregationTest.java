@@ -34,7 +34,7 @@ class BucketAggregationTest {
     @ValueSource(strings = {"$where", "owner.$id", "a..b", ".a", "a.", "", "a b", "{\"$gt\": 1}"})
     void rejectsFieldPathsThatAreNotPlainPaths(final String path) {
         assertThatThrownBy(() -> Grouping.terms(path)).isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> org.graylog2.database.aggregation.ValueSource.related(path, "users", "_id", "name"))
+        assertThatThrownBy(() -> GroupedValueSource.related(path, "users", "_id", "name"))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -42,14 +42,14 @@ class BucketAggregationTest {
     @ValueSource(strings = {"owner", "event.timestamp", "assets.id", "_id", "gl2_source-input"})
     void acceptsPlainFieldPaths(final String path) {
         assertThat(Grouping.terms(path).source())
-                .isEqualTo(new org.graylog2.database.aggregation.ValueSource.Field(path));
+                .isEqualTo(new GroupedValueSource.Field(path));
     }
 
     @Test
     void rejectsSystemAndInvalidCollections() {
-        assertThatThrownBy(() -> org.graylog2.database.aggregation.ValueSource.related("owner", "system.users", "_id", "name"))
+        assertThatThrownBy(() -> GroupedValueSource.related("owner", "system.users", "_id", "name"))
                 .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> org.graylog2.database.aggregation.ValueSource.related("owner", "$users", "_id", "name"))
+        assertThatThrownBy(() -> GroupedValueSource.related("owner", "$users", "_id", "name"))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -81,7 +81,7 @@ class BucketAggregationTest {
 
     @Test
     void validatesRanges() {
-        final var score = org.graylog2.database.aggregation.ValueSource.field("score");
+        final var score = GroupedValueSource.field("score");
 
         assertThatThrownBy(() -> Range.of("empty", (Number) null, null)).hasMessageContaining("at least one bound");
         assertThatThrownBy(() -> Range.of("backwards", 10, 5)).hasMessageContaining("start before it ends");

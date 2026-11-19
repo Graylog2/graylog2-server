@@ -157,7 +157,7 @@ class MongoAggregatorTest {
     class Ranges {
         @Test
         void bucketsNumbersByRangeAndTreatsOtherTypesAsMissing() {
-            final var grouping = Grouping.ranges(ValueSource.field("score"), List.of(
+            final var grouping = Grouping.ranges(GroupedValueSource.field("score"), List.of(
                     Range.of("low", null, 30),
                     Range.of("medium", 30, 80),
                     Range.of("high", 80, null)));
@@ -171,7 +171,7 @@ class MongoAggregatorTest {
 
         @Test
         void bucketsInstantsByRange() {
-            final var grouping = Grouping.ranges(ValueSource.field("timestamp"), List.of(
+            final var grouping = Grouping.ranges(GroupedValueSource.field("timestamp"), List.of(
                     Range.of("before", null, Instant.parse("2024-01-02T00:00:00Z")),
                     Range.of("after", Instant.parse("2024-01-02T00:00:00Z"), null)));
 
@@ -182,7 +182,8 @@ class MongoAggregatorTest {
 
         @Test
         void treatsRangeKeysAsLiterals() {
-            final var grouping = Grouping.ranges(ValueSource.field("score"), List.of(Range.of("$owner", 0, 100)));
+            final var grouping = Grouping.ranges(GroupedValueSource.field("score"),
+                    List.of(Range.of("$owner", 0, 100)));
 
             assertThat(keys(items.buckets(BucketAggregation.of(ALL, grouping)))).containsExactly("$owner");
         }
@@ -192,7 +193,8 @@ class MongoAggregatorTest {
     class DateHistogram {
         @Test
         void bucketsByCalendarDay() {
-            final var grouping = Grouping.dateHistogram(ValueSource.field("timestamp"), DateUnit.DAY, ZoneOffset.UTC);
+            final var grouping = Grouping.dateHistogram(GroupedValueSource.field("timestamp"), DateUnit.DAY,
+                    ZoneOffset.UTC);
 
             final var result = items.buckets(BucketAggregation.of(ALL, grouping)
                     .withOrder(BucketOrder.byKey(SortOrder.ASCENDING)));
@@ -207,7 +209,7 @@ class MongoAggregatorTest {
 
         @Test
         void alignsDaysToTimezone() {
-            final var grouping = Grouping.dateHistogram(ValueSource.field("timestamp"), DateUnit.DAY,
+            final var grouping = Grouping.dateHistogram(GroupedValueSource.field("timestamp"), DateUnit.DAY,
                     ZoneId.of("Europe/Berlin"));
 
             final var result = items.buckets(BucketAggregation.of(ALL, grouping)
@@ -246,7 +248,8 @@ class MongoAggregatorTest {
 
         @Test
         void groupsByFieldOfReferencingDocuments() {
-            final var grouping = Grouping.terms(ValueSource.related("event_id", "investigations", "events", "status"));
+            final var grouping = Grouping.terms(
+                    GroupedValueSource.related("event_id", "investigations", "events", "status"));
 
             final var result = mongoCollections.aggregator("events").buckets(BucketAggregation.of(ALL, grouping));
 
@@ -257,8 +260,9 @@ class MongoAggregatorTest {
 
         @Test
         void considersOnlyRelatedDocumentsMatchingTheirFilter() {
-            final var grouping = Grouping.terms(ValueSource.related("event_id", "investigations", "events", "status")
-                    .withFilter(Filters.eq("team", "blue")));
+            final var grouping = Grouping.terms(
+                    GroupedValueSource.related("event_id", "investigations", "events", "status")
+                            .withFilter(Filters.eq("team", "blue")));
 
             final var result = mongoCollections.aggregator("events").buckets(BucketAggregation.of(ALL, grouping));
 
@@ -268,7 +272,7 @@ class MongoAggregatorTest {
 
         @Test
         void convertsStringReferencesToObjectIds() {
-            final var source = ValueSource.related("owner", "users", "_id", "team");
+            final var source = GroupedValueSource.related("owner", "users", "_id", "team");
             final var events = mongoCollections.aggregator("events");
 
             final var converted = events.buckets(BucketAggregation.of(ALL, Grouping.terms(source.withLocalFieldAsObjectId())));
