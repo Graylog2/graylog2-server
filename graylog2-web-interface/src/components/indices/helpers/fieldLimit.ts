@@ -51,8 +51,8 @@ export const prepareFieldLimitValues = <T extends FieldLimitValues>(values: T, a
 };
 
 const FIELD_ERROR_PATTERNS: Array<[keyof FieldLimitErrors, RegExp]> = [
-  ['field_limit', /field_?limit/i],
-  ['dynamic_mapping_disabled', /dynamic_?mapping/i],
+  ['field_limit', /field[ _]?limit/i],
+  ['dynamic_mapping_disabled', /dynamic[ _]?mapping/i],
 ];
 
 const TEMPLATE_ERROR_MESSAGE = /^Invalid value for field \[([^\]]+)\]:\s*(.*)$/;

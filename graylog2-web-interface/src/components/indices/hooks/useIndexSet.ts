@@ -28,6 +28,8 @@ const useIndexSet = (initialIndexSet?: IndexSet): [IndexSet, Dispatch<SetStateAc
   const [indexSet, setIndexSet] = useState(initialIndexSet);
   const { selectedIndexSetTemplate } = useSelectedIndexSetTemplate();
 
+  /* eslint-disable react-hooks/set-state-in-effect, react-hooks/immutability */
+  // FIXME: derive the index set during render and stop mutating the selected template
   useEffect(() => {
     if (loadingIndexSetTemplateDefaults || !indexSetTemplateDefaults) return;
 
@@ -79,9 +81,14 @@ const useIndexSet = (initialIndexSet?: IndexSet): [IndexSet, Dispatch<SetStateAc
         index_set_template_id: selectedIndexSetTemplate.id,
       });
     } else {
-      setIndexSet({ ...defaultIndexSet });
+      setIndexSet({
+        ...defaultIndexSet,
+        field_limit: indexSetTemplateDefaults.field_limit,
+        dynamic_mapping_disabled: indexSetTemplateDefaults.dynamic_mapping_disabled,
+      });
     }
   }, [loadingIndexSetTemplateDefaults, indexSetTemplateDefaults, initialIndexSet, selectedIndexSetTemplate]);
+  /* eslint-enable react-hooks/set-state-in-effect, react-hooks/immutability */
 
   return [indexSet, setIndexSet];
 };

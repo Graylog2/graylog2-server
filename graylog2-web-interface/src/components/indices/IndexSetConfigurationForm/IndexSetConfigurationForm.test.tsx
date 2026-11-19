@@ -394,6 +394,28 @@ describe('IndexSetConfigurationForm', () => {
       expect(screen.getByText(/assign a field type profile to this index set first/i)).toBeInTheDocument();
     });
 
+    it('Should take the limit of the default template when creating without a selected template', async () => {
+      asMock(useIndexSetTemplateDefaults).mockReturnValue({
+        loadingIndexSetTemplateDefaults: false,
+        indexSetTemplateDefaults: { ...indexSetTemplateDefaults, field_limit: 1500 },
+      });
+
+      render(<SUT create />);
+
+      expect(await screen.findByRole('spinbutton', { name: /max field count/i })).toHaveValue(1500);
+    });
+
+    it('Should keep an unset limit empty when editing, even if the default template has one', async () => {
+      asMock(useIndexSetTemplateDefaults).mockReturnValue({
+        loadingIndexSetTemplateDefaults: false,
+        indexSetTemplateDefaults: { ...indexSetTemplateDefaults, field_limit: 1500 },
+      });
+
+      render(<SUT indexSet={{ ...indexSet, field_limit: null }} />);
+
+      expect(await screen.findByRole('spinbutton', { name: /max field count/i })).toHaveValue(null);
+    });
+
     it('Should enable the toggle when a profile is assigned', async () => {
       render(<SUT indexSet={{ ...indexSet, field_type_profile: 'profile-id' }} />);
 

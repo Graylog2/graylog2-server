@@ -31,6 +31,14 @@ describe('extractFieldLimitErrors', () => {
     expect(extractFieldLimitErrors(error)).toEqual({ field_limit: 'must be greater than or equal to 1000' });
   });
 
+  it('reads the plain validation messages of the index set endpoints', () => {
+    const message = 'Dynamic mapping can only be disabled for index sets with a field type profile';
+
+    expect(extractFieldLimitErrors({ additional: { body: { message } } })).toEqual({
+      dynamic_mapping_disabled: message,
+    });
+  });
+
   it('ignores errors that belong to other fields', () => {
     expect(
       extractFieldLimitErrors({ additional: { body: { message: 'Invalid value for field [shards]: bad' } } }),
