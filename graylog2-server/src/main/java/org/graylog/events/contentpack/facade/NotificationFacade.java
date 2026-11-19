@@ -18,6 +18,11 @@ package org.graylog.events.contentpack.facade;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.InvalidTypeIdException;
+import com.google.common.graph.Graph;
+import com.google.common.graph.GraphBuilder;
+import com.google.common.graph.ImmutableGraph;
+import com.google.common.graph.MutableGraph;
 import jakarta.inject.Inject;
 import org.graylog.events.contentpack.entities.NotificationEntity;
 import org.graylog.events.notifications.DBNotificationService;
@@ -106,6 +111,40 @@ public class NotificationFacade implements EntityFacade<NotificationDto> {
     public Optional<NativeEntity<NotificationDto>> loadNativeEntity(NativeEntityDescriptor nativeEntityDescriptor) {
         final Optional<NotificationDto> notificationDto = notificationService.get(nativeEntityDescriptor.id().id());
         return notificationDto.map(notification -> NativeEntity.create(nativeEntityDescriptor, notification));
+    }
+
+    @Override
+    public Graph<EntityDescriptor> resolveNativeEntity(EntityDescriptor entityDescriptor) {
+        final MutableGraph<EntityDescriptor> mutableGraph = GraphBuilder.directed().build();
+        mutableGraph.addNode(entityDescriptor);
+        notificationService.get(entityDescriptor.id().id()).ifPresentOrElse(
+                notification -> notification.config().resolveNativeEntity(entityDescriptor, mutableGraph),
+                () -> LOG.debug("Couldn't find notification {}", entityDescriptor));
+        return ImmutableGraph.copyOf(mutableGraph);
+    }
+
+    @Override
+    public Graph<Entity> resolveForInstallation(Entity entity,
+                                                Map<String, ValueReference> parameters,
+                                                Map<EntityDescriptor, Entity> entities) {
+        if (!(entity instanceof EntityV1 entityV1)) {
+            throw new IllegalArgumentException("Unsupported entity version: " + entity.getClass());
+        }
+        final MutableGraph<Entity> graph = GraphBuilder.directed().build();
+        graph.addNode(entity);
+        final NotificationEntity notificationEntity;
+        try {
+            notificationEntity = objectMapper.convertValue(entityV1.data(), NotificationEntity.class);
+        } catch (IllegalArgumentException e) {
+            // Uninstall and upgrade build this graph too, and must keep working when the notification type is no longer registered.
+            if (!(e.getCause() instanceof InvalidTypeIdException)) {
+                throw e;
+            }
+            LOG.warn("Couldn't resolve dependencies of notification {} with an unregistered type", entityV1.id(), e);
+            return ImmutableGraph.copyOf(graph);
+        }
+        notificationEntity.config().resolveForInstallation(entityV1, parameters, entities, graph);
+        return ImmutableGraph.copyOf(graph);
     }
 
     @Override
