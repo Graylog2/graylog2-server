@@ -32,8 +32,8 @@ describe('extractFieldLimitErrors', () => {
   });
 
   it('ignores errors that belong to other fields', () => {
-    expect(extractFieldLimitErrors({ additional: { body: { message: 'Invalid value for field [shards]: bad' } } })).toEqual(
-      {},
-    );
+    expect(
+      extractFieldLimitErrors({ additional: { body: { message: 'Invalid value for field [shards]: bad' } } }),
+    ).toEqual({});
   });
 });
