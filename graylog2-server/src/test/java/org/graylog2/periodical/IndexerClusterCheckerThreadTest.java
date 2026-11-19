@@ -230,6 +230,20 @@ public class IndexerClusterCheckerThreadTest {
         assertThat(publishedNotification.getType()).isEqualTo(Notification.Type.ES_SHARD_ALLOCATION_MAXIMUM);
     }
 
+    @Test
+    public void testShardAllocationIgnoresUnassignedShards() {
+        when(cluster.clusterShardAllocation()).thenReturn(
+                new ClusterShardAllocation(100, List.of(
+                        new NodeShardAllocation("node1", 90),
+                        new NodeShardAllocation("UNASSIGNED", 950)
+                ))
+        );
+        when(notificationService.buildNow()).thenReturn(new NotificationImpl());
+
+        indexerClusterCheckerThread.checkShardAllocation();
+        verify(notificationService, never()).publishIfFirst(any());
+    }
+
     private Set<NodeDiskUsageStats> mockNodeDiskUsageStats() {
         return mockNodeDiskUsageStats(EnumSet.of(MASTER_ELIGIBLE, DATA));
     }
