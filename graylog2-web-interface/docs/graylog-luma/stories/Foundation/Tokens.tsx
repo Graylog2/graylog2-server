@@ -140,7 +140,7 @@ const ValueCell = styled.div`
 const PaletteLabel = styled.span<{ $missing?: boolean }>`
   display: block;
   font-size: 11px;
-  color: ${({ $missing, theme }) => ($missing ? '#E74342' : theme.colors.text.secondary)};
+  color: ${({ $missing, theme }) => ($missing ? theme.colors.variant.dark.danger : theme.colors.text.secondary)};
 `;
 
 const ColorValue = ({ value }: { value: string | undefined }) => {

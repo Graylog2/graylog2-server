@@ -16,6 +16,8 @@
  */
 import type { DefaultTheme } from 'styled-components';
 
+import { opacify } from 'theme/sawmill/utils';
+
 import { paletteHex } from './colorPalette';
 
 // Luma design tokens that don't exist in the Graylog theme yet. Values are built from the Luma palette
@@ -23,17 +25,10 @@ import { paletteHex } from './colorPalette';
 
 type ModeValues = { light: string; dark: string };
 
-// Adds an opacity to a 6-digit hex value, e.g. withAlpha('#C1C7DC', 0.5) -> '#C1C7DC80'.
-const withAlpha = (hex: string, alpha: number) =>
-  `${hex}${Math.round(alpha * 255)
-    .toString(16)
-    .padStart(2, '0')
-    .toUpperCase()}`;
-
 export const BORDER_TOKENS: Record<'divider' | 'dividerSecondary', ModeValues> = {
   divider: {
-    light: withAlpha(paletteHex('Gray', '2'), 0.5),
-    dark: withAlpha(paletteHex('Gray', '3'), 0.5),
+    light: opacify(paletteHex('Gray', '2'), 0.5),
+    dark: opacify(paletteHex('Gray', '3'), 0.5),
   },
   dividerSecondary: {
     light: paletteHex('Gray', '2'),
