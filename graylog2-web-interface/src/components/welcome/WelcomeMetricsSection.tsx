@@ -33,6 +33,10 @@ import GeneralWelcomeMetrics from './GeneralWelcomeMetrics';
 const Container = styled.div`
   margin-bottom: 6.4px;
 
+  /* Like the sections below, which are bootstrap rows, the widgets extend 15px beyond the page content. */
+  margin-left: -15px;
+  margin-right: -15px;
+
   .${widgetActionsMenuClass} {
     opacity: 1;
   }

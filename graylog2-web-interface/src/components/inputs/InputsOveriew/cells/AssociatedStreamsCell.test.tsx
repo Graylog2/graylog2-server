@@ -19,15 +19,15 @@ import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
+import useEntityTitles from 'hooks/useEntityTitles';
 import { useInputMetricsFor } from 'components/inputs/InputsOveriew/InputMetricsContext';
-import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
 
 import AssociatedStreamsCell from './AssociatedStreamsCell';
 
 jest.mock('components/inputs/InputsOveriew/InputMetricsContext', () => ({
   useInputMetricsFor: jest.fn(),
 }));
-jest.mock('components/common/EntityDataTable/hooks/useExpandedSections', () => jest.fn());
+jest.mock('hooks/useEntityTitles');
 
 const input = {
   id: 'input-1',
@@ -43,49 +43,55 @@ const input = {
   content_pack: '',
 };
 
-describe('AssociatedStreamsCell', () => {
-  const toggleSection = jest.fn();
+const mockMessagesPerStream = (messagesPerStream: Record<string, number>) =>
+  asMock(useInputMetricsFor).mockReturnValue({
+    metrics: { messages_per_stream: messagesPerStream },
+    isInitialLoading: false,
+    isError: false,
+  });
 
+describe('AssociatedStreamsCell', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    asMock(useExpandedSections).mockReturnValue({ toggleSection, expandedSections: {} });
-  });
-
-  it('renders the number of streams from the messages_per_stream keys', () => {
-    asMock(useInputMetricsFor).mockReturnValue({
-      metrics: { messages_per_stream: { 'stream-a': 10, 'stream-b': 5, 'stream-c': 0 } },
+    asMock(useEntityTitles).mockReturnValue({
+      titlesById: { 'stream-a': 'Alpha Stream', 'stream-b': 'Beta Stream' },
+      notPermittedIds: new Set(),
       isInitialLoading: false,
+      isFetching: false,
       isError: false,
     });
+  });
+
+  it('renders the first stream and the number of the others', async () => {
+    mockMessagesPerStream({ 'stream-b': 5, 'stream-a': 10 });
 
     render(<AssociatedStreamsCell input={input} />);
 
-    expect(screen.getByText('3')).toBeInTheDocument();
+    await screen.findByRole('link', { name: 'Alpha Stream' });
+
+    expect(await screen.findByRole('button', { name: /show 1 more/i })).toHaveTextContent('+1');
+    expect(screen.queryByText('Beta Stream')).not.toBeInTheDocument();
   });
 
-  it('renders 0 when no streams have received messages', () => {
-    asMock(useInputMetricsFor).mockReturnValue({
-      metrics: { messages_per_stream: {} },
-      isInitialLoading: false,
-      isError: false,
-    });
+  it('links each stream to its page when the list is expanded', async () => {
+    mockMessagesPerStream({ 'stream-a': 10, 'stream-b': 5 });
 
     render(<AssociatedStreamsCell input={input} />);
 
-    expect(screen.getByText('0')).toBeInTheDocument();
+    await userEvent.click(await screen.findByRole('button', { name: /show 1 more/i }));
+
+    expect(await screen.findByRole('link', { name: 'Alpha Stream' })).toHaveAttribute('href', '/streams/stream-a/view');
+    expect(await screen.findByRole('link', { name: 'Beta Stream' })).toHaveAttribute('href', '/streams/stream-b/view');
   });
 
-  it('toggles the associated_streams section when clicked', async () => {
-    asMock(useInputMetricsFor).mockReturnValue({
-      metrics: { messages_per_stream: { 'stream-a': 1, 'stream-b': 1 } },
-      isInitialLoading: false,
-      isError: false,
-    });
+  it('renders a dash when no streams have received messages', async () => {
+    mockMessagesPerStream({});
 
     render(<AssociatedStreamsCell input={input} />);
-    await userEvent.click(screen.getByText('2'));
 
-    expect(toggleSection).toHaveBeenCalledWith('input-1', 'associated_streams');
+    await screen.findByText('—');
+
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
   it('renders a spinner while metrics are loading and no cached data is present', async () => {
@@ -97,10 +103,10 @@ describe('AssociatedStreamsCell', () => {
 
     render(<AssociatedStreamsCell input={input} />);
 
-    expect(await screen.findByText(/loading/i)).toBeInTheDocument();
+    await screen.findByText(/loading/i);
   });
 
-  it('renders a dash when the request errored', () => {
+  it('renders a dash when the request errored', async () => {
     asMock(useInputMetricsFor).mockReturnValue({
       metrics: undefined,
       isInitialLoading: false,
@@ -109,6 +115,6 @@ describe('AssociatedStreamsCell', () => {
 
     render(<AssociatedStreamsCell input={input} />);
 
-    expect(screen.getByText('—')).toBeInTheDocument();
+    await screen.findByText('—');
   });
 });
