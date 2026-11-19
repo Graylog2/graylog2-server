@@ -18,98 +18,31 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { ColorSwatch, HexValue, StoryContainer } from './shared';
-import { SECTIONS } from './colorPalette';
-import type { Swatch } from './colorPalette';
-import { dividerColor } from './lumaTokens';
-
-// Palette data lives in ./colorPalette so the Tokens page can reuse it.
-
-// ─── Layout ────────────────────────────────────────────────────────────────
-
-// Border and spacing above come from the global H2 rule in .storybook/DocsContainer.tsx.
-const SectionTitle = styled.h2`
-  margin-bottom: ${({ theme }) => theme.spacings.xs};
-`;
-
-const PaletteBlock = styled.div`
-  margin: ${({ theme }) => `${theme.spacings.lg} 0`};
-`;
-
-const PaletteHeader = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${({ theme }) => theme.spacings.xs};
-`;
-
-const PaletteName = styled.h3`
-  margin: 0;
-  font-weight: 700;
-`;
-
-const CountPill = styled.span`
-  padding: 1px ${({ theme }) => theme.spacings.xs};
-  border: 1px solid ${({ theme }) => dividerColor(theme)};
-  border-radius: 999px;
-  font-size: 11px;
-  color: ${({ theme }) => theme.colors.text.secondary};
-`;
-
-const Muted = styled.p`
-  max-width: 560px;
-  margin: ${({ theme }) => `${theme.spacings.xxs} 0 ${theme.spacings.sm}`};
-  color: ${({ theme }) => theme.colors.text.secondary};
-`;
+import { PALETTES } from './colorPalette';
+import type { PaletteKey } from './colorPalette';
 
 const SwatchGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
   gap: ${({ theme }) => `${theme.spacings.sm} ${theme.spacings.xs}`};
-  margin-top: ${({ theme }) => theme.spacings.sm};
 `;
 
 const SwatchLabel = styled.div`
   margin-top: ${({ theme }) => theme.spacings.xs};
-  font-size: 12px;
-  font-weight: 700;
+  font-size: ${({ theme }) => theme.fonts.size.small};
+  font-weight: 600;
 `;
 
-const PaletteSwatch = ({ swatch }: { swatch: Swatch }) => (
-  <div>
-    <ColorSwatch color={swatch.hex} width="100%" height="44px" />
-    <SwatchLabel>{swatch.label}</SwatchLabel>
-    <HexValue>{swatch.hex}</HexValue>
-  </div>
-);
-
-const Count = ({ n }: { n: number }) => <CountPill>{n} colors</CountPill>;
-
-export const ColorsDoc = () => (
+export const PaletteDoc = ({ palette }: { palette: PaletteKey }) => (
   <StoryContainer>
-    {SECTIONS.map((section) => {
-      const single = section.palettes.length === 1 && !section.palettes[0].name;
-
-      return (
-        <section key={section.title}>
-          <SectionTitle>{section.title}</SectionTitle>
-          {section.intro && <Muted>{section.intro}</Muted>}
-          {section.palettes.map((palette) => (
-            <PaletteBlock key={`${section.title}-${palette.name ?? ''}`}>
-              {(palette.name || single) && (
-                <PaletteHeader>
-                  {palette.name && <PaletteName>{palette.name}</PaletteName>}
-                  <Count n={palette.swatches.length} />
-                </PaletteHeader>
-              )}
-              {palette.description && <Muted>{palette.description}</Muted>}
-              <SwatchGrid>
-                {palette.swatches.map((swatch) => (
-                  <PaletteSwatch key={`${swatch.label}-${swatch.hex}`} swatch={swatch} />
-                ))}
-              </SwatchGrid>
-            </PaletteBlock>
-          ))}
-        </section>
-      );
-    })}
+    <SwatchGrid>
+      {PALETTES[palette].swatches.map((swatch) => (
+        <div key={swatch.label}>
+          <ColorSwatch color={swatch.hex} width="100%" height="44px" />
+          <SwatchLabel>{swatch.label}</SwatchLabel>
+          <HexValue>{swatch.hex}</HexValue>
+        </div>
+      ))}
+    </SwatchGrid>
   </StoryContainer>
 );

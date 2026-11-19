@@ -14,8 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-// ─── Luma color palette ────────────────────────────────────────────────────
-// Scales come from the theme's color variants (src/theme/sawmill/THEME_BASE.ts).
 import { colorVariants } from 'theme/sawmill/THEME_BASE';
 
 export type Swatch = {
@@ -23,97 +21,37 @@ export type Swatch = {
   hex: string;
 };
 
-export type Palette = {
+type Palette = {
   name?: string;
-  description?: string;
   swatches: Swatch[];
-};
-
-export type Section = {
-  title: string;
-  intro?: string;
-  palettes: Palette[];
 };
 
 const scale = (hexes: string[]): Swatch[] => hexes.map((hex, i) => ({ label: String(i), hex }));
 
-export const SECTIONS: Section[] = [
-  {
-    title: 'Core Brand Colors',
-    intro: 'Our primary palette is used for our core UI elements and content.',
-    palettes: [
-      {
-        name: 'Gray',
-        swatches: scale(colorVariants.gray),
-      },
-      {
-        name: 'Blue',
-        swatches: scale(colorVariants.primary),
-      },
+export const PALETTES = {
+  gray: { name: 'Gray', swatches: scale(colorVariants.gray) },
+  blue: { name: 'Blue', swatches: scale(colorVariants.primary) },
+  yellow: { name: 'Yellow', swatches: scale(colorVariants.warning) },
+  green: { name: 'Green', swatches: scale(colorVariants.success) },
+  red: { name: 'Red', swatches: scale(colorVariants.danger) },
+  violet: { name: 'Violet', swatches: scale(colorVariants.violet) },
+  cyan: { name: 'Cyan', swatches: scale(colorVariants.info) },
+  common: {
+    swatches: [
+      { label: 'White', hex: '#FFFFFF' },
+      { label: 'Black', hex: colorVariants.default[8] },
     ],
   },
-  {
-    title: 'Semantic Colors',
-    palettes: [
-      {
-        name: 'Yellow',
-        description: 'Warning: used to indicate moderate urgency.',
-        swatches: scale(colorVariants.warning),
-      },
-      {
-        name: 'Green',
-        description: 'Success: used to indicate a positive state.',
-        swatches: scale(colorVariants.success),
-      },
-      {
-        name: 'Red',
-        description: 'Danger: used to indicate immediate attention or a destructive action.',
-        swatches: scale(colorVariants.danger),
-      },
-    ],
-  },
-  {
-    title: 'Accent Colors',
-    intro: 'Our accent colors are used in infographics and dashboard elements.',
-    palettes: [
-      {
-        name: 'Violet',
-        swatches: scale(colorVariants.violet),
-      },
-      {
-        name: 'Cyan',
-        swatches: scale(colorVariants.info),
-      },
-    ],
-  },
-  {
-    title: 'Common Colors',
-    palettes: [
-      {
-        swatches: [
-          { label: 'White', hex: '#FFFFFF' },
-          { label: 'Black', hex: colorVariants.default[8] },
-        ],
-      },
-    ],
-  },
-];
+} satisfies Record<string, Palette>;
+
+export type PaletteKey = keyof typeof PALETTES;
 
 // Flat lookup of every palette color by hex, e.g. '#232B43' -> 'Gray 6'.
 export const PALETTE_NAMES: Record<string, string> = Object.fromEntries(
-  SECTIONS.flatMap((section) =>
-    section.palettes.flatMap((palette) =>
-      palette.swatches.map((swatch) => [
-        swatch.hex.toUpperCase(),
-        palette.name ? `${palette.name} ${swatch.label}` : swatch.label,
-      ]),
-    ),
+  Object.values(PALETTES).flatMap((palette: Palette) =>
+    palette.swatches.map((swatch) => [
+      swatch.hex.toUpperCase(),
+      palette.name ? `${palette.name} ${swatch.label}` : swatch.label,
+    ]),
   ),
 );
-
-// Hex value of a palette color, e.g. paletteHex('Gray', '2'). Unnamed palettes (Common) use their label: paletteHex(undefined, 'White').
-export const paletteHex = (paletteName: string | undefined, label: string) =>
-  SECTIONS.flatMap((section) => section.palettes)
-    .filter((palette) => palette.name === paletteName)
-    .flatMap((palette) => palette.swatches)
-    .find((swatch) => swatch.label === label)?.hex;

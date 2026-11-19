@@ -18,7 +18,7 @@ import type { DefaultTheme } from 'styled-components';
 
 import { opacify } from 'theme/sawmill/utils';
 
-import { paletteHex } from './colorPalette';
+import { PALETTES } from './colorPalette';
 
 // Luma design tokens that don't exist in the Graylog theme yet. Values are built from the Luma palette
 // so they stay in sync with the Colors page. Used by the Tokens page and by Storybook's own layout.
@@ -27,12 +27,12 @@ type ModeValues = { light: string; dark: string };
 
 export const BORDER_TOKENS: Record<'divider' | 'dividerSecondary', ModeValues> = {
   divider: {
-    light: opacify(paletteHex('Gray', '2'), 0.5),
-    dark: opacify(paletteHex('Gray', '3'), 0.5),
+    light: opacify(PALETTES.gray.swatches[2].hex, 0.5),
+    dark: opacify(PALETTES.gray.swatches[3].hex, 0.5),
   },
   dividerSecondary: {
-    light: paletteHex('Gray', '2'),
-    dark: paletteHex('Gray', '9'),
+    light: PALETTES.gray.swatches[2].hex,
+    dark: PALETTES.gray.swatches[9].hex,
   },
 };
 
