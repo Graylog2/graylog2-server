@@ -27,6 +27,7 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.database.aggregation.BucketAggregation;
 import org.graylog2.database.aggregation.BucketAggregationResult;
 import org.graylog2.database.aggregation.Grouping;
+import org.graylog2.database.aggregation.PermissionFilter;
 import org.graylog2.database.filtering.inmemory.SingleFilterParser;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.FilterOption;
@@ -91,20 +92,21 @@ public class EntitySlicer {
     /**
      * @param entity           the list to slice
      * @param request          the column to slice by, and the list's current query and filters
-     * @param scope            the entities the user may read; others are never counted
+     * @param permissionFilter the entities the user may read; others are never counted
      * @param titlePermissions decides which related entities' titles the user may read
      * @throws BadRequestException if the column can't be sliced, or has more distinct values than can be listed
      */
     public Slices slices(final SliceableEntity entity,
                          final SliceRequest request,
-                         final ReadScope scope,
+                         final PermissionFilter permissionFilter,
                          final EntityPermissions titlePermissions) {
         final EntityAttribute attribute = sliceableAttribute(entity, request.sliceColumn());
         final Bson listFilter = entity.queryCreator().createDbQuery(filtersOnOtherColumns(request.filters(), attribute),
                 request.query());
         // The filters match a plain attribute on its id, so slices group by it too.
         final BucketAggregationResult result = mongoCollections.aggregator(entity.collection())
-                .buckets(BucketAggregation.of(Filters.and(scope.filter(), listFilter), Grouping.terms(attribute.id()))
+                .buckets(BucketAggregation.of(Filters.and(permissionFilter.filter(), listFilter),
+                                Grouping.terms(attribute.id()))
                         .withLimit(maxSlices));
         if (result.isTruncated()) {
             throw new BadRequestException(f("Column <%s> has more than %d distinct values and can't be sliced",

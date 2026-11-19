@@ -22,6 +22,7 @@ import org.graylog.plugins.views.search.permissions.EntityPermissions;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.database.aggregation.PermissionFilter;
 import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
 import org.graylog2.database.dbcatalog.DbEntityCatalogEntry;
 import org.graylog2.database.filtering.DbQueryCreator;
@@ -80,8 +81,8 @@ class EntitySlicerTest {
                     .sliceable(true).build());
     private static final SliceableEntity SECURITY_EVENTS = new SliceableEntity("security_events", ATTRIBUTES,
             new DbQueryCreator("event_id", ATTRIBUTES));
-    private static final ReadScope STREAM_S1 = ReadScope.of(Filters.in("event.source_streams", "s1"));
-    private static final ReadScope STREAM_S2 = ReadScope.of(Filters.in("event.source_streams", "s2"));
+    private static final PermissionFilter STREAM_S1 = PermissionFilter.of(Filters.in("event.source_streams", "s1"));
+    private static final PermissionFilter STREAM_S2 = PermissionFilter.of(Filters.in("event.source_streams", "s2"));
     // The user may read every title, except cid's.
     private static final EntityPermissions TITLE_PERMISSIONS = (readPermission, id) -> !CID.equals(id);
 
@@ -115,7 +116,7 @@ class EntitySlicerTest {
     void ignoresFiltersOnTheSlicedColumn() {
         // Selecting another status replaces "status:NEW", so all of ben's events are counted.
         final var slices = slices(SliceRequest.of("status", List.of("status:NEW", "owner:" + BEN), ""),
-                ReadScope.unrestricted());
+                PermissionFilter.unrestricted());
 
         assertThat(slices).containsExactly(
                 new Slice("CLOSED", "Closed", 1),
@@ -126,13 +127,13 @@ class EntitySlicerTest {
 
     @Test
     void appliesTheListQuery() {
-        final var slices = slices(SliceRequest.of("event.tags", List.of(), "e1"), ReadScope.unrestricted());
+        final var slices = slices(SliceRequest.of("event.tags", List.of(), "e1"), PermissionFilter.unrestricted());
 
         assertThat(slices).containsExactly(new Slice("email", "email", 1), new Slice("malware", "malware", 1));
     }
 
     @Test
-    void countsOnlyEventsInTheReadScope() {
+    void countsOnlyEventsTheUserMayRead() {
         final var slices = slices(SliceRequest.of("event.tags", List.of(), ""), STREAM_S1);
 
         // e7 and e8, with the tags "phishing" and "recon", are in stream s2
@@ -145,7 +146,7 @@ class EntitySlicerTest {
 
     @Test
     void titlesOwnersByNameUnlessTheUserMayNotReadThem() {
-        final var slices = slices(SliceRequest.of("owner", List.of(), ""), ReadScope.unrestricted());
+        final var slices = slices(SliceRequest.of("owner", List.of(), ""), PermissionFilter.unrestricted());
 
         // cid's name is hidden and the deleted user has none, so both are titled by their id
         assertThat(slices).containsExactly(
@@ -158,7 +159,8 @@ class EntitySlicerTest {
 
     @Test
     void countsEventsOncePerAsset() {
-        final var slices = slices(SliceRequest.of("event.associated_assets", List.of(), ""), ReadScope.unrestricted());
+        final var slices = slices(SliceRequest.of("event.associated_assets", List.of(), ""),
+                PermissionFilter.unrestricted());
 
         assertThat(slices).containsExactly(
                 new Slice(WEB_01, "web-01", 3),
@@ -171,13 +173,14 @@ class EntitySlicerTest {
 
     @Test
     void rejectsColumnsThatCannotBeSliced() {
-        assertThatThrownBy(() -> slices(SliceRequest.of("risk_score", List.of(), ""), ReadScope.unrestricted()))
+        assertThatThrownBy(() -> slices(SliceRequest.of("risk_score", List.of(), ""), PermissionFilter.unrestricted()))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("Unknown slice column <risk_score>");
-        assertThatThrownBy(() -> slices(SliceRequest.of(null, null, null), ReadScope.unrestricted()))
+        assertThatThrownBy(() -> slices(SliceRequest.of(null, null, null), PermissionFilter.unrestricted()))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("Unknown slice column <>");
-        assertThatThrownBy(() -> slices(SliceRequest.of("event.timestamp", List.of(), ""), ReadScope.unrestricted()))
+        assertThatThrownBy(() -> slices(SliceRequest.of("event.timestamp", List.of(), ""),
+                PermissionFilter.unrestricted()))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("Column <event.timestamp> can't be sliced");
     }
@@ -187,13 +190,13 @@ class EntitySlicerTest {
         final var limitedSlicer = new EntitySlicer(mongoCollections, entityTitleService, 3);
         final var request = SliceRequest.of("event.tags", List.of(), "");
 
-        assertThatThrownBy(() -> limitedSlicer.slices(SECURITY_EVENTS, request, ReadScope.unrestricted(),
+        assertThatThrownBy(() -> limitedSlicer.slices(SECURITY_EVENTS, request, PermissionFilter.unrestricted(),
                 TITLE_PERMISSIONS))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("more than 3 distinct values");
     }
 
-    private List<Slice> slices(final SliceRequest request, final ReadScope scope) {
-        return slicer.slices(SECURITY_EVENTS, request, scope, TITLE_PERMISSIONS).slices();
+    private List<Slice> slices(final SliceRequest request, final PermissionFilter permissionFilter) {
+        return slicer.slices(SECURITY_EVENTS, request, permissionFilter, TITLE_PERMISSIONS).slices();
     }
 }

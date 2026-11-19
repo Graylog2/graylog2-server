@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.database.slicing;
+package org.graylog2.database.aggregation;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -24,21 +24,25 @@ import java.util.Objects;
 /**
  * The documents a user may read, as a MongoDB filter, e.g. the events of the streams they have access to.
  * <p>
- * Counting is only correct if the documents the user can't read are left out before grouping, so slicing requires a
- * scope instead of accepting any filter. A caller that doesn't restrict access says so with {@link #unrestricted()}.
+ * Counting is only correct if the documents the user can't read are left out before grouping, so aggregating for a
+ * user requires a permission filter instead of accepting any filter. A caller that doesn't restrict access says so with
+ * {@link #unrestricted()}.
+ *
+ * @see CatalogPermissionFilters
+ * @see PermittedAggregator
  *
  * @param filter matches the documents the user may read; should be backed by an index
  */
-public record ReadScope(Bson filter) {
-    public ReadScope {
+public record PermissionFilter(Bson filter) {
+    public PermissionFilter {
         Objects.requireNonNull(filter, "filter");
     }
 
-    public static ReadScope of(final Bson filter) {
-        return new ReadScope(filter);
+    public static PermissionFilter of(final Bson filter) {
+        return new PermissionFilter(filter);
     }
 
-    public static ReadScope unrestricted() {
-        return new ReadScope(new Document());
+    public static PermissionFilter unrestricted() {
+        return new PermissionFilter(new Document());
     }
 }

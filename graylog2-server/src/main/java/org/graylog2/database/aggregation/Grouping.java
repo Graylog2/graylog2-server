@@ -37,6 +37,11 @@ public sealed interface Grouping {
 
     ValueSource source();
 
+    /**
+     * The same grouping of another source's values.
+     */
+    Grouping withSource(ValueSource source);
+
     static Terms terms(final String field) {
         return new Terms(ValueSource.field(field));
     }
@@ -60,6 +65,11 @@ public sealed interface Grouping {
         public Terms {
             Objects.requireNonNull(source, "source");
         }
+
+        @Override
+        public Terms withSource(final ValueSource source) {
+            return new Terms(source);
+        }
     }
 
     /**
@@ -81,6 +91,11 @@ public sealed interface Grouping {
                     throw new IllegalArgumentException("Ranges must not mix numbers and instants");
                 }
             }
+        }
+
+        @Override
+        public Ranges withSource(final ValueSource source) {
+            return new Ranges(source, ranges);
         }
 
         public boolean isTemporal() {
@@ -147,6 +162,11 @@ public sealed interface Grouping {
             if (binSize < 1) {
                 throw new IllegalArgumentException("Bin size must be at least 1");
             }
+        }
+
+        @Override
+        public DateHistogram withSource(final ValueSource source) {
+            return new DateHistogram(source, unit, binSize, timezone);
         }
 
         public DateHistogram withBinSize(final int binSize) {
