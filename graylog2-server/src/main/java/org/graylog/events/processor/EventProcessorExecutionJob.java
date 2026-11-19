@@ -25,7 +25,6 @@ import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import org.graylog.events.configuration.EventsConfigurationProvider;
 import org.graylog.scheduler.Job;
-import org.graylog.scheduler.JobDefinitionConfig;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobExecutionContext;
 import org.graylog.scheduler.JobExecutionException;
@@ -160,31 +159,6 @@ public class EventProcessorExecutionJob implements Job {
     @JsonTypeName(EventProcessorExecutionJob.TYPE_NAME)
     @JsonDeserialize(builder = Config.Builder.class)
     public abstract static class Config implements EventProcessorJobConfig {
-        public static final String FIELD_EVENT_DEFINITION_ID = "event_definition_id";
-        private static final String FIELD_PARAMETERS = "parameters";
-        private static final String FIELD_PROCESSING_WINDOW_SIZE = "processing_window_size";
-        private static final String FIELD_PROCESSING_HOP_SIZE = "processing_hop_size";
-        private static final String FIELD_IS_CRON = "is_cron";
-        private static final String FIELD_DISABLE_CATCHUP = "disable_catchup";
-
-        @JsonProperty(FIELD_EVENT_DEFINITION_ID)
-        public abstract String eventDefinitionId();
-
-        @JsonProperty(FIELD_PARAMETERS)
-        public abstract EventProcessorParametersWithTimerange parameters();
-
-        @JsonProperty(FIELD_PROCESSING_WINDOW_SIZE)
-        public abstract long processingWindowSize();
-
-        @JsonProperty(FIELD_PROCESSING_HOP_SIZE)
-        public abstract long processingHopSize();
-
-        @JsonProperty(FIELD_IS_CRON)
-        public abstract boolean isCron();
-
-        @JsonProperty(FIELD_DISABLE_CATCHUP)
-        public abstract boolean disableCatchup();
-
         public static Builder builder() {
             return Builder.create();
         }
@@ -192,7 +166,7 @@ public class EventProcessorExecutionJob implements Job {
         public abstract Builder toBuilder();
 
         @AutoValue.Builder
-        public abstract static class Builder implements JobDefinitionConfig.Builder<Builder> {
+        public abstract static class Builder implements EventProcessorJobConfig.Builder<Builder> {
             @JsonCreator
             public static Builder create() {
                 return new AutoValue_EventProcessorExecutionJob_Config.Builder()
@@ -200,24 +174,6 @@ public class EventProcessorExecutionJob implements Job {
                         .isCron(false)
                         .disableCatchup(false); // Default: catch-up enabled
             }
-
-            @JsonProperty(FIELD_EVENT_DEFINITION_ID)
-            public abstract Builder eventDefinitionId(String eventDefinitionId);
-
-            @JsonProperty(FIELD_PARAMETERS)
-            public abstract Builder parameters(EventProcessorParametersWithTimerange parameters);
-
-            @JsonProperty(FIELD_PROCESSING_WINDOW_SIZE)
-            public abstract Builder processingWindowSize(long windowSize);
-
-            @JsonProperty(FIELD_PROCESSING_HOP_SIZE)
-            public abstract Builder processingHopSize(long hopSize);
-
-            @JsonProperty(FIELD_IS_CRON)
-            public abstract Builder isCron(boolean isCron);
-
-            @JsonProperty(value = FIELD_DISABLE_CATCHUP, defaultValue = "false")
-            public abstract Builder disableCatchup(boolean disableCatchup);
 
             abstract Config autoBuild();
 

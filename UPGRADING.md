@@ -41,7 +41,8 @@ following locations where they are displayed:
   To keep the previous behavior, return a `204 No Content` response explicitly.
 - `EventProcessorSchedulerConfig#jobDefinitionConfig()` and its `create` and builder methods now use the new
   `EventProcessorJobConfig` interface instead of `JobDefinitionConfig`. `EventProcessorExecutionJob.Config` implements
-  it. Plugins that build an `EventProcessorSchedulerConfig` must be recompiled.
+  it and inherits its getters, builder setters and `FIELD_*` constants from it. Plugins that build an
+  `EventProcessorSchedulerConfig` or an `EventProcessorExecutionJob.Config` must be recompiled.
 
 ## REST API Endpoint Changes
 
