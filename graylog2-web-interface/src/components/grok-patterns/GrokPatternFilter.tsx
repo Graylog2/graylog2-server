@@ -123,7 +123,7 @@ class GrokPatternFilter extends React.Component<
     try {
       regExp = RegExp(patternFilter, 'i');
     } catch (error) {
-      regExpError = error?.message;
+      regExpError = error instanceof Error ? error.message : String(error);
     }
 
     this.shownListItems = [];

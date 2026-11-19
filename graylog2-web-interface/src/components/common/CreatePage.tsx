@@ -110,7 +110,7 @@ const CreatePage = <TValues extends object>({
       const { id } = await onSubmit(values);
       history.push(detailsRoute(id));
     } catch (error) {
-      setSubmitError(error?.message ?? 'An error occurred. Please try again.');
+      setSubmitError(error instanceof Error ? error.message : 'An error occurred. Please try again.');
     }
   };
 
