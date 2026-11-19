@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
 import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from 'theme/sawmill';
@@ -38,67 +38,50 @@ type TokenEntry = {
   usage: string;
 };
 
-type TokenGroup = {
-  title: string;
-  intro?: string;
-  tokens: TokenEntry[];
-};
-
-const GROUPS: TokenGroup[] = [
-  {
-    title: 'Text',
-    intro: 'Colors for text and inline links.',
-    tokens: [
-      { path: 'text.primary', usage: 'Default body and heading text.' },
-      { path: 'text.secondary', usage: 'Supporting text: descriptions, help text, metadata, table headers.' },
-      { path: 'text.disabled', usage: 'Text in disabled controls.' },
-      {
-        path: 'global.textAlt',
-        usage: 'Text on dark or colored surfaces where the primary text color would not contrast.',
-      },
-      { path: 'input.placeholder', usage: 'Placeholder text inside form inputs.' },
-      { path: 'global.link', usage: 'Inline links.' },
-      { path: 'global.linkHover', usage: 'Inline links on hover.' },
-    ],
-  },
-  {
-    title: 'Surfaces',
-    intro: 'Background colors for the page and the containers on it, from back to front.',
-    tokens: [
-      { path: 'global.background', usage: 'Page background behind all content.' },
-      { path: 'global.contentBackground', usage: 'Main content areas: panels, cards, tables and modals.' },
-      { path: 'global.navigationBackground', usage: 'Top navigation bar.' },
-      { path: 'background.secondaryNav', usage: 'Secondary navigation.' },
-      { path: 'section.filled.background', usage: 'Filled sections that group content inside a page.' },
-      { path: 'cards.background', usage: 'Card backgrounds.' },
-      { path: 'input.background', usage: 'Form input backgrounds.' },
-      { path: 'table.row.backgroundStriped', usage: 'Alternate rows in striped tables.' },
-      { path: 'table.row.backgroundHover', usage: 'Table rows on hover.' },
-    ],
-  },
-  {
-    title: 'Borders',
-    intro:
-      'Border colors. These Luma tokens are not in the Graylog theme yet, so Storybook builds them from the Luma palette.',
-    tokens: [
-      {
-        name: 'divider',
-        values: BORDER_TOKENS.divider,
-        usage: 'All borders: section header lines, tables, cards, inputs and swatches.',
-      },
-      {
-        name: 'dividerSecondary',
-        values: BORDER_TOKENS.dividerSecondary,
-        usage: 'Stronger, fully opaque separators where divider is too subtle.',
-      },
-    ],
-  },
-];
+const GROUPS = {
+  text: [
+    { path: 'text.primary', usage: 'Default body and heading text.' },
+    { path: 'text.secondary', usage: 'Supporting text: descriptions, help text, metadata, table headers.' },
+    { path: 'text.disabled', usage: 'Text in disabled controls.' },
+    {
+      path: 'global.textAlt',
+      usage: 'Text on dark or colored surfaces where the primary text color would not contrast.',
+    },
+    { path: 'input.placeholder', usage: 'Placeholder text inside form inputs.' },
+    { path: 'global.link', usage: 'Inline links.' },
+    { path: 'global.linkHover', usage: 'Inline links on hover.' },
+  ],
+  surfaces: [
+    { path: 'global.background', usage: 'Page background behind all content.' },
+    { path: 'global.contentBackground', usage: 'Main content areas: panels, cards, tables and modals.' },
+    { path: 'global.navigationBackground', usage: 'Top navigation bar.' },
+    { path: 'background.secondaryNav', usage: 'Secondary navigation.' },
+    { path: 'section.filled.background', usage: 'Filled sections that group content inside a page.' },
+    { path: 'cards.background', usage: 'Card backgrounds.' },
+    { path: 'input.background', usage: 'Form input backgrounds.' },
+    { path: 'table.row.backgroundStriped', usage: 'Alternate rows in striped tables.' },
+    { path: 'table.row.backgroundHover', usage: 'Table rows on hover.' },
+  ],
+  borders: [
+    {
+      name: 'divider',
+      values: BORDER_TOKENS.divider,
+      usage: 'All borders: section header lines, tables, cards, inputs and swatches.',
+    },
+    {
+      name: 'dividerSecondary',
+      values: BORDER_TOKENS.dividerSecondary,
+      usage: 'Stronger, fully opaque separators where divider is too subtle.',
+    },
+  ],
+} satisfies Record<string, TokenEntry[]>;
 
 // ─── Theme values ──────────────────────────────────────────────────────────
 
 const buildColors = (scheme: typeof COLOR_SCHEME_LIGHT | typeof COLOR_SCHEME_DARK) =>
   SawmillSC(SawmillMantine({ colorScheme: scheme })).colors;
+
+const THEME_COLORS = { light: buildColors(COLOR_SCHEME_LIGHT), dark: buildColors(COLOR_SCHEME_DARK) };
 
 const lookup = (colors: unknown, path: string): string | undefined =>
   path.split('.').reduce<any>((value, key) => (value == null ? undefined : value[key]), colors);
@@ -121,16 +104,6 @@ const paletteName = (value: string | undefined) => {
 
 // ─── Layout ────────────────────────────────────────────────────────────────
 
-// Border and spacing above come from the global H2 rule in .storybook/DocsContainer.tsx.
-const GroupTitle = styled.h2`
-  margin-bottom: ${({ theme }) => theme.spacings.xs};
-`;
-
-const Muted = styled.p`
-  margin: ${({ theme }) => `${theme.spacings.xxs} 0 ${theme.spacings.sm}`};
-  color: ${({ theme }) => theme.colors.text.secondary};
-`;
-
 const ValueCell = styled.div`
   display: flex;
   align-items: center;
@@ -139,7 +112,7 @@ const ValueCell = styled.div`
 
 const PaletteLabel = styled.span<{ $missing?: boolean }>`
   display: block;
-  font-size: 11px;
+  font-size: ${({ theme }) => theme.fonts.size.small};
   color: ${({ $missing, theme }) => ($missing ? theme.colors.variant.dark.danger : theme.colors.text.secondary)};
 `;
 
@@ -161,42 +134,27 @@ const ColorValue = ({ value }: { value: string | undefined }) => {
 
 type Row = TokenEntry & { light?: string; dark?: string };
 
-export const TokensDoc = () => {
-  const { light, dark } = useMemo(
-    () => ({ light: buildColors(COLOR_SCHEME_LIGHT), dark: buildColors(COLOR_SCHEME_DARK) }),
-    [],
-  );
+const COLUMNS = [
+  {
+    header: 'Token',
+    width: '300px',
+    render: (r: Row) => <Token>{r.path ? `theme.colors.${r.path}` : r.name}</Token>,
+  },
+  { header: 'Light', width: '190px', render: (r: Row) => <ColorValue value={r.light} /> },
+  { header: 'Dark', width: '190px', render: (r: Row) => <ColorValue value={r.dark} /> },
+  { header: 'Usage', render: (r: Row) => r.usage },
+];
+
+export const TokenGroupDoc = ({ group }: { group: keyof typeof GROUPS }) => {
+  const rows: Row[] = GROUPS[group].map((token: TokenEntry) => ({
+    ...token,
+    light: token.values?.light ?? lookup(THEME_COLORS.light, token.path),
+    dark: token.values?.dark ?? lookup(THEME_COLORS.dark, token.path),
+  }));
 
   return (
     <StoryContainer>
-      {GROUPS.map((group) => {
-        const rows: Row[] = group.tokens.map((token) => ({
-          ...token,
-          light: token.values?.light ?? lookup(light, token.path),
-          dark: token.values?.dark ?? lookup(dark, token.path),
-        }));
-
-        return (
-          <section key={group.title}>
-            <GroupTitle>{group.title}</GroupTitle>
-            {group.intro && <Muted>{group.intro}</Muted>}
-            <FoundationTable
-              columns={[
-                {
-                  header: 'Token',
-                  width: '300px',
-                  render: (r: Row) => <Token>{r.path ? `theme.colors.${r.path}` : r.name}</Token>,
-                },
-                { header: 'Light', width: '190px', render: (r: Row) => <ColorValue value={r.light} /> },
-                { header: 'Dark', width: '190px', render: (r: Row) => <ColorValue value={r.dark} /> },
-                { header: 'Usage', render: (r: Row) => r.usage },
-              ]}
-              rows={rows}
-              keyBy={(r) => r.path ?? r.name}
-            />
-          </section>
-        );
-      })}
+      <FoundationTable columns={COLUMNS} rows={rows} keyBy={(r) => r.path ?? r.name} />
     </StoryContainer>
   );
 };
