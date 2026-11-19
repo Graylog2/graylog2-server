@@ -33,6 +33,7 @@ import org.graylog.datanode.process.CommandLineProcessListener;
 import org.graylog.datanode.process.ProcessInformation;
 import org.graylog.datanode.process.ProcessListener;
 import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreItem;
+import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreStringItem;
 import org.graylog.datanode.process.configuration.files.DatanodeConfigFile;
 import org.graylog.datanode.process.configuration.files.KeystoreConfigFile;
 import org.slf4j.Logger;
@@ -42,6 +43,7 @@ import java.io.Closeable;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -97,7 +99,19 @@ public class OpensearchCommandLineProcess implements Closeable {
         final String createdMessage = opensearchCli.keystore().create();
         LOG.info(createdMessage);
         final Collection<OpensearchKeystoreItem> keystoreItems = config.getKeystoreItems();
-        keystoreItems.forEach((item) -> item.persist(opensearchCli.keystore()));
+        // Every call of the keystore tool starts a JVM, so string secrets are added with one call. File secrets need a
+        // call of their own.
+        final List<OpensearchKeystoreStringItem> strings = new ArrayList<>();
+        final List<OpensearchKeystoreItem> others = new ArrayList<>();
+        for (OpensearchKeystoreItem item : keystoreItems) {
+            if (item instanceof OpensearchKeystoreStringItem string) {
+                strings.add(string);
+            } else {
+                others.add(item);
+            }
+        }
+        OpensearchKeystoreStringItem.persistAll(strings, opensearchCli.keystore());
+        others.forEach(item -> item.persist(opensearchCli.keystore()));
         LOG.info("Added {} keystore items", keystoreItems.size());
     }
 
