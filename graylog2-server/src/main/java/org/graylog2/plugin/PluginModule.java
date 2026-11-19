@@ -27,6 +27,7 @@ import org.graylog.events.contentpack.entities.EventNotificationConfigEntity;
 import org.graylog.events.fields.providers.FieldValueProvider;
 import org.graylog.events.notifications.EventNotification;
 import org.graylog.events.notifications.EventNotificationConfig;
+import org.graylog.events.processor.EventDefinitionNormalizer;
 import org.graylog.events.processor.EventProcessor;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorParameters;
@@ -277,6 +278,14 @@ public abstract class PluginModule extends Graylog2Module {
 
     protected void addEventModifier(Class<? extends EventModifier> eventModifierClass) {
         eventModifierBinder().addBinding().to(eventModifierClass);
+    }
+
+    protected Multibinder<EventDefinitionNormalizer> eventDefinitionNormalizerBinder() {
+        return Multibinder.newSetBinder(binder(), EventDefinitionNormalizer.class);
+    }
+
+    protected void addEventDefinitionNormalizer(Class<? extends EventDefinitionNormalizer> normalizerClass) {
+        eventDefinitionNormalizerBinder().addBinding().to(normalizerClass);
     }
 
     protected Multibinder<EventQuerySearchTypeSupplier> eventQuerySearchTypeSupplierBinder() {

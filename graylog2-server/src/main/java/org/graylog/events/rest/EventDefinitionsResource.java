@@ -63,6 +63,7 @@ import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventDefinitionConfiguration;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
+import org.graylog.events.processor.EventDefinitionNormalizers;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorEngine;
 import org.graylog.events.processor.EventProcessorException;
@@ -175,6 +176,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     private final EventResolver eventResolver;
     private final EntitySharesService entitySharesService;
     private final TacticsTechniquesValidator tacticsTechniquesValidator;
+    private final EventDefinitionNormalizers normalizers;
 
     @Inject
     public EventDefinitionsResource(DBEventDefinitionService dbService,
@@ -187,7 +189,8 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                     EventResolver eventResolver,
                                     EventDefinitionConfiguration eventDefinitionConfiguration,
                                     EntitySharesService entitySharesService,
-                                    TacticsTechniquesValidator tacticsTechniquesValidator
+                                    TacticsTechniquesValidator tacticsTechniquesValidator,
+                                    EventDefinitionNormalizers normalizers
     ) {
         this.dbService = dbService;
         this.eventDefinitionHandler = eventDefinitionHandler;
@@ -212,6 +215,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         this.eventResolver = eventResolver;
         this.entitySharesService = entitySharesService;
         this.tacticsTechniquesValidator = tacticsTechniquesValidator;
+        this.normalizers = normalizers;
     }
 
     @GET
@@ -390,7 +394,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
     public Response create(@Parameter(name = "schedule") @QueryParam("schedule") @DefaultValue("true") boolean schedule,
                            @Parameter(name = "JSON Body") CreateEntityRequest<EventDefinitionDto> createEntityRequest, @Context UserContext userContext) {
-        final EventDefinitionDto dto = createEntityRequest.entity();
+        final EventDefinitionDto dto = normalizers.normalize(createEntityRequest.entity());
         checkEventDefinitionPermissions(dto, "create");
 
         final ValidationResult result = dto.validate(null, eventDefinitionConfiguration, userContext);
@@ -422,6 +426,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                            @Parameter(name = "JSON Body") EventDefinitionDto dto,
                            @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);
+        dto = normalizers.normalize(dto);
         checkEventDefinitionPermissions(dto, "update");
         EventDefinitionDto oldDto = dbService.get(definitionId)
                 .orElseThrow(() -> new NotFoundException("Event definition <" + definitionId + "> doesn't exist"));
@@ -606,8 +611,10 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @Operation(summary = "Validate an event definition")
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
     public ValidationResult validateEventDefinition(@RequestBody(required = true)
-                                         @Valid @NotNull EventDefinitionDto toValidate,
+                                         @Valid @NotNull EventDefinitionDto unnormalized,
                                      @Context UserContext userContext) {
+        // Validate what create and update would store
+        final EventDefinitionDto toValidate = normalizers.normalize(unnormalized);
         EventProcessorConfig oldConfig = dbService.get(toValidate.id()).map(EventDefinition::config).orElse(null);
         ValidationResult validationResult = toValidate.config().validate(userContext);
         validationResult.addAll(toValidate.config().validate(userContext, oldConfig, eventDefinitionConfiguration));

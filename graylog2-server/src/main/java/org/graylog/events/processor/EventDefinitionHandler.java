@@ -442,7 +442,7 @@ public class EventDefinitionHandler {
 
     private JobTriggerDto newJobTrigger(JobDefinitionDto jobDefinition, EventProcessorSchedulerConfig schedulerConfig) {
         return JobTriggerDto.builderWithClock(clock)
-                .jobDefinitionType(EventProcessorExecutionJob.TYPE_NAME)
+                .jobDefinitionType(schedulerConfig.jobDefinitionConfig().type())
                 .jobDefinitionId(requireNonNull(jobDefinition.id(), "Job definition ID cannot be null"))
                 .nextTime(clock.nowUTC())
                 .schedule(schedulerConfig.schedule())
@@ -475,14 +475,24 @@ public class EventDefinitionHandler {
 
         final JobTriggerDto oldJobTrigger = optionalOldJobTrigger.get();
 
+        final EventProcessorJobConfig config = schedulerConfig.jobDefinitionConfig();
+
+        // A trigger can't change its job type in place, and its data belongs to the old job. Replace it instead,
+        // like disable and enable do, so the new job starts at the current time with empty data.
+        if (!oldJobTrigger.jobDefinitionType().equals(config.type())) {
+            deleteJobTrigger(jobDefinition, eventDefinition);
+            createJobTrigger(eventDefinition, jobDefinition, schedulerConfig);
+            return;
+        }
+
         // Update the existing object to make sure we keep the ID
         final JobTriggerDto.Builder unsavedJobTriggerBuilder = oldJobTrigger.toBuilder()
                 .jobDefinitionId(requireNonNull(jobDefinition.id(), "Job definition ID cannot be null"))
                 .schedule(schedulerConfig.schedule())
                 .nextTime(clock.nowUTC());
 
-        final EventProcessorExecutionJob.Config oldConfig = (EventProcessorExecutionJob.Config) oldJobDefinition.config();
-        final EventProcessorExecutionJob.Config config = (EventProcessorExecutionJob.Config) jobDefinition.config();
+        final EventProcessorJobConfig oldConfig = (EventProcessorJobConfig) oldJobDefinition.config();
+
         // If necessary, reset the scheduling times
         if (!config.hasEqualSchedule(oldConfig)) {
             // jobDefinition has a newly created scheduling timerange.

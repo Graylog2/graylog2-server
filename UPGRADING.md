@@ -39,6 +39,10 @@ following locations where they are displayed:
 
 - REST resources that return an empty `Optional` now respond with `404 Not Found` instead of `204 No Content`.
   To keep the previous behavior, return a `204 No Content` response explicitly.
+- `EventProcessorSchedulerConfig#jobDefinitionConfig()` and its `create` and builder methods now use the new
+  `EventProcessorJobConfig` interface instead of `JobDefinitionConfig`. `EventProcessorExecutionJob.Config` implements
+  it and inherits its getters, builder setters and `FIELD_*` constants from it. Plugins that build an
+  `EventProcessorSchedulerConfig` or an `EventProcessorExecutionJob.Config` must be recompiled.
 
 ## REST API Endpoint Changes
 
