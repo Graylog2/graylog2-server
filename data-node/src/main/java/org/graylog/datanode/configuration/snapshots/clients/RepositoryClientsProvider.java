@@ -1,0 +1,142 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+package org.graylog.datanode.configuration.snapshots.clients;
+
+import com.mongodb.client.MongoCollection;
+import jakarta.annotation.Nullable;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import org.apache.commons.lang3.StringUtils;
+import org.bson.BsonValue;
+import org.bson.RawBsonDocument;
+import org.bson.codecs.Codec;
+import org.bson.codecs.DecoderContext;
+import org.graylog.datanode.configuration.snapshots.RepositoryConfiguration;
+import org.graylog.datanode.configuration.snapshots.RepositoryConfigurationProvider;
+import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreFileContentItem;
+import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreItem;
+import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreStringItem;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.datanode.repositories.RepositoryClientDto;
+import org.graylog2.datanode.repositories.RepositoryClientSettings;
+import org.graylog2.security.encryption.EncryptedValue;
+import org.graylog2.security.encryption.EncryptedValueService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
+
+/**
+ * Provides the opensearch repository clients stored by the Graylog server, see {@link RepositoryClientDto}. The
+ * clients are read every time the opensearch configuration is built, so changes are applied on the next opensearch
+ * restart. Clients that can't be used are skipped, they must not prevent opensearch from starting.
+ */
+@Singleton
+public class RepositoryClientsProvider implements RepositoryConfigurationProvider {
+
+    private static final Logger LOG = LoggerFactory.getLogger(RepositoryClientsProvider.class);
+
+    private final MongoCollection<RawBsonDocument> collection;
+    private final Codec<RepositoryClientDto> codec;
+    private final EncryptedValueService encryptedValueService;
+
+    @Inject
+    public RepositoryClientsProvider(MongoCollections mongoCollections, EncryptedValueService encryptedValueService) {
+        final MongoCollection<RepositoryClientDto> typed = mongoCollections.nonEntityCollection(
+                RepositoryClientDto.COLLECTION_NAME, RepositoryClientDto.class);
+        // Records are decoded one by one, so a record that can't be decoded doesn't discard the others
+        this.collection = typed.withDocumentClass(RawBsonDocument.class);
+        this.codec = typed.getCodecRegistry().get(RepositoryClientDto.class);
+        this.encryptedValueService = encryptedValueService;
+    }
+
+    @Override
+    public Collection<RepositoryConfiguration> get() {
+        final List<RawBsonDocument> records;
+        try {
+            records = collection.find().into(new ArrayList<>());
+        } catch (Exception e) {
+            LOG.error("Failed to read repository clients, opensearch won't have clients for warm tier repositories.", e);
+            return List.of();
+        }
+        final List<RepositoryConfiguration> clients = new ArrayList<>();
+        for (RawBsonDocument record : records) {
+            final String repositoryName = string(record, RepositoryClientDto.FIELD_REPOSITORY_NAME);
+            final String clientName = string(record, RepositoryClientDto.FIELD_CLIENT_NAME);
+            try {
+                configuration(codec.decode(record.asBsonReader(), DecoderContext.builder().build())).ifPresent(clients::add);
+            } catch (Exception e) {
+                LOG.error("Failed to read client <{}> of repository <{}>, skipping it.", clientName, repositoryName, e);
+            }
+        }
+        return clients;
+    }
+
+    private Optional<RepositoryConfiguration> configuration(RepositoryClientDto client) {
+        final RepositoryClientSettings opensearch = client.opensearch();
+        final Map<String, String> properties = new LinkedHashMap<>();
+        opensearch.settings().forEach((setting, value) -> properties.put(key(client, setting), value));
+
+        final List<OpensearchKeystoreItem> keystoreItems = new ArrayList<>();
+        for (Map.Entry<String, EncryptedValue> setting : opensearch.secureSettings().entrySet()) {
+            final String value = decrypt(setting.getValue());
+            if (value == null) {
+                return skipUndecryptable(client);
+            }
+            keystoreItems.add(new OpensearchKeystoreStringItem(key(client, setting.getKey()), value));
+        }
+        for (Map.Entry<String, EncryptedValue> file : opensearch.secureFiles().entrySet()) {
+            final String content = decrypt(file.getValue());
+            if (content == null) {
+                return skipUndecryptable(client);
+            }
+            keystoreItems.add(new OpensearchKeystoreFileContentItem(key(client, file.getKey()), content.getBytes(StandardCharsets.UTF_8)));
+        }
+        return Optional.of(new RepositoryClientConfiguration(properties, List.copyOf(keystoreItems)));
+    }
+
+    private static Optional<RepositoryConfiguration> skipUndecryptable(RepositoryClientDto client) {
+        LOG.warn("Secrets of client <{}> of repository <{}> can't be decrypted, make sure password_secret matches the Graylog server. Skipping it.",
+                client.clientName(), client.repositoryName());
+        return Optional.empty();
+    }
+
+    // Null when the value can't be decrypted
+    @Nullable
+    private String decrypt(EncryptedValue value) {
+        final String plain = encryptedValueService.decrypt(value);
+        return StringUtils.isBlank(plain) ? null : plain;
+    }
+
+    private static String key(RepositoryClientDto client, String setting) {
+        return f("%s.client.%s.%s", client.opensearch().type(), client.clientName(), setting);
+    }
+
+    @Nullable
+    private static String string(RawBsonDocument record, String field) {
+        final BsonValue value = record.get(field);
+        return value != null && value.isString() ? value.asString().getValue() : null;
+    }
+}
