@@ -61,10 +61,6 @@
         <skip.web.build>false</skip.web.build>
         <skip.web.tests>false</skip.web.tests>
 
-        <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
-        <!-- to work around filtering bug, which makes maven.build.timestamp inaccessible -->
-        <build.timestamp>${maven.build.timestamp}</build.timestamp>
-
         <!-- OpenAPI generation parameters (for generate-openapi profile) - can be overridden via -D flags -->
         <openapi.server.output.file>${project.build.directory}/openapi.yaml</openapi.server.output.file>
         <openapi.server.config.file>${project.basedir}/../misc/graylog.conf</openapi.server.config.file>

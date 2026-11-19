@@ -87,6 +87,10 @@
         <maven.compiler.target>21</maven.compiler.target>
         <maven.compiler.useIncrementalCompilation>false</maven.compiler.useIncrementalCompilation>
 
+        <!-- Use the build start time for file entries in JARs and tarballs. Maven 3.10+ otherwise defaults to 1980-02-01.
+             The maven.build.timestamp format must stay ISO-8601. Use ${artifact.timestamp} for file names. -->
+        <project.build.outputTimestamp>${maven.build.timestamp}</project.build.outputTimestamp>
+
         <!-- This property will be overridden during the release to collect all artifacts in a central location. -->
         <local.repo.path>${project.build.directory}/local-maven-repo</local.repo.path>
 
@@ -999,6 +1003,11 @@
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>3.8.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
                     <version>3.7.0</version>
                 </plugin>
@@ -1100,6 +1109,26 @@
         </pluginManagement>
 
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <!-- Compact build timestamp for artifact file names, e.g. 20261119144335 -->
+                        <id>artifact-timestamp</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>regex-property</goal>
+                        </goals>
+                        <configuration>
+                            <name>artifact.timestamp</name>
+                            <value>${maven.build.timestamp}</value>
+                            <regex>[-:TZ]</regex>
+                            <replacement></replacement>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
