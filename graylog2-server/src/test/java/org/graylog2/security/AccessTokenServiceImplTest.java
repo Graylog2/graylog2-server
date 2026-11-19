@@ -27,9 +27,12 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog2.Configuration;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.rest.models.SortOrder;
+import org.graylog2.search.SearchQuery;
 import org.graylog2.users.UserConfiguration;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -49,6 +52,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -193,6 +197,20 @@ public class AccessTokenServiceImplTest {
 
         verify(eventBus).post(new AccessTokenDeletedEvent("admin", "client-a"));
         verify(eventBus).post(new AccessTokenDeletedEvent("admin", null));
+    }
+
+    @Test
+    public void findPaginatedReadsTokensWithOAuthClient() {
+        final PeriodDuration ttl = PeriodDuration.of(Duration.ofHours(1));
+        accessTokenService.create("admin", "client", ttl, "client-a");
+        accessTokenService.create("admin", "personal", ttl);
+
+        final PaginatedList<AccessTokenEntity> tokens = new PaginatedAccessTokenEntityService(mongoCollections)
+                .findPaginated(new SearchQuery(""), 1, 10, AccessTokenEntity.FIELD_NAME, SortOrder.ASCENDING);
+
+        assertThat(tokens.delegate())
+                .extracting(AccessTokenEntity::name, AccessTokenEntity::oauthClientId)
+                .containsExactly(tuple("client", "client-a"), tuple("personal", null));
     }
 
     @Test
