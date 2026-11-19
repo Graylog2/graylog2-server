@@ -150,11 +150,15 @@ describe('Markdown', () => {
       it('in fenced code blocks', async () => {
         const { container } = render(
           <Markdown
-            text={'```\nGET /search?q=<script>alert(document.cookie)</script> HTTP/1.1 200\n<img src=x onerror=alert(1)>\n```'}
+            text={
+              '```\nGET /search?q=<script>alert(document.cookie)</script> HTTP/1.1 200\n<img src=x onerror=alert(1)>\n```'
+            }
           />,
         );
 
-        const code = await screen.findByText(/GET \/search\?q=<script>alert\(document\.cookie\)<\/script> HTTP\/1\.1 200/);
+        const code = await screen.findByText(
+          /GET \/search\?q=<script>alert\(document\.cookie\)<\/script> HTTP\/1\.1 200/,
+        );
 
         expect(code.tagName).toBe('CODE');
         expect(code).toHaveTextContent('<img src=x onerror=alert(1)>');
@@ -162,7 +166,9 @@ describe('Markdown', () => {
       });
 
       it('in indented code blocks', async () => {
-        const { container } = render(<Markdown text={'Request:\n\n    <iframe src="https://evil.example"></iframe>'} />);
+        const { container } = render(
+          <Markdown text={'Request:\n\n    <iframe src="https://evil.example"></iframe>'} />,
+        );
 
         const code = await screen.findByText('<iframe src="https://evil.example"></iframe>');
 
@@ -171,7 +177,7 @@ describe('Markdown', () => {
       });
 
       it('with entities in inline code', async () => {
-        render(<Markdown text={"Encoded as `&lt;script&gt;` and `&amp;`"} />);
+        render(<Markdown text={'Encoded as `&lt;script&gt;` and `&amp;`'} />);
 
         await screen.findByText('&lt;script&gt;');
         await screen.findByText('&amp;');
@@ -185,7 +191,7 @@ describe('Markdown', () => {
       });
 
       it('with comparison operators and ampersands', async () => {
-        render(<Markdown text={"a < b > c && AT&T"} />);
+        render(<Markdown text={'a < b > c && AT&T'} />);
 
         await screen.findByText('a < b > c && AT&T');
       });
@@ -270,7 +276,9 @@ describe('Markdown', () => {
   });
 
   describe('mermaid diagrams', () => {
-    const diagram = ['```mermaid', 'graph LR', '  A[Start] -->|"ok & done"| B{Is it > 1?}', '  B <--> C', '```'].join('\n');
+    const diagram = ['```mermaid', 'graph LR', '  A[Start] -->|"ok & done"| B{Is it > 1?}', '  B <--> C', '```'].join(
+      '\n',
+    );
 
     beforeEach(() => {
       asMock(mermaid.render).mockReset();
@@ -354,7 +362,10 @@ describe('Markdown', () => {
 
       await screen.findByRole('img', { name: 'Diagram' });
 
-      expect(mermaid.render).toHaveBeenCalledWith(expect.any(String), 'graph LR\n  A["<b>&lt;tag&gt; &amp;</b>"] --> B\n');
+      expect(mermaid.render).toHaveBeenCalledWith(
+        expect.any(String),
+        'graph LR\n  A["<b>&lt;tag&gt; &amp;</b>"] --> B\n',
+      );
     });
 
     it('keeps other code blocks', async () => {

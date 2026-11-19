@@ -19,7 +19,6 @@ import React, { useMemo } from 'react';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { useAssistantPanelContext } from 'components/assistant';
 import GeneralEventSideBar from 'components/events/ReplaySearchSidebar/GeneralEventSideBar';
-import type { EventDefinitionSideBarDetailsProps, EventReplaySideBarDetailsProps } from 'views/types';
 
 type Props = {
   alertId: string;
@@ -27,27 +26,16 @@ type Props = {
 };
 
 const ReplaySearchSidebar = ({ alertId, definitionId = undefined }: Props) => {
-  const sideBarDetailsPlugin = usePluginEntities('views.components.eventReplay.sideBarDetails');
+  const sideBarDetails = usePluginEntities('views.components.eventReplay.sideBarDetails')[0];
+  // The plugin entity is fixed for the lifetime of the page, so this hook is always called in the same order.
+  const hasPlugin = sideBarDetails?.useCondition?.() ?? true;
   const isEventDefinition = !alertId && !!definitionId;
-  useAssistantPanelContext(useMemo(() => (alertId ? { type: 'event' as const, event_id: alertId } : undefined), [alertId]));
+  useAssistantPanelContext(
+    useMemo(() => (alertId ? { type: 'event' as const, event_id: alertId } : undefined), [alertId]),
+  );
 
-  const EventDefSideBar = useMemo<React.ComponentType<EventDefinitionSideBarDetailsProps> | null>(() => {
-    const sideBarDetails = sideBarDetailsPlugin[0];
-    const hasPlugin = typeof sideBarDetails?.useCondition === 'function' ? sideBarDetails.useCondition() : true;
-
-    if (hasPlugin && sideBarDetails?.eventDefinitionComponent) return sideBarDetails.eventDefinitionComponent;
-
-    return null;
-  }, [sideBarDetailsPlugin]);
-
-  const EventSideBarDetails = useMemo<React.ComponentType<EventReplaySideBarDetailsProps>>(() => {
-    const sideBarDetails = sideBarDetailsPlugin[0];
-    const hasPlugin = typeof sideBarDetails?.useCondition === 'function' ? sideBarDetails.useCondition() : true;
-
-    if (hasPlugin && !!sideBarDetails?.component) return sideBarDetails.component;
-
-    return GeneralEventSideBar;
-  }, [sideBarDetailsPlugin]);
+  const EventDefSideBar = hasPlugin ? sideBarDetails?.eventDefinitionComponent : undefined;
+  const EventSideBarDetails = (hasPlugin ? sideBarDetails?.component : undefined) ?? GeneralEventSideBar;
 
   if (isEventDefinition && EventDefSideBar) {
     return <EventDefSideBar definitionId={definitionId} />;

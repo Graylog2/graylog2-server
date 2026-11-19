@@ -98,7 +98,13 @@ const ViewerBadges = ({ viewers, max = 5 }: Props) => {
             </HiddenViewers>
           }
           withArrow>
-          <StyledAvatar size="sm" radius="xl" variant="light" color="gray" role="img" aria-label={`${hidden.length} more viewers`}>
+          <StyledAvatar
+            size="sm"
+            radius="xl"
+            variant="light"
+            color="gray"
+            role="img"
+            aria-label={`${hidden.length} more viewers`}>
             +{hidden.length}
           </StyledAvatar>
         </Tooltip>

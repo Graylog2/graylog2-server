@@ -55,9 +55,7 @@ const CartesianOnClickPopoverDropdown = ({
 
   const { rowPivotValues, columnPivotValues, metricValue } = useMemo<ValueGroups>(() => {
     if (!clickPoint || !config) return {};
-    const splitNames: Array<string | number> = splitCompositeKey(
-      clickPoint.data.originalName ?? clickPoint.data.name,
-    );
+    const splitNames: Array<string | number> = splitCompositeKey(clickPoint.data.originalName ?? clickPoint.data.name);
     const metric: string = config.series.length === 1 ? config.series[0].function : (splitNames.pop() as string);
     const columnValues = splitNames.filter((value) => value !== metric);
 
