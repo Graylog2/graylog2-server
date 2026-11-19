@@ -23,8 +23,11 @@ import normalizeSearchURLQueryParams from 'views/logic/NormalizeSearchURLQueryPa
 import createSearch from 'views/logic/slices/createSearch';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 
-const bindSearchParamsFromQuery: ViewHook = async ({ query, view, executionState }: ViewHookArguments) => {
-  const { queryString, timeRange, streamsFilter, streamCategoriesFilter } = normalizeSearchURLQueryParams(query);
+const bindSearchParamsFromQuery: ViewHook = async ({ query, view, executionState, userTimezone }: ViewHookArguments) => {
+  const { queryString, timeRange, streamsFilter, streamCategoriesFilter } = normalizeSearchURLQueryParams(
+    query,
+    userTimezone,
+  );
 
   if (view.type === View.Type.Dashboard) {
     if (!queryString && !timeRange) {

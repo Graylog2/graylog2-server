@@ -21,6 +21,7 @@ import ErrorPage from 'components/errors/ErrorPage';
 import usePluginEntities from 'hooks/usePluginEntities';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import useProductName from 'brand-customization/useProductName';
+import useUserDateTime from 'hooks/useUserDateTime';
 
 import type View from './View';
 import processHooks from './processHooks';
@@ -60,14 +61,23 @@ const useProcessHooksForView = (
 ): ResultType => {
   const loadingViewHooks = usePluginEntities('views.hooks.loadingView');
   const executingViewHooks = usePluginEntities('views.hooks.executingView');
+  const { userTimezone } = useUserDateTime();
 
   const [result, setResult] = useState<ResultType>({ status: 'loading' });
 
   useEffect(
     () => {
-      processHooks(view, executionState, loadingViewHooks, executingViewHooks, query, (v, e) => {
-        setResult({ status: 'loaded', view: v, executionState: e });
-      }).catch((e: Error | HookComponent) => {
+      processHooks(
+        view,
+        executionState,
+        loadingViewHooks,
+        executingViewHooks,
+        query,
+        (v, e) => {
+          setResult({ status: 'loaded', view: v, executionState: e });
+        },
+        userTimezone,
+      ).catch((e: Error | HookComponent) => {
         if (e instanceof Error) {
           // eslint-disable-next-line no-console
           console.error(e);
