@@ -69,6 +69,16 @@ describe('TimeRange', () => {
         keyword: undefined,
       });
     });
+
+    it('includes timezone of keyword time ranges only if present', () => {
+      expect(timeRangeToQueryParameter({ type: 'keyword', keyword: 'today', timezone: 'America/New_York' })).toEqual({
+        rangetype: 'keyword',
+        keyword: 'today',
+        timezone: 'America/New_York',
+      });
+
+      expect(timeRangeToQueryParameter({ type: 'keyword', keyword: 'today' })).not.toHaveProperty('timezone');
+    });
   });
 
   describe('timeRangeFromQueryParameter', () => {
@@ -115,6 +125,25 @@ describe('TimeRange', () => {
       });
 
       expect(timeRangeFromQueryParameter({ rangetype: 'keyword', keyword: undefined })).toEqual({ type: 'keyword' });
+    });
+
+    it('uses default timezone for keyword time ranges without timezone', () => {
+      expect(timeRangeFromQueryParameter({ rangetype: 'keyword', keyword: 'today' }, 'America/New_York')).toEqual({
+        type: 'keyword',
+        keyword: 'today',
+        timezone: 'America/New_York',
+      });
+
+      expect(
+        timeRangeFromQueryParameter(
+          { rangetype: 'keyword', keyword: 'today', timezone: 'Europe/Berlin' },
+          'America/New_York',
+        ),
+      ).toEqual({
+        type: 'keyword',
+        keyword: 'today',
+        timezone: 'Europe/Berlin',
+      });
     });
   });
 });
