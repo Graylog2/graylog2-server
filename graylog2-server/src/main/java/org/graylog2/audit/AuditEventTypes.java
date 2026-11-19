@@ -201,7 +201,6 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String MCP_PROMPT_GET = MCP_PREFIX + "prompt:get";
     public static final String MCP_TOOL_LIST = MCP_PREFIX + "tool:list";
     public static final String MCP_TOOL_CALL = MCP_PREFIX + "tool:call";
-    public static final String MCP_OAUTH_CLIENT_REGISTER = MCP_PREFIX + "oauth_client:register";
     public static final String MCP_OAUTH_AUTHORIZATION_GRANT = MCP_PREFIX + "oauth_authorization:grant";
     public static final String MCP_OAUTH_AUTHORIZATION_DENY = MCP_PREFIX + "oauth_authorization:deny";
     public static final String MCP_OAUTH_AUTHORIZATION_REVOKE = MCP_PREFIX + "oauth_authorization:revoke";
@@ -395,7 +394,6 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(MCP_TOOL_CALL)
             .add(MCP_PROMPT_LIST)
             .add(MCP_PROMPT_GET)
-            .add(MCP_OAUTH_CLIENT_REGISTER)
             .add(MCP_OAUTH_AUTHORIZATION_GRANT)
             .add(MCP_OAUTH_AUTHORIZATION_DENY)
             .add(MCP_OAUTH_AUTHORIZATION_REVOKE)

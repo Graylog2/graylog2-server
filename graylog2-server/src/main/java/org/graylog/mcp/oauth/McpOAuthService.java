@@ -19,7 +19,6 @@ package org.graylog.mcp.oauth;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import jakarta.ws.rs.core.Response;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.mcp.config.McpConfiguration;
 import org.graylog.security.GranteeAuthorizer;
@@ -46,7 +45,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -57,12 +55,10 @@ import static org.graylog.mcp.oauth.OAuthException.INVALID_GRANT;
 import static org.graylog.mcp.oauth.OAuthException.INVALID_REDIRECT_URI;
 import static org.graylog.mcp.oauth.OAuthException.INVALID_REQUEST;
 import static org.graylog.mcp.oauth.OAuthException.INVALID_TARGET;
-import static org.graylog.mcp.oauth.OAuthException.TEMPORARILY_UNAVAILABLE;
 import static org.graylog.mcp.oauth.OAuthException.UNSUPPORTED_RESPONSE_TYPE;
 import static org.graylog2.audit.AuditEventTypes.MCP_OAUTH_AUTHORIZATION_DENY;
 import static org.graylog2.audit.AuditEventTypes.MCP_OAUTH_AUTHORIZATION_GRANT;
 import static org.graylog2.audit.AuditEventTypes.MCP_OAUTH_AUTHORIZATION_REVOKE;
-import static org.graylog2.audit.AuditEventTypes.MCP_OAUTH_CLIENT_REGISTER;
 import static org.graylog2.audit.AuditEventTypes.MCP_OAUTH_REFRESH_TOKEN_REUSE;
 import static org.graylog2.audit.AuditEventTypes.MCP_OAUTH_TOKEN_ISSUE;
 import static org.graylog2.audit.AuditEventTypes.MCP_OAUTH_TOKEN_REFRESH;
@@ -86,15 +82,13 @@ public class McpOAuthService {
     public static final String TOKEN_ENDPOINT_AUTH_METHOD_NONE = "none";
 
     static final Duration AUTHORIZATION_CODE_TTL = Duration.ofMinutes(1);
-    static final Duration UNUSED_CLIENT_TTL = Duration.ofDays(1);
     // Lets clients refresh concurrently without being taken for a replay
     static final Duration REFRESH_TOKEN_REUSE_GRACE_PERIOD = Duration.ofSeconds(30);
-    static final long MAX_CLIENTS = 10_000;
     private static final int MAX_REDIRECT_URIS = 10;
     private static final int MAX_CLIENT_NAME_LENGTH = 100;
     private static final String DEFAULT_CLIENT_NAME = "Unnamed MCP client";
 
-    private final OAuthClientService clientService;
+    private final OAuthClientIds clientIds;
     private final OAuthAuthorizationCodeService codeService;
     private final OAuthRefreshTokenService refreshTokenService;
     private final AccessTokenService accessTokenService;
@@ -105,7 +99,7 @@ public class McpOAuthService {
     private final Clock clock;
 
     @Inject
-    public McpOAuthService(OAuthClientService clientService,
+    public McpOAuthService(OAuthClientIds clientIds,
                            OAuthAuthorizationCodeService codeService,
                            OAuthRefreshTokenService refreshTokenService,
                            AccessTokenService accessTokenService,
@@ -114,7 +108,7 @@ public class McpOAuthService {
                            AuditEventSender auditEventSender,
                            ClusterConfigService clusterConfigService,
                            Clock clock) {
-        this.clientService = clientService;
+        this.clientIds = clientIds;
         this.codeService = codeService;
         this.refreshTokenService = refreshTokenService;
         this.accessTokenService = accessTokenService;
@@ -150,7 +144,8 @@ public class McpOAuthService {
     public record Grant(String clientId, String clientName, Instant lastRefreshedAt, Instant expiresAt) {}
 
     /**
-     * Dynamic client registration (RFC 7591). All clients are registered as public clients.
+     * Dynamic client registration (RFC 7591). All clients are registered as public clients. Nothing is stored, the
+     * client ID carries the registration.
      */
     public OAuthClient registerClient(ClientRegistrationRequest request) {
         final List<String> redirectUris = Optional.ofNullable(request.redirectUris()).orElse(List.of());
@@ -169,24 +164,9 @@ public class McpOAuthService {
         if (request.responseTypes() != null && !Set.of(RESPONSE_TYPE_CODE).containsAll(request.responseTypes())) {
             throw OAuthException.of(INVALID_CLIENT_METADATA, "Only the code response type is supported");
         }
-        if (clientService.count() >= MAX_CLIENTS) {
-            LOG.warn("Refusing OAuth client registration, the maximum of {} registered clients is reached.", MAX_CLIENTS);
-            throw OAuthException.of(TEMPORARILY_UNAVAILABLE, "Too many registered clients", Response.Status.SERVICE_UNAVAILABLE);
-        }
-
-        final Instant now = Instant.now(clock);
-        final OAuthClient client = new OAuthClient(
-                null,
-                f("mcp-%s", UUID.randomUUID()),
-                sanitizeClientName(request.clientName()),
-                request.clientUri(),
-                List.copyOf(redirectUris),
-                now,
-                now.plus(UNUSED_CLIENT_TTL)
-        );
-        clientService.create(client);
-        LOG.debug("Registered OAuth client <{}> ({}) with redirect URIs {}", client.clientId(), client.clientName(), redirectUris);
-        auditEventSender.success(AuditActor.user("anonymous"), MCP_OAUTH_CLIENT_REGISTER, clientContext(client));
+        final OAuthClient client = clientIds.issue(sanitizeClientName(request.clientName()), request.clientUri(), redirectUris, Instant.now(clock))
+                .orElseThrow(() -> OAuthException.of(INVALID_CLIENT_METADATA, "The client metadata is too large"));
+        LOG.debug("Registered OAuth client <{}> with redirect URIs {}", client.clientName(), redirectUris);
         return client;
     }
 
@@ -203,7 +183,7 @@ public class McpOAuthService {
         if (isBlank(clientId)) {
             throw OAuthException.of(INVALID_REQUEST, "Missing client_id");
         }
-        final OAuthClient client = clientService.findByClientId(clientId)
+        final OAuthClient client = clientIds.decode(clientId)
                 .orElseThrow(() -> OAuthException.invalidClient("Unknown client"));
         final String effectiveRedirectUri = resolveRedirectUri(client, redirectUri, config().oauthAllowedRedirectUris());
         try {
@@ -353,11 +333,8 @@ public class McpOAuthService {
                 .filter(token -> token.expiresAt().isAfter(Instant.now(clock)))
                 .collect(Collectors.toMap(OAuthRefreshToken::clientId, Function.identity(),
                         (a, b) -> a.createdAt().isAfter(b.createdAt()) ? a : b));
-        final Map<String, String> clientNames = clientService.findByClientIds(latestByClient.keySet()).stream()
-                .collect(Collectors.toMap(OAuthClient::clientId, OAuthClient::clientName));
-
         return latestByClient.values().stream()
-                .map(token -> new Grant(token.clientId(), clientNames.getOrDefault(token.clientId(), DEFAULT_CLIENT_NAME), token.createdAt(), token.expiresAt()))
+                .map(token -> new Grant(token.clientId(), clientName(token.clientId()), token.createdAt(), token.expiresAt()))
                 .sorted(Comparator.comparing(Grant::lastRefreshedAt).reversed())
                 .toList();
     }
@@ -403,7 +380,6 @@ public class McpOAuthService {
                 now,
                 refreshTokenExpiresAt
         ));
-        clientService.extendExpiry(client.clientId(), refreshTokenExpiresAt);
 
         return new TokenResponse(accessToken.getToken(), accessTokenTtl.toSeconds(), refreshToken);
     }
@@ -438,7 +414,7 @@ public class McpOAuthService {
         if (isBlank(clientId)) {
             throw OAuthException.invalidClient("Missing client_id");
         }
-        final OAuthClient client = clientService.findByClientId(clientId).orElseThrow(() -> OAuthException.invalidClient("Unknown client"));
+        final OAuthClient client = clientIds.decode(clientId).orElseThrow(() -> OAuthException.invalidClient("Unknown client"));
         final List<String> allowedRedirectUris = config().oauthAllowedRedirectUris();
         if (client.redirectUris().stream().noneMatch(uri -> RedirectUriPolicy.isAllowed(uri, allowedRedirectUris))) {
             throw OAuthException.invalidClient("None of the client's redirect URIs is allowed anymore");
@@ -509,6 +485,10 @@ public class McpOAuthService {
                 .map(e -> f("%s=%s", e.getKey(), URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8)))
                 .collect(Collectors.joining("&"));
         return f("%s%s%s", uri, uri.contains("?") ? "&" : "?", query);
+    }
+
+    private String clientName(String clientId) {
+        return clientIds.decode(clientId).map(OAuthClient::clientName).orElse(DEFAULT_CLIENT_NAME);
     }
 
     private static String sanitizeClientName(@Nullable String clientName) {

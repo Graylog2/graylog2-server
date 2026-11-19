@@ -24,6 +24,7 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.AccessToken;
 import org.graylog2.security.AccessTokenService;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,6 +42,8 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
+import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -57,15 +60,13 @@ class McpOAuthServiceTest {
     private static final String CHALLENGE = "y369XJCBGNH-E16nEZoxIbr002YWs9OIKuuf5ExCbFg";
     private static final String RESOURCE = "https://graylog.example.com/api/mcp";
     private static final McpConfiguration CONFIG = McpConfiguration.create(true, false, false);
-    private static final OAuthClient CLIENT = new OAuthClient("id", "mcp-client", "Claude Code", null,
-            List.of(REDIRECT_URI), NOW.minusSeconds(60), NOW.plus(Duration.ofDays(1)));
+    private static final OAuthClientIds CLIENT_IDS = new OAuthClientIds("password-secret", new ObjectMapperProvider().get());
+    private static final OAuthClient CLIENT = CLIENT_IDS.issue("Claude Code", null, List.of(REDIRECT_URI), NOW.minusSeconds(60)).orElseThrow();
     private static final String WEB_REDIRECT_URI = "https://claude.ai/api/mcp/auth_callback";
-    private static final OAuthClient WEB_CLIENT = new OAuthClient("web-id", "mcp-web-client", "Claude", null,
-            List.of(WEB_REDIRECT_URI), NOW.minusSeconds(60), NOW.plus(Duration.ofDays(1)));
+    private static final OAuthClient WEB_CLIENT = CLIENT_IDS.issue("Claude", null, List.of(WEB_REDIRECT_URI), NOW.minusSeconds(60)).orElseThrow();
     private static final McpConfiguration CONFIG_WITHOUT_WEB_CLIENTS = McpConfiguration.create(true, false, false, null, null, null, List.of());
 
     private ClusterConfigService clusterConfigService;
-    private OAuthClientService clientService;
     private OAuthAuthorizationCodeService codeService;
     private OAuthRefreshTokenService refreshTokenService;
     private AccessTokenService accessTokenService;
@@ -76,7 +77,6 @@ class McpOAuthServiceTest {
 
     @BeforeEach
     void setUp() {
-        clientService = mock(OAuthClientService.class);
         codeService = mock(OAuthAuthorizationCodeService.class);
         refreshTokenService = mock(OAuthRefreshTokenService.class);
         accessTokenService = mock(AccessTokenService.class);
@@ -85,7 +85,7 @@ class McpOAuthServiceTest {
         final GranteeAuthorizer.Factory authorizerFactory = mock(GranteeAuthorizer.Factory.class);
         clusterConfigService = mock(ClusterConfigService.class);
         when(clusterConfigService.getOrDefault(eq(McpConfiguration.class), any())).thenReturn(CONFIG);
-        service = new McpOAuthService(clientService, codeService, refreshTokenService, accessTokenService, userService,
+        service = new McpOAuthService(CLIENT_IDS, codeService, refreshTokenService, accessTokenService, userService,
                 authorizerFactory, mock(AuditEventSender.class), clusterConfigService, Clock.fixed(NOW, ZoneOffset.UTC));
 
         user = mock(User.class);
@@ -96,8 +96,6 @@ class McpOAuthServiceTest {
         when(authorizerFactory.create(user)).thenReturn(authorizer);
         when(authorizer.isPermitted(RestPermissions.MCP_SERVER_ACCESS)).thenReturn(true);
         when(authorizer.isPermitted(RestPermissions.USERS_TOKENCREATE, "jane")).thenReturn(true);
-        when(clientService.findByClientId(CLIENT.clientId())).thenReturn(Optional.of(CLIENT));
-        when(clientService.findByClientId(WEB_CLIENT.clientId())).thenReturn(Optional.of(WEB_CLIENT));
     }
 
     @Test
@@ -105,10 +103,32 @@ class McpOAuthServiceTest {
         final OAuthClient client = service.registerClient(new McpOAuthService.ClientRegistrationRequest(
                 List.of(REDIRECT_URI), "  Claude\u0000 Code ", null, List.of("authorization_code", "refresh_token"), List.of("code")));
 
-        assertThat(client.clientId()).startsWith("mcp-");
         assertThat(client.clientName()).isEqualTo("Claude Code");
-        assertThat(client.expiresAt()).isEqualTo(NOW.plus(McpOAuthService.UNUSED_CLIENT_TTL));
-        verify(clientService).create(client);
+        assertThat(client.createdAt()).isEqualTo(NOW);
+        assertThat(validate(client.clientId(), REDIRECT_URI, CHALLENGE, "S256").client()).isEqualTo(client);
+    }
+
+    @Test
+    void rejectsRegistrationWithOversizedMetadata() {
+        final List<String> redirectUris = List.of(1, 2, 3).stream()
+                .map(i -> f("http://127.0.0.1/%d/%s", i, "a".repeat(1000)))
+                .toList();
+
+        assertThatThrownBy(() -> service.registerClient(new McpOAuthService.ClientRegistrationRequest(
+                redirectUris, null, null, null, null)))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_CLIENT_METADATA));
+    }
+
+    @Test
+    void namesGrantsAfterTheirClient() {
+        when(refreshTokenService.findActiveByUsername("jane")).thenReturn(List.of(
+                refreshToken(null),
+                new OAuthRefreshToken("rt-other", "hash", "mcp-unknown", "user-id", "jane", null, null, NOW.minusSeconds(60), NOW.plus(Duration.ofDays(1)))
+        ));
+
+        assertThat(service.grantsForUser("jane"))
+                .extracting(McpOAuthService.Grant::clientId, McpOAuthService.Grant::clientName)
+                .containsExactly(tuple("mcp-unknown", "Unnamed MCP client"), tuple(CLIENT.clientId(), "Claude Code"));
     }
 
     @Test
@@ -116,7 +136,6 @@ class McpOAuthServiceTest {
         assertThatThrownBy(() -> service.registerClient(new McpOAuthService.ClientRegistrationRequest(
                 List.of("https://evil.example.com/callback"), "Evil", null, null, null)))
                 .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_REDIRECT_URI));
-        verify(clientService, never()).create(any());
     }
 
     @Test
@@ -130,6 +149,15 @@ class McpOAuthServiceTest {
     void unknownClientErrorsAreNotRedirected() {
         assertThatThrownBy(() -> validate("unknown", REDIRECT_URI, CHALLENGE, "S256"))
                 .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.redirectUri()).isEmpty());
+    }
+
+    @Test
+    void rejectsClientIdSignedWithOtherSecret() {
+        final OAuthClient foreign = new OAuthClientIds("other-secret", new ObjectMapperProvider().get())
+                .issue("Claude Code", null, List.of(REDIRECT_URI), NOW).orElseThrow();
+
+        assertThatThrownBy(() -> validate(foreign.clientId(), REDIRECT_URI, CHALLENGE, "S256"))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_CLIENT));
     }
 
     @Test
@@ -187,7 +215,6 @@ class McpOAuthServiceTest {
         verify(refreshTokenService).create(refreshToken.capture());
         assertThat(refreshToken.getValue().tokenHash()).isEqualTo(OAuthTokens.hash(response.refreshToken()));
         assertThat(refreshToken.getValue().expiresAt()).isEqualTo(NOW.plus(CONFIG.oauthRefreshTokenTtl()));
-        verify(clientService).extendExpiry(CLIENT.clientId(), NOW.plus(CONFIG.oauthRefreshTokenTtl()));
     }
 
     @Test

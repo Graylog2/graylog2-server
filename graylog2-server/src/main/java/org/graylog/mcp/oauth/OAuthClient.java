@@ -16,41 +16,16 @@
  */
 package org.graylog.mcp.oauth;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.annotation.Nullable;
-import org.graylog2.database.MongoEntity;
-import org.graylog2.jackson.MongoInstantDeserializer;
-import org.graylog2.jackson.MongoInstantSerializer;
-import org.mongojack.Id;
-import org.mongojack.ObjectId;
 
 import java.time.Instant;
 import java.util.List;
 
 /**
- * An OAuth client registered via dynamic client registration (RFC 7591).
- *
- * @param expiresAt the client is removed after this point in time. It is pushed forward whenever tokens are issued.
+ * An OAuth client registered via dynamic client registration (RFC 7591). It is not stored, see {@link OAuthClientIds}.
  */
-public record OAuthClient(
-        @ObjectId @Id @Nullable @JsonProperty(MongoEntity.FIELD_ID) String id,
-        @JsonProperty(FIELD_CLIENT_ID) String clientId,
-        @JsonProperty(FIELD_CLIENT_NAME) String clientName,
-        @Nullable @JsonProperty(FIELD_CLIENT_URI) String clientUri,
-        @JsonProperty(FIELD_REDIRECT_URIS) List<String> redirectUris,
-        @JsonSerialize(using = MongoInstantSerializer.class)
-        @JsonDeserialize(using = MongoInstantDeserializer.class)
-        @JsonProperty(FIELD_CREATED_AT) Instant createdAt,
-        @JsonSerialize(using = MongoInstantSerializer.class)
-        @JsonDeserialize(using = MongoInstantDeserializer.class)
-        @JsonProperty(FIELD_EXPIRES_AT) Instant expiresAt
-) implements MongoEntity {
-    public static final String FIELD_CLIENT_ID = "client_id";
-    public static final String FIELD_CLIENT_NAME = "client_name";
-    public static final String FIELD_CLIENT_URI = "client_uri";
-    public static final String FIELD_REDIRECT_URIS = "redirect_uris";
-    public static final String FIELD_CREATED_AT = "created_at";
-    public static final String FIELD_EXPIRES_AT = "expires_at";
-}
+public record OAuthClient(String clientId,
+                          String clientName,
+                          @Nullable String clientUri,
+                          List<String> redirectUris,
+                          Instant createdAt) {}

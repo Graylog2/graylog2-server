@@ -38,8 +38,8 @@ import static org.mockito.Mockito.when;
 
 class OAuthResourceTest {
     private static final String REQUESTED_REDIRECT_URI = "http://127.0.0.1:50000/callback";
-    private static final OAuthClient CLIENT = new OAuthClient("id", "mcp-client", "Claude Code", null,
-            List.of("http://127.0.0.1:33418/callback"), Instant.EPOCH, Instant.EPOCH);
+    private static final OAuthClient CLIENT = new OAuthClient("mcp-client", "Claude Code", null,
+            List.of("http://127.0.0.1:33418/callback"), Instant.EPOCH);
 
     private final McpOAuthService oauthService = mock(McpOAuthService.class);
     private final HttpHeaders headers = mock(HttpHeaders.class);
