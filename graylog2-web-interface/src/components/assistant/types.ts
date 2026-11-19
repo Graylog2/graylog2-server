@@ -26,6 +26,8 @@ export type SearchPage = {
   focused_widget_id?: string;
   // Whether the focused widget is open in its editor, whose changes are not in `view` until they are applied.
   focused_widget_editing?: boolean;
+  // The search filters of the shown query, which may not be saved yet.
+  active_query_filters?: Array<unknown>;
 };
 
 export type NotebookPage = {
