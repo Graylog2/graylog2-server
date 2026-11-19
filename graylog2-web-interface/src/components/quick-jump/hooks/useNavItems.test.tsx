@@ -271,6 +271,10 @@ describe('useNavItems conditions', () => {
         ],
       },
     ],
+    entityCreators: [
+      { id: 'Shown', title: 'Create shown', path: prefixUrl('/shown/new'), useCondition: met },
+      { id: 'Hidden', title: 'Create hidden', path: prefixUrl('/hidden/new'), useCondition: notMet },
+    ],
   };
 
   usePluginExports(plugins);
@@ -282,7 +286,9 @@ describe('useNavItems conditions', () => {
   };
 
   it('offers navigation items and pages whose condition is met', () => {
-    expect(titles()).toEqual(expect.arrayContaining(['Shown link', 'Menu / Shown child', 'Group / Shown page']));
+    expect(titles()).toEqual(
+      expect.arrayContaining(['Shown link', 'Menu / Shown child', 'Group / Shown page', 'Create shown']),
+    );
   });
 
   it('hides navigation items and pages whose condition is not met', () => {
@@ -291,6 +297,7 @@ describe('useNavItems conditions', () => {
     expect(result).not.toContain('Hidden link');
     expect(result).not.toContain('Menu / Hidden child');
     expect(result).not.toContain('Group / Hidden page');
+    expect(result).not.toContain('Create hidden');
   });
 
   it('hides the children of a dropdown whose condition is not met', () => {

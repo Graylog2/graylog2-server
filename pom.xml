@@ -111,9 +111,9 @@
         <auto-service.version>1.1.1</auto-service.version>
         <auto-value.version>1.11.1</auto-value.version>
         <aws-java-sdk-1.version>1.12.797</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.57.3</aws-java-sdk-2.version>
+        <aws-java-sdk-2.version>2.58.0</aws-java-sdk-2.version>
         <aws-kinesis-client.version>3.5.4</aws-kinesis-client.version>
-        <aws-msk-iam-auth.version>2.3.9</aws-msk-iam-auth.version>
+        <aws-msk-iam-auth.version>2.4.0</aws-msk-iam-auth.version>
         <bouncycastle-prov.version>1.86</bouncycastle-prov.version>
         <bouncycastle-pkix.version>1.86</bouncycastle-pkix.version>
         <byte-buddy.version>1.18.17</byte-buddy.version>
@@ -132,7 +132,7 @@
         <error-prone.version>2.52.0</error-prone.version>
         <freemarker.version>2.3.35</freemarker.version>
         <gcs.version>2.77.0</gcs.version>
-        <azure-blob-storage.version>12.37.1</azure-blob-storage.version>
+        <azure-blob-storage.version>12.37.2</azure-blob-storage.version>
         <azure-core.version>1.61.0</azure-core.version>
         <azure-identity.version>1.19.0</azure-identity.version>
         <azure-json.version>1.5.1</azure-json.version>
