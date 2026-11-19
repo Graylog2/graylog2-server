@@ -30,7 +30,7 @@ type Props = {
  */
 const FetchErrorAlert = ({ message, error = null }: Props) => (
   <Alert bsStyle="danger">
-    {message}: {error?.message ?? 'Unknown error'}
+    {message}. {error?.message ?? 'Unknown error'}
   </Alert>
 );
 
