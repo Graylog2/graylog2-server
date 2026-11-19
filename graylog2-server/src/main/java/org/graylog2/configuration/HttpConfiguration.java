@@ -159,6 +159,11 @@ public class HttpConfiguration {
             Send the "Strict-Transport-Security" header on all HTTPS responses of the HTTP interface.
             This only has an effect if $http_enable_tls is enabled. If TLS is terminated by a reverse proxy
             or load-balancer, configure HSTS there instead.
+
+            Browsers apply HSTS to the whole hostname, regardless of the port. Other services on the same hostname
+            which are only reachable via plain HTTP will become inaccessible in browsers for the duration of
+            $http_hsts_max_age. Disabling HSTS again does not clear the policy in browsers which have already
+            received it; set $http_hsts_max_age to "0s" for a while instead to make browsers forget it.
             """)
     @Parameter(value = "http_hsts_enabled")
     private boolean httpHstsEnabled = false;
