@@ -383,6 +383,40 @@ describe('IndexSetConfigurationForm', () => {
     });
   });
 
+  describe('Selected index set template', () => {
+    const selectedTemplate = {
+      id: 'template-id',
+      title: 'Template',
+      description: 'Template description',
+      built_in: false,
+      default: false,
+      enabled: true,
+      disabled_reason: '',
+      index_set_config: {
+        ...indexSetTemplateDefaults,
+        shards: 7,
+        field_limit: 1200,
+        use_legacy_rotation: true,
+        data_tiering: { type: DATA_TIERING_TYPE.HOT_ONLY, index_lifetime_min: '1', index_lifetime_max: '2' },
+      },
+    };
+
+    it('Should prefill the form from the template without changing the template', async () => {
+      const templateDataTiering = { ...selectedTemplate.index_set_config.data_tiering };
+
+      asMock(useSelectedIndexSetTemplate).mockReturnValue({
+        selectedIndexSetTemplate: selectedTemplate as never,
+        setSelectedIndexSetTemplate: jest.fn(),
+      });
+
+      render(<SUT create />);
+
+      expect(await screen.findByRole('spinbutton', { name: /index shards/i })).toHaveValue(7);
+      expect(screen.getByRole('spinbutton', { name: /max field count/i })).toHaveValue(1200);
+      expect(selectedTemplate.index_set_config.data_tiering).toEqual(templateDataTiering);
+    });
+  });
+
   describe('Max field count and dynamic mapping', () => {
     it('Should show the default as placeholder and disable the toggle without a profile', async () => {
       render(<SUT indexSet={indexSet} />);

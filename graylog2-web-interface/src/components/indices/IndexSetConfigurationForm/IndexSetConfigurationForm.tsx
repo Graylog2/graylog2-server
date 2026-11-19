@@ -118,7 +118,7 @@ const IndexSetConfigurationForm = ({
 
   const [fieldTypeRefreshIntervalUnit, setFieldTypeRefreshIntervalUnit] = useState<Unit>('seconds');
   const { loadingIndexSetTemplateDefaults, indexSetTemplateDefaults } = useIndexSetTemplateDefaults();
-  const [indexSet] = useIndexSet(initialIndexSet);
+  const indexSet = useIndexSet(initialIndexSet);
   const [autoFillPrefix, setAutoFillPrefix] = useState<boolean>(true);
   const [fieldLimitErrors, setFieldLimitErrors] = useState<FieldLimitErrors>({});
 

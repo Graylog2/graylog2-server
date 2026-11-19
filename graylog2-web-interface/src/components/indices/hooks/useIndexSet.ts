@@ -15,82 +15,69 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useEffect, useState } from 'react';
-import type { Dispatch, SetStateAction } from 'react';
-
 import useIndexSetTemplateDefaults from 'components/indices/IndexSetTemplates/hooks/useIndexSetTemplateDefaults';
 import useSelectedIndexSetTemplate from 'components/indices/IndexSetTemplates/hooks/useSelectedTemplate';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import type { RotationStrategyConfig, RetentionStrategyConfig } from 'components/indices/Types';
 
-const useIndexSet = (initialIndexSet?: IndexSet): [IndexSet, Dispatch<SetStateAction<IndexSet>>] => {
+const withoutNullValues = (values: object) => Object.fromEntries(Object.entries(values).filter(([_, v]) => v != null));
+
+const useIndexSet = (initialIndexSet?: IndexSet): IndexSet | undefined => {
   const { loadingIndexSetTemplateDefaults, indexSetTemplateDefaults } = useIndexSetTemplateDefaults();
-  const [indexSet, setIndexSet] = useState(initialIndexSet);
   const { selectedIndexSetTemplate } = useSelectedIndexSetTemplate();
 
-  /* eslint-disable react-hooks/set-state-in-effect, react-hooks/immutability */
-  // FIXME: derive the index set during render and stop mutating the selected template
-  useEffect(() => {
-    if (loadingIndexSetTemplateDefaults || !indexSetTemplateDefaults) return;
+  if (loadingIndexSetTemplateDefaults || !indexSetTemplateDefaults) {
+    return initialIndexSet;
+  }
 
-    const defaultIndexSet: IndexSet = {
-      title: '',
-      description: '',
-      index_prefix: '',
-      writable: true,
-      shards: indexSetTemplateDefaults.shards,
-      data_tiering: indexSetTemplateDefaults.data_tiering,
-      replicas: indexSetTemplateDefaults.replicas,
-      rotation_strategy_class: indexSetTemplateDefaults.rotation_strategy_class,
-      rotation_strategy: indexSetTemplateDefaults.rotation_strategy as RotationStrategyConfig,
-      retention_strategy_class: indexSetTemplateDefaults.retention_strategy_class,
-      retention_strategy: indexSetTemplateDefaults.retention_strategy as RetentionStrategyConfig,
-      index_analyzer: indexSetTemplateDefaults.index_analyzer,
-      index_optimization_max_num_segments: indexSetTemplateDefaults.index_optimization_max_num_segments,
-      index_optimization_disabled: indexSetTemplateDefaults.index_optimization_disabled,
-      field_type_refresh_interval: indexSetTemplateDefaults.field_type_refresh_interval,
-      field_restrictions: indexSetTemplateDefaults.field_restrictions,
-      index_set_template_id: null,
+  const defaultIndexSet: IndexSet = {
+    title: '',
+    description: '',
+    index_prefix: '',
+    writable: true,
+    shards: indexSetTemplateDefaults.shards,
+    data_tiering: indexSetTemplateDefaults.data_tiering,
+    replicas: indexSetTemplateDefaults.replicas,
+    rotation_strategy_class: indexSetTemplateDefaults.rotation_strategy_class,
+    rotation_strategy: indexSetTemplateDefaults.rotation_strategy as RotationStrategyConfig,
+    retention_strategy_class: indexSetTemplateDefaults.retention_strategy_class,
+    retention_strategy: indexSetTemplateDefaults.retention_strategy as RetentionStrategyConfig,
+    index_analyzer: indexSetTemplateDefaults.index_analyzer,
+    index_optimization_max_num_segments: indexSetTemplateDefaults.index_optimization_max_num_segments,
+    index_optimization_disabled: indexSetTemplateDefaults.index_optimization_disabled,
+    field_type_refresh_interval: indexSetTemplateDefaults.field_type_refresh_interval,
+    field_restrictions: indexSetTemplateDefaults.field_restrictions,
+    index_set_template_id: null,
+  };
+
+  if (initialIndexSet) {
+    return { ...defaultIndexSet, ...withoutNullValues(initialIndexSet) };
+  }
+
+  if (selectedIndexSetTemplate) {
+    const templateConfig = selectedIndexSetTemplate.index_set_config;
+    const templateConfigWithDefaultStrategies = templateConfig.use_legacy_rotation
+      ? { ...templateConfig, data_tiering: indexSetTemplateDefaults.data_tiering }
+      : {
+          ...templateConfig,
+          rotation_strategy_class: indexSetTemplateDefaults.rotation_strategy_class,
+          rotation_strategy: indexSetTemplateDefaults.rotation_strategy as RotationStrategyConfig,
+          retention_strategy_class: indexSetTemplateDefaults.retention_strategy_class,
+          retention_strategy: indexSetTemplateDefaults.retention_strategy as RetentionStrategyConfig,
+        };
+
+    return {
+      ...defaultIndexSet,
+      ...withoutNullValues(templateConfigWithDefaultStrategies),
+      index_set_template_id: selectedIndexSetTemplate.id,
     };
+  }
 
-    if (initialIndexSet) {
-      const initialIndexWithoutNullValues = Object.fromEntries(
-        Object.entries(initialIndexSet).filter(([_, v]) => v != null),
-      );
-      setIndexSet({ ...defaultIndexSet, ...initialIndexWithoutNullValues });
-    } else if (selectedIndexSetTemplate) {
-      const indexSetTemplateConfig = selectedIndexSetTemplate.index_set_config;
-
-      if (indexSetTemplateConfig.use_legacy_rotation) {
-        indexSetTemplateConfig.data_tiering = indexSetTemplateDefaults.data_tiering;
-      } else {
-        indexSetTemplateConfig.rotation_strategy_class = indexSetTemplateDefaults.rotation_strategy_class;
-        indexSetTemplateConfig.rotation_strategy = indexSetTemplateDefaults.rotation_strategy as RotationStrategyConfig;
-        indexSetTemplateConfig.retention_strategy_class = indexSetTemplateDefaults.retention_strategy_class;
-        indexSetTemplateConfig.retention_strategy =
-          indexSetTemplateDefaults.retention_strategy as RetentionStrategyConfig;
-      }
-
-      const indexSetTemplateConfigWithoutNullValues = Object.fromEntries(
-        Object.entries(indexSetTemplateConfig).filter(([_, v]) => v != null),
-      );
-
-      setIndexSet({
-        ...defaultIndexSet,
-        ...indexSetTemplateConfigWithoutNullValues,
-        index_set_template_id: selectedIndexSetTemplate.id,
-      });
-    } else {
-      setIndexSet({
-        ...defaultIndexSet,
-        field_limit: indexSetTemplateDefaults.field_limit,
-        dynamic_mapping_disabled: indexSetTemplateDefaults.dynamic_mapping_disabled,
-      });
-    }
-  }, [loadingIndexSetTemplateDefaults, indexSetTemplateDefaults, initialIndexSet, selectedIndexSetTemplate]);
-  /* eslint-enable react-hooks/set-state-in-effect, react-hooks/immutability */
-
-  return [indexSet, setIndexSet];
+  return {
+    ...defaultIndexSet,
+    field_limit: indexSetTemplateDefaults.field_limit,
+    dynamic_mapping_disabled: indexSetTemplateDefaults.dynamic_mapping_disabled,
+  };
 };
 
 export default useIndexSet;
