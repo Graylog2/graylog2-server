@@ -15,14 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled, { useTheme } from 'styled-components';
-import type { DefaultTheme } from 'styled-components';
+import { useTheme } from 'styled-components';
 
 import {
   COL_WIDTH_SIZE,
   COL_WIDTH_STYLE,
   COL_WIDTH_VARIABLE,
-  ColorSwatch,
   FoundationTable,
   PxLabel,
   StoryContainer,
@@ -272,78 +270,6 @@ export const TypeScaleGroupDoc = ({ label }: { label: string }) => {
   return (
     <StoryContainer>
       <FoundationTable columns={columns} rows={group.items} keyBy={(row) => `${row.key}-${row.family ?? 'default'}`} />
-    </StoryContainer>
-  );
-};
-
-// ─── Text Colors ───────────────────────────────────────────────────────────
-
-const ColorCell = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${({ theme }) => theme.spacings.xs};
-`;
-
-type ColorEntry = {
-  name: string;
-  token: string;
-  getColor: (theme: DefaultTheme) => string;
-  usage: string;
-};
-
-const TEXT_COLORS: Array<ColorEntry> = [
-  {
-    name: 'Primary',
-    token: 'theme.colors.text.primary',
-    getColor: (t) => t.colors.text.primary,
-    usage: 'Primary text. This should be used for all text in the app.',
-  },
-  {
-    name: 'Secondary',
-    token: 'theme.colors.text.secondary',
-    getColor: (t) => t.colors.text.secondary,
-    usage: 'Light theme secondary text. Used for most descriptions, charts, and table headers.',
-  },
-  {
-    name: 'Disabled',
-    token: 'theme.colors.text.disabled',
-    getColor: (t) => t.colors.text.disabled,
-    usage: 'Light theme disabled text.',
-  },
-];
-
-export const TextColorsDoc = () => {
-  const theme = useTheme();
-
-  const columns = [
-    {
-      header: 'Style',
-      width: COL_WIDTH_STYLE,
-      render: (row: ColorEntry) => {
-        const color = row.getColor(theme);
-
-        return (
-          <ColorCell>
-            <ColorSwatch color={color} />
-            {row.name}
-          </ColorCell>
-        );
-      },
-    },
-    {
-      header: 'Variable',
-      width: COL_WIDTH_VARIABLE,
-      render: (row: ColorEntry) => <Token>{row.token}</Token>,
-    },
-    {
-      header: 'Usage',
-      render: (row: ColorEntry) => row.usage,
-    },
-  ];
-
-  return (
-    <StoryContainer>
-      <FoundationTable columns={columns} rows={TEXT_COLORS} keyBy={(row) => row.token} />
     </StoryContainer>
   );
 };
