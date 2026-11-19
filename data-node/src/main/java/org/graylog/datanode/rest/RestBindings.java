@@ -28,5 +28,6 @@ public class RestBindings extends Graylog2Module {
         addSystemRestResource(CertificatesController.class);
         addSystemRestResource(OpensearchLockCheckController.class);
         addSystemRestResource(MetricsController.class);
+        addSystemRestResource(RepositoryClientsController.class);
     }
 }
