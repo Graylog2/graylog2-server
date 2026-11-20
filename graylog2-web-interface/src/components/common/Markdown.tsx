@@ -100,10 +100,10 @@ const mergeTransformer =
     return undefined;
   };
 
-// A table wider than its container scrolls instead of squeezing its columns.
+// Narrow tables are centered; a table wider than its container scrolls instead of squeezing its columns.
 const SpacedTable = styled(Table)(
   ({ theme }) => css`
-    margin: ${theme.spacings.xs} 0;
+    margin: ${theme.spacings.xs} auto;
     width: auto;
   `,
 );

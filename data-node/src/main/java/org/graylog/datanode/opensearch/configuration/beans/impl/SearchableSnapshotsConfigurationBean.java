@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -84,10 +85,15 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
     public DatanodeConfigurationPart buildConfigurationPart(OpensearchConfigurationParams configurationParams) {
         final String searchableSnapshotsRole = configurationParams.datanodeConfiguration().opensearchDistribution().distributionProperties().searchableSnapshotsRole();
 
-        final List<RepositoryConfiguration> enabledRepositories = repositoryProviders.stream()
-                .flatMap(provider -> provider.get().stream())
-                .filter(RepositoryConfiguration::isRepositoryEnabled)
-                .toList();
+        final List<RepositoryConfiguration> enabledRepositories = new ArrayList<>();
+        boolean requiredRepositories = false;
+        for (RepositoryConfigurationProvider provider : repositoryProviders) {
+            final List<RepositoryConfiguration> enabled = provider.get().stream()
+                    .filter(RepositoryConfiguration::isRepositoryEnabled)
+                    .toList();
+            enabledRepositories.addAll(enabled);
+            requiredRepositories |= !enabled.isEmpty() && !provider.isOptional();
+        }
 
         if (!enabledRepositories.isEmpty()) {
             LOG.info("Searchable snapshots are configured, adding opensearch configuration");
@@ -96,7 +102,16 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
             final boolean searchRoleEnabled = searchRoleEnabled(searchableSnapshotsRole);
             if (searchRoleEnabled) {
                 LOG.info("Search role enabled, validating usable space and adding search role to opensearch configuration");
-                validateUsableSpace();
+                try {
+                    validateUsableSpace();
+                } catch (OpensearchConfigurationException | PreflightCheckException e) {
+                    if (requiredRepositories || searchRoleExplicitlyConfigured(searchableSnapshotsRole)) {
+                        throw e;
+                    }
+                    LOG.error("Skipping the optional snapshot repositories, opensearch starts without the {} role. {}",
+                            searchableSnapshotsRole, e.getMessage());
+                    return DatanodeConfigurationPart.builder().build();
+                }
                 builder.addNodeRole(searchableSnapshotsRole);
             }
             return builder
