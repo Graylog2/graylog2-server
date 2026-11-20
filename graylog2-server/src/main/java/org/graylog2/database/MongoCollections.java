@@ -125,7 +125,7 @@ public class MongoCollections {
 
     /**
      * Provides bucket counts, e.g. for slicing, over the documents of any collection. It doesn't check permissions:
-     * to aggregate on behalf of a user, use {@link org.graylog2.database.aggregation.PermittedAggregator}.
+     * to aggregate on behalf of a user, use {@link org.graylog2.database.aggregation.PermittedAggregators}.
      */
     public MongoAggregator aggregator(final String collectionName) {
         return new MongoAggregator(mongoConnection.getMongoDatabase().getCollection(collectionName, Document.class));

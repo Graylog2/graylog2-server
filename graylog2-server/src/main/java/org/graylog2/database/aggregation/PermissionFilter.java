@@ -16,6 +16,7 @@
  */
 package org.graylog2.database.aggregation;
 
+import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
@@ -29,7 +30,7 @@ import java.util.Objects;
  * {@link #unrestricted()}.
  *
  * @see CatalogPermissionFilters
- * @see PermittedAggregator
+ * @see PermittedAggregators
  *
  * @param filter matches the documents the user may read; should be backed by an index
  */
@@ -44,5 +45,13 @@ public record PermissionFilter(Bson filter) {
 
     public static PermissionFilter unrestricted() {
         return new PermissionFilter(new Document());
+    }
+
+    public boolean isUnrestricted() {
+        return switch (filter) {
+            case Document document -> document.isEmpty();
+            case BsonDocument document -> document.isEmpty();
+            default -> false;
+        };
     }
 }
