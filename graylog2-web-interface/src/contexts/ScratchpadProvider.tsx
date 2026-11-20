@@ -68,6 +68,7 @@ export const ScratchpadProvider = ({ children, loginName }: Props) => {
     actionKey: 'show-scratchpad-modal',
     callback: () => scratchpadContextValue.setScratchpadVisibility(true),
     scope: 'general',
+    options: { useKey: true },
     dependencies: [scratchpadContextValue],
   });
 

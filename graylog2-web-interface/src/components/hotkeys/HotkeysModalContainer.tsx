@@ -29,6 +29,7 @@ const HotkeysModalContainer = () => {
     actionKey: 'show-hotkeys-modal',
     callback: () => setShowHotkeysModal(true),
     scope: 'general',
+    options: { useKey: true },
   });
 
   if (!showHotkeysModal) {

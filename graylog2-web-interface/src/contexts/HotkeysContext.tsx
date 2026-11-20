@@ -51,6 +51,7 @@ export type Options = {
   preventDefault?: Trigger; // Prevent default browser behavior? (Default: false)
   displayInOverview?: boolean;
   splitKey?: string;
+  useKey?: boolean; // Match `event.key` instead of `event.code`, e.g. for symbols like `?`. (Default: false)
 };
 export type ActiveHotkey = {
   options?: Options & { scope: ScopeName };
