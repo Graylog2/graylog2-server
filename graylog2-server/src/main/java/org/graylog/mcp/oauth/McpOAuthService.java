@@ -305,13 +305,24 @@ public class McpOAuthService {
         final String effectiveResource = validateResource(resource, token.resource());
         final User user = loadAuthorizedUser(token.userId());
 
-        // Only consume the token once the refresh is going to succeed, so rejected refreshes can be retried
-        final String newRefreshToken = rotateRefreshToken(token, client, user, effectiveResource, now);
-        final TokenResponse response = new TokenResponse(createAccessToken(client, user), config().oauthAccessTokenTtl().toSeconds(), newRefreshToken);
+        final AccessToken accessToken = createAccessToken(client, user);
+        final String newRefreshToken;
+        try {
+            // Only consume the token once the refresh is going to succeed, so rejected refreshes can be retried
+            newRefreshToken = rotateRefreshToken(token, client, user, effectiveResource, now, accessToken.getId());
+        } catch (RuntimeException e) {
+            accessTokenService.deleteById(accessToken.getId());
+            throw e;
+        }
+        final TokenResponse response = new TokenResponse(accessToken.getToken(), config().oauthAccessTokenTtl().toSeconds(), newRefreshToken);
         // Revocations delete the used token too, so its absence means a revocation might have missed the new tokens
         if (refreshTokenService.findByHash(tokenHash).isEmpty()) {
             revokeTokens(token.username(), token.clientId());
             throw OAuthException.of(INVALID_GRANT, "Authorization was revoked");
+        }
+        if (token.accessTokenId() != null) {
+            // Not destroy(), its deletion event would revoke the whole grant
+            accessTokenService.deleteById(token.accessTokenId());
         }
         auditEventSender.success(AuditActor.user(user), MCP_OAUTH_TOKEN_REFRESH, clientContext(client));
         return response;
@@ -365,22 +376,21 @@ public class McpOAuthService {
     }
 
     private TokenResponse issueTokens(OAuthClient client, User user, @Nullable String resource) {
-        final String accessToken = createAccessToken(client, user);
-        final String refreshToken = createRefreshToken(client, user, resource, Instant.now(clock));
-        return new TokenResponse(accessToken, config().oauthAccessTokenTtl().toSeconds(), refreshToken);
+        final AccessToken accessToken = createAccessToken(client, user);
+        final String refreshToken = createRefreshToken(client, user, resource, Instant.now(clock), accessToken.getId());
+        return new TokenResponse(accessToken.getToken(), config().oauthAccessTokenTtl().toSeconds(), refreshToken);
     }
 
-    private String createAccessToken(OAuthClient client, User user) {
-        final AccessToken accessToken = accessTokenService.create(
+    private AccessToken createAccessToken(OAuthClient client, User user) {
+        return accessTokenService.create(
                 user.getName(),
                 f("MCP: %s", client.clientName()),
                 PeriodDuration.of(config().oauthAccessTokenTtl()),
                 client.clientId()
         );
-        return accessToken.getToken();
     }
 
-    private String createRefreshToken(OAuthClient client, User user, @Nullable String resource, Instant now) {
+    private String createRefreshToken(OAuthClient client, User user, @Nullable String resource, Instant now, String accessTokenId) {
         final String refreshToken = OAuthTokens.generate();
         refreshTokenService.create(new OAuthRefreshToken(
                 null,
@@ -389,6 +399,7 @@ public class McpOAuthService {
                 user.getId(),
                 user.getName(),
                 resource,
+                accessTokenId,
                 null,
                 null,
                 now,
@@ -401,11 +412,11 @@ public class McpOAuthService {
      * Exchanges a refresh token for its successor. Refreshes within the grace period get the same successor, so a
      * grant never forks into parallel token chains that would escape replay detection.
      */
-    private String rotateRefreshToken(OAuthRefreshToken token, OAuthClient client, User user, @Nullable String resource, Instant now) {
+    private String rotateRefreshToken(OAuthRefreshToken token, OAuthClient client, User user, @Nullable String resource, Instant now, String accessTokenId) {
         OAuthRefreshToken used = token;
         if (token.usedAt() == null) {
             // Stored before marking the token used, so the successor exists before any concurrent refresh can return it
-            final String successor = createRefreshToken(client, user, resource, now);
+            final String successor = createRefreshToken(client, user, resource, now, accessTokenId);
             if (refreshTokenService.markUsed(token.tokenHash(), now, cipher.encrypt(successor)).isPresent()) {
                 return successor;
             }
