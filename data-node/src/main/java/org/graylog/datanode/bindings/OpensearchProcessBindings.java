@@ -31,6 +31,7 @@ import org.graylog.datanode.metrics.ConfigureMetricsIndexSettings;
 import org.graylog.datanode.opensearch.OpensearchProcess;
 import org.graylog.datanode.opensearch.OpensearchProcessImpl;
 import org.graylog.datanode.opensearch.OpensearchProcessService;
+import org.graylog.datanode.opensearch.configuration.ManagedClusterSettingsApplier;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
 import org.graylog.datanode.opensearch.configuration.OpensearchUsableSpace;
 import org.graylog.datanode.opensearch.configuration.OpensearchUsableSpaceProvider;
@@ -104,6 +105,7 @@ public class OpensearchProcessBindings extends AbstractModule {
         tracerBinder.addBinding().to(ConfigureMetricsIndexSettings.class).asEagerSingleton();
         tracerBinder.addBinding().to(OpensearchVersionTracer.class).asEagerSingleton();
         tracerBinder.addBinding().to(ManagedConfigurationAppliedTracer.class).asEagerSingleton();
+        tracerBinder.addBinding().to(ManagedClusterSettingsApplier.class).asEagerSingleton();
 
         bind(ManagedConfigurationApplier.class).asEagerSingleton();
     }

@@ -24,6 +24,7 @@ import org.graylog.datanode.opensearch.OpensearchStartRequestedEvent;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
 import org.graylog2.configuration.managed.ManagedConfigurationApplier;
+import org.graylog2.configuration.managed.NodeConfigurationReporter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -37,6 +38,7 @@ import java.nio.file.Path;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -57,6 +59,8 @@ class OpensearchConfigurationServiceTest {
     private OpensearchDistribution opensearchDistribution;
     @Mock
     private ManagedConfigurationApplier managedConfigurationApplier;
+    @Mock
+    private NodeConfigurationReporter nodeConfigurationReporter;
 
     private OpensearchConfigurationService service;
 
@@ -68,7 +72,7 @@ class OpensearchConfigurationServiceTest {
 
         service = new OpensearchConfigurationService(localConfiguration, datanodeConfigurationProvider,
                 Set.<DatanodeConfigurationBean<OpensearchConfigurationParams>>of(), eventBus, opensearchUpgradeAction,
-                managedConfigurationApplier);
+                managedConfigurationApplier, nodeConfigurationReporter);
     }
 
     @Test
@@ -79,6 +83,14 @@ class OpensearchConfigurationServiceTest {
 
         inOrder.verify(managedConfigurationApplier).prepareProcessStart();
         inOrder.verify(eventBus).post(any(OpensearchConfigurationChangeEvent.class));
+    }
+
+    @Test
+    void reportsTheNodeRolesOpensearchIsStartedWith() {
+        service.onStartRequested(new OpensearchStartRequestedEvent());
+
+        // No configuration beans, so no roles
+        verify(nodeConfigurationReporter).reportResolvedValue(eq("node_roles"), eq(""));
     }
 
     @Test

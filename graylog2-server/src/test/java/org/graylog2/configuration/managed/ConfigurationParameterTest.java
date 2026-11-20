@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ConfigurationParameterTest {
 
@@ -91,5 +92,16 @@ class ConfigurationParameterTest {
         assertThat(parameter.backing()).isEqualTo(ParameterBacking.CONFIG_FILE);
         assertThat(parameter.scope()).isEqualTo(ParameterScope.NODE);
         assertThat(parameter.requiresRestart()).isTrue();
+    }
+
+
+    @Test
+    void rejectsLiveParametersWhichAreNotClusterWide() {
+        final var builder = ConfigurationParameter.builder(NodeType.DATANODE, "a.setting", "A setting")
+                .backing(ParameterBacking.RUNTIME).requiresRestart(false).scope(ParameterScope.NODE);
+
+        assertThatThrownBy(builder::build)
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("cluster wide");
     }
 }

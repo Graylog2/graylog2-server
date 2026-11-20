@@ -29,6 +29,7 @@ import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationPara
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
 import org.graylog2.configuration.managed.ManagedConfigurationApplier;
+import org.graylog2.configuration.managed.NodeConfigurationReporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +41,7 @@ import java.util.stream.Collectors;
 public class OpensearchConfigurationService extends AbstractIdleService {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpensearchConfigurationService.class);
+    private static final String NODE_ROLES = "node_roles";
 
     private final Configuration localConfiguration;
     private final DatanodeConfigurationProvider datanodeConfigurationProvider;
@@ -47,6 +49,7 @@ public class OpensearchConfigurationService extends AbstractIdleService {
     private final EventBus eventBus;
     private final OpensearchUpgradeAction opensearchUpgradeAction;
     private final ManagedConfigurationApplier managedConfigurationApplier;
+    private final NodeConfigurationReporter nodeConfigurationReporter;
 
     @Inject
     public OpensearchConfigurationService(final Configuration localConfiguration,
@@ -54,13 +57,15 @@ public class OpensearchConfigurationService extends AbstractIdleService {
                                           final Set<DatanodeConfigurationBean<OpensearchConfigurationParams>> opensearchConfigurationBeans,
                                           final EventBus eventBus,
                                           OpensearchUpgradeAction  opensearchUpgradeAction,
-                                          final ManagedConfigurationApplier managedConfigurationApplier) {
+                                          final ManagedConfigurationApplier managedConfigurationApplier,
+                                          final NodeConfigurationReporter nodeConfigurationReporter) {
         this.localConfiguration = localConfiguration;
         this.datanodeConfigurationProvider = datanodeConfigurationProvider;
         this.opensearchConfigurationBeans = opensearchConfigurationBeans;
         this.eventBus = eventBus;
         this.opensearchUpgradeAction = opensearchUpgradeAction;
         this.managedConfigurationApplier = managedConfigurationApplier;
+        this.nodeConfigurationReporter = nodeConfigurationReporter;
         eventBus.register(this);
     }
 
@@ -127,6 +132,20 @@ public class OpensearchConfigurationService extends AbstractIdleService {
         // the process is about to be (re)started, so this is where values stored through the web interface have to
         // reach the configuration beans the opensearch configuration is built from
         managedConfigurationApplier.prepareProcessStart();
-        eventBus.post(new OpensearchConfigurationChangeEvent(get()));
+        final OpensearchConfiguration configuration = get();
+        reportNodeRoles(configuration);
+        eventBus.post(new OpensearchConfigurationChangeEvent(configuration));
+    }
+
+    /**
+     * The roles opensearch starts with can differ from the configured ones, e.g. by the role for searchable snapshots
+     * (search or warm, depending on the opensearch version), which is added when a snapshot repository is configured.
+     */
+    private void reportNodeRoles(OpensearchConfiguration configuration) {
+        try {
+            nodeConfigurationReporter.reportResolvedValue(NODE_ROLES, String.join(",", configuration.opensearchRoles()));
+        } catch (Exception e) {
+            LOG.warn("Couldn't report the node roles opensearch is started with.", e);
+        }
     }
 }
