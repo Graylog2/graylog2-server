@@ -17,12 +17,14 @@
 package org.graylog.events.processor.aggregation;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.graph.MutableGraph;
+import org.graylog.events.conditions.BooleanNumberConditionsVisitor;
 import org.graylog.events.contentpack.entities.AggregationEventProcessorConfigEntity;
 import org.graylog.events.contentpack.entities.EventProcessorConfigEntity;
 import org.graylog.events.contentpack.entities.SeriesSpecEntity;
@@ -36,6 +38,9 @@ import org.graylog.plugins.views.search.Parameter;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.HasField;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Cardinality;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
 import org.graylog.scheduler.JobSchedule;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.schedule.CronJobSchedule;
@@ -55,6 +60,7 @@ import org.joda.time.DateTime;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -231,6 +237,33 @@ public abstract class AggregationEventProcessorConfig implements EventProcessorC
         public abstract Builder cronTimezone(String cronTimezone);
 
         public abstract AggregationEventProcessorConfig build();
+    }
+
+    /**
+     * Whether a window without messages creates an event, as with {@code count() < 1}. Such definitions detect an
+     * ingestion outage, so they keep running while every node is idle.
+     */
+    @JsonIgnore
+    public boolean firesOnEmptyWindow() {
+        // With group_by, an empty window has no rows and so creates no events.
+        if (!groupBy().isEmpty() || series().isEmpty()) {
+            return false;
+        }
+        final Map<String, Double> emptyValues = series().stream()
+                .collect(Collectors.toMap(SeriesSpec::id, AggregationEventProcessorConfig::emptyWindowValue, (a, b) -> a));
+        try {
+            return conditions().flatMap(AggregationConditions::expression)
+                    .map(expr -> expr.accept(new BooleanNumberConditionsVisitor(emptyValues)))
+                    .orElse(false);
+        } catch (IllegalArgumentException e) {
+            // A condition referencing an unknown series never matches a real result either.
+            return false;
+        }
+    }
+
+    // Matches what PivotAggregationSearch reads for an empty window: zero for counting functions, NaN for null results.
+    private static double emptyWindowValue(SeriesSpec series) {
+        return series instanceof Count || series instanceof Cardinality || series instanceof Sum ? 0 : Double.NaN;
     }
 
     private boolean isConditionsEmpty() {

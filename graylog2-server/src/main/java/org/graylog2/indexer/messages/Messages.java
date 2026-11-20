@@ -142,7 +142,11 @@ public class Messages {
 
         final IndexingResults finalResults = retryBlockResults.mergeWith(indexingResults.successes(), List.of());
 
-        recordTimestamp(finalResults.successes());
+        // The processing status tracks how far received messages have been indexed. System traffic such as events
+        // never passes through the journal, so recording it would make a backlogged or idle node look up to date.
+        if (!isSystemTraffic) {
+            recordTimestamp(finalResults.successes());
+        }
         accountTotalMessageSizes(finalResults.successes(), isSystemTraffic);
 
         if (!finalResults.errors().isEmpty()) {

@@ -1,0 +1,4 @@
+type = "f"
+message = "Fixed system traffic incorrectly advancing the `post_indexing` timestamp that is used to prevent event definitions from running when the cluster has not yet processed messages in their search windows."
+
+pulls = ["28286"]

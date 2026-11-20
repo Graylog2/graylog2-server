@@ -36,6 +36,7 @@ import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Cardinality;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Latest;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Sum;
@@ -367,5 +368,57 @@ public class AggregationEventProcessorConfigTest {
 
         assertThat(dbService.get("54e3deadbeefdeadbeefafff")).get().satisfies(definition ->
                 assertThat(definition.config().validate(userContext).getErrors()).containsKey("streams"));
+    }
+
+    @Test
+    public void firesOnEmptyWindowForAbsenceConditions() {
+        final SeriesSpec count = Count.builder().id("count").build();
+        final SeriesSpec sum = Sum.builder().id("sum").field("bytes").build();
+        final SeriesSpec avg = Average.builder().id("avg").field("took_ms").build();
+
+        assertThat(emptyWindowConfig(List.of(count), Expr.Lesser.create(ref("count"), value(1))).firesOnEmptyWindow()).isTrue();
+        assertThat(emptyWindowConfig(List.of(count), Expr.Equal.create(ref("count"), value(0))).firesOnEmptyWindow()).isTrue();
+        assertThat(emptyWindowConfig(List.of(count), Expr.Not.create(Expr.Greater.create(ref("count"), value(0)))).firesOnEmptyWindow()).isTrue();
+        assertThat(emptyWindowConfig(List.of(sum), Expr.Lesser.create(ref("sum"), value(100))).firesOnEmptyWindow()).isTrue();
+        assertThat(emptyWindowConfig(List.of(count, avg), Expr.Or.create(
+                Expr.Lesser.create(ref("count"), value(1)),
+                Expr.Greater.create(ref("avg"), value(5)))).firesOnEmptyWindow()).isTrue();
+    }
+
+    @Test
+    public void doesNotFireOnEmptyWindowForPresenceConditions() {
+        final SeriesSpec count = Count.builder().id("count").build();
+        final SeriesSpec avg = Average.builder().id("avg").field("took_ms").build();
+
+        assertThat(emptyWindowConfig(List.of(count), Expr.Greater.create(ref("count"), value(10))).firesOnEmptyWindow()).isFalse();
+        // An empty window yields NaN for avg, which matches no comparison.
+        assertThat(emptyWindowConfig(List.of(avg), Expr.Lesser.create(ref("avg"), value(5))).firesOnEmptyWindow()).isFalse();
+        assertThat(emptyWindowConfig(List.of(count), Expr.Lesser.create(ref("unknown"), value(1))).firesOnEmptyWindow()).isFalse();
+    }
+
+    @Test
+    public void doesNotFireOnEmptyWindowWithGroupByOrWithoutSeries() {
+        final SeriesSpec count = Count.builder().id("count").build();
+
+        assertThat(emptyWindowConfig(List.of(count), Expr.Lesser.create(ref("count"), value(1))).toBuilder()
+                .groupBy(List.of("source"))
+                .build()
+                .firesOnEmptyWindow()).isFalse();
+        assertThat(getConfig().firesOnEmptyWindow()).isFalse();
+    }
+
+    private AggregationEventProcessorConfig emptyWindowConfig(List<SeriesSpec> series, BooleanExpression expression) {
+        return getConfig().toBuilder()
+                .series(series)
+                .conditions(AggregationConditions.builder().expression(expression).build())
+                .build();
+    }
+
+    private static Expr.NumberReference ref(String seriesId) {
+        return Expr.NumberReference.create(seriesId);
+    }
+
+    private static Expr.NumberValue value(double value) {
+        return Expr.NumberValue.create(value);
     }
 }

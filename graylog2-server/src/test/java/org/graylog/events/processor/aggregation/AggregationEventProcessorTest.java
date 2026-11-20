@@ -65,6 +65,7 @@ import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.graylog2.plugin.streams.Stream.NON_MESSAGE_STREAM_IDS;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
@@ -119,7 +120,7 @@ public class AggregationEventProcessorTest {
     }
     @Test
     public void createEventsWithFilter() throws Exception {
-        when(eventProcessorDependencyCheck.hasMessagesIndexedUpTo(any(TimeRange.class))).thenReturn(true);
+        when(eventProcessorDependencyCheck.hasMessagesIndexedUpTo(any(TimeRange.class), anyBoolean())).thenReturn(true);
         when(streamService.getSystemStreamIds(false)).thenReturn(NON_MESSAGE_STREAM_IDS);
 
         final DateTime now = DateTime.now(DateTimeZone.UTC);
@@ -179,7 +180,7 @@ public class AggregationEventProcessorTest {
                 eventProcessorDependencyCheck, stateService, moreSearch, eventStreamService, messages, permittedStreams, Set.of(), messageFactory);
 
         // If the dependency check returns true, there should be no exception raised and the state service should be called
-        when(eventProcessorDependencyCheck.hasMessagesIndexedUpTo(timerange)).thenReturn(true);
+        when(eventProcessorDependencyCheck.hasMessagesIndexedUpTo(eq(timerange), eq(false))).thenReturn(true);
         when(streamService.getSystemStreamIds(false)).thenReturn(NON_MESSAGE_STREAM_IDS);
         assertThatCode(() -> eventProcessor.createEvents(eventFactory, parameters, (events) -> {})).doesNotThrowAnyException();
 
@@ -197,7 +198,7 @@ public class AggregationEventProcessorTest {
         reset(stateService, moreSearch, searchFactory); // Rest mocks so we can verify it again
 
         // If the dependency check returns false, a precondition exception should be raised and the state service not be called
-        when(eventProcessorDependencyCheck.hasMessagesIndexedUpTo(timerange)).thenReturn(false);
+        when(eventProcessorDependencyCheck.hasMessagesIndexedUpTo(eq(timerange), eq(false))).thenReturn(false);
 
         assertThatCode(() -> eventProcessor.createEvents(eventFactory, parameters, (events) -> {}))
                 .hasMessageContaining(eventDefinitionDto.title())
