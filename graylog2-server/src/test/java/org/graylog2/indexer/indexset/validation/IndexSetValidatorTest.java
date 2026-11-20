@@ -24,6 +24,8 @@ import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
@@ -49,6 +51,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.indexer.indexset.IndexSetConfig.DEFAULT_INDEX_TEMPLATE_TYPE;
 import static org.graylog2.indexer.template.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
+import static org.graylog2.indexer.template.IndexTemplateProvider.ILLUMINATE_INDEX_TEMPLATE_TYPE;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -67,11 +70,14 @@ class IndexSetValidatorTest {
     @Mock
     private DataTieringChecker dataTieringChecker;
 
+    @Mock
+    private IndexFieldTypeProfileService profileService;
+
     private IndexSetValidator validator;
 
     @BeforeEach
     void setUp() {
-        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker, Set.of());
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker, Set.of(), profileService);
     }
 
     @Test
@@ -140,6 +146,7 @@ class IndexSetValidatorTest {
         when(indexSetRegistry.getAllIndexSets()).thenReturn(Collections.singleton(indexSet));
         when(indexSet.getIndexPrefix()).thenReturn("foo");
         when(newConfig.indexPrefix()).thenReturn("graylog_index");
+        when(newConfig.fieldLimit()).thenReturn(null);
 
         when(newConfig.fieldTypeRefreshInterval()).thenReturn(fieldTypeRefreshInterval);
 
@@ -184,6 +191,7 @@ class IndexSetValidatorTest {
         when(indexSet.getIndexPrefix()).thenReturn("foo");
         when(indexSetRegistry.getAllIndexSets()).thenReturn(Collections.singleton(indexSet));
         when(newConfig.indexPrefix()).thenReturn(prefix);
+        when(newConfig.fieldLimit()).thenReturn(null);
         when(newConfig.fieldTypeRefreshInterval()).thenReturn(fieldTypeRefreshInterval);
         when(newConfig.retentionStrategyConfig()).thenReturn(retentionStrategyConfig);
 
@@ -219,7 +227,7 @@ class IndexSetValidatorTest {
         when(indexSet.getIndexPrefix()).thenReturn("foo");
         when(indexSetRegistry.getAllIndexSets()).thenReturn(Collections.singleton(indexSet));
 
-        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker, Set.of());
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker, Set.of(), profileService);
 
         IndexSetConfig config = testIndexSetConfig().toBuilder().dataTieringConfig(mock(DataTieringConfig.class)).build();
         assertThat(validator.validate(config)).hasValueSatisfying(v ->
@@ -233,7 +241,7 @@ class IndexSetValidatorTest {
     void testWarmTierKeywordReserved() {
         IndexSetConfig config = testIndexSetConfig().toBuilder().indexPrefix("warm_").build();
 
-        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker, Set.of());
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker, Set.of(), profileService);
 
         assertThat(validator.validate(config)).hasValueSatisfying(v ->
                 assertThat(v.message()).contains("contains reserved keyword 'warm_'!"));
@@ -245,7 +253,7 @@ class IndexSetValidatorTest {
         when(indexSetRegistry.getAllIndexSets()).thenReturn(Collections.singleton(indexSet));
         when(indexSet.getIndexPrefix()).thenReturn("foo");
 
-        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker, Set.of());
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker, Set.of(), profileService);
         IndexSetConfig config = testIndexSetConfig().toBuilder().indexTemplateType(EVENT_TEMPLATE_TYPE).fieldTypeProfile("smth").build();
         assertThat(validator.validate(config)).hasValueSatisfying(v ->
                 assertThat(v.message()).contains("Profiles cannot be set for events and failures index sets"));
@@ -273,7 +281,7 @@ class IndexSetValidatorTest {
         when(indexSetRegistry.getAllIndexSets()).thenReturn(Collections.singleton(indexSet));
         when(indexSet.getIndexPrefix()).thenReturn("foo");
 
-        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker, Set.of());
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker, Set.of(), profileService);
         IndexSetConfig config = testIndexSetConfig().toBuilder().indexTemplateType(EVENT_TEMPLATE_TYPE)
                 .customFieldMappings(new CustomFieldMappings(List.of(new CustomFieldMapping("john", "long"))))
                 .build();
@@ -298,6 +306,73 @@ class IndexSetValidatorTest {
         config = testIndexSetConfig().toBuilder().indexTemplateType(DEFAULT_INDEX_TEMPLATE_TYPE)
                 .customFieldMappings(new CustomFieldMappings(List.of(new CustomFieldMapping("john", "long"))))
                 .build();
+        assertThat(validator.validate(config)).isEmpty();
+    }
+
+    @Test
+    void testValidationOfFieldLimitInIndexSetConfig() {
+        final IndexSet indexSet = mock(IndexSet.class);
+        when(indexSetRegistry.getAllIndexSets()).thenReturn(Collections.singleton(indexSet));
+        when(indexSet.getIndexPrefix()).thenReturn("foo");
+
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker, Set.of(), profileService);
+        IndexSetConfig config = testIndexSetConfig().toBuilder().indexTemplateType(EVENT_TEMPLATE_TYPE).fieldLimit(1500).build();
+        assertThat(validator.validate(config)).hasValueSatisfying(v ->
+                assertThat(v.message()).contains("A field limit cannot be set for events, failures and collector logs index sets"));
+
+        config = testIndexSetConfig().toBuilder().indexTemplateType(EVENT_TEMPLATE_TYPE).fieldLimit(null).build();
+        assertThat(validator.validate(config)).isEmpty();
+
+        config = testIndexSetConfig().toBuilder().indexTemplateType(DEFAULT_INDEX_TEMPLATE_TYPE).fieldLimit(1500).build();
+        assertThat(validator.validate(config)).isEmpty();
+
+        config = testIndexSetConfig().toBuilder().indexTemplateType(ILLUMINATE_INDEX_TEMPLATE_TYPE).fieldLimit(1500).build();
+        assertThat(validator.validate(config)).isEmpty();
+    }
+
+    @Test
+    void testValidationOfDynamicMappingDisabledInIndexSetConfig() {
+        final IndexSet indexSet = mock(IndexSet.class);
+        when(indexSetRegistry.getAllIndexSets()).thenReturn(Collections.singleton(indexSet));
+        when(indexSet.getIndexPrefix()).thenReturn("foo");
+
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker, Set.of(), profileService);
+        IndexSetConfig config = testIndexSetConfig().toBuilder().indexTemplateType(EVENT_TEMPLATE_TYPE).dynamicMappingDisabled(true).build();
+        assertThat(validator.validate(config)).hasValueSatisfying(v ->
+                assertThat(v.message()).contains("Dynamic mapping cannot be disabled for events, failures and collector logs index sets"));
+
+        config = testIndexSetConfig().toBuilder().indexTemplateType(EVENT_TEMPLATE_TYPE).dynamicMappingDisabled(false).build();
+        assertThat(validator.validate(config)).isEmpty();
+
+        when(profileService.get("smth")).thenReturn(Optional.of(mock(IndexFieldTypeProfile.class)));
+        config = testIndexSetConfig().toBuilder().indexTemplateType(DEFAULT_INDEX_TEMPLATE_TYPE).dynamicMappingDisabled(true).fieldTypeProfile("smth").build();
+        assertThat(validator.validate(config)).isEmpty();
+    }
+
+    @Test
+    void testDynamicMappingCanOnlyBeDisabledWithProfile() {
+        final IndexSet indexSet = mock(IndexSet.class);
+        when(indexSetRegistry.getAllIndexSets()).thenReturn(Collections.singleton(indexSet));
+        when(indexSet.getIndexPrefix()).thenReturn("foo");
+
+        this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker, Set.of(), profileService);
+        IndexSetConfig config = testIndexSetConfig().toBuilder().indexTemplateType(DEFAULT_INDEX_TEMPLATE_TYPE).dynamicMappingDisabled(true).fieldTypeProfile(null).build();
+        assertThat(validator.validate(config)).hasValueSatisfying(v ->
+                assertThat(v.message()).contains("Dynamic mapping can only be disabled for index sets with a field type profile"));
+
+        config = testIndexSetConfig().toBuilder().indexTemplateType(DEFAULT_INDEX_TEMPLATE_TYPE).dynamicMappingDisabled(true).fieldTypeProfile("").build();
+        assertThat(validator.validate(config)).hasValueSatisfying(v ->
+                assertThat(v.message()).contains("Dynamic mapping can only be disabled for index sets with a field type profile"));
+
+        config = testIndexSetConfig().toBuilder().indexTemplateType(DEFAULT_INDEX_TEMPLATE_TYPE).dynamicMappingDisabled(true).fieldTypeProfile("missing").build();
+        assertThat(validator.validate(config)).hasValueSatisfying(v ->
+                assertThat(v.message()).contains("<missing> does not exist"));
+
+        // Illuminate index sets can't have a profile; their fixed field types count as one.
+        config = testIndexSetConfig().toBuilder().indexTemplateType(ILLUMINATE_INDEX_TEMPLATE_TYPE).dynamicMappingDisabled(true).build();
+        assertThat(validator.validate(config)).isEmpty();
+
+        config = testIndexSetConfig().toBuilder().indexTemplateType(DEFAULT_INDEX_TEMPLATE_TYPE).dynamicMappingDisabled(false).fieldTypeProfile(null).build();
         assertThat(validator.validate(config)).isEmpty();
     }
 

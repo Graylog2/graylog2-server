@@ -56,6 +56,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -63,6 +64,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.indexer.indexset.IndexSetConfig.DEFAULT_FIELD_TYPE_REFRESH_INTERVAL;
 import static org.graylog2.indexer.template.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
+import static org.graylog2.indexer.template.IndexTemplateProvider.ILLUMINATE_INDEX_TEMPLATE_TYPE;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
@@ -273,7 +275,7 @@ public class MongoIndexSetServiceTest {
                                 1,
                                 false,
                                 DEFAULT_FIELD_TYPE_REFRESH_INTERVAL,
-                                null, null, null, null
+                                null, null, null, null, null, null, null
                         )
                 );
     }
@@ -310,6 +312,36 @@ public class MongoIndexSetServiceTest {
         assertThat(subscriber.getEvents())
                 .hasSize(1)
                 .containsExactly(IndexSetCreatedEvent.create(savedIndexSetConfig));
+    }
+
+    @Test
+    public void saveKeepsKeptFieldsWithDottedNames() {
+        final List<KeptField> keptFields = List.of(
+                new KeptField("vendor.user.name", Map.of("type", "keyword", "ignore_above", 8191)),
+                new KeptField("vendor_port", Map.of("type", "long")));
+        final IndexSetConfig indexSetConfig = IndexSetConfig.create(
+                "Test 3",
+                null,
+                true, true,
+                "test_3",
+                10,
+                0,
+                MessageCountRotationStrategy.class.getCanonicalName(),
+                MessageCountRotationStrategyConfig.create(10000),
+                NoopRetentionStrategy.class.getCanonicalName(),
+                NoopRetentionStrategyConfig.create(5),
+                ZonedDateTime.of(2016, 10, 4, 12, 0, 0, 0, ZoneOffset.UTC),
+                "standard",
+                "index-template",
+                ILLUMINATE_INDEX_TEMPLATE_TYPE,
+                1,
+                false
+        ).toBuilder().dynamicMappingDisabled(true).keptFields(keptFields).build();
+
+        final IndexSetConfig savedIndexSetConfig = indexSetService.save(indexSetConfig);
+
+        assertThat(indexSetService.get(savedIndexSetConfig.id()))
+                .hasValueSatisfying(config -> assertThat(config.keptFields()).isEqualTo(keptFields));
     }
 
     @Test

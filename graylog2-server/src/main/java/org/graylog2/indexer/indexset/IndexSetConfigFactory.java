@@ -42,7 +42,7 @@ public class IndexSetConfigFactory {
     }
 
     private static DataTieringConfig getDataTieringConfig(IndexSetTemplateConfig defaultConfig) {
-        return defaultConfig.useLegacyRotation() ? null : defaultConfig.dataTieringConfig();
+        return Boolean.TRUE.equals(defaultConfig.useLegacyRotation()) ? null : defaultConfig.dataTieringConfig();
     }
 
     public IndexSetConfig.Builder createDefault() {

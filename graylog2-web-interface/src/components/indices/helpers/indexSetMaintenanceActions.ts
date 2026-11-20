@@ -14,9 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import omit from 'lodash/omit';
+
 import { ClusterDeflector, SystemDeflector, SystemIndexRanges } from '@graylog/server-api';
 
 import { defaultOnError } from 'util/conditional/onError';
+import { updateIndexSet } from 'stores/indices/IndexSetsStore';
+import type { IndexSet } from 'stores/indices/IndexSetsStore';
 
 export const recalculateIndexRanges = (indexSetId: string) =>
   defaultOnError(
@@ -30,3 +34,16 @@ export const cycleActiveWriteIndex = (indexSetId: string) =>
     ClusterDeflector.cycleByindexSetId(indexSetId).then(() => SystemDeflector.deflector(indexSetId)),
     'Cycling deflector failed',
   );
+
+export const saveIndexSetFieldLimit = (indexSet: IndexSet, fieldLimit: number) =>
+  updateIndexSet({
+    ...omit(indexSet, [
+      'index_prefix',
+      'index_analyzer',
+      'creation_date',
+      'can_be_default',
+      'default',
+      'kept_fields_count',
+    ]),
+    field_limit: fieldLimit,
+  } as IndexSet);

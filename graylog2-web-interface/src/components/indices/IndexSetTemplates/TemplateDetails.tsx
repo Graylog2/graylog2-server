@@ -32,6 +32,7 @@ import {
 } from 'components/indices/data-tiering';
 import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
 import usePluginEntities from 'hooks/usePluginEntities';
+import { DEFAULT_FIELD_LIMIT } from 'components/indices/helpers/fieldLimit';
 
 type Props = {
   template: IndexSetTemplate;
@@ -146,6 +147,10 @@ const TemplateDetails = ({ template, showDescription = false }: Props) => {
                   </dd>
                   <dt>Field Type Refresh Interval:</dt>
                   <dd>{formatRefreshInterval(template.index_set_config.field_type_refresh_interval)}</dd>
+                  <dt>Max field count:</dt>
+                  <dd>{template.index_set_config.field_limit ?? `${DEFAULT_FIELD_LIMIT} (default)`}</dd>
+                  <dt>Dynamic index mapping:</dt>
+                  <dd>{template.index_set_config.dynamic_mapping_disabled ? 'Disabled' : 'Enabled'}</dd>
                 </dl>
               </Section>
               <Section title="Rotation & Retention">

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import numeral from 'numeral';
 
 import HideOnCloud from 'util/conditional/HideOnCloud';
@@ -32,8 +32,7 @@ import { IndexerClusterHealthSummary } from 'components/indexers';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 import useParams from 'routing/useParams';
-import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import { fetchIndexSet } from 'stores/indices/IndexSetsStore';
+import useSingleIndexSet from 'components/indices/hooks/useSingleIndexSet';
 import useIndexerOverview from 'hooks/useIndexerOverview';
 import { useIndices } from 'hooks/useIndices';
 
@@ -70,14 +69,12 @@ const ElasticsearchUnavailableInformation = () => {
 
 const IndexSetPage = () => {
   const { indexSetId } = useParams<{ indexSetId?: string }>();
-  const [indexSet, setIndexSet] = useState<IndexSet | undefined>(undefined);
+  const { data: indexSet } = useSingleIndexSet(indexSetId);
   const { data: indexerOverview, error: indexerOverviewError, refetch } = useIndexerOverview(indexSetId);
   const { data: indicesData } = useIndices(indexSetId);
   const { indices: indexDetailsIndices, closedIndices: indexDetailsClosedIndices } = indicesData ?? {};
 
   useEffect(() => {
-    fetchIndexSet(indexSetId).then((response) => setIndexSet(response));
-
     const timerId = setInterval(() => {
       refetch();
     }, REFRESH_INTERVAL);
@@ -85,7 +82,7 @@ const IndexSetPage = () => {
     return () => {
       clearInterval(timerId);
     };
-  }, [indexSetId, refetch]);
+  }, [refetch]);
 
   if (!indexSet) {
     return <Spinner />;

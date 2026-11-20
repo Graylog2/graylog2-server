@@ -35,15 +35,14 @@ const EditTemplate = ({ template }: Props) => {
   const { updateTemplate } = useTemplateMutation();
 
   const onSubmit = useCallback(
-    (newTemplate: IndexSetTemplate) => {
+    (newTemplate: IndexSetTemplate) =>
       updateTemplate({ template: newTemplate, id: template.id }).then(() => {
         sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_TEMPLATE.EDIT, {
           app_action_value: 'edit-index-set-template-edited',
         });
 
         push(Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW);
-      });
-    },
+      }),
     [updateTemplate, push, template.id, sendTelemetry],
   );
 

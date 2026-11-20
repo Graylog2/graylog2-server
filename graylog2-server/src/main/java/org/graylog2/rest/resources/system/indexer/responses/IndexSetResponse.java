@@ -37,6 +37,7 @@ public abstract class IndexSetResponse implements
     private static final String FIELD_DEFAULT = "default";
     private static final String FIELD_CAN_BE_DEFAULT = "can_be_default";
     private static final String FIELD_DATA_TIERING_STATUS = "data_tiering_status";
+    private static final String FIELD_KEPT_FIELDS_COUNT = "kept_fields_count";
 
 
     @JsonProperty(FIELD_DEFAULT)
@@ -49,6 +50,13 @@ public abstract class IndexSetResponse implements
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty(FIELD_DATA_TIERING_STATUS)
     public abstract DataTieringStatus dataTieringStatus();
+
+    /**
+     * The number of fields kept when dynamic mapping was turned off, or null if the index set keeps none.
+     */
+    @Nullable
+    @JsonProperty(FIELD_KEPT_FIELDS_COUNT)
+    public abstract Integer keptFieldsCount();
 
     public static Builder builder() {
         return new AutoValue_IndexSetResponse.Builder();
@@ -78,6 +86,9 @@ public abstract class IndexSetResponse implements
                 .fieldTypeRefreshInterval(indexSetConfig.fieldTypeRefreshInterval())
                 .indexTemplateType(indexSetConfig.indexTemplateType().orElse(null))
                 .fieldTypeProfile(indexSetConfig.fieldTypeProfile())
+                .fieldLimit(indexSetConfig.fieldLimit())
+                .dynamicMappingDisabled(indexSetConfig.dynamicMappingDisabled())
+                .keptFieldsCount(indexSetConfig.keptFields() == null ? null : indexSetConfig.keptFields().size())
                 .dataTieringConfig(indexSetConfig.dataTieringConfig())
                 .useLegacyRotation(indexSetConfig.dataTieringConfig() == null)
                 .dataTieringStatus(dataTieringStatus)
@@ -97,6 +108,8 @@ public abstract class IndexSetResponse implements
         public abstract Builder canBeDefault(boolean canBeDefault);
 
         public abstract Builder dataTieringStatus(@Nullable DataTieringStatus dataTieringStatus);
+
+        public abstract Builder keptFieldsCount(@Nullable Integer keptFieldsCount);
 
         public abstract IndexSetResponse build();
     }

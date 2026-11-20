@@ -116,6 +116,9 @@ public class IndexFieldTypeProfileUsagesServiceTest {
                 new CustomFieldMappings(),
                 profileId,
                 null,
+                null,
+                null,
+                null,
                 null);
     }
 

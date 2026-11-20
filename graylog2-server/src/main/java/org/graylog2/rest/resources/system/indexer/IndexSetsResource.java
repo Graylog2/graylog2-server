@@ -64,6 +64,7 @@ import org.graylog2.indexer.indexset.IndexSetCategoryCounts;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indexset.IndexSetStatsCreator;
+import org.graylog2.indexer.indexset.KeptFieldsCollector;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
 import org.graylog2.indexer.indexset.PaginatedIndexSetService;
 import org.graylog2.indexer.indexset.RotationModel;
@@ -107,6 +108,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -166,6 +168,7 @@ public class IndexSetsResource extends RestResource {
     private final PaginatedIndexSetService paginatedIndexSetService;
     private final StreamService streamService;
     private final EntityPermissionsUtils entityPermissionsUtils;
+    private final KeptFieldsCollector keptFieldsCollector;
 
     @Inject
     public IndexSetsResource(final Indices indices,
@@ -184,7 +187,8 @@ public class IndexSetsResource extends RestResource {
                              final RefreshingLockService.Factory lockServiceFactory,
                              final PaginatedIndexSetService paginatedIndexSetService,
                              final StreamService streamService,
-                             final EntityPermissionsUtils entityPermissionsUtils) {
+                             final EntityPermissionsUtils entityPermissionsUtils,
+                             final KeptFieldsCollector keptFieldsCollector) {
         this.indices = requireNonNull(indices);
         this.indexSetService = requireNonNull(indexSetService);
         this.indexSetRegistry = indexSetRegistry;
@@ -202,6 +206,7 @@ public class IndexSetsResource extends RestResource {
         this.paginatedIndexSetService = requireNonNull(paginatedIndexSetService);
         this.streamService = requireNonNull(streamService);
         this.entityPermissionsUtils = requireNonNull(entityPermissionsUtils);
+        this.keptFieldsCollector = requireNonNull(keptFieldsCollector);
     }
 
     @GET
@@ -440,7 +445,7 @@ public class IndexSetsResource extends RestResource {
                                  @Valid @NotNull IndexSetCreationRequest indexSet) {
         try {
             checkDataTieringNotNull(indexSet.useLegacyRotation(), indexSet.dataTieringConfig());
-            final IndexSetConfig indexSetConfig = indexSetRestrictionsService.createIndexSetConfig(indexSet, isPermitted(RestPermissions.INDEXSETS_FIELD_RESTRICTIONS_EDIT));
+            final IndexSetConfig indexSetConfig = indexSetRestrictionsService.createIndexSetConfig(indexSet, isPermitted(RestPermissions.INDEXSETS_FIELD_RESTRICTIONS_EDIT), isPermitted("*"));
 
             final IndexSetConfig savedObject = validateAndSaveWithRepositoryLock(indexSetConfig);
             final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
@@ -482,36 +487,53 @@ public class IndexSetsResource extends RestResource {
         checkDataTieringNotNull(updateRequest.useLegacyRotation(), updateRequest.dataTieringConfig());
 
         final IndexSetConfig indexSetConfig = indexSetRestrictionsService.updateIndexSetConfig(updateRequest, oldConfig,
-                isPermitted(RestPermissions.INDEXSETS_FIELD_RESTRICTIONS_EDIT));
+                isPermitted(RestPermissions.INDEXSETS_FIELD_RESTRICTIONS_EDIT), isPermitted("*"));
 
-        final IndexSetConfig savedObject = validateAndSaveWithRepositoryLock(indexSetConfig);
+        final IndexSetConfig savedObject = validateAndSaveWithRepositoryLock(indexSetConfig, config -> withKeptFields(oldConfig, config));
 
         return IndexSetResponse.fromIndexSetConfig(savedObject, isDefaultSet, null);
+    }
+
+    /**
+     * Collects the kept fields once, when dynamic mapping turns off, and clears them when it turns back on.
+     */
+    private IndexSetConfig withKeptFields(IndexSetConfig oldConfig, IndexSetConfig newConfig) {
+        if (!Boolean.TRUE.equals(newConfig.dynamicMappingDisabled())) {
+            return newConfig.toBuilder().keptFields(null).build();
+        }
+        if (Boolean.TRUE.equals(oldConfig.dynamicMappingDisabled())) {
+            return newConfig;
+        }
+        return newConfig.toBuilder().keptFields(keptFieldsCollector.collect(newConfig)).build();
+    }
+
+    private IndexSetConfig validateAndSaveWithRepositoryLock(IndexSetConfig indexSetConfig) {
+        return validateAndSaveWithRepositoryLock(indexSetConfig, UnaryOperator.identity());
     }
 
     // Keeps a concurrent repository delete from missing the reference this save adds. Covers operator
     // edits only, internally created index sets inherit their repository from the default template,
     // which is itself a reference that blocks the delete.
-    private IndexSetConfig validateAndSaveWithRepositoryLock(IndexSetConfig indexSetConfig) {
+    private IndexSetConfig validateAndSaveWithRepositoryLock(IndexSetConfig indexSetConfig, UnaryOperator<IndexSetConfig> afterValidation) {
         final Optional<String> repositoryLockId = Optional.ofNullable(indexSetConfig.dataTieringConfig())
                 .flatMap(DataTieringConfig::repositoryLockId);
         if (repositoryLockId.isEmpty()) {
-            return validateAndSave(indexSetConfig);
+            return validateAndSave(indexSetConfig, afterValidation);
         }
         try (RefreshingLockService lockService = lockServiceFactory.create()) {
             lockService.acquireAndKeepLock(repositoryLockId.get(), 1);
-            return validateAndSave(indexSetConfig);
+            return validateAndSave(indexSetConfig, afterValidation);
         } catch (AlreadyLockedException e) {
             throw new ClientErrorException(e.getMessage(), Response.Status.CONFLICT);
         }
     }
 
-    private IndexSetConfig validateAndSave(IndexSetConfig indexSetConfig) {
+    private IndexSetConfig validateAndSave(IndexSetConfig indexSetConfig, UnaryOperator<IndexSetConfig> afterValidation) {
         final Optional<Violation> violation = indexSetValidator.validate(indexSetConfig);
         if (violation.isPresent()) {
             throw new BadRequestException(violation.get().message());
         }
-        return indexSetService.save(indexSetConfig);
+        return indexSetService.save(afterValidation.apply(indexSetConfig));
     }
 
     private void checkDataTieringNotNull(Boolean useLegacyRotation, DataTieringConfig dataTieringConfig) {

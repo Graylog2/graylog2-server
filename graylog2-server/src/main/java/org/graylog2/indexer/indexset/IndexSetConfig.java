@@ -40,6 +40,7 @@ import org.graylog2.indexer.indexset.fields.IndexAnalyzerField;
 import org.graylog2.indexer.indexset.fields.IndexPrefixField;
 import org.graylog2.indexer.indexset.fields.IndexTemplateNameField;
 import org.graylog2.indexer.indexset.fields.IndexTemplateTypeField;
+import org.graylog2.indexer.indexset.fields.KeptFieldsField;
 import org.graylog2.indexer.indexset.fields.ShardsAndReplicasField;
 import org.graylog2.indexer.indexset.restrictions.IndexSetFieldRestriction;
 import org.graylog2.indexer.template.IndexTemplateProvider;
@@ -53,6 +54,7 @@ import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -88,6 +90,7 @@ public abstract class IndexSetConfig implements
         IndexTemplateTypeField,
         IndexPrefixField,
         CustomFieldMappingsField,
+        KeptFieldsField,
         ScopedEntity<IndexSetConfig.Builder> {
     public static final String DEFAULT_INDEX_TEMPLATE_TYPE = MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
 
@@ -100,6 +103,12 @@ public abstract class IndexSetConfig implements
             EVENT_TEMPLATE_TYPE,
             IndexTemplateProvider.FAILURE_TEMPLATE_TYPE,
             IndexTemplateProvider.ILLUMINATE_INDEX_TEMPLATE_TYPE,
+            CollectorLogsIndexTemplateProvider.COLLECTOR_LOGS_TEMPLATE_TYPE
+    );
+
+    private static final Set<String> TEMPLATE_TYPES_IGNORING_FIELD_LIMIT_AND_DYNAMIC_MAPPING = Set.of(
+            EVENT_TEMPLATE_TYPE,
+            IndexTemplateProvider.FAILURE_TEMPLATE_TYPE,
             CollectorLogsIndexTemplateProvider.COLLECTOR_LOGS_TEMPLATE_TYPE
     );
 
@@ -129,7 +138,10 @@ public abstract class IndexSetConfig implements
                                         @JsonProperty(FIELD_CUSTOM_FIELD_MAPPINGS) @Nullable CustomFieldMappings customFieldMappings,
                                         @JsonProperty(FIELD_PROFILE_ID) @ValidObjectId @Nullable String fieldTypeProfile,
                                         @JsonProperty(FIELD_DATA_TIERING) @Nullable DataTieringConfig dataTiering,
-                                        @JsonProperty(FIELD_RESTRICTIONS) @Nullable Map<String, Set<IndexSetFieldRestriction>> fieldRestrictions
+                                        @JsonProperty(FIELD_RESTRICTIONS) @Nullable Map<String, Set<IndexSetFieldRestriction>> fieldRestrictions,
+                                        @JsonProperty(FIELD_FIELD_LIMIT) @Nullable Integer fieldLimit,
+                                        @JsonProperty(FIELD_DYNAMIC_MAPPING_DISABLED) @Nullable Boolean dynamicMappingDisabled,
+                                        @JsonProperty(FIELD_KEPT_FIELDS) @Nullable List<KeptField> keptFields
     ) {
 
         final boolean writableValue = isWritable == null || isWritable;
@@ -171,6 +183,9 @@ public abstract class IndexSetConfig implements
                 .dataTieringConfig(dataTiering)
                 .scope(scope)
                 .fieldRestrictions(fieldRestrictions)
+                .fieldLimit(fieldLimit)
+                .dynamicMappingDisabled(dynamicMappingDisabled)
+                .keptFields(keptFields)
                 .build();
     }
 
@@ -196,7 +211,7 @@ public abstract class IndexSetConfig implements
         return create(id, null, title, description, isWritable, isRegular, indexPrefix, null, null, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
                 indexAnalyzer, indexTemplateName, indexTemplateType, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
-                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings(), null, null, null);
+                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings(), null, null, null, null, null, null);
     }
 
     // Compatibility creator after field type refresh interval has been introduced
@@ -220,7 +235,7 @@ public abstract class IndexSetConfig implements
         return create(null, DefaultEntityScope.NAME, title, description, isWritable, isRegular, indexPrefix, null, null, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
                 indexAnalyzer, indexTemplateName, indexTemplateType, indexOptimizationMaxNumSegments, indexOptimizationDisabled,
-                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings(), null, null, null);
+                DEFAULT_FIELD_TYPE_REFRESH_INTERVAL, new CustomFieldMappings(), null, null, null, null, null, null);
     }
 
     /**
@@ -287,6 +302,11 @@ public abstract class IndexSetConfig implements
         return !this.indexTemplateType().map(TEMPLATE_TYPES_FOR_INDEX_SETS_WITH_IMMUTABLE_FIELD_TYPES::contains).orElse(false);
     }
 
+    @JsonIgnore
+    public boolean canHaveFieldLimitAndDynamicMapping() {
+        return !this.indexTemplateType().map(TEMPLATE_TYPES_IGNORING_FIELD_LIMIT_AND_DYNAMIC_MAPPING::contains).orElse(false);
+    }
+
     @Override
     public int compareTo(IndexSetConfig o) {
         return ComparisonChain.start()
@@ -307,6 +327,7 @@ public abstract class IndexSetConfig implements
             IndexTemplateTypeFieldBuilder<Builder>,
             IndexPrefixFieldBuilder<Builder>,
             CustomFieldMappingsFieldBuilder<Builder>,
+            KeptFieldsFieldBuilder<Builder>,
             ScopedEntity.Builder<Builder> {
 
         @JsonProperty(FIELD_REGULAR)
