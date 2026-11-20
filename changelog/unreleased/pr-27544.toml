@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix 'From Input' pipeline function to support the possible system state of having multiple inputs with the same name/title."
+
+pulls = ["27544"]
