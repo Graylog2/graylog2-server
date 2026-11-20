@@ -408,6 +408,28 @@ public class HttpConfigurationTest {
         assertThat(configuration.getHttpPublishUri()).hasScheme("https");
     }
 
+    @Test
+    public void testHstsDefaults() throws RepositoryException, ValidationException {
+        jadConfig.setRepository(new InMemoryRepository(Map.of())).addConfigurationBean(configuration).process();
+
+        assertThat(configuration.isHttpHstsEnabled()).isFalse();
+        assertThat(configuration.getHttpHstsMaxAge().toSeconds()).isEqualTo(31536000L);
+        assertThat(configuration.isHttpHstsIncludeSubdomains()).isFalse();
+    }
+
+    @Test
+    public void testHstsSettings() throws RepositoryException, ValidationException {
+        final Map<String, String> properties = Map.of(
+                "http_hsts_enabled", "true",
+                "http_hsts_max_age", "30d",
+                "http_hsts_include_subdomains", "true");
+        jadConfig.setRepository(new InMemoryRepository(properties)).addConfigurationBean(configuration).process();
+
+        assertThat(configuration.isHttpHstsEnabled()).isTrue();
+        assertThat(configuration.getHttpHstsMaxAge().toSeconds()).isEqualTo(2592000L);
+        assertThat(configuration.isHttpHstsIncludeSubdomains()).isTrue();
+    }
+
     private static File newFile(File parent, String child) throws IOException {
         File result = new File(parent, child);
         result.createNewFile();
