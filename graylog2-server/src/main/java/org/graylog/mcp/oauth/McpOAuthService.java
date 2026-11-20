@@ -288,7 +288,9 @@ public class McpOAuthService {
         }
         final String tokenHash = OAuthTokens.hash(refreshToken);
         final Instant now = Instant.now(clock);
-        final OAuthRefreshToken token = consumeRefreshToken(tokenHash, now);
+        final OAuthRefreshToken token = refreshTokenService.findByHash(tokenHash)
+                .orElseThrow(() -> OAuthException.of(INVALID_GRANT, "Invalid refresh token"));
+        ensureNotReplayed(token, now);
 
         if (!token.clientId().equals(client.clientId())) {
             throw OAuthException.of(INVALID_GRANT, "Refresh token was issued to another client");
@@ -298,6 +300,13 @@ public class McpOAuthService {
         }
         final String effectiveResource = validateResource(resource, token.resource());
         final User user = loadAuthorizedUser(token.userId());
+
+        // Only consume the token once the refresh is going to succeed, so rejected refreshes can be retried
+        if (token.usedAt() == null && refreshTokenService.markUsed(tokenHash, now).isEmpty()) {
+            final OAuthRefreshToken concurrentlyUsed = refreshTokenService.findByHash(tokenHash)
+                    .orElseThrow(() -> OAuthException.of(INVALID_GRANT, "Authorization was revoked"));
+            ensureNotReplayed(concurrentlyUsed, now);
+        }
 
         final TokenResponse response = issueTokens(client, user, effectiveResource);
         // Revocations delete the used token too, so its absence means a revocation might have missed the new tokens
@@ -384,18 +393,11 @@ public class McpOAuthService {
         return new TokenResponse(accessToken.getToken(), accessTokenTtl.toSeconds(), refreshToken);
     }
 
-    private OAuthRefreshToken consumeRefreshToken(String tokenHash, Instant now) {
-        final Optional<OAuthRefreshToken> unused = refreshTokenService.markUsed(tokenHash, now);
-        if (unused.isPresent()) {
-            return unused.get();
-        }
-        final OAuthRefreshToken used = refreshTokenService.findByHash(tokenHash)
-                .orElseThrow(() -> OAuthException.of(INVALID_GRANT, "Invalid refresh token"));
-        if (used.usedAt() == null || used.usedAt().plus(REFRESH_TOKEN_REUSE_GRACE_PERIOD).isBefore(now)) {
-            handleRefreshTokenReuse(used);
+    private void ensureNotReplayed(OAuthRefreshToken token, Instant now) {
+        if (token.usedAt() != null && token.usedAt().plus(REFRESH_TOKEN_REUSE_GRACE_PERIOD).isBefore(now)) {
+            handleRefreshTokenReuse(token);
             throw OAuthException.of(INVALID_GRANT, "Invalid refresh token");
         }
-        return used;
     }
 
     private void handleRefreshTokenReuse(OAuthRefreshToken token) {

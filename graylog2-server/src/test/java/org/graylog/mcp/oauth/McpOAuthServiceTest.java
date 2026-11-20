@@ -20,6 +20,7 @@ import jakarta.annotation.Nullable;
 import org.graylog.mcp.config.McpConfiguration;
 import org.graylog.security.GranteeAuthorizer;
 import org.graylog2.audit.AuditEventSender;
+import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.AccessToken;
@@ -70,6 +71,7 @@ class McpOAuthServiceTest {
     private OAuthAuthorizationCodeService codeService;
     private OAuthRefreshTokenService refreshTokenService;
     private AccessTokenService accessTokenService;
+    private AuditEventSender auditEventSender;
     private UserService userService;
     private GranteeAuthorizer authorizer;
     private McpOAuthService service;
@@ -80,13 +82,14 @@ class McpOAuthServiceTest {
         codeService = mock(OAuthAuthorizationCodeService.class);
         refreshTokenService = mock(OAuthRefreshTokenService.class);
         accessTokenService = mock(AccessTokenService.class);
+        auditEventSender = mock(AuditEventSender.class);
         userService = mock(UserService.class);
         authorizer = mock(GranteeAuthorizer.class);
         final GranteeAuthorizer.Factory authorizerFactory = mock(GranteeAuthorizer.Factory.class);
         clusterConfigService = mock(ClusterConfigService.class);
         when(clusterConfigService.getOrDefault(eq(McpConfiguration.class), any())).thenReturn(CONFIG);
         service = new McpOAuthService(CLIENT_IDS, codeService, refreshTokenService, accessTokenService, userService,
-                authorizerFactory, mock(AuditEventSender.class), clusterConfigService, Clock.fixed(NOW, ZoneOffset.UTC));
+                authorizerFactory, auditEventSender, clusterConfigService, Clock.fixed(NOW, ZoneOffset.UTC));
 
         user = mock(User.class);
         when(user.getId()).thenReturn("user-id");
@@ -302,7 +305,7 @@ class McpOAuthServiceTest {
     @Test
     void revokesTokensIssuedWhileAuthorizationWasRevoked() {
         when(refreshTokenService.markUsed(OAuthTokens.hash("refresh"), NOW)).thenReturn(Optional.of(refreshToken(null)));
-        when(refreshTokenService.findByHash(OAuthTokens.hash("refresh"))).thenReturn(Optional.empty());
+        when(refreshTokenService.findByHash(OAuthTokens.hash("refresh"))).thenReturn(Optional.of(refreshToken(null)), Optional.empty());
         stubAccessTokenCreation();
 
         assertThatThrownBy(() -> service.refresh(CLIENT.clientId(), "refresh", null))
@@ -341,7 +344,7 @@ class McpOAuthServiceTest {
 
     @Test
     void rejectsRefreshWhenUserLostMcpAccess() {
-        when(refreshTokenService.markUsed(OAuthTokens.hash("refresh"), NOW)).thenReturn(Optional.of(refreshToken(null)));
+        when(refreshTokenService.findByHash(OAuthTokens.hash("refresh"))).thenReturn(Optional.of(refreshToken(null)));
         when(authorizer.isPermitted(RestPermissions.MCP_SERVER_ACCESS)).thenReturn(false);
 
         assertThatThrownBy(() -> service.refresh(CLIENT.clientId(), "refresh", null))
@@ -351,7 +354,7 @@ class McpOAuthServiceTest {
 
     @Test
     void rejectsRefreshWhenUserMayNotCreateTokens() {
-        when(refreshTokenService.markUsed(OAuthTokens.hash("refresh"), NOW)).thenReturn(Optional.of(refreshToken(null)));
+        when(refreshTokenService.findByHash(OAuthTokens.hash("refresh"))).thenReturn(Optional.of(refreshToken(null)));
         when(authorizer.isPermitted(RestPermissions.USERS_TOKENCREATE, "jane")).thenReturn(false);
 
         assertThatThrownBy(() -> service.refresh(CLIENT.clientId(), "refresh", null))
@@ -361,11 +364,51 @@ class McpOAuthServiceTest {
 
     @Test
     void rejectsRefreshForDisabledUser() {
-        when(refreshTokenService.markUsed(OAuthTokens.hash("refresh"), NOW)).thenReturn(Optional.of(refreshToken(null)));
+        when(refreshTokenService.findByHash(OAuthTokens.hash("refresh"))).thenReturn(Optional.of(refreshToken(null)));
         when(user.getAccountStatus()).thenReturn(User.AccountStatus.DISABLED);
 
         assertThatThrownBy(() -> service.refresh(CLIENT.clientId(), "refresh", null))
                 .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_GRANT));
+        verify(refreshTokenService, never()).markUsed(anyString(), any());
+    }
+
+    @Test
+    void rejectedRefreshDoesNotConsumeToken() {
+        final OAuthRefreshToken existing = new OAuthRefreshToken("rt-id", OAuthTokens.hash("refresh"), CLIENT.clientId(), "user-id", "jane",
+                RESOURCE, null, NOW.minusSeconds(3600), NOW.plus(Duration.ofDays(10)));
+        when(refreshTokenService.findByHash(OAuthTokens.hash("refresh"))).thenReturn(Optional.of(existing));
+        when(refreshTokenService.markUsed(OAuthTokens.hash("refresh"), NOW)).thenReturn(Optional.of(existing));
+        stubAccessTokenCreation();
+
+        assertThatThrownBy(() -> service.refresh(CLIENT.clientId(), "refresh", RESOURCE + "/"))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_TARGET));
+        verify(refreshTokenService, never()).markUsed(anyString(), any());
+
+        assertThat(service.refresh(CLIENT.clientId(), "refresh", null).accessToken()).isEqualTo("access-token");
+        verify(refreshTokenService).markUsed(OAuthTokens.hash("refresh"), NOW);
+        verify(refreshTokenService, never()).deleteByUsernameAndClientId(anyString(), anyString());
+    }
+
+    @Test
+    void detectsRefreshTokenReuseBeforeValidatingRequest() {
+        when(refreshTokenService.findByHash(OAuthTokens.hash("refresh"))).thenReturn(Optional.of(refreshToken(
+                NOW.minus(McpOAuthService.REFRESH_TOKEN_REUSE_GRACE_PERIOD).minusSeconds(1))));
+
+        assertThatThrownBy(() -> service.refresh(CLIENT.clientId(), "refresh", "https://other.example.com/api/mcp"))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_GRANT));
+        verify(refreshTokenService).deleteByUsernameAndClientId("jane", CLIENT.clientId());
+        verify(auditEventSender).success(any(), eq(AuditEventTypes.MCP_OAUTH_REFRESH_TOKEN_REUSE), any());
+    }
+
+    @Test
+    void allowsRefreshThatLostRaceWithinGracePeriod() {
+        when(refreshTokenService.findByHash(OAuthTokens.hash("refresh")))
+                .thenReturn(Optional.of(refreshToken(null)), Optional.of(refreshToken(NOW)));
+        when(refreshTokenService.markUsed(OAuthTokens.hash("refresh"), NOW)).thenReturn(Optional.empty());
+        stubAccessTokenCreation();
+
+        assertThat(service.refresh(CLIENT.clientId(), "refresh", null).accessToken()).isEqualTo("access-token");
+        verify(refreshTokenService, never()).deleteByUsernameAndClientId(anyString(), anyString());
     }
 
     @Test
