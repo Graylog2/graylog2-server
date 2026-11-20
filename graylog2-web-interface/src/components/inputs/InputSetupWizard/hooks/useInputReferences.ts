@@ -48,7 +48,7 @@ const useInputReferences = (
   isLoading: boolean;
 } => {
   const { data, isLoading } = useQuery({
-    queryKey: [INPUT_REFERENCES],
+    queryKey: [INPUT_REFERENCES, inputId],
 
     queryFn: () =>
       onError(fetchInputReferences(inputId), (errorThrown: FetchError) => {
