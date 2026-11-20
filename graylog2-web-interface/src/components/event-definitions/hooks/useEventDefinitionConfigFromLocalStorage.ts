@@ -20,6 +20,7 @@ import { useMemo } from 'react';
 import Store from 'logic/local-storage/Store';
 import useQuery from 'routing/useQuery';
 import type { ParameterJson } from 'views/logic/parameters/Parameter';
+import getSeriesId from 'components/event-definitions/event-definition-types/getSeriesId';
 
 export type EventDefinitionLocalStorageConfig = {
   type;
@@ -85,8 +86,7 @@ const useEventDefinitionConfigFromLocalStorage = (): {
     } = parsedLocalStorageConfig;
 
     const details = Object.entries({ title, description, priority }).filter(([, value]) => value !== undefined);
-    // Series as the condition form and the backend name them: by their function's type, and an id made of it and the field.
-    const seriesId = `${agg_function}-${agg_field ?? ''}`;
+    const seriesId = getSeriesId({ type: agg_function, field: agg_field });
     const aggData =
       agg_function && agg_value !== undefined && agg_value !== null && agg_value !== ''
         ? {

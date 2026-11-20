@@ -26,7 +26,7 @@ import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { selectActiveQuery, selectView } from 'views/logic/slices/viewSelectors';
 import { selectGlobalOverride } from 'views/logic/slices/searchExecutionSelectors';
 import { setGlobalOverrideQuery } from 'views/logic/slices/searchExecutionSlice';
-import { executeActiveQuery, updateQueryString, updateViewState } from 'views/logic/slices/viewSlice';
+import { executeActiveQuery, updateQuery, updateQueryString, updateViewState } from 'views/logic/slices/viewSlice';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import View from 'views/logic/views/View';
 import ViewState from 'views/logic/views/ViewState';
@@ -37,13 +37,16 @@ import Series from 'views/logic/aggregationbuilder/Series';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
+import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
+import type Query from 'views/logic/queries/Query';
 import { addWidget } from 'views/logic/slices/widgetActions';
 import { createSearch } from 'fixtures/searches';
 import type Widget from 'views/logic/widgets/Widget';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import TextWidget from 'views/logic/widgets/TextWidget';
+import TextWidgetConfig from 'views/logic/widgets/TextWidgetConfig';
 import EventsWidget from 'views/logic/widgets/events/EventsWidget';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import type { FocusContextState } from 'views/components/contexts/WidgetFocusContext';
@@ -63,6 +66,7 @@ jest.mock('views/logic/slices/searchExecutionSlice', () => ({
 }));
 jest.mock('views/logic/slices/viewSlice', () => ({
   ...jest.requireActual('views/logic/slices/viewSlice'),
+  updateQuery: jest.fn(() => 'updateQuery'),
   updateQueryString: jest.fn(() => 'updateQueryString'),
   updateViewState: jest.fn(() => 'updateViewState'),
   executeActiveQuery: jest.fn(() => 'executeActiveQuery'),
@@ -139,6 +143,28 @@ const mockPageWithBarChart = (widget: Widget = barChart) => {
 
 const updatedViewState = () => asMock(updateViewState).mock.calls[0][1] as ViewState;
 
+const noTestHosts = { type: 'referenced' as const, id: 'f1', title: 'No test hosts', queryString: 'NOT source:test*' };
+
+// A search whose shown query has the given search filters.
+const searchWithFilters = (filters: Array<typeof noTestHosts> = []) => {
+  const search = createSearch({ queryId: 'query-id' }).toBuilder().type(View.Type.Search).build();
+  const query = search.search.queries.first().toBuilder().filters(filters).build();
+
+  return search
+    .toBuilder()
+    .search(search.search.toBuilder().queries([query]).build())
+    .build();
+};
+
+const mockDispatchFor = (view: View) =>
+  asMock(useViewsDispatch).mockReturnValue(
+    jest.fn((action: unknown) =>
+      typeof action === 'function' ? action(jest.fn(), () => ({ view: { activeQuery: 'query-id', view } })) : Promise.resolve(),
+    ) as unknown as ReturnType<typeof useViewsDispatch>,
+  );
+
+const updatedQueryFilters = () => (asMock(updateQuery).mock.calls[0][1] as Query).filters.toArray();
+
 describe('SearchPageAssistantContext', () => {
   const mockState = (view: View, globalOverride?: GlobalOverride) =>
     asMock(useViewsSelector).mockImplementation((selector) => {
@@ -151,6 +177,7 @@ describe('SearchPageAssistantContext', () => {
 
   beforeAll(() => {
     VisualizationConfig.registerSubtype('bar', BarVisualizationConfig);
+    VisualizationConfig.registerSubtype('line', LineVisualizationConfig);
   });
 
   beforeEach(() => {
@@ -294,6 +321,120 @@ describe('SearchPageAssistantContext', () => {
     expect(updatedViewState().titles.getIn(['widget', 'w1'])).toBe('Logins per host');
   });
 
+  const barChartWithAxes = barChart
+    .toBuilder()
+    .config(
+      barChart.config
+        .toBuilder()
+        .visualizationConfig(
+          BarVisualizationConfig.create('group', 'logarithmic', { number: { title: 'Logins', color: '#e6194b' } }),
+        )
+        .build(),
+    )
+    .build();
+
+  it('changes only the visualization settings it is given, merging nested ones', async () => {
+    mockPageWithBarChart(barChartWithAxes);
+    const tools = renderTools();
+
+    await tools().update_widget({
+      widget_id: 'w1',
+      visualization_config: { barmode: 'stack', axis_config: { number: { title: 'Failed logins' }, xaxis: { title: 'Host' } } },
+    });
+
+    const { config } = updatedViewState().widgets.first() as AggregationWidget;
+
+    expect(config.rowPivots.map(({ fields }) => fields)).toEqual([['source']]);
+    expect(config.visualizationConfig).toEqual(
+      BarVisualizationConfig.create('stack', 'logarithmic', {
+        number: { title: 'Failed logins', color: '#e6194b' },
+        xaxis: { title: 'Host' },
+      }),
+    );
+  });
+
+  it('merges nested visualization settings when changing the aggregation', async () => {
+    mockPageWithBarChart(barChartWithAxes);
+    const tools = renderTools();
+
+    await tools().update_widget({
+      widget_id: 'w1',
+      config: {
+        row_pivots: [{ fields: ['source'], type: 'values', config: { limit: 15 } }],
+        column_pivots: [],
+        series: [{ function: 'count()', config: {} }],
+        sort: [],
+        visualization: 'bar',
+        visualization_config: { axis_config: { xaxis: { title: 'Host' } } },
+        rollup: true,
+      },
+    });
+
+    const { config } = updatedViewState().widgets.first() as AggregationWidget;
+
+    expect(config.visualizationConfig).toEqual(
+      BarVisualizationConfig.create('group', 'logarithmic', {
+        number: { title: 'Logins', color: '#e6194b' },
+        xaxis: { title: 'Host' },
+      }),
+    );
+  });
+
+  it('resets visualization settings changed to null', async () => {
+    mockPageWithBarChart(barChartWithAxes);
+    const tools = renderTools();
+
+    await tools().update_widget({ widget_id: 'w1', visualization_config: { axis_config: { number: null } } });
+
+    const { config } = updatedViewState().widgets.first() as AggregationWidget;
+
+    expect(config.visualizationConfig).toEqual(BarVisualizationConfig.create('group', 'logarithmic', {}));
+  });
+
+  it('refuses to change the settings of another visualization than the widget shows', async () => {
+    mockPageWithBarChart(barChartWithAxes);
+    const tools = renderTools();
+
+    await expect(
+      tools().update_widget({ widget_id: 'w1', visualization: 'line', visualization_config: { interpolation: 'spline' } }),
+    ).rejects.toThrow('The widget shows a bar visualization now, not line.');
+  });
+
+  it('applies the settings of another visualization to its defaults', async () => {
+    mockPageWithBarChart(barChartWithAxes);
+    const tools = renderTools();
+
+    await tools().update_widget({
+      widget_id: 'w1',
+      config: {
+        row_pivots: [{ fields: ['timestamp'], type: 'time', config: { interval: { type: 'auto', scaling: 1.0 } } }],
+        column_pivots: [],
+        series: [{ function: 'count()', config: {} }],
+        sort: [],
+        visualization: 'line',
+        visualization_config: { interpolation: 'spline' },
+        rollup: true,
+      },
+      visualization_defaults: { interpolation: 'linear', axis_type: 'linear', axis_config: null },
+    });
+
+    const { config } = updatedViewState().widgets.first() as AggregationWidget;
+
+    expect(config.visualization).toBe('line');
+    expect(config.visualizationConfig.toJSON()).toEqual(
+      expect.objectContaining({ interpolation: 'spline', axis_type: 'linear' }),
+    );
+  });
+
+  it('refuses to change the visualization settings of widgets without a visualization', async () => {
+    mockPageWithBarChart(TextWidget.builder().id('w1').config(new TextWidgetConfig('Notes')).build());
+    const tools = renderTools();
+
+    await expect(tools().update_widget({ widget_id: 'w1', visualization_config: { barmode: 'stack' } })).rejects.toThrow(
+      'Only aggregation widgets',
+    );
+  });
+
   describe('create_event_definition', () => {
     afterEach(() => {
       window.localStorage.clear();
@@ -380,5 +521,60 @@ describe('SearchPageAssistantContext', () => {
     const { getPage } = renderPage({ id: 'w1', editing: false, focusing: true });
 
     expect((getPage() as SearchPage).focused_widget_editing).toBe(false);
+  });
+
+  it('adds a search filter to the shown query of a search, excluding its matches if asked', async () => {
+    const search = searchWithFilters();
+    mockState(search);
+    mockDispatchFor(search);
+    const tools = renderTools();
+
+    const result = await tools().add_search_filter({
+      filter_id: 'f1',
+      title: 'No test hosts',
+      query_string: 'NOT source:test*',
+      negation: true,
+    });
+
+    expect(updatedQueryFilters()).toEqual([
+      expect.objectContaining({ type: 'referenced', id: 'f1', title: 'No test hosts', negation: true, disabled: false }),
+    ]);
+    expect(executeActiveQuery).toHaveBeenCalled();
+    expect(result).toEqual(expect.objectContaining({ summary: 'Added search filter "No test hosts", excluding its matches' }));
+  });
+
+  it('removes a search filter from the shown query, and refuses one that is not applied', async () => {
+    const search = searchWithFilters([noTestHosts]);
+    mockState(search);
+    mockDispatchFor(search);
+    const tools = renderTools();
+
+    await expect(tools().remove_search_filter({ filter_id: 'f2', title: 'Lab' })).rejects.toThrow('not applied');
+
+    await tools().remove_search_filter({ filter_id: 'f1', title: 'No test hosts' });
+
+    expect(updatedQueryFilters()).toEqual([]);
+  });
+
+  it('adds a search filter to a dashboard widget, but needs the widget on a dashboard', async () => {
+    mockState(createSearch().toBuilder().type(View.Type.Dashboard).build());
+    mockPageWithBarChart();
+    const tools = renderTools();
+
+    await expect(tools().add_search_filter({ filter_id: 'f1' })).rejects.toThrow('give the widget');
+
+    await tools().add_search_filter({ filter_id: 'f1', title: 'No test hosts', widget_id: 'w1' });
+
+    expect(updatedViewState().widgets.first().filters.toArray()).toEqual([
+      expect.objectContaining({ type: 'referenced', id: 'f1', negation: false }),
+    ]);
+  });
+
+  it('tells the Assistant the search filters of the shown query', () => {
+    mockState(searchWithFilters([noTestHosts]));
+
+    const { getPage } = renderPage();
+
+    expect((getPage() as SearchPage).active_query_filters).toEqual([noTestHosts]);
   });
 });
