@@ -397,6 +397,12 @@ describe('IndexSetConfigurationForm', () => {
         shards: 7,
         field_limit: 1200,
         use_legacy_rotation: true,
+        rotation_strategy: indexSetTemplateDefaults.rotation_strategy_config,
+        retention_strategy_class: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategy',
+        retention_strategy: {
+          type: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig',
+          max_number_of_indices: 2147483647,
+        },
         data_tiering: { type: DATA_TIERING_TYPE.HOT_ONLY, index_lifetime_min: '1', index_lifetime_max: '2' },
       },
     };
