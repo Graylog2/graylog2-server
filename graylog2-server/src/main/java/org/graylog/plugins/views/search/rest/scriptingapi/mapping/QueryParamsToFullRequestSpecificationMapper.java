@@ -48,7 +48,8 @@ public class QueryParamsToFullRequestSpecificationMapper {
                                                                            final SortSpec.Direction sortOrder,
                                                                            final int from,
                                                                            final int size,
-                                                                           final boolean includeUnresolvedIds) {
+                                                                           final boolean includeUnresolvedIds,
+                                                                           final boolean includeDocumentIds) {
 
         return new MessagesRequestSpec(query,
                 streams,
@@ -59,7 +60,8 @@ public class QueryParamsToFullRequestSpecificationMapper {
                 from,
                 size,
                 fields,
-                includeUnresolvedIds);
+                includeUnresolvedIds,
+                includeDocumentIds);
     }
 
     public AggregationRequestSpec simpleQueryParamsToFullRequestSpecification(final String query,

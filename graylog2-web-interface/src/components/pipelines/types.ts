@@ -17,7 +17,7 @@
 
 export type StageType = {
   stage: number;
-  match: 'ALL' | 'EITHER' | 'PASS';
+  match?: 'ALL' | 'EITHER' | 'PASS';
   rules: Array<string>;
 };
 
@@ -29,15 +29,15 @@ type ParseError = {
 
 export type PipelineType = {
   id: string;
-  title: string;
-  description: string;
+  title?: string;
+  description?: string;
   source: string;
-  created_at: string;
-  modified_at: string;
-  stages: Array<StageType>;
-  errors: Array<ParseError> | null;
-  has_deprecated_functions: boolean;
-  _scope: string;
+  created_at?: string;
+  modified_at?: string;
+  stages?: Array<StageType>;
+  errors?: Array<ParseError> | null;
+  has_deprecated_functions?: boolean;
+  _scope?: string;
 };
 
 export type NewPipelineType = Pick<PipelineType, 'title' | 'description'> &

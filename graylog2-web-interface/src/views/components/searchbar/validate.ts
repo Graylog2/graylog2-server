@@ -20,7 +20,6 @@ import type { QueryValidationState } from 'views/components/searchbar/queryvalid
 import validateTimeRange from 'views/components/TimeRangeValidation';
 import type { TimeRange, NoTimeRangeOverride } from 'views/logic/queries/Query';
 import type { SearchBarControl, HandlerContext } from 'views/types';
-import type { DateTime } from 'util/DateTime';
 import { validatePluggableValues } from 'views/logic/searchbar/pluggableSearchBarControlsHandler';
 
 type FormValues = {
@@ -34,14 +33,13 @@ const validate = async <T extends FormValues>(
   setFieldWarning: (fieldName: string, warning: unknown) => void,
   validateQueryString: (values: T) => Promise<QueryValidationState>,
   pluggableSearchBarControls: Array<() => SearchBarControl>,
-  formatTime: (dateTime: DateTime, format: string) => string,
   context: HandlerContext,
   userTimezone: string,
 ) => {
   const { timerange: nextTimeRange } = values;
   let errors = {};
 
-  const timeRangeErrors = await validateTimeRange(nextTimeRange, limitDuration, formatTime, userTimezone, false);
+  const timeRangeErrors = await validateTimeRange(nextTimeRange, limitDuration, userTimezone, false);
 
   if (!isEmpty(timeRangeErrors)) {
     errors = { ...errors, timerange: timeRangeErrors };
