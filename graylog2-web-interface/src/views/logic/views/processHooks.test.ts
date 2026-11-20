@@ -25,8 +25,12 @@ describe('processHooks', () => {
   const executionState = SearchExecutionState.empty();
 
   it('passes user timezone to loading and executing view hooks', async () => {
-    const loadingHook = jest.fn<ReturnType<ViewHook>, [ViewHookArguments]>(async (args) => [args.view, args.executionState] as const);
-    const executingHook = jest.fn<ReturnType<ViewHook>, [ViewHookArguments]>(async (args) => [args.view, args.executionState] as const);
+    const loadingHook = jest.fn<ReturnType<ViewHook>, [ViewHookArguments]>(
+      async (args) => [args.view, args.executionState] as const,
+    );
+    const executingHook = jest.fn<ReturnType<ViewHook>, [ViewHookArguments]>(
+      async (args) => [args.view, args.executionState] as const,
+    );
 
     await processHooks(
       Promise.resolve(view),
