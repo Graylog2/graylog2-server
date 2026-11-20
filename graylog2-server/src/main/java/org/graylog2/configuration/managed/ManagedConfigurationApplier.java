@@ -62,7 +62,8 @@ public class ManagedConfigurationApplier {
     private final ConfigurationReprocessor reprocessor;
     private final NodeConfigurationReporter reporter;
     private final ManagedConfigurationRepository repository;
-    private final Set<String> runtimeParameters;
+    private final Set<String> processStartParameters;
+    private final Set<String> liveParameters;
     private final boolean enabled;
 
     @Inject
@@ -84,12 +85,13 @@ public class ManagedConfigurationApplier {
                 .filter(name -> !name.isEmpty())
                 .collect(Collectors.toUnmodifiableSet());
         this.repository = new ManagedConfigurationRepository(configurationService, catalog, this.nodeId, ignored);
-        this.runtimeParameters = catalog.get(nodeType).stream()
-                .filter(parameter -> parameter.backing() == ParameterBacking.RUNTIME)
-                .map(ConfigurationParameter::name)
-                .filter(name -> !ignored.contains(name))
-                .collect(Collectors.toUnmodifiableSet());
         this.enabled = !ignored.contains(IGNORE_ALL);
+        final Set<ConfigurationParameter> runtimeParameters = catalog.get(nodeType).stream()
+                .filter(parameter -> parameter.backing() == ParameterBacking.RUNTIME)
+                .filter(parameter -> enabled && !ignored.contains(parameter.name()))
+                .collect(Collectors.toUnmodifiableSet());
+        this.processStartParameters = names(runtimeParameters, true);
+        this.liveParameters = names(runtimeParameters, false);
 
         if (!enabled) {
             LOG.warn("All configuration values stored through the API are ignored on this node.");
@@ -100,6 +102,13 @@ public class ManagedConfigurationApplier {
             // Replicated cluster events arrive on the regular event bus
             eventBus.register(this);
         }
+    }
+
+    private static Set<String> names(Set<ConfigurationParameter> parameters, boolean requiresRestart) {
+        return parameters.stream()
+                .filter(parameter -> parameter.requiresRestart() == requiresRestart)
+                .map(ConfigurationParameter::name)
+                .collect(Collectors.toUnmodifiableSet());
     }
 
     @Subscribe
@@ -169,17 +178,40 @@ public class ManagedConfigurationApplier {
     }
 
     /**
-     * The stored values of parameters which only exist at runtime. They aren't declared in a configuration bean, so
-     * processing the beans doesn't apply them: whoever starts the process has to hand them over.
+     * The stored values of runtime parameters which only take effect when the process starts. They aren't declared in
+     * a configuration bean, so processing the beans doesn't apply them: whoever starts the process has to hand them
+     * over.
      *
      * @return the stored values keyed by parameter name
      */
-    public Map<String, String> runtimeValues() {
-        if (!enabled) {
+    public Map<String, String> processStartValues() {
+        return storedValues(processStartParameters);
+    }
+
+    /**
+     * The stored values of the parameters which are applied to the running process.
+     *
+     * @return the stored values keyed by parameter name, a subset of {@link #liveParameters()}
+     */
+    public Map<String, String> liveValues() {
+        return storedValues(liveParameters);
+    }
+
+    /**
+     * The parameters this node applies to the running process. A parameter in here without a stored value has to be
+     * reset, so that the process falls back to its own configuration. Ignored parameters aren't included, so their
+     * values are left alone.
+     */
+    public Set<String> liveParameters() {
+        return liveParameters;
+    }
+
+    private Map<String, String> storedValues(Set<String> parameters) {
+        if (parameters.isEmpty()) {
             return Map.of();
         }
         return configurationService.storedValues(nodeId).entrySet().stream()
-                .filter(entry -> runtimeParameters.contains(entry.getKey()))
+                .filter(entry -> parameters.contains(entry.getKey()))
                 .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }

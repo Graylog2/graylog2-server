@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
@@ -49,6 +50,15 @@ public class NodeConfigurationReporter extends AbstractIdleService {
     private final ConfigurationCatalog catalog;
     private final ConfigurationInfoService configurationInfoService;
     private final ManagedConfigurationService configurationService;
+    private final Map<String, ResolvedValue> resolvedValues = new ConcurrentHashMap<>();
+
+    /**
+     * A value the node derived from the configured one, e.g. by adding a role on its own.
+     *
+     * @param configuredValue the configured value it was derived from, so that it stops counting once the
+     *                        configuration changes
+     */
+    private record ResolvedValue(@Nullable String configuredValue, String value) {}
 
     @Inject
     public NodeConfigurationReporter(NodeType nodeType,
@@ -77,14 +87,14 @@ public class NodeConfigurationReporter extends AbstractIdleService {
      * Writes the values this node resolved into the database. Called on startup, and to be called again whenever this
      * node applies a change without restarting.
      */
-    public void report() {
+    public synchronized void report() {
         final Map<String, ReportedValue> reportedValues = new LinkedHashMap<>();
         for (final ConfigurationParameter parameter : catalog.get(nodeType)) {
             if (parameter.backing() != ParameterBacking.CONFIG_FILE) {
                 continue;
             }
             configurationInfoService.get(parameter.name())
-                    .map(NodeConfigurationReporter::toReportedValue)
+                    .map(parameterInfo -> toReportedValue(parameter.name(), parameterInfo))
                     .ifPresent(reported -> reportedValues.put(parameter.name(), reported));
         }
 
@@ -121,8 +131,29 @@ public class NodeConfigurationReporter extends AbstractIdleService {
         }
     }
 
-    private static ReportedValue toReportedValue(ParameterInfo parameterInfo) {
-        return new ReportedValue(rawValue(parameterInfo), ConfigurationSource.of(parameterInfo));
+    /**
+     * Reports the value this node actually uses for a parameter, where it derives it from the configured one, e.g.
+     * the node roles of a data node, which adds the role for searchable snapshots on its own. The value is reported
+     * with the source of the configured value, and only until the configured value changes.
+     *
+     * @param name  the name of the parameter
+     * @param value the value in use
+     */
+    public synchronized void reportResolvedValue(String name, String value) {
+        final String configuredValue = configurationInfoService.get(name)
+                .map(NodeConfigurationReporter::rawValue)
+                .orElse(null);
+        resolvedValues.put(name, new ResolvedValue(configuredValue, value));
+        report();
+    }
+
+    private ReportedValue toReportedValue(String name, ParameterInfo parameterInfo) {
+        final String configuredValue = rawValue(parameterInfo);
+        final ResolvedValue resolved = resolvedValues.get(name);
+        final String value = resolved != null && Objects.equals(resolved.configuredValue(), configuredValue)
+                ? resolved.value()
+                : configuredValue;
+        return new ReportedValue(value, ConfigurationSource.of(parameterInfo));
     }
 
     /**
