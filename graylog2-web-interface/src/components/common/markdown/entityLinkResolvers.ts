@@ -23,6 +23,8 @@ const entityLinkResolvers: PluginExports['markdown.entityLinkResolvers'] = [
     uriSegment: 'streams',
     resolve: ([id]) => (id ? { grnType: 'stream', id, Title: StreamTitle } : null),
   },
+  { uriSegment: 'dashboards', resolve: ([id]) => (id ? { grnType: 'dashboard', id } : null) },
+  { uriSegment: 'searches', resolve: ([id]) => (id ? { grnType: 'search', id } : null) },
 ];
 
 export default entityLinkResolvers;
