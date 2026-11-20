@@ -1,0 +1,11 @@
+type = "a"
+message = "Count indexing failures per index set and report the cluster's indexing failures in telemetry."
+
+details.user = """
+The new index set metric `indexing_failures` holds the number of messages that failed to index into each index set over the last 10 minutes. `GET /api/system/indices/index_sets/metrics` returns it. With Graylog Enterprise and failure processing on, the count comes from the failures stream; otherwise it comes from the indexer failures shown under System > Overview.
+
+Telemetry now includes the number of indexing failures over the last 24 hours, summed over all indices.
+"""
+
+issues = ["28234"]
+pulls = ["28261", "Graylog2/graylog-plugin-enterprise#16412"]
