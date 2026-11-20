@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Clear the save errors of fixed condition fields from the event definition summary."
+
+
+pulls = ["28283"]
