@@ -19,11 +19,13 @@ package org.graylog.events.notifications;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.google.common.graph.MutableGraph;
 import org.graylog.events.contentpack.entities.EventNotificationConfigEntity;
 import org.graylog.events.event.EventDto;
 import org.graylog.scheduler.JobTriggerData;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
+import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.plugin.rest.ValidationResult;
 
 @JsonTypeInfo(
@@ -52,6 +54,12 @@ public interface EventNotificationConfig extends ContentPackable<EventNotificati
 
     @JsonIgnore
     default EventNotificationConfig prepareConfigUpdate(EventNotificationConfig newConfig) {return newConfig;}
+
+    /**
+     * Adds edges from the notification to entities this config references, so content pack export includes them.
+     */
+    default void resolveNativeEntity(EntityDescriptor entityDescriptor, MutableGraph<EntityDescriptor> mutableGraph) {
+    }
 
     class FallbackNotificationConfig implements EventNotificationConfig {
         @Override
