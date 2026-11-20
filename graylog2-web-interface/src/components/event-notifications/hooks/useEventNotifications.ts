@@ -76,7 +76,7 @@ type SubmitError = { status?: number; additional?: { body?: { failed?: boolean }
 type EventNotificationsResult = {
   list: Array<EventNotification>;
   pagination: { total: number };
-  attributes: Array<{ id: string; title: string; sortable: boolean }>;
+  attributes: Array<{ id: string; title: string; sortable?: boolean }>;
 };
 
 // Port of the old EventNotificationsStore `searchPaginated` action.

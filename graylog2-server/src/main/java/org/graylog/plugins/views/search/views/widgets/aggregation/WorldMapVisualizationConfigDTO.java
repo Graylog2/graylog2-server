@@ -16,8 +16,10 @@
  */
 package org.graylog.plugins.views.search.views.widgets.aggregation;
 
+import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -25,11 +27,13 @@ import com.google.auto.value.AutoValue;
 import jakarta.validation.Valid;
 
 @AutoValue
+@JsonClassDescription("World map: the values of a group-by on a field with geo coordinates, as circles on a map.")
 @JsonTypeName(WorldMapVisualizationConfigDTO.NAME)
 @JsonDeserialize(builder = WorldMapVisualizationConfigDTO.Builder.class)
 public abstract class WorldMapVisualizationConfigDTO implements VisualizationConfigDTO {
     public static final String NAME = "map";
 
+    @JsonPropertyDescription("The part of the map that is shown.")
     @JsonProperty
     public abstract Viewport viewport();
 
@@ -43,7 +47,8 @@ public abstract class WorldMapVisualizationConfigDTO implements VisualizationCon
 
         @JsonCreator
         public static Builder builder() {
-            return new AutoValue_WorldMapVisualizationConfigDTO.Builder();
+            return new AutoValue_WorldMapVisualizationConfigDTO.Builder()
+                    .viewport(Viewport.Builder.builder().centerX(0).centerY(0).zoom(1).build());
         }
     }
 }
