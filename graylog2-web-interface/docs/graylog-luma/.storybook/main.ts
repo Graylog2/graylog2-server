@@ -31,6 +31,22 @@ const { createBootstrapLessRule, lessRule } = require(path.resolve(webInterfaceR
 // style-loader v4 (used by Storybook) dropped function support for `insert`; use a string selector instead
 const bootstrapLessRule = createBootstrapLessRule({ insert: 'head' });
 
+// Compile TypeScript in the shared web-interface src folder
+const srcSwcRule = {
+  test: /\.(tsx?|jsx?)$/,
+  include: [path.resolve(webInterfaceRoot, 'src')],
+  exclude: /node_modules/,
+  use: {
+    loader: require.resolve('swc-loader'),
+    options: {
+      jsc: {
+        parser: { syntax: 'typescript', tsx: true },
+        transform: { react: { runtime: 'automatic' } },
+      },
+    },
+  },
+};
+
 const config: StorybookConfig = {
   stories: ['../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)', '../stories/**/*.mdx'],
   addons: ['@storybook/addon-webpack5-compiler-swc', '@storybook/addon-docs', 'storybook-dark-mode'],
@@ -42,7 +58,7 @@ const config: StorybookConfig = {
     ...sbConfig,
     module: {
       ...sbConfig.module,
-      rules: [...(sbConfig.module?.rules ?? []), bootstrapLessRule, lessRule],
+      rules: [...(sbConfig.module?.rules ?? []), bootstrapLessRule, lessRule, srcSwcRule],
     },
     resolve: {
       ...sbConfig.resolve,
