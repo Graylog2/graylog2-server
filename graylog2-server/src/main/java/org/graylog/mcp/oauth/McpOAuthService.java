@@ -27,6 +27,7 @@ import org.graylog2.audit.AuditEventSender;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.AccessToken;
+import org.graylog2.security.AccessTokenCipher;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
@@ -92,6 +93,7 @@ public class McpOAuthService {
     private final OAuthAuthorizationCodeService codeService;
     private final OAuthRefreshTokenService refreshTokenService;
     private final AccessTokenService accessTokenService;
+    private final AccessTokenCipher cipher;
     private final UserService userService;
     private final GranteeAuthorizer.Factory granteeAuthorizerFactory;
     private final AuditEventSender auditEventSender;
@@ -103,6 +105,7 @@ public class McpOAuthService {
                            OAuthAuthorizationCodeService codeService,
                            OAuthRefreshTokenService refreshTokenService,
                            AccessTokenService accessTokenService,
+                           AccessTokenCipher cipher,
                            UserService userService,
                            GranteeAuthorizer.Factory granteeAuthorizerFactory,
                            AuditEventSender auditEventSender,
@@ -112,6 +115,7 @@ public class McpOAuthService {
         this.codeService = codeService;
         this.refreshTokenService = refreshTokenService;
         this.accessTokenService = accessTokenService;
+        this.cipher = cipher;
         this.userService = userService;
         this.granteeAuthorizerFactory = granteeAuthorizerFactory;
         this.auditEventSender = auditEventSender;
@@ -302,13 +306,8 @@ public class McpOAuthService {
         final User user = loadAuthorizedUser(token.userId());
 
         // Only consume the token once the refresh is going to succeed, so rejected refreshes can be retried
-        if (token.usedAt() == null && refreshTokenService.markUsed(tokenHash, now).isEmpty()) {
-            final OAuthRefreshToken concurrentlyUsed = refreshTokenService.findByHash(tokenHash)
-                    .orElseThrow(() -> OAuthException.of(INVALID_GRANT, "Authorization was revoked"));
-            ensureNotReplayed(concurrentlyUsed, now);
-        }
-
-        final TokenResponse response = issueTokens(client, user, effectiveResource);
+        final String newRefreshToken = rotateRefreshToken(token, client, user, effectiveResource, now);
+        final TokenResponse response = new TokenResponse(createAccessToken(client, user), config().oauthAccessTokenTtl().toSeconds(), newRefreshToken);
         // Revocations delete the used token too, so its absence means a revocation might have missed the new tokens
         if (refreshTokenService.findByHash(tokenHash).isEmpty()) {
             revokeTokens(token.username(), token.clientId());
@@ -366,17 +365,22 @@ public class McpOAuthService {
     }
 
     private TokenResponse issueTokens(OAuthClient client, User user, @Nullable String resource) {
-        final McpConfiguration config = config();
-        final Instant now = Instant.now(clock);
-        final Duration accessTokenTtl = config.oauthAccessTokenTtl();
-        final Instant refreshTokenExpiresAt = now.plus(config.oauthRefreshTokenTtl());
+        final String accessToken = createAccessToken(client, user);
+        final String refreshToken = createRefreshToken(client, user, resource, Instant.now(clock));
+        return new TokenResponse(accessToken, config().oauthAccessTokenTtl().toSeconds(), refreshToken);
+    }
 
+    private String createAccessToken(OAuthClient client, User user) {
         final AccessToken accessToken = accessTokenService.create(
                 user.getName(),
                 f("MCP: %s", client.clientName()),
-                PeriodDuration.of(accessTokenTtl),
+                PeriodDuration.of(config().oauthAccessTokenTtl()),
                 client.clientId()
         );
+        return accessToken.getToken();
+    }
+
+    private String createRefreshToken(OAuthClient client, User user, @Nullable String resource, Instant now) {
         final String refreshToken = OAuthTokens.generate();
         refreshTokenService.create(new OAuthRefreshToken(
                 null,
@@ -386,11 +390,34 @@ public class McpOAuthService {
                 user.getName(),
                 resource,
                 null,
+                null,
                 now,
-                refreshTokenExpiresAt
+                now.plus(config().oauthRefreshTokenTtl())
         ));
+        return refreshToken;
+    }
 
-        return new TokenResponse(accessToken.getToken(), accessTokenTtl.toSeconds(), refreshToken);
+    /**
+     * Exchanges a refresh token for its successor. Refreshes within the grace period get the same successor, so a
+     * grant never forks into parallel token chains that would escape replay detection.
+     */
+    private String rotateRefreshToken(OAuthRefreshToken token, OAuthClient client, User user, @Nullable String resource, Instant now) {
+        OAuthRefreshToken used = token;
+        if (token.usedAt() == null) {
+            // Stored before marking the token used, so the successor exists before any concurrent refresh can return it
+            final String successor = createRefreshToken(client, user, resource, now);
+            if (refreshTokenService.markUsed(token.tokenHash(), now, cipher.encrypt(successor)).isPresent()) {
+                return successor;
+            }
+            refreshTokenService.deleteByHash(OAuthTokens.hash(successor));
+            used = refreshTokenService.findByHash(token.tokenHash())
+                    .orElseThrow(() -> OAuthException.of(INVALID_GRANT, "Authorization was revoked"));
+            ensureNotReplayed(used, now);
+        }
+        if (used.successor() == null) {
+            throw OAuthException.of(INVALID_GRANT, "Invalid refresh token");
+        }
+        return cipher.decrypt(used.successor());
     }
 
     private void ensureNotReplayed(OAuthRefreshToken token, Instant now) {

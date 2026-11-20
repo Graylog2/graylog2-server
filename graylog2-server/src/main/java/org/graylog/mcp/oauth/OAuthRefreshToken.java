@@ -31,8 +31,10 @@ import java.time.Instant;
 /**
  * A refresh token. Refresh tokens are rotated on every use.
  *
- * @param usedAt when this token was exchanged. Presenting it again after a grace period revokes all tokens of the
- *               client for the user.
+ * @param usedAt    when this token was exchanged. Presenting it again after a grace period revokes all tokens of the
+ *                  client for the user.
+ * @param successor the encrypted refresh token this one was exchanged for. Refreshes within the grace period get it
+ *                  too, so a grant never forks into parallel token chains.
  */
 public record OAuthRefreshToken(
         @ObjectId @Id @Nullable @JsonProperty(MongoEntity.FIELD_ID) String id,
@@ -45,6 +47,7 @@ public record OAuthRefreshToken(
         @JsonSerialize(using = MongoInstantSerializer.class)
         @JsonDeserialize(using = MongoInstantDeserializer.class)
         @JsonProperty(FIELD_USED_AT) Instant usedAt,
+        @Nullable @JsonProperty(FIELD_SUCCESSOR) String successor,
         @JsonSerialize(using = MongoInstantSerializer.class)
         @JsonDeserialize(using = MongoInstantDeserializer.class)
         @JsonProperty(FIELD_CREATED_AT) Instant createdAt,
@@ -58,6 +61,7 @@ public record OAuthRefreshToken(
     public static final String FIELD_USERNAME = "username";
     public static final String FIELD_RESOURCE = "resource";
     public static final String FIELD_USED_AT = "used_at";
+    public static final String FIELD_SUCCESSOR = "successor";
     public static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_EXPIRES_AT = "expires_at";
 }

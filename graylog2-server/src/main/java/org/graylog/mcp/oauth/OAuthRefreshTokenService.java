@@ -60,15 +60,22 @@ public class OAuthRefreshTokenService {
     }
 
     /**
-     * Atomically marks an unused token as used.
+     * Atomically marks an unused token as used and records the token it was exchanged for.
      *
      * @return the token if it was unused before, empty if it doesn't exist or was already used
      */
-    public Optional<OAuthRefreshToken> markUsed(String tokenHash, Instant usedAt) {
+    public Optional<OAuthRefreshToken> markUsed(String tokenHash, Instant usedAt, String encryptedSuccessor) {
         return Optional.ofNullable(collection.findOneAndUpdate(
                 and(eq(OAuthRefreshToken.FIELD_TOKEN_HASH, tokenHash), eq(OAuthRefreshToken.FIELD_USED_AT, null)),
-                Updates.set(OAuthRefreshToken.FIELD_USED_AT, Date.from(usedAt))
+                Updates.combine(
+                        Updates.set(OAuthRefreshToken.FIELD_USED_AT, Date.from(usedAt)),
+                        Updates.set(OAuthRefreshToken.FIELD_SUCCESSOR, encryptedSuccessor)
+                )
         ));
+    }
+
+    public void deleteByHash(String tokenHash) {
+        collection.deleteOne(eq(OAuthRefreshToken.FIELD_TOKEN_HASH, tokenHash));
     }
 
     public List<OAuthRefreshToken> findActiveByUsername(String username) {
