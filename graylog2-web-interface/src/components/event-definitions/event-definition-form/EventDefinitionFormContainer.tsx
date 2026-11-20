@@ -36,6 +36,7 @@ import useEventDefinitionSteps, { INITIAL_EVENT_DEFINITION } from './useEventDef
 import EventDetailsForm from './EventDetailsForm';
 import EventConditionForm from './EventConditionForm';
 import EventDefinitionForm, { getStepKeys } from './EventDefinitionForm';
+import changedKeys from './changedKeys';
 
 import useEventDefinitionMutations from '../hooks/useEventDefinitionMutations';
 import {
@@ -130,12 +131,12 @@ const EventDefinitionFormContainer = ({
       setEventDefinition((prev) => ({ ...prev, [key]: value }));
       onEventDefinitionChange({ ...eventDefinition, [key]: value } as EventDefinition);
       setIsDirty(true);
-      // Drop any stale submit-time validation error for the field being edited so the user
-      // gets immediate feedback on their fix. Each field still owns its live client-side
-      // validation; this only clears the server-returned error from the last submit attempt.
+      const editedKeys = [key, ...changedKeys(eventDefinition[key], value)];
       setValidation((prev) => {
-        if (!prev.errors || !(key in prev.errors)) return prev;
-        const { [key]: _dropped, ...remaining } = prev.errors as Record<string, unknown>;
+        if (!prev.errors || !editedKeys.some((editedKey) => editedKey in prev.errors)) return prev;
+        const remaining = Object.fromEntries(
+          Object.entries(prev.errors).filter(([errorKey]) => !editedKeys.includes(errorKey)),
+        );
 
         return { ...prev, errors: remaining };
       });

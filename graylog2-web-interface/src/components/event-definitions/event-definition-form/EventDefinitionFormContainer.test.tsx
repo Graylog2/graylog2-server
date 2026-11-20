@@ -21,7 +21,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { defaultUser as mockDefaultUser } from 'defaultMockValues';
 
-import { EventsEntityTypes } from '@graylog/server-api';
+import { EventsDefinitions, EventsEntityTypes } from '@graylog/server-api';
 
 import selectEvent from 'helpers/selectEvent';
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
@@ -38,6 +38,7 @@ import { SYSTEM_EVENT_DEFINITION_TYPE as mockSYSTEM_EVENT_DEFINITION_TYPE } from
 import type { PermissionsByScopeReturnType } from 'hooks/useScopePermissions';
 import type { GenericEntityType } from 'logic/lookup-tables/types';
 import type { EventNotification } from 'components/event-notifications/hooks/useEventNotifications';
+import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 
 import EventDefinitionFormContainer from './EventDefinitionFormContainer';
 
@@ -110,7 +111,10 @@ jest.mock('logic/rest/FetchProvider', () => {
 jest.mock('@graylog/server-api', () => ({
   ...jest.requireActual('@graylog/server-api'),
   EventsEntityTypes: { all: jest.fn() },
+  EventsDefinitions: { create: jest.fn() },
 }));
+
+jest.mock('util/UserNotification', () => ({ error: jest.fn(), success: jest.fn() }));
 
 const mockEntityTypes = {
   aggregation_functions: [
@@ -371,6 +375,62 @@ describe('EventDefinitionFormContainer', () => {
     await userEvent.click(tab);
 
     expect(screen.getByRole('button', { name: /update event definition/i })).toBeVisible();
+  });
+
+  it('drops the save error of an edited condition field and keeps the others', async () => {
+    asMock(EventsDefinitions.create).mockRejectedValue({
+      status: 400,
+      additional: {
+        body: {
+          failed: true,
+          errors: {
+            search_within_ms: ['Search within must be greater than 0.'],
+            series: ['Series is required.'],
+          },
+        },
+      },
+    });
+    const StubConditionForm = ({
+      eventDefinition,
+      onChange,
+    }: {
+      eventDefinition: EventDefinition;
+      onChange: (key: string, value: unknown) => void;
+    }) => (
+      <button type="button" onClick={() => onChange('config', { ...eventDefinition.config, search_within_ms: 300000 })}>
+        Change search window
+      </button>
+    );
+    asMock(usePluginEntities).mockImplementation(
+      (entityKey) =>
+        ({
+          eventDefinitionTypes: [
+            {
+              type: 'aggregation-v1',
+              displayName: 'Filter & Aggregation',
+              useCondition: () => true,
+              formComponent: StubConditionForm,
+            },
+          ],
+          'views.components.eventProcedureSummary': [],
+          'licenseCheck': [(_license: string) => ({ data: { valid: false } })],
+        })[entityKey] ?? [],
+    );
+    render(<EventDefinitionFormContainer action="create" eventDefinition={mockAggregationEventDefinition} />);
+
+    await userEvent.click(await screen.findByRole('button', { name: /^summary$/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /create event definition/i }));
+
+    await screen.findByText('Search within must be greater than 0.');
+    screen.getByText('Series is required.');
+
+    await userEvent.click(await screen.findByRole('button', { name: /condition/i }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Change search window' }));
+    await userEvent.click(await screen.findByRole('button', { name: /^summary$/i }));
+
+    await screen.findByText('Series is required.');
+
+    expect(screen.queryByText('Search within must be greater than 0.')).not.toBeInTheDocument();
   });
 
   it('keeps the selected collaborators when navigating away from and back to the Share step', async () => {
