@@ -18,21 +18,9 @@ package org.graylog2.database.aggregation;
 
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
-import org.graylog2.database.aggregation.BucketAggregationResult.Bucket;
 
 import java.time.Duration;
-import java.util.Date;
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-
-import static org.graylog2.database.aggregation.AggregationPipelines.BUCKET_COUNT;
-import static org.graylog2.database.aggregation.AggregationPipelines.COUNT;
-import static org.graylog2.database.aggregation.AggregationPipelines.FACET_BUCKETS;
-import static org.graylog2.database.aggregation.AggregationPipelines.FACET_MISSING;
-import static org.graylog2.database.aggregation.AggregationPipelines.FACET_OTHER;
-import static org.graylog2.database.aggregation.AggregationPipelines.ID;
 
 /**
  * Counts the documents of one collection per bucket, e.g. for slicing, in a single round trip.
@@ -61,34 +49,6 @@ public class MongoAggregator {
     }
 
     public BucketAggregationResult buckets(final BucketAggregation request) {
-        // $facet always returns exactly one document
-        final Document result = Objects.requireNonNull(collection.aggregate(AggregationPipelines.buckets(request))
-                .allowDiskUse(true)
-                .maxTime(timeout.toMillis(), TimeUnit.MILLISECONDS)
-                .first());
-        final List<Bucket> buckets = result.getList(FACET_BUCKETS, Document.class).stream()
-                .map(bucket -> new Bucket(normalizeKey(bucket.get(ID)), count(bucket, COUNT)))
-                .toList();
-        final long missingCount = result.getList(FACET_MISSING, Document.class).stream()
-                .findFirst()
-                .map(missing -> count(missing, COUNT))
-                .orElse(0L);
-        final Optional<Document> other = result.getList(FACET_OTHER, Document.class).stream().findFirst();
-        return new BucketAggregationResult(buckets,
-                missingCount,
-                other.map(rest -> count(rest, BUCKET_COUNT)).orElse(0L),
-                other.map(rest -> count(rest, COUNT)).orElse(0L));
-    }
-
-    private static long count(final Document document, final String field) {
-        return document.get(field, Number.class).longValue();
-    }
-
-    private static Object normalizeKey(final Object key) {
-        return switch (key) {
-            case Integer integer -> integer.longValue();
-            case Date date -> date.toInstant();
-            default -> key;
-        };
+        return BucketQuery.run(collection, request, timeout);
     }
 }

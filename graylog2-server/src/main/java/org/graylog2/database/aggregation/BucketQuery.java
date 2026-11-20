@@ -16,6 +16,7 @@
  */
 package org.graylog2.database.aggregation;
 
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Facet;
@@ -31,7 +32,9 @@ import org.bson.BsonValue;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
+import org.graylog2.database.aggregation.BucketAggregationResult.Bucket;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -39,32 +42,70 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
- * Translates bucket aggregations into MongoDB pipelines.
+ * Runs a bucket aggregation as one MongoDB pipeline and reads its result.
  * <p>
  * An aggregation runs in one pass: match, compute each document's distinct values into a temporary field, unwind
  * them, count per bucket key, then split the buckets into the missing bucket, the top buckets and the summed-up rest
  * with {@code $facet}.
  */
-final class AggregationPipelines {
-    static final String FACET_BUCKETS = "buckets";
-    static final String FACET_MISSING = "missing";
-    static final String FACET_OTHER = "other";
-    static final String ID = "_id";
-    static final String COUNT = "count";
-    static final String BUCKET_COUNT = "bucket_count";
+final class BucketQuery {
+    private static final String FACET_BUCKETS = "buckets";
+    private static final String FACET_MISSING = "missing";
+    private static final String FACET_OTHER = "other";
+    private static final String ID = "_id";
+    private static final String COUNT = "count";
+    private static final String BUCKET_COUNT = "bucket_count";
 
     private static final String VALUE = "__agg_value";
     private static final String RELATED = "__agg_related";
     private static final String REFERENCE = "__agg_reference";
 
-    private AggregationPipelines() {}
+    private BucketQuery() {}
 
-    static List<Bson> buckets(final BucketAggregation request) {
+    static BucketAggregationResult run(final MongoCollection<Document> collection,
+                                       final BucketAggregation request,
+                                       final Duration timeout) {
+        // $facet always returns exactly one document
+        final Document facets = Objects.requireNonNull(collection.aggregate(pipeline(request))
+                .allowDiskUse(true)
+                .maxTime(timeout.toMillis(), TimeUnit.MILLISECONDS)
+                .first());
+        final List<Bucket> buckets = facets.getList(FACET_BUCKETS, Document.class).stream()
+                .map(bucket -> new Bucket(normalizeKey(bucket.get(ID)), count(bucket, COUNT)))
+                .toList();
+        final long missingCount = facets.getList(FACET_MISSING, Document.class).stream()
+                .findFirst()
+                .map(missing -> count(missing, COUNT))
+                .orElse(0L);
+        final Optional<Document> other = facets.getList(FACET_OTHER, Document.class).stream().findFirst();
+        return new BucketAggregationResult(buckets,
+                missingCount,
+                other.map(rest -> count(rest, BUCKET_COUNT)).orElse(0L),
+                other.map(rest -> count(rest, COUNT)).orElse(0L));
+    }
+
+    private static long count(final Document document, final String field) {
+        return document.get(field, Number.class).longValue();
+    }
+
+    private static Object normalizeKey(final Object key) {
+        return switch (key) {
+            case Integer integer -> integer.longValue();
+            case Date date -> date.toInstant();
+            default -> key;
+        };
+    }
+
+    private static List<Bson> pipeline(final BucketAggregation request) {
         final var stages = new ArrayList<Bson>();
         stages.add(Aggregates.match(request.documentFilter()));
         stages.addAll(valueStages(request.grouping().source()));
+        //unwinds for arrays, does nothing for single-value fields
         stages.add(Aggregates.unwind("$" + VALUE, new UnwindOptions().preserveNullAndEmptyArrays(true)));
         stages.add(Aggregates.group(bucketKey(request.grouping()), Accumulators.sum(COUNT, 1L)));
 
