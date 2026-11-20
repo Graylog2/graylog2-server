@@ -37,6 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -51,6 +52,7 @@ class NodeConfigurationReporterTest {
 
     private final ManagedConfigurationService configurationService = mock(ManagedConfigurationService.class);
     private ConfigurationInfoService configurationInfoService;
+    private ConfigurationReprocessor reprocessor;
 
     /**
      * Stands in for a real configuration bean: one parameter configured explicitly, one left at its default.
@@ -75,6 +77,7 @@ class NodeConfigurationReporterTest {
         jadConfig.process();
 
         configurationInfoService = new ConfigurationInfoService(collector.getParameterInfos());
+        reprocessor = new ConfigurationReprocessor(jadConfig, collector, configurationInfoService);
     }
 
     @AfterEach
@@ -162,5 +165,36 @@ class NodeConfigurationReporterTest {
         reporter(parameter(CONFIGURED)).report();
 
         verify(configurationService, never()).adoptClusterValue(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void reportsTheResolvedValueWithTheSourceOfTheConfiguredOne() {
+        final var reporter = reporter(parameter(DEFAULTED));
+
+        reporter.reportResolvedValue(DEFAULTED, "8");
+
+        verify(configurationService).reportNodeValues(eq(NODE_ID),
+                eq(Map.of(DEFAULTED, new ReportedValue("8", ConfigurationSource.DEFAULT))));
+    }
+
+    @Test
+    void dropsTheResolvedValueOnceTheConfiguredValueChanges() throws Exception {
+        final var reporter = reporter(parameter(CONFIGURED));
+        reporter.reportResolvedValue(CONFIGURED, "configured value, extended");
+
+        // Stands in for a stored value being picked up before the next start
+        System.setProperty(PREFIX + CONFIGURED, "another value");
+        reprocessor.reprocess();
+        reporter.report();
+
+        verify(configurationService).reportNodeValues(eq(NODE_ID), eq(Map.of(CONFIGURED,
+                new ReportedValue("configured value, extended", ConfigurationSource.SYSTEM_PROPERTY))));
+        assertThat(lastReportedValues().get(CONFIGURED).value()).isEqualTo("another value");
+    }
+
+    private Map<String, ReportedValue> lastReportedValues() {
+        final ArgumentCaptor<Map<String, ReportedValue>> captor = ArgumentCaptor.forClass(Map.class);
+        verify(configurationService, atLeastOnce()).reportNodeValues(eq(NODE_ID), captor.capture());
+        return captor.getValue();
     }
 }

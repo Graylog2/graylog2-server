@@ -17,6 +17,7 @@
 package org.graylog2.configuration.managed;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.annotation.Nullable;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,6 +39,9 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  * @param order Position of the parameter within its category, lower values first
  * @param units The units the value can be given in, mapping the suffix appended to the amount to the label the user
  *              interface shows. Empty when the value has no unit, and in the order the options are offered in.
+ * @param defaultValue The value which applies while nothing is stored and the node didn't report one, e.g. the
+ *                     default of OpenSearch for a {@link ParameterBacking#RUNTIME} parameter, which no node reports.
+ *                     {@code null} if unknown.
  */
 public record ConfigurationParameter(@JsonProperty("node_type") NodeType nodeType,
                                      @JsonProperty("name") String name,
@@ -50,7 +54,8 @@ public record ConfigurationParameter(@JsonProperty("node_type") NodeType nodeTyp
                                      @JsonProperty("constraints") ParameterConstraints constraints,
                                      @JsonProperty("requires_restart") boolean requiresRestart,
                                      @JsonProperty("backing") ParameterBacking backing,
-                                     @JsonProperty("scope") ParameterScope scope) {
+                                     @JsonProperty("scope") ParameterScope scope,
+                                     @JsonProperty("default_value") @Nullable String defaultValue) {
 
     public ConfigurationParameter {
         Objects.requireNonNull(nodeType, "nodeType");
@@ -64,6 +69,11 @@ public record ConfigurationParameter(@JsonProperty("node_type") NodeType nodeTyp
         // Map#copyOf doesn't keep the iteration order, which decides the order of the unit options
         units = units == null ? Map.of() : Collections.unmodifiableMap(new LinkedHashMap<>(units));
         constraints = constraints == null ? ParameterConstraints.none() : constraints;
+        if (backing == ParameterBacking.RUNTIME && !requiresRestart && scope != ParameterScope.CLUSTER) {
+            // Applied live through the cluster settings API, where a value always holds for the whole cluster
+            throw new IllegalArgumentException("Parameter <" + name + "> is applied without a restart, so it has " +
+                    "to be cluster wide.");
+        }
     }
 
     /**
@@ -140,6 +150,7 @@ public record ConfigurationParameter(@JsonProperty("node_type") NodeType nodeTyp
         private boolean requiresRestart = true;
         private ParameterBacking backing = ParameterBacking.CONFIG_FILE;
         private ParameterScope scope = ParameterScope.NODE;
+        private String defaultValue;
 
         private Builder(NodeType nodeType, String name, String label) {
             this.nodeType = nodeType;
@@ -195,9 +206,18 @@ public record ConfigurationParameter(@JsonProperty("node_type") NodeType nodeTyp
             return this;
         }
 
+        /**
+         * The value which applies while nothing is stored and no node reported one. Has to match the actual default
+         * of whoever consumes the parameter, so it can only be omitted for parameters which every node reports.
+         */
+        public Builder defaultValue(String defaultValue) {
+            this.defaultValue = defaultValue;
+            return this;
+        }
+
         public ConfigurationParameter build() {
             return new ConfigurationParameter(nodeType, name, label, description, category, order, type, units,
-                    constraints, requiresRestart, backing, scope);
+                    constraints, requiresRestart, backing, scope, defaultValue);
         }
     }
 }

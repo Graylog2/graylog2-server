@@ -214,8 +214,9 @@ public class ManagedConfigurationResource extends RestResource {
      * @param value      The value which applies, which is {@link #setValue()} when one has been stored
      * @param source     Where {@link #value} comes from, {@code null} while nothing is known about it yet
      * @param setValue   The value stored through this API, {@code null} if nobody stored one
-     * @param nodeValue  What the node resolved for itself and runs with, {@code null} while the node hasn't reported
-     *                   it yet. Parameters which don't exist in a configuration bean are never reported.
+     * @param nodeValue  What the node resolved for itself and runs with. Falls back to the default of the parameter
+     *                   while no node reported a value: parameters which don't exist in a configuration bean are
+     *                   never reported, and nodes report their own values, not the ones shared by all nodes.
      * @param pendingRestart Whether a node still has to be restarted to use the stored value
      */
     public record ManagedConfigurationParameter(@JsonProperty("name") String name,
@@ -241,6 +242,13 @@ public class ManagedConfigurationResource extends RestResource {
         static ManagedConfigurationParameter of(ConfigurationParameter parameter,
                                                 @Nullable ManagedConfigurationEntry entry,
                                                 boolean pendingRestart) {
+            final String reportedValue = entry == null ? null : entry.nodeValue();
+            final String nodeValue = reportedValue != null ? reportedValue : parameter.defaultValue();
+            final ConfigurationSource nodeSource = reportedValue != null
+                    ? entry.nodeSource()
+                    : (nodeValue == null ? null : ConfigurationSource.DEFAULT);
+            final String storedValue = entry == null ? null : entry.value();
+
             return new ManagedConfigurationParameter(
                     parameter.name(),
                     parameter.label(),
@@ -253,13 +261,13 @@ public class ManagedConfigurationResource extends RestResource {
                     parameter.requiresRestart(),
                     parameter.backing(),
                     parameter.scope(),
-                    entry == null ? null : entry.effectiveValue(),
-                    entry == null ? null : entry.effectiveSource(),
-                    entry == null ? null : entry.value(),
+                    storedValue != null ? storedValue : nodeValue,
+                    storedValue != null ? ConfigurationSource.DATABASE : nodeSource,
+                    storedValue,
                     entry == null ? null : entry.updatedAt(),
                     entry == null ? null : entry.updatedBy(),
-                    entry == null ? null : entry.nodeValue(),
-                    entry == null ? null : entry.nodeSource(),
+                    nodeValue,
+                    nodeSource,
                     pendingRestart);
         }
     }
