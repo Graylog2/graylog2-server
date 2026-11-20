@@ -27,6 +27,7 @@ export type UserPreferences = {
   searchSidebarIsPinned?: boolean;
   dashboardSidebarIsPinned?: boolean;
   'views.widgetSummary.doNotAskAgain'?: boolean;
+  'welcome.assistantPromptTarget'?: 'assistant' | 'notebook';
   [PREFERENCES_THEME_MODE]?: ColorScheme;
 };
 
