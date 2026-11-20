@@ -68,6 +68,31 @@ class MessagesBulkIndexRetryingTest {
     }
 
     @Test
+    public void bulkIndexingRecordsReceiveTimeOfIndexedMessages() throws Exception {
+        final DateTime receiveTime = DateTime.parse("2026-01-01T00:00:00Z");
+        final Message message = mock(Message.class);
+        when(message.getReceiveTime()).thenReturn(receiveTime);
+        when(messagesAdapter.bulkIndex(any()))
+                .thenReturn(IndexingResults.create(List.of(IndexingSuccess.create(message, "randomIndex")), List.of()));
+
+        messages.bulkIndex(messageListWith(message), false);
+
+        verify(processingStatusRecorder).updatePostIndexingReceiveTime(receiveTime);
+    }
+
+    @Test
+    public void bulkIndexingSystemTrafficDoesNotRecordReceiveTime() throws Exception {
+        final Message message = mock(Message.class);
+        when(message.getReceiveTime()).thenReturn(DateTime.parse("2026-01-01T00:00:00Z"));
+        when(messagesAdapter.bulkIndex(any()))
+                .thenReturn(IndexingResults.create(List.of(IndexingSuccess.create(message, "randomIndex")), List.of()));
+
+        messages.bulkIndex(messageListWith(message), true);
+
+        verify(processingStatusRecorder, never()).updatePostIndexingReceiveTime(any());
+    }
+
+    @Test
     public void bulkIndexingShouldNotRetryForIndexMappingErrors() throws Exception {
         final String messageId = "BOOMID";
 
