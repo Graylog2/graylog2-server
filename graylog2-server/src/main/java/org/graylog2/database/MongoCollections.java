@@ -24,6 +24,7 @@ import jakarta.inject.Singleton;
 import org.bson.Document;
 import org.bson.codecs.Codec;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.aggregation.MongoAggregator;
 import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.database.indices.MongoDbIndexTools;
@@ -120,6 +121,14 @@ public class MongoCollections {
      */
     public <T extends ScopedEntity<?>> ScopedEntityMongoUtils<T> scopedEntityUtils(MongoCollection<T> collection, EntityScopeService entityScopeService) {
         return new ScopedEntityMongoUtils<>(collection, entityScopeService);
+    }
+
+    /**
+     * Provides bucket counts, e.g. for slicing, over the documents of any collection. It doesn't check permissions:
+     * to aggregate on behalf of a user, use {@link org.graylog2.database.aggregation.PermittedAggregators}.
+     */
+    public MongoAggregator aggregator(final String collectionName) {
+        return new MongoAggregator(mongoConnection.getMongoDatabase().getCollection(collectionName, Document.class));
     }
 
     public <T extends MongoEntity> MongoDbIndexTools indexUtils(MongoCollection<T> collection) {
