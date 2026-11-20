@@ -22,22 +22,30 @@ import { ConfigurationsActions, ConfigurationsStore } from 'stores/configuration
 import { getConfig } from 'components/configurations/helpers';
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
 import { BootstrapModalForm, Button, Input } from 'components/bootstrap';
-import { IfPermitted } from 'components/common';
+import { IfPermitted, InputList, ISODurationInput } from 'components/common';
 import Spinner from 'components/common/Spinner';
 import 'moment-duration-format';
 import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
+import useProductName from 'brand-customization/useProductName';
 
 type McpConfigState = {
   enable_remote_access: boolean;
   enable_output_schema: boolean;
   enable_input_validation: boolean;
+  enable_oauth: boolean;
+  oauth_access_token_ttl: string;
+  oauth_refresh_token_ttl: string;
+  oauth_allowed_redirect_uris: Array<string>;
 };
+
+type ToggleKey = 'enable_remote_access' | 'enable_output_schema' | 'enable_input_validation' | 'enable_oauth';
 
 const McpConfig = () => {
   const [showConfigModal, setShowConfigModal] = useState<boolean>(false);
   const [modalConfig, setModalConfig] = useState<McpConfigState | undefined>(undefined);
   const [viewConfig, setViewConfig] = useState<McpConfigState | undefined>(undefined);
+  const productName = useProductName();
   const configuration = useStore(ConfigurationsStore, (state) => state?.configuration);
 
   useEffect(() => {
@@ -52,17 +60,7 @@ const McpConfig = () => {
     setShowConfigModal(true);
   };
 
-  const onModalClickEnableRemoteAccess = () => {
-    setModalConfig({ ...modalConfig, enable_remote_access: !modalConfig.enable_remote_access });
-  };
-
-  const onModalClickEnableOutputSchema = () => {
-    setModalConfig({ ...modalConfig, enable_output_schema: !modalConfig.enable_output_schema });
-  };
-
-  const onModalClickEnableInputValidation = () => {
-    setModalConfig({ ...modalConfig, enable_input_validation: !modalConfig.enable_input_validation });
-  };
+  const toggle = (key: ToggleKey) => () => setModalConfig({ ...modalConfig, [key]: !modalConfig[key] });
 
   const onModalCancel = () => {
     setShowConfigModal(false);
@@ -70,7 +68,7 @@ const McpConfig = () => {
   };
 
   const onModalSave = () => {
-    ConfigurationsActions.update(ConfigurationType.MCP_CONFIG, { ...modalConfig }).then(() => {
+    ConfigurationsActions.update(ConfigurationType.MCP_CONFIG, modalConfig).then(() => {
       setShowConfigModal(false);
     });
   };
@@ -78,6 +76,8 @@ const McpConfig = () => {
   if (!viewConfig) {
     return <Spinner />;
   }
+
+  const oauthDisabled = !modalConfig.enable_remote_access || !modalConfig.enable_oauth;
 
   return (
     <div>
@@ -99,6 +99,17 @@ const McpConfig = () => {
         <br />
         <dt>Input validation</dt>
         <dd>{viewConfig.enable_input_validation ? 'Enabled' : 'Disabled'}</dd>
+        <br />
+        <dt>OAuth client sign-in</dt>
+        <dd>{viewConfig.enable_oauth ? 'Enabled' : 'Disabled'}</dd>
+        <dt>Access token lifetime</dt>
+        <dd>{viewConfig.oauth_access_token_ttl}</dd>
+        <dt>Refresh token lifetime</dt>
+        <dd>{viewConfig.oauth_refresh_token_ttl}</dd>
+        <dt>Allowed redirect URIs</dt>
+        <dd>
+          {viewConfig.oauth_allowed_redirect_uris?.length ? viewConfig.oauth_allowed_redirect_uris.join(', ') : '-'}
+        </dd>
       </dl>
 
       <IfPermitted permissions="clusterconfigentry:edit">
@@ -122,7 +133,7 @@ const McpConfig = () => {
               label="Enable remote MCP access"
               name="enabled"
               checked={modalConfig.enable_remote_access}
-              onChange={onModalClickEnableRemoteAccess}
+              onChange={toggle('enable_remote_access')}
             />
             <Input
               id="enable-output-schema-checkbox"
@@ -131,7 +142,7 @@ const McpConfig = () => {
               label="Enable Output Schema generation"
               name="output-schema-enabled"
               checked={modalConfig.enable_output_schema}
-              onChange={onModalClickEnableOutputSchema}
+              onChange={toggle('enable_output_schema')}
             />
             <Input
               id="enable-input-validation-checkbox"
@@ -140,7 +151,46 @@ const McpConfig = () => {
               label="Enable Tool Input Validation"
               name="input-validation-enabled"
               checked={modalConfig.enable_input_validation}
-              onChange={onModalClickEnableInputValidation}
+              onChange={toggle('enable_input_validation')}
+            />
+            <Input
+              id="enable-oauth-checkbox"
+              disabled={!modalConfig.enable_remote_access}
+              type="checkbox"
+              label="Enable OAuth client sign-in"
+              name="oauth-enabled"
+              help={`MCP clients only need the server URL and let users sign in through ${productName} in their browser.`}
+              checked={modalConfig.enable_oauth}
+              onChange={toggle('enable_oauth')}
+            />
+            <ISODurationInput
+              id="oauth-access-token-ttl"
+              label="Access token lifetime"
+              help="How long an access token issued to an MCP client is valid. Clients refresh it automatically."
+              duration={modalConfig.oauth_access_token_ttl}
+              update={(value) => setModalConfig({ ...modalConfig, oauth_access_token_ttl: value })}
+              disabled={oauthDisabled}
+              required
+            />
+            <ISODurationInput
+              id="oauth-refresh-token-ttl"
+              label="Refresh token lifetime"
+              help="After this period without use, the user has to authorize the client again."
+              duration={modalConfig.oauth_refresh_token_ttl}
+              update={(value) => setModalConfig({ ...modalConfig, oauth_refresh_token_ttl: value })}
+              disabled={oauthDisabled}
+              required
+            />
+            <InputList
+              id="oauth-allowed-redirect-uris"
+              name="oauth-allowed-redirect-uris"
+              label="Allowed redirect URIs"
+              help="Clients may use these web callbacks in addition to local (loopback) and app callbacks."
+              values={modalConfig.oauth_allowed_redirect_uris}
+              onChange={({ target: { value } }) =>
+                setModalConfig({ ...modalConfig, oauth_allowed_redirect_uris: value.map(String) })
+              }
+              isDisabled={oauthDisabled}
             />
           </fieldset>
         </BootstrapModalForm>

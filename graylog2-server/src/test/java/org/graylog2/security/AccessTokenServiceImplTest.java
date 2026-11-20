@@ -16,6 +16,7 @@
  */
 package org.graylog2.security;
 
+import com.google.common.eventbus.EventBus;
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
@@ -26,9 +27,12 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog2.Configuration;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.rest.models.SortOrder;
+import org.graylog2.search.SearchQuery;
 import org.graylog2.users.UserConfiguration;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -48,6 +52,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -71,6 +76,9 @@ public class AccessTokenServiceImplTest {
     @Mock
     private Configuration configuration;
 
+    @Mock
+    private EventBus eventBus;
+
     private AccessTokenService accessTokenService;
     private MongoCollections mongoCollections;
 
@@ -82,7 +90,7 @@ public class AccessTokenServiceImplTest {
         when(accessTokenCipher.encrypt(anyString())).then(inv -> StringUtils.reverse(inv.getArgument(0)));
         when(accessTokenCipher.decrypt(anyString())).then(inv -> StringUtils.reverse(inv.getArgument(0)));
 
-        this.accessTokenService = new AccessTokenServiceImpl(mongoCollections.mongoConnection(), paginatedAccessTokenEntityService, accessTokenCipher, configService, configuration);
+        this.accessTokenService = new AccessTokenServiceImpl(mongoCollections.mongoConnection(), paginatedAccessTokenEntityService, accessTokenCipher, configService, configuration, eventBus);
     }
 
     @AfterEach
@@ -160,6 +168,49 @@ public class AccessTokenServiceImplTest {
         assertNotNull(token.getExpiresAt(), "\"ExpiresAt\" should not be null");
         assertEquals(token.getCreatedAt().plusDays(ttlInDays), token.getExpiresAt(), "Expiration-timestamp should be " + ttlInDays + " days after creation-timestamp");
         verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
+    }
+
+    @Test
+    public void deleteForOAuthClientOnlyDeletesTokensOfThatClient() {
+        final PeriodDuration ttl = PeriodDuration.of(Duration.ofHours(1));
+        final AccessToken clientToken = accessTokenService.create("admin", "client", ttl, "client-a");
+        final AccessToken otherClientToken = accessTokenService.create("admin", "other client", ttl, "client-b");
+        final AccessToken personalToken = accessTokenService.create("admin", "personal", ttl);
+
+        assertThat(accessTokenService.deleteForOAuthClient(otherClientToken.getToken(), "client-a")).isEmpty();
+        assertThat(accessTokenService.deleteForOAuthClient(personalToken.getToken(), "client-a")).isEmpty();
+        assertThat(accessTokenService.deleteForOAuthClient(clientToken.getToken(), "client-a"))
+                .hasValueSatisfying(deleted -> assertThat(deleted.getUserName()).isEqualTo("admin"));
+
+        assertThat(accessTokenService.load(clientToken.getToken())).isNull();
+        assertThat(accessTokenService.loadAll("admin")).extracting(AccessToken::getName).containsExactlyInAnyOrder("other client", "personal");
+    }
+
+    @Test
+    public void destroyPostsDeletionEventWithOAuthClient() {
+        final PeriodDuration ttl = PeriodDuration.of(Duration.ofHours(1));
+        final AccessToken clientToken = accessTokenService.create("admin", "client", ttl, "client-a");
+        final AccessToken personalToken = accessTokenService.create("admin", "personal", ttl);
+
+        accessTokenService.destroy(accessTokenService.loadById(clientToken.getId()));
+        accessTokenService.destroy(accessTokenService.loadById(personalToken.getId()));
+
+        verify(eventBus).post(new AccessTokenDeletedEvent("admin", "client-a"));
+        verify(eventBus).post(new AccessTokenDeletedEvent("admin", null));
+    }
+
+    @Test
+    public void findPaginatedReadsTokensWithOAuthClient() {
+        final PeriodDuration ttl = PeriodDuration.of(Duration.ofHours(1));
+        accessTokenService.create("admin", "client", ttl, "client-a");
+        accessTokenService.create("admin", "personal", ttl);
+
+        final PaginatedList<AccessTokenEntity> tokens = new PaginatedAccessTokenEntityService(mongoCollections)
+                .findPaginated(new SearchQuery(""), 1, 10, AccessTokenEntity.FIELD_NAME, SortOrder.ASCENDING);
+
+        assertThat(tokens.delegate())
+                .extracting(AccessTokenEntity::name, AccessTokenEntity::oauthClientId)
+                .containsExactly(tuple("client", "client-a"), tuple("personal", null));
     }
 
     @Test

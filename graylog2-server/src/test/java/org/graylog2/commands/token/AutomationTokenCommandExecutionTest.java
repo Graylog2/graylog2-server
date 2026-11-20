@@ -17,6 +17,7 @@
 package org.graylog2.commands.token;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.eventbus.EventBus;
 import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.Configuration;
@@ -64,7 +65,8 @@ public class AutomationTokenCommandExecutionTest {
         doReturn("password-secret").when(configuration)
                 .getPasswordSecret();
         accessTokenService =
-                new AccessTokenServiceImpl(mongoCollections.mongoConnection(), paginatedAccessTokenEntityService, new AccessTokenCipher(configuration), configService, configuration);
+                new AccessTokenServiceImpl(mongoCollections.mongoConnection(), paginatedAccessTokenEntityService, new AccessTokenCipher(configuration), configService, configuration,
+                        new EventBus());
         tokenCommandExecution = new AutomationTokenCommandExecution(accessTokenService, configuration);
     }
 
