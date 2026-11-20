@@ -70,6 +70,22 @@ public class EventProcessorDependencyCheck {
      * @return true if messages up to the given timeRange have already been indexed, false otherwise
      */
     public boolean hasMessagesIndexedUpTo(TimeRange timeRange) {
-        return ProcessingNodesState.SOME_UP_TO_DATE == processingStatusService.calculateProcessingState(timeRange);
+        return hasMessagesIndexedUpTo(timeRange, false);
+    }
+
+    /**
+     * Like {@link #hasMessagesIndexedUpTo(TimeRange)}, but optionally also passes while every node is idle.
+     *
+     * @param timeRange            the time range to check
+     * @param runsWhileClusterIdle whether the caller treats a window without messages as a signal, e.g. an absence
+     *                             alert that must fire during an ingestion outage
+     * @return true if the caller can search the given time range, false otherwise
+     */
+    public boolean hasMessagesIndexedUpTo(TimeRange timeRange, boolean runsWhileClusterIdle) {
+        return switch (processingStatusService.calculateProcessingState(timeRange)) {
+            case SOME_UP_TO_DATE -> true;
+            case ALL_IDLE -> runsWhileClusterIdle;
+            case SOME_OVERLOADED, NONE_ACTIVE -> false;
+        };
     }
 }
