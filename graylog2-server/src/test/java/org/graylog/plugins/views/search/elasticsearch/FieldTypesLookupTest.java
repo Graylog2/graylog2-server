@@ -245,7 +245,7 @@ public class FieldTypesLookupTest {
         Mockito.doAnswer(invocation -> Arrays.stream(dtos)
                 .map(dto -> {
                     final Stream mock = mock(Stream.class, RETURNS_DEEP_STUBS);
-                    when(mock.getIndexSet().getConfig().id()).thenReturn(dto.indexSetId());
+                    when(mock.getIndexSetId()).thenReturn(dto.indexSetId());
                     return mock;
                 })
                 .collect(Collectors.toSet())
