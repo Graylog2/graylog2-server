@@ -64,6 +64,17 @@ const _updateOrder = (
 const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCancel, onSave }: Props) => {
   const [currentStream, setCurrentStream] = useState(DEFAULT_STREAM_ID);
   const [modifiedDecorators, setModifiedDecorators] = useState(decorators);
+  const [wasShown, setWasShown] = useState(show);
+
+  if (show !== wasShown) {
+    // Start from the current decorators every time the dialog is opened, not from the list of the previous session.
+    setWasShown(show);
+
+    if (show) {
+      setModifiedDecorators(decorators);
+    }
+  }
+
   const sendTelemetry = useSendTelemetry('decorators');
   const { isPermitted } = usePermissions();
 
