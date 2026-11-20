@@ -26,6 +26,7 @@ import type { IndexSetFieldTypeProfileForm } from 'components/indices/IndexSetFi
 import useProfileMutations from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileMutations';
 import Routes from 'routing/Routes';
 import useHistory from 'routing/useHistory';
+import StringUtils from 'util/StringUtils';
 
 const CreateProfile = () => {
   const sendTelemetry = useSendTelemetry();
@@ -81,8 +82,8 @@ const CreateProfile = () => {
     <>
       {skippedFieldsCount > 0 && (
         <Alert bsStyle="info">
-          {skippedFieldsCount} {skippedFieldsCount === 1 ? 'field was' : 'fields were'} left out because a profile
-          cannot map reserved fields or fields of this type.
+          {skippedFieldsCount} {StringUtils.pluralize(skippedFieldsCount, 'field was', 'fields were')} left out because
+          a profile cannot map reserved fields or fields of this type.
         </Alert>
       )}
       <ProfileForm
