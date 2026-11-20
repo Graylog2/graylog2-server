@@ -22,9 +22,11 @@ import com.google.inject.assistedinject.Assisted;
 import io.swagger.v3.core.util.ReflectionUtils;
 import io.swagger.v3.jaxrs2.Reader;
 import io.swagger.v3.oas.integration.api.OpenAPIConfiguration;
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Operation;
 import io.swagger.v3.oas.models.Paths;
+import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponses;
@@ -44,6 +46,7 @@ import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.initializers.JerseyService;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -90,7 +93,42 @@ public class CustomReader extends Reader {
         openAPI.getPaths().clear();
         openAPI.getPaths().putAll(newPaths);
 
+        if (openAPI.getComponents() != null && openAPI.getComponents().getSchemas() != null) {
+            inlineParentsOfOneOfSubtypes(openAPI.getComponents().getSchemas());
+        }
+
         return openAPI;
+    }
+
+    // A oneOf parent and its subtypes' allOf references to it form cycles the API browser's resolver hangs on.
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    static void inlineParentsOfOneOfSubtypes(Map<String, Schema> schemas) {
+        schemas.forEach((parentName, parent) -> {
+            if (parent.getOneOf() == null) {
+                return;
+            }
+            final var parentRef = Components.COMPONENTS_SCHEMAS_REF + parentName;
+            final List<Schema> subtypes = parent.getOneOf();
+            subtypes.stream()
+                    .map(Schema::get$ref)
+                    .filter(Objects::nonNull)
+                    .filter(ref -> ref.startsWith(Components.COMPONENTS_SCHEMAS_REF))
+                    .map(ref -> schemas.get(ref.substring(Components.COMPONENTS_SCHEMAS_REF.length())))
+                    .filter(subtype -> subtype != null && subtype.getAllOf() != null)
+                    .forEach(subtype -> {
+                        final List<Schema> allOf = new ArrayList<>(subtype.getAllOf());
+                        allOf.replaceAll(s -> parentRef.equals(s.get$ref()) ? parentProperties(parent) : s);
+                        subtype.setAllOf(allOf);
+                    });
+        });
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static Schema parentProperties(Schema parent) {
+        final var inlined = new Schema<>(parent.getSpecVersion());
+        inlined.setProperties(parent.getProperties());
+        inlined.setRequired(parent.getRequired());
+        return inlined;
     }
 
     /**

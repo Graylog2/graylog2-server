@@ -399,6 +399,29 @@
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
         </dependency>
+        <!--
+            Jakarta EL 6 for Hibernate Validator.
+
+            Why: jersey-bean-validation 4.x brings Jakarta EL 5 (jakarta.el-api 5.0.1, expressly 5.0.0), because
+            Jersey 4.x builds against Hibernate Validator 8.0.x. Hibernate Validator 9.x is built against EL 6, and
+            since 9.1.6 its message interpolation uses jakarta.el.RecordELResolver, which only exists in EL 6.
+            With EL 5, interpolating any message that contains an EL expression (e.g. the default messages of
+            @DecimalMin and @DecimalMax) throws NoClassDefFoundError. REST requests then fail with a 500 response
+            instead of a 400 validation error.
+
+            Jersey itself doesn't use EL. It only adds the dependency for Hibernate Validator, so EL 6 is safe here.
+
+            Remove this once Jersey brings EL 6 itself (planned for Jersey 5.x, not available in Jersey 4.x).
+            ValidatorModuleTest fails if EL 5 is on the classpath.
+        -->
+        <dependency>
+            <groupId>jakarta.el</groupId>
+            <artifactId>jakarta.el-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.expressly</groupId>
+            <artifactId>expressly</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk18on</artifactId>
