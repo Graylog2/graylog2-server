@@ -76,24 +76,17 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class CollectorsModule extends PluginModule {
     private static final String OTLP_DUMP_FLAG = "collector_otlp_traffic_dump";
-    public static final String COLLECTORS_FLAG = "collectors";
 
-    private final boolean collectorsEnabled;
     private final boolean otlpDumpEnabled;
     private final boolean isCloud;
 
     public CollectorsModule(FeatureFlags featureFlags, Configuration configuration) {
-        this.collectorsEnabled = featureFlags.isOn(COLLECTORS_FLAG);
         this.otlpDumpEnabled = featureFlags.isOn(OTLP_DUMP_FLAG);
         this.isCloud = configuration.isCloud();
     }
 
     @Override
     protected void configure() {
-        if (!collectorsEnabled) {
-            return;
-        }
-
         install(new OpAmpModule());
 
         // Fleet transaction log
