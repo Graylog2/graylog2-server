@@ -32,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -162,7 +161,6 @@ public class MigrationHelpers {
                 fixedUser.setFirstLastFullNames(firstName, lastName);
                 fixedUser.setPassword(password);
                 fixedUser.setEmail(email);
-                fixedUser.setPermissions(Collections.emptyList());
                 fixedUser.setRoleIds(expectedRoles);
                 fixedUser.setTimeZone(DateTimeZone.UTC);
                 fixedUser.setServiceAccount(isServiceAccount);

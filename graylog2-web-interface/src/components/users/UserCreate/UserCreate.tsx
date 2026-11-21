@@ -167,7 +167,7 @@ const UserCreate = () => {
   };
 
   const handleFormSubmit = (formData, roles) => {
-    let data = { ...formData, roles: roles.toJS(), permissions: [] };
+    let data = { ...formData, roles: roles.toJS() };
     delete data.password_repeat;
 
     if (isCloud && oktaUserForm) {

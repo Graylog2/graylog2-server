@@ -20,10 +20,10 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -47,6 +47,8 @@ public abstract class CreateUserRequest {
     @JsonProperty("last_name")
     public abstract String lastName();
 
+    @Deprecated(since = "7.3.0", forRemoval = true)
+    @Schema(deprecated = true, description = "Deprecated: direct user permissions will be removed in version 8.0. Assign roles instead.")
     @JsonProperty("permissions")
     public abstract List<String> permissions();
 
@@ -75,14 +77,14 @@ public abstract class CreateUserRequest {
                                            @JsonProperty("email") @Email String email,
                                            @JsonProperty("first_name") @NotEmpty String firstName,
                                            @JsonProperty("last_name") @NotEmpty String lastName,
-                                           @JsonProperty("permissions") @NotNull List<String> permissions,
+                                           @JsonProperty("permissions") @Nullable List<String> permissions,
                                            @JsonProperty("timezone") @Nullable String timezone,
                                            @JsonProperty("session_timeout_ms") @Nullable @Min(1) Long sessionTimeoutMs,
                                            @JsonProperty("startpage") @Nullable Startpage startpage,
                                            @JsonProperty("roles") @Nullable List<String> roles,
                                            @JsonProperty("service_account") @Nullable Boolean isServiceAccount) {
         return new AutoValue_CreateUserRequest(username, password, email, firstName, lastName,
-                permissions, timezone, sessionTimeoutMs, startpage, roles,
+                permissions == null ? List.of() : permissions, timezone, sessionTimeoutMs, startpage, roles,
                 isServiceAccount != null && isServiceAccount);
     }
 }

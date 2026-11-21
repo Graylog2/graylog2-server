@@ -18,6 +18,7 @@ package org.graylog2.migrations.V20200803120800_GrantsMigrations;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import jakarta.inject.Named;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
@@ -31,8 +32,6 @@ import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Named;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -93,6 +92,7 @@ public class UserPermissionsToGrantsMigration {
         });
     }
 
+    @SuppressWarnings("removal")
     private void migrateUserPermissions(User user, Map<String, Set<String>> migratableEntities) {
         migratableEntities.forEach((entityID, permissions) -> {
             final GRNTypeCapability grnTypeCapability = GrantsMetaMigration.MIGRATION_MAP.get(permissions);
