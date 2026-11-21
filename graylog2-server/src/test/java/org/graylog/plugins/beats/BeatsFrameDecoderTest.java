@@ -42,7 +42,7 @@ public class BeatsFrameDecoderTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        decoder = new BeatsFrameDecoder();
+        decoder = new BeatsFrameDecoder(BeatsInputDefaultsConfig.DEFAULT_MAX_EVENT_SIZE);
         channel = new EmbeddedChannel(new LoggingHandler(), decoder);
     }
 
@@ -242,8 +242,8 @@ public class BeatsFrameDecoderTest {
     }
 
     @Test
-    public void rejectsJsonFrameExceedingLengthLimit() {
-        final byte[] oversizedJson = ("{\"message\":\"" + "X".repeat(16 * 1024 * 1024) + "\"}")
+    public void rejectsJsonFrameExceedingDefaultMaxEventSize() {
+        final byte[] oversizedJson = ("{\"message\":\"" + "X".repeat(BeatsInputDefaultsConfig.DEFAULT_MAX_EVENT_SIZE) + "\"}")
                 .getBytes(StandardCharsets.UTF_8);
 
         final ByteBuf frame = buildJsonFrame(oversizedJson, 0);
@@ -251,35 +251,107 @@ public class BeatsFrameDecoderTest {
         assertThatThrownBy(() -> {
             channel.writeInbound(frame);
             channel.checkException();
-        }).isInstanceOf(DecoderException.class);
+        }).isInstanceOf(DecoderException.class)
+                .hasMessageContaining("JSON frame size")
+                .hasMessageContaining("maximum event size of " + BeatsInputDefaultsConfig.DEFAULT_MAX_EVENT_SIZE);
     }
 
     @Test
-    public void rejectsDataFrameExceedingPairLimit() {
-        final ByteBuf frame = Unpooled.buffer();
-        frame.writeByte('2');
-        frame.writeByte('D');
-        frame.writeInt(0);
-        frame.writeInt(1025);
+    public void acceptsJsonFrameUpToConfiguredMaxEventSize() throws Exception {
+        final byte[] jsonBytes = "{\"answer\": 42}".getBytes(StandardCharsets.UTF_8);
+        channel = new EmbeddedChannel(new BeatsFrameDecoder(jsonBytes.length));
+
+        channel.writeInbound(buildJsonFrame(jsonBytes, 0));
+
+        final ByteBuf received = channel.readInbound();
+        assertThat(received.toString(StandardCharsets.UTF_8)).isEqualTo("{\"answer\": 42}");
+        received.release();
+        channel.finishAndReleaseAll();
+    }
+
+    @Test
+    public void rejectsJsonFrameExceedingConfiguredMaxEventSize() {
+        final byte[] jsonBytes = "{\"answer\": 42}".getBytes(StandardCharsets.UTF_8);
+        channel = new EmbeddedChannel(new BeatsFrameDecoder(jsonBytes.length - 1));
 
         assertThatThrownBy(() -> {
-            channel.writeInbound(frame);
+            channel.writeInbound(buildJsonFrame(jsonBytes, 0));
             channel.checkException();
         }).isInstanceOf(DecoderException.class);
     }
 
     @Test
-    public void rejectsDataItemExceedingLengthLimit() {
+    public void rejectsJsonFrameExceedingMaxEventSizeInsideCompressedFrame() {
+        final byte[] jsonBytes = "{\"answer\": 42}".getBytes(StandardCharsets.UTF_8);
+        final ByteBuf innerFrame = buildJsonFrame(jsonBytes, 0);
+        final byte[] innerBytes = new byte[innerFrame.readableBytes()];
+        innerFrame.readBytes(innerBytes);
+        channel = new EmbeddedChannel(new BeatsFrameDecoder(jsonBytes.length - 1));
+
+        assertThatThrownBy(() -> {
+            channel.writeInbound(buildCompressedFrame(innerBytes, 6));
+            channel.checkException();
+        }).isInstanceOf(DecoderException.class);
+    }
+
+    @Test
+    public void rejectsDataFrameWhosePairCountAloneExceedsMaxEventSize() {
+        final ByteBuf frame = Unpooled.buffer();
+        frame.writeByte('2');
+        frame.writeByte('D');
+        frame.writeInt(0);
+        // 2^31 pairs need at least 16 GiB for their length prefixes alone
+        frame.writeInt(Integer.MIN_VALUE);
+
+        assertThatThrownBy(() -> {
+            channel.writeInbound(frame);
+            channel.checkException();
+        }).isInstanceOf(DecoderException.class)
+                .hasMessageContaining("Data frame size");
+    }
+
+    @Test
+    public void rejectsDataFrameItemExceedingMaxEventSize() {
         final ByteBuf frame = Unpooled.buffer();
         frame.writeByte('2');
         frame.writeByte('D');
         frame.writeInt(0);
         frame.writeInt(1);
-        frame.writeInt(1024 * 1024 + 1);
+        frame.writeInt(BeatsInputDefaultsConfig.DEFAULT_MAX_EVENT_SIZE + 1);
 
         assertThatThrownBy(() -> {
             channel.writeInbound(frame);
             channel.checkException();
         }).isInstanceOf(DecoderException.class);
+    }
+
+    @Test
+    public void acceptsDataFrameUpToConfiguredMaxEventSize() throws Exception {
+        // 2 * 4 bytes length prefixes + 3 bytes key + 5 bytes value
+        channel = new EmbeddedChannel(new BeatsFrameDecoder(16));
+
+        channel.writeInbound(buildDataFrame(ImmutableMap.of("foo", "hello"), 0));
+
+        final ByteBuf received = channel.readInbound();
+        final Map<String, Object> result = objectMapper.readValue(received.toString(StandardCharsets.UTF_8), TypeReferences.MAP_STRING_OBJECT);
+        assertThat(result).containsEntry("foo", "hello");
+        received.release();
+        channel.finishAndReleaseAll();
+    }
+
+    @Test
+    public void rejectsDataFrameExceedingConfiguredMaxEventSizeAcrossPairs() {
+        // Each pair alone fits into the limit, but both together don't.
+        channel = new EmbeddedChannel(new BeatsFrameDecoder(16));
+
+        assertThatThrownBy(() -> {
+            channel.writeInbound(buildDataFrame(ImmutableMap.of("foo", "hello", "bar", "world"), 0));
+            channel.checkException();
+        }).isInstanceOf(DecoderException.class);
+    }
+
+    @Test
+    public void rejectsNonPositiveMaxEventSize() {
+        assertThatThrownBy(() -> new BeatsFrameDecoder(0)).isInstanceOf(IllegalArgumentException.class);
     }
 }

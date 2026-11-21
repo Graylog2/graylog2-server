@@ -21,6 +21,7 @@ import com.google.inject.assistedinject.Assisted;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
@@ -41,6 +42,12 @@ public class Beats2Input extends MessageInput {
                        ServerStatus serverStatus) {
         super(metricRegistry, configuration, transportFactory.create(configuration),
                 localRegistry, codecFactory.create(configuration), config, descriptor, serverStatus);
+    }
+
+    @Override
+    public void checkConfiguration() throws ConfigurationException {
+        super.checkConfiguration();
+        BeatsTransport.checkConfiguration(getConfiguration());
     }
 
     @FactoryClass
