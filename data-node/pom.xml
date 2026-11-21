@@ -60,7 +60,6 @@
         <maven.source.skip>true</maven.source.skip>
         <maven.javadoc.skip>true</maven.javadoc.skip>
         <maven.deploy.skip>true</maven.deploy.skip>
-        <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
     </properties>
 
     <dependencies>
@@ -737,7 +736,7 @@
                     </descriptors>
                     <!-- to make it easier to collect assemblies, we put them into the _parent's_ build directory -->
                     <outputDirectory>${project.basedir}/../target/assembly</outputDirectory>
-                    <finalName>datanode-${project.version}-${maven.build.timestamp}</finalName>
+                    <finalName>datanode-${project.version}-${artifact.timestamp}</finalName>
                 </configuration>
             </plugin>
 

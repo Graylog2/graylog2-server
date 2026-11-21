@@ -87,6 +87,10 @@
         <maven.compiler.target>21</maven.compiler.target>
         <maven.compiler.useIncrementalCompilation>false</maven.compiler.useIncrementalCompilation>
 
+        <!-- Use the build start time for file entries in JARs and tarballs. Maven 3.10+ otherwise defaults to 1980-02-01.
+             The maven.build.timestamp format must stay ISO-8601. Use ${artifact.timestamp} for file names. -->
+        <project.build.outputTimestamp>${maven.build.timestamp}</project.build.outputTimestamp>
+
         <!-- This property will be overridden during the release to collect all artifacts in a central location. -->
         <local.repo.path>${project.build.directory}/local-maven-repo</local.repo.path>
 
@@ -990,6 +994,16 @@
                     <version>3.6.1</version>
                 </plugin>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>3.7.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>3.8.0</version>
+                </plugin>
+                <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
                     <version>3.7.0</version>
@@ -998,6 +1012,11 @@
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
                     <version>2.25.1</version>
+                    <configuration>
+                        <!-- versions:set (used by the release script) would otherwise replace the
+                             ${maven.build.timestamp} reference in project.build.outputTimestamp with a fixed date -->
+                        <updateBuildOutputTimestampPolicy>never</updateBuildOutputTimestampPolicy>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
@@ -1092,6 +1111,27 @@
         </pluginManagement>
 
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <!-- Compact build timestamp for artifact file names, e.g. 20261119144335.
+                             Runs in initialize, after the enforcer has checked the timestamp format in validate. -->
+                        <id>artifact-timestamp</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>regex-property</goal>
+                        </goals>
+                        <configuration>
+                            <name>artifact.timestamp</name>
+                            <value>${maven.build.timestamp}</value>
+                            <regex>[-:TZ]</regex>
+                            <replacement></replacement>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -1220,6 +1260,13 @@
                                 <requireOS>
                                     <family>unix</family>
                                 </requireOS>
+                                <!-- project.build.outputTimestamp and artifact.timestamp are derived from
+                                     maven.build.timestamp and need its default ISO-8601 format. -->
+                                <requireProperty>
+                                    <property>project.build.outputTimestamp</property>
+                                    <regex>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z</regex>
+                                    <regexMessage>project.build.outputTimestamp is "${project.build.outputTimestamp}" but must be an ISO-8601 UTC timestamp like 2026-01-01T00:00:00Z. Do not override maven.build.timestamp.format. Use the artifact.timestamp property for a compact timestamp in file names.</regexMessage>
+                                </requireProperty>
                             </rules>
                         </configuration>
                     </execution>
