@@ -19,23 +19,15 @@ package org.graylog2.plugin;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import org.joda.time.DateTime;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
 
 /**
  * MessageSummary is being used as a return value for AlarmCallbacks.
  */
 public class MessageSummary {
-    // for these fields we define individual json properties
-    private static final HashSet<String> RESERVED_FIELDS = Sets.newHashSet(Message.FIELD_ID,
-                                                                          Message.FIELD_MESSAGE,
-                                                                          Message.FIELD_SOURCE,
-                                                                          Message.FIELD_TIMESTAMP,
-                                                                          Message.FIELD_STREAMS);
     @JsonIgnore
     private final String index;
 
@@ -79,17 +71,12 @@ public class MessageSummary {
 
     @JsonProperty
     public Map<String, Object> getFields() {
-        Map<String, Object> genericFields = Maps.newHashMap();
-
         // strip out common "fields" that we report as individual properties
-        for (Map.Entry<String, Object> entry : message.getFieldsEntries()) {
-            if (!RESERVED_FIELDS.contains(entry.getKey())) {
-                genericFields.put(entry.getKey(), entry.getValue());
-            }
+        return Maps.newHashMap(message.getFields(key -> !isIndividualProperty(key)));
+    }
 
-        }
-
-        return genericFields;
+    private static boolean isIndividualProperty(String key) {
+        return Message.STANDARD_FIELDS.contains(key) || Message.FIELD_STREAMS.equals(key);
     }
 
     @JsonIgnore
