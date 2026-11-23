@@ -23,6 +23,7 @@ import org.graylog2.telemetry.scheduler.TelemetrySubmissionPeriodical;
 import org.graylog2.telemetry.suppliers.DashboardsMetricsSupplier;
 import org.graylog2.telemetry.suppliers.EventDefinitionsMetricsSupplier;
 import org.graylog2.telemetry.suppliers.EventNotificationsMetricsSupplier;
+import org.graylog2.telemetry.suppliers.IndexingFailuresMetricsSupplier;
 import org.graylog2.telemetry.suppliers.InputsMetricsSupplier;
 import org.graylog2.telemetry.suppliers.LookupTablesSupplier;
 import org.graylog2.telemetry.suppliers.MongoDBMetricsSupplier;
@@ -59,5 +60,6 @@ public class TelemetryModule extends PluginModule {
         addTelemetryMetricProvider("Sidecars Version", SidecarsVersionSupplier.class);
         addTelemetryMetricProvider("Nodes System Metrics", NodesSystemMetricsSupplier.class);
         addTelemetryMetricProvider("Outdated Indices Metrics", OutdatedIndicesMetricsSupplier.class);
+        addTelemetryMetricProvider("Indexing Failures Metrics", IndexingFailuresMetricsSupplier.class);
     }
 }
