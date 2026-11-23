@@ -27,6 +27,7 @@ import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/h
 import { profile1, attributes, profile2 } from 'fixtures/indexSetFieldTypeProfiles';
 import ProfilesList from 'components/indices/IndexSetFieldTypeProfiles/ProfilesList';
 import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
+import Routes from 'routing/Routes';
 
 const getData = (list = [profile1]) => ({
   list,
@@ -45,6 +46,17 @@ const renderIndexSetFieldTypeProfilesList = () =>
 
 jest.mock('routing/useParams', () => jest.fn());
 
+const mockPushWithState = jest.fn();
+
+jest.mock('routing/useHistory', () => {
+  const actual = jest.requireActual('routing/useHistory');
+
+  return {
+    __esModule: true,
+    default: () => ({ ...actual.default(), pushWithState: mockPushWithState }),
+  };
+});
+
 jest.mock('components/common/PaginatedEntityTable/useFetchEntities', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
 
@@ -54,6 +66,8 @@ describe('IndexSetFieldTypesList', () => {
   useViewsPlugin();
 
   beforeEach(() => {
+    mockPushWithState.mockClear();
+
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: {
         ...layoutPreferences,
@@ -93,14 +107,14 @@ describe('IndexSetFieldTypesList', () => {
 
     await within(tableRow1).findByText('Profile 1');
     await within(tableRow1).findByText('Description 1');
-    await within(tableRow1).findByText('2');
+    await within(tableRow1).findByText('http_method');
     await within(tableRow1).findByText('Edit');
 
     const tableRow2 = await screen.findByTestId('table-row-222');
 
     await within(tableRow2).findByText('Profile 2');
     await within(tableRow2).findByText('Description 2');
-    await within(tableRow2).findByText('3');
+    await within(tableRow2).findByText('logged_in');
     await within(tableRow2).findByText('Edit');
   });
 
@@ -115,13 +129,31 @@ describe('IndexSetFieldTypesList', () => {
 
     const tableRow2 = await screen.findByTestId('table-row-222');
 
-    const customFieldTypeMappingAmount = await within(tableRow2).findByText('3');
+    await userEvent.click(await within(tableRow2).findByRole('button', { name: /show 2 more/i }));
 
-    await userEvent.click(customFieldTypeMappingAmount);
+    await within(tableRow2).findByText('user_name');
+    await within(tableRow2).findByText('String type');
+    await within(tableRow2).findByText('sum');
+    await within(tableRow2).findByText('Number(int)');
+  });
 
-    expect(tableRow2.textContent).toContain('Custom Field Mappings');
-    expect(tableRow2.textContent).toContain('user_name:String type');
-    expect(tableRow2.textContent).toContain('logged_in:Boolean');
-    expect(tableRow2.textContent).toContain('sum:Number(int)');
+  it('Opens the create form with a copy of the profile when choosing Duplicate', async () => {
+    asMock(useFetchEntities).mockReturnValue({
+      isInitialLoading: false,
+      refetch: () => {},
+      data: getData([profile1, profile2]),
+    });
+
+    renderIndexSetFieldTypeProfilesList();
+
+    const tableRow1 = await screen.findByTestId('table-row-111');
+    await userEvent.click(await within(tableRow1).findByRole('button', { name: /^more( actions)?$/i }));
+    await userEvent.click(await screen.findByText('Duplicate'));
+
+    expect(mockPushWithState).toHaveBeenCalledWith(Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.CREATE, {
+      name: 'Profile 1 (COPY)',
+      description: 'Description 1',
+      customFieldMappings: profile1.customFieldMappings,
+    });
   });
 });

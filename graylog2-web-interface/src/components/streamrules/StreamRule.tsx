@@ -35,7 +35,7 @@ const ActionButtonsWrap = styled.span`
 type Props = {
   matchData?: {
     matches: boolean;
-    rules: { [id: string]: false };
+    rules: { [id: string]: boolean };
   };
   stream: Stream;
   onDelete?: (ruleId: string) => void;

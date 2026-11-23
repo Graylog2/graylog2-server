@@ -55,7 +55,7 @@ const renderOption = (option: StreamsAndCategoriesOption) =>
 type StreamsAndCategoriesFilterProps = Omit<React.ComponentProps<typeof Select>, 'options' | 'value'> & {
   onChange: (value: StreamsAndCategoriesSelection) => void;
   value?: StreamsAndCategoriesSelection;
-  streams: Array<{ id: string; title: string; categories: string[] }>;
+  streams: Array<{ id: string; title: string; categories?: string[] }>;
   streamCategories?: string[] | undefined;
   showStreams?: boolean;
   showCategories?: boolean;

@@ -128,9 +128,9 @@ export type EnrollmentTokenMetadata = {
   fleet_id: string;
   created_by: EnrollmentTokenCreator;
   created_at: string;
-  expires_at: string | null;
+  expires_at?: string | null;
   usage_count: number;
-  last_used_at: string | null;
+  last_used_at?: string | null;
 };
 
 export type CollectorStats = {
@@ -154,10 +154,10 @@ export type TokenSigningKey = {
 };
 
 export type CollectorsConfig = {
-  ca_cert_id: string | null;
-  signing_cert_id: string | null;
-  token_signing_key: TokenSigningKey | null;
-  otlp_server_cert_id: string | null;
+  ca_cert_id?: string | null;
+  signing_cert_id?: string | null;
+  token_signing_key?: TokenSigningKey | null;
+  otlp_server_cert_id?: string | null;
   http: IngestEndpointConfig;
   collector_heartbeat_interval: string;
   collector_offline_threshold: string;

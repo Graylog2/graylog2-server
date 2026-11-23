@@ -31,6 +31,7 @@ import type { StepType } from 'components/common/Wizard';
 import type { InputSetupWizardStep } from 'components/inputs/InputSetupWizard';
 import type { TelemetryEventType } from 'logic/telemetry/TelemetryContext';
 import type { RightSidebarContextType } from 'contexts/RightSidebarContext';
+import type { HotkeyCollection, ScopeName } from 'contexts/HotkeysContext';
 
 type PluginNavigationLink = {
   path: QualifiedUrl<string>;
@@ -261,6 +262,7 @@ declare module 'graylog-web-plugin/plugin' {
     permissions?: Permissions;
     telemetryEvent?: CreatorTelemetryEvent;
     requiredFeatureFlag?: string;
+    useCondition?: () => boolean;
   }
 
   interface EntityActions {
@@ -357,16 +359,14 @@ declare module 'graylog-web-plugin/plugin' {
     StreamIndexSetDataLakeWarning: React.ComponentType<{ streamId: string; isArchivingEnabled: boolean }>;
     fetchStreamDataLakeStatus: (streamId: string) => Promise<{
       id: string;
-      archive_name: string;
       enabled: boolean;
       stream_id: string;
-      retention_time: number;
+      retention_time?: string;
     }>;
     fetchStreamDataLake: (streamId: string) => Promise<{
       id: string;
       archive_config_id: string;
       message_count: number;
-      archive_name: string;
       timestamp_from: string;
       timestamp_to: string;
       restore_history: Array<{ id: string }>;
@@ -445,9 +445,7 @@ declare module 'graylog-web-plugin/plugin' {
 
   type EntityLinkResolver = {
     uriSegment: string;
-    resolve: (
-      trailingSegments: ReadonlyArray<string>,
-    ) =>
+    resolve: (trailingSegments: ReadonlyArray<string>) =>
       | { grnType: string; id: string; Title?: React.ComponentType<EntityLinkTitleProps> }
       | { onClick: (context: EntityLinkOnClickContext) => void }
       // Renders the link itself, for targets only known where the link is shown, e.g. through a React context.
@@ -472,9 +470,13 @@ declare module 'graylog-web-plugin/plugin' {
     dataTiering?: Array<DataTiering>;
     defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
+    // Shown next to every page, after the right sidebar, e.g. the Assistant's chat.
+    globalSidebars?: Array<{ key: string; component: React.ComponentType }>;
     'navigation.badges'?: Array<NavigationBadge>;
     globalNotifications?: Array<GlobalNotification>;
     helpMenu?: Array<HelpMenuItem>;
+    // Adds keyboard shortcuts to an existing scope, so `useHotkey` and the shortcut overview know them.
+    hotkeys?: Array<{ scope: ScopeName; actions: HotkeyCollection['actions'] }>;
     'quickJump.queryActions'?: Array<QuickJumpQueryAction>;
     fieldValueProviders?: Array<FieldValueProvider>;
     license?: Array<License>;

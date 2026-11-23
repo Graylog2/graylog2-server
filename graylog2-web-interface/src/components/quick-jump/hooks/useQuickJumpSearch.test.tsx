@@ -36,15 +36,25 @@ describe('useQuickJumpSearch', () => {
     'quickJump.queryActions': [
       {
         key: 'ask',
-        item: (query: string) => ({ type: ACTION_TYPE, title: `Ask about "${query}"`, link: `/ask?q=${query}` as QualifiedUrl<string> }),
+        item: (query: string) => ({
+          type: ACTION_TYPE,
+          title: `Ask about "${query}"`,
+          link: `/ask?q=${query}` as QualifiedUrl<string>,
+        }),
       },
-      { key: 'hidden', item: () => ({ type: ACTION_TYPE, title: 'Hidden', link: '/hidden' as QualifiedUrl<string> }), useCondition: () => false },
+      {
+        key: 'hidden',
+        item: () => ({ type: ACTION_TYPE, title: 'Hidden', link: '/hidden' as QualifiedUrl<string> }),
+        useCondition: () => false,
+      },
     ],
   });
 
   beforeEach(() => {
     asMock(QuickJump.search).mockResolvedValue({ results: [] } as Awaited<ReturnType<typeof QuickJump.search>>);
-    asMock(useNavItems).mockReturnValue([{ type: PAGE_TYPE, title: 'Streams', link: '/streams' as QualifiedUrl<string> }]);
+    asMock(useNavItems).mockReturnValue([
+      { type: PAGE_TYPE, title: 'Streams', link: '/streams' as QualifiedUrl<string> },
+    ]);
   });
 
   it('offers actions for the typed text after everything that matches it', async () => {
@@ -53,9 +63,7 @@ describe('useQuickJumpSearch', () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     expect(result.current.searchResults.map(({ title }) => title)).toEqual(['Streams', 'Ask about "streams"']);
-    expect(result.current.searchResults[1]).toEqual(
-      expect.objectContaining({ key: 'ask', link: '/ask?q=streams' }),
-    );
+    expect(result.current.searchResults[1]).toEqual(expect.objectContaining({ key: 'ask', link: '/ask?q=streams' }));
   });
 
   it('offers no actions without text', async () => {

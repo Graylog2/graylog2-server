@@ -106,7 +106,7 @@ const OverlayTrigger = (
             onMouseEnter={hover ? open : undefined}
             onMouseLeave={hover ? close : undefined}
             onFocus={focus ? open : undefined}
-            onBlur={focus ? open : undefined}>
+            onBlur={focus ? close : undefined}>
             {children}
           </TriggerWrap>
         </Popover.Target>
