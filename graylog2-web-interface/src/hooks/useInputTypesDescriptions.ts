@@ -29,7 +29,7 @@ type InputType = {
   link_to_docs: string;
   name: string;
   is_exclusive: boolean;
-  description: string;
+  description?: string;
   type: string;
 };
 export type InputTypeDescriptionsResponse = {

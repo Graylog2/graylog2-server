@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
@@ -43,6 +44,7 @@ public abstract class PipelineSource {
     @Nullable
     @Id
     @ObjectId
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     public abstract String id();
 
     @JsonProperty("_scope")
