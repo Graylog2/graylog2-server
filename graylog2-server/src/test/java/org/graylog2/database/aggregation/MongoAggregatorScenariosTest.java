@@ -23,8 +23,13 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.aggregation.BucketAggregationResult.Bucket;
-import org.graylog2.database.aggregation.Grouping.DateUnit;
-import org.graylog2.database.aggregation.Grouping.Range;
+import org.graylog2.database.aggregation.grouping.DateHistogram;
+import org.graylog2.database.aggregation.grouping.DateUnit;
+import org.graylog2.database.aggregation.grouping.GroupedValueSource;
+import org.graylog2.database.aggregation.grouping.Grouping;
+import org.graylog2.database.aggregation.grouping.Range;
+import org.graylog2.database.aggregation.grouping.Ranges;
+import org.graylog2.database.aggregation.grouping.RelatedSource;
 import org.graylog2.rest.models.SortOrder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -237,9 +242,9 @@ class MongoAggregatorScenariosTest {
 
     @Nested
     class Relations {
-        private static final GroupedValueSource.Related OWNER_ACCOUNT_STATUS =
+        private static final RelatedSource OWNER_ACCOUNT_STATUS =
                 GroupedValueSource.related("owner", "users", "_id", "account_status").withLocalFieldAsObjectId();
-        private static final GroupedValueSource.Related ASSET_CATEGORY =
+        private static final RelatedSource ASSET_CATEGORY =
                 GroupedValueSource.related("event.associated_assets", "assets", "_id", "category")
                         .withLocalFieldAsObjectId();
 

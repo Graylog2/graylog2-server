@@ -21,6 +21,8 @@ import com.mongodb.client.model.Filters;
 import jakarta.annotation.Nullable;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.graylog2.database.aggregation.grouping.Grouping;
+import org.graylog2.database.aggregation.grouping.RelatedSource;
 
 import java.time.Duration;
 import java.util.Objects;
@@ -76,7 +78,7 @@ public class MongoAggregator {
     }
 
     private BucketAggregationRequest permitted(final BucketAggregationRequest request) {
-        final Grouping grouping = request.grouping().source() instanceof GroupedValueSource.Related related
+        final Grouping grouping = request.grouping().source() instanceof RelatedSource related
                 ? request.grouping().withSource(permitted(related))
                 : request.grouping();
         return new BucketAggregationRequest(and(permissionFilter, request.documentFilter()), grouping, request.order(),
@@ -84,7 +86,7 @@ public class MongoAggregator {
     }
 
     // A document whose related documents the user may not read counts as missing, like one without any.
-    private GroupedValueSource.Related permitted(final GroupedValueSource.Related related) {
+    private RelatedSource permitted(final RelatedSource related) {
         final PermissionFilter relatedPermissionFilter = relatedPermissionFilters.apply(related.collection());
         if (relatedPermissionFilter.isUnrestricted()) {
             return related;

@@ -19,6 +19,7 @@ package org.graylog2.database.aggregation;
 import com.mongodb.client.model.Filters;
 import jakarta.annotation.Nullable;
 import org.bson.conversions.Bson;
+import org.graylog2.database.aggregation.grouping.Grouping;
 import org.graylog2.rest.models.SortOrder;
 
 import java.util.Objects;

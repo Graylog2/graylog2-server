@@ -17,7 +17,10 @@
 package org.graylog2.database.aggregation;
 
 import org.bson.Document;
-import org.graylog2.database.aggregation.Grouping.Range;
+import org.graylog2.database.aggregation.grouping.FieldSource;
+import org.graylog2.database.aggregation.grouping.GroupedValueSource;
+import org.graylog2.database.aggregation.grouping.Grouping;
+import org.graylog2.database.aggregation.grouping.Range;
 import org.graylog2.rest.models.SortOrder;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -42,7 +45,7 @@ class BucketAggregationRequestTest {
     @ValueSource(strings = {"owner", "event.timestamp", "assets.id", "_id", "gl2_source-input"})
     void acceptsPlainFieldPaths(final String path) {
         assertThat(Grouping.terms(path).source())
-                .isEqualTo(new GroupedValueSource.Field(path));
+                .isEqualTo(new FieldSource(path));
     }
 
     @Test

@@ -22,6 +22,9 @@ import org.apache.shiro.subject.Subject;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.database.aggregation.grouping.GroupedValueSource;
+import org.graylog2.database.aggregation.grouping.Grouping;
+import org.graylog2.database.aggregation.grouping.RelatedSource;
 import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
 import org.graylog2.database.dbcatalog.DbEntityCatalogEntry;
 import org.graylog2.shared.security.EntityPermissionsUtils;
@@ -56,7 +59,7 @@ class PermittedAggregatorsTest {
     private static final String DB_01 = "65f0000000000000000000a2";
     private static final String LAPTOP_07 = "65f0000000000000000000a3";
     private static final PermissionFilter STREAM_S1 = PermissionFilter.of(Filters.in("event.source_streams", "s1"));
-    private static final GroupedValueSource.Related ASSET_CATEGORY =
+    private static final RelatedSource ASSET_CATEGORY =
             GroupedValueSource.related("event.associated_assets", "assets", "_id", "category")
                     .withLocalFieldAsObjectId();
 

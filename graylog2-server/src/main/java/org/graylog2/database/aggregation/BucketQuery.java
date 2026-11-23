@@ -33,6 +33,14 @@ import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.conversions.Bson;
 import org.graylog2.database.aggregation.BucketAggregationResult.Bucket;
+import org.graylog2.database.aggregation.grouping.DateHistogram;
+import org.graylog2.database.aggregation.grouping.DateUnit;
+import org.graylog2.database.aggregation.grouping.FieldSource;
+import org.graylog2.database.aggregation.grouping.GroupedValueSource;
+import org.graylog2.database.aggregation.grouping.Grouping;
+import org.graylog2.database.aggregation.grouping.Ranges;
+import org.graylog2.database.aggregation.grouping.RelatedSource;
+import org.graylog2.database.aggregation.grouping.Terms;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -42,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -122,13 +131,13 @@ final class BucketQuery {
 
     private static List<Bson> valueStages(final GroupedValueSource source) {
         return switch (source) {
-            case GroupedValueSource.Field field ->
+            case FieldSource field ->
                     List.of(Aggregates.set(new Field<>(VALUE, distinctValues("$" + field.path()))));
-            case GroupedValueSource.Related related -> relatedValueStages(related);
+            case RelatedSource related -> relatedValueStages(related);
         };
     }
 
-    private static List<Bson> relatedValueStages(final GroupedValueSource.Related related) {
+    private static List<Bson> relatedValueStages(final RelatedSource related) {
         final var stages = new ArrayList<Bson>();
         final var temporaryFields = new ArrayList<>(List.of(RELATED));
         var localField = related.localField();
@@ -214,13 +223,13 @@ final class BucketQuery {
     private static Object bucketKey(final Grouping grouping) {
         final String value = "$" + VALUE;
         return switch (grouping) {
-            case Grouping.Terms terms -> value;
-            case Grouping.Ranges ranges -> rangeKey(ranges, value);
-            case Grouping.DateHistogram histogram -> dateHistogramKey(histogram, value);
+            case Terms terms -> value;
+            case Ranges ranges -> rangeKey(ranges, value);
+            case DateHistogram histogram -> dateHistogramKey(histogram, value);
         };
     }
 
-    private static Document rangeKey(final Grouping.Ranges ranges, final String value) {
+    private static Document rangeKey(final Ranges ranges, final String value) {
         final Document hasRangeType = ranges.isTemporal() ? isDate(value) : new Document("$isNumber", value);
         final List<Document> branches = ranges.ranges().stream()
                 .map(range -> {
@@ -242,12 +251,12 @@ final class BucketQuery {
         return bound instanceof Instant instant ? Date.from(instant) : bound;
     }
 
-    private static Document dateHistogramKey(final Grouping.DateHistogram histogram, final String value) {
+    private static Document dateHistogramKey(final DateHistogram histogram, final String value) {
         final var dateTrunc = new Document("date", value)
-                .append("unit", histogram.unit().mongoName())
+                .append("unit", histogram.unit().name().toLowerCase(Locale.ROOT))
                 .append("binSize", histogram.binSize())
                 .append("timezone", timezone(histogram.timezone()));
-        if (histogram.unit() == Grouping.DateUnit.WEEK) {
+        if (histogram.unit() == DateUnit.WEEK) {
             dateTrunc.append("startOfWeek", "monday");
         }
         return new Document("$cond", new Document("if", isDate(value))

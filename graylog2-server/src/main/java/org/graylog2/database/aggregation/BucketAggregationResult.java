@@ -16,6 +16,8 @@
  */
 package org.graylog2.database.aggregation;
 
+import org.graylog2.database.aggregation.grouping.Terms;
+
 import java.util.List;
 
 /**
@@ -36,7 +38,7 @@ public record BucketAggregationResult(List<Bucket> buckets, long missingCount, l
     }
 
     /**
-     * The number of distinct keys, including those left out by the limit. For a {@link Grouping.Terms} grouping, this
+     * The number of distinct keys, including those left out by the limit. For a {@link Terms} grouping, this
      * is the number of distinct values of the field, counting the elements of arrays.
      */
     public long bucketCount() {
