@@ -29,7 +29,7 @@ export const COLLECTORS_QUERY_KEY = ['collectors'] as const;
 
 type ListResponse = {
   collectors: Array<Collector>;
-  query: string;
+  query?: string;
   total: number;
   pagination: {
     page: number;

@@ -171,7 +171,10 @@ describe('BindSearchParamsFromQuery should', () => {
       .toBuilder()
       .timerange({ type: 'keyword', keyword: '7am -0400 till now', timezone: 'America/New_York' })
       .build();
-    const keywordView = view.toBuilder().search(search.toBuilder().queries([keywordQuery]).build()).build();
+    const keywordView = view
+      .toBuilder()
+      .search(search.toBuilder().queries([keywordQuery]).build())
+      .build();
     const input = {
       ...defaultInput,
       view: keywordView,
