@@ -22,6 +22,7 @@ export {
   useAssistantPageSnapshot,
   useAssistantPageSelector,
 } from './AssistantPageContext';
+export { PageToolNotifiedError } from './types';
 export type {
   Page,
   PageContext,
