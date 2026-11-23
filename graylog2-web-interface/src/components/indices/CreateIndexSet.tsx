@@ -15,9 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useRef } from 'react';
 
 import AppConfig from 'util/AppConfig';
 import { Spinner } from 'components/common';
+import type { Input } from 'components/bootstrap';
 import { IndexSetConfigurationForm } from 'components/indices';
 import Routes from 'routing/Routes';
 import { createIndexSet } from 'stores/indices/IndexSetsStore';
@@ -40,6 +42,7 @@ const CreateIndexSet = ({ showSelectTemplateModal, setShowSelectTemplateModal }:
   const history = useHistory();
   const sendTelemetry = useSendTelemetry();
   const { retentionStrategies, rotationStrategies, retentionStrategiesContext } = useIndicesConfiguration();
+  const titleInputRef = useRef<Input>(null);
 
   const { isPermitted } = usePermissions();
 
@@ -55,6 +58,11 @@ const CreateIndexSet = ({ showSelectTemplateModal, setShowSelectTemplateModal }:
     return createIndexSet(copy).then(() => {
       history.push(Routes.SYSTEM.INDICES.LIST);
     });
+  };
+
+  const hideSelectTemplateModal = () => {
+    setShowSelectTemplateModal(false);
+    titleInputRef.current?.getInputDOMNode()?.focus();
   };
 
   const isLoading = () => !rotationStrategies || !retentionStrategies;
@@ -74,12 +82,10 @@ const CreateIndexSet = ({ showSelectTemplateModal, setShowSelectTemplateModal }:
         create
         cancelLink={Routes.SYSTEM.INDICES.LIST}
         onUpdate={_saveConfiguration}
+        titleInputRef={titleInputRef}
       />
       {!isCloud && isPermitted('indexset_templates:read') && showSelectTemplateModal && (
-        <SelectIndexSetTemplateModal
-          show={showSelectTemplateModal}
-          hideModal={() => setShowSelectTemplateModal(false)}
-        />
+        <SelectIndexSetTemplateModal show={showSelectTemplateModal} hideModal={hideSelectTemplateModal} />
       )}
     </>
   );

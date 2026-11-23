@@ -107,7 +107,7 @@ const IndexSetFieldTypesList = () => {
       tableLayout={DEFAULT_LAYOUT}
       topRightCol={indexFieldTypeChangeAllowed && <IndexSetProfile indexSet={indexSet} />}
       fetchEntities={(searchParams) => fetchIndexSetFieldTypes(indexSetId, searchParams)}
-      keyFn={keyFn}
+      keyFn={(searchParams) => keyFn(indexSetId, searchParams)}
       bulkSelection={bulkSelection}
       entityAttributesAreCamelCase
       filterValueRenderers={FilterValueRenderers}

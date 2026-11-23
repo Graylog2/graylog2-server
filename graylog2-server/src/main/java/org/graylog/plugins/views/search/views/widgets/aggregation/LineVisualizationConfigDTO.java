@@ -16,8 +16,10 @@
  */
 package org.graylog.plugins.views.search.views.widgets.aggregation;
 
+import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -26,18 +28,22 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 
 @AutoValue
+@JsonClassDescription("Line chart: metrics over time as lines. The first group-by must be timestamp.")
 @JsonTypeName(LineVisualizationConfigDTO.NAME)
 @JsonDeserialize(builder = LineVisualizationConfigDTO.Builder.class)
 public abstract class LineVisualizationConfigDTO implements VisualizationConfigDTO, XYVisualizationConfig {
     public static final String NAME = "line";
     private static final String FIELD_INTERPOLATION = "interpolation";
 
+    @JsonPropertyDescription(Interpolation.DESCRIPTION)
     @JsonProperty(FIELD_INTERPOLATION)
     public abstract Interpolation interpolation();
 
+    @JsonPropertyDescription(XYVisualizationConfig.AXIS_TYPE_DESCRIPTION)
     @JsonProperty(FIELD_AXIS_TYPE)
     public abstract AxisType axisType();
 
+    @JsonPropertyDescription(XYVisualizationConfig.AXIS_CONFIG_DESCRIPTION)
     @JsonProperty(FIELD_AXIS_CONFIG)
     public abstract Optional<AxisConfig> axisConfig();
 

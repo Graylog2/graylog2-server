@@ -41,7 +41,7 @@ type Input = {
   id: string;
   title: string;
   type: string;
-  node: string;
+  node?: string;
   global: boolean;
   creator_user_id?: string;
   created_at?: string;

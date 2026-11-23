@@ -17,24 +17,18 @@
 
 import { useMutation } from '@tanstack/react-query';
 
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
+import { SystemFieldTypes } from '@graylog/server-api';
+
 import UserNotification from 'util/UserNotification';
-import type { ChangeFieldTypeBody, ChangeFieldTypeBodyJson } from 'views/logic/fieldactions/ChangeFieldType/types';
+import type { ChangeFieldTypeBody } from 'views/logic/fieldactions/ChangeFieldType/types';
 
-export const urlPrefix = '/system/indices/mappings';
-
-const putFieldType = async ({ indexSetSelection, newFieldType, rotated, field }: ChangeFieldTypeBody) => {
-  const url = qualifyUrl(urlPrefix);
-  const body: ChangeFieldTypeBodyJson = {
+const putFieldType = async ({ indexSetSelection, newFieldType, rotated, field }: ChangeFieldTypeBody) =>
+  SystemFieldTypes.changeFieldType({
     index_sets: indexSetSelection,
     type: newFieldType,
     rotate: rotated,
     field: field,
-  };
-
-  return fetch('PUT', url, body);
-};
+  });
 
 const usePutFieldTypeMutation = () => {
   const put = useMutation({
