@@ -65,12 +65,13 @@ export type PageContext = {
 export type PageToolLink = { label: string; path: string };
 
 // What a page tool did, shown in the chat; `undo` reverts it. `result` tells the Assistant what it needs to refer to
-// it later, e.g. the id of a created entity.
+// it later, e.g. the id of a created entity. `enable` turns on what it created disabled, and says what it did then.
 export type PageToolResult = {
   summary?: string;
   links?: Array<PageToolLink>;
   result?: string;
   undo?: () => unknown;
+  enable?: () => Promise<{ summary: string; result?: string }>;
 } | void;
 
 // Runs a page tool the Assistant asked for, with arguments the backend checked.
