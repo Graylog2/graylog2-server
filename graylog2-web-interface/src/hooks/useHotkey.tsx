@@ -37,6 +37,7 @@ const defaultOptions: Omit<ReactHotKeysHookOptions, 'splitKey'> & Options = {
   description: undefined,
   document: undefined,
   ignoreModifiers: false,
+  useKey: true,
   displayInOverview: undefined,
 };
 
