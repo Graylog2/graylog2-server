@@ -33,8 +33,8 @@ type ListParams = {
 
 type ListResponse = {
   sidecars: Array<SidecarSummary>;
-  query: string;
-  filters: {};
+  query?: string;
+  filters?: {};
   pagination: {
     total: number;
     count: number;

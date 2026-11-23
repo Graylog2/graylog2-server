@@ -37,6 +37,7 @@ import Series from 'views/logic/aggregationbuilder/Series';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
 import BarVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
+import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
 import { addWidget } from 'views/logic/slices/widgetActions';
@@ -44,16 +45,14 @@ import { createSearch } from 'fixtures/searches';
 import type Widget from 'views/logic/widgets/Widget';
 import MessagesWidget from 'views/logic/widgets/MessagesWidget';
 import TextWidget from 'views/logic/widgets/TextWidget';
+import TextWidgetConfig from 'views/logic/widgets/TextWidgetConfig';
 import EventsWidget from 'views/logic/widgets/events/EventsWidget';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import type { FocusContextState } from 'views/components/contexts/WidgetFocusContext';
-import Store from 'logic/local-storage/Store';
 
 import SearchPageAssistantContext from './SearchPageAssistantContext';
 
 jest.mock('routing/useLocation', () => () => ({ pathname: '/search' }));
-const mockHistory = { push: jest.fn() };
-jest.mock('routing/useHistory', () => () => mockHistory);
 jest.mock('views/stores/useViewsSelector');
 jest.mock('views/stores/useViewsDispatch');
 jest.mock('views/logic/slices/widgetActions', () => ({ addWidget: jest.fn(() => 'addWidget') }));
@@ -151,6 +150,7 @@ describe('SearchPageAssistantContext', () => {
 
   beforeAll(() => {
     VisualizationConfig.registerSubtype('bar', BarVisualizationConfig);
+    VisualizationConfig.registerSubtype('line', LineVisualizationConfig);
   });
 
   beforeEach(() => {
@@ -294,44 +294,118 @@ describe('SearchPageAssistantContext', () => {
     expect(updatedViewState().titles.getIn(['widget', 'w1'])).toBe('Logins per host');
   });
 
-  describe('create_event_definition', () => {
-    afterEach(() => {
-      window.localStorage.clear();
+  const barChartWithAxes = barChart
+    .toBuilder()
+    .config(
+      barChart.config
+        .toBuilder()
+        .visualizationConfig(
+          BarVisualizationConfig.create('group', 'logarithmic', { number: { title: 'Logins', color: '#e6194b' } }),
+        )
+        .build(),
+    )
+    .build();
+
+  it('changes only the visualization settings it is given, merging nested ones', async () => {
+    mockPageWithBarChart(barChartWithAxes);
+    const tools = renderTools();
+
+    await tools().update_widget({
+      widget_id: 'w1',
+      visualization_config: { barmode: 'stack', axis_config: { number: { title: 'Failed logins' }, xaxis: { title: 'Host' } } },
     });
 
-    it('opens the event definition form in the app, filled in with the definition and its condition', () => {
-      const result = renderTools()().create_event_definition({
-        title: 'Many failed logins',
-        description: 'Brute force attempts',
-        priority: 3,
-        query: 'action:login_failed',
-        streams: ['s1'],
-        search_within_ms: 600000,
-        execute_every_ms: 60000,
-        condition: { function: 'count', field: '', operator: '>=', threshold: 10, group_by: ['source'] },
-      });
+    const { config } = updatedViewState().widgets.first() as AggregationWidget;
 
-      const [url] = mockHistory.push.mock.calls[0] as [string];
-      const [, path, step, sessionId] = url.match(/^(.*)\?step=([^&]+)&session-id=(.+)$/);
+    expect(config.rowPivots.map(({ fields }) => fields)).toEqual([['source']]);
+    expect(config.visualizationConfig).toEqual(
+      BarVisualizationConfig.create('stack', 'logarithmic', {
+        number: { title: 'Failed logins', color: '#e6194b' },
+        xaxis: { title: 'Host' },
+      }),
+    );
+  });
 
-      expect(path).toBe('/alerts/definitions/new');
-      expect(step).toBe('event-details');
-      expect(Store.get(sessionId)).toEqual({
-        type: 'aggregation-v1',
-        title: 'Many failed logins',
-        description: 'Brute force attempts',
-        priority: 3,
-        query: 'action:login_failed',
-        streams: ['s1'],
-        search_within_ms: 600000,
-        execute_every_ms: 60000,
-        agg_function: 'count',
-        agg_operator: '>=',
-        agg_value: 10,
-        group_by: ['source'],
-      });
-      expect(result).toEqual({ summary: 'Opened the form for event definition "Many failed logins"' });
+  it('merges nested visualization settings when changing the aggregation', async () => {
+    mockPageWithBarChart(barChartWithAxes);
+    const tools = renderTools();
+
+    await tools().update_widget({
+      widget_id: 'w1',
+      config: {
+        row_pivots: [{ fields: ['source'], type: 'values', config: { limit: 15 } }],
+        column_pivots: [],
+        series: [{ function: 'count()', config: {} }],
+        sort: [],
+        visualization: 'bar',
+        visualization_config: { axis_config: { xaxis: { title: 'Host' } } },
+        rollup: true,
+      },
     });
+
+    const { config } = updatedViewState().widgets.first() as AggregationWidget;
+
+    expect(config.visualizationConfig).toEqual(
+      BarVisualizationConfig.create('group', 'logarithmic', {
+        number: { title: 'Logins', color: '#e6194b' },
+        xaxis: { title: 'Host' },
+      }),
+    );
+  });
+
+  it('resets visualization settings changed to null', async () => {
+    mockPageWithBarChart(barChartWithAxes);
+    const tools = renderTools();
+
+    await tools().update_widget({ widget_id: 'w1', visualization_config: { axis_config: { number: null } } });
+
+    const { config } = updatedViewState().widgets.first() as AggregationWidget;
+
+    expect(config.visualizationConfig).toEqual(BarVisualizationConfig.create('group', 'logarithmic', {}));
+  });
+
+  it('refuses to change the settings of another visualization than the widget shows', async () => {
+    mockPageWithBarChart(barChartWithAxes);
+    const tools = renderTools();
+
+    await expect(
+      tools().update_widget({ widget_id: 'w1', visualization: 'line', visualization_config: { interpolation: 'spline' } }),
+    ).rejects.toThrow('The widget shows a bar visualization now, not line.');
+  });
+
+  it('applies the settings of another visualization to its defaults', async () => {
+    mockPageWithBarChart(barChartWithAxes);
+    const tools = renderTools();
+
+    await tools().update_widget({
+      widget_id: 'w1',
+      config: {
+        row_pivots: [{ fields: ['timestamp'], type: 'time', config: { interval: { type: 'auto', scaling: 1.0 } } }],
+        column_pivots: [],
+        series: [{ function: 'count()', config: {} }],
+        sort: [],
+        visualization: 'line',
+        visualization_config: { interpolation: 'spline' },
+        rollup: true,
+      },
+      visualization_defaults: { interpolation: 'linear', axis_type: 'linear', axis_config: null },
+    });
+
+    const { config } = updatedViewState().widgets.first() as AggregationWidget;
+
+    expect(config.visualization).toBe('line');
+    expect(config.visualizationConfig.toJSON()).toEqual(
+      expect.objectContaining({ interpolation: 'spline', axis_type: 'linear' }),
+    );
+  });
+
+  it('refuses to change the visualization settings of widgets without a visualization', async () => {
+    mockPageWithBarChart(TextWidget.builder().id('w1').config(new TextWidgetConfig('Notes')).build());
+    const tools = renderTools();
+
+    await expect(tools().update_widget({ widget_id: 'w1', visualization_config: { barmode: 'stack' } })).rejects.toThrow(
+      'Only aggregation widgets',
+    );
   });
 
   it('refuses to change a widget that is not on the shown tab', async () => {

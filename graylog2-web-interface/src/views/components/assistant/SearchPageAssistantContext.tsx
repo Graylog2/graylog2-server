@@ -17,6 +17,7 @@
 import { useContext, useMemo } from 'react';
 import { OrderedSet } from 'immutable';
 import isEqual from 'lodash/isEqual';
+import isPlainObject from 'lodash/isPlainObject';
 
 import { useAssistantPageContext, useAssistantPageTools } from 'components/assistant';
 import type { PageTools, SearchPage } from 'components/assistant';
@@ -32,6 +33,7 @@ import type Widget from 'views/logic/widgets/Widget';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { AggregationWidgetConfigJson } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
+import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import type { VisualizationConfigJson } from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import type Pivot from 'views/logic/aggregationbuilder/Pivot';
@@ -53,11 +55,6 @@ import normalizeViewState from 'views/logic/views/normalizeViewState';
 import { setGlobalOverrideQuery, setGlobalOverrideTimerange } from 'views/logic/slices/searchExecutionSlice';
 import { undo } from 'views/logic/slices/undoRedoActions';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
-import Store from 'logic/local-storage/Store';
-import generateId from 'logic/generateId';
-import Routes from 'routing/Routes';
-import useHistory from 'routing/useHistory';
-import type { EventDefinitionLocalStorageConfig } from 'components/event-definitions/hooks/useEventDefinitionConfigFromLocalStorage';
 import type { TimeRange } from 'views/logic/queries/Query';
 
 const useSearchPage = (): SearchPage => {
@@ -96,7 +93,17 @@ type WidgetSearchArgs = {
 
 type AddWidgetArgs = WidgetSearchArgs & { config: AggregationWidgetConfigJson };
 
-type UpdateWidgetArgs = Partial<WidgetSearchArgs> & { widget_id: string; config?: AggregationWidgetConfigJson };
+type Settings = Record<string, unknown>;
+
+type UpdateWidgetArgs = Partial<WidgetSearchArgs> & {
+  widget_id: string;
+  config?: AggregationWidgetConfigJson;
+  // The settings of the visualization the config switches to, for those its changes do not give.
+  visualization_defaults?: Settings;
+  // Changed settings of the widget's visualization, which must still be the given one, without changing its aggregation.
+  visualization?: string;
+  visualization_config?: Settings;
+};
 
 type AddMessageTableArgs = WidgetSearchArgs & {
   fields?: Array<string>;
@@ -104,45 +111,6 @@ type AddMessageTableArgs = WidgetSearchArgs & {
 };
 
 type AddEventsWidgetArgs = WidgetSearchArgs & { mode: VisualizationType; filters: Array<Filter> };
-
-type CreateEventDefinitionArgs = {
-  title: string;
-  description: string;
-  priority: number;
-  query: string;
-  streams: Array<string>;
-  search_within_ms: number;
-  execute_every_ms: number;
-  condition?: {
-    function: string;
-    field: string;
-    operator: EventDefinitionLocalStorageConfig['agg_operator'];
-    threshold: number;
-    group_by: Array<string>;
-  };
-};
-
-// Hands the event definition to its form, as creating one from a widget's value does.
-const eventDefinitionFormUrl = (args: Record<string, unknown>) => {
-  const { condition, ...definition } = args as CreateEventDefinitionArgs;
-  const sessionId = `assistant-${generateId()}`;
-  const config: EventDefinitionLocalStorageConfig = {
-    type: 'aggregation-v1',
-    ...definition,
-    ...(condition
-      ? {
-          agg_function: condition.function,
-          agg_field: condition.field || undefined,
-          agg_operator: condition.operator,
-          agg_value: condition.threshold,
-          group_by: condition.group_by,
-        }
-      : {}),
-  };
-  Store.set(sessionId, config);
-
-  return `${Routes.ALERTS.DEFINITIONS.CREATE}?step=event-details&session-id=${sessionId}`;
-};
 
 type WidgetBuilder = ReturnType<typeof Widget.builder>;
 
@@ -165,28 +133,68 @@ const withSearch = (builder: WidgetBuilder, { query, streams, timerange }: Parti
   return result;
 };
 
-const visualizationConfigJson = (config: AggregationWidgetConfig) =>
-  (config.visualizationConfig as { toJSON?: () => Record<string, unknown> } | undefined)?.toJSON?.() ?? {};
+const visualizationConfigJson = (config: AggregationWidgetConfig): Settings =>
+  (config.visualizationConfig as { toJSON?: () => Settings } | undefined)?.toJSON?.() ?? {};
 
-// The assistant sends only the visualization settings it changes, e.g. the bar mode; the others stay as they are.
+// Changed settings replace the current ones, nested ones key by key, e.g. the label of one axis; null resets one.
+const mergeSettings = (current: Settings, changes: Settings): Settings =>
+  Object.entries(changes).reduce((merged, [key, value]) => {
+    if (value === null) {
+      const { [key]: _reset, ...rest } = merged;
+
+      return rest;
+    }
+
+    const previous = merged[key];
+
+    return {
+      ...merged,
+      [key]: isPlainObject(value) && isPlainObject(previous) ? mergeSettings(previous as Settings, value as Settings) : value,
+    };
+  }, current);
+
+// The assistant sends only the visualization settings it changes; the others stay as they are, or, for another
+// visualization, become its defaults.
 const withCurrentVisualizationConfig = (
   current: AggregationWidgetConfig,
   changed: AggregationWidgetConfigJson,
-): AggregationWidgetConfigJson =>
-  changed.visualization === current.visualization && current.visualizationConfig
-    ? {
-        ...changed,
-        visualization_config: {
-          ...visualizationConfigJson(current),
-          ...(changed.visualization_config ?? {}),
-        } as VisualizationConfigJson,
-      }
+  defaults: Settings | undefined,
+): AggregationWidgetConfigJson => {
+  const changes = changed.visualization_config as Settings | undefined;
+
+  if (changed.visualization === current.visualization && current.visualizationConfig) {
+    return {
+      ...changed,
+      visualization_config: mergeSettings(visualizationConfigJson(current), changes ?? {}) as VisualizationConfigJson,
+    };
+  }
+
+  return changes
+    ? { ...changed, visualization_config: mergeSettings(defaults ?? {}, changes) as VisualizationConfigJson }
     : changed;
+};
+
+const withChangedSettings = (current: AggregationWidgetConfig, visualization: string, changes: Settings) => {
+  if (visualization && current.visualization !== visualization) {
+    throw new Error(`The widget shows a ${current.visualization} visualization now, not ${visualization}.`);
+  }
+
+  return current
+    .toBuilder()
+    .visualizationConfig(
+      VisualizationConfig.fromJSON(current.visualization, mergeSettings(visualizationConfigJson(current), changes)),
+    )
+    .build();
+};
 
 // The changed aggregation, with the settings the user chose for the widget where they still apply: the limits and
 // intervals of its group-bys, the names of its metrics, its sort, and its visualization's settings.
-const mergeAggregation = (current: AggregationWidgetConfig, changedJson: AggregationWidgetConfigJson) => {
-  const changed = AggregationWidgetConfig.fromJSON(withCurrentVisualizationConfig(current, changedJson));
+const mergeAggregation = (
+  current: AggregationWidgetConfig,
+  changedJson: AggregationWidgetConfigJson,
+  defaults: Settings | undefined,
+) => {
+  const changed = AggregationWidgetConfig.fromJSON(withCurrentVisualizationConfig(current, changedJson, defaults));
   const currentPivots = [...current.rowPivots, ...current.columnPivots];
   const keepPivot = (pivot: Pivot) =>
     currentPivots.find(({ type, fields }) => type === pivot.type && isEqual(fields, pivot.fields)) ?? pivot;
@@ -214,7 +222,6 @@ const mergeAggregation = (current: AggregationWidgetConfig, changedJson: Aggrega
 
 const useSearchPageTools = (): PageTools => {
   const dispatch = useViewsDispatch();
-  const history = useHistory();
   const view = useViewsSelector(selectView);
   const activeQueryId = useViewsSelector(selectActiveQuery);
   const globalOverride = useViewsSelector(selectGlobalOverride);
@@ -248,7 +255,15 @@ const useSearchPageTools = (): PageTools => {
         return add(withSearch(MessagesWidget.builder().newId().config(config.build()), search).build(), search.title);
       },
       update_widget: async (args) => {
-        const { widget_id: widgetId, title, config, ...search } = args as UpdateWidgetArgs;
+        const {
+          widget_id: widgetId,
+          title,
+          config,
+          visualization_defaults: defaults,
+          visualization,
+          visualization_config: settings,
+          ...search
+        } = args as UpdateWidgetArgs;
         const viewState = dispatch((_dispatch: ViewsDispatch, getState: GetState) => selectActiveViewState(getState()));
         const widget = viewState?.widgets.find(({ id }) => id === widgetId);
 
@@ -258,12 +273,16 @@ const useSearchPageTools = (): PageTools => {
 
         let builder = withSearch(widget.toBuilder(), search);
 
-        if (config) {
+        if (config || settings) {
           if (!(widget instanceof AggregationWidget)) {
             throw new Error('Only aggregation widgets have a visualization, group-bys and metrics.');
           }
 
-          builder = builder.config(mergeAggregation(widget.config, config));
+          builder = builder.config(
+            config
+              ? mergeAggregation(widget.config, config, defaults)
+              : withChangedSettings(widget.config, visualization, settings),
+          );
         }
 
         // One change, so a single undo reverts the widget and its title.
@@ -326,13 +345,8 @@ const useSearchPageTools = (): PageTools => {
 
         return { summary: 'Changed the time range', undo: isDashboard ? undefined : () => dispatch(undo()) };
       },
-      create_event_definition: (args) => {
-        history.push(eventDefinitionFormUrl(args));
-
-        return { summary: `Opened the form for event definition "${String(args.title)}"` };
-      },
     };
-  }, [activeQueryId, dispatch, globalOverride, history, isDashboard]);
+  }, [activeQueryId, dispatch, globalOverride, isDashboard]);
 };
 
 // Tells the Assistant what the search or dashboard shows, and lets it change the page.
