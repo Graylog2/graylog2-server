@@ -73,7 +73,7 @@ export default class EntityIndex {
     return false;
   }
 
-  static fromJSON(value: { id: string; title: string; type: any }) {
+  static fromJSON(value: { id: string; title?: string; type: any }) {
     const { id, title, type } = value;
 
     return EntityIndex.create(id, title, type);

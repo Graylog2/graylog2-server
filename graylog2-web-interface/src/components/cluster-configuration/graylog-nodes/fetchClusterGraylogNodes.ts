@@ -57,7 +57,7 @@ export type GraylogNode = {
   id: string;
   node_id: string;
   short_node_id: string;
-  transport_address: string;
+  transport_address?: string;
   hostname?: string;
   last_seen?: string;
   is_leader: boolean;

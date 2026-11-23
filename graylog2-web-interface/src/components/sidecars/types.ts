@@ -20,7 +20,7 @@ export type Configuration = {
   collector_id: string;
   name: string;
   id: string;
-  tags: string[];
+  tags?: string[];
 };
 
 export type Collector = {
@@ -38,7 +38,7 @@ export type CollectorStatus = {
   verbose_message: string;
   collector_id: string;
   message: string;
-  configuration_id: string;
+  configuration_id?: string;
   status: number;
 };
 
@@ -58,7 +58,7 @@ export type NodeLogFile = {
 export type SidecarSummary = {
   node_details: NodeDetails;
   assignments: ConfigurationAssignment[];
-  collectors: string[];
+  collectors?: string[];
   last_seen: string;
   sidecar_version: string;
   node_name: string;
@@ -67,9 +67,9 @@ export type SidecarSummary = {
 };
 
 export type NodeMetrics = {
-  cpu_idle: number;
-  disks_75: string[];
-  load_1: number;
+  cpu_idle?: number;
+  disks_75?: string[];
+  load_1?: number;
 };
 
 export type CollectorStatusList = {
@@ -79,13 +79,13 @@ export type CollectorStatusList = {
 };
 
 export type NodeDetails = {
-  ip: string;
-  collector_configuration_directory: string;
+  ip?: string;
+  collector_configuration_directory?: string;
   operating_system: string;
-  metrics: NodeMetrics;
-  log_file_list: NodeLogFile[];
-  status: CollectorStatusList;
-  tags: string[];
+  metrics?: NodeMetrics;
+  log_file_list?: NodeLogFile[];
+  status?: CollectorStatusList;
+  tags?: string[];
 };
 
 export type ConfigurationSidecarsResponse = {
