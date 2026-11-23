@@ -71,15 +71,15 @@ public class MongoAggregator {
         return new MongoAggregator(collection, permissionFilter, relatedPermissionFilters, timeout);
     }
 
-    public BucketAggregationResult buckets(final BucketAggregation request) {
+    public BucketAggregationResult buckets(final BucketAggregationRequest request) {
         return BucketQuery.run(collection, permitted(request), timeout);
     }
 
-    private BucketAggregation permitted(final BucketAggregation request) {
+    private BucketAggregationRequest permitted(final BucketAggregationRequest request) {
         final Grouping grouping = request.grouping().source() instanceof GroupedValueSource.Related related
                 ? request.grouping().withSource(permitted(related))
                 : request.grouping();
-        return new BucketAggregation(and(permissionFilter, request.documentFilter()), grouping, request.order(),
+        return new BucketAggregationRequest(and(permissionFilter, request.documentFilter()), grouping, request.order(),
                 request.limit());
     }
 

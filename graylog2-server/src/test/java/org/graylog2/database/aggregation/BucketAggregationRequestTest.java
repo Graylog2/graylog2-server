@@ -29,7 +29,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class BucketAggregationTest {
+class BucketAggregationRequestTest {
     @ParameterizedTest
     @ValueSource(strings = {"$where", "owner.$id", "a..b", ".a", "a.", "", "a b", "{\"$gt\": 1}"})
     void rejectsFieldPathsThatAreNotPlainPaths(final String path) {
@@ -55,14 +55,14 @@ class BucketAggregationTest {
 
     @Test
     void aggregatesAllDocumentsWithoutAFilter() {
-        final var request = BucketAggregation.of(null, Grouping.terms("owner"));
+        final var request = BucketAggregationRequest.of(null, Grouping.terms("owner"));
 
         assertThat(request.documentFilter().toBsonDocument()).isEmpty();
     }
 
     @Test
     void ordersByCountDescendingWithoutAnOrder() {
-        final var request = BucketAggregation.of(null, Grouping.terms("owner"))
+        final var request = BucketAggregationRequest.of(null, Grouping.terms("owner"))
                 .withOrder(BucketOrder.byKey(SortOrder.ASCENDING))
                 .withOrder(null);
 
@@ -71,12 +71,13 @@ class BucketAggregationTest {
 
     @Test
     void validatesOrderAndLimit() {
-        final var request = BucketAggregation.of(new Document(), Grouping.terms("owner"));
+        final var request = BucketAggregationRequest.of(new Document(), Grouping.terms("owner"));
 
         assertThat(request.order()).isEqualTo(BucketOrder.byCount(SortOrder.DESCENDING));
-        assertThat(request.limit()).isEqualTo(BucketAggregation.DEFAULT_LIMIT);
+        assertThat(request.limit()).isEqualTo(BucketAggregationRequest.DEFAULT_LIMIT);
         assertThatThrownBy(() -> request.withLimit(0)).hasMessageContaining("Limit must be between");
-        assertThatThrownBy(() -> request.withLimit(BucketAggregation.MAX_LIMIT + 1)).hasMessageContaining("Limit must be between");
+        assertThatThrownBy(() -> request.withLimit(BucketAggregationRequest.MAX_LIMIT + 1))
+                .hasMessageContaining("Limit must be between");
     }
 
     @Test

@@ -75,7 +75,7 @@ class MongoAggregatorTest {
     class Terms {
         @Test
         void countsDocumentsPerValueAndCollectsMissingValues() {
-            final var result = items.buckets(BucketAggregation.of(ALL, Grouping.terms("owner")));
+            final var result = items.buckets(BucketAggregationRequest.of(ALL, Grouping.terms("owner")));
 
             // equal counts are ordered by key
             assertThat(counts(result)).containsExactly(entry("alice", 2L), entry("bob", 1L), entry("carol", 1L));
@@ -87,7 +87,7 @@ class MongoAggregatorTest {
 
         @Test
         void countsEachDocumentOncePerDistinctArrayElement() {
-            final var result = items.buckets(BucketAggregation.of(ALL, Grouping.terms("tags")));
+            final var result = items.buckets(BucketAggregationRequest.of(ALL, Grouping.terms("tags")));
 
             assertThat(counts(result)).containsExactly(entry("a", 2L), entry("b", 1L), entry("c", 1L));
             // an empty array counts as missing, like an absent field
@@ -96,7 +96,7 @@ class MongoAggregatorTest {
 
         @Test
         void groupsByPathThroughArrayOfEmbeddedDocuments() {
-            final var result = items.buckets(BucketAggregation.of(ALL, Grouping.terms("assets.id")));
+            final var result = items.buckets(BucketAggregationRequest.of(ALL, Grouping.terms("assets.id")));
 
             assertThat(counts(result)).containsExactly(entry("x", 2L), entry("y", 1L));
             assertThat(result.missingCount()).isEqualTo(4);
@@ -104,7 +104,8 @@ class MongoAggregatorTest {
 
         @Test
         void appliesFilterBeforeGrouping() {
-            final var result = items.buckets(BucketAggregation.of(Filters.eq("status", "closed"), Grouping.terms("owner")));
+            final var result = items.buckets(
+                    BucketAggregationRequest.of(Filters.eq("status", "closed"), Grouping.terms("owner")));
 
             assertThat(counts(result)).containsExactly(entry("alice", 1L), entry("carol", 1L));
             assertThat(result.missingCount()).isZero();
@@ -112,7 +113,8 @@ class MongoAggregatorTest {
 
         @Test
         void returnsNoBucketsWhenNothingMatches() {
-            final var result = items.buckets(BucketAggregation.of(Filters.eq("owner", "nobody"), Grouping.terms("owner")));
+            final var result = items.buckets(
+                    BucketAggregationRequest.of(Filters.eq("owner", "nobody"), Grouping.terms("owner")));
 
             assertThat(result.buckets()).isEmpty();
             assertThat(result.missingCount()).isZero();
@@ -124,7 +126,7 @@ class MongoAggregatorTest {
     class LimitAndOrder {
         @Test
         void sumsUpBucketsBeyondLimit() {
-            final var result = items.buckets(BucketAggregation.of(ALL, Grouping.terms("owner")).withLimit(1));
+            final var result = items.buckets(BucketAggregationRequest.of(ALL, Grouping.terms("owner")).withLimit(1));
 
             assertThat(counts(result)).containsExactly(entry("alice", 2L));
             assertThat(result.isTruncated()).isTrue();
@@ -137,7 +139,7 @@ class MongoAggregatorTest {
 
         @Test
         void ordersByKey() {
-            final var request = BucketAggregation.of(ALL, Grouping.terms("owner"))
+            final var request = BucketAggregationRequest.of(ALL, Grouping.terms("owner"))
                     .withOrder(BucketOrder.byKey(SortOrder.DESCENDING));
 
             assertThat(keys(items.buckets(request))).containsExactly("carol", "bob", "alice");
@@ -145,7 +147,7 @@ class MongoAggregatorTest {
 
         @Test
         void ordersByCountAscending() {
-            final var request = BucketAggregation.of(ALL, Grouping.terms("owner"))
+            final var request = BucketAggregationRequest.of(ALL, Grouping.terms("owner"))
                     .withOrder(BucketOrder.byCount(SortOrder.ASCENDING));
 
             // equal counts are still ordered by key ascending
@@ -162,7 +164,7 @@ class MongoAggregatorTest {
                     Range.of("medium", 30, 80),
                     Range.of("high", 80, null)));
 
-            final var result = items.buckets(BucketAggregation.of(ALL, grouping));
+            final var result = items.buckets(BucketAggregationRequest.of(ALL, grouping));
 
             assertThat(counts(result)).containsExactly(entry("low", 2L), entry("medium", 2L), entry("high", 1L));
             // the string "high" isn't a number
@@ -175,7 +177,7 @@ class MongoAggregatorTest {
                     Range.of("before", null, Instant.parse("2024-01-02T00:00:00Z")),
                     Range.of("after", Instant.parse("2024-01-02T00:00:00Z"), null)));
 
-            final var result = items.buckets(BucketAggregation.of(ALL, grouping));
+            final var result = items.buckets(BucketAggregationRequest.of(ALL, grouping));
 
             assertThat(counts(result)).containsExactly(entry("after", 4L), entry("before", 1L));
         }
@@ -185,7 +187,7 @@ class MongoAggregatorTest {
             final var grouping = Grouping.ranges(GroupedValueSource.field("score"),
                     List.of(Range.of("$owner", 0, 100)));
 
-            assertThat(keys(items.buckets(BucketAggregation.of(ALL, grouping)))).containsExactly("$owner");
+            assertThat(keys(items.buckets(BucketAggregationRequest.of(ALL, grouping)))).containsExactly("$owner");
         }
     }
 
@@ -196,7 +198,7 @@ class MongoAggregatorTest {
             final var grouping = Grouping.dateHistogram(GroupedValueSource.field("timestamp"), DateUnit.DAY,
                     ZoneOffset.UTC);
 
-            final var result = items.buckets(BucketAggregation.of(ALL, grouping)
+            final var result = items.buckets(BucketAggregationRequest.of(ALL, grouping)
                     .withOrder(BucketOrder.byKey(SortOrder.ASCENDING)));
 
             assertThat(counts(result)).containsExactly(
@@ -212,7 +214,7 @@ class MongoAggregatorTest {
             final var grouping = Grouping.dateHistogram(GroupedValueSource.field("timestamp"), DateUnit.DAY,
                     ZoneId.of("Europe/Berlin"));
 
-            final var result = items.buckets(BucketAggregation.of(ALL, grouping)
+            final var result = items.buckets(BucketAggregationRequest.of(ALL, grouping)
                     .withOrder(BucketOrder.byKey(SortOrder.ASCENDING)));
 
             // 23:30 UTC is already the next day in Berlin
@@ -251,7 +253,8 @@ class MongoAggregatorTest {
             final var grouping = Grouping.terms(
                     GroupedValueSource.related("event_id", "investigations", "events", "status"));
 
-            final var result = mongoCollections.aggregator("events").buckets(BucketAggregation.of(ALL, grouping));
+            final var result = mongoCollections.aggregator("events")
+                    .buckets(BucketAggregationRequest.of(ALL, grouping));
 
             // e1 is in two open investigations, but counts once
             assertThat(counts(result)).containsExactly(entry("open", 2L), entry("closed", 1L));
@@ -264,7 +267,8 @@ class MongoAggregatorTest {
                     GroupedValueSource.related("event_id", "investigations", "events", "status")
                             .withFilter(Filters.eq("team", "blue")));
 
-            final var result = mongoCollections.aggregator("events").buckets(BucketAggregation.of(ALL, grouping));
+            final var result = mongoCollections.aggregator("events")
+                    .buckets(BucketAggregationRequest.of(ALL, grouping));
 
             assertThat(counts(result)).containsExactly(entry("open", 1L));
             assertThat(result.missingCount()).isEqualTo(4);
@@ -275,12 +279,13 @@ class MongoAggregatorTest {
             final var source = GroupedValueSource.related("owner", "users", "_id", "team");
             final var events = mongoCollections.aggregator("events");
 
-            final var converted = events.buckets(BucketAggregation.of(ALL, Grouping.terms(source.withLocalFieldAsObjectId())));
+            final var converted = events.buckets(
+                    BucketAggregationRequest.of(ALL, Grouping.terms(source.withLocalFieldAsObjectId())));
             assertThat(counts(converted)).containsExactly(entry("red", 2L), entry("blue", 1L));
             // the invalid and the absent reference
             assertThat(converted.missingCount()).isEqualTo(2);
 
-            final var unconverted = events.buckets(BucketAggregation.of(ALL, Grouping.terms(source)));
+            final var unconverted = events.buckets(BucketAggregationRequest.of(ALL, Grouping.terms(source)));
             assertThat(unconverted.buckets()).isEmpty();
         }
     }

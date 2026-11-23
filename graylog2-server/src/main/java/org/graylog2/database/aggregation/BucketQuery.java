@@ -68,7 +68,7 @@ final class BucketQuery {
     private BucketQuery() {}
 
     static BucketAggregationResult run(final MongoCollection<Document> collection,
-                                       final BucketAggregation request,
+                                       final BucketAggregationRequest request,
                                        final Duration timeout) {
         // $facet always returns exactly one document
         final Document facets = Objects.requireNonNull(collection.aggregate(pipeline(request))
@@ -101,7 +101,7 @@ final class BucketQuery {
         };
     }
 
-    private static List<Bson> pipeline(final BucketAggregation request) {
+    private static List<Bson> pipeline(final BucketAggregationRequest request) {
         final var stages = new ArrayList<Bson>();
         stages.add(Aggregates.match(request.documentFilter()));
         stages.addAll(valueStages(request.grouping().source()));

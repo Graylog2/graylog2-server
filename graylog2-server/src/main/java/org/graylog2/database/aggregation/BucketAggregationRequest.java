@@ -36,16 +36,16 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  *                       {@link #DEFAULT_ORDER}.
  * @param limit          how many buckets to return; the rest are summed up as "other" in the result
  */
-public record BucketAggregation(Bson documentFilter, Grouping grouping, BucketOrder order, int limit) {
+public record BucketAggregationRequest(Bson documentFilter, Grouping grouping, BucketOrder order, int limit) {
     public static final int DEFAULT_LIMIT = 100;
     public static final int MAX_LIMIT = 10_000;
 
     public static final BucketOrder DEFAULT_ORDER = BucketOrder.byCount(SortOrder.DESCENDING);
 
-    public BucketAggregation(@Nullable final Bson documentFilter,
-                             final Grouping grouping,
-                             @Nullable final BucketOrder order,
-                             final int limit) {
+    public BucketAggregationRequest(@Nullable final Bson documentFilter,
+                                    final Grouping grouping,
+                                    @Nullable final BucketOrder order,
+                                    final int limit) {
         this.documentFilter = documentFilter == null ? Filters.empty() : documentFilter;
         this.order = order == null ? DEFAULT_ORDER : order;
         this.grouping = Objects.requireNonNull(grouping, "grouping");
@@ -60,18 +60,18 @@ public record BucketAggregation(Bson documentFilter, Grouping grouping, BucketOr
      *
      * @param documentFilter selects the documents to aggregate; {@code null} aggregates all of them
      */
-    public static BucketAggregation of(@Nullable final Bson documentFilter, final Grouping grouping) {
-        return new BucketAggregation(documentFilter, grouping, DEFAULT_ORDER, DEFAULT_LIMIT);
+    public static BucketAggregationRequest of(@Nullable final Bson documentFilter, final Grouping grouping) {
+        return new BucketAggregationRequest(documentFilter, grouping, DEFAULT_ORDER, DEFAULT_LIMIT);
     }
 
     /**
      * @param order the order of buckets; {@code null} restores the {@link #DEFAULT_ORDER}
      */
-    public BucketAggregation withOrder(@Nullable final BucketOrder order) {
-        return new BucketAggregation(documentFilter, grouping, order, limit);
+    public BucketAggregationRequest withOrder(@Nullable final BucketOrder order) {
+        return new BucketAggregationRequest(documentFilter, grouping, order, limit);
     }
 
-    public BucketAggregation withLimit(final int limit) {
-        return new BucketAggregation(documentFilter, grouping, order, limit);
+    public BucketAggregationRequest withLimit(final int limit) {
+        return new BucketAggregationRequest(documentFilter, grouping, order, limit);
     }
 }

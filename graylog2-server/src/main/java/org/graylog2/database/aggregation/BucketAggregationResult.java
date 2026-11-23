@@ -19,7 +19,7 @@ package org.graylog2.database.aggregation;
 import java.util.List;
 
 /**
- * The result of a {@link BucketAggregation}.
+ * The result of a {@link BucketAggregationRequest}.
  * <p>
  * A document with several values belongs to several buckets, so bucket counts can add up to more than the number of
  * matched documents.

@@ -79,7 +79,7 @@ class PermittedAggregatorsTest {
         permissions.addAll(List.of("assets:read:" + WEB_01, "assets:read:" + LAPTOP_07));
 
         final var result = aggregators.forUser("assets", subject)
-                .buckets(BucketAggregation.of(null, Grouping.terms("category")));
+                .buckets(BucketAggregationRequest.of(null, Grouping.terms("category")));
 
         // db-01 and printer-02 aren't readable
         assertThat(counts(result)).containsExactly(entry("server", 1L), entry("workstation", 1L));
@@ -89,7 +89,7 @@ class PermittedAggregatorsTest {
     @Test
     void appliesTheRequestFilterWithinThePermissionFilter() {
         permissions.addAll(List.of("assets:read:" + WEB_01, "assets:read:" + DB_01, "assets:read:" + LAPTOP_07));
-        final var request = BucketAggregation.of(Filters.ne("name", "web-01"), Grouping.terms("category"));
+        final var request = BucketAggregationRequest.of(Filters.ne("name", "web-01"), Grouping.terms("category"));
 
         final var result = aggregators.forUser("assets", subject).buckets(request);
 
@@ -102,7 +102,7 @@ class PermittedAggregatorsTest {
         permissions.add("assets:read:" + WEB_01);
 
         final var result = aggregators.forUser("security_events", PermissionFilter.unrestricted(), subject)
-                .buckets(BucketAggregation.of(null, Grouping.terms(ASSET_CATEGORY)));
+                .buckets(BucketAggregationRequest.of(null, Grouping.terms(ASSET_CATEGORY)));
 
         // e1, e2 and e4 reference web-01. e2's db-01 and e4's laptop-07 aren't readable, so e3 and e5, which only
         // reference unreadable assets, count as missing, like e6 and e8 without assets and e7 with a deleted one.
@@ -115,7 +115,7 @@ class PermittedAggregatorsTest {
         permissions.addAll(List.of("assets:read:" + WEB_01, "assets:read:" + LAPTOP_07));
 
         final var result = aggregators.forUser("security_events", STREAM_S1, subject)
-                .buckets(BucketAggregation.of(null, Grouping.terms(ASSET_CATEGORY)));
+                .buckets(BucketAggregationRequest.of(null, Grouping.terms(ASSET_CATEGORY)));
 
         // e7 and e8 are in stream s2. Of the others, e5 only references printer-02, which isn't readable, and e6
         // has no assets.
@@ -129,7 +129,7 @@ class PermittedAggregatorsTest {
 
         final var result = aggregators.forUser("assets", subject)
                 .withTimeout(Duration.ofSeconds(5))
-                .buckets(BucketAggregation.of(null, Grouping.terms("category")));
+                .buckets(BucketAggregationRequest.of(null, Grouping.terms("category")));
 
         assertThat(counts(result)).containsExactly(entry("server", 1L));
     }
@@ -139,7 +139,7 @@ class PermittedAggregatorsTest {
         when(subject.isPermitted(any(Permission.class))).thenReturn(true);
 
         final var result = aggregators.forUser("security_events", PermissionFilter.unrestricted(), subject)
-                .buckets(BucketAggregation.of(null, Grouping.terms(ASSET_CATEGORY)));
+                .buckets(BucketAggregationRequest.of(null, Grouping.terms(ASSET_CATEGORY)));
 
         assertThat(counts(result))
                 .containsExactly(entry("server", 3L), entry("workstation", 2L), entry("database", 1L));
@@ -155,7 +155,7 @@ class PermittedAggregatorsTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Collection <security_events> isn't registered");
         assertThatThrownBy(() -> aggregators.forUser("security_events", PermissionFilter.unrestricted(), subject)
-                .buckets(BucketAggregation.of(null, Grouping.terms(ownerStatus))))
+                .buckets(BucketAggregationRequest.of(null, Grouping.terms(ownerStatus))))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Collection <users> isn't registered");
     }

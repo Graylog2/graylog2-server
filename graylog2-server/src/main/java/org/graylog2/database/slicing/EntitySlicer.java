@@ -24,7 +24,7 @@ import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.aggregations.MissingBucketConstants;
 import org.graylog.plugins.views.search.permissions.EntityPermissions;
 import org.graylog2.database.MongoCollections;
-import org.graylog2.database.aggregation.BucketAggregation;
+import org.graylog2.database.aggregation.BucketAggregationRequest;
 import org.graylog2.database.aggregation.BucketAggregationResult;
 import org.graylog2.database.aggregation.Grouping;
 import org.graylog2.database.aggregation.PermissionFilter;
@@ -78,7 +78,7 @@ public class EntitySlicer {
 
     @Inject
     public EntitySlicer(final MongoCollections mongoCollections, final EntityTitleService entityTitleService) {
-        this(mongoCollections, entityTitleService, BucketAggregation.MAX_LIMIT);
+        this(mongoCollections, entityTitleService, BucketAggregationRequest.MAX_LIMIT);
     }
 
     EntitySlicer(final MongoCollections mongoCollections,
@@ -105,7 +105,7 @@ public class EntitySlicer {
                 request.query());
         // The filters match a plain attribute on its id, so slices group by it too.
         final BucketAggregationResult result = mongoCollections.aggregator(entity.collection())
-                .buckets(BucketAggregation.of(Filters.and(permissionFilter.filter(), listFilter),
+                .buckets(BucketAggregationRequest.of(Filters.and(permissionFilter.filter(), listFilter),
                                 Grouping.terms(attribute.id()))
                         .withLimit(maxSlices));
         if (result.isTruncated()) {

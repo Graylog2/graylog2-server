@@ -84,7 +84,7 @@ class MongoAggregatorScenariosTest {
     class GroupingByField {
         @Test
         void countsEventsPerStatus() {
-            final var result = securityEvents.buckets(BucketAggregation.of(ALL, Grouping.terms("status")));
+            final var result = securityEvents.buckets(BucketAggregationRequest.of(ALL, Grouping.terms("status")));
 
             assertThat(counts(result)).containsExactly(
                     entry("CLOSED", 3), entry("INVESTIGATING", 2), entry("NEW", 2), entry("FALSE_POSITIVE", 1));
@@ -93,7 +93,7 @@ class MongoAggregatorScenariosTest {
 
         @Test
         void countsEventsPerTag() {
-            final var result = securityEvents.buckets(BucketAggregation.of(ALL, Grouping.terms("event.tags")));
+            final var result = securityEvents.buckets(BucketAggregationRequest.of(ALL, Grouping.terms("event.tags")));
 
             assertThat(counts(result)).containsExactly(
                     entry("malware", 3), entry("email", 2), entry("phishing", 2), entry("recon", 1));
@@ -105,7 +105,7 @@ class MongoAggregatorScenariosTest {
         void countsEventsPerProcedureStepTaken() {
             final var grouping = Grouping.terms("actions_taken.step_id");
 
-            final var result = securityEvents.buckets(BucketAggregation.of(ALL, grouping));
+            final var result = securityEvents.buckets(BucketAggregationRequest.of(ALL, grouping));
 
             assertThat(counts(result)).containsExactly(entry("triage", 2), entry("contain", 1), entry("notify", 1));
             assertThat(result.missingCount()).isEqualTo(5);
@@ -115,7 +115,7 @@ class MongoAggregatorScenariosTest {
         void countsOnlyEventsMatchingTheFilter() {
             final var openEvents = Filters.in("status", "NEW", "INVESTIGATING");
 
-            final var result = securityEvents.buckets(BucketAggregation.of(openEvents, Grouping.terms("owner")));
+            final var result = securityEvents.buckets(BucketAggregationRequest.of(openEvents, Grouping.terms("owner")));
 
             assertThat(counts(result)).containsExactly(entry(ANN, 2), entry(BEN, 1), entry(CID, 1));
             assertThat(result.missingCount()).isZero();
@@ -126,7 +126,7 @@ class MongoAggregatorScenariosTest {
     class Sorting {
         @Test
         void ordersByCountDescendingByDefault() {
-            final var request = BucketAggregation.of(ALL, Grouping.terms("status"));
+            final var request = BucketAggregationRequest.of(ALL, Grouping.terms("status"));
 
             // equal counts are ordered by key
             assertThat(keys(securityEvents.buckets(request)))
@@ -135,7 +135,7 @@ class MongoAggregatorScenariosTest {
 
         @Test
         void ordersByCountAscending() {
-            final var request = BucketAggregation.of(ALL, Grouping.terms("status"))
+            final var request = BucketAggregationRequest.of(ALL, Grouping.terms("status"))
                     .withOrder(BucketOrder.byCount(SortOrder.ASCENDING));
 
             assertThat(keys(securityEvents.buckets(request)))
@@ -144,7 +144,7 @@ class MongoAggregatorScenariosTest {
 
         @Test
         void ordersByKey() {
-            final var request = BucketAggregation.of(ALL, Grouping.terms("status"));
+            final var request = BucketAggregationRequest.of(ALL, Grouping.terms("status"));
 
             assertThat(keys(securityEvents.buckets(request.withOrder(BucketOrder.byKey(SortOrder.ASCENDING)))))
                     .containsExactly("CLOSED", "FALSE_POSITIVE", "INVESTIGATING", "NEW");
@@ -157,7 +157,7 @@ class MongoAggregatorScenariosTest {
     class Limit {
         @Test
         void sumsUpBucketsBeyondTheLimit() {
-            final var request = BucketAggregation.of(ALL, Grouping.terms("event.tags")).withLimit(2);
+            final var request = BucketAggregationRequest.of(ALL, Grouping.terms("event.tags")).withLimit(2);
 
             final var result = securityEvents.buckets(request);
 
@@ -173,7 +173,7 @@ class MongoAggregatorScenariosTest {
 
         @Test
         void keepsBucketsInTheRequestedOrder() {
-            final var result = securityEvents.buckets(BucketAggregation.of(ALL, Grouping.terms("status"))
+            final var result = securityEvents.buckets(BucketAggregationRequest.of(ALL, Grouping.terms("status"))
                     .withOrder(BucketOrder.byKey(SortOrder.ASCENDING))
                     .withLimit(1));
 
@@ -192,7 +192,7 @@ class MongoAggregatorScenariosTest {
                     Range.of("medium", 30, 70),
                     Range.of("high", 70, null)));
 
-            final var result = securityEvents.buckets(BucketAggregation.of(ALL, grouping));
+            final var result = securityEvents.buckets(BucketAggregationRequest.of(ALL, grouping));
 
             assertThat(counts(result)).containsExactly(entry("low", 3), entry("high", 2), entry("medium", 2));
             // e8 has no risk score yet
@@ -245,7 +245,8 @@ class MongoAggregatorScenariosTest {
 
         @Test
         void countsEventsPerAccountStatusOfTheirOwner() {
-            final var result = securityEvents.buckets(BucketAggregation.of(ALL, Grouping.terms(OWNER_ACCOUNT_STATUS)));
+            final var result = securityEvents.buckets(
+                    BucketAggregationRequest.of(ALL, Grouping.terms(OWNER_ACCOUNT_STATUS)));
 
             assertThat(counts(result)).containsExactly(entry("enabled", 4), entry("disabled", 2));
             // e7's owner was deleted, e8 has none
@@ -257,7 +258,7 @@ class MongoAggregatorScenariosTest {
             final var visibleOwners = Filters.in("_id", new ObjectId(ANN), new ObjectId(BEN));
             final var grouping = Grouping.terms(OWNER_ACCOUNT_STATUS.withFilter(visibleOwners));
 
-            final var result = securityEvents.buckets(BucketAggregation.of(ALL, grouping));
+            final var result = securityEvents.buckets(BucketAggregationRequest.of(ALL, grouping));
 
             // cid's events e4 and e6 count as missing, like those without a known owner
             assertThat(counts(result)).containsExactly(entry("disabled", 2), entry("enabled", 2));
@@ -266,7 +267,7 @@ class MongoAggregatorScenariosTest {
 
         @Test
         void countsEventsPerCategoryOfTheirAssets() {
-            final var result = securityEvents.buckets(BucketAggregation.of(ALL, Grouping.terms(ASSET_CATEGORY)));
+            final var result = securityEvents.buckets(BucketAggregationRequest.of(ALL, Grouping.terms(ASSET_CATEGORY)));
 
             // e2's two servers count once; e4 has a server and a workstation and counts for both
             assertThat(counts(result))
@@ -277,7 +278,7 @@ class MongoAggregatorScenariosTest {
 
         @Test
         void sortsAndLimitsRelatedValuesLikeFieldValues() {
-            final var result = securityEvents.buckets(BucketAggregation.of(ALL, Grouping.terms(ASSET_CATEGORY))
+            final var result = securityEvents.buckets(BucketAggregationRequest.of(ALL, Grouping.terms(ASSET_CATEGORY))
                     .withOrder(BucketOrder.byKey(SortOrder.ASCENDING))
                     .withLimit(1));
 
@@ -287,8 +288,8 @@ class MongoAggregatorScenariosTest {
         }
     }
 
-    private static BucketAggregation inKeyOrder(final Grouping grouping) {
-        return BucketAggregation.of(ALL, grouping).withOrder(BucketOrder.byKey(SortOrder.ASCENDING));
+    private static BucketAggregationRequest inKeyOrder(final Grouping grouping) {
+        return BucketAggregationRequest.of(ALL, grouping).withOrder(BucketOrder.byKey(SortOrder.ASCENDING));
     }
 
     private static Map<Object, Long> counts(final BucketAggregationResult result) {
