@@ -25,7 +25,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class RedirectUriPolicyTest {
-    private static final List<String> ALLOWED = List.of("https://claude.ai/api/mcp/auth_callback");
+    private static final List<String> ALLOWED = List.of("https://claude.ai/api/mcp/auth_callback", "cursor:", "exact-app://callback");
 
     @ParameterizedTest
     @ValueSource(strings = {
@@ -33,7 +33,10 @@ class RedirectUriPolicyTest {
             "http://localhost:6274/oauth/callback",
             "http://[::1]:8080/cb",
             "https://claude.ai/api/mcp/auth_callback",
-            "cursor://anysphere.cursor-retrieval/oauth/user-graylog/callback"
+            "cursor://anysphere.cursor-retrieval/oauth/user-graylog/callback",
+            "CURSOR://anysphere.cursor-retrieval/oauth/user-graylog/callback",
+            "exact-app://callback",
+            "com.example.app:/oauth/callback"
     })
     void allowsLoopbackAllowlistedAndNativeAppUris(String uri) {
         assertThat(RedirectUriPolicy.isAllowed(uri, ALLOWED)).isTrue();
@@ -49,6 +52,12 @@ class RedirectUriPolicyTest {
             "http://user@127.0.0.1:8080/cb",
             "javascript:alert(1)",
             "data:text/html,hi",
+            "microsoft-edge:https://evil.example.com/callback",
+            "googlechromes://evil.example.com/callback",
+            "x-safari-https://evil.example.com/callback",
+            "firefox://open-url?url=https://evil.example.com/callback",
+            "exact-app://other",
+            "evil-app://claude.ai/api/mcp/auth_callback",
             "/relative/callback",
             ""
     })

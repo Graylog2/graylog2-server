@@ -30,8 +30,8 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  * Decides which redirect URIs clients may register and use.
  * <ul>
  *     <li>Loopback {@code http} URIs are always allowed, with any port (RFC 8252 section 7.3)</li>
- *     <li>Private-use URI schemes of native apps are allowed (RFC 8252 section 7.1)</li>
- *     <li>Other {@code http(s)} URIs need to be allowed by an administrator</li>
+ *     <li>Reverse domain name schemes of native apps are allowed (RFC 8252 section 7.1)</li>
+ *     <li>Other URIs need to be allowed by an administrator, either exactly or for custom schemes as {@code scheme:}</li>
  * </ul>
  */
 public final class RedirectUriPolicy {
@@ -52,10 +52,14 @@ public final class RedirectUriPolicy {
         if (isLoopback(uri)) {
             return true;
         }
-        if (scheme.equals("http") || scheme.equals("https")) {
-            return allowedUris.contains(redirectUri);
+        if (allowedUris.contains(redirectUri)) {
+            return true;
         }
-        return !FORBIDDEN_SCHEMES.contains(scheme);
+        if (scheme.equals("http") || scheme.equals("https") || FORBIDDEN_SCHEMES.contains(scheme)) {
+            return false;
+        }
+        // Schemes without a dot may be browser handlers (e.g. "microsoft-edge:https://...") that would bypass the allowlist
+        return scheme.contains(".") || allowedUris.contains(f("%s:", scheme));
     }
 
     /**

@@ -185,7 +185,7 @@ const McpConfig = () => {
               id="oauth-allowed-redirect-uris"
               name="oauth-allowed-redirect-uris"
               label="Allowed redirect URIs"
-              help="Clients may use these web callbacks in addition to local (loopback) and app callbacks."
+              help="Clients may use these callbacks in addition to local (loopback) and reverse domain name app callbacks (e.g. com.example.app:/callback). Use scheme: (e.g. cursor:) to allow all callbacks of an app scheme."
               values={modalConfig.oauth_allowed_redirect_uris}
               onChange={({ target: { value } }) =>
                 setModalConfig({ ...modalConfig, oauth_allowed_redirect_uris: value.map(String) })
