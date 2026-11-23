@@ -270,7 +270,7 @@ class MongoAggregatorTest {
         void considersOnlyRelatedDocumentsMatchingTheirFilter() {
             final var grouping = Grouping.terms(
                     GroupedValueSource.related("event_id", "investigations", "events", "status")
-                            .withFilter(Filters.eq("team", "blue")));
+                            .withRelatedFilter(Filters.eq("team", "blue")));
 
             final var result = mongoCollections.aggregator("events")
                     .buckets(BucketAggregationRequest.of(ALL, grouping));
@@ -285,7 +285,7 @@ class MongoAggregatorTest {
             final var events = mongoCollections.aggregator("events");
 
             final var converted = events.buckets(
-                    BucketAggregationRequest.of(ALL, Grouping.terms(source.withLocalFieldAsObjectId())));
+                    BucketAggregationRequest.of(ALL, Grouping.terms(source.withLocalKeyAsObjectId())));
             assertThat(counts(converted)).containsExactly(entry("red", 2L), entry("blue", 1L));
             // the invalid and the absent reference
             assertThat(converted.missingCount()).isEqualTo(2);

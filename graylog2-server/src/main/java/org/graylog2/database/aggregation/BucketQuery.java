@@ -140,22 +140,22 @@ final class BucketQuery {
     private static List<Bson> relatedValueStages(final RelatedSource related) {
         final var stages = new ArrayList<Bson>();
         final var temporaryFields = new ArrayList<>(List.of(RELATED));
-        var localField = related.localField();
-        if (related.localFieldAsObjectId()) {
-            stages.add(Aggregates.set(new Field<>(REFERENCE, toObjectIds("$" + related.localField()))));
-            localField = REFERENCE;
+        var localKey = related.localKey();
+        if (related.localKeyAsObjectId()) {
+            stages.add(Aggregates.set(new Field<>(REFERENCE, toObjectIds("$" + related.localKey()))));
+            localKey = REFERENCE;
             temporaryFields.add(REFERENCE);
         }
 
-        // Without a reference, the lookup would match every related document lacking the foreign field.
-        final var lookupStages = new ArrayList<>(List.of(Aggregates.match(Filters.ne(related.foreignField(), null))));
-        if (related.filter() != null) {
-            lookupStages.add(Aggregates.match(related.filter()));
+        // Without a reference, the lookup would match every related document lacking the related key.
+        final var lookupStages = new ArrayList<>(List.of(Aggregates.match(Filters.ne(related.relatedKey(), null))));
+        if (related.relatedFilter() != null) {
+            lookupStages.add(Aggregates.match(related.relatedFilter()));
         }
-        lookupStages.add(Aggregates.project(Projections.include(related.path())));
+        lookupStages.add(Aggregates.project(Projections.include(related.groupByField())));
 
-        stages.add(lookup(related.collection(), localField, related.foreignField(), lookupStages, RELATED));
-        stages.add(Aggregates.set(new Field<>(VALUE, distinctValues("$" + RELATED + "." + related.path()))));
+        stages.add(lookup(related.relatedCollection(), localKey, related.relatedKey(), lookupStages, RELATED));
+        stages.add(Aggregates.set(new Field<>(VALUE, distinctValues("$" + RELATED + "." + related.groupByField()))));
         stages.add(Aggregates.unset(temporaryFields));
         return stages;
     }

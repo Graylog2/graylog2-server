@@ -36,10 +36,10 @@ public sealed interface GroupedValueSource permits FieldSource, RelatedSource {
      *
      * @see RelatedSource
      */
-    static RelatedSource related(final String localField,
-                                 final String collection,
-                                 final String foreignField,
-                                 final String path) {
-        return new RelatedSource(localField, collection, foreignField, path, null, false);
+    static RelatedSource related(final String localKey,
+                                 final String relatedCollection,
+                                 final String relatedKey,
+                                 final String groupByField) {
+        return new RelatedSource(localKey, relatedCollection, relatedKey, groupByField, null, false);
     }
 }

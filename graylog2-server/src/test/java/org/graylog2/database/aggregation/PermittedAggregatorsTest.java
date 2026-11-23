@@ -61,7 +61,7 @@ class PermittedAggregatorsTest {
     private static final PermissionFilter STREAM_S1 = PermissionFilter.of(Filters.in("event.source_streams", "s1"));
     private static final RelatedSource ASSET_CATEGORY =
             GroupedValueSource.related("event.associated_assets", "assets", "_id", "category")
-                    .withLocalFieldAsObjectId();
+                    .withLocalKeyAsObjectId();
 
     private final Set<String> permissions = new HashSet<>();
     private final Subject subject = mock(Subject.class);
@@ -152,7 +152,7 @@ class PermittedAggregatorsTest {
     @Test
     void rejectsCollectionsMissingFromTheCatalog() {
         final var ownerStatus = GroupedValueSource.related("owner", "users", "_id", "account_status")
-                .withLocalFieldAsObjectId();
+                .withLocalKeyAsObjectId();
 
         assertThatThrownBy(() -> aggregators.forUser("security_events", subject))
                 .isInstanceOf(IllegalArgumentException.class)

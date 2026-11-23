@@ -20,41 +20,47 @@ import jakarta.annotation.Nullable;
 import org.bson.conversions.Bson;
 
 /**
- * A field of the documents in {@code collection} whose {@code foreignField} equals the document's
- * {@code localField}. Either side may be an array, in which case any shared element links the documents.
- * Documents without a reference, or whose related documents don't exist, count as missing.
+ * A field of the documents in another collection that are joined to the grouped document, like a column of a joined
+ * table: the related documents whose {@code relatedKey} equals the document's {@code localKey}. The reference may
+ * point either way, e.g. from an event's {@code owner} to a user's {@code _id}, or from an investigation's
+ * {@code events} to an event's id.
  * <p>
- * The lookup runs once per matched document, so {@code foreignField} should be indexed and the request filter
+ * Unlike foreign keys in a relational database, nothing guarantees that a reference resolves. Either key may be an
+ * array, in which case any shared element joins the documents. Documents without a reference, or whose related
+ * documents don't exist, count as missing.
+ * <p>
+ * The lookup runs once per matched document, so {@code relatedKey} should be indexed and the request filter
  * selective. Each distinct related value counts once per document, even if several related documents share it.
  *
- * @param localField           the field of the grouped document holding the reference
- * @param collection           the related collection, in the same database
- * @param foreignField         the field of the related documents that the reference points to, e.g. {@code _id}
- * @param path                 the field of the related documents to group by
- * @param filter               restricts the related documents considered, e.g. to those the user may see.
- *                             A document whose related documents all fail it counts as missing.
- * @param localFieldAsObjectId whether to convert the reference to an ObjectId before matching. Graylog usually
- *                             stores references as strings, while {@code _id} holds ObjectIds; values that
- *                             aren't valid ObjectIds don't match anything.
+ * @param localKey           the grouped document's join key
+ * @param relatedCollection  the collection joined to, in the same database
+ * @param relatedKey         the related documents' join key, e.g. {@code _id}
+ * @param groupByField       the field of the related documents whose values become buckets
+ * @param relatedFilter      restricts the related documents joined, e.g. to those the user may see. A document whose
+ *                           related documents all fail it counts as missing.
+ * @param localKeyAsObjectId whether to convert the local key to an ObjectId before joining. Graylog usually stores
+ *                           references as strings, while {@code _id} holds ObjectIds; values that aren't valid
+ *                           ObjectIds don't join anything.
  */
-public record RelatedSource(String localField,
-                            String collection,
-                            String foreignField,
-                            String path,
-                            @Nullable Bson filter,
-                            boolean localFieldAsObjectId) implements GroupedValueSource {
+public record RelatedSource(String localKey,
+                            String relatedCollection,
+                            String relatedKey,
+                            String groupByField,
+                            @Nullable Bson relatedFilter,
+                            boolean localKeyAsObjectId) implements GroupedValueSource {
     public RelatedSource {
-        FieldPaths.requireFieldPath(localField);
-        FieldPaths.requireCollectionName(collection);
-        FieldPaths.requireFieldPath(foreignField);
-        FieldPaths.requireFieldPath(path);
+        FieldPaths.requireFieldPath(localKey);
+        FieldPaths.requireCollectionName(relatedCollection);
+        FieldPaths.requireFieldPath(relatedKey);
+        FieldPaths.requireFieldPath(groupByField);
     }
 
-    public RelatedSource withFilter(final Bson filter) {
-        return new RelatedSource(localField, collection, foreignField, path, filter, localFieldAsObjectId);
+    public RelatedSource withRelatedFilter(final Bson relatedFilter) {
+        return new RelatedSource(localKey, relatedCollection, relatedKey, groupByField, relatedFilter,
+                localKeyAsObjectId);
     }
 
-    public RelatedSource withLocalFieldAsObjectId() {
-        return new RelatedSource(localField, collection, foreignField, path, filter, true);
+    public RelatedSource withLocalKeyAsObjectId() {
+        return new RelatedSource(localKey, relatedCollection, relatedKey, groupByField, relatedFilter, true);
     }
 }

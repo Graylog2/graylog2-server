@@ -87,11 +87,11 @@ public class MongoAggregator {
 
     // A document whose related documents the user may not read counts as missing, like one without any.
     private RelatedSource permitted(final RelatedSource related) {
-        final PermissionFilter relatedPermissionFilter = relatedPermissionFilters.apply(related.collection());
+        final PermissionFilter relatedPermissionFilter = relatedPermissionFilters.apply(related.relatedCollection());
         if (relatedPermissionFilter.isUnrestricted()) {
             return related;
         }
-        return related.withFilter(and(relatedPermissionFilter, related.filter()));
+        return related.withRelatedFilter(and(relatedPermissionFilter, related.relatedFilter()));
     }
 
     private static Bson and(final PermissionFilter permissionFilter, @Nullable final Bson filter) {

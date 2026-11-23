@@ -243,10 +243,10 @@ class MongoAggregatorScenariosTest {
     @Nested
     class Relations {
         private static final RelatedSource OWNER_ACCOUNT_STATUS =
-                GroupedValueSource.related("owner", "users", "_id", "account_status").withLocalFieldAsObjectId();
+                GroupedValueSource.related("owner", "users", "_id", "account_status").withLocalKeyAsObjectId();
         private static final RelatedSource ASSET_CATEGORY =
                 GroupedValueSource.related("event.associated_assets", "assets", "_id", "category")
-                        .withLocalFieldAsObjectId();
+                        .withLocalKeyAsObjectId();
 
         @Test
         void countsEventsPerAccountStatusOfTheirOwner() {
@@ -261,7 +261,7 @@ class MongoAggregatorScenariosTest {
         @Test
         void considersOnlyOwnersTheUserMaySee() {
             final var visibleOwners = Filters.in("_id", new ObjectId(ANN), new ObjectId(BEN));
-            final var grouping = Grouping.terms(OWNER_ACCOUNT_STATUS.withFilter(visibleOwners));
+            final var grouping = Grouping.terms(OWNER_ACCOUNT_STATUS.withRelatedFilter(visibleOwners));
 
             final var result = securityEvents.buckets(BucketAggregationRequest.of(ALL, grouping));
 
