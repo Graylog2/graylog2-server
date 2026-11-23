@@ -5,6 +5,8 @@ details.user = """
 The new index set metric `indexing_failures` holds the number of messages that failed to index into each index set over the last 10 minutes. `GET /api/system/indices/index_sets/metrics` returns it. With Graylog Enterprise and failure processing on, the count comes from the failures stream; otherwise it comes from the indexer failures shown under System > Overview.
 
 Telemetry now includes the number of indexing failures over the last 24 hours, summed over all indices.
+
+Indexer failures stored in MongoDB now record when the failure happened instead of the failed message's timestamp. This makes the System > Overview count of the last 24 hours include failures of messages with older timestamps, for example after a journal replay.
 """
 
 issues = ["28234"]
