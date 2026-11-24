@@ -246,7 +246,7 @@ const generateColors = (mantineTheme: MantineTheme): StyledComponentsTheme['colo
       containerBackground: isLightTheme ? colors.gray[0] : colors.gray[0],
       containerBorder: isLightTheme ? colors.gray[1] : colors.gray[1],
       lines: isLightTheme ? colors.gray[1] : colors.gray[4],
-      zeroLine: isLightTheme ? colors.gray[2] : colors.gray[3],
+      zeroLine: isLightTheme ? opacify(colors.gray[3], 0.6) : colors.gray[3],
       highlight: colors.info[5],
       cyan: {
         markerColor: colors.info[5],
