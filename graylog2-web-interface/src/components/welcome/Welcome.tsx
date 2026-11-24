@@ -44,7 +44,7 @@ const Welcome = () => {
   const onboardingEnabled = useFeature('onboarding_experience');
   const { metricsEnabled } = useWelcomePageConfig();
   const productName = useProductName();
-  const prompts = usePluginEntities('welcomePage.prompts');
+  const sections = usePluginEntities('welcomePage.sections');
 
   return (
     <>
@@ -53,8 +53,8 @@ const Welcome = () => {
       </VisuallyHidden>
       {onboardingEnabled && <OnboardingBanner />}
       {metricsEnabled && <WelcomeMetricsSection />}
-      {prompts.map(({ key, component: Prompt }) => (
-        <Prompt key={key} />
+      {sections.map(({ key, component: Section }) => (
+        <Section key={key} />
       ))}
       <SectionHeader>
         <h2>Search and Usage</h2>

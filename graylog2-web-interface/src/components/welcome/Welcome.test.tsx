@@ -104,9 +104,9 @@ describe('Welcome', () => {
     asMock(usePluginEntities).mockReturnValue([]);
   });
 
-  it('shows prompts of plugins', async () => {
+  it('shows sections of plugins', async () => {
     asMock(usePluginEntities).mockImplementation((key) =>
-      key === 'welcomePage.prompts' ? [{ key: 'prompt', component: () => <span>Ask something</span> }] : [],
+      key === 'welcomePage.sections' ? [{ key: 'section', component: () => <span>Ask something</span> }] : [],
     );
 
     render(<Welcome />);
