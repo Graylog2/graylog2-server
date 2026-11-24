@@ -18,6 +18,8 @@ package org.graylog2.configuration.managed;
 
 import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.documentation.Documentation;
 import com.github.joschi.jadconfig.info.ParameterInfoCollector;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
@@ -51,6 +53,11 @@ class ManagedConfigurationApplierTest {
     private static final String MANAGED_NUMBER = "managed_number";
     private static final String UNREGISTERED = "unregistered_parameter";
     private static final String RUNTIME = "a.runtime.setting";
+    /**
+     * A value of {@link #MANAGED_NUMBER} which converts and passes the parameter validators, but is refused by a
+     * validator method of the bean, like a check across several parameters would.
+     */
+    private static final int REFUSED_BY_BEAN = 13;
 
     /**
      * Stands in for the configuration bean of a node.
@@ -67,6 +74,14 @@ class ManagedConfigurationApplierTest {
         @Documentation("A parameter which isn't registered in the catalog")
         @Parameter(UNREGISTERED)
         private String unregistered = "the default";
+
+        @ValidatorMethod
+        @SuppressWarnings("unused")
+        public void validate() throws ValidationException {
+            if (managedNumber == REFUSED_BY_BEAN) {
+                throw new ValidationException(MANAGED_NUMBER + " must not be " + REFUSED_BY_BEAN);
+            }
+        }
     }
 
     private final TestConfiguration configuration = new TestConfiguration();
@@ -139,6 +154,32 @@ class ManagedConfigurationApplierTest {
         assertThat(configuration.managed).isEqualTo("from the file");
         assertThat(lastReportedValues().get(MANAGED).value()).isEqualTo("from the file");
         assertThat(lastReportedValues().get(MANAGED).source()).isNotEqualTo(ConfigurationSource.DATABASE);
+    }
+
+    @Test
+    void removedValueFallsBackToTheDefaultWhenTheNodeDoesNotConfigureTheParameter() {
+        final var applier = applier();
+        storedValues.put(MANAGED_NUMBER, "12");
+        applier.refresh();
+        assertThat(configuration.managedNumber).isEqualTo(12);
+
+        storedValues.clear();
+        applier.refresh();
+
+        // JadConfig leaves a field alone when no repository has a value for it, so the stored value sticks
+        assertThat(configuration.managedNumber).isEqualTo(7);
+        assertThat(lastReportedValues().get(MANAGED_NUMBER).value()).isEqualTo("7");
+    }
+
+    @Test
+    void fallsBackToTheDefaultWhenAStoredValueIsRefusedByAValidatorMethod() {
+        storedValues.put(MANAGED_NUMBER, String.valueOf(REFUSED_BY_BEAN));
+
+        applier().refresh();
+
+        // The field has been set before the validator method refused it, and processing again without the stored
+        // values doesn't reset it, so the node keeps running with the refused value
+        assertThat(configuration.managedNumber).isEqualTo(7);
     }
 
     @Test
