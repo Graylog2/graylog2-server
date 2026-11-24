@@ -103,18 +103,20 @@ public class EntitySlicer {
         final EntityAttribute attribute = sliceableAttribute(entity, request.sliceColumn());
         final Bson listFilter = entity.queryCreator().createDbQuery(filtersOnOtherColumns(request.filters(), attribute),
                 request.query());
-        // The filters match a plain attribute on its id, so slices group by it too.
+        // The filters match a plain attribute on its field, so slices group by it too.
+        final String field = attribute.dbField() != null ? attribute.dbField() : attribute.id();
         final BucketAggregationResult result = mongoCollections.aggregator(entity.collection())
                 .buckets(BucketAggregationRequest.of(Filters.and(permissionFilter.filter(), listFilter),
-                                Grouping.terms(attribute.id()))
+                                Grouping.terms(field))
                         .withLimit(maxSlices));
         if (result.isTruncated()) {
             throw new BadRequestException(f("Column <%s> has more than %d distinct values and can't be sliced",
                     attribute.id(), maxSlices));
         }
 
+        // Values of different types can read the same, like an ObjectId and its hex string.
         final Map<String, Long> counts = new LinkedHashMap<>();
-        result.buckets().forEach(bucket -> counts.put(String.valueOf(bucket.key()), bucket.count()));
+        result.buckets().forEach(bucket -> counts.merge(String.valueOf(bucket.key()), bucket.count(), Long::sum));
         final Map<String, String> optionTitles = optionTitles(attribute);
         final Set<String> values = new LinkedHashSet<>(optionTitles.keySet());
         values.addAll(counts.keySet());

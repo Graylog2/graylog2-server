@@ -58,9 +58,9 @@ import java.util.concurrent.TimeUnit;
 /**
  * Runs a bucket aggregation as one MongoDB pipeline and reads its result.
  * <p>
- * An aggregation runs in one pass: match, compute each document's distinct values into a temporary field, unwind
- * them, count per bucket key, then split the buckets into the missing bucket, the top buckets and the summed-up rest
- * with {@code $facet}.
+ * An aggregation runs in one pass: match, compute each document's distinct bucket keys into a temporary field, unwind
+ * them, count per key, then split the buckets into the missing bucket, the top buckets and the summed-up rest with
+ * {@code $facet}.
  */
 final class BucketQuery {
     private static final String FACET_BUCKETS = "buckets";
@@ -73,6 +73,7 @@ final class BucketQuery {
     private static final String VALUE = "__agg_value";
     private static final String RELATED = "__agg_related";
     private static final String REFERENCE = "__agg_reference";
+    private static final String ELEMENT = "element";
 
     private BucketQuery() {}
 
@@ -114,9 +115,10 @@ final class BucketQuery {
         final var stages = new ArrayList<Bson>();
         stages.add(Aggregates.match(request.documentFilter()));
         stages.addAll(valueStages(request.grouping().source()));
+        stages.addAll(keyStages(request.grouping()));
         //unwinds for arrays, does nothing for single-value fields
         stages.add(Aggregates.unwind("$" + VALUE, new UnwindOptions().preserveNullAndEmptyArrays(true)));
-        stages.add(Aggregates.group(bucketKey(request.grouping()), Accumulators.sum(COUNT, 1L)));
+        stages.add(Aggregates.group("$" + VALUE, Accumulators.sum(COUNT, 1L)));
 
         final Bson hasKey = Aggregates.match(Filters.ne(ID, null));
         final Bson sort = Aggregates.sort(sort(request.order()));
@@ -196,13 +198,16 @@ final class BucketQuery {
                         new Document("if", new Document("$isArray", "$$this"))
                                 .append("then", "$$this")
                                 .append("else", List.of("$$this")))))));
-        final var withoutNulls = new Document("$filter", new Document("input", flattened)
-                .append("as", "element")
-                .append("cond", new Document("$ne", Arrays.asList("$$element", null))));
         return new Document("$let", new Document("vars", new Document("values", expression))
                 .append("in", new Document("$cond", new Document("if", new Document("$isArray", "$$values"))
-                        .append("then", withoutNulls)
+                        .append("then", withoutNulls(flattened))
                         .append("else", "$$values"))));
+    }
+
+    private static Document withoutNulls(final Object array) {
+        return new Document("$filter", new Document("input", array)
+                .append("as", ELEMENT)
+                .append("cond", new Document("$ne", Arrays.asList("$$" + ELEMENT, null))));
     }
 
     private static Document toObjectIds(final String expression) {
@@ -220,13 +225,28 @@ final class BucketQuery {
                 .append("onNull", null));
     }
 
-    private static Object bucketKey(final Grouping grouping) {
-        final String value = "$" + VALUE;
+    /**
+     * Replaces the values by their distinct bucket keys, so that a document counts once per bucket, and as missing
+     * only if none of its values has a bucket. The distinct values already are the keys of terms.
+     */
+    private static List<Bson> keyStages(final Grouping grouping) {
+        final String element = "$$" + ELEMENT;
         return switch (grouping) {
-            case Terms terms -> value;
-            case Ranges ranges -> rangeKey(ranges, value);
-            case DateHistogram histogram -> dateHistogramKey(histogram, value);
+            case Terms terms -> List.of();
+            case Ranges ranges -> List.of(bucketKeys(rangeKey(ranges, element)));
+            case DateHistogram histogram -> List.of(bucketKeys(dateHistogramKey(histogram, element)));
         };
+    }
+
+    private static Bson bucketKeys(final Document keyOfElement) {
+        final String value = "$" + VALUE;
+        final var values = new Document("$cond", new Document("if", new Document("$isArray", value))
+                .append("then", value)
+                .append("else", List.of(value)));
+        final var keys = new Document("$map", new Document("input", values)
+                .append("as", ELEMENT)
+                .append("in", keyOfElement));
+        return Aggregates.set(new Field<>(VALUE, new Document("$setUnion", List.of(withoutNulls(keys)))));
     }
 
     private static Document rangeKey(final Ranges ranges, final String value) {

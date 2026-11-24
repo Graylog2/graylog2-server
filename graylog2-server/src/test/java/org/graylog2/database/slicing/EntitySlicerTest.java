@@ -18,6 +18,8 @@ package org.graylog2.database.slicing;
 
 import com.mongodb.client.model.Filters;
 import jakarta.ws.rs.BadRequestException;
+import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.graylog.plugins.views.search.permissions.EntityPermissions;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
@@ -169,6 +171,35 @@ class EntitySlicerTest {
                 new Slice(DB_01, "db-01", 1),
                 new Slice(PRINTER_02, "printer-02", 1),
                 new Slice(null, EMPTY_VALUE, 2));
+    }
+
+    @Test
+    void addsUpValuesStoredWithDifferentTypes() {
+        mongoCollections.connection().getMongoDatabase().getCollection("security_events")
+                .insertOne(new Document("event_id", "e9").append("owner", new ObjectId(ANN))
+                        .append("event", new Document("source_streams", List.of("s1"))));
+
+        final var slices = slices(SliceRequest.of("owner", List.of(), ""), PermissionFilter.unrestricted());
+
+        // e9 references ann by ObjectId, the other events by string
+        assertThat(slices).first().isEqualTo(new Slice(ANN, "Ann", 3));
+    }
+
+    @Test
+    void groupsByTheDatabaseFieldOfTheColumn() {
+        final var state = EntityAttribute.builder().id("state").title("State").dbField("status").filterable(true)
+                .sliceable(true).build();
+        final var entity = new SliceableEntity("security_events", List.of(state),
+                new DbQueryCreator("event_id", List.of(state)));
+
+        final var slices = slicer.slices(entity, SliceRequest.of("state", List.of(), ""),
+                PermissionFilter.unrestricted(), TITLE_PERMISSIONS).slices();
+
+        assertThat(slices).containsExactly(
+                new Slice("CLOSED", "CLOSED", 3),
+                new Slice("INVESTIGATING", "INVESTIGATING", 2),
+                new Slice("NEW", "NEW", 2),
+                new Slice("FALSE_POSITIVE", "FALSE_POSITIVE", 1));
     }
 
     @Test

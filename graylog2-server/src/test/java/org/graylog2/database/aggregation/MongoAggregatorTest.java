@@ -23,13 +23,10 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.aggregation.BucketAggregationResult.Bucket;
-import org.graylog2.database.aggregation.grouping.DateHistogram;
 import org.graylog2.database.aggregation.grouping.DateUnit;
 import org.graylog2.database.aggregation.grouping.GroupedValueSource;
 import org.graylog2.database.aggregation.grouping.Grouping;
 import org.graylog2.database.aggregation.grouping.Range;
-import org.graylog2.database.aggregation.grouping.Ranges;
-import org.graylog2.database.aggregation.grouping.Terms;
 import org.graylog2.rest.models.SortOrder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -188,6 +185,25 @@ class MongoAggregatorTest {
         }
 
         @Test
+        void countsDocumentsOncePerRange() {
+            mongodb.mongoCollection("readings").insertMany(List.of(
+                    new Document("_id", "r1").append("values", List.of(10, 20)),
+                    new Document("_id", "r2").append("values", List.of(10, 90, "x")),
+                    new Document("_id", "r3").append("values", List.of("x", 200))));
+            final var grouping = Grouping.ranges(GroupedValueSource.field("values"), List.of(
+                    Range.of("low", null, 30),
+                    Range.of("high", 80, 100)));
+
+            final var result = mongoCollections.aggregator("readings")
+                    .buckets(BucketAggregationRequest.of(ALL, grouping));
+
+            // r1 has two low values. r2 also has a value that isn't a number, but other values in ranges. Only r3
+            // has no value in any range.
+            assertThat(counts(result)).containsExactly(entry("low", 2L), entry("high", 1L));
+            assertThat(result.missingCount()).isEqualTo(1);
+        }
+
+        @Test
         void treatsRangeKeysAsLiterals() {
             final var grouping = Grouping.ranges(GroupedValueSource.field("score"),
                     List.of(Range.of("$owner", 0, 100)));
@@ -212,6 +228,26 @@ class MongoAggregatorTest {
                     entry(Instant.parse("2024-01-03T00:00:00Z"), 2L));
             // "not a date"
             assertThat(result.missingCount()).isEqualTo(1);
+        }
+
+        @Test
+        void countsDocumentsOncePerPeriod() {
+            mongodb.mongoCollection("sessions").insertMany(List.of(
+                    new Document("_id", "s1").append("logins",
+                            List.of(date("2024-01-01T08:00:00Z"), date("2024-01-01T18:00:00Z"))),
+                    new Document("_id", "s2").append("logins",
+                            List.of(date("2024-01-01T09:00:00Z"), date("2024-01-02T09:00:00Z")))));
+            final var request = BucketAggregationRequest.of(ALL,
+                            Grouping.dateHistogram(GroupedValueSource.field("logins"), DateUnit.DAY, ZoneOffset.UTC))
+                    .withOrder(BucketOrder.byKey(SortOrder.ASCENDING));
+
+            final var result = mongoCollections.aggregator("sessions").buckets(request);
+
+            // s1 logged in twice on the first day
+            assertThat(counts(result)).containsExactly(
+                    entry(Instant.parse("2024-01-01T00:00:00Z"), 2L),
+                    entry(Instant.parse("2024-01-02T00:00:00Z"), 1L));
+            assertThat(result.missingCount()).isZero();
         }
 
         @Test

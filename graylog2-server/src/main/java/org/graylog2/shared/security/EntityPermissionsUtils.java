@@ -42,7 +42,8 @@ public class EntityPermissionsUtils {
     public Predicate<Document> createPermissionCheck(final Subject subject, final String collection) {
         final var readPermission = readPermissionForCollection(collection);
         return doc -> readPermission
-                .map(permission -> subject.isPermitted(permission + ":" + doc.getObjectId(ID_FIELD).toString()))
+                // Not every collection uses ObjectIds, and the permission holds the id as a string either way.
+                .map(permission -> subject.isPermitted(permission + ":" + doc.get(ID_FIELD)))
                 .orElse(false);
     }
 

@@ -18,6 +18,7 @@ package org.graylog2.database.aggregation;
 
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.subject.Subject;
+import org.bson.Document;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
@@ -77,6 +78,16 @@ class CatalogPermissionFiltersTest {
         final var permissionFilter = permissionFilters.permissionFilter("assets", subject);
 
         assertThat(readableNames("assets", permissionFilter)).containsExactlyInAnyOrder("web-01", "laptop-07");
+    }
+
+    @Test
+    void readsEntitiesWhoseIdIsNoObjectId() {
+        mongodb.mongoCollection("assets").insertOne(new Document("_id", "legacy-asset").append("name", "legacy"));
+        permissions.addAll(List.of("assets:read:" + WEB_01, "assets:read:legacy-asset"));
+
+        final var permissionFilter = permissionFilters.permissionFilter("assets", subject);
+
+        assertThat(readableNames("assets", permissionFilter)).containsExactlyInAnyOrder("web-01", "legacy");
     }
 
     @Test
