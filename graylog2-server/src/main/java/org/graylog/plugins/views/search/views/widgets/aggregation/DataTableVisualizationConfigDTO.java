@@ -16,8 +16,10 @@
  */
 package org.graylog.plugins.views.search.views.widgets.aggregation;
 
+import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -25,6 +27,7 @@ import com.google.auto.value.AutoValue;
 import java.util.List;
 
 @AutoValue
+@JsonClassDescription("Data table: the result as a table, with a row per group-by value.")
 @JsonTypeName(DataTableVisualizationConfigDTO.NAME)
 @JsonDeserialize(builder = DataTableVisualizationConfigDTO.Builder.class)
 public abstract class DataTableVisualizationConfigDTO implements VisualizationConfigDTO {
@@ -33,9 +36,11 @@ public abstract class DataTableVisualizationConfigDTO implements VisualizationCo
     private static final String FIELD_PINNED_COLUMNS = "pinned_columns";
     private static final String FIELD_SHOW_ROW_NUMBERS = "show_row_numbers";
 
+    @JsonPropertyDescription("Fields of row group-bys whose columns stay visible when scrolling sideways.")
     @JsonProperty(FIELD_PINNED_COLUMNS)
     public abstract List<String> pinnedColumns();
 
+    @JsonPropertyDescription("Shows a number in front of each row.")
     @JsonProperty(FIELD_SHOW_ROW_NUMBERS)
     public abstract boolean showRowNumbers();
 

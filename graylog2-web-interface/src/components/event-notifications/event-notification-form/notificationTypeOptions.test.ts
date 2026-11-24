@@ -47,7 +47,9 @@ describe('notificationTypeOptions', () => {
   });
 
   it('hides a type whose required permissions are missing', () => {
-    expect(notificationTypeOptions(types, () => false, undefined)).toEqual([{ label: 'email display', value: 'email' }]);
+    expect(notificationTypeOptions(types, () => false, undefined)).toEqual([
+      { label: 'email display', value: 'email' },
+    ]);
   });
 
   it('keeps the type of the notification being edited even without permissions', () => {
@@ -58,15 +60,25 @@ describe('notificationTypeOptions', () => {
   });
 
   it('hides a type whose condition is not met', () => {
-    expect(notificationTypeOptions(types, () => true, undefined, (type) => type.type !== 'watchlist')).toEqual([
-      { label: 'email display', value: 'email' },
-    ]);
+    expect(
+      notificationTypeOptions(
+        types,
+        () => true,
+        undefined,
+        (type) => type.type !== 'watchlist',
+      ),
+    ).toEqual([{ label: 'email display', value: 'email' }]);
   });
 
   it('keeps the type of the notification being edited even when its condition is not met', () => {
-    expect(notificationTypeOptions(types, () => true, 'watchlist', () => false)).toEqual([
-      { label: 'watchlist display', value: 'watchlist' },
-    ]);
+    expect(
+      notificationTypeOptions(
+        types,
+        () => true,
+        'watchlist',
+        () => false,
+      ),
+    ).toEqual([{ label: 'watchlist display', value: 'watchlist' }]);
   });
 
   it('checks the declared permissions', () => {

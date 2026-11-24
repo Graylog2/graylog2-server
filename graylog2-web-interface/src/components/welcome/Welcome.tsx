@@ -24,6 +24,7 @@ import useFeature from 'hooks/useFeature';
 import SectionHeader from 'components/welcome/SectionHeader';
 import VisuallyHidden from 'components/common/VisuallyHidden';
 import useProductName from 'brand-customization/useProductName';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 import LastOpenList from './LastOpenList';
 import FavoriteItemsList from './FavoriteItemsList';
@@ -43,6 +44,7 @@ const Welcome = () => {
   const onboardingEnabled = useFeature('onboarding_experience');
   const { metricsEnabled } = useWelcomePageConfig();
   const productName = useProductName();
+  const sections = usePluginEntities('welcomePage.sections');
 
   return (
     <>
@@ -51,6 +53,9 @@ const Welcome = () => {
       </VisuallyHidden>
       {onboardingEnabled && <OnboardingBanner />}
       {metricsEnabled && <WelcomeMetricsSection />}
+      {sections.map(({ key, component: Section }) => (
+        <Section key={key} />
+      ))}
       <SectionHeader>
         <h2>Search and Usage</h2>
       </SectionHeader>

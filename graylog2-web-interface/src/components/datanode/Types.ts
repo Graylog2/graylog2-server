@@ -47,25 +47,25 @@ export type CompatibilityResponseType = {
 };
 
 export type DataNode = {
-  hostname: string;
+  hostname?: string;
   id: string;
   is_leader: boolean;
   is_master: boolean;
-  last_seen: string;
+  last_seen?: string;
   node_id: string;
   short_node_id: string;
-  transport_address: string;
+  transport_address?: string;
   type?: string;
   status: DataNodeStatus;
   datanode_status?: string;
-  cert_valid_until: string | null;
+  cert_valid_until?: string | null;
   error_msg?: string;
-  datanode_version: string;
+  datanode_version?: string;
   version_compatible: boolean;
   object_id?: string;
-  cluster_address: string;
-  rest_api_address: string;
-  action_queue: string;
+  cluster_address?: string;
+  rest_api_address?: string;
+  action_queue?: string;
   opensearch_roles?: string[];
   configuration_warnings?: string[];
 };

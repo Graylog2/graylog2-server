@@ -26,6 +26,7 @@ import jakarta.inject.Singleton;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
 import org.graylog2.indexer.indexset.metrics.IndexSetDeflectorHealthDescriptor;
 import org.graylog2.indexer.indexset.metrics.IndexSetFieldCountDescriptor;
+import org.graylog2.indexer.indexset.metrics.IndexSetIndexingFailuresDescriptor;
 import org.graylog2.indexer.indexset.metrics.IndexSetStatsDescriptor;
 import org.graylog2.inputs.InputServiceImpl;
 import org.graylog2.inputs.metrics.InputExtractorCountDescriptor;
@@ -83,6 +84,7 @@ public class EntityMetricsModule extends AbstractModule {
         indexSetDescriptors.addBinding().to(IndexSetStatsDescriptor.SizeBytes.class);
         indexSetDescriptors.addBinding().to(IndexSetFieldCountDescriptor.class);
         indexSetDescriptors.addBinding().to(IndexSetDeflectorHealthDescriptor.class);
+        indexSetDescriptors.addBinding().to(IndexSetIndexingFailuresDescriptor.class);
 
         final Multibinder<InputType> inputTypes = Multibinder.newSetBinder(binder(), InputType.class);
         inputTypes.addBinding().to(RegularInputType.class);

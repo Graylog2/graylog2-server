@@ -42,7 +42,7 @@ public class DefaultFailureHandler implements FailureHandler {
                         .put("index", failure.targetIndex())
                         .put("type", failure.failureType().toString())
                         .put("message", failure.failureDetails())
-                        .put("timestamp", failure.messageTimestamp())
+                        .put("timestamp", failure.failureTimestamp())
                         .build())));
     }
 
