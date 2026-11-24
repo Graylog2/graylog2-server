@@ -58,7 +58,9 @@ const Snapshot = () => {
 
   return (
     <>
-      <button type="button" onClick={() => setSnapshot(JSON.stringify({ ...getSnapshot(), tools: Object.keys(getTools()) }))}>
+      <button
+        type="button"
+        onClick={() => setSnapshot(JSON.stringify({ ...getSnapshot(), tools: Object.keys(getTools()) }))}>
         Read
       </button>
       <pre>{snapshot}</pre>

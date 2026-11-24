@@ -16,16 +16,21 @@
  */
 package org.graylog.plugins.views.search.views.widgets.aggregation;
 
+import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog.jsonschema.AllowedValues;
 import com.mongodb.lang.Nullable;
 
 import java.util.Optional;
 
 @AutoValue
+@JsonClassDescription("Heatmap: one metric for every pair of values of exactly two group-bys, e.g. [timestamp, "
+        + "source], as colored cells.")
 @JsonTypeName(HeatmapVisualizationConfigDTO.NAME)
 @JsonDeserialize(builder = HeatmapVisualizationConfigDTO.Builder.class)
 public abstract class HeatmapVisualizationConfigDTO implements VisualizationConfigDTO {
@@ -38,24 +43,35 @@ public abstract class HeatmapVisualizationConfigDTO implements VisualizationConf
     private static final String FIELD_DEFAULT_VALUE = "default_value";
     private static final String FIELD_USE_SMALLEST_AS_DEFAULT = "use_smallest_as_default";
 
+    @JsonPropertyDescription("The color scale of the cells.")
     @JsonProperty(FIELD_COLOR_SCALE)
+    @AllowedValues(ColorScale.class)
     public abstract String colorScale();
 
+    @JsonPropertyDescription("Reverses the color scale.")
     @JsonProperty(FIELD_REVERSE_SCALE)
     public abstract boolean reverseScale();
 
+    @JsonPropertyDescription("Derives the range of the color scale from the values; turn it off to set z_min and "
+            + "z_max.")
     @JsonProperty(FIELD_AUTO_SCALE)
     public abstract boolean autoScale();
 
+    @JsonPropertyDescription("The value at the low end of the color scale, as a number in a string, e.g. \"0\"; only"
+            + " used while auto_scale is off.")
     @JsonProperty(FIELD_Z_MIN)
     public abstract Optional<String> zMin();
 
+    @JsonPropertyDescription("The value at the high end of the color scale, as a number in a string, e.g. \"100\"; "
+            + "only used while auto_scale is off.")
     @JsonProperty(FIELD_Z_MAX)
     public abstract Optional<String> zMax();
 
+    @JsonPropertyDescription("The value of cells without data; only used while use_smallest_as_default is off.")
     @JsonProperty(FIELD_DEFAULT_VALUE)
     public abstract Optional<Long> defaultValue();
 
+    @JsonPropertyDescription("Gives cells without data the smallest value of the result.")
     @JsonProperty(FIELD_USE_SMALLEST_AS_DEFAULT)
     public abstract boolean useSmallestAsDefault();
 

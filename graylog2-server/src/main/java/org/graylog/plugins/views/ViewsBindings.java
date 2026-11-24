@@ -120,19 +120,10 @@ import org.graylog.plugins.views.search.validation.validators.UnknownFieldsValid
 import org.graylog.plugins.views.search.views.RequiresParameterSupport;
 import org.graylog.plugins.views.search.views.ViewRequirements;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AggregationConfigDTO;
-import org.graylog.plugins.views.search.views.widgets.aggregation.AreaVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDTO;
-import org.graylog.plugins.views.search.views.widgets.aggregation.BarVisualizationConfigDTO;
-import org.graylog.plugins.views.search.views.widgets.aggregation.DataTableVisualizationConfigDTO;
-import org.graylog.plugins.views.search.views.widgets.aggregation.HeatmapVisualizationConfigDTO;
-import org.graylog.plugins.views.search.views.widgets.aggregation.LineVisualizationConfigDTO;
-import org.graylog.plugins.views.search.views.widgets.aggregation.NetworkVisualizationConfigDTO;
-import org.graylog.plugins.views.search.views.widgets.aggregation.NumberVisualizationConfigDTO;
-import org.graylog.plugins.views.search.views.widgets.aggregation.ScatterVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.TimeHistogramConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.TimeUnitIntervalDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.ValueConfigDTO;
-import org.graylog.plugins.views.search.views.widgets.aggregation.WorldMapVisualizationConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSortConfig;
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SeriesSortConfig;
 import org.graylog.plugins.views.search.views.widgets.events.EventsWidgetConfigDTO;
@@ -140,6 +131,7 @@ import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListCon
 import org.graylog.plugins.views.search.views.widgets.text.TextWidgetConfigDTO;
 import org.graylog.plugins.views.startpage.StartPageResource;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityUpdatesListener;
+import org.graylog.plugins.views.visualizations.CoreVisualizations;
 import org.graylog2.contentpacks.facades.DashboardEntityCreator;
 import org.graylog2.contentpacks.facades.DashboardFacade;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
@@ -247,7 +239,7 @@ public class ViewsBindings extends ViewsModule {
 
         registerWidgetConfigSubtypes();
 
-        registerVisualizationConfigSubtypes();
+        registerVisualizations();
 
         addPeriodical(SearchesCleanUpJob.class);
         addPeriodical(SearchJobStateCleanupOnStartup.class);
@@ -335,16 +327,8 @@ public class ViewsBindings extends ViewsModule {
         registerJacksonSubtype(TextWidgetConfigDTO.class);
     }
 
-    private void registerVisualizationConfigSubtypes() {
-        registerJacksonSubtype(WorldMapVisualizationConfigDTO.class);
-        registerJacksonSubtype(BarVisualizationConfigDTO.class);
-        registerJacksonSubtype(NumberVisualizationConfigDTO.class);
-        registerJacksonSubtype(LineVisualizationConfigDTO.class);
-        registerJacksonSubtype(AreaVisualizationConfigDTO.class);
-        registerJacksonSubtype(HeatmapVisualizationConfigDTO.class);
-        registerJacksonSubtype(DataTableVisualizationConfigDTO.class);
-        registerJacksonSubtype(ScatterVisualizationConfigDTO.class);
-        registerJacksonSubtype(NetworkVisualizationConfigDTO.class);
+    private void registerVisualizations() {
+        CoreVisualizations.all().forEach(this::addVisualization);
     }
 
     private void registerParameterSubtypes() {

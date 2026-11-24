@@ -404,7 +404,7 @@ const exports: PluginExports = {
       {
         type: 'create-event-definition-from-value',
         title: 'Create event definition',
-        isEnabled: () => true,
+        isEnabled: ({ contexts }) => !!contexts?.isPermitted?.('eventdefinitions:create'),
         resetFocus: false,
         component: CreateEventDefinition,
       },

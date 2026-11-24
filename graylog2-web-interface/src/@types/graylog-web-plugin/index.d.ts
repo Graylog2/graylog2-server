@@ -262,6 +262,7 @@ declare module 'graylog-web-plugin/plugin' {
     permissions?: Permissions;
     telemetryEvent?: CreatorTelemetryEvent;
     requiredFeatureFlag?: string;
+    useCondition?: () => boolean;
   }
 
   interface EntityActions {
@@ -358,16 +359,14 @@ declare module 'graylog-web-plugin/plugin' {
     StreamIndexSetDataLakeWarning: React.ComponentType<{ streamId: string; isArchivingEnabled: boolean }>;
     fetchStreamDataLakeStatus: (streamId: string) => Promise<{
       id: string;
-      archive_name: string;
       enabled: boolean;
       stream_id: string;
-      retention_time: number;
+      retention_time?: string;
     }>;
     fetchStreamDataLake: (streamId: string) => Promise<{
       id: string;
       archive_config_id: string;
       message_count: number;
-      archive_name: string;
       timestamp_from: string;
       timestamp_to: string;
       restore_history: Array<{ id: string }>;
@@ -446,9 +445,7 @@ declare module 'graylog-web-plugin/plugin' {
 
   type EntityLinkResolver = {
     uriSegment: string;
-    resolve: (
-      trailingSegments: ReadonlyArray<string>,
-    ) =>
+    resolve: (trailingSegments: ReadonlyArray<string>) =>
       | { grnType: string; id: string; Title?: React.ComponentType<EntityLinkTitleProps> }
       | { onClick: (context: EntityLinkOnClickContext) => void }
       // Renders the link itself, for targets only known where the link is shown, e.g. through a React context.

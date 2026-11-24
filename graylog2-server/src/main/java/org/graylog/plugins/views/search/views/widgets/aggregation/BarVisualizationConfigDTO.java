@@ -16,8 +16,10 @@
  */
 package org.graylog.plugins.views.search.views.widgets.aggregation;
 
+import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -26,6 +28,7 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 
 @AutoValue
+@JsonClassDescription("Bar chart: a bar per group-by value, or per time bucket when grouping by timestamp.")
 @JsonTypeName(BarVisualizationConfigDTO.NAME)
 @JsonDeserialize(builder = BarVisualizationConfigDTO.Builder.class)
 public abstract class BarVisualizationConfigDTO implements VisualizationConfigDTO, XYVisualizationConfig {
@@ -39,12 +42,17 @@ public abstract class BarVisualizationConfigDTO implements VisualizationConfigDT
         relative
     };
 
+    @JsonPropertyDescription("How the bars of several series are drawn: group puts them side by side, stack stacks "
+            + "them into one bar, relative stacks them with negative values below zero, overlay draws them on top of"
+            + " each other, semi-transparent.")
     @JsonProperty
     public abstract BarMode barmode();
 
+    @JsonPropertyDescription(XYVisualizationConfig.AXIS_TYPE_DESCRIPTION)
     @JsonProperty(FIELD_AXIS_TYPE)
     public abstract AxisType axisType();
 
+    @JsonPropertyDescription(XYVisualizationConfig.AXIS_CONFIG_DESCRIPTION)
     @JsonProperty(FIELD_AXIS_CONFIG)
     public abstract Optional<AxisConfig> axisConfig();
 
@@ -65,6 +73,7 @@ public abstract class BarVisualizationConfigDTO implements VisualizationConfigDT
         @JsonCreator
         public static Builder builder() {
             return new AutoValue_BarVisualizationConfigDTO.Builder()
+                    .barmode(BarMode.group)
                     .axisType(DEFAULT_AXIS_TYPE);
         }
     }

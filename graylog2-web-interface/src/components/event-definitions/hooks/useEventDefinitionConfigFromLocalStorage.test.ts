@@ -76,7 +76,7 @@ describe('useEventDefinitionConfigFromLocalStorage', () => {
           series: [
             {
               field: 'action',
-              function: 'count',
+              type: 'count',
               id: 'count-action',
             },
           ],
@@ -100,7 +100,7 @@ describe('useEventDefinitionConfigFromLocalStorage', () => {
             expression: {
               left: {
                 expr: 'number-ref',
-                ref: 'count-undefined',
+                ref: 'count-',
               },
               right: {
                 expr: 'number',
@@ -126,8 +126,9 @@ describe('useEventDefinitionConfigFromLocalStorage', () => {
           search_within_ms: 300000,
           series: [
             {
-              function: 'count',
-              id: 'count-undefined',
+              field: null,
+              type: 'count',
+              id: 'count-',
             },
           ],
           streams: ['streamId-1', 'streamId-2'],
@@ -165,6 +166,44 @@ describe('useEventDefinitionConfigFromLocalStorage', () => {
           type: 'aggregation-v1',
         },
         hasLocalStorageConfig: true,
+      }),
+    );
+  });
+
+  it('returns the details, schedule and comparison when they are given, also for a threshold of 0', async () => {
+    Store.set('session-id', {
+      type: 'aggregation-v1',
+      title: 'Any failed login',
+      description: 'Failed logins',
+      priority: 3,
+      query: 'action:login_failed',
+      search_within_ms: 600000,
+      execute_every_ms: 60000,
+      agg_function: 'count',
+      agg_operator: '>',
+      agg_value: 0,
+    });
+
+    const { result } = renderHook(() => useEventDefinitionConfigFromLocalStorage());
+
+    await waitFor(() => expect(result.current.hasLocalStorageConfig).toBe(true));
+
+    expect(result.current.detailsFromLocalStorage).toEqual({
+      title: 'Any failed login',
+      description: 'Failed logins',
+      priority: 3,
+    });
+    expect(result.current.configFromLocalStorage).toEqual(
+      expect.objectContaining({
+        execute_every_ms: 60000,
+        conditions: {
+          expression: {
+            expr: '>',
+            left: { expr: 'number-ref', ref: 'count-' },
+            right: { expr: 'number', value: 0 },
+          },
+        },
+        series: [{ id: 'count-', type: 'count', field: null }],
       }),
     );
   });

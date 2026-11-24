@@ -123,7 +123,7 @@ class QueryParamsToFullRequestSpecificationMapperTest {
                 )
         );
 
-        final MessagesRequestSpec messagesRequestSpec = toTest.simpleQueryParamsToFullRequestSpecification(null, null, null, null, null, null, null, 0, 10, false);
+        final MessagesRequestSpec messagesRequestSpec = toTest.simpleQueryParamsToFullRequestSpecification(null, null, null, null, null, null, null, 0, 10, false, false);
         assertThat(messagesRequestSpec).isEqualTo(new MessagesRequestSpec(
                         "*",
                         Set.of(),
@@ -137,6 +137,12 @@ class QueryParamsToFullRequestSpecificationMapperTest {
                         false
                 )
         );
+    }
+
+    @Test
+    void passesIncludeDocumentIdsToMessagesRequestSpec() {
+        assertThat(toTest.simpleQueryParamsToFullRequestSpecification(null, null, null, null, null, null, null, 0, 10, false, true)
+                .includeDocumentIds()).isTrue();
     }
 
     @Test
