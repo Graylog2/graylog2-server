@@ -24,6 +24,12 @@ import mockwebserver3.RecordedRequest;
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.appender.AbstractAppender;
+import org.apache.logging.log4j.core.config.Property;
 import org.graylog2.configuration.EmailConfiguration;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.email.SmtpOAuth2TokenProvider.AccessToken;
@@ -40,7 +46,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -162,6 +170,30 @@ class SmtpOAuth2TokenProviderTest {
     }
 
     @Test
+    void logsTokenRequestFailure() {
+        server.enqueue(new MockResponse(401, JSON,
+                "{\"error\":\"invalid_client\",\"error_description\":\"AADSTS7000215: Invalid client secret provided.\"}"));
+
+        final Logger logger = (Logger) LogManager.getLogger(SmtpOAuth2TokenProvider.class);
+        final CapturingAppender appender = new CapturingAppender();
+        appender.start();
+        logger.addAppender(appender);
+        try {
+            assertThatThrownBy(tokenProvider::getAccessToken).isInstanceOf(MessagingException.class);
+        } finally {
+            logger.removeAppender(appender);
+            appender.stop();
+        }
+
+        assertThat(appender.events).singleElement().satisfies(event -> {
+            assertThat(event.getLevel()).isEqualTo(Level.WARN);
+            assertThat(event.getMessage().getFormattedMessage())
+                    .contains("HTTP 401 (invalid_client: AADSTS7000215: Invalid client secret provided.)")
+                    .doesNotContain("the-client-secret");
+        });
+    }
+
+    @Test
     void failsOnNonJsonErrorResponse() {
         server.enqueue(new MockResponse(503, Headers.of(), "<html>Service Unavailable</html>"));
 
@@ -214,6 +246,19 @@ class SmtpOAuth2TokenProviderTest {
         final EmailConfiguration configuration = new EmailConfiguration();
         new JadConfig(new InMemoryRepository(settings), configuration).process();
         return configuration;
+    }
+
+    private static class CapturingAppender extends AbstractAppender {
+        private final List<LogEvent> events = new CopyOnWriteArrayList<>();
+
+        CapturingAppender() {
+            super("capturing", null, null, true, Property.EMPTY_ARRAY);
+        }
+
+        @Override
+        public void append(LogEvent event) {
+            events.add(event.toImmutable());
+        }
     }
 
     private static Map<String, String> formParams(RecordedRequest request) {

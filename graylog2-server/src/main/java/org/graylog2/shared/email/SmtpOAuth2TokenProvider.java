@@ -132,19 +132,28 @@ public class SmtpOAuth2TokenProvider {
         try (Response response = httpClient.newCall(request).execute()) {
             final String body = response.body().string();
             if (!response.isSuccessful()) {
-                throw new MessagingException(f("Failed to obtain OAuth 2.0 access token for SMTP authentication from <%s>: HTTP %d%s",
-                        tokenUrl, response.code(), errorDetails(body)));
+                throw logged(new MessagingException(f("Failed to obtain OAuth 2.0 access token for SMTP authentication from <%s>: HTTP %d%s",
+                        tokenUrl, response.code(), errorDetails(body))));
             }
 
             final TokenResponse tokenResponse = objectMapper.readValue(body, TokenResponse.class);
             if (Strings.isNullOrEmpty(tokenResponse.accessToken())) {
-                throw new MessagingException(f("OAuth 2.0 token response from <%s> does not contain an access token", tokenUrl));
+                throw logged(new MessagingException(f("OAuth 2.0 token response from <%s> does not contain an access token", tokenUrl)));
             }
             return tokenResponse;
         } catch (IOException e) {
-            throw new MessagingException(f("Failed to obtain OAuth 2.0 access token for SMTP authentication from <%s>: %s",
-                    tokenUrl, e.getMessage()), e);
+            throw logged(new MessagingException(f("Failed to obtain OAuth 2.0 access token for SMTP authentication from <%s>: %s",
+                    tokenUrl, e.getMessage()), e));
         }
+    }
+
+    private static MessagingException logged(MessagingException e) {
+        if (e.getCause() != null) {
+            LOG.warn(e.getMessage(), e.getCause());
+        } else {
+            LOG.warn(e.getMessage());
+        }
+        return e;
     }
 
     private String errorDetails(String body) {

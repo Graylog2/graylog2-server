@@ -93,6 +93,7 @@ public class OAuth2SmtpTransport extends SMTPTransport {
             }
         }
 
+        LOG.warn(failure.getMessage());
         // Throw instead of returning false, because JavaMail would otherwise retry without credentials.
         throw failure;
     }
