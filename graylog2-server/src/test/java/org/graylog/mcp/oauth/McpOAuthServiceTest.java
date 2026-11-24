@@ -401,7 +401,7 @@ class McpOAuthServiceTest {
         when(refreshTokenService.markUsed(eq(OAuthTokens.hash("refresh")), eq(NOW), anyString())).thenReturn(Optional.of(existing));
         stubAccessTokenCreation();
 
-        assertThatThrownBy(() -> service.refresh(CLIENT.clientId(), "refresh", RESOURCE + "/"))
+        assertThatThrownBy(() -> service.refresh(CLIENT.clientId(), "refresh", f("%s/", RESOURCE)))
                 .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_TARGET));
         verify(refreshTokenService, never()).markUsed(anyString(), any(), anyString());
         verify(accessTokenService, never()).create(anyString(), anyString(), any(), anyString());

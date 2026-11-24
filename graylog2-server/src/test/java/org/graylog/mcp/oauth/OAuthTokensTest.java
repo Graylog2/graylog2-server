@@ -19,6 +19,7 @@ package org.graylog.mcp.oauth;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 class OAuthTokensTest {
     private static final String VERIFIER = "dBjftJeZ4CVP-mJ92K9yY6qZ9sEb7rfo4M5fdRFOrqA";
@@ -37,7 +38,7 @@ class OAuthTokensTest {
     @Test
     void rejectsMalformedVerifier() {
         assertThat(OAuthTokens.verifyPkce("too-short", CHALLENGE)).isFalse();
-        assertThat(OAuthTokens.verifyPkce(VERIFIER + "!", CHALLENGE)).isFalse();
+        assertThat(OAuthTokens.verifyPkce(f("%s!", VERIFIER), CHALLENGE)).isFalse();
     }
 
     @Test

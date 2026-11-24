@@ -59,7 +59,7 @@ public class McpOAuthUrls {
                 return false;
             }
             final String scheme = uri.getScheme().toLowerCase(Locale.ROOT);
-            return (scheme.equals("http") || scheme.equals("https")) && StringUtils.removeEnd(uri.getPath(), "/").endsWith("/" + MCP_PATH);
+            return (scheme.equals("http") || scheme.equals("https")) && StringUtils.removeEnd(uri.getPath(), "/").endsWith(f("/%s", MCP_PATH));
         } catch (IllegalArgumentException e) {
             return false;
         }
@@ -68,7 +68,7 @@ public class McpOAuthUrls {
     public record Urls(URI base) {
         public Urls {
             if (!base.toString().endsWith("/")) {
-                base = URI.create(base + "/");
+                base = URI.create(f("%s/", base));
             }
         }
 

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Alert, Button, ButtonToolbar } from 'components/bootstrap';
@@ -60,7 +60,7 @@ const Details = styled.dl(
 
 const McpOAuthConsent = () => {
   const query = useQueryParameters();
-  const params = useMemo(() => parseAuthorizationParams(query), [query]);
+  const params = parseAuthorizationParams(query);
   const currentUser = useCurrentUser();
   const productName = useProductName();
   const { data: request, isLoading, error } = useMcpAuthorizationRequest(params);
