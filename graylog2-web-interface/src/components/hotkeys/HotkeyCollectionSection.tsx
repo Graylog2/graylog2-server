@@ -20,7 +20,7 @@ import flattenDeep from 'lodash/flattenDeep';
 import styled from 'styled-components';
 
 import { KeyboardKey } from 'components/bootstrap';
-import { isMacOS as _isMacOS } from 'util/OSUtils';
+import { isMacOS as _isMacOS, keyLabel } from 'util/OSUtils';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 const ShortcutList = styled.div`
@@ -49,17 +49,6 @@ const KeySeparator = styled.div`
   display: flex;
   align-items: center;
 `;
-
-const keyMapper = (key: string, isMacOS: boolean) => {
-  const keyMap = {
-    mod: isMacOS ? '⌘' : 'Ctrl',
-    alt: isMacOS ? '⌥' : 'Alt',
-    ctrl: isMacOS ? '⌃' : 'Ctrl',
-    meta: isMacOS ? '⌘' : 'Win',
-  };
-
-  return keyMap[key] || key;
-};
 
 type KeyProps = {
   combinationKey: string;
@@ -93,7 +82,7 @@ const ShortcutKeys = ({ keys, splitKey, combinationKey, isMacOS }: ShortcutKeysP
 
               return (
                 <React.Fragment key={key}>
-                  <KeyboardKey>{keyMapper(key, isMacOS)}</KeyboardKey>
+                  <KeyboardKey>{keyLabel(key, isMacOS)}</KeyboardKey>
                   {!isLast && <KeySeparator>{combinationKey}</KeySeparator>}
                 </React.Fragment>
               );
