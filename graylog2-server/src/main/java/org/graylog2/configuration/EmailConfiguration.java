@@ -17,6 +17,7 @@
 package org.graylog2.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.ParameterException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.Validator;
 import com.github.joschi.jadconfig.ValidatorMethod;
@@ -28,6 +29,12 @@ import org.graylog2.configuration.converters.JavaDurationConverter;
 
 import java.net.URI;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @DocumentationSection(heading = "Email transport", description = "")
 public class EmailConfiguration {
@@ -43,9 +50,45 @@ public class EmailConfiguration {
     @Parameter(value = "transport_email_port", validator = InetPortValidator.class)
     private int port = 25;
 
-    @Documentation("Authenticate against the SMTP server using transport_email_auth_username and transport_email_auth_password.")
+    @Documentation("""
+            Authenticate against the SMTP server. The authentication method is selected with transport_email_auth_method.
+            """)
     @Parameter(value = "transport_email_use_auth")
     private boolean useAuth = false;
+
+    @Documentation("""
+            Authentication method used when transport_email_use_auth is enabled.
+
+              password: Authenticate with transport_email_auth_username and transport_email_auth_password.
+              oauth2:   Authenticate with an OAuth 2.0 access token (SASL XOAUTH2), obtained with the client credentials
+                        grant using the transport_email_auth_oauth2_* settings. transport_email_auth_username must be set
+                        to the mailbox used for sending. Use this for Microsoft Exchange Online / Microsoft 365, which
+                        no longer accepts basic (password) authentication for SMTP.
+            """)
+    @Parameter(value = "transport_email_auth_method", converter = AuthMethod.Converter.class)
+    private AuthMethod authMethod = AuthMethod.PASSWORD;
+
+    @Documentation("""
+            OAuth 2.0 token endpoint used to obtain access tokens for SMTP authentication.
+            Microsoft 365: https://login.microsoftonline.com/<tenant-id>/oauth2/v2.0/token
+            """)
+    @Parameter(value = "transport_email_auth_oauth2_token_url")
+    private URI oauth2TokenUrl;
+
+    @Documentation("OAuth 2.0 client ID used to obtain access tokens for SMTP authentication.")
+    @Parameter(value = "transport_email_auth_oauth2_client_id")
+    private String oauth2ClientId;
+
+    @Documentation("OAuth 2.0 client secret used to obtain access tokens for SMTP authentication.")
+    @Parameter(value = "transport_email_auth_oauth2_client_secret")
+    private String oauth2ClientSecret;
+
+    @Documentation("""
+            OAuth 2.0 scope requested for SMTP access tokens. Multiple scopes are separated by spaces.
+            Microsoft 365: https://outlook.office365.com/.default
+            """)
+    @Parameter(value = "transport_email_auth_oauth2_scope")
+    private String oauth2Scope;
 
     @Documentation("""
             Encryption settings
@@ -128,6 +171,30 @@ public class EmailConfiguration {
         return password;
     }
 
+    public AuthMethod getAuthMethod() {
+        return authMethod;
+    }
+
+    public boolean isUseOAuth2() {
+        return isUseAuth() && authMethod == AuthMethod.OAUTH2;
+    }
+
+    public URI getOAuth2TokenUrl() {
+        return oauth2TokenUrl;
+    }
+
+    public String getOAuth2ClientId() {
+        return oauth2ClientId;
+    }
+
+    public String getOAuth2ClientSecret() {
+        return oauth2ClientSecret;
+    }
+
+    public String getOAuth2Scope() {
+        return oauth2Scope;
+    }
+
     public String getFromEmail() {
         return fromEmail;
     }
@@ -152,12 +219,71 @@ public class EmailConfiguration {
         }
     }
 
+    @ValidatorMethod
+    @SuppressWarnings("unused")
+    public void validateOAuth2() throws ValidationException {
+        if (!isEnabled() || !isUseOAuth2()) {
+            return;
+        }
+        final List<String> missing = new ArrayList<>();
+        if (Strings.isNullOrEmpty(getUsername())) {
+            missing.add("transport_email_auth_username");
+        }
+        if (getOAuth2TokenUrl() == null) {
+            missing.add("transport_email_auth_oauth2_token_url");
+        }
+        if (Strings.isNullOrEmpty(getOAuth2ClientId())) {
+            missing.add("transport_email_auth_oauth2_client_id");
+        }
+        if (Strings.isNullOrEmpty(getOAuth2ClientSecret())) {
+            missing.add("transport_email_auth_oauth2_client_secret");
+        }
+        if (Strings.isNullOrEmpty(getOAuth2Scope())) {
+            missing.add("transport_email_auth_oauth2_scope");
+        }
+        if (!missing.isEmpty()) {
+            throw new ValidationException(f("OAuth 2.0 email authentication requires the following settings: %s",
+                    String.join(", ", missing)));
+        }
+        final String scheme = getOAuth2TokenUrl().getScheme();
+        if (!"https".equalsIgnoreCase(scheme) && !"http".equalsIgnoreCase(scheme)) {
+            throw new ValidationException("transport_email_auth_oauth2_token_url must be an http(s) URL");
+        }
+    }
+
     public Duration getSocketConnectionTimeout() {
         return socketConnectionTimeout;
     }
 
     public Duration getSocketTimeout() {
         return socketTimeout;
+    }
+
+    public enum AuthMethod {
+        PASSWORD,
+        OAUTH2;
+
+        @Override
+        public String toString() {
+            return name().toLowerCase(Locale.ROOT);
+        }
+
+        public static class Converter implements com.github.joschi.jadconfig.Converter<AuthMethod> {
+            @Override
+            public AuthMethod convertFrom(String value) {
+                try {
+                    return AuthMethod.valueOf(value.trim().toUpperCase(Locale.ROOT));
+                } catch (IllegalArgumentException e) {
+                    throw new ParameterException(f("Unable to parse email authentication method <%s>. Valid methods are: %s.",
+                            value, Arrays.toString(AuthMethod.values())));
+                }
+            }
+
+            @Override
+            public String convertTo(AuthMethod value) {
+                return value.toString();
+            }
+        }
     }
 
     public static class MillisecondDurationValidator implements Validator<Duration> {

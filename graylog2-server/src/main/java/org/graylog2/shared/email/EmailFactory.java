@@ -18,6 +18,8 @@ package org.graylog2.shared.email;
 
 import com.google.common.base.Strings;
 import com.google.common.primitives.Ints;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailConstants;
@@ -27,9 +29,6 @@ import org.apache.commons.mail.ImageHtmlEmail;
 import org.apache.commons.mail.MultiPartEmail;
 import org.apache.commons.mail.SimpleEmail;
 import org.graylog2.configuration.EmailConfiguration;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 
 import java.util.function.Supplier;
 
@@ -41,11 +40,19 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  */
 @Singleton
 public class EmailFactory {
+    /**
+     * JavaMail ships the SASL XOAUTH2 mechanism but doesn't enable it by default.
+     */
+    private static final String MAIL_SMTP_AUTH_MECHANISMS = "mail.smtp.auth.mechanisms";
+    private static final String XOAUTH2 = "XOAUTH2";
+
     private final EmailConfiguration configuration;
+    private final SmtpOAuth2TokenProvider oAuth2TokenProvider;
 
     @Inject
-    public EmailFactory(EmailConfiguration configuration) {
+    public EmailFactory(EmailConfiguration configuration, SmtpOAuth2TokenProvider oAuth2TokenProvider) {
         this.configuration = configuration;
+        this.oAuth2TokenProvider = oAuth2TokenProvider;
     }
 
     public boolean isEmailTransportEnabled() {
@@ -107,7 +114,13 @@ public class EmailFactory {
             email.setSslSmtpPort(Integer.toString(configuration.getPort()));
         }
 
-        if (configuration.isUseAuth()) {
+        if (configuration.isUseOAuth2()) {
+            // With XOAUTH2, the access token takes the place of the password.
+            email.setAuthenticator(new DefaultAuthenticator(
+                    Strings.nullToEmpty(configuration.getUsername()),
+                    oAuth2TokenProvider.getAccessToken()
+            ));
+        } else if (configuration.isUseAuth()) {
             email.setAuthenticator(new DefaultAuthenticator(
                     Strings.nullToEmpty(configuration.getUsername()),
                     Strings.nullToEmpty(configuration.getPassword())
@@ -123,6 +136,12 @@ public class EmailFactory {
 
         email.setSocketConnectionTimeout(Ints.saturatedCast(configuration.getSocketConnectionTimeout().toMillis()));
         email.setSocketTimeout(Ints.saturatedCast(configuration.getSocketTimeout().toMillis()));
+
+        if (configuration.isUseOAuth2()) {
+            // Creates the mail session from the settings above. The session properties are only consulted when
+            // connecting, so restricting the mechanisms here affects this email only and no global state.
+            email.getMailSession().getProperties().setProperty(MAIL_SMTP_AUTH_MECHANISMS, XOAUTH2);
+        }
 
         return email;
     }
