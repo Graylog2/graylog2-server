@@ -108,7 +108,7 @@ const addPluginHotkeys = (collections: HotkeyCollections, pluginHotkeys: PluginE
 const CustomHotkeysProvider = ({ children }: PropsWithChildren) => {
   const pluginHotkeys = usePluginEntities('hotkeys');
   const [activeHotkeys, setActiveHotkeys] = useState<ActiveHotkeys>(Immutable.Map());
-  const { enabledScopes } = useOriginalHotkeysContext();
+  const { activeScopes: enabledScopes } = useOriginalHotkeysContext();
   const [showHotkeysModal, setShowHotkeysModal] = useState(false);
 
   const addActiveHotkey = useCallback(
