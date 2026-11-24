@@ -86,6 +86,15 @@ public class RepositoryClientsProvider implements RepositoryConfigurationProvide
         return clients;
     }
 
+    /**
+     * The clients come from MongoDB, so they must not prevent opensearch from starting, e.g. when the node search
+     * cache doesn't fit on the disk.
+     */
+    @Override
+    public boolean isOptional() {
+        return true;
+    }
+
     @Nullable
     private static String string(RawBsonDocument record, String field) {
         final BsonValue value = record.get(field);
