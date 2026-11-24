@@ -156,7 +156,7 @@
     "less": "^4.4.1",
     "less-loader": "^12.3.0",
     "node-fetch": "^2.6.1",
-    "oxfmt": "^0.47.0",
+    "oxfmt": "^0.80.0",
     "puppeteer": "^25.11.0",
     "react-bootstrap": "0.33.1",
     "react-compiler-runtime": "^1.0.0",
