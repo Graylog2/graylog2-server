@@ -15,28 +15,32 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import type { DefaultTheme } from 'styled-components';
+
 import { AXIS_LABEL_MARGIN } from 'views/components/visualizations/Constants';
 import getDefaultPlotFontSettings from 'views/components/visualizations/utils/getDefaultPlotFontSettings';
 import type { ChartAxisConfig } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
-const getPlotXTitleSettings = (theme, config: AggregationWidgetConfig) => {
-  const visualizationAxisTitle =
+const getDefaultPlotXLayoutSettings = (theme: DefaultTheme, config?: AggregationWidgetConfig) => {
+  const axisConfig =
     config?.visualizationConfig && 'axisConfig' in config.visualizationConfig
-      ? (config?.visualizationConfig?.axisConfig as ChartAxisConfig)?.xaxis?.title
-      : undefined;
-  const visualizationAxisColor =
-    config?.visualizationConfig && 'axisConfig' in config.visualizationConfig
-      ? (config?.visualizationConfig?.axisConfig as ChartAxisConfig)?.xaxis?.color
+      ? (config.visualizationConfig.axisConfig as ChartAxisConfig)?.xaxis
       : undefined;
   const fontSettings = getDefaultPlotFontSettings(theme);
-  const color = visualizationAxisColor ?? fontSettings.color;
+  const color = axisConfig?.color ?? fontSettings.color;
 
   return {
-    text: visualizationAxisTitle,
-    standoff: AXIS_LABEL_MARGIN,
-    font: { ...fontSettings, color },
+    automargin: true,
+    gridcolor: theme.colors.charts.lines,
+    zerolinecolor: theme.colors.charts.zeroLine,
+    tickfont: fontSettings,
+    title: {
+      font: { ...fontSettings, color },
+      text: axisConfig?.title,
+      standoff: AXIS_LABEL_MARGIN,
+    },
   };
 };
 
-export default getPlotXTitleSettings;
+export default getDefaultPlotXLayoutSettings;
