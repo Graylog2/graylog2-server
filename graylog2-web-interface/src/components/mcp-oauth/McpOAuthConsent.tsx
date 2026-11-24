@@ -103,7 +103,7 @@ const McpOAuthConsent = () => {
       </p>
       <Details>
         <dt>Redirects to</dt>
-        <dd>{request.redirectHost}</dd>
+        <dd>{request.redirectUri}</dd>
         <dt>Registered</dt>
         <dd>
           <RelativeTime dateTime={request.clientRegisteredAt} />

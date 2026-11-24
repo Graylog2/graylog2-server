@@ -46,7 +46,6 @@ import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
-import java.net.URI;
 import java.time.Instant;
 import java.util.List;
 
@@ -71,7 +70,6 @@ public class McpOAuthResource extends RestResource {
                                               @JsonProperty("client_name") String clientName,
                                               @JsonProperty("client_uri") @Nullable String clientUri,
                                               @JsonProperty("redirect_uri") String redirectUri,
-                                              @JsonProperty("redirect_host") String redirectHost,
                                               @JsonProperty("client_registered_at") Instant clientRegisteredAt) {}
 
     public record AuthorizationDecision(@JsonProperty("client_id") @NotNull String clientId,
@@ -110,7 +108,6 @@ public class McpOAuthResource extends RestResource {
                 request.client().clientName(),
                 request.client().clientUri(),
                 request.redirectUri(),
-                redirectHost(request.redirectUri()),
                 request.client().createdAt()
         );
     }
@@ -173,10 +170,5 @@ public class McpOAuthResource extends RestResource {
         } catch (OAuthException e) {
             throw new BadRequestException(e.description());
         }
-    }
-
-    private static String redirectHost(String redirectUri) {
-        final URI uri = URI.create(redirectUri);
-        return uri.getHost() != null ? uri.getHost() : uri.getScheme();
     }
 }

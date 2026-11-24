@@ -45,7 +45,7 @@ describe('McpOAuthConsent', () => {
     asMock(useCurrentUser).mockReturnValue(alice);
     asMock(useLocation).mockReturnValue({ search: SEARCH, pathname: '/oauth-consent', hash: '', state: null, key: '' });
     asMock(useMcpAuthorizationRequest).mockReturnValue({
-      data: { clientName: 'Claude Code', redirectHost: '127.0.0.1', clientRegisteredAt: '2026-10-28T11:59:00.000Z' },
+      data: { clientName: 'Claude Code', redirectUri: 'http://127.0.0.1:3000/cb', clientRegisteredAt: '2026-10-28T11:59:00.000Z' },
       isLoading: false,
       error: null,
     });
@@ -59,7 +59,7 @@ describe('McpOAuthConsent', () => {
     await screen.findByRole('heading', { name: /authorize claude code/i });
 
     expect(screen.getByText(alice.username)).toBeInTheDocument();
-    expect(screen.getByText('127.0.0.1')).toBeInTheDocument();
+    expect(screen.getByText('http://127.0.0.1:3000/cb')).toBeInTheDocument();
     expect(useMcpAuthorizationRequest).toHaveBeenCalledWith(
       expect.objectContaining({ client_id: 'mcp-1', redirect_uri: 'http://127.0.0.1:3000/cb', state: 'xyz' }),
     );

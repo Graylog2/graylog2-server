@@ -24,7 +24,7 @@ import type { McpAuthorizationParams } from './parseAuthorizationParams';
 
 export type McpAuthorizationRequest = {
   clientName: string;
-  redirectHost: string;
+  redirectUri: string;
   clientRegisteredAt: string;
 };
 
@@ -39,7 +39,7 @@ const fetchAuthorizationRequest = (params: McpAuthorizationParams): Promise<McpA
     params.resource,
   ).then((details) => ({
     clientName: details.client_name,
-    redirectHost: details.redirect_host,
+    redirectUri: details.redirect_uri,
     clientRegisteredAt: details.client_registered_at,
   }));
 
