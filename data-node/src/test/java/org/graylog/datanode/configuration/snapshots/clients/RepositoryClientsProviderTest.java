@@ -100,12 +100,12 @@ class RepositoryClientsProviderTest {
                 "s3.client.repository_archive-eu_7f3a.protocol", "https",
                 "s3.client.repository_archive-eu_7f3a.endpoint", "s3.cn-north-1.amazonaws.com.cn",
                 "s3.client.repository_archive-eu_7f3a.path_style_access", "false"));
-        // Without keys, opensearch uses the AWS credentials of the host. The session name tells the repository.
+        // Without keys, opensearch uses the AWS credentials of the host. The session name tells the client.
         assertThat(client.keystoreItems(null))
                 .extracting("key", "secret")
                 .containsExactlyInAnyOrder(
                         tuple("s3.client.repository_archive-eu_7f3a.role_arn", "arn:aws-cn:iam::123456789012:role/warm"),
-                        tuple("s3.client.repository_archive-eu_7f3a.role_session_name", "graylog-archive-eu"));
+                        tuple("s3.client.repository_archive-eu_7f3a.role_session_name", "graylog-repository_archive-eu_7f3a"));
     }
 
     @Test

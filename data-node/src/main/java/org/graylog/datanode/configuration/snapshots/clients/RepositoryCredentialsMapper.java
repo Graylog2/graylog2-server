@@ -24,7 +24,6 @@ import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreFileCo
 import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreItem;
 import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreStringItem;
 import org.graylog2.datanode.repositories.AzureBlobEndpoints;
-import org.graylog2.datanode.repositories.RepositoryClientNames;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
 import software.amazon.awssdk.regions.PartitionMetadata;
@@ -71,14 +70,14 @@ public class RepositoryCredentialsMapper {
         }
         final Client client = new Client(credentials.typeOrDefault(), record.clientName());
         return switch (client.type()) {
-            case RepositoryCredentialsDocument.TYPE_S3 -> s3(credentials, client, record.repositoryName());
+            case RepositoryCredentialsDocument.TYPE_S3 -> s3(credentials, client);
             case RepositoryCredentialsDocument.TYPE_AZURE -> azure(credentials, client);
             case RepositoryCredentialsDocument.TYPE_GCS -> gcs(credentials, client);
             default -> throw new IllegalArgumentException(f("unknown credentials type %s", client.type()));
         };
     }
 
-    private RepositoryClientConfiguration s3(Credentials credentials, Client client, String repositoryName) {
+    private RepositoryClientConfiguration s3(Credentials credentials, Client client) {
         if (StringUtils.isNotBlank(credentials.awsExternalId())) {
             throw new IllegalArgumentException("an external ID for assuming an AWS role is not supported");
         }
@@ -91,9 +90,10 @@ public class RepositoryCredentialsMapper {
             client.secure("secret_key", decrypt(credentials.awsSecretAccessKey(), "secret key"));
         }
         if (StringUtils.isNotBlank(credentials.awsAssumeRoleArn())) {
-            // The session name identifies the repository in the AWS CloudTrail logs
+            // The session name identifies the client, and so the repository, in the AWS CloudTrail logs. Client names
+            // only contain characters AWS allows and are short enough.
             client.secure("role_arn", credentials.awsAssumeRoleArn());
-            client.secure("role_session_name", f("graylog-%s", RepositoryClientNames.slug(repositoryName)));
+            client.secure("role_session_name", f("graylog-%s", client.name()));
         }
 
         final String region = StringUtils.trimToNull(credentials.awsRegion());

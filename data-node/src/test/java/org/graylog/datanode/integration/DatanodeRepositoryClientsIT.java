@@ -29,7 +29,6 @@ import org.graylog.testing.restoperations.DatanodeOpensearchWait;
 import org.graylog.testing.restoperations.RestOperationParameters;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
-import org.graylog2.datanode.repositories.RepositoryClientNames;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -107,7 +106,7 @@ public class DatanodeRepositoryClientsIT {
                 new MongoJackObjectMapperProvider(new ObjectMapperProvider().get()), mongoDB.mongoConnection());
         // The Data Node decrypts the secrets with its password_secret, which has to match the server's
         final EncryptedValue encryptedSecret = new EncryptedValueService(ContainerizedGraylogBackend.PASSWORD_SECRET).encrypt(secretKey);
-        final String clientName = RepositoryClientNames.generate(repositoryName);
+        final String clientName = f("repository_%s_0001", repositoryName);
         final Document credentials = new Document("type", "s3")
                 .append("auth_mode", "key_secret")
                 .append("aws_access_key_id", s3Container.getAccessKey())
