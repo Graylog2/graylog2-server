@@ -19,9 +19,11 @@ package org.graylog.datanode.opensearch.cli;
 import org.graylog.datanode.process.Environment;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class OpensearchKeystoreCli extends AbstractOpensearchCli {
 
@@ -47,6 +49,21 @@ public class OpensearchKeystoreCli extends AbstractOpensearchCli {
      */
     public void add(String key, String secretValue) {
         runWithStdin(List.of(secretValue), "add", "-x", key); // -x allows input from stdin, bypassing the prompt
+    }
+
+    /**
+     * Add several secrets to the store with one command. Every command starts a JVM, which takes seconds, so this is
+     * much faster than adding the secrets one by one. The values are read from STDIN, one line each, like
+     * {@link #add} reads its single value.
+     */
+    public void addAll(Map<String, String> secrets) {
+        if (secrets.isEmpty()) {
+            return;
+        }
+        final List<String> keys = List.copyOf(secrets.keySet());
+        final List<String> args = new ArrayList<>(List.of("add", "-x"));
+        args.addAll(keys);
+        runWithStdin(keys.stream().map(secrets::get).toList(), args.toArray(String[]::new));
     }
 
     /**
