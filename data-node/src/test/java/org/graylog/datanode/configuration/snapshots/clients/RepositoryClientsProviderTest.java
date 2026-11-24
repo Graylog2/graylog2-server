@@ -123,7 +123,8 @@ class RepositoryClientsProviderTest {
                 .append("service_account_key", encrypted("{\"type\": \"service_account\"}")));
 
         final RepositoryConfiguration client = single(provider.get());
-        assertThat(client.opensearchProperties()).isEmpty();
+        assertThat(client.opensearchProperties()).isEqualTo(Map.of(
+                "gcs.client.repository_archive-eu_7f3a.endpoint", "https://storage.googleapis.com"));
         assertThat(client.keystoreItems(null))
                 .singleElement()
                 .usingRecursiveComparison()
@@ -132,11 +133,12 @@ class RepositoryClientsProviderTest {
     }
 
     @Test
-    void gcsWithAutomaticAuthenticationHasNoSecrets() {
+    void gcsWithAutomaticAuthenticationHasNoSecretsButASettingSoThatOpensearchKnowsTheClient() {
         insert("gcs", CLIENT, new Document("type", "gcs").append("auth_mode", "automatic"));
 
         final RepositoryConfiguration client = single(provider.get());
-        assertThat(client.opensearchProperties()).isEmpty();
+        assertThat(client.opensearchProperties()).isEqualTo(Map.of(
+                "gcs.client.repository_archive-eu_7f3a.endpoint", "https://storage.googleapis.com"));
         assertThat(client.keystoreItems(null)).isEmpty();
     }
 

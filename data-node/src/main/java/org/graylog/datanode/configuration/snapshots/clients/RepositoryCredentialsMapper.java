@@ -49,6 +49,8 @@ public class RepositoryCredentialsMapper {
     private static final String DEFAULT_AWS_REGION = Region.US_EAST_1.id();
     // Value of the token_credential_type setting for the managed identity of the host
     private static final String AZURE_MANAGED_IDENTITY = "managed";
+    // The default endpoint, set explicitly so that every GCS client has a regular setting
+    private static final String GCS_DEFAULT_ENDPOINT = "https://storage.googleapis.com";
 
     private final EncryptedValueService encryptedValueService;
 
@@ -140,6 +142,9 @@ public class RepositoryCredentialsMapper {
     }
 
     private RepositoryClientConfiguration gcs(Credentials credentials, Client client) {
+        // Opensearch only knows GCS clients with at least one setting, a client with automatic authentication
+        // wouldn't have any otherwise and registering its repository would fail with an unknown client
+        client.setting("endpoint", GCS_DEFAULT_ENDPOINT);
         // With automatic authentication, opensearch uses the Application Default Credentials of the Data Node host
         if (!credentials.isAutomatic()) {
             client.secureFile("credentials_file", decrypt(credentials.serviceAccountKey(), "service account key"));
