@@ -76,6 +76,15 @@ export type PageToolResult = {
   enable?: () => Promise<{ summary: string; result?: string }>;
 } | void;
 
+// Thrown by a page tool whose failure the user was already told about, e.g. by a mutation hook's error toast, so the
+// Assistant does not show a second error.
+export class PageToolNotifiedError extends Error {
+  constructor(cause: unknown) {
+    super(cause instanceof Error ? cause.message : String(cause), { cause });
+    this.name = 'PageToolNotifiedError';
+  }
+}
+
 // Runs a page tool the Assistant asked for, with arguments the backend checked.
 export type PageToolHandler = (args: Record<string, unknown>) => PageToolResult | Promise<PageToolResult>;
 
