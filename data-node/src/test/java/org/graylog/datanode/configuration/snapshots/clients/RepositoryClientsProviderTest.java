@@ -224,7 +224,7 @@ class RepositoryClientsProviderTest {
         return new RepositoryClientsProvider(mongoCollections, new RepositoryCredentialsMapper(encryptedValueService));
     }
 
-    // Stores a record like the enterprise plugin of the server does
+    // Stores a record like the Graylog server does
     private void insert(String repositoryName, String clientName, Document credentials) {
         records.insertOne(new Document("repository_name", repositoryName).append("client_name", clientName)
                 .append("credentials", credentials));

@@ -40,8 +40,8 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * Turns a warm tier repository credential record into the opensearch repository client the repository is registered
- * with. The server rejects credentials that can't be converted for repositories with their own client, see
- * {@code DataNodeClientSupport} in the enterprise plugin, both have to stay in sync.
+ * with. The Graylog server has to reject credentials that can't be converted for repositories with their own client,
+ * so what is converted here and what the server accepts have to stay in sync.
  */
 public class RepositoryCredentialsMapper {
 

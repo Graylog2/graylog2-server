@@ -100,7 +100,7 @@ public class DatanodeRepositoryClientsIT {
                 .body("error.type", Matchers.equalTo("repository_verification_exception"));
     }
 
-    // Stores a credential record with a client name like the enterprise plugin of the server does
+    // Stores a credential record with a client name like the Graylog server does
     private String saveCredentials(String repositoryName, String secretKey) {
         final MongoCollections mongoCollections = new MongoCollections(
                 new MongoJackObjectMapperProvider(new ObjectMapperProvider().get()), mongoDB.mongoConnection());
