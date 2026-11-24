@@ -22,26 +22,25 @@ import getDefaultPlotFontSettings from 'views/components/visualizations/utils/ge
 import type { ChartAxisConfig } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
-const getPlotXLayoutSettings = (theme: DefaultTheme, config: AggregationWidgetConfig) => {
-  const visualizationAxisTitle =
+const getDefaultPlotXLayoutSettings = (theme: DefaultTheme, config?: AggregationWidgetConfig) => {
+  const axisConfig =
     config?.visualizationConfig && 'axisConfig' in config.visualizationConfig
-      ? (config?.visualizationConfig?.axisConfig as ChartAxisConfig)?.xaxis?.title
-      : undefined;
-  const visualizationAxisColor =
-    config?.visualizationConfig && 'axisConfig' in config.visualizationConfig
-      ? (config?.visualizationConfig?.axisConfig as ChartAxisConfig)?.xaxis?.color
+      ? (config.visualizationConfig.axisConfig as ChartAxisConfig)?.xaxis
       : undefined;
   const fontSettings = getDefaultPlotFontSettings(theme);
-  const color = visualizationAxisColor ?? fontSettings.color;
+  const color = axisConfig?.color ?? fontSettings.color;
 
   return {
-    gridcolor: visualizationAxisColor ? theme.utils.colorLevel(visualizationAxisColor, -4) : theme.colors.charts.lines,
+    automargin: true,
+    gridcolor: theme.colors.charts.lines,
+    zerolinecolor: theme.colors.charts.zeroLine,
+    tickfont: fontSettings,
     title: {
-      text: visualizationAxisTitle,
-      standoff: AXIS_LABEL_MARGIN,
       font: { ...fontSettings, color },
+      text: axisConfig?.title,
+      standoff: AXIS_LABEL_MARGIN,
     },
   };
 };
 
-export default getPlotXLayoutSettings;
+export default getDefaultPlotXLayoutSettings;

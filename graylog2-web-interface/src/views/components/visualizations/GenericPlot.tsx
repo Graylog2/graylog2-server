@@ -26,6 +26,7 @@ import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import { EVENT_COLOR, eventsDisplayName } from 'views/logic/searchtypes/events/EventHandler';
 import { ROOT_FONT_SIZE } from 'theme/constants';
 import getDefaultPlotYLayoutSettings from 'views/components/visualizations/utils/getDefaultPlotYLayoutSettings';
+import getDefaultPlotXLayoutSettings from 'views/components/visualizations/utils/getDefaultPlotXLayoutSettings';
 
 import ChartColorContext from './ChartColorContext';
 
@@ -175,15 +176,7 @@ const usePlotLayout = (layout: Partial<Layout>) => {
         font: fontSettings,
       },
       yaxis: getDefaultPlotYLayoutSettings(theme),
-      xaxis: {
-        automargin: true,
-        gridcolor: theme.colors.charts.lines,
-        zerolinecolor: theme.colors.charts.zeroLine,
-        tickfont: fontSettings,
-        title: {
-          font: fontSettings,
-        },
-      },
+      xaxis: getDefaultPlotXLayoutSettings(theme),
     };
 
     const plotLayout = merge({}, defaultLayout, layout);
