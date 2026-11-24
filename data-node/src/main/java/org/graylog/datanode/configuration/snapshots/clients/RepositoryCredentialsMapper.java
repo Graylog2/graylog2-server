@@ -24,6 +24,7 @@ import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreFileCo
 import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreItem;
 import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreStringItem;
 import org.graylog.datanode.rest.RepositoryClientsResponse;
+import org.graylog2.datanode.repositories.AzureBlobEndpoints;
 import org.graylog2.datanode.repositories.RepositoryClientNames;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
@@ -54,6 +55,8 @@ public class RepositoryCredentialsMapper {
     // The defaults, set explicitly so that the clients get a regular setting
     private static final String GCS_DEFAULT_ENDPOINT = "https://storage.googleapis.com";
     private static final String AZURE_DEFAULT_ENDPOINT_SUFFIX = "core.windows.net";
+    // Value of the token_credential_type setting for the managed identity of the host
+    private static final String AZURE_MANAGED_IDENTITY = "managed";
 
     private final EncryptedValueService encryptedValueService;
 
@@ -63,6 +66,8 @@ public class RepositoryCredentialsMapper {
     }
 
     /**
+     * The client of the given record.
+     *
      * @param record a record with a client name and credentials
      * @throws IllegalArgumentException when opensearch can't use the credentials, the message tells why
      */
@@ -121,18 +126,24 @@ public class RepositoryCredentialsMapper {
     }
 
     private RepositoryClientConfiguration azure(Credentials credentials, Client client) {
-        if (credentials.isAutomatic()) {
-            throw new IllegalArgumentException("automatic authentication is not supported");
-        }
-        if (credentials.endpointUri() != null) {
-            throw new IllegalArgumentException("custom Azure endpoints are not supported");
-        }
-        if (StringUtils.isBlank(credentials.accountName())) {
+        final String accountName = credentials.accountName();
+        if (StringUtils.isBlank(accountName)) {
             throw new IllegalArgumentException("an account name is required");
         }
-        client.setting("endpoint_suffix", AZURE_DEFAULT_ENDPOINT_SUFFIX);
-        client.secure("account", credentials.accountName());
-        client.secure("key", decrypt(credentials.accountKey(), "account key"));
+        // Opensearch addresses https://<account>.blob.<endpoint suffix> only
+        final URI endpointUri = credentials.endpointUri();
+        final String endpointSuffix = endpointUri == null
+                ? AZURE_DEFAULT_ENDPOINT_SUFFIX
+                : AzureBlobEndpoints.endpointSuffix(accountName, endpointUri)
+                .orElseThrow(() -> new IllegalArgumentException("the endpoint isn't https://<account>.blob.<endpoint suffix>"));
+        client.setting("endpoint_suffix", endpointSuffix);
+        client.secure("account", accountName);
+        if (credentials.isAutomatic()) {
+            // Opensearch supports the managed identity of the Data Node host only, not other automatic credentials
+            client.setting("token_credential_type", AZURE_MANAGED_IDENTITY);
+        } else {
+            client.secure("key", decrypt(credentials.accountKey(), "account key"));
+        }
         return client.configuration();
     }
 
@@ -159,7 +170,8 @@ public class RepositoryCredentialsMapper {
     // Without user info, it isn't used for authentication and must not end up in the opensearch configuration
     private static String endpoint(URI uri) {
         final String port = uri.getPort() == -1 ? "" : f(":%d", uri.getPort());
-        final String path = StringUtils.removeEnd(StringUtils.defaultString(uri.getRawPath()), "/");
+        final String rawPath = StringUtils.defaultString(uri.getRawPath());
+        final String path = rawPath.endsWith("/") ? rawPath.substring(0, rawPath.length() - 1) : rawPath;
         return f("%s%s%s", uri.getHost(), port, path);
     }
 

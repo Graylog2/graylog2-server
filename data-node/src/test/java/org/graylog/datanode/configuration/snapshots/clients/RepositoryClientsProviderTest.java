@@ -138,8 +138,7 @@ class RepositoryClientsProviderTest {
 
     @Test
     void azureAccountKey() {
-        insert("azure", CLIENT, new Document("type", "azure").append("auth_mode", "account_key")
-                .append("account_name", "account").append("account_key", encrypted("key")));
+        insert("azure", CLIENT, azureKeyCredentials());
 
         final RepositoryConfiguration client = single(provider.get());
         assertThat(client.opensearchProperties()).isEqualTo(Map.of(
@@ -149,6 +148,27 @@ class RepositoryClientsProviderTest {
                 .containsExactlyInAnyOrder(
                         tuple("azure.client.repository_archive-eu_7f3a.account", "account"),
                         tuple("azure.client.repository_archive-eu_7f3a.key", "key"));
+    }
+
+    @Test
+    void azureAutomaticAuthenticationUsesTheManagedIdentity() {
+        insert("azure", CLIENT, new Document("type", "azure").append("auth_mode", "automatic").append("account_name", "account"));
+
+        final RepositoryConfiguration client = single(provider.get());
+        assertThat(client.opensearchProperties()).isEqualTo(Map.of(
+                "azure.client.repository_archive-eu_7f3a.endpoint_suffix", "core.windows.net",
+                "azure.client.repository_archive-eu_7f3a.token_credential_type", "managed"));
+        assertThat(client.keystoreItems(null))
+                .extracting("key", "secret")
+                .containsExactly(tuple("azure.client.repository_archive-eu_7f3a.account", "account"));
+    }
+
+    @Test
+    void azureEndpointOfAnotherCloud() {
+        insert("azure", CLIENT, azureKeyCredentials().append("endpoint_uri", "https://account.blob.core.chinacloudapi.cn/"));
+
+        assertThat(single(provider.get()).opensearchProperties()).isEqualTo(Map.of(
+                "azure.client.repository_archive-eu_7f3a.endpoint_suffix", "core.chinacloudapi.cn"));
     }
 
     @Test
@@ -174,7 +194,7 @@ class RepositoryClientsProviderTest {
         insert("undecodable", "repository_undecodable_0001", new Document("type", "s3").append("aws_region", new Document()));
         insert("unknown-type", "repository_unknown-type_0002", new Document("type", "hdfs"));
         insert("external-id", "repository_external-id_0003", s3KeySecret().append("aws_external_id", "external"));
-        insert("azure-automatic", "repository_azure-automatic_0004", new Document("type", "azure").append("auth_mode", "automatic"));
+        insert("azurite", "repository_azurite_0004", azureKeyCredentials().append("endpoint_uri", "http://azurite:10000/account"));
         insert("no-credentials", "repository_no-credentials_0005", null);
         insert("missing-secret", "repository_missing-secret_0006", new Document("type", "s3").append("auth_mode", "key_secret")
                 .append("aws_access_key_id", "access"));
@@ -212,6 +232,11 @@ class RepositoryClientsProviderTest {
         return new Document("type", "s3").append("auth_mode", "key_secret")
                 .append("aws_access_key_id", "access")
                 .append("aws_secret_access_key", encrypted("secret"));
+    }
+
+    private Document azureKeyCredentials() {
+        return new Document("type", "azure").append("auth_mode", "account_key")
+                .append("account_name", "account").append("account_key", encrypted("key"));
     }
 
     private Document encrypted(String value) {
