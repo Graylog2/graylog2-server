@@ -325,8 +325,9 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     sort: activeSort,
   });
 
+  // The table instance is stable, so the header groups need to be rebuilt explicitly when the columns change.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const headerGroups = useMemo(() => table.getHeaderGroups(), [columnOrder]);
+  const headerGroups = useMemo(() => table.getHeaderGroups(), [columnOrder, columnDefinitions]);
 
   const hasColumnLayoutPreferences =
     Object.keys(layoutPreferences?.attributes ?? {}).length > 0 || (layoutPreferences?.order?.length ?? 0) > 0;

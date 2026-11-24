@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix entity tables showing columns without headers when the column definitions load after the initial render."
+
+issues = ["Graylog2/graylog-plugin-enterprise#16174"]
+pulls = []
