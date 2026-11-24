@@ -58,6 +58,14 @@ public class ManagedConfigurationRepository implements Repository {
                 .collect(Collectors.toUnmodifiableSet());
     }
 
+    /**
+     * The parameters this repository can serve a value for, which are therefore the ones whose value can go away
+     * at runtime.
+     */
+    public Set<String> servedParameters() {
+        return servedParameters;
+    }
+
     @Override
     public void open() {
         try {

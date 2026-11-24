@@ -122,7 +122,7 @@ public class ManagedConfigurationApplier {
         repository.resume();
         reprocessor.prependRepository(repository);
         try {
-            reprocessor.reprocess();
+            reprocessor.reprocess(repository.servedParameters());
         } catch (Exception e) {
             LOG.error("Couldn't process the configuration with the values stored through the API, falling back to " +
                     "the configuration of this node. Correct or remove the stored value to resolve this.", e);
@@ -134,7 +134,7 @@ public class ManagedConfigurationApplier {
     private void fallBackToNodeConfiguration() {
         repository.suspend();
         try {
-            reprocessor.reprocess();
+            reprocessor.reprocess(repository.servedParameters());
         } catch (Exception e) {
             LOG.error("Couldn't process the configuration of this node either.", e);
         }
