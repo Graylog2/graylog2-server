@@ -40,12 +40,6 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  */
 @Singleton
 public class EmailFactory {
-    /**
-     * JavaMail ships the SASL XOAUTH2 mechanism but doesn't enable it by default.
-     */
-    private static final String MAIL_SMTP_AUTH_MECHANISMS = "mail.smtp.auth.mechanisms";
-    private static final String XOAUTH2 = "XOAUTH2";
-
     private final EmailConfiguration configuration;
     private final SmtpOAuth2TokenProvider oAuth2TokenProvider;
 
@@ -114,19 +108,6 @@ public class EmailFactory {
             email.setSslSmtpPort(Integer.toString(configuration.getPort()));
         }
 
-        if (configuration.isUseOAuth2()) {
-            // With XOAUTH2, the access token takes the place of the password.
-            email.setAuthenticator(new DefaultAuthenticator(
-                    Strings.nullToEmpty(configuration.getUsername()),
-                    oAuth2TokenProvider.getAccessToken()
-            ));
-        } else if (configuration.isUseAuth()) {
-            email.setAuthenticator(new DefaultAuthenticator(
-                    Strings.nullToEmpty(configuration.getUsername()),
-                    Strings.nullToEmpty(configuration.getPassword())
-            ));
-        }
-
         email.setSSLOnConnect(configuration.isUseSsl());
         email.setStartTLSEnabled(configuration.isUseTls());
 
@@ -138,9 +119,12 @@ public class EmailFactory {
         email.setSocketTimeout(Ints.saturatedCast(configuration.getSocketTimeout().toMillis()));
 
         if (configuration.isUseOAuth2()) {
-            // Creates the mail session from the settings above. The session properties are only consulted when
-            // connecting, so restricting the mechanisms here affects this email only and no global state.
-            email.getMailSession().getProperties().setProperty(MAIL_SMTP_AUTH_MECHANISMS, XOAUTH2);
+            OAuth2SmtpTransport.configure(email.getMailSession(), oAuth2TokenProvider, configuration.getUsername());
+        } else if (configuration.isUseAuth()) {
+            email.setAuthenticator(new DefaultAuthenticator(
+                    Strings.nullToEmpty(configuration.getUsername()),
+                    Strings.nullToEmpty(configuration.getPassword())
+            ));
         }
 
         return email;

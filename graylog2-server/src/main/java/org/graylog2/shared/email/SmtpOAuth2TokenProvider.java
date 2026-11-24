@@ -29,10 +29,11 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.apache.commons.mail.EmailException;
 import org.graylog2.configuration.EmailConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.mail.MessagingException;
 
 import java.io.IOException;
 import java.time.Clock;
@@ -45,17 +46,21 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 /**
  * Obtains OAuth 2.0 access tokens for SMTP authentication (SASL XOAUTH2) using the client credentials grant
  * (RFC 6749, section 4.4) and caches them until shortly before they expire.
+ * <p>
+ * Tokens are requested by {@link OAuth2SmtpTransport} right before authenticating, so the remaining lifetime of a
+ * token only has to cover the SMTP handshake. A cached token that the SMTP server rejects anyway (e.g. because it was
+ * revoked) is {@link #invalidate(String) invalidated} and the authentication is retried once with a new token.
  */
 @Singleton
 public class SmtpOAuth2TokenProvider {
     private static final Logger LOG = LoggerFactory.getLogger(SmtpOAuth2TokenProvider.class);
 
     /**
-     * Tokens are refreshed this long before they expire, so a token handed out right before sending
-     * an email is still valid when the SMTP connection authenticates.
+     * Tokens are refreshed this long before they expire. This only needs to cover the time between handing out a
+     * token and the SMTP server validating it, plus clock skew. Rejected tokens are handled by a retry, not by this.
      */
     @VisibleForTesting
-    static final Duration EXPIRY_MARGIN = Duration.ofMinutes(5);
+    static final Duration EXPIRY_MARGIN = Duration.ofMinutes(1);
 
     private final EmailConfiguration configuration;
     private final OkHttpClient httpClient;
@@ -80,12 +85,12 @@ public class SmtpOAuth2TokenProvider {
     /**
      * Returns a valid access token, requesting a new one from the configured token endpoint if necessary.
      *
-     * @throws EmailException if no access token could be obtained.
+     * @throws MessagingException if no access token could be obtained.
      */
-    public synchronized String getAccessToken() throws EmailException {
+    public synchronized AccessToken getAccessToken() throws MessagingException {
         final Instant now = clock.instant();
         if (cachedToken != null && now.isBefore(cachedToken.refreshAt())) {
-            return cachedToken.accessToken();
+            return new AccessToken(cachedToken.accessToken(), true);
         }
 
         final TokenResponse tokenResponse = requestToken();
@@ -97,10 +102,20 @@ public class SmtpOAuth2TokenProvider {
             // Without an expiry we cannot know how long the token is valid, so don't cache it.
             cachedToken = null;
         }
-        return tokenResponse.accessToken();
+        return new AccessToken(tokenResponse.accessToken(), false);
     }
 
-    private TokenResponse requestToken() throws EmailException {
+    /**
+     * Removes the given token from the cache, so the next call to {@link #getAccessToken()} requests a new one.
+     * Does nothing if a different token has been cached in the meantime.
+     */
+    public synchronized void invalidate(String accessToken) {
+        if (cachedToken != null && cachedToken.accessToken().equals(accessToken)) {
+            cachedToken = null;
+        }
+    }
+
+    private TokenResponse requestToken() throws MessagingException {
         final HttpUrl tokenUrl = HttpUrl.get(configuration.getOAuth2TokenUrl().toString());
         final Request request = new Request.Builder()
                 .url(tokenUrl)
@@ -117,17 +132,17 @@ public class SmtpOAuth2TokenProvider {
         try (Response response = httpClient.newCall(request).execute()) {
             final String body = response.body().string();
             if (!response.isSuccessful()) {
-                throw new EmailException(f("Failed to obtain OAuth 2.0 access token for SMTP authentication from <%s>: HTTP %d%s",
+                throw new MessagingException(f("Failed to obtain OAuth 2.0 access token for SMTP authentication from <%s>: HTTP %d%s",
                         tokenUrl, response.code(), errorDetails(body)));
             }
 
             final TokenResponse tokenResponse = objectMapper.readValue(body, TokenResponse.class);
             if (Strings.isNullOrEmpty(tokenResponse.accessToken())) {
-                throw new EmailException(f("OAuth 2.0 token response from <%s> does not contain an access token", tokenUrl));
+                throw new MessagingException(f("OAuth 2.0 token response from <%s> does not contain an access token", tokenUrl));
             }
             return tokenResponse;
         } catch (IOException e) {
-            throw new EmailException(f("Failed to obtain OAuth 2.0 access token for SMTP authentication from <%s>: %s",
+            throw new MessagingException(f("Failed to obtain OAuth 2.0 access token for SMTP authentication from <%s>: %s",
                     tokenUrl, e.getMessage()), e);
         }
     }
@@ -144,6 +159,17 @@ public class SmtpOAuth2TokenProvider {
             // Not a standard OAuth 2.0 error response.
         }
         return "";
+    }
+
+    /**
+     * @param value     the access token
+     * @param fromCache whether the token was cached from an earlier request rather than requested just now
+     */
+    public record AccessToken(String value, boolean fromCache) {
+        @Override
+        public String toString() {
+            return f("AccessToken{fromCache=%s}", fromCache);
+        }
     }
 
     private record CachedToken(String accessToken, Instant refreshAt) {}

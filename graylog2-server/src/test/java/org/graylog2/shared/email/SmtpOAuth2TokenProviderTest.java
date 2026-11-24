@@ -24,12 +24,14 @@ import mockwebserver3.RecordedRequest;
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
-import org.apache.commons.mail.EmailException;
 import org.graylog2.configuration.EmailConfiguration;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.shared.email.SmtpOAuth2TokenProvider.AccessToken;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import javax.mail.MessagingException;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -71,7 +73,7 @@ class SmtpOAuth2TokenProviderTest {
     void requestsTokenWithClientCredentialsGrant() throws Exception {
         server.enqueue(tokenResponse("token-1", 3599));
 
-        assertThat(tokenProvider.getAccessToken()).isEqualTo("token-1");
+        assertThat(tokenProvider.getAccessToken()).isEqualTo(new AccessToken("token-1", false));
 
         final RecordedRequest request = server.takeRequest();
         assertThat(request.getMethod()).isEqualTo("POST");
@@ -90,14 +92,14 @@ class SmtpOAuth2TokenProviderTest {
         server.enqueue(tokenResponse("token-1", 3600));
         server.enqueue(tokenResponse("token-2", 3600));
 
-        assertThat(tokenProvider.getAccessToken()).isEqualTo("token-1");
+        assertThat(tokenProvider.getAccessToken()).isEqualTo(new AccessToken("token-1", false));
 
         when(clock.instant()).thenReturn(NOW.plus(Duration.ofSeconds(3600)).minus(SmtpOAuth2TokenProvider.EXPIRY_MARGIN).minusSeconds(1));
-        assertThat(tokenProvider.getAccessToken()).isEqualTo("token-1");
+        assertThat(tokenProvider.getAccessToken()).isEqualTo(new AccessToken("token-1", true));
         assertThat(server.getRequestCount()).isEqualTo(1);
 
         when(clock.instant()).thenReturn(NOW.plus(Duration.ofSeconds(3600)).minus(SmtpOAuth2TokenProvider.EXPIRY_MARGIN));
-        assertThat(tokenProvider.getAccessToken()).isEqualTo("token-2");
+        assertThat(tokenProvider.getAccessToken()).isEqualTo(new AccessToken("token-2", false));
         assertThat(server.getRequestCount()).isEqualTo(2);
     }
 
@@ -106,8 +108,45 @@ class SmtpOAuth2TokenProviderTest {
         server.enqueue(new MockResponse(200, JSON, "{\"access_token\":\"token-1\",\"token_type\":\"Bearer\"}"));
         server.enqueue(new MockResponse(200, JSON, "{\"access_token\":\"token-2\",\"token_type\":\"Bearer\"}"));
 
-        assertThat(tokenProvider.getAccessToken()).isEqualTo("token-1");
-        assertThat(tokenProvider.getAccessToken()).isEqualTo("token-2");
+        assertThat(tokenProvider.getAccessToken().value()).isEqualTo("token-1");
+        assertThat(tokenProvider.getAccessToken().value()).isEqualTo("token-2");
+    }
+
+    @Test
+    void shortLivedTokensAreCachedForHalfTheirLifetime() throws Exception {
+        server.enqueue(tokenResponse("token-1", 60));
+        server.enqueue(tokenResponse("token-2", 60));
+
+        assertThat(tokenProvider.getAccessToken().value()).isEqualTo("token-1");
+        when(clock.instant()).thenReturn(NOW.plusSeconds(29));
+        assertThat(tokenProvider.getAccessToken()).isEqualTo(new AccessToken("token-1", true));
+        when(clock.instant()).thenReturn(NOW.plusSeconds(30));
+        assertThat(tokenProvider.getAccessToken()).isEqualTo(new AccessToken("token-2", false));
+    }
+
+    @Test
+    void invalidateRemovesCachedToken() throws Exception {
+        server.enqueue(tokenResponse("token-1", 3600));
+        server.enqueue(tokenResponse("token-2", 3600));
+
+        assertThat(tokenProvider.getAccessToken().value()).isEqualTo("token-1");
+        tokenProvider.invalidate("token-1");
+        assertThat(tokenProvider.getAccessToken()).isEqualTo(new AccessToken("token-2", false));
+    }
+
+    @Test
+    void invalidateIgnoresOtherTokens() throws Exception {
+        server.enqueue(tokenResponse("token-2", 3600));
+
+        assertThat(tokenProvider.getAccessToken().value()).isEqualTo("token-2");
+        tokenProvider.invalidate("token-1");
+        assertThat(tokenProvider.getAccessToken()).isEqualTo(new AccessToken("token-2", true));
+        assertThat(server.getRequestCount()).isEqualTo(1);
+    }
+
+    @Test
+    void accessTokenToStringDoesNotContainToken() {
+        assertThat(new AccessToken("secret-token", true).toString()).doesNotContain("secret-token");
     }
 
     @Test
@@ -116,7 +155,7 @@ class SmtpOAuth2TokenProviderTest {
                 "{\"error\":\"invalid_client\",\"error_description\":\"AADSTS7000215: Invalid client secret provided.\"}"));
 
         assertThatThrownBy(tokenProvider::getAccessToken)
-                .isInstanceOf(EmailException.class)
+                .isInstanceOf(MessagingException.class)
                 .hasMessageContaining("HTTP 401")
                 .hasMessageContaining("invalid_client: AADSTS7000215: Invalid client secret provided.")
                 .hasMessageNotContaining("the-client-secret");
@@ -127,7 +166,7 @@ class SmtpOAuth2TokenProviderTest {
         server.enqueue(new MockResponse(503, Headers.of(), "<html>Service Unavailable</html>"));
 
         assertThatThrownBy(tokenProvider::getAccessToken)
-                .isInstanceOf(EmailException.class)
+                .isInstanceOf(MessagingException.class)
                 .hasMessageEndingWith("HTTP 503");
     }
 
@@ -136,7 +175,7 @@ class SmtpOAuth2TokenProviderTest {
         server.enqueue(new MockResponse(200, JSON, "{\"token_type\":\"Bearer\",\"expires_in\":3599}"));
 
         assertThatThrownBy(tokenProvider::getAccessToken)
-                .isInstanceOf(EmailException.class)
+                .isInstanceOf(MessagingException.class)
                 .hasMessageContaining("does not contain an access token");
     }
 
@@ -145,8 +184,8 @@ class SmtpOAuth2TokenProviderTest {
         server.enqueue(new MockResponse(500, Headers.of(), ""));
         server.enqueue(tokenResponse("token-1", 3599));
 
-        assertThatThrownBy(tokenProvider::getAccessToken).isInstanceOf(EmailException.class);
-        assertThat(tokenProvider.getAccessToken()).isEqualTo("token-1");
+        assertThatThrownBy(tokenProvider::getAccessToken).isInstanceOf(MessagingException.class);
+        assertThat(tokenProvider.getAccessToken().value()).isEqualTo("token-1");
     }
 
     static MockResponse tokenResponse(String accessToken, long expiresIn) {

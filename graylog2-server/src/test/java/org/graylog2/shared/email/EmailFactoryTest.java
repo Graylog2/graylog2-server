@@ -19,11 +19,16 @@ package org.graylog2.shared.email;
 import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import okhttp3.HttpUrl;
+import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
 import org.graylog2.configuration.EmailConfiguration;
+import org.graylog2.shared.email.SmtpOAuth2TokenProvider.AccessToken;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import javax.mail.AuthenticationFailedException;
+import javax.mail.MessagingException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -38,14 +43,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 class EmailFactoryTest {
+    private static final String AUTH_REJECTED = "535 5.7.3 Authentication unsuccessful";
+
     private FakeSmtpServer smtpServer;
     private final SmtpOAuth2TokenProvider tokenProvider = mock(SmtpOAuth2TokenProvider.class);
 
@@ -61,16 +74,86 @@ class EmailFactoryTest {
 
     @Test
     void authenticatesWithXOAuth2() throws Exception {
-        when(tokenProvider.getAccessToken()).thenReturn("the-access-token");
-        final EmailConfiguration configuration = SmtpOAuth2TokenProviderTest.oauth2Config(
-                HttpUrl.get("https://login.example.com/token"), smtpSettings());
+        when(tokenProvider.getAccessToken()).thenReturn(new AccessToken("the-access-token", false));
 
-        send(new EmailFactory(configuration, tokenProvider));
+        send(oauth2EmailFactory());
 
-        final String expectedInitialResponse = Base64.getEncoder().encodeToString(
-                "user=graylog@example.com\u0001auth=Bearer the-access-token\u0001\u0001".getBytes(StandardCharsets.UTF_8));
-        assertThat(smtpServer.authCommands()).containsExactly("AUTH XOAUTH2 " + expectedInitialResponse);
+        assertThat(smtpServer.authCommands()).containsExactly(xoauth2("the-access-token"));
         assertThat(smtpServer.commands()).contains("MAIL FROM:<sender@example.com>", "RCPT TO:<recipient@example.com>");
+    }
+
+    @Test
+    void requestsTokenWhenSendingNotWhenCreatingEmail() throws Exception {
+        when(tokenProvider.getAccessToken()).thenReturn(new AccessToken("the-access-token", false));
+
+        final SimpleEmail email = oauth2EmailFactory().simpleEmail();
+        verifyNoInteractions(tokenProvider);
+
+        email.addTo("recipient@example.com");
+        email.setSubject("Test");
+        email.setMsg("Hello");
+        email.send();
+        verify(tokenProvider).getAccessToken();
+    }
+
+    @Test
+    void retriesWithNewTokenIfCachedTokenIsRejected() throws Exception {
+        smtpServer.rejectNextAuth();
+        when(tokenProvider.getAccessToken()).thenReturn(
+                new AccessToken("cached-token", true),
+                new AccessToken("new-token", false));
+
+        send(oauth2EmailFactory());
+
+        assertThat(smtpServer.authCommands()).containsExactly(xoauth2("cached-token"), xoauth2("new-token"));
+        assertThat(smtpServer.commands()).contains("RCPT TO:<recipient@example.com>");
+        final var inOrder = inOrder(tokenProvider);
+        inOrder.verify(tokenProvider).getAccessToken();
+        inOrder.verify(tokenProvider).invalidate("cached-token");
+        inOrder.verify(tokenProvider).getAccessToken();
+    }
+
+    @Test
+    void doesNotRetryIfNewlyRequestedTokenIsRejected() throws Exception {
+        smtpServer.rejectNextAuth();
+        when(tokenProvider.getAccessToken()).thenReturn(new AccessToken("new-token", false));
+
+        assertThatThrownBy(() -> send(oauth2EmailFactory()))
+                .isInstanceOf(EmailException.class)
+                .cause()
+                .isInstanceOf(AuthenticationFailedException.class)
+                .hasMessage("SMTP server <127.0.0.1> rejected the OAuth 2.0 access token for <graylog@example.com>: " + AUTH_REJECTED);
+
+        assertThat(smtpServer.authCommands()).containsExactly(xoauth2("new-token"));
+        verify(tokenProvider, never()).invalidate("new-token");
+    }
+
+    @Test
+    void retriesOnlyOnce() throws Exception {
+        smtpServer.rejectNextAuth();
+        smtpServer.rejectNextAuth();
+        when(tokenProvider.getAccessToken()).thenReturn(
+                new AccessToken("cached-token", true),
+                new AccessToken("new-token", false));
+
+        assertThatThrownBy(() -> send(oauth2EmailFactory()))
+                .isInstanceOf(EmailException.class)
+                .cause()
+                .isInstanceOf(AuthenticationFailedException.class);
+
+        assertThat(smtpServer.authCommands()).containsExactly(xoauth2("cached-token"), xoauth2("new-token"));
+    }
+
+    @Test
+    void reportsTokenRequestFailure() throws Exception {
+        when(tokenProvider.getAccessToken()).thenThrow(new MessagingException("Failed to obtain OAuth 2.0 access token"));
+
+        assertThatThrownBy(() -> send(oauth2EmailFactory()))
+                .isInstanceOf(EmailException.class)
+                .cause()
+                .hasMessage("Failed to obtain OAuth 2.0 access token");
+
+        assertThat(smtpServer.authCommands()).isEmpty();
     }
 
     @Test
@@ -90,6 +173,12 @@ class EmailFactoryTest {
         verifyNoInteractions(tokenProvider);
     }
 
+    private EmailFactory oauth2EmailFactory() throws Exception {
+        final EmailConfiguration configuration = SmtpOAuth2TokenProviderTest.oauth2Config(
+                HttpUrl.get("https://login.example.com/token"), smtpSettings());
+        return new EmailFactory(configuration, tokenProvider);
+    }
+
     private Map<String, String> smtpSettings() {
         return Map.of(
                 "transport_email_enabled", "true",
@@ -98,6 +187,11 @@ class EmailFactoryTest {
                 "transport_email_use_tls", "false",
                 "transport_email_from_email", "sender@example.com"
         );
+    }
+
+    private static String xoauth2(String token) {
+        return "AUTH XOAUTH2 " + Base64.getEncoder().encodeToString(
+                ("user=graylog@example.com\u0001auth=Bearer " + token + "\u0001\u0001").getBytes(StandardCharsets.UTF_8));
     }
 
     private static void send(EmailFactory emailFactory) throws Exception {
@@ -109,12 +203,13 @@ class EmailFactoryTest {
     }
 
     /**
-     * Minimal scripted SMTP server that accepts a single connection, advertises LOGIN and XOAUTH2,
-     * accepts any credentials and records the commands it receives.
+     * Minimal scripted SMTP server that handles connections one after another, advertises LOGIN and XOAUTH2,
+     * accepts any credentials unless told to reject them, and records the commands it receives.
      */
     private static class FakeSmtpServer implements AutoCloseable {
         private final ServerSocket serverSocket;
         private final List<String> commands = new CopyOnWriteArrayList<>();
+        private final Queue<String> authResponses = new ConcurrentLinkedQueue<>();
 
         FakeSmtpServer() throws IOException {
             serverSocket = new ServerSocket(0, 1, InetAddress.getLoopbackAddress());
@@ -127,6 +222,10 @@ class EmailFactoryTest {
             return serverSocket.getLocalPort();
         }
 
+        void rejectNextAuth() {
+            authResponses.add(AUTH_REJECTED);
+        }
+
         List<String> commands() {
             return commands;
         }
@@ -136,41 +235,48 @@ class EmailFactoryTest {
         }
 
         private void serve() {
-            try (Socket socket = serverSocket.accept();
-                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.US_ASCII))) {
-                final OutputStream out = socket.getOutputStream();
-                reply(out, "220 localhost ESMTP");
-                String line;
-                while ((line = in.readLine()) != null) {
-                    commands.add(line);
-                    final String verb = line.split(" ", 2)[0].toUpperCase(Locale.ROOT);
-                    switch (verb) {
-                        case "EHLO" -> reply(out, "250-localhost\r\n250 AUTH LOGIN XOAUTH2");
-                        case "AUTH" -> {
-                            if (line.startsWith("AUTH LOGIN")) {
-                                reply(out, "334 VXNlcm5hbWU6");
-                                in.readLine();
-                                reply(out, "334 UGFzc3dvcmQ6");
-                                in.readLine();
-                            }
-                            reply(out, "235 2.7.0 Authentication successful");
-                        }
-                        case "DATA" -> {
-                            reply(out, "354 Start mail input");
-                            while (!".".equals(in.readLine())) {
-                                // discard message content
-                            }
-                            reply(out, "250 OK");
-                        }
-                        case "QUIT" -> {
-                            reply(out, "221 Bye");
-                            return;
-                        }
-                        default -> reply(out, "250 OK");
-                    }
+            while (!serverSocket.isClosed()) {
+                try (Socket socket = serverSocket.accept()) {
+                    handle(socket);
+                } catch (IOException ignored) {
+                    // Connection or server socket closed
                 }
-            } catch (IOException ignored) {
-                // Server socket closed
+            }
+        }
+
+        private void handle(Socket socket) throws IOException {
+            final BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.US_ASCII));
+            final OutputStream out = socket.getOutputStream();
+            reply(out, "220 localhost ESMTP");
+            String line;
+            while ((line = in.readLine()) != null) {
+                commands.add(line);
+                final String verb = line.split(" ", 2)[0].toUpperCase(Locale.ROOT);
+                switch (verb) {
+                    case "EHLO" -> reply(out, "250-localhost\r\n250 AUTH LOGIN XOAUTH2");
+                    case "AUTH" -> {
+                        if (line.startsWith("AUTH LOGIN")) {
+                            reply(out, "334 VXNlcm5hbWU6");
+                            in.readLine();
+                            reply(out, "334 UGFzc3dvcmQ6");
+                            in.readLine();
+                        }
+                        final String response = authResponses.poll();
+                        reply(out, response != null ? response : "235 2.7.0 Authentication successful");
+                    }
+                    case "DATA" -> {
+                        reply(out, "354 Start mail input");
+                        while (!".".equals(in.readLine())) {
+                            // discard message content
+                        }
+                        reply(out, "250 OK");
+                    }
+                    case "QUIT" -> {
+                        reply(out, "221 Bye");
+                        return;
+                    }
+                    default -> reply(out, "250 OK");
+                }
             }
         }
 
