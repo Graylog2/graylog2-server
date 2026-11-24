@@ -25,8 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A named opensearch repository client with the settings the Graylog server prepared for it, see
- * {@link org.graylog2.datanode.repositories.RepositoryClientSettings}.
+ * A named opensearch repository client of a warm tier repository, see {@link RepositoryCredentialsMapper}.
  *
  * @param opensearchProperties the regular client settings with their full keys
  * @param keystoreItems        the secure client settings with their full keys, already decrypted

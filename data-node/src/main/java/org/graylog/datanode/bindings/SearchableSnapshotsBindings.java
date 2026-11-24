@@ -26,8 +26,8 @@ import org.graylog.datanode.configuration.snapshots.clients.RepositoryClientsPro
 import java.util.Set;
 
 /**
- * Registers the repositories defined in the datanode configuration file and the repository clients stored by the
- * Graylog server as {@link RepositoryConfigurationProvider}s. Plugins can contribute
+ * Registers the repositories defined in the datanode configuration file and the clients of warm tier repositories
+ * with credentials stored by the Graylog server as {@link RepositoryConfigurationProvider}s. Plugins can contribute
  * further providers to the same multibinder.
  */
 public class SearchableSnapshotsBindings extends AbstractModule {

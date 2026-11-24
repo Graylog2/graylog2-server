@@ -28,7 +28,8 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * Names of the OpenSearch repository clients that Graylog manages, e.g. {@code repository_archive-eu_7f3a}. Data
- * Nodes configure such a client from its {@link RepositoryClientDto}.
+ * Nodes configure such a client from the credentials of its repository, which the enterprise plugin stores together
+ * with the client name.
  * <p>
  * A name is generated once, when a repository with its own client is created, and never derived again. The slug
  * tells which repository the client was created for. The random suffix makes a repository re-created under the same

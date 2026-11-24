@@ -19,6 +19,8 @@ package org.graylog.datanode.integration;
 import com.github.rholder.retry.RetryException;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
+import org.bson.Document;
+import org.graylog.datanode.configuration.snapshots.clients.RepositoryCredentialsDocument;
 import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
 import org.graylog.testing.completebackend.ContainerizedGraylogBackend;
 import org.graylog.testing.completebackend.S3MinioContainer;
@@ -27,8 +29,8 @@ import org.graylog.testing.restoperations.DatanodeOpensearchWait;
 import org.graylog.testing.restoperations.RestOperationParameters;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
-import org.graylog2.datanode.repositories.RepositoryClientService;
-import org.graylog2.datanode.repositories.RepositoryClientSettings;
+import org.graylog2.datanode.repositories.RepositoryClientNames;
+import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.hamcrest.Matchers;
@@ -39,8 +41,6 @@ import org.testcontainers.containers.Network;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 
-import java.net.URI;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import static io.restassured.RestAssured.given;
@@ -101,21 +101,24 @@ public class DatanodeRepositoryClientsIT {
                 .body("error.type", Matchers.equalTo("repository_verification_exception"));
     }
 
+    // Stores a credential record with a client name like the enterprise plugin of the server does
     private String saveCredentials(String repositoryName, String secretKey) {
         final MongoCollections mongoCollections = new MongoCollections(
                 new MongoJackObjectMapperProvider(new ObjectMapperProvider().get()), mongoDB.mongoConnection());
         // The Data Node decrypts the secrets with its password_secret, which has to match the server's
-        final EncryptedValueService encryptedValueService = new EncryptedValueService(ContainerizedGraylogBackend.PASSWORD_SECRET);
-        final URI endpoint = s3Container.getInternalURI();
-        final RepositoryClientSettings settings = new RepositoryClientSettings(RepositoryClientSettings.TYPE_S3,
-                Map.of("protocol", endpoint.getScheme(),
-                        "endpoint", f("%s:%d", endpoint.getHost(), endpoint.getPort()),
-                        "region", "us-east-1",
-                        "path_style_access", "true"),
-                Map.of("access_key", encryptedValueService.encrypt(s3Container.getAccessKey()),
-                        "secret_key", encryptedValueService.encrypt(secretKey)),
-                Map.of());
-        return new RepositoryClientService(mongoCollections).create(repositoryName, settings).clientName();
+        final EncryptedValue encryptedSecret = new EncryptedValueService(ContainerizedGraylogBackend.PASSWORD_SECRET).encrypt(secretKey);
+        final String clientName = RepositoryClientNames.generate(repositoryName);
+        final Document credentials = new Document("type", "s3")
+                .append("auth_mode", "key_secret")
+                .append("aws_access_key_id", s3Container.getAccessKey())
+                .append("aws_secret_access_key", new Document("encrypted_value", encryptedSecret.value()).append("salt", encryptedSecret.salt()))
+                .append("aws_region", "us-east-1")
+                .append("endpoint_uri", s3Container.getInternalURI().toString());
+        mongoCollections.nonEntityCollection(RepositoryCredentialsDocument.COLLECTION_NAME, Document.class)
+                .insertOne(new Document("repository_name", repositoryName)
+                        .append("client_name", clientName)
+                        .append("credentials", credentials));
+        return clientName;
     }
 
     private String startDatanode() throws ExecutionException, RetryException {
