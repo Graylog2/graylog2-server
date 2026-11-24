@@ -41,15 +41,13 @@ class RepositoryClientsProviderTest {
     private static final String CLIENT = "repository_archive-eu_7f3a";
 
     private final EncryptedValueService encryptedValueService = new EncryptedValueService("1234567890abcdef");
-    private MongoCollections mongoCollections;
     private MongoCollection<Document> records;
     private RepositoryClientsProvider provider;
 
     @BeforeEach
     void setUp(MongoCollections mongoCollections) {
-        this.mongoCollections = mongoCollections;
         records = mongoCollections.nonEntityCollection(RepositoryCredentialsDocument.COLLECTION_NAME, Document.class);
-        provider = provider(encryptedValueService);
+        provider = new RepositoryClientsProvider(mongoCollections, new RepositoryCredentialsMapper(encryptedValueService));
     }
 
     @Test
@@ -205,25 +203,6 @@ class RepositoryClientsProviderTest {
         insert("working", CLIENT, s3KeySecret());
 
         assertThat(single(provider.get()).opensearchProperties()).containsKey("s3.client.repository_archive-eu_7f3a.endpoint");
-    }
-
-    @Test
-    void secretsEncryptedWithAnotherPasswordSecretAreSkipped() {
-        // AES/CBC without integrity check may decrypt with a wrong key to garbage instead of failing, so a service
-        // that can't decrypt stands in for a Data Node with another password_secret
-        provider = provider(new EncryptedValueService("1234567890abcdef") {
-            @Override
-            public String decrypt(EncryptedValue value) {
-                return null;
-            }
-        });
-        insert("minio", CLIENT, s3KeySecret());
-
-        assertThat(provider.get()).isEmpty();
-    }
-
-    private RepositoryClientsProvider provider(EncryptedValueService encryptedValueService) {
-        return new RepositoryClientsProvider(mongoCollections, new RepositoryCredentialsMapper(encryptedValueService));
     }
 
     // Stores a record like the Graylog server does

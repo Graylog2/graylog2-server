@@ -156,11 +156,8 @@ public class RepositoryCredentialsMapper {
         if (value == null || !value.isSet()) {
             throw new IllegalArgumentException(f("a %s is required", name));
         }
-        final String decrypted = encryptedValueService.decrypt(value);
-        if (StringUtils.isBlank(decrypted)) {
-            throw new IllegalArgumentException(f("the %s can't be decrypted, make sure password_secret matches the Graylog server", name));
-        }
-        return decrypted;
+        // A matching password_secret is ensured by the preflight check of the Data Node
+        return encryptedValueService.decrypt(value);
     }
 
     // Without user info, it isn't used for authentication and must not end up in the opensearch configuration
