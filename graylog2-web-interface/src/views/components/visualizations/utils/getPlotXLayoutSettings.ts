@@ -15,12 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import type { DefaultTheme } from 'styled-components';
+
 import { AXIS_LABEL_MARGIN } from 'views/components/visualizations/Constants';
 import getDefaultPlotFontSettings from 'views/components/visualizations/utils/getDefaultPlotFontSettings';
 import type { ChartAxisConfig } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 
-const getPlotXTitleSettings = (theme, config: AggregationWidgetConfig) => {
+const getPlotXLayoutSettings = (theme: DefaultTheme, config: AggregationWidgetConfig) => {
   const visualizationAxisTitle =
     config?.visualizationConfig && 'axisConfig' in config.visualizationConfig
       ? (config?.visualizationConfig?.axisConfig as ChartAxisConfig)?.xaxis?.title
@@ -33,10 +35,13 @@ const getPlotXTitleSettings = (theme, config: AggregationWidgetConfig) => {
   const color = visualizationAxisColor ?? fontSettings.color;
 
   return {
-    text: visualizationAxisTitle,
-    standoff: AXIS_LABEL_MARGIN,
-    font: { ...fontSettings, color },
+    gridcolor: visualizationAxisColor ? theme.utils.colorLevel(visualizationAxisColor, -4) : theme.colors.charts.lines,
+    title: {
+      text: visualizationAxisTitle,
+      standoff: AXIS_LABEL_MARGIN,
+      font: { ...fontSettings, color },
+    },
   };
 };
 
-export default getPlotXTitleSettings;
+export default getPlotXLayoutSettings;

@@ -28,7 +28,7 @@ import useFeature from 'hooks/useFeature';
 import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 import useXAxisTicksAndType from 'views/components/visualizations/hooks/useXAxisTicksAndType';
 import getThresholdShapes from 'views/components/visualizations/utils/getThresholdShapes';
-import getPlotXTitleSettings from 'views/components/visualizations/utils/getPlotXTitleSettings';
+import getPlotXLayoutSettings from 'views/components/visualizations/utils/getPlotXLayoutSettings';
 
 const useChartLayoutSettingsWithCustomUnits = ({
   config,
@@ -79,7 +79,7 @@ const useChartLayoutSettingsWithCustomUnits = ({
       annotations: thresholdsAnnotations,
       hovermode: 'x',
       xaxis: {
-        title: getPlotXTitleSettings(theme, config),
+        ...getPlotXLayoutSettings(theme, config),
         ...ticksAndTypeConfig,
       },
     };

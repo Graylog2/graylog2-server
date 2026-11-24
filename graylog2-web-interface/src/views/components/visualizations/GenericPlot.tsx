@@ -177,6 +177,8 @@ const usePlotLayout = (layout: Partial<Layout>) => {
       yaxis: getDefaultPlotYLayoutSettings(theme),
       xaxis: {
         automargin: true,
+        gridcolor: theme.colors.charts.lines,
+        zerolinecolor: theme.colors.charts.zeroLine,
         tickfont: fontSettings,
         title: {
           font: fontSettings,

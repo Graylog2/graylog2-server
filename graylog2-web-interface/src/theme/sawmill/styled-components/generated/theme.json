@@ -397,6 +397,7 @@
         "containerBackground": "#F6F7FC",
         "containerBorder": "#E1E4ED",
         "lines": "#E1E4ED",
+        "zeroLine": "#C1C7DC",
         "highlight": "#03C2FF",
         "cyan": {
           "markerColor": "#03C2FF",
@@ -856,6 +857,7 @@
         "containerBackground": "#F6F7FC",
         "containerBorder": "#E1E4ED",
         "lines": "#394261",
+        "zeroLine": "#6F768F",
         "highlight": "#03C2FF",
         "cyan": {
           "markerColor": "#03C2FF",
