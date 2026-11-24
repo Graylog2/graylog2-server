@@ -58,6 +58,11 @@ class RepositoryClientsProviderTest {
     }
 
     @Test
+    void clientsDoNotPreventOpensearchFromStarting() {
+        assertThat(provider.isOptional()).isTrue();
+    }
+
+    @Test
     void recordsWithoutClientNameAreIgnored() {
         records.insertOne(new Document("repository_name", "default-client").append("credentials", s3KeySecret()));
 
@@ -118,8 +123,7 @@ class RepositoryClientsProviderTest {
                 .append("service_account_key", encrypted("{\"type\": \"service_account\"}")));
 
         final RepositoryConfiguration client = single(provider.get());
-        assertThat(client.opensearchProperties()).isEqualTo(Map.of(
-                "gcs.client.repository_archive-eu_7f3a.endpoint", "https://storage.googleapis.com"));
+        assertThat(client.opensearchProperties()).isEmpty();
         assertThat(client.keystoreItems(null))
                 .singleElement()
                 .usingRecursiveComparison()
@@ -132,7 +136,7 @@ class RepositoryClientsProviderTest {
         insert("gcs", CLIENT, new Document("type", "gcs").append("auth_mode", "automatic"));
 
         final RepositoryConfiguration client = single(provider.get());
-        assertThat(client.opensearchProperties()).containsOnlyKeys("gcs.client.repository_archive-eu_7f3a.endpoint");
+        assertThat(client.opensearchProperties()).isEmpty();
         assertThat(client.keystoreItems(null)).isEmpty();
     }
 
@@ -141,8 +145,7 @@ class RepositoryClientsProviderTest {
         insert("azure", CLIENT, azureKeyCredentials());
 
         final RepositoryConfiguration client = single(provider.get());
-        assertThat(client.opensearchProperties()).isEqualTo(Map.of(
-                "azure.client.repository_archive-eu_7f3a.endpoint_suffix", "core.windows.net"));
+        assertThat(client.opensearchProperties()).isEmpty();
         assertThat(client.keystoreItems(null))
                 .extracting("key", "secret")
                 .containsExactlyInAnyOrder(
@@ -156,7 +159,6 @@ class RepositoryClientsProviderTest {
 
         final RepositoryConfiguration client = single(provider.get());
         assertThat(client.opensearchProperties()).isEqualTo(Map.of(
-                "azure.client.repository_archive-eu_7f3a.endpoint_suffix", "core.windows.net",
                 "azure.client.repository_archive-eu_7f3a.token_credential_type", "managed"));
         assertThat(client.keystoreItems(null))
                 .extracting("key", "secret")

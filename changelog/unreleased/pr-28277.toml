@@ -4,8 +4,7 @@ message = "Allow Data Nodes to configure OpenSearch repository clients managed b
 details.user = """
 Data Nodes now configure the OpenSearch repository clients of warm tier repositories from the repository credentials
 stored by the Graylog server, so the credentials no longer have to be set up on each Data Node. New or changed clients
-take effect after the Data Node restarts. The new Data Node endpoint `/repository-clients` shows the snapshot
-repositories, the client each one uses and the nodes that don't have it yet, as the OpenSearch cluster sees them.
+take effect after the Data Node restarts.
 """
 
 pulls = ["28277"]

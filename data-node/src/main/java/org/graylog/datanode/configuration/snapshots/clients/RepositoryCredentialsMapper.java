@@ -23,7 +23,6 @@ import org.graylog.datanode.configuration.snapshots.clients.RepositoryCredential
 import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreFileContentItem;
 import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreItem;
 import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreStringItem;
-import org.graylog.datanode.rest.RepositoryClientsResponse;
 import org.graylog2.datanode.repositories.AzureBlobEndpoints;
 import org.graylog2.datanode.repositories.RepositoryClientNames;
 import org.graylog2.security.encryption.EncryptedValue;
@@ -44,17 +43,11 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  * Turns a warm tier repository credential record into the opensearch repository client the repository is registered
  * with. The server rejects credentials that can't be converted for repositories with their own client, see
  * {@code DataNodeClientSupport} in the enterprise plugin, both have to stay in sync.
- * <p>
- * Every client gets at least one regular setting: opensearch only lists those, secure settings stay hidden, see
- * {@link RepositoryClientsResponse}.
  */
 public class RepositoryCredentialsMapper {
 
     // Same fallback as the server-side S3 client uses
     private static final String DEFAULT_AWS_REGION = Region.US_EAST_1.id();
-    // The defaults, set explicitly so that the clients get a regular setting
-    private static final String GCS_DEFAULT_ENDPOINT = "https://storage.googleapis.com";
-    private static final String AZURE_DEFAULT_ENDPOINT_SUFFIX = "core.windows.net";
     // Value of the token_credential_type setting for the managed identity of the host
     private static final String AZURE_MANAGED_IDENTITY = "managed";
 
@@ -130,13 +123,12 @@ public class RepositoryCredentialsMapper {
         if (StringUtils.isBlank(accountName)) {
             throw new IllegalArgumentException("an account name is required");
         }
-        // Opensearch addresses https://<account>.blob.<endpoint suffix> only
+        // Opensearch addresses https://<account>.blob.<endpoint suffix> only, without an endpoint the public cloud
         final URI endpointUri = credentials.endpointUri();
-        final String endpointSuffix = endpointUri == null
-                ? AZURE_DEFAULT_ENDPOINT_SUFFIX
-                : AzureBlobEndpoints.endpointSuffix(accountName, endpointUri)
-                .orElseThrow(() -> new IllegalArgumentException("the endpoint isn't https://<account>.blob.<endpoint suffix>"));
-        client.setting("endpoint_suffix", endpointSuffix);
+        if (endpointUri != null) {
+            client.setting("endpoint_suffix", AzureBlobEndpoints.endpointSuffix(accountName, endpointUri)
+                    .orElseThrow(() -> new IllegalArgumentException("the endpoint isn't https://<account>.blob.<endpoint suffix>")));
+        }
         client.secure("account", accountName);
         if (credentials.isAutomatic()) {
             // Opensearch supports the managed identity of the Data Node host only, not other automatic credentials
@@ -148,7 +140,6 @@ public class RepositoryCredentialsMapper {
     }
 
     private RepositoryClientConfiguration gcs(Credentials credentials, Client client) {
-        client.setting("endpoint", GCS_DEFAULT_ENDPOINT);
         // With automatic authentication, opensearch uses the Application Default Credentials of the Data Node host
         if (!credentials.isAutomatic()) {
             client.secureFile("credentials_file", decrypt(credentials.serviceAccountKey(), "service account key"));
