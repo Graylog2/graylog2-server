@@ -26,3 +26,18 @@ export function describeExpression(expression: string): string | null {
 
   return null;
 }
+
+export function cronExpressionError(expression: string): string | null {
+  if (!expression) {
+    return null;
+  }
+
+  try {
+    cronstrue.toString(expression, { dayOfWeekStartIndexZero: false });
+
+    return null;
+  } catch (error) {
+    // cronstrue throws its parse errors as strings prefixed with "Error: ".
+    return String(error).replace(/^Error: /, '');
+  }
+}
