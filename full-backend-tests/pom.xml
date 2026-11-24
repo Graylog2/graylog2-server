@@ -224,7 +224,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
-                    <forkCount>3</forkCount>
+                    <forkCount>2</forkCount>
                     <reuseForks>true</reuseForks>
                 </configuration>
             </plugin>
