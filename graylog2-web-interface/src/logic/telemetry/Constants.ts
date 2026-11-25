@@ -374,6 +374,8 @@ export const TELEMETRY_EVENT_TYPE = {
     CHANGE_FOR_INDEX_CHANGED: 'Index Set Field Type Profile Change For Index Changed',
     CHANGE_FOR_INDEX_REMOVED: 'Index Set Field Type Profile Change For Index Removed',
     CREATE_PROFILE_FROM_SELECTED_RAN: 'Index Set Field Type Profile Create From Selected Ran',
+    DUPLICATE_RAN: 'Index Set Field Type Profile Duplicate Ran',
+    IMPORT_RAN: 'Index Set Field Type Profile Import Ran',
   },
   INDEX_SET_TEMPLATE: {
     NEW_OPENED: 'Index Set Template Create Opened',
@@ -413,6 +415,7 @@ export const TELEMETRY_EVENT_TYPE = {
     INPLACE_JOURNAL_SIZE_DOWNTIME_WARNING_NEXT_CLICKED:
       'Datanode Migration Inplace Journal Size Downtime Warning Next Clicked',
     INPLACE_STOP_MESSAGE_PROCESSING_NEXT_CLICKED: 'Datanode Migration Inplace Stop Message Processing Next Clicked',
+    // eslint-disable-next-line graylog/no-literal-product-name -- renaming the event would break existing telemetry data
     INPLACE_RESTART_GRAYLOG_NEXT_CLICKED: 'Datanode Migration Inplace Restart Graylog Next Clicked',
   },
   DATANODE_OPENSEARCH_UPGRADE: {
@@ -522,6 +525,10 @@ export const TELEMETRY_EVENT_TYPE = {
     EXPANDED: 'Right Sidebar Expanded',
     NAVIGATED_BACK: 'Right Sidebar Navigated Back',
     NAVIGATED_FORWARD: 'Right Sidebar Navigated Forward',
+  },
+  SCRATCHPAD: {
+    OPENED: 'Scratchpad Opened',
+    CLOSED: 'Scratchpad Closed',
   },
   WELCOME: {
     SETUP_COLLECTOR_CLICKED: 'Welcome Enroll Collector Clicked',

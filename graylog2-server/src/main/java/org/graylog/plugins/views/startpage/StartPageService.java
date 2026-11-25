@@ -31,6 +31,7 @@ import org.graylog.plugins.views.startpage.recentActivities.RecentActivity;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.plugins.views.startpage.title.StartPageItemTitleRetriever;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.PaginatedResponse;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -108,8 +109,15 @@ public class StartPageService {
 
     public void addLastOpenedFor(final ViewDTO view, final SearchUser searchUser) {
         final var type = view.type().equals(ViewDTO.Type.DASHBOARD) ? GRNTypes.DASHBOARD : GRNTypes.SEARCH;
-        final var lastOpenedItems = lastOpenedService.findForUser(searchUser);
-        final var item = new LastOpenedDTO(grnRegistry.newGRN(type, view.id()), DateTime.now(DateTimeZone.UTC));
+        addLastOpenedFor(grnRegistry.newGRN(type, view.id()), searchUser.getUser());
+    }
+
+    /**
+     * Records that the user opened the entity, which lists it as last opened on the start page and in quick jump.
+     */
+    public void addLastOpenedFor(final GRN grn, final User user) {
+        final var lastOpenedItems = lastOpenedService.findForUser(user.getId());
+        final var item = new LastOpenedDTO(grn, DateTime.now(DateTimeZone.UTC));
         if (lastOpenedItems.isPresent()) {
             var loi = lastOpenedItems.get();
             var items = filterForExistingIdAndCapAtMaximum(loi, item.grn(), MAXIMUM_LAST_OPENED_PER_USER);
@@ -118,7 +126,7 @@ public class StartPageService {
             loi.items().addAll(items);
             lastOpenedService.save(loi);
         } else {
-            var items = new LastOpenedForUserDTO(searchUser.getUser().getId(), List.of(item));
+            var items = new LastOpenedForUserDTO(user.getId(), List.of(item));
             lastOpenedService.create(items);
         }
     }

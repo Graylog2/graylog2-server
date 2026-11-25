@@ -28,11 +28,18 @@ import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import { Properties, type Property } from 'views/logic/fieldtypes/FieldType';
 import FieldTypeIcon from 'views/components/sidebar/fields/FieldTypeIcon';
+import getSeriesId from 'components/event-definitions/event-definition-types/getSeriesId';
 
-const formatFunctions = (functions) =>
+type Series = {
+  id: string;
+  type?: string;
+  field?: string | null;
+  strategy?: string;
+  percentile?: number;
+};
+
+const formatFunctions = (functions: Array<string>) =>
   functions.sort(naturalSort).map((fn) => ({ label: `${fn.toLowerCase()}()`, value: fn }));
-
-const getSeriesId = (currentSeries) => `${currentSeries.type}-${currentSeries.field ?? ''}`;
 
 type NumberRefExpressionProps = {
   aggregationFunctions: any[];
@@ -92,17 +99,21 @@ const NumberRefExpression = ({
   validation = {},
 }: NumberRefExpressionProps) => {
   const getSeries = useCallback(
-    (seriesId) => eventDefinition?.config?.series?.find((series) => series.id === seriesId),
+    (seriesId: string): Series | undefined =>
+      eventDefinition?.config?.series?.find((series: Series) => series.id === seriesId),
     [eventDefinition?.config?.series],
   );
 
-  const createSeries = useCallback(() => ({ id: expression.ref }), [expression.ref]);
+  const createSeries = useCallback((): Series => ({ id: expression.ref }), [expression.ref]);
 
-  const getOrCreateSeries = useCallback((seriesId) => getSeries(seriesId) || createSeries(), [createSeries, getSeries]);
+  const getOrCreateSeries = useCallback(
+    (seriesId: string): Series => getSeries(seriesId) || createSeries(),
+    [createSeries, getSeries],
+  );
 
   const handleFieldChange = useCallback(
-    (key, value) => {
-      const series = cloneDeep(eventDefinition?.config?.series);
+    <K extends keyof Series>(key: K, value: Series[K]) => {
+      const series: Array<Series> = cloneDeep(eventDefinition?.config?.series);
       const nextSeries = cloneDeep(getOrCreateSeries(expression.ref));
 
       if (value !== undefined) {
@@ -120,7 +131,7 @@ const NumberRefExpression = ({
       const nextSeriesId = getSeriesId(nextSeries);
       nextSeries.id = nextSeriesId;
 
-      const seriesIndex = series.findIndex((s) => s.id === nextSeries.id);
+      const seriesIndex = series.findIndex((s: Series) => s.id === nextSeries.id);
 
       if (seriesIndex >= 0) {
         series[seriesIndex] = nextSeries;
@@ -141,14 +152,14 @@ const NumberRefExpression = ({
   );
 
   const handleAggregationFunctionChange = useCallback(
-    (nextFunction) => {
+    (nextFunction: string) => {
       handleFieldChange('type', nextFunction);
     },
     [handleFieldChange],
   );
 
   const handleAggregationFieldChange = useCallback(
-    (nextField) => {
+    (nextField: string) => {
       const normalizedField = nextField === '' ? null : nextField;
 
       handleFieldChange('field', normalizedField);
@@ -156,7 +167,7 @@ const NumberRefExpression = ({
     [handleFieldChange],
   );
 
-  const series = getSeries(expression.ref) || {};
+  const series: Partial<Series> = getSeries(expression.ref) || {};
 
   const elements = ['percentage', 'percentile'].includes(series.type) ? 3 : 2;
 

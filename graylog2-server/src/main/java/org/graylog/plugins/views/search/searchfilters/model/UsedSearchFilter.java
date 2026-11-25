@@ -19,6 +19,8 @@ package org.graylog.plugins.views.search.searchfilters.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import io.swagger.v3.oas.annotations.media.DiscriminatorMapping;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.graylog2.contentpacks.ContentPackable;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.NativeEntityConverter;
@@ -35,6 +37,14 @@ import java.util.Map;
         @JsonSubTypes.Type(value = InlineQueryStringSearchFilter.class, name = UsedSearchFilter.INLINE_QUERY_STRING_SEARCH_FILTER),
         @JsonSubTypes.Type(value = ReferencedQueryStringSearchFilter.class, name = UsedSearchFilter.REFERENCED_SEARCH_FILTER),
 })
+@Schema(discriminatorProperty = UsedSearchFilter.TYPE,
+        oneOf = {InlineQueryStringSearchFilter.class, ReferencedQueryStringSearchFilter.class},
+        discriminatorMapping = {
+                @DiscriminatorMapping(value = UsedSearchFilter.INLINE_QUERY_STRING_SEARCH_FILTER,
+                        schema = InlineQueryStringSearchFilter.class),
+                @DiscriminatorMapping(value = UsedSearchFilter.REFERENCED_SEARCH_FILTER,
+                        schema = ReferencedQueryStringSearchFilter.class),
+        })
 public interface UsedSearchFilter extends NativeEntityConverter<UsedSearchFilter>, ContentPackable<UsedSearchFilter> {
 
     String TYPE = "type";

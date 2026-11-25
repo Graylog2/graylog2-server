@@ -50,6 +50,7 @@ const _processViewHooks = (
   query: Query,
   executionState: SearchExecutionState,
   onSuccess: OnSuccess,
+  userTimezone: string | undefined,
 ) => {
   let promise: Promise<readonly [View, SearchExecutionState]>;
 
@@ -58,10 +59,10 @@ const _processViewHooks = (
       const _view = args.view ?? view;
       const _executionState = args.executionState ?? executionState;
 
-      return _processViewHooks(viewHooks, _view, query, _executionState, onSuccess);
+      return _processViewHooks(viewHooks, _view, query, _executionState, onSuccess, userTimezone);
     };
 
-    promise = _chainHooks(viewHooks, { view, retry, query, executionState });
+    promise = _chainHooks(viewHooks, { view, retry, query, executionState, userTimezone });
   } else {
     promise = Promise.resolve([view, executionState] as const);
   }
@@ -80,11 +81,12 @@ const processHooks = (
   executingViewHooks: Array<ViewHook> = [],
   query: Query = {},
   onSuccess: OnSuccess = () => {},
+  userTimezone: string | undefined = undefined,
 ) =>
   promise
-    .then((view: View) => _processViewHooks(loadingViewHooks, view, query, executionState, onSuccess))
+    .then((view: View) => _processViewHooks(loadingViewHooks, view, query, executionState, onSuccess, userTimezone))
     .then(([newView, newExecutionState]) =>
-      _processViewHooks(executingViewHooks, newView, query, newExecutionState, onSuccess),
+      _processViewHooks(executingViewHooks, newView, query, newExecutionState, onSuccess, userTimezone),
     );
 
 export default processHooks;

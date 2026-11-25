@@ -76,7 +76,7 @@ type SubmitError = { status?: number; additional?: { body?: { failed?: boolean }
 type EventNotificationsResult = {
   list: Array<EventNotification>;
   pagination: { total: number };
-  attributes: Array<{ id: string; title: string; sortable: boolean }>;
+  attributes: Array<{ id: string; title: string; sortable?: boolean }>;
 };
 
 // Port of the old EventNotificationsStore `searchPaginated` action.
@@ -127,7 +127,15 @@ export const getEventNotification = (notificationId: string): Promise<EventNotif
 export const createEventNotification = (notification: EventNotification & EntityShare): Promise<unknown> => {
   const { share_request, ...rest } = notification;
 
-  return fetch('POST', eventNotificationsUrl({}), { entity: rest, share_request }).then(
+  return EventsNotifications.create({
+    entity: rest,
+    share_request: share_request
+      ? {
+          selected_collections: share_request.selected_collections,
+          selected_grantee_capabilities: share_request.selected_grantee_capabilities?.toJS(),
+        }
+      : undefined,
+  }).then(
     (response: unknown) => {
       UserNotification.success(
         'Notification created successfully',

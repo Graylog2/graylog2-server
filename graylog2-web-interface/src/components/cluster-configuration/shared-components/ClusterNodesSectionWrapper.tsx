@@ -48,20 +48,22 @@ const TableWrapper = styled.div.withConfig({
   ({ maxHeight }) => css`
     margin-top: ${({ theme }) => `-${theme.spacings.px.xs}px`};
 
-    ${maxHeight &&
-    css`
-      div#scroll-container {
-        max-height: ${maxHeight};
-        overflow-y: auto;
-      }
+    ${
+      maxHeight &&
+      css`
+        div#scroll-container {
+          max-height: ${maxHeight};
+          overflow-y: auto;
+        }
 
-      div#scroll-container table thead {
-        background-color: ${({ theme }) => theme.colors.global.contentBackground};
-        position: sticky;
-        top: 0;
-        z-index: 1;
-      }
-    `}
+        div#scroll-container table thead {
+          background-color: ${({ theme }) => theme.colors.global.contentBackground};
+          position: sticky;
+          top: 0;
+          z-index: 1;
+        }
+      `
+    }
   `,
 );
 

@@ -59,7 +59,7 @@ const StaticSearch = ({ searchJson, viewJson, searchJobResult }: Props) => {
       execute: async () => searchResult,
       parse: async () => searchMetadata,
       resultMapper: (result) => result,
-      cancelJob: () => Promise.resolve(null),
+      cancelJob: () => Promise.resolve(),
       startJob: () => Promise.resolve({ asyncSearchId: '1nbmnbmnb1', nodeId: '222' }),
       executeJobResult: () => Promise.resolve(searchResult),
     }),

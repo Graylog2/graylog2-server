@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { render, screen, within } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { StreamRoutingRules } from '@graylog/server-api';
 
@@ -51,12 +52,12 @@ const listResponse = {
       stage: 1,
       connected_streams: [
         {
-          id: 'stream-id-1',
-          title: 'Stream Title 1',
-        },
-        {
           id: 'stream-id-2',
           title: 'Stream Title 2',
+        },
+        {
+          id: 'stream-id-1',
+          title: 'Stream Title 1',
         },
       ],
     },
@@ -173,14 +174,15 @@ describe('<StreamConnectedPipelines />', () => {
 
     const row = await screen.findByTestId('table-row-test-id-1');
 
-    const rule = await within(row).findByText(/Rule 1/i);
-    const pipeline = await within(row).findByText(/Pipeline 1/i);
-    const connectedStream1 = await within(row).findByText(/Stream Title 1/i);
-    const connectedStream2 = await within(row).findByText(/Stream Title 2/i);
+    await within(row).findByText(/Rule 1/i);
+    await within(row).findByText(/Pipeline 1/i);
+    // Sorted by title, so the first stream is shown although it is connected second.
+    await within(row).findByText(/Stream Title 1/i);
 
-    expect(rule).toBeInTheDocument();
-    expect(pipeline).toBeInTheDocument();
-    expect(connectedStream1).toBeInTheDocument();
-    expect(connectedStream2).toBeInTheDocument();
+    expect(within(row).queryByText(/Stream Title 2/i)).not.toBeInTheDocument();
+
+    await userEvent.click(await within(row).findByRole('button', { name: /show 1 more/i }));
+    await within(row).findByText(/Stream Title 1/i);
+    await within(row).findByText(/Stream Title 2/i);
   });
 });

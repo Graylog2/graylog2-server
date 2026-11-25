@@ -35,13 +35,17 @@ public record MessagesRequestSpec(@JsonProperty("query") String queryString,
                                   @JsonProperty("from") int from,
                                   @JsonProperty("size") int size,
                                   @JsonProperty("fields") List<String> fields,
-                                  @JsonProperty("include_unresolved_ids") boolean includeUnresolvedIds) implements SearchRequestSpec {
+                                  @JsonProperty("include_unresolved_ids") boolean includeUnresolvedIds,
+                                  @JsonProperty("include_document_ids") boolean includeDocumentIds) implements SearchRequestSpec {
 
 
     public static final String DEFAULT_SORT = Message.FIELD_TIMESTAMP;
     public static final SortSpec.Direction DEFAULT_SORT_ORDER = SortSpec.Direction.Descending;
     public static final int DEFAULT_SIZE = 10;
     public static final int DEFAULT_FROM = 0;
+    /** The columns {@link #includeDocumentIds()} adds: the id of each message's document, and its index. */
+    public static final String DOCUMENT_ID = Message.FIELD_ID;
+    public static final String DOCUMENT_INDEX = "_index";
 
     public MessagesRequestSpec {
         if (Strings.isNullOrEmpty(queryString)) {
@@ -71,6 +75,13 @@ public record MessagesRequestSpec(@JsonProperty("query") String queryString,
         if (fields == null) {
             fields = List.of();
         }
+    }
+
+    public MessagesRequestSpec(String queryString, Set<String> streams, Set<String> streamCategories,
+                               TimeRange timerange, String sort, SortSpec.Direction sortOrder, int from, int size,
+                               List<String> fields, boolean includeUnresolvedIds) {
+        this(queryString, streams, streamCategories, timerange, sort, sortOrder, from, size, fields,
+                includeUnresolvedIds, false);
     }
 
     @Deprecated

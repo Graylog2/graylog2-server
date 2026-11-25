@@ -30,7 +30,8 @@ import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import type { FieldTypes } from 'views/components/contexts/FieldTypesContext';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
-import { keySeparator, humanSeparator } from 'views/Constants';
+import { humanSeparator } from 'views/Constants';
+import { splitCompositeKey } from 'views/logic/compositeKey';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import { useIsInteractiveMode } from 'views/components/contexts/InteractiveContext';
 import WidgetRenderingContext from 'views/components/widgets/WidgetRenderingContext';
@@ -82,7 +83,7 @@ const stringLenSort = (s1: string, s2: string) => {
 const columnPivotsToFields = (config: Props['config']) => config?.columnPivots?.flatMap((pivot) => pivot.fields) ?? [];
 
 const labelsWithFields = (value: string, labelFields: Array<string>, fieldTypes: FieldTypes) =>
-  value.split(keySeparator).map((label, idx) => {
+  splitCompositeKey(value).map((label, idx) => {
     const field = labelFields[idx];
     const type = fieldTypes?.currentQuery?.find((fieldType) => fieldType.name === field)?.type ?? FieldType.Unknown;
 

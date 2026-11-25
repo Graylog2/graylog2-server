@@ -21,8 +21,8 @@ type PipelineStage = {
 };
 
 type Pipeline = {
-  title: string;
-  stages: Array<PipelineStage>;
+  title?: string;
+  stages?: Array<PipelineStage>;
 };
 
 const SourceGenerator = {

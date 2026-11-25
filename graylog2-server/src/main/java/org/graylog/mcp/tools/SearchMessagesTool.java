@@ -36,13 +36,7 @@ import org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesReques
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.web.customization.CustomizationConfig;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,14 +44,10 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import static org.graylog2.shared.utilities.StringUtils.f;
-
 public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, TabularResponse> {
     private static final Logger LOG = LoggerFactory.getLogger(SearchMessagesTool.class);
 
     public static String NAME = "search_messages";
-
-    private static final DateTimeFormatter ISO_8601 = ISODateTimeFormat.dateTimeParser().withZoneUTC();
 
     private final ScriptingApiService scriptingApiService;
 
@@ -101,13 +91,14 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
                     parameters.query(),
                     parameters.streams(),
                     parameters.streamCategories(),
-                    timerange(parameters),
+                    McpTimeRanges.timerange(parameters.rangeSeconds(), parameters.from(), parameters.to()),
                     null,
                     parameters.sortOrder(),
                     parameters.offset(),
                     parameters.limit(),
                     parameters.fields(),
-                    parameters.includeUnresolvedIds()
+                    parameters.includeUnresolvedIds(),
+                    parameters.includeDocumentIds()
             );
             // the query engine performs permission checks, so we don't have to do that here.
             final TabularResponse tabularResponse = scriptingApiService.executeQuery(spec, permissionHelper.getSearchUser());
@@ -116,25 +107,6 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
 
         } catch (NoSuchElementException | QueryFailedException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    private static TimeRange timerange(Parameters parameters) {
-        if (parameters.from() == null && parameters.to() == null) {
-            return RelativeRange.create(parameters.rangeSeconds());
-        }
-        if (parameters.from() == null || parameters.to() == null) {
-            throw new IllegalArgumentException("Pass both from and to for an absolute time range, or neither");
-        }
-        return AbsoluteRange.create(parseTimestamp("from", parameters.from()), parseTimestamp("to", parameters.to()));
-    }
-
-    // Accepts ISO 8601 with or without fractional seconds, which callers often omit.
-    private static DateTime parseTimestamp(String name, String value) {
-        try {
-            return ISO_8601.parseDateTime(value);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(f("%s must be an ISO 8601 timestamp, got <%s>", name, value), e);
         }
     }
 
@@ -195,6 +167,11 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
         @DefaultValue("false")
         public abstract boolean includeUnresolvedIds();
 
+        @JsonProperty("include_document_ids")
+        @JsonPropertyDescription("Additionally return the id of each message's document as `_id` and its index as `_index`, which together identify the message.")
+        @DefaultValue("false")
+        public abstract boolean includeDocumentIds();
+
         public static Builder builder() {
             return Builder.create();
         }
@@ -213,7 +190,8 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
                         .offset(0)
                         .rangeSeconds(3600)
                         .sortOrder(SortSpec.Direction.Descending)
-                        .includeUnresolvedIds(false);
+                        .includeUnresolvedIds(false)
+                        .includeDocumentIds(false);
             }
 
             @JsonProperty("query")
@@ -250,6 +228,9 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
 
             @JsonProperty("include_unresolved_ids")
             public abstract Builder includeUnresolvedIds(final boolean includeUnresolvedIds);
+
+            @JsonProperty("include_document_ids")
+            public abstract Builder includeDocumentIds(final boolean includeDocumentIds);
 
             public abstract Parameters build();
         }

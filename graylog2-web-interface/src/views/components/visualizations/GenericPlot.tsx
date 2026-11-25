@@ -26,11 +26,12 @@ import type ColorMapper from 'views/components/visualizations/ColorMapper';
 import { EVENT_COLOR, eventsDisplayName } from 'views/logic/searchtypes/events/EventHandler';
 import { ROOT_FONT_SIZE } from 'theme/constants';
 import getDefaultPlotYLayoutSettings from 'views/components/visualizations/utils/getDefaultPlotYLayoutSettings';
+import getDefaultPlotXLayoutSettings from 'views/components/visualizations/utils/getDefaultPlotXLayoutSettings';
 
 import ChartColorContext from './ChartColorContext';
 
 import { useIsInteractiveMode, useIsReadOnlyMode } from '../contexts/InteractiveContext';
-import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
+import useRenderCompletionCallback from '../widgets/useRenderCompletionCallback';
 
 export type PlotLayout = Layout;
 
@@ -59,12 +60,14 @@ const StyledPlot = styled(Plot)<{ $interactive: boolean }>(
       }
     }
 
-    ${!$interactive &&
-    css`
-      .cursor-pointer {
-        cursor: default !important;
-      }
-    `}
+    ${
+      !$interactive &&
+      css`
+        .cursor-pointer {
+          cursor: default !important;
+        }
+      `
+    }
   `,
 );
 
@@ -175,13 +178,7 @@ const usePlotLayout = (layout: Partial<Layout>) => {
         font: fontSettings,
       },
       yaxis: getDefaultPlotYLayoutSettings(theme),
-      xaxis: {
-        automargin: true,
-        tickfont: fontSettings,
-        title: {
-          font: fontSettings,
-        },
-      },
+      xaxis: getDefaultPlotXLayoutSettings(theme),
     };
 
     const plotLayout = merge({}, defaultLayout, layout);
@@ -271,7 +268,7 @@ const GenericPlot = ({
   );
 
   const plotConfig = useMemo(() => ({ ...defaultPlotConfig, ...config }), [config]);
-  const onRenderComplete = useContext(RenderCompletionCallback);
+  const onRenderComplete = useRenderCompletionCallback();
 
   const _onRelayout = useCallback(
     (axis: Axis) => {

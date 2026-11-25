@@ -33,7 +33,7 @@ import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlot
 import heatmapOnClickPopover from 'views/components/visualizations/heatmap/heatmapOnClickPopover';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { DateType } from 'views/logic/aggregationbuilder/Pivot';
-import { keySeparator } from 'views/Constants';
+import { splitCompositeKey } from 'views/logic/compositeKey';
 import { toDateObject } from 'util/DateTime';
 
 import GenericPlot from '../GenericPlot';
@@ -122,7 +122,7 @@ const _sortColumnKeys = (keys: Array<string>, config: AggregationWidgetConfig) =
     return keys;
   }
 
-  return sortBy(keys, (key) => toDateObject(key.split(keySeparator)[0]).valueOf());
+  return sortBy(keys, (key) => toDateObject(splitCompositeKey(key)[0]).valueOf());
 };
 
 const _formatSeries =
