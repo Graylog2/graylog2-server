@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import useRightSidebar from 'hooks/useRightSidebar';
@@ -28,10 +28,14 @@ import useRightSidebarWidth from './useRightSidebarWidth';
 import SidebarWidthHandle from './SidebarWidthHandle';
 
 // Stacked above a global sidebar like the Assistant, it is as wide as the column, without widening it.
-const Container = styled(SidebarPanel)<{ $stackedHeight: number | undefined }>(
-  ({ $stackedHeight }) => css`
+const Container = styled(SidebarPanel)<{ $stackedHeight: number | undefined; $slidesIn: boolean }>(
+  ({ $stackedHeight, $slidesIn }) => css`
     position: sticky;
     top: 0;
+    ${!$slidesIn &&
+    css`
+      animation: none;
+    `}
 
     ${$stackedHeight !== undefined &&
     css`
@@ -39,12 +43,35 @@ const Container = styled(SidebarPanel)<{ $stackedHeight: number | undefined }>(
       min-width: 0;
       flex-shrink: 0;
       contain: inline-size;
-      animation: none;
       height: ${$stackedHeight}px;
       max-height: calc(100% - ${STACKED_MIN_HEIGHT_BELOW}px);
     `}
   `,
 );
+
+type PanelProps = React.PropsWithChildren<{
+  width: number;
+  stackedHeight: number | undefined;
+  title: string;
+}>;
+
+// Decides when it shows whether it slides in: only next to the page, as the column's width cannot be animated.
+// Deciding once keeps switching between stacked and side by side from replaying the slide, which looked like the
+// sidebar closing and opening again.
+const Panel = ({ width, stackedHeight, title, children = undefined }: PanelProps) => {
+  const [slidesIn] = useState(stackedHeight === undefined);
+
+  return (
+    <Container
+      $width={width}
+      $stackedHeight={stackedHeight}
+      $slidesIn={slidesIn}
+      role="complementary"
+      aria-label={`${title} sidebar`}>
+      {children}
+    </Container>
+  );
+};
 
 const Collapsed = styled(CollapsedSidebar)(
   ({ theme }) => css`
@@ -99,11 +126,7 @@ const RightSidebar = ({ stackedHeight = undefined }: Props) => {
   }
 
   return (
-    <Container
-      $width={width}
-      $stackedHeight={stackedHeight}
-      role="complementary"
-      aria-label={`${content.title} sidebar`}>
+    <Panel width={width} stackedHeight={stackedHeight} title={content.title}>
       {stackedHeight === undefined && <SidebarWidthHandle label="Resize sidebar" />}
       <SidebarPanelHeader
         titleId="sidebar-title"
@@ -132,7 +155,7 @@ const RightSidebar = ({ stackedHeight = undefined }: Props) => {
       <SidebarContentArea aria-labelledby="sidebar-title">
         <ContentComponent {...(content.props || {})} />
       </SidebarContentArea>
-    </Container>
+    </Panel>
   );
 };
 
