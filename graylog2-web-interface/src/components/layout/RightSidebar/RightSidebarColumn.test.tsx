@@ -59,7 +59,7 @@ describe('<RightSidebarColumn />', () => {
             {
               key: 'assistant',
               component: Assistant,
-              useSidebarState: () => ({ isOpen: true, isCollapsed: false }),
+              useVisibility: () => 'expanded' as const,
             },
           ]
         : [],

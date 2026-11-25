@@ -43,7 +43,7 @@ interface PluginNavigationItems {
 }
 
 // What the layout needs to know about a global sidebar.
-type GlobalSidebarState = { isOpen: boolean; isCollapsed: boolean };
+type GlobalSidebarVisibility = 'closed' | 'expanded' | 'collapsed';
 
 interface GlobalNotification {
   key: string;
@@ -482,7 +482,7 @@ declare module 'graylog-web-plugin/plugin' {
       component: React.ComponentType<{ stacked: boolean }>;
       // Called on every render of the layout, for all global sidebars in turn, so plugins must not change while the
       // page runs.
-      useSidebarState?: () => GlobalSidebarState;
+      useVisibility?: () => GlobalSidebarVisibility;
     }>;
     'navigation.badges'?: Array<NavigationBadge>;
     globalNotifications?: Array<GlobalNotification>;

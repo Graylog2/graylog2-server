@@ -17,15 +17,14 @@
 import usePluginEntities from 'hooks/usePluginEntities';
 
 // The plugin entities are fixed for the lifetime of the page, so the hooks are always called in the same order.
-const useGlobalSidebarState = () => {
-  const openSidebars = usePluginEntities('globalSidebars')
-    .map((sidebar) => sidebar.useSidebarState?.())
-    .filter((state) => state?.isOpen);
+const useGlobalSidebarVisibility = () => {
+  const visibilities = usePluginEntities('globalSidebars').map((sidebar) => sidebar.useVisibility?.() ?? 'closed');
 
-  return {
-    isOpen: openSidebars.length > 0,
-    isCollapsed: openSidebars.some(({ isCollapsed }) => isCollapsed),
-  };
+  if (visibilities.includes('collapsed')) {
+    return 'collapsed';
+  }
+
+  return visibilities.includes('expanded') ? 'expanded' : 'closed';
 };
 
-export default useGlobalSidebarState;
+export default useGlobalSidebarVisibility;
