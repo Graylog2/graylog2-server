@@ -92,9 +92,10 @@ type Props = React.PropsWithChildren<{
   // Shown above the title, e.g. that an answer is still running.
   status?: React.ReactNode;
   expandTitle: string;
-  closeTitle: string;
+  closeTitle?: string;
   onExpand: () => void;
-  onClose: () => void;
+  // Without it, e.g. for a sidebar that belongs to its page, the strip only expands.
+  onClose?: () => void;
   className?: string;
   role?: React.AriaRole;
   'aria-label'?: string;
@@ -108,15 +109,15 @@ const CollapsedSidebar = ({
   icon = undefined,
   status = undefined,
   expandTitle,
-  closeTitle,
+  closeTitle = 'Close sidebar',
   onExpand,
-  onClose,
+  onClose = undefined,
   className = undefined,
   role = undefined,
   'aria-label': ariaLabel = undefined,
 }: Props) => (
   <Container className={className} role={role} aria-label={ariaLabel}>
-    <IconButton name="close" title={closeTitle} onClick={onClose} />
+    {onClose && <IconButton name="close" title={closeTitle} onClick={onClose} />}
     {status}
     <ExpandButton type="button" title={expandTitle} onClick={onExpand}>
       <Title>{children}</Title>
