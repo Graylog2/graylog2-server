@@ -61,9 +61,9 @@ public class EmailConfiguration {
 
               password: Authenticate with transport_email_auth_username and transport_email_auth_password.
               oauth2:   Authenticate with an OAuth 2.0 access token (SASL XOAUTH2), obtained with the client credentials
-                        grant using the transport_email_auth_oauth2_* settings. transport_email_auth_username must be set
-                        to the mailbox used for sending. Use this for Microsoft Exchange Online / Microsoft 365, which
-                        no longer accepts basic (password) authentication for SMTP.
+                        grant using the transport_email_auth_oauth2_* settings. Requires transport_email_use_auth = true.
+                        transport_email_auth_username must be set to the mailbox used for sending. Use this for Microsoft
+                        Exchange Online / Microsoft 365, which no longer accepts basic (password) authentication for SMTP.
             """)
     @Parameter(value = "transport_email_auth_method", converter = AuthMethod.Converter.class)
     private AuthMethod authMethod = AuthMethod.PASSWORD;
@@ -222,8 +222,11 @@ public class EmailConfiguration {
     @ValidatorMethod
     @SuppressWarnings("unused")
     public void validateOAuth2() throws ValidationException {
-        if (!isEnabled() || !isUseOAuth2()) {
+        if (!isEnabled() || authMethod != AuthMethod.OAUTH2) {
             return;
+        }
+        if (!isUseAuth()) {
+            throw new ValidationException("transport_email_auth_method = oauth2 requires transport_email_use_auth = true");
         }
         final List<String> missing = new ArrayList<>();
         if (Strings.isNullOrEmpty(getUsername())) {

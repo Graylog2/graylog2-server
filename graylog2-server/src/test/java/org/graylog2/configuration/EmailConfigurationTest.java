@@ -133,13 +133,13 @@ public class EmailConfigurationTest {
     }
 
     @Test
-    public void oauth2RequiresUseAuth() throws ValidationException, RepositoryException {
+    public void validationFailsIfOAuth2IsUsedWithoutUseAuth() {
         final Map<String, String> settings = oauth2Settings();
         settings.put("transport_email_use_auth", "false");
-        final EmailConfiguration emailConfiguration = new EmailConfiguration();
-        new JadConfig(new InMemoryRepository(settings), emailConfiguration).process();
 
-        assertThat(emailConfiguration.isUseOAuth2()).isFalse();
+        assertThatThrownBy(new JadConfig(new InMemoryRepository(settings), new EmailConfiguration())::process)
+                .isInstanceOf(ValidationException.class)
+                .hasMessage("transport_email_auth_method = oauth2 requires transport_email_use_auth = true");
     }
 
     @Test
