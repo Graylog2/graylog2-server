@@ -16,43 +16,31 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
-import type { DefaultTheme } from 'styled-components';
 
 import useRightSidebar from 'hooks/useRightSidebar';
 import usePluginEntities from 'hooks/usePluginEntities';
-import Icon from 'components/common/Icon';
+import useSidebarWidth from 'hooks/useSidebarWidth';
 import IconButton from 'components/common/IconButton';
+import SidebarResizeHandle from 'components/common/SidebarResizeHandle';
 
-import {
-  STACKED_MIN_HEIGHT_BELOW,
-  SidebarContainer,
-  SidebarRow,
-  SidebarContentArea,
-  SidebarHeader,
-  SidebarTitle,
-} from './SidebarStyles';
+import { SIDEBAR_WIDTH, STACKED_MIN_HEIGHT_BELOW, SidebarContentArea, SidebarPanel } from './SidebarStyles';
 import CollapsedSidebar from './CollapsedSidebar';
+import SidebarPanelHeader from './SidebarPanelHeader';
 
 type StackedHeight = number | 'fill';
 
-// Stacked above a global sidebar like the Assistant: as wide as the column, without widening it.
-const stackedStyles = (theme: DefaultTheme) => css`
-  width: auto;
-  min-width: 0;
-  flex-shrink: 0;
-  contain: inline-size;
-  background-color: ${theme.colors.global.contentBackground};
-  border-left: 1px solid ${theme.colors.cards.border};
-`;
-
-const Container = styled(SidebarContainer)<{ $stackedHeight: StackedHeight | undefined }>(
-  ({ theme, $stackedHeight }) => css`
+// Stacked above a global sidebar like the Assistant, it is as wide as the column, without widening it.
+const Container = styled(SidebarPanel)<{ $stackedHeight: StackedHeight | undefined }>(
+  ({ $stackedHeight }) => css`
     position: sticky;
     top: 0;
 
     ${$stackedHeight !== undefined &&
     css`
-      ${stackedStyles(theme)};
+      width: auto;
+      min-width: 0;
+      flex-shrink: 0;
+      contain: inline-size;
       animation: none;
       ${$stackedHeight === 'fill'
         ? css`
@@ -67,38 +55,13 @@ const Container = styled(SidebarContainer)<{ $stackedHeight: StackedHeight | und
   `,
 );
 
-const StackedCollapsedBar = styled(CollapsedSidebar)(
-  ({ theme }) => css`
-    ${stackedStyles(theme)};
-    border-bottom: 1px solid ${theme.colors.cards.border};
-  `,
-);
-
-const NavigationButtons = styled.div`
-  display: flex;
-  gap: 4px;
-  margin-right: 8px;
-`;
-
-const HeaderActions = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 4px;
-`;
-
-const CollapseButton = styled.button(
-  ({ theme }) => css`
-    background: none;
-    border: none;
-    padding: 4px;
-    cursor: pointer;
-    color: ${theme.colors.text.primary};
-    display: flex;
-    align-items: center;
-
-    :hover {
-      color: ${theme.colors.variant.dark.default};
-    }
+const Collapsed = styled(CollapsedSidebar)(
+  ({ theme, orientation }) => css`
+    border-left: 1px solid ${theme.colors.cards.border};
+    ${orientation === 'horizontal' &&
+    css`
+      border-bottom: 1px solid ${theme.colors.cards.border};
+    `}
   `,
 );
 
@@ -111,7 +74,6 @@ type Props = {
 const RightSidebar = ({ stackedHeight = undefined }: Props) => {
   const {
     content,
-    width,
     isCollapsed,
     closeSidebar,
     collapseSidebar,
@@ -122,30 +84,17 @@ const RightSidebar = ({ stackedHeight = undefined }: Props) => {
     canGoForward,
   } = useRightSidebar();
   const sidebarComponents = usePluginEntities('sidebar.components');
+  const [width, setWidth] = useSidebarWidth('right-sidebar.width', SIDEBAR_WIDTH);
+  const stacked = stackedHeight !== undefined;
 
   if (!content) {
     return null;
   }
 
-  if (isCollapsed && stackedHeight !== undefined) {
-    return (
-      <StackedCollapsedBar
-        orientation="horizontal"
-        role="complementary"
-        aria-label={`${content.title} sidebar (collapsed)`}
-        expandTitle="Expand sidebar"
-        closeTitle="Close sidebar"
-        onExpand={expandSidebar}
-        onClose={closeSidebar}>
-        {content.title}
-      </StackedCollapsedBar>
-    );
-  }
-
   if (isCollapsed) {
     return (
-      <CollapsedSidebar
-        orientation="vertical"
+      <Collapsed
+        orientation={stacked ? 'horizontal' : 'vertical'}
         role="complementary"
         aria-label={`${content.title} sidebar (collapsed)`}
         expandTitle="Expand sidebar"
@@ -153,7 +102,7 @@ const RightSidebar = ({ stackedHeight = undefined }: Props) => {
         onExpand={expandSidebar}
         onClose={closeSidebar}>
         {content.title}
-      </CollapsedSidebar>
+      </Collapsed>
     );
   }
 
@@ -170,9 +119,21 @@ const RightSidebar = ({ stackedHeight = undefined }: Props) => {
       $stackedHeight={stackedHeight}
       role="complementary"
       aria-label={`${content.title} sidebar`}>
-      <SidebarRow className="content">
-        <SidebarHeader>
-          <NavigationButtons>
+      {!stacked && (
+        <SidebarResizeHandle
+          side="right"
+          width={width}
+          bounds={SIDEBAR_WIDTH}
+          label="Resize sidebar"
+          onResize={setWidth}
+          onDragPastMin={collapseSidebar}
+        />
+      )}
+      <SidebarPanelHeader
+        titleId="sidebar-title"
+        title={content.title}
+        leading={
+          <>
             <IconButton
               name="arrow_back"
               title="Go back"
@@ -187,23 +148,14 @@ const RightSidebar = ({ stackedHeight = undefined }: Props) => {
               disabled={!canGoForward}
               aria-label="Go forward to next content"
             />
-          </NavigationButtons>
-          <SidebarTitle id="sidebar-title">{content.title}</SidebarTitle>
-          <HeaderActions>
-            <CollapseButton
-              type="button"
-              title="Collapse sidebar"
-              onClick={collapseSidebar}
-              aria-label="Collapse sidebar">
-              <Icon name="collapse_content" />
-            </CollapseButton>
-            <IconButton name="close" title="Close sidebar" onClick={closeSidebar} aria-label="Close sidebar" />
-          </HeaderActions>
-        </SidebarHeader>
-        <SidebarContentArea aria-labelledby="sidebar-title">
-          <ContentComponent {...(content.props || {})} />
-        </SidebarContentArea>
-      </SidebarRow>
+          </>
+        }
+        onCollapse={collapseSidebar}
+        onClose={closeSidebar}
+      />
+      <SidebarContentArea aria-labelledby="sidebar-title">
+        <ContentComponent {...(content.props || {})} />
+      </SidebarContentArea>
     </Container>
   );
 };

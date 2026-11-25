@@ -37,11 +37,9 @@ describe('useRightSidebar', () => {
       expect.objectContaining({
         isOpen: false,
         content: null,
-        width: 400,
         openSidebar: expect.any(Function),
         closeSidebar: expect.any(Function),
         updateContent: expect.any(Function),
-        setWidth: expect.any(Function),
         goBack: expect.any(Function),
         goForward: expect.any(Function),
         canGoBack: false,
@@ -137,20 +135,6 @@ describe('useRightSidebar', () => {
 
     await waitFor(() => {
       expect(result.current.content).toEqual(updatedContent);
-    });
-  });
-
-  it('should update width', async () => {
-    const { result } = renderHook(() => useRightSidebar(), { wrapper: Wrapper });
-
-    expect(result.current.width).toBe(400);
-
-    act(() => {
-      result.current.setWidth(600);
-    });
-
-    await waitFor(() => {
-      expect(result.current.width).toBe(600);
     });
   });
 });

@@ -16,4 +16,13 @@
  */
 export { default } from './RightSidebar';
 export { default as CollapsedSidebar } from './CollapsedSidebar';
-export { SidebarContainer, SidebarRow, SidebarContentArea, SidebarHeader, SidebarTitle } from './SidebarStyles';
+export {
+  SIDEBAR_WIDTH,
+  SidebarContainer,
+  SidebarPanel,
+  SidebarRow,
+  SidebarContentArea,
+  SidebarHeader,
+  SidebarTitle,
+} from './SidebarStyles';
+export { default as SidebarPanelHeader } from './SidebarPanelHeader';

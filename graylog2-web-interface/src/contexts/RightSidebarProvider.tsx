@@ -34,7 +34,6 @@ type HistoryState = {
   currentIndex: number;
   isOpen: boolean;
   isCollapsed: boolean;
-  width: number;
 };
 
 type HistoryAction =
@@ -44,15 +43,13 @@ type HistoryAction =
   | { type: 'EXPAND_SIDEBAR' }
   | { type: 'UPDATE_CONTENT'; content: RightSidebarContent }
   | { type: 'GO_BACK' }
-  | { type: 'GO_FORWARD' }
-  | { type: 'SET_WIDTH'; width: number };
+  | { type: 'GO_FORWARD' };
 
 const initialState: HistoryState = {
   contentHistory: [],
   currentIndex: -1,
   isOpen: false,
   isCollapsed: false,
-  width: 400,
 };
 
 const isSameContent = (content1: RightSidebarContent, content2: RightSidebarContent): boolean => {
@@ -166,13 +163,6 @@ const historyReducer = (state: HistoryState, action: HistoryAction): HistoryStat
       };
     }
 
-    case 'SET_WIDTH': {
-      return {
-        ...state,
-        width: action.width,
-      };
-    }
-
     default:
       return state;
   }
@@ -225,10 +215,6 @@ const RightSidebarProvider = ({ children }: Props) => {
     dispatch({ type: 'UPDATE_CONTENT', content: newContent as RightSidebarContent<any> });
   }, []);
 
-  const setWidth = useCallback((newWidth: number) => {
-    dispatch({ type: 'SET_WIDTH', width: newWidth });
-  }, []);
-
   const goBack = useCallback(() => {
     sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.NAVIGATED_BACK);
     dispatch({ type: 'GO_BACK' });
@@ -244,13 +230,11 @@ const RightSidebarProvider = ({ children }: Props) => {
       isOpen: state.isOpen,
       isCollapsed: state.isCollapsed,
       content,
-      width: state.width,
       openSidebar,
       closeSidebar,
       collapseSidebar,
       expandSidebar,
       updateContent,
-      setWidth,
       goBack,
       goForward,
       canGoBack,
@@ -260,13 +244,11 @@ const RightSidebarProvider = ({ children }: Props) => {
       state.isOpen,
       state.isCollapsed,
       content,
-      state.width,
       openSidebar,
       closeSidebar,
       collapseSidebar,
       expandSidebar,
       updateContent,
-      setWidth,
       goBack,
       goForward,
       canGoBack,

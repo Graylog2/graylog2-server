@@ -31,13 +31,11 @@ export type RightSidebarContextType = {
   isOpen: boolean;
   isCollapsed: boolean;
   content: RightSidebarContent<any> | null;
-  width: number;
   openSidebar: <T = Record<string, unknown>>(content: RightSidebarContent<T>) => void;
   closeSidebar: () => void;
   collapseSidebar: () => void;
   expandSidebar: () => void;
   updateContent: <T = Record<string, unknown>>(content: RightSidebarContent<T>) => void;
-  setWidth: (width: number) => void;
   goBack: () => void;
   goForward: () => void;
   canGoBack: boolean;

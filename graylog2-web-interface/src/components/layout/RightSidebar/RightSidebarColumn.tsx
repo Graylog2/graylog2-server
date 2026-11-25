@@ -24,7 +24,7 @@ import useSidebarWidth from 'hooks/useSidebarWidth';
 import SidebarResizeHandle from 'components/common/SidebarResizeHandle';
 
 import RightSidebar from './RightSidebar';
-import { STACKED_MIN_HEIGHT_BELOW } from './SidebarStyles';
+import { SIDEBAR_WIDTH, STACKED_MIN_HEIGHT_BELOW } from './SidebarStyles';
 import useGlobalSidebarState from './useGlobalSidebarState';
 
 const STACKED_HEIGHT = { initial: 320, min: 120, max: 640 };
@@ -37,11 +37,12 @@ const stackedHeightBounds = (columnHeight: number) =>
 
 // Has no box of its own while the sidebars sit side by side; the same elements in both layouts keep the global
 // sidebars mounted, e.g. so a running answer of the Assistant finishes.
-const Column = styled.div<{ $stacked: boolean }>(({ $stacked }) =>
+const Column = styled.div<{ $stacked: boolean; $width: number }>(({ $stacked, $width }) =>
   $stacked
     ? css`
         position: sticky;
         top: 0;
+        width: ${$width}px;
         flex-shrink: 0;
         align-self: stretch;
         display: flex;
@@ -83,7 +84,7 @@ const GlobalSidebars = () => {
 
 // While a global sidebar is open next to the right sidebar, both share one column, the right sidebar on top. Only one
 // of them is collapsed at a time; the global sidebar takes care of that. Dragging the divider between them far up or
-// down collapses one of them.
+// down collapses one of them. The column then has its own width, which both fill.
 const RightSidebarColumn = () => {
   const { isOpen, isCollapsed, collapseSidebar } = useRightSidebar();
   const globalSidebar = useGlobalSidebarState();
@@ -91,6 +92,7 @@ const RightSidebarColumn = () => {
   const { height: columnHeight } = useElementDimensions(columnRef);
   const bounds = stackedHeightBounds(columnHeight);
   const [storedHeight, setStackedHeight] = useSidebarWidth('right-sidebar.stacked-height', bounds);
+  const [width, setWidth] = useSidebarWidth('right-sidebar.stacked-width', SIDEBAR_WIDTH);
   // The stored height can exceed what a smaller window leaves.
   const stackedHeight = Math.min(storedHeight, bounds.max);
   const stacked = isOpen && globalSidebar.isOpen;
@@ -98,7 +100,16 @@ const RightSidebarColumn = () => {
   const detailsHeight = isGlobalSidebarCollapsed ? 'fill' : stackedHeight;
 
   return (
-    <Column ref={columnRef} $stacked={stacked}>
+    <Column ref={columnRef} $stacked={stacked} $width={width}>
+      {stacked && (
+        <SidebarResizeHandle
+          side="right"
+          width={width}
+          bounds={SIDEBAR_WIDTH}
+          label="Resize sidebars"
+          onResize={setWidth}
+        />
+      )}
       {isOpen && <RightSidebar stackedHeight={stacked ? detailsHeight : undefined} />}
       {stacked && !isCollapsed && !isGlobalSidebarCollapsed && (
         <SidebarResizeHandle
