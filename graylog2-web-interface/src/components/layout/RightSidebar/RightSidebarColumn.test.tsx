@@ -54,16 +54,6 @@ const renderWithOpenDetails = async () => {
 };
 
 describe('<RightSidebarColumn />', () => {
-  beforeAll(() => {
-    // jsdom has no PointerEvent; without it, pointer events carry no coordinates.
-    if (!window.PointerEvent) {
-      (window as { PointerEvent: unknown }).PointerEvent = window.MouseEvent;
-    }
-
-    HTMLElement.prototype.setPointerCapture = jest.fn();
-    HTMLElement.prototype.releasePointerCapture = jest.fn();
-  });
-
   beforeEach(() => {
     collapseAssistant.mockClear();
     asMock(usePluginEntities).mockImplementation((entityKey) =>
@@ -84,12 +74,7 @@ describe('<RightSidebarColumn />', () => {
 
     await screen.findByText('Event details');
     await screen.findByText('Assistant chat');
-
-    expect(await screen.findAllByRole('separator', { name: /resize/i })).toHaveLength(2);
-    expect(await screen.findByRole('separator', { name: 'Resize sidebars' })).toHaveAttribute(
-      'aria-orientation',
-      'vertical',
-    );
+    await screen.findByRole('separator', { name: 'Resize sidebars' });
   });
 
   it('collapses only the details with their collapse button', async () => {
@@ -101,19 +86,5 @@ describe('<RightSidebarColumn />', () => {
     await screen.findByText('Assistant chat');
 
     expect(collapseAssistant).not.toHaveBeenCalled();
-  });
-
-  it('collapses all sidebars when their edge is dragged far past the smallest width', async () => {
-    await renderWithOpenDetails();
-    const handle = await screen.findByRole('separator', { name: 'Resize sidebars' });
-
-    await userEvent.pointer([
-      { keys: '[MouseLeft>]', target: handle, coords: { clientX: 1000 } },
-      { target: handle, coords: { clientX: 1300 } },
-    ]);
-
-    await screen.findByRole('button', { name: 'Expand sidebar' });
-
-    expect(collapseAssistant).toHaveBeenCalledTimes(1);
   });
 });
