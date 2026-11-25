@@ -25,7 +25,6 @@ import SidebarResizeHandle from 'components/common/SidebarResizeHandle';
 
 import RightSidebar from './RightSidebar';
 import { COLLAPSED_SIDEBAR_ORDER, STACKED_MIN_HEIGHT_BELOW } from './SidebarStyles';
-import SidebarLayoutContext from './SidebarLayoutContext';
 import useGlobalSidebarState from './useGlobalSidebarState';
 import SidebarWidthHandle from './SidebarWidthHandle';
 
@@ -79,13 +78,13 @@ const GlobalSidebarSlot = styled.div<{ $stacked: boolean; $collapsed: boolean }>
 });
 
 // Sidebars shown next to every page, e.g. the Assistant's chat, which stays open across pages.
-const GlobalSidebars = () => {
+const GlobalSidebars = ({ stacked }: { stacked: boolean }) => {
   const sidebars = usePluginEntities('globalSidebars');
 
   return (
     <>
       {sidebars.map(({ key, component: Sidebar }) => (
-        <Sidebar key={key} />
+        <Sidebar key={key} stacked={stacked} />
       ))}
     </>
   );
@@ -105,24 +104,22 @@ const RightSidebarColumn = () => {
   const stacked = isOpen && !isCollapsed && globalSidebar.isOpen && !globalSidebar.isCollapsed;
 
   return (
-    <SidebarLayoutContext.Provider value={{ stacked }}>
-      <Column ref={columnRef} $stacked={stacked}>
-        {stacked && <SidebarWidthHandle label="Resize sidebars" />}
-        {isOpen && <RightSidebar stackedHeight={stacked ? stackedHeight : undefined} />}
-        {stacked && (
-          <SidebarResizeHandle
-            side="top"
-            size={stackedHeight}
-            bounds={bounds}
-            label="Resize sidebar"
-            onResize={setStackedHeight}
-          />
-        )}
-        <GlobalSidebarSlot $stacked={stacked} $collapsed={globalSidebar.isCollapsed}>
-          <GlobalSidebars />
-        </GlobalSidebarSlot>
-      </Column>
-    </SidebarLayoutContext.Provider>
+    <Column ref={columnRef} $stacked={stacked}>
+      {stacked && <SidebarWidthHandle label="Resize sidebars" />}
+      {isOpen && <RightSidebar stackedHeight={stacked ? stackedHeight : undefined} />}
+      {stacked && (
+        <SidebarResizeHandle
+          side="top"
+          size={stackedHeight}
+          bounds={bounds}
+          label="Resize sidebar"
+          onResize={setStackedHeight}
+        />
+      )}
+      <GlobalSidebarSlot $stacked={stacked} $collapsed={globalSidebar.isCollapsed}>
+        <GlobalSidebars stacked={stacked} />
+      </GlobalSidebarSlot>
+    </Column>
   );
 };
 

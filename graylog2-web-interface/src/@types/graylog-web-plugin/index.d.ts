@@ -478,7 +478,8 @@ declare module 'graylog-web-plugin/plugin' {
     // column with the right sidebar, below it.
     globalSidebars?: Array<{
       key: string;
-      component: React.ComponentType;
+      // `stacked` while it shares a column with the right sidebar, which then has the resize handle.
+      component: React.ComponentType<{ stacked: boolean }>;
       // Called on every render of the layout, for all global sidebars in turn, so plugins must not change while the
       // page runs.
       useSidebarState?: () => GlobalSidebarState;
