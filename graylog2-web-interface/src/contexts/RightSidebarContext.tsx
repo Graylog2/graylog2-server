@@ -27,11 +27,16 @@ type RightSidebarContentBase<T = Record<string, unknown>> = {
 export type RightSidebarContent<T = Record<string, unknown>> = RightSidebarContentBase<T> &
   ({ component: React.ComponentType<T>; componentKey?: never } | { componentKey: string; component?: never });
 
+// `slideIn: false` e.g. for a sidebar a page opens while it loads, which then is already there.
+export type OpenSidebarOptions = { slideIn?: boolean };
+
 export type RightSidebarContextType = {
   isOpen: boolean;
   isCollapsed: boolean;
+  // Whether the sidebar slides in when it shows; not when a page opened it while loading.
+  slidesIn: boolean;
   content: RightSidebarContent<any> | null;
-  openSidebar: <T = Record<string, unknown>>(content: RightSidebarContent<T>) => void;
+  openSidebar: <T = Record<string, unknown>>(content: RightSidebarContent<T>, options?: OpenSidebarOptions) => void;
   closeSidebar: () => void;
   collapseSidebar: () => void;
   expandSidebar: () => void;

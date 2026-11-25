@@ -51,21 +51,23 @@ const Container = styled(SidebarPanel)<{ $stackedHeight: number | undefined; $sl
 
 type PanelProps = React.PropsWithChildren<{
   width: number;
+  slidesIn: boolean;
   stackedHeight: number | undefined;
   title: string;
 }>;
 
-// Decides when it shows whether it slides in: only next to the page, as the column's width cannot be animated.
+// Decides when it shows whether it slides in: only next to the page, as the column's width cannot be animated, and not
+// when a page opened it while loading.
 // Deciding once keeps switching between stacked and side by side from replaying the slide, which looked like the
 // sidebar closing and opening again.
-const Panel = ({ width, stackedHeight, title, children = undefined }: PanelProps) => {
-  const [slidesIn] = useState(stackedHeight === undefined);
+const Panel = ({ width, slidesIn, stackedHeight, title, children = undefined }: PanelProps) => {
+  const [slides] = useState(slidesIn && stackedHeight === undefined);
 
   return (
     <Container
       $width={width}
       $stackedHeight={stackedHeight}
-      $slidesIn={slidesIn}
+      $slidesIn={slides}
       role="complementary"
       aria-label={`${title} sidebar`}>
       {children}
@@ -89,6 +91,7 @@ const RightSidebar = ({ stackedHeight = undefined }: Props) => {
   const {
     content,
     isCollapsed,
+    slidesIn,
     closeSidebar,
     collapseSidebar,
     expandSidebar,
@@ -126,7 +129,7 @@ const RightSidebar = ({ stackedHeight = undefined }: Props) => {
   }
 
   return (
-    <Panel width={width} stackedHeight={stackedHeight} title={content.title}>
+    <Panel width={width} slidesIn={slidesIn} stackedHeight={stackedHeight} title={content.title}>
       {stackedHeight === undefined && <SidebarWidthHandle label="Resize sidebar" />}
       <SidebarPanelHeader
         titleId="sidebar-title"
