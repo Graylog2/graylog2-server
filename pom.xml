@@ -249,7 +249,7 @@
         <graalvm.version>25.5.5.0.3</graalvm.version>
 
         <!-- Nodejs dependencies -->
-        <nodejs.version>v24.13.0</nodejs.version>
+        <nodejs.version>v24.22.3</nodejs.version>
         <yarn.version>v1.22.22</yarn.version>
 
         <!-- Plugin versions -->
