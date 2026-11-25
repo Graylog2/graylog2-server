@@ -19,13 +19,13 @@ import styled, { css } from 'styled-components';
 
 import useRightSidebar from 'hooks/useRightSidebar';
 import usePluginEntities from 'hooks/usePluginEntities';
-import useSidebarWidth from 'hooks/useSidebarWidth';
 import IconButton from 'components/common/IconButton';
 import SidebarResizeHandle from 'components/common/SidebarResizeHandle';
 
 import { SIDEBAR_WIDTH, STACKED_MIN_HEIGHT_BELOW, SidebarContentArea, SidebarPanel } from './SidebarStyles';
 import CollapsedSidebar from './CollapsedSidebar';
 import SidebarPanelHeader from './SidebarPanelHeader';
+import useRightSidebarWidth from './useRightSidebarWidth';
 
 type StackedHeight = number | 'fill';
 
@@ -84,7 +84,7 @@ const RightSidebar = ({ stackedHeight = undefined }: Props) => {
     canGoForward,
   } = useRightSidebar();
   const sidebarComponents = usePluginEntities('sidebar.components');
-  const [width, setWidth] = useSidebarWidth('right-sidebar.width', SIDEBAR_WIDTH);
+  const [width, setWidth] = useRightSidebarWidth();
   const stacked = stackedHeight !== undefined;
 
   if (!content) {
@@ -119,16 +119,14 @@ const RightSidebar = ({ stackedHeight = undefined }: Props) => {
       $stackedHeight={stackedHeight}
       role="complementary"
       aria-label={`${content.title} sidebar`}>
-      {!stacked && (
-        <SidebarResizeHandle
-          side="right"
-          width={width}
-          bounds={SIDEBAR_WIDTH}
-          label="Resize sidebar"
-          onResize={setWidth}
-          onDragPastMin={collapseSidebar}
-        />
-      )}
+      <SidebarResizeHandle
+        side="right"
+        width={width}
+        bounds={SIDEBAR_WIDTH}
+        label="Resize sidebar"
+        onResize={setWidth}
+        onDragPastMin={collapseSidebar}
+      />
       <SidebarPanelHeader
         titleId="sidebar-title"
         title={content.title}

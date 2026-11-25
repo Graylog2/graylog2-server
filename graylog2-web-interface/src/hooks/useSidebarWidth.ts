@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useState } from 'react';
+import { useSyncExternalStore } from 'react';
 
 import Store from 'logic/local-storage/Store';
 
@@ -23,35 +23,49 @@ export type SidebarBounds = { initial: number; min: number; max: number };
 export const clampWidth = (width: number, { min, max }: SidebarBounds) =>
   Math.min(max, Math.max(min, Math.round(width)));
 
-// Storage can be unavailable, e.g. in private windows; the sidebar then starts at its initial width.
-const storedWidth = (storageKey: string, bounds: SidebarBounds) => {
+// Used while local storage is unavailable, e.g. in private windows, so a width lasts until the page is reloaded.
+const unstoredWidths = new Map<string, number>();
+const listeners = new Map<string, Set<() => void>>();
+
+const storedWidth = (storageKey: string) => {
   try {
     const width = Store.get<number>(storageKey);
 
-    return typeof width === 'number' && Number.isFinite(width) ? clampWidth(width, bounds) : bounds.initial;
+    return typeof width === 'number' && Number.isFinite(width) ? width : undefined;
   } catch {
-    return bounds.initial;
+    return unstoredWidths.get(storageKey);
   }
 };
 
+const storeWidth = (storageKey: string, width: number) => {
+  try {
+    Store.set(storageKey, width);
+  } catch {
+    unstoredWidths.set(storageKey, width);
+  }
+
+  listeners.get(storageKey)?.forEach((listener) => listener());
+};
+
+const subscribe = (storageKey: string) => (listener: () => void) => {
+  const keyListeners = listeners.get(storageKey) ?? new Set<() => void>();
+  keyListeners.add(listener);
+  listeners.set(storageKey, keyListeners);
+
+  return () => {
+    keyListeners.delete(listener);
+  };
+};
+
 /**
- * The width of a resizable sidebar, kept in the browser's local storage under `storageKey`.
+ * The width of a resizable sidebar, kept in the browser's local storage under `storageKey`. Sidebars using the same
+ * key share their width.
  */
 const useSidebarWidth = (storageKey: string, bounds: SidebarBounds) => {
-  const [width, setWidthState] = useState(() => storedWidth(storageKey, bounds));
+  const width = useSyncExternalStore(subscribe(storageKey), () => storedWidth(storageKey));
+  const setWidth = (next: number) => storeWidth(storageKey, clampWidth(next, bounds));
 
-  const setWidth = (next: number) => {
-    const clamped = clampWidth(next, bounds);
-    setWidthState(clamped);
-
-    try {
-      Store.set(storageKey, clamped);
-    } catch {
-      // The width then only lasts until the page is reloaded.
-    }
-  };
-
-  return [width, setWidth] as const;
+  return [clampWidth(width ?? bounds.initial, bounds), setWidth] as const;
 };
 
 export default useSidebarWidth;

@@ -26,3 +26,4 @@ export {
   SidebarTitle,
 } from './SidebarStyles';
 export { default as SidebarPanelHeader } from './SidebarPanelHeader';
+export { default as useRightSidebarWidth } from './useRightSidebarWidth';

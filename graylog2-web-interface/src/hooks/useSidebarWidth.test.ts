@@ -36,6 +36,15 @@ describe('useSidebarWidth', () => {
     expect(renderHook(() => useSidebarWidth(STORAGE_KEY, BOUNDS)).result.current[0]).toBe(300);
   });
 
+  it('shares the width between sidebars with the same key', () => {
+    const { result: first } = renderHook(() => useSidebarWidth(STORAGE_KEY, BOUNDS));
+    const { result: second } = renderHook(() => useSidebarWidth(STORAGE_KEY, BOUNDS));
+
+    act(() => first.current[1](320));
+
+    expect(second.current[0]).toBe(320);
+  });
+
   it('keeps widths within the bounds', () => {
     const { result } = renderHook(() => useSidebarWidth(STORAGE_KEY, BOUNDS));
 
