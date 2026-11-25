@@ -460,6 +460,20 @@ public abstract class MessageInput implements Stoppable {
 
             return r;
         }
+
+        /**
+         * @see Transport.Config#withNewInputDefaults(Map)
+         */
+        public Map<String, Object> withNewInputDefaults(Map<String, Object> configuration) {
+            return transportConfig.withNewInputDefaults(configuration);
+        }
+
+        /**
+         * @see Transport.Config#withStoredInputDefaults(Map)
+         */
+        public Map<String, Object> withStoredInputDefaults(Map<String, Object> configuration) {
+            return transportConfig.withStoredInputDefaults(configuration);
+        }
     }
 
     public boolean supportsSetupMode() {

@@ -124,7 +124,7 @@ public class InputServiceImpl implements InputService {
     @Override
     public List<Input> all() {
         final ImmutableList.Builder<Input> result = ImmutableList.builder();
-        collection.find().forEach(result::add);
+        collection.find().forEach(e -> result.add(withStoredInputDefaults(e)));
 
         return result.build();
     }
@@ -140,7 +140,7 @@ public class InputServiceImpl implements InputService {
                 .sort(order.toBsonSort(sortField))
                 .filter(searchQuery)
                 .page(page, filter);
-        final List<Input> inputs = new ArrayList<>(pagedListResponse.stream().map(this::withEncryptedFields).toList());
+        final List<Input> inputs = new ArrayList<>(pagedListResponse.stream().map(this::withStoredInputDefaults).toList());
         return new PaginatedList<>(inputs, pagedListResponse.pagination().total(), pagedListResponse.pagination().page(), pagedListResponse.pagination().perPage());
     }
 
@@ -150,7 +150,7 @@ public class InputServiceImpl implements InputService {
         collection.find(or(
                 eq(MessageInput.FIELD_NODE_ID, nodeId),
                 eq(MessageInput.FIELD_GLOBAL, true)
-        )).forEach(e -> result.add(withEncryptedFields(e)));
+        )).forEach(e -> result.add(withStoredInputDefaults(e)));
 
         return result.build();
     }
@@ -158,7 +158,7 @@ public class InputServiceImpl implements InputService {
     @Override
     public List<Input> allByType(final String type) {
         final ImmutableList.Builder<Input> result = ImmutableList.builder();
-        collection.find(eq(MessageInput.FIELD_TYPE, type)).forEach(e -> result.add(withEncryptedFields(e)));
+        collection.find(eq(MessageInput.FIELD_TYPE, type)).forEach(e -> result.add(withStoredInputDefaults(e)));
 
         return result.build();
     }
@@ -178,7 +178,7 @@ public class InputServiceImpl implements InputService {
     @Override
     public Set<Input> findByIds(Collection<String> ids) {
         final Set<Input> result = new HashSet<>();
-        mongoUtils.getByIds(ids).forEach(e -> result.add(withEncryptedFields(e)));
+        mongoUtils.getByIds(ids).forEach(e -> result.add(withStoredInputDefaults(e)));
 
         return result;
     }
@@ -197,7 +197,7 @@ public class InputServiceImpl implements InputService {
         boolean isNew = (inputId == null || inputId.isBlank());
 
         if (isNew) {
-            inputId = MongoUtils.insertedIdAsString(collection.insertOne(input));
+            inputId = MongoUtils.insertedIdAsString(collection.insertOne(withNewInputDefaults(input)));
         } else {
             collection.replaceOne(MongoUtils.idEq(inputId), input);
         }
@@ -304,7 +304,7 @@ public class InputServiceImpl implements InputService {
 
         final InputImpl input = mongoUtils.getById(id)
                 .orElseThrow(() -> new NotFoundException("Couldn't find input " + id));
-        return withEncryptedFields(input);
+        return withStoredInputDefaults(input);
     }
 
     @Override
@@ -705,27 +705,54 @@ public class InputServiceImpl implements InputService {
         this.clusterEventBus.post(event);
     }
 
-    private Set<String> getEncryptedFields(String type) {
-        return messageInputFactory.getConfig(type)
-                .map(EncryptedInputConfigs::getEncryptedFields)
-                .orElse(Set.of());
+    /**
+     * Applies the input type's defaults for new inputs to the configuration of a newly created input.
+     *
+     * @see MessageInput.Config#withNewInputDefaults(Map)
+     */
+    private InputImpl withNewInputDefaults(InputImpl input) {
+        final Map<String, Object> originalConfig = input.getConfiguration();
+        if (originalConfig == null) {
+            return input;
+        }
+        final Map<String, Object> newConfig = messageInputFactory.getConfig(input.getType())
+                .map(config -> config.withNewInputDefaults(originalConfig))
+                .orElse(originalConfig);
+        return newConfig == originalConfig ? input : input.toBuilder().setConfiguration(newConfig).build();
     }
 
-    private InputImpl withEncryptedFields(InputImpl input) {
+    /**
+     * Prepares the configuration of a persisted input for callers: converts encrypted values to
+     * {@link EncryptedValue} and applies the input type's defaults for persisted inputs.
+     * The persisted document is not modified.
+     *
+     * @see MessageInput.Config#withStoredInputDefaults(Map)
+     */
+    private InputImpl withStoredInputDefaults(InputImpl input) {
         if (input == null) {
             return null;
-        }
-        final Set<String> encryptedFields = getEncryptedFields(input.getType());
-        if (encryptedFields.isEmpty()) {
-            return input;
         }
         final Map<String, Object> originalConfig = input.getConfiguration();
         if (originalConfig == null || originalConfig.isEmpty()) {
             return input;
         }
+        final Optional<MessageInput.Config> inputConfig = messageInputFactory.getConfig(input.getType());
+        if (inputConfig.isEmpty()) {
+            return input;
+        }
+
+        final Map<String, Object> newConfig = inputConfig.get().withStoredInputDefaults(
+                withEncryptedValues(input.getId(), originalConfig, EncryptedInputConfigs.getEncryptedFields(inputConfig.get())));
+        return newConfig == originalConfig ? input : input.toBuilder().setConfiguration(newConfig).build();
+    }
+
+    private Map<String, Object> withEncryptedValues(String inputId, Map<String, Object> config, Set<String> encryptedFields) {
+        if (encryptedFields.isEmpty()) {
+            return config;
+        }
 
         boolean modified = false;
-        final Map<String, Object> newConfig = new HashMap<>(originalConfig);
+        final Map<String, Object> newConfig = new HashMap<>(config);
         for (String field : encryptedFields) {
             final Object raw = newConfig.get(field);
             if (raw != null && !(raw instanceof EncryptedValue)) {
@@ -734,11 +761,11 @@ public class InputServiceImpl implements InputService {
                     newConfig.put(field, ev);
                     modified = true;
                 } catch (IllegalArgumentException e) {
-                    LOG.warn("Failed to convert field '{}' to EncryptedValue for input '{}': {}", field, input.getId(), e.getMessage());
+                    LOG.warn("Failed to convert field '{}' to EncryptedValue for input '{}': {}", field, inputId, e.getMessage());
                 }
             }
         }
-        return modified ? input.toBuilder().setConfiguration(newConfig).build() : input;
+        return modified ? newConfig : config;
     }
 
     @Override

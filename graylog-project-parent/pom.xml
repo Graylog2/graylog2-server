@@ -206,6 +206,14 @@
                 <groupId>com.rabbitmq</groupId>
                 <artifactId>amqp-client</artifactId>
                 <version>${amqp-client.version}</version>
+                <exclusions>
+                    <!-- Netty is only used by the Netty IO mode, which Graylog doesn't use. (blocking IO) -->
+                    <!-- Excluded to avoid upper bound conflicts with the Netty version Graylog manages. -->
+                    <exclusion>
+                        <groupId>io.netty</groupId>
+                        <artifactId>*</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>

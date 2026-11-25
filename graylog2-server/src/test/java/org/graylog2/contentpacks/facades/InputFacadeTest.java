@@ -22,7 +22,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 import com.google.common.graph.Graph;
+import com.mongodb.client.model.Filters;
 import org.apache.commons.collections.map.HashedMap;
+import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -38,6 +41,7 @@ import org.graylog2.contentpacks.model.entities.GrokPatternEntity;
 import org.graylog2.contentpacks.model.entities.InputEntity;
 import org.graylog2.contentpacks.model.entities.LookupTableEntity;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
+import org.graylog2.contentpacks.model.entities.references.ReferenceMap;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.contentpacks.model.entities.references.ValueType;
@@ -53,18 +57,22 @@ import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputImpl;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.InputServiceImpl;
+import org.graylog2.inputs.codecs.RawCodec;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
 import org.graylog2.inputs.extractors.GrokExtractor;
 import org.graylog2.inputs.extractors.LookupTableExtractor;
 import org.graylog2.inputs.misc.jsonpath.JsonPathInput;
 import org.graylog2.inputs.random.FakeHttpMessageInput;
+import org.graylog2.inputs.raw.amqp.RawAMQPInput;
 import org.graylog2.inputs.raw.udp.RawUDPInput;
+import org.graylog2.inputs.transports.AmqpTransport;
 import org.graylog2.lookup.LookupTableService;
 import org.graylog2.lookup.db.DBLookupTableService;
 import org.graylog2.lookup.dto.LookupTableDto;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.ServerStatus;
+import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -94,9 +102,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -104,6 +117,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class InputFacadeTest {
+    private static final String AMQP_INPUT_TYPE = RawAMQPInput.class.getCanonicalName();
+    private static final String LEGACY_AMQP_INPUT_ID = "6a1e00000000000000000001";
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
@@ -598,5 +613,84 @@ public class InputFacadeTest {
         entities.put(entityDescriptor, expectedEntity);
         Graph<Entity> graph = facade.resolveForInstallation(entity, Collections.emptyMap(), entities);
         assertThat(graph.nodes()).contains(expectedEntity);
+    }
+
+    @Test
+    public void createNativeEntityForAmqpInputWithoutTlsVerificationSettingEnablesVerification(MongoCollections mongoCollections) throws Exception {
+        setUpAmqpInputType();
+        final Map<String, Object> configuration = amqpInputConfiguration();
+
+        final NativeEntity<InputWithExtractors> nativeEntity = facade.createNativeEntity(
+                amqpInputEntity(ReferenceMapUtils.toReferenceMap(configuration)), Collections.emptyMap(), Collections.emptyMap(), "username");
+
+        assertThat(persistedConfiguration(mongoCollections, nativeEntity.entity().input().getId()))
+                .containsEntry(AmqpTransport.CK_TLS_VERIFICATION_ENABLED, true);
+    }
+
+    @Test
+    @MongoDBFixtures("org/graylog2/inputs/amqp-tls-verification-inputs.json")
+    public void exportedAmqpInputWithoutTlsVerificationSettingKeepsVerificationDisabledWhenInstalled(MongoCollections mongoCollections) throws Exception {
+        setUpAmqpInputType();
+        final EntityDescriptor descriptor = EntityDescriptor.create(ModelId.of(LEGACY_AMQP_INPUT_ID), ModelTypes.INPUT_V1);
+
+        final Entity exported = facade.exportEntity(descriptor, EntityDescriptorIds.of(descriptor)).orElseThrow(AssertionError::new);
+
+        final InputEntity inputEntity = objectMapper.convertValue(((EntityV1) exported).data(), InputEntity.class);
+        assertThat(inputEntity.configuration())
+                .containsEntry(AmqpTransport.CK_TLS_VERIFICATION_ENABLED, ValueReference.of(false));
+
+        final NativeEntity<InputWithExtractors> installed = facade.createNativeEntity(
+                exported, Collections.emptyMap(), Collections.emptyMap(), "username");
+
+        assertThat(persistedConfiguration(mongoCollections, installed.entity().input().getId()))
+                .containsEntry(AmqpTransport.CK_TLS_VERIFICATION_ENABLED, false);
+    }
+
+    private void setUpAmqpInputType() throws Exception {
+        final AmqpTransport.Factory transportFactory = mock(AmqpTransport.Factory.class);
+        when(transportFactory.getConfig()).thenReturn(new AmqpTransport.Config());
+        final RawCodec.Factory codecFactory = mock(RawCodec.Factory.class);
+        when(codecFactory.getConfig()).thenReturn(new RawCodec.Config());
+        when(messageInputFactory.getConfig(AMQP_INPUT_TYPE))
+                .thenReturn(Optional.of(new RawAMQPInput.Config(transportFactory, codecFactory)));
+
+        final MessageInput messageInput = mock(MessageInput.class);
+        final AtomicReference<String> persistId = new AtomicReference<>();
+        doAnswer(invocation -> {
+            persistId.set(invocation.getArgument(0));
+            return null;
+        }).when(messageInput).setPersistId(anyString());
+        when(messageInput.getPersistId()).thenAnswer(invocation -> persistId.get());
+        when(messageInputFactory.create(eq(AMQP_INPUT_TYPE), any(Configuration.class))).thenReturn(messageInput);
+    }
+
+    private static Map<String, Object> amqpInputConfiguration() {
+        final Map<String, Object> configuration = new HashMap<>();
+        configuration.put(AmqpTransport.CK_HOSTNAME, "rabbitmq.example.com");
+        configuration.put(AmqpTransport.CK_PORT, 5671);
+        configuration.put(AmqpTransport.CK_TLS, true);
+        return configuration;
+    }
+
+    private Entity amqpInputEntity(ReferenceMap configuration) {
+        return EntityV1.builder()
+                .id(ModelId.of(UUID.randomUUID().toString()))
+                .type(ModelTypes.INPUT_V1)
+                .data(objectMapper.convertValue(InputEntity.create(
+                        ValueReference.of("AMQP input"),
+                        configuration,
+                        Collections.emptyMap(),
+                        ValueReference.of(AMQP_INPUT_TYPE),
+                        ValueReference.of(true),
+                        Collections.emptyList()), JsonNode.class))
+                .build();
+    }
+
+    private static Map<String, Object> persistedConfiguration(MongoCollections mongoCollections, String id) {
+        final Document document = mongoCollections.nonEntityCollection(InputServiceImpl.COLLECTION_NAME, Document.class)
+                .find(Filters.eq("_id", new ObjectId(id)))
+                .first();
+        assertThat(document).isNotNull();
+        return document.get(MessageInput.FIELD_CONFIGURATION, Document.class);
     }
 }

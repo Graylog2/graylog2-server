@@ -18,6 +18,7 @@ package org.graylog2.inputs.transports;
 
 import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricSet;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -68,6 +69,7 @@ import static org.graylog2.inputs.transports.AmqpTransport.CK_QUEUE_DECLARE_PASS
 import static org.graylog2.inputs.transports.AmqpTransport.CK_REQUEUE_INVALID_MESSAGES;
 import static org.graylog2.inputs.transports.AmqpTransport.CK_ROUTING_KEY;
 import static org.graylog2.inputs.transports.AmqpTransport.CK_TLS;
+import static org.graylog2.inputs.transports.AmqpTransport.CK_TLS_VERIFICATION_ENABLED;
 import static org.graylog2.inputs.transports.AmqpTransport.CK_USERNAME;
 import static org.graylog2.inputs.transports.AmqpTransport.CK_VHOST;
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -95,6 +97,7 @@ public class AmqpConsumer {
     private final MessageInput sourceInput;
     private final int parallelQueues;
     private final boolean tls;
+    private final boolean tlsVerificationEnabled;
     private final InputFailureRecorder inputFailureRecorder;
     private final AmqpTransport amqpTransport;
     private final EncryptedValueService encryptedValueService;
@@ -134,6 +137,8 @@ public class AmqpConsumer {
         this.parallelQueues = configuration.getInt(CK_PARALLEL_QUEUES);
         this.requeueInvalid = configuration.getBoolean(CK_REQUEUE_INVALID_MESSAGES);
         this.tls = configuration.getBoolean(CK_TLS);
+        // Inputs created before the setting existed don't have it and must keep their behavior.
+        this.tlsVerificationEnabled = configuration.getBoolean(CK_TLS_VERIFICATION_ENABLED, false);
         this.heartbeatTimeout = heartbeatTimeout;
         this.sourceInput = sourceInput;
         this.inputFailureRecorder = inputFailureRecorder;
@@ -252,12 +257,7 @@ public class AmqpConsumer {
         factory.setSharedExecutor(executorService);
 
         if (tls) {
-            try {
-                LOG.info("Enabling TLS for AMQP input {}.", sourceInput.toIdentifier());
-                factory.useSslProtocol();
-            } catch (NoSuchAlgorithmException | KeyManagementException e) {
-                throw new IOException("Couldn't enable TLS for AMQP input.", e);
-            }
+            configureTls(factory);
         }
 
         // Authenticate?
@@ -289,6 +289,22 @@ public class AmqpConsumer {
         });
     }
 
+
+    @VisibleForTesting
+    void configureTls(ConnectionFactory factory) throws IOException {
+        try {
+            if (tlsVerificationEnabled) {
+                LOG.info("Enabling TLS with certificate verification for AMQP input {}.", sourceInput.toIdentifier());
+                factory.useSslProtocol();
+            } else {
+                LOG.warn("Enabling TLS WITHOUT certificate verification for AMQP input {}. This is insecure! " +
+                        "Enable the \"Verify TLS certificate\" setting of the input to verify the broker certificate.", sourceInput.toIdentifier());
+                factory.useTlsWithNoVerification();
+            }
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
+            throw new IOException("Couldn't enable TLS for AMQP input.", e);
+        }
+    }
 
     public void stop() throws IOException {
         if (channel != null && channel.isOpen()) {

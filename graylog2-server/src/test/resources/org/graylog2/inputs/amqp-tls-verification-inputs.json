@@ -1,0 +1,96 @@
+{
+  "inputs": [
+    {
+      "_id": {
+        "$oid": "6a1e00000000000000000001"
+      },
+      "creator_user_id": "admin",
+      "configuration": {
+        "broker_hostname": "rabbitmq.example.com",
+        "broker_port": 5671,
+        "broker_vhost": "/",
+        "prefetch": 100,
+        "queue": "log-messages",
+        "exchange": "log-messages",
+        "routing_key": "#",
+        "parallel_queues": 1,
+        "tls": true
+      },
+      "created_at": {
+        "$date": "2025-01-01T00:00:00.000Z"
+      },
+      "global": true,
+      "type": "org.graylog2.inputs.raw.amqp.RawAMQPInput",
+      "title": "AMQP input created before the verification setting existed",
+      "content_pack": null
+    },
+    {
+      "_id": {
+        "$oid": "6a1e00000000000000000002"
+      },
+      "creator_user_id": "admin",
+      "configuration": {
+        "broker_hostname": "rabbitmq.example.com",
+        "broker_port": 5671,
+        "broker_vhost": "/",
+        "prefetch": 100,
+        "queue": "log-messages",
+        "exchange": "log-messages",
+        "routing_key": "#",
+        "parallel_queues": 1,
+        "tls": true,
+        "tls_verification_enabled": null
+      },
+      "created_at": {
+        "$date": "2025-01-01T00:00:00.000Z"
+      },
+      "global": true,
+      "type": "org.graylog2.inputs.raw.amqp.RawAMQPInput",
+      "title": "AMQP input with null verification setting",
+      "content_pack": null
+    },
+    {
+      "_id": {
+        "$oid": "6a1e00000000000000000003"
+      },
+      "creator_user_id": "admin",
+      "configuration": {
+        "broker_hostname": "rabbitmq.example.com",
+        "broker_port": 5671,
+        "broker_vhost": "/",
+        "prefetch": 100,
+        "queue": "log-messages",
+        "exchange": "log-messages",
+        "routing_key": "#",
+        "parallel_queues": 1,
+        "tls": true,
+        "tls_verification_enabled": true
+      },
+      "created_at": {
+        "$date": "2026-12-01T00:00:00.000Z"
+      },
+      "global": true,
+      "type": "org.graylog2.inputs.raw.amqp.RawAMQPInput",
+      "title": "AMQP input with verification enabled",
+      "content_pack": null
+    },
+    {
+      "_id": {
+        "$oid": "6a1e00000000000000000004"
+      },
+      "creator_user_id": "admin",
+      "configuration": {
+        "bind_address": "127.0.0.1",
+        "port": 5555,
+        "tls_enable": false
+      },
+      "created_at": {
+        "$date": "2025-01-01T00:00:00.000Z"
+      },
+      "global": true,
+      "type": "org.graylog2.inputs.raw.tcp.RawTCPInput",
+      "title": "Non-AMQP input",
+      "content_pack": null
+    }
+  ]
+}

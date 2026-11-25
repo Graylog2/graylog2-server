@@ -197,6 +197,8 @@ public class InputServiceImplTest {
         when(messageInputFactory.getConfig("test type")).thenReturn(Optional.of(
                 inputConfig
         ));
+        when(inputConfig.withNewInputDefaults(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(inputConfig.withStoredInputDefaults(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         final EncryptedValue secret = encryptedValueService.encrypt("secret");
         final EncryptedValue secret2 = encryptedValueService.encrypt("secret2");

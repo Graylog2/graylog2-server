@@ -48,6 +48,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -71,6 +73,7 @@ public class AmqpTransport extends ThrottleableTransport2 {
     public static final String CK_ROUTING_KEY = "routing_key";
     public static final String CK_PARALLEL_QUEUES = "parallel_queues";
     public static final String CK_TLS = "tls";
+    public static final String CK_TLS_VERIFICATION_ENABLED = "tls_verification_enabled";
     public static final String CK_REQUEUE_INVALID_MESSAGES = "requeue_invalid_messages";
     public static final String CK_HEARTBEAT_TIMEOUT = "heartbeat";
     public static final String CK_CONNECTION_RECOVERY_INTERVAL = "connection_recovery_interval";
@@ -422,6 +425,18 @@ public class AmqpTransport extends ThrottleableTransport2 {
 
             cr.addField(
                     new BooleanField(
+                            CK_TLS_VERIFICATION_ENABLED,
+                            "Verify TLS certificate",
+                            true,
+                            "Verify the broker certificate against the JVM trust store and check that it matches the broker hostname. " +
+                                    "Requires the hostname or IP address to be listed in the certificate. " +
+                                    "Disabling verification is insecure. " +
+                                    "Inputs created before this setting existed keep verification disabled."
+                    )
+            );
+
+            cr.addField(
+                    new BooleanField(
                             CK_REQUEUE_INVALID_MESSAGES,
                             "Re-queue invalid messages?",
                             true,
@@ -439,6 +454,32 @@ public class AmqpTransport extends ThrottleableTransport2 {
             );
 
             return cr;
+        }
+
+        /**
+         * New inputs verify the TLS certificate unless the configuration explicitly disables it.
+         */
+        @Override
+        public Map<String, Object> withNewInputDefaults(Map<String, Object> configuration) {
+            return withDefaultTlsVerification(configuration, true);
+        }
+
+        /**
+         * Inputs created before the {@link #CK_TLS_VERIFICATION_ENABLED} setting existed don't verify the TLS
+         * certificate, to keep them working with brokers that use certificates that can't be verified.
+         */
+        @Override
+        public Map<String, Object> withStoredInputDefaults(Map<String, Object> configuration) {
+            return withDefaultTlsVerification(configuration, false);
+        }
+
+        private static Map<String, Object> withDefaultTlsVerification(Map<String, Object> configuration, boolean value) {
+            if (configuration == null || configuration.get(CK_TLS_VERIFICATION_ENABLED) != null) {
+                return configuration;
+            }
+            final Map<String, Object> result = new HashMap<>(configuration);
+            result.put(CK_TLS_VERIFICATION_ENABLED, value);
+            return result;
         }
 
         protected String defaultRoutingKey() {
