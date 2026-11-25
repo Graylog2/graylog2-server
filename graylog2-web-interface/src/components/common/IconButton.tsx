@@ -27,11 +27,13 @@ import type { BsSize } from 'components/bootstrap/types';
 
 const Wrapper = styled(Button)<{ disabled: boolean }>(
   ({ theme, disabled, bsStyle }) => css`
-    ${bsStyle === 'transparent' &&
-    css`
-      padding: 0 3px;
-      color: ${disabled ? theme.colors.gray[90] : theme.colors.gray[60]};
-    `}
+    ${
+      bsStyle === 'transparent' &&
+      css`
+        padding: 0 3px;
+        color: ${disabled ? theme.colors.gray[90] : theme.colors.gray[60]};
+      `
+    }
   `,
 );
 

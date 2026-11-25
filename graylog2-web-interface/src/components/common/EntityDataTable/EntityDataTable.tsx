@@ -95,12 +95,14 @@ const ScrollContainer = styled.div<{
     ${$actionsHeaderWidth ? cssVariable(actionsHeaderWidthVar, `${$actionsHeaderWidth}px`) : ''}
     ${$canScrollRight ? cssVariable(displayScrollRightIndicatorVar, 'block') : ''}
     ${$scrollContainerWidth ? cssVariable(scrollContainerWidthVar, `${$scrollContainerWidth}px`) : ''}
-    ${$activeColId
-      ? css`
-          ${cssVariable(columnOpacityVar($activeColId), 0.4)}
-          ${cssVariable(columnTransition(), 'transform 0.2s ease-in-out')}
-        `
-      : ''}
+    ${
+      $activeColId
+        ? css`
+            ${cssVariable(columnOpacityVar($activeColId), 0.4)}
+            ${cssVariable(columnTransition(), 'transform 0.2s ease-in-out')}
+          `
+        : ''
+    }
   `,
 );
 

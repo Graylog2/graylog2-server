@@ -68,23 +68,27 @@ export const ThInner = styled.div<{
     position: relative;
     padding: ${CELL_PADDING_HEADER};
 
-    ${!$isResizingAnyColumn &&
-    css`
-      &:hover .header-action {
-        opacity: 1;
-      }
-    `}
+    ${
+      !$isResizingAnyColumn &&
+      css`
+        &:hover .header-action {
+          opacity: 1;
+        }
+      `
+    }
 
     /* pointer, not grab, below: a plain click opens the actions menu, which is the more common
        interaction, so the cursor hints at that instead of the (still available) drag-to-reorder. */
-    ${$isDraggable &&
-    css`
-      cursor: ${$isDragging ? 'grabbing' : 'pointer'};
+    ${
+      $isDraggable &&
+      css`
+        cursor: ${$isDragging ? 'grabbing' : 'pointer'};
 
-      &:focus-visible .header-action {
-        opacity: 1;
-      }
-    `}
+        &:focus-visible .header-action {
+          opacity: 1;
+        }
+      `
+    }
   `,
 );
 
@@ -102,13 +106,15 @@ export const IndicatorCol = styled.div`
 
 const ActiveSliceIcon = styled(Icon)<{ $isRightAligned?: boolean }>(
   ({ theme, $isRightAligned }) => css`
-    ${$isRightAligned
-      ? css`
-          margin-right: ${theme.spacings.xs};
-        `
-      : css`
-          margin-left: ${theme.spacings.xs};
-        `}
+    ${
+      $isRightAligned
+        ? css`
+            margin-right: ${theme.spacings.xs};
+          `
+        : css`
+            margin-left: ${theme.spacings.xs};
+          `
+    }
     color: ${theme.colors.gray[20]};
   `,
 );
