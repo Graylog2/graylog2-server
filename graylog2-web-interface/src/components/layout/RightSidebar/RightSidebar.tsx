@@ -59,8 +59,17 @@ type Props = {
 };
 
 const RightSidebar = ({ stackedHeight = undefined }: Props) => {
-  const { content, isCollapsed, closeSidebar, expandSidebar, goBack, goForward, canGoBack, canGoForward } =
-    useRightSidebar();
+  const {
+    content,
+    isCollapsed,
+    closeSidebar,
+    collapseSidebar,
+    expandSidebar,
+    goBack,
+    goForward,
+    canGoBack,
+    canGoForward,
+  } = useRightSidebar();
   const sidebarComponents = usePluginEntities('sidebar.components');
   const [width, setWidth] = useRightSidebarWidth();
   const collapseSidebars = useCollapseSidebars();
@@ -125,7 +134,7 @@ const RightSidebar = ({ stackedHeight = undefined }: Props) => {
             />
           </>
         }
-        onCollapse={collapseSidebars}
+        onCollapse={collapseSidebar}
         onClose={closeSidebar}
       />
       <SidebarContentArea aria-labelledby="sidebar-title">
