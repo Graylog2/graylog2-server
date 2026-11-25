@@ -22,7 +22,13 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import IconButton from 'components/common/IconButton';
 import SidebarResizeHandle from 'components/common/SidebarResizeHandle';
 
-import { SIDEBAR_WIDTH, STACKED_MIN_HEIGHT_BELOW, SidebarContentArea, SidebarPanel } from './SidebarStyles';
+import {
+  COLLAPSED_SIDEBAR_ORDER,
+  SIDEBAR_WIDTH,
+  STACKED_MIN_HEIGHT_BELOW,
+  SidebarContentArea,
+  SidebarPanel,
+} from './SidebarStyles';
 import CollapsedSidebar from './CollapsedSidebar';
 import SidebarPanelHeader from './SidebarPanelHeader';
 import useRightSidebarWidth from './useRightSidebarWidth';
@@ -49,6 +55,7 @@ const Container = styled(SidebarPanel)<{ $stackedHeight: number | undefined }>(
 
 const Collapsed = styled(CollapsedSidebar)(
   ({ theme }) => css`
+    order: ${COLLAPSED_SIDEBAR_ORDER};
     border-left: 1px solid ${theme.colors.cards.border};
   `,
 );

@@ -24,7 +24,7 @@ import useSidebarWidth from 'hooks/useSidebarWidth';
 import SidebarResizeHandle from 'components/common/SidebarResizeHandle';
 
 import RightSidebar from './RightSidebar';
-import { STACKED_MIN_HEIGHT_BELOW } from './SidebarStyles';
+import { COLLAPSED_SIDEBAR_ORDER, STACKED_MIN_HEIGHT_BELOW } from './SidebarStyles';
 import useGlobalSidebarState from './useGlobalSidebarState';
 
 const STACKED_HEIGHT = { initial: 320, min: 120, max: 640 };
@@ -53,17 +53,28 @@ const Column = styled.div<{ $stacked: boolean }>(({ $stacked }) =>
       `,
 );
 
-const GlobalSidebarSlot = styled.div<{ $stacked: boolean }>(({ $stacked }) =>
-  $stacked
-    ? css`
-        flex: 1;
-        min-height: 0;
-        display: flex;
-      `
-    : css`
-        display: contents;
-      `,
-);
+// A collapsed global sidebar needs a box of its own to move after the open sidebars.
+const GlobalSidebarSlot = styled.div<{ $stacked: boolean; $collapsed: boolean }>(({ $stacked, $collapsed }) => {
+  if ($stacked) {
+    return css`
+      flex: 1;
+      min-height: 0;
+      display: flex;
+    `;
+  }
+
+  if ($collapsed) {
+    return css`
+      order: ${COLLAPSED_SIDEBAR_ORDER};
+      flex-shrink: 0;
+      display: flex;
+    `;
+  }
+
+  return css`
+    display: contents;
+  `;
+});
 
 // Sidebars shown next to every page, e.g. the Assistant's chat, which stays open across pages.
 const GlobalSidebars = () => {
@@ -104,7 +115,7 @@ const RightSidebarColumn = () => {
           onResize={setStackedHeight}
         />
       )}
-      <GlobalSidebarSlot $stacked={stacked}>
+      <GlobalSidebarSlot $stacked={stacked} $collapsed={globalSidebar.isCollapsed}>
         <GlobalSidebars />
       </GlobalSidebarSlot>
     </Column>
