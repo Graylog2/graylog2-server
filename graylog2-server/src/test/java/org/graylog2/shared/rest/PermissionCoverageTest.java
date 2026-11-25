@@ -26,6 +26,7 @@ import org.apache.shiro.authz.annotation.RequiresGuest;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.assertj.core.groups.Tuple;
 import org.glassfish.jersey.server.model.Resource;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.shared.rest.PermissionCoverage.Declaration;
 import org.graylog2.shared.rest.PermissionCoverage.Endpoint;
 import org.junit.jupiter.api.Test;
@@ -198,6 +199,7 @@ class PermissionCoverageTest {
         }
 
         @DELETE
+        @NoAuditEvent("Test")
         @Path("{id}")
         public void undeclared(@PathParam("id") String id) {
         }
@@ -212,6 +214,7 @@ class PermissionCoverageTest {
         }
 
         @POST
+        @NoAuditEvent("Test")
         @NoPermissionCheckRequired(value = Exemption.ANY_AUTHENTICATED_USER, reason = "Returns static data.")
         public String create() {
             return "";
@@ -230,6 +233,7 @@ class PermissionCoverageTest {
     @Path("/fixture/double")
     public static class DoubleFixture {
         @PUT
+        @NoAuditEvent("Test")
         @RequiresPermissions("fixture:edit")
         @InlinePermissionCheck("fixture:edit")
         public String both() {
