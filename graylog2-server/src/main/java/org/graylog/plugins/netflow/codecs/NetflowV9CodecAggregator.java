@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -143,7 +144,7 @@ public class NetflowV9CodecAggregator implements RemoteAddressCodecAggregator {
             if (!rawNetFlowV9Packet.templates().isEmpty() || rawNetFlowV9Packet.optionTemplate() != null) {
                 final Set<Integer> knownTemplateIds = new HashSet<>();
                 for (TemplateKey templateKey : templateCache.asMap().keySet()) {
-                    if (templateKey.getRemoteAddress() == remoteAddress && templateKey.getSourceId() == sourceId) {
+                    if (Objects.equals(templateKey.getRemoteAddress(), remoteAddress) && templateKey.getSourceId() == sourceId) {
                         final Integer templateId = templateKey.getTemplateId();
                         knownTemplateIds.add(templateId);
                     }

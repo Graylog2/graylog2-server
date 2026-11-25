@@ -68,13 +68,15 @@ public class DefaultFailureHandlerTest {
         when(indexable2.getId()).thenReturn("msg-2");
         when(indexable2.getTimestamp()).thenReturn(ts);
 
+        final DateTime failedAt = ts.plusHours(1);
+
         final IndexingFailure indexingFailure1 = new IndexingFailure(
                 IndexingFailureCause.MappingError, "indexingFailureMessage1",
-                "indexingFailureDetails1", Tools.nowUTC(), indexable1, "index1");
+                "indexingFailureDetails1", failedAt, indexable1, "index1");
 
         final IndexingFailure indexingFailure2 = new IndexingFailure(
                 IndexingFailureCause.MappingError, "indexingFailureMessage2",
-                "indexingFailureDetails2", Tools.nowUTC(), indexable2, "index2");
+                "indexingFailureDetails2", failedAt, indexable2, "index2");
 
         final FailureBatch indexingFailureBatch = FailureBatch.indexingFailureBatch(ImmutableList.of(indexingFailure1, indexingFailure2));
 
@@ -89,7 +91,7 @@ public class DefaultFailureHandlerTest {
                         arg.asMap().get("index").equals("index1") &&
                         arg.asMap().get("type").equals("indexing") &&
                         arg.asMap().get("message").equals("indexingFailureDetails1") &&
-                        arg.asMap().get("timestamp") != null
+                        arg.asMap().get("timestamp").equals(Tools.getISO8601String(failedAt))
                 ));
 
         verify(indexFailureService, times(1)).saveWithoutValidation(argThat(arg ->
@@ -97,7 +99,7 @@ public class DefaultFailureHandlerTest {
                         arg.asMap().get("index").equals("index2") &&
                         arg.asMap().get("type").equals("indexing") &&
                         arg.asMap().get("message").equals("indexingFailureDetails2") &&
-                        arg.asMap().get("timestamp") != null
+                        arg.asMap().get("timestamp").equals(Tools.getISO8601String(failedAt))
         ));
     }
 }

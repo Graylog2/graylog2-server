@@ -19,7 +19,7 @@ import React from 'react';
 import RelativeTime from 'components/common/RelativeTime';
 
 type Props = {
-  indexRange: { calculated_at: string; took_ms: number } | undefined;
+  indexRange: { calculated_at?: string; took_ms: number } | undefined;
 };
 
 const IndexRangeSummary = ({ indexRange }: Props) => {

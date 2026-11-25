@@ -1,0 +1,8 @@
+type = "f"
+message = "Use theme colors for the grid lines of line, area, bar and scatter charts."
+
+details.user = """
+In dark mode, the vertical grid lines were bright light gray and the horizontal ones almost black. Both now use the same subtle theme color, and the zero line is slightly stronger.
+"""
+
+pulls = ["28311"]

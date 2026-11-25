@@ -31,6 +31,8 @@ const QuickJumpModalContainer = () => {
     actionKey: 'show-quick-jump-modal',
     callback: () => setShowQuickJumpModal(true),
     scope: 'general',
+    // `event.key` of the space key is ' ', so `mod+space` only matches by code.
+    options: { useKey: false },
   });
 
   return (

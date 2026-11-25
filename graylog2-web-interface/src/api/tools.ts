@@ -163,8 +163,8 @@ export const testRegex = (
   regex: string;
   string: string;
   matched: boolean;
-  match: {
-    match: string;
+  match?: {
+    match?: string;
   };
 }> => {
   const promise = ToolsRegexTester.testRegex({
@@ -190,8 +190,8 @@ export const testRegexReplace = (
   replace_all: boolean;
   string: string;
   matched: boolean;
-  match: {
-    match: string;
+  match?: {
+    match?: string;
   };
 }> => {
   const payload = {

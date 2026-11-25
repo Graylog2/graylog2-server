@@ -374,6 +374,8 @@ export const TELEMETRY_EVENT_TYPE = {
     CHANGE_FOR_INDEX_CHANGED: 'Index Set Field Type Profile Change For Index Changed',
     CHANGE_FOR_INDEX_REMOVED: 'Index Set Field Type Profile Change For Index Removed',
     CREATE_PROFILE_FROM_SELECTED_RAN: 'Index Set Field Type Profile Create From Selected Ran',
+    DUPLICATE_RAN: 'Index Set Field Type Profile Duplicate Ran',
+    IMPORT_RAN: 'Index Set Field Type Profile Import Ran',
   },
   INDEX_SET_TEMPLATE: {
     NEW_OPENED: 'Index Set Template Create Opened',

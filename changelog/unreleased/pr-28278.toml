@@ -1,0 +1,4 @@
+type = "c"
+message = "Speed up Data Node startup by writing all OpenSearch keystore secrets in one step instead of one at a time."
+
+pulls = ["28278"]

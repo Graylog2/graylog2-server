@@ -2136,100 +2136,100 @@
   resolved "https://registry.yarnpkg.com/@openfonts/ubuntu-mono_latin/-/ubuntu-mono_latin-1.44.1.tgz#cbb8f3d820c6fee419699724654c2d4b4e0da9b8"
   integrity sha512-yqSfwLAwBk9gpmVBC/LjcJGuJA2RsgYopLOhueHZDrwhxhnaWwgBOtjWiLYKeAhH0qDyoMh/q8DJJ9e2VxA0yA==
 
-"@oxfmt/binding-android-arm-eabi@0.47.0":
-  version "0.47.0"
-  resolved "https://registry.npmjs.org/@oxfmt/binding-android-arm-eabi/-/binding-android-arm-eabi-0.47.0.tgz#5516a2c695e6d45829b2c98a01d9528b0b6e61a0"
-  integrity sha512-KrMQRdMi/upr81qT4ijK6X6BNp6jqpMY7FwILQnwIy9QLc3qpnhUx5rsCLGzn4ewsCQ0CNAspN2ogmP1GXLyLw==
+"@oxfmt/binding-android-arm-eabi@0.80.0":
+  version "0.80.0"
+  resolved "https://registry.npmjs.org/@oxfmt/binding-android-arm-eabi/-/binding-android-arm-eabi-0.80.0.tgz#a14420a694bec365d47c32801d868ac4c30a7026"
+  integrity sha512-IKgbKL684l/0zb1yAIr7YkqmUsZmO6O02ELkb+78SLFsDJAJxCtPtLypHGUGNpeOrsdIHXIZMxYGo/9QYSHuhg==
 
-"@oxfmt/binding-android-arm64@0.47.0":
-  version "0.47.0"
-  resolved "https://registry.npmjs.org/@oxfmt/binding-android-arm64/-/binding-android-arm64-0.47.0.tgz#85ea358f46a73f2485343fe12c5223fdb50c069d"
-  integrity sha512-r4ixS/PeUpAFKgrpDoZ5pSkthjZzVzKd95525Aazj+aOv9H4ulK5zYHGb7wFY5n5kZxHK8TbOJUZgoEb1ohddQ==
+"@oxfmt/binding-android-arm64@0.80.0":
+  version "0.80.0"
+  resolved "https://registry.npmjs.org/@oxfmt/binding-android-arm64/-/binding-android-arm64-0.80.0.tgz#9bb9f947bb7b51f9866a9e537557cb497a3f6041"
+  integrity sha512-fGqMAgBeKlE1CsnpKNuIlahJmJgYxLrOiwacsYdqK0fv8hu7flDAQN0MTa5joCoc0gfLV/RJKAKp0b6FsODGYQ==
 
-"@oxfmt/binding-darwin-arm64@0.47.0":
-  version "0.47.0"
-  resolved "https://registry.npmjs.org/@oxfmt/binding-darwin-arm64/-/binding-darwin-arm64-0.47.0.tgz#90c757ac8d87b4ede92965aec61eac94e47ff6dd"
-  integrity sha512-CLWxiKpMl+195cm09CuaWEhJK0CirRkoMa07aR9+9AFPat2LfIKtwx1JqxZM0MTvcMe6+adlJNdVL6jdInvq3g==
+"@oxfmt/binding-darwin-arm64@0.80.0":
+  version "0.80.0"
+  resolved "https://registry.npmjs.org/@oxfmt/binding-darwin-arm64/-/binding-darwin-arm64-0.80.0.tgz#f0cdcb744b47779c1858c5a01fe0c073ceedf919"
+  integrity sha512-6EyFZdBrB+86OK/C4CqqqRwRPnp/sLxzFf1vWg8Ghd369zAyNLkxAu9JMXnzkXoW491j7X7cRNs/ayuFs7hMwg==
 
-"@oxfmt/binding-darwin-x64@0.47.0":
-  version "0.47.0"
-  resolved "https://registry.npmjs.org/@oxfmt/binding-darwin-x64/-/binding-darwin-x64-0.47.0.tgz#1ebcf47ed790e31441e73ecaeee441f6ab0fe0fb"
-  integrity sha512-Xq5fjTYDC50faUeLSm0rZdBqoTgleXEdD7NpJdARtQIczkCJn3xNjMUSQQkUmh4CtxkKTNL68lytcOK3e/osgg==
+"@oxfmt/binding-darwin-x64@0.80.0":
+  version "0.80.0"
+  resolved "https://registry.npmjs.org/@oxfmt/binding-darwin-x64/-/binding-darwin-x64-0.80.0.tgz#9526a261c4784e41e7a6abf6fead1e3c490932c9"
+  integrity sha512-ZZEKe4O/3qrRTYcMWVBpfBN3+ANDwwEGt5FijDw4Q31zqXDj8WXfnytWsTGu0sh3nJ7tLbIzypY+oYRCfb9ffg==
 
-"@oxfmt/binding-freebsd-x64@0.47.0":
-  version "0.47.0"
-  resolved "https://registry.npmjs.org/@oxfmt/binding-freebsd-x64/-/binding-freebsd-x64-0.47.0.tgz#99eaea7abd9ba897b697eabcffc1c475e78cb6b7"
-  integrity sha512-QOU9ZIJ52p5askcEC0QJvvr8trHAWoonul8bgISo6gYUL3s50zkqafBYcNAr9LJZQbsZtPfIWHk9+5+nUp1qJQ==
+"@oxfmt/binding-freebsd-x64@0.80.0":
+  version "0.80.0"
+  resolved "https://registry.npmjs.org/@oxfmt/binding-freebsd-x64/-/binding-freebsd-x64-0.80.0.tgz#cbd3655d3a6db0076518dfd4f02e289a7fc259a4"
+  integrity sha512-yBTHy84SOBhag+A/KRMp0vctB0t5Vn6PjlVHfYWpqzWhWgvgktzdFplTSSV8Lu9oXY4Xr8EU+01N88J1S2tNCg==
 
-"@oxfmt/binding-linux-arm-gnueabihf@0.47.0":
-  version "0.47.0"
-  resolved "https://registry.npmjs.org/@oxfmt/binding-linux-arm-gnueabihf/-/binding-linux-arm-gnueabihf-0.47.0.tgz#9166b54e49e3311f1337ed085ddea7884def2762"
-  integrity sha512-oJxDM1aBhPvz9gmElBv8UpxyiqhwfjcbrSxT5F0xtuUzY6dQI27/AQPIt3eu3Z5Yvn0kQl5R7MA3Z+MbnRvCBw==
+"@oxfmt/binding-linux-arm-gnueabihf@0.80.0":
+  version "0.80.0"
+  resolved "https://registry.npmjs.org/@oxfmt/binding-linux-arm-gnueabihf/-/binding-linux-arm-gnueabihf-0.80.0.tgz#0defe49416f14b35bde8e257387b74c04960426b"
+  integrity sha512-HwSZYzbNF04nwduBcn0KZZ2kwnCuzEf8hCfsZ4bkRbDIzjIjhTsI6O3l+0sIKpU2F718szvkEfVPMkIksZ/NYQ==
 
-"@oxfmt/binding-linux-arm-musleabihf@0.47.0":
-  version "0.47.0"
-  resolved "https://registry.npmjs.org/@oxfmt/binding-linux-arm-musleabihf/-/binding-linux-arm-musleabihf-0.47.0.tgz#665bd22db9a926533e1c22354a6f516a1151ecac"
-  integrity sha512-g8Lh50VS4ibGz2q6v7r9UZY4D0dM16SdrFYOMzhqIoCwGcai8VMIRUAcqn1/jlCsOOzUXJ741+kCeJt0cofakQ==
+"@oxfmt/binding-linux-arm-musleabihf@0.80.0":
+  version "0.80.0"
+  resolved "https://registry.npmjs.org/@oxfmt/binding-linux-arm-musleabihf/-/binding-linux-arm-musleabihf-0.80.0.tgz#95711cd8f89c1eda2e7eed99522ef3ab2a5c3a1f"
+  integrity sha512-rVPpw9dRTiBLgxdfySNhKihMTPy1SPb1+y+EDrVK0aUj/k8pm51zTANKfFr9bMgVxcDuGO227QwzZRhT0WQcHQ==
 
-"@oxfmt/binding-linux-arm64-gnu@0.47.0":
-  version "0.47.0"
-  resolved "https://registry.npmjs.org/@oxfmt/binding-linux-arm64-gnu/-/binding-linux-arm64-gnu-0.47.0.tgz#b6f1a0c40557397ec4ad79727bae16636c76c411"
-  integrity sha512-YrNT1vQ0asaXoRbrvYENPqmBfOQ9Xr8enPNOULeYfg44VjCcrUowFy5QZr+WawE0zyP8cH9e9Gxxg0fDEFzhcg==
+"@oxfmt/binding-linux-arm64-gnu@0.80.0":
+  version "0.80.0"
+  resolved "https://registry.npmjs.org/@oxfmt/binding-linux-arm64-gnu/-/binding-linux-arm64-gnu-0.80.0.tgz#9336f7a6344550dab562d1d9074caa1ac0958228"
+  integrity sha512-1yZ3eWD9X2TcwpMt/SaQjlclyZqVVmBNh+62svgGBRZJIzWz4EIBq0ZMj5Unn20gzm3y9OLEnWdmJ4b9/izmLw==
 
-"@oxfmt/binding-linux-arm64-musl@0.47.0":
-  version "0.47.0"
-  resolved "https://registry.npmjs.org/@oxfmt/binding-linux-arm64-musl/-/binding-linux-arm64-musl-0.47.0.tgz#9617da44d91b4bb0a679ec1504eb0aa0c919fbb1"
-  integrity sha512-IxtQC/sbBi4ubbY+MdwdanRWrG9InQJVZqyMsBa5IUaQcnSg86gQme574HxXMC1p4bo4YhV99zQ+wNnGCvEgzw==
+"@oxfmt/binding-linux-arm64-musl@0.80.0":
+  version "0.80.0"
+  resolved "https://registry.npmjs.org/@oxfmt/binding-linux-arm64-musl/-/binding-linux-arm64-musl-0.80.0.tgz#bf382f8f2e1e97ee2172e59c5c23cb16d7d6d1f3"
+  integrity sha512-FTCv1p32lqfXNmicCXvluPACYrqqMChrI4bVJWh8UrvwlaxO9YkF3toLu6MaESav0e3X/GA7BkK2c7wyok7qyQ==
 
-"@oxfmt/binding-linux-ppc64-gnu@0.47.0":
-  version "0.47.0"
-  resolved "https://registry.npmjs.org/@oxfmt/binding-linux-ppc64-gnu/-/binding-linux-ppc64-gnu-0.47.0.tgz#6e672e383178bd0a90b5685d9e513d60a66ba818"
-  integrity sha512-EWXEhOMbWO0q6eJSbu0QLkU8cKi0ljlYLngeDs2Ocu/pm1rrLwyQiYzlFbdnMRURI4w9ndr1sI9rSbhlJ5o23Q==
+"@oxfmt/binding-linux-ppc64-gnu@0.80.0":
+  version "0.80.0"
+  resolved "https://registry.npmjs.org/@oxfmt/binding-linux-ppc64-gnu/-/binding-linux-ppc64-gnu-0.80.0.tgz#35ae92e57a4ecb622cf6263e35c0ec18382b0d11"
+  integrity sha512-jl0ivd2WpjlWbe/sgcvW3E4CbJyxVXNBc9vVTSv1mNN28phPXczG97nXxWhdQu+oAikpXtyf5VAP41P4OT+48A==
 
-"@oxfmt/binding-linux-riscv64-gnu@0.47.0":
-  version "0.47.0"
-  resolved "https://registry.npmjs.org/@oxfmt/binding-linux-riscv64-gnu/-/binding-linux-riscv64-gnu-0.47.0.tgz#68563084137eb3ca353af0d55739fdbf49a667a0"
-  integrity sha512-tZrjS11TUiDuEpRaqdk8K9F9xETRyKXfuZKmdeW+Gj7coBnm7+8sBEfyt033EAFEQSlkniAXvBLh+Qja2ioGBQ==
+"@oxfmt/binding-linux-riscv64-gnu@0.80.0":
+  version "0.80.0"
+  resolved "https://registry.npmjs.org/@oxfmt/binding-linux-riscv64-gnu/-/binding-linux-riscv64-gnu-0.80.0.tgz#e6434d413a17a328181b2ae425635120f5821107"
+  integrity sha512-Iu6q6EsvYtGag7pxQl9HV/k+lEv9SbatZb4fyrWYwIFeAivAl9NNh7o4kizpzsfDOIFKWSmEPkbhzKrucSdQZg==
 
-"@oxfmt/binding-linux-riscv64-musl@0.47.0":
-  version "0.47.0"
-  resolved "https://registry.npmjs.org/@oxfmt/binding-linux-riscv64-musl/-/binding-linux-riscv64-musl-0.47.0.tgz#6a2f0d5f159d86e16691753a49c7e78027e8e568"
-  integrity sha512-KBFy+2CFKUCZzYwX2ZOPQKck1vjQbz+hextuc19G4r0WRJwadfAeuQMQRQvB+Ivc8brlbOVg7et8K7E467440g==
+"@oxfmt/binding-linux-riscv64-musl@0.80.0":
+  version "0.80.0"
+  resolved "https://registry.npmjs.org/@oxfmt/binding-linux-riscv64-musl/-/binding-linux-riscv64-musl-0.80.0.tgz#5ef360924f5e4f59bb3d680e84fcb9ade155a7c5"
+  integrity sha512-e6QIq9l1yHQuNp1u8+veTkQGOHBeayekax5ZfWoi2gwBGJoFVaq9Klovdt8wg/I8R+3eHQVB7yzhXekfMXozQw==
 
-"@oxfmt/binding-linux-s390x-gnu@0.47.0":
-  version "0.47.0"
-  resolved "https://registry.npmjs.org/@oxfmt/binding-linux-s390x-gnu/-/binding-linux-s390x-gnu-0.47.0.tgz#888c1e9db152c68e51ebe3c4b21a8c2fc5331f07"
-  integrity sha512-REUPFKVGSiK99B+9eaPhluEVglzaoj/SMykNC5SUiV2RSsBfV5lWN7Y0iCIc251Wz3GaeAGZsJ/zj3gjarxdFg==
+"@oxfmt/binding-linux-s390x-gnu@0.80.0":
+  version "0.80.0"
+  resolved "https://registry.npmjs.org/@oxfmt/binding-linux-s390x-gnu/-/binding-linux-s390x-gnu-0.80.0.tgz#b84aecd45e99aee62a3de2a093d80640834f02bf"
+  integrity sha512-Fqs2/RNU3MaHvGvLinaRIhZbXJV6MwloGnyK0COfHbF4oTmfgfmdXzrMgk/04DD+0RfdZvdF/82DoaWbYWgfqA==
 
-"@oxfmt/binding-linux-x64-gnu@0.47.0":
-  version "0.47.0"
-  resolved "https://registry.npmjs.org/@oxfmt/binding-linux-x64-gnu/-/binding-linux-x64-gnu-0.47.0.tgz#8a279adaa8a404acc661b5ba915cc72ac6e15626"
-  integrity sha512-KVftVSVEDeIfRW3TIeLe3aNI/iY4m1fu5mDwHcisKMZSCMKLkrhFsjowC7o9RoqNPxbbglm2+/6KAKBIts2t0Q==
+"@oxfmt/binding-linux-x64-gnu@0.80.0":
+  version "0.80.0"
+  resolved "https://registry.npmjs.org/@oxfmt/binding-linux-x64-gnu/-/binding-linux-x64-gnu-0.80.0.tgz#099d9492255b8188a62e5e9f0650f24f1fcc3c01"
+  integrity sha512-5ZZBWDHwGYsqprHma9UwFXNJfkTo4IXu/obbxhz8y/qsQfl/k00HQsXZYBnIlytEWjE1tZZmSimjIObqj8Jyog==
 
-"@oxfmt/binding-linux-x64-musl@0.47.0":
-  version "0.47.0"
-  resolved "https://registry.npmjs.org/@oxfmt/binding-linux-x64-musl/-/binding-linux-x64-musl-0.47.0.tgz#e8ecc62fd533255298f316f64ed1d25553ea147d"
-  integrity sha512-DTsmGEaA2860Aq5VUyDO8/MT9NFxwVL93RnRYmpMwK6DsSkThmvEpqoUDDljziEpAedMRG19SCogrNbINSbLUQ==
+"@oxfmt/binding-linux-x64-musl@0.80.0":
+  version "0.80.0"
+  resolved "https://registry.npmjs.org/@oxfmt/binding-linux-x64-musl/-/binding-linux-x64-musl-0.80.0.tgz#0b8ce9b290b5142a64185b6bd36b04f9db4081a5"
+  integrity sha512-3hbDeK3hijv3zyoZm0kONLkqJbfd4nr0cfFL/veo1chgcnovp9lyiuFiFltCqFKs0qnuEz7qA99mee0Pcm+fXw==
 
-"@oxfmt/binding-openharmony-arm64@0.47.0":
-  version "0.47.0"
-  resolved "https://registry.npmjs.org/@oxfmt/binding-openharmony-arm64/-/binding-openharmony-arm64-0.47.0.tgz#96ee2865d75c0fc8a65416ad8866218ba47c394d"
-  integrity sha512-8r5BDro7fLOBoq1JXHLVSs55OlrxQhEso4HVo0TcY7OXJUPYfjPoOaYL5us+yIwqyP9rQwN+rxuiNFSmaxSuOQ==
+"@oxfmt/binding-openharmony-arm64@0.80.0":
+  version "0.80.0"
+  resolved "https://registry.npmjs.org/@oxfmt/binding-openharmony-arm64/-/binding-openharmony-arm64-0.80.0.tgz#20a03924f1927317d24c17276ffabb512c22ddc5"
+  integrity sha512-5ThMiM6QKqfWaOxtzq+HaYyrWe48MGg49pDc9ll5KFvPEPo2Hqagz0JSk6hhZ3vOF/7tIhGIGu3mVnVuulwMQA==
 
-"@oxfmt/binding-win32-arm64-msvc@0.47.0":
-  version "0.47.0"
-  resolved "https://registry.npmjs.org/@oxfmt/binding-win32-arm64-msvc/-/binding-win32-arm64-msvc-0.47.0.tgz#ca4025455656510653c8491809efa83cb5c0cb70"
-  integrity sha512-qtz/gzm8IjSPUlseZ0ofW8zyHLoZsuP5HTfcGGkWkUblB89JT8GNYH3ICqjbDsqsGqXum0/ZndXTFplSdXFIcg==
+"@oxfmt/binding-win32-arm64-msvc@0.80.0":
+  version "0.80.0"
+  resolved "https://registry.npmjs.org/@oxfmt/binding-win32-arm64-msvc/-/binding-win32-arm64-msvc-0.80.0.tgz#40715d631a7614d12161ee267fedeb45b8f4bd23"
+  integrity sha512-YEPyJo02Wc9fzHBqp8OofJVmb9i92PtYTfpUJ5oXmCOGjfiDoqVlIh7vGVts91LnKL8UZ3cyXuM3tuqPKoZ40g==
 
-"@oxfmt/binding-win32-ia32-msvc@0.47.0":
-  version "0.47.0"
-  resolved "https://registry.npmjs.org/@oxfmt/binding-win32-ia32-msvc/-/binding-win32-ia32-msvc-0.47.0.tgz#66a3379214661b6a738da74ea5fd09ce4d55390c"
-  integrity sha512-5vIcdcIDE7nCx+MXN6sm8kbC4zajDB31E86rez4i45iHNH/2NjdKlJ720xcHTr3eeiMcttCGPHPhE1TjtBDGZw==
+"@oxfmt/binding-win32-ia32-msvc@0.80.0":
+  version "0.80.0"
+  resolved "https://registry.npmjs.org/@oxfmt/binding-win32-ia32-msvc/-/binding-win32-ia32-msvc-0.80.0.tgz#4ac724bad944d8688bb635251d1f3d6daa9741a9"
+  integrity sha512-vimQJkghBVQO/+YEe6ybFaqUd2oMl2srd/jJFGgVlpdSOIWmOVIsBv9dn9SyjzSFXJnhDrBCtU0pnTutjNWnSg==
 
-"@oxfmt/binding-win32-x64-msvc@0.47.0":
-  version "0.47.0"
-  resolved "https://registry.npmjs.org/@oxfmt/binding-win32-x64-msvc/-/binding-win32-x64-msvc-0.47.0.tgz#ad962adfc251270125f98b107a985d1365ce6b07"
-  integrity sha512-Sr59Y5ms54ONBjxFeWhVlGyQcHXxcl9DxC23f6yXlRkcos7LXBLoO+KDfxexjHIOZh7cWqrWduzvUjJ+pHp8cQ==
+"@oxfmt/binding-win32-x64-msvc@0.80.0":
+  version "0.80.0"
+  resolved "https://registry.npmjs.org/@oxfmt/binding-win32-x64-msvc/-/binding-win32-x64-msvc-0.80.0.tgz#3d148ac2df2b11f7140477bca0a1392eb2967d05"
+  integrity sha512-kfJaMYppxdcTfZe+4Ify0uAVCgwEMFg/yp9WDnZ2Vh4KFd09dN5dgsomYDWN0UhzSTb9/OqDY3S7IczL+XOmaA==
 
 "@parcel/watcher-android-arm64@2.6.0":
   version "2.6.0"
@@ -7438,10 +7438,10 @@ escodegen@^1.11.1:
     eslint "9.39.2"
     eslint-import-resolver-webpack "0.13.11"
     eslint-plugin-compat "7.0.2"
-    eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:../../../../../../../home/code/.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-76da377f-a833-4cf1-ae50-fa71a0a22ad4-1795508240128/node_modules/eslint-plugin-graylog"
     eslint-plugin-import "2.32.0"
-    eslint-plugin-jest "29.17.0"
-    eslint-plugin-jest-dom "5.10.1"
+    eslint-plugin-jest "29.17.1"
+    eslint-plugin-jest-dom "5.10.2"
     eslint-plugin-jest-formatting "4.0.0"
     eslint-plugin-jsx-a11y "6.10.2"
     eslint-plugin-react "7.37.5"
@@ -7522,10 +7522,10 @@ eslint-plugin-import@2.32.0:
     string.prototype.trimend "^1.0.9"
     tsconfig-paths "^3.15.0"
 
-eslint-plugin-jest-dom@5.10.1:
-  version "5.10.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jest-dom/-/eslint-plugin-jest-dom-5.10.1.tgz#4d37e9ef9ebdbb5b53add4e9db1f76e9c32963da"
-  integrity sha512-IIJdzbACbhJUJyMAqpA9E9gxp1Gv29TeQ3DtL+pepwP8Oq2WiqjOB2HbnEIs23h0ewdKIZRDI56yLro2eUO+DA==
+eslint-plugin-jest-dom@5.10.2:
+  version "5.10.2"
+  resolved "https://registry.npmjs.org/eslint-plugin-jest-dom/-/eslint-plugin-jest-dom-5.10.2.tgz#22c18bc31c6f5090063056787c6cfcee8251231d"
+  integrity sha512-Ij9pCRrBNPEUKqg0oMUv8aMjGzPKdpayOarDW3zWmYdtQ2dt7lZ7myppA2KwJMUJhhHAtSWY5Pgg7iMjC6w6JA==
   dependencies:
     requireindex "^1.2.0"
 
@@ -7534,10 +7534,10 @@ eslint-plugin-jest-formatting@4.0.0:
   resolved "https://registry.yarnpkg.com/eslint-plugin-jest-formatting/-/eslint-plugin-jest-formatting-4.0.0.tgz#8ca2f8999a0b2782122c7579a27de0ea5cd4b06c"
   integrity sha512-98RiPKqKZf6HLr7fzH9wcZ7By3aaW+g76kAseagXP2AT6VvIQcPEbas4+Hl/SXD4Cyzl2DDvV6Kw+SZX9EUc4A==
 
-eslint-plugin-jest@29.17.0:
-  version "29.17.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jest/-/eslint-plugin-jest-29.17.0.tgz#513444e5f0b2ed559116f0be02a41e6e22e84f39"
-  integrity sha512-6jtpU6MhYKbagkES02TupWAUUooJpZtKg94Ax0b8HhUorv3InSTBU8RRtlSBe0LocOcShXOpyec3PHzPDkJCSg==
+eslint-plugin-jest@29.17.1:
+  version "29.17.1"
+  resolved "https://registry.npmjs.org/eslint-plugin-jest/-/eslint-plugin-jest-29.17.1.tgz#42f8430f2cf8b03b3b7dfaed8a7657bbe457ed53"
+  integrity sha512-Ec5MnIgjAGAHwXQ0sMeEqXGzEe1jtBe6r52Iw7AquulmI92ldRWQNITBFvnCwPxz6s+89zTViQr49gSH/aGiXA==
   dependencies:
     "@typescript-eslint/utils" "^8.0.0"
 
@@ -8784,11 +8784,11 @@ graphemer@^1.4.0:
     "@reduxjs/toolkit" "^2.5.1"
     "@tanstack/react-query" "5.107.1"
     "@types/react" "18.3.12"
-    eslint-config-graylog "file:packages/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../../../../home/code/.cache/yarn/v6/npm-graylog-web-plugin-7.3.0-SNAPSHOT-3aa4eba2-a45d-4520-bdea-661d69927fb3-1795508240106/node_modules/eslint-config-graylog"
     formik "2.4.9"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:packages/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../../../../home/code/.cache/yarn/v6/npm-graylog-web-plugin-7.3.0-SNAPSHOT-3aa4eba2-a45d-4520-bdea-661d69927fb3-1795508240106/node_modules/jest-preset-graylog"
     moment "2.31.0"
     moment-timezone "0.6.6"
     react "18.3.1"
@@ -11936,32 +11936,32 @@ own-keys@^1.0.1:
     object-keys "^1.1.1"
     safe-push-apply "^1.0.0"
 
-oxfmt@^0.47.0:
-  version "0.47.0"
-  resolved "https://registry.npmjs.org/oxfmt/-/oxfmt-0.47.0.tgz#34faf46a5f7c22138ac9d566ac28be7c52e8ca98"
-  integrity sha512-OFbkbzxKCpooQEnRmpTDnuwTX8KHXzZTQ4Df/hz85fpS67Pl+lxPEFvUtin56HIIS0B1k4X8oIzTXRZPufA2CA==
+oxfmt@^0.80.0:
+  version "0.80.0"
+  resolved "https://registry.npmjs.org/oxfmt/-/oxfmt-0.80.0.tgz#ba33b6f7071645bafa3dfeb03d65621126fe7cf3"
+  integrity sha512-jy8/kYEomtC6g1LqXDl1LEXk5Ih+c7a1jB5wxqEp8qBmDoOD7Ei+XCxU2jGEjGUdBfoPef6rDiSENVLJ5gWq+Q==
   dependencies:
-    tinypool "2.1.0"
+    tinypool "2.2.0"
   optionalDependencies:
-    "@oxfmt/binding-android-arm-eabi" "0.47.0"
-    "@oxfmt/binding-android-arm64" "0.47.0"
-    "@oxfmt/binding-darwin-arm64" "0.47.0"
-    "@oxfmt/binding-darwin-x64" "0.47.0"
-    "@oxfmt/binding-freebsd-x64" "0.47.0"
-    "@oxfmt/binding-linux-arm-gnueabihf" "0.47.0"
-    "@oxfmt/binding-linux-arm-musleabihf" "0.47.0"
-    "@oxfmt/binding-linux-arm64-gnu" "0.47.0"
-    "@oxfmt/binding-linux-arm64-musl" "0.47.0"
-    "@oxfmt/binding-linux-ppc64-gnu" "0.47.0"
-    "@oxfmt/binding-linux-riscv64-gnu" "0.47.0"
-    "@oxfmt/binding-linux-riscv64-musl" "0.47.0"
-    "@oxfmt/binding-linux-s390x-gnu" "0.47.0"
-    "@oxfmt/binding-linux-x64-gnu" "0.47.0"
-    "@oxfmt/binding-linux-x64-musl" "0.47.0"
-    "@oxfmt/binding-openharmony-arm64" "0.47.0"
-    "@oxfmt/binding-win32-arm64-msvc" "0.47.0"
-    "@oxfmt/binding-win32-ia32-msvc" "0.47.0"
-    "@oxfmt/binding-win32-x64-msvc" "0.47.0"
+    "@oxfmt/binding-android-arm-eabi" "0.80.0"
+    "@oxfmt/binding-android-arm64" "0.80.0"
+    "@oxfmt/binding-darwin-arm64" "0.80.0"
+    "@oxfmt/binding-darwin-x64" "0.80.0"
+    "@oxfmt/binding-freebsd-x64" "0.80.0"
+    "@oxfmt/binding-linux-arm-gnueabihf" "0.80.0"
+    "@oxfmt/binding-linux-arm-musleabihf" "0.80.0"
+    "@oxfmt/binding-linux-arm64-gnu" "0.80.0"
+    "@oxfmt/binding-linux-arm64-musl" "0.80.0"
+    "@oxfmt/binding-linux-ppc64-gnu" "0.80.0"
+    "@oxfmt/binding-linux-riscv64-gnu" "0.80.0"
+    "@oxfmt/binding-linux-riscv64-musl" "0.80.0"
+    "@oxfmt/binding-linux-s390x-gnu" "0.80.0"
+    "@oxfmt/binding-linux-x64-gnu" "0.80.0"
+    "@oxfmt/binding-linux-x64-musl" "0.80.0"
+    "@oxfmt/binding-openharmony-arm64" "0.80.0"
+    "@oxfmt/binding-win32-arm64-msvc" "0.80.0"
+    "@oxfmt/binding-win32-ia32-msvc" "0.80.0"
+    "@oxfmt/binding-win32-x64-msvc" "0.80.0"
 
 p-debounce@^4.0.0:
   version "4.0.0"
@@ -12876,10 +12876,10 @@ react-grid-layout@^1.5.2:
     react-resizable "^3.0.5"
     resize-observer-polyfill "^1.5.1"
 
-react-hotkeys-hook@^4.4.1:
-  version "4.6.1"
-  resolved "https://registry.yarnpkg.com/react-hotkeys-hook/-/react-hotkeys-hook-4.6.1.tgz#db9066c07377a1c8be067a238ab16e328266345a"
-  integrity sha512-XlZpbKUj9tkfgPgT9gA+1p7Ey6vFIZHttUjPqpTdyT5nqQ8mHL7elxvSbaC+dpSiHUSmr21Ya1mDxBZG3aje4Q==
+react-hotkeys-hook@^5.4.0:
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/react-hotkeys-hook/-/react-hotkeys-hook-5.4.0.tgz#b3adee1c466bdb6a34ee8c5eeab0cf4ffc040ee5"
+  integrity sha512-bxbbIOUTiEGzzH65VYuBor2hv1lYYbE5u1+Tv5oMkgUE0WHSTR71Co6OBOBT1/MSj0bMrAPiibWcUVTucLOKGg==
 
 react-is@^16.13.1, react-is@^16.3.2, react-is@^16.7.0:
   version "16.13.1"
@@ -14799,10 +14799,10 @@ tinyglobby@^0.2.12, tinyglobby@^0.2.15:
     fdir "^6.5.0"
     picomatch "^4.0.3"
 
-tinypool@2.1.0:
-  version "2.1.0"
-  resolved "https://registry.npmjs.org/tinypool/-/tinypool-2.1.0.tgz#303a671d6ef68d03c9512cdc9a47c86b8a85f20c"
-  integrity sha512-Pugqs6M0m7Lv1I7FtxN4aoyToKg1C4tu+/381vH35y8oENM/Ai7f7C4StcoK4/+BSw9ebcS8jRiVrORFKCALLw==
+tinypool@2.2.0:
+  version "2.2.0"
+  resolved "https://registry.npmjs.org/tinypool/-/tinypool-2.2.0.tgz#cbd3f850b02f132ad288546bbc14c42cd93b32e5"
+  integrity sha512-jBrmx4lYmaC9k/mgPbylxs7kBUxHtD8256up+HjLaDFfXScKJQyil+SWXSvhAtT7XHo+yTVlpB81PGmHP8oLSQ==
 
 tinyqueue@^2.0.3:
   version "2.0.3"
