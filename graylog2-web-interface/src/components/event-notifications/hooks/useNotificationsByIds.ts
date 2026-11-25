@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useQuery } from '@tanstack/react-query';
+import { create, windowScheduler } from '@yornaath/batshit';
 
 import { SystemCatalog } from '@graylog/server-api';
 
@@ -37,6 +38,19 @@ const fetchTitles = (ids: Array<string>) =>
     })),
   });
 
+type TitlesResponse = Awaited<ReturnType<typeof fetchTitles>>;
+
+// Batches the requests of components rendered together, e.g. the notifications cells of an event definitions page.
+const notificationTitles = create({
+  fetcher: (ids: Array<string>) => fetchTitles([...new Set(ids)]),
+  resolver: (response: TitlesResponse, id: string) => ({
+    id,
+    entity: response.entities?.find((entity) => entity.id === id),
+    isPermitted: !response.not_permitted_to_view?.includes(id),
+  }),
+  scheduler: windowScheduler(10),
+});
+
 type Result = {
   data: Array<ResolvedNotificationTitle> | undefined;
   notPermittedIds: Array<string>;
@@ -47,16 +61,14 @@ const useNotificationsByIds = (ids: Array<string>): Result => {
   const sortedIds = [...new Set(ids)].sort();
   const { data, isLoading } = useQuery({
     queryKey: ['eventNotifications', 'titles', sortedIds],
-    queryFn: () => fetchTitles(sortedIds),
+    queryFn: () => Promise.all(sortedIds.map((id) => notificationTitles.fetch(id))),
     enabled: sortedIds.length > 0,
     staleTime: 30_000,
   });
 
-  const notPermittedIds = data?.not_permitted_to_view ?? [];
-
   return {
-    data: data?.entities?.filter(({ id }) => !notPermittedIds.includes(id)).map(({ id, title }) => ({ id, title })),
-    notPermittedIds,
+    data: data?.flatMap(({ id, entity, isPermitted }) => (entity && isPermitted ? [{ id, title: entity.title }] : [])),
+    notPermittedIds: data?.filter(({ isPermitted }) => !isPermitted).map(({ id }) => id) ?? [],
     isLoading,
   };
 };

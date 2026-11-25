@@ -18,9 +18,9 @@ import React from 'react';
 import { DocsContainer as BaseDocsContainer } from '@storybook/addon-docs/blocks';
 import type { DocsContainerProps } from '@storybook/addon-docs/blocks';
 import { useDarkMode } from 'storybook-dark-mode';
-import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from '@graylog/sawmill';
 import { createGlobalStyle, css } from 'styled-components';
 
+import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from 'theme/sawmill';
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 import GlobalThemeStyles from 'theme/GlobalThemeStyles';
 

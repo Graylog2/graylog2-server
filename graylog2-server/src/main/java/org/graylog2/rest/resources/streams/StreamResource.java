@@ -46,6 +46,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -62,6 +63,7 @@ import org.graylog.plugins.views.startpage.recentActivities.RecentActivityServic
 import org.graylog.security.UserContext;
 import org.graylog.security.shares.CreateEntityRequest;
 import org.graylog.security.shares.EntitySharesService;
+import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -73,6 +75,7 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.DbQueryCreator;
 import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
 import org.graylog2.plugin.Message;
@@ -116,6 +119,8 @@ import org.graylog2.streams.filters.StreamDestinationFilterService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.ISODateTimeFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -142,6 +147,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 @Tag(name = "Streams", description = "Manage streams")
 @Path("/streams")
 public class StreamResource extends RestResource {
+    private static final Logger LOG = LoggerFactory.getLogger(StreamResource.class);
     private static final String DEFAULT_SORT_FIELD = StreamImpl.FIELD_TITLE;
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
@@ -176,6 +182,7 @@ public class StreamResource extends RestResource {
     private final PipelineStreamConnectionsService pipelineStreamConnectionsService;
     private final PipelineService pipelineService;
     private final EntitySharesService entitySharesService;
+    private final AuditEventSender auditEventSender;
 
     private final DbQueryCreator dbQueryCreator;
 
@@ -204,6 +211,7 @@ public class StreamResource extends RestResource {
         this.entitySharesService = entitySharesService;
         this.dbQueryCreator = new DbQueryCreator(StreamImpl.FIELD_TITLE, attributes);
         this.recentActivityService = recentActivityService;
+        this.auditEventSender = auditEventSender;
         final SuccessContextCreator<Stream> successAuditLogContextCreator = (entity, entityClass) ->
                 Map.of("response_entity",
                         Map.of("stream_id", entity.getId(),
@@ -736,21 +744,38 @@ public class StreamResource extends RestResource {
     })
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @AuditEvent(type = AuditEventTypes.STREAM_UPDATE)
+    @NoAuditEvent("Audit events triggered manually")
     public Response assignToIndexSet(@Parameter(name = "indexSetId", required = true) @PathParam("indexSetId") String indexSetId,
-                                     @RequestBody(required = true) @NotEmpty List<@NotBlank String> streamIds) {
+                                     @RequestBody(required = true) @NotEmpty List<@NotBlank String> streamIds,
+                                     @Context UserContext userContext) {
+        final AuditActor auditActor = AuditActor.user(userContext.getUser());
+        final Response response;
+        try {
+            response = assignStreamsToIndexSet(indexSetId, streamIds, auditActor);
+        } catch (WebApplicationException e) {
+            auditRejectedAssignment(auditActor, indexSetId, streamIds);
+            throw e;
+        }
+        if (response.getStatus() != Response.Status.OK.getStatusCode()) {
+            auditRejectedAssignment(auditActor, indexSetId, streamIds);
+        }
+        return response;
+    }
+
+    private Response assignStreamsToIndexSet(String indexSetId, List<String> streamIds, AuditActor auditActor) {
         checkPermission(RestPermissions.INDEXSETS_READ, indexSetId);
         streamIds.forEach(streamId -> {
             checkPermission(RestPermissions.STREAMS_EDIT, streamId);
             checkNotEditableStream(streamId, "The stream with id <" + streamId + "> cannot be edited.");
         });
 
-        final Set<String> existingStreams;
+        final List<Stream> existingStreams;
         try (var stream = streamService.streamDTOByIds(streamIds)) {
-            existingStreams = stream.map(Stream::getId).collect(Collectors.toSet());
+            existingStreams = stream.toList();
         }
 
-        final Set<String> missingStreams = Sets.difference(new HashSet<>(streamIds), existingStreams);
+        final Set<String> existingStreamIds = existingStreams.stream().map(Stream::getId).collect(Collectors.toSet());
+        final Set<String> missingStreams = Sets.difference(new HashSet<>(streamIds), existingStreamIds);
 
         if (!missingStreams.isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND).entity("Missing streams: " + missingStreams).build();
@@ -760,10 +785,44 @@ public class StreamResource extends RestResource {
                 .map(indexSet -> {
                     checkIndexSet(indexSet);
 
-                    streamService.addToIndexSet(indexSetId, streamIds);
+                    try {
+                        streamService.addToIndexSet(indexSetId, streamIds);
+                    } catch (RuntimeException e) {
+                        existingStreams.forEach(stream -> auditIndexSetAssignment(auditActor, stream, indexSet.getConfig(), false));
+                        throw e;
+                    }
+                    existingStreams.forEach(stream -> auditIndexSetAssignment(auditActor, stream, indexSet.getConfig(), true));
                     return Response.ok().build();
                 })
                 .orElse(Response.status(Response.Status.NOT_FOUND).build());
+    }
+
+    private void auditIndexSetAssignment(AuditActor auditActor, Stream stream, IndexSetConfig indexSetConfig, boolean success) {
+        sendIndexSetAssignmentEvent(auditActor, Map.of(
+                "stream_id", stream.getId(),
+                "title", stream.getTitle(),
+                "index_set_id", indexSetConfig.id(),
+                "index_set_title", indexSetConfig.title()), success);
+    }
+
+    // Rejected before anything was loaded, so the entries only carry the requested IDs
+    private void auditRejectedAssignment(AuditActor auditActor, String indexSetId, List<String> streamIds) {
+        streamIds.stream().distinct().forEach(streamId ->
+                sendIndexSetAssignmentEvent(auditActor, Map.of("stream_id", streamId, "index_set_id", indexSetId), false));
+    }
+
+    private void sendIndexSetAssignmentEvent(AuditActor auditActor, Map<String, Object> responseEntity, boolean success) {
+        final Map<String, Object> context = Map.of("response_entity", responseEntity);
+        try {
+            if (success) {
+                auditEventSender.success(auditActor, AuditEventTypes.STREAM_ASSIGN_INDEX_SET, context);
+            } else {
+                auditEventSender.failure(auditActor, AuditEventTypes.STREAM_ASSIGN_INDEX_SET, context);
+            }
+        } catch (Exception e) {
+            // A failing audit sink must not fail the request
+            LOG.error("Failed to store audit log entry for stream <{}>", responseEntity.get("stream_id"), e);
+        }
     }
 
     private void checkIndexSet(IndexSet indexSet) {

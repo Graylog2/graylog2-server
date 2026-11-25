@@ -123,7 +123,7 @@ jest.mock('components/indices/hooks/useIndexSetsList');
 // IndexSetsStore mock removed - components now use useIndexSetsList hook
 
 describe('ChangeFieldTypeModal', () => {
-  const putFieldTypeMutationMock = jest.fn(() => Promise.resolve());
+  const putFieldTypeMutationMock = jest.fn(() => Promise.resolve({}));
 
   useViewsPlugin();
 

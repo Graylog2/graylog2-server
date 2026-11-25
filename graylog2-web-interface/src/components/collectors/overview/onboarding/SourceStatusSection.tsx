@@ -81,11 +81,13 @@ const RowStatus = styled.span<{ $variant?: 'muted' | 'success' | 'warning' }>(
     align-items: center;
     gap: ${theme.spacings.xxs};
     font-size: ${theme.fonts.size.small};
-    color: ${{
-      muted: theme.colors.gray[60],
-      success: theme.colors.variant.success,
-      warning: theme.colors.variant.darker.warning,
-    }[$variant]};
+    color: ${
+      {
+        muted: theme.colors.gray[60],
+        success: theme.colors.variant.success,
+        warning: theme.colors.variant.darker.warning,
+      }[$variant]
+    };
   `,
 );
 

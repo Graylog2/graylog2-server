@@ -17,3 +17,4 @@
 export { default as StoreMock } from './StoreMock';
 export { default as MockStore } from './StoreMock';
 export { default as asMock } from './AsMock';
+export { default as ExternalStoreMock } from './ExternalStoreMock';

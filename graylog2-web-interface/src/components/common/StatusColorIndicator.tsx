@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import type { ColorVariant } from '@graylog/sawmill';
 import type { MantineRadius } from '@mantine/core';
 
+import type { ColorVariant } from 'theme/sawmill';
 import Indicator from 'components/bootstrap/Indicator';
 
 type Props = React.PropsWithChildren<{
@@ -31,10 +31,12 @@ type Props = React.PropsWithChildren<{
 const StyledIndicator = styled(Indicator)<{ color: ColorVariant }>(
   ({ color, theme }) => css`
     .mantine-Indicator-indicator::before {
-      ${color === 'gray' &&
-      css`
-        background-color: ${theme.colors.gray[50]};
-      `}
+      ${
+        color === 'gray' &&
+        css`
+          background-color: ${theme.colors.gray[50]};
+        `
+      }
     }
   `,
 );

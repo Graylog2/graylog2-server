@@ -36,17 +36,19 @@ const TimeRangeWrapper = styled.div<{ $centerTimestamps: boolean }>(
     background-color: ${theme.colors.table.row.backgroundStriped};
     align-items: center;
 
-    ${$centerTimestamps
-      ? css`
-          padding: 3px 0;
-          display: grid;
-          grid-template-columns: 4fr 0.75fr 4fr;
-        `
-      : css`
-          padding: 3px 13px;
-          display: flex;
-          justify-content: space-around;
-        `}
+    ${
+      $centerTimestamps
+        ? css`
+            padding: 3px 0;
+            display: grid;
+            grid-template-columns: 4fr 0.75fr 4fr;
+          `
+        : css`
+            padding: 3px 13px;
+            display: flex;
+            justify-content: space-around;
+          `
+    }
   `,
 );
 
@@ -56,15 +58,17 @@ const TimeRangeCell = styled.span<{
   $fullWidth?: boolean;
 }>(
   ({ $centerTimestamps, $gridColumn, $fullWidth }) => css`
-    ${$centerTimestamps
-      ? css`
-          min-width: 0;
-          text-align: center;
-          grid-column: ${$fullWidth ? '1 / -1' : $gridColumn};
-        `
-      : css`
-          flex: 1;
-        `}
+    ${
+      $centerTimestamps
+        ? css`
+            min-width: 0;
+            text-align: center;
+            grid-column: ${$fullWidth ? '1 / -1' : $gridColumn};
+          `
+        : css`
+            flex: 1;
+          `
+    }
   `,
 );
 

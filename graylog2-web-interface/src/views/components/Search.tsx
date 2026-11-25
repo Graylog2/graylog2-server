@@ -56,6 +56,7 @@ import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useViewTitle from 'views/hooks/useViewTitle';
 import { executeActiveQuery } from 'views/logic/slices/viewSlice';
 import AsideElements from 'views/components/AsideElements';
+import SearchPageAssistantContext from 'views/components/assistant/SearchPageAssistantContext';
 
 import ExternalValueActionsProvider from './ExternalValueActionsProvider';
 import ViewsFieldActionsProvider from './ViewsFieldActionsProvider';
@@ -80,18 +81,20 @@ const SearchArea = styled(PageContentLayout)(() => {
   const { focusedWidget } = useContext(WidgetFocusContext);
 
   return css`
-    ${focusedWidget?.id &&
-    css`
-      .page-content-grid {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        width: 100%;
+    ${
+      focusedWidget?.id &&
+      css`
+        .page-content-grid {
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          width: 100%;
 
-        /* overflow auto is required to display the message table widget height correctly */
-        overflow: ${focusedWidget?.id ? 'auto' : 'visible'};
-      }
-    `}
+          /* overflow auto is required to display the message table widget height correctly */
+          overflow: ${focusedWidget?.id ? 'auto' : 'visible'};
+        }
+      `
+    }
   `;
 });
 
@@ -200,6 +203,7 @@ const Search = ({ forceSideBarPinned = false, loadingPlaceholder = undefined }: 
                       <IfDashboard>
                         <WindowLeaveMessage />
                       </IfDashboard>
+                      <SearchPageAssistantContext />
                     </IfInteractive>
                     <SearchPagePreferencesProvider>
                       <DefaultFieldTypesProvider>

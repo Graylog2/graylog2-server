@@ -39,6 +39,7 @@ import org.graylog.grn.GRNTypeProvider;
 import org.graylog.mcp.server.ResourceProvider;
 import org.graylog.mcp.server.Tool;
 import org.graylog.plugins.views.search.export.ExportFormat;
+import org.graylog.plugins.views.visualizations.VisualizationDescriptor;
 import org.graylog.scheduler.Job;
 import org.graylog.scheduler.JobDefinitionConfig;
 import org.graylog.scheduler.JobSchedule;
@@ -551,6 +552,21 @@ public abstract class PluginModule extends Graylog2Module {
 
     protected void addSchemaModule(Class<? extends com.github.victools.jsonschema.generator.Module> moduleClass) {
         schemaModuleBinder().addBinding().to(moduleClass);
+    }
+
+    protected MapBinder<String, VisualizationDescriptor> visualizationBinder() {
+        return MapBinder.newMapBinder(binder(), String.class, VisualizationDescriptor.class);
+    }
+
+    /**
+     * Registers a visualization of aggregation widgets, and its config class for deserialization. Every visualization
+     * the web interface offers needs one, so tools like the Assistant can create and change widgets showing it.
+     */
+    protected void addVisualization(VisualizationDescriptor visualization) {
+        visualizationBinder().addBinding(visualization.name()).toInstance(visualization);
+        if (visualization.configClass() != null) {
+            registerJacksonSubtype(visualization.configClass(), visualization.name());
+        }
     }
 
     protected Multibinder<QuickJumpProvider> quickJumpProviderBinder() {

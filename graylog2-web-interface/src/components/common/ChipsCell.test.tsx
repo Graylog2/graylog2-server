@@ -27,38 +27,39 @@ describe('ChipsCell', () => {
     expect(screen.queryByText(/\+/)).not.toBeInTheDocument();
   });
 
-  it('renders all items when count is at or below collapsedCount', () => {
-    render(<ChipsCell items={['phishing', 'lateral-movement']} />);
-    expect(screen.getByText('phishing')).toBeInTheDocument();
-    expect(screen.getByText('lateral-movement')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /Show all|Show fewer/i })).not.toBeInTheDocument();
+  it('renders all items when count is at or below collapsedCount', async () => {
+    render(<ChipsCell items={['phishing', 'lateral-movement']} collapsedCount={2} />);
+
+    await screen.findByText('phishing');
+    await screen.findByText('lateral-movement');
+
+    expect(screen.queryByRole('button', { name: /show \d+ more/i })).not.toBeInTheDocument();
   });
 
-  it('truncates items above collapsedCount and shows a clickable "+ N" toggle', () => {
+  it('truncates items above collapsedCount and shows a clickable "+N" toggle', async () => {
     const items = ['t1', 't2', 't3', 't4', 't5', 't6', 't7'];
     render(<ChipsCell items={items} />);
 
-    expect(screen.getByText('t1')).toBeInTheDocument();
-    expect(screen.getByText('t3')).toBeInTheDocument();
-    expect(screen.queryByText('t4')).not.toBeInTheDocument();
+    await screen.findByText('t1');
+
+    expect(screen.queryByText('t2')).not.toBeInTheDocument();
     expect(screen.queryByText('t7')).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Show all' })).toHaveTextContent('+ 4');
+    expect(await screen.findByRole('button', { name: /show 6 more/i })).toHaveTextContent('+6');
   });
 
   it('expands and collapses when the toggle is clicked', async () => {
     const items = ['t1', 't2', 't3', 't4', 't5', 't6', 't7'];
     render(<ChipsCell items={items} />);
 
-    await userEvent.click(screen.getByRole('button', { name: 'Show all' }));
+    await userEvent.click(await screen.findByRole('button', { name: /show 6 more/i }));
 
-    expect(screen.getByText('t4')).toBeInTheDocument();
-    expect(screen.getByText('t7')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Show fewer' })).toBeInTheDocument();
+    await screen.findByText('t2');
+    await screen.findByText('t7');
 
-    await userEvent.click(screen.getByRole('button', { name: 'Show fewer' }));
+    await userEvent.click(await screen.findByRole('button', { name: /show less/i }));
 
-    expect(screen.queryByText('t4')).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Show all' })).toHaveTextContent('+ 4');
+    expect(await screen.findByRole('button', { name: /show 6 more/i })).toHaveTextContent('+6');
+    expect(screen.queryByText('t2')).not.toBeInTheDocument();
   });
 
   it('renders items as plain spans without onItemClick', () => {
@@ -70,15 +71,16 @@ describe('ChipsCell', () => {
     const onItemClick = jest.fn();
     render(<ChipsCell items={['phishing', 'exfil']} onItemClick={onItemClick} itemLabel="tag" />);
 
-    await userEvent.click(screen.getByRole('button', { name: 'Filter by tag "phishing"' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Filter by tag "exfil"' }));
 
-    expect(onItemClick).toHaveBeenCalledWith('phishing');
+    expect(onItemClick).toHaveBeenCalledWith('exfil');
   });
 
   it('uses custom chip content when renderItemContent is supplied', () => {
     render(
       <ChipsCell
         items={['T1059', 'T1003']}
+        truncate={false}
         renderItemContent={(t) => <span data-testid="custom-chip">CUSTOM-{t}</span>}
       />,
     );
@@ -123,12 +125,13 @@ describe('ChipsCell', () => {
     ).toHaveAttribute('title', 'Filter by technique "T1059: Command and Scripting Interpreter"');
   });
 
-  it('respects a custom collapsedCount', () => {
+  it('respects a custom collapsedCount', async () => {
     render(<ChipsCell items={['a', 'b', 'c', 'd']} collapsedCount={2} />);
 
-    expect(screen.getByText('a')).toBeInTheDocument();
-    expect(screen.getByText('b')).toBeInTheDocument();
+    await screen.findByText('a');
+    await screen.findByText('b');
+
     expect(screen.queryByText('c')).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Show all' })).toHaveTextContent('+ 2');
+    expect(await screen.findByRole('button', { name: /show 2 more/i })).toHaveTextContent('+2');
   });
 });

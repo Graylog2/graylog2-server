@@ -20,7 +20,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { useQueryClient } from '@tanstack/react-query';
 
 import { ConfirmLeaveDialog, Spinner } from 'components/common';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import CurrentUser from 'logic/users/CurrentUser';
 import type {
   EventDefinition,
   EventDefinitionFormControlsProps,
@@ -81,7 +81,8 @@ const EventDefinitionFormContainer = ({
   onSubmit = undefined,
 }: Props) => {
   const [activeStep, setActiveStep] = useState(initialStep);
-  const { configFromLocalStorage, hasLocalStorageConfig } = useEventDefinitionConfigFromLocalStorage();
+  const { configFromLocalStorage, detailsFromLocalStorage, hasLocalStorageConfig } =
+    useEventDefinitionConfigFromLocalStorage();
   // Merge the optional localStorage-stored config into the initial event definition once, at
   // first render. Previously this happened in a useEffect that called setEventDefinition,
   // which trips the react-hooks/set-state-in-effect rule.
@@ -94,6 +95,7 @@ const EventDefinitionFormContainer = ({
 
     return {
       ...cloned,
+      ...detailsFromLocalStorage,
       config: {
         ...defaultConfig,
         ...cloned.config,
@@ -184,7 +186,7 @@ const EventDefinitionFormContainer = ({
   const handleSubmitSuccessResponse = () => {
     setIsDirty(false);
     queryClient.invalidateQueries({ queryKey: EVENT_DEFINITIONS_QUERY_KEY });
-    CurrentUserStore.update(currentUser.username);
+    CurrentUser.reload();
 
     onSubmit();
   };

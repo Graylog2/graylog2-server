@@ -1,0 +1,4 @@
+type = "f"
+message = "Show all attributes in the expanded event details, also the ones displayed as table columns."
+
+pulls = ["28185"]

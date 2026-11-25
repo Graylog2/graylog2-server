@@ -21,7 +21,8 @@ import type { LayoutAxis } from 'plotly.js';
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
-import { keySeparator, humanSeparator } from 'views/Constants';
+import { humanSeparator } from 'views/Constants';
+import { splitCompositeKey } from 'views/logic/compositeKey';
 import useQueryFieldTypes from 'views/hooks/useQueryFieldTypes';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 
@@ -48,8 +49,7 @@ const useXAxisTicksAndType = (
   return {
     tickvals,
     ticktext: tickvals.map((label) =>
-      label
-        .split(keySeparator)
+      splitCompositeKey(label)
         .map((l, i) => mapKeys(l, rowPivotFields[i]))
         .join(humanSeparator),
     ),

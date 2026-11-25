@@ -30,7 +30,7 @@ import fetch from 'logic/rest/FetchProvider';
 import { ConfigurationsActions } from 'stores/configurations/ConfigurationsStore';
 import { defaultOnError } from 'util/conditional/onError';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import CurrentUser from 'logic/users/CurrentUser';
 import EventDefinitionTagsFilter from 'components/event-definitions/EventDefinitionTagsFilter';
 import EventDefinitionTypeFilter from 'components/event-definitions/EventDefinitionTypeFilter';
 import type { Attribute, SearchParams } from 'stores/PaginationTypes';
@@ -139,7 +139,7 @@ type EventDefinitionResult = {
 };
 
 export const fetchEventDefinitions = (searchParams: SearchParams): Promise<EventDefinitionResult> => {
-  CurrentUserStore.update(CurrentUserStore.getInitialState().currentUser.username);
+  CurrentUser.reload();
 
   const url = PaginationURL(`${sourceUrl}/paginated`, searchParams.page, searchParams.pageSize, searchParams.query, {
     sort: searchParams?.sort.attributeId,
@@ -353,9 +353,10 @@ export const keyFn = (searchParams: SearchParams) => [
   searchParams,
 ];
 
-export const useEventDefinitionWithContext = (eventDefinitionId: string) => {
+export const useEventDefinitionWithContext = (eventDefinitionId: string, enabled = true) => {
   const { data, isFetching } = useQuery({
     queryKey: [...EVENT_DEFINITIONS_QUERY_KEY, eventDefinitionId],
+    enabled,
 
     queryFn: () =>
       defaultOnError(

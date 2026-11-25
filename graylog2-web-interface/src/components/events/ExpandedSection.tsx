@@ -20,15 +20,13 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import type { Event, EventsAdditionalData } from 'components/events/events/types';
 import useMetaDataContext from 'components/common/EntityDataTable/hooks/useMetaDataContext';
 import GeneralEventDetailsTable from 'components/events/events/GeneralEventDetailsTable';
-import useNonDisplayedAttributes from 'components/events/events/hooks/useNonDisplayedAttributes';
-import type { DefaultLayout } from 'components/common/EntityDataTable/types';
+import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import sortEventDetailsAttributes from 'components/events/events/sortEventDetailsAttributes';
 import usePermissions from 'hooks/usePermissions';
-import TagsDetailRow from 'components/events/TagsDetailRow';
 
 const noDetails = <em>No further details</em>;
 
 type Props = {
-  defaultLayout: DefaultLayout;
   event: Event;
 };
 
@@ -41,31 +39,29 @@ const TacticsTechniquesPluginRow = ({ event }: { event: Event }) => {
   return <Row entity={event} />;
 };
 
-const GeneralEventDetails = ({ defaultLayout, event }: Props) => {
+const GeneralEventDetails = ({ event }: Props) => {
   const { meta } = useMetaDataContext<EventsAdditionalData>();
-  const nonDisplayedAttributes = useNonDisplayedAttributes(defaultLayout);
-  const hasTags = !!event.tags?.length;
+  // The details show all attributes, also the ones shown as table columns.
+  const { attributes } = useTableFetchContext();
+  const detailsAttributes = sortEventDetailsAttributes(attributes);
 
-  if (!nonDisplayedAttributes.length && !hasTags) return noDetails;
+  if (!detailsAttributes.length) return noDetails;
 
   return (
     <>
-      {nonDisplayedAttributes.length ? (
-        <GeneralEventDetailsTable attributesList={nonDisplayedAttributes} event={event} meta={meta} />
-      ) : null}
-      <TagsDetailRow tags={event.tags} />
+      <GeneralEventDetailsTable attributesList={detailsAttributes} event={event} meta={meta} />
       <TacticsTechniquesPluginRow event={event} />
     </>
   );
 };
 
-const ExpandedSection = ({ defaultLayout, event }: Props) => {
+const ExpandedSection = ({ event }: Props) => {
   const { isPermitted } = usePermissions();
   if (!isPermitted(`eventdefinitions:read:${event.event_definition_id}`)) {
     return noDetails;
   }
 
-  return <GeneralEventDetails defaultLayout={defaultLayout} event={event} />;
+  return <GeneralEventDetails event={event} />;
 };
 
 export default ExpandedSection;

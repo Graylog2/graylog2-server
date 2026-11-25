@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import type { ColorVariant } from '@graylog/sawmill';
 
+import type { ColorVariant } from 'theme/sawmill';
 import { Label } from 'components/bootstrap';
 
 import { MetricsColumn, MetricsRow } from '../../shared-components/NodeMetricsLayout';

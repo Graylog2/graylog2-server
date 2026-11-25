@@ -1643,9 +1643,9 @@ findup@^0.1.5:
     commander "~2.1.0"
 
 follow-redirects@^1.0.0:
-  version "1.16.1"
-  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.16.1.tgz#6e0efa40a727fb369b98dab15883ec34787d675e"
-  integrity sha512-FNvFGzoMLWmE6Yj9spb/zjd7yiNCHiAW9/Tg9CXrQ8wuu32HtlJOwWO11OJafl5FfY3DxTdQ0vj42zU1kvv5jg==
+  version "1.16.3"
+  resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.16.3.tgz#62b60932427f616327014a5e401e8fc5e9027e9b"
+  integrity sha512-toOSoqN6d51Wjf1aOFJYcoVv1aND9rj/CwjLU0Vz40oDuSpWDayCeKe4JpL5NL0WdFvoOOCI3BRo69HahjbR1A==
 
 foreground-child@^2.0.0:
   version "2.0.0"
@@ -2701,9 +2701,9 @@ node-dir@^0.1.10:
     minimatch "^3.0.2"
 
 node-forge@^1:
-  version "1.4.2"
-  resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-1.4.2.tgz#9988b154241e3b401a969a76cfb7aca7ddb5e70b"
-  integrity sha512-rRtAR5XLJ8gCKd9du4qrKAsgCG1ObGP4gLeNJMa4vYSeq4bmBMOJk5IHkrviBV0q7uoAJlVd8HEQYQSVUb4FGQ==
+  version "1.4.4"
+  resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-1.4.4.tgz#4f4c87f12432a21acc61fff9a0a00803e19d46da"
+  integrity sha512-T6VRRpF3+czIGcXW/LOeoD7Ej28d8CF1UMEAbJyJRUtYMvyXAgxUPW2kbUibumvV9LiUQAznJOFyeYclzSJMMg==
 
 node-releases@^2.0.53:
   version "2.0.54"

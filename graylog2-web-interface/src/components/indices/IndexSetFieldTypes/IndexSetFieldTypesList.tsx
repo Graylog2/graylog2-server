@@ -24,7 +24,6 @@ import useParams from 'routing/useParams';
 import { PaginatedEntityTable, StatusIcon } from 'components/common';
 import type { Sort } from 'stores/PaginationTypes';
 import FieldTypeActions from 'components/indices/IndexSetFieldTypes/FieldTypeActions';
-import expandedSections from 'components/indices/IndexSetFieldTypes/originExpandedSections/expandedSections';
 import type { FieldTypeOrigin, IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
 import OriginFilterValueRenderer from 'components/indices/IndexSetFieldTypes/OriginFilterValueRenderer';
 import useCustomColumnRenderers from 'components/indices/IndexSetFieldTypes/hooks/useCustomColumnRenderers';
@@ -108,9 +107,8 @@ const IndexSetFieldTypesList = () => {
       tableLayout={DEFAULT_LAYOUT}
       topRightCol={indexFieldTypeChangeAllowed && <IndexSetProfile indexSet={indexSet} />}
       fetchEntities={(searchParams) => fetchIndexSetFieldTypes(indexSetId, searchParams)}
-      keyFn={keyFn}
+      keyFn={(searchParams) => keyFn(indexSetId, searchParams)}
       bulkSelection={bulkSelection}
-      expandedSectionRenderers={expandedSections}
       entityAttributesAreCamelCase
       filterValueRenderers={FilterValueRenderers}
       columnRenderers={customColumnRenderers}

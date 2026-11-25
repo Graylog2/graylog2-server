@@ -17,41 +17,29 @@
 import * as React from 'react';
 
 import type { InputSummary } from 'hooks/usePaginatedInputs';
-import { CountBadge, Spinner } from 'components/common';
-import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
+import { Spinner } from 'components/common';
+import EntityTitlesCellList from 'components/common/EntityTitlesCellList';
+import Routes from 'routing/Routes';
 import { useInputMetricsFor } from 'components/inputs/InputsOveriew/InputMetricsContext';
-import { METRIC_COLUMN_IDS } from 'components/inputs/InputsOveriew/metricColumns';
 
 type Props = {
   input: InputSummary;
 };
 
-const SECTION_NAME = METRIC_COLUMN_IDS.associatedStreams;
-
 const AssociatedStreamsCell = ({ input }: Props) => {
   const { metrics, isInitialLoading, isError } = useInputMetricsFor(input.id);
-  const { toggleSection, expandedSections } = useExpandedSections();
 
   if (isInitialLoading && !metrics) {
     return <Spinner size="xs" />;
   }
 
-  if (isError || !metrics?.messages_per_stream) {
+  const streamIds = Object.keys(metrics?.messages_per_stream ?? {});
+
+  if (isError || !streamIds.length) {
     return <span aria-label={`No associated streams available for input ${input.title}`}>—</span>;
   }
 
-  const streamCount = Object.keys(metrics.messages_per_stream).length;
-  const isOpen = expandedSections?.[input.id]?.includes(SECTION_NAME) ?? false;
-  const title = `${isOpen ? 'Hide' : 'Show'} associated streams for ${input.title}`;
-
-  return (
-    <CountBadge
-      count={streamCount}
-      iconName={isOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
-      onClick={() => toggleSection(input.id, SECTION_NAME)}
-      title={title}
-    />
-  );
+  return <EntityTitlesCellList entityIds={streamIds} entityType="streams" entityRoute={Routes.stream_view} />;
 };
 
 export default AssociatedStreamsCell;

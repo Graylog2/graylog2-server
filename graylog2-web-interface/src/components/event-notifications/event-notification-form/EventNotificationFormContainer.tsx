@@ -30,7 +30,7 @@ import {
 } from 'components/event-notifications/hooks/useEventNotifications';
 import withHistory from 'routing/withHistory';
 import type CancellablePromise from 'logic/rest/CancellablePromise';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import CurrentUser from 'logic/users/CurrentUser';
 
 import EventNotificationForm from './EventNotificationForm';
 
@@ -116,7 +116,6 @@ class EventNotificationFormContainer extends React.Component<
   handleSubmit = () => {
     const { action, embedded, onSubmit, history, queryClient } = this.props;
     const { notification } = this.state;
-    const currentUser = CurrentUserStore.getInitialState();
 
     this.setState({ isDirty: false });
 
@@ -128,7 +127,7 @@ class EventNotificationFormContainer extends React.Component<
       promise
         .then((response) => {
           queryClient.invalidateQueries({ queryKey: EVENT_NOTIFICATIONS_QUERY_KEY });
-          CurrentUserStore.update(currentUser.currentUser.username);
+          CurrentUser.reload();
 
           return response;
         })

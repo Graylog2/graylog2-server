@@ -15,20 +15,21 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { ColorScheme } from '@graylog/sawmill';
 
+import type { ColorScheme } from 'theme/sawmill';
 import type { PREFERENCES_THEME_MODE } from 'theme/constants';
 
 import { singleton } from '../logic/singleton';
 
-export type UserPreferences = {
+// An interface, so plugins can add their preferences by augmenting the 'contexts/UserPreferencesContext' module.
+export interface UserPreferences {
   enableSmartSearch: boolean;
   updateUnfocussed: boolean;
   searchSidebarIsPinned?: boolean;
   dashboardSidebarIsPinned?: boolean;
   'views.widgetSummary.doNotAskAgain'?: boolean;
   [PREFERENCES_THEME_MODE]?: ColorScheme;
-};
+}
 
 export const defaultUserPreferences = {
   enableSmartSearch: true,

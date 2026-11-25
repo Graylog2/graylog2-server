@@ -58,10 +58,11 @@ const SHARED_LAYOUT = {
 
 const getIndexSetTableElements = (
   extensionAttributes: Array<Attribute>,
+  extensionColumnIds: Array<string>,
   extensionColumnGroups: ExtensionColumnGroups,
 ) => {
   const groupedIds = new Set(extensionColumnGroups.configuration);
-  const ungroupedExtensionIds = extensionAttributes.map(({ id }) => id).filter((id) => !groupedIds.has(id));
+  const ungroupedExtensionIds = extensionColumnIds.filter((id) => !groupedIds.has(id));
 
   const defaultCols = [
     'title',

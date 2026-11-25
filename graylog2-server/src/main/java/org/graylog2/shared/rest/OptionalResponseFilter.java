@@ -19,7 +19,9 @@ package org.graylog2.shared.rest;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerResponseContext;
 import jakarta.ws.rs.container.ContainerResponseFilter;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.graylog2.plugin.rest.ApiError;
 
 import java.util.Optional;
 
@@ -30,8 +32,9 @@ public class OptionalResponseFilter implements ContainerResponseFilter {
                        ContainerResponseContext response) {
         final Object entity = response.getEntity();
         if (isEmptyOptional(entity)) {
-            response.setStatus(Response.Status.NO_CONTENT.getStatusCode());
-            response.setEntity(null);
+            response.setStatus(Response.Status.NOT_FOUND.getStatusCode());
+            response.setEntity(ApiError.create("The requested resource doesn't exist."),
+                    response.getEntityAnnotations(), MediaType.APPLICATION_JSON_TYPE);
         }
     }
 

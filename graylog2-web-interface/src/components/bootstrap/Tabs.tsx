@@ -34,6 +34,7 @@ type Props = React.PropsWithChildren<{
   onChange?: (value: string | null) => void;
   variant?: 'default' | 'outline' | 'pills';
   className?: string;
+  keepMounted?: boolean;
 }>;
 
 const Tabs = ({
@@ -43,8 +44,15 @@ const Tabs = ({
   onChange = undefined,
   variant = 'outline',
   className = undefined,
+  keepMounted = undefined,
 }: Props) => (
-  <MantineTabs defaultValue={defaultValue} value={value} onChange={onChange} variant={variant} className={className}>
+  <MantineTabs
+    defaultValue={defaultValue}
+    value={value}
+    onChange={onChange}
+    variant={variant}
+    className={className}
+    keepMounted={keepMounted}>
     {children}
   </MantineTabs>
 );

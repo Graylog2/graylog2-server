@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.deser.std.StdScalarDeserializer;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.datatype.joda.cfg.JacksonJodaDateFormat;
 import com.fasterxml.jackson.datatype.joda.deser.DateTimeDeserializer;
 import org.graylog2.plugin.Tools;
@@ -69,7 +70,7 @@ public class ESMongoDateTimeDeserializer extends StdScalarDeserializer<DateTime>
         try {
             // Values in ISO8601 format
             return (DateTime) ISO_DATE_DESERIALIZER.deserialize(p, ctxt);
-        } catch (IllegalArgumentException  e) {
+        } catch (InvalidFormatException e) {
             // Values in Tools.ES_DATE_FORMAT format
             return (DateTime) ES_DATE_DESERIALIZER.deserialize(p, ctxt);
         }

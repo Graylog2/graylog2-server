@@ -17,8 +17,8 @@
 
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import type { ColorVariant } from '@graylog/sawmill';
 
+import type { ColorVariant } from 'theme/sawmill';
 import { HoverForHelp, AccessibleCard } from 'components/common';
 export type Variant = 'default' | 'success' | 'warning' | 'danger' | 'primary';
 
@@ -42,10 +42,12 @@ const Card = styled(AccessibleCard)<{ $variant: ColorVariant }>(
     padding: ${theme.spacings.md};
     color: inherit;
     font: inherit;
-    ${$variant !== 'default' &&
-    css`
-      border-left: 3px solid ${theme.colors.variant[$variant]};
-    `}
+    ${
+      $variant !== 'default' &&
+      css`
+        border-left: 3px solid ${theme.colors.variant[$variant]};
+      `
+    }
     position: relative;
   `,
 );

@@ -29,7 +29,7 @@ const INITIAL_DATA = {
 };
 export type InputSummary = {
   creator_user_id: string;
-  node: string;
+  node?: string;
   name: string;
   created_at: string;
   global: boolean;
@@ -39,7 +39,7 @@ export type InputSummary = {
   id: string;
   title: string;
   type: string;
-  content_pack: string;
+  content_pack?: string;
   static_fields: {
     [key: string]: string;
   };

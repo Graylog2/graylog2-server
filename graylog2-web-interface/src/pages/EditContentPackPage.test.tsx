@@ -62,6 +62,7 @@ describe('EditContentPackPage', () => {
     render(<EditContentPackPage />);
 
     await waitFor(() =>
+      // eslint-disable-next-line no-restricted-syntax -- ContentPackEdit is a class component, asMock only takes functions
       expect((ContentPackEdit as unknown as jest.Mock).mock.lastCall[0]).toEqual(
         expect.objectContaining({
           selectedEntities: { stream: [packStream] },

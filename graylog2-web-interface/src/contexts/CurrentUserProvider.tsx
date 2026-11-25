@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 
-import { useStore } from 'stores/connect';
 import User from 'logic/users/User';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import useExternalStore from 'hooks/useExternalStore';
+import CurrentUser from 'logic/users/CurrentUser';
 import Spinner from 'components/common/Spinner';
 
 import CurrentUserContext from './CurrentUserContext';
@@ -28,7 +28,7 @@ type CurrentUserProviderProps = {
 };
 
 const CurrentUserProvider = ({ children }: CurrentUserProviderProps) => {
-  const currentUserJSON = useStore(CurrentUserStore, (state) => state?.currentUser);
+  const currentUserJSON = useExternalStore(CurrentUser, (state) => state.currentUser);
   const currentUser = currentUserJSON ? User.fromJSON(currentUserJSON) : undefined;
 
   if (!currentUser) {

@@ -21,7 +21,7 @@ import { Streams } from '@graylog/server-api';
 import type { Stream as OriginalStream, StreamConfiguration } from 'logic/streams/types';
 import UserNotification from 'util/UserNotification';
 import type { EntityShare } from 'actions/permissions/EntityShareActions';
-import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import CurrentUser from 'logic/users/CurrentUser';
 import {
   updateStream as updateStreamApi,
   removeStream as removeStreamApi,
@@ -61,7 +61,7 @@ const useStreamMutations = () => {
     mutationFn: createStream,
     onSuccess: () => {
       invalidateStreamQueries();
-      CurrentUserStore.reload();
+      CurrentUser.reload();
     },
     onError: (errorThrown) => {
       UserNotification.error(`Saving Stream failed with status: ${errorThrown}`, 'Could not save Stream');

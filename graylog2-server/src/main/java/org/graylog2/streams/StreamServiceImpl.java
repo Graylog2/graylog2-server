@@ -459,7 +459,8 @@ public class StreamServiceImpl implements StreamService {
     public void addToIndexSet(String indexSetId, Collection<String> streamIds) {
         final UpdateResult update = collection.updateMany(stringIdsIn(streamIds), set(FIELD_INDEX_SET_ID, indexSetId));
 
-        if (update.getModifiedCount() < streamIds.stream().distinct().count()) {
+        // Matched rather than modified, so streams that are already in the index set don't count as failures
+        if (update.getMatchedCount() < streamIds.stream().distinct().count()) {
             throw new IllegalStateException("Assigning streams " + streamIds + " to index set <" + indexSetId + "> failed!");
         }
     }

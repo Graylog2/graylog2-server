@@ -17,7 +17,8 @@
 import * as React from 'react';
 import styled, { css, keyframes } from 'styled-components';
 import chroma from 'chroma-js';
-import type { ColorVariant } from '@graylog/sawmill';
+
+import type { ColorVariant } from 'theme/sawmill';
 
 type StyledBarProps = {
   $animated?: boolean;
@@ -98,24 +99,28 @@ const Bar = styled.div<StyledBarProps>(({ $animated, $striped, theme, value }) =
     text-shadow:
       0 1px 2px ${chroma(theme.colors.gray[10]).alpha(0.4).css()},
       2px -1px 3px ${chroma(theme.colors.gray[100]).alpha(0.5).css()};
-    ${($animated || $striped) &&
-    css`
-      background-image: linear-gradient(
-        45deg,
-        ${defaultStripColor} 25%,
-        transparent 25%,
-        transparent 50%,
-        ${defaultStripColor} 50%,
-        ${defaultStripColor} 75%,
-        transparent 75%,
-        transparent
-      );
-      background-size: 40px 40px;
-    `}
-    ${$animated &&
-    css`
-      animation: ${animatedStripes} 2s linear infinite;
-    `}
+    ${
+      ($animated || $striped) &&
+      css`
+        background-image: linear-gradient(
+          45deg,
+          ${defaultStripColor} 25%,
+          transparent 25%,
+          transparent 50%,
+          ${defaultStripColor} 50%,
+          ${defaultStripColor} 75%,
+          transparent 75%,
+          transparent
+        );
+        background-size: 40px 40px;
+      `
+    }
+    ${
+      $animated &&
+      css`
+        animation: ${animatedStripes} 2s linear infinite;
+      `
+    }
     ${progressBarVariants}
   `;
 });

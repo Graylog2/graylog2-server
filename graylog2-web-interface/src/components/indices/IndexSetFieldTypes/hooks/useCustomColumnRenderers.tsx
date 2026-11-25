@@ -16,11 +16,10 @@
  */
 import React, { useMemo } from 'react';
 
-import type { FieldTypeOrigin } from 'components/indices/IndexSetFieldTypes/types';
+import type { FieldTypeOrigin, IndexSetFieldType } from 'components/indices/IndexSetFieldTypes/types';
 import { Icon } from 'components/common';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import OriginCell from 'components/indices/IndexSetFieldTypes/originBadges/OriginCell';
-import { ExpandedSectionToggleWrapper } from 'components/common/EntityDataTable';
 import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 
 const useCustomColumnRenderers = () => {
@@ -38,12 +37,8 @@ const useCustomColumnRenderers = () => {
           renderCell: (item: string) => <span>{fieldTypes[item]}</span>,
         },
         origin: {
-          renderCell: (origin: FieldTypeOrigin, { id }) => (
-            <ExpandedSectionToggleWrapper id={id} section="overriddenProfile">
-              <OriginCell origin={origin} />
-            </ExpandedSectionToggleWrapper>
-          ),
-          staticWidth: 150,
+          renderCell: (_origin: FieldTypeOrigin, fieldType: IndexSetFieldType) => <OriginCell fieldType={fieldType} />,
+          staticWidth: 180,
         },
         is_reserved: {
           renderCell: (isReserved: boolean) =>
