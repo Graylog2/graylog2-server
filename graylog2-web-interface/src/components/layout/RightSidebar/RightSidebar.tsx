@@ -16,11 +16,14 @@
  */
 import React from 'react';
 import styled, { css, keyframes } from 'styled-components';
+import type { DefaultTheme } from 'styled-components';
 
 import useRightSidebar from 'hooks/useRightSidebar';
 import usePluginEntities from 'hooks/usePluginEntities';
+import useSidebarWidth from 'hooks/useSidebarWidth';
 import Icon from 'components/common/Icon';
 import IconButton from 'components/common/IconButton';
+import SidebarResizeHandle from 'components/common/SidebarResizeHandle';
 
 import {
   ANIMATION_DURATION,
@@ -32,6 +35,9 @@ import {
 } from './SidebarStyles';
 
 const COLLAPSED_WIDTH = 36;
+const STACKED_HEIGHT = { initial: 320, min: 120, max: 640 };
+// Keeps the Assistant below usable however far the sidebar is dragged down.
+const MIN_HEIGHT_BELOW = 240;
 
 const fade = keyframes`
   from {
@@ -39,13 +45,37 @@ const fade = keyframes`
   }
 `;
 
-const Container = styled(SidebarContainer)`
-  position: sticky;
-  top: 0;
+// Stacked above a global sidebar like the Assistant: as wide as the column, without widening it.
+const stackedStyles = (theme: DefaultTheme) => css`
+  width: auto;
+  min-width: 0;
+  flex-shrink: 0;
+  contain: inline-size;
+  background-color: ${theme.colors.global.contentBackground};
+  border-left: 1px solid ${theme.colors.cards.border};
+  border-bottom: 1px solid ${theme.colors.cards.border};
 `;
 
-const CollapsedContainer = styled.div(
-  ({ theme }) => css`
+const Container = styled(SidebarContainer)<{ $stackedHeight: number | undefined }>(
+  ({ theme, $stackedHeight }) => css`
+    position: sticky;
+    top: 0;
+
+    ${$stackedHeight !== undefined &&
+    css`
+      ${stackedStyles(theme)};
+      height: ${$stackedHeight}px;
+      max-height: calc(100% - ${MIN_HEIGHT_BELOW}px);
+      animation: none;
+
+      /* Keeps the resize handle on its bottom edge above the global sidebar. */
+      z-index: 1;
+    `}
+  `,
+);
+
+const CollapsedContainer = styled.div<{ $stacked: boolean }>(
+  ({ theme, $stacked }) => css`
     width: ${COLLAPSED_WIDTH}px;
     min-width: ${COLLAPSED_WIDTH}px;
     flex-shrink: 0;
@@ -56,16 +86,25 @@ const CollapsedContainer = styled.div(
     flex-direction: column;
     align-items: center;
     background-color: ${theme.colors.global.contentBackground};
+
+    ${$stacked &&
+    css`
+      ${stackedStyles(theme)};
+      height: ${COLLAPSED_WIDTH}px;
+      flex-direction: row-reverse;
+    `}
   `,
 );
 
-const CollapsedTitleArea = styled.div(
-  ({ theme }) => css`
+const CollapsedTitleArea = styled.div<{ $stacked: boolean }>(
+  ({ theme, $stacked }) => css`
     flex: 1;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: ${$stacked ? 'flex-start' : 'center'};
     width: 100%;
+    height: 100%;
+    padding: 0 ${$stacked ? theme.spacings.md : 0};
     cursor: pointer;
     overflow: hidden;
 
@@ -75,11 +114,11 @@ const CollapsedTitleArea = styled.div(
   `,
 );
 
-const CollapsedTitle = styled.span(
-  ({ theme }) => css`
-    writing-mode: vertical-rl;
+const CollapsedTitle = styled.span<{ $stacked: boolean }>(
+  ({ theme, $stacked }) => css`
+    writing-mode: ${$stacked ? 'horizontal-tb' : 'vertical-rl'};
     text-orientation: mixed;
-    transform: rotate(180deg);
+    transform: ${$stacked ? 'none' : 'rotate(180deg)'};
     font-size: ${theme.fonts.size.small};
     white-space: nowrap;
     overflow: hidden;
@@ -124,7 +163,12 @@ const CollapseButton = styled.button(
   `,
 );
 
-const RightSidebar = () => {
+type Props = {
+  // Above a global sidebar like the Assistant, in one column.
+  stacked?: boolean;
+};
+
+const RightSidebar = ({ stacked = false }: Props) => {
   const {
     content,
     width,
@@ -138,6 +182,7 @@ const RightSidebar = () => {
     canGoForward,
   } = useRightSidebar();
   const sidebarComponents = usePluginEntities('sidebar.components');
+  const [stackedHeight, setStackedHeight] = useSidebarWidth('right-sidebar.stacked-height', STACKED_HEIGHT);
 
   if (!content) {
     return null;
@@ -145,10 +190,10 @@ const RightSidebar = () => {
 
   if (isCollapsed) {
     return (
-      <CollapsedContainer role="complementary" aria-label={`${content.title} sidebar (collapsed)`}>
+      <CollapsedContainer $stacked={stacked} role="complementary" aria-label={`${content.title} sidebar (collapsed)`}>
         <IconButton name="close" title="Close sidebar" onClick={closeSidebar} aria-label="Close sidebar" />
-        <CollapsedTitleArea onClick={expandSidebar} title="Expand sidebar">
-          <CollapsedTitle>{content.title}</CollapsedTitle>
+        <CollapsedTitleArea $stacked={stacked} onClick={expandSidebar} title="Expand sidebar">
+          <CollapsedTitle $stacked={stacked}>{content.title}</CollapsedTitle>
         </CollapsedTitleArea>
       </CollapsedContainer>
     );
@@ -162,7 +207,20 @@ const RightSidebar = () => {
   }
 
   return (
-    <Container $width={width} role="complementary" aria-label={`${content.title} sidebar`}>
+    <Container
+      $width={width}
+      $stackedHeight={stacked ? stackedHeight : undefined}
+      role="complementary"
+      aria-label={`${content.title} sidebar`}>
+      {stacked && (
+        <SidebarResizeHandle
+          side="top"
+          width={stackedHeight}
+          bounds={STACKED_HEIGHT}
+          label="Resize sidebar"
+          onResize={setStackedHeight}
+        />
+      )}
       <SidebarRow className="content">
         <SidebarHeader>
           <NavigationButtons>

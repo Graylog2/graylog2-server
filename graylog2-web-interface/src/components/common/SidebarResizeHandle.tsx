@@ -22,17 +22,33 @@ import type { SidebarBounds } from 'hooks/useSidebarWidth';
 
 const KEYBOARD_STEP = 16;
 
+type Side = 'left' | 'right' | 'top' | 'bottom';
+
+const isVertical = (side: Side) => side === 'top' || side === 'bottom';
+
+const OPPOSITE_EDGE = { left: 'right', right: 'left', top: 'bottom', bottom: 'top' } as const;
+
 // Sits on the sidebar's inner edge, over its border.
-const Handle = styled.div<{ $side: 'left' | 'right' }>(
+const Handle = styled.div<{ $side: Side }>(
   ({ theme, $side }) => css`
     position: absolute;
-    top: 0;
-    bottom: 0;
-    ${$side === 'left' ? 'right' : 'left'}: -3px;
+    ${OPPOSITE_EDGE[$side]}: -3px;
     z-index: 2;
-    width: 6px;
-    cursor: col-resize;
     touch-action: none;
+
+    ${isVertical($side)
+      ? css`
+          left: 0;
+          right: 0;
+          height: 6px;
+          cursor: row-resize;
+        `
+      : css`
+          top: 0;
+          bottom: 0;
+          width: 6px;
+          cursor: col-resize;
+        `}
 
     &:hover,
     &:focus-visible,
@@ -44,8 +60,9 @@ const Handle = styled.div<{ $side: 'left' | 'right' }>(
 );
 
 type Props = {
-  // The side of the page the sidebar is on; dragging away from it widens the sidebar.
-  side: 'left' | 'right';
+  // The side of the page the sidebar is on; dragging away from it enlarges the sidebar.
+  side: Side;
+  // The sidebar's size along the drag direction, its height for `top` and `bottom`.
   width: number;
   bounds: SidebarBounds;
   label: string;
@@ -53,26 +70,28 @@ type Props = {
 };
 
 /**
- * Resizes a sidebar by dragging or with the arrow keys; a double click restores its initial width.
+ * Resizes a sidebar by dragging or with the arrow keys; a double click restores its initial size.
  * Place it inside the sidebar's positioned container.
  */
 const SidebarResizeHandle = ({ side, width, bounds, label, onResize }: Props) => {
-  const drag = useRef<{ pointerId: number; startX: number; startWidth: number } | undefined>(undefined);
+  const drag = useRef<{ pointerId: number; start: number; startWidth: number } | undefined>(undefined);
   const [dragging, setDragging] = useState(false);
-  const direction = side === 'left' ? 1 : -1;
+  const vertical = isVertical(side);
+  const direction = side === 'left' || side === 'top' ? 1 : -1;
+  const position = (event: React.PointerEvent) => (vertical ? event.clientY : event.clientX);
 
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (drag.current || event.button !== 0) return;
 
     event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
-    drag.current = { pointerId: event.pointerId, startX: event.clientX, startWidth: width };
+    drag.current = { pointerId: event.pointerId, start: position(event), startWidth: width };
     setDragging(true);
   };
 
   const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
     if (drag.current && drag.current.pointerId === event.pointerId) {
-      onResize(drag.current.startWidth + direction * (event.clientX - drag.current.startX));
+      onResize(drag.current.startWidth + direction * (position(event) - drag.current.start));
     }
   };
 
@@ -85,7 +104,10 @@ const SidebarResizeHandle = ({ side, width, bounds, label, onResize }: Props) =>
   };
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    const step = { ArrowLeft: -KEYBOARD_STEP, ArrowRight: KEYBOARD_STEP }[event.key];
+    const steps = vertical
+      ? { ArrowUp: -KEYBOARD_STEP, ArrowDown: KEYBOARD_STEP }
+      : { ArrowLeft: -KEYBOARD_STEP, ArrowRight: KEYBOARD_STEP };
+    const step = steps[event.key];
 
     if (step !== undefined) {
       event.preventDefault();
@@ -97,7 +119,7 @@ const SidebarResizeHandle = ({ side, width, bounds, label, onResize }: Props) =>
     <Handle
       $side={side}
       role="separator"
-      aria-orientation="vertical"
+      aria-orientation={vertical ? 'horizontal' : 'vertical'}
       aria-label={label}
       aria-valuenow={width}
       aria-valuemin={bounds.min}
