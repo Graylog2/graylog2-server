@@ -25,8 +25,7 @@ import SidebarResizeHandle from 'components/common/SidebarResizeHandle';
 
 import RightSidebar from './RightSidebar';
 import { COLLAPSED_SIDEBAR_ORDER, SIDEBAR_WIDTH, STACKED_MIN_HEIGHT_BELOW } from './SidebarStyles';
-import useAreSidebarsStacked from './useAreSidebarsStacked';
-import useCollapseSidebars from './useCollapseSidebars';
+import SidebarLayoutContext from './SidebarLayoutContext';
 import useGlobalSidebarState from './useGlobalSidebarState';
 import useRightSidebarWidth from './useRightSidebarWidth';
 
@@ -95,7 +94,7 @@ const GlobalSidebars = () => {
 // While a global sidebar is open and expanded next to the expanded right sidebar, both share one column, the right
 // sidebar on top. Collapsed, each is a strip next to the page.
 const RightSidebarColumn = () => {
-  const { isOpen } = useRightSidebar();
+  const { isOpen, isCollapsed, collapseSidebar } = useRightSidebar();
   const globalSidebar = useGlobalSidebarState();
   const columnRef = useRef<HTMLDivElement>(null);
   const { height: columnHeight } = useElementDimensions(columnRef);
@@ -103,37 +102,46 @@ const RightSidebarColumn = () => {
   const [storedHeight, setStackedHeight] = useSidebarWidth('right-sidebar.stacked-height', bounds);
   // The stored height can exceed what a smaller window leaves.
   const stackedHeight = Math.min(storedHeight, bounds.max);
-  const stacked = useAreSidebarsStacked();
+  const stacked = isOpen && !isCollapsed && globalSidebar.isOpen && !globalSidebar.isCollapsed;
   const [width, setWidth] = useRightSidebarWidth();
-  const collapseSidebars = useCollapseSidebars();
+
+  const collapseAll = () => {
+    if (isOpen) {
+      collapseSidebar();
+    }
+
+    globalSidebar.collapse();
+  };
 
   return (
-    <Column ref={columnRef} $stacked={stacked}>
-      {stacked && (
-        <SidebarResizeHandle
-          side="right"
-          width={width}
-          bounds={SIDEBAR_WIDTH}
-          label="Resize sidebars"
-          onResize={setWidth}
-          onDragPastMin={collapseSidebars}
-        />
-      )}
-      {isOpen && <RightSidebar stackedHeight={stacked ? stackedHeight : undefined} />}
-      {stacked && (
-        <SidebarResizeHandle
-          variant="bar"
-          side="top"
-          width={stackedHeight}
-          bounds={bounds}
-          label="Resize sidebar"
-          onResize={setStackedHeight}
-        />
-      )}
-      <GlobalSidebarSlot $stacked={stacked} $collapsed={globalSidebar.isCollapsed}>
-        <GlobalSidebars />
-      </GlobalSidebarSlot>
-    </Column>
+    <SidebarLayoutContext.Provider value={{ stacked, collapseAll }}>
+      <Column ref={columnRef} $stacked={stacked}>
+        {stacked && (
+          <SidebarResizeHandle
+            side="right"
+            width={width}
+            bounds={SIDEBAR_WIDTH}
+            label="Resize sidebars"
+            onResize={setWidth}
+            onDragPastMin={collapseAll}
+          />
+        )}
+        {isOpen && <RightSidebar stackedHeight={stacked ? stackedHeight : undefined} />}
+        {stacked && (
+          <SidebarResizeHandle
+            variant="bar"
+            side="top"
+            width={stackedHeight}
+            bounds={bounds}
+            label="Resize sidebar"
+            onResize={setStackedHeight}
+          />
+        )}
+        <GlobalSidebarSlot $stacked={stacked} $collapsed={globalSidebar.isCollapsed}>
+          <GlobalSidebars />
+        </GlobalSidebarSlot>
+      </Column>
+    </SidebarLayoutContext.Provider>
   );
 };
 

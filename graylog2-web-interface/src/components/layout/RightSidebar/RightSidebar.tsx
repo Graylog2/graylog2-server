@@ -32,7 +32,7 @@ import {
 import CollapsedSidebar from './CollapsedSidebar';
 import SidebarPanelHeader from './SidebarPanelHeader';
 import useRightSidebarWidth from './useRightSidebarWidth';
-import useCollapseSidebars from './useCollapseSidebars';
+import { useSidebarLayout } from './SidebarLayoutContext';
 
 // Stacked above a global sidebar like the Assistant, it is as wide as the column, without widening it.
 const Container = styled(SidebarPanel)<{ $stackedHeight: number | undefined }>(
@@ -79,7 +79,7 @@ const RightSidebar = ({ stackedHeight = undefined }: Props) => {
   } = useRightSidebar();
   const sidebarComponents = usePluginEntities('sidebar.components');
   const [width, setWidth] = useRightSidebarWidth();
-  const collapseSidebars = useCollapseSidebars();
+  const { collapseAll } = useSidebarLayout();
 
   if (!content) {
     return null;
@@ -119,7 +119,7 @@ const RightSidebar = ({ stackedHeight = undefined }: Props) => {
           bounds={SIDEBAR_WIDTH}
           label="Resize sidebar"
           onResize={setWidth}
-          onDragPastMin={collapseSidebars}
+          onDragPastMin={collapseAll}
         />
       )}
       <SidebarPanelHeader
