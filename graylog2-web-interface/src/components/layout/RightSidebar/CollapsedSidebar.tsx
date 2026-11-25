@@ -21,9 +21,7 @@ import IconButton from 'components/common/IconButton';
 
 import { ANIMATION_DURATION } from './SidebarStyles';
 
-type Orientation = 'horizontal' | 'vertical';
-
-const SIZE = 36;
+const WIDTH = 36;
 
 const fade = keyframes`
   from {
@@ -31,45 +29,31 @@ const fade = keyframes`
   }
 `;
 
-// `vertical` is a strip next to the page, `horizontal` a bar sharing a column with another sidebar, taking the
-// column's width without widening it.
-const Container = styled.div<{ $orientation: Orientation }>(({ theme, $orientation }) =>
-  $orientation === 'vertical'
-    ? css`
-        width: ${SIZE}px;
-        min-width: ${SIZE}px;
-        flex-shrink: 0;
-        align-self: stretch;
-        position: sticky;
-        top: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: ${theme.spacings.xs};
-        background-color: ${theme.colors.global.contentBackground};
-      `
-    : css`
-        height: ${SIZE}px;
-        flex-shrink: 0;
-        contain: inline-size;
-        display: flex;
-        flex-direction: row-reverse;
-        align-items: center;
-        background-color: ${theme.colors.global.contentBackground};
-      `,
+const Container = styled.div(
+  ({ theme }) => css`
+    width: ${WIDTH}px;
+    min-width: ${WIDTH}px;
+    flex-shrink: 0;
+    align-self: stretch;
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: ${theme.spacings.xs};
+    background-color: ${theme.colors.global.contentBackground};
+  `,
 );
 
-const ExpandButton = styled.button<{ $orientation: Orientation }>(
-  ({ theme, $orientation }) => css`
+const ExpandButton = styled.button(
+  ({ theme }) => css`
     flex: 1;
-    min-width: 0;
     min-height: 0;
+    width: 100%;
     display: flex;
     align-items: center;
-    justify-content: ${$orientation === 'vertical' ? 'center' : 'flex-start'};
-    gap: ${theme.spacings.xs};
-    ${$orientation === 'vertical' ? 'width: 100%;' : 'height: 100%;'}
-    padding: 0 ${$orientation === 'vertical' ? 0 : theme.spacings.md};
+    justify-content: center;
+    padding: 0;
     background: none;
     border: 0;
     color: ${theme.colors.text.primary};
@@ -84,30 +68,23 @@ const ExpandButton = styled.button<{ $orientation: Orientation }>(
   `,
 );
 
-const Title = styled.span<{ $orientation: Orientation }>(
-  ({ $orientation }) => css`
-    overflow: hidden;
-    text-overflow: ellipsis;
-    user-select: none;
-    animation: ${fade} ${ANIMATION_DURATION} ease-in-out;
+const Title = styled.span`
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  max-height: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+  animation: ${fade} ${ANIMATION_DURATION} ease-in-out;
 
-    ${$orientation === 'vertical' &&
-    css`
-      writing-mode: vertical-rl;
-      text-orientation: mixed;
-      transform: rotate(180deg);
-      max-height: 100%;
-    `}
-
-    @media (prefers-reduced-motion: reduce) {
-      animation: none;
-    }
-  `,
-);
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+`;
 
 type Props = React.PropsWithChildren<{
-  orientation: Orientation;
-  // Shown next to the title, e.g. that an answer is still running.
+  // Shown above the title, e.g. that an answer is still running.
   status?: React.ReactNode;
   expandTitle: string;
   closeTitle: string;
@@ -119,11 +96,10 @@ type Props = React.PropsWithChildren<{
 }>;
 
 /**
- * A collapsed sidebar showing its title, which expands it on click.
+ * A collapsed sidebar: a strip next to the page showing its title, which expands it on click.
  */
 const CollapsedSidebar = ({
   children = undefined,
-  orientation,
   status = undefined,
   expandTitle,
   closeTitle,
@@ -133,12 +109,11 @@ const CollapsedSidebar = ({
   role = undefined,
   'aria-label': ariaLabel = undefined,
 }: Props) => (
-  <Container $orientation={orientation} className={className} role={role} aria-label={ariaLabel}>
+  <Container className={className} role={role} aria-label={ariaLabel}>
     <IconButton name="close" title={closeTitle} onClick={onClose} />
-    {orientation === 'vertical' && status}
-    <ExpandButton type="button" $orientation={orientation} title={expandTitle} onClick={onExpand}>
-      <Title $orientation={orientation}>{children}</Title>
-      {orientation === 'horizontal' && status}
+    {status}
+    <ExpandButton type="button" title={expandTitle} onClick={onExpand}>
+      <Title>{children}</Title>
     </ExpandButton>
   </Container>
 );

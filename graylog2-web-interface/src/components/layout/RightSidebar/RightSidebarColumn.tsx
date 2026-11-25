@@ -53,20 +53,17 @@ const Column = styled.div<{ $stacked: boolean }>(({ $stacked }) =>
       `,
 );
 
-// A collapsed global sidebar only takes the height of its bar.
-const GlobalSidebarSlot = styled.div<{ $stacked: boolean; $collapsed: boolean }>(({ $stacked, $collapsed }) => {
-  if (!$stacked) {
-    return css`
-      display: contents;
-    `;
-  }
-
-  return css`
-    flex: ${$collapsed ? '0 0 auto' : '1'};
-    min-height: 0;
-    display: flex;
-  `;
-});
+const GlobalSidebarSlot = styled.div<{ $stacked: boolean }>(({ $stacked }) =>
+  $stacked
+    ? css`
+        flex: 1;
+        min-height: 0;
+        display: flex;
+      `
+    : css`
+        display: contents;
+      `,
+);
 
 // Sidebars shown next to every page, e.g. the Assistant's chat, which stays open across pages.
 const GlobalSidebars = () => {
@@ -81,11 +78,10 @@ const GlobalSidebars = () => {
   );
 };
 
-// While a global sidebar is open next to the right sidebar, both share one column, the right sidebar on top. Only one
-// of them is collapsed at a time; the global sidebar takes care of that. Dragging the divider between them far up or
-// down collapses one of them.
+// While a global sidebar is open and expanded next to the expanded right sidebar, both share one column, the right
+// sidebar on top. Collapsed, each is a strip next to the page.
 const RightSidebarColumn = () => {
-  const { isOpen, isCollapsed, collapseSidebar } = useRightSidebar();
+  const { isOpen, isCollapsed } = useRightSidebar();
   const globalSidebar = useGlobalSidebarState();
   const columnRef = useRef<HTMLDivElement>(null);
   const { height: columnHeight } = useElementDimensions(columnRef);
@@ -93,14 +89,12 @@ const RightSidebarColumn = () => {
   const [storedHeight, setStackedHeight] = useSidebarWidth('right-sidebar.stacked-height', bounds);
   // The stored height can exceed what a smaller window leaves.
   const stackedHeight = Math.min(storedHeight, bounds.max);
-  const stacked = isOpen && globalSidebar.isOpen;
-  const isGlobalSidebarCollapsed = stacked && globalSidebar.isCollapsed;
-  const detailsHeight = isGlobalSidebarCollapsed ? 'fill' : stackedHeight;
+  const stacked = isOpen && !isCollapsed && globalSidebar.isOpen && !globalSidebar.isCollapsed;
 
   return (
     <Column ref={columnRef} $stacked={stacked}>
-      {isOpen && <RightSidebar stackedHeight={stacked ? detailsHeight : undefined} />}
-      {stacked && !isCollapsed && !isGlobalSidebarCollapsed && (
+      {isOpen && <RightSidebar stackedHeight={stacked ? stackedHeight : undefined} />}
+      {stacked && (
         <SidebarResizeHandle
           variant="bar"
           side="top"
@@ -108,11 +102,9 @@ const RightSidebarColumn = () => {
           bounds={bounds}
           label="Resize sidebar"
           onResize={setStackedHeight}
-          onDragPastMin={collapseSidebar}
-          onDragPastMax={globalSidebar.collapse}
         />
       )}
-      <GlobalSidebarSlot $stacked={stacked} $collapsed={isGlobalSidebarCollapsed}>
+      <GlobalSidebarSlot $stacked={stacked}>
         <GlobalSidebars />
       </GlobalSidebarSlot>
     </Column>

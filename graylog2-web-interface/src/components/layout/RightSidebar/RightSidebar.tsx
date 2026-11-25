@@ -26,11 +26,10 @@ import { SIDEBAR_WIDTH, STACKED_MIN_HEIGHT_BELOW, SidebarContentArea, SidebarPan
 import CollapsedSidebar from './CollapsedSidebar';
 import SidebarPanelHeader from './SidebarPanelHeader';
 import useRightSidebarWidth from './useRightSidebarWidth';
-
-type StackedHeight = number | 'fill';
+import useCollapseSidebars from './useCollapseSidebars';
 
 // Stacked above a global sidebar like the Assistant, it is as wide as the column, without widening it.
-const Container = styled(SidebarPanel)<{ $stackedHeight: StackedHeight | undefined }>(
+const Container = styled(SidebarPanel)<{ $stackedHeight: number | undefined }>(
   ({ $stackedHeight }) => css`
     position: sticky;
     top: 0;
@@ -42,50 +41,29 @@ const Container = styled(SidebarPanel)<{ $stackedHeight: StackedHeight | undefin
       flex-shrink: 0;
       contain: inline-size;
       animation: none;
-      ${$stackedHeight === 'fill'
-        ? css`
-            flex: 1;
-            min-height: 0;
-          `
-        : css`
-            height: ${$stackedHeight}px;
-            max-height: calc(100% - ${STACKED_MIN_HEIGHT_BELOW}px);
-          `}
+      height: ${$stackedHeight}px;
+      max-height: calc(100% - ${STACKED_MIN_HEIGHT_BELOW}px);
     `}
   `,
 );
 
 const Collapsed = styled(CollapsedSidebar)(
-  ({ theme, orientation }) => css`
+  ({ theme }) => css`
     border-left: 1px solid ${theme.colors.cards.border};
-    ${orientation === 'horizontal' &&
-    css`
-      border-bottom: 1px solid ${theme.colors.cards.border};
-    `}
   `,
 );
 
 type Props = {
-  // Set while it is stacked above a global sidebar like the Assistant, in one column. `fill` takes the height the
-  // collapsed global sidebar leaves.
-  stackedHeight?: StackedHeight;
+  // Set while it is stacked above a global sidebar like the Assistant, in one column.
+  stackedHeight?: number;
 };
 
 const RightSidebar = ({ stackedHeight = undefined }: Props) => {
-  const {
-    content,
-    isCollapsed,
-    closeSidebar,
-    collapseSidebar,
-    expandSidebar,
-    goBack,
-    goForward,
-    canGoBack,
-    canGoForward,
-  } = useRightSidebar();
+  const { content, isCollapsed, closeSidebar, expandSidebar, goBack, goForward, canGoBack, canGoForward } =
+    useRightSidebar();
   const sidebarComponents = usePluginEntities('sidebar.components');
   const [width, setWidth] = useRightSidebarWidth();
-  const stacked = stackedHeight !== undefined;
+  const collapseSidebars = useCollapseSidebars();
 
   if (!content) {
     return null;
@@ -94,7 +72,6 @@ const RightSidebar = ({ stackedHeight = undefined }: Props) => {
   if (isCollapsed) {
     return (
       <Collapsed
-        orientation={stacked ? 'horizontal' : 'vertical'}
         role="complementary"
         aria-label={`${content.title} sidebar (collapsed)`}
         expandTitle="Expand sidebar"
@@ -125,7 +102,7 @@ const RightSidebar = ({ stackedHeight = undefined }: Props) => {
         bounds={SIDEBAR_WIDTH}
         label="Resize sidebar"
         onResize={setWidth}
-        onDragPastMin={collapseSidebar}
+        onDragPastMin={collapseSidebars}
       />
       <SidebarPanelHeader
         titleId="sidebar-title"
@@ -148,7 +125,7 @@ const RightSidebar = ({ stackedHeight = undefined }: Props) => {
             />
           </>
         }
-        onCollapse={collapseSidebar}
+        onCollapse={collapseSidebars}
         onClose={closeSidebar}
       />
       <SidebarContentArea aria-labelledby="sidebar-title">

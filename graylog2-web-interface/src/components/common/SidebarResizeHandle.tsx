@@ -21,8 +21,8 @@ import styled, { css } from 'styled-components';
 import type { SidebarBounds } from 'hooks/useSidebarWidth';
 
 const KEYBOARD_STEP = 16;
-// How far beyond its smallest or largest size the user drags before e.g. a sidebar collapses, so resizing it to
-// its limit does not collapse it by accident.
+// How far beyond its smallest size the user drags before e.g. a sidebar collapses, so resizing it to its limit does
+// not collapse it by accident.
 const DRAG_PAST_LIMIT = 80;
 
 type Side = 'left' | 'right' | 'top' | 'bottom';
@@ -113,10 +113,9 @@ type Props = {
   label: string;
   onResize: (width: number) => void;
   variant?: Variant;
-  // Called when dragged far past the smallest or largest size, e.g. to collapse a sidebar. The size goes back to
-  // the one before the drag.
+  // Called when dragged far past the smallest size, e.g. to collapse a sidebar. The size goes back to the one before
+  // the drag.
   onDragPastMin?: () => void;
-  onDragPastMax?: () => void;
 };
 
 /**
@@ -131,7 +130,6 @@ const SidebarResizeHandle = ({
   onResize,
   variant = 'edge',
   onDragPastMin = undefined,
-  onDragPastMax = undefined,
 }: Props) => {
   const drag = useRef<{ pointerId: number; start: number; startWidth: number } | undefined>(undefined);
   const [dragging, setDragging] = useState(false);
@@ -161,13 +159,10 @@ const SidebarResizeHandle = ({
 
     const { startWidth } = drag.current;
     const size = startWidth + direction * (position(event) - drag.current.start);
-    const onPastLimit =
-      (size < bounds.min - DRAG_PAST_LIMIT && onDragPastMin) || (size > bounds.max + DRAG_PAST_LIMIT && onDragPastMax);
-
-    if (onPastLimit) {
+    if (onDragPastMin && size < bounds.min - DRAG_PAST_LIMIT) {
       endDrag(event);
       onResize(startWidth);
-      onPastLimit();
+      onDragPastMin();
 
       return;
     }
