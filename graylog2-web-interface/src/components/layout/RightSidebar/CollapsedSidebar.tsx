@@ -51,8 +51,10 @@ const ExpandButton = styled.button(
     min-height: 0;
     width: 100%;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: ${theme.spacings.xs};
     padding: 0;
     background: none;
     border: 0;
@@ -84,6 +86,8 @@ const Title = styled.span`
 `;
 
 type Props = React.PropsWithChildren<{
+  // Shown upright above the title, e.g. to tell several collapsed sidebars apart.
+  icon?: React.ReactNode;
   // Shown above the title, e.g. that an answer is still running.
   status?: React.ReactNode;
   expandTitle: string;
@@ -100,6 +104,7 @@ type Props = React.PropsWithChildren<{
  */
 const CollapsedSidebar = ({
   children = undefined,
+  icon = undefined,
   status = undefined,
   expandTitle,
   closeTitle,
@@ -113,6 +118,7 @@ const CollapsedSidebar = ({
     <IconButton name="close" title={closeTitle} onClick={onClose} />
     {status}
     <ExpandButton type="button" title={expandTitle} onClick={onExpand}>
+      {icon}
       <Title>{children}</Title>
     </ExpandButton>
   </Container>
