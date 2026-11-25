@@ -18,11 +18,12 @@ import React, { useEffect } from 'react';
 
 import useHistory from 'routing/useHistory';
 import { DocumentTitle, PageHeader } from 'components/common';
-import { Row, Col } from 'components/bootstrap';
+import { ButtonToolbar, Row, Col } from 'components/bootstrap';
 import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 import ProfilesList from 'components/indices/IndexSetFieldTypeProfiles/ProfilesList';
 import CreateProfileButton from 'components/indices/IndexSetFieldTypeProfiles/CreateProfileButton';
+import ImportProfileButton from 'components/indices/IndexSetFieldTypeProfiles/ImportProfileButton';
 import { IndicesPageNavigation } from 'components/indices';
 import useHasTypeMappingPermission from 'hooks/useHasTypeMappingPermission';
 
@@ -45,7 +46,12 @@ const IndexSetFieldTypeProfilesPage = () => {
           title: 'Index model documentation',
           path: DocsHelper.PAGES.INDEX_MODEL,
         }}
-        actions={<CreateProfileButton />}>
+        actions={
+          <ButtonToolbar>
+            <ImportProfileButton />
+            <CreateProfileButton />
+          </ButtonToolbar>
+        }>
         <span>
           With index set field type profiles you can bundle up custom field types into profiles. Then you can assign
           this profile to any index set. You can view and edit existing profiles or create new ones.

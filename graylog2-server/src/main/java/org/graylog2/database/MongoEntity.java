@@ -17,6 +17,7 @@
 package org.graylog2.database;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Nullable;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
@@ -33,9 +34,11 @@ public interface MongoEntity {
      *
      * @return Hex string representation of the entity's ID
      */
+    // Missing only before the entity is created, so responses always have it.
     @Nullable
     @ObjectId
     @Id
     @JsonProperty(FIELD_ID)
+    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
     String id();
 }

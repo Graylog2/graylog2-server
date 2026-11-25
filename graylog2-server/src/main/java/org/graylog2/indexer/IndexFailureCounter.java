@@ -14,9 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { Kbd } from '@mantine/core';
+package org.graylog2.indexer;
 
-const KeyboardKey = ({ children }: React.PropsWithChildren) => <Kbd>{children}</Kbd>;
+import org.joda.time.DateTime;
 
-export default KeyboardKey;
+import java.util.Map;
+
+/**
+ * Counts indexing failures per target index. The default reads {@link IndexFailureService}; plugins that store
+ * indexing failures elsewhere replace it.
+ */
+public interface IndexFailureCounter {
+    /**
+     * @return the number of indexing failures since the given time, keyed by the index the failed message targeted
+     */
+    Map<String, Long> countByIndexSince(DateTime since);
+}

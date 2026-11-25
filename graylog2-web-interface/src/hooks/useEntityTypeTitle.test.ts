@@ -14,22 +14,35 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import getTitleForEntityType from 'util/getTitleForEntityType';
+import { renderHook } from 'wrappedTestingLibrary/hooks';
 
-describe('getTitleForEntityType', () => {
+import usePluginEntities from 'hooks/usePluginEntities';
+import { asMock } from 'helpers/mocking';
+
+import useEntityTypeTitle from './useEntityTypeTitle';
+
+jest.mock('hooks/usePluginEntities');
+
+const renderTitle = (type: string) => renderHook(() => useEntityTypeTitle(type)).result.current;
+
+describe('useEntityTypeTitle', () => {
+  beforeEach(() => {
+    asMock(usePluginEntities).mockReturnValue([{ type: 'plugin_entity', title: 'plugin entity' }]);
+  });
+
   it('returns a readable title for a collection', () => {
-    expect(getTitleForEntityType('collection')).toBe('collection');
+    expect(renderTitle('collection')).toBe('collection');
   });
 
   it('returns a readable title for collection entities, which is what sharing a collection records', () => {
-    expect(getTitleForEntityType('collection_entities')).toBe('collection entities');
+    expect(renderTitle('collection_entities')).toBe('collection entities');
   });
 
   it('returns titles registered by plugins', () => {
-    expect(getTitleForEntityType('notebook', true, { notebook: 'notebook' })).toBe('notebook');
+    expect(renderTitle('plugin_entity')).toBe('plugin entity');
   });
 
-  it('returns undefined for unknown types when not throwing', () => {
-    expect(getTitleForEntityType('unknown_type', false)).toBeUndefined();
+  it('returns undefined for unknown types', () => {
+    expect(renderTitle('unknown_type')).toBeUndefined();
   });
 });

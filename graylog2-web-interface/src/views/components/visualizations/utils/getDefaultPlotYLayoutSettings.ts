@@ -38,11 +38,12 @@ const getDefaultPlotYLayoutSettings = (
   const color = visualizationAxisColor ?? fontSettings.color;
   const gridColor = visualizationAxisColor
     ? theme.utils.colorLevel(visualizationAxisColor, -4)
-    : theme.colors.variant.lightest.default;
+    : theme.colors.charts.lines;
 
   return {
     automargin: true,
     gridcolor: gridColor,
+    zerolinecolor: theme.colors.charts.zeroLine,
     tickfont: { ...fontSettings, color },
     title: {
       font: { ...fontSettings, color },

@@ -18,16 +18,15 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
+import defaultQueryOptions from 'contexts/defaultQueryOptions';
+
 type Props = {
   children: React.ReactNode;
 };
 
 const options = {
   defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      networkMode: 'always' as const,
-    },
+    queries: defaultQueryOptions,
   },
 };
 

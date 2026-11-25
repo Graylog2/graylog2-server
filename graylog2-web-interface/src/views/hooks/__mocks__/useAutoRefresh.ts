@@ -16,14 +16,12 @@
  */
 import type { AutoRefreshContextType } from 'views/components/contexts/AutoRefreshContext';
 
-const useAutoRefresh = jest.fn(
-  (): AutoRefreshContextType => ({
-    animationId: 'animation-id',
-    refreshConfig: null,
-    restartAutoRefresh: () => {},
-    startAutoRefresh: () => {},
-    stopAutoRefresh: () => {},
-  }),
-);
+const useAutoRefresh = jest.fn((): AutoRefreshContextType => ({
+  animationId: 'animation-id',
+  refreshConfig: null,
+  restartAutoRefresh: () => {},
+  startAutoRefresh: () => {},
+  stopAutoRefresh: () => {},
+}));
 
 export default useAutoRefresh;

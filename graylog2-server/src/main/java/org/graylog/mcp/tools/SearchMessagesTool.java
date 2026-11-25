@@ -97,7 +97,8 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
                     parameters.offset(),
                     parameters.limit(),
                     parameters.fields(),
-                    parameters.includeUnresolvedIds()
+                    parameters.includeUnresolvedIds(),
+                    parameters.includeDocumentIds()
             );
             // the query engine performs permission checks, so we don't have to do that here.
             final TabularResponse tabularResponse = scriptingApiService.executeQuery(spec, permissionHelper.getSearchUser());
@@ -166,6 +167,11 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
         @DefaultValue("false")
         public abstract boolean includeUnresolvedIds();
 
+        @JsonProperty("include_document_ids")
+        @JsonPropertyDescription("Additionally return the id of each message's document as `_id` and its index as `_index`, which together identify the message.")
+        @DefaultValue("false")
+        public abstract boolean includeDocumentIds();
+
         public static Builder builder() {
             return Builder.create();
         }
@@ -184,7 +190,8 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
                         .offset(0)
                         .rangeSeconds(3600)
                         .sortOrder(SortSpec.Direction.Descending)
-                        .includeUnresolvedIds(false);
+                        .includeUnresolvedIds(false)
+                        .includeDocumentIds(false);
             }
 
             @JsonProperty("query")
@@ -221,6 +228,9 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
 
             @JsonProperty("include_unresolved_ids")
             public abstract Builder includeUnresolvedIds(final boolean includeUnresolvedIds);
+
+            @JsonProperty("include_document_ids")
+            public abstract Builder includeDocumentIds(final boolean includeDocumentIds);
 
             public abstract Parameters build();
         }

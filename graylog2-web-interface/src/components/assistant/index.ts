@@ -22,11 +22,13 @@ export {
   useAssistantPageSnapshot,
   useAssistantPageSelector,
 } from './AssistantPageContext';
+export { PageToolNotifiedError } from './types';
 export type {
   Page,
   PageContext,
   Panel,
   PageToolHandler,
+  PageToolLink,
   PageToolResult,
   PageTools,
   SearchPage,

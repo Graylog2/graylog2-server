@@ -66,38 +66,44 @@ const StyledTable = styled(MantineTable)<StyledProps>(
     border-spacing: 0;
     background-color: ${theme.colors.global.contentBackground};
 
-    ${$bordered &&
-    css`
-      border-top: ${TABLE_BORDER_WIDTH}px solid ${theme.colors.table.row.divider};
-      border-left: ${TABLE_BORDER_WIDTH}px solid ${theme.colors.table.row.divider};
-    `}
+    ${
+      $bordered &&
+      css`
+        border-top: ${TABLE_BORDER_WIDTH}px solid ${theme.colors.table.row.divider};
+        border-left: ${TABLE_BORDER_WIDTH}px solid ${theme.colors.table.row.divider};
+      `
+    }
 
     & th,
     & td {
       padding: ${$condensed ? '5px' : '8px'};
       vertical-align: middle;
       border-top: ${TABLE_BORDER_WIDTH}px solid ${theme.colors.table.row.divider};
-      ${$bordered &&
-      css`
-        border-top: none;
-        border-bottom: ${TABLE_BORDER_WIDTH}px solid ${theme.colors.table.row.divider};
-      `}
+      ${
+        $bordered &&
+        css`
+          border-top: none;
+          border-bottom: ${TABLE_BORDER_WIDTH}px solid ${theme.colors.table.row.divider};
+        `
+      }
     }
 
-    ${$bordered &&
-    css`
-      & th {
-        border-right: ${TABLE_BORDER_WIDTH}px solid ${theme.colors.table.row.divider};
-      }
+    ${
+      $bordered &&
+      css`
+        & th {
+          border-right: ${TABLE_BORDER_WIDTH}px solid ${theme.colors.table.row.divider};
+        }
 
-      & td {
-        border-right: ${TABLE_BORDER_WIDTH}px solid ${theme.colors.table.column.divider};
-      }
+        & td {
+          border-right: ${TABLE_BORDER_WIDTH}px solid ${theme.colors.table.column.divider};
+        }
 
-      & tr > td:last-child {
-        border-right: ${TABLE_BORDER_WIDTH}px solid ${theme.colors.table.row.divider};
-      }
-    `}
+        & tr > td:last-child {
+          border-right: ${TABLE_BORDER_WIDTH}px solid ${theme.colors.table.row.divider};
+        }
+      `
+    }
 
     & thead > tr > th {
       background-color: ${theme.colors.table.head.background};
@@ -117,42 +123,48 @@ const StyledTable = styled(MantineTable)<StyledProps>(
       transition: ${TABLE_ROW_HOVER_TRANSITION};
     }
 
-    ${$striped &&
-    css`
-      & tbody:only-of-type > tr:nth-of-type(${STRIPED_ROW_NTH_OF_TYPE}) {
-        background-color: ${theme.colors.table.row.backgroundStriped};
-      }
+    ${
+      $striped &&
+      css`
+        & tbody:only-of-type > tr:nth-of-type(${STRIPED_ROW_NTH_OF_TYPE}) {
+          background-color: ${theme.colors.table.row.backgroundStriped};
+        }
 
-      & tbody:not(:only-of-type):nth-of-type(odd) > tr {
-        background-color: ${theme.colors.table.row.background};
-      }
+        & tbody:not(:only-of-type):nth-of-type(odd) > tr {
+          background-color: ${theme.colors.table.row.background};
+        }
 
-      & tbody:not(:only-of-type):nth-of-type(even) > tr {
-        background-color: ${theme.colors.table.row.backgroundStriped};
-      }
-    `}
+        & tbody:not(:only-of-type):nth-of-type(even) > tr {
+          background-color: ${theme.colors.table.row.backgroundStriped};
+        }
+      `
+    }
 
-    ${$hover &&
-    css`
-      & tbody > tr:hover {
-        background-color: ${theme.colors.table.row.backgroundHover};
-        ${TABLE_ROW_PINNED_HOVER_BG_VAR}: ${flattenTableBackground(theme, theme.colors.table.row.backgroundHover)};
-      }
+    ${
+      $hover &&
+      css`
+        & tbody > tr:hover {
+          background-color: ${theme.colors.table.row.backgroundHover};
+          ${TABLE_ROW_PINNED_HOVER_BG_VAR}: ${flattenTableBackground(theme, theme.colors.table.row.backgroundHover)};
+        }
 
-      & tbody > tr:hover > .${PINNED_CELL_CLASS_NAME}, & tbody > tr:hover > .${PINNED_CELL_STRIPED_CLASS_NAME} {
-        background-color: var(${TABLE_ROW_PINNED_HOVER_BG_VAR});
-      }
-    `}
+        & tbody > tr:hover > .${PINNED_CELL_CLASS_NAME}, & tbody > tr:hover > .${PINNED_CELL_STRIPED_CLASS_NAME} {
+          background-color: var(${TABLE_ROW_PINNED_HOVER_BG_VAR});
+        }
+      `
+    }
 
-    ${$striped &&
-    $hover &&
-    css`
-      & tbody:only-of-type > tr:hover,
-      & tbody:not(:only-of-type) > tr:hover {
-        background-color: ${theme.colors.table.row.backgroundHover};
-        ${TABLE_ROW_PINNED_HOVER_BG_VAR}: ${flattenTableBackground(theme, theme.colors.table.row.backgroundHover)};
-      }
-    `}
+    ${
+      $striped &&
+      $hover &&
+      css`
+        & tbody:only-of-type > tr:hover,
+        & tbody:not(:only-of-type) > tr:hover {
+          background-color: ${theme.colors.table.row.backgroundHover};
+          ${TABLE_ROW_PINNED_HOVER_BG_VAR}: ${flattenTableBackground(theme, theme.colors.table.row.backgroundHover)};
+        }
+      `
+    }
 
     & thead > tr > th.${PINNED_CELL_CLASS_NAME} {
       background-color: ${flattenTableBackground(theme, theme.colors.table.head.background)};

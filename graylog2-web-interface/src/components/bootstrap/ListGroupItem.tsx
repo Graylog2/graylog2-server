@@ -53,76 +53,88 @@ const InnerContainer = styled.div<StyledProps>(
       margin-bottom: 5px;
     }
 
-    ${$isInteractive &&
-    css`
-      cursor: pointer;
-
-      .list-group-item-heading {
-        color: ${theme.colors.variant.darkest.default};
-      }
-
-      &:hover:not([disabled]),
-      &:focus:not([disabled]) {
-        color: inherit;
-        background-color: ${theme.utils.colorLevel(theme.colors.global.contentBackground, 10)};
+    ${
+      $isInteractive &&
+      css`
+        cursor: pointer;
 
         .list-group-item-heading {
-          color: ${theme.utils.readableColor(theme.colors.variant.lightest.default)};
+          color: ${theme.colors.variant.darkest.default};
         }
-      }
-    `}
 
-    ${$disabled &&
-    css`
-      pointer-events: none;
-      color: ${theme.colors.text.disabled};
-      background-color: ${theme.colors.variant.lightest.default};
+        &:hover:not([disabled]),
+        &:focus:not([disabled]) {
+          color: inherit;
+          background-color: ${theme.utils.colorLevel(theme.colors.global.contentBackground, 10)};
 
-      .list-group-item-heading {
-        color: inherit;
-      }
+          .list-group-item-heading {
+            color: ${theme.utils.readableColor(theme.colors.variant.lightest.default)};
+          }
+        }
+      `
+    }
 
-      .list-group-item-text {
-        color: ${theme.colors.variant.default};
-      }
-    `}
-
-    ${$active &&
-    css`
-      color: ${theme.colors.variant.darker.default};
-      background-color: ${theme.colors.variant.lightest.info};
-
-      .list-group-item-heading,
-      .list-group-item-heading > small,
-      .list-group-item-heading > .small {
-        color: inherit;
-      }
-
-      .list-group-item-text {
-        color: ${theme.colors.variant.light.primary};
-      }
-    `}
-
-    ${$bsStyle &&
-    css`
-      color: ${theme.utils.readableColor(theme.colors.variant.lighter[$bsStyle])};
-      background-color: ${theme.colors.variant.lighter[$bsStyle]};
-
-      ${$isInteractive &&
+    ${
+      $disabled &&
       css`
-        &:hover,
-        &:focus {
-          color: ${theme.utils.readableColor(theme.colors.variant.lighter[$bsStyle])};
-          background-color: ${theme.colors.variant.light[$bsStyle]};
+        pointer-events: none;
+        color: ${theme.colors.text.disabled};
+        background-color: ${theme.colors.variant.lightest.default};
+
+        .list-group-item-heading {
+          color: inherit;
         }
 
-        ${$active &&
-        css`
-          color: ${theme.utils.readableColor(theme.colors.variant.light[$bsStyle])};
-          background-color: ${theme.colors.variant.light[$bsStyle]};
-        `}
-      `}
-    `}
+        .list-group-item-text {
+          color: ${theme.colors.variant.default};
+        }
+      `
+    }
+
+    ${
+      $active &&
+      css`
+        color: ${theme.colors.variant.darker.default};
+        background-color: ${theme.colors.variant.lightest.info};
+
+        .list-group-item-heading,
+        .list-group-item-heading > small,
+        .list-group-item-heading > .small {
+          color: inherit;
+        }
+
+        .list-group-item-text {
+          color: ${theme.colors.variant.light.primary};
+        }
+      `
+    }
+
+    ${
+      $bsStyle &&
+      css`
+        color: ${theme.utils.readableColor(theme.colors.variant.lighter[$bsStyle])};
+        background-color: ${theme.colors.variant.lighter[$bsStyle]};
+
+        ${
+          $isInteractive &&
+          css`
+            &:hover,
+            &:focus {
+              color: ${theme.utils.readableColor(theme.colors.variant.lighter[$bsStyle])};
+              background-color: ${theme.colors.variant.light[$bsStyle]};
+            }
+
+            ${
+              $active &&
+              css`
+                color: ${theme.utils.readableColor(theme.colors.variant.light[$bsStyle])};
+                background-color: ${theme.colors.variant.light[$bsStyle]};
+              `
+            }
+          `
+        }
+      `
+    }
   `,
 );
 
