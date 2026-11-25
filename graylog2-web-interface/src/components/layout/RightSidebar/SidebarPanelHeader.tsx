@@ -71,7 +71,7 @@ const SidebarPanelHeader = ({
     {leading}
     <Title id={titleId}>{title}</Title>
     {children}
-    {onCollapse && <IconButton name="collapse_content" title={collapseTitle} onClick={onCollapse} />}
+    {onCollapse && <IconButton name="right_panel_close" title={collapseTitle} onClick={onCollapse} />}
     {onClose && <IconButton name="close" title={closeTitle} onClick={onClose} />}
   </Header>
 );
