@@ -1,0 +1,10 @@
+DELETE org.graylog2.rest.resources.system.lookup.LookupTableResource#deleteAdapter /system/lookup/adapters/{idOrName}
+DELETE org.graylog2.rest.resources.system.lookup.LookupTableResource#deleteCache /system/lookup/caches/{idOrName}
+DELETE org.graylog2.rest.resources.system.lookup.LookupTableResource#removeTable /system/lookup/tables/{idOrName}
+GET org.graylog2.rest.resources.system.lookup.LookupTableResource#get /system/lookup/tables/{idOrName}
+GET org.graylog2.rest.resources.system.lookup.LookupTableResource#getAdapter /system/lookup/adapters/{idOrName}
+GET org.graylog2.rest.resources.system.lookup.LookupTableResource#getCache /system/lookup/caches/{idOrName}
+GET org.graylog2.rest.resources.system.lookup.LookupTableResource#getPreview /system/lookup/tables/preview/{idOrName}
+PUT org.graylog2.rest.resources.system.lookup.LookupTableResource#updateAdapter /system/lookup/adapters/{idOrName}
+PUT org.graylog2.rest.resources.system.lookup.LookupTableResource#updateCache /system/lookup/caches/{idOrName}
+PUT org.graylog2.rest.resources.system.lookup.LookupTableResource#updateTable /system/lookup/tables/{idOrName}

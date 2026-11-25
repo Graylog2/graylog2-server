@@ -1,0 +1,6 @@
+DELETE org.graylog2.rest.resources.system.outputs.OutputResource#delete /system/outputs/{outputId}
+GET org.graylog2.rest.resources.system.outputs.OutputResource#available /system/outputs/available
+GET org.graylog2.rest.resources.system.outputs.OutputResource#get /system/outputs
+GET org.graylog2.rest.resources.system.outputs.OutputResource#get /system/outputs/{outputId}
+POST org.graylog2.rest.resources.system.outputs.OutputResource#create /system/outputs
+PUT org.graylog2.rest.resources.system.outputs.OutputResource#update /system/outputs/{outputId}

@@ -1,0 +1,5 @@
+GET org.graylog2.rest.resources.system.debug.DebugEventsResource#showLastClusterDebugEvent /system/debug/events/cluster
+GET org.graylog2.rest.resources.system.debug.DebugEventsResource#showLastDebugEvent /system/debug/events/local
+GET org.graylog2.rest.resources.system.debug.DebugStreamsResource#getEngineFingerprint /system/debug/streams/router_engine_info
+POST org.graylog2.rest.resources.system.debug.DebugEventsResource#generateClusterDebugEvent /system/debug/events/cluster
+POST org.graylog2.rest.resources.system.debug.DebugEventsResource#generateDebugEvent /system/debug/events/local

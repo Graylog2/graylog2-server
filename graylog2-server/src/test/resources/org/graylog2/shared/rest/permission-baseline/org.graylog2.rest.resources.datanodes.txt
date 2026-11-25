@@ -1,0 +1,4 @@
+GET org.graylog2.rest.resources.datanodes.DatanodeResource#dataNodes /system/cluster/datanodes
+POST org.graylog2.rest.resources.datanodes.DataNodeManagementResource#bulkRemove /datanode/bulk_remove
+POST org.graylog2.rest.resources.datanodes.DataNodeManagementResource#bulkStart /datanode/bulk_start
+POST org.graylog2.rest.resources.datanodes.DataNodeManagementResource#bulkStop /datanode/bulk_stop

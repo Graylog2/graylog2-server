@@ -1,0 +1,1 @@
+GET org.graylog2.rest.resources.suggestions.EntitySuggestionResource#getPage /entity_suggestions

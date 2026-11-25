@@ -1,0 +1,3 @@
+GET org.graylog2.contentstream.rest.ContentStreamResource#getContentStreamTags /contentstream/tags
+GET org.graylog2.contentstream.rest.ContentStreamResource#getContentStreamUserSettings /contentstream/settings/{username}
+PUT org.graylog2.contentstream.rest.ContentStreamResource#setContentStreamUserSettings /contentstream/settings/{username}

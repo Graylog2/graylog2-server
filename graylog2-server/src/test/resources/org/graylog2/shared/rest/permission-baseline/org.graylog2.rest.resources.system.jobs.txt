@@ -1,0 +1,6 @@
+DELETE org.graylog2.rest.resources.system.jobs.SystemJobResource#acknowledgeJob /system/jobs/acknowledge/{jobId}
+DELETE org.graylog2.rest.resources.system.jobs.SystemJobResource#cancel /system/jobs/{jobId}
+GET org.graylog2.rest.resources.system.jobs.ServiceManagerResource#list /system/serviceManager
+GET org.graylog2.rest.resources.system.jobs.SystemJobResource#get /system/jobs/{jobId}
+GET org.graylog2.rest.resources.system.jobs.SystemJobResource#list /system/jobs
+POST org.graylog2.rest.resources.system.jobs.SystemJobResource#trigger /system/jobs

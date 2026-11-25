@@ -1,0 +1,4 @@
+GET org.graylog2.rest.resources.system.indices.RetentionStrategyResource#configSchema /system/indices/retention/strategies/{strategy}
+GET org.graylog2.rest.resources.system.indices.RetentionStrategyResource#list /system/indices/retention/strategies
+GET org.graylog2.rest.resources.system.indices.RotationStrategyResource#configSchema /system/indices/rotation/strategies/{strategy}
+GET org.graylog2.rest.resources.system.indices.RotationStrategyResource#list /system/indices/rotation/strategies

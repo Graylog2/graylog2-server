@@ -1,0 +1,13 @@
+DELETE org.graylog2.rest.resources.entities.preferences.EntityListPreferencesResource#delete /entitylists/preferences/{entity_list_id}
+DELETE org.graylog2.rest.resources.roles.RolesResource#delete /roles/{rolename}
+DELETE org.graylog2.rest.resources.roles.RolesResource#removeMember /roles/{rolename}/members/{username}
+GET org.graylog.plugins.onboarding.rest.OnboardingResource#get /onboarding
+GET org.graylog2.database.entities.EntityScopeResource#getAllEntityScopes /entity_scopes
+GET org.graylog2.rest.resources.entities.preferences.EntityListPreferencesResource#get /entitylists/preferences/{entity_list_id}
+GET org.graylog2.rest.resources.roles.RolesResource#listAll /roles
+GET org.graylog2.rest.resources.roles.RolesResource#read /roles/{rolename}
+POST org.graylog2.plugin.quickjump.rest.QuickJumpResource#search /quickjump
+POST org.graylog2.rest.resources.entities.preferences.EntityListPreferencesResource#create /entitylists/preferences/{entity_list_id}
+POST org.graylog2.rest.resources.entities.preferences.EntityListPreferencesResource#listPredefined /entitylists/preferences/list_predefined/{entity_list_id}
+PUT org.graylog2.rest.resources.roles.RolesResource#addMember /roles/{rolename}/members/{username}
+PUT org.graylog2.rest.resources.roles.RolesResource#update /roles/{rolename}
