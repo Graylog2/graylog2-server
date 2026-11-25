@@ -31,20 +31,22 @@ const StyledButton = styled(Button)<{ $dirty: boolean }>(
     position: relative;
     min-width: ${SEARCH_BUTTON_WIDTH}px;
 
-    ${$dirty
-      ? css`
-          &::after {
-            position: absolute;
-            content: '';
-            height: 16px;
-            width: 16px;
-            top: -5px;
-            right: -6px;
-            border-radius: 50%;
-            background-color: ${theme.colors.variant.warning};
-          }
-        `
-      : ''}
+    ${
+      $dirty
+        ? css`
+            &::after {
+              position: absolute;
+              content: '';
+              height: 16px;
+              width: 16px;
+              top: -5px;
+              right: -6px;
+              border-radius: 50%;
+              background-color: ${theme.colors.variant.warning};
+            }
+          `
+        : ''
+    }
   `,
 );
 

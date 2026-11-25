@@ -27,13 +27,15 @@ const StyledCommonSortIcon = styled(CommonSortIcon)<{ $isRightAligned?: boolean 
     display: inline-flex;
     // Mirrors the rest of the header for right-aligned (numeric) columns: the indicator icons sit
     // on the other side of the title there, so the margin needs to face the other way too.
-    ${$isRightAligned
-      ? css`
-          margin-right: ${theme.spacings.xs};
-        `
-      : css`
-          margin-left: ${theme.spacings.xs};
-        `}
+    ${
+      $isRightAligned
+        ? css`
+            margin-right: ${theme.spacings.xs};
+          `
+        : css`
+            margin-left: ${theme.spacings.xs};
+          `
+    }
     padding: 0;
     cursor: pointer;
   `,
