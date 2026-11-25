@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled, { css, keyframes } from 'styled-components';
+import styled, { css } from 'styled-components';
 import type { DefaultTheme } from 'styled-components';
 
 import useRightSidebar from 'hooks/useRightSidebar';
@@ -24,26 +24,16 @@ import Icon from 'components/common/Icon';
 import IconButton from 'components/common/IconButton';
 
 import {
-  ANIMATION_DURATION,
+  STACKED_MIN_HEIGHT_BELOW,
   SidebarContainer,
   SidebarRow,
   SidebarContentArea,
   SidebarHeader,
   SidebarTitle,
 } from './SidebarStyles';
-import CollapsedSidebarBar from './CollapsedSidebarBar';
+import CollapsedSidebar from './CollapsedSidebar';
 
 type StackedHeight = number | 'fill';
-
-const COLLAPSED_WIDTH = 36;
-// Keeps the Assistant below usable however far the sidebar is dragged down.
-const MIN_HEIGHT_BELOW = 240;
-
-const fade = keyframes`
-  from {
-    opacity: 0;
-  }
-`;
 
 // Stacked above a global sidebar like the Assistant: as wide as the column, without widening it.
 const stackedStyles = (theme: DefaultTheme) => css`
@@ -71,68 +61,16 @@ const Container = styled(SidebarContainer)<{ $stackedHeight: StackedHeight | und
           `
         : css`
             height: ${$stackedHeight}px;
-            max-height: calc(100% - ${MIN_HEIGHT_BELOW}px);
+            max-height: calc(100% - ${STACKED_MIN_HEIGHT_BELOW}px);
           `}
     `}
   `,
 );
 
-const StackedCollapsedBar = styled(CollapsedSidebarBar)(
+const StackedCollapsedBar = styled(CollapsedSidebar)(
   ({ theme }) => css`
     ${stackedStyles(theme)};
     border-bottom: 1px solid ${theme.colors.cards.border};
-  `,
-);
-
-const CollapsedContainer = styled.div(
-  ({ theme }) => css`
-    width: ${COLLAPSED_WIDTH}px;
-    min-width: ${COLLAPSED_WIDTH}px;
-    flex-shrink: 0;
-    align-self: stretch;
-    position: sticky;
-    top: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: ${theme.colors.global.contentBackground};
-  `,
-);
-
-const CollapsedTitleArea = styled.div(
-  ({ theme }) => css`
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    cursor: pointer;
-    overflow: hidden;
-
-    :hover {
-      background-color: ${theme.colors.variant.lightest.default};
-    }
-  `,
-);
-
-const CollapsedTitle = styled.span(
-  ({ theme }) => css`
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-    transform: rotate(180deg);
-    font-size: ${theme.fonts.size.small};
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-height: 100%;
-    color: ${theme.colors.text.primary};
-    user-select: none;
-
-    animation: ${fade} ${ANIMATION_DURATION} ease-in-out;
-
-    @media (prefers-reduced-motion: reduce) {
-      animation: none;
-    }
   `,
 );
 
@@ -192,6 +130,7 @@ const RightSidebar = ({ stackedHeight = undefined }: Props) => {
   if (isCollapsed && stackedHeight !== undefined) {
     return (
       <StackedCollapsedBar
+        orientation="horizontal"
         role="complementary"
         aria-label={`${content.title} sidebar (collapsed)`}
         expandTitle="Expand sidebar"
@@ -205,12 +144,16 @@ const RightSidebar = ({ stackedHeight = undefined }: Props) => {
 
   if (isCollapsed) {
     return (
-      <CollapsedContainer role="complementary" aria-label={`${content.title} sidebar (collapsed)`}>
-        <IconButton name="close" title="Close sidebar" onClick={closeSidebar} aria-label="Close sidebar" />
-        <CollapsedTitleArea onClick={expandSidebar} title="Expand sidebar">
-          <CollapsedTitle>{content.title}</CollapsedTitle>
-        </CollapsedTitleArea>
-      </CollapsedContainer>
+      <CollapsedSidebar
+        orientation="vertical"
+        role="complementary"
+        aria-label={`${content.title} sidebar (collapsed)`}
+        expandTitle="Expand sidebar"
+        closeTitle="Close sidebar"
+        onExpand={expandSidebar}
+        onClose={closeSidebar}>
+        {content.title}
+      </CollapsedSidebar>
     );
   }
 

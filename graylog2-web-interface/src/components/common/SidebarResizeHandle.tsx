@@ -21,6 +21,9 @@ import styled, { css } from 'styled-components';
 import type { SidebarBounds } from 'hooks/useSidebarWidth';
 
 const KEYBOARD_STEP = 16;
+// How far beyond its smallest or largest size the user drags before e.g. a sidebar collapses, so resizing it to
+// its limit does not collapse it by accident.
+const DRAG_PAST_LIMIT = 80;
 
 type Side = 'left' | 'right' | 'top' | 'bottom';
 
@@ -110,13 +113,26 @@ type Props = {
   label: string;
   onResize: (width: number) => void;
   variant?: Variant;
+  // Called when dragged far past the smallest or largest size, e.g. to collapse a sidebar. The size goes back to
+  // the one before the drag.
+  onDragPastMin?: () => void;
+  onDragPastMax?: () => void;
 };
 
 /**
  * Resizes a sidebar by dragging or with the arrow keys; a double click restores its initial size.
  * Place an `edge` handle inside the sidebar's positioned container, a `bar` next to the sidebar.
  */
-const SidebarResizeHandle = ({ side, width, bounds, label, onResize, variant = 'edge' }: Props) => {
+const SidebarResizeHandle = ({
+  side,
+  width,
+  bounds,
+  label,
+  onResize,
+  variant = 'edge',
+  onDragPastMin = undefined,
+  onDragPastMax = undefined,
+}: Props) => {
   const drag = useRef<{ pointerId: number; start: number; startWidth: number } | undefined>(undefined);
   const [dragging, setDragging] = useState(false);
   const vertical = isVertical(side);
@@ -132,18 +148,31 @@ const SidebarResizeHandle = ({ side, width, bounds, label, onResize, variant = '
     setDragging(true);
   };
 
-  const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (drag.current && drag.current.pointerId === event.pointerId) {
-      onResize(drag.current.startWidth + direction * (position(event) - drag.current.start));
-    }
-  };
-
   const endDrag = (event: React.PointerEvent<HTMLDivElement>) => {
     if (drag.current && drag.current.pointerId === event.pointerId) {
       event.currentTarget.releasePointerCapture(event.pointerId);
       drag.current = undefined;
       setDragging(false);
     }
+  };
+
+  const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!drag.current || drag.current.pointerId !== event.pointerId) return;
+
+    const { startWidth } = drag.current;
+    const size = startWidth + direction * (position(event) - drag.current.start);
+    const onPastLimit =
+      (size < bounds.min - DRAG_PAST_LIMIT && onDragPastMin) || (size > bounds.max + DRAG_PAST_LIMIT && onDragPastMax);
+
+    if (onPastLimit) {
+      endDrag(event);
+      onResize(startWidth);
+      onPastLimit();
+
+      return;
+    }
+
+    onResize(size);
   };
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {

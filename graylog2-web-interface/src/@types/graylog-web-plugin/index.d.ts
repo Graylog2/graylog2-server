@@ -41,6 +41,10 @@ interface PluginNavigationItems {
   key: string;
   component: React.ComponentType;
 }
+
+// What the layout needs to know about a global sidebar; `collapse` e.g. when the user drags the divider above it down.
+type GlobalSidebarState = { isOpen: boolean; isCollapsed: boolean; collapse: () => void };
+
 interface GlobalNotification {
   key: string;
   component: React.ComponentType;
@@ -471,12 +475,11 @@ declare module 'graylog-web-plugin/plugin' {
     defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
     // Shown next to every page, after the right sidebar, e.g. the Assistant's chat. While one is open, it shares a
-    // column with the right sidebar, below it, and may collapse to a bar there.
+    // column with the right sidebar, below it.
     globalSidebars?: Array<{
       key: string;
       component: React.ComponentType;
-      useIsOpen?: () => boolean;
-      useIsCollapsed?: () => boolean;
+      useSidebarState?: () => GlobalSidebarState;
     }>;
     'navigation.badges'?: Array<NavigationBadge>;
     globalNotifications?: Array<GlobalNotification>;

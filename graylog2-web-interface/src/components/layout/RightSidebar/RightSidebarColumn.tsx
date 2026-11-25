@@ -14,18 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useRef } from 'react';
 import styled, { css } from 'styled-components';
 
+import useElementDimensions from 'hooks/useElementDimensions';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useRightSidebar from 'hooks/useRightSidebar';
 import useSidebarWidth from 'hooks/useSidebarWidth';
 import SidebarResizeHandle from 'components/common/SidebarResizeHandle';
 
 import RightSidebar from './RightSidebar';
+import { STACKED_MIN_HEIGHT_BELOW } from './SidebarStyles';
 import useGlobalSidebarState from './useGlobalSidebarState';
 
 const STACKED_HEIGHT = { initial: 320, min: 120, max: 640 };
+
+// Leaves room for the global sidebar below, once the column is measured.
+const stackedHeightBounds = (columnHeight: number) =>
+  columnHeight > 0
+    ? { ...STACKED_HEIGHT, max: Math.max(STACKED_HEIGHT.min, columnHeight - STACKED_MIN_HEIGHT_BELOW) }
+    : STACKED_HEIGHT;
 
 // Has no box of its own while the sidebars sit side by side; the same elements in both layouts keep the global
 // sidebars mounted, e.g. so a running answer of the Assistant finishes.
@@ -74,26 +82,34 @@ const GlobalSidebars = () => {
 };
 
 // While a global sidebar is open next to the right sidebar, both share one column, the right sidebar on top. Only one
-// of them is collapsed at a time; the global sidebar takes care of that.
+// of them is collapsed at a time; the global sidebar takes care of that. Dragging the divider between them far up or
+// down collapses one of them.
 const RightSidebarColumn = () => {
-  const { isOpen, isCollapsed } = useRightSidebar();
+  const { isOpen, isCollapsed, collapseSidebar } = useRightSidebar();
   const globalSidebar = useGlobalSidebarState();
-  const [stackedHeight, setStackedHeight] = useSidebarWidth('right-sidebar.stacked-height', STACKED_HEIGHT);
+  const columnRef = useRef<HTMLDivElement>(null);
+  const { height: columnHeight } = useElementDimensions(columnRef);
+  const bounds = stackedHeightBounds(columnHeight);
+  const [storedHeight, setStackedHeight] = useSidebarWidth('right-sidebar.stacked-height', bounds);
+  // The stored height can exceed what a smaller window leaves.
+  const stackedHeight = Math.min(storedHeight, bounds.max);
   const stacked = isOpen && globalSidebar.isOpen;
   const isGlobalSidebarCollapsed = stacked && globalSidebar.isCollapsed;
   const detailsHeight = isGlobalSidebarCollapsed ? 'fill' : stackedHeight;
 
   return (
-    <Column $stacked={stacked}>
+    <Column ref={columnRef} $stacked={stacked}>
       {isOpen && <RightSidebar stackedHeight={stacked ? detailsHeight : undefined} />}
       {stacked && !isCollapsed && !isGlobalSidebarCollapsed && (
         <SidebarResizeHandle
           variant="bar"
           side="top"
           width={stackedHeight}
-          bounds={STACKED_HEIGHT}
+          bounds={bounds}
           label="Resize sidebar"
           onResize={setStackedHeight}
+          onDragPastMin={collapseSidebar}
+          onDragPastMax={globalSidebar.collapse}
         />
       )}
       <GlobalSidebarSlot $stacked={stacked} $collapsed={isGlobalSidebarCollapsed}>

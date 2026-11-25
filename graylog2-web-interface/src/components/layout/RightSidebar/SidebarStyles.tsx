@@ -19,6 +19,8 @@ import styled, { css, keyframes } from 'styled-components';
 import Row from 'components/bootstrap/Row';
 
 const ANIMATION_DURATION = '0.3s';
+// Keeps a global sidebar like the Assistant usable below the stacked right sidebar.
+const STACKED_MIN_HEIGHT_BELOW = 240;
 
 const slideAnimation = keyframes`
   from {
@@ -94,6 +96,7 @@ const SidebarTitle = styled.h4(
 
 export {
   ANIMATION_DURATION,
+  STACKED_MIN_HEIGHT_BELOW,
   slideAnimation,
   fadeAnimation,
   SidebarContainer,
