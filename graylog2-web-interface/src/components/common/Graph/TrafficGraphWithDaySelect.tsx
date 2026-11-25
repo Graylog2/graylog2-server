@@ -88,11 +88,11 @@ const TrafficGraphWithDaySelect = ({
   };
 
   // Values above Number.MAX_SAFE_INTEGER are parsed as BigInt
-  const numericTraffic = useMemo(() => (traffic ? mapValues(traffic, Number) : null), [traffic]);
+  const numericTraffic = traffic ? mapValues(traffic, Number) : null;
   const numericTrafficLimit = trafficLimit === undefined || trafficLimit === null ? undefined : Number(trafficLimit);
 
-  const bytesOut = useMemo(() => (numericTraffic ? sum(Object.values(numericTraffic)) : null), [numericTraffic]);
-  const unixTraffic = useMemo(() => (numericTraffic ? formatTrafficData(numericTraffic) : null), [numericTraffic]);
+  const bytesOut = numericTraffic ? sum(Object.values(numericTraffic)) : null;
+  const unixTraffic = numericTraffic ? formatTrafficData(numericTraffic) : null;
 
   const formattedTotalTraffic = useMemo(() => {
     const prettified = getPrettifiedValue(bytesOut, { abbrev: 'b', unitType: 'binary_size' });
