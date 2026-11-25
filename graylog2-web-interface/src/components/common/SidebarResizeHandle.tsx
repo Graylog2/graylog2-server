@@ -29,68 +29,39 @@ type Side = 'left' | 'right' | 'top' | 'bottom';
 
 const isVertical = (side: Side) => side === 'top' || side === 'bottom';
 
-const OPPOSITE_EDGE = { left: 'right', right: 'left', top: 'bottom', bottom: 'top' } as const;
+const BAR_HEIGHT = 8;
 
-type Variant = 'edge' | 'bar';
-
-const BAR_SIZE = 8;
-const GRIP_LENGTH = 32;
-
-// `edge` sits on the sidebar's inner edge, over its border. `bar` is a visible divider with a grip, placed between
-// the sidebar and what it is resized against.
-const Handle = styled.div<{ $side: Side; $variant: Variant }>(({ theme, $side, $variant }) => {
-  const vertical = isVertical($side);
-
-  if ($variant === 'bar') {
-    return css`
-      position: relative;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      ${vertical ? 'height' : 'width'}: ${BAR_SIZE}px;
-      cursor: ${vertical ? 'row-resize' : 'col-resize'};
-      touch-action: none;
-      background-color: ${theme.colors.global.background};
-      border: 1px solid ${theme.colors.cards.border};
-
-      &::before {
-        content: '';
-        ${vertical ? 'width' : 'height'}: ${GRIP_LENGTH}px;
-        ${vertical ? 'height' : 'width'}: 2px;
-        border-radius: 1px;
-        background: ${theme.colors.text.secondary};
-      }
-
-      &:hover,
-      &:focus-visible,
-      &[data-dragging='true'] {
-        border-color: ${theme.colors.input.borderFocus};
-        outline: none;
-
-        &::before {
-          background: ${theme.colors.input.borderFocus};
-        }
-      }
-    `;
-  }
-
-  return css`
-    position: absolute;
-    ${OPPOSITE_EDGE[$side]}: -3px;
-    z-index: 2;
+// Left and right sidebars resize from an invisible edge over their border, top and bottom ones from a visible bar
+// with a grip, placed between them and what they are resized against.
+const Handle = styled.div<{ $side: Side }>(
+  ({ theme, $side }) => css`
     touch-action: none;
 
-    ${vertical
+    ${isVertical($side)
       ? css`
-          left: 0;
-          right: 0;
-          height: 6px;
+          display: flex;
+          flex-shrink: 0;
+          align-items: center;
+          justify-content: center;
+          height: ${BAR_HEIGHT}px;
           cursor: row-resize;
+          background-color: ${theme.colors.global.background};
+          border: 1px solid ${theme.colors.cards.border};
+
+          &::before {
+            content: '';
+            width: 32px;
+            height: 2px;
+            border-radius: 1px;
+            background: ${theme.colors.text.secondary};
+          }
         `
       : css`
+          position: absolute;
           top: 0;
           bottom: 0;
+          ${$side === 'left' ? 'right' : 'left'}: -3px;
+          z-index: 2;
           width: 6px;
           cursor: col-resize;
         `}
@@ -101,8 +72,8 @@ const Handle = styled.div<{ $side: Side; $variant: Variant }>(({ theme, $side, $
       background: ${theme.colors.input.borderFocus};
       outline: none;
     }
-  `;
-});
+  `,
+);
 
 type Props = {
   // The side of the page the sidebar is on; dragging away from it enlarges the sidebar.
@@ -112,7 +83,6 @@ type Props = {
   bounds: SidebarBounds;
   label: string;
   onResize: (size: number) => void;
-  variant?: Variant;
   // Called when dragged far past the smallest size, e.g. to collapse a sidebar. The size goes back to the one before
   // the drag.
   onDragPastMin?: () => void;
@@ -120,17 +90,9 @@ type Props = {
 
 /**
  * Resizes a sidebar by dragging or with the arrow keys; a double click restores its initial size.
- * Place an `edge` handle inside the sidebar's positioned container, a `bar` next to the sidebar.
+ * Place a left or right handle inside the sidebar's positioned container, a top or bottom one next to the sidebar.
  */
-const SidebarResizeHandle = ({
-  side,
-  size,
-  bounds,
-  label,
-  onResize,
-  variant = 'edge',
-  onDragPastMin = undefined,
-}: Props) => {
+const SidebarResizeHandle = ({ side, size, bounds, label, onResize, onDragPastMin = undefined }: Props) => {
   const drag = useRef<{ pointerId: number; start: number; startSize: number } | undefined>(undefined);
   const [dragging, setDragging] = useState(false);
   const vertical = isVertical(side);
@@ -186,7 +148,6 @@ const SidebarResizeHandle = ({
   return (
     <Handle
       $side={side}
-      $variant={variant}
       role="separator"
       aria-orientation={vertical ? 'horizontal' : 'vertical'}
       aria-label={label}

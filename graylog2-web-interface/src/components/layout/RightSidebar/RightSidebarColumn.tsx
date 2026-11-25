@@ -119,7 +119,6 @@ const RightSidebarColumn = () => {
         {isOpen && <RightSidebar stackedHeight={stacked ? stackedHeight : undefined} />}
         {stacked && (
           <SidebarResizeHandle
-            variant="bar"
             side="top"
             size={stackedHeight}
             bounds={bounds}
