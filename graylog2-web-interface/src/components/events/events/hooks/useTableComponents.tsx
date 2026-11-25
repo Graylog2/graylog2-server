@@ -22,15 +22,11 @@ import EventActions from 'components/events/events/EventActions';
 import type { Event } from 'components/events/events/types';
 import ExpandedSection from 'components/events/ExpandedSection';
 import BulkActions from 'components/events/events/BulkActions';
-import type { DefaultLayout } from 'components/common/EntityDataTable/types';
 
-const useTableElements = ({ defaultLayout }: { defaultLayout: DefaultLayout }) => {
+const useTableElements = () => {
   const entityActions = useCallback((event: Event) => <EventActions event={event} />, []);
 
-  const renderExpandedRules = useCallback(
-    (event: Event) => <ExpandedSection defaultLayout={defaultLayout} event={event} />,
-    [defaultLayout],
-  );
+  const renderExpandedRules = useCallback((event: Event) => <ExpandedSection event={event} />, []);
 
   const expandedSections = useMemo(
     () => ({

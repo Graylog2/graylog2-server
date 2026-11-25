@@ -51,20 +51,22 @@ const StyledModalFooter = styled(MantineModal.Body)(
 const StyledModalRoot = styled(MantineModal.Root)<{ $scrollInContent: boolean }>(
   ({ theme, $scrollInContent }) => css`
     --mantine-color-body: ${theme.colors.global.contentBackground};
-    ${$scrollInContent &&
-    css`
-      .mantine-Modal-content {
-        display: flex;
-        flex-direction: column;
-      }
+    ${
+      $scrollInContent &&
+      css`
+        .mantine-Modal-content {
+          display: flex;
+          flex-direction: column;
+        }
 
-      .mantine-Modal-body {
-        flex: 1;
-        overflow: auto;
-        display: flex;
-        flex-direction: column;
-      }
-    `})
+        .mantine-Modal-body {
+          flex: 1;
+          overflow: auto;
+          display: flex;
+          flex-direction: column;
+        }
+      `
+    })
   `,
 );
 

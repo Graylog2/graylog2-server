@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { SearchJobs } from '@graylog/server-api';
+
 import fetch from 'logic/rest/FetchProvider';
 import * as URLUtils from 'util/URLUtils';
 import type Search from 'views/logic/search/Search';
@@ -24,9 +26,6 @@ type SearchJobId = string;
 type SearchId = string;
 
 const startJobUrl = (id: string) => URLUtils.qualifyUrl(`/views/search/${id}/execute`);
-
-const cancelJobUrl = (nodeId: string, jobId: string) =>
-  URLUtils.qualifyUrl(`/views/searchjobs/${nodeId}/${jobId}/cancel`);
 
 const pollJobUrl = (nodeId: string, jobId: string, page?: number, perPage?: number) =>
   URLUtils.qualifyUrl(
@@ -76,6 +75,6 @@ export function runPollJob({
   return fetch('GET', pollJobUrl(nodeId, asyncSearchId, page, perPage));
 }
 
-export function runCancelJob({ nodeId, asyncSearchId }: JobIds): Promise<null> {
-  return fetch('DELETE', cancelJobUrl(nodeId, asyncSearchId));
+export function runCancelJob({ nodeId, asyncSearchId }: JobIds): Promise<void> {
+  return SearchJobs.cancelAsyncSearchJob(asyncSearchId, nodeId);
 }

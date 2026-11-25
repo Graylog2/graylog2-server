@@ -123,13 +123,31 @@ class MessagesTabularResponseCreatorTest {
         assertThat(columnNames(response)).containsExactly("streams", "streams#id", "streams");
     }
 
+    @Test
+    void addsTheDocumentIdAndIndexOfEachMessageWhenAsked() throws QueryFailedException {
+        final TabularResponse response = creator.mapToResponse(new MessagesRequestSpec(null, Set.of(STREAM_ID),
+                Set.of(), null, null, null, 0, 10, List.of("source"), false, true), searchJob(), searchUser);
+
+        assertThat(columnNames(response)).containsExactly("source", "_id", "_index");
+        assertThat(response.datarows()).containsExactly(List.of("example.org", "doc-1", "graylog_0"));
+    }
+
+    @Test
+    void addsNoDocumentIdsByDefaultAndNoneTwice() throws QueryFailedException {
+        assertThat(columnNames(creator.mapToResponse(spec(List.of("source"), false), searchJob(), searchUser)))
+                .containsExactly("source");
+        assertThat(columnNames(creator.mapToResponse(new MessagesRequestSpec(null, Set.of(STREAM_ID), Set.of(), null,
+                null, null, 0, 10, List.of("_id"), false, true), searchJob(), searchUser)))
+                .containsExactly("_id", "_index");
+    }
+
     private static MessagesRequestSpec spec(List<String> fields, boolean includeUnresolvedIds) {
         return new MessagesRequestSpec(null, Set.of(STREAM_ID), Set.of(), null, null, null, 0, 10, fields, includeUnresolvedIds);
     }
 
     private static SearchJob searchJob() {
         final ResultMessageSummary message = ResultMessageSummary.create(null,
-                Map.of("source", "example.org", Message.FIELD_STREAMS, List.of(STREAM_ID)),
+                Map.of("source", "example.org", Message.FIELD_STREAMS, List.of(STREAM_ID), Message.FIELD_ID, "doc-1"),
                 "graylog_0");
         final MessageList.Result messageList = mock(MessageList.Result.class);
         when(messageList.messages()).thenReturn(List.of(message));

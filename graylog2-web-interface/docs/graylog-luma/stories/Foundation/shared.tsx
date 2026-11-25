@@ -17,6 +17,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
+import { dividerColor } from './lumaTokens';
+
 export const COL_WIDTH_STYLE = '200px';
 export const COL_WIDTH_VARIABLE = '220px';
 export const COL_WIDTH_SIZE = '140px';
@@ -49,7 +51,7 @@ const CopiedHint = styled.span<{ $visible: boolean }>`
   background: rgba(0, 0, 0, 0.75);
   color: #fff;
   font-size: 11px;
-  padding: 2px 6px;
+  padding: 2px ${({ theme }) => theme.spacings.xs};
   border-radius: 3px;
   white-space: nowrap;
   pointer-events: none;
@@ -82,6 +84,35 @@ export const PxLabel = styled.span`
   color: ${({ theme }) => theme.colors.text.secondary};
 `;
 
+export const HexValue = styled.span`
+  display: block;
+  font-family: ${({ theme }) => theme.fonts.family.monospace};
+  font-size: ${({ theme }) => theme.fonts.size.small};
+  color: ${({ theme }) => theme.colors.text.secondary};
+`;
+
+// Checkerboard behind the color so semi-transparent colors are visible.
+const StyledColorSwatch = styled.div<{ $color: string; $width: string; $height: string }>`
+  flex-shrink: 0;
+  width: ${({ $width }) => $width};
+  height: ${({ $height }) => $height};
+  border-radius: 4px;
+  border: 1px solid ${({ theme }) => dividerColor(theme)};
+  background:
+    linear-gradient(${({ $color }) => $color}, ${({ $color }) => $color}),
+    repeating-conic-gradient(#ccc 0% 25%, #fff 0% 50%) 0 0 / 8px 8px;
+`;
+
+type ColorSwatchProps = {
+  color: string;
+  width?: string;
+  height?: string;
+};
+
+export const ColorSwatch = ({ color, width = '32px', height = '24px' }: ColorSwatchProps) => (
+  <StyledColorSwatch $color={color} $width={width} $height={height} />
+);
+
 export const StoryContainer = styled.div`
   padding-bottom: ${({ theme }) => theme.spacings.xs};
 `;
@@ -102,14 +133,14 @@ const Th = styled.th<{ $width?: string }>`
   text-transform: uppercase;
   letter-spacing: 0.07em;
   color: ${({ theme }) => theme.colors.text.secondary};
-  border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+  border-bottom: 1px solid ${({ theme }) => dividerColor(theme)};
   ${({ $width }) => $width && `width: ${$width};`}
 `;
 
 const Td = styled.td`
   padding: ${({ theme }) => theme.spacings.sm};
   vertical-align: top;
-  border-bottom: 1px solid rgba(128, 128, 128, 0.12);
+  border-bottom: 1px solid ${({ theme }) => dividerColor(theme)};
   line-height: 1.5;
 `;
 
