@@ -471,8 +471,13 @@ declare module 'graylog-web-plugin/plugin' {
     defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
     // Shown next to every page, after the right sidebar, e.g. the Assistant's chat. While one is open, it shares a
-    // column with the right sidebar.
-    globalSidebars?: Array<{ key: string; component: React.ComponentType; useIsOpen?: () => boolean }>;
+    // column with the right sidebar, below it, and may collapse to a bar there.
+    globalSidebars?: Array<{
+      key: string;
+      component: React.ComponentType;
+      useIsOpen?: () => boolean;
+      useIsCollapsed?: () => boolean;
+    }>;
     'navigation.badges'?: Array<NavigationBadge>;
     globalNotifications?: Array<GlobalNotification>;
     helpMenu?: Array<HelpMenuItem>;

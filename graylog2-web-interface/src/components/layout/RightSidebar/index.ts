@@ -15,4 +15,5 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 export { default } from './RightSidebar';
+export { default as CollapsedSidebarBar } from './CollapsedSidebarBar';
 export { SidebarContainer, SidebarRow, SidebarContentArea, SidebarHeader, SidebarTitle } from './SidebarStyles';
