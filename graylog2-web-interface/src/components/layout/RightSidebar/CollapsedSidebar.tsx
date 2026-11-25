@@ -86,7 +86,8 @@ const Title = styled.span`
 `;
 
 type Props = React.PropsWithChildren<{
-  // Shown upright above the title, e.g. to tell several collapsed sidebars apart.
+  // Shown upright below the title, where it starts as it reads from bottom to top, like an icon before a title
+  // elsewhere. E.g. to tell several collapsed sidebars apart.
   icon?: React.ReactNode;
   // Shown above the title, e.g. that an answer is still running.
   status?: React.ReactNode;
@@ -118,8 +119,8 @@ const CollapsedSidebar = ({
     <IconButton name="close" title={closeTitle} onClick={onClose} />
     {status}
     <ExpandButton type="button" title={expandTitle} onClick={onExpand}>
-      {icon}
       <Title>{children}</Title>
+      {icon}
     </ExpandButton>
   </Container>
 );
