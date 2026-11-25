@@ -69,15 +69,13 @@ jest.mock('components/indices/IndicesConfiguration', () => ({
   default: ({ indexSet }: { indexSet: IndexSetEntity }) => <span>Rotation and retention of {indexSet.title}</span>,
 }));
 
-const [defaultIndexSet, exampleIndexSet] = indexSets.map(
-  (indexSet): IndexSetEntity => ({
-    ...indexSet,
-    id: indexSet.id,
-    category: 'user',
-    can_have_profile: true,
-    stream_count: 0,
-  }),
-);
+const [defaultIndexSet, exampleIndexSet] = indexSets.map((indexSet): IndexSetEntity => ({
+  ...indexSet,
+  id: indexSet.id,
+  category: 'user',
+  can_have_profile: true,
+  stream_count: 0,
+}));
 const readOnlyIndexSet: IndexSetEntity = {
   ...exampleIndexSet,
   id: 'index-set-id-3',

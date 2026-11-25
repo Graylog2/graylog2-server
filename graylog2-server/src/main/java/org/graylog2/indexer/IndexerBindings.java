@@ -50,5 +50,6 @@ public class IndexerBindings extends Graylog2Module {
         Multibinder.newSetBinder(binder(), IndexSetConfigValidator.class);
 
         OptionalBinder.newOptionalBinder(binder(), IndexSetConfigTransformer.class).setDefault().to(DefaultIndexSetConfigTransformer.class);
+        OptionalBinder.newOptionalBinder(binder(), IndexFailureCounter.class).setDefault().to(IndexFailureService.class);
     }
 }

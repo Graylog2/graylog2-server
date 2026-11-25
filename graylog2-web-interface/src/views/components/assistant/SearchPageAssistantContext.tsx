@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useContext, useMemo } from 'react';
-import { OrderedSet } from 'immutable';
+import { List, OrderedSet } from 'immutable';
 import isEqual from 'lodash/isEqual';
 import isPlainObject from 'lodash/isPlainObject';
 
@@ -24,7 +24,7 @@ import type { PageTools, SearchPage } from 'components/assistant';
 import useViewsSelector from 'views/stores/useViewsSelector';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
-import type { GetState } from 'views/types';
+import type { FiltersType, GetState, SearchFilter } from 'views/types';
 import { selectActiveQuery, selectActiveViewState, selectIsDirty, selectView } from 'views/logic/slices/viewSelectors';
 import { selectGlobalOverride, selectParameterBindings } from 'views/logic/slices/searchExecutionSelectors';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
@@ -50,16 +50,17 @@ import type { Filter, VisualizationType } from 'views/logic/widgets/events/Event
 import { DEFAULT_MESSAGE_FIELDS } from 'views/Constants';
 import { addWidget } from 'views/logic/slices/widgetActions';
 import TitleTypes from 'views/stores/TitleTypes';
-import { executeActiveQuery, setTimerange, updateQueryString, updateViewState } from 'views/logic/slices/viewSlice';
+import {
+  executeActiveQuery,
+  setTimerange,
+  updateQuery,
+  updateQueryString,
+  updateViewState,
+} from 'views/logic/slices/viewSlice';
 import normalizeViewState from 'views/logic/views/normalizeViewState';
 import { setGlobalOverrideQuery, setGlobalOverrideTimerange } from 'views/logic/slices/searchExecutionSlice';
 import { undo } from 'views/logic/slices/undoRedoActions';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
-import Store from 'logic/local-storage/Store';
-import generateId from 'logic/generateId';
-import Routes from 'routing/Routes';
-import useHistory from 'routing/useHistory';
-import type { EventDefinitionLocalStorageConfig } from 'components/event-definitions/hooks/useEventDefinitionConfigFromLocalStorage';
 import type { TimeRange } from 'views/logic/queries/Query';
 
 const useSearchPage = (): SearchPage => {
@@ -84,6 +85,7 @@ const useSearchPage = (): SearchPage => {
       },
       focused_widget_id: focusedWidget?.id,
       focused_widget_editing: !!focusedWidget?.editing,
+      active_query_filters: view?.search?.queries?.find(({ id }) => id === activeQueryId)?.filters?.toArray(),
     }),
     [activeQueryId, dirty, focusedWidget?.editing, focusedWidget?.id, globalOverride, parameterBindings, view],
   );
@@ -117,46 +119,20 @@ type AddMessageTableArgs = WidgetSearchArgs & {
 
 type AddEventsWidgetArgs = WidgetSearchArgs & { mode: VisualizationType; filters: Array<Filter> };
 
-type CreateEventDefinitionArgs = {
-  title: string;
-  description: string;
-  priority: number;
-  query: string;
-  streams: Array<string>;
-  search_within_ms: number;
-  execute_every_ms: number;
-  condition?: {
-    function: string;
-    field: string;
-    operator: EventDefinitionLocalStorageConfig['agg_operator'];
-    threshold: number;
-    group_by: Array<string>;
-  };
-};
-
-// Hands the event definition to its form, as creating one from a widget's value does.
-const eventDefinitionFormUrl = (args: Record<string, unknown>) => {
-  const { condition, ...definition } = args as CreateEventDefinitionArgs;
-  const sessionId = `assistant-${generateId()}`;
-  const config: EventDefinitionLocalStorageConfig = {
-    type: 'aggregation-v1',
-    ...definition,
-    ...(condition
-      ? {
-          agg_function: condition.function,
-          agg_field: condition.field || undefined,
-          agg_operator: condition.operator,
-          agg_value: condition.threshold,
-          group_by: condition.group_by,
-        }
-      : {}),
-  };
-  Store.set(sessionId, config);
-
-  return `${Routes.ALERTS.DEFINITIONS.CREATE}?step=event-details&session-id=${sessionId}`;
-};
-
 type WidgetBuilder = ReturnType<typeof Widget.builder>;
+
+type SearchFilterArgs = {
+  filter_id: string;
+  title?: string;
+  query_string?: string;
+  description?: string;
+  negation?: boolean;
+  widget_id?: string;
+};
+
+const isFilter = (id: string) => (filter: SearchFilter) => filter.type === 'referenced' && filter.id === id;
+
+const withoutFilter = (filters: FiltersType, id: string) => filters.filterNot(isFilter(id)).toList();
 
 // Without them, the widget uses the query, streams and time range of the page.
 const withSearch = (builder: WidgetBuilder, { query, streams, timerange }: Partial<WidgetSearchArgs>) => {
@@ -193,7 +169,10 @@ const mergeSettings = (current: Settings, changes: Settings): Settings =>
 
     return {
       ...merged,
-      [key]: isPlainObject(value) && isPlainObject(previous) ? mergeSettings(previous as Settings, value as Settings) : value,
+      [key]:
+        isPlainObject(value) && isPlainObject(previous)
+          ? mergeSettings(previous as Settings, value as Settings)
+          : value,
     };
   }, current);
 
@@ -266,7 +245,6 @@ const mergeAggregation = (
 
 const useSearchPageTools = (): PageTools => {
   const dispatch = useViewsDispatch();
-  const history = useHistory();
   const view = useViewsSelector(selectView);
   const activeQueryId = useViewsSelector(selectActiveQuery);
   const globalOverride = useViewsSelector(selectGlobalOverride);
@@ -277,6 +255,48 @@ const useSearchPageTools = (): PageTools => {
       await dispatch(addWidget(widget, undefined, title));
 
       return { summary: `Added "${title}"`, undo: () => dispatch(undo()) };
+    };
+
+    // Changes the search filters of a widget, or of the shown query of a search, in one change the user can undo.
+    const changeFilters = async (widgetId: string | undefined, change: (filters: FiltersType) => FiltersType) => {
+      if (widgetId) {
+        const viewState = dispatch((_dispatch: ViewsDispatch, getState: GetState) => selectActiveViewState(getState()));
+        const widget = viewState?.widgets.find(({ id }) => id === widgetId);
+
+        if (!widget) {
+          throw new Error('The widget is not on the shown tab anymore.');
+        }
+
+        const updated = widget
+          .toBuilder()
+          .filters(change(widget.filters ?? List()))
+          .build();
+        const widgets = viewState.widgets.map((current) => (current.id === widgetId ? updated : current)).toList();
+        await dispatch(
+          updateViewState(activeQueryId, normalizeViewState(viewState.toBuilder().widgets(widgets).build())),
+        );
+      } else {
+        if (isDashboard) {
+          throw new Error('A dashboard has no search filters of its own; give the widget to filter.');
+        }
+
+        const query = dispatch((_dispatch: ViewsDispatch, getState: GetState) =>
+          selectView(getState()).search.queries.find(({ id }) => id === activeQueryId),
+        );
+        await dispatch(
+          updateQuery(
+            activeQueryId,
+            query
+              .toBuilder()
+              .filters(change(query.filters ?? List()))
+              .build(),
+          ),
+        );
+      }
+
+      await dispatch(executeActiveQuery());
+
+      return () => dispatch(undo());
     };
 
     return {
@@ -357,6 +377,36 @@ const useSearchPageTools = (): PageTools => {
 
         return add(withSearch(EventsWidget.builder().newId().config(config), search).build(), search.title);
       },
+      add_search_filter: async (args) => {
+        const { filter_id: id, title, query_string, description, negation, widget_id } = args as SearchFilterArgs;
+        const filter: SearchFilter = {
+          type: 'referenced',
+          id,
+          title,
+          queryString: query_string ?? '',
+          description,
+          negation: !!negation,
+          disabled: false,
+        };
+        const undoChange = await changeFilters(widget_id, (filters) => withoutFilter(filters, id).push(filter));
+
+        return {
+          summary: `Added search filter "${title ?? id}"${negation ? ', excluding its matches' : ''}`,
+          undo: undoChange,
+        };
+      },
+      remove_search_filter: async (args) => {
+        const { filter_id: id, title, widget_id } = args as SearchFilterArgs;
+        const undoChange = await changeFilters(widget_id, (filters) => {
+          if (!filters.some(isFilter(id))) {
+            throw new Error(`The search filter "${title ?? id}" is not applied there.`);
+          }
+
+          return withoutFilter(filters, id);
+        });
+
+        return { summary: `Removed search filter "${title ?? id}"`, undo: undoChange };
+      },
       set_query: async (args) => {
         const { query } = args as { query: string };
         const summary = `Changed the query to "${query}"`;
@@ -390,13 +440,8 @@ const useSearchPageTools = (): PageTools => {
 
         return { summary: 'Changed the time range', undo: isDashboard ? undefined : () => dispatch(undo()) };
       },
-      create_event_definition: (args) => {
-        history.push(eventDefinitionFormUrl(args));
-
-        return { summary: `Opened the form for event definition "${String(args.title)}"` };
-      },
     };
-  }, [activeQueryId, dispatch, globalOverride, history, isDashboard]);
+  }, [activeQueryId, dispatch, globalOverride, isDashboard]);
 };
 
 // Tells the Assistant what the search or dashboard shows, and lets it change the page.

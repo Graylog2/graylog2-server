@@ -97,7 +97,6 @@ const navigationBindings: PluginExports = {
               path: Routes.SYSTEM.COLLECTORS.OVERVIEW,
               description: 'Collectors',
               permissions: ['collector_fleets:read', 'collectors_config:read'],
-              requiredFeatureFlag: 'collectors',
             },
           ],
           AppConfig.isCloud() && !AppConfig.isFeatureEnabled('cloud_inputs') ? [Routes.SYSTEM.INPUTS] : [],

@@ -32,12 +32,14 @@ const Background = styled.div<{ $trend: TrendDirection | undefined }>(({ theme, 
 
   return css`
     width: 100%;
-    ${$trend &&
-    css`
-      background-color: ${bgColor} !important; /* Needed for report generation */
-      color: ${theme.utils.contrastingColor(bgColor)} !important; /* Needed for report generation */
-      color-adjust: exact !important; /* Needed for report generation */
-    `}
+    ${
+      $trend &&
+      css`
+        background-color: ${bgColor} !important; /* Needed for report generation */
+        color: ${theme.utils.contrastingColor(bgColor)} !important; /* Needed for report generation */
+        color-adjust: exact !important; /* Needed for report generation */
+      `
+    }
   `;
 });
 
@@ -48,11 +50,13 @@ const TextContainer = styled.div<{ $trend: TrendDirection | undefined }>(({ them
     padding: ${theme.spacings.xxs};
     text-align: right;
     font-family: ${theme.fonts.family.body};
-    ${$trend &&
-    css`
-      color: ${theme.utils.contrastingColor(bgColor)} !important; /* Needed for report generation */
-      color-adjust: exact !important; /* Needed for report generation */
-    `}
+    ${
+      $trend &&
+      css`
+        color: ${theme.utils.contrastingColor(bgColor)} !important; /* Needed for report generation */
+        color-adjust: exact !important; /* Needed for report generation */
+      `
+    }
   `;
 });
 

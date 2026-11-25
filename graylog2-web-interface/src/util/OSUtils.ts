@@ -16,3 +16,15 @@
  */
 
 export const isMacOS = () => /Macintosh|MacIntel/.test(navigator.userAgent);
+
+// The label of a hotkey's key name, e.g. `mod` is ⌘ on macOS and Ctrl elsewhere. Other keys keep their name.
+export const keyLabel = (key: string, macOS = isMacOS()) => {
+  const labels = {
+    mod: macOS ? '⌘' : 'Ctrl',
+    alt: macOS ? '⌥' : 'Alt',
+    ctrl: macOS ? '⌃' : 'Ctrl',
+    meta: macOS ? '⌘' : 'Win',
+  };
+
+  return labels[key] ?? key;
+};

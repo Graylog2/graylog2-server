@@ -18,6 +18,10 @@ package org.graylog.datanode.process.configuration.beans;
 
 import org.graylog.datanode.opensearch.cli.OpensearchKeystoreCli;
 
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public class OpensearchKeystoreStringItem implements OpensearchKeystoreItem {
 
     private final String key;
@@ -36,5 +40,15 @@ public class OpensearchKeystoreStringItem implements OpensearchKeystoreItem {
     @Override
     public void persist(OpensearchKeystoreCli cli) {
         cli.add(key, secret);
+    }
+
+    /**
+     * Adds all items with one call of the keystore tool. Every call starts a JVM, which takes seconds, so this is
+     * much faster than persisting the items one by one.
+     */
+    public static void persistAll(Collection<OpensearchKeystoreStringItem> items, OpensearchKeystoreCli cli) {
+        final Map<String, String> secrets = new LinkedHashMap<>();
+        items.forEach(item -> secrets.put(item.key, item.secret));
+        cli.addAll(secrets);
     }
 }

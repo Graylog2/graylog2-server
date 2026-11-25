@@ -65,22 +65,24 @@ const SearchRow = styled.div<{ $compactView: boolean }>(
     justify-content: space-between;
     align-items: center;
 
-    ${$compactView &&
-    css`
-      flex-wrap: wrap;
+    ${
+      $compactView &&
+      css`
+        flex-wrap: wrap;
 
-      .compact-search-form {
-        flex: 1;
-        min-width: 0;
-      }
+        .compact-search-form {
+          flex: 1;
+          min-width: 0;
+        }
 
-      .compact-search-form .form-group,
-      .compact-search-form .input-container,
-      .compact-search-form .query {
-        display: block;
-        width: 100%;
-      }
-    `}
+        .compact-search-form .form-group,
+        .compact-search-form .input-container,
+        .compact-search-form .query {
+          display: block;
+          width: 100%;
+        }
+      `
+    }
   `,
 );
 

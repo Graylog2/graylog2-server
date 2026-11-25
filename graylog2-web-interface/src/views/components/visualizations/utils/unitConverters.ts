@@ -111,16 +111,14 @@ const unitFromJson = (unitJson: UnitJson): Unit => ({
 });
 
 export const mappedUnitsFromJSONForAggregation: FieldUnitTypes = <FieldUnitTypes>(
-  mapValues(
-    sourceUnits,
-    (unitsJson: Array<UnitJson>): Array<Unit> => unitsJson.map((unitJson: UnitJson): Unit => unitFromJson(unitJson)),
+  mapValues(sourceUnits, (unitsJson: Array<UnitJson>): Array<Unit> =>
+    unitsJson.map((unitJson: UnitJson): Unit => unitFromJson(unitJson)),
   )
 );
 
 export const mappedUnitsFromJSON: FieldUnitTypes = <FieldUnitTypes>(
-  mapValues(
-    { ...sourceUnits, binary_size: binarySize },
-    (unitsJson: Array<UnitJson>): Array<Unit> => unitsJson.map((unitJson: UnitJson): Unit => unitFromJson(unitJson)),
+  mapValues({ ...sourceUnits, binary_size: binarySize }, (unitsJson: Array<UnitJson>): Array<Unit> =>
+    unitsJson.map((unitJson: UnitJson): Unit => unitFromJson(unitJson)),
   )
 );
 
