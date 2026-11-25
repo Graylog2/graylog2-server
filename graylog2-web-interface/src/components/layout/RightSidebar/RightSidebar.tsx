@@ -20,19 +20,12 @@ import styled, { css } from 'styled-components';
 import useRightSidebar from 'hooks/useRightSidebar';
 import usePluginEntities from 'hooks/usePluginEntities';
 import IconButton from 'components/common/IconButton';
-import SidebarResizeHandle from 'components/common/SidebarResizeHandle';
 
-import {
-  COLLAPSED_SIDEBAR_ORDER,
-  SIDEBAR_WIDTH,
-  STACKED_MIN_HEIGHT_BELOW,
-  SidebarContentArea,
-  SidebarPanel,
-} from './SidebarStyles';
+import { COLLAPSED_SIDEBAR_ORDER, STACKED_MIN_HEIGHT_BELOW, SidebarContentArea, SidebarPanel } from './SidebarStyles';
 import CollapsedSidebar from './CollapsedSidebar';
 import SidebarPanelHeader from './SidebarPanelHeader';
 import useRightSidebarWidth from './useRightSidebarWidth';
-import { useSidebarLayout } from './SidebarLayoutContext';
+import SidebarWidthHandle from './SidebarWidthHandle';
 
 // Stacked above a global sidebar like the Assistant, it is as wide as the column, without widening it.
 const Container = styled(SidebarPanel)<{ $stackedHeight: number | undefined }>(
@@ -78,8 +71,7 @@ const RightSidebar = ({ stackedHeight = undefined }: Props) => {
     canGoForward,
   } = useRightSidebar();
   const sidebarComponents = usePluginEntities('sidebar.components');
-  const [width, setWidth] = useRightSidebarWidth();
-  const { collapseAll } = useSidebarLayout();
+  const [width] = useRightSidebarWidth();
 
   if (!content) {
     return null;
@@ -112,16 +104,7 @@ const RightSidebar = ({ stackedHeight = undefined }: Props) => {
       $stackedHeight={stackedHeight}
       role="complementary"
       aria-label={`${content.title} sidebar`}>
-      {stackedHeight === undefined && (
-        <SidebarResizeHandle
-          side="right"
-          width={width}
-          bounds={SIDEBAR_WIDTH}
-          label="Resize sidebar"
-          onResize={setWidth}
-          onDragPastMin={collapseAll}
-        />
-      )}
+      {stackedHeight === undefined && <SidebarWidthHandle label="Resize sidebar" />}
       <SidebarPanelHeader
         titleId="sidebar-title"
         title={content.title}

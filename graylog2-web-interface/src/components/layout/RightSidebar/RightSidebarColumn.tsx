@@ -24,10 +24,10 @@ import useSidebarWidth from 'hooks/useSidebarWidth';
 import SidebarResizeHandle from 'components/common/SidebarResizeHandle';
 
 import RightSidebar from './RightSidebar';
-import { COLLAPSED_SIDEBAR_ORDER, SIDEBAR_WIDTH, STACKED_MIN_HEIGHT_BELOW } from './SidebarStyles';
+import { COLLAPSED_SIDEBAR_ORDER, STACKED_MIN_HEIGHT_BELOW } from './SidebarStyles';
 import SidebarLayoutContext from './SidebarLayoutContext';
 import useGlobalSidebarState from './useGlobalSidebarState';
-import useRightSidebarWidth from './useRightSidebarWidth';
+import SidebarWidthHandle from './SidebarWidthHandle';
 
 const STACKED_HEIGHT = { initial: 320, min: 120, max: 640 };
 
@@ -103,7 +103,6 @@ const RightSidebarColumn = () => {
   // The stored height can exceed what a smaller window leaves.
   const stackedHeight = Math.min(storedHeight, bounds.max);
   const stacked = isOpen && !isCollapsed && globalSidebar.isOpen && !globalSidebar.isCollapsed;
-  const [width, setWidth] = useRightSidebarWidth();
 
   const collapseAll = () => {
     if (isOpen) {
@@ -116,16 +115,7 @@ const RightSidebarColumn = () => {
   return (
     <SidebarLayoutContext.Provider value={{ stacked, collapseAll }}>
       <Column ref={columnRef} $stacked={stacked}>
-        {stacked && (
-          <SidebarResizeHandle
-            side="right"
-            width={width}
-            bounds={SIDEBAR_WIDTH}
-            label="Resize sidebars"
-            onResize={setWidth}
-            onDragPastMin={collapseAll}
-          />
-        )}
+        {stacked && <SidebarWidthHandle label="Resize sidebars" />}
         {isOpen && <RightSidebar stackedHeight={stacked ? stackedHeight : undefined} />}
         {stacked && (
           <SidebarResizeHandle

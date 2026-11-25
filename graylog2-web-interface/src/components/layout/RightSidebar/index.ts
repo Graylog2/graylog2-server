@@ -17,7 +17,6 @@
 export { default } from './RightSidebar';
 export { default as CollapsedSidebar } from './CollapsedSidebar';
 export {
-  SIDEBAR_WIDTH,
   SidebarContainer,
   SidebarPanel,
   SidebarRow,
@@ -28,3 +27,4 @@ export {
 export { default as SidebarPanelHeader } from './SidebarPanelHeader';
 export { default as useRightSidebarWidth } from './useRightSidebarWidth';
 export { useSidebarLayout } from './SidebarLayoutContext';
+export { default as SidebarWidthHandle } from './SidebarWidthHandle';
