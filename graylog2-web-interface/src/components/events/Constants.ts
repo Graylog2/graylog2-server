@@ -110,7 +110,7 @@ export const detailsAttributes: Array<Attribute> = [
 export const eventsTableSpecificAttributes: Array<Attribute> = [
   {
     id: 'message',
-    title: 'Description',
+    title: 'Message',
     type: 'STRING',
     sortable: false,
     searchable: false,
