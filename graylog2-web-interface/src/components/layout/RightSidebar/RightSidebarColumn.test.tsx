@@ -27,8 +27,6 @@ import RightSidebarColumn from './RightSidebarColumn';
 
 jest.mock('hooks/usePluginEntities');
 
-const collapseAssistant = jest.fn();
-
 const Assistant = () => <p>Assistant chat</p>;
 const EventDetails = () => <p>Event details</p>;
 
@@ -55,14 +53,13 @@ const renderWithOpenDetails = async () => {
 
 describe('<RightSidebarColumn />', () => {
   beforeEach(() => {
-    collapseAssistant.mockClear();
     asMock(usePluginEntities).mockImplementation((entityKey) =>
       entityKey === 'globalSidebars'
         ? [
             {
               key: 'assistant',
               component: Assistant,
-              useSidebarState: () => ({ isOpen: true, isCollapsed: false, collapse: collapseAssistant }),
+              useSidebarState: () => ({ isOpen: true, isCollapsed: false }),
             },
           ]
         : [],
@@ -84,7 +81,5 @@ describe('<RightSidebarColumn />', () => {
 
     await screen.findByRole('button', { name: 'Expand sidebar' });
     await screen.findByText('Assistant chat');
-
-    expect(collapseAssistant).not.toHaveBeenCalled();
   });
 });

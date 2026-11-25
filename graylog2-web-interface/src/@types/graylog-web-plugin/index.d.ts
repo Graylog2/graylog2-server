@@ -42,8 +42,8 @@ interface PluginNavigationItems {
   component: React.ComponentType;
 }
 
-// What the layout needs to know about a global sidebar; `collapse` e.g. when the user drags the divider above it down.
-type GlobalSidebarState = { isOpen: boolean; isCollapsed: boolean; collapse: () => void };
+// What the layout needs to know about a global sidebar.
+type GlobalSidebarState = { isOpen: boolean; isCollapsed: boolean };
 
 interface GlobalNotification {
   key: string;

@@ -25,7 +25,6 @@ const useGlobalSidebarState = () => {
   return {
     isOpen: openSidebars.length > 0,
     isCollapsed: openSidebars.some(({ isCollapsed }) => isCollapsed),
-    collapse: () => openSidebars.forEach(({ collapse }) => collapse()),
   };
 };
 

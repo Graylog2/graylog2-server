@@ -21,9 +21,6 @@ import styled, { css } from 'styled-components';
 import type { SidebarBounds } from 'hooks/useSidebarSize';
 
 const KEYBOARD_STEP = 16;
-// How far beyond its smallest size the user drags before e.g. a sidebar collapses, so resizing it to its limit does
-// not collapse it by accident.
-const DRAG_PAST_LIMIT = 80;
 
 type Side = 'left' | 'right' | 'top' | 'bottom';
 
@@ -83,16 +80,13 @@ type Props = {
   bounds: SidebarBounds;
   label: string;
   onResize: (size: number) => void;
-  // Called when dragged far past the smallest size, e.g. to collapse a sidebar. The size goes back to the one before
-  // the drag.
-  onDragPastMin?: () => void;
 };
 
 /**
  * Resizes a sidebar by dragging or with the arrow keys; a double click restores its initial size.
  * Place a left or right handle inside the sidebar's positioned container, a top or bottom one next to the sidebar.
  */
-const SidebarResizeHandle = ({ side, size, bounds, label, onResize, onDragPastMin = undefined }: Props) => {
+const SidebarResizeHandle = ({ side, size, bounds, label, onResize }: Props) => {
   const drag = useRef<{ pointerId: number; start: number; startSize: number } | undefined>(undefined);
   const [dragging, setDragging] = useState(false);
   const vertical = isVertical(side);
@@ -117,20 +111,9 @@ const SidebarResizeHandle = ({ side, size, bounds, label, onResize, onDragPastMi
   };
 
   const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (!drag.current || drag.current.pointerId !== event.pointerId) return;
-
-    const { startSize } = drag.current;
-    const draggedSize = startSize + direction * (position(event) - drag.current.start);
-
-    if (onDragPastMin && draggedSize < bounds.min - DRAG_PAST_LIMIT) {
-      endDrag(event);
-      onResize(startSize);
-      onDragPastMin();
-
-      return;
+    if (drag.current && drag.current.pointerId === event.pointerId) {
+      onResize(drag.current.startSize + direction * (position(event) - drag.current.start));
     }
-
-    onResize(draggedSize);
   };
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {

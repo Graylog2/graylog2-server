@@ -94,7 +94,7 @@ const GlobalSidebars = () => {
 // While a global sidebar is open and expanded next to the expanded right sidebar, both share one column, the right
 // sidebar on top. Collapsed, each is a strip next to the page.
 const RightSidebarColumn = () => {
-  const { isOpen, isCollapsed, collapseSidebar } = useRightSidebar();
+  const { isOpen, isCollapsed } = useRightSidebar();
   const globalSidebar = useGlobalSidebarState();
   const columnRef = useRef<HTMLDivElement>(null);
   const { height: columnHeight } = useElementDimensions(columnRef);
@@ -104,16 +104,8 @@ const RightSidebarColumn = () => {
   const stackedHeight = Math.min(storedHeight, bounds.max);
   const stacked = isOpen && !isCollapsed && globalSidebar.isOpen && !globalSidebar.isCollapsed;
 
-  const collapseAll = () => {
-    if (isOpen) {
-      collapseSidebar();
-    }
-
-    globalSidebar.collapse();
-  };
-
   return (
-    <SidebarLayoutContext.Provider value={{ stacked, collapseAll }}>
+    <SidebarLayoutContext.Provider value={{ stacked }}>
       <Column ref={columnRef} $stacked={stacked}>
         {stacked && <SidebarWidthHandle label="Resize sidebars" />}
         {isOpen && <RightSidebar stackedHeight={stacked ? stackedHeight : undefined} />}

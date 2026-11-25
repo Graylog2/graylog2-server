@@ -19,7 +19,6 @@ import * as React from 'react';
 import SidebarResizeHandle from 'components/common/SidebarResizeHandle';
 
 import { SIDEBAR_WIDTH } from './SidebarStyles';
-import { useSidebarLayout } from './SidebarLayoutContext';
 import useRightSidebarWidth from './useRightSidebarWidth';
 
 type Props = {
@@ -27,22 +26,12 @@ type Props = {
 };
 
 /**
- * Resizes the width the sidebars next to the page share. Dragged far past the smallest width, it collapses them all.
+ * Resizes the width the sidebars next to the page share.
  */
 const SidebarWidthHandle = ({ label }: Props) => {
   const [width, setWidth] = useRightSidebarWidth();
-  const { collapseAll } = useSidebarLayout();
 
-  return (
-    <SidebarResizeHandle
-      side="right"
-      size={width}
-      bounds={SIDEBAR_WIDTH}
-      label={label}
-      onResize={setWidth}
-      onDragPastMin={collapseAll}
-    />
-  );
+  return <SidebarResizeHandle side="right" size={width} bounds={SIDEBAR_WIDTH} label={label} onResize={setWidth} />;
 };
 
 export default SidebarWidthHandle;

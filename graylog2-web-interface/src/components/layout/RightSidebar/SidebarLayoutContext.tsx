@@ -22,13 +22,11 @@ import { singleton } from 'logic/singleton';
 type SidebarLayout = {
   // Whether the right sidebar and a global sidebar like the Assistant share one column.
   stacked: boolean;
-  // Collapses every open sidebar next to the page at once.
-  collapseAll: () => void;
 };
 
 // Set by the column the sidebars next to the page are in, so they follow one layout.
 const SidebarLayoutContext = singleton('contexts.SidebarLayout', () =>
-  React.createContext<SidebarLayout>({ stacked: false, collapseAll: () => {} }),
+  React.createContext<SidebarLayout>({ stacked: false }),
 );
 
 export const useSidebarLayout = () => useContext(SidebarLayoutContext);
