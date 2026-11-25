@@ -18,7 +18,8 @@ import React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import MockStore from 'helpers/mocking/StoreMock';
+import { SystemClusterConfig } from '@graylog/server-api';
+
 import asMock from 'helpers/mocking/AsMock';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
@@ -32,22 +33,12 @@ const mockConfig = {
   require_special_chars: false,
 };
 
-const mockUpdate = jest.fn().mockResolvedValue(undefined);
-const mockListPasswordComplexityConfig = jest.fn().mockResolvedValue(undefined);
-
 jest.mock('logic/telemetry/useSendTelemetry');
-jest.mock('stores/configurations/ConfigurationsStore', () => ({
-  ConfigurationsStore: MockStore([
-    'getInitialState',
-    () => ({
-      configuration: {
-        'org.graylog2.users.PasswordComplexityConfig': mockConfig,
-      },
-    }),
-  ]),
-  ConfigurationsActions: {
-    listPasswordComplexityConfig: (...args: unknown[]) => mockListPasswordComplexityConfig(...args),
-    update: (...args: unknown[]) => mockUpdate(...args),
+jest.mock('util/UserNotification', () => ({ success: jest.fn(), error: jest.fn() }));
+jest.mock('@graylog/server-api', () => ({
+  SystemClusterConfig: {
+    read: jest.fn(),
+    update: jest.fn(),
   },
 }));
 
@@ -55,6 +46,8 @@ describe('PasswordComplexityConfig', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     asMock(useSendTelemetry).mockReturnValue(jest.fn());
+    asMock(SystemClusterConfig.read).mockResolvedValue(mockConfig);
+    asMock(SystemClusterConfig.update).mockImplementation(async (_key, config) => config);
   });
 
   it('renders current password requirements', async () => {
@@ -82,7 +75,7 @@ describe('PasswordComplexityConfig', () => {
     await userEvent.click(await screen.findByRole('button', { name: /update configuration/i }));
 
     await waitFor(() => {
-      expect(mockUpdate).toHaveBeenCalledWith('org.graylog2.users.PasswordComplexityConfig', {
+      expect(SystemClusterConfig.update).toHaveBeenCalledWith('org.graylog2.users.PasswordComplexityConfig', {
         min_length: 12,
         require_uppercase: true,
         require_lowercase: true,

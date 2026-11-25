@@ -45,13 +45,11 @@ const SelectableMessageTableMessagesProvider = ({
     return {
       selectableMessageTableMessages: messages
         .filter((message) => !!message.message?._id && isEntitySelectable(message))
-        .map(
-          ({ index, message }): SelectableMessageTableMessage => ({
-            id: message._id,
-            index,
-            timestamp: message.timestamp,
-          }),
-        ),
+        .map(({ index, message }): SelectableMessageTableMessage => ({
+          id: message._id,
+          index,
+          timestamp: message.timestamp,
+        })),
     };
   }, [displayBulkSelectCol, isEntitySelectable, messages]);
 

@@ -168,9 +168,7 @@ describe('FetchProvider', () => {
     const error = await fetch('GET', `${baseUrl}/simulatesSessionExpiration`).catch((e) => e);
 
     expect(error.name).toEqual('FetchError');
-    expect(error.message).toEqual(
-      'There was an error fetching a resource: Unauthorized. Additional information: Not available',
-    );
+    expect(error.message).toEqual('There was an error fetching a resource: Unauthorized.');
 
     expect(Session.isLoggedIn()).toBe(false);
     expect(onLogout).toHaveBeenCalledTimes(1);
@@ -215,9 +213,7 @@ describe('FetchProvider', () => {
     const error = await fetch('POST', 'http://localhost:12223/').catch((e) => e);
 
     expect(error.status).toEqual(undefined);
-    expect(error.message).toEqual(
-      'There was an error fetching a resource: undefined. Additional information: Not available',
-    );
+    expect(error.message).toEqual('There was an error fetching a resource: The server could not be reached.');
   });
 
   it('reports 403 by default', async () => {
@@ -225,9 +221,7 @@ describe('FetchProvider', () => {
     const error = await promise.catch((e) => e);
 
     expect(error.status).toEqual(403);
-    expect(error.message).toEqual(
-      'There was an error fetching a resource: Forbidden. Additional information: Not available',
-    );
+    expect(error.message).toEqual('There was an error fetching a resource: Forbidden.');
 
     expect(ErrorsActions.report).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -240,9 +234,7 @@ describe('FetchProvider', () => {
     const promise = new Builder('GET', `${baseUrl}/simulatesUnauthorized`).json().ignoreUnauthorized().build();
     const error = await promise.catch((e) => e);
 
-    expect(error.message).toEqual(
-      'There was an error fetching a resource: Forbidden. Additional information: Not available',
-    );
+    expect(error.message).toEqual('There was an error fetching a resource: Forbidden.');
 
     expect(ErrorsActions.report).not.toHaveBeenCalled();
   });

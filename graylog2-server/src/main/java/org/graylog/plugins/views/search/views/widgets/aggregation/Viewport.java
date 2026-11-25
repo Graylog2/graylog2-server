@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.views.widgets.aggregation;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
@@ -27,12 +28,15 @@ import com.google.auto.value.AutoValue;
 @JsonDeserialize(builder = Viewport.Builder.class)
 public abstract class Viewport {
     @JsonProperty("center_x")
+    @JsonPropertyDescription("The latitude of the map's center.")
     public abstract double centerX();
 
     @JsonProperty("center_y")
+    @JsonPropertyDescription("The longitude of the map's center.")
     public abstract double centerY();
 
     @JsonProperty
+    @JsonPropertyDescription("The zoom level, 1 showing the whole world.")
     public abstract int zoom();
 
     @AutoValue.Builder

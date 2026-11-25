@@ -18,6 +18,7 @@ package org.graylog.plugins.views.search.views.widgets.aggregation;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import java.util.HashMap;
@@ -26,6 +27,11 @@ import java.util.Optional;
 public interface XYVisualizationConfig {
     String FIELD_AXIS_TYPE = "axis_type";
     String FIELD_AXIS_CONFIG = "axis_config";
+    String AXIS_TYPE_DESCRIPTION = "The scale of the y-axis: linear, or logarithmic for values that span several "
+            + "orders of magnitude.";
+    String AXIS_CONFIG_DESCRIPTION = "Labels and colors of the axes, by axis: xaxis for the x-axis, number for the "
+            + "y-axis of metrics without a unit, and percent, time and size for the y-axes of metrics on fields with "
+            + "that unit. Give each axis a title, a color, or both.";
     AxisType DEFAULT_AXIS_TYPE = AxisType.LINEAR;
 
     enum AxisType {
@@ -55,7 +61,10 @@ public interface XYVisualizationConfig {
         xaxis;
     }
 
-    record SingleAxisConfig(@JsonProperty Optional<String> title, @JsonProperty Optional<String> color) {}
+    record SingleAxisConfig(@JsonProperty @JsonPropertyDescription("The label of the axis.")
+                            Optional<String> title,
+                            @JsonProperty @JsonPropertyDescription("The color of the axis, e.g. #e6194b.")
+                            Optional<String> color) {}
 
     class AxisConfig extends HashMap<UnitType, SingleAxisConfig> {}
 

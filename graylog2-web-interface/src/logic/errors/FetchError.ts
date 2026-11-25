@@ -41,9 +41,11 @@ export default class FetchError extends Error {
     super(message);
     this.name = 'FetchError';
 
-    const details = isString(additional) ? additional : (additional?.message ?? 'Not available');
-    this.details = details;
-    this.message = `There was an error fetching a resource: ${message}. Additional information: ${details}`;
+    const details = isString(additional) ? additional : additional?.message;
+    this.details = details ?? 'Not available';
+    this.message = details
+      ? `There was an error fetching a resource: ${message}. Additional information: ${details}`
+      : `There was an error fetching a resource: ${message}.`;
 
     this.responseMessage = additional?.message ?? undefined;
 

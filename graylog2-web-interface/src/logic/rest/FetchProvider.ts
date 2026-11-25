@@ -32,7 +32,12 @@ const onServerError = async (error: Response | undefined, onUnauthorized = defau
   const response = await (contentType?.startsWith('application/json')
     ? error.json().then((body) => body)
     : error?.text?.());
-  const fetchError = new FetchError(error.statusText, error.status, emptyToUndefined(response));
+  // A request that fails without an HTTP response, e.g. because of a network error, rejects with an error instead of a `Response`.
+  const fetchError = new FetchError(
+    error.statusText ?? 'The server could not be reached',
+    error.status,
+    emptyToUndefined(response),
+  );
 
   if (Session.isLoggedIn() && error.status === 401) {
     Session.logout().catch(() => {});

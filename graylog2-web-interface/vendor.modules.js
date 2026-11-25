@@ -29,6 +29,7 @@ module.exports = [
   'react',
   'react-bootstrap',
   'react-dom',
+  'react-hotkeys-hook',
   'react-redux',
   'react-router',
   'redux',

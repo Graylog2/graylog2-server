@@ -18,12 +18,15 @@ package org.graylog.integrations.ipfix.codecs;
 
 import com.google.common.collect.Maps;
 import com.google.common.io.Resources;
+import com.google.protobuf.ByteString;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.pkts.Pcap;
 import io.pkts.packet.UDPPacket;
 import io.pkts.protocol.Protocol;
 import org.graylog.integrations.ipfix.InformationElementDefinitions;
+import org.graylog.integrations.ipfix.IpfixJournal;
 import org.graylog.integrations.ipfix.IpfixMessage;
 import org.graylog.integrations.ipfix.IpfixParser;
 import org.graylog.integrations.ipfix.Utils;
@@ -39,6 +42,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -57,6 +61,14 @@ import static org.assertj.core.api.Assertions.fail;
 
 public class IpfixAggregatorTest {
     private static final Logger LOG = LoggerFactory.getLogger(IpfixAggregatorTest.class);
+    private static final int TEMPLATE_SET_ID = 2;
+    private static final int COLLIDING_TEMPLATE_ID = 258;
+    private static final int IE_PROTOCOL_IDENTIFIER = 4;
+    private static final int IE_SOURCE_IPV4_ADDRESS = 8;
+    private static final int IE_DESTINATION_TRANSPORT_PORT = 11;
+    private static final int OPTIONS_TEMPLATE_SET_ID = 3;
+    private static final int DATA_TEMPLATE_ID = 258;
+    private static final int OPTIONS_TEMPLATE_ID = 300;
     private final InetSocketAddress someAddress = InetSocketAddress.createUnresolved("192.168.1.1", 999);
     private final MessageFactory messageFactory = new TestMessageFactory();
 
@@ -218,6 +230,208 @@ public class IpfixAggregatorTest {
             fail("Cannot process PCAP stream");
         }
         assertThat(messages).hasSize(2);
+    }
+
+    @Test
+    public void releasesBufferedDataSetsWhoseTemplateArrivedInAnEarlierPacket() throws IOException {
+        final IpfixAggregator ipfixAggregator = new IpfixAggregator();
+        final IpfixCodec codec = new IpfixCodec(new Configuration(Map.of()), ipfixAggregator, messageFactory);
+        final byte[] template258 = new byte[]{
+                0x01, 0x02, 0x00, 0x02, // template id 258, 2 fields
+                0x00, 0x08, 0x00, 0x04, // sourceIPv4Address
+                0x00, 0x04, 0x00, 0x01 // protocolIdentifier
+        };
+        final byte[] template259 = new byte[]{
+                0x01, 0x03, 0x00, 0x02, // template id 259, 2 fields
+                0x00, 0x08, 0x00, 0x04, // sourceIPv4Address
+                0x00, 0x04, 0x00, 0x01 // protocolIdentifier
+        };
+
+        // every datagram comes with its own, equal but not identical, address object
+        final CodecAggregator.Result templateResult = ipfixAggregator.addChunk(
+                ipfixMessage(set(TEMPLATE_SET_ID, template258)), exporterAddress());
+        assertThat(templateResult.getMessage()).isNull();
+
+        // template 259 is still unknown, so the whole packet is buffered
+        final CodecAggregator.Result bufferedResult = ipfixAggregator.addChunk(ipfixMessage(
+                set(258, new byte[]{10, 0, 0, 1, 6}),
+                set(259, new byte[]{10, 0, 0, 2, 17})), exporterAddress());
+        assertThat(bufferedResult.isValid()).isTrue();
+        assertThat(bufferedResult.getMessage()).isNull();
+
+        final CodecAggregator.Result releasedResult = ipfixAggregator.addChunk(
+                ipfixMessage(set(TEMPLATE_SET_ID, template259)), exporterAddress());
+        assertThat(releasedResult.isValid()).isTrue();
+        assertThat(releasedResult.getMessage()).isNotNull();
+
+        final Collection<Message> messages = codec.decodeMessages(new RawMessage(ByteBufUtil.getBytes(releasedResult.getMessage())));
+        assertThat(messages)
+                .extracting(message -> message.getField("sourceIPv4Address"))
+                .as("both buffered data sets are released")
+                .containsExactlyInAnyOrder("10.0.0.1", "10.0.0.2");
+    }
+
+    private static InetSocketAddress exporterAddress() {
+        return InetSocketAddress.createUnresolved("192.168.1.1", 4739);
+    }
+
+    private static ByteBuf set(int setId, byte[] content) {
+        final ByteBuf set = Unpooled.buffer();
+        set.writeShort(setId);
+        set.writeShort(4 + content.length);
+        set.writeBytes(content);
+        return set;
+    }
+
+    private static ByteBuf ipfixMessage(ByteBuf... sets) {
+        final ByteBuf packet = Unpooled.buffer();
+        packet.writeShort(10); // IPFIX version
+        packet.writeShort(0); // message length, set below
+        packet.writeInt(1700000000); // export time
+        packet.writeInt(1); // sequence number
+        packet.writeInt(0); // observation domain id
+        for (ByteBuf set : sets) {
+            packet.writeBytes(set);
+        }
+        packet.setShort(2, packet.readableBytes());
+        return packet;
+    }
+
+    @Test
+    public void usesOnlyTemplatesOfTheSendingExporterWhenTemplateIdsCollide() throws IOException {
+        // Two exporters use the same observation domain id and the same template id, but different field layouts.
+        final Exporter exporterA = new Exporter(InetSocketAddress.createUnresolved("192.168.1.1", 4739),
+                templateRecord(COLLIDING_TEMPLATE_ID, IE_SOURCE_IPV4_ADDRESS, 4, IE_PROTOCOL_IDENTIFIER, 1),
+                ByteString.copyFrom(new byte[]{10, 0, 0, 1, 6}),
+                "10.0.0.1", 6L);
+        final Exporter exporterB = new Exporter(InetSocketAddress.createUnresolved("192.168.1.2", 4739),
+                templateRecord(COLLIDING_TEMPLATE_ID, IE_SOURCE_IPV4_ADDRESS, 4, IE_DESTINATION_TRANSPORT_PORT, 2, IE_PROTOCOL_IDENTIFIER, 1),
+                ByteString.copyFrom(new byte[]{10, 0, 0, 2, 0x01, (byte) 0xbb, 17}),
+                "10.0.0.2", 17L);
+
+        // the arrival order of the exporters must not matter
+        assertExportersUseTheirOwnTemplates(exporterA, exporterB);
+        assertExportersUseTheirOwnTemplates(exporterB, exporterA);
+    }
+
+    private void assertExportersUseTheirOwnTemplates(Exporter first, Exporter second) throws IOException {
+        final IpfixAggregator ipfixAggregator = new IpfixAggregator();
+        final IpfixCodec codec = new IpfixCodec(new Configuration(Map.of()), ipfixAggregator, messageFactory);
+
+        // template and data record in the same packet
+        for (Exporter exporter : List.of(first, second)) {
+            assertAggregatedWithOwnTemplate(ipfixAggregator, codec, exporter, ipfixPacket(exporter.templateRecord(), exporter.dataRecord()));
+        }
+        // data-only packets after the templates of both exporters are known
+        for (Exporter exporter : List.of(first, second)) {
+            assertAggregatedWithOwnTemplate(ipfixAggregator, codec, exporter, ipfixPacket(null, exporter.dataRecord()));
+        }
+    }
+
+    private void assertAggregatedWithOwnTemplate(IpfixAggregator ipfixAggregator, IpfixCodec codec, Exporter exporter, ByteBuf packet) throws IOException {
+        final CodecAggregator.Result result = ipfixAggregator.addChunk(packet, exporter.address());
+        assertThat(result.isValid()).isTrue();
+        assertThat(result.getMessage()).isNotNull();
+
+        final byte[] bytes = ByteBufUtil.getBytes(result.getMessage());
+        final IpfixJournal.RawIpfix rawIpfix = IpfixJournal.RawIpfix.parseFrom(bytes);
+        assertThat(rawIpfix.getTemplatesMap())
+                .as("templates sent along with the data of exporter %s", exporter.address())
+                .containsOnlyKeys(COLLIDING_TEMPLATE_ID)
+                .containsEntry(COLLIDING_TEMPLATE_ID, exporter.templateRecord());
+
+        final Collection<Message> messages = codec.decodeMessages(new RawMessage(bytes));
+        assertThat(messages).singleElement().satisfies(message -> {
+            assertThat(message.getField("sourceIPv4Address")).isEqualTo(exporter.expectedSourceAddress());
+            assertThat(message.getField("protocolIdentifier")).isEqualTo(exporter.expectedProtocol());
+        });
+    }
+
+    private static ByteString templateRecord(int templateId, int... fieldIdsAndLengths) {
+        final ByteBuf buf = Unpooled.buffer();
+        buf.writeShort(templateId);
+        buf.writeShort(fieldIdsAndLengths.length / 2);
+        for (int value : fieldIdsAndLengths) {
+            buf.writeShort(value);
+        }
+        return ByteString.copyFrom(ByteBufUtil.getBytes(buf));
+    }
+
+    private static ByteBuf ipfixPacket(@Nullable ByteString templateRecord, ByteString dataRecord) {
+        final ByteBuf sets = Unpooled.buffer();
+        if (templateRecord != null) {
+            sets.writeShort(2); // template set id
+            sets.writeShort(4 + templateRecord.size());
+            sets.writeBytes(templateRecord.toByteArray());
+        }
+        sets.writeShort(COLLIDING_TEMPLATE_ID); // data set id
+        sets.writeShort(4 + dataRecord.size());
+        sets.writeBytes(dataRecord.toByteArray());
+
+        final ByteBuf packet = Unpooled.buffer();
+        packet.writeShort(10); // IPFIX version
+        packet.writeShort(16 + sets.readableBytes());
+        packet.writeInt(1700000000); // export time
+        packet.writeInt(1); // sequence number
+        packet.writeInt(0); // observation domain id
+        packet.writeBytes(sets);
+        return packet;
+    }
+
+    private record Exporter(InetSocketAddress address, ByteString templateRecord, ByteString dataRecord,
+                            String expectedSourceAddress, long expectedProtocol) {
+    }
+
+    @Test
+    public void decodesDataSetsOfPacketsThatAlsoContainOptionsDataSets() throws IOException {
+        final IpfixAggregator ipfixAggregator = new IpfixAggregator();
+        final IpfixCodec codec = new IpfixCodec(new Configuration(Map.of()), ipfixAggregator, messageFactory);
+        final byte[] templateRecord = new byte[]{
+                0x01, 0x02, 0x00, 0x02, // template id 258, 2 fields
+                0x00, 0x08, 0x00, 0x04, // sourceIPv4Address
+                0x00, 0x04, 0x00, 0x01 // protocolIdentifier
+        };
+        final byte[] optionsTemplateRecord = new byte[]{
+                0x01, 0x2c, 0x00, 0x02, 0x00, 0x01, // template id 300, 2 fields, 1 scope field
+                0x00, (byte) 0x90, 0x00, 0x04, // exportingProcessId (scope)
+                0x00, 0x28, 0x00, 0x08 // exportedOctetTotalCount
+        };
+        final byte[] dataRecord = new byte[]{10, 0, 0, 1, 6};
+        final byte[] optionsDataRecord = new byte[]{0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0x10, 0};
+
+        // template, data, options template and options data in the same packet
+        assertDataSetIsDecoded(ipfixAggregator, codec, ipfixMessage(
+                set(TEMPLATE_SET_ID, templateRecord),
+                set(DATA_TEMPLATE_ID, dataRecord),
+                set(OPTIONS_TEMPLATE_SET_ID, optionsTemplateRecord),
+                set(OPTIONS_TEMPLATE_ID, optionsDataRecord)));
+
+        // options data and data only, both templates are known from the previous packet
+        assertDataSetIsDecoded(ipfixAggregator, codec, ipfixMessage(
+                set(OPTIONS_TEMPLATE_ID, optionsDataRecord),
+                set(DATA_TEMPLATE_ID, dataRecord)));
+
+        // options data only: there is nothing to decode
+        final CodecAggregator.Result optionsOnlyResult = ipfixAggregator.addChunk(ipfixMessage(set(OPTIONS_TEMPLATE_ID, optionsDataRecord)), someAddress);
+        assertThat(optionsOnlyResult.isValid()).isTrue();
+        assertThat(optionsOnlyResult.getMessage()).isNull();
+    }
+
+    private void assertDataSetIsDecoded(IpfixAggregator ipfixAggregator, IpfixCodec codec, ByteBuf packet) throws IOException {
+        final CodecAggregator.Result result = ipfixAggregator.addChunk(packet, someAddress);
+        assertThat(result.isValid()).isTrue();
+        assertThat(result.getMessage()).as("aggregated message").isNotNull();
+
+        final byte[] bytes = ByteBufUtil.getBytes(result.getMessage());
+        assertThat(IpfixJournal.RawIpfix.parseFrom(bytes).getDataSetsList())
+                .extracting(IpfixJournal.DataSet::getTemplateId)
+                .containsExactly(DATA_TEMPLATE_ID);
+
+        final Collection<Message> messages = codec.decodeMessages(new RawMessage(bytes));
+        assertThat(messages).singleElement().satisfies(message -> {
+            assertThat(message.getField("sourceIPv4Address")).isEqualTo("10.0.0.1");
+            assertThat(message.getField("protocolIdentifier")).isEqualTo(6L);
+        });
     }
 
     private Map<String, Object> getIxiaConfigmap() throws URISyntaxException {

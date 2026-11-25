@@ -58,11 +58,13 @@ const StyledSpan = styled.span<{
     font-size: ${sizeMap[$size] ?? '1.15em'};
     transform: rotate(${$rotation}deg) scaleY(${$flip === 'horizontal' || $flip === 'both' ? -1 : 1})
       scaleX(${$flip === 'vertical' || $flip === 'both' ? -1 : 1});
-    animation: ${$spin
-      ? css`
+    animation: ${
+      $spin
+        ? css`
           ${spinAnimation} 2s infinite linear
         `
-      : 'none'};
+        : 'none'
+    };
     vertical-align: middle;
     color: ${$bsStyle ? theme.colors.button[$bsStyle].background : 'inherit'};
   `,

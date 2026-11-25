@@ -94,11 +94,13 @@ type ExtraProps = {
 };
 const StyledPopoverDropdown = styled(Popover.Dropdown)<ExtraProps>(
   ({ $shaking }) => css`
-    animation: ${$shaking
-      ? css`
+    animation: ${
+      $shaking
+        ? css`
           ${shakeAnimation} 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both
         `
-      : 'none'};
+        : 'none'
+    };
   `,
 );
 const ErrorIcon = styled(Icon)<{ $status: string }>(
@@ -110,11 +112,13 @@ const ErrorIcon = styled(Icon)<{ $status: string }>(
       return theme.colors.variant.warning;
     }};
     font-size: 22px;
-    animation: ${$status === 'INFO'
-      ? css`
+    animation: ${
+      $status === 'INFO'
+        ? css`
           ${shakeAnimation} 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both
         `
-      : 'none'};
+        : 'none'
+    };
     animation-iteration-count: 2;
   `,
 );

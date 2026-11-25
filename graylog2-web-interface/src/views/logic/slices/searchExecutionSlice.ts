@@ -153,7 +153,7 @@ export type SearchExecutors = {
     perPage?: number;
     stopPolling?: (progress: number) => boolean;
   }) => Promise<SearchExecutionResult>;
-  cancelJob: (jobIds: JobIds) => Promise<null>;
+  cancelJob: (jobIds: JobIds) => Promise<void>;
   /**
    * Stores a search before it is executed. Executors that do not run it, e.g. ones showing stored results, return it
    * unchanged.

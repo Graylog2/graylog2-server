@@ -24,6 +24,10 @@ export type SearchPage = {
   active_query_id?: string;
   overrides?: { query?: string; timerange?: TimeRangeJson; parameter_values?: Record<string, unknown> };
   focused_widget_id?: string;
+  // Whether the focused widget is open in its editor, whose changes are not in `view` until they are applied.
+  focused_widget_editing?: boolean;
+  // The search filters of the shown query, which may not be saved yet.
+  active_query_filters?: Array<unknown>;
 };
 
 export type NotebookPage = {
@@ -59,8 +63,27 @@ export type PageContext = {
   panels: Array<Panel>;
 };
 
-// What a page tool did, shown in the chat; `undo` reverts it.
-export type PageToolResult = { summary?: string; undo?: () => unknown } | void;
+// A page the chat links to after a page tool ran, e.g. a stream it created; `path` is a route within Graylog.
+export type PageToolLink = { label: string; path: string };
+
+// What a page tool did, shown in the chat; `undo` reverts it. `result` tells the Assistant what it needs to refer to
+// it later, e.g. the id of a created entity. `enable` turns on what it created disabled, and says what it did then.
+export type PageToolResult = {
+  summary?: string;
+  links?: Array<PageToolLink>;
+  result?: string;
+  undo?: () => unknown;
+  enable?: () => Promise<{ summary: string; result?: string }>;
+} | void;
+
+// Thrown by a page tool whose failure the user was already told about, e.g. by a mutation hook's error toast, so the
+// Assistant does not show a second error.
+export class PageToolNotifiedError extends Error {
+  constructor(cause: unknown) {
+    super(cause instanceof Error ? cause.message : String(cause), { cause });
+    this.name = 'PageToolNotifiedError';
+  }
+}
 
 // Runs a page tool the Assistant asked for, with arguments the backend checked.
 export type PageToolHandler = (args: Record<string, unknown>) => PageToolResult | Promise<PageToolResult>;
