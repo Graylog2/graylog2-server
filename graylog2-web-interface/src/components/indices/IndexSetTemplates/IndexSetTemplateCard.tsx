@@ -40,11 +40,13 @@ const StyledCard = styled(Card)<{ $selected: boolean; $disabled: boolean }>(
     gap: ${theme.spacings.sm};
     ${$disabled && `color: ${theme.colors.text.secondary};`}
 
-    ${$selected &&
-    `
+    ${
+      $selected &&
+      `
     background-color: ${theme.colors.global.background};
     border: 2px solid ${theme.colors.contrast.default};
-  `}
+  `
+    }
   `,
 );
 

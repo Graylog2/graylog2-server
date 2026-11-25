@@ -26,22 +26,20 @@ import { defaultOnError } from 'util/conditional/onError';
 export const RECENT_ACTIONS_QUERY_KEY = 'recent_actions_query_key';
 
 const fetchRecentActivities = async ({ page }: RequestQuery): Promise<PaginatedRecentActivity> =>
-  StartPage.getRecentActivity(page, 5).then(
-    (data: PaginatedResponseRecentActivity): PaginatedRecentActivity => ({
-      page: data.page,
-      per_page: data.per_page,
-      count: data.count,
-      total: data.total,
-      recentActivity: data.recentActivity.map((activity) => ({
-        id: activity.id,
-        itemTitle: activity.item_title,
-        timestamp: activity.timestamp,
-        activityType: activity.activity_type,
-        itemGrn: activity.item_grn,
-        userName: activity.user_name,
-      })),
-    }),
-  );
+  StartPage.getRecentActivity(page, 5).then((data: PaginatedResponseRecentActivity): PaginatedRecentActivity => ({
+    page: data.page,
+    per_page: data.per_page,
+    count: data.count,
+    total: data.total,
+    recentActivity: data.recentActivity.map((activity) => ({
+      id: activity.id,
+      itemTitle: activity.item_title,
+      timestamp: activity.timestamp,
+      activityType: activity.activity_type,
+      itemGrn: activity.item_grn,
+      userName: activity.user_name,
+    })),
+  }));
 
 const useRecentActivity = (pagination: RequestQuery): { data: PaginatedRecentActivity; isFetching: boolean } =>
   useQuery({

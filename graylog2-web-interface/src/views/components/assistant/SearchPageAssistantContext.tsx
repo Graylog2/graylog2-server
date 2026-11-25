@@ -169,7 +169,10 @@ const mergeSettings = (current: Settings, changes: Settings): Settings =>
 
     return {
       ...merged,
-      [key]: isPlainObject(value) && isPlainObject(previous) ? mergeSettings(previous as Settings, value as Settings) : value,
+      [key]:
+        isPlainObject(value) && isPlainObject(previous)
+          ? mergeSettings(previous as Settings, value as Settings)
+          : value,
     };
   }, current);
 
@@ -269,7 +272,9 @@ const useSearchPageTools = (): PageTools => {
           .filters(change(widget.filters ?? List()))
           .build();
         const widgets = viewState.widgets.map((current) => (current.id === widgetId ? updated : current)).toList();
-        await dispatch(updateViewState(activeQueryId, normalizeViewState(viewState.toBuilder().widgets(widgets).build())));
+        await dispatch(
+          updateViewState(activeQueryId, normalizeViewState(viewState.toBuilder().widgets(widgets).build())),
+        );
       } else {
         if (isDashboard) {
           throw new Error('A dashboard has no search filters of its own; give the widget to filter.');

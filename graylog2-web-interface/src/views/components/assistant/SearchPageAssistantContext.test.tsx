@@ -156,7 +156,9 @@ const searchWithFilters = (filters: Array<typeof noTestHosts> = []) => {
 const mockDispatchFor = (view: View) =>
   asMock(useViewsDispatch).mockReturnValue(
     jest.fn((action: unknown) =>
-      typeof action === 'function' ? action(jest.fn(), () => ({ view: { activeQuery: 'query-id', view } })) : Promise.resolve(),
+      typeof action === 'function'
+        ? action(jest.fn(), () => ({ view: { activeQuery: 'query-id', view } }))
+        : Promise.resolve(),
     ) as unknown as ReturnType<typeof useViewsDispatch>,
   );
 
@@ -336,7 +338,10 @@ describe('SearchPageAssistantContext', () => {
 
     await tools().update_widget({
       widget_id: 'w1',
-      visualization_config: { barmode: 'stack', axis_config: { number: { title: 'Failed logins' }, xaxis: { title: 'Host' } } },
+      visualization_config: {
+        barmode: 'stack',
+        axis_config: { number: { title: 'Failed logins' }, xaxis: { title: 'Host' } },
+      },
     });
 
     const { config } = updatedViewState().widgets.first() as AggregationWidget;
@@ -393,7 +398,11 @@ describe('SearchPageAssistantContext', () => {
     const tools = renderTools();
 
     await expect(
-      tools().update_widget({ widget_id: 'w1', visualization: 'line', visualization_config: { interpolation: 'spline' } }),
+      tools().update_widget({
+        widget_id: 'w1',
+        visualization: 'line',
+        visualization_config: { interpolation: 'spline' },
+      }),
     ).rejects.toThrow('The widget shows a bar visualization now, not line.');
   });
 
@@ -427,9 +436,9 @@ describe('SearchPageAssistantContext', () => {
     mockPageWithBarChart(TextWidget.builder().id('w1').config(new TextWidgetConfig('Notes')).build());
     const tools = renderTools();
 
-    await expect(tools().update_widget({ widget_id: 'w1', visualization_config: { barmode: 'stack' } })).rejects.toThrow(
-      'Only aggregation widgets',
-    );
+    await expect(
+      tools().update_widget({ widget_id: 'w1', visualization_config: { barmode: 'stack' } }),
+    ).rejects.toThrow('Only aggregation widgets');
   });
 
   it('refuses to change a widget that is not on the shown tab', async () => {
@@ -494,10 +503,18 @@ describe('SearchPageAssistantContext', () => {
     });
 
     expect(updatedQueryFilters()).toEqual([
-      expect.objectContaining({ type: 'referenced', id: 'f1', title: 'No test hosts', negation: true, disabled: false }),
+      expect.objectContaining({
+        type: 'referenced',
+        id: 'f1',
+        title: 'No test hosts',
+        negation: true,
+        disabled: false,
+      }),
     ]);
     expect(executeActiveQuery).toHaveBeenCalled();
-    expect(result).toEqual(expect.objectContaining({ summary: 'Added search filter "No test hosts", excluding its matches' }));
+    expect(result).toEqual(
+      expect.objectContaining({ summary: 'Added search filter "No test hosts", excluding its matches' }),
+    );
   });
 
   it('removes a search filter from the shown query, and refuses one that is not applied', async () => {

@@ -24,10 +24,12 @@ import Icon from 'components/common/Icon';
 const ToggleBadge = styled(Badge)<{ $isExpanded: boolean }>(
   ({ $isExpanded }) => css`
     flex-shrink: 0;
-    ${$isExpanded &&
-    css`
-      align-self: flex-start;
-    `}
+    ${
+      $isExpanded &&
+      css`
+        align-self: flex-start;
+      `
+    }
   `,
 );
 

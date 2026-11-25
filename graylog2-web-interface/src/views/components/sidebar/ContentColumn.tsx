@@ -49,20 +49,22 @@ export const Container = styled.div<{ $sidebarIsPinned: boolean; $width: number 
     box-shadow: ${$sidebarIsPinned ? `3px 3px 3px ${theme.colors.global.navigationBoxShadow}` : 'none'};
     z-index: ${zIndices.sidebar};
 
-    ${$sidebarIsPinned &&
-    css`
-      &::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        right: -6px;
-        height: 6px;
-        width: 6px;
-        border-top-left-radius: 50%;
-        background: transparent;
-        box-shadow: -6px -6px 0 3px ${theme.colors.global.contentBackground};
-      }
-    `}
+    ${
+      $sidebarIsPinned &&
+      css`
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          right: -6px;
+          height: 6px;
+          width: 6px;
+          border-top-left-radius: 50%;
+          background: transparent;
+          box-shadow: -6px -6px 0 3px ${theme.colors.global.contentBackground};
+        }
+      `
+    }
   `,
 );
 
