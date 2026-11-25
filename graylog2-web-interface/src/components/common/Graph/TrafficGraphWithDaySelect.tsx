@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import reduce from 'lodash/reduce';
+import mapValues from 'lodash/mapValues';
+import sum from 'lodash/sum';
 import styled, { css } from 'styled-components';
 import { useMemo } from 'react';
 
@@ -58,7 +59,7 @@ const Wrapper = styled.div(
 
 type Props = {
   traffic: Traffic;
-  trafficLimit?: number;
+  trafficLimit?: number | bigint;
   title?: string;
   trafficType?: 'input-indexed' | 'output';
 };
@@ -86,8 +87,12 @@ const TrafficGraphWithDaySelect = ({
     });
   };
 
-  const bytesOut = useMemo(() => (traffic ? reduce(traffic, (result, value) => result + value) : null), [traffic]);
-  const unixTraffic = useMemo(() => (traffic ? formatTrafficData(traffic) : null), [traffic]);
+  // Values above Number.MAX_SAFE_INTEGER are parsed as BigInt
+  const numericTraffic = useMemo(() => (traffic ? mapValues(traffic, Number) : null), [traffic]);
+  const numericTrafficLimit = trafficLimit === undefined || trafficLimit === null ? undefined : Number(trafficLimit);
+
+  const bytesOut = useMemo(() => (numericTraffic ? sum(Object.values(numericTraffic)) : null), [numericTraffic]);
+  const unixTraffic = useMemo(() => (numericTraffic ? formatTrafficData(numericTraffic) : null), [numericTraffic]);
 
   const formattedTotalTraffic = useMemo(() => {
     const prettified = getPrettifiedValue(bytesOut, { abbrev: 'b', unitType: 'binary_size' });
@@ -116,14 +121,14 @@ const TrafficGraphWithDaySelect = ({
 
       <StyledH3 ref={graphContainerRef}>
         {title ?? (trafficType === 'input-indexed' ? 'Incoming traffic' : 'Outgoing traffic')}{' '}
-        {bytesOut && (
+        {!!bytesOut && (
           <small>
             Last {graphDays} days: {formattedTotalTraffic}
           </small>
         )}
       </StyledH3>
       {unixTraffic ? (
-        <TrafficGraph trafficLimit={trafficLimit} traffic={unixTraffic} width={graphWidth} />
+        <TrafficGraph trafficLimit={numericTrafficLimit} traffic={unixTraffic} width={graphWidth} />
       ) : (
         <Spinner />
       )}
