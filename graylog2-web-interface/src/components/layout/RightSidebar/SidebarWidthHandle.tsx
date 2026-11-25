@@ -36,7 +36,7 @@ const SidebarWidthHandle = ({ label }: Props) => {
   return (
     <SidebarResizeHandle
       side="right"
-      width={width}
+      size={width}
       bounds={SIDEBAR_WIDTH}
       label={label}
       onResize={setWidth}

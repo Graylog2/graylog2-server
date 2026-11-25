@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import type { SidebarBounds } from 'hooks/useSidebarWidth';
+import type { SidebarBounds } from 'hooks/useSidebarSize';
 
 const KEYBOARD_STEP = 16;
 // How far beyond its smallest size the user drags before e.g. a sidebar collapses, so resizing it to its limit does
@@ -108,10 +108,10 @@ type Props = {
   // The side of the page the sidebar is on; dragging away from it enlarges the sidebar.
   side: Side;
   // The sidebar's size along the drag direction, its height for `top` and `bottom`.
-  width: number;
+  size: number;
   bounds: SidebarBounds;
   label: string;
-  onResize: (width: number) => void;
+  onResize: (size: number) => void;
   variant?: Variant;
   // Called when dragged far past the smallest size, e.g. to collapse a sidebar. The size goes back to the one before
   // the drag.
@@ -124,14 +124,14 @@ type Props = {
  */
 const SidebarResizeHandle = ({
   side,
-  width,
+  size,
   bounds,
   label,
   onResize,
   variant = 'edge',
   onDragPastMin = undefined,
 }: Props) => {
-  const drag = useRef<{ pointerId: number; start: number; startWidth: number } | undefined>(undefined);
+  const drag = useRef<{ pointerId: number; start: number; startSize: number } | undefined>(undefined);
   const [dragging, setDragging] = useState(false);
   const vertical = isVertical(side);
   const direction = side === 'left' || side === 'top' ? 1 : -1;
@@ -142,7 +142,7 @@ const SidebarResizeHandle = ({
 
     event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
-    drag.current = { pointerId: event.pointerId, start: position(event), startWidth: width };
+    drag.current = { pointerId: event.pointerId, start: position(event), startSize: size };
     setDragging(true);
   };
 
@@ -157,17 +157,18 @@ const SidebarResizeHandle = ({
   const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
     if (!drag.current || drag.current.pointerId !== event.pointerId) return;
 
-    const { startWidth } = drag.current;
-    const size = startWidth + direction * (position(event) - drag.current.start);
-    if (onDragPastMin && size < bounds.min - DRAG_PAST_LIMIT) {
+    const { startSize } = drag.current;
+    const draggedSize = startSize + direction * (position(event) - drag.current.start);
+
+    if (onDragPastMin && draggedSize < bounds.min - DRAG_PAST_LIMIT) {
       endDrag(event);
-      onResize(startWidth);
+      onResize(startSize);
       onDragPastMin();
 
       return;
     }
 
-    onResize(size);
+    onResize(draggedSize);
   };
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -178,7 +179,7 @@ const SidebarResizeHandle = ({
 
     if (step !== undefined) {
       event.preventDefault();
-      onResize(width + direction * step);
+      onResize(size + direction * step);
     }
   };
 
@@ -189,7 +190,7 @@ const SidebarResizeHandle = ({
       role="separator"
       aria-orientation={vertical ? 'horizontal' : 'vertical'}
       aria-label={label}
-      aria-valuenow={width}
+      aria-valuenow={size}
       aria-valuemin={bounds.min}
       aria-valuemax={bounds.max}
       tabIndex={0}

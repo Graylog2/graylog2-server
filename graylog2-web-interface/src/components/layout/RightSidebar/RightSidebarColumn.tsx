@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components';
 import useElementDimensions from 'hooks/useElementDimensions';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useRightSidebar from 'hooks/useRightSidebar';
-import useSidebarWidth from 'hooks/useSidebarWidth';
+import useSidebarSize from 'hooks/useSidebarSize';
 import SidebarResizeHandle from 'components/common/SidebarResizeHandle';
 
 import RightSidebar from './RightSidebar';
@@ -99,7 +99,7 @@ const RightSidebarColumn = () => {
   const columnRef = useRef<HTMLDivElement>(null);
   const { height: columnHeight } = useElementDimensions(columnRef);
   const bounds = stackedHeightBounds(columnHeight);
-  const [storedHeight, setStackedHeight] = useSidebarWidth('right-sidebar.stacked-height', bounds);
+  const [storedHeight, setStackedHeight] = useSidebarSize('right-sidebar.stacked-height', bounds);
   // The stored height can exceed what a smaller window leaves.
   const stackedHeight = Math.min(storedHeight, bounds.max);
   const stacked = isOpen && !isCollapsed && globalSidebar.isOpen && !globalSidebar.isCollapsed;
@@ -121,7 +121,7 @@ const RightSidebarColumn = () => {
           <SidebarResizeHandle
             variant="bar"
             side="top"
-            width={stackedHeight}
+            size={stackedHeight}
             bounds={bounds}
             label="Resize sidebar"
             onResize={setStackedHeight}

@@ -14,11 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import useSidebarWidth from 'hooks/useSidebarWidth';
+import useSidebarSize from 'hooks/useSidebarSize';
 
 import { SIDEBAR_WIDTH } from './SidebarStyles';
 
 // The width the details sidebar and global sidebars like the Assistant share, also while stacked in one column.
-const useRightSidebarWidth = () => useSidebarWidth('right-sidebar.width', SIDEBAR_WIDTH);
+const useRightSidebarWidth = () => useSidebarSize('right-sidebar.width', SIDEBAR_WIDTH);
 
 export default useRightSidebarWidth;
