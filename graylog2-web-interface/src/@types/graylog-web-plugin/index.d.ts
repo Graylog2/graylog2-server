@@ -479,6 +479,8 @@ declare module 'graylog-web-plugin/plugin' {
     globalSidebars?: Array<{
       key: string;
       component: React.ComponentType;
+      // Called on every render of the layout, for all global sidebars in turn, so plugins must not change while the
+      // page runs.
       useSidebarState?: () => GlobalSidebarState;
     }>;
     'navigation.badges'?: Array<NavigationBadge>;

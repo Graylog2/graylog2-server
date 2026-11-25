@@ -15,19 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css, keyframes } from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import IconButton from 'components/common/IconButton';
 
-import { ANIMATION_DURATION } from './SidebarStyles';
-
 const WIDTH = 36;
-
-const fade = keyframes`
-  from {
-    opacity: 0;
-  }
-`;
 
 const Container = styled.div(
   ({ theme }) => css`
@@ -78,11 +70,6 @@ const Title = styled.span`
   overflow: hidden;
   text-overflow: ellipsis;
   user-select: none;
-  animation: ${fade} ${ANIMATION_DURATION} ease-in-out;
-
-  @media (prefers-reduced-motion: reduce) {
-    animation: none;
-  }
 `;
 
 type Props = React.PropsWithChildren<{
