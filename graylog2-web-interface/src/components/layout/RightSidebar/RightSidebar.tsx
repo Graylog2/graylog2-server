@@ -61,7 +61,7 @@ const Collapsed = styled(CollapsedSidebar)(
 );
 
 type Props = {
-  // Set while it is stacked above a global sidebar like the Assistant, in one column.
+  // Set while it is stacked above a global sidebar like the Assistant, in one column, which has the resize handle.
   stackedHeight?: number;
 };
 
@@ -112,14 +112,16 @@ const RightSidebar = ({ stackedHeight = undefined }: Props) => {
       $stackedHeight={stackedHeight}
       role="complementary"
       aria-label={`${content.title} sidebar`}>
-      <SidebarResizeHandle
-        side="right"
-        width={width}
-        bounds={SIDEBAR_WIDTH}
-        label="Resize sidebar"
-        onResize={setWidth}
-        onDragPastMin={collapseSidebars}
-      />
+      {stackedHeight === undefined && (
+        <SidebarResizeHandle
+          side="right"
+          width={width}
+          bounds={SIDEBAR_WIDTH}
+          label="Resize sidebar"
+          onResize={setWidth}
+          onDragPastMin={collapseSidebars}
+        />
+      )}
       <SidebarPanelHeader
         titleId="sidebar-title"
         title={content.title}

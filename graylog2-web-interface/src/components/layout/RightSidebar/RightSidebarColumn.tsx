@@ -24,8 +24,11 @@ import useSidebarWidth from 'hooks/useSidebarWidth';
 import SidebarResizeHandle from 'components/common/SidebarResizeHandle';
 
 import RightSidebar from './RightSidebar';
-import { COLLAPSED_SIDEBAR_ORDER, STACKED_MIN_HEIGHT_BELOW } from './SidebarStyles';
+import { COLLAPSED_SIDEBAR_ORDER, SIDEBAR_WIDTH, STACKED_MIN_HEIGHT_BELOW } from './SidebarStyles';
+import useAreSidebarsStacked from './useAreSidebarsStacked';
+import useCollapseSidebars from './useCollapseSidebars';
 import useGlobalSidebarState from './useGlobalSidebarState';
+import useRightSidebarWidth from './useRightSidebarWidth';
 
 const STACKED_HEIGHT = { initial: 320, min: 120, max: 640 };
 
@@ -92,7 +95,7 @@ const GlobalSidebars = () => {
 // While a global sidebar is open and expanded next to the expanded right sidebar, both share one column, the right
 // sidebar on top. Collapsed, each is a strip next to the page.
 const RightSidebarColumn = () => {
-  const { isOpen, isCollapsed } = useRightSidebar();
+  const { isOpen } = useRightSidebar();
   const globalSidebar = useGlobalSidebarState();
   const columnRef = useRef<HTMLDivElement>(null);
   const { height: columnHeight } = useElementDimensions(columnRef);
@@ -100,10 +103,22 @@ const RightSidebarColumn = () => {
   const [storedHeight, setStackedHeight] = useSidebarWidth('right-sidebar.stacked-height', bounds);
   // The stored height can exceed what a smaller window leaves.
   const stackedHeight = Math.min(storedHeight, bounds.max);
-  const stacked = isOpen && !isCollapsed && globalSidebar.isOpen && !globalSidebar.isCollapsed;
+  const stacked = useAreSidebarsStacked();
+  const [width, setWidth] = useRightSidebarWidth();
+  const collapseSidebars = useCollapseSidebars();
 
   return (
     <Column ref={columnRef} $stacked={stacked}>
+      {stacked && (
+        <SidebarResizeHandle
+          side="right"
+          width={width}
+          bounds={SIDEBAR_WIDTH}
+          label="Resize sidebars"
+          onResize={setWidth}
+          onDragPastMin={collapseSidebars}
+        />
+      )}
       {isOpen && <RightSidebar stackedHeight={stacked ? stackedHeight : undefined} />}
       {stacked && (
         <SidebarResizeHandle
