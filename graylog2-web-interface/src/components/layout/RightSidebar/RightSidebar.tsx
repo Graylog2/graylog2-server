@@ -20,10 +20,8 @@ import type { DefaultTheme } from 'styled-components';
 
 import useRightSidebar from 'hooks/useRightSidebar';
 import usePluginEntities from 'hooks/usePluginEntities';
-import useSidebarWidth from 'hooks/useSidebarWidth';
 import Icon from 'components/common/Icon';
 import IconButton from 'components/common/IconButton';
-import SidebarResizeHandle from 'components/common/SidebarResizeHandle';
 
 import {
   ANIMATION_DURATION,
@@ -35,7 +33,6 @@ import {
 } from './SidebarStyles';
 
 const COLLAPSED_WIDTH = 36;
-const STACKED_HEIGHT = { initial: 320, min: 120, max: 640 };
 // Keeps the Assistant below usable however far the sidebar is dragged down.
 const MIN_HEIGHT_BELOW = 240;
 
@@ -53,7 +50,6 @@ const stackedStyles = (theme: DefaultTheme) => css`
   contain: inline-size;
   background-color: ${theme.colors.global.contentBackground};
   border-left: 1px solid ${theme.colors.cards.border};
-  border-bottom: 1px solid ${theme.colors.cards.border};
 `;
 
 const Container = styled(SidebarContainer)<{ $stackedHeight: number | undefined }>(
@@ -67,9 +63,6 @@ const Container = styled(SidebarContainer)<{ $stackedHeight: number | undefined 
       height: ${$stackedHeight}px;
       max-height: calc(100% - ${MIN_HEIGHT_BELOW}px);
       animation: none;
-
-      /* Keeps the resize handle on its bottom edge above the global sidebar. */
-      z-index: 1;
     `}
   `,
 );
@@ -92,6 +85,7 @@ const CollapsedContainer = styled.div<{ $stacked: boolean }>(
       ${stackedStyles(theme)};
       height: ${COLLAPSED_WIDTH}px;
       flex-direction: row-reverse;
+      border-bottom: 1px solid ${theme.colors.cards.border};
     `}
   `,
 );
@@ -164,11 +158,12 @@ const CollapseButton = styled.button(
 );
 
 type Props = {
-  // Above a global sidebar like the Assistant, in one column.
-  stacked?: boolean;
+  // Set while it is stacked above a global sidebar like the Assistant, in one column.
+  stackedHeight?: number;
 };
 
-const RightSidebar = ({ stacked = false }: Props) => {
+const RightSidebar = ({ stackedHeight = undefined }: Props) => {
+  const stacked = stackedHeight !== undefined;
   const {
     content,
     width,
@@ -182,7 +177,6 @@ const RightSidebar = ({ stacked = false }: Props) => {
     canGoForward,
   } = useRightSidebar();
   const sidebarComponents = usePluginEntities('sidebar.components');
-  const [stackedHeight, setStackedHeight] = useSidebarWidth('right-sidebar.stacked-height', STACKED_HEIGHT);
 
   if (!content) {
     return null;
@@ -209,18 +203,9 @@ const RightSidebar = ({ stacked = false }: Props) => {
   return (
     <Container
       $width={width}
-      $stackedHeight={stacked ? stackedHeight : undefined}
+      $stackedHeight={stackedHeight}
       role="complementary"
       aria-label={`${content.title} sidebar`}>
-      {stacked && (
-        <SidebarResizeHandle
-          side="top"
-          width={stackedHeight}
-          bounds={STACKED_HEIGHT}
-          label="Resize sidebar"
-          onResize={setStackedHeight}
-        />
-      )}
       <SidebarRow className="content">
         <SidebarHeader>
           <NavigationButtons>

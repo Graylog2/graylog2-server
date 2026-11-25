@@ -19,9 +19,13 @@ import styled, { css } from 'styled-components';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import useRightSidebar from 'hooks/useRightSidebar';
+import useSidebarWidth from 'hooks/useSidebarWidth';
+import SidebarResizeHandle from 'components/common/SidebarResizeHandle';
 
 import RightSidebar from './RightSidebar';
 import useIsGlobalSidebarOpen from './useIsGlobalSidebarOpen';
+
+const STACKED_HEIGHT = { initial: 320, min: 120, max: 640 };
 
 // Has no box of its own while the sidebars sit side by side; the same elements in both layouts keep the global
 // sidebars mounted, e.g. so a running answer of the Assistant finishes.
@@ -68,13 +72,24 @@ const GlobalSidebars = () => {
 
 // While a global sidebar is open next to the right sidebar, both share one column, the right sidebar on top.
 const RightSidebarColumn = () => {
-  const { isOpen } = useRightSidebar();
+  const { isOpen, isCollapsed } = useRightSidebar();
   const isGlobalSidebarOpen = useIsGlobalSidebarOpen();
+  const [stackedHeight, setStackedHeight] = useSidebarWidth('right-sidebar.stacked-height', STACKED_HEIGHT);
   const stacked = isOpen && isGlobalSidebarOpen;
 
   return (
     <Column $stacked={stacked}>
-      {isOpen && <RightSidebar stacked={stacked} />}
+      {isOpen && <RightSidebar stackedHeight={stacked ? stackedHeight : undefined} />}
+      {stacked && !isCollapsed && (
+        <SidebarResizeHandle
+          variant="bar"
+          side="top"
+          width={stackedHeight}
+          bounds={STACKED_HEIGHT}
+          label="Resize sidebar"
+          onResize={setStackedHeight}
+        />
+      )}
       <GlobalSidebarSlot $stacked={stacked}>
         <GlobalSidebars />
       </GlobalSidebarSlot>

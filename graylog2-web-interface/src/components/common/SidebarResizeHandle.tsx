@@ -28,15 +28,57 @@ const isVertical = (side: Side) => side === 'top' || side === 'bottom';
 
 const OPPOSITE_EDGE = { left: 'right', right: 'left', top: 'bottom', bottom: 'top' } as const;
 
-// Sits on the sidebar's inner edge, over its border.
-const Handle = styled.div<{ $side: Side }>(
-  ({ theme, $side }) => css`
+type Variant = 'edge' | 'bar';
+
+const BAR_SIZE = 8;
+const GRIP_LENGTH = 32;
+
+// `edge` sits on the sidebar's inner edge, over its border. `bar` is a visible divider with a grip, placed between
+// the sidebar and what it is resized against.
+const Handle = styled.div<{ $side: Side; $variant: Variant }>(({ theme, $side, $variant }) => {
+  const vertical = isVertical($side);
+
+  if ($variant === 'bar') {
+    return css`
+      position: relative;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      ${vertical ? 'height' : 'width'}: ${BAR_SIZE}px;
+      cursor: ${vertical ? 'row-resize' : 'col-resize'};
+      touch-action: none;
+      background-color: ${theme.colors.global.background};
+      border: 1px solid ${theme.colors.cards.border};
+
+      &::before {
+        content: '';
+        ${vertical ? 'width' : 'height'}: ${GRIP_LENGTH}px;
+        ${vertical ? 'height' : 'width'}: 2px;
+        border-radius: 1px;
+        background: ${theme.colors.text.secondary};
+      }
+
+      &:hover,
+      &:focus-visible,
+      &[data-dragging='true'] {
+        border-color: ${theme.colors.input.borderFocus};
+        outline: none;
+
+        &::before {
+          background: ${theme.colors.input.borderFocus};
+        }
+      }
+    `;
+  }
+
+  return css`
     position: absolute;
     ${OPPOSITE_EDGE[$side]}: -3px;
     z-index: 2;
     touch-action: none;
 
-    ${isVertical($side)
+    ${vertical
       ? css`
           left: 0;
           right: 0;
@@ -56,8 +98,8 @@ const Handle = styled.div<{ $side: Side }>(
       background: ${theme.colors.input.borderFocus};
       outline: none;
     }
-  `,
-);
+  `;
+});
 
 type Props = {
   // The side of the page the sidebar is on; dragging away from it enlarges the sidebar.
@@ -67,13 +109,14 @@ type Props = {
   bounds: SidebarBounds;
   label: string;
   onResize: (width: number) => void;
+  variant?: Variant;
 };
 
 /**
  * Resizes a sidebar by dragging or with the arrow keys; a double click restores its initial size.
- * Place it inside the sidebar's positioned container.
+ * Place an `edge` handle inside the sidebar's positioned container, a `bar` next to the sidebar.
  */
-const SidebarResizeHandle = ({ side, width, bounds, label, onResize }: Props) => {
+const SidebarResizeHandle = ({ side, width, bounds, label, onResize, variant = 'edge' }: Props) => {
   const drag = useRef<{ pointerId: number; start: number; startWidth: number } | undefined>(undefined);
   const [dragging, setDragging] = useState(false);
   const vertical = isVertical(side);
@@ -118,6 +161,7 @@ const SidebarResizeHandle = ({ side, width, bounds, label, onResize }: Props) =>
   return (
     <Handle
       $side={side}
+      $variant={variant}
       role="separator"
       aria-orientation={vertical ? 'horizontal' : 'vertical'}
       aria-label={label}
