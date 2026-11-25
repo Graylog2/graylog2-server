@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import { Label } from 'components/bootstrap';
-import ExpandableCellList from 'components/common/ExpandableCellList';
+import ExpandableCellList from 'components/common/cell-list/ExpandableCellList';
 
 const DEFAULT_COLLAPSED_COUNT = 1;
 

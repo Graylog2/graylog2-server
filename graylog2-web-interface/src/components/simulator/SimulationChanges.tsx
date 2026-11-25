@@ -75,11 +75,13 @@ const FieldValue = styled.dd<{ removed: boolean }>(
   ({ removed, theme }) => css`
     font-family: ${theme.fonts.family.monospace};
 
-    ${removed &&
-    css`
-      text-decoration: line-through;
-      font-style: italic;
-    `}
+    ${
+      removed &&
+      css`
+        text-decoration: line-through;
+        font-style: italic;
+      `
+    }
   `,
 );
 

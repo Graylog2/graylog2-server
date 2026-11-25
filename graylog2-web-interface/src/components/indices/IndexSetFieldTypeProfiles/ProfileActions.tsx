@@ -16,16 +16,35 @@
  */
 import React from 'react';
 
-import { Button, ButtonToolbar, DeleteMenuItem } from 'components/bootstrap';
+import { Button, ButtonToolbar, DeleteMenuItem, MenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
+import useHistory from 'routing/useHistory';
 import { LinkContainer } from 'components/common';
 import { MoreActions } from 'components/common/EntityDataTable';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import useProfileMutations from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileMutations';
+import type { IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldTypeProfiles/types';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-const ProfileActions = ({ profileId, profileName }: { profileId: string; profileName: string }) => {
+const ProfileActions = ({ profile }: { profile: IndexSetFieldTypeProfile }) => {
+  const { id: profileId, name: profileName, description, customFieldMappings } = profile;
   const { deselectEntity } = useSelectedEntities();
   const { deleteProfile } = useProfileMutations();
+  const { pushWithState } = useHistory();
+  const sendTelemetry = useSendTelemetry();
+
+  const onDuplicate = () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INDEX_SET_FIELD_TYPE_PROFILE.DUPLICATE_RAN, {
+      app_action_value: { mappingsQuantity: customFieldMappings.length },
+    });
+
+    pushWithState(Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.CREATE, {
+      name: `${profileName} (COPY)`,
+      description,
+      customFieldMappings,
+    });
+  };
 
   const onDelete = () => {
     // eslint-disable-next-line no-alert
@@ -42,6 +61,7 @@ const ProfileActions = ({ profileId, profileName }: { profileId: string; profile
         <Button bsSize="xs">Edit</Button>
       </LinkContainer>
       <MoreActions>
+        <MenuItem onSelect={onDuplicate}>Duplicate</MenuItem>
         <DeleteMenuItem onSelect={onDelete} />
       </MoreActions>
     </ButtonToolbar>

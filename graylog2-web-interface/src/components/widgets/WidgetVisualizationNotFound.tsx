@@ -14,19 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext, useEffect } from 'react';
+import React from 'react';
 
 import { Alert } from 'components/bootstrap';
-import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
+import useReportRenderComplete from 'views/components/widgets/useReportRenderComplete';
 
 type Props = {
   widgetClassName: string;
 };
 
 const WidgetVisualizationNotFound = ({ widgetClassName }: Props) => {
-  const onRenderComplete = useContext(RenderCompletionCallback);
-
-  useEffect(() => onRenderComplete(), [onRenderComplete]);
+  useReportRenderComplete();
 
   return (
     <Alert bsStyle="danger">

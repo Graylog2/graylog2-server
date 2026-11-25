@@ -55,6 +55,31 @@ class OpensearchKeystoreCommandLineIT {
                 .contains("gcs.client.default.credentials_file");
     }
 
+    @Test
+    void addsSeveralSecretsWithOneCall(@TempDir Path tempDir) throws URISyntaxException {
+        final OpensearchCli cli = createCli(tempDir);
+        cli.keystore().create();
+
+        cli.keystore().addAll(Map.of(
+                "s3.client.first.access_key", "first-access",
+                "s3.client.first.secret_key", "first-secret",
+                "s3.client.second.access_key", "second-access"));
+
+        Assertions.assertThat(cli.keystore().list())
+                .containsExactlyInAnyOrder("keystore.seed", "s3.client.first.access_key",
+                        "s3.client.first.secret_key", "s3.client.second.access_key");
+    }
+
+    @Test
+    void addingNoSecretsDoesNothing(@TempDir Path tempDir) throws URISyntaxException {
+        final OpensearchCli cli = createCli(tempDir);
+        cli.keystore().create();
+
+        cli.keystore().addAll(Map.of());
+
+        Assertions.assertThat(cli.keystore().list()).containsExactly("keystore.seed");
+    }
+
     private OpensearchCli createCli(Path tempDir) throws URISyntaxException {
         final Path binDirPath = detectOpensearchBinDir();
         Environment env = new Environment(Map.of())

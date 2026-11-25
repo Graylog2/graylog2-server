@@ -36,11 +36,13 @@ const StyledTable = styled(Table as React.ComponentType<React.ComponentProps<typ
     word-break: break-all;
 
     thead {
-      ${$stickyHeader
-        ? `position: sticky;
+      ${
+        $stickyHeader
+          ? `position: sticky;
     top: 0;
     z-index: 2`
-        : ''}
+          : ''
+      }
     }
 
     td,

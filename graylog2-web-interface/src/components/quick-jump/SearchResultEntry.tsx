@@ -35,15 +35,17 @@ const StyledListGroupItem = styled(ListGroupItem)<{ $active?: boolean }>(({ them
     cursor: pointer;
     transition: background-color 0.15s ease-in-out;
 
-    ${$active &&
-    css`
-      background-color: ${highlightColor};
+    ${
+      $active &&
+      css`
+        background-color: ${highlightColor};
 
-      a {
-        color: inherit;
-        text-decoration: none;
-      }
-    `}
+        a {
+          color: inherit;
+          text-decoration: none;
+        }
+      `
+    }
   `;
 });
 

@@ -14,6 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { Views } from '@graylog/server-api';
+
 import type View from 'views/logic/views/View';
 import type { ViewJson } from 'views/logic/views/View';
 import fetch from 'logic/rest/FetchProvider';
@@ -26,8 +28,8 @@ const viewsUrl = qualifyUrl('/views');
 const viewsIdUrl = (id) => qualifyUrl(`/views/${id}`);
 
 export const getView = (viewId: string): Promise<ViewJson> => fetch('GET', viewsIdUrl(viewId));
-export const deleteView = (view: View): Promise<void> =>
-  fetch('DELETE', viewsIdUrl(view.id)).catch((error) => {
+export const deleteView = (view: View) =>
+  Views.remove(view.id).catch((error) => {
     UserNotification.error(`Deleting view ${view.title} failed with status: ${error}`, 'Could not delete view');
   });
 export const createView = (view: View, entityShare?: EntitySharePayload, clonedFrom?: string): Promise<View> => {

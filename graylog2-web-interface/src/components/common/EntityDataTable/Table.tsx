@@ -67,10 +67,12 @@ const Td = styled.td<{
 }>(
   ({ $colId, $hideEmptyTailBorder, $hidePadding, $isLastVisibleColumn, $pinningPosition, $textAlign, theme }) => css`
     word-break: break-word;
-    ${$textAlign &&
-    css`
-      text-align: ${$textAlign};
-    `}
+    ${
+      $textAlign &&
+      css`
+        text-align: ${$textAlign};
+      `
+    }
     opacity: var(${columnOpacityVar($colId)}, 1);
     transform: var(${columnTransformVar($colId)}, none);
     transition: var(${columnTransition()}, none);
@@ -79,38 +81,46 @@ const Td = styled.td<{
       padding: ${CELL_PADDING_VERTICAL}px ${CELL_PADDING_HORIZONTAL}px;
     }
 
-    ${$pinningPosition
-      ? css`
-          position: sticky;
-          ${$pinningPosition === 'left' ? 'left' : 'right'}: 0;
+    ${
+      $pinningPosition
+        ? css`
+            position: sticky;
+            ${$pinningPosition === 'left' ? 'left' : 'right'}: 0;
 
-          ${ScrollShadow('left')}
-          &::before {
-            display: var(${displayScrollRightIndicatorVar}, none);
-          }
-        `
-      : ''}
+            ${ScrollShadow('left')}
+            &::before {
+              display: var(${displayScrollRightIndicatorVar}, none);
+            }
+          `
+        : ''
+    }
 
-    ${$hidePadding &&
-    css`
-      && {
-        padding: 0;
-      }
-    `}
+    ${
+      $hidePadding &&
+      css`
+        && {
+          padding: 0;
+        }
+      `
+    }
 
-    ${$hideEmptyTailBorder &&
-    css`
-      &&& {
-        border-right: none;
-      }
-    `}
+    ${
+      $hideEmptyTailBorder &&
+      css`
+        &&& {
+          border-right: none;
+        }
+      `
+    }
 
-    ${$isLastVisibleColumn &&
-    css`
-      && {
-        border-right-color: ${theme.colors.table.row.divider};
-      }
-    `}
+    ${
+      $isLastVisibleColumn &&
+      css`
+        && {
+          border-right-color: ${theme.colors.table.row.divider};
+        }
+      `
+    }
   `,
 );
 

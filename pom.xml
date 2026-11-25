@@ -111,14 +111,14 @@
         <auto-service.version>1.1.1</auto-service.version>
         <auto-value.version>1.11.1</auto-value.version>
         <aws-java-sdk-1.version>1.12.797</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.57.3</aws-java-sdk-2.version>
-        <aws-kinesis-client.version>3.5.3</aws-kinesis-client.version>
-        <aws-msk-iam-auth.version>2.3.9</aws-msk-iam-auth.version>
+        <aws-java-sdk-2.version>2.58.0</aws-java-sdk-2.version>
+        <aws-kinesis-client.version>3.5.4</aws-kinesis-client.version>
+        <aws-msk-iam-auth.version>2.4.0</aws-msk-iam-auth.version>
         <bouncycastle-prov.version>1.86</bouncycastle-prov.version>
         <bouncycastle-pkix.version>1.86</bouncycastle-pkix.version>
         <byte-buddy.version>1.18.17</byte-buddy.version>
         <caffeine.version>3.3.1</caffeine.version>
-        <classgraph.version>5.0.1</classgraph.version>
+        <classgraph.version>5.0.2</classgraph.version>
         <commons-codec.version>1.22.1</commons-codec.version>
         <commons-collections4.version>4.6.0</commons-collections4.version>
         <commons-csv.version>1.14.1</commons-csv.version>
@@ -130,26 +130,27 @@
         <commons-io.version>2.22.0</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.52.0</error-prone.version>
+        <!-- Jakarta EL 6 implementation. See the jakarta.el-api dependency in graylog2-server/pom.xml for details. -->
+        <expressly.version>6.0.0</expressly.version>
         <freemarker.version>2.3.35</freemarker.version>
-        <gcs.version>2.76.0</gcs.version>
-        <azure-blob-storage.version>12.36.0</azure-blob-storage.version>
+        <gcs.version>2.78.0</gcs.version>
+        <azure-blob-storage.version>12.37.2</azure-blob-storage.version>
         <azure-core.version>1.61.0</azure-core.version>
         <azure-identity.version>1.19.0</azure-identity.version>
         <azure-json.version>1.5.1</azure-json.version>
-        <azure-messaging-eventhubs.version>5.21.7</azure-messaging-eventhubs.version>
+        <azure-messaging-eventhubs.version>5.22.1</azure-messaging-eventhubs.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>5.2.0</geoip2.version>
         <google-api-client.version>2.9.2</google-api-client.version>
-        <google-api-common.version>2.71.0</google-api-common.version>
+        <google-api-common.version>2.73.0</google-api-common.version>
         <google-api-services-admin-reports.version>reports_v1-rev20251202-2.0.0</google-api-services-admin-reports.version>
-        <google-api-services-compute.version>v1-rev20251110-2.0.0</google-api-services-compute.version>
-        <google-auth-library.version>1.55.0</google-auth-library.version>
+        <google-auth-library.version>1.57.0</google-auth-library.version>
         <google-oauth-client.version>1.39.0</google-oauth-client.version>
-        <google-cloud-bigquery.version>2.74.0</google-cloud-bigquery.version>
-        <google-cloud-core.version>2.78.0</google-cloud-core.version>
-        <google-cloud-logging.version>3.41.0</google-cloud-logging.version>
-        <google-conscrypt.version>2.8.0</google-conscrypt.version>
-        <google-gax.version>2.88.0</google-gax.version>
+        <google-cloud-bigquery.version>2.76.0</google-cloud-bigquery.version>
+        <google-cloud-core.version>2.80.0</google-cloud-core.version>
+        <google-cloud-logging.version>3.43.0</google-cloud-logging.version>
+        <google-conscrypt.version>2.9.0</google-conscrypt.version>
+        <google-gax.version>2.90.0</google-gax.version>
         <google-http-client.version>2.2.0</google-http-client.version>
         <grizzly.version>4.1.0</grizzly.version> <!-- Should match the version used by Jersey -->
         <grok.version>0.1.9-graylog-3</grok.version>
@@ -160,14 +161,15 @@
         <guice.version>7.0.0</guice.version>
         <HdrHistogram.version>2.2.2</HdrHistogram.version>
         <hamcrest.version>3.0</hamcrest.version>
-        <hibernate-validator.version>9.1.5.Final</hibernate-validator.version>
+        <hibernate-validator.version>9.1.6.Final</hibernate-validator.version>
         <hk2.version>4.0.3</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
-        <jackson.version>2.22.4</jackson.version>
+        <jackson.version>2.23.0</jackson.version>
         <jadconfig.version>1.2.1</jadconfig.version>
         <java-semver.version>0.10.2</java-semver.version>
         <javassist.version>3.33.0-GA</javassist.version>
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
         <jakarta.annotation-api.version>3.0.0</jakarta.annotation-api.version>
+        <jakarta.el-api.version>6.0.1</jakarta.el-api.version> <!-- Must match the EL version implemented by expressly -->
         <jakarta.inject.version>2.0.1</jakarta.inject.version>
         <jakarta.ws.rs-api.version>4.0.0</jakarta.ws.rs-api.version>
         <jakarta.servlet-api.version>6.1.0</jakarta.servlet-api.version>
@@ -179,7 +181,7 @@
         <jool.version>0.9.16</jool.version>
         <json-org.version>20260814</json-org.version>
         <json-path.version>3.0.0</json-path.version>
-        <jsoup.version>1.23.2</jsoup.version>
+        <jsoup.version>1.24.1</jsoup.version>
         <jspecify.version>1.0.1</jspecify.version>
         <jsr305.version>3.0.2</jsr305.version>
         <kafka.version>4.4.0</kafka.version>
@@ -196,18 +198,18 @@
         <netty-tcnative-boringssl-static.version>2.0.85.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>5.5.1</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
-        <opentelemetry.version>1.67.0</opentelemetry.version>
+        <opentelemetry.version>1.68.0</opentelemetry.version>
         <opentelemetry-instrumentation.version>2.33.1</opentelemetry-instrumentation.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.18</pkts.version>
         <prometheus-client.version>0.16.0</prometheus-client.version>
         <protobuf.version>4.36.2</protobuf.version>
-        <proto-google-common-protos.version>2.79.0</proto-google-common-protos.version>
-        <proto-google-iam-v1.version>1.74.0</proto-google-iam-v1.version>
+        <proto-google-common-protos.version>2.81.0</proto-google-common-protos.version>
+        <proto-google-iam-v1.version>1.76.0</proto-google-iam-v1.version>
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>3.0.0</retrofit.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
-        <shiro.version>3.0.1</shiro.version>
+        <shiro.version>3.0.2</shiro.version>
         <snakeyaml.version>2.7</snakeyaml.version>
         <snappy-java.version>1.1.10.12</snappy-java.version>
         <oshi.version>7.7.3</oshi.version>
@@ -222,14 +224,14 @@
         <unboundid-ldap.version>7.0.6</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>3.1.1</validation-api.version>
-        <zstd.version>1.5.7-25</zstd.version>
+        <zstd.version>1.5.7-26</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
         <jjwt.version>0.13.0</jjwt.version>
         <stateless4j.version>2.6.0</stateless4j.version>
         <poi.version>5.5.1</poi.version>
         <mcp-bom.version>2.1.0</mcp-bom.version>
-        <json-schema-validator.version>2.0.4</json-schema-validator.version>
+        <json-schema-validator.version>2.0.8</json-schema-validator.version>
         <json-schema-generator.version>4.38.0</json-schema-generator.version>
 
         <!-- Test dependencies -->
@@ -244,7 +246,7 @@
         <restassured.version>6.3.0</restassured.version>
         <testcontainers.version>2.0.5</testcontainers.version>
         <testcontainers.opensearch.version>4.1.0</testcontainers.opensearch.version>
-        <graalvm.version>25.4.4.1.1</graalvm.version>
+        <graalvm.version>25.5.5.0.3</graalvm.version>
 
         <!-- Nodejs dependencies -->
         <nodejs.version>v24.13.0</nodejs.version>
@@ -357,6 +359,16 @@
                 <groupId>com.azure</groupId>
                 <artifactId>azure-storage-blob</artifactId>
                 <version>${azure-blob-storage.version}</version>
+                <exclusions>
+                    <!-- reactor-netty-http (via azure-core-http-netty) pulls in netty-codec-http3, which brings QUIC native
+                         libraries for all platforms. HTTP/3 isn't used, so drop the natives to keep the distribution small. (~ 12 MB overhead)
+                         Keep netty-codec-http3 and netty-codec-classes-quic: reactor-netty references the Quic class
+                         when it initializes HTTPS clients and fails without it. -->
+                    <exclusion>
+                        <groupId>io.netty</groupId>
+                        <artifactId>netty-codec-native-quic</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <!-- Keep azure-core aligned with the version azure-storage-blob and azure-messaging-eventhubs require -->
             <dependency>
@@ -506,11 +518,6 @@
                 <version>${google-api-services-admin-reports.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.google.apis</groupId>
-                <artifactId>google-api-services-compute</artifactId>
-                <version>${google-api-services-compute.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.google.cloud</groupId>
                 <artifactId>google-cloud-bigquery</artifactId>
                 <version>${google-cloud-bigquery.version}</version>
@@ -625,7 +632,7 @@
             <dependency>
                 <groupId>net.minidev</groupId>
                 <artifactId>json-smart</artifactId>
-                <version>2.6.0</version>
+                <version>2.6.1</version>
             </dependency>
             <dependency>
                 <groupId>org.ow2.asm</groupId>
@@ -985,12 +992,12 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
-                    <version>3.6.4</version>
+                    <version>3.7.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.23.0</version>
+                    <version>2.25.1</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>

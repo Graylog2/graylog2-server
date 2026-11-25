@@ -33,7 +33,11 @@ const streams = [
   { id: 'stream-a', title: 'Stream A' },
   { id: 'stream-b', title: 'Stream B' },
 ] as Stream[];
-const connection = (streamId: string) => ({ id: `connection-${streamId}`, stream_id: streamId, pipeline_ids: [pipeline.id] });
+const connection = (streamId: string) => ({
+  id: `connection-${streamId}`,
+  stream_id: streamId,
+  pipeline_ids: [pipeline.id],
+});
 
 const openForm = async () => userEvent.click(await screen.findByRole('button', { name: /edit connections/i }));
 const submit = async () => userEvent.click(await screen.findByRole('button', { name: /update connections/i }));

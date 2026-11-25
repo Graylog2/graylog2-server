@@ -105,9 +105,16 @@ export type WelcomeGeneralPageMetricsPlugin = {
   isEnabled?: (context: WelcomePageMetricsPluginContext) => boolean;
 };
 
+// A section shown prominently between the welcome page's metrics and its usage sections, e.g. to ask the Assistant.
+export type WelcomePageSection = {
+  key: string;
+  component: React.ComponentType;
+};
+
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     welcomePageMetrics?: Array<WelcomePageMetricsPlugin>;
     'welcomePageMetrics.general'?: Array<WelcomeGeneralPageMetricsPlugin>;
+    'welcomePage.sections'?: Array<WelcomePageSection>;
   }
 }
