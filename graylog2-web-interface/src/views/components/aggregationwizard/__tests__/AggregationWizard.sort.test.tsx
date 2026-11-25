@@ -190,6 +190,48 @@ describe('AggregationWizard', () => {
   );
 
   it(
+    'should sort on the full function of a percentile metric',
+    async () => {
+      const onChangeMock = jest.fn();
+      const percentileSeries = Series.create('percentile', 'took_ms', 95);
+      const config = widgetConfig.toBuilder().series([percentileSeries]).sort([]).build();
+
+      renderSUT({ config, onChange: onChangeMock });
+
+      await addSortElement();
+      await sortByTookMsDesc('sort-element-0', 'percentile(took_ms,95)');
+      await submitWidgetConfigForm();
+
+      const updatedConfig = config.toBuilder().sort([SortConfig.fromSeries(percentileSeries)]).build();
+
+      await waitFor(() => expect(onChangeMock).toHaveBeenCalledTimes(1));
+
+      expect(onChangeMock).toHaveBeenCalledWith(updatedConfig);
+    },
+    extendedTimeout,
+  );
+
+  it(
+    'should keep the sort on a percentile metric when displaying the config',
+    async () => {
+      const percentileSeries = Series.create('percentile', 'took_ms', 95);
+      const config = widgetConfig
+        .toBuilder()
+        .series([percentileSeries])
+        .sort([SortConfig.fromSeries(percentileSeries)])
+        .build();
+
+      renderSUT({ config });
+
+      const sortContainer = await screen.findByTestId('sort-element-0');
+
+      expect(within(sortContainer).getByText('percentile(took_ms,95)')).toBeInTheDocument();
+      expect(within(sortContainer).getByLabelText('Select field for sorting')).toBeEnabled();
+    },
+    extendedTimeout,
+  );
+
+  it(
     'should require field when creating a sort element',
     async () => {
       renderSUT();
