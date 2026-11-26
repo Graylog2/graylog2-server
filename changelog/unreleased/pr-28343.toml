@@ -1,0 +1,5 @@
+type = "a"
+message = "Add Certificate auth to  OAuth 2.0 (XOAUTH2) authentication for sending emails via SMTP."
+
+issues = ["Graylog2/graylog-plugin-enterprise#16433"]
+pulls = ["28343"]
