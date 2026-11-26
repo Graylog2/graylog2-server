@@ -17,29 +17,21 @@
 import React, { useState } from 'react';
 import { Form, FormikProvider } from 'formik';
 import { Navigate, Route, Routes, useMatch } from 'react-router-dom';
-import styled from 'styled-components';
 
 import { Alert, Button, Col, NavItem, Row } from 'components/bootstrap';
-import { ConfirmLeaveDialog, FormSubmit, Link, LinkContainer } from 'components/common';
+import { ConfirmLeaveDialog, FormSubmit, LinkContainer } from 'components/common';
 import { SectionNav, SectionNavItem } from 'components/configurations/SectionNav';
 import usePermissions from 'hooks/usePermissions';
 import RoutePaths from 'routing/Routes';
 
 import type { ConfigurationCategory } from './types';
-import { categoryId } from './configurationFields';
 import useDataNodeConfigurationForm from './useDataNodeConfigurationForm';
 import DataNodeConfigurationSection from './DataNodeConfigurationSection';
 import ConfigurationPrecedenceHelp from './ConfigurationPrecedenceHelp';
 import DataNodeRestartProgress from './DataNodeRestartProgress';
+import DataNodeRestartRequiredAlert from './DataNodeRestartRequiredAlert';
 
-const RestartSettingsList = styled.ul`
-  display: flex;
-  flex-direction: column;
-  gap: ${({ theme }) => theme.spacings.xs};
-  margin-top: ${({ theme }) => theme.spacings.sm};
-  padding-left: ${({ theme }) => theme.spacings.lg};
-  list-style-type: disc;
-`;
+import ForceStartConfirmDialog from '../opensearch-upgrade/ForceStartConfirmDialog';
 
 type SectionLinkProps = { category: ConfigurationCategory; basePath: string };
 
@@ -58,6 +50,12 @@ const SectionLink = ({ category, basePath }: SectionLinkProps) => {
   );
 };
 
+const restartAlertTitle = (nodeId: string | null, paused: boolean) => {
+  if (paused) return 'Data Node restart paused';
+
+  return nodeId === null ? 'Restarting Data Nodes' : 'Restarting Data Node';
+};
+
 type Props = React.PropsWithChildren<{
   categories: Array<ConfigurationCategory>;
   nodeId: string | null;
@@ -71,9 +69,14 @@ const DataNodeConfigurationForm = ({ categories, nodeId, basePath, children = un
     hasUnsavedChanges,
     restartParameters,
     hasUnsavedRestartChanges,
+    pendingSharedRestart,
+    isRestartPending,
     saveChangesWithoutRestart,
+    canRestart,
     isRestarting,
+    isRestartPaused,
     restartProgress,
+    forceRestart,
   } = useDataNodeConfigurationForm({ categories, nodeId, basePath });
   const { isSubmitting, resetForm } = formik;
   const [selectedUnits, setSelectedUnits] = useState<Record<string, string>>({});
@@ -82,7 +85,7 @@ const DataNodeConfigurationForm = ({ categories, nodeId, basePath, children = un
   const canEdit = isPermitted(['clusterconfigentry:create', 'clusterconfigentry:edit']);
   const showNavigation = categories.length > 1;
   const nodeLabel = nodeId === null ? 'Data Nodes' : 'Data Node';
-  const restartTarget = nodeId === null ? 'the Data Nodes' : 'this Data Node';
+  const offerRestart = canRestart && isRestartPending && !isRestarting;
   const ignoredRoutes = [basePath, ...categories.map(({ id }) => `${basePath}/${id}`)].flatMap((path) => [
     path,
     `${path}/`,
@@ -133,37 +136,32 @@ const DataNodeConfigurationForm = ({ categories, nodeId, basePath, children = un
                   <Route path="*" element={<Navigate to={RoutePaths.NOTFOUND} replace />} />
                 </Routes>
                 {isRestarting && (
-                  <Alert bsStyle="info" title={nodeId === null ? 'Restarting Data Nodes' : 'Restarting Data Node'}>
-                    <DataNodeRestartProgress progress={restartProgress} />
+                  <Alert
+                    bsStyle={isRestartPaused ? 'warning' : 'info'}
+                    title={restartAlertTitle(nodeId, isRestartPaused)}>
+                    <DataNodeRestartProgress progress={restartProgress} paused={isRestartPaused} />
                   </Alert>
                 )}
-                {canEdit && !isRestarting && restartParameters.length > 0 && (
-                  <Alert
-                    bsStyle="warning"
-                    title={
-                      hasUnsavedRestartChanges ? 'Restart required after saving' : 'Saved changes require a restart'
-                    }>
-                    {hasUnsavedRestartChanges
-                      ? `Changes to the following settings require restarting ${restartTarget} to take effect:`
-                      : `The following settings have been saved. Restart ${restartTarget} for them to take effect:`}
-                    <RestartSettingsList>
-                      {restartParameters.map(({ name, label, category }) => (
-                        <li key={name}>
-                          <Link to={`${basePath}/${categoryId(category)}#${encodeURIComponent(name)}`}>{label}</Link>
-                        </li>
-                      ))}
-                    </RestartSettingsList>
-                  </Alert>
+                {canEdit && !isRestarting && isRestartPending && (
+                  <DataNodeRestartRequiredAlert
+                    nodeId={nodeId}
+                    basePath={basePath}
+                    restartParameters={restartParameters}
+                    hasUnsavedRestartChanges={hasUnsavedRestartChanges}
+                    pendingSharedRestart={pendingSharedRestart}
+                    canRestart={canRestart}
+                  />
                 )}
                 {canEdit && (
                   <FormSubmit
                     submitButtonText={
-                      restartParameters.length > 0 && !isRestarting
+                      offerRestart
                         ? `${hasUnsavedChanges ? 'Apply changes and restart' : 'Restart'} ${nodeLabel}`
                         : 'Apply changes'
                     }
                     centerCol={
-                      restartParameters.length > 0 && (
+                      canRestart &&
+                      isRestartPending && (
                         <Button
                           type="button"
                           disabled={!hasUnsavedChanges || isSubmitting}
@@ -175,7 +173,7 @@ const DataNodeConfigurationForm = ({ categories, nodeId, basePath, children = un
                     isAsyncSubmit
                     isSubmitting={isSubmitting}
                     submitLoadingText="Saving changes..."
-                    disabledSubmit={!hasUnsavedChanges && (restartParameters.length === 0 || isRestarting)}
+                    disabledSubmit={!hasUnsavedChanges && !offerRestart}
                     disabledCancel={!hasUnsavedChanges}
                     onCancel={() => resetForm()}
                   />
@@ -185,6 +183,18 @@ const DataNodeConfigurationForm = ({ categories, nodeId, basePath, children = un
           </Col>
         </Row>
       </Form>
+      {forceRestart.failedChecks.length > 0 && (
+        <ForceStartConfirmDialog
+          title="Restart the Data Nodes anyway?"
+          intro="The configuration has been saved, but the checks before a rolling restart did not pass."
+          confirmText="Restart Data Nodes anyway"
+          submittingText="Restarting..."
+          failedChecks={forceRestart.failedChecks}
+          isSubmitting={forceRestart.isSubmitting}
+          onCancel={forceRestart.cancel}
+          onConfirm={forceRestart.confirm}
+        />
+      )}
     </FormikProvider>
   );
 };

@@ -27,10 +27,8 @@ const managedConfigurationApi = {
     SystemManagedConfiguration.update({ node_type: NODE_TYPE, node_id: nodeId, values }),
   // A single Data Node restarts its OpenSearch process right away. All Data Nodes are restarted one after another, so
   // the cluster stays available, without upgrading OpenSearch.
-  restart: (nodeId: string | null = null): Promise<unknown> =>
-    nodeId === null
-      ? DataNodeRollingRestart.start({ force: false, restart_only: true })
-      : Datanode.restartNode(nodeId),
+  restart: (nodeId: string | null = null, force = false): Promise<unknown> =>
+    nodeId === null ? DataNodeRollingRestart.start({ force, restart_only: true }) : Datanode.restartNode(nodeId),
 };
 
 export default managedConfigurationApi;

@@ -25,13 +25,15 @@ import useDataNodeRestartProgress from 'components/datanode/configuration/useDat
  * another, so their metrics and status in the table below are expected to be off for a while.
  */
 const DataNodeRestartBanner = () => {
-  const { isRestarting, progress } = useDataNodeRestartProgress(null);
+  const { isRestarting, isPaused, progress } = useDataNodeRestartProgress(null);
 
   if (!isRestarting) return null;
 
   return (
-    <Alert bsStyle="info" title="Data Node restart in progress">
-      <DataNodeRestartProgress progress={progress} />
+    <Alert
+      bsStyle={isPaused ? 'warning' : 'info'}
+      title={isPaused ? 'Data Node restart paused' : 'Data Node restart in progress'}>
+      <DataNodeRestartProgress progress={progress} paused={isPaused} />
     </Alert>
   );
 };

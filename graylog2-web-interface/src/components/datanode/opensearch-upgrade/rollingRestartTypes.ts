@@ -52,6 +52,7 @@ export type RollingRestartData = {
   paused_reason?: string | null;
   last_error?: string | null;
   waiting_green_since: string;
+  target_opensearch_version?: string | null;
 };
 
 export type RollingRestartJob = {
@@ -69,6 +70,8 @@ export const isRollingRestartTerminalState = (state: RollingRestartState | undef
   state === 'COMPLETED' || state === 'ABORTED' || state === 'FAILED';
 
 export const isRollingRestartPaused = (state: RollingRestartState | undefined) => state === 'PAUSED_WAITING_GREEN';
+
+export const isRestartOnly = (data: RollingRestartData) => data.target_opensearch_version === null;
 
 export const isRollingRestartActive = (job: RollingRestartJob | null | undefined) =>
   !!job?.data && !isRollingRestartTerminalState(job.data.sm_state);

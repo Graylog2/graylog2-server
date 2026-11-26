@@ -17,7 +17,8 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { Spinner } from 'components/common';
+import { Link, Spinner } from 'components/common';
+import RoutePaths from 'routing/Routes';
 
 const Progress = styled.span`
   display: inline-flex;
@@ -25,13 +26,28 @@ const Progress = styled.span`
   gap: ${({ theme }) => theme.spacings.sm};
 `;
 
-type Props = { progress: string | undefined };
+type Props = { progress: string | undefined; paused?: boolean };
 
-const DataNodeRestartProgress = ({ progress }: Props) => (
-  <Progress>
-    <Spinner text="" delay={0} />
-    <span role="status">{progress}</span>
-  </Progress>
-);
+const DataNodeRestartProgress = ({ progress, paused = false }: Props) => {
+  if (paused) {
+    return (
+      <>
+        <p role="status">{progress}</p>
+        <p>
+          Once the cluster is green again,{' '}
+          <Link to={RoutePaths.SYSTEM.CLUSTER.DATANODE_UPGRADE}>resume the restart</Link> on the Data Node Upgrade
+          page.
+        </p>
+      </>
+    );
+  }
+
+  return (
+    <Progress>
+      <Spinner text="" delay={0} />
+      <span role="status">{progress}</span>
+    </Progress>
+  );
+};
 
 export default DataNodeRestartProgress;

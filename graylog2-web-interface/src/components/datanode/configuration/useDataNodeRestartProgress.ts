@@ -21,7 +21,7 @@ import usePermissions from 'hooks/usePermissions';
 import useManagedConfiguration from './useManagedConfiguration';
 
 import { useCurrentRollingRestart } from '../opensearch-upgrade/hooks/useOpenSearchRollingRestart';
-import { isRollingRestartActive } from '../opensearch-upgrade/rollingRestartTypes';
+import { isRollingRestartActive, isRollingRestartPaused } from '../opensearch-upgrade/rollingRestartTypes';
 
 // A Data Node reports that it restarts shortly after being asked to. Until then the request itself counts.
 const REQUEST_GRACE_PERIOD = 30000;
@@ -49,12 +49,17 @@ const useDataNodeRestartProgress = (nodeId: string | null) => {
   }, [restartRequested]);
 
   const isRestarting = restartRequested || isNodeRestarting || rollingRestartActive;
+  const isPaused = rollingRestartActive && isRollingRestartPaused(rollingRestart?.data?.sm_state);
 
   const progress = (() => {
     if (rollingRestartActive) {
       const nodes = rollingRestart?.data?.nodes ?? [];
       const done = nodes.filter(({ status }) => status === 'COMPLETED' || status === 'SKIPPED').length;
       const current = nodes.find(({ status }) => status === 'RESTARTING' || status === 'STARTED');
+
+      if (isPaused) {
+        return `The rolling restart is paused after ${done} of ${nodes.length} Data Nodes, because the cluster did not return to green health in time.`;
+      }
 
       return `Restarting the Data Nodes one after another: ${done} of ${nodes.length} done${
         current ? `, now restarting ${current.hostname}` : ''
@@ -70,6 +75,7 @@ const useDataNodeRestartProgress = (nodeId: string | null) => {
 
   return {
     isRestarting,
+    isPaused,
     progress: isRestarting ? progress : undefined,
     markRestartRequested: () => setRestartRequested(true),
   };

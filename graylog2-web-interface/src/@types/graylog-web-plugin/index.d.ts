@@ -280,7 +280,7 @@ declare module 'graylog-web-plugin/plugin' {
     collectors_config: 'read';
     contentpack: 'read';
     dashboards: 'create' | 'edit' | 'read';
-    datanode: 'read' | 'start';
+    datanode: 'read' | 'start' | 'restart';
     decorators: 'create' | 'edit' | 'read';
     deflector: 'cycle';
     eventdefinitions: 'create' | 'delete' | 'edit' | 'read';

@@ -274,6 +274,25 @@ describe('DataNodePage configuration', () => {
       await waitFor(() => expect(client.restartNode).toHaveBeenCalledWith(nodeId));
     });
 
+    it('offers a restart when settings shared by all Data Nodes are not in use on this Data Node yet', async () => {
+      const client = mockManagedConfigurationApi([
+        sampleClusterConfiguration,
+        { ...sampleNodeConfiguration(nodeId), restart_required: true, pending_nodes: [nodeId] },
+      ]);
+      renderPage();
+
+      expect(
+        await screen.findByText(/Settings shared by all Data Nodes have been saved, but this Data Node does not use/),
+      ).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'Data Node Configuration' })).toHaveAttribute(
+        'href',
+        RoutePaths.SYSTEM.CLUSTER.DATANODE_CONFIGURATION,
+      );
+      await userEvent.click(screen.getByRole('button', { name: 'Restart Data Node' }));
+
+      await waitFor(() => expect(client.restartNode).toHaveBeenCalledWith(nodeId));
+    });
+
     it('locks the restart and shows progress while this Data Node restarts', async () => {
       const client = mockManagedConfigurationApi([
         sampleClusterConfiguration,
@@ -451,7 +470,7 @@ describe('DataNodePage configuration', () => {
         expect(heap).toHaveFocus();
         expect(heap).toHaveAccessibleDescription(
           fallback === null
-            ? /^Description of OpenSearch JVM heap\. opensearch_heap$/
+            ? /^Description of OpenSearch JVM heap\. opensearch_heap Requires restart$/
             : /Current source: Configuration file/,
         );
         expect(resetButton).toBeDisabled();

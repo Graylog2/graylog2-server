@@ -39,7 +39,7 @@ type UpdateManagedConfigurationResult = {
 };
 
 type RestartDataNodesResult = {
-  restartDataNodes: () => Promise<unknown>;
+  restartDataNodes: (force?: boolean) => Promise<unknown>;
 };
 
 const useManagedConfiguration = (nodeId: string | null = null, enabled = true): ManagedConfigurationResult => {
@@ -73,7 +73,7 @@ export const useUpdateManagedConfiguration = (nodeId: string | null = null): Upd
 export const useRestartDataNodes = (nodeId: string | null = null): RestartDataNodesResult => {
   const queryClient = useQueryClient();
   const { mutateAsync } = useMutation({
-    mutationFn: () => managedConfigurationApi.restart(nodeId),
+    mutationFn: (force: boolean = false) => managedConfigurationApi.restart(nodeId, force),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: getQueryKey(nodeId), exact: true });
 

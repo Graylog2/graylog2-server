@@ -18,8 +18,8 @@ import React from 'react';
 import { useFormikContext } from 'formik';
 import styled from 'styled-components';
 
-import { Button, Input } from 'components/bootstrap';
-import { Icon, Select, Tooltip } from 'components/common';
+import { Badge, Button, Input } from 'components/bootstrap';
+import { Icon, RelativeTime, Select, Tooltip } from 'components/common';
 
 import type { ConfigurationValues, ConfigurationParameter, ConfigurationSource } from './types';
 import ConfigurationQuantityInput from './ConfigurationQuantityInput';
@@ -35,6 +35,11 @@ import {
 const FieldDetail = styled.span`
   display: block;
   margin-top: ${({ theme }) => theme.spacings.xs};
+`;
+
+const RestartBadge = styled(Badge)`
+  margin-left: ${({ theme }) => theme.spacings.xs};
+  vertical-align: middle;
 `;
 
 const sourceDescriptions: Partial<Record<ConfigurationSource, { label: string; description: string }>> = {
@@ -60,6 +65,11 @@ const sourceDescriptions: Partial<Record<ConfigurationSource, { label: string; d
   },
 };
 
+const restartBadges = {
+  restart: { color: 'gray', label: 'Requires restart', title: 'Takes effect once the Data Node restarts.' },
+  live: { color: 'primary', label: 'Applies without restart', title: 'Does not need a Data Node restart to take effect.' },
+} as const;
+
 type Props = {
   parameter: ConfigurationParameter;
   canEdit: boolean;
@@ -71,7 +81,8 @@ type Props = {
 const ConfigurationFieldInput = ({ parameter, canEdit, canDelete, selectedUnit, onSelectUnit }: Props) => {
   const { values, initialValues, errors, touched, isSubmitting, submitCount, setValues, setTouched } =
     useFormikContext<ConfigurationValues>();
-  const { name, label, description, type, units, constraints } = parameter;
+  const { name, label, description, type, units, constraints, requires_restart, set_by, set_at } = parameter;
+  const restartBadge = requires_restart ? restartBadges.restart : restartBadges.live;
   const draftValue = values[name];
   const selectableValues = Object.entries(constraints?.values ?? {});
   const error = touched[name] || submitCount > 0 ? errors[name] : undefined;
@@ -223,8 +234,22 @@ const ConfigurationFieldInput = ({ parameter, canEdit, canDelete, selectedUnit, 
                     <Icon name="help" type="regular" />
                   </Button>
                 </Tooltip>
+                {source === 'database' && set_by && (
+                  <>
+                    {` · Set by ${set_by}`}
+                    {set_at && (
+                      <>
+                        {' '}
+                        <RelativeTime dateTime={set_at} />
+                      </>
+                    )}
+                  </>
+                )}
               </>
             )}
+            <RestartBadge color={restartBadge.color} variant="light" size="sm" title={restartBadge.title}>
+              {restartBadge.label}
+            </RestartBadge>
           </FieldDetail>
         </span>
       }>
