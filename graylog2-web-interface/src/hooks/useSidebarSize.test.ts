@@ -16,16 +16,16 @@
  */
 import { act, renderHook } from 'wrappedTestingLibrary/hooks';
 
-import useSidebarWidth from './useSidebarWidth';
+import useSidebarSize from './useSidebarSize';
 
 const STORAGE_KEY = 'sidebar-width.outline';
 const BOUNDS = { initial: 236, min: 180, max: 480 };
 
-describe('useSidebarWidth', () => {
+describe('useSidebarSize', () => {
   beforeEach(() => localStorage.clear());
 
-  it('starts at the initial width and keeps changes in local storage', () => {
-    const { result } = renderHook(() => useSidebarWidth(STORAGE_KEY, BOUNDS));
+  it('starts at the initial size and keeps changes in local storage', () => {
+    const { result } = renderHook(() => useSidebarSize(STORAGE_KEY, BOUNDS));
 
     expect(result.current[0]).toBe(236);
 
@@ -33,11 +33,20 @@ describe('useSidebarWidth', () => {
 
     expect(result.current[0]).toBe(300);
     expect(JSON.parse(localStorage.getItem(STORAGE_KEY))).toBe(300);
-    expect(renderHook(() => useSidebarWidth(STORAGE_KEY, BOUNDS)).result.current[0]).toBe(300);
+    expect(renderHook(() => useSidebarSize(STORAGE_KEY, BOUNDS)).result.current[0]).toBe(300);
   });
 
-  it('keeps widths within the bounds', () => {
-    const { result } = renderHook(() => useSidebarWidth(STORAGE_KEY, BOUNDS));
+  it('shares the size between sidebars with the same key', () => {
+    const { result: first } = renderHook(() => useSidebarSize(STORAGE_KEY, BOUNDS));
+    const { result: second } = renderHook(() => useSidebarSize(STORAGE_KEY, BOUNDS));
+
+    act(() => first.current[1](320));
+
+    expect(second.current[0]).toBe(320);
+  });
+
+  it('keeps sizes within the bounds', () => {
+    const { result } = renderHook(() => useSidebarSize(STORAGE_KEY, BOUNDS));
 
     act(() => result.current[1](50));
 
@@ -48,13 +57,13 @@ describe('useSidebarWidth', () => {
     expect(result.current[0]).toBe(480);
   });
 
-  it('ignores stored widths that are not numbers and clamps those out of bounds', () => {
+  it('ignores stored sizes that are not numbers and clamps those out of bounds', () => {
     localStorage.setItem(STORAGE_KEY, '"wide"');
 
-    expect(renderHook(() => useSidebarWidth(STORAGE_KEY, BOUNDS)).result.current[0]).toBe(236);
+    expect(renderHook(() => useSidebarSize(STORAGE_KEY, BOUNDS)).result.current[0]).toBe(236);
 
     localStorage.setItem(STORAGE_KEY, '9000');
 
-    expect(renderHook(() => useSidebarWidth(STORAGE_KEY, BOUNDS)).result.current[0]).toBe(480);
+    expect(renderHook(() => useSidebarSize(STORAGE_KEY, BOUNDS)).result.current[0]).toBe(480);
   });
 });
