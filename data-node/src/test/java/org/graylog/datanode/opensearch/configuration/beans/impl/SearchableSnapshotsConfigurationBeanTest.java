@@ -45,6 +45,8 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -254,6 +256,84 @@ class SearchableSnapshotsConfigurationBeanTest {
         Assertions.assertThatThrownBy(() -> bean.buildConfigurationPart(emptyBuildParams(tempDir)))
                 .isInstanceOf(OpensearchConfigurationException.class)
                 .hasMessageContaining("There is not enough usable space for the node search cache. Your system has only 8gb available");
+    }
+
+    @Test
+    void testOptionalRepositoriesAreSkippedWhenTheCacheDoesNotFit(@TempDir Path tempDir) throws ValidationException, RepositoryException {
+        final SearchableSnapshotsConfigurationBean bean = smallDiskBean(tempDir, Map.of(), Set.of(optional(s3Configuration(s3Settings()))));
+
+        // Optional repositories must not prevent opensearch from starting
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
+
+        Assertions.assertThat(configurationPart.nodeRoles()).isEmpty();
+        Assertions.assertThat(configurationPart.properties()).isEmpty();
+        Assertions.assertThat(configurationPart.keystoreItems()).isEmpty();
+    }
+
+    @Test
+    void testRequiredRepositoriesFailWhenTheCacheDoesNotFitEvenWithOptionalOnes(@TempDir Path tempDir) throws ValidationException, RepositoryException {
+        final SearchableSnapshotsConfigurationBean bean = smallDiskBean(tempDir, Map.of(), Set.of(
+                optional(s3Configuration(s3Settings())),
+                new LocalRepositoryConfigurationProvider(List.of(azureConfiguration(Map.of(
+                        "azure_client_default_account", "account",
+                        "azure_client_default_key", "key"
+                ))))));
+
+        Assertions.assertThatThrownBy(() -> bean.buildConfigurationPart(emptyBuildParams(tempDir)))
+                .isInstanceOf(OpensearchConfigurationException.class)
+                .hasMessageContaining("There is not enough usable space for the node search cache");
+    }
+
+    @Test
+    void testOptionalRepositoriesFailWhenTheCacheDoesNotFitAndTheSearchRoleIsConfigured(@TempDir Path tempDir) throws ValidationException, RepositoryException {
+        final SearchableSnapshotsConfigurationBean bean = smallDiskBean(tempDir, Map.of("node_roles", "cluster_manager,data,search"),
+                Set.of(optional(s3Configuration(s3Settings()))));
+
+        // The search role was requested explicitly, opensearch can't run as configured
+        Assertions.assertThatThrownBy(() -> bean.buildConfigurationPart(emptyBuildParams(tempDir)))
+                .isInstanceOf(OpensearchConfigurationException.class)
+                .hasMessageContaining("There is not enough usable space for the node search cache");
+    }
+
+    @Test
+    void testOptionalRepositoriesWithEnoughSpace(@TempDir Path tempDir) throws ValidationException, RepositoryException {
+        final SearchableSnapshotsConfigurationBean bean = snapshotsBean(tempDir, Set.of(optional(s3Configuration(s3Settings()))));
+
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
+
+        Assertions.assertThat(configurationPart.nodeRoles()).containsExactly("search");
+        Assertions.assertThat(configurationPart.properties()).containsEntry("s3.client.default.endpoint", "http://localhost:9000");
+    }
+
+    private SearchableSnapshotsConfigurationBean smallDiskBean(Path tempDir, Map<String, String> settings, Set<RepositoryConfigurationProvider> providers) throws ValidationException, RepositoryException {
+        final Map<String, String> configuration = new HashMap<>(settings);
+        configuration.put("node_search_cache_size", "10gb");
+        return new SearchableSnapshotsConfigurationBean(
+                DatanodeTestUtils.datanodeConfiguration(configuration, tempDir),
+                datanodeConfiguration(tempDir),
+                providers,
+                () -> new OpensearchUsableSpace(tempDir, 8L * 1024 * 1024 * 1024));
+    }
+
+    private static Map<String, String> s3Settings() {
+        return Map.of(
+                "s3_client_default_access_key", "user",
+                "s3_client_default_secret_key", "password",
+                "s3_client_default_endpoint", "http://localhost:9000");
+    }
+
+    private static RepositoryConfigurationProvider optional(RepositoryConfiguration... repositories) {
+        return new RepositoryConfigurationProvider() {
+            @Override
+            public Collection<RepositoryConfiguration> get() {
+                return List.of(repositories);
+            }
+
+            @Override
+            public boolean isOptional() {
+                return true;
+            }
+        };
     }
 
     @Test

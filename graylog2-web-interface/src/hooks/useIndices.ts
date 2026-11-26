@@ -41,9 +41,9 @@ export type IndexShardRouting = {
   active: boolean;
   primary: boolean;
   node_id: string;
-  node_name: string;
-  node_hostname: string;
-  relocating_to: string | null;
+  node_name?: string;
+  node_hostname?: string;
+  relocating_to?: string | null;
 };
 
 export type IndexInfo = {

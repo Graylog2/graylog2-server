@@ -314,7 +314,7 @@ export const unitTypeMapper4Charts: UnitTypeMapper = {
 
 export const theme = {
   colors: {
-    variant: { lightest: { default: '#000' } },
+    charts: { lines: '#000', zeroLine: '#111' },
     text: { primary: '#fff' },
   },
   fonts: {
@@ -333,6 +333,7 @@ export const layoutsFor4axis = {
     autoshift: true,
     fixedrange: true,
     gridcolor: '#000',
+    zerolinecolor: '#111',
     range: [0, 0.21],
     rangemode: 'tozero',
     side: 'left',
@@ -362,6 +363,7 @@ export const layoutsFor4axis = {
     autoshift: true,
     fixedrange: true,
     gridcolor: '#000',
+    zerolinecolor: '#111',
     overlaying: 'y',
     range: [0, 525],
     rangemode: 'tozero',
@@ -392,6 +394,7 @@ export const layoutsFor4axis = {
     autoshift: true,
     fixedrange: true,
     gridcolor: '#000',
+    zerolinecolor: '#111',
     overlaying: 'y',
     rangemode: 'tozero',
     side: 'left',
@@ -420,6 +423,7 @@ export const layoutsFor4axis = {
     autoshift: true,
     fixedrange: true,
     gridcolor: '#000',
+    zerolinecolor: '#111',
     overlaying: 'y',
     rangemode: 'tozero',
     side: 'right',

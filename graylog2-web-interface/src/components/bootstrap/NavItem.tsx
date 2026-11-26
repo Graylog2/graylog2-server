@@ -23,10 +23,12 @@ import { NAVBAR_GAP, NAV_ITEM_HEIGHT } from 'theme/constants';
 const NavigationLink = styled.a<{ $withMinHeight: boolean }>(
   ({ theme, $withMinHeight }) => css`
     color: ${theme.colors.text.primary};
-    ${$withMinHeight &&
-    css`
-      min-height: ${NAV_ITEM_HEIGHT};
-    `}
+    ${
+      $withMinHeight &&
+      css`
+        min-height: ${NAV_ITEM_HEIGHT};
+      `
+    }
     display: inline-flex;
     align-items: center;
     justify-content: center;

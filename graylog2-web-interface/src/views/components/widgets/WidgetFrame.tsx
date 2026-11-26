@@ -112,11 +112,11 @@ const WidgetWrap = styled.div(
     }
 
     &:hover
-      .${widgetActionsMenuClass},
-      &:focus-within
-      .${widgetActionsMenuClass},
-      &:has(.${widgetActionsDropdownOpenClass})
-      .${widgetActionsMenuClass} {
+    .${widgetActionsMenuClass},
+    &:focus-within
+    .${widgetActionsMenuClass},
+    &:has(.${widgetActionsDropdownOpenClass})
+    .${widgetActionsMenuClass} {
       position: relative;
       opacity: 1;
       transform: none;

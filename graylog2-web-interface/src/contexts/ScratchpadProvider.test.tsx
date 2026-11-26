@@ -137,7 +137,7 @@ describe('ScratchpadProvider', () => {
     render(<SUT />);
 
     await screen.findByText('hidden');
-    await userEvent.keyboard('{Meta>}/{/Meta}');
+    await userEvent.keyboard('{Control>}/{/Control}');
     await screen.findByText('visible');
 
     expect(scratchpadEvents(sendTelemetry)).toEqual([TELEMETRY_EVENT_TYPE.SCRATCHPAD.OPENED]);
@@ -150,7 +150,7 @@ describe('ScratchpadProvider', () => {
     render(<SUT />);
 
     await screen.findByText('visible');
-    await userEvent.keyboard('{Meta>}/{/Meta}');
+    await userEvent.keyboard('{Control>}/{/Control}');
 
     expect(scratchpadEvents(sendTelemetry)).toEqual([]);
   });

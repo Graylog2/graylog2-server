@@ -16,13 +16,18 @@
  */
 package org.graylog.plugins.views.search.views.widgets.aggregation;
 
+import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog.jsonschema.AllowedValues;
 
 @AutoValue
+@JsonClassDescription("Network graph: who talks to whom, with the values of two or more group-bys, without "
+        + "timestamp, as nodes, connected by edges weighted by the metric.")
 @JsonTypeName(NetworkVisualizationConfigDTO.NAME)
 @JsonDeserialize(builder = NetworkVisualizationConfigDTO.Builder.class)
 public abstract class NetworkVisualizationConfigDTO implements VisualizationConfigDTO {
@@ -30,9 +35,12 @@ public abstract class NetworkVisualizationConfigDTO implements VisualizationConf
     private static final String FIELD_COLOR_SCALE = "color_scale";
     private static final String FIELD_REVERSE_SCALE = "reverse_scale";
 
+    @JsonPropertyDescription("The color scale of the nodes and edges.")
     @JsonProperty(FIELD_COLOR_SCALE)
+    @AllowedValues(ColorScale.class)
     public abstract String colorScale();
 
+    @JsonPropertyDescription("Reverses the color scale.")
     @JsonProperty(FIELD_REVERSE_SCALE)
     public abstract boolean reverseScale();
 

@@ -87,6 +87,7 @@ export { default as InteractableModal } from './InteractableModal';
 export { default as JSONClipboardButton } from './JSONClipboardButton';
 export { default as JSONClipboardIconButton } from './JSONClipboardIconButton';
 export { default as JSONValueInput } from './JSONValueInput';
+export { default as Kbd } from './Kbd';
 export { default as KeyCapture } from './KeyCapture';
 export { default as KeyValueTable } from './KeyValueTable';
 export { default as Link } from './Link';

@@ -1,0 +1,4 @@
+type = "a"
+message = "Added Duplicate and Import Profile to Field Type Profiles, so admins can start a new profile from an existing profile or from the field types of an index set. Long lists of field mappings are now paged and sorted alphabetically."
+
+issues = ["28188"]

@@ -25,6 +25,7 @@ import useLastOpened from 'components/welcome/hooks/useLastOpened';
 import useFavoriteItems from 'components/welcome/hooks/useFavoriteItems';
 import useRecentActivity from 'components/welcome/hooks/useRecentActivity';
 import useCurrentUser from 'hooks/useCurrentUser';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 jest.mock('components/content-stream/ContentStreamSection', () => 'content-stream-section');
 
@@ -95,10 +96,22 @@ jest.mock('components/welcome/hooks/useRecentActivity', () =>
 );
 
 jest.mock('hooks/useCurrentUser');
+jest.mock('hooks/usePluginEntities');
 
 describe('Welcome', () => {
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
+    asMock(usePluginEntities).mockReturnValue([]);
+  });
+
+  it('shows sections of plugins', async () => {
+    asMock(usePluginEntities).mockImplementation((key) =>
+      key === 'welcomePage.sections' ? [{ key: 'section', component: () => <span>Ask something</span> }] : [],
+    );
+
+    render(<Welcome />);
+
+    await screen.findByText('Ask something');
   });
 
   describe('Last opened list', () => {

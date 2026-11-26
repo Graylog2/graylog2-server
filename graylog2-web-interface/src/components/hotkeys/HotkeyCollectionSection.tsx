@@ -19,8 +19,7 @@ import isArray from 'lodash/isArray';
 import flattenDeep from 'lodash/flattenDeep';
 import styled from 'styled-components';
 
-import { KeyboardKey } from 'components/bootstrap';
-import { isMacOS as _isMacOS } from 'util/OSUtils';
+import { Kbd } from 'components/common';
 import SectionComponent from 'components/common/Section/SectionComponent';
 
 const ShortcutList = styled.div`
@@ -50,21 +49,9 @@ const KeySeparator = styled.div`
   align-items: center;
 `;
 
-const keyMapper = (key: string, isMacOS: boolean) => {
-  const keyMap = {
-    mod: isMacOS ? '⌘' : 'Ctrl',
-    alt: isMacOS ? '⌥' : 'Alt',
-    ctrl: isMacOS ? '⌃' : 'Ctrl',
-    meta: isMacOS ? '⌘' : 'Win',
-  };
-
-  return keyMap[key] || key;
-};
-
 type KeyProps = {
   combinationKey: string;
   description: string;
-  isMacOS: boolean;
   keys: string | Array<string>;
   splitKey: string;
 };
@@ -73,10 +60,9 @@ type ShortcutKeysProps = {
   keys: string | Array<string>;
   splitKey: string;
   combinationKey: string;
-  isMacOS: boolean;
 };
 
-const ShortcutKeys = ({ keys, splitKey, combinationKey, isMacOS }: ShortcutKeysProps) => {
+const ShortcutKeys = ({ keys, splitKey, combinationKey }: ShortcutKeysProps) => {
   const shortcutsArray = isArray(keys) ? keys : [keys];
   const splitShortcutsArray = flattenDeep(shortcutsArray.map((key) => key.split(splitKey)));
 
@@ -93,7 +79,7 @@ const ShortcutKeys = ({ keys, splitKey, combinationKey, isMacOS }: ShortcutKeysP
 
               return (
                 <React.Fragment key={key}>
-                  <KeyboardKey>{keyMapper(key, isMacOS)}</KeyboardKey>
+                  <Kbd name={key} />
                   {!isLast && <KeySeparator>{combinationKey}</KeySeparator>}
                 </React.Fragment>
               );
@@ -106,11 +92,11 @@ const ShortcutKeys = ({ keys, splitKey, combinationKey, isMacOS }: ShortcutKeysP
   );
 };
 
-const Key = ({ description, keys, combinationKey, splitKey, isMacOS }: KeyProps) => (
+const Key = ({ description, keys, combinationKey, splitKey }: KeyProps) => (
   <ShortcutListItem>
     {description}
     <KeysList>
-      <ShortcutKeys keys={keys} combinationKey={combinationKey} splitKey={splitKey} isMacOS={isMacOS} />
+      <ShortcutKeys keys={keys} combinationKey={combinationKey} splitKey={splitKey} />
     </KeysList>
   </ShortcutListItem>
 );
@@ -127,26 +113,21 @@ type Props = {
   }>;
 };
 
-const HotkeyCollectionSection = ({ title, description, sectionActions }: Props) => {
-  const isMacOS = _isMacOS();
-
-  return (
-    <SectionComponent title={title}>
-      <p className="description">{description}</p>
-      <ShortcutList>
-        {sectionActions.map(({ keyDescription, keys, combinationKey, splitKey, reactKey }) => (
-          <Key
-            description={keyDescription}
-            keys={keys}
-            combinationKey={combinationKey}
-            splitKey={splitKey}
-            isMacOS={isMacOS}
-            key={reactKey}
-          />
-        ))}
-      </ShortcutList>
-    </SectionComponent>
-  );
-};
+const HotkeyCollectionSection = ({ title, description, sectionActions }: Props) => (
+  <SectionComponent title={title}>
+    <p className="description">{description}</p>
+    <ShortcutList>
+      {sectionActions.map(({ keyDescription, keys, combinationKey, splitKey, reactKey }) => (
+        <Key
+          description={keyDescription}
+          keys={keys}
+          combinationKey={combinationKey}
+          splitKey={splitKey}
+          key={reactKey}
+        />
+      ))}
+    </ShortcutList>
+  </SectionComponent>
+);
 
 export default HotkeyCollectionSection;
