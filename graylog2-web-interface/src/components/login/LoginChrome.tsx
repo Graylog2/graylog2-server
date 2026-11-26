@@ -20,9 +20,10 @@ import styled, { css } from 'styled-components';
 import DOMPurify from 'dompurify';
 
 import LoginBox from 'components/login/LoginBox';
+import PlasmaBackground from 'components/login/PlasmaBackground';
 import { Sanitize } from 'components/common';
 import PublicNotifications from 'components/common/PublicNotifications';
-import backgroundImage from 'images/auth/login-bg.svg';
+import defaultBackgroundImage from 'images/auth/login-bg.svg';
 import { Logo } from 'components/navigation/NavigationBrand';
 import AppConfig from 'util/AppConfig';
 import useThemes from 'theme/hooks/useThemes';
@@ -47,22 +48,33 @@ const Background = styled.div`
   width: 100%;
 `;
 
-const BackgroundText = styled.div<{ $backgroundImage: string }>(
+const BackgroundImage = styled.div<{ $backgroundImage: string }>(
   ({ $backgroundImage }) => css`
     z-index: -1;
-    display: flex;
-    flex-direction: column;
     position: absolute;
-    vertical-align: middle;
-    justify-content: center;
-    height: 100%;
-    width: 100%;
-    padding: 0 30px;
+    inset: 0;
     background-image: url(${$backgroundImage});
     background-position: center;
     background-size: cover;
   `,
 );
+
+const BlendedPlasma = styled(PlasmaBackground)`
+  mix-blend-mode: screen;
+  opacity: 0.7;
+`;
+
+const BackgroundText = styled.div`
+  z-index: -1;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  vertical-align: middle;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  padding: 0 30px;
+`;
 
 const NotificationsContainer = styled.div`
   position: absolute;
@@ -126,12 +138,12 @@ type Props = {
 };
 
 const svgDataUrl = (content: string) => `data:image/svg+xml;base64,${Buffer.from(content).toString('base64')}`;
-const useLoginBackground = () =>
+const useCustomLoginBackground = () =>
   useMemo(
     () =>
       AppConfig.branding()?.login?.background
         ? svgDataUrl(sanitize(AppConfig.branding()?.login?.background))
-        : backgroundImage,
+        : undefined,
     [],
   );
 
@@ -139,7 +151,7 @@ const useShowLogo = () => useMemo(() => AppConfig.branding()?.login?.show_logo ?
 
 const LoginChrome = ({ children }: Props) => {
   const productName = useProductName();
-  const loginBackground = useLoginBackground();
+  const customLoginBackground = useCustomLoginBackground();
   const showLogo = useShowLogo();
 
   return (
@@ -152,7 +164,9 @@ const LoginChrome = ({ children }: Props) => {
         <NotificationsContainer>
           <PublicNotifications login />
         </NotificationsContainer>
-        <BackgroundText $backgroundImage={loginBackground}>
+        <BackgroundImage $backgroundImage={customLoginBackground ?? defaultBackgroundImage} />
+        {!customLoginBackground && <BlendedPlasma />}
+        <BackgroundText>
           {showLogo && (
             <TextContainer>
               <CustomizableLogo />
