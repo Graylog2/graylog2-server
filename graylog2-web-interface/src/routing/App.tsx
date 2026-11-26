@@ -33,8 +33,8 @@ import PageContextProviders from 'components/page/contexts/PageContextProviders'
 import { singleton } from 'logic/singleton';
 import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 import RightSidebarProvider from 'contexts/RightSidebarProvider';
-import RightSidebar from 'components/layout/RightSidebar';
-import RightSidebarContext from 'contexts/RightSidebarContext';
+import RightSidebarColumn from 'components/layout/RightSidebar/RightSidebarColumn';
+import { AssistantPageContextProvider } from 'components/assistant';
 
 const AppLayout = styled.div`
   display: flex;
@@ -71,37 +71,37 @@ const App = () => (
         }
 
         return (
-          <RightSidebarProvider>
-            <HotkeysProvider>
-              <ScratchpadProvider loginName={currentUser.username}>
-                <NavigationTelemetry />
-                <>
-                  <AppLayout>
-                    <Navigation />
-                    <ReportedErrorBoundary>
-                      <ContentRow>
-                        <MainContentColumn>
-                          <Scratchpad />
-                          <RuntimeErrorBoundary>
-                            <PageContextProviders>
-                              <PageContent>
-                                <Outlet />
-                              </PageContent>
-                            </PageContextProviders>
-                          </RuntimeErrorBoundary>
-                        </MainContentColumn>
-                        <RightSidebarContext.Consumer>
-                          {({ isOpen }) => isOpen && <RightSidebar />}
-                        </RightSidebarContext.Consumer>
-                      </ContentRow>
-                    </ReportedErrorBoundary>
-                  </AppLayout>
-                  <HotkeysModalContainer />
-                  <TelemetryDebugOverlay />
-                </>
-              </ScratchpadProvider>
-            </HotkeysProvider>
-          </RightSidebarProvider>
+          <AssistantPageContextProvider>
+            <RightSidebarProvider>
+              <HotkeysProvider>
+                <ScratchpadProvider loginName={currentUser.username}>
+                  <NavigationTelemetry />
+                  <>
+                    <AppLayout>
+                      <Navigation />
+                      <ReportedErrorBoundary>
+                        <ContentRow>
+                          <MainContentColumn>
+                            <Scratchpad />
+                            <RuntimeErrorBoundary>
+                              <PageContextProviders>
+                                <PageContent>
+                                  <Outlet />
+                                </PageContent>
+                              </PageContextProviders>
+                            </RuntimeErrorBoundary>
+                          </MainContentColumn>
+                          <RightSidebarColumn />
+                        </ContentRow>
+                      </ReportedErrorBoundary>
+                    </AppLayout>
+                    <HotkeysModalContainer />
+                    <TelemetryDebugOverlay />
+                  </>
+                </ScratchpadProvider>
+              </HotkeysProvider>
+            </RightSidebarProvider>
+          </AssistantPageContextProvider>
         );
       }}
     </CurrentUserContext.Consumer>

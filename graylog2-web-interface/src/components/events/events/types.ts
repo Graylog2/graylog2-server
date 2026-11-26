@@ -35,7 +35,7 @@ export interface Event {
   source_streams: string[];
   source?: string;
   priority: number;
-  message: string;
+  message?: string;
   associated_assets?: string[];
   tactics_techniques?: string[];
   tags?: string[];
@@ -50,7 +50,7 @@ export interface Event {
   fields: {
     [_key: string]: string;
   };
-  key: string;
+  key?: string;
   aggregation_conditions?: {
     [_key: string]: number;
   };

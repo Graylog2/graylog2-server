@@ -16,8 +16,10 @@
  */
 package org.graylog.plugins.views.search.views.widgets.aggregation;
 
+import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -26,14 +28,17 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 
 @AutoValue
+@JsonClassDescription("Scatter plot: metrics as points, per group-by value or time bucket.")
 @JsonTypeName(ScatterVisualizationConfigDTO.NAME)
 @JsonDeserialize(builder = ScatterVisualizationConfigDTO.Builder.class)
 public abstract class ScatterVisualizationConfigDTO implements VisualizationConfigDTO, XYVisualizationConfig{
     public static final String NAME = "scatter";
 
+    @JsonPropertyDescription(XYVisualizationConfig.AXIS_TYPE_DESCRIPTION)
     @JsonProperty(FIELD_AXIS_TYPE)
     public abstract XYVisualizationConfig.AxisType axisType();
 
+    @JsonPropertyDescription(XYVisualizationConfig.AXIS_CONFIG_DESCRIPTION)
     @JsonProperty(FIELD_AXIS_CONFIG)
     public abstract Optional<AxisConfig> axisConfig();
 

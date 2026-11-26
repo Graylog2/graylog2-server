@@ -1,0 +1,32 @@
+import { Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { TokenGroupDoc } from './Tokens';
+
+<Meta title="Foundation/Colors/Tokens" />
+
+# Color Tokens
+
+Tokens are the color names used in code. Use them instead of hex values so components work in both light and dark mode. Each token shows its light and dark value and the Luma palette color it maps to. Click a token to copy it.
+
+## Text
+
+Colors for text and inline links.
+
+<Unstyled>
+  <TokenGroupDoc group="text" />
+</Unstyled>
+
+## Surfaces
+
+Background colors for the page and the containers on it, from back to front.
+
+<Unstyled>
+  <TokenGroupDoc group="surfaces" />
+</Unstyled>
+
+## Borders
+
+Border colors. These Luma tokens are not in the Graylog theme yet, so Storybook builds them from the Luma palette.
+
+<Unstyled>
+  <TokenGroupDoc group="borders" />
+</Unstyled>

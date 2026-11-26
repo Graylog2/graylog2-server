@@ -24,6 +24,7 @@ import useCurrentUser from 'hooks/useCurrentUser';
 
 const usePersistedSetting = <T extends keyof UserPreferences>(
   settingKey: T,
+  { displaySuccessNotification = true }: { displaySuccessNotification?: boolean } = {},
 ): [UserPreferences[T], (newValue: UserPreferences[T]) => void] => {
   const currentUser = useCurrentUser(false);
   const { userIsReadOnly, username } = useMemo(
@@ -44,9 +45,9 @@ const usePersistedSetting = <T extends keyof UserPreferences>(
 
       const nextPreferences = { ...userPreferences, [settingKey]: newSetting };
 
-      return saveUserPreferences(username, nextPreferences);
+      return saveUserPreferences(username, nextPreferences, undefined, displaySuccessNotification);
     },
-    [settingKey, userIsReadOnly, userPreferences, username],
+    [displaySuccessNotification, settingKey, userIsReadOnly, userPreferences, username],
   );
 
   return useMemo(() => [setting, setSetting], [setSetting, setting]);

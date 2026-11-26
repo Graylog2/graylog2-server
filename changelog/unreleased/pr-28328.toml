@@ -1,0 +1,5 @@
+type = "f"
+message = "Keep `negation` and `disabled` fields on saved search filters of dashboard widgets when saving."
+
+issues = ["Graylog2/graylog-plugin-enterprise#16166"]
+pulls = ["28328"]

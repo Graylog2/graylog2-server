@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fixed PDF exports and reports timing out when a widget's search fails."
+
+pulls = ["28143"]

@@ -14,11 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext, useEffect } from 'react';
+import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { Button } from 'components/bootstrap';
-import RenderCompletionCallback from 'views/components/widgets/RenderCompletionCallback';
+import useReportRenderComplete from 'views/components/widgets/useReportRenderComplete';
 import { UPDATE_WIDGET_BTN_TEXT } from 'views/components/widgets/SaveOrCancelButtons';
 import { UPDATE_WIDGET_PREVIEW_BTN_TEXT } from 'views/components/aggregationwizard/ElementsConfigurationActions';
 
@@ -44,13 +44,7 @@ const SpacedHeading = styled.h2(
 );
 
 const EmptyAggregationContent = ({ toggleEdit, editing = false }: Props) => {
-  const onRenderComplete = useContext(RenderCompletionCallback);
-
-  useEffect(() => {
-    if (onRenderComplete) {
-      onRenderComplete();
-    }
-  }, [onRenderComplete]);
+  useReportRenderComplete();
 
   const interactive = useIsInteractiveMode();
   const text = editing ? (

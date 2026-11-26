@@ -17,34 +17,43 @@
 
 import { useEffect, useState } from 'react';
 
+type Options = {
+  /** The element whose visible area the target is checked against. Defaults to the viewport. */
+  root?: React.RefObject<HTMLElement>;
+  rootMargin?: string;
+  threshold?: number;
+  /** Returned until the first observation. */
+  initialIsIntersecting?: boolean;
+};
+
+/**
+ * Returns whether the target element intersects with its root, e.g. whether it is visible in a scroll container.
+ */
 const useIntersectionObserver = (
-  containerRef: React.RefObject<HTMLDivElement>,
-  targetElementRef: React.RefObject<HTMLDivElement>,
+  targetRef: React.RefObject<HTMLElement>,
+  { root = undefined, rootMargin = undefined, threshold = undefined, initialIsIntersecting = false }: Options = {},
 ) => {
-  const [elementIsVisible, setElementIsVisible] = useState(false);
+  const [isIntersecting, setIsIntersecting] = useState(initialIsIntersecting);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setElementIsVisible(!entry.isIntersecting);
-      },
-      { threshold: 0.9, root: containerRef.current },
-    );
+    const target = targetRef.current;
 
-    const indicatorElement = targetElementRef.current;
-
-    if (indicatorElement) {
-      observer.observe(indicatorElement);
+    if (!target) {
+      return undefined;
     }
 
-    return () => {
-      if (indicatorElement) {
-        observer.unobserve(indicatorElement);
-      }
-    };
-  }, [containerRef, targetElementRef]);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsIntersecting(entry.isIntersecting);
+      },
+      { root: root?.current, rootMargin, threshold },
+    );
+    observer.observe(target);
 
-  return elementIsVisible;
+    return () => observer.disconnect();
+  }, [root, rootMargin, targetRef, threshold]);
+
+  return isIntersecting;
 };
 
 export default useIntersectionObserver;

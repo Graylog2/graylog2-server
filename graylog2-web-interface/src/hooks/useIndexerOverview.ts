@@ -24,7 +24,7 @@ export type IndexRange = {
   index_name?: string;
   begin: string;
   end: string;
-  calculated_at: string;
+  calculated_at?: string;
   took_ms: number;
 };
 
@@ -32,12 +32,12 @@ export type IndexTier = 'WARM' | 'HOT';
 
 export type IndexSummary = {
   index_name?: string;
-  size: {
+  size?: {
     events: number;
     deleted: number;
     bytes: number;
   };
-  range: IndexRange;
+  range?: IndexRange;
   is_deflector: boolean;
   is_closed: boolean;
   is_reopened: boolean;
@@ -47,7 +47,7 @@ export type IndexSummary = {
 
 export type IndexerOverview = {
   deflector: {
-    current_target: string;
+    current_target?: string;
     is_up: boolean;
   };
   indexer_cluster: {
