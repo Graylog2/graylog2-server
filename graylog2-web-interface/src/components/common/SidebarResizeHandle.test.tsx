@@ -23,7 +23,7 @@ import SidebarResizeHandle from './SidebarResizeHandle';
 const BOUNDS = { initial: 384, min: 300, max: 720 };
 
 const renderHandle = (side: 'left' | 'right', onResize = jest.fn()) => {
-  render(<SidebarResizeHandle side={side} width={400} bounds={BOUNDS} label="Resize Assistant" onResize={onResize} />);
+  render(<SidebarResizeHandle side={side} size={400} bounds={BOUNDS} label="Resize Assistant" onResize={onResize} />);
 
   return onResize;
 };
