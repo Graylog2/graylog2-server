@@ -115,9 +115,14 @@ const CustomLogo = styled.div`
   }
 `;
 
-const CustomizableLogo = () => {
+const useLoginCustomLogo = () => {
   const { colorScheme } = useThemes('dark', false);
-  const customLogo = useCustomLogo(colorScheme);
+
+  return useCustomLogo(colorScheme);
+};
+
+const CustomizableLogo = () => {
+  const customLogo = useLoginCustomLogo();
 
   return customLogo ? (
     <CustomLogo>
@@ -153,6 +158,8 @@ const LoginChrome = ({ children }: Props) => {
   const productName = useProductName();
   const customLoginBackground = useCustomLoginBackground();
   const showLogo = useShowLogo();
+  const customLogo = useLoginCustomLogo();
+  const showPlasma = !customLoginBackground && !customLogo;
 
   return (
     <LoginContainer>
@@ -165,7 +172,7 @@ const LoginChrome = ({ children }: Props) => {
           <PublicNotifications login />
         </NotificationsContainer>
         <BackgroundImage $backgroundImage={customLoginBackground ?? defaultBackgroundImage} />
-        {!customLoginBackground && <BlendedPlasma />}
+        {showPlasma && <BlendedPlasma />}
         <BackgroundText>
           {showLogo && (
             <TextContainer>
