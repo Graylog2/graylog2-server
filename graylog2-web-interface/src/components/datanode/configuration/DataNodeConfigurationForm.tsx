@@ -30,6 +30,8 @@ import DataNodeConfigurationSection from './DataNodeConfigurationSection';
 import ConfigurationPrecedenceHelp from './ConfigurationPrecedenceHelp';
 import DataNodeRestartProgress from './DataNodeRestartProgress';
 import DataNodeRestartRequiredAlert from './DataNodeRestartRequiredAlert';
+import LiveSettingsErrorAlert from './LiveSettingsErrorAlert';
+import useManagedConfiguration from './useManagedConfiguration';
 
 import ForceStartConfirmDialog from '../opensearch-upgrade/ForceStartConfirmDialog';
 
@@ -79,6 +81,7 @@ const DataNodeConfigurationForm = ({ categories, nodeId, basePath, children = un
     forceRestart,
   } = useDataNodeConfigurationForm({ categories, nodeId, basePath });
   const { isSubmitting, resetForm } = formik;
+  const { data: configuration } = useManagedConfiguration(nodeId);
   const [selectedUnits, setSelectedUnits] = useState<Record<string, string>>({});
   const selectUnit = (name: string, unit: string) => setSelectedUnits((units) => ({ ...units, [name]: unit }));
   const canDelete = isPermitted('clusterconfigentry:delete');
@@ -135,6 +138,7 @@ const DataNodeConfigurationForm = ({ categories, nodeId, basePath, children = un
                   ))}
                   <Route path="*" element={<Navigate to={RoutePaths.NOTFOUND} replace />} />
                 </Routes>
+                <LiveSettingsErrorAlert nodeId={nodeId} errors={configuration?.live_settings_errors} />
                 {isRestarting && (
                   <Alert
                     bsStyle={isRestartPaused ? 'warning' : 'info'}

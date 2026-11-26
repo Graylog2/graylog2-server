@@ -216,4 +216,13 @@ class ManagedConfigurationServiceTest {
         assertThat(applied.appliedAt()).isEqualTo(loaded.loadedAt());
         assertThat(service.configurationStates()).containsOnlyKeys(NODE_ID);
     }
+
+    @Test
+    void recordsAndClearsTheLiveSettingsErrorOfANode() {
+        service.recordLiveSettingsResult(NODE_ID, "refused");
+        assertThat(service.configurationState(NODE_ID).orElseThrow().liveSettingsError()).isEqualTo("refused");
+
+        service.recordLiveSettingsResult(NODE_ID, null);
+        assertThat(service.configurationState(NODE_ID).orElseThrow().liveSettingsError()).isNull();
+    }
 }

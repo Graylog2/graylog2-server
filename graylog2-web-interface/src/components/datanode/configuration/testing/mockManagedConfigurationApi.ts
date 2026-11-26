@@ -208,6 +208,7 @@ export const managedConfigurationResponse = (
   restart_required: false,
   pending_nodes: [],
   restarting_nodes: [],
+  live_settings_errors: {},
 });
 
 export const sampleClusterConfiguration = managedConfigurationResponse({

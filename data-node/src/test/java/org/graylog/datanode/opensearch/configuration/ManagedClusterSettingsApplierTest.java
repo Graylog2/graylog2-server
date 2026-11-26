@@ -19,6 +19,7 @@ package org.graylog.datanode.opensearch.configuration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import jakarta.json.Json;
+import jakarta.json.JsonValue;
 import org.graylog.datanode.opensearch.OpensearchProcess;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
@@ -45,8 +46,12 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -140,10 +145,7 @@ class ManagedClusterSettingsApplierTest {
     }
 
     /**
-     * Fails with the current implementation, which treats the database as the only source of the live settings and
-     * resets every managed setting without a stored value (see {@link ManagedClusterSettingsApplier#changes}).
-     * <p>
-     * That holds once the settings are managed through the web interface, but not on the first start after an
+     * The database is the only source of the live settings once a value has been stored for them. That holds once the settings are managed through the web interface, but not on the first start after an
      * upgrade: the database is empty then, while the cluster may well carry persistent values which admins set
      * through the cluster settings API, before this feature existed. An empty database doesn't mean "reset", it
      * means "never configured here". Resetting those values silently undoes deliberate tuning, on every cluster,
@@ -159,16 +161,90 @@ class ManagedClusterSettingsApplierTest {
         // earlier, and nothing has been stored through the web interface yet
         final OpenSearchClusterClient cluster = clusterWithPersistentSettings(Map.of(SHARDS, "3000"));
         when(managedConfigurationApplier.liveValues()).thenReturn(Map.of());
+        // Nothing has ever been stored for the setting, so the value can be adopted
+        when(managedConfigurationApplier.adoptLiveValue(SHARDS, "3000")).thenReturn(true);
 
         // The first data node to become available after the upgrade applies the (empty) stored settings
         becomeAvailable();
 
-        // The current implementation PUTs {"cluster.max_shards_per_node": null} here. That drops the limit back to
+        // Resetting would PUT {"cluster.max_shards_per_node": null} here. That drops the limit back to
         // the default of 1000, so as soon as the cluster holds more shards than that, creating indices fails
         // ("this action would add [N] total shards, but this cluster currently has [M]/[1000]"), index rotation
         // stops and ingestion stalls. Nothing in the web interface hints at the cause: the setting shows no stored
         // value, just as before the upgrade.
         verify(cluster, never()).putSettings(any(PutClusterSettingsRequest.class));
+    }
+
+    @Test
+    void resetsASettingWhoseStoredValueHasBeenRemoved() throws Exception {
+        final OpenSearchClusterClient cluster = clusterWithPersistentSettings(Map.of(SHARDS, "3000"));
+        when(managedConfigurationApplier.liveValues()).thenReturn(Map.of());
+        // A value has been stored and removed again, so it isn't adopted any more
+        when(managedConfigurationApplier.adoptLiveValue(SHARDS, "3000")).thenReturn(false);
+
+        becomeAvailable();
+
+        final ArgumentCaptor<PutClusterSettingsRequest> request = ArgumentCaptor.forClass(PutClusterSettingsRequest.class);
+        verify(cluster).putSettings(request.capture());
+        assertThat(request.getValue().persistent()).containsOnlyKeys(SHARDS);
+        assertThat(request.getValue().persistent().get(SHARDS).toJson()).isEqualTo(JsonValue.NULL);
+    }
+
+    @Test
+    void appliesTheOtherSettingsWhenOpensearchRefusesOne() throws Exception {
+        final OpenSearchClusterClient cluster = clusterWithPersistentSettings(Map.of());
+        when(managedConfigurationApplier.liveValues()).thenReturn(Map.of(LOW, "95%", SHARDS, "2000"));
+        refuse(cluster, LOW, "low disk watermark [95%] more than high disk watermark [90%]");
+
+        becomeAvailable();
+
+        verify(cluster, times(2)).putSettings(any(PutClusterSettingsRequest.class));
+        final ArgumentCaptor<String> error = ArgumentCaptor.forClass(String.class);
+        verify(managedConfigurationApplier).recordLiveSettingsResult(error.capture());
+        // The reason opensearch gives is wrapped by the client, and has to be found among the causes
+        assertThat(error.getValue())
+                .contains(LOW)
+                .contains("low disk watermark [95%] more than high disk watermark [90%]")
+                .doesNotContain(SHARDS);
+    }
+
+    @Test
+    void retriesOnHealthChecksUntilAnAttemptSucceeds() throws Exception {
+        final OpenSearchClusterClient cluster = clusterWithPersistentSettings(Map.of());
+        when(managedConfigurationApplier.liveValues()).thenReturn(Map.of(SHARDS, "2000"));
+        refuse(cluster, SHARDS, "no cluster manager");
+        final var applier = new ManagedClusterSettingsApplier(process, managedConfigurationApplier, new EventBus());
+
+        applier.transition(OpensearchEvent.HEALTH_CHECK_OK, OpensearchState.STARTING, OpensearchState.AVAILABLE);
+        doReturn(PutClusterSettingsResponse.of(b -> b.acknowledged(true).persistent(Map.of()).transient_(Map.of())))
+                .when(cluster).putSettings(any(PutClusterSettingsRequest.class));
+        applier.transition(OpensearchEvent.HEALTH_CHECK_OK, OpensearchState.AVAILABLE, OpensearchState.AVAILABLE);
+        // Succeeded, so further health checks leave the settings alone
+        applier.transition(OpensearchEvent.HEALTH_CHECK_OK, OpensearchState.AVAILABLE, OpensearchState.AVAILABLE);
+
+        verify(cluster, times(2)).putSettings(any(PutClusterSettingsRequest.class));
+        final var inOrder = inOrder(managedConfigurationApplier);
+        inOrder.verify(managedConfigurationApplier).recordLiveSettingsResult(contains("no cluster manager"));
+        inOrder.verify(managedConfigurationApplier).recordLiveSettingsResult(isNull());
+    }
+
+    @Test
+    void describesTheCausesOfAnException() {
+        final var exception = new RuntimeException("Couldn't update cluster setting",
+                new IllegalStateException("illegal_argument_exception", new IllegalArgumentException("the reason")));
+
+        assertThat(ManagedClusterSettingsApplier.describe(exception))
+                .isEqualTo("Couldn't update cluster setting: illegal_argument_exception: the reason");
+    }
+
+    private static void refuse(OpenSearchClusterClient cluster, String name, String reason) throws Exception {
+        doAnswer(invocation -> {
+            final PutClusterSettingsRequest request = invocation.getArgument(0);
+            if (request.persistent().containsKey(name)) {
+                throw new IllegalStateException("request failed", new IllegalArgumentException(reason));
+            }
+            return PutClusterSettingsResponse.of(b -> b.acknowledged(true).persistent(Map.of()).transient_(Map.of()));
+        }).when(cluster).putSettings(any(PutClusterSettingsRequest.class));
     }
 
     private OpenSearchClusterClient clusterWithPersistentSettings(Map<String, String> persistent) throws Exception {

@@ -29,7 +29,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class OpensearchCommonConfigurationBeanTest {
 
@@ -115,5 +118,22 @@ class OpensearchCommonConfigurationBeanTest {
                 100,
                 IndexerJwtAuthToken.disabled()
         );
+    }
+
+    @Test
+    void translatesTheWarmRoleWhereItDoesNotExist() {
+        // opensearch 2.x knows searchable snapshots only as the search role
+        assertThat(OpensearchCommonConfigurationBean.translateRoles(List.of("data", "warm"), "search"))
+                .containsExactly("data", "search");
+        assertThat(OpensearchCommonConfigurationBean.translateRoles(List.of("warm", "search"), "search"))
+                .containsExactly("search");
+    }
+
+    @Test
+    void keepsTheSearchRoleWhereItIsARoleOfItsOwn() {
+        // From opensearch 3.x on, search is the role for search replicas and warm the one for searchable snapshots
+        assertThat(OpensearchCommonConfigurationBean.translateRoles(List.of("data", "search", "warm"), "warm"))
+                .containsExactly("data", "search", "warm");
+        assertThat(OpensearchCommonConfigurationBean.translateRoles(null, "search")).isNull();
     }
 }

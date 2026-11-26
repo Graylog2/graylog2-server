@@ -17,6 +17,7 @@
 package org.graylog.datanode.opensearch.configuration.beans.impl;
 
 import com.google.common.collect.ImmutableMap;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import org.apache.commons.exec.OS;
 import org.graylog.datanode.Configuration;
@@ -49,7 +50,7 @@ public class OpensearchCommonConfigurationBean implements DatanodeConfigurationB
     public DatanodeConfigurationPart buildConfigurationPart(OpensearchConfigurationParams buildParams) {
         return DatanodeConfigurationPart.builder()
                 .properties(commonOpensearchConfig(buildParams))
-                .nodeRoles(getNodeRoles(localConfiguration))
+                .nodeRoles(nodeRoles(buildParams))
                 .javaOpt("-Xms%s".formatted(localConfiguration.getOpensearchHeap()))
                 .javaOpt("-Xmx%s".formatted(localConfiguration.getOpensearchHeap()))
                 .javaOpt("-Dopensearch.transport.cname_in_publish_address=true")
@@ -62,6 +63,35 @@ public class OpensearchCommonConfigurationBean implements DatanodeConfigurationB
             return Collections.singletonList("Data node is running in insecure mode(insecure_startup=true). There is neither HTTPS nor any auth enabled!");
         }
         return Collections.emptyList();
+    }
+
+    /**
+     * The role for searchable snapshots is {@code search} up to opensearch 2.x and {@code warm} from 3.x on, where
+     * {@code search} became a role of its own, for search replicas. Roles are stored for all data nodes, which can
+     * run different versions during an upgrade, so {@code warm} is translated where it doesn't exist. A configured
+     * {@code search} stays as it is: from 3.x on it means the other role.
+     *
+     * @return the roles with {@code warm} replaced by the role for searchable snapshots of the running distribution,
+     * {@code null} if none are configured
+     */
+    public static List<String> translateRoles(@Nullable List<String> roles, String searchableSnapshotsRole) {
+        if (roles == null || OpensearchNodeRole.WARM.equals(searchableSnapshotsRole)) {
+            return roles;
+        }
+        return roles.stream()
+                .map(role -> OpensearchNodeRole.WARM.equals(role) ? searchableSnapshotsRole : role)
+                .distinct()
+                .toList();
+    }
+
+    private List<String> nodeRoles(OpensearchConfigurationParams buildParams) {
+        final List<String> roles = getNodeRoles(localConfiguration);
+        if (!roles.contains(OpensearchNodeRole.WARM)) {
+            return roles;
+        }
+        final String searchableSnapshotsRole = buildParams.datanodeConfiguration().opensearchDistribution()
+                .distributionProperties().searchableSnapshotsRole();
+        return translateRoles(roles, searchableSnapshotsRole);
     }
 
     public static List<String> getNodeRoles(Configuration localConfiguration) {

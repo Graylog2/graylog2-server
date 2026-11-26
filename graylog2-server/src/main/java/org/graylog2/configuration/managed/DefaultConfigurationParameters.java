@@ -198,7 +198,9 @@ public final class DefaultConfigurationParameters {
                         .build(),
                 ConfigurationParameter.builder(NodeType.DATANODE, "node_roles", "Node roles")
                         .description("The roles this Data Node performs in the OpenSearch cluster. Without roles "
-                                + "configured, a Data Node with a snapshot repository also takes the search role.")
+                                + "configured, a Data Node with a snapshot repository also takes the role for "
+                                + "searchable snapshots. Warm stands for that role on every OpenSearch version, "
+                                + "while Search is a separate role from OpenSearch 3 on.")
                         .defaultValue("cluster_manager,data,ingest,remote_cluster_client")
                         .category(CATEGORY_NODE).order(20)
                         .type(ParameterType.LIST)
@@ -207,8 +209,8 @@ public final class DefaultConfigurationParameters {
                                 "data", "Data",
                                 "ingest", "Ingest",
                                 "remote_cluster_client", "Remote cluster client",
-                                "search", "Search",
-                                "warm", "Warm")))
+                                "warm", "Warm (searchable snapshots)",
+                                "search", "Search")))
                         .requiresRestart(true)
                         .scope(ParameterScope.NODE)
                         .build(),

@@ -42,6 +42,7 @@ import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.configuration.managed.ConfigurationCatalog;
 import org.graylog2.configuration.managed.ConfigurationParameter;
 import org.graylog2.configuration.managed.ConfigurationSource;
+import org.graylog2.configuration.managed.DiskWatermarks;
 import org.graylog2.configuration.managed.ManagedConfigurationEntry;
 import org.graylog2.configuration.managed.ManagedConfigurationServices;
 import org.graylog2.configuration.managed.NodeType;
@@ -60,6 +61,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.emptyToNull;
@@ -124,6 +126,7 @@ public class ManagedConfigurationResource extends RestResource {
             checkPermission(RestPermissions.CLUSTER_CONFIG_ENTRY_DELETE);
         }
         request.values().forEach((name, value) -> validate(request.nodeType(), scope, name, value));
+        validateDiskWatermarks(request.nodeType(), scopeNodeId, request.values());
 
         configurationServices.get(request.nodeType())
                 .update(scopeNodeId, request.values(), currentUserName());
@@ -148,6 +151,31 @@ public class ManagedConfigurationResource extends RestResource {
         }
     }
 
+    /**
+     * Checks the disk watermarks against each other, as OpenSearch refuses a combination which is valid value by
+     * value but mixes units or isn't ordered. The values not changed by the request are taken as they apply now.
+     */
+    private void validateDiskWatermarks(NodeType nodeType, @Nullable String nodeId, Map<String, String> values) {
+        if (nodeType != NodeType.DATANODE || nodeId != null
+                || DiskWatermarks.NAMES.stream().noneMatch(values::containsKey)) {
+            return;
+        }
+        final Map<String, ManagedConfigurationEntry> entries = configurationServices.get(nodeType).get(null);
+        DiskWatermarks.check(name -> catalog.get(nodeType, name)
+                        .map(parameter -> {
+                            final var current = ManagedConfigurationParameter.of(parameter, entries.get(name), false);
+                            if (!values.containsKey(name)) {
+                                return current.value();
+                            }
+                            // Removing the stored value falls back to what applies without one
+                            return values.get(name) != null ? values.get(name) : current.nodeValue();
+                        })
+                        .orElse(null))
+                .ifPresent(message -> {
+                    throw new BadRequestException(message);
+                });
+    }
+
     private ManagedConfiguration read(NodeType nodeType, @Nullable String nodeId) {
         final ParameterScope scope = nodeId == null ? ParameterScope.CLUSTER : ParameterScope.NODE;
         final Map<String, ManagedConfigurationEntry> entries = configurationServices.get(nodeType).get(nodeId);
@@ -165,7 +193,26 @@ public class ManagedConfigurationResource extends RestResource {
                         pendingParameters.contains(parameter.name())))
                 .toList();
         return new ManagedConfiguration(nodeType, nodeId, parameters, !pendingNodes.isEmpty(), pendingNodes,
-                List.copyOf(restartingNodes(nodeType, nodeId)));
+                List.copyOf(restartingNodes(nodeType, nodeId)), liveSettingsErrors(nodeType, nodeId));
+    }
+
+    /**
+     * Why nodes couldn't apply the stored settings which take effect without a restart, for the node of the request
+     * or for every active node of the type. These settings hold for the whole cluster, so an error concerns a node
+     * page as well.
+     */
+    private Map<String, String> liveSettingsErrors(NodeType nodeType, @Nullable String nodeId) {
+        if (nodeType != NodeType.DATANODE) {
+            return Map.of();
+        }
+        final Collection<String> nodeIds = nodeId == null ? dataNodeService.allActive().keySet() : List.of(nodeId);
+        final Map<String, String> errors = new TreeMap<>();
+        configurationServices.get(nodeType).configurationStates().forEach((id, state) -> {
+            if (nodeIds.contains(id) && state.liveSettingsError() != null) {
+                errors.put(id, state.liveSettingsError());
+            }
+        });
+        return errors;
     }
 
     private Set<String> restartingNodes(NodeType nodeType, @Nullable String nodeId) {
@@ -200,13 +247,16 @@ public class ManagedConfigurationResource extends RestResource {
      *                        {@code parameters} then.
      * @param pendingNodes    The IDs of the nodes which have to be restarted
      * @param restartingNodes The IDs of the nodes which are restarting right now
+     * @param liveSettingsErrors Why nodes couldn't apply the stored settings which take effect without a restart,
+     *                           keyed by node ID. Empty while all of them are applied.
      */
     public record ManagedConfiguration(@JsonProperty("node_type") NodeType nodeType,
                                        @JsonProperty("node_id") @Nullable String nodeId,
                                        @JsonProperty("parameters") List<ManagedConfigurationParameter> parameters,
                                        @JsonProperty("restart_required") boolean restartRequired,
                                        @JsonProperty("pending_nodes") List<String> pendingNodes,
-                                       @JsonProperty("restarting_nodes") List<String> restartingNodes) {}
+                                       @JsonProperty("restarting_nodes") List<String> restartingNodes,
+                                       @JsonProperty("live_settings_errors") Map<String, String> liveSettingsErrors) {}
 
     /**
      * A parameter with everything needed to show and edit it.

@@ -169,6 +169,8 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
             ignored, so that the configuration of this data node is used for them. Use * to ignore all stored values.
             Stored values otherwise take precedence over this file, environment variables and system properties.
             Use this to start a data node which doesn't work with a stored value.
+            Settings which apply to the whole cluster without a restart, like the disk watermarks, can't be ignored:
+            every data node writes them to the cluster. Correct or remove their stored value in the web interface.
             """)
     @Parameter(value = ManagedConfigurationApplier.IGNORED_PARAMETERS, converter = StringSetConverter.class)
     private Set<String> ignoreStoredConfiguration = Set.of();

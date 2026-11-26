@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
@@ -293,9 +294,9 @@ class ManagedConfigurationApplierTest {
         assertThat(configuration.managed).isEqualTo("from the file");
         assertThat(configuration.managedNumber).isEqualTo(12);
         assertThat(applier.processStartValues()).isEmpty();
-        // An ignored live parameter mustn't be reset either, its value is left to the configuration of the node
-        assertThat(applier.liveParameters()).isEmpty();
-        assertThat(applier.liveValues()).isEmpty();
+        // Live parameters hold for the whole cluster, so ignoring them on a single node can't work and isn't done
+        assertThat(applier.liveParameters()).containsExactly(LIVE);
+        assertThat(applier.liveValues()).containsExactly(Map.entry(LIVE, "1000"));
     }
 
     @Test
@@ -311,8 +312,30 @@ class ManagedConfigurationApplierTest {
 
         assertThat(configuration.managed).isEqualTo("from the file");
         assertThat(applier.processStartValues()).isEmpty();
-        assertThat(applier.liveParameters()).isEmpty();
+        // Live parameters hold for the whole cluster, the other nodes would write them anyway
+        assertThat(applier.liveValues()).containsExactly(Map.entry(LIVE, "1000"));
         // A restart still has to be visible to whoever waits for it
         verify(configurationService).markConfigurationLoaded(NODE_ID);
+    }
+
+    @Test
+    void adoptsOnlyValuesOfLiveParameters() {
+        final var applier = applier();
+        when(configurationService.adoptClusterValue(eq(LIVE), eq("3000"), anyString())).thenReturn(true);
+
+        assertThat(applier.adoptLiveValue(LIVE, "3000")).isTrue();
+        assertThat(applier.adoptLiveValue(RUNTIME, "85%")).isFalse();
+        verify(configurationService, never()).adoptClusterValue(eq(RUNTIME), anyString(), anyString());
+    }
+
+    @Test
+    void recordsTheOutcomeOfApplyingLiveSettings() {
+        final var applier = applier();
+
+        applier.recordLiveSettingsResult("refused");
+        applier.recordLiveSettingsResult(null);
+
+        verify(configurationService).recordLiveSettingsResult(NODE_ID, "refused");
+        verify(configurationService).recordLiveSettingsResult(NODE_ID, null);
     }
 }

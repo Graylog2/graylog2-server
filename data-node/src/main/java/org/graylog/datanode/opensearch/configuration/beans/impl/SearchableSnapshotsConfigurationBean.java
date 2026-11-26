@@ -18,6 +18,7 @@ package org.graylog.datanode.opensearch.configuration.beans.impl;
 
 import com.google.common.collect.ImmutableMap;
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import org.apache.commons.io.FileUtils;
@@ -128,12 +129,18 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
     }
 
     private boolean searchRoleExplicitlyConfigured(String searchableSnapshotsRole) {
-        return localConfiguration.getNodeRoles() != null && localConfiguration.getNodeRoles().contains(searchableSnapshotsRole);
+        final List<String> roles = configuredRoles(searchableSnapshotsRole);
+        return roles != null && roles.contains(searchableSnapshotsRole);
+    }
+
+    @Nullable
+    private List<String> configuredRoles(String searchableSnapshotsRole) {
+        return OpensearchCommonConfigurationBean.translateRoles(localConfiguration.getNodeRoles(), searchableSnapshotsRole);
     }
 
     private boolean searchRoleEnabled(String searchableSnapshotsRole) {
-        final boolean rolesNotConfigured = localConfiguration.getNodeRoles() == null || localConfiguration.getNodeRoles().isEmpty();
-        return rolesNotConfigured || localConfiguration.getNodeRoles().contains(searchableSnapshotsRole);
+        final List<String> roles = configuredRoles(searchableSnapshotsRole);
+        return roles == null || roles.isEmpty() || roles.contains(searchableSnapshotsRole);
     }
 
     private void validateUsableSpace() throws OpensearchConfigurationException {
