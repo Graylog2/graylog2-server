@@ -14,6 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export type Traffic = { [key: string]: number };
+export type Traffic = { [key: string]: number | bigint };
 
 export const DAYS = [30, 90, 180, 365] as const;

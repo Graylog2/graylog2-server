@@ -1,0 +1,5 @@
+type = "a"
+message = "Add OAuth 2.0 (XOAUTH2) authentication for sending emails via SMTP, e.g. for Microsoft Exchange Online which is retiring basic authentication for SMTP. Configure it with `transport_email_auth_method = oauth2` and the new `transport_email_auth_oauth2_*` settings."
+
+issues = ["Graylog2/graylog-plugin-enterprise#16433"]
+pulls = ["28313"]
