@@ -143,7 +143,9 @@ public abstract class ReferencedQueryStringSearchFilter implements ReferencedSea
 
     @Override
     public ReferencedSearchFilter stripToId() {
-        return builder().id(id()).negation(null).disabled(null).build();
+        // negation and disabled describe how the referencing entity uses the filter, they are not part of the
+        // stored filter and cannot be re-fetched, so they have to be kept.
+        return builder().id(id()).negation(negation()).disabled(disabled()).build();
     }
 
     @Override
