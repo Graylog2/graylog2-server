@@ -36,16 +36,18 @@ const Items = styled.div<{ $layout: Layout }>(
   ({ theme, $layout }) => css`
     display: flex;
     min-width: 0;
-    ${$layout === 'stacked'
-      ? css`
-          flex-direction: column;
-          align-items: flex-start;
-          gap: ${theme.spacings.xxs};
-        `
-      : css`
-          flex-wrap: wrap;
-          gap: ${theme.spacings.xs};
-        `}
+    ${
+      $layout === 'stacked'
+        ? css`
+            flex-direction: column;
+            align-items: flex-start;
+            gap: ${theme.spacings.xxs};
+          `
+        : css`
+            flex-wrap: wrap;
+            gap: ${theme.spacings.xs};
+          `
+    }
   `,
 );
 
@@ -54,15 +56,17 @@ const Item = styled.div<{ $layout: Layout }>(
   ({ $layout }) => css`
     min-width: 0;
     max-width: 100%;
-    ${$layout === 'stacked' &&
-    css`
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+    ${
+      $layout === 'stacked' &&
+      css`
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
 
-      /* With overflow: hidden the item may shrink below its content height, so a capped list would squeeze it. */
-      flex-shrink: 0;
-    `}
+        /* With overflow: hidden the item may shrink below its content height, so a capped list would squeeze it. */
+        flex-shrink: 0;
+      `
+    }
   `,
 );
 

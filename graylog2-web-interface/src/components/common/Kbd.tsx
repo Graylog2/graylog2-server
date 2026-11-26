@@ -15,8 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { Kbd } from '@mantine/core';
+import { Kbd as MantineKbd } from '@mantine/core';
+import type { KbdProps } from '@mantine/core';
 
-const KeyboardKey = ({ children }: React.PropsWithChildren) => <Kbd>{children}</Kbd>;
+import { keyLabel } from 'util/OSUtils';
 
-export default KeyboardKey;
+type Props = Omit<KbdProps, 'children'> & {
+  name: string;
+};
+
+const Kbd = ({ name, ...rest }: Props) => <MantineKbd {...rest}>{keyLabel(name)}</MantineKbd>;
+
+export default Kbd;

@@ -52,30 +52,32 @@ const Container = styled.button<ContainerProps>(
     }
 
     /* stylelint-disable selector-max-empty-lines, indentation */
-    ${$isSelected &&
-    !$isLink &&
-    !$sidebarIsPinned &&
-    css`
-      &::before,
-      &::after {
-        content: '';
-        position: absolute;
-        right: -5px;
-        height: 15px;
-        width: 5px;
-        background-color: ${colors.global.contentBackground};
-      }
+    ${
+      $isSelected &&
+      !$isLink &&
+      !$sidebarIsPinned &&
+      css`
+        &::before,
+        &::after {
+          content: '';
+          position: absolute;
+          right: -5px;
+          height: 15px;
+          width: 5px;
+          background-color: ${colors.global.contentBackground};
+        }
 
-      &::before {
-        transform: skewY(-45deg);
-        top: calc(50% - 12px);
-      }
+        &::before {
+          transform: skewY(-45deg);
+          top: calc(50% - 12px);
+        }
 
-      &::after {
-        transform: skewY(45deg);
-        bottom: calc(50% - 12px);
-      }
-    `}/* stylelint-enable selector-max-empty-lines, indentation */
+        &::after {
+          transform: skewY(45deg);
+          bottom: calc(50% - 12px);
+        }
+      `
+    } /* stylelint-enable selector-max-empty-lines, indentation */
   `,
 );
 
@@ -112,9 +114,11 @@ const IconWrap = styled.span<IconWrapProps>(
 
     &::after {
       display: ${$isSelected && !$isLink ? 'block' : 'none'};
-      box-shadow: ${$isSelected && !$sidebarIsPinned && !$isLink
-        ? `inset 2px -2px 2px 0 ${colors.global.navigationBoxShadow}`
-        : 'none'};
+      box-shadow: ${
+        $isSelected && !$sidebarIsPinned && !$isLink
+          ? `inset 2px -2px 2px 0 ${colors.global.navigationBoxShadow}`
+          : 'none'
+      };
       background-color: ${$isSelected && !$isLink ? colors.global.contentBackground : colors.variant.lightest.info};
       border: ${$isSelected && !$isLink ? 'none' : `1px solid ${colors.variant.light.info}`};
       content: ' ';

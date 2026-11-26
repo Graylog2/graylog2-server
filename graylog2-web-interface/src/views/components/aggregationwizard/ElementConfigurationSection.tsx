@@ -70,9 +70,9 @@ const Header = styled.div<{ $isEmpty: boolean }>(
       top: 50%;
       width: 100%;
       border-bottom: 1px solid
-        ${$isEmpty
-          ? theme.colors.gray['70']
-          : theme.utils.contrastingColor(theme.colors.global.contentBackground, 'AA')};
+        ${
+          $isEmpty ? theme.colors.gray['70'] : theme.utils.contrastingColor(theme.colors.global.contentBackground, 'AA')
+        };
       position: absolute;
     }
   `,

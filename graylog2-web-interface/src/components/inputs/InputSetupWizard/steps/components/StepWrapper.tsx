@@ -57,8 +57,8 @@ const StepCol = styled(Col)(
 export const RecommendedTooltip = styled(Tooltip)(
   ({ theme }) => css`
     &.mantine-Tooltip-tooltip {
-      background-color: ${theme.colors.global.background}!important;
-      font-size: ${theme.fonts.size.small}!important;
+      background-color: ${theme.colors.global.background} !important;
+      font-size: ${theme.fonts.size.small} !important;
     }
   `,
 );

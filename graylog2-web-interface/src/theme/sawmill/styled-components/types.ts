@@ -161,6 +161,7 @@ export type TColors = {
     containerBorder: string;
     highlight: string;
     lines: string;
+    zeroLine: string;
     cyan: {
       markerColor: string;
       textColor: string;
