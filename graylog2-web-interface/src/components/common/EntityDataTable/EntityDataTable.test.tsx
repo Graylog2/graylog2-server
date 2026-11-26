@@ -210,6 +210,28 @@ describe('<EntityDataTable />', () => {
     await screen.findByText('Details content');
   });
 
+  it('renders headers of columns whose schema is provided after the initial render', async () => {
+    const layoutPreferences = {
+      attributes: { title: { status: ATTRIBUTE_STATUS.show }, stream: { status: ATTRIBUTE_STATUS.show } },
+    };
+    const { rerender } = render(
+      <EntityDataTable
+        {...defaultProps}
+        layoutPreferences={layoutPreferences}
+        columnSchemas={columnSchemas.filter(({ id }) => id !== 'stream')}
+      />,
+    );
+
+    await screen.findByRole('columnheader', { name: /title/i });
+
+    expect(screen.queryByRole('columnheader', { name: /stream/i })).not.toBeInTheDocument();
+
+    rerender(<EntityDataTable {...defaultProps} layoutPreferences={layoutPreferences} />);
+
+    await screen.findByRole('columnheader', { name: /stream/i });
+    await screen.findByText('Entity stream');
+  });
+
   it('keeps the trailing actions column even without row actions', async () => {
     render(<EntityDataTable {...defaultProps} />);
 

@@ -44,12 +44,14 @@ const Container = styled.div<{ $height: number; $trend: TrendDirection | undefin
   return css`
     height: ${$height}px;
     width: 100%;
-    ${$trend &&
-    css`
-      background-color: ${bgColor} !important; /* Needed for report generation */
-      color: ${theme.utils.contrastingColor(bgColor)} !important; /* Needed for report generation */
-      color-adjust: exact !important; /* Needed for report generation */
-    `}
+    ${
+      $trend &&
+      css`
+        background-color: ${bgColor} !important; /* Needed for report generation */
+        color: ${theme.utils.contrastingColor(bgColor)} !important; /* Needed for report generation */
+        color-adjust: exact !important; /* Needed for report generation */
+      `
+    }
   `;
 });
 

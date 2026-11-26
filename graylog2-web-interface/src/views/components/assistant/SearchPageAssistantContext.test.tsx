@@ -50,13 +50,10 @@ import TextWidgetConfig from 'views/logic/widgets/TextWidgetConfig';
 import EventsWidget from 'views/logic/widgets/events/EventsWidget';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import type { FocusContextState } from 'views/components/contexts/WidgetFocusContext';
-import Store from 'logic/local-storage/Store';
 
 import SearchPageAssistantContext from './SearchPageAssistantContext';
 
 jest.mock('routing/useLocation', () => () => ({ pathname: '/search' }));
-const mockHistory = { push: jest.fn() };
-jest.mock('routing/useHistory', () => () => mockHistory);
 jest.mock('views/stores/useViewsSelector');
 jest.mock('views/stores/useViewsDispatch');
 jest.mock('views/logic/slices/widgetActions', () => ({ addWidget: jest.fn(() => 'addWidget') }));
@@ -159,7 +156,9 @@ const searchWithFilters = (filters: Array<typeof noTestHosts> = []) => {
 const mockDispatchFor = (view: View) =>
   asMock(useViewsDispatch).mockReturnValue(
     jest.fn((action: unknown) =>
-      typeof action === 'function' ? action(jest.fn(), () => ({ view: { activeQuery: 'query-id', view } })) : Promise.resolve(),
+      typeof action === 'function'
+        ? action(jest.fn(), () => ({ view: { activeQuery: 'query-id', view } }))
+        : Promise.resolve(),
     ) as unknown as ReturnType<typeof useViewsDispatch>,
   );
 
@@ -339,7 +338,10 @@ describe('SearchPageAssistantContext', () => {
 
     await tools().update_widget({
       widget_id: 'w1',
-      visualization_config: { barmode: 'stack', axis_config: { number: { title: 'Failed logins' }, xaxis: { title: 'Host' } } },
+      visualization_config: {
+        barmode: 'stack',
+        axis_config: { number: { title: 'Failed logins' }, xaxis: { title: 'Host' } },
+      },
     });
 
     const { config } = updatedViewState().widgets.first() as AggregationWidget;
@@ -396,7 +398,11 @@ describe('SearchPageAssistantContext', () => {
     const tools = renderTools();
 
     await expect(
-      tools().update_widget({ widget_id: 'w1', visualization: 'line', visualization_config: { interpolation: 'spline' } }),
+      tools().update_widget({
+        widget_id: 'w1',
+        visualization: 'line',
+        visualization_config: { interpolation: 'spline' },
+      }),
     ).rejects.toThrow('The widget shows a bar visualization now, not line.');
   });
 
@@ -430,49 +436,9 @@ describe('SearchPageAssistantContext', () => {
     mockPageWithBarChart(TextWidget.builder().id('w1').config(new TextWidgetConfig('Notes')).build());
     const tools = renderTools();
 
-    await expect(tools().update_widget({ widget_id: 'w1', visualization_config: { barmode: 'stack' } })).rejects.toThrow(
-      'Only aggregation widgets',
-    );
-  });
-
-  describe('create_event_definition', () => {
-    afterEach(() => {
-      window.localStorage.clear();
-    });
-
-    it('opens the event definition form in the app, filled in with the definition and its condition', () => {
-      const result = renderTools()().create_event_definition({
-        title: 'Many failed logins',
-        description: 'Brute force attempts',
-        priority: 3,
-        query: 'action:login_failed',
-        streams: ['s1'],
-        search_within_ms: 600000,
-        execute_every_ms: 60000,
-        condition: { function: 'count', field: '', operator: '>=', threshold: 10, group_by: ['source'] },
-      });
-
-      const [url] = mockHistory.push.mock.calls[0] as [string];
-      const [, path, step, sessionId] = url.match(/^(.*)\?step=([^&]+)&session-id=(.+)$/);
-
-      expect(path).toBe('/alerts/definitions/new');
-      expect(step).toBe('event-details');
-      expect(Store.get(sessionId)).toEqual({
-        type: 'aggregation-v1',
-        title: 'Many failed logins',
-        description: 'Brute force attempts',
-        priority: 3,
-        query: 'action:login_failed',
-        streams: ['s1'],
-        search_within_ms: 600000,
-        execute_every_ms: 60000,
-        agg_function: 'count',
-        agg_operator: '>=',
-        agg_value: 10,
-        group_by: ['source'],
-      });
-      expect(result).toEqual({ summary: 'Opened the form for event definition "Many failed logins"' });
-    });
+    await expect(
+      tools().update_widget({ widget_id: 'w1', visualization_config: { barmode: 'stack' } }),
+    ).rejects.toThrow('Only aggregation widgets');
   });
 
   it('refuses to change a widget that is not on the shown tab', async () => {
@@ -537,10 +503,18 @@ describe('SearchPageAssistantContext', () => {
     });
 
     expect(updatedQueryFilters()).toEqual([
-      expect.objectContaining({ type: 'referenced', id: 'f1', title: 'No test hosts', negation: true, disabled: false }),
+      expect.objectContaining({
+        type: 'referenced',
+        id: 'f1',
+        title: 'No test hosts',
+        negation: true,
+        disabled: false,
+      }),
     ]);
     expect(executeActiveQuery).toHaveBeenCalled();
-    expect(result).toEqual(expect.objectContaining({ summary: 'Added search filter "No test hosts", excluding its matches' }));
+    expect(result).toEqual(
+      expect.objectContaining({ summary: 'Added search filter "No test hosts", excluding its matches' }),
+    );
   });
 
   it('removes a search filter from the shown query, and refuses one that is not applied', async () => {

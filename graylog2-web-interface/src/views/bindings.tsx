@@ -173,12 +173,12 @@ const exports: PluginExports = {
     { path: dashboardsPath, component: DashboardsPage },
     { path: showDashboardsPath(), component: ShowViewPage, parentComponent: App },
 
-    { path: newSearchPath, component: NewSearchRedirectPage, parentComponent: null },
+    { path: newSearchPath, component: NewSearchRedirectPage, parentComponent: App },
     { path: showSearchPath, component: ShowViewPage, parentComponent: App },
     {
       path: `${Routes.unqualified.stream_search(':streamId')}/new`,
       component: NewSearchRedirectPage,
-      parentComponent: null,
+      parentComponent: App,
     },
     { path: Routes.unqualified.stream_search(':streamId'), component: StreamSearchPage, parentComponent: App },
     { path: extendedSearchPath, component: NewSearchPage, parentComponent: App },

@@ -60,13 +60,15 @@ const StyledDragIcon = styled(DragIcon)`
 const ActiveSliceIcon = styled(Icon)<{ $isRightAligned?: boolean }>(
   ({ theme, $isRightAligned }) => css`
     display: inline-flex;
-    ${$isRightAligned
-      ? css`
-          margin-right: ${theme.spacings.xs};
-        `
-      : css`
-          margin-left: ${theme.spacings.xs};
-        `}
+    ${
+      $isRightAligned
+        ? css`
+            margin-right: ${theme.spacings.xs};
+          `
+        : css`
+            margin-left: ${theme.spacings.xs};
+          `
+    }
     color: ${theme.colors.text.secondary};
     cursor: default;
   `,

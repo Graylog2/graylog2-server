@@ -61,11 +61,6 @@ import normalizeViewState from 'views/logic/views/normalizeViewState';
 import { setGlobalOverrideQuery, setGlobalOverrideTimerange } from 'views/logic/slices/searchExecutionSlice';
 import { undo } from 'views/logic/slices/undoRedoActions';
 import { createElasticsearchQueryString } from 'views/logic/queries/Query';
-import Store from 'logic/local-storage/Store';
-import generateId from 'logic/generateId';
-import Routes from 'routing/Routes';
-import useHistory from 'routing/useHistory';
-import type { EventDefinitionLocalStorageConfig } from 'components/event-definitions/hooks/useEventDefinitionConfigFromLocalStorage';
 import type { TimeRange } from 'views/logic/queries/Query';
 
 const useSearchPage = (): SearchPage => {
@@ -124,45 +119,6 @@ type AddMessageTableArgs = WidgetSearchArgs & {
 
 type AddEventsWidgetArgs = WidgetSearchArgs & { mode: VisualizationType; filters: Array<Filter> };
 
-type CreateEventDefinitionArgs = {
-  title: string;
-  description: string;
-  priority: number;
-  query: string;
-  streams: Array<string>;
-  search_within_ms: number;
-  execute_every_ms: number;
-  condition?: {
-    function: string;
-    field: string;
-    operator: EventDefinitionLocalStorageConfig['agg_operator'];
-    threshold: number;
-    group_by: Array<string>;
-  };
-};
-
-// Hands the event definition to its form, as creating one from a widget's value does.
-const eventDefinitionFormUrl = (args: Record<string, unknown>) => {
-  const { condition, ...definition } = args as CreateEventDefinitionArgs;
-  const sessionId = `assistant-${generateId()}`;
-  const config: EventDefinitionLocalStorageConfig = {
-    type: 'aggregation-v1',
-    ...definition,
-    ...(condition
-      ? {
-          agg_function: condition.function,
-          agg_field: condition.field || undefined,
-          agg_operator: condition.operator,
-          agg_value: condition.threshold,
-          group_by: condition.group_by,
-        }
-      : {}),
-  };
-  Store.set(sessionId, config);
-
-  return `${Routes.ALERTS.DEFINITIONS.CREATE}?step=event-details&session-id=${sessionId}`;
-};
-
 type WidgetBuilder = ReturnType<typeof Widget.builder>;
 
 type SearchFilterArgs = {
@@ -213,7 +169,10 @@ const mergeSettings = (current: Settings, changes: Settings): Settings =>
 
     return {
       ...merged,
-      [key]: isPlainObject(value) && isPlainObject(previous) ? mergeSettings(previous as Settings, value as Settings) : value,
+      [key]:
+        isPlainObject(value) && isPlainObject(previous)
+          ? mergeSettings(previous as Settings, value as Settings)
+          : value,
     };
   }, current);
 
@@ -286,7 +245,6 @@ const mergeAggregation = (
 
 const useSearchPageTools = (): PageTools => {
   const dispatch = useViewsDispatch();
-  const history = useHistory();
   const view = useViewsSelector(selectView);
   const activeQueryId = useViewsSelector(selectActiveQuery);
   const globalOverride = useViewsSelector(selectGlobalOverride);
@@ -314,7 +272,9 @@ const useSearchPageTools = (): PageTools => {
           .filters(change(widget.filters ?? List()))
           .build();
         const widgets = viewState.widgets.map((current) => (current.id === widgetId ? updated : current)).toList();
-        await dispatch(updateViewState(activeQueryId, normalizeViewState(viewState.toBuilder().widgets(widgets).build())));
+        await dispatch(
+          updateViewState(activeQueryId, normalizeViewState(viewState.toBuilder().widgets(widgets).build())),
+        );
       } else {
         if (isDashboard) {
           throw new Error('A dashboard has no search filters of its own; give the widget to filter.');
@@ -480,13 +440,8 @@ const useSearchPageTools = (): PageTools => {
 
         return { summary: 'Changed the time range', undo: isDashboard ? undefined : () => dispatch(undo()) };
       },
-      create_event_definition: (args) => {
-        history.push(eventDefinitionFormUrl(args));
-
-        return { summary: `Opened the form for event definition "${String(args.title)}"` };
-      },
     };
-  }, [activeQueryId, dispatch, globalOverride, history, isDashboard]);
+  }, [activeQueryId, dispatch, globalOverride, isDashboard]);
 };
 
 // Tells the Assistant what the search or dashboard shows, and lets it change the page.

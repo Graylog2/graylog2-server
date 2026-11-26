@@ -18,6 +18,8 @@ package org.graylog2.shared.email;
 
 import com.google.common.base.Strings;
 import com.google.common.primitives.Ints;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailConstants;
@@ -27,9 +29,6 @@ import org.apache.commons.mail.ImageHtmlEmail;
 import org.apache.commons.mail.MultiPartEmail;
 import org.apache.commons.mail.SimpleEmail;
 import org.graylog2.configuration.EmailConfiguration;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 
 import java.util.function.Supplier;
 
@@ -42,10 +41,12 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 @Singleton
 public class EmailFactory {
     private final EmailConfiguration configuration;
+    private final SmtpOAuth2TokenProvider oAuth2TokenProvider;
 
     @Inject
-    public EmailFactory(EmailConfiguration configuration) {
+    public EmailFactory(EmailConfiguration configuration, SmtpOAuth2TokenProvider oAuth2TokenProvider) {
         this.configuration = configuration;
+        this.oAuth2TokenProvider = oAuth2TokenProvider;
     }
 
     public boolean isEmailTransportEnabled() {
@@ -107,13 +108,6 @@ public class EmailFactory {
             email.setSslSmtpPort(Integer.toString(configuration.getPort()));
         }
 
-        if (configuration.isUseAuth()) {
-            email.setAuthenticator(new DefaultAuthenticator(
-                    Strings.nullToEmpty(configuration.getUsername()),
-                    Strings.nullToEmpty(configuration.getPassword())
-            ));
-        }
-
         email.setSSLOnConnect(configuration.isUseSsl());
         email.setStartTLSEnabled(configuration.isUseTls());
 
@@ -123,6 +117,15 @@ public class EmailFactory {
 
         email.setSocketConnectionTimeout(Ints.saturatedCast(configuration.getSocketConnectionTimeout().toMillis()));
         email.setSocketTimeout(Ints.saturatedCast(configuration.getSocketTimeout().toMillis()));
+
+        if (configuration.isUseOAuth2()) {
+            OAuth2SmtpTransport.configure(email.getMailSession(), oAuth2TokenProvider, configuration.getUsername());
+        } else if (configuration.isUseAuth()) {
+            email.setAuthenticator(new DefaultAuthenticator(
+                    Strings.nullToEmpty(configuration.getUsername()),
+                    Strings.nullToEmpty(configuration.getPassword())
+            ));
+        }
 
         return email;
     }
