@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Update to Netty 4.2.21 to keep the native transports working on ARM64 systems with glibc older than 2.33."
+
+pulls = ["28308"]
