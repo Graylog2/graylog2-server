@@ -1,0 +1,4 @@
+type = "f"
+message = "Fix user edit page showing old preference values after saving the preferences and switching sections."
+
+pulls = ["28358"]
