@@ -32,20 +32,24 @@ const Container = styled(SidebarPanel)<{ $stackedHeight: number | undefined; $sl
   ({ $stackedHeight, $slidesIn }) => css`
     position: sticky;
     top: 0;
-    ${!$slidesIn &&
-    css`
-      animation: none;
-    `}
+    ${
+      !$slidesIn &&
+      css`
+        animation: none;
+      `
+    }
 
-    ${$stackedHeight !== undefined &&
-    css`
-      width: auto;
-      min-width: 0;
-      flex-shrink: 0;
-      contain: inline-size;
-      height: ${$stackedHeight}px;
-      max-height: calc(100% - ${STACKED_MIN_HEIGHT_BELOW}px);
-    `}
+    ${
+      $stackedHeight !== undefined &&
+      css`
+        width: auto;
+        min-width: 0;
+        flex-shrink: 0;
+        contain: inline-size;
+        height: ${$stackedHeight}px;
+        max-height: calc(100% - ${STACKED_MIN_HEIGHT_BELOW}px);
+      `
+    }
   `,
 );
 

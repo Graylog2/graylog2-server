@@ -34,34 +34,36 @@ const Handle = styled.div<{ $side: Side }>(
   ({ theme, $side }) => css`
     touch-action: none;
 
-    ${isVertical($side)
-      ? css`
-          display: flex;
-          flex-shrink: 0;
-          align-items: center;
-          justify-content: center;
-          height: ${BAR_HEIGHT}px;
-          cursor: row-resize;
-          background-color: ${theme.colors.global.background};
-          border: 1px solid ${theme.colors.cards.border};
+    ${
+      isVertical($side)
+        ? css`
+            display: flex;
+            flex-shrink: 0;
+            align-items: center;
+            justify-content: center;
+            height: ${BAR_HEIGHT}px;
+            cursor: row-resize;
+            background-color: ${theme.colors.global.background};
+            border: 1px solid ${theme.colors.cards.border};
 
-          &::before {
-            content: '';
-            width: 32px;
-            height: 2px;
-            border-radius: 1px;
-            background: ${theme.colors.text.secondary};
-          }
-        `
-      : css`
-          position: absolute;
-          top: 0;
-          bottom: 0;
-          ${$side === 'left' ? 'right' : 'left'}: -3px;
-          z-index: 2;
-          width: 6px;
-          cursor: col-resize;
-        `}
+            &::before {
+              content: '';
+              width: 32px;
+              height: 2px;
+              border-radius: 1px;
+              background: ${theme.colors.text.secondary};
+            }
+          `
+        : css`
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            ${$side === 'left' ? 'right' : 'left'}: -3px;
+            z-index: 2;
+            width: 6px;
+            cursor: col-resize;
+          `
+    }
 
     &:hover,
     &:focus-visible,
