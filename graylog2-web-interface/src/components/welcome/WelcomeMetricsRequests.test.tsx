@@ -40,6 +40,9 @@ jest.mock('logic/rest/FetchProvider', () => {
     fetchIgnoringUnauthorized: jest.fn(),
   };
 });
+jest.mock('@graylog/server-api', () => ({
+  SearchJobs: { cancelAsyncSearchJob: jest.fn(() => Promise.resolve()) },
+}));
 
 const SEARCH_ID = 'welcome-search-id';
 

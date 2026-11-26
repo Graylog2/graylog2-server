@@ -15,11 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, within } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import { Form, Formik } from 'formik';
 import userEvent from '@testing-library/user-event';
 
+import asMock from 'helpers/mocking/AsMock';
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
@@ -37,15 +38,25 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import AggregationWidget from 'views/logic/aggregationbuilder/AggregationWidget';
 import { createViewWithWidgets } from 'fixtures/searches';
 import { updateWidgetConfig } from 'views/logic/slices/widgetActions';
+import { updateQueryString } from 'views/logic/slices/viewSlice';
+import Query, { createElasticsearchQueryString } from 'views/logic/queries/Query';
 
-import RenderCompletionCallback from '../widgets/RenderCompletionCallback';
+import InteractiveContext from '../contexts/InteractiveContext';
+import useRenderCompletionCallback from '../widgets/useRenderCompletionCallback';
 
 const createWidget = (config: AggregationWidgetConfig = AggregationWidgetConfig.builder().build()) =>
   AggregationWidget.builder().id('deadbeef').config(config).build();
 
+jest.mock('../widgets/useRenderCompletionCallback');
+
 jest.mock('views/logic/slices/widgetActions', () => ({
   ...jest.requireActual('views/logic/slices/widgetActions'),
   updateWidgetConfig: jest.fn(() => async () => {}),
+}));
+
+jest.mock('views/logic/slices/viewSlice', () => ({
+  ...jest.requireActual('views/logic/slices/viewSlice'),
+  updateQueryString: jest.fn(() => async () => {}),
 }));
 
 describe('DataTable', () => {
@@ -126,7 +137,12 @@ describe('DataTable', () => {
 
   const SimplifiedDataTable = (props: Partial<React.ComponentProps<typeof DataTable>>) => {
     const widget = createWidget(props.config);
-    const view = createViewWithWidgets([widget], {});
+    const viewWithWidgets = createViewWithWidgets([widget], {});
+    const query = Query.builder().id('query-id-1').query(createElasticsearchQueryString()).build();
+    const view = viewWithWidgets
+      .toBuilder()
+      .search(viewWithWidgets.search.toBuilder().queries([query]).build())
+      .build();
 
     return (
       <TestStoreProvider view={view}>
@@ -314,11 +330,9 @@ describe('DataTable', () => {
       .build();
     const onRenderComplete = jest.fn();
 
-    render(
-      <RenderCompletionCallback.Provider value={onRenderComplete}>
-        <SimplifiedDataTable config={config} />
-      </RenderCompletionCallback.Provider>,
-    );
+    asMock(useRenderCompletionCallback).mockReturnValue(onRenderComplete);
+
+    render(<SimplifiedDataTable config={config} />);
 
     expect(onRenderComplete).toHaveBeenCalled();
   });
@@ -479,6 +493,124 @@ describe('DataTable', () => {
           .visualizationConfig(DataTableVisualizationConfig.create(['bytes']).toBuilder().build())
           .build(),
       );
+    });
+  });
+
+  describe('selecting rows', () => {
+    const sourceData = {
+      chart: ['host1', 'host2', 'host3'].map((host) => ({
+        key: [host],
+        source: 'leaf',
+        values: [{ key: ['count()'], rollup: true, source: 'row-leaf', value: 42 }],
+      })),
+    };
+    const sourceConfig = AggregationWidgetConfig.builder()
+      .rowPivots([Pivot.createValues(['source'])])
+      .series([series])
+      .visualization('table')
+      .rollup(true)
+      .build();
+
+    const rowCheckbox = async (rowName: RegExp) =>
+      within(await screen.findByRole('row', { name: rowName })).getByRole('checkbox');
+
+    const openBulkActionFields = async (action: string) => {
+      await userEvent.click(screen.getByRole('button', { name: /bulk actions/i }));
+      await userEvent.click(await screen.findByRole('menuitem', { name: action }));
+    };
+
+    const selectBulkAction = async (action: string, field: string) => {
+      await openBulkActionFields(action);
+      await userEvent.click(await screen.findByRole('menuitem', { name: field }));
+    };
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+    });
+
+    it('adds values of selected rows to query', async () => {
+      // @ts-expect-error
+      render(<SimplifiedDataTable config={sourceConfig} data={sourceData} />);
+
+      await userEvent.click(await rowCheckbox(/host1/));
+      await userEvent.click(await rowCheckbox(/host3/));
+      await selectBulkAction('Add to query', 'source');
+
+      expect(updateQueryString).toHaveBeenCalledWith('query-id-1', '(source:(host1 OR host3))');
+    });
+
+    it('excludes values of all rows from query', async () => {
+      // @ts-expect-error
+      render(<SimplifiedDataTable config={sourceConfig} data={sourceData} />);
+
+      await userEvent.click(await screen.findByRole('checkbox', { name: 'Select all rows' }));
+      await selectBulkAction('Exclude from results', 'source');
+
+      expect(updateQueryString).toHaveBeenCalledWith('query-id-1', 'NOT (source:(host1 OR host2 OR host3))');
+    });
+
+    it('adds distinct values of chosen field when grouping by multiple fields', async () => {
+      const config = sourceConfig
+        .toBuilder()
+        .rowPivots([Pivot.createValues(['source', 'controller'])])
+        .build();
+      const multiFieldData = {
+        chart: [
+          ['host1', 'UsersController'],
+          ['host1', 'StreamsController'],
+        ].map((key) => ({
+          key,
+          source: 'leaf',
+          values: [{ key: ['count()'], rollup: true, source: 'row-leaf', value: 42 }],
+        })),
+      };
+      // @ts-expect-error
+      render(<SimplifiedDataTable config={config} data={multiFieldData} />);
+
+      await userEvent.click(await screen.findByRole('checkbox', { name: 'Select all rows' }));
+      await selectBulkAction('Add to query', 'source');
+
+      expect(updateQueryString).toHaveBeenCalledWith('query-id-1', 'source:host1');
+    });
+
+    it('offers only value pivot fields', async () => {
+      const config = sourceConfig
+        .toBuilder()
+        .rowPivots([
+          Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1.0 } }),
+          Pivot.createValues(['source']),
+        ])
+        .build();
+      const mixedData = {
+        chart: [
+          {
+            key: ['2019-01-17T11:00:00.000Z', 'host1'],
+            source: 'leaf',
+            values: [{ key: ['count()'], rollup: true, source: 'row-leaf', value: 42 }],
+          },
+        ],
+      };
+      // @ts-expect-error
+      render(<SimplifiedDataTable config={config} data={mixedData} />);
+
+      await userEvent.click(await rowCheckbox(/host1/));
+      await openBulkActionFields('Add to query');
+      await screen.findByRole('menuitem', { name: 'source' });
+
+      expect(screen.queryByRole('menuitem', { name: 'timestamp' })).not.toBeInTheDocument();
+    });
+
+    it('does not allow selecting rows in non-interactive mode', async () => {
+      render(
+        <InteractiveContext.Provider value="read-only">
+          {/* @ts-expect-error */}
+          <SimplifiedDataTable config={sourceConfig} data={sourceData} />
+        </InteractiveContext.Provider>,
+      );
+
+      await screen.findByText('host1');
+
+      expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
     });
   });
 });

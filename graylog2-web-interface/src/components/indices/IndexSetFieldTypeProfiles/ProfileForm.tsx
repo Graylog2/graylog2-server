@@ -17,39 +17,18 @@
 
 import { styled } from 'styled-components';
 import React, { useMemo } from 'react';
-import { Formik, Form, FieldArray, Field } from 'formik';
+import { Formik, Form } from 'formik';
 import countBy from 'lodash/countBy';
 
 import type { IndexSetFieldTypeProfileForm } from 'components/indices/IndexSetFieldTypeProfiles/types';
-import { FormikInput, IconButton, Select, FormSubmit, Spinner, InputOptionalInfo } from 'components/common';
-import { Button, Col, HelpBlock, Input } from 'components/bootstrap';
+import { FormikInput, FormSubmit, InputOptionalInfo } from 'components/common';
+import { Col } from 'components/bootstrap';
 import useFieldTypes from 'views/logic/fieldtypes/useFieldTypes';
 import useFieldTypesForMapping from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import { defaultCompare } from 'logic/DefaultCompare';
 import isReservedField from 'views/logic/IsReservedField';
-
-const SelectContainer = styled.div`
-  flex-basis: 100%;
-`;
-
-const SelectGroup = styled.div`
-  flex-grow: 1;
-  display: flex;
-  gap: 5px;
-`;
-const List = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-const StyledLabel = styled.h5`
-  font-weight: bold;
-  margin-bottom: 5px;
-`;
-
-const Item = styled.div`
-  display: flex;
-  gap: 5px;
-`;
+import { sortMappingsByField } from 'components/indices/IndexSetFieldTypeProfiles/helpers/mappingsPaging';
+import ProfileMappings from 'components/indices/IndexSetFieldTypeProfiles/ProfileMappings';
 
 const StyledFormSubmit = styled(FormSubmit)`
   margin-top: 30px;
@@ -97,42 +76,6 @@ const validate = (formValues: IndexSetFieldTypeProfileForm) => {
   return errors;
 };
 
-type ProfileFormSelectProps = {
-  onChange: (param: { target: { value: string; name: string } }) => void;
-  options: Array<{ value: string; label: string; disabled?: boolean }>;
-  error: string;
-  name: string;
-  value: string | undefined | null;
-  placeholder: string;
-  allowCreate: boolean;
-};
-
-const ProfileFormSelect = ({
-  onChange,
-  options,
-  error,
-  name,
-  value,
-  placeholder,
-  allowCreate,
-}: ProfileFormSelectProps) => (
-  <SelectContainer>
-    <Input error={error} name={name} id={name}>
-      <Select
-        options={options}
-        value={value}
-        inputId={name}
-        onChange={(newVal) => {
-          onChange({ target: { value: newVal, name } });
-        }}
-        aria-label={`Select ${name}`}
-        placeholder={placeholder}
-        allowCreate={allowCreate}
-      />
-    </Input>
-  </SelectContainer>
-);
-
 const ProfileForm = ({
   initialValues = { name: '', description: '', customFieldMappings: [{ type: '', field: '' }] },
   submitButtonText,
@@ -170,11 +113,14 @@ const ProfileForm = ({
   return (
     <Col lg={8}>
       <Formik<IndexSetFieldTypeProfileForm>
-        initialValues={initialValues}
+        initialValues={{
+          ...initialValues,
+          customFieldMappings: sortMappingsByField(initialValues.customFieldMappings),
+        }}
         onSubmit={_onSubmit}
         validate={validate}
         validateOnChange>
-        {({ isSubmitting, isValid, isValidating, values: { customFieldMappings } }) => (
+        {({ isSubmitting, isValid, isValidating }) => (
           <Form>
             <FormikInput
               name="name"
@@ -197,58 +143,10 @@ const ProfileForm = ({
               help="Longer description for profile"
               rows={6}
             />
-            <FieldArray
-              name="customFieldMappings"
-              render={({ remove, push }) => (
-                <>
-                  <StyledLabel>Set up mappings</StyledLabel>
-                  <HelpBlock>Here you can set up type mapping to any field.</HelpBlock>
-                  <List>
-                    {isLoading || isLoadingFieldTypes ? (
-                      <Spinner />
-                    ) : (
-                      customFieldMappings.map(({ field }, index) => (
-                        <Item key={index} data-testid={`custom-mapping-row-for-${field}`}>
-                          <SelectGroup>
-                            <Field name={`customFieldMappings.${index}.field`} required>
-                              {({ field: { name, value, onChange }, meta: { error } }) => (
-                                <ProfileFormSelect
-                                  value={value}
-                                  onChange={onChange}
-                                  options={fields}
-                                  name={name}
-                                  error={error}
-                                  placeholder="Select or type field name"
-                                  allowCreate
-                                />
-                              )}
-                            </Field>
-                            <Field name={`customFieldMappings.${index}.type`} required>
-                              {({ field: { name, value, onChange }, meta: { error } }) => (
-                                <ProfileFormSelect
-                                  value={value}
-                                  onChange={onChange}
-                                  options={fieldTypeOptions}
-                                  name={name}
-                                  error={error}
-                                  placeholder="Select field type"
-                                  allowCreate={false}
-                                />
-                              )}
-                            </Field>
-                          </SelectGroup>
-                          {customFieldMappings.length > 1 && (
-                            <IconButton name="delete" onClick={() => remove(index)} title="Remove mapping" />
-                          )}
-                        </Item>
-                      ))
-                    )}
-                  </List>
-                  <Button bsSize="xs" onClick={() => push({})} name="plus" title="Add mapping">
-                    Add mapping
-                  </Button>
-                </>
-              )}
+            <ProfileMappings
+              fields={fields}
+              fieldTypeOptions={fieldTypeOptions}
+              isLoading={isLoading || isLoadingFieldTypes}
             />
             <StyledFormSubmit
               submitButtonText={submitButtonText}

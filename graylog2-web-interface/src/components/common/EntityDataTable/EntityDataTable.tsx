@@ -95,12 +95,14 @@ const ScrollContainer = styled.div<{
     ${$actionsHeaderWidth ? cssVariable(actionsHeaderWidthVar, `${$actionsHeaderWidth}px`) : ''}
     ${$canScrollRight ? cssVariable(displayScrollRightIndicatorVar, 'block') : ''}
     ${$scrollContainerWidth ? cssVariable(scrollContainerWidthVar, `${$scrollContainerWidth}px`) : ''}
-    ${$activeColId
-      ? css`
-          ${cssVariable(columnOpacityVar($activeColId), 0.4)}
-          ${cssVariable(columnTransition(), 'transform 0.2s ease-in-out')}
-        `
-      : ''}
+    ${
+      $activeColId
+        ? css`
+            ${cssVariable(columnOpacityVar($activeColId), 0.4)}
+            ${cssVariable(columnTransition(), 'transform 0.2s ease-in-out')}
+          `
+        : ''
+    }
   `,
 );
 
@@ -186,7 +188,7 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   /** Function to handle page size changes */
   onPageSizeChange?: (newPageSize: number) => void;
   /** Function to handle layout preferences reset */
-  onResetLayoutPreferences: () => Promise<void>;
+  onResetLayoutPreferences: () => Promise<unknown>;
   /** Active page size */
   pageSize?: number;
   appSection?: string;
@@ -245,7 +247,11 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   const { headerMinWidths, handleHeaderSectionResize } = useHeaderMinWidths();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const scrolledToRightIndicator = useRef<HTMLDivElement>();
-  const scrolledToRight = useIntersectionObserver(scrollContainerRef, scrolledToRightIndicator);
+  const scrolledToRight = useIntersectionObserver(scrolledToRightIndicator, {
+    root: scrollContainerRef,
+    threshold: 0.9,
+    initialIsIntersecting: true,
+  });
 
   const {
     setInternalAttributeColumnOrder,
@@ -321,8 +327,9 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     sort: activeSort,
   });
 
+  // The table instance is stable, so the header groups need to be rebuilt explicitly when the columns change.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const headerGroups = useMemo(() => table.getHeaderGroups(), [columnOrder]);
+  const headerGroups = useMemo(() => table.getHeaderGroups(), [columnOrder, columnDefinitions]);
 
   const hasColumnLayoutPreferences =
     Object.keys(layoutPreferences?.attributes ?? {}).length > 0 || (layoutPreferences?.order?.length ?? 0) > 0;
@@ -378,7 +385,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                     $activeColId={activeColId}
                     $columnTransform={columnTransform}
                     $columnWidths={columnWidths}
-                    $canScrollRight={scrolledToRight && tableIsCompressed}
+                    $canScrollRight={!scrolledToRight && tableIsCompressed}
                     $scrollContainerWidth={scrollContainerWidth}
                     $tableMinWidth={tableMinWidth}>
                     <InnerContainer>

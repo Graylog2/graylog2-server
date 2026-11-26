@@ -24,6 +24,9 @@ public enum Interpolation {
     stepAfter("step-after"),
     spline("spline");
 
+    public static final String DESCRIPTION = "How lines connect the data points: linear with straight lines, spline "
+            + "with smooth curves, step-after with steps that keep each value until the next point.";
+
     private final String value;
     @JsonValue
     public String value() {

@@ -25,7 +25,7 @@ export type PaginatedResponseType = {
   total: number;
   page: number;
   per_page: number;
-  query: string | null;
+  query?: string | null;
 };
 
 export type PaginatedListJSON = {

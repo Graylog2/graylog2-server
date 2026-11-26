@@ -20,6 +20,9 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
+import com.mongodb.client.model.Accumulators;
+import com.mongodb.client.model.Aggregates;
+import com.mongodb.client.model.Filters;
 import org.bson.types.ObjectId;
 import org.graylog2.database.DbEntity;
 import org.graylog2.database.MongoConnection;
@@ -30,7 +33,9 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Singleton
 public class IndexFailureServiceImpl extends PersistedServiceImpl implements IndexFailureService {
@@ -70,6 +75,21 @@ public class IndexFailureServiceImpl extends PersistedServiceImpl implements Ind
         final BasicDBObject query = new BasicDBObject("timestamp", new BasicDBObject("$gte", since.toDate()));
 
         return count(IndexFailureImpl.class, query);
+    }
+
+    @Override
+    public Map<String, Long> countByIndexSince(DateTime since) {
+        final Map<String, Long> counts = new HashMap<>();
+        mongoCollection(IndexFailureImpl.class).aggregate(List.of(
+                Aggregates.match(Filters.gte("timestamp", since.toDate())),
+                Aggregates.group("$index", Accumulators.sum("count", 1L))
+        )).forEach(result -> {
+            final String index = result.getString("_id");
+            if (index != null) {
+                counts.put(index, result.get("count", Number.class).longValue());
+            }
+        });
+        return counts;
     }
 
     @Override

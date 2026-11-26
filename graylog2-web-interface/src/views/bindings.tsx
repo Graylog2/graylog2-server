@@ -173,12 +173,12 @@ const exports: PluginExports = {
     { path: dashboardsPath, component: DashboardsPage },
     { path: showDashboardsPath(), component: ShowViewPage, parentComponent: App },
 
-    { path: newSearchPath, component: NewSearchRedirectPage, parentComponent: null },
+    { path: newSearchPath, component: NewSearchRedirectPage, parentComponent: App },
     { path: showSearchPath, component: ShowViewPage, parentComponent: App },
     {
       path: `${Routes.unqualified.stream_search(':streamId')}/new`,
       component: NewSearchRedirectPage,
-      parentComponent: null,
+      parentComponent: App,
     },
     { path: Routes.unqualified.stream_search(':streamId'), component: StreamSearchPage, parentComponent: App },
     { path: extendedSearchPath, component: NewSearchPage, parentComponent: App },
@@ -404,7 +404,7 @@ const exports: PluginExports = {
       {
         type: 'create-event-definition-from-value',
         title: 'Create event definition',
-        isEnabled: () => true,
+        isEnabled: ({ contexts }) => !!contexts?.isPermitted?.('eventdefinitions:create'),
         resetFocus: false,
         component: CreateEventDefinition,
       },

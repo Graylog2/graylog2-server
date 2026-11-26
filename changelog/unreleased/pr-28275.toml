@@ -1,0 +1,8 @@
+type = "f"
+message = "Leave placeholder text out of fetch error messages."
+
+details.user = """
+Errors of requests that fail without a response, such as network errors, say that the server could not be reached instead of showing "undefined". Errors without a response body no longer end with "Additional information: Not available".
+"""
+
+pulls = ["28275"]

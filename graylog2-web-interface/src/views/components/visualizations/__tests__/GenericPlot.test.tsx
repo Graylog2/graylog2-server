@@ -25,7 +25,9 @@ import asMock from 'helpers/mocking/AsMock';
 import ChartColorContext from '../ChartColorContext';
 import type { ChartConfig } from '../GenericPlot';
 import GenericPlot from '../GenericPlot';
-import RenderCompletionCallback from '../../widgets/RenderCompletionCallback';
+import useRenderCompletionCallback from '../../widgets/useRenderCompletionCallback';
+
+jest.mock('../../widgets/useRenderCompletionCallback');
 
 jest.mock('views/components/visualizations/plotly/AsyncPlot', () => jest.fn());
 jest.mock('components/common/ColorPicker', () => 'color-picker');
@@ -173,15 +175,15 @@ describe('GenericPlot', () => {
     });
 
     const onRenderComplete = jest.fn();
+    asMock(useRenderCompletionCallback).mockReturnValue(onRenderComplete);
+
     render(
-      <RenderCompletionCallback.Provider value={onRenderComplete}>
-        <GenericPlot
-          chartData={[
-            { x: 23, name: 'count()' },
-            { x: 42, name: 'sum(bytes)' },
-          ]}
-        />
-      </RenderCompletionCallback.Provider>,
+      <GenericPlot
+        chartData={[
+          { x: 23, name: 'count()' },
+          { x: 42, name: 'sum(bytes)' },
+        ]}
+      />,
     );
 
     expect(onRenderComplete).toHaveBeenCalled();

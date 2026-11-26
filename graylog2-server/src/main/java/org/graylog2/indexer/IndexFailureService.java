@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public interface IndexFailureService extends PersistedService {
+public interface IndexFailureService extends PersistedService, IndexFailureCounter {
     List<IndexFailure> all(int limit, int offset);
 
     long countSince(DateTime since);

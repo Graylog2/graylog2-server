@@ -16,7 +16,8 @@
  */
 import React, { useMemo } from 'react';
 
-import type { CustomFieldMapping, IndexSetFieldTypeProfile } from 'components/indices/IndexSetFieldTypeProfiles/types';
+import { COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
+import type { CustomFieldMapping } from 'components/indices/IndexSetFieldTypeProfiles/types';
 import CustomFieldMappingsCell from 'components/indices/IndexSetFieldTypeProfiles/cells/CustomFieldMappingsCell';
 import IndexSetsCell from 'components/indices/IndexSetFieldTypeProfiles/cells/IndexSetsCell';
 
@@ -25,10 +26,10 @@ const useCustomColumnRenderers = (normalizedIndexSetsTitles: Record<string, stri
     () => ({
       attributes: {
         custom_field_mappings: {
-          renderCell: (customFieldTypes: Array<CustomFieldMapping>, profile: IndexSetFieldTypeProfile) => (
-            <CustomFieldMappingsCell profile={profile} customFieldTypes={customFieldTypes} />
+          renderCell: (customFieldTypes: Array<CustomFieldMapping>) => (
+            <CustomFieldMappingsCell customFieldTypes={customFieldTypes} />
           ),
-          staticWidth: 'matchHeader' as const,
+          staticWidth: COLUMN_WIDTH.reference,
         },
         index_set_ids: {
           renderCell: (indexSetIds: Array<string>) => (

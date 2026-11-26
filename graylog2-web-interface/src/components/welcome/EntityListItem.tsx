@@ -15,12 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import styled, { css } from 'styled-components';
 
 import { Link, RelativeTime } from 'components/common';
 import { ListGroupItem } from 'components/bootstrap';
-import getTitleForEntityType from 'util/getTitleForEntityType';
+import useEntityTypeTitle from 'hooks/useEntityTypeTitle';
 import { getValuesFromGRN } from 'logic/permissions/GRN';
 import useHasEntityPermissionByGRN from 'hooks/useHasEntityPermissionByGRN';
 import useShowRouteFromGRN from 'routing/hooks/useShowRouteFromGRN';
@@ -53,7 +53,7 @@ type Props = {
 const EntityItem = ({ title, grn, timestamp = undefined }: Props) => {
   const { id, type } = getValuesFromGRN(grn);
   const hasReadPermission = useHasEntityPermissionByGRN(grn, 'read');
-  const entityTypeTitle = useMemo(() => getTitleForEntityType(type, false) ?? 'unknown', [type]);
+  const entityTypeTitle = useEntityTypeTitle(type) ?? 'unknown';
   const entityLink = useShowRouteFromGRN(grn);
   const entityTitle = title ?? id;
   const showLink = !!entityLink && hasReadPermission;
