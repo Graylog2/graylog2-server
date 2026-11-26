@@ -63,7 +63,7 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
         final var ordering = orderListForPivot(pivot, queryContext, DEFAULT_ORDER, query);
         final int limit = bucketSpec.limit();
         final List<String> orderedBuckets = ValuesBucketOrdering.orderFields(bucketSpec.fields(), pivot.sort());
-        final TermsAggregation.Builder termsAggregationBuilder = createTerms(orderedBuckets, limit);
+        final TermsAggregation.Builder termsAggregationBuilder = createTerms(orderedBuckets, limit, bucketSpec.keepListsWhole());
 
         termsAggregationBuilder.order(mapOrders(ordering.orders()));
         MutableNamedAggregationBuilder termsAggregation = new MutableNamedAggregationBuilder(
@@ -109,18 +109,18 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
                 .collect(Collectors.toList());
     }
 
-    private TermsAggregation.Builder createTerms(List<String> valueBuckets, int limit) {
-        return createScriptedTerms(valueBuckets, limit);
+    private TermsAggregation.Builder createTerms(List<String> valueBuckets, int limit, boolean keepListsWhole) {
+        return createScriptedTerms(valueBuckets, limit, keepListsWhole);
     }
 
-    private TermsAggregation.Builder createScriptedTerms(List<String> buckets, int limit) {
+    private TermsAggregation.Builder createScriptedTerms(List<String> buckets, int limit, boolean keepListsWhole) {
         return TermsAggregation.builder()
-                .script(scriptForPivots(buckets))
+                .script(scriptForPivots(buckets, keepListsWhole))
                 .size(limit);
     }
 
-    private Script scriptForPivots(Collection<String> pivots) {
-        final PivotKeyScript script = PivotKeyScript.create(pivots, KEY_SEPARATOR_PHRASE);
+    private Script scriptForPivots(Collection<String> pivots, boolean keepListsWhole) {
+        final PivotKeyScript script = PivotKeyScript.create(pivots, KEY_SEPARATOR_PHRASE, keepListsWhole);
         final Map<String, JsonData> params = script.params().entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> JsonData.of(entry.getValue())));
         return Script.of(b -> b.inline(s -> s.source(script.source()).params(params)));

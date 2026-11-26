@@ -1,0 +1,174 @@
+{
+  "documents": [
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message"
+          }
+        },
+        {
+          "data": {
+            "source": "list-fixtures",
+            "message": "Sign-in 0",
+            "timestamp": "2022-01-02 01:00:00.000",
+            "fixtureType": "815302",
+            "user_name": [
+              "admin",
+              "bob"
+            ],
+            "country": "DE",
+            "streams": [
+              "000000000000000000000001"
+            ],
+            "port": [
+              80,
+              443,
+              443
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message"
+          }
+        },
+        {
+          "data": {
+            "source": "list-fixtures",
+            "message": "Sign-in 1",
+            "timestamp": "2022-01-02 01:00:01.000",
+            "fixtureType": "815302",
+            "user_name": [
+              "bob",
+              "admin"
+            ],
+            "country": "DE",
+            "streams": [
+              "000000000000000000000001"
+            ],
+            "port": [
+              443,
+              80
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message"
+          }
+        },
+        {
+          "data": {
+            "source": "list-fixtures",
+            "message": "Sign-in 2",
+            "timestamp": "2022-01-02 01:00:02.000",
+            "fixtureType": "815302",
+            "user_name": [
+              "admin",
+              "bob",
+              "bob"
+            ],
+            "country": "US",
+            "streams": [
+              "000000000000000000000001"
+            ],
+            "port": [
+              80,
+              443
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message"
+          }
+        },
+        {
+          "data": {
+            "source": "list-fixtures",
+            "message": "Sign-in 3",
+            "timestamp": "2022-01-02 01:00:03.000",
+            "fixtureType": "815302",
+            "user_name": "admin",
+            "country": "DE",
+            "streams": [
+              "000000000000000000000001"
+            ],
+            "port": 443
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message"
+          }
+        },
+        {
+          "data": {
+            "source": "list-fixtures",
+            "message": "Sign-in 4",
+            "timestamp": "2022-01-02 01:00:04.000",
+            "fixtureType": "815302",
+            "user_name": "bob",
+            "country": [
+              "DE",
+              "US"
+            ],
+            "streams": [
+              "000000000000000000000001"
+            ],
+            "port": 443
+          }
+        }
+      ]
+    },
+    {
+      "document": [
+        {
+          "index": {
+            "indexName": "graylog_0",
+            "indexType": "message"
+          }
+        },
+        {
+          "data": {
+            "source": "list-fixtures",
+            "message": "Sign-in 5",
+            "timestamp": "2022-01-02 01:00:05.000",
+            "fixtureType": "815302",
+            "user_name": "bob",
+            "country": [
+              "US",
+              "DE"
+            ],
+            "streams": [
+              "000000000000000000000001"
+            ],
+            "port": 80
+          }
+        }
+      ]
+    }
+  ]
+}

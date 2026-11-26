@@ -28,8 +28,7 @@ class PivotKeyScriptTest {
 
     @Test
     void passesFieldNamesAsParametersInsteadOfInterpolatingThemIntoTheSource() {
-        final PivotKeyScript script = PivotKeyScript.create(List.of("source", "http.response.status_code"),
-                KEY_SEPARATOR_PHRASE);
+        final PivotKeyScript script = PivotKeyScript.create(List.of("source", "http.response.status_code"), KEY_SEPARATOR_PHRASE, false);
 
         assertThat(script.source())
                 .doesNotContain("source")
@@ -46,26 +45,49 @@ class PivotKeyScriptTest {
 
     @Test
     void joinsFieldExpressionsWithTheKeySeparatorPhrase() {
-        assertThat(PivotKeyScript.create(List.of("a"), KEY_SEPARATOR_PHRASE).source())
+        assertThat(PivotKeyScript.create(List.of("a"), KEY_SEPARATOR_PHRASE, false).source())
                 .doesNotContain(KEY_SEPARATOR_PHRASE);
-        assertThat(PivotKeyScript.create(List.of("a", "b"), KEY_SEPARATOR_PHRASE).source())
+        assertThat(PivotKeyScript.create(List.of("a", "b"), KEY_SEPARATOR_PHRASE, false).source())
                 .containsOnlyOnce(KEY_SEPARATOR_PHRASE);
-        assertThat(PivotKeyScript.create(List.of("a", "b", "c"), KEY_SEPARATOR_PHRASE).source())
+        assertThat(PivotKeyScript.create(List.of("a", "b", "c"), KEY_SEPARATOR_PHRASE, false).source())
                 .contains(KEY_SEPARATOR_PHRASE);
     }
 
     @Test
     void generatesIdenticalSourceForDifferentFieldsOfTheSameCardinality() {
-        assertThat(PivotKeyScript.create(List.of("source", "message"), KEY_SEPARATOR_PHRASE).source())
+        assertThat(PivotKeyScript.create(List.of("source", "message"), KEY_SEPARATOR_PHRASE, false).source())
                 .as("the script source must be reusable so that the backend does not compile one script per field combination")
-                .isEqualTo(PivotKeyScript.create(List.of("timestamp", "gl2_source_input"), KEY_SEPARATOR_PHRASE).source());
+                .isEqualTo(PivotKeyScript.create(List.of("timestamp", "gl2_source_input"), KEY_SEPARATOR_PHRASE, false).source());
     }
 
     @Test
     void keepsDuplicateFieldsAsSeparateParameters() {
-        final PivotKeyScript script = PivotKeyScript.create(List.of("source", "source"), KEY_SEPARATOR_PHRASE);
+        final PivotKeyScript script = PivotKeyScript.create(List.of("source", "source"), KEY_SEPARATOR_PHRASE, false);
 
         assertThat(script.params()).containsEntry("field0", "source");
         assertThat(script.params()).containsEntry("field1", "source");
+    }
+
+    @Test
+    void returnsListsAsIsSoASingleFieldSplitsThem() {
+        assertThat(PivotKeyScript.create(List.of("user_name"), KEY_SEPARATOR_PHRASE, false).source())
+                .contains("doc[params.field0]")
+                .doesNotContain("String.valueOf(doc[params.field0])");
+    }
+
+    @Test
+    void turnsListsIntoOneStringWhenKeepingListsWholeForASingleField() {
+        final PivotKeyScript script = PivotKeyScript.create(List.of("user_name"), KEY_SEPARATOR_PHRASE, true);
+
+        assertThat(script.source())
+                .contains("String.valueOf(doc[params.field0])");
+        assertThat(script.params()).containsEntry("field0", "user_name");
+    }
+
+    @Test
+    void generatesIdenticalSourceForSeveralFieldsWhetherOrNotListsAreKeptWhole() {
+        assertThat(PivotKeyScript.create(List.of("user_name", "country"), KEY_SEPARATOR_PHRASE, true).source())
+                .as("concatenation keeps lists whole anyway, so the flag must not cost another script compilation")
+                .isEqualTo(PivotKeyScript.create(List.of("user_name", "country"), KEY_SEPARATOR_PHRASE, false).source());
     }
 }
