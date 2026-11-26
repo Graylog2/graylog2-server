@@ -18,7 +18,7 @@ import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 import { OrderedMap } from 'immutable';
 import * as React from 'react';
 import { MemoryRouter } from 'react-router-dom';
-import { memoryRouterFuture } from 'reactRouterFutureFlags';
+import { routerTestProps } from 'routerTestProps';
 
 import { useQueryParam } from 'routing/QueryParams';
 import { asMock } from 'helpers/mocking';
@@ -32,7 +32,7 @@ jest.mock('routing/QueryParams', () => ({
 
 describe('useUrlQueryFilters', () => {
   const wrapper = ({ children }: { children: React.ReactNode }) => (
-    <MemoryRouter future={memoryRouterFuture}>{children}</MemoryRouter>
+    <MemoryRouter {...routerTestProps}>{children}</MemoryRouter>
   );
 
   beforeEach(() => {

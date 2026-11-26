@@ -15,15 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useCallback, useContext } from 'react';
+import type { ContextType } from 'react';
 import type { Optional } from 'utility-types';
 import { UNSAFE_DataRouterContext as DataRouterContext, matchRoutes } from 'react-router-dom';
-import type { DataRouterContextObject } from 'react-router/dist/lib/context';
 
 import type { TelemetryEventType, TelemetryEvent } from 'logic/telemetry/TelemetryContext';
 import TelemetryContext from 'logic/telemetry/TelemetryContext';
 import { currentPathname, stripPrefixFromPathname, getPathnameWithoutId } from 'util/URLUtils';
 import { singleton } from 'logic/singleton';
 import useLocation from 'routing/useLocation';
+
+type DataRouterContextObject = ContextType<typeof DataRouterContext>;
 
 const retrieveCurrentRoute = (dataRouterContext: DataRouterContextObject) => {
   if (!dataRouterContext?.router?.routes) {
