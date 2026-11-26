@@ -1,0 +1,12 @@
+DELETE org.graylog2.rest.resources.system.contentpacks.ContentPackResource#deleteContentPack /system/content_packs/{contentPackId}
+DELETE org.graylog2.rest.resources.system.contentpacks.ContentPackResource#deleteContentPack /system/content_packs/{contentPackId}/{revision}
+DELETE org.graylog2.rest.resources.system.contentpacks.ContentPackResource#deleteContentPackInstallationById /system/content_packs/{contentPackId}/installations/{installationId}
+GET org.graylog2.rest.resources.system.contentpacks.ContentPackResource#downloadContentPackRevisions /system/content_packs/{contentPackId}/{revision}/download
+GET org.graylog2.rest.resources.system.contentpacks.ContentPackResource#getContentPackRevisions /system/content_packs/{contentPackId}/{revision}
+GET org.graylog2.rest.resources.system.contentpacks.ContentPackResource#listContentPackInstallationsById /system/content_packs/{contentPackId}/installations
+GET org.graylog2.rest.resources.system.contentpacks.ContentPackResource#listContentPackRevisions /system/content_packs/{contentPackId}
+GET org.graylog2.rest.resources.system.contentpacks.ContentPackResource#listLatestContentPacks /system/content_packs/latest
+GET org.graylog2.rest.resources.system.contentpacks.ContentPackResource#uninstallDetails /system/content_packs/{contentPackId}/installations/{installationId}/uninstall_details
+POST org.graylog2.rest.resources.system.contentpacks.CatalogResource#getTitles /system/catalog/entities/titles
+POST org.graylog2.rest.resources.system.contentpacks.ContentPackResource#createContentPack /system/content_packs
+POST org.graylog2.rest.resources.system.contentpacks.ContentPackResource#installContentPack /system/content_packs/{contentPackId}/{revision}/installations

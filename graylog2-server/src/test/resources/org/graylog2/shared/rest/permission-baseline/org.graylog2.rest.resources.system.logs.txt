@@ -1,0 +1,4 @@
+GET org.graylog2.rest.resources.system.logs.LoggersResource#loggers /system/loggers
+GET org.graylog2.rest.resources.system.logs.LoggersResource#subsystems /system/loggers/subsystems
+PUT org.graylog2.rest.resources.system.logs.LoggersResource#setSingleLoggerLevel /system/loggers/{loggerName}/level/{level}
+PUT org.graylog2.rest.resources.system.logs.LoggersResource#setSubsystemLoggerLevel /system/loggers/subsystems/{subsystem}/level/{level}

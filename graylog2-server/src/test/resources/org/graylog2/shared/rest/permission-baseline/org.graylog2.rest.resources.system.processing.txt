@@ -1,0 +1,4 @@
+GET org.graylog2.rest.resources.system.processing.ClusterProcessingStatusResource#getPersistedStatus /cluster/processing/status/persisted
+GET org.graylog2.rest.resources.system.processing.ClusterProcessingStatusResource#getStatus /cluster/processing/status
+GET org.graylog2.rest.resources.system.processing.SystemProcessingStatusResource#getPersistedStatus /system/processing/status/persisted
+GET org.graylog2.rest.resources.system.processing.SystemProcessingStatusResource#getStatus /system/processing/status

@@ -1,0 +1,7 @@
+GET org.graylog2.rest.resources.system.field_types.FieldTypeMappingsResource#getAllFieldTypes /system/indices/mappings/types
+PUT org.graylog2.rest.resources.system.field_types.FieldTypeMappingsResource#bulkRemoveProfile /system/indices/mappings/bulk_remove_profile
+PUT org.graylog2.rest.resources.system.field_types.FieldTypeMappingsResource#bulkSetProfile /system/indices/mappings/bulk_set_profile
+PUT org.graylog2.rest.resources.system.field_types.FieldTypeMappingsResource#changeFieldType /system/indices/mappings
+PUT org.graylog2.rest.resources.system.field_types.FieldTypeMappingsResource#removeCustomMapping /system/indices/mappings/remove_mapping
+PUT org.graylog2.rest.resources.system.field_types.FieldTypeMappingsResource#removeProfileFromIndexSets /system/indices/mappings/remove_profile_from
+PUT org.graylog2.rest.resources.system.field_types.FieldTypeMappingsResource#setProfile /system/indices/mappings/set_profile

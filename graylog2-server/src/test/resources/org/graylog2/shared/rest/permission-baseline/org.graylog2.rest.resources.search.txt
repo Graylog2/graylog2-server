@@ -1,0 +1,14 @@
+DELETE org.graylog2.rest.resources.search.DecoratorResource#delete /search/decorators/{decoratorId}
+GET org.graylog2.rest.resources.search.AbsoluteSearchResource#exportSearchAbsoluteChunked /search/universal/absolute/export
+GET org.graylog2.rest.resources.search.AbsoluteSearchResource#searchAbsolute /search/universal/absolute
+GET org.graylog2.rest.resources.search.AbsoluteSearchResource#searchAbsoluteChunked /search/universal/absolute
+GET org.graylog2.rest.resources.search.DecoratorResource#get /search/decorators
+GET org.graylog2.rest.resources.search.DecoratorResource#getAvailable /search/decorators/available
+GET org.graylog2.rest.resources.search.KeywordSearchResource#exportSearchKeywordChunked /search/universal/keyword/export
+GET org.graylog2.rest.resources.search.KeywordSearchResource#searchKeyword /search/universal/keyword
+GET org.graylog2.rest.resources.search.KeywordSearchResource#searchKeywordChunked /search/universal/keyword
+GET org.graylog2.rest.resources.search.RelativeSearchResource#exportSearchRelativeChunked /search/universal/relative/export
+GET org.graylog2.rest.resources.search.RelativeSearchResource#searchRelative /search/universal/relative
+GET org.graylog2.rest.resources.search.RelativeSearchResource#searchRelativeChunked /search/universal/relative
+POST org.graylog2.rest.resources.search.DecoratorResource#create /search/decorators
+PUT org.graylog2.rest.resources.search.DecoratorResource#update /search/decorators/{decoratorId}

@@ -1,0 +1,14 @@
+DELETE org.graylog2.rest.resources.users.UsersResource#deleteUser /users/{username}
+DELETE org.graylog2.rest.resources.users.UsersResource#deleteUserById /users/id/{userId}
+DELETE org.graylog2.rest.resources.users.UsersResource#revokeToken /users/{userId}/tokens/{idOrToken}
+GET org.graylog2.rest.resources.users.UsersResource#get /users/{username}
+GET org.graylog2.rest.resources.users.UsersResource#getBasicUserById /users/basic/id/{userId}
+GET org.graylog2.rest.resources.users.UsersResource#getPage /users/paginated
+GET org.graylog2.rest.resources.users.UsersResource#getbyId /users/id/{userId}
+GET org.graylog2.rest.resources.users.UsersResource#listTokens /users/{userId}/tokens
+GET org.graylog2.rest.resources.users.UsersResource#listUsers /users
+POST org.graylog2.rest.resources.users.UsersResource#generateNewToken /users/{userId}/tokens/{name}
+PUT org.graylog2.rest.resources.users.UsersResource#changePassword /users/{userId}/password
+PUT org.graylog2.rest.resources.users.UsersResource#changeUser /users/{userId}
+PUT org.graylog2.rest.resources.users.UsersResource#savePreferences /users/{username}/preferences
+PUT org.graylog2.rest.resources.users.UsersResource#updateAccountStatus /users/{userId}/status/{newStatus}

@@ -1,0 +1,20 @@
+GET org.graylog2.shared.rest.documentation.openapi.OpenApiResource#getOpenApi /openapi{ext: (\.yaml)?}
+GET org.graylog2.shared.rest.resources.documentation.ApiBrowserRedirectResource#redirect /api-browser{route: .*}
+GET org.graylog2.shared.rest.resources.documentation.DocumentationResource#globalOverview /api-docs/global
+GET org.graylog2.shared.rest.resources.documentation.DocumentationResource#overview /api-docs
+GET org.graylog2.shared.rest.resources.documentation.DocumentationResource#route /api-docs/{route: .+}
+GET org.graylog2.shared.rest.resources.system.LoadBalancerStatusResource#status /system/lbstatus
+GET org.graylog2.shared.rest.resources.system.MetricsResource#byNamespace /system/metrics/namespace/{namespace}
+GET org.graylog2.shared.rest.resources.system.MetricsResource#singleMetric /system/metrics/{metricName}
+GET org.graylog2.shared.rest.resources.system.SystemPluginResource#list /system/plugins
+GET org.graylog2.shared.rest.resources.system.SystemResource#jvm /system/jvm
+GET org.graylog2.shared.rest.resources.system.SystemResource#locales /system/locales
+GET org.graylog2.shared.rest.resources.system.SystemResource#processBufferDump /system/processbufferdump
+GET org.graylog2.shared.rest.resources.system.SystemResource#system /system
+GET org.graylog2.shared.rest.resources.system.SystemResource#threadDumpAsText /system/threaddump
+GET org.graylog2.shared.rest.resources.system.SystemResource#threaddump /system/threaddump
+GET org.graylog2.shared.rest.resources.system.codecs.CodecTypesResource#getAll /system/codecs/types/all
+GET org.graylog2.shared.rest.resources.system.inputs.InputTypesResource#all /system/inputs/types/all
+GET org.graylog2.shared.rest.resources.system.inputs.InputTypesResource#info /system/inputs/types/{inputType}
+GET org.graylog2.shared.rest.resources.system.inputs.InputTypesResource#types /system/inputs/types
+POST org.graylog2.shared.rest.resources.system.MetricsResource#multipleMetrics /system/metrics/multiple

@@ -1,0 +1,1 @@
+GET org.graylog2.rest.resources.HelloWorldResource#helloWorld /

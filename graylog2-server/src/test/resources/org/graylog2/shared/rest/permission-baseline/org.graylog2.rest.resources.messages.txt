@@ -1,0 +1,2 @@
+GET org.graylog2.rest.resources.messages.MessageResource#search /messages/{index}/{messageId}
+POST org.graylog2.rest.resources.messages.MessageResource#parse /messages/parse

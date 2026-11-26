@@ -1,0 +1,5 @@
+GET org.graylog2.web.resources.AppConfigResource#get /config.js
+GET org.graylog2.web.resources.WebInterfaceAssetsResource#get /assets/plugin/{plugin}/{filename}
+GET org.graylog2.web.resources.WebInterfaceAssetsResource#get /assets/{filename: .*}
+GET org.graylog2.web.resources.WebInterfaceAssetsResource#getFavicon /assets/favicon.png
+GET org.graylog2.web.resources.WebInterfaceAssetsResource#getIndex /{filename:.*}
