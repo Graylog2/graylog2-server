@@ -16,8 +16,10 @@
  */
 import * as React from 'react';
 import { useState, useCallback } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 import UsersDomain from 'domainActions/users/UsersDomain';
+import { saveUserPreferences, type PreferencesUpdateMap } from 'api/preferences';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { Col, Row, SegmentedControl, Alert } from 'components/bootstrap';
 import { Spinner, IfPermitted } from 'components/common';
@@ -25,7 +27,7 @@ import SectionComponent from 'components/common/Section/SectionComponent';
 import type User from 'logic/users/User';
 import CurrentUser from 'logic/users/CurrentUser';
 import TelemetrySettingsConfig from 'logic/telemetry/TelemetrySettingsConfig';
-import type { UserUpdate } from 'hooks/useUsers';
+import { USERS_QUERY_KEY, type UserUpdate } from 'hooks/useUsers';
 
 import ReadOnlyWarning from './ReadOnlyWarning';
 import SettingsSection from './SettingsSection';
@@ -45,6 +47,7 @@ type Props = {
 
 const UserEdit = ({ user }: Props) => {
   const currentUser = useCurrentUser();
+  const queryClient = useQueryClient();
   const [selectedSegment, setSelectedSegment] = useState<UserSegment>('profile');
   const updateUser = useCallback(
     (data: UserUpdate) =>
@@ -55,6 +58,13 @@ const UserEdit = ({ user }: Props) => {
       }),
     [user, currentUser?.id],
   );
+
+  // Reload the edited user after saving, otherwise the preferences section shows the old values after switching
+  // sections. The save only finishes once the reloaded user is fetched.
+  const updatePreferences = (data: PreferencesUpdateMap) =>
+    saveUserPreferences(user.username, data).then(() =>
+      queryClient.invalidateQueries({ queryKey: [...USERS_QUERY_KEY, user.id] }),
+    );
 
   if (!user) {
     return <Spinner />;
@@ -94,7 +104,7 @@ const UserEdit = ({ user }: Props) => {
           {selectedSegment === 'settings_preferences' && (
             <>
               <SettingsSection user={user} onSubmit={(data) => updateUser(data)} />
-              <PreferencesSection user={user} />
+              <PreferencesSection user={user} onSubmit={updatePreferences} />
               {currentUser.id === user.id && <TelemetrySettingsConfig />}
             </>
           )}
