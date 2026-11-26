@@ -1,0 +1,5 @@
+type = "c"
+message = "Update time zone database to 2026f."
+
+issues = ["graylog-plugin-enterprise#16481"]
+pulls = ["28349"]
