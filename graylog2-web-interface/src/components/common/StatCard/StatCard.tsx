@@ -42,10 +42,12 @@ const Card = styled(AccessibleCard)<{ $variant: ColorVariant }>(
     padding: ${theme.spacings.md};
     color: inherit;
     font: inherit;
-    ${$variant !== 'default' &&
-    css`
-      border-left: 3px solid ${theme.colors.variant[$variant]};
-    `}
+    ${
+      $variant !== 'default' &&
+      css`
+        border-left: 3px solid ${theme.colors.variant[$variant]};
+      `
+    }
     position: relative;
   `,
 );

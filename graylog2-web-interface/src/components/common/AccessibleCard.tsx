@@ -31,21 +31,25 @@ const Container = styled.div<{ $isActive: boolean; $isClickable: boolean }>(
     border-radius: ${theme.spacings.xs};
     padding: ${theme.spacings.sm};
 
-    ${$isActive &&
-    css`
-      outline: 1px solid ${theme.colors.input.borderFocus};
-    `}
-
-    ${$isClickable &&
-    css`
-      cursor: pointer;
-
-      &:hover,
-      &:focus-visible {
+    ${
+      $isActive &&
+      css`
         outline: 1px solid ${theme.colors.input.borderFocus};
-        box-shadow: ${theme.colors.input.boxShadow};
-      }
-    `}
+      `
+    }
+
+    ${
+      $isClickable &&
+      css`
+        cursor: pointer;
+
+        &:hover,
+        &:focus-visible {
+          outline: 1px solid ${theme.colors.input.borderFocus};
+          box-shadow: ${theme.colors.input.boxShadow};
+        }
+      `
+    }
   `,
 );
 

@@ -43,19 +43,22 @@ const StyledNav: React.ComponentType<any> = styled(Nav)<{
   $justified?: boolean;
 }>(
   ({ $style, $stacked, $justified, theme }) => css`
-    ${$stacked
-      ? `
+    ${
+      $stacked
+        ? `
   flex-direction: column;
   align-items: stretch;
   `
-      : `
+        : `
   > li {
     flex: 1 1 0;
     min-width: 0;
   }
-  `}
-    ${$style === 'stepper'
-      ? `
+  `
+    }
+    ${
+      $style === 'stepper'
+        ? `
   & {
    counter-reset: line-number;
     > li {
@@ -156,7 +159,7 @@ const StyledNav: React.ComponentType<any> = styled(Nav)<{
     }
   }
   `
-      : `& {
+        : `& {
     > li {
       border: 1px solid ${theme.colors.variant.lighter.default};
       border-left: 0;
@@ -260,7 +263,8 @@ const StyledNav: React.ComponentType<any> = styled(Nav)<{
           : ''
       }
     }
-  }`}
+  }`
+    }
   `,
 );
 

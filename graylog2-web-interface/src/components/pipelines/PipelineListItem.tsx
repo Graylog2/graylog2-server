@@ -71,9 +71,9 @@ const PipelineStage = styled.div<{ $idle?: boolean }>(
     padding: ${theme.spacings.sm};
     text-align: center;
     width: 120px;
-    background-color: ${$idle
-      ? theme.utils.colorLevel(theme.colors.global.contentBackground, 10)
-      : theme.colors.global.contentBackground};
+    background-color: ${
+      $idle ? theme.utils.colorLevel(theme.colors.global.contentBackground, 10) : theme.colors.global.contentBackground
+    };
   `,
 );
 const DefaultLabel = styled(Label)(

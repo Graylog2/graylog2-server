@@ -31,7 +31,7 @@ export type InputStateByNode = {
   [nodeId: string]: {
     state: InputState;
     id: string;
-    detailed_message: string | null;
+    detailed_message?: string | null;
     last_failed_at?: string | null;
     message_input: InputSummary;
     only_one_per_cluster?: boolean;

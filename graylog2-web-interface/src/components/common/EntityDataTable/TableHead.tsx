@@ -77,47 +77,59 @@ export const Th = styled.th<{
       background-color: transparent;
     }
 
-    ${$revealHeaderActions &&
-    css`
-      .header-action {
-        opacity: 1;
-      }
-    `}
+    ${
+      $revealHeaderActions &&
+      css`
+        .header-action {
+          opacity: 1;
+        }
+      `
+    }
 
-    ${$pinningPosition
-      ? css`
-          position: sticky;
-          ${$pinningPosition === 'left' ? 'left' : 'right'}: 0;
-          ${$pinningPosition === 'right' &&
-          !$hideEmptyTailPinShadow &&
-          css`
-            box-shadow: inset -1px 0 0 ${theme.colors.table.row.divider};
-          `}
-        `
-      : ''}
+    ${
+      $pinningPosition
+        ? css`
+            position: sticky;
+            ${$pinningPosition === 'left' ? 'left' : 'right'}: 0;
+            ${
+              $pinningPosition === 'right' &&
+              !$hideEmptyTailPinShadow &&
+              css`
+                box-shadow: inset -1px 0 0 ${theme.colors.table.row.divider};
+              `
+            }
+          `
+        : ''
+    }
 
-    ${$hidePadding &&
-    css`
-      && {
-        padding: 0;
-      }
-    `}
+    ${
+      $hidePadding &&
+      css`
+        && {
+          padding: 0;
+        }
+      `
+    }
 
-    ${$colId === ACTIONS_COL_ID &&
-    css`
-      position: sticky;
-      ${ScrollShadow('left')}
-      &::before {
-        display: var(${displayScrollRightIndicatorVar}, none);
-      }
-    `}
+    ${
+      $colId === ACTIONS_COL_ID &&
+      css`
+        position: sticky;
+        ${ScrollShadow('left')}
+        &::before {
+          display: var(${displayScrollRightIndicatorVar}, none);
+        }
+      `
+    }
 
-    ${$hideEmptyTailBorder &&
-    css`
-      && {
-        border-right: none;
-      }
-    `}
+    ${
+      $hideEmptyTailBorder &&
+      css`
+        && {
+          border-right: none;
+        }
+      `
+    }
   `,
 );
 
@@ -143,13 +155,15 @@ const ResizeHitArea = styled.div<{ $isResizing: boolean; $constrainOverhang: boo
       background-color: ${theme.colors.variant.info};
       opacity: ${$isResizing ? 1 : 0};
       transition: opacity 0.15s ease-in-out;
-      ${$constrainOverhang
-        ? css`
-            right: -2px;
-          `
-        : css`
-            left: 50%;
-          `};
+      ${
+        $constrainOverhang
+          ? css`
+              right: -2px;
+            `
+          : css`
+              left: 50%;
+            `
+      };
     }
 
     &:hover::after {

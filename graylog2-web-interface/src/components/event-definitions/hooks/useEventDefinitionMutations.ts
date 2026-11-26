@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import pick from 'lodash/pick';
 import cloneDeep from 'lodash/cloneDeep';
 import omit from 'lodash/omit';
@@ -23,6 +23,8 @@ import { EventsDefinitions } from '@graylog/server-api';
 
 import UserNotification from 'util/UserNotification';
 import type { EntityShare } from 'actions/permissions/EntityShareActions';
+
+import { EVENT_DEFINITIONS_QUERY_KEY, deleteEventDefinition, enableEventDefinition } from './useEventDefinitions';
 
 import type { EventDefinition } from '../event-definitions-types';
 
@@ -51,6 +53,11 @@ const createEventDefinition = async (newEventDefinition: EventDefinition & Entit
 };
 
 const useEventDefinitionMutations = () => {
+  const queryClient = useQueryClient();
+  const invalidateEventDefinitions = () => {
+    queryClient.invalidateQueries({ queryKey: EVENT_DEFINITIONS_QUERY_KEY });
+  };
+
   const createMutation = useMutation({
     mutationFn: createEventDefinition,
     onError: (errorThrown) => {
@@ -64,10 +71,17 @@ const useEventDefinitionMutations = () => {
         'Event Definition created successfully',
         `Event Definition "${eventDefinition.title}" was created successfully.`,
       );
+      invalidateEventDefinitions();
     },
   });
+  const enableMutation = useMutation({ mutationFn: enableEventDefinition, onSuccess: invalidateEventDefinitions });
+  const deleteMutation = useMutation({ mutationFn: deleteEventDefinition, onSuccess: invalidateEventDefinitions });
 
-  return { createEventDefinition: createMutation.mutateAsync };
+  return {
+    createEventDefinition: createMutation.mutateAsync,
+    enableEventDefinition: enableMutation.mutateAsync,
+    deleteEventDefinition: deleteMutation.mutateAsync,
+  };
 };
 
 export default useEventDefinitionMutations;
