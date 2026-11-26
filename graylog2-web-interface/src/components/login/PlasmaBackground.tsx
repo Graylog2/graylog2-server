@@ -21,6 +21,7 @@ import styled from 'styled-components';
 import { createPalette, renderPlasmaFrame } from './plasma';
 
 const SCALE = 10;
+const FRAME_INTERVAL = 1000 / 20;
 
 const Canvas = styled.canvas`
   z-index: -1;
@@ -53,8 +54,17 @@ const PlasmaBackground = ({ className = undefined }: Props) => {
     const animate = !prefersReducedMotion();
     let imageData: ImageData | undefined;
     let frameId: number | undefined;
+    let lastDrawTime: number | undefined;
 
     const draw = (time: number) => {
+      // Small tolerance, so frames at the display's refresh rate don't miss the interval by a fraction.
+      if (lastDrawTime !== undefined && time - lastDrawTime < FRAME_INTERVAL - 2) {
+        frameId = window.requestAnimationFrame(draw);
+
+        return;
+      }
+
+      lastDrawTime = time;
       const width = Math.max(1, Math.ceil(canvas.clientWidth / SCALE));
       const height = Math.max(1, Math.ceil(canvas.clientHeight / SCALE));
 
