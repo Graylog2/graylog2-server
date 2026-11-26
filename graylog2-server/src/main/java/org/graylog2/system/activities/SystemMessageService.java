@@ -16,7 +16,10 @@
  */
 package org.graylog2.system.activities;
 
+import jakarta.annotation.Nullable;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.database.PersistedService;
+import org.joda.time.DateTime;
 
 import java.util.List;
 import java.util.Map;
@@ -27,5 +30,14 @@ import java.util.Map;
 public interface SystemMessageService extends PersistedService {
     List<SystemMessage> all(int page);
     long totalCount();
+
+    /**
+     * The messages whose content or caller contains the query, ignoring case, newest first.
+     *
+     * @param query plain text, not a search query; empty matches every message
+     * @param since only messages at or after this time, if given
+     * @param page  the page of 30 messages, starting at 1
+     */
+    PaginatedList<SystemMessage> find(String query, @Nullable DateTime since, int page);
     SystemMessage create(Map<String, Object> fields);
 }
