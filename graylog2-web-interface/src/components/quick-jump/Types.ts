@@ -52,10 +52,15 @@ export type SearchResultItem = SearchResultItemBase &
  * Offers to do something with the text the user typed, e.g. to ask about it. Its item is shown last, whatever else
  * matches the text.
  */
+export type QuickJumpQueryActionAvailability =
+  | { status: 'available' }
+  // Shown, but cannot be used now, e.g. while the feature behind it is not set up.
+  | { status: 'disabled'; reason: string }
+  | { status: 'hidden' };
+
 export type QuickJumpQueryAction = {
   key: string;
   item: (query: string) => SearchResultItem;
-  useCondition?: () => boolean;
-  // Why the action is shown but cannot be used now, e.g. while the feature behind it is not set up.
-  useDisabledReason?: () => string | undefined;
+  // Available when missing.
+  useAvailability?: () => QuickJumpQueryActionAvailability;
 };

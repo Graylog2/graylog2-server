@@ -49,12 +49,12 @@ describe('useQuickJumpSearch', () => {
           title: `Unavailable "${query}"`,
           link: '/unavailable' as QualifiedUrl<string>,
         }),
-        useDisabledReason: () => 'Not set up yet.',
+        useAvailability: () => ({ status: 'disabled', reason: 'Not set up yet.' }),
       },
       {
         key: 'hidden',
         item: () => ({ type: ACTION_TYPE, title: 'Hidden', link: '/hidden' as QualifiedUrl<string> }),
-        useCondition: () => false,
+        useAvailability: () => ({ status: 'hidden' }),
       },
     ],
   });
