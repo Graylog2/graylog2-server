@@ -81,6 +81,7 @@ public class JobExecutionEngine {
     private final JobWorkerPool workerPool;
     private final RefreshingLockService.Factory refreshingLockServiceFactory;
     private final Map<String, Integer> concurrencyLimits;
+    private final Map<String, java.time.Duration> concurrencyRescheduleBackoffs;
     private final long backoffMillis;
 
     private final Counter executionSuccessful;
@@ -132,6 +133,7 @@ public class JobExecutionEngine {
         this.workerPool = workerPool;
         this.refreshingLockServiceFactory = refreshingLockServiceFactory;
         this.concurrencyLimits = schedulerConfig.concurrencyLimits();
+        this.concurrencyRescheduleBackoffs = schedulerConfig.concurrencyRescheduleBackoffs();
         this.backoffMillis = backoffMillis;
 
         this.executionSuccessful = metricRegistry.counter(MetricRegistry.name(getClass(), name, "executions", "successful"));
@@ -246,14 +248,18 @@ public class JobExecutionEngine {
     }
 
     /**
-     * Progressively reduce backoff from 100% to 20% based on how many times the trigger was rescheduled.
+     * Progressively reduce backoff from 100% to 20% based on how many times the trigger was rescheduled. The base is
+     * the job type's configured backoff, or the engine's default.
      */
-    private Duration slidingBackoff(JobTriggerDto trigger) {
+    @VisibleForTesting
+    Duration slidingBackoff(JobTriggerDto trigger) {
+        final java.time.Duration typeBackoff = concurrencyRescheduleBackoffs.get(trigger.jobDefinitionType());
+        final long baseMillis = typeBackoff == null ? backoffMillis : typeBackoff.toMillis();
         final long slidingBackoffMillis;
         if (trigger.concurrencyRescheduleCount() < 1) {
-            slidingBackoffMillis = backoffMillis;
+            slidingBackoffMillis = baseMillis;
         } else {
-            slidingBackoffMillis = backoffMillis / Math.min(trigger.concurrencyRescheduleCount(), 5);
+            slidingBackoffMillis = baseMillis / Math.min(trigger.concurrencyRescheduleCount(), 5);
         }
         return Duration.millis(slidingBackoffMillis);
     }

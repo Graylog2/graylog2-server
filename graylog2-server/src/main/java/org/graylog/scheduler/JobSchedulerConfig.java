@@ -16,6 +16,7 @@
  */
 package org.graylog.scheduler;
 
+import java.time.Duration;
 import java.util.Map;
 
 /**
@@ -45,4 +46,14 @@ public interface JobSchedulerConfig {
      * entry signifies unlimited concurrency (up to numberOfWorkerThreads)
      */
     Map<String, Integer> concurrencyLimits();
+
+    /**
+     * Base wait per job type before a trigger that its type's concurrency limit turned away tries again. The wait
+     * shrinks to a fifth of the base while the trigger keeps being turned away.
+     *
+     * @return mapping of job type to base wait. A missing entry uses the engine's default of 5 seconds.
+     */
+    default Map<String, Duration> concurrencyRescheduleBackoffs() {
+        return Map.of();
+    }
 }
