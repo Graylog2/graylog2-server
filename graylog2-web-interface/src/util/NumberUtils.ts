@@ -16,7 +16,7 @@
  */
 import numeral from 'numeral';
 
-type NumberInput = number | string;
+type NumberInput = number | string | bigint;
 
 const NumberUtils = {
   JAVA_INTEGER_MIN_VALUE: 2 ** 31 * -1,

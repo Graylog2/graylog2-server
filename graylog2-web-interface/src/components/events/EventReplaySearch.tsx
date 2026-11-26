@@ -63,7 +63,7 @@ const EventReplaySearch = ({ eventDefinitionMappedData, eventData, searchPageLay
   );
 
   useEffect(() => {
-    openSidebar(SidebarEventDetails(eventData?.id, eventDefinition?.id));
+    openSidebar(SidebarEventDetails(eventData?.id, eventDefinition?.id), { slideIn: false });
   }, [openSidebar, eventData?.id, eventDefinition?.id]);
 
   return (

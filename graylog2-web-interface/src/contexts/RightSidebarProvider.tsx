@@ -18,7 +18,7 @@ import isEqual from 'lodash/isEqual';
 import React, { useReducer, useCallback, useMemo } from 'react';
 
 import RightSidebarContext from 'contexts/RightSidebarContext';
-import type { RightSidebarContent } from 'contexts/RightSidebarContext';
+import type { OpenSidebarOptions, RightSidebarContent } from 'contexts/RightSidebarContext';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import type { TelemetryEventType } from 'logic/telemetry/TelemetryContext';
@@ -34,25 +34,24 @@ type HistoryState = {
   currentIndex: number;
   isOpen: boolean;
   isCollapsed: boolean;
-  width: number;
+  slidesIn: boolean;
 };
 
 type HistoryAction =
-  | { type: 'OPEN_SIDEBAR'; content: RightSidebarContent }
+  | { type: 'OPEN_SIDEBAR'; content: RightSidebarContent; slideIn: boolean }
   | { type: 'CLOSE_SIDEBAR' }
   | { type: 'COLLAPSE_SIDEBAR' }
   | { type: 'EXPAND_SIDEBAR' }
   | { type: 'UPDATE_CONTENT'; content: RightSidebarContent }
   | { type: 'GO_BACK' }
-  | { type: 'GO_FORWARD' }
-  | { type: 'SET_WIDTH'; width: number };
+  | { type: 'GO_FORWARD' };
 
 const initialState: HistoryState = {
   contentHistory: [],
   currentIndex: -1,
   isOpen: false,
   isCollapsed: false,
-  width: 400,
+  slidesIn: true,
 };
 
 const isSameContent = (content1: RightSidebarContent, content2: RightSidebarContent): boolean => {
@@ -79,6 +78,7 @@ const historyReducer = (state: HistoryState, action: HistoryAction): HistoryStat
           contentHistory: newHistory,
           isOpen: true,
           isCollapsed: false,
+          slidesIn: action.slideIn,
         };
       }
 
@@ -94,6 +94,7 @@ const historyReducer = (state: HistoryState, action: HistoryAction): HistoryStat
           currentIndex: MAX_HISTORY_DEPTH - 1,
           isOpen: true,
           isCollapsed: false,
+          slidesIn: action.slideIn,
         };
       }
 
@@ -103,6 +104,7 @@ const historyReducer = (state: HistoryState, action: HistoryAction): HistoryStat
         currentIndex: newHistory.length - 1,
         isOpen: true,
         isCollapsed: false,
+        slidesIn: action.slideIn,
       };
     }
 
@@ -127,6 +129,7 @@ const historyReducer = (state: HistoryState, action: HistoryAction): HistoryStat
       return {
         ...state,
         isCollapsed: false,
+        slidesIn: true,
       };
     }
 
@@ -166,13 +169,6 @@ const historyReducer = (state: HistoryState, action: HistoryAction): HistoryStat
       };
     }
 
-    case 'SET_WIDTH': {
-      return {
-        ...state,
-        width: action.width,
-      };
-    }
-
     default:
       return state;
   }
@@ -196,12 +192,12 @@ const RightSidebarProvider = ({ children }: Props) => {
   );
 
   const openSidebar = useCallback(
-    <T = Record<string, unknown>,>(newContent: RightSidebarContent<T>) => {
+    <T = Record<string, unknown>,>(newContent: RightSidebarContent<T>, { slideIn = true }: OpenSidebarOptions = {}) => {
       sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.OPENED, {
         content_id: newContent.id,
         component_key: newContent.componentKey,
       });
-      dispatch({ type: 'OPEN_SIDEBAR', content: newContent as RightSidebarContent<any> });
+      dispatch({ type: 'OPEN_SIDEBAR', content: newContent as RightSidebarContent<any>, slideIn });
     },
     [sendSidebarTelemetry],
   );
@@ -225,10 +221,6 @@ const RightSidebarProvider = ({ children }: Props) => {
     dispatch({ type: 'UPDATE_CONTENT', content: newContent as RightSidebarContent<any> });
   }, []);
 
-  const setWidth = useCallback((newWidth: number) => {
-    dispatch({ type: 'SET_WIDTH', width: newWidth });
-  }, []);
-
   const goBack = useCallback(() => {
     sendSidebarTelemetry(TELEMETRY_EVENT_TYPE.RIGHT_SIDEBAR.NAVIGATED_BACK);
     dispatch({ type: 'GO_BACK' });
@@ -243,14 +235,13 @@ const RightSidebarProvider = ({ children }: Props) => {
     () => ({
       isOpen: state.isOpen,
       isCollapsed: state.isCollapsed,
+      slidesIn: state.slidesIn,
       content,
-      width: state.width,
       openSidebar,
       closeSidebar,
       collapseSidebar,
       expandSidebar,
       updateContent,
-      setWidth,
       goBack,
       goForward,
       canGoBack,
@@ -259,14 +250,13 @@ const RightSidebarProvider = ({ children }: Props) => {
     [
       state.isOpen,
       state.isCollapsed,
+      state.slidesIn,
       content,
-      state.width,
       openSidebar,
       closeSidebar,
       collapseSidebar,
       expandSidebar,
       updateContent,
-      setWidth,
       goBack,
       goForward,
       canGoBack,
