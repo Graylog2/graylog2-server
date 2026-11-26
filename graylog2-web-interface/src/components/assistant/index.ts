@@ -24,6 +24,7 @@ export {
 } from './AssistantPageContext';
 export { PageToolNotifiedError } from './types';
 export type {
+  ChangedEntity,
   Page,
   PageContext,
   Panel,
