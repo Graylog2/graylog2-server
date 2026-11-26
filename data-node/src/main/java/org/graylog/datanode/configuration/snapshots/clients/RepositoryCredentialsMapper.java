@@ -108,7 +108,11 @@ public class RepositoryCredentialsMapper {
             if (StringUtils.isBlank(endpointUri.getHost())) {
                 throw new IllegalArgumentException("the endpoint has no host");
             }
-            client.setting("protocol", endpointUri.getScheme());
+            final String protocol = StringUtils.lowerCase(endpointUri.getScheme(), Locale.ROOT);
+            if (!"http".equals(protocol) && !"https".equals(protocol)) {
+                throw new IllegalArgumentException("the endpoint must use http or https");
+            }
+            client.setting("protocol", protocol);
             client.setting("endpoint", endpoint(endpointUri));
             client.setting("path_style_access", "true");
         } else {
