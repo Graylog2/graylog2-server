@@ -41,6 +41,10 @@ interface PluginNavigationItems {
   key: string;
   component: React.ComponentType;
 }
+
+// What the layout needs to know about a global sidebar.
+type GlobalSidebarVisibility = 'closed' | 'expanded' | 'collapsed';
+
 interface GlobalNotification {
   key: string;
   component: React.ComponentType;
@@ -470,8 +474,16 @@ declare module 'graylog-web-plugin/plugin' {
     dataTiering?: Array<DataTiering>;
     defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
-    // Shown next to every page, after the right sidebar, e.g. the Assistant's chat.
-    globalSidebars?: Array<{ key: string; component: React.ComponentType }>;
+    // Shown next to every page, after the right sidebar, e.g. the Assistant's chat. While one is open, it shares a
+    // column with the right sidebar, below it.
+    globalSidebars?: Array<{
+      key: string;
+      // `stacked` while it shares a column with the right sidebar, which then has the resize handle.
+      component: React.ComponentType<{ stacked: boolean }>;
+      // Called on every render of the layout, for all global sidebars in turn, so plugins must not change while the
+      // page runs.
+      useVisibility?: () => GlobalSidebarVisibility;
+    }>;
     'navigation.badges'?: Array<NavigationBadge>;
     globalNotifications?: Array<GlobalNotification>;
     helpMenu?: Array<HelpMenuItem>;
