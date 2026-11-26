@@ -130,4 +130,15 @@ describe('TrafficGraphWithDaySelect', () => {
 
     expect(container).toBeInTheDocument();
   });
+
+  it('handles BigInt traffic values and traffic limit', async () => {
+    render(
+      <TrafficGraphWithDaySelect
+        traffic={{ '2022-09-21T08:00:00.000Z': BigInt('9007199254740993'), '2022-09-21T09:00:00.000Z': 1024 }}
+        trafficLimit={BigInt('9223372036854775807')}
+      />,
+    );
+
+    await screen.findByText(/8,388,608\.0 GiB/);
+  });
 });
