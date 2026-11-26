@@ -23,6 +23,8 @@ type SearchResultItemBase = {
   score?: number;
   last_opened?: boolean;
   favorite?: boolean;
+  // Shown below the title. The item stays in the list, but cannot be selected.
+  disabledReason?: string;
 };
 
 type SearchResultItemLink = {
@@ -54,4 +56,6 @@ export type QuickJumpQueryAction = {
   key: string;
   item: (query: string) => SearchResultItem;
   useCondition?: () => boolean;
+  // Why the action is shown but cannot be used now, e.g. while the feature behind it is not set up.
+  useDisabledReason?: () => string | undefined;
 };

@@ -81,12 +81,23 @@ const useEntityResultMapper = () => {
 
 // Offers to do something with the typed text, after everything that matches it.
 const useQueryActionItems = (searchQuery: string): Array<SearchResultItem> => {
+  // Every action's hooks run, whether it is shown or not, so their order stays the same.
   const queryActions = usePluginEntities('quickJump.queryActions')
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    .filter(({ useCondition }) => useCondition?.() ?? true);
+    .map((action) => ({
+      ...action,
+      isShown: action.useCondition?.() ?? true,
+      disabledReason: action.useDisabledReason?.(),
+    }))
+    .filter(({ isShown }) => isShown);
   const query = searchQuery.trim();
 
-  return query === '' ? [] : queryActions.map(({ key, item }) => ({ key, ...item(query) }));
+  return query === ''
+    ? []
+    : queryActions.map(({ key, item, disabledReason }) => {
+        const result = item(query);
+
+        return { key, ...result, disabledReason: disabledReason ?? result.disabledReason };
+      });
 };
 
 const useQuickJumpSearch = (searchQuery: string) => {
