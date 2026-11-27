@@ -68,6 +68,7 @@ import static org.graylog2.inputs.transports.AmqpTransport.CK_QUEUE_DECLARE_PASS
 import static org.graylog2.inputs.transports.AmqpTransport.CK_REQUEUE_INVALID_MESSAGES;
 import static org.graylog2.inputs.transports.AmqpTransport.CK_ROUTING_KEY;
 import static org.graylog2.inputs.transports.AmqpTransport.CK_TLS;
+import static org.graylog2.inputs.transports.AmqpTransport.CK_TLS_VERIFY;
 import static org.graylog2.inputs.transports.AmqpTransport.CK_USERNAME;
 import static org.graylog2.inputs.transports.AmqpTransport.CK_VHOST;
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -95,6 +96,7 @@ public class AmqpConsumer {
     private final MessageInput sourceInput;
     private final int parallelQueues;
     private final boolean tls;
+    private final boolean tlsVerify;
     private final InputFailureRecorder inputFailureRecorder;
     private final AmqpTransport amqpTransport;
     private final EncryptedValueService encryptedValueService;
@@ -134,6 +136,7 @@ public class AmqpConsumer {
         this.parallelQueues = configuration.getInt(CK_PARALLEL_QUEUES);
         this.requeueInvalid = configuration.getBoolean(CK_REQUEUE_INVALID_MESSAGES);
         this.tls = configuration.getBoolean(CK_TLS);
+        this.tlsVerify = configuration.getBoolean(CK_TLS_VERIFY);
         this.heartbeatTimeout = heartbeatTimeout;
         this.sourceInput = sourceInput;
         this.inputFailureRecorder = inputFailureRecorder;
@@ -253,8 +256,15 @@ public class AmqpConsumer {
 
         if (tls) {
             try {
-                LOG.info("Enabling TLS for AMQP input {}.", sourceInput.toIdentifier());
-                factory.useSslProtocol();
+                if (tlsVerify) {
+                    LOG.info("Enabling TLS with certificate and hostname verification for AMQP input {}.", sourceInput.toIdentifier());
+                    // Uses the JVM default SSLContext, which validates the broker certificate, and enables hostname verification.
+                    factory.useSslProtocol();
+                } else {
+                    LOG.info("Enabling TLS without certificate verification for AMQP input {}.", sourceInput.toIdentifier());
+                    // Keeps the behavior of inputs created before the "tls_verify" option existed.
+                    factory.useTlsWithNoVerification();
+                }
             } catch (NoSuchAlgorithmException | KeyManagementException e) {
                 throw new IOException("Couldn't enable TLS for AMQP input.", e);
             }
