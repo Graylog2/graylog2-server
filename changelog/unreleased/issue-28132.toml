@@ -1,0 +1,5 @@
+type = "f"
+message = "Reset the decorators configuration dialog to the current decorators each time it is opened, so saving it again no longer deletes or re-creates decorators."
+
+issues = ["28132"]
+pulls = []
