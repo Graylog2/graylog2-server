@@ -29,5 +29,16 @@ public interface GranteeService {
 
     Set<User> getVisibleUsers(User requestingUser);
 
+    /**
+     * Filters the given grantees to those the viewer could see in the share dialog. Unlike
+     * {@link #getAvailableGrantees(User)}, this only loads the given grantees, so its cost does not depend on the
+     * total number of users or teams. The viewer is never part of the result.
+     *
+     * @param viewer     the user who looks at the grantees
+     * @param candidates the grantee GRNs to filter
+     * @return the visible grantees
+     */
+    Set<Grantee> getVisibleGrantees(User viewer, Set<GRN> candidates);
+
     Set<GRN> getGranteeAliases(GRN grantee);
 }

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { Attribute, Sort } from 'stores/PaginationTypes';
+import { SHARED_WITH_OTHERS_ATTRIBUTE } from 'components/permissions/SharedWithOthers/Constants';
 
 import type { ExtensionColumnGroups } from './hooks/useStreamsOverviewExtensions';
 import { METRIC_COLUMN_IDS, METRIC_COLUMN_TITLES } from './metricColumns';
@@ -76,7 +77,14 @@ const getStreamTableElements = (
     METRIC_COLUMN_IDS.maxProcessingTime,
   ];
 
-  const defaultColumnOrder = [...defaultCols, ...routingCols, ...performanceCols, ...ungroupedExtNames, 'created_at'];
+  const defaultColumnOrder = [
+    ...defaultCols,
+    ...routingCols,
+    ...performanceCols,
+    ...ungroupedExtNames,
+    SHARED_WITH_OTHERS_ATTRIBUTE.id,
+    'created_at',
+  ];
 
   const defaultVariantLayout = {
     ...SHARED_LAYOUT,
@@ -134,6 +142,7 @@ const getStreamTableElements = (
       title: METRIC_COLUMN_TITLES[METRIC_COLUMN_IDS.maxProcessingTime],
       type: 'LONG' as const,
     },
+    SHARED_WITH_OTHERS_ATTRIBUTE,
   ];
 
   return {

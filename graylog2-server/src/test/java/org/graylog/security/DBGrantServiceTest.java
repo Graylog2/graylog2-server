@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -141,6 +142,23 @@ public class DBGrantServiceTest {
             assertThat(result.get(dashboard2)).containsExactlyInAnyOrder(john);
             assertThat(result).doesNotContainKey(stream1);
         });
+    }
+
+    @Test
+    @MongoDBFixtures("grants.json")
+    public void getForTargets() {
+        final GRN stream1 = grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0001");
+        final GRN dashboard1 = grnRegistry.parse("grn::::dashboard:54e3deadbeefdeadbeef0000");
+
+        assertThat(dbService.getForTargets(ImmutableSet.of(stream1, dashboard1)))
+                .extracting(GrantDTO::target, GrantDTO::grantee, GrantDTO::capability)
+                .containsExactlyInAnyOrder(
+                        tuple(stream1, grnRegistry.parse("grn::::user:jane"), Capability.MANAGE),
+                        tuple(stream1, grnRegistry.parse("grn::::user:john"), Capability.VIEW),
+                        tuple(stream1, GRNRegistry.GLOBAL_USER_GRN, Capability.VIEW),
+                        tuple(dashboard1, grnRegistry.parse("grn::::user:jane"), Capability.OWN)
+                );
+        assertThat(dbService.getForTargets(ImmutableSet.of(grnRegistry.parse("grn::::stream:54e3deadbeefdeadbeef0009")))).isEmpty();
     }
 
     @Test

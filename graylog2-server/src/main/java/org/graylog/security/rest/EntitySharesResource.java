@@ -26,6 +26,7 @@ import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DefaultValue;
@@ -47,7 +48,9 @@ import org.graylog.security.entities.EntityDescriptor;
 import org.graylog.security.shares.EntityShareRequest;
 import org.graylog.security.shares.EntityShareResponse;
 import org.graylog.security.shares.EntitySharesService;
+import org.graylog.security.shares.GranteeShare;
 import org.graylog.security.shares.GranteeSharesService;
+import org.graylog.security.shares.ShareSummary;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.PaginationParameters;
@@ -60,10 +63,14 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 import static org.graylog.security.shares.EntityShareRequest.SELECTED_GRANTEE_CAPABILITIES;
 import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @Path("/authz/shares")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -150,6 +157,49 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
         } else {
             return entitySharesService.prepareShare(getCurrentUser(),
                     request.selectedGranteeCapabilities() == null ? ImmutableMap.of() : request.selectedGranteeCapabilities());
+        }
+    }
+
+    public record ShareSummaryRequest(@JsonProperty("grns") @NotNull Set<GRN> grns) {
+    }
+
+    public record ShareSummaryResponse(@JsonProperty("summaries") Map<GRN, ShareSummary> summaries) {
+    }
+
+    /**
+     * Return the number of grantees per capability for many entities. Entities the user does not own and
+     * entities without grantees are left out of the response.
+     */
+    @POST
+    @Operation(summary = "Return the number of grantees per capability for many entities")
+    @Path("entities/summary")
+    @NoAuditEvent("This does not change any data")
+    public ShareSummaryResponse getSummaries(@RequestBody(required = true) @NotNull @Valid ShareSummaryRequest request) {
+        final Set<GRN> ownedEntities = request.grns().stream()
+                .filter(this::isOwner)
+                .collect(Collectors.toSet());
+
+        return new ShareSummaryResponse(entitySharesService.summarize(ownedEntities, getCurrentUser()));
+    }
+
+    public record GranteesResponse(@JsonProperty("grantees") List<GranteeShare> grantees) {
+    }
+
+    @GET
+    @Operation(summary = "Return the grantees of an entity with their capabilities")
+    @Path("entities/{entityGRN}/grantees")
+    public GranteesResponse getGrantees(@Parameter(name = "entityGRN", required = true) @PathParam("entityGRN") @NotBlank String entityGRN) {
+        final GRN grn = parseGRN(entityGRN);
+        checkOwnership(grn);
+
+        return new GranteesResponse(entitySharesService.getGrantees(grn, getCurrentUser()));
+    }
+
+    private GRN parseGRN(String grn) {
+        try {
+            return grnRegistry.parse(grn);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(f("Invalid GRN <%s>", grn), e);
         }
     }
 
