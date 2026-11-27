@@ -228,6 +228,20 @@ public abstract class ManagedConfigurationService {
                         Updates.set(NodeConfigurationState.FIELD_APPLIED_AT, Date.from(loadedAt))));
     }
 
+    /**
+     * Records whether a node managed to apply the stored settings which take effect without a restart.
+     *
+     * @param error why applying failed, {@code null} if it succeeded
+     */
+    public void recordLiveSettingsResult(String nodeId, @Nullable String error) {
+        stateCollection.updateOne(
+                eq(NodeConfigurationState.FIELD_NODE_ID, nodeId),
+                error == null
+                        ? Updates.unset(NodeConfigurationState.FIELD_LIVE_SETTINGS_ERROR)
+                        : Updates.set(NodeConfigurationState.FIELD_LIVE_SETTINGS_ERROR, error),
+                new UpdateOptions().upsert(true));
+    }
+
     public Optional<NodeConfigurationState> configurationState(String nodeId) {
         return Optional.ofNullable(stateCollection.find(eq(NodeConfigurationState.FIELD_NODE_ID, nodeId)).first());
     }

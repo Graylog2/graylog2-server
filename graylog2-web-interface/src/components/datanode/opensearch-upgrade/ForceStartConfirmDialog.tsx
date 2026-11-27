@@ -19,11 +19,19 @@ import React from 'react';
 import { ConfirmDialog } from 'components/common';
 
 const ForceStartConfirmDialog = ({
+  title = 'Start OpenSearch upgrade anyway?',
+  intro = 'The backend reported that the normal preflight checks did not pass.',
+  confirmText = 'Start anyway',
+  submittingText = 'Starting...',
   failedChecks,
   isSubmitting,
   onCancel,
   onConfirm,
 }: {
+  title?: string;
+  intro?: string;
+  confirmText?: string;
+  submittingText?: string;
   failedChecks: Array<string>;
   isSubmitting: boolean;
   onCancel: () => void;
@@ -31,14 +39,14 @@ const ForceStartConfirmDialog = ({
 }) => (
   <ConfirmDialog
     show
-    title="Start OpenSearch upgrade anyway?"
-    btnConfirmText="Start anyway"
+    title={title}
+    btnConfirmText={confirmText}
     isAsyncSubmit
     isSubmitting={isSubmitting}
     onCancel={onCancel}
     onConfirm={onConfirm}
-    submitLoadingText="Starting...">
-    <p>The backend reported that the normal preflight checks did not pass.</p>
+    submitLoadingText={submittingText}>
+    <p>{intro}</p>
     <ul>
       {failedChecks.map((failedCheck) => (
         <li key={failedCheck}>{failedCheck}</li>

@@ -38,6 +38,8 @@ import java.time.Instant;
  *
  * @param loadedAt  When the node last loaded its stored values to start its process with them
  * @param appliedAt The {@link #loadedAt} of the configuration the running process has been started with
+ * @param liveSettingsError Why the node couldn't apply the stored settings which take effect without a restart the
+ *                          last time it tried, {@code null} if it succeeded
  */
 public record NodeConfigurationState(
         @ObjectId @Id @Nullable @JsonProperty(FIELD_ID) String id,
@@ -47,9 +49,11 @@ public record NodeConfigurationState(
         @JsonProperty(FIELD_LOADED_AT) @Nullable Instant loadedAt,
         @JsonSerialize(using = MongoInstantSerializer.class)
         @JsonDeserialize(using = MongoInstantDeserializer.class)
-        @JsonProperty(FIELD_APPLIED_AT) @Nullable Instant appliedAt
+        @JsonProperty(FIELD_APPLIED_AT) @Nullable Instant appliedAt,
+        @JsonProperty(FIELD_LIVE_SETTINGS_ERROR) @Nullable String liveSettingsError
 ) implements MongoEntity {
     public static final String FIELD_NODE_ID = "node_id";
     public static final String FIELD_LOADED_AT = "loaded_at";
     public static final String FIELD_APPLIED_AT = "applied_at";
+    public static final String FIELD_LIVE_SETTINGS_ERROR = "live_settings_error";
 }

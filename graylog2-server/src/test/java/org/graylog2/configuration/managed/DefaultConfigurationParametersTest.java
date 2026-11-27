@@ -67,6 +67,47 @@ class DefaultConfigurationParametersTest {
                 .isNotEmpty();
     }
 
+    @Test
+    void dynamicOpensearchSettingsAreAppliedLiveForTheWholeCluster() {
+        assertThat(PARAMETERS)
+                .filteredOn(parameter -> !parameter.requiresRestart())
+                .extracting(ConfigurationParameter::name)
+                .contains("cluster.routing.allocation.disk.watermark.low",
+                        "cluster.routing.allocation.disk.watermark.high",
+                        "cluster.routing.allocation.disk.watermark.flood_stage",
+                        "cluster.max_shards_per_node",
+                        "indices.recovery.max_bytes_per_sec");
+        // Static node settings are only read when OpenSearch starts
+        assertThat(parameter("indices.queries.cache.size").requiresRestart()).isTrue();
+        assertThat(parameter("indices.memory.index_buffer_size").requiresRestart()).isTrue();
+    }
+
+    @Test
+    void runtimeParametersDeclareTheirDefault() {
+        // No node reports a runtime parameter, so without a default the user interface couldn't show any value
+        assertThat(PARAMETERS)
+                .filteredOn(parameter -> parameter.backing() == ParameterBacking.RUNTIME)
+                .allSatisfy(parameter -> assertThat(parameter.defaultValue())
+                        .describedAs("default of <%s>", parameter.name())
+                        .isNotNull());
+    }
+
+    @Test
+    void defaultsAreValidValues() {
+        PARAMETERS.stream()
+                .filter(parameter -> parameter.defaultValue() != null)
+                .forEach(parameter -> assertThat(parameter.validate(parameter.defaultValue()))
+                        .describedAs("default of <%s>", parameter.name())
+                        .isEmpty());
+    }
+
+    @Test
+    void leavesOutSettingsWhichAreChangedAutomatically() {
+        // Toggled by rolling restarts, a stored value would be reapplied in the middle of one
+        assertThat(PARAMETERS).extracting(ConfigurationParameter::name)
+                .doesNotContain("cluster.routing.allocation.enable");
+    }
+
     @ParameterizedTest
     @CsvSource({
             "opensearch_heap, 2g, true",
@@ -89,6 +130,15 @@ class DefaultConfigurationParametersTest {
             "cluster.max_shards_per_node, 0, false",
             "indices.recovery.max_bytes_per_sec, 40mb, true",
             "indices.recovery.max_bytes_per_sec, 40%, false",
+            "indices.recovery.max_bytes_per_sec, 0, true",
+            "cluster.routing.allocation.node_concurrent_recoveries, 4, true",
+            "cluster.routing.allocation.node_concurrent_recoveries, 0, false",
+            "search.max_buckets, 65535, true",
+            "node_search_cache_size, 10gb, true",
+            "node_search_cache_size, 2.5GB, true",
+            "node_search_cache_size, 10tb, false",
+            "opensearch_logger_org_opensearch, DEBUG, true",
+            "opensearch_logger_org_opensearch, verbose, false",
             "indices.queries.cache.size, 10%, true",
             "indices.queries.cache.size, 512mb, true"
     })

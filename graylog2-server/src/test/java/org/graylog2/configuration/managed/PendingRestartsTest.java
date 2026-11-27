@@ -59,7 +59,7 @@ class PendingRestartsTest {
     }
 
     private static NodeConfigurationState appliedAt(String nodeId, Instant appliedAt) {
-        return new NodeConfigurationState(null, nodeId, appliedAt, appliedAt);
+        return new NodeConfigurationState(null, nodeId, appliedAt, appliedAt, null);
     }
 
     private void storedForCluster(ManagedConfigurationEntry... entries) {
@@ -139,9 +139,9 @@ class PendingRestartsTest {
     @Test
     void nodeIsRestartingBetweenLoadingItsConfigurationAndItsProcessBecomingAvailable() {
         when(configurationService.configurationStates()).thenReturn(Map.of(
-                "restarting", new NodeConfigurationState(null, "restarting", AFTER_CHANGE, BEFORE_CHANGE),
-                "first-start", new NodeConfigurationState(null, "first-start", AFTER_CHANGE, null),
-                "done", new NodeConfigurationState(null, "done", AFTER_CHANGE, AFTER_CHANGE)));
+                "restarting", new NodeConfigurationState(null, "restarting", AFTER_CHANGE, BEFORE_CHANGE, null),
+                "first-start", new NodeConfigurationState(null, "first-start", AFTER_CHANGE, null, null),
+                "done", new NodeConfigurationState(null, "done", AFTER_CHANGE, AFTER_CHANGE, null)));
 
         assertThat(pendingRestarts.restartingNodes(NodeType.DATANODE, List.of("restarting", "first-start", "done", "unknown")))
                 .containsExactly("first-start", "restarting");
@@ -152,7 +152,7 @@ class PendingRestartsTest {
     void nodeWhichTakesTooLongToStartNoLongerCountsAsRestarting() {
         final Instant longAgo = NOW.minus(PendingRestarts.RESTART_TIMEOUT).minusSeconds(1);
         when(configurationService.configurationStates()).thenReturn(Map.of(
-                "stuck", new NodeConfigurationState(null, "stuck", longAgo, longAgo.minusSeconds(60))));
+                "stuck", new NodeConfigurationState(null, "stuck", longAgo, longAgo.minusSeconds(60), null)));
 
         assertThat(pendingRestarts.isRestarting(NodeType.DATANODE, "stuck")).isFalse();
     }

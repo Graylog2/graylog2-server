@@ -18,6 +18,7 @@ package org.graylog2.configuration.managed;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
@@ -27,7 +28,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * Makes this node pick up the values stored through the API.
@@ -62,7 +66,8 @@ public class ManagedConfigurationApplier {
     private final ConfigurationReprocessor reprocessor;
     private final NodeConfigurationReporter reporter;
     private final ManagedConfigurationRepository repository;
-    private final Set<String> runtimeParameters;
+    private final Set<String> processStartParameters;
+    private final Set<String> liveParameters;
     private final boolean enabled;
 
     @Inject
@@ -84,12 +89,24 @@ public class ManagedConfigurationApplier {
                 .filter(name -> !name.isEmpty())
                 .collect(Collectors.toUnmodifiableSet());
         this.repository = new ManagedConfigurationRepository(configurationService, catalog, this.nodeId, ignored);
-        this.runtimeParameters = catalog.get(nodeType).stream()
-                .filter(parameter -> parameter.backing() == ParameterBacking.RUNTIME)
-                .map(ConfigurationParameter::name)
-                .filter(name -> !ignored.contains(name))
-                .collect(Collectors.toUnmodifiableSet());
         this.enabled = !ignored.contains(IGNORE_ALL);
+        final Set<ConfigurationParameter> runtimeParameters = catalog.get(nodeType).stream()
+                .filter(parameter -> parameter.backing() == ParameterBacking.RUNTIME)
+                .collect(Collectors.toUnmodifiableSet());
+        this.processStartParameters = names(runtimeParameters, true).stream()
+                .filter(name -> enabled && !ignored.contains(name))
+                .collect(Collectors.toUnmodifiableSet());
+        // Settings applied live hold for the whole cluster and every node writes them, so ignoring them on a single
+        // node can't work. They never keep a node from starting either, so a bad value can be removed through the
+        // API instead.
+        this.liveParameters = names(runtimeParameters, false);
+        final Set<String> ignoredLiveParameters = ignored.stream()
+                .filter(liveParameters::contains)
+                .collect(Collectors.toCollection(TreeSet::new));
+        if (!ignoredLiveParameters.isEmpty()) {
+            LOG.warn("Ignoring stored values has no effect on settings which apply to the whole cluster without a " +
+                    "restart: {}. Remove or correct the stored value instead.", ignoredLiveParameters);
+        }
 
         if (!enabled) {
             LOG.warn("All configuration values stored through the API are ignored on this node.");
@@ -100,6 +117,13 @@ public class ManagedConfigurationApplier {
             // Replicated cluster events arrive on the regular event bus
             eventBus.register(this);
         }
+    }
+
+    private static Set<String> names(Set<ConfigurationParameter> parameters, boolean requiresRestart) {
+        return parameters.stream()
+                .filter(parameter -> parameter.requiresRestart() == requiresRestart)
+                .map(ConfigurationParameter::name)
+                .collect(Collectors.toUnmodifiableSet());
     }
 
     @Subscribe
@@ -169,17 +193,70 @@ public class ManagedConfigurationApplier {
     }
 
     /**
-     * The stored values of parameters which only exist at runtime. They aren't declared in a configuration bean, so
-     * processing the beans doesn't apply them: whoever starts the process has to hand them over.
+     * The stored values of runtime parameters which only take effect when the process starts. They aren't declared in
+     * a configuration bean, so processing the beans doesn't apply them: whoever starts the process has to hand them
+     * over.
      *
      * @return the stored values keyed by parameter name
      */
-    public Map<String, String> runtimeValues() {
-        if (!enabled) {
+    public Map<String, String> processStartValues() {
+        return storedValues(processStartParameters);
+    }
+
+    /**
+     * The stored values of the parameters which are applied to the running process.
+     *
+     * @return the stored values keyed by parameter name, a subset of {@link #liveParameters()}
+     */
+    public Map<String, String> liveValues() {
+        return storedValues(liveParameters);
+    }
+
+    /**
+     * The parameters this node applies to the running process. A parameter in here without a stored value has to be
+     * reset, so that the process falls back to its own configuration. The parameters named by
+     * {@link #IGNORED_PARAMETERS} are included as well: these settings hold for the whole cluster, so ignoring them
+     * on a single node would have no effect.
+     */
+    public Set<String> liveParameters() {
+        return liveParameters;
+    }
+
+    /**
+     * Stores a value found in the running process for a parameter which is applied live, unless a value has ever
+     * been stored for it. Values which were set by other means before the parameter was managed are kept that way,
+     * while a value removed through the API stays removed.
+     *
+     * @return {@code true} if the value has been stored by this call
+     */
+    public boolean adoptLiveValue(String name, String value) {
+        if (!liveParameters.contains(name)) {
+            return false;
+        }
+        return configurationService.adoptClusterValue(name, value,
+                f("adopted from the OpenSearch cluster settings by node %s", nodeId));
+    }
+
+    /**
+     * Records whether this node managed to apply the stored values of the parameters which are applied live, so that
+     * a failure can be shown.
+     *
+     * @param error why applying failed, {@code null} if it succeeded
+     */
+    public void recordLiveSettingsResult(@Nullable String error) {
+        try {
+            configurationService.recordLiveSettingsResult(nodeId, error);
+        } catch (Exception e) {
+            LOG.warn("Couldn't record the outcome of applying the stored cluster settings.", e);
+        }
+    }
+
+    private Map<String, String> storedValues(Set<String> parameters) {
+        if (parameters.isEmpty()) {
             return Map.of();
         }
         return configurationService.storedValues(nodeId).entrySet().stream()
-                .filter(entry -> runtimeParameters.contains(entry.getKey()))
+                .filter(entry -> parameters.contains(entry.getKey()))
                 .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }

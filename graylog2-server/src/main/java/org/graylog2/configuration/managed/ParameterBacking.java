@@ -31,8 +31,9 @@ public enum ParameterBacking {
      */
     CONFIG_FILE,
     /**
-     * The parameter only exists at runtime and is never read from a configuration bean, e.g. an OpenSearch cluster
-     * setting.
+     * The parameter only exists at runtime and is never read from a configuration bean, e.g. an OpenSearch setting.
+     * Its value is handed over when the process starts or, if it doesn't require a restart, applied to the running
+     * process.
      */
     RUNTIME;
 

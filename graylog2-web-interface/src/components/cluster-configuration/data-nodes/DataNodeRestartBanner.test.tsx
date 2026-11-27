@@ -28,6 +28,7 @@ describe('<DataNodeRestartBanner />', () => {
   it('shows the progress while Data Nodes restart', () => {
     asMock(useDataNodeRestartProgress).mockReturnValue({
       isRestarting: true,
+      isPaused: false,
       progress: 'Restarting the Data Nodes one after another: 1 of 3 done, now restarting datanode-2.',
       markRestartRequested: jest.fn(),
     });
@@ -42,6 +43,7 @@ describe('<DataNodeRestartBanner />', () => {
   it('shows nothing while no Data Node restarts', () => {
     asMock(useDataNodeRestartProgress).mockReturnValue({
       isRestarting: false,
+      isPaused: false,
       progress: undefined,
       markRestartRequested: jest.fn(),
     });

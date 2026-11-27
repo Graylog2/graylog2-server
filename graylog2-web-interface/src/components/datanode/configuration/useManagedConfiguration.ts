@@ -25,6 +25,10 @@ const ROLLING_RESTART_QUERY_KEY = ['opensearch-upgrade', 'rolling-restart'];
 const PENDING_RESTART_REFETCH_INTERVAL = 10000;
 // While Data Nodes restart, refetch more often so the page unlocks soon after they are back.
 const RESTARTING_REFETCH_INTERVAL = 5000;
+// While Data Nodes fail to apply settings, refetch so the error disappears once they succeed.
+const LIVE_SETTINGS_ERROR_REFETCH_INTERVAL = 10000;
+// Data Nodes apply settings which need no restart after saving, so check for errors shortly afterwards.
+const LIVE_SETTINGS_CHECK_DELAY = 3000;
 
 type ManagedConfigurationResult = {
   data: ManagedConfiguration | undefined;
@@ -39,7 +43,7 @@ type UpdateManagedConfigurationResult = {
 };
 
 type RestartDataNodesResult = {
-  restartDataNodes: () => Promise<unknown>;
+  restartDataNodes: (force?: boolean) => Promise<unknown>;
 };
 
 const useManagedConfiguration = (nodeId: string | null = null, enabled = true): ManagedConfigurationResult => {
@@ -49,8 +53,11 @@ const useManagedConfiguration = (nodeId: string | null = null, enabled = true): 
     enabled,
     refetchInterval: (query) => {
       if (query.state.data?.restarting_nodes?.length) return RESTARTING_REFETCH_INTERVAL;
+      if (query.state.data?.restart_required) return PENDING_RESTART_REFETCH_INTERVAL;
 
-      return query.state.data?.restart_required ? PENDING_RESTART_REFETCH_INTERVAL : false;
+      return Object.keys(query.state.data?.live_settings_errors ?? {}).length
+        ? LIVE_SETTINGS_ERROR_REFETCH_INTERVAL
+        : false;
     },
   });
 
@@ -64,6 +71,9 @@ export const useUpdateManagedConfiguration = (nodeId: string | null = null): Upd
     onSuccess: async (data) => {
       await queryClient.cancelQueries({ queryKey: getQueryKey(nodeId), exact: true });
       queryClient.setQueryData(getQueryKey(nodeId), data);
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: getQueryKey(nodeId), exact: true });
+      }, LIVE_SETTINGS_CHECK_DELAY);
     },
   });
 
@@ -73,7 +83,7 @@ export const useUpdateManagedConfiguration = (nodeId: string | null = null): Upd
 export const useRestartDataNodes = (nodeId: string | null = null): RestartDataNodesResult => {
   const queryClient = useQueryClient();
   const { mutateAsync } = useMutation({
-    mutationFn: () => managedConfigurationApi.restart(nodeId),
+    mutationFn: (force: boolean = false) => managedConfigurationApi.restart(nodeId, force),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: getQueryKey(nodeId), exact: true });
 

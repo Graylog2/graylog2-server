@@ -60,12 +60,16 @@ const IN_FLIGHT_NODE_STATUSES: Array<RollingRestartNodeStatus> = ['RESTARTING', 
 const nodeName = (node: RollingRestartNode, versionNode: OpenSearchVersionNode | undefined) =>
   versionNode?.datanode?.node_name ?? versionNode?.datanode?.hostname ?? node.hostname;
 
-const opensearchVersion = (node: RollingRestartNode, versionNode: OpenSearchVersionNode | undefined) => {
+const opensearchVersion = (
+  node: RollingRestartNode,
+  versionNode: OpenSearchVersionNode | undefined,
+  restartOnly: boolean,
+) => {
   if (!versionNode) {
     return 'Unknown';
   }
 
-  return node.status === 'COMPLETED'
+  return node.status === 'COMPLETED' && !restartOnly
     ? (versionNode.available_version ?? versionNode.current_version)
     : versionNode.current_version;
 };
@@ -107,15 +111,25 @@ const NodeIdentityCell = ({
 const OpenSearchVersionCell = ({
   node,
   versionNode = undefined,
+  restartOnly,
 }: {
   node: RollingRestartNode;
   versionNode?: OpenSearchVersionNode;
-}) => <td>{opensearchVersion(node, versionNode)}</td>;
+  restartOnly: boolean;
+}) => <td>{opensearchVersion(node, versionNode, restartOnly)}</td>;
 
-const NodeStatusCell = ({ node, showProgress }: { node: RollingRestartNode; showProgress: boolean }) => (
+const NodeStatusCell = ({
+  node,
+  showProgress,
+  restartOnly,
+}: {
+  node: RollingRestartNode;
+  showProgress: boolean;
+  restartOnly: boolean;
+}) => (
   <td align="right">
     <Label bsStyle={NODE_STATUS_STYLE[node.status]}>
-      {NODE_STATUS_LABELS[node.status]}
+      {restartOnly && node.status === 'COMPLETED' ? 'Restarted' : NODE_STATUS_LABELS[node.status]}
       &nbsp;
       {node.status === 'COMPLETED' && <Icon name="check" />}
       {showProgress && IN_FLIGHT_NODE_STATUSES.includes(node.status) && (
@@ -130,11 +144,13 @@ const OpenSearchRollingUpgradeNodeTable = ({
   nodes,
   currentNodeIndex,
   showProgress,
+  restartOnly = false,
 }: {
   emptyMessage: string;
   nodes: Array<RollingUpgradeNodeWithContext>;
   currentNodeIndex: number;
   showProgress: boolean;
+  restartOnly?: boolean;
 }) => (
   <Table>
     <thead>
@@ -148,8 +164,8 @@ const OpenSearchRollingUpgradeNodeTable = ({
       {nodes.map(({ node, index, versionNode }) => (
         <tr key={node.datanode_id}>
           <NodeIdentityCell node={node} versionNode={versionNode} isCurrent={index === currentNodeIndex} />
-          <OpenSearchVersionCell node={node} versionNode={versionNode} />
-          <NodeStatusCell node={node} showProgress={showProgress} />
+          <OpenSearchVersionCell node={node} versionNode={versionNode} restartOnly={restartOnly} />
+          <NodeStatusCell node={node} showProgress={showProgress} restartOnly={restartOnly} />
         </tr>
       ))}
       {!nodes.length && (

@@ -22,4 +22,5 @@ public interface OpensearchNodeRole {
     String INGEST = "ingest";
     String REMOTE_CLUSTER_CLIENT = "remote_cluster_client";
     // searchable snapshots role SEARCH(2.x) or WARM(3.x) is obtainable via OpensearchDistribution, from distribution.properties file
+    String WARM = "warm";
 }

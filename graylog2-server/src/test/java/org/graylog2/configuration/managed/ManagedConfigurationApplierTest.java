@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
@@ -53,6 +54,7 @@ class ManagedConfigurationApplierTest {
     private static final String MANAGED_NUMBER = "managed_number";
     private static final String UNREGISTERED = "unregistered_parameter";
     private static final String RUNTIME = "a.runtime.setting";
+    private static final String LIVE = "a.live.setting";
     /**
      * A value of {@link #MANAGED_NUMBER} which converts and passes the parameter validators, but is refused by a
      * validator method of the bean, like a check across several parameters would.
@@ -108,7 +110,10 @@ class ManagedConfigurationApplierTest {
                 ConfigurationParameter.builder(NodeType.SERVER, MANAGED_NUMBER, "Managed number")
                         .type(ParameterType.INTEGER).build(),
                 ConfigurationParameter.builder(NodeType.SERVER, RUNTIME, "Runtime")
-                        .backing(ParameterBacking.RUNTIME).build()));
+                        .backing(ParameterBacking.RUNTIME).build(),
+                ConfigurationParameter.builder(NodeType.SERVER, LIVE, "Live")
+                        .backing(ParameterBacking.RUNTIME).requiresRestart(false).scope(ParameterScope.CLUSTER)
+                        .build()));
 
         when(configurationService.nodeType()).thenReturn(NodeType.SERVER);
         when(configurationService.storedValues(NODE_ID)).thenAnswer(invocation -> Map.copyOf(storedValues));
@@ -239,12 +244,25 @@ class ManagedConfigurationApplierTest {
     }
 
     @Test
-    void handsOverOnlyRuntimeParameters() {
+    void handsOverOnlyRuntimeParametersWhichNeedARestartOnProcessStart() {
         storedValues.put(MANAGED, "from the database");
         storedValues.put(RUNTIME, "85%");
+        storedValues.put(LIVE, "1000");
         storedValues.put("not.registered", "anything");
 
-        assertThat(applier().runtimeValues()).containsExactly(Map.entry(RUNTIME, "85%"));
+        assertThat(applier().processStartValues()).containsExactly(Map.entry(RUNTIME, "85%"));
+    }
+
+    @Test
+    void separatesTheParametersWhichAreAppliedLive() {
+        final var applier = applier();
+        assertThat(applier.liveParameters()).containsExactly(LIVE);
+        assertThat(applier.liveValues()).isEmpty();
+
+        storedValues.put(RUNTIME, "85%");
+        storedValues.put(LIVE, "1000");
+
+        assertThat(applier.liveValues()).containsExactly(Map.entry(LIVE, "1000"));
     }
 
     @Test
@@ -268,13 +286,17 @@ class ManagedConfigurationApplierTest {
         storedValues.put(MANAGED, "from the database");
         storedValues.put(MANAGED_NUMBER, "12");
         storedValues.put(RUNTIME, "85%");
+        storedValues.put(LIVE, "1000");
 
-        final var applier = applier(" " + MANAGED + " ", RUNTIME);
+        final var applier = applier(" " + MANAGED + " ", RUNTIME, LIVE);
         applier.refresh();
 
         assertThat(configuration.managed).isEqualTo("from the file");
         assertThat(configuration.managedNumber).isEqualTo(12);
-        assertThat(applier.runtimeValues()).isEmpty();
+        assertThat(applier.processStartValues()).isEmpty();
+        // Live parameters hold for the whole cluster, so ignoring them on a single node can't work and isn't done
+        assertThat(applier.liveParameters()).containsExactly(LIVE);
+        assertThat(applier.liveValues()).containsExactly(Map.entry(LIVE, "1000"));
     }
 
     @Test
@@ -282,14 +304,38 @@ class ManagedConfigurationApplierTest {
         final var applier = applier(ManagedConfigurationApplier.IGNORE_ALL);
         storedValues.put(MANAGED, "from the database");
         storedValues.put(RUNTIME, "85%");
+        storedValues.put(LIVE, "1000");
 
         applier.refresh();
         eventBus.post(new ManagedConfigurationChangedEvent(NodeType.SERVER, NODE_ID, Set.of(MANAGED)));
         applier.prepareProcessStart();
 
         assertThat(configuration.managed).isEqualTo("from the file");
-        assertThat(applier.runtimeValues()).isEmpty();
+        assertThat(applier.processStartValues()).isEmpty();
+        // Live parameters hold for the whole cluster, the other nodes would write them anyway
+        assertThat(applier.liveValues()).containsExactly(Map.entry(LIVE, "1000"));
         // A restart still has to be visible to whoever waits for it
         verify(configurationService).markConfigurationLoaded(NODE_ID);
+    }
+
+    @Test
+    void adoptsOnlyValuesOfLiveParameters() {
+        final var applier = applier();
+        when(configurationService.adoptClusterValue(eq(LIVE), eq("3000"), anyString())).thenReturn(true);
+
+        assertThat(applier.adoptLiveValue(LIVE, "3000")).isTrue();
+        assertThat(applier.adoptLiveValue(RUNTIME, "85%")).isFalse();
+        verify(configurationService, never()).adoptClusterValue(eq(RUNTIME), anyString(), anyString());
+    }
+
+    @Test
+    void recordsTheOutcomeOfApplyingLiveSettings() {
+        final var applier = applier();
+
+        applier.recordLiveSettingsResult("refused");
+        applier.recordLiveSettingsResult(null);
+
+        verify(configurationService).recordLiveSettingsResult(NODE_ID, "refused");
+        verify(configurationService).recordLiveSettingsResult(NODE_ID, null);
     }
 }

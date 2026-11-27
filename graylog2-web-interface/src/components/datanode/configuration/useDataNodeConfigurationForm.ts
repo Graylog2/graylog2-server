@@ -29,10 +29,14 @@ import {
   buildConfigurationValuesPatch,
   validateConfigurationValues,
 } from './configurationFields';
-import { useRestartDataNodes, useUpdateManagedConfiguration } from './useManagedConfiguration';
-import useDataNodeRestartProgress from './useDataNodeRestartProgress';
-
-import { rollingRestartStartError } from '../opensearch-upgrade/hooks/useOpenSearchRollingRestart';
+import useManagedConfiguration, { useUpdateManagedConfiguration } from './useManagedConfiguration';
+import useConfigurationRestart from './useConfigurationRestart';
+import {
+  hasChangedLiveParameter,
+  hasPendingSharedRestart,
+  needsRestartAfterSave,
+  restartTargetOf,
+} from './configurationRestart';
 
 type Options = {
   categories: Array<ConfigurationCategory>;
@@ -42,8 +46,9 @@ type Options = {
 
 const useDataNodeConfigurationForm = ({ categories, nodeId, basePath }: Options) => {
   const { updateConfiguration } = useUpdateManagedConfiguration(nodeId);
-  const { restartDataNodes } = useRestartDataNodes(nodeId);
-  const { isRestarting, progress: restartProgress, markRestartRequested } = useDataNodeRestartProgress(nodeId);
+  const { data: configuration } = useManagedConfiguration(nodeId);
+  const { canRestart, isRestarting, isRestartPaused, restartProgress, restart, forceRestart } =
+    useConfigurationRestart(nodeId);
   const { push } = useHistory();
   const { pathname, hash, key: locationKey } = useLocation();
   const lastFocusedSubmit = useRef(0);
@@ -58,7 +63,7 @@ const useDataNodeConfigurationForm = ({ categories, nodeId, basePath }: Options)
     onSubmit: async (draftValues, { resetForm }) => {
       const saveOnly = saveOnlyRequested.current;
       const changes = buildConfigurationValuesPatch(formik.initialValues, draftValues, parameters);
-      const restartTarget = nodeId === null ? 'the Data Nodes' : 'this Data Node';
+      const restartTarget = restartTargetOf(nodeId);
 
       let saved;
       try {
@@ -75,17 +80,22 @@ const useDataNodeConfigurationForm = ({ categories, nodeId, basePath }: Options)
         return;
       }
 
-      // Restart for what was just changed, and for values saved earlier which the Data Nodes don't run with yet.
-      const changedRestartParameter = parameters.some(
-        ({ name, requires_restart }) => requires_restart && Object.hasOwn(changes, name),
-      );
-      const needsRestart =
-        changedRestartParameter ||
-        saved.restart_required ||
-        saved.parameters.some(({ pending_restart }) => pending_restart);
+      const needsRestart = needsRestartAfterSave(parameters, changes, saved, nodeId);
 
-      if (saveOnly || !needsRestart) {
-        UserNotification.success('Configuration saved.');
+      if (!needsRestart) {
+        UserNotification.success(
+          hasChangedLiveParameter(parameters, changes)
+            ? 'Configuration saved. These changes do not need a Data Node restart.'
+            : 'Configuration saved.',
+        );
+
+        return;
+      }
+
+      if (saveOnly || !canRestart) {
+        UserNotification.success(
+          `Configuration saved. Some changes take effect once ${restartTarget} ${nodeId === null ? 'are' : 'is'} restarted.`,
+        );
 
         return;
       }
@@ -99,16 +109,7 @@ const useDataNodeConfigurationForm = ({ categories, nodeId, basePath }: Options)
         return;
       }
 
-      try {
-        await restartDataNodes();
-        markRestartRequested();
-        UserNotification.success(`Configuration saved. Restarting ${restartTarget}.`);
-      } catch (error) {
-        UserNotification.error(
-          rollingRestartStartError(error).message,
-          `Configuration saved, but ${restartTarget} could not be restarted`,
-        );
-      }
+      await restart();
     },
   });
   const { values, errors, isSubmitting, isValidating, resetForm, submitCount } = formik;
@@ -120,6 +121,8 @@ const useDataNodeConfigurationForm = ({ categories, nodeId, basePath }: Options)
       (requires_restart && Object.hasOwn(changedValues, name)) || pending_restart,
   );
   const hasUnsavedRestartChanges = restartParameters.some(({ name }) => Object.hasOwn(changedValues, name));
+  const pendingSharedRestart = restartParameters.length === 0 && hasPendingSharedRestart(configuration, nodeId);
+  const isRestartPending = restartParameters.length > 0 || pendingSharedRestart;
 
   const saveChangesWithoutRestart = async () => {
     saveOnlyRequested.current = true;
@@ -165,9 +168,14 @@ const useDataNodeConfigurationForm = ({ categories, nodeId, basePath }: Options)
     hasUnsavedChanges,
     restartParameters,
     hasUnsavedRestartChanges,
+    pendingSharedRestart,
+    isRestartPending,
     saveChangesWithoutRestart,
+    canRestart,
     isRestarting,
+    isRestartPaused,
     restartProgress,
+    forceRestart,
   };
 };
 

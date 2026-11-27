@@ -309,6 +309,50 @@ describe('DataNodeConfigurationPage', () => {
       expect(client.restartAll).not.toHaveBeenCalled();
     });
 
+    it('tells that a paused rolling restart has to be resumed', async () => {
+      mockManagedConfigurationApi([
+        {
+          ...sampleClusterConfiguration,
+          parameters: sampleClusterConfiguration.parameters.map((parameter) =>
+            parameter.name === shardLimitName ? { ...parameter, pending_restart: true } : parameter,
+          ),
+        },
+      ]);
+      asMock(DataNodeRollingRestart.current).mockResolvedValue({
+        job_definition_type: 'rolling-restart-v1',
+        job_definition_id: 'rolling-restart',
+        status: 'running',
+        created_at: '2026-11-17T10:00:00.000Z',
+        updated_at: '2026-11-17T10:00:00.000Z',
+        next_time: null,
+        data: {
+          type: 'rolling-restart-v1',
+          sm_state: 'PAUSED_WAITING_GREEN',
+          current_node_index: 0,
+          abort_requested: false,
+          triggered_by: 'admin',
+          waiting_green_since: '2026-11-17T10:00:00.000Z',
+          paused_reason: 'Cluster did not return to GREEN within PT30M.',
+          nodes: [
+            { hostname: 'datanode-1', datanode_id: 'node-1', status: 'COMPLETED', attempts: 1 },
+            { hostname: 'datanode-2', datanode_id: 'node-2', status: 'PENDING', attempts: 0 },
+            { hostname: 'datanode-3', datanode_id: 'node-3', status: 'PENDING', attempts: 0 },
+          ],
+        },
+      });
+      renderPage();
+
+      expect(await screen.findByRole('status')).toHaveTextContent(
+        'The rolling restart is paused after 1 of 3 Data Nodes, because the cluster did not return to green health in time.',
+      );
+      expect(screen.getByText('Data Node restart paused')).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'resume the restart' })).toHaveAttribute(
+        'href',
+        '/system/cluster/datanode-upgrade',
+      );
+      expect(screen.queryByRole('button', { name: 'Restart Data Nodes' })).not.toBeInTheDocument();
+    });
+
     it('shows why the rolling restart could not start', async () => {
       const client = mockManagedConfigurationApi([
         {
@@ -332,6 +376,76 @@ describe('DataNodeConfigurationPage', () => {
           'Configuration saved, but the Data Nodes could not be restarted',
         ),
       );
+    });
+
+    it('restarts the Data Nodes anyway once failed checks which can be overridden are confirmed', async () => {
+      const client = mockManagedConfigurationApi([
+        {
+          ...sampleClusterConfiguration,
+          parameters: sampleClusterConfiguration.parameters.map((parameter) =>
+            parameter.name === shardLimitName ? { ...parameter, pending_restart: true } : parameter,
+          ),
+        },
+      ]);
+      client.restartAll.mockRejectedValueOnce(
+        new FetchError('Bad Request', 400, {
+          failed_checks: ['Cluster status is YELLOW (pass force=true to override)'],
+        }),
+      );
+      const notify = jest.spyOn(UserNotification, 'success');
+      renderPage();
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Restart Data Nodes' }));
+
+      const dialog = await screen.findByRole('dialog', { name: 'Restart the Data Nodes anyway?' });
+      expect(dialog).toHaveTextContent('Cluster status is YELLOW');
+      await userEvent.click(screen.getByRole('button', { name: 'Restart Data Nodes anyway' }));
+
+      await waitFor(() => expect(client.restartAll).toHaveBeenLastCalledWith({ force: true, restart_only: true }));
+      expect(notify).toHaveBeenCalledWith('Configuration saved. Restarting the Data Nodes.');
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    });
+  });
+
+  describe('Applying without restart', () => {
+    it('marks the settings which apply without a restart and who saved them', async () => {
+      renderPage();
+
+      const shardLimit = await screen.findByLabelText('Shard limit per Data Node');
+
+      expect(shardLimit).toHaveAccessibleDescription(/Set by backend-admin .* Applies without restart$/);
+    });
+
+    it('applies settings without restarting the Data Nodes', async () => {
+      const client = mockManagedConfigurationApi([sampleClusterConfiguration]);
+      const notify = jest.spyOn(UserNotification, 'success');
+      renderPage();
+
+      await changeConfigurationField('Shard limit per Data Node', '1200');
+      expect(getApplyButton()).toHaveAccessibleName('Apply changes');
+      expect(screen.queryByText('Restart required after saving')).not.toBeInTheDocument();
+      await userEvent.click(getApplyButton());
+
+      await waitFor(() =>
+        expect(notify).toHaveBeenCalledWith(
+          'Configuration saved. These changes do not need a Data Node restart.',
+        ),
+      );
+      expect(client.restartAll).not.toHaveBeenCalled();
+    });
+
+    it('does not restart all Data Nodes for values saved for a single Data Node', async () => {
+      const client = mockManagedConfigurationApi([
+        { ...sampleClusterConfiguration, restart_required: true, pending_nodes: ['node-1'] },
+      ]);
+      renderPage();
+
+      await changeConfigurationField('Shard limit per Data Node', '1200');
+      expect(getApplyButton()).toHaveAccessibleName('Apply changes');
+      await userEvent.click(getApplyButton());
+
+      await waitFor(() => expect(client.update).toHaveBeenCalled());
+      expect(client.restartAll).not.toHaveBeenCalled();
     });
   });
 
@@ -972,6 +1086,46 @@ describe('DataNodeConfigurationPage', () => {
       expect(await screen.findByRole('button', { name: /^Reset value/ })).toBeDisabled();
       expect(screen.getByLabelText('Shard limit per Data Node')).not.toBeDisabled();
     });
+
+    it('saves without offering a restart to users who may not restart Data Nodes', async () => {
+      const client = mockManagedConfigurationApi([
+        {
+          ...sampleClusterConfiguration,
+          parameters: sampleClusterConfiguration.parameters.map((parameter) =>
+            parameter.name === shardLimitName ? { ...parameter, pending_restart: true } : parameter,
+          ),
+        },
+      ]);
+      asMock(useCurrentUser).mockReturnValue(
+        defaultUser
+          .toBuilder()
+          .permissions([
+            'clusterconfigentry:read',
+            'clusterconfigentry:create',
+            'clusterconfigentry:edit',
+            'datanode:read',
+          ])
+          .build(),
+      );
+      const notify = jest.spyOn(UserNotification, 'success');
+      renderPage();
+
+      expect(await screen.findByText(/You are not allowed to restart Data Nodes/)).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Restart Data Nodes' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Save changes' })).not.toBeInTheDocument();
+      expect(getApplyButton()).toBeDisabled();
+
+      await changeConfigurationField('Stop allocating shards at', '80', '% disk used');
+      expect(getApplyButton()).toHaveAccessibleName('Apply changes');
+      await userEvent.click(getApplyButton());
+
+      await waitFor(() =>
+        expect(notify).toHaveBeenCalledWith(
+          'Configuration saved. Some changes take effect once the Data Nodes are restarted.',
+        ),
+      );
+      expect(client.restartAll).not.toHaveBeenCalled();
+    });
   });
 
   describe('Loading', () => {
@@ -1013,7 +1167,9 @@ describe('DataNodeConfigurationPage', () => {
         node_id: null,
         values: { [shardLimitName]: '1200' },
       });
-      expect(notify).toHaveBeenCalledWith('Configuration saved.');
+      expect(notify).toHaveBeenCalledWith(
+        'Configuration saved. These changes do not need a Data Node restart.',
+      );
     });
 
     it('retries a failed initial load using the keyboard without falling back to samples', async () => {

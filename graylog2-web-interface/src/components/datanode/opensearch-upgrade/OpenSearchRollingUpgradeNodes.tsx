@@ -23,7 +23,7 @@ import { Icon } from 'components/common';
 import type { OpenSearchVersionNode } from './hooks/useOpenSearchClusterStats';
 import OpenSearchRollingUpgradeNodeTable from './OpenSearchRollingUpgradeNodeTable';
 import type { RollingRestartJob, RollingRestartState } from './rollingRestartTypes';
-import { isRollingRestartPaused, isRollingRestartTerminalState } from './rollingRestartTypes';
+import { isRestartOnly, isRollingRestartPaused, isRollingRestartTerminalState } from './rollingRestartTypes';
 
 type Props = {
   job: RollingRestartJob | null | undefined;
@@ -64,6 +64,22 @@ const STATE_LABELS: Record<RollingRestartState, string> = {
   FAILED: 'Failed',
 };
 
+const UPGRADE_TEXTS = {
+  heading: 'OpenSearch rolling upgrade',
+  abortRequested: 'Abort requested. The upgrade will stop after the current step.',
+  remainingHeading: 'Waiting for OpenSearch upgrade',
+  completedHeading: 'Upgraded to target OpenSearch',
+  noCompletedNodes: 'No upgraded nodes yet.',
+};
+
+const RESTART_TEXTS: typeof UPGRADE_TEXTS = {
+  heading: 'Data Node rolling restart',
+  abortRequested: 'Abort requested. The restart will stop after the current step.',
+  remainingHeading: 'Waiting for restart',
+  completedHeading: 'Restarted',
+  noCompletedNodes: 'No restarted nodes yet.',
+};
+
 const STATE_STYLE: Record<RollingRestartState, 'default' | 'info' | 'success' | 'warning' | 'danger'> = {
   PREPARING_CLUSTER: 'info',
   SELECTING_NEXT_NODE: 'info',
@@ -97,13 +113,18 @@ const OpenSearchRollingUpgradeNodes = ({ job, versionNodes }: Props) => {
   const currentNodeIndex = isTerminal ? -1 : data.current_node_index;
   // Fallbacks cover backend states the UI doesn't know yet.
   const stateStyle = STATE_STYLE[data.sm_state] ?? 'info';
-  const stateLabel = STATE_LABELS[data.sm_state] ?? 'In progress';
+  const restartOnly = isRestartOnly(data);
+  const texts = restartOnly ? RESTART_TEXTS : UPGRADE_TEXTS;
+  const stateLabel =
+    restartOnly && data.sm_state === 'UPGRADING_NODE'
+      ? 'Restarting node'
+      : (STATE_LABELS[data.sm_state] ?? 'In progress');
   const showProgress = !isTerminal && !isRollingRestartPaused(data.sm_state);
 
   return (
     <>
       <SectionHeading>
-        OpenSearch rolling upgrade&nbsp;
+        {texts.heading}&nbsp;
         <Label bsStyle={stateStyle}>
           {stateLabel}
           {showProgress && <ProgressSpinner name="progress_activity" spin data-testid="rolling-upgrade-progress" />}
@@ -111,26 +132,26 @@ const OpenSearchRollingUpgradeNodes = ({ job, versionNodes }: Props) => {
       </SectionHeading>
       {data.paused_reason && <Alert bsStyle="warning">{data.paused_reason}</Alert>}
       {data.last_error && <Alert bsStyle="danger">{data.last_error}</Alert>}
-      {data.abort_requested && (
-        <Alert bsStyle="warning">Abort requested. The upgrade will stop after the current step.</Alert>
-      )}
+      {data.abort_requested && <Alert bsStyle="warning">{texts.abortRequested}</Alert>}
       <Row>
         <Col sm={6}>
-          <NodesHeading>Waiting for OpenSearch upgrade</NodesHeading>
+          <NodesHeading>{texts.remainingHeading}</NodesHeading>
           <OpenSearchRollingUpgradeNodeTable
             nodes={remainingNodes}
             currentNodeIndex={currentNodeIndex}
             emptyMessage="No remaining nodes."
             showProgress={showProgress}
+            restartOnly={restartOnly}
           />
         </Col>
         <Col sm={6}>
-          <NodesHeading>Upgraded to target OpenSearch</NodesHeading>
+          <NodesHeading>{texts.completedHeading}</NodesHeading>
           <OpenSearchRollingUpgradeNodeTable
             nodes={completedNodes}
             currentNodeIndex={currentNodeIndex}
-            emptyMessage="No upgraded nodes yet."
+            emptyMessage={texts.noCompletedNodes}
             showProgress={showProgress}
+            restartOnly={restartOnly}
           />
         </Col>
       </Row>
