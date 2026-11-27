@@ -1,5 +1,5 @@
 type = "c"
-message = "Derive the Data Node keystore encryption key from `password_secret` instead of using the secret directly."
+message = "Derive the Data Node keystore encryption key from `password_secret` instead of using the secret directly. Data Node keystore will be reencrypted and can't be later downgraded to any older version."
 
 details.user = """
 Data Node keystores are now encrypted with a key derived from `password_secret` using HKDF, instead of reusing the secret itself.
