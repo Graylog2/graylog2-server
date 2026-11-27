@@ -20,6 +20,7 @@ import pick from 'lodash/pick';
 import { useQueryClient } from '@tanstack/react-query';
 
 import UsersDomain from 'domainActions/users/UsersDomain';
+import { saveUserPreferences, type PreferencesUpdateMap } from 'api/preferences';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { Col, Row, SegmentedControl, Alert } from 'components/bootstrap';
 import { Spinner, IfPermitted } from 'components/common';
@@ -72,6 +73,16 @@ const UserEdit = ({ user }: Props) => {
       .finally(() => setIsUpdating(false));
   };
 
+  // Reload the edited user after saving, otherwise the preferences section shows the old values after switching
+  // sections. The save only finishes once the reloaded user is fetched.
+  const updatePreferences = (data: PreferencesUpdateMap) => {
+    setIsUpdating(true);
+
+    return saveUserPreferences(user.username, data)
+      .then(() => queryClient.invalidateQueries({ queryKey: [...USERS_QUERY_KEY, user.id] }))
+      .finally(() => setIsUpdating(false));
+  };
+
   if (!user) {
     return <Spinner />;
   }
@@ -111,7 +122,7 @@ const UserEdit = ({ user }: Props) => {
           {selectedSegment === 'settings_preferences' && (
             <>
               <SettingsSection user={user} onSubmit={(data) => updateUser(data)} />
-              <PreferencesSection user={user} />
+              <PreferencesSection user={user} onSubmit={updatePreferences} />
               {currentUser.id === user.id && <TelemetrySettingsConfig />}
             </>
           )}

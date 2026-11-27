@@ -21,6 +21,7 @@ import userEvent from '@testing-library/user-event';
 
 import { adminUser } from 'fixtures/users';
 import UsersDomain from 'domainActions/users/UsersDomain';
+import { saveUserPreferences } from 'api/preferences';
 import { asMock } from 'helpers/mocking';
 import type User from 'logic/users/User';
 
@@ -47,19 +48,37 @@ const MockSection = ({ name, data, user, onSubmit }: SectionProps & { name: stri
   );
 };
 
+const MockPreferencesSection = ({ user, onSubmit }: SectionProps) => {
+  const [initialUser] = useState(user);
+  const [saved, setSaved] = useState(false);
+
+  return (
+    <div>
+      <span>Preferences update unfocussed: {String(initialUser.preferences.updateUnfocussed)}</span>
+      {saved && <span>Preferences saved</span>}
+      <button type="button" onClick={() => onSubmit({ updateUnfocussed: true }).then(() => setSaved(true))}>
+        Update Preferences
+      </button>
+    </div>
+  );
+};
+
 jest.mock('components/users/UserEdit/ProfileSection', () => (props: SectionProps) => (
   <MockSection name="Profile" data={{ last_name: 'Updated' }} {...props} />
 ));
 jest.mock('components/users/UserEdit/SettingsSection', () => (props: SectionProps) => (
   <MockSection name="Settings" data={{ timezone: 'America/Vancouver' }} {...props} />
 ));
-jest.mock('components/users/UserEdit/PreferencesSection', () => () => <div>PreferencesSection</div>);
+jest.mock('components/users/UserEdit/PreferencesSection', () => (props: SectionProps) => (
+  <MockPreferencesSection {...props} />
+));
 jest.mock('components/users/UserEdit/PasswordSection', () => () => <div>PasswordSection</div>);
 jest.mock('components/users/UserEdit/RolesSection', () => () => <div>RolesSection</div>);
 jest.mock('components/users/UserEdit/TeamsSection', () => () => <div>TeamsSection</div>);
 jest.mock('components/users/navigation/UsersPageNavigation', () => () => <div>UsersPageNavigation</div>);
 jest.mock('components/users/navigation/UserActionLinks', () => () => <div>UserActionLinks</div>);
 jest.mock('domainActions/users/UsersDomain');
+jest.mock('api/preferences', () => ({ saveUserPreferences: jest.fn() }));
 jest.mock('logic/users/CurrentUser');
 jest.mock('routing/withParams', () => (x) => x);
 
@@ -69,6 +88,7 @@ const user = adminUser
   .external(false)
   .lastName('Original')
   .timezone('Europe/Berlin')
+  .preferences({ enableSmartSearch: true, updateUnfocussed: false, themeMode: 'dark' })
   .build();
 const updatedUser = user.toBuilder().lastName('Updated').timezone('America/Vancouver').build();
 
@@ -111,6 +131,29 @@ describe('UserEditPage', () => {
     await selectTab(/Profile/i);
 
     await screen.findByText('Profile last name: Updated');
+  });
+
+  it('shows saved preferences after switching sections', async () => {
+    const userWithUpdatedPreferences = user
+      .toBuilder()
+      .preferences({ ...user.preferences, updateUnfocussed: true })
+      .build();
+    asMock(UsersDomain.load).mockResolvedValueOnce(user).mockResolvedValue(userWithUpdatedPreferences);
+    asMock(saveUserPreferences).mockResolvedValue(undefined);
+
+    render(<SimpleUserEditPage />);
+
+    await selectTab(/Preferences/i);
+    await screen.findByText('Preferences update unfocussed: false');
+    await userEvent.click(screen.getByRole('button', { name: 'Update Preferences' }));
+    await screen.findByText('Preferences saved');
+
+    expect(saveUserPreferences).toHaveBeenCalledWith(user.username, { updateUnfocussed: true });
+
+    await selectTab(/Profile/i);
+    await selectTab(/Preferences/i);
+
+    await screen.findByText('Preferences update unfocussed: true');
   });
 
   it('sends the saved timezone with following updates of other sections', async () => {
