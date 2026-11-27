@@ -25,19 +25,24 @@ import DefaultProviders from 'DefaultProviders';
 
 import PreflightWrappingContainer from '../PreflightWrappingContainer';
 import WrappingContainer from '../WrappingContainer';
-import { dataRouterFuture, routerProviderFuture } from '../reactRouterFutureFlags';
+import { routerTestProps } from '../routerTestProps';
 
-export const renderWithWrapper = (Component: React.ReactElement<any>, options?: RenderOptions) =>
+export const renderWithWrapper = (
+  Component: React.ReactElement<any>,
+  { initialEntries, ...options }: RenderOptions & { initialEntries?: Array<string> } = {},
+) =>
   render(Component, {
-    wrapper: WrappingContainer,
+    wrapper: ({ children }: React.PropsWithChildren) => (
+      <WrappingContainer initialEntries={initialEntries}>{children}</WrappingContainer>
+    ),
     ...options,
   });
 
 export const renderWithDataRouter = (element: React.ReactElement<any>, options?: RenderOptions) =>
   render(
     <RouterProvider
-      router={createMemoryRouter([{ path: '/', element }], { future: dataRouterFuture })}
-      future={routerProviderFuture}
+      router={createMemoryRouter([{ path: '/', element }])}
+      {...routerTestProps}
     />,
     {
       wrapper: DefaultProviders,

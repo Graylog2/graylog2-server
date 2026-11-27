@@ -21,10 +21,12 @@ import 'jest-styled-components';
 import type { RenderHookOptions } from '@testing-library/react';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import type { QueryClientConfig } from '@tanstack/react-query';
-import { createMemoryRouter, RouterProvider } from 'react-router-dom';
+import { createMemoryRouter, MemoryRouter, RouterProvider } from 'react-router-dom';
+
+import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 import DefaultQueryClientProvider from '../DefaultQueryClientProvider';
-import { dataRouterFuture, routerProviderFuture } from '../reactRouterFutureFlags';
+import { routerTestProps } from '../routerTestProps';
 
 const renderHookWithWrapper = <TProps, TResult>(
   callback: (props: TProps) => TResult,
@@ -44,6 +46,28 @@ const renderHookWithWrapper = <TProps, TResult>(
     },
   });
 
+const renderHookWithRouter = <TProps, TResult>(
+  callback: (props: TProps) => TResult,
+  {
+    initialEntries,
+    ...options
+  }: RenderHookOptions<TProps> & { queryClientOptions?: QueryClientConfig; initialEntries?: Array<string> } = {},
+) =>
+  renderHookWithWrapper(callback, {
+    ...options,
+    wrapper: ({ children }: React.PropsWithChildren) => {
+      const CustomWrapper = (options.wrapper as React.ElementType) ?? React.Fragment;
+
+      return (
+        <MemoryRouter initialEntries={initialEntries} {...routerTestProps}>
+          <DefaultQueryParamProvider>
+            <CustomWrapper>{children}</CustomWrapper>
+          </DefaultQueryParamProvider>
+        </MemoryRouter>
+      );
+    },
+  });
+
 const renderHookWithDataRouter = <TProps, TResult>(
   callback: (props: TProps) => TResult,
   options: RenderHookOptions<TProps> & { queryClientOptions?: QueryClientConfig } = {},
@@ -56,11 +80,11 @@ const renderHookWithDataRouter = <TProps, TResult>(
 
       return (
         <RouterProvider
-          router={createMemoryRouter([{ path: '/', element: <Wrapper /> }], { future: dataRouterFuture })}
-          future={routerProviderFuture}
+          router={createMemoryRouter([{ path: '/', element: <Wrapper /> }])}
+          {...routerTestProps}
         />
       );
     },
   });
 
-export { renderHookWithWrapper as renderHook, act, waitFor, renderHookWithDataRouter };
+export { renderHookWithWrapper as renderHook, act, waitFor, renderHookWithRouter, renderHookWithDataRouter };

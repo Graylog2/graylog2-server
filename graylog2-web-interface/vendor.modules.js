@@ -32,6 +32,7 @@ module.exports = [
   'react-hotkeys-hook',
   'react-redux',
   'react-router',
+  'react-router/dom',
   'redux',
   'reflux',
   'reflux-core',

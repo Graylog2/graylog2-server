@@ -23,7 +23,6 @@ import type { RouteObject } from 'react-router-dom';
 import { createBrowserRouter, createMemoryRouter } from 'react-router-dom';
 import { defaultUser } from 'defaultMockValues';
 import type { PluginExports, Permission } from 'graylog-web-plugin/plugin';
-import { dataRouterFuture } from 'reactRouterFutureFlags';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 import type User from 'logic/users/User';
@@ -73,7 +72,6 @@ const setInitialPath = (path: string) => {
   asMock(createBrowserRouter).mockImplementation((routes: RouteObject[]) =>
     createMemoryRouter(routes, {
       initialEntries: [path],
-      future: dataRouterFuture,
     }),
   );
 };
@@ -90,7 +88,7 @@ describe('AppRouter', () => {
     asMock(AppConfig.isFeatureEnabled).mockReturnValue(false);
     asMock(usePluginEntities).mockReturnValue([]);
     asMock(createBrowserRouter).mockImplementation((routes: RouteObject[]) =>
-      createMemoryRouter(routes, { future: dataRouterFuture }),
+      createMemoryRouter(routes),
     );
   });
 

@@ -2586,11 +2586,6 @@
     redux-thunk "^3.1.0"
     reselect "^5.1.0"
 
-"@remix-run/router@1.23.4":
-  version "1.23.4"
-  resolved "https://registry.npmjs.org/@remix-run/router/-/router-1.23.4.tgz#d2becd2afca4a40c30a659d913b9b0bcc28bced8"
-  integrity sha512-q7j5geK7xs3UJSdm9/iytUNclBnLmYx1EnSeCFXHPeutdqgIMeFeHtUZgS3EhlKxdBEAu8OwtJCwmLrEzpSs7Q==
-
 "@rtsao/scc@^1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@rtsao/scc/-/scc-1.1.0.tgz#927dd2fae9bc3361403ac2c7a00c32ddce9ad7e8"
@@ -3213,16 +3208,6 @@
   resolved "https://registry.npmjs.org/@types/geojson/-/geojson-7946.0.16.tgz#8ebe53d69efada7044454e3305c19017d97ced2a"
   integrity sha512-6C8nqWur3j98U6+lXDfTUWIfgvZU+EumvpHKcYjujKH7woYyLj2sUmff0tRhrqM7BohUw7Pz3ZB1jj2gW9Fvmg==
 
-"@types/history@*":
-  version "4.7.8"
-  resolved "https://registry.yarnpkg.com/@types/history/-/history-4.7.8.tgz#49348387983075705fe8f4e02fb67f7daaec4934"
-  integrity sha512-S78QIYirQcUoo6UJZx9CSP0O2ix9IaeAXwQi26Rhr/+mg7qqPy8TzaxHSUut7eGjL8WmLccT7/MXf304WjqHcA==
-
-"@types/history@^4.7.11":
-  version "4.7.11"
-  resolved "https://registry.yarnpkg.com/@types/history/-/history-4.7.11.tgz#56588b17ae8f50c53983a524fc3cc47437969d64"
-  integrity sha512-qjDJRrmvBMiTx+jyLxvLfJU7UznFuokDv4f3WRuriHKERccVpFU+8XMQUAbDzoiJCsmexxRExQeMwwCdamSKDA==
-
 "@types/hoist-non-react-statics@^3.3.1":
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/@types/hoist-non-react-statics/-/hoist-non-react-statics-3.3.1.tgz#1124aafe5118cb591977aeb1ceaaed1070eb039f"
@@ -3412,23 +3397,6 @@
   integrity sha512-AU6w1u3qEGM0NmBA69PaOgNc0KPFA/+qkH6Uu9EBTJ45/WYOUoXi9AF5O15PRM2klpHSiHAAs4WnlI+OZAFmUA==
   dependencies:
     "@types/plotly.js" "*"
-    "@types/react" "*"
-
-"@types/react-router-dom@^5.3.3":
-  version "5.3.3"
-  resolved "https://registry.yarnpkg.com/@types/react-router-dom/-/react-router-dom-5.3.3.tgz#e9d6b4a66fcdbd651a5f106c2656a30088cc1e83"
-  integrity sha512-kpqnYK4wcdm5UaWI3fLcELopqLrHgLqNsdpHauzlQktfkHL3npOSwtj1Uz9oKBAzs7lFtVkV8j83voAz2D8fhw==
-  dependencies:
-    "@types/history" "^4.7.11"
-    "@types/react" "*"
-    "@types/react-router" "*"
-
-"@types/react-router@*":
-  version "5.1.15"
-  resolved "https://registry.yarnpkg.com/@types/react-router/-/react-router-5.1.15.tgz#c1069e0da4617fd315e381b56b18b89490e14e2a"
-  integrity sha512-z3UlMG/x91SFEVmmvykk9FLTliDvfdIUky4k2rCfXWQ0NKbrP8o9BTCaCTPuYsB8gDkUnUmkcA2vYlm2DR+HAA==
-  dependencies:
-    "@types/history" "*"
     "@types/react" "*"
 
 "@types/react-slider@^1.3.1":
@@ -5490,6 +5458,11 @@ cookie@<1, cookie@^0.7.1:
   resolved "https://registry.yarnpkg.com/cookie/-/cookie-0.7.2.tgz#556369c472a2ba910f2979891b526b3436237ed7"
   integrity sha512-yki5XnKuf750l50uGTllt6kKILY4nQ1eNIQatoXEByZ5dWgnKqbnqmTrBE5B4N7lrMJKQ2ytWMiTO2o0v6Ew/w==
 
+cookie@^1.0.1:
+  version "1.1.1"
+  resolved "https://registry.npmjs.org/cookie/-/cookie-1.1.1.tgz#3bb9bdfc82369db9c2f69c93c9c3ceb310c88b3c"
+  integrity sha512-ei8Aos7ja0weRpFzJnEA9UHJ/7XQmqglbRwnf2ATjcB9Wq874VKH9kfjjirM6UhU2/E5fFYadylyhFldcqSidQ==
+
 copy-anything@^3.0.5:
   version "3.0.5"
   resolved "https://registry.npmjs.org/copy-anything/-/copy-anything-3.0.5.tgz#2d92dce8c498f790fa7ad16b01a1ae5a45b020a0"
@@ -7438,7 +7411,7 @@ escodegen@^1.11.1:
     eslint "9.39.2"
     eslint-import-resolver-webpack "0.13.11"
     eslint-plugin-compat "7.0.2"
-    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-8678e154-5f7d-48f4-b18b-c8d8231852f1-1795609013679/node_modules/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:../../../../../../code/.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-7b779288-eb61-46cd-bd52-c4e898211435-1795678263799/node_modules/eslint-plugin-graylog"
     eslint-plugin-import "2.32.0"
     eslint-plugin-jest "29.17.1"
     eslint-plugin-jest-dom "5.10.2"
@@ -8784,17 +8757,17 @@ graphemer@^1.4.0:
     "@reduxjs/toolkit" "^2.5.1"
     "@tanstack/react-query" "5.108.0"
     "@types/react" "18.3.12"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-7.3.0-SNAPSHOT-6ad793fa-f5fc-4e89-b87a-cb1718e75445-1795609013496/node_modules/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../../../code/.cache/yarn/v6/npm-graylog-web-plugin-7.3.0-SNAPSHOT-2cc4637c-f557-45cb-a230-495b6cbfc211-1795678263705/node_modules/eslint-config-graylog"
     formik "2.4.9"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-7.3.0-SNAPSHOT-6ad793fa-f5fc-4e89-b87a-cb1718e75445-1795609013496/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:../../../../../../code/.cache/yarn/v6/npm-graylog-web-plugin-7.3.0-SNAPSHOT-2cc4637c-f557-45cb-a230-495b6cbfc211-1795678263705/node_modules/jest-preset-graylog"
     moment "2.31.0"
     moment-timezone "0.6.6"
     react "18.3.1"
     react-dom "18.2.0"
     react-redux "^9.2.0"
-    react-router-dom "6.30.6"
+    react-router-dom "7.18.6"
     redux "^5.0.1"
     reflux "0.2.13"
     styled-components "6.1.1"
@@ -12996,20 +12969,20 @@ react-rnd@^10.5.3:
     react-draggable "^4.5.0"
     tslib "2.6.2"
 
-react-router-dom@6.30.6:
-  version "6.30.6"
-  resolved "https://registry.npmjs.org/react-router-dom/-/react-router-dom-6.30.6.tgz#acaf0db65efeddabd0840616243c97f578b3baf3"
-  integrity sha512-0RHKZz7wwffvkU+2MFVT2NnjK44ssLEV+m0CAJaS2Ksmorrwj7WxH00jO0SOCW26/tINUnJHToXblDs33I38YQ==
+react-router-dom@7.18.6:
+  version "7.18.6"
+  resolved "https://registry.npmjs.org/react-router-dom/-/react-router-dom-7.18.6.tgz#f924708031845e12158c5c63302dc644b3ede88e"
+  integrity sha512-a8JzFsKEY3EY9QL7t4T1b1OhuY0ngEfwMzXQNgBO/2cuIW9028JbVq3uk2rKnjLredzcIoDKLzUkguIq6fnkFA==
   dependencies:
-    "@remix-run/router" "1.23.4"
-    react-router "6.30.6"
+    react-router "7.18.6"
 
-react-router@6.30.6:
-  version "6.30.6"
-  resolved "https://registry.npmjs.org/react-router/-/react-router-6.30.6.tgz#a2ad70f3472de61c61e44182b3e5a25fd91f9f68"
-  integrity sha512-5HfK7k5im7LTOB0EqCQmfvy4C13G92Ssj1VTmouTK3AJvyjKTnFuCV0vcMAD/JS+JC4DvDIBRrlAeJIFjh5VWg==
+react-router@7.18.6:
+  version "7.18.6"
+  resolved "https://registry.npmjs.org/react-router/-/react-router-7.18.6.tgz#b769c92ec74a89e20b57b40725175d74038880a2"
+  integrity sha512-SP8KqKfRLlJzqzPseC+r6yYFsqPEavtQCC4BKV810tBGijjESLtwVPam+gPOO+wYeXrYN/TNy2CAykQVcNg4iQ==
   dependencies:
-    "@remix-run/router" "1.23.4"
+    cookie "^1.0.1"
+    set-cookie-parser "^2.6.0"
 
 react-select-event@5.5.1:
   version "5.5.1"
@@ -13785,6 +13758,11 @@ serve-static@^2.2.0:
     escape-html "^1.0.3"
     parseurl "^1.3.3"
     send "^1.2.0"
+
+set-cookie-parser@^2.6.0:
+  version "2.7.3"
+  resolved "https://registry.npmjs.org/set-cookie-parser/-/set-cookie-parser-2.7.3.tgz#ded8e573414ceb6f5752f610dc9751f4eda0295d"
+  integrity sha512-irZHtTqurLna57KQG/s+fzOwv/J6XSH4cs8M/vsrY3uCaQ3S6+QJguAH0WdN47SXlk82voMZ4naWMQf8fdEoIg==
 
 set-function-length@^1.1.1:
   version "1.1.1"
