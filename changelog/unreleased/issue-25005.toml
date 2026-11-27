@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Format aggregation series values in event messages as comma-grouped plain decimals, using scientific notation only for values at or beyond 1 billion or at or below 1e-13."
+
+issues = ["25005"]
+pulls = ["27333"]

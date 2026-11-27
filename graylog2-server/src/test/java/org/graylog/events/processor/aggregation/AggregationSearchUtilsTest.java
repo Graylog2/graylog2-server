@@ -49,6 +49,7 @@ import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -199,6 +200,106 @@ public class AggregationSearchUtilsTest {
             assertThat(event.getGroupByFields().get("group_field_one")).isEqualTo("one");
             assertThat(event.getGroupByFields().get("group_field_two")).isEqualTo("two");
         });
+    }
+
+    @Test
+    public void testEventMessageUsesScientificNotationOnlyBeyondBillionOrBelowOneEMinus13() throws EventProcessorException {
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.minusHours(1).plusMillis(SEARCH_WINDOW_MS));
+
+        final TestEvent event1 = new TestEvent(timerange.to());
+        final ArgumentCaptor<String> messageCaptor = ArgumentCaptor.forClass(String.class);
+        when(eventFactory.createEvent(any(EventDefinition.class), any(DateTime.class), messageCaptor.capture()))
+                .thenReturn(event1);
+
+        final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of("stream-2"), ImmutableList.of(), null, emptyList());
+        final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
+                .timerange(timerange)
+                .build();
+
+        final AggregationSearchUtils searchUtils = new AggregationSearchUtils(
+                eventDefinitionDto,
+                (AggregationEventProcessorConfig) eventDefinitionDto.config(),
+                Set.of(),
+                searchFactory,
+                eventStreamService,
+                messageFactory,
+                permittedStreams
+        );
+
+        final AggregationResult result = AggregationResult.builder()
+                .effectiveTimerange(timerange)
+                .totalAggregatedMessages(1)
+                .sourceStreams(ImmutableSet.of("stream-1", "stream-2"))
+                .keyResults(ImmutableList.of(
+                        AggregationKeyResult.builder()
+                                .key(ImmutableList.of("one", "two"))
+                                .timestamp(timerange.to())
+                                .seriesValues(ImmutableList.of(
+                                        // At or beyond 1 billion, scientific notation is used
+                                        AggregationSeriesValue.builder()
+                                                .key(ImmutableList.of("a"))
+                                                .value(4_238_917_465.0d)
+                                                .series(Count.builder()
+                                                        .id("billion-and-up")
+                                                        .field("network_bytes")
+                                                        .build())
+                                                .build(),
+                                        // Just below 1 billion, the value is rendered as a plain, comma-grouped decimal
+                                        AggregationSeriesValue.builder()
+                                                .key(ImmutableList.of("a"))
+                                                .value(80_053_026.0d)
+                                                .series(Count.builder()
+                                                        .id("below-billion")
+                                                        .field("bytes_written")
+                                                        .build())
+                                                .build(),
+                                        // At or below 1e-13, scientific notation is used
+                                        AggregationSeriesValue.builder()
+                                                .key(ImmutableList.of("a"))
+                                                .value(0.00000000000005d)
+                                                .series(Cardinality.builder()
+                                                        .id("below-1e-13")
+                                                        .field("source")
+                                                        .build())
+                                                .build(),
+                                        // A whole number in the normal range drops the insignificant trailing decimal
+                                        AggregationSeriesValue.builder()
+                                                .key(ImmutableList.of("a"))
+                                                .value(42.0d)
+                                                .series(Count.builder()
+                                                        .id("whole-value")
+                                                        .field("user")
+                                                        .build())
+                                                .build(),
+                                        // A noisy floating-point average is rounded to 2 decimal places
+                                        AggregationSeriesValue.builder()
+                                                .key(ImmutableList.of("a"))
+                                                .value(3.1399999856948853d)
+                                                .series(Cardinality.builder()
+                                                        .id("fractional-value")
+                                                        .field("response_time_ms")
+                                                        .build())
+                                                .build()
+                                ))
+                                .build()
+                ))
+                .build();
+
+        final ImmutableList<EventWithContext> eventsWithContext = searchUtils.eventsFromAggregationResult(eventFactory, parameters, result, (event) -> {});
+
+        assertThat(eventsWithContext).hasSize(1);
+
+        final String eventMessage = messageCaptor.getValue();
+
+        assertThat(eventMessage)
+                .contains("=4.238917465E9")
+                .contains("=80,053,026")
+                .contains("=5.0E-14")
+                .contains("=42")
+                .doesNotContain("=42.0")
+                .contains("=3.14")
+                .doesNotContain("3.1399999856948853");
     }
 
     @Test
