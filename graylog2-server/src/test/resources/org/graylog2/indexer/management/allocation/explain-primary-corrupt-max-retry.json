@@ -1,0 +1,37 @@
+{
+  "index" : "graylog_2",
+  "shard" : 0,
+  "primary" : true,
+  "current_state" : "unassigned",
+  "unassigned_info" : {
+    "reason" : "ALLOCATION_FAILED",
+    "at" : "2026-10-03T18:47:54.533Z",
+    "failed_allocation_attempts" : 5,
+    "details" : "failed shard on node [rtBtz0HaSxu-1B50379-zA]: failed recovery, failure RecoveryFailedException[[graylog_2][0]: Recovery failed on {os-dev-node-0}{rtBtz0HaSxu-1B50379-zA}{1T2zoyU7TveZWUUeMCVlDw}{10.40.2.134}{10.40.2.134:9300}{dim}{shard_indexing_pressure_enabled=true}]; nested: IndexShardRecoveryException[failed recovery]; nested: OpenSearchException[java.io.IOException: failed to read /usr/share/opensearch/data/nodes/0/indices/E7bzAC_uTsq9NV9UjDyk5w/0/_state/retention-leases-7508.st]; nested: IOException[failed to read /usr/share/opensearch/data/nodes/0/indices/E7bzAC_uTsq9NV9UjDyk5w/0/_state/retention-leases-7508.st]; nested: CorruptStateException[org.apache.lucene.index.CorruptIndexException: codec footer mismatch (file truncated?): actual footer=0 vs expected footer=-1071082520 (resource=BufferedChecksumIndexInput(Endianness reverser Index Input wrapper))]; nested: CorruptIndexException[codec footer mismatch (file truncated?): actual footer=0 vs expected footer=-1071082520 (resource=BufferedChecksumIndexInput(Endianness reverser Index Input wrapper))]; ",
+    "last_allocation_status" : "no"
+  },
+  "can_allocate" : "no",
+  "allocate_explanation" : "cannot allocate because allocation is not permitted to any of the nodes that hold an in-sync shard copy",
+  "node_allocation_decisions" : [
+    {
+      "node_id" : "rtBtz0HaSxu-1B50379-zA",
+      "node_name" : "os-dev-node-0",
+      "transport_address" : "10.40.2.134:9300",
+      "node_attributes" : {
+        "shard_indexing_pressure_enabled" : "true"
+      },
+      "node_decision" : "no",
+      "store" : {
+        "in_sync" : true,
+        "allocation_id" : "1Koz_9vETMaKD4p3xYBv4g"
+      },
+      "deciders" : [
+        {
+          "decider" : "max_retry",
+          "decision" : "NO",
+          "explanation" : "shard has exceeded the maximum number of retries [5] on failed allocation attempts - manually call [/_cluster/reroute?retry_failed=true] to retry, [unassigned_info[[reason=ALLOCATION_FAILED], at[2026-10-03T18:47:54.533Z], failed_attempts[5], failed_nodes[[rtBtz0HaSxu-1B50379-zA]], delayed=false, details[failed shard on node [rtBtz0HaSxu-1B50379-zA]: failed recovery, failure RecoveryFailedException[[graylog_2][0]: Recovery failed on {os-dev-node-0}{rtBtz0HaSxu-1B50379-zA}{1T2zoyU7TveZWUUeMCVlDw}{10.40.2.134}{10.40.2.134:9300}{dim}{shard_indexing_pressure_enabled=true}]; nested: IndexShardRecoveryException[failed recovery]; nested: OpenSearchException[java.io.IOException: failed to read /usr/share/opensearch/data/nodes/0/indices/E7bzAC_uTsq9NV9UjDyk5w/0/_state/retention-leases-7508.st]; nested: IOException[failed to read /usr/share/opensearch/data/nodes/0/indices/E7bzAC_uTsq9NV9UjDyk5w/0/_state/retention-leases-7508.st]; nested: CorruptStateException[org.apache.lucene.index.CorruptIndexException: codec footer mismatch (file truncated?): actual footer=0 vs expected footer=-1071082520 (resource=BufferedChecksumIndexInput(Endianness reverser Index Input wrapper))]; nested: CorruptIndexException[codec footer mismatch (file truncated?): actual footer=0 vs expected footer=-1071082520 (resource=BufferedChecksumIndexInput(Endianness reverser Index Input wrapper))]; ], allocation_status[deciders_no]]]"
+        }
+      ]
+    }
+  ]
+}

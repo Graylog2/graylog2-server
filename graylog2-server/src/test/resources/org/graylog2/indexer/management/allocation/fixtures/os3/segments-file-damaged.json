@@ -1,0 +1,64 @@
+{
+  "index" : "alloc-test-r14",
+  "shard" : 0,
+  "primary" : true,
+  "current_state" : "unassigned",
+  "unassigned_info" : {
+    "reason" : "NODE_LEFT",
+    "at" : "2026-10-06T21:47:11.362Z",
+    "details" : "node_left [6Rv--47TSK61F9h03QIgEQ]",
+    "last_allocation_status" : "no_valid_shard_copy"
+  },
+  "can_allocate" : "no_valid_shard_copy",
+  "allocate_explanation" : "cannot allocate because all found copies of the shard are either stale or corrupt",
+  "node_allocation_decisions" : [
+    {
+      "node_id" : "6Rv--47TSK61F9h03QIgEQ",
+      "node_name" : "os3-node-2",
+      "transport_address" : "10.40.68.10:9300",
+      "node_attributes" : {
+        "shard_indexing_pressure_enabled" : "true"
+      },
+      "node_decision" : "no",
+      "store" : {
+        "in_sync" : true,
+        "allocation_id" : "TlK6Y2eIR6idwbGq-8Iuig",
+        "store_exception" : {
+          "type" : "corrupt_index_exception",
+          "reason" : "checksum status indeterminate: remaining=0; please run checkindex for more details (resource=BufferedChecksumIndexInput(NIOFSIndexInput(path=\"/usr/share/opensearch/data/nodes/0/indices/0c6mWLoORHeMZwqOUL5Vrw/0/index/segments_3\")))",
+          "suppressed" : [
+            {
+              "type" : "e_o_f_exception",
+              "reason" : "read past EOF: NIOFSIndexInput(path=\"/usr/share/opensearch/data/nodes/0/indices/0c6mWLoORHeMZwqOUL5Vrw/0/index/segments_3\")"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "node_id" : "KvBPYWMFRkedKhzv-9qoHA",
+      "node_name" : "os3-node-0",
+      "transport_address" : "10.40.68.5:9300",
+      "node_attributes" : {
+        "shard_indexing_pressure_enabled" : "true"
+      },
+      "node_decision" : "no",
+      "store" : {
+        "found" : false
+      }
+    },
+    {
+      "node_id" : "R-zGvRGdRlGomtFe_WC9yw",
+      "node_name" : "os3-node-1",
+      "transport_address" : "10.40.68.7:9300",
+      "node_attributes" : {
+        "shard_indexing_pressure_enabled" : "true"
+      },
+      "node_decision" : "no",
+      "store" : {
+        "found" : false
+      }
+    }
+  ]
+}
+

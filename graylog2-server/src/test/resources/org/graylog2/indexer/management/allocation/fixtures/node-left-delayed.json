@@ -1,0 +1,47 @@
+{
+  "index" : "alloc-test-r4",
+  "shard" : 0,
+  "primary" : false,
+  "current_state" : "unassigned",
+  "unassigned_info" : {
+    "reason" : "NODE_LEFT",
+    "at" : "2026-10-06T15:45:07.400Z",
+    "details" : "node_left [Ubm6UZfJTACzIT7Ihle31Q]",
+    "last_allocation_status" : "no_attempt"
+  },
+  "can_allocate" : "allocation_delayed",
+  "allocate_explanation" : "cannot allocate because the cluster is still waiting 59.6s for the departed node holding a replica to rejoin, despite being allowed to allocate the shard to at least one other node",
+  "configured_delay_in_millis" : 60000,
+  "remaining_delay_in_millis" : 59622,
+  "node_allocation_decisions" : [
+    {
+      "node_id" : "rtBtz0HaSxu-1B50379-zA",
+      "node_name" : "os-dev-node-0",
+      "transport_address" : "10.40.2.172:9300",
+      "node_attributes" : {
+        "shard_indexing_pressure_enabled" : "true"
+      },
+      "node_decision" : "yes"
+    },
+    {
+      "node_id" : "2svFqa49RO2JWKoEAwoX_g",
+      "node_name" : "os-dev-node-1",
+      "transport_address" : "10.40.2.171:9300",
+      "node_attributes" : {
+        "shard_indexing_pressure_enabled" : "true"
+      },
+      "node_decision" : "no",
+      "store" : {
+        "matching_size_in_bytes" : 208
+      },
+      "deciders" : [
+        {
+          "decider" : "same_shard",
+          "decision" : "NO",
+          "explanation" : "a copy of this shard is already allocated to this node [[alloc-test-r4][0], node[2svFqa49RO2JWKoEAwoX_g], [P], s[STARTED], a[id=TyjpSDGMQO-_jh4osV8Lhw]]"
+        }
+      ]
+    }
+  ]
+}
+

@@ -1,0 +1,69 @@
+{
+  "index" : "alloc-test-r4",
+  "shard" : 0,
+  "primary" : false,
+  "current_state" : "unassigned",
+  "unassigned_info" : {
+    "reason" : "REPLICA_ADDED",
+    "at" : "2026-10-06T21:42:28.210Z",
+    "last_allocation_status" : "no_attempt"
+  },
+  "can_allocate" : "no",
+  "allocate_explanation" : "cannot allocate because allocation is not permitted to any of the nodes",
+  "node_allocation_decisions" : [
+    {
+      "node_id" : "6Rv--47TSK61F9h03QIgEQ",
+      "node_name" : "os3-node-2",
+      "transport_address" : "10.40.68.4:9300",
+      "node_attributes" : {
+        "shard_indexing_pressure_enabled" : "true"
+      },
+      "node_decision" : "no",
+      "deciders" : [
+        {
+          "decider" : "awareness",
+          "decision" : "NO",
+          "explanation" : "node does not contain the awareness attribute [zone]; required attributes cluster setting [cluster.routing.allocation.awareness.attributes=zone]"
+        }
+      ]
+    },
+    {
+      "node_id" : "KvBPYWMFRkedKhzv-9qoHA",
+      "node_name" : "os3-node-0",
+      "transport_address" : "10.40.68.5:9300",
+      "node_attributes" : {
+        "shard_indexing_pressure_enabled" : "true"
+      },
+      "node_decision" : "no",
+      "deciders" : [
+        {
+          "decider" : "same_shard",
+          "decision" : "NO",
+          "explanation" : "a copy of this shard is already allocated to this node [[alloc-test-r4][0], node[KvBPYWMFRkedKhzv-9qoHA], [P], s[STARTED], a[id=AqZCQAgcSIyEU4DHZLcEHA]]"
+        },
+        {
+          "decider" : "awareness",
+          "decision" : "NO",
+          "explanation" : "node does not contain the awareness attribute [zone]; required attributes cluster setting [cluster.routing.allocation.awareness.attributes=zone]"
+        }
+      ]
+    },
+    {
+      "node_id" : "R-zGvRGdRlGomtFe_WC9yw",
+      "node_name" : "os3-node-1",
+      "transport_address" : "10.40.68.3:9300",
+      "node_attributes" : {
+        "shard_indexing_pressure_enabled" : "true"
+      },
+      "node_decision" : "no",
+      "deciders" : [
+        {
+          "decider" : "awareness",
+          "decision" : "NO",
+          "explanation" : "node does not contain the awareness attribute [zone]; required attributes cluster setting [cluster.routing.allocation.awareness.attributes=zone]"
+        }
+      ]
+    }
+  ]
+}
+
