@@ -43,9 +43,18 @@ describe('useQuickJumpSearch', () => {
         }),
       },
       {
+        key: 'unavailable',
+        item: (query: string) => ({
+          type: ACTION_TYPE,
+          title: `Unavailable "${query}"`,
+          link: '/unavailable' as QualifiedUrl<string>,
+        }),
+        useAvailability: () => ({ status: 'disabled', reason: 'Not set up yet.' }),
+      },
+      {
         key: 'hidden',
         item: () => ({ type: ACTION_TYPE, title: 'Hidden', link: '/hidden' as QualifiedUrl<string> }),
-        useCondition: () => false,
+        useAvailability: () => ({ status: 'hidden' }),
       },
     ],
   });
@@ -62,8 +71,22 @@ describe('useQuickJumpSearch', () => {
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
-    expect(result.current.searchResults.map(({ title }) => title)).toEqual(['Streams', 'Ask about "streams"']);
+    expect(result.current.searchResults.map(({ title }) => title)).toEqual([
+      'Streams',
+      'Ask about "streams"',
+      'Unavailable "streams"',
+    ]);
     expect(result.current.searchResults[1]).toEqual(expect.objectContaining({ key: 'ask', link: '/ask?q=streams' }));
+  });
+
+  it('gives an action that cannot be used now its reason', async () => {
+    const { result } = renderHook(() => useQuickJumpSearch('streams'));
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    expect(result.current.searchResults[2]).toEqual(
+      expect.objectContaining({ key: 'unavailable', disabledReason: 'Not set up yet.' }),
+    );
   });
 
   it('offers no actions without text', async () => {
