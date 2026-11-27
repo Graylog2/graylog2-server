@@ -42,6 +42,7 @@ import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import { serializeTimeRange } from 'components/common/EntityFilters/helpers/timeRange';
 
 const additionalSearchFields = {
+  message: 'Search for a string in the message of the event',
   key: 'The key of the event',
 };
 
@@ -68,9 +69,7 @@ const EventsEntityTable = () => {
     <EventsRefreshProvider>
       <PaginatedEntityTable<Event, EventsAdditionalData>
         humanName="events"
-        queryHelpComponent={
-          <QueryHelper entityName="event" commonFields={['id', 'description']} fieldMap={additionalSearchFields} />
-        }
+        queryHelpComponent={<QueryHelper entityName="event" commonFields={['id']} fieldMap={additionalSearchFields} />}
         entityActions={entityActions}
         tableLayout={eventsTableElements.defaultLayout}
         defaultFilters={defaultFilters}

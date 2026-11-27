@@ -85,12 +85,12 @@ describe('ExpandedSection', () => {
     await screen.findByText('The Additional Field');
   });
 
-  it('does not toggle the details when clicking the description in them', async () => {
+  it('does not toggle the details when clicking the message in them', async () => {
     const toggleSection = jest.fn();
     asMock(useExpandedSections).mockReturnValue({ toggleSection, expandedSections: {} });
     asMock(useTableFetchContext).mockReturnValue({
       refetch: jest.fn(),
-      attributes: [{ id: 'message', title: 'Description' }],
+      attributes: [{ id: 'message', title: 'Message' }],
       entityTableId: eventsTableElements.defaultLayout.entityTableId,
     });
 
