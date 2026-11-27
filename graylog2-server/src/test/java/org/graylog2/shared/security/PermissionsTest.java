@@ -17,12 +17,14 @@
 package org.graylog2.shared.security;
 
 import com.google.common.collect.ImmutableSet;
+import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
 import org.graylog2.plugin.security.Permission;
 import org.graylog2.plugin.security.PluginPermissions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -107,5 +109,27 @@ public class PermissionsTest {
                         .stream()
                         .map(Permission::permission)
                         .collect(Collectors.toSet()));
+    }
+
+    @Test
+    public void selfEditPermissionsOfAWildcardUsernameDoNotImplyPermissionsOnOtherUsers() {
+        // Shiro treats "*" as a wildcard and "," as an alternation inside a permission part, so a username carrying
+        // those characters must never be concatenated into an instance permission.
+        final var victim = new CaseSensitiveWildcardPermission("users:passwordchange:admin");
+
+        for (final String username : List.of("*", "admin,attacker", "attacker,admin")) {
+            assertThat(permissions.userSelfEditPermissions(username, true))
+                    .as("self-edit permissions of user <%s>", username)
+                    .allSatisfy(granted -> assertThat(new CaseSensitiveWildcardPermission(granted).implies(victim))
+                            .as("<%s> must not imply <%s>", granted, victim)
+                            .isFalse());
+        }
+    }
+
+    @Test
+    public void selfEditPermissionsAreGrantedForOrdinaryUsernames() {
+        assertThat(permissions.userSelfEditPermissions("alice", true))
+                .contains("users:read:alice", "users:edit:alice", "users:passwordchange:alice",
+                        "users:tokenlist:alice", "users:tokencreate:alice", "users:tokenremove:alice");
     }
 }
