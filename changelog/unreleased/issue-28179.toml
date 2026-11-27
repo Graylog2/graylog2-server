@@ -1,0 +1,5 @@
+type = "f"
+message = "Return the real cluster ID from the MCP get_system_status and get_formatted_system_status tools."
+
+issues = ["28179"]
+pulls = []
