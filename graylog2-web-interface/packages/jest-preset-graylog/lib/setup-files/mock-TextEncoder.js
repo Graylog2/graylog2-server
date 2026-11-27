@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+/* eslint-disable @typescript-eslint/no-require-imports, no-undef */
 // jsdom lacks these; react-router v7 instantiates a TextEncoder at import time.
 const { TextEncoder, TextDecoder } = require('util');
 
