@@ -20,7 +20,6 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.io.ByteStreams;
-import com.google.common.primitives.Ints;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -39,6 +38,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.zip.InflaterInputStream;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * FrameDecoder for the Beats/Lumberjack protocol.
@@ -64,15 +66,21 @@ public class BeatsFrameDecoder extends ReplayingDecoder<BeatsFrameDecoder.Decodi
         FRAME_WINDOW_SIZE
     }
 
-    private static final int MAX_JSON_FRAME_BYTES = 16 * 1024 * 1024;
-    private static final int MAX_DATA_PAIRS = 1024;
-    private static final int MAX_DATA_ITEM_BYTES = 1024 * 1024;
+    // Each key and value in a data frame is prefixed with its length as a 32-bit unsigned integer.
+    private static final int DATA_ITEM_LENGTH_BYTES = 4;
 
+    private final int maxEventSize;
     private long windowSize;
     private long sequenceNum;
 
-    public BeatsFrameDecoder() {
+    /**
+     * @param maxEventSize maximum size in bytes of a single event, i.e. the payload of a JSON frame or the encoded
+     *                     key/value pairs of a data frame
+     */
+    public BeatsFrameDecoder(int maxEventSize) {
         super(DecodingState.PROTOCOL_VERSION);
+        checkArgument(maxEventSize > 0, "maxEventSize must be positive, but is %s", maxEventSize);
+        this.maxEventSize = maxEventSize;
     }
 
     @Override
@@ -168,12 +176,10 @@ public class BeatsFrameDecoder extends ReplayingDecoder<BeatsFrameDecoder.Decodi
         sequenceNum = channelBuffer.readUnsignedInt();
         LOG.trace("Received sequence number {}", sequenceNum);
 
-        final int jsonLength = Ints.saturatedCast(channelBuffer.readUnsignedInt());
-        if (jsonLength > MAX_JSON_FRAME_BYTES) {
-            throw new IllegalStateException("JSON frame size " + jsonLength + " exceeds maximum " + MAX_JSON_FRAME_BYTES);
-        }
+        final long jsonLength = channelBuffer.readUnsignedInt();
+        checkEventSize("JSON", jsonLength);
 
-        final ByteBuf buffer = channelBuffer.readBytes(jsonLength);
+        final ByteBuf buffer = channelBuffer.readBytes((int) jsonLength);
         sendACK(channel);
 
         return Collections.singleton(buffer);
@@ -217,17 +223,26 @@ public class BeatsFrameDecoder extends ReplayingDecoder<BeatsFrameDecoder.Decodi
         sequenceNum = channelBuffer.readUnsignedInt();
         LOG.trace("Received sequence number {}", sequenceNum);
 
-        final int pairs = Ints.saturatedCast(channelBuffer.readUnsignedInt());
-        if (pairs > MAX_DATA_PAIRS) {
-            throw new IllegalStateException("Data frame pair count " + pairs + " exceeds maximum " + MAX_DATA_PAIRS);
-        }
+        final long pairs = channelBuffer.readUnsignedInt();
+        // Reject before reading any pairs if the length prefixes alone exceed the limit.
+        long eventSize = pairs * 2 * DATA_ITEM_LENGTH_BYTES;
+        checkEventSize("Data", eventSize);
+
         final JsonFactory jsonFactory = new JsonFactory();
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try (final JsonGenerator jg = jsonFactory.createGenerator(outputStream)) {
             jg.writeStartObject();
-            for (int i = 0; i < pairs; i++) {
-                final String key = parseDataItem(channelBuffer);
-                final String value = parseDataItem(channelBuffer);
+            for (long i = 0; i < pairs; i++) {
+                final long keyLength = channelBuffer.readUnsignedInt();
+                eventSize += keyLength;
+                checkEventSize("Data", eventSize);
+                final String key = parseDataItem(channelBuffer, keyLength);
+
+                final long valueLength = channelBuffer.readUnsignedInt();
+                eventSize += valueLength;
+                checkEventSize("Data", eventSize);
+                final String value = parseDataItem(channelBuffer, valueLength);
+
                 jg.writeStringField(key, value);
             }
             jg.writeEndObject();
@@ -239,13 +254,17 @@ public class BeatsFrameDecoder extends ReplayingDecoder<BeatsFrameDecoder.Decodi
         return Collections.singleton(buffer);
     }
 
-    private String parseDataItem(ByteBuf buf) {
-        int length = Ints.saturatedCast(buf.readUnsignedInt());
-        if (length > MAX_DATA_ITEM_BYTES) {
-            throw new IllegalStateException("Data item size " + length + " exceeds maximum " + MAX_DATA_ITEM_BYTES);
-        }
-        final ByteBuf item = buf.readSlice(length);
+    private String parseDataItem(ByteBuf buf, long length) {
+        final ByteBuf item = buf.readSlice((int) length);
         return item.toString(StandardCharsets.UTF_8);
+    }
+
+    private void checkEventSize(String frameType, long size) {
+        if (size > maxEventSize) {
+            throw new IllegalStateException(f("%s frame size %d exceeds the maximum event size of %d bytes. The limit can be " +
+                    "raised in the Beats input configuration or in the Beats input defaults under System > Configurations.",
+                    frameType, size, maxEventSize));
+        }
     }
 
     @VisibleForTesting

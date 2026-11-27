@@ -63,7 +63,7 @@ public class Beats2Codec extends AbstractCodec {
         super(configuration);
 
         this.noBeatsPrefix = configuration.getBoolean(CK_NO_BEATS_PREFIX, false);
-        this.objectMapper = requireNonNull(objectMapper);
+        this.objectMapper = BeatsObjectMappers.withoutStringLengthLimit(requireNonNull(objectMapper));
         this.messageFactory = messageFactory;
     }
 

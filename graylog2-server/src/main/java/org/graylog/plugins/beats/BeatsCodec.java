@@ -52,7 +52,7 @@ public class BeatsCodec extends AbstractCodec {
     @Inject
     public BeatsCodec(@Assisted Configuration configuration, ObjectMapper objectMapper, MessageFactory messageFactory) {
         super(configuration);
-        this.objectMapper = requireNonNull(objectMapper);
+        this.objectMapper = BeatsObjectMappers.withoutStringLengthLimit(requireNonNull(objectMapper));
         this.messageFactory = messageFactory;
     }
 
