@@ -59,7 +59,7 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
         final var ordering = orderListForPivot(pivot, queryContext, DEFAULT_ORDER, query);
         final int limit = bucketSpec.limit();
         final List<String> orderedBuckets = ValuesBucketOrdering.orderFields(bucketSpec.fields(), pivot.sort());
-        final var termsAggregation = createTerms(orderedBuckets, limit);
+        final var termsAggregation = createTerms(orderedBuckets, limit, bucketSpec.keepListsWhole());
 
         termsAggregation.order(ordering.orders());
         ordering.sortingAggregations().forEach(termsAggregation::subAggregation);
@@ -78,18 +78,18 @@ public class OSValuesHandler extends OSPivotBucketSpecHandler<Values> {
                 .otherBucket(true);
     }
 
-    private TermsAggregationBuilder createTerms(List<String> valueBuckets, int limit) {
-        return createScriptedTerms(valueBuckets, limit);
+    private TermsAggregationBuilder createTerms(List<String> valueBuckets, int limit, boolean keepListsWhole) {
+        return createScriptedTerms(valueBuckets, limit, keepListsWhole);
     }
 
-    private TermsAggregationBuilder createScriptedTerms(List<String> buckets, int limit) {
+    private TermsAggregationBuilder createScriptedTerms(List<String> buckets, int limit, boolean keepListsWhole) {
         return AggregationBuilders.terms(AGG_NAME)
-                .script(scriptForPivots(buckets))
+                .script(scriptForPivots(buckets, keepListsWhole))
                 .size(limit);
     }
 
-    private Script scriptForPivots(Collection<String> pivots) {
-        final PivotKeyScript script = PivotKeyScript.create(pivots, KEY_SEPARATOR_PHRASE);
+    private Script scriptForPivots(Collection<String> pivots, boolean keepListsWhole) {
+        final PivotKeyScript script = PivotKeyScript.create(pivots, KEY_SEPARATOR_PHRASE, keepListsWhole);
         return new Script(ScriptType.INLINE, "painless", script.source(), script.params());
     }
 

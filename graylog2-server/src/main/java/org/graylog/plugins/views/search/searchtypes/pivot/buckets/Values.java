@@ -38,6 +38,7 @@ public abstract class Values implements BucketSpec {
     public static final String NAME = "values";
     public static final int DEFAULT_LIMIT = 15;
     private static final String FIELD_SKIP_EMPTY_VALUES = "skip_empty_values";
+    private static final String FIELD_KEEP_LISTS_WHOLE = "keep_lists_whole";
 
     @Override
     public abstract String type();
@@ -52,11 +53,29 @@ public abstract class Values implements BucketSpec {
     @JsonProperty(FIELD_SKIP_EMPTY_VALUES)
     public abstract boolean skipEmptyValues();
 
+    /**
+     * A field can hold several values in one message. By default, a grouping by a single field puts such a message
+     * into one group per value, while a grouping by several fields keeps the list whole as one value. When this is
+     * {@code true}, lists stay whole in both cases.
+     * <p>
+     * A whole list compares as stored in the doc values. Keyword doc values are sorted and hold each value once, so
+     * {@code [bob, admin, bob]} and {@code [admin, bob]} are the same group. Numeric and date doc values are sorted but
+     * keep repeated values, so {@code [80, 443, 443]} and {@code [80, 443]} are different groups. A keyword list that
+     * holds one distinct value, such as {@code [bob, bob]}, is the same group as {@code bob}.
+     * <p>
+     * The group key of a whole list is its string form, for example {@code "[admin, bob]"}. It is meant for display
+     * and comparison; it cannot be searched for as a field value. Values that contain {@code ", "} or look like a list
+     * can share a key with a different list, for example {@code ["a, b", "c"]} and {@code [a, b, c]}.
+     */
+    @JsonProperty(FIELD_KEEP_LISTS_WHOLE)
+    public abstract boolean keepListsWhole();
+
     public static Values.Builder builder() {
         return new AutoValue_Values.Builder()
                 .type(NAME)
                 .limit(DEFAULT_LIMIT)
-                .skipEmptyValues(false);
+                .skipEmptyValues(false)
+                .keepListsWhole(false);
     }
 
     public Values withLimit(int limit) {
@@ -94,6 +113,17 @@ public abstract class Values implements BucketSpec {
         @JsonProperty(FIELD_SKIP_EMPTY_VALUES)
         public Builder setSkipEmptyValues(@Nullable Boolean skipEmptyValues) {
             return skipEmptyValues(firstNonNull(skipEmptyValues, false));
+        }
+
+        public abstract Builder keepListsWhole(boolean keepListsWhole);
+
+        public Builder keepListsWhole() {
+            return keepListsWhole(true);
+        }
+
+        @JsonProperty(FIELD_KEEP_LISTS_WHOLE)
+        public Builder setKeepListsWhole(@Nullable Boolean keepListsWhole) {
+            return keepListsWhole(firstNonNull(keepListsWhole, false));
         }
     }
 }

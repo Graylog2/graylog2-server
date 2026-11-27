@@ -39,22 +39,32 @@ public record PivotKeyScript(String source, Map<String, Object> params) {
     private static final String FIELD_EXPRESSION = """
             (doc.containsKey(params.%1$s) && doc[params.%1$s].size() > 0
             ? doc[params.%1$s].size() > 1
-                ? doc[params.%1$s]
+                ? %3$s
                 : String.valueOf(doc[params.%1$s].value)
             : params.%2$s)
             """;
+    // A list returned as the whole script result becomes one bucket per value. Joined with other fields, Painless
+    // turns it into its string form, e.g. "[admin, bob]", which keeps it whole.
+    private static final String SPLIT_LIST_EXPRESSION = "doc[params.%1$s]";
+    // Turns a list into its string form even when it is the only field, so it stays one bucket.
+    private static final String WHOLE_LIST_EXPRESSION = "String.valueOf(doc[params.%1$s])";
 
     /**
      * @param fields             the fields whose values make up the composite bucket key
      * @param keySeparatorPhrase the script expression joining two field values, including the key separator
+     * @param keepListsWhole     whether a field holding several values counts as one value even when it is the only
+     *                           field; with several fields, lists are always kept whole
      */
-    public static PivotKeyScript create(final Collection<String> fields, final String keySeparatorPhrase) {
+    public static PivotKeyScript create(final Collection<String> fields, final String keySeparatorPhrase, final boolean keepListsWhole) {
+        // With several fields, concatenation keeps lists whole anyway. Using the same expression for both settings
+        // keeps one script source per number of fields.
+        final String listExpression = keepListsWhole && fields.size() == 1 ? WHOLE_LIST_EXPRESSION : SPLIT_LIST_EXPRESSION;
         final Map<String, Object> params = new LinkedHashMap<>();
         final List<String> expressions = new ArrayList<>(fields.size());
         for (final String field : fields) {
             final String fieldParam = FIELD_PARAM_PREFIX + expressions.size();
             params.put(fieldParam, field);
-            expressions.add(FIELD_EXPRESSION.formatted(fieldParam, MISSING_VALUE_PARAM));
+            expressions.add(FIELD_EXPRESSION.formatted(fieldParam, MISSING_VALUE_PARAM, listExpression.formatted(fieldParam)));
         }
         params.put(MISSING_VALUE_PARAM, MissingBucketConstants.MISSING_BUCKET_NAME);
 
