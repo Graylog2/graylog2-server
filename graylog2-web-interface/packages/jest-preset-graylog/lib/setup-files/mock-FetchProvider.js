@@ -31,6 +31,7 @@ class MockBuilder {
 
   noSessionExtension = () => this;
 
+  // eslint-disable-next-line class-methods-use-this
   build = () => Promise.resolve({});
 }
 
@@ -42,6 +43,7 @@ const MockFetchProvider = Object.assign(() => Promise.resolve(mockResponse), {
   default: jest.fn(() => Promise.resolve(mockResponse)),
   fetchPlainText: jest.fn(() => Promise.resolve(mockResponse)),
   fetchPeriodically: jest.fn(() => Promise.resolve(mockResponse)),
+  fetchIgnoringUnauthorized: jest.fn(() => Promise.resolve(mockResponse)),
   fetchFile: jest.fn(() => Promise.resolve(mockResponse)),
 });
 
