@@ -375,9 +375,9 @@ const FilterForm = ({ eventDefinition, onChange, streams, validation }: Props) =
 
   const handleQueryChange = useCallback(
     (event: { target: { value: string; name: string } }): Promise<string> => {
-      const { name, value } = event.target;
-      const newConfig = getUpdatedConfig(name as EventDefinitionConfigKeys, value);
-      handleConfigChange(name, newConfig);
+      const { value } = event.target;
+      const newConfig = getUpdatedConfig('query', value);
+      handleConfigChange('query', newConfig);
       debouncedParseQuery(value, newConfig);
 
       return Promise.resolve(value);
@@ -521,7 +521,7 @@ const FilterForm = ({ eventDefinition, onChange, streams, validation }: Props) =
           <InputRow>
             <ViewsQueryInput
               inputId="filter-query"
-              name="query"
+              name="search query"
               value={currentConfig.query ?? ''}
               onChange={handleQueryChange}
               isValidating={false}
