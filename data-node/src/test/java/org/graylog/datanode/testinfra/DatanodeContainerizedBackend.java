@@ -23,7 +23,7 @@ import org.graylog.testing.completebackend.DefaultMavenProjectDirProvider;
 import org.graylog.testing.datanode.DatanodeDockerHooks;
 import org.graylog.testing.graylognode.MavenPackager;
 import org.graylog.testing.mongodb.MongoDBTestService;
-import org.graylog2.security.JwtSecret;
+import org.graylog2.security.JwtSecretProvider;
 import org.graylog2.security.jwt.IndexerJwtAuthToken;
 import org.graylog2.security.jwt.IndexerJwtAuthTokenProvider;
 import org.testcontainers.containers.BindMode;
@@ -44,7 +44,7 @@ public class DatanodeContainerizedBackend {
 
     @Nonnull
     private static IndexerJwtAuthToken createJwtAuthToken(String signingSecret, Duration tokenExpirationDuration, Duration cachingDuration, Duration clockSkewTolerance) {
-        return new IndexerJwtAuthTokenProvider(new JwtSecret(signingSecret), tokenExpirationDuration, cachingDuration, clockSkewTolerance, true, Clock.systemDefaultZone())
+        return new IndexerJwtAuthTokenProvider(new JwtSecretProvider(signingSecret).get(), tokenExpirationDuration, cachingDuration, clockSkewTolerance, true, Clock.systemDefaultZone())
                 .get();
     }
 

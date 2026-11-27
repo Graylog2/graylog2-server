@@ -20,32 +20,46 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
-import org.apache.commons.lang3.StringUtils;
+import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.crypto.generators.HKDFBytesGenerator;
+import org.bouncycastle.crypto.params.HKDFParameters;
+
+import java.nio.charset.StandardCharsets;
 
 @Singleton
 public class JwtSecretProvider implements Provider<JwtSecret> {
+
+    /**
+     * HKDF info parameter used to derive the JWT signing key from the password_secret. Graylog server and datanode
+     * must derive the same key, so changing this value breaks the authentication between them.
+     */
+    private static final byte[] JWT_SIGNING_KEY_HKDF_INFO = "graylog-indexer-jwt-signing-key-v1".getBytes(StandardCharsets.UTF_8);
+
+    /**
+     * 64 bytes, so the key is accepted for HS512 signatures.
+     */
+    private static final int JWT_SIGNING_KEY_LENGTH_BYTES = 64;
 
     private final JwtSecret jwtSecret;
 
     @Inject
     public JwtSecretProvider(@Named("password_secret") final String passwordSecret) {
-        this.jwtSecret = new JwtSecret(adaptPassword(passwordSecret));
+        this.jwtSecret = new JwtSecret(deriveSigningKey(passwordSecret));
     }
 
     /**
-     * Our default requirement to secret password is length > 16 characters. But for JWT signing, we need at least 64.
-     * So internally we have to extend the provided password to at least 64 if the actual length is not sufficient.
+     * Derive a dedicated JWT signing key from the password_secret, so the secret itself is never used as a signing
+     * key nor written to the opensearch security configuration.
      *
      * @param passwordSecret configured password_secret, both from datanode and graylog server (needs to be the same)
-     * @return signing secret extended to at least 64 characters
+     * @return signing key derived from the password_secret
      */
-    private String adaptPassword(String passwordSecret) {
-        if (passwordSecret.length() < 64) {
-            final String extended = passwordSecret + StringUtils.repeat(passwordSecret, 3);
-            return extended.substring(0, 64);
-        } else {
-            return passwordSecret;
-        }
+    private static byte[] deriveSigningKey(String passwordSecret) {
+        final HKDFBytesGenerator hkdf = new HKDFBytesGenerator(new SHA256Digest());
+        hkdf.init(new HKDFParameters(passwordSecret.getBytes(StandardCharsets.UTF_8), null, JWT_SIGNING_KEY_HKDF_INFO));
+        final byte[] derived = new byte[JWT_SIGNING_KEY_LENGTH_BYTES];
+        hkdf.generateBytes(derived, 0, derived.length);
+        return derived;
     }
 
     @Override

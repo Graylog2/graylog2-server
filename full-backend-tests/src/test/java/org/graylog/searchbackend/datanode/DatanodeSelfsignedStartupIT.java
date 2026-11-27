@@ -28,7 +28,7 @@ import org.graylog.testing.completebackend.FullBackendTest;
 import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog.testing.restoperations.DatanodeOpensearchWait;
 import org.graylog.testing.restoperations.RestOperationParameters;
-import org.graylog2.security.JwtSecret;
+import org.graylog2.security.JwtSecretProvider;
 import org.graylog2.security.jwt.IndexerJwtAuthToken;
 import org.graylog2.security.jwt.IndexerJwtAuthTokenProvider;
 import org.graylog2.storage.SearchVersion;
@@ -90,7 +90,7 @@ public class DatanodeSelfsignedStartupIT {
 
     @Nonnull
     private static IndexerJwtAuthToken createJwtAuthToken() {
-        final IndexerJwtAuthTokenProvider provider = new IndexerJwtAuthTokenProvider(new JwtSecret(ContainerizedGraylogBackend.PASSWORD_SECRET), Duration.seconds(120), Duration.seconds(60), Duration.seconds(30), true, Clock.systemDefaultZone());
+        final IndexerJwtAuthTokenProvider provider = new IndexerJwtAuthTokenProvider(new JwtSecretProvider(ContainerizedGraylogBackend.PASSWORD_SECRET).get(), Duration.seconds(120), Duration.seconds(60), Duration.seconds(30), true, Clock.systemDefaultZone());
         return provider.get();
     }
 }

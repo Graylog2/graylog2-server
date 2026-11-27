@@ -23,14 +23,18 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 public class JwtSecret {
-    private final String secret;
+    private final byte[] secret;
 
     public JwtSecret(String secret) {
-        this.secret = secret;
+        this(secret.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public JwtSecret(byte[] secret) {
+        this.secret = secret.clone();
     }
 
     public byte[] getBytes() {
-        return secret.getBytes(StandardCharsets.UTF_8);
+        return secret.clone();
     }
 
     public SecretKey getSigningKey() {

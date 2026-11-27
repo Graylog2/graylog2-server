@@ -17,27 +17,44 @@
 package org.graylog2.security;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class JwtSecretProviderTest {
 
     @Test
     void testShortPassword() {
-        final String shortPassword = RandomStringUtils.random(16);
-        final JwtSecretProvider provider = new JwtSecretProvider(shortPassword);
-        final String signingKey = new String(provider.get().getBytes(), StandardCharsets.UTF_8);
-        Assertions.assertThat(signingKey.length()).isEqualTo(64);
+        final String shortPassword = RandomStringUtils.secure().nextAlphanumeric(16);
+        final JwtSecret secret = new JwtSecretProvider(shortPassword).get();
+        assertThat(secret.getBytes()).hasSize(64);
+        assertThat(secret.getSigningKey().getAlgorithm()).isEqualTo("HmacSHA512");
     }
-
 
     @Test
     void testLongPassword() {
-        final String longPassword = RandomStringUtils.random(96);
-        final JwtSecretProvider provider = new JwtSecretProvider(longPassword);
-        final String signingKey = new String(provider.get().getBytes(), StandardCharsets.UTF_8);
-        Assertions.assertThat(signingKey).isEqualTo(longPassword);
+        final String longPassword = RandomStringUtils.secure().nextAlphanumeric(96);
+        final JwtSecret secret = new JwtSecretProvider(longPassword).get();
+        assertThat(secret.getBytes()).hasSize(64);
+        assertThat(secret.getBytes()).isNotEqualTo(longPassword.getBytes(StandardCharsets.UTF_8));
+    }
+
+    @Test
+    void testDerivationIsDeterministic() {
+        final String password = RandomStringUtils.secure().nextAlphanumeric(32);
+        assertThat(new JwtSecretProvider(password).get().getBytes())
+                .isEqualTo(new JwtSecretProvider(password).get().getBytes());
+        assertThat(new JwtSecretProvider(password).get().getBytes())
+                .isNotEqualTo(new JwtSecretProvider(password + "x").get().getBytes());
+    }
+
+    @Test
+    void testPasswordSecretNotLeaked() {
+        final String password = "thisisverysecretpasswordthisisverysecretpasswordthisisverysecret";
+        final JwtSecret secret = new JwtSecretProvider(password).get();
+        assertThat(new String(secret.getBytes(), StandardCharsets.UTF_8)).doesNotContain(password);
+        assertThat(secret.getBase64Encoded()).isNotEqualTo(new JwtSecret(password).getBase64Encoded());
     }
 }
