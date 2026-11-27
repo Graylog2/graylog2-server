@@ -34,14 +34,17 @@ import org.graylog.events.processor.DefaultEventResolver;
 import org.graylog.events.processor.EventDefinitionConfiguration;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
+import org.graylog.events.processor.EventDefinitionNormalizers;
 import org.graylog.events.processor.EventProcessorConfig;
 import org.graylog.events.processor.EventProcessorEngine;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.security.UserContext;
+import org.graylog.security.shares.CreateEntityRequest;
 import org.graylog.security.shares.EntitySharesService;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.shared.security.RestPermissions;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,6 +58,7 @@ import org.mockito.quality.Strictness;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -63,6 +67,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -321,6 +326,40 @@ public class EventDefinitionsResourceTest {
                 Filters.and(Filters.and(Filters.or(Filters.eq("_id", new ObjectId(definitionId))))));
     }
 
+    @Test
+    public void createNormalizesBeforeValidation() {
+        // An empty title fails validation, so the save only succeeds if the normalizer runs first
+        final EventDefinitionsResource normalizingResource = new TestEventDefinitionsResource(subject,
+                new EventDefinitionConfiguration(),
+                new EventDefinitionNormalizers(Set.of(dto -> dto.toBuilder().title("Normalized").build())));
+        when(config1.validate(any(UserContext.class))).thenReturn(new ValidationResult());
+        when(config1.validate(any(UserContext.class), any(), any())).thenReturn(new ValidationResult());
+        when(eventDefinitionHandler.create(any(), any())).thenAnswer(invocation ->
+                invocation.getArgument(0, EventDefinitionDto.class).toBuilder().id("54e3deadbeefdeadbeefaffe").build());
+        final UserContext userContext = mock(UserContext.class);
+        when(userContext.getUser()).thenReturn(mock(User.class));
+
+        final var response = normalizingResource.create(true,
+                CreateEntityRequest.create(eventDefinitionDto(config1).toBuilder().title("").build(), null), userContext);
+
+        Assertions.assertThat(response.getStatus()).isEqualTo(200);
+        verify(eventDefinitionHandler).create(argThat(dto -> dto.title().equals("Normalized")), any());
+    }
+
+    @Test
+    public void validateChecksTheNormalizedDefinition() {
+        final EventDefinitionsResource normalizingResource = new TestEventDefinitionsResource(subject,
+                new EventDefinitionConfiguration(),
+                new EventDefinitionNormalizers(Set.of(dto -> dto.toBuilder().config(config2).build())));
+        when(config2.validate(any(UserContext.class))).thenReturn(new ValidationResult());
+        when(config2.validate(any(UserContext.class), any(), any())).thenReturn(new ValidationResult());
+
+        normalizingResource.validateEventDefinition(eventDefinitionDto(config1), mock(UserContext.class));
+
+        verify(config2).validate(any(UserContext.class));
+        verify(config1, never()).validate(any(UserContext.class));
+    }
+
     static EventDefinitionDto withTags(String... tags) {
         return eventDefinitionDto(mock(EventProcessorConfig.class)).toBuilder()
                 .id("54e3deadbeefdeadbeefaffe")
@@ -356,9 +395,14 @@ public class EventDefinitionsResourceTest {
         }
 
         TestEventDefinitionsResource(Subject subject, EventDefinitionConfiguration configuration) {
+            this(subject, configuration, EventDefinitionNormalizers.none());
+        }
+
+        TestEventDefinitionsResource(Subject subject, EventDefinitionConfiguration configuration, EventDefinitionNormalizers normalizers) {
             super(dbService, eventDefinitionHandler, contextService, engine, recentActivityService,
                     auditEventSender, objectMapper, new DefaultEventResolver(), configuration,
-                    entitySharesService, new org.graylog.events.processor.TacticsTechniquesValidator.NoOp());
+                    entitySharesService, new org.graylog.events.processor.TacticsTechniquesValidator.NoOp(),
+                    normalizers);
             this.subject = subject;
         }
 

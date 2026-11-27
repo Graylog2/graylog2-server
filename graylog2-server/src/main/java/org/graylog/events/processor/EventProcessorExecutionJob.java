@@ -25,7 +25,6 @@ import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import org.graylog.events.configuration.EventsConfigurationProvider;
 import org.graylog.scheduler.Job;
-import org.graylog.scheduler.JobDefinitionConfig;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobExecutionContext;
 import org.graylog.scheduler.JobExecutionException;
@@ -56,11 +55,10 @@ public class EventProcessorExecutionJob implements Job {
     // TODO: Make retry interval configurable and check if we need different intervals for different error conditions
     private static final long RETRY_INTERVAL = 5000;
 
-    private final JobScheduleStrategies scheduleStrategies;
     private final JobSchedulerClock clock;
     private final EventProcessorEngine eventProcessorEngine;
     private final Config config;
-    private final EventsConfigurationProvider configurationProvider;
+    private final EventProcessorWindows windows;
 
     @Inject
     public EventProcessorExecutionJob(JobScheduleStrategies scheduleStrategies,
@@ -68,10 +66,9 @@ public class EventProcessorExecutionJob implements Job {
                                       EventProcessorEngine eventProcessorEngine,
                                       EventsConfigurationProvider configurationProvider,
                                       @Assisted JobDefinitionDto jobDefinition) {
-        this.scheduleStrategies = scheduleStrategies;
         this.clock = clock;
         this.eventProcessorEngine = eventProcessorEngine;
-        this.configurationProvider = configurationProvider;
+        this.windows = new EventProcessorWindows(scheduleStrategies, configurationProvider);
         this.config = (Config) jobDefinition.config();
     }
 
@@ -114,63 +111,16 @@ public class EventProcessorExecutionJob implements Job {
         try {
             eventProcessorEngine.execute(config.eventDefinitionId(), parameters);
 
-            // By using the processingWindowSize and the processingHopSize we can implement hopping and tumbling
-            // windows. (a tumbling window is simply a hopping window where windowSize and hopSize are the same).
-            // If the job uses cron scheduling, we need to instead calculate the nextTo field based on the current to
-            // field as it is possible to skip contiguous time ranges with cron scheduling.
-            DateTime nextTo = config.isCron() ?
-                    scheduleStrategies.nextTime(ctx.trigger(), to).orElse(to.plus(config.processingHopSize())) :
-                    to.plus(config.processingHopSize());
-            DateTime nextFrom = nextTo.minus(config.processingWindowSize());
-
-            // If the event processor is catching up on old data (e.g. the server was shut down for a significant time),
-            // we can switch to a bigger scheduling window: `processingCatchUpWindowSize`.
-            // If engaged, we will schedule jobs with a timerange of multiple processingWindowSize chunks.
-            // It's the specific event processors' duty to handle being executed with this larger timerange.
-            // If an event processor was configured with a processingHopSize greater than the processingWindowSize
-            // we can't use the catchup mode.
-            // Catch-up can be disabled per event processor via the disableCatchup flag.
-            final long catchUpSize = configurationProvider.get().eventCatchupWindow();
-            if (!config.disableCatchup() && !config.isCron() && catchUpSize > 0 && catchUpSize > config.processingWindowSize() && to.plus(catchUpSize).isBefore(now) &&
-                    config.processingHopSize() <= config.processingWindowSize()) {
-                final long chunkCount = catchUpSize / config.processingWindowSize();
-
-                // Align to multiples of the processingWindowSize
-                nextTo = to.plus(config.processingWindowSize() * chunkCount);
-                LOG.info("Event processor <{}> is catching up on old data. Combining {} search windows with catchUpWindowSize={}ms: from={} to={}",
-                        config.eventDefinitionId(), chunkCount, catchUpSize, nextFrom, nextTo);
-            }
-
-            LOG.trace("Set new timerange of eventproc <{}> in job trigger data: from={} to={} (hopSize={}ms windowSize={}ms)",
-                    config.eventDefinitionId(), nextFrom, nextTo, config.processingHopSize(), config.processingWindowSize());
-
+            final EventProcessorWindows.NextWindow next = windows.next(ctx.trigger(), config, to, now);
             final Data newData = data.map(Data::toBuilder).orElse(Data.builder())
-                    .timerangeFrom(nextFrom)
-                    .timerangeTo(nextTo)
+                    .timerangeFrom(next.from())
+                    .timerangeTo(next.to())
                     .build();
 
-            final Optional<DateTime> nextTime = scheduleStrategies.nextTime(ctx.trigger());
-
-            // The nextTime Optional can be empty if there will be no further executions of the trigger
-            if (nextTime.isPresent()) {
-                if (!config.disableCatchup() && nextTo.isBefore(now)) {
-                    // If the next "to" timestamp of the timerange to process is in the past, we want to schedule the next
-                    // execution of this job as soon as possible to make sure we catch up.
-                    LOG.trace("Set nextTime to <{}> to catch up faster - calculated nextTime was <{}>", now, nextTime.get());
-                    return JobTriggerUpdate.withNextTimeAndData(now, newData);
-                } else if (nextTo.isBefore(nextTime.get())) {
-                    LOG.trace("Set nextTime to <{}> because it's closer to the timerange time - calculated nextTime was <{}>", nextTo, nextTime.get());
-                    return JobTriggerUpdate.withNextTimeAndData(nextTo, newData);
-                } else {
-                    // Otherwise use the calculated nextTime
-                    LOG.trace("Set nextTime to <{}>", nextTime.get());
-                    return JobTriggerUpdate.withNextTimeAndData(nextTime.get(), newData);
-                }
-            } else {
-                // Or no next time if this has been a ONCE trigger
-                LOG.trace("No nextTime for trigger <{}>", ctx.trigger().id());
-                return JobTriggerUpdate.withoutNextTime();
-            }
+            // No next time if this has been a ONCE trigger
+            return next.nextTime()
+                    .map(nextTime -> JobTriggerUpdate.withNextTimeAndData(nextTime, newData))
+                    .orElseGet(JobTriggerUpdate::withoutNextTime);
         } catch (EventProcessorPreconditionException e) {
             // A precondition for the event processor is not ready yet. This job must be retried.
             if (e.getEventDefinition().isPresent()) {
@@ -208,45 +158,15 @@ public class EventProcessorExecutionJob implements Job {
     @AutoValue
     @JsonTypeName(EventProcessorExecutionJob.TYPE_NAME)
     @JsonDeserialize(builder = Config.Builder.class)
-    public abstract static class Config implements JobDefinitionConfig {
-        public static final String FIELD_EVENT_DEFINITION_ID = "event_definition_id";
-        private static final String FIELD_PARAMETERS = "parameters";
-        private static final String FIELD_PROCESSING_WINDOW_SIZE = "processing_window_size";
-        private static final String FIELD_PROCESSING_HOP_SIZE = "processing_hop_size";
-        private static final String FIELD_IS_CRON = "is_cron";
-        private static final String FIELD_DISABLE_CATCHUP = "disable_catchup";
-
-        @JsonProperty(FIELD_EVENT_DEFINITION_ID)
-        public abstract String eventDefinitionId();
-
-        @JsonProperty(FIELD_PARAMETERS)
-        public abstract EventProcessorParametersWithTimerange parameters();
-
-        @JsonProperty(FIELD_PROCESSING_WINDOW_SIZE)
-        public abstract long processingWindowSize();
-
-        @JsonProperty(FIELD_PROCESSING_HOP_SIZE)
-        public abstract long processingHopSize();
-
-        @JsonProperty(FIELD_IS_CRON)
-        public abstract boolean isCron();
-
-        @JsonProperty(FIELD_DISABLE_CATCHUP)
-        public abstract boolean disableCatchup();
-
+    public abstract static class Config implements EventProcessorJobConfig {
         public static Builder builder() {
             return Builder.create();
         }
 
         public abstract Builder toBuilder();
 
-        public boolean hasEqualSchedule(Config other) {
-            return processingWindowSize() == other.processingWindowSize() &&
-                    processingHopSize() == other.processingHopSize();
-        }
-
         @AutoValue.Builder
-        public abstract static class Builder implements JobDefinitionConfig.Builder<Builder> {
+        public abstract static class Builder implements EventProcessorJobConfig.Builder<Builder> {
             @JsonCreator
             public static Builder create() {
                 return new AutoValue_EventProcessorExecutionJob_Config.Builder()
@@ -254,24 +174,6 @@ public class EventProcessorExecutionJob implements Job {
                         .isCron(false)
                         .disableCatchup(false); // Default: catch-up enabled
             }
-
-            @JsonProperty(FIELD_EVENT_DEFINITION_ID)
-            public abstract Builder eventDefinitionId(String eventDefinitionId);
-
-            @JsonProperty(FIELD_PARAMETERS)
-            public abstract Builder parameters(EventProcessorParametersWithTimerange parameters);
-
-            @JsonProperty(FIELD_PROCESSING_WINDOW_SIZE)
-            public abstract Builder processingWindowSize(long windowSize);
-
-            @JsonProperty(FIELD_PROCESSING_HOP_SIZE)
-            public abstract Builder processingHopSize(long hopSize);
-
-            @JsonProperty(FIELD_IS_CRON)
-            public abstract Builder isCron(boolean isCron);
-
-            @JsonProperty(value = FIELD_DISABLE_CATCHUP, defaultValue = "false")
-            public abstract Builder disableCatchup(boolean disableCatchup);
 
             abstract Config autoBuild();
 

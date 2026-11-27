@@ -30,6 +30,7 @@ import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
+import org.graylog.events.processor.EventDefinitionNormalizers;
 import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.JobDefinitionDto;
@@ -69,6 +70,7 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto>, 
     private final DBEventDefinitionService eventDefinitionService;
     private final Set<PluginMetaData> pluginMetaData;
     private final UserService userService;
+    private final EventDefinitionNormalizers normalizers;
 
     @Inject
     public EventDefinitionFacade(ObjectMapper objectMapper,
@@ -76,13 +78,15 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto>, 
                                  Set<PluginMetaData> pluginMetaData,
                                  DBJobDefinitionService jobDefinitionService,
                                  DBEventDefinitionService eventDefinitionService,
-                                 UserService userService) {
+                                 UserService userService,
+                                 EventDefinitionNormalizers normalizers) {
         this.objectMapper = objectMapper;
         this.pluginMetaData = pluginMetaData;
         this.eventDefinitionHandler = eventDefinitionHandler;
         this.jobDefinitionService = jobDefinitionService;
         this.eventDefinitionService = eventDefinitionService;
         this.userService = userService;
+        this.normalizers = normalizers;
     }
 
     @VisibleForTesting
@@ -141,7 +145,7 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto>, 
                                                     Map<EntityDescriptor, Object> nativeEntities, User user) {
         final EventDefinitionEntity eventDefinitionEntity = objectMapper.convertValue(entity.data(),
                 EventDefinitionEntity.class);
-        final EventDefinitionDto eventDefinition = eventDefinitionEntity.toNativeEntity(parameters, nativeEntities);
+        final EventDefinitionDto eventDefinition = normalizers.normalize(eventDefinitionEntity.toNativeEntity(parameters, nativeEntities));
         final EventDefinitionDto savedDto;
         if (eventDefinitionEntity.isScheduled().asBoolean(parameters)) {
             savedDto = eventDefinitionHandler.create(eventDefinition, Optional.ofNullable(user));
@@ -171,8 +175,8 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto>, 
                 EventDefinitionEntity.class);
         // Seed with the existing entity so fields the pack doesn't carry (id, state, ...) keep their
         // stored values; guard scope since the mutability bypass below would otherwise let the pack change it.
-        final EventDefinitionDto updated = eventDefinitionEntity
-                .toNativeEntity(parameters, nativeEntities, existing.toBuilder())
+        final EventDefinitionDto updated = normalizers.normalize(eventDefinitionEntity
+                        .toNativeEntity(parameters, nativeEntities, existing.toBuilder()))
                 .toBuilder().scope(existing.scope()).build();
         // Scheduling follows the user's enabled/disabled choice, not the pack's is_scheduled flag.
         final boolean schedule = existing.state() == EventDefinition.State.ENABLED;

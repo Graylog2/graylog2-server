@@ -35,6 +35,7 @@ import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventDefinitionHandler;
+import org.graylog.events.processor.EventDefinitionNormalizers;
 import org.graylog.events.processor.aggregation.AggregationConditions;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
@@ -236,7 +237,7 @@ public class ContentPackServiceTest {
                 ModelTypes.STREAM_REF_V1, new StreamReferenceFacade(objectMapper, streamService, streamRuleService, indexSetService, userService, favoriteFieldsService),
                 ModelTypes.OUTPUT_V1, new OutputFacade(objectMapper, outputService, pluginMetaData, outputFactories, outputFactories2),
                 ModelTypes.SEARCH_V1, new SearchFacade(objectMapper, searchDbService, viewService, viewSummaryService, userService),
-                ModelTypes.EVENT_DEFINITION_V1, new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService),
+                ModelTypes.EVENT_DEFINITION_V1, new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService, EventDefinitionNormalizers.none()),
                 ModelTypes.INPUT_V1, new InputFacade(objectMapper, inputService, inputRegistry, lookupTableService, grokPatternService, messageInputFactory,
                         extractorFactory, converterFactory, serverStatus, pluginMetaData, new HashMap<>())
         );

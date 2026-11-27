@@ -103,6 +103,9 @@ public class EventsModule extends PluginModule {
         OptionalBinder.newOptionalBinder(binder(), TacticsTechniquesValidator.class)
                 .setDefault().to(TacticsTechniquesValidator.NoOp.class);
 
+        // Declare the set so it can be injected when no plugin adds a normalizer
+        eventDefinitionNormalizerBinder();
+
         addSystemRestResource(AvailableEntityTypesResource.class);
         addSystemRestResource(EventDefinitionsResource.class);
         addSystemRestResource(EventNotificationsResource.class);
