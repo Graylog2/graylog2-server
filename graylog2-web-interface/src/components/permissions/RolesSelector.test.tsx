@@ -76,7 +76,9 @@ describe('RolesSelector', () => {
     const onSubmit = jest.fn(() => Promise.reject(new Error('Assignment failed')));
     const roleName = mockRoles.first().name;
 
-    render(<RolesSelector assignedRolesIds={Immutable.Set([''])} identifier={(role) => role.name} onSubmit={onSubmit} />);
+    render(
+      <RolesSelector assignedRolesIds={Immutable.Set([''])} identifier={(role) => role.name} onSubmit={onSubmit} />,
+    );
 
     await selectEvent.chooseOption('Search for roles', roleName);
     await userEvent.click(await screen.findByRole('button', { name: /assign role/i }));
