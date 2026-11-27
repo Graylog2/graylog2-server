@@ -75,6 +75,10 @@ const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Option
 
   const handleItemSelect = useCallback(
     (item: SearchResultItem) => {
+      if (item.disabledReason) {
+        return;
+      }
+
       if ('link' in item) {
         history.push(item.link);
       } else if ('externalLink' in item) {

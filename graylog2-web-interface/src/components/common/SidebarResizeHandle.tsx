@@ -18,21 +18,52 @@ import * as React from 'react';
 import { useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 
-import type { SidebarBounds } from 'hooks/useSidebarWidth';
+import type { SidebarBounds } from 'hooks/useSidebarSize';
 
 const KEYBOARD_STEP = 16;
 
-// Sits on the sidebar's inner edge, over its border.
-const Handle = styled.div<{ $side: 'left' | 'right' }>(
+type Side = 'left' | 'right' | 'top' | 'bottom';
+
+const isVertical = (side: Side) => side === 'top' || side === 'bottom';
+
+const BAR_HEIGHT = 8;
+
+// Left and right sidebars resize from an invisible edge over their border, top and bottom ones from a visible bar
+// with a grip, placed between them and what they are resized against.
+const Handle = styled.div<{ $side: Side }>(
   ({ theme, $side }) => css`
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    ${$side === 'left' ? 'right' : 'left'}: -3px;
-    z-index: 2;
-    width: 6px;
-    cursor: col-resize;
     touch-action: none;
+
+    ${
+      isVertical($side)
+        ? css`
+            display: flex;
+            flex-shrink: 0;
+            align-items: center;
+            justify-content: center;
+            height: ${BAR_HEIGHT}px;
+            cursor: row-resize;
+            background-color: ${theme.colors.global.background};
+            border: 1px solid ${theme.colors.cards.border};
+
+            &::before {
+              content: '';
+              width: 32px;
+              height: 2px;
+              border-radius: 1px;
+              background: ${theme.colors.text.secondary};
+            }
+          `
+        : css`
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            ${$side === 'left' ? 'right' : 'left'}: -3px;
+            z-index: 2;
+            width: 6px;
+            cursor: col-resize;
+          `
+    }
 
     &:hover,
     &:focus-visible,
@@ -44,36 +75,33 @@ const Handle = styled.div<{ $side: 'left' | 'right' }>(
 );
 
 type Props = {
-  // The side of the page the sidebar is on; dragging away from it widens the sidebar.
-  side: 'left' | 'right';
-  width: number;
+  // The side of the page the sidebar is on; dragging away from it enlarges the sidebar.
+  side: Side;
+  // The sidebar's size along the drag direction, its height for `top` and `bottom`.
+  size: number;
   bounds: SidebarBounds;
   label: string;
-  onResize: (width: number) => void;
+  onResize: (size: number) => void;
 };
 
 /**
- * Resizes a sidebar by dragging or with the arrow keys; a double click restores its initial width.
- * Place it inside the sidebar's positioned container.
+ * Resizes a sidebar by dragging or with the arrow keys; a double click restores its initial size.
+ * Place a left or right handle inside the sidebar's positioned container, a top or bottom one next to the sidebar.
  */
-const SidebarResizeHandle = ({ side, width, bounds, label, onResize }: Props) => {
-  const drag = useRef<{ pointerId: number; startX: number; startWidth: number } | undefined>(undefined);
+const SidebarResizeHandle = ({ side, size, bounds, label, onResize }: Props) => {
+  const drag = useRef<{ pointerId: number; start: number; startSize: number } | undefined>(undefined);
   const [dragging, setDragging] = useState(false);
-  const direction = side === 'left' ? 1 : -1;
+  const vertical = isVertical(side);
+  const direction = side === 'left' || side === 'top' ? 1 : -1;
+  const position = (event: React.PointerEvent) => (vertical ? event.clientY : event.clientX);
 
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (drag.current || event.button !== 0) return;
 
     event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
-    drag.current = { pointerId: event.pointerId, startX: event.clientX, startWidth: width };
+    drag.current = { pointerId: event.pointerId, start: position(event), startSize: size };
     setDragging(true);
-  };
-
-  const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (drag.current && drag.current.pointerId === event.pointerId) {
-      onResize(drag.current.startWidth + direction * (event.clientX - drag.current.startX));
-    }
   };
 
   const endDrag = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -84,12 +112,21 @@ const SidebarResizeHandle = ({ side, width, bounds, label, onResize }: Props) =>
     }
   };
 
+  const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (drag.current && drag.current.pointerId === event.pointerId) {
+      onResize(drag.current.startSize + direction * (position(event) - drag.current.start));
+    }
+  };
+
   const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    const step = { ArrowLeft: -KEYBOARD_STEP, ArrowRight: KEYBOARD_STEP }[event.key];
+    const steps = vertical
+      ? { ArrowUp: -KEYBOARD_STEP, ArrowDown: KEYBOARD_STEP }
+      : { ArrowLeft: -KEYBOARD_STEP, ArrowRight: KEYBOARD_STEP };
+    const step = steps[event.key];
 
     if (step !== undefined) {
       event.preventDefault();
-      onResize(width + direction * step);
+      onResize(size + direction * step);
     }
   };
 
@@ -97,9 +134,9 @@ const SidebarResizeHandle = ({ side, width, bounds, label, onResize }: Props) =>
     <Handle
       $side={side}
       role="separator"
-      aria-orientation="vertical"
+      aria-orientation={vertical ? 'horizontal' : 'vertical'}
       aria-label={label}
-      aria-valuenow={width}
+      aria-valuenow={size}
       aria-valuemin={bounds.min}
       aria-valuemax={bounds.max}
       tabIndex={0}
