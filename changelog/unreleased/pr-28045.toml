@@ -1,0 +1,8 @@
+type = "a"
+message = "Add URL template and custom link text to the Hyperlink String decorator."
+
+details.user = """
+The Hyperlink String decorator can now build the link URL from message fields, e.g. `https://whois.example.com/lookup?ip=${source}`, and show custom link text such as `Whois lookup` or `Ticket ${ticket_id}` instead of the full URL. The URL is still shown as a tooltip. Link fields that don't contain text, such as numbers or empty values, no longer stop other decorators from being applied.
+"""
+
+pulls = ["28045"]
