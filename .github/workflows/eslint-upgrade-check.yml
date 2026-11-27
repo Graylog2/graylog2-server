@@ -1,0 +1,96 @@
+name: ESLint Upgrade Check
+
+on:
+  pull_request:
+    paths:
+      - 'graylog2-web-interface/package.json'
+      - 'graylog2-web-interface/yarn.lock'
+      - 'graylog2-web-interface/eslint.config.mjs'
+      - 'graylog2-web-interface/packages/eslint-config-graylog/**'
+      - 'graylog2-web-interface/packages/eslint-plugin-graylog/**'
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  check-eslint-changes:
+    runs-on: ubuntu-slim
+    outputs:
+      eslint_changed: ${{ steps.detect.outputs.eslint_changed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect ESLint-related changes
+        id: detect
+        run: |
+          BASE="origin/${{ github.base_ref }}"
+
+          # Check if package.json diffs mention eslint
+          PACKAGE_DIFF=$(git diff "$BASE" -- \
+            graylog2-web-interface/package.json \
+            graylog2-web-interface/packages/eslint-config-graylog/package.json \
+            graylog2-web-interface/packages/eslint-plugin-graylog/package.json \
+            2>/dev/null || true)
+
+          if echo "$PACKAGE_DIFF" | grep -qi eslint; then
+            echo "eslint_changed=true" >> "$GITHUB_OUTPUT"
+            echo "Detected ESLint dependency changes in package.json"
+            exit 0
+          fi
+
+          # Check for config or plugin source changes
+          CONFIG_CHANGES=$(git diff --name-only "$BASE" -- \
+            graylog2-web-interface/eslint.config.mjs \
+            graylog2-web-interface/packages/eslint-config-graylog/ \
+            graylog2-web-interface/packages/eslint-plugin-graylog/ \
+            2>/dev/null || true)
+
+          if [ -n "$CONFIG_CHANGES" ]; then
+            echo "eslint_changed=true" >> "$GITHUB_OUTPUT"
+            echo "Detected ESLint config/plugin changes:"
+            echo "$CONFIG_CHANGES"
+            exit 0
+          fi
+
+          echo "eslint_changed=false" >> "$GITHUB_OUTPUT"
+          echo "No ESLint-related changes detected"
+
+  verify-eslint:
+    needs: check-eslint-changes
+    if: needs.check-eslint-changes.outputs.eslint_changed == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: graylog2-web-interface
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Verify ESLint configuration
+        run: |
+          set +e
+          yarn lint
+          EXIT_CODE=$?
+          set -e
+
+          if [ "$EXIT_CODE" -eq 2 ]; then
+            echo "::error::ESLint fatal error (exit code 2) — configuration is broken."
+            exit 1
+          elif [ "$EXIT_CODE" -eq 1 ]; then
+            echo "::notice::ESLint found lint issues (exit code 1) — configuration is working correctly."
+            exit 0
+          else
+            echo "ESLint passed cleanly."
+            exit 0
+          fi
