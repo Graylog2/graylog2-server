@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix crash of traffic graph on system overview page for licenses with very large traffic limits."
+
+pulls = ["28331"]
