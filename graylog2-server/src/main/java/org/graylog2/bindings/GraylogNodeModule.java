@@ -38,6 +38,7 @@ import org.graylog2.shared.bindings.ServerStatusBindings;
 import org.graylog2.shared.bindings.providers.EventBusProvider;
 import org.graylog2.shared.plugins.ChainingClassLoader;
 
+import java.time.Clock;
 import java.util.Set;
 
 /**
@@ -81,6 +82,7 @@ public class GraylogNodeModule extends Graylog2Module {
         install(new ServerStatusBindings(configuration.withCapabilities()));
 
         bind(EncryptedValueService.class).asEagerSingleton();
+        bind(Clock.class).toProvider(Clock::systemUTC).asEagerSingleton();
         if (!configuration.withInputs()) {
             bind(InputConfigurationBeanDeserializerModifier.class).toInstance(InputConfigurationBeanDeserializerModifier.withoutConfig());
         }

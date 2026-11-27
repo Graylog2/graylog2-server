@@ -16,26 +16,26 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import { Datanode } from '@graylog/server-api';
-
+import { qualifyUrl } from 'util/URLUtils';
 import type { DataNode } from 'components/datanode/Types';
+import { fetchPeriodically } from 'logic/rest/FetchProvider';
 import { defaultOnError } from 'util/conditional/onError';
 
-const fetchDataNode = async (datanodeId: string) => Datanode.getDataNode(datanodeId);
+const fetchDataNode = async (datanodeId: string) =>
+  fetchPeriodically<DataNode>('GET', qualifyUrl(`/datanode/${datanodeId}`));
 
 const useDataNode = (
   datanodeId: string,
 ): {
-  data: DataNode;
+  data: DataNode | undefined;
   refetch: () => void;
   isInitialLoading: boolean;
-  error: any;
+  error: Error | null;
 } => {
   const { data, refetch, isInitialLoading, error } = useQuery({
     queryKey: ['datanode', datanodeId],
     queryFn: () =>
       defaultOnError(fetchDataNode(datanodeId), 'Loading Data Node failed with status', 'Could not load Data Node'),
-    notifyOnChangeProps: ['data', 'error'],
     refetchInterval: 5000,
   });
 
