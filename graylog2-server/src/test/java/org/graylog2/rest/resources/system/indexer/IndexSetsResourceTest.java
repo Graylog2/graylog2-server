@@ -41,6 +41,8 @@ import org.graylog2.indexer.indexset.IndexSetCategoryCounts;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indexset.IndexSetStatsCreator;
+import org.graylog2.indexer.indexset.KeptField;
+import org.graylog2.indexer.indexset.KeptFieldsCollector;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
 import org.graylog2.indexer.indexset.PaginatedIndexSetService;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
@@ -145,6 +147,8 @@ public class IndexSetsResourceTest {
     private EntityPermissionsUtils entityPermissionsUtils;
     @Mock
     private RefreshingLockService lockService;
+    @Mock
+    private KeptFieldsCollector keptFieldsCollector;
 
     public IndexSetsResourceTest() {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
@@ -158,11 +162,11 @@ public class IndexSetsResourceTest {
     public void setUp() throws Exception {
         this.permissionCheck = permission -> true;
         this.indexSetsResource = createIndexSetsResource(Set.of(), Set.of());
-        when(indexSetRestrictionsService.createIndexSetConfig(any(), anyBoolean())).then(invocationOnMock -> {
+        when(indexSetRestrictionsService.createIndexSetConfig(any(), anyBoolean(), anyBoolean())).then(invocationOnMock -> {
             IndexSetCreationRequest request = invocationOnMock.getArgument(0);
             return request.toIndexSetConfig(true, null);
         });
-        when(indexSetRestrictionsService.updateIndexSetConfig(any(), any(), anyBoolean())).then(invocationOnMock -> {
+        when(indexSetRestrictionsService.updateIndexSetConfig(any(), any(), anyBoolean(), anyBoolean())).then(invocationOnMock -> {
             IndexSetUpdateRequest request = invocationOnMock.getArgument(0);
             IndexSetConfig config = invocationOnMock.getArgument(1);
             return request.toIndexSetConfig(config);
@@ -399,6 +403,61 @@ public class IndexSetsResourceTest {
 
         assertThat(exception.getResponse().getStatus()).isEqualTo(409);
         verify(indexSetService, never()).save(any());
+    }
+
+    @Test
+    public void updateCollectsKeptFieldsWhenDynamicMappingTurnsOff() {
+        final IndexSetConfig oldConfig = createIndexSetConfig();
+        final IndexSetConfig newConfig = oldConfig.toBuilder().dynamicMappingDisabled(true).build();
+        final List<KeptField> keptFields = List.of(new KeptField("vendor_user", Map.of("type", "keyword")));
+        when(indexSetService.get(oldConfig.id())).thenReturn(Optional.of(oldConfig));
+        when(indexSetService.save(any())).then(invocation -> invocation.getArgument(0));
+        when(keptFieldsCollector.collect(any())).thenReturn(keptFields);
+
+        final IndexSetResponse response = indexSetsResource.update(oldConfig.id(), IndexSetTestUtils.toUpdateRequest(newConfig));
+
+        assertThat(response.keptFieldsCount()).isEqualTo(1);
+    }
+
+    @Test
+    public void updateValidatesBeforeCollectingKeptFields() {
+        final IndexSetConfig oldConfig = createIndexSetConfig();
+        final IndexSetConfig newConfig = oldConfig.toBuilder().dynamicMappingDisabled(true).build();
+        when(indexSetService.get(oldConfig.id())).thenReturn(Optional.of(oldConfig));
+        when(indexSetValidator.validate(any(IndexSetConfig.class))).thenReturn(Optional.of(IndexSetValidator.Violation.create("invalid")));
+
+        assertThrows(BadRequestException.class, () -> indexSetsResource.update(oldConfig.id(), IndexSetTestUtils.toUpdateRequest(newConfig)));
+
+        verifyNoInteractions(keptFieldsCollector);
+    }
+
+    @Test
+    public void updateKeepsKeptFieldsWhileDynamicMappingStaysOff() {
+        final List<KeptField> keptFields = List.of(new KeptField("vendor_user", Map.of("type", "keyword")));
+        final IndexSetConfig oldConfig = createIndexSetConfig().toBuilder().dynamicMappingDisabled(true).keptFields(keptFields).build();
+        when(indexSetService.get(oldConfig.id())).thenReturn(Optional.of(oldConfig));
+        when(indexSetService.save(any())).then(invocation -> invocation.getArgument(0));
+
+        final IndexSetResponse response = indexSetsResource.update(oldConfig.id(), IndexSetTestUtils.toUpdateRequest(oldConfig));
+
+        assertThat(response.keptFieldsCount()).isEqualTo(1);
+        verifyNoInteractions(keptFieldsCollector);
+    }
+
+    @Test
+    public void updateClearsKeptFieldsWhenDynamicMappingTurnsOn() {
+        final IndexSetConfig oldConfig = createIndexSetConfig().toBuilder()
+                .dynamicMappingDisabled(true)
+                .keptFields(List.of(new KeptField("vendor_user", Map.of("type", "keyword"))))
+                .build();
+        final IndexSetConfig newConfig = oldConfig.toBuilder().dynamicMappingDisabled(false).build();
+        when(indexSetService.get(oldConfig.id())).thenReturn(Optional.of(oldConfig));
+        when(indexSetService.save(any())).then(invocation -> invocation.getArgument(0));
+
+        final IndexSetResponse response = indexSetsResource.update(oldConfig.id(), IndexSetTestUtils.toUpdateRequest(newConfig));
+
+        assertThat(response.keptFieldsCount()).isNull();
+        verifyNoInteractions(keptFieldsCollector);
     }
 
     private static DataTieringConfig dataTieringWithLockId() {
@@ -1059,7 +1118,8 @@ public class IndexSetsResourceTest {
                                                  Set<IndexSetOverviewAttributeProvider> attributeProviders) {
         return new TestResource(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory,
                 indexSetStatsCreator, clusterConfigService, systemJobManager, permission -> permissionCheck.test(permission), openIndexSetFilterFactories,
-                attributeProviders, indexSetRestrictionsService, lockServiceFactory, paginatedIndexSetService, streamService, entityPermissionsUtils);
+                attributeProviders, indexSetRestrictionsService, lockServiceFactory, paginatedIndexSetService, streamService, entityPermissionsUtils,
+                keptFieldsCollector);
     }
 
     private static class TestResource extends IndexSetsResource {
@@ -1073,11 +1133,13 @@ public class IndexSetsResourceTest {
                      Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories,
                      Set<IndexSetOverviewAttributeProvider> attributeProviders, IndexSetRestrictionsService indexSetRestrictionsService,
                      RefreshingLockService.Factory lockServiceFactory, PaginatedIndexSetService paginatedIndexSetService,
-                     StreamService streamService, EntityPermissionsUtils entityPermissionsUtils) {
+                     StreamService streamService, EntityPermissionsUtils entityPermissionsUtils,
+                     KeptFieldsCollector keptFieldsCollector) {
             super(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory,
                     indexSetStatsCreator, clusterConfigService, systemJobManager, mock(DataTieringStatusService.class),
                     openIndexSetFilterFactories, attributeProviders, indexSetRestrictionsService,
-                    mock(EventBus.class), lockServiceFactory, paginatedIndexSetService, streamService, entityPermissionsUtils);
+                    mock(EventBus.class), lockServiceFactory, paginatedIndexSetService, streamService, entityPermissionsUtils,
+                    keptFieldsCollector);
             this.permissionCheck = permissionCheck;
         }
 

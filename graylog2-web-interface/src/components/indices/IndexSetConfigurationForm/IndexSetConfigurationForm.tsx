@@ -20,6 +20,7 @@ import { Formik, Form, Field } from 'formik';
 import type { FormikHelpers } from 'formik';
 import styled, { css } from 'styled-components';
 import deburr from 'lodash/deburr';
+import isEmpty from 'lodash/isEmpty';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import useIndexSetTemplateDefaults from 'components/indices/IndexSetTemplates/hooks/useIndexSetTemplateDefaults';
@@ -41,6 +42,14 @@ import type {
 import IndexRetentionProvider from 'components/indices/contexts/IndexRetentionProvider';
 import useHistory from 'routing/useHistory';
 import IndexSetProfileConfiguration from 'components/indices/IndexSetProfileConfiguration';
+import FieldLimitSettings from 'components/indices/FieldLimitSettings';
+import {
+  extractFieldLimitErrors,
+  isFieldLimitAllowed,
+  isIlluminateTemplateType,
+  prepareFieldLimitValues,
+} from 'components/indices/helpers/fieldLimit';
+import type { FieldLimitErrors } from 'components/indices/helpers/fieldLimit';
 import useFeature from 'hooks/useFeature';
 import useIndexSet from 'components/indices/hooks/useIndexSet';
 import isIndexFieldTypeChangeAllowed from 'components/indices/helpers/isIndexFieldTypeChangeAllowed';
@@ -112,8 +121,9 @@ const IndexSetConfigurationForm = ({
 
   const [fieldTypeRefreshIntervalUnit, setFieldTypeRefreshIntervalUnit] = useState<Unit>('seconds');
   const { loadingIndexSetTemplateDefaults, indexSetTemplateDefaults } = useIndexSetTemplateDefaults();
-  const [indexSet] = useIndexSet(initialIndexSet);
+  const indexSet = useIndexSet(initialIndexSet);
   const [autoFillPrefix, setAutoFillPrefix] = useState<boolean>(true);
+  const [fieldLimitErrors, setFieldLimitErrors] = useState<FieldLimitErrors>({});
 
   const getFieldRestrictions = useCallback(() => parseFieldRestrictions(indexSet?.field_restrictions), [indexSet]);
 
@@ -255,8 +265,25 @@ const IndexSetConfigurationForm = ({
     return indexSet as unknown as IndexSetFormValues;
   };
 
+  const submitIndexSet = (values: IndexSet) => {
+    setFieldLimitErrors({});
+
+    return Promise.resolve(onUpdate(values)).catch((error) => {
+      const errors = extractFieldLimitErrors(error);
+
+      if (isEmpty(errors)) {
+        throw error;
+      }
+
+      setFieldLimitErrors(errors);
+    });
+  };
+
   const saveConfiguration = (values: IndexSetFormValues, { setSubmitting }: FormikHelpers<IndexSetFormValues>) => {
-    const preparedValues = prepareRetentionConfigBeforeSubmit(values);
+    const preparedValues = prepareFieldLimitValues(
+      prepareRetentionConfigBeforeSubmit(values),
+      isFieldLimitAllowed(indexSet.index_template_type),
+    );
 
     const required = submitConfirmation(prepareInitialValues(), preparedValues);
 
@@ -267,7 +294,7 @@ const IndexSetConfigurationForm = ({
       return undefined;
     }
 
-    return onUpdate(preparedValues);
+    return submitIndexSet(preparedValues);
   };
 
   const cancelConfirmation = () => setConfirmation(null);
@@ -278,7 +305,7 @@ const IndexSetConfigurationForm = ({
     setSavingConfirmed(true);
 
     return Promise.resolve()
-      .then(() => onUpdate(values))
+      .then(() => submitIndexSet(values))
       .finally(() => setSavingConfirmed(false));
   };
 
@@ -446,6 +473,18 @@ const IndexSetConfigurationForm = ({
                           />
                         )}
                       </Field>
+                    </Section>
+                  )}
+                  {isFieldLimitAllowed(indexSet.index_template_type) && (
+                    <Section title="Field Limit">
+                      <FieldLimitSettings
+                        errors={fieldLimitErrors}
+                        profile={{
+                          id: values.field_type_profile,
+                          isIlluminate: isIlluminateTemplateType(indexSet.index_template_type),
+                          keptFieldsCount: indexSet.kept_fields_count,
+                        }}
+                      />
                     </Section>
                   )}
                   <Section title="Important Note">

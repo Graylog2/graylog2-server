@@ -16,11 +16,17 @@
  */
 package org.graylog2.indexer.indexset;
 
+import javax.annotation.Nullable;
+import java.util.List;
+
 /**
  * Part of {@link IndexSetConfig} and {@link IndexSet} needed by index template building.
  */
 public record IndexSetMappingTemplate(String indexAnalyzer,
                                       String indexWildcard,
-                                      CustomFieldMappings customFieldMappings) {
+                                      CustomFieldMappings customFieldMappings,
+                                      @Nullable Integer fieldLimit,
+                                      @Nullable Boolean dynamicMappingDisabled,
+                                      @Nullable List<KeptField> keptFields) {
 
 }

@@ -17,11 +17,13 @@
 package org.graylog2.indexer.indexset.profile;
 
 import com.google.common.primitives.Ints;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.ReplaceOptions;
 import com.mongodb.client.model.Sorts;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoCollection;
@@ -30,6 +32,7 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.DbQueryCreator;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.indexer.fieldtypes.mapping.CustomMappingValidation;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
@@ -47,6 +50,8 @@ import java.util.stream.Collectors;
 
 import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
+import static org.graylog2.indexer.indexset.fields.DynamicMappingDisabledField.FIELD_DYNAMIC_MAPPING_DISABLED;
+import static org.graylog2.indexer.indexset.fields.FieldTypeProfileField.FIELD_PROFILE_ID;
 import static org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile.CUSTOM_MAPPINGS_FIELD_NAME;
 import static org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile.DESCRIPTION_FIELD_NAME;
 import static org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile.ID_FIELD_NAME;
@@ -138,9 +143,22 @@ public class IndexFieldTypeProfileService {
         if (!ObjectId.isValid(id)) {
             return 0;
         }
+        checkNoIndexSetNeedsProfile(id);
         int numRemoved = mongoUtils.deleteById(id) ? 1 : 0;
         indexSetService.removeReferencesToProfile(id);
         return numRemoved;
+    }
+
+    private void checkNoIndexSetNeedsProfile(final String profileId) {
+        final List<String> titles = indexSetService.findMany(Filters.and(
+                        Filters.eq(FIELD_PROFILE_ID, profileId),
+                        Filters.eq(FIELD_DYNAMIC_MAPPING_DISABLED, true)))
+                .stream()
+                .map(IndexSetConfig::title)
+                .toList();
+        if (!titles.isEmpty()) {
+            throw new BadRequestException("Unable to delete the profile, dynamic mapping is disabled in index sets: " + titles);
+        }
     }
 
     public boolean update(final String profileId, final IndexFieldTypeProfile updatedProfile) {

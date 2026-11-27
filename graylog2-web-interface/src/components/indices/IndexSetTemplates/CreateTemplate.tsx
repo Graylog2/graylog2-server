@@ -36,7 +36,7 @@ const CreateTemplate = () => {
         app_action_value: 'create-new-index-set-template-created',
       });
 
-      createTemplate(template).then(() => {
+      return createTemplate(template).then(() => {
         history.push(Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW);
       });
     },

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, within } from 'wrappedTestingLibrary';
 import { waitFor } from 'wrappedTestingLibrary/hooks';
 import userEvent from '@testing-library/user-event';
 
@@ -23,6 +23,8 @@ import useIndexSetTemplateDefaults from 'components/indices/IndexSetTemplates/ho
 import useSelectedIndexSetTemplate from 'components/indices/IndexSetTemplates/hooks/useSelectedTemplate';
 import asMock from 'helpers/mocking/AsMock';
 import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions';
+import useProfile from 'components/indices/IndexSetFieldTypeProfiles/hooks/useProfile';
+import AppConfig from 'util/AppConfig';
 import { DATA_TIERING_TYPE } from 'components/indices/data-tiering';
 
 import IndexSetConfigurationForm from './IndexSetConfigurationForm';
@@ -243,12 +245,19 @@ const indexSetTemplateDefaults = {
 };
 
 jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions', () => jest.fn());
+jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfile', () => jest.fn());
 jest.mock('components/indices/IndexSetTemplates/hooks/useIndexSetTemplateDefaults', () => jest.fn());
 jest.mock('components/indices/IndexSetTemplates/hooks/useSelectedTemplate', () => jest.fn());
 
 describe('IndexSetConfigurationForm', () => {
   beforeEach(() => {
     asMock(useProfileOptions).mockReturnValue({ isLoading: false, options: [], refetch: () => {} });
+    asMock(useProfile).mockReturnValue({
+      data: { id: null, name: null, description: null, customFieldMappings: [], indexSetIds: [] },
+      isFetched: true,
+      isFetching: false,
+      refetch: () => {},
+    });
     asMock(useIndexSetTemplateDefaults).mockReturnValue({
       loadingIndexSetTemplateDefaults: false,
       indexSetTemplateDefaults,
@@ -371,6 +380,229 @@ describe('IndexSetConfigurationForm', () => {
       await waitFor(() => {
         expect(screen.queryByRole('textbox', { name: /index prefix/i })).not.toBeInTheDocument();
       });
+    });
+  });
+
+  describe('Selected index set template', () => {
+    const selectedTemplate = {
+      id: 'template-id',
+      title: 'Template',
+      description: 'Template description',
+      built_in: false,
+      default: false,
+      enabled: true,
+      disabled_reason: '',
+      index_set_config: {
+        ...indexSetTemplateDefaults,
+        shards: 7,
+        field_limit: 1200,
+        use_legacy_rotation: true,
+        rotation_strategy: indexSetTemplateDefaults.rotation_strategy_config,
+        retention_strategy_class: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategy',
+        retention_strategy: {
+          type: 'org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig',
+          max_number_of_indices: 2147483647,
+        },
+        data_tiering: { type: DATA_TIERING_TYPE.HOT_ONLY, index_lifetime_min: '1', index_lifetime_max: '2' },
+      },
+    };
+
+    it('Should prefill the form from the template without changing the template', async () => {
+      const templateDataTiering = { ...selectedTemplate.index_set_config.data_tiering };
+
+      asMock(useSelectedIndexSetTemplate).mockReturnValue({
+        selectedIndexSetTemplate: selectedTemplate as never,
+        setSelectedIndexSetTemplate: jest.fn(),
+      });
+
+      render(<SUT create />);
+
+      expect(await screen.findByRole('spinbutton', { name: /index shards/i })).toHaveValue(7);
+      expect(screen.getByRole('spinbutton', { name: /max field count/i })).toHaveValue(1200);
+      expect(selectedTemplate.index_set_config.data_tiering).toEqual(templateDataTiering);
+    });
+  });
+
+  describe('Max field count and dynamic mapping', () => {
+    it('Should show the default as placeholder and disable the toggle without a profile', async () => {
+      render(<SUT indexSet={indexSet} />);
+
+      const limitInput = await screen.findByRole('spinbutton', { name: /max field count/i });
+
+      expect(limitInput).toHaveAttribute('placeholder', '1000 (default)');
+      expect(await screen.findByLabelText(/disable dynamic index mapping/i)).toBeDisabled();
+      expect(screen.getByText(/assign a field type profile to this index set first/i)).toBeInTheDocument();
+    });
+
+    it('Should take the limit of the default template when creating without a selected template', async () => {
+      asMock(useIndexSetTemplateDefaults).mockReturnValue({
+        loadingIndexSetTemplateDefaults: false,
+        indexSetTemplateDefaults: { ...indexSetTemplateDefaults, field_limit: 1500 },
+      });
+
+      render(<SUT create />);
+
+      expect(await screen.findByRole('spinbutton', { name: /max field count/i })).toHaveValue(1500);
+    });
+
+    it('Should keep an unset limit empty when editing, even if the default template has one', async () => {
+      asMock(useIndexSetTemplateDefaults).mockReturnValue({
+        loadingIndexSetTemplateDefaults: false,
+        indexSetTemplateDefaults: { ...indexSetTemplateDefaults, field_limit: 1500 },
+      });
+
+      render(<SUT indexSet={{ ...indexSet, field_limit: null }} />);
+
+      expect(await screen.findByRole('spinbutton', { name: /max field count/i })).toHaveValue(null);
+    });
+
+    it('Should enable the toggle when a profile is assigned', async () => {
+      render(<SUT indexSet={{ ...indexSet, field_type_profile: 'profile-id' }} />);
+
+      expect(await screen.findByLabelText(/disable dynamic index mapping/i)).toBeEnabled();
+    });
+
+    it('Should warn when the assigned profile holds as many mappings as the limit', async () => {
+      asMock(useProfile).mockReturnValue({
+        data: {
+          id: 'profile-id',
+          name: 'Profile',
+          description: '',
+          customFieldMappings: Array.from({ length: 1000 }, (_, i) => ({ field: `field_${i}`, type: 'string' })),
+          indexSetIds: [],
+        },
+        isFetched: true,
+        isFetching: false,
+        refetch: () => {},
+      });
+
+      render(<SUT indexSet={{ ...indexSet, field_type_profile: 'profile-id' }} />);
+
+      expect(await screen.findByText(/as many as or more than the limit of 1000 fields/i)).toBeInTheDocument();
+    });
+
+    it('Should not show the settings for event index sets', async () => {
+      render(<SUT indexSet={{ ...indexSet, index_template_type: 'events' }} />);
+
+      await screen.findByDisplayValue(/Foo Title/i);
+
+      expect(screen.queryByRole('spinbutton', { name: /max field count/i })).not.toBeInTheDocument();
+      expect(screen.queryByLabelText(/disable dynamic index mapping/i)).not.toBeInTheDocument();
+    });
+
+    it('Should show the max field count and an enabled toggle for Illuminate index sets', async () => {
+      render(<SUT indexSet={{ ...indexSet, index_template_type: 'illuminate_content' }} />);
+
+      expect(await screen.findByRole('spinbutton', { name: /max field count/i })).toBeInTheDocument();
+      expect(await screen.findByLabelText(/disable dynamic index mapping/i)).toBeEnabled();
+      expect(screen.getByText(/fields first seen later are not searchable/i)).toBeInTheDocument();
+    });
+
+    it('Should show how many fields were kept on Illuminate index sets with dynamic mapping off', async () => {
+      render(
+        <SUT
+          indexSet={{
+            ...indexSet,
+            index_template_type: 'illuminate_content',
+            dynamic_mapping_disabled: true,
+            kept_fields_count: 42,
+          }}
+        />,
+      );
+
+      expect(await screen.findByText(/42 fields were kept from the write index/i)).toBeInTheDocument();
+    });
+
+    it('Should warn when no fields were kept on Illuminate index sets with dynamic mapping off', async () => {
+      render(
+        <SUT
+          indexSet={{
+            ...indexSet,
+            index_template_type: 'illuminate_content',
+            dynamic_mapping_disabled: true,
+            kept_fields_count: null,
+          }}
+        />,
+      );
+
+      expect(
+        await screen.findByText(/only the fields the illuminate package lists stay searchable/i),
+      ).toBeInTheDocument();
+    });
+
+    it('Should hide the max field count but keep the toggle on Cloud', async () => {
+      const isCloud = jest.spyOn(AppConfig, 'isCloud').mockReturnValue(true);
+
+      render(<SUT indexSet={{ ...indexSet, field_type_profile: 'profile-id' }} />);
+
+      expect(await screen.findByLabelText(/disable dynamic index mapping/i)).toBeInTheDocument();
+      expect(screen.queryByRole('spinbutton', { name: /max field count/i })).not.toBeInTheDocument();
+
+      isCloud.mockRestore();
+    });
+
+    it('Should keep dynamic mapping on when the confirmation is cancelled', async () => {
+      render(<SUT indexSet={{ ...indexSet, field_type_profile: 'profile-id' }} />);
+
+      const toggle = await screen.findByLabelText(/disable dynamic index mapping/i);
+      await userEvent.click(toggle);
+
+      const dialog = await screen.findByRole('dialog');
+      await userEvent.click(within(dialog).getByRole('button', { name: /cancel/i }));
+
+      await waitFor(() => {
+        expect(screen.queryByText('Disable dynamic index mapping?')).not.toBeInTheDocument();
+      });
+
+      expect(toggle).not.toBeChecked();
+    });
+
+    it('Should disable dynamic mapping only after the confirmation', async () => {
+      render(<SUT indexSet={{ ...indexSet, field_type_profile: 'profile-id' }} />);
+
+      const toggle = await screen.findByLabelText(/disable dynamic index mapping/i);
+      await userEvent.click(toggle);
+
+      expect(toggle).not.toBeChecked();
+
+      const dialog = await screen.findByRole('dialog');
+      await userEvent.click(within(dialog).getByRole('button', { name: /disable dynamic mapping/i }));
+
+      await waitFor(() => {
+        expect(toggle).toBeChecked();
+      });
+
+      await userEvent.click(await screen.findByRole('button', { name: /save/i }));
+
+      await waitFor(() => {
+        expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ dynamic_mapping_disabled: true }));
+      });
+    });
+
+    it('Should turn dynamic mapping back on without a confirmation', async () => {
+      render(<SUT indexSet={{ ...indexSet, field_type_profile: 'profile-id', dynamic_mapping_disabled: true }} />);
+
+      const toggle = await screen.findByLabelText(/disable dynamic index mapping/i);
+      await userEvent.click(toggle);
+
+      await waitFor(() => {
+        expect(toggle).not.toBeChecked();
+      });
+
+      expect(screen.queryByText('Disable dynamic index mapping?')).not.toBeInTheDocument();
+    });
+
+    it('Should show the backend error on the field', async () => {
+      onSave.mockRejectedValueOnce({
+        additional: { body: [{ path: 'field_limit', message: 'must be between 1000 and 2000' }] },
+      });
+
+      render(<SUT indexSet={indexSet} />);
+
+      await userEvent.type(await screen.findByRole('spinbutton', { name: /max field count/i }), '5000');
+      await userEvent.click(await screen.findByRole('button', { name: /save/i }));
+
+      expect(await screen.findByText(/must be between 1000 and 2000/i)).toBeInTheDocument();
     });
   });
 });

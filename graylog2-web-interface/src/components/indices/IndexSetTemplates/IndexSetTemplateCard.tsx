@@ -22,6 +22,8 @@ import { Button, Col, Row } from 'components/bootstrap';
 import { Card } from 'components/common';
 import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
 import { prepareDataTieringInitialValues, DataTieringVisualisation } from 'components/indices/data-tiering';
+import { DEFAULT_FIELD_LIMIT } from 'components/indices/helpers/fieldLimit';
+import AppConfig from 'util/AppConfig';
 
 type Props = {
   template: IndexSetTemplate;
@@ -60,7 +62,12 @@ const Description = styled.p`
   margin-bottom: 0;
 `;
 
+const Settings = styled.dl`
+  margin-bottom: 0;
+`;
+
 const IndexSetTemplateCard = ({ template, handleCardClick, isSelected }: Props) => {
+  const { field_limit: fieldLimit, dynamic_mapping_disabled: dynamicMappingDisabled } = template.index_set_config;
   const dataTieringConfig = prepareDataTieringInitialValues(template.index_set_config.data_tiering, PluginStore, false);
 
   return (
@@ -83,6 +90,16 @@ const IndexSetTemplateCard = ({ template, handleCardClick, isSelected }: Props) 
           </Col>
         </Row>
       )}
+      <Settings>
+        {!AppConfig.isCloud() && (
+          <>
+            <dt>Max field count:</dt>
+            <dd>{fieldLimit ?? `${DEFAULT_FIELD_LIMIT} (default)`}</dd>
+          </>
+        )}
+        <dt>Dynamic index mapping:</dt>
+        <dd>{dynamicMappingDisabled ? 'Disabled' : 'Enabled'}</dd>
+      </Settings>
       {template.enabled && (
         <ButtonWrapper>
           <Button onClick={() => handleCardClick(template)} disabled={isSelected}>

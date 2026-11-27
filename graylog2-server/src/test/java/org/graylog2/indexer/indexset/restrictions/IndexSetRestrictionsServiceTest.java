@@ -17,6 +17,7 @@
 package org.graylog2.indexer.indexset.restrictions;
 
 import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplateService;
 import org.graylog2.indexer.indexset.template.IndexSetTemplate;
@@ -65,11 +66,16 @@ public class IndexSetRestrictionsServiceTest {
 
     @BeforeEach
     void setUp() {
-        underTest = new IndexSetRestrictionsService(
+        underTest = service(false);
+    }
+
+    private IndexSetRestrictionsService service(boolean isCloud) {
+        return new IndexSetRestrictionsService(
                 templateService,
                 indexSetDefaultTemplateService,
                 new DefaultIndexSetConfigTransformer(),
-                new FieldRestrictionService(new ObjectMapperProvider().get()));
+                new FieldRestrictionService(new ObjectMapperProvider().get()),
+                isCloud);
     }
 
     @Test
@@ -83,7 +89,7 @@ public class IndexSetRestrictionsServiceTest {
                 .build();
         when(templateService.get(indexSetTemplate.id())).thenReturn(Optional.of(indexSetTemplate));
 
-        IndexSetConfig created = underTest.createIndexSetConfig(request, false);
+        IndexSetConfig created = underTest.createIndexSetConfig(request, false, true);
 
         assertThat(created).isEqualTo(indexSetConfig);
     }
@@ -103,7 +109,7 @@ public class IndexSetRestrictionsServiceTest {
         when(templateService.get(indexSetTemplate.id())).thenReturn(Optional.of(indexSetTemplate));
 
         final BadRequestException exception = assertThrows(BadRequestException.class, () ->
-                underTest.createIndexSetConfig(request, false));
+                underTest.createIndexSetConfig(request, false, true));
         for (Map.Entry<String, Set<IndexSetFieldRestriction>> entry : FIELD_RESTRICTION.entrySet()) {
             assertThat(exception.getMessage()).contains(f("%s : %s", entry.getKey(), ImmutableIndexSetField.TYPE_NAME));
         }
@@ -121,7 +127,7 @@ public class IndexSetRestrictionsServiceTest {
                 .build();
         when(templateService.get(indexSetTemplate.id())).thenReturn(Optional.of(indexSetTemplate));
 
-        IndexSetConfig created = underTest.createIndexSetConfig(request, true);
+        IndexSetConfig created = underTest.createIndexSetConfig(request, true, true);
 
         assertThat(created).isEqualTo(indexSetConfig.toBuilder()
                 .shards(request.shards())
@@ -137,7 +143,7 @@ public class IndexSetRestrictionsServiceTest {
                 .replicas(1)
                 .build();
 
-        IndexSetConfig created = underTest.updateIndexSetConfig(request, indexSetConfig, false);
+        IndexSetConfig created = underTest.updateIndexSetConfig(request, indexSetConfig, false, true);
 
         assertThat(created).isEqualTo(indexSetConfig.toBuilder()
                 .replicas(request.replicas())
@@ -157,7 +163,7 @@ public class IndexSetRestrictionsServiceTest {
                 .build();
 
         final BadRequestException exception = assertThrows(BadRequestException.class, () ->
-                underTest.updateIndexSetConfig(request, indexSetConfig, false));
+                underTest.updateIndexSetConfig(request, indexSetConfig, false, true));
         for (Map.Entry<String, Set<IndexSetFieldRestriction>> entry : FIELD_RESTRICTION.entrySet()) {
             assertThat(exception.getMessage()).contains(f("%s : %s", entry.getKey(), ImmutableIndexSetField.TYPE_NAME));
         }
@@ -172,7 +178,7 @@ public class IndexSetRestrictionsServiceTest {
                 .fieldRestrictions(null)
                 .build();
 
-        assertThatThrownBy(() -> underTest.updateIndexSetConfig(request, indexSetConfig, false))
+        assertThatThrownBy(() -> underTest.updateIndexSetConfig(request, indexSetConfig, false, true))
                 .hasMessageContaining(RestPermissions.INDEXSETS_FIELD_RESTRICTIONS_EDIT);
     }
 
@@ -185,11 +191,44 @@ public class IndexSetRestrictionsServiceTest {
                 .shards(indexSetConfig.shards() + 1)
                 .build();
 
-        IndexSetConfig created = underTest.updateIndexSetConfig(request, indexSetConfig, true);
+        IndexSetConfig created = underTest.updateIndexSetConfig(request, indexSetConfig, true, true);
 
         assertThat(created).isEqualTo(indexSetConfig.toBuilder()
                 .shards(request.shards())
                 .build());
+    }
+
+    @Test
+    void onCloudNonAdminCreatesIndexSetWithTheTemplatesFieldLimit() {
+        final IndexSetConfig indexSetConfig = createIndexSetConfig(null, "title").toBuilder().fieldLimit(1500).build();
+        final IndexSetTemplate indexSetTemplate = createIndexSetTemplate(indexSetConfig);
+        final IndexSetCreationRequest request = toCreationRequest(indexSetConfig).toBuilder()
+                .indexSetTemplateId(indexSetTemplate.id())
+                .build();
+        when(templateService.get(indexSetTemplate.id())).thenReturn(Optional.of(indexSetTemplate));
+
+        assertThat(service(true).createIndexSetConfig(request, true, false).fieldLimit()).isEqualTo(1500);
+    }
+
+    @Test
+    void onCloudNonAdminCannotChangeFieldLimit() {
+        assertThatThrownBy(() -> changeFieldLimit(service(true), false)).isInstanceOf(ForbiddenException.class);
+    }
+
+    @Test
+    void onCloudAdminCanChangeFieldLimit() {
+        assertThat(changeFieldLimit(service(true), true).fieldLimit()).isEqualTo(1500);
+    }
+
+    @Test
+    void outsideCloudNonAdminCanChangeFieldLimit() {
+        assertThat(changeFieldLimit(underTest, false).fieldLimit()).isEqualTo(1500);
+    }
+
+    private static IndexSetConfig changeFieldLimit(IndexSetRestrictionsService service, boolean isAdmin) {
+        final IndexSetConfig oldConfig = createIndexSetConfig("1", "title");
+        final IndexSetUpdateRequest request = toUpdateRequest(oldConfig.toBuilder().fieldLimit(1500).build());
+        return service.updateIndexSetConfig(request, oldConfig, true, isAdmin);
     }
 
     public static IndexSetTemplate createIndexSetTemplate(IndexSetConfig indexSetConfig) {
@@ -207,6 +246,7 @@ public class IndexSetRestrictionsServiceTest {
                 .useLegacyRotation(indexSetConfig.dataTieringConfig() == null)
                 .fieldRestrictions(indexSetConfig.fieldRestrictions())
                 .dataTieringConfig(indexSetConfig.dataTieringConfig())
+                .fieldLimit(indexSetConfig.fieldLimit())
                 .build());
     }
 

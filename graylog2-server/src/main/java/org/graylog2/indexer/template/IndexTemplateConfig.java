@@ -18,11 +18,14 @@ package org.graylog2.indexer.template;
 
 import com.google.auto.value.AutoValue;
 import org.graylog2.indexer.indexset.fields.CustomFieldMappingsField;
+import org.graylog2.indexer.indexset.fields.DynamicMappingDisabledField;
+import org.graylog2.indexer.indexset.fields.FieldLimitField;
 import org.graylog2.indexer.indexset.fields.FieldTypeProfileField;
 import org.graylog2.indexer.indexset.fields.IndexAnalyzerField;
 import org.graylog2.indexer.indexset.fields.IndexPrefixField;
 import org.graylog2.indexer.indexset.fields.IndexTemplateNameField;
 import org.graylog2.indexer.indexset.fields.IndexTemplateTypeField;
+import org.graylog2.indexer.indexset.fields.KeptFieldsField;
 
 @AutoValue
 public abstract class IndexTemplateConfig implements
@@ -31,6 +34,9 @@ public abstract class IndexTemplateConfig implements
         IndexTemplateNameField,
         FieldTypeProfileField,
         CustomFieldMappingsField,
+        FieldLimitField,
+        DynamicMappingDisabledField,
+        KeptFieldsField,
         IndexAnalyzerField {
 
     public abstract String indexWildcard();
@@ -48,6 +54,9 @@ public abstract class IndexTemplateConfig implements
             IndexTemplateTypeFieldBuilder<Builder>,
             IndexTemplateNameFieldBuilder<Builder>,
             CustomFieldMappingsField.CustomFieldMappingsFieldBuilder<Builder>,
+            FieldLimitField.FieldLimitFieldBuilder<Builder>,
+            DynamicMappingDisabledField.DynamicMappingDisabledFieldBuilder<Builder>,
+            KeptFieldsField.KeptFieldsFieldBuilder<Builder>,
             IndexAnalyzerField.IndexAnalyzerFieldBuilder<Builder>,
             IndexPrefixFieldBuilder<Builder> {
 

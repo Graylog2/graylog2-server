@@ -27,6 +27,7 @@ import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.fields.RotationAndRetentionFields;
 import org.graylog2.indexer.indexset.index.IndexPattern;
+import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
@@ -50,6 +51,7 @@ import static org.graylog2.indexer.indexset.fields.RotationAndRetentionFields.FI
 import static org.graylog2.indexer.indexset.fields.RotationAndRetentionFields.FIELD_ROTATION_STRATEGY;
 import static org.graylog2.indexer.indexset.fields.RotationAndRetentionFields.FIELD_ROTATION_STRATEGY_CLASS;
 import static org.graylog2.indexer.indexset.index.IndexPattern.WARM_INDEX_INFIX;
+import static org.graylog2.indexer.template.IndexTemplateProvider.ILLUMINATE_INDEX_TEMPLATE_TYPE;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class IndexSetValidator {
@@ -59,17 +61,20 @@ public class IndexSetValidator {
     private final DataTieringOrchestrator dataTieringOrchestrator;
     private final DataTieringChecker dataTieringChecker;
     private final Set<IndexSetConfigValidator> pluginValidators;
+    private final IndexFieldTypeProfileService profileService;
 
     @Inject
     public IndexSetValidator(IndexSetRegistry indexSetRegistry,
                              ElasticsearchConfiguration elasticsearchConfiguration,
                              DataTieringOrchestrator dataTieringOrchestrator, DataTieringChecker dataTieringChecker,
-                             Set<IndexSetConfigValidator> pluginValidators) {
+                             Set<IndexSetConfigValidator> pluginValidators,
+                             IndexFieldTypeProfileService profileService) {
         this.indexSetRegistry = indexSetRegistry;
         this.elasticsearchConfiguration = elasticsearchConfiguration;
         this.dataTieringOrchestrator = dataTieringOrchestrator;
         this.dataTieringChecker = dataTieringChecker;
         this.pluginValidators = pluginValidators;
+        this.profileService = profileService;
     }
 
     public Optional<Violation> validate(IndexSetConfig newConfig) {
@@ -152,6 +157,22 @@ public class IndexSetValidator {
         }
         if (!config.canHaveCustomFieldMappings() && config.customFieldMappings() != null && !config.customFieldMappings().isEmpty()) {
             return Violation.create("Custom field mappings cannot be set for events and failures index sets");
+        }
+        if (!config.canHaveFieldLimitAndDynamicMapping() && config.fieldLimit() != null) {
+            return Violation.create("A field limit cannot be set for events, failures and collector logs index sets");
+        }
+        if (Boolean.TRUE.equals(config.dynamicMappingDisabled())) {
+            if (!config.canHaveFieldLimitAndDynamicMapping()) {
+                return Violation.create("Dynamic mapping cannot be disabled for events, failures and collector logs index sets");
+            }
+            // Illuminate index sets can't have a profile; their fixed field types count as one.
+            final boolean isIlluminate = config.indexTemplateType().map(ILLUMINATE_INDEX_TEMPLATE_TYPE::equals).orElse(false);
+            if (Strings.isNullOrEmpty(config.fieldTypeProfile()) && !isIlluminate) {
+                return Violation.create("Dynamic mapping can only be disabled for index sets with a field type profile");
+            }
+            if (!Strings.isNullOrEmpty(config.fieldTypeProfile()) && profileService.get(config.fieldTypeProfile()).isEmpty()) {
+                return Violation.create(f("Dynamic mapping can only be disabled with an existing field type profile, <%s> does not exist", config.fieldTypeProfile()));
+            }
         }
         return null;
     }

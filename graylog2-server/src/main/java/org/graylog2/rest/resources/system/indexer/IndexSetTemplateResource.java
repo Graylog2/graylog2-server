@@ -46,6 +46,7 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.cluster.lock.AlreadyLockedException;
 import org.graylog2.cluster.lock.RefreshingLockService;
 import org.graylog2.datatiering.DataTieringConfig;
+import org.graylog2.indexer.indexset.restrictions.IndexSetRestrictionsService;
 import org.graylog2.indexer.indexset.validation.IndexSetValidator;
 import org.graylog2.indexer.indexset.template.IndexSetDefaultTemplateService;
 import org.graylog2.indexer.indexset.template.IndexSetTemplate;
@@ -83,6 +84,7 @@ public class IndexSetTemplateResource extends RestResource {
     private final IndexSetDefaultTemplateService indexSetDefaultTemplateService;
     private final IndexSetTemplateRequirementsChecker indexSetTemplateRequirementsChecker;
     private final RefreshingLockService.Factory lockServiceFactory;
+    private final IndexSetRestrictionsService indexSetRestrictionsService;
 
     @Inject
     public IndexSetTemplateResource(IndexSetValidator indexSetValidator,
@@ -90,13 +92,15 @@ public class IndexSetTemplateResource extends RestResource {
                                     IndexSetTemplateService templateService,
                                     IndexSetDefaultTemplateService indexSetDefaultTemplateService,
                                     IndexSetTemplateRequirementsChecker indexSetTemplateRequirementsChecker,
-                                    RefreshingLockService.Factory lockServiceFactory) {
+                                    RefreshingLockService.Factory lockServiceFactory,
+                                    IndexSetRestrictionsService indexSetRestrictionsService) {
         this.indexSetValidator = indexSetValidator;
         this.validator = validator;
         this.templateService = templateService;
         this.indexSetDefaultTemplateService = indexSetDefaultTemplateService;
         this.indexSetTemplateRequirementsChecker = indexSetTemplateRequirementsChecker;
         this.lockServiceFactory = lockServiceFactory;
+        this.indexSetRestrictionsService = indexSetRestrictionsService;
     }
 
     @GET
@@ -153,6 +157,7 @@ public class IndexSetTemplateResource extends RestResource {
     @ApiResponse(responseCode = "409", description = "A concurrent operation holds the selected repository's lock")
     public IndexSetTemplateResponse create(@Parameter(name = "request") IndexSetTemplateRequest templateData) {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_CREATE);
+        indexSetRestrictionsService.checkFieldLimitChange(null, templateData.indexSetConfig().fieldLimit(), isPermitted("*"));
 
         return toResponse(validateAndPersistWithRepositoryLock(templateData.indexSetConfig(),
                 () -> templateService.save(new IndexSetTemplate(templateData))));
@@ -169,7 +174,9 @@ public class IndexSetTemplateResource extends RestResource {
                        @Parameter(name = "request")
                        @NotNull IndexSetTemplateRequest template) throws IllegalAccessException {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_EDIT, id);
-        checkReadOnly(getIndexSetTemplate(id));
+        final IndexSetTemplateResponse existing = getIndexSetTemplate(id);
+        checkReadOnly(existing);
+        indexSetRestrictionsService.checkFieldLimitChange(existing.indexSetConfig().fieldLimit(), template.indexSetConfig().fieldLimit(), isPermitted("*"));
 
         final boolean updated = validateAndPersistWithRepositoryLock(template.indexSetConfig(),
                 () -> templateService.update(id, new IndexSetTemplate(template)));

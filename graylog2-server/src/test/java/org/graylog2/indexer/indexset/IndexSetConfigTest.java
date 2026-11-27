@@ -405,6 +405,9 @@ public class IndexSetConfigTest {
                 customFieldMappings,
                 fieldTypeProfile,
                 null,
+                null,
+                null,
+                null,
                 null);
 
     }

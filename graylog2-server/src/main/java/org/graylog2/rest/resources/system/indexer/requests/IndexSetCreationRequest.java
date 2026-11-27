@@ -67,6 +67,8 @@ public abstract class IndexSetCreationRequest implements
                 .indexOptimizationDisabled(indexOptimizationDisabled())
                 .fieldTypeRefreshInterval(fieldTypeRefreshInterval())
                 .fieldTypeProfile(fieldTypeProfile())
+                .fieldLimit(fieldLimit())
+                .dynamicMappingDisabled(dynamicMappingDisabled())
                 .dataTieringConfig(Boolean.FALSE.equals(useLegacyRotation()) ? dataTieringConfig() : null)
                 .fieldRestrictions(fieldRestrictions);
 
