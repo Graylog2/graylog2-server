@@ -105,6 +105,7 @@ public class IndexerOverviewService {
         final long deleted = docs.path("deleted").asLong();
         final JsonNode store = primaries.path("store");
         final long sizeInBytes = store.path("size_in_bytes").asLong();
+        final long totalSizeInBytes = indexStats.getValue().path("total").path("store").path("size_in_bytes").asLong();
         final long shardCount = indicesAdapter.getShardsInfo(indexName).size();
 
         final Optional<IndexRangeSummary> range = indexRanges.stream()
@@ -115,7 +116,7 @@ public class IndexerOverviewService {
 
         return IndexSummary.create(
                 indexName,
-                IndexSizeSummary.create(count, deleted, sizeInBytes),
+                IndexSizeSummary.create(count, deleted, sizeInBytes, totalSizeInBytes),
                 range.orElse(null),
                 isDeflector,
                 false,

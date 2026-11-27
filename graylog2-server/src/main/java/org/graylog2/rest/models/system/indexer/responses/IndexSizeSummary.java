@@ -30,13 +30,23 @@ public abstract class IndexSizeSummary {
     @JsonProperty("deleted")
     public abstract long deleted();
 
+    /**
+     * Size of the primary shards only.
+     */
     @JsonProperty("bytes")
     public abstract long bytes();
+
+    /**
+     * Size of all shards, including replicas.
+     */
+    @JsonProperty("total_bytes")
+    public abstract long totalBytes();
 
     @JsonCreator
     public static IndexSizeSummary create(@JsonProperty("events") long events,
                                           @JsonProperty("deleted") long deleted,
-                                          @JsonProperty("bytes") long bytes) {
-        return new AutoValue_IndexSizeSummary(events, deleted, bytes);
+                                          @JsonProperty("bytes") long bytes,
+                                          @JsonProperty("total_bytes") long totalBytes) {
+        return new AutoValue_IndexSizeSummary(events, deleted, bytes, totalBytes);
     }
 }

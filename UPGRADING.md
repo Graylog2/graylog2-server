@@ -44,6 +44,10 @@ following locations where they are displayed:
 
 The following REST API changes have been made.
 
-| Endpoint                     | Description                                                                    |
-|------------------------------|--------------------------------------------------------------------------------|
-| `GET /events/{event_id}`     | Responds with `404 Not Found` instead of `204 No Content` for a missing event. |
+| Endpoint                                                                  | Description                                                                                                                                 |
+|---------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
+| `GET /events/{event_id}`                                                  | Responds with `404 Not Found` instead of `204 No Content` for a missing event.                                                              |
+| `GET /system/indices/index_sets/{id}/stats`                               | `size` now includes replica shards, instead of only the primary shards.                                                                     |
+| `GET /system/indices/index_sets`, `GET /system/indices/index_sets/search` | With `stats=true`, the `size` of each index set in `stats` now includes replica shards.                                                     |
+| `GET /system/indices/index_sets/metrics`                                  | The `size_bytes` metric now includes replica shards.                                                                                        |
+| `GET /system/indexer/overview/{indexSetId}`                               | The `size` of each index has a new `total_bytes` field, the size including replica shards. `bytes` is still the size of the primary shards. |

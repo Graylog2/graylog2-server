@@ -136,7 +136,10 @@ const StatList = styled.dl`
 `;
 
 const IndexSection = ({ headline, subheading, indices, indexDetails, indexSetId = undefined }: Props) => {
-  const size = indices.map((index) => index.size?.bytes || 0).reduce((partialSum, a) => partialSum + a, 0) || 0;
+  const size = indices.map((index) => index.size?.bytes ?? 0).reduce((partialSum, a) => partialSum + a, 0);
+  const totalSize = indices
+    .map((index) => index.size?.total_bytes ?? index.size?.bytes ?? 0)
+    .reduce((partialSum, a) => partialSum + a, 0);
   const shards = indices.map((index) => index.shard_count).reduce((partialSum, a) => partialSum + a, 0) || 0;
 
   return (
@@ -152,8 +155,10 @@ const IndexSection = ({ headline, subheading, indices, indexDetails, indexSetId 
             <dd>{indices.length}</dd>
             <dt>Shards:</dt>
             <dd>{shards}</dd>
-            <dt>Total Size:</dt>
+            <dt>Size (primaries):</dt>
             <dd>{NumberUtils.formatBytes(size)}</dd>
+            <dt>Size (incl. replicas):</dt>
+            <dd>{NumberUtils.formatBytes(totalSize)}</dd>
           </StatList>
         </Col>
       </SectionHeader>

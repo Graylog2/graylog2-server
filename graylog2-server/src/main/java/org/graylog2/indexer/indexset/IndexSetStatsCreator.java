@@ -52,10 +52,8 @@ public class IndexSetStatsCreator {
 
     public IndexSetStats getForIndexSet(final IndexSet indexSet) {
         final Set<String> closedIndices = indices.getClosedIndices(indexSet);
-        final List<JsonNode> primaries = indices.getIndexStats(indexSet).valueStream()
-                .map(json -> json.get("primaries"))
-                .toList();
-        return toStats(primaries, closedIndices.size());
+        final List<JsonNode> indexStats = indices.getIndexStats(indexSet).valueStream().toList();
+        return toStats(indexStats, closedIndices.size());
     }
 
     /**
@@ -78,19 +76,20 @@ public class IndexSetStatsCreator {
 
         final Map<String, IndexSetStats> result = new HashMap<>();
         for (final IndexSet indexSet : indexSets) {
-            final List<JsonNode> primaries = stats.properties().stream()
+            final List<JsonNode> indexStats = stats.properties().stream()
                     .filter(entry -> indexSet.isManagedIndex(entry.getKey()))
-                    .map(entry -> entry.getValue().path("primaries"))
+                    .map(Map.Entry::getValue)
                     .toList();
             final long closedCount = closedIndices.stream().filter(indexSet::isManagedIndex).count();
-            result.put(indexSet.getConfig().id(), toStats(primaries, closedCount));
+            result.put(indexSet.getConfig().id(), toStats(indexStats, closedCount));
         }
         return result;
     }
 
-    private static IndexSetStats toStats(final List<JsonNode> primaries, final long closedIndices) {
-        final long documents = primaries.stream().mapToLong(json -> json.path("docs").path("count").asLong()).sum();
-        final long size = primaries.stream().mapToLong(json -> json.path("store").path("size_in_bytes").asLong()).sum();
-        return IndexSetStats.create(primaries.size() + closedIndices, documents, size);
+    private static IndexSetStats toStats(final List<JsonNode> indexStats, final long closedIndices) {
+        final long documents = indexStats.stream().mapToLong(json -> json.path("primaries").path("docs").path("count").asLong()).sum();
+        // Replicas take up storage too, so the size covers all shards, while the documents are counted once.
+        final long size = indexStats.stream().mapToLong(json -> json.path("total").path("store").path("size_in_bytes").asLong()).sum();
+        return IndexSetStats.create(indexStats.size() + closedIndices, documents, size);
     }
 }

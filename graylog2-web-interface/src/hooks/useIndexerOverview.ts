@@ -36,6 +36,7 @@ export type IndexSummary = {
     events: number;
     deleted: number;
     bytes: number;
+    total_bytes: number;
   };
   range?: IndexRange;
   is_deflector: boolean;
