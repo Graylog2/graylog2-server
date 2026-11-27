@@ -17,22 +17,29 @@
 import React from 'react';
 import numeral from 'numeral';
 
+import type { IndexSummary } from 'hooks/useIndexerOverview';
 import NumberUtils from 'util/NumberUtils';
 
 type Props = {
-  index: any;
+  index: IndexSummary;
 };
 
 const IndexSizeSummary = ({ index }: Props) => {
-  if (index.size) {
-    return (
-      <span>
-        ({NumberUtils.formatBytes(index.size.bytes)} / {numeral(index.size.events).format('0,0')} messages){' '}
-      </span>
-    );
+  if (!index.size) {
+    return <span />;
   }
 
-  return <span />;
+  const { bytes, total_bytes: totalBytes, events } = index.size;
+  const formattedSize =
+    totalBytes > bytes
+      ? `${NumberUtils.formatBytes(bytes)} primaries, ${NumberUtils.formatBytes(totalBytes)} incl. replicas`
+      : NumberUtils.formatBytes(bytes);
+
+  return (
+    <span>
+      ({formattedSize} / {numeral(events).format('0,0')} messages){' '}
+    </span>
+  );
 };
 
 export default IndexSizeSummary;

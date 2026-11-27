@@ -45,17 +45,17 @@ class IndexSetStatsCreatorTest {
     private final IndexSetStatsCreator creator = new IndexSetStatsCreator(indices, ticker);
 
     @Test
-    void getForIndexSetSumsOpenPrimariesAndCountsClosedIndices() throws Exception {
+    void getForIndexSetSumsOpenIndicesAndCountsClosedIndices() throws Exception {
         final IndexSet indexSet = indexSet("a", "graylog");
         when(indices.getClosedIndices(indexSet)).thenReturn(Set.of("graylog_0"));
         when(indices.getIndexStats(indexSet)).thenReturn(new ObjectMapper().readTree("""
                 {
-                  "graylog_1": {"primaries": {"docs": {"count": 10}, "store": {"size_in_bytes": 100}}},
-                  "graylog_2": {"primaries": {"docs": {"count": 5}, "store": {"size_in_bytes": 50}}}
+                  "graylog_1": {"primaries": {"docs": {"count": 10}, "store": {"size_in_bytes": 100}}, "total": {"store": {"size_in_bytes": 200}}},
+                  "graylog_2": {"primaries": {"docs": {"count": 5}, "store": {"size_in_bytes": 50}}, "total": {"store": {"size_in_bytes": 100}}}
                 }
                 """));
 
-        assertThat(creator.getForIndexSet(indexSet)).isEqualTo(IndexSetStats.create(3, 15, 150));
+        assertThat(creator.getForIndexSet(indexSet)).isEqualTo(IndexSetStats.create(3, 15, 300));
     }
 
     @Test
@@ -63,17 +63,17 @@ class IndexSetStatsCreatorTest {
         when(indices.getClosedIndices(anyCollection())).thenReturn(Set.of("graylog_0", "other_3"));
         when(indices.getIndexStats(anyCollection())).thenReturn(new ObjectMapper().readTree("""
                 {
-                  "graylog_1": {"primaries": {"docs": {"count": 10}, "store": {"size_in_bytes": 100}}},
-                  "graylog_2": {"primaries": {"docs": {"count": 5}, "store": {"size_in_bytes": 50}}},
-                  "other_4": {"primaries": {"docs": {"count": 1}, "store": {"size_in_bytes": 1}}}
+                  "graylog_1": {"primaries": {"docs": {"count": 10}, "store": {"size_in_bytes": 100}}, "total": {"store": {"size_in_bytes": 200}}},
+                  "graylog_2": {"primaries": {"docs": {"count": 5}, "store": {"size_in_bytes": 50}}, "total": {"store": {"size_in_bytes": 100}}},
+                  "other_4": {"primaries": {"docs": {"count": 1}, "store": {"size_in_bytes": 1}}, "total": {"store": {"size_in_bytes": 2}}}
                 }
                 """));
 
         final Map<String, IndexSetStats> stats = creator.getForIndexSets(List.of(indexSet("a", "graylog"), indexSet("b", "other")));
 
         assertThat(stats).containsOnly(
-                entry("a", IndexSetStats.create(3, 15, 150)),
-                entry("b", IndexSetStats.create(2, 1, 1)));
+                entry("a", IndexSetStats.create(3, 15, 300)),
+                entry("b", IndexSetStats.create(2, 1, 2)));
         verify(indices).getIndexStats(anyCollection());
         verify(indices).getClosedIndices(anyCollection());
     }
@@ -102,8 +102,8 @@ class IndexSetStatsCreatorTest {
     void getForIndexSetsFetchesOnlyTheIndexSetsMissingFromTheMemo() throws Exception {
         when(indices.getIndexStats(anyCollection())).thenReturn(new ObjectMapper().readTree("""
                 {
-                  "graylog_1": {"primaries": {"docs": {"count": 10}, "store": {"size_in_bytes": 100}}},
-                  "other_4": {"primaries": {"docs": {"count": 1}, "store": {"size_in_bytes": 1}}}
+                  "graylog_1": {"primaries": {"docs": {"count": 10}, "store": {"size_in_bytes": 100}}, "total": {"store": {"size_in_bytes": 200}}},
+                  "other_4": {"primaries": {"docs": {"count": 1}, "store": {"size_in_bytes": 1}}, "total": {"store": {"size_in_bytes": 2}}}
                 }
                 """));
         final IndexSet graylog = indexSet("a", "graylog");
@@ -114,8 +114,8 @@ class IndexSetStatsCreatorTest {
 
         verify(indices).getIndexStats(List.of("other_*"));
         assertThat(stats).containsOnly(
-                entry("a", IndexSetStats.create(1, 10, 100)),
-                entry("b", IndexSetStats.create(1, 1, 1)));
+                entry("a", IndexSetStats.create(1, 10, 200)),
+                entry("b", IndexSetStats.create(1, 1, 2)));
     }
 
     private static IndexSet indexSet(String id, String prefix) {

@@ -34,6 +34,9 @@ public abstract class IndexSetStats {
     @JsonProperty(FIELD_DOCUMENTS)
     public abstract long documents();
 
+    /**
+     * Size of all shards, including replicas.
+     */
     @JsonProperty(FIELD_SIZE)
     public abstract long size();
 
