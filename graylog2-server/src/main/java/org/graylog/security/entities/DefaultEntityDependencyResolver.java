@@ -16,6 +16,7 @@
  */
 package org.graylog.security.entities;
 
+import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import jakarta.inject.Inject;
@@ -36,15 +37,20 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
 public class DefaultEntityDependencyResolver implements EntityDependencyResolver {
+    // Matches the TTL already used for the equivalent cache in org.graylog2.lookup.Catalog.
+    private static final long ENTITY_EXCERPTS_CACHE_TTL_SECONDS = 5;
     private final ContentPackEntityResolver contentPackEntityResolver;
     private final GRNRegistry grnRegistry;
     private final GRNDescriptorService descriptorService;
     private final DBGrantService grantService;
+    private final Supplier<ImmutableMap<GRN, Optional<String>>> entityExcerptsSupplier;
 
     @Inject
     public DefaultEntityDependencyResolver(ContentPackEntityResolver contentPackEntityResolver,
@@ -55,6 +61,9 @@ public class DefaultEntityDependencyResolver implements EntityDependencyResolver
         this.grnRegistry = grnRegistry;
         this.descriptorService = descriptorService;
         this.grantService = grantService;
+        this.entityExcerptsSupplier = Suppliers.memoizeWithExpiration(
+                this::computeEntityExcerpts, ENTITY_EXCERPTS_CACHE_TTL_SECONDS, TimeUnit.SECONDS);
+
     }
 
     @Override
@@ -130,6 +139,10 @@ public class DefaultEntityDependencyResolver implements EntityDependencyResolver
     }
 
     private ImmutableMap<GRN, Optional<String>> entityExcerpts() {
+        return entityExcerptsSupplier.get();
+    }
+
+    private ImmutableMap<GRN, Optional<String>> computeEntityExcerpts() {
         // TODO: Replace entity excerpt usage with GRNDescriptors once we implemented GRN descriptors for every entity
         return contentPackEntityResolver.listAllEntityExcerpts().stream()
                 // TODO: Use the GRNRegistry instead of manually building a GRN. Requires all entity types to be in the registry.

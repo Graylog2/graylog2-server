@@ -70,7 +70,8 @@ public class SecurityModule extends PluginModule {
         OptionalBinder.newOptionalBinder(binder(), GranteeService.class)
                 .setDefault().to(DefaultGranteeService.class);
         OptionalBinder.newOptionalBinder(binder(), EntityDependencyResolver.class)
-                .setDefault().to(DefaultEntityDependencyResolver.class);
+                .setDefault().to(DefaultEntityDependencyResolver.class)
+                .in(Scopes.SINGLETON);
 
         addEntityRegistrationHandler(EntityOwnershipRegistrationHandler.class);
 
