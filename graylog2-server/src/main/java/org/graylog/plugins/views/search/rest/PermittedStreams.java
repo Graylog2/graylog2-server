@@ -17,21 +17,29 @@
 package org.graylog.plugins.views.search.rest;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.errorprone.annotations.MustBeClosed;
 import jakarta.inject.Inject;
+import org.graylog.plugins.views.search.StreamCategoryMapper;
 import org.graylog.plugins.views.search.permissions.StreamPermissions;
 import org.graylog2.streams.StreamService;
 
 import java.util.Collection;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public class PermittedStreams {
-    private final Supplier<Stream<String>> allStreamsProvider;
-    private final Function<Collection<String>, Stream<String>> streamCategoryMapper;
+
+    @FunctionalInterface
+    public interface AllStreamsProvider {
+        @MustBeClosed
+        Stream<String> get();
+    }
+
+    private final AllStreamsProvider allStreamsProvider;
+    private final StreamCategoryMapper streamCategoryMapper;
     private final Supplier<Collection<String>> systemStreamIdSupplier;
 
-    public PermittedStreams(Supplier<Stream<String>> allStreamsProvider, Function<Collection<String>, Stream<String>> streamCategoryMapper, Supplier<Collection<String>> systemStreamIdSupplier) {
+    public PermittedStreams(AllStreamsProvider allStreamsProvider, StreamCategoryMapper streamCategoryMapper, Supplier<Collection<String>> systemStreamIdSupplier) {
         this.allStreamsProvider = allStreamsProvider;
         this.streamCategoryMapper = streamCategoryMapper;
         this.systemStreamIdSupplier = systemStreamIdSupplier;
@@ -44,14 +52,16 @@ public class PermittedStreams {
     }
 
     public ImmutableSet<String> loadAllMessageStreams(final StreamPermissions streamPermissions) {
-        return allStreamsProvider.get()
-                // Unless explicitly queried, exclude event and failure indices by default
-                // Having these indices in every search, makes sorting almost impossible
-                // because it triggers https://github.com/Graylog2/graylog2-server/issues/6378
-                // TODO: this filter could be removed, once we implement https://github.com/Graylog2/graylog2-server/issues/6490
-                .filter(id -> !systemStreamIdSupplier.get().contains(id))
-                .filter(streamPermissions::canReadStream)
-                .collect(ImmutableSet.toImmutableSet());
+        try (var stream = allStreamsProvider.get()) {
+            return stream
+                    // Unless explicitly queried, exclude event and failure indices by default
+                    // Having these indices in every search, makes sorting almost impossible
+                    // because it triggers https://github.com/Graylog2/graylog2-server/issues/6378
+                    // TODO: this filter could be removed, once we implement https://github.com/Graylog2/graylog2-server/issues/6490
+                    .filter(id -> !systemStreamIdSupplier.get().contains(id))
+                    .filter(streamPermissions::canReadStream)
+                    .collect(ImmutableSet.toImmutableSet());
+        }
     }
 
     public ImmutableSet<String> loadAll(final StreamPermissions streamPermissions) {

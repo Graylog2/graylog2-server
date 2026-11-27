@@ -39,6 +39,7 @@ import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchDomain;
 import org.graylog.plugins.views.search.SearchExecutionGuard;
+import org.graylog.plugins.views.search.StreamCategoryMapper;
 import org.graylog.plugins.views.search.export.AuditContext;
 import org.graylog.plugins.views.search.export.AuditingMessagesExporter;
 import org.graylog.plugins.views.search.export.ChunkedRunner;
@@ -67,12 +68,10 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTimeZone;
 
-import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 @PublicCloudAPI
 @Tag(name = "Search/Messages", description = "Simple search returning (matching) messages only, as CSV.")
@@ -85,7 +84,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     private final SearchExecutionGuard executionGuard;
     private final ExportJobService exportJobService;
     private final QueryValidationService queryValidationService;
-    private final Function<Collection<String>, Stream<String>> streamCategoryMapper;
+    private final StreamCategoryMapper streamCategoryMapper;
 
     //allow mocking
     Function<Consumer<Consumer<SimpleMessageChunk>>, ChunkedOutput<SimpleMessageChunk>> asyncRunner = ChunkedRunner::runAsync;
@@ -111,7 +110,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
                      @SuppressWarnings("UnstableApiUsage") EventBus eventBus,
                      ExportJobService exportJobService,
                      QueryValidationService queryValidationService,
-                     Function<Collection<String>, Stream<String>> streamCategoryMapper) {
+                     StreamCategoryMapper streamCategoryMapper) {
         this.commandFactory = commandFactory;
         this.searchDomain = searchDomain;
         this.executionGuard = executionGuard;

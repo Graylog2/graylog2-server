@@ -66,7 +66,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -364,7 +363,7 @@ public class QueryTest {
                 .filter(AndFilter.and(colorCategory, numberCategory))
                 .build();
 
-        queryWithCategories = queryWithCategories.replaceStreamCategoryFilters(mock(Function.class), streamId -> true);
+        queryWithCategories = queryWithCategories.replaceStreamCategoryFilters(mock(StreamCategoryMapper.class), streamId -> true);
         Filter filter = queryWithCategories.filter();
         assertThat(filter).isInstanceOf(AndFilter.class);
         assertThat(filter.filters()).isNotNull();
@@ -398,7 +397,7 @@ public class QueryTest {
                         .build())
                 .build();
 
-        queryWithCategories = queryWithCategories.replaceStreamCategoryFilters(mock(Function.class), streamId -> true);
+        queryWithCategories = queryWithCategories.replaceStreamCategoryFilters(mock(StreamCategoryMapper.class), streamId -> true);
         Filter filter = queryWithCategories.filter();
         assertThat(filter).isInstanceOf(AndFilter.class);
         assertThat(filter.filters()).isNotNull();
@@ -423,7 +422,7 @@ public class QueryTest {
                 .filter(AndFilter.and(colorCategory, numberCategory))
                 .build();
 
-        queryWithCategories = queryWithCategories.replaceStreamCategoryFilters(mock(Function.class), (streamId) -> false);
+        queryWithCategories = queryWithCategories.replaceStreamCategoryFilters(mock(StreamCategoryMapper.class), (streamId) -> false);
         Filter filter = queryWithCategories.filter();
         assertThat(filter).isNull();
     }
@@ -445,7 +444,7 @@ public class QueryTest {
                         .build())
                 .build();
 
-        queryWithCategories = queryWithCategories.replaceStreamCategoryFilters(mock(Function.class), (streamId) -> false);
+        queryWithCategories = queryWithCategories.replaceStreamCategoryFilters(mock(StreamCategoryMapper.class), (streamId) -> false);
         Filter filter = queryWithCategories.filter();
         assertThat(filter).isInstanceOf(AndFilter.class);
         assertThat(filter.filters()).isNotNull();

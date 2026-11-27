@@ -23,14 +23,12 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.Filter;
+import org.graylog.plugins.views.search.StreamCategoryMapper;
 import org.graylog.plugins.views.search.permissions.StreamPermissions;
 
 import javax.annotation.Nullable;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Stream;
 
 @AutoValue
 @JsonTypeName(StreamCategoryFilter.NAME)
@@ -61,10 +59,10 @@ public abstract class StreamCategoryFilter implements Filter {
         return builder().category(category).build();
     }
 
-    public Filter toStreamFilter(Function<Collection<String>, Stream<String>> categoryMappingFunction,
+    public Filter toStreamFilter(StreamCategoryMapper categoryMapper,
                                  StreamPermissions streamPermissions) {
         String[] mappedStreamIds;
-        try (var stream = categoryMappingFunction.apply(List.of(category()))) {
+        try (var stream = categoryMapper.apply(List.of(category()))) {
             mappedStreamIds = stream.filter(streamPermissions::canReadStream).toArray(String[]::new);
         }
         // If the streamPermissions do not allow for any of the streams to be read, nullify this filter.

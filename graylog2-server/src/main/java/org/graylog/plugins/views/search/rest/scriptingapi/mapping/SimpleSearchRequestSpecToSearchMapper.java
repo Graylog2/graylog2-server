@@ -21,6 +21,7 @@ import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.StreamCategoryMapper;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationRequestSpec;
@@ -30,22 +31,19 @@ import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.streams.StreamService;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.stream.Stream;
 
 public class SimpleSearchRequestSpecToSearchMapper implements SearchRequestSpecToSearchMapper {
     private final AggregationSpecToPivotMapper pivotCreator;
     private final MessagesSpecToMessageListMapper messageListCreator;
-    private final Function<Collection<String>, Stream<String>> streamCategoryMapper;
+    private final StreamCategoryMapper streamCategoryMapper;
 
     @Inject
     public SimpleSearchRequestSpecToSearchMapper(final AggregationSpecToPivotMapper pivotCreator,
-                                           final MessagesSpecToMessageListMapper messageListCreator,
-                                           StreamService streamService) {
+                                                 final MessagesSpecToMessageListMapper messageListCreator,
+                                                 StreamService streamService) {
         this.pivotCreator = pivotCreator;
         this.messageListCreator = messageListCreator;
         this.streamCategoryMapper = streamService::mapCategoriesToIds;
