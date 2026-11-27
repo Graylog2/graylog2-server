@@ -92,6 +92,7 @@ export class PageToolNotifiedError extends Error {
 }
 
 // Runs a page tool the Assistant asked for, with arguments the backend checked.
-export type PageToolHandler = (args: Record<string, unknown>) => PageToolResult | Promise<PageToolResult>;
+export type PageToolHandler<Args = Record<string, unknown>> = (args: Args) => PageToolResult | Promise<PageToolResult>;
 
-export type PageTools = Record<string, PageToolHandler>;
+// Holds handlers of different argument types; the backend checked the arguments it passes to each.
+export type PageTools = Record<string, PageToolHandler<any>>;
