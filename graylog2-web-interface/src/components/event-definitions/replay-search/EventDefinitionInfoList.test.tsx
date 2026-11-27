@@ -92,6 +92,28 @@ describe('<EventDefinitionInfoList />', () => {
     expect(notifications).toHaveTextContent('Email notification');
   });
 
+  it('Shows cron schedule instead of interval when cron scheduling is used', async () => {
+    mockUseAlertAndEventDefinitionData({
+      eventDefinition: {
+        ...mockEventDefinitionTwoAggregations,
+        config: {
+          ...mockEventDefinitionTwoAggregations.config,
+          execute_every_ms: 300000,
+          use_cron_scheduling: true,
+          cron_expression: '0 0/10 * ? * * *',
+          cron_timezone: 'Europe/Berlin',
+        },
+      },
+    });
+
+    render(<EventInfoComponent type="event" />);
+
+    const execution = await screen.findByTitle('Execute search');
+
+    expect(execution).toHaveTextContent('Every 10 minutes (Europe/Berlin)');
+    expect(screen.queryByTitle('Execute search every')).not.toBeInTheDocument();
+  });
+
   it('Shows event definition link for event', async () => {
     render(<EventInfoComponent type="event" />);
 

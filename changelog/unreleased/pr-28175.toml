@@ -1,0 +1,5 @@
+type = "f"
+message = "Show the cron schedule instead of the unused interval in the event definition details drawer."
+
+issues = ["Graylog2/graylog-plugin-enterprise#15119"]
+pulls = ["28175"]
