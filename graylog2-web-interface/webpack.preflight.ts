@@ -51,7 +51,7 @@ const baseConfig = {
   resolve: {
     // you can now require('file') instead of require('file.coffee')
     extensions: ['.js', '.json', '.jsx', '.ts', '.tsx'],
-    modules: [APP_PATH, path.resolve(ROOT_PATH, 'node_modules'), path.resolve(ROOT_PATH, 'public')],
+    modules: [APP_PATH, 'node_modules', path.resolve(ROOT_PATH, 'node_modules'), path.resolve(ROOT_PATH, 'public')],
   },
   module: {
     rules: core.rules(TARGET, supportedBrowsers),
