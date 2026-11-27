@@ -114,8 +114,8 @@
         <aws-java-sdk-2.version>2.59.4</aws-java-sdk-2.version>
         <aws-kinesis-client.version>3.5.4</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.4.0</aws-msk-iam-auth.version>
-        <bouncycastle-prov.version>1.86</bouncycastle-prov.version>
-        <bouncycastle-pkix.version>1.86</bouncycastle-pkix.version>
+        <bouncycastle-prov.version>1.87</bouncycastle-prov.version>
+        <bouncycastle-pkix.version>1.87</bouncycastle-pkix.version>
         <byte-buddy.version>1.18.17</byte-buddy.version>
         <caffeine.version>3.3.1</caffeine.version>
         <classgraph.version>5.0.2</classgraph.version>
