@@ -17,6 +17,8 @@
 package org.graylog.events.notifications.types;
 
 import com.floreysoft.jmte.Engine;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import jakarta.inject.Inject;
 import org.graylog.events.notifications.EventNotification;
@@ -137,6 +139,9 @@ public class EmailEventNotification implements EventNotification {
             throw new TemporaryEventNotificationException("Notification has email recipients and is triggered, but email transport is not configured. " +
                     e.getMessage());
         } catch (Exception e) {
+            // The UI only shows the generic message below, the actual reason (e.g. a rejected login) is in the causes.
+            LOG.warn("Sending emails for notification <{}> failed: {}", ctx.notificationId(), describeWithCauses(e));
+
             String exceptionDetail = e.toString();
             if (e.getCause() != null) {
                 exceptionDetail += " (" + e.getCause() + ")";
@@ -269,5 +274,26 @@ public class EmailEventNotification implements EventNotification {
         ConfigurationError(String message) {
             super(message);
         }
+    }
+
+    /**
+     * Joins the messages of the exception and its causes. Mail libraries wrap the actual reason (e.g. a rejected login or
+     * a failed OAuth 2.0 token request) in a generic "sending failed" exception, so its own message isn't enough.
+     */
+    @VisibleForTesting
+    static String describeWithCauses(Throwable throwable) {
+        final StringBuilder description = new StringBuilder();
+        for (Throwable cause : Throwables.getCausalChain(throwable)) {
+            final String message = cause.getMessage();
+            // Wrapping exceptions often repeat the message of their cause.
+            if (isNullOrEmpty(message) || description.indexOf(message) >= 0) {
+                continue;
+            }
+            if (!description.isEmpty()) {
+                description.append(": ");
+            }
+            description.append(message);
+        }
+        return description.isEmpty() ? throwable.toString() : description.toString();
     }
 }

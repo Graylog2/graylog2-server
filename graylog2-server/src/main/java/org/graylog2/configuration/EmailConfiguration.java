@@ -23,11 +23,13 @@ import com.github.joschi.jadconfig.Validator;
 import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.documentation.Documentation;
 import com.github.joschi.jadconfig.documentation.DocumentationSection;
+import com.github.joschi.jadconfig.validators.FilePathReadableValidator;
 import com.github.joschi.jadconfig.validators.InetPortValidator;
 import com.google.common.base.Strings;
 import org.graylog2.configuration.converters.JavaDurationConverter;
 
 import java.net.URI;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -79,9 +81,32 @@ public class EmailConfiguration {
     @Parameter(value = "transport_email_auth_oauth2_client_id")
     private String oauth2ClientId;
 
-    @Documentation("OAuth 2.0 client secret used to obtain access tokens for SMTP authentication.")
+    @Documentation("""
+            OAuth 2.0 client secret used to obtain access tokens for SMTP authentication.
+            Alternatively, authenticate with a certificate, see transport_email_auth_oauth2_client_certificate_file.
+            """)
     @Parameter(value = "transport_email_auth_oauth2_client_secret")
     private String oauth2ClientSecret;
+
+    @Documentation("""
+            X.509 certificate file in PEM format used to authenticate the OAuth 2.0 client instead of a client secret.
+            The certificate must be registered with the OAuth 2.0 client (e.g. uploaded to the Microsoft Entra app
+            registration). Requires transport_email_auth_oauth2_client_private_key_file.
+            The files are read for every token request, so a renewed certificate is used without a restart.
+            """)
+    @Parameter(value = "transport_email_auth_oauth2_client_certificate_file", validators = FilePathReadableValidator.class)
+    private Path oauth2ClientCertificateFile;
+
+    @Documentation("""
+            RSA private key file in PEM format (PKCS#8, optionally encrypted, or PKCS#1) belonging to
+            transport_email_auth_oauth2_client_certificate_file.
+            """)
+    @Parameter(value = "transport_email_auth_oauth2_client_private_key_file", validators = FilePathReadableValidator.class)
+    private Path oauth2ClientPrivateKeyFile;
+
+    @Documentation("Password of transport_email_auth_oauth2_client_private_key_file, if it is encrypted.")
+    @Parameter(value = "transport_email_auth_oauth2_client_private_key_password")
+    private String oauth2ClientPrivateKeyPassword;
 
     @Documentation("""
             OAuth 2.0 scope requested for SMTP access tokens. Multiple scopes are separated by spaces.
@@ -195,6 +220,25 @@ public class EmailConfiguration {
         return oauth2Scope;
     }
 
+    /**
+     * @return whether the OAuth 2.0 client authenticates with a certificate instead of a client secret
+     */
+    public boolean isUseOAuth2ClientCertificate() {
+        return oauth2ClientCertificateFile != null;
+    }
+
+    public Path getOAuth2ClientCertificateFile() {
+        return oauth2ClientCertificateFile;
+    }
+
+    public Path getOAuth2ClientPrivateKeyFile() {
+        return oauth2ClientPrivateKeyFile;
+    }
+
+    public String getOAuth2ClientPrivateKeyPassword() {
+        return oauth2ClientPrivateKeyPassword;
+    }
+
     public String getFromEmail() {
         return fromEmail;
     }
@@ -238,8 +282,20 @@ public class EmailConfiguration {
         if (Strings.isNullOrEmpty(getOAuth2ClientId())) {
             missing.add("transport_email_auth_oauth2_client_id");
         }
-        if (Strings.isNullOrEmpty(getOAuth2ClientSecret())) {
-            missing.add("transport_email_auth_oauth2_client_secret");
+        final boolean hasSecret = !Strings.isNullOrEmpty(getOAuth2ClientSecret());
+        final boolean hasCertificate = getOAuth2ClientCertificateFile() != null;
+        final boolean hasPrivateKey = getOAuth2ClientPrivateKeyFile() != null;
+        if (hasSecret && (hasCertificate || hasPrivateKey)) {
+            throw new ValidationException("Configure either transport_email_auth_oauth2_client_secret or " +
+                    "transport_email_auth_oauth2_client_certificate_file and transport_email_auth_oauth2_client_private_key_file, not both");
+        }
+        if (hasCertificate && !hasPrivateKey) {
+            missing.add("transport_email_auth_oauth2_client_private_key_file");
+        } else if (hasPrivateKey && !hasCertificate) {
+            missing.add("transport_email_auth_oauth2_client_certificate_file");
+        } else if (!hasSecret && !hasCertificate) {
+            missing.add("transport_email_auth_oauth2_client_secret (or transport_email_auth_oauth2_client_certificate_file " +
+                    "and transport_email_auth_oauth2_client_private_key_file)");
         }
         if (Strings.isNullOrEmpty(getOAuth2Scope())) {
             missing.add("transport_email_auth_oauth2_scope");

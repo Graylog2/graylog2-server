@@ -45,7 +45,8 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * Obtains OAuth 2.0 access tokens for SMTP authentication (SASL XOAUTH2) using the client credentials grant
- * (RFC 6749, section 4.4) and caches them until shortly before they expire.
+ * (RFC 6749, section 4.4) and caches them until shortly before they expire. The client authenticates with either a
+ * client secret or a certificate ({@link OAuth2ClientAssertion}).
  * <p>
  * Tokens are requested by {@link OAuth2SmtpTransport} right before authenticating, so the remaining lifetime of a
  * token only has to cover the SMTP handshake. A cached token that the SMTP server rejects anyway (e.g. because it was
@@ -66,6 +67,7 @@ public class SmtpOAuth2TokenProvider {
     private final OkHttpClient httpClient;
     private final ObjectMapper objectMapper;
     private final Clock clock;
+    private final OAuth2ClientAssertion clientAssertion;
 
     private CachedToken cachedToken;
 
@@ -80,6 +82,7 @@ public class SmtpOAuth2TokenProvider {
         this.httpClient = requireNonNull(httpClient, "httpClient");
         this.objectMapper = requireNonNull(objectMapper, "objectMapper");
         this.clock = requireNonNull(clock, "clock");
+        this.clientAssertion = new OAuth2ClientAssertion(clock);
     }
 
     /**
@@ -117,15 +120,26 @@ public class SmtpOAuth2TokenProvider {
 
     private TokenResponse requestToken() throws MessagingException {
         final HttpUrl tokenUrl = HttpUrl.get(configuration.getOAuth2TokenUrl().toString());
+        final FormBody.Builder form = new FormBody.Builder()
+                .add("grant_type", "client_credentials")
+                .add("client_id", configuration.getOAuth2ClientId())
+                .add("scope", configuration.getOAuth2Scope());
+        if (configuration.isUseOAuth2ClientCertificate()) {
+            try {
+                form.add("client_assertion_type", OAuth2ClientAssertion.ASSERTION_TYPE)
+                        .add("client_assertion", clientAssertion.create(configuration.getOAuth2ClientId(), tokenUrl.toString(),
+                                configuration.getOAuth2ClientCertificateFile(), configuration.getOAuth2ClientPrivateKeyFile(),
+                                configuration.getOAuth2ClientPrivateKeyPassword()));
+            } catch (MessagingException e) {
+                throw logged(e);
+            }
+        } else {
+            form.add("client_secret", configuration.getOAuth2ClientSecret());
+        }
         final Request request = new Request.Builder()
                 .url(tokenUrl)
                 .header("Accept", "application/json")
-                .post(new FormBody.Builder()
-                        .add("grant_type", "client_credentials")
-                        .add("client_id", configuration.getOAuth2ClientId())
-                        .add("client_secret", configuration.getOAuth2ClientSecret())
-                        .add("scope", configuration.getOAuth2Scope())
-                        .build())
+                .post(form.build())
                 .build();
 
         LOG.debug("Requesting OAuth 2.0 access token for SMTP authentication from <{}>", tokenUrl);

@@ -18,6 +18,8 @@ package org.graylog2.shared.email;
 
 import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import mockwebserver3.MockResponse;
 import mockwebserver3.MockWebServer;
 import mockwebserver3.RecordedRequest;
@@ -32,15 +34,19 @@ import org.apache.logging.log4j.core.appender.AbstractAppender;
 import org.apache.logging.log4j.core.config.Property;
 import org.graylog2.configuration.EmailConfiguration;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.shared.email.OAuth2ClientAssertionTest.ClientCertificate;
 import org.graylog2.shared.email.SmtpOAuth2TokenProvider.AccessToken;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import javax.mail.MessagingException;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -93,6 +99,39 @@ class SmtpOAuth2TokenProviderTest {
                 "client_secret", "the-client-secret",
                 "scope", "https://outlook.office365.com/.default"
         ));
+    }
+
+    @Test
+    void requestsTokenWithClientCertificate(@TempDir Path tempDir) throws Exception {
+        OAuth2ClientAssertionTest.registerBouncyCastle();
+        final ClientCertificate client = ClientCertificate.write(tempDir);
+        server.enqueue(tokenResponse("token-1", 3599));
+
+        assertThat(certificateTokenProvider(client.certificateFile(), client.keyFile()).getAccessToken())
+                .isEqualTo(new AccessToken("token-1", false));
+
+        final Map<String, String> params = formParams(server.takeRequest());
+        assertThat(params).containsOnlyKeys("grant_type", "client_id", "scope", "client_assertion_type", "client_assertion");
+        assertThat(params).containsEntry("grant_type", "client_credentials")
+                .containsEntry("client_id", "the-client-id")
+                .containsEntry("client_assertion_type", "urn:ietf:params:oauth:client-assertion-type:jwt-bearer");
+        final Claims claims = Jwts.parser().verifyWith(client.keyPair().publicKey()).build()
+                .parseSignedClaims(params.get("client_assertion")).getPayload();
+        assertThat(claims.getIssuer()).isEqualTo("the-client-id");
+        assertThat(claims.getAudience()).containsExactly(server.url("/tenant/oauth2/v2.0/token").toString());
+    }
+
+    @Test
+    void logsClientCertificateFailure(@TempDir Path tempDir) throws Exception {
+        OAuth2ClientAssertionTest.registerBouncyCastle();
+        final ClientCertificate client = ClientCertificate.write(tempDir);
+        final Path notAKey = Files.writeString(tempDir.resolve("not-a.key"), "not a key");
+
+        assertThat(warningsOfFailedTokenRequest(certificateTokenProvider(client.certificateFile(), notAKey)))
+                .singleElement()
+                .satisfies(event -> assertThat(event.getMessage().getFormattedMessage())
+                        .startsWith("Failed to read OAuth 2.0 client private key <" + notAKey + ">"));
+        assertThat(server.getRequestCount()).isZero();
     }
 
     @Test
@@ -174,18 +213,7 @@ class SmtpOAuth2TokenProviderTest {
         server.enqueue(new MockResponse(401, JSON,
                 "{\"error\":\"invalid_client\",\"error_description\":\"AADSTS7000215: Invalid client secret provided.\"}"));
 
-        final Logger logger = (Logger) LogManager.getLogger(SmtpOAuth2TokenProvider.class);
-        final CapturingAppender appender = new CapturingAppender();
-        appender.start();
-        logger.addAppender(appender);
-        try {
-            assertThatThrownBy(tokenProvider::getAccessToken).isInstanceOf(MessagingException.class);
-        } finally {
-            logger.removeAppender(appender);
-            appender.stop();
-        }
-
-        assertThat(appender.events).singleElement().satisfies(event -> {
+        assertThat(warningsOfFailedTokenRequest(tokenProvider)).singleElement().satisfies(event -> {
             assertThat(event.getLevel()).isEqualTo(Level.WARN);
             assertThat(event.getMessage().getFormattedMessage())
                     .contains("HTTP 401 (invalid_client: AADSTS7000215: Invalid client secret provided.)")
@@ -231,7 +259,13 @@ class SmtpOAuth2TokenProviderTest {
     }
 
     static EmailConfiguration oauth2Config(HttpUrl tokenUrl, Map<String, String> additionalSettings) throws Exception {
-        final Map<String, String> settings = new HashMap<>(Map.of(
+        final Map<String, String> settings = oauth2Settings(tokenUrl);
+        settings.putAll(additionalSettings);
+        return emailConfiguration(settings);
+    }
+
+    private static Map<String, String> oauth2Settings(HttpUrl tokenUrl) {
+        return new HashMap<>(Map.of(
                 "transport_email_enabled", "true",
                 "transport_email_hostname", "localhost",
                 "transport_email_use_auth", "true",
@@ -242,10 +276,38 @@ class SmtpOAuth2TokenProviderTest {
                 "transport_email_auth_oauth2_client_secret", "the-client-secret",
                 "transport_email_auth_oauth2_scope", "https://outlook.office365.com/.default"
         ));
-        settings.putAll(additionalSettings);
+    }
+
+    private static EmailConfiguration emailConfiguration(Map<String, String> settings) throws Exception {
         final EmailConfiguration configuration = new EmailConfiguration();
         new JadConfig(new InMemoryRepository(settings), configuration).process();
         return configuration;
+    }
+
+    private SmtpOAuth2TokenProvider certificateTokenProvider(Path certificateFile, Path keyFile) throws Exception {
+        final Map<String, String> settings = oauth2Settings(server.url("/tenant/oauth2/v2.0/token"));
+        settings.remove("transport_email_auth_oauth2_client_secret");
+        settings.put("transport_email_auth_oauth2_client_certificate_file", certificateFile.toString());
+        settings.put("transport_email_auth_oauth2_client_private_key_file", keyFile.toString());
+        // The certificate is only valid from now on, so don't use the mocked clock.
+        return new SmtpOAuth2TokenProvider(emailConfiguration(settings), new OkHttpClient(), new ObjectMapperProvider().get());
+    }
+
+    /**
+     * Requests a token, expecting it to fail, and returns the warnings logged by the token provider.
+     */
+    private static List<LogEvent> warningsOfFailedTokenRequest(SmtpOAuth2TokenProvider provider) {
+        final Logger logger = (Logger) LogManager.getLogger(SmtpOAuth2TokenProvider.class);
+        final CapturingAppender appender = new CapturingAppender();
+        appender.start();
+        logger.addAppender(appender);
+        try {
+            assertThatThrownBy(provider::getAccessToken).isInstanceOf(MessagingException.class);
+        } finally {
+            logger.removeAppender(appender);
+            appender.stop();
+        }
+        return appender.events.stream().filter(event -> event.getLevel() == Level.WARN).toList();
     }
 
     private static class CapturingAppender extends AbstractAppender {

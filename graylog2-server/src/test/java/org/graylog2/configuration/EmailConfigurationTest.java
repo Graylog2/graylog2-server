@@ -23,8 +23,12 @@ import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
+import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -152,7 +156,72 @@ public class EmailConfigurationTest {
         assertThatThrownBy(new JadConfig(new InMemoryRepository(settings), new EmailConfiguration())::process)
                 .isInstanceOf(ValidationException.class)
                 .hasMessage("OAuth 2.0 email authentication requires the following settings: transport_email_auth_username, " +
-                        "transport_email_auth_oauth2_client_secret, transport_email_auth_oauth2_scope");
+                        "transport_email_auth_oauth2_client_secret (or transport_email_auth_oauth2_client_certificate_file " +
+                        "and transport_email_auth_oauth2_client_private_key_file), transport_email_auth_oauth2_scope");
+    }
+
+    @Test
+    public void parsesOAuth2ClientCertificateSettings(@TempDir Path tempDir) throws Exception {
+        final Map<String, String> settings = oauth2CertificateSettings(tempDir);
+        settings.put("transport_email_auth_oauth2_client_private_key_password", "key-password");
+        final EmailConfiguration emailConfiguration = new EmailConfiguration();
+        new JadConfig(new InMemoryRepository(settings), emailConfiguration).process();
+
+        assertThat(emailConfiguration.isUseOAuth2ClientCertificate()).isTrue();
+        assertThat(emailConfiguration.getOAuth2ClientCertificateFile()).isEqualTo(tempDir.resolve("client.crt"));
+        assertThat(emailConfiguration.getOAuth2ClientPrivateKeyFile()).isEqualTo(tempDir.resolve("client.key"));
+        assertThat(emailConfiguration.getOAuth2ClientPrivateKeyPassword()).isEqualTo("key-password");
+    }
+
+    @Test
+    public void clientSecretDoesNotUseCertificate() throws Exception {
+        final EmailConfiguration emailConfiguration = new EmailConfiguration();
+        new JadConfig(new InMemoryRepository(oauth2Settings()), emailConfiguration).process();
+
+        assertThat(emailConfiguration.isUseOAuth2ClientCertificate()).isFalse();
+    }
+
+    @Test
+    public void validationFailsIfClientSecretAndCertificateAreConfigured(@TempDir Path tempDir) throws Exception {
+        final Map<String, String> settings = oauth2CertificateSettings(tempDir);
+        settings.put("transport_email_auth_oauth2_client_secret", "client-secret");
+
+        assertThatThrownBy(new JadConfig(new InMemoryRepository(settings), new EmailConfiguration())::process)
+                .isInstanceOf(ValidationException.class)
+                .hasMessage("Configure either transport_email_auth_oauth2_client_secret or " +
+                        "transport_email_auth_oauth2_client_certificate_file and transport_email_auth_oauth2_client_private_key_file, not both");
+    }
+
+    @Test
+    public void validationFailsIfCertificateIsConfiguredWithoutPrivateKey(@TempDir Path tempDir) throws Exception {
+        final Map<String, String> settings = oauth2CertificateSettings(tempDir);
+        settings.remove("transport_email_auth_oauth2_client_private_key_file");
+
+        assertThatThrownBy(new JadConfig(new InMemoryRepository(settings), new EmailConfiguration())::process)
+                .isInstanceOf(ValidationException.class)
+                .hasMessage("OAuth 2.0 email authentication requires the following settings: " +
+                        "transport_email_auth_oauth2_client_private_key_file");
+    }
+
+    @Test
+    public void validationFailsIfPrivateKeyIsConfiguredWithoutCertificate(@TempDir Path tempDir) throws Exception {
+        final Map<String, String> settings = oauth2CertificateSettings(tempDir);
+        settings.remove("transport_email_auth_oauth2_client_certificate_file");
+
+        assertThatThrownBy(new JadConfig(new InMemoryRepository(settings), new EmailConfiguration())::process)
+                .isInstanceOf(ValidationException.class)
+                .hasMessage("OAuth 2.0 email authentication requires the following settings: " +
+                        "transport_email_auth_oauth2_client_certificate_file");
+    }
+
+    @Test
+    public void validationFailsIfCertificateFileIsNotReadable(@TempDir Path tempDir) throws Exception {
+        final Map<String, String> settings = oauth2CertificateSettings(tempDir);
+        settings.put("transport_email_auth_oauth2_client_certificate_file", tempDir.resolve("missing.crt").toString());
+
+        assertThatThrownBy(new JadConfig(new InMemoryRepository(settings), new EmailConfiguration())::process)
+                .isInstanceOf(ValidationException.class)
+                .hasMessageContaining("missing.crt");
     }
 
     @Test
@@ -198,6 +267,16 @@ public class EmailConfigurationTest {
                 "transport_email_auth_oauth2_client_secret", "client-secret",
                 "transport_email_auth_oauth2_scope", "https://outlook.office365.com/.default"
         ));
+    }
+
+    private Map<String, String> oauth2CertificateSettings(Path tempDir) throws IOException {
+        final Map<String, String> settings = oauth2Settings();
+        settings.remove("transport_email_auth_oauth2_client_secret");
+        settings.put("transport_email_auth_oauth2_client_certificate_file",
+                Files.writeString(tempDir.resolve("client.crt"), "certificate").toString());
+        settings.put("transport_email_auth_oauth2_client_private_key_file",
+                Files.writeString(tempDir.resolve("client.key"), "key").toString());
+        return settings;
     }
 
     private JadConfig toConfig(String key, String value) {
