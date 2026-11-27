@@ -33,6 +33,7 @@ import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.processor.EventStreamService;
 import org.graylog.plugins.views.search.SearchType;
+import org.graylog.plugins.views.search.StreamCategoryMapper;
 import org.graylog.plugins.views.search.rest.PermittedStreams;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
@@ -52,13 +53,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
@@ -91,7 +89,7 @@ public class AggregationSearchUtilsTest {
 
     @BeforeEach
     public void setup() {
-        final Supplier<Stream<String>> streamIdSupplier = () -> Stream.of(
+        final PermittedStreams.AllStreamsProvider streamIdSupplier = () -> Stream.of(
                 "stream-1",
                 "stream-2",
                 "stream-3",
@@ -100,7 +98,7 @@ public class AggregationSearchUtilsTest {
                 DEFAULT_SYSTEM_EVENTS_STREAM_ID,
                 FAILURES_STREAM_ID
         );
-        final Function<Collection<String>, Stream<String>> categoryMappingFunction = (categories) -> Stream.of();
+        final StreamCategoryMapper categoryMappingFunction = (categories) -> Stream.of();
 
         permittedStreams = new PermittedStreams(streamIdSupplier, categoryMappingFunction, () -> NON_EDITABLE_STREAM_IDS);
         eventStreamService = new EventStreamService(streamService);

@@ -20,6 +20,7 @@ import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.StreamCategoryMapper;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.ExecutionState;
 import org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride;
@@ -28,19 +29,16 @@ import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Stream;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
 public class PluggableSearchNormalization implements SearchNormalization {
     private final Set<SearchNormalizer> pluggableNormalizers;
     private final Set<SearchNormalizer> postValidationNormalizers;
-    private final Function<Collection<String>, Stream<String>> streamCategoryMapper;
+    private final StreamCategoryMapper streamCategoryMapper;
 
     @Inject
     public PluggableSearchNormalization(Set<SearchNormalizer> pluggableNormalizers,

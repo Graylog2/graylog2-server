@@ -54,7 +54,6 @@ import org.joda.time.DateTime;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -62,9 +61,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
@@ -269,18 +266,18 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
         return toBuilder().filter(OrFilter.or(combinedFilters.toArray(new Filter[]{}))).build();
     }
 
-    public Query replaceStreamCategoryFilters(Function<Collection<String>, Stream<String>> categoryMappingFunction,
+    public Query replaceStreamCategoryFilters(StreamCategoryMapper categoryMapper,
                                               StreamPermissions streamPermissions) {
         if (filter() == null) {
             return this;
         }
         return toBuilder()
-                .filter(streamCategoryToStreamFiltersRecursively(filter(), categoryMappingFunction, streamPermissions))
+                .filter(streamCategoryToStreamFiltersRecursively(filter(), categoryMapper, streamPermissions))
                 .build();
     }
 
     private Filter streamCategoryToStreamFiltersRecursively(Filter filter,
-                                                            Function<Collection<String>, Stream<String>> categoryMappingFunction,
+                                                            StreamCategoryMapper categoryMapper,
                                                             StreamPermissions streamPermissions) {
         if (filter.filters() == null || filter.filters().isEmpty()) {
             return filter;
@@ -289,10 +286,10 @@ public abstract class Query implements ContentPackable<QueryEntity>, UsesSearchF
         for (Filter f : filter.filters()) {
             Filter mappedFilter = f;
             if (f instanceof StreamCategoryFilter scf) {
-                mappedFilter = scf.toStreamFilter(categoryMappingFunction, streamPermissions);
+                mappedFilter = scf.toStreamFilter(categoryMapper, streamPermissions);
             }
             if (mappedFilter != null) {
-                mappedFilter = streamCategoryToStreamFiltersRecursively(mappedFilter, categoryMappingFunction, streamPermissions);
+                mappedFilter = streamCategoryToStreamFiltersRecursively(mappedFilter, categoryMapper, streamPermissions);
                 mappedFilters.add(mappedFilter);
             }
         }

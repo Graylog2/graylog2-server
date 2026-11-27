@@ -47,17 +47,14 @@ import org.mongojack.ObjectId;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.stream.Collectors.toSet;
@@ -158,7 +155,7 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
         return toBuilder().queries(newQueries).build();
     }
 
-    public Search addStreamsToQueriesWithCategories(Function<Collection<String>, Stream<String>> categoryMappingFunction,
+    public Search addStreamsToQueriesWithCategories(StreamCategoryMapper categoryMapper,
                                                     StreamPermissions streamPermissions) {
         if (!hasQueriesWithStreamCategories() || DataLakeSearchValidator.containsDataLakeSearchElements(this)) {
             return this;
@@ -168,7 +165,7 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
         final Set<Query> withMappedStreamCategories = new HashSet<>();
 
         for (Query query : withStreamCategories) {
-            try (var stream = categoryMappingFunction.apply(query.usedStreamCategories())) {
+            try (var stream = categoryMapper.apply(query.usedStreamCategories())) {
                 final Set<String> mappedStreamIds = stream
                         .filter(streamPermissions::canReadStream)
                         .collect(toSet());
@@ -181,7 +178,7 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
         return toBuilder().queries(newQueries).build();
     }
 
-    public Search addStreamsToSearchTypesWithCategories(Function<Collection<String>, Stream<String>> categoryMappingFunction,
+    public Search addStreamsToSearchTypesWithCategories(StreamCategoryMapper categoryMapper,
                                                         StreamPermissions streamPermissions) {
         if (!hasQuerySearchTypesWithStreamCategories() || DataLakeSearchValidator.containsDataLakeSearchElements(this)) {
             return this;
@@ -199,7 +196,7 @@ public abstract class Search implements ContentPackable<SearchEntity>, Parameter
                 if (!st.hasStreamCategories()) {
                     mappedSearchTypes.add(st);
                 } else {
-                    try (var stream = categoryMappingFunction.apply(st.streamCategories())) {
+                    try (var stream = categoryMapper.apply(st.streamCategories())) {
                         final Set<String> mappedStreamIds = stream
                                 .filter(streamPermissions::canReadStream)
                                 .collect(toSet());
