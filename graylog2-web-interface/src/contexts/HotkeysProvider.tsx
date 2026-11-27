@@ -83,6 +83,8 @@ export const hotKeysCollections: HotkeyCollections = {
         description: 'Show suggestions, displays query history when input is empty',
       },
       'show-history': { keys: 'alt+shift+h', description: 'View your search query history' },
+      'navigate-history-up': { keys: 'up', description: 'Navigate to older query in history' },
+      'navigate-history-down': { keys: 'down', description: 'Navigate to newer query in history' },
     },
   },
   scratchpad: {
