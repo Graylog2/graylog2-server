@@ -42,6 +42,7 @@ import org.glassfish.jersey.server.model.Resource;
 import org.graylog2.Configuration;
 import org.graylog2.bootstrap.preflight.web.BasicAuthFilter;
 import org.graylog2.configuration.HttpConfiguration;
+import org.graylog2.jersey.IgnoreH2cUpgradeAddOn;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.shared.rest.exceptionmappers.AnyExceptionClassMapper;
 import org.graylog2.shared.rest.exceptionmappers.JsonProcessingExceptionMapper;
@@ -228,6 +229,7 @@ public class PreflightJerseyService extends AbstractIdleService {
                 false);
 
         final NetworkListener listener = httpServer.getListener("grizzly");
+        listener.registerAddOn(new IgnoreH2cUpgradeAddOn());
         listener.setMaxHttpHeaderSize(maxHeaderSize);
 
         final ExecutorService workerThreadPoolExecutor = instrumentedExecutor(

@@ -50,6 +50,7 @@ import org.graylog2.audit.jersey.AuditEventModelProcessor;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.jersey.HttpServerExtension;
+import org.graylog2.jersey.IgnoreH2cUpgradeAddOn;
 import org.graylog2.jersey.PrefixAddingModelProcessor;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -348,6 +349,7 @@ public class JerseyService extends AbstractIdleService {
                 false);
 
         final NetworkListener listener = httpServer.getListener("grizzly");
+        listener.registerAddOn(new IgnoreH2cUpgradeAddOn());
         listener.setMaxHttpHeaderSize(maxHeaderSize);
         // Graylog Collector has a default poll interval of 30 seconds. The default Grizzly idle timeout is
         // also 30 seconds. We increase the default timeout to avoid race conditions where the Collector tries to
