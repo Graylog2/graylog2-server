@@ -114,4 +114,19 @@ public class EventProcessorDependencyCheckTest {
 
         assertThat(dependencyCheck.hasMessagesIndexedUpTo(any)).isTrue();
     }
+
+    @Test
+    public void hasMessagesIndexedUpToPassesIdleClusterOnlyWhenRequested() {
+        TimeRange any = AbsoluteRange.create("2019-01-01T00:00:00.000Z", "2019-01-01T00:00:30.000Z");
+
+        when(dbProcessingStatusService.calculateProcessingState(any)).thenReturn(ProcessingNodesState.ALL_IDLE);
+        assertThat(dependencyCheck.hasMessagesIndexedUpTo(any)).isFalse();
+        assertThat(dependencyCheck.hasMessagesIndexedUpTo(any, false)).isFalse();
+        assertThat(dependencyCheck.hasMessagesIndexedUpTo(any, true)).isTrue();
+
+        for (ProcessingNodesState held : new ProcessingNodesState[]{ProcessingNodesState.SOME_OVERLOADED, ProcessingNodesState.NONE_ACTIVE}) {
+            when(dbProcessingStatusService.calculateProcessingState(any)).thenReturn(held);
+            assertThat(dependencyCheck.hasMessagesIndexedUpTo(any, true)).as(held.name()).isFalse();
+        }
+    }
 }

@@ -117,7 +117,7 @@ public class AggregationEventProcessor implements EventProcessor {
         final AggregationEventProcessorParameters parameters = (AggregationEventProcessorParameters) processorParameters;
 
         // TODO: We have to take the Elasticsearch index.refresh_interval into account here!
-        if (!dependencyCheck.hasMessagesIndexedUpTo(parameters.timerange())) {
+        if (!dependencyCheck.hasMessagesIndexedUpTo(parameters.timerange(), config.firesOnEmptyWindow())) {
             final String msg = String.format(Locale.ROOT, "Couldn't run aggregation <%s/%s> for timerange <%s to %s> because required messages haven't been indexed, yet.",
                     eventDefinition.title(), eventDefinition.id(), parameters.timerange().getFrom(), parameters.timerange().getTo());
             throw new EventProcessorPreconditionException(msg, eventDefinition);
