@@ -115,7 +115,7 @@
         <auto-service.version>1.1.1</auto-service.version>
         <auto-value.version>1.11.1</auto-value.version>
         <aws-java-sdk-1.version>1.12.797</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.58.0</aws-java-sdk-2.version>
+        <aws-java-sdk-2.version>2.59.4</aws-java-sdk-2.version>
         <aws-kinesis-client.version>3.5.4</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.4.0</aws-msk-iam-auth.version>
         <bouncycastle-prov.version>1.86</bouncycastle-prov.version>
@@ -137,7 +137,7 @@
         <!-- Jakarta EL 6 implementation. See the jakarta.el-api dependency in graylog2-server/pom.xml for details. -->
         <expressly.version>6.0.0</expressly.version>
         <freemarker.version>2.3.35</freemarker.version>
-        <gcs.version>2.78.0</gcs.version>
+        <gcs.version>2.79.0</gcs.version>
         <azure-blob-storage.version>12.37.2</azure-blob-storage.version>
         <azure-core.version>1.61.0</azure-core.version>
         <azure-identity.version>1.19.0</azure-identity.version>
@@ -146,15 +146,15 @@
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>5.2.0</geoip2.version>
         <google-api-client.version>2.9.2</google-api-client.version>
-        <google-api-common.version>2.73.0</google-api-common.version>
+        <google-api-common.version>2.74.0</google-api-common.version>
         <google-api-services-admin-reports.version>reports_v1-rev20251202-2.0.0</google-api-services-admin-reports.version>
-        <google-auth-library.version>1.57.0</google-auth-library.version>
+        <google-auth-library.version>1.58.0</google-auth-library.version>
         <google-oauth-client.version>1.39.0</google-oauth-client.version>
-        <google-cloud-bigquery.version>2.76.0</google-cloud-bigquery.version>
-        <google-cloud-core.version>2.80.0</google-cloud-core.version>
-        <google-cloud-logging.version>3.43.0</google-cloud-logging.version>
+        <google-cloud-bigquery.version>2.77.0</google-cloud-bigquery.version>
+        <google-cloud-core.version>2.81.0</google-cloud-core.version>
+        <google-cloud-logging.version>3.44.0</google-cloud-logging.version>
         <google-conscrypt.version>2.9.0</google-conscrypt.version>
-        <google-gax.version>2.90.0</google-gax.version>
+        <google-gax.version>2.91.0</google-gax.version>
         <google-http-client.version>2.2.0</google-http-client.version>
         <grizzly.version>4.1.0</grizzly.version> <!-- Should match the version used by Jersey -->
         <grok.version>0.1.9-graylog-3</grok.version>
@@ -193,42 +193,42 @@
         <jetbrains-annotations.version>26.1.0</jetbrains-annotations.version>
         <log4j.version>2.26.1</log4j.version>
         <lucene.version>10.6.0</lucene.version>
-        <lz4.version>1.12.1</lz4.version>
+        <lz4.version>1.14.1</lz4.version>
         <metrics.version>4.2.40</metrics.version>
         <mongodb-driver.version>5.14.0</mongodb-driver.version>
         <mongojack.version>5.1.0</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.2.20.Final</netty.version>
-        <netty-tcnative-boringssl-static.version>2.0.85.Final</netty-tcnative-boringssl-static.version>
+        <netty.version>4.2.21.Final</netty.version>
+        <netty-tcnative-boringssl-static.version>2.0.86.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>5.5.1</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
         <opentelemetry.version>1.68.0</opentelemetry.version>
-        <opentelemetry-instrumentation.version>2.33.1</opentelemetry-instrumentation.version>
+        <opentelemetry-instrumentation.version>2.34.0</opentelemetry-instrumentation.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.18</pkts.version>
         <prometheus-client.version>0.16.0</prometheus-client.version>
         <protobuf.version>4.36.2</protobuf.version>
-        <proto-google-common-protos.version>2.81.0</proto-google-common-protos.version>
-        <proto-google-iam-v1.version>1.76.0</proto-google-iam-v1.version>
+        <proto-google-common-protos.version>2.82.0</proto-google-common-protos.version>
+        <proto-google-iam-v1.version>1.77.0</proto-google-iam-v1.version>
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>3.0.0</retrofit.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
         <shiro.version>3.0.2</shiro.version>
         <snakeyaml.version>2.7</snakeyaml.version>
         <snappy-java.version>1.1.10.12</snappy-java.version>
-        <oshi.version>7.7.3</oshi.version>
+        <oshi.version>7.8.0</oshi.version>
         <siv-mode.version>1.6.1</siv-mode.version>
         <slf4j.version>2.0.20</slf4j.version>
         <streamex.version>0.9.0</streamex.version>
         <swagger.version>2.2.55</swagger.version>
-        <swagger-parser.version>2.1.48</swagger-parser.version>
+        <swagger-parser.version>2.1.49</swagger-parser.version>
         <syslog4j.version>0.9.63</syslog4j.version>
         <threeten-extra.version>1.11.0</threeten-extra.version>
         <ulid.version>8.3.0</ulid.version>
         <unboundid-ldap.version>7.0.6</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>3.1.1</validation-api.version>
-        <zstd.version>1.5.7-26</zstd.version>
+        <zstd.version>1.5.7-28</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
         <jjwt.version>0.13.0</jjwt.version>
@@ -249,7 +249,7 @@
         <mockito.version>5.24.0</mockito.version>
         <restassured.version>6.3.0</restassured.version>
         <testcontainers.version>2.0.5</testcontainers.version>
-        <testcontainers.opensearch.version>4.1.0</testcontainers.opensearch.version>
+        <testcontainers.opensearch.version>4.1.1</testcontainers.opensearch.version>
         <graalvm.version>25.5.5.0.3</graalvm.version>
 
         <!-- Nodejs dependencies -->
@@ -1011,7 +1011,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.25.1</version>
+                    <version>2.25.2</version>
                     <configuration>
                         <!-- versions:set (used by the release script) would otherwise replace the
                              ${maven.build.timestamp} reference in project.build.outputTimestamp with a fixed date -->
