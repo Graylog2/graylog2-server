@@ -27,9 +27,14 @@ import PreflightWrappingContainer from '../PreflightWrappingContainer';
 import WrappingContainer from '../WrappingContainer';
 import { routerTestProps } from '../routerTestProps';
 
-export const renderWithWrapper = (Component: React.ReactElement<any>, options?: RenderOptions) =>
+export const renderWithWrapper = (
+  Component: React.ReactElement<any>,
+  { initialEntries, ...options }: RenderOptions & { initialEntries?: Array<string> } = {},
+) =>
   render(Component, {
-    wrapper: WrappingContainer,
+    wrapper: ({ children }: React.PropsWithChildren) => (
+      <WrappingContainer initialEntries={initialEntries}>{children}</WrappingContainer>
+    ),
     ...options,
   });
 
