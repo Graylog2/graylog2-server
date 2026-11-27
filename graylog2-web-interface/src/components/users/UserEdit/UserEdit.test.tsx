@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import pick from 'lodash/pick';
 import { screen, render, act, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
@@ -32,7 +33,12 @@ jest.mock('./ProfileSection', () => ({ onSubmit }) => (
   </div>
 ));
 jest.mock('./PreferencesSection', () => () => <div>PreferencesSection</div>);
-jest.mock('./SettingsSection', () => () => <div>SettingsSection</div>);
+jest.mock('./SettingsSection', () => ({ onSubmit }) => (
+  <div>
+    SettingsSection
+    <button onClick={() => onSubmit({ timezone: 'America/Vancouver', startpage: null })}>Update Settings</button>
+  </div>
+));
 jest.mock('./PasswordSection', () => () => <div>PasswordSection</div>);
 jest.mock('./RolesSection', () => ({ onSubmit }) => (
   <div>
@@ -109,7 +115,7 @@ describe('<UserEdit />', () => {
     });
   });
 
-  it('should send complete UserUpdate object when updating user profile', async () => {
+  it('should only send profile data, timezone and startpage when updating user profile', async () => {
     const updateSpy = jest.fn(() => Promise.resolve());
     asMock(UsersDomain.update).mockImplementation(updateSpy);
 
@@ -123,14 +129,14 @@ describe('<UserEdit />', () => {
     expect(updateSpy).toHaveBeenCalledWith(
       user.id,
       {
-        ...user.toJSON(),
+        ...pick(user.toJSON(), ['timezone', 'startpage']),
         fullName: 'Updated Name',
       },
       user.fullName,
     );
   });
 
-  it('should send complete UserUpdate object when updating user roles', async () => {
+  it('should only send roles, timezone and startpage when updating user roles', async () => {
     const updateSpy = jest.fn(() => Promise.resolve());
     asMock(UsersDomain.update).mockImplementation(updateSpy);
 
@@ -147,10 +153,64 @@ describe('<UserEdit />', () => {
     expect(updateSpy).toHaveBeenCalledWith(
       user.id,
       {
-        ...user.toJSON(),
+        ...pick(user.toJSON(), ['timezone', 'startpage']),
         roles: ['new-role'],
       },
       user.fullName,
+    );
+  });
+
+  it('should not send permissions but keep timezone and startpage when updating user', async () => {
+    const updateSpy = jest.fn((_userId: string, _payload: object, _fullName: string) => Promise.resolve());
+    asMock(UsersDomain.update).mockImplementation(updateSpy);
+    const userWithSettings = user
+      .toBuilder()
+      .timezone('Europe/Berlin')
+      .startpage({ type: 'dashboard', id: 'dashboard-id' })
+      .build();
+
+    render(<UserEdit user={userWithSettings} />);
+
+    const updateButton = await screen.findByText('Update Profile');
+    await setupUser().click(updateButton);
+
+    await waitFor(() => expect(updateSpy).toHaveBeenCalledTimes(1));
+
+    const payload = updateSpy.mock.calls[0][1];
+
+    expect(payload).not.toHaveProperty('permissions');
+    expect(payload).not.toHaveProperty('grn_permissions');
+    expect(payload).not.toHaveProperty('roles');
+    expect(payload).not.toHaveProperty('email');
+    expect(payload).not.toHaveProperty('first_name');
+    expect(payload).not.toHaveProperty('last_name');
+    expect(payload).toHaveProperty('timezone', 'Europe/Berlin');
+    expect(payload).toHaveProperty('startpage', { type: 'dashboard', id: 'dashboard-id' });
+  });
+
+  it('should send timezone and startpage from settings section instead of current values', async () => {
+    const updateSpy = jest.fn((_userId: string, _payload: object, _fullName: string) => Promise.resolve());
+    asMock(UsersDomain.update).mockImplementation(updateSpy);
+    const userWithSettings = user
+      .toBuilder()
+      .timezone('Europe/Berlin')
+      .startpage({ type: 'dashboard', id: 'dashboard-id' })
+      .build();
+
+    render(<UserEdit user={userWithSettings} />);
+
+    const tab = await screen.findByLabelText(/Preferences/i);
+    await setupUser().click(tab);
+
+    const updateButton = await screen.findByText('Update Settings');
+    await setupUser().click(updateButton);
+
+    await waitFor(() => expect(updateSpy).toHaveBeenCalledTimes(1));
+
+    expect(updateSpy).toHaveBeenCalledWith(
+      userWithSettings.id,
+      { timezone: 'America/Vancouver', startpage: null },
+      userWithSettings.fullName,
     );
   });
 

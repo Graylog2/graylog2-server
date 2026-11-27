@@ -57,7 +57,7 @@ const EventDefinitionReplaySearch = ({ eventDefinitionMappedData }: Props) => {
   );
 
   useEffect(() => {
-    openSidebar(SidebarEventDefinitionDetails(eventDefinition.id));
+    openSidebar(SidebarEventDefinitionDetails(eventDefinition.id), { slideIn: false });
   }, [openSidebar, eventDefinition.id]);
 
   return (

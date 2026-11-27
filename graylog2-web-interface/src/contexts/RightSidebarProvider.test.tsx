@@ -42,12 +42,10 @@ const TestConsumer = () => {
     isOpen,
     isCollapsed,
     content,
-    width,
     openSidebar,
     closeSidebar,
     collapseSidebar,
     expandSidebar,
-    setWidth,
     updateContent,
     goBack,
     goForward,
@@ -60,7 +58,6 @@ const TestConsumer = () => {
       <div data-testid="is-open">{String(isOpen)}</div>
       <div data-testid="is-collapsed">{String(isCollapsed)}</div>
       <div data-testid="content-id">{content?.id || 'null'}</div>
-      <div data-testid="width">{width}</div>
       <div data-testid="can-go-back">{String(canGoBack)}</div>
       <div data-testid="can-go-forward">{String(canGoForward)}</div>
       <button
@@ -141,9 +138,6 @@ const TestConsumer = () => {
       <button type="button" onClick={expandSidebar}>
         Expand Sidebar
       </button>
-      <button type="button" onClick={() => setWidth(500)}>
-        Set Width 500
-      </button>
       <button type="button" onClick={goBack}>
         Go Back
       </button>
@@ -167,7 +161,6 @@ describe('RightSidebarProvider', () => {
     expect(screen.getByTestId('is-open')).toHaveTextContent('false');
     expect(screen.getByTestId('is-collapsed')).toHaveTextContent('false');
     expect(screen.getByTestId('content-id')).toHaveTextContent('null');
-    expect(screen.getByTestId('width')).toHaveTextContent('400');
     expect(screen.getByTestId('can-go-back')).toHaveTextContent('false');
     expect(screen.getByTestId('can-go-forward')).toHaveTextContent('false');
   });
@@ -189,16 +182,6 @@ describe('RightSidebarProvider', () => {
 
     await userEvent.click(screen.getByText('Close Sidebar'));
     expect(screen.getByTestId('is-open')).toHaveTextContent('false');
-  });
-
-  it('should update sidebar width', async () => {
-    render(<SUT />);
-
-    expect(screen.getByTestId('width')).toHaveTextContent('400');
-
-    await userEvent.click(screen.getByText('Set Width 500'));
-
-    expect(screen.getByTestId('width')).toHaveTextContent('500');
   });
 
   describe('Navigation History', () => {

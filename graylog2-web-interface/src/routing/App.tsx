@@ -33,10 +33,8 @@ import PageContextProviders from 'components/page/contexts/PageContextProviders'
 import { singleton } from 'logic/singleton';
 import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 import RightSidebarProvider from 'contexts/RightSidebarProvider';
-import RightSidebar from 'components/layout/RightSidebar';
-import RightSidebarContext from 'contexts/RightSidebarContext';
+import RightSidebarColumn from 'components/layout/RightSidebar/RightSidebarColumn';
 import { AssistantPageContextProvider } from 'components/assistant';
-import usePluginEntities from 'hooks/usePluginEntities';
 
 const AppLayout = styled.div`
   display: flex;
@@ -63,19 +61,6 @@ const PageContent = styled.div`
   flex: 1;
   min-height: 0;
 `;
-
-// Sidebars shown next to every page, e.g. the Assistant's chat, which stays open across pages.
-const GlobalSidebars = () => {
-  const sidebars = usePluginEntities('globalSidebars');
-
-  return (
-    <>
-      {sidebars.map(({ key, component: Sidebar }) => (
-        <Sidebar key={key} />
-      ))}
-    </>
-  );
-};
 
 const App = () => (
   <DefaultQueryParamProvider>
@@ -106,10 +91,7 @@ const App = () => (
                               </PageContextProviders>
                             </RuntimeErrorBoundary>
                           </MainContentColumn>
-                          <RightSidebarContext.Consumer>
-                            {({ isOpen }) => isOpen && <RightSidebar />}
-                          </RightSidebarContext.Consumer>
-                          <GlobalSidebars />
+                          <RightSidebarColumn />
                         </ContentRow>
                       </ReportedErrorBoundary>
                     </AppLayout>
