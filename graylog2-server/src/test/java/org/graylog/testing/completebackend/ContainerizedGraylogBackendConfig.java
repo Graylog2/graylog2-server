@@ -42,6 +42,12 @@ public abstract class ContainerizedGraylogBackendConfig {
 
     public abstract boolean importLicenses();
 
+    /** MongoDB fixtures imported before the server starts, see {@code GraylogBackendConfiguration#mongoDBFixtures()}. */
+    public abstract List<String> mongoDBFixtures();
+
+    /** The class that relative {@link #mongoDBFixtures()} paths are resolved against. */
+    public abstract Class<?> mongoDBFixtureClass();
+
     @Memoized
     public ContainerizedGraylogBackendServicesProvider serviceProvider() {
         return new ContainerizedGraylogBackendServicesProvider(lifecycle());
@@ -54,7 +60,9 @@ public abstract class ContainerizedGraylogBackendConfig {
     @AutoValue.Builder
     public static abstract class Builder {
         public static Builder create() {
-            return new AutoValue_ContainerizedGraylogBackendConfig.Builder();
+            return new AutoValue_ContainerizedGraylogBackendConfig.Builder()
+                    .mongoDBFixtures(List.of())
+                    .mongoDBFixtureClass(Object.class);
         }
 
         public abstract Builder lifecycle(Lifecycle lifecycle);
@@ -72,6 +80,10 @@ public abstract class ContainerizedGraylogBackendConfig {
         public abstract Builder env(Map<String, String> env);
 
         public abstract Builder importLicenses(boolean importLicenses);
+
+        public abstract Builder mongoDBFixtures(List<String> mongoDBFixtures);
+
+        public abstract Builder mongoDBFixtureClass(Class<?> mongoDBFixtureClass);
 
         public abstract ContainerizedGraylogBackendConfig build();
     }
