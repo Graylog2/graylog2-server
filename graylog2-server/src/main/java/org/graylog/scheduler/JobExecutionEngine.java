@@ -44,9 +44,11 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -81,6 +83,7 @@ public class JobExecutionEngine {
     private final JobWorkerPool workerPool;
     private final RefreshingLockService.Factory refreshingLockServiceFactory;
     private final Map<String, Integer> concurrencyLimits;
+    private final Map<String, Long> concurrencyRescheduleBackoffMillis;
     private final long backoffMillis;
 
     private final Counter executionSuccessful;
@@ -132,6 +135,7 @@ public class JobExecutionEngine {
         this.workerPool = workerPool;
         this.refreshingLockServiceFactory = refreshingLockServiceFactory;
         this.concurrencyLimits = schedulerConfig.concurrencyLimits();
+        this.concurrencyRescheduleBackoffMillis = positiveMillis(schedulerConfig.concurrencyRescheduleBackoffs());
         this.backoffMillis = backoffMillis;
 
         this.executionSuccessful = metricRegistry.counter(MetricRegistry.name(getClass(), name, "executions", "successful"));
@@ -229,15 +233,30 @@ public class JobExecutionEngine {
     private void handleTriggerWithConcurrencyLimit(JobTriggerDto trigger) {
         final int maxTypeConcurrency = concurrencyLimits.getOrDefault(trigger.jobDefinitionType(), 0);
         if (maxTypeConcurrency > 0) {
+            boolean handled = false;
             try (final RefreshingLockService refreshingLockService = refreshingLockServiceFactory.create()) {
                 try {
                     refreshingLockService.acquireAndKeepLock(trigger.jobDefinitionType(), maxTypeConcurrency);
-                    handleTrigger(trigger);
                 } catch (AlreadyLockedException e) {
-                    final DateTime nextTime = DateTime.now(DateTimeZone.UTC).plus(slidingBackoff(trigger));
+                    final DateTime nextTime = DateTime.now(DateTimeZone.UTC).plus(jittered(slidingBackoff(trigger)));
                     jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withConcurrencyReschedule(nextTime));
                     executionDenied.mark();
                     executionRescheduled.mark();
+                    return;
+                }
+                handled = true;
+                handleTrigger(trigger);
+            } catch (Exception e) {
+                if (handled) {
+                    // handleTrigger released the trigger, and this node may already run it again. Only the type
+                    // lock is left, and it expires on its own because its refresh was stopped.
+                    LOG.error("Couldn't release the concurrency lock of trigger {}", trigger.id(), e);
+                } else {
+                    // Without a release the trigger stays RUNNING and locked by this node, and the lock heartbeat
+                    // keeps it that way until a restart, because updateLockedJobs refreshes its lock time.
+                    final DateTime nextTime = DateTime.now(DateTimeZone.UTC).plusSeconds(5);
+                    LOG.error("Couldn't handle trigger {} with concurrency limit - retrying at {}", trigger.id(), nextTime, e);
+                    jobTriggerService.releaseTrigger(trigger, JobTriggerUpdate.withNextTime(nextTime));
                 }
             }
         } else {
@@ -246,16 +265,36 @@ public class JobExecutionEngine {
     }
 
     /**
-     * Progressively reduce backoff from 100% to 20% based on how many times the trigger was rescheduled.
+     * Progressively reduce backoff from 100% to 20% based on how many times the trigger was rescheduled. The first
+     * two reschedules (count 0 and 1) both wait the full base. The base is the job type's configured backoff, or the
+     * engine's default.
      */
-    private Duration slidingBackoff(JobTriggerDto trigger) {
-        final long slidingBackoffMillis;
-        if (trigger.concurrencyRescheduleCount() < 1) {
-            slidingBackoffMillis = backoffMillis;
-        } else {
-            slidingBackoffMillis = backoffMillis / Math.min(trigger.concurrencyRescheduleCount(), 5);
-        }
-        return Duration.millis(slidingBackoffMillis);
+    @VisibleForTesting
+    Duration slidingBackoff(JobTriggerDto trigger) {
+        final long baseMillis = concurrencyRescheduleBackoffMillis.getOrDefault(trigger.jobDefinitionType(), backoffMillis);
+        return Duration.millis(baseMillis / Math.clamp(trigger.concurrencyRescheduleCount(), 1, 5));
+    }
+
+    /**
+     * Spread the backoff by up to 20% in either direction, so triggers that were turned away together don't all
+     * come due together and collide again.
+     */
+    @VisibleForTesting
+    static Duration jittered(Duration backoff) {
+        final long spreadMillis = backoff.getMillis() / 5;
+        return backoff.plus(ThreadLocalRandom.current().nextLong(-spreadMillis, spreadMillis + 1));
+    }
+
+    private static Map<String, Long> positiveMillis(Map<String, java.time.Duration> backoffs) {
+        final Map<String, Long> millis = new HashMap<>();
+        backoffs.forEach((type, backoff) -> {
+            if (backoff.isPositive()) {
+                millis.put(type, backoff.toMillis());
+            } else {
+                LOG.warn("Ignoring concurrency reschedule backoff <{}> for job type <{}>, it must be positive", backoff, type);
+            }
+        });
+        return Map.copyOf(millis);
     }
 
     private void handleTrigger(JobTriggerDto trigger) {
