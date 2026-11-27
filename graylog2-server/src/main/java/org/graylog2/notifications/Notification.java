@@ -114,7 +114,7 @@ public interface Notification extends Persisted {
         ES_NODE_DISK_WATERMARK_LOW,
         ES_NODE_DISK_WATERMARK_HIGH,
         ES_NODE_DISK_WATERMARK_FLOOD_STAGE,
-        ES_SHARD_ALLOCATION_MAXIMUM,
+        @Deprecated ES_SHARD_ALLOCATION_MAXIMUM, // no longer published, kept so stored notifications can still be read
         ES_VERSION_MISMATCH,
         LEGACY_LDAP_CONFIG_MIGRATION,
         MULTI_LEADER,

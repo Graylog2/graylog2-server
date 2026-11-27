@@ -22,6 +22,7 @@ import com.google.common.io.Resources;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.get.GetSettingsResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Cancellable;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.health.ClusterHealthStatus;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
@@ -215,23 +216,21 @@ class ClusterAdapterOS2Test {
 
     @Test
     void testClusterShardAllocation() {
-
-        when(client.execute(any())).thenReturn(new ClusterGetSettingsResponse(
-                Settings.builder()
-                        .put("cluster.max_shards_per_node", "42")
-                        .build(),
-                Settings.builder().build(),
-                Settings.builder().build()
-        ));
+        mockClusterShardSettings(Settings.builder().build());
 
         when(catApi.getNodeShardAllocations()).thenReturn(List.of(
                 new NodeShardAllocation("node1", 1),
-                new NodeShardAllocation("node2", 2)
+                new NodeShardAllocation("node2", 2),
+                new NodeShardAllocation("UNASSIGNED", 6)
         ));
 
         final ClusterShardAllocation clusterShardAllocation = clusterAdapter.clusterShardAllocation();
 
         assertThat(clusterShardAllocation.maxShardsPerNode()).isEqualTo(42);
+        assertThat(clusterShardAllocation.maxShardsPerCluster()).isEqualTo(ClusterShardAllocation.NO_CLUSTER_LIMIT);
+        assertThat(clusterShardAllocation.unassignedShards()).isEqualTo(6);
+        // Without cluster.max_remote_capable_shards_per_node (before OpenSearch 3.4), searchable snapshots count too.
+        assertThat(clusterShardAllocation.openShards()).isEqualTo(12);
         assertThat(clusterShardAllocation.nodeShardAllocations()).hasSize(2);
         assertThat(clusterShardAllocation.nodeShardAllocations())
                 .extracting(NodeShardAllocation::node)
@@ -239,6 +238,46 @@ class ClusterAdapterOS2Test {
         assertThat(clusterShardAllocation.nodeShardAllocations())
                 .extracting(NodeShardAllocation::shards)
                 .containsExactly(1, 2);
+    }
+
+    @Test
+    void testClusterShardAllocationWithRemoteCapableShardPool() {
+        mockClusterShardSettings(Settings.builder()
+                .put("cluster.routing.allocation.total_shards_limit", "50")
+                .put("cluster.max_remote_capable_shards_per_node", "1000")
+                .build());
+        when(catApi.getNodeShardAllocations()).thenReturn(List.of(new NodeShardAllocation("node1", 1)));
+
+        final ClusterShardAllocation clusterShardAllocation = clusterAdapter.clusterShardAllocation();
+
+        assertThat(clusterShardAllocation.maxShardsPerCluster()).isEqualTo(50);
+        // Searchable snapshot shards count toward cluster.max_remote_capable_shards_per_node instead.
+        assertThat(clusterShardAllocation.openShards()).isEqualTo(9);
+    }
+
+    private void mockClusterShardSettings(Settings defaults) {
+        when(client.execute(any())).thenReturn(new ClusterGetSettingsResponse(
+                Settings.builder()
+                        .put("cluster.max_shards_per_node", "42")
+                        .build(),
+                Settings.builder().build(),
+                defaults
+        ));
+        when(client.execute(any(), anyString())).thenReturn(new GetSettingsResponse(Map.of(
+                "graylog_0", Settings.builder()
+                        .put("index.number_of_shards", 4)
+                        .put("index.number_of_replicas", 1)
+                        .build(),
+                ".hidden_index", Settings.builder()
+                        .put("index.number_of_shards", 1)
+                        .put("index.number_of_replicas", 0)
+                        .build(),
+                "mounted", Settings.builder()
+                        .put("index.number_of_shards", 3)
+                        .put("index.number_of_replicas", 0)
+                        .put("index.store.type", "remote_snapshot")
+                        .build()
+        ), Map.of()));
     }
 
 

@@ -1,0 +1,5 @@
+type = "f"
+message = "Remove the \"Indexer node reaches maximum number of shards\" notification, which compared shards per node and reported unassigned shards as a node named `UNASSIGNED`. The search cluster shard limit is applied cluster-wide and is now reported by a health check instead."
+
+issues = ["27916"]
+pulls = []
