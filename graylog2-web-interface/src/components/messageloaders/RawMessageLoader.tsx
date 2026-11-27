@@ -332,8 +332,21 @@ const RawMessageLoader = ({ onMessageLoaded, inputIdSelector = false, inputs = u
     const currentCodecConfiguration = codecTypes[codec].requested_configuration;
 
     codecConfigurationOptions = Object.keys(currentCodecConfiguration)
-      .sort((keyA, keyB) => currentCodecConfiguration[keyA].is_optional - currentCodecConfiguration[keyB].is_optional)
-      .map((key) => _formatConfigField(key, currentCodecConfiguration[key]));
+      .map((name, pos) => ({ name, pos }))
+      .sort((x1, x2) => {
+        const DEFAULT_POSITION = 100;
+        const x1pos = currentCodecConfiguration[x1.name].position || DEFAULT_POSITION;
+        const x2pos = currentCodecConfiguration[x2.name].position || DEFAULT_POSITION;
+
+        let diff = x1pos - x2pos;
+
+        if (!diff) {
+          diff = x1.pos - x2.pos;
+        }
+
+        return diff;
+      })
+      .map((key) => _formatConfigField(key.name, currentCodecConfiguration[key.name]));
   }
 
   return (
