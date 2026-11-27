@@ -1,0 +1,134 @@
+{
+  "views": [
+    {
+      "_id": {"$oid": "54e3deadbeefdeadbeef0001"},
+      "title": "View with referenced filter with excess attributes",
+      "state": {
+        "a81afc3f-4b7e-4e5a-ad70-1234567890ab": {
+          "widgets": [
+            {
+              "id": "widget-id-001",
+              "type": "aggregation",
+              "filters": [
+                {
+                  "type": "referenced",
+                  "id": "60e3deadbeefdeadbeef0001",
+                  "title": "My Search Filter",
+                  "description": "Filters by source",
+                  "queryString": "source:nginx",
+                  "scope": "DEFAULT",
+                  "negation": false,
+                  "disabled": false
+                }
+              ],
+              "config": {}
+            }
+          ]
+        }
+      }
+    },
+    {
+      "_id": {"$oid": "54e3deadbeefdeadbeef0002"},
+      "title": "View with only inline filters",
+      "state": {
+        "b91bfc3f-4b7e-4e5a-ad70-1234567890cd": {
+          "widgets": [
+            {
+              "id": "widget-id-002",
+              "type": "aggregation",
+              "filters": [
+                {
+                  "type": "inlineQueryString",
+                  "id": "inline-filter-id-001",
+                  "title": "Inline Filter",
+                  "description": "An inline filter",
+                  "queryString": "source:apache",
+                  "negation": true,
+                  "disabled": false
+                }
+              ],
+              "config": {}
+            }
+          ]
+        }
+      }
+    },
+    {
+      "_id": {"$oid": "54e3deadbeefdeadbeef0003"},
+      "title": "View with mixed filters across multiple state entries",
+      "state": {
+        "c01cfc3f-4b7e-4e5a-ad70-1234567890ef": {
+          "widgets": [
+            {
+              "id": "widget-id-003",
+              "type": "aggregation",
+              "filters": [
+                {
+                  "type": "referenced",
+                  "id": "60e3deadbeefdeadbeef0002",
+                  "title": "Referenced Filter To Strip",
+                  "description": "Should be stripped",
+                  "queryString": "http_method:GET",
+                  "scope": "DEFAULT",
+                  "negation": false,
+                  "disabled": true
+                },
+                {
+                  "type": "inlineQueryString",
+                  "id": "inline-filter-id-002",
+                  "title": "Inline Filter To Keep",
+                  "description": "Should stay intact",
+                  "queryString": "status:200",
+                  "negation": false,
+                  "disabled": false
+                }
+              ],
+              "config": {}
+            }
+          ]
+        },
+        "d11dfc3f-4b7e-4e5a-ad70-123456789012": {
+          "widgets": [
+            {
+              "id": "widget-id-004",
+              "type": "messages",
+              "filters": [
+                {
+                  "type": "referenced",
+                  "id": "60e3deadbeefdeadbeef0003",
+                  "title": "Another Referenced Filter",
+                  "queryString": "level:ERROR",
+                  "scope": "DEFAULT",
+                  "negation": true,
+                  "disabled": false
+                }
+              ],
+              "config": {}
+            }
+          ]
+        }
+      }
+    },
+    {
+      "_id": {"$oid": "54e3deadbeefdeadbeef0004"},
+      "title": "View with already clean referenced filter",
+      "state": {
+        "e21efc3f-4b7e-4e5a-ad70-1234567890ij": {
+          "widgets": [
+            {
+              "id": "widget-id-005",
+              "type": "aggregation",
+              "filters": [
+                {
+                  "type": "referenced",
+                  "id": "60e3deadbeefdeadbeef0004"
+                }
+              ],
+              "config": {}
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
