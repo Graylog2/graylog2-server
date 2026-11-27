@@ -21,13 +21,14 @@ import UserNotification from 'util/UserNotification';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore } from 'logic/singleton';
+import type User from 'logic/users/User';
 
 export const StartpageStore = singletonStore('core.Startpage', () =>
   Reflux.createStore({
     listenables: [],
 
-    set(userId: string, type: string, id: string) {
-      const url = qualifyUrl(ApiRoutes.UsersApiController.update(userId).url);
+    set(user: Pick<User, 'id' | 'timezone'>, type: string, id: string) {
+      const url = qualifyUrl(ApiRoutes.UsersApiController.update(encodeURIComponent(user.id)).url);
       const payload: { type?: string; id?: string } = {};
 
       if (type && id) {
@@ -35,7 +36,8 @@ export const StartpageStore = singletonStore('core.Startpage', () =>
         payload.id = id;
       }
 
-      return fetch('PUT', url, { startpage: payload }).then(
+      // The backend treats a missing timezone as null and clears it, so we always send the current value.
+      return fetch('PUT', url, { timezone: user.timezone, startpage: payload }).then(
         (response: unknown) => {
           this.trigger();
           UserNotification.success('Your start page was changed successfully');

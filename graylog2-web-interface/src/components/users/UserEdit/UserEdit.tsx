@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
+import pick from 'lodash/pick';
 
 import UsersDomain from 'domainActions/users/UsersDomain';
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -46,15 +47,29 @@ type Props = {
 const UserEdit = ({ user }: Props) => {
   const currentUser = useCurrentUser();
   const [selectedSegment, setSelectedSegment] = useState<UserSegment>('profile');
-  const updateUser = useCallback(
-    (data: UserUpdate) =>
-      UsersDomain.update(user.id, { ...user.toJSON(), ...data }, user.fullName).then(() => {
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const updateUser = (data: UserUpdate) => {
+    setIsUpdating(true);
+
+    // Only send the data of the updated section. The exceptions are timezone and startpage: the backend treats
+    // missing timezone and startpage values as null and clears them, so we always send the current values.
+    return UsersDomain.update(user.id, { ...pick(user.toJSON(), ['timezone', 'startpage']), ...data }, user.fullName)
+      .then(() => {
         if (user.id === currentUser?.id) {
           CurrentUserStore.reload();
         }
-      }),
-    [user, currentUser?.id],
-  );
+
+        // Reload the edited user so the sections show the saved values (e.g. after switching tabs) and following
+        // updates don't send stale timezone and startpage values. The page updates the user when the load completes.
+        // We return the promise so the update only finishes once the reloaded user is fetched. Until then, the
+        // submitting section is busy and switching to other sections is disabled, so no section can submit stale data
+        // in the meantime.
+        return UsersDomain.load(user.id);
+      })
+      .then(() => {})
+      .finally(() => setIsUpdating(false));
+  };
 
   if (!user) {
     return <Spinner />;
@@ -71,6 +86,7 @@ const UserEdit = ({ user }: Props) => {
           data={editableUserSegments}
           value={selectedSegment}
           onChange={setSelectedSegment}
+          disabled={isUpdating}
         />
       </Col>
       <Col md={12}>
