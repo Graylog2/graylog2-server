@@ -19,7 +19,6 @@ import { useState, useCallback } from 'react';
 import * as Immutable from 'immutable';
 import styled from 'styled-components';
 
-import UsersDomain from 'domainActions/users/UsersDomain';
 import AuthzRolesDomain from 'domainActions/roles/AuthzRolesDomain';
 import { ErrorAlert } from 'components/common';
 import type User from 'logic/users/User';
@@ -41,8 +40,9 @@ const Container = styled.div`
 `;
 
 const RolesSection = ({ user, onSubmit }: Props) => {
-  const { username, id } = user;
+  const { username } = user;
   const [loading, setLoading] = useState(false);
+  const [updating, setUpdating] = useState(false);
   const [paginatedRoles, setPaginatedRoles] = useState<PaginatedRoles | undefined>();
   const [errors, setErrors] = useState<string | undefined>();
 
@@ -59,13 +59,23 @@ const RolesSection = ({ user, onSubmit }: Props) => {
     [username],
   );
 
-  const onRolesUpdate = (data: { roles: Array<string> }) =>
-    onSubmit(data).then(() => {
-      _onLoad().then(setPaginatedRoles);
-      UsersDomain.load(id);
-    });
+  // The new roles are computed from `user.roles`, which is only up to date once the previous update finished.
+  // Ignore role changes while an update is running to avoid sending outdated roles.
+  const onRolesUpdate = (data: { roles: Array<string> }) => {
+    setUpdating(true);
+
+    return onSubmit(data)
+      .then(() => {
+        _onLoad().then(setPaginatedRoles);
+      })
+      .finally(() => setUpdating(false));
+  };
 
   const _onAssignRole = (newRoles: Immutable.Set<DescriptiveItem>) => {
+    if (updating) {
+      return Promise.resolve();
+    }
+
     const userRoles = user.roles;
     const newRoleNames = newRoles.map((r) => r.name);
     const newUserRoles = userRoles.union(newRoleNames).toJS();
@@ -78,10 +88,15 @@ const RolesSection = ({ user, onSubmit }: Props) => {
   const ensureReaderOrAdminRole = (newRoles) => newRoles.includes('Reader') || newRoles.includes('Admin');
 
   const onDeleteRole = (role: DescriptiveItem) => {
+    if (updating) {
+      return;
+    }
+
     const newUserRoles = Immutable.Set(user.roles.toJS()).remove(role.name).toJS();
 
     if (ensureReaderOrAdminRole(newUserRoles)) {
-      onRolesUpdate({ roles: newUserRoles });
+      // The update shows an error notification when it fails.
+      onRolesUpdate({ roles: newUserRoles }).catch(() => {});
       setErrors(undefined);
     } else {
       setErrors('Roles must at least contain Admin or Reader role.');
@@ -90,7 +105,7 @@ const RolesSection = ({ user, onSubmit }: Props) => {
   };
 
   return (
-    <SectionComponent title="Roles" showLoading={loading}>
+    <SectionComponent title="Roles" showLoading={loading || updating}>
       <h3>Assign Roles</h3>
       <Container>
         <RolesSelector onSubmit={_onAssignRole} assignedRolesIds={user.roles} identifier={(role) => role.name} />
