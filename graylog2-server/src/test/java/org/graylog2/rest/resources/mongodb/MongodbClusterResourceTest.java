@@ -19,10 +19,13 @@ package org.graylog2.rest.resources.mongodb;
 import jakarta.ws.rs.core.Response;
 import org.bson.Document;
 import org.graylog2.cluster.nodes.mongodb.MongodbClusterCommand;
+import org.graylog2.cluster.nodes.mongodb.MongodbNode;
 import org.graylog2.cluster.nodes.mongodb.MongodbNodesProvider;
+import org.graylog2.rest.models.SortOrder;
 import org.junit.jupiter.api.Test;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,6 +34,30 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class MongodbClusterResourceTest {
+
+    @Test
+    void listNodesReportsFilteredTotalIndependentOfPageSize() throws Exception {
+        final MongodbNodesProvider provider = mock(MongodbNodesProvider.class);
+        when(provider.get()).thenReturn(List.of(
+                new MongodbNode("1", "alpha", "PRIMARY"),
+                new MongodbNode("2", "beta", "SECONDARY"),
+                new MongodbNode("3", "gamma", "SECONDARY")));
+        final MongodbClusterResource resource = new MongodbClusterResource(provider, mock(MongodbClusterCommand.class));
+
+        final var all = resource.listNodes(1, 1, "", "name", SortOrder.ASCENDING);
+        assertThat(all.elements()).hasSize(1);
+        assertThat(all.total()).isEqualTo(3);
+        assertThat(all.paginationInfo().total()).isEqualTo(3);
+
+        final var filtered = resource.listNodes(1, 1, "role:SECONDARY", "name", SortOrder.ASCENDING);
+        assertThat(filtered.elements()).hasSize(1);
+        assertThat(filtered.total()).isEqualTo(2);
+        assertThat(filtered.paginationInfo().total()).isEqualTo(2);
+
+        final var empty = resource.listNodes(1, 1, "name:missing", "name", SortOrder.ASCENDING);
+        assertThat(empty.elements()).isEmpty();
+        assertThat(empty.total()).isZero();
+    }
 
     @Test
     void profilingStatus_reportsSlowMs_whenAllNodesAgree() {
