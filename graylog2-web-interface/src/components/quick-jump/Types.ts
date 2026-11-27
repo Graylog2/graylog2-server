@@ -23,6 +23,8 @@ type SearchResultItemBase = {
   score?: number;
   last_opened?: boolean;
   favorite?: boolean;
+  // Shown below the title. The item stays in the list, but cannot be selected.
+  disabledReason?: string;
 };
 
 type SearchResultItemLink = {
@@ -50,8 +52,15 @@ export type SearchResultItem = SearchResultItemBase &
  * Offers to do something with the text the user typed, e.g. to ask about it. Its item is shown last, whatever else
  * matches the text.
  */
+export type QuickJumpQueryActionAvailability =
+  | { status: 'available' }
+  // Shown, but cannot be used now, e.g. while the feature behind it is not set up.
+  | { status: 'disabled'; reason: string }
+  | { status: 'hidden' };
+
 export type QuickJumpQueryAction = {
   key: string;
   item: (query: string) => SearchResultItem;
-  useCondition?: () => boolean;
+  // Available when missing.
+  useAvailability?: () => QuickJumpQueryActionAvailability;
 };
