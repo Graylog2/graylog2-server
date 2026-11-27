@@ -7,10 +7,18 @@
 <!--- Why is this change required? What problem does it solve? -->
 <!--- If it fixes an open issue, please link to the issue here. -->
 
+## Related PRs
+<!--- Optional. Companion PRs that must be built and merged together, one per line, -->
+<!--- in this exact form so CI picks them up: /prd Graylog2/<repo>#<number> -->
+
+## Risks and Known Issues
+<!--- Optional. What could break, and known bugs or limitations this PR leaves open (link issues). -->
+
 ## How Has This Been Tested?
 <!--- Please describe in detail how you tested your changes. -->
 <!--- Include details of your testing environment, and the tests you ran to -->
 <!--- see how your change affects other areas of the code, etc. -->
+<!--- Also describe how a reviewer can reproduce it: setup, steps, what to look for. -->
 
 ## Screenshots (if appropriate):
 
