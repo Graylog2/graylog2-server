@@ -28,6 +28,7 @@ import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ExecutionCondition;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
+import org.junit.jupiter.api.extension.ExtensionContext.StoreScope;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
@@ -106,14 +107,14 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
                                    ExtensionContext extensionContext) throws ParameterResolutionException {
         final var paramType = parameterContext.getParameter().getType();
         final var store = extensionContext.getStore(NAMESPACE);
-        final var rootStore = extensionContext.getRoot().getStore(NAMESPACE);
+        final var sessionStore = extensionContext.getStore(StoreScope.LAUNCHER_SESSION, NAMESPACE);
         final var lifecycle = store.get(BACKEND_LIFECYCLE_KEY, Lifecycle.class);
         if (lifecycle == null) {
             throw new ParameterResolutionException("backend_lifecycle store not found");
         }
 
         final var backend = switch (lifecycle) {
-            case VM -> rootStore.get(VM_LIFECYCLE_BACKEND_KEY, ContainerizedGraylogBackend.class);
+            case VM -> sessionStore.get(VM_LIFECYCLE_BACKEND_KEY, ContainerizedGraylogBackend.class);
             case CLASS -> store.get(CLASS_LIFECYCLE_BACKEND_KEY, ContainerizedGraylogBackend.class);
         };
         if (backend == null) {
@@ -134,7 +135,8 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
         LOG.debug("Before test: {} backend config: {}", context.getRequiredTestClass().getName(), backendConfiguration);
 
         final var store = context.getStore(NAMESPACE);
-        final var rootStore = context.getRoot().getStore(NAMESPACE);
+        // With forkCount > 1, failsafe runs each class in its own execution request, so the root store isn't shared.
+        final var sessionStore = context.getStore(StoreScope.LAUNCHER_SESSION, NAMESPACE);
 
         if (backendConfiguration.isEmpty()) {
             LOG.warn("Extension cannot find @GraylogBackendConfiguration annotation");
@@ -161,14 +163,14 @@ public class GraylogBackendExtension implements BeforeAllCallback, ParameterReso
         // note that ContainerizedGraylogBackend implements CloseableResource so junit will properly close the instances
         // as their contexts go out of scope.
         if (config.serverLifecycle() == Lifecycle.VM) {
-            if (rootStore.get(VM_LIFECYCLE_BACKEND_KEY) == null) {
+            if (sessionStore.get(VM_LIFECYCLE_BACKEND_KEY) == null) {
                 // this backend will be re-used and only shut down at the very end
                 LOG.info("Creating VM-lifecycle server backend for class {}", context.getRequiredTestClass().getName());
                 final var sw = Stopwatch.createStarted();
                 final var backend = createBackend(config);
                 LOG.info("Created VM-lifecycle server backend for class {} in {}",
                         context.getRequiredTestClass().getName(), sw.stop().elapsed());
-                rootStore.put(VM_LIFECYCLE_BACKEND_KEY, backend);
+                sessionStore.put(VM_LIFECYCLE_BACKEND_KEY, backend);
             } else {
                 LOG.info("Re-using existing VM-lifecycle server backend for class {}",
                         context.getRequiredTestClass().getName());

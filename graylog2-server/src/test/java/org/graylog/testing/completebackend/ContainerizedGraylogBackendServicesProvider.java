@@ -55,6 +55,7 @@ public class ContainerizedGraylogBackendServicesProvider {
 
     private static final Logger LOG = LoggerFactory.getLogger(ContainerizedGraylogBackendServicesProvider.class);
 
+    private static final String SEARCH_SERVER_HEAP_SIZE = "1g";
     private static final ConcurrentMap<String, Services> SERVICES_CACHE = new ConcurrentHashMap<>();
     private final Lifecycle lifecycle;
 
@@ -138,6 +139,7 @@ public class ContainerizedGraylogBackendServicesProvider {
                 LOG.debug("Starting search server: {}", searchVersion);
                 final SearchServerInstance searchServer = builder
                         .cachedInstance(false) // This service layer caches OpenSearch instances itself
+                        .heapSize(SEARCH_SERVER_HEAP_SIZE)
                         .network(network)
                         .mongoDbUri(mongoDB.internalUri())
                         .passwordSecret(PASSWORD_SECRET)
