@@ -452,7 +452,11 @@ public class KafkaTransport extends ThrottleableTransport {
     public void doStop() {
         stopped = true;
 
-        serverEventBus.unregister(this);
+        try {
+            serverEventBus.unregister(this);
+        } catch (IllegalArgumentException iae) {
+            LOG.warn("Failed to unregister input from eventbus. This hints that stopping the input happens multiple times instead of once.", iae);
+        }
 
         if (stopLatch != null) {
             try {
