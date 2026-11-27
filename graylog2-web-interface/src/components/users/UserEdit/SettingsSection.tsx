@@ -48,7 +48,7 @@ const GlobalTimeoutMessage = styled(ReadOnlyFormGroup)`
 
 type Props = {
   user: User;
-  onSubmit: (payload: { timezone: User['timezone'] }) => Promise<void>;
+  onSubmit: (payload: SettingsFormValues) => Promise<void>;
 };
 
 const _validate = async (values) => {

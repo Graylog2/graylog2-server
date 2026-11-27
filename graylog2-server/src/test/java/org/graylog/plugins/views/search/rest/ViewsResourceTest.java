@@ -652,7 +652,7 @@ public class ViewsResourceTest {
     }
 
     @Test
-    public void stripsAdditionalAttributesFromReferencedFiltersOnCreate() throws Exception {
+    public void stripsReferencedFiltersButKeepsNegationAndDisabledOnCreate() throws Exception {
         final ViewService viewService = mock(ViewService.class);
         when(viewService.saveWithOwner(any(), any())).thenReturn(TEST_SEARCH_VIEW);
 
@@ -693,12 +693,12 @@ public class ViewsResourceTest {
         assertThat(savedFilter.title()).isNull();
         assertThat(savedFilter.description()).isNull();
         assertThat(savedFilter.queryString()).isNull();
-        assertThat(savedFilter.negation()).isNull();
-        assertThat(savedFilter.disabled()).isNull();
+        assertThat(savedFilter.negation()).isTrue();
+        assertThat(savedFilter.disabled()).isTrue();
     }
 
     @Test
-    public void stripsAdditionalAttributesFromReferencedFiltersOnUpdate() {
+    public void stripsReferencedFiltersButKeepsNegationAndDisabledOnUpdate() {
         final ViewService viewService = mockViewService(TEST_SEARCH_VIEW);
         when(viewService.update(any())).thenReturn(TEST_SEARCH_VIEW);
 
@@ -739,8 +739,8 @@ public class ViewsResourceTest {
         assertThat(savedFilter.title()).isNull();
         assertThat(savedFilter.description()).isNull();
         assertThat(savedFilter.queryString()).isNull();
-        assertThat(savedFilter.negation()).isNull();
-        assertThat(savedFilter.disabled()).isNull();
+        assertThat(savedFilter.negation()).isTrue();
+        assertThat(savedFilter.disabled()).isTrue();
     }
 
     @Test

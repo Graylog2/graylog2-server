@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.graylog2.audit.AuditEventTypes.DATANODE_API_REQUEST;
+import static org.graylog2.rest.resources.datanodes.DataNodeProxyAllowlist.hasPathPrefix;
 
 @RequiresAuthentication
 @Tag(name = "DataNodes/REST/API", description = "Proxy direct access to Data Node's API")
@@ -60,7 +61,7 @@ public class DataNodeRestApiProxyResource extends RestResource {
     ));
 
     private static boolean isAllowed(ProxyRequestAdapter.ProxyRequest request, String path, String method, String permission) {
-        return request.path().startsWith(path) && method.equals(request.method()) && (request.subject() != null && request.subject().isPermitted(permission));
+        return hasPathPrefix(request, path) && method.equals(request.method()) && (request.subject() != null && request.subject().isPermitted(permission));
     }
 
     private final DatanodeRestApiProxy proxyRequestAdapter;

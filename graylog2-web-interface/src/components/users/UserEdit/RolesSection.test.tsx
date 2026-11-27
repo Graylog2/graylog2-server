@@ -101,4 +101,35 @@ describe('<RolesSection />', () => {
 
     expect(onSubmitStub).toHaveBeenCalledWith({ roles: [assignedRole2.name] });
   });
+
+  it('should ignore role changes while an update is running', async () => {
+    const newExampleUser = alice
+      .toBuilder()
+      .roles(Immutable.Set([assignedRole1.name, assignedRole2.name]))
+      .build();
+    let finishUpdate: () => void;
+    const onSubmitStub = jest.fn(
+      (_data: { roles: string[] }) =>
+        new Promise<void>((resolve) => {
+          finishUpdate = resolve;
+        }),
+    );
+    render(<RolesSection user={newExampleUser} onSubmit={(data) => onSubmitStub(data)} />);
+    await act(() => mockRolesForUserPromise.then());
+    await act(() => mockLoadRolesPromise.then());
+
+    const removeRole = async () =>
+      userEvent.click(await screen.findByRole('button', { name: `Remove ${assignedRole1.name}` }));
+
+    await removeRole();
+    await removeRole();
+
+    expect(onSubmitStub).toHaveBeenCalledTimes(1);
+
+    await act(async () => finishUpdate());
+    await act(() => mockRolesForUserPromise.then());
+    await removeRole();
+
+    await waitFor(() => expect(onSubmitStub).toHaveBeenCalledTimes(2));
+  });
 });
