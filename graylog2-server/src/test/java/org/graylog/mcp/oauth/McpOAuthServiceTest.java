@@ -1,0 +1,491 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+package org.graylog.mcp.oauth;
+
+import jakarta.annotation.Nullable;
+import org.graylog.mcp.config.McpConfiguration;
+import org.graylog.security.GranteeAuthorizer;
+import org.graylog2.Configuration;
+import org.graylog2.audit.AuditEventSender;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.database.users.User;
+import org.graylog2.security.AccessToken;
+import org.graylog2.security.AccessTokenCipher;
+import org.graylog2.security.AccessTokenService;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.shared.users.UserService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.threeten.extra.PeriodDuration;
+
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
+import static org.graylog2.shared.utilities.StringUtils.f;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+class McpOAuthServiceTest {
+    private static final Instant NOW = Instant.parse("2026-10-28T12:00:00Z");
+    private static final String ISSUER = "https://graylog.example.com";
+    private static final String REDIRECT_URI = "http://127.0.0.1:33418/callback";
+    private static final String VERIFIER = "dBjftJeZ4CVP-mJ92K9yY6qZ9sEb7rfo4M5fdRFOrqA";
+    private static final String CHALLENGE = "y369XJCBGNH-E16nEZoxIbr002YWs9OIKuuf5ExCbFg";
+    private static final String RESOURCE = "https://graylog.example.com/api/mcp";
+    private static final McpConfiguration CONFIG = McpConfiguration.create(true, false, false);
+    private static final OAuthClientIds CLIENT_IDS = new OAuthClientIds("password-secret", new ObjectMapperProvider().get());
+    private static final OAuthClient CLIENT = CLIENT_IDS.issue("Claude Code", null, List.of(REDIRECT_URI), NOW.minusSeconds(60)).orElseThrow();
+    private static final String WEB_REDIRECT_URI = "https://claude.ai/api/mcp/auth_callback";
+    private static final OAuthClient WEB_CLIENT = CLIENT_IDS.issue("Claude", null, List.of(WEB_REDIRECT_URI), NOW.minusSeconds(60)).orElseThrow();
+    private static final McpConfiguration CONFIG_WITHOUT_WEB_CLIENTS = McpConfiguration.create(true, false, false, null, null, null, List.of());
+
+    private ClusterConfigService clusterConfigService;
+    private OAuthAuthorizationCodeService codeService;
+    private OAuthRefreshTokenService refreshTokenService;
+    private AccessTokenService accessTokenService;
+    private AccessTokenCipher cipher;
+    private AuditEventSender auditEventSender;
+    private UserService userService;
+    private GranteeAuthorizer authorizer;
+    private McpOAuthService service;
+    private User user;
+
+    @BeforeEach
+    void setUp() {
+        codeService = mock(OAuthAuthorizationCodeService.class);
+        refreshTokenService = mock(OAuthRefreshTokenService.class);
+        accessTokenService = mock(AccessTokenService.class);
+        auditEventSender = mock(AuditEventSender.class);
+        final Configuration configuration = mock(Configuration.class);
+        when(configuration.getPasswordSecret()).thenReturn("password-secret-of-sufficient-length");
+        cipher = new AccessTokenCipher(configuration);
+        userService = mock(UserService.class);
+        authorizer = mock(GranteeAuthorizer.class);
+        final GranteeAuthorizer.Factory authorizerFactory = mock(GranteeAuthorizer.Factory.class);
+        clusterConfigService = mock(ClusterConfigService.class);
+        when(clusterConfigService.getOrDefault(eq(McpConfiguration.class), any())).thenReturn(CONFIG);
+        service = new McpOAuthService(CLIENT_IDS, codeService, refreshTokenService, accessTokenService, cipher, userService,
+                authorizerFactory, auditEventSender, clusterConfigService, Clock.fixed(NOW, ZoneOffset.UTC));
+
+        user = mock(User.class);
+        when(user.getId()).thenReturn("user-id");
+        when(user.getName()).thenReturn("jane");
+        when(user.getAccountStatus()).thenReturn(User.AccountStatus.ENABLED);
+        when(userService.loadById("user-id")).thenReturn(user);
+        when(authorizerFactory.create(user)).thenReturn(authorizer);
+        when(authorizer.isPermitted(RestPermissions.MCP_SERVER_ACCESS)).thenReturn(true);
+        when(authorizer.isPermitted(RestPermissions.USERS_TOKENCREATE, "jane")).thenReturn(true);
+    }
+
+    @Test
+    void registersPublicClientWithSanitizedName() {
+        final OAuthClient client = service.registerClient(new McpOAuthService.ClientRegistrationRequest(
+                List.of(REDIRECT_URI), "  Claude\u0000 Code ", null, List.of("authorization_code", "refresh_token"), List.of("code")));
+
+        assertThat(client.clientName()).isEqualTo("Claude Code");
+        assertThat(client.createdAt()).isEqualTo(NOW);
+        assertThat(validate(client.clientId(), REDIRECT_URI, CHALLENGE, "S256").client()).isEqualTo(client);
+    }
+
+    @Test
+    void rejectsRegistrationWithOversizedMetadata() {
+        final List<String> redirectUris = List.of(1, 2, 3).stream()
+                .map(i -> f("http://127.0.0.1/%d/%s", i, "a".repeat(1000)))
+                .toList();
+
+        assertThatThrownBy(() -> service.registerClient(new McpOAuthService.ClientRegistrationRequest(
+                redirectUris, null, null, null, null)))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_CLIENT_METADATA));
+    }
+
+    @Test
+    void namesGrantsAfterTheirClient() {
+        when(refreshTokenService.findActiveByUsername("jane")).thenReturn(List.of(
+                refreshToken(null),
+                new OAuthRefreshToken("rt-other", "hash", "mcp-unknown", "user-id", "jane", null, null, null, null, NOW.minusSeconds(60), NOW.plus(Duration.ofDays(1)))
+        ));
+
+        assertThat(service.grantsForUser("jane"))
+                .extracting(McpOAuthService.Grant::clientId, McpOAuthService.Grant::clientName)
+                .containsExactly(tuple("mcp-unknown", "Unnamed MCP client"), tuple(CLIENT.clientId(), "Claude Code"));
+    }
+
+    @Test
+    void rejectsRegistrationWithForeignRedirectUri() {
+        assertThatThrownBy(() -> service.registerClient(new McpOAuthService.ClientRegistrationRequest(
+                List.of("https://evil.example.com/callback"), "Evil", null, null, null)))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_REDIRECT_URI));
+    }
+
+    @Test
+    void rejectsRegistrationWithUnsupportedGrantType() {
+        assertThatThrownBy(() -> service.registerClient(new McpOAuthService.ClientRegistrationRequest(
+                List.of(REDIRECT_URI), null, null, List.of("client_credentials"), null)))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_CLIENT_METADATA));
+    }
+
+    @Test
+    void unknownClientErrorsAreNotRedirected() {
+        assertThatThrownBy(() -> validate("unknown", REDIRECT_URI, CHALLENGE, "S256"))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.redirectUri()).isEmpty());
+    }
+
+    @Test
+    void rejectsClientIdSignedWithOtherSecret() {
+        final OAuthClient foreign = new OAuthClientIds("other-secret", new ObjectMapperProvider().get())
+                .issue("Claude Code", null, List.of(REDIRECT_URI), NOW).orElseThrow();
+
+        assertThatThrownBy(() -> validate(foreign.clientId(), REDIRECT_URI, CHALLENGE, "S256"))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_CLIENT));
+    }
+
+    @Test
+    void unregisteredRedirectUriErrorsAreNotRedirected() {
+        assertThatThrownBy(() -> validate(CLIENT.clientId(), "http://127.0.0.1:33418/other", CHALLENGE, "S256"))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.redirectUri()).isEmpty());
+    }
+
+    @Test
+    void requiresS256Pkce() {
+        assertThatThrownBy(() -> validate(CLIENT.clientId(), REDIRECT_URI, null, null))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.redirectUri()).contains(REDIRECT_URI));
+        assertThatThrownBy(() -> validate(CLIENT.clientId(), REDIRECT_URI, CHALLENGE, "plain"))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.redirectUri()).contains(REDIRECT_URI));
+    }
+
+    @Test
+    void allowsDifferentLoopbackPort() {
+        final McpOAuthService.AuthorizationRequest request = validate(CLIENT.clientId(), "http://127.0.0.1:50000/callback", CHALLENGE, "S256");
+
+        assertThat(request.redirectUri()).isEqualTo("http://127.0.0.1:50000/callback");
+    }
+
+    @Test
+    void doesNotRedirectErrorsWithoutValidatedRedirectUri() {
+        final OAuthException error = OAuthException.of(OAuthException.INVALID_REQUEST, "PKCE required");
+
+        assertThat(McpOAuthService.errorRedirect(error, "state", ISSUER)).isEmpty();
+    }
+
+    @Test
+    void redirectsRedirectableErrorsWithState() {
+        final OAuthException error = OAuthException.of(OAuthException.INVALID_REQUEST, "PKCE {required}").redirectTo(REDIRECT_URI);
+
+        assertThat(McpOAuthService.errorRedirect(error, "a b", ISSUER))
+                .contains("http://127.0.0.1:33418/callback?error=invalid_request&error_description=PKCE+%7Brequired%7D"
+                        + "&iss=https%3A%2F%2Fgraylog.example.com&state=a+b");
+    }
+
+    @Test
+    void issuesClientBoundTokensForValidCode() {
+        final String code = approveAndCaptureCode();
+        final AccessToken accessToken = stubAccessTokenCreation();
+
+        final McpOAuthService.TokenResponse response = service.exchangeAuthorizationCode(CLIENT.clientId(), code,
+                REDIRECT_URI, VERIFIER, RESOURCE);
+
+        assertThat(response.accessToken()).isEqualTo(accessToken.getToken());
+        assertThat(response.expiresIn()).isEqualTo(CONFIG.oauthAccessTokenTtl().toSeconds());
+        assertThat(response.refreshToken()).isNotBlank();
+        verify(accessTokenService).create(eq("jane"), eq("MCP: Claude Code"), eq(PeriodDuration.of(CONFIG.oauthAccessTokenTtl())),
+                eq(CLIENT.clientId()));
+
+        final ArgumentCaptor<OAuthRefreshToken> refreshToken = ArgumentCaptor.forClass(OAuthRefreshToken.class);
+        verify(refreshTokenService).create(refreshToken.capture());
+        assertThat(refreshToken.getValue().tokenHash()).isEqualTo(OAuthTokens.hash(response.refreshToken()));
+        assertThat(refreshToken.getValue().expiresAt()).isEqualTo(NOW.plus(CONFIG.oauthRefreshTokenTtl()));
+        assertThat(refreshToken.getValue().accessTokenId()).isEqualTo(accessToken.getId());
+    }
+
+    @Test
+    void rejectsCodeWithWrongVerifier() {
+        final String code = approveAndCaptureCode();
+
+        assertThatThrownBy(() -> service.exchangeAuthorizationCode(CLIENT.clientId(), code, REDIRECT_URI,
+                VERIFIER.replace('d', 'e'), null))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_GRANT));
+        verify(accessTokenService, never()).create(anyString(), anyString(), any(), anyString());
+    }
+
+    @Test
+    void rejectsCodeWhenUserMayNotCreateTokens() {
+        final String code = approveAndCaptureCode();
+        when(authorizer.isPermitted(RestPermissions.USERS_TOKENCREATE, "jane")).thenReturn(false);
+
+        assertThatThrownBy(() -> service.exchangeAuthorizationCode(CLIENT.clientId(), code, REDIRECT_URI, VERIFIER, null))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_GRANT));
+        verify(accessTokenService, never()).create(anyString(), anyString(), any(), anyString());
+    }
+
+    @Test
+    void rejectsCodeForOtherRedirectUri() {
+        final String code = approveAndCaptureCode();
+
+        assertThatThrownBy(() -> service.exchangeAuthorizationCode(CLIENT.clientId(), code, "http://127.0.0.1:1/callback",
+                VERIFIER, null))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_GRANT));
+    }
+
+    @Test
+    void rejectsCodeForOtherResource() {
+        final String code = approveAndCaptureCode();
+
+        assertThatThrownBy(() -> service.exchangeAuthorizationCode(CLIENT.clientId(), code, REDIRECT_URI, VERIFIER,
+                "https://other.example.com/api/mcp"))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_TARGET));
+    }
+
+    @Test
+    void rotatesRefreshToken() {
+        final OAuthRefreshToken existing = refreshToken(null);
+        when(refreshTokenService.markUsed(eq(OAuthTokens.hash("refresh")), eq(NOW), anyString())).thenReturn(Optional.of(existing));
+        when(refreshTokenService.findByHash(OAuthTokens.hash("refresh"))).thenReturn(Optional.of(existing));
+        stubAccessTokenCreation();
+
+        final McpOAuthService.TokenResponse response = service.refresh(CLIENT.clientId(), "refresh", null);
+
+        final ArgumentCaptor<OAuthRefreshToken> rotated = ArgumentCaptor.forClass(OAuthRefreshToken.class);
+        verify(refreshTokenService).create(rotated.capture());
+        assertThat(rotated.getValue().clientId()).isEqualTo(existing.clientId());
+        assertThat(rotated.getValue().tokenHash()).isEqualTo(OAuthTokens.hash(response.refreshToken()));
+
+        final ArgumentCaptor<String> successor = ArgumentCaptor.forClass(String.class);
+        verify(refreshTokenService).markUsed(eq(OAuthTokens.hash("refresh")), eq(NOW), successor.capture());
+        assertThat(cipher.decrypt(successor.getValue())).isEqualTo(response.refreshToken());
+
+        assertThat(rotated.getValue().accessTokenId()).isEqualTo("access-token-id");
+        verify(accessTokenService).deleteById("previous-access-token-id");
+        verify(accessTokenService, never()).deleteById("access-token-id");
+        verify(accessTokenService, never()).destroy(any());
+    }
+
+    @Test
+    void allowsConcurrentRefreshWithinGracePeriod() {
+        when(refreshTokenService.markUsed(eq(OAuthTokens.hash("refresh")), eq(NOW), anyString())).thenReturn(Optional.empty());
+        when(refreshTokenService.findByHash(OAuthTokens.hash("refresh"))).thenReturn(Optional.of(refreshToken(NOW.minusSeconds(5))));
+        stubAccessTokenCreation();
+
+        final McpOAuthService.TokenResponse response = service.refresh(CLIENT.clientId(), "refresh", null);
+
+        assertThat(response.accessToken()).isEqualTo("access-token");
+        assertThat(response.refreshToken()).isEqualTo("successor");
+        verify(refreshTokenService, never()).create(any());
+        verify(accessTokenService, never()).deleteById("access-token-id");
+        verify(refreshTokenService, never()).deleteByUsernameAndClientId(anyString(), anyString());
+    }
+
+    @Test
+    void revokesAllTokensOnRefreshTokenReuse() {
+        when(refreshTokenService.markUsed(eq(OAuthTokens.hash("refresh")), eq(NOW), anyString())).thenReturn(Optional.empty());
+        when(refreshTokenService.findByHash(OAuthTokens.hash("refresh"))).thenReturn(Optional.of(refreshToken(
+                NOW.minus(McpOAuthService.REFRESH_TOKEN_REUSE_GRACE_PERIOD).minusSeconds(1))));
+
+        assertThatThrownBy(() -> service.refresh(CLIENT.clientId(), "refresh", null))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_GRANT));
+        verify(refreshTokenService).deleteByUsernameAndClientId("jane", CLIENT.clientId());
+        verify(accessTokenService).deleteAllForOAuthClient("jane", CLIENT.clientId());
+    }
+
+    @Test
+    void revokesAccessTokenOfRequestingClient() {
+        service.revoke(CLIENT.clientId(), "access-token");
+
+        verify(accessTokenService).deleteForOAuthClient("access-token", CLIENT.clientId());
+    }
+
+    @Test
+    void revokesTokensIssuedWhileAuthorizationWasRevoked() {
+        when(refreshTokenService.markUsed(eq(OAuthTokens.hash("refresh")), eq(NOW), anyString())).thenReturn(Optional.of(refreshToken(null)));
+        when(refreshTokenService.findByHash(OAuthTokens.hash("refresh"))).thenReturn(Optional.of(refreshToken(null)), Optional.empty());
+        stubAccessTokenCreation();
+
+        assertThatThrownBy(() -> service.refresh(CLIENT.clientId(), "refresh", null))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_GRANT));
+        verify(refreshTokenService).deleteByUsernameAndClientId("jane", CLIENT.clientId());
+        verify(accessTokenService).deleteAllForOAuthClient("jane", CLIENT.clientId());
+    }
+
+    @Test
+    void revokesGrantOfDeletedAccessToken() {
+        service.revokeGrantOfDeletedAccessToken("jane", CLIENT.clientId());
+
+        verify(refreshTokenService).deleteByUsernameAndClientId("jane", CLIENT.clientId());
+        verify(accessTokenService).deleteAllForOAuthClient("jane", CLIENT.clientId());
+    }
+
+    @Test
+    void rejectsAuthorizationForRedirectUriNoLongerAllowed() {
+        assertThat(validate(WEB_CLIENT.clientId(), WEB_REDIRECT_URI, CHALLENGE, "S256").redirectUri()).isEqualTo(WEB_REDIRECT_URI);
+
+        when(clusterConfigService.getOrDefault(eq(McpConfiguration.class), any())).thenReturn(CONFIG_WITHOUT_WEB_CLIENTS);
+        assertThatThrownBy(() -> validate(WEB_CLIENT.clientId(), WEB_REDIRECT_URI, CHALLENGE, "S256"))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.redirectUri()).isEmpty());
+        assertThatThrownBy(() -> validate(WEB_CLIENT.clientId(), null, CHALLENGE, "S256"))
+                .isInstanceOf(OAuthException.class);
+    }
+
+    @Test
+    void rejectsRefreshForClientWithoutAllowedRedirectUri() {
+        when(clusterConfigService.getOrDefault(eq(McpConfiguration.class), any())).thenReturn(CONFIG_WITHOUT_WEB_CLIENTS);
+
+        assertThatThrownBy(() -> service.refresh(WEB_CLIENT.clientId(), "refresh", null))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_CLIENT));
+        verify(refreshTokenService, never()).markUsed(anyString(), any(), anyString());
+    }
+
+    @Test
+    void rejectsRefreshWhenUserLostMcpAccess() {
+        when(refreshTokenService.findByHash(OAuthTokens.hash("refresh"))).thenReturn(Optional.of(refreshToken(null)));
+        when(authorizer.isPermitted(RestPermissions.MCP_SERVER_ACCESS)).thenReturn(false);
+
+        assertThatThrownBy(() -> service.refresh(CLIENT.clientId(), "refresh", null))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_GRANT));
+        verify(accessTokenService, never()).create(anyString(), anyString(), any(), anyString());
+    }
+
+    @Test
+    void rejectsRefreshWhenUserMayNotCreateTokens() {
+        when(refreshTokenService.findByHash(OAuthTokens.hash("refresh"))).thenReturn(Optional.of(refreshToken(null)));
+        when(authorizer.isPermitted(RestPermissions.USERS_TOKENCREATE, "jane")).thenReturn(false);
+
+        assertThatThrownBy(() -> service.refresh(CLIENT.clientId(), "refresh", null))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_GRANT));
+        verify(accessTokenService, never()).create(anyString(), anyString(), any(), anyString());
+    }
+
+    @Test
+    void rejectsRefreshForDisabledUser() {
+        when(refreshTokenService.findByHash(OAuthTokens.hash("refresh"))).thenReturn(Optional.of(refreshToken(null)));
+        when(user.getAccountStatus()).thenReturn(User.AccountStatus.DISABLED);
+
+        assertThatThrownBy(() -> service.refresh(CLIENT.clientId(), "refresh", null))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_GRANT));
+        verify(refreshTokenService, never()).markUsed(anyString(), any(), anyString());
+    }
+
+    @Test
+    void rejectedRefreshDoesNotConsumeToken() {
+        final OAuthRefreshToken existing = new OAuthRefreshToken("rt-id", OAuthTokens.hash("refresh"), CLIENT.clientId(), "user-id", "jane",
+                RESOURCE, "previous-access-token-id", null, null, NOW.minusSeconds(3600), NOW.plus(Duration.ofDays(10)));
+        when(refreshTokenService.findByHash(OAuthTokens.hash("refresh"))).thenReturn(Optional.of(existing));
+        when(refreshTokenService.markUsed(eq(OAuthTokens.hash("refresh")), eq(NOW), anyString())).thenReturn(Optional.of(existing));
+        stubAccessTokenCreation();
+
+        assertThatThrownBy(() -> service.refresh(CLIENT.clientId(), "refresh", f("%s/", RESOURCE)))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_TARGET));
+        verify(refreshTokenService, never()).markUsed(anyString(), any(), anyString());
+        verify(accessTokenService, never()).create(anyString(), anyString(), any(), anyString());
+        verify(accessTokenService, never()).deleteById(anyString());
+
+        assertThat(service.refresh(CLIENT.clientId(), "refresh", null).accessToken()).isEqualTo("access-token");
+        verify(refreshTokenService).markUsed(eq(OAuthTokens.hash("refresh")), eq(NOW), anyString());
+        verify(refreshTokenService, never()).deleteByUsernameAndClientId(anyString(), anyString());
+    }
+
+    @Test
+    void detectsRefreshTokenReuseBeforeValidatingRequest() {
+        when(refreshTokenService.findByHash(OAuthTokens.hash("refresh"))).thenReturn(Optional.of(refreshToken(
+                NOW.minus(McpOAuthService.REFRESH_TOKEN_REUSE_GRACE_PERIOD).minusSeconds(1))));
+
+        assertThatThrownBy(() -> service.refresh(CLIENT.clientId(), "refresh", "https://other.example.com/api/mcp"))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_GRANT));
+        verify(refreshTokenService).deleteByUsernameAndClientId("jane", CLIENT.clientId());
+        verify(auditEventSender).success(any(), eq(AuditEventTypes.MCP_OAUTH_REFRESH_TOKEN_REUSE), any());
+    }
+
+    @Test
+    void allowsRefreshThatLostRaceWithinGracePeriod() {
+        when(refreshTokenService.findByHash(OAuthTokens.hash("refresh")))
+                .thenReturn(Optional.of(refreshToken(null)), Optional.of(refreshToken(NOW)));
+        when(refreshTokenService.markUsed(eq(OAuthTokens.hash("refresh")), eq(NOW), anyString())).thenReturn(Optional.empty());
+        stubAccessTokenCreation();
+
+        final McpOAuthService.TokenResponse response = service.refresh(CLIENT.clientId(), "refresh", null);
+
+        assertThat(response.refreshToken()).isEqualTo("successor");
+        final ArgumentCaptor<OAuthRefreshToken> discarded = ArgumentCaptor.forClass(OAuthRefreshToken.class);
+        verify(refreshTokenService).create(discarded.capture());
+        verify(refreshTokenService).deleteByHash(discarded.getValue().tokenHash());
+        verify(accessTokenService, never()).deleteById("access-token-id");
+        verify(refreshTokenService, never()).deleteByUsernameAndClientId(anyString(), anyString());
+    }
+
+    @Test
+    void revokesRefreshThatLostRaceAfterGracePeriod() {
+        when(refreshTokenService.findByHash(OAuthTokens.hash("refresh"))).thenReturn(Optional.of(refreshToken(null)),
+                Optional.of(refreshToken(NOW.minus(McpOAuthService.REFRESH_TOKEN_REUSE_GRACE_PERIOD).minusSeconds(1))));
+        when(refreshTokenService.markUsed(eq(OAuthTokens.hash("refresh")), eq(NOW), anyString())).thenReturn(Optional.empty());
+        stubAccessTokenCreation();
+
+        assertThatThrownBy(() -> service.refresh(CLIENT.clientId(), "refresh", null))
+                .isInstanceOfSatisfying(OAuthException.class, e -> assertThat(e.error()).isEqualTo(OAuthException.INVALID_GRANT));
+        verify(refreshTokenService).deleteByUsernameAndClientId("jane", CLIENT.clientId());
+        verify(accessTokenService).deleteById("access-token-id");
+        verify(accessTokenService, never()).deleteById("previous-access-token-id");
+    }
+
+    @Test
+    void appendsToExistingQuery() {
+        assertThat(McpOAuthService.appendQueryParameters("http://127.0.0.1/cb?x=1", Map.of("code", "a/b")))
+                .isEqualTo("http://127.0.0.1/cb?x=1&code=a%2Fb");
+    }
+
+    private McpOAuthService.AuthorizationRequest validate(String clientId, String redirectUri, String challenge, String method) {
+        return service.validateAuthorizationRequest(clientId, redirectUri, "code", challenge, method, "state", RESOURCE);
+    }
+
+    private String approveAndCaptureCode() {
+        final String redirect = service.approve(validate(CLIENT.clientId(), REDIRECT_URI, CHALLENGE, "S256"), user, ISSUER);
+        final String code = redirect.replaceAll(".*[?&]code=([^&]+).*", "$1");
+
+        final ArgumentCaptor<OAuthAuthorizationCode> stored = ArgumentCaptor.forClass(OAuthAuthorizationCode.class);
+        verify(codeService).create(stored.capture());
+        assertThat(stored.getValue().codeHash()).isEqualTo(OAuthTokens.hash(code));
+        assertThat(redirect).contains("state=state").contains("iss=");
+        when(codeService.consume(OAuthTokens.hash(code))).thenReturn(Optional.of(stored.getValue()));
+        return code;
+    }
+
+    private AccessToken stubAccessTokenCreation() {
+        final AccessToken accessToken = mock(AccessToken.class);
+        when(accessToken.getId()).thenReturn("access-token-id");
+        when(accessToken.getToken()).thenReturn("access-token");
+        when(accessTokenService.create(anyString(), anyString(), any(), anyString())).thenReturn(accessToken);
+        return accessToken;
+    }
+
+    private OAuthRefreshToken refreshToken(@Nullable Instant usedAt) {
+        return new OAuthRefreshToken("rt-id", OAuthTokens.hash("refresh"), CLIENT.clientId(), "user-id", "jane",
+                null, "previous-access-token-id", usedAt, usedAt == null ? null : cipher.encrypt("successor"), NOW.minusSeconds(3600), NOW.plus(Duration.ofDays(10)));
+    }
+}

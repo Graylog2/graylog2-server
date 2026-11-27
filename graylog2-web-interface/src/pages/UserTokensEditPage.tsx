@@ -21,11 +21,13 @@ import withParams from 'routing/withParams';
 import { Row, Col } from 'components/bootstrap';
 import DocsHelper from 'util/DocsHelper';
 import UsersDomain from 'domainActions/users/UsersDomain';
-import { PageHeader, DocumentTitle, Spinner } from 'components/common';
+import { PageHeader, DocumentTitle, Spinner, IfPermitted } from 'components/common';
 import TokenList from 'components/users/TokenList';
 import UsersPageNavigation from 'components/users/navigation/UsersPageNavigation';
 import UserActionLinks from 'components/users/navigation/UserActionLinks';
 import useBasicUser from 'hooks/useBasicUser';
+import useCurrentUser from 'hooks/useCurrentUser';
+import McpClientGrants from 'components/mcp-oauth/McpClientGrants';
 
 type Props = {
   params: {
@@ -73,6 +75,7 @@ const UserEditPage = ({ params }: Props) => {
   const userId = params?.userId;
 
   const { data: loadedUser } = useBasicUser(userId, { enabled: !!userId });
+  const currentUser = useCurrentUser();
 
   const loadTokens = useCallback(() => _loadTokens(loadedUser, setTokens), [loadedUser]);
   const _handleTokenCreate = ({ tokenName, tokenTtl }: { tokenName: string; tokenTtl: string }) =>
@@ -104,13 +107,21 @@ const UserEditPage = ({ params }: Props) => {
       <Row className="content">
         <Col lg={12}>
           {loadedUser ? (
-            <TokenList
-              tokens={tokens}
-              user={loadedUser}
-              onCreate={_handleTokenCreate}
-              creatingToken={creatingToken}
-              onDelete={loadTokens}
-            />
+            <>
+              <TokenList
+                tokens={tokens}
+                user={loadedUser}
+                onCreate={_handleTokenCreate}
+                creatingToken={creatingToken}
+                onDelete={loadTokens}
+              />
+              {loadedUser.id === currentUser?.id && (
+                <IfPermitted permissions="mcp_server:access">
+                  <hr />
+                  <McpClientGrants />
+                </IfPermitted>
+              )}
+            </>
           ) : (
             <Row>
               <Col xs={12}>

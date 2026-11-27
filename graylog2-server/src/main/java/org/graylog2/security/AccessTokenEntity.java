@@ -39,6 +39,7 @@ public abstract class AccessTokenEntity implements MongoEntity {
     public static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_LAST_ACCESS = "last_access";
     public static final String FIELD_EXPIRES_AT = "expires_at";
+    public static final String FIELD_OAUTH_CLIENT_ID = AccessTokenImpl.OAUTH_CLIENT_ID;
 
     @Id
     @ObjectId
@@ -63,6 +64,10 @@ public abstract class AccessTokenEntity implements MongoEntity {
     @Nullable
     @JsonProperty(FIELD_EXPIRES_AT)
     public abstract DateTime expiresAt();
+
+    @Nullable
+    @JsonProperty(FIELD_OAUTH_CLIENT_ID)
+    public abstract String oauthClientId();
 
     @AutoValue.Builder
     @JsonIgnoreProperties({"token", "token_type"})
@@ -92,6 +97,9 @@ public abstract class AccessTokenEntity implements MongoEntity {
 
         @JsonProperty(FIELD_EXPIRES_AT)
         public abstract Builder expiresAt(@Nullable DateTime expiresAt);
+
+        @JsonProperty(FIELD_OAUTH_CLIENT_ID)
+        public abstract Builder oauthClientId(@Nullable String oauthClientId);
 
         public abstract AccessTokenEntity build();
     }

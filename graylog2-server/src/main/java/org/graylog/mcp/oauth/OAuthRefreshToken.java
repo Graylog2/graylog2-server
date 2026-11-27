@@ -1,0 +1,70 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+package org.graylog.mcp.oauth;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import jakarta.annotation.Nullable;
+import org.graylog2.database.MongoEntity;
+import org.graylog2.jackson.MongoInstantDeserializer;
+import org.graylog2.jackson.MongoInstantSerializer;
+import org.mongojack.Id;
+import org.mongojack.ObjectId;
+
+import java.time.Instant;
+
+/**
+ * A refresh token. Refresh tokens are rotated on every use.
+ *
+ * @param accessTokenId the access token issued together with this token. It is deleted when this token is rotated.
+ * @param usedAt        when this token was exchanged. Presenting it again after a grace period revokes all tokens of
+ *                      the client for the user.
+ * @param successor     the encrypted refresh token this one was exchanged for. Refreshes within the grace period get
+ *                      it too, so a grant never forks into parallel token chains.
+ */
+public record OAuthRefreshToken(
+        @ObjectId @Id @Nullable @JsonProperty(MongoEntity.FIELD_ID) String id,
+        @JsonProperty(FIELD_TOKEN_HASH) String tokenHash,
+        @JsonProperty(FIELD_CLIENT_ID) String clientId,
+        @JsonProperty(FIELD_USER_ID) String userId,
+        @JsonProperty(FIELD_USERNAME) String username,
+        @Nullable @JsonProperty(FIELD_RESOURCE) String resource,
+        @Nullable @JsonProperty(FIELD_ACCESS_TOKEN_ID) String accessTokenId,
+        @Nullable
+        @JsonSerialize(using = MongoInstantSerializer.class)
+        @JsonDeserialize(using = MongoInstantDeserializer.class)
+        @JsonProperty(FIELD_USED_AT) Instant usedAt,
+        @Nullable @JsonProperty(FIELD_SUCCESSOR) String successor,
+        @JsonSerialize(using = MongoInstantSerializer.class)
+        @JsonDeserialize(using = MongoInstantDeserializer.class)
+        @JsonProperty(FIELD_CREATED_AT) Instant createdAt,
+        @JsonSerialize(using = MongoInstantSerializer.class)
+        @JsonDeserialize(using = MongoInstantDeserializer.class)
+        @JsonProperty(FIELD_EXPIRES_AT) Instant expiresAt
+) implements MongoEntity {
+    public static final String FIELD_TOKEN_HASH = "token_hash";
+    public static final String FIELD_CLIENT_ID = "client_id";
+    public static final String FIELD_USER_ID = "user_id";
+    public static final String FIELD_USERNAME = "username";
+    public static final String FIELD_RESOURCE = "resource";
+    public static final String FIELD_ACCESS_TOKEN_ID = "access_token_id";
+    public static final String FIELD_USED_AT = "used_at";
+    public static final String FIELD_SUCCESSOR = "successor";
+    public static final String FIELD_CREATED_AT = "created_at";
+    public static final String FIELD_EXPIRES_AT = "expires_at";
+}

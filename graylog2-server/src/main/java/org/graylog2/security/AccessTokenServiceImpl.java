@@ -21,6 +21,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Maps;
+import com.google.common.eventbus.EventBus;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
@@ -41,6 +42,7 @@ import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
@@ -93,16 +95,19 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
     private final AccessTokenCipher cipher;
     private final ClusterConfigService configService;
     private final Configuration configuration;
+    private final EventBus eventBus;
     private LoadingCache<String, DateTime> lastAccessCache;
 
     @Inject
     public AccessTokenServiceImpl(MongoConnection mongoConnection, PaginatedAccessTokenEntityService paginatedAccessTokenEntityService,
-                                  AccessTokenCipher accessTokenCipher, ClusterConfigService configService, Configuration configuration) {
+                                  AccessTokenCipher accessTokenCipher, ClusterConfigService configService, Configuration configuration,
+                                  EventBus eventBus) {
         super(mongoConnection);
         this.paginatedAccessTokenEntityService = paginatedAccessTokenEntityService;
         this.cipher = accessTokenCipher;
         this.configService = configService;
         this.configuration = configuration;
+        this.eventBus = eventBus;
         setLastAccessCache(30, TimeUnit.SECONDS);
 
         collection(AccessTokenImpl.class).createIndex(new BasicDBObject(AccessTokenImpl.TOKEN_TYPE, 1));
@@ -110,6 +115,7 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
         collection(AccessTokenImpl.class).createIndex(new BasicDBObject(AccessTokenImpl.TOKEN, 1), new BasicDBObject("unique", true));
         // Add an index on the expires_at field to speed up the search for expired tokens:
         collection(AccessTokenImpl.class).createIndex(new BasicDBObject(AccessTokenImpl.EXPIRES_AT, 1));
+        collection(AccessTokenImpl.class).createIndex(new BasicDBObject(AccessTokenImpl.USERNAME, 1).append(AccessTokenImpl.OAUTH_CLIENT_ID, 1));
     }
 
     @Override
@@ -161,6 +167,15 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
 
     @Override
     public AccessToken create(String username, String name, PeriodDuration ttl) {
+        return create(username, name, ttl, Map.of());
+    }
+
+    @Override
+    public AccessToken create(String username, String name, PeriodDuration ttl, String oauthClientId) {
+        return create(username, name, ttl, Map.of(AccessTokenImpl.OAUTH_CLIENT_ID, oauthClientId));
+    }
+
+    private AccessToken create(String username, String name, PeriodDuration ttl, Map<String, Object> additionalFields) {
         Map<String, Object> fields = Maps.newHashMap();
         AccessTokenImpl accessToken;
         String id = null;
@@ -179,6 +194,7 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
             // Until then, we need to add all fields of the period and the duration separately:
             fields.put(AccessTokenImpl.EXPIRES_AT, addTtlPeriodDuration(nowUTC, ttl));
             fields.put(AccessTokenImpl.LAST_ACCESS, Tools.dateTimeFromDouble(0)); // aka never.
+            fields.putAll(additionalFields);
             accessToken = new AccessTokenImpl(fields);
             try {
                 id = saveWithoutValidation(encrypt(accessToken));
@@ -222,6 +238,32 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
         final int result = destroy(query, AccessTokenImpl.COLLECTION_NAME);
         LOG.debug("Deleted {} access tokens of user \"{}\"", result, username);
         return result;
+    }
+
+    @Override
+    public <T extends Persisted> int destroy(T model) {
+        final int deleted = super.destroy(model);
+        if (deleted > 0 && model instanceof AccessToken accessToken) {
+            eventBus.post(new AccessTokenDeletedEvent(accessToken.getUserName(),
+                    (String) accessToken.getFields().get(AccessTokenImpl.OAUTH_CLIENT_ID)));
+        }
+        return deleted;
+    }
+
+    @Override
+    public int deleteAllForOAuthClient(String username, String oauthClientId) {
+        final DBObject query = BasicDBObjectBuilder.start(AccessTokenImpl.USERNAME, username)
+                .add(AccessTokenImpl.OAUTH_CLIENT_ID, oauthClientId)
+                .get();
+        return destroy(query, AccessTokenImpl.COLLECTION_NAME);
+    }
+
+    @Override
+    public Optional<AccessToken> deleteForOAuthClient(String token, String oauthClientId) {
+        final DBObject query = BasicDBObjectBuilder.start(AccessTokenImpl.TOKEN, cipher.encrypt(token))
+                .add(AccessTokenImpl.OAUTH_CLIENT_ID, oauthClientId)
+                .get();
+        return Optional.ofNullable(collection(AccessTokenImpl.class).findAndRemove(query)).map(this::fromDBObject);
     }
 
     @SuppressWarnings("unchecked")
