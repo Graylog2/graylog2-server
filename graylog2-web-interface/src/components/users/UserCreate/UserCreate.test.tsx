@@ -110,7 +110,6 @@ describe('<UserCreate />', () => {
           timezone: 'Europe/Berlin',
           roles: ['Reader', 'Manager'],
           email: 'username@example.org',
-          permissions: [],
           session_timeout_ms: 144000000,
           password: 'thepassword',
         }),
@@ -151,7 +150,6 @@ describe('<UserCreate />', () => {
           last_name: 'The last name',
           roles: ['Reader'],
           email: 'username@example.org',
-          permissions: [],
           password: 'thepassword',
         }),
       );

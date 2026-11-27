@@ -43,6 +43,7 @@ public class PrivilegeEscalationGuard {
         this.roleService = roleService;
     }
 
+    @SuppressWarnings("removal")
     public void validatePermissionsAndRoles(@NotNull CreateUserRequest cr, UserContext userContext) {
         validatePermissionsAndRoles(cr.roles(), cr.permissions(), userContext);
     }

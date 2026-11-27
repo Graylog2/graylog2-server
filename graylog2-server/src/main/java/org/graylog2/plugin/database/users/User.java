@@ -70,6 +70,10 @@ public interface User extends Persisted {
 
     void setSessionTimeoutMs(long timeoutValue);
 
+    /**
+     * @deprecated Direct user permissions will be removed in version 8.0. Assign roles instead.
+     */
+    @Deprecated(since = "7.3.0", forRemoval = true)
     void setPermissions(List<String> permissions);
 
     void setPreferences(Map<String, Object> preferences);
@@ -83,8 +87,9 @@ public interface User extends Persisted {
     /**
      * Set the first, last, and full user's name. The full user's full name is composed by concatenating the first and
      * last names together with a space between. For example "First Last".
+     *
      * @param firstName Required. The user's first name.
-     * @param lastName Required. The user's last name.
+     * @param lastName  Required. The user's last name.
      */
     void setFirstLastFullNames(String firstName, String lastName);
 

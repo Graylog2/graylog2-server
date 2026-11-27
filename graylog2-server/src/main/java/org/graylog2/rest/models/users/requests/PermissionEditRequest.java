@@ -24,6 +24,10 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
+/**
+ * @deprecated Direct user permissions will be removed in version 8.0. Assign roles instead.
+ */
+@Deprecated(since = "7.3.0", forRemoval = true)
 @JsonAutoDetect
 @AutoValue
 public abstract class PermissionEditRequest {

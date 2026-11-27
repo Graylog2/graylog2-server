@@ -51,6 +51,7 @@ public class V20250506090000_AddInputTypesPermissions extends Migration {
         return ZonedDateTime.parse("2025-05-06T09:00:00Z");
     }
 
+    @SuppressWarnings("removal")
     @Override
     public void upgrade() {
         if (clusterConfigService.get(V20250506090000_AddInputTypesPermissions.MigrationCompleted.class) != null) {
