@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Fix setting a stream as start page clearing the user's timezone."
+
+pulls = ["28071"]
