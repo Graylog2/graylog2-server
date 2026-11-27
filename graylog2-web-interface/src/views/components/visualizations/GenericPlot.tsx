@@ -60,12 +60,14 @@ const StyledPlot = styled(Plot)<{ $interactive: boolean }>(
       }
     }
 
-    ${!$interactive &&
-    css`
-      .cursor-pointer {
-        cursor: default !important;
-      }
-    `}
+    ${
+      !$interactive &&
+      css`
+        .cursor-pointer {
+          cursor: default !important;
+        }
+      `
+    }
   `,
 );
 

@@ -19,6 +19,12 @@ import styled, { css, keyframes } from 'styled-components';
 import Row from 'components/bootstrap/Row';
 
 const ANIMATION_DURATION = '0.3s';
+// Keeps a global sidebar like the Assistant usable below the stacked right sidebar.
+const STACKED_MIN_HEIGHT_BELOW = 240;
+// Moves collapsed sidebars after the open ones, so their strips are always on the page's right edge.
+const COLLAPSED_SIDEBAR_ORDER = 1;
+// Widths a user can resize a sidebar next to the page to.
+const SIDEBAR_WIDTH = { initial: 400, min: 320, max: 760 };
 
 const slideAnimation = keyframes`
   from {
@@ -47,6 +53,17 @@ const SidebarContainer = styled.div<{ $width: number }>(
     @media (prefers-reduced-motion: reduce) {
       animation: none;
     }
+  `,
+);
+
+// A sidebar next to the page with its own background, e.g. the details sidebar or the Assistant.
+const SidebarPanel = styled(SidebarContainer)(
+  ({ theme }) => css`
+    position: relative;
+    overflow: hidden;
+    padding: 0;
+    background-color: ${theme.colors.global.contentBackground};
+    border-left: 1px solid ${theme.colors.cards.border};
   `,
 );
 
@@ -94,9 +111,13 @@ const SidebarTitle = styled.h4(
 
 export {
   ANIMATION_DURATION,
+  STACKED_MIN_HEIGHT_BELOW,
+  COLLAPSED_SIDEBAR_ORDER,
+  SIDEBAR_WIDTH,
   slideAnimation,
   fadeAnimation,
   SidebarContainer,
+  SidebarPanel,
   SidebarRow,
   SidebarContentArea,
   SidebarHeader,

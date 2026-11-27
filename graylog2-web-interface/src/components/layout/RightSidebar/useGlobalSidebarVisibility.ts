@@ -14,9 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { Kbd } from '@mantine/core';
+import usePluginEntities from 'hooks/usePluginEntities';
 
-const KeyboardKey = ({ children }: React.PropsWithChildren) => <Kbd>{children}</Kbd>;
+// The plugin entities are fixed for the lifetime of the page, so the hooks are always called in the same order.
+const useGlobalSidebarVisibility = () => {
+  const visibilities = usePluginEntities('globalSidebars').map((sidebar) => sidebar.useVisibility?.() ?? 'closed');
 
-export default KeyboardKey;
+  if (visibilities.includes('collapsed')) {
+    return 'collapsed';
+  }
+
+  return visibilities.includes('expanded') ? 'expanded' : 'closed';
+};
+
+export default useGlobalSidebarVisibility;

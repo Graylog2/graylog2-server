@@ -60,14 +60,16 @@ const ThroughputData = styled.span<{ $dataIn?: boolean }>(
     }
 
     &::after {
-      ${$dataIn &&
-      css`
-        content: ' ';
-        min-height: 1px;
-        background-color: ${theme.colors.variant.light.default};
-        display: block;
-        grid-area: 2 / 1 / 3 / 3;
-      `}
+      ${
+        $dataIn &&
+        css`
+          content: ' ';
+          min-height: 1px;
+          background-color: ${theme.colors.variant.light.default};
+          display: block;
+          grid-area: 2 / 1 / 3 / 3;
+        `
+      }
     }
   `,
 );

@@ -46,6 +46,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.graylog2.audit.AuditEventTypes.DATANODE_API_REQUEST;
+import static org.graylog2.rest.resources.datanodes.DataNodeProxyAllowlist.hasPathPrefix;
 
 @RequiresAuthentication
 @Tag(name = "DataNodes/API", description = "Proxy direct access to Data Node's Opensearch API")
@@ -55,9 +56,9 @@ import static org.graylog2.audit.AuditEventTypes.DATANODE_API_REQUEST;
 @RequiresPermissions(RestPermissions.DATANODE_OPENSEARCH_PROXY)
 public class DataNodeApiProxyResource extends RestResource {
     private static final DataNodeProxyAllowlist RESTRICTED_ALLOWLIST = new DataNodeProxyAllowlist(List.of(
-            request -> request.path().startsWith("_cluster"),
-            request -> request.path().startsWith("_cat"),
-            request -> request.path().startsWith("_mapping") && request.method().equals("GET")
+            request -> hasPathPrefix(request, "_cluster"),
+            request -> hasPathPrefix(request, "_cat"),
+            request -> hasPathPrefix(request, "_mapping") && request.method().equals("GET")
     ));
 
     private final ProxyRequestAdapter proxyRequestAdapter;

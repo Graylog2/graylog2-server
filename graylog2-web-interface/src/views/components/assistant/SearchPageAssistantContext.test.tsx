@@ -20,13 +20,19 @@ import { render } from 'wrappedTestingLibrary';
 
 import { asMock } from 'helpers/mocking';
 import { AssistantPageContextProvider, useAssistantPageSnapshot } from 'components/assistant';
-import type { PageContext, PageTools, SearchPage } from 'components/assistant';
+import type { PageContext, SearchPage } from 'components/assistant';
 import useViewsSelector from 'views/stores/useViewsSelector';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { selectActiveQuery, selectView } from 'views/logic/slices/viewSelectors';
 import { selectGlobalOverride } from 'views/logic/slices/searchExecutionSelectors';
 import { setGlobalOverrideQuery } from 'views/logic/slices/searchExecutionSlice';
-import { executeActiveQuery, updateQuery, updateQueryString, updateViewState } from 'views/logic/slices/viewSlice';
+import {
+  executeActiveQuery,
+  setTimerange,
+  updateQuery,
+  updateQueryString,
+  updateViewState,
+} from 'views/logic/slices/viewSlice';
 import GlobalOverride from 'views/logic/search/GlobalOverride';
 import View from 'views/logic/views/View';
 import ViewState from 'views/logic/views/ViewState';
@@ -52,6 +58,7 @@ import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import type { FocusContextState } from 'views/components/contexts/WidgetFocusContext';
 
 import SearchPageAssistantContext from './SearchPageAssistantContext';
+import type { SearchPageTools } from './types';
 
 jest.mock('routing/useLocation', () => () => ({ pathname: '/search' }));
 jest.mock('views/stores/useViewsSelector');
@@ -65,6 +72,7 @@ jest.mock('views/logic/slices/viewSlice', () => ({
   ...jest.requireActual('views/logic/slices/viewSlice'),
   updateQuery: jest.fn(() => 'updateQuery'),
   updateQueryString: jest.fn(() => 'updateQueryString'),
+  setTimerange: jest.fn(() => 'setTimerange'),
   updateViewState: jest.fn(() => 'updateViewState'),
   executeActiveQuery: jest.fn(() => 'executeActiveQuery'),
 }));
@@ -94,7 +102,7 @@ const renderPage = (focusedWidget?: FocusContextState) => {
   );
 
   return {
-    getTools: (): PageTools => snapshot.getTools(),
+    getTools: () => snapshot.getTools() as SearchPageTools,
     getPage: (): PageContext['page'] => snapshot.getSnapshot().page,
   };
 };
@@ -156,7 +164,9 @@ const searchWithFilters = (filters: Array<typeof noTestHosts> = []) => {
 const mockDispatchFor = (view: View) =>
   asMock(useViewsDispatch).mockReturnValue(
     jest.fn((action: unknown) =>
-      typeof action === 'function' ? action(jest.fn(), () => ({ view: { activeQuery: 'query-id', view } })) : Promise.resolve(),
+      typeof action === 'function'
+        ? action(jest.fn(), () => ({ view: { activeQuery: 'query-id', view } }))
+        : Promise.resolve(),
     ) as unknown as ReturnType<typeof useViewsDispatch>,
   );
 
@@ -181,6 +191,43 @@ describe('SearchPageAssistantContext', () => {
     jest.clearAllMocks();
     mockState(createSearch());
     asMock(useViewsDispatch).mockReturnValue(jest.fn(async () => {}) as unknown as ReturnType<typeof useViewsDispatch>);
+  });
+
+  it('adds an aggregation widget with its own search', async () => {
+    const tools = renderTools();
+    const timerange = {
+      type: 'absolute' as const,
+      from: '2026-11-19T09:00:00.000Z',
+      to: '2026-11-19T10:00:00.000Z',
+    };
+
+    await tools().add_widget({
+      title: 'Failed logins per host',
+      query: 'action:login_failed',
+      streams: ['s1'],
+      timerange,
+      config: {
+        row_pivots: [{ fields: ['timestamp'], type: 'time', config: { interval: { type: 'auto', scaling: 1.0 } } }],
+        column_pivots: [{ fields: ['source'], type: 'values', config: { limit: 15 } }],
+        series: [
+          { function: 'count()', config: {} },
+          { function: 'avg(took_ms)', config: {} },
+        ],
+        sort: [],
+        visualization: 'line',
+        visualization_config: { axis_config: null, axis_type: 'linear', interpolation: 'spline' },
+        rollup: true,
+      },
+    });
+
+    const widget = addedWidget() as AggregationWidget;
+
+    expect(widget).toBeInstanceOf(AggregationWidget);
+    expect(widget.config.visualization).toBe('line');
+    expect(widget.config.series.map((series) => series.function)).toEqual(['count()', 'avg(took_ms)']);
+    expect(widget.streams).toEqual(['s1']);
+    expect(widget.timerange).toEqual(timerange);
+    expect(addWidget).toHaveBeenCalledWith(widget, undefined, 'Failed logins per host');
   });
 
   it('adds a message table with the given columns, sort and search', async () => {
@@ -336,7 +383,10 @@ describe('SearchPageAssistantContext', () => {
 
     await tools().update_widget({
       widget_id: 'w1',
-      visualization_config: { barmode: 'stack', axis_config: { number: { title: 'Failed logins' }, xaxis: { title: 'Host' } } },
+      visualization_config: {
+        barmode: 'stack',
+        axis_config: { number: { title: 'Failed logins' }, xaxis: { title: 'Host' } },
+      },
     });
 
     const { config } = updatedViewState().widgets.first() as AggregationWidget;
@@ -393,7 +443,11 @@ describe('SearchPageAssistantContext', () => {
     const tools = renderTools();
 
     await expect(
-      tools().update_widget({ widget_id: 'w1', visualization: 'line', visualization_config: { interpolation: 'spline' } }),
+      tools().update_widget({
+        widget_id: 'w1',
+        visualization: 'line',
+        visualization_config: { interpolation: 'spline' },
+      }),
     ).rejects.toThrow('The widget shows a bar visualization now, not line.');
   });
 
@@ -427,9 +481,9 @@ describe('SearchPageAssistantContext', () => {
     mockPageWithBarChart(TextWidget.builder().id('w1').config(new TextWidgetConfig('Notes')).build());
     const tools = renderTools();
 
-    await expect(tools().update_widget({ widget_id: 'w1', visualization_config: { barmode: 'stack' } })).rejects.toThrow(
-      'Only aggregation widgets',
-    );
+    await expect(
+      tools().update_widget({ widget_id: 'w1', visualization_config: { barmode: 'stack' } }),
+    ).rejects.toThrow('Only aggregation widgets');
   });
 
   it('refuses to change a widget that is not on the shown tab', async () => {
@@ -468,6 +522,16 @@ describe('SearchPageAssistantContext', () => {
     expect(executeActiveQuery).toHaveBeenCalledTimes(2);
   });
 
+  it('sets the time range of the shown tab of a search', async () => {
+    mockState(createSearch().toBuilder().type(View.Type.Search).build());
+    const tools = renderTools();
+
+    await tools().set_timerange({ timerange: { type: 'relative', range: 3600 } });
+
+    expect(setTimerange).toHaveBeenCalledWith('query-id', { type: 'relative', range: 3600 });
+    expect(executeActiveQuery).toHaveBeenCalled();
+  });
+
   it('tells the Assistant whether the focused widget is being edited', () => {
     const { getPage } = renderPage({ id: 'w1', editing: true, focusing: true });
 
@@ -490,14 +554,24 @@ describe('SearchPageAssistantContext', () => {
       filter_id: 'f1',
       title: 'No test hosts',
       query_string: 'NOT source:test*',
+      description: 'Hides test machines',
       negation: true,
+      asked: true,
     });
 
     expect(updatedQueryFilters()).toEqual([
-      expect.objectContaining({ type: 'referenced', id: 'f1', title: 'No test hosts', negation: true, disabled: false }),
+      expect.objectContaining({
+        type: 'referenced',
+        id: 'f1',
+        title: 'No test hosts',
+        negation: true,
+        disabled: false,
+      }),
     ]);
     expect(executeActiveQuery).toHaveBeenCalled();
-    expect(result).toEqual(expect.objectContaining({ summary: 'Added search filter "No test hosts", excluding its matches' }));
+    expect(result).toEqual(
+      expect.objectContaining({ summary: 'Added search filter "No test hosts", excluding its matches' }),
+    );
   });
 
   it('removes a search filter from the shown query, and refuses one that is not applied', async () => {
@@ -506,9 +580,11 @@ describe('SearchPageAssistantContext', () => {
     mockDispatchFor(search);
     const tools = renderTools();
 
-    await expect(tools().remove_search_filter({ filter_id: 'f2', title: 'Lab' })).rejects.toThrow('not applied');
+    await expect(tools().remove_search_filter({ filter_id: 'f2', title: 'Lab', asked: true })).rejects.toThrow(
+      'not applied',
+    );
 
-    await tools().remove_search_filter({ filter_id: 'f1', title: 'No test hosts' });
+    await tools().remove_search_filter({ filter_id: 'f1', title: 'No test hosts', asked: false });
 
     expect(updatedQueryFilters()).toEqual([]);
   });
@@ -518,9 +594,18 @@ describe('SearchPageAssistantContext', () => {
     mockPageWithBarChart();
     const tools = renderTools();
 
-    await expect(tools().add_search_filter({ filter_id: 'f1' })).rejects.toThrow('give the widget');
+    const filter = {
+      filter_id: 'f1',
+      title: 'No test hosts',
+      query_string: 'NOT source:test*',
+      description: '',
+      negation: false,
+      asked: true,
+    };
 
-    await tools().add_search_filter({ filter_id: 'f1', title: 'No test hosts', widget_id: 'w1' });
+    await expect(tools().add_search_filter(filter)).rejects.toThrow('give the widget');
+
+    await tools().add_search_filter({ ...filter, widget_id: 'w1' });
 
     expect(updatedViewState().widgets.first().filters.toArray()).toEqual([
       expect.objectContaining({ type: 'referenced', id: 'f1', negation: false }),

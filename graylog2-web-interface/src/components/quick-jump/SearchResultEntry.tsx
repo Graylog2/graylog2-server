@@ -35,21 +35,30 @@ const StyledListGroupItem = styled(ListGroupItem)<{ $active?: boolean }>(({ them
     cursor: pointer;
     transition: background-color 0.15s ease-in-out;
 
-    ${$active &&
-    css`
-      background-color: ${highlightColor};
+    ${
+      $active &&
+      css`
+        background-color: ${highlightColor};
 
-      a {
-        color: inherit;
-        text-decoration: none;
-      }
-    `}
+        a {
+          color: inherit;
+          text-decoration: none;
+        }
+      `
+    }
   `;
 });
 
 const FullWidthCol = styled.div`
   flex: 1;
 `;
+
+const DisabledReason = styled.div(
+  ({ theme }) => css`
+    color: ${theme.colors.text.secondary};
+    font-size: ${theme.fonts.size.small};
+  `,
+);
 
 const HeaderRow = styled.div`
   max-height: 18px;
@@ -126,7 +135,7 @@ const SearchResultEntry = ({ item, itemProps, isActive, lastOpened, favorite }: 
   const typeColor = useTypeColor(item.type);
 
   return (
-    <StyledListGroupItem $active={isActive} {...itemProps}>
+    <StyledListGroupItem $active={isActive} disabled={!!item.disabledReason} {...itemProps}>
       <TypeColorIndicator $color={typeColor} />
       <FullWidthCol>
         <HeaderRow>
@@ -139,6 +148,7 @@ const SearchResultEntry = ({ item, itemProps, isActive, lastOpened, favorite }: 
           {item.type === LINK_TYPE && <ExternalIcon name="open_in_new" />}
           {favorite ? <FavIcon name="star" type="solid" size="xs" /> : null}
         </div>
+        {item.disabledReason && <DisabledReason>{item.disabledReason}</DisabledReason>}
       </FullWidthCol>
     </StyledListGroupItem>
   );

@@ -51,6 +51,7 @@ export type Options = {
   preventDefault?: Trigger; // Prevent default browser behavior? (Default: false)
   displayInOverview?: boolean;
   splitKey?: string;
+  useKey?: boolean; // Match `event.key` before `event.code`, so shortcuts follow the keyboard layout. (Default: true)
 };
 export type ActiveHotkey = {
   options?: Options & { scope: ScopeName };
