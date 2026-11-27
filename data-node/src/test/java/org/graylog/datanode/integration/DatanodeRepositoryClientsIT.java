@@ -40,14 +40,20 @@ import org.testcontainers.containers.Network;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 
+import java.nio.charset.StandardCharsets;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * Stores repository clients like the Graylog server does and verifies that the Data Node gives each repository its
- * own working opensearch S3 client.
+ * own opensearch client, with settings opensearch accepts.
  */
 public class DatanodeRepositoryClientsIT {
 
@@ -82,11 +88,11 @@ public class DatanodeRepositoryClientsIT {
     @Test
     void repositoriesGetTheirOwnClients() throws ExecutionException, RetryException {
         // Credentials are read when the opensearch configuration is built, so they have to exist before the start
-        final String valid = saveCredentials("valid", s3Container.getSecretKey());
-        final String invalid = saveCredentials("invalid", "wrong-secret");
+        final String valid = saveCredentials("valid", s3Credentials(s3Container.getSecretKey()));
+        final String invalid = saveCredentials("invalid", s3Credentials("wrong-secret"));
         final String baseUrl = startDatanode();
 
-        registerRepository(baseUrl, "valid", valid)
+        registerS3Repository(baseUrl, "valid", valid)
                 .statusCode(200)
                 .body("acknowledged", Matchers.equalTo(true));
         given().put(f("%s/_snapshot/valid/1?wait_for_completion=true", baseUrl))
@@ -95,24 +101,97 @@ public class DatanodeRepositoryClientsIT {
                 .body("snapshot.state", Matchers.equalTo("SUCCESS"));
 
         // The other repository uses its own client with its own (wrong) credentials, so verification fails
-        registerRepository(baseUrl, "invalid", invalid)
+        registerS3Repository(baseUrl, "invalid", invalid)
                 .statusCode(500)
                 .body("error.type", Matchers.equalTo("repository_verification_exception"));
     }
 
-    // Stores a credential record with a client name like the Graylog server does
-    private String saveCredentials(String repositoryName, String secretKey) {
-        final MongoCollections mongoCollections = new MongoCollections(
-                new MongoJackObjectMapperProvider(new ObjectMapperProvider().get()), mongoDB.mongoConnection());
-        // The Data Node decrypts the secrets with its password_secret, which has to match the server's
-        final EncryptedValue encryptedSecret = new EncryptedValueService(ContainerizedGraylogBackend.PASSWORD_SECRET).encrypt(secretKey);
-        final String clientName = f("repository_%s_0001", repositoryName);
-        final Document credentials = new Document("type", "s3")
+    /**
+     * There is no GCS or Azure storage to test against, the repositories are registered without verification. This
+     * still makes sure that opensearch starts with the settings of all clients and accepts their repositories.
+     */
+    @Test
+    void opensearchAcceptsGcsAndAzureClients() throws ExecutionException, RetryException, NoSuchAlgorithmException {
+        final String gcsKey = saveCredentials("gcs-key", new Document("type", "gcs")
+                .append("auth_mode", "service_account_key")
+                .append("service_account_key", encrypted(serviceAccountKey())));
+        final String gcsAutomatic = saveCredentials("gcs-automatic", new Document("type", "gcs")
+                .append("auth_mode", "automatic"));
+        final String azureKey = saveCredentials("azure-key", new Document("type", "azure")
+                .append("auth_mode", "account_key")
+                .append("account_name", "graylog")
+                .append("account_key", encrypted(Base64.getEncoder().encodeToString("account-key".getBytes(StandardCharsets.UTF_8)))));
+        final String azureSovereign = saveCredentials("azure-sovereign", new Document("type", "azure")
+                .append("auth_mode", "account_key")
+                .append("account_name", "graylog")
+                .append("account_key", encrypted(Base64.getEncoder().encodeToString("account-key".getBytes(StandardCharsets.UTF_8))))
+                .append("endpoint_uri", "https://graylog.blob.core.usgovcloudapi.net"));
+        final String azureAutomatic = saveCredentials("azure-automatic", new Document("type", "azure")
+                .append("auth_mode", "automatic")
+                .append("account_name", "graylog"));
+        final String baseUrl = startDatanode();
+
+        registerUnverifiedRepository(baseUrl, "gcs", "gcs-key", gcsKey);
+        registerUnverifiedRepository(baseUrl, "gcs", "gcs-automatic", gcsAutomatic);
+        registerUnverifiedRepository(baseUrl, "azure", "azure-key", azureKey);
+        registerUnverifiedRepository(baseUrl, "azure", "azure-sovereign", azureSovereign);
+        registerUnverifiedRepository(baseUrl, "azure", "azure-automatic", azureAutomatic);
+
+        // Without the clients opensearch would accept the repositories as well, so make sure they got all clients
+        assertThat(datanode.getLogs()).doesNotContainIgnoringCase("skipping them");
+        // Only some clients have regular settings, the others are in the keystore
+        final Map<String, Object> settings = given()
+                .get(f("%s/_nodes/_local/settings?flat_settings=true", baseUrl))
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getMap("nodes.values()[0].settings");
+        assertThat(settings)
+                .containsEntry(f("gcs.client.%s.endpoint", gcsKey), "https://storage.googleapis.com")
+                .containsEntry(f("gcs.client.%s.endpoint", gcsAutomatic), "https://storage.googleapis.com")
+                .containsEntry(f("azure.client.%s.endpoint_suffix", azureSovereign), "core.usgovcloudapi.net")
+                .containsEntry(f("azure.client.%s.token_credential_type", azureAutomatic), "managed");
+    }
+
+    private Document s3Credentials(String secretKey) {
+        return new Document("type", "s3")
                 .append("auth_mode", "key_secret")
                 .append("aws_access_key_id", s3Container.getAccessKey())
-                .append("aws_secret_access_key", new Document("encrypted_value", encryptedSecret.value()).append("salt", encryptedSecret.salt()))
+                .append("aws_secret_access_key", encrypted(secretKey))
                 .append("aws_region", "us-east-1")
                 .append("endpoint_uri", s3Container.getInternalURI().toString());
+    }
+
+    // The Data Node decrypts the secrets with its password_secret, which has to match the server's
+    private static Document encrypted(String secret) {
+        final EncryptedValue encrypted = new EncryptedValueService(ContainerizedGraylogBackend.PASSWORD_SECRET).encrypt(secret);
+        return new Document("encrypted_value", encrypted.value()).append("salt", encrypted.salt());
+    }
+
+    // Opensearch parses the service account key when it loads the client settings, so it needs a real private key
+    private static String serviceAccountKey() throws NoSuchAlgorithmException {
+        final KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+        generator.initialize(2048);
+        final String privateKey = Base64.getEncoder().encodeToString(generator.generateKeyPair().getPrivate().getEncoded());
+        return f("""
+                {
+                  "type": "service_account",
+                  "project_id": "graylog-test",
+                  "private_key_id": "0001",
+                  "private_key": "-----BEGIN PRIVATE KEY-----\\n%s\\n-----END PRIVATE KEY-----\\n",
+                  "client_email": "graylog@graylog-test.iam.gserviceaccount.com",
+                  "client_id": "1",
+                  "token_uri": "https://oauth2.googleapis.com/token"
+                }
+                """, privateKey);
+    }
+
+    // Stores a credential record with a client name like the Graylog server does
+    private String saveCredentials(String repositoryName, Document credentials) {
+        final MongoCollections mongoCollections = new MongoCollections(
+                new MongoJackObjectMapperProvider(new ObjectMapperProvider().get()), mongoDB.mongoConnection());
+        final String clientName = f("repository_%s_0001", repositoryName);
         mongoCollections.nonEntityCollection(RepositoryCredentialsDocument.COLLECTION_NAME, Document.class)
                 .insertOne(new Document("repository_name", repositoryName)
                         .append("client_name", clientName)
@@ -133,7 +212,29 @@ public class DatanodeRepositoryClientsIT {
         return f("http://localhost:%d", port);
     }
 
-    private static ValidatableResponse registerRepository(String baseUrl, String repositoryName, String clientName) {
+    private static void registerUnverifiedRepository(String baseUrl, String type, String repositoryName, String clientName) {
+        // GCS calls the bucket a bucket, Azure a container
+        final String location = "gcs".equals(type) ? "bucket" : "container";
+        final String request = f("""
+                {
+                  "type": "%s",
+                  "settings": {
+                    "%s": "%s",
+                    "base_path": "%s",
+                    "client": "%s"
+                  }
+                }
+                """, type, location, BUCKET, repositoryName, clientName);
+        given()
+                .body(request)
+                .contentType(ContentType.JSON)
+                .put(f("%s/_snapshot/%s?verify=false", baseUrl, repositoryName))
+                .then()
+                .statusCode(200)
+                .body("acknowledged", Matchers.equalTo(true));
+    }
+
+    private static ValidatableResponse registerS3Repository(String baseUrl, String repositoryName, String clientName) {
         final String request = f("""
                 {
                   "type": "s3",
