@@ -131,7 +131,7 @@ public class Expr {
 
     @AutoValue
     public static abstract class Equal implements BooleanExpression {
-        static final String EXPR = "==";
+        public static final String EXPR = "==";
 
         @JsonProperty(LEFT)
         public abstract NumberExpression left();
@@ -159,7 +159,7 @@ public class Expr {
 
     @AutoValue
     public static abstract class Greater implements BooleanExpression {
-        static final String EXPR = ">";
+        public static final String EXPR = ">";
 
         @JsonProperty(LEFT)
         public abstract NumberExpression left();
@@ -187,7 +187,7 @@ public class Expr {
 
     @AutoValue
     public static abstract class GreaterEqual implements BooleanExpression {
-        static final String EXPR = ">=";
+        public static final String EXPR = ">=";
 
         @JsonProperty(LEFT)
         public abstract NumberExpression left();
@@ -215,7 +215,7 @@ public class Expr {
 
     @AutoValue
     public static abstract class Lesser implements BooleanExpression {
-        static final String EXPR = "<";
+        public static final String EXPR = "<";
 
         @JsonProperty(LEFT)
         public abstract NumberExpression left();
@@ -243,7 +243,7 @@ public class Expr {
 
     @AutoValue
     public static abstract class LesserEqual implements BooleanExpression {
-        static final String EXPR = "<=";
+        public static final String EXPR = "<=";
 
         @JsonProperty(LEFT)
         public abstract NumberExpression left();
