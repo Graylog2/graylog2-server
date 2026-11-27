@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
+import pick from 'lodash/pick';
 import { useQueryClient } from '@tanstack/react-query';
 
 import UsersDomain from 'domainActions/users/UsersDomain';
@@ -27,7 +28,8 @@ import SectionComponent from 'components/common/Section/SectionComponent';
 import type User from 'logic/users/User';
 import CurrentUser from 'logic/users/CurrentUser';
 import TelemetrySettingsConfig from 'logic/telemetry/TelemetrySettingsConfig';
-import { USERS_QUERY_KEY, type UserUpdate } from 'hooks/useUsers';
+import type { UserUpdate } from 'hooks/useUsers';
+import { USERS_QUERY_KEY } from 'hooks/useUsers';
 
 import ReadOnlyWarning from './ReadOnlyWarning';
 import SettingsSection from './SettingsSection';
@@ -49,22 +51,37 @@ const UserEdit = ({ user }: Props) => {
   const currentUser = useCurrentUser();
   const queryClient = useQueryClient();
   const [selectedSegment, setSelectedSegment] = useState<UserSegment>('profile');
-  const updateUser = useCallback(
-    (data: UserUpdate) =>
-      UsersDomain.update(user.id, { ...user.toJSON(), ...data }, user.fullName).then(() => {
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  const updateUser = (data: UserUpdate) => {
+    setIsUpdating(true);
+
+    // Only send the data of the updated section. The exceptions are timezone and startpage: the backend treats
+    // missing timezone and startpage values as null and clears them, so we always send the current values.
+    return UsersDomain.update(user.id, { ...pick(user.toJSON(), ['timezone', 'startpage']), ...data }, user.fullName)
+      .then(() => {
         if (user.id === currentUser?.id) {
           CurrentUser.reload();
         }
-      }),
-    [user, currentUser?.id],
-  );
+
+        // Reload the edited user so the sections show the saved values (e.g. after switching tabs) and following
+        // updates don't send stale timezone and startpage values. We return the promise so the update only finishes
+        // once the reloaded user is fetched. Until then, the submitting section is busy and switching to other
+        // sections is disabled, so no section can submit stale data in the meantime.
+        return queryClient.invalidateQueries({ queryKey: [...USERS_QUERY_KEY, user.id] });
+      })
+      .finally(() => setIsUpdating(false));
+  };
 
   // Reload the edited user after saving, otherwise the preferences section shows the old values after switching
   // sections. The save only finishes once the reloaded user is fetched.
-  const updatePreferences = (data: PreferencesUpdateMap) =>
-    saveUserPreferences(user.username, data).then(() =>
-      queryClient.invalidateQueries({ queryKey: [...USERS_QUERY_KEY, user.id] }),
-    );
+  const updatePreferences = (data: PreferencesUpdateMap) => {
+    setIsUpdating(true);
+
+    return saveUserPreferences(user.username, data)
+      .then(() => queryClient.invalidateQueries({ queryKey: [...USERS_QUERY_KEY, user.id] }))
+      .finally(() => setIsUpdating(false));
+  };
 
   if (!user) {
     return <Spinner />;
@@ -81,6 +98,7 @@ const UserEdit = ({ user }: Props) => {
           data={editableUserSegments}
           value={selectedSegment}
           onChange={setSelectedSegment}
+          disabled={isUpdating}
         />
       </Col>
       <Col md={12}>

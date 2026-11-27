@@ -46,16 +46,19 @@ const PageTitle = ({ fullName }: { fullName: string | null | undefined }) => (
 const UserEditPage = ({ params }: Props) => {
   const userId = params?.userId;
 
-  // Child components (e.g. the roles section) trigger a user state update by invalidating this query.
-  const { data: loadedUser } = useQuery({
+  // UserEdit invalidates this query after every user update to reload the user.
+  const { data: loadedUser, isFetchedAfterMount } = useQuery({
     queryKey: [...USERS_QUERY_KEY, userId],
     queryFn: () => UsersDomain.load(userId),
     retry: false,
+    refetchOnMount: 'always',
   });
 
   const fullName = loadedUser?.fullName ?? '';
   const readOnly = loadedUser?.readOnly ?? false;
-  const userToEdit = userId === loadedUser?.id ? loadedUser : undefined;
+  // Wait for the reload of a cached user, because it might be outdated (e.g. after "Set as start page") and the forms
+  // in UserEdit don't update their values once they are rendered.
+  const userToEdit = isFetchedAfterMount && userId === loadedUser?.id ? loadedUser : undefined;
 
   return (
     <DocumentTitle title={`Edit User ${fullName}`}>
