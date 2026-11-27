@@ -102,6 +102,15 @@ public abstract class EntityAttribute {
     public abstract Boolean hidden();
 
     /**
+     * Whether the list can be sliced by this column, showing how many entities have each of its values.
+     *
+     * @see org.graylog2.database.slicing.EntitySlicer
+     */
+    @JsonProperty("sliceable")
+    @Nullable
+    public abstract Boolean sliceable();
+
+    /**
      * The MongoDB collection name that this attribute references as a foreign key.
      * <p>
      * When set, the frontend uses this to query the entity title service
@@ -233,6 +242,9 @@ public abstract class EntityAttribute {
 
         /** @see EntityAttribute#hidden() */
         public abstract Builder hidden(Boolean hidden);
+
+        /** @see EntityAttribute#sliceable() */
+        public abstract Builder sliceable(Boolean sliceable);
 
         /**
          * MongoDB collection name this attribute references as a foreign key.

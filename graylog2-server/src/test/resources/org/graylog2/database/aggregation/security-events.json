@@ -1,0 +1,126 @@
+{
+  "security_events": {
+    "data": [
+      {
+        "event_id": "e1",
+        "status": "NEW",
+        "risk_score": 12.5,
+        "owner": "65f000000000000000000001",
+        "event": {
+          "timestamp": {"$date": "2024-03-04T09:00:00.000Z"},
+          "source_streams": ["s1"],
+          "tags": ["malware", "email"],
+          "associated_assets": ["65f0000000000000000000a1"]
+        },
+        "actions_taken": [
+          {"type": "procedure_step", "step_id": "triage"},
+          {"type": "procedure_step", "step_id": "contain"}
+        ]
+      },
+      {
+        "event_id": "e2",
+        "status": "NEW",
+        "risk_score": 25,
+        "owner": "65f000000000000000000001",
+        "event": {
+          "timestamp": {"$date": "2024-03-04T23:30:00.000Z"},
+          "source_streams": ["s1"],
+          "tags": ["malware"],
+          "associated_assets": ["65f0000000000000000000a1", "65f0000000000000000000a2"]
+        },
+        "actions_taken": [
+          {"type": "procedure_step", "step_id": "triage"}
+        ]
+      },
+      {
+        "event_id": "e3",
+        "status": "INVESTIGATING",
+        "risk_score": 55,
+        "owner": "65f000000000000000000002",
+        "event": {
+          "timestamp": {"$date": "2024-03-05T10:00:00.000Z"},
+          "source_streams": ["s1"],
+          "tags": ["phishing", "email"],
+          "associated_assets": ["65f0000000000000000000a3"]
+        },
+        "actions_taken": []
+      },
+      {
+        "event_id": "e4",
+        "status": "INVESTIGATING",
+        "risk_score": 40,
+        "owner": "65f000000000000000000003",
+        "event": {
+          "timestamp": {"$date": "2024-03-06T12:00:00.000Z"},
+          "source_streams": ["s1"],
+          "tags": [],
+          "associated_assets": ["65f0000000000000000000a1", "65f0000000000000000000a3"]
+        }
+      },
+      {
+        "event_id": "e5",
+        "status": "CLOSED",
+        "risk_score": 85,
+        "owner": "65f000000000000000000002",
+        "event": {
+          "timestamp": {"$date": "2024-03-10T23:30:00.000Z"},
+          "source_streams": ["s1"],
+          "tags": ["malware"],
+          "associated_assets": ["65f0000000000000000000a4"]
+        },
+        "actions_taken": [
+          {"type": "procedure_step", "step_id": "notify"}
+        ]
+      },
+      {
+        "event_id": "e6",
+        "status": "CLOSED",
+        "risk_score": 10,
+        "owner": "65f000000000000000000003",
+        "event": {
+          "timestamp": {"$date": "2024-03-11T08:00:00.000Z"},
+          "source_streams": ["s1"],
+          "tags": [],
+          "associated_assets": []
+        }
+      },
+      {
+        "event_id": "e7",
+        "status": "CLOSED",
+        "risk_score": 72,
+        "owner": "65f0000000000000000000ff",
+        "event": {
+          "timestamp": {"$date": "2024-03-11T23:15:00.000Z"},
+          "source_streams": ["s2"],
+          "tags": ["phishing"],
+          "associated_assets": ["65f0000000000000000000af"]
+        }
+      },
+      {
+        "event_id": "e8",
+        "status": "FALSE_POSITIVE",
+        "event": {
+          "timestamp": {"$date": "2024-03-12T06:00:00.000Z"},
+          "source_streams": ["s2"],
+          "tags": ["recon"],
+          "associated_assets": []
+        }
+      }
+    ],
+    "indexes": [
+      {"index": {"event_id": 1}, "options": {"unique": true}},
+      {"index": {"owner": 1}}
+    ]
+  },
+  "users": [
+    {"_id": {"$oid": "65f000000000000000000001"}, "username": "ann", "full_name": "Ann", "account_status": "enabled"},
+    {"_id": {"$oid": "65f000000000000000000002"}, "username": "ben", "full_name": "Ben", "account_status": "disabled"},
+    {"_id": {"$oid": "65f000000000000000000003"}, "username": "cid", "full_name": "Cid", "account_status": "enabled"}
+  ],
+  "assets": [
+    {"_id": {"$oid": "65f0000000000000000000a1"}, "name": "web-01", "category": ["server"], "risk_score": 60},
+    {"_id": {"$oid": "65f0000000000000000000a2"}, "name": "db-01", "category": ["server", "database"], "risk_score": 80},
+    {"_id": {"$oid": "65f0000000000000000000a3"}, "name": "laptop-07", "category": ["workstation"], "risk_score": 20},
+    {"_id": {"$oid": "65f0000000000000000000a4"}, "name": "printer-02", "category": [], "risk_score": 0}
+  ]
+}
