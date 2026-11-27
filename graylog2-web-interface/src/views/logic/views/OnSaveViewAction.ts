@@ -18,14 +18,12 @@ import UserNotification from 'util/UserNotification';
 import type View from 'views/logic/views/View';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import { setIsNew, setIsDirty } from 'views/logic/slices/viewSlice';
-import type FetchError from 'logic/errors/FetchError';
+import FetchError from 'logic/errors/FetchError';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import { updateView } from 'views/api/views';
 
-const _extractErrorMessage = (error: FetchError) =>
-  error && error.additional && error.additional.body && error.additional.body.message
-    ? error.additional.body.message
-    : error;
+const _extractErrorMessage = (error: unknown) =>
+  error instanceof FetchError && error.additional?.body?.message ? error.additional.body.message : error;
 
 export default (view: View, entityShare?: EntitySharePayload) => async (dispatch: ViewsDispatch) => {
   try {

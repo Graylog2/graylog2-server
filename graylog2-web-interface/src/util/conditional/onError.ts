@@ -20,7 +20,7 @@ export async function onError<T, E = Error>(promise: Promise<T>, handler: (e: E)
   try {
     return await promise;
   } catch (e) {
-    handler(e);
+    handler(e as E);
     throw e;
   }
 }
@@ -36,7 +36,7 @@ export async function onSettled<T, R, E = Error>(
 
     return result;
   } catch (e) {
-    handleError(e);
+    handleError(e as E);
     throw e;
   }
 }

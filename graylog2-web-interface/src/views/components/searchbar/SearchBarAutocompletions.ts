@@ -55,7 +55,7 @@ export interface Completer {
   identifierRegexps?: RegExp[];
 }
 
-const onCompleterError = (error: Error) => {
+const onCompleterError = (error: unknown) => {
   // eslint-disable-next-line no-console
   console.warn('Exception thrown in completer: ', error);
 };
