@@ -66,14 +66,20 @@ export type PageContext = {
 // A page the chat links to after a page tool ran, e.g. a stream it created; `path` is a route within Graylog.
 export type PageToolLink = { label: string; path: string };
 
+// An entity an Assistant tool changed, so pages showing it reload it. Without `id`, any entity of the type may have
+// changed, e.g. a new one.
+export type ChangedEntity = { type: string; id?: string };
+
 // What a page tool did, shown in the chat; `undo` reverts it. `result` tells the Assistant what it needs to refer to
 // it later, e.g. the id of a created entity. `enable` turns on what it created disabled, and says what it did then.
+// `changed` lists the entities it changed that its own requests did not reload already.
 export type PageToolResult = {
   summary?: string;
   links?: Array<PageToolLink>;
   result?: string;
   undo?: () => unknown;
   enable?: () => Promise<{ summary: string; result?: string }>;
+  changed?: Array<ChangedEntity>;
 } | void;
 
 // Thrown by a page tool whose failure the user was already told about, e.g. by a mutation hook's error toast, so the
