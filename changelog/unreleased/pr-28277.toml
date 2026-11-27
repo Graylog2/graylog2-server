@@ -1,0 +1,10 @@
+type = "a"
+message = "Allow Data Nodes to configure OpenSearch repository clients managed by Graylog, so snapshot repositories of the same type can use different credentials."
+
+details.user = """
+Data Nodes now configure the OpenSearch repository clients of warm tier repositories from the repository credentials
+stored by the Graylog server, so the credentials no longer have to be set up on each Data Node. New or changed clients
+take effect after the Data Node restarts.
+"""
+
+pulls = ["28277"]
