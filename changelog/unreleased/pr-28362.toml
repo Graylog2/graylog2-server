@@ -1,0 +1,4 @@
+type = "s"
+message = "Update MongoDB Java driver to 5.15.0 to fix CVE-2026-129932."
+
+pulls = ["28362"]
