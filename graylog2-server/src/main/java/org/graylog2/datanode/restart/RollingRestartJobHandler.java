@@ -74,6 +74,13 @@ public class RollingRestartJobHandler {
     }
 
     public JobTriggerDto start(String triggeredBy, boolean force) {
+        return start(triggeredBy, force, false);
+    }
+
+    /**
+     * @param restartOnly restart every node to pick up its stored configuration, without upgrading OpenSearch
+     */
+    public JobTriggerDto start(String triggeredBy, boolean force, boolean restartOnly) {
         // Cluster-wide lock around the find-active + create sequence so two concurrent /restart calls
         // (different Graylog nodes or the same node) cannot both pass preflight and insert duplicate triggers.
         final Lock lock = lockService.lock(START_LOCK_RESOURCE, 1)
@@ -92,7 +99,7 @@ public class RollingRestartJobHandler {
                     .map(n -> RollingRestartNodeEntry.pending(n.getHostname(), n.getNodeId()))
                     .toList();
 
-            final String targetOpensearchVersion = dataNodeMetadataService.getVersionsOverview()
+            final String targetOpensearchVersion = restartOnly ? null : dataNodeMetadataService.getVersionsOverview()
                     .highestAvailableVersion()
                     .orElseThrow(() -> new IllegalStateException("There is no available opensearch version to upgrade"));
 
@@ -176,6 +183,13 @@ public class RollingRestartJobHandler {
     private JobDefinitionDto ensureDefinition() {
         return jobDefinitionService.get(RollingRestartExecutionJob.DEFINITION_INSTANCE.id())
                 .orElseGet(() -> jobDefinitionService.save(RollingRestartExecutionJob.DEFINITION_INSTANCE));
+    }
+
+    /**
+     * Whether a rolling restart is running or waiting to continue.
+     */
+    public boolean isActive() {
+        return findActive().isPresent();
     }
 
     private Optional<JobTriggerDto> findActive() {

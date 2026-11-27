@@ -21,6 +21,8 @@ import type { ColumnSchema } from 'components/common/EntityDataTable';
 import DataNodeActions from 'components/datanode/DataNodeList/DataNodeActions';
 import type { FetchOptions } from 'components/common/PaginatedEntityTable/useFetchEntities';
 import useProductName from 'brand-customization/useProductName';
+import usePermissions from 'hooks/usePermissions';
+import useManagedConfiguration from 'components/datanode/configuration/useManagedConfiguration';
 
 import {
   createColumnDefinitions,
@@ -29,6 +31,7 @@ import {
 } from './DataNodesColumnConfiguration';
 import { clusterDataNodesKeyFn, fetchClusterDataNodesWithMetrics } from './fetchClusterDataNodes';
 import type { ClusterDataNode } from './fetchClusterDataNodes';
+import DataNodeRestartBanner from './DataNodeRestartBanner';
 
 import ClusterNodesSectionWrapper from '../shared-components/ClusterNodesSectionWrapper';
 
@@ -49,9 +52,17 @@ const DataNodesExpandable = ({
 }: Props) => {
   const [totalDataNodes, setTotalDataNodes] = useState<number | undefined>(undefined);
   const productName = useProductName();
+  const { isPermitted } = usePermissions();
+  // The cluster wide configuration lists every Data Node which still has to be restarted, for its own values too
+  const { data: configuration } = useManagedConfiguration(null, isPermitted('clusterconfigentry:read'));
+  const pendingNodes = configuration?.pending_nodes;
+  const pendingRestartNodeIds = useMemo(() => new Set(pendingNodes ?? []), [pendingNodes]);
 
   const columnSchemas = useMemo<Array<ColumnSchema>>(() => createColumnDefinitions(), []);
-  const columnRenderers = useMemo(() => createColumnRenderers(productName), [productName]);
+  const columnRenderers = useMemo(
+    () => createColumnRenderers(productName, pendingRestartNodeIds),
+    [productName, pendingRestartNodeIds],
+  );
 
   const renderActions = useCallback((entity: ClusterDataNode) => <DataNodeActions dataNode={entity} />, []);
   const tableLayout = useMemo(
@@ -73,6 +84,7 @@ const DataNodesExpandable = ({
       titleCount={totalDataNodes}
       onTitleCountClick={onSelectNodeType ?? null}
       collapsible={collapsible}>
+      <DataNodeRestartBanner />
       <PaginatedEntityTable<ClusterDataNode>
         tableLayout={tableLayout}
         fetchEntities={fetchClusterDataNodesWithMetrics}

@@ -29,6 +29,10 @@ jest.mock('components/common/PaginatedEntityTable', () => ({
   useTableFetchContext: jest.fn(),
 }));
 jest.mock('brand-customization/useProductName', () => jest.fn(() => 'Graylog'));
+jest.mock('components/datanode/configuration/useManagedConfiguration', () => jest.fn(() => ({ data: undefined })));
+jest.mock('components/datanode/configuration/useDataNodeRestartProgress', () =>
+  jest.fn(() => ({ isRestarting: false, progress: undefined })),
+);
 
 describe('<DataNodesExpandable />', () => {
   beforeEach(() => {

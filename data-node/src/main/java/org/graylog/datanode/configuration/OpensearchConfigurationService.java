@@ -28,6 +28,7 @@ import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
+import org.graylog2.configuration.managed.ManagedConfigurationApplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,18 +46,21 @@ public class OpensearchConfigurationService extends AbstractIdleService {
     private final Set<DatanodeConfigurationBean<OpensearchConfigurationParams>> opensearchConfigurationBeans;
     private final EventBus eventBus;
     private final OpensearchUpgradeAction opensearchUpgradeAction;
+    private final ManagedConfigurationApplier managedConfigurationApplier;
 
     @Inject
     public OpensearchConfigurationService(final Configuration localConfiguration,
                                           final DatanodeConfigurationProvider datanodeConfigurationProvider,
                                           final Set<DatanodeConfigurationBean<OpensearchConfigurationParams>> opensearchConfigurationBeans,
                                           final EventBus eventBus,
-                                          OpensearchUpgradeAction  opensearchUpgradeAction) {
+                                          OpensearchUpgradeAction  opensearchUpgradeAction,
+                                          final ManagedConfigurationApplier managedConfigurationApplier) {
         this.localConfiguration = localConfiguration;
         this.datanodeConfigurationProvider = datanodeConfigurationProvider;
         this.opensearchConfigurationBeans = opensearchConfigurationBeans;
         this.eventBus = eventBus;
         this.opensearchUpgradeAction = opensearchUpgradeAction;
+        this.managedConfigurationApplier = managedConfigurationApplier;
         eventBus.register(this);
     }
 
@@ -120,6 +124,9 @@ public class OpensearchConfigurationService extends AbstractIdleService {
     }
 
     private void triggerConfigurationChangedEvent() {
+        // the process is about to be (re)started, so this is where values stored through the web interface have to
+        // reach the configuration beans the opensearch configuration is built from
+        managedConfigurationApplier.prepareProcessStart();
         eventBus.post(new OpensearchConfigurationChangeEvent(get()));
     }
 }

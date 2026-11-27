@@ -31,6 +31,7 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import useDataNode from 'components/datanode/hooks/useDataNode';
 import { Link } from 'components/common';
 import AppConfig from 'util/AppConfig';
+import UserNotification from 'util/UserNotification';
 import mockManagedConfigurationApi, {
   managedConfigurationResponse,
   sampleClusterConfiguration,
@@ -45,6 +46,8 @@ import DataNodePage from './DataNodePage';
 jest.mock('hooks/useCurrentUser');
 jest.mock('@graylog/server-api', () => ({
   SystemManagedConfiguration: { get: jest.fn(), update: jest.fn() },
+  Datanode: { restartNode: jest.fn() },
+  DataNodeRollingRestart: { start: jest.fn(), current: jest.fn() },
 }));
 jest.mock('components/datanode/hooks/useDataNode');
 jest.mock('components/cluster-configuration/ClusterConfigurationPageNavigation', () => () => null);
@@ -219,6 +222,105 @@ describe('DataNodePage configuration', () => {
 
       await userEvent.click(screen.getByRole('link', { name: 'First Data Node' }));
       await waitFor(() => expect(screen.getByLabelText(/^Query cache size \(/)).toHaveValue(15));
+    });
+  });
+
+  describe('Restarting', () => {
+    const withPendingHeap = () => {
+      const configuration = sampleNodeConfiguration(nodeId);
+
+      return {
+        ...configuration,
+        parameters: configuration.parameters.map((parameter) =>
+          parameter.name === 'opensearch_heap' ? { ...parameter, pending_restart: true } : parameter,
+        ),
+      };
+    };
+
+    it('restarts this Data Node after saving a setting which requires a restart', async () => {
+      const client = mockManagedConfigurationApi([sampleClusterConfiguration, sampleNodeConfiguration(nodeId)]);
+      const notify = jest.spyOn(UserNotification, 'success');
+      renderPage();
+
+      await changeConfigurationField('OpenSearch JVM heap', '4', 'GB');
+      expect(getApplyButton()).toHaveAccessibleName('Apply changes and restart Data Node');
+      await userEvent.click(getApplyButton());
+
+      await waitFor(() => expect(client.restartNode).toHaveBeenCalledWith(nodeId));
+      expect(client.update).toHaveBeenCalledWith(expect.objectContaining({ values: { opensearch_heap: '4g' } }));
+      expect(client.restartAll).not.toHaveBeenCalled();
+      expect(notify).toHaveBeenCalledWith('Configuration saved. Restarting this Data Node.');
+    });
+
+    it('saves without restarting when only saving is requested', async () => {
+      const client = mockManagedConfigurationApi([sampleClusterConfiguration, sampleNodeConfiguration(nodeId)]);
+      renderPage();
+
+      await changeConfigurationField('OpenSearch JVM heap', '4', 'GB');
+      await userEvent.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      await waitFor(() => expect(client.update).toHaveBeenCalled());
+      expect(client.restartNode).not.toHaveBeenCalled();
+    });
+
+    it('restarts a Data Node whose saved values are not in use yet without any changes', async () => {
+      const client = mockManagedConfigurationApi([sampleClusterConfiguration, withPendingHeap()]);
+      renderPage();
+
+      const restartButton = await screen.findByRole('button', { name: 'Restart Data Node' });
+      expect(restartButton).toBeEnabled();
+      await userEvent.click(restartButton);
+
+      await waitFor(() => expect(client.restartNode).toHaveBeenCalledWith(nodeId));
+    });
+
+    it('locks the restart and shows progress while this Data Node restarts', async () => {
+      const client = mockManagedConfigurationApi([
+        sampleClusterConfiguration,
+        { ...withPendingHeap(), restarting_nodes: [nodeId] },
+      ]);
+      renderPage();
+
+      expect(await screen.findByRole('status')).toHaveTextContent('Restarting this Data Node.');
+      expect(screen.queryByRole('button', { name: 'Restart Data Node' })).not.toBeInTheDocument();
+      expect(getApplyButton()).toBeDisabled();
+
+      // Changes can still be saved, they are picked up by the restart which is running already
+      await changeConfigurationField('OpenSearch JVM heap', '4', 'GB');
+      expect(getApplyButton()).toHaveAccessibleName('Apply changes');
+      await userEvent.click(getApplyButton());
+
+      await waitFor(() => expect(client.update).toHaveBeenCalled());
+      expect(client.restartNode).not.toHaveBeenCalled();
+    });
+
+    it('locks the restart right after it has been requested', async () => {
+      const client = mockManagedConfigurationApi([sampleClusterConfiguration, withPendingHeap()]);
+      renderPage();
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Restart Data Node' }));
+
+      await waitFor(() => expect(client.restartNode).toHaveBeenCalledTimes(1));
+      expect(await screen.findByRole('status')).toHaveTextContent('Restarting this Data Node.');
+      expect(screen.queryByRole('button', { name: 'Restart Data Node' })).not.toBeInTheDocument();
+    });
+
+    it('keeps the saved values and reports when the restart fails', async () => {
+      const client = mockManagedConfigurationApi([sampleClusterConfiguration, sampleNodeConfiguration(nodeId)]);
+      client.restartNode.mockRejectedValueOnce(new Error('Data Node is not reachable'));
+      const notifyError = jest.spyOn(UserNotification, 'error');
+      renderPage();
+
+      await changeConfigurationField('OpenSearch JVM heap', '4', 'GB');
+      await userEvent.click(getApplyButton());
+
+      await waitFor(() =>
+        expect(notifyError).toHaveBeenCalledWith(
+          expect.stringContaining('Data Node is not reachable'),
+          'Configuration saved, but this Data Node could not be restarted',
+        ),
+      );
+      expect(await savedValueOf('opensearch_heap', nodeId)).toBe('4g');
     });
   });
 

@@ -21,7 +21,7 @@ import jakarta.annotation.Nullable;
 import java.util.Objects;
 
 /**
- * A value a node resolved for one of its configuration parameters, without taking the database into account.
+ * A value a node resolved for one of its configuration parameters, which is the value it runs with.
  *
  * @param value {@code null} if the parameter has no value at all, not even a default
  */
@@ -31,10 +31,10 @@ public record ReportedValue(@Nullable String value, ConfigurationSource source) 
     }
 
     /**
-     * Whether the value has been configured explicitly instead of falling back to the default of the configuration
-     * bean.
+     * Whether the value has been configured on the node itself: in its configuration file, by an environment variable
+     * or by a system property. Neither a default nor a value stored through the API counts.
      */
     public boolean isExplicit() {
-        return source != ConfigurationSource.DEFAULT && value != null;
+        return value != null && source != ConfigurationSource.DEFAULT && source != ConfigurationSource.DATABASE;
     }
 }

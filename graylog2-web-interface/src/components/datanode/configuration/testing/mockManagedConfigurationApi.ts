@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { SystemManagedConfiguration } from '@graylog/server-api';
+import { DataNodeRollingRestart, Datanode, SystemManagedConfiguration } from '@graylog/server-api';
 
 import asMock from 'helpers/mocking/AsMock';
 
@@ -50,6 +50,7 @@ export const configurationParameter = (parameter: ParameterOverrides): Configura
   set_by: null,
   node_value: null,
   node_source: null,
+  pending_restart: false,
   ...parameter,
 });
 
@@ -204,6 +205,9 @@ export const managedConfigurationResponse = (
   parameters: (nodeId === null ? clusterParameters() : nodeParameters()).map((parameter) =>
     withStoredValue(parameter, storedValues[parameter.name] ?? null),
   ),
+  restart_required: false,
+  pending_nodes: [],
+  restarting_nodes: [],
 });
 
 export const sampleClusterConfiguration = managedConfigurationResponse({
@@ -267,7 +271,14 @@ const mockManagedConfigurationApi = (initialConfigurations: Array<ManagedConfigu
       return respond(nodeId);
     });
 
-  return { get, update };
+  const restartNode = asMock(Datanode.restartNode)
+    .mockReset()
+    .mockImplementation(async (nodeId) => ({ node_id: nodeId }) as Awaited<ReturnType<typeof Datanode.restartNode>>);
+  const restartAll = asMock(DataNodeRollingRestart.start).mockReset().mockResolvedValue({});
+  // No rolling restart is running unless a test says so
+  asMock(DataNodeRollingRestart.current).mockReset().mockResolvedValue(null);
+
+  return { get, update, restartNode, restartAll };
 };
 
 export default mockManagedConfigurationApi;

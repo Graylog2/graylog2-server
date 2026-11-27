@@ -28,6 +28,10 @@ import java.util.stream.Stream;
  * Parameters of every node type are declared here, in the server: descriptors are plain data, so describing a data
  * node parameter doesn't require the data node classes. Adding a parameter here is what makes it readable and
  * changeable, so each one should be added deliberately, after checking that its consumers cope with a changed value.
+ * <p>
+ * Every parameter currently needs a restart: stored values only reach OpenSearch when its process is started. The
+ * OpenSearch settings which could be changed while it runs will stop needing one once they are applied through its
+ * cluster settings API.
  */
 public final class DefaultConfigurationParameters {
     public static final String CATEGORY_NODE = "Node Settings";
@@ -110,7 +114,7 @@ public final class DefaultConfigurationParameters {
                         .category(CATEGORY_STORAGE).order(10)
                         .type(ParameterType.SIZE).units(diskUnits)
                         .constraints(ParameterConstraints.pattern(PERCENTAGE + "|" + BYTE_SIZE + "|" + RATIO))
-                        .requiresRestart(false)
+                        .requiresRestart(true)
                         .backing(ParameterBacking.RUNTIME)
                         .scope(ParameterScope.CLUSTER)
                         .build(),
@@ -121,7 +125,7 @@ public final class DefaultConfigurationParameters {
                         .category(CATEGORY_STORAGE).order(20)
                         .type(ParameterType.SIZE).units(diskUnits)
                         .constraints(ParameterConstraints.pattern(PERCENTAGE + "|" + BYTE_SIZE + "|" + RATIO))
-                        .requiresRestart(false)
+                        .requiresRestart(true)
                         .backing(ParameterBacking.RUNTIME)
                         .scope(ParameterScope.CLUSTER)
                         .build(),
@@ -132,7 +136,7 @@ public final class DefaultConfigurationParameters {
                         .category(CATEGORY_STORAGE).order(30)
                         .type(ParameterType.SIZE).units(diskUnits)
                         .constraints(ParameterConstraints.pattern(PERCENTAGE + "|" + BYTE_SIZE + "|" + RATIO))
-                        .requiresRestart(false)
+                        .requiresRestart(true)
                         .backing(ParameterBacking.RUNTIME)
                         .scope(ParameterScope.CLUSTER)
                         .build(),
@@ -143,7 +147,7 @@ public final class DefaultConfigurationParameters {
                         .category(CATEGORY_STORAGE).order(40)
                         .type(ParameterType.INTEGER)
                         .constraints(ParameterConstraints.range(1L, null))
-                        .requiresRestart(false)
+                        .requiresRestart(true)
                         .backing(ParameterBacking.RUNTIME)
                         .scope(ParameterScope.CLUSTER)
                         .build(),
@@ -185,7 +189,7 @@ public final class DefaultConfigurationParameters {
                         .category(CATEGORY_INDEXING).order(20)
                         .type(ParameterType.SIZE).units(byteUnits("/s"))
                         .constraints(ParameterConstraints.pattern(BYTE_SIZE))
-                        .requiresRestart(false)
+                        .requiresRestart(true)
                         .backing(ParameterBacking.RUNTIME)
                         .scope(ParameterScope.NODE)
                         .build()

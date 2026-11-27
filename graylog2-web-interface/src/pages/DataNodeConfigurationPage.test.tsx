@@ -27,6 +27,8 @@ import { defaultUser } from 'defaultMockValues';
 import { dataRouterFuture, routerProviderFuture } from 'reactRouterFutureFlags';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
+import { DataNodeRollingRestart } from '@graylog/server-api';
+
 import asMock from 'helpers/mocking/AsMock';
 import useCurrentUser from 'hooks/useCurrentUser';
 import AppConfig from 'util/AppConfig';
@@ -52,6 +54,8 @@ import DataNodeConfigurationPage from './DataNodeConfigurationPage';
 jest.mock('hooks/useCurrentUser');
 jest.mock('@graylog/server-api', () => ({
   SystemManagedConfiguration: { get: jest.fn(), update: jest.fn() },
+  Datanode: { restartNode: jest.fn() },
+  DataNodeRollingRestart: { start: jest.fn(), current: jest.fn() },
 }));
 jest.mock('components/datanode/hooks/useRunsWithDataNode');
 jest.mock('components/datanode/hooks/useShowDatanodeMigration');
@@ -242,6 +246,92 @@ describe('DataNodeConfigurationPage', () => {
 
       expect(await screen.findByLabelText(/^Stop allocating shards at \(/)).toHaveValue(85);
       expect(update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Restarting', () => {
+    it('restarts all Data Nodes one after another without upgrading OpenSearch', async () => {
+      const client = mockManagedConfigurationApi([
+        {
+          ...sampleClusterConfiguration,
+          parameters: sampleClusterConfiguration.parameters.map((parameter) =>
+            parameter.name === shardLimitName ? { ...parameter, pending_restart: true } : parameter,
+          ),
+        },
+      ]);
+      const notify = jest.spyOn(UserNotification, 'success');
+      renderPage();
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Restart Data Nodes' }));
+
+      await waitFor(() => expect(client.restartAll).toHaveBeenCalledWith({ force: false, restart_only: true }));
+      expect(client.restartNode).not.toHaveBeenCalled();
+      expect(notify).toHaveBeenCalledWith('Configuration saved. Restarting the Data Nodes.');
+    });
+
+    it('shows the progress of a rolling restart and does not start another one', async () => {
+      const client = mockManagedConfigurationApi([
+        {
+          ...sampleClusterConfiguration,
+          parameters: sampleClusterConfiguration.parameters.map((parameter) =>
+            parameter.name === shardLimitName ? { ...parameter, pending_restart: true } : parameter,
+          ),
+        },
+      ]);
+      asMock(DataNodeRollingRestart.current).mockResolvedValue({
+        job_definition_type: 'rolling-restart-v1',
+        job_definition_id: 'rolling-restart',
+        status: 'running',
+        created_at: '2026-11-17T10:00:00.000Z',
+        updated_at: '2026-11-17T10:00:00.000Z',
+        next_time: null,
+        data: {
+          type: 'rolling-restart-v1',
+          sm_state: 'WAITING_NODE_JOINED',
+          current_node_index: 1,
+          abort_requested: false,
+          triggered_by: 'admin',
+          waiting_green_since: '2026-11-17T10:00:00.000Z',
+          nodes: [
+            { hostname: 'datanode-1', datanode_id: 'node-1', status: 'COMPLETED', attempts: 1 },
+            { hostname: 'datanode-2', datanode_id: 'node-2', status: 'RESTARTING', attempts: 1 },
+            { hostname: 'datanode-3', datanode_id: 'node-3', status: 'PENDING', attempts: 0 },
+          ],
+        },
+      });
+      renderPage();
+
+      expect(await screen.findByRole('status')).toHaveTextContent(
+        'Restarting the Data Nodes one after another: 1 of 3 done, now restarting datanode-2.',
+      );
+      expect(screen.queryByRole('button', { name: 'Restart Data Nodes' })).not.toBeInTheDocument();
+      expect(getApplyButton()).toBeDisabled();
+      expect(client.restartAll).not.toHaveBeenCalled();
+    });
+
+    it('shows why the rolling restart could not start', async () => {
+      const client = mockManagedConfigurationApi([
+        {
+          ...sampleClusterConfiguration,
+          parameters: sampleClusterConfiguration.parameters.map((parameter) =>
+            parameter.name === shardLimitName ? { ...parameter, pending_restart: true } : parameter,
+          ),
+        },
+      ]);
+      client.restartAll.mockRejectedValueOnce(
+        new FetchError('Bad Request', 400, { failed_checks: ['Cluster status is YELLOW'] }),
+      );
+      const notifyError = jest.spyOn(UserNotification, 'error');
+      renderPage();
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Restart Data Nodes' }));
+
+      await waitFor(() =>
+        expect(notifyError).toHaveBeenCalledWith(
+          'Cluster status is YELLOW',
+          'Configuration saved, but the Data Nodes could not be restarted',
+        ),
+      );
     });
   });
 

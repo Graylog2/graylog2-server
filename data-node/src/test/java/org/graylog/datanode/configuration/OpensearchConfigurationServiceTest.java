@@ -23,6 +23,7 @@ import org.graylog.datanode.opensearch.OpensearchConfigurationChangeEvent;
 import org.graylog.datanode.opensearch.OpensearchStartRequestedEvent;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBean;
+import org.graylog2.configuration.managed.ManagedConfigurationApplier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -36,6 +37,7 @@ import java.nio.file.Path;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -53,6 +55,8 @@ class OpensearchConfigurationServiceTest {
     private OpensearchUpgradeAction opensearchUpgradeAction;
     @Mock
     private OpensearchDistribution opensearchDistribution;
+    @Mock
+    private ManagedConfigurationApplier managedConfigurationApplier;
 
     private OpensearchConfigurationService service;
 
@@ -63,7 +67,18 @@ class OpensearchConfigurationServiceTest {
         when(datanodeConfigurationProvider.get()).thenReturn(datanodeConfiguration);
 
         service = new OpensearchConfigurationService(localConfiguration, datanodeConfigurationProvider,
-                Set.<DatanodeConfigurationBean<OpensearchConfigurationParams>>of(), eventBus, opensearchUpgradeAction);
+                Set.<DatanodeConfigurationBean<OpensearchConfigurationParams>>of(), eventBus, opensearchUpgradeAction,
+                managedConfigurationApplier);
+    }
+
+    @Test
+    void startRequestedPicksUpStoredConfigurationBeforeBuildingTheConfiguration() {
+        final var inOrder = inOrder(managedConfigurationApplier, eventBus);
+
+        service.onStartRequested(new OpensearchStartRequestedEvent());
+
+        inOrder.verify(managedConfigurationApplier).prepareProcessStart();
+        inOrder.verify(eventBus).post(any(OpensearchConfigurationChangeEvent.class));
     }
 
     @Test

@@ -39,7 +39,7 @@ const fetchCurrentRollingRestart = () =>
   DataNodeRollingRestart.current({ requestShouldExtendSession: false }) as Promise<RollingRestartJob | null>;
 
 const startRollingRestartRequest = (force: boolean) =>
-  DataNodeRollingRestart.start({ force }) as Promise<RollingRestartJob>;
+  DataNodeRollingRestart.start({ force, restart_only: false }) as Promise<RollingRestartJob>;
 
 const rollingRestartErrorBody = (error: unknown): RollingRestartErrorBody | undefined =>
   error instanceof FetchError ? error.additional?.body : undefined;
@@ -68,9 +68,10 @@ export const rollingRestartStartError = (error: unknown) => {
   };
 };
 
-export const useCurrentRollingRestart = () => {
+export const useCurrentRollingRestart = (enabled = true) => {
   const { data, isInitialLoading, refetch } = useQuery<RollingRestartJob | null>({
     queryKey: ROLLING_RESTART_QUERY_KEY,
+    enabled,
     queryFn: () =>
       defaultOnError(
         fetchCurrentRollingRestart(),

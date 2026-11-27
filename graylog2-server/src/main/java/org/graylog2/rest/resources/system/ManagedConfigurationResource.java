@@ -37,6 +37,8 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.cluster.nodes.DataNodeDto;
+import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.configuration.managed.ConfigurationCatalog;
 import org.graylog2.configuration.managed.ConfigurationParameter;
 import org.graylog2.configuration.managed.ConfigurationSource;
@@ -47,14 +49,18 @@ import org.graylog2.configuration.managed.ParameterBacking;
 import org.graylog2.configuration.managed.ParameterConstraints;
 import org.graylog2.configuration.managed.ParameterScope;
 import org.graylog2.configuration.managed.ParameterType;
+import org.graylog2.configuration.managed.PendingRestarts;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.emptyToNull;
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -77,12 +83,18 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 public class ManagedConfigurationResource extends RestResource {
     private final ConfigurationCatalog catalog;
     private final ManagedConfigurationServices configurationServices;
+    private final PendingRestarts pendingRestarts;
+    private final NodeService<DataNodeDto> dataNodeService;
 
     @Inject
     public ManagedConfigurationResource(ConfigurationCatalog catalog,
-                                        ManagedConfigurationServices configurationServices) {
+                                        ManagedConfigurationServices configurationServices,
+                                        PendingRestarts pendingRestarts,
+                                        NodeService<DataNodeDto> dataNodeService) {
         this.catalog = catalog;
         this.configurationServices = configurationServices;
+        this.pendingRestarts = pendingRestarts;
+        this.dataNodeService = dataNodeService;
     }
 
     @GET
@@ -139,10 +151,41 @@ public class ManagedConfigurationResource extends RestResource {
     private ManagedConfiguration read(NodeType nodeType, @Nullable String nodeId) {
         final ParameterScope scope = nodeId == null ? ParameterScope.CLUSTER : ParameterScope.NODE;
         final Map<String, ManagedConfigurationEntry> entries = configurationServices.get(nodeType).get(nodeId);
-        final List<ManagedConfigurationParameter> parameters = catalog.get(nodeType, scope).stream()
-                .map(parameter -> ManagedConfigurationParameter.of(parameter, entries.get(parameter.name())))
+        final Map<String, Set<String>> pendingByNode = pendingParametersByNode(nodeType, nodeId);
+        final Set<String> pendingParameters = pendingByNode.values().stream()
+                .flatMap(Set::stream)
+                .collect(Collectors.toSet());
+        final List<String> pendingNodes = pendingByNode.entrySet().stream()
+                .filter(entry -> !entry.getValue().isEmpty())
+                .map(Map.Entry::getKey)
                 .toList();
-        return new ManagedConfiguration(nodeType, nodeId, parameters);
+
+        final List<ManagedConfigurationParameter> parameters = catalog.get(nodeType, scope).stream()
+                .map(parameter -> ManagedConfigurationParameter.of(parameter, entries.get(parameter.name()),
+                        pendingParameters.contains(parameter.name())))
+                .toList();
+        return new ManagedConfiguration(nodeType, nodeId, parameters, !pendingNodes.isEmpty(), pendingNodes,
+                List.copyOf(restartingNodes(nodeType, nodeId)));
+    }
+
+    private Set<String> restartingNodes(NodeType nodeType, @Nullable String nodeId) {
+        if (nodeType != NodeType.DATANODE) {
+            return Set.of();
+        }
+        final Collection<String> nodeIds = nodeId == null ? dataNodeService.allActive().keySet() : List.of(nodeId);
+        return pendingRestarts.restartingNodes(nodeType, nodeIds);
+    }
+
+    /**
+     * The parameters which aren't in use yet, for the node of the request or for every active node of the type.
+     * Restarts are only tracked for data nodes so far.
+     */
+    private Map<String, Set<String>> pendingParametersByNode(NodeType nodeType, @Nullable String nodeId) {
+        if (nodeType != NodeType.DATANODE) {
+            return Map.of();
+        }
+        final Collection<String> nodeIds = nodeId == null ? dataNodeService.allActive().keySet() : List.of(nodeId);
+        return pendingRestarts.pendingParameters(nodeType, nodeIds);
     }
 
     private String currentUserName() {
@@ -151,11 +194,19 @@ public class ManagedConfigurationResource extends RestResource {
     }
 
     /**
-     * @param nodeId {@code null} when the parameters are shared by all nodes of the type
+     * @param nodeId          {@code null} when the parameters are shared by all nodes of the type
+     * @param restartRequired Whether a node has to be restarted to use all stored values. For a single node this
+     *                        also covers the values shared by all nodes of the type, which aren't part of
+     *                        {@code parameters} then.
+     * @param pendingNodes    The IDs of the nodes which have to be restarted
+     * @param restartingNodes The IDs of the nodes which are restarting right now
      */
     public record ManagedConfiguration(@JsonProperty("node_type") NodeType nodeType,
                                        @JsonProperty("node_id") @Nullable String nodeId,
-                                       @JsonProperty("parameters") List<ManagedConfigurationParameter> parameters) {}
+                                       @JsonProperty("parameters") List<ManagedConfigurationParameter> parameters,
+                                       @JsonProperty("restart_required") boolean restartRequired,
+                                       @JsonProperty("pending_nodes") List<String> pendingNodes,
+                                       @JsonProperty("restarting_nodes") List<String> restartingNodes) {}
 
     /**
      * A parameter with everything needed to show and edit it.
@@ -163,8 +214,9 @@ public class ManagedConfigurationResource extends RestResource {
      * @param value      The value which applies, which is {@link #setValue()} when one has been stored
      * @param source     Where {@link #value} comes from, {@code null} while nothing is known about it yet
      * @param setValue   The value stored through this API, {@code null} if nobody stored one
-     * @param nodeValue  What the node resolved from its configuration file, environment or defaults, {@code null}
-     *                   while the node hasn't reported it yet
+     * @param nodeValue  What the node resolved for itself and runs with, {@code null} while the node hasn't reported
+     *                   it yet. Parameters which don't exist in a configuration bean are never reported.
+     * @param pendingRestart Whether a node still has to be restarted to use the stored value
      */
     public record ManagedConfigurationParameter(@JsonProperty("name") String name,
                                                 @JsonProperty("label") String label,
@@ -183,10 +235,12 @@ public class ManagedConfigurationResource extends RestResource {
                                                 @JsonProperty("set_at") @Nullable Instant setAt,
                                                 @JsonProperty("set_by") @Nullable String setBy,
                                                 @JsonProperty("node_value") @Nullable String nodeValue,
-                                                @JsonProperty("node_source") @Nullable ConfigurationSource nodeSource) {
+                                                @JsonProperty("node_source") @Nullable ConfigurationSource nodeSource,
+                                                @JsonProperty("pending_restart") boolean pendingRestart) {
 
         static ManagedConfigurationParameter of(ConfigurationParameter parameter,
-                                                @Nullable ManagedConfigurationEntry entry) {
+                                                @Nullable ManagedConfigurationEntry entry,
+                                                boolean pendingRestart) {
             return new ManagedConfigurationParameter(
                     parameter.name(),
                     parameter.label(),
@@ -205,7 +259,8 @@ public class ManagedConfigurationResource extends RestResource {
                     entry == null ? null : entry.updatedAt(),
                     entry == null ? null : entry.updatedBy(),
                     entry == null ? null : entry.nodeValue(),
-                    entry == null ? null : entry.nodeSource());
+                    entry == null ? null : entry.nodeSource(),
+                    pendingRestart);
         }
     }
 

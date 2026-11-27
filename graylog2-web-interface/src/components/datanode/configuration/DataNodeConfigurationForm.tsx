@@ -30,6 +30,7 @@ import { categoryId } from './configurationFields';
 import useDataNodeConfigurationForm from './useDataNodeConfigurationForm';
 import DataNodeConfigurationSection from './DataNodeConfigurationSection';
 import ConfigurationPrecedenceHelp from './ConfigurationPrecedenceHelp';
+import DataNodeRestartProgress from './DataNodeRestartProgress';
 
 const RestartSettingsList = styled.ul`
   display: flex;
@@ -65,8 +66,15 @@ type Props = React.PropsWithChildren<{
 
 const DataNodeConfigurationForm = ({ categories, nodeId, basePath, children = undefined }: Props) => {
   const { isPermitted } = usePermissions();
-  const { formik, hasUnsavedChanges, restartParameters, hasUnsavedRestartChanges, saveChangesWithoutRestart } =
-    useDataNodeConfigurationForm({ categories, nodeId, basePath });
+  const {
+    formik,
+    hasUnsavedChanges,
+    restartParameters,
+    hasUnsavedRestartChanges,
+    saveChangesWithoutRestart,
+    isRestarting,
+    restartProgress,
+  } = useDataNodeConfigurationForm({ categories, nodeId, basePath });
   const { isSubmitting, resetForm } = formik;
   const [selectedUnits, setSelectedUnits] = useState<Record<string, string>>({});
   const selectUnit = (name: string, unit: string) => setSelectedUnits((units) => ({ ...units, [name]: unit }));
@@ -124,7 +132,12 @@ const DataNodeConfigurationForm = ({ categories, nodeId, basePath, children = un
                   ))}
                   <Route path="*" element={<Navigate to={RoutePaths.NOTFOUND} replace />} />
                 </Routes>
-                {canEdit && restartParameters.length > 0 && (
+                {isRestarting && (
+                  <Alert bsStyle="info" title={nodeId === null ? 'Restarting Data Nodes' : 'Restarting Data Node'}>
+                    <DataNodeRestartProgress progress={restartProgress} />
+                  </Alert>
+                )}
+                {canEdit && !isRestarting && restartParameters.length > 0 && (
                   <Alert
                     bsStyle="warning"
                     title={
@@ -145,7 +158,7 @@ const DataNodeConfigurationForm = ({ categories, nodeId, basePath, children = un
                 {canEdit && (
                   <FormSubmit
                     submitButtonText={
-                      restartParameters.length > 0
+                      restartParameters.length > 0 && !isRestarting
                         ? `${hasUnsavedChanges ? 'Apply changes and restart' : 'Restart'} ${nodeLabel}`
                         : 'Apply changes'
                     }
@@ -162,7 +175,7 @@ const DataNodeConfigurationForm = ({ categories, nodeId, basePath, children = un
                     isAsyncSubmit
                     isSubmitting={isSubmitting}
                     submitLoadingText="Saving changes..."
-                    disabledSubmit={!hasUnsavedChanges && restartParameters.length === 0}
+                    disabledSubmit={!hasUnsavedChanges && (restartParameters.length === 0 || isRestarting)}
                     disabledCancel={!hasUnsavedChanges}
                     onCancel={() => resetForm()}
                   />

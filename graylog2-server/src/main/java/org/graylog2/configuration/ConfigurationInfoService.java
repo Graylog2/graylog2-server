@@ -37,6 +37,15 @@ public class ConfigurationInfoService {
     }
 
     /**
+     * Replaces the information with the outcome of processing the configuration beans again, which happens when a
+     * value stored through the API is picked up.
+     */
+    public void refresh(Map<String, ParameterInfo> parameterInfos) {
+        this.parameterInfos.putAll(parameterInfos);
+        this.parameterInfos.keySet().retainAll(parameterInfos.keySet());
+    }
+
+    /**
      * Returns the information of all configuration parameters, sorted by parameter name.
      * <p>
      * Values are as configured, the effective value used at runtime may differ.

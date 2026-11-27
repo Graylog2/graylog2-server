@@ -16,6 +16,7 @@
  */
 package org.graylog2.datanode.restart;
 
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.plugins.datanode.DatanodeClusterAdminAdapter;
@@ -24,6 +25,9 @@ import org.graylog.plugins.datanode.dto.Node;
 import org.graylog.plugins.datanode.dto.ShardReplication;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
+import org.graylog2.configuration.managed.ManagedConfigurationServices;
+import org.graylog2.configuration.managed.NodeConfigurationState;
+import org.graylog2.configuration.managed.NodeType;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.rest.resources.datanodes.DatanodeRestApiProxy;
 import org.graylog2.security.AccessToken;
@@ -39,6 +43,7 @@ import retrofit2.http.POST;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -61,18 +66,21 @@ public class RollingRestartActions {
     private final NodeService<DataNodeDto> nodeService;
     private final ClusterProcessingControlFactory clusterProcessingControlFactory;
     private final AccessTokenService accessTokenService;
+    private final ManagedConfigurationServices configurationServices;
 
     @Inject
     public RollingRestartActions(DatanodeClusterAdminAdapter clusterAdmin,
                                  DatanodeRestApiProxy datanodeProxy,
                                  NodeService<DataNodeDto> nodeService,
                                  ClusterProcessingControlFactory clusterProcessingControlFactory,
-                                 AccessTokenService accessTokenService) {
+                                 AccessTokenService accessTokenService,
+                                 ManagedConfigurationServices configurationServices) {
         this.clusterAdmin = clusterAdmin;
         this.datanodeProxy = datanodeProxy;
         this.nodeService = nodeService;
         this.clusterProcessingControlFactory = clusterProcessingControlFactory;
         this.accessTokenService = accessTokenService;
+        this.configurationServices = configurationServices;
     }
 
     public void prepareCluster() {
@@ -140,6 +148,25 @@ public class RollingRestartActions {
         datanodeProxy.remoteInterface(hostname, DataNodeManagementClient.class, DataNodeManagementClient::upgrade);
     }
 
+    /**
+     * Restarts the OpenSearch process of a DataNode without changing its version, so that it picks up its stored
+     * configuration.
+     */
+    public void restartNode(String hostname) {
+        LOG.info("Sending RESTART trigger to DataNode {}", hostname);
+        datanodeProxy.remoteInterface(hostname, DataNodeManagementClient.class, DataNodeManagementClient::restart);
+    }
+
+    /**
+     * When the OpenSearch process of a DataNode last became available with freshly loaded configuration. A restart
+     * without a version change is only visible through this time moving on: the node is listed in the cluster with
+     * the same version before and after.
+     */
+    public Optional<Instant> configurationAppliedAt(String nodeId) {
+        return configurationServices.get(NodeType.DATANODE).configurationState(nodeId)
+                .map(NodeConfigurationState::appliedAt);
+    }
+
     public ClusterState getClusterState() {
         return clusterAdmin.getClusterState();
     }
@@ -162,10 +189,13 @@ public class RollingRestartActions {
         }
     }
 
-    public boolean isNodeInCluster(String hostname, String expectedOpensearchVersion) {
+    /**
+     * @param expectedOpensearchVersion the version the node has to run, {@code null} to accept any version
+     */
+    public boolean isNodeInCluster(String hostname, @Nullable String expectedOpensearchVersion) {
         try {
             return clusterAdmin.getClusterState().findByHostname(hostname)
-                    .filter(n -> Objects.equals(n.version(), expectedOpensearchVersion))
+                    .filter(n -> expectedOpensearchVersion == null || Objects.equals(n.version(), expectedOpensearchVersion))
                     .isPresent();
         } catch (Exception e) {
             LOG.debug("Failed to check node presence for {}", hostname, e);
@@ -194,5 +224,8 @@ public class RollingRestartActions {
     interface DataNodeManagementClient {
         @POST("management/upgrade")
         Call<Void> upgrade();
+
+        @POST("management/restart")
+        Call<Void> restart();
     }
 }

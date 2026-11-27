@@ -238,6 +238,26 @@ class RollingRestartJobHandlerTest {
     }
 
     @Test
+    void start_restartOnly_needsNoAvailableVersion() {
+        mockNoActiveTrigger();
+        greenClusterWithThreeNodes();
+        // No newer OpenSearch version to upgrade to, which a plain restart doesn't need
+        final OpensearchVersionsOverview noUpgrade = mock(OpensearchVersionsOverview.class);
+        lenient().when(noUpgrade.highestAvailableVersion()).thenReturn(Optional.empty());
+        lenient().when(dataNodeMetadataService.getVersionsOverview()).thenReturn(noUpgrade);
+        when(jobDefinitionService.get(RollingRestartExecutionJob.DEFINITION_INSTANCE.id()))
+                .thenReturn(Optional.of(RollingRestartExecutionJob.DEFINITION_INSTANCE));
+        when(jobTriggerService.create(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        final var created = handler.start("alice", false, true);
+
+        final var data = (RollingRestartExecutionJob.Data) created.data().orElseThrow();
+        assertThat(data.restartOnly()).isTrue();
+        assertThat(data.targetOpensearchVersion()).isNull();
+        assertThat(data.nodes()).hasSize(3);
+    }
+
+    @Test
     void start_releasesLock_onPreconditionFailure() {
         when(jobTriggerService.streamByQuery(any(Bson.class))).thenReturn(Stream.empty());
         when(actions.liveDataNodes()).thenReturn(List.of()); // no nodes → precondition failure

@@ -39,6 +39,10 @@ jest.mock('@graylog/server-api', () => ({
 }));
 
 jest.mock('hooks/useCurrentUser');
+jest.mock('components/datanode/configuration/useManagedConfiguration', () => jest.fn(() => ({ data: undefined })));
+jest.mock('components/datanode/configuration/useDataNodeRestartProgress', () =>
+  jest.fn(() => ({ isRestarting: false, progress: undefined })),
+);
 
 jest.mock('components/common/PaginatedEntityTable', () => ({
   __esModule: true,
