@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import static java.util.Collections.singletonMap;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -77,7 +78,9 @@ public class MongoDbConfigurationTest {
         );
         new JadConfig(new InMemoryRepository(properties), configuration).process();
 
-        assertEquals("mongodb://example.com:1234,127.0.0.1:5678/TEST", configuration.getMongoClientURI().toString());
+        final var uri = configuration.getMongoClientURI();
+        assertThat(uri.getHosts()).containsExactlyInAnyOrder("example.com:1234", "127.0.0.1:5678");
+        assertThat(uri.getDatabase()).isEqualTo("TEST");
     }
 
     @Test
@@ -88,6 +91,9 @@ public class MongoDbConfigurationTest {
         );
         new JadConfig(new InMemoryRepository(properties), configuration).process();
 
-        assertEquals("mongodb://[2001:DB8::DEAD:BEEF:CAFE:BABE]:1234,127.0.0.1:5678/TEST", configuration.getMongoClientURI().toString());
+        final var uri = configuration.getMongoClientURI();
+        assertThat(uri.getHosts())
+                .containsExactlyInAnyOrder("[2001:DB8::DEAD:BEEF:CAFE:BABE]:1234", "127.0.0.1:5678");
+        assertThat(uri.getDatabase()).isEqualTo("TEST");
     }
 }
