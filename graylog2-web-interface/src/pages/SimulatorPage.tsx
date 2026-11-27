@@ -14,18 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo } from 'react';
+import * as React from 'react';
 
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import ProcessorSimulator from 'components/simulator/ProcessorSimulator';
 import DocsHelper from 'util/DocsHelper';
-import useAllStreams from 'components/streams/hooks/useAllStreams';
 import PipelinesPageNavigation from 'components/pipelines/PipelinesPageNavigation';
+import useEditableStreams from 'hooks/useEditableStreams';
 
 const SimulatorPage = () => {
-  const { data: allStreams } = useAllStreams();
-  const streams = useMemo(() => (allStreams ? allStreams.filter((s) => s.is_editable) : undefined), [allStreams]);
+  const streams = useEditableStreams();
 
   const content = !streams ? <Spinner /> : <ProcessorSimulator streams={streams} />;
 
