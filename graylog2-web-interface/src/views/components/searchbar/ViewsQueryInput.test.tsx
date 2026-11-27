@@ -18,7 +18,7 @@ import * as React from 'react';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import QueryValidationActions from 'views/actions/QueryValidationActions';
+import QueryValidationErrors from 'views/components/searchbar/queryvalidation/QueryValidationErrors';
 import { validationError } from 'fixtures/queryValidationState';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
@@ -28,8 +28,8 @@ import ViewsQueryInput from './ViewsQueryInput';
 jest.mock('views/logic/fieldtypes/useFieldTypes');
 jest.mock('hooks/useHotkey', () => jest.fn());
 
-jest.mock('views/actions/QueryValidationActions', () => ({
-  displayValidationErrors: jest.fn(),
+jest.mock('views/components/searchbar/queryvalidation/QueryValidationErrors', () => ({
+  display: jest.fn(),
 }));
 
 class Completer {
@@ -120,7 +120,7 @@ describe('QueryInput', () => {
       expect(onExecute).not.toHaveBeenCalledTimes(1);
     });
 
-    it('triggers QueryValidationActions.displayValidationErrors when there in an error', async () => {
+    it('triggers QueryValidationErrors.display when there in an error', async () => {
       const onExecute = jest.fn();
       render(<SimpleQueryInput value="source:" onExecute={onExecute} error={validationError} />);
 
@@ -128,12 +128,12 @@ describe('QueryInput', () => {
       queryInput.focus();
       await userEvent.type(queryInput, '{enter}');
 
-      expect(QueryValidationActions.displayValidationErrors).toHaveBeenCalledTimes(1);
+      expect(QueryValidationErrors.display).toHaveBeenCalledTimes(1);
 
       expect(onExecute).not.toHaveBeenCalled();
     });
 
-    it('triggers QueryValidationActions.displayValidationErrors when there is an error after a change', async () => {
+    it('triggers QueryValidationErrors.display when there is an error after a change', async () => {
       const onExecute = jest.fn();
       const { rerender } = render(<SimpleQueryInput value="source" onExecute={onExecute} />);
       rerender(<SimpleQueryInput value="source:" onExecute={onExecute} error={validationError} />);
@@ -142,7 +142,7 @@ describe('QueryInput', () => {
       queryInput.focus();
       await userEvent.type(queryInput, '{enter}');
 
-      expect(QueryValidationActions.displayValidationErrors).toHaveBeenCalledTimes(1);
+      expect(QueryValidationErrors.display).toHaveBeenCalledTimes(1);
 
       expect(onExecute).not.toHaveBeenCalled();
     });
