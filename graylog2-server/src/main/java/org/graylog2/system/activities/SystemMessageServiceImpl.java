@@ -21,16 +21,20 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.client.model.CreateCollectionOptions;
 import com.mongodb.client.model.Indexes;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.bson.types.ObjectId;
 import org.graylog2.database.DbEntity;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.database.PersistedServiceImpl;
+import org.joda.time.DateTime;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 @Singleton
 public class SystemMessageServiceImpl extends PersistedServiceImpl implements SystemMessageService {
@@ -66,6 +70,27 @@ public class SystemMessageServiceImpl extends PersistedServiceImpl implements Sy
         }
 
         return messages;
+    }
+
+    @Override
+    public PaginatedList<SystemMessage> find(String query, @Nullable DateTime since, int page) {
+        if (page < 1) {
+            throw new IllegalArgumentException("page must be at least 1");
+        }
+        final BasicDBObject filter = new BasicDBObject();
+        final String text = query == null ? "" : query.strip();
+        if (!text.isEmpty()) {
+            final Pattern pattern = Pattern.compile(Pattern.quote(text), Pattern.CASE_INSENSITIVE);
+            filter.put("$or", List.of(new BasicDBObject("content", pattern), new BasicDBObject("caller", pattern)));
+        }
+        if (since != null) {
+            filter.put("timestamp", new BasicDBObject("$gte", since.toDate()));
+        }
+        final List<SystemMessage> messages = query(SystemMessageImpl.class, filter, new BasicDBObject("timestamp", -1),
+                PER_PAGE, PER_PAGE * (page - 1)).stream()
+                .map(o -> (SystemMessage) new SystemMessageImpl(new ObjectId(o.get("_id").toString()), o.toMap()))
+                .toList();
+        return new PaginatedList<>(messages, Math.toIntExact(count(SystemMessageImpl.class, filter)), page, PER_PAGE);
     }
 
     @Override
